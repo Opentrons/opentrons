@@ -6,44 +6,22 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-## Opentrons App Changes in 3.21.2
+## Opentrons App Changes in 4.0.0
 
-### Fixes
+Opentrons App 4.0.0 is a major software release, bringing an entirely overhauled robot calibration process for the OT-2; a full switch to Opentrons Protocol API Version 2; and many look and feel improvements.
 
-- Fixed an issue that prevented fresh installations of the app from downloading robot updates from our release server
+**After you install this update, you must calibrate your OT-2's pipette offsets and tip lengths before running a protocol**. This will take approximately fifteen minutes, but you will not be able to run a protocol until your OT-2 is calibrated.
 
-&nbsp;
+## OT-2 Calibration Changes
 
----
+In Opentrons App and Robot Software 4.0.0, the calibration process for the OT-2 is different and improved from major version 3. With these changes, you'll calibrate less often; the calibration processes are shorter, easier, and more reliable; and you can finally use different kinds of tips on the same pipette in the same protocol accurately.
 
-## Opentrons App Changes in 3.21.1
+For more in-depth information on the changes, [click here](https://support.opentrons.com/en/articles/3499692-how-calibration-works-on-the-ot-2).
 
-### Features
+## Full Use of Python Protocol API Version 2
 
-- You can now disable app update pop-up notifications in More > App > App Software Settings
+We released Python Protocol API Version 2 almost a year ago, and have been continuously improving it since, with 8 new intermediate API levels, each containing bugfixes, improvements, or support for new hardware. It's ready to be the only way Python protocols are written for the OT-2. Accordingly, in 4.0.0 and subsequent releases, **the OT-2 will not accept Python Protocol API Version 1 protocols**.
 
-&nbsp;
+## Look and Feel Changes
 
----
-
-## Opentrons App Changes in 3.21.0
-
-### Fixes
-
-- Properly enable / disable the "Update robot software from file" button
-  - This button was sometimes enabled and disabled at improper times
-  - That logic has been fixed and a tooltip has been added whenever it is disabled
-- Better support for updating your OT-2's software while offline
-  - The Opentrons App will now save the latest robot software update in a cache
-  - After the app has downloaded the robot update, you will be able to tell the app to update an OT-2 even if your computer doesn't have internet at the time
-- Remove an errant "Exit" button on the last page of the Deck Calibration Check wizard
-- Ensure modules render correctly in the deck map when loaded in slot 3, 6, or 9
-- Ensure "Last Updated" times for custom labware are correct
-
-### Features
-
-- Automatically sync the OT-2's clock with the App on connect
-  - When the App connects to an OT-2 running v3.21.0, it will sync the OT-2's clock with your computer's clock
-  - This should fix issues with incorrectly displayed protocol run times
-- Open Jupyter Notebook directly from to the Robot's page in the app
-  - The Opentrons App now has a button in a given robot's "Advanced Settings" section to open that OT-2's Jupyter Notebook in your computer's browser
+In 4.0.0, the Opentrons App has some major changes to the Robots tab and the Pipettes & Modules page. These changes present information about the new calibration data more concisely in a better-organized way. We hope you like it!

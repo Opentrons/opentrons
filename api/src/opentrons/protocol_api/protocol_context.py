@@ -4,15 +4,17 @@ import logging
 from typing import (Dict, Iterator, List,
                     Optional, Set, Tuple, Union, TYPE_CHECKING, cast)
 
-from opentrons import types, commands as cmds
+from opentrons import types
 from opentrons.hardware_control import API
-from opentrons.commands import CommandPublisher
+from opentrons.commands import protocol_commands as cmds, types as cmd_types
+from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.types import Protocol
+from .labware import Labware
 from opentrons.protocols.implementations.interfaces.labware import \
     LabwareInterface
 from opentrons.protocols.implementations.interfaces.protocol_context import \
     ProtocolContextInterface
-from opentrons.protocols.types import APIVersion, Protocol
-from .labware import Labware
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry, ModuleType)
 from opentrons.protocols.geometry.deck import Deck
@@ -189,7 +191,7 @@ class ProtocolContext(CommandPublisher):
                 self._commands.append(text.format(**payload))
 
         self._unsubscribe_commands = self.broker.subscribe(
-            cmds.types.COMMAND, on_command)
+            cmd_types.COMMAND, on_command)
 
     @contextlib.contextmanager
     def temp_connect(self, hardware: API):
@@ -531,7 +533,7 @@ class ProtocolContext(CommandPublisher):
                 in self._instruments.items()
                 if instr}
 
-    @cmds.publish.both(command=cmds.pause)
+    @publish.both(command=cmds.pause)
     @requires_version(2, 0)
     def pause(self, msg=None):
         """ Pause execution of the protocol until resume is called.
@@ -544,13 +546,13 @@ class ProtocolContext(CommandPublisher):
         """
         self._implementation.pause()
 
-    @cmds.publish.both(command=cmds.resume)
+    @publish.both(command=cmds.resume)
     @requires_version(2, 0)
     def resume(self):
         """ Resume a previously-paused protocol """
         self._implementation.resume()
 
-    @cmds.publish.both(command=cmds.comment)
+    @publish.both(command=cmds.comment)
     @requires_version(2, 0)
     def comment(self, msg):
         """
@@ -563,7 +565,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._implementation.comment(msg=msg)
 
-    @cmds.publish.both(command=cmds.delay)
+    @publish.both(command=cmds.delay)
     @requires_version(2, 0)
     def delay(self, seconds=0, minutes=0, msg=None):
         """ Delay protocol execution for a specific amount of time.

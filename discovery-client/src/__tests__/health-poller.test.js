@@ -15,7 +15,10 @@ const fetch: JestMockFn<
   $Call<typeof nodeFetch, any, any>
 > = nodeFetch
 
-const EXPECTED_FETCH_OPTS = { timeout: 10000 }
+const EXPECTED_FETCH_OPTS = {
+  timeout: 10000,
+  headers: { 'Opentrons-Version': '2' },
+}
 
 const stubFetchOnce = (
   stubUrl: string,

@@ -22,7 +22,7 @@ describe('SaveXYPoint', () => {
     wrapper.find('button[title="save"]')
 
   const getJogButton = (wrapper, direction) =>
-    wrapper.find(`JogButton[name="${direction}"]`).find('button')
+    wrapper.find(`button[title="${direction}"]`).find('button')
 
   const getVideo = wrapper => wrapper.find(`source`)
 
@@ -144,6 +144,11 @@ describe('SaveXYPoint', () => {
     })
   })
 
+  it('renders need help link', () => {
+    const wrapper = render()
+    expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
+  })
+
   it('deck cal session sends save offset and move to point two commands when current step is savingPointOne', () => {
     const wrapper = render({
       sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
@@ -220,5 +225,17 @@ describe('SaveXYPoint', () => {
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: Sessions.sharedCalCommands.SAVE_OFFSET,
     })
+  })
+
+  it('renders the confirm crash link', () => {
+    const wrapper = render()
+    expect(wrapper.find('a[children="Start over"]').exists()).toBe(true)
+  })
+
+  it('renders the confirm crash modal when invoked', () => {
+    const wrapper = render()
+    wrapper.find('a[children="Start over"]').invoke('onClick')()
+    wrapper.update()
+    expect(wrapper.find('ConfirmCrashRecoveryModal').exists()).toBe(true)
   })
 })

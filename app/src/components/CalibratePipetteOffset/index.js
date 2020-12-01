@@ -97,7 +97,14 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 export function CalibratePipetteOffset(
   props: CalibratePipetteOffsetParentProps
 ): React.Node {
-  const { session, robotName, dispatchRequests, showSpinner } = props
+  const {
+    session,
+    robotName,
+    dispatchRequests,
+    showSpinner,
+    isJogging,
+    intent,
+  } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
   const {
@@ -120,7 +127,7 @@ export function CalibratePipetteOffset(
   }, [instrument])
 
   function sendCommands(...commands: Array<SessionCommandParams>) {
-    if (session?.id) {
+    if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
           command: c.command,
@@ -155,7 +162,7 @@ export function CalibratePipetteOffset(
   }
 
   if (showSpinner) {
-    return <SpinnerModalPage titleBar={titleBarProps} />
+    return <SpinnerModalPage key={instrument?.mount} titleBar={titleBarProps} />
   }
 
   const Panel = PANEL_BY_STEP[currentStep]
@@ -164,6 +171,7 @@ export function CalibratePipetteOffset(
       <ModalPage
         titleBar={titleBarProps}
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
+        key={instrument?.mount}
       >
         <Panel
           sendCommands={sendCommands}
@@ -175,6 +183,7 @@ export function CalibratePipetteOffset(
           currentStep={currentStep}
           sessionType={session.sessionType}
           shouldPerformTipLength={shouldPerformTipLength}
+          intent={intent}
         />
       </ModalPage>
       {showConfirmExit && (

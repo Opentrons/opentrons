@@ -10,22 +10,5 @@ stages:
       method: GET
     response:
       status_code: 200
-      json:
-        name: opentrons-dev
-        # starts with semantic version
-        api_version: !re_match "\\d+\\.\\d+\\.\\d+"
-        fw_version: Virtual Smoothie
-        board_revision: !re_match "\\d+\\.\\d+"
-        logs:
-        - /logs/serial.log
-        - /logs/api.log
-        system_version: 0.0.0
-        protocol_api_version:
-          - 2
-          - 8
-        links:
-          apiLog: /logs/api.log
-          serialLog: /logs/serial.log
-          # Specific link can change.
-          apiSpec: !re_match "/openapi.*"
-          systemTime: /system/time
+      verify_response_with:
+        function: 'tests.integration.fixtures:check_health_response'

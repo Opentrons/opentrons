@@ -11,7 +11,7 @@ import { Upload } from '../../../pages/Upload'
 import { Calibrate } from '../../../pages/Calibrate'
 import { Run } from '../../../pages/Run'
 import { Navbar } from '../../Navbar'
-import { PortalRoot } from '../../portal'
+import { TopPortalRoot, PortalRoot } from '../../portal'
 import { Alerts } from '../../Alerts'
 
 jest.mock('../../../pages/SidePanel', () => ({ SidePanel: () => <></> }))
@@ -75,6 +75,11 @@ describe('top level App component', () => {
   it('should render a PortalRoot for modals', () => {
     const wrapper = render()
     expect(wrapper.exists(PortalRoot)).toBe(true)
+  })
+
+  it('should render a TopPortalRoot for top level modals', () => {
+    const wrapper = render()
+    expect(wrapper.exists(TopPortalRoot)).toBe(true)
   })
 
   it('should redirect to /robots from /', () => {

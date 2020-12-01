@@ -5,7 +5,7 @@ from opentrons.protocols.implementations.protocol_context import \
     ProtocolContextImplementation
 from opentrons.types import Mount, TransferTipPolicy
 from opentrons.protocols.advanced_control import transfers as tx
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture

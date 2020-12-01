@@ -1,10 +1,11 @@
 """Protocol engine state management."""
 from __future__ import annotations
-from typing import List
+from typing import List, Sequence
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 
-from .. import command_models as cmd
+from .. import commands as cmd
+from ..resources import DeckFixedLabware
 from .substore import CommandReactive
 from .commands import CommandStore, CommandState
 from .labware import LabwareStore, LabwareState
@@ -83,10 +84,16 @@ class StateStore(StateView):
     be allowed to modify State classes.
     """
 
-    def __init__(self, deck_definition: DeckDefinitionV2) -> None:
+    def __init__(
+        self,
+        deck_definition: DeckDefinitionV2,
+        deck_fixed_labware: Sequence[DeckFixedLabware],
+    ) -> None:
         """Initialize a StateStore."""
         command_store = CommandStore()
-        labware_store = LabwareStore()
+        labware_store = LabwareStore(
+            deck_fixed_labware=deck_fixed_labware
+        )
         pipette_store = PipetteStore()
         geometry_store = GeometryStore(
             deck_definition=deck_definition,

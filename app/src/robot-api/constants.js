@@ -1,5 +1,7 @@
 // @flow
 
+export const HTTP_API_VERSION: 2 = 2
+
 export const GET: 'GET' = 'GET'
 export const POST: 'POST' = 'POST'
 export const PUT: 'PUT' = 'PUT'

@@ -44,6 +44,9 @@ export const TEXT_TRANSFORM_CAPITALIZE = 'capitalize'
 export const TEXT_TRANSFORM_UPPERCASE = 'uppercase'
 export const TEXT_TRANSFORM_LOWERCASE = 'lowercase'
 
+// text decoration
+export const TEXT_DECORATION_UNDERLINE = 'underline'
+
 // font property sets
 export const FONT_HEADER_DARK: CSSRules = css`
   font-size: ${FONT_SIZE_HEADER};

@@ -6,50 +6,36 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-## OT-2 Software Changes in 3.21.2
+# OT-2 Software Changes in 4.0.0
 
-### Fixes
+Opentrons Robot Software 4.0.0 is a major software release, bringing an entirely overhauled robot calibration process for the OT-2; a full switch to Opentrons Protocol API Version 2; and improvements to the OT-2's HTTP API.
 
-- Fixed an issue that could cause the API server to fail to boot if certain testing files were present
+**After you install this update, you must calibrate your OT-2's pipette offsets and tip lengths before running a protocol.** This will take approximately fifteen minutes, but you will not be able to run a protocol until your OT-2 is calibrated.
 
-&nbsp;
+In addition, **after you install this update, Opentrons Apps on version 3.21.2 or earlier will not be able to interact with this OT-2 beyond downgrading its software**. This is due to the HTTP API changes described below. Opentrons App Version 4.0.0 is designed to work with the changes, but 3.21.2 and previous cannot interact with an OT-2 on Robot Software 4.0.0 other than downgrading its software.
 
----
+## OT-2 Calibration Changes
 
-## OT-2 Software Changes in 3.21.1
+In Opentrons App and Robot Software 4.0.0, the calibration process for the OT-2 is different and improved from major version 3. With these changes, you'll calibrate less often; the calibration processes are shorter, easier, and more reliable; and you can finally use different kinds of tips on the same pipette in the same protocol accurately.
 
-No changes - version bump only for synchronization with Opentrons App.
+For more in-depth information on the changes, [click here](https://support.opentrons.com/en/articles/3499692-how-calibration-works-on-the-ot-2).
 
----
+## Full Use of Python Protocol API Version 2
 
-## OT-2 Software Changes in 3.21.0
+We released Python Protocol API Version 2 almost a year ago, and have been continuously improving it since, with 8 new intermediate API levels, each containing bugfixes, improvements, or support for new hardware. It's ready to be the only way Python protocols are written for the OT-2. Accordingly, in 4.0.0 and subsequent releases, **the OT-2 will not accept Python Protocol API Version 1 protocols**.
 
-### Fixes
+## HTTP API Changes
 
-- Prevent HardLimitErrors when jogging during labware calibration
-  - The robot will now refuse to execute jog commands if it thinks doing so will cause it to hit an axis limit
-- Do not overwrite custom flow rates when new pipettes are loaded
-  - Previously, in Python protocols, loading a second pipette would cause any custom settings of the first pipette to be overwritten
-- Better handling of set temperature commands for thermocyclers
-  - A race condition in the driver code could cause consecutive set temperature commands to a thermocycler to fail
-- Prevent extra pipette movement after homing
-- Add missing documentation for "unloading" labware from a slot in Python protocols
-  - Thanks to Theo Sanderson for their contributions in [PR 6260][]!
+Robot Software 4.0.0 is a big step forward in a well-defined, stable, HTTP API for the OT-2. This API is what the Opentrons App uses to communicate with the OT-2, and documentation for it is available on the OT-2's IP address, port 31950 at `/docs`. In Robot Software 4.0.0, interaction with this API now requires use of the `Opentrons-Version` header, set to either `*` (to accept any version) or `2`.
 
-[pr 6260]: https://github.com/Opentrons/opentrons/pull/6260
+We consider the HTTP API a core part of the OT-2's API, and changes to it will be documented in release notes just like Python Protocol API changes.
 
-### Features
+## Other Changes
 
-- Check if an instrument has a tip through the Python Protocol API
-  - Using `apiLevel: '2.7'` in your Python protocol will allow you to access the new `has_tip` property of a given pipette
-- Allow the Opentrons App to get and set the OT-2's clock
-  - If your OT-2 is not connected to the internet, it can have trouble getting the correct time for its internal clock
-  - The Opentrons App can now set your OT-2's time, which should prevent miscommunication between your app and OT-2
-- New packages and libraries for the OT-2's embedded Linux environment
-  - `curl`, `wget`, and `git` to retrieve content for complex workflows
-  - `grep` and `sl` because no command-line environment is complete without them
-  - `screen` and `tmux` for all your persistent session and terminal multiplexing needs
-  - Python bindings for `curses` so you can write your own curses
-  - Thanks to Theo Sanderson for their contributions in [PR 102][]!
-
-[pr 102]: https://github.com/Opentrons/buildroot/pull/102
+- New Python Protocol API version: 2.8
+  - You can now specify blow out locations in `transfer`, `consolidate`, and `distribute` to be the source well, destination well, or trash
+  - `Well` now has the method `from_center_cartesian`, which allows you to calculate positions relative to the well center in X, Y, and Z
+  - For more information, see [the Python Protocol API documentation](https://docs.opentrons.com/v2/versioning.html#version-2-8)
+- Protocol Designer protocols will now always be executed with API Version 2.8 behaviors
+  - Future changes to the behavior executed in Protocol Designer protocols will be communicated here
+- `transfer`, `consolidate`, and `distribute` will now do nothing if passed a 0 transfer volume.

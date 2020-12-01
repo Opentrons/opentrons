@@ -11,40 +11,13 @@ from opentrons.hardware_control import ThreadedAsyncForbidden
 
 from tests.opentrons.conftest import state
 from functools import partial
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
+from opentrons.protocol_api.labware import load
+from opentrons.types import Location, Point
 
 state = partial(state, 'session')
-
-
-@pytest.fixture
-def run_session(request, session_manager):
-    return session_manager.create('dino', 'from opentrons import robot')
-
-
-async def test_load_from_text(session_manager, protocol):
-    session = session_manager.create(name='<blank>', contents=protocol.text)
-    assert session.name == '<blank>'
-
-    acc = []
-
-    def traverse(commands):
-        for command in commands:
-            acc.append(command)
-            traverse(command['children'])
-    traverse(session.commands)
-    # Less commands now that trash is built in
-    assert len(acc) == 75
-
-
-async def test_clear_tips(session_manager, tip_clear_protocol):
-    session = session_manager.create(
-        name='<blank>', contents=tip_clear_protocol.text)
-
-    assert len(session._instruments) == 1
-    for instrument in session._instruments:
-        assert not instrument.tip_attached
 
 
 async def test_async_notifications(main_router):
@@ -62,8 +35,7 @@ async def test_async_notifications(main_router):
         '''
 metadata={"apiLevel": "2.0"}
 blah
-def run(ctx): pass''',
-        'metadata={"apiLevel": "1.0"}; blah',
+def run(ctx): pass'''
     ])
 def test_load_protocol_with_error(session_manager, hardware,
                                   proto_with_error):
@@ -78,7 +50,7 @@ def test_load_protocol_with_error(session_manager, hardware,
 
 @pytest.mark.parametrize(
     'protocol_file',
-    ['testosaur_v2.py', 'testosaur.py', 'multi-single.py'])
+    ['testosaur_v2.py'])
 async def test_load_and_run_v2(
         main_router,
         protocol,
@@ -121,54 +93,6 @@ async def test_load_and_run_v2(
     assert session.protocol_text == protocol.text
 
 
-def test_init(run_session):
-    assert run_session.state == 'loaded'
-    assert run_session.name == 'dino'
-
-
-def test_set_state(run_session):
-    states = 'loaded', 'running', 'finished', 'stopped', 'paused'
-    for state in states:
-        run_session.set_state(state)
-        assert run_session.state == state
-
-    with pytest.raises(ValueError):
-        run_session.set_state('impossible-state')
-
-
-def test_set_state_info(run_session, monkeypatch):
-    assert run_session.stateInfo == {}
-    run_session.set_state('paused',
-                          reason='test1',
-                          user_message='cool message',
-                          duration=10)
-    assert run_session.stateInfo == {'message': 'test1',
-                                     'userMessage': 'cool message',
-                                     'estimatedDuration': 10}
-    run_session.startTime = 300
-    monkeypatch.setattr(session, 'now', lambda: 350)
-    run_session.set_state('running')
-    assert run_session.stateInfo == {'changedAt': 50}
-
-
-def test_error_append(run_session):
-    foo = Exception('Foo')
-    bar = Exception('Bar')
-    run_session.error_append(foo)
-    run_session.error_append(bar)
-
-    errors = [
-        value
-        for value in run_session.errors
-        if isinstance(value.pop('timestamp'), int)
-    ]
-
-    assert errors == [
-        {'error': foo},
-        {'error': bar}
-    ]
-
-
 def test_accumulate():
     res = \
         _accumulate([
@@ -181,83 +105,27 @@ def test_accumulate():
 
 
 def test_dedupe():
-    assert ''.join(_dedupe('aaaaabbbbcbbbbcccaa')) == 'abc'
+    first = load('opentrons_96_tiprack_300ul',
+                 Location(point=Point(0, 0, 0), labware='1'))
+    second = load('opentrons_96_tiprack_300ul',
+                  Location(point=Point(1, 2, 3), labware='2'))
+    third = load('opentrons_96_tiprack_20ul',
+                 Location(point=Point(4, 5, 6), labware='3'))
+
+    iterable = (
+        [first]*10
+        + [second]*10
+        # This is the key part of this test. Well.parent now builds a new
+        # Labware item that therefore breaks identity checking.
+        + [third['A1'].parent for elem in range(10)])
+    assert sorted(_dedupe(iterable), key=lambda lw: lw.name)\
+        == sorted([first, second, third], key=lambda lw: lw.name)
 
 
-async def test_session_model_functional(session_manager, protocol):
-    session = session_manager.create(name='<blank>', contents=protocol.text)
-    assert [container.name for container in session.containers] == \
-           ['tiprack', 'trough', 'plate', 'opentrons_1_trash_1100ml_fixed']
-    names = [instrument.name for instrument in session.instruments]
-    assert names == ['p300_single_v1']
-
-
-@pytest.mark.parametrize('protocol_file', ['testosaur-gen2.py',
-                                           'testosaur-gen2-v2.py'])
+@pytest.mark.parametrize('protocol_file', ['testosaur-gen2-v2.py'])
 async def test_requested_as(session_manager, protocol, protocol_file):
     session = session_manager.create(name='<blank>', contents=protocol.text)
     assert session.get_instruments()[0].requested_as == 'p300_single_gen2'
-
-
-# TODO(artyom 20171018): design a small protocol specifically for the test
-@pytest.mark.parametrize('protocol_file', ['bradford_assay.py'])
-async def test_drop_tip_with_trash(session_manager, protocol, protocol_file):
-    """
-    Bradford Assay is using drop_tip() with no arguments that assumes
-    tip drop into trash-box. In this test we are confirming that
-    that trash location is being inferred from a command, and trash
-    is listed as a container for a protocol, as well as a container
-    instruments are interacting with.
-    """
-    session = session_manager.create(name='<blank>', contents=protocol.text)
-
-    assert 'opentrons_1_trash_1100ml_fixed' in [
-        c.name for c in session.get_containers()]
-    containers = sum([i.containers for i in session.get_instruments()], [])
-    assert 'opentrons_1_trash_1100ml_fixed' in [c.name for c in containers]
-
-
-async def test_session_create_error(main_router):
-    with pytest.raises(SyntaxError):
-        main_router.session_manager.create(
-            name='<blank>',
-            contents='from opentrons import instruments; syntax error ;(')
-
-    with pytest.raises(TimeoutError):
-        # No state change is expected
-        await main_router.wait_until(lambda _: True)
-
-    with pytest.raises(ZeroDivisionError):
-        main_router.session_manager.create(
-            name='<blank>',
-            contents='from opentrons import instruments; 1/0')
-
-    with pytest.raises(TimeoutError):
-        # No state change is expected
-        await main_router.wait_until(lambda _: True)
-
-
-async def test_session_metadata_v1(main_router):
-    expected = {
-        'hello': 'world',
-        'what?': 'no'
-    }
-
-    prot = """
-from opentrons import instruments
-this = 0
-that = 1
-metadata = {
-'what?': 'no',
-'hello': 'world'
-}
-print('wat?')
-"""
-
-    session = main_router.session_manager.create(
-        name='<blank>',
-        contents=prot)
-    assert session.metadata == expected
 
 
 async def test_session_metadata_v2(main_router):
@@ -380,49 +248,12 @@ def run(ctx):
     assert 'temperatureModuleV1' in [mod.model for mod in session.modules]
     assert 'tempdeck' in [mod.name for mod in session.modules]
 
-    v1proto = '''
-from opentrons import instruments, modules, labware
-
-racks = [labware.load('opentrons_96_tiprack_300ul', slot)
-         for slot in (1, 2)]
-magdeck = modules.load('magdeck', '4')
-tempdeck = modules.load('tempdeck', '5')
-plate = labware.load('corning_96_wellplate_360ul_flat', '5', share=True)
-left = instruments.P300_Single('left', tip_racks=[racks[0]])
-right = instruments.P10_Multi('right', tip_racks=[racks[1]])
-
-tempdeck.set_temperature(60)
-left.pick_up_tip()
-left.aspirate(plate.wells(0))
-left.dispense(plate.wells(1))
-left.drop_tip()
-'''
-
     # json protocols don't support modules so we only have to check pipettes
     jsonp = get_json_protocol_fixture('3', 'unusedPipette', decode=False)
     session2 = main_router.session_manager.create('dummy-pipette-json',
                                                   jsonp)
     assert 'p50_single_v1' in [pip.name for pip in session2.instruments]
     assert 'p10_single_v1' in [pip.name for pip in session2.instruments]
-
-    # do not change behavior for v1: instruments must have interactions
-    # to appear
-    session3 = main_router.session_manager.create('dummy-pipette_v1',
-                                                  v1proto)
-    assert ['p300_single_v1'] == [pip.name for pip in session3.instruments]
-    assert ['temperatureModuleV1'] == [mod.model for mod in session3.modules]
-    assert ['tempdeck'] == [mod.name for mod in session3.modules]
-
-
-async def test_session_robot_connect_not_allowed(main_router,
-                                                 virtual_smoothie_env):
-    proto = """
-from opentrons import robot
-robot.connect()
-"""
-
-    with pytest.raises(RuntimeError, match='.*robot.connect.*'):
-        main_router.session_manager.create('calls-connect', proto)
 
 
 async def test_session_run_concurrently(

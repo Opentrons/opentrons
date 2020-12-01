@@ -68,21 +68,16 @@ export type ResourceLink = {|
 export type ResourceLinks = $Shape<{| [string]: ResourceLink | string | void |}>
 
 // generic response data supertype
-export type RobotApiV2ResponseData = {|
+export type RobotApiV2ResponseData = {
   id: string,
-  // the "+" means that these properties are covariant, so
-  // "extending" types may specify more strict subtypes
-  +type: string,
-  +attributes: { ... },
-|}
+  ...
+}
 
 export type RobotApiV2ResponseBody<
-  DataT: RobotApiV2ResponseData | $ReadOnlyArray<RobotApiV2ResponseData>,
-  MetaT = void
+  DataT: RobotApiV2ResponseData | $ReadOnlyArray<RobotApiV2ResponseData>
 > = {|
   data: DataT,
   links?: ResourceLinks,
-  meta?: MetaT,
 |}
 
 export type RobotApiV2Error = {|

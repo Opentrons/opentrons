@@ -28,6 +28,7 @@ import {
   SaveXYPoint,
   CompleteConfirmation,
   ConfirmExitModal,
+  INTENT_DECK_CALIBRATION,
 } from '../CalibrationPanels'
 
 import type { StyleProps } from '@opentrons/components'
@@ -92,13 +93,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
   [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
 }
 export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
-  const {
-    session,
-    robotName,
-    closeWizard,
-    dispatchRequests,
-    showSpinner,
-  } = props
+  const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
   const {
@@ -115,7 +110,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
   }, [instrument])
 
   function sendCommands(...commands: Array<SessionCommandParams>) {
-    if (session?.id) {
+    if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
           command: c.command,
@@ -136,7 +131,6 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
         Sessions.deleteSession(robotName, session.id)
       )
     }
-    closeWizard()
   }
 
   const tipRack: CalibrationLabware | null =
@@ -170,6 +164,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
           mount={instrument?.mount.toLowerCase()}
           currentStep={currentStep}
           sessionType={session.sessionType}
+          intent={INTENT_DECK_CALIBRATION}
         />
       </ModalPage>
       {showConfirmExit && (

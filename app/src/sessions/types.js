@@ -16,10 +16,11 @@ import typeof {
   FETCH_ALL_SESSIONS_SUCCESS,
   FETCH_ALL_SESSIONS_FAILURE,
   ENSURE_SESSION,
+  CLEAR_ALL_SESSIONS,
   CREATE_SESSION_COMMAND,
   CREATE_SESSION_COMMAND_SUCCESS,
   CREATE_SESSION_COMMAND_FAILURE,
-  SESSION_TYPE_CALIBRATION_CHECK,
+  SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
   SESSION_TYPE_TIP_LENGTH_CALIBRATION,
   SESSION_TYPE_DECK_CALIBRATION,
   SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
@@ -48,7 +49,7 @@ export type * from './pipette-offset-calibration/types'
 
 // The available session types
 export type SessionType =
-  | SESSION_TYPE_CALIBRATION_CHECK
+  | SESSION_TYPE_CALIBRATION_HEALTH_CHECK
   | SESSION_TYPE_TIP_LENGTH_CALIBRATION
   | SESSION_TYPE_DECK_CALIBRATION
   | SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
@@ -57,6 +58,7 @@ export type SessionParams =
   | {||}
   | TipLengthCalTypes.TipLengthCalibrationSessionParams
   | PipOffsetCalTypes.PipetteOffsetCalibrationSessionParams
+  | CalCheckTypes.CheckCalibrationSessionParams
 
 export type SessionCommandString =
   | $Values<typeof CalCheckConstants.checkCommands>
@@ -83,9 +85,9 @@ export type SessionCommandParams = {
 }
 
 export type CalibrationCheckSessionResponseAttributes = {|
-  sessionType: SESSION_TYPE_CALIBRATION_CHECK,
-  details: CalCheckTypes.RobotCalibrationCheckSessionDetails,
-  createParams: {},
+  sessionType: SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+  details: CalCheckTypes.CheckCalibrationSessionDetails,
+  createParams: CalCheckTypes.CheckCalibrationSessionParams,
 |}
 
 export type TipLengthCalibrationSessionResponseAttributes = {|
@@ -140,31 +142,22 @@ export type Session =
 export type SessionCommandAttributes = {|
   command: SessionCommandString,
   data: SessionCommandData,
+|}
+
+export type SessionResponseModel = Session
+
+export type SessionCommandResponseModel = {|
+  ...SessionCommandAttributes,
+  id: string,
   status?: string,
 |}
 
-export type SessionResponseModel = {|
-  id: string,
-  type: 'Session',
-  attributes: SessionResponseAttributes,
-|}
-
-export type SessionCommandResponseModel = {|
-  id: string,
-  type: 'SessionCommand',
-  attributes: SessionCommandAttributes,
-|}
-
-export type SessionResponse = RobotApiV2ResponseBody<SessionResponseModel, {||}>
+export type SessionResponse = RobotApiV2ResponseBody<SessionResponseModel>
 export type MultiSessionResponse = RobotApiV2ResponseBody<
-  $ReadOnlyArray<SessionResponseModel>,
-  {||}
+  $ReadOnlyArray<SessionResponseModel>
 >
 
-export type SessionCommandResponse = RobotApiV2ResponseBody<
-  SessionCommandResponseModel,
-  Session
->
+export type SessionCommandResponse = RobotApiV2ResponseBody<SessionCommandResponseModel>
 
 export type CreateSessionAction = {|
   type: CREATE_SESSION,
@@ -293,6 +286,11 @@ export type CreateSessionCommandFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+export type ClearAllSessionsAction = {|
+  type: CLEAR_ALL_SESSIONS,
+  payload: {| robotName: string |},
+|}
+
 export type SessionsAction =
   | CreateSessionAction
   | CreateSessionSuccessAction
@@ -310,6 +308,7 @@ export type SessionsAction =
   | CreateSessionCommandSuccessAction
   | CreateSessionCommandFailureAction
   | EnsureSessionAction
+  | ClearAllSessionsAction
 
 export type SessionsById = $Shape<{|
   [id: string]: Session,
@@ -326,66 +325,6 @@ export type SessionState = $Shape<
     [robotName: string]: void | PerRobotSessionState,
   |}>
 >
-
-export type AnalyticsModelsByMount = {|
-  leftPipetteModel?: string,
-  rightPipetteModel?: string,
-|}
-
-export type CalibrationCheckCommonEventData = {|
-  comparingFirstPipetteHeightExceedsThreshold?: boolean,
-  comparingFirstPipetteHeightErrorSource?: string,
-  comparingFirstPipettePointOneExceedsThreshold?: boolean,
-  comparingFirstPipettePointOneErrorSource?: string,
-  comparingFirstPipettePointTwoExceedsThreshold?: boolean,
-  comparingFirstPipettePointTwoErrorSource?: string,
-  comparingFirstPipettePointThreeExceedsThreshold?: boolean,
-  comparingFirstPipettePointThreeErrorSource?: string,
-  comparingSecondPipetteHeightExceedsThreshold?: boolean,
-  comparingSecondPipetteHeightErrorSource?: string,
-  comparingSecondPipettePointOneExceedsThreshold?: boolean,
-  comparingSecondPipettePointOneErrorSource?: string,
-|}
-
-export type CalibrationCheckIntercomData = {|
-  ...CalibrationCheckCommonEventData,
-  succeeded: boolean,
-|}
-
-export type CalibrationCheckAnalyticsData = {|
-  ...CalibrationCheckCommonEventData,
-  comparingFirstPipetteHeightDifferenceVector?: VectorTuple,
-  comparingFirstPipetteHeightThresholdVector?: VectorTuple,
-  comparingFirstPipettePointOneDifferenceVector?: VectorTuple,
-  comparingFirstPipettePointOneThresholdVector?: VectorTuple,
-  comparingFirstPipettePointTwoDifferenceVector?: VectorTuple,
-  comparingFirstPipettePointTwoThresholdVector?: VectorTuple,
-  comparingFirstPipettePointThreeDifferenceVector?: VectorTuple,
-  comparingFirstPipettePointThreeThresholdVector?: VectorTuple,
-  comparingSecondPipetteHeightDifferenceVector?: VectorTuple,
-  comparingSecondPipetteHeightThresholdVector?: VectorTuple,
-  comparingSecondPipettePointOneDifferenceVector?: VectorTuple,
-  comparingSecondPipettePointOneThresholdVector?: VectorTuple,
-|}
-
-export type SharedAnalyticsProps = {|
-  sessionType: SessionType,
-|}
-
-export type CalibrationCheckSessionAnalyticsProps = {|
-  ...SharedAnalyticsProps,
-  ...AnalyticsModelsByMount,
-  ...CalibrationCheckAnalyticsData,
-|}
-
-export type CalibrationCheckSessionIntercomProps = {|
-  ...SharedAnalyticsProps,
-  ...AnalyticsModelsByMount,
-  ...CalibrationCheckIntercomData,
-|}
-
-export type SessionAnalyticsProps = CalibrationCheckSessionAnalyticsProps
-export type SessionIntercomProps = CalibrationCheckSessionIntercomProps
 
 export type CalibrationLabware = {|
   slot: string,

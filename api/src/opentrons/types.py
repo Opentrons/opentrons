@@ -144,6 +144,13 @@ class Mount(enum.Enum):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def string_to_mount(cls, mount: str) -> 'Mount':
+        if mount == 'right':
+            return cls.RIGHT
+        else:
+            return cls.LEFT
+
 
 class MountType(str, enum.Enum):
     LEFT = "left"
@@ -173,6 +180,11 @@ class DeckSlotName(int, enum.Enum):
     SLOT_10 = 10
     SLOT_11 = 11
     FIXED_TRASH = 12
+
+    @classmethod
+    def from_string(cls, value: str) -> DeckSlotName:
+        int_val = int(value)
+        return cls(int_val)
 
     def __str__(self):
         """Stringify to a simple integer string."""

@@ -3,10 +3,166 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.21.2](https://github.com/Opentrons/opentrons/compare/v3.21.1...v3.21.2) (2020-10-16)
-
+# [4.0.0](https://github.com/Opentrons/opentrons/compare/v3.21.2...v4.0.0) (2020-11-20)
 
 ### Bug Fixes
+
+* **api:** Mark pipette and deck calibration as bad for slot one ([#7035](https://github.com/Opentrons/opentrons/issues/7035)) ([92f1cbf](https://github.com/Opentrons/opentrons/commit/92f1cbf))
+* **app:** cal check: fix deck setup typo ([#7037](https://github.com/Opentrons/opentrons/issues/7037)) ([0c0013e](https://github.com/Opentrons/opentrons/commit/0c0013e))
+* **api:** handle missing intermediate keys in poc index ([#7029](https://github.com/Opentrons/opentrons/issues/7029)) ([a123a5f](https://github.com/Opentrons/opentrons/commit/a123a5f))
+* **api:** tolerate delete of nonexistent pip offset ([#7027](https://github.com/Opentrons/opentrons/issues/7027)) ([6fac6ce](https://github.com/Opentrons/opentrons/commit/6fac6ce))
+* **app:** Filter pipette offset calibrations by mount as well ([#7017](https://github.com/Opentrons/opentrons/issues/7017)) ([8bf5a71](https://github.com/Opentrons/opentrons/commit/8bf5a71))
+* **app:** fix pipette info page flag for configuring or changing pipette ([#7018](https://github.com/Opentrons/opentrons/issues/7018)) ([74d9cb4](https://github.com/Opentrons/opentrons/commit/74d9cb4))
+* **robot-server:** deck cal: clear pipette offset cal when deck cal completes ([#7019](https://github.com/Opentrons/opentrons/issues/7019)) ([243c683](https://github.com/Opentrons/opentrons/commit/243c683))
+* **robot-server:** remove pip offset after tlc in fused flow ([#7020](https://github.com/Opentrons/opentrons/issues/7020)) ([858219e](https://github.com/Opentrons/opentrons/commit/858219e))
+* **app:** consistent date formatting for calibration last modified time ([#7003](https://github.com/Opentrons/opentrons/issues/7003)) ([3b3d75d](https://github.com/Opentrons/opentrons/commit/3b3d75d)), closes [#7002](https://github.com/Opentrons/opentrons/issues/7002)
+* **app:** fix post attach pipette calibration double wizard ([#7008](https://github.com/Opentrons/opentrons/issues/7008)) ([f4ec258](https://github.com/Opentrons/opentrons/commit/f4ec258))
+* **app:** fix required modules list on protocol info page ([#7012](https://github.com/Opentrons/opentrons/issues/7012)) ([47fdbb5](https://github.com/Opentrons/opentrons/commit/47fdbb5))
+* **robot-server:** load tip length data correctly in pipette offset cal ([#7009](https://github.com/Opentrons/opentrons/issues/7009)) ([8c8ef89](https://github.com/Opentrons/opentrons/commit/8c8ef89))
+* **app:** misc cal overhaul sizing, font weight, and spacing tweaks ([#6999](https://github.com/Opentrons/opentrons/issues/6999)) ([ac07045](https://github.com/Opentrons/opentrons/commit/ac07045))
+* **app:** pipette calibration info sections show be same height ([#6996](https://github.com/Opentrons/opentrons/issues/6996)) ([bb9cfc4](https://github.com/Opentrons/opentrons/commit/bb9cfc4))
+* **api:** session._dedupe needs to use equality checking ([#6988](https://github.com/Opentrons/opentrons/issues/6988)) ([26c666b](https://github.com/Opentrons/opentrons/commit/26c666b)), closes [#6692](https://github.com/Opentrons/opentrons/issues/6692)
+* **robot-server:** reset cal when starting pip offset cal ([#6991](https://github.com/Opentrons/opentrons/issues/6991)) ([d471900](https://github.com/Opentrons/opentrons/commit/d471900))
+* **shared-data:** fix P300 GEN2 tip overlap values ([#6987](https://github.com/Opentrons/opentrons/issues/6987)) ([bc38f36](https://github.com/Opentrons/opentrons/commit/bc38f36))
+* **app:** Accidental parens in react usememo deps ([#6968](https://github.com/Opentrons/opentrons/issues/6968)) ([df0a15e](https://github.com/Opentrons/opentrons/commit/df0a15e))
+* **app:** Correct text when saving z point for all sessions ([#6955](https://github.com/Opentrons/opentrons/issues/6955)) ([71d5ff9](https://github.com/Opentrons/opentrons/commit/71d5ff9))
+* **app:** Ensure we are using the correct logic for screen transitions in cal check ([#6960](https://github.com/Opentrons/opentrons/issues/6960)) ([2fbc872](https://github.com/Opentrons/opentrons/commit/2fbc872))
+* **app:** fix buildroot download modal title ([#6966](https://github.com/Opentrons/opentrons/issues/6966)) ([9ea7b45](https://github.com/Opentrons/opentrons/commit/9ea7b45)), closes [#5546](https://github.com/Opentrons/opentrons/issues/5546)
+* **app:** Fix calibration warning text ([#6977](https://github.com/Opentrons/opentrons/issues/6977)) ([32c90c5](https://github.com/Opentrons/opentrons/commit/32c90c5))
+* **app:** fix change pipette and add tests ([#6976](https://github.com/Opentrons/opentrons/issues/6976)) ([079b8c3](https://github.com/Opentrons/opentrons/commit/079b8c3))
+* **app:** full-width jog controls ([#6970](https://github.com/Opentrons/opentrons/issues/6970)) ([e41ab7a](https://github.com/Opentrons/opentrons/commit/e41ab7a))
+* **app:** prettyprint cal check results ([#6964](https://github.com/Opentrons/opentrons/issues/6964)) ([8ebb9f7](https://github.com/Opentrons/opentrons/commit/8ebb9f7))
+* **robot-server:** cal check: fix comparingHeight y-value ([#6981](https://github.com/Opentrons/opentrons/issues/6981)) ([dd393e9](https://github.com/Opentrons/opentrons/commit/dd393e9))
+* **robot-server:** Opt logs out of version requirements ([#6980](https://github.com/Opentrons/opentrons/issues/6980)) ([e73083d](https://github.com/Opentrons/opentrons/commit/e73083d))
+* **app:** Fix a typo in introduction ([#6946](https://github.com/Opentrons/opentrons/issues/6946)) ([8cba814](https://github.com/Opentrons/opentrons/commit/8cba814))
+* **app:** place top portal at higher z index than page level portal ([#6950](https://github.com/Opentrons/opentrons/issues/6950)) ([b08c4d3](https://github.com/Opentrons/opentrons/commit/b08c4d3))
+* **app:** debounce jogs in calcheck ([#6933](https://github.com/Opentrons/opentrons/issues/6933)) ([f355397](https://github.com/Opentrons/opentrons/commit/f355397))
+* **app:** Fix intro screen layout with p1k tiprack ([#6932](https://github.com/Opentrons/opentrons/issues/6932)) ([431eacc](https://github.com/Opentrons/opentrons/commit/431eacc))
+* **app:** Handle cal data without status ([#6936](https://github.com/Opentrons/opentrons/issues/6936)) ([1cfc0a5](https://github.com/Opentrons/opentrons/commit/1cfc0a5))
+* **app:** suppress title bar exit in calcheck results ([#6941](https://github.com/Opentrons/opentrons/issues/6941)) ([e52c8db](https://github.com/Opentrons/opentrons/commit/e52c8db))
+* **robot-server:** calcheck: fix invalidation, pickup, retract ([#6934](https://github.com/Opentrons/opentrons/issues/6934)) ([c351ea7](https://github.com/Opentrons/opentrons/commit/c351ea7))
+* **robot-server,api:** reset cal during dc process ([#6942](https://github.com/Opentrons/opentrons/issues/6942)) ([8d142d4](https://github.com/Opentrons/opentrons/commit/8d142d4))
+* **app:** change pipette exit button text ([#6930](https://github.com/Opentrons/opentrons/issues/6930))
+* **app:** Spinner for deck calibration button ([#6902](https://github.com/Opentrons/opentrons/issues/6902)) ([7df8b95](https://github.com/Opentrons/opentrons/commit/7df8b95))
+* **robot-server:** prefer smaller pipette in deck cal ([#6900](https://github.com/Opentrons/opentrons/issues/6900)) ([9f2830a](https://github.com/Opentrons/opentrons/commit/9f2830a))
+* **api:** recache position before plunger home ([#6881](https://github.com/Opentrons/opentrons/issues/6881)) ([603dfff](https://github.com/Opentrons/opentrons/commit/603dfff))
+* **app:** cal wizards show if session exists, always ask for cal block if not saved ([#6870](https://github.com/Opentrons/opentrons/issues/6870)) ([e19b850](https://github.com/Opentrons/opentrons/commit/e19b850))
+* **build:** Dont break make with weird deps in shared-data ([#6857](https://github.com/Opentrons/opentrons/issues/6857)) ([0681ae0](https://github.com/Opentrons/opentrons/commit/0681ae0))
+* **app:** Center start over in measure nozzle ([c875f3d](https://github.com/Opentrons/opentrons/commit/c875f3d))
+* **app:** put blocking user flows in new top level modal portal ([#6821](https://github.com/Opentrons/opentrons/issues/6821)) ([0e62ff4](https://github.com/Opentrons/opentrons/commit/0e62ff4))
+* **robot-server:** cache instruments before each calibration flow ([#6822](https://github.com/Opentrons/opentrons/issues/6822)) ([0d61b0e](https://github.com/Opentrons/opentrons/commit/0d61b0e))
+* **robot-server:** home plungers in cal flows ([#6823](https://github.com/Opentrons/opentrons/issues/6823)) ([c641d0f](https://github.com/Opentrons/opentrons/commit/c641d0f))
+* **api,robot-server:** reload robot calibration on deck calibration exit ([#6815](https://github.com/Opentrons/opentrons/issues/6815)) ([254af66](https://github.com/Opentrons/opentrons/commit/254af66))
+* **app:** Display if DC was migrated ([#6812](https://github.com/Opentrons/opentrons/issues/6812)) ([d37c0c0](https://github.com/Opentrons/opentrons/commit/d37c0c0))
+* **robot-server:** Fix return tip moves in cal flows ([#6814](https://github.com/Opentrons/opentrons/issues/6814)) ([3c94eef](https://github.com/Opentrons/opentrons/commit/3c94eef))
+* **robot-server:** Home pipettes after calibration flows ([#6813](https://github.com/Opentrons/opentrons/issues/6813)) ([1f378a2](https://github.com/Opentrons/opentrons/commit/1f378a2))
+* **api:** Do not perform a transfer if a zero volume is passed in ([#6620](https://github.com/opentrons/opentrons/issues/6620)) ([05e66b4](https://github.com/opentrons/opentrons/commit/05e66b4))
+* **api:** Increase the tolerance on this test for how long a function takes to execute ([#6621](https://github.com/opentrons/opentrons/issues/6621)) ([1b068c2](https://github.com/opentrons/opentrons/commit/1b068c2))
+* **api,robot-server:** add pydantic to api, upgrade and add test dev deps ([#6673](https://github.com/opentrons/opentrons/issues/6673)) ([2e4ad6a](https://github.com/opentrons/opentrons/commit/2e4ad6a))
+* **app:** debounce calibration jog requests while others are in flight ([#6794](https://github.com/opentrons/opentrons/issues/6794)) ([d5ae8cd](https://github.com/opentrons/opentrons/commit/d5ae8cd))
+* **app:** fix fetch-on-session-end epics for POC, TLC ([#6757](https://github.com/opentrons/opentrons/issues/6757)) ([7124bd9](https://github.com/opentrons/opentrons/commit/7124bd9)), closes [#6747](https://github.com/opentrons/opentrons/issues/6747)
+* **app:** Fix the fetch epics for real this time ([#6761](https://github.com/opentrons/opentrons/issues/6761)) ([0df6dc5](https://github.com/opentrons/opentrons/commit/0df6dc5))
+* **app:** remove redundant tip rack display name from tooltip ([#6770](https://github.com/opentrons/opentrons/issues/6770)) ([a81228a](https://github.com/opentrons/opentrons/commit/a81228a))
+* **app, robot-server:** add param to set has cal block command  ([#6792](https://github.com/opentrons/opentrons/issues/6792)) ([4b9e582](https://github.com/opentrons/opentrons/commit/4b9e582))
+* **protocol-designer:** cast mix tip offset to number ([#6629](https://github.com/opentrons/opentrons/issues/6629)) ([7b4ee9b](https://github.com/opentrons/opentrons/commit/7b4ee9b)), closes [#6552](https://github.com/opentrons/opentrons/issues/6552)
+* **protocol-designer:** fix 5.1.0 migration ([#6643](https://github.com/opentrons/opentrons/issues/6643)) ([cc7cd17](https://github.com/opentrons/opentrons/commit/cc7cd17))
+* **api:** Increase the tolerance on this test for how long a function takes to execute ([#6621](https://github.com/Opentrons/opentrons/issues/6621)) ([1b068c2](https://github.com/Opentrons/opentrons/commit/1b068c2))
+* **api,robot-server:** add pydantic to api, upgrade and add test dev deps ([#6673](https://github.com/Opentrons/opentrons/issues/6673)) ([2e4ad6a](https://github.com/Opentrons/opentrons/commit/2e4ad6a))
+* **app:** fix fetch-on-session-end epics for POC, TLC ([#6757](https://github.com/Opentrons/opentrons/issues/6757)) ([7124bd9](https://github.com/Opentrons/opentrons/commit/7124bd9)), closes [#6747](https://github.com/Opentrons/opentrons/issues/6747)
+* **app:** Fix the fetch epics for real this time ([#6761](https://github.com/Opentrons/opentrons/issues/6761)) ([0df6dc5](https://github.com/Opentrons/opentrons/commit/0df6dc5))
+* **app:** remove redundant tip rack display name from tooltip ([#6770](https://github.com/Opentrons/opentrons/issues/6770)) ([a81228a](https://github.com/Opentrons/opentrons/commit/a81228a))
+* **app, robot-server:** add param to set has cal block command  ([#6792](https://github.com/Opentrons/opentrons/issues/6792)) ([4b9e582](https://github.com/Opentrons/opentrons/commit/4b9e582))
+* **protocol-designer:** cast mix tip offset to number ([#6629](https://github.com/Opentrons/opentrons/issues/6629)) ([7b4ee9b](https://github.com/Opentrons/opentrons/commit/7b4ee9b)), closes [#6552](https://github.com/Opentrons/opentrons/issues/6552)
+* **protocol-designer:** fix 5.1.0 migration ([#6643](https://github.com/Opentrons/opentrons/issues/6643)) ([cc7cd17](https://github.com/Opentrons/opentrons/commit/cc7cd17))
+
+
+
+
+
+### Performance Improvements
+
+* **shared-data,api:** speed up pipette settings ([#6952](https://github.com/Opentrons/opentrons/issues/6952)) ([f8b6266](https://github.com/Opentrons/opentrons/commit/f8b6266))
+
+
+
+### Features
+
+* **api:** Mark calibrations as bad when determined they exceed threshold ([#6918](https://github.com/Opentrons/opentrons/issues/6918)) ([ac3a866](https://github.com/Opentrons/opentrons/commit/ac3a866))
+* **app, robot-server:** Report both the minimum and maximum supported protocol api versions ([#6921](https://github.com/Opentrons/opentrons/issues/6921)) ([22fc36a](https://github.com/Opentrons/opentrons/commit/22fc36a))
+* **api:** p1000_single_v2.2, p20_single_v2.2 ([#6922](https://github.com/Opentrons/opentrons/issues/6922)) ([14659b8](https://github.com/Opentrons/opentrons/commit/14659b8))
+
+([7d4a6bd](https://github.com/Opentrons/opentrons/commit/7d4a6bd))
+* **app,discovery-client:** send Opentrons-Version header with HTTP requests ([#6914](https://github.com/Opentrons/opentrons/issues/6914)) ([089dd36](https://github.com/Opentrons/opentrons/commit/089dd36)), closes [#6852](https://github.com/Opentrons/opentrons/issues/6852)
+* **robot-server:** increment HTTP API version ([#6917](https://github.com/Opentrons/opentrons/issues/6917)) ([601c3fb](https://github.com/Opentrons/opentrons/commit/601c3fb)), closes [#6851](https://github.com/Opentrons/opentrons/issues/6851)
+* **app:** Send intercom event on no-cal-block selected ([#6893](https://github.com/Opentrons/opentrons/issues/6893))
+* **notify-server:** add models package and Event model ([#6785](https://github.com/Opentrons/opentrons/issues/6785)) ([aa26264](https://github.com/Opentrons/opentrons/commit/aa26264)), closes [#6705](https://github.com/Opentrons/opentrons/issues/6705)
+* **notify-server:** create pub sub server ([#6777](https://github.com/Opentrons/opentrons/issues/6777)) ([04b1e7e](https://github.com/Opentrons/opentrons/commit/04b1e7e)), closes [#6703](https://github.com/Opentrons/opentrons/issues/6703)
+* **notify-server:** Notify server publisher client ([#6817](https://github.com/Opentrons/opentrons/issues/6817)) ([12b1c09](https://github.com/Opentrons/opentrons/commit/12b1c09)), closes [#6706](https://github.com/Opentrons/opentrons/issues/6706)
+* **notify-server:** Notify server subscriber client ([#6818](https://github.com/Opentrons/opentrons/issues/6818)) ([6611e07](https://github.com/Opentrons/opentrons/commit/6611e07)), closes [#6707](https://github.com/Opentrons/opentrons/issues/6707)
+* **protocol-designer:** add dispense air gap to distribute command creator ([#6824](https://github.com/Opentrons/opentrons/issues/6824)) ([2aeccd4](https://github.com/Opentrons/opentrons/commit/2aeccd4)), closes [#6510](https://github.com/Opentrons/opentrons/issues/6510)
+* **protocol-designer:** add validation to dispense > air gap volume ([#6771](https://github.com/Opentrons/opentrons/issues/6771)) ([2594aa8](https://github.com/Opentrons/opentrons/commit/2594aa8)), closes [#6500](https://github.com/Opentrons/opentrons/issues/6500) [#6513](https://github.com/Opentrons/opentrons/issues/6513) [#6652](https://github.com/Opentrons/opentrons/issues/6652)
+* **protocol-designer:** implement consolidate dispense airgap commands ([#6845](https://github.com/Opentrons/opentrons/issues/6845)) ([0dd7157](https://github.com/Opentrons/opentrons/commit/0dd7157)), closes [#6512](https://github.com/Opentrons/opentrons/issues/6512)
+* add basic application configuration using pydantic BaseSettings. ([#6768](https://github.com/Opentrons/opentrons/issues/6768)) ([13db187](https://github.com/Opentrons/opentrons/commit/13db187)), closes [#6704](https://github.com/Opentrons/opentrons/issues/6704)
+* **api:** Prevent Python API v1 protocol upload in server version 4.0.0 ([#6841](https://github.com/Opentrons/opentrons/issues/6841)) ([054f037](https://github.com/Opentrons/opentrons/commit/054f037))
+* **app,robot-server:** Retry cal actions ([#6830](https://github.com/Opentrons/opentrons/issues/6830)) ([86c729b](https://github.com/Opentrons/opentrons/commit/86c729b)), closes [#6729](https://github.com/Opentrons/opentrons/issues/6729)
+* **api:** Add calibration status to all of the calibration data models ([#6648](https://github.com/opentrons/opentrons/issues/6648)) ([2753734](https://github.com/opentrons/opentrons/commit/2753734))
+* **api:** add source blowout location option to transfer function ([#6670](https://github.com/opentrons/opentrons/issues/6670)) ([811a767](https://github.com/opentrons/opentrons/commit/811a767)), closes [#6576](https://github.com/opentrons/opentrons/issues/6576)
+* **api:** pin JSON protocols to APIVersion 2.8 ([#6691](https://github.com/opentrons/opentrons/issues/6691)) ([0804474](https://github.com/opentrons/opentrons/commit/0804474)), closes [#6681](https://github.com/opentrons/opentrons/issues/6681)
+* **api:** Use more human-friendly names in "API version too low" error messages ([#6662](https://github.com/opentrons/opentrons/issues/6662)) ([55daec2](https://github.com/opentrons/opentrons/commit/55daec2))
+* **api,robot-server:** Overhaul robot calibration flows ([#6797](https://github.com/opentrons/opentrons/issues/6797)) ([f0f236f](https://github.com/opentrons/opentrons/commit/f0f236f)), closes [#6738](https://github.com/opentrons/opentrons/issues/6738) [#6739](https://github.com/opentrons/opentrons/issues/6739)
+* **app:** Overhaul OT-2 calibration experience ([#6804](https://github.com/opentrons/opentrons/issues/6804)) ([91f9e98](https://github.com/opentrons/opentrons/commit/91f9e98)), closes [#6736](https://github.com/opentrons/opentrons/issues/6736) [#6737](https://github.com/opentrons/opentrons/issues/6737)
+* **app:** update pipette attach flow to include calibration ([#6760](https://github.com/opentrons/opentrons/issues/6760)) ([c873113](https://github.com/opentrons/opentrons/commit/c873113)), closes [#2130](https://github.com/opentrons/opentrons/issues/2130)
+* **labware-library:** Add labware creator visibility ([#6667](https://github.com/opentrons/opentrons/issues/6667)) ([eb906a3](https://github.com/opentrons/opentrons/commit/eb906a3)), closes [#6307](https://github.com/opentrons/opentrons/issues/6307)
+* **protocol designer:** put mix delay behind FF ([#6619](https://github.com/opentrons/opentrons/issues/6619)) ([5c7bf7d](https://github.com/opentrons/opentrons/commit/5c7bf7d))
+* **protocol-designer:** add air gap dispense FF ([#6647](https://github.com/opentrons/opentrons/issues/6647)) ([4c53b73](https://github.com/opentrons/opentrons/commit/4c53b73)), closes [#6522](https://github.com/opentrons/opentrons/issues/6522)
+* **protocol-designer:** add air gap dispense for fields to move liquid form ([#6658](https://github.com/opentrons/opentrons/issues/6658)) ([a6c1930](https://github.com/opentrons/opentrons/commit/a6c1930)), closes [#6499](https://github.com/opentrons/opentrons/issues/6499)
+* **protocol-designer:** add dispenseAirGapVolume arg ([#6656](https://github.com/opentrons/opentrons/issues/6656)) ([4703456](https://github.com/opentrons/opentrons/commit/4703456)), closes [#6653](https://github.com/opentrons/opentrons/issues/6653)
+* **protocol-designer:** add mix delay commands ([#6631](https://github.com/opentrons/opentrons/issues/6631)) ([953d454](https://github.com/opentrons/opentrons/commit/953d454)), closes [#6498](https://github.com/opentrons/opentrons/issues/6498)
+* **protocol-designer:** add mix delay default values ([#6607](https://github.com/opentrons/opentrons/issues/6607)) ([db2b331](https://github.com/opentrons/opentrons/commit/db2b331)), closes [#6579](https://github.com/opentrons/opentrons/issues/6579)
+* **protocol-designer:** bump pd to 5.1.0; add migration ([#6583](https://github.com/opentrons/opentrons/issues/6583)) ([d6ba128](https://github.com/opentrons/opentrons/commit/d6ba128)), closes [#6573](https://github.com/opentrons/opentrons/issues/6573) [#6634](https://github.com/opentrons/opentrons/issues/6634)
+* **protocol-designer:** implement dispense > air gap for Transfer command creator ([#6745](https://github.com/opentrons/opentrons/issues/6745)) ([e684f7d](https://github.com/opentrons/opentrons/commit/e684f7d)), closes [#6508](https://github.com/opentrons/opentrons/issues/6508)
+* **protocol-designer:** update air gap dispense tooltip ([#6753](https://github.com/opentrons/opentrons/issues/6753)) ([b6ace2d](https://github.com/opentrons/opentrons/commit/b6ace2d)), closes [#6714](https://github.com/opentrons/opentrons/issues/6714)
+* **robot-server:** create models for basic pipetting session commands ([#6560](https://github.com/opentrons/opentrons/issues/6560)) ([b31377b](https://github.com/opentrons/opentrons/commit/b31377b)), closes [#6556](https://github.com/opentrons/opentrons/issues/6556)
+* **robot-server:** http basic pipetting session - command routing and state store ([#6606](https://github.com/opentrons/opentrons/issues/6606)) ([534f038](https://github.com/opentrons/opentrons/commit/534f038)), closes [#6559](https://github.com/opentrons/opentrons/issues/6559)
+* **robot-server:** http basic pipetting- load labware ([#6640](https://github.com/opentrons/opentrons/issues/6640)) ([afeee2e](https://github.com/opentrons/opentrons/commit/afeee2e))
+* **robot-server:** live protocol session handles LoadInstrument command ([#6639](https://github.com/opentrons/opentrons/issues/6639)) ([969112c](https://github.com/opentrons/opentrons/commit/969112c)), closes [#6602](https://github.com/opentrons/opentrons/issues/6602)
+* **robot-server,app:** extend pipette offset cal to include tip length cal if needed ([#6641](https://github.com/opentrons/opentrons/issues/6641)) ([5819f29](https://github.com/opentrons/opentrons/commit/5819f29))
+* **api:** Add calibration status to all of the calibration data models ([#6648](https://github.com/Opentrons/opentrons/issues/6648)) ([2753734](https://github.com/Opentrons/opentrons/commit/2753734))
+* **api:** add source blowout location option to transfer function ([#6670](https://github.com/Opentrons/opentrons/issues/6670)) ([811a767](https://github.com/Opentrons/opentrons/commit/811a767)), closes [#6576](https://github.com/Opentrons/opentrons/issues/6576)
+* **api:** pin JSON protocols to APIVersion 2.8 ([#6691](https://github.com/Opentrons/opentrons/issues/6691)) ([0804474](https://github.com/Opentrons/opentrons/commit/0804474)), closes [#6681](https://github.com/Opentrons/opentrons/issues/6681)
+* **api:** Use more human-friendly names in "API version too low" error messages ([#6662](https://github.com/Opentrons/opentrons/issues/6662)) ([55daec2](https://github.com/Opentrons/opentrons/commit/55daec2))
+* **app:** update pipette attach flow to include calibration ([#6760](https://github.com/Opentrons/opentrons/issues/6760)) ([c873113](https://github.com/Opentrons/opentrons/commit/c873113)), closes [#2130](https://github.com/Opentrons/opentrons/issues/2130)
+* **labware-library:** Add labware creator visibility ([#6667](https://github.com/Opentrons/opentrons/issues/6667)) ([eb906a3](https://github.com/Opentrons/opentrons/commit/eb906a3)), closes [#6307](https://github.com/Opentrons/opentrons/issues/6307)
+* **protocol designer:** put mix delay behind FF ([#6619](https://github.com/Opentrons/opentrons/issues/6619)) ([5c7bf7d](https://github.com/Opentrons/opentrons/commit/5c7bf7d))
+* **protocol-designer:** add air gap dispense FF ([#6647](https://github.com/Opentrons/opentrons/issues/6647)) ([4c53b73](https://github.com/Opentrons/opentrons/commit/4c53b73)), closes [#6522](https://github.com/Opentrons/opentrons/issues/6522)
+* **protocol-designer:** add air gap dispense for fields to move liquid form ([#6658](https://github.com/Opentrons/opentrons/issues/6658)) ([a6c1930](https://github.com/Opentrons/opentrons/commit/a6c1930)), closes [#6499](https://github.com/Opentrons/opentrons/issues/6499)
+* **protocol-designer:** add dispenseAirGapVolume arg ([#6656](https://github.com/Opentrons/opentrons/issues/6656)) ([4703456](https://github.com/Opentrons/opentrons/commit/4703456)), closes [#6653](https://github.com/Opentrons/opentrons/issues/6653)
+* **protocol-designer:** add mix delay commands ([#6631](https://github.com/Opentrons/opentrons/issues/6631)) ([953d454](https://github.com/Opentrons/opentrons/commit/953d454)), closes [#6498](https://github.com/Opentrons/opentrons/issues/6498)
+* **protocol-designer:** add mix delay default values ([#6607](https://github.com/Opentrons/opentrons/issues/6607)) ([db2b331](https://github.com/Opentrons/opentrons/commit/db2b331)), closes [#6579](https://github.com/Opentrons/opentrons/issues/6579)
+* **protocol-designer:** bump pd to 5.1.0; add migration ([#6583](https://github.com/Opentrons/opentrons/issues/6583)) ([d6ba128](https://github.com/Opentrons/opentrons/commit/d6ba128)), closes [#6573](https://github.com/Opentrons/opentrons/issues/6573) [#6634](https://github.com/Opentrons/opentrons/issues/6634)
+* **protocol-designer:** implement dispense > air gap for Transfer command creator ([#6745](https://github.com/Opentrons/opentrons/issues/6745)) ([e684f7d](https://github.com/Opentrons/opentrons/commit/e684f7d)), closes [#6508](https://github.com/Opentrons/opentrons/issues/6508)
+* **protocol-designer:** update air gap dispense tooltip ([#6753](https://github.com/Opentrons/opentrons/issues/6753)) ([b6ace2d](https://github.com/Opentrons/opentrons/commit/b6ace2d)), closes [#6714](https://github.com/Opentrons/opentrons/issues/6714)
+* **robot-server:** create models for basic pipetting session commands ([#6560](https://github.com/Opentrons/opentrons/issues/6560)) ([b31377b](https://github.com/Opentrons/opentrons/commit/b31377b)), closes [#6556](https://github.com/Opentrons/opentrons/issues/6556)
+* **robot-server:** http basic pipetting session - command routing and state store ([#6606](https://github.com/Opentrons/opentrons/issues/6606)) ([534f038](https://github.com/Opentrons/opentrons/commit/534f038)), closes [#6559](https://github.com/Opentrons/opentrons/issues/6559)
+* **robot-server:** http basic pipetting- load labware ([#6640](https://github.com/Opentrons/opentrons/issues/6640)) ([afeee2e](https://github.com/Opentrons/opentrons/commit/afeee2e))
+* **robot-server:** live protocol session handles LoadInstrument command ([#6639](https://github.com/Opentrons/opentrons/issues/6639)) ([969112c](https://github.com/Opentrons/opentrons/commit/969112c)), closes [#6602](https://github.com/Opentrons/opentrons/issues/6602)
+* **robot-server,app:** extend pipette offset cal to include tip length cal if needed ([#6641](https://github.com/Opentrons/opentrons/issues/6641)) ([5819f29](https://github.com/Opentrons/opentrons/commit/5819f29))
+
+
+
+
+
+### BREAKING CHANGES
+
+* **robot-server:** Requests without Opentrons-Version or with a value lower than 2 will be rejected
+
+([8e7059a](https://github.com/Opentrons/opentrons/commit/8e7059a)), closes [#6781](https://github.com/Opentrons/opentrons/issues/6781)
+
+
+
+
+## [3.21.2](https://github.com/Opentrons/opentrons/compare/v3.21.1...v3.21.2) (2020-10-16)
+
 
 * **api:** Be fault-tolerant to bad deck cal data ([#6803](https://github.com/Opentrons/opentrons/issues/6803)) ([43ba721](https://github.com/Opentrons/opentrons/commit/43ba721))
 * **app:** add analytics and support tracking to ignore app update ([#6790](https://github.com/Opentrons/opentrons/issues/6790)) ([079c2e9](https://github.com/Opentrons/opentrons/commit/079c2e9))

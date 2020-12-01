@@ -25,7 +25,7 @@ FILTERTIPRACK_300 = _lw_fmt.format(_filtertiprack, 300)
 FILTERTIPRACK_1000 = _lw_fmt.format(_filtertiprack, 1000)
 
 
-ALLOWED_SESSIONS = {'check'}
+JOG_TO_DECK_SLOT: Final = '5'
 
 
 @dataclass
@@ -95,3 +95,8 @@ CAL_BLOCK_SETUP_BY_MOUNT: Dict[Mount, LabwareInfo] = {
         load_name='opentrons_calibrationblock_short_side_left',
         slot='1',
         well='A2')}
+CAL_BLOCK_SETUP_CAL_CHECK: LabwareInfo = LabwareInfo(
+    load_name='opentrons_calibrationblock_short_side_right',
+    slot='6',
+    well='A1'
+)

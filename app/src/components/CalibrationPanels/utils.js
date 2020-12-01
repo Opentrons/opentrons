@@ -1,4 +1,5 @@
 // @flow
+import { format } from 'date-fns'
 import type { JogAxis } from '../../http-api-client'
 import type { VectorTuple } from '../../sessions/types'
 
@@ -16,4 +17,10 @@ export function formatJogVector(
     vector[index] = step * direction
   }
   return vector
+}
+
+export function formatLastModified(lastModified: string | null): string {
+  return typeof lastModified === 'string'
+    ? format(new Date(lastModified), 'MMMM dd, yyyy HH:mm')
+    : 'unknown'
 }

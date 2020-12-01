@@ -78,7 +78,7 @@ lint: $(ot_py_sources)
 	$(python) -m pylama $(SRC_PATH) tests
 
 .PHONY: dev
-dev: export OT_ROBOT_SERVER_DOT_ENV_PATH := dev.env
+dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
 	$(pipenv) run uvicorn "robot_server.service.app:app" --host localhost --port 31950 --ws wsproto --reload
 

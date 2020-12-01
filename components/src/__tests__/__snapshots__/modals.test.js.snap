@@ -160,11 +160,11 @@ exports[`modals Modal renders correctly with optional heading 1`] = `
 `;
 
 exports[`modals ModalPage renders correctly 1`] = `
-.c1 {
+.c0 {
   min-width: 0;
 }
 
-.c0.spin {
+.c1.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
   animation: GLFYz 0.8s steps(8) infinite;
   -webkit-transform-origin: center;
@@ -173,7 +173,7 @@ exports[`modals ModalPage renders correctly 1`] = `
 }
 
 <div
-  className="modal_page"
+  className="c0 modal_page"
 >
   <div
     className="overlay"
@@ -189,7 +189,7 @@ exports[`modals ModalPage renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0 icon"
+        className="sc-AxmLO c1 icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -219,7 +219,7 @@ exports[`modals ModalPage renders correctly 1`] = `
     </h2>
   </header>
   <div
-    className="c1 modal_page_contents"
+    className="c0 modal_page_contents"
   >
     children
   </div>

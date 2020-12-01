@@ -1,8 +1,8 @@
-from opentrons.commands import tree
+from opentrons.commands.util import from_list
 
 
 def test_command_tree():
-    commands = tree.from_list([
+    commands = from_list([
         {'level': 0, 'description': 'A', 'id': 0},
         {'level': 0, 'description': 'B', 'id': 1},
         {'level': 0, 'description': 'C', 'id': 2}
@@ -26,7 +26,7 @@ def test_command_tree():
         },
     ]
 
-    commands = tree.from_list([
+    commands = from_list([
         {'level': 0, 'description': 'A', 'id': 0},
         {'level': 1, 'description': 'B', 'id': 1},
         {'level': 2, 'description': 'C', 'id': 2},

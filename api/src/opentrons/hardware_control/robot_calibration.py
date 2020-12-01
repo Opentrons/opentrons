@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 from opentrons import config
-from opentrons.config import robot_configs, feature_flags as ff
+
 from opentrons.calibration_storage import modify, types, get
 from opentrons.types import Mount
 from opentrons.util import linal
@@ -17,6 +17,18 @@ log = logging.getLogger(__name__)
 @dataclass
 class RobotCalibration:
     deck_calibration: types.DeckCalibration
+
+
+def build_temporary_identity_calibration() -> RobotCalibration:
+    """
+    Get a temporary identity deck cal suitable for use during
+    calibration
+    """
+    return RobotCalibration(
+        deck_calibration=types.DeckCalibration(
+            attitude=linal.identity_deck_transform().tolist(),
+            source=types.SourceType.default,
+            status=types.CalibrationStatus()))
 
 
 def validate_attitude_deck_calibration(deck_cal: types.DeckCalibration):
@@ -94,8 +106,8 @@ def save_attitude_matrix(
 
 def load_attitude_matrix() -> types.DeckCalibration:
     calibration_data = get.get_robot_deck_attitude()
-    if not calibration_data and ff.enable_calibration_overhaul():
-        gantry_cal = robot_configs.load().gantry_calibration
+    if not calibration_data:
+        gantry_cal = config.robot_configs.load().gantry_calibration
         if validate_gantry_calibration(gantry_cal) == DeckTransformState.OK:
             log.debug(
                 "Attitude deck calibration matrix not found. Migrating "
@@ -104,7 +116,8 @@ def load_attitude_matrix() -> types.DeckCalibration:
             attitude = migrate_affine_xy_to_attitude(gantry_cal)
             modify.save_robot_deck_attitude(transform=attitude,
                                             pip_id=None,
-                                            lw_hash=None)
+                                            lw_hash=None,
+                                            source=types.SourceType.legacy)
             calibration_data = get.get_robot_deck_attitude()
 
     if calibration_data:
@@ -112,7 +125,7 @@ def load_attitude_matrix() -> types.DeckCalibration:
     else:
         # load default if deck calibration data do not exist
         return types.DeckCalibration(
-            attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2,
+            attitude=config.robot_configs.DEFAULT_DECK_CALIBRATION_V2,
             source=types.SourceType.default,
             status=types.CalibrationStatus())
 
@@ -122,7 +135,7 @@ def load_pipette_offset(
         mount: Mount) -> types.PipetteOffsetByPipetteMount:
     # load default if pipette offset data do not exist
     pip_cal_obj = types.PipetteOffsetByPipetteMount(
-        offset=robot_configs.DEFAULT_PIPETTE_OFFSET,
+        offset=config.robot_configs.DEFAULT_PIPETTE_OFFSET,
         source=types.SourceType.default,
         status=types.CalibrationStatus())
     if pip_id:

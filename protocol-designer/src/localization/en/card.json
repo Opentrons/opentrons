@@ -6,6 +6,8 @@
     "reason_for_collecting_data": "We’re working to improve Protocol Designer. Part of the process involves watching real user sessions to understand which parts of the interface are working and which could use improvement.",
     "restore_hints": "Restore all hints and tips notifications"
   },
+  "name": "Name",
+  "notes": "Notes:",
   "title": {
     "information": "Information",
     "feature_flags": "Experimental Settings",
@@ -15,5 +17,7 @@
   },
   "toggle": {
     "share_session": "Share sessions with the Opentrons Product Team"
-  }
+  },
+  "unnamedLiquid": "Unnamed Liquid",
+  "well": "Well"
 }

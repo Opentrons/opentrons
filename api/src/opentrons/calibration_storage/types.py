@@ -18,6 +18,7 @@ class SourceType(str, Enum):
     factory = "factory"
     user = "user"
     calibration_check = "calibration_check"
+    legacy = 'legacy'
     unknown = "unknown"
 
 
@@ -74,7 +75,7 @@ class ParentOptions:
 
 
 @dataclass
-class CalibrationTypes:
+class LabwareCalibrationTypes:
     """
     Class to categorize what calibration
     data might be stored for a labware.
@@ -89,7 +90,7 @@ class CalibrationInformation:
     Class to store important calibration
     info for labware.
     """
-    calibration: CalibrationTypes
+    calibration: LabwareCalibrationTypes
     parent: ParentOptions
     labware_id: str
     uri: str
@@ -118,7 +119,7 @@ class DeckCalibration:
 @dataclass
 class PipetteOffsetByPipetteMount:
     """
-    Class to store pipette offset without pipette and monut info
+    Class to store pipette offset without pipette and mount info
     """
     offset: PipetteOffset
     source: SourceType

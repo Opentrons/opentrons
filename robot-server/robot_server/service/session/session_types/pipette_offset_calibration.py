@@ -14,7 +14,8 @@ from robot_server.service.session.command_execution import \
 
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
-from ..models.session import SessionType, SessionDetails
+from ..models.session import (
+    SessionType, PipetteOffsetCalibrationResponseAttributes)
 from ..errors import UnsupportedFeature
 
 if TYPE_CHECKING:
@@ -53,19 +54,21 @@ class PipetteOffsetCalibrationSession(BaseSession):
         recalibrate_tip_length\
             = instance_meta.create_params.shouldRecalibrateTipLength
         has_cal_block = instance_meta.create_params.hasCalibrationBlock
-        tiprack = instance_meta.create_params.tipRackDefinition
+        tip_rack_def = instance_meta.create_params.tipRackDefinition
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
         session_controls_lights =\
             not configuration.hardware.get_lights()['rails']
+        await configuration.hardware.cache_instruments()
+        await configuration.hardware.home()
         try:
             pip_offset_cal_user_flow = PipetteOffsetCalibrationUserFlow(
                     hardware=configuration.hardware,
                     mount=Mount[mount.upper()],
                     recalibrate_tip_length=recalibrate_tip_length,
                     has_calibration_block=has_cal_block,
-                    tip_rack_def=cast('LabwareDefinition', tiprack))
+                    tip_rack_def=cast('LabwareDefinition', tip_rack_def))
         except AssertionError as e:
             raise SessionCreationException(str(e))
 
@@ -92,7 +95,15 @@ class PipetteOffsetCalibrationSession(BaseSession):
     def session_type(self) -> SessionType:
         return SessionType.pipette_offset_calibration
 
-    def _get_response_details(self) -> SessionDetails:
+    def get_response_model(self) -> PipetteOffsetCalibrationResponseAttributes:
+        return PipetteOffsetCalibrationResponseAttributes(
+            id=self.meta.identifier,
+            details=self._get_response_details(),
+            createdAt=self.meta.created_at,
+            createParams=cast(SessionCreateParams, self.meta.create_params)
+        )
+
+    def _get_response_details(self) -> PipetteOffsetCalibrationSessionStatus:
         uf = self._pip_offset_cal_user_flow
         return PipetteOffsetCalibrationSessionStatus(
             instrument=uf.get_pipette(),

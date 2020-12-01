@@ -12,9 +12,7 @@ stages:
       method: POST
       json:
         data:
-          type: Session
-          attributes:
-            sessionType: deckCalibration
+          sessionType: deckCalibration
     response:
       status_code: 201
       save:
@@ -31,15 +29,13 @@ stages:
         links: !anydict
         data: &session_data
           id: "{session_id}"
-          type: Session
-          attributes: &session_data_attributes
-            sessionType: deckCalibration
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            createParams: null
-            details: &session_data_attribute_details
-              currentStep: sessionStarted
-              instrument: !anydict
-              labware: !anylist
+          sessionType: deckCalibration
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createParams: null
+          details: &session_data_attribute_details
+            currentStep: sessionStarted
+            instrument: !anydict
+            labware: !anylist
 
   - name: Load labware
     request: &post_command
@@ -47,10 +43,8 @@ stages:
       method: POST
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.loadLabware
-            data: {}
+          command: calibration.loadLabware
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -61,21 +55,17 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: labwareLoaded
+          details:
+            <<: *session_data_attribute_details
+            currentStep: labwareLoaded
 
   - name: Move to tiprack
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.moveToTipRack
-            data: {}
+          command: calibration.moveToTipRack
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -86,21 +76,17 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: preparingPipette
+          details:
+            <<: *session_data_attribute_details
+            currentStep: preparingPipette
 
   - name: Pick up the tip
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.pickUpTip
-            data: {}
+          command: calibration.pickUpTip
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -111,21 +97,17 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: inspectingTip
+          details:
+            <<: *session_data_attribute_details
+            currentStep: inspectingTip
 
   - name: Invalidate the tip
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.invalidateTip
-            data: {}
+          command: calibration.invalidateTip
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -136,21 +118,17 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: preparingPipette
+          details:
+            <<: *session_data_attribute_details
+            currentStep: preparingPipette
 
   - name: Pick up the tip
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.pickUpTip
-            data: {}
+          command: calibration.pickUpTip
+          data: {}
     response:
       status_code: 200
 
@@ -159,10 +137,8 @@ stages:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.moveToDeck
-            data: {}
+          command: calibration.moveToDeck
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -173,22 +149,18 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: joggingToDeck
+          details:
+            <<: *session_data_attribute_details
+            currentStep: joggingToDeck
 
   - name: Jog pipette to deck
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.jog
-            data:
-              vector: [0, 0, -10]
+          command: calibration.jog
+          data:
+            vector: [0, 0, -10]
     response:
       status_code: 200
   - name: Check the effect of command
@@ -199,21 +171,17 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: joggingToDeck
+          details:
+            <<: *session_data_attribute_details
+            currentStep: joggingToDeck
 
   - name: Save deck height
     request:
       <<: *post_command
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.saveOffset
-            data: {}
+          command: calibration.saveOffset
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -224,11 +192,9 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: joggingToDeck
+          details:
+            <<: *session_data_attribute_details
+            currentStep: joggingToDeck
 
   - name: Move to point one
     request:
@@ -236,10 +202,8 @@ stages:
       method: POST
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.moveToPointOne
-            data: {}
+          command: calibration.moveToPointOne
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -250,11 +214,9 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: savingPointOne
+          details:
+            <<: *session_data_attribute_details
+            currentStep: savingPointOne
 
   - name: Move to point two
     request:
@@ -262,10 +224,8 @@ stages:
       method: POST
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.deck.moveToPointTwo
-            data: {}
+          command: calibration.deck.moveToPointTwo
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -276,11 +236,9 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: savingPointTwo
+          details:
+            <<: *session_data_attribute_details
+            currentStep: savingPointTwo
 
   - name: Move to point three
     request:
@@ -288,10 +246,8 @@ stages:
       method: POST
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.deck.moveToPointThree
-            data: {}
+          command: calibration.deck.moveToPointThree
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -302,11 +258,9 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: savingPointThree
+          details:
+            <<: *session_data_attribute_details
+            currentStep: savingPointThree
 
   - name: Exit Session
     request:
@@ -314,10 +268,8 @@ stages:
       method: POST
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: calibration.exitSession
-            data: {}
+          command: calibration.exitSession
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -328,11 +280,9 @@ stages:
         links: !anydict
         data:
           <<: *session_data
-          attributes:
-            <<: *session_data_attributes
-            details:
-              <<: *session_data_attribute_details
-              currentStep: sessionExited
+          details:
+            <<: *session_data_attribute_details
+            currentStep: sessionExited
 
   - name: Delete the session
     request:
@@ -341,18 +291,12 @@ stages:
     response:
       status_code: 200
 
-  - name: There are no session except default
+  - name: There are no session
     request:
         url: "{host:s}:{port:d}/sessions"
         method: GET
     response:
       status_code: 200
       json:
-        data:
-          - id: "default"
-            type: Session
-            attributes:
-              sessionType: default
-              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-              details: {}
-              createParams: null
+        links: null
+        data: []

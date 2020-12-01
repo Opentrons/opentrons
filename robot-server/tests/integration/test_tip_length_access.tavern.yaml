@@ -11,7 +11,6 @@ stages:
     response: &no_tip_length_response
       status_code: 200
       json:
-        meta: null
         links: null
         data: []
 
@@ -27,129 +26,113 @@ stages:
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: !anystr
-              tiprack: !anystr
-              tipLength: !anyfloat
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: !anystr
+            tiprack: !anystr
+            tipLength: !anyfloat
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: !anystr
-            type: 'TipLengthCalibration'
-          - attributes:
-              pipette: !anystr
-              tiprack: !anystr
-              tipLength: !anyfloat
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: !anystr
+            tiprack: !anystr
+            tipLength: !anyfloat
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: !anystr
-            type: 'TipLengthCalibration'
 
   - name: GET request returns filter with pipette id
     request:
       url: "{host:s}:{port:d}/calibration/tip_length"
       method: GET
       params:
-        pipette_id: 'pip_1'
+        pipette_id: '123'
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: 'pip_1'
-              tiprack: 'fakehash'
-              tipLength: 30.5
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: '123'
+            tiprack: !anystr
+            tipLength: 30.5
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
 
-            id: 'fakehash&pip_1'
-            type: 'TipLengthCalibration'
+            id: '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824&123'
 
   - name: GET request returns filter with tiprack hash
     request:
       url: "{host:s}:{port:d}/calibration/tip_length"
       method: GET
       params:
-        tiprack_hash: 'fakehash'
+        tiprack_hash: '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824'
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: !anystr
-              tiprack: !anystr
-              tipLength: !anyfloat
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: !anystr
+            tiprack: !anystr
+            tipLength: !anyfloat
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: !anystr
-            type: 'TipLengthCalibration'
-          - attributes:
-              pipette: !anystr
-              tiprack: !anystr
-              tipLength: !anyfloat
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
+          - pipette: !anystr
+            tiprack: !anystr
+            tipLength: !anyfloat
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
             id: !anystr
-            type: 'TipLengthCalibration'
 
   - name: GET request returns filter with pipette AND tiprack
     request:
       url: "{host:s}:{port:d}/calibration/tip_length"
       method: GET
       params:
-        pipette_id: 'pip_1'
-        tiprack_hash: 'fakehash'
+        pipette_id: '123'
+        tiprack_hash: '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824'
     response:
       status_code: 200
       json:
-        meta: null
         links: null
         data:
-          - attributes:
-              pipette: 'pip_1'
-              tiprack: 'fakehash'
-              tipLength: 30.5
-              lastModified: !anystr
-              source: 'unknown'
-              status:
-                markedAt: null
-                markedBad: false
-                source: null
-            id: 'fakehash&pip_1'
-            type: 'TipLengthCalibration'
+          - pipette: '123'
+            tiprack: !anystr
+            tipLength: 30.5
+            lastModified: !anystr
+            source: 'unknown'
+            status:
+              markedAt: null
+              markedBad: false
+              source: null
+            id: '130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824&123'
 
   - name: GET request returns filter with wrong pipette AND tiprack
     request:
       url: "{host:s}:{port:d}/calibration/tip_length"
       method: GET
       params:
-        pipette_id: 'pip_2'
+        pipette_id: '321'
         tiprack_hash: 'wronghash'
     response: *no_tip_length_response
 
@@ -159,14 +142,14 @@ marks: *cal_marks
 stages:
   - name: DELETE request with correct pipette AND tiprack
     request:
-      url: "{host:s}:{port:d}/calibration/tip_length?pipette_id=pip_2&tiprack_hash=fakehash"
+      url: "{host:s}:{port:d}/calibration/tip_length?pipette_id=321&tiprack_hash=130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824"
       method: DELETE
     response:
         status_code: 200
 
   - name: DELETE request with incorrect pipette AND tiprack
     request:
-      url: "{host:s}:{port:d}/calibration/tip_length?pipette_id=pip_2&tiprack_hash=wronghash"
+      url: "{host:s}:{port:d}/calibration/tip_length?pipette_id=321&tiprack_hash=wronghash"
       method: DELETE
     response:
         status_code: 404

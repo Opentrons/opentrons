@@ -32,6 +32,11 @@ class CalibrationError(ErrorDef):
         format_string='The command handler {handler} may not occur in the'
                       ' state {state} when "{condition}" is not true'
     )
+    UNCALIBRATED_ROBOT = ErrorCreateDef(
+        status_code=HTTPStatus.CONFLICT,
+        title='No Calibration Data Found',
+        format_string='Cannot start {flow} without robot calibration'
+    )
     ERROR_DURING_TRANSITION = ErrorCreateDef(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         title='Error During State Transition',

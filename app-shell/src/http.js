@@ -6,6 +6,8 @@ import pump from 'pump'
 import _fetch from 'node-fetch'
 import FormData from 'form-data'
 
+import { HTTP_API_VERSION } from '@opentrons/app/src/robot-api/constants'
+
 import type { Request, RequestInit, Response } from 'node-fetch'
 
 type RequestInput = Request | string
@@ -16,7 +18,10 @@ export function fetch(
   input: RequestInput,
   init?: RequestInit
 ): Promise<Response> {
-  return _fetch(input, init).then(response => {
+  const opts = init ?? {}
+  opts.headers = { ...opts.headers, 'Opentrons-Version': `${HTTP_API_VERSION}` }
+
+  return _fetch(input, opts).then(response => {
     if (!response.ok) {
       const error = `${response.status} - ${response.statusText}`
       throw new Error(`Request error: ${error}`)

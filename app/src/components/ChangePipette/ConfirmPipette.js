@@ -1,13 +1,11 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { useSelector } from 'react-redux'
 
 import { Icon, PrimaryBtn, ModalPage, SPACING_2 } from '@opentrons/components'
 import { getDiagramsSrc } from './InstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import styles from './styles.css'
-import { getFeatureFlags } from '../../config'
 
 import type {
   PipetteNameSpecs,
@@ -22,7 +20,7 @@ const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
 const EXIT_WITHOUT_CAL = 'exit without calibrating'
 const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
 
-type Props = {|
+export type Props = {|
   robotName: string,
   mount: Mount,
   title: string,
@@ -51,8 +49,6 @@ export function ConfirmPipette(props: Props): React.Node {
     back,
   } = props
 
-  const ff = useSelector(getFeatureFlags)
-
   return (
     <ModalPage
       titleBar={{
@@ -65,10 +61,9 @@ export function ConfirmPipette(props: Props): React.Node {
       <StatusDetails {...props} />
       {!success && <TryAgainButton {...props} />}
       {success && !actualPipette && <AttachAnotherButton {...props} />}
-      {ff.enableCalibrationOverhaul &&
-        success &&
-        actualPipette &&
-        !actualPipetteOffset && <CalibratePipetteOffsetButton {...props} />}
+      {success && actualPipette && !actualPipetteOffset && (
+        <CalibratePipetteOffsetButton {...props} />
+      )}
       <ExitButton {...props} />
     </ModalPage>
   )
@@ -205,11 +200,20 @@ function TryAgainButton(props: Props) {
   )
 }
 
+const exitButtonMessage: (props: Props) => string = props => {
+  const { attachedWrong, actualPipette, actualPipetteOffset, success } = props
+  if (success && actualPipette && !Boolean(actualPipetteOffset)) {
+    return EXIT_WITHOUT_CAL
+  }
+  if (attachedWrong) {
+    return EXIT_BUTTON_MESSAGE_WRONG
+  }
+  return EXIT_BUTTON_MESSAGE
+}
+
 function ExitButton(props: Props) {
-  const { exit, attachedWrong, actualPipetteOffset } = props
-  let buttonText = EXIT_BUTTON_MESSAGE
-  if (attachedWrong) buttonText = EXIT_BUTTON_MESSAGE_WRONG
-  else if (!actualPipetteOffset) buttonText = EXIT_WITHOUT_CAL
+  const { exit } = props
+  const buttonText = exitButtonMessage(props)
 
   return (
     <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={exit}>

@@ -58,15 +58,18 @@ export function NavbarLink(props: NavbarLinkProps): React.Node {
     iconName,
     disabledReason,
     notificationReason,
+    warningReason,
     ...styleProps
   } = props
 
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_RIGHT,
   })
-  const tooltipContents = disabledReason ?? notificationReason ?? null
+  const tooltipContents =
+    disabledReason ?? notificationReason ?? warningReason ?? null
   const hasNotification = Boolean(notificationReason)
   const isDisabled = Boolean(disabledReason)
+  const hasWarning = Boolean(warningReason)
 
   const LinkComponent = isDisabled ? 'div' : NavLink
   const linkProps = isDisabled ? styleProps : { to: path, ...styleProps }
@@ -84,7 +87,9 @@ export function NavbarLink(props: NavbarLinkProps): React.Node {
       >
         <NotificationIcon
           name={iconName}
-          childName={hasNotification ? 'circle' : null}
+          childName={
+            hasWarning ? 'alert-circle' : hasNotification ? 'circle' : null
+          }
           width="100%"
           paddingX={SPACING_2}
         />

@@ -1,10 +1,25 @@
 """Geometry state store and getters."""
+from dataclasses import dataclass
+from typing_extensions import final
+
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2, SlotDefV2
 from opentrons.types import Point, DeckSlotName
+from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
 from .substore import Substore, CommandReactive
 from .labware import LabwareStore, LabwareData
+
+
+# TODO(mc, 2020-11-12): reconcile this data structure with WellGeometry
+@final
+@dataclass(frozen=True)
+class TipGeometry:
+    """Tip geometry data."""
+
+    effective_length: float
+    diameter: float
+    volume: int
 
 
 class GeometryState:
@@ -85,6 +100,56 @@ class GeometryState:
         slot_pos = self.get_slot_position(lw_data.location.slot)
 
         return z_dim + slot_pos[2] + lw_data.calibration[2]
+
+    # TODO(mc, 2020-11-12): reconcile with existing protocol logic and include
+    # data from tip-length calibration once v4.0.0 is in `edge`
+    def get_effective_tip_length(
+        self,
+        labware_id: str,
+        pipette_config: PipetteDict
+    ) -> float:
+        """
+        Given a labware and a pipette's config, get the effective tip length.
+
+        Effective tip length is the nominal tip length less the distance the
+        tip overlaps with the pipette nozzle.
+        """
+        labware_uri = self._labware_store.state.get_definition_uri(labware_id)
+        nominal_length = self._labware_store.state.get_tip_length(labware_id)
+        overlap_config = pipette_config["tip_overlap"]
+        default_overlap = overlap_config.get("default", 0)
+        overlap = overlap_config.get(labware_uri, default_overlap)
+
+        return nominal_length - overlap
+
+    # TODO(mc, 2020-11-12): reconcile with existing geometry logic
+    def get_tip_geometry(
+        self,
+        labware_id: str,
+        well_name: str,
+        pipette_config: PipetteDict
+    ) -> TipGeometry:
+        """
+        Given a labware, well, and hardware pipette config, get the tip geometry.
+
+        Tip geometry includes effective tip length, tip diameter, and tip volume,
+        which is all data required by the hardware controller for proper tip handling.
+        """
+        effective_length = self.get_effective_tip_length(labware_id, pipette_config)
+        well_def = self._labware_store.state.get_well_definition(labware_id, well_name)
+
+        if well_def["shape"] != "circular":
+            raise errors.LabwareIsNotTipRackError(
+                f"Well {well_name} in labware {labware_id} is not circular."
+            )
+
+        return TipGeometry(
+            effective_length=effective_length,
+            diameter=well_def["diameter"],
+            # TODO(mc, 2020-11-12): WellDefinition type says totalLiquidVolume
+            # is a float, but hardware controller expects an int
+            volume=int(well_def["totalLiquidVolume"]),
+        )
 
 
 class GeometryStore(Substore[GeometryState], CommandReactive):

@@ -9,8 +9,10 @@ import * as selectors from '../selectors'
 
 jest.mock('../selectors')
 jest.mock('../../robot/selectors')
-jest.mock('../../sessions')
+jest.mock('../../sessions/selectors')
 jest.mock('../../discovery/selectors')
+jest.mock('../../pipettes/selectors')
+jest.mock('../../calibration/selectors')
 
 describe('analytics events map', () => {
   beforeEach(() => {
@@ -223,6 +225,151 @@ describe('analytics events map', () => {
           ...protocolData,
           runTime: 4,
         },
+      })
+    })
+
+    it('robotAdmin:RESET_CONFIG -> resetRobotConfig event', () => {
+      const state = {}
+      const action = {
+        type: 'robotAdmin:RESET_CONFIG',
+        payload: {
+          robotName: 'robotName',
+          resets: {
+            foo: true,
+            bar: true,
+          },
+        },
+      }
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'resetRobotConfig',
+        properties: {
+          ...action.payload.resets,
+        },
+      })
+    })
+  })
+
+  describe('events with calibration data', () => {
+    it('analytics:PIPETTE_OFFSET_STARTED -> pipetteOffsetCalibrationStarted event', () => {
+      const state = {}
+      const action = {
+        type: 'analytics:PIPETTE_OFFSET_STARTED',
+        payload: {
+          someStuff: 'some-other-stuff',
+        },
+      }
+      selectors.getAnalyticsPipetteCalibrationData.mockReturnValue({
+        markedBad: true,
+        calibrationExists: true,
+        pipetteModel: 'my pipette model',
+      })
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'pipetteOffsetCalibrationStarted',
+        properties: {
+          ...action.payload,
+          calibrationExists: true,
+          markedBad: true,
+          pipetteModel: 'my pipette model',
+        },
+      })
+    })
+
+    it('analytics:TIP_LENGTH_STARTED -> tipLengthCalibrationStarted event', () => {
+      const state = {}
+      const action = {
+        type: 'analytics:TIP_LENGTH_STARTED',
+        payload: {
+          someStuff: 'some-other-stuff',
+        },
+      }
+      selectors.getAnalyticsTipLengthCalibrationData.mockReturnValue({
+        markedBad: true,
+        calibrationExists: true,
+        pipetteModel: 'pipette-model',
+      })
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'tipLengthCalibrationStarted',
+        properties: {
+          ...action.payload,
+          calibrationExists: true,
+          markedBad: true,
+          pipetteModel: 'pipette-model',
+        },
+      })
+    })
+
+    it('sessions:ENSURE_SESSION for deck cal -> deckCalibrationStarted event', () => {
+      const state = {}
+      const action = {
+        type: 'sessions:ENSURE_SESSION',
+        payload: {
+          sessionType: 'deckCalibration',
+        },
+      }
+      selectors.getAnalyticsDeckCalibrationData.mockReturnValue({
+        calibrationStatus: 'IDENTITY',
+        markedBad: true,
+        pipettes: { left: { model: 'my pipette model' } },
+      })
+
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'deckCalibrationStarted',
+        properties: {
+          calibrationStatus: 'IDENTITY',
+          markedBad: true,
+          pipettes: { left: { model: 'my pipette model' } },
+        },
+      })
+    })
+
+    it('sessions:ENSURE_SESSION for health check -> calibrationHealthCheckStarted event', () => {
+      const state = {}
+      const action = {
+        type: 'sessions:ENSURE_SESSION',
+        payload: {
+          sessionType: 'calibrationCheck',
+        },
+      }
+      selectors.getAnalyticsHealthCheckData.mockReturnValue({
+        pipettes: { left: { model: 'my pipette model' } },
+      })
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'calibrationHealthCheckStarted',
+        properties: {
+          pipettes: { left: { model: 'my pipette model' } },
+        },
+      })
+    })
+
+    it('sessions:ENSURE_SESSION for other session -> no event', () => {
+      const state = {}
+      const action = {
+        type: 'sessions:ENSURE_SESSION',
+        payload: {
+          sessionType: 'some-other-session',
+        },
+      }
+      return expect(makeEvent(action, state)).resolves.toBeNull()
+    })
+
+    it('sessions:CREATE_SESSION_COMMAND for exit -> {type}Exit', () => {
+      const state = {}
+      const action = {
+        type: 'sessions:CREATE_SESSION_COMMAND',
+        payload: {
+          robotName: 'my-robot',
+          sessionId: 'seshid',
+          command: { command: 'calibration.exitSession' },
+        },
+      }
+      selectors.getAnalyticsSessionExitDetails.mockReturnValue({
+        sessionType: 'my-session-type',
+        step: 'session-step',
+      })
+
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'my-session-typeExit',
+        properties: { step: 'session-step' },
       })
     })
   })

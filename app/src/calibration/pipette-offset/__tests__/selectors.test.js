@@ -21,9 +21,9 @@ describe('getPipetteOffsetCalibrations', () => {
     expect(
       Selectors.getPipetteOffsetCalibrations(mockState, 'robot-name')
     ).toEqual([
-      Fixtures.mockPipetteOffsetCalibration1.attributes,
-      Fixtures.mockPipetteOffsetCalibration2.attributes,
-      Fixtures.mockPipetteOffsetCalibration3.attributes,
+      Fixtures.mockPipetteOffsetCalibration1,
+      Fixtures.mockPipetteOffsetCalibration2,
+      Fixtures.mockPipetteOffsetCalibration3,
     ])
   })
   it('should not find calibrations from other robots', () => {
@@ -39,16 +39,18 @@ describe('getCalibrationForPipette', () => {
       Selectors.getCalibrationForPipette(
         mockState,
         'robot-name',
-        'P1KVS2108052020A02'
+        'P1KVS2108052020A02',
+        'right'
       )
-    ).toEqual(Fixtures.mockPipetteOffsetCalibration3.attributes)
+    ).toEqual(Fixtures.mockPipetteOffsetCalibration3)
   })
   it('should get no calibration when no matching calibration exists', () => {
     expect(
       Selectors.getCalibrationForPipette(
         mockState,
         'robot-name',
-        'no such pipette'
+        'no such pipette',
+        'some mount'
       )
     ).toBeNull()
   })
@@ -57,7 +59,8 @@ describe('getCalibrationForPipette', () => {
       Selectors.getCalibrationForPipette(
         mockState,
         'some other robot',
-        'P20MV2008052020A02'
+        'P20MV2008052020A02',
+        'right'
       )
     ).toBeNull()
   })

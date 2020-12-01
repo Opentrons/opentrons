@@ -16,6 +16,7 @@ export type TypographyProps = {|
   lineHeight?: string | number,
   textAlign?: string,
   textTransform?: string,
+  textDecoration?: string,
 |}
 
 export type SpacingProps = {|
@@ -55,6 +56,14 @@ export type FlexboxProps = {|
   flexWrap?: string,
 |}
 
+export type GridProps = {|
+  gridGap?: string | number,
+  gridTemplateRows?: string,
+  gridTemplateColumns?: string,
+  gridRow?: string | number,
+  gridColumn?: string | number,
+|}
+
 export type LayoutProps = {|
   display?: string,
   size?: string | number,
@@ -64,6 +73,7 @@ export type LayoutProps = {|
   height?: string | number,
   minHeight?: string | number,
   maxHeight?: string | number,
+  wordSpacing?: string | number,
 |}
 
 export type PositionProps = {|
@@ -81,6 +91,7 @@ export type StyleProps = {|
   ...SpacingProps,
   ...BorderProps,
   ...FlexboxProps,
+  ...GridProps,
   ...LayoutProps,
   ...PositionProps,
   className?: string,

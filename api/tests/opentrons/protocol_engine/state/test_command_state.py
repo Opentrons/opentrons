@@ -4,7 +4,7 @@ from datetime import datetime
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import StateStore
 from opentrons.protocol_engine.types import DeckSlotLocation
-from opentrons.protocol_engine.command_models import (
+from opentrons.protocol_engine.commands import (
     PendingCommand,
     LoadLabwareRequest,
     LoadLabwareResult

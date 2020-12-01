@@ -5,7 +5,7 @@ from typing import (
     Any, Awaitable, Callable, Dict, List, Optional, Tuple,
     Union, TYPE_CHECKING)
 
-from opentrons.calibration_storage import get
+from opentrons.calibration_storage import get, delete
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.calibration_storage import helpers
 from opentrons.config import feature_flags as ff
@@ -13,24 +13,23 @@ from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import ThreadManager, CriticalPoint
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry import deck
+from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
+from opentrons.util import linal
 
 from robot_server.robot.calibration.constants import \
     TIP_RACK_LOOKUP_BY_MAX_VOL
 from robot_server.service.errors import RobotServerError
-from opentrons.util import linal
 
 from robot_server.service.session.models.command import (
     CalibrationCommand, DeckCalibrationCommand)
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK, STANDARD_DECK, MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER, POINT_ONE_ID, POINT_TWO_ID,
-    POINT_THREE_ID)
+    POINT_THREE_ID, JOG_TO_DECK_SLOT)
 import robot_server.robot.calibration.util as uf
 from .constants import (
     DeckCalibrationState as State,
-    JOG_TO_DECK_SLOT,
     TIP_RACK_SLOT,
     MOVE_POINT_STATE_MAP,
     SAVE_POINT_STATE_MAP)
@@ -75,7 +74,7 @@ class DeckCalibrationUserFlow:
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
-        self._deck = deck.Deck(load_name=deck_load_name)
+        self._deck = Deck(load_name=deck_load_name)
         self._tip_rack = self._get_tip_rack_lw()
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 
@@ -99,11 +98,43 @@ class DeckCalibrationUserFlow:
             DeckCalibrationCommand.move_to_point_two: self.move_to_point_two,
             DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
             CalibrationCommand.exit: self.exit_session,
+            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,  # noqa: E501
         }
+        self.hardware.set_robot_calibration(
+            robot_cal.build_temporary_identity_calibration())
+        self._hw_pipette.update_pipette_offset(
+            robot_cal.load_pipette_offset(pip_id=None, mount=self._mount))
+
+    @property
+    def deck(self) -> Deck:
+        return self._deck
 
     @property
     def hardware(self) -> ThreadManager:
         return self._hardware
+
+    @property
+    def mount(self) -> Mount:
+        return self._mount
+
+    @property
+    def hw_pipette(self) -> Pipette:
+        return self._hw_pipette
+
+    @property
+    def tip_origin(self) -> Point:
+        if self._tip_origin_pt:
+            return self._tip_origin_pt
+        else:
+            return self._tip_rack.wells()[0].top().point +\
+                MOVE_TO_TIP_RACK_SAFETY_BUFFER
+
+    @tip_origin.setter
+    def tip_origin(self, new_val: Optional[Point]):
+        self._tip_origin_pt = new_val
+
+    def reset_tip_origin(self):
+        self._tip_origin_pt = None
 
     @property
     def current_state(self) -> State:
@@ -146,11 +177,18 @@ class DeckCalibrationUserFlow:
 
         right_pip = pips[Mount.RIGHT]
         left_pip = pips[Mount.LEFT]
-        if right_pip.config.max_volume > left_pip.config.max_volume or \
-                right_pip.config.channels > left_pip.config.channels:
-            return left_pip, Mount.LEFT
+        if right_pip.config.max_volume == left_pip.config.max_volume:
+            if right_pip.config.channels == left_pip.config.channels:
+                return right_pip, Mount.RIGHT
+            else:
+                return sorted(
+                    [(right_pip, Mount.RIGHT), (left_pip, Mount.LEFT)],
+                    key=lambda p_m: p_m[0].config.channels
+                )[0]
         else:
-            return right_pip, Mount.RIGHT
+            return sorted(
+                [(right_pip, Mount.RIGHT), (left_pip, Mount.LEFT)],
+                key=lambda p_m: p_m[0].config.max_volume)[0]
 
     def _get_tip_rack_lw(self) -> labware.Labware:
         pip_vol = self._hw_pipette.config.max_volume
@@ -185,7 +223,6 @@ class DeckCalibrationUserFlow:
         """
         next_state = self._state_machine.get_next_state(self._current_state,
                                                         name)
-
         handler = self._command_map.get(name)
         if handler is not None:
             await handler(**data)
@@ -194,11 +231,12 @@ class DeckCalibrationUserFlow:
             f'DeckCalUserFlow handled command {name}, transitioned'
             f'from {self._current_state} to {next_state}')
 
-    def _get_critical_point_override(self) -> Optional[CriticalPoint]:
+    @property
+    def critical_point_override(self) -> Optional[CriticalPoint]:
         return (CriticalPoint.FRONT_NOZZLE if
                 self._hw_pipette.config.channels == 8 else None)
 
-    async def _get_current_point(
+    async def get_current_point(
             self,
             critical_point: CriticalPoint = None) -> Point:
         return await self._hardware.gantry_position(self._mount,
@@ -212,10 +250,9 @@ class DeckCalibrationUserFlow:
                                       delta=Point(*vector))
 
     async def move_to_tip_rack(self):
-        point = self._tip_rack.wells()[0].top().point + \
-                MOVE_TO_TIP_RACK_SAFETY_BUFFER
-        to_loc = Location(point, None)
-        await self._move(to_loc)
+        if self._current_state == State.labwareLoaded:
+            await self.hardware.home()
+        await self._move(Location(self.tip_origin, None))
 
     async def move_to_deck(self):
         deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
@@ -229,7 +266,7 @@ class DeckCalibrationUserFlow:
     def _get_move_to_point_loc_by_state(self) -> Location:
         assert self._z_height_reference is not None, \
             "saveOffset has not been called yet"
-        pt_id = MOVE_POINT_STATE_MAP[self._current_state]
+        pt_id = MOVE_POINT_STATE_MAP[self.current_state]
         coords = self._deck.get_calibration_position(pt_id).position
         loc = Location(Point(*coords), None)
         return loc.move(point=Point(0, 0, self._z_height_reference))
@@ -244,7 +281,7 @@ class DeckCalibrationUserFlow:
         await self._move(self._get_move_to_point_loc_by_state())
 
     async def save_offset(self):
-        cur_pt = await self._get_current_point(critical_point=None)
+        cur_pt = await self.get_current_point(critical_point=None)
         if self.current_state == State.joggingToDeck:
             self._z_height_reference = cur_pt.z
         else:
@@ -253,6 +290,8 @@ class DeckCalibrationUserFlow:
 
             if self._current_state == State.savingPointThree:
                 self._save_attitude_matrix()
+                # clear all pipette offset data
+                delete.clear_pipette_offset_calibrations()
 
     def _save_attitude_matrix(self):
         e = tuplefy_cal_point_dicts(self._expected_points)
@@ -273,7 +312,7 @@ class DeckCalibrationUserFlow:
                 pip_id,
                 self._tip_rack._implementation.get_definition(),
                 ''
-            )['tipLength']
+            ).tip_length
         except TipLengthCalNotFound:
             tip_overlap = self._hw_pipette.config.tip_overlap.get(
                 self._tip_rack.uri,
@@ -287,12 +326,27 @@ class DeckCalibrationUserFlow:
     async def invalidate_tip(self):
         await uf.invalidate_tip(self)
 
-    async def _return_tip(self):
+    async def return_tip(self):
         await uf.return_tip(self, tip_length=self._get_tip_length())
 
     async def _move(self, to_loc: Location):
         await uf.move(self, to_loc)
 
     async def exit_session(self):
+        if self.hw_pipette.has_tip:
+            await self.move_to_tip_rack()
+            await self.return_tip()
+        # reload new deck calibration
+        self._hardware.reset_robot_calibration()
+        self._hardware.reset_instrument()
+        await self._hardware.home()
+
+    async def invalidate_last_action(self):
+        await self.hardware.home()
+        await self._hardware.gantry_position(self.mount, refresh=True)
+        if self._current_state != State.preparingPipette:
+            trash = self._deck.get_fixed_trash()
+            assert trash, 'Bad deck setup'
+            await uf.move(self, trash['A1'].top(), CriticalPoint.XY_CENTER)
+            await self.hardware.drop_tip(self.mount)
         await self.move_to_tip_rack()
-        await self._return_tip()

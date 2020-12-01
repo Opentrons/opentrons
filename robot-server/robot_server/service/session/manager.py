@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from typing import Optional, Tuple, Dict, Type
 
@@ -13,8 +12,8 @@ from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models.session import SessionType
 from robot_server.service.session.models.common import IdentifierType
 from robot_server.service.session.session_types import (
-    NullSession, CheckSession, SessionMetaData, TipLengthCalibration,
-    DeckCalibrationSession, PipetteOffsetCalibrationSession, DefaultSession)
+    CheckSession, SessionMetaData, TipLengthCalibration,
+    DeckCalibrationSession, PipetteOffsetCalibrationSession)
 from robot_server.service.session.session_types.live_protocol.session import \
     LiveProtocolSession
 from robot_server.service.session.session_types.protocol.session import \
@@ -23,12 +22,10 @@ from robot_server.service.session.session_types.protocol.session import \
 log = logging.getLogger(__name__)
 
 SessionTypeToClass: Dict[SessionType, Type[BaseSession]] = {
-    SessionType.null: NullSession,
     SessionType.calibration_check: CheckSession,
     SessionType.tip_length_calibration: TipLengthCalibration,
     SessionType.deck_calibration: DeckCalibrationSession,
     SessionType.pipette_offset_calibration: PipetteOffsetCalibrationSession,
-    SessionType.default: DefaultSession,
     SessionType.protocol: ProtocolSession,
     SessionType.live_protocol: LiveProtocolSession,
 }
@@ -48,19 +45,13 @@ class SessionManager:
         :param protocol_manager: ProtocolManager for protocol related sessions
         """
         self._sessions: Dict[IdentifierType, BaseSession] = {}
-        self._active = ActiveSessionId(
-            default_id=DefaultSession.DEFAULT_ID
-        )
+        self._active = ActiveSessionId()
         # Create object supplied to all sessions
         self._session_common = SessionConfiguration(
             hardware=hardware,
             is_active=self.is_active,
             motion_lock=motion_lock,
             protocol_manager=protocol_manager
-        )
-        # Create the default session.
-        asyncio.new_event_loop().run_until_complete(
-            self.add(SessionType.default, SessionMetaData())
         )
 
     async def add(self,
@@ -89,11 +80,6 @@ class SessionManager:
     async def remove(self, identifier: IdentifierType) \
             -> Optional[BaseSession]:
         """Remove a session"""
-        if identifier == DefaultSession.DEFAULT_ID:
-            raise SessionException(
-                reason=f"Cannot remove {identifier} session"
-            )
-
         session = self.deactivate(identifier)
         if session:
             del self._sessions[session.meta.identifier]
@@ -126,7 +112,8 @@ class SessionManager:
 
     def get_active(self) -> Optional[BaseSession]:
         """Get the active session"""
-        return self.get_by_id(self._active.active_id)
+        return self.get_by_id(self._active.active_id) \
+            if self._active.active_id else None
 
     def is_active(self, identifier: IdentifierType) -> bool:
         """Check if session identifier is active"""
@@ -148,18 +135,13 @@ class SessionManager:
 
 
 class ActiveSessionId:
-    def __init__(self, default_id: IdentifierType):
-        self._default_id = default_id
-        self._active_id = default_id
+    def __init__(self):
+        self._active_id: Optional[IdentifierType] = None
 
     @property
-    def active_id(self):
+    def active_id(self) -> Optional[IdentifierType]:
         return self._active_id
 
     @active_id.setter
-    def active_id(self, val):
-        self._active_id = val if val is not None else self._default_id
-
-    @property
-    def default_id(self):
-        return self._default_id
+    def active_id(self, val: Optional[IdentifierType]) -> None:
+        self._active_id = val

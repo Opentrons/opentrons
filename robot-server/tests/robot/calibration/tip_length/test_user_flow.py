@@ -5,14 +5,19 @@ from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.config.pipette_config import load
+from opentrons.calibration_storage import types as cal_types
 
-from robot_server.robot.calibration.util import get_reference_location
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
+
+PIP_CAL = cal_types.PipetteOffsetByPipetteMount(
+    offset=[0, 0, 0],
+    source=cal_types.SourceType.user,
+    status=cal_types.CalibrationStatus())
 
 pipette_map = {
     "p10_single_v1.5": "opentrons_96_tiprack_10ul",
@@ -38,6 +43,7 @@ def mock_hw_pipette_all_combos(request):
                                'single': [0, 0, 0],
                                'multi': [0, 0, 0]
                            },
+                           PIP_CAL,
                            'testId')
 
 
@@ -66,6 +72,7 @@ def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
     hardware.drop_tip = MagicMock(side_effect=async_mock)
     hardware.gantry_position = MagicMock(side_effect=gantry_pos_mock)
     hardware.move_to = MagicMock(side_effect=async_mock_move_to)
+    hardware.home_plunger = MagicMock(side_effect=async_mock)
     hardware.get_instrument_max_height.return_value = 180
     return hardware
 
@@ -77,6 +84,7 @@ def mock_hw(hardware):
                               'single': [0, 0, 0],
                               'multi': [0, 0, 0]
                           },
+                          PIP_CAL,
                           'testId')
     hardware._attached_instruments = {Mount.RIGHT: pip}
     hardware._current_pos = Point(0, 0, 0)
@@ -95,12 +103,18 @@ def mock_hw(hardware):
     async def gantry_pos_mock(*args, **kwargs):
         return hardware._current_pos
 
+    async def async_mock_home_plunger(*args, **kwargs):
+        pass
+
     hardware.move_rel = MagicMock(side_effect=async_mock_move_rel)
     hardware.pick_up_tip = MagicMock(side_effect=async_mock)
     hardware.drop_tip = MagicMock(side_effect=async_mock)
     hardware.gantry_position = MagicMock(side_effect=gantry_pos_mock)
     hardware.move_to = MagicMock(side_effect=async_mock_move_to)
     hardware.get_instrument_max_height.return_value = 180
+    hardware.home_plunger = MagicMock(side_effect=async_mock_home_plunger)
+    hardware.drop_tip = MagicMock(side_effect=async_mock)
+    hardware.home = MagicMock(side_effect=async_mock)
     return hardware
 
 
@@ -149,13 +163,27 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
      {}, 'move_to'),
     (CalibrationCommand.move_to_tip_rack, 'measuringTipOffset',
      {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action,
+     'preparingPipette', {}, 'home'),
+    (CalibrationCommand.invalidate_last_action,
+     'preparingPipette', {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action,
+     'measuringTipOffset', {}, 'home'),
+    (CalibrationCommand.invalidate_last_action,
+     'measuringTipOffset', {}, 'drop_tip'),
+    (CalibrationCommand.invalidate_last_action,
+     'measuringTipOffset', {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action,
+     'measuringNozzleOffset', {}, 'home'),
+    (CalibrationCommand.invalidate_last_action,
+     'measuringNozzleOffset', {}, 'move_to'),
 ]
 
 
 async def test_move_to_tip_rack(mock_user_flow):
     uf = mock_user_flow
     await uf.move_to_tip_rack()
-    cur_pt = await uf._get_current_point(None)
+    cur_pt = await uf.get_current_point(None)
     assert cur_pt == uf._deck['8'].wells()[0].top().point + Point(0, 0, 10)
 
 
@@ -164,7 +192,7 @@ async def test_move_to_reference_point(mock_user_flow_all_combos):
     await uf.move_to_reference_point()
     buff = Point(0, 0, 5)
     trash_offset = Point(-57.84, -55, 0)  # offset from center of trash
-    cur_pt = await uf._get_current_point(None)
+    cur_pt = await uf.get_current_point(None)
     if uf._has_calibration_block:
         if uf._mount == Mount.LEFT:
             assert cur_pt == \
@@ -181,9 +209,9 @@ async def test_move_to_reference_point(mock_user_flow_all_combos):
 async def test_jog(mock_user_flow):
     uf = mock_user_flow
     await uf.jog(vector=(0, 0, 0.1))
-    assert await uf._get_current_point(None) == Point(0, 0, 0.1)
+    assert await uf.get_current_point(None) == Point(0, 0, 0.1)
     await uf.jog(vector=(1, 0, 0))
-    assert await uf._get_current_point(None) == Point(1, 0, 0.1)
+    assert await uf.get_current_point(None) == Point(1, 0, 0.1)
 
 
 async def test_pick_up_tip(mock_user_flow):
@@ -206,8 +234,7 @@ async def test_invalidate_tip(mock_user_flow):
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._get_critical_point_override()
-        ),
+            critical_point=uf.critical_point_override,)
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
     uf._hardware.drop_tip.assert_called()
@@ -225,8 +252,7 @@ async def test_exit(mock_user_flow):
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._get_critical_point_override()
-        ),
+            critical_point=uf.critical_point_override)
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
     uf._hardware.drop_tip.assert_called()
@@ -270,9 +296,8 @@ def test_load_cal_block(mock_user_flow_all_combos):
 
 async def test_get_reference_location(mock_user_flow_all_combos):
     uf = mock_user_flow_all_combos
-    result = get_reference_location(
-        mount=uf._mount, deck=uf._deck,
-        has_calibration_block=uf._has_calibration_block)
+    await uf.move_to_reference_point()
+    cur_pt = await uf.get_current_point(None)
     if uf._has_calibration_block:
         if uf._mount == Mount.LEFT:
             exp = uf._deck['3'].wells()[0].top().move(Point(0, 0, 5))
@@ -281,7 +306,7 @@ async def test_get_reference_location(mock_user_flow_all_combos):
     else:
         exp = uf._deck.get_fixed_trash().wells()[0].top().move(
             Point(-57.84, -55, 5))
-    assert result == exp
+    assert cur_pt == exp.point
 
 
 async def test_save_offsets(mock_user_flow):
@@ -294,8 +319,7 @@ async def test_save_offsets(mock_user_flow):
         await uf._hardware.move_to(
             mount=uf._mount,
             abs_position=Point(x=10, y=10, z=10),
-            critical_point=uf._get_critical_point_override()
-        )
+            critical_point=uf.critical_point_override)
         await uf.save_offset()
         assert uf._nozzle_height_at_reference == 10
 
@@ -304,8 +328,7 @@ async def test_save_offsets(mock_user_flow):
         await uf._hardware.move_to(
             mount=uf._mount,
             abs_position=Point(x=10, y=10, z=40),
-            critical_point=uf._get_critical_point_override()
-        )
+            critical_point=uf.critical_point_override)
         await uf.save_offset()
         create_tip_length_data_patch.assert_called_with(ANY, '', 30)
 

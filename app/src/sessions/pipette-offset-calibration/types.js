@@ -37,7 +37,7 @@ export type PipetteOffsetCalibrationSessionParams = {|
   mount: string,
   shouldRecalibrateTipLength: boolean,
   hasCalibrationBlock: boolean,
-  tipRackDefinition: ?LabwareDefinition2,
+  tipRackDefinition: LabwareDefinition2 | null,
 |}
 
 export type PipetteOffsetCalibrationSessionDetails = {|

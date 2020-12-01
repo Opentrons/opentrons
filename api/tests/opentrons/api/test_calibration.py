@@ -53,32 +53,6 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
     main_router.calibration_manager.tip_probe(model.instrument)
 
 
-@pytest.mark.api1_only
-async def test_tip_probe_v1(main_router, model):
-    with mock.patch(
-        'opentrons.util.calibration_functions.probe_instrument'
-    ) as probe_patch:
-        probe_patch.return_value = (0, 0, 0)
-
-        with mock.patch(
-            'opentrons.util.calibration_functions.update_instrument_config'
-        ) as update_patch:
-
-            main_router.calibration_manager.tip_probe(model.instrument)
-
-            probe_patch.assert_called_with(
-                instrument=model.instrument._instrument,
-                robot=model.instrument._instrument.robot)
-
-            update_patch.assert_called_with(
-                instrument=model.instrument._instrument,
-                measured_center=(0, 0, 0))
-
-    await main_router.wait_until(state('probing'))
-    await main_router.wait_until(state('moving'))
-    await main_router.wait_until(state('ready'))
-
-
 async def test_correct_hotspots():
     config = robot_configs.build_config([], {})
 
@@ -144,24 +118,6 @@ async def test_move_to_front_api2(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
-@pytest.mark.api1_only
-async def test_move_to_front_api1(main_router, model):
-    robot = model.robot
-
-    robot.home()
-
-    with mock.patch(
-        'opentrons.util.calibration_functions.move_instrument_for_probing_prep'
-    ) as patch:
-        main_router.calibration_manager.move_to_front(model.instrument)
-        patch.assert_called_with(
-            model.instrument._instrument,
-            robot)
-
-        await main_router.wait_until(state('moving'))
-        await main_router.wait_until(state('ready'))
-
-
 async def test_pick_up_tip(main_router, model):
     with mock.patch.object(
             model.instrument._instrument, 'pick_up_tip') as pick_up_tip:
@@ -210,18 +166,6 @@ async def test_home_api2(main_router, model):
     await main_router.wait_until(state('ready'))
 
 
-@pytest.mark.api1_only
-async def test_home_api1(main_router, model):
-    with mock.patch.object(model.instrument._instrument, 'home') as home:
-        main_router.calibration_manager.home(
-            model.instrument)
-
-        home.assert_called_with()
-
-        await main_router.wait_until(state('moving'))
-        await main_router.wait_until(state('ready'))
-
-
 @pytest.mark.api2_only
 async def test_home_all_api2(main_router, model):
     with mock.patch.object(model.instrument._context, 'home') as home:
@@ -229,32 +173,6 @@ async def test_home_all_api2(main_router, model):
             model.instrument)
 
         home.assert_called_once()
-
-        await main_router.wait_until(state('moving'))
-        await main_router.wait_until(state('ready'))
-
-
-@pytest.mark.api1_only
-async def test_home_all_api1(main_router, model):
-    with mock.patch.object(main_router.calibration_manager, '_hardware') as hardware:
-        main_router.calibration_manager.home_all(
-            model.instrument)
-
-        hardware.home.assert_called_with()
-
-        await main_router.wait_until(state('moving'))
-        await main_router.wait_until(state('ready'))
-
-
-@pytest.mark.api1_only
-@pytest.mark.parametrize('labware_name', ['trough-1row-25ml'])
-async def test_move_to_top_api1_1well(main_router, model, labware_name):
-    with mock.patch.object(model.instrument._instrument, 'move_to') as move_to:
-        main_router.calibration_manager.move_to(
-            model.instrument,
-            model.container)
-        target = model.container._container.wells(0).top()
-        move_to.assert_called_with(target)
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))
@@ -293,31 +211,6 @@ async def test_jog_api2(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
-@pytest.mark.api1_only
-async def test_jog_api1(main_router, model):
-    with mock.patch(
-            'opentrons.util.calibration_functions.jog_instrument') as jog:
-        for distance, axis in zip((1, 2, 3), 'xyz'):
-            main_router.calibration_manager.jog(
-                model.instrument,
-                distance,
-                axis
-            )
-
-        expected = [
-            mock.call(
-                instrument=model.instrument._instrument,
-                distance=distance,
-                axis=axis,
-                robot=model.instrument._instrument.robot)
-            for axis, distance in zip('xyz', (1, 2, 3))]
-
-        assert jog.mock_calls == expected
-
-        await main_router.wait_until(state('moving'))
-        await main_router.wait_until(state('ready'))
-
-
 @pytest.mark.api2_only
 async def test_update_container_offset_v2(main_router, model):
     with mock.patch(
@@ -333,22 +226,6 @@ async def test_update_container_offset_v2(main_router, model):
                 - model.container._container.wells()[0].top().point)
         call.assert_called_with(model.container._container,
                                 diff)
-
-
-@pytest.mark.api1_only
-async def test_update_container_offset_v1(main_router, model):
-    with mock.patch.object(
-            model.robot,
-            'calibrate_container_with_instrument') as call:
-        main_router.calibration_manager.update_container_offset(
-            model.container,
-            model.instrument
-        )
-        call.assert_called_with(
-            container=model.container._container,
-            instrument=model.instrument._instrument,
-            save=True
-        )
 
 
 @pytest.mark.api2_only
@@ -378,58 +255,6 @@ async def test_jog_calibrate_bottom_v2(
         == pytest.approx(old_bottom + Point(1, 2, 3))
 
 
-@pytest.mark.api1_only
-async def test_jog_calibrate_bottom_v1(
-        main_router,
-        model,
-        calibrate_bottom_flag):
-
-    # Check that the feature flag correctly implements calibrate to bottom
-    from numpy import array, isclose
-    from opentrons.trackers import pose_tracker
-
-    robot = model.robot
-
-    container = model.container._container
-    pos1 = pose_tracker.change_base(
-        robot.poses,
-        src=container[0],
-        dst=robot.deck)
-    coordinates1 = container.coordinates()
-    height = container['A1'].properties['height']
-
-    main_router.calibration_manager.move_to(model.instrument, model.container)
-    main_router.calibration_manager.jog(model.instrument, 1, 'x')
-    main_router.calibration_manager.jog(model.instrument, 2, 'y')
-    main_router.calibration_manager.jog(model.instrument, 3, 'z')
-    main_router.calibration_manager.jog(model.instrument, -height, 'z')
-
-    # Todo: make tests use a tmp dir instead of a real one
-    main_router.calibration_manager.update_container_offset(
-        model.container,
-        model.instrument
-    )
-
-    pos2 = pose_tracker.absolute(robot.poses, container[0])
-    coordinates2 = container.coordinates()
-
-    assert isclose(pos1 + (1, 2, 3), pos2).all()
-    assert isclose(
-        array([*coordinates1]) + (1, 2, 3),
-        array([*coordinates2])).all()
-
-    main_router.calibration_manager.pick_up_tip(
-        model.instrument,
-        model.container
-    )
-
-    # NOTE: only check XY, as the instrument moves up after tip pickup
-    assert isclose(
-        pose_tracker.absolute(robot.poses, container[0])[:-1],
-        pose_tracker.absolute(robot.poses, model.instrument._instrument)[:-1]
-    ).all()
-
-
 @pytest.mark.api2_only
 async def test_jog_calibrate_top_v2(
         main_router,
@@ -451,57 +276,3 @@ async def test_jog_calibrate_top_v2(
     )
     assert list(model.container._container.wells()[0].top().point)\
         == pytest.approx(old_top + Point(1, 2, 3))
-
-
-@pytest.mark.api1_only
-async def test_jog_calibrate_top(
-        main_router,
-        model,
-        monkeypatch):
-
-    # Check that the old behavior remains the same without the feature flag
-    from numpy import array, isclose
-    from opentrons.trackers import pose_tracker
-    import tempfile
-    temp = tempfile.gettempdir()
-    monkeypatch.setenv('USER_DEFN_ROOT', temp)
-
-    robot = model.robot
-
-    container = model.container._container
-    container_coords1 = container.coordinates()
-    pos1 = pose_tracker.absolute(robot.poses, container[0])
-    coordinates1 = container[0].coordinates()
-
-    main_router.calibration_manager.move_to(model.instrument, model.container)
-    main_router.calibration_manager.jog(model.instrument, 1, 'x')
-    main_router.calibration_manager.jog(model.instrument, 2, 'y')
-    main_router.calibration_manager.jog(model.instrument, 3, 'z')
-
-    main_router.calibration_manager.update_container_offset(
-        model.container,
-        model.instrument
-    )
-
-    container_coords2 = container.coordinates()
-    pos2 = pose_tracker.absolute(robot.poses, container[0])
-    coordinates2 = container[0].coordinates()
-
-    assert isclose(
-        array([*container_coords1]) + (1, 2, 3),
-        array([*container_coords2])).all()
-    assert isclose(pos1 + (1, 2, 3), pos2).all()
-    assert isclose(
-        array([*coordinates1]) + (1, 2, 3),
-        array([*coordinates2])).all()
-
-    main_router.calibration_manager.pick_up_tip(
-        model.instrument,
-        model.container
-    )
-
-    # NOTE: only check XY, as the instrument moves up after tip pickup
-    assert isclose(
-        pose_tracker.absolute(robot.poses, container[0])[:-1],
-        pose_tracker.absolute(robot.poses, model.instrument._instrument)[:-1]
-    ).all()

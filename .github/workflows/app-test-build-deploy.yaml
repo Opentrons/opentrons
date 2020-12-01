@@ -43,6 +43,7 @@ env:
   OT_APP_DEPLOY_BUCKET: opentrons-app
   OT_APP_DEPLOY_FOLDER: builds
 
+
 jobs:
   js-unit-test:
     # unit tests for js frontend projects (e.g. not app-shell or discovery-client) do not need
@@ -56,7 +57,7 @@ jobs:
           node-version: '12'
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v3
+        uses: actions/github-script@v3.1
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
@@ -94,7 +95,7 @@ jobs:
           node-version: '12'
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v3
+        uses: actions/github-script@v3.1
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)

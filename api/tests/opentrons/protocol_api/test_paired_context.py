@@ -2,7 +2,7 @@ import pytest
 from unittest import mock
 
 from opentrons.hardware_control import API
-from opentrons.types import Mount, Point
+from opentrons.types import Mount, Point, Location
 from opentrons.protocol_api import paired_instrument_context as pc
 from opentrons.hardware_control.pipette import Pipette
 
@@ -21,9 +21,18 @@ def set_up_paired_instrument(ctx):
     return right.pair_with(left), [tiprack, tiprack2, tiprack3]
 
 
+def test_pick_up_and_drop_tip_in_specified_location(set_up_paired_instrument):
+    paired, tipracks = set_up_paired_instrument
+
+    random_location = Location(Point(0, 0, 0), tipracks[0])
+    paired.pick_up_tip(random_location)
+    paired.drop_tip()
+
+
 def test_pick_up_and_drop_tip_with_tipracks(set_up_paired_instrument):
     paired, tipracks = set_up_paired_instrument
     assert paired.tip_racks == [tipracks[1]]
+
     for col in tipracks[1].columns()[0:4]:
         for well in col:
             second_well = paired._get_secondary_target(tipracks[1], well)
@@ -56,9 +65,9 @@ def test_pick_up_and_drop_tip_no_tipracks(ctx):
         hardware._attached_instruments[Mount.RIGHT]
     l_pip: Pipette =\
         hardware._attached_instruments[Mount.LEFT]
-    model_offset = Point(*r_pip.config.model_offset)
-    assert r_pip.critical_point() == model_offset
-    assert l_pip.critical_point() == model_offset
+    nozzle_offset = Point(*r_pip.config.nozzle_offset)
+    assert r_pip.critical_point() == nozzle_offset
+    assert l_pip.critical_point() == nozzle_offset
     target_location = tiprack['A1'].top()
 
     paired.pick_up_tip(target_location)
@@ -67,8 +76,8 @@ def test_pick_up_and_drop_tip_no_tipracks(ctx):
     assert not tiprack.wells()[0].has_tip
     assert not tiprack.columns()[4][0].has_tip
     overlap = right.hw_pipette['tip_overlap'][tiprack.uri]
-    new_offset = model_offset - Point(0, 0,
-                                      tip_length-overlap)
+    new_offset = nozzle_offset - Point(0, 0,
+                                       tip_length-overlap)
     assert r_pip.critical_point() == new_offset
     assert l_pip.critical_point() == new_offset
     assert r_pip.has_tip

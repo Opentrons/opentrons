@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from opentrons import simulate, protocols
+from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 
 HERE = Path(__file__).parent
@@ -72,16 +73,8 @@ def test_simulate_function_bundle_apiv2(get_bundle_fixture):
 
 @pytest.mark.parametrize('protocol_file', ['testosaur.py'])
 def test_simulate_function_v1(protocol, protocol_file):
-    runlog, bundle = simulate.simulate(protocol.filelike, 'testosaur.py')
-    assert bundle is None
-    assert [item['payload']['text'] for item in runlog] == [
-        'Picking up tip from well A1 in "5"',
-        'Aspirating 10.0 uL from well A1 in "8" at 150.0 uL/sec',
-        'Dispensing 10.0 uL into well H12 in "8" at 300.0 uL/sec',
-        'Aspirating 10.0 uL from well A1 in "11" at 150.0 uL/sec',
-        'Dispensing 10.0 uL into well H12 in "11" at 300.0 uL/sec',
-        'Dropping tip into well A1 in "12"'
-    ]
+    with pytest.raises(ApiDeprecationError):
+        simulate.simulate(protocol.filelike, 'testosaur.py')
 
 
 @pytest.mark.parametrize('protocol_file', ['python_v2_custom_lw.py'])

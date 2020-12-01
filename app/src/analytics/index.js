@@ -9,6 +9,7 @@ import type {
 
 export * from './hooks'
 export * from './selectors'
+export * from './actions'
 
 export function toggleAnalyticsOptedIn(): ToggleConfigValueAction {
   return toggleConfigValue('analytics.optedIn')

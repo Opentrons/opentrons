@@ -6,13 +6,11 @@ import * as Selectors from '../selectors'
 import * as Fixtures from '../__fixtures__'
 import * as RobotSelectors from '../../robot/selectors'
 import * as POCSelectors from '../../calibration/pipette-offset/selectors'
-import * as ConfigSelectors from '../../config/selectors'
 import type { State } from '../../types'
 
 jest.mock('@opentrons/shared-data')
 jest.mock('../../robot/selectors')
 jest.mock('../../calibration/pipette-offset/selectors')
-jest.mock('../../config/selectors')
 
 type SelectorSpec = {|
   name: string,
@@ -23,11 +21,6 @@ type SelectorSpec = {|
   before?: () => mixed,
   after?: () => mixed,
 |}
-
-const mockGetFeatureFlags: JestMockFn<
-  [State],
-  $Call<typeof ConfigSelectors.getFeatureFlags, State>
-> = ConfigSelectors.getFeatureFlags
 
 const mockGetPipetteOffsetCalibrations: JestMockFn<
   [State, string],
@@ -133,7 +126,6 @@ const SPECS: Array<SelectorSpec> = [
     calibrated: true,
     before: () => {
       mockGetPipetteOffsetCalibrations.mockReturnValue([])
-      mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: false })
     },
   },
   {
@@ -178,7 +170,6 @@ const SPECS: Array<SelectorSpec> = [
         mockLeftPipetteCalibration,
         mockRightPipetteCalibration,
       ])
-      mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: false })
     },
   },
   {
@@ -203,7 +194,6 @@ const SPECS: Array<SelectorSpec> = [
         mockLeftPipetteCalibration,
         mockRightPipetteCalibration,
       ])
-      mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: false })
     },
     expected: {
       left: {
@@ -257,7 +247,6 @@ const SPECS: Array<SelectorSpec> = [
         mockLeftPipetteCalibration,
         mockRightPipetteCalibration,
       ])
-      mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: false })
     },
     matching: true,
     calibrated: true,
@@ -307,7 +296,6 @@ const SPECS: Array<SelectorSpec> = [
         mockLeftPipetteCalibration,
         mockRightPipetteCalibration,
       ])
-      mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: false })
     },
     expected: {
       left: {
@@ -333,51 +321,7 @@ const SPECS: Array<SelectorSpec> = [
     },
   },
   {
-    name: 'ignores missing calibration if ff off',
-    state: {
-      pipettes: {
-        robotName: {
-          attachedByMount: {
-            left: mockLeftPipette,
-            right: Fixtures.mockUnattachedPipette,
-          },
-          settingsById: null,
-        },
-      },
-    },
-    matching: true,
-    calibrated: true,
-    expected: {
-      left: {
-        compatibility: 'match',
-        protocol: {
-          ...mockLeftProtoPipette,
-          displayName: 'Left Pipette',
-        },
-        actual: {
-          ...mockLeftPipette,
-          modelSpecs: mockLeftSpecs,
-          displayName: 'Left Pipette',
-        },
-        needsOffsetCalibration: false,
-      },
-      right: {
-        compatibility: 'match',
-        protocol: null,
-        actual: null,
-        needsOffsetCalibration: false,
-      },
-    },
-    before: () => {
-      mockGetProtocolPipettes.mockReturnValue([mockLeftProtoPipette])
-      mockGetPipetteOffsetCalibrations.mockReturnValue([
-        mockRightPipetteCalibration,
-      ])
-      mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: false })
-    },
-  },
-  {
-    name: 'flags missing calibration if ff on',
+    name: 'flags missing calibration',
     state: {
       pipettes: {
         robotName: {
@@ -428,11 +372,10 @@ const SPECS: Array<SelectorSpec> = [
       mockGetPipetteOffsetCalibrations.mockReturnValue([
         mockLeftPipetteCalibration,
       ])
-      mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
     },
   },
   {
-    name: 'allows pass if ff on and all pipettes matching and calibrated',
+    name: 'allows pass if all pipettes matching and calibrated',
     state: {
       pipettes: {
         robotName: {
@@ -484,12 +427,10 @@ const SPECS: Array<SelectorSpec> = [
         mockLeftPipetteCalibration,
         mockRightPipetteCalibration,
       ])
-      mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
     },
   },
   {
-    name:
-      'allows pass if ff on and an unused but attached pipette is not calibrated',
+    name: 'allows pass if an unused but attached pipette is not calibrated',
     state: {
       pipettes: {
         robotName: {
@@ -533,7 +474,6 @@ const SPECS: Array<SelectorSpec> = [
       mockGetPipetteOffsetCalibrations.mockReturnValue([
         mockLeftPipetteCalibration,
       ])
-      mockGetFeatureFlags.mockReturnValue({ enableCalibrationOverhaul: true })
     },
   },
 ]

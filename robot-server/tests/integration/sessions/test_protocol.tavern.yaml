@@ -13,11 +13,9 @@ stages:
       method: POST
       json:
         data:
-          type: Session
-          attributes:
-            sessionType: protocol
-            createParams:
-              protocolId: "my_protocol"
+          sessionType: protocol
+          createParams:
+            protocolId: "my_protocol"
     response:
       status_code: 404
 ---
@@ -45,11 +43,9 @@ stages:
       method: POST
       json:
         data:
-          type: Session
-          attributes:
-            sessionType: protocol
-            createParams:
-              protocolId: "{protocol_id}"
+          sessionType: protocol
+          createParams:
+            protocolId: "{protocol_id}"
     response:
       status_code: 403
       json:
@@ -87,11 +83,9 @@ stages:
       method: POST
       json:
         data:
-          type: Session
-          attributes:
-            sessionType: protocol
-            createParams:
-              protocolId: "{protocol_id}"
+          sessionType: protocol
+          createParams:
+            protocolId: "{protocol_id}"
     response:
       status_code: 201
       save:
@@ -100,16 +94,14 @@ stages:
       json: &proto_session
         data:
           id: !anystr
-          type: Session
-          attributes:
-            sessionType: protocol
-            createParams:
-              protocolId: "{protocol_id}"
-            createdAt: !anystr
-            details:
-              protocolId: "{protocol_id}"
-              currentState: !anystr
-              events: !anylist
+          sessionType: protocol
+          createParams:
+            protocolId: "{protocol_id}"
+          createdAt: !anystr
+          details:
+            protocolId: "{protocol_id}"
+            currentState: !anystr
+            events: !anylist
         links: !anydict
   - name: Get the session
     request:

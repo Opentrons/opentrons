@@ -20,9 +20,9 @@ describe('getTipLengthCalibrations', () => {
   it('should find all tip length calibrations when they exist', () => {
     expect(Selectors.getTipLengthCalibrations(mockState, 'robot-name')).toEqual(
       [
-        Fixtures.mockTipLengthCalibration1.attributes,
-        Fixtures.mockTipLengthCalibration2.attributes,
-        Fixtures.mockTipLengthCalibration3.attributes,
+        Fixtures.mockTipLengthCalibration1,
+        Fixtures.mockTipLengthCalibration2,
+        Fixtures.mockTipLengthCalibration3,
       ]
     )
   })
@@ -42,7 +42,7 @@ describe('getCalibrationForPipette', () => {
         'P20MV2008052020A02',
         'opentrons_96_tiprack_20ul_hash'
       )
-    ).toEqual(Fixtures.mockTipLengthCalibration3.attributes)
+    ).toEqual(Fixtures.mockTipLengthCalibration3)
   })
   it('should get no calibration when no matching calibration exists', () => {
     expect(

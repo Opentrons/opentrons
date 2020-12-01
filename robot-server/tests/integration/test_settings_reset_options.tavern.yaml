@@ -1,34 +1,8 @@
 ---
-test_name: GET Settings Reset Options legacy
+test_name: GET Settings Reset Options
 marks:
   - usefixtures:
       - run_server
-      - tavern_disable_calibration_overhaul
-stages:
-  - name: Reset Options GET request returns correct option
-    request:
-      url: "{host:s}:{port:d}/settings/reset/options"
-      method: GET
-    response:
-      status_code: 200
-      json:
-        options:
-        - id: labwareCalibration
-          name: Labware Calibration
-          description: !re_search "Clear labware calibration and Protocol API v1 custom labware"
-        - id: bootScripts
-          name: Boot Scripts
-          description: Clear custom boot scripts
-        - id: tipProbe
-          name: Pipette Calibration
-          description: Clear pipette offset and tip length calibration
-
----
-test_name: GET Settings Reset Options cal overhaul
-marks:
-  - usefixtures:
-      - run_server
-      - tavern_enable_calibration_overhaul
 stages:
   - name: Reset Options GET request returns correct option
     request:
@@ -53,33 +27,6 @@ stages:
         - id: tipLengthCalibrations
           name: Tip Length Calibrations
           description: !re_search "Clear tip length calibrations"
----
-test_name: POST Reset tipProbe option
-marks:
-  - usefixtures:
-      - run_server
-      - tavern_disable_calibration_overhaul
-stages:
-  - name: POST Reset tipProbe true
-    request:
-      url: "{host:s}:{port:d}/settings/reset"
-      method: POST
-      json:
-        tipProbe: true
-    response:
-      status_code: 200
-      json:
-        message: "Options 'tip_probe' were reset"
-  - name: POST Reset tipProbe false
-    request:
-      url: "{host:s}:{port:d}/settings/reset"
-      method: POST
-      json:
-        tipProbe: false
-    response:
-      status_code: 200
-      json:
-        message: "Nothing to do"
 ---
 test_name: POST Reset labwareCalibration option
 marks:
@@ -184,50 +131,6 @@ stages:
       status_code: 200
       json:
         message: "Nothing to do"
----
-test_name: POST Reset tip length calibrations option
-marks:
-  - usefixtures:
-      - run_server
-stages:
-  - name: POST Reset tipLengthCalibrations true
-    request:
-      url: "{host:s}:{port:d}/settings/reset"
-      method: POST
-      json:
-        tipLengthCalibrations: true
-    response:
-      status_code: 200
-      json:
-        message: "Options 'tip_length_calibrations' were reset"
-  - name: POST Reset tipLengthCalibrations false
-    request:
-      url: "{host:s}:{port:d}/settings/reset"
-      method: POST
-      json:
-        tipLengthCalibrations: false
-    response:
-      status_code: 200
-      json:
-        message: "Nothing to do"
----
-test_name: POST Reset all options
-marks:
-  - usefixtures:
-      - run_server
-stages:
-  - name: POST Reset all options (legacy)
-    request:
-      url: "{host:s}:{port:d}/settings/reset"
-      method: POST
-      json:
-        tipProbe: true
-        labwareCalibration: true
-        bootScripts: true
-    response:
-      status_code: 200
-      json:
-        message: !re_match "(?=.*?(labware_calibration))(?=.*?(tip_probe))(?=.*?(boot_scripts))"
 ---
 test_name: POST Reset non existant option
 marks:

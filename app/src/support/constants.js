@@ -17,3 +17,4 @@ export const PROFILE_FEATURE_FLAG = 'Robot FF'
 // supported event names
 export const INTERCOM_EVENT_CALCHECK_COMPLETE: 'completed-robot-calibration-check' =
   'completed-robot-calibration-check'
+export const INTERCOM_EVENT_NO_CAL_BLOCK: 'no-cal-block' = 'no-cal-block'

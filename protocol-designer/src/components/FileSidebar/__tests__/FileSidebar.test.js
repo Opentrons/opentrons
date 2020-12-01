@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { shallow, mount } from 'enzyme'
-import fileSaver from 'file-saver'
 import { PrimaryButton, AlertModal, OutlineButton } from '@opentrons/components'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import {
@@ -13,7 +12,6 @@ import { FileSidebar, v4WarningContent, v5WarningContent } from '../FileSidebar'
 import { useBlockingHint } from '../../Hints/useBlockingHint'
 import type { HintArgs } from '../../Hints/useBlockingHint'
 
-jest.mock('file-saver')
 jest.mock('../../Hints/useBlockingHint')
 
 const mockUseBlockingHint: JestMockFn<[HintArgs], ?React.Node> = useBlockingHint
@@ -23,24 +21,19 @@ describe('FileSidebar', () => {
   const pipetteRightId = 'pipetteRightId'
   let props, commands, modulesOnDeck, pipettesOnDeck, savedStepForms
   beforeEach(() => {
-    fileSaver.saveAs = jest.fn()
-
     props = {
       loadFile: jest.fn(),
       createNewFile: jest.fn(),
       canDownload: true,
       onDownload: jest.fn(),
-      downloadData: {
-        fileData: {
-          labware: {},
-          labwareDefinitions: {},
-          metadata: {},
-          pipettes: {},
-          robot: { model: 'OT-2 Standard' },
-          schemaVersion: 3,
-          commands: [],
-        },
-        fileName: 'protocol.json',
+      fileData: {
+        labware: {},
+        labwareDefinitions: {},
+        metadata: {},
+        pipettes: {},
+        robot: { model: 'OT-2 Standard' },
+        schemaVersion: 3,
+        commands: [],
       },
       pipettesOnDeck: {},
       modulesOnDeck: {},
@@ -119,17 +112,12 @@ describe('FileSidebar', () => {
   })
 
   it('export button exports protocol when no errors', () => {
-    props.downloadData.fileData.commands = commands
-    const blob = new Blob([JSON.stringify(props.downloadData.fileData)], {
-      type: 'application/json',
-    })
-
+    props.fileData.commands = commands
     const wrapper = shallow(<FileSidebar {...props} />)
     const downloadButton = wrapper.find(PrimaryButton).at(0)
     downloadButton.simulate('click')
 
     expect(props.onDownload).toHaveBeenCalled()
-    expect(fileSaver.saveAs).toHaveBeenCalledWith(blob, 'protocol.json')
   })
 
   it('warning modal is shown when export is clicked with no command', () => {
@@ -140,10 +128,17 @@ describe('FileSidebar', () => {
 
     expect(alertModal).toHaveLength(1)
     expect(alertModal.prop('heading')).toEqual('Your protocol has no steps')
+
+    const continueButton = alertModal
+      .dive()
+      .find(OutlineButton)
+      .at(1)
+    continueButton.simulate('click')
+    expect(props.onDownload).toHaveBeenCalled()
   })
 
   it('warning modal is shown when export is clicked with unused pipette', () => {
-    props.downloadData.fileData.commands = commands
+    props.fileData.commands = commands
     props.pipettesOnDeck = pipettesOnDeck
     props.savedStepForms = savedStepForms
 
@@ -161,12 +156,19 @@ describe('FileSidebar', () => {
     expect(alertModal.html()).not.toContain(
       pipettesOnDeck.pipetteLeftId.spec.displayName
     )
+
+    const continueButton = alertModal
+      .dive()
+      .find(OutlineButton)
+      .at(1)
+    continueButton.simulate('click')
+    expect(props.onDownload).toHaveBeenCalled()
   })
 
   it('warning modal is shown when export is clicked with unused module', () => {
     props.modulesOnDeck = modulesOnDeck
     props.savedStepForms = savedStepForms
-    props.downloadData.fileData.commands = commands
+    props.fileData.commands = commands
 
     const wrapper = shallow(<FileSidebar {...props} />)
     const downloadButton = wrapper.find(PrimaryButton).at(0)
@@ -176,13 +178,20 @@ describe('FileSidebar', () => {
     expect(alertModal).toHaveLength(1)
     expect(alertModal.prop('heading')).toEqual('Unused module')
     expect(alertModal.html()).toContain('Magnetic module')
+
+    const continueButton = alertModal
+      .dive()
+      .find(OutlineButton)
+      .at(1)
+    continueButton.simulate('click')
+    expect(props.onDownload).toHaveBeenCalled()
   })
 
   it('warning modal is shown when export is clicked with unused module and pipette', () => {
     props.modulesOnDeck = modulesOnDeck
     props.pipettesOnDeck = pipettesOnDeck
     props.savedStepForms = savedStepForms
-    props.downloadData.fileData.commands = commands
+    props.fileData.commands = commands
 
     const wrapper = shallow(<FileSidebar {...props} />)
     const downloadButton = wrapper.find(PrimaryButton).at(0)
@@ -199,10 +208,17 @@ describe('FileSidebar', () => {
     expect(alertModal.html()).not.toContain(
       pipettesOnDeck.pipetteLeftId.spec.displayName
     )
+
+    const continueButton = alertModal
+      .dive()
+      .find(OutlineButton)
+      .at(1)
+    continueButton.simulate('click')
+    expect(props.onDownload).toHaveBeenCalled()
   })
 
   it('blocking hint is shown when protocol is v4', () => {
-    props.downloadData.fileData.commands = commands
+    props.fileData.commands = commands
     props.pipettesOnDeck = {
       pipetteLeftId: {
         name: 'string',
@@ -247,7 +263,7 @@ describe('FileSidebar', () => {
   })
 
   it('blocking hint is shown when protocol is v5', () => {
-    props.downloadData.fileData.commands = commands
+    props.fileData.commands = commands
     props.savedStepForms = savedStepForms
 
     const MockHintComponent = () => {

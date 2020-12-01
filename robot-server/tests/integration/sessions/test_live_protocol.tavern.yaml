@@ -12,9 +12,7 @@ stages:
       method: POST
       json:
         data:
-          type: Session
-          attributes:
-            sessionType: liveProtocol
+          sessionType: liveProtocol
     response:
       save:
         json:
@@ -26,94 +24,82 @@ stages:
       method: POST
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: equipment.loadLabware
-            data: &labware_data
-              location: 2
-              loadName: corning_96_wellplate_360ul_flat
-              displayName: my well plate
-              namespace: Opentrons
-              version: 1
+          command: equipment.loadLabware
+          data: &labware_data
+            location: 2
+            loadName: corning_96_wellplate_360ul_flat
+            displayName: my well plate
+            namespace: Opentrons
+            version: 1
     response:
       status_code: 200
       json:
         links: !anydict
         data:
           id: !anystr
-          type: SessionCommand
-          attributes:
-            data: *labware_data
-            command: equipment.loadLabware
-            status: executed
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
-            result:
-              labwareId: !anystr
-              definition: !anydict
-              calibration: !anylist
+          data: *labware_data
+          command: equipment.loadLabware
+          status: executed
+          createdAt: !anystr
+          startedAt: !anystr
+          completedAt: !anystr
+          result:
+            labwareId: !anystr
+            definition: !anydict
+            calibration: !anylist
   - name: Load tip rack command
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: equipment.loadLabware
-            data: &tiprack_data
-              location: 1
-              loadName: opentrons_96_tiprack_300ul
-              displayName: my tip rack
-              namespace: Opentrons
-              version: 1
+          command: equipment.loadLabware
+          data: &tiprack_data
+            location: 1
+            loadName: opentrons_96_tiprack_300ul
+            displayName: my tip rack
+            namespace: Opentrons
+            version: 1
     response:
       status_code: 200
       json:
         links: !anydict
         data:
           id: !anystr
-          type: SessionCommand
-          attributes:
-            data: *tiprack_data
-            command: equipment.loadLabware
-            status: executed
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
-            result:
-              labwareId: !anystr
-              definition: !anydict
-              calibration: !anylist
+          data: *tiprack_data
+          command: equipment.loadLabware
+          status: executed
+          createdAt: !anystr
+          startedAt: !anystr
+          completedAt: !anystr
+          result:
+            labwareId: !anystr
+            definition: !anydict
+            calibration: !anylist
   - name: Load instrument command
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
-          type: SessionCommand
-          attributes:
-            command: equipment.loadInstrument
-            data: &create_instrument_data
-              instrumentName: p300_single
-              mount: left
+          command: equipment.loadInstrument
+          data: &create_instrument_data
+            instrumentName: p300_single
+            mount: left
     response:
       status_code: 200
       json:
         links: !anydict
         data:
           id: !anystr
-          type: SessionCommand
-          attributes:
-            data: *create_instrument_data
-            command: equipment.loadInstrument
-            status: executed
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
-            result:
-              instrumentId: !anystr
+          data: *create_instrument_data
+          command: equipment.loadInstrument
+          status: executed
+          createdAt: !anystr
+          startedAt: !anystr
+          completedAt: !anystr
+          result:
+            instrumentId: !anystr
   - name: Delete the session
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}"

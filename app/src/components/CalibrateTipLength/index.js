@@ -34,6 +34,7 @@ import {
   ConfirmExitModal,
   MeasureNozzle,
   MeasureTip,
+  INTENT_TIP_LENGTH_IN_PROTOCOL,
 } from '../CalibrationPanels'
 
 import type { CalibrateTipLengthParentProps } from './types'
@@ -93,13 +94,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
-  const {
-    session,
-    robotName,
-    closeWizard,
-    showSpinner,
-    dispatchRequests,
-  } = props
+  const { session, robotName, showSpinner, dispatchRequests, isJogging } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
   const isMulti = React.useMemo(() => {
@@ -114,7 +109,7 @@ export function CalibrateTipLength(
     : null
 
   function sendCommands(...commands: Array<SessionCommandParams>) {
-    if (session?.id) {
+    if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
           command: c.command,
@@ -135,7 +130,6 @@ export function CalibrateTipLength(
         Sessions.deleteSession(robotName, session.id)
       )
     }
-    closeWizard()
   }
 
   const {
@@ -176,6 +170,7 @@ export function CalibrateTipLength(
           calBlock={calBlock}
           currentStep={currentStep}
           sessionType={session.sessionType}
+          intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
         />
       </ModalPage>
       {showConfirmExit && (

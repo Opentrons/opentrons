@@ -9,8 +9,11 @@ import type {
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { PipetteOffsetItem } from '../PipetteOffsetItem'
 import { InlineCalibrationWarning } from '../../InlineCalibrationWarning'
-
 import { findLabwareDefWithCustom } from '../../../findLabware'
+import type {
+  PipetteOffsetCalibration,
+  TipLengthCalibration,
+} from '../../../calibration/types'
 
 jest.mock('../../../findLabware')
 
@@ -36,11 +39,11 @@ const mockGetLabwareDisplayName: JestMockFn<
 
 const getMountLabel = wrapper => wrapper.find('h4')
 
-const getPipetteName = wrapper => wrapper.find('p').at(0)
+const getPipetteName = wrapper => wrapper.find('p').at(1)
 const getNotCalibrated = wrapper => wrapper.find('p').at(1)
 const getCalibrationText = wrapper => wrapper.find('p')
-const getCalibrationTime = wrapper => wrapper.find('p').at(1)
-const getCalibrationTiprack = wrapper => wrapper.find('p').at(2)
+const getCalibrationTime = wrapper => wrapper.find('p').at(3)
+const getCalibrationTiprack = wrapper => wrapper.find('p').at(5)
 const getCalibrationWarning = wrapper => wrapper.find(InlineCalibrationWarning)
 
 describe('PipetteOffsetItem', () => {
@@ -74,8 +77,10 @@ describe('PipetteOffsetItem', () => {
               source: 'unknown',
               markedAt: '',
             },
+            id: 'a_pip_id',
           },
           tipLength: {
+            id: '1',
             tipLength: 30,
             tiprack: 'asdagasdfasdsa',
             pipette: 'pipette-id-11',
@@ -101,20 +106,44 @@ describe('PipetteOffsetItem', () => {
     }
   })
 
+  it('renders acceptably when talking to a robot with cal data but no status', () => {
+    const wrapper = render({
+      calibration: {
+        offset: ({
+          pipette: 'pipette-id-11',
+          mount: 'left',
+          offset: [1, 2, 3],
+          tiprack: 'asdagasdfasdsa',
+          tiprackUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+          lastModified: '2020-09-10T05:13Z',
+          source: 'user',
+          id: 'a_pip_id',
+        }: $Shape<PipetteOffsetCalibration>),
+        tipLength: ({
+          id: '1',
+          tipLength: 30,
+          tiprack: 'asdagasdfasdsa',
+          pipette: 'pipette-id-11',
+          lastModified: '2020-09-10T05:10Z',
+          source: 'user',
+        }: $Shape<TipLengthCalibration>),
+      },
+    })
+    expect(wrapper.find('PipetteOffsetItem')).not.toBeNull()
+  })
+
   it('shows null when no pipette present', () => {
     const wrapper = render({ pipette: null })
-    expect(getMountLabel(wrapper).text()).toEqual('left')
-    expect(getCalibrationText(wrapper).text()).toEqual('n/a')
+    expect(getMountLabel(wrapper).text()).toEqual('left mount')
+    expect(getCalibrationText(wrapper).text()).toMatch(/no pipette attached/i)
     expect(getCalibrationWarning(wrapper).exists()).toBe(false)
   })
 
   it('says when you havent calibrated', () => {
     const wrapper = render({ calibration: null })
-    expect(getMountLabel(wrapper).text()).toEqual('left')
-    expect(getPipetteName(wrapper).text()).toEqual('P300 Single GEN2')
-    expect(getNotCalibrated(wrapper).text()).toMatch(/haven't calibrated/)
-    expect(getCalibrationText(wrapper)).toHaveLength(2)
-    expect(getCalibrationWarning(wrapper).exists()).toBe(false)
+    expect(getMountLabel(wrapper).text()).toEqual('left mount')
+    expect(getNotCalibrated(wrapper).text()).toMatch(/calibration required/i)
+    expect(getCalibrationWarning(wrapper).exists()).toBe(true)
   })
 
   it('displays date and tiprack display name from def', () => {
@@ -133,7 +162,7 @@ describe('PipetteOffsetItem', () => {
     expect(mockGetLabwareDisplayName).toHaveBeenCalledWith({
       parameters: { loadName: 'opentrons_96_tiprack_300ul' },
     })
-    expect(getMountLabel(wrapper).text()).toEqual('left')
+    expect(getMountLabel(wrapper).text()).toEqual('left mount')
     expect(getPipetteName(wrapper).text()).toEqual('P300 Single GEN2')
     expect(getCalibrationTime(wrapper).text()).toMatch(/September 10/)
     expect(getCalibrationTiprack(wrapper).text()).toMatch(
@@ -163,8 +192,10 @@ describe('PipetteOffsetItem', () => {
             source: 'calibration_check',
             markedAt: '2020-10-09T13:30:00Z',
           },
+          id: 'a_pip_id',
         },
         tipLength: {
+          id: '1',
           tipLength: 30,
           tiprack: 'asdagasdfasdsa',
           pipette: 'pipette-id-11',
@@ -203,8 +234,10 @@ describe('PipetteOffsetItem', () => {
             source: 'unknown',
             markedAt: '2020-10-09T13:30:00Z',
           },
+          id: 'a_pip_id',
         },
         tipLength: {
+          id: '1',
           tipLength: 30,
           tiprack: 'asdagasdfasdsa',
           pipette: 'pipette-id-11',

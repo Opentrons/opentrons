@@ -24,7 +24,10 @@ pipette_barcode_to_model = {
     'P50MV1418010104': 'p50_multi_v1.4',
     'P3HSV1418010105': 'p300_single_v1.4',
     'P3HMV1418010106': 'p300_multi_v1.4',
-    'P1KSV1418010107': 'p1000_single_v1.4'
+    'P1KSV1418010107': 'p1000_single_v1.4',
+    'P20MV2120120204': 'p20_multi_v2.1',
+    'P1KSV2218010107': 'p1000_single_v2.2',
+    'P20SV2220020501': 'p20_single_v2.2',
 }
 
 

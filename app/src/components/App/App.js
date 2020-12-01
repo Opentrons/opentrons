@@ -22,7 +22,7 @@ import { Run } from '../../pages/Run'
 import { SidePanel } from '../../pages/SidePanel'
 import { Navbar } from '../Navbar'
 import { Alerts } from '../Alerts'
-import { PortalRoot as ModalPortalRoot } from '../portal'
+import { PortalRoot as ModalPortalRoot, TopPortalRoot } from '../portal'
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -91,6 +91,7 @@ export function App(): React.Node {
           <ModalPortalRoot />
           <Alerts />
         </Box>
+        <TopPortalRoot />
       </Flex>
     </>
   )

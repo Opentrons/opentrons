@@ -8,6 +8,10 @@
     },
     "default_protocol_name": "Untitled"
   },
+  "pipette_mount_label": {
+    "left": "(L)",
+    "right": "(R)"
+  },
   "liquid_edit": {
     "details": "Details",
     "description": "Description",

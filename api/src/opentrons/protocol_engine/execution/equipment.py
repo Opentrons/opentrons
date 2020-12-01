@@ -1,68 +1,91 @@
 """Equipment command side-effect logic."""
+from dataclasses import dataclass
+from typing import Tuple
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
 
 from ..errors import FailedToLoadPipetteError
-from ..resources import IdGenerator, LabwareData
+from ..resources import ResourceProviders
 from ..state import StateView
+from ..types import LabwareLocation
 
-from ..command_models import (
-    LoadLabwareRequest,
-    LoadLabwareResult,
-    LoadPipetteRequest,
-    LoadPipetteResult
-)
+
+@dataclass(frozen=True)
+class LoadedLabware:
+    """The result of a load labware procedure."""
+
+    labware_id: str
+    definition: LabwareDefinition
+    calibration: Tuple[float, float, float]
+
+
+@dataclass(frozen=True)
+class LoadedPipette:
+    """The result of a load pipette procedure."""
+
+    pipette_id: str
 
 
 class EquipmentHandler:
     """Implementation logic for labware, pipette, and module loading."""
 
+    _hardware: HardwareAPI
+    _state: StateView
+    _resources: ResourceProviders
+
     def __init__(
         self,
         hardware: HardwareAPI,
         state: StateView,
-        id_generator: IdGenerator,
-        labware_data: LabwareData
+        resources: ResourceProviders,
     ) -> None:
         """Initialize an EquipmentHandler instance."""
-        self._hardware: HardwareAPI = hardware
-        self._state: StateView = state
-        self._id_generator: IdGenerator = id_generator
-        self._labware_data: LabwareData = labware_data
+        self._hardware = hardware
+        self._state = state
+        self._resources = resources
 
-    async def handle_load_labware(
+    async def load_labware(
         self,
-        request: LoadLabwareRequest
-    ) -> LoadLabwareResult:
-        """Load labware definition and calibration data."""
-        labware_id = self._id_generator.generate_id()
-        labware_def = await self._labware_data.get_labware_definition(
-            load_name=request.loadName,
-            namespace=request.namespace,
-            version=request.version
-        )
-        cal_data = await self._labware_data.get_labware_calibration(
-            definition=labware_def,
-            location=request.location,
+        load_name: str,
+        namespace: str,
+        version: int,
+        location: LabwareLocation,
+    ) -> LoadedLabware:
+        """Load labware by assigning an identifier and pulling required data."""
+        labware_id = self._resources.id_generator.generate_id()
+
+        definition = await self._resources.labware_data.get_labware_definition(
+            load_name=load_name,
+            namespace=namespace,
+            version=version,
         )
 
-        return LoadLabwareResult(
-            labwareId=labware_id,
-            definition=labware_def,
-            calibration=cal_data
+        calibration = await self._resources.labware_data.get_labware_calibration(
+            definition=definition,
+            location=location,
         )
 
-    async def handle_load_pipette(
+        return LoadedLabware(
+            labware_id=labware_id,
+            definition=definition,
+            calibration=calibration,
+        )
+
+    async def load_pipette(
         self,
-        request: LoadPipetteRequest,
-    ) -> LoadPipetteResult:
+        pipette_name: PipetteName,
+        mount: MountType,
+    ) -> LoadedPipette:
         """Ensure the requested pipette is attached."""
-        mount = request.mount
-        other_mount = request.mount.other_mount()
+        other_mount = mount.other_mount()
         other_pipette = self._state.pipettes.get_pipette_data_by_mount(
-            other_mount
+            other_mount,
         )
 
-        cache_request = {mount.to_hw_mount(): request.pipetteName}
+        cache_request = {mount.to_hw_mount(): pipette_name}
         if other_pipette is not None:
             cache_request[
                 other_mount.to_hw_mount()
@@ -76,5 +99,6 @@ class EquipmentHandler:
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 
-        pipette_id = self._id_generator.generate_id()
-        return LoadPipetteResult(pipetteId=pipette_id)
+        pipette_id = self._resources.id_generator.generate_id()
+
+        return LoadedPipette(pipette_id=pipette_id)

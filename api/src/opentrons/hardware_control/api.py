@@ -10,8 +10,7 @@ from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.util import linal
 from functools import lru_cache
-from opentrons.config import (
-    robot_configs, feature_flags as ff)
+from opentrons.config import robot_configs
 
 from .util import (
     use_or_initialize_loop, DeckTransformState, check_motion_bounds)
@@ -95,6 +94,10 @@ class API(HardwareAPILike):
     @property
     def robot_calibration(self) -> rb_cal.RobotCalibration:
         return self._robot_calibration
+
+    def reset_robot_calibration(self):
+        self._calculate_valid_attitude.cache_clear()
+        self._robot_calibration = rb_cal.load()
 
     def set_robot_calibration(
             self, robot_calibration: rb_cal.RobotCalibration):
@@ -247,15 +250,7 @@ class API(HardwareAPILike):
 
         Once decorators are more fully supported, we can remove this.
         """
-        if ff.enable_calibration_overhaul():
-            return self._calculate_valid_attitude()
-        else:
-            return self._calculate_valid_calibration()
-
-    @lru_cache(maxsize=1)
-    def _calculate_valid_calibration(self) -> DeckTransformState:
-        return rb_cal.validate_gantry_calibration(
-            self._config.gantry_calibration)
+        return self._calculate_valid_attitude()
 
     @lru_cache(maxsize=1)
     def _calculate_valid_attitude(self) -> DeckTransformState:
@@ -369,6 +364,23 @@ class API(HardwareAPILike):
                 _reset(m)
         else:
             _reset(mount)
+
+    def set_instrument_offset(
+            self, mount: top_types.Mount, new_offset: top_types.Point):
+        """
+        Temporarily (i.e., without saving to disk) override the instrument
+        offset of the instrument attached to ``mount``. This should only be
+        used in calibration workflows where the device under calibration
+        should be using no calibration at all, to avoid altering the saved
+        calibration.
+
+        To reload the saved value, call :py:meth:`cache_instruments` again.
+        """
+        pip = self._attached_instruments[mount]
+        if not pip:
+            raise top_types.PipetteNotAttachedError(
+                f'No pipette attached to {mount.name} mount')
+        pip.update_instrument_offset(new_offset)
 
     async def cache_instruments(
             self,
@@ -633,8 +645,7 @@ class API(HardwareAPILike):
             with self._backend.save_current():
                 self._backend.set_active_current(
                     {checked_axis: instr.config.plunger_current})
-                smoothie_pos = self._backend.home([checked_axis.name.upper()])
-                smoothie_pos.update(self._backend.update_position())
+                self._backend.home([checked_axis.name.upper()])
                 # either we were passed False for our acquire_lock and we
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
@@ -650,6 +661,7 @@ class API(HardwareAPILike):
         :param mount: the mount associated with the target plunger
         :type mount: :py:class:`.top_types.Mount`
         """
+        await self.current_position(mount=mount, refresh=True)
         await self._do_plunger_home(mount=mount,
                                     acquire_lock=True)
 
@@ -729,22 +741,12 @@ class API(HardwareAPILike):
                 with_enum[Axis.Y],
                 with_enum[Axis.by_mount(top_types.Mount.LEFT)])
 
-        if ff.enable_calibration_overhaul():
-            gantry_calibration =\
-                self.robot_calibration.deck_calibration.attitude
-            right_deck = linal.apply_reverse(
-                gantry_calibration, right, with_offsets=False)
-            left_deck = linal.apply_reverse(
-                gantry_calibration, left, with_offsets=False)
-        else:
-            gantry_calibration = self._config.gantry_calibration
-            # Tell apply_transform to just do the change of
-            # base part of the transform rather than the full
-            # affine transform, because this is an offset
-            right_deck = linal.apply_reverse(gantry_calibration,
-                                             right)
-            left_deck = linal.apply_reverse(gantry_calibration,
-                                            left)
+        gantry_calibration =\
+            self.robot_calibration.deck_calibration.attitude
+        right_deck = linal.apply_reverse(
+            gantry_calibration, right, with_offsets=False)
+        left_deck = linal.apply_reverse(
+            gantry_calibration, left, with_offsets=False)
         deck_pos = {Axis.X: right_deck[0],
                     Axis.Y: right_deck[1],
                     Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],
@@ -780,10 +782,7 @@ class API(HardwareAPILike):
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
             else:
-                if ff.enable_calibration_overhaul():
-                    offset = top_types.Point(*self._config.left_mount_offset)
-                else:
-                    offset = top_types.Point(*self._config.mount_offset)
+                offset = top_types.Point(*self._config.left_mount_offset)
             z_ax = Axis.by_mount(mount)
             plunger_ax = Axis.of_plunger(mount)
             cp = self._critical_point_for(mount, critical_point)
@@ -883,10 +882,7 @@ class API(HardwareAPILike):
         if len(mounts) > 1:
             secondary_mount = mounts[1]  # type: ignore
 
-        if ff.enable_calibration_overhaul():
-            mount_offset = self._config.left_mount_offset
-        else:
-            mount_offset = self._config.mount_offset
+        mount_offset = self._config.left_mount_offset
         if primary_mount == top_types.Mount.LEFT:
             primary_offset = top_types.Point(*mount_offset)
             s_offset = top_types.Point(0, 0, 0)
@@ -1029,22 +1025,14 @@ class API(HardwareAPILike):
         # target_position.items() is (rightly) Tuple[float, ...] with unbounded
         # size; unfortunately, mypy can’t quite figure out the length check
         # above that makes this OK
-        if ff.enable_calibration_overhaul():
-            primary_transformed = linal.apply_transform(
-                self.robot_calibration.deck_calibration.attitude,
-                to_transform_primary,  # type: ignore
-                with_offsets=False)
-            secondary_transformed = linal.apply_transform(
-                self.robot_calibration.deck_calibration.attitude,
-                to_transform_secondary,  # type: ignore
-                with_offsets=False)
-        else:
-            primary_transformed = linal.apply_transform(
-                self._config.gantry_calibration,
-                to_transform_primary)  # type: ignore
-            secondary_transformed = linal.apply_transform(
-                self._config.gantry_calibration,
-                to_transform_secondary)  # type: ignore
+        primary_transformed = linal.apply_transform(
+            self.robot_calibration.deck_calibration.attitude,
+            to_transform_primary,  # type: ignore
+            with_offsets=False)
+        secondary_transformed = linal.apply_transform(
+            self.robot_calibration.deck_calibration.attitude,
+            to_transform_secondary,  # type: ignore
+            with_offsets=False)
         return primary_transformed, secondary_transformed
 
     async def _move(self, target_position: 'OrderedDict[Axis, float]',
@@ -1204,8 +1192,6 @@ class API(HardwareAPILike):
         Documentation on keys can be found in the documentation for
         :py:class:`.robot_config`.
         """
-        if kwargs.get('gantry_calibration'):
-            self._calculate_valid_calibration.cache_clear()
         self._config = self._config._replace(**kwargs)  # type: ignore
 
     async def update_deck_calibration(self, new_transform):
@@ -1800,7 +1786,7 @@ class API(HardwareAPILike):
         :type mount: opentrons.types.Mount
         """
         # Clear the old offset during calibration
-        pip.update_instrument_offset(top_types.Point())
+        self.set_instrument_offset(mount, top_types.Point())
         # Hotspots based on our expectation of tip length and config
         hotspots = robot_configs.calculate_tip_probe_hotspots(
             pip.current_tip_length, self._config.tip_probe)
@@ -1929,6 +1915,9 @@ class API(HardwareAPILike):
         This will update both the stored value in the robot settings and
         the live value in the currently-loaded pipette.
 
+        If you just want to change the live value for the currently-attached
+        instrument without saving it, use :py:meth:`.set_instrument_offset`.
+
         This can be specified either directly by using the new_offset arg
         or using the result of a previous call to
         :py:meth:`locate_tip_probe_center` with the same mount.
@@ -1956,7 +1945,7 @@ class API(HardwareAPILike):
                                                    new_offset.y,
                                                    new_offset.z]
         await self.update_config(instrument_offset=inst_offs)
-        pip.update_instrument_offset(new_offset)
+        self.set_instrument_offset(mount, new_offset)
         robot_configs.save_robot_settings(self._config)
 
     def get_instrument_max_height(

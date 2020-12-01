@@ -14,11 +14,18 @@ from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command import CalibrationCommand
 from robot_server.robot.calibration.pipette_offset.user_flow import \
     PipetteOffsetCalibrationUserFlow
-from robot_server.robot.calibration.pipette_offset.constants import\
-    PipetteOffsetCalibrationState as POCState
+from robot_server.robot.calibration.pipette_offset.constants import (
+    PipetteOffsetCalibrationState as POCState,
+    PipetteOffsetWithTipLengthCalibrationState as POWTState
+)
 
 
 stub_jog_data = {'vector': Point(1, 1, 1)}
+
+PIP_CAL = CSTypes.PipetteOffsetByPipetteMount(
+    offset=[0, 0, 0],
+    source=CSTypes.SourceType.user,
+    status=CSTypes.CalibrationStatus())
 
 pipette_map = {
     "p10_single_v1.5": "opentrons_96_tiprack_10ul",
@@ -75,6 +82,7 @@ def mock_hw_pipette_all_combos(request):
                                'single': [0, 0, 0],
                                'multi': [0, 0, 0]
                            },
+                           PIP_CAL,
                            'testId')
 
 
@@ -104,6 +112,7 @@ def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
     hardware.gantry_position = MagicMock(side_effect=gantry_pos_mock)
     hardware.move_to = MagicMock(side_effect=async_mock_move_to)
     hardware.get_instrument_max_height.return_value = 180
+    hardware.retract = MagicMock(side_effect=async_mock)
     return hardware
 
 
@@ -114,6 +123,7 @@ def mock_hw(hardware):
                               'single': [0, 0, 0],
                               'multi': [0, 0, 0]
                           },
+                          PIP_CAL,
                           'testId')
     hardware._attached_instruments = {Mount.RIGHT: pip}
     hardware._current_pos = Point(0, 0, 0)
@@ -138,6 +148,9 @@ def mock_hw(hardware):
     hardware.gantry_position = MagicMock(side_effect=gantry_pos_mock)
     hardware.move_to = MagicMock(side_effect=async_mock_move_to)
     hardware.get_instrument_max_height.return_value = 180
+    hardware.home_plunger = MagicMock(side_effect=async_mock)
+    hardware.home = MagicMock(side_effect=async_mock)
+    hardware.retract = MagicMock(side_effect=async_mock)
 
     return hardware
 
@@ -158,6 +171,23 @@ def mock_user_flow(mock_hw):
         yield m
 
 
+@pytest.fixture
+def mock_user_flow_fused(mock_hw):
+    mount = next(k for k, v in
+                 mock_hw._attached_instruments.items() if v)
+    with patch.object(
+            PipetteOffsetCalibrationUserFlow,
+            '_get_stored_tip_length_cal',
+            new=build_mock_stored_tip_length()),\
+            patch.object(
+                PipetteOffsetCalibrationUserFlow,
+                '_get_stored_pipette_offset_cal',
+                new=build_mock_stored_pipette_offset()):
+        m = PipetteOffsetCalibrationUserFlow(
+            hardware=mock_hw, mount=mount, recalibrate_tip_length=True)
+        yield m
+
+
 hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
     (CalibrationCommand.jog, POCState.preparingPipette,
      stub_jog_data, 'move_rel'),
@@ -169,43 +199,104 @@ hw_commands: List[Tuple[str, str, Dict[Any, Any], str]] = [
      {}, 'move_to'),
     (CalibrationCommand.move_to_tip_rack, POCState.labwareLoaded,
      {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POCState.preparingPipette,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POCState.preparingPipette,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POCState.joggingToDeck,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POCState.joggingToDeck,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POCState.joggingToDeck,
+     {}, 'drop_tip'),
+    (CalibrationCommand.invalidate_last_action, POCState.savingPointOne,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POCState.savingPointOne,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POCState.savingPointOne,
+     {}, 'drop_tip'),
+]
+
+hw_commands_fused: List[Tuple[str, str, Dict[Any, Any], str]] = [
+    (CalibrationCommand.invalidate_last_action,
+     POWTState.measuringNozzleOffset,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action,
+     POWTState.measuringNozzleOffset,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POWTState.preparingPipette,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POWTState.preparingPipette,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POWTState.measuringTipOffset,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POWTState.measuringTipOffset,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POWTState.measuringTipOffset,
+     {}, 'drop_tip'),
+    (CalibrationCommand.invalidate_last_action, POWTState.joggingToDeck,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POWTState.joggingToDeck,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POWTState.joggingToDeck,
+     {}, 'drop_tip'),
+    (CalibrationCommand.invalidate_last_action, POWTState.savingPointOne,
+     {}, 'move_to'),
+    (CalibrationCommand.invalidate_last_action, POWTState.savingPointOne,
+     {}, 'home'),
+    (CalibrationCommand.invalidate_last_action, POWTState.savingPointOne,
+     {}, 'drop_tip'),
 ]
 
 
 @pytest.mark.parametrize(
-    'existing_poc,existing_tlc,recalibrate,trd,whichdef,dotip', [
+    'existing_poc,existing_tlc,recalibrate,trd,whichdef,dotip,'
+    'hasblock,useblock',
+    [
         # If we otherwise have everything we need, follow the argument
         (build_mock_stored_pipette_offset(),
          build_mock_stored_tip_length(),
-         True, None, 'stored', True),
+         True, None, 'stored', True, True, True),
         (build_mock_stored_pipette_offset(),
          build_mock_stored_tip_length(),
-         False, None, 'stored', False),
+         True, None, 'stored', True, False, False),
+        (build_mock_stored_pipette_offset(),
+         build_mock_stored_tip_length(),
+         False, None, 'stored', False, True, False),
         (build_mock_stored_pipette_offset('empty'),
          build_mock_stored_tip_length(),
-         False, LW_DEFINITION, 'specified', False),
+         False, LW_DEFINITION, 'specified', False, True, False),
         (build_mock_stored_pipette_offset('empty'),
          build_mock_stored_tip_length(),
-         True, LW_DEFINITION, 'specified', True),
+         True, LW_DEFINITION, 'specified', True, True, True),
         (build_mock_stored_pipette_offset('empty'),
          build_mock_stored_tip_length(),
-         True, None, 'default', True),
+         True, LW_DEFINITION, 'specified', True, False, False),
         (build_mock_stored_pipette_offset('empty'),
          build_mock_stored_tip_length(),
-         True, None, 'default', True),
+         True, None, 'default', True, True, True),
+        (build_mock_stored_pipette_offset('empty'),
+         build_mock_stored_tip_length(),
+         True, None, 'default', True, False, False),
         # In all cases where we cannot resolve a TLC for this
         # labware, recalibrate tip length
         (build_mock_stored_pipette_offset('empty'),
          build_mock_stored_tip_length('empty'),
-         False, LW_DEFINITION, 'specified', True),
+         False, LW_DEFINITION, 'specified', True, True, True),
         (build_mock_stored_pipette_offset('empty'),
          build_mock_stored_tip_length('empty'),
-         False, None, 'default', True),
+         False, LW_DEFINITION, 'specified', True, False, False,),
+        (build_mock_stored_pipette_offset('empty'),
+         build_mock_stored_tip_length('empty'),
+         False, None, 'default', True, True, True),
+        (build_mock_stored_pipette_offset('empty'),
+         build_mock_stored_tip_length('empty'),
+         False, None, 'default', True, False, False),
     ]
 )
-def test_recalibrate_options(mock_hw,
-                             existing_poc, existing_tlc, recalibrate,
-                             trd, whichdef, dotip):
+def test_create_params(mock_hw,
+                       existing_poc, existing_tlc, recalibrate,
+                       trd, whichdef, dotip, hasblock, useblock):
     with patch.object(
             PipetteOffsetCalibrationUserFlow,
             '_get_stored_tip_length_cal',
@@ -218,41 +309,45 @@ def test_recalibrate_options(mock_hw,
             hardware=mock_hw, mount=Mount.RIGHT,
             recalibrate_tip_length=recalibrate,
             tip_rack_def=trd,
-            has_calibration_block=False)
+            has_calibration_block=hasblock)
         assert m.should_perform_tip_length == dotip
+        tiprack = next(
+                lw for lw in m.get_required_labware() if lw.isTiprack)
         if whichdef == 'stored':
-            required = m.get_required_labware()[0]
-            assert required.loadName == 'opentrons_96_filtertiprack_200ul'
-            assert required.version == '1'
+            assert tiprack.loadName == 'opentrons_96_filtertiprack_200ul'
+            assert tiprack.version == '1'
         elif whichdef == 'default':
-            assert m.get_required_labware()[0].loadName\
+            assert tiprack.loadName\
                 == 'opentrons_96_tiprack_300ul'
         elif whichdef == 'specified':
-            required = m.get_required_labware()[0]
-            assert required.loadName == 'opentrons_96_filtertiprack_200ul'
-            assert required.version == '2'
+            assert tiprack.loadName == 'opentrons_96_filtertiprack_200ul'
+            assert tiprack.version == '2'
         else:
             assert False, 'you messed up the param spec'
+        assert m._has_calibration_block == useblock
+        assert any('calibration'
+                   in lw.loadName
+                   for lw in m.get_required_labware()
+                   if lw) == useblock
 
 
 async def test_move_to_tip_rack(mock_user_flow):
     uf = mock_user_flow
     await uf.move_to_tip_rack()
-    cur_pt = await uf._get_current_point(None)
+    cur_pt = await uf.get_current_point(None)
     assert cur_pt == uf._deck['8'].wells()[0].top().point + Point(0, 0, 10)
 
 
 async def test_jog(mock_user_flow):
     uf = mock_user_flow
     await uf.jog(vector=(0, 0, 0.1))
-    assert await uf._get_current_point(None) == Point(0, 0, 0.1)
+    assert await uf.get_current_point(None) == Point(0, 0, 0.1)
     await uf.jog(vector=(1, 0, 0))
-    assert await uf._get_current_point(None) == Point(1, 0, 0.1)
+    assert await uf.get_current_point(None) == Point(1, 0, 0.1)
 
 
 async def test_pick_up_tip(mock_user_flow):
     uf = mock_user_flow
-    assert uf._tip_origin_pt is None
     await uf.pick_up_tip()
     # check that it saves the tip pick up location locally
     assert uf._tip_origin_pt == Point(0, 0, 0)
@@ -264,14 +359,13 @@ async def test_return_tip(mock_user_flow):
     uf._hw_pipette._has_tip = True
     z_offset = uf._hw_pipette.config.return_tip_height * \
         uf._get_tip_length()
-    await uf._return_tip()
+    await uf.return_tip()
     # should move to return tip
     move_calls = [
         call(
             mount=Mount.RIGHT,
             abs_position=Point(1, 1, 1 - z_offset),
-            critical_point=uf._get_critical_point_override()
-        ),
+            critical_point=uf.critical_point_override)
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
     uf._hardware.drop_tip.assert_called()
@@ -286,6 +380,19 @@ async def test_hw_calls(command, current_state, data, hw_meth, mock_user_flow):
     await mock_user_flow.handle_command(command, data)
 
     getattr(mock_user_flow._hardware, hw_meth).assert_called()
+
+
+@pytest.mark.parametrize(
+    'command,current_state,data,hw_meth', hw_commands_fused)
+async def test_hw_calls_fused(
+        command, current_state, data, hw_meth, mock_user_flow_fused):
+    mock_user_flow_fused._current_state = current_state
+    # z height reference must be present for moving to point one
+    if command == CalibrationCommand.move_to_point_one:
+        mock_user_flow_fused._z_height_reference = 0.1
+    await mock_user_flow_fused.handle_command(command, data)
+
+    getattr(mock_user_flow_fused._hardware, hw_meth).assert_called()
 
 
 def test_load_trash(mock_user_flow):
@@ -306,9 +413,44 @@ def test_no_pipette(hardware, mount):
 
 @pytest.fixture
 def mock_save_pipette():
-    with patch('opentrons.calibration_storage.modify.save_pipette_calibration',
+    with patch(
+            'opentrons.calibration_storage.modify.save_pipette_calibration',
+            autospec=True) as mock_save:
+        yield mock_save
+
+
+@pytest.fixture
+def mock_delete_pipette():
+    with patch(
+            'opentrons.calibration_storage.delete.delete_pipette_offset_file',
+            autospec=True) as mock_delete:
+        yield mock_delete
+
+
+@pytest.fixture
+def mock_save_tip_length():
+    with patch('robot_server.robot.calibration.util.save_tip_length_calibration',  # noqa(E501)
                autospec=True) as mock_save:
         yield mock_save
+
+
+async def test_save_tip_length(
+        mock_user_flow_fused, mock_save_tip_length, mock_delete_pipette):
+    uf = mock_user_flow_fused
+    uf._current_state = uf._state.measuringTipOffset
+    uf._nozzle_height_at_reference = 10
+    uf._hw_pipette.add_tip(50)
+    await uf._hardware.move_to(mount=uf._mount,
+                               abs_poition=Point(x=10, y=10, z=40),
+                               critical_point=uf.critical_point_override)
+    await uf.save_offset()
+    mock_save_tip_length.assert_called_with(
+        pipette_id=uf._hw_pipette.pipette_id,
+        tip_length_offset=-10,
+        tip_rack=uf._tip_rack
+    )
+    mock_delete_pipette.assert_called_with(
+        uf._hw_pipette.pipette_id, uf.mount)
 
 
 async def test_save_pipette_calibration(mock_user_flow, mock_save_pipette):
@@ -318,8 +460,7 @@ async def test_save_pipette_calibration(mock_user_flow, mock_save_pipette):
     await uf._hardware.move_to(
             mount=uf._mount,
             abs_position=Point(x=10, y=10, z=40),
-            critical_point=uf._get_critical_point_override()
-        )
+            critical_point=uf.critical_point_override)
 
     await uf.save_offset()
     tiprack_hash = helpers.hash_labware_def(

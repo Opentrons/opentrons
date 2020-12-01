@@ -49,11 +49,15 @@ describe('CompleteConfirmation', () => {
   it('clicking continue sends exit command and deletes session', () => {
     const wrapper = render()
 
-    expect(wrapper.find('ConfirmClearDeckModal').exists()).toBe(false)
     getContinueButton(wrapper).invoke('onClick')()
     wrapper.update()
 
     expect(mockCleanUpAndExit).toHaveBeenCalled()
+  })
+
+  it('renders need help link', () => {
+    const wrapper = render()
+    expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
   })
 
   it('pip offset cal session type shows correct text', () => {

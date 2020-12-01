@@ -17,7 +17,7 @@ export function DownloadUpdateModal(
   props: DownloadUpdateModalProps
 ): React.Node {
   const { notNowButton, error, progress } = props
-  const heading = error !== null ? 'Downloading Update' : 'Download Error'
+  const heading = error !== null ? 'Download Error' : 'Downloading Update'
 
   return (
     <AlertModal

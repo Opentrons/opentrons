@@ -13,8 +13,9 @@ from opentrons.protocols.parse import (
     version_from_metadata)
 from opentrons.protocols.types import (JsonProtocol,
                                        PythonProtocol,
-                                       APIVersion,
-                                       MalformedProtocolError)
+                                       MalformedProtocolError,
+                                       ApiDeprecationError)
+from opentrons.protocols.api_support.types import APIVersion
 
 
 def test_extract_metadata():
@@ -122,8 +123,12 @@ p = instr.P300_Single('right')
 
 @pytest.mark.parametrize('proto,version', infer_version_cases)
 def test_get_version(proto, version):
-    parsed = parse(proto)
-    assert parsed.api_level == version
+    if version == APIVersion(1, 0):
+        with pytest.raises(ApiDeprecationError):
+            parse(proto)
+    else:
+        parsed = parse(proto)
+        assert parsed.api_level == version
 
 
 test_valid_metadata = [
@@ -197,7 +202,7 @@ def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
 
 
 @pytest.mark.parametrize('protocol_file',
-                         ['testosaur.py', 'testosaur_v2.py'])
+                         ['testosaur_v2.py'])
 @pytest.mark.parametrize('protocol_text_kind', ['str', 'bytes'])
 @pytest.mark.parametrize('filename', ['real', 'none'])
 def test_parse_python_details(
@@ -216,23 +221,14 @@ def test_parse_python_details(
     assert isinstance(parsed.text, str)
     fname = fake_fname if fake_fname else '<protocol>'
     assert parsed.filename == fname
-    if '2' in protocol.filename:
-        assert parsed.api_level == APIVersion(2, 0)
-        assert parsed.metadata == {
-            'protocolName': 'Testosaur',
-            'author': 'Opentrons <engineering@opentrons.com>',
-            'description': 'A variant on "Dinosaur" for testing',
-            'source': 'Opentrons Repository',
-            'apiLevel': '2.0'
-        }
-    else:
-        assert parsed.api_level == APIVersion(1, 0)
-        assert parsed.metadata == {
-            'protocolName': 'Testosaur',
-            'author': 'Opentrons <engineering@opentrons.com>',
-            'description': 'A variant on "Dinosaur" for testing',
-            'source': 'Opentrons Repository',
-        }
+    assert parsed.api_level == APIVersion(2, 0)
+    assert parsed.metadata == {
+        'protocolName': 'Testosaur',
+        'author': 'Opentrons <engineering@opentrons.com>',
+        'description': 'A variant on "Dinosaur" for testing',
+        'source': 'Opentrons Repository',
+        'apiLevel': '2.0'
+    }
     assert parsed.contents == compile(
         protocol.text,
         filename=fname,
@@ -281,7 +277,7 @@ def test_parse_bundle_details(get_bundle_fixture):
 
 
 @pytest.mark.parametrize('protocol_file',
-                         ['testosaur.py'])
+                         ['testosaur_v2.py'])
 def test_extra_contents(
         get_labware_fixture, protocol_file, protocol):
     fixture_96_plate = get_labware_fixture('fixture_96_plate')
@@ -289,7 +285,7 @@ def test_extra_contents(
         'fixture/fixture_96_plate/1': fixture_96_plate
     }
     extra_data = {'hi': b'there'}
-    parsed = parse(protocol.text, 'testosaur.py',
+    parsed = parse(protocol.text, 'testosaur_v2.py',
                    extra_labware=bundled_labware,
                    extra_data=extra_data)
     assert parsed.extra_labware == bundled_labware
@@ -299,8 +295,8 @@ def test_extra_contents(
 # noqa(E122)
 @pytest.mark.parametrize('bad_protocol', [
     '''
-from opentrons import robot
 metadata={"apiLevel": "2.0"}
+def run(ctx): pass
 def run(ctx): pass
 ''',
     '''

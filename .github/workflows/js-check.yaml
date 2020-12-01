@@ -39,7 +39,7 @@ jobs:
           node-version: '12'
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v3
+        uses: actions/github-script@v3.1
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)

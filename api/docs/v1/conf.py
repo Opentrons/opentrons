@@ -25,6 +25,7 @@ import pkgutil
 # newly-built module
 _package_json = json.loads(pkgutil.get_data('opentrons', 'package.json'))
 
+sys.path.insert(0, os.path.abspath('./api_cache'))
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, os.path.abspath('../sphinxext'))
 

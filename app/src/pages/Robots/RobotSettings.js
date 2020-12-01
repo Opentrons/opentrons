@@ -34,7 +34,6 @@ import {
   ConnectAlertModal,
 } from '../../components/RobotSettings'
 import { UpdateBuildroot } from '../../components/RobotSettings/UpdateBuildroot'
-import { CalibrateDeck } from '../../components/LegacyCalibrateDeck'
 import { ConnectBanner } from '../../components/RobotSettings/ConnectBanner'
 import { ReachableRobotBanner } from '../../components/RobotSettings/ReachableRobotBanner'
 import { RestartRequiredBanner } from '../../components/RobotSettings/RestartRequiredBanner'
@@ -48,6 +47,7 @@ import type { ShellUpdateState } from '../../shell/types'
 type OP = {|
   ...ContextRouter,
   robot: ViewableRobot,
+  // TODO(mc, 2020-11-10): this prop is unused and should be removed
   appUpdate: ShellUpdateState,
 |}
 
@@ -78,7 +78,6 @@ export const RobotSettings: React.AbstractComponent<
 )
 
 const UPDATE_FRAGMENT = 'update'
-const CALIBRATE_DECK_FRAGMENT = 'calibrate-deck'
 const RESET_FRAGMENT = 'reset'
 const INSTRUMENTS_FRAGMENT = 'instruments'
 
@@ -100,7 +99,6 @@ function RobotSettingsComponent(props: Props) {
   const { name: robotName } = robot
   const titleBarProps = { title: robot.displayName }
   const updateUrl = `${url}/${UPDATE_FRAGMENT}`
-  const calibrateDeckUrl = `${url}/${CALIBRATE_DECK_FRAGMENT}`
   const resetUrl = `${url}/${RESET_FRAGMENT}`
   const pipettesPageUrl = `${url}/${INSTRUMENTS_FRAGMENT}`
 
@@ -125,7 +123,6 @@ function RobotSettingsComponent(props: Props) {
         <RobotSettingsContents
           robot={robot}
           updateUrl={updateUrl}
-          calibrateDeckUrl={calibrateDeckUrl}
           resetUrl={resetUrl}
           pipettesPageUrl={pipettesPageUrl}
         />
@@ -141,11 +138,6 @@ function RobotSettingsComponent(props: Props) {
               />
             )
           }}
-        />
-
-        <Route
-          path={`${path}/${CALIBRATE_DECK_FRAGMENT}`}
-          render={() => <CalibrateDeck robot={robot} parentUrl={url} />}
         />
 
         <Route

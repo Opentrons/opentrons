@@ -20,11 +20,13 @@ TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     State.measuringNozzleOffset: {
         CalibrationCommand.save_offset: State.measuringNozzleOffset,
         CalibrationCommand.jog: State.measuringNozzleOffset,
-        CalibrationCommand.move_to_tip_rack: State.preparingPipette
+        CalibrationCommand.move_to_tip_rack: State.preparingPipette,
+        CalibrationCommand.invalidate_last_action: State.measuringNozzleOffset,
     },
     State.preparingPipette: {
         CalibrationCommand.jog: State.preparingPipette,
         CalibrationCommand.pick_up_tip: State.inspectingTip,
+        CalibrationCommand.invalidate_last_action: State.preparingPipette,
     },
     State.inspectingTip: {
         CalibrationCommand.invalidate_tip: State.preparingPipette,
@@ -33,7 +35,8 @@ TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     State.measuringTipOffset: {
         CalibrationCommand.save_offset: State.measuringTipOffset,
         CalibrationCommand.jog: State.measuringTipOffset,
-        CalibrationCommand.move_to_tip_rack: State.calibrationComplete
+        CalibrationCommand.move_to_tip_rack: State.calibrationComplete,
+        CalibrationCommand.invalidate_last_action: State.preparingPipette
     },
     State.WILDCARD: {
         CalibrationCommand.exit: State.sessionExited

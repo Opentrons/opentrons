@@ -17,7 +17,6 @@ import io
 import json
 import pathlib
 import re
-import shutil
 import tempfile
 from collections import namedtuple
 from functools import partial
@@ -25,21 +24,13 @@ import zipfile
 
 import pytest
 
-from opentrons.legacy_api.containers import load
-from opentrons.legacy_api.instruments.pipette import Pipette
 from opentrons.api.routers import MainRouter
 from opentrons.api import models
-from opentrons.data_storage import database_migration
-from opentrons import config, types
-from opentrons.deck_calibration import endpoints
+from opentrons import config
 from opentrons import hardware_control as hc
 from opentrons.hardware_control import API, ThreadManager, ThreadedAsyncLock
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount, Location, Point
-from opentrons import (robot as rb,
-                       instruments as ins,
-                       containers as cns,
-                       modules as mods)
 
 
 Session = namedtuple(
@@ -49,37 +40,6 @@ Session = namedtuple(
 Protocol = namedtuple(
     'Protocol',
     ['text', 'filename', 'filelike'])
-
-
-@pytest.fixture
-def singletons(virtual_smoothie_env):
-    rb.reset()
-    yield {'robot': rb,
-           'instruments': ins,
-           'labware': cns,
-           'modules': mods}
-    rb.disconnect()
-    rb.reset()
-
-
-@pytest.fixture
-def robot(singletons):
-    yield singletons['robot']
-
-
-@pytest.fixture
-def instruments(singletons):
-    yield singletons['instruments']
-
-
-@pytest.fixture
-def labware(singletons):
-    yield singletons['labware']
-
-
-@pytest.fixture
-def modules(singletons):
-    yield singletons['modules']
 
 
 @pytest.fixture(autouse=True)
@@ -112,32 +72,11 @@ def log_by_axis(log, axis):
     return reduce(reducer, log, {axis: [] for axis in axis})
 
 
-@pytest.mark.apiv1
-@pytest.fixture(scope='session')
-def template_db(tmpdir_factory):
-    template_db = tmpdir_factory.mktemp('template_db.sqlite')\
-                                .join('opentrons.db')
-    config.CONFIG['labware_database_file'] = str(template_db)
-    database_migration.check_version_and_perform_full_migration()
-    return template_db
-
-
 @pytest.fixture
 def mock_config():
     """Robot config setup and teardown"""
     yield robot_configs.load()
     robot_configs.clear()
-
-
-@pytest.mark.apiv1
-@pytest.fixture(scope='function')
-def config_tempdir(tmpdir, template_db):
-    os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
-    config.reload()
-    if not os.path.exists(config.CONFIG['labware_database_file']):
-        shutil.copyfile(
-            template_db, config.CONFIG['labware_database_file'])
-    yield tmpdir, template_db
 
 
 @pytest.fixture
@@ -236,20 +175,7 @@ async def toggle_new_calibration(request):
         yield
 
 
-@pytest.fixture
-async def dc_session(request, hardware, monkeypatch, loop):
-    """
-    Mock session manager for deck calibation
-    """
-    await hardware.cache_instruments({
-        types.Mount.RIGHT: 'p300_multi'})
-    ses = endpoints.SessionManager(hardware)
-    endpoints.session_wrapper.session = ses
-    yield ses
-    endpoints.session_wrapper.session = None
-
-
-@pytest.fixture(params=["dinosaur.py"])
+@pytest.fixture(params=["testosaur_v2.py"])
 def protocol(request):
     try:
         root = request.getfixturevalue('protocol_file')
@@ -356,21 +282,6 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
             return result
 
 
-def build_v1_model(r, lw_name):
-    plate = load(r, lw_name or '96-flat', '1')
-    tiprack = load(r, 'opentrons-tiprack-300ul', '2')
-    pipette = Pipette(r,
-                      ul_per_mm=18.5, max_volume=300, mount='right',
-                      tip_racks=[tiprack])
-    instrument = models.Instrument(pipette)
-    container = models.Container(plate)
-    return namedtuple('model', 'robot instrument container')(
-        robot=r,
-        instrument=instrument,
-        container=container,
-    )
-
-
 @pytest.fixture
 def ctx(loop) -> ProtocolContext:
     return ProtocolContext(
@@ -401,14 +312,11 @@ def build_v2_model(h, lw_name, loop):
     )
 
 
-@pytest.fixture(params=[build_v1_model, build_v2_model])
-def model(request, robot, hardware, loop):
+@pytest.fixture(params=[build_v2_model])
+def model(request, hardware, loop):
     # Use with pytest.mark.parametrize(’labware’, [some-labware-name])
     # to have a different labware loaded as .container. If not passed,
     # defaults to the version-appropriate way to do 96 flat
-    if request.node.get_closest_marker('api1_only')\
-       and request.param != build_v1_model:
-        pytest.skip('only works with a robot')
     if request.node.get_closest_marker('api2_only')\
        and request.param != build_v2_model:
         pytest.skip('only works with hardware controller')
@@ -419,28 +327,7 @@ def model(request, robot, hardware, loop):
 
     builder = request.param
 
-    if builder == build_v1_model:
-        return builder(robot, lw_name)
-    else:
-        return builder(hardware, lw_name, loop)
-
-
-@pytest.fixture
-def model_with_trough(robot):
-    from opentrons.legacy_api.containers import load
-    from opentrons.legacy_api.instruments.pipette import Pipette
-
-    pipette = Pipette(robot, ul_per_mm=18.5, max_volume=300, mount='right')
-    plate = load(robot, 'trough-12row', '1')
-
-    instrument = models.Instrument(pipette)
-    container = models.Container(plate)
-
-    return namedtuple('model', 'robot instrument container')(
-            robot=robot,
-            instrument=instrument,
-            container=container
-        )
+    return builder(hardware, lw_name, loop)
 
 
 @pytest.fixture

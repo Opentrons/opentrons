@@ -102,14 +102,21 @@ Parameters for the complex liquid handling are listed here in order of operation
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
 |          ``air_gap``           |                Volume in µL                          |           0                |                 0                  |               0                    |
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
-|         ``blow_out``           |  ``True`` or ``False``, if true blow out at dispense |        ``False``           |              ``False``             |           ``False``                |
+|         ``blow_out``           |  ``True`` or ``False``, if true and no location      |        ``False``           |              ``False``             |           ``False``                |
+|                                |  specified it will blow out in the trash.            |                            |                                    |                                    |
+|                                |                                                      |                            |                                    |                                    |
+|                                |  **Note**:                                           |                            |                                    |                                    |
+|                                |  1. If the pipette tip is empty, and no location is  |                            |                                    |                                    |
+|                                |  specified, the pipette will blow out in the trash.  |                            |                                    |                                    |
+|                                |  2. If the pipette tip is not empty, and no          |                            |                                    |                                    |
+|                                |  location is specified, the pipette will blow out    |                            |                                    |                                    |
+|                                |  into the source well.                               |                            |                                    |                                    |
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
-|         ``blowout_location``   |  ``trash``, ``source well``, ``destination well``    | If pipette empty, blowout  | If pipette empty, blowout          | If pipette empty, blowout          |
-|                                |                                                      | into trash, otherwise      | into trash, otherwise              | into trash, otherwise              |
-|                                |                                                      | blowout into source well   | blowout into source well           | blowout into source well           |
-|                                |                                                      | If ``blow_out`` is false   | If ``blow_out`` is false           | If ``blowout`` is false            |
-|                                |                                                      | ``blowout_location`` will  | ``blowout_location`` will          | ``blowout_location`` will          |
-|                                |                                                      | be ignored                 | be ignored                         | be ignored                         |
+|         ``blowout_location``   |  ``trash``, ``source well``, ``destination well``    | There is no location by    | There is no location by            | There is no location by            |
+|                                |                                                      | default. Please see        | default. Please see ``blow_out``   | default. Please see ``blow_out``   |
+|                                | **Note**: If ``blow_out`` is set to ``False`` this   | ``blow_out`` above for     | above for default behavior.        | above for default behavior.        |
+|                                | parameter will be ignored.                           | default behavior.          |                                    |                                    |
+|                                |                                                      |                            |                                    |                                    |
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
 |          ``trash``             | ``True`` or ``False``, if false return tip to tiprack|         ``True``           |              ``True``              |            ``True``                |
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
@@ -727,7 +734,7 @@ will have the steps...
 ``blow_out``
 ------------
 
-A :ref:`blow-out` can be performed after every dispense that leaves the tip empty by setting ``blow_out=True``.
+A :ref:`blow-out` into the trash can be performed after every dispense that leaves the tip empty by setting ``blow_out=True``.
 
 .. code-block:: python
 
@@ -750,6 +757,80 @@ will have the steps...
     Dropping tip well A1 in "12"
 
 .. versionadded:: 2.0
+
+The robot will automatically dispense any left over liquid that is *not* from using ``disposal_volume`` into
+the source well of your transfer function.
+
+.. code-block:: python
+
+    pipette.pick_up_tip()
+    pipette.aspirate(10, plate['A1'])
+    pipette.transfer(
+        100,
+        plate['A1'],
+        plate['A2'],
+        blow_out=True,   # blow out droplets into the source well (A1 of "plate")
+        new_tip='never')
+
+.. versionadded:: 2.8
+
+
+``blowout_location``
+--------------------
+
+Starting in Python API Version 2.8 and above, you can specify the well type you would like your pipette to blow out in.
+Specifying a location will override any defaults from the ``blow_out`` argument.
+
+The code below is the same default behavior you would see utilizing ``blow_out=True`` only. It will blow out for
+every transfer into the trash.
+
+.. code-block:: python
+
+    pipette.transfer(
+        100,
+        plate['A1'],
+        plate['A2'],
+        blow_out=True,
+        blowout_location='trash')      # blow out droplets into the trash
+
+.. versionadded:: 2.8
+
+The same is true even if you have extra liquid left in your tip shown below.
+
+.. code-block:: python
+
+    pipette.pick_up_tip()
+    pipette.aspirate(10, plate['A1'])
+    pipette.transfer(
+        100,
+        plate['A1'],
+        plate['A2'],
+        blow_out=True,
+        blowout_location='trash',    # blow out droplets into the trash
+        new_tip='never')
+
+.. versionadded:: 2.8
+
+If you wish to blow out in the source or destination well you can do so by specifying the location as either ``source well`` or ``destination well``.
+For example, to blow out in the destination well you can do the following:
+
+.. code-block:: python
+
+    pipette.transfer(
+        100,
+        plate['A1'],
+        plate.wells(),
+        blow_out=True,
+        blowout_location='destination well')      # blow out droplets into each destination well (this will blow out in wells `A1`, `B1`, `C1`..etc)
+
+.. versionadded:: 2.8
+
+
+.. note::
+
+You *must* specify ``blow_out=True`` in order to utilize the new argument ``blowout_location``
+
+
 
 ``mix_before``, ``mix_after``
 -----------------------------

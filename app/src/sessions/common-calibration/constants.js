@@ -16,6 +16,8 @@ const SAVE_OFFSET: 'calibration.saveOffset' = 'calibration.saveOffset'
 const SET_CALIBRATION_BLOCK: 'calibration.setHasCalibrationBlock' =
   'calibration.setHasCalibrationBlock'
 const EXIT: 'calibration.exitSession' = 'calibration.exitSession'
+const INVALIDATE_LAST_ACTION: 'calibration.invalidateLastAction' =
+  'calibration.invalidateLastAction'
 
 export const sharedCalCommands = {
   LOAD_LABWARE,
@@ -29,5 +31,6 @@ export const sharedCalCommands = {
   MOVE_TO_REFERENCE_POINT,
   SAVE_OFFSET,
   SET_CALIBRATION_BLOCK,
+  INVALIDATE_LAST_ACTION,
   EXIT,
 }

@@ -13,13 +13,14 @@ export type InstrumentSettingsProps = {|
   robotDisplayName: string,
   url: string,
   path: string,
+  pathname: string,
 |}
 
 // used to guarantee mount param in route is left or right
 const RE_MOUNT = `(${LEFT}|${RIGHT})`
 
 export function InstrumentSettings(props: InstrumentSettingsProps): React.Node {
-  const { robotName, robotDisplayName, url, path } = props
+  const { robotName, robotDisplayName, url, path, pathname } = props
   const titleBarProps = { title: robotDisplayName }
 
   return (
@@ -27,6 +28,7 @@ export function InstrumentSettings(props: InstrumentSettingsProps): React.Node {
       <Page titleBarProps={titleBarProps}>
         <SettingsContent
           robotName={robotName}
+          isChangingOrConfiguringPipette={pathname !== url}
           makeChangePipetteUrl={mnt => `${url}/change-pipette/${mnt}`}
           makeConfigurePipetteUrl={mnt => `${url}/configure-pipette/${mnt}`}
         />

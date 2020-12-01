@@ -1,6 +1,19 @@
 // @flow
 
 import * as React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import {
+  Icon,
+  Text,
+  SecondaryBtn,
+  BORDER_SOLID_LIGHT,
+  SPACING_4,
+  useConditionalConfirm,
+  FONT_STYLE_ITALIC,
+  Tooltip,
+  useHoverTooltip,
+  AlertModal,
+} from '@opentrons/components'
 
 import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
@@ -16,20 +29,9 @@ import {
   REQUIRED,
   RECOMMENDED,
 } from '../InlineCalibrationWarning'
-import { useSelector } from 'react-redux'
-import { format } from 'date-fns'
-import {
-  Text,
-  SecondaryBtn,
-  BORDER_SOLID_LIGHT,
-  SPACING_4,
-  useConditionalConfirm,
-  FONT_STYLE_ITALIC,
-  Tooltip,
-  useHoverTooltip,
-} from '@opentrons/components'
+import { formatLastModified } from '../CalibrationPanels/utils'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type {
   DeckCalibrationStatus,
   DeckCalibrationData,
@@ -41,11 +43,19 @@ import type {
 import type { RequestState } from '../../robot-api/types'
 
 const DECK_NEVER_CALIBRATED = "You haven't calibrated the deck yet"
-const LAST_CALIBRATED = 'Last calibrated: '
+const LAST_CALIBRATED = 'Last calibrated:'
+const MIGRATED = 'Last known calibration migrated'
 const CALIBRATE_DECK_DESCRIPTION =
   "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
-const CALIBRATE_BUTTON_TEXT = 'Calibrate'
+const BUTTON_TEXT_CALIBRATE = 'calibrate deck'
+const BUTTON_TEXT_RECALIBRATE = 'recalibrate deck'
 const CALIBRATE_TITLE_TEXT = 'Calibrate deck'
+const STARTING = 'Deck calibration is starting'
+const ENDING = 'Deck calibration is ending'
+const OK_TEXT = 'Ok'
+const FAILED_START_HEADER = 'Failed to start deck calibration'
+const FAILED_START_BODY =
+  'An error occurred while trying to start deck calibration'
 
 const buildDeckLastCalibrated: (
   data: DeckCalibrationData,
@@ -56,9 +66,16 @@ const buildDeckLastCalibrated: (
   }
   const datestring =
     typeof data.lastModified === 'string'
-      ? format(new Date(data.lastModified), 'yyyy-MM-dd HH:mm')
+      ? formatLastModified(data.lastModified)
       : 'unknown'
-  return `${LAST_CALIBRATED} ${datestring}`
+  const prefix = calData =>
+    typeof data?.source === 'string'
+      ? calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
+        ? MIGRATED
+        : LAST_CALIBRATED
+      : LAST_CALIBRATED
+
+  return `${prefix(data)} ${datestring}`
 }
 
 // deck calibration commands for which the full page spinner should not appear
@@ -71,27 +88,36 @@ export type Props = {|
   disabledReason: string | null,
   deckCalStatus: DeckCalibrationStatus | null,
   deckCalData: DeckCalibrationData | null,
+  pipOffsetDataPresent: boolean,
 |}
 
 export function DeckCalibrationControl(props: Props): React.Node {
-  const { robotName, disabledReason, deckCalStatus, deckCalData } = props
+  const {
+    robotName,
+    disabledReason,
+    deckCalStatus,
+    deckCalData,
+    pipOffsetDataPresent,
+  } = props
 
-  const [showWizard, setShowWizard] = React.useState(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const dispatch = useDispatch<Dispatch>()
 
   const trackedRequestId = React.useRef<string | null>(null)
-  const deleteRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
+  const jogRequestId = React.useRef<string | null>(null)
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
         createRequestId.current = dispatchedAction.meta.requestId
+        trackedRequestId.current = dispatchedAction.meta.requestId
       } else if (
-        dispatchedAction.type === Sessions.DELETE_SESSION &&
-        deckCalibrationSession?.id === dispatchedAction.payload.sessionId
+        dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
+        dispatchedAction.payload.command.command ===
+          Sessions.sharedCalCommands.JOG
       ) {
-        deleteRequestId.current = dispatchedAction.meta.requestId
+        jogRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
@@ -110,30 +136,25 @@ export function DeckCalibrationControl(props: Props): React.Node {
         : null
     )?.status === RobotApi.PENDING
 
-  const shouldClose =
-    useSelector<State, RequestState | null>(state =>
-      deleteRequestId.current
-        ? RobotApi.getRequestById(state, deleteRequestId.current)
-        : null
-    )?.status === RobotApi.SUCCESS
+  const createRequest = useSelector((state: State) =>
+    createRequestId.current
+      ? RobotApi.getRequestById(state, createRequestId.current)
+      : null
+  )
+  const createStatus = createRequest?.status
 
-  const shouldOpen =
+  const isJogging =
     useSelector((state: State) =>
-      createRequestId.current
-        ? RobotApi.getRequestById(state, createRequestId.current)
+      jogRequestId.current
+        ? RobotApi.getRequestById(state, jogRequestId.current)
         : null
-    )?.status === RobotApi.SUCCESS
+    )?.status === RobotApi.PENDING
 
   React.useEffect(() => {
-    if (shouldOpen) {
-      setShowWizard(true)
+    if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
     }
-    if (shouldClose) {
-      setShowWizard(false)
-      deleteRequestId.current = null
-    }
-  }, [shouldOpen, shouldClose])
+  }, [createStatus])
 
   const handleStartDeckCalSession = () => {
     dispatchRequests(
@@ -151,9 +172,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
     showConfirmation: showConfirmStart,
     confirm: confirmStart,
     cancel: cancelStart,
-  } = useConditionalConfirm(() => {
-    handleStartDeckCalSession()
-  }, true)
+  } = useConditionalConfirm(handleStartDeckCalSession, !!pipOffsetDataPresent)
 
   let warningType = null
   if (deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_OK) {
@@ -166,6 +185,17 @@ export function DeckCalibrationControl(props: Props): React.Node {
     warningType = RECOMMENDED
   }
 
+  const disabledOrBusyReason = showSpinner
+    ? createStatus === RobotApi.PENDING
+      ? STARTING
+      : ENDING
+    : disabledReason
+
+  const buttonText =
+    deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
+      ? BUTTON_TEXT_RECALIBRATE
+      : BUTTON_TEXT_CALIBRATE
+
   return (
     <>
       <TitledControl
@@ -175,48 +205,69 @@ export function DeckCalibrationControl(props: Props): React.Node {
           <>
             <InlineCalibrationWarning warningType={warningType} />
             <Text>{CALIBRATE_DECK_DESCRIPTION}</Text>
+            {deckCalData && deckCalStatus && (
+              <Text marginTop={SPACING_4} fontStyle={FONT_STYLE_ITALIC}>
+                {buildDeckLastCalibrated(deckCalData, deckCalStatus)}
+              </Text>
+            )}
           </>
         }
         control={
           <SecondaryBtn
             {...targetProps}
-            width="9rem"
+            width="13rem"
             onClick={confirmStart}
-            disabled={disabledReason}
+            disabled={disabledOrBusyReason}
           >
-            {CALIBRATE_BUTTON_TEXT}
+            {showSpinner ? (
+              <Icon name="ot-spinner" height="1em" spin />
+            ) : (
+              buttonText
+            )}
           </SecondaryBtn>
         }
       >
-        {disabledReason !== null && (
-          <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>
-        )}
-
-        {deckCalData && deckCalStatus && (
-          <Text marginTop={SPACING_4} fontStyle={FONT_STYLE_ITALIC}>
-            {buildDeckLastCalibrated(deckCalData, deckCalStatus)}
-          </Text>
+        {disabledOrBusyReason !== null && (
+          <Tooltip {...tooltipProps}>{disabledOrBusyReason}</Tooltip>
         )}
       </TitledControl>
-      {showConfirmStart && (
-        <Portal>
+      <Portal level="top">
+        <CalibrateDeck
+          session={deckCalibrationSession}
+          robotName={robotName}
+          dispatchRequests={dispatchRequests}
+          showSpinner={showSpinner}
+          isJogging={isJogging}
+        />
+        {showConfirmStart && pipOffsetDataPresent && (
           <ConfirmStartDeckCalModal
             confirm={confirmStart}
             cancel={cancelStart}
           />
-        </Portal>
-      )}
-      {showWizard && (
-        <Portal>
-          <CalibrateDeck
-            session={deckCalibrationSession}
-            robotName={robotName}
-            closeWizard={() => setShowWizard(false)}
-            dispatchRequests={dispatchRequests}
-            showSpinner={showSpinner}
-          />
-        </Portal>
-      )}
+        )}
+        {createStatus === RobotApi.FAILURE && (
+          <AlertModal
+            alertOverlay
+            heading={FAILED_START_HEADER}
+            buttons={[
+              {
+                children: OK_TEXT,
+                onClick: () => {
+                  createRequestId.current &&
+                    dispatch(RobotApi.dismissRequest(createRequestId.current))
+                  createRequestId.current = null
+                },
+              },
+            ]}
+          >
+            <Text>{FAILED_START_BODY}</Text>
+            <Text>
+              {createRequest?.error &&
+                RobotApi.getErrorResponseMessage(createRequest.error)}
+            </Text>
+          </AlertModal>
+        )}
+      </Portal>
     </>
   )
 }

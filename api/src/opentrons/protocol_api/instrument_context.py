@@ -3,13 +3,13 @@ from __future__ import annotations
 import logging
 from functools import lru_cache
 from typing import (
-    Any, Dict, List, Optional, Tuple, Sequence, Union, TYPE_CHECKING)
-from opentrons import types, commands as cmds, hardware_control as hc
+    Any, Dict, List, Optional, Tuple, Sequence, TYPE_CHECKING, Union)
 from opentrons.broker import Broker
+from opentrons import types, hardware_control as hc
+from opentrons.commands import commands as cmds
+from opentrons.commands.publisher import CommandPublisher, do_publish, publish
 from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
-from opentrons.commands import CommandPublisher
-from opentrons.config.feature_flags import enable_calibration_overhaul
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import PipettePair
 from opentrons.protocols.api_support.labware_like import LabwareLike
@@ -18,8 +18,7 @@ from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances, clamp_value, requires_version)
 from opentrons.protocols.implementations.interfaces.instrument_context import \
     InstrumentContextInterface
-
-from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.protocol.dev_types import (
     BlowoutLocation, LiquidHandlingCommand)
 from .labware import (
@@ -262,11 +261,11 @@ class InstrumentContext(CommandPublisher):
         c_vol = self._implementation.get_available_volume() \
             if not volume else volume
 
-        cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
-                        'before', None, None, self, c_vol, dest, rate)
+        do_publish(self.broker, cmds.aspirate, self.aspirate,
+                   'before', None, None, self, c_vol, dest, rate)
         self._implementation.aspirate(volume=c_vol, rate=rate)
-        cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
-                        'after', self, None, self, c_vol, dest, rate)
+        do_publish(self.broker, cmds.aspirate, self.aspirate,
+                   'after', self, None, self, c_vol, dest, rate)
         return self
 
     @requires_version(2, 0)
@@ -342,11 +341,11 @@ class InstrumentContext(CommandPublisher):
 
         c_vol = self.current_volume if not volume else volume
 
-        cmds.do_publish(self.broker, cmds.dispense, self.dispense,
-                        'before', None, None, self, c_vol, loc, rate)
+        do_publish(self.broker, cmds.dispense, self.dispense,
+                   'before', None, None, self, c_vol, loc, rate)
         self._implementation.dispense(volume=c_vol, rate=rate)
-        cmds.do_publish(self.broker, cmds.dispense, self.dispense,
-                        'after', self, None, self, c_vol, loc, rate)
+        do_publish(self.broker, cmds.dispense, self.dispense,
+                   'after', self, None, self, c_vol, loc, rate)
         return self
 
     @requires_version(2, 0)
@@ -397,21 +396,20 @@ class InstrumentContext(CommandPublisher):
         c_vol = self._implementation.get_available_volume() \
             if not volume else volume
 
-        cmds.do_publish(self.broker, cmds.mix, self.mix,
-                        'before', None, None,
-                        self, repetitions, c_vol, location)
+        do_publish(self.broker, cmds.mix, self.mix,
+                   'before', None, None,
+                   self, repetitions, c_vol, location)
         self.aspirate(volume, location, rate)
         while repetitions - 1 > 0:
             self.dispense(volume, rate=rate)
             self.aspirate(volume, rate=rate)
             repetitions -= 1
         self.dispense(volume, rate=rate)
-        cmds.do_publish(self.broker, cmds.mix, self.mix,
-                        'after', None, None,
-                        self, repetitions, c_vol, location)
+        do_publish(self.broker, cmds.mix, self.mix,
+                   'after', None, None,
+                   self, repetitions, c_vol, location)
         return self
 
-    @cmds.publish.both(command=cmds.blow_out)
     @requires_version(2, 0)
     def blow_out(self,
                  location: Union[types.Location, Well] = None
@@ -461,7 +459,12 @@ class InstrumentContext(CommandPublisher):
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
+
+        do_publish(self.broker, cmds.blow_out, self.blow_out, 'before',
+                   None, None, self, location or self._ctx.location_cache)
         self._implementation.blow_out()
+        do_publish(self.broker, cmds.blow_out, self.blow_out, 'after',
+                   None, None, self, location or self._ctx.location_cache)
         return self
 
     def _determine_speed(self, speed: float):
@@ -470,7 +473,7 @@ class InstrumentContext(CommandPublisher):
         else:
             return clamp_value(speed, 80, 1, 'touch_tip:')
 
-    @cmds.publish.both(command=cmds.touch_tip)
+    @publish.both(command=cmds.touch_tip)
     @requires_version(2, 0)
     def touch_tip(self,
                   location: Optional[Well] = None,
@@ -554,7 +557,7 @@ class InstrumentContext(CommandPublisher):
         )
         return self
 
-    @cmds.publish.both(command=cmds.air_gap)
+    @publish.both(command=cmds.air_gap)
     @requires_version(2, 0)
     def air_gap(self,
                 volume: Optional[float] = None,
@@ -603,7 +606,7 @@ class InstrumentContext(CommandPublisher):
         self.aspirate(volume)
         return self
 
-    @cmds.publish.both(command=cmds.return_tip)
+    @publish.both(command=cmds.return_tip)
     @requires_version(2, 0)
     def return_tip(self, home_after: bool = True) -> InstrumentContext:
         """
@@ -613,6 +616,9 @@ class InstrumentContext(CommandPublisher):
         It will not reset tip tracking so the well flag will remain False.
 
         :returns: This instance
+
+        :param home_after:
+            See the ``home_after`` parameter in :py:obj:`drop_tip`.
         """
         if not self._implementation.has_tip():
             self._log.warning('Pipette has no tip to return')
@@ -703,8 +709,8 @@ class InstrumentContext(CommandPublisher):
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
         self._validate_tiprack(tiprack)
-        cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
-                        'before', None, None, self, location=target)
+        do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
+                   'before', None, None, self, location=target)
         self.move_to(target.top())
 
         self._implementation.pick_up_tip(
@@ -714,8 +720,9 @@ class InstrumentContext(CommandPublisher):
             increment=increment
         )
         # Note that the hardware API pick_up_tip action includes homing z after
-        cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
-                        'after', self, None, self, location=target)
+        do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
+                   'after', self, None, self, location=target)
+
         tiprack.use_tips(target, self.channels)
         self._last_tip_picked_up_from = target
 
@@ -766,15 +773,47 @@ class InstrumentContext(CommandPublisher):
               can be a :py:class:`.types.Location`; for instance, you can call
               `instr.drop_tip(tiprack.wells()[0].top())`.
 
-        :param location: The location to drop the tip
-        :type location: :py:class:`.types.Location` or :py:class:`.Well` or
-                        None
-        :param home_after: Whether to home the plunger after dropping the tip
-                           (defaults to ``True``). The plungeer must home after
-                           dropping tips because the ejector shroud that pops
-                           the tip off the end of the pipette is driven by the
-                           plunger motor, and may skip steps when dropping the
-                           tip.
+        :param location:
+            The location to drop the tip
+        :type location:
+            :py:class:`.types.Location` or :py:class:`.Well` or None
+        :param home_after:
+            Whether to home this pipette's plunger after dropping the tip.
+            Defaults to ``True``.
+
+            Setting ``home_after=False`` saves waiting a couple of seconds
+            after the pipette drops the tip, but risks causing other problems.
+
+            .. warning::
+                Only set ``home_after=False`` if:
+
+                * You're using a GEN2 pipette, not a GEN1 pipette.
+                * You've tested ``home_after=False` extensively with your
+                  particular pipette and your particular tips.
+                * You understand the risks described below.
+
+            The ejector shroud that pops the tip off the end of the pipette is
+            driven by the plunger's stepper motor. Sometimes, the strain of
+            ejecting the tip can make that motor *skip* and fall out of sync
+            with where the robot thinks it is.
+
+            Homing the plunger fixes this, so, to be safe, we normally do it
+            after every tip drop.
+
+            If you set ``home_after=False`` to disable homing the plunger, and
+            the motor happens to skip, you might see problems like these until
+            the next time the plunger is homed:
+
+            * The run might halt with a "hard limit" error message.
+            * The pipette might aspirate or dispense the wrong volumes.
+            * The pipette might not fully drop subsequent tips.
+
+            GEN1 pipettes are especially vulnerable to this skipping, so you
+            should never set ``home_after=False`` with a GEN1 pipette.
+
+            Even on GEN2 pipettes, the motor can still skip. So, always
+            extensively test ``home_after=False` with your particular pipette
+            and your particular tips before relying on it.
 
         :returns: This instance
         """
@@ -802,12 +841,14 @@ class InstrumentContext(CommandPublisher):
                 "types.Location (e.g. the return value from "
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
                 " However, it is a {}".format(location))
-        cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
-                        'before', None, None, self, location=target)
+        do_publish(self.broker, cmds.drop_tip, self.drop_tip,
+                   'before', None, None, self, location=target)
         self.move_to(target)
+
         self._implementation.drop_tip(home_after=home_after)
-        cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
-                        'after', self, None, self, location=target)
+        do_publish(self.broker, cmds.drop_tip, self.drop_tip,
+                   'after', self, None, self, location=target)
+
         if self.api_version < APIVersion(2, 2) \
                 and target.labware.is_well \
                 and target.labware.as_well().parent.is_tiprack:
@@ -831,13 +872,12 @@ class InstrumentContext(CommandPublisher):
         :returns: This instance.
         """
         def home_dummy(mount): pass
-
         mount_name = self._implementation.get_mount().name.lower()
-        cmds.do_publish(self.broker, cmds.home, home_dummy,
-                        'before', None, None, mount_name)
+        do_publish(self.broker, cmds.home, home_dummy,
+                   'before', None, None, mount_name)
         self._implementation.home()
-        cmds.do_publish(self.broker, cmds.home, home_dummy,
-                        'after', self, None, mount_name)
+        do_publish(self.broker, cmds.home, home_dummy,
+                   'after', self, None, mount_name)
         return self
 
     @requires_version(2, 0)
@@ -849,7 +889,7 @@ class InstrumentContext(CommandPublisher):
         self._implementation.home_plunger()
         return self
 
-    @cmds.publish.both(command=cmds.distribute)
+    @publish.both(command=cmds.distribute)
     @requires_version(2, 0)
     def distribute(self,
                    volume: Union[float, Sequence[float]],
@@ -881,7 +921,7 @@ class InstrumentContext(CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @cmds.publish.both(command=cmds.consolidate)
+    @publish.both(command=cmds.consolidate)
     @requires_version(2, 0)
     def consolidate(self,
                     volume: Union[float, Sequence[float]],
@@ -911,7 +951,7 @@ class InstrumentContext(CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @cmds.publish.both(command=cmds.transfer)  # noqa(C901)
+    @publish.both(command=cmds.transfer)  # noqa(C901)
     @requires_version(2, 0)
     def transfer(self,
                  volume: Union[float, Sequence[float]],
@@ -976,13 +1016,13 @@ class InstrumentContext(CommandPublisher):
                 - 'destintation well': blowout excess liquid into destination
                    well
                 - 'trash': blowout excess liquid into the trash
-                If no `blow_out_location` specified and there is liquid left in
-                the pipette, a :py:meth:`blow_out` will occur into the source
-                well
+                If no `blow_out_location` specified, no `disposal_volume`
+                specified, and the pipette contains liquid,
+                a :py:meth:`blow_out` will occur into the source well
 
-                If no `blow_out_location` specified and there is no liquid
-                left in
-                the pipette, a :py:meth:`blow_out` will occur into the trash
+                If no `blow_out_location` specified and either
+                `disposal_volume` is specified or the pipette is empty,
+                a :py:meth:`blow_out` will occur into the trash
 
                 If `blow_out` is set to `False`, this parameter will be ignored
 
@@ -1500,14 +1540,11 @@ class InstrumentContext(CommandPublisher):
             tip_length = tiprack.tip_length
             return tip_length - tip_overlap
 
-        if not enable_calibration_overhaul():
+        try:
+            parent = LabwareLike(tiprack).first_parent() or ''
+            return get.load_tip_length_calibration(
+                self.hw_pipette['pipette_id'],
+                tiprack._implementation.get_definition(),
+                parent).tip_length
+        except TipLengthCalNotFound:
             return _build_length_from_overlap()
-        else:
-            try:
-                parent = LabwareLike(tiprack).first_parent() or ''
-                return get.load_tip_length_calibration(
-                    self.hw_pipette['pipette_id'],
-                    tiprack._implementation.get_definition(),
-                    parent)['tipLength']
-            except TipLengthCalNotFound:
-                return _build_length_from_overlap()

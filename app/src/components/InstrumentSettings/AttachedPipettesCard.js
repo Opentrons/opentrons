@@ -2,6 +2,13 @@
 // attached pipettes container card
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import {
+  Card,
+  useInterval,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING_3,
+} from '@opentrons/components'
 
 import {
   LEFT,
@@ -12,10 +19,7 @@ import {
   getAttachedPipetteSettings,
 } from '../../pipettes'
 
-import { PipetteInfo, LegacyPipetteInfo } from './PipetteInfo'
-import { getFeatureFlags } from '../../config'
-import { CardContentFlex } from '../layout'
-import { Card, useInterval } from '@opentrons/components'
+import { PipetteInfo } from './PipetteInfo'
 
 import type { State, Dispatch } from '../../types'
 import {
@@ -28,6 +32,7 @@ type Props = {|
   robotName: string,
   makeChangeUrl: (mount: Mount) => string,
   makeConfigureUrl: (mount: Mount) => string,
+  isChangingOrConfiguringPipette: boolean,
 |}
 
 // TODO(mc, 2019-12-09): i18n
@@ -36,10 +41,13 @@ const PIPETTES = 'Pipettes'
 const FETCH_PIPETTES_INTERVAL_MS = 5000
 
 export function AttachedPipettesCard(props: Props): React.Node {
-  const { robotName, makeChangeUrl, makeConfigureUrl } = props
+  const {
+    robotName,
+    makeChangeUrl,
+    makeConfigureUrl,
+    isChangingOrConfiguringPipette,
+  } = props
   const dispatch = useDispatch<Dispatch>()
-
-  const ff = useSelector(getFeatureFlags)
 
   const pipettes = useSelector((state: State) =>
     getAttachedPipettes(state, robotName)
@@ -59,27 +67,26 @@ export function AttachedPipettesCard(props: Props): React.Node {
     true
   )
 
-  const PipetteEl = ff.enableCalibrationOverhaul
-    ? PipetteInfo
-    : LegacyPipetteInfo
   return (
     <Card title={PIPETTES}>
-      <CardContentFlex>
-        <PipetteEl
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
+        <PipetteInfo
           robotName={robotName}
           mount={LEFT}
           pipette={pipettes.left}
           changeUrl={makeChangeUrl(LEFT)}
           settingsUrl={settings.left ? makeConfigureUrl(LEFT) : null}
+          isChangingOrConfiguringPipette={isChangingOrConfiguringPipette}
         />
-        <PipetteEl
+        <PipetteInfo
           robotName={robotName}
           mount={RIGHT}
           pipette={pipettes.right}
           changeUrl={makeChangeUrl(RIGHT)}
           settingsUrl={settings.right ? makeConfigureUrl(RIGHT) : null}
+          isChangingOrConfiguringPipette={isChangingOrConfiguringPipette}
         />
-      </CardContentFlex>
+      </Flex>
     </Card>
   )
 }

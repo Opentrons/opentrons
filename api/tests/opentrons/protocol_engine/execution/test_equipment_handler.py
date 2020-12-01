@@ -5,86 +5,78 @@ from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 
-from opentrons.protocol_engine import errors
+from opentrons.protocol_engine import errors, ResourceProviders
 from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.state import PipetteData
-from opentrons.protocol_engine.resources import IdGenerator, LabwareData
-from opentrons.protocol_engine.execution.equipment import EquipmentHandler
-from opentrons.protocol_engine.command_models import (
-    LoadLabwareRequest,
-    LoadLabwareResult,
-    LoadPipetteRequest,
-    LoadPipetteResult,
+
+from opentrons.protocol_engine.execution.equipment import (
+    EquipmentHandler,
+    LoadedLabware,
+    LoadedPipette,
 )
 
 
 @pytest.fixture
-def mock_labware_data(minimal_labware_def: LabwareDefinition) -> AsyncMock:
-    """Get a mock in the shape of the LabwareData resource primed with data."""
-    mock = AsyncMock(spec=LabwareData)
-    mock.get_labware_definition.return_value = minimal_labware_def
-    mock.get_labware_calibration.return_value = (1, 2, 3)
-    return mock
+def mock_resources_with_data(
+    minimal_labware_def: LabwareDefinition,
+    mock_resources: AsyncMock,
+) -> AsyncMock:
+    """Get a mock in the shape of the LabwareDataProvider primed with data."""
+    mock_resources.labware_data.get_labware_definition.return_value = (
+        minimal_labware_def
+    )
+    mock_resources.labware_data.get_labware_calibration.return_value = (1, 2, 3)
+    mock_resources.id_generator.generate_id.return_value = "unique-id"
 
-
-@pytest.fixture
-def mock_id_generator() -> MagicMock:
-    """Get a mock in the shape of an IdGenerator resource primed with data."""
-    mock = MagicMock(spec=IdGenerator)
-    mock.generate_id.return_value = "unique-id"
-    return mock
+    return mock_resources
 
 
 @pytest.fixture
 def handler(
     mock_hardware: AsyncMock,
     mock_state_view: MagicMock,
-    mock_labware_data: AsyncMock,
-    mock_id_generator: MagicMock,
+    mock_resources_with_data: AsyncMock,
 ) -> EquipmentHandler:
     """Get an EquipmentHandler with its dependencies mocked out."""
     return EquipmentHandler(
         hardware=mock_hardware,
         state=mock_state_view,
-        id_generator=mock_id_generator,
-        labware_data=mock_labware_data,
+        resources=mock_resources_with_data,
     )
 
 
 async def test_load_labware_assigns_id(
-    mock_id_generator: MagicMock,
+    mock_resources_with_data: AsyncMock,
     handler: EquipmentHandler,
 ) -> None:
-    """A LoadLabwareRequest should create a resource ID for the labware."""
-    req = LoadLabwareRequest(
+    """Loading labware should create a resource ID for the labware."""
+    res = await handler.load_labware(
         location=DeckSlotLocation(DeckSlotName.SLOT_3),
-        loadName="load-name",
+        load_name="load-name",
         namespace="opentrons-test",
         version=1
     )
-    res = await handler.handle_load_labware(req)
 
-    assert type(res) == LoadLabwareResult
-    assert res.labwareId == "unique-id"
+    assert type(res) == LoadedLabware
+    assert res.labware_id == "unique-id"
 
 
 async def test_load_labware_gets_labware_def(
     minimal_labware_def: LabwareDefinition,
-    mock_labware_data: AsyncMock,
+    mock_resources_with_data: AsyncMock,
     handler: EquipmentHandler,
 ) -> None:
-    """A LoadLabwareRequest should create a resource ID for the labware."""
-    req = LoadLabwareRequest(
+    """Loading labware should load the labware's defintion."""
+    res = await handler.load_labware(
         location=DeckSlotLocation(DeckSlotName.SLOT_3),
-        loadName="load-name",
+        load_name="load-name",
         namespace="opentrons-test",
         version=1
     )
-    res = await handler.handle_load_labware(req)
 
-    assert type(res) == LoadLabwareResult
+    assert type(res) == LoadedLabware
     assert res.definition == minimal_labware_def
-    mock_labware_data.get_labware_definition.assert_called_with(
+    mock_resources_with_data.labware_data.get_labware_definition.assert_called_with(
         load_name="load-name",
         namespace="opentrons-test",
         version=1
@@ -93,36 +85,34 @@ async def test_load_labware_gets_labware_def(
 
 async def test_load_labware_gets_labware_cal_data(
     minimal_labware_def: LabwareDefinition,
-    mock_labware_data: AsyncMock,
+    mock_resources_with_data: AsyncMock,
     handler: EquipmentHandler,
 ) -> None:
-    """A LoadLabwareRequest should create a resource ID for the labware."""
-    req = LoadLabwareRequest(
+    """Loading labware should load the labware's calibration data."""
+    res = await handler.load_labware(
         location=DeckSlotLocation(DeckSlotName.SLOT_3),
-        loadName="load-name",
+        load_name="load-name",
         namespace="opentrons-test",
         version=1
     )
-    res = await handler.handle_load_labware(req)
 
-    assert type(res) == LoadLabwareResult
+    assert type(res) == LoadedLabware
     assert res.calibration == (1, 2, 3)
-    mock_labware_data.get_labware_calibration.assert_called_with(
+    mock_resources_with_data.labware_data.get_labware_calibration.assert_called_with(
         definition=minimal_labware_def,
         location=DeckSlotLocation(DeckSlotName.SLOT_3),
     )
 
 
 async def test_load_pipette_assigns_id(
-    mock_id_generator: MagicMock,
+    mock_resources_with_data: ResourceProviders,
     handler: EquipmentHandler,
 ) -> None:
-    """A LoadPipetteRequest should generate a unique identifier for the pipette."""
-    req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.LEFT)
-    res = await handler.handle_load_pipette(req)
+    """Loading a pipette should generate a unique identifier for the pipette."""
+    res = await handler.load_pipette(pipette_name="p300_single", mount=MountType.LEFT)
 
-    assert type(res) == LoadPipetteResult
-    assert res.pipetteId == "unique-id"
+    assert type(res) == LoadedPipette
+    assert res.pipette_id == "unique-id"
 
 
 async def test_load_pipette_checks_checks_existence(
@@ -130,10 +120,9 @@ async def test_load_pipette_checks_checks_existence(
     mock_hardware: AsyncMock,
     handler: EquipmentHandler,
 ) -> None:
-    """A LoadPipetteRequest should cache hardware instruments."""
+    """Loading a pipette should cache hardware instruments."""
     mock_state_view.pipettes.get_pipette_data_by_mount.return_value = None
-    req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.LEFT)
-    await handler.handle_load_pipette(req)
+    await handler.load_pipette(pipette_name="p300_single", mount=MountType.LEFT)
 
     mock_state_view.pipettes.get_pipette_data_by_mount.assert_called_with(
         MountType.RIGHT
@@ -148,12 +137,10 @@ async def test_load_pipette_checks_checks_existence_with_already_loaded(
     mock_hardware: AsyncMock,
     handler: EquipmentHandler,
 ) -> None:
-    """A LoadPipetteRequest should cache with pipettes already attached."""
+    """Loading a pipette should cache with pipettes already attached."""
     mock_state_view.pipettes.get_pipette_data_by_mount.return_value = \
         PipetteData(mount=MountType.LEFT, pipette_name="p300_multi")
-    req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.RIGHT)
-
-    await handler.handle_load_pipette(req)
+    await handler.load_pipette(pipette_name="p300_single", mount=MountType.RIGHT)
 
     mock_state_view.pipettes.get_pipette_data_by_mount.assert_called_with(
         MountType.LEFT
@@ -169,16 +156,14 @@ async def test_load_pipette_raises_if_pipette_not_attached(
     mock_hardware: AsyncMock,
     handler: EquipmentHandler,
 ) -> None:
-    """A LoadPipetteRequest should raise if unable to cache instruments."""
+    """Loading a pipette should should raise if unable to cache instruments."""
     mock_hardware.cache_instruments.side_effect = RuntimeError(
         'mount LEFT: instrument p300_single was requested, '
         'but no instrument is present'
     )
 
-    req = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.LEFT)
-
     with pytest.raises(
         errors.FailedToLoadPipetteError,
         match=".+p300_single was requested"
     ):
-        await handler.handle_load_pipette(req)
+        await handler.load_pipette(pipette_name="p300_single", mount=MountType.LEFT)
