@@ -325,13 +325,13 @@ class API(HardwareAPILike):
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
 
-    async def delay(self, duration_s: int):
+    async def delay(self, duration_s: float):
         """ Delay execution by pausing and sleeping.
         """
         await self._wait_for_is_running()
         self.pause()
         if not self.is_simulator:
-            async def sleep_for_seconds(seconds: int):
+            async def sleep_for_seconds(seconds: float):
                 await asyncio.sleep(seconds)
             delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
             await self._execution_manager.register_cancellable_task(delay_task)

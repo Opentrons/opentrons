@@ -16,16 +16,17 @@ def comment(msg):
 
 def delay(seconds, minutes, msg=None):
     td = timedelta(minutes=minutes, seconds=seconds)
-    minutes, seconds = divmod(td.seconds, 60)
+    actual_min, whole_sec = divmod(td.seconds, 60)
+    actual_sec = whole_sec + round(float(seconds) - int(seconds), 3)
 
-    text = f"Delaying for {minutes} minutes and {seconds} seconds"
+    text = f"Delaying for {actual_min} minutes and {actual_sec} seconds"
     if msg:
         text = f"{text}. {msg}"
     return make_command(
         name=command_types.DELAY,
         payload={
-            'minutes': minutes,
-            'seconds': seconds,
+            'minutes': actual_min,
+            'seconds': actual_sec,
             'text': text
         }
     )
