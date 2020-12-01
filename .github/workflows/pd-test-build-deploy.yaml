@@ -1,0 +1,146 @@
+# Run tests, build PD, and deploy it to sandbox
+
+name: 'PD test, build, and deploy'
+
+on:
+  pull_request:
+    paths:
+      - 'protocol-designer/**'
+      - 'shared-data/**'
+      - 'components/**'
+      - 'webpack-config/**'
+      - 'package.json'
+      - '.github/workflows/pd-test-build-deploy.yaml'
+  push:
+    paths:
+      - 'protocol-designer/**'
+      - 'shared-data/**'
+      - 'components/**'
+      - 'webpack-config/**'
+      - 'package.json'
+      - '.github/workflows/pd-test-build-deploy.yaml'
+    branches:
+      - '*'
+    tags:
+      - 'protocol-designer*'
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: true
+
+jobs:
+  js-unit-test:
+    name: 'protocol designer unit tests'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
+      - name: 'run PD unit tests'
+        run: |
+          yarn jest --coverage=true --ci=true protocol-designer/
+  e2e-test:
+    name: 'pd e2e tests'
+    strategy:
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest']
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
+      - name: 'test-e2e'
+        run: make -C protocol-designer test-e2e
+  build-PD:
+    name: 'build protocol designer'
+    runs-on: 'ubuntu-latest'
+    needs: [js-unit-test, e2e-test]
+    if: github.event_name != 'pull_request'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
+      - name: 'build PD'
+        run: |
+          make -C protocol-designer
+        # now it'll be built to dist
+        # need to upload the artifact so that we can deploy it in the next job
+      - name: 'upload github artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'pd-artifact'
+          path: dist
+  deploy-pd:
+    name: 'Deploy built PD artifact to S3'
+    runs-on: 'ubuntu-latest'
+    needs: build-PD
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: 'set complex environment variables'
+          id: 'set-vars'
+          uses: actions/github-script@v3.1
+          with:
+            script: |
+              const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+              buildComplexEnvVars(core, context)
+      - name: 'download PD build'
+        uses: 'actions/download-artifact@v2'
+        with:
+          name: pd-artifact
+      - name: 'deploy builds to s3'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
+        uses: './.github/actions/webstack/deploy-to-sandbox'
+        with:
+          domain: 'designer.opentrons.com'
+          distPath: './dist'
+          destPrefix: ${{ env.OT_BRANCH }}
