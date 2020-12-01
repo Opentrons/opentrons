@@ -111,8 +111,6 @@ jobs:
       - name: 'build PD'
         run: |
           make -C protocol-designer
-        # now it'll be built to dist
-        # need to upload the artifact so that we can deploy it in the next job
       - name: 'upload github artifact'
         uses: actions/upload-artifact@v2
         with:
