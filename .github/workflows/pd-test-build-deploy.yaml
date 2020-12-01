@@ -117,7 +117,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: 'pd-artifact'
-          path: dist
+          path: protocol-designer/dist
   deploy-pd:
     name: 'Deploy built PD artifact to S3'
     runs-on: 'ubuntu-latest'
@@ -139,6 +139,7 @@ jobs:
         uses: 'actions/download-artifact@v2'
         with:
           name: pd-artifact
+          path: ./dist
       - name: 'deploy builds to s3'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
