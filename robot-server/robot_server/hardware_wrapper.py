@@ -18,6 +18,9 @@ class RobotEventTopics(enum.Enum):
     # SPP: Should this be moved to an 'event_topics.py' file?
     DOOR_EVENT = "hardware.door_event"
 
+    def __str__(self):
+        return self.value
+
 
 class HardwareWrapper:
     """Wrapper to support initializing the opentrons api hardware
@@ -66,7 +69,7 @@ class HardwareWrapper:
 
     def _publish_door_event(self, hw_event: HardwareEvent):
         if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
-            self._publish_event(topic=RobotEventTopics.DOOR_EVENT,
+            self._publish_event(topic=str(RobotEventTopics.DOOR_EVENT),
                                 publisher=self._publish_door_event,
                                 data=DoorSwitchEventType(
                                     new_state=hw_event.new_state))
