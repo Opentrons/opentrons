@@ -14,9 +14,9 @@ from opentrons.broker import Broker
 from opentrons.config import feature_flags as ff
 from opentrons.commands.util import from_list, session_listify
 from opentrons.commands import types as command_types
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.implementations.protocol_context import \
     ProtocolContextImplementation
-from opentrons.protocols.types import APIVersion
 from opentrons.protocols.parse import parse
 from opentrons.types import Location, Point
 from opentrons.calibration_storage import helpers

@@ -1,6 +1,7 @@
 from typing import Optional
 
 from opentrons import types
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -13,7 +14,6 @@ from opentrons.protocols.implementations.interfaces.instrument_context import \
 from opentrons.protocols.implementations.interfaces.protocol_context import \
     ProtocolContextInterface
 from opentrons.protocols.implementations.well import WellImplementation
-from opentrons.protocols.types import APIVersion
 
 
 class InstrumentContextImplementation(InstrumentContextInterface):

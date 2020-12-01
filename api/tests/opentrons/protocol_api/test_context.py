@@ -209,7 +209,6 @@ def test_pick_up_and_drop_tip(ctx, get_labware_def):
     instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
 
     pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa E501
-    pipette: Pipette = ctx._hw_manager.hardware._attached_instruments[mount]
     nozzle_offset = Point(*pipette.config.nozzle_offset)
     assert pipette.critical_point() == nozzle_offset
     target_location = tiprack['A1'].top()

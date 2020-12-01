@@ -33,7 +33,8 @@ def paired_aspirate(
         pub_type: str):
     loc_text = combine_locations(locations)
     flow_rate = min(
-        rate * FlowRates(instr).aspirate for instr in instruments)
+        rate * FlowRates(instr._implementation).aspirate
+        for instr in instruments)
     text_type = f'{pub_type}: Aspirating '
     text_content = f'{volume} uL from {loc_text} at {flow_rate} uL/sec'
     text = text_type + text_content
@@ -55,7 +56,8 @@ def paired_dispense(
         pub_type: str):
     loc_text = combine_locations(locations)
     flow_rate = min(
-        rate * FlowRates(instr).dispense for instr in instruments)
+        rate * FlowRates(instr._implementation).dispense
+        for instr in instruments)
     text_type = f'{pub_type}: Dispensing '
     text_content = f'{volume} uL into {loc_text} at {flow_rate} uL/sec'
     text = text_type + text_content

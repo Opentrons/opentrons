@@ -2,6 +2,7 @@ import logging
 from typing import Dict, Optional, Set
 
 from opentrons import types, API
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control.modules import MagDeck, TempDeck, Thermocycler
 from opentrons.hardware_control import ExecutionManager, SynchronousAdapter
@@ -22,7 +23,7 @@ from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds, HardwareToManage, HardwareManager)
 from opentrons.protocols.labware import load_from_definition, \
     get_labware_definition
-from opentrons.protocols.types import Protocol, APIVersion
+from opentrons.protocols.types import Protocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
