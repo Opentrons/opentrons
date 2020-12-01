@@ -40,13 +40,6 @@ jobs:
       after_success:
         - make coverage
       deploy:
-        - # upload protocol designer artifacts to S3
-          <<: *deploy_s3
-          dot_match: true
-          local-dir: protocol-designer/dist
-          bucket: $OT_PD_DEPLOY_BUCKET
-          upload-dir: $TRAVIS_BRANCH
-
         - # upload labware library artifacts to S3
           <<: *deploy_s3
           local-dir: labware-library/dist
