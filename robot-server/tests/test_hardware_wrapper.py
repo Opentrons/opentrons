@@ -11,8 +11,8 @@ from robot_server.service import dependencies
 def simulating_wrapper():
     with patch.object(hardware_wrapper, 'get_settings',
                       return_value=RobotServerSettings(
-                          simulator_configuration_file_path
-                          ='simulators/test.json')):
+                          simulator_configuration_file_path='simulators'
+                                                            '/test.json')):
         return hardware_wrapper.HardwareWrapper()
 
 
