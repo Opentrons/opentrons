@@ -666,6 +666,8 @@ def _accumulate(iterable: Sequence[CommandReferents]) -> CommandReferents:
 
 
 It = TypeVar('It')
+
+
 def _dedupe(iterable: Sequence[It]) -> Sequence[It]:
     acc: Set[It] = set()
 

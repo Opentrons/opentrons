@@ -100,7 +100,8 @@ def test_accumulate():
             (['b', 'c'], ['e', 'f'], ['i'], [('m', 'n')])
         ])
 
-    assert res == (['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i'], [('l', 'm'), ('m', 'n')])
+    assert res == (['a', 'b', 'c'], ['d', 'e', 'f'],
+                   ['g', 'h', 'i'], [('l', 'm'), ('m', 'n')])
     assert _accumulate([]) == ([], [], [], [])
 
 
