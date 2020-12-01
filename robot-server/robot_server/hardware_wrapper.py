@@ -1,5 +1,6 @@
 import asyncio
 import typing
+import enum
 from pathlib import Path
 
 from opentrons import ThreadManager, initialize as initialize_api
@@ -8,10 +9,14 @@ from opentrons.hardware_control.types import (HardwareEventType, HardwareEvent)
 from opentrons.util.helpers import utc_now
 from robot_server.main import log
 from robot_server.settings import get_settings
-from notify_server.clients import publisher
+
 from notify_server.models.event import Event
 from notify_server.models.payload_type import DoorSwitchEventType
-from notify_server.settings import Settings as NotifyServerSettings
+
+
+class RobotEventTopics(enum.Enum):
+    # SPP: Should this be moved to an 'event_topics.py' file?
+    DOOR_EVENT = "hardware.door_event"
 
 
 class HardwareWrapper:
@@ -20,8 +25,7 @@ class HardwareWrapper:
 
     def __init__(self):
         self._tm: typing.Optional[ThreadManager] = None
-        self._event_watcher = None
-        self._event_publisher = None
+        self._door_event_watcher = None
 
     async def initialize(self) -> ThreadManager:
         """Initialize the API"""
@@ -39,39 +43,42 @@ class HardwareWrapper:
                 hardware_server=app_settings.hardware_server_enable,
                 hardware_server_socket=app_settings.hardware_server_socket_path
             )
-        await self.init_door_event_publisher()
+        await self.init_event_watchers()
         log.info("Opentrons API initialized")
         return self._tm
 
-    async def init_door_event_publisher(self):
+    async def init_event_watchers(self):
         """
-        Create a notify-server publisher for safety door state,
-        publish the initial state, & register the publisher callback with
-        the hw thread manager.
+        Register the publisher callbacks with the hw thread manager.
         """
         if self._tm is None:
-            log.warning("HW Thread Manager not initialized")
+            log.error("HW Thread Manager not initialized. "
+                      "Cannot initialize robot event watchers.")
             return
-        settings = NotifyServerSettings()
-        if self._event_watcher is None:
+
+        if self._door_event_watcher is None:
             log.info("Starting door-switch-notify publisher")
-            self._event_publisher = publisher.create(
-                settings.publisher_address.connection_string()
-            )
-            self._event_watcher = await self._tm.register_callback(
+            self._door_event_watcher = await self._tm.register_callback(
                 self._publish_door_event)
         else:
             log.warning("Cannot start new hardware event watcher "
                         "when one already exists")
 
     def _publish_door_event(self, hw_event: HardwareEvent):
-        if self._event_publisher and \
-                hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
-            self._event_publisher.send_nowait("hardware.door_event", Event(
-                createdOn=utc_now(),
-                publisher=self._publish_door_event.__qualname__,
-                data=DoorSwitchEventType(new_state=hw_event.new_state)
-            ))
+        if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
+            self._publish_event(topic=RobotEventTopics.DOOR_EVENT,
+                                publisher=self._publish_door_event,
+                                data=DoorSwitchEventType(
+                                    new_state=hw_event.new_state))
+
+    def _publish_event(self, topic, publisher, data):
+        from robot_server.service.dependencies import get_event_publisher
+        event_publisher = get_event_publisher()
+        if event_publisher:
+            event_publisher.send_nowait(topic,
+                                        Event(createdOn=utc_now(),
+                                              publisher=publisher.__qualname__,
+                                              data=data))
 
     def async_initialize(self):
         """Create task to initialize hardware."""

@@ -9,7 +9,6 @@ python_version = "3.7"
 [packages]
 pyzmq = "==19.*,>=19.0.2"
 pydantic = "==1.4"
-"c445fee" = {editable = true, path = "./../api"}
 opentrons = {editable = true, path = "./../api"}
 
 [dev-packages]
