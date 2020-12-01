@@ -69,7 +69,7 @@ class ProtocolRunner:
                 broker=self._broker,
                 motion_lock=self._motion_lock,
                 # TODO Amit 8/3/2020 - need an answer for custom labware
-                extra_labware={})
+                extra_labware=[])
 
     def run(self):
         """Run the protocol"""

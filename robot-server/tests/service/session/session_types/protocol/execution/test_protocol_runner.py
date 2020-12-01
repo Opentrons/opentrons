@@ -67,7 +67,7 @@ def test_load(protocol_runner, mock_context,
             loop=protocol_runner._loop,
             broker=protocol_runner._broker,
             motion_lock=protocol_runner._motion_lock,
-            extra_labware={})
+            extra_labware=[])
 
 
 @pytest.mark.parametrize(argnames="func",
