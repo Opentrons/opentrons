@@ -9,6 +9,7 @@ from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocols.geometry.planning import MoveType, get_waypoints
 
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.types import WellLocation, WellOrigin
 from opentrons.protocol_engine.state import (
     PipetteData,
     LocationData,
@@ -44,7 +45,7 @@ def motion_store(
     mock_pipette_store: MagicMock,
     mock_geometry_store: MagicMock,
 ) -> MotionStore:
-    """Get a MotionStore with its dependecies mocked out."""
+    """Get a MotionStore with its dependencies mocked out."""
     return MotionStore(
         labware_store=mock_labware_store,
         pipette_store=mock_pipette_store,
@@ -153,6 +154,7 @@ class WaypointSpec:
     pipette_id: str = "pipette-id"
     labware_id: str = "labware-id"
     well_name: str = "A1"
+    well_location: Optional[WellLocation] = None
     origin: Point = field(default_factory=lambda: Point(1, 2, 3))
     dest: Point = field(default_factory=lambda: Point(4, 5, 6))
     origin_cp: Optional[CriticalPoint] = None
@@ -200,7 +202,13 @@ class WaypointSpec:
         all_labware_z=20,
         expected_move_type=MoveType.GENERAL_ARC,
         expected_dest_cp=CriticalPoint.XY_CENTER,
-    )
+    ),
+    WaypointSpec(
+        name="General arc with a well offset",
+        all_labware_z=20,
+        well_location=WellLocation(origin=WellOrigin.TOP, offset=(0, 0, 1)),
+        expected_move_type=MoveType.GENERAL_ARC,
+    ),
 ])
 def test_get_movement_waypoints(
     mock_labware_store: MagicMock,
@@ -230,6 +238,7 @@ def test_get_movement_waypoints(
         pipette_id=spec.pipette_id,
         labware_id=spec.labware_id,
         well_name=spec.well_name,
+        well_location=spec.well_location,
         origin=spec.origin,
         origin_cp=spec.origin_cp,
         max_travel_z=spec.max_travel_z,
@@ -253,6 +262,7 @@ def test_get_movement_waypoints(
     mock_geometry_store.state.get_well_position.assert_called_with(
         spec.labware_id,
         spec.well_name,
+        spec.well_location,
     )
     if spec.labware_z is not None:
         mock_geometry_store.state.get_labware_highest_z.assert_called_with(
@@ -275,6 +285,7 @@ def test_get_movement_waypoints_raises(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="A1",
+            well_location=None,
             origin=Point(1, 2, 3),
             origin_cp=None,
             # this max_travel_z is too low and will induce failure

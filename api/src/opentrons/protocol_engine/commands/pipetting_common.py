@@ -1,5 +1,4 @@
 """Common pipetting command base models."""
-
 from pydantic import BaseModel, Field
 
 

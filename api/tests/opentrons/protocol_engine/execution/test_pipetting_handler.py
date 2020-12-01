@@ -6,6 +6,7 @@ from typing import cast
 from opentrons.types import Mount
 from opentrons.hardware_control.dev_types import PipetteDict
 
+from opentrons.protocol_engine.types import WellLocation
 from opentrons.protocol_engine.state import TipGeometry, HardwarePipette
 from opentrons.protocol_engine.execution.movement import MovementHandler
 from opentrons.protocol_engine.execution.pipetting import PipettingHandler
@@ -86,4 +87,54 @@ async def test_handle_pick_up_tip_request(
         labware_id="labware-id",
         well_name="B2",
         pipette_config={"name": "p300_single"},
+    )
+
+
+async def test_handle_drop_up_tip_request_into_trash(
+    mock_state_view: MagicMock,
+    mock_hardware: AsyncMock,
+    mock_movement_handler: AsyncMock,
+    handler: PipettingHandler,
+) -> None:
+    """It should handle a PickUpTipRequest properly."""
+    mock_config = cast(PipetteDict, {"name": "p300_single"})
+    mock_attached_pipettes = {Mount.LEFT: None, Mount.RIGHT: mock_config}
+
+    mock_hardware.attached_instruments = mock_attached_pipettes
+
+    mock_state_view.pipettes.get_hardware_pipette.return_value = HardwarePipette(
+        mount=Mount.RIGHT,
+        config=mock_config,
+    )
+
+    mock_state_view.geometry.get_tip_drop_location.return_value = WellLocation(
+        offset=(0, 0, 10),
+    )
+
+    await handler.drop_tip(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="A1",
+    )
+
+    mock_state_view.pipettes.get_hardware_pipette.assert_called_with(
+        pipette_id="pipette-id",
+        attached_pipettes=mock_attached_pipettes,
+    )
+
+    mock_state_view.geometry.get_tip_drop_location.assert_called_with(
+        labware_id="labware-id",
+        pipette_config=mock_config,
+    )
+
+    mock_movement_handler.move_to_well.assert_called_with(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="A1",
+        well_location=WellLocation(offset=(0, 0, 10))
+    )
+
+    mock_hardware.drop_tip.assert_called_with(
+        mount=Mount.RIGHT,
+        home_after=True,
     )
