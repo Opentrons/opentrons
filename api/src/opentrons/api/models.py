@@ -16,9 +16,8 @@ class Container:
     def __init__(
             self,
             container: labware.Labware,
-            instruments: List[InstrumentContext] = None,
-            context: ProtocolContext = None):
-        instruments = instruments or []
+            instruments: List[InstrumentContext],
+            context: ProtocolContext):
         self._container = container
         self._context = context
         self.id = id(container)
@@ -36,7 +35,7 @@ class Container:
         self.definition_hash = labware.get_labware_hash_with_parent(
             container)
         self.instruments = [
-            Instrument(instrument)
+            Instrument(instrument, [], self._context)
             for instrument in instruments]
 
 
@@ -44,8 +43,8 @@ class Instrument:
     def __init__(
             self,
             instrument: InstrumentContext,
-            containers: List[labware.Labware] = None,
-            context: ProtocolContext = None):
+            containers: List[labware.Labware],
+            context: ProtocolContext):
         containers = containers or []
         self._instrument = instrument
         self._context = context
@@ -58,11 +57,11 @@ class Instrument:
         self.channels = instrument.channels
         self.mount = instrument.mount
         self.containers = [
-            Container(container)
+            Container(container, [], self._context)
             for container in containers
         ]
         self.tip_racks = [
-            Container(container)
+            Container(container, [], self._context)
             for container in instrument.tip_racks]
         if context:
             self.tip_racks.extend([
@@ -74,7 +73,7 @@ class Module:
     def __init__(
             self,
             module: module_geometry.ModuleGeometry,
-            context: ProtocolContext = None):
+            context: ProtocolContext):
         self.id = id(module)
         _type_lookup = {
             module_geometry.ModuleType.MAGNETIC: 'magdeck',

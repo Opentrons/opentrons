@@ -21,16 +21,18 @@ from opentrons.protocols.parse import parse
 from opentrons.protocols.types import Protocol
 from opentrons.calibration_storage import helpers
 from opentrons.protocol_api import (ProtocolContext,
+                                    InstrumentContext,
                                     labware)
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.execution.execute import run_protocol
 from opentrons.hardware_control import (API, ThreadManager,
+                                        SynchronousAdapter,
                                         ExecutionCancelledError,
                                         ThreadedAsyncLock)
 from opentrons.hardware_control.types import (DoorState, HardwareEventType,
                                               HardwareEvent)
 from .models import Container, Instrument, Module
-from .dev_types import State, StateInfo, Message, LastCommand, Error
+from .dev_types import State, StateInfo, Message, LastCommand, Error, CommandShortId
 
 log = logging.getLogger(__name__)
 
@@ -40,16 +42,20 @@ VALID_STATES: Set[State] = {
 
 class SessionManager:
     def __init__(
-            self, hardware, loop=None, broker=None, lock=None):
+            self,
+            hardware: SynchronousAdapter,
+            loop=None,
+            broker: Broker = None,
+            lock: ThreadedAsyncLock = None):
         self._broker = broker or Broker()
         self._loop = loop or asyncio.get_event_loop()
-        self.session = None
+        self.session: Optional[Session] = None
         self._session_lock = False
         self._hardware = hardware
         self._command_logger = logging.getLogger(
             'opentrons.server.command_logger')
         self._broker.set_logger(self._command_logger)
-        self._motion_lock = lock
+        self._motion_lock = lock or ThreadedAsyncLock()
 
     @requires_http_protocols_disabled
     def create(
@@ -210,8 +216,15 @@ class Session(RobotBusy):
 
     @classmethod
     def build_and_prep(
-        cls, name, contents, hardware, loop, broker, motion_lock, extra_labware
-    ):
+            cls,
+            name: str,
+            contents: Any,
+            hardware: SynchronousAdapter,
+            loop,
+            broker: Broker,
+            motion_lock: ThreadedAsyncLock,
+            extra_labware
+    ) -> Session:
         protocol = parse(contents, filename=name,
                          extra_labware={helpers.uri_from_definition(defn): defn
                                         for defn in extra_labware})
@@ -219,7 +232,12 @@ class Session(RobotBusy):
         sess.prepare()
         return sess
 
-    def __init__(self, name, protocol, hardware, loop, broker, motion_lock):
+    def __init__(
+            self, name: str, protocol: Protocol,
+            hardware: SynchronousAdapter,
+            loop,
+            broker: Broker,
+            motion_lock: ThreadedAsyncLock):
         self._broker = broker
         self._default_logger = self._broker.logger
         self._sim_logger = self._broker.logger.getChild('sim')
@@ -244,18 +262,20 @@ class Session(RobotBusy):
         #: The current state
         self.stateInfo: 'StateInfo' = {}
         #: A message associated with the current state
-        self.commands = []
+        self.commands: List[command_types.CommandMessage] = []
         self.command_log: Dict[int, int] = {}
         self.errors: List[Error] = []
 
-        self._containers = []
-        self._instruments = []
-        self._modules = []
-        self._interactions = []
+        # Underlying objects harvested from commands, internal
+        self._containers: List[labware.Labware] = []
+        self._instruments: List[InstrumentContext] = []
+        self._modules: List[module_geometry.ModuleGeometry] = []
+        self._interactions: List[Tuple[InstrumentContext, labware.Labware]] = []
 
-        self.instruments = None
-        self.containers = None
-        self.modules = None
+        # RPC-safe models of objects harvested from commands
+        self.instruments: Optional[List[Instrument]] = None
+        self.containers: Optional[List[Container]] = None
+        self.modules: Optional[List[Module]] = None
         self.protocol_text = protocol.text
 
         self.startTime: Optional[float] = None
@@ -268,10 +288,10 @@ class Session(RobotBusy):
     def busy_lock(self) -> ThreadedAsyncLock:
         return self._motion_lock
 
-    def _hw_iface(self):
+    def _hw_iface(self) -> SynchronousAdapter:
         return self._hardware
 
-    def prepare(self):
+    def prepare(self) -> None:
         self.refresh()
 
     def get_instruments(self) -> List[Instrument]:
@@ -309,24 +329,24 @@ class Session(RobotBusy):
             for module in self._modules
         ]
 
-    def clear_logs(self):
+    def clear_logs(self) -> None:
         self.command_log.clear()
         self.errors.clear()
 
     @robot_is_busy
-    def _simulate(self):
+    def _simulate(self) -> List[CommandShortId]:
         self._reset()
 
-        stack: List[Dict[str, Any]] = []
-        res: List[Dict[str, Any]] = []
-        commands: List[Dict[str, Any]] = []
+        stack: List[command_types.CommandMessage] = []
+        res: List[CommandShortId] = []
+        commands: List[command_types.CommandPayload] = []
 
         self._containers.clear()
         self._instruments.clear()
         self._modules.clear()
         self._interactions.clear()
 
-        def on_command(message):
+        def on_command(message: command_types.CommandMessage):
             payload = message['payload']
             description = payload.get('text', '').format(
                 **payload
@@ -395,7 +415,7 @@ class Session(RobotBusy):
 
         return res
 
-    def refresh(self):
+    def refresh(self) -> None:
         self._reset()
 
         try:
@@ -414,9 +434,7 @@ class Session(RobotBusy):
         self.startTime = None
         self.set_state('loaded')
 
-        return self
-
-    def stop(self):
+    def stop(self) -> None:
         self._hw_iface().halt()
         with self._motion_lock.lock():
             try:
@@ -424,26 +442,22 @@ class Session(RobotBusy):
             except asyncio.CancelledError:
                 pass
         self.set_state('stopped')
-        return self
 
     def pause(self,
               reason: str = None,
               user_message: str = None,
-              duration: float = None):
+              duration: float = None) -> None:
         self._hardware.pause()
         self.set_state(
             'paused', reason=reason,
             user_message=user_message, duration=duration)
-        return self
 
-    def resume(self):
+    def resume(self) -> None:
         if not self.blocked:
             self._hardware.resume()
-
             self.set_state('running')
-            return self
 
-    def _start_hardware_event_watcher(self):
+    def _start_hardware_event_watcher(self) -> None:
         if not callable(self._event_watcher):
             # initialize and update window switch state
             self._update_window_state(self._hardware.door_state)
@@ -454,12 +468,12 @@ class Session(RobotBusy):
             log.warning("Cannot start new hardware event watcher "
                         "when one already exists")
 
-    def _remove_hardware_event_watcher(self):
-        if callable(self._event_watcher):
+    def _remove_hardware_event_watcher(self) -> None:
+        if self._event_watcher and callable(self._event_watcher):
             self._event_watcher()
             self._event_watcher = None
 
-    def _handle_hardware_event(self, hw_event: 'HardwareEvent'):
+    def _handle_hardware_event(self, hw_event: HardwareEvent):
         if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
             self._update_window_state(hw_event.new_state)
             if ff.enable_door_safety_switch() and \
@@ -478,7 +492,7 @@ class Session(RobotBusy):
             self.blocked = False
 
     @robot_is_busy  # noqa(C901)
-    def _run(self):
+    def _run(self) -> None:
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
@@ -536,7 +550,7 @@ class Session(RobotBusy):
         finally:
             _unsubscribe()
 
-    def run(self):
+    def run(self) -> None:
         if not self.blocked:
             try:
                 self._broker.set_logger(self._run_logger)
@@ -545,7 +559,6 @@ class Session(RobotBusy):
                 raise
             finally:
                 self._broker.set_logger(self._default_logger)
-            return self
         else:
             raise RuntimeError(
                 'Protocol is blocked and cannot run. Make sure robot door '
@@ -578,12 +591,12 @@ class Session(RobotBusy):
             self.stateInfo.pop('changedAt', None)
         self._on_state_changed()
 
-    def log_append(self):
+    def log_append(self) -> None:
         self.command_log.update({
             len(self.command_log): now()})
         self._on_state_changed()
 
-    def error_append(self, error):
+    def error_append(self, error) -> None:
         self.errors.append(
             {
                 'timestamp': now(),
@@ -591,7 +604,7 @@ class Session(RobotBusy):
             }
         )
 
-    def _reset(self):
+    def _reset(self) -> None:
         self._hw_iface().reset()
         self.clear_logs()
         # unregister existing event watcher
@@ -652,6 +665,7 @@ def _accumulate(iterable: Sequence[CommandReferents]) -> CommandReferents:
         cast(CommandReferents, ([], [], [], [])))
 
 
+It = TypeVar('It')
 def _dedupe(iterable: Sequence[It]) -> Sequence[It]:
     acc: Set[It] = set()
 

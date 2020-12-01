@@ -41,3 +41,9 @@ class SnapPayload(TypedDict):
 class Message(TypedDict):
     topic: Literal['session']
     payload: SnapPayload
+
+
+class CommandShortId(TypedDict):
+    level: int
+    description: str
+    id: int

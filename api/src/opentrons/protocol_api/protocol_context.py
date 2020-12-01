@@ -5,7 +5,8 @@ from typing import (Dict, Iterator, List,
                     Optional, Set, Tuple, Union, TYPE_CHECKING)
 
 from opentrons import types
-from opentrons.hardware_control import (SynchronousAdapter, modules,
+from opentrons.hardware_control import (SynchronousAdapter, ThreadManager,
+                                        modules,
                                         API, ExecutionManager)
 from opentrons.config import feature_flags as fflags
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
@@ -228,7 +229,7 @@ class ProtocolContext(CommandPublisher):
             cmd_types.COMMAND, on_command)
 
     @contextlib.contextmanager
-    def temp_connect(self, hardware: API):
+    def temp_connect(self, hardware: Union[ThreadManager, SynchronousAdapter]):
         """ Connect temporarily to the specified hardware controller.
 
         This should be used as a context manager:
