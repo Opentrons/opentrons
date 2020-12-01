@@ -30,3 +30,11 @@ stages:
               markedBad: False
               source: null
               markedAt: null
+        instrumentCalibration:
+          right: &inst
+            single: &vector
+            - !anyfloat
+            - !anyfloat
+            - !anyfloat
+            multi: *vector
+          left: *inst

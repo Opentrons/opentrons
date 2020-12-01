@@ -31,6 +31,16 @@ export const mockCalibrationStatus: CalibrationStatus = {
       },
     },
   },
+  instrumentCalibration: {
+    right: {
+      single: [0.0, 0.0, 0.0],
+      multi: [0.0, 0.0, 0.0],
+    },
+    left: {
+      single: [0.0, 0.0, 0.0],
+      multi: [0.0, 0.0, 0.0],
+    },
+  },
 }
 
 export const {
