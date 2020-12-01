@@ -1,5 +1,6 @@
 import pytest
 from http import HTTPStatus
+
 from robot_server.constants import API_VERSION_HEADER, API_VERSION
 
 
@@ -80,4 +81,3 @@ def test_custom_request_validation_exception_handler(api_client):
 def test_api_versioning(api_client, headers, expected_version):
     resp = api_client.get('/openapi', headers=headers)
     assert resp.headers.get(API_VERSION_HEADER) == str(expected_version)
-

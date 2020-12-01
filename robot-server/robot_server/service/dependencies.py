@@ -25,7 +25,6 @@ api_wrapper = HardwareWrapper()
 
 @lru_cache(maxsize=1)
 def get_event_publisher():
-    # SPP: Does this have to be in this file? Creates circular dependency.
     notify_server_settings = NotifyServerSettings()
     event_publisher = publisher.create(
                 notify_server_settings.publisher_address.connection_string()
