@@ -4,10 +4,6 @@ from opentrons.protocol_api.labware import Well
 from opentrons.types import Location
 
 
-def make_command(name, payload):
-    return {'name': name, 'payload': payload}
-
-
 CommandLocation = Union[Location, None, Sequence, Well]
 
 

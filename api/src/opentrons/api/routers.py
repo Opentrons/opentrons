@@ -12,7 +12,7 @@ class MainRouter:
             self,
             hardware: ThreadManager,
             loop: AbstractEventLoop = None,
-            lock: ThreadedAsyncLock = None):
+            lock: ThreadedAsyncLock = None) -> None:
         topics = [Session.TOPIC, CalibrationManager.TOPIC]
         self._broker = Broker()
         self._notifications: Notifications[
@@ -31,9 +31,10 @@ class MainRouter:
                                                       lock=lock)
 
     @property
-    def notifications(self):
+    def notifications(self) -> Notifications[
+            Union[SessionMessage, CalibrationMessage]]:
         return self._notifications
 
     @property
-    def broker(self):
+    def broker(self) -> Broker:
         return self._broker

@@ -1,8 +1,9 @@
 from __future__ import annotations
+import asyncio
 import functools
 import logging
 from copy import copy
-from typing import Optional, Union, Set
+from typing import Any, cast, Callable, Optional, Union, Set, TypeVar
 from typing_extensions import TypedDict, Literal, Final
 
 from opentrons.config import feature_flags as ff
@@ -23,22 +24,25 @@ State = Union[Literal['moving'], Literal['ready']]
 VALID_STATES: Set[State] = {'moving', 'ready'}
 
 
-def _well0(cont):
+def _well0(cont: labware.Labware) -> labware.Well:
     return cont.wells()[0]
 
 
-def _home_if_first_call(func):
+Func = TypeVar('Func', bound=Callable)
+
+
+def _home_if_first_call(func: Func) -> Func:
     """ Decorator to make a function home if it is the first one called in
     this session."""
     @functools.wraps(func)
-    def decorated(*args, **kwargs):
+    def decorated(*args: Any, **kwargs: Any) -> Any:
         self = args[0]
         if not self._has_homed:
             log.info("this is the first calibration action, homing")
             self._hardware.home()
             self._has_homed = True
         return func(*args, **kwargs)
-    return decorated
+    return cast(Func, decorated)
 
 
 class Message(TypedDict):
@@ -57,9 +61,9 @@ class CalibrationManager(RobotBusy):
     def __init__(
             self,
             hardware: SynchronousAdapter,
-            loop=None,
+            loop: asyncio.AbstractEventLoop = None,
             broker: Broker = None,
-            lock: ThreadedAsyncLock = None):
+            lock: ThreadedAsyncLock = None) -> None:
         self._broker = broker or Broker()
         self._hardware = hardware
         self._loop = loop
@@ -71,7 +75,7 @@ class CalibrationManager(RobotBusy):
     def busy_lock(self) -> ThreadedAsyncLock:
         return self._lock
 
-    def _set_state(self, state: State):
+    def _set_state(self, state: State) -> None:
         if state not in VALID_STATES:
             raise ValueError(
                 'State {0} not in {1}'.format(state, VALID_STATES))
@@ -80,13 +84,13 @@ class CalibrationManager(RobotBusy):
 
     @robot_is_busy
     @_home_if_first_call
-    def tip_probe(self, instrument: Instrument):
+    def tip_probe(self, instrument: Instrument) -> None:
         log.warning("Deprecated call to tip_probe, update app")
         self._set_state('ready')
 
     @robot_is_busy
     @_home_if_first_call
-    def pick_up_tip(self, instrument: Instrument, container: Container):
+    def pick_up_tip(self, instrument: Instrument, container: Container) -> None:
         if not isinstance(container, Container):
             raise ValueError(
                 'Invalid object type {0}. Expected models.Container'
@@ -110,7 +114,7 @@ class CalibrationManager(RobotBusy):
 
     @robot_is_busy
     @_home_if_first_call
-    def drop_tip(self, instrument: Instrument, container: Container):
+    def drop_tip(self, instrument: Instrument, container: Container) -> None:
         if not isinstance(container, Container):
             raise ValueError(
                 'Invalid object type {0}. Expected models.Container'
@@ -127,7 +131,7 @@ class CalibrationManager(RobotBusy):
 
     @robot_is_busy
     @_home_if_first_call
-    def return_tip(self, instrument: Instrument):
+    def return_tip(self, instrument: Instrument) -> None:
         inst = instrument._instrument
         log.info('Returning tip from {}'.format(instrument.name))
         self._set_state('moving')
@@ -138,11 +142,11 @@ class CalibrationManager(RobotBusy):
 
     @robot_is_busy
     @_home_if_first_call
-    def move_to_front(self, instrument: Instrument):
+    def move_to_front(self, instrument: Instrument) -> None:
         """Public face of move_to_front"""
         self._move_to_front(instrument)
 
-    def _move_to_front(self, instrument: Instrument):
+    def _move_to_front(self, instrument: Instrument) -> None:
         """Private move_to_front that can be called internally"""
         inst = instrument._instrument
         log.info('Moving {}'.format(instrument.name))
@@ -165,7 +169,7 @@ class CalibrationManager(RobotBusy):
 
     @robot_is_busy
     @_home_if_first_call
-    def move_to(self, instrument: Instrument, container: Container):
+    def move_to(self, instrument: Instrument, container: Container) -> None:
         if not isinstance(container, Container):
             raise ValueError(
                 'Invalid object type {0}. Expected models.Container'
@@ -187,7 +191,7 @@ class CalibrationManager(RobotBusy):
 
     @robot_is_busy
     @_home_if_first_call
-    def jog(self, instrument: Instrument, distance: float, axis: str):
+    def jog(self, instrument: Instrument, distance: float, axis: str) -> None:
         inst = instrument._instrument
         log.info('Jogging {} by {} in {}'.format(
             instrument.name, distance, axis))
@@ -202,7 +206,7 @@ class CalibrationManager(RobotBusy):
 
     @robot_is_busy
     @_home_if_first_call
-    def home(self, instrument: Instrument):
+    def home(self, instrument: Instrument) -> None:
         inst = instrument._instrument
         log.info('Homing {}'.format(instrument.name))
         self._set_state('moving')
@@ -212,7 +216,7 @@ class CalibrationManager(RobotBusy):
         self._set_state('ready')
 
     @robot_is_busy
-    def home_all(self, instrument: Instrument):
+    def home_all(self, instrument: Instrument) -> None:
         # NOTE: this only takes instrument as a param, because we need
         # its reference to the ProtocolContext. This is code smell that
         # will be removed once sessions are managed better
@@ -223,7 +227,8 @@ class CalibrationManager(RobotBusy):
         self._set_state('ready')
 
     @robot_is_busy
-    def update_container_offset(self, container: Container, instrument: Instrument):
+    def update_container_offset(
+            self, container: Container, instrument: Instrument) -> None:
         inst = instrument._instrument
         log.info('Updating {} in {}'.format(container.name, container.slot))
         if 'centerMultichannelOnWells' in container._container.quirks:

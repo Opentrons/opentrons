@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING, List, Union, overload
 
 
 from .helpers import stringify_location, listify
@@ -140,6 +140,14 @@ def transfer(
             'text': text
         }
     }
+
+
+@overload
+def transform_volumes(volumes: Union[float, int]) -> float: ...
+
+
+@overload
+def transform_volumes(volumes: List[Union[float]]) -> List[float]: ...
 
 
 def transform_volumes(volumes):

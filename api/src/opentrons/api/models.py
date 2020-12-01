@@ -1,15 +1,19 @@
-from typing import List
+from typing import cast, List, Optional, Tuple
+from opentrons.types import Point
 from opentrons.protocol_api import (
     labware, InstrumentContext, ProtocolContext)
 
 from opentrons.protocols.geometry import module_geometry
 
 
-def _get_parent_slot_and_position(labware_obj):
+def _get_parent_slot_and_position(
+        labware_obj: labware.Labware) -> Tuple[str, Optional[Point]]:
     if isinstance(labware_obj.parent, (module_geometry.ModuleGeometry)):
-        return (labware_obj.parent.parent, labware_obj.parent.labware_offset)
+        return (
+            cast(str, labware_obj.parent.parent),
+            labware_obj.parent.labware_offset)
     else:
-        return (labware_obj.parent, None)
+        return (cast(str, labware_obj.parent), None)
 
 
 class Container:
@@ -17,7 +21,7 @@ class Container:
             self,
             container: labware.Labware,
             instruments: List[InstrumentContext],
-            context: ProtocolContext):
+            context: ProtocolContext) -> None:
         self._container = container
         self._context = context
         self.id = id(container)
@@ -44,7 +48,7 @@ class Instrument:
             self,
             instrument: InstrumentContext,
             containers: List[labware.Labware],
-            context: ProtocolContext):
+            context: ProtocolContext) -> None:
         containers = containers or []
         self._instrument = instrument
         self._context = context
@@ -73,7 +77,7 @@ class Module:
     def __init__(
             self,
             module: module_geometry.ModuleGeometry,
-            context: ProtocolContext):
+            context: ProtocolContext) -> None:
         self.id = id(module)
         _type_lookup = {
             module_geometry.ModuleType.MAGNETIC: 'magdeck',

@@ -10,6 +10,8 @@ from typing import (
 from typing_extensions import Final
 from uuid import uuid4
 
+from opentrons_shared_data.labware import LabwareDefinition
+
 from opentrons.api.util import (RobotBusy, robot_is_busy,
                                 requires_http_protocols_disabled)
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
@@ -45,9 +47,9 @@ class SessionManager:
     def __init__(
             self,
             hardware: SynchronousAdapter,
-            loop=None,
+            loop: asyncio.AbstractEventLoop = None,
             broker: Broker = None,
-            lock: ThreadedAsyncLock = None):
+            lock: ThreadedAsyncLock = None) -> None:
         self._broker = broker or Broker()
         self._loop = loop or asyncio.get_event_loop()
         self.session: Optional[Session] = None
@@ -63,7 +65,7 @@ class SessionManager:
             self,
             name: str,
             contents: str,
-            is_binary: bool = False) -> 'Session':
+            is_binary: bool = False) -> Session:
         """ Create a protocol session from either
 
         - a json protocol
@@ -117,7 +119,7 @@ class SessionManager:
             self._session_lock = False
 
     @requires_http_protocols_disabled
-    def create_from_bundle(self, name: str, contents: str) -> 'Session':
+    def create_from_bundle(self, name: str, contents: str) -> Session:
         """ Create a protocol session from a base64'd zip file.
 
         :param str name: The name of the protocol
@@ -158,7 +160,7 @@ class SessionManager:
             self,
             name: str,
             contents: str,
-            extra_labware: List[Dict[str, Any]]) -> 'Session':
+            extra_labware: List[LabwareDefinition]) -> Session:
         """
         Create a protocol session from a python protocol string with a list
         of extra custom labware to make available.
@@ -197,7 +199,7 @@ class SessionManager:
         finally:
             self._session_lock = False
 
-    def clear(self):
+    def clear(self) -> None:
         if self._session_lock:
             raise Exception(
                 'Cannot clear session while simulation in progress')
@@ -208,7 +210,7 @@ class SessionManager:
         self.session = None
         self._broker.set_logger(self._command_logger)
 
-    def get_session(self):
+    def get_session(self) -> Optional[Session]:
         return self.session
 
 
@@ -221,10 +223,10 @@ class Session(RobotBusy):
             name: str,
             contents: Any,
             hardware: SynchronousAdapter,
-            loop,
+            loop: asyncio.AbstractEventLoop,
             broker: Broker,
             motion_lock: ThreadedAsyncLock,
-            extra_labware
+            extra_labware: List[LabwareDefinition]
     ) -> Session:
         protocol = parse(contents, filename=name,
                          extra_labware={helpers.uri_from_definition(defn): defn
@@ -236,9 +238,9 @@ class Session(RobotBusy):
     def __init__(
             self, name: str, protocol: Protocol,
             hardware: SynchronousAdapter,
-            loop,
+            loop: asyncio.AbstractEventLoop,
             broker: Broker,
-            motion_lock: ThreadedAsyncLock):
+            motion_lock: ThreadedAsyncLock) -> None:
         self._broker = broker
         self._default_logger = self._broker.logger
         self._sim_logger = self._broker.logger.getChild('sim')
@@ -347,7 +349,7 @@ class Session(RobotBusy):
         self._modules.clear()
         self._interactions.clear()
 
-        def on_command(message: command_types.CommandMessage):
+        def on_command(message: command_types.CommandMessage) -> None:
             payload = message['payload']
             description = payload.get('text', '').format(
                 **payload
@@ -474,7 +476,7 @@ class Session(RobotBusy):
             self._event_watcher()
             self._event_watcher = None
 
-    def _handle_hardware_event(self, hw_event: HardwareEvent):
+    def _handle_hardware_event(self, hw_event: HardwareEvent) -> None:
         if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
             self._update_window_state(hw_event.new_state)
             if ff.enable_door_safety_switch() and \
@@ -484,7 +486,7 @@ class Session(RobotBusy):
             else:
                 self._on_state_changed()
 
-    def _update_window_state(self, state: DoorState):
+    def _update_window_state(self, state: DoorState) -> None:
         self.door_state = str(state)
         if ff.enable_door_safety_switch() and \
                 state == DoorState.OPEN:
@@ -494,7 +496,7 @@ class Session(RobotBusy):
 
     @robot_is_busy  # noqa(C901)
     def _run(self) -> None:
-        def on_command(message):
+        def on_command(message: command_types.CommandMessage) -> None:
             if message['$'] == 'before':
                 self.log_append()
             if message['name'] == command_types.PAUSE:
@@ -568,7 +570,7 @@ class Session(RobotBusy):
     def set_state(self, state: 'State',
                   reason: str = None,
                   user_message: str = None,
-                  duration: float = None):
+                  duration: float = None) -> None:
         if state not in VALID_STATES:
             raise ValueError(
                 'Invalid state: {0}. Valid states are: {1}'
@@ -597,7 +599,7 @@ class Session(RobotBusy):
             len(self.command_log): now()})
         self._on_state_changed()
 
-    def error_append(self, error) -> None:
+    def error_append(self, error: Exception) -> None:
         self.errors.append(
             {
                 'timestamp': now(),

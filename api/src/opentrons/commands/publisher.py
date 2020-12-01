@@ -1,20 +1,20 @@
 import functools
 import inspect
-from typing import Any, Callable, cast
+from typing import Any, Callable, cast, Dict, Tuple, Mapping
 from opentrons.broker import Broker
 from . import types as command_types
 
 
 class CommandPublisher:
-    def __init__(self, broker: Broker):
+    def __init__(self, broker: Broker) -> None:
         self._broker = broker or Broker()
 
     @property
-    def broker(self):
+    def broker(self) -> Broker:
         return self._broker
 
     @broker.setter
-    def broker(self, broker):
+    def broker(self, broker: Broker) -> None:
         self._broker = broker
 
 
@@ -28,7 +28,7 @@ def do_publish(
         when: command_types.MessageSequenceId,
         res: Any,
         meta: Any,
-        *args, **kwargs):
+        *args: Any, **kwargs: Any) -> None:
     """ Implement the publish so it can be called outside the decorator """
     publish_command = functools.partial(
         broker.publish,
@@ -77,8 +77,8 @@ def publish_paired(
         cmd: CmdFunction,
         when: command_types.MessageSequenceId,
         res: Any,
-        *args,
-        pub_type='Paired Pipettes'):
+        *args: Any,
+        pub_type: str = 'Paired Pipettes') -> None:
     """ Implement a second publisher outside of the decorator that
     relies on the method providing all of the arguments required
     rather than binding defaults to the signature"""
@@ -92,12 +92,15 @@ def publish_paired(
 
 
 def _publish_dec(
-        before: bool, after: bool, command: CmdFunction, meta: Any = None):
-    def decorator(f: Callable):
+        before: bool,
+        after: bool,
+        command: CmdFunction,
+        meta: Any = None):  # noqa: ANN202
+    def _decorator(f: Callable):  # noqa: ANN202,ANN003,ANN002
         @functools.wraps(
             f,
             updated=functools.WRAPPER_UPDATES+('__globals__',))  # type: ignore
-        def decorated(*args, **kwargs):
+        def _decorated(*args, **kwargs):  # noqa: ANN202,ANN003,ANN002
             try:
                 broker = cast(Broker, args[0].broker)
             except AttributeError:
@@ -111,9 +114,9 @@ def _publish_dec(
                 do_publish(
                     broker, command, f, 'after', res, meta, *args, **kwargs)
             return res
-        return decorated
+        return _decorated
 
-    return decorator
+    return _decorator
 
 
 class publish:
@@ -134,14 +137,17 @@ class publish:
     both = functools.partial(_publish_dec, before=True, after=True)
 
 
-def _get_args(f, args, kwargs):
+def _get_args(
+        f: Callable,
+        args: Tuple,
+        kwargs: Mapping[str, Any]) -> Dict[str, Any]:
     # Create the initial dictionary with args that have defaults
     res = {}
     sig = inspect.signature(f)
-    if inspect.ismethod(f) and args[0] is f.__self__:
+    if inspect.ismethod(f) and args[0] is f.__self__:  # type: ignore
         args = args[1:]
     if inspect.ismethod(f):
-        res['self'] = f.__self__
+        res['self'] = f.__self__  # type: ignore
 
     bound = sig.bind(*args, **kwargs)
     bound.apply_defaults()
