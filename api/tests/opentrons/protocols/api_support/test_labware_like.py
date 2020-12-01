@@ -41,7 +41,7 @@ def mod_trough(trough_definition, module):
     return mod_trough
 
 
-def test_labware(trough):
+def test_labware(trough, mod_trough, module):
     ll = LabwareLike(trough)
     assert ll.has_parent is True
     assert ll.parent.object == trough.parent
@@ -64,6 +64,8 @@ def test_module(module):
     assert ll.parent.object is module.parent
     assert ll.object is module
     assert ll.object_type == LabwareLikeType.MODULE
+    assert ll.is_module
+    assert ll.as_module() == module
 
 
 def test_slot():
@@ -80,6 +82,14 @@ def test_empty():
     assert ll.parent.object is None
     assert ll.object is None
     assert ll.object_type == LabwareLikeType.NONE
+
+
+def test_module_parent(trough, module, mod_trough):
+    assert LabwareLike(mod_trough).module_parent() == module
+    assert LabwareLike(mod_trough['A1']).module_parent() == module
+    assert LabwareLike(module).module_parent() == module
+    assert LabwareLike(trough).module_parent() is None
+    assert LabwareLike('1').module_parent() is None
 
 
 def test_first_parent(trough, module, mod_trough):

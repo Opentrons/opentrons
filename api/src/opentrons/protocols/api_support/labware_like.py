@@ -96,6 +96,10 @@ class LabwareLike:
     def is_empty(self) -> bool:
         return self.object_type == LabwareLikeType.NONE
 
+    @property
+    def is_module(self) -> bool:
+        return self.object_type == LabwareLikeType.MODULE
+
     def as_well(self) -> 'Well':
         # Import locally to avoid circular dependency
         from opentrons.protocol_api.labware import Well
@@ -105,6 +109,10 @@ class LabwareLike:
         # Import locally to avoid circular dependency
         from opentrons.protocol_api.labware import Labware
         return cast(Labware, self.object)
+
+    def as_module(self) -> 'ModuleGeometry':
+        from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+        return cast(ModuleGeometry, self.object)
 
     def get_parent_labware_and_well(self) -> Tuple[Optional['Labware'],
                                                    Optional['Well']]:
@@ -137,6 +145,25 @@ class LabwareLike:
                 return location.parent.first_parent()
 
         return _fp_recurse(self)
+
+    def module_parent(self) -> Optional['ModuleGeometry']:
+        """
+        Return the closest parent of this LabwareLike (including, possibly,
+        the wrapped object) that is a ModuleGeometry
+        """
+        def recursive_get_module_parent(
+                obj: LabwareLike) -> Optional['ModuleGeometry']:
+            if obj.is_module:
+                return obj.as_module()
+            next_obj = obj.parent
+            if next_obj.is_empty:
+                return None
+            else:
+                return recursive_get_module_parent(obj.parent)
+
+        if self.is_empty:
+            return None
+        return recursive_get_module_parent(self)
 
     def quirks_from_any_parent(self) -> Set[str]:
         """ Walk the tree of wells and labwares and extract quirks """
