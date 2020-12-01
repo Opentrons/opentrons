@@ -5,7 +5,8 @@ from copy import copy
 from functools import reduce
 import logging
 from time import time, sleep
-from typing import cast, List, Dict, Any, Optional, Set, Sequence, Tuple, TypeVar
+from typing import (
+    cast, List, Dict, Any, Optional, Set, Sequence, Tuple, TypeVar, Iterator)
 from typing_extensions import Final
 from uuid import uuid4
 
@@ -668,7 +669,7 @@ def _accumulate(iterable: Sequence[CommandReferents]) -> CommandReferents:
 It = TypeVar('It')
 
 
-def _dedupe(iterable: Sequence[It]) -> Sequence[It]:
+def _dedupe(iterable: Sequence[It]) -> Iterator[It]:
     acc: Set[It] = set()
 
     for item in iterable:
