@@ -48,6 +48,7 @@ def mock_context():
 
 @pytest.fixture
 def protocol_runner(mock_protocol, loop, hardware):
+    setattr(hardware, 'sync', MagicMock())
     return ProtocolRunner(protocol=mock_protocol,
                           loop=loop,
                           hardware=hardware,
@@ -62,7 +63,7 @@ def test_load(protocol_runner, mock_context,
         mock.assert_called_once_with(
             name=uploaded_protocol_meta.protocol_file.path.name,
             contents=mock_protocol.get_contents(),
-            hardware=protocol_runner._hardware,
+            hardware=protocol_runner._hardware.sync,
             loop=protocol_runner._loop,
             broker=protocol_runner._broker,
             motion_lock=protocol_runner._motion_lock,

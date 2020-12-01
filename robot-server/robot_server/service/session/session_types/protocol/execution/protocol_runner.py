@@ -64,7 +64,7 @@ class ProtocolRunner:
             self._session = ApiProtocolSession.build_and_prep(
                 name=self._protocol.meta.protocol_file.path.name,
                 contents=self._protocol.get_contents(),
-                hardware=self._hardware,
+                hardware=self._hardware.sync,
                 loop=self._loop,
                 broker=self._broker,
                 motion_lock=self._motion_lock,
