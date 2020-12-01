@@ -124,6 +124,10 @@ jobs:
     needs: build-PD
     if: github.event_name != 'pull_request'
     steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
       - name: 'set complex environment variables'
           id: 'set-vars'
           uses: actions/github-script@v3.1
