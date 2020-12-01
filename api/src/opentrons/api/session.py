@@ -10,7 +10,7 @@ from typing import (
 from typing_extensions import Final
 from uuid import uuid4
 
-from opentrons_shared_data.labware import LabwareDefinition
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.api.util import (RobotBusy, robot_is_busy,
                                 requires_http_protocols_disabled)
