@@ -8,6 +8,7 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION, M
 from . import labware  # noqa(E402)
 from .contexts import (ProtocolContext,  # noqa(E402)
                        InstrumentContext,
+                       PairedInstrumentContext,
                        TemperatureModuleContext,
                        MagneticModuleContext,
                        ThermocyclerContext)
@@ -17,4 +18,5 @@ __all__ = ['ProtocolContext',
            'TemperatureModuleContext',
            'MagneticModuleContext',
            'ThermocyclerContext',
+           'PairedInstrumentContext',
            'labware']
