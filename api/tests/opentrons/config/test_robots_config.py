@@ -37,33 +37,17 @@ dummy_settings = {
     'default_pipette_configs': {
         'homePosition': 220, 'maxTravel': 30, 'stepsPerMM': 768},
     'log_level': 'NADA',
-    'tip_probe': {
-        'bounce_distance': 5.0,
-        'switch_offset': [2.0, 5.0, 5.0],
-        'switch_clearance': 7.5,
-        'z_clearance': {
-            'normal': 5.0,
-            'deck': 5.0,
-            'crossover': 35.0,
-            'start': 20.0
-        }
-    }
 }
 
 
 @pytest.mark.xfail
 async def test_old_probe_height(short_trash_flag):
     cfg = robot_configs.load()
-
-    assert cfg.tip_probe.center[2] == 55.0
-    assert cfg.tip_probe.dimensions[2] == 60.0
     assert cfg.gantry_calibration == DEFAULT_SIMULATION_CALIBRATION
 
 
 def test_default_probe_height():
     cfg = robot_configs.load()
-    assert cfg.tip_probe.center[2] == 74.3
-    assert cfg.tip_probe.dimensions[2] == 79.3
     assert cfg.gantry_calibration == DEFAULT_SIMULATION_CALIBRATION
 
 
@@ -81,23 +65,10 @@ def test_build_config():
     built_config = robot_configs.build_config(dummy_cal, dummy_settings)
 
     assert built_config.gantry_calibration == dummy_cal
-    for key in [k for k in dummy_settings.keys() if k != 'tip_probe']:
-        assert getattr(built_config, key) == dummy_settings[key]
-    for key in [k for k in dummy_settings['tip_probe'].keys()
-                if k != 'z_clearance']:
-        assert getattr(built_config.tip_probe, key)\
-            == dummy_settings['tip_probe'][key]
-    for key in [k for k in dummy_settings['tip_probe']['z_clearance'].keys()]:
-        assert getattr(built_config.tip_probe.z_clearance, key)\
-            == dummy_settings['tip_probe']['z_clearance'][key]
 
 
 def test_dictify_roundtrip():
     new_settings = copy.deepcopy(dummy_settings)
-    new_settings['tip_probe']['dimensions']\
-        = robot_configs._default_probe_dimensions()
-    new_settings['tip_probe']['center']\
-        = robot_configs._default_probe_center()
     built_config = robot_configs.build_config(dummy_cal, dummy_settings)
     new_cal, new_config = robot_configs.config_to_save(built_config)
     assert new_cal == dummy_cal

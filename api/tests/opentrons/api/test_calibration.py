@@ -2,16 +2,14 @@ import pytest
 from unittest import mock
 from functools import partial
 from tests.opentrons.conftest import state
-from opentrons.config import robot_configs
-from opentrons.protocol_api import labware
-from opentrons.api import models
-from opentrons.types import Point, Location, Mount
+from opentrons.types import Point, Mount
 from opentrons.hardware_control import CriticalPoint, API
 from opentrons.hardware_control.types import MotionChecks
 
 state = partial(state, 'calibration')
 
 
+<<<<<<< HEAD
 @pytest.mark.api2_only  # noqa(C901)
 async def test_tip_probe_v2(main_router, model, monkeypatch):
 
@@ -97,6 +95,8 @@ async def test_correct_hotspots():
     assert expected == actual
 
 
+=======
+>>>>>>> refactor(api): remove remaining tip probe related code
 @pytest.mark.api2_only
 async def test_move_to_front_api2(main_router, model):
     main_router.calibration_manager._hardware.home()
