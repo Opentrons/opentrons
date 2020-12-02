@@ -1898,10 +1898,7 @@ class API(HardwareAPILike):
         max_height = pip.config.home_position - \
             self._config.z_retract_distance + cp.z
 
-        _, _, transformed_z = linal.apply_reverse(
-            self.robot_calibration.deck_calibration.attitude,
-            (0, 0, max_height))
-        return transformed_z
+        return max_height
 
     def clean_up(self):
         """ Get the API ready to stop cleanly. """
