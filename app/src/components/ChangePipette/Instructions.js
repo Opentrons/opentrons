@@ -68,19 +68,15 @@ export function Instructions(props: Props): React.Node {
       {!actualPipette && !wantedPipette && (
         <PipetteSelection onPipetteChange={setWantedName} />
       )}
-
-      {(actualPipette || wantedPipette) && (
-        <div>
-          <Steps {...props} />
-          <CheckPipettesButton
-            className={styles.check_pipette_button}
-            robotName={robotName}
-            onDone={confirm}
-          >
-            {actualPipette ? DETACH_CONFIRM : ATTACH_CONFIRM}
-          </CheckPipettesButton>
-        </div>
-      )}
+      {(actualPipette || wantedPipette) && <Steps {...props} />}
+      <CheckPipettesButton
+        className={styles.check_pipette_button}
+        robotName={robotName}
+        onDone={confirm}
+        hidden={!actualPipette && !wantedPipette}
+      >
+        {actualPipette ? DETACH_CONFIRM : ATTACH_CONFIRM}
+      </CheckPipettesButton>
     </ModalPage>
   )
 }
