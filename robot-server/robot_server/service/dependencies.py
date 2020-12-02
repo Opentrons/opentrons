@@ -2,7 +2,6 @@ from functools import lru_cache
 
 from starlette import status
 from fastapi import Depends, HTTPException
-from opentrons.api import MainRouter
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server.hardware_wrapper import HardwareWrapper
@@ -47,6 +46,7 @@ def get_motion_lock() -> ThreadedAsyncLock:
 
 async def get_rpc_server() -> RPCServer:
     """The RPC Server instance"""
+    from opentrons.api import MainRouter
     global _rpc_server_instance
     if not _rpc_server_instance:
         h = await get_hardware()

@@ -31,7 +31,7 @@ def aspirate(
         rate: float) -> command_types.AspirateCommand:
     location_text = stringify_location(location)
     template = 'Aspirating {volume} uL from {location} at {flow} uL/sec'
-    flow_rate = rate * FlowRates(instrument).aspirate
+    flow_rate = rate * FlowRates(instrument._implementation).aspirate
     text = template.format(
         volume=float(volume), location=location_text, flow=flow_rate)
 
@@ -54,7 +54,7 @@ def dispense(
         rate: float) -> command_types.DispenseCommand:
     location_text = stringify_location(location)
     template = 'Dispensing {volume} uL into {location} at {flow} uL/sec'
-    flow_rate = rate * FlowRates(instrument).dispense
+    flow_rate = rate * FlowRates(instrument._implementation).dispense
     text = template.format(
         volume=float(volume), location=location_text, flow=flow_rate)
 

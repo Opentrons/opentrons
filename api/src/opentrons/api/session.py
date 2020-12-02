@@ -20,6 +20,8 @@ from opentrons.config import feature_flags as ff
 from opentrons.commands.util import from_list
 from opentrons.commands import types as command_types, introspection
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.implementations.protocol_context import \
+    ProtocolContextImplementation
 from opentrons.protocols.parse import parse
 from opentrons.protocols.types import Protocol
 from opentrons.calibration_storage import helpers
@@ -259,7 +261,12 @@ class Session(RobotBusy):
 
         self._hardware = hardware
         self._simulating_ctx = ProtocolContext.build_using(
-            self._protocol, loop=self._loop, broker=self._broker)
+            implementation=ProtocolContextImplementation.build_using(
+                self._protocol),
+            protocol=self._protocol,
+            loop=self._loop,
+            broker=self._broker
+        )
 
         self.state: 'State' = None
         #: The current state
@@ -386,12 +393,16 @@ class Session(RobotBusy):
                     strict_attached_instruments=False
                     ).sync
             sync_sim.home()
-            self._simulating_ctx = ProtocolContext.build_using(
+            ctx_impl = ProtocolContextImplementation.build_using(
                 self._protocol,
-                loop=self._loop,
                 hardware=sync_sim,
-                broker=self._broker,
                 extra_labware=getattr(self._protocol, 'extra_labware', {}))
+            self._simulating_ctx = ProtocolContext.build_using(
+                protocol=self._protocol,
+                loop=self._loop,
+                broker=self._broker,
+                implementation=ctx_impl
+            )
             run_protocol(self._protocol,
                          context=self._simulating_ctx)
 
@@ -519,11 +530,15 @@ class Session(RobotBusy):
             self._pre_run_hooks()
             self._hardware.cache_instruments()
             self._hardware.reset_instrument()
-            ctx = ProtocolContext.build_using(
+            ctx_impl = ProtocolContextImplementation.build_using(
                 self._protocol,
-                loop=self._loop,
-                broker=self._broker,
                 extra_labware=getattr(self._protocol, 'extra_labware', {}))
+            ctx = ProtocolContext.build_using(
+                protocol=self._protocol,
+                implementation=ctx_impl,
+                loop=self._loop,
+                broker=self._broker
+            )
             ctx.connect(self._hardware)
             ctx.home()
             run_protocol(self._protocol, context=ctx)

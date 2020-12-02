@@ -1,14 +1,15 @@
 """ Test the Transfer class and its functions """
 import pytest
 import opentrons.protocol_api as papi
+from opentrons.protocols.implementations.protocol_context import \
+    ProtocolContextImplementation
 from opentrons.types import Mount, TransferTipPolicy
 from opentrons.protocols.advanced_control import transfers as tx
 from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture
-def _instr_labware(loop):
-    ctx = papi.ProtocolContext(loop)
+def _instr_labware(ctx):
     lw1 = ctx.load_labware('biorad_96_wellplate_200ul_pcr', 1)
     lw2 = ctx.load_labware('corning_96_wellplate_360ul_flat', 2)
     tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
@@ -936,7 +937,9 @@ def test_oversized_transfer(_instr_labware):
 def test_multichannel_transfer_old_version(loop):
     # for API version below 2.2, multichannel pipette can only
     # reach row A of 384-well plates
-    ctx = papi.ProtocolContext(loop, api_version=APIVersion(2, 1))
+    ctx = papi.ProtocolContext(implementation=ProtocolContextImplementation(),
+                               loop=loop,
+                               api_version=APIVersion(2, 1))
     lw1 = ctx.load_labware('biorad_96_wellplate_200ul_pcr', 1)
     lw2 = ctx.load_labware('corning_384_wellplate_112ul_flat', 2)
     tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
@@ -972,7 +975,12 @@ def test_multichannel_transfer_old_version(loop):
 
 
 def test_multichannel_transfer_locs(loop):
-    ctx = papi.ProtocolContext(loop, api_version=APIVersion(2, 2))
+    api_version = APIVersion(2, 2)
+    ctx = papi.ProtocolContext(
+        implementation=ProtocolContextImplementation(api_version=api_version),
+        loop=loop,
+        api_version=api_version
+    )
     lw1 = ctx.load_labware('biorad_96_wellplate_200ul_pcr', 1)
     lw2 = ctx.load_labware('corning_384_wellplate_112ul_flat', 2)
     tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)

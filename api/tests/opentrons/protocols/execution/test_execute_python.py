@@ -1,5 +1,4 @@
 import pytest
-from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.execution import execute, execute_python
 from opentrons.protocols.parse import parse
 
@@ -37,15 +36,12 @@ def test_api2_runfunc():
 
 
 @pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
-def test_execute_ok(protocol, protocol_file, loop):
+def test_execute_ok(protocol, protocol_file, ctx):
     proto = parse(protocol.text, protocol.filename)
-    ctx = ProtocolContext(loop)
     execute.run_protocol(proto, context=ctx)
 
 
-def test_bad_protocol(loop):
-    ctx = ProtocolContext(loop)
-
+def test_bad_protocol(ctx):
     no_args = parse('''
 metadata={"apiLevel": "2.0"}
 def run():
@@ -65,8 +61,7 @@ def run(a, b):
         assert "must be called with more than one argument" in str(e.value)
 
 
-def test_proto_with_exception(loop):
-    ctx = ProtocolContext(loop)
+def test_proto_with_exception(ctx):
     exc_in_root = '''metadata={"apiLevel": "2.0"}
 
 def run(ctx):

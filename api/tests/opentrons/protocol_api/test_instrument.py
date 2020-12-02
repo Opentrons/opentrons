@@ -3,6 +3,8 @@ import pytest
 from unittest import mock
 import opentrons.protocol_api as papi
 from opentrons.protocols.advanced_control import transfers
+from opentrons.protocols.implementations.protocol_context import \
+    ProtocolContextImplementation
 from opentrons.types import Mount
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -10,7 +12,12 @@ from opentrons.protocols.api_support.types import APIVersion
 @pytest.fixture
 def make_context_and_labware():
     def _make_context_and_labware(api_version):
-        ctx = papi.ProtocolContext(api_version=api_version)
+        ctx = papi.ProtocolContext(
+            implementation=ProtocolContextImplementation(
+                api_version=api_version
+            ),
+            api_version=api_version
+        )
         lw1 = ctx.load_labware('biorad_96_wellplate_200ul_pcr', 1)
         instr = ctx.load_instrument('p300_single', Mount.RIGHT)
 

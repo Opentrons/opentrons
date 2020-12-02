@@ -55,8 +55,7 @@ def test_set_flow_rate():
     assert pipette.flow_rate.blow_out == 42
 
 
-def test_load_labware_from_json_defs(loop, get_labware_fixture):
-    ctx = ProtocolContext(loop=loop)
+def test_load_labware_from_json_defs(ctx, get_labware_fixture):
     custom_trough_def = get_labware_fixture('fixture_12_trough')
     data = {
         "labwareDefinitions": {
@@ -407,11 +406,10 @@ def test_dispatch_json_invalid_command():
             loaded_labware=None)
 
 
-def test_papi_execute_json_v3(monkeypatch, loop, get_json_protocol_fixture):
+def test_papi_execute_json_v3(monkeypatch, ctx, get_json_protocol_fixture):
     protocol_data = get_json_protocol_fixture(
         '3', 'testAllAtomicSingleV3', False)
     protocol = parse(protocol_data, None)
-    ctx = ProtocolContext(loop=loop)
     ctx.home()
     # Check that we end up executing the protocol ok
     execute.run_protocol(protocol, ctx)

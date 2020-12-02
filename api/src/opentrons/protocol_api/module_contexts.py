@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import asyncio
 import logging
-from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar
+from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, Union
 
 from opentrons import types
 from opentrons.hardware_control import modules
@@ -16,8 +18,15 @@ from opentrons.protocols.geometry.module_geometry import ModuleGeometry,\
 from opentrons.protocols.api_support.util import requires_version
 
 if TYPE_CHECKING:
-    from .protocol_context import ProtocolContext
+    from.protocol_context import ProtocolContext
     from opentrons_shared_data.labware.dev_types import (LabwareDefinition)
+
+
+ModuleTypes = Union[
+    'TemperatureModuleContext',
+    'MagneticModuleContext',
+    'ThermocyclerContext'
+]
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
 STANDARD_MAGDECK_LABWARE = [
@@ -37,7 +46,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
     """
 
     def __init__(self,
-                 ctx: 'ProtocolContext',
+                 ctx: ProtocolContext,
                  geometry: GeometryType,
                  at_version: APIVersion) -> None:
         """ Build the ModuleContext.
@@ -70,15 +79,15 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
         :returns: The properly-linked labware object
         """
         mod_labware = self._geometry.add_labware(labware)
-        self._ctx.deck.recalculate_high_z()
+        self._ctx._implementation.get_deck().recalculate_high_z()
         return mod_labware
 
     @requires_version(2, 0)
     def load_labware(
             self,
             name: str,
-            label: str = None,
-            namespace: str = None,
+            label: Optional[str] = None,
+            namespace: Optional[str] = None,
             version: int = 1,
             ) -> Labware:
         """ Specify the presence of a piece of labware on the module.
@@ -104,15 +113,15 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
                 'are trying to utilize new load_labware parameters in 2.1')
         lw = load(name, self._geometry.location,
                   label, namespace, version,
-                  bundled_defs=self._ctx._bundled_labware,
-                  extra_defs=self._ctx._extra_labware)
+                  bundled_defs=self._ctx._implementation.get_bundled_labware(),
+                  extra_defs=self._ctx._implementation.get_extra_labware())
         return self.load_labware_object(lw)
 
     @requires_version(2, 0)
     def load_labware_from_definition(
             self,
             definition: 'LabwareDefinition',
-            label: str = None) -> Labware:
+            label: Optional[str] = None) -> Labware:
         """
         Specify the presence of a labware on the module, using an
         inline definition.
@@ -131,8 +140,8 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
     @requires_version(2, 1)
     def load_labware_by_name(self,
                              name: str,
-                             label: str = None,
-                             namespace: str = None,
+                             label: Optional[str] = None,
+                             namespace: Optional[str] = None,
                              version: int = 1,) -> Labware:
         MODULE_LOG.warning(
             'load_labware_by_name is deprecated and will be removed in '
@@ -191,7 +200,8 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     .. versionadded:: 2.0
 
     """
-    def __init__(self, ctx: 'ProtocolContext',
+    def __init__(self,
+                 ctx: ProtocolContext,
                  hw_module: modules.tempdeck.TempDeck,
                  geometry: ModuleGeometry,
                  at_version: APIVersion,
@@ -273,7 +283,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
     """
     def __init__(self,
-                 ctx: 'ProtocolContext',
+                 ctx: ProtocolContext,
                  hw_module: modules.magdeck.MagDeck,
                  geometry: ModuleGeometry,
                  at_version: APIVersion,
@@ -307,9 +317,9 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     @publish.both(command=cmds.magdeck_engage)
     @requires_version(2, 0)
     def engage(self,
-               height: float = None,
-               offset: float = None,
-               height_from_base: float = None):
+               height: Optional[float] = None,
+               offset: Optional[float] = None,
+               height_from_base: Optional[float] = None):
         """ Raise the Magnetic Module's magnets.
 
         The destination of the magnets can be specified in several different
@@ -405,7 +415,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     .. versionadded:: 2.0
     """
     def __init__(self,
-                 ctx: 'ProtocolContext',
+                 ctx: ProtocolContext,
                  hw_module: modules.thermocycler.Thermocycler,
                  geometry: ThermocyclerGeometry,
                  at_version: APIVersion,
@@ -416,7 +426,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
 
     def _prepare_for_lid_move(self):
         loaded_instruments = [instr for mount, instr in
-                              self._ctx.loaded_instruments.items()
+                              self._ctx._instruments.items()
                               if instr is not None]
         try:
             instr = loaded_instruments[0]
@@ -425,12 +435,15 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
                 "Cannot assure a safe gantry position to avoid colliding"
                 " with the lid of the Thermocycler Module.")
         else:
-            self._ctx._hw_manager.hardware.retract(instr._mount)
-            high_point = self._ctx._hw_manager.hardware.current_position(
-                    instr._mount)
+            ctx_impl = self._ctx._implementation
+            instr_impl = instr._implementation
+            hardware = ctx_impl.get_hardware().hardware
+
+            hardware.retract(instr_impl.get_mount())
+            high_point = hardware.current_position(instr_impl.get_mount())
             trash_top = self._ctx.fixed_trash.wells()[0].top()
             safe_point = trash_top.point._replace(
-                    z=high_point[Axis.by_mount(instr._mount)])
+                    z=high_point[Axis.by_mount(instr_impl.get_mount())])
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
     def flag_unsafe_move(self,
@@ -465,10 +478,10 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     @requires_version(2, 0)
     def set_block_temperature(self,
                               temperature: float,
-                              hold_time_seconds: float = None,
-                              hold_time_minutes: float = None,
-                              ramp_rate: float = None,
-                              block_max_volume: float = None):
+                              hold_time_seconds: Optional[float] = None,
+                              hold_time_minutes: Optional[float] = None,
+                              ramp_rate: Optional[float] = None,
+                              block_max_volume: Optional[float] = None):
         """ Set the target temperature for the well block, in °C.
 
         Valid operational range yet to be determined.
@@ -526,7 +539,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def execute_profile(self,
                         steps: List[modules.ThermocyclerStep],
                         repetitions: int,
-                        block_max_volume: float = None):
+                        block_max_volume: Optional[float] = None):
         """ Execute a Thermocycler Profile defined as a cycle of
         :py:attr:`steps` to repeat for a given number of :py:attr:`repetitions`
 

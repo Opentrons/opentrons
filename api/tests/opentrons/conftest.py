@@ -4,6 +4,8 @@
 from opentrons.config import robot_configs
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.implementations.labware import LabwareImplementation
+from opentrons.protocols.implementations.protocol_context import \
+    ProtocolContextImplementation
 
 try:
     import aionotify
@@ -280,8 +282,18 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
             return result
 
 
+@pytest.fixture
+def ctx(loop) -> ProtocolContext:
+    return ProtocolContext(
+        implementation=ProtocolContextImplementation(),
+        loop=loop
+    )
+
+
 def build_v2_model(h, lw_name, loop):
-    ctx = ProtocolContext(loop=loop, hardware=h)
+    ctx = ProtocolContext(
+        implementation=ProtocolContextImplementation(hardware=h),
+        loop=loop)
 
     loop.run_until_complete(h.cache_instruments(
         {Mount.RIGHT: 'p300_single'}))
