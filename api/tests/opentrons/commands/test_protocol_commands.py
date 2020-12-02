@@ -34,3 +34,12 @@ def test_delay(seconds,
     assert payload['seconds'] == expected_seconds
     assert payload['minutes'] == expected_minutes
     assert payload['text'] == expected_text
+
+
+def test_delay_with_message():
+    """It should allow a message to be appended to the delay text."""
+    command = protocol_commands.delay(seconds=1, minutes=1, msg="Waiting...")
+
+    assert command["payload"]["text"] == (
+        "Delaying for 1 minutes and 1.0 seconds. Waiting..."
+    )
