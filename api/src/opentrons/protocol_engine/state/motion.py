@@ -12,6 +12,7 @@ from opentrons.motion_planning import (
 )
 
 from .. import commands, errors
+from ..types import WellLocation
 from .substore import Substore, CommandReactive
 from .labware import LabwareStore
 from .pipettes import PipetteStore
@@ -88,6 +89,7 @@ class MotionState:
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        well_location: Optional[WellLocation],
         origin: Point,
         origin_cp: Optional[CriticalPoint],
         max_travel_z: float
@@ -101,7 +103,8 @@ class MotionState:
 
         dest = self._geometry_store.state.get_well_position(
             labware_id,
-            well_name
+            well_name,
+            well_location,
         )
         dest_cp = CriticalPoint.XY_CENTER if center_dest else None
 
@@ -163,7 +166,11 @@ class MotionStore(Substore[MotionState], CommandReactive):
         """Modify state in reaction to a CompletedCommand."""
         if isinstance(
             command.result,
-            (commands.MoveToWellResult, commands.PickUpTipResult),
+            (
+                commands.MoveToWellResult,
+                commands.PickUpTipResult,
+                commands.DropTipResult,
+            ),
         ):
             self._state._current_location = LocationData(
                 pipette_id=command.request.pipetteId,

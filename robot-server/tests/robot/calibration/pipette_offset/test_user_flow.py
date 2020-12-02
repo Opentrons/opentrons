@@ -78,10 +78,6 @@ LW_DEFINITION['version'] = 2
 def mock_hw_pipette_all_combos(request):
     model = request.param
     return pipette.Pipette(load(model, 'testId'),
-                           {
-                               'single': [0, 0, 0],
-                               'multi': [0, 0, 0]
-                           },
                            PIP_CAL,
                            'testId')
 
@@ -119,10 +115,6 @@ def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
 @pytest.fixture
 def mock_hw(hardware):
     pip = pipette.Pipette(load("p300_single_v2.1", 'testId'),
-                          {
-                              'single': [0, 0, 0],
-                              'multi': [0, 0, 0]
-                          },
                           PIP_CAL,
                           'testId')
     hardware._attached_instruments = {Mount.RIGHT: pip}

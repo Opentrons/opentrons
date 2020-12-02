@@ -7,6 +7,7 @@ from typing import cast
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckSlotName
+from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
 from opentrons.protocol_engine import ProtocolEngine, errors
 from opentrons.protocol_engine.types import DeckSlotLocation
@@ -51,7 +52,7 @@ async def test_create_engine_initializes_state_with_deck_geometry(
     state = engine.state_store
 
     assert state.geometry.get_deck_definition() == standard_deck_def
-    assert state.labware.get_labware_data_by_id("fixedTrash") == LabwareData(
+    assert state.labware.get_labware_data_by_id(FIXED_TRASH_ID) == LabwareData(
         location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
         definition=fixed_trash_def,
         calibration=(0, 0, 0),

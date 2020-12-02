@@ -301,10 +301,10 @@ def build_v2_model(h, lw_name, loop):
         'opentrons_96_tiprack_300ul', '2')
     pip = ctx.load_instrument('p300_single', 'right',
                               tip_racks=[tiprack])
-    instrument = models.Instrument(pip, context=ctx)
+    instrument = models.Instrument(pip, [], ctx)
     plate = ctx.load_labware(
         lw_name or 'corning_96_wellplate_360ul_flat', 1)
-    container = models.Container(plate, context=ctx)
+    container = models.Container(plate, [], context=ctx)
     return namedtuple('model', 'robot instrument container')(
         robot=h,
         instrument=instrument,

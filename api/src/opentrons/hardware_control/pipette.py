@@ -25,8 +25,6 @@ RECONFIG_KEYS = {'quirks'}
 
 mod_log = logging.getLogger(__name__)
 
-InstrumentOffsetConfig = Dict[str, Tuple[float, float, float]]
-
 
 class Pipette:
     """ A class to gather and track pipette state and configs.
@@ -41,7 +39,6 @@ class Pipette:
     def __init__(
             self,
             config: pipette_config.PipetteConfig,
-            inst_offset_config: Union[InstrumentOffsetConfig, Point],
             pipette_offset_cal: PipetteOffsetByPipetteMount,
             pipette_id: str = None) -> None:
         self._config = config
@@ -49,7 +46,6 @@ class Pipette:
         self._acting_as = self._config.name
         self._name = self._config.name
         self._model = self._config.model
-        self._model_offset = self._config.model_offset
         self._nozzle_offset = self._config.nozzle_offset
         self._current_volume = 0.0
         self._working_volume = self._config.max_volume
@@ -59,16 +55,10 @@ class Pipette:
         self._tip_overlap_map = self._config.tip_overlap
         self._has_tip = False
         self._pipette_id = pipette_id
-        if isinstance(inst_offset_config, dict):
-            pip_type = 'multi' if self._config.channels == 8 else 'single'
-            self._instrument_offset = Point(*inst_offset_config[pip_type])
-        else:
-            self._instrument_offset = inst_offset_config
         self._log = mod_log.getChild(self._pipette_id
                                      if self._pipette_id else '<unknown>')
-        self._log.info("loaded: {}, instr offset {}, pipette offset {}"
-                       .format(config.model, self._instrument_offset,
-                               self._pipette_offset.offset))
+        self._log.info("loaded: {}, pipette offset: {}".format(
+            config.model, self._pipette_offset.offset))
         self.ready_to_aspirate = False
         #: True if ready to aspirate
         self._aspirate_flow_rate\
@@ -98,10 +88,6 @@ class Pipette:
     def acting_as(self) -> PipetteName:
         return self._acting_as
 
-    def update_instrument_offset(self, new_offset: Point):
-        self._log.info("updated instrument offset to {}".format(new_offset))
-        self._instrument_offset = new_offset
-
     def update_pipette_offset(self, offset_cal: PipetteOffsetByPipetteMount):
         self._log.info("updating pipette offset to {}"
                        .format(offset_cal.offset))
@@ -110,10 +96,6 @@ class Pipette:
     @property
     def config(self) -> pipette_config.PipetteConfig:
         return self._config
-
-    @property
-    def model_offset(self) -> Tuple[float, float, float]:
-        return self._model_offset
 
     @property
     def nozzle_offset(self) -> Tuple[float, float, float]:
@@ -349,7 +331,6 @@ def _reload_and_check_skip(
         if changed.intersection(RECONFIG_KEYS):
             # Something has changed that requires reconfig
             p = Pipette(new_config,
-                        attached_instr._instrument_offset,
                         pipette_offset,
                         attached_instr._pipette_id)
             p.act_as(attached_instr.acting_as)
@@ -363,7 +344,6 @@ def load_from_config_and_check_skip(
         attached: Optional[Pipette],
         requested: Optional[PipetteName],
         serial: Optional[str],
-        instrument_offset: InstrumentOffsetConfig,
         pipette_offset: PipetteOffsetByPipetteMount)\
         -> Tuple[Optional[Pipette], bool]:
     """
@@ -404,7 +384,7 @@ def load_from_config_and_check_skip(
 
     if config:
         return \
-            Pipette(config, instrument_offset, pipette_offset, serial), False
+            Pipette(config, pipette_offset, serial), False
     else:
         return None, False
 

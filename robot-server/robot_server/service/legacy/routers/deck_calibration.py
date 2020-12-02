@@ -1,15 +1,19 @@
 from fastapi import APIRouter, Depends
 
-from opentrons.config import robot_configs
 from opentrons.hardware_control import ThreadManager
 from opentrons.calibration_storage import helpers
 
 from robot_server.service.dependencies import get_hardware
 from robot_server.service.legacy.models.deck_calibration import (
-    CalibrationStatus, DeckCalibrationStatus, DeckCalibrationData, MatrixType)
+    CalibrationStatus, DeckCalibrationStatus, DeckCalibrationData, MatrixType,
+    InstrumentCalibrationStatus, InstrumentOffset)
 from robot_server.service.shared_models import calibration as cal_model
 
 router = APIRouter()
+
+DEFAULT_INSTR_OFFSET = InstrumentOffset(
+    single=(0, 0, 0),
+    multi=(0, 0, 0))
 
 
 @router.get("/calibration/status",
@@ -17,7 +21,12 @@ router = APIRouter()
             response_model=CalibrationStatus)
 async def get_calibration_status(
         hardware: ThreadManager = Depends(get_hardware)) -> CalibrationStatus:
-    robot_conf = robot_configs.load()
+    # TODO: AA 12-01-2020 Instrument offset has been deprecated. We should
+    # exclude instrument calibration in a future refactor
+    instr_offset = InstrumentCalibrationStatus(  # always load default values
+        right=DEFAULT_INSTR_OFFSET,
+        left=DEFAULT_INSTR_OFFSET)
+
     deck_cal = hardware.robot_calibration.deck_calibration
     status = cal_model.CalibrationStatus(
         **helpers.convert_to_dict(deck_cal.status))
@@ -34,4 +43,4 @@ async def get_calibration_status(
         deckCalibration=DeckCalibrationStatus(
             status=hardware.validate_calibration(),
             data=deck_cal_data),
-        instrumentCalibration=robot_conf.instrument_offset)
+        instrumentCalibration=instr_offset)

@@ -1,9 +1,10 @@
 import asyncio
 import contextlib
 import logging
-from typing import (Dict, Iterator, List,
+from typing import (Dict, Iterator, List, Callable,
                     Optional, Set, Tuple, Union, TYPE_CHECKING, cast)
 
+from opentrons.hardware_control import (SynchronousAdapter, ThreadManager)
 from opentrons import types
 from opentrons.hardware_control import API
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
@@ -86,7 +87,7 @@ class ProtocolContext(CommandPublisher):
 
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
         self._commands: List[str] = []
-        self._unsubscribe_commands = None
+        self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
 
     @classmethod
@@ -194,7 +195,7 @@ class ProtocolContext(CommandPublisher):
             cmd_types.COMMAND, on_command)
 
     @contextlib.contextmanager
-    def temp_connect(self, hardware: API):
+    def temp_connect(self, hardware: Union[ThreadManager, SynchronousAdapter]):
         """ Connect temporarily to the specified hardware controller.
 
         This should be used as a context manager:

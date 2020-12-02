@@ -34,7 +34,6 @@ class PipetteConfig:
     aspirate_flow_rate: float
     dispense_flow_rate: float
     channels: float
-    model_offset: Tuple[float, float, float]
     nozzle_offset: Tuple[float, float, float]
     plunger_current: float
     drop_tip_current: float
@@ -186,7 +185,6 @@ def load(
         aspirate_flow_rate=cfg['defaultAspirateFlowRate']['value'],
         dispense_flow_rate=cfg['defaultDispenseFlowRate']['value'],
         channels=ensure_value(cfg, 'channels', MUTABLE_CONFIGS),
-        model_offset=ensure_value(cfg, 'modelOffset', MUTABLE_CONFIGS),
         nozzle_offset=cfg.get(  # type: ignore
             'nozzleOffset', NOZZLE_OFFSET_DEFAULT),
         plunger_current=ensure_value(cfg, 'plungerCurrent', MUTABLE_CONFIGS),

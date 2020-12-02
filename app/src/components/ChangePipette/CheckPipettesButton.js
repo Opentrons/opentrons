@@ -1,16 +1,15 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import last from 'lodash/last'
 
 import {
-  useDispatchApiRequest,
+  useDispatchApiRequests,
   getRequestById,
   PENDING,
   SUCCESS,
 } from '../../robot-api'
 
-import { fetchPipettes } from '../../pipettes'
+import { fetchPipettes, FETCH_PIPETTES } from '../../pipettes'
 import { PrimaryButton, Icon } from '@opentrons/components'
 
 import type { State } from '../../types'
@@ -21,17 +20,30 @@ export type CheckPipetteButtonProps = {|
   robotName: string,
   className: string,
   children: React.Node,
+  hidden?: boolean,
   onDone?: () => mixed,
 |}
 
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps
 ): React.Node {
-  const { robotName, onDone, className, children } = props
-  const [dispatch, requestIds] = useDispatchApiRequest<FetchPipettesAction>()
+  const { robotName, onDone, className, children, hidden = false } = props
+  const fetchPipettesRequestId = React.useRef<string | null>(null)
+  const [dispatch] = useDispatchApiRequests<FetchPipettesAction>(
+    dispatchedAction => {
+      if (
+        dispatchedAction.type === FETCH_PIPETTES &&
+        dispatchedAction.meta.requestId
+      ) {
+        fetchPipettesRequestId.current = dispatchedAction.meta.requestId
+      }
+    }
+  )
   const handleClick = () => dispatch(fetchPipettes(robotName, true))
   const requestStatus = useSelector<State, RequestState | null>(state =>
-    getRequestById(state, last(requestIds))
+    fetchPipettesRequestId.current
+      ? getRequestById(state, fetchPipettesRequestId.current)
+      : null
   )?.status
   const pending = requestStatus === PENDING
 
@@ -39,7 +51,7 @@ export function CheckPipettesButton(
     if (requestStatus === SUCCESS && onDone) onDone()
   }, [onDone, requestStatus])
 
-  return (
+  return hidden ? null : (
     <PrimaryButton
       onClick={handleClick}
       disabled={pending}

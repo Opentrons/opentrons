@@ -22,10 +22,6 @@ PIP_OFFSET = cal_types.PipetteOffsetByPipetteMount(
 @pytest.fixture
 def mock_hw(hardware):
     pip = pipette.Pipette(load("p300_single_v2.1", 'testiId'),
-                          {
-                              'single': [0, 0, 0],
-                              'multi': [0, 0, 0]
-                          },
                           PIP_OFFSET,
                           'testId')
     hardware._attached_instruments = {Mount.RIGHT: pip, Mount.LEFT: pip}
@@ -72,12 +68,10 @@ def test_user_flow_select_pipette(pipettes, target_mount, hardware):
     pip, pip2 = None, None
     if pipettes[0]:
         pip = pipette.Pipette(load(pipettes[0], 'testId'),
-                              {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                               PIP_OFFSET,
                               'testId')
     if pipettes[1]:
         pip2 = pipette.Pipette(load(pipettes[1], 'testId'),
-                               {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                                PIP_OFFSET,
                                'testId2')
     hardware._attached_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
@@ -132,7 +126,6 @@ async def test_save_default_pick_up_current(mock_hw):
     # make sure pick up current for multi-channels is
     # modified during tip pick up
     pip = pipette.Pipette(load("p20_multi_v2.1", 'testId'),
-                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                           PIP_OFFSET,
                           'testid')
     mock_hw._attached_instruments[Mount.LEFT] = pip

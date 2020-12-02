@@ -6,10 +6,11 @@ from typing import cast
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.labware.dev_types import LabwareDefinition, WellDefinition
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine import StateStore, errors
-from opentrons.protocol_engine.types import DeckSlotLocation
+from opentrons.protocol_engine.types import DeckSlotLocation, WellLocation, WellOrigin
 from opentrons.protocol_engine.state import LabwareData
 from opentrons.protocol_engine.state.labware import LabwareStore
 from opentrons.protocol_engine.state.geometry import GeometryStore
@@ -158,12 +159,12 @@ def test_get_well_position(
         calibration=(1, -2, 3)
     )
     well_def = well_plate_def["wells"]["B2"]
+    slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
 
     mock_labware_store.state.get_labware_data_by_id.return_value = labware_data
     mock_labware_store.state.get_well_definition.return_value = well_def
 
     point = geometry_store.state.get_well_position("plate-id", "B2")
-    slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
 
     mock_labware_store.state.get_labware_data_by_id.assert_called_with(
         "plate-id"
@@ -176,6 +177,68 @@ def test_get_well_position(
         x=slot_pos[0] + 1 + well_def["x"],
         y=slot_pos[1] - 2 + well_def["y"],
         z=slot_pos[2] + 3 + well_def["z"] + well_def["depth"],
+    )
+
+
+def test_get_well_position_with_top_offset(
+    well_plate_def: LabwareDefinition,
+    standard_deck_def: DeckDefinitionV2,
+    mock_labware_store: MagicMock,
+    geometry_store: GeometryStore,
+) -> None:
+    """It should be able to get the position of a well top in a labware."""
+    labware_data = LabwareData(
+        definition=well_plate_def,
+        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        calibration=(1, -2, 3)
+    )
+    well_def = well_plate_def["wells"]["B2"]
+    slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
+
+    mock_labware_store.state.get_labware_data_by_id.return_value = labware_data
+    mock_labware_store.state.get_well_definition.return_value = well_def
+
+    point = geometry_store.state.get_well_position(
+        "plate-id",
+        "B2",
+        WellLocation(origin=WellOrigin.TOP, offset=(1, 2, 3))
+    )
+
+    assert point == Point(
+        x=slot_pos[0] + 1 + well_def["x"] + 1,
+        y=slot_pos[1] - 2 + well_def["y"] + 2,
+        z=slot_pos[2] + 3 + well_def["z"] + well_def["depth"] + 3,
+    )
+
+
+def test_get_well_position_with_bottom_offset(
+    well_plate_def: LabwareDefinition,
+    standard_deck_def: DeckDefinitionV2,
+    mock_labware_store: MagicMock,
+    geometry_store: GeometryStore,
+) -> None:
+    """It should be able to get the position of a well top in a labware."""
+    labware_data = LabwareData(
+        definition=well_plate_def,
+        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        calibration=(1, -2, 3)
+    )
+    well_def = well_plate_def["wells"]["B2"]
+    slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
+
+    mock_labware_store.state.get_labware_data_by_id.return_value = labware_data
+    mock_labware_store.state.get_well_definition.return_value = well_def
+
+    point = geometry_store.state.get_well_position(
+        "plate-id",
+        "B2",
+        WellLocation(origin=WellOrigin.BOTTOM, offset=(3, 2, 1))
+    )
+
+    assert point == Point(
+        x=slot_pos[0] + 1 + well_def["x"] + 3,
+        y=slot_pos[1] - 2 + well_def["y"] + 2,
+        z=slot_pos[2] + 3 + well_def["z"] + 1,
     )
 
 
@@ -253,3 +316,40 @@ def test_get_tip_geometry(
             well_name="B2",
             pipette_config=pipette_config
         )
+
+
+def test_get_tip_drop_location(
+    tip_rack_def: LabwareDefinition,
+    mock_labware_store: MagicMock,
+    geometry_store: GeometryStore,
+) -> None:
+    """It should get relative drop tip location for a pipette/labware combo."""
+    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.7})
+
+    mock_labware_store.state.get_tip_length.return_value = 50
+
+    location = geometry_store.state.get_tip_drop_location(
+        labware_id="tip-rack-id",
+        pipette_config=pipette_config
+    )
+
+    assert location == WellLocation(
+        origin=WellOrigin.TOP,
+        offset=(0, 0, -0.7 * 50),
+    )
+    mock_labware_store.state.get_tip_length.assert_called_with("tip-rack-id")
+
+
+def test_get_tip_drop_location_with_trash(
+    mock_labware_store: MagicMock,
+    geometry_store: GeometryStore,
+) -> None:
+    """It should get relative drop tip location for a the fixed trash."""
+    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.7})
+
+    location = geometry_store.state.get_tip_drop_location(
+        labware_id=FIXED_TRASH_ID,
+        pipette_config=pipette_config
+    )
+
+    assert location == WellLocation(origin=WellOrigin.TOP, offset=(0, 0, 0))

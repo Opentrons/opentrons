@@ -4,8 +4,7 @@ from opentrons.protocol_api.labware import Well
 from opentrons.types import Location
 
 
-def make_command(name, payload):
-    return {'name': name, 'payload': payload}
+CommandLocation = Union[Location, None, Sequence, Well]
 
 
 def listify(location: Any) -> List:
@@ -30,8 +29,7 @@ def _stringify_new_loc(loc: Union[Location, Well]) -> str:
         raise TypeError(loc)
 
 
-def stringify_location(location: Union[Location, None,
-                                       Sequence]) -> str:
+def stringify_location(location: CommandLocation) -> str:
     loc_str_list = [_stringify_new_loc(loc)
                     for loc in listify(location)]
     return ', '.join(loc_str_list)
