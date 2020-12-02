@@ -16,16 +16,21 @@ def delay(
         minutes: float,
         msg: str = None) -> command_types.DelayCommand:
     td = timedelta(minutes=minutes, seconds=seconds)
-    minutes, seconds = divmod(td.seconds, 60)
+    actual_min, actual_sec = divmod(td.total_seconds(), 60)
 
-    text = f"Delaying for {minutes} minutes and {seconds} seconds"
+    text = (
+        f"Delaying for {int(actual_min)} minutes and "
+        f"{round(actual_sec, 3)} seconds"
+    )
+
     if msg:
         text = f"{text}. {msg}"
+
     return {
         'name': command_types.DELAY,
         'payload': {
-            'minutes': minutes,
-            'seconds': seconds,
+            'minutes': actual_min,
+            'seconds': actual_sec,
             'text': text
         }
     }
