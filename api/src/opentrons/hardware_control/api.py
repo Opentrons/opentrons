@@ -725,9 +725,9 @@ class API(HardwareAPILike):
         gantry_calibration =\
             self.robot_calibration.deck_calibration.attitude
         right_deck = linal.apply_reverse(
-            gantry_calibration, right, with_offsets=False)
+            gantry_calibration, right)
         left_deck = linal.apply_reverse(
-            gantry_calibration, left, with_offsets=False)
+            gantry_calibration, left)
         deck_pos = {Axis.X: right_deck[0],
                     Axis.Y: right_deck[1],
                     Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],
@@ -1008,12 +1008,10 @@ class API(HardwareAPILike):
         # above that makes this OK
         primary_transformed = linal.apply_transform(
             self.robot_calibration.deck_calibration.attitude,
-            to_transform_primary,  # type: ignore
-            with_offsets=False)
+            to_transform_primary)  # type: ignore
         secondary_transformed = linal.apply_transform(
             self.robot_calibration.deck_calibration.attitude,
-            to_transform_secondary,  # type: ignore
-            with_offsets=False)
+            to_transform_secondary)  # type: ignore
         return primary_transformed, secondary_transformed
 
     async def _move(self, target_position: 'OrderedDict[Axis, float]',
@@ -1901,7 +1899,7 @@ class API(HardwareAPILike):
             self._config.z_retract_distance + cp.z
 
         _, _, transformed_z = linal.apply_reverse(
-            self._config.gantry_calibration,
+            self.robot_calibration.deck_calibration.attitude,
             (0, 0, max_height))
         return transformed_z
 

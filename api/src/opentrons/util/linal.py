@@ -172,29 +172,21 @@ def add_matrices(
 
 def apply_transform(
         t: Union[List[List[float]], np.ndarray],
-        pos: AxisPosition,
-        with_offsets=True) -> Tuple[float, float, float]:
+        pos: AxisPosition) -> Tuple[float, float, float]:
     """
     Change of base using a transform matrix. Primarily used to render a point
     in space in a way that is more readable for the user.
 
     :param t: A transformation matrix from one 3D space [A] to another [B]
     :param pos: XYZ point in space A
-    :param with_offsets: Whether to apply the transform as an affine transform
-                         or as a standard transform. You might use
-                         with_offsets=False
     :return: corresponding XYZ point in space B
     """
-    if with_offsets:
-        return tuple(dot(t, list(pos) + [1])[:3])  # type: ignore
-    else:
-        return tuple(dot(t, list(pos))[:3])  # type: ignore
+    return tuple(dot(t, list(pos))[:3])  # type: ignore
 
 
 def apply_reverse(
         t: Union[List[List[float]], np.ndarray],
-        pos: AxisPosition,
-        with_offsets=True) -> Tuple[float, float, float]:
+        pos: AxisPosition) -> Tuple[float, float, float]:
     """ Like apply_transform but inverts the transform first
     """
-    return apply_transform(inv(t), pos, with_offsets)
+    return apply_transform(inv(t), pos)
