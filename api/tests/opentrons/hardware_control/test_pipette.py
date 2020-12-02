@@ -12,8 +12,6 @@ PIP_CAL = cal_types.PipetteOffsetByPipetteMount(
 
 def test_tip_tracking():
     pip = pipette.Pipette(pipette_config.load('p10_single_v1'),
-                          {'single': [0, 0, 0],
-                           'multi': [0, 0, 0]},
                           PIP_CAL,
                           'testID')
     with pytest.raises(AssertionError):
@@ -34,7 +32,6 @@ def test_tip_tracking():
 def test_critical_points_nozzle_offset(model, use_new_calibration):
     loaded = pipette_config.load(model)
     pip = pipette.Pipette(loaded,
-                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                           PIP_CAL,
                           'testID')
     # default pipette offset is[0, 0, 0], only nozzle offset would be used
@@ -65,7 +62,6 @@ def test_critical_points_pipette_offset(model, use_new_calibration):
         source=cal_types.SourceType.user,
         status=cal_types.CalibrationStatus())
     pip = pipette.Pipette(loaded,
-                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                           pip_cal,
                           'testID')
     # pipette offset + nozzle offset to determine critical point
@@ -90,7 +86,6 @@ def test_critical_points_pipette_offset(model, use_new_calibration):
 def test_volume_tracking(config_model):
     loaded = pipette_config.load(config_model)
     pip = pipette.Pipette(loaded,
-                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                           PIP_CAL,
                           'testID')
     assert pip.current_volume == 0.0
@@ -117,7 +112,6 @@ def test_volume_tracking(config_model):
 def test_config_update(config_model):
     loaded = pipette_config.load(config_model)
     pip = pipette.Pipette(loaded,
-                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                           PIP_CAL,
                           'testID')
     sample_plunger_pos = {'top': 19.5}
@@ -134,7 +128,6 @@ def test_smoothie_config_update(monkeypatch):
 def test_tip_overlap(config_model):
     loaded = pipette_config.load(config_model)
     pip = pipette.Pipette(loaded,
-                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                           PIP_CAL,
                           'testId')
     assert pip.config.tip_overlap\
@@ -143,7 +136,6 @@ def test_tip_overlap(config_model):
 
 def test_flow_rate_setting():
     pip = pipette.Pipette(pipette_config.load('p300_single_v2.0'),
-                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                           PIP_CAL,
                           'testId')
     # pipettes should load settings from config at init time

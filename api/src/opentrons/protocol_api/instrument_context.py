@@ -3,23 +3,22 @@ from __future__ import annotations
 from functools import lru_cache
 import logging
 from typing import (
-    Any, Dict, List, Optional, Tuple, Sequence, TYPE_CHECKING, Union)
+    Any, Dict, List, Sequence, TYPE_CHECKING, Union)
 from opentrons import types, hardware_control as hc
 from opentrons.commands import commands as cmds
 from opentrons.commands.publisher import CommandPublisher, do_publish, publish
 from opentrons.hardware_control.types import CriticalPoint, PipettePair
-from opentrons.calibration_storage import get
-from opentrons.calibration_storage.types import TipLengthCalNotFound
+from opentrons.protocols.advanced_control.mix import mix_from_kwargs
+from opentrons.protocols.api_support.instrument import \
+    validate_blowout_location, tip_length_for, validate_tiprack, \
+    determine_drop_target
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances,
     clamp_value, requires_version, build_edges)
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.protocol.dev_types import (
-    BlowoutLocation, LiquidHandlingCommand)
 from .labware import (
-    filter_tipracks_to_start, Labware, OutOfTipsError,
-    select_tiprack_from_list, Well)
+    Labware, OutOfTipsError, Well, next_available_tip)
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.advanced_control import transfers
 from .module_contexts import ThermocyclerContext
@@ -36,15 +35,6 @@ AdvancedLiquidHandling = Union[
     types.Location,
     List[Union[Well, types.Location]],
     List[List[Well]]]
-
-
-VALID_PIP_TIPRACK_VOL = {
-    'p10': [10, 20],
-    'p20': [10, 20],
-    'p50': [200, 300],
-    'p300': [200, 300],
-    'p1000': [1000]
-}
 
 
 class InstrumentContext(CommandPublisher):
@@ -87,7 +77,7 @@ class InstrumentContext(CommandPublisher):
         self._tip_racks = tip_racks or list()
         for tip_rack in self.tip_racks:
             assert tip_rack.is_tiprack
-            self._validate_tiprack(tip_rack)
+            validate_tiprack(self.name, tip_rack, self._log)
         if trash is None:
             self.trash_container = self._ctx.fixed_trash
         else:
@@ -144,47 +134,6 @@ class InstrumentContext(CommandPublisher):
     @default_speed.setter
     def default_speed(self, speed: float):
         self._default_speed = speed
-
-    def _validate_tiprack(self, tiprack: Labware):
-        # TODO AA 2020-06-24 - we should instead add the acceptable Opentrons
-        # tipracks to the pipette as a refactor
-        if tiprack._implementation.get_definition()['namespace'] \
-                == 'opentrons':
-            tiprack_vol = tiprack.wells()[0].max_volume
-            valid_vols = VALID_PIP_TIPRACK_VOL[self.name.split('_')[0]]
-            if tiprack_vol not in valid_vols:
-                self._log.warning(
-                    f'The pipette {self.name} and its tiprack '
-                    f'{tiprack.load_name} in slot {tiprack.parent} appear to '
-                    'be mismatched. Please check your protocol before running '
-                    'on the robot.')
-
-    def _validate_blowout_location(
-            self,
-            liquid_handling_command: LiquidHandlingCommand,
-            blowout_location: Optional[Any]):
-
-        if blowout_location and self._api_version < APIVersion(2, 8):
-            raise ValueError(
-                'Cannot specify blowout location when using api' +
-                ' version below 2.8, current version is {api_version}'
-                .format(api_version=self._api_version))
-
-        elif liquid_handling_command == 'consolidate' \
-                and blowout_location == 'source well':
-            raise ValueError(
-                "blowout location for consolidate cannot be source well")
-        elif liquid_handling_command == 'distribute' \
-                and blowout_location == 'destination well':
-            raise ValueError(
-                "blowout location for distribute cannot be destination well")
-        elif liquid_handling_command == 'transfer' and \
-            blowout_location and blowout_location not in [
-                location.value for location in BlowoutLocation]:
-            raise ValueError(
-                "blowout location should be either 'source well', " +
-                " 'destination well', or 'trash'" +
-                f" but it is {blowout_location}")
 
     @requires_version(2, 0)
     def aspirate(self,
@@ -639,20 +588,15 @@ class InstrumentContext(CommandPublisher):
         if not isinstance(loc, Well):
             raise TypeError('Last tip location should be a Well but it is: '
                             '{}'.format(loc))
-        drop_loc = self._determine_drop_target(loc, APIVersion(2, 3))
+        drop_loc = determine_drop_target(self.api_version,
+                                         loc,
+                                         self.hw_pipette.get(
+                                             'return_tip_height', 0.5
+                                         ),
+                                         APIVersion(2, 3))
         self.drop_tip(drop_loc, home_after=home_after)
 
         return self
-
-    def _next_available_tip(self) -> Tuple[Labware, Well]:
-        start = self.starting_tip
-        if start is None:
-            return select_tiprack_from_list(
-                self.tip_racks, self.channels)
-        else:
-            return select_tiprack_from_list(
-                filter_tipracks_to_start(start, self.tip_racks),
-                self.channels, start)
 
     @requires_version(2, 0)
     def pick_up_tip(  # noqa(C901)
@@ -712,7 +656,9 @@ class InstrumentContext(CommandPublisher):
             tiprack = location.parent
             target = location
         elif not location:
-            tiprack, target = self._next_available_tip()
+            tiprack, target = next_available_tip(self.starting_tip,
+                                                 self.tip_racks,
+                                                 self.channels)
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
@@ -721,9 +667,10 @@ class InstrumentContext(CommandPublisher):
                 " However, it is a {}".format(location))
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
-        self._validate_tiprack(tiprack)
+        validate_tiprack(self.name, tiprack, self._log)
         do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                    'before', None, None, self, location=target)
+
         self.move_to(target.top())
 
         self._hw_manager.hardware.set_current_tiprack_diameter(
@@ -739,21 +686,6 @@ class InstrumentContext(CommandPublisher):
         self._last_tip_picked_up_from = target
 
         return self
-
-    def _determine_drop_target(
-            self, location: Well,
-            version_breakpoint: APIVersion = None) -> types.Location:
-        version_breakpoint = version_breakpoint or APIVersion(2, 2)
-        if self.api_version < version_breakpoint:
-            bot = location.bottom()
-            return types.Location(
-                point=bot.point._replace(z=bot.point.z + 10),
-                labware=location)
-        else:
-            tr = location.parent
-            assert tr.is_tiprack
-            z_height = self.return_height * tr.tip_length
-            return location.top(-z_height)
 
     @requires_version(2, 0)
     def drop_tip(  # noqa(C901)
@@ -844,7 +776,9 @@ class InstrumentContext(CommandPublisher):
             if LabwareLike(location).is_fixed_trash():
                 target = location.top()
             else:
-                target = self._determine_drop_target(location)
+                target = determine_drop_target(self.api_version,
+                                               location,
+                                               self.return_height)
         elif not location:
             target = self.trash_container.wells()[0].top()
         else:
@@ -927,7 +861,7 @@ class InstrumentContext(CommandPublisher):
             'disposal_volume', self.min_volume)
         kwargs['mix_after'] = (0, 0)
         blowout_location = kwargs.get('blowout_location')
-        self._validate_blowout_location('distribute', blowout_location)
+        validate_blowout_location(self.api_version, 'distribute', blowout_location)
 
         return self.transfer(volume, source, dest, **kwargs)
 
@@ -957,7 +891,7 @@ class InstrumentContext(CommandPublisher):
         kwargs['mix_before'] = (0, 0)
         kwargs['disposal_volume'] = 0
         blowout_location = kwargs.get('blowout_location')
-        self._validate_blowout_location('consolidate', blowout_location)
+        validate_blowout_location(self.api_version, 'consolidate', blowout_location)
 
         return self.transfer(volume, source, dest, **kwargs)
 
@@ -1069,11 +1003,11 @@ class InstrumentContext(CommandPublisher):
             volume, source, dest))
 
         blowout_location = kwargs.get('blowout_location')
-        self._validate_blowout_location('transfer', blowout_location)
+        validate_blowout_location(self.api_version, 'transfer', blowout_location)
 
         kwargs['mode'] = kwargs.get('mode', 'transfer')
 
-        mix_strategy, mix_opts = self._mix_from_kwargs(kwargs)
+        mix_strategy, mix_opts = mix_from_kwargs(kwargs)
 
         if trash:
             drop_tip = transfers.DropTipStrategy.TRASH
@@ -1101,7 +1035,9 @@ class InstrumentContext(CommandPublisher):
                 blow_out_strategy = transfers.BlowOutStrategy.TRASH
 
         if new_tip != types.TransferTipPolicy.NEVER:
-            tr, next_tip = self._next_available_tip()
+            tr, next_tip = next_available_tip(self.starting_tip,
+                                              self.tip_racks,
+                                              self.channels)
             max_volume = min(next_tip.max_volume, self.max_volume)
         else:
             max_volume = self.hw_pipette['working_volume']
@@ -1147,55 +1083,6 @@ class InstrumentContext(CommandPublisher):
     def _execute_transfer(self, plan: transfers.TransferPlan):
         for cmd in plan:
             getattr(self, cmd['method'])(*cmd['args'], **cmd['kwargs'])
-
-    @staticmethod
-    def _mix_from_kwargs(
-            top_kwargs: Dict[str, Any])\
-            -> Tuple[transfers.MixStrategy, transfers.Mix]:
-
-        def _mix_requested(kwargs, opt):
-            """
-            Helper for determining mix options from :py:meth:`transfer` kwargs
-            Mixes can be ignored in kwargs by either
-            - Not specifying the kwarg
-            - Specifying it as None
-            - Specifying it as (0, 0)
-
-            This handles all these cases.
-            """
-            val = kwargs.get(opt)
-            if None is val:
-                return False
-            if val == (0, 0):
-                return False
-            return True
-
-        mix_opts = transfers.Mix()
-        if _mix_requested(top_kwargs, 'mix_before')\
-           and _mix_requested(top_kwargs, 'mix_after'):
-            mix_strategy = transfers.MixStrategy.BOTH
-            before_opts = top_kwargs['mix_before']
-            after_opts = top_kwargs['mix_after']
-            mix_opts = mix_opts._replace(
-                mix_after=mix_opts.mix_after._replace(
-                    repetitions=after_opts[0], volume=after_opts[1]),
-                mix_before=mix_opts.mix_before._replace(
-                    repetitions=before_opts[0], volume=before_opts[1]))
-        elif _mix_requested(top_kwargs, 'mix_before'):
-            mix_strategy = transfers.MixStrategy.BEFORE
-            before_opts = top_kwargs['mix_before']
-            mix_opts = mix_opts._replace(
-                mix_before=mix_opts.mix_before._replace(
-                    repetitions=before_opts[0], volume=before_opts[1]))
-        elif _mix_requested(top_kwargs, 'mix_after'):
-            mix_strategy = transfers.MixStrategy.AFTER
-            after_opts = top_kwargs['mix_after']
-            mix_opts = mix_opts._replace(
-                mix_after=mix_opts.mix_after._replace(
-                    repetitions=after_opts[0], volume=after_opts[1]))
-        else:
-            mix_strategy = transfers.MixStrategy.NEVER
-        return mix_strategy, mix_opts
 
     @requires_version(2, 0)
     def delay(self):
@@ -1563,19 +1450,4 @@ class InstrumentContext(CommandPublisher):
     @lru_cache(maxsize=12)
     def _tip_length_for(self, tiprack: Labware) -> float:
         """ Get the tip length, including overlap, for a tip from this rack """
-
-        def _build_length_from_overlap() -> float:
-            tip_overlap = self.hw_pipette['tip_overlap'].get(
-                tiprack.uri,
-                self.hw_pipette['tip_overlap']['default'])
-            tip_length = tiprack.tip_length
-            return tip_length - tip_overlap
-
-        try:
-            parent = LabwareLike(tiprack).first_parent() or ''
-            return get.load_tip_length_calibration(
-                self.hw_pipette['pipette_id'],
-                tiprack._implementation.get_definition(),
-                parent).tip_length
-        except TipLengthCalNotFound:
-            return _build_length_from_overlap()
+        return tip_length_for(self.hw_pipette, tiprack)

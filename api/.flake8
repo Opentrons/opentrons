@@ -27,17 +27,17 @@ per-file-ignores =
     src/opentrons/execute.py:ANN,D
     src/opentrons/simulate.py:ANN,D
     src/opentrons/types.py:ANN,D
-    src/opentrons/api/*:ANN,D
+    src/opentrons/api/*:D
     src/opentrons/calibration_storage/*:ANN,D
     src/opentrons/cli/*:ANN,D
-    src/opentrons/commands/*:ANN,D
+    src/opentrons/commands/*:D
+    src/opentrons/commands/util.py:ANN,D
     src/opentrons/config/*:ANN,D
     src/opentrons/data_storage/*:ANN,D
     src/opentrons/deck_calibration/*:ANN,D
     src/opentrons/drivers/*:ANN,D
     src/opentrons/hardware_control/*:ANN,D
     src/opentrons/helpers/*:ANN,D
-    src/opentrons/legacy_api/*:ANN,D
     src/opentrons/protocol_api/*:ANN,D
     src/opentrons/protocols/*:ANN,D
     src/opentrons/resources/*:ANN,D
@@ -61,7 +61,6 @@ per-file-ignores =
     tests/opentrons/containers/*:ANN,D
     tests/opentrons/data/*:ANN,D
     tests/opentrons/database/*:ANN,D
-    tests/opentrons/deck_calibration/*:ANN,D
     tests/opentrons/drivers/*:ANN,D
     tests/opentrons/hardware_control/*:ANN,D
     tests/opentrons/helpers/*:ANN,D

@@ -43,25 +43,6 @@ stages:
           - 0.0
           - 0.0
           - 1.0
-        instrument_offset:
-          right:
-            single:
-            - 0.0
-            - 0.0
-            - 0.0
-            multi:
-            - 0.0
-            - 0.0
-            - 0.0
-          left:
-            single:
-            - 0.0
-            - 0.0
-            - 0.0
-            multi:
-            - 0.0
-            - 0.0
-            - 0.0
         serial_speed: !anyint
         tip_length: !anydict
         default_current:

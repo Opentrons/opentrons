@@ -22,13 +22,14 @@ from .load_labware import LoadLabwareRequest, LoadLabwareResult
 from .load_pipette import LoadPipetteRequest, LoadPipetteResult
 from .move_to_well import MoveToWellRequest, MoveToWellResult
 from .pick_up_tip import PickUpTipRequest, PickUpTipResult
-
+from .drop_tip import DropTipRequest, DropTipResult
 
 CommandRequestType = Union[
     LoadLabwareRequest,
     LoadPipetteRequest,
     MoveToWellRequest,
     PickUpTipRequest,
+    DropTipRequest,
 ]
 
 CommandResultType = Union[
@@ -36,6 +37,7 @@ CommandResultType = Union[
     LoadPipetteResult,
     MoveToWellResult,
     PickUpTipResult,
+    DropTipResult,
 ]
 
 PendingCommandType = Union[
@@ -43,6 +45,7 @@ PendingCommandType = Union[
     PendingCommand[LoadPipetteRequest, LoadPipetteResult],
     PendingCommand[MoveToWellRequest, MoveToWellResult],
     PendingCommand[PickUpTipRequest, PickUpTipResult],
+    PendingCommand[DropTipRequest, DropTipResult],
 ]
 
 RunningCommandType = Union[
@@ -50,6 +53,7 @@ RunningCommandType = Union[
     RunningCommand[LoadPipetteRequest, LoadPipetteResult],
     RunningCommand[MoveToWellRequest, MoveToWellResult],
     RunningCommand[PickUpTipRequest, PickUpTipResult],
+    RunningCommand[DropTipRequest, DropTipResult],
 ]
 
 CompletedCommandType = Union[
@@ -57,6 +61,7 @@ CompletedCommandType = Union[
     CompletedCommand[LoadPipetteRequest, LoadPipetteResult],
     CompletedCommand[MoveToWellRequest, MoveToWellResult],
     CompletedCommand[PickUpTipRequest, PickUpTipResult],
+    CompletedCommand[DropTipRequest, DropTipResult],
 ]
 
 FailedCommandType = Union[
@@ -64,6 +69,7 @@ FailedCommandType = Union[
     FailedCommand[LoadPipetteRequest],
     FailedCommand[MoveToWellRequest],
     FailedCommand[PickUpTipRequest],
+    FailedCommand[DropTipRequest],
 ]
 
 CommandType = Union[
@@ -100,4 +106,6 @@ __all__ = [
     "MoveToWellResult",
     "PickUpTipRequest",
     "PickUpTipResult",
+    "DropTipRequest",
+    "DropTipResult",
 ]

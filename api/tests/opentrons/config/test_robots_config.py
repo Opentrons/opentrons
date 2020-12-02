@@ -25,16 +25,6 @@ dummy_settings = {
     'gantry_steps_per_mm': {
         'X': 80.00, 'Y': 80.00, 'Z': 400, 'A': 400},
     'acceleration': {'X': 3, 'Y': 2, 'Z': 15, 'A': 15, 'B': 2, 'C': 2},
-    'instrument_offset': {
-        'left': {
-            'single': [1, 2, 3],
-            'multi': [4, 5, 6]
-        },
-        'right': {
-            'single': [7, 8, 9],
-            'multi': [10, 11, 12]
-        }
-    },
     'z_retract_distance': 2,
     'tip_length': 999,
     'mount_offset': [-3, -2, -1],
@@ -100,22 +90,6 @@ def test_build_config():
     for key in [k for k in dummy_settings['tip_probe']['z_clearance'].keys()]:
         assert getattr(built_config.tip_probe.z_clearance, key)\
             == dummy_settings['tip_probe']['z_clearance'][key]
-
-    settings = copy.deepcopy(dummy_settings)
-    settings['instrument_offset'].update({'right': {}})
-
-    built_config = robot_configs.build_config(dummy_cal, settings)
-    expected = {
-            'left': {
-                'single': [1, 2, 3],
-                'multi': [4, 5, 6]
-            },
-            'right': {
-                'single': [0, 0, 0],
-                'multi': [0, 0, 0]
-            }
-        }
-    assert built_config.instrument_offset == expected
 
 
 def test_dictify_roundtrip():

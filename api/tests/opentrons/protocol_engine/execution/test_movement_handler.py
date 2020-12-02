@@ -7,6 +7,7 @@ from opentrons.types import MountType, Mount, Point
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import Waypoint
 
+from opentrons.protocol_engine.types import WellLocation, WellOrigin
 from opentrons.protocol_engine.state import PipetteLocationData
 from opentrons.protocol_engine.execution.movement import MovementHandler
 
@@ -65,7 +66,8 @@ def handler(
     )
 
 
-async def test_move_to_well_passes_waypoints_to_hc(
+async def test_move_to_well(
+    state_with_data: MagicMock,
     hc_with_data: AsyncMock,
     handler: MovementHandler
 ) -> None:
@@ -99,18 +101,6 @@ async def test_move_to_well_passes_waypoints_to_hc(
         ),
     ])
 
-
-async def test_move_to_well_gets_data_from_state(
-    state_with_data: MagicMock,
-    handler: MovementHandler
-) -> None:
-    """Move requests should get move parameters from state."""
-    await handler.move_to_well(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="B2"
-    )
-
     state_with_data.motion.get_pipette_location.assert_called_with("pipette-id")
 
     state_with_data.motion.get_movement_waypoints.assert_called_with(
@@ -120,4 +110,30 @@ async def test_move_to_well_gets_data_from_state(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="B2",
+        well_location=None,
+    )
+
+
+async def test_move_to_well_with_offset(
+    state_with_data: MagicMock,
+    hc_with_data: AsyncMock,
+    handler: MovementHandler
+) -> None:
+    """It should pass a move offset to the waypoints calculation."""
+    well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
+    await handler.move_to_well(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="B2",
+        well_location=well_location
+    )
+
+    state_with_data.motion.get_movement_waypoints.assert_called_with(
+        origin=Point(1, 1, 1),
+        origin_cp=CriticalPoint.FRONT_NOZZLE,
+        max_travel_z=42.0,
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="B2",
+        well_location=well_location,
     )

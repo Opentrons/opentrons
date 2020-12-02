@@ -1,80 +1,83 @@
-from opentrons.drivers import utils
+from typing import List
 
-from .helpers import make_command
+from opentrons.drivers import utils
+from opentrons.hardware_control.modules import ThermocyclerStep
+
 from . import types as command_types
 
 
-def magdeck_engage():
+def magdeck_engage() -> command_types.MagdeckEngageCommand:
     text = "Engaging Magnetic Module"
-    return make_command(
-        name=command_types.MAGDECK_ENGAGE,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.MAGDECK_ENGAGE,
+        'payload': {'text': text}
+    }
 
 
-def magdeck_disengage():
+def magdeck_disengage() -> command_types.MagdeckDisengageCommand:
     text = "Disengaging Magnetic Module"
-    return make_command(
-        name=command_types.MAGDECK_DISENGAGE,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.MAGDECK_DISENGAGE,
+        'payload': {'text': text}
+    }
 
 
-def magdeck_calibrate():
+def magdeck_calibrate() -> command_types.MagdeckCalibrateCommand:
     text = "Calibrating Magnetic Module"
-    return make_command(
-        name=command_types.MAGDECK_CALIBRATE,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.MAGDECK_CALIBRATE,
+        'payload': {'text': text}
+    }
 
 
-def tempdeck_set_temp(celsius):
-    text = "Setting Temperature Module temperature " \
-           "to {temp} °C (rounded off to nearest integer)".format(
-            temp=round(float(celsius),
-                       utils.TEMPDECK_GCODE_ROUNDING_PRECISION))
-    return make_command(
-        name=command_types.TEMPDECK_SET_TEMP,
-        payload={
+def tempdeck_set_temp(celsius: float) -> command_types.TempdeckSetTempCommand:
+    temp = round(float(celsius),
+                 utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+    text = f"Setting Temperature Module temperature " \
+           f"to {temp} °C (rounded off to nearest integer)"
+    return {
+        'name': command_types.TEMPDECK_SET_TEMP,
+        'payload': {
             'celsius': celsius,
             'text': text
         }
-    )
+    }
 
 
-def tempdeck_await_temp(celsius):
+def tempdeck_await_temp(celsius: float) -> command_types.TempdeckAwaitTempCommand:
     text = "Waiting for Temperature Module to reach temperature " \
            "{temp} °C (rounded off to nearest integer)".format(
             temp=round(float(celsius),
                        utils.TEMPDECK_GCODE_ROUNDING_PRECISION))
-    return make_command(
-        name=command_types.TEMPDECK_AWAIT_TEMP,
-        payload={
+    return {
+        'name': command_types.TEMPDECK_AWAIT_TEMP,
+        'payload': {
             'celsius': celsius,
             'text': text
         }
-    )
+    }
 
 
-def tempdeck_deactivate():
+def tempdeck_deactivate() -> command_types.TempdeckDeactivateCommand:
     text = "Deactivating Temperature Module"
-    return make_command(
-        name=command_types.TEMPDECK_DEACTIVATE,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.TEMPDECK_DEACTIVATE,
+        'payload': {'text': text}
+    }
 
 
-def thermocycler_open():
+def thermocycler_open() -> command_types.ThermocyclerOpenCommand:
     text = "Opening Thermocycler lid"
-    return make_command(
-        name=command_types.THERMOCYCLER_OPEN,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.THERMOCYCLER_OPEN,
+        'payload': {'text': text}
+    }
 
 
-def thermocycler_set_block_temp(temperature,
-                                hold_time_seconds,
-                                hold_time_minutes):
+def thermocycler_set_block_temp(
+        temperature: float,
+        hold_time_seconds: float,
+        hold_time_minutes: float) -> command_types.ThermocyclerSetBlockTempCommand:
     temp = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
     text = f'Setting Thermocycler well block temperature to {temp} °C'
     total_seconds = None
@@ -93,88 +96,91 @@ def thermocycler_set_block_temp(temperature,
         if clean_minutes > 0:
             text += f'{clean_minutes} minutes and '
         text += f'{clean_seconds} seconds'
-    return make_command(
-        name=command_types.THERMOCYCLER_SET_BLOCK_TEMP,
-        payload={
+    return {
+        'name': command_types.THERMOCYCLER_SET_BLOCK_TEMP,
+        'payload': {
             'temperature': temperature,
             'hold_time': total_seconds,
             'text': text
         }
-    )
+    }
 
 
-def thermocycler_execute_profile(steps, repetitions):
+def thermocycler_execute_profile(
+        steps: List[ThermocyclerStep],
+        repetitions: int) -> command_types.ThermocyclerExecuteProfileCommand:
     text = f'Thermocycler starting {repetitions} repetitions' \
             ' of cycle composed of the following steps: {steps}'
-    return make_command(
-        name=command_types.THERMOCYCLER_EXECUTE_PROFILE,
-        payload={
+    return {
+        'name': command_types.THERMOCYCLER_EXECUTE_PROFILE,
+        'payload': {
             'text': text,
             'steps': steps
         }
-    )
+    }
 
 
-def thermocycler_wait_for_hold():
+def thermocycler_wait_for_hold() -> command_types.ThermocyclerWaitForHoldCommand:
     text = "Waiting for hold time duration"
-    return make_command(
-        name=command_types.THERMOCYCLER_WAIT_FOR_HOLD,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.THERMOCYCLER_WAIT_FOR_HOLD,
+        'payload': {'text': text}
+    }
 
 
-def thermocycler_wait_for_temp():
+def thermocycler_wait_for_temp() -> command_types.ThermocyclerWaitForTempCommand:
     text = "Waiting for Thermocycler to reach target"
-    return make_command(
-        name=command_types.THERMOCYCLER_WAIT_FOR_TEMP,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.THERMOCYCLER_WAIT_FOR_TEMP,
+        'payload': {'text': text}
+    }
 
 
-def thermocycler_set_lid_temperature(temperature):
+def thermocycler_set_lid_temperature(
+        temperature: float) -> command_types.ThermocyclerSetLidTempCommand:
     temp = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
     text = f'Setting Thermocycler lid temperature to {temp} °C'
-    return make_command(
-        name=command_types.THERMOCYCLER_SET_LID_TEMP,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.THERMOCYCLER_SET_LID_TEMP,
+        'payload': {'text': text}
+    }
 
 
-def thermocycler_deactivate_lid():
+def thermocycler_deactivate_lid() -> command_types.ThermocyclerDeactivateLidCommand:
     text = "Deactivating Thermocycler lid heating"
-    return make_command(
-        name=command_types.THERMOCYCLER_DEACTIVATE_LID,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.THERMOCYCLER_DEACTIVATE_LID,
+        'payload': {'text': text}
+    }
 
 
-def thermocycler_deactivate_block():
+def thermocycler_deactivate_block() -> command_types.ThermocyclerDeactivateBlockCommand:
     text = "Deactivating Thermocycler well block heating"
-    return make_command(
-        name=command_types.THERMOCYCLER_DEACTIVATE_BLOCK,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.THERMOCYCLER_DEACTIVATE_BLOCK,
+        'payload': {'text': text}
+    }
 
 
-def thermocycler_deactivate():
+def thermocycler_deactivate() -> command_types.ThermocyclerDeactivateCommand:
     text = "Deactivating Thermocycler"
-    return make_command(
-        name=command_types.THERMOCYCLER_DEACTIVATE,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.THERMOCYCLER_DEACTIVATE,
+        'payload': {'text': text}
+    }
 
 
-def thermocycler_wait_for_lid_temp():
+def thermocycler_wait_for_lid_temp() -> command_types.ThermocyclerWaitForLidTempCommand:
     text = "Waiting for Thermocycler lid to reach target temperature"
-    return make_command(
-        name=command_types.THERMOCYCLER_WAIT_FOR_LID_TEMP,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.THERMOCYCLER_WAIT_FOR_LID_TEMP,
+        'payload': {'text': text}
+    }
 
 
-def thermocycler_close():
+def thermocycler_close() -> command_types.ThermocyclerCloseCommand:
     text = "Closing Thermocycler lid"
-    return make_command(
-        name=command_types.THERMOCYCLER_CLOSE,
-        payload={'text': text}
-    )
+    return {
+        'name': command_types.THERMOCYCLER_CLOSE,
+        'payload': {'text': text}
+    }
