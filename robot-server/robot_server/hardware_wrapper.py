@@ -15,7 +15,6 @@ from notify_server.models.payload_type import DoorSwitchEventType
 
 
 class RobotEventTopics(enum.Enum):
-    # SPP: Should this be moved to an 'event_topics.py' file?
     DOOR_EVENT = "hardware.door_event"
 
     def __str__(self):

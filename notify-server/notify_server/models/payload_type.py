@@ -8,6 +8,9 @@ from opentrons.hardware_control.types import DoorState
 class DoorSwitchEventType(BaseModel):
     """Payload type of a Door switch update event."""
 
+    # TODO (SPP,2020-12-02): Add more specific type bindings for pub/subs
+    # so that there is type-level association between a topic and
+    # its associated event(s).
     new_state: DoorState
 
 
