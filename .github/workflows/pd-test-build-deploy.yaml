@@ -84,7 +84,7 @@ jobs:
           make setup-js
       - name: 'test-e2e'
         run: make -C protocol-designer test-e2e
-  build-PD:
+  build-pd:
     name: 'build protocol designer artifact'
     runs-on: 'ubuntu-latest'
     needs: [js-unit-test, e2e-test]
