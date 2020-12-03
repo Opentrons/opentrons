@@ -82,7 +82,6 @@ stages:
         - 0
         - 0
         log_level: !re_match "DEBUG|INFO|WARNING|ERROR"
-        tip_probe: !anylist
         default_pipette_configs:
           homePosition: 220
           maxTravel: 30

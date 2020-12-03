@@ -228,10 +228,10 @@ def build_config(deck_cal: List[List[float]],
 
 
 def config_to_save(
-        config: robot_config) -> List[List[float]]:
-    top = dict(config._asdict())
-    gc = top.pop('gantry_calibration')
-    return gc
+        config: robot_config) -> Tuple[List[List[float]], Dict[str, Any]]:
+    converted_config = dict(config._asdict())
+    gc = converted_config.pop('gantry_calibration')
+    return gc, converted_config
 
 
 def _determine_calibration_to_use(deck_cal_to_check, api_v1):
@@ -278,7 +278,6 @@ def save_deck_calibration(config: robot_config, dc_filename=None, tag=None):
 
 def save_robot_settings(config: robot_config, rs_filename=None, tag=None):
     _, config_dict = config_to_save(config)
-
     # Save everything else in a different file
     rs_filename = rs_filename or CONFIG['robot_settings_file']
     if tag:
