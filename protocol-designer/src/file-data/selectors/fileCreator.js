@@ -23,7 +23,13 @@ import type {
   FileModule,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
-import type { ModuleEntity } from '../../step-forms'
+import type {
+  ModuleEntity,
+  PipetteEntity,
+  LabwareEntities,
+  PipetteEntities,
+} from '../../step-forms'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Selector } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
 import type { Timeline } from '../../step-generation/types'
@@ -38,6 +44,36 @@ const applicationVersion: string = process.env.OT_PD_VERSION || ''
 // it just helps us humans quickly identify what build a user was using
 // when we look at saved protocols (without requiring us to trace thru git logs)
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
+
+// A labware definition is considered "in use" and should be included in
+// the protocol file if it either...
+// 1. is present on the deck in initial deck setup
+// 2. OR is a tiprack def assigned to a pipette, even if it's not on the deck
+export const getLabwareDefinitionsInUse = (
+  labware: LabwareEntities,
+  pipettes: PipetteEntities,
+  allLabwareDefsByURI: LabwareDefByDefURI
+): LabwareDefByDefURI => {
+  const labwareDefURIsOnDeck: Array<string> = Object.keys(labware).map(
+    (labwareId: string) => labware[labwareId].labwareDefURI
+  )
+  const tiprackDefURIsInUse: Array<string> = Object.keys(pipettes)
+    .map(id => pipettes[id])
+    .map((pipetteEntity: PipetteEntity) => pipetteEntity.tiprackDefURI)
+
+  const labwareDefURIsInUse = uniq([
+    ...tiprackDefURIsInUse,
+    ...labwareDefURIsOnDeck,
+  ])
+
+  return labwareDefURIsInUse.reduce<LabwareDefByDefURI>(
+    (acc, labwareDefURI: string) => ({
+      ...acc,
+      [labwareDefURI]: allLabwareDefsByURI[labwareDefURI],
+    }),
+    {}
+  )
+}
 
 // NOTE: V3 commands are a subset of V4 commands.
 // 'airGap' is specified in the V3 schema but was never implemented, so it doesn't count.
@@ -193,18 +229,10 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       stepId => savedStepForms[stepId]
     )
 
-    // exclude definitions that aren't used by any labware in the protocol
-    const labwareDefsInUse = uniq(
-      Object.keys(labware).map(
-        (labwareId: string) => labware[labwareId].definitionId
-      )
-    )
-    const labwareDefinitions = labwareDefsInUse.reduce<typeof labwareDefsByURI>(
-      (acc, labwareDefURI: string) => ({
-        ...acc,
-        [labwareDefURI]: labwareDefsByURI[labwareDefURI],
-      }),
-      {}
+    const labwareDefinitions = getLabwareDefinitionsInUse(
+      labwareEntities,
+      pipetteEntities,
+      labwareDefsByURI
     )
 
     const commands: Array<Command> = flatMap(
