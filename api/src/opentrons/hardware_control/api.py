@@ -1751,68 +1751,6 @@ class API(HardwareAPILike):
             self._log.info(f"Module {name} discovered and attached"
                            f" at port {port}, new_instance: {new_instance}")
 
-    async def locate_tip_probe_center(
-            self, mount, tip_length=None):
-        """ Use the specified mount (which should have a tip) to find the
-        position of the tip probe target center relative to its definition
-
-        :param mount: The mount to use for the probe
-        :param tip_length: If specified (it should usually be specified),
-                           the length of the tip assumed to be attached.
-
-        The tip length specification is for the use case during protocol
-        calibration, when the machine cannot yet pick up a tip on its own.
-        For that reason, it is not universally necessary. Instead, there
-        are several cases:
-
-        1. A tip has previously been picked up with :py:meth:`pick_up_tip`.
-           ``tip_length`` should not be specified since the tip length is
-           known. If ``tip_length`` is not ``None``, this function asserts.
-        2. A tip has not previously been picked up, and ``tip_length`` is
-           specified. The pipette will internally have a tip added of the
-           specified length.
-        3. A tip has not previously been picked up, and ``tip_length`` is
-           not specified. The pipette will use the tip length from its
-           config.
-
-        The return value is a dict containing the updated position, in deck
-        coordinates, of the tip probe center.
-        """
-        self._log.info("This function is deprecated."
-                       "Please use the Opentrons App to calibrate"
-                       "your tip length.")
-
-    async def update_instrument_offset(self, mount, offset: top_types.Point):
-        """ Update the instrument offset for a pipette on the specified mount.
-
-        This will update both the stored value in the robot settings and
-        the live value in the currently-loaded pipette.
-
-        If you just want to change the live value for the currently-attached
-        instrument without saving it, use :py:meth:`.set_instrument_offset`.
-
-        This can be specified by using the offset arg.
-
-        :note: Z differences in the instrument offset cannot be
-               disambiguated between differences in the position of the
-               nozzle and differences in the length of the nozzle/tip
-               interface (assuming that tips are of reasonably uniform
-               length). For this reason, they are saved as adjustments
-               to the nozzle interface length and only applied when a
-               tip is present.
-        """
-        opt_pip = self._attached_instruments[mount]
-        assert opt_pip, '{} has no pipette'.format(mount.name.lower())
-        pip = opt_pip
-        inst_offs = self._config.instrument_offset
-        pip_type = 'multi' if pip.config.channels > 1 else 'single'
-        inst_offs[mount.name.lower()][pip_type] = [offset.x,
-                                                   offset.y,
-                                                   offset.z]
-        await self.update_config(instrument_offset=inst_offs)
-        self.set_instrument_offset(mount, offset)
-        robot_configs.save_robot_settings(self._config)
-
     def get_instrument_max_height(
             self,
             mount: top_types.Mount,

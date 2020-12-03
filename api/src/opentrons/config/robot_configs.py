@@ -5,10 +5,10 @@ import os
 
 from numpy import array, array_equal  # type: ignore
 from opentrons.util import linal
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Tuple
 
 from opentrons import config
-from opentrons.config import CONFIG, feature_flags as fflags
+from opentrons.config import CONFIG
 
 log = logging.getLogger(__name__)
 
@@ -122,12 +122,7 @@ DEFAULT_GANTRY_STEPS_PER_MM: Dict[str, float] = {
 }
 
 DEFAULT_STEPS_PER_MM = 'M92 X80.00 Y80.00 Z400 A400 B768 C768'
-# This probe height is ~73 from deck to the top surface of the switch body
-# per CAD; 74.3mm is the nominal for engagement from the switch drawing.
-# Note that this has a piece-to-piece tolerance stackup of +-1.5mm
-# Switch drawing: https://www.mouser.com/datasheet/2/307/en-d2f-587403.pdf
-# model no D2F-01L
-DEFAULT_PROBE_HEIGHT = 74.3
+
 DEFAULT_MOUNT_OFFSET = [-34, 0, 0]
 DEFAULT_INST_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
@@ -157,35 +152,6 @@ robot_config = namedtuple(
         'left_mount_offset'
     ]
 )
-
-
-def _default_probe_center():
-    if fflags.short_fixed_trash():
-        probe_height = 55.0
-    else:
-        probe_height = DEFAULT_PROBE_HEIGHT
-    return [293.03, 301.27, probe_height]
-
-
-def _default_probe_dimensions():
-    if fflags.short_fixed_trash():
-        probe_height = 55.0
-    else:
-        probe_height = DEFAULT_PROBE_HEIGHT
-    return [35.0, 40.0, probe_height + 5.0]
-
-
-def build_fallback_instrument_offset(robot_settings: dict) -> dict:
-    # because `instrument_offset` is a dict of dicts, we must loop through it
-    # and replace empty values with the default offset
-    inst_offs: dict = {'right': {}, 'left': {}}
-    pip_types = ['single', 'multi']
-    prev_instrument_offset = robot_settings.get('instrument_offset', {})
-    for mount in inst_offs.keys():
-        mount_dict = prev_instrument_offset.get(mount, {})
-        for typ in pip_types:
-            inst_offs[mount][typ] = mount_dict.get(typ, DEFAULT_INST_OFFSET)
-    return inst_offs
 
 
 def _build_conf_dict(
