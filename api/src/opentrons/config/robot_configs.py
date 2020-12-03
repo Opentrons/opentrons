@@ -5,33 +5,14 @@ import os
 
 from numpy import array, array_equal  # type: ignore
 from opentrons.util import linal
-from typing import Any, Dict, List, NamedTuple, Tuple, Union
+from typing import Any, Dict, List, Union, Tuple
 
 from opentrons import config
-from opentrons.config import CONFIG, feature_flags as fflags
+from opentrons.config import CONFIG
 
 log = logging.getLogger(__name__)
 
 ROBOT_CONFIG_VERSION = 3
-
-TIP_PROBE_BOUNCE_DISTANCE = 5.0
-
-# The X and Y switch offsets are to position relative to the *opposite* axes
-# during calibration, to make the tip hit the raised end of the switch plate,
-# which requires less pressure to activate. E.g.: when probing in the x
-# direction, the tip will be moved by X_SWITCH_OFFSET in the y axis, and when
-# probing in y, it will be adjusted by the Y_SWITCH_OFFSET in the x axis.
-# When probing in z, it will be adjusted by the Z_SWITCH_OFFSET in the y axis.
-
-TIP_PROBE_X_SWITCH_OFFSET = 2.0
-TIP_PROBE_Y_SWITCH_OFFSET = 5.0
-TIP_PROBE_Z_SWITCH_OFFSET = 5.0
-TIP_PROBE_SWITCH_CLEARANCE = 7.5
-
-TIP_PROBE_Z_CLEARANCE_NORMAL = 5.0
-TIP_PROBE_Z_CLEARANCE_DECK = 5.0
-TIP_PROBE_Z_CLEARANCE_START = 20
-TIP_PROBE_Z_CLEARANCE_CROSSOVER = 35
 
 PLUNGER_CURRENT_LOW = 0.05
 PLUNGER_CURRENT_HIGH = 0.05
@@ -141,40 +122,13 @@ DEFAULT_GANTRY_STEPS_PER_MM: Dict[str, float] = {
 }
 
 DEFAULT_STEPS_PER_MM = 'M92 X80.00 Y80.00 Z400 A400 B768 C768'
-# This probe height is ~73 from deck to the top surface of the switch body
-# per CAD; 74.3mm is the nominal for engagement from the switch drawing.
-# Note that this has a piece-to-piece tolerance stackup of +-1.5mm
-# Switch drawing: https://www.mouser.com/datasheet/2/307/en-d2f-587403.pdf
-# model no D2F-01L
-DEFAULT_PROBE_HEIGHT = 74.3
+
 DEFAULT_MOUNT_OFFSET = [-34, 0, 0]
 DEFAULT_INST_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 SERIAL_SPEED = 115200
 DEFAULT_TIP_LENGTH_DICT = {'Pipette': 51.7}
 DEFAULT_LOG_LEVEL = 'INFO'
-
-tip_probe_z_clearance = namedtuple(
-    'tip_probe_z_clearance',
-    [
-        'normal',
-        'deck',
-        'crossover',
-        'start'
-    ]
-)
-
-tip_probe_config = namedtuple(
-    'tip_probe_config',
-    [
-        'bounce_distance',
-        'switch_offset',
-        'switch_clearance',
-        'z_clearance',
-        'center',
-        'dimensions'
-    ]
-)
 
 robot_config = namedtuple(
     'robot_config',
@@ -193,74 +147,11 @@ robot_config = namedtuple(
         'default_max_speed',
         'mount_offset',
         'log_level',
-        'tip_probe',
         'default_pipette_configs',
         'z_retract_distance',
         'left_mount_offset'
     ]
 )
-
-
-def _default_probe_center():
-    if fflags.short_fixed_trash():
-        probe_height = 55.0
-    else:
-        probe_height = DEFAULT_PROBE_HEIGHT
-    return [293.03, 301.27, probe_height]
-
-
-def _default_probe_dimensions():
-    if fflags.short_fixed_trash():
-        probe_height = 55.0
-    else:
-        probe_height = DEFAULT_PROBE_HEIGHT
-    return [35.0, 40.0, probe_height + 5.0]
-
-
-def _ensure_tip_probe_offsets(maybe_offsets):
-    if not isinstance(maybe_offsets, list) or len(maybe_offsets) != 3:
-        return [TIP_PROBE_X_SWITCH_OFFSET,
-                TIP_PROBE_Y_SWITCH_OFFSET,
-                TIP_PROBE_Z_SWITCH_OFFSET]
-    else:
-        return maybe_offsets
-
-
-def _build_z_clearance(z_clearance: dict) -> tip_probe_z_clearance:
-    return tip_probe_z_clearance(
-        normal=z_clearance.get('normal', TIP_PROBE_Z_CLEARANCE_NORMAL),
-        deck=z_clearance.get('deck', TIP_PROBE_Z_CLEARANCE_DECK),
-        crossover=z_clearance.get('crossover',
-                                  TIP_PROBE_Z_CLEARANCE_CROSSOVER),
-        start=z_clearance.get('start',
-                              TIP_PROBE_Z_CLEARANCE_START)
-    )
-
-
-def _tip_probe_settings_with_migration(full_settings):
-    new_tp = full_settings.get('tip_probe', {})
-    old_tp = full_settings.get('probe_center', {})
-    if old_tp:
-        new_tp['center'] = old_tp
-    elif 'center' not in new_tp:
-        new_tp['center'] = _default_probe_center()
-    return new_tp
-
-
-def _build_tip_probe(tip_probe_settings: dict) -> tip_probe_config:
-    return tip_probe_config(
-        bounce_distance=tip_probe_settings.get('bounce_distance',
-                                               TIP_PROBE_BOUNCE_DISTANCE),
-        switch_offset=_ensure_tip_probe_offsets(tip_probe_settings.get(
-            'switch_offset', [])),
-        switch_clearance=tip_probe_settings.get('switch_clearance',
-                                                TIP_PROBE_SWITCH_CLEARANCE),
-        z_clearance=_build_z_clearance(tip_probe_settings.get('z_clearance',
-                                                              {})),
-        center=tip_probe_settings.get('center', _default_probe_center()),
-        dimensions=tip_probe_settings.get('dimensions',
-                                          _default_probe_dimensions())
-    )
 
 
 def _build_conf_dict(
@@ -292,8 +183,6 @@ def build_config(deck_cal: List[List[float]],
         default_max_speed=robot_settings.get(
             'default_max_speed', DEFAULT_MAX_SPEEDS),
         log_level=robot_settings.get('log_level', DEFAULT_LOG_LEVEL),
-        tip_probe=_build_tip_probe(
-            _tip_probe_settings_with_migration(robot_settings)),
         default_pipette_configs=robot_settings.get(
             'default_pipette_configs', DEFAULT_PIPETTE_CONFIGS),
         z_retract_distance=robot_settings.get(
@@ -306,12 +195,9 @@ def build_config(deck_cal: List[List[float]],
 
 def config_to_save(
         config: robot_config) -> Tuple[List[List[float]], Dict[str, Any]]:
-    top = dict(config._asdict())
-    top['tip_probe'] = dict(top['tip_probe']._asdict())
-    top['tip_probe']['z_clearance'] = dict(
-        top['tip_probe']['z_clearance']._asdict())
-    gc = top.pop('gantry_calibration')
-    return gc, top
+    converted_config = dict(config._asdict())
+    gc = converted_config.pop('gantry_calibration')
+    return gc, converted_config
 
 
 def _determine_calibration_to_use(deck_cal_to_check, api_v1):
@@ -358,7 +244,6 @@ def save_deck_calibration(config: robot_config, dc_filename=None, tag=None):
 
 def save_robot_settings(config: robot_config, rs_filename=None, tag=None):
     _, config_dict = config_to_save(config)
-
     # Save everything else in a different file
     rs_filename = rs_filename or CONFIG['robot_settings_file']
     if tag:
@@ -414,69 +299,3 @@ def _save_json(data, filename):
         return data
     except OSError:
         log.exception('Write failed with exception:')
-
-
-class HotSpot(NamedTuple):
-    axis: str
-    x_start_offs: float
-    y_start_offs: float
-    z_start_abs: float
-    probe_distance: float
-
-
-def calculate_tip_probe_hotspots(
-        tip_length: float,
-        tip_probe_settings: tip_probe_config)\
-        -> List[HotSpot]:
-    """
-    Generate a list of tuples describing motions for doing the xy part of
-    tip probe based on the config's description of the tip probe box.
-    """
-    # probe_dimensions is the external bounding box of the probe unit
-    size_x, size_y, size_z = tip_probe_settings.dimensions
-
-    rel_x_start = (size_x / 2) + tip_probe_settings.switch_clearance
-    rel_y_start = (size_y / 2) + tip_probe_settings.switch_clearance
-
-    # Ensure that the nozzle will clear the probe unit and tip will clear deck
-    nozzle_safe_z = round((size_z - tip_length)
-                          + tip_probe_settings.z_clearance.normal, 3)
-
-    z_start = max(tip_probe_settings.z_clearance.deck, nozzle_safe_z)
-    switch_offset = tip_probe_settings.switch_offset
-    # Each list item defines axis we are probing for, starting position vector
-    # and travel distance
-    neg_x = HotSpot('x',
-                    -rel_x_start,
-                    switch_offset[0],
-                    z_start,
-                    size_x)
-    pos_x = HotSpot('x',
-                    rel_x_start,
-                    switch_offset[0],
-                    z_start,
-                    -size_x)
-    neg_y = HotSpot('y',
-                    switch_offset[1],
-                    -rel_y_start,
-                    z_start,
-                    size_y)
-    pos_y = HotSpot('y',
-                    switch_offset[1],
-                    rel_y_start,
-                    z_start,
-                    -size_y)
-    z = HotSpot(
-        'z',
-        0,
-        switch_offset[2],
-        tip_probe_settings.center[2] + tip_probe_settings.z_clearance.start,
-        -size_z)
-
-    return [
-        neg_x,
-        pos_x,
-        neg_y,
-        pos_y,
-        z
-    ]

@@ -2,99 +2,11 @@ import pytest
 from unittest import mock
 from functools import partial
 from tests.opentrons.conftest import state
-from opentrons.config import robot_configs
-from opentrons.protocol_api import labware
-from opentrons.api import models
-from opentrons.types import Point, Location, Mount
+from opentrons.types import Point, Mount
 from opentrons.hardware_control import CriticalPoint, API
 from opentrons.hardware_control.types import MotionChecks
 
 state = partial(state, 'calibration')
-
-
-@pytest.mark.api2_only  # noqa(C901)
-async def test_tip_probe_v2(main_router, model, monkeypatch):
-
-    def fake_move(instrument):
-        assert instrument == model.instrument
-
-    monkeypatch.setattr(main_router.calibration_manager,
-                        '_move_to_front', fake_move)
-
-    tr = labware.load('opentrons_96_tiprack_300ul', Location(Point(), 'test'))
-
-    model.instrument.tip_racks = [
-        models.Container(tr,
-                         [model.instrument._instrument],
-                         model.instrument._context)]
-
-    def new_fake_locate(self, mount, tip_length):
-        assert tip_length == pytest.approx(59.3 - 7.47)
-        return Point(0, 0, 0)
-
-    monkeypatch.setattr(API, 'locate_tip_probe_center', new_fake_locate)
-    main_router.calibration_manager.tip_probe(model.instrument)
-    await main_router.wait_until(state('ready'))
-
-    def new_fake_locate2(self, mount, tip_length):
-        assert tip_length == pytest.approx(59.3 - 7.47)
-        return Point(0, 0, 0)
-
-    monkeypatch.setattr(API, 'locate_tip_probe_center', new_fake_locate2)
-    main_router.calibration_manager.tip_probe(model.instrument)
-
-
-async def test_correct_hotspots():
-    config = robot_configs.build_config([], {})
-
-    tip_length = 47
-    switch_clearance = 7.5
-    x_switch_offset = 2.0
-    y_switch_offset = 5.0
-    z_switch_offset = 5.0
-    deck_clearance = 5.0
-    z_probe_clearance = 5.0
-    z_start_clearance = 20.0
-
-    size_x, size_y, size_z = config.tip_probe.dimensions
-
-    rel_x_start = (size_x / 2) + switch_clearance
-    rel_y_start = (size_y / 2) + switch_clearance
-    center = [293.03, 301.27, 74.3]
-
-    nozzle_safe_z = round((size_z - tip_length) + z_probe_clearance, 3)
-    z_start = max(deck_clearance, nozzle_safe_z)
-    expected = [robot_configs.HotSpot('x',
-                                      -rel_x_start,
-                                      x_switch_offset,
-                                      z_start,
-                                      size_x),
-                robot_configs.HotSpot('x',
-                                      rel_x_start,
-                                      x_switch_offset,
-                                      z_start,
-                                      -size_x),
-                robot_configs.HotSpot('y',
-                                      y_switch_offset,
-                                      -rel_y_start,
-                                      z_start,
-                                      size_y),
-                robot_configs.HotSpot('y',
-                                      y_switch_offset,
-                                      rel_y_start,
-                                      z_start,
-                                      -size_y),
-                robot_configs.HotSpot('z',
-                                      0,
-                                      z_switch_offset,
-                                      center[2] + z_start_clearance,
-                                      -size_z)]
-
-    actual = robot_configs.calculate_tip_probe_hotspots(
-        tip_length,
-        config.tip_probe)
-
-    assert expected == actual
 
 
 @pytest.mark.api2_only
