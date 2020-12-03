@@ -2,20 +2,28 @@
 from typing import Union
 from pydantic import BaseModel
 from notify_server.models.sample_events import SampleOne, SampleTwo
-from opentrons.hardware_control.types import DoorState
+from opentrons.hardware_control.types import HardwareEvent
 
 
-class DoorSwitchEventType(BaseModel):
-    """Payload type of a Door switch update event."""
+class HardwareEventPayload(BaseModel):
+    """Payload for events originating in hardware.
 
-    # TODO (SPP,2020-12-02): Add more specific type bindings for pub/subs
-    # so that there is type-level association between a topic and
-    # its associated event(s).
-    new_state: DoorState
+    Includes door event,..
+    """
+
+    val: HardwareEvent
+
+    class Config:
+        """Allow use of arbitrary types.
+
+        Needed for DoorStateNotification dataclass.
+        """
+
+        arbitrary_types_allowed = True
 
 
 PayloadType = Union[
     SampleOne,
     SampleTwo,
-    DoorSwitchEventType,
+    HardwareEventPayload,
 ]
