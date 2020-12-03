@@ -41,7 +41,8 @@ const UPDATE_RECHECK_DELAY_MS = 60000
 
 export function InformationCard(props: InformationCardProps): React.Node {
   const { robot, updateUrl } = props
-  const { t } = useTranslation()
+  const { t } = useTranslation(['robot_info', 'shared'])
+
   const [updateBtnProps, updateBtnTooltipProps] = useHoverTooltip()
   const { autoUpdateAction, autoUpdateDisabledReason } = useSelector(
     (state: State) => {
@@ -55,7 +56,7 @@ export function InformationCard(props: InformationCardProps): React.Node {
   ])
 
   const { displayName } = robot
-  const unknown = t('robot_settings.unknown')
+  const unknown = t('shared:unknown')
   const version = getRobotApiVersion(robot)
   const firmwareVersion = getRobotFirmwareVersion(robot)
   const protocolApiVersions = getRobotProtocolApiVersion(robot)
@@ -69,29 +70,26 @@ export function InformationCard(props: InformationCardProps): React.Node {
   useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
 
   return (
-    <Card title={t('robot_settings.info.title')}>
+    <Card title={t('title')}>
       <Flex alignItems={ALIGN_FLEX_START} padding={SPACING_3}>
         <Box marginRight={SPACING_3}>
           <Box marginBottom={SPACING_3}>
-            <LabeledValue
-              label={`${t('robot_settings.info.robot_name')}:`}
-              value={displayName}
-            />
+            <LabeledValue label={`${t('robot_name')}:`} value={displayName} />
           </Box>
           <LabeledValue
-            label={`${t('robot_settings.info.firmware_version')}:`}
+            label={`${t('firmware_version')}:`}
             value={firmwareVersion || unknown}
           />
         </Box>
         <Box marginRight={SPACING_AUTO}>
           <Box marginBottom={SPACING_3}>
             <LabeledValue
-              label={`${t('robot_settings.info.server_version')}:`}
+              label={`${t('server_version')}:`}
               value={version || unknown}
             />
           </Box>
           <LabeledValue
-            label={`${t('robot_settings.info.supported_api_versions')}:`}
+            label={`${t('supported_api_versions')}:`}
             value={API_VERSION_DISPLAY}
           />
         </Box>

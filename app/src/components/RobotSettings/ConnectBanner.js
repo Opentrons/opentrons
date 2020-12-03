@@ -10,7 +10,7 @@ type Props = Robot
 export function ConnectBanner(props: Props): React.Node {
   const { displayName, connected } = props
 
-  const { t } = useTranslation()
+  const { t } = useTranslation('robot_connection')
   const [dismissed, setDismissed] = React.useState(false)
 
   const isVisible = connected && !dismissed
@@ -20,7 +20,7 @@ export function ConnectBanner(props: Props): React.Node {
     <AlertItem
       type="success"
       onCloseClick={() => setDismissed(true)}
-      title={t('robot_settings.connection.success_banner', {
+      title={t('success_banner', {
         robot: displayName,
       })}
     />

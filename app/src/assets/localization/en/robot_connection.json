@@ -1,0 +1,23 @@
+{
+  "connect": "connect",
+  "disconnect": "disconnect",
+  "success_banner": "{{robot}} successfully connected",
+  "connected_description": "Your app is currently connected to your robot via {{type}} at IP address {{ip}}",
+  "connection_label": "this robot is currently",
+  "connection_status_default": "idle",
+  "connection_status_disconnected":"unknown - connect to view status",
+  "connection_status_not_connectable": "not connectable",
+  "connection_title": "status",
+  "disconnected_description": "Your app is trying to connect to your robot via {{type}} at IP address {{ip}}",
+  "internet_status_full": "<bold>Internet:</bold> The robot is connected to a network and has full access to the Internet.",
+  "internet_status_limited": "<bold>Internet:</bold> The  robot is connected to a network, but it has no access to the Internet.",
+  "internet_status_none": "<bold>Internet:</bold> The robot is not connected to any network.",
+  "internet_status_portal": "<bold>Internet:</bold> The robot is behind a captive portal and cannot reach the full Internet.",
+  "internet_status_unknown": "<bold>Internet:</bold> Unknown",
+  "ip": "<bold>{{type}} IP:</bold> {{ip}}",
+  "mac": "<bold>{{type}} MAC Address:</bold> {{mac}}",
+  "subnet": "<bold>{{type}} Subnet Mask:</bold> {{subnet}}",
+  "title": "connectivity",
+  "wired": "wired",
+  "wireless": "wireless"
+}

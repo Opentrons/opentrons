@@ -29,7 +29,7 @@ type Props = {| robot: ViewableRobot |}
 export function StatusCard(props: Props): React.Node {
   const { robot } = props
   const dispatch = useDispatch<Dispatch>()
-  const { t } = useTranslation()
+  const { t } = useTranslation('robot_connection')
 
   const connectable = robot.status === CONNECTABLE
   const connected = robot.connected != null && robot.connected === true
@@ -37,11 +37,11 @@ export function StatusCard(props: Props): React.Node {
   const connectRequest = useSelector(robotSelectors.getConnectRequest)
   const connectButtonDisabled = !connectable || connectRequest.inProgress
 
-  let status = t('robot_settings.status.default')
+  let status = t('connection_status', { context: 'default' })
   if (!connectable) {
-    status = t('robot_settings.status.not_connectable')
+    status = t('connection_status', { context: 'not_connectable' })
   } else if (!connected) {
-    status = t('robot_settings.status.disconnected')
+    status = t('connection_status', { context: 'disconnected' })
   } else if (sessionStatus) {
     status = sessionStatus
   }
@@ -55,20 +55,20 @@ export function StatusCard(props: Props): React.Node {
   }
 
   return (
-    <Card title={t('robot_settings.status.title')}>
+    <Card title={t('connection_title')}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
         <LabeledValue
-          label={t('robot_settings.status.label')}
+          label={t('connection_label')}
           value={status}
           valueProps={{ textTransform: TEXT_TRANSFORM_CAPITALIZE }}
         />
         <SecondaryBtn onClick={handleClick} disabled={connectButtonDisabled}>
           {connected ? (
-            t('robot_settings.disconnect')
+            t('disconnect')
           ) : connectRequest.name === robot.name ? (
             <Icon name="ot-spinner" height="1em" spin />
           ) : (
-            t('robot_settings.connect')
+            t('connect')
           )}
         </SecondaryBtn>
       </Flex>

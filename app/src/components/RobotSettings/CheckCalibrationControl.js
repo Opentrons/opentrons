@@ -39,7 +39,7 @@ export function CheckCalibrationControl({
   robotName,
   disabledReason,
 }: CheckCalibrationControlProps): React.Node {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['robot_calibration', 'shared'])
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const trackedRequestId = React.useRef<string | null>(null)
@@ -136,15 +136,15 @@ export function CheckCalibrationControl({
   const buttonChildren = showSpinner ? (
     <Icon name="ot-spinner" height="1em" spin />
   ) : (
-    t('robot_settings.calibration.health_check_button')
+    t('health_check_button')
   )
 
   return (
     <>
       <TitledControl
         borderBottom={BORDER_SOLID_LIGHT}
-        title={t('robot_settings.calibration.health_check_title')}
-        description={t('robot_settings.calibration.health_check_description')}
+        title={t('health_check_title')}
+        description={t('health_check_description')}
         control={
           <SecondaryBtn
             {...targetProps}
@@ -164,18 +164,18 @@ export function CheckCalibrationControl({
         {showCalBlockModal ? (
           <AskForCalibrationBlockModal
             onResponse={handleStart}
-            titleBarTitle={t('robot_settings.calibration.health_check_title')}
+            titleBarTitle={t('health_check_title')}
             closePrompt={() => setShowCalBlockModal(false)}
           />
         ) : null}
         {createStatus === RobotApi.PENDING ? (
           <SpinnerModalPage
             titleBar={{
-              title: t('robot_settings.calibration.health_check_title'),
+              title: t('health_check_title'),
               back: {
                 disabled: true,
-                title: t('button.exit'),
-                children: t('button.exit'),
+                title: t('shared:exit'),
+                children: t('shared:exit'),
               },
             }}
           />

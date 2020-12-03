@@ -1,0 +1,20 @@
+{
+  "attached_pipettes": "",
+  "calibrate_deck": "calibrate deck",
+  "deck_calibration_description": "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots.",
+  "deck_calibration_error_occured": "An error occurred while trying to start deck calibration",
+  "deck_calibration_failure": "Failed to start deck calibration",
+  "deck_calibration_missing": "You haven't calibrated the deck yet",
+  "deck_calibration_redo": "recalibrate deck",
+  "deck_calibration_spinner": "Deck calibration is {{ongoing_action}}",
+  "download_calibration": "",
+  "health_check_button": "",
+  "health_check_description": "",
+  "health_check_title": "",
+  "last_calibrated": "Last calibrated",
+  "last_migrated": "",
+  "manage_pipettes": "",
+  "pipette_offset_description": "",
+  "title": "",
+  "unknown_custom_tiprack": ""
+}

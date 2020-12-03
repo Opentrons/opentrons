@@ -21,7 +21,7 @@ export type OpenJupyterControlProps = {|
 
 export function OpenJupyterControl(props: OpenJupyterControlProps): React.Node {
   const { robotIp } = props
-  const { t } = useTranslation()
+  const { t } = useTranslation(['robot_advanced_settings', 'shared'])
   const href = `http://${robotIp}:48888`
   const trackEvent = useTrackEvent()
 
@@ -32,10 +32,11 @@ export function OpenJupyterControl(props: OpenJupyterControlProps): React.Node {
       padding={SPACING_3}
     >
       <LabeledValue
-        label={t('robot_settings.advanced.open_jupyter_label')}
+        label={t('open_jupyter_label')}
         value={
           <Trans
-            i18nKey="robot_settings.advanced.open_jupyter_description"
+            t={t}
+            i18nKey="open_jupyter_description"
             components={{
               jn: <Link external href="https://jupyter.org/" />,
               docs: (
@@ -55,7 +56,7 @@ export function OpenJupyterControl(props: OpenJupyterControlProps): React.Node {
         width="9rem"
         external
       >
-        {t('button.open')}
+        {t('shared:open')}
       </SecondaryBtn>
     </Flex>
   )

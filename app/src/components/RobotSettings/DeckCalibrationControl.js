@@ -65,7 +65,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
     pipOffsetDataPresent,
   } = props
 
-  const { t } = useTranslation()
+  const { t } = useTranslation(['robot_calibration', 'shared'])
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
 
@@ -156,47 +156,45 @@ export function DeckCalibrationControl(props: Props): React.Node {
     status: DeckCalibrationStatus
   ) => string = (data, status) => {
     if (status === Calibration.DECK_CAL_STATUS_IDENTITY) {
-      return t('robot_settings.calibration.deck_calibration_missing')
+      return t('deck_calibration_missing')
     }
     const datestring =
       typeof data.lastModified === 'string'
         ? formatLastModified(data.lastModified)
-        : t('robot_settings.unknown')
+        : t('shared:unknown')
     const getPrefix = calData =>
       typeof data?.source === 'string'
         ? calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
-          ? t('robot_settings.calibration.last_migrated')
-          : t('robot_settings.calibration.last_calibrated')
-        : t('robot_settings.calibration.last_calibrated')
+          ? t('last_migrated')
+          : t('last_calibrated')
+        : t('last_calibrated')
 
     return `${getPrefix(data)}: ${datestring}`
   }
 
   const disabledOrBusyReason = showSpinner
-    ? t('robot_settings.calibration.deck_calibration_spinner', {
+    ? t('deck_calibration_spinner', {
         ongoing_action:
           createStatus === RobotApi.PENDING
-            ? t('robot_settings.starting')
-            : t('robot_settings.ending'),
+            ? t('shared:starting')
+            : t('shared:ending'),
       })
     : disabledReason
 
   const buttonText =
     deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
-      ? t('robot_settings.calibration.deck_calibration_redo')
-      : t('robot_settings.calibration.calibrate_deck')
+      ? t('deck_calibration_redo')
+      : t('calibrate_deck')
 
   return (
     <>
       <TitledControl
         borderBottom={BORDER_SOLID_LIGHT}
-        title={t('robot_settings.calibration.calibrate_deck')}
+        title={t('calibrate_deck')}
         description={
           <>
             <InlineCalibrationWarning warningType={warningType} />
-            <Text>
-              {t('robot_settings.calibration.deck_calibration_description')}
-            </Text>
+            <Text>{t('deck_calibration_description')}</Text>
             {deckCalData && deckCalStatus && (
               <Text marginTop={SPACING_4} fontStyle={FONT_STYLE_ITALIC}>
                 {buildDeckLastCalibrated(deckCalData, deckCalStatus)}
@@ -240,10 +238,10 @@ export function DeckCalibrationControl(props: Props): React.Node {
         {createStatus === RobotApi.FAILURE && (
           <AlertModal
             alertOverlay
-            heading={t('robot_settings.calibration.deck_calibration_failure')}
+            heading={t('deck_calibration_failure')}
             buttons={[
               {
-                children: t('button.ok'),
+                children: t('shared:ok'),
                 onClick: () => {
                   createRequestId.current &&
                     dispatch(RobotApi.dismissRequest(createRequestId.current))
@@ -252,9 +250,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
               },
             ]}
           >
-            <Text>
-              {t('robot_settings.calibration.deck_calibration_error_occured')}
-            </Text>
+            <Text>{t('deck_calibration_error_occured')}</Text>
             <Text>
               {createRequest?.error &&
                 RobotApi.getErrorResponseMessage(createRequest.error)}

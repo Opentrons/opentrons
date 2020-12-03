@@ -20,7 +20,18 @@ module.exports = {
       ],
     },
   },
-  plugins: ['@babel/plugin-proposal-class-properties'],
+  plugins: [
+    '@babel/plugin-proposal-class-properties',
+    [
+      'i18next-extract',
+      {
+        outputPath: (locale, namespace) =>
+          `src/assets/localization/${locale}/${namespace}.json`,
+        defaultNS: 'shared',
+        discardOldKeys: true,
+      },
+    ],
+  ],
   presets: [
     '@babel/preset-flow',
     '@babel/preset-react',

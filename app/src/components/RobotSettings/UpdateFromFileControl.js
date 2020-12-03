@@ -38,7 +38,7 @@ export function UpdateFromFileControl(
   props: UpdateFromFileControlProps
 ): React.Node {
   const { robotName } = props
-  const { t } = useTranslation()
+  const { t } = useTranslation(['robot_advanced_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robotName)
@@ -64,10 +64,11 @@ export function UpdateFromFileControl(
       padding={SPACING_3}
     >
       <LabeledValue
-        label={t('robot_settings.advanced.update_from_file_label')}
+        label={t('update_from_file_label')}
         value={
           <Trans
-            i18nKey="robot_settings.advanced.update_from_file_description"
+            t={t}
+            i18nKey="update_from_file_description"
             components={{
               a: <Link external href="https://www.opentrons.com/ot-app/" />,
             }}
@@ -80,7 +81,7 @@ export function UpdateFromFileControl(
         className={cx({ disabled: updateDisabled })}
         {...updateBtnProps}
       >
-        {t('button.browse')}
+        {t('shared:browse')}
         <input
           type="file"
           onChange={handleChange}

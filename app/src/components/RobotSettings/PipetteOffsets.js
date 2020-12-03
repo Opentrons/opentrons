@@ -34,7 +34,7 @@ export function PipetteOffsets(props: Props): React.Node {
   const { pipettesPageUrl, robot } = props
   const { name: robotName } = robot
 
-  const { t } = useTranslation()
+  const { t } = useTranslation('robot_calibration')
   const attachedPipettes = useSelector((state: State) => {
     return Pipettes.getAttachedPipettes(state, robotName)
   })
@@ -51,11 +51,11 @@ export function PipetteOffsets(props: Props): React.Node {
     <TitledControl
       padding={SPACING_3}
       borderBottom={BORDER_SOLID_LIGHT}
-      title={t('robot_settings.calibration.attached_pipettes')}
-      description={t('robot_settings.calibration.pipette_offset_description')}
+      title={t('attached_pipettes')}
+      description={t('pipette_offset_description')}
       control={
         <SecondaryBtn as={RRDLink} to={pipettesPageUrl}>
-          {t('robot_settings.calibration.manage_pipettes')}
+          {t('manage_pipettes')}
         </SecondaryBtn>
       }
     >

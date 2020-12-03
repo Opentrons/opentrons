@@ -39,7 +39,7 @@ type Props = {|
 |}
 
 export function ControlsCard(props: Props): React.Node {
-  const { t } = useTranslation()
+  const { t } = useTranslation('robot_controls')
   const dispatch = useDispatch<Dispatch>()
   const { robot } = props
   const { name: robotName, status } = robot
@@ -64,42 +64,39 @@ export function ControlsCard(props: Props): React.Node {
   const buttonDisabled = Boolean(buttonDisabledReason)
 
   return (
-    <Card title={t('robot_settings.controls.title')}>
+    <Card title={t('title')}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
-        <LabeledValue
-          label={t('robot_settings.controls.home_label')}
-          value={t('robot_settings.controls.home_description')}
-        />
+        <LabeledValue label={t('home_label')} value={t('home_description')} />
         <SecondaryBtn
           onClick={() => dispatch(home(robotName, ROBOT))}
           disabled={buttonDisabled}
           width={SIZE_4}
         >
-          {t('robot_settings.controls.home_button')}
+          {t('home_button')}
         </SecondaryBtn>
       </Flex>
       <Divider />
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
         <LabeledValue
-          label={t('robot_settings.controls.restart_label')}
-          value={t('robot_settings.controls.restart_description')}
+          label={t('restart_label')}
+          value={t('restart_description')}
         />
         <SecondaryBtn
           onClick={() => dispatch(restartRobot(robotName))}
           disabled={buttonDisabled}
           width={SIZE_4}
         >
-          {t('robot_settings.controls.restart_button')}
+          {t('restart_button')}
         </SecondaryBtn>
       </Flex>
       <Divider />
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
         <LabeledValue
-          label={t('robot_settings.controls.lights_label')}
-          value={t('robot_settings.controls.lights_description')}
+          label={t('lights_label')}
+          value={t('lights_description')}
         />
         <ToggleBtn
-          label={t('robot_settings.controls.lights_label')}
+          label={t('lights_label')}
           toggledOn={Boolean(lightsOn)}
           onClick={toggleLights}
           disabled={buttonDisabled}

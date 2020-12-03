@@ -48,7 +48,7 @@ export function AdvancedSettingsCard(
 ): React.Node {
   const { robot, resetUrl } = props
   const { name, ip, health, status } = robot
-  const { t } = useTranslation()
+  const { t } = useTranslation('robot_advanced_settings')
   const settings = useSelector<State, RobotSettings>(state =>
     getRobotSettings(state, name)
   )
@@ -68,11 +68,11 @@ export function AdvancedSettingsCard(
   }, [dispatch, name])
 
   return (
-    <Card title={t('robot_settings.advanced.title')}>
+    <Card title={t('title')}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
         <LabeledValue
-          label={t('robot_settings.advanced.download_logs_label')}
-          value={t('robot_settings.advanced.download_logs_description')}
+          label={t('download_logs_label')}
+          value={t('download_logs_description')}
         />
         <SecondaryBtn
           disabled={controlsDisabled || !logsAvailable || robotLogsDownloading}
@@ -82,23 +82,20 @@ export function AdvancedSettingsCard(
           {robotLogsDownloading ? (
             <Icon name="ot-spinner" height="1em" spin />
           ) : (
-            t('robot_settings.advanced.download_logs_button')
+            t('download_logs_button')
           )}
         </SecondaryBtn>
       </Flex>
       <Divider />
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
-        <LabeledValue
-          label={t('robot_settings.advanced.reset_label')}
-          value={t('robot_settings.advanced.reset_description')}
-        />
+        <LabeledValue label={t('reset_label')} value={t('reset_description')} />
         <SecondaryBtn
           disabled={controlsDisabled}
           as={Link}
           to={resetUrl}
           minWidth={SIZE_4}
         >
-          {t('robot_settings.advanced.reset_button')}
+          {t('reset_button')}
         </SecondaryBtn>
       </Flex>
       <Divider />
@@ -106,13 +103,9 @@ export function AdvancedSettingsCard(
       <Divider />
       <OpenJupyterControl robotIp={ip} />
       {settings.map(({ id, title, description, value }) => (
-        <>
+        <React.Fragment key={id}>
           <Divider />
-          <Flex
-            key={id}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            padding={SPACING_3}
-          >
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
             <LabeledValue label={title} value={description} />
             <ToggleBtn
               label={title}
@@ -124,26 +117,26 @@ export function AdvancedSettingsCard(
               flex="0 0 auto"
             />
           </Flex>
-        </>
+        </React.Fragment>
       ))}
       {showLogOptoutModal && (
         <Portal>
           <AlertModal
             alertOverlay
-            heading={t('robot_settings.advanced.log_opt_out_heading')}
+            heading={t('log_opt_out_heading')}
             buttons={[
               {
-                children: t('robot_settings.advanced.opt_out'),
+                children: t('opt_out'),
                 onClick: () => setLogOptout(true),
               },
               {
-                children: t('robot_settings.advanced.opt_in'),
+                children: t('opt_in'),
                 onClick: () => setLogOptout(false),
               },
             ]}
           >
-            <Text>{t('robot_settings.advanced.log_opt_out_explanation')}</Text>
-            <Text>{t('robot_settings.advanced.log_opt_out_instruction')}</Text>
+            <Text>{t('log_opt_out_explanation')}</Text>
+            <Text>{t('log_opt_out_instruction')}</Text>
           </AlertModal>
         </Portal>
       )}

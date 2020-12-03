@@ -1,0 +1,18 @@
+{
+  "download_logs_button": "download",
+  "download_logs_description": "Access logs from this robot.",
+  "download_logs_label": "download logs",
+  "log_opt_out_explanation": "If your OT-2 is connected to the internet, Opentrons will collect logs from your robot to troubleshoot issues and identify error trends.",
+  "log_opt_out_heading": "Robot Logging",
+  "log_opt_out_instruction": "If you would like to disable log collection, please click &quot;Opt out&quot; below.",
+  "open_jupyter_description": "Open the <jn>Jupyter Notebook</jn> running on this OT-2 in your web browser. (Experimental feature! See <docs>documentation</docs> for more details.)",
+  "open_jupyter_label": "Jupyter Notebook",
+  "opt_in": "Sounds Good!",
+  "opt_out": "Opt Out",
+  "reset_button": "reset",
+  "reset_description": "Restore robot to factory configuration.",
+  "reset_label": "factory reset",
+  "title": "advanced settings",
+  "update_from_file_description": "If your app is unable to auto-download robot updates, you can <a>download the robot update yourself</a> and update your robot manually.",
+  "update_from_file_label": "Update robot software from file"
+}

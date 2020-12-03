@@ -19,7 +19,7 @@ export function ScanButton(props: ScanButtonProps): React.Node {
     <Icon name="ot-spinner" className={styles.scan_progress} spin />
   ) : (
     <PrimaryButton onClick={onScanClick} className={styles.scan_button}>
-      {found ? t('button.refresh_list') : t('button.try_again')}
+      {found ? t('refresh_list') : t('try_again')}
     </PrimaryButton>
   )
 }

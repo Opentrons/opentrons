@@ -38,26 +38,31 @@ export function ConnectionStatusMessage(
   props: ConnectionStatusProps
 ): React.Node {
   const { type, ipAddress, status, internetStatus } = props
+  const { t } = useTranslation(['robot_connection', 'shared'])
 
   return (
     <div className={styles.connection_status}>
       <Text>
-        <Trans
-          i18nKey={
-            status === CONNECTABLE
-              ? 'robot_settings.connection.connected_description'
-              : 'robot_settings.connection.disconnected_description'
-          }
-          tOptions={{
-            ip: ipAddress,
-            type: type,
-          }}
-        />
+        {status === CONNECTABLE ? (
+          <Trans
+            t={t}
+            i18nKey="connected_description"
+            tOptions={{ ip: ipAddress, type: type }}
+          />
+        ) : (
+          <Trans
+            t={t}
+            i18nKey="disconnected_description"
+            tOptions={{ ip: ipAddress, type: type }}
+          />
+        )}
       </Text>
       <Text>
         <Trans
-          i18nKey={`robot_settings.connection.status.${internetStatus ||
-            'unknown'}`}
+          t={t}
+          i18nKey="internet_status"
+          tOptions={{ context: internetStatus }}
+          defaultValue={t('shared:unknown')}
           components={{ bold: <Text {...boldProps} /> }}
         />
       </Text>
@@ -104,11 +109,9 @@ type NetworkAddressProps = {
 
 function NetworkAddresses(props: NetworkAddressProps) {
   const { wired, disabled, connection } = props
-  const { t } = useTranslation()
-  const unknown = t('robot_settings.unknown')
-  const type = wired
-    ? t('robot_settings.connection.wired')
-    : t('robot_settings.connection.wireless')
+  const { t } = useTranslation(['robot_connection', 'shared'])
+  const unknown = t('shared:unknown')
+  const type = wired ? t('wired') : t('wireless')
   const ip = connection?.ipAddress || unknown
   const subnet = connection?.subnetMask || unknown
   const mac = connection?.macAddress || unknown
@@ -117,21 +120,24 @@ function NetworkAddresses(props: NetworkAddressProps) {
     <div className={cx(styles.wireless_info, { [styles.disabled]: disabled })}>
       <Text>
         <Trans
-          i18nKey="robot_settings.connection.ip"
+          t={t}
+          i18nKey="ip"
           tOptions={{ type, ip }}
           components={{ bold: <Text {...boldProps} /> }}
         />
       </Text>
       <Text>
         <Trans
-          i18nKey="robot_settings.connection.subnet"
+          t={t}
+          i18nKey="subnet"
           tOptions={{ type, subnet }}
           components={{ bold: <Text {...boldProps} /> }}
         />
       </Text>
       <Text>
         <Trans
-          i18nKey="robot_settings.connection.mac"
+          t={t}
+          i18nKey="mac"
           tOptions={{ type, mac }}
           components={{ bold: <Text {...boldProps} /> }}
         />

@@ -49,7 +49,7 @@ function TipRackDisplayName(props: {|
   tiprackUri: string,
   customLabware: Array<LabwareDefinition2>,
 |}): React.Node {
-  const { t } = useTranslation()
+  const { t } = useTranslation('robot_calibration')
   const { tiprackUri, customLabware } = props
   const [namespace, loadName] = tiprackUri ? tiprackUri.split('/') : ['', '']
   const definition = findLabwareDefWithCustom(
@@ -62,7 +62,7 @@ function TipRackDisplayName(props: {|
     <Text>
       {definition
         ? getLabwareDisplayName(definition)
-        : `${t('robot_settings.calibration.unknown_custom_tiprack')}`}
+        : `${t('unknown_custom_tiprack')}`}
     </Text>
   )
 }
@@ -77,9 +77,9 @@ function LastCalibrated(props: {|
       fontStyle={FONT_STYLE_ITALIC}
       marginTop={SPACING_1}
     >
-      {`${t(
-        'robot_settings.calibration.last_calibrated'
-      )}: ${formatLastModified(props.calibration.lastModified)}`}
+      {`${t('last_calibrated')}: ${formatLastModified(
+        props.calibration.lastModified
+      )}`}
     </Text>
   )
 }
@@ -99,14 +99,14 @@ function PipetteOffsetSection(props: PipetteOffsetSectionProps): React.Node {
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING_2}
       >
-        {t('robot_settings.calibration.pipette_offset_title')}
+        {t('pipette_offset_title')}
       </Text>
       {calibration ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Text key={'displayName'}>{pipette.modelSpecs.displayName}</Text>
-          <Text key={'serialNumber'}>{`${t(
-            'robot_settings.calibration.serial_number'
-          )}: ${pipette.id}`}</Text>
+          <Text key={'serialNumber'}>{`${t('serial_number')}: ${
+            pipette.id
+          }`}</Text>
           <LastCalibrated calibration={calibration} />
         </Flex>
       ) : (
@@ -131,7 +131,7 @@ export function TipLengthSection(props: TipLengthSectionProps): React.Node {
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING_2}
       >
-        {t('robot_settings.calibration.tip_length')}
+        {t('tip_length')}
       </Text>
       {calibration?.offset && calibration?.tipLength ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
@@ -144,9 +144,7 @@ export function TipLengthSection(props: TipLengthSectionProps): React.Node {
           )}
         </Flex>
       ) : (
-        <Text fontStyle={FONT_STYLE_ITALIC}>
-          {t('robot_settings.calibration.no_tip_length')}
-        </Text>
+        <Text fontStyle={FONT_STYLE_ITALIC}>{t('no_tip_length')}</Text>
       )}
     </Box>
   )
@@ -202,9 +200,7 @@ export function PipetteOffsetItem(props: Props): React.Node {
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
           >
-            <Text fontStyle={FONT_STYLE_ITALIC}>
-              {t('robot_settings.calibration.no_pipette')}
-            </Text>
+            <Text fontStyle={FONT_STYLE_ITALIC}>{t('no_pipette')}</Text>
           </Flex>
         )}
       </Box>

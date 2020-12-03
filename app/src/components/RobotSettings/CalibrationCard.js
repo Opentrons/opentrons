@@ -78,7 +78,7 @@ export function CalibrationCard(props: Props): React.Node {
   const { name: robotName, status } = robot
   const notConnectable = status !== CONNECTABLE
 
-  const { t } = useTranslation()
+  const { t } = useTranslation('robot_calibration')
   const dispatch = useDispatch<Dispatch>()
 
   // Poll deck cal status data
@@ -182,7 +182,7 @@ export function CalibrationCard(props: Props): React.Node {
           paddingTop={SPACING_3}
           paddingX={SPACING_3}
         >
-          {t('robot_settings.calibration.title')}
+          {t('title')}
         </Text>
         <Link
           href="#"
@@ -192,7 +192,7 @@ export function CalibrationCard(props: Props): React.Node {
           fontSize={FONT_SIZE_BODY_1}
           onClick={onClickSaveAs}
         >
-          {t('robot_settings.calibration.download_calibration')}
+          {t('download_calibration')}
         </Link>
       </Flex>
       <Box
@@ -202,7 +202,8 @@ export function CalibrationCard(props: Props): React.Node {
       >
         <Text display={DISPLAY_INLINE}>
           <Trans
-            i18nKey="robot_settings.calibration.definition"
+            t={t}
+            i18nKey="definition"
             components={{
               a: (
                 <Link

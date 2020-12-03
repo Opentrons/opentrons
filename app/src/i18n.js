@@ -8,11 +8,20 @@ i18n.use(initReactI18next).init(
     lng: 'en',
     fallbackLng: 'en',
     debug: true,
-    ns: ['shared'],
+    ns: [
+      'shared',
+      'robot_advanced_settings',
+      'robot_calibration',
+      'robot_connection',
+      'robot_controls',
+      'robot_info',
+      'top_navigation',
+    ],
     defaultNS: 'shared',
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
+    keySeparator: false, // use namespaces and context instead
     saveMissing: true,
     missingKeyHandler: (lng, ns, key, fallbackValue) => {
       console.warn(`Missing Translation: key={${key}} ns={${ns}}`)
