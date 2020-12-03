@@ -11,7 +11,6 @@ c445fee = {editable = true,path = "./../api"}
 pytest = "==6.1.0"
 pytest-watch = "~=4.2.0"
 pytest-cov = "*"
-mypy = "==0.740"
 atomicwrites = {version = "*",sys_platform = "== 'win32'"}
 pylama = "*"
 requests = "*"
@@ -20,6 +19,7 @@ tavern = "==1.6.0"
 pytest-aiohttp = "*"
 graphviz = "*"
 mock = "~=4.0.2"
+mypy = "==0.790.0"
 
 [packages]
 uvicorn = "==0.11.3"
@@ -29,5 +29,4 @@ python-dotenv = "*"
 pydantic = "==1.4"
 wsproto = "==0.15.0"
 typing-extensions = "==3.7.4.3"
-mypy = "*"
 notify-server = {editable = true, path = "./../notify-server"}

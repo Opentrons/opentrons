@@ -62,7 +62,7 @@ class HardwareWrapper:
         from robot_server.service.dependencies import get_event_publisher
         event_publisher = get_event_publisher()
         if event_publisher:
-            topic = str(topics.RobotEventTopics.HARDWARE_EVENT)
+            topic = topics.RobotEventTopics.HARDWARE_EVENTS
             publisher = self._publish_hardware_event.__qualname__
             payload = payload_type.HardwareEventPayload(val=hw_event)
             event_publisher.send_nowait(topic,

@@ -2,11 +2,8 @@
 import enum
 
 
-class RobotEventTopics(enum.Enum):
+class RobotEventTopics(str, enum.Enum):
     """All robot-server event topics."""
 
-    HARDWARE_EVENT = "hardware_events"
+    HARDWARE_EVENTS = "hardware_events"
 
-    def __str__(self) -> str:
-        """Topic string."""
-        return str(self.value)
