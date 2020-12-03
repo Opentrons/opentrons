@@ -70,7 +70,7 @@ function TipRackDisplayName(props: {|
 function LastCalibrated(props: {|
   calibration: PipetteOffsetCalibration | TipLengthCalibration,
 |}): React.Node {
-  const { t } = useTranslation()
+  const { t } = useTranslation('robot_calibration')
   return (
     <Text
       key={'calibrationDate'}
@@ -90,7 +90,7 @@ type PipetteOffsetSectionProps = {|
 |}
 
 function PipetteOffsetSection(props: PipetteOffsetSectionProps): React.Node {
-  const { t } = useTranslation()
+  const { t } = useTranslation('robot_calibration')
   const { pipette, calibration } = props
   return (
     <Box key={'pipetteOffset'} marginTop={SPACING_2}>
@@ -123,7 +123,7 @@ type TipLengthSectionProps = {|
 
 export function TipLengthSection(props: TipLengthSectionProps): React.Node {
   const { calibration, customLabware } = props
-  const { t } = useTranslation()
+  const { t } = useTranslation('robot_calibration')
   return (
     <Box key={'tipLength'} marginTop={SPACING_3}>
       <Text
@@ -151,7 +151,7 @@ export function TipLengthSection(props: TipLengthSectionProps): React.Node {
 }
 
 export function PipetteOffsetItem(props: Props): React.Node {
-  const { t } = useTranslation()
+  const { t } = useTranslation('robot_calibration')
   const { mount, pipette, calibration, customLabware } = props
   return (
     <Box width={'50%'} display={DISPLAY_BLOCK}>

@@ -28,7 +28,7 @@ module.exports = {
         outputPath: (locale, namespace) =>
           `src/assets/localization/${locale}/${namespace}.json`,
         defaultNS: 'shared',
-        discardOldKeys: true,
+        // discardOldKeys: true,
       },
     ],
   ],
