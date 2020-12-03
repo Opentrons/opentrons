@@ -62,13 +62,4 @@ describe('OpenJupyterControl component', () => {
       properties: {},
     })
   })
-
-  it('should accept style props', () => {
-    const wrapper = mount(
-      <OpenJupyterControl robotIp="localhost" borderBottom="solid 1px black" />
-    )
-    const control = wrapper.find(TitledControl)
-
-    expect(control.prop('borderBottom')).toBe('solid 1px black')
-  })
 })
