@@ -61,8 +61,8 @@ class Publisher:
         """
         try:
             self._queue.put_nowait(QueueEntry(topic, event))
-        except asyncio.QueueFull as e:
-            log.exception(f"Exception while sending publish event: {e}")
+        except asyncio.QueueFull:
+            log.exception("Exception while sending publish event.")
 
     async def stop(self) -> None:
         """Stop the publisher task."""
