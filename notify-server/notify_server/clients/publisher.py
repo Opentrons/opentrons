@@ -45,8 +45,24 @@ class Publisher:
         self._queue = queue
 
     async def send(self, topic: str, event: Event) -> None:
-        """Publish an event to a topic."""
+        """
+        Publish an event to a topic.
+
+        Waits until free slot is available before adding the entry to the
+        queue.
+        """
         await self._queue.put(QueueEntry(topic, event))
+
+    def send_nowait(self, topic: str, event: Event) -> None:
+        """
+        Publish an event to a topic.
+
+        Uses put_nowait to add queue entry without blocking.
+        """
+        try:
+            self._queue.put_nowait(QueueEntry(topic, event))
+        except asyncio.QueueFull:
+            log.exception("Exception while sending publish event.")
 
     async def stop(self) -> None:
         """Stop the publisher task."""
