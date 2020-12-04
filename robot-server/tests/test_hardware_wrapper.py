@@ -2,10 +2,10 @@ import pytest
 from mock import AsyncMock, patch
 from datetime import datetime, timezone
 
+from notify_server.models.hardware_event import DoorStatePayload
 from opentrons.hardware_control.types import (
     HardwareEventType, DoorStateNotification, DoorState)
 from notify_server.models.event import Event
-from notify_server.models.payload_type import HardwareEventPayload
 from robot_server import hardware_wrapper
 from robot_server.settings import RobotServerSettings
 from robot_server.service import dependencies
@@ -53,7 +53,7 @@ async def test_door_event(simulating_wrapper, mock_utc, mock_time):
         new_state=DoorState.OPEN)
     pub_event = Event(createdOn=mock_time,
                       publisher='HardwareWrapper._publish_hardware_event',
-                      data=HardwareEventPayload(val=hw_event))
+                      data=DoorStatePayload(state=DoorState.OPEN))
     with patch.object(dependencies, 'get_event_publisher') as pub:
         simulating_wrapper._publish_hardware_event(hw_event)
         pub().send_nowait.assert_called_once_with('hardware_events',
