@@ -1,33 +1,11 @@
 from typing import AsyncGenerator
-from dataclasses import asdict
-from datetime import datetime
 
 import pytest
 from mock import MagicMock, patch
 from notify_server.clients.queue_entry import QueueEntry
-from notify_server.models.event import Event
-from notify_server.models.sample_events import SampleTwo
 from starlette.websockets import WebSocket
 from robot_server.service.notifications import handle_subscriber
 from robot_server.settings import get_settings
-
-
-@pytest.fixture
-def queue_entry() -> QueueEntry:
-    return QueueEntry(topic="some_topic",
-                      event=Event(
-                          createdOn=datetime(2020, 1, 1),
-                          publisher="some_one",
-                          data=SampleTwo(val1=1, val2="2")
-                      ))
-
-
-@pytest.fixture
-def mock_subscriber(queue_entry) -> AsyncGenerator:
-    """A mock subscriber."""
-    async def _f():
-        yield queue_entry
-    return _f()
 
 
 @pytest.fixture
@@ -65,4 +43,4 @@ async def test_send_entry(
         mock_socket: MagicMock) -> None:
     """Test that queue entry is sent as json."""
     await handle_subscriber.send(mock_socket, queue_entry)
-    mock_socket.send_json.assert_called_once_with(asdict(queue_entry))
+    mock_socket.send_text.assert_called_once_with(queue_entry.json())

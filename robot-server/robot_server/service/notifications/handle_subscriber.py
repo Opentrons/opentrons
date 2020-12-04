@@ -1,6 +1,5 @@
 """Websocket subscriber handler functions."""
 
-from dataclasses import asdict
 from typing import List
 
 from starlette.websockets import WebSocket
@@ -24,7 +23,7 @@ async def handle_socket(
 
 async def send(websocket: WebSocket, queue_entry: QueueEntry) -> None:
     """Send queue entry to web socket."""
-    await websocket.send_json(asdict(queue_entry))
+    await websocket.send_text(queue_entry.json())
 
 
 async def route_events(websocket: WebSocket, subscriber: Subscriber) -> None:
