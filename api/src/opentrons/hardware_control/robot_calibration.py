@@ -5,6 +5,7 @@ from typing import Optional, List
 
 from opentrons import config
 
+from opentrons.config.robot_configs import get_legacy_gantry_calibration
 from opentrons.calibration_storage import modify, types, get
 from opentrons.types import Mount
 from opentrons.util import linal
@@ -106,8 +107,8 @@ def save_attitude_matrix(
 
 def load_attitude_matrix() -> types.DeckCalibration:
     calibration_data = get.get_robot_deck_attitude()
-    if not calibration_data:
-        gantry_cal = config.robot_configs.load().gantry_calibration
+    gantry_cal = get_legacy_gantry_calibration()
+    if not calibration_data and gantry_cal:
         if validate_gantry_calibration(gantry_cal) == DeckTransformState.OK:
             log.debug(
                 "Attitude deck calibration matrix not found. Migrating "

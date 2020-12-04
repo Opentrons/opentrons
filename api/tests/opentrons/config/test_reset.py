@@ -92,8 +92,6 @@ def test_deck_calibration_reset(mock_cal_storage_delete, mock_robot_config):
     mock_cal_storage_delete.delete_robot_deck_attitude.assert_called_once()
     mock_cal_storage_delete.clear_pipette_offset_calibrations\
                            .assert_called_once()
-    mock_robot_config.clear.assert_called_once_with(
-        calibration=True, robot=False)
 
 
 def test_tip_length_calibrations_reset(mock_cal_storage_delete):

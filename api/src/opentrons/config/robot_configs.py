@@ -3,11 +3,8 @@ import json
 import logging
 import os
 
-from numpy import array, array_equal  # type: ignore
-from opentrons.util import linal
-from typing import Any, Dict, List, Union, Tuple
+from typing import Any, Dict, List, NamedTuple, Union, Optional
 
-from opentrons import config
 from opentrons.config import CONFIG
 
 log = logging.getLogger(__name__)
@@ -74,12 +71,6 @@ DEFAULT_MAX_SPEEDS: Dict[str, float] = {
 DEFAULT_CURRENT_STRING = ' '.join(
     ['{}{}'.format(key, value) for key, value in DEFAULT_CURRENT.items()])
 
-DEFAULT_DECK_CALIBRATION: List[List[float]] = [
-    [1.00, 0.00, 0.00, 0.00],
-    [0.00, 1.00, 0.00, 0.00],
-    [0.00, 0.00, 1.00, 0.00],
-    [0.00, 0.00, 0.00, 1.00]]
-
 DEFAULT_DECK_CALIBRATION_V2: List[List[float]] = [
     [1.00, 0.00, 0.00],
     [0.00, 1.00, 0.00],
@@ -138,14 +129,12 @@ robot_config = namedtuple(
         'steps_per_mm',
         'gantry_steps_per_mm',
         'acceleration',
-        'gantry_calibration',
         'serial_speed',
         'tip_length',
         'default_current',
         'low_current',
         'high_current',
         'default_max_speed',
-        'mount_offset',
         'log_level',
         'default_pipette_configs',
         'z_retract_distance',
@@ -162,8 +151,7 @@ def _build_conf_dict(
         return from_conf
 
 
-def build_config(deck_cal: List[List[float]],
-                 robot_settings: Dict[str, Any]) -> robot_config:
+def build_config(robot_settings: Dict[str, Any]) -> robot_config:
     cfg = robot_config(
         name=robot_settings.get('name', 'Ada Lovelace'),
         version=int(robot_settings.get('version', ROBOT_CONFIG_VERSION)),
@@ -173,9 +161,7 @@ def build_config(deck_cal: List[List[float]],
             robot_settings.get('steps_per_mm'), DEFAULT_GANTRY_STEPS_PER_MM),
         acceleration=_build_conf_dict(
             robot_settings.get('acceleration'), DEFAULT_ACCELERATION),
-        gantry_calibration=deck_cal or DEFAULT_DECK_CALIBRATION,
         tip_length=robot_settings.get('tip_length', DEFAULT_TIP_LENGTH_DICT),
-        mount_offset=robot_settings.get('mount_offset', DEFAULT_MOUNT_OFFSET),
         serial_speed=robot_settings.get('serial_speed', SERIAL_SPEED),
         default_current=robot_settings.get('default_current', DEFAULT_CURRENT),
         low_current=robot_settings.get('low_current', LOW_CURRENT),
@@ -194,56 +180,20 @@ def build_config(deck_cal: List[List[float]],
 
 
 def config_to_save(
-        config: robot_config) -> Tuple[List[List[float]], Dict[str, Any]]:
-    converted_config = dict(config._asdict())
-    gc = converted_config.pop('gantry_calibration')
-    return gc, converted_config
+        config: robot_config) -> Dict[str, Any]:
+    return dict(config._asdict())
 
 
-def _determine_calibration_to_use(deck_cal_to_check, api_v1):
-    """
-    The default calibration loaded in simulation is not
-    a valid way to check whether labware exceeds a given
-    height. As a workaround, we should load the identity
-    matrix with a Z offset if we are not running on a
-    robot.
-    """
-    id_matrix = linal.identity_deck_transform()
-    deck_cal_to_use = deck_cal_to_check
-    if not config.IS_ROBOT and not api_v1:
-        if not deck_cal_to_check:
-            deck_cal_to_use = DEFAULT_SIMULATION_CALIBRATION
-        elif deck_cal_to_check and\
-                array_equal(array(deck_cal_to_check), id_matrix):
-            deck_cal_to_use = deck_cal_to_check
-    return deck_cal_to_use
-
-
-def load(deck_cal_file=None, api_v1=False):
-    deck_cal_file = deck_cal_file or CONFIG['deck_calibration_file']
-    log.debug("Loading deck calibration from {}".format(deck_cal_file))
-    current_deck_cal = _load_json(deck_cal_file).get('gantry_calibration', {})
-    deck_cal = _determine_calibration_to_use(current_deck_cal, api_v1)
+def load():
     settings_file = CONFIG['robot_settings_file']
     log.debug("Loading robot settings from {}".format(settings_file))
     robot_settings = _load_json(settings_file) or {}
-    return build_config(deck_cal, robot_settings)
-
-
-def save_deck_calibration(config: robot_config, dc_filename=None, tag=None):
-    cal_lists, _ = config_to_save(config)
-
-    dc_filename = dc_filename or CONFIG['deck_calibration_file']
-    if tag:
-        root, ext = os.path.splitext(dc_filename)
-        dc_filename = "{}-{}{}".format(root, tag, ext)
-    deck_calibration = {
-        'gantry_calibration': cal_lists}
-    _save_json(deck_calibration, filename=dc_filename)
+    return build_config(robot_settings)
 
 
 def save_robot_settings(config: robot_config, rs_filename=None, tag=None):
-    _, config_dict = config_to_save(config)
+    config_dict = config_to_save(config)
+
     # Save everything else in a different file
     rs_filename = rs_filename or CONFIG['robot_settings_file']
     if tag:
@@ -258,15 +208,25 @@ def backup_configuration(config: robot_config, tag=None):
     import time
     if not tag:
         tag = str(int(time.time() * 1000))
-    save_deck_calibration(config, tag=tag)
     save_robot_settings(config, tag=tag)
 
 
-def clear(calibration=True, robot=True):
-    if calibration:
-        _clear_file(CONFIG['deck_calibration_file'])
-    if robot:
-        _clear_file(CONFIG['robot_settings_file'])
+def get_legacy_gantry_calibration() -> Optional[List[List[float]]]:
+    """
+    Returns the legacy gantry calibration if exists.
+
+    This should happen only if the new deck calibration file does not exist.
+    The legacy calibration should then be migrated to the new format.
+    """
+    gantry_cal = _load_json(CONFIG['deck_calibration_file'])
+    if 'gantry_calibration' in gantry_cal:
+        return gantry_cal['gantry_calibration']
+    else:
+        return None
+
+
+def clear():
+    _clear_file(CONFIG['robot_settings_file'])
 
 
 def _clear_file(filename):

@@ -26,23 +26,6 @@ stages:
           X: !anyint
           Y: !anyint
           Z: !anyint
-        gantry_calibration:
-        - - 1.0
-          - 0.0
-          - 0.0
-          - 0.0
-        - - 0.0
-          - 1.0
-          - 0.0
-          - 0.0
-        - - 0.0
-          - 0.0
-          - 1.0
-          - -25.0
-        - - 0.0
-          - 0.0
-          - 0.0
-          - 1.0
         serial_speed: !anyint
         tip_length: !anydict
         default_current:
@@ -73,10 +56,6 @@ stages:
           X: 600
           Y: 400
           Z: 125
-        mount_offset:
-        - !anyint
-        - !anyint
-        - !anyint
         left_mount_offset:
         - -34
         - 0

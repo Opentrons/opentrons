@@ -72,7 +72,7 @@ def _prepare_for_dict(key, value):
     if key == 'attached_instruments' and value:
         return {mount.name.lower(): data for (mount, data) in value.items()}
     if key == 'config' and value:
-        return robot_configs.config_to_save(value)[1]
+        return robot_configs.config_to_save(value)
     return value
 
 
@@ -81,7 +81,7 @@ def _prepare_for_simulator_setup(key, value):
     if key == 'attached_instruments' and value:
         return {Mount[mount.upper()]: data for (mount, data) in value.items()}
     if key == 'config' and value:
-        return robot_configs.build_config([], value)
+        return robot_configs.build_config(value)
     if key == 'attached_modules' and value:
         return {k: [ModuleCall(**data) for data in v] for (k, v)
                 in value.items()}
