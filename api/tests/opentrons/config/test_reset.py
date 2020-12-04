@@ -45,12 +45,6 @@ def mock_cal_storage_delete():
         yield m
 
 
-@pytest.fixture
-def mock_robot_config():
-    with patch('opentrons.config.reset.robot_configs', autospec=True) as m:
-        yield m
-
-
 def test_reset_empty_set(mock_reset_boot_scripts,
                          mock_reset_labware_calibration,
                          mock_reset_pipette_offset,
@@ -87,13 +81,11 @@ def test_labware_calibration_reset(mock_labware):
     mock_labware.clear_calibrations.assert_called_once()
 
 
-def test_deck_calibration_reset(mock_cal_storage_delete, mock_robot_config):
+def test_deck_calibration_reset(mock_cal_storage_delete):
     reset.reset_deck_calibration()
     mock_cal_storage_delete.delete_robot_deck_attitude.assert_called_once()
     mock_cal_storage_delete.clear_pipette_offset_calibrations\
                            .assert_called_once()
-    mock_robot_config.clear.assert_called_once_with(
-        calibration=True, robot=False)
 
 
 def test_tip_length_calibrations_reset(mock_cal_storage_delete):
