@@ -1,6 +1,5 @@
 import copy
 import json
-import pytest
 import os
 
 from opentrons.config import CONFIG, robot_configs
@@ -38,7 +37,8 @@ def test_load_corrupt_json():
 
 def test_build_config():
     built_config = robot_configs.build_config(dummy_settings)
-    assert built_config == dummy_settings
+    new_config = robot_configs.config_to_save(built_config)
+    assert new_config == dummy_settings
 
 
 def test_dictify_roundtrip():

@@ -3,7 +3,7 @@ import json
 import logging
 import os
 
-from typing import Any, Dict, List, NamedTuple, Union, Optional
+from typing import Any, Dict, List, Union, Optional
 
 from opentrons.config import CONFIG
 
