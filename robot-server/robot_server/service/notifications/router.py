@@ -2,6 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, Query
 from starlette.websockets import WebSocket
+from robot_server.service.notifications import handle_subscriber
 
 router = APIRouter()
 
@@ -12,6 +13,4 @@ async def handle_subscribe(
         topic: List[str] = Query(...)):
     """Accept a websocket connection."""
     await websocket.accept()
-    await websocket.send_json({
-        "status": "subscribed",
-        "topics":  topic})
+    await handle_subscriber.handle_socket(websocket, topic)

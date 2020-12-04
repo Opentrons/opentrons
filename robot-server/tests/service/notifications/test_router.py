@@ -1,20 +1,20 @@
-import json
+from mock import patch
 
 import pytest
 from starlette.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
 
+from robot_server.service.notifications import handle_subscriber
+
 
 def test_subscribe(api_client: TestClient):
-    """Test that a connection can be established."""
-    socket = api_client.websocket_connect(
-        "/notifications/subscribe?topic=a&topic=b&topic=c"
-    )
-    s = socket.receive()
-    assert json.loads(s['text']) == {
-        "status": "subscribed",
-        "topics": ["a", "b", "c"]
-    }
+    """Test that a connection can be established and topics discovered."""
+    with patch.object(handle_subscriber, "handle_socket") as m:
+        api_client.websocket_connect(
+            "/notifications/subscribe?topic=a&topic=b&topic=c"
+        )
+        m.assert_called_once()
+        assert m.call_args[0][1] == ["a", "b", "c"]
 
 
 def test_subscribe_no_topic(api_client: TestClient):
