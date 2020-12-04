@@ -4,13 +4,14 @@ from pathlib import Path
 
 from opentrons import ThreadManager, initialize as initialize_api
 from opentrons.hardware_control.simulator_setup import load_simulator
-from opentrons.hardware_control.types import HardwareEvent
+from opentrons.hardware_control.types import HardwareEvent, HardwareEventType
 from opentrons.util.helpers import utc_now
 
 from robot_server.main import log
 from robot_server.settings import get_settings
 
-from notify_server.models import event, payload_type, topics
+from notify_server.models import event, topics
+from notify_server.models.hardware_event import DoorStatePayload
 
 
 class HardwareWrapper:
@@ -60,16 +61,19 @@ class HardwareWrapper:
 
     def _publish_hardware_event(self, hw_event: HardwareEvent):
         from robot_server.service.dependencies import get_event_publisher
+        if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
+            payload = DoorStatePayload(state=hw_event.new_state)
+        else:
+            return
+
         event_publisher = get_event_publisher()
-        if event_publisher:
-            topic = topics.RobotEventTopics.HARDWARE_EVENTS
-            publisher = self._publish_hardware_event.__qualname__
-            payload = payload_type.HardwareEventPayload(val=hw_event)
-            event_publisher.send_nowait(topic,
-                                        event.Event(
-                                            createdOn=utc_now(),
-                                            publisher=publisher,
-                                            data=payload))
+        topic = topics.RobotEventTopics.HARDWARE_EVENTS
+        publisher = self._publish_hardware_event.__qualname__
+        event_publisher.send_nowait(topic,
+                                    event.Event(
+                                        createdOn=utc_now(),
+                                        publisher=publisher,
+                                        data=payload))
 
     def async_initialize(self):
         """Create task to initialize hardware."""
