@@ -27,7 +27,11 @@
       "stepsPerMM": 768,
       "homePosition": 220,
       "travelDistance": 30
-    }
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_10ul/1",
+      "opentrons/opentrons_96_filtertiprack_10ul/1",
+      "opentrons/geb_96_tiprack_10ul/1"]
   },
   "p10_multi": {
     "displayName": "P10 8-Channel GEN1",
@@ -57,7 +61,11 @@
       "stepsPerMM": 768,
       "homePosition": 220,
       "travelDistance": 30
-    }
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_10ul/1",
+      "opentrons/opentrons_96_filtertiprack_10ul/1",
+      "opentrons/geb_96_tiprack_10ul/1"]
   },
   "p20_single_gen2": {
     "displayName": "P20 Single-Channel GEN2",
@@ -96,7 +104,13 @@
       "stepsPerMM": 3200,
       "homePosition": 172.15,
       "travelDistance": 60
-    }
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_20ul/1",
+      "opentrons/opentrons_96_filtertiprack_20ul/1",
+      "opentrons/opentrons_96_tiprack_10ul/1",
+      "opentrons/opentrons_96_filtertiprack_10ul/1",
+      "opentrons/geb_96_tiprack_10ul/1"]
   },
   "p20_multi_gen2": {
     "displayName": "P20 8-Channel GEN2",
@@ -132,7 +146,13 @@
       "stepsPerMM": 3200,
       "homePosition": 155.75,
       "travelDistance": 60
-    }
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_20ul/1",
+      "opentrons/opentrons_96_filtertiprack_20ul/1",
+      "opentrons/opentrons_96_tiprack_10ul/1",
+      "opentrons/opentrons_96_filtertiprack_10ul/1",
+      "opentrons/geb_96_tiprack_10ul/1"]
   },
   "p50_single": {
     "displayName": "P50 Single-Channel GEN1",
@@ -162,7 +182,11 @@
       "stepsPerMM": 768,
       "homePosition": 220,
       "travelDistance": 30
-    }
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_300ul/1",
+      "opentrons/opentrons_96_filtertiprack_200ul/1"
+    ]
   },
   "p50_multi": {
     "displayName": "P50 8-Channel GEN1",
@@ -192,7 +216,11 @@
       "stepsPerMM": 768,
       "homePosition": 220,
       "travelDistance": 30
-    }
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_300ul/1",
+      "opentrons/opentrons_96_filtertiprack_200ul/1"
+    ]
   },
   "p300_single": {
     "displayName": "P300 Single-Channel GEN1",
@@ -222,7 +250,11 @@
       "stepsPerMM": 768,
       "homePosition": 220,
       "travelDistance": 30
-    }
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_300ul/1",
+      "opentrons/opentrons_96_filtertiprack_200ul/1"
+    ]
   },
   "p300_single_gen2": {
     "displayName": "P300 Single-Channel GEN2",
@@ -261,7 +293,11 @@
       "stepsPerMM": 3200,
       "homePosition": 172.15,
       "travelDistance": 60
-    }
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_300ul/1",
+      "opentrons/opentrons_96_filtertiprack_200ul/1"
+    ]
   },
   "p300_multi_gen2": {
     "displayName": "P300 8-Channel GEN2",
@@ -297,7 +333,11 @@
       "stepsPerMM": 3200,
       "homePosition": 155.75,
       "travelDistance": 60
-    }
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_300ul/1",
+      "opentrons/opentrons_96_filtertiprack_200ul/1"
+    ]
   },
   "p300_multi": {
     "displayName": "P300 8-Channel GEN1",
@@ -327,7 +367,11 @@
       "stepsPerMM": 768,
       "homePosition": 220,
       "travelDistance": 30
-    }
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_300ul/1",
+      "opentrons/opentrons_96_filtertiprack_200ul/1"
+    ]
   },
   "p1000_single": {
     "displayName": "P1000 Single-Channel GEN1",
@@ -357,7 +401,11 @@
       "stepsPerMM": 768,
       "homePosition": 220,
       "travelDistance": 30
-    }
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_1000ul/1",
+      "opentrons/opentrons_96_filtertiprack_1000ul/1",
+      "opentrons/geb_96_tiprack_1000ul/1"]
   },
   "p1000_single_gen2": {
     "displayName": "P1000 Single-Channel GEN2",
@@ -396,6 +444,10 @@
       "stepsPerMM": 3200,
       "homePosition": 172.15,
       "travelDistance": 60
-    }
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_1000ul/1",
+      "opentrons/opentrons_96_filtertiprack_1000ul/1",
+      "opentrons/geb_96_tiprack_1000ul/1"]
   }
 }
