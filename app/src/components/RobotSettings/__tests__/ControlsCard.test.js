@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithProviders } from '@opentrons/components/__utils__'
 
+import { i18n } from '../../../i18n'
 import * as RobotControls from '../../../robot-controls'
 import * as RobotAdmin from '../../../robot-admin'
 import * as RobotSelectors from '../../../robot/selectors'
@@ -48,25 +49,20 @@ const MOCK_STATE: State = ({ mockState: true }: any)
 
 describe('ControlsCard', () => {
   const render = (robot: ViewableRobot = mockRobot) => {
-    return mountWithStore<_, State, Action>(<ControlsCard robot={robot} />, {
-      initialState: MOCK_STATE,
-    })
+    return mountWithProviders<_, State, Action>(
+      <ControlsCard robot={robot} />,
+      {
+        initialState: MOCK_STATE,
+        i18n,
+      }
+    )
   }
 
-  const getHomeButton = wrapper =>
-    wrapper
-      .find({ label: 'Home all axes' })
-      .find(LabeledButton)
-      .find('button')
+  const getHomeButton = wrapper => wrapper.find('button[children="home"]')
 
-  const getRestartButton = wrapper =>
-    wrapper
-      .find({ label: 'Restart robot' })
-      .find(LabeledButton)
-      .find('button')
+  const getRestartButton = wrapper => wrapper.find('button[children="restart"]')
 
-  const getLightsButton = wrapper =>
-    wrapper.find({ label: 'Lights' }).find(LabeledToggle)
+  const getLightsButton = wrapper => wrapper.find('ToggleBtn[label="lights"]')
 
   beforeEach(() => {
     jest.useFakeTimers()
