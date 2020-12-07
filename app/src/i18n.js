@@ -24,7 +24,9 @@ i18n.use(initReactI18next).init(
     keySeparator: false, // use namespaces and context instead
     saveMissing: true,
     missingKeyHandler: (lng, ns, key, fallbackValue) => {
-      console.warn(`Missing Translation: key={${key}} ns={${ns}}`)
+      process.env.NODE_ENV === 'test'
+        ? console.error(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
+        : console.warn(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
     },
   },
   (err, t) => {

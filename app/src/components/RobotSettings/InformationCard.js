@@ -62,7 +62,10 @@ export function InformationCard(props: InformationCardProps): React.Node {
   const protocolApiVersions = getRobotProtocolApiVersion(robot)
   const minProtocolApiVersion = protocolApiVersions?.min ?? unknown
   const maxProtocolApiVersion = protocolApiVersions?.max ?? unknown
-  const API_VERSION_DISPLAY = `Min: ${minProtocolApiVersion},  Max: ${maxProtocolApiVersion}`
+  const apiVersionMinMax = t('api_version_min_max', {
+    min: minProtocolApiVersion,
+    max: maxProtocolApiVersion,
+  })
 
   const updateDisabled = autoUpdateDisabledReason !== null
 
@@ -90,7 +93,7 @@ export function InformationCard(props: InformationCardProps): React.Node {
           </Box>
           <LabeledValue
             label={`${t('supported_api_versions')}:`}
-            value={API_VERSION_DISPLAY}
+            value={apiVersionMinMax}
           />
         </Box>
         <SecondaryBtn

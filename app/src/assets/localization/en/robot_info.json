@@ -1,4 +1,5 @@
 {
+  "api_version_min_max": "min: {{min}},  max: {{max}}",
   "firmware_version": "firmware version",
   "robot_name": "robot name",
   "server_version": "server version",
