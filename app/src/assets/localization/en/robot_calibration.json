@@ -19,6 +19,8 @@
   "no_tip_length": "Calibrate your pipette to see saved tip length",
   "pipette_offset_description": "Calibrate the position for the the default tip and pipette combination.",
   "pipette_offset_title": "pipette offset calibration",
+  "recalibrate_warning_heading": "Are you sure you want to recalibrate your deck?",
+  "recalibrate_warning_body": "Performing a deck calibration will clear all of your pipette offset and tip length calibrations. You will need to recalibrate your pipette offset and tip length after completing a deck calibration.",
   "serial_number": "Serial number",
   "tip_length": "tip length calibration",
   "title": "robot calibration",

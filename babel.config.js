@@ -42,12 +42,14 @@ module.exports = {
     {
       test: ['app/**/*', 'labware-library/**/*', 'protocol-designer/**/*'],
       plugins: [
-        'i18next-extract',
-        {
-          outputPath: (locale, namespace) =>
-            `src/assets/localization/${locale}/${namespace}.json`,
-          defaultNS: 'shared',
-        },
+        [
+          'i18next-extract',
+          {
+            outputPath: (locale, namespace) =>
+              `src/assets/localization/${locale}/${namespace}.json`,
+            defaultNS: 'shared',
+          },
+        ],
       ],
       presets: [['@babel/preset-env', { useBuiltIns: 'usage', corejs: 3 }]],
     },

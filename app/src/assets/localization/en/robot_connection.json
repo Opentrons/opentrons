@@ -9,6 +9,9 @@
   "connection_status_not_connectable": "not connectable",
   "connection_title": "status",
   "disconnected_description": "Your app is trying to connect to your robot via {{type}} at IP address {{ip}}",
+
+  "failed_connection_heading": "Could not connect to robot",
+  "failed_connection_body": "If this problem persists, we recommend restarting your robot and waiting 30 seconds before trying again. If you're still unable to connect, please contact our support team",
   "internet_status": "<bold>Internet:</bold> Unknown",
   "internet_status_full": "<bold>Internet:</bold> The robot is connected to a network and has full access to the Internet.",
   "internet_status_limited": "<bold>Internet:</bold> The  robot is connected to a network, but it has no access to the Internet.",

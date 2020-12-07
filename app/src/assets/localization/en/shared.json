@@ -1,6 +1,9 @@
 {
   "browse": "browse",
+  "cancel": "cancel",
+  "continue": "continue",
   "ending": "ending",
+  "exit": "exit",
   "ok": "ok",
   "open": "open",
   "refresh_list": "refresh list",
