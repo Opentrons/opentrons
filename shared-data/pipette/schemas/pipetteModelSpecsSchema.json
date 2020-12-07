@@ -85,8 +85,7 @@
             "dropTipSpeed",
             "ulPerMm",
             "tipLength",
-            "nozzleOffset",
-            "defaultTipracks"
+            "nozzleOffset"
           ],
           "additionalProperties": false,
           "properties": {
@@ -137,12 +136,6 @@
                 "default": { "type": "number" }
               },
               "additionalProperties": { "type": "number" }
-            },
-            "defaultTipracks": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
             }
           }
         }

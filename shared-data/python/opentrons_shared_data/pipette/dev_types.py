@@ -18,11 +18,16 @@ PipetteName = Union[Literal['p10_single'], Literal['p10_multi'],
                     Literal['p1000_single'], Literal['p100_single_gen2']]
 
 PipetteDefaultTiprack =\
-    Union[Literal["opentrons/opentrons_96_tiprack_10ul/1"], Literal["opentrons/opentrons_96_filtertiprack_10ul/1"],
-          Literal["opentrons/geb_96_tiprack_10ul/1"], Literal["opentrons/opentrons_96_tiprack_20ul/1"],
-          Literal["opentrons/opentrons_96_filtertiprack_20ul/1"], Literal["opentrons/opentrons_96_tiprack_300ul/1"],
-          Literal["opentrons/opentrons_96_filtertiprack_200ul/1"], Literal["opentrons/opentrons_96_tiprack_1000ul/1"],
-          Literal["opentrons/opentrons_96_filtertiprack_1000ul/1"], Literal["opentrons/geb_96_tiprack_1000ul/1"]]
+    Union[Literal["opentrons/opentrons_96_tiprack_10ul/1"],
+          Literal["opentrons/opentrons_96_filtertiprack_10ul/1"],
+          Literal["opentrons/geb_96_tiprack_10ul/1"],
+          Literal["opentrons/opentrons_96_tiprack_20ul/1"],
+          Literal["opentrons/opentrons_96_filtertiprack_20ul/1"],
+          Literal["opentrons/opentrons_96_tiprack_300ul/1"],
+          Literal["opentrons/opentrons_96_filtertiprack_200ul/1"],
+          Literal["opentrons/opentrons_96_tiprack_1000ul/1"],
+          Literal["opentrons/opentrons_96_filtertiprack_1000ul/1"],
+          Literal["opentrons/geb_96_tiprack_1000ul/1"]]
 
 # Generic NewType for models because we get new ones frequently and theres
 # a huge number of them
