@@ -27,28 +27,47 @@ X_CURRENT_HIGH = 1.25
 Y_CURRENT_LOW = 0.3
 Y_CURRENT_HIGH = 1.25
 
+XY_CURRENT_LOW_REFRESH = 0.7
+MOUNT_CURRENT_HIGH_REFRESH = 0.5
+
 Z_RETRACT_DISTANCE = 2
 
 HIGH_CURRENT: CurrentDict = {
     'default': {
         'X': X_CURRENT_HIGH,
         'Y': Y_CURRENT_HIGH,
+        'Z': MOUNT_CURRENT_HIGH_REFRESH,
+        'A': MOUNT_CURRENT_HIGH_REFRESH,
+        'B': PLUNGER_CURRENT_HIGH,
+        'C': PLUNGER_CURRENT_HIGH
+    },
+    '2.1': {
+        'X': X_CURRENT_HIGH,
+        'Y': Y_CURRENT_HIGH,
         'Z': MOUNT_CURRENT_HIGH,
         'A': MOUNT_CURRENT_HIGH,
         'B': PLUNGER_CURRENT_HIGH,
         'C': PLUNGER_CURRENT_HIGH
-    },
+    }
 }
 
 LOW_CURRENT: CurrentDict = {
     'default': {
+        'X': XY_CURRENT_LOW_REFRESH,
+        'Y': XY_CURRENT_LOW_REFRESH,
+        'Z': MOUNT_CURRENT_LOW,
+        'A': MOUNT_CURRENT_LOW,
+        'B': PLUNGER_CURRENT_LOW,
+        'C': PLUNGER_CURRENT_LOW
+    },
+    '2.1': {
         'X': X_CURRENT_LOW,
         'Y': Y_CURRENT_LOW,
         'Z': MOUNT_CURRENT_LOW,
         'A': MOUNT_CURRENT_LOW,
         'B': PLUNGER_CURRENT_LOW,
         'C': PLUNGER_CURRENT_LOW
-    },
+    }
 }
 
 DEFAULT_CURRENT: CurrentDict = {
@@ -60,6 +79,14 @@ DEFAULT_CURRENT: CurrentDict = {
         'B': LOW_CURRENT['default']['B'],
         'C': LOW_CURRENT['default']['C']
     },
+    '2.1': {
+        'X': HIGH_CURRENT['2.1']['X'],
+        'Y': HIGH_CURRENT['2.1']['Y'],
+        'Z': HIGH_CURRENT['2.1']['Z'],
+        'A': HIGH_CURRENT['2.1']['A'],
+        'B': LOW_CURRENT['2.1']['B'],
+        'C': LOW_CURRENT['2.1']['C']
+    }
 }
 
 X_MAX_SPEED = 600
