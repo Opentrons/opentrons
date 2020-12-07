@@ -25,11 +25,6 @@ import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
 import { LabeledValue, Divider } from '../structure'
 import { ToggleBtn } from '../ToggleBtn'
-import {
-  DISABLED_CANNOT_CONNECT,
-  DISABLED_CONNECT_TO_ROBOT,
-  DISABLED_PROTOCOL_IS_RUNNING,
-} from './constants'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -39,7 +34,7 @@ type Props = {|
 |}
 
 export function ControlsCard(props: Props): React.Node {
-  const { t } = useTranslation('robot_controls')
+  const { t } = useTranslation(['robot_controls', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const { robot } = props
   const { name: robotName, status } = robot
@@ -54,11 +49,11 @@ export function ControlsCard(props: Props): React.Node {
 
   let buttonDisabledReason = null
   if (notConnectable) {
-    buttonDisabledReason = DISABLED_CANNOT_CONNECT
+    buttonDisabledReason = t('shared:disabled_cannot_connect')
   } else if (!robot.connected) {
-    buttonDisabledReason = DISABLED_CONNECT_TO_ROBOT
+    buttonDisabledReason = t('shared:disabled_connect_to_robot')
   } else if (isRunning) {
-    buttonDisabledReason = DISABLED_PROTOCOL_IS_RUNNING
+    buttonDisabledReason = t('shared:disabled_protocol_is_running')
   }
 
   const buttonDisabled = Boolean(buttonDisabledReason)
