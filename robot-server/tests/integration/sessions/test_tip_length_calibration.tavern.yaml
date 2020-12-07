@@ -52,7 +52,8 @@ stages:
       json:
         data:
           command: calibration.loadLabware
-          data: {}
+          data:
+            tiprackDefinition: !include fixture_tiprack_300_ul.json
     response:
       status_code: 200
       json:
@@ -65,7 +66,8 @@ stages:
             !re_match "\\d+-\\d+-\\d+T"
           startedAt: *dt
           completedAt: *dt
-          data: {}
+          data:
+            tiprackDefinition: !include fixture_tiprack_300_ul.json
           result: null
 
   - name: Attempt conflicting command

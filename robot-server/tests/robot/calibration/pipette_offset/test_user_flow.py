@@ -7,6 +7,7 @@ from opentrons.calibration_storage import helpers, types as CSTypes
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from opentrons.config.pipette_config import load
+from opentrons.protocol_api import labware
 
 from opentrons_shared_data.labware import load_definition
 
@@ -391,6 +392,23 @@ async def test_hw_calls_fused(
 def test_load_trash(mock_user_flow):
     assert mock_user_flow._deck['12'].load_name == \
         'opentrons_1_trash_1100ml_fixed'
+
+
+async def test_load_labware(mock_user_flow, monkeypatch):
+    old_tiprack = mock_user_flow._tip_rack
+    assert mock_user_flow.should_perform_tip_length is False
+    new_def = labware.get_labware_definition(
+        load_name='opentrons_96_tiprack_300ul',
+        namespace='opentrons', version=1)
+    fake_tip_length = MagicMock(return_value=None)
+    monkeypatch.setattr(
+        mock_user_flow, '_get_stored_tip_length_cal',
+        fake_tip_length)
+    await mock_user_flow.load_labware(new_def)
+    assert mock_user_flow._tip_rack.uri ==\
+        'opentrons/opentrons_96_tiprack_300ul/1'
+    assert mock_user_flow._tip_rack != old_tiprack
+    assert mock_user_flow.should_perform_tip_length is True
 
 
 @pytest.mark.parametrize(argnames="mount",

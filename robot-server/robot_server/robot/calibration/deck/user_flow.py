@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import (
     Any, Awaitable, Callable, Dict, List, Optional, Tuple,
-    Union, TYPE_CHECKING)
+    Union, TYPE_CHECKING, cast)
 
 from opentrons.calibration_storage import get, delete
 from opentrons.calibration_storage.types import TipLengthCalNotFound
@@ -41,6 +41,7 @@ from ..helper_classes import (
 
 if TYPE_CHECKING:
     from .dev_types import SavedPoints, ExpectedPoints
+    from opentrons_shared_data.labware import LabwareDefinition
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -152,8 +153,7 @@ class DeckCalibrationUserFlow:
             serial=self._hw_pipette.pipette_id)  # type: ignore[arg-type]
 
     def get_required_labware(self) -> List[RequiredLabware]:
-        lw = self._get_tip_rack_lw()
-        return [RequiredLabware.from_lw(lw)]
+        return [RequiredLabware.from_lw(self._tip_rack)]
 
     def _set_current_state(self, to_state: State):
         self._current_state = to_state
@@ -190,15 +190,17 @@ class DeckCalibrationUserFlow:
                 [(right_pip, Mount.RIGHT), (left_pip, Mount.LEFT)],
                 key=lambda p_m: p_m[0].config.max_volume)[0]
 
-    def _get_tip_rack_lw(self) -> labware.Labware:
-        pip_vol = self._hw_pipette.config.max_volume
-        lw_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
-        return labware.load(
-            lw_load_name, self._deck.position_for(TIP_RACK_SLOT))
-
-    def _initialize_deck(self):
-        tip_rack_lw = self._get_tip_rack_lw()
-        self._deck[TIP_RACK_SLOT] = tip_rack_lw
+    def _get_tip_rack_lw(
+            self, tiprack_definition: Optional['LabwareDefinition'] = None
+            ) -> labware.Labware:
+        if tiprack_definition:
+            return labware.load_from_definition(
+                tiprack_definition, self._deck.position_for(TIP_RACK_SLOT))
+        else:
+            pip_vol = self._hw_pipette.config.max_volume
+            lw_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
+            return labware.load(
+                lw_load_name, self._deck.position_for(TIP_RACK_SLOT))
 
     def _build_expected_points_dict(self) -> ExpectedPoints:
         pos_1 = self._deck.get_calibration_position(POINT_ONE_ID).position
@@ -242,8 +244,12 @@ class DeckCalibrationUserFlow:
         return await self._hardware.gantry_position(self._mount,
                                                     critical_point)
 
-    async def load_labware(self):
-        pass
+    async def load_labware(self, tiprackDefinition: dict):
+        self._tip_rack = self._get_tip_rack_lw(
+            cast(Optional['LabwareDefinition'], tiprackDefinition))
+        if self._deck[TIP_RACK_SLOT]:
+            del self._deck[TIP_RACK_SLOT]
+        self._deck[TIP_RACK_SLOT] = self._tip_rack
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,
