@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { Provider } from 'react-redux'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 import { i18n } from '../../../i18n'
 
@@ -9,7 +8,7 @@ import {
   actions as RobotActions,
   selectors as RobotSelectors,
 } from '../../../robot'
-import { OutlineButton, Icon, LabeledValue } from '@opentrons/components'
+import { SecondaryBtn, Icon } from '@opentrons/components'
 import { StatusCard } from '../StatusCard'
 
 import type { State } from '../../../types'
@@ -28,16 +27,9 @@ const getConnectRequest: JestMockFn<
 > = RobotSelectors.getConnectRequest
 
 describe('RobotSettings StatusCard', () => {
-  const store = {
-    dispatch: jest.fn(),
-    getState: () => ({ mockState: true }),
-    subscribe: () => {},
-  }
-
   const render = (robot: ViewableRobot = Fixtures.mockConnectableRobot) => {
     return mountWithProviders(<StatusCard robot={robot} />, {
-      wrappingComponent: Provider,
-      wrappingComponentProps: { store, i18n },
+      i18n,
     })
   }
 
@@ -56,14 +48,14 @@ describe('RobotSettings StatusCard', () => {
 
   it('should have a connect button', () => {
     const { wrapper } = render()
-    const button = wrapper.find(OutlineButton)
+    const button = wrapper.find(SecondaryBtn)
 
     expect(button.html()).toContain('connect')
   })
 
   it('dispatch connect on connect button click if disconnected', () => {
-    const { wrapper } = render()
-    const button = wrapper.find(OutlineButton)
+    const { wrapper, store } = render()
+    const button = wrapper.find(SecondaryBtn)
 
     button.invoke('onClick')()
     expect(store.dispatch).toHaveBeenCalledWith(
@@ -73,14 +65,14 @@ describe('RobotSettings StatusCard', () => {
 
   it('should have a disconnect button if connected', () => {
     const { wrapper } = render(Fixtures.mockConnectedRobot)
-    const button = wrapper.find(OutlineButton)
+    const button = wrapper.find(SecondaryBtn)
 
     expect(button.html()).toContain('disconnect')
   })
 
   it('dispatch disconnect on button click if connected', () => {
-    const { wrapper } = render(Fixtures.mockConnectedRobot)
-    const button = wrapper.find(OutlineButton)
+    const { wrapper, store } = render(Fixtures.mockConnectedRobot)
+    const button = wrapper.find(SecondaryBtn)
 
     button.invoke('onClick')()
     expect(store.dispatch).toHaveBeenCalledWith(RobotActions.disconnect())
@@ -89,7 +81,7 @@ describe('RobotSettings StatusCard', () => {
   // TODO(mc, 2020-03-30): add tooltip to button
   it('connect button should be disabled if robot not connectable', () => {
     const { wrapper } = render(Fixtures.mockReachableRobot)
-    const button = wrapper.find(OutlineButton)
+    const button = wrapper.find(SecondaryBtn)
 
     expect(button.prop('disabled')).toBe(true)
   })
@@ -103,7 +95,7 @@ describe('RobotSettings StatusCard', () => {
     })
 
     const { wrapper } = render()
-    const button = wrapper.find(OutlineButton)
+    const button = wrapper.find(SecondaryBtn)
 
     expect(button.prop('disabled')).toBe(true)
   })
@@ -116,7 +108,7 @@ describe('RobotSettings StatusCard', () => {
     })
 
     const { wrapper } = render()
-    const button = wrapper.find(OutlineButton)
+    const button = wrapper.find(SecondaryBtn)
     const icon = button.find(Icon)
     expect(button.prop('disabled')).toBe(true)
     expect(icon.prop('name')).toBe('ot-spinner')
@@ -125,7 +117,7 @@ describe('RobotSettings StatusCard', () => {
 
   it('displays unknown session status if not connected', () => {
     const { wrapper } = render()
-    const status = wrapper.find(LabeledValue)
+    const status = wrapper.find('LabeledValue')
 
     expect(status.html()).toMatch(/unknown/i)
   })
@@ -135,7 +127,7 @@ describe('RobotSettings StatusCard', () => {
     getSessionStatus.mockReturnValue('running')
 
     const { wrapper } = render(Fixtures.mockConnectedRobot)
-    const status = wrapper.find(LabeledValue)
+    const status = wrapper.find('LabeledValue')
 
     expect(status.html()).toMatch(/running/i)
   })

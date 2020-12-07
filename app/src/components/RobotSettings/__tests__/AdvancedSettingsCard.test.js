@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
-import { BORDER_SOLID_LIGHT } from '@opentrons/components'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithProviders } from '@opentrons/components/__utils__'
+
+import { i18n } from '../../../i18n'
 
 import * as RobotSettings from '../../../robot-settings'
 import { mockConnectableRobot } from '../../../discovery/__fixtures__'
@@ -30,8 +31,9 @@ const getRobotSettings: JestMockFn<
 describe('RobotSettings > AdvancedSettingsCard', () => {
   const render = (robot = mockConnectableRobot) => {
     const resetUrl = `/robots/${robot.name}/reset`
-    return mountWithStore(
-      <AdvancedSettingsCard robot={robot} resetUrl={resetUrl} />
+    return mountWithProviders(
+      <AdvancedSettingsCard robot={robot} resetUrl={resetUrl} />,
+      { i18n }
     )
   }
 
@@ -48,7 +50,6 @@ describe('RobotSettings > AdvancedSettingsCard', () => {
     const updateFromFile = wrapper.find(UpdateFromFileControl)
 
     expect(updateFromFile.prop('robotName')).toBe(mockConnectableRobot.name)
-    expect(updateFromFile.prop('borderBottom')).toBe(BORDER_SOLID_LIGHT)
   })
 
   it('should render an OpenJupyterControl', () => {
@@ -56,6 +57,5 @@ describe('RobotSettings > AdvancedSettingsCard', () => {
     const openJupyter = wrapper.find(OpenJupyterControl)
 
     expect(openJupyter.prop('robotIp')).toBe(mockConnectableRobot.ip)
-    expect(openJupyter.prop('borderBottom')).toBe(BORDER_SOLID_LIGHT)
   })
 })

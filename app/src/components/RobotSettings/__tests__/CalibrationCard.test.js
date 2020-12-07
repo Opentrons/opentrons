@@ -1,9 +1,10 @@
 // @flow
 
 import * as React from 'react'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithProviders } from '@opentrons/components/__utils__'
 import { saveAs } from 'file-saver'
 
+import { i18n } from '../../../i18n'
 import * as PipetteOffset from '../../../calibration/pipette-offset'
 import * as TipLength from '../../../calibration/tip-length'
 import * as Calibration from '../../../calibration'
@@ -118,11 +119,9 @@ const getDownloadButton = wrapper =>
 
 describe('CalibrationCard', () => {
   const render = (robot: ViewableRobot = mockRobot) => {
-    return mountWithStore<_, State, Action>(
+    return mountWithProviders<_, State, Action>(
       <CalibrationCard robot={robot} pipettesPageUrl={'fake-url'} />,
-      {
-        initialState: MOCK_STATE,
-      }
+      { initialState: MOCK_STATE, i18n }
     )
   }
 

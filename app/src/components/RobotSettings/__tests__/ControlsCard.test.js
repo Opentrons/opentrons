@@ -8,7 +8,6 @@ import * as RobotAdmin from '../../../robot-admin'
 import * as RobotSelectors from '../../../robot/selectors'
 
 import { ControlsCard } from '../ControlsCard'
-import { LabeledToggle, LabeledButton } from '@opentrons/components'
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
 
 import type { State, Action } from '../../../types'
