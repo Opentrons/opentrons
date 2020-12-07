@@ -27,6 +27,7 @@ export type ResetRobotModalProps = {|
   closeModal: () => mixed,
 |}
 
+// TODO(bc, 2020-12-07): i18n
 const TITLE = 'Robot Configuration Reset'
 
 export function ResetRobotModal(props: ResetRobotModalProps): React.Node {

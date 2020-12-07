@@ -8,6 +8,7 @@ export type ConnectAlertModalProps = {|
   onCloseClick: () => mixed,
 |}
 
+// TODO(bc, 2020-12-07): i18n
 const HEADING = 'Could not connect to robot'
 
 const TRY_AGAIN_MESSAGE =

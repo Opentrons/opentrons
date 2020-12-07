@@ -9,6 +9,7 @@ export type ConfirmStartDeckCalModalProps = {|
   confirm: () => mixed,
 |}
 
+// TODO(bc, 2020-12-07): i18n
 const HEADING = 'Are you sure you want to recalibrate your deck?'
 const CANCEL = 'cancel'
 const EXIT = 'continue'

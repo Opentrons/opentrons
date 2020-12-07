@@ -20,18 +20,7 @@ module.exports = {
       ],
     },
   },
-  plugins: [
-    '@babel/plugin-proposal-class-properties',
-    [
-      'i18next-extract',
-      {
-        outputPath: (locale, namespace) =>
-          `src/assets/localization/${locale}/${namespace}.json`,
-        defaultNS: 'shared',
-        // discardOldKeys: true,
-      },
-    ],
-  ],
+  plugins: ['@babel/plugin-proposal-class-properties'],
   presets: [
     '@babel/preset-flow',
     '@babel/preset-react',
@@ -52,6 +41,14 @@ module.exports = {
     // these projects require `core-js` in their package.json `dependencies`
     {
       test: ['app/**/*', 'labware-library/**/*', 'protocol-designer/**/*'],
+      plugins: [
+        'i18next-extract',
+        {
+          outputPath: (locale, namespace) =>
+            `src/assets/localization/${locale}/${namespace}.json`,
+          defaultNS: 'shared',
+        },
+      ],
       presets: [['@babel/preset-env', { useBuiltIns: 'usage', corejs: 3 }]],
     },
   ],
