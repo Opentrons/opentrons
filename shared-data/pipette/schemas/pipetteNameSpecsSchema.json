@@ -81,9 +81,9 @@
         },
         "defaultTipracks": {
           "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "items": {
+            "type": "string"
+          }
         }
       }
     }

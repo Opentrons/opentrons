@@ -31,7 +31,8 @@
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_10ul/1",
       "opentrons/opentrons_96_filtertiprack_10ul/1",
-      "opentrons/geb_96_tiprack_10ul/1"]
+      "opentrons/geb_96_tiprack_10ul/1"
+    ]
   },
   "p10_multi": {
     "displayName": "P10 8-Channel GEN1",
@@ -65,7 +66,8 @@
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_10ul/1",
       "opentrons/opentrons_96_filtertiprack_10ul/1",
-      "opentrons/geb_96_tiprack_10ul/1"]
+      "opentrons/geb_96_tiprack_10ul/1"
+    ]
   },
   "p20_single_gen2": {
     "displayName": "P20 Single-Channel GEN2",
@@ -110,7 +112,8 @@
       "opentrons/opentrons_96_filtertiprack_20ul/1",
       "opentrons/opentrons_96_tiprack_10ul/1",
       "opentrons/opentrons_96_filtertiprack_10ul/1",
-      "opentrons/geb_96_tiprack_10ul/1"]
+      "opentrons/geb_96_tiprack_10ul/1"
+    ]
   },
   "p20_multi_gen2": {
     "displayName": "P20 8-Channel GEN2",
@@ -152,7 +155,8 @@
       "opentrons/opentrons_96_filtertiprack_20ul/1",
       "opentrons/opentrons_96_tiprack_10ul/1",
       "opentrons/opentrons_96_filtertiprack_10ul/1",
-      "opentrons/geb_96_tiprack_10ul/1"]
+      "opentrons/geb_96_tiprack_10ul/1"
+    ]
   },
   "p50_single": {
     "displayName": "P50 Single-Channel GEN1",
@@ -405,7 +409,8 @@
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_1000ul/1",
       "opentrons/opentrons_96_filtertiprack_1000ul/1",
-      "opentrons/geb_96_tiprack_1000ul/1"]
+      "opentrons/geb_96_tiprack_1000ul/1"
+    ]
   },
   "p1000_single_gen2": {
     "displayName": "P1000 Single-Channel GEN2",
@@ -448,6 +453,7 @@
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_1000ul/1",
       "opentrons/opentrons_96_filtertiprack_1000ul/1",
-      "opentrons/geb_96_tiprack_1000ul/1"]
+      "opentrons/geb_96_tiprack_1000ul/1"
+    ]
   }
 }
