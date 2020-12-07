@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+from dataclasses import replace
 import logging
 import pathlib
 from collections import OrderedDict
@@ -11,6 +12,7 @@ from opentrons import types as top_types
 from opentrons.util import linal
 from functools import lru_cache
 from opentrons.config import robot_configs
+from opentrons.config.types import RobotConfig
 
 from .util import (
     use_or_initialize_loop, DeckTransformState, check_motion_bounds)
@@ -59,7 +61,7 @@ class API(HardwareAPILike):
     def __init__(self,
                  backend: Union[Controller, Simulator],
                  loop: asyncio.AbstractEventLoop,
-                 config: robot_configs.robot_config = None
+                 config: RobotConfig = None
                  ) -> None:
         """ Initialize an API instance.
 
@@ -129,7 +131,7 @@ class API(HardwareAPILike):
 
     @classmethod
     async def build_hardware_controller(
-            cls, config: robot_configs.robot_config = None,
+            cls, config: RobotConfig = None,
             port: str = None,
             loop: asyncio.AbstractEventLoop = None,
             firmware: Tuple[pathlib.Path, str] = None) -> 'API':
@@ -196,7 +198,7 @@ class API(HardwareAPILike):
             cls,
             attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,  # noqa E501
             attached_modules: List[str] = None,
-            config: robot_configs.robot_config = None,
+            config: RobotConfig = None,
             loop: asyncio.AbstractEventLoop = None,
             strict_attached_instruments: bool = True) -> 'API':
         """ Build a simulating hardware controller.
@@ -419,7 +421,8 @@ class API(HardwareAPILike):
 
             self._log.info(
                 f"Doing full configuration on {mount.name}")
-            hw_config = generate_hardware_configs(p, self._config)
+            hw_config = generate_hardware_configs(
+                p, self._config, self._backend.board_revision)
             self._backend.configure_mount(mount, hw_config)
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
@@ -1148,14 +1151,14 @@ class API(HardwareAPILike):
             return top_types.Point(0, 0, 0)
 
     # Gantry/frame (i.e. not pipette) config API
-    def get_config(self) -> robot_configs.robot_config:
+    def get_config(self) -> RobotConfig:
         """ Get the robot's configuration object.
 
-        :returns .robot_config: The object.
+        :returns .RobotConfig: The object.
         """
         return self._config
 
-    def set_config(self, config: robot_configs.robot_config):
+    def set_config(self, config: RobotConfig):
         """ Replace the currently-loaded config """
         self._config = config
 
@@ -1169,9 +1172,9 @@ class API(HardwareAPILike):
         server log level to :py:attr:`logging.DEBUG`.
 
         Documentation on keys can be found in the documentation for
-        :py:class:`.robot_config`.
+        :py:class:`.RobotConfig`.
         """
-        self._config = self._config._replace(**kwargs)  # type: ignore
+        self._config = replace(self._config, **kwargs)  # type: ignore
 
     async def update_deck_calibration(self, new_transform):
         pass

@@ -4,16 +4,18 @@ from os import environ
 import logging
 from time import sleep, time
 from threading import Event, RLock
-from typing import Any, Dict, Optional, Union, List, Tuple
-
+from typing import Any, Dict, Optional, Union, List, Tuple, cast
 from math import isclose
 from serial.serialutil import SerialException  # type: ignore
 
+from opentrons.config.types import RobotConfig
+from opentrons.config.robot_configs import current_for_revision
 from opentrons.drivers import serial_communication
 from opentrons.drivers.types import MoveSplits
 from opentrons.drivers.utils import (
     AxisMoveTimestamp, parse_key_from_substring, parse_number_from_substring)
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
+from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 from opentrons.system import smoothie_update
 """
 - Driver is responsible for providing an interface for motion control
@@ -28,6 +30,7 @@ log = logging.getLogger(__name__)
 
 ERROR_KEYWORD = 'error'
 ALARM_KEYWORD = 'alarm'
+
 
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION: Dict[str, float] = {
@@ -297,12 +300,15 @@ def _parse_homing_status_values(raw_homing_status_values):
 
 
 class SmoothieDriver_3_0_0:
-    def __init__(self, config, gpio_chardev=None, handle_locks=True):
+    def __init__(
+            self,
+            config: RobotConfig,
+            gpio_chardev: GPIODriverLike = None,
+            handle_locks: bool = True):
         self.run_flag = Event()
         self.run_flag.set()
 
         self._position = HOMED_POSITION.copy()
-        self.log = []
 
         # why do we do this after copying the HOMED_POSITION?
         self._update_position({axis: 0 for axis in AXES})
@@ -318,17 +324,35 @@ class SmoothieDriver_3_0_0:
         # Current-Settings is the amperage each axis was last set to
         # Active-Current-Settings is set when an axis is moving/homing
         # Dwelling-Current-Settings is set when an axis is NOT moving/homing
-        self._current_settings = {
-            'now': config.low_current.copy(),
-            'saved': config.low_current.copy()  # used in push/pop methods
+        self._current_settings: Dict[str, Dict[str, float]] = {
+            'now': cast(
+                Dict[str, float],
+                current_for_revision(
+                    config.low_current, self._gpio_chardev.board_rev).copy()),
+            'saved': cast(
+                Dict[str, float],
+                current_for_revision(
+                    config.low_current, self._gpio_chardev.board_rev).copy()),
         }
-        self._active_current_settings = {
-            'now': config.high_current.copy(),
-            'saved': config.high_current.copy()  # used in push/pop methods
+        self._active_current_settings: Dict[str, Dict[str, float]] = {
+            'now': cast(
+                Dict[str, float],
+                current_for_revision(
+                    config.high_current, self._gpio_chardev.board_rev).copy()),
+            'saved': cast(
+                Dict[str, float],
+                current_for_revision(
+                    config.high_current, self._gpio_chardev.board_rev).copy()),
         }
-        self._dwelling_current_settings = {
-            'now': config.low_current.copy(),
-            'saved': config.low_current.copy()  # used in push/pop methods
+        self._dwelling_current_settings: Dict[str, Dict[str, float]] = {
+            'now': cast(
+                Dict[str, float],
+                current_for_revision(
+                    config.low_current, self._gpio_chardev.board_rev).copy()),
+            'saved': cast(
+                Dict[str, float],
+                current_for_revision(
+                    config.low_current, self._gpio_chardev.board_rev).copy()),
         }
 
         # Active axes are axes that are in use. An axis might be disabled if
@@ -350,13 +374,13 @@ class SmoothieDriver_3_0_0:
         self._saved_max_speed_settings = self._max_speed_settings.copy()
         self._combined_speed = float(DEFAULT_AXES_SPEED)
         self._saved_axes_speed = float(self._combined_speed)
-        self._steps_per_mm = {}
+        self._steps_per_mm: Dict[str, float] = {}
         self._acceleration = config.acceleration.copy()
         self._saved_acceleration = config.acceleration.copy()
 
         # position after homing
         self._homed_position = HOMED_POSITION.copy()
-        self.homed_flags = {}
+        self.homed_flags: Dict[str, bool] = {}
         self.update_homed_flags(flags={
             'X': False,
             'Y': False,
@@ -399,8 +423,6 @@ class SmoothieDriver_3_0_0:
             axis: value
             for axis, value in target.items() if value is not None
         })
-
-        self.log += [self._position.copy()]
 
     def update_position(self, default=None):
         if default is None:
@@ -720,7 +742,7 @@ class SmoothieDriver_3_0_0:
         try:
             yield
         finally:
-            self.set_axis_max_speed(self._max_speed_settings)
+            self.set_axis_max_speed(self._max_speed_settings)  # type: ignore
 
     def set_axis_max_speed(
             self, settings: Dict[str, float], update: bool = True):
@@ -734,7 +756,7 @@ class SmoothieDriver_3_0_0:
             bool, True to save the settings for future use
         """
         if update:
-            self._max_speed_settings.update(settings)
+            self._max_speed_settings.update(settings)  # type: ignore
         values = ['{}{}'.format(axis.upper(), value)
                   for axis, value in sorted(settings.items())]
         command = '{} {}'.format(
@@ -748,7 +770,7 @@ class SmoothieDriver_3_0_0:
         self._saved_max_speed_settings = self._max_speed_settings.copy()
 
     def pop_axis_max_speed(self):
-        self.set_axis_max_speed(self._saved_max_speed_settings)
+        self.set_axis_max_speed(self._saved_max_speed_settings)  # type: ignore
 
     def set_acceleration(self, settings: Dict[str, float]):
         """
@@ -1766,7 +1788,7 @@ class SmoothieDriver_3_0_0:
 
         self.push_active_current()
         self.set_active_current({
-            ax: self._config.high_current[ax]
+            ax: self._config.high_current['default'][ax]  # type: ignore
             for ax in axes
             })
         self.push_axis_max_speed()

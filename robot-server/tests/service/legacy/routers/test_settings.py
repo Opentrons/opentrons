@@ -1,7 +1,7 @@
 import logging
 import pytest
 from unittest.mock import patch, call
-from collections import namedtuple
+from dataclasses import make_dataclass
 
 from opentrons.config.reset import ResetOptionId
 from opentrons.config import advanced_settings
@@ -93,8 +93,8 @@ def test_post_log_level_upstream_fails_reload(api_client):
 
 
 def test_get_robot_settings(api_client, hardware):
-    Conf = namedtuple("Conf", ("a", "b", "c"))
-    hardware.config = Conf("test", "this", 5)
+    Conf = make_dataclass("Conf", ["a", "b", "c"])
+    hardware.config = Conf(a="test", b="this", c=5)
 
     res = api_client.get("/settings/robot")
 

@@ -7,10 +7,10 @@ from typing import Any, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING
 
 from opentrons.types import Point
 from opentrons.calibration_storage.types import PipetteOffsetByPipetteMount
-from opentrons.config import pipette_config
+from opentrons.config import pipette_config, robot_configs
+from opentrons.config.types import RobotConfig
 from opentrons.drivers.types import MoveSplit
-from opentrons.config.robot_configs import robot_config
-from .types import CriticalPoint
+from .types import CriticalPoint, BoardRevision
 
 
 if TYPE_CHECKING:
@@ -403,7 +403,8 @@ def _build_splits(pipette: Pipette) -> Optional[MoveSplit]:
 
 def generate_hardware_configs(
         pipette: Optional[Pipette],
-        robot_config: robot_config) -> InstrumentHardwareConfigs:
+        robot_config: RobotConfig,
+        revision: BoardRevision) -> InstrumentHardwareConfigs:
     """
     Fuse robot and pipette configuration to generate commands to send to
     the motor driver if required
@@ -422,6 +423,7 @@ def generate_hardware_configs(
             'steps_per_mm': dpcs['stepsPerMM'],
             'home_pos': dpcs['homePosition'],
             'max_travel': dpcs['maxTravel'],
-            'idle_current': robot_config.low_current['B'],
+            'idle_current': robot_configs.current_for_revision(
+                robot_config.low_current, revision)['B'],
             'splits': None
         }

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from opentrons.config import robot_configs
+from opentrons.config.types import RobotConfig
 from opentrons.types import Mount
 from opentrons.hardware_control import API
 
@@ -21,7 +22,7 @@ class SimulatorSetup:
     attached_instruments: Dict[Mount, Dict[str, Optional[str]]] =\
         field(default_factory=dict)
     attached_modules: Dict[str, List[ModuleCall]] = field(default_factory=dict)
-    config: Optional[robot_configs.robot_config] = None
+    config: Optional[RobotConfig] = None
     strict_attached_instruments: bool = True
 
 
@@ -71,8 +72,6 @@ def _prepare_for_dict(key, value):
     """Convert an element in SimulatorSetup to be a serializable dict"""
     if key == 'attached_instruments' and value:
         return {mount.name.lower(): data for (mount, data) in value.items()}
-    if key == 'config' and value:
-        return robot_configs.config_to_save(value)
     return value
 
 

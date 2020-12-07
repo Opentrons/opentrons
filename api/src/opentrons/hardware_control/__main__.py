@@ -14,6 +14,7 @@ import logging
 
 from . import API
 from opentrons.config import robot_configs as rc
+from opentrons.config.types import RobotConfig
 
 LOG = logging.getLogger('opentrons.hardware_control.__main__')
 
@@ -34,7 +35,7 @@ def exception_handler(loop, context):
     loop.default_exception_handler(context)
 
 
-async def arun(config: rc.robot_config = None,
+async def arun(config: RobotConfig = None,
                port: str = None):
     """ Asynchronous entrypoint for the server
 
@@ -45,7 +46,7 @@ async def arun(config: rc.robot_config = None,
     hc = await API.build_hardware_controller(rconf, port) # noqa(F841)
 
 
-def run(config: rc.robot_config = None,
+def run(config: RobotConfig = None,
         port: str = None):
     """ Synchronous entrypoint for the server.
 

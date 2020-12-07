@@ -13,56 +13,17 @@ stages:
       json:
         name: !anystr
         version: !anyint
-        steps_per_mm: !re_match "M\\d+ X\\d+\\.\\d+ Y\\d+\\.\\d+ Z\\d+ A\\d+ B\\d+ C\\d+"
-        gantry_steps_per_mm:
-          X: !anyfloat
-          Y: !anyfloat
-          Z: !anyint
-          A: !anyint
-        acceleration:
-          A: !anyint
-          B: !anyint
-          C: !anyint
-          X: !anyint
-          Y: !anyint
-          Z: !anyint
+        gantry_steps_per_mm: !anydict
+        acceleration: !anydict
         serial_speed: !anyint
-        tip_length: !anydict
-        default_current:
-          A: !anyfloat
-          B: !anyfloat
-          C: !anyfloat
-          X: !anyfloat
-          Y: !anyfloat
-          Z: !anyfloat
-        low_current:
-          A: !anyfloat
-          B: !anyfloat
-          C: !anyfloat
-          X: !anyfloat
-          Y: !anyfloat
-          Z: !anyfloat
-        high_current:
-          A: !anyfloat
-          B: !anyfloat
-          C: !anyfloat
-          X: !anyfloat
-          Y: !anyfloat
-          Z: !anyfloat
-        default_max_speed:
-          A: 125
-          B: 40
-          C: 40
-          X: 600
-          Y: 400
-          Z: 125
+        default_current: !anydict
+        low_current: !anydict
+        high_current: !anydict
+        default_max_speed: !anydict
         left_mount_offset:
-        - -34
-        - 0
-        - 0
+          - -34
+          - 0
+          - 0
         log_level: !re_match "DEBUG|INFO|WARNING|ERROR"
-        default_pipette_configs:
-          homePosition: 220
-          maxTravel: 30
-          stepsPerMM: 768
+        default_pipette_configs: !anydict
         z_retract_distance: 2

@@ -3,7 +3,8 @@ import asyncio
 import enum
 import logging
 from dataclasses import dataclass
-from typing import Tuple, Union, TYPE_CHECKING
+from typing import cast, Tuple, Union, TYPE_CHECKING
+from typing_extensions import Literal
 from opentrons import types as top_types
 
 if TYPE_CHECKING:
@@ -118,6 +119,9 @@ class HardwareAPILike(abc.ABC):
         ...
 
 
+RevisionLiteral = Literal['2.1', 'A', 'B', 'C', 'UNKNOWN']
+
+
 class BoardRevision(enum.Enum):
     UNKNOWN = enum.auto()
     OG = enum.auto()
@@ -135,8 +139,12 @@ class BoardRevision(enum.Enum):
         }
         return br[rev_bits]
 
-    def __str__(self):
-        return '2.1' if self.name == 'OG' else self.name
+    def real_name(self) -> Union[RevisionLiteral, Literal['UNKNOWN']]:
+        rn = '2.1' if self.name == 'OG' else self.name
+        return cast(Union[RevisionLiteral, Literal['UNKNOWN']], rn)
+
+    def __str__(self) -> str:
+        return self.real_name()
 
 
 class CriticalPoint(enum.Enum):
