@@ -4,11 +4,12 @@ require typing_extensions.
 
 This module should only be imported if typing.TYPE_CHECKING is True.
 """
-
 from typing import Dict, List, NewType, Union
 
 from typing_extensions import Literal, TypedDict
 
+
+LabwareUri = NewType('LabwareUri', str)
 # Explicit listing of pipette names because we don't frequently get new ones
 PipetteName = Union[Literal['p10_single'], Literal['p10_multi'],
                     Literal['p20_single_gen2'], Literal['p20_multi_gen2'],
@@ -16,18 +17,6 @@ PipetteName = Union[Literal['p10_single'], Literal['p10_multi'],
                     Literal['p300_single'], Literal['p300_multi'],
                     Literal['p300_single_gen2'], Literal['p300_multi_gen2'],
                     Literal['p1000_single'], Literal['p100_single_gen2']]
-
-PipetteDefaultTiprack =\
-    Union[Literal["opentrons/opentrons_96_tiprack_10ul/1"],
-          Literal["opentrons/opentrons_96_filtertiprack_10ul/1"],
-          Literal["opentrons/geb_96_tiprack_10ul/1"],
-          Literal["opentrons/opentrons_96_tiprack_20ul/1"],
-          Literal["opentrons/opentrons_96_filtertiprack_20ul/1"],
-          Literal["opentrons/opentrons_96_tiprack_300ul/1"],
-          Literal["opentrons/opentrons_96_filtertiprack_200ul/1"],
-          Literal["opentrons/opentrons_96_tiprack_1000ul/1"],
-          Literal["opentrons/opentrons_96_filtertiprack_1000ul/1"],
-          Literal["opentrons/geb_96_tiprack_1000ul/1"]]
 
 # Generic NewType for models because we get new ones frequently and theres
 # a huge number of them
@@ -94,7 +83,7 @@ class PipetteNameSpec(TypedDict):
     defaultDispenseFlowRate: PipetteConfigElementWithPerApiLevelValue
     defaultBlowOutFlowRate: PipetteConfigElementWithPerApiLevelValue
     smoothieConfigs: SmoothieConfigs
-    defaultTipracks: List[PipetteDefaultTiprack]
+    defaultTipracks: List[LabwareUri]
 
 
 PipetteNameSpecs = Dict[PipetteName, PipetteNameSpec]

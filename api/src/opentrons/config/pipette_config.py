@@ -14,7 +14,7 @@ from opentrons_shared_data.pipette import (
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
         PipetteName, PipetteModel, UlPerMm, Quirk,
-        PipetteFusedSpec, PipetteDefaultTiprack
+        PipetteFusedSpec, LabwareUri
     )
 
 
@@ -59,7 +59,7 @@ class PipetteConfig:
     default_aspirate_flow_rates: Dict[str, float]
     default_dispense_flow_rates: Dict[str, float]
     model: PipetteModel
-    default_tipracks: List[PipetteDefaultTiprack]
+    default_tipracks: List[LabwareUri]
 
 
 # Notes:

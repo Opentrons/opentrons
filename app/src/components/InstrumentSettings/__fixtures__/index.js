@@ -24,5 +24,6 @@ export const mockAttachedPipette = {
       homePosition: 0,
       travelDistance: 100,
     },
+    defaultTipracks: ['opentrons/my_fav_tiprack_200ul/1'],
   },
 }
