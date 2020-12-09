@@ -298,6 +298,7 @@ export type PipetteNameSpecs = {|
   defaultAspirateFlowRate: FlowRateSpec,
   defaultDispenseFlowRate: FlowRateSpec,
   defaultBlowOutFlowRate: FlowRateSpec,
+  defaultTipracks: Array<string>,
   smoothieConfigs?: {|
     stepsPerMM: number,
     homePosition: number,

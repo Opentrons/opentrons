@@ -13,7 +13,8 @@ from opentrons_shared_data.pipette import (
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
-        PipetteName, PipetteModel, UlPerMm, Quirk, PipetteFusedSpec
+        PipetteName, PipetteModel, UlPerMm, Quirk,
+        PipetteFusedSpec, LabwareUri
     )
 
 
@@ -58,6 +59,7 @@ class PipetteConfig:
     default_aspirate_flow_rates: Dict[str, float]
     default_dispense_flow_rates: Dict[str, float]
     model: PipetteModel
+    default_tipracks: List[LabwareUri]
 
 
 # Notes:
@@ -215,6 +217,7 @@ def load(
             'valuesByApiLevel',
             {'2.0': cfg['defaultAspirateFlowRate']['value']}),
         model=pipette_model,
+        default_tipracks=cfg['defaultTipracks']
     )
 
     return res

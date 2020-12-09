@@ -41,6 +41,11 @@ Object {
       "2.0": 10,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P10 8-Channel GEN1",
   "dropTip": Object {
@@ -262,6 +267,11 @@ Object {
       "2.0": 10,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P10 8-Channel GEN1",
   "dropTip": Object {
@@ -483,6 +493,11 @@ Object {
       "2.0": 10,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P10 8-Channel GEN1",
   "dropTip": Object {
@@ -704,6 +719,11 @@ Object {
       "2.0": 10,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P10 8-Channel GEN1",
   "dropTip": Object {
@@ -895,6 +915,11 @@ Object {
       "2.0": 10,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel GEN1",
   "dropTip": Object {
@@ -1121,6 +1146,11 @@ Object {
       "2.0": 10,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel GEN1",
   "dropTip": Object {
@@ -1347,6 +1377,11 @@ Object {
       "2.0": 10,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel GEN1",
   "dropTip": Object {
@@ -1573,6 +1608,11 @@ Object {
       "2.0": 10,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel GEN1",
   "dropTip": Object {
@@ -1763,6 +1803,10 @@ Object {
       "2.0": 50,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P50 8-Channel GEN1",
   "dropTip": Object {
@@ -1973,6 +2017,10 @@ Object {
       "2.0": 50,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P50 8-Channel GEN1",
   "dropTip": Object {
@@ -2183,6 +2231,10 @@ Object {
       "2.0": 50,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P50 8-Channel GEN1",
   "dropTip": Object {
@@ -2393,6 +2445,10 @@ Object {
       "2.0": 50,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P50 8-Channel GEN1",
   "dropTip": Object {
@@ -2583,6 +2639,10 @@ Object {
       "2.0": 50,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P50 Single-Channel GEN1",
   "dropTip": Object {
@@ -2793,6 +2853,10 @@ Object {
       "2.0": 50,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P50 Single-Channel GEN1",
   "dropTip": Object {
@@ -3003,6 +3067,10 @@ Object {
       "2.0": 50,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P50 Single-Channel GEN1",
   "dropTip": Object {
@@ -3213,6 +3281,10 @@ Object {
       "2.0": 300,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P300 8-Channel GEN1",
   "dropTip": Object {
@@ -3387,6 +3459,10 @@ Object {
       "2.0": 300,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P300 8-Channel GEN1",
   "dropTip": Object {
@@ -3561,6 +3637,10 @@ Object {
       "2.0": 300,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P300 8-Channel GEN1",
   "dropTip": Object {
@@ -3735,6 +3815,10 @@ Object {
       "2.0": 300,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P300 8-Channel GEN1",
   "dropTip": Object {
@@ -3910,6 +3994,10 @@ Object {
       "2.0": 300,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel GEN1",
   "dropTip": Object {
@@ -4140,6 +4228,10 @@ Object {
       "2.0": 300,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel GEN1",
   "dropTip": Object {
@@ -4370,6 +4462,10 @@ Object {
       "2.0": 300,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel GEN1",
   "dropTip": Object {
@@ -4600,6 +4696,10 @@ Object {
       "2.0": 300,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel GEN1",
   "dropTip": Object {
@@ -4794,6 +4894,11 @@ Object {
       "2.0": 1000,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_1000ul/1",
+    "opentrons/opentrons_96_filtertiprack_1000ul/1",
+    "opentrons/geb_96_tiprack_1000ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel GEN1",
   "dropTip": Object {
@@ -4990,6 +5095,11 @@ Object {
       "2.0": 1000,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_1000ul/1",
+    "opentrons/opentrons_96_filtertiprack_1000ul/1",
+    "opentrons/geb_96_tiprack_1000ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel GEN1",
   "dropTip": Object {
@@ -5186,6 +5296,11 @@ Object {
       "2.0": 1000,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_1000ul/1",
+    "opentrons/opentrons_96_filtertiprack_1000ul/1",
+    "opentrons/geb_96_tiprack_1000ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel GEN1",
   "dropTip": Object {
@@ -5382,6 +5497,11 @@ Object {
       "2.0": 1000,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_1000ul/1",
+    "opentrons/opentrons_96_filtertiprack_1000ul/1",
+    "opentrons/geb_96_tiprack_1000ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel GEN1",
   "dropTip": Object {
@@ -5564,6 +5684,11 @@ Object {
       "2.0": 10,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P10 8-Channel GEN1",
   "maxVolume": 10,
@@ -5604,6 +5729,11 @@ Object {
       "2.0": 10,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel GEN1",
   "maxVolume": 10,
@@ -5644,6 +5774,10 @@ Object {
       "2.0": 50,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P50 8-Channel GEN1",
   "maxVolume": 50,
@@ -5684,6 +5818,10 @@ Object {
       "2.0": 50,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P50 Single-Channel GEN1",
   "maxVolume": 50,
@@ -5724,6 +5862,10 @@ Object {
       "2.0": 300,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P300 8-Channel GEN1",
   "maxVolume": 300,
@@ -5764,6 +5906,10 @@ Object {
       "2.0": 300,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel GEN1",
   "maxVolume": 300,
@@ -5804,6 +5950,11 @@ Object {
       "2.0": 1000,
     },
   },
+  "defaultTipracks": Array [
+    "opentrons/opentrons_96_tiprack_1000ul/1",
+    "opentrons/opentrons_96_filtertiprack_1000ul/1",
+    "opentrons/geb_96_tiprack_1000ul/1",
+  ],
   "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel GEN1",
   "maxVolume": 1000,

@@ -51,7 +51,8 @@
         "defaultDispenseFlowRate",
         "defaultBlowOutFlowRate",
         "maxVolume",
-        "minVolume"
+        "minVolume",
+        "defaultTipracks"
       ],
       "additionalProperties": false,
       "properties": {
@@ -76,6 +77,12 @@
             "stepsPerMM": { "type": "number" },
             "homePosition": { "type": "number" },
             "travelDistance": { "type": "number" }
+          }
+        },
+        "defaultTipracks": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         }
       }
