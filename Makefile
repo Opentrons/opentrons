@@ -17,6 +17,7 @@ PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
+NOTIFY_SERVER_DIR := notify-server
 APP_SHELL_DIR := app-shell
 
 # This may be set as an environment variable (and is by CI tasks that upload
@@ -56,9 +57,9 @@ setup-py:
 	$(OT_PYTHON) -m pip install pipenv==2020.8.13
 	$(MAKE) -C $(API_DIR) setup
 	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
+	$(MAKE) -C $(NOTIFY_SERVER_DIR) setup
 	$(MAKE) -C $(ROBOT_SERVER_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
-
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
@@ -116,7 +117,10 @@ push:
 	sleep 1
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push
 	sleep 1
+	$(MAKE) -C $(NOTIFY_SERVER_DIR) push
+	sleep 1
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push
+
 
 
 .PHONY: term
