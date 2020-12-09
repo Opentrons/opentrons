@@ -12,6 +12,7 @@ class SimProtocolContext(ProtocolContextImplementation):
                         instrument_name: str,
                         mount: types.Mount,
                         replace: bool = False) -> InstrumentContextInterface:
+        """Create a simulating instrument context."""
         instr = self._instruments[mount]
         if instr and not replace:
             raise RuntimeError(
@@ -24,13 +25,15 @@ class SimProtocolContext(ProtocolContextImplementation):
                     if instr}
         attached[mount] = instrument_name
         self._hw_manager.hardware.cache_instruments(attached)
-        # If the cache call didn’t raise, the instrument is attached
+
         new_instr = SimInstrumentContext(
             protocol_interface=self,
-            pipette_dict=self._hw_manager.hardware.get_attached_instruments()[mount],
+            pipette_dict=self._hw_manager.hardware.get_attached_instruments()[
+                mount
+            ],
             mount=mount,
             instrument_name=instrument_name,
         )
         self._instruments[mount] = new_instr
-        self._log.info("Instrument {} loaded".format(new_instr))
+        self._log.info(f"Instrument {new_instr} loaded")
         return new_instr

@@ -2,7 +2,6 @@ import typing
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds, \
     Clearances
 from opentrons.protocols.implementations.interfaces.instrument_context import \
@@ -10,24 +9,23 @@ from opentrons.protocols.implementations.interfaces.instrument_context import \
 from opentrons.protocols.implementations.interfaces.protocol_context import \
     ProtocolContextInterface
 from opentrons.protocols.implementations.well import WellImplementation
-from opentrons.protocols.types import APIVersion
 
 
 class SimInstrumentContext(InstrumentContextInterface):
+    """A simulation of an instrument context."""
 
     def __init__(self,
                  protocol_interface: ProtocolContextInterface,
                  pipette_dict: PipetteDict,
                  mount: types.Mount,
                  instrument_name: str,
-                 default_speed: float = 400.0,
-                 api_version: APIVersion = None):
+                 default_speed: float = 400.0):
+        """Constructor."""
         self._protocol_interface = protocol_interface
         self._mount = mount
         self._pipette_dict = pipette_dict
         self._instrument_name = instrument_name
         self._default_speed = default_speed
-        self._api_version = api_version or MAX_SUPPORTED_VERSION
         self._flow_rate = FlowRates(self)
         self._plunger_speeds = PlungerSpeeds(self)
 
