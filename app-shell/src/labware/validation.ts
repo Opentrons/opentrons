@@ -37,8 +37,8 @@ export function validateLabwareFiles(
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const definition = data && validateLabwareDefinition(data)
 
-    if (definition === null) {
-      return { filename, modified, type: INVALID_LABWARE_FILE }
+    if (errors) {
+      return { filename, modified, type: INVALID_LABWARE_FILE, errors }
     }
 
     const props = { filename, modified, definition }

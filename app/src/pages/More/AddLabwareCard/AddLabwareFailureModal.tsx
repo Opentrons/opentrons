@@ -105,9 +105,13 @@ export function AddLabwareFailureModalTemplate(
   } else if (file.type === INVALID_LABWARE_FILE) {
     heading = INVALID_LABWARE_DEFINITION
     children = (
-      <p>
-        {THE_FILE} {renderFilename(file)} {IS_NOT_A_VALID_LABWARE_DEFINITION}
-      </p>
+      <>
+        <p>
+          {THE_FILE} {renderFilename(file)} {IS_NOT_A_VALID_LABWARE_DEFINITION}
+        </p>
+        {file.errors && file.errors.map(({ dataPath, message }) =>
+          <p>{dataPath} {message}</p>)}
+      </>
     )
   } else if (file.type === OPENTRONS_LABWARE_FILE) {
     heading = CONFLICT_WITH_OPENTRONS_LABWARE
