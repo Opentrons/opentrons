@@ -70,8 +70,12 @@ export function LabwareItem(props: LabwareItemProps): JSX.Element {
           <div className={styles.item_warning_wrapper}>
             <Warning>
               <p>{warning}</p>
-                {errors && errors.map(({ dataPath, message }) =>
-                  <p>{dataPath} {message}</p>)}
+              {errors &&
+                errors.map(({ dataPath, message }) => (
+                  <p>
+                    {dataPath} {message}
+                  </p>
+                ))}
             </Warning>
           </div>
         )}
