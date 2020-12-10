@@ -30,7 +30,8 @@ from robot_server.service.labware.router import router as labware_router
 from robot_server.service.protocol.router import router as protocol_router
 from robot_server.service.system.router import router as system_router
 from robot_server.service.tip_length.router import router as tl_router
-from robot_server.service.notifications import router as notifications_router
+from robot_server.service.notifications.router import router as \
+    notifications_router
 
 
 log = logging.getLogger(__name__)
@@ -68,7 +69,7 @@ routes.include_router(router=pip_os_router,
                       tags=["Pipette Offset Calibration Management"])
 routes.include_router(router=tl_router,
                       tags=["Tip Length Calibration Management"])
-routes.include_router(router=notifications_router.router,
+routes.include_router(router=notifications_router,
                       tags=["Notification Server Management"])
 
 app.include_router(router=routes,
