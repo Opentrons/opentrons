@@ -1,8 +1,9 @@
 """Implementation of the QueueEntry class."""
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import List
+
+from pydantic import BaseModel
 
 from notify_server.models.event import Event
 
@@ -13,8 +14,7 @@ class MalformedFrames(Exception):
     pass
 
 
-@dataclass
-class QueueEntry:
+class QueueEntry(BaseModel):
     """An entry in a send/receive queue."""
 
     topic: str

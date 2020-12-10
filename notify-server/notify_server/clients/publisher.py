@@ -51,7 +51,7 @@ class Publisher:
         Waits until free slot is available before adding the entry to the
         queue.
         """
-        await self._queue.put(QueueEntry(topic, event))
+        await self._queue.put(QueueEntry(topic=topic, event=event))
 
     def send_nowait(self, topic: str, event: Event) -> None:
         """
@@ -60,7 +60,7 @@ class Publisher:
         Uses put_nowait to add queue entry without blocking.
         """
         try:
-            self._queue.put_nowait(QueueEntry(topic, event))
+            self._queue.put_nowait(QueueEntry(topic=topic, event=event))
         except asyncio.QueueFull:
             log.exception("Exception while sending publish event.")
 
