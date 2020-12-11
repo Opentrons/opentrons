@@ -46,7 +46,8 @@ module.exports = {
           'i18next-extract',
           {
             outputPath: (locale, namespace) =>
-              `src/assets/localization/${locale}/${namespace}.json`,
+              `app/src/assets/localization/${locale}/${namespace}.json`,
+            keySeparator: null,
             defaultNS: 'shared',
           },
         ],

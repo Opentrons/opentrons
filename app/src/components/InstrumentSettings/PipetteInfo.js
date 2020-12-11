@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 import {
   InstrumentDiagram,
@@ -28,10 +29,6 @@ import {
 import styles from './styles.css'
 import { getRobotByName } from '../../discovery'
 import { getIsRunning } from '../../robot/selectors'
-import {
-  DISABLED_CONNECT_TO_ROBOT,
-  DISABLED_PROTOCOL_IS_RUNNING,
-} from '../RobotSettings/constants'
 import { PipetteCalibrationInfo } from './PipetteCalibrationInfo'
 
 import type { State } from '../../types'
@@ -65,6 +62,7 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const serialNumber = pipette ? pipette.id : null
   const channels = pipette ? pipette.modelSpecs.channels : null
 
+  const { t } = useTranslation()
   const isRunning = useSelector(getIsRunning)
   const isConnected = useSelector(
     (state: State) => getRobotByName(state, robotName)?.connected
@@ -75,9 +73,9 @@ export function PipetteInfo(props: PipetteInfoProps): React.Node {
 
   let disabledReason = null
   if (!isConnected) {
-    disabledReason = DISABLED_CONNECT_TO_ROBOT
+    disabledReason = t('disabled_cannot_connect')
   } else if (isRunning) {
-    disabledReason = DISABLED_PROTOCOL_IS_RUNNING
+    disabledReason = t('disabled_protocol_is_running')
   }
 
   return (
