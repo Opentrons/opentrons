@@ -5,19 +5,7 @@ import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
-import type { ReactWrapper } from 'enzyme'
-
-export type MockStore<State, Action> = {|
-  getState: JestMockFn<[], State>,
-  subscribe: JestMockFn<[], void>,
-  dispatch: JestMockFn<[Action], Action>,
-|}
-
-export type WrapperWithStore<Element, State, Action> = {|
-  wrapper: ReactWrapper<Element>,
-  store: MockStore<State, Action>,
-  refresh: (nextState?: State) => void,
-|}
+import type { MockStore, WrapperWithStore } from './mountWithStore'
 
 export type MountWithProvidersOptions<State> = {
   initialState?: State,
