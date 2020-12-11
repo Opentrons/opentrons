@@ -37,20 +37,6 @@ module.exports = {
       plugins: [['react-hot-loader/babel', false]],
       presets: [['@babel/preset-env', { targets: { node: '8' } }]],
     },
-    {
-      test: ['app/**/*'],
-      plugins: [
-        [
-          'i18next-extract',
-          {
-            outputPath: (locale, namespace) =>
-              `app/src/assets/localization/${locale}/${namespace}.json`,
-            keySeparator: null,
-            defaultNS: 'shared',
-          },
-        ],
-      ],
-    },
     // apps that should be polyfilled
     // these projects require `core-js` in their package.json `dependencies`
     {
