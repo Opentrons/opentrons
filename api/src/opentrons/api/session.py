@@ -7,6 +7,7 @@ import logging
 from time import time, sleep
 from typing import (
     cast, List, Dict, Any, Optional, Set, Sequence, Tuple, TypeVar, Iterator)
+
 from typing_extensions import Final
 from uuid import uuid4
 
@@ -22,6 +23,8 @@ from opentrons.commands import types as command_types, introspection
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.implementations.protocol_context import \
     ProtocolContextImplementation
+from opentrons.protocols.implementations.simulators.protocol_context import \
+    SimProtocolContext
 from opentrons.protocols.parse import parse
 from opentrons.protocols.types import Protocol
 from opentrons.calibration_storage import helpers
@@ -345,6 +348,8 @@ class Session(RobotBusy):
 
     @robot_is_busy
     def _simulate(self) -> List[CommandShortId]:
+        """Execute the protocol with the purpose of catching simple errors and
+        extracting equipment and command steps."""
         self._reset()
 
         stack: List[command_types.CommandMessage] = []
@@ -393,7 +398,8 @@ class Session(RobotBusy):
                     strict_attached_instruments=False
                     ).sync
             sync_sim.home()
-            ctx_impl = ProtocolContextImplementation.build_using(
+            # Use a simulated protocol context.
+            ctx_impl = SimProtocolContext.build_using(
                 self._protocol,
                 hardware=sync_sim,
                 extra_labware=getattr(self._protocol, 'extra_labware', {}))
