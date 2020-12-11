@@ -37,10 +37,8 @@ module.exports = {
       plugins: [['react-hot-loader/babel', false]],
       presets: [['@babel/preset-env', { targets: { node: '8' } }]],
     },
-    // app that should be polyfilled
-    // these projects require `core-js` in their package.json `dependencies`
     {
-      test: ['app/**/*', 'labware-library/**/*', 'protocol-designer/**/*'],
+      test: ['app/**/*'],
       plugins: [
         [
           'i18next-extract',
@@ -52,6 +50,11 @@ module.exports = {
           },
         ],
       ],
+    },
+    // apps that should be polyfilled
+    // these projects require `core-js` in their package.json `dependencies`
+    {
+      test: ['app/**/*', 'labware-library/**/*', 'protocol-designer/**/*'],
       presets: [['@babel/preset-env', { useBuiltIns: 'usage', corejs: 3 }]],
     },
   ],
