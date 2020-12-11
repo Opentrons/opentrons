@@ -194,19 +194,12 @@ export function CalibrationCard(props: Props): React.Node {
         fontSize={FONT_SIZE_BODY_1}
         padding={SPACING_3}
       >
-        <Text display={DISPLAY_INLINE}>
+        <Text>
           <Trans
             t={t}
             i18nKey="definition"
             components={{
-              a: (
-                <Link
-                  color={C_BLUE}
-                  display={DISPLAY_INLINE}
-                  external
-                  href={CAL_ARTICLE_URL}
-                />
-              ),
+              a: <Link color={C_BLUE} external href={CAL_ARTICLE_URL} />,
             }}
           />
         </Text>
