@@ -11,6 +11,9 @@ class Links(BaseModel):
     serialLog: str = \
         Field(...,
               description="The URI of the serial logs")
+    serverLog: str = \
+        Field(...,
+              description="The URI of the server logs")
     apiSpec: str = \
         Field(...,
               description="The URI to this API specification")

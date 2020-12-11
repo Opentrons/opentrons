@@ -1,9 +1,16 @@
 from fastapi import APIRouter, Query, Response
+from typing import Dict
 
 from opentrons.system import log_control
 from robot_server.service.legacy.models.logs import LogIdentifier, LogFormat
 
 router = APIRouter()
+
+IDENTIFIER_TO_SYSLOG_ID: Dict[LogIdentifier, str] = {
+    LogIdentifier.api: 'opentrons-api',
+    LogIdentifier.serial: 'opentrons-api-serial',
+    LogIdentifier.server: 'uvicorn',
+}
 
 
 @router.get("/logs/{log_identifier}", description="Get logs from the robot.")
@@ -15,15 +22,12 @@ async def get_logs(
         gt=0, le=log_control.MAX_RECORDS
     ),
 ) -> Response:
-    identifier = 'opentrons-api-serial'
-    if log_identifier == LogIdentifier.api:
-        identifier = 'opentrons-api'
-
+    syslog_id = IDENTIFIER_TO_SYSLOG_ID[log_identifier]
     modes = {LogFormat.json: ("json", "application/json"),
              LogFormat.text: ("short", "text/plain")}
     format_type, media_type = modes[format]
     output = await log_control.get_records_dumb(
-        identifier, records, format_type
+        syslog_id, records, format_type
     )
     return Response(
         content=output.decode('utf-8'), media_type=media_type)

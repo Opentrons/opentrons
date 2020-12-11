@@ -12,13 +12,14 @@ def test_health(api_client, hardware):
         'api_version': __version__,
         'fw_version': 'FW111',
         'board_revision': 'BR2.1',
-        'logs': ['/logs/serial.log', '/logs/api.log'],
+        'logs': ['/logs/serial.log', '/logs/api.log', '/logs/server.log'],
         'system_version': '0.0.0',
         'minimum_protocol_api_version': list(MIN_SUPPORTED_VERSION),
         'maximum_protocol_api_version': list(MAX_SUPPORTED_VERSION),
         "links": {
             "apiLog": "/logs/api.log",
             "serialLog": "/logs/serial.log",
+            "serverLog": "/logs/server.log",
             "apiSpec": "/openapi.json",
             "systemTime": "/system/time"
         }

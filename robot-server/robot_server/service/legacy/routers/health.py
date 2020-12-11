@@ -22,7 +22,7 @@ router = APIRouter()
             response_description="OT-2 /health response")
 async def get_health(
         hardware: ThreadManager = Depends(get_hardware)) -> Health:
-    static_paths = ['/logs/serial.log', '/logs/api.log']
+    static_paths = ['/logs/serial.log', '/logs/api.log', '/logs/server.log']
     # This conditional handles the case where we have just changed
     # the use protocol api v2 feature flag, so it does not match
     # the type of hardware we're actually using.
@@ -44,6 +44,7 @@ async def get_health(
                   links=Links(
                       apiLog='/logs/api.log',
                       serialLog='/logs/serial.log',
+                      serverLog='/logs/server.log',
                       apiSpec="/openapi.json",
                       systemTime="/system/time"
                   ))
