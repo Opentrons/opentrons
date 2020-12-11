@@ -5,6 +5,7 @@ class LogIdentifier(str, Enum):
     """Identifier of the log"""
     api = "api.log"
     serial = "serial.log"
+    server = "server.log"
 
 
 class LogFormat(str, Enum):
