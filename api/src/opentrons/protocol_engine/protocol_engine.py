@@ -2,13 +2,12 @@
 from __future__ import annotations
 from typing import Union
 
-from opentrons_shared_data.deck import load as load_deck
-from opentrons.protocols.api_support.constants import STANDARD_DECK
 from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.util.helpers import utc_now
 
 from .errors import ProtocolEngineError, UnexpectedProtocolError
 from .execution import CommandHandlers
+from .resources import ResourceProviders
 from .state import StateStore, StateView
 from .commands import (
     CommandRequestType,
@@ -30,13 +29,24 @@ class ProtocolEngine:
     _handlers: CommandHandlers
 
     @classmethod
-    def create(cls, hardware: HardwareAPI) -> ProtocolEngine:
+    async def create(cls, hardware: HardwareAPI) -> ProtocolEngine:
         """Create a ProtocolEngine instance."""
-        deck_definition = load_deck(STANDARD_DECK, 2)
-        state_store = StateStore(deck_definition=deck_definition)
+        resources = ResourceProviders.create()
+
+        # TODO(mc, 2020-11-18): check short trash FF
+        # TODO(mc, 2020-11-18): consider moving into a StateStore.create factory
+        deck_def = await resources.deck_data.get_deck_definition()
+        fixed_labware = await resources.deck_data.get_deck_fixed_labware(deck_def)
+
+        state_store = StateStore(
+            deck_definition=deck_def,
+            deck_fixed_labware=fixed_labware
+        )
+
         handlers = CommandHandlers.create(
+            resources=resources,
             hardware=hardware,
-            state=StateView.create_view(state_store)
+            state=StateView.create_view(state_store),
         )
 
         return cls(state_store=state_store, handlers=handlers)

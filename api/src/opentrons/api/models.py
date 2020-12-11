@@ -1,59 +1,54 @@
-from opentrons.protocol_api import labware
+from typing import cast, List, Optional, Tuple
+from opentrons.types import Point
+from opentrons.protocol_api import (
+    labware, InstrumentContext, ProtocolContext)
+
 from opentrons.protocols.geometry import module_geometry
-from opentrons.legacy_api.containers import Slot, placeable
 
 
-def _get_parent_slot_legacy(placeable):
-    if isinstance(placeable, Slot) or not placeable:
-        res = placeable
-    else:
-        res = _get_parent_slot_legacy(placeable.parent)
-    return res
-
-
-def _get_parent_slot_and_position(labware_obj):
+def _get_parent_slot_and_position(
+        labware_obj: labware.Labware) -> Tuple[str, Optional[Point]]:
     if isinstance(labware_obj.parent, (module_geometry.ModuleGeometry)):
-        return (labware_obj.parent.parent, labware_obj.parent.labware_offset)
+        return (
+            cast(str, labware_obj.parent.parent),
+            labware_obj.parent.labware_offset)
     else:
-        return (labware_obj.parent, None)
+        return (cast(str, labware_obj.parent), None)
 
 
 class Container:
-    def __init__(self, container, instruments=None, context=None):
-        instruments = instruments or []
+    def __init__(
+            self,
+            container: labware.Labware,
+            instruments: List[InstrumentContext],
+            context: ProtocolContext) -> None:
         self._container = container
         self._context = context
         self.id = id(container)
         self.labware_offset_from_slot = 0
 
-        if isinstance(container, placeable.Placeable):
-            self.name = container.get_name()
-            self.type = container.get_type()
-            self.slot = _get_parent_slot_legacy(container).get_name()
-            self.is_legacy = container.properties.get(
-                'labware_hash') is None
-            self.definition_hash = container.properties.get(
-                'labware_hash', None)
-
-        else:
-            # will be labware's load name or label
-            self.name = container.name
-            # type must be load_name so client can load correct definition
-            self.type = container.load_name
-            slot, position = _get_parent_slot_and_position(container)
-            self.slot = slot
-            self.position = position
-            self.is_legacy = False
-            self.is_tiprack = container.is_tiprack
-            self.definition_hash = labware.get_labware_hash_with_parent(
-                container)
+        # will be labware's load name or label
+        self.name = container.name
+        # type must be load_name so client can load correct definition
+        self.type = container.load_name
+        slot, position = _get_parent_slot_and_position(container)
+        self.slot = slot
+        self.position = position
+        self.is_legacy = False
+        self.is_tiprack = container.is_tiprack
+        self.definition_hash = labware.get_labware_hash_with_parent(
+            container)
         self.instruments = [
-            Instrument(instrument)
+            Instrument(instrument, [], self._context)
             for instrument in instruments]
 
 
 class Instrument:
-    def __init__(self, instrument, containers=None, context=None):
+    def __init__(
+            self,
+            instrument: InstrumentContext,
+            containers: List[labware.Labware],
+            context: ProtocolContext) -> None:
         containers = containers or []
         self._instrument = instrument
         self._context = context
@@ -66,11 +61,11 @@ class Instrument:
         self.channels = instrument.channels
         self.mount = instrument.mount
         self.containers = [
-            Container(container)
+            Container(container, [], self._context)
             for container in containers
         ]
         self.tip_racks = [
-            Container(container)
+            Container(container, [], self._context)
             for container in instrument.tip_racks]
         if context:
             self.tip_racks.extend([
@@ -79,23 +74,16 @@ class Instrument:
 
 
 class Module:
-    def __init__(self, module, context=None):
+    def __init__(
+            self,
+            module: module_geometry.ModuleGeometry,
+            context: ProtocolContext) -> None:
         self.id = id(module)
-        if isinstance(module, module_geometry.ModuleGeometry):
-            _type_lookup = {
-                module_geometry.ModuleType.MAGNETIC: 'magdeck',
-                module_geometry.ModuleType.TEMPERATURE: 'tempdeck',
-                module_geometry.ModuleType.THERMOCYCLER: 'thermocycler'}
-            self.name = _type_lookup[module.module_type]
-            self.model = module.model.value
-            self.slot = module.parent
-        else:
-            self.name = module.get_name()
-            _legacy_lookup = {
-                'tempdeck': 'temperatureModuleV1',
-                'magdeck': 'magneticModuleV1',
-                'thermocycler': 'thermocyclerModuleV1'
-            }
-            self.model = _legacy_lookup[module.get_name()]
-            self.slot = module.parent.get_name()
+        _type_lookup = {
+            module_geometry.ModuleType.MAGNETIC: 'magdeck',
+            module_geometry.ModuleType.TEMPERATURE: 'tempdeck',
+            module_geometry.ModuleType.THERMOCYCLER: 'thermocycler'}
+        self.name = _type_lookup[module.module_type]
+        self.model = module.model.value
+        self.slot = module.parent
         self._context = context

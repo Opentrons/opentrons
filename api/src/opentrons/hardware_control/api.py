@@ -325,13 +325,13 @@ class API(HardwareAPILike):
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
 
-    async def delay(self, duration_s: int):
+    async def delay(self, duration_s: float):
         """ Delay execution by pausing and sleeping.
         """
         await self._wait_for_is_running()
         self.pause()
         if not self.is_simulator:
-            async def sleep_for_seconds(seconds: int):
+            async def sleep_for_seconds(seconds: float):
                 await asyncio.sleep(seconds)
             delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
             await self._execution_manager.register_cancellable_task(delay_task)
@@ -353,7 +353,6 @@ class API(HardwareAPILike):
                 return
             new_p = Pipette(
                 p._config,
-                self._config.instrument_offset[m.name.lower()],
                 rb_cal.load_pipette_offset(p.pipette_id, m),
                 p.pipette_id)
             new_p.act_as(p.acting_as)
@@ -364,23 +363,6 @@ class API(HardwareAPILike):
                 _reset(m)
         else:
             _reset(mount)
-
-    def set_instrument_offset(
-            self, mount: top_types.Mount, new_offset: top_types.Point):
-        """
-        Temporarily (i.e., without saving to disk) override the instrument
-        offset of the instrument attached to ``mount``. This should only be
-        used in calibration workflows where the device under calibration
-        should be using no calibration at all, to avoid altering the saved
-        calibration.
-
-        To reload the saved value, call :py:meth:`cache_instruments` again.
-        """
-        pip = self._attached_instruments[mount]
-        if not pip:
-            raise top_types.PipetteNotAttachedError(
-                f'No pipette attached to {mount.name} mount')
-        pip.update_instrument_offset(new_offset)
 
     async def cache_instruments(
             self,
@@ -425,7 +407,6 @@ class API(HardwareAPILike):
                 self._attached_instruments[mount],
                 req_instr,
                 pip_id,
-                self._config.instrument_offset[mount.name.lower()],
                 pip_offset_cal)
             self._attached_instruments[mount] = p
             if req_instr and p:
@@ -744,9 +725,9 @@ class API(HardwareAPILike):
         gantry_calibration =\
             self.robot_calibration.deck_calibration.attitude
         right_deck = linal.apply_reverse(
-            gantry_calibration, right, with_offsets=False)
+            gantry_calibration, right)
         left_deck = linal.apply_reverse(
-            gantry_calibration, left, with_offsets=False)
+            gantry_calibration, left)
         deck_pos = {Axis.X: right_deck[0],
                     Axis.Y: right_deck[1],
                     Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],
@@ -1027,12 +1008,10 @@ class API(HardwareAPILike):
         # above that makes this OK
         primary_transformed = linal.apply_transform(
             self.robot_calibration.deck_calibration.attitude,
-            to_transform_primary,  # type: ignore
-            with_offsets=False)
+            to_transform_primary)  # type: ignore
         secondary_transformed = linal.apply_transform(
             self.robot_calibration.deck_calibration.attitude,
-            to_transform_secondary,  # type: ignore
-            with_offsets=False)
+            to_transform_secondary)  # type: ignore
         return primary_transformed, secondary_transformed
 
     async def _move(self, target_position: 'OrderedDict[Axis, float]',
@@ -1772,182 +1751,6 @@ class API(HardwareAPILike):
             self._log.info(f"Module {name} discovered and attached"
                            f" at port {port}, new_instance: {new_instance}")
 
-    async def _do_tp(self, pip, mount) -> top_types.Point:
-        """ Execute the work of tip probe.
-
-        This is a separate function so that it can be encapsulated in
-        a context manager that ensures the state of the pipette tip tracking
-        is reset properly. It should not be called outside of
-        :py:meth:`locate_tip_probe_center`.
-
-        :param pip: The pipette to use
-        :type pip: opentrons.hardware_control.pipette.Pipette
-        :param mount: The mount on which the pipette is attached
-        :type mount: opentrons.types.Mount
-        """
-        # Clear the old offset during calibration
-        self.set_instrument_offset(mount, top_types.Point())
-        # Hotspots based on our expectation of tip length and config
-        hotspots = robot_configs.calculate_tip_probe_hotspots(
-            pip.current_tip_length, self._config.tip_probe)
-        new_pos: Dict[Axis, List[float]] = {
-            ax: [] for ax in Axis.gantry_axes() if ax != Axis.A}
-        safe_z = self._config.tip_probe.z_clearance.crossover + \
-            self._config.tip_probe.center[2]
-        for hs in hotspots:
-            ax_en = Axis[hs.axis.upper()]
-            overridden_center = {
-                ax: sum(vals)/len(vals)
-                if len(vals) == 2
-                else self._config.tip_probe.center[ax.value]
-                for ax, vals in new_pos.items()
-            }
-            x0 = overridden_center[Axis.X] + hs.x_start_offs
-            y0 = overridden_center[Axis.Y] + hs.y_start_offs
-            z0 = hs.z_start_abs
-            pos = await self.current_position(mount)
-
-            # Move safely to the setup point for the probe
-            await self.move_to(mount,
-                               top_types.Point(pos[Axis.X],
-                                               pos[Axis.Y],
-                                               safe_z))
-            await self.move_to(mount,
-                               top_types.Point(x0, y0, safe_z))
-            await self.move_to(mount,
-                               top_types.Point(x0, y0, z0))
-            if ax_en == Axis.Z:
-                to_probe = Axis.by_mount(mount)
-            else:
-                to_probe = ax_en
-            # Probe and retrieve the position afterwards
-            async with self._motion_lock:
-                self._current_position = self._deck_from_smoothie(
-                    self._backend.probe(
-                        to_probe.name.lower(), hs.probe_distance))
-            xyz = await self.gantry_position(mount)
-            # Store the upated position.
-            self._log.debug(
-                "tip probe: hs {}: start: ({} {} {}) status {} will add {}"
-                .format(hs, x0, y0, z0, new_pos, xyz[ax_en.value]))
-            new_pos[ax_en].append(xyz[ax_en.value])
-            # Before moving up, move back to clear the switches
-            bounce = self._config.tip_probe.bounce_distance\
-                * (-1.0 if hs.probe_distance > 0 else 1.0)
-            await self.move_rel(mount,
-                                top_types.Point(
-                                    **{hs.axis: bounce}))
-            await self.move_to(mount, xyz._replace(z=safe_z))
-
-        to_ret = top_types.Point(**{ax.name.lower(): sum(vals)/len(vals)
-                                    for ax, vals in new_pos.items()})
-        self._log.info("Tip probe complete with {} {} on {}. "
-                       "New position: {} (default {}), averaged from {}"
-                       .format(pip.model, pip.pipette_id, mount.name,
-                               to_ret, self._config.tip_probe.center,
-                               new_pos))
-        return to_ret
-
-    async def locate_tip_probe_center(
-            self, mount, tip_length=None) -> top_types.Point:
-        """ Use the specified mount (which should have a tip) to find the
-        position of the tip probe target center relative to its definition
-
-        :param mount: The mount to use for the probe
-        :param tip_length: If specified (it should usually be specified),
-                           the length of the tip assumed to be attached.
-
-        The tip length specification is for the use case during protocol
-        calibration, when the machine cannot yet pick up a tip on its own.
-        For that reason, it is not universally necessary. Instead, there
-        are several cases:
-
-        1. A tip has previously been picked up with :py:meth:`pick_up_tip`.
-           ``tip_length`` should not be specified since the tip length is
-           known. If ``tip_length`` is not ``None``, this function asserts.
-        2. A tip has not previously been picked up, and ``tip_length`` is
-           specified. The pipette will internally have a tip added of the
-           specified length.
-        3. A tip has not previously been picked up, and ``tip_length`` is
-           not specified. The pipette will use the tip length from its
-           config.
-
-        The return value is a dict containing the updated position, in deck
-        coordinates, of the tip probe center.
-        """
-        opt_pip = self._attached_instruments[mount]
-        assert opt_pip, '{} has no pipette'.format(mount.name.lower())
-        pip = opt_pip
-
-        if pip.has_tip and tip_length:
-            pip.remove_tip()
-
-        if not tip_length:
-            assert pip.has_tip,\
-                'If pipette has no tip a tip length must be specified'
-            tip_length = pip._current_tip_length
-
-        # assure_tip lets us make sure we don’t pollute the pipette
-        # state even if there’s an exception in tip probe
-        @contextlib.contextmanager
-        def _assure_tip():
-            if pip.has_tip:
-                old_tip: Optional[float] = pip._current_tip_length
-                pip.remove_tip()
-            else:
-                old_tip = None
-            pip.add_tip(tip_length)
-            try:
-                yield
-            finally:
-                pip.remove_tip()
-                if old_tip:
-                    pip.add_tip(old_tip)
-
-        with _assure_tip():
-            return await self._do_tp(pip, mount)
-
-    async def update_instrument_offset(self, mount,
-                                       new_offset: top_types.Point = None,
-                                       from_tip_probe: top_types.Point = None):
-        """ Update the instrument offset for a pipette on the specified mount.
-
-        This will update both the stored value in the robot settings and
-        the live value in the currently-loaded pipette.
-
-        If you just want to change the live value for the currently-attached
-        instrument without saving it, use :py:meth:`.set_instrument_offset`.
-
-        This can be specified either directly by using the new_offset arg
-        or using the result of a previous call to
-        :py:meth:`locate_tip_probe_center` with the same mount.
-
-        :note: Z differences in the instrument offset cannot be
-               disambiguated between differences in the position of the
-               nozzle and differences in the length of the nozzle/tip
-               interface (assuming that tips are of reasonably uniform
-               length). For this reason, they are saved as adjustments
-               to the nozzle interface length and only applied when a
-               tip is present.
-        """
-        if from_tip_probe:
-            new_offset = (top_types.Point(*self._config.tip_probe.center)
-                          - from_tip_probe)
-        elif not new_offset:
-            raise ValueError(
-                "Either from_tip_probe or new_offset must be specified")
-        opt_pip = self._attached_instruments[mount]
-        assert opt_pip, '{} has no pipette'.format(mount.name.lower())
-        pip = opt_pip
-        inst_offs = self._config.instrument_offset
-        pip_type = 'multi' if pip.config.channels > 1 else 'single'
-        inst_offs[mount.name.lower()][pip_type] = [new_offset.x,
-                                                   new_offset.y,
-                                                   new_offset.z]
-        await self.update_config(instrument_offset=inst_offs)
-        self.set_instrument_offset(mount, new_offset)
-        robot_configs.save_robot_settings(self._config)
-
     def get_instrument_max_height(
             self,
             mount: top_types.Mount,
@@ -1962,10 +1765,7 @@ class API(HardwareAPILike):
         max_height = pip.config.home_position - \
             self._config.z_retract_distance + cp.z
 
-        _, _, transformed_z = linal.apply_reverse(
-            self._config.gantry_calibration,
-            (0, 0, max_height))
-        return transformed_z
+        return max_height
 
     def clean_up(self):
         """ Get the API ready to stop cleanly. """

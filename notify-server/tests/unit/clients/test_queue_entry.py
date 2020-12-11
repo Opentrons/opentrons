@@ -8,7 +8,7 @@ from notify_server.models.event import Event
 
 def test_entry_to_frames(event: Event) -> None:
     """Test that to frames method creates a list of byte frames."""
-    entry = QueueEntry("topic", event)
+    entry = QueueEntry(topic="topic", event=event)
     assert entry.to_frames() == [
         b'topic', event.json().encode('utf-8')
     ]

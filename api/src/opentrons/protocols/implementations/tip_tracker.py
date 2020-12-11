@@ -14,7 +14,7 @@ class TipTracker:
 
     def next_tip(self,
                  num_tips: int = 1,
-                 starting_tip: WellImplementation = None) \
+                 starting_tip: Optional[WellImplementation] = None) \
             -> Optional[WellImplementation]:
         """
         Find the next valid well for pick-up.

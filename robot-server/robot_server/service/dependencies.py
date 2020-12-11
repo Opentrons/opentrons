@@ -2,13 +2,15 @@ from functools import lru_cache
 
 from starlette import status
 from fastapi import Depends, HTTPException
-from opentrons.api import MainRouter
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server.hardware_wrapper import HardwareWrapper
 from robot_server.service.session.manager import SessionManager
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.legacy.rpc import RPCServer
+
+from notify_server.clients import publisher
+from notify_server.settings import Settings as NotifyServerSettings
 
 
 # The single instance of the RPCServer
@@ -18,6 +20,15 @@ _rpc_server_instance = None
 _session_manager_inst = None
 
 api_wrapper = HardwareWrapper()
+
+
+@lru_cache(maxsize=1)
+def get_event_publisher():
+    notify_server_settings = NotifyServerSettings()
+    event_publisher = publisher.create(
+                notify_server_settings.publisher_address.connection_string()
+            )
+    return event_publisher
 
 
 async def verify_hardware():
@@ -47,6 +58,7 @@ def get_motion_lock() -> ThreadedAsyncLock:
 
 async def get_rpc_server() -> RPCServer:
     """The RPC Server instance"""
+    from opentrons.api import MainRouter
     global _rpc_server_instance
     if not _rpc_server_instance:
         h = await get_hardware()

@@ -1,50 +1,40 @@
 from __future__ import annotations
 
-from functools import lru_cache
 import logging
+from functools import lru_cache
 from typing import (
-    Any, Dict, List, Optional, Tuple, Sequence, TYPE_CHECKING, Union)
+    List, Optional, Sequence, TYPE_CHECKING, Union)
+from opentrons.broker import Broker
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
 from opentrons.commands import commands as cmds
 from opentrons.commands.publisher import CommandPublisher, do_publish, publish
-from opentrons.hardware_control.types import CriticalPoint, PipettePair
-from opentrons.calibration_storage import get
-from opentrons.calibration_storage.types import TipLengthCalNotFound
+from opentrons.hardware_control.types import PipettePair
+from opentrons.protocols.advanced_control.mix import mix_from_kwargs
+from opentrons.protocols.api_support.instrument import \
+    validate_blowout_location, tip_length_for, validate_tiprack, \
+    determine_drop_target
 from opentrons.protocols.api_support.labware_like import LabwareLike
+from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.util import (
-    FlowRates, PlungerSpeeds, Clearances,
-    clamp_value, requires_version, build_edges)
+    FlowRates, PlungerSpeeds, Clearances, clamp_value, requires_version)
+from opentrons.protocols.implementations.interfaces.instrument_context import \
+    InstrumentContextInterface
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.protocol.dev_types import (
-    BlowoutLocation, LiquidHandlingCommand)
 from .labware import (
-    filter_tipracks_to_start, Labware, OutOfTipsError,
-    select_tiprack_from_list, Well)
-from opentrons.protocols.geometry import planning
+    Labware, OutOfTipsError, Well, next_available_tip)
 from opentrons.protocols.advanced_control import transfers
-from .module_contexts import ThermocyclerContext
 from .paired_instrument_context import (
     PairedInstrumentContext, UnsupportedInstrumentPairingError)
 
 if TYPE_CHECKING:
-    from .protocol_context import ProtocolContext
-    from opentrons.protocols.api_support.util import HardwareManager
-
+    from opentrons.protocol_api import ProtocolContext
 
 AdvancedLiquidHandling = Union[
     Well,
     types.Location,
     List[Union[Well, types.Location]],
     List[List[Well]]]
-
-
-VALID_PIP_TIPRACK_VOL = {
-    'p10': [10, 20],
-    'p20': [10, 20],
-    'p50': [200, 300],
-    'p300': [200, 300],
-    'p1000': [1000]
-}
 
 
 class InstrumentContext(CommandPublisher):
@@ -66,44 +56,33 @@ class InstrumentContext(CommandPublisher):
     """
 
     def __init__(self,
+                 implementation: InstrumentContextInterface,
                  ctx: ProtocolContext,
-                 hardware_mgr: HardwareManager,
-                 mount: types.Mount,
+                 broker: Broker,
                  log_parent: logging.Logger,
                  at_version: APIVersion,
                  tip_racks: List[Labware] = None,
-                 trash: Labware = None,
-                 default_speed: float = 400.0,
-                 requested_as: str = None,
-                 **config_kwargs) -> None:
+                 trash: Optional[Labware] = None,
+                 ) -> None:
 
-        super().__init__(ctx.broker)
+        super().__init__(broker)
         self._api_version = at_version
-        self._hw_manager = hardware_mgr
+        self._implementation = implementation
         self._ctx = ctx
-        self._mount = mount
         self._log = log_parent.getChild(repr(self))
 
         self._tip_racks = tip_racks or list()
         for tip_rack in self.tip_racks:
             assert tip_rack.is_tiprack
-            self._validate_tiprack(tip_rack)
+            validate_tiprack(self.name, tip_rack, self._log)
         if trash is None:
             self.trash_container = self._ctx.fixed_trash
         else:
             self.trash_container = trash
 
-        self._default_speed = default_speed
-
-        self._last_location: Union[Labware, Well, None] = None
         self._last_tip_picked_up_from: Union[Well, None] = None
-        self._well_bottom_clearance = Clearances(
-            default_aspirate=1.0, default_dispense=1.0)
-        self._flow_rates = FlowRates(self)
-        self._speeds = PlungerSpeeds(self)
         self._starting_tip: Union[Well, None] = None
-        self.requested_as = requested_as
-        self._flow_rates.set_defaults(self._api_version)
+        self.requested_as = self._implementation.get_instrument_name()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -139,56 +118,15 @@ class InstrumentContext(CommandPublisher):
         default, the speed of individual motions can be changed with the
         ``speed`` argument to :py:meth:`InstrumentContext.move_to`.
         """
-        return self._default_speed
+        return self._implementation.get_default_speed()
 
     @default_speed.setter
     def default_speed(self, speed: float):
-        self._default_speed = speed
-
-    def _validate_tiprack(self, tiprack: Labware):
-        # TODO AA 2020-06-24 - we should instead add the acceptable Opentrons
-        # tipracks to the pipette as a refactor
-        if tiprack._implementation.get_definition()['namespace'] \
-                == 'opentrons':
-            tiprack_vol = tiprack.wells()[0].max_volume
-            valid_vols = VALID_PIP_TIPRACK_VOL[self.name.split('_')[0]]
-            if tiprack_vol not in valid_vols:
-                self._log.warning(
-                    f'The pipette {self.name} and its tiprack '
-                    f'{tiprack.load_name} in slot {tiprack.parent} appear to '
-                    'be mismatched. Please check your protocol before running '
-                    'on the robot.')
-
-    def _validate_blowout_location(
-            self,
-            liquid_handling_command: LiquidHandlingCommand,
-            blowout_location: Optional[Any]):
-
-        if blowout_location and self._api_version < APIVersion(2, 8):
-            raise ValueError(
-                'Cannot specify blowout location when using api' +
-                ' version below 2.8, current version is {api_version}'
-                .format(api_version=self._api_version))
-
-        elif liquid_handling_command == 'consolidate' \
-                and blowout_location == 'source well':
-            raise ValueError(
-                "blowout location for consolidate cannot be source well")
-        elif liquid_handling_command == 'distribute' \
-                and blowout_location == 'destination well':
-            raise ValueError(
-                "blowout location for distribute cannot be destination well")
-        elif liquid_handling_command == 'transfer' and \
-            blowout_location and blowout_location not in [
-                location.value for location in BlowoutLocation]:
-            raise ValueError(
-                "blowout location should be either 'source well', " +
-                " 'destination well', or 'trash'" +
-                f" but it is {blowout_location}")
+        self._implementation.set_default_speed(speed)
 
     @requires_version(2, 0)
     def aspirate(self,
-                 volume: float = None,
+                 volume: Optional[float] = None,
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> InstrumentContext:
         """
@@ -230,11 +168,8 @@ class InstrumentContext(CommandPublisher):
                                 rate))
 
         if isinstance(location, Well):
-            point, well = location.bottom()
-            dest = types.Location(
-                point + types.Point(0, 0,
-                                    self.well_bottom_clearance.aspirate),
-                well)
+            dest = location.bottom().move(
+                types.Point(0, 0, self.well_bottom_clearance.aspirate))
         elif isinstance(location, types.Location):
             dest = location
         elif location is not None:
@@ -254,8 +189,8 @@ class InstrumentContext(CommandPublisher):
             # Make sure we're at the top of the labware and clear of any
             # liquid to prepare the pipette for aspiration
 
-            if self._api_version < APIVersion(2, 3) or \
-                    not self.hw_pipette['ready_to_aspirate']:
+            if self.api_version < APIVersion(2, 3) or \
+                    not self._implementation.is_ready_to_aspirate():
                 if dest.labware.is_well:
                     self.move_to(dest.labware.as_well().top())
                 else:
@@ -267,23 +202,24 @@ class InstrumentContext(CommandPublisher):
                         " the well to prepare for aspiration. This might "
                         "cause over aspiration if the previous command is a "
                         "blow_out.")
-                self._hw_manager.hardware.prepare_for_aspirate(self._mount)
+                self._implementation.prepare_for_aspirate()
             self.move_to(dest)
         elif dest != self._ctx.location_cache:
             self.move_to(dest)
 
-        c_vol = self.hw_pipette['available_volume'] if not volume else volume
+        c_vol = self._implementation.get_available_volume() \
+            if not volume else volume
 
         do_publish(self.broker, cmds.aspirate, self.aspirate,
                    'before', None, None, self, c_vol, dest, rate)
-        self._hw_manager.hardware.aspirate(self._mount, volume, rate)
+        self._implementation.aspirate(volume=c_vol, rate=rate)
         do_publish(self.broker, cmds.aspirate, self.aspirate,
                    'after', self, None, self, c_vol, dest, rate)
         return self
 
     @requires_version(2, 0)
     def dispense(self,
-                 volume: float = None,
+                 volume: Optional[float] = None,
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> InstrumentContext:
         """
@@ -334,19 +270,15 @@ class InstrumentContext(CommandPublisher):
             if LabwareLike(location).is_fixed_trash():
                 loc = location.top()
             else:
-                point, well = location.bottom()
-                loc = types.Location(
-                    point + types.Point(0, 0,
-                                        self.well_bottom_clearance.dispense),
-                    well)
+                loc = location.bottom().move(
+                    types.Point(0, 0, self.well_bottom_clearance.dispense))
             self.move_to(loc)
         elif isinstance(location, types.Location):
             loc = location
             self.move_to(location)
         elif location is not None:
             raise TypeError(
-                'location should be a Well or Location, but it is {}'
-                .format(location))
+                f'location should be a Well or Location, but it is {location}')
         elif self._ctx.location_cache:
             loc = self._ctx.location_cache
         else:
@@ -360,7 +292,7 @@ class InstrumentContext(CommandPublisher):
 
         do_publish(self.broker, cmds.dispense, self.dispense,
                    'before', None, None, self, c_vol, loc, rate)
-        self._hw_manager.hardware.dispense(self._mount, volume, rate)
+        self._implementation.dispense(volume=c_vol, rate=rate)
         do_publish(self.broker, cmds.dispense, self.dispense,
                    'after', self, None, self, c_vol, loc, rate)
         return self
@@ -368,7 +300,7 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 0)
     def mix(self,
             repetitions: int = 1,
-            volume: float = None,
+            volume: Optional[float] = None,
             location: Union[types.Location, Well] = None,
             rate: float = 1.0) -> InstrumentContext:
         """
@@ -407,10 +339,11 @@ class InstrumentContext(CommandPublisher):
             'mixing {}uL with {} repetitions in {} at rate={}'.format(
                 volume, repetitions,
                 location if location else 'current position', rate))
-        if not self._has_tip:
+        if not self._implementation.has_tip():
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
 
-        c_vol = self.hw_pipette['available_volume'] if not volume else volume
+        c_vol = self._implementation.get_available_volume() \
+            if not volume else volume
 
         do_publish(self.broker, cmds.mix, self.mix,
                    'before', None, None,
@@ -475,15 +408,16 @@ class InstrumentContext(CommandPublisher):
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
+
         do_publish(self.broker, cmds.blow_out, self.blow_out, 'before',
                    None, None, self, location or self._ctx.location_cache)
-        self._hw_manager.hardware.blow_out(self._mount)
+        self._implementation.blow_out()
         do_publish(self.broker, cmds.blow_out, self.blow_out, 'after',
                    None, None, self, location or self._ctx.location_cache)
         return self
 
     def _determine_speed(self, speed: float):
-        if self._api_version < APIVersion(2, 4):
+        if self.api_version < APIVersion(2, 4):
             return clamp_value(speed, 80, 20, 'touch_tip:')
         else:
             return clamp_value(speed, 80, 1, 'touch_tip:')
@@ -491,7 +425,7 @@ class InstrumentContext(CommandPublisher):
     @publish.both(command=cmds.touch_tip)
     @requires_version(2, 0)
     def touch_tip(self,
-                  location: Well = None,
+                  location: Optional[Well] = None,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
                   speed: float = 60.0) -> InstrumentContext:
@@ -529,17 +463,18 @@ class InstrumentContext(CommandPublisher):
             :py:class:`.Placeable` as the ``location`` parameter)
 
         """
-        if not self._has_tip:
+        if not self._implementation.has_tip():
             raise hc.NoTipAttachedError('Pipette has no tip to touch_tip()')
 
         checked_speed = self._determine_speed(speed)
 
         # If location is a valid well, move to the well first
         if location is None:
-            if not self._ctx.location_cache:
+            last_location = self._ctx.location_cache
+            if not last_location:
                 raise RuntimeError('No valid current location cache present')
             else:
-                well = self._ctx.location_cache.labware
+                well = last_location.labware
                 # type checked below
         else:
             well = LabwareLike(location)
@@ -552,7 +487,7 @@ class InstrumentContext(CommandPublisher):
                 self._log.warning('Touch_tip being performed on a tiprack. '
                                   'Please re-check your code')
 
-            if self._api_version < APIVersion(2, 4):
+            if self.api_version < APIVersion(2, 4):
                 to_loc = well.as_well().top()
             else:
                 move_with_z_offset =\
@@ -563,18 +498,19 @@ class InstrumentContext(CommandPublisher):
             raise TypeError(
                 'location should be a Well, but it is {}'.format(location))
 
-        edges = build_edges(
-            well.as_well(), v_offset, self._mount,
-            self._ctx._deck_layout, radius, self._api_version)
-        for edge in edges:
-            self._hw_manager.hardware.move_to(self._mount, edge, checked_speed)
+        self._implementation.touch_tip(
+            location=well.as_well()._impl,
+            radius=radius,
+            v_offset=v_offset,
+            speed=checked_speed
+        )
         return self
 
     @publish.both(command=cmds.air_gap)
     @requires_version(2, 0)
     def air_gap(self,
-                volume: float = None,
-                height: float = None) -> InstrumentContext:
+                volume: Optional[float] = None,
+                height: Optional[float] = None) -> InstrumentContext:
         """
         Pull air into the pipette current tip at the current location
 
@@ -606,7 +542,7 @@ class InstrumentContext(CommandPublisher):
 
 
         """
-        if not self._has_tip:
+        if not self._implementation.has_tip():
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting air_gap')
 
         if height is None:
@@ -633,32 +569,27 @@ class InstrumentContext(CommandPublisher):
         :param home_after:
             See the ``home_after`` parameter in :py:obj:`drop_tip`.
         """
-        if not self._has_tip:
+        if not self._implementation.has_tip():
             self._log.warning('Pipette has no tip to return')
         loc = self._last_tip_picked_up_from
         if not isinstance(loc, Well):
             raise TypeError('Last tip location should be a Well but it is: '
                             '{}'.format(loc))
-        drop_loc = self._determine_drop_target(loc, APIVersion(2, 3))
+        drop_loc = determine_drop_target(self.api_version,
+                                         loc,
+                                         self.hw_pipette.get(
+                                             'return_tip_height', 0.5
+                                         ),
+                                         APIVersion(2, 3))
         self.drop_tip(drop_loc, home_after=home_after)
 
         return self
 
-    def _next_available_tip(self) -> Tuple[Labware, Well]:
-        start = self.starting_tip
-        if start is None:
-            return select_tiprack_from_list(
-                self.tip_racks, self.channels)
-        else:
-            return select_tiprack_from_list(
-                filter_tipracks_to_start(start, self.tip_racks),
-                self.channels, start)
-
     @requires_version(2, 0)
     def pick_up_tip(  # noqa(C901)
             self, location: Union[types.Location, Well] = None,
-            presses: int = None,
-            increment: float = None) -> InstrumentContext:
+            presses: Optional[int] = None,
+            increment: Optional[float] = None) -> InstrumentContext:
         """
         Pick up a tip for the pipette to run liquid-handling commands with
 
@@ -712,7 +643,9 @@ class InstrumentContext(CommandPublisher):
             tiprack = location.parent
             target = location
         elif not location:
-            tiprack, target = self._next_available_tip()
+            tiprack, target = next_available_tip(self.starting_tip,
+                                                 self.tip_racks,
+                                                 self.channels)
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
@@ -721,39 +654,26 @@ class InstrumentContext(CommandPublisher):
                 " However, it is a {}".format(location))
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
-        self._validate_tiprack(tiprack)
+        validate_tiprack(self.name, tiprack, self._log)
         do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                    'before', None, None, self, location=target)
+
         self.move_to(target.top())
 
-        self._hw_manager.hardware.set_current_tiprack_diameter(
-            self._mount, target.diameter)
-        self._hw_manager.hardware.pick_up_tip(
-            self._mount, self._tip_length_for(tiprack), presses, increment)
+        self._implementation.pick_up_tip(
+            well=target._impl,
+            tip_length=self._tip_length_for(tiprack),
+            presses=presses,
+            increment=increment
+        )
         # Note that the hardware API pick_up_tip action includes homing z after
         do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                    'after', self, None, self, location=target)
-        self._hw_manager.hardware.set_working_volume(
-            self._mount, target.max_volume)
+
         tiprack.use_tips(target, self.channels)
         self._last_tip_picked_up_from = target
 
         return self
-
-    def _determine_drop_target(
-            self, location: Well,
-            version_breakpoint: APIVersion = None) -> types.Location:
-        version_breakpoint = version_breakpoint or APIVersion(2, 2)
-        if self.api_version < version_breakpoint:
-            bot = location.bottom()
-            return types.Location(
-                point=bot.point._replace(z=bot.point.z + 10),
-                labware=location)
-        else:
-            tr = location.parent
-            assert tr.is_tiprack
-            z_height = self.return_height * tr.tip_length
-            return location.top(-z_height)
 
     @requires_version(2, 0)
     def drop_tip(  # noqa(C901)
@@ -844,7 +764,9 @@ class InstrumentContext(CommandPublisher):
             if LabwareLike(location).is_fixed_trash():
                 target = location.top()
             else:
-                target = self._determine_drop_target(location)
+                target = determine_drop_target(self.api_version,
+                                               location,
+                                               self.return_height)
         elif not location:
             target = self.trash_container.wells()[0].top()
         else:
@@ -856,9 +778,11 @@ class InstrumentContext(CommandPublisher):
         do_publish(self.broker, cmds.drop_tip, self.drop_tip,
                    'before', None, None, self, location=target)
         self.move_to(target)
-        self._hw_manager.hardware.drop_tip(self._mount, home_after=home_after)
+
+        self._implementation.drop_tip(home_after=home_after)
         do_publish(self.broker, cmds.drop_tip, self.drop_tip,
                    'after', self, None, self, location=target)
+
         if self.api_version < APIVersion(2, 2) \
                 and target.labware.is_well \
                 and target.labware.as_well().parent.is_tiprack:
@@ -882,12 +806,12 @@ class InstrumentContext(CommandPublisher):
         :returns: This instance.
         """
         def home_dummy(mount): pass
+        mount_name = self._implementation.get_mount().name.lower()
         do_publish(self.broker, cmds.home, home_dummy,
-                   'before', None, None, self._mount.name.lower())
-        self._hw_manager.hardware.home_z(self._mount)
-        self._hw_manager.hardware.home_plunger(self._mount)
+                   'before', None, None, mount_name)
+        self._implementation.home()
         do_publish(self.broker, cmds.home, home_dummy,
-                   'after', self, None, self._mount.name.lower())
+                   'after', self, None, mount_name)
         return self
 
     @requires_version(2, 0)
@@ -896,7 +820,7 @@ class InstrumentContext(CommandPublisher):
 
         :returns: This instance.
         """
-        self._hw_manager.hardware.home_plunger(self._mount)
+        self._implementation.home_plunger()
         return self
 
     @publish.both(command=cmds.distribute)
@@ -927,7 +851,7 @@ class InstrumentContext(CommandPublisher):
             'disposal_volume', self.min_volume)
         kwargs['mix_after'] = (0, 0)
         blowout_location = kwargs.get('blowout_location')
-        self._validate_blowout_location('distribute', blowout_location)
+        validate_blowout_location(self.api_version, 'distribute', blowout_location)
 
         return self.transfer(volume, source, dest, **kwargs)
 
@@ -957,7 +881,7 @@ class InstrumentContext(CommandPublisher):
         kwargs['mix_before'] = (0, 0)
         kwargs['disposal_volume'] = 0
         blowout_location = kwargs.get('blowout_location')
-        self._validate_blowout_location('consolidate', blowout_location)
+        validate_blowout_location(self.api_version, 'consolidate', blowout_location)
 
         return self.transfer(volume, source, dest, **kwargs)
 
@@ -1069,11 +993,11 @@ class InstrumentContext(CommandPublisher):
             volume, source, dest))
 
         blowout_location = kwargs.get('blowout_location')
-        self._validate_blowout_location('transfer', blowout_location)
+        validate_blowout_location(self.api_version, 'transfer', blowout_location)
 
         kwargs['mode'] = kwargs.get('mode', 'transfer')
 
-        mix_strategy, mix_opts = self._mix_from_kwargs(kwargs)
+        mix_strategy, mix_opts = mix_from_kwargs(kwargs)
 
         if trash:
             drop_tip = transfers.DropTipStrategy.TRASH
@@ -1101,7 +1025,9 @@ class InstrumentContext(CommandPublisher):
                 blow_out_strategy = transfers.BlowOutStrategy.TRASH
 
         if new_tip != types.TransferTipPolicy.NEVER:
-            tr, next_tip = self._next_available_tip()
+            tr, next_tip = next_available_tip(self.starting_tip,
+                                              self.tip_racks,
+                                              self.channels)
             max_volume = min(next_tip.max_volume, self.max_volume)
         else:
             max_volume = self.hw_pipette['working_volume']
@@ -1148,63 +1074,16 @@ class InstrumentContext(CommandPublisher):
         for cmd in plan:
             getattr(self, cmd['method'])(*cmd['args'], **cmd['kwargs'])
 
-    @staticmethod
-    def _mix_from_kwargs(
-            top_kwargs: Dict[str, Any])\
-            -> Tuple[transfers.MixStrategy, transfers.Mix]:
-
-        def _mix_requested(kwargs, opt):
-            """
-            Helper for determining mix options from :py:meth:`transfer` kwargs
-            Mixes can be ignored in kwargs by either
-            - Not specifying the kwarg
-            - Specifying it as None
-            - Specifying it as (0, 0)
-
-            This handles all these cases.
-            """
-            val = kwargs.get(opt)
-            if None is val:
-                return False
-            if val == (0, 0):
-                return False
-            return True
-
-        mix_opts = transfers.Mix()
-        if _mix_requested(top_kwargs, 'mix_before')\
-           and _mix_requested(top_kwargs, 'mix_after'):
-            mix_strategy = transfers.MixStrategy.BOTH
-            before_opts = top_kwargs['mix_before']
-            after_opts = top_kwargs['mix_after']
-            mix_opts = mix_opts._replace(
-                mix_after=mix_opts.mix_after._replace(
-                    repetitions=after_opts[0], volume=after_opts[1]),
-                mix_before=mix_opts.mix_before._replace(
-                    repetitions=before_opts[0], volume=before_opts[1]))
-        elif _mix_requested(top_kwargs, 'mix_before'):
-            mix_strategy = transfers.MixStrategy.BEFORE
-            before_opts = top_kwargs['mix_before']
-            mix_opts = mix_opts._replace(
-                mix_before=mix_opts.mix_before._replace(
-                    repetitions=before_opts[0], volume=before_opts[1]))
-        elif _mix_requested(top_kwargs, 'mix_after'):
-            mix_strategy = transfers.MixStrategy.AFTER
-            after_opts = top_kwargs['mix_after']
-            mix_opts = mix_opts._replace(
-                mix_after=mix_opts.mix_after._replace(
-                    repetitions=after_opts[0], volume=after_opts[1]))
-        else:
-            mix_strategy = transfers.MixStrategy.NEVER
-        return mix_strategy, mix_opts
-
     @requires_version(2, 0)
     def delay(self):
-        return self._ctx.delay()
+        return self._implementation.delay()
 
     @requires_version(2, 0)
-    def move_to(self, location: types.Location, force_direct: bool = False,
-                minimum_z_height: float = None,
-                speed: float = None
+    def move_to(self,
+                location: types.Location,
+                force_direct: bool = False,
+                minimum_z_height: Optional[float] = None,
+                speed: Optional[float] = None
                 ) -> InstrumentContext:
         """ Move the instrument.
 
@@ -1220,52 +1099,27 @@ class InstrumentContext(CommandPublisher):
                       individual axis speeds, you can use
                       :py:attr:`.ProtocolContext.max_speeds`.
         """
-        if self._ctx.location_cache:
-            from_lw = self._ctx.location_cache.labware
-        else:
-            from_lw = LabwareLike(None)
-
-        if not speed:
-            speed = self.default_speed
-
-        from_center = from_lw.center_multichannel_on_wells() \
-            if from_lw else False
-        cp_override = CriticalPoint.XY_CENTER if from_center else None
-        from_loc = types.Location(
-            self._hw_manager.hardware.gantry_position(
-                self._mount, critical_point=cp_override),
-            from_lw)
+        from_loc = self._ctx.location_cache
+        if not from_loc:
+            from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
 
         for mod in self._ctx._modules:
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
 
-        instr_max_height = \
-            self._hw_manager.hardware.get_instrument_max_height(self._mount)
-        moves = planning.plan_moves(from_loc, location, self._ctx.deck,
-                                    instr_max_height,
-                                    force_direct=force_direct,
-                                    minimum_z_height=minimum_z_height
-                                    )
-        self._log.debug("move_to: {}->{} via:\n\t{}"
-                        .format(from_loc, location, moves))
-        try:
-            for move in moves:
-                self._hw_manager.hardware.move_to(
-                    self._mount, move[0], critical_point=move[1], speed=speed,
-                    max_speeds=self._ctx.max_speeds.data)
-        except Exception:
-            self._ctx.location_cache = None
-            raise
-        else:
-            self._ctx.location_cache = location
+        self._implementation.move_to(
+            location=location,
+            force_direct=force_direct,
+            minimum_z_height=minimum_z_height,
+            speed=speed
+        )
         return self
 
     @property  # type: ignore
     @requires_version(2, 0)
     def mount(self) -> str:
         """ Return the name of the mount this pipette is attached to """
-        return self._mount.name.lower()
+        return self._implementation.get_mount().name.lower()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1292,7 +1146,7 @@ class InstrumentContext(CommandPublisher):
             instrument.speed.aspirate = 50
 
         """
-        return self._speeds
+        return self._implementation.get_speed()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1319,7 +1173,7 @@ class InstrumentContext(CommandPublisher):
             instrument.flow_rate.aspirate = 50
 
         """
-        return self._flow_rates
+        return self._implementation.get_flow_rate()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1370,7 +1224,7 @@ class InstrumentContext(CommandPublisher):
         """
         The name string for the pipette (e.g. 'p300_single')
         """
-        return self.hw_pipette['name']
+        return self._implementation.get_pipette_name()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1378,12 +1232,12 @@ class InstrumentContext(CommandPublisher):
         """
         The model string for the pipette (e.g. 'p300_single_v1.3')
         """
-        return self.hw_pipette['model']
+        return self._implementation.get_model()
 
     @property  # type: ignore
     @requires_version(2, 0)
     def min_volume(self) -> float:
-        return self.hw_pipette['min_volume']
+        return self._implementation.get_min_volume()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1397,7 +1251,7 @@ class InstrumentContext(CommandPublisher):
         300 µL, but if it's using a 200 µL filter tip, its usable volume would
         be limited to 200 µL.
         """
-        return self.hw_pipette['max_volume']
+        return self._implementation.get_max_volume()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1405,7 +1259,7 @@ class InstrumentContext(CommandPublisher):
         """
         The current amount of liquid, in microliters, held in the pipette.
         """
-        return self.hw_pipette['current_volume']
+        return self._implementation.get_current_volume()
 
     @property  # type: ignore
     @requires_version(2, 7)
@@ -1414,7 +1268,7 @@ class InstrumentContext(CommandPublisher):
         :returns: Whether this instrument has a tip attached or not.
         :type: bool
         """
-        return self.hw_pipette['has_tip']
+        return self._implementation.has_tip()
 
     @property  # type: ignore
     def _has_tip(self) -> bool:
@@ -1422,32 +1276,29 @@ class InstrumentContext(CommandPublisher):
         Internal function used to check whether this instrument has a
         tip attached or not.
         """
-        return self.hw_pipette['has_tip']
+        return self._implementation.has_tip()
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def hw_pipette(self) -> Dict[str, Any]:
+    def hw_pipette(self) -> PipetteDict:
         """ View the information returned by the hardware API directly.
 
         :raises: a :py:class:`.types.PipetteNotAttachedError` if the pipette is
                  no longer attached (should not happen).
         """
-        pipette = self._hw_manager.hardware.attached_instruments[self._mount]
-        if pipette is None:
-            raise types.PipetteNotAttachedError
-        return pipette
+        return self._implementation.get_pipette()
 
     @property  # type: ignore
     @requires_version(2, 0)
     def channels(self) -> int:
         """ The number of channels on the pipette. """
-        return self.hw_pipette['channels']
+        return self._implementation.get_channels()
 
     @property  # type: ignore
     @requires_version(2, 2)
-    def return_height(self) -> int:
+    def return_height(self) -> float:
         """ The height to return a tip to its tiprack. """
-        return self.hw_pipette.get('return_tip_height', 0.5)
+        return self._implementation.get_return_height()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1470,16 +1321,16 @@ class InstrumentContext(CommandPublisher):
             instr.well_bottom_clearance.aspirate = 1
 
         """
-        return self._well_bottom_clearance
+        return self._implementation.get_well_bottom_clearance()
 
     def __repr__(self):
         return '<{}: {} in {}>'.format(self.__class__.__name__,
-                                       self.hw_pipette['model'],
-                                       self._mount.name)
+                                       self._implementation.get_model(),
+                                       self._implementation.get_mount().name)
 
     def __str__(self):
         return '{} on {} mount'.format(self.hw_pipette['display_name'],
-                                       self._mount.name.lower())
+                                       self.mount)
 
     @requires_version(2, 7)
     def pair_with(
@@ -1555,27 +1406,17 @@ class InstrumentContext(CommandPublisher):
                 f'{instrument.name} with {self.name}')
 
         return PairedInstrumentContext(
-            primary_instrument=self, secondary_instrument=instrument,
-            ctx=self._ctx, pair_policy=PipettePair.of_mount(self._mount),
-            api_version=self.api_version, hardware_manager=self._hw_manager,
-            trash=self.trash_container, log_parent=self._log)
+            primary_instrument=self,
+            secondary_instrument=instrument,
+            ctx=self._ctx,
+            pair_policy=PipettePair.of_mount(self._implementation.get_mount()),
+            api_version=self.api_version,
+            hardware_manager=self._ctx._implementation.get_hardware(),
+            trash=self.trash_container,
+            log_parent=self._log
+        )
 
     @lru_cache(maxsize=12)
     def _tip_length_for(self, tiprack: Labware) -> float:
         """ Get the tip length, including overlap, for a tip from this rack """
-
-        def _build_length_from_overlap() -> float:
-            tip_overlap = self.hw_pipette['tip_overlap'].get(
-                tiprack.uri,
-                self.hw_pipette['tip_overlap']['default'])
-            tip_length = tiprack.tip_length
-            return tip_length - tip_overlap
-
-        try:
-            parent = LabwareLike(tiprack).first_parent() or ''
-            return get.load_tip_length_calibration(
-                self.hw_pipette['pipette_id'],
-                tiprack._implementation.get_definition(),
-                parent).tip_length
-        except TipLengthCalNotFound:
-            return _build_length_from_overlap()
+        return tip_length_for(self.hw_pipette, tiprack)

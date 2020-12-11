@@ -74,5 +74,10 @@ class RobotServerSettings(BaseSettings):
         description="The maximum number of protocols allowed for upload"
     )
 
+    notification_server_subscriber_address: str = Field(
+        "tcp://localhost:5555",
+        description="The endpoint to subscribe to notification server topics."
+    )
+
     class Config:
         env_prefix = "OT_ROBOT_SERVER_"

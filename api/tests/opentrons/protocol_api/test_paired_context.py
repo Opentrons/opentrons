@@ -1,7 +1,6 @@
 import pytest
 from unittest import mock
 
-import opentrons.protocol_api as papi
 from opentrons.hardware_control import API
 from opentrons.types import Mount, Point, Location
 from opentrons.protocol_api import paired_instrument_context as pc
@@ -9,8 +8,7 @@ from opentrons.hardware_control.pipette import Pipette
 
 
 @pytest.fixture
-def set_up_paired_instrument(loop):
-    ctx = papi.ProtocolContext(loop)
+def set_up_paired_instrument(ctx):
     ctx.home()
     tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
     tiprack2 = ctx.load_labware('opentrons_96_tiprack_300ul', 2)
@@ -54,8 +52,7 @@ def test_incompatible_pickup_location(set_up_paired_instrument):
         paired.pick_up_tip(tipracks[2].columns_by_name()['12'][0])
 
 
-def test_pick_up_and_drop_tip_no_tipracks(loop):
-    ctx = papi.ProtocolContext(loop)
+def test_pick_up_and_drop_tip_no_tipracks(ctx):
     ctx.home()
     tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
     tip_length = tiprack.tip_length
@@ -63,10 +60,11 @@ def test_pick_up_and_drop_tip_no_tipracks(loop):
     left = ctx.load_instrument('p300_multi', Mount.LEFT)
 
     paired = right.pair_with(left)
+    hardware = ctx._implementation.get_hardware().hardware
     r_pip: Pipette =\
-        ctx._hw_manager.hardware._attached_instruments[Mount.RIGHT]
+        hardware._attached_instruments[Mount.RIGHT]
     l_pip: Pipette =\
-        ctx._hw_manager.hardware._attached_instruments[Mount.LEFT]
+        hardware._attached_instruments[Mount.LEFT]
     nozzle_offset = Point(*r_pip.config.nozzle_offset)
     assert r_pip.critical_point() == nozzle_offset
     assert l_pip.critical_point() == nozzle_offset
@@ -102,9 +100,8 @@ def test_return_tip(set_up_paired_instrument):
     assert not tipracks[1].wells()[0].has_tip
 
 
-def test_aspirate(set_up_paired_instrument, monkeypatch):
+def test_aspirate(set_up_paired_instrument, monkeypatch, ctx):
     paired, _ = set_up_paired_instrument
-    ctx = paired.paired_instrument_obj._ctx
     lw = ctx.load_labware('corning_96_wellplate_360ul_flat', 4)
 
     fake_hw_aspirate = mock.Mock()
@@ -133,9 +130,10 @@ def test_aspirate(set_up_paired_instrument, monkeypatch):
             paired._pair_policy, dest_point, critical_point=None,
             speed=400, max_speeds={})
     fake_move.reset_mock()
-    ctx._hw_manager.hardware._obj_to_adapt\
-                            ._attached_instruments[Mount.RIGHT]\
-                            ._current_volume = 1
+    hardware = ctx._implementation.get_hardware().hardware
+    hardware._obj_to_adapt._attached_instruments[
+        Mount.RIGHT
+    ]._current_volume = 1
 
     paired.aspirate(2.0)
     fake_move.assert_not_called()
@@ -155,9 +153,8 @@ def test_aspirate(set_up_paired_instrument, monkeypatch):
             speed=400, max_speeds={})
 
 
-def test_dispense(set_up_paired_instrument, monkeypatch):
+def test_dispense(set_up_paired_instrument, monkeypatch, ctx):
     paired, _ = set_up_paired_instrument
-    ctx = paired.paired_instrument_obj._ctx
     lw = ctx.load_labware('corning_96_wellplate_360ul_flat', 4)
 
     disp_called_with = None
@@ -198,9 +195,8 @@ def test_dispense(set_up_paired_instrument, monkeypatch):
     assert move_called_with is None
 
 
-def test_mix(set_up_paired_instrument, monkeypatch):
+def test_mix(set_up_paired_instrument, monkeypatch, ctx):
     paired, _ = set_up_paired_instrument
-    ctx = paired.paired_instrument_obj._ctx
     lw = ctx.load_labware(
         'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 4)
 
@@ -238,9 +234,8 @@ def test_mix(set_up_paired_instrument, monkeypatch):
     assert mix_steps == expected_mix_steps
 
 
-def test_blow_out(set_up_paired_instrument, monkeypatch):
+def test_blow_out(set_up_paired_instrument, monkeypatch, ctx):
     paired, _ = set_up_paired_instrument
-    ctx = paired.paired_instrument_obj._ctx
     lw = ctx.load_labware(
         'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 4)
 
@@ -270,14 +265,14 @@ def test_blow_out(set_up_paired_instrument, monkeypatch):
     assert move_location == lw.wells()[0].bottom()
 
 
-def test_air_gap(set_up_paired_instrument, monkeypatch):
+def test_air_gap(set_up_paired_instrument, monkeypatch, ctx):
     paired, _ = set_up_paired_instrument
-    ctx = paired.paired_instrument_obj._ctx
 
+    hardware = ctx._implementation.get_hardware().hardware
     r_pip: Pipette =\
-        ctx._hw_manager.hardware._attached_instruments[Mount.RIGHT]
+        hardware._attached_instruments[Mount.RIGHT]
     l_pip: Pipette =\
-        ctx._hw_manager.hardware._attached_instruments[Mount.LEFT]
+        hardware._attached_instruments[Mount.LEFT]
 
     paired.pick_up_tip()
     assert r_pip.current_volume == 0
@@ -309,8 +304,7 @@ def test_air_gap(set_up_paired_instrument, monkeypatch):
         [mock.call(paired._pair_policy, None, 1.0)]
 
 
-def test_touch_tip_new_default_args(loop, monkeypatch):
-    ctx = papi.ProtocolContext(loop)
+def test_touch_tip_new_default_args(ctx, monkeypatch):
     ctx.home()
     lw = ctx.load_labware(
         'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 1)
@@ -351,8 +345,7 @@ def test_touch_tip_new_default_args(loop, monkeypatch):
     assert total_hw_moves[0][0].z == total_hw_moves[1][0].z
 
 
-def test_touch_tip_disabled(loop, monkeypatch, get_labware_fixture):
-    ctx = papi.ProtocolContext(loop)
+def test_touch_tip_disabled(ctx, monkeypatch, get_labware_fixture):
     ctx.home()
     trough1 = get_labware_fixture('fixture_12_trough')
     trough_lw = ctx.load_labware_from_definition(trough1, '1')

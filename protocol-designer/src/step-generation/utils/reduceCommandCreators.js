@@ -40,9 +40,9 @@ export const reduceCommandCreators = (
 
       const allCommands = [...prev.commands, ...next.commands]
       const updates = getNextRobotStateAndWarnings(
-        allCommands,
+        next.commands,
         invariantContext,
-        initialRobotState
+        prev.robotState
       )
       return {
         ...prev,

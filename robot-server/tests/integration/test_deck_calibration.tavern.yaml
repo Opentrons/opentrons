@@ -12,7 +12,7 @@ stages:
       status_code: 200
       json:
         deckCalibration:
-          status: OK
+          status: IDENTITY
           data:
             type: attitude
             matrix:
@@ -22,10 +22,10 @@ stages:
                 - !anyfloat
               - *matrix_row
               - *matrix_row
-            lastModified: !re_search "T"
+            lastModified: null
             pipetteCalibratedWith: null
             tiprack: null
-            source: "legacy"
+            source: "default"
             status:
               markedBad: False
               source: null

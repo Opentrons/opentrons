@@ -68,3 +68,37 @@ class PipettingHandler:
             mount=hw_pipette.mount,
             tip_volume=tip_geometry.volume
         )
+
+    async def drop_tip(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+    ) -> None:
+        """Drop a tip at the specified "well"."""
+        # get mount and config data from state and hardware controller
+        hw_pipette = self._state.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware.attached_instruments
+        )
+
+        # get the tip drop location
+        well_location = self._state.geometry.get_tip_drop_location(
+            labware_id=labware_id,
+            pipette_config=hw_pipette.config,
+        )
+
+        # move the pipette to tip drop location
+        await self._movement_handler.move_to_well(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
+
+        # perform the tip drop routine
+        await self._hardware.drop_tip(
+            mount=hw_pipette.mount,
+            # TODO(mc, 2020-11-12): include this parameter in the request
+            home_after=True
+        )

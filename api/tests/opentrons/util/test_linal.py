@@ -1,5 +1,5 @@
 from math import pi, sin, cos
-from opentrons.util.linal import solve, add_z, apply_transform
+from opentrons.util.linal import solve, add_z, apply_transform, solve_attitude
 from numpy.linalg import inv
 import numpy as np
 
@@ -51,20 +51,20 @@ def test_apply_transform():
     y = 2
     z = 3
 
-    x_delta = -0.1
-    y_delta = -0.2
-    z_delta = 0.3
+    x_delta = 0.1
+    y_delta = 0.2
 
-    transform = [
-        [1, 0, 0, x_delta],
-        [0, 1, 0, y_delta],
-        [0, 0, 1, z_delta],
-        [0, 0, 0, 1]]
+    e = ((1, 1, 3), (2, 2, 2), (1, 2, 1))
+    a = (
+        (1 + x_delta, 1 + y_delta, 1.1),
+        (2 + x_delta, 2 + y_delta, 2.2),
+        (1 + x_delta, 2 + y_delta, 1.1))
+    transform = solve_attitude(e, a)
 
     expected = (
         round(x - x_delta, 2),
         round(y - y_delta, 2),
-        round(z - z_delta, 2))
+        round(z))
 
-    result = apply_transform(inv(transform), (x, y, z))
-    assert result == expected
+    result = apply_transform(inv(transform), (1, 2, 3))
+    assert np.isclose(result, expected, atol=0.1).all()

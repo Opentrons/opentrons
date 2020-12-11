@@ -1,47 +1,54 @@
+from __future__ import annotations
+import asyncio
 import functools
 import logging
 from copy import copy
-from typing import Optional
+from typing import Any, cast, Callable, Optional, Union, Set, TypeVar
+from typing_extensions import TypedDict, Literal, Final
 
-from opentrons.util import calibration_functions
 from opentrons.config import feature_flags as ff
 from opentrons.broker import Broker
 from opentrons.types import Point, Mount, Location
 from opentrons.protocol_api import labware
 from opentrons.hardware_control import CriticalPoint, ThreadedAsyncLock
 from opentrons.hardware_control.types import OutOfBoundsMove, MotionChecks
+from opentrons.hardware_control.adapters import SynchronousAdapter
 
-from .models import Container
+from .models import Container, Instrument
 from .util import robot_is_busy, RobotBusy
 
 
 log = logging.getLogger(__name__)
 
-VALID_STATES = {'probing', 'moving', 'ready'}
+State = Union[Literal['moving'], Literal['ready']]
+VALID_STATES: Set[State] = {'moving', 'ready'}
 
 
-# This hack is because if you have an old container that uses Placeable with
-# just one well, Placeable.wells() returns the Well rather than [Well].
-# Passing the well as an argument, though, will always return the well.
-def _well0(cont):
-    if isinstance(cont, labware.Labware):
-        return cont.wells()[0]
-    else:
-        return cont.wells(0)
+def _well0(cont: labware.Labware) -> labware.Well:
+    return cont.wells()[0]
 
 
-def _home_if_first_call(func):
+Func = TypeVar('Func', bound=Callable)
+
+
+def _home_if_first_call(func: Func) -> Func:
     """ Decorator to make a function home if it is the first one called in
     this session."""
     @functools.wraps(func)
-    def decorated(*args, **kwargs):
+    def decorated(*args: Any, **kwargs: Any) -> Any:
         self = args[0]
         if not self._has_homed:
             log.info("this is the first calibration action, homing")
             self._hardware.home()
             self._has_homed = True
         return func(*args, **kwargs)
-    return decorated
+    return cast(Func, decorated)
+
+
+class Message(TypedDict):
+    topic: Literal['calibration']
+    name: Literal['state']
+    payload: CalibrationManager
 
 
 class CalibrationManager(RobotBusy):
@@ -49,21 +56,26 @@ class CalibrationManager(RobotBusy):
     Serves endpoints that are primarily used in
     opentrons/app/ui/robot/api-client/client.js
     """
-    TOPIC = 'calibration'
+    TOPIC: Final = 'calibration'
 
-    def __init__(self, hardware, loop=None, broker=None, lock=None):
+    def __init__(
+            self,
+            hardware: SynchronousAdapter,
+            loop: asyncio.AbstractEventLoop = None,
+            broker: Broker = None,
+            lock: ThreadedAsyncLock = None) -> None:
         self._broker = broker or Broker()
         self._hardware = hardware
         self._loop = loop
-        self.state = None
-        self._lock = lock
+        self.state = 'ready'
+        self._lock = lock or ThreadedAsyncLock()
         self._has_homed = False
 
     @property
     def busy_lock(self) -> ThreadedAsyncLock:
         return self._lock
 
-    def _set_state(self, state):
+    def _set_state(self, state: State) -> None:
         if state not in VALID_STATES:
             raise ValueError(
                 'State {0} not in {1}'.format(state, VALID_STATES))
@@ -72,49 +84,13 @@ class CalibrationManager(RobotBusy):
 
     @robot_is_busy
     @_home_if_first_call
-    def tip_probe(self, instrument):
-        inst = instrument._instrument
-        log.info('Probing tip with {}'.format(instrument.name))
-        self._set_state('probing')
-
-        if instrument._context:
-            instrument._context.location_cache = None
-            mount = Mount[instrument._instrument.mount.upper()]
-            assert instrument.tip_racks,\
-                'No known tipracks for {}'.format(instrument)
-            tip_length = inst._tip_length_for(
-                instrument.tip_racks[0]._container)
-            # TODO (tm, 2019-04-22): This warns "coroutine not awaited" in
-            # TODO: test. The test fixture probably needs to be modified to get
-            # TODO: a synchronous adapter instead of a raw hardware_control API
-            #             finally:
-            measured_center = self._hardware.locate_tip_probe_center(
-                mount, tip_length)
-        else:
-            measured_center = calibration_functions.probe_instrument(
-                instrument=inst,
-                robot=inst.robot)
-
-        log.info('Measured probe top center: {0}'.format(measured_center))
-
-        if instrument._context:
-            self._hardware.update_instrument_offset(
-                Mount[instrument._instrument.mount.upper()],
-                from_tip_probe=measured_center)
-            config = self._hardware.config
-        else:
-            config = calibration_functions.update_instrument_config(
-                instrument=inst,
-                measured_center=measured_center)
-
-        log.info('New config: {0}'.format(config))
-
-        self._move_to_front(instrument)
+    def tip_probe(self, instrument: Instrument) -> None:
+        log.warning("Deprecated call to tip_probe, update app")
         self._set_state('ready')
 
     @robot_is_busy
     @_home_if_first_call
-    def pick_up_tip(self, instrument, container):
+    def pick_up_tip(self, instrument: Instrument, container: Container) -> None:
         if not isinstance(container, Container):
             raise ValueError(
                 'Invalid object type {0}. Expected models.Container'
@@ -124,24 +100,21 @@ class CalibrationManager(RobotBusy):
         log.info('Picking up tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
-        if instrument._context:
-            with instrument._context.temp_connect(self._hardware):
-                loc = _well0(container._container)
-                instrument._context.location_cache =\
-                    Location(self._hardware.gantry_position(
-                        Mount[inst.mount.upper()],
-                        critical_point=CriticalPoint.NOZZLE,
-                        refresh=True),
-                        loc)
-                loc_leg = _well0(container._container)
-                inst.pick_up_tip(loc_leg)
-        else:
-            inst.pick_up_tip(_well0(container._container))
+        with instrument._context.temp_connect(self._hardware):
+            loc = _well0(container._container)
+            instrument._context.location_cache =\
+                Location(self._hardware.gantry_position(
+                    Mount[inst.mount.upper()],
+                    critical_point=CriticalPoint.NOZZLE,
+                    refresh=True),
+                    loc)
+            loc_leg = _well0(container._container)
+            inst.pick_up_tip(loc_leg)
         self._set_state('ready')
 
     @robot_is_busy
     @_home_if_first_call
-    def drop_tip(self, instrument, container):
+    def drop_tip(self, instrument: Instrument, container: Container) -> None:
         if not isinstance(container, Container):
             raise ValueError(
                 'Invalid object type {0}. Expected models.Container'
@@ -151,62 +124,52 @@ class CalibrationManager(RobotBusy):
         log.info('Dropping tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
-        if instrument._context:
-            with instrument._context.temp_connect(self._hardware):
-                instrument._context.location_cache = None
-                inst.drop_tip(_well0(container._container))
-        else:
+        with instrument._context.temp_connect(self._hardware):
+            instrument._context.location_cache = None
             inst.drop_tip(_well0(container._container))
         self._set_state('ready')
 
     @robot_is_busy
     @_home_if_first_call
-    def return_tip(self, instrument):
+    def return_tip(self, instrument: Instrument) -> None:
         inst = instrument._instrument
         log.info('Returning tip from {}'.format(instrument.name))
         self._set_state('moving')
-        if instrument._context:
-            with instrument._context.temp_connect(self._hardware):
-                instrument._context.location_cache = None
-                inst.return_tip()
-        else:
+        with instrument._context.temp_connect(self._hardware):
+            instrument._context.location_cache = None
             inst.return_tip()
         self._set_state('ready')
 
     @robot_is_busy
     @_home_if_first_call
-    def move_to_front(self, instrument):
+    def move_to_front(self, instrument: Instrument) -> None:
         """Public face of move_to_front"""
         self._move_to_front(instrument)
 
-    def _move_to_front(self, instrument):
+    def _move_to_front(self, instrument: Instrument) -> None:
         """Private move_to_front that can be called internally"""
         inst = instrument._instrument
         log.info('Moving {}'.format(instrument.name))
         self._set_state('moving')
-        if instrument._context:
-            current = self._hardware.gantry_position(
-                Mount[inst.mount.upper()],
-                critical_point=CriticalPoint.NOZZLE,
-                refresh=True)
-            dest = instrument._context.deck.position_for(5) \
-                .point._replace(z=150)
-            self._hardware.move_to(Mount[inst.mount.upper()],
-                                   current,
-                                   critical_point=CriticalPoint.NOZZLE)
-            self._hardware.move_to(Mount[inst.mount.upper()],
-                                   dest._replace(z=current.z),
-                                   critical_point=CriticalPoint.NOZZLE)
-            self._hardware.move_to(Mount[inst.mount.upper()],
-                                   dest, critical_point=CriticalPoint.NOZZLE)
-        else:
-            calibration_functions.move_instrument_for_probing_prep(
-                inst, inst.robot)
+        current = self._hardware.gantry_position(
+            Mount[inst.mount.upper()],
+            critical_point=CriticalPoint.NOZZLE,
+            refresh=True)
+        dest = instrument._context.deck.position_for(5) \
+            .point._replace(z=150)
+        self._hardware.move_to(Mount[inst.mount.upper()],
+                               current,
+                               critical_point=CriticalPoint.NOZZLE)
+        self._hardware.move_to(Mount[inst.mount.upper()],
+                               dest._replace(z=current.z),
+                               critical_point=CriticalPoint.NOZZLE)
+        self._hardware.move_to(Mount[inst.mount.upper()],
+                               dest, critical_point=CriticalPoint.NOZZLE)
         self._set_state('ready')
 
     @robot_is_busy
     @_home_if_first_call
-    def move_to(self, instrument, container):
+    def move_to(self, instrument: Instrument, container: Container) -> None:
         if not isinstance(container, Container):
             raise ValueError(
                 'Invalid object type {0}. Expected models.Container'
@@ -220,102 +183,78 @@ class CalibrationManager(RobotBusy):
             instrument.name, container.name, container.slot))
         self._set_state('moving')
 
-        if instrument._context:
-            with instrument._context.temp_connect(self._hardware):
-                instrument._context.location_cache = None
-                inst.move_to(target)
-        else:
+        with instrument._context.temp_connect(self._hardware):
+            instrument._context.location_cache = None
             inst.move_to(target)
 
         self._set_state('ready')
 
     @robot_is_busy
     @_home_if_first_call
-    def jog(self, instrument, distance, axis):
+    def jog(self, instrument: Instrument, distance: float, axis: str) -> None:
         inst = instrument._instrument
         log.info('Jogging {} by {} in {}'.format(
             instrument.name, distance, axis))
         self._set_state('moving')
-        if instrument._context:
-            try:
-                self._hardware.move_rel(
-                    Mount[inst.mount.upper()], Point(**{axis: distance}),
-                    check_bounds=MotionChecks.HIGH)
-            except OutOfBoundsMove:
-                log.exception('Out of bounds jog')
-        else:
-            calibration_functions.jog_instrument(
-                instrument=inst,
-                distance=distance,
-                axis=axis,
-                robot=inst.robot)
+        try:
+            self._hardware.move_rel(
+                Mount[inst.mount.upper()], Point(**{axis: distance}),
+                check_bounds=MotionChecks.HIGH)
+        except OutOfBoundsMove:
+            log.exception('Out of bounds jog')
         self._set_state('ready')
 
     @robot_is_busy
     @_home_if_first_call
-    def home(self, instrument):
+    def home(self, instrument: Instrument) -> None:
         inst = instrument._instrument
         log.info('Homing {}'.format(instrument.name))
         self._set_state('moving')
-        if instrument._context:
-            with instrument._context.temp_connect(self._hardware):
-                instrument._context.location_cache = None
-                inst.home()
-        else:
+        with instrument._context.temp_connect(self._hardware):
+            instrument._context.location_cache = None
             inst.home()
         self._set_state('ready')
 
     @robot_is_busy
-    def home_all(self, instrument):
+    def home_all(self, instrument: Instrument) -> None:
         # NOTE: this only takes instrument as a param, because we need
         # its reference to the ProtocolContext. This is code smell that
         # will be removed once sessions are managed better
         log.info('Homing via Calibration Manager')
         self._set_state('moving')
-        if instrument._context:
-            with instrument._context.temp_connect(self._hardware):
-                instrument._context.home()
-        else:
-            self._hardware.home()
+        with instrument._context.temp_connect(self._hardware):
+            instrument._context.home()
         self._set_state('ready')
 
     @robot_is_busy
-    def update_container_offset(self, container, instrument):
+    def update_container_offset(
+            self, container: Container, instrument: Instrument) -> None:
         inst = instrument._instrument
         log.info('Updating {} in {}'.format(container.name, container.slot))
-        if instrument._context:
-            if 'centerMultichannelOnWells' in container._container.quirks:
-                cp: Optional[CriticalPoint] = CriticalPoint.XY_CENTER
-            else:
-                cp = None
-            here = self._hardware.gantry_position(Mount[inst.mount.upper()],
-                                                  critical_point=cp,
-                                                  refresh=True)
-            # Reset calibration so we don’t actually calibrate the offset
-            # relative to the old calibration
-            container._container.set_calibration(Point(0, 0, 0))
-            if ff.calibrate_to_bottom() and not (
-                    container._container.is_tiprack):
-                orig = _well0(container._container).geometry.bottom()
-            else:
-                orig = _well0(container._container).geometry.top()
-            delta = here - orig
-            labware.save_calibration(container._container, delta)
+        if 'centerMultichannelOnWells' in container._container.quirks:
+            cp: Optional[CriticalPoint] = CriticalPoint.XY_CENTER
         else:
-            inst.robot.calibrate_container_with_instrument(
-                container=container._container,
-                instrument=inst,
-                save=True
-            )
+            cp = None
+        here = self._hardware.gantry_position(Mount[inst.mount.upper()],
+                                              critical_point=cp,
+                                              refresh=True)
+        # Reset calibration so we don’t actually calibrate the offset
+        # relative to the old calibration
+        container._container.set_calibration(Point(0, 0, 0))
+        if ff.calibrate_to_bottom() and not (
+                container._container.is_tiprack):
+            orig = _well0(container._container).geometry.bottom()
+        else:
+            orig = _well0(container._container).geometry.top()
+        delta = here - orig
+        labware.save_calibration(container._container, delta)
 
-    def _snapshot(self):
+    def _snapshot(self) -> Message:
         return {
             'topic': CalibrationManager.TOPIC,
             'name': 'state',
             'payload': copy(self)
         }
 
-    def _on_state_changed(self):
-        self._hardware._use_safest_height = (self.state in
-                                             ['probing', 'moving'])
+    def _on_state_changed(self) -> None:
         self._broker.publish(CalibrationManager.TOPIC, self._snapshot())

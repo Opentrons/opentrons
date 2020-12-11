@@ -25,6 +25,8 @@ from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons import protocol_api
 from opentrons.commands import types as command_types
 from opentrons.protocols.api_support.util import HardwareToManage
+from opentrons.protocols.implementations.protocol_context import \
+    ProtocolContextImplementation
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
     PythonProtocol, BundleContents)
@@ -193,13 +195,14 @@ def _build_protocol_context(
     version specification for use with
     :py:meth:`.protocol_api.execute.run_protocol`
     """
-    context = protocol_api.contexts.ProtocolContext(
+    ctx_impl = ProtocolContextImplementation(
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
         api_version=version,
         extra_labware=extra_labware,
-        hardware=hardware_simulator,
+        hardware=hardware_simulator
     )
+    context = protocol_api.contexts.ProtocolContext(implementation=ctx_impl)
     context.home()
     return context
 
@@ -341,7 +344,10 @@ def simulate(protocol_file: TextIO,
             bundled_data=getattr(protocol, 'bundled_data', None),
             hardware_simulator=hardware_simulator,
             extra_labware=gpa_extras)
-        scraper = CommandScraper(stack_logger, log_level, context.broker)
+        broker = context.broker
+        scraper = CommandScraper(stack_logger,
+                                 log_level,
+                                 broker)
         try:
             execute.run_protocol(protocol, context)
             if isinstance(protocol, PythonProtocol)\

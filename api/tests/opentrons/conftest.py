@@ -4,6 +4,8 @@
 from opentrons.config import robot_configs
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.implementations.labware import LabwareImplementation
+from opentrons.protocols.implementations.protocol_context import \
+    ProtocolContextImplementation
 
 try:
     import aionotify
@@ -15,7 +17,6 @@ import io
 import json
 import pathlib
 import re
-import shutil
 import tempfile
 from collections import namedtuple
 from functools import partial
@@ -25,7 +26,6 @@ import pytest
 
 from opentrons.api.routers import MainRouter
 from opentrons.api import models
-from opentrons.data_storage import database_migration
 from opentrons import config
 from opentrons import hardware_control as hc
 from opentrons.hardware_control import API, ThreadManager, ThreadedAsyncLock
@@ -72,32 +72,11 @@ def log_by_axis(log, axis):
     return reduce(reducer, log, {axis: [] for axis in axis})
 
 
-@pytest.mark.apiv1
-@pytest.fixture(scope='session')
-def template_db(tmpdir_factory):
-    template_db = tmpdir_factory.mktemp('template_db.sqlite')\
-                                .join('opentrons.db')
-    config.CONFIG['labware_database_file'] = str(template_db)
-    database_migration.check_version_and_perform_full_migration()
-    return template_db
-
-
 @pytest.fixture
 def mock_config():
     """Robot config setup and teardown"""
     yield robot_configs.load()
     robot_configs.clear()
-
-
-@pytest.mark.apiv1
-@pytest.fixture(scope='function')
-def config_tempdir(tmpdir, template_db):
-    os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
-    config.reload()
-    if not os.path.exists(config.CONFIG['labware_database_file']):
-        shutil.copyfile(
-            template_db, config.CONFIG['labware_database_file'])
-    yield tmpdir, template_db
 
 
 @pytest.fixture
@@ -303,8 +282,18 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
             return result
 
 
+@pytest.fixture
+def ctx(loop) -> ProtocolContext:
+    return ProtocolContext(
+        implementation=ProtocolContextImplementation(),
+        loop=loop
+    )
+
+
 def build_v2_model(h, lw_name, loop):
-    ctx = ProtocolContext(loop=loop, hardware=h)
+    ctx = ProtocolContext(
+        implementation=ProtocolContextImplementation(hardware=h),
+        loop=loop)
 
     loop.run_until_complete(h.cache_instruments(
         {Mount.RIGHT: 'p300_single'}))
@@ -312,10 +301,10 @@ def build_v2_model(h, lw_name, loop):
         'opentrons_96_tiprack_300ul', '2')
     pip = ctx.load_instrument('p300_single', 'right',
                               tip_racks=[tiprack])
-    instrument = models.Instrument(pip, context=ctx)
+    instrument = models.Instrument(pip, [], ctx)
     plate = ctx.load_labware(
         lw_name or 'corning_96_wellplate_360ul_flat', 1)
-    container = models.Container(plate, context=ctx)
+    container = models.Container(plate, [], context=ctx)
     return namedtuple('model', 'robot instrument container')(
         robot=h,
         instrument=instrument,

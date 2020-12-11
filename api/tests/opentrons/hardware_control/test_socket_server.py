@@ -229,7 +229,7 @@ async def test_complex_method(hc_stream_server, loop, monkeypatch):
         (Dict[Axis, bool], {Axis.X: True}, {'X': True}),
         (robot_configs.robot_config,
          robot_configs.load(),
-         list(robot_configs.config_to_save(robot_configs.load()))),
+         robot_configs.config_to_save(robot_configs.load())),
         (Dict[Mount, Pipette.DictType],
          {Mount.LEFT: {'asdasd': 2, 'asda': False}},
          {'LEFT': {'asdasd': 2, 'asda': False}}),

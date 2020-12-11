@@ -90,7 +90,7 @@ def test_persistance(tmpdir):
                                            kwargs={'celsius': 24})
             ]
         },
-        config=robot_configs.build_config([], {})
+        config=robot_configs.build_config({})
     )
     file = Path(tmpdir) / "sim_setup.json"
     simulator_setup.save_simulator_setup(sim, file)

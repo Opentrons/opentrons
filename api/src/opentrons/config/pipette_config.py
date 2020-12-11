@@ -13,7 +13,8 @@ from opentrons_shared_data.pipette import (
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
-        PipetteName, PipetteModel, UlPerMm, Quirk, PipetteFusedSpec
+        PipetteName, PipetteModel, UlPerMm, Quirk,
+        PipetteFusedSpec, LabwareUri
     )
 
 
@@ -34,7 +35,6 @@ class PipetteConfig:
     aspirate_flow_rate: float
     dispense_flow_rate: float
     channels: float
-    model_offset: Tuple[float, float, float]
     nozzle_offset: Tuple[float, float, float]
     plunger_current: float
     drop_tip_current: float
@@ -59,6 +59,7 @@ class PipetteConfig:
     default_aspirate_flow_rates: Dict[str, float]
     default_dispense_flow_rates: Dict[str, float]
     model: PipetteModel
+    default_tipracks: List[LabwareUri]
 
 
 # Notes:
@@ -186,7 +187,6 @@ def load(
         aspirate_flow_rate=cfg['defaultAspirateFlowRate']['value'],
         dispense_flow_rate=cfg['defaultDispenseFlowRate']['value'],
         channels=ensure_value(cfg, 'channels', MUTABLE_CONFIGS),
-        model_offset=ensure_value(cfg, 'modelOffset', MUTABLE_CONFIGS),
         nozzle_offset=cfg.get(  # type: ignore
             'nozzleOffset', NOZZLE_OFFSET_DEFAULT),
         plunger_current=ensure_value(cfg, 'plungerCurrent', MUTABLE_CONFIGS),
@@ -217,6 +217,7 @@ def load(
             'valuesByApiLevel',
             {'2.0': cfg['defaultAspirateFlowRate']['value']}),
         model=pipette_model,
+        default_tipracks=cfg['defaultTipracks']
     )
 
     return res

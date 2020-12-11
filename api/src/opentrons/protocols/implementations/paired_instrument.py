@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING, Union, Optional, Callable, Tuple
 
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocol_api.labware import (
     Labware, Well)
-from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.api_support.util import build_edges
@@ -66,8 +66,10 @@ class PairedInstrument:
                 speed: Optional[float] = None):
         if not speed:
             speed = self.p_instrument.default_speed
-        if self._ctx.location_cache:
-            from_lw = self._ctx.location_cache.labware
+
+        last_location = self._ctx.location_cache
+        if last_location:
+            from_lw = last_location.labware
         else:
             from_lw = LabwareLike(None)
 
@@ -89,7 +91,9 @@ class PairedInstrument:
         secondary_height = \
             self._hw_manager.hardware.get_instrument_max_height(
                 self._pair_policy.secondary)
-        moves = planning.plan_moves(from_loc, location, self._ctx.deck,
+        moves = planning.plan_moves(from_loc,
+                                    location,
+                                    self._ctx._implementation.get_deck(),
                                     min(primary_height, secondary_height),
                                     force_direct=force_direct,
                                     minimum_z_height=minimum_z_height
@@ -100,7 +104,8 @@ class PairedInstrument:
             for move in moves:
                 self._hw_manager.hardware.move_to(
                     self._pair_policy, move[0], critical_point=move[1],
-                    speed=speed, max_speeds=self._ctx.max_speeds.data)
+                    speed=speed,
+                    max_speeds=self._ctx._implementation.get_max_speeds().data)
         except Exception:
             self._ctx.location_cache = None
             raise
@@ -112,10 +117,11 @@ class PairedInstrument:
             self, volume: Optional[float],
             location: Optional[types.Location] = None,
             rate: Optional[float] = 1.0) -> Tuple[types.Location, Callable]:
+        last_location = self._ctx.location_cache
         if location:
             loc = location
-        elif self._ctx.location_cache:
-            loc = self._ctx.location_cache
+        elif last_location:
+            loc = last_location
         else:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
@@ -143,7 +149,7 @@ class PairedInstrument:
                 self._hw_manager.hardware.prepare_for_aspirate(
                     self._pair_policy)
             self.move_to(loc)
-        elif loc != self._ctx.location_cache:
+        elif loc != last_location:
             self.move_to(loc)
 
         hw_aspirate = self._hw_manager.hardware.aspirate
@@ -153,11 +159,12 @@ class PairedInstrument:
             self, volume: Optional[float],
             location: Optional[types.Location],
             rate: float) -> Tuple[types.Location, Callable]:
+        last_location = self._ctx.location_cache
         if location:
             loc = location
             self.move_to(location)
-        elif self._ctx.location_cache:
-            loc = self._ctx.location_cache
+        elif last_location:
+            loc = last_location
             pass
         else:
             raise RuntimeError(
@@ -166,7 +173,7 @@ class PairedInstrument:
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
         hw_dispense = self._hw_manager.hardware.dispense
-        return (loc, partial(hw_dispense, self._pair_policy, volume, rate))
+        return loc, partial(hw_dispense, self._pair_policy, volume, rate)
 
     def blow_out(self, location: types.Location):
         if location:
@@ -225,7 +232,7 @@ class PairedInstrument:
 
         edges = build_edges(
             well.as_well(), v_offset, self._pair_policy.primary,
-            self._ctx._deck_layout, radius)
+            self._ctx._implementation.get_deck(), radius)
         for edge in edges:
             self._hw_manager.hardware.move_to(
                 self._pair_policy, edge, speed)

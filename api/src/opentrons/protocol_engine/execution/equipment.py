@@ -8,7 +8,7 @@ from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
 
 from ..errors import FailedToLoadPipetteError
-from ..resources import IdGenerator, LabwareData
+from ..resources import ResourceProviders
 from ..state import StateView
 from ..types import LabwareLocation
 
@@ -34,21 +34,18 @@ class EquipmentHandler:
 
     _hardware: HardwareAPI
     _state: StateView
-    _id_generator: IdGenerator
-    _labware_data: LabwareData
+    _resources: ResourceProviders
 
     def __init__(
         self,
         hardware: HardwareAPI,
         state: StateView,
-        id_generator: IdGenerator,
-        labware_data: LabwareData,
+        resources: ResourceProviders,
     ) -> None:
         """Initialize an EquipmentHandler instance."""
         self._hardware = hardware
         self._state = state
-        self._id_generator = id_generator
-        self._labware_data = labware_data
+        self._resources = resources
 
     async def load_labware(
         self,
@@ -58,15 +55,15 @@ class EquipmentHandler:
         location: LabwareLocation,
     ) -> LoadedLabware:
         """Load labware by assigning an identifier and pulling required data."""
-        labware_id = self._id_generator.generate_id()
+        labware_id = self._resources.id_generator.generate_id()
 
-        definition = await self._labware_data.get_labware_definition(
+        definition = await self._resources.labware_data.get_labware_definition(
             load_name=load_name,
             namespace=namespace,
             version=version,
         )
 
-        calibration = await self._labware_data.get_labware_calibration(
+        calibration = await self._resources.labware_data.get_labware_calibration(
             definition=definition,
             location=location,
         )
@@ -102,6 +99,6 @@ class EquipmentHandler:
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 
-        pipette_id = self._id_generator.generate_id()
+        pipette_id = self._resources.id_generator.generate_id()
 
         return LoadedPipette(pipette_id=pipette_id)

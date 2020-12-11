@@ -5,7 +5,19 @@ import protocolV3Schema from '@opentrons/shared-data/protocol/schemas/3.json'
 import protocolV4Schema from '@opentrons/shared-data/protocol/schemas/4.json'
 import protocolV5Schema from '@opentrons/shared-data/protocol/schemas/5.json'
 import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
-import { createFile, getRequiresAtLeastV5 } from '../selectors'
+import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import {
+  fixtureP10Single,
+  fixtureP300Single,
+} from '@opentrons/shared-data/pipette/fixtures/name'
+import {
+  createFile,
+  getRequiresAtLeastV5,
+  getLabwareDefinitionsInUse,
+} from '../selectors'
 import {
   fileMetadata,
   dismissedWarnings,
@@ -189,5 +201,62 @@ describe('getRequiresAtLeastV5', () => {
       // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
       getRequiresAtLeastV5.resultFunc(engageMagnet.robotStateTimeline)
     ).toBe(false)
+  })
+})
+
+describe('getLabwareDefinitionsInUse util', () => {
+  it('should exclude definitions that are neither on the deck nor assigned to a pipette', () => {
+    const assignedTiprackOnDeckDef = fixture_tiprack_10_ul
+    const assignedTiprackNotOnDeckDef = fixture_tiprack_300_ul
+    const nonTiprackLabwareOnDeckDef = fixture_12_trough
+    const nonTiprackLabwareNotOnDeckDef = fixture_96_plate
+
+    // NOTE that assignedTiprackNotOnDeckDef and nonTiprackLabwareNotOnDeckDef are
+    // missing from LabwareEntities bc they're not on the deck
+    const labwareEntities = {
+      someLabwareId: {
+        id: 'someLabwareId',
+        def: assignedTiprackOnDeckDef,
+        labwareDefURI: 'assignedTiprackOnDeckURI',
+      },
+      otherLabwareId: {
+        id: 'otherLabwareId',
+        def: nonTiprackLabwareOnDeckDef,
+        labwareDefURI: 'nonTiprackLabwareOnDeckURI',
+      },
+    }
+    const allLabwareDefsByURI = {
+      assignedTiprackOnDeckURI: assignedTiprackOnDeckDef,
+      assignedTiprackNotOnDeckURI: assignedTiprackNotOnDeckDef,
+      nonTiprackLabwareOnDeckURI: nonTiprackLabwareOnDeckDef,
+      nonTiprackLabwareNotOnDeckURI: nonTiprackLabwareNotOnDeckDef,
+    }
+    const pipetteEntities = {
+      somePipetteId: {
+        id: 'somePipetteId',
+        name: 'foo',
+        spec: fixtureP10Single,
+        tiprackLabwareDef: assignedTiprackOnDeckDef,
+        tiprackDefURI: 'assignedTiprackOnDeckURI',
+      },
+      otherPipetteId: {
+        id: 'otherPipetteId',
+        name: 'foo',
+        spec: fixtureP300Single,
+        tiprackLabwareDef: assignedTiprackNotOnDeckDef,
+        tiprackDefURI: 'assignedTiprackNotOnDeckURI',
+      },
+    }
+
+    const result = getLabwareDefinitionsInUse(
+      labwareEntities,
+      pipetteEntities,
+      allLabwareDefsByURI
+    )
+    expect(result).toEqual({
+      assignedTiprackOnDeckURI: assignedTiprackOnDeckDef,
+      assignedTiprackNotOnDeckURI: assignedTiprackNotOnDeckDef,
+      nonTiprackLabwareOnDeckURI: nonTiprackLabwareOnDeckDef,
+    })
   })
 })

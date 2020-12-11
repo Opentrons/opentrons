@@ -4,11 +4,12 @@ require typing_extensions.
 
 This module should only be imported if typing.TYPE_CHECKING is True.
 """
-
 from typing import Dict, List, NewType, Union
 
 from typing_extensions import Literal, TypedDict
 
+
+LabwareUri = NewType('LabwareUri', str)
 # Explicit listing of pipette names because we don't frequently get new ones
 PipetteName = Union[Literal['p10_single'], Literal['p10_multi'],
                     Literal['p20_single_gen2'], Literal['p20_multi_gen2'],
@@ -82,6 +83,7 @@ class PipetteNameSpec(TypedDict):
     defaultDispenseFlowRate: PipetteConfigElementWithPerApiLevelValue
     defaultBlowOutFlowRate: PipetteConfigElementWithPerApiLevelValue
     smoothieConfigs: SmoothieConfigs
+    defaultTipracks: List[LabwareUri]
 
 
 PipetteNameSpecs = Dict[PipetteName, PipetteNameSpec]

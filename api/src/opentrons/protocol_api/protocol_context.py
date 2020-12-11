@@ -1,25 +1,23 @@
 import asyncio
 import contextlib
 import logging
-from typing import (Dict, Iterator, List,
-                    Optional, Set, Tuple, Union, TYPE_CHECKING)
+from typing import (Dict, Iterator, List, Callable,
+                    Optional, Set, Tuple, Union, TYPE_CHECKING, cast)
 
+from opentrons.hardware_control import (SynchronousAdapter, ThreadManager)
 from opentrons import types
-from opentrons.hardware_control import (SynchronousAdapter, modules,
-                                        API, ExecutionManager)
-from opentrons.config import feature_flags as fflags
+from opentrons.hardware_control import API
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
-from opentrons.protocols.api_support.constants import SHORT_TRASH_DECK, \
-    STANDARD_DECK
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.types import Protocol
-from .labware import (
-    Labware, get_labware_definition, load_from_definition)
+from .labware import Labware
+from opentrons.protocols.implementations.interfaces.labware import \
+    LabwareInterface
+from opentrons.protocols.implementations.interfaces.protocol_context import \
+    ProtocolContextInterface
 from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry, load_module, resolve_module_model,
-    resolve_module_type, models_compatible, ModuleType,
-    module_model_from_string)
+    ModuleGeometry, ModuleType)
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from .instrument_context import InstrumentContext
@@ -27,8 +25,7 @@ from .module_contexts import (
     ModuleContext, MagneticModuleContext, TemperatureModuleContext,
     ThermocyclerContext)
 from opentrons.protocols.api_support.util import (
-    AxisMaxSpeeds, HardwareManager, requires_version, HardwareToManage,
-    APIVersionError, convert_door_state_to_bool)
+    AxisMaxSpeeds, requires_version, APIVersionError)
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -59,41 +56,23 @@ class ProtocolContext(CommandPublisher):
     """
 
     def __init__(self,
+                 implementation: ProtocolContextInterface,
                  loop: asyncio.AbstractEventLoop = None,
-                 hardware: HardwareToManage = None,
                  broker=None,
-                 bundled_labware: Dict[str, 'LabwareDefinition'] = None,
-                 bundled_data: Dict[str, bytes] = None,
-                 extra_labware: Dict[str, 'LabwareDefinition'] = None,
-                 api_version: APIVersion = None,
+                 api_version: Optional[APIVersion] = None,
                  ) -> None:
         """ Build a :py:class:`.ProtocolContext`.
 
         :param loop: An event loop to use. If not specified, this ctor will
                      (eventually) call :py:meth:`asyncio.get_event_loop`.
-        :param hardware: An optional hardware controller to link to. If not
-                         specified, a new simulator will be created.
         :param broker: An optional command broker to link to. If not
                       specified, a dummy one is used.
-        :param bundled_labware: A dict mapping labware URIs to definitions.
-                                This is used when executing bundled protocols,
-                                and if specified will be the only allowed
-                                source for labware definitions, excluding the
-                                built in definitions and anything in
-                                ``extra_labware``.
-        :param bundled_data: A dict mapping filenames to the contents of data
-                             files. Can be used by the protocol, since it is
-                             exposed as
-                             :py:attr:`.ProtocolContext.bundled_data`
-        :param extra_labware: A dict mapping labware URIs to definitions. These
-                              URIs are searched during :py:meth:`.load_labware`
-                              in addition to the system definitions (if
-                              ``bundled_labware`` was not specified). Used to
-                              provide custom labware definitions.
         :param api_version: The API version to use. If this is ``None``, uses
                             the max supported version.
         """
         super().__init__(broker)
+
+        self._implementation = implementation
 
         self._api_version = api_version or MAX_SUPPORTED_VERSION
         if self._api_version > MAX_SUPPORTED_VERSION:
@@ -102,29 +81,18 @@ class ProtocolContext(CommandPublisher):
                 f'robot software. Please either reduce your requested API '
                 f'version or update your robot.')
         self._loop = loop or asyncio.get_event_loop()
-        deck_load_name = SHORT_TRASH_DECK if fflags.short_fixed_trash() \
-            else STANDARD_DECK
-        self._deck_layout = Deck(load_name=deck_load_name)
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
             = {mount: None for mount in types.Mount}
         self._modules: Set[ModuleContext] = set()
-        self._last_moved_instrument: Optional[types.Mount] = None
-        self._location_cache: Optional[types.Location] = None
 
-        self._hw_manager = HardwareManager(hardware)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
         self._commands: List[str] = []
-        self._unsubscribe_commands = None
+        self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
-
-        self._bundled_labware = bundled_labware
-        self._extra_labware = extra_labware or {}
-
-        self._bundled_data: Dict[str, bytes] = bundled_data or {}
-        self._default_max_speeds = AxisMaxSpeeds()
 
     @classmethod
     def build_using(cls,
+                    implementation: ProtocolContextInterface,
                     protocol: Protocol,
                     *args, **kwargs):
         """ Build an API instance for the specified parsed protocol
@@ -132,10 +100,9 @@ class ProtocolContext(CommandPublisher):
         This is used internally to provision the context with bundle
         contents or api levels.
         """
-        kwargs['bundled_data'] = getattr(protocol, 'bundled_data', None)
-        kwargs['bundled_labware'] = getattr(protocol, 'bundled_labware', None)
         kwargs['api_version'] = getattr(
             protocol, 'api_level', MAX_SUPPORTED_VERSION)
+        kwargs['implementation'] = implementation
         return cls(*args, **kwargs)
 
     @property  # type: ignore
@@ -160,7 +127,7 @@ class ProtocolContext(CommandPublisher):
         ``data/mydata/aspirations.csv`` it will be in the dict as
         ``'aspirations.csv'``) to the bytes contents of the files.
         """
-        return self._bundled_data
+        return self._implementation.get_bundled_data()
 
     def cleanup(self):
         """ Finalize and clean up the protocol context. """
@@ -203,7 +170,7 @@ class ProtocolContext(CommandPublisher):
                 protocol.max_speeds['X'] = None  # reset to default
 
         """
-        return self._default_max_speeds
+        return self._implementation.get_max_speeds()
 
     @requires_version(2, 0)
     def commands(self):
@@ -228,7 +195,7 @@ class ProtocolContext(CommandPublisher):
             cmd_types.COMMAND, on_command)
 
     @contextlib.contextmanager
-    def temp_connect(self, hardware: API):
+    def temp_connect(self, hardware: Union[ThreadManager, SynchronousAdapter]):
         """ Connect temporarily to the specified hardware controller.
 
         This should be used as a context manager:
@@ -243,11 +210,12 @@ class ProtocolContext(CommandPublisher):
             # an error occurred in the code inside the with block
 
         """
-        old_hw = self._hw_manager.hardware
+        hardware_manager = self._implementation.get_hardware()
+        old_hw = hardware_manager.hardware
         old_tc = None
         tc_context = None
         try:
-            self._hw_manager.set_hw(hardware)
+            hardware_manager.set_hw(hardware)
             for mod_ctx in self._modules:
                 if isinstance(mod_ctx, ThermocyclerContext):
                     tc_context = mod_ctx
@@ -259,7 +227,7 @@ class ProtocolContext(CommandPublisher):
                         mod_ctx._module = hw_tc
             yield self
         finally:
-            self._hw_manager.set_hw(old_hw)
+            hardware_manager.set_hw(old_hw)
             if tc_context is not None and old_tc is not None:
                 tc_context._module = old_tc
 
@@ -273,25 +241,24 @@ class ProtocolContext(CommandPublisher):
         :py:class:`.ProtocolContext`; :py:meth:`disconnect` simply creates
         a new simulator and replaces the current hardware with it.
         """
-        self._hw_manager.set_hw(hardware)
-        self._hw_manager.hardware.cache_instruments()
+        self._implementation.connect(hardware=hardware)
 
     @requires_version(2, 0)
     def disconnect(self):
         """ Disconnect from currently-connected hardware and simulate instead
         """
-        self._hw_manager.reset_hw()
+        self._implementation.disconnect()
 
     @requires_version(2, 0)
     def is_simulating(self) -> bool:
-        return self._hw_manager.hardware.is_simulator
+        return self._implementation.is_simulating()
 
     @requires_version(2, 0)
     def load_labware_from_definition(
             self,
             labware_def: 'LabwareDefinition',
             location: types.DeckLocation,
-            label: str = None,
+            label: Optional[str] = None,
     ) -> Labware:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
@@ -307,19 +274,21 @@ class ProtocolContext(CommandPublisher):
                           as in the run log and the calibration view in the
                           Opentrons app.
         """
-        parent = self.deck.position_for(location)
-        labware_obj = load_from_definition(labware_def, parent, label)
-        self._deck_layout[location] = labware_obj
-        return labware_obj
+        implementation = self._implementation.load_labware_from_definition(
+            labware_def=labware_def,
+            location=location,
+            label=label
+        )
+        return Labware(implementation=implementation)
 
     @requires_version(2, 0)
     def load_labware(
             self,
             load_name: str,
             location: types.DeckLocation,
-            label: str = None,
-            namespace: str = None,
-            version: int = None,
+            label: Optional[str] = None,
+            namespace: Optional[str] = None,
+            version: Optional[int] = None,
     ) -> Labware:
         """ Load a labware onto the deck given its name.
 
@@ -343,20 +312,22 @@ class ProtocolContext(CommandPublisher):
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
         """
-        labware_def = get_labware_definition(
-            load_name, namespace, version,
-            bundled_defs=self._bundled_labware,
-            extra_defs=self._extra_labware)
-        return self.load_labware_from_definition(
-            labware_def, location, label)
+        implementation = self._implementation.load_labware(
+            load_name=load_name,
+            location=location,
+            label=label,
+            namespace=namespace,
+            version=version
+        )
+        return Labware(implementation=implementation)
 
     @requires_version(2, 0)
     def load_labware_by_name(
             self,
             load_name: str,
             location: types.DeckLocation,
-            label: str = None,
-            namespace: str = None,
+            label: Optional[str] = None,
+            namespace: Optional[str] = None,
             version: int = 1
     ) -> Labware:
         MODULE_LOG.warning(
@@ -387,8 +358,10 @@ class ProtocolContext(CommandPublisher):
         """
         def _only_labwares() -> Iterator[
                 Tuple[int, Union[Labware, ModuleGeometry]]]:
-            for slotnum, slotitem in self._deck_layout.items():
-                if isinstance(slotitem, Labware):
+            for slotnum, slotitem in self._implementation.get_deck().items():
+                if isinstance(slotitem, LabwareInterface):
+                    yield slotnum, Labware(implementation=slotitem)
+                elif isinstance(slotitem, Labware):
                     yield slotnum, slotitem
                 elif isinstance(slotitem, ModuleGeometry):
                     if slotitem.labware:
@@ -400,7 +373,7 @@ class ProtocolContext(CommandPublisher):
     def load_module(
             self, module_name: str,
             location: Optional[types.DeckLocation] = None,
-            configuration: str = None) -> ModuleTypes:
+            configuration: Optional[str] = None) -> ModuleTypes:
         """ Load a module onto the deck given its name.
 
         This is the function to call to use a module in your protocol, like
@@ -429,58 +402,31 @@ class ProtocolContext(CommandPublisher):
         :returns ModuleContext: The loaded and initialized
                                 :py:class:`ModuleContext`.
         """
-        resolved_model = resolve_module_model(module_name)
-        resolved_type = resolve_module_type(resolved_model)
-        resolved_location = self._deck_layout.resolve_module_location(
-            resolved_type, location)
         if self._api_version < APIVersion(2, 4) and configuration:
             raise APIVersionError(
                 f'You have specified API {self._api_version}, but you are'
                 'using thermocycler parameters only available in 2.4')
 
-        geometry = load_module(
-            resolved_model,
-            self._deck_layout.position_for(
-                resolved_location),
-            self._api_version, configuration)
+        module = self._implementation.load_module(
+            module_name=module_name,
+            location=location,
+            configuration=configuration)
 
-        hc_mod_instance = None
+        if not module:
+            raise RuntimeError(
+                f'Could not find specified module: {module_name}')
+
         mod_class = {
             ModuleType.MAGNETIC: MagneticModuleContext,
             ModuleType.TEMPERATURE: TemperatureModuleContext,
-            ModuleType.THERMOCYCLER: ThermocyclerContext}[resolved_type]
-        for mod in self._hw_manager.hardware.attached_modules:
-            if models_compatible(
-                    module_model_from_string(mod.model()), resolved_model):
-                hc_mod_instance = SynchronousAdapter(mod)
-                break
+            ModuleType.THERMOCYCLER: ThermocyclerContext
+        }[module.type]
 
-        if self.is_simulating() and hc_mod_instance is None:
-            mod_type = {
-                ModuleType.MAGNETIC: modules.magdeck.MagDeck,
-                ModuleType.TEMPERATURE: modules.tempdeck.TempDeck,
-                ModuleType.THERMOCYCLER: modules.thermocycler.Thermocycler
-                }[resolved_type]
-            hc_mod_instance = SynchronousAdapter(mod_type(
-                    port='',
-                    simulating=True,
-                    loop=self._hw_manager.hardware.loop,
-                    execution_manager=ExecutionManager(
-                        loop=self._hw_manager.hardware.loop),
-                    sim_model=resolved_model.value))
-            hc_mod_instance._connect()
-        if hc_mod_instance:
-            mod_ctx = mod_class(self,
-                                hc_mod_instance,
-                                geometry,
-                                self.api_version,
-                                self._loop)
-        else:
-            raise RuntimeError(
-                f'Could not find specified module: {module_name}')
-        self._modules.add(mod_ctx)
-        self._deck_layout[resolved_location] = geometry
-        return mod_ctx
+        module_context = mod_class(
+            self, module.module, module.geometry, self.api_version, self._loop
+        )
+        self._modules.add(module_context)
+        return module_context
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -550,30 +496,22 @@ class ProtocolContext(CommandPublisher):
                 " or a string, but is {}.".format(mount))
         self._log.info("Trying to load {} on {} mount"
                        .format(instrument_name, checked_mount.name.lower()))
-        instr = self._instruments[checked_mount]
-        if instr and not replace:
-            raise RuntimeError("Instrument already present in {} mount: {}"
-                               .format(checked_mount.name.lower(),
-                                       instr.name))
-        attached = {att_mount: instr.get('name', None)
-                    for att_mount, instr
-                    in self._hw_manager.hardware.attached_instruments.items()
-                    if instr}
-        attached[checked_mount] = instrument_name
-        self._log.debug("cache instruments expectation: {}"
-                        .format(attached))
-        self._hw_manager.hardware.cache_instruments(attached)
-        # If the cache call didn’t raise, the instrument is attached
+
+        impl = self._implementation.load_instrument(
+            instrument_name=instrument_name,
+            mount=checked_mount,
+            replace=replace
+        )
+
         new_instr = InstrumentContext(
             ctx=self,
-            hardware_mgr=self._hw_manager,
-            mount=checked_mount,
-            at_version=self._api_version,
+            broker=self.broker,
+            implementation=impl,
+            at_version=self.api_version,
             tip_racks=tip_racks,
             log_parent=self._log,
-            requested_as=instrument_name)
+        )
         self._instruments[checked_mount] = new_instr
-        self._log.info("Instrument {} loaded".format(new_instr))
         return new_instr
 
     @property  # type: ignore
@@ -607,13 +545,13 @@ class ProtocolContext(CommandPublisher):
 
         :param str msg: A message to echo back to connected clients.
         """
-        self._hw_manager.hardware.pause()
+        self._implementation.pause()
 
     @publish.both(command=cmds.resume)
     @requires_version(2, 0)
     def resume(self):
         """ Resume a previously-paused protocol """
-        self._hw_manager.hardware.resume()
+        self._implementation.resume()
 
     @publish.both(command=cmds.comment)
     @requires_version(2, 0)
@@ -626,7 +564,7 @@ class ProtocolContext(CommandPublisher):
         so cannot be used to communicate real-time information from the robot's
         actual run.
         """
-        pass
+        self._implementation.comment(msg=msg)
 
     @publish.both(command=cmds.delay)
     @requires_version(2, 0)
@@ -639,25 +577,24 @@ class ProtocolContext(CommandPublisher):
         If both `seconds` and `minutes` are specified, they will be added.
         """
         delay_time = seconds + minutes * 60
-        self._hw_manager.hardware.delay(delay_time)
+        self._implementation.delay(seconds=delay_time, msg=msg)
 
     @requires_version(2, 0)
     def home(self):
         """ Homes the robot.
         """
         self._log.debug("home")
-        self._location_cache = None
-        self._hw_manager.hardware.home()
+        self._implementation.home()
 
     @property
     def location_cache(self) -> Optional[types.Location]:
         """ The cache used by the robot to determine where it last was.
         """
-        return self._location_cache
+        return self._implementation.get_last_location()
 
     @location_cache.setter
     def location_cache(self, loc: Optional[types.Location]):
-        self._location_cache = loc
+        self._implementation.set_last_location(loc)
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -681,7 +618,7 @@ class ProtocolContext(CommandPublisher):
         reflect the labware physically on the deck (or be higher than the
         labware on the deck).
         """
-        return self._deck_layout
+        return self._implementation.get_deck()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -691,10 +628,12 @@ class ProtocolContext(CommandPublisher):
         It has one well and should be accessed like labware in your protocol.
         e.g. ``protocol.fixed_trash['A1']``
         """
-        trash = self._deck_layout['12']
-        if not trash:
-            raise RuntimeError("Robot must have a trash container in 12")
-        return trash  # type: ignore
+        trash = self._implementation.get_fixed_trash()
+        # TODO AL 20201113 - remove this when DeckLayout only holds
+        #  LabwareInterface instances.
+        if isinstance(trash, LabwareInterface):
+            return Labware(implementation=trash)
+        return cast("Labware", trash)
 
     @requires_version(2, 5)
     def set_rail_lights(self, on: bool):
@@ -703,17 +642,16 @@ class ProtocolContext(CommandPublisher):
 
         :param bool on: If true, turn on rail lights; otherwise, turn off.
         """
-        self._hw_manager.hardware.set_lights(rails=on)
+        self._implementation.set_rail_lights(on=on)
 
     @property  # type: ignore
     @requires_version(2, 5)
     def rail_lights_on(self) -> bool:
         """ Returns True if the rail lights are on """
-        return self._hw_manager.hardware.get_lights()['rails']
+        return self._implementation.get_rail_lights_on()
 
     @property  # type: ignore
     @requires_version(2, 5)
     def door_closed(self) -> bool:
         """ Returns True if the robot door is closed """
-        return convert_door_state_to_bool(
-            self._hw_manager.hardware.door_state)
+        return self._implementation.door_closed()

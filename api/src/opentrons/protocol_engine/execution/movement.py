@@ -1,6 +1,8 @@
 """Movement command handling."""
+from typing import Optional
 from opentrons.hardware_control.api import API as HardwareAPI
 
+from ..types import WellLocation
 from ..state import StateView
 
 
@@ -24,6 +26,7 @@ class MovementHandler:
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        well_location: Optional[WellLocation] = None,
     ) -> None:
         """Move to a specific well."""
         # get the pipette's mount and current critical point, if applicable
@@ -43,6 +46,7 @@ class MovementHandler:
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
+            well_location=well_location,
             origin=origin,
             origin_cp=origin_cp,
             max_travel_z=max_travel_z,

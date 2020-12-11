@@ -1,62 +1,73 @@
+from __future__ import annotations
 import asyncio
 import base64
 from copy import copy
 from functools import reduce
 import logging
 from time import time, sleep
-from typing import List, Dict, Any, Optional, Set, TYPE_CHECKING
+from typing import (
+    cast, List, Dict, Any, Optional, Set, Sequence, Tuple, TypeVar, Iterator)
+from typing_extensions import Final
 from uuid import uuid4
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.api.util import (RobotBusy, robot_is_busy,
                                 requires_http_protocols_disabled)
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 from opentrons.broker import Broker
 from opentrons.config import feature_flags as ff
-from opentrons.commands.util import from_list, session_listify
-from opentrons.commands import types as command_types
+from opentrons.commands.util import from_list
+from opentrons.commands import types as command_types, introspection
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.implementations.protocol_context import \
+    ProtocolContextImplementation
 from opentrons.protocols.parse import parse
-from opentrons.types import Location, Point
+from opentrons.protocols.types import Protocol
 from opentrons.calibration_storage import helpers
 from opentrons.protocol_api import (ProtocolContext,
+                                    InstrumentContext,
                                     labware)
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.execution.execute import run_protocol
 from opentrons.hardware_control import (API, ThreadManager,
+                                        SynchronousAdapter,
                                         ExecutionCancelledError,
                                         ThreadedAsyncLock)
 from opentrons.hardware_control.types import (DoorState, HardwareEventType,
                                               HardwareEvent)
 from .models import Container, Instrument, Module
-
-if TYPE_CHECKING:
-    from .dev_types import State, StateInfo
+from .dev_types import State, StateInfo, Message, LastCommand, Error, CommandShortId
 
 log = logging.getLogger(__name__)
 
-VALID_STATES: Set['State'] = {
+VALID_STATES: Set[State] = {
     'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 
 
 class SessionManager:
     def __init__(
-            self, hardware, loop=None, broker=None, lock=None):
+            self,
+            hardware: SynchronousAdapter,
+            loop: asyncio.AbstractEventLoop = None,
+            broker: Broker = None,
+            lock: ThreadedAsyncLock = None) -> None:
         self._broker = broker or Broker()
         self._loop = loop or asyncio.get_event_loop()
-        self.session = None
+        self.session: Optional[Session] = None
         self._session_lock = False
         self._hardware = hardware
         self._command_logger = logging.getLogger(
             'opentrons.server.command_logger')
         self._broker.set_logger(self._command_logger)
-        self._motion_lock = lock
+        self._motion_lock = lock or ThreadedAsyncLock()
 
     @requires_http_protocols_disabled
     def create(
             self,
             name: str,
             contents: str,
-            is_binary: bool = False) -> 'Session':
+            is_binary: bool = False) -> Session:
         """ Create a protocol session from either
 
         - a json protocol
@@ -110,7 +121,7 @@ class SessionManager:
             self._session_lock = False
 
     @requires_http_protocols_disabled
-    def create_from_bundle(self, name: str, contents: str) -> 'Session':
+    def create_from_bundle(self, name: str, contents: str) -> Session:
         """ Create a protocol session from a base64'd zip file.
 
         :param str name: The name of the protocol
@@ -151,7 +162,7 @@ class SessionManager:
             self,
             name: str,
             contents: str,
-            extra_labware: List[Dict[str, Any]]) -> 'Session':
+            extra_labware: List[LabwareDefinition]) -> Session:
         """
         Create a protocol session from a python protocol string with a list
         of extra custom labware to make available.
@@ -190,7 +201,7 @@ class SessionManager:
         finally:
             self._session_lock = False
 
-    def clear(self):
+    def clear(self) -> None:
         if self._session_lock:
             raise Exception(
                 'Cannot clear session while simulation in progress')
@@ -201,17 +212,24 @@ class SessionManager:
         self.session = None
         self._broker.set_logger(self._command_logger)
 
-    def get_session(self):
+    def get_session(self) -> Optional[Session]:
         return self.session
 
 
 class Session(RobotBusy):
-    TOPIC = 'session'
+    TOPIC: Final = 'session'
 
     @classmethod
     def build_and_prep(
-        cls, name, contents, hardware, loop, broker, motion_lock, extra_labware
-    ):
+            cls,
+            name: str,
+            contents: Any,
+            hardware: SynchronousAdapter,
+            loop: asyncio.AbstractEventLoop,
+            broker: Broker,
+            motion_lock: ThreadedAsyncLock,
+            extra_labware: List[LabwareDefinition]
+    ) -> Session:
         protocol = parse(contents, filename=name,
                          extra_labware={helpers.uri_from_definition(defn): defn
                                         for defn in extra_labware})
@@ -219,7 +237,12 @@ class Session(RobotBusy):
         sess.prepare()
         return sess
 
-    def __init__(self, name, protocol, hardware, loop, broker, motion_lock):
+    def __init__(
+            self, name: str, protocol: Protocol,
+            hardware: SynchronousAdapter,
+            loop: asyncio.AbstractEventLoop,
+            broker: Broker,
+            motion_lock: ThreadedAsyncLock) -> None:
         self._broker = broker
         self._default_logger = self._broker.logger
         self._sim_logger = self._broker.logger.getChild('sim')
@@ -238,24 +261,31 @@ class Session(RobotBusy):
 
         self._hardware = hardware
         self._simulating_ctx = ProtocolContext.build_using(
-            self._protocol, loop=self._loop, broker=self._broker)
+            implementation=ProtocolContextImplementation.build_using(
+                self._protocol),
+            protocol=self._protocol,
+            loop=self._loop,
+            broker=self._broker
+        )
 
         self.state: 'State' = None
         #: The current state
         self.stateInfo: 'StateInfo' = {}
         #: A message associated with the current state
-        self.commands = []
-        self.command_log = {}
-        self.errors = []
+        self.commands: List[command_types.CommandMessage] = []
+        self.command_log: Dict[int, int] = {}
+        self.errors: List[Error] = []
 
-        self._containers = []
-        self._instruments = []
-        self._modules = []
-        self._interactions = []
+        # Underlying objects harvested from commands, internal
+        self._containers: List[labware.Labware] = []
+        self._instruments: List[InstrumentContext] = []
+        self._modules: List[module_geometry.ModuleGeometry] = []
+        self._interactions: List[Tuple[InstrumentContext, labware.Labware]] = []
 
-        self.instruments = None
-        self.containers = None
-        self.modules = None
+        # RPC-safe models of objects harvested from commands
+        self.instruments: Optional[List[Instrument]] = None
+        self.containers: Optional[List[Container]] = None
+        self.modules: Optional[List[Module]] = None
         self.protocol_text = protocol.text
 
         self.startTime: Optional[float] = None
@@ -268,13 +298,13 @@ class Session(RobotBusy):
     def busy_lock(self) -> ThreadedAsyncLock:
         return self._motion_lock
 
-    def _hw_iface(self):
+    def _hw_iface(self) -> SynchronousAdapter:
         return self._hardware
 
-    def prepare(self):
+    def prepare(self) -> None:
         self.refresh()
 
-    def get_instruments(self):
+    def get_instruments(self) -> List[Instrument]:
         return [
             Instrument(
                 instrument=instrument,
@@ -288,7 +318,7 @@ class Session(RobotBusy):
             for instrument in self._instruments
         ]
 
-    def get_containers(self):
+    def get_containers(self) -> List[Container]:
         return [
             Container(
                 container=container,
@@ -302,31 +332,31 @@ class Session(RobotBusy):
             for container in self._containers
         ]
 
-    def get_modules(self):
+    def get_modules(self) -> List[Module]:
         return [
             Module(module=module,
                    context=self._use_v2 and self._simulating_ctx)
             for module in self._modules
         ]
 
-    def clear_logs(self):
+    def clear_logs(self) -> None:
         self.command_log.clear()
         self.errors.clear()
 
     @robot_is_busy
-    def _simulate(self):
+    def _simulate(self) -> List[CommandShortId]:
         self._reset()
 
-        stack: List[Dict[str, Any]] = []
-        res: List[Dict[str, Any]] = []
-        commands: List[Dict[str, Any]] = []
+        stack: List[command_types.CommandMessage] = []
+        res: List[CommandShortId] = []
+        commands: List[command_types.CommandPayload] = []
 
         self._containers.clear()
         self._instruments.clear()
         self._modules.clear()
         self._interactions.clear()
 
-        def on_command(message):
+        def on_command(message: command_types.CommandMessage) -> None:
             payload = message['payload']
             description = payload.get('text', '').format(
                 **payload
@@ -363,12 +393,16 @@ class Session(RobotBusy):
                     strict_attached_instruments=False
                     ).sync
             sync_sim.home()
-            self._simulating_ctx = ProtocolContext.build_using(
+            ctx_impl = ProtocolContextImplementation.build_using(
                 self._protocol,
-                loop=self._loop,
                 hardware=sync_sim,
-                broker=self._broker,
                 extra_labware=getattr(self._protocol, 'extra_labware', {}))
+            self._simulating_ctx = ProtocolContext.build_using(
+                protocol=self._protocol,
+                loop=self._loop,
+                broker=self._broker,
+                implementation=ctx_impl
+            )
             run_protocol(self._protocol,
                          context=self._simulating_ctx)
 
@@ -395,7 +429,7 @@ class Session(RobotBusy):
 
         return res
 
-    def refresh(self):
+    def refresh(self) -> None:
         self._reset()
 
         try:
@@ -414,9 +448,7 @@ class Session(RobotBusy):
         self.startTime = None
         self.set_state('loaded')
 
-        return self
-
-    def stop(self):
+    def stop(self) -> None:
         self._hw_iface().halt()
         with self._motion_lock.lock():
             try:
@@ -424,26 +456,22 @@ class Session(RobotBusy):
             except asyncio.CancelledError:
                 pass
         self.set_state('stopped')
-        return self
 
     def pause(self,
               reason: str = None,
               user_message: str = None,
-              duration: float = None):
+              duration: float = None) -> None:
         self._hardware.pause()
         self.set_state(
             'paused', reason=reason,
             user_message=user_message, duration=duration)
-        return self
 
-    def resume(self):
+    def resume(self) -> None:
         if not self.blocked:
             self._hardware.resume()
-
             self.set_state('running')
-            return self
 
-    def _start_hardware_event_watcher(self):
+    def _start_hardware_event_watcher(self) -> None:
         if not callable(self._event_watcher):
             # initialize and update window switch state
             self._update_window_state(self._hardware.door_state)
@@ -454,12 +482,12 @@ class Session(RobotBusy):
             log.warning("Cannot start new hardware event watcher "
                         "when one already exists")
 
-    def _remove_hardware_event_watcher(self):
-        if callable(self._event_watcher):
+    def _remove_hardware_event_watcher(self) -> None:
+        if self._event_watcher and callable(self._event_watcher):
             self._event_watcher()
             self._event_watcher = None
 
-    def _handle_hardware_event(self, hw_event: 'HardwareEvent'):
+    def _handle_hardware_event(self, hw_event: HardwareEvent) -> None:
         if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
             self._update_window_state(hw_event.new_state)
             if ff.enable_door_safety_switch() and \
@@ -469,7 +497,7 @@ class Session(RobotBusy):
             else:
                 self._on_state_changed()
 
-    def _update_window_state(self, state: DoorState):
+    def _update_window_state(self, state: DoorState) -> None:
         self.door_state = str(state)
         if ff.enable_door_safety_switch() and \
                 state == DoorState.OPEN:
@@ -478,8 +506,8 @@ class Session(RobotBusy):
             self.blocked = False
 
     @robot_is_busy  # noqa(C901)
-    def _run(self):
-        def on_command(message):
+    def _run(self) -> None:
+        def on_command(message: command_types.CommandMessage) -> None:
             if message['$'] == 'before':
                 self.log_append()
             if message['name'] == command_types.PAUSE:
@@ -502,11 +530,15 @@ class Session(RobotBusy):
             self._pre_run_hooks()
             self._hardware.cache_instruments()
             self._hardware.reset_instrument()
-            ctx = ProtocolContext.build_using(
+            ctx_impl = ProtocolContextImplementation.build_using(
                 self._protocol,
-                loop=self._loop,
-                broker=self._broker,
                 extra_labware=getattr(self._protocol, 'extra_labware', {}))
+            ctx = ProtocolContext.build_using(
+                protocol=self._protocol,
+                implementation=ctx_impl,
+                loop=self._loop,
+                broker=self._broker
+            )
             ctx.connect(self._hardware)
             ctx.home()
             run_protocol(self._protocol, context=ctx)
@@ -536,7 +568,7 @@ class Session(RobotBusy):
         finally:
             _unsubscribe()
 
-    def run(self):
+    def run(self) -> None:
         if not self.blocked:
             try:
                 self._broker.set_logger(self._run_logger)
@@ -545,7 +577,6 @@ class Session(RobotBusy):
                 raise
             finally:
                 self._broker.set_logger(self._default_logger)
-            return self
         else:
             raise RuntimeError(
                 'Protocol is blocked and cannot run. Make sure robot door '
@@ -554,7 +585,7 @@ class Session(RobotBusy):
     def set_state(self, state: 'State',
                   reason: str = None,
                   user_message: str = None,
-                  duration: float = None):
+                  duration: float = None) -> None:
         if state not in VALID_STATES:
             raise ValueError(
                 'Invalid state: {0}. Valid states are: {1}'
@@ -578,12 +609,12 @@ class Session(RobotBusy):
             self.stateInfo.pop('changedAt', None)
         self._on_state_changed()
 
-    def log_append(self):
+    def log_append(self) -> None:
         self.command_log.update({
             len(self.command_log): now()})
         self._on_state_changed()
 
-    def error_append(self, error):
+    def error_append(self, error: Exception) -> None:
         self.errors.append(
             {
                 'timestamp': now(),
@@ -591,21 +622,21 @@ class Session(RobotBusy):
             }
         )
 
-    def _reset(self):
+    def _reset(self) -> None:
         self._hw_iface().reset()
         self.clear_logs()
         # unregister existing event watcher
         self._remove_hardware_event_watcher()
         self._start_hardware_event_watcher()
 
-    def _snapshot(self):
+    def _snapshot(self) -> Message:
         if self.state == 'loaded':
             payload: Any = copy(self)
         else:
             if self.command_log.keys():
                 idx = sorted(self.command_log.keys())[-1]
                 timestamp = self.command_log[idx]
-                last_command: Optional[Dict[str, Any]]\
+                last_command: Optional[LastCommand]\
                     = {'id': idx, 'handledAt': timestamp}
             else:
                 last_command = None
@@ -624,105 +655,63 @@ class Session(RobotBusy):
             'payload': payload
         }
 
-    def _on_state_changed(self):
+    def _on_state_changed(self) -> None:
         snap = self._snapshot()
         self._broker.publish(Session.TOPIC, snap)
 
-    def _pre_run_hooks(self):
+    def _pre_run_hooks(self) -> None:
         self._hw_iface().home_z()
 
 
-def _accumulate(iterable):
+CommandReferents = Tuple[
+    List[InstrumentContext], List[labware.Labware],
+    List[module_geometry.ModuleGeometry],
+    List[Tuple[InstrumentContext, labware.Labware]]]
+
+
+def _accumulate(iterable: Sequence[CommandReferents]) -> CommandReferents:
+
+    def _reducer(acc: CommandReferents, item: CommandReferents) -> CommandReferents:
+        return (acc[0] + item[0],
+                acc[1] + item[1],
+                acc[2] + item[2],
+                acc[3] + item[3])
+
     return reduce(
-        lambda x, y: tuple([x + y for x, y in zip(x, y)]),  # type: ignore
+        _reducer,
         iterable,
-        ([], [], [], []))
+        cast(CommandReferents, ([], [], [], [])))
 
 
-def _dedupe(iterable):
-    def _dupecheck(accumulator, item):
-        if not any([item == accumulated for accumulated in accumulator]):
-            accumulator.append(item)
-        return accumulator
-    return reduce(_dupecheck, iterable, [])
+It = TypeVar('It')
 
 
-def now():
+def _dedupe(iterable: Sequence[It]) -> Iterator[It]:
+    acc: Set[It] = set()
+
+    for item in iterable:
+        if item not in acc:
+            acc.add(item)
+            yield item
+
+
+def now() -> int:
     return int(time() * 1000)
 
 
-def _get_parent_module(placeable):
-    if not placeable or isinstance(placeable, (Point, str)):
-        res = None
-    elif isinstance(placeable,
-                    module_geometry.ModuleGeometry):
-        res = placeable
-    elif isinstance(placeable, List):
-        res = _get_parent_module(placeable[0].parent)
-    else:
-        res = _get_parent_module(placeable.parent)
-    return res
+def _get_labware(
+        command: command_types.CommandPayload) -> CommandReferents:
+    interactions: List[Tuple[InstrumentContext, labware.Labware]] = []
 
+    try:
+        instruments, containers, modules = introspection.get_referred_objects(command)
+    except ValueError:
+        log.exception(f'Cant handle location in command {command!r}')
+        instruments = []
+        containers = []
+        modules = []
 
-def _get_new_labware(loc):
-    if isinstance(loc, Location):
-        return _get_new_labware(loc.labware)
-    elif isinstance(loc, labware.Well):
-        return loc.parent
-    elif isinstance(loc, labware.Labware):
-        return loc
-    else:
-        raise TypeError(loc)
-
-
-def _get_labware(command):  # noqa(C901)
-    containers = []
-    instruments = []
-    modules = []
-    interactions = []
-
-    location = command.get('location')
-    instrument = command.get('instrument')
-
-    placeable = location
-    if isinstance(location, Location):
-        placeable = location.labware.object
-    elif isinstance(location, tuple):
-        placeable = location[0]
-
-    maybe_module = _get_parent_module(placeable)
-    modules.append(maybe_module)
-
-    locations = command.get('locations')
-    multiple_instruments = command.get('instruments')
-
-    if location:
-        if isinstance(location, Location):
-            if location.labware.is_well:
-                containers.append(location.labware.parent.as_labware())
-            elif location.labware.is_labware:
-                containers.append(location.labware.as_labware())
-        elif isinstance(location, (labware.Well, labware.Labware)):
-            containers.append(_get_new_labware(location))
-        else:
-            log.error(f'Cant handle location {location!r}')
-
-    if locations:
-        list_of_locations = session_listify(locations)
-        containers.extend(
-            [_get_new_labware(loc) for loc in list_of_locations])
-
-    containers = [c for c in containers if c is not None]
-    modules = [m for m in modules if m is not None]
-
-    if instrument:
-        instruments.append(instrument)
-        interactions.extend(
-            [(instrument, container) for container in containers])
-    if multiple_instruments:
-        for instr in multiple_instruments:
-            instruments.append(instr)
-            interactions.extend(
-                [(instr, container) for container in containers])
+    for instrument in instruments:
+        interactions.extend([(instrument, container) for container in containers])
 
     return instruments, containers, modules, interactions

@@ -66,8 +66,8 @@ _SERDES = {
         }
     ),
     robot_configs.robot_config: SerDes(
-        serializer=lambda config: list(robot_configs.config_to_save(config)),
-        deserializer=lambda clist: robot_configs.build_config(*clist)
+        serializer=lambda config: robot_configs.config_to_save(config),
+        deserializer=lambda clist: robot_configs.build_config(clist)
     ),
     List[types.Axis]: SerDes(
         serializer=lambda axlist: [ax.name for ax in axlist],

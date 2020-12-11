@@ -5,8 +5,7 @@ from enum import Enum
 from pathlib import Path
 from typing import NamedTuple, Dict, Set
 
-from opentrons.config import IS_ROBOT, robot_configs
-from opentrons.data_storage import database as db
+from opentrons.config import IS_ROBOT
 from opentrons.calibration_storage import delete
 
 DATA_BOOT_D = Path('/data/boot.d')
@@ -102,7 +101,6 @@ def reset_boot_scripts():
 def reset_deck_calibration():
     delete.delete_robot_deck_attitude()
     delete.clear_pipette_offset_calibrations()
-    robot_configs.clear(calibration=True, robot=False)
 
 
 def reset_pipette_offset():
@@ -116,4 +114,3 @@ def reset_tip_length_calibrations():
 
 def reset_labware_calibration():
     delete.clear_calibrations()
-    db.reset()

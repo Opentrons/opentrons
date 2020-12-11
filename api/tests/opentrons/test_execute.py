@@ -76,7 +76,7 @@ def test_execute_function_json_v3_apiv2(get_json_protocol_fixture,
             if item['$'] == 'before'] == [
         'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1',
         'Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec',
-        'Delaying for 0 minutes and 42 seconds',
+        'Delaying for 0 minutes and 42.0 seconds',
         'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec',
         'Touching tip',
         'Blowing out at B1 of Dest Plate on 3',
@@ -102,7 +102,7 @@ def test_execute_function_json_v4_apiv2(get_json_protocol_fixture,
             if item['$'] == 'before'] == [
         'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1',
         'Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec',
-        'Delaying for 0 minutes and 42 seconds',
+        'Delaying for 0 minutes and 42.0 seconds',
         'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec',
         'Touching tip',
         'Blowing out at B1 of Dest Plate on 3',
@@ -128,7 +128,7 @@ def test_execute_function_json_v5_apiv2(get_json_protocol_fixture,
             if item['$'] == 'before'] == [
         'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1',
         'Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec',
-        'Delaying for 0 minutes and 42 seconds',
+        'Delaying for 0 minutes and 42.0 seconds',
         'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec',
         'Touching tip',
         'Blowing out at B1 of Dest Plate on 3',
@@ -201,7 +201,7 @@ def test_execute_extra_labware(protocol, protocol_file, monkeypatch,
                        match='.*FileNotFoundError.*'):
         execute.execute(protocol.filelike, 'custom_labware.py')
     no_lw = execute.get_protocol_api('2.0')
-    assert not no_lw._extra_labware
+    assert not no_lw._implementation._extra_labware
     protocol.filelike.seek(0)
     monkeypatch.setattr(execute, 'IS_ROBOT', True)
     monkeypatch.setattr(execute, 'JUPYTER_NOTEBOOK_LABWARE_DIR',
@@ -215,7 +215,8 @@ def test_execute_extra_labware(protocol, protocol_file, monkeypatch,
 
     # make sure the extra labware loaded by default is right
     ctx = execute.get_protocol_api('2.0')
-    assert len(ctx._extra_labware.keys()) == len(os.listdir(fixturedir))
+    assert len(ctx._implementation._extra_labware.keys()) ==\
+           len(os.listdir(fixturedir))
 
     assert ctx.load_labware('fixture_12_trough', 1, namespace='fixture')
 

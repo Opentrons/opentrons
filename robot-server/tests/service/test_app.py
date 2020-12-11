@@ -1,3 +1,4 @@
+from mock import patch
 import pytest
 from http import HTTPStatus
 
@@ -70,6 +71,13 @@ def test_api_versioning(api_client, headers, expected_version):
     assert resp.headers.get(MIN_API_VERSION_HEADER) == str(MIN_API_VERSION)
 
 
+@pytest.fixture
+def mock_log_control():
+    with patch("opentrons.system.log_control.get_records_dumb") as p:
+        p.return_value = b""
+        yield p
+
+
 @pytest.mark.parametrize(
     argnames="path",
     argvalues=[
@@ -81,7 +89,8 @@ def test_api_versioning(api_client, headers, expected_version):
         "/logs/some-random-journald-thing",
         "/",
     ])
-def test_api_versioning_non_versions_endpoints(api_client, path):
+def test_api_versioning_non_versions_endpoints(
+        api_client, path, mock_log_control):
     del api_client.headers["Opentrons-Version"]
     resp = api_client.get(path)
     assert resp.headers.get(API_VERSION_HEADER) == str(API_VERSION)

@@ -30,7 +30,7 @@ ERROR_KEYWORD = 'error'
 ALARM_KEYWORD = 'alarm'
 
 # TODO (artyom, ben 20171026): move to config
-HOMED_POSITION = {
+HOMED_POSITION: Dict[str, float] = {
     'X': 418,
     'Y': 353,
     'Z': 218,
@@ -1600,23 +1600,24 @@ class SmoothieDriver_3_0_0:
                     self._set_saved_current()
 
         # Only update axes that have been selected for homing
+        homed_axes = "".join(home_sequence)
         homed = {
             ax: self.homed_position.get(ax)
-            for ax in ''.join(home_sequence)
+            for ax in homed_axes
         }
         self.update_position(default=homed)
-        for axis in ''.join(home_sequence):
-            self.engaged_axes[axis] = True
 
-        # coordinate after homing might not synce with default in API
+        for ax in homed_axes:
+            self.engaged_axes[ax] = True
+
+        # coordinate after homing might not sync with default in API
         # so update this driver's homed position using current coordinates
         new = {
             ax: self.position[ax]
-            for ax in self.homed_position.keys()
-            if ax in axis
+            for ax in homed_axes
         }
         self._homed_position.update(new)
-        self._axes_moved_at.mark_moved(axis)
+        self._axes_moved_at.mark_moved(homed_axes)
         return self.position
 
     def _build_fullstep_configurations(self, axes: str) -> Tuple[str, str]:
