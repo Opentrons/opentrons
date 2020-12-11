@@ -25,7 +25,6 @@ import {
   Card,
   Box,
   BORDER_SOLID_LIGHT,
-  DISPLAY_INLINE,
   ALIGN_BASELINE,
   FONT_SIZE_BODY_1,
   Link,
