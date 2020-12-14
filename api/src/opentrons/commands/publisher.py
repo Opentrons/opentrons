@@ -38,10 +38,11 @@ def do_publish(
         broker.logger.info("{}: {}".format(
             f.__qualname__,
             {k: v for k, v in call_args.items() if str(k) != 'self'}))
+    getfullargspec = inspect.getfullargspec(cmd)
     command_args = dict(
         zip(
-            reversed(inspect.getfullargspec(cmd).args),
-            reversed(inspect.getfullargspec(cmd).defaults
+            reversed(getfullargspec.args),
+            reversed(getfullargspec.defaults
                      or [])))
 
     # TODO (artyom, 20170927): we are doing this to be able to use
@@ -49,7 +50,7 @@ def do_publish(
     # self is effectively an instrument.
     # To narrow the scope of this hack, we are checking if the
     # command is expecting instrument first.
-    if 'instrument' in inspect.getfullargspec(cmd).args:
+    if 'instrument' in getfullargspec.args:
         # We are also checking if call arguments have 'self' and
         # don't have instruments specified, in which case
         # instruments should take precedence.
@@ -59,7 +60,7 @@ def do_publish(
     command_args.update({
         key: call_args[key]
         for key in
-        (set(inspect.getfullargspec(cmd).args)
+        (set(getfullargspec.args)
          & call_args.keys())
     })
 
