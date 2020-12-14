@@ -45,17 +45,17 @@ export type ConditionalConfirmOutput = {|
  */
 
 export const useConditionalConfirm = (
-  handleContinue: () => mixed,
+  handleContinue: (...args: Array<mixed>) => mixed,
   shouldBlock: boolean
 ): ConditionalConfirmOutput => {
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false)
 
-  const confirm = () => {
+  const confirm = (...args) => {
     if (shouldBlock && !showConfirmation) {
       setShowConfirmation(true)
     } else {
       setShowConfirmation(false)
-      handleContinue()
+      handleContinue(...args)
     }
   }
 

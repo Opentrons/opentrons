@@ -13,9 +13,12 @@ import {
   getHoveredSubstep,
   getHoveredStepId,
   getSelectedStepId,
+  getMultiSelectItemIds,
   actions as stepsActions,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
+import { getIsStepSelected } from '../ui/steps/selectors'
+import { getBatchEditEnabled } from '../feature-flags/selectors'
 
 import { StepItem, StepItemContents } from '../components/steplist/StepItem'
 import {
@@ -55,7 +58,12 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const collapsed = useSelector(getCollapsedSteps)[stepId]
   const hoveredSubstep = useSelector(getHoveredSubstep)
   const hoveredStep = useSelector(getHoveredStepId)
-  const selected = useSelector(getSelectedStepId) === stepId
+  const isStepSelected = useSelector(getIsStepSelected)
+  const selectedStepId = useSelector(getSelectedStepId)
+  const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
+  const multiSelectItemIds = useSelector(getMultiSelectItemIds)
+  const selected =
+    selectedStepId === stepId || multiSelectItemIds.includes(stepId)
 
   const substeps = useSelector(fileDataSelectors.getSubsteps)[stepId]
 
@@ -70,20 +78,64 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     stepFormSelectors.getCurrentFormHasUnsavedChanges
   )
 
+  const isBatchEditEnabled = useSelector(getBatchEditEnabled)
+
   // Actions
   const dispatch = useDispatch()
 
   const highlightSubstep = (payload: SubstepIdentifier) =>
     dispatch(stepsActions.hoverOnSubstep(payload))
   const selectStep = () => dispatch(stepsActions.selectStep(stepId))
+  const selectMultipleSteps = (steps: Array<StepIdType>) =>
+    dispatch(stepsActions.selectMultipleSteps(steps))
   const toggleStepCollapsed = () =>
     dispatch(stepsActions.toggleStepCollapsed(stepId))
   const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
 
+  const handleStepItemSelection = (e: SyntheticMouseEvent<>) => {
+    const isShiftKeyPressed: boolean = e.shiftKey
+    const isMetaKeyPressed: boolean = e.metaKey
+    let stepsToSelect: Array<StepIdType> = []
+
+    if (isBatchEditEnabled) {
+      if (isShiftKeyPressed) {
+        if (selectedStepId) {
+          // take the range as the index of the selected step, to the current stepNumber (inclusive)
+          const startIndex: number = orderedStepIds.indexOf(selectedStepId)
+          const endIndex: number = stepNumber
+          stepsToSelect = orderedStepIds.slice(startIndex, endIndex)
+        } else {
+          // enter batch edit mode with only this one step selected
+          stepsToSelect = [stepId]
+        }
+      } else if (isMetaKeyPressed) {
+        if (isStepSelected && selectedStepId) {
+          // include the current step index in the steps to select
+          stepsToSelect = [selectedStepId, stepId]
+        } else if (multiSelectItemIds) {
+          stepsToSelect = multiSelectItemIds.includes(stepId)
+            ? multiSelectItemIds.filter(id => id !== stepId)
+            : [...multiSelectItemIds, stepId]
+        } else {
+          // enter batch edit mode with only this one step selected
+          stepsToSelect = [stepId]
+        }
+      }
+      if (stepsToSelect.length) {
+        selectMultipleSteps(stepsToSelect)
+      } else {
+        selectStep()
+      }
+    } else {
+      // if batch edit is not enabled ignore shift/meta keys
+      selectStep()
+    }
+  }
+
   // step selection is gated when showConfirmation is true
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
-    selectStep,
+    handleStepItemSelection,
     currentFormIsPresaved || formHasChanges
   )
 
@@ -103,7 +155,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     hovered: hoveredStep === stepId && !hoveredSubstep,
 
     highlightStep,
-    selectStep: confirm,
+    handleClick: confirm,
     toggleStepCollapsed,
     unhighlightStep,
   }
