@@ -440,50 +440,51 @@ class API(HardwareAPILike):
         for changes, use :py:meth:`cache_instruments`. This process deactivates
         the motors and should be used sparingly.
         """
-        configs = ['name', 'min_volume', 'max_volume', 'channels',
-                   'aspirate_flow_rate', 'dispense_flow_rate',
-                   'pipette_id', 'current_volume', 'display_name',
-                   'tip_length', 'model', 'blow_out_flow_rate',
-                   'working_volume', 'tip_overlap', 'available_volume',
-                   'return_tip_height',  'default_aspirate_flow_rates',
-                   'default_blow_out_flow_rates',
-                   'default_dispense_flow_rates']
-        instruments: Dict[top_types.Mount, Dict[str, Any]] = {
-            top_types.Mount.LEFT: {},
-            top_types.Mount.RIGHT: {}
+        return {
+            m: self.get_attached_instrument(m)
+            for m in (top_types.Mount.LEFT, top_types.Mount.RIGHT)
         }
-        for mount in top_types.Mount:
-            instr = self._attached_instruments[mount]
-            if not instr:
-                continue
+
+    def get_attached_instrument(self, mount: top_types.Mount) -> 'PipetteDict':
+        instr = self._attached_instruments[mount]
+        result: Dict[str, Any] = {}
+        if instr:
+            configs = ['name', 'min_volume', 'max_volume', 'channels',
+                       'aspirate_flow_rate', 'dispense_flow_rate',
+                       'pipette_id', 'current_volume', 'display_name',
+                       'tip_length', 'model', 'blow_out_flow_rate',
+                       'working_volume', 'tip_overlap', 'available_volume',
+                       'return_tip_height', 'default_aspirate_flow_rates',
+                       'default_blow_out_flow_rates',
+                       'default_dispense_flow_rates']
+
             instr_dict = instr.as_dict()
             for key in configs:
-                instruments[mount][key] = instr_dict[key]
-            instruments[mount]['has_tip'] = instr.has_tip
-            instruments[mount]['aspirate_speed'] = self._plunger_speed(
+                result[key] = instr_dict[key]
+            result['has_tip'] = instr.has_tip
+            result['aspirate_speed'] = self._plunger_speed(
                 instr, instr.aspirate_flow_rate, 'aspirate')
-            instruments[mount]['dispense_speed'] = self._plunger_speed(
+            result['dispense_speed'] = self._plunger_speed(
                 instr, instr.dispense_flow_rate, 'dispense')
-            instruments[mount]['blow_out_speed'] = self._plunger_speed(
+            result['blow_out_speed'] = self._plunger_speed(
                 instr, instr.blow_out_flow_rate, 'dispense')
-            instruments[mount]['ready_to_aspirate'] = instr.ready_to_aspirate
-            instruments[mount]['default_blow_out_speeds'] = {
+            result['ready_to_aspirate'] = instr.ready_to_aspirate
+            result['default_blow_out_speeds'] = {
                 alvl: self._plunger_speed(instr, fr, 'dispense')
                 for alvl, fr
                 in instr.config.default_aspirate_flow_rates.items()
             }
-            instruments[mount]['default_dispense_speeds'] = {
+            result['default_dispense_speeds'] = {
                 alvl: self._plunger_speed(instr, fr, 'dispense')
                 for alvl, fr
                 in instr.config.default_dispense_flow_rates.items()
             }
-            instruments[mount]['default_aspirate_speeds'] = {
+            result['default_aspirate_speeds'] = {
                 alvl: self._plunger_speed(instr, fr, 'aspirate')
                 for alvl, fr
                 in instr.config.default_aspirate_flow_rates.items()
             }
-        return cast(Dict[top_types.Mount, 'PipetteDict'],
-                    instruments)
+        return cast('PipetteDict', result)
 
     @property
     def attached_instruments(self) -> Dict[top_types.Mount, 'PipetteDict']:
