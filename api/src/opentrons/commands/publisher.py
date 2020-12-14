@@ -139,8 +139,8 @@ class publish:
 
 
 class SignatureCache:
-    def __init__(self):
-        self._cache = {}
+    def __init__(self) -> None:
+        self._cache: Dict[Callable, inspect.Signature] = {}
 
     def get(self, f: Callable) -> inspect.Signature:
         sig = self._cache.get(f)
