@@ -138,16 +138,32 @@ class publish:
     both = functools.partial(_publish_dec, before=True, after=True)
 
 
+class SignatureCache:
+    def __init__(self):
+        self._cache = {}
+
+    def get(self, f: Callable) -> inspect.Signature:
+        sig = self._cache.get(f)
+        if not sig:
+            sig = inspect.signature(f)
+            self._cache[f] = sig
+        return sig
+
+
+signature_cache = SignatureCache()
+
+
 def _get_args(
         f: Callable,
         args: Tuple,
         kwargs: Mapping[str, Any]) -> Dict[str, Any]:
     # Create the initial dictionary with args that have defaults
     res = {}
-    sig = inspect.signature(f)
-    if inspect.ismethod(f) and args[0] is f.__self__:  # type: ignore
+    sig = signature_cache.get(f)
+    ismethod = inspect.ismethod(f)
+    if ismethod and args[0] is f.__self__:  # type: ignore
         args = args[1:]
-    if inspect.ismethod(f):
+    if ismethod:
         res['self'] = f.__self__  # type: ignore
 
     bound = sig.bind(*args, **kwargs)
