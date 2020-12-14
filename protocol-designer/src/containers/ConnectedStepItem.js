@@ -17,7 +17,6 @@ import {
   actions as stepsActions,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
-import { getIsStepSelected } from '../ui/steps/selectors'
 import { getBatchEditEnabled } from '../feature-flags/selectors'
 
 import { StepItem, StepItemContents } from '../components/steplist/StepItem'
@@ -58,7 +57,6 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const collapsed = useSelector(getCollapsedSteps)[stepId]
   const hoveredSubstep = useSelector(getHoveredSubstep)
   const hoveredStep = useSelector(getHoveredStepId)
-  const isStepSelected = useSelector(getIsStepSelected)
   const selectedStepId = useSelector(getSelectedStepId)
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
@@ -111,7 +109,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
         // have to explicitly check whether the step is truly selected because
         // getSelectedStepId might return the last item in saved step forms
         // regardless of whether or not it is actually "selected"
-        if (isStepSelected && selectedStepId) {
+        if (selectedStepId) {
           stepsToSelect = [selectedStepId, stepId]
         } else if (multiSelectItemIds) {
           stepsToSelect = multiSelectItemIds.includes(stepId)
