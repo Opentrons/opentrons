@@ -101,24 +101,20 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     if (isBatchEditEnabled) {
       if (isShiftKeyPressed) {
         if (selectedStepId) {
-          // take the range as the index of the selected step, to the current stepNumber (inclusive)
           const startIndex: number = orderedStepIds.indexOf(selectedStepId)
           const endIndex: number = stepNumber
           stepsToSelect = orderedStepIds.slice(startIndex, endIndex)
         } else {
-          // enter batch edit mode with only this one step selected
           stepsToSelect = [stepId]
         }
       } else if (isMetaKeyPressed) {
         if (isStepSelected && selectedStepId) {
-          // include the current step index in the steps to select
           stepsToSelect = [selectedStepId, stepId]
         } else if (multiSelectItemIds) {
           stepsToSelect = multiSelectItemIds.includes(stepId)
             ? multiSelectItemIds.filter(id => id !== stepId)
             : [...multiSelectItemIds, stepId]
         } else {
-          // enter batch edit mode with only this one step selected
           stepsToSelect = [stepId]
         }
       }
@@ -128,7 +124,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
         selectStep()
       }
     } else {
-      // if batch edit is not enabled ignore shift/meta keys
+      // if batch edit is not enabled, always just select one step
       selectStep()
     }
   }
