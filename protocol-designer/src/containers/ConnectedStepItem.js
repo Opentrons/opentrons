@@ -108,6 +108,9 @@ export const ConnectedStepItem = (props: Props): React.Node => {
           stepsToSelect = [stepId]
         }
       } else if (isMetaKeyPressed) {
+        // have to explicitly check whether the step is truly selected because
+        // getSelectedStepId might return the last item in saved step forms
+        // regardless of whether or not it is actually "selected"
         if (isStepSelected && selectedStepId) {
           stepsToSelect = [selectedStepId, stepId]
         } else if (multiSelectItemIds) {
