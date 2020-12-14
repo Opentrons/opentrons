@@ -67,6 +67,7 @@ class Pipette:
             = self._config.default_dispense_flow_rates['2.0']
         self._blow_out_flow_rate\
             = self._config.default_blow_out_flow_rates['2.0']
+        self._config_as_dict = asdict(config)
 
     def act_as(self, name: PipetteName):
         """ Reconfigure to act as ``name``. ``name`` must be either the
@@ -105,6 +106,8 @@ class Pipette:
         self._log.info("updated config: {}={}".format(elem_name, elem_val))
         self._config = replace(self._config,
                                **{elem_name: elem_val})
+        # Update the cached dict representation
+        self._config_as_dict = asdict(self._config)
 
     @property
     def name(self) -> PipetteName:
@@ -295,18 +298,19 @@ class Pipette:
                                     id(self))
 
     def as_dict(self) -> 'Pipette.DictType':
-        config_dict = asdict(self.config)
-        config_dict.update({'current_volume': self.current_volume,
-                            'available_volume': self.available_volume,
-                            'name': self.name,
-                            'model': self.model,
-                            'pipette_id': self.pipette_id,
-                            'has_tip': self.has_tip,
-                            'working_volume': self.working_volume,
-                            'aspirate_flow_rate':  self.aspirate_flow_rate,
-                            'dispense_flow_rate': self.dispense_flow_rate,
-                            'blow_out_flow_rate': self.blow_out_flow_rate})
-        return config_dict
+        self._config_as_dict.update({
+            'current_volume': self.current_volume,
+            'available_volume': self.available_volume,
+            'name': self.name,
+            'model': self.model,
+            'pipette_id': self.pipette_id,
+            'has_tip': self.has_tip,
+            'working_volume': self.working_volume,
+            'aspirate_flow_rate':  self.aspirate_flow_rate,
+            'dispense_flow_rate': self.dispense_flow_rate,
+            'blow_out_flow_rate': self.blow_out_flow_rate
+        })
+        return self._config_as_dict
 
 
 def _reload_and_check_skip(
