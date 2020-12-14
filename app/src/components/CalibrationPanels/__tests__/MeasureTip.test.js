@@ -88,8 +88,8 @@ describe('MeasureTip', () => {
       })
     })
 
-    const unavailableJogDirections = ['left', 'right', 'back', 'forward']
-    unavailableJogDirections.forEach(direction => {
+    const unavailableSigns = ['left', 'right', 'back', 'forward']
+    unavailableSigns.forEach(direction => {
       expect(getJogButton(wrapper, direction)).toEqual({})
     })
   })

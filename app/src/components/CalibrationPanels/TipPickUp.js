@@ -25,7 +25,7 @@ import {
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../sessions'
-import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import type { Axis, Sign, StepSize } from '../JogControls/types'
 import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'
 import type { CalibrationPanelProps } from './types'
@@ -78,7 +78,7 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
     sendCommands({ command: Sessions.sharedCalCommands.PICK_UP_TIP })
   }
 
-  const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
+  const jog = (axis: Axis, dir: Sign, step: StepSize) => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {

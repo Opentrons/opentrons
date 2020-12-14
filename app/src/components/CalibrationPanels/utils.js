@@ -1,9 +1,9 @@
 // @flow
 import { format } from 'date-fns'
-import type { JogAxis } from '../../http-api-client'
+import type { Axis } from '../JogControls/types'
 import type { VectorTuple } from '../../sessions/types'
 
-const ORDERED_AXES: [JogAxis, JogAxis, JogAxis] = ['x', 'y', 'z']
+const ORDERED_AXES: [Axis, Axis, Axis] = ['x', 'y', 'z']
 
 // e.g. reformat from ['x', -1, 0.1] to [-0.1, 0, 0]
 export function formatJogVector(

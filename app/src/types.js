@@ -14,10 +14,6 @@ import type {
 import type { BuildrootState, BuildrootAction } from './buildroot/types'
 import type { PipettesState, PipettesAction } from './pipettes/types'
 import type { ModulesState, ModulesAction } from './modules/types'
-import type {
-  State as SuperDeprecatedRobotApiState,
-  HttpApiAction as SuperDeprecatedRobotApiAction,
-} from './http-api-client'
 import type { RobotState, Action as RobotAction } from './robot'
 import type { ShellState, ShellAction } from './shell/types'
 import type { ConfigState, ConfigAction } from './config/types'
@@ -46,7 +42,6 @@ import type { AnalyticsTriggerAction } from './analytics/types'
 
 export type State = $ReadOnly<{|
   robot: RobotState,
-  superDeprecatedRobotApi: SuperDeprecatedRobotApiState,
   robotApi: RobotApiState,
   robotAdmin: RobotAdminState,
   robotControls: RobotControlsState,
@@ -69,7 +64,6 @@ export type State = $ReadOnly<{|
 
 export type Action =
   | RobotAction
-  | SuperDeprecatedRobotApiAction
   | RobotApiAction
   | RobotAdminAction
   | RobotControlsAction
