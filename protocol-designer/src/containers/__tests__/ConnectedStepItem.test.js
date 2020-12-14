@@ -36,6 +36,7 @@ const getHasFormLevelWarningsPerStepMock =
 const getCollapsedStepsMock = uiStepSelectors.getCollapsedSteps
 const getMultiSelectItemIdsMock = uiStepSelectors.getMultiSelectItemIds
 const getSubstepsMock = fileDataSelectors.getSubsteps
+const getErrorStepId = fileDataSelectors.getErrorStepId
 const getBatchEditEnabledMock = featureFlagSelectors.getBatchEditEnabled
 
 const middlewares = [thunk]
@@ -57,6 +58,10 @@ describe('ConnectedStepItem', () => {
       .mockReturnValue(false)
 
     when(getCurrentFormHasUnsavedChangesMock)
+      .calledWith(expect.anything())
+      .mockReturnValue(false)
+
+    when(getErrorStepId)
       .calledWith(expect.anything())
       .mockReturnValue(false)
 
@@ -110,7 +115,7 @@ describe('ConnectedStepItem', () => {
         const wrapper = render(props)
         wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
         const actions = store.getActions()
-        const selectStepAction = { type: 'SELECT_STEP', payload: 'SOMEID' }
+        const selectStepAction = { type: 'SELECT_STEP', payload: mockId }
         expect(actions[0]).toEqual(selectStepAction)
       })
     })
