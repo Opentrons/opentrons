@@ -7,6 +7,7 @@ export {
   rootSelector,
   getSelectedStepTitleInfo,
   getSelectedStepId,
+  getMultiSelectItemIds,
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
   getHoveredStepId,

@@ -20,6 +20,7 @@ import type {
   HoverOnSubstepAction,
   HoverOnTerminalItemAction,
   SelectStepAction,
+  SelectMultipleStepsAction,
   SelectTerminalItemAction,
   ToggleStepCollapsedAction,
 } from './actions/types'
@@ -69,6 +70,7 @@ export type SelectableItem =
     }
 
 type SelectedItemState = ?SelectableItem
+type MultiSelectedItemsState = Array<StepIdType>
 
 function stepIdHelper(id: ?StepIdType): SelectedItemState {
   if (id == null) return null
@@ -99,8 +101,27 @@ const selectedItem: Reducer<SelectedItemState, *> = handleActions(
       action: SelectTerminalItemAction
     ) => terminalItemIdHelper(action.payload),
     DELETE_STEP: () => null,
+    SELECT_MULTIPLE_STEPS: () => null,
   },
   initialSelectedItemState
+)
+
+const multiSelectedItems: Reducer<MultiSelectedItemsState, *> = handleActions(
+  {
+    SELECT_MULTIPLE_STEPS: (
+      state: MultiSelectedItemsState,
+      action: SelectMultipleStepsAction
+    ) => [...action.payload],
+    SELECT_STEP: (
+      state: MultiSelectedItemsState,
+      action: SelectStepAction
+    ) => [],
+    SELECT_TERMINAL_ITEM: (
+      state: MultiSelectedItemsState,
+      action: SelectTerminalItemAction
+    ) => [],
+  },
+  []
 )
 
 type HoveredItemState = SelectedItemState
@@ -142,6 +163,7 @@ const wellSelectionLabwareKey: Reducer<string | null, any> = handleActions(
 export type StepsState = {|
   collapsedSteps: CollapsedStepsState,
   selectedItem: SelectedItemState,
+  multiSelectedItems: MultiSelectedItemsState,
   hoveredItem: HoveredItemState,
   hoveredSubstep: SubstepIdentifier,
   wellSelectionLabwareKey: string | null,
@@ -150,6 +172,7 @@ export type StepsState = {|
 export const _allReducers = {
   collapsedSteps,
   selectedItem,
+  multiSelectedItems,
   hoveredItem,
   hoveredSubstep,
   wellSelectionLabwareKey,
