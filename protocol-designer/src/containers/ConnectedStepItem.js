@@ -60,8 +60,9 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const selectedStepId = useSelector(getSelectedStepId)
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
-  const selected =
-    selectedStepId === stepId || multiSelectItemIds.includes(stepId)
+  const selected = multiSelectItemIds.length
+    ? multiSelectItemIds.includes(stepId)
+    : selectedStepId === stepId
 
   const substeps = useSelector(fileDataSelectors.getSubsteps)[stepId]
 
@@ -109,12 +110,12 @@ export const ConnectedStepItem = (props: Props): React.Node => {
         // have to explicitly check whether the step is truly selected because
         // getSelectedStepId might return the last item in saved step forms
         // regardless of whether or not it is actually "selected"
-        if (selectedStepId) {
-          stepsToSelect = [selectedStepId, stepId]
-        } else if (multiSelectItemIds) {
+        if (multiSelectItemIds.length) {
           stepsToSelect = multiSelectItemIds.includes(stepId)
             ? multiSelectItemIds.filter(id => id !== stepId)
             : [...multiSelectItemIds, stepId]
+        } else if (selectedStepId) {
+          stepsToSelect = [selectedStepId, stepId]
         } else {
           stepsToSelect = [stepId]
         }
