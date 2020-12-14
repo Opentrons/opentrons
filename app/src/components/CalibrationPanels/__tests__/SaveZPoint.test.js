@@ -93,8 +93,8 @@ describe('SaveZPoint', () => {
       mockSendCommands.mockClear()
     })
 
-    const unavailableSigns = ['left', 'right', 'back', 'forward']
-    unavailableSigns.forEach(direction => {
+    const unavailableJogDirections = ['left', 'right', 'back', 'forward']
+    unavailableJogDirections.forEach(direction => {
       expect(getJogButton(wrapper, direction)).toEqual({})
     })
   })

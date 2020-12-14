@@ -138,8 +138,8 @@ describe('SaveXYPoint', () => {
       })
     })
 
-    const unavailableSigns = ['up', 'down']
-    unavailableSigns.forEach(direction => {
+    const unavailableJogDirections = ['up', 'down']
+    unavailableJogDirections.forEach(direction => {
       expect(getJogButton(wrapper, direction)).toEqual({})
     })
   })
