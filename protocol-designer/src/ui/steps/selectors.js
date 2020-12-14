@@ -47,6 +47,18 @@ export const getSelectedTerminalItemId: Selector<?TerminalItemId> = createSelect
   item => (!item.isStep ? item.id : null)
 )
 
+export const getIsStepSelected: Selector<boolean> = createSelector(
+  rootSelector,
+  (state: StepsState) => state.selectedItem != null
+)
+
+export const getMultiSelectItemIds: Selector<
+  Array<StepIdType>
+> = createSelector(
+  rootSelector,
+  (state: StepsState) => state.multiSelectedItems
+)
+
 export const getHoveredItem: Selector<?SelectableItem> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredItem
