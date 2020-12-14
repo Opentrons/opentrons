@@ -44,8 +44,8 @@ export type ConditionalConfirmOutput = {|
  * ```
  */
 
-export const useConditionalConfirm = (
-  handleContinue: (...args: Array<any>) => mixed,
+export const useConditionalConfirm = <T>(
+  handleContinue: (...args: Array<T>) => mixed,
   shouldBlock: boolean
 ): ConditionalConfirmOutput => {
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false)
