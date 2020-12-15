@@ -5,7 +5,16 @@ import {
   PRESAVED_STEP_ID,
   START_TERMINAL_ITEM_ID,
 } from '../../../steplist/types'
-import { getHoveredStepLabware, getSelectedStepTitleInfo } from '../selectors'
+import {
+  SINGLE_STEP_SELECTION_TYPE,
+  MULTI_STEP_SELECTION_TYPE,
+  TERMINAL_ITEM_SELECTION_TYPE,
+} from '../reducers'
+import {
+  getHoveredStepLabware,
+  getSelectedStepTitleInfo,
+  getActiveItem,
+} from '../selectors'
 import * as utils from '../../modules/utils'
 
 function createArgsForStepId(stepId, stepArgs) {
@@ -218,6 +227,68 @@ describe('getSelectedStepTitleInfo', () => {
     expect(result).toEqual({
       stepName: savedForm.stepName,
       stepType: savedForm.stepType,
+    })
+  })
+})
+
+describe('getActiveItem', () => {
+  const testCases = [
+    {
+      title: 'should show what is hovered, if anything is hovered',
+      selected: {
+        selectionType: MULTI_STEP_SELECTION_TYPE,
+        ids: ['notTheseSteps', 'nope'],
+      },
+      hovered: {
+        selectionType: SINGLE_STEP_SELECTION_TYPE,
+        id: 'hoveredId',
+      },
+      expected: {
+        selectionType: SINGLE_STEP_SELECTION_TYPE,
+        id: 'hoveredId',
+      },
+    },
+    {
+      title:
+        'should return null, if nothing is hovered and multi-select is selected',
+      selected: {
+        selectionType: MULTI_STEP_SELECTION_TYPE,
+        ids: ['notTheseSteps', 'nope'],
+      },
+      hovered: null,
+      expected: null,
+    },
+    {
+      title: 'should show the single-selected step item, if nothing is hovered',
+      selected: {
+        selectionType: SINGLE_STEP_SELECTION_TYPE,
+        id: 'singleStepId',
+      },
+      hovered: null,
+      expected: {
+        selectionType: SINGLE_STEP_SELECTION_TYPE,
+        id: 'singleStepId',
+      },
+    },
+    {
+      title:
+        'should show the single-selected terminal item, if nothing is hovered',
+      selected: {
+        selectionType: TERMINAL_ITEM_SELECTION_TYPE,
+        id: 'someItem',
+      },
+      hovered: null,
+      expected: {
+        selectionType: TERMINAL_ITEM_SELECTION_TYPE,
+        id: 'someItem',
+      },
+    },
+  ]
+
+  testCases.forEach(({ title, selected, hovered, expected }) => {
+    it(title, () => {
+      const result = getActiveItem.resultFunc(selected, hovered)
+      expect(result).toEqual(expected)
     })
   })
 })
