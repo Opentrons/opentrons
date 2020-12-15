@@ -118,7 +118,13 @@ const selectedItem: Reducer<SelectedItemState, *> = handleActions(
       action: SelectTerminalItemAction
     ) => terminalItemIdHelper(action.payload),
     DELETE_STEP: () => null,
-    SELECT_MULTIPLE_STEPS: () => null,
+    SELECT_MULTIPLE_STEPS: (
+      state: SelectedItemState,
+      action: SelectMultipleStepsAction
+    ) => ({
+      selectionType: MULTI_STEP_SELECTION_TYPE,
+      ids: action.payload,
+    }),
   },
   initialSelectedItemState
 )

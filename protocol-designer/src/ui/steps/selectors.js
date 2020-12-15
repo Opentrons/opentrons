@@ -44,35 +44,32 @@ const getSelectedItem: Selector<SelectableItem> = createSelector(
   }
 )
 
-export const getSelectedStepId: Selector<?StepIdType> = createSelector(
+export const getSelectedStepId: Selector<StepIdType | null> = createSelector(
   getSelectedItem,
   item => (item.selectionType === SINGLE_STEP_SELECTION_TYPE ? item.id : null)
 )
 
-export const getSelectedTerminalItemId: Selector<?TerminalItemId> = createSelector(
+export const getSelectedTerminalItemId: Selector<TerminalItemId | null> = createSelector(
   getSelectedItem,
   item => (item.selectionType === TERMINAL_ITEM_SELECTION_TYPE ? item.id : null)
 )
 
 export const getMultiSelectItemIds: Selector<Array<StepIdType> | null> = createSelector(
-  rootSelector,
-  (state: StepsState) => {
-    if (
-      state.selectedItem &&
-      state.selectedItem.selectionType === MULTI_STEP_SELECTION_TYPE
-    ) {
-      return state.selectedItem.ids
+  getSelectedItem,
+  item => {
+    if (item && item.selectionType === MULTI_STEP_SELECTION_TYPE) {
+      return item.ids
     }
     return null
   }
 )
 
-export const getHoveredItem: Selector<?HoverableItem> = createSelector(
+export const getHoveredItem: Selector<HoverableItem | null> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredItem
 )
 
-export const getHoveredStepId: Selector<?StepIdType> = createSelector(
+export const getHoveredStepId: Selector<StepIdType | null> = createSelector(
   getHoveredItem,
   item =>
     item && item.selectionType === SINGLE_STEP_SELECTION_TYPE ? item.id : null
@@ -129,7 +126,7 @@ export const getHoveredStepLabware: Selector<Array<string>> = createSelector(
   }
 )
 
-export const getHoveredTerminalItemId: Selector<?TerminalItemId> = createSelector(
+export const getHoveredTerminalItemId: Selector<TerminalItemId | null> = createSelector(
   getHoveredItem,
   item =>
     item && item.selectionType === TERMINAL_ITEM_SELECTION_TYPE ? item.id : null
@@ -192,7 +189,9 @@ export const getSelectedStepTitleInfo: Selector<StepTitleInfo | null> = createSe
   }
 )
 
-export const getWellSelectionLabwareKey: Selector<?string> = createSelector(
+export const getWellSelectionLabwareKey: Selector<
+  string | null
+> = createSelector(
   rootSelector,
   (state: StepsState) => state.wellSelectionLabwareKey
 )

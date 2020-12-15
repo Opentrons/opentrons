@@ -119,6 +119,67 @@ describe('selectedItem reducer', () => {
     })
   })
 
+  describe('multi-step selection', () => {
+    const steps = ['someStepId', 'anotherStepId']
+    const action = {
+      type: 'SELECT_MULTIPLE_STEPS',
+      payload: steps,
+    }
+    const multiTestCases = [
+      {
+        title: 'should enter multi-select mode from null',
+        prev: null,
+        action,
+        expected: {
+          selectionType: MULTI_STEP_SELECTION_TYPE,
+          ids: steps,
+        },
+      },
+      {
+        title: 'should enter multi-select mode from multi-select',
+        prev: {
+          selectionType: MULTI_STEP_SELECTION_TYPE,
+          ids: ['notTheseSteps', 'nope'],
+        },
+        action,
+        expected: {
+          selectionType: MULTI_STEP_SELECTION_TYPE,
+          ids: steps,
+        },
+      },
+      {
+        title: 'should enter multi-select mode from single-selected step',
+        prev: {
+          selectionType: SINGLE_STEP_SELECTION_TYPE,
+          id: 'notThisId',
+        },
+        action,
+        expected: {
+          selectionType: MULTI_STEP_SELECTION_TYPE,
+          ids: steps,
+        },
+      },
+      {
+        title:
+          'should enter multi-select mode from single-selected terminal item',
+        prev: {
+          selectionType: TERMINAL_ITEM_SELECTION_TYPE,
+          id: 'someTerminalItem',
+        },
+        action,
+        expected: {
+          selectionType: MULTI_STEP_SELECTION_TYPE,
+          ids: steps,
+        },
+      },
+    ]
+    multiTestCases.forEach(({ title, prev, action, expected }) => {
+      it(title, () => {
+        expect(selectedItem(prev, action)).toEqual(expected)
+      })
+    })
+  })
+
   it('should deselect on DELETE_STEP', () => {
     const action = {
       type: 'DELETE_STEP',
