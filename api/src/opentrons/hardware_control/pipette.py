@@ -67,6 +67,8 @@ class Pipette:
             = self._config.default_dispense_flow_rates['2.0']
         self._blow_out_flow_rate\
             = self._config.default_blow_out_flow_rates['2.0']
+        # cache a dict representation of config for improved performance of
+        # as_dict.
         self._config_as_dict = asdict(config)
 
     def act_as(self, name: PipetteName):
