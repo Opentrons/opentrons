@@ -13,6 +13,8 @@ class TipCalibrationSessionStatus(BaseModel):
     nextSteps: Optional[NextSteps] =\
         Field(None, description="Next Available Steps in Session")
     labware: List[RequiredLabware]
+    supportedCommands: List[Optional[str]] = Field(
+        ..., description="A list of supported commands for this user flow")
 
     class Config:
         schema_extra = {

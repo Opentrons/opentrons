@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, cast, Awaitable
+from typing import cast, Awaitable
 from opentrons.types import Mount
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
@@ -10,15 +10,13 @@ from robot_server.service.session.errors import (SessionCreationException,
                                                  CommandExecutionException)
 from robot_server.service.session.command_execution import \
      CallableExecutor, Command, CompletedCommand, CommandQueue, CommandExecutor
+from opentrons.protocol_api import labware
 
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
 from ..models.session import (SessionType,
                               TipLengthCalibrationResponseAttributes)
 from ..errors import UnsupportedFeature
-
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware import LabwareDefinition
 
 
 class TipLengthCalibrationCommandExecutor(CallableExecutor):
@@ -50,6 +48,10 @@ class TipLengthCalibration(BaseSession):
         has_calibration_block = instance_meta.create_params.hasCalibrationBlock
         mount = instance_meta.create_params.mount
         tip_rack_def = instance_meta.create_params.tipRackDefinition
+        if tip_rack_def:
+            verified_definition = labware.verify_definition(tip_rack_def)
+        else:
+            raise SessionCreationException('No tiprack def provided')
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
@@ -62,7 +64,7 @@ class TipLengthCalibration(BaseSession):
                     hardware=configuration.hardware,
                     mount=Mount[mount.upper()],
                     has_calibration_block=has_calibration_block,
-                    tip_rack=cast('LabwareDefinition', tip_rack_def))
+                    tip_rack=verified_definition)
         except AssertionError as e:
             raise SessionCreationException(str(e))
 
@@ -102,6 +104,7 @@ class TipLengthCalibration(BaseSession):
             instrument=self._tip_cal_user_flow.get_pipette(),
             currentStep=self._tip_cal_user_flow.current_state,
             labware=self._tip_cal_user_flow.get_required_labware(),
+            supportedCommands=self._tip_cal_user_flow.get_supported_commands()
         )
 
     async def clean_up(self):

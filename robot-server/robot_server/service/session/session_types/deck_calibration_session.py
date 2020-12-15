@@ -90,7 +90,8 @@ class DeckCalibrationSession(BaseSession):
         return DeckCalibrationSessionStatus(
             instrument=self._deck_cal_user_flow.get_pipette(),  # type: ignore[arg-type] # noqa: e501
             currentStep=self._deck_cal_user_flow.current_state,
-            labware=self._deck_cal_user_flow.get_required_labware())
+            labware=self._deck_cal_user_flow.get_required_labware(),
+            supportedCommands=self._deck_cal_user_flow.get_supported_commands())
 
     async def clean_up(self):
         if self._shutdown_coroutine:

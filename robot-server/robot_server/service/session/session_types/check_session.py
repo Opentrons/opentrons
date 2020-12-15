@@ -114,7 +114,8 @@ class CheckSession(BaseSession):
             comparisonsByPipette=comparison_map,
             labware=self._calibration_check.get_required_labware(),
             activePipette=self._calibration_check.get_active_pipette(),
-            activeTipRack=self._calibration_check.get_active_tiprack()
+            activeTipRack=self._calibration_check.get_active_tiprack(),
+            supportedCommands=self._calibration_check.get_supported_commands()
         )
 
     @property

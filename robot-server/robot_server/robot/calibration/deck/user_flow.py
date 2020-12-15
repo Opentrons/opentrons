@@ -137,6 +137,10 @@ class DeckCalibrationUserFlow:
     def reset_tip_origin(self):
         self._tip_origin_pt = None
 
+    @staticmethod
+    def get_supported_commands() -> List:
+        return ['loadLabware']
+
     @property
     def current_state(self) -> State:
         return self._current_state
@@ -245,8 +249,9 @@ class DeckCalibrationUserFlow:
                                                     critical_point)
 
     async def load_labware(self, tiprackDefinition: dict):
+        verified_definition = labware.verify_definition(tiprackDefinition)
         self._tip_rack = self._get_tip_rack_lw(
-            cast(Optional['LabwareDefinition'], tiprackDefinition))
+            verified_definition)
         if self._deck[TIP_RACK_SLOT]:
             del self._deck[TIP_RACK_SLOT]
         self._deck[TIP_RACK_SLOT] = self._tip_rack

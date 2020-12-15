@@ -115,6 +115,10 @@ class TipCalibrationUserFlow:
     def reset_tip_origin(self):
         self._tip_origin_pt = None
 
+    @staticmethod
+    def get_supported_commands() -> List:
+        return []
+
     @property
     def current_state(self) -> State:
         return self._current_state

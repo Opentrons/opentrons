@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 
 from ..helper_classes import AttachedPipette, RequiredLabware
 
@@ -11,6 +11,8 @@ class DeckCalibrationSessionStatus(BaseModel):
         ...,
         description="Current step of deck calibration user flow")
     labware: List[RequiredLabware]
+    supportedCommands: List[Optional[str]] = Field(
+        ..., description="A list of supported commands for this user flow")
 
     class Config:
         schema_extra = {

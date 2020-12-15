@@ -1,6 +1,8 @@
 import logging
 from typing import Awaitable, cast, TYPE_CHECKING
 from opentrons.types import Mount
+from opentrons.protocol_api import labware
+
 from robot_server.robot.calibration.pipette_offset.user_flow import \
     PipetteOffsetCalibrationUserFlow
 from robot_server.robot.calibration.models import \
@@ -55,6 +57,10 @@ class PipetteOffsetCalibrationSession(BaseSession):
             = instance_meta.create_params.shouldRecalibrateTipLength
         has_cal_block = instance_meta.create_params.hasCalibrationBlock
         tip_rack_def = instance_meta.create_params.tipRackDefinition
+        if tip_rack_def:
+            verified_definition = labware.verify_definition(tip_rack_def)
+        else:
+            verified_definition = tip_rack_def
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
@@ -68,7 +74,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
                     mount=Mount[mount.upper()],
                     recalibrate_tip_length=recalibrate_tip_length,
                     has_calibration_block=has_cal_block,
-                    tip_rack_def=cast('LabwareDefinition', tip_rack_def))
+                    tip_rack_def=cast('LabwareDefinition', verified_definition))
         except AssertionError as e:
             raise SessionCreationException(str(e))
 
@@ -110,6 +116,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
             currentStep=uf.current_state,
             labware=uf.get_required_labware(),
             shouldPerformTipLength=uf.should_perform_tip_length,
+            supportedCommands=uf.get_supported_commands()
         )
 
     async def clean_up(self):

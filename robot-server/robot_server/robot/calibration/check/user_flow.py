@@ -163,6 +163,10 @@ class CheckCalibrationUserFlow:
     def hw_pipette(self) -> Pipette:
         return self._get_hw_pipettes()[0]
 
+    @staticmethod
+    def get_supported_commands() -> List:
+        return []
+
     async def transition(self, tiprackDefinition: dict):
         pass
 
