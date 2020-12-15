@@ -239,7 +239,12 @@ def piecewise_volume_conversion(
     """
     # pick the first item from the seq for which the target is less than
     # the bracketing element
-    i = list(filter(lambda x: ul <= x[0], sequence))[0]
+    i = None
+    for x in sequence:
+        if ul <= x[0]:
+            i = x
+            break
+    assert i
     # use that element to calculate the movement distance in mm
     return i[1]*ul + i[2]
 
