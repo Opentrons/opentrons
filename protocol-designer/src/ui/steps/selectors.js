@@ -140,15 +140,22 @@ export const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
   (state: StepsState) => state.hoveredSubstep
 )
 
-// Hovered or selected item. Hovered has priority.
+// Hovered or selected item. Hovered has priority. Used to tell deck what to display
 export const getActiveItem: Selector<HoverableItem | null> = createSelector(
   getSelectedItem,
   getHoveredItem,
   (selected, hovered) => {
-    if (selected.selectionType === MULTI_STEP_SELECTION_TYPE) {
+    // TODO IMMEDIATELY: add test cases
+    // hover: show hover
+    // no hover, multi select -> null
+    // no hover: show selected if selected is single step or single terminal
+    if (hovered != null) {
+      return hovered
+    } else if (selected.selectionType === MULTI_STEP_SELECTION_TYPE) {
       return null
+    } else {
+      return selected
     }
-    return hovered != null ? hovered : selected
   }
 )
 

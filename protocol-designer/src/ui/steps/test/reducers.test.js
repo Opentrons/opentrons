@@ -1,6 +1,11 @@
 // @flow
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
-import { _allReducers } from '../reducers.js'
+import {
+  _allReducers,
+  SINGLE_STEP_SELECTION_TYPE,
+  MULTI_STEP_SELECTION_TYPE,
+  TERMINAL_ITEM_SELECTION_TYPE,
+} from '../reducers.js'
 
 jest.mock('../../../labware-defs/utils')
 
@@ -73,7 +78,7 @@ describe('selectedItem reducer', () => {
       payload: PRESAVED_STEP_ID,
     }
     expect(selectedItem(null, action)).toEqual({
-      isStep: false,
+      selectionType: TERMINAL_ITEM_SELECTION_TYPE,
       id: PRESAVED_STEP_ID,
     })
   })
@@ -85,7 +90,7 @@ describe('selectedItem reducer', () => {
       payload: { id: stepId },
     }
     expect(selectedItem(null, action)).toEqual({
-      isStep: true,
+      selectionType: SINGLE_STEP_SELECTION_TYPE,
       id: stepId,
     })
   })
@@ -97,7 +102,7 @@ describe('selectedItem reducer', () => {
       payload: stepId,
     }
     expect(selectedItem(null, action)).toEqual({
-      isStep: true,
+      selectionType: SINGLE_STEP_SELECTION_TYPE,
       id: stepId,
     })
   })
@@ -109,7 +114,7 @@ describe('selectedItem reducer', () => {
       payload: terminalId,
     }
     expect(selectedItem(null, action)).toEqual({
-      isStep: false,
+      selectionType: TERMINAL_ITEM_SELECTION_TYPE,
       id: terminalId,
     })
   })
@@ -119,6 +124,11 @@ describe('selectedItem reducer', () => {
       type: 'DELETE_STEP',
       payload: 'someStepId',
     }
-    expect(selectedItem({ isStep: true, id: 'anyId' }, action)).toEqual(null)
+    expect(
+      selectedItem(
+        { selectionType: SINGLE_STEP_SELECTION_TYPE, id: 'anyId' },
+        action
+      )
+    ).toEqual(null)
   })
 })

@@ -59,16 +59,6 @@ const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions(
   {}
 )
 
-// export type SelectableItem =
-//   | {
-//       isStep: true,
-//       id: StepIdType,
-//     }
-//   | {
-//       isStep: false,
-//       id: TerminalItemId,
-//     }
-
 export const SINGLE_STEP_SELECTION_TYPE: 'SINGLE_STEP_SELECTION_TYPE' =
   'SINGLE_STEP_SELECTION_TYPE'
 export const MULTI_STEP_SELECTION_TYPE: 'MULTI_STEP_SELECTION_TYPE' =

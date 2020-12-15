@@ -66,9 +66,14 @@ function mapStateToProps(state: BaseState): SP {
   const definition = labwareId
     ? stepFormSelectors.getLabwareEntities(state)[labwareId]?.def
     : null
-  const wellContents = labwareId
-    ? wellContentsSelectors.getAllWellContentsForActiveItem(state)[labwareId]
-    : {}
+
+  const allWellContentsForActiveItem = wellContentsSelectors.getAllWellContentsForActiveItem(
+    state
+  )
+  const wellContents =
+    labwareId && allWellContentsForActiveItem
+      ? allWellContentsForActiveItem[labwareId]
+      : {} // TODO IMMEDIATELY null instead of {}?
   const ingredNames = selectors.getLiquidNamesById(state)
   return {
     wellContents,

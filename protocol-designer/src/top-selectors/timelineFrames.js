@@ -10,15 +10,21 @@ import { START_TERMINAL_ITEM_ID, PRESAVED_STEP_ID } from '../steplist'
 
 import type { Selector } from '../types'
 import type { CommandsAndRobotState } from '../step-generation'
-import { SINGLE_STEP_SELECTION_TYPE } from '../ui/steps/reducers'
+import {
+  SINGLE_STEP_SELECTION_TYPE,
+  TERMINAL_ITEM_SELECTION_TYPE,
+} from '../ui/steps/reducers'
 
+// TODO IMMEDIATELY: add unit tests
 const _timelineFrameHelper = (beforeActiveItem: boolean) => (
   activeItem,
   initialRobotState,
   robotStateTimeline,
   lastValidRobotState,
   orderedStepIds
-): CommandsAndRobotState => {
+): CommandsAndRobotState | null => {
+  if (activeItem === null) return null
+
   // Add pseudo-frames for start and end terminal items
   const timeline = [
     { robotState: initialRobotState, commands: [] },
@@ -29,7 +35,7 @@ const _timelineFrameHelper = (beforeActiveItem: boolean) => (
   let timelineIdx = lastValidRobotStateIdx // default to last valid robot state
 
   if (
-    !activeItem.selectionType === SINGLE_STEP_SELECTION_TYPE &&
+    activeItem.selectionType === TERMINAL_ITEM_SELECTION_TYPE &&
     activeItem.id === PRESAVED_STEP_ID
   ) {
     // presaved step acts the same whether looking at timeline before or after active item
@@ -65,7 +71,7 @@ const _timelineFrameHelper = (beforeActiveItem: boolean) => (
   return timeline[timelineIdx]
 }
 
-export const timelineFrameBeforeActiveItem: Selector<CommandsAndRobotState> = createSelector(
+export const timelineFrameBeforeActiveItem: Selector<CommandsAndRobotState | null> = createSelector(
   getActiveItem,
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.getRobotStateTimeline,
@@ -74,7 +80,7 @@ export const timelineFrameBeforeActiveItem: Selector<CommandsAndRobotState> = cr
   _timelineFrameHelper(true)
 )
 
-export const timelineFrameAfterActiveItem: Selector<CommandsAndRobotState> = createSelector(
+export const timelineFrameAfterActiveItem: Selector<CommandsAndRobotState | null> = createSelector(
   getActiveItem,
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.getRobotStateTimeline,
