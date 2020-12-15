@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from opentrons.types import Mount
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
+from robot_server.service.session.models import command_definitions
 from robot_server.service.session.models.common import OffsetVector
 from robot_server.service.session.models import command as models
 from robot_server.service.session.command_execution import (
@@ -28,12 +29,12 @@ class StateStore:
         self._commands: List[Command] = []
         self._command_results_map: Dict[str, CommandResult] = dict()
         self._handler_map: Dict[
-            models.CommandDefinition,
+            command_definitions.CommandDefinition,
             Callable[[Command, CommandResult], None]
         ] = {
-            models.EquipmentCommand.load_labware:
+            command_definitions.EquipmentCommand.load_labware:
                 self.handle_load_labware,
-            models.EquipmentCommand.load_instrument:
+            command_definitions.EquipmentCommand.load_instrument:
                 self.handle_load_instrument,
         }
         self._labware: Dict[models.IdentifierType, LabwareEntry] = {}

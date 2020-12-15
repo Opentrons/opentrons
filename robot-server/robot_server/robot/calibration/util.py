@@ -12,8 +12,7 @@ from opentrons.calibration_storage import modify
 from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models.command import (
-    CommandDefinition)
+from ...service.session.models.command_definitions import CommandDefinition
 from .constants import (
     STATE_WILDCARD, MOVE_TO_REF_POINT_SAFETY_BUFFER,
     TRASH_WELL, TRASH_REF_POINT_OFFSET)

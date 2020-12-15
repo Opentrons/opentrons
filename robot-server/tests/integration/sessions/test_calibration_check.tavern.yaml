@@ -531,9 +531,9 @@ stages:
       json:
         data:
           id: "{session_id}"
-          command: calibration.moveToTipRack
+          command: calibration.jog
           data:
-            vector: [1, 2, 3]
+            vector: [1, 2]
     response:
       status_code: 422
 

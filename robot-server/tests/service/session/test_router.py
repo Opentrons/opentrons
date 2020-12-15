@@ -14,7 +14,8 @@ from robot_server.service.session.command_execution.command import \
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedCommandException, CommandExecutionException
 from robot_server.service.session.models.common import EmptyModel, JogPosition
-from robot_server.service.session.models.command import CalibrationCommand
+from robot_server.service.session.models.command_definitions import \
+    CalibrationCommand
 from robot_server.service.session.models.session import SessionType
 from robot_server.service.session.session_types import (
     LiveProtocolSession, SessionMetaData)
@@ -50,7 +51,7 @@ def command_created_at():
 
 @pytest.fixture
 def patch_create_command(command_id, command_created_at):
-    with patch("robot_server.service.session.router.create_command") as p:
+    with patch("robot_server.service.session.session_types.base_session.create_command") as p:
         p.side_effect = lambda c, n: Command(
             content=CommandContent(c, n),
             meta=CommandMeta(command_id, command_created_at))
