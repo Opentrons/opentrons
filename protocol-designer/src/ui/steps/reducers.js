@@ -59,31 +59,58 @@ const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions(
   {}
 )
 
+// export type SelectableItem =
+//   | {
+//       isStep: true,
+//       id: StepIdType,
+//     }
+//   | {
+//       isStep: false,
+//       id: TerminalItemId,
+//     }
+
+export const SINGLE_STEP_SELECTION_TYPE: 'SINGLE_STEP_SELECTION_TYPE' =
+  'SINGLE_STEP_SELECTION_TYPE'
+export const MULTI_STEP_SELECTION_TYPE: 'MULTI_STEP_SELECTION_TYPE' =
+  'MULTI_STEP_SELECTION_TYPE'
+export const TERMINAL_ITEM_SELECTION_TYPE: 'TERMINAL_ITEM_SELECTION_TYPE' =
+  'TERMINAL_ITEM_SELECTION_TYPE'
+
+type SingleSelectedItem = {|
+  selectionType: typeof SINGLE_STEP_SELECTION_TYPE,
+  id: StepIdType,
+|}
+
+type MultipleSelectedItem = {|
+  selectionType: typeof MULTI_STEP_SELECTION_TYPE,
+  ids: Array<StepIdType>,
+|}
+
+type TerminalItem = {|
+  selectionType: typeof TERMINAL_ITEM_SELECTION_TYPE,
+  id: TerminalItemId,
+|}
 export type SelectableItem =
-  | {
-      isStep: true,
-      id: StepIdType,
-    }
-  | {
-      isStep: false,
-      id: TerminalItemId,
-    }
+  | SingleSelectedItem
+  | MultipleSelectedItem
+  | TerminalItem
 
 type SelectedItemState = ?SelectableItem
-type MultiSelectedItemsState = Array<StepIdType>
 
-function stepIdHelper(id: ?StepIdType): SelectedItemState {
+export type HoverableItem = SingleSelectedItem | TerminalItem
+
+function stepIdHelper(id: ?StepIdType): SingleSelectedItem | null {
   if (id == null) return null
-  return { isStep: true, id }
+  return { selectionType: SINGLE_STEP_SELECTION_TYPE, id }
 }
 
-function terminalItemIdHelper(id: ?TerminalItemId): SelectedItemState {
+function terminalItemIdHelper(id: ?TerminalItemId): TerminalItem | null {
   if (id == null) return null
-  return { isStep: false, id }
+  return { selectionType: TERMINAL_ITEM_SELECTION_TYPE, id }
 }
 
 export const initialSelectedItemState = {
-  isStep: false,
+  selectionType: TERMINAL_ITEM_SELECTION_TYPE,
   id: START_TERMINAL_ITEM_ID,
 }
 
@@ -106,25 +133,7 @@ const selectedItem: Reducer<SelectedItemState, *> = handleActions(
   initialSelectedItemState
 )
 
-const multiSelectedItems: Reducer<MultiSelectedItemsState, *> = handleActions(
-  {
-    SELECT_MULTIPLE_STEPS: (
-      state: MultiSelectedItemsState,
-      action: SelectMultipleStepsAction
-    ) => [...action.payload],
-    SELECT_STEP: (
-      state: MultiSelectedItemsState,
-      action: SelectStepAction
-    ) => [],
-    SELECT_TERMINAL_ITEM: (
-      state: MultiSelectedItemsState,
-      action: SelectTerminalItemAction
-    ) => [],
-  },
-  []
-)
-
-type HoveredItemState = SelectedItemState
+type HoveredItemState = HoverableItem | null
 
 const hoveredItem: Reducer<HoveredItemState, *> = handleActions(
   {
@@ -163,7 +172,6 @@ const wellSelectionLabwareKey: Reducer<string | null, any> = handleActions(
 export type StepsState = {|
   collapsedSteps: CollapsedStepsState,
   selectedItem: SelectedItemState,
-  multiSelectedItems: MultiSelectedItemsState,
   hoveredItem: HoveredItemState,
   hoveredSubstep: SubstepIdentifier,
   wellSelectionLabwareKey: string | null,
@@ -172,7 +180,6 @@ export type StepsState = {|
 export const _allReducers = {
   collapsedSteps,
   selectedItem,
-  multiSelectedItems,
   hoveredItem,
   hoveredSubstep,
   wellSelectionLabwareKey,

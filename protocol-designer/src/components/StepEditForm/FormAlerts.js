@@ -6,7 +6,7 @@ import {
   actions as dismissActions,
   selectors as dismissSelectors,
 } from '../../dismiss'
-import { getSelectedItem } from '../../ui/steps/selectors'
+import { getSelectedStepId } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getVisibleFormErrors,
@@ -25,7 +25,7 @@ import type { BaseState } from '../../types'
 type SP = {|
   errors: $PropertyType<Props, 'errors'>,
   warnings: $PropertyType<Props, 'warnings'>,
-  stepId: StepIdType,
+  stepId?: ?StepIdType,
 |}
 
 type OP = {|
@@ -81,7 +81,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
       description: warning.body || null,
       dismissId: warning.type,
     })),
-    stepId: getSelectedItem(state)?.id,
+    stepId: getSelectedStepId(state),
   }
 }
 
@@ -94,7 +94,8 @@ const mergeProps = (
   return {
     ...stateProps,
     dismissWarning: (dismissId: string) => {
-      dispatch(dismissActions.dismissFormWarning({ type: dismissId, stepId }))
+      if (stepId)
+        dispatch(dismissActions.dismissFormWarning({ type: dismissId, stepId }))
     },
   }
 }

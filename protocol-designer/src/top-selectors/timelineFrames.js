@@ -10,6 +10,7 @@ import { START_TERMINAL_ITEM_ID, PRESAVED_STEP_ID } from '../steplist'
 
 import type { Selector } from '../types'
 import type { CommandsAndRobotState } from '../step-generation'
+import { SINGLE_STEP_SELECTION_TYPE } from '../ui/steps/reducers'
 
 const _timelineFrameHelper = (beforeActiveItem: boolean) => (
   activeItem,
@@ -27,11 +28,14 @@ const _timelineFrameHelper = (beforeActiveItem: boolean) => (
   const lastValidRobotStateIdx = timeline.length - 1
   let timelineIdx = lastValidRobotStateIdx // default to last valid robot state
 
-  if (!activeItem.isStep && activeItem.id === PRESAVED_STEP_ID) {
+  if (
+    !activeItem.selectionType === SINGLE_STEP_SELECTION_TYPE &&
+    activeItem.id === PRESAVED_STEP_ID
+  ) {
     // presaved step acts the same whether looking at timeline before or after active item
     timelineIdx = lastValidRobotStateIdx
   } else if (beforeActiveItem) {
-    if (activeItem.isStep) {
+    if (activeItem.selectionType === SINGLE_STEP_SELECTION_TYPE) {
       timelineIdx = Math.min(
         orderedStepIds.findIndex(id => id === activeItem.id),
         lastValidRobotStateIdx
@@ -43,7 +47,10 @@ const _timelineFrameHelper = (beforeActiveItem: boolean) => (
     // after active item
     const idxAfterStep =
       orderedStepIds.findIndex(id => id === activeItem.id) + 1
-    if (activeItem.isStep && idxAfterStep <= lastValidRobotStateIdx) {
+    if (
+      activeItem.selectionType === SINGLE_STEP_SELECTION_TYPE &&
+      idxAfterStep <= lastValidRobotStateIdx
+    ) {
       timelineIdx = idxAfterStep
     } else if (activeItem.id === START_TERMINAL_ITEM_ID) {
       timelineIdx = 0
