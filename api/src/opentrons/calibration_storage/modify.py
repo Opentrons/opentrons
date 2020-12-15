@@ -24,6 +24,7 @@ if typing.TYPE_CHECKING:
         TipLengthCalibration, PipTipLengthCalibration,
         DeckCalibrationData, PipetteCalibrationData, CalibrationStatusDict)
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 
 def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str):
@@ -124,6 +125,7 @@ def create_tip_length_data(
     # assert labware._is_tiprack, \
     #     'cannot save tip length for non-tiprack labware'
     labware_hash = helpers.hash_labware_def(definition)
+    labware_uri = helpers.uri_from_definition(definition)
     if cal_status:
         status = cal_status
     else:
@@ -135,7 +137,8 @@ def create_tip_length_data(
         'tipLength': length,
         'lastModified': utc_now(),
         'source': local_types.SourceType.user,
-        'status': status_dict
+        'status': status_dict,
+        'uri': typing.cast('LabwareUri', labware_uri)
     }
 
     data = {labware_hash + parent: tip_length_data}

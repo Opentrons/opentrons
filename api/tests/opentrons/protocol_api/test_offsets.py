@@ -157,6 +157,7 @@ def test_create_tip_length_calibration_data(monkeypatch):
             'lastModified': fake_time,
             'source': cs_types.SourceType.user,
             'status': {'markedBad': False},
+            'uri': 'opentrons/minimal_labware_def/1'
         }
     }
     result = modify.create_tip_length_data(
@@ -238,6 +239,7 @@ def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
         source=cs_types.SourceType.user,
         status=cs_types.CalibrationStatus(markedBad=False),
         tiprack=MOCK_HASH,
+        uri='opentrons/minimal_labware_def/1',
         last_modified=test_data[MOCK_HASH]['lastModified']
     )
     assert result == expected

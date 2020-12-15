@@ -28,7 +28,8 @@ def _format_calibration(
         pipette=calibration.pipette,
         lastModified=calibration.last_modified,
         source=calibration.source,
-        status=status)
+        status=status,
+        uri=calibration.uri)
 
     return formatted_cal
 

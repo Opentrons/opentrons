@@ -5,6 +5,7 @@ from datetime import datetime
 from enum import Enum
 from os import PathLike
 
+from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 CalibrationID = typing.NewType('CalibrationID', str)
 StrPath = typing.Union[str, PathLike]
@@ -104,6 +105,7 @@ class TipLengthCalibration:
     pipette: str
     tiprack: str
     last_modified: datetime
+    uri: typing.Union[LabwareUri, str]
 
 
 @dataclass

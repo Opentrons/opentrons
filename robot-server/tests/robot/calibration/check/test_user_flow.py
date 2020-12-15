@@ -152,7 +152,8 @@ def build_mock_stored_tip_length(kind='normal'):
             tiprack='fake_hash',
             last_modified='some time',
             source=CSTypes.SourceType.user,
-            status=CSTypes.CalibrationStatus(markedBad=False))
+            status=CSTypes.CalibrationStatus(markedBad=False),
+            uri='path/to_my_labware/1')
         return MagicMock(return_value=tip_length)
     else:
         return MagicMock(return_value=None)
