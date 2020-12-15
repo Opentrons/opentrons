@@ -52,6 +52,26 @@ Some important directories:
   - `app/src/http-api-client` - HTTP API client
 - `app/webpack` - Webpack configuration helpers
 
+## copy management
+
+We use [i18next](https://www.i18next.com) for copy management and internationalization.
+
+When adding any translatable copy strings, follow these conventions:
+
+Choose a continuous chunk of target copy that composes a translatable unit. This should be all text in a paragraph, or sentence, but might only be 1 word (e.g. within a button).
+
+1. Does the new copy belong within an existing translations namespace (e.g. 'robot_connection', 'robot_calibration', 'shared'...)?
+
+   - if yes, add a new key-value pair to that file. The value should be the english copy string. The key should be a snake case string that describes this copy's purpose within the namespace.
+   - if no, create a new namespace for this area of the application's functionality. Add a file titled `[namespace].json` to `app/src/assets/localization/en/`. Add a new key-value pair to that file. The value should be the english copy string. The key should be a snake case string that describes this copy's purpose within the namespace. Include the namespace in the i18n instance initialization function at `app/src/i18n.js` under the `ns` key of the options passed to the init fn (`{...ns: [ 'new_namespace' ]...}`). Import and export the new `[namespace].json` file from the manifest file at `app/src/assets/localization/en/index.js`
+
+2. Does the copy include dynamic internal values, or embedded markup (e.g. "Hello {{user}}, click `<a>`here`</a>`.")?
+
+   - if yes, use the `Trans` component from `react-i18next` docs [here](https://react.i18next.com/latest/trans-component)
+   - if no, use `useTranslation` hook to retrieve the `t` function. docs [here](https://react.i18next.com/latest/usetranslation-hook)
+
+**Note**: If a component utilizes both the `Trans` component and the `useTranslation` hook, be sure to pass the `t` function in as the `t` prop of the `Trans` component, that way the same namespace resolution order is maintained for all translation keys within that component.
+
 ## testing
 
 Tests for the App are run from the top-level along with all other JS project tests.
