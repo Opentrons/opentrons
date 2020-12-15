@@ -86,6 +86,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
 
   return (
     <PDTitledList
+      className={cx(styles.step_item_wrapper)}
       description={Description}
       iconName={error || warning ? 'alert-circle' : iconName}
       iconProps={{ className: iconClassName }}
