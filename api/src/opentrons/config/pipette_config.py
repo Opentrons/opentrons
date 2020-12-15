@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-@dataclass
+@dataclass(frozen=True)
 class PipetteConfig:
     top: float
     bottom: float

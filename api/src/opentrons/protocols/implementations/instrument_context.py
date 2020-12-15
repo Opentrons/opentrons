@@ -231,7 +231,7 @@ class InstrumentContextImplementation(InstrumentContextInterface):
     def get_pipette(self) -> PipetteDict:
         """Get the hardware pipette dictionary."""
         hw_manager = self._protocol_interface.get_hardware()
-        pipette = hw_manager.hardware.attached_instruments[self._mount]
+        pipette = hw_manager.hardware.get_attached_instrument(self._mount)
         if pipette is None:
             raise types.PipetteNotAttachedError()
         return pipette

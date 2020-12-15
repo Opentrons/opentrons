@@ -38,10 +38,11 @@ def do_publish(
         broker.logger.info("{}: {}".format(
             f.__qualname__,
             {k: v for k, v in call_args.items() if str(k) != 'self'}))
+    getfullargspec = inspect.getfullargspec(cmd)
     command_args = dict(
         zip(
-            reversed(inspect.getfullargspec(cmd).args),
-            reversed(inspect.getfullargspec(cmd).defaults
+            reversed(getfullargspec.args),
+            reversed(getfullargspec.defaults
                      or [])))
 
     # TODO (artyom, 20170927): we are doing this to be able to use
@@ -49,7 +50,7 @@ def do_publish(
     # self is effectively an instrument.
     # To narrow the scope of this hack, we are checking if the
     # command is expecting instrument first.
-    if 'instrument' in inspect.getfullargspec(cmd).args:
+    if 'instrument' in getfullargspec.args:
         # We are also checking if call arguments have 'self' and
         # don't have instruments specified, in which case
         # instruments should take precedence.
@@ -59,7 +60,7 @@ def do_publish(
     command_args.update({
         key: call_args[key]
         for key in
-        (set(inspect.getfullargspec(cmd).args)
+        (set(getfullargspec.args)
          & call_args.keys())
     })
 
@@ -137,16 +138,32 @@ class publish:
     both = functools.partial(_publish_dec, before=True, after=True)
 
 
+class SignatureCache:
+    def __init__(self) -> None:
+        self._cache: Dict[Callable, inspect.Signature] = {}
+
+    def get(self, f: Callable) -> inspect.Signature:
+        sig = self._cache.get(f)
+        if not sig:
+            sig = inspect.signature(f)
+            self._cache[f] = sig
+        return sig
+
+
+signature_cache = SignatureCache()
+
+
 def _get_args(
         f: Callable,
         args: Tuple,
         kwargs: Mapping[str, Any]) -> Dict[str, Any]:
     # Create the initial dictionary with args that have defaults
     res = {}
-    sig = inspect.signature(f)
-    if inspect.ismethod(f) and args[0] is f.__self__:  # type: ignore
+    sig = signature_cache.get(f)
+    ismethod = inspect.ismethod(f)
+    if ismethod and args[0] is f.__self__:  # type: ignore
         args = args[1:]
-    if inspect.ismethod(f):
+    if ismethod:
         res['self'] = f.__self__  # type: ignore
 
     bound = sig.bind(*args, **kwargs)
