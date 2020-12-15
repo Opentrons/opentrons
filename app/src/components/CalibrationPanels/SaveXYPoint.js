@@ -25,7 +25,7 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
-import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import type { Axis, Sign, StepSize } from '../JogControls/types'
 import type { CalibrationPanelProps } from './types'
 import type {
   SessionType,
@@ -183,7 +183,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
 
   const isHealthCheck =
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
-  const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
+  const jog = (axis: Axis, dir: Sign, step: StepSize) => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {

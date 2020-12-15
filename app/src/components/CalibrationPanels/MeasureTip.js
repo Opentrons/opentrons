@@ -24,7 +24,7 @@ import {
 
 import * as Sessions from '../../sessions'
 import { JogControls, VERTICAL_PLANE } from '../JogControls'
-import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import type { Axis, Sign, StepSize } from '../JogControls/types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 import { NeedHelpLink } from './NeedHelpLink'
@@ -123,7 +123,7 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
     [mount, isMulti, calBlock, sessionType]
   )
 
-  const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
+  const jog = (axis: Axis, dir: Sign, step: StepSize) => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {
