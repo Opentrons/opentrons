@@ -1,8 +1,30 @@
 import functools
 import inspect
-from typing import Any, Callable, cast, Dict, Tuple, Mapping
+from typing import Any, Callable, cast, Dict, Tuple, Mapping, Generic, TypeVar
 from opentrons.broker import Broker
 from . import types as command_types
+
+
+CacheT = TypeVar("CacheT")
+
+
+class InspectMemoizer(Generic[CacheT]):
+    def __init__(self, method: Callable[[Any], CacheT]) -> None:
+        self._method = method
+        self._cache: Dict[Callable, CacheT] = {}
+
+    def get(self, f: Callable) -> CacheT:
+        v = self._cache.get(f)
+        if not v:
+            v = self._method(f)
+            self._cache[f] = v
+        return v
+
+
+signature_cache = InspectMemoizer(inspect.signature)
+"""Cache inspect.signature method calls"""
+getfullargspec_cache = InspectMemoizer(inspect.getfullargspec)
+"""Cache inspect.getfullargspec method calls"""
 
 
 class CommandPublisher:
@@ -38,7 +60,7 @@ def do_publish(
         broker.logger.info("{}: {}".format(
             f.__qualname__,
             {k: v for k, v in call_args.items() if str(k) != 'self'}))
-    getfullargspec = inspect.getfullargspec(cmd)
+    getfullargspec = getfullargspec_cache.get(cmd)
     command_args = dict(
         zip(
             reversed(getfullargspec.args),
@@ -136,21 +158,6 @@ class publish:
     before = functools.partial(_publish_dec, before=True, after=False)
     after = functools.partial(_publish_dec, before=False, after=True)
     both = functools.partial(_publish_dec, before=True, after=True)
-
-
-class SignatureCache:
-    def __init__(self) -> None:
-        self._cache: Dict[Callable, inspect.Signature] = {}
-
-    def get(self, f: Callable) -> inspect.Signature:
-        sig = self._cache.get(f)
-        if not sig:
-            sig = inspect.signature(f)
-            self._cache[f] = sig
-        return sig
-
-
-signature_cache = SignatureCache()
 
 
 def _get_args(
