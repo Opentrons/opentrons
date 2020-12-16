@@ -1,88 +1,83 @@
+"""Internal models of uploaded protocol"""
 import logging
 import typing
+from contextlib import contextmanager
 from datetime import datetime
-from tempfile import TemporaryDirectory
-from dataclasses import dataclass, field, replace
-from pathlib import Path
+from dataclasses import dataclass, field
 
 from fastapi import UploadFile
 
-from robot_server.service.protocol.errors import ProtocolAlreadyExistsException
-from robot_server.util import FileMeta, save_upload
+from robot_server.service.protocol import contents, analyze, environment
 from opentrons.util.helpers import utc_now
 
 log = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
-class UploadedProtocolMeta:
+@dataclass
+class UploadedProtocolData:
     identifier: str
-    protocol_file: FileMeta
-    directory: TemporaryDirectory
-    support_files: typing.List[FileMeta] = field(default_factory=list)
+    contents: contents.Contents
+    analysis_result: analyze.AnalysisResult
     last_modified_at: datetime = field(default_factory=utc_now)
     created_at: datetime = field(default_factory=utc_now)
 
 
 class UploadedProtocol:
-    DIR_PREFIX = 'opentrons_'
-    DIR_SUFFIX = '._proto_dir'
-
     def __init__(self,
-                 protocol_id: str,
-                 protocol_file: UploadFile,
-                 support_files: typing.List[UploadFile]
-                 ):
+                 data: UploadedProtocolData):
+        """Constructor"""
+        self._data = data
+
+    @classmethod
+    def create(
+            cls,
+            protocol_id: str,
+            protocol_file: UploadFile,
+            support_files: typing.List[UploadFile]) -> 'UploadedProtocol':
         """
-        Constructor
+        create
 
         :param protocol_id: The id assigned to this protocol
         :param protocol_file: The uploaded protocol file
         :param support_files: Optional support files
         """
-        temp_dir = TemporaryDirectory(suffix=UploadedProtocol.DIR_SUFFIX,
-                                      prefix=UploadedProtocol.DIR_PREFIX)
+        f = contents.create(
+            protocol_file=protocol_file,
+            support_files=support_files,
+        )
+        an = analyze.analyze_protocol(f)
 
-        temp_dir_path = Path(temp_dir.name)
-        protocol_file_meta = save_upload(temp_dir_path, protocol_file)
-        support_files_meta = [save_upload(temp_dir_path, s)
-                              for s in support_files]
-
-        self._meta = UploadedProtocolMeta(
-            identifier=protocol_id,
-            protocol_file=protocol_file_meta,
-            support_files=support_files_meta,
-            directory=temp_dir
+        return cls(
+            UploadedProtocolData(
+                identifier=protocol_id,
+                analysis_result=an,
+                contents=f
+            )
         )
 
     def add(self, support_file: UploadFile):
         """Add a support file to protocol temp directory"""
-        temp_dir = Path(self._meta.directory.name)
+        c = contents.add(self._data.contents, support_file)
 
-        path = temp_dir / support_file.filename
-        if path.exists():
-            raise ProtocolAlreadyExistsException(
-                f"File {support_file.filename} already exists"
-            )
-
-        file_meta = save_upload(directory=temp_dir, upload_file=support_file)
-
-        self._meta = replace(
-            self._meta,
-            support_files=self._meta.support_files + [file_meta],
-            last_modified_at=utc_now()
-        )
+        self._data.analysis_result = analyze.analyze_protocol(c)
+        self._data.last_modified_at = utc_now()
+        self._data.contents = c
 
     def clean_up(self):
         """Protocol is being removed. Perform any clean up required."""
-        self._meta.directory.cleanup()
+        contents.clean_up(self._data.contents)
 
     @property
-    def meta(self) -> UploadedProtocolMeta:
-        return self._meta
+    def data(self) -> UploadedProtocolData:
+        return self._data
 
     def get_contents(self) -> str:
         """Read the protocol file contents as a string"""
+        return contents.get_protocol_contents(self._data.contents)
 
-        with self.meta.protocol_file.path.open("r") as f:
-            return f.read()
+    @contextmanager
+    def protocol_environment(self):
+        """Context manager used to run a protocol within the environment
+        created by the uploaded protocol."""
+        with environment.protocol_environment(self._data.contents):
+            yield self

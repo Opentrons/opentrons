@@ -50,9 +50,9 @@ class Meta(BaseModel):
 
 class RequiredEquipment(BaseModel):
     """Results of analysis of protocol."""
-    pipettesByMount: typing.Dict[Mount, LoadedPipette]
-    labwareBySlot: typing.Dict[int, LoadedLabware]
-    modulesBySlot: typing.Dict[int, LoadedModule]
+    pipettes: typing.List[LoadedPipette]
+    labware: typing.List[LoadedLabware]
+    modules: typing.List[LoadedModule]
 
 
 class FileAttributes(BaseModel):
