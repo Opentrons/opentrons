@@ -5,6 +5,8 @@ labware calibration from its designated file location.
 """
 import itertools
 import typing
+from typing_extensions import Literal
+
 from opentrons import config
 from opentrons.types import Point, Mount
 
@@ -13,6 +15,7 @@ from . import (
     file_operators as io, helpers, migration, modify)
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.pipette.dev_types import LabwareUri
     from .dev_types import CalibrationIndexDict, CalibrationDict
 
 
@@ -75,7 +78,8 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
 
 
 def _get_tip_length_data(
-        pip_id: str, labware_hash: str, labware_load_name: str
+        pip_id: str, labware_hash: str,
+        labware_load_name: str, labware_uri: 'LabwareUri'
 ) -> local_types.TipLengthCalibration:
     try:
         pip_tip_length_path = config.get_tip_length_cal_path()/f'{pip_id}.json'
@@ -88,7 +92,8 @@ def _get_tip_length_data(
             tiprack=labware_hash,
             last_modified=tip_length_info['lastModified'],
             source=_get_calibration_source(tip_length_info),
-            status=_get_calibration_status(tip_length_info))
+            status=_get_calibration_status(tip_length_info),
+            uri=labware_uri)
     except (FileNotFoundError, KeyError):
         raise local_types.TipLengthCalNotFound(
             f'Tip length of {labware_load_name} has not been '
@@ -139,11 +144,13 @@ def load_tip_length_calibration(
     # assert labware._is_tiprack, \
     #     'cannot save tip length for non-tiprack labware'
     labware_hash = helpers.hash_labware_def(definition)
+    labware_uri = helpers.uri_from_definition(definition)
     load_name = definition['parameters']['loadName']
     return _get_tip_length_data(
         pip_id=pip_id,
         labware_hash=labware_hash + parent,
-        labware_load_name=load_name)
+        labware_load_name=load_name,
+        labware_uri=labware_uri)
 
 
 def get_all_tip_length_calibrations() \
@@ -174,7 +181,8 @@ def get_all_tip_length_calibrations() \
                         tiprack=tiprack,
                         last_modified=info['lastModified'],
                         source=_get_calibration_source(info),
-                        status=_get_calibration_status(info)))
+                        status=_get_calibration_status(info),
+                        uri=_get_tip_rack_uri(info)))
     return all_calibrations
 
 
@@ -191,6 +199,15 @@ def _get_calibration_status(
         return local_types.CalibrationStatus()
     else:
         return local_types.CalibrationStatus(**data['status'])
+
+
+def _get_tip_rack_uri(data: typing.Dict) -> typing.Union['LabwareUri', Literal['']]:
+    if 'uri' not in data.keys():
+        # We cannot reverse look-up a labware definition using a hash
+        # so we must return an empty string if no uri is found.
+        return ''
+    else:
+        return typing.cast('LabwareUri', data['uri'])
 
 
 def get_robot_deck_attitude() \

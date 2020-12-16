@@ -14,7 +14,8 @@ def test_access_tip_length_calibration(
         'lastModified': None,
         'source': 'unknown',
         'status': {
-            'markedAt': None, 'markedBad': False, 'source': None}
+            'markedAt': None, 'markedBad': False, 'source': None},
+        'uri': ''
     }
 
     resp = api_client.get(

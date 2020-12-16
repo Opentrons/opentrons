@@ -849,7 +849,8 @@ def test_tip_length_for_caldata(ctx, monkeypatch, use_new_calibration):
             tiprack='fake_hash',
             last_modified='some time',
             source=cs_types.SourceType.user,
-            status=cs_types.CalibrationStatus(markedBad=False))
+            status=cs_types.CalibrationStatus(markedBad=False),
+            uri='opentrons/geb_96_tiprack_10ul/1')
     monkeypatch.setattr(get, 'load_tip_length_calibration', mock_tip_length)
     instr._tip_length_for.cache_clear()
     assert instr._tip_length_for(tiprack) == 2

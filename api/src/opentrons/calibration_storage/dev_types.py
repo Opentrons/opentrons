@@ -1,6 +1,8 @@
 import typing
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, Literal
 from datetime import datetime
+
+from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from .types import AttitudeMatrix, PipetteOffset, SourceType
 
@@ -16,6 +18,7 @@ class TipLengthCalibration(TypedDict):
     lastModified: datetime
     source: SourceType
     status: CalibrationStatusDict
+    uri: typing.Union[LabwareUri, Literal['']]
 
 
 class ModuleDict(TypedDict):
