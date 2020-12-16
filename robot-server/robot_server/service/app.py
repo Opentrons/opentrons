@@ -47,6 +47,7 @@ app = FastAPI(
     version=__version__,
 )
 
+
 # Legacy routes
 app.include_router(router=legacy_routes,
                    tags=[constants.V1_TAG],

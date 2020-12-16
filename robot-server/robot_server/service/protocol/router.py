@@ -12,15 +12,15 @@ from robot_server.service.dependencies import get_protocol_manager
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.protocol.protocol import UploadedProtocol
 
-PATH_PROTOCOL_ID = "/protocols/{protocolId}"
-
 log = logging.getLogger(__name__)
-
 
 router = APIRouter()
 
+PATH_ROOT = "/protocols"
+PATH_PROTOCOL_ID = PATH_ROOT + "/{protocolId}"
 
-@router.post("/protocols",
+
+@router.post(PATH_ROOT,
              description="Create a protocol",
              response_model_exclude_unset=True,
              response_model=route_models.ProtocolResponse,
@@ -37,11 +37,11 @@ async def create_protocol(
                                         support_files=supportFiles,)
     return route_models.ProtocolResponse(
         data=_to_response(new_proto),
-        links=get_protocol_links(router, new_proto.meta.identifier)
+        links=get_protocol_links(router, new_proto.data.identifier)
     )
 
 
-@router.get("/protocols",
+@router.get(PATH_ROOT,
             description="Get all protocols",
             response_model_exclude_unset=True,
             response_model=route_models.MultiProtocolResponse)
@@ -63,7 +63,7 @@ async def get_protocol(
     proto = protocol_manager.get(protocolId)
     return route_models.ProtocolResponse(
         data=_to_response(proto),
-        links=get_protocol_links(router, proto.meta.identifier)
+        links=get_protocol_links(router, proto.data.identifier)
     )
 
 
@@ -94,24 +94,27 @@ async def create_protocol_file(
     proto.add(file)
     return route_models.ProtocolResponse(
         data=_to_response(proto),
-        links=get_protocol_links(router, proto.meta.identifier),
+        links=get_protocol_links(router, proto.data.identifier),
     )
 
 
 def _to_response(uploaded_protocol: UploadedProtocol) \
         -> route_models.ProtocolResponseAttributes:
     """Create ProtocolResponse from an UploadedProtocol"""
-    meta = uploaded_protocol.meta
+    meta = uploaded_protocol.data
+    analysis_result = uploaded_protocol.data.analysis_result
     return route_models.ProtocolResponseAttributes(
         id=meta.identifier,
         protocolFile=route_models.FileAttributes(
-            basename=meta.protocol_file.path.name
+            basename=meta.contents.protocol_file.path.name
         ),
         supportFiles=[route_models.FileAttributes(
             basename=s.path.name
-        ) for s in meta.support_files],
+        ) for s in meta.contents.support_files],
         lastModifiedAt=meta.last_modified_at,
         createdAt=meta.created_at,
+        metadata=analysis_result.meta,
+        requiredEquipment=analysis_result.required_equipment
     )
 
 
