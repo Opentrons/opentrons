@@ -5,6 +5,8 @@ labware calibration from its designated file location.
 """
 import itertools
 import typing
+from typing_extensions import Literal
+
 from opentrons import config
 from opentrons.types import Point, Mount
 
@@ -199,7 +201,7 @@ def _get_calibration_status(
         return local_types.CalibrationStatus(**data['status'])
 
 
-def _get_tip_rack_uri(data: typing.Dict) -> typing.Union['LabwareUri', str]:
+def _get_tip_rack_uri(data: typing.Dict) -> typing.Union['LabwareUri', Literal['']]:
     if 'uri' not in data.keys():
         # We cannot reverse look-up a labware definition using a hash
         # so we must return an empty string if no uri is found.

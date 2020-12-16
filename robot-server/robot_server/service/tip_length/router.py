@@ -41,7 +41,8 @@ def _format_calibration(
     response_model=tl_models.MultipleCalibrationsResponse)
 async def get_all_tip_length_calibrations(
     tiprack_hash: str = None,
-    pipette_id: str = None
+    pipette_id: str = None,
+    tiprack_uri: str = None
 ) -> tl_models.MultipleCalibrationsResponse:
     all_calibrations = get_cal.get_all_tip_length_calibrations()
 
@@ -56,6 +57,9 @@ async def get_all_tip_length_calibrations(
     if pipette_id:
         all_calibrations = list(filter(
             lambda cal: cal.pipette == pipette_id, all_calibrations))
+    if tiprack_uri:
+        all_calibrations = list(filter(
+            lambda cal: cal.uri == tiprack_uri, all_calibrations))
 
     calibrations = [_format_calibration(cal) for cal in all_calibrations]
     return tl_models.MultipleCalibrationsResponse(data=calibrations)
