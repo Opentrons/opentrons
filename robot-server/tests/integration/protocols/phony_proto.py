@@ -1,6 +1,7 @@
 metadata = {
     'protocolName': 'nothing proto',
-    'apiLevel': '2.2'
+    'apiLevel': '2.2',
+    'author': 'some developer',
 }
 
 

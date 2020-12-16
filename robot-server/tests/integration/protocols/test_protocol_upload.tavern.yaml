@@ -20,8 +20,14 @@ stages:
             basename: phony_proto.py
           supportFiles:
             - basename: data.csv
-          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          lastModifiedAt: &dt
+            !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: *dt
+          metadata:
+            author: some developer
+            apiLevel: "2.2"
+            name: nothing proto
+          requiredEquipment: !anydict
         links:
           self:
             href: '/protocols/phony_proto'
@@ -86,12 +92,8 @@ stages:
       status_code: 201
       json:
         data:
-          id: phony_proto
-          protocolFile:
-            basename: phony_proto.py
+          <<: *response_data
           supportFiles: []
-          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
         links:
           self:
             href: '/protocols/phony_proto'
@@ -107,12 +109,8 @@ stages:
       status_code: 200
       json:
         data:
-          id: phony_proto
-          protocolFile:
-            basename: phony_proto.py
-          supportFiles: []
-          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          <<: *response_data
+          supportFiles: [ ]
         links:
           self:
             href: '/protocols/phony_proto'
@@ -129,14 +127,7 @@ stages:
     response:
       status_code: 201
       json:
-        data:
-          id: phony_proto
-          protocolFile:
-            basename: phony_proto.py
-          supportFiles:
-          - basename: 'data.csv'
-          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+        data: *response_data
         links:
           self:
             href: '/protocols/phony_proto'
@@ -151,14 +142,7 @@ stages:
     response:
       status_code: 200
       json:
-        data:
-          id: phony_proto
-          protocolFile:
-            basename: phony_proto.py
-          supportFiles:
-          - basename: 'data.csv'
-          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+        data: *response_data
         links:
           self:
             href: '/protocols'
