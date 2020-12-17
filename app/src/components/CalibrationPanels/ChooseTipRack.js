@@ -44,6 +44,7 @@ import type { SelectOptionOrGroup, SelectOption } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import styles from './styles.css'
 import { INTENT_PIPETTE_OFFSET } from './constants'
+import { findLabwareDefWithCustom } from '../../findLabware'
 
 const HEADER = 'choose tip rack'
 const INTRO = 'Choose what tip rack you would like to use to calibrate your'
@@ -73,19 +74,25 @@ const introContentByType: SessionType => string = sessionType => {
   }
 }
 
+function getLabwareDefinitionFromUri(
+  uri: string,
+  customTipRacks: Array<LabwareDefinition2>
+) {
+  const [namespace, loadName, version] = uri.split('/')
+  const labwareDef = findLabwareDefWithCustom(
+    namespace,
+    loadName,
+    version,
+    customTipRacks
+  )
+  return labwareDef
+}
+
 function formatOptionsFromLabwareDef(lw: LabwareDefinition2) {
   return {
     label: lw.metadata.displayName,
     value: getLabwareDefURI(lw),
   }
-}
-
-function formatOptionsFromLabwareUri(uri: string) {
-  const loadName = uri.split('/')[1]
-  const labwareDef = getLatestLabwareDef(loadName)
-  return labwareDef
-    ? { label: labwareDef.metadata.displayName, value: uri }
-    : null
 }
 
 function getOptionsByIntent(
@@ -107,11 +114,9 @@ function getOptionsByIntent(
 
 type ChooseTipRackProps = {|
   tipRack: CalibrationLabware,
-  mount: string,
   sessionType: SessionType,
-  robotName: string,
-  sessionTipRack: SelectOption | null,
-  handleSessionTiprack: (arg: SelectOption) => mixed,
+  chosenTipRack: LabwareDefinition2 | null,
+  handleChosenTipRack: (arg: LabwareDefinition2) => mixed,
   closeModal: () => mixed,
   intent?: Intent,
 |}
@@ -120,30 +125,38 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
   const {
     tipRack,
     sessionType,
-    mount,
-    robotName,
-    sessionTipRack,
-    handleSessionTiprack,
+    chosenTipRack,
+    handleChosenTipRack,
     closeModal,
     intent,
   } = props
 
-  const attachedPipette = useSelector(
-    (state: State) => getAttachedPipettes(state, robotName)[mount]
-  )
   const customTipRacks = useSelector(getCustomTipRackDefinitions)
   const customTipRackOptions = customTipRacks.map(formatOptionsFromLabwareDef)
 
-  const opentronsTipRackUris = attachedPipette.modelSpecs.defaultTipracks
-  const opentronsTipRackOptions = opentronsTipRackUris.map(
-    formatOptionsFromLabwareUri
-  )
+  const opentronsTipRacks = [
+    'opentrons/opentrons_96_tiprack_10ul/1',
+    'opentrons/opentrons_96_tiprack_20ul/1',
+    'opentrons/opentrons_96_tiprack_300ul/1',
+  ].map(tr => getLabwareDefinitionFromUri(tr, customTipRacks)) // THIS IS WHAT WE WILL BE GETTING FROM THE SESSION
 
-  const groupOptions = getOptionsByIntent(
-    opentronsTipRackOptions.concat(customTipRackOptions),
-    intent
-  )
-  console.log(groupOptions)
+  const allTipRackDefs = opentronsTipRacks.concat(customTipRacks)
+
+  const allTipRackOptions = allTipRackDefs.map(lw => {
+    if (lw) {
+      const uri = getLabwareDefURI(lw)
+      return { label: lw.metadata.displayName, value: uri }
+    }
+  })
+
+  const tipRackByUriMap = allTipRackDefs.reduce((obj, lw) => {
+    if (lw) {
+      obj[getLabwareDefURI(lw)] = lw
+    }
+    return obj
+  }, {})
+
+  const groupOptions = getOptionsByIntent(allTipRackOptions, intent)
 
   const [selectedValue, setSelectedValue] = React.useState<SelectOption>(
     formatOptionsFromLabwareDef(tipRack.definition)
@@ -153,8 +166,10 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
     selected && setSelectedValue(selected)
   }
   const handleUseTipRack = () => {
-    if (!isEqual(sessionTipRack, selectedValue.value)) {
-      handleSessionTiprack(selectedValue)
+    const selectedTipRack = tipRackByUriMap[selectedValue.value]
+    console.log(selectedTipRack)
+    if (!isEqual(chosenTipRack, selectedTipRack)) {
+      handleChosenTipRack(selectedTipRack)
     }
     closeModal()
   }

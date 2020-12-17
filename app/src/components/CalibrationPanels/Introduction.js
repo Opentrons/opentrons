@@ -27,11 +27,14 @@ import {
   SPACING_2,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
+  SecondaryBtn,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
 import { labwareImages } from './labwareImages'
 import { NeedHelpLink } from './NeedHelpLink'
+import { ChooseTipRack } from './ChooseTipRack'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { SessionType } from '../../sessions/types'
 import type { CalibrationPanelProps, Intent } from './types'
 import {
@@ -70,6 +73,7 @@ const TIP_LENGTH_CAL_EXPLANATION_FRAGMENT =
 const TIP_LENGTH_INVALIDATES_PIPETTE_OFFSET =
   'This tip was used to calibrate this pipette’s offset. Recalibrating this tip’s length will invalidate this pipette’s offset. If you recalibrate this tip length, you will need to recalibrate this pipette offset afterwards.'
 
+const CHOOSE_TIP_RACK_BUTTON_TEXT = 'Use a different tip rack'
 const START = 'start'
 const PIP_AND_TIP_CAL_HEADER = 'tip length and pipette offset calibration'
 const LABWARE_REQS = 'You will need:'
@@ -96,6 +100,7 @@ type PanelContents = {|
   invalidationText: string | null,
   bodyContentFragments: Array<BodySpec>,
   outcomeText: string | null,
+  chooseTipRackButtonText: string | null,
   continueButtonText: string,
   noteBody: BodySpec,
 |}
@@ -146,6 +151,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
           },
         ],
         outcomeText: null,
+        chooseTipRackButtonText: CHOOSE_TIP_RACK_BUTTON_TEXT,
         continueButtonText: `${START} ${DECK_CAL_HEADER}`,
         noteBody: {
           preFragment: IT_IS,
@@ -165,6 +171,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
           },
         ],
         outcomeText: null,
+        chooseTipRackButtonText: null,
         continueButtonText: `${START} ${TIP_LENGTH_CAL_HEADER}`,
         noteBody: {
           preFragment: IT_IS,
@@ -195,6 +202,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
                 },
               ],
               outcomeText: null,
+              chooseTipRackButtonText: nullß,
               continueButtonText: `${START} ${TIP_LENGTH_CAL_HEADER}`,
               noteBody: {
                 preFragment: IT_IS,
@@ -218,6 +226,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
                   postFragment: PIP_OFFSET_CAL_EXPLANATION_FRAGMENT,
                 },
               ],
+              chooseTipRackButtonText: CHOOSE_TIP_RACK_BUTTON_TEXT,
               outcomeText: null,
               continueButtonText: `${START} ${TIP_LENGTH_CAL_HEADER}`,
               noteBody: {
@@ -243,6 +252,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
                 },
               ],
               outcomeText: null,
+              chooseTipRackButtonText: CHOOSE_TIP_RACK_BUTTON_TEXT,
               continueButtonText: `${START} ${TIP_LENGTH_CAL_HEADER}`,
               noteBody: {
                 preFragment: IT_IS,
@@ -262,6 +272,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
                 },
               ],
               outcomeText: null,
+              chooseTipRackButtonText: null,
               continueButtonText: `${START} ${PIP_OFFSET_CAL_HEADER}`,
               noteBody: {
                 preFragment: IT_IS,
@@ -282,6 +293,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
             },
           ],
           outcomeText: null,
+          chooseTipRackButtonText: CHOOSE_TIP_RACK_BUTTON_TEXT,
           continueButtonText: `${START} ${PIP_OFFSET_CAL_HEADER}`,
           noteBody: {
             preFragment: IT_IS,
@@ -302,6 +314,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
           },
         ],
         outcomeText: HEALTH_CHECK_PROMPT_FRAGMENT,
+        chooseTipRackButtonText: null,
         continueButtonText: `${START} ${HEALTH_CHECK_HEADER}`,
         noteBody: {
           preFragment: null,
@@ -315,6 +328,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
         invalidationText: 'This panel is shown in error',
         bodyContentFragments: [],
         continueButtonText: 'Error',
+        chooseTipRackButtonText: null,
         outcomeText: null,
         noteBody: { preFragment: null, boldFragment: null, postFragment: null },
       }
@@ -338,6 +352,13 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
   const uniqueTipRacks = new Set(
     instruments?.map(instr => instr.tipRackLoadName)
   )
+
+  const [showChooseTipRack, setShowChooseTipRack] = React.useState(false)
+  const [chosenTipRack, setChosenTipRack] = React.useState(null)
+
+  const handleChosenTipRack = (value: LabwareDefinition2 | null) => {
+    setChosenTipRack(value)
+  }
   const proceed = () =>
     sendCommands({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
 
@@ -346,12 +367,22 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
     invalidationText,
     bodyContentFragments,
     outcomeText,
+    chooseTipRackButtonText,
     continueButtonText,
     noteBody,
   } = contentsByParams(sessionType, isExtendedPipOffset, intent)
 
   const isKnownTiprack = tipRack.loadName in labwareImages
-  return (
+  return showChooseTipRack ? (
+    <ChooseTipRack
+      tipRack={props.tipRack}
+      sessionType={props.sessionType}
+      chosenTipRack={chosenTipRack}
+      handleChosenTipRack={handleChosenTipRack}
+      closeModal={() => setShowChooseTipRack(false)}
+      intent={props.intent}
+    />
+  ) : (
     <>
       <Flex
         key={'intro'}
@@ -400,6 +431,14 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
                 />
               )
             })
+          ) : chosenTipRack ? (
+            <RequiredLabwareCard
+              loadName={chosenTipRack.parameters.loadName}
+              displayName={chosenTipRack.metadata.displayName}
+              linkToMeasurements={
+                chosenTipRack.parameters.loadName in labwareImages
+              }
+            />
           ) : (
             <RequiredLabwareCard
               loadName={tipRack.loadName}
@@ -441,6 +480,14 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
         </Flex>
       </Flex>
       <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
+        {chooseTipRackButtonText && (
+          <SecondaryBtn
+            data-test="chooseTipRackButton"
+            onClick={() => setShowChooseTipRack(true)}
+          >
+            {chooseTipRackButtonText}
+          </SecondaryBtn>
+        )}
         <PrimaryBtn
           data-test="continueButton"
           onClick={proceed}
