@@ -11,7 +11,8 @@ from opentrons.config.pipette_config import load
 from opentrons_shared_data.labware import load_definition
 
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models.command import CalibrationCommand
+from robot_server.service.session.models.command_definitions import \
+    CalibrationCommand
 from robot_server.robot.calibration.pipette_offset.user_flow import \
     PipetteOffsetCalibrationUserFlow
 from robot_server.robot.calibration.pipette_offset.constants import (

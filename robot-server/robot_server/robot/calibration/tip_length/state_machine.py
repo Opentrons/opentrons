@@ -1,6 +1,6 @@
 from typing import Dict
-from robot_server.service.session.models.command import (
-    CommandDefinition, CalibrationCommand)
+from robot_server.service.session.models.command_definitions import \
+    CommandDefinition, CalibrationCommand
 from robot_server.robot.calibration.util import (
     SimpleStateMachine,
     StateTransitionError

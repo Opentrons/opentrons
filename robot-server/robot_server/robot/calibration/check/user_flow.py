@@ -24,8 +24,8 @@ from robot_server.robot.calibration.helper_classes import (
     RobotHealthCheck, PipetteRank, PipetteInfo,
     RequiredLabware)
 
-from robot_server.service.session.models.command import (
-    CalibrationCommand, CheckCalibrationCommand, DeckCalibrationCommand)
+from robot_server.service.session.models.command_definitions import \
+    CalibrationCommand, DeckCalibrationCommand, CheckCalibrationCommand
 from robot_server.service.errors import RobotServerError
 
 from .util import (

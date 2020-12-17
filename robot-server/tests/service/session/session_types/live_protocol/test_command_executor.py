@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 import pytest
 
+from robot_server.service.session.models import command_definitions
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.session.command_execution.command import \
     CommandContent, CommandResult
@@ -63,7 +64,7 @@ async def test_load_labware(command_executor, mock_command_interface):
                                         namespace="test")
     result = await command_executor.execute(
         Command(content=CommandContent(
-            name=models.EquipmentCommand.load_labware,
+            name=command_definitions.EquipmentCommand.load_labware,
             data=command))
     )
 
@@ -71,7 +72,7 @@ async def test_load_labware(command_executor, mock_command_interface):
 
     assert result.result.data == expected_response
     assert result.content == CommandContent(
-            name=models.EquipmentCommand.load_labware,
+            name=command_definitions.EquipmentCommand.load_labware,
             data=command)
 
 
@@ -88,7 +89,7 @@ async def test_load_instrument(command_executor, mock_command_interface):
                                            mount=Mount.left)
     result = await command_executor.execute(
         Command(content=CommandContent(
-            name=models.EquipmentCommand.load_instrument,
+            name=command_definitions.EquipmentCommand.load_instrument,
             data=command))
     )
 
@@ -97,15 +98,15 @@ async def test_load_instrument(command_executor, mock_command_interface):
 
     assert result.result.data == expected_response
     assert result.content == CommandContent(
-            name=models.EquipmentCommand.load_instrument,
+            name=command_definitions.EquipmentCommand.load_instrument,
             data=command)
 
 
 @pytest.mark.parametrize(
     argnames=['handler_name', 'command_type'],
     argvalues=[
-        ['handle_aspirate', models.PipetteCommand.aspirate],
-        ['handle_dispense', models.PipetteCommand.dispense]
+        ['handle_aspirate', command_definitions.PipetteCommand.aspirate],
+        ['handle_dispense', command_definitions.PipetteCommand.dispense]
     ])
 async def test_liquid_commands(command_executor, mock_command_interface,
                                handler_name, command_type):
@@ -137,8 +138,8 @@ async def test_liquid_commands(command_executor, mock_command_interface,
 @pytest.mark.parametrize(
     argnames=['handler_name', 'command_type'],
     argvalues=[
-        ['handle_pick_up_tip', models.PipetteCommand.pick_up_tip],
-        ['handle_drop_tip', models.PipetteCommand.drop_tip]
+        ['handle_pick_up_tip', command_definitions.PipetteCommand.pick_up_tip],
+        ['handle_drop_tip', command_definitions.PipetteCommand.drop_tip]
     ])
 async def test_tip_commands(command_executor, mock_command_interface,
                             handler_name, command_type):

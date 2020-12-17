@@ -1,8 +1,8 @@
 from typing import Dict
 
-from robot_server.service.session.models.command import (
-    CommandDefinition, DeckCalibrationCommand as DeckCalCommand,
-    CalibrationCommand)
+from robot_server.service.session.models.command_definitions import \
+    CommandDefinition, CalibrationCommand, \
+    DeckCalibrationCommand as DeckCalCommand
 from robot_server.robot.calibration.util import (
     SimpleStateMachine, StateTransitionError)
 from .constants import DeckCalibrationState as State

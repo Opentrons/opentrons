@@ -6,7 +6,7 @@ from robot_server.service.session.command_execution import (
 from robot_server.service.session.errors import UnsupportedCommandException
 from robot_server.service.session.session_types.live_protocol.command_interface import CommandInterface  # noqa: E501
 from robot_server.service.session.session_types.live_protocol.state_store import StateStore  # noqa: E501
-from robot_server.service.session.models import command as models
+from robot_server.service.session.models import command_definitions as models
 from robot_server.util import duration
 
 log = logging.getLogger(__name__)

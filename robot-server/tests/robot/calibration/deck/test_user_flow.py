@@ -8,7 +8,8 @@ from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
 from robot_server.robot.calibration.deck.user_flow import \
     DeckCalibrationUserFlow, tuplefy_cal_point_dicts
-from robot_server.service.session.models.command import CalibrationCommand
+from robot_server.service.session.models.command_definitions import \
+    CalibrationCommand
 from robot_server.robot.calibration.deck.constants import \
     POINT_ONE_ID, POINT_TWO_ID, POINT_THREE_ID, DeckCalibrationState
 

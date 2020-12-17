@@ -8,7 +8,8 @@ from opentrons.config.pipette_config import load
 from opentrons.calibration_storage import types as cal_types
 
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models.command import CalibrationCommand
+from robot_server.service.session.models.command_definitions import \
+    CalibrationCommand
 from robot_server.robot.calibration.tip_length.user_flow import \
     TipCalibrationUserFlow
 

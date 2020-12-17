@@ -11,7 +11,8 @@ from opentrons.protocols.geometry.deck import Deck
 from robot_server.robot.calibration import util
 from robot_server.service.errors import RobotServerError
 
-from robot_server.service.session.models.command import CalibrationCommand
+from robot_server.service.session.models.command_definitions import \
+    CalibrationCommand
 from ..errors import CalibrationError
 from ..helper_classes import RequiredLabware, AttachedPipette
 from ..constants import (
