@@ -73,7 +73,7 @@ function mapStateToProps(state: BaseState): SP {
   const wellContents =
     labwareId && allWellContentsForActiveItem
       ? allWellContentsForActiveItem[labwareId]
-      : {} // TODO IMMEDIATELY null instead of {}?
+      : {} // TODO(IL, 2020-12-15): null instead of {}? See #7135
   const ingredNames = selectors.getLiquidNamesById(state)
   return {
     wellContents,

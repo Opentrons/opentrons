@@ -64,6 +64,16 @@ export const getMultiSelectItemIds: Selector<Array<StepIdType> | null> = createS
   }
 )
 
+export const getMultiSelectLastSelected: Selector<StepIdType | null> = createSelector(
+  getSelectedItem,
+  item => {
+    if (item.selectionType === MULTI_STEP_SELECTION_TYPE) {
+      return item.lastSelected
+    }
+    return null
+  }
+)
+
 export const getHoveredItem: Selector<HoverableItem | null> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredItem

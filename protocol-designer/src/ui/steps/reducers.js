@@ -74,6 +74,7 @@ type SingleSelectedItem = {|
 type MultipleSelectedItem = {|
   selectionType: typeof MULTI_STEP_SELECTION_TYPE,
   ids: Array<StepIdType>,
+  lastSelected: StepIdType,
 |}
 
 type TerminalItem = {|
@@ -123,7 +124,8 @@ const selectedItem: Reducer<SelectedItemState, *> = handleActions(
       action: SelectMultipleStepsAction
     ) => ({
       selectionType: MULTI_STEP_SELECTION_TYPE,
-      ids: action.payload,
+      ids: action.payload.stepIds,
+      lastSelected: action.payload.lastSelected,
     }),
   },
   initialSelectedItemState

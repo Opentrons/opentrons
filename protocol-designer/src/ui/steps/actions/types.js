@@ -70,5 +70,8 @@ export type SelectStepAction = {| type: 'SELECT_STEP', payload: StepIdType |}
 
 export type SelectMultipleStepsAction = {|
   type: 'SELECT_MULTIPLE_STEPS',
-  payload: Array<StepIdType>,
+  payload: {|
+    stepIds: Array<StepIdType>,
+    lastSelected: StepIdType,
+  |},
 |}

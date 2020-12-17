@@ -54,13 +54,13 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   return {
     wellContents: allWellContentsForActiveItem
       ? allWellContentsForActiveItem[labwareOnDeck.id]
-      : {}, // TODO IMMEDIATELY null instead of {}?
+      : {}, // TODO(IL, 2020-12-15): null instead of {}? See #7135
     highlightedWells: highlightSelectors.wellHighlightsByLabwareId(state)[
       labwareOnDeck.id
     ],
     missingTips: missingTipsByLabwareId
       ? missingTipsByLabwareId[labwareOnDeck.id]
-      : {}, // TODO IMMEDIATELY null instead of {}?
+      : {}, // TODO(IL, 2020-12-15): null instead of {}? See #7135
   }
 }
 

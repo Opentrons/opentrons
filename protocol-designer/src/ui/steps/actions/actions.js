@@ -114,11 +114,12 @@ export const selectStep = (stepId: StepIdType): ThunkAction<*> => (
 
 // NOTE(sa, 2020-12-11): this is a thunk so that we can populate the batch edit form with things later
 export const selectMultipleSteps = (
-  stepIds: Array<StepIdType>
+  stepIds: Array<StepIdType>,
+  lastSelected: StepIdType
 ): ThunkAction<*> => (dispatch: ThunkDispatch<*>, getState: GetState) => {
   const selectStepAction: SelectMultipleStepsAction = {
     type: 'SELECT_MULTIPLE_STEPS',
-    payload: stepIds,
+    payload: { stepIds, lastSelected },
   }
   dispatch(selectStepAction)
 }
