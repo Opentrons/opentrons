@@ -20,6 +20,7 @@ import {
 import { labwareImages } from './labwareImages'
 
 import type { Intent } from './types'
+import { INTENT_PIPETTE_OFFSET } from './constants'
 import type { SelectOption } from '@opentrons/components'
 
 const TIP_LENGTH_CALIBRATED_PROMPT = 'Calibrated on'
@@ -31,11 +32,14 @@ export type ChosenTipRackRenderProps = {|
   intent?: Intent,
 |}
 
-export function ChosenTipRackRender(props: ChosenTipRackRenderProps): React.Node {
+export function ChosenTipRackRender(
+  props: ChosenTipRackRenderProps
+): React.Node {
   const { selectedValue, intent } = props
   const loadName = selectedValue.value.split('/')[1]
   const displayName = selectedValue.label
-  const calibrated = true // TODO: figure out if it's actually calibrated only if intent is pipette offset
+  const showCalibration = intent === INTENT_PIPETTE_OFFSET
+  const calibrationData = false // get tip length data
 
   const imageSrc =
     loadName in labwareImages
@@ -62,16 +66,19 @@ export function ChosenTipRackRender(props: ChosenTipRackRenderProps): React.Node
         src={imageSrc}
       />
       <Box>
-        <Text textAlign={TEXT_ALIGN_CENTER} marginBottom={SPACING_2}>{displayName}</Text>
+        <Text textAlign={TEXT_ALIGN_CENTER} marginBottom={SPACING_2}>
+          {displayName}
+        </Text>
         <Text
           color={C_MED_DARK_GRAY}
           fontSize={FONT_SIZE_BODY_1}
           fontStyle={FONT_STYLE_ITALIC}
           textAlign={TEXT_ALIGN_CENTER}
         >
-          {calibrated
-            ? TIP_LENGTH_CALIBRATED_PROMPT
-            : TIP_LENGTH_UNCALIBRATED_PROMPT}
+          {showCalibration &&
+            (calibrationData
+              ? TIP_LENGTH_CALIBRATED_PROMPT
+              : TIP_LENGTH_UNCALIBRATED_PROMPT)}
         </Text>
       </Box>
     </Flex>

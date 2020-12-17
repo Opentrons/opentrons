@@ -132,7 +132,6 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
   } = props
 
   const customTipRacks = useSelector(getCustomTipRackDefinitions)
-  const customTipRackOptions = customTipRacks.map(formatOptionsFromLabwareDef)
 
   const opentronsTipRacks = [
     'opentrons/opentrons_96_tiprack_10ul/1',
@@ -142,12 +141,9 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
 
   const allTipRackDefs = opentronsTipRacks.concat(customTipRacks)
 
-  const allTipRackOptions = allTipRackDefs.map(lw => {
-    if (lw) {
-      const uri = getLabwareDefURI(lw)
-      return { label: lw.metadata.displayName, value: uri }
-    }
-  })
+  const allTipRackOptions = allTipRackDefs.map(
+    lw => lw && formatOptionsFromLabwareDef(lw)
+  )
 
   const tipRackByUriMap = allTipRackDefs.reduce((obj, lw) => {
     if (lw) {
