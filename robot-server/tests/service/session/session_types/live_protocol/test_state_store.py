@@ -56,10 +56,10 @@ def test_store_has_handle_command_response_method():
 @pytest.mark.parametrize(
     argnames="command_name, handler",
     argvalues=[[
-                   command_definitions.EquipmentCommand.load_labware,
+                command_definitions.EquipmentCommand.load_labware,
                 "handle_load_labware"],
                [
-                   command_definitions.EquipmentCommand.load_instrument,
+                command_definitions.EquipmentCommand.load_instrument,
                 "handle_load_instrument"]]
 )
 def test_command_result_state_handler(command_name, handler):
@@ -77,7 +77,8 @@ def test_command_result_state_handler(command_name, handler):
 
 def test_load_labware_update():
     store = StateStore()
-    command = create_command(name=command_definitions.EquipmentCommand.load_labware,
+    labware = command_definitions.EquipmentCommand.load_labware
+    command = create_command(name=labware,
                              data=models.LoadLabwareRequest(
                                     location=1,
                                     loadName="labware-load-name",
@@ -101,7 +102,8 @@ def test_load_labware_update():
 
 def test_load_instrument_update():
     store = StateStore()
-    command = create_command(name=command_definitions.EquipmentCommand.load_instrument,
+    instrument = command_definitions.EquipmentCommand.load_instrument
+    command = create_command(name=instrument,
                              data=models.LoadInstrumentRequest(
                                  instrumentName='p10_single',
                                  mount=Mount.left)

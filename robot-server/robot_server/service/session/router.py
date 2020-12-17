@@ -9,11 +9,10 @@ from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.json_api import ResourceLink
 from robot_server.service.json_api.resource_links import ResourceLinkKey, \
     ResourceLinks
-from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.errors import CommandExecutionException
 from robot_server.service.session.manager import SessionManager, BaseSession
-from robot_server.service.session.models.command import SessionCommand, \
-    CommandResponse, CommandRequest
+from robot_server.service.session.models.command import CommandResponse,\
+    CommandRequest
 from robot_server.service.session.models.session import SessionResponse, \
     SessionCreateRequest, MultiSessionResponse, SessionType
 from robot_server.service.session.session_types import SessionMetaData

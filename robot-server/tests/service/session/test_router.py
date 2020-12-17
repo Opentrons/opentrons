@@ -51,7 +51,8 @@ def command_created_at():
 
 @pytest.fixture
 def patch_create_command(command_id, command_created_at):
-    with patch("robot_server.service.session.session_types.base_session.create_command") as p:
+    session_path = "robot_server.service.session.session_types"
+    with patch(f"{session_path}.base_session.create_command") as p:
         p.side_effect = lambda c, n: Command(
             content=CommandContent(c, n),
             meta=CommandMeta(command_id, command_created_at))
