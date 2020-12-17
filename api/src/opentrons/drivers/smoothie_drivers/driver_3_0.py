@@ -5,8 +5,6 @@ import logging
 from time import sleep, time
 from threading import Event, RLock
 from typing import Any, Dict, Optional, Union, List, Tuple, cast
-from typing import Any, Dict, Optional, Union, List, Tuple, cast
-from typing_extensions import Final
 
 from math import isclose
 from serial.serialutil import SerialException  # type: ignore
@@ -20,6 +18,9 @@ from opentrons.drivers.utils import (
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 from opentrons.system import smoothie_update
+from . import HOMED_POSITION, Y_BOUND_OVERRIDE
+
+
 """
 - Driver is responsible for providing an interface for motion control
 - Driver is the only system component that knows about GCODES or how smoothie
@@ -33,19 +34,6 @@ log = logging.getLogger(__name__)
 
 ERROR_KEYWORD = 'error'
 ALARM_KEYWORD = 'alarm'
-
-
-# TODO (artyom, ben 20171026): move to config
-HOMED_POSITION: Final = {
-    'X': 418.0,
-    'Y': 353.0,
-    'Z': 218.0,
-    'A': 218.0,
-    'B': 19.0,
-    'C': 19.0
-}
-Y_BOUND_OVERRIDE: Final = 370
-
 
 PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30

@@ -1,3 +1,17 @@
+from typing_extensions import Final
+
+
+HOMED_POSITION: Final = {
+    'X': 418.0,
+    'Y': 353.0,
+    'Z': 218.0,
+    'A': 218.0,
+    'B': 19.0,
+    'C': 19.0
+}
+Y_BOUND_OVERRIDE: Final = 370
+
+
 class SmoothieDriver(object):
 
     def __init__(self):
@@ -13,7 +27,6 @@ class VirtualSmoothie(object):
 class SimulatingDriver:
     def __init__(self):
         self._steps_per_mm = {}
-        self.homed_position = {}
 
     def home(self, axis):
         pass
@@ -81,3 +94,13 @@ class SimulatingDriver:
 
     def set_acceleration(self, settings):
         pass
+
+    @property
+    def homed_position(self):
+        return HOMED_POSITION.copy()
+
+    @property
+    def axis_bounds(self):
+        position = HOMED_POSITION.copy()
+        position['Y'] = Y_BOUND_OVERRIDE
+        return position
