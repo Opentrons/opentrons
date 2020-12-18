@@ -27,7 +27,7 @@ describe('Introduction', () => {
         currentStep = Sessions.DECK_STEP_SESSION_STARTED,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
         shouldPerformTipLength = false,
-        intent = Constants.INTENT_PIPETTE_OFFSET,
+        intent = Constants.INTENT_CALIBRATE_PIPETTE_OFFSET,
       } = props
       return mount(
         <Introduction
@@ -52,7 +52,7 @@ describe('Introduction', () => {
   const PIP_OFFSET_SPECS = [
     {
       when: 'doing offset only with pipette offset intent',
-      intent: Constants.INTENT_PIPETTE_OFFSET,
+      intent: Constants.INTENT_CALIBRATE_PIPETTE_OFFSET,
       shouldPerformTipLength: false,
       header: 'pipette offset calibration',
       body: /calibrating pipette offset/i,
@@ -76,7 +76,7 @@ describe('Introduction', () => {
     },
     {
       when: 'doing fused with pipette offset intent',
-      intent: Constants.INTENT_PIPETTE_OFFSET,
+      intent: Constants.INTENT_CALIBRATE_PIPETTE_OFFSET,
       shouldPerformTipLength: true,
       header: 'tip length and pipette offset calibration',
       body: /calibrating pipette offset.*tip length calibration/i,

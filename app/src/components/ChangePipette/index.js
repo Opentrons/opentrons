@@ -26,7 +26,7 @@ import {
 
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
-import { INTENT_PIPETTE_OFFSET } from '../CalibrationPanels'
+import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../CalibrationPanels'
 import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
 import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
@@ -130,7 +130,7 @@ export function ChangePipette(props: Props): React.Node {
             configHasCalibrationBlock ?? hasBlockModalResponse
           ),
         },
-        withIntent: INTENT_PIPETTE_OFFSET,
+        withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
       })
       setShowCalBlockModal(false)
     }

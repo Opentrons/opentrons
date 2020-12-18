@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
@@ -30,6 +31,7 @@ import {
   SecondaryBtn,
 } from '@opentrons/components'
 
+import * as Config from '../../config'
 import * as Sessions from '../../sessions'
 import { labwareImages } from './labwareImages'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -40,7 +42,8 @@ import type { CalibrationPanelProps, Intent } from './types'
 import {
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
   INTENT_TIP_LENGTH_IN_PROTOCOL,
-  INTENT_PIPETTE_OFFSET,
+  INTENT_CALIBRATE_PIPETTE_OFFSET,
+  INTENT_RECALIBRATE_PIPETTE_OFFSET,
   TRASH_BIN_LOAD_NAME,
 } from './constants'
 
@@ -202,7 +205,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
                 },
               ],
               outcomeText: null,
-              chooseTipRackButtonText: nullß,
+              chooseTipRackButtonText: null,
               continueButtonText: `${START} ${TIP_LENGTH_CAL_HEADER}`,
               noteBody: {
                 preFragment: IT_IS,
@@ -235,7 +238,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
                 postFragment: NOTE_BODY_OUTSIDE_PROTOCOL,
               },
             }
-          case INTENT_PIPETTE_OFFSET:
+          case INTENT_CALIBRATE_PIPETTE_OFFSET:
             return {
               headerText: PIP_AND_TIP_CAL_HEADER,
               invalidationText: PIP_OFFSET_REQUIRES_TIP_LENGTH,
@@ -272,7 +275,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
                 },
               ],
               outcomeText: null,
-              chooseTipRackButtonText: null,
+              chooseTipRackButtonText: CHOOSE_TIP_RACK_BUTTON_TEXT,
               continueButtonText: `${START} ${PIP_OFFSET_CAL_HEADER}`,
               noteBody: {
                 preFragment: IT_IS,
@@ -282,24 +285,47 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
             }
         }
       } else {
-        return {
-          headerText: PIP_OFFSET_CAL_HEADER,
-          invalidationText: null,
-          bodyContentFragments: [
-            {
-              preFragment: PIP_OFFSET_CAL_INTRO_FRAGMENT,
-              boldFragment: PIP_OFFSET_CAL_NAME_FRAGMENT,
-              postFragment: PIP_OFFSET_CAL_EXPLANATION_FRAGMENT,
-            },
-          ],
-          outcomeText: null,
-          chooseTipRackButtonText: CHOOSE_TIP_RACK_BUTTON_TEXT,
-          continueButtonText: `${START} ${PIP_OFFSET_CAL_HEADER}`,
-          noteBody: {
-            preFragment: IT_IS,
-            boldFragment: EXTREMELY,
-            postFragment: NOTE_BODY_OUTSIDE_PROTOCOL,
-          },
+        switch (intent) {
+          case INTENT_RECALIBRATE_PIPETTE_OFFSET:
+            return {
+              headerText: PIP_OFFSET_CAL_HEADER,
+              invalidationText: null,
+              bodyContentFragments: [
+                {
+                  preFragment: PIP_OFFSET_CAL_INTRO_FRAGMENT,
+                  boldFragment: PIP_OFFSET_CAL_NAME_FRAGMENT,
+                  postFragment: PIP_OFFSET_CAL_EXPLANATION_FRAGMENT,
+                },
+              ],
+              outcomeText: null,
+              chooseTipRackButtonText: null,
+              continueButtonText: `${START} ${PIP_OFFSET_CAL_HEADER}`,
+              noteBody: {
+                preFragment: IT_IS,
+                boldFragment: EXTREMELY,
+                postFragment: NOTE_BODY_OUTSIDE_PROTOCOL,
+              },
+            }
+          default:
+            return {
+              headerText: PIP_OFFSET_CAL_HEADER,
+              invalidationText: null,
+              bodyContentFragments: [
+                {
+                  preFragment: PIP_OFFSET_CAL_INTRO_FRAGMENT,
+                  boldFragment: PIP_OFFSET_CAL_NAME_FRAGMENT,
+                  postFragment: PIP_OFFSET_CAL_EXPLANATION_FRAGMENT,
+                },
+              ],
+              outcomeText: null,
+              chooseTipRackButtonText: CHOOSE_TIP_RACK_BUTTON_TEXT,
+              continueButtonText: `${START} ${PIP_OFFSET_CAL_HEADER}`,
+              noteBody: {
+                preFragment: IT_IS,
+                boldFragment: EXTREMELY,
+                postFragment: NOTE_BODY_OUTSIDE_PROTOCOL,
+              },
+            }
         }
       }
     case Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK:
@@ -349,15 +375,27 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
   const isExtendedPipOffset =
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
     shouldPerformTipLength
+  console.log(`Should perform tip length?: ${shouldPerformTipLength}`)
+  console.log(intent)
   const uniqueTipRacks = new Set(
     instruments?.map(instr => instr.tipRackLoadName)
   )
 
   const [showChooseTipRack, setShowChooseTipRack] = React.useState(false)
-  const [chosenTipRack, setChosenTipRack] = React.useState(null)
-
+  const [forceCalibrateTip, setForceCalibrateTip] = React.useState(false)
+  const [
+    chosenTipRack,
+    setChosenTipRack,
+  ] = React.useState<LabwareDefinition2 | null>(null)
+  const [useCalBlock, setUseCalBlock] = React.useState(calBlock)
+  const doSomething = (hasBlockResponse: boolean) => {
+    setUseCalBlock(hasBlockResponse)
+  }
   const handleChosenTipRack = (value: LabwareDefinition2 | null) => {
-    setChosenTipRack(value)
+    value && setChosenTipRack(value)
+  }
+  const handleForceCalibrateTip = (value: boolean) => {
+    setForceCalibrateTip(value)
   }
   const proceed = () =>
     sendCommands({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
@@ -379,6 +417,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
       sessionType={props.sessionType}
       chosenTipRack={chosenTipRack}
       handleChosenTipRack={handleChosenTipRack}
+      handleForceCalibrateTip={handleForceCalibrateTip}
       closeModal={() => setShowChooseTipRack(false)}
       intent={props.intent}
     />
