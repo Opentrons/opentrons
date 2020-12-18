@@ -61,9 +61,6 @@ export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
 export const END_TERMINAL_TITLE = 'FINAL DECK STATE'
 
 // special ID for invisible deck setup step-form
-//
-// NOTE(IL, 2020-12-18): INITIAL_DECK_SETUP_STEP_ID is deprecated and should
-// be removed, see #7144. We should use START_TERMINAL_ITEM_ID = '__initial_setup__' instead.
 export const INITIAL_DECK_SETUP_STEP_ID = '__INITIAL_DECK_SETUP_STEP__'
 
 export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
