@@ -130,6 +130,7 @@ export type TipLengthCalibration = {|
   source: CalibrationSource,
   status: IndividualCalibrationStatus,
   id: string,
+  uri: string,
 |}
 
 export type AllTipLengthCalibrations = {|
