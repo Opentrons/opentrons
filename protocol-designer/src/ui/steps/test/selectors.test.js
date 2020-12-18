@@ -14,6 +14,7 @@ import {
   getHoveredStepLabware,
   getSelectedStepTitleInfo,
   getActiveItem,
+  getMultiSelectLastSelected,
 } from '../selectors'
 import * as utils from '../../modules/utils'
 
@@ -290,5 +291,30 @@ describe('getActiveItem', () => {
       const result = getActiveItem.resultFunc(selected, hovered)
       expect(result).toEqual(expected)
     })
+  })
+})
+
+describe('getMultiSelectLastSelected', () => {
+  it('should return null if the selected item is a single step', () => {
+    const result = getMultiSelectLastSelected.resultFunc({
+      selectionType: SINGLE_STEP_SELECTION_TYPE,
+      id: 'foo',
+    })
+    expect(result).toEqual(null)
+  })
+  it('should return null if the selected item is a terminal item', () => {
+    const result = getMultiSelectLastSelected.resultFunc({
+      selectionType: TERMINAL_ITEM_SELECTION_TYPE,
+      id: 'foo',
+    })
+    expect(result).toEqual(null)
+  })
+  it('should return the lastSelected step Id if the selected item is a multi-selection', () => {
+    const result = getMultiSelectLastSelected.resultFunc({
+      selectionType: MULTI_STEP_SELECTION_TYPE,
+      ids: ['foo', 'spam', 'bar'],
+      lastSelected: 'spam',
+    })
+    expect(result).toEqual('spam')
   })
 })

@@ -5,7 +5,9 @@ import {
   SINGLE_STEP_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
+  type SelectableItem,
 } from '../reducers.js'
+import type { SelectMultipleStepsAction } from '../actions/types'
 
 jest.mock('../../../labware-defs/utils')
 
@@ -120,19 +122,26 @@ describe('selectedItem reducer', () => {
   })
 
   describe('multi-step selection', () => {
-    const steps = ['someStepId', 'anotherStepId']
-    const action = {
+    const stepIds = ['someStepId', 'anotherStepId']
+    const lastSelected = 'anotherStepId'
+    const action: SelectMultipleStepsAction = {
       type: 'SELECT_MULTIPLE_STEPS',
-      payload: steps,
+      payload: { stepIds, lastSelected },
     }
-    const multiTestCases = [
+    const multiTestCases: {|
+      title: string,
+      prev: SelectableItem | null,
+      action: SelectMultipleStepsAction,
+      expected: SelectableItem | null,
+    |} = [
       {
         title: 'should enter multi-select mode from null',
         prev: null,
         action,
         expected: {
           selectionType: MULTI_STEP_SELECTION_TYPE,
-          ids: steps,
+          ids: stepIds,
+          lastSelected,
         },
       },
       {
@@ -144,7 +153,8 @@ describe('selectedItem reducer', () => {
         action,
         expected: {
           selectionType: MULTI_STEP_SELECTION_TYPE,
-          ids: steps,
+          ids: stepIds,
+          lastSelected,
         },
       },
       {
@@ -156,7 +166,8 @@ describe('selectedItem reducer', () => {
         action,
         expected: {
           selectionType: MULTI_STEP_SELECTION_TYPE,
-          ids: steps,
+          ids: stepIds,
+          lastSelected,
         },
       },
       {
@@ -169,7 +180,8 @@ describe('selectedItem reducer', () => {
         action,
         expected: {
           selectionType: MULTI_STEP_SELECTION_TYPE,
-          ids: steps,
+          ids: stepIds,
+          lastSelected,
         },
       },
     ]

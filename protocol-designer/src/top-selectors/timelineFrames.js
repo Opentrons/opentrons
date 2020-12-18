@@ -15,7 +15,6 @@ import {
   TERMINAL_ITEM_SELECTION_TYPE,
 } from '../ui/steps/reducers'
 
-// TODO IMMEDIATELY: add unit tests
 const _timelineFrameHelper = (beforeActiveItem: boolean) => (
   activeItem,
   initialRobotState,
