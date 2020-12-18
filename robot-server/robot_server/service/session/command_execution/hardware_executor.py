@@ -5,7 +5,8 @@ from . import Command, CompletedCommand, CommandResult
 from . base_executor import CommandExecutor
 from ..errors import UnsupportedCommandException
 from ..models.command import (
-    CommandDataType, RobotCommand, CommandDefinition)
+    CommandDataType)
+from ..models.command_definitions import CommandDefinition, RobotCommand
 from robot_server.util import duration
 
 

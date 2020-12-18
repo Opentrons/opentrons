@@ -1,8 +1,30 @@
 import functools
 import inspect
-from typing import Any, Callable, cast, Dict, Tuple, Mapping
+from typing import Any, Callable, cast, Dict, Tuple, Mapping, Generic, TypeVar
 from opentrons.broker import Broker
 from . import types as command_types
+
+
+CacheT = TypeVar("CacheT")
+
+
+class InspectMemoizer(Generic[CacheT]):
+    def __init__(self, method: Callable[[Any], CacheT]) -> None:
+        self._method = method
+        self._cache: Dict[Callable, CacheT] = {}
+
+    def get(self, f: Callable) -> CacheT:
+        v = self._cache.get(f)
+        if not v:
+            v = self._method(f)
+            self._cache[f] = v
+        return v
+
+
+signature_cache = InspectMemoizer(inspect.signature)
+"""Cache inspect.signature method calls"""
+getfullargspec_cache = InspectMemoizer(inspect.getfullargspec)
+"""Cache inspect.getfullargspec method calls"""
 
 
 class CommandPublisher:
@@ -38,10 +60,11 @@ def do_publish(
         broker.logger.info("{}: {}".format(
             f.__qualname__,
             {k: v for k, v in call_args.items() if str(k) != 'self'}))
+    getfullargspec = getfullargspec_cache.get(cmd)
     command_args = dict(
         zip(
-            reversed(inspect.getfullargspec(cmd).args),
-            reversed(inspect.getfullargspec(cmd).defaults
+            reversed(getfullargspec.args),
+            reversed(getfullargspec.defaults
                      or [])))
 
     # TODO (artyom, 20170927): we are doing this to be able to use
@@ -49,7 +72,7 @@ def do_publish(
     # self is effectively an instrument.
     # To narrow the scope of this hack, we are checking if the
     # command is expecting instrument first.
-    if 'instrument' in inspect.getfullargspec(cmd).args:
+    if 'instrument' in getfullargspec.args:
         # We are also checking if call arguments have 'self' and
         # don't have instruments specified, in which case
         # instruments should take precedence.
@@ -59,7 +82,7 @@ def do_publish(
     command_args.update({
         key: call_args[key]
         for key in
-        (set(inspect.getfullargspec(cmd).args)
+        (set(getfullargspec.args)
          & call_args.keys())
     })
 
@@ -143,10 +166,11 @@ def _get_args(
         kwargs: Mapping[str, Any]) -> Dict[str, Any]:
     # Create the initial dictionary with args that have defaults
     res = {}
-    sig = inspect.signature(f)
-    if inspect.ismethod(f) and args[0] is f.__self__:  # type: ignore
+    sig = signature_cache.get(f)
+    ismethod = inspect.ismethod(f)
+    if ismethod and args[0] is f.__self__:  # type: ignore
         args = args[1:]
-    if inspect.ismethod(f):
+    if ismethod:
         res['self'] = f.__self__  # type: ignore
 
     bound = sig.bind(*args, **kwargs)

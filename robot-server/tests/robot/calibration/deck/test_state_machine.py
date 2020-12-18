@@ -1,9 +1,8 @@
 import pytest
 from typing import List, Tuple
 
-from robot_server.service.session.models.command import (
-    CalibrationCommand as CalCommand,
-    DeckCalibrationCommand as DeckCommand)
+from robot_server.service.session.models.command_definitions import \
+    CalibrationCommand as CalCommand, DeckCalibrationCommand as DeckCommand
 from robot_server.robot.calibration.deck.state_machine import \
     DeckCalibrationStateMachine
 

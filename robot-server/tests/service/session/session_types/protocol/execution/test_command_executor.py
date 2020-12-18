@@ -4,7 +4,8 @@ import pytest
 
 from robot_server.service.session.command_execution.command import Command, CommandContent  # noqa: E501
 from robot_server.service.session.errors import UnsupportedCommandException
-from robot_server.service.session.models.command import ProtocolCommand
+from robot_server.service.session.models.command_definitions import \
+    ProtocolCommand
 from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types.protocol.execution import \
     command_executor

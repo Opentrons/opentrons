@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 import {
   Box,
   PrimaryBtn,
+  Btn,
   Flex,
   Text,
   FONT_SIZE_BODY_2,
@@ -15,18 +16,23 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  ALIGN_STRETCH,
+  FONT_BODY_2_DARK,
+  ALIGN_CENTER,
+  TEXT_DECORATION_UNDERLINE,
+  TEXT_ALIGN_CENTER,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 
 import * as Sessions from '../../sessions'
-import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import type { Axis, Sign, StepSize } from '../JogControls/types'
 import type { CalibrationPanelProps } from './types'
 import type {
   SessionType,
   CalibrationSessionStep,
   SessionCommandString,
 } from '../../sessions/types'
-import { JogControls, HORIZONTAL_PLANE } from '../JogControls'
+import { JogControls, HORIZONTAL_PLANE, VERTICAL_PLANE } from '../JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -94,6 +100,7 @@ const MOVE_TO_POINT_TWO_BUTTON_TEXT = `${BASE_BUTTON_TEXT} and move to slot 3`
 const MOVE_TO_POINT_THREE_BUTTON_TEXT = `${BASE_BUTTON_TEXT} and move to slot 7`
 const HEALTH_POINT_TWO_BUTTON_TEXT = `${HEALTH_BUTTON_TEXT} and move to slot 3`
 const HEALTH_POINT_THREE_BUTTON_TEXT = `${HEALTH_BUTTON_TEXT} and move to slot 7`
+const ALLOW_VERTICAL_TEXT = 'Reveal Z jog controls to move up and down'
 
 const contentsBySessionTypeByCurrentStep: {
   [SessionType]: {
@@ -176,7 +183,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
 
   const isHealthCheck =
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
-  const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
+  const jog = (axis: Axis, dir: Sign, step: StepSize) => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {
@@ -214,6 +221,27 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_FIRST
       ? HEALTH_BUTTON_TEXT
       : buttonText
+
+  const [allowVertical, setAllowVertical] = React.useState(false)
+
+  const AllowVerticalPrompt = () => (
+    <Flex
+      justifyContent={JUSTIFY_CENTER}
+      alignItems={ALIGN_CENTER}
+      flex={1}
+      alignSelf={ALIGN_STRETCH}
+    >
+      <Btn
+        onClick={() => setAllowVertical(true)}
+        css={FONT_BODY_2_DARK}
+        textDecoration={TEXT_DECORATION_UNDERLINE}
+        textAlign={TEXT_ALIGN_CENTER}
+      >
+        {ALLOW_VERTICAL_TEXT}
+      </Btn>
+    </Flex>
+  )
+
   return (
     <>
       <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -257,7 +285,16 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
           <source src={demoAsset} />
         </video>
       </Flex>
-      <JogControls jog={jog} stepSizes={[0.1, 1]} planes={[HORIZONTAL_PLANE]} />
+      <JogControls
+        jog={jog}
+        stepSizes={[0.1, 1]}
+        planes={
+          allowVertical
+            ? [HORIZONTAL_PLANE, VERTICAL_PLANE]
+            : [HORIZONTAL_PLANE]
+        }
+        auxiliaryControl={allowVertical ? null : <AllowVerticalPrompt />}
+      />
       <Flex
         width="100%"
         justifyContent={JUSTIFY_CENTER}

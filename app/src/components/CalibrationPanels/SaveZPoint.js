@@ -26,7 +26,7 @@ import {
 
 import * as Sessions from '../../sessions'
 import type { SessionType } from '../../sessions/types'
-import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import type { Axis, Sign, StepSize } from '../JogControls/types'
 import type { CalibrationPanelProps } from './types'
 import { JogControls, HORIZONTAL_PLANE, VERTICAL_PLANE } from '../JogControls'
 import { formatJogVector } from './utils'
@@ -107,7 +107,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
 
   const [allowHorizontal, setAllowHorizontal] = React.useState(false)
 
-  const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
+  const jog = (axis: Axis, dir: Sign, step: StepSize) => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {

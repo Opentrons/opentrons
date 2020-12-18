@@ -21,8 +21,8 @@ from robot_server.robot.calibration.constants import \
     TIP_RACK_LOOKUP_BY_MAX_VOL
 from robot_server.service.errors import RobotServerError
 
-from robot_server.service.session.models.command import (
-    CalibrationCommand, DeckCalibrationCommand)
+from robot_server.service.session.models.command_definitions import \
+    CalibrationCommand, DeckCalibrationCommand
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK, STANDARD_DECK, MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER, POINT_ONE_ID, POINT_TWO_ID,

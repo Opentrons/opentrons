@@ -13,7 +13,7 @@ from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models.command import \
+from robot_server.service.session.models.command_definitions import \
     CalibrationCommand
 from robot_server.robot.calibration import util
 from robot_server.robot.calibration.constants import (

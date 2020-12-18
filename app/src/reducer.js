@@ -8,9 +8,6 @@ import { combineReducers } from 'redux'
 // oldest robot api state
 import { robotReducer } from './robot'
 
-// oldest api state
-import { superDeprecatedRobotApiReducer } from './http-api-client'
-
 // api state
 import { robotApiReducer } from './robot-api/reducer'
 
@@ -70,7 +67,6 @@ export const history: HashHistory = createHistory()
 
 export const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   robot: robotReducer,
-  superDeprecatedRobotApi: superDeprecatedRobotApiReducer,
   robotApi: robotApiReducer,
   robotAdmin: robotAdminReducer,
   robotControls: robotControlsReducer,

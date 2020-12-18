@@ -24,6 +24,8 @@ class TipLengthCalibration(ResponseDataModel):
         Field(..., description="The calibration source")
     status: cal_model.CalibrationStatus = \
         Field(..., description="The status of this calibration")
+    uri: str = \
+        Field(..., description="The uri of the tiprack")
 
 
 MultipleCalibrationsResponse = MultiResponseModel[

@@ -25,7 +25,7 @@ import {
 
 import { JogControls, VERTICAL_PLANE } from '../JogControls'
 import * as Sessions from '../../sessions'
-import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import type { Axis, Sign, StepSize } from '../JogControls/types'
 import type { CalibrationPanelProps } from './types'
 
 import { NeedHelpLink } from './NeedHelpLink'
@@ -117,7 +117,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
     [mount, isMulti, calBlock, sessionType]
   )
 
-  const jog = (axis: JogAxis, dir: JogDirection, step: JogStep) => {
+  const jog = (axis: Axis, dir: Sign, step: StepSize) => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {

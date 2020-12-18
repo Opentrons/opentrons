@@ -83,7 +83,7 @@ The ending well will be in the bottom right, see the diagram below for further e
 
     def run(protocol):
 
-        plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', slot='1')
+        plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', location='1')
 
 
 .. versionadded:: 2.0
@@ -328,7 +328,7 @@ For example:
 
     def run(protocol):
         plate = protocol.load_labware(
-        'corning_24_wellplate_3.4ml_flat', slot='1')
+        'corning_24_wellplate_3.4ml_flat', location='1')
 
         # Get the center of well A1.
         center_location = plate['A1'].center()

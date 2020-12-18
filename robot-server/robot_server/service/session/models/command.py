@@ -4,9 +4,15 @@ import typing
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteName
+from typing_extensions import Literal
+
+from robot_server.service.session.models.command_definitions import \
+    CommandDefinitionType, RobotCommand, ProtocolCommand, EquipmentCommand, \
+    PipetteCommand, CalibrationCommand, DeckCalibrationCommand, \
+    CheckCalibrationCommand
 from robot_server.service.session.models.common import (
     EmptyModel, JogPosition, IdentifierType, OffsetVector)
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.json_api import (
     ResponseModel, RequestModel, ResponseDataModel)
@@ -81,143 +87,6 @@ class SetHasCalibrationBlockRequest(BaseModel):
         description="whether or not there is a calibration block present")
 
 
-class CommandStatus(str, Enum):
-    """The command status"""
-    executed = "executed"
-    queued = "queued"
-    failed = "failed"
-
-
-class CommandDefinition(str, Enum):
-    def __new__(cls, value, model=EmptyModel):
-        """Create a string enum with the expected model
-
-        IMPORTANT: Model definition must appear in CommandDataType
-        Union below.
-        """
-        namespace = cls.namespace()
-        full_name = f"{namespace}.{value}" if namespace else value
-        # Ignoring type errors because this is exactly as described here
-        # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
-        obj = str.__new__(cls, full_name)  # type: ignore
-        obj._value_ = full_name
-        obj._localname = value
-        obj._model = model
-        return obj
-
-    @property
-    def model(self):
-        """Get the data model of the payload of the command"""
-        return self._model  # type: ignore
-
-    @staticmethod
-    def namespace():
-        """
-        This is primarily for allowing  definitions to define a
-        namespace. The name space will be used to make the value of the
-        enum. It will be "{namespace}.{value}"
-        """
-        return None
-
-    @property
-    def localname(self):
-        """Get the name of the command without the namespace"""
-        return self._localname  # type: ignore
-
-
-class RobotCommand(CommandDefinition):
-    """Robot commands"""
-    home_all_motors = "homeAllMotors"
-    home_pipette = "homePipette"
-    toggle_lights = "toggleLights"
-
-    @staticmethod
-    def namespace():
-        return "robot"
-
-
-class ProtocolCommand(CommandDefinition):
-    """Protocol commands"""
-    start_run = "startRun"
-    start_simulate = "startSimulate"
-    cancel = "cancel"
-    pause = "pause"
-    resume = "resume"
-
-    @staticmethod
-    def namespace():
-        return "protocol"
-
-
-class EquipmentCommand(CommandDefinition):
-    load_labware = ("loadLabware", LoadLabwareRequest)
-    load_instrument = ("loadInstrument", LoadInstrumentRequest)
-
-    @staticmethod
-    def namespace():
-        return "equipment"
-
-
-class PipetteCommand(CommandDefinition):
-    aspirate = ("aspirate", LiquidRequest)
-    dispense = ("dispense", LiquidRequest)
-    drop_tip = ("dropTip", PipetteRequestBase)
-    pick_up_tip = ("pickUpTip", PipetteRequestBase)
-
-    @staticmethod
-    def namespace():
-        return "pipette"
-
-
-class CalibrationCommand(CommandDefinition):
-    """Shared Between Calibration Flows"""
-    load_labware = "loadLabware"
-    jog = ("jog", JogPosition)
-    set_has_calibration_block = ("setHasCalibrationBlock",
-                                 SetHasCalibrationBlockRequest)
-    move_to_tip_rack = "moveToTipRack"
-    move_to_point_one = "moveToPointOne"
-    move_to_deck = "moveToDeck"
-    move_to_reference_point = "moveToReferencePoint"
-    pick_up_tip = "pickUpTip"
-    confirm_tip_attached = "confirmTip"
-    invalidate_tip = "invalidateTip"
-    save_offset = "saveOffset"
-    exit = "exitSession"
-    invalidate_last_action = "invalidateLastAction"
-
-    @staticmethod
-    def namespace():
-        return "calibration"
-
-
-class DeckCalibrationCommand(CommandDefinition):
-    """Deck Calibration Specific"""
-    move_to_point_two = "moveToPointTwo"
-    move_to_point_three = "moveToPointThree"
-
-    @staticmethod
-    def namespace():
-        return "calibration.deck"
-
-
-class CheckCalibrationCommand(CommandDefinition):
-    """Check Calibration Health Specific"""
-    compare_point = "comparePoint"
-    switch_pipette = "switchPipette"
-    return_tip = "returnTip"
-    transition = "transition"
-
-    @staticmethod
-    def namespace():
-        return "calibration.check"
-
-
-"""
-IMPORTANT: See note for SessionCreateParamType
-
-Read more here: https://pydantic-docs.helpmanual.io/usage/types/#unions
-"""
 CommandDataType = typing.Union[
     SetHasCalibrationBlockRequest,
     JogPosition,
@@ -228,18 +97,6 @@ CommandDataType = typing.Union[
     EmptyModel
 ]
 
-
-# A Union of all CommandDefinition enumerations accepted
-CommandDefinitionType = typing.Union[
-    RobotCommand,
-    CalibrationCommand,
-    CheckCalibrationCommand,
-    DeckCalibrationCommand,
-    ProtocolCommand,
-    PipetteCommand,
-    EquipmentCommand,
-]
-
 # A Union of all command result types
 CommandResultType = typing.Union[
     LoadLabwareResponse,
@@ -247,26 +104,114 @@ CommandResultType = typing.Union[
 ]
 
 
+class CommandStatus(str, Enum):
+    """The command status"""
+    executed = "executed"
+    queued = "queued"
+    failed = "failed"
+
+
 class BasicSessionCommand(BaseModel):
     """A session command"""
-    data: CommandDataType
-    # For validation, command MUST appear after data
     command: CommandDefinitionType = Field(
         ...,
         description="The command description")
 
-    @validator('command', always=True, allow_reuse=True)
-    def check_data_type(cls, v, values):
-        """Validate that the command and data match"""
-        d = values.get('data')
-        if not isinstance(d, v.model):
-            raise ValueError(f"Invalid command data for command type {v}. "
-                             f"Expecting {v.model}")
-        return v
+
+class EmptySessionCommand(BasicSessionCommand):
+    data: EmptyModel
 
 
-class SessionCommand(ResponseDataModel, BasicSessionCommand):
+class RobotCommandRequest(EmptySessionCommand):
+    command: Literal[
+        RobotCommand.home_all_motors,
+        RobotCommand.home_pipette,
+        RobotCommand.toggle_lights
+    ]
+
+
+class ProtocolCommandRequest(EmptySessionCommand):
+    command: Literal[
+        ProtocolCommand.start_run,
+        ProtocolCommand.start_simulate,
+        ProtocolCommand.cancel,
+        ProtocolCommand.pause,
+        ProtocolCommand.resume
+    ]
+
+
+class LoadLabwareRequestM(BasicSessionCommand):
+    command: Literal[EquipmentCommand.load_labware]
+    data: LoadLabwareRequest
+
+
+class LoadInstrumentRequestM(BasicSessionCommand):
+    command: Literal[EquipmentCommand.load_instrument]
+    data: LoadInstrumentRequest
+
+
+class LiquidRequestM(BasicSessionCommand):
+    command: Literal[
+        PipetteCommand.aspirate,
+        PipetteCommand.dispense
+    ]
+    data: LiquidRequest
+
+
+class TipRequestM(BasicSessionCommand):
+    command: Literal[
+        PipetteCommand.drop_tip,
+        PipetteCommand.pick_up_tip
+    ]
+    data: PipetteRequestBase
+
+
+class CalibrationRequest(EmptySessionCommand):
+    command: Literal[
+        CalibrationCommand.load_labware,
+        CalibrationCommand.move_to_tip_rack,
+        CalibrationCommand.move_to_point_one,
+        CalibrationCommand.move_to_deck,
+        CalibrationCommand.move_to_reference_point,
+        CalibrationCommand.pick_up_tip,
+        CalibrationCommand.confirm_tip_attached,
+        CalibrationCommand.invalidate_tip,
+        CalibrationCommand.save_offset,
+        CalibrationCommand.exit,
+        CalibrationCommand.invalidate_last_action,
+    ]
+
+
+class JogRequest(BasicSessionCommand):
+    command: Literal[CalibrationCommand.jog]
+    data: JogPosition
+
+
+class SetHasCalibrationBlockRequestM(BasicSessionCommand):
+    command: Literal[CalibrationCommand.set_has_calibration_block]
+    data: SetHasCalibrationBlockRequest
+
+
+class DeckCalibrationCommandRequest(EmptySessionCommand):
+    command: Literal[
+        DeckCalibrationCommand.move_to_point_two,
+        DeckCalibrationCommand.move_to_point_three
+    ]
+
+
+class CheckCalibrationCommandRequest(EmptySessionCommand):
+    command: Literal[
+        CheckCalibrationCommand.compare_point,
+        CheckCalibrationCommand.switch_pipette,
+        CheckCalibrationCommand.return_tip,
+        CheckCalibrationCommand.transition
+    ]
+
+
+class SessionCommand(ResponseDataModel):
     """A session command response"""
+    command: CommandDefinitionType
+    data: CommandDataType
     status: CommandStatus
     createdAt: datetime = Field(..., default_factory=utc_now)
     startedAt: typing.Optional[datetime]
@@ -274,9 +219,23 @@ class SessionCommand(ResponseDataModel, BasicSessionCommand):
     result: typing.Optional[CommandResultType] = None
 
 
+RequestTypes = typing.Union[
+    RobotCommandRequest,
+    ProtocolCommandRequest,
+    LoadLabwareRequestM,
+    LoadInstrumentRequestM,
+    LiquidRequestM,
+    TipRequestM,
+    CalibrationRequest,
+    JogRequest,
+    SetHasCalibrationBlockRequestM,
+    DeckCalibrationCommandRequest,
+    CheckCalibrationCommandRequest
+]
+
 # Session command requests/responses
 CommandRequest = RequestModel[
-    BasicSessionCommand
+    RequestTypes
 ]
 CommandResponse = ResponseModel[
     SessionCommand

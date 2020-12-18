@@ -9,11 +9,10 @@ from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.json_api import ResourceLink
 from robot_server.service.json_api.resource_links import ResourceLinkKey, \
     ResourceLinks
-from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.errors import CommandExecutionException
 from robot_server.service.session.manager import SessionManager, BaseSession
-from robot_server.service.session.models.command import SessionCommand, \
-    CommandResponse, CommandRequest
+from robot_server.service.session.models.command import CommandResponse,\
+    CommandRequest
 from robot_server.service.session.models.session import SessionResponse, \
     SessionCreateRequest, MultiSessionResponse, SessionType
 from robot_server.service.session.session_types import SessionMetaData
@@ -136,23 +135,12 @@ async def session_command_execute_handler(
             reason=f"Session '{sessionId}' is not active. "
                    "Only the active session can execute commands")
 
-    command = create_command(command_request.data.command,
-                             command_request.data.data)
-    command_result = await session_obj.command_executor.execute(command)
+    command_result = await session_obj.execute_command(command_request.data)
 
     log.debug(f"Command result: {command_result}")
 
     return CommandResponse(
-        data=SessionCommand(
-            id=command_result.meta.identifier,
-            data=command_result.content.data,
-            command=command_result.content.name,
-            status=command_result.result.status,
-            createdAt=command_result.meta.created_at,
-            startedAt=command_result.result.started_at,
-            completedAt=command_result.result.completed_at,
-            result=command_result.result.data,
-        ),
+        data=command_result,
         links=get_valid_session_links(sessionId, router)
     )
 

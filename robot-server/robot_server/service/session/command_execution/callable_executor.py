@@ -24,7 +24,7 @@ class CallableExecutor(CommandExecutor):
     async def execute(self, command: Command) -> CompletedCommand:
         """Execute command"""
         with duration() as time_it:
-            name_arg = command.content.name.value
+            name_arg = command.content.name
             data = command.content.data
             data_arg = data.dict() if data else {}
 

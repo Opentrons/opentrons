@@ -5,7 +5,7 @@ This module has functions that you can import to save robot or
 labware calibration to its designated file location.
 """
 import json
-from typing import Union, List, Dict, TYPE_CHECKING
+from typing import Union, List, Dict, TYPE_CHECKING, cast
 from dataclasses import is_dataclass, asdict
 
 
@@ -15,6 +15,7 @@ from . import types as local_types
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 
 DictionaryFactoryType = Union[List, Dict]
@@ -72,17 +73,20 @@ def details_from_uri(uri: str, delimiter='/') -> local_types.UriDetails:
 
 def uri_from_details(namespace: str, load_name: str,
                      version: Union[str, int],
-                     delimiter='/') -> str:
+                     delimiter='/') -> 'LabwareUri':
     """ Build a labware URI from its details.
 
     A labware URI is a string that uniquely specifies a labware definition.
 
     :returns str: The URI.
     """
-    return f'{namespace}{delimiter}{load_name}{delimiter}{version}'
+    return cast(
+        'LabwareUri',
+        f'{namespace}{delimiter}{load_name}{delimiter}{version}')
 
 
-def uri_from_definition(definition: 'LabwareDefinition', delimiter='/') -> str:
+def uri_from_definition(
+        definition: 'LabwareDefinition', delimiter='/') -> 'LabwareUri':
     """ Build a labware URI from its definition.
 
     A labware URI is a string that uniquely specifies a labware definition.
