@@ -100,10 +100,6 @@ def run_server(request_session, server_temp_directory):
                                'OT_API_CONFIG_DIR': server_temp_directory},
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE) as proc:
-        # Wait for a bit to get started by polling /health
-        # TODO (lc, 23-06-2020) We should investigate
-        # using symlinks for the file copy to avoid
-        # having such a long delay
         from requests.exceptions import ConnectionError
         while True:
             try:
