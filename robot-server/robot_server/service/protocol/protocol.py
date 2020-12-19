@@ -23,6 +23,7 @@ class UploadedProtocolData:
 
 
 class UploadedProtocol:
+    # TODO AL 20201219 - make the methods of this class async
     def __init__(self,
                  data: UploadedProtocolData):
         """Constructor"""
@@ -41,17 +42,17 @@ class UploadedProtocol:
         :param protocol_file: The uploaded protocol file
         :param support_files: Optional support files
         """
-        f = contents.create(
+        protocol_contents = contents.create(
             protocol_file=protocol_file,
             support_files=support_files,
         )
-        an = analyze.analyze_protocol(f)
+        analysis_results = analyze.analyze_protocol(protocol_contents)
 
         return cls(
             UploadedProtocolData(
                 identifier=protocol_id,
-                analysis_result=an,
-                contents=f
+                analysis_result=analysis_results,
+                contents=protocol_contents
             )
         )
 
