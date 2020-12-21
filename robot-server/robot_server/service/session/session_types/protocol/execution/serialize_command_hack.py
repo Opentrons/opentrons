@@ -44,7 +44,8 @@ def check_for(payload_entry):
 def command_to(command):
     return ProtocolStepEvent(
         command=command['name'],
-        data={k: check_for(v) for (k, v) in command['payload'].items() if k != "text"}
+        data={k: check_for(v) for (k, v) in command['payload'].items()
+              if k not in {"text", "source", "dest", "locations"}}
     )
 
 

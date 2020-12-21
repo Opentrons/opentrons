@@ -203,7 +203,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
                     result=result,
                 )
 
-                publish_command(publisher, command)
+                publish_command(self._publisher, cmd)
             if event:
                 self._events.append(event)
 
