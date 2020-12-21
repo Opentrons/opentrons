@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from asyncio import Future
 from typing import List, Any, Sequence
 
 import zmq  # type: ignore
@@ -14,7 +15,7 @@ log = logging.getLogger(__name__)
 
 def create_pull(address: str) -> Connection:
     """Create a PULL server connection."""
-    ctx = Context()
+    ctx = Context.instance()
     sock = ctx.socket(zmq.PULL)
 
     log.info("Puller binding to %s", address)
@@ -25,7 +26,7 @@ def create_pull(address: str) -> Connection:
 
 def create_push(address: str) -> Connection:
     """Create a PUSH client connection."""
-    ctx = Context()
+    ctx = Context.instance()
     sock = ctx.socket(zmq.PUSH)
 
     log.info("Pusher connecting to %s", address)
@@ -36,7 +37,7 @@ def create_push(address: str) -> Connection:
 
 def create_publisher(address: str) -> Connection:
     """Create a PUB client connection."""
-    ctx = Context()
+    ctx = Context.instance()
     sock = ctx.socket(zmq.PUB)
 
     log.info("Publisher binding to %s", address)
@@ -47,7 +48,7 @@ def create_publisher(address: str) -> Connection:
 
 def create_subscriber(address: str, topics: Sequence[str]) -> Connection:
     """Create a SUB client connection."""
-    ctx = Context()
+    ctx = Context.instance()
     sock = ctx.socket(zmq.SUB)
 
     log.info("Subscriber connecting to %s", address)
@@ -67,15 +68,17 @@ class Connection:
         """Construct."""
         self._socket = socket
 
-    async def send_multipart(self, frames: List[bytes]) -> None:
+    def send_multipart(self, frames: List[bytes]) -> Future[Any]:
         """Send a multipart message."""
-        await self._socket.send_multipart(frames)
+        # Type ignore is due to zmq not providing type annotation.
+        return self._socket.send_multipart(frames)  # type: ignore
 
-    async def recv_multipart(self) -> Any:
+    def recv_multipart(self) -> Future[Any]:
         """Recv a multipart message."""
-        return await self._socket.recv_multipart()
+        # Type ignore is due to zmq not providing type annotation.
+        return self._socket.recv_multipart()  # type: ignore
 
     def close(self) -> None:
         """Close the socket."""
-        log.info("Closing socket")
+        log.debug("Closing socket")
         self._socket.close()
