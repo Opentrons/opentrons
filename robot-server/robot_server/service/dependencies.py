@@ -84,7 +84,8 @@ def get_protocol_manager() -> ProtocolManager:
 def get_session_manager(
         hardware: ThreadManager = Depends(get_hardware),
         motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
-        protocol_manager: ProtocolManager = Depends(get_protocol_manager)) \
+        protocol_manager: ProtocolManager = Depends(get_protocol_manager),
+        event_publisher: publisher.Publisher = Depends(get_event_publisher)) \
         -> SessionManager:
     """The single session manager instance"""
     global _session_manager_inst
@@ -92,5 +93,7 @@ def get_session_manager(
         _session_manager_inst = SessionManager(
             hardware=hardware,
             motion_lock=motion_lock,
-            protocol_manager=protocol_manager)
+            protocol_manager=protocol_manager,
+            event_publisher=event_publisher,
+        )
     return _session_manager_inst

@@ -1,5 +1,6 @@
 from typing import Callable
 
+from notify_server.clients.publisher import Publisher
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server.service.protocol.manager import ProtocolManager
@@ -14,11 +15,13 @@ class SessionConfiguration:
                  hardware: ThreadManager,
                  is_active: Callable[[IdentifierType], bool],
                  motion_lock: ThreadedAsyncLock,
-                 protocol_manager: ProtocolManager):
+                 protocol_manager: ProtocolManager,
+                 event_publisher: Publisher):
         self._hardware = hardware
         self._is_active = is_active
         self._motion_lock = motion_lock
         self._protocol_manager = protocol_manager
+        self._event_publisher = event_publisher
 
     @property
     def hardware(self) -> ThreadManager:
@@ -37,3 +40,7 @@ class SessionConfiguration:
     def protocol_manager(self) -> ProtocolManager:
         """Access the protocol manager"""
         return self._protocol_manager
+
+    @property
+    def event_publisher(self) -> Publisher:
+        return self._event_publisher

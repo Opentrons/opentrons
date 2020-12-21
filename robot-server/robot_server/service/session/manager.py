@@ -1,6 +1,7 @@
 import logging
 from typing import Optional, Tuple, Dict, Type
 
+from notify_server.clients.publisher import Publisher
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server.service.errors import RobotServerError, CommonErrorDef
@@ -37,12 +38,15 @@ class SessionManager:
     def __init__(self,
                  hardware: ThreadManager,
                  motion_lock: ThreadedAsyncLock,
-                 protocol_manager: ProtocolManager):
+                 protocol_manager: ProtocolManager,
+                 event_publisher: Publisher):
         """
         Construct the session manager
 
         :param hardware: ThreadManager to interact with hardware
+        :param motion_lock: Modion thread / task lock
         :param protocol_manager: ProtocolManager for protocol related sessions
+        :param event_publisher: Notification server publisher client
         """
         self._sessions: Dict[IdentifierType, BaseSession] = {}
         self._active = ActiveSessionId()
@@ -51,7 +55,8 @@ class SessionManager:
             hardware=hardware,
             is_active=self.is_active,
             motion_lock=motion_lock,
-            protocol_manager=protocol_manager
+            protocol_manager=protocol_manager,
+            event_publisher=event_publisher
         )
 
     async def add(self,

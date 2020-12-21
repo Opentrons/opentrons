@@ -4,6 +4,9 @@ import typing
 
 from opentrons.util.helpers import deep_get, utc_now
 
+from robot_server.service.session.session_types.protocol.execution.serialize_command_hack import \
+    publish_command
+
 if typing.TYPE_CHECKING:
     from opentrons.api.dev_types import State
 
@@ -68,6 +71,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         #  the most reasonable start state.
         self._worker_state: 'State' = 'stopped'
         self._worker = self.create_worker(configuration, protocol, self)
+        self._publisher = configuration.event_publisher
         self._handlers: typing.Dict[CommandDefinitionType, typing.Any] = {
             ProtocolCommand.start_run: self._worker.handle_run,
             ProtocolCommand.start_simulate: self._worker.handle_simulate,
@@ -199,6 +203,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
                     result=result,
                 )
 
+                publish_command(publisher, command)
             if event:
                 self._events.append(event)
 
@@ -221,3 +226,6 @@ class IdMaker:
     def use_last_id(self) -> str:
         """Use the the most recently created id"""
         return self._id_stack.pop()
+
+
+
