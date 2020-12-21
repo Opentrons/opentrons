@@ -1,9 +1,9 @@
 """A publisher client."""
 from __future__ import annotations
 
-import asyncio
 import logging
-from asyncio import Task, Queue
+from asyncio import Future
+from typing import Any
 
 from notify_server.clients.queue_entry import QueueEntry
 from notify_server.models.event import Event
@@ -18,56 +18,25 @@ def create(host_address: str) -> Publisher:
 
     :param host_address: uri to connect to.
     """
-    queue: Queue = Queue()
-    task = asyncio.create_task(_send_task(connection=create_push(host_address),
-                                          queue=queue))
-    return Publisher(task=task, queue=queue)
-
-
-async def _send_task(connection: Connection, queue: Queue) -> None:
-    """Run asyncio task that reads from queue and publishes to server."""
-    try:
-        while True:
-            entry: QueueEntry = await queue.get()
-            await connection.send_multipart(entry.to_frames())
-    except asyncio.CancelledError:
-        log.exception("Done")
-    finally:
-        connection.close()
+    return Publisher(connection=create_push(host_address))
 
 
 class Publisher:
     """Async publisher class."""
 
-    def __init__(self, task: Task, queue: Queue) -> None:
-        """Construct a _Publisher."""
-        self._task = task
-        self._queue = queue
+    def __init__(self, connection: Connection) -> None:
+        """Construct a Publisher."""
+        self._connection = connection
 
     async def send(self, topic: str, event: Event) -> None:
-        """
-        Publish an event to a topic.
+        """Publish an event to a topic."""
+        await self.send_nowait(topic=topic, event=event)
 
-        Waits until free slot is available before adding the entry to the
-        queue.
-        """
-        await self._queue.put(QueueEntry(topic=topic, event=event))
+    def send_nowait(self, topic: str, event: Event) -> Future[Any]:
+        """Publish an event to a topic without waiting for completion."""
+        frames = QueueEntry(topic=topic, event=event).to_frames()
+        return self._connection.send_multipart(frames)
 
-    def send_nowait(self, topic: str, event: Event) -> None:
-        """
-        Publish an event to a topic.
-
-        Uses put_nowait to add queue entry without blocking.
-        """
-        try:
-            self._queue.put_nowait(QueueEntry(topic=topic, event=event))
-        except asyncio.QueueFull:
-            log.exception("Exception while sending publish event.")
-
-    async def stop(self) -> None:
-        """Stop the publisher task."""
-        self._task.cancel()
-        try:
-            await self._task
-        except asyncio.CancelledError:
-            pass
+    def close(self) -> None:
+        """Close the connection."""
+        self._connection.close()

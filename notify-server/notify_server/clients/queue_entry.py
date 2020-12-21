@@ -14,6 +14,12 @@ class MalformedFrames(Exception):
     pass
 
 
+class FrameEncodingError(Exception):
+    """Exception raise on encoding error."""
+
+    pass
+
+
 class QueueEntry(BaseModel):
     """An entry in a send/receive queue."""
 
@@ -21,9 +27,20 @@ class QueueEntry(BaseModel):
     event: Event
 
     def to_frames(self) -> List[bytes]:
-        """Create zmq frames from members."""
+        """
+        Create zmq frames from members.
+
+        :raises: FrameEncodingError
+        """
+        try:
+            event_json = self.event.json()
+        except (ValueError, TypeError) as e:
+            # Could not encode event to json.
+            raise FrameEncodingError() from e
+
         return [
-            bytes(v, 'utf-8') for v in (self.topic, self.event.json(),)]
+            bytes(v, 'utf-8') for v in (self.topic, event_json,)
+        ]
 
     @classmethod
     def from_frames(cls, frames: List[bytes]) -> QueueEntry:
