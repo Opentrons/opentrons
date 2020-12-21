@@ -29,7 +29,7 @@ jest.mock('../../../step-forms')
 
 const timelineFrameBeforeActiveItemMock: JestMockFn<
   [BaseState],
-  CommandsAndRobotState
+  CommandsAndRobotState | null
 > = timelineFramesSelectors.timelineFrameBeforeActiveItem
 
 const getModuleEntitiesMock: JestMockFn<[BaseState], ModuleEntities> =

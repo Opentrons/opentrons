@@ -20,6 +20,7 @@ import type {
   HoverOnSubstepAction,
   HoverOnTerminalItemAction,
   SelectStepAction,
+  SelectMultipleStepsAction,
   SelectTerminalItemAction,
   ToggleStepCollapsedAction,
 } from './actions/types'
@@ -58,30 +59,49 @@ const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions(
   {}
 )
 
+export const SINGLE_STEP_SELECTION_TYPE: 'SINGLE_STEP_SELECTION_TYPE' =
+  'SINGLE_STEP_SELECTION_TYPE'
+export const MULTI_STEP_SELECTION_TYPE: 'MULTI_STEP_SELECTION_TYPE' =
+  'MULTI_STEP_SELECTION_TYPE'
+export const TERMINAL_ITEM_SELECTION_TYPE: 'TERMINAL_ITEM_SELECTION_TYPE' =
+  'TERMINAL_ITEM_SELECTION_TYPE'
+
+type SingleSelectedItem = {|
+  selectionType: typeof SINGLE_STEP_SELECTION_TYPE,
+  id: StepIdType,
+|}
+
+type MultipleSelectedItem = {|
+  selectionType: typeof MULTI_STEP_SELECTION_TYPE,
+  ids: Array<StepIdType>,
+  lastSelected: StepIdType,
+|}
+
+type TerminalItem = {|
+  selectionType: typeof TERMINAL_ITEM_SELECTION_TYPE,
+  id: TerminalItemId,
+|}
 export type SelectableItem =
-  | {
-      isStep: true,
-      id: StepIdType,
-    }
-  | {
-      isStep: false,
-      id: TerminalItemId,
-    }
+  | SingleSelectedItem
+  | MultipleSelectedItem
+  | TerminalItem
 
 type SelectedItemState = ?SelectableItem
 
-function stepIdHelper(id: ?StepIdType): SelectedItemState {
+export type HoverableItem = SingleSelectedItem | TerminalItem
+
+function stepIdHelper(id: ?StepIdType): SingleSelectedItem | null {
   if (id == null) return null
-  return { isStep: true, id }
+  return { selectionType: SINGLE_STEP_SELECTION_TYPE, id }
 }
 
-function terminalItemIdHelper(id: ?TerminalItemId): SelectedItemState {
+function terminalItemIdHelper(id: ?TerminalItemId): TerminalItem | null {
   if (id == null) return null
-  return { isStep: false, id }
+  return { selectionType: TERMINAL_ITEM_SELECTION_TYPE, id }
 }
 
 export const initialSelectedItemState = {
-  isStep: false,
+  selectionType: TERMINAL_ITEM_SELECTION_TYPE,
   id: START_TERMINAL_ITEM_ID,
 }
 
@@ -99,11 +119,19 @@ const selectedItem: Reducer<SelectedItemState, *> = handleActions(
       action: SelectTerminalItemAction
     ) => terminalItemIdHelper(action.payload),
     DELETE_STEP: () => null,
+    SELECT_MULTIPLE_STEPS: (
+      state: SelectedItemState,
+      action: SelectMultipleStepsAction
+    ) => ({
+      selectionType: MULTI_STEP_SELECTION_TYPE,
+      ids: action.payload.stepIds,
+      lastSelected: action.payload.lastSelected,
+    }),
   },
   initialSelectedItemState
 )
 
-type HoveredItemState = SelectedItemState
+type HoveredItemState = HoverableItem | null
 
 const hoveredItem: Reducer<HoveredItemState, *> = handleActions(
   {

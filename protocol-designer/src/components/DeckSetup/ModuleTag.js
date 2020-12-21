@@ -126,7 +126,7 @@ const ModuleTagComponent = (props: Props) => {
     props.id
   ]
   const moduleState: ?$PropertyType<ModuleTemporalProperties, 'moduleState'> =
-    timelineFrame.robotState.modules[props.id]?.moduleState
+    timelineFrame?.robotState.modules[props.id]?.moduleState
   const moduleType: ?ModuleRealType = moduleEntity?.type
 
   const hoveredLabwares = useSelector(uiSelectors.getHoveredStepLabware)

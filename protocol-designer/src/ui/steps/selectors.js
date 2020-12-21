@@ -14,6 +14,10 @@ import {
   type SelectableItem,
   type StepsState,
   type CollapsedStepsState,
+  type HoverableItem,
+  SINGLE_STEP_SELECTION_TYPE,
+  TERMINAL_ITEM_SELECTION_TYPE,
+  MULTI_STEP_SELECTION_TYPE,
 } from './reducers'
 import type { FormData, StepIdType, StepType } from '../../form-types'
 import type { BaseState, Selector } from '../../types'
@@ -26,35 +30,59 @@ export const rootSelector = (state: BaseState): StepsState => state.ui.steps
 // (or the initial selected item, if there are no more saved steps).
 // Ideally this would happen in the selectedItem reducer itself,
 // but it's not easy to feed orderedStepIds into that reducer.
-export const getSelectedItem: Selector<SelectableItem> = createSelector(
+const getSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
   stepFormSelectors.getOrderedStepIds,
   (state, orderedStepIds) => {
     if (state.selectedItem != null) return state.selectedItem
     if (orderedStepIds.length > 0)
-      return { isStep: true, id: last(orderedStepIds) }
+      return {
+        selectionType: SINGLE_STEP_SELECTION_TYPE,
+        id: last(orderedStepIds),
+      }
     return initialSelectedItemState
   }
 )
 
-export const getSelectedStepId: Selector<?StepIdType> = createSelector(
+export const getSelectedStepId: Selector<StepIdType | null> = createSelector(
   getSelectedItem,
-  item => (item.isStep ? item.id : null)
+  item => (item.selectionType === SINGLE_STEP_SELECTION_TYPE ? item.id : null)
 )
 
-export const getSelectedTerminalItemId: Selector<?TerminalItemId> = createSelector(
+export const getSelectedTerminalItemId: Selector<TerminalItemId | null> = createSelector(
   getSelectedItem,
-  item => (!item.isStep ? item.id : null)
+  item => (item.selectionType === TERMINAL_ITEM_SELECTION_TYPE ? item.id : null)
 )
 
-export const getHoveredItem: Selector<?SelectableItem> = createSelector(
+export const getMultiSelectItemIds: Selector<Array<StepIdType> | null> = createSelector(
+  getSelectedItem,
+  item => {
+    if (item && item.selectionType === MULTI_STEP_SELECTION_TYPE) {
+      return item.ids
+    }
+    return null
+  }
+)
+
+export const getMultiSelectLastSelected: Selector<StepIdType | null> = createSelector(
+  getSelectedItem,
+  item => {
+    if (item.selectionType === MULTI_STEP_SELECTION_TYPE) {
+      return item.lastSelected
+    }
+    return null
+  }
+)
+
+export const getHoveredItem: Selector<HoverableItem | null> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredItem
 )
 
-export const getHoveredStepId: Selector<?StepIdType> = createSelector(
+export const getHoveredStepId: Selector<StepIdType | null> = createSelector(
   getHoveredItem,
-  item => (item && item.isStep ? item.id : null)
+  item =>
+    item && item.selectionType === SINGLE_STEP_SELECTION_TYPE ? item.id : null
 )
 
 /** Array of labware (labwareId's) involved in hovered Step, or [] */
@@ -108,9 +136,10 @@ export const getHoveredStepLabware: Selector<Array<string>> = createSelector(
   }
 )
 
-export const getHoveredTerminalItemId: Selector<?TerminalItemId> = createSelector(
+export const getHoveredTerminalItemId: Selector<TerminalItemId | null> = createSelector(
   getHoveredItem,
-  item => (item && !item.isStep ? item.id : null)
+  item =>
+    item && item.selectionType === TERMINAL_ITEM_SELECTION_TYPE ? item.id : null
 )
 
 export const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
@@ -118,11 +147,19 @@ export const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
   (state: StepsState) => state.hoveredSubstep
 )
 
-// Hovered or selected item. Hovered has priority.
-export const getActiveItem: Selector<SelectableItem> = createSelector(
+// Hovered or selected item. Hovered has priority. Used to tell deck what to display
+export const getActiveItem: Selector<HoverableItem | null> = createSelector(
   getSelectedItem,
   getHoveredItem,
-  (selected, hovered) => (hovered != null ? hovered : selected)
+  (selected, hovered) => {
+    if (hovered != null) {
+      return hovered
+    } else if (selected.selectionType === MULTI_STEP_SELECTION_TYPE) {
+      return null
+    } else {
+      return selected
+    }
+  }
 )
 
 // TODO: BC 2018-12-17 refactor as react state
@@ -158,7 +195,9 @@ export const getSelectedStepTitleInfo: Selector<StepTitleInfo | null> = createSe
   }
 )
 
-export const getWellSelectionLabwareKey: Selector<?string> = createSelector(
+export const getWellSelectionLabwareKey: Selector<
+  string | null
+> = createSelector(
   rootSelector,
   (state: StepsState) => state.wellSelectionLabwareKey
 )

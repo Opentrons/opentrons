@@ -1,108 +1,22 @@
 // @flow
 import { createSelector } from 'reselect'
-import noop from 'lodash/noop'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
-import { getWellSetForMultichannel } from '../../utils'
-import * as StepGeneration from '../../step-generation'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
 } from '../../steplist'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import {
-  getActiveItem,
-  getHoveredStepId,
-  getHoveredSubstep,
-} from '../../ui/steps'
+import { getActiveItem } from '../../ui/steps'
+import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { selectors as fileDataSelectors } from '../../file-data'
 import type { WellGroup } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
-import type { OutputSelector } from 'reselect'
-import type { BaseState, Selector } from '../../types'
-
-type GetTipCallback = (
-  wellName: string
-) => ?{ empty: boolean, highlighted: boolean }
-
-type GetTipSelector = OutputSelector<
-  BaseState,
-  { labwareId: string },
-  GetTipCallback
->
-
-function getLabwareIdProp(state, props: { labwareId: string }) {
-  return props.labwareId
-}
-
-function getTipHighlighted(
-  labwareId: string,
-  labwareDef: LabwareDefinition2,
-  wellName: string,
-  commandsAndRobotState: StepGeneration.CommandsAndRobotState,
-  invariantContext: StepGeneration.InvariantContext
-): boolean {
-  const { commands } = commandsAndRobotState
-  const commandUsesTip = (c: Command) => {
-    if (c.command === 'pickUpTip' && c.params.labware === labwareId) {
-      const commandWellName = c.params.well
-      const pipetteId = c.params.pipette
-      const pipetteSpec =
-        invariantContext.pipetteEntities[pipetteId]?.spec || {}
-
-      if (pipetteSpec.channels === 1) {
-        return commandWellName === wellName
-      } else if (pipetteSpec.channels === 8) {
-        const wellSet = getWellSetForMultichannel(labwareDef, commandWellName)
-        return Boolean(wellSet && wellSet.includes(wellName))
-      } else {
-        console.error(
-          `Unexpected number of channels: ${pipetteSpec.channels ||
-            '?'}. Could not get tip highlight state`
-        )
-        return false
-      }
-    }
-    return false
-  }
-
-  return commands.some(commandUsesTip)
-}
-
-function getTipEmpty(
-  wellName: string,
-  labwareId: string,
-  robotState: StepGeneration.RobotState
-): boolean {
-  return !(
-    robotState.tipState.tipracks[labwareId] &&
-    robotState.tipState.tipracks[labwareId][wellName]
-  )
-}
-
-const getInitialTips: GetTipSelector = createSelector(
-  fileDataSelectors.getInitialRobotState,
-  getLabwareIdProp,
-  (initialRobotState, labwareId) => (wellName: string) => ({
-    empty: getTipEmpty(wellName, labwareId, initialRobotState),
-    highlighted: false,
-  })
-)
-
-const getLastValidTips: GetTipSelector = createSelector(
-  fileDataSelectors.lastValidRobotState,
-  getLabwareIdProp,
-  (lastValidRobotState, labwareId) => (wellName: string) => ({
-    empty: getTipEmpty(wellName, labwareId, lastValidRobotState),
-    highlighted: false,
-  })
-)
+import type { Selector } from '../../types'
 
 export const getMissingTipsByLabwareId: Selector<{
   [labwareId: string]: WellGroup,
-}> = createSelector(
+} | null> = createSelector(
   stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
   getActiveItem,
@@ -117,7 +31,9 @@ export const getMissingTipsByLabwareId: Selector<{
   ) => {
     let robotState = null
 
-    if (!activeItem.isStep) {
+    if (activeItem == null) return null
+
+    if (activeItem.selectionType === TERMINAL_ITEM_SELECTION_TYPE) {
       const terminalId = activeItem.id
       if (terminalId === START_TERMINAL_ITEM_ID) {
         robotState = initialRobotState
@@ -140,7 +56,7 @@ export const getMissingTipsByLabwareId: Selector<{
 
       if (timelineIdx == null) {
         console.error(`Expected non-null timelineIdx for step ${stepId}`)
-        return {}
+        return null
       }
 
       const prevFrame = timeline[timelineIdx - 1]
@@ -159,121 +75,6 @@ export const getMissingTipsByLabwareId: Selector<{
           {}
         )
       )
-    return missingTips || {}
-  }
-)
-
-export const getTipsForCurrentStep: GetTipSelector = createSelector(
-  stepFormSelectors.getOrderedStepIds,
-  stepFormSelectors.getInvariantContext,
-  fileDataSelectors.getRobotStateTimeline,
-  getHoveredStepId,
-  getActiveItem,
-  getInitialTips,
-  getLastValidTips,
-  getLabwareIdProp,
-  getHoveredSubstep,
-  fileDataSelectors.getSubsteps,
-  (
-    orderedStepIds,
-    invariantContext,
-    robotStateTimeline,
-    hoveredStepId,
-    activeItem,
-    initialTips,
-    lastValidTips,
-    labwareId,
-    hoveredSubstepIdentifier,
-    substepsById
-  ) => {
-    const labwareDef = invariantContext.labwareEntities[labwareId].def
-    if (!activeItem.isStep) {
-      const terminalId = activeItem.id
-      if (terminalId === START_TERMINAL_ITEM_ID) {
-        return initialTips
-      } else if (
-        terminalId === END_TERMINAL_ITEM_ID ||
-        terminalId === PRESAVED_STEP_ID
-      ) {
-        return lastValidTips
-      } else {
-        console.error(
-          `Invalid terminalId ${terminalId}, could not getTipsForCurrentStep`
-        )
-        return noop
-      }
-    }
-
-    const stepId = activeItem.id
-    const timeline = robotStateTimeline.timeline
-    const timelineIdx = orderedStepIds.includes(stepId)
-      ? orderedStepIds.findIndex(id => id === stepId)
-      : null
-
-    if (timelineIdx == null) {
-      console.error(`Expected non-null timelineIdx for step ${stepId}`)
-      return noop
-    }
-
-    const prevFrame = timeline[timelineIdx - 1]
-
-    const hovered = stepId === hoveredStepId
-    const currentFrame = timeline[timelineIdx]
-    return (wellName: string) => {
-      // show empty/present tip state at end of previous frame
-      const empty = prevFrame
-        ? getTipEmpty(wellName, labwareId, prevFrame.robotState)
-        : false
-
-      // show highlights of tips used by current frame, if user is hovering
-      let highlighted = false
-      if (hoveredSubstepIdentifier && currentFrame) {
-        const { substepIndex } = hoveredSubstepIdentifier
-        const substepsForStep = substepsById[hoveredSubstepIdentifier.stepId]
-
-        if (substepsForStep && substepsForStep.substepType === 'sourceDest') {
-          if (substepsForStep.multichannel) {
-            const hoveredSubstepData =
-              substepsForStep.multiRows[substepIndex][0] // just use first multi row
-
-            let wellSet: ?Array<string> = []
-            const hoveredTipWell = hoveredSubstepData.activeTips?.well
-            if (hoveredTipWell != null) {
-              wellSet = getWellSetForMultichannel(labwareDef, hoveredTipWell)
-            }
-
-            highlighted =
-              (hoveredSubstepData &&
-                hoveredSubstepData.activeTips &&
-                hoveredSubstepData.activeTips.labware === labwareId &&
-                Boolean(wellSet && wellSet.includes(wellName))) ||
-              false
-          } else {
-            // single-channel
-            const hoveredSubstepData = substepsForStep.rows[substepIndex]
-
-            highlighted =
-              (hoveredSubstepData &&
-                hoveredSubstepData.activeTips &&
-                hoveredSubstepData.activeTips.labware === labwareId &&
-                hoveredSubstepData.activeTips.well === wellName) ||
-              false
-          }
-        }
-      } else if (hovered && currentFrame) {
-        highlighted = getTipHighlighted(
-          labwareId,
-          labwareDef,
-          wellName,
-          currentFrame,
-          invariantContext
-        )
-      }
-
-      return {
-        empty,
-        highlighted,
-      }
-    }
+    return missingTips
   }
 )

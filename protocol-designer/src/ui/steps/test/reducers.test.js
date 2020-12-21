@@ -1,6 +1,13 @@
 // @flow
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
-import { _allReducers } from '../reducers.js'
+import {
+  _allReducers,
+  SINGLE_STEP_SELECTION_TYPE,
+  MULTI_STEP_SELECTION_TYPE,
+  TERMINAL_ITEM_SELECTION_TYPE,
+  type SelectableItem,
+} from '../reducers.js'
+import type { SelectMultipleStepsAction } from '../actions/types'
 
 jest.mock('../../../labware-defs/utils')
 
@@ -73,7 +80,7 @@ describe('selectedItem reducer', () => {
       payload: PRESAVED_STEP_ID,
     }
     expect(selectedItem(null, action)).toEqual({
-      isStep: false,
+      selectionType: TERMINAL_ITEM_SELECTION_TYPE,
       id: PRESAVED_STEP_ID,
     })
   })
@@ -85,7 +92,7 @@ describe('selectedItem reducer', () => {
       payload: { id: stepId },
     }
     expect(selectedItem(null, action)).toEqual({
-      isStep: true,
+      selectionType: SINGLE_STEP_SELECTION_TYPE,
       id: stepId,
     })
   })
@@ -97,7 +104,7 @@ describe('selectedItem reducer', () => {
       payload: stepId,
     }
     expect(selectedItem(null, action)).toEqual({
-      isStep: true,
+      selectionType: SINGLE_STEP_SELECTION_TYPE,
       id: stepId,
     })
   })
@@ -109,8 +116,79 @@ describe('selectedItem reducer', () => {
       payload: terminalId,
     }
     expect(selectedItem(null, action)).toEqual({
-      isStep: false,
+      selectionType: TERMINAL_ITEM_SELECTION_TYPE,
       id: terminalId,
+    })
+  })
+
+  describe('multi-step selection', () => {
+    const stepIds = ['someStepId', 'anotherStepId']
+    const lastSelected = 'anotherStepId'
+    const action: SelectMultipleStepsAction = {
+      type: 'SELECT_MULTIPLE_STEPS',
+      payload: { stepIds, lastSelected },
+    }
+    const multiTestCases: {|
+      title: string,
+      prev: SelectableItem | null,
+      action: SelectMultipleStepsAction,
+      expected: SelectableItem | null,
+    |} = [
+      {
+        title: 'should enter multi-select mode from null',
+        prev: null,
+        action,
+        expected: {
+          selectionType: MULTI_STEP_SELECTION_TYPE,
+          ids: stepIds,
+          lastSelected,
+        },
+      },
+      {
+        title: 'should enter multi-select mode from multi-select',
+        prev: {
+          selectionType: MULTI_STEP_SELECTION_TYPE,
+          ids: ['notTheseSteps', 'nope'],
+        },
+        action,
+        expected: {
+          selectionType: MULTI_STEP_SELECTION_TYPE,
+          ids: stepIds,
+          lastSelected,
+        },
+      },
+      {
+        title: 'should enter multi-select mode from single-selected step',
+        prev: {
+          selectionType: SINGLE_STEP_SELECTION_TYPE,
+          id: 'notThisId',
+        },
+        action,
+        expected: {
+          selectionType: MULTI_STEP_SELECTION_TYPE,
+          ids: stepIds,
+          lastSelected,
+        },
+      },
+      {
+        title:
+          'should enter multi-select mode from single-selected terminal item',
+        prev: {
+          selectionType: TERMINAL_ITEM_SELECTION_TYPE,
+          id: 'someTerminalItem',
+        },
+        action,
+        expected: {
+          selectionType: MULTI_STEP_SELECTION_TYPE,
+          ids: stepIds,
+          lastSelected,
+        },
+      },
+    ]
+    multiTestCases.forEach(({ title, prev, action, expected }) => {
+      it(title, () => {
+        expect(selectedItem(prev, action)).toEqual(expected)
+      })
     })
   })
 
@@ -119,6 +197,11 @@ describe('selectedItem reducer', () => {
       type: 'DELETE_STEP',
       payload: 'someStepId',
     }
-    expect(selectedItem({ isStep: true, id: 'anyId' }, action)).toEqual(null)
+    expect(
+      selectedItem(
+        { selectionType: SINGLE_STEP_SELECTION_TYPE, id: 'anyId' },
+        action
+      )
+    ).toEqual(null)
   })
 })

@@ -43,16 +43,24 @@ const LabwareOnDeckComponent = (props: Props) => (
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const { labwareOnDeck } = ownProps
 
+  const missingTipsByLabwareId = tipContentsSelectors.getMissingTipsByLabwareId(
+    state
+  )
+
+  const allWellContentsForActiveItem = wellContentsSelectors.getAllWellContentsForActiveItem(
+    state
+  )
+
   return {
-    wellContents: wellContentsSelectors.getAllWellContentsForActiveItem(state)[
-      labwareOnDeck.id
-    ],
+    wellContents: allWellContentsForActiveItem
+      ? allWellContentsForActiveItem[labwareOnDeck.id]
+      : {}, // TODO(IL, 2020-12-15): null instead of {}? See #7135
     highlightedWells: highlightSelectors.wellHighlightsByLabwareId(state)[
       labwareOnDeck.id
     ],
-    missingTips: tipContentsSelectors.getMissingTipsByLabwareId(state)[
-      labwareOnDeck.id
-    ],
+    missingTips: missingTipsByLabwareId
+      ? missingTipsByLabwareId[labwareOnDeck.id]
+      : {}, // TODO(IL, 2020-12-15): null instead of {}? See #7135
   }
 }
 

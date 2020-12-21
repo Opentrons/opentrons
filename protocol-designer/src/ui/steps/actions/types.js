@@ -67,3 +67,11 @@ export type SetWellSelectionLabwareKeyAction = {|
 |}
 
 export type SelectStepAction = {| type: 'SELECT_STEP', payload: StepIdType |}
+
+export type SelectMultipleStepsAction = {|
+  type: 'SELECT_MULTIPLE_STEPS',
+  payload: {|
+    stepIds: Array<StepIdType>,
+    lastSelected: StepIdType,
+  |},
+|}

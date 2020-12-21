@@ -68,10 +68,12 @@ export function _wellContentsForLabware(
   )
 }
 
-export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware> = createSelector(
+export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware | null> = createSelector(
   stepFormSelectors.getLabwareEntities,
   timelineFrameBeforeActiveItem,
   (labwareEntities, timelineFrame) => {
+    if (timelineFrame == null) return null
+
     const liquidState = timelineFrame.robotState.liquidState.labware
     const wellContentsByLabwareId = mapValues(
       liquidState,

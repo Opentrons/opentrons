@@ -37,10 +37,14 @@ export const getCanClearHintDismissals: Selector<boolean> = createSelector(
 )
 
 export const shouldShowCoolingHint: Selector<boolean> = createSelector(
-  timelineFrameBeforeActiveItem,
+  timelineFrameBeforeActiveItem, // TODO(IL, 2020-12-15): this shouldn't use activeItem bc that is tied to hover state
   getUnsavedForm,
   (prevTimelineFrame, unsavedForm) => {
     if (unsavedForm?.stepType !== 'thermocycler') {
+      return false
+    }
+    // TODO(IL, 2020-12-15): this might not be needed if we stop using activeItem. There should always be a prev frame IRL
+    if (prevTimelineFrame == null) {
       return false
     }
 
