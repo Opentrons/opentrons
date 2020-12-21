@@ -9,7 +9,7 @@ from notify_server.clients.subscriber import create
 async def run(host_address: str, topics: List[str]) -> None:
     """Run the subscriber client."""
     print(f"Connecting to {host_address} for topics '{topics}'")
-    sub = create(host_address, topics)
+    sub = await create(host_address, topics)
     async for e in sub:
         print(f"{e.event.createdOn}: topic={e.topic}, "
               f"publisher={e.event.publisher}, data={e.event.data}")

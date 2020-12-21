@@ -12,7 +12,7 @@ from notify_server.network.connection import create_push, Connection
 log = logging.getLogger(__name__)
 
 
-def create(host_address: str) -> Publisher:
+async def create(host_address: str) -> Publisher:
     """
     Construct a publisher.
 
@@ -29,7 +29,10 @@ async def _send_task(connection: Connection, queue: Queue) -> None:
     try:
         while True:
             entry: QueueEntry = await queue.get()
-            await connection.send_multipart(entry.to_frames())
+            try:
+                await connection.send_multipart(entry.to_frames())
+            except Exception:
+                log.exception(f"Failed to send {entry}")
     except asyncio.CancelledError:
         log.exception("Done")
     finally:

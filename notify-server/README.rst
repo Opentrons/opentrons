@@ -67,7 +67,7 @@ To start from the command line:
 
 .. code-block:: bash
 
-   python -m notify_server.subscriber -s tcp://localhost:5555 topic1 topic2
+   python -m notify_server.app_sub -s tcp://localhost:5555 topic1 topic2
 
 models
 =======

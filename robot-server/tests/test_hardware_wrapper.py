@@ -1,5 +1,5 @@
 import pytest
-from mock import AsyncMock, patch
+from mock import AsyncMock, patch, MagicMock
 from datetime import datetime, timezone
 
 from notify_server.models.hardware_event import DoorStatePayload
@@ -38,23 +38,24 @@ async def test_init_hw_event(simulating_wrapper):
         Test that init starts an _event_watcher.
      """
     simulating_wrapper._tm = AsyncMock()
-    await simulating_wrapper.init_event_watchers()
-    simulating_wrapper._tm.register_callback.assert_awaited_once_with(
-        simulating_wrapper._publish_hardware_event
-    )
-    simulating_wrapper._tm.reset_mock()
+    with patch.object(dependencies, 'get_event_publisher') as pub:
+        await simulating_wrapper.init_event_watchers()
+        simulating_wrapper._tm.register_callback.assert_awaited_once_with(
+            simulating_wrapper._publish_hardware_event
+        )
+        pub.assert_called_once()
+        simulating_wrapper._tm.reset_mock()
 
 
 async def test_door_event(simulating_wrapper, mock_utc, mock_time):
     """ Verify that a door event is published on hw event. """
-
+    simulating_wrapper._event_publisher = MagicMock()
     hw_event = DoorStateNotification(
         event=HardwareEventType.DOOR_SWITCH_CHANGE,
         new_state=DoorState.OPEN)
     pub_event = Event(createdOn=mock_time,
                       publisher='HardwareWrapper._publish_hardware_event',
                       data=DoorStatePayload(state=DoorState.OPEN))
-    with patch.object(dependencies, 'get_event_publisher') as pub:
-        simulating_wrapper._publish_hardware_event(hw_event)
-        pub().send_nowait.assert_called_once_with('hardware_events',
-                                                  pub_event)
+    simulating_wrapper._publish_hardware_event(hw_event)
+    simulating_wrapper._event_publisher.send_nowait.assert_called_once_with(
+        'hardware_events', pub_event)

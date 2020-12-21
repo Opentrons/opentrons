@@ -19,16 +19,24 @@ _rpc_server_instance = None
 # The single instance of the SessionManager
 _session_manager_inst = None
 
+# The single instance of Publisher
+_event_publisher_inst = None
+
 api_wrapper = HardwareWrapper()
 
 
-@lru_cache(maxsize=1)
-def get_event_publisher():
-    notify_server_settings = NotifyServerSettings()
-    event_publisher = publisher.create(
+async def get_event_publisher() -> publisher.Publisher:
+    """
+    A dependency that is the single instance of a Publisher for publishing
+    events to the notification server.
+    """
+    global _event_publisher_inst
+    if not _event_publisher_inst:
+        notify_server_settings = NotifyServerSettings()
+        _event_publisher_inst = await publisher.create(
                 notify_server_settings.publisher_address.connection_string()
             )
-    return event_publisher
+    return _event_publisher_inst
 
 
 async def verify_hardware():

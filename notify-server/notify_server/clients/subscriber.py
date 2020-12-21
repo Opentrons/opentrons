@@ -11,8 +11,9 @@ from notify_server.network.connection import create_subscriber, Connection
 log = logging.getLogger(__name__)
 
 
-def create(host_address: str,
-           topics: typing.Sequence[str]) -> Subscriber:
+async def create(
+        host_address: str,
+        topics: typing.Sequence[str]) -> Subscriber:
     """
     Create a subscriber.
 

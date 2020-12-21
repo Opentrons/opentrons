@@ -14,7 +14,7 @@ async def handle_socket(
         websocket: WebSocket,
         topics: List[str]) -> None:
     """Handle a websocket connection."""
-    subscriber = create(
+    subscriber = await create(
         get_settings().notification_server_subscriber_address,
         topics
     )
