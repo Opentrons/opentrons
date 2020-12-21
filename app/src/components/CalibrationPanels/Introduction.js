@@ -22,6 +22,7 @@ import {
   FONT_SIZE_BODY_2,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
+  JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_RELATIVE,
   SPACING_1,
@@ -534,21 +535,22 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
           </Box>
         </Flex>
       </Flex>
-      <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
+      <Flex
+        width="100%"
+        justifyContent={JUSTIFY_CENTER}
+        paddingX={chooseTipRackButtonText ? '0' : '5rem'}
+      >
         {chooseTipRackButtonText && (
           <SecondaryBtn
             data-test="chooseTipRackButton"
             onClick={() => setShowChooseTipRack(true)}
+            width="48%"
+            marginRight="1rem"
           >
             {chooseTipRackButtonText}
           </SecondaryBtn>
         )}
-        <PrimaryBtn
-          data-test="continueButton"
-          onClick={proceed}
-          flex="1"
-          marginX="5rem"
-        >
+        <PrimaryBtn data-test="continueButton" onClick={proceed} flex="1">
           {continueButtonText}
         </PrimaryBtn>
       </Flex>
