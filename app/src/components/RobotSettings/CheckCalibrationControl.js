@@ -148,7 +148,7 @@ export function CheckCalibrationControl({
         control={
           <SecondaryBtn
             {...targetProps}
-            width="12rem"
+            minWidth="12rem"
             onClick={() => handleStart(null)} // passing in null because we want to show the AskForBlock modal
             disabled={buttonDisabled}
           >
