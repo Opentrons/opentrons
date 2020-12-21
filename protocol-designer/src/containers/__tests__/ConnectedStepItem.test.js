@@ -150,7 +150,10 @@ describe('ConnectedStepItem', () => {
           const actions = store.getActions()
           const selectStepAction = {
             type: 'SELECT_MULTIPLE_STEPS',
-            payload: ['ANOTHER_ID', mockId],
+            payload: {
+              stepIds: ['ANOTHER_ID', mockId],
+              lastSelected: mockId,
+            },
           }
           expect(actions[0]).toEqual(selectStepAction)
         })
@@ -173,7 +176,10 @@ describe('ConnectedStepItem', () => {
           const actions = store.getActions()
           const selectStepAction = {
             type: 'SELECT_MULTIPLE_STEPS',
-            payload: ['ANOTHER_ID'],
+            payload: {
+              stepIds: ['ANOTHER_ID'],
+              lastSelected: mockId,
+            },
           }
           expect(actions[0]).toEqual(selectStepAction)
         })
@@ -188,7 +194,10 @@ describe('ConnectedStepItem', () => {
           setupMocks: null,
           expectedAction: {
             type: 'SELECT_MULTIPLE_STEPS',
-            payload: [mockId],
+            payload: {
+              stepIds: [mockId],
+              lastSelected: mockId,
+            },
           },
         },
         {
@@ -206,7 +215,10 @@ describe('ConnectedStepItem', () => {
           },
           expectedAction: {
             type: 'SELECT_MULTIPLE_STEPS',
-            payload: ['ANOTHER_ID', 'YET_ANOTHER_ID', mockId],
+            payload: {
+              stepIds: ['ANOTHER_ID', 'YET_ANOTHER_ID', mockId],
+              lastSelected: mockId,
+            },
           },
         },
         // {
@@ -262,7 +274,10 @@ describe('ConnectedStepItem', () => {
           setupMocks: null,
           expectedAction: {
             type: 'SELECT_MULTIPLE_STEPS',
-            payload: [mockId],
+            payload: {
+              stepIds: [mockId],
+              lastSelected: mockId,
+            },
           },
         },
         {
@@ -282,7 +297,10 @@ describe('ConnectedStepItem', () => {
           },
           expectedAction: {
             type: 'SELECT_MULTIPLE_STEPS',
-            payload: [mockId],
+            payload: {
+              stepIds: [mockId],
+              lastSelected: mockId,
+            },
           },
         },
         {
@@ -296,21 +314,10 @@ describe('ConnectedStepItem', () => {
           },
           expectedAction: {
             type: 'SELECT_MULTIPLE_STEPS',
-            payload: ['ANOTHER_ID', mockId],
-          },
-        },
-        {
-          name: 'should deselect the step',
-          props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: { shiftKey: false, metaKey: true, ctrlKey: false },
-          setupMocks: () => {
-            when(getMultiSelectItemIdsMock)
-              .calledWith(expect.anything())
-              .mockReturnValue(['ANOTHER_ID'])
-          },
-          expectedAction: {
-            type: 'SELECT_MULTIPLE_STEPS',
-            payload: ['ANOTHER_ID', mockId],
+            payload: {
+              stepIds: ['ANOTHER_ID', mockId],
+              lastSelected: mockId,
+            },
           },
         },
         {
