@@ -189,8 +189,8 @@ def current_for_revision(
         revision: BoardRevision) -> AxisDict:
     if revision == BoardRevision.UNKNOWN:
         return current_dict.get('2.1', current_dict['default'])
-    elif revision.real_name in current_dict:
-        return current_dict[revision.real_name]  # type: ignore
+    elif revision.real_name() in current_dict:
+        return current_dict[revision.real_name()]  # type: ignore
     else:
         return current_dict['default']
 

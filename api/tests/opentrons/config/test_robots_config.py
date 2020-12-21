@@ -1,7 +1,10 @@
 import json
 import os
 
+import pytest
+
 from opentrons.config import CONFIG, robot_configs
+from opentrons.hardware_control.types import BoardRevision
 
 legacy_dummy_settings = {
     'name': 'Rosalind Franklin',
@@ -136,3 +139,16 @@ def test_load_currents():
         default_different_vals, default) == default_different_vals
     assert robot_configs._build_hw_versioned_current_dict(
         None, default) == default
+
+
+@pytest.mark.parametrize(
+    'current_dict,board_rev,result',
+    [
+        ({'default': {'X': 1}, '2.1': {'X': 2}}, BoardRevision.OG, {'X': 2}),
+        ({'default': {'X': 1}, 'A': {'X': 2}}, BoardRevision.OG,  {'X': 1}),
+        ({'default': {'X': 1}, 'A': {'X': 2}, '2.1': {'X': 3}},
+         BoardRevision.A, {'X': 2})
+    ]
+)
+def test_current_for_revision(current_dict, board_rev, result):
+    assert robot_configs.current_for_revision(current_dict, board_rev) == result
