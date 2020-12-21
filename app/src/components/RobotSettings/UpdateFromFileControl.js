@@ -14,6 +14,8 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING_3,
+  SPACING_4,
+  SIZE_4,
 } from '@opentrons/components'
 
 import {
@@ -77,7 +79,8 @@ export function UpdateFromFileControl(
       />
       <SecondaryBtn
         as="label"
-        width="9rem"
+        minWidth={SIZE_4}
+        marginLeft={SPACING_4}
         className={cx({ disabled: updateDisabled })}
         {...updateBtnProps}
       >

@@ -78,6 +78,7 @@ export function AdvancedSettingsCard(
           disabled={controlsDisabled || !logsAvailable || robotLogsDownloading}
           onClick={() => dispatch(downloadLogs(robot))}
           minWidth={SIZE_4}
+          marginLeft={SPACING_4}
         >
           {robotLogsDownloading ? (
             <Icon name="ot-spinner" height="1em" spin />
@@ -94,6 +95,7 @@ export function AdvancedSettingsCard(
           as={Link}
           to={resetUrl}
           minWidth={SIZE_4}
+          marginLeft={SPACING_4}
         >
           {t('reset_button')}
         </SecondaryBtn>

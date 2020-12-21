@@ -205,7 +205,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
         control={
           <SecondaryBtn
             {...targetProps}
-            width="13rem"
+            width="12rem"
             onClick={confirmStart}
             disabled={disabledOrBusyReason}
           >

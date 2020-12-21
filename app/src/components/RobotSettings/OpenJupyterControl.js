@@ -9,6 +9,8 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING_3,
+  SPACING_4,
+  SIZE_4,
 } from '@opentrons/components'
 import { useTrackEvent } from '../../analytics'
 import { LabeledValue } from '../structure'
@@ -53,7 +55,8 @@ export function OpenJupyterControl(props: OpenJupyterControlProps): React.Node {
         onClick={() => trackEvent(EVENT_JUPYTER_OPEN)}
         as={Link}
         href={href}
-        width="9rem"
+        minWidth={SIZE_4}
+        marginLeft={SPACING_4}
         external
       >
         {t('shared:open')}
