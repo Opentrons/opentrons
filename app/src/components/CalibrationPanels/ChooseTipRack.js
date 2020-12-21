@@ -1,17 +1,17 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { head } from 'lodash'
 import isEqual from 'lodash/isEqual'
 
 import {
+  AlertItem,
   ALIGN_FLEX_START,
   BORDER_SOLID_MEDIUM,
   Box,
-  DISPLAY_INLINE,
   DIRECTION_COLUMN,
   Flex,
   FONT_HEADER_DARK,
-  FONT_SIZE_BODY_1,
   FONT_SIZE_BODY_2,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
@@ -31,20 +31,18 @@ import {
 import * as Sessions from '../../sessions'
 import { NeedHelpLink } from './NeedHelpLink'
 import { ChosenTipRackRender } from './ChosenTipRackRender'
-import { getLatestLabwareDef } from '../../getLabware'
 import { getCustomTipRackDefinitions } from '../../custom-labware'
 import { getAttachedPipettes } from '../../pipettes'
+import { getTipLengthCalibrations } from '../../calibration/tip-length/'
 import { getLabwareDefURI } from '@opentrons/shared-data'
+import { findLabwareDefWithCustom } from '../../findLabware'
+import styles from './styles.css'
 
-import type { Intent } from './types'
-import type { AttachedPipette } from '../../pipettes/types'
+import type { TipRackMap } from './ChosenTipRackRender'
 import type { SessionType, CalibrationLabware } from '../../sessions/types'
 import type { State } from '../../types'
 import type { SelectOptionOrGroup, SelectOption } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import styles from './styles.css'
-import { INTENT_PIPETTE_OFFSET } from './constants'
-import { findLabwareDefWithCustom } from '../../findLabware'
 
 const HEADER = 'choose tip rack'
 const INTRO = 'Choose what tip rack you would like to use to calibrate your'
@@ -54,13 +52,12 @@ const DECK_CAL_INTRO_FRAGMENT = 'Deck'
 const PROMPT =
   'Want to use a tip rack that is not listed here? Go to More > Custom Labware to add labware.'
 
-const CALIBRATED_LABEL = 'calibrated'
-const NOT_YET_CALIBRATED_LABEL = 'not yet calibrated'
-
 const SELECT_TIP_RACK = 'select tip rack'
-const NOTE_HEADER = 'Please note:'
-const NOTE_BODY =
-  'Opentrons cannot guarantee accuracy with third party tip racks.'
+const ALERT_TEXT =
+  'Opentrons recommends using Opentrons tip racks and cannot guarantee accuracy with non-Opentrons tip racks.'
+
+const OPENTRONS_LABEL = 'opentrons'
+const CUSTOM_LABEL = 'custom'
 const USE_THIS_TIP_RACK = 'use this tip rack'
 
 const introContentByType: SessionType => string = sessionType => {
@@ -77,7 +74,7 @@ const introContentByType: SessionType => string = sessionType => {
 function getLabwareDefinitionFromUri(
   uri: string,
   customTipRacks: Array<LabwareDefinition2>
-) {
+): LabwareDefinition2 | null {
   const [namespace, loadName, version] = uri.split('/')
   const labwareDef = findLabwareDefWithCustom(
     namespace,
@@ -88,71 +85,89 @@ function getLabwareDefinitionFromUri(
   return labwareDef
 }
 
-function formatOptionsFromLabwareDef(lw: LabwareDefinition2) {
+function formatOptionsFromLabwareDef(lw: LabwareDefinition2): SelectOption {
   return {
-    label: lw.metadata.displayName,
     value: getLabwareDefURI(lw),
-  }
-}
-
-function getOptionsByIntent(
-  tipRackOptions: array<SelectOptionOrGroup>,
-  intent: ?Intent
-) {
-  switch (intent) {
-    case INTENT_PIPETTE_OFFSET: {
-      // TODO: find out which tiprack has been calbirated using lodash.partition
-      return [
-        { label: CALIBRATED_LABEL, options: [] },
-        { label: NOT_YET_CALIBRATED_LABEL, options: tipRackOptions },
-      ]
-    }
-    default:
-      return tipRackOptions
+    label: lw.metadata.displayName,
   }
 }
 
 type ChooseTipRackProps = {|
   tipRack: CalibrationLabware,
+  mount: string,
   sessionType: SessionType,
   chosenTipRack: LabwareDefinition2 | null,
-  handleChosenTipRack: (arg: LabwareDefinition2) => mixed,
+  handleChosenTipRack: (arg: LabwareDefinition2 | null) => mixed,
   closeModal: () => mixed,
-  intent?: Intent,
+  robotName?: string | null,
 |}
 
 export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
   const {
     tipRack,
+    mount,
     sessionType,
     chosenTipRack,
     handleChosenTipRack,
     closeModal,
-    intent,
+    robotName,
   } = props
 
+  const pipSerial = useSelector(
+    (state: State) =>
+      robotName && getAttachedPipettes(state, robotName)[mount].id
+  )
+
+  const allTipLengthCal = useSelector((state: State) =>
+    robotName ? getTipLengthCalibrations(state, robotName) : []
+  )
   const customTipRacks = useSelector(getCustomTipRackDefinitions)
 
-  const opentronsTipRacks = [
+  const opentronsTipRacks: Array<LabwareDefinition2> = [
     'opentrons/opentrons_96_tiprack_10ul/1',
     'opentrons/opentrons_96_tiprack_20ul/1',
     'opentrons/opentrons_96_tiprack_300ul/1',
-  ].map(tr => getLabwareDefinitionFromUri(tr, customTipRacks)) // THIS IS WHAT WE WILL BE GETTING FROM THE SESSION
+  ].reduce((acc, tr) => {
+    const def = getLabwareDefinitionFromUri(tr, customTipRacks)
+    if (def) {
+      acc.push(def)
+    }
+    return acc
+  }, []) // TODO: Actually get the default tipracks from user flow
 
   const allTipRackDefs = opentronsTipRacks.concat(customTipRacks)
-
-  const allTipRackOptions = allTipRackDefs.map(
-    lw => lw && formatOptionsFromLabwareDef(lw)
-  )
-
-  const tipRackByUriMap = allTipRackDefs.reduce((obj, lw) => {
+  const tipRackByUriMap: TipRackMap = allTipRackDefs.reduce((obj, lw) => {
     if (lw) {
-      obj[getLabwareDefURI(lw)] = lw
+      obj[getLabwareDefURI(lw)] = {
+        definition: lw,
+        calibration:
+          head(
+            allTipLengthCal.filter(
+              cal =>
+                cal.pipette === pipSerial && cal.uri === getLabwareDefURI(lw)
+            )
+          ) || null,
+      }
     }
     return obj
   }, {})
 
-  const groupOptions = getOptionsByIntent(allTipRackOptions, intent)
+  const opentronsTipRacksOptions: Array<SelectOption> = opentronsTipRacks.map(
+    lw => formatOptionsFromLabwareDef(lw)
+  )
+  const customTipRacksOptions: Array<SelectOption> = customTipRacks.map(lw =>
+    formatOptionsFromLabwareDef(lw)
+  )
+  const groupOptions = [
+    {
+      label: OPENTRONS_LABEL,
+      options: opentronsTipRacksOptions,
+    },
+    {
+      label: CUSTOM_LABEL,
+      options: customTipRacksOptions,
+    },
+  ]
 
   const [selectedValue, setSelectedValue] = React.useState<SelectOption>(
     formatOptionsFromLabwareDef(tipRack.definition)
@@ -163,9 +178,8 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
   }
   const handleUseTipRack = () => {
     const selectedTipRack = tipRackByUriMap[selectedValue.value]
-    console.log(selectedTipRack)
-    if (!isEqual(chosenTipRack, selectedTipRack)) {
-      handleChosenTipRack(selectedTipRack)
+    if (!isEqual(chosenTipRack, selectedTipRack.definition)) {
+      handleChosenTipRack(selectedTipRack.definition)
     }
     closeModal()
   }
@@ -191,13 +205,16 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
         </Text>
         <NeedHelpLink />
       </Flex>
-      <Box marginBottom={SPACING_4}>
+      <Box marginBottom={SPACING_3}>
         <Text marginBottom={SPACING_3}>{introText}</Text>
         <Text>{PROMPT}</Text>
       </Box>
+      <Flex marginBottom={SPACING_4}>
+        <AlertItem type="warning" title={ALERT_TEXT} />
+      </Flex>
       <Flex
         width="80%"
-        marginBottom={SPACING_2}
+        marginBottom={SPACING_4}
         justifyContent={JUSTIFY_CENTER}
         flexDirection={DIRECTION_COLUMN}
         alignSelf={ALIGN_CENTER}
@@ -227,25 +244,14 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
           <Box width="45%" height="100%">
             <ChosenTipRackRender
               selectedValue={selectedValue}
-              intent={intent}
+              tipRackByUriMap={tipRackByUriMap}
             />
           </Box>
-        </Flex>
-        <Flex marginBottom={SPACING_4} fontSize={FONT_SIZE_BODY_1}>
-          <Text
-            display={DISPLAY_INLINE}
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-          >
-            {NOTE_HEADER}
-          </Text>
-          &nbsp;
-          <Text>{NOTE_BODY}</Text>
         </Flex>
       </Flex>
       <PrimaryBtn
         alignSelf={ALIGN_CENTER}
-        width="50%"
+        width="60%"
         onClick={handleUseTipRack}
       >
         {USE_THIS_TIP_RACK}

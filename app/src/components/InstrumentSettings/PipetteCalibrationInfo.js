@@ -144,7 +144,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
           shouldRecalibrateTipLength: !keepTipLength,
         },
         withIntent: keepTipLength
-          ? INTENT_CALIBRATE_PIPETTE_OFFSET
+          ? INTENT_RECALIBRATE_PIPETTE_OFFSET
           : INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
       })
       setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)

@@ -18,28 +18,37 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 import { labwareImages } from './labwareImages'
+import { formatLastModified } from './utils'
 
-import type { Intent } from './types'
-import { INTENT_PIPETTE_OFFSET } from './constants'
 import type { SelectOption } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { TipLengthCalibration } from '../../calibration/api-types'
 
 const TIP_LENGTH_CALIBRATED_PROMPT = 'Calibrated on'
 const TIP_LENGTH_UNCALIBRATED_PROMPT =
   'Not yet calibrated. You will calibrate this tip length before proceeding to Pipette Offset Calibration.'
 
+type TipRackInfo = {|
+  definition: LabwareDefinition2,
+  calibration: TipLengthCalibration | null,
+|}
+
+export type TipRackMap = $Shape<{|
+  [uri: string]: TipRackInfo,
+|}>
+
 export type ChosenTipRackRenderProps = {|
   selectedValue: SelectOption,
-  intent?: Intent,
+  tipRackByUriMap: TipRackMap,
 |}
 
 export function ChosenTipRackRender(
   props: ChosenTipRackRenderProps
 ): React.Node {
-  const { selectedValue, intent } = props
+  const { selectedValue, tipRackByUriMap } = props
   const loadName = selectedValue.value.split('/')[1]
   const displayName = selectedValue.label
-  const showCalibration = intent === INTENT_PIPETTE_OFFSET
-  const calibrationData = false // get tip length data
+  const calibrationData = tipRackByUriMap[selectedValue.value].calibration
 
   const imageSrc =
     loadName in labwareImages
@@ -57,8 +66,8 @@ export function ChosenTipRackRender(
     >
       <img
         css={css`
-          max-width: 50%;
-          max-height: 80%;
+          max-width: 8rem;
+          max-height: 6rem;
           flex: 0 1 5rem;
           display: block;
           margin-bottom: 1rem;
@@ -75,10 +84,11 @@ export function ChosenTipRackRender(
           fontStyle={FONT_STYLE_ITALIC}
           textAlign={TEXT_ALIGN_CENTER}
         >
-          {showCalibration &&
-            (calibrationData
-              ? TIP_LENGTH_CALIBRATED_PROMPT
-              : TIP_LENGTH_UNCALIBRATED_PROMPT)}
+          {calibrationData
+            ? `${TIP_LENGTH_CALIBRATED_PROMPT} ${formatLastModified(
+                calibrationData.lastModified
+              )}`
+            : TIP_LENGTH_UNCALIBRATED_PROMPT}
         </Text>
       </Box>
     </Flex>

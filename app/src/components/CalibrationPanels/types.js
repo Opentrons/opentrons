@@ -65,4 +65,5 @@ export type CalibrationPanelProps = {|
   comparisonsByPipette?: CalibrationCheckComparisonByPipette | null,
   activePipette?: CalibrationCheckInstrument,
   intent?: Intent,
+  robotName?: string | null,
 |}
