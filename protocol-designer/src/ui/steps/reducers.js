@@ -87,7 +87,6 @@ export type SelectableItem =
   | TerminalItem
 
 type SelectedItemState = ?SelectableItem
-type MultiSelectedItemsState = Array<StepIdType>
 
 export type HoverableItem = SingleSelectedItem | TerminalItem
 
