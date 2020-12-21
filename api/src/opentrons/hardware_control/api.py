@@ -61,7 +61,7 @@ class API(HardwareAPILike):
     def __init__(self,
                  backend: Union[Controller, Simulator],
                  loop: asyncio.AbstractEventLoop,
-                 config: RobotConfig = None
+                 config: RobotConfig
                  ) -> None:
         """ Initialize an API instance.
 
@@ -70,7 +70,7 @@ class API(HardwareAPILike):
         build_hardware_simulator should be used.
         """
         self._log = self.CLS_LOG.getChild(str(id(self)))
-        self._config = config or robot_configs.load()
+        self._config = config
         self._backend = backend
         self._loop = loop
         self._execution_manager = ExecutionManager(loop=loop)
@@ -148,8 +148,8 @@ class API(HardwareAPILike):
                      :py:meth:`asyncio.get_event_loop`.
         """
         checked_loop = use_or_initialize_loop(loop)
-        backend = Controller(config)
-        await backend.setup_gpio_chardev()
+        checked_config = config or robot_configs.load()
+        backend = await Controller.build(checked_config)
         backend.set_lights(button=None, rails=False)
 
         async def blink():
@@ -181,7 +181,7 @@ class API(HardwareAPILike):
                 mod_log.error(msg)
                 raise RuntimeError(msg)
 
-            api_instance = cls(backend, loop=checked_loop, config=config)
+            api_instance = cls(backend, loop=checked_loop, config=checked_config)
             await api_instance.cache_instruments()
             checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
@@ -214,13 +214,14 @@ class API(HardwareAPILike):
             attached_modules = []
 
         checked_loop = use_or_initialize_loop(loop)
+        checked_config = config or robot_configs.load()
 
-        backend = Simulator(attached_instruments,
-                            attached_modules,
-                            config, checked_loop,
-                            strict_attached_instruments)
-        await backend.setup_gpio_chardev()
-        api_instance = cls(backend, loop=checked_loop, config=config)
+        backend = await Simulator.build(
+            attached_instruments,
+            attached_modules,
+            checked_config, checked_loop,
+            strict_attached_instruments)
+        api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance.cache_instruments()
         await backend.watch_modules(
                 register_modules=api_instance.register_modules)
