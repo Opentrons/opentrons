@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import UAParser from 'ua-parser-js'
 import { useConditionalConfirm } from '@opentrons/components'
 
 import { selectors as uiLabwareSelectors } from '../ui/labware'
@@ -35,6 +36,11 @@ type Props = {|
   onStepContextMenu?: () => mixed,
 |}
 
+const nonePressed = (keysPressed: Array<boolean>): boolean =>
+  keysPressed.every(keyPress => keyPress === false)
+
+const getUserOS = () => new UAParser().getOS().name
+
 export const ConnectedStepItem = (props: Props): React.Node => {
   const { stepId, stepNumber } = props
 
@@ -60,7 +66,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const selectedStepId = useSelector(getSelectedStepId)
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
-  const selected = multiSelectItemIds.length
+  const selected: boolean = multiSelectItemIds?.length
     ? multiSelectItemIds.includes(stepId)
     : selectedStepId === stepId
 
@@ -85,49 +91,63 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const highlightSubstep = (payload: SubstepIdentifier) =>
     dispatch(stepsActions.hoverOnSubstep(payload))
   const selectStep = () => dispatch(stepsActions.selectStep(stepId))
-  const selectMultipleSteps = (steps: Array<StepIdType>) =>
-    dispatch(stepsActions.selectMultipleSteps(steps))
+  const selectMultipleSteps = (
+    steps: Array<StepIdType>,
+    lastSelected: StepIdType
+  ) => dispatch(stepsActions.selectMultipleSteps(steps, lastSelected))
   const toggleStepCollapsed = () =>
     dispatch(stepsActions.toggleStepCollapsed(stepId))
   const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
 
-  const handleStepItemSelection = (e: SyntheticMouseEvent<>) => {
+  const handleStepItemSelection = (e: SyntheticMouseEvent<>): void => {
+    const isMac: boolean = getUserOS() === 'Mac OS'
     const isShiftKeyPressed: boolean = e.shiftKey
-    const isMetaKeyPressed: boolean = e.metaKey
+    const isMetaKeyPressed: boolean =
+      (isMac && e.metaKey) || (!isMac && e.ctrlKey)
+
     let stepsToSelect: Array<StepIdType> = []
 
-    if (isBatchEditEnabled) {
-      if (isShiftKeyPressed) {
-        if (selectedStepId) {
-          const startIndex: number = orderedStepIds.indexOf(selectedStepId)
-          const endIndex: number = stepNumber
-          stepsToSelect = orderedStepIds.slice(startIndex, endIndex)
-        } else {
-          stepsToSelect = [stepId]
-        }
-      } else if (isMetaKeyPressed) {
-        // have to explicitly check whether the step is truly selected because
-        // getSelectedStepId might return the last item in saved step forms
-        // regardless of whether or not it is actually "selected"
-        if (multiSelectItemIds.length) {
-          stepsToSelect = multiSelectItemIds.includes(stepId)
-            ? multiSelectItemIds.filter(id => id !== stepId)
-            : [...multiSelectItemIds, stepId]
-        } else if (selectedStepId) {
-          stepsToSelect = [selectedStepId, stepId]
-        } else {
-          stepsToSelect = [stepId]
-        }
-      }
-      if (stepsToSelect.length) {
-        selectMultipleSteps(stepsToSelect)
+    if (nonePressed([isShiftKeyPressed, isMetaKeyPressed])) {
+      if (multiSelectItemIds?.length) {
+        stepsToSelect = multiSelectItemIds.includes(stepId)
+          ? multiSelectItemIds.filter(id => id !== stepId)
+          : [...multiSelectItemIds, stepId]
+        stepsToSelect.length && selectMultipleSteps(stepsToSelect, stepId)
       } else {
         selectStep()
       }
-    } else {
-      // if batch edit is not enabled, always just select one step
-      selectStep()
+      return
+    }
+
+    if (isBatchEditEnabled) {
+      if ((isMetaKeyPressed || isShiftKeyPressed) && currentFormIsPresaved) {
+        // current form is presaved, enter batch edit mode with only the selected step
+        stepsToSelect = [stepId]
+      } else {
+        if (isShiftKeyPressed) {
+          if (selectedStepId) {
+            const startIndex: number = orderedStepIds.indexOf(selectedStepId)
+            const endIndex: number = orderedStepIds.indexOf(stepId)
+            stepsToSelect = orderedStepIds.slice(startIndex, endIndex + 1)
+          } else {
+            stepsToSelect = [stepId]
+          }
+        } else if (isMetaKeyPressed) {
+          if (multiSelectItemIds?.length) {
+            stepsToSelect = multiSelectItemIds.includes(stepId)
+              ? multiSelectItemIds.filter(id => id !== stepId)
+              : [...multiSelectItemIds, stepId]
+          } else if (selectedStepId) {
+            stepsToSelect = [selectedStepId, stepId]
+          } else {
+            stepsToSelect = [stepId]
+          }
+        }
+      }
+      if (stepsToSelect.length) {
+        selectMultipleSteps(stepsToSelect, stepId)
+      }
     }
   }
 
