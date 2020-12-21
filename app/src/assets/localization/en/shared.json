@@ -1,0 +1,17 @@
+{
+  "browse": "browse",
+  "cancel": "cancel",
+  "continue": "continue",
+  "disabled_cannot_connect": "Cannot connect to robot",
+  "disabled_connect_to_robot": "Connect to robot to control",
+  "disabled_no_pipette_attached": "Attach a pipette to proceed",
+  "disabled_protocol_is_running": "Protocol is running",
+  "ending": "ending",
+  "exit": "exit",
+  "ok": "ok",
+  "open": "open",
+  "refresh_list": "refresh list",
+  "starting": "starting",
+  "try_again": "try again",
+  "unknown": "unknown"
+}

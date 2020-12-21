@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Link as RRDLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 import type { State } from '../../types'
 import * as Pipettes from '../../pipettes'
@@ -24,12 +25,6 @@ import type { ViewableRobot } from '../../discovery/types'
 
 import { PipetteOffsetItem } from './PipetteOffsetItem'
 
-const TITLE = 'Attached Pipette Calibrations'
-const DESCRIPTION =
-  'Calibrate the position for the the default tip and pipette combination.'
-
-const BUTTON_TEXT = 'Manage Pipettes'
-
 type Props = {|
   pipettesPageUrl: string,
   robot: ViewableRobot,
@@ -39,6 +34,7 @@ export function PipetteOffsets(props: Props): React.Node {
   const { pipettesPageUrl, robot } = props
   const { name: robotName } = robot
 
+  const { t } = useTranslation('robot_calibration')
   const attachedPipettes = useSelector((state: State) => {
     return Pipettes.getAttachedPipettes(state, robotName)
   })
@@ -55,11 +51,11 @@ export function PipetteOffsets(props: Props): React.Node {
     <TitledControl
       padding={SPACING_3}
       borderBottom={BORDER_SOLID_LIGHT}
-      title={TITLE}
-      description={DESCRIPTION}
+      title={t('attached_pipettes')}
+      description={t('pipette_offset_description')}
       control={
         <SecondaryBtn as={RRDLink} to={pipettesPageUrl}>
-          {BUTTON_TEXT}
+          {t('manage_pipettes')}
         </SecondaryBtn>
       }
     >
@@ -70,13 +66,13 @@ export function PipetteOffsets(props: Props): React.Node {
       >
         <Flex width={'100%'} paddingTop={SPACING_4}>
           <PipetteOffsetItem
-            mount={'left'}
+            mount="left"
             pipette={attachedPipettes.left}
             calibration={pipetteCalibrations.left}
             customLabware={customLabwareDefs}
           />
           <PipetteOffsetItem
-            mount={'right'}
+            mount="right"
             pipette={attachedPipettes.right}
             calibration={pipetteCalibrations.right}
             customLabware={customLabwareDefs}

@@ -1,12 +1,13 @@
 // @flow
 
 import * as React from 'react'
-import * as Enzyme from 'enzyme'
+import { mountWithProviders } from '@opentrons/components/__utils__'
 import type {
   PipetteModelSpecs,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
+import { i18n } from '../../../i18n'
 import { PipetteOffsetItem } from '../PipetteOffsetItem'
 import { InlineCalibrationWarning } from '../../InlineCalibrationWarning'
 import { findLabwareDefWithCustom } from '../../../findLabware'
@@ -95,19 +96,20 @@ describe('PipetteOffsetItem', () => {
         },
         customLabware = [],
       } = props
-      return Enzyme.mount(
+      return mountWithProviders(
         <PipetteOffsetItem
           mount={mount}
           pipette={pipette}
           calibration={calibration}
           customLabware={customLabware}
-        />
+        />,
+        { i18n: i18n }
       )
     }
   })
 
   it('renders acceptably when talking to a robot with cal data but no status', () => {
-    const wrapper = render({
+    const { wrapper } = render({
       calibration: {
         offset: ({
           pipette: 'pipette-id-11',
@@ -133,14 +135,14 @@ describe('PipetteOffsetItem', () => {
   })
 
   it('shows null when no pipette present', () => {
-    const wrapper = render({ pipette: null })
+    const { wrapper } = render({ pipette: null })
     expect(getMountLabel(wrapper).text()).toEqual('left mount')
     expect(getCalibrationText(wrapper).text()).toMatch(/no pipette attached/i)
     expect(getCalibrationWarning(wrapper).exists()).toBe(false)
   })
 
   it('says when you havent calibrated', () => {
-    const wrapper = render({ calibration: null })
+    const { wrapper } = render({ calibration: null })
     expect(getMountLabel(wrapper).text()).toEqual('left mount')
     expect(getNotCalibrated(wrapper).text()).toMatch(/calibration required/i)
     expect(getCalibrationWarning(wrapper).exists()).toBe(true)
@@ -152,7 +154,7 @@ describe('PipetteOffsetItem', () => {
     )
     mockGetLabwareDisplayName.mockReturnValue('Opentrons 96 Tiprack 300 fancy')
 
-    const wrapper = render()
+    const { wrapper } = render()
     expect(mockFindLabwareDefWithCustom).toHaveBeenCalledWith(
       'opentrons',
       'opentrons_96_tiprack_300ul',
@@ -177,7 +179,7 @@ describe('PipetteOffsetItem', () => {
     )
     mockGetLabwareDisplayName.mockReturnValue('Opentrons 96 Tiprack 300 fancy')
 
-    const wrapper = render({
+    const { wrapper } = render({
       calibration: {
         offset: {
           pipette: 'pipette-id-11',
@@ -219,7 +221,7 @@ describe('PipetteOffsetItem', () => {
     )
     mockGetLabwareDisplayName.mockReturnValue('Opentrons 96 Tiprack 300 fancy')
 
-    const wrapper = render({
+    const { wrapper } = render({
       calibration: {
         offset: {
           pipette: 'pipette-id-11',

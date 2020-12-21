@@ -4,6 +4,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { saveAs } from 'file-saver'
+import { Trans, useTranslation } from 'react-i18next'
 
 import type { Dispatch, State } from '../../types'
 import * as Calibration from '../../calibration'
@@ -24,7 +25,6 @@ import {
   Card,
   Box,
   BORDER_SOLID_LIGHT,
-  DISPLAY_INLINE,
   ALIGN_BASELINE,
   FONT_SIZE_BODY_1,
   Link,
@@ -39,13 +39,6 @@ import {
   C_BLUE,
 } from '@opentrons/components'
 
-import {
-  DECK_CAL_STATUS_POLL_INTERVAL,
-  DISABLED_CANNOT_CONNECT,
-  DISABLED_CONNECT_TO_ROBOT,
-  DISABLED_PROTOCOL_IS_RUNNING,
-  DISABLED_NO_PIPETTE_ATTACHED,
-} from './constants'
 import { DeckCalibrationControl } from './DeckCalibrationControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
 import { PipetteOffsets } from './PipetteOffsets'
@@ -55,14 +48,7 @@ type Props = {|
   pipettesPageUrl: string,
 |}
 
-const EVENT_CALIBRATION_DOWNLOADED = 'calibrationDataDownloaded'
-const TITLE = 'Robot Calibration'
-
-const DOWNLOAD_CALIBRATION = 'Download your calibration data'
-const CAL_EXPLANATION =
-  'Your OT-2 moves pipettes around in 3D space based on its calibration.'
-const LEARN_MORE = 'Learn more'
-const CAL_EXPLANATION_SUFFIX = 'about how calibration works on the OT-2.'
+const DECK_CAL_STATUS_POLL_INTERVAL = 10000
 const CAL_ARTICLE_URL =
   'https://support.opentrons.com/en/articles/3499692-how-calibration-works-on-the-ot-2'
 
@@ -85,6 +71,7 @@ export function CalibrationCard(props: Props): React.Node {
   const { name: robotName, status } = robot
   const notConnectable = status !== CONNECTABLE
 
+  const { t } = useTranslation(['robot_calibration', 'shared'])
   const dispatch = useDispatch<Dispatch>()
 
   // Poll deck cal status data
@@ -136,18 +123,21 @@ export function CalibrationCard(props: Props): React.Node {
 
   let buttonDisabledReason = null
   if (notConnectable) {
-    buttonDisabledReason = DISABLED_CANNOT_CONNECT
+    buttonDisabledReason = t('shared:disabled_cannot_connect')
   } else if (!robot.connected) {
-    buttonDisabledReason = DISABLED_CONNECT_TO_ROBOT
+    buttonDisabledReason = t('shared:disabled_connect_to_robot')
   } else if (isRunning) {
-    buttonDisabledReason = DISABLED_PROTOCOL_IS_RUNNING
+    buttonDisabledReason = t('shared:disabled_protocol_is_running')
   } else if (!pipettePresent) {
-    buttonDisabledReason = DISABLED_NO_PIPETTE_ATTACHED
+    buttonDisabledReason = t('shared:disabled_no_pipette_attached')
   }
 
   const onClickSaveAs = e => {
     e.preventDefault()
-    doTrackEvent({ name: EVENT_CALIBRATION_DOWNLOADED, properties: {} })
+    doTrackEvent({
+      name: Calibration.EVENT_CALIBRATION_DOWNLOADED,
+      properties: {},
+    })
     saveAs(
       new Blob([
         JSON.stringify({
@@ -185,7 +175,7 @@ export function CalibrationCard(props: Props): React.Node {
           paddingTop={SPACING_3}
           paddingX={SPACING_3}
         >
-          {TITLE}
+          {t('title')}
         </Text>
         <Link
           href="#"
@@ -195,7 +185,7 @@ export function CalibrationCard(props: Props): React.Node {
           fontSize={FONT_SIZE_BODY_1}
           onClick={onClickSaveAs}
         >
-          {DOWNLOAD_CALIBRATION}
+          {t('download_calibration')}
         </Link>
       </Flex>
       <Box
@@ -203,18 +193,15 @@ export function CalibrationCard(props: Props): React.Node {
         fontSize={FONT_SIZE_BODY_1}
         padding={SPACING_3}
       >
-        <Text display={DISPLAY_INLINE}>{CAL_EXPLANATION}</Text>
-        &nbsp;
-        <Link
-          color={C_BLUE}
-          display={DISPLAY_INLINE}
-          external
-          href={CAL_ARTICLE_URL}
-        >
-          {LEARN_MORE}
-        </Link>
-        &nbsp;
-        <Text display={DISPLAY_INLINE}>{CAL_EXPLANATION_SUFFIX}</Text>
+        <Text>
+          <Trans
+            t={t}
+            i18nKey="definition"
+            components={{
+              a: <Link color={C_BLUE} external href={CAL_ARTICLE_URL} />,
+            }}
+          />
+        </Text>
       </Box>
       <DeckCalibrationControl
         robotName={robotName}

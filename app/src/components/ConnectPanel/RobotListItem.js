@@ -2,6 +2,7 @@
 // presentational component for an item in a RobotList
 import * as React from 'react'
 import { NotificationIcon, Icon, ToggleButton } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 import { RobotLink } from './RobotLink'
 import styles from './styles.css'
@@ -28,6 +29,7 @@ export function RobotListItem(props: RobotListItemProps): React.Node {
     isConnected,
     onToggleConnect,
   } = props
+  const { t } = useTranslation('top_navigation')
 
   return (
     <li className={styles.robot_group}>
@@ -53,7 +55,7 @@ export function RobotListItem(props: RobotListItemProps): React.Node {
           url={`/robots/${name}/instruments`}
           className={styles.instrument_item}
         >
-          <p className={styles.link_text}>Pipettes & Modules</p>
+          <p className={styles.link_text}>{t('pipettes_and_modules')}</p>
           <Icon name="chevron-right" className={styles.robot_item_icon} />
         </RobotLink>
       )}

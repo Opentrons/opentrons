@@ -3,13 +3,15 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
-import { mountWithStore } from '@opentrons/components/__utils__'
-import { LabeledValue, SecondaryBtn, Tooltip } from '@opentrons/components'
+import { mountWithProviders } from '@opentrons/components/__utils__'
+import { SecondaryBtn, Tooltip } from '@opentrons/components'
+import { i18n } from '../../../i18n'
 
 import * as Buildroot from '../../../buildroot'
 import * as Discovery from '../../../discovery'
 import { mockConnectableRobot } from '../../../discovery/__fixtures__'
 import { checkShellUpdate } from '../../../shell'
+import { LabeledValue } from '../../structure'
 import { InformationCard } from '../InformationCard'
 
 import type { State } from '../../../types'
@@ -49,8 +51,9 @@ const MOCK_MAX_PAPI_VERSION = '2.8'
 describe('InformationCard', () => {
   const render = (robot = mockConnectableRobot) => {
     const updateUrl = `/robots/${robot.name}/update`
-    return mountWithStore(
-      <InformationCard robot={robot} updateUrl={updateUrl} />
+    return mountWithProviders(
+      <InformationCard robot={robot} updateUrl={updateUrl} />,
+      { i18n }
     )
   }
 
@@ -89,7 +92,7 @@ describe('InformationCard', () => {
 
     const labeledValue = wrapper
       .find(LabeledValue)
-      .filter('[label="Robot name"]')
+      .filter('[label="robot name:"]')
 
     expect(labeledValue.prop('value')).toBe(mockConnectableRobot.displayName)
   })
@@ -99,7 +102,7 @@ describe('InformationCard', () => {
 
     const labeledValue = wrapper
       .find(LabeledValue)
-      .filter('[label="Server version"]')
+      .filter('[label="server version:"]')
 
     expect(getRobotApiVersion).toHaveBeenCalledWith(mockConnectableRobot)
     expect(labeledValue.prop('value')).toBe(MOCK_ROBOT_VERSION)
@@ -111,9 +114,9 @@ describe('InformationCard', () => {
     const { wrapper } = render()
     const labeledValue = wrapper
       .find(LabeledValue)
-      .filter('[label="Server version"]')
+      .filter('[label="server version:"]')
 
-    expect(labeledValue.prop('value')).toBe('Unknown')
+    expect(labeledValue.prop('value')).toBe('unknown')
   })
 
   it('should show the motor controller firmware version in a LabeledValue', () => {
@@ -121,7 +124,7 @@ describe('InformationCard', () => {
 
     const labeledValue = wrapper
       .find(LabeledValue)
-      .filter('[label="Firmware version"]')
+      .filter('[label="firmware version:"]')
 
     expect(getRobotFirmwareVersion).toHaveBeenCalledWith(mockConnectableRobot)
     expect(labeledValue.prop('value')).toBe(MOCK_FIRMWARE_VERSION)
@@ -133,9 +136,9 @@ describe('InformationCard', () => {
     const { wrapper } = render()
     const labeledValue = wrapper
       .find(LabeledValue)
-      .filter('[label="Firmware version"]')
+      .filter('[label="firmware version:"]')
 
-    expect(labeledValue.prop('value')).toBe('Unknown')
+    expect(labeledValue.prop('value')).toBe('unknown')
   })
 
   it('should show the protocol API versions in a LabeledValue', () => {
@@ -143,13 +146,13 @@ describe('InformationCard', () => {
 
     const labeledValue = wrapper
       .find(LabeledValue)
-      .filter('[label="Supported Protocol API Versions"]')
+      .filter('[label="supported protocol API versions:"]')
 
     expect(getRobotProtocolApiVersion).toHaveBeenCalledWith(
       mockConnectableRobot
     )
     expect(labeledValue.prop('value')).toBe(
-      `Min: ${MOCK_MIN_PAPI_VERSION},  Max: ${MOCK_MAX_PAPI_VERSION}`
+      `min: ${MOCK_MIN_PAPI_VERSION},  max: ${MOCK_MAX_PAPI_VERSION}`
     )
   })
 
@@ -159,9 +162,9 @@ describe('InformationCard', () => {
     const { wrapper } = render()
     const labeledValue = wrapper
       .find(LabeledValue)
-      .filter('[label="Supported Protocol API Versions"]')
+      .filter('[label="supported protocol API versions:"]')
 
-    expect(labeledValue.prop('value')).toBe('Min: Unknown,  Max: Unknown')
+    expect(labeledValue.prop('value')).toBe('min: unknown,  max: unknown')
   })
 
   it('should have a link to the update page if an update is available', () => {

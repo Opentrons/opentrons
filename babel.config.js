@@ -37,7 +37,7 @@ module.exports = {
       plugins: [['react-hot-loader/babel', false]],
       presets: [['@babel/preset-env', { targets: { node: '8' } }]],
     },
-    // app that should be polyfilled
+    // apps that should be polyfilled
     // these projects require `core-js` in their package.json `dependencies`
     {
       test: ['app/**/*', 'labware-library/**/*', 'protocol-designer/**/*'],

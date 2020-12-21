@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
@@ -44,19 +45,12 @@ type Props = {|
   customLabware: Array<LabwareDefinition2>,
 |}
 
-const NO_PIPETTE = 'No pipette attached'
-const LAST_CALIBRATED = 'Last calibrated'
-const UNKNOWN_CUSTOM_LABWARE = 'unknown custom tiprack'
-const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
-const TIP_LENGTH_CALIBRATION = 'tip length calibration'
-const SERIAL_NUMBER = 'Serial number'
-const TIP_LENGTH_NOT_DISPLAYED =
-  'Calibrate your pipette to see saved tip length'
-
-function getDisplayNameForTiprack(
+function TipRackDisplayName(props: {|
   tiprackUri: string,
-  customLabware: Array<LabwareDefinition2>
-): string {
+  customLabware: Array<LabwareDefinition2>,
+|}): React.Node {
+  const { t } = useTranslation('robot_calibration')
+  const { tiprackUri, customLabware } = props
   const [namespace, loadName] = tiprackUri ? tiprackUri.split('/') : ['', '']
   const definition = findLabwareDefWithCustom(
     namespace,
@@ -64,21 +58,28 @@ function getDisplayNameForTiprack(
     null,
     customLabware
   )
-  return definition
-    ? getLabwareDisplayName(definition)
-    : `${UNKNOWN_CUSTOM_LABWARE}`
+  return (
+    <Text>
+      {definition
+        ? getLabwareDisplayName(definition)
+        : `${t('unknown_custom_tiprack')}`}
+    </Text>
+  )
 }
 
-function getCalibrationDate(
-  calibration: PipetteOffsetCalibration | TipLengthCalibration
-): React.Node {
+function LastCalibrated(props: {|
+  calibration: PipetteOffsetCalibration | TipLengthCalibration,
+|}): React.Node {
+  const { t } = useTranslation('robot_calibration')
   return (
     <Text
       key={'calibrationDate'}
       fontStyle={FONT_STYLE_ITALIC}
       marginTop={SPACING_1}
     >
-      {`${LAST_CALIBRATED}: ${formatLastModified(calibration.lastModified)}`}
+      {`${t('last_calibrated')}: ${formatLastModified(
+        props.calibration.lastModified
+      )}`}
     </Text>
   )
 }
@@ -89,6 +90,7 @@ type PipetteOffsetSectionProps = {|
 |}
 
 function PipetteOffsetSection(props: PipetteOffsetSectionProps): React.Node {
+  const { t } = useTranslation('robot_calibration')
   const { pipette, calibration } = props
   return (
     <Box key={'pipetteOffset'} marginTop={SPACING_2}>
@@ -97,13 +99,15 @@ function PipetteOffsetSection(props: PipetteOffsetSectionProps): React.Node {
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING_2}
       >
-        {PIPETTE_OFFSET_CALIBRATION}
+        {t('pipette_offset_title')}
       </Text>
       {calibration ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Text key={'displayName'}>{pipette.modelSpecs.displayName}</Text>
-          <Text key={'serialNumber'}>{`${SERIAL_NUMBER}: ${pipette.id}`}</Text>
-          {getCalibrationDate(calibration)}
+          <Text key={'serialNumber'}>{`${t('serial_number')}: ${
+            pipette.id
+          }`}</Text>
+          <LastCalibrated calibration={calibration} />
         </Flex>
       ) : (
         <InlineCalibrationWarning warningType={REQUIRED} />
@@ -119,6 +123,7 @@ type TipLengthSectionProps = {|
 
 export function TipLengthSection(props: TipLengthSectionProps): React.Node {
   const { calibration, customLabware } = props
+  const { t } = useTranslation('robot_calibration')
   return (
     <Box key={'tipLength'} marginTop={SPACING_3}>
       <Text
@@ -126,26 +131,27 @@ export function TipLengthSection(props: TipLengthSectionProps): React.Node {
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING_2}
       >
-        {TIP_LENGTH_CALIBRATION}
+        {t('tip_length')}
       </Text>
       {calibration?.offset && calibration?.tipLength ? (
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <Text key={'tiprackDisplayName'}>
-            {getDisplayNameForTiprack(
-              calibration.offset.tiprackUri,
-              customLabware
-            )}
-          </Text>
-          {calibration?.tipLength && getCalibrationDate(calibration.tipLength)}
+          <TipRackDisplayName
+            tiprackUri={calibration.offset.tiprackUri}
+            customLabware={customLabware}
+          />
+          {calibration?.tipLength && (
+            <LastCalibrated calibration={calibration.tipLength} />
+          )}
         </Flex>
       ) : (
-        <Text fontStyle={FONT_STYLE_ITALIC}>{TIP_LENGTH_NOT_DISPLAYED}</Text>
+        <Text fontStyle={FONT_STYLE_ITALIC}>{t('no_tip_length')}</Text>
       )}
     </Box>
   )
 }
 
 export function PipetteOffsetItem(props: Props): React.Node {
+  const { t } = useTranslation('robot_calibration')
   const { mount, pipette, calibration, customLabware } = props
   return (
     <Box width={'50%'} display={DISPLAY_BLOCK}>
@@ -194,7 +200,7 @@ export function PipetteOffsetItem(props: Props): React.Node {
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
           >
-            <Text fontStyle={FONT_STYLE_ITALIC}>{NO_PIPETTE}</Text>
+            <Text fontStyle={FONT_STYLE_ITALIC}>{t('no_pipette')}</Text>
           </Flex>
         )}
       </Box>

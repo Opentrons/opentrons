@@ -1,10 +1,11 @@
 // @flow
 import * as React from 'react'
+import { mountWithProviders } from '@opentrons/components/__utils__'
 
+import { i18n } from '../../../i18n'
 import * as Sessions from '../../../sessions'
 
 import { Tooltip, PrimaryBtn, SecondaryBtn } from '@opentrons/components'
-import { mountWithStore } from '@opentrons/components/__utils__'
 import { TitledControl } from '../../TitledControl'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 
@@ -33,19 +34,19 @@ const MOCK_STATE: State = ({ mockState: true }: any)
 describe('CheckCalibrationControl', () => {
   const getCalCheckButton = wrapper =>
     wrapper
-      .find('TitledControl[title="Calibration Health Check"]')
+      .find('TitledControl[title="calibration health check"]')
       .find('button')
 
   const render = (
     props: $Shape<React.ElementProps<typeof CheckCalibrationControl>> = {}
   ) => {
     const { robotName = 'robot-name', disabledReason = null } = props
-    return mountWithStore(
+    return mountWithProviders(
       <CheckCalibrationControl
         robotName={robotName}
         disabledReason={disabledReason}
       />,
-      { initialState: MOCK_STATE }
+      { initialState: MOCK_STATE, i18n }
     )
   }
 
@@ -66,11 +67,10 @@ describe('CheckCalibrationControl', () => {
     const titledButton = wrapper.find(TitledControl)
     const button = titledButton.find(SecondaryBtn)
 
-    expect(titledButton.prop('title')).toMatch(/Calibration Health Check/)
+    expect(titledButton.prop('title')).toMatch(/calibration health check/)
     expect(titledButton.html()).toMatch(
       /check the health of the current calibration settings/i
     )
-    expect(button.prop('width')).toBe('12rem')
     expect(button.html()).toMatch(/check health/i)
   })
 

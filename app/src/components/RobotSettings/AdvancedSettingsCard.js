@@ -1,27 +1,34 @@
 // @flow
 // app info card with version and updated
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+import {
+  AlertModal,
+  Card,
+  Icon,
+  Text,
+  Flex,
+  SecondaryBtn,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING_3,
+  SPACING_4,
+  SIZE_2,
+  SIZE_4,
+} from '@opentrons/components'
 
 import {
   fetchSettings,
   updateSetting,
   getRobotSettings,
 } from '../../robot-settings'
-
 import { CONNECTABLE } from '../../discovery'
 import { downloadLogs } from '../../shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../shell/robot-logs/selectors'
 import { Portal } from '../portal'
-import {
-  BORDER_SOLID_LIGHT,
-  AlertModal,
-  Card,
-  LabeledButton,
-  LabeledToggle,
-  Icon,
-} from '@opentrons/components'
+import { LabeledValue, Divider } from '../structure'
+import { ToggleBtn } from '../ToggleBtn'
 
 import { UpdateFromFileControl } from './UpdateFromFileControl'
 import { OpenJupyterControl } from './OpenJupyterControl'
@@ -35,28 +42,13 @@ export type AdvancedSettingsCardProps = {|
   resetUrl: string,
 |}
 
-const TITLE = 'Advanced Settings'
 const ROBOT_LOGS_OPTOUT_ID = 'disableLogAggregation'
-
-const ROBOT_LOGS_OUTOUT_HEADING = 'Robot Logging'
-const ROBOT_LOGS_OPTOUT_MESSAGE = (
-  <>
-    <p>
-      If your OT-2 is connected to the internet, Opentrons will collect logs
-      from your robot to troubleshoot issues and identify error trends.
-    </p>
-    <p>
-      If you would like to disable log collection, please click &quot;Opt
-      out&quot; below.
-    </p>
-  </>
-)
-
 export function AdvancedSettingsCard(
   props: AdvancedSettingsCardProps
 ): React.Node {
   const { robot, resetUrl } = props
   const { name, ip, health, status } = robot
+  const { t } = useTranslation('robot_advanced_settings')
   const settings = useSelector<State, RobotSettings>(state =>
     getRobotSettings(state, name)
   )
@@ -76,59 +68,77 @@ export function AdvancedSettingsCard(
   }, [dispatch, name])
 
   return (
-    <Card title={TITLE}>
-      <LabeledButton
-        label="Download Logs"
-        buttonProps={{
-          children: robotLogsDownloading ? (
+    <Card title={t('title')}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
+        <LabeledValue
+          label={t('download_logs_label')}
+          value={t('download_logs_description')}
+        />
+        <SecondaryBtn
+          disabled={controlsDisabled || !logsAvailable || robotLogsDownloading}
+          onClick={() => dispatch(downloadLogs(robot))}
+          minWidth={SIZE_4}
+          marginLeft={SPACING_4}
+        >
+          {robotLogsDownloading ? (
             <Icon name="ot-spinner" height="1em" spin />
           ) : (
-            'Download'
-          ),
-          disabled: controlsDisabled || !logsAvailable || robotLogsDownloading,
-          onClick: () => dispatch(downloadLogs(robot)),
-        }}
-      >
-        <p>Access logs from this robot.</p>
-      </LabeledButton>
-      <LabeledButton
-        label="Factory Reset"
-        buttonProps={{
-          disabled: controlsDisabled,
-          Component: Link,
-          to: resetUrl,
-          children: 'Reset',
-        }}
-      >
-        <p>Restore robot to factory configuration</p>
-      </LabeledButton>
-      <UpdateFromFileControl
-        robotName={name}
-        borderBottom={BORDER_SOLID_LIGHT}
-      />
-      <OpenJupyterControl robotIp={ip} borderBottom={BORDER_SOLID_LIGHT} />
-      {settings.map(({ id, title, description, value }) => (
-        <LabeledToggle
-          key={id}
-          label={title}
-          toggledOn={value === true}
+            t('download_logs_button')
+          )}
+        </SecondaryBtn>
+      </Flex>
+      <Divider />
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
+        <LabeledValue label={t('reset_label')} value={t('reset_description')} />
+        <SecondaryBtn
           disabled={controlsDisabled}
-          onClick={() => dispatch(updateSetting(name, id, !value))}
+          as={Link}
+          to={resetUrl}
+          minWidth={SIZE_4}
+          marginLeft={SPACING_4}
         >
-          <p>{description}</p>
-        </LabeledToggle>
+          {t('reset_button')}
+        </SecondaryBtn>
+      </Flex>
+      <Divider />
+      <UpdateFromFileControl robotName={name} />
+      <Divider />
+      <OpenJupyterControl robotIp={ip} />
+      {settings.map(({ id, title, description, value }) => (
+        <React.Fragment key={id}>
+          <Divider />
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
+            <LabeledValue label={title} value={description} />
+            <ToggleBtn
+              label={title}
+              onClick={() => dispatch(updateSetting(name, id, !value))}
+              toggledOn={value === true}
+              disabled={controlsDisabled}
+              size={SIZE_2}
+              marginLeft={SPACING_4}
+              flex="0 0 auto"
+            />
+          </Flex>
+        </React.Fragment>
       ))}
       {showLogOptoutModal && (
         <Portal>
           <AlertModal
             alertOverlay
-            heading={ROBOT_LOGS_OUTOUT_HEADING}
+            heading={t('log_opt_out_heading')}
             buttons={[
-              { children: 'Opt out', onClick: () => setLogOptout(true) },
-              { children: 'Sounds Good!', onClick: () => setLogOptout(false) },
+              {
+                children: t('opt_out'),
+                onClick: () => setLogOptout(true),
+              },
+              {
+                children: t('opt_in'),
+                onClick: () => setLogOptout(false),
+              },
             ]}
           >
-            {ROBOT_LOGS_OPTOUT_MESSAGE}
+            <Text>{t('log_opt_out_explanation')}</Text>
+            <Text>{t('log_opt_out_instruction')}</Text>
           </AlertModal>
         </Portal>
       )}

@@ -4,12 +4,12 @@ import * as React from 'react'
 import cx from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 import {
   Card,
   Flex,
   Box,
-  LabeledValue,
   SecondaryBtn,
   Tooltip,
   useInterval,
@@ -27,6 +27,7 @@ import {
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
 } from '../../discovery'
+import { LabeledValue } from '../structure'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -36,17 +37,12 @@ export type InformationCardProps = {|
   updateUrl: string,
 |}
 
-const TITLE = 'Information'
-const NAME_LABEL = 'Robot name'
-const SERVER_VERSION_LABEL = 'Server version'
-const FIRMWARE_VERSION_LABEL = 'Firmware version'
-const BOTH_PROTOCOL_API_VERSIONS_LABEL = 'Supported Protocol API Versions'
-const UNKNOWN = 'Unknown'
-
 const UPDATE_RECHECK_DELAY_MS = 60000
 
 export function InformationCard(props: InformationCardProps): React.Node {
   const { robot, updateUrl } = props
+  const { t } = useTranslation(['robot_info', 'shared'])
+
   const [updateBtnProps, updateBtnTooltipProps] = useHoverTooltip()
   const { autoUpdateAction, autoUpdateDisabledReason } = useSelector(
     (state: State) => {
@@ -60,12 +56,16 @@ export function InformationCard(props: InformationCardProps): React.Node {
   ])
 
   const { displayName } = robot
+  const unknown = t('shared:unknown')
   const version = getRobotApiVersion(robot)
   const firmwareVersion = getRobotFirmwareVersion(robot)
   const protocolApiVersions = getRobotProtocolApiVersion(robot)
-  const minProtocolApiVersion = protocolApiVersions?.min ?? UNKNOWN
-  const maxProtocolApiVersion = protocolApiVersions?.max ?? UNKNOWN
-  const API_VERSION_DISPLAY = `Min: ${minProtocolApiVersion},  Max: ${maxProtocolApiVersion}`
+  const minProtocolApiVersion = protocolApiVersions?.min ?? unknown
+  const maxProtocolApiVersion = protocolApiVersions?.max ?? unknown
+  const apiVersionMinMax = t('api_version_min_max', {
+    min: minProtocolApiVersion,
+    max: maxProtocolApiVersion,
+  })
 
   const updateDisabled = autoUpdateDisabledReason !== null
 
@@ -73,27 +73,27 @@ export function InformationCard(props: InformationCardProps): React.Node {
   useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
 
   return (
-    <Card title={TITLE}>
+    <Card title={t('title')}>
       <Flex alignItems={ALIGN_FLEX_START} padding={SPACING_3}>
         <Box marginRight={SPACING_3}>
           <Box marginBottom={SPACING_3}>
-            <LabeledValue label={NAME_LABEL} value={displayName} />
+            <LabeledValue label={`${t('robot_name')}:`} value={displayName} />
           </Box>
           <LabeledValue
-            label={FIRMWARE_VERSION_LABEL}
-            value={firmwareVersion || UNKNOWN}
+            label={`${t('firmware_version')}:`}
+            value={firmwareVersion || unknown}
           />
         </Box>
         <Box marginRight={SPACING_AUTO}>
           <Box marginBottom={SPACING_3}>
             <LabeledValue
-              label={SERVER_VERSION_LABEL}
-              value={version || UNKNOWN}
+              label={`${t('server_version')}:`}
+              value={version || unknown}
             />
           </Box>
           <LabeledValue
-            label={BOTH_PROTOCOL_API_VERSIONS_LABEL}
-            value={API_VERSION_DISPLAY}
+            label={`${t('supported_api_versions')}:`}
+            value={apiVersionMinMax}
           />
         </Box>
         <SecondaryBtn

@@ -1,36 +1,27 @@
 // @flow
 // AlertModal for failed connection to robot
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
-import { AlertModal } from '@opentrons/components'
+import { AlertModal, Text } from '@opentrons/components'
 import { Portal } from '../portal'
 export type ConnectAlertModalProps = {|
   onCloseClick: () => mixed,
 |}
 
-const HEADING = 'Could not connect to robot'
-
-const TRY_AGAIN_MESSAGE =
-  'If this problem persists, we recommend restarting your robot and waiting 30 seconds before trying again. '
-
-const CONTACT_SUPPORT_MESSAGE =
-  "If you're still unable to connect, please contact our support team"
-
 export function ConnectAlertModal(props: ConnectAlertModalProps): React.Node {
   const { onCloseClick } = props
+  const { t } = useTranslation('robot_connection')
 
   return (
     <Portal>
       <AlertModal
-        heading={HEADING}
+        heading={t('failed_connection_heading')}
         onCloseClick={onCloseClick}
         buttons={[{ onClick: onCloseClick, children: 'close' }]}
         alertOverlay
       >
-        <p>
-          {TRY_AGAIN_MESSAGE}
-          {CONTACT_SUPPORT_MESSAGE}
-        </p>
+        <Text>{t('failed_connection_body')}</Text>
       </AlertModal>
     </Portal>
   )

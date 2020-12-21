@@ -1,60 +1,66 @@
 // @flow
 import * as React from 'react'
+import { useTranslation, Trans } from 'react-i18next'
 
-import { SecondaryBtn, Link } from '@opentrons/components'
+import {
+  SecondaryBtn,
+  Link,
+  Flex,
+  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING_3,
+  SPACING_4,
+  SIZE_4,
+} from '@opentrons/components'
 import { useTrackEvent } from '../../analytics'
-import { TitledControl } from '../TitledControl'
-
-import type { StyleProps } from '@opentrons/components'
-
-// TODO(mc, 2020-09-09): i18n
-const OPEN = 'Open'
-const JUPYTER_NOTEBOOK = 'Jupyter Notebook'
-const OPEN_JUPYTER_DESCRIPTION = (
-  <>
-    Open the{' '}
-    <Link external href="https://jupyter.org/">
-      Jupyter Notebook
-    </Link>{' '}
-    running on this OT-2 in your web browser. (Experimental feature! See{' '}
-    <Link
-      external
-      href="https://docs.opentrons.com/v2/new_advanced_running.html#jupyter-notebook"
-    >
-      documentation
-    </Link>{' '}
-    for more details.)
-  </>
-)
+import { LabeledValue } from '../structure'
 
 const EVENT_JUPYTER_OPEN = { name: 'jupyterOpen', properties: {} }
 
 export type OpenJupyterControlProps = {|
   robotIp: string,
-  ...StyleProps,
 |}
 
 export function OpenJupyterControl(props: OpenJupyterControlProps): React.Node {
-  const { robotIp, ...styleProps } = props
+  const { robotIp } = props
+  const { t } = useTranslation(['robot_advanced_settings', 'shared'])
   const href = `http://${robotIp}:48888`
   const trackEvent = useTrackEvent()
 
   return (
-    <TitledControl
-      {...styleProps}
-      title={JUPYTER_NOTEBOOK}
-      description={OPEN_JUPYTER_DESCRIPTION}
-      control={
-        <SecondaryBtn
-          onClick={() => trackEvent(EVENT_JUPYTER_OPEN)}
-          as={Link}
-          href={href}
-          width="9rem"
-          external
-        >
-          {OPEN}
-        </SecondaryBtn>
-      }
-    />
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING_3}
+    >
+      <LabeledValue
+        label={t('open_jupyter_label')}
+        value={
+          <Trans
+            t={t}
+            i18nKey="open_jupyter_description"
+            components={{
+              jn: <Link external href="https://jupyter.org/" />,
+              docs: (
+                <Link
+                  external
+                  href="https://docs.opentrons.com/v2/new_advanced_running.html#jupyter-notebook"
+                />
+              ),
+            }}
+          />
+        }
+      />
+      <SecondaryBtn
+        onClick={() => trackEvent(EVENT_JUPYTER_OPEN)}
+        as={Link}
+        href={href}
+        minWidth={SIZE_4}
+        marginLeft={SPACING_4}
+        external
+      >
+        {t('shared:open')}
+      </SecondaryBtn>
+    </Flex>
   )
 }

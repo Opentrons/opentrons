@@ -13,6 +13,7 @@ import type { ReachableRobot, HealthStatus } from '../../discovery/types'
 
 type State = {| dismissed: boolean |}
 
+// TODO(bc, 2020-12-07): i18n
 const UNRESPONSIVE_TITLE = 'Unable to establish connection with robot'
 
 const STATUS_DESCRIPTION = {

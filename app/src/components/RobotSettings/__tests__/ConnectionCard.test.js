@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
+import { mountWithProviders } from '@opentrons/components/__utils__'
+import { i18n } from '../../../i18n'
 
 import * as Networking from '../../../networking'
 import { CONNECTABLE } from '../../../discovery'
@@ -23,6 +23,7 @@ const mockRobot: ViewableRobot = ({
   name: 'robot-name',
   connected: true,
   status: CONNECTABLE,
+  ip: '1.2.3.4',
 }: any)
 
 const mockGetInternetStatus: JestMockFn<
@@ -36,26 +37,17 @@ const mockGetNetworkInterfaces: JestMockFn<
 > = Networking.getNetworkInterfaces
 
 describe('ConnectionCard', () => {
-  let dispatch
-  let mockStore
   let render
 
   beforeEach(() => {
-    dispatch = jest.fn()
-    mockStore = {
-      dispatch,
-      subscribe: () => {},
-      getState: () => ({ mockState: true }),
-    }
     jest.useFakeTimers()
 
     mockGetInternetStatus.mockReturnValue(null)
     mockGetNetworkInterfaces.mockReturnValue({ wifi: null, ethernet: null })
 
     render = (robot: ViewableRobot = mockRobot) => {
-      return mount(<ConnectionCard robot={robot} />, {
-        wrappingComponent: Provider,
-        wrappingComponentProps: { store: mockStore },
+      return mountWithProviders(<ConnectionCard robot={robot} />, {
+        i18n,
       })
     }
   })
@@ -68,28 +60,28 @@ describe('ConnectionCard', () => {
 
   it('calls fetchStatus on mount', () => {
     const expected = Networking.fetchStatus(mockRobot.name)
-    render()
-    expect(dispatch).toHaveBeenCalledWith(expected)
+    const { store } = render()
+    expect(store.dispatch).toHaveBeenCalledWith(expected)
   })
 
   it('calls fetchStatus on an interval', () => {
     const expected = Networking.fetchStatus(mockRobot.name)
 
-    render()
+    const { store } = render()
     jest.advanceTimersByTime(10000)
-    expect(dispatch).toHaveBeenNthCalledWith(1, expected)
-    expect(dispatch).toHaveBeenNthCalledWith(2, expected)
-    expect(dispatch).toHaveBeenNthCalledWith(3, expected)
+    expect(store.dispatch).toHaveBeenNthCalledWith(1, expected)
+    expect(store.dispatch).toHaveBeenNthCalledWith(2, expected)
+    expect(store.dispatch).toHaveBeenNthCalledWith(3, expected)
   })
 
   it('passes robot and internet status to ConnectionStatusMessage', () => {
     mockGetInternetStatus.mockReturnValue(Networking.STATUS_FULL)
 
-    const wrapper = render()
+    const { wrapper } = render()
     const status = wrapper.find(ConnectionStatusMessage)
 
     expect(status.prop('status')).toEqual(mockRobot.status)
-    expect(status.prop('ipAdress')).toEqual(mockRobot.ip)
+    expect(status.prop('ipAddress')).toEqual(mockRobot.ip)
     expect(status.prop('internetStatus')).toEqual(Networking.STATUS_FULL)
   })
 
@@ -97,11 +89,11 @@ describe('ConnectionCard', () => {
     mockGetInternetStatus.mockReturnValue(Networking.STATUS_FULL)
 
     const localRobot: ViewableRobot = ({ ...mockRobot, local: true }: any)
-    const localWrapper = render(localRobot)
+    const { wrapper: localWrapper } = render(localRobot)
     const localStatus = localWrapper.find(ConnectionStatusMessage)
 
     const wifiRobot: ViewableRobot = ({ ...mockRobot, local: false }: any)
-    const wifiWrapper = render(wifiRobot)
+    const { wrapper: wifiWrapper } = render(wifiRobot)
     const wifiStatus = wifiWrapper.find(ConnectionStatusMessage)
 
     expect(localStatus.prop('type')).toEqual('USB')
@@ -121,7 +113,7 @@ describe('ConnectionCard', () => {
       ethernet: mockEthernet,
     })
 
-    const wrapper = render()
+    const { wrapper } = render()
     const info = wrapper.find('ConnectionInfo[title="USB"]')
 
     expect(info.prop('connection')).toEqual(mockEthernet)
@@ -140,14 +132,14 @@ describe('ConnectionCard', () => {
       ethernet: null,
     })
 
-    const wrapper = render()
+    const { wrapper } = render()
     const info = wrapper.find('ConnectionInfo[title="Wi-Fi"]')
 
     expect(info.prop('connection')).toEqual(mockWifi)
   })
 
   it('renders SelectNetwork', () => {
-    const wrapper = render()
+    const { wrapper } = render()
     const select = wrapper.find(SelectNetwork)
 
     expect(select.prop('robotName')).toEqual(mockRobot.name)

@@ -1,28 +1,28 @@
 // @flow
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { AlertItem } from '@opentrons/components'
 
 import type { Robot } from '../../discovery/types'
 
-type ConnectBannerState = {| dismissed: boolean |}
+type Props = Robot
 
-export class ConnectBanner extends React.Component<Robot, ConnectBannerState> {
-  constructor(props: Robot) {
-    super(props)
-    this.state = { dismissed: false }
-  }
+export function ConnectBanner(props: Props): React.Node {
+  const { displayName, connected } = props
 
-  render(): React.Node {
-    const { displayName, connected } = this.props
-    const isVisible = connected && !this.state.dismissed
-    if (!isVisible) return null
+  const { t } = useTranslation('robot_connection')
+  const [dismissed, setDismissed] = React.useState(false)
 
-    return (
-      <AlertItem
-        type="success"
-        onCloseClick={() => this.setState({ dismissed: true })}
-        title={`${displayName} successfully connected`}
-      />
-    )
-  }
+  const isVisible = connected && !dismissed
+  if (!isVisible) return null
+
+  return (
+    <AlertItem
+      type="success"
+      onCloseClick={() => setDismissed(true)}
+      title={t('success_banner', {
+        robot: displayName,
+      })}
+    />
+  )
 }
