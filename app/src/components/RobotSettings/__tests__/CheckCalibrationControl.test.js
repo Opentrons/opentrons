@@ -71,7 +71,6 @@ describe('CheckCalibrationControl', () => {
     expect(titledButton.html()).toMatch(
       /check the health of the current calibration settings/i
     )
-    expect(button.prop('width')).toBe('12rem')
     expect(button.html()).toMatch(/check health/i)
   })
 
