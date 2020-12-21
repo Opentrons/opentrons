@@ -6,6 +6,7 @@ from opentrons import types
 from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocols.api_support.labware_like import LabwareLike
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.util.helpers import utc_now
 
 
@@ -20,6 +21,8 @@ def inst_to(instrument: InstrumentContext):
 def check_for(payload_entry):
     if isinstance(payload_entry, InstrumentContext):
         return inst_to(payload_entry)
+    if isinstance(payload_entry, ModuleGeometry):
+        return {"name": payload_entry.load_name}
     elif isinstance(payload_entry, Labware):
         return {"labware": {
             "name": payload_entry.load_name,
@@ -41,8 +44,7 @@ def check_for(payload_entry):
 def command_to(command):
     return ProtocolStepEvent(
         command=command['name'],
-        payload={k: check_for(v) for (k, v) in
-                    command['payload'].items() if k != "text"}
+        data={k: check_for(v) for (k, v) in command['payload'].items() if k != "text"}
     )
 
 
