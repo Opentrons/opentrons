@@ -15,6 +15,7 @@ import {
   getHoveredStepId,
   getSelectedStepId,
   getMultiSelectItemIds,
+  getMultiSelectLastSelected,
   actions as stepsActions,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
@@ -66,6 +67,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const selectedStepId = useSelector(getSelectedStepId)
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
+  const lastMultiSelectedStepId = useSelector(getMultiSelectLastSelected)
   const selected: boolean = multiSelectItemIds?.length
     ? multiSelectItemIds.includes(stepId)
     : selectedStepId === stepId
@@ -130,6 +132,42 @@ export const ConnectedStepItem = (props: Props): React.Node => {
             const startIndex: number = orderedStepIds.indexOf(selectedStepId)
             const endIndex: number = orderedStepIds.indexOf(stepId)
             stepsToSelect = orderedStepIds.slice(startIndex, endIndex + 1)
+          } else if (multiSelectItemIds?.length) {
+            const prevIndex: number = orderedStepIds.indexOf(
+              lastMultiSelectedStepId
+            )
+            const currentIndex: number = orderedStepIds.indexOf(stepId)
+
+            const [startIndex, endIndex] = [prevIndex, currentIndex].sort(
+              (a, b) => a - b
+            )
+            const potentialStepsToSelect = orderedStepIds.slice(
+              startIndex,
+              endIndex + 1
+            )
+
+            const allSelected = potentialStepsToSelect
+              .slice(1)
+              .every(stepId => multiSelectItemIds.includes(stepId))
+
+            if (allSelected) {
+              // if they're all selected, deselect them all
+              if (
+                multiSelectItemIds.length - potentialStepsToSelect.length >
+                0
+              ) {
+                stepsToSelect = multiSelectItemIds.filter(
+                  id => !potentialStepsToSelect.includes(id)
+                )
+              } else {
+                // unless deselecting them all results in none being selected
+                stepsToSelect = [potentialStepsToSelect[0]]
+              }
+            } else {
+              stepsToSelect = [
+                ...new Set([...multiSelectItemIds, ...potentialStepsToSelect]),
+              ]
+            }
           } else {
             stepsToSelect = [stepId]
           }

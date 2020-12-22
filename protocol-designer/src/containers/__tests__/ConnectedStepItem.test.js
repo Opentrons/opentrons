@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import UAParser from 'ua-parser-js'
 import { mount } from 'enzyme'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
@@ -38,6 +38,8 @@ const getHasFormLevelWarningsPerStepMock =
   dismissSelectors.getHasFormLevelWarningsPerStep
 const getCollapsedStepsMock = uiStepSelectors.getCollapsedSteps
 const getSelectedStepIdMock = uiStepSelectors.getSelectedStepId
+const getMultiSelectLastSelectedMock =
+  uiStepSelectors.getMultiSelectLastSelected
 const getMultiSelectItemIdsMock = uiStepSelectors.getMultiSelectItemIds
 const getSubstepsMock = fileDataSelectors.getSubsteps
 const getErrorStepId = fileDataSelectors.getErrorStepId
@@ -100,6 +102,7 @@ describe('ConnectedStepItem', () => {
   })
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   const render = props =>
@@ -188,10 +191,19 @@ describe('ConnectedStepItem', () => {
     describe('when shift + clicked', () => {
       const testCases = [
         {
-          name: 'should enter batch edit mode with just step',
+          name: 'should select just one step (in batch edit mode)',
           props: { stepId: mockId, stepNumber: 1 },
           mockClickEvent: { shiftKey: true, metaKey: false, ctrlKey: false },
-          setupMocks: null,
+          setupMocks: () => {
+            when(getOrderedStepIdsMock)
+              .calledWith(expect.anything())
+              .mockReturnValue([
+                'ANOTHER_ID',
+                'NOT_SELECTED_ID',
+                'YET_ANOTHER_ID',
+                mockId,
+              ])
+          },
           expectedAction: {
             type: 'SELECT_MULTIPLE_STEPS',
             payload: {
@@ -202,7 +214,7 @@ describe('ConnectedStepItem', () => {
         },
         {
           name:
-            'should enter batch edit mode with a range of steps when one step is already selected',
+            'should select a range of steps when one step is already selected',
           props: { stepId: mockId, stepNumber: 1 },
           mockClickEvent: { shiftKey: true, metaKey: false, ctrlKey: false },
           setupMocks: () => {
@@ -221,34 +233,86 @@ describe('ConnectedStepItem', () => {
             },
           },
         },
-        // {
-        //   name:
-        //     'should select all steps in the range when some of them are already selected',
-        //   props: { stepId: mockId, stepNumber: 1 },
-        //   mockClickEvent: { shiftKey: true, metaKey: false },
-        //   setupMocks: () => {
-        //     when(getMultiSelectItemIdsMock)
-        //       .calledWith(expect.anything())
-        //       .mockReturnValue(['YET_ANOTHER_ID'])
-        //     when(getOrderedStepIdsMock)
-        //       .calledWith(expect.anything())
-        //       .mockReturnValue([
-        //         'ANOTHER_ID',
-        //         'NOT_SELECTED_ID',
-        //         'YET_ANOTHER_ID',
-        //         mockId,
-        //       ])
-        //   },
-        //   expectedAction: {
-        //     type: 'SELECT_MULTIPLE_STEPS',
-        //     payload: [
-        //       'ANOTHER_ID',
-        //       'NOT_SELECTED_ID',
-        //       'YET_ANOTHER_ID',
-        //       mockId,
-        //     ],
-        //   },
-        // },
+        {
+          name: 'should select a range when some of them are already selected',
+          props: { stepId: mockId, stepNumber: 1 },
+          mockClickEvent: { shiftKey: true, metaKey: false, ctrlKey: false },
+          setupMocks: () => {
+            when(getMultiSelectItemIdsMock)
+              .calledWith(expect.anything())
+              .mockReturnValue(['FIRST_ID', 'SECOND_ID', 'THIRD_ID'])
+            when(getOrderedStepIdsMock)
+              .calledWith(expect.anything())
+              .mockReturnValue(['FIRST_ID', 'SECOND_ID', 'THIRD_ID', mockId])
+            when(getMultiSelectLastSelectedMock)
+              .calledWith(expect.anything())
+              .mockReturnValue('THIRD_ID')
+          },
+          expectedAction: {
+            type: 'SELECT_MULTIPLE_STEPS',
+            payload: {
+              stepIds: ['FIRST_ID', 'SECOND_ID', 'THIRD_ID', mockId],
+              lastSelected: mockId,
+            },
+          },
+        },
+        {
+          name: 'should deselect a range when all of them are already selected',
+          props: { stepId: mockId, stepNumber: 1 },
+          mockClickEvent: { shiftKey: true, metaKey: false, ctrlKey: false },
+          setupMocks: () => {
+            when(getMultiSelectItemIdsMock)
+              .calledWith(expect.anything())
+              .mockReturnValue([
+                'FIRST_ID',
+                'ANOTHER_ID',
+                'YET_ANOTHER_ID',
+                mockId,
+              ])
+            when(getOrderedStepIdsMock)
+              .calledWith(expect.anything())
+              .mockReturnValue([
+                'FIRST_ID ',
+                'ANOTHER_ID',
+                'YET_ANOTHER_ID',
+                mockId,
+              ])
+            when(getMultiSelectLastSelectedMock)
+              .calledWith(expect.anything())
+              .mockReturnValue('ANOTHER_ID')
+          },
+          expectedAction: {
+            type: 'SELECT_MULTIPLE_STEPS',
+            payload: {
+              stepIds: ['FIRST_ID'],
+              lastSelected: mockId,
+            },
+          },
+        },
+        {
+          name:
+            'should deselect a range when all of them are already selected (but preserve the first item and not exit batch edit mode)',
+          props: { stepId: mockId, stepNumber: 1 },
+          mockClickEvent: { shiftKey: true, metaKey: false, ctrlKey: false },
+          setupMocks: () => {
+            when(getMultiSelectItemIdsMock)
+              .calledWith(expect.anything())
+              .mockReturnValue(['YET_ANOTHER_ID', mockId])
+            when(getOrderedStepIdsMock)
+              .calledWith(expect.anything())
+              .mockReturnValue(['ANOTHER_ID', 'YET_ANOTHER_ID', mockId])
+            when(getMultiSelectLastSelectedMock)
+              .calledWith(expect.anything())
+              .mockReturnValue('ANOTHER_ID')
+          },
+          expectedAction: {
+            type: 'SELECT_MULTIPLE_STEPS',
+            payload: {
+              stepIds: ['ANOTHER_ID'],
+              lastSelected: mockId,
+            },
+          },
+        },
       ]
 
       testCases.forEach(
