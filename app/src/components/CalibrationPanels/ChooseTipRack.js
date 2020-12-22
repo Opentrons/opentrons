@@ -27,6 +27,7 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   FONT_WEIGHT_SEMIBOLD,
   ALIGN_CENTER,
+  SecondaryBtn,
 } from '@opentrons/components'
 import * as Sessions from '../../sessions'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -54,7 +55,7 @@ const PROMPT =
 
 const SELECT_TIP_RACK = 'select tip rack'
 const ALERT_TEXT =
-  'Opentrons recommends using Opentrons tip racks and cannot guarantee accuracy with non-Opentrons tip racks.'
+  'Opentrons tip racks are strongly recommended. Accuracy cannot be guaranteed with other tip racks.'
 
 const OPENTRONS_LABEL = 'opentrons'
 const CUSTOM_LABEL = 'custom'
@@ -152,7 +153,6 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
     return obj
   }, {})
 
-  console.log(tipRackByUriMap)
   const opentronsTipRacksOptions: Array<SelectOption> = opentronsTipRacks.map(
     lw => formatOptionsFromLabwareDef(lw)
   )
@@ -253,14 +253,23 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
           </Box>
         </Flex>
       </Flex>
-      <PrimaryBtn
-        data-test="useThisTipRackButton"
-        alignSelf={ALIGN_CENTER}
-        width="60%"
-        onClick={handleUseTipRack}
-      >
-        {USE_THIS_TIP_RACK}
-      </PrimaryBtn>
+      <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
+        <SecondaryBtn
+          data-test="useThisTipRackButton"
+          width="25%"
+          marginRight="1rem"
+          onClick={() => closeModal()}
+        >
+          Cancel
+        </SecondaryBtn>
+        <PrimaryBtn
+          data-test="useThisTipRackButton"
+          width="48%"
+          onClick={handleUseTipRack}
+        >
+          {USE_THIS_TIP_RACK}
+        </PrimaryBtn>
+      </Flex>
     </Flex>
   )
 }
