@@ -42,7 +42,7 @@ import styles from './styles.css'
 import type { TipRackMap } from './ChosenTipRackRender'
 import type { SessionType, CalibrationLabware } from '../../sessions/types'
 import type { State } from '../../types'
-import type { SelectOption } from '@opentrons/components'
+import type { SelectOption, SelectOptionOrGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const HEADER = 'choose tip rack'
@@ -159,16 +159,20 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
   const customTipRacksOptions: Array<SelectOption> = customTipRacks.map(lw =>
     formatOptionsFromLabwareDef(lw)
   )
-  const groupOptions = [
-    {
-      label: OPENTRONS_LABEL,
-      options: opentronsTipRacksOptions,
-    },
-    {
-      label: CUSTOM_LABEL,
-      options: customTipRacksOptions,
-    },
-  ]
+
+  const groupOptions: Array<SelectOptionOrGroup> =
+    customTipRacks.length > 0
+      ? [
+          {
+            label: OPENTRONS_LABEL,
+            options: opentronsTipRacksOptions,
+          },
+          {
+            label: CUSTOM_LABEL,
+            options: customTipRacksOptions,
+          },
+        ]
+      : [...opentronsTipRacksOptions]
 
   const [selectedValue, setSelectedValue] = React.useState<SelectOption>(
     formatOptionsFromLabwareDef(tipRack.definition)
