@@ -59,7 +59,7 @@ const StepPill = (props: StepPillProps): React.Node => {
 }
 
 // TODO IMMEDIATELY: i18n all text
-const _StepSelectionBanner = (props: Props): React.Node => {
+export const StepSelectionBannerComponent = (props: Props): React.Node => {
   const { selectedSteps, handleExitBatchEdit } = props
   const numSteps = selectedSteps.length
   const countPerType = selectedSteps.reduce((acc, step) => {
@@ -109,7 +109,3 @@ const _StepSelectionBanner = (props: Props): React.Node => {
     </Flex>
   )
 }
-
-export const StepSelectionBanner: React.AbstractComponent<Props> = React.memo(
-  _StepSelectionBanner
-)
