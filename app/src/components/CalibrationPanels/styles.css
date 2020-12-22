@@ -16,6 +16,8 @@
 }
 
 .select_tiprack_menu {
+  position: relative;
+
   & :global(.ot_select__menu-list) {
     max-height: 200px;
     overflow: scroll;
