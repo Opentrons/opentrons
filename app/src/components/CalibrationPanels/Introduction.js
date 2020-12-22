@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
@@ -22,7 +21,6 @@ import {
   FONT_SIZE_BODY_2,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
-  JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_RELATIVE,
   SPACING_1,
@@ -32,7 +30,6 @@ import {
   SecondaryBtn,
 } from '@opentrons/components'
 
-import * as Config from '../../config'
 import * as Sessions from '../../sessions'
 import { labwareImages } from './labwareImages'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -344,7 +341,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
                 },
               ],
               outcomeText: null,
-              chooseTipRackButtonText: CHOOSE_TIP_RACK_BUTTON_TEXT,
+              chooseTipRackButtonText: null,
               continueButtonText: `${START} ${PIP_OFFSET_CAL_HEADER}`,
               noteBody: {
                 preFragment: IT_IS,

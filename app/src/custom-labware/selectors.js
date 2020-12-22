@@ -63,7 +63,9 @@ export const getCustomLabwareDefinitions: State => Array<LabwareDefinition2> = c
   labware => labware.map(lw => lw.definition)
 )
 
-export const getCustomTipRackDefinitions: State => Array<LabwareDefinition2> = createSelector(
+export const getCustomTipRackDefinitions: (
+  state: State
+) => Array<LabwareDefinition2> = createSelector(
   getCustomLabwareDefinitions,
   labware => labware.filter(lw => getIsTiprack(lw))
 )

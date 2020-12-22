@@ -38,6 +38,7 @@ export type TipRackMap = $Shape<{|
 |}>
 
 export type ChosenTipRackRenderProps = {|
+  showCalibrationText: boolean,
   selectedValue: SelectOption,
   tipRackByUriMap: TipRackMap,
 |}
@@ -45,7 +46,7 @@ export type ChosenTipRackRenderProps = {|
 export function ChosenTipRackRender(
   props: ChosenTipRackRenderProps
 ): React.Node {
-  const { selectedValue, tipRackByUriMap } = props
+  const { showCalibrationText, selectedValue, tipRackByUriMap } = props
   const loadName = selectedValue.value.split('/')[1]
   const displayName = selectedValue.label
   const calibrationData = tipRackByUriMap[selectedValue.value].calibration
@@ -78,18 +79,20 @@ export function ChosenTipRackRender(
         <Text textAlign={TEXT_ALIGN_CENTER} marginBottom={SPACING_2}>
           {displayName}
         </Text>
-        <Text
-          color={C_MED_DARK_GRAY}
-          fontSize={FONT_SIZE_BODY_1}
-          fontStyle={FONT_STYLE_ITALIC}
-          textAlign={TEXT_ALIGN_CENTER}
-        >
-          {calibrationData
-            ? `${TIP_LENGTH_CALIBRATED_PROMPT} ${formatLastModified(
-                calibrationData.lastModified
-              )}`
-            : TIP_LENGTH_UNCALIBRATED_PROMPT}
-        </Text>
+        {showCalibrationText && (
+          <Text
+            color={C_MED_DARK_GRAY}
+            fontSize={FONT_SIZE_BODY_1}
+            fontStyle={FONT_STYLE_ITALIC}
+            textAlign={TEXT_ALIGN_CENTER}
+          >
+            {calibrationData
+              ? `${TIP_LENGTH_CALIBRATED_PROMPT} ${formatLastModified(
+                  calibrationData.lastModified
+                )}`
+              : TIP_LENGTH_UNCALIBRATED_PROMPT}
+          </Text>
+        )}
       </Box>
     </Flex>
   )

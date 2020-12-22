@@ -37,7 +37,6 @@ import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibrat
 import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import {
-  INTENT_CALIBRATE_PIPETTE_OFFSET,
   INTENT_RECALIBRATE_PIPETTE_OFFSET,
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
 } from '../CalibrationPanels'

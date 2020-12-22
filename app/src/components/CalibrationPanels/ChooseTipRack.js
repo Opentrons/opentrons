@@ -41,7 +41,7 @@ import styles from './styles.css'
 import type { TipRackMap } from './ChosenTipRackRender'
 import type { SessionType, CalibrationLabware } from '../../sessions/types'
 import type { State } from '../../types'
-import type { SelectOptionOrGroup, SelectOption } from '@opentrons/components'
+import type { SelectOption } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const HEADER = 'choose tip rack'
@@ -152,6 +152,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
     return obj
   }, {})
 
+  console.log(tipRackByUriMap)
   const opentronsTipRacksOptions: Array<SelectOption> = opentronsTipRacks.map(
     lw => formatOptionsFromLabwareDef(lw)
   )
@@ -243,6 +244,9 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
           </Box>
           <Box width="45%" height="100%">
             <ChosenTipRackRender
+              showCalibrationText={
+                sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+              }
               selectedValue={selectedValue}
               tipRackByUriMap={tipRackByUriMap}
             />
@@ -250,6 +254,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
         </Flex>
       </Flex>
       <PrimaryBtn
+        data-test="useThisTipRackButton"
         alignSelf={ALIGN_CENTER}
         width="60%"
         onClick={handleUseTipRack}

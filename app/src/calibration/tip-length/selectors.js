@@ -21,7 +21,7 @@ export const getTipLengthForPipetteAndTiprackByUri: (
   state: State,
   robotName: string | null,
   pipetteSerial: string,
-  tiprackUri: string,
+  tiprackUri: string
 ) => TipLengthCalibration | null = createSelector(
   getTipLengthCalibrations,
   (allCalibrations, pipetteSerial, tipRackUri) => {
