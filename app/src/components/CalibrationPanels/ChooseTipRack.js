@@ -173,9 +173,11 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
           },
         ]
       : [...opentronsTipRacksOptions]
-
+  console.log(chosenTipRack)
   const [selectedValue, setSelectedValue] = React.useState<SelectOption>(
-    formatOptionsFromLabwareDef(tipRack.definition)
+    chosenTipRack
+      ? formatOptionsFromLabwareDef(chosenTipRack)
+      : formatOptionsFromLabwareDef(tipRack.definition)
   )
 
   const handleValueChange = (selected: SelectOption | null, _) => {
