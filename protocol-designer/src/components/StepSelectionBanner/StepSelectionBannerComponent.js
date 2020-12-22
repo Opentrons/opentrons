@@ -10,6 +10,7 @@ import {
   ALIGN_CENTER,
   BORDER_STYLE_SOLID,
   BORDER_WIDTH_DEFAULT,
+  C_BG_SELECTED,
   C_SELECTED_DARK,
   C_TRANSPARENT,
   FONT_SIZE_BODY_1,
@@ -24,9 +25,6 @@ import {
 import { i18n } from '../../localization'
 import { stepIconsByType } from '../../form-types'
 import type { FormData, StepType } from '../../form-types'
-
-// TODO IMMEDIATELY
-const NAME_THIS_LIGHT_BLUE_COLOR = '#f0f3ff'
 
 type Props = {|
   selectedSteps: Array<FormData>,
@@ -58,7 +56,6 @@ const StepPill = (props: StepPillProps): React.Node => {
   )
 }
 
-// TODO IMMEDIATELY: i18n all text
 export const StepSelectionBannerComponent = (props: Props): React.Node => {
   const { selectedSteps, handleExitBatchEdit } = props
   const numSteps = selectedSteps.length
@@ -71,12 +68,12 @@ export const StepSelectionBannerComponent = (props: Props): React.Node => {
 
   return (
     <Flex
-      backgroundColor={NAME_THIS_LIGHT_BLUE_COLOR}
+      backgroundColor={C_BG_SELECTED}
       padding={SPACING_3}
       color={C_SELECTED_DARK}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
-      <Box flexGrow="0">
+      <Box flex="0 1 auto">
         <Flex alignItems={ALIGN_CENTER}>
           <Icon name="checkbox-multiple-marked-outline" width={SIZE_2} />
           <Text
@@ -84,7 +81,9 @@ export const StepSelectionBannerComponent = (props: Props): React.Node => {
             marginLeft="0.5rem"
             fontWeight={FONT_WEIGHT_SEMIBOLD}
             textTransform={TEXT_TRANSFORM_UPPERCASE}
-          >{`${numSteps} steps selected`}</Text>
+          >
+            {i18n.t('application.n_steps_selected', { n: numSteps })}
+          </Text>
         </Flex>
       </Box>
       <Flex justifyContent={JUSTIFY_FLEX_START} flexWrap="wrap" flex="1">
@@ -96,14 +95,13 @@ export const StepSelectionBannerComponent = (props: Props): React.Node => {
           />
         ))}
       </Flex>
-      <Box>
+      <Box flex="0 1 auto">
         <SecondaryBtn
-          flexGrow="0"
           color={C_SELECTED_DARK}
           backgroundColor={C_TRANSPARENT}
           onClick={handleExitBatchEdit}
         >
-          exit batch edit
+          {i18n.t('application.exit_batch_edit')}
         </SecondaryBtn>
       </Box>
     </Flex>
