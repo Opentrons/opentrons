@@ -12,6 +12,7 @@ import { Hints } from '../components/Hints'
 import { LiquidPlacementModal } from '../components/LiquidPlacementModal.js'
 import { LabwareSelectionModal } from '../components/LabwareSelectionModal'
 import { StepEditForm } from '../components/StepEditForm'
+import { StepSelectionBanner } from '../components/StepEditForm/StepSelectionBanner'
 import { TimelineAlerts } from '../components/alerts/TimelineAlerts'
 
 import { getSelectedTerminalItemId } from '../ui/steps'
@@ -46,6 +47,17 @@ function MainPanelComponent(props: Props) {
             <Hints />
             {startTerminalItemSelected && <LabwareSelectionModal />}
             <StepEditForm />
+            <StepSelectionBanner
+              selectedSteps={[
+                { stepType: 'moveLiquid' },
+                { stepType: 'moveLiquid' },
+                { stepType: 'mix' },
+                { stepType: 'mix' },
+                { stepType: 'temperature' },
+                { stepType: 'pause' },
+              ]}
+              handleExitBatchEdit={() => console.log('TODO: exit batch edit')}
+            />
             {startTerminalItemSelected && ingredSelectionMode && (
               <LiquidPlacementModal />
             )}
