@@ -1,4 +1,7 @@
 #######
+import sys
+from typing import Set
+
 from notify_server.clients.publisher import Publisher
 from notify_server.models.event import Event
 from notify_server.models.protocol_event import ProtocolStepEvent
@@ -55,3 +58,31 @@ def publish_command(publisher: Publisher, command):
                                 publisher="hack",
                                 data=command_to(command))
                           )
+
+
+class Tracer:
+    def __init__(self, proto_files: Set[str]):
+        self._proto = proto_files
+        self._line_number = None
+        self._function = None
+        self._file = None
+
+    def __enter__(self):
+        sys.settrace(self)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.settrace(None)
+
+    def __call__(self, frame, event, arg):
+        if frame.f_code.co_filename in self._proto:
+            self._function = frame.f_code.co_name
+            self._line_number = frame.f_lineno
+            self._file = frame.f_code.co_filename
+            return None if event != 'call' else self
+        return self
+
+    @property
+    def line(self):
+        return self._line_number
+

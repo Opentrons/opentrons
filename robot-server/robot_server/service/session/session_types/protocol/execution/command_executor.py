@@ -5,7 +5,7 @@ import typing
 from opentrons.util.helpers import deep_get, utc_now
 
 from robot_server.service.session.session_types.protocol.execution.serialize_command_hack import \
-    publish_command
+    publish_command, Tracer
 
 if typing.TYPE_CHECKING:
     from opentrons.api.dev_types import State
@@ -69,8 +69,10 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         # We're using Session to manage state so I'm not
         #  adding states. Don't want to start with `None` and `stopped` seems
         #  the most reasonable start state.
+
+        self._tracer = Tracer(set(x.path.name for x in ([protocol.data.contents.protocol_file] + protocol.data.contents.support_files)))
         self._worker_state: 'State' = 'stopped'
-        self._worker = self.create_worker(configuration, protocol, self)
+        self._worker = self.create_worker(configuration, protocol, self, self._tracer)
         self._publisher = configuration.event_publisher
         self._handlers: typing.Dict[CommandDefinitionType, typing.Any] = {
             ProtocolCommand.start_run: self._worker.handle_run,
@@ -85,7 +87,8 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
     @staticmethod
     def create_worker(configuration: SessionConfiguration,
                       protocol: UploadedProtocol,
-                      worker_listener: WorkerListener):
+                      worker_listener: WorkerListener,
+                      tracer: Tracer):
         """Create the _Worker instance that will handle commands and notify
         of progress"""
         # Create the protocol runner
@@ -94,7 +97,9 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
             protocol=protocol,
             loop=loop,
             hardware=configuration.hardware,
-            motion_lock=configuration.motion_lock)
+            motion_lock=configuration.motion_lock,
+            tracer=tracer
+        )
         # The async worker to which all commands are delegated.
         return _Worker(
             protocol_runner=protocol_runner,
@@ -202,7 +207,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
                     timestamp=utc_now(),
                     result=result,
                 )
-
+                cmd['payload']['line_number'] = self._tracer.line
                 publish_command(self._publisher, cmd)
             if event:
                 self._events.append(event)

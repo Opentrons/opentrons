@@ -8,7 +8,8 @@ from opentrons.hardware_control import ThreadedAsyncLock, ThreadManager
 from opentrons.api.session import Session as ApiProtocolSession
 
 from robot_server.service.protocol.protocol import UploadedProtocol
-
+from robot_server.service.session.session_types.protocol.execution.serialize_command_hack import \
+    Tracer
 
 log = logging.getLogger(__name__)
 
@@ -36,6 +37,7 @@ class ProtocolRunner:
                  loop: asyncio.AbstractEventLoop,
                  hardware: ThreadManager,
                  motion_lock: ThreadedAsyncLock,
+                 tracer: Tracer
                  ):
         """Constructor"""
         self._protocol = protocol
@@ -47,6 +49,7 @@ class ProtocolRunner:
         self._broker.subscribe(command_types.COMMAND, self._on_message)
         self._broker.subscribe(ApiProtocolSession.TOPIC, self._on_message)
         self._listeners: typing.List[ListenerType] = []
+        self._tracer = tracer
 
     def add_listener(self, listener: ListenerType):
         """Add a command listener"""
@@ -59,27 +62,30 @@ class ProtocolRunner:
     def load(self):
         """Create and simulate the api protocol session"""
         with self._protocol.protocol_environment():
-            self._session = ApiProtocolSession.build_and_prep(
-                name=self._protocol.data.contents.protocol_file.path.name,
-                contents=self._protocol.get_contents(),
-                hardware=self._hardware.sync,
-                loop=self._loop,
-                broker=self._broker,
-                motion_lock=self._motion_lock,
-                # TODO Amit 8/3/2020 - need an answer for custom labware
-                extra_labware=[])
+            with self._tracer:
+                self._session = ApiProtocolSession.build_and_prep(
+                    name=self._protocol.data.contents.protocol_file.path.name,
+                    contents=self._protocol.get_contents(),
+                    hardware=self._hardware.sync,
+                    loop=self._loop,
+                    broker=self._broker,
+                    motion_lock=self._motion_lock,
+                    # TODO Amit 8/3/2020 - need an answer for custom labware
+                    extra_labware=[])
 
     def run(self):
         """Run the protocol"""
         if self._session:
             with self._protocol.protocol_environment():
-                self._session.run()
+                with self._tracer:
+                    self._session.run()
 
     def simulate(self):
         """Simulate the protocol"""
         if self._session:
             with self._protocol.protocol_environment():
-                self._session.refresh()
+                with self._tracer:
+                    self._session.refresh()
 
     def cancel(self):
         """Cancel running"""
