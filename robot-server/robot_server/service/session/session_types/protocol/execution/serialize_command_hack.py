@@ -37,7 +37,12 @@ def check_for(payload_entry):
             'parent': check_for(payload_entry.parent),
         }}
     elif isinstance(payload_entry, types.Location):
-        return {"location": payload_entry.point,
+        point = {
+            "x": payload_entry.point.x,
+            "y": payload_entry.point.y,
+            "z": payload_entry.point.z
+        }
+        return {"location": point,
                 "labware": check_for(payload_entry.labware)}
     elif isinstance(payload_entry, LabwareLike):
         return check_for(payload_entry.object)
