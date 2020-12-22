@@ -25,6 +25,8 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { TipLengthCalibration } from '../../calibration/api-types'
 
 const TIP_LENGTH_CALIBRATED_PROMPT = 'Calibrated on'
+const OVERRIDE_TIP_LENGTH_CALIBRATED_PROMPT =
+  'Choosing this tiprack will override previous Tip Length Calibration data.'
 const TIP_LENGTH_UNCALIBRATED_PROMPT =
   'Not yet calibrated. You will calibrate this tip length before proceeding to Pipette Offset Calibration.'
 
@@ -89,7 +91,7 @@ export function ChosenTipRackRender(
             {calibrationData
               ? `${TIP_LENGTH_CALIBRATED_PROMPT} ${formatLastModified(
                   calibrationData.lastModified
-                )}`
+                )}. ${OVERRIDE_TIP_LENGTH_CALIBRATED_PROMPT}`
               : TIP_LENGTH_UNCALIBRATED_PROMPT}
           </Text>
         )}
