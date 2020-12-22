@@ -235,7 +235,7 @@ class PipetteOffsetCalibrationUserFlow:
         return await self._hardware.gantry_position(self._mount,
                                                     critical_point)
 
-    async def load_labware(self, tiprackDefinition: dict):
+    async def load_labware(self, tiprackDefinition: Optional[dict]):
         verified_definition = labware.verify_definition(tiprackDefinition)
         existing_offset_calibration = self._get_stored_pipette_offset_cal()
         self._load_tip_rack(

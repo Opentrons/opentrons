@@ -167,7 +167,7 @@ class CheckCalibrationUserFlow:
     def get_supported_commands() -> List:
         return []
 
-    async def transition(self, tiprackDefinition: dict):
+    async def transition(self, tiprackDefinition: Optional[dict]):
         pass
 
     async def change_active_pipette(self):

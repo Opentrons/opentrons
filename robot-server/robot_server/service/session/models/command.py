@@ -58,9 +58,14 @@ class LoadLabwareRequestData(BaseModel):
         description="The labware definition version")
 
 
+class LoadTiprackRequest(BaseModel):
+    tiprackDefinition: typing.Optional[dict] = Field(
+        None,
+        description="The tiprack definition to load into a user flow")
+
+
 class LoadLabwareResponseData(BaseModel):
     """Result field in an equipment.loadLabware command response."""
-
     labwareId: IdentifierType
     definition: LabwareDefinition
     calibration: OffsetVector
@@ -284,11 +289,16 @@ JogRequest = SessionCommandRequest[
 ]
 
 
-JogResponse = SessionCommandResponse[
-    Literal[CalibrationCommand.jog],
-    JogPosition,
-    EmptyModel
-]
+class LoadTiprackRequestM(BasicSessionCommand):
+    command: Literal[CalibrationCommand.load_labware]
+    data: LoadTiprackRequest
+
+
+class DeckCalibrationCommandRequest(EmptySessionCommand):
+    command: Literal[
+        DeckCalibrationCommand.move_to_point_two,
+        DeckCalibrationCommand.move_to_point_three
+    ]
 
 
 SetHasCalibrationBlockRequest = SessionCommandRequest[

@@ -160,7 +160,7 @@ class TipCalibrationUserFlow:
         MODULE_LOG.debug(f'TipCalUserFlow handled command {name}, transitioned'
                          f'from {self._current_state} to {next_state}')
 
-    async def load_labware(self, tiprackDefinition: dict):
+    async def load_labware(self, tiprackDefinition: Optional[dict]):
         pass
 
     async def move_to_tip_rack(self):
