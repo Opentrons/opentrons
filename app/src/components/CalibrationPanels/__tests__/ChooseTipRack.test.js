@@ -7,7 +7,11 @@ import { mockDeckCalTipRack } from '../../../sessions/__fixtures__'
 import { mockTipRackDefinition } from '../../../custom-labware/__fixtures__'
 import * as Sessions from '../../../sessions'
 
-import { getTipLengthCalibrations } from '../../../calibration'
+import {
+  getCalibrationForPipette,
+  getTipLengthForPipetteAndTiprack,
+  getTipLengthCalibrations,
+} from '../../../calibration'
 import { getCustomTipRackDefinitions } from '../../../custom-labware'
 import { getAttachedPipettes } from '../../../pipettes'
 
@@ -16,13 +20,23 @@ import type { State } from '../../../types'
 import type { AttachedPipettesByMount } from '../../../pipettes/types'
 
 jest.mock('../../../pipettes/selectors')
-jest.mock('../../../calibration/tip-length/selectors')
+jest.mock('../../../calibration/')
 jest.mock('../../../custom-labware/selectors')
 
 const mockAttachedPipettes: AttachedPipettesByMount = ({
   left: mockAttachedPipette,
   right: null,
 }: any)
+
+const mockGetCalibrationForPipette: JestMockFn<
+  [State, string, string, string],
+  $Call<typeof getCalibrationForPipette, State, string, string, string>
+> = getCalibrationForPipette
+
+const mockGetTipLengthForPipetteAndTiprack: JestMockFn<
+  [State, string, string, string],
+  $Call<typeof getTipLengthForPipetteAndTiprack, State, string, string, string>
+> = getTipLengthForPipetteAndTiprack
 
 const mockGetTipLengthCalibrations: JestMockFn<
   [State, string],
@@ -42,10 +56,12 @@ const mockGetCustomTipRackDefinitions: JestMockFn<
 describe('ChooseTipRack', () => {
   let render
 
-  const getUseThisTipRackBUtton = wrapper =>
+  const getUseThisTipRackButton = wrapper =>
     wrapper.find('button[data-test="useThisTipRackButton"]')
 
   beforeEach(() => {
+    mockGetCalibrationForPipette.mockReturnValue(null)
+    mockGetTipLengthForPipetteAndTiprack.mockReturnValue(null)
     mockGetTipLengthCalibrations.mockReturnValue([])
     mockGetAttachedPipettes.mockReturnValue(mockAttachedPipettes)
     mockGetCustomTipRackDefinitions.mockReturnValue([
@@ -85,7 +101,7 @@ describe('ChooseTipRack', () => {
     const { wrapper } = render()
     const allText = wrapper.text()
     expect(allText).toContain('calibrate your Deck')
-    expect(getUseThisTipRackBUtton(wrapper).exists()).toBe(true)
+    expect(getUseThisTipRackButton(wrapper).exists()).toBe(true)
   })
 
   it('Pipette offset calibration shows correct text', () => {
@@ -94,6 +110,6 @@ describe('ChooseTipRack', () => {
     })
     const allText = wrapper.text()
     expect(allText).toContain('calibrate your Pipette Offset')
-    expect(getUseThisTipRackBUtton(wrapper).exists()).toBe(true)
+    expect(getUseThisTipRackButton(wrapper).exists()).toBe(true)
   })
 })
