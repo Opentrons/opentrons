@@ -102,12 +102,25 @@ docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
 	$(SHX) cp docs/img/lightbulb.jpg $@/_images/ # sphinx wont automatically do this because it's only in a template
 
+docs/build/html/hardware: docs/hardware src/opentrons/hardware_control
+	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
+	$(SHX) mkdir $@/_images/
+	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
+
 docs/build/pdf/OpentronsPythonAPIV%.pdf: docs/v%
 	$(sphinx_build) -b latex -d docs/build/doctrees $< $(@D)
 	$(MAKE) -C $(@D) all-pdf $(if $(CI),>/dev/null,|| $(SHX) echo "latex build failed (pdflatex not installed?)")
 	$(SHX) ls $(@D)/*.pdf $(if $(CI),,|| $(SHX) echo "no pdf produced")
 
+docs/build/pdf/OT2HardwareControl.pdf: docs/hardware
+	$(sphinx_build) -b latex -d docs/build/doctrees $< $(@D)
+	$(MAKE) -C $(@D) all-pdf $(if $(CI),>/dev/null,|| $(SHX) echo "latex build failed (pdflatex not installed)")
+
 docs/dist/v%: docs/build/html/v% docs/build/pdf/OpentronsPythonAPIV%.pdf
+	$(SHX) mkdir -p $@
+	$(SHX) cp -R $^ $(@D) $(if $(CI),,|| true)
+
+docs/dist/hardware: docs/build/html/hardware docs/build/pdf/OT2HardwareControl.pdf
 	$(SHX) mkdir -p $@
 	$(SHX) cp -R $^ $(@D) $(if $(CI),,|| true)
 
@@ -120,7 +133,7 @@ docs/dist/%: docs/root/%
 	$(SHX) cp -R docs/root/* docs/dist/
 
 .PHONY: docs
-docs: docs/dist/index.html docs/dist/v1 docs/dist/v2 docs/dist/ot1
+docs: docs/dist/index.html docs/dist/v1 docs/dist/v2 docs/dist/ot1 docs/dist/hardware
 
 .PHONY: docs-clean
 docs-clean:
