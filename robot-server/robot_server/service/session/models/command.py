@@ -119,6 +119,27 @@ class SetHasCalibrationBlockRequestData(BaseModel):
         description="whether or not there is a calibration block present")
 
 
+<<<<<<< HEAD
+=======
+CommandDataType = typing.Union[
+    SetHasCalibrationBlockRequest,
+    JogPosition,
+    LiquidRequest,
+    PipetteRequestBase,
+    LoadLabwareRequest,
+    LoadInstrumentRequest,
+    LoadTiprackRequest,
+    EmptyModel
+]
+
+# A Union of all command result types
+CommandResultType = typing.Union[
+    LoadLabwareResponse,
+    LoadInstrumentResponse,
+]
+
+
+>>>>>>> move LoadTiprackRequest down in the union CommandDataType list. It is very not specific.
 class CommandStatus(str, Enum):
     """The command status."""
     executed = "executed"
