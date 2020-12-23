@@ -34,7 +34,11 @@ import { NeedHelpLink } from './NeedHelpLink'
 import { ChosenTipRackRender } from './ChosenTipRackRender'
 import { getCustomTipRackDefinitions } from '../../custom-labware'
 import { getAttachedPipettes } from '../../pipettes'
-import { getTipLengthCalibrations } from '../../calibration/tip-length/'
+import {
+  getCalibrationForPipette,
+  getTipLengthCalibrations,
+  getTipLengthForPipetteAndTiprack,
+} from '../../calibration/'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { findLabwareDefWithCustom } from '../../findLabware'
 import styles from './styles.css'
@@ -119,6 +123,21 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
       robotName && getAttachedPipettes(state, robotName)[mount].id
   )
 
+  const pipetteOffsetCal = useSelector((state: State) =>
+    robotName && pipSerial
+      ? getCalibrationForPipette(state, robotName, pipSerial, mount)
+      : null
+  )
+  const tipLengthCal = useSelector((state: State) =>
+    robotName && pipSerial && pipetteOffsetCal
+      ? getTipLengthForPipetteAndTiprack(
+          state,
+          robotName,
+          pipSerial,
+          pipetteOffsetCal?.tiprack
+        )
+      : null
+  )
   const allTipLengthCal = useSelector((state: State) =>
     robotName ? getTipLengthCalibrations(state, robotName) : []
   )
@@ -147,7 +166,15 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
               cal =>
                 cal.pipette === pipSerial && cal.uri === getLabwareDefURI(lw)
             )
-          ) || null,
+          ) ||
+          // Old tip length data don't have tiprack uri info, so we are using the
+          // tiprack hash in pipette offset to check against tip length cal for
+          // backward compatability purposes
+          (pipetteOffsetCal &&
+          tipLengthCal &&
+          pipetteOffsetCal.tiprackUri === getLabwareDefURI(lw)
+            ? tipLengthCal
+            : null),
       }
     }
     return obj
@@ -173,7 +200,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
           },
         ]
       : [...opentronsTipRacksOptions]
-  console.log(chosenTipRack)
+
   const [selectedValue, setSelectedValue] = React.useState<SelectOption>(
     chosenTipRack
       ? formatOptionsFromLabwareDef(chosenTipRack)
