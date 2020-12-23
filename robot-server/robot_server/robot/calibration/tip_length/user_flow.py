@@ -80,6 +80,8 @@ class TipCalibrationUserFlow:
             CalibrationCommand.invalidate_last_action: self.invalidate_last_action,  # noqa: E501
             CalibrationCommand.exit: self.exit_session,
         }
+        self._default_tipracks =\
+            util.get_default_tipracks(self.hw_pipette.config.default_tipracks)
 
     def _set_current_state(self, to_state: State):
         self._current_state = to_state
@@ -125,12 +127,13 @@ class TipCalibrationUserFlow:
 
     def get_pipette(self) -> AttachedPipette:
         # TODO(mc, 2020-09-17): s/tip_length/tipLength
-        return AttachedPipette(  # type: ignore[call-arg]
+        return AttachedPipette(
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
-            tip_length=self._hw_pipette.config.tip_length,
+            tipLength=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
-            serial=self._hw_pipette.pipette_id
+            serial=self._hw_pipette.pipette_id,
+            defaultTipracks=self._default_tipracks
         )
 
     def get_required_labware(self) -> List[RequiredLabware]:

@@ -64,6 +64,7 @@ class PipetteInfo:
     max_volume: int
     channels: int
     tip_rack: 'Labware'
+    default_tipracks: typing.List[dict]
 
 
 # TODO: BC: the mount field here is typed as a string
@@ -87,6 +88,8 @@ class AttachedPipette(BaseModel):
         Field(None, description="The mount this pipette attached to")
     serial: str =\
         Field(None, description="The serial number of the attached pipette")
+    defaultTipracks: typing.List[dict] =\
+        Field(None, description="A list of default tipracks for this pipette")
 
 
 class RequiredLabware(BaseModel):

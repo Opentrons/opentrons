@@ -87,11 +87,12 @@ class DeckCalibrationSession(BaseSession):
     def _get_response_details(self) -> DeckCalibrationSessionStatus:
         # TODO(mc, 2020-09-17): get_pipette() returns an Optional value but
         # DeckCalibrationSessionStatus has an exact type for instrument
+        supported_commands = self._deck_cal_user_flow.get_supported_commands()
         return DeckCalibrationSessionStatus(
             instrument=self._deck_cal_user_flow.get_pipette(),  # type: ignore[arg-type] # noqa: e501
             currentStep=self._deck_cal_user_flow.current_state,
             labware=self._deck_cal_user_flow.get_required_labware(),
-            supportedCommands=self._deck_cal_user_flow.get_supported_commands())
+            supportedCommands=supported_commands)
 
     async def clean_up(self):
         if self._shutdown_coroutine:

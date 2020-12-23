@@ -251,7 +251,9 @@ class CheckCalibrationUserFlow:
                     max_volume=pip.config.max_volume,
                     mount=mount,
                     tip_rack=self._get_tiprack_by_pipette_volume(
-                        pip.config.max_volume, pip_calibration))
+                        pip.config.max_volume, pip_calibration),
+                    default_tipracks=uf.get_default_tipracks(
+                        pip.config.default_tipracks))
                 return info, [info]
 
         right_pip = pips[Mount.RIGHT]
@@ -266,14 +268,18 @@ class CheckCalibrationUserFlow:
             rank=PipetteRank.first,
             mount=Mount.RIGHT,
             tip_rack=self._get_tiprack_by_pipette_volume(
-                right_pip.config.max_volume, r_calibration))
+                right_pip.config.max_volume, r_calibration),
+            default_tipracks=uf.get_default_tipracks(
+                right_pip.config.default_tipracks))
         l_info = PipetteInfo(
             channels=left_pip.config.channels,
             max_volume=left_pip.config.max_volume,
             rank=PipetteRank.first,
             mount=Mount.LEFT,
             tip_rack=self._get_tiprack_by_pipette_volume(
-                left_pip.config.max_volume, l_calibration))
+                left_pip.config.max_volume, l_calibration),
+            default_tipracks=uf.get_default_tipracks(
+                left_pip.config.default_tipracks))
         if left_pip.config.max_volume > right_pip.config.max_volume or \
                 right_pip.config.channels > left_pip.config.channels:
             r_info.rank = PipetteRank.second
@@ -479,7 +485,8 @@ class CheckCalibrationUserFlow:
                 tipRackUri=info_pip.tip_rack.uri,
                 rank=info_pip.rank.value,
                 mount=str(info_pip.mount),
-                serial=hw_pip.pipette_id)  # type: ignore[arg-type]
+                serial=hw_pip.pipette_id,  # type: ignore[arg-type]
+                defaultTipracks=info_pip.default_tipracks)
             for hw_pip, info_pip in zip(hw_pips, info_pips)]
 
     def get_active_pipette(self) -> CheckAttachedPipette:

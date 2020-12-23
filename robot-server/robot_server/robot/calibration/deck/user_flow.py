@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import (
     Any, Awaitable, Callable, Dict, List, Optional, Tuple,
-    Union, TYPE_CHECKING, cast)
+    Union, TYPE_CHECKING)
 
 from opentrons.calibration_storage import get, delete
 from opentrons.calibration_storage.types import TipLengthCalNotFound
@@ -72,6 +72,7 @@ class DeckCalibrationUserFlow:
                  hardware: ThreadManager):
         self._hardware = hardware
         self._hw_pipette, self._mount = self._select_target_pipette()
+        self._default_tipracks = self._get_default_tipracks()
 
         deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() \
             else STANDARD_DECK
@@ -149,12 +150,13 @@ class DeckCalibrationUserFlow:
         # TODO(mc, 2020-09-17): s/tip_length/tipLength
         # TODO(mc, 2020-09-17): type of pipette_id does not match expected
         # type of AttachedPipette.serial
-        return AttachedPipette(  # type: ignore[call-arg]
+        return AttachedPipette(
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
-            tip_length=self._hw_pipette.config.tip_length,
+            tipLength=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
-            serial=self._hw_pipette.pipette_id)  # type: ignore[arg-type]
+            serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
+            defaultTipracks=self._default_tipracks)
 
     def get_required_labware(self) -> List[RequiredLabware]:
         return [RequiredLabware.from_lw(self._tip_rack)]
@@ -206,6 +208,9 @@ class DeckCalibrationUserFlow:
             return labware.load(
                 lw_load_name, self._deck.position_for(TIP_RACK_SLOT))
 
+    def _get_default_tipracks(self):
+        return uf.get_default_tipracks(self.hw_pipette.config.default_tipracks)
+
     def _build_expected_points_dict(self) -> ExpectedPoints:
         pos_1 = self._deck.get_calibration_position(POINT_ONE_ID).position
         pos_2 = self._deck.get_calibration_position(POINT_TWO_ID).position
@@ -249,12 +254,13 @@ class DeckCalibrationUserFlow:
                                                     critical_point)
 
     async def load_labware(self, tiprackDefinition: Optional[dict]):
-        verified_definition = labware.verify_definition(tiprackDefinition)
-        self._tip_rack = self._get_tip_rack_lw(
-            verified_definition)
-        if self._deck[TIP_RACK_SLOT]:
-            del self._deck[TIP_RACK_SLOT]
-        self._deck[TIP_RACK_SLOT] = self._tip_rack
+        if tiprackDefinition:
+            verified_definition = labware.verify_definition(tiprackDefinition)
+            self._tip_rack = self._get_tip_rack_lw(
+                verified_definition)
+            if self._deck[TIP_RACK_SLOT]:
+                del self._deck[TIP_RACK_SLOT]
+            self._deck[TIP_RACK_SLOT] = self._tip_rack
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,

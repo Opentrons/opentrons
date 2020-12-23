@@ -36,6 +36,7 @@ stages:
             currentStep: sessionStarted
             instrument: !anydict
             labware: !anylist
+            supportedCommands: !anylist
 
   - name: Load labware
     request: &post_command
