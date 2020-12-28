@@ -367,7 +367,7 @@ async def test_return_tip(mock_user_flow):
 
 @pytest.mark.parametrize('command,current_state,data,hw_meth', hw_commands)
 async def test_hw_calls(command, current_state, data, hw_meth, mock_user_flow):
-    mock_user_flow._current_state = current_state
+    mock_user_flow._sm.set_state(current_state)
     # z height reference must be present for moving to point one
     if command == CalibrationCommand.move_to_point_one:
         mock_user_flow._z_height_reference = 0.1
@@ -380,7 +380,7 @@ async def test_hw_calls(command, current_state, data, hw_meth, mock_user_flow):
     'command,current_state,data,hw_meth', hw_commands_fused)
 async def test_hw_calls_fused(
         command, current_state, data, hw_meth, mock_user_flow_fused):
-    mock_user_flow_fused._current_state = current_state
+    mock_user_flow_fused._sm.set_state(current_state)
     # z height reference must be present for moving to point one
     if command == CalibrationCommand.move_to_point_one:
         mock_user_flow_fused._z_height_reference = 0.1
@@ -448,7 +448,7 @@ def mock_save_tip_length():
 async def test_save_tip_length(
         mock_user_flow_fused, mock_save_tip_length, mock_delete_pipette):
     uf = mock_user_flow_fused
-    uf._current_state = uf._state.measuringTipOffset
+    uf._sm.set_state(uf._sm.state.measuringTipOffset)
     uf._nozzle_height_at_reference = 10
     uf._hw_pipette.add_tip(50)
     await uf._hardware.move_to(mount=uf._mount,
@@ -467,7 +467,7 @@ async def test_save_tip_length(
 async def test_save_pipette_calibration(mock_user_flow, mock_save_pipette):
     uf = mock_user_flow
 
-    uf._current_state = 'savingPointOne'
+    uf._sm.set_state(uf._sm.state.savingPointOne)
     await uf._hardware.move_to(
             mount=uf._mount,
             abs_position=Point(x=10, y=10, z=40),

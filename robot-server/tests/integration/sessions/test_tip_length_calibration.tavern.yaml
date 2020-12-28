@@ -39,6 +39,7 @@ stages:
             instrument: !anydict
             labware: !anylist
             nextSteps: null
+            supportedCommands: !anylist
           createParams:
             mount: left
             hasCalibrationBlock: true
@@ -52,8 +53,7 @@ stages:
       json:
         data:
           command: calibration.loadLabware
-          data:
-            tiprackDefinition: !include fixture_tiprack_300_ul.json
+          data: {}
     response:
       status_code: 200
       json:
@@ -66,8 +66,7 @@ stages:
             !re_match "\\d+-\\d+-\\d+T"
           startedAt: *dt
           completedAt: *dt
-          data:
-            tiprackDefinition: !include fixture_tiprack_300_ul.json
+          data: {}
           result: null
 
   - name: Attempt conflicting command

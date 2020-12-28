@@ -133,7 +133,7 @@ class TipCalibrationUserFlow:
             tipLength=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
             serial=self._hw_pipette.pipette_id,
-            defaultTipracks=self._default_tipracks
+            defaultTipracks=self._default_tipracks  # type: ignore[arg-type]
         )
 
     def get_required_labware(self) -> List[RequiredLabware]:
@@ -163,7 +163,7 @@ class TipCalibrationUserFlow:
         MODULE_LOG.debug(f'TipCalUserFlow handled command {name}, transitioned'
                          f'from {self._current_state} to {next_state}')
 
-    async def load_labware(self, tiprackDefinition: Optional[dict]):
+    async def load_labware(self, tiprackDefinition: Optional[dict] = None):
         pass
 
     async def move_to_tip_rack(self):

@@ -253,7 +253,7 @@ class DeckCalibrationUserFlow:
         return await self._hardware.gantry_position(self._mount,
                                                     critical_point)
 
-    async def load_labware(self, tiprackDefinition: Optional[dict]):
+    async def load_labware(self, tiprackDefinition: Optional[dict] = None):
         if tiprackDefinition:
             verified_definition = labware.verify_definition(tiprackDefinition)
             self._tip_rack = self._get_tip_rack_lw(

@@ -433,11 +433,11 @@ class PipetteOffsetCalibrationUserFlow:
                 tiprack_hash=tiprack_hash,
                 tiprack_uri=self._tip_rack.uri)
             self._saved_offset_this_session = True
-        elif isinstance(self._sm.state, POWTState)\
-                and current_state == self._sm.state.measuringNozzleOffset:
+        elif isinstance(current_state, POWTState)\
+                and current_state == POWTState.measuringNozzleOffset:
             self._nozzle_height_at_reference = cur_pt.z
-        elif isinstance(self._sm.state, POWTState)\
-                and current_state == self._sm.state.measuringTipOffset:
+        elif isinstance(current_state, POWTState)\
+                and current_state == POWTState.measuringTipOffset:
             assert self._hw_pipette.has_tip
             assert self._nozzle_height_at_reference is not None
             # set critical point explicitly to nozzle

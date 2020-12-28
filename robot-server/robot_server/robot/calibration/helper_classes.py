@@ -10,6 +10,7 @@ from opentrons.types import DeckLocation
 
 if typing.TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
+    from opentrons_shared_data.labware import LabwareDefinition
 
 
 class RobotHealthCheck(Enum):
@@ -64,7 +65,7 @@ class PipetteInfo:
     max_volume: int
     channels: int
     tip_rack: 'Labware'
-    default_tipracks: typing.List[dict]
+    default_tipracks: typing.List['LabwareDefinition']
 
 
 # TODO: BC: the mount field here is typed as a string

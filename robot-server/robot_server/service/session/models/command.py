@@ -128,8 +128,8 @@ CommandDataType = typing.Union[
     PipetteRequestBase,
     LoadLabwareRequest,
     LoadInstrumentRequest,
-    LoadTiprackRequest,
-    EmptyModel
+    EmptyModel,
+    LoadTiprackRequest
 ]
 
 # A Union of all command result types

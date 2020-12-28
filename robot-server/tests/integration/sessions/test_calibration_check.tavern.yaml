@@ -47,6 +47,8 @@ stages:
             activeTipRack: !anydict
             labware: !anylist
             comparisonsByPipette: !anydict
+            supportedCommands: !anylist
+
 
   - name: Load labware
     request: &post_command
@@ -55,8 +57,7 @@ stages:
       json:
         data:
           command: calibration.loadLabware
-          data:
-            tiprackDefinition: !include fixture_tiprack_300_ul.json
+          data: {}
     response:
       status_code: 200
   - name: Check the effect of command
