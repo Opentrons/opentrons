@@ -53,7 +53,7 @@ class StateStore:
         Update the state upon completion of a handled command.
         """
         self._command_results_map[command.meta.identifier] = result
-        handler = self._handler_map.get(command.content.name)
+        handler = self._handler_map.get(command.request.command)
         if handler:
             handler(command, result)
 
@@ -63,7 +63,7 @@ class StateStore:
         """Update state according to load_labware() command result."""
         result_data = cast(models.LoadLabwareResponseData, result.data)
         command_data = cast(models.LoadLabwareRequestData,
-                            command.content.data)
+                            command.request.data)
         self._labware[result_data.labwareId] = LabwareEntry(
             definition=result_data.definition,
             calibration=result_data.calibration,
@@ -75,7 +75,7 @@ class StateStore:
         """Store result of load instrument"""
         result_data = cast(models.LoadInstrumentResponseData, result.data)
         command_data = cast(models.LoadInstrumentRequestData,
-                            command.content.data)
+                            command.request.data)
         self._instruments[result_data.instrumentId] = InstrumentEntry(
             mount=command_data.mount.to_hw_mount(),
             name=command_data.instrumentName

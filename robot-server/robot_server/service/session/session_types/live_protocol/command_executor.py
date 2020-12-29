@@ -44,14 +44,14 @@ class LiveProtocolCommandExecutor(CommandExecutor):
         self._store.handle_command_request(command)
 
         # handle side-effects with timing
-        handler = self._handler_map.get(command.content.name)
+        handler = self._handler_map.get(command.request.command)
 
         if handler:
             with duration() as timed:
-                data = await handler(command.content.data)
+                data = await handler(command.request.data)
         else:
             raise UnsupportedCommandException(
-                f"Command '{command.content.name}' is not supported."
+                f"Command '{command.request.command}' is not supported."
             )
 
         result = CommandResult(started_at=timed.start,
@@ -63,7 +63,7 @@ class LiveProtocolCommandExecutor(CommandExecutor):
 
         # return completed command to session
         return CompletedCommand(
-            content=command.content,
+            request=command.request,
             meta=command.meta,
             result=result,
         )

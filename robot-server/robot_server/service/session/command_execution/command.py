@@ -3,18 +3,10 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from robot_server.service.session.models.command import (
-    CommandDataType, CommandStatus, CommandResultType)
-from robot_server.service.session.models.command_definitions import \
-    CommandDefinitionType
+    CommandStatus, CommandResultType, RequestTypes)
 from robot_server.service.session.models.common import (
     IdentifierType, create_identifier)
 from opentrons.util.helpers import utc_now
-
-
-@dataclass(frozen=True)
-class CommandContent:
-    name: CommandDefinitionType
-    data: CommandDataType
 
 
 @dataclass(frozen=True)
@@ -33,23 +25,19 @@ class CommandResult:
 
 @dataclass(frozen=True)
 class Command:
-    content: CommandContent
+    request: RequestTypes
     meta: CommandMeta = field(default_factory=CommandMeta)
 
 
 @dataclass(frozen=True)
 class CompletedCommand:
-    content: CommandContent
+    request: RequestTypes
     meta: CommandMeta
     result: CommandResult
 
 
-def create_command(name: CommandDefinitionType,
-                   data: CommandDataType) -> Command:
+def create_command(request: RequestTypes) -> Command:
     """Create a command object"""
     return Command(
-        content=CommandContent(
-            name=name,
-            data=data
-        )
+        request=request
     )

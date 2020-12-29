@@ -2,8 +2,9 @@ from unittest.mock import MagicMock, patch, PropertyMock
 from datetime import datetime
 import pytest
 
-from robot_server.service.session.command_execution.command import Command, CommandContent  # noqa: E501
+from robot_server.service.session.command_execution.command import Command
 from robot_server.service.session.errors import UnsupportedCommandException
+from robot_server.service.session.models.command import ProtocolCommandRequest
 from robot_server.service.session.models.command_definitions import \
     ProtocolCommand
 from robot_server.service.session.models.common import EmptyModel
@@ -74,8 +75,8 @@ async def test_command_state_reject(loop,
     protocol_command_executor.current_state = current_state
 
     for protocol_command in ProtocolCommand:
-        command = Command(content=CommandContent(
-            name=protocol_command,
+        command = Command(request=ProtocolCommandRequest(
+            command=protocol_command,
             data=EmptyModel())
         )
         if protocol_command in accepted_commands:
@@ -100,8 +101,8 @@ async def test_execute(loop, command, worker_method_name,
     with patch.object(ProtocolCommandExecutor,
                       "STATE_COMMAND_MAP",
                       new={protocol_command_executor.current_state: ProtocolCommand}):  # noqa: E501
-        protocol_command = Command(content=CommandContent(
-            name=command,
+        protocol_command = Command(request=ProtocolCommandRequest(
+            command=command,
             data=EmptyModel())
         )
         await protocol_command_executor.execute(protocol_command)

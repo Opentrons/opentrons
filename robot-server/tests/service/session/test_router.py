@@ -10,9 +10,11 @@ from robot_server.service.dependencies import get_session_manager
 from robot_server.service.session.command_execution import CommandExecutor, \
     Command
 from robot_server.service.session.command_execution.command import \
-    CommandResult, CompletedCommand, CommandContent, CommandMeta, CommandStatus
+    CommandResult, CompletedCommand, CommandMeta, CommandStatus
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedCommandException, CommandExecutionException
+from robot_server.service.session.models.command import JogRequest, \
+    LoadLabwareRequest, CalibrationRequest
 from robot_server.service.session.models.common import EmptyModel, JogPosition
 from robot_server.service.session.models.command_definitions import \
     CalibrationCommand
@@ -53,8 +55,8 @@ def command_created_at():
 def patch_create_command(command_id, command_created_at):
     session_path = "robot_server.service.session.session_types"
     with patch(f"{session_path}.base_session.create_command") as p:
-        p.side_effect = lambda c, n: Command(
-            content=CommandContent(c, n),
+        p.side_effect = lambda c: Command(
+            request=c,
             meta=CommandMeta(command_id, command_created_at))
         yield p
 
@@ -64,7 +66,7 @@ def mock_command_executor():
     mock = MagicMock(spec=CommandExecutor)
 
     async def func(command):
-        return CompletedCommand(content=command.content,
+        return CompletedCommand(request=command.request,
                                 meta=command.meta,
                                 result=CommandResult(
                                     status=CommandStatus.executed,
@@ -313,8 +315,8 @@ def test_execute_command(api_client,
 
     mock_command_executor.execute.assert_called_once_with(
         Command(
-            content=CommandContent(
-                name=CalibrationCommand.jog,
+            request=JogRequest(
+                command=CalibrationCommand.jog,
                 data=JogPosition(vector=(1, 2, 3,))
             ),
             meta=CommandMeta(identifier=command_id,
@@ -370,8 +372,8 @@ def test_execute_command_no_body(api_client,
 
     mock_command_executor.execute.assert_called_once_with(
         Command(
-            content=CommandContent(
-                name=CalibrationCommand.load_labware,
+            request=CalibrationRequest(
+                command=CalibrationCommand.load_labware,
                 data=EmptyModel()),
             meta=CommandMeta(command_id, command_created_at)
         )

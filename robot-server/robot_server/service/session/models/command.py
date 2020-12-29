@@ -13,6 +13,7 @@ from robot_server.service.session.models.command_definitions import \
 from robot_server.service.session.models.common import (
     EmptyModel, JogPosition, IdentifierType, OffsetVector)
 from pydantic import BaseModel, Field
+from pydantic.generics import GenericModel
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.json_api import (
     ResponseModel, RequestModel, ResponseDataModel)
@@ -111,18 +112,18 @@ class CommandStatus(str, Enum):
     failed = "failed"
 
 
-class BasicSessionCommand(BaseModel):
+RequestDataT = typing.TypeVar('RequestDataT', bound=BaseModel)
+
+
+class SessionCommandRequest(GenericModel, typing.Generic[RequestDataT]):
     """A session command"""
     command: CommandDefinitionType = Field(
         ...,
         description="The command description")
+    data: RequestDataT
 
 
-class EmptySessionCommand(BasicSessionCommand):
-    data: EmptyModel
-
-
-class RobotCommandRequest(EmptySessionCommand):
+class RobotCommandRequest(SessionCommandRequest[EmptyModel]):
     command: Literal[
         RobotCommand.home_all_motors,
         RobotCommand.home_pipette,
@@ -130,7 +131,7 @@ class RobotCommandRequest(EmptySessionCommand):
     ]
 
 
-class ProtocolCommandRequest(EmptySessionCommand):
+class ProtocolCommandRequest(SessionCommandRequest[EmptyModel]):
     command: Literal[
         ProtocolCommand.start_run,
         ProtocolCommand.start_simulate,
@@ -140,33 +141,29 @@ class ProtocolCommandRequest(EmptySessionCommand):
     ]
 
 
-class LoadLabwareRequest(BasicSessionCommand):
+class LoadLabwareRequest(SessionCommandRequest[LoadLabwareRequestData]):
     command: Literal[EquipmentCommand.load_labware]
-    data: LoadLabwareRequestData
 
 
-class LoadInstrumentRequest(BasicSessionCommand):
+class LoadInstrumentRequest(SessionCommandRequest[LoadInstrumentRequestData]):
     command: Literal[EquipmentCommand.load_instrument]
-    data: LoadInstrumentRequestData
 
 
-class LiquidRequest(BasicSessionCommand):
+class LiquidRequest(SessionCommandRequest[LiquidRequestData]):
     command: Literal[
         PipetteCommand.aspirate,
         PipetteCommand.dispense
     ]
-    data: LiquidRequestData
 
 
-class TipRequest(BasicSessionCommand):
+class TipRequest(SessionCommandRequest[PipetteRequestDataBase]):
     command: Literal[
         PipetteCommand.drop_tip,
         PipetteCommand.pick_up_tip
     ]
-    data: PipetteRequestDataBase
 
 
-class CalibrationRequest(EmptySessionCommand):
+class CalibrationRequest(SessionCommandRequest[EmptyModel]):
     command: Literal[
         CalibrationCommand.load_labware,
         CalibrationCommand.move_to_tip_rack,
@@ -182,24 +179,24 @@ class CalibrationRequest(EmptySessionCommand):
     ]
 
 
-class JogRequest(BasicSessionCommand):
+class JogRequest(SessionCommandRequest[JogPosition]):
     command: Literal[CalibrationCommand.jog]
-    data: JogPosition
 
 
-class SetHasCalibrationBlockRequestM(BasicSessionCommand):
+class SetHasCalibrationBlockRequestM(
+    SessionCommandRequest[SetHasCalibrationBlockRequestData]
+):
     command: Literal[CalibrationCommand.set_has_calibration_block]
-    data: SetHasCalibrationBlockRequestData
 
 
-class DeckCalibrationCommandRequest(EmptySessionCommand):
+class DeckCalibrationCommandRequest(SessionCommandRequest[EmptyModel]):
     command: Literal[
         DeckCalibrationCommand.move_to_point_two,
         DeckCalibrationCommand.move_to_point_three
     ]
 
 
-class CheckCalibrationCommandRequest(EmptySessionCommand):
+class CheckCalibrationCommandRequest(SessionCommandRequest[EmptyModel]):
     command: Literal[
         CheckCalibrationCommand.compare_point,
         CheckCalibrationCommand.switch_pipette,

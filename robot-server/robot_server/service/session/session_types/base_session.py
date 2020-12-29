@@ -66,8 +66,7 @@ class BaseSession(ABC):
     async def execute_command(self, command: command_models.RequestTypes) -> \
             command_models.SessionCommand:
         """Execute a command."""
-        command_obj = create_command(command.command,
-                                     command.data)
+        command_obj = create_command(command)
         command_result = await self.command_executor.execute(command_obj)
 
         return command_models.SessionCommand(
