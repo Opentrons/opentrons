@@ -5,7 +5,7 @@ import logging
 from asyncio import Future
 from typing import Any
 
-from notify_server.clients.queue_entry import QueueEntry
+from notify_server.clients.serdes import to_frames
 from notify_server.models.event import Event
 from notify_server.network.connection import create_push, Connection
 
@@ -22,7 +22,7 @@ def create(host_address: str) -> Publisher:
 
 
 class Publisher:
-    """Async publisher class."""
+    """Publisher class."""
 
     def __init__(self, connection: Connection) -> None:
         """Construct a Publisher."""
@@ -34,7 +34,7 @@ class Publisher:
 
     def send_nowait(self, topic: str, event: Event) -> Future[Any]:
         """Publish an event to a topic without waiting for completion."""
-        frames = QueueEntry(topic=topic, event=event).to_frames()
+        frames = to_frames(topic=topic, event=event)
         return self._connection.send_multipart(frames)
 
     def close(self) -> None:
