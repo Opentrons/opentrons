@@ -37,16 +37,16 @@ def to_frames(topic: str, event: Event) -> List[bytes]:
     ]
 
 
-class SubscriberEntry(BaseModel):
-    """An entry in a send/receive queue."""
+class TopicEvent(BaseModel):
+    """An event received by a topic subscriber."""
 
     topic: str
     event: Event
 
 
-def from_frames(frames: List[bytes]) -> SubscriberEntry:
+def from_frames(frames: List[bytes]) -> TopicEvent:
     """
-    Create a SubscriberEntry from a zmq frame.
+    Create an object from a zmq frame.
 
     The frame must have two entries: a topic, a json serialized Event
     object.
@@ -54,7 +54,7 @@ def from_frames(frames: List[bytes]) -> SubscriberEntry:
     :raises: MalformedFrame
     """
     try:
-        return SubscriberEntry(
+        return TopicEvent(
             topic=frames[0].decode(),
             event=Event.parse_raw((frames[1]))
         )

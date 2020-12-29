@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 import typing
 
-from notify_server.clients.serdes import SubscriberEntry, from_frames
+from notify_server.clients.serdes import TopicEvent, from_frames
 from notify_server.network.connection import create_subscriber, Connection
 
 log = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ class Subscriber:
         """Stop the subscriber task."""
         self._connection.close()
 
-    async def next_event(self) -> SubscriberEntry:
+    async def next_event(self) -> TopicEvent:
         """Get next event."""
         s = await self._connection.recv_multipart()
         return from_frames(s)
@@ -44,6 +44,6 @@ class Subscriber:
         """Create an async iterator."""
         return self
 
-    async def __anext__(self) -> SubscriberEntry:
+    async def __anext__(self) -> TopicEvent:
         """Get next event."""
         return await self.next_event()

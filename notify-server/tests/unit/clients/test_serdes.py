@@ -3,7 +3,7 @@ from typing import List
 
 import pytest
 from notify_server.clients.serdes import (
-    SubscriberEntry, MalformedFrames, to_frames, from_frames)
+    TopicEvent, MalformedFrames, to_frames, from_frames)
 from notify_server.models.event import Event
 
 
@@ -29,4 +29,4 @@ def test_entry_from_frames_fail(frames: List[bytes]) -> None:
 def test_entry_from_frames(event: Event) -> None:
     """Test that an object is created from_frames."""
     entry = from_frames([b"topic", event.json().encode('utf-8')])
-    assert entry == SubscriberEntry(topic="topic", event=event)
+    assert entry == TopicEvent(topic="topic", event=event)
