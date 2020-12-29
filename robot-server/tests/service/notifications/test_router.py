@@ -3,7 +3,6 @@ from typing import AsyncGenerator
 from mock import patch
 
 import pytest
-from notify_server.clients.queue_entry import QueueEntry
 from starlette.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
 
@@ -31,7 +30,7 @@ def test_subscribe_no_topic(api_client: TestClient):
 def test_integration(
         api_client: TestClient,
         mock_subscriber: AsyncGenerator,
-        queue_entry: QueueEntry) -> None:
+        topic_event) -> None:
     """Test receiving a single event."""
     with patch.object(handle_subscriber,
                       "create",
@@ -40,5 +39,5 @@ def test_integration(
             "/notifications/subscribe?topic=t"
         )
         event = sock.receive()
-        assert event["text"] == queue_entry.json()
+        assert event["text"] == topic_event.json()
         assert event["type"] == "websocket.send"
