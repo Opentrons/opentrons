@@ -48,20 +48,21 @@ def command_executor(mock_command_interface, mock_state_store)\
 
 
 async def test_load_labware(command_executor, mock_command_interface):
-    expected_response = models.LoadLabwareResponse(labwareId="your labware",
-                                                   definition={},
-                                                   calibration=(1, 2, 3))
+    expected_response = models.LoadLabwareResponseData(
+        labwareId="your labware",
+        definition={},
+        calibration=(1, 2, 3))
 
     async def handler(command):
         return expected_response
 
     mock_command_interface.handle_load_labware.side_effect = handler
 
-    command = models.LoadLabwareRequest(location=1,
-                                        loadName="hello",
-                                        displayName="niceName",
-                                        version=1,
-                                        namespace="test")
+    command = models.LoadLabwareRequestData(location=1,
+                                            loadName="hello",
+                                            displayName="niceName",
+                                            version=1,
+                                            namespace="test")
     result = await command_executor.execute(
         Command(content=CommandContent(
             name=command_definitions.EquipmentCommand.load_labware,
@@ -77,7 +78,7 @@ async def test_load_labware(command_executor, mock_command_interface):
 
 
 async def test_load_instrument(command_executor, mock_command_interface):
-    expected_response = models.LoadInstrumentResponse(
+    expected_response = models.LoadInstrumentResponseData(
         instrumentId="your instrument")
 
     async def handler(command):
@@ -85,8 +86,8 @@ async def test_load_instrument(command_executor, mock_command_interface):
 
     mock_command_interface.handle_load_instrument.side_effect = handler
 
-    command = models.LoadInstrumentRequest(instrumentName="p1000_single",
-                                           mount=Mount.left)
+    command = models.LoadInstrumentRequestData(instrumentName="p1000_single",
+                                               mount=Mount.left)
     result = await command_executor.execute(
         Command(content=CommandContent(
             name=command_definitions.EquipmentCommand.load_instrument,
@@ -113,7 +114,7 @@ async def test_liquid_commands(command_executor, mock_command_interface,
     async def handler(command):
         return None
 
-    command_data = models.LiquidRequest(
+    command_data = models.LiquidRequestData(
         pipetteId="", labwareId="", wellId="",
         flowRate=2, volume=1, offsetFromBottom=2)
 
@@ -146,7 +147,7 @@ async def test_tip_commands(command_executor, mock_command_interface,
     async def handler(command):
         return None
 
-    command_data = models.PipetteRequestBase(
+    command_data = models.PipetteRequestDataBase(
         pipetteId="", labwareId="", wellId="")
 
     mock_command_interface.handle_pick_up_tip.side_effect = handler

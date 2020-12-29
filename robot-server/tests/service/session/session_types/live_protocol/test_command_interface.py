@@ -28,7 +28,7 @@ def labware_calibration_mock():
 
 @pytest.fixture
 def load_labware_cmd():
-    return models.LoadLabwareRequest(
+    return models.LoadLabwareRequestData(
         location=1,
         loadName="labware-load-name",
         displayName="labware display name",
@@ -39,7 +39,7 @@ def load_labware_cmd():
 
 @pytest.fixture
 def load_instrument_cmd():
-    return models.LoadInstrumentRequest(
+    return models.LoadInstrumentRequestData(
         instrumentName='p50_single',
         mount=Mount.left
     )

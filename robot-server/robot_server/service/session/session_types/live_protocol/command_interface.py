@@ -25,7 +25,8 @@ class CommandInterface:
 
     async def handle_load_labware(
             self,
-            command: models.LoadLabwareRequest) -> models.LoadLabwareResponse:
+            command: models.LoadLabwareRequestData) ->\
+            models.LoadLabwareResponseData:
 
         labware_def = get_labware_definition(load_name=command.loadName,
                                              namespace=command.namespace,
@@ -34,14 +35,14 @@ class CommandInterface:
         labware_path = f'{helpers.hash_labware_def(labware_def)}.json'
         calibration = get.get_labware_calibration(labware_path, labware_def,
                                                   '')
-        return models.LoadLabwareResponse(labwareId=create_identifier(),
-                                          definition=labware_def,
-                                          calibration=calibration)
+        return models.LoadLabwareResponseData(labwareId=create_identifier(),
+                                              definition=labware_def,
+                                              calibration=calibration)
 
     async def handle_load_instrument(
             self,
-            command: models.LoadInstrumentRequest) \
-            -> models.LoadInstrumentResponse:
+            command: models.LoadInstrumentRequestData) \
+            -> models.LoadInstrumentResponseData:
         """Load an instrument while checking if it is connected"""
         mount = command.mount
         other_mount = mount.other_mount()
@@ -63,16 +64,17 @@ class CommandInterface:
             log.exception("Failed to cache_instruments")
             raise ProtocolErrorInstrument(str(e))
 
-        return models.LoadInstrumentResponse(instrumentId=create_identifier())
+        return models.LoadInstrumentResponseData(
+            instrumentId=create_identifier())
 
-    async def handle_aspirate(self, command: models.PipetteRequestBase):
+    async def handle_aspirate(self, command: models.PipetteRequestDataBase):
         raise UnsupportedCommandException("")
 
-    async def handle_dispense(self, command: models.PipetteRequestBase):
+    async def handle_dispense(self, command: models.PipetteRequestDataBase):
         raise UnsupportedCommandException("")
 
-    async def handle_pick_up_tip(self, command: models.PipetteRequestBase):
+    async def handle_pick_up_tip(self, command: models.PipetteRequestDataBase):
         raise UnsupportedCommandException("")
 
-    async def handle_drop_tip(self, command: models.PipetteRequestBase):
+    async def handle_drop_tip(self, command: models.PipetteRequestDataBase):
         raise UnsupportedCommandException("")

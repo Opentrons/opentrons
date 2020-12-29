@@ -16,7 +16,7 @@ def test_handle_command_request():
     store = StateStore()
     command = create_command(
         name=command_definitions.EquipmentCommand.load_labware,
-        data=models.LoadLabwareRequest(
+        data=models.LoadLabwareRequestData(
             location=1,
             loadName="labware-load-name",
             displayName="labware display name",
@@ -34,7 +34,7 @@ def test_store_has_handle_command_response_method():
         store = StateStore()
         command = create_command(
             name=command_definitions.EquipmentCommand.load_labware,
-            data=models.LoadLabwareRequest(
+            data=models.LoadLabwareRequestData(
                 location=1,
                 loadName="labware-load-name",
                 displayName="labware display name",
@@ -79,7 +79,7 @@ def test_load_labware_update():
     store = StateStore()
     labware = command_definitions.EquipmentCommand.load_labware
     command = create_command(name=labware,
-                             data=models.LoadLabwareRequest(
+                             data=models.LoadLabwareRequestData(
                                     location=1,
                                     loadName="labware-load-name",
                                     displayName="labware display name",
@@ -89,9 +89,10 @@ def test_load_labware_update():
     command_result = CommandResult(
         started_at=command.meta.created_at,
         completed_at=command.meta.created_at,
-        data=models.LoadLabwareResponse(labwareId="1234",
-                                        definition={"myLabware": "definition"},
-                                        calibration=(1, 2, 3)))
+        data=models.LoadLabwareResponseData(
+            labwareId="1234",
+            definition={"myLabware": "definition"},
+            calibration=(1, 2, 3)))
     assert store.get_labware_by_id(command_result.data.labwareId) is None
     store.handle_command_result(command, command_result)
     assert store.get_labware_by_id(command_result.data.labwareId) == \
@@ -104,14 +105,14 @@ def test_load_instrument_update():
     store = StateStore()
     instrument = command_definitions.EquipmentCommand.load_instrument
     command = create_command(name=instrument,
-                             data=models.LoadInstrumentRequest(
+                             data=models.LoadInstrumentRequestData(
                                  instrumentName='p10_single',
                                  mount=Mount.left)
                              )
     command_result = CommandResult(
         started_at=command.meta.created_at,
         completed_at=command.meta.created_at,
-        data=models.LoadInstrumentResponse(instrumentId="1234"))
+        data=models.LoadInstrumentResponseData(instrumentId="1234"))
 
     assert store.get_instrument_by_id(command_result.data.instrumentId) is None
     assert store.get_instrument_by_mount(

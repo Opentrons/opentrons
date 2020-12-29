@@ -19,7 +19,7 @@ from robot_server.service.json_api import (
 from opentrons.util.helpers import utc_now
 
 
-class LoadLabwareRequest(BaseModel):
+class LoadLabwareRequestData(BaseModel):
     location: int = Field(
         ...,
         description="Deck slot", ge=1, lt=12)
@@ -37,30 +37,30 @@ class LoadLabwareRequest(BaseModel):
         description="The labware definition version")
 
 
-class LoadLabwareResponse(BaseModel):
+class LoadLabwareResponseData(BaseModel):
     labwareId: IdentifierType
     definition: LabwareDefinition
     calibration: OffsetVector
 
 
-class LoadInstrumentRequest(BaseModel):
+class LoadInstrumentRequestData(BaseModel):
     instrumentName: PipetteName = Field(
         ...,
         description="The name of the instrument model")
     mount: Mount
 
 
-class LoadInstrumentResponse(BaseModel):
+class LoadInstrumentResponseData(BaseModel):
     instrumentId: IdentifierType
 
 
-class PipetteRequestBase(BaseModel):
+class PipetteRequestDataBase(BaseModel):
     pipetteId: str
     labwareId: str
     wellId: str
 
 
-class LiquidRequest(PipetteRequestBase):
+class LiquidRequestData(PipetteRequestDataBase):
     volume: float = Field(
         ...,
         description="Amount of liquid in uL. Must be greater than 0 and less "
@@ -81,26 +81,26 @@ class LiquidRequest(PipetteRequestBase):
     )
 
 
-class SetHasCalibrationBlockRequest(BaseModel):
+class SetHasCalibrationBlockRequestData(BaseModel):
     hasBlock: bool = Field(
         ...,
         description="whether or not there is a calibration block present")
 
 
 CommandDataType = typing.Union[
-    SetHasCalibrationBlockRequest,
+    SetHasCalibrationBlockRequestData,
     JogPosition,
-    LiquidRequest,
-    PipetteRequestBase,
-    LoadLabwareRequest,
-    LoadInstrumentRequest,
+    LiquidRequestData,
+    PipetteRequestDataBase,
+    LoadLabwareRequestData,
+    LoadInstrumentRequestData,
     EmptyModel
 ]
 
 # A Union of all command result types
 CommandResultType = typing.Union[
-    LoadLabwareResponse,
-    LoadInstrumentResponse,
+    LoadLabwareResponseData,
+    LoadInstrumentResponseData,
 ]
 
 
@@ -140,30 +140,30 @@ class ProtocolCommandRequest(EmptySessionCommand):
     ]
 
 
-class LoadLabwareRequestM(BasicSessionCommand):
+class LoadLabwareRequest(BasicSessionCommand):
     command: Literal[EquipmentCommand.load_labware]
-    data: LoadLabwareRequest
+    data: LoadLabwareRequestData
 
 
-class LoadInstrumentRequestM(BasicSessionCommand):
+class LoadInstrumentRequest(BasicSessionCommand):
     command: Literal[EquipmentCommand.load_instrument]
-    data: LoadInstrumentRequest
+    data: LoadInstrumentRequestData
 
 
-class LiquidRequestM(BasicSessionCommand):
+class LiquidRequest(BasicSessionCommand):
     command: Literal[
         PipetteCommand.aspirate,
         PipetteCommand.dispense
     ]
-    data: LiquidRequest
+    data: LiquidRequestData
 
 
-class TipRequestM(BasicSessionCommand):
+class TipRequest(BasicSessionCommand):
     command: Literal[
         PipetteCommand.drop_tip,
         PipetteCommand.pick_up_tip
     ]
-    data: PipetteRequestBase
+    data: PipetteRequestDataBase
 
 
 class CalibrationRequest(EmptySessionCommand):
@@ -189,7 +189,7 @@ class JogRequest(BasicSessionCommand):
 
 class SetHasCalibrationBlockRequestM(BasicSessionCommand):
     command: Literal[CalibrationCommand.set_has_calibration_block]
-    data: SetHasCalibrationBlockRequest
+    data: SetHasCalibrationBlockRequestData
 
 
 class DeckCalibrationCommandRequest(EmptySessionCommand):
@@ -222,10 +222,10 @@ class SessionCommand(ResponseDataModel):
 RequestTypes = typing.Union[
     RobotCommandRequest,
     ProtocolCommandRequest,
-    LoadLabwareRequestM,
-    LoadInstrumentRequestM,
-    LiquidRequestM,
-    TipRequestM,
+    LoadLabwareRequest,
+    LoadInstrumentRequest,
+    LiquidRequest,
+    TipRequest,
     CalibrationRequest,
     JogRequest,
     SetHasCalibrationBlockRequestM,
