@@ -1,22 +1,15 @@
 // @flow
 import { useState } from 'react'
-export type ConditionalConfirmOutput = {|
-  /** should be called when the user attempts the action (eg clicks "DELETE" button) as well as passed into the confirm UI's continue button (eg "CONFIRM" button of modal) */
-  confirm: () => mixed,
-  /** should control the rendering of the confirm UI (eg a modal) */
-  showConfirmation: boolean,
-  /** should be passed into the confirm UI's cancel button */
-  cancel: () => mixed,
-|}
 
 /**
  * useConditionalConfirm is intended for cases where we want to block and defer
  * a particular user action until the user clicks "ok" in any kind of "are you sure?"
- * confirmation UI.
- *
+ * confirmation UI. The arguments passed to the confirm function will be preserved and
+ * used to call handleContinue. Ex. a click event is being deferred by a modal. When the
+ * user confirms, the initial click event passed as an argument will be used as the argument in
+ * the callback.
  * @param {() => mixed)} handleContinue (the action we may want to require confirmation for)
  * @param {boolean} shouldBlock (if no confirmation is needed, we will avoid the modal and immediately call handleContinue)
- * @returns {ConditionalConfirmOutput}
  * @example
  * ```js
  * import { useConditionalConfirm } from '@opentrons/components'
@@ -45,25 +38,32 @@ export type ConditionalConfirmOutput = {|
  */
 
 export const useConditionalConfirm = <T>(
-  handleContinue: (...args: Array<T>) => mixed,
+  handleContinue: (...Array<T>) => mixed,
   shouldBlock: boolean
-): ConditionalConfirmOutput => {
-  const [showConfirmation, setShowConfirmation] = useState<boolean>(false)
-
-  const confirm = (...args) => {
-    if (shouldBlock && !showConfirmation) {
-      setShowConfirmation(true)
+): {|
+  confirm: (...Array<T>) => mixed,
+  showConfirmation: boolean,
+  cancel: () => mixed,
+|} => {
+  const [pendingArgs, setPendingArgs] = useState<Array<T> | null>(null)
+  const pendingConfirm = pendingArgs !== null
+  const confirm = (...confirmArgs) => {
+    if (shouldBlock && !pendingConfirm) {
+      setPendingArgs(confirmArgs)
     } else {
-      setShowConfirmation(false)
-      handleContinue(...args)
+      // call handleContinue with pending args if we have them
+      const handleContinueArgs =
+        pendingArgs !== null ? pendingArgs : confirmArgs
+      handleContinue(...handleContinueArgs)
+      setPendingArgs(null)
     }
   }
 
   return {
     confirm,
-    showConfirmation,
+    showConfirmation: pendingConfirm,
     cancel: () => {
-      setShowConfirmation(false)
+      setPendingArgs(null)
     },
   }
 }

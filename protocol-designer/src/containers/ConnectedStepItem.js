@@ -110,82 +110,46 @@ export const ConnectedStepItem = (props: Props): React.Node => {
 
     let stepsToSelect: Array<StepIdType> = []
 
-    if (nonePressed([isShiftKeyPressed, isMetaKeyPressed])) {
-      if (multiSelectItemIds?.length) {
-        stepsToSelect = multiSelectItemIds.includes(stepId)
-          ? multiSelectItemIds.filter(id => id !== stepId)
-          : [...multiSelectItemIds, stepId]
-        stepsToSelect.length && selectMultipleSteps(stepsToSelect, stepId)
-      } else {
-        selectStep()
-      }
-      return
-    }
-
     if (isBatchEditEnabled) {
-      if ((isMetaKeyPressed || isShiftKeyPressed) && currentFormIsPresaved) {
-        // current form is presaved, enter batch edit mode with only the selected step
+      if (nonePressed([isShiftKeyPressed, isMetaKeyPressed])) {
+        if (multiSelectItemIds) {
+          const alreadySelected = multiSelectItemIds.includes(stepId)
+          if (alreadySelected) {
+            stepsToSelect = multiSelectItemIds.filter(id => id !== stepId)
+          } else {
+            stepsToSelect = [...multiSelectItemIds, stepId]
+          }
+        } else {
+          selectStep()
+        }
+      } else if (
+        (isMetaKeyPressed || isShiftKeyPressed) &&
+        currentFormIsPresaved
+      ) {
+        // current form is presaved, enter batch edit mode with only the clicked
         stepsToSelect = [stepId]
       } else {
         if (isShiftKeyPressed) {
-          if (selectedStepId) {
-            const startIndex: number = orderedStepIds.indexOf(selectedStepId)
-            const endIndex: number = orderedStepIds.indexOf(stepId)
-            stepsToSelect = orderedStepIds.slice(startIndex, endIndex + 1)
-          } else if (multiSelectItemIds?.length) {
-            const prevIndex: number = orderedStepIds.indexOf(
-              lastMultiSelectedStepId
-            )
-            const currentIndex: number = orderedStepIds.indexOf(stepId)
-
-            const [startIndex, endIndex] = [prevIndex, currentIndex].sort(
-              (a, b) => a - b
-            )
-            const potentialStepsToSelect = orderedStepIds.slice(
-              startIndex,
-              endIndex + 1
-            )
-
-            const allSelected = potentialStepsToSelect
-              .slice(1)
-              .every(stepId => multiSelectItemIds.includes(stepId))
-
-            if (allSelected) {
-              // if they're all selected, deselect them all
-              if (
-                multiSelectItemIds.length - potentialStepsToSelect.length >
-                0
-              ) {
-                stepsToSelect = multiSelectItemIds.filter(
-                  id => !potentialStepsToSelect.includes(id)
-                )
-              } else {
-                // unless deselecting them all results in none being selected
-                stepsToSelect = [potentialStepsToSelect[0]]
-              }
-            } else {
-              stepsToSelect = [
-                ...new Set([...multiSelectItemIds, ...potentialStepsToSelect]),
-              ]
-            }
-          } else {
-            stepsToSelect = [stepId]
-          }
+          stepsToSelect = getShiftSelectedSteps(
+            selectedStepId,
+            orderedStepIds,
+            stepId,
+            multiSelectItemIds,
+            lastMultiSelectedStepId
+          )
         } else if (isMetaKeyPressed) {
-          if (multiSelectItemIds?.length) {
-            stepsToSelect = multiSelectItemIds.includes(stepId)
-              ? multiSelectItemIds.filter(id => id !== stepId)
-              : [...multiSelectItemIds, stepId]
-          } else if (selectedStepId) {
-            stepsToSelect = [selectedStepId, stepId]
-          } else {
-            stepsToSelect = [stepId]
-          }
+          stepsToSelect = getMetaSelectedSteps(
+            multiSelectItemIds,
+            stepId,
+            selectedStepId
+          )
         }
       }
       if (stepsToSelect.length) {
         selectMultipleSteps(stepsToSelect, stepId)
       }
+    } else {
+      selectStep()
     }
   }
 
@@ -194,6 +158,12 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     handleStepItemSelection,
     currentFormIsPresaved || formHasChanges
   )
+  // (SA 2020/12/23): This will not be needed once we update to React 17
+  // since event pooling will be eliminated
+  const confirmWithPersistedEvent = (event: SyntheticMouseEvent<>): void => {
+    event.persist()
+    confirm(event)
+  }
 
   const stepItemProps = {
     description: step.stepDetails,
@@ -211,7 +181,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     hovered: hoveredStep === stepId && !hoveredSubstep,
 
     highlightStep,
-    handleClick: confirm,
+    handleClick: confirmWithPersistedEvent,
     toggleStepCollapsed,
     unhighlightStep,
   }
@@ -237,7 +207,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
               ? CLOSE_UNSAVED_STEP_FORM
               : CLOSE_STEP_FORM_WITH_CHANGES
           }
-          onContinueClick={confirm}
+          onContinueClick={confirmWithPersistedEvent}
           onCancelClick={cancel}
         />
       )}
@@ -246,4 +216,66 @@ export const ConnectedStepItem = (props: Props): React.Node => {
       </StepItem>
     </>
   )
+}
+function getMetaSelectedSteps(multiSelectItemIds, stepId, selectedStepId) {
+  let stepsToSelect: Array<StepIdType> = []
+  if (multiSelectItemIds?.length) {
+    stepsToSelect = multiSelectItemIds.includes(stepId)
+      ? multiSelectItemIds.filter(id => id !== stepId)
+      : [...multiSelectItemIds, stepId]
+  } else if (selectedStepId) {
+    stepsToSelect = [selectedStepId, stepId]
+  } else {
+    stepsToSelect = [stepId]
+  }
+  return stepsToSelect
+}
+
+function getShiftSelectedSteps(
+  selectedStepId,
+  orderedStepIds,
+  stepId,
+  multiSelectItemIds,
+  lastMultiSelectedStepId
+) {
+  let stepsToSelect: Array<StepIdType>
+  if (selectedStepId) {
+    const startIndex: number = orderedStepIds.indexOf(selectedStepId)
+    const endIndex: number = orderedStepIds.indexOf(stepId)
+    stepsToSelect = orderedStepIds.slice(startIndex, endIndex + 1)
+  } else if (multiSelectItemIds?.length) {
+    const prevIndex: number = orderedStepIds.indexOf(lastMultiSelectedStepId)
+    const currentIndex: number = orderedStepIds.indexOf(stepId)
+
+    const [startIndex, endIndex] = [prevIndex, currentIndex].sort(
+      (a, b) => a - b
+    )
+    const potentialStepsToSelect = orderedStepIds.slice(
+      startIndex,
+      endIndex + 1
+    )
+
+    const allSelected: boolean = potentialStepsToSelect
+      .slice(1)
+      .every(stepId => multiSelectItemIds.includes(stepId))
+
+    if (allSelected) {
+      // if they're all selected, deselect them all
+      if (multiSelectItemIds.length - potentialStepsToSelect.length > 0) {
+        stepsToSelect = multiSelectItemIds.filter(
+          id => !potentialStepsToSelect.includes(id)
+        )
+      } else {
+        // unless deselecting them all results in none being selected
+        stepsToSelect = [potentialStepsToSelect[0]]
+      }
+    } else {
+      stepsToSelect = [
+        ...new Set([...multiSelectItemIds, ...potentialStepsToSelect]),
+      ]
+    }
+  } else {
+    stepsToSelect = [stepId]
+  }
+  return stepsToSelect
 }

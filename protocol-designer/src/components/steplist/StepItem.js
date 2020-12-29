@@ -49,7 +49,7 @@ export type StepItemProps = {|
 
   highlightStep: () => mixed,
   onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
-  handleClick?: () => mixed,
+  handleClick?: (event: SyntheticMouseEvent<>) => mixed,
   toggleStepCollapsed: () => mixed,
   unhighlightStep: (event?: SyntheticEvent<>) => mixed,
   children?: React.Node,

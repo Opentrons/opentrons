@@ -94,7 +94,7 @@ describe('ConnectedStepItem', () => {
 
     when(getMultiSelectItemIdsMock)
       .calledWith(expect.anything())
-      .mockReturnValue([])
+      .mockReturnValue(null)
 
     when(getSubstepsMock)
       .calledWith(expect.anything())
@@ -125,6 +125,7 @@ describe('ConnectedStepItem', () => {
           shiftKey: false,
           metaKey: false,
           ctrlKey: false,
+          persist: jest.fn(),
         }
         const wrapper = render(props)
 
@@ -147,6 +148,7 @@ describe('ConnectedStepItem', () => {
             shiftKey: false,
             metaKey: false,
             ctrlKey: false,
+            persist: jest.fn(),
           }
           const wrapper = render(props)
           wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
@@ -173,6 +175,7 @@ describe('ConnectedStepItem', () => {
             shiftKey: false,
             metaKey: false,
             ctrlKey: false,
+            persist: jest.fn(),
           }
           const wrapper = render(props)
           wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
@@ -193,7 +196,12 @@ describe('ConnectedStepItem', () => {
         {
           name: 'should select just one step (in batch edit mode)',
           props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: { shiftKey: true, metaKey: false, ctrlKey: false },
+          mockClickEvent: {
+            shiftKey: true,
+            metaKey: false,
+            ctrlKey: false,
+            persist: jest.fn(),
+          },
           setupMocks: () => {
             when(getOrderedStepIdsMock)
               .calledWith(expect.anything())
@@ -216,7 +224,12 @@ describe('ConnectedStepItem', () => {
           name:
             'should select a range of steps when one step is already selected',
           props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: { shiftKey: true, metaKey: false, ctrlKey: false },
+          mockClickEvent: {
+            shiftKey: true,
+            metaKey: false,
+            ctrlKey: false,
+            persist: jest.fn(),
+          },
           setupMocks: () => {
             when(getSelectedStepIdMock)
               .calledWith(expect.anything())
@@ -236,7 +249,12 @@ describe('ConnectedStepItem', () => {
         {
           name: 'should select a range when some of them are already selected',
           props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: { shiftKey: true, metaKey: false, ctrlKey: false },
+          mockClickEvent: {
+            shiftKey: true,
+            metaKey: false,
+            ctrlKey: false,
+            persist: jest.fn(),
+          },
           setupMocks: () => {
             when(getMultiSelectItemIdsMock)
               .calledWith(expect.anything())
@@ -259,7 +277,12 @@ describe('ConnectedStepItem', () => {
         {
           name: 'should deselect a range when all of them are already selected',
           props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: { shiftKey: true, metaKey: false, ctrlKey: false },
+          mockClickEvent: {
+            shiftKey: true,
+            metaKey: false,
+            ctrlKey: false,
+            persist: jest.fn(),
+          },
           setupMocks: () => {
             when(getMultiSelectItemIdsMock)
               .calledWith(expect.anything())
@@ -293,7 +316,12 @@ describe('ConnectedStepItem', () => {
           name:
             'should deselect a range when all of them are already selected (but preserve the first item and not exit batch edit mode)',
           props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: { shiftKey: true, metaKey: false, ctrlKey: false },
+          mockClickEvent: {
+            shiftKey: true,
+            metaKey: false,
+            ctrlKey: false,
+            persist: jest.fn(),
+          },
           setupMocks: () => {
             when(getMultiSelectItemIdsMock)
               .calledWith(expect.anything())
@@ -334,7 +362,12 @@ describe('ConnectedStepItem', () => {
         {
           name: 'should enter batch edit mode with just step when OS is mac',
           props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: { shiftKey: false, metaKey: true, ctrlKey: false },
+          mockClickEvent: {
+            shiftKey: false,
+            metaKey: true,
+            ctrlKey: false,
+            persist: jest.fn(),
+          },
           setupMocks: null,
           expectedAction: {
             type: 'SELECT_MULTIPLE_STEPS',
@@ -348,7 +381,12 @@ describe('ConnectedStepItem', () => {
           name:
             'should enter batch edit mode with just step when OS is not mac',
           props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: { shiftKey: false, metaKey: false, ctrlKey: true },
+          mockClickEvent: {
+            shiftKey: false,
+            metaKey: false,
+            ctrlKey: true,
+            persist: jest.fn(),
+          },
           setupMocks: () => {
             UAParser.mockImplementation(() => {
               return {
@@ -370,7 +408,12 @@ describe('ConnectedStepItem', () => {
         {
           name: 'should enter batch edit mode with multiple steps',
           props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: { shiftKey: false, metaKey: true, ctrlKey: false },
+          mockClickEvent: {
+            shiftKey: false,
+            metaKey: true,
+            ctrlKey: false,
+            persist: jest.fn(),
+          },
           setupMocks: () => {
             when(getMultiSelectItemIdsMock)
               .calledWith(expect.anything())
@@ -388,7 +431,12 @@ describe('ConnectedStepItem', () => {
           name:
             'should do nothing if deselecting the step item results in 0 steps being selected',
           props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: { shiftKey: false, metaKey: true, ctrlKey: false },
+          mockClickEvent: {
+            shiftKey: false,
+            metaKey: true,
+            ctrlKey: false,
+            persist: jest.fn(),
+          },
           setupMocks: () => {
             when(getMultiSelectItemIdsMock)
               .calledWith(expect.anything())
