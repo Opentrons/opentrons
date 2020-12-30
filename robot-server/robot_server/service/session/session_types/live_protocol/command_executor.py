@@ -1,12 +1,13 @@
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Union
 
 from robot_server.service.session.command_execution import (
     CommandExecutor, Command, CompletedCommand, CommandResult)
 from robot_server.service.session.errors import UnsupportedCommandException
 from robot_server.service.session.session_types.live_protocol.command_interface import CommandInterface  # noqa: E501
 from robot_server.service.session.session_types.live_protocol.state_store import StateStore  # noqa: E501
-from robot_server.service.session.models import command_definitions as models
+from robot_server.service.session.models import (
+    command_definitions as models, command as command_models)
 from robot_server.util import duration
 
 log = logging.getLogger(__name__)
@@ -54,9 +55,13 @@ class LiveProtocolCommandExecutor(CommandExecutor):
                 f"Command '{command.request.command}' is not supported."
             )
 
-        result = CommandResult(started_at=timed.start,
-                               completed_at=timed.end,
-                               data=data)
+        result = CommandResult[
+            Union[
+                command_models.LoadLabwareResponseData,
+                command_models.LoadInstrumentResponseData
+            ]](started_at=timed.start,
+               completed_at=timed.end,
+               data=data)
 
         # add result to state
         self._store.handle_command_result(command, result)

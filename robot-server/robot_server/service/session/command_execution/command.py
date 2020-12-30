@@ -1,9 +1,9 @@
 from datetime import datetime
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Generic, TypeVar
 
 from robot_server.service.session.models.command import (
-    CommandStatus, CommandResultType, RequestTypes)
+    CommandStatus, RequestTypes)
 from robot_server.service.session.models.common import (
     IdentifierType, create_identifier)
 from opentrons.util.helpers import utc_now
@@ -15,12 +15,15 @@ class CommandMeta:
     created_at: datetime = field(default_factory=utc_now)
 
 
+ResultTypeT = TypeVar("ResultTypeT")
+
+
 @dataclass(frozen=True)
-class CommandResult:
+class CommandResult(Generic[ResultTypeT]):
     started_at: datetime
     completed_at: datetime
     status: CommandStatus = CommandStatus.executed
-    data: Optional[CommandResultType] = None
+    data: Optional[ResultTypeT] = None
 
 
 @dataclass(frozen=True)

@@ -2,22 +2,22 @@ from datetime import datetime
 from enum import Enum
 import typing
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteName
 from typing_extensions import Literal
-
-from robot_server.service.session.models.command_definitions import \
-    CommandDefinitionType, RobotCommand, ProtocolCommand, EquipmentCommand, \
-    PipetteCommand, CalibrationCommand, DeckCalibrationCommand, \
-    CheckCalibrationCommand
-from robot_server.service.session.models.common import (
-    EmptyModel, JogPosition, IdentifierType, OffsetVector)
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.util.helpers import utc_now
+
+from robot_server.service.session.models.command_definitions import (
+    ProtocolCommand, EquipmentCommand, PipetteCommand, CalibrationCommand,
+    DeckCalibrationCommand, CheckCalibrationCommand, CommandDefinitionType)
+from robot_server.service.session.models.common import (
+    EmptyModel, JogPosition, IdentifierType, OffsetVector)
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.json_api import (
     ResponseModel, RequestModel, ResponseDataModel)
-from opentrons.util.helpers import utc_now
 
 
 class LoadLabwareRequestData(BaseModel):
@@ -112,122 +112,207 @@ class CommandStatus(str, Enum):
     failed = "failed"
 
 
+CommandT = typing.TypeVar('CommandT', bound=CommandDefinitionType)
 RequestDataT = typing.TypeVar('RequestDataT', bound=BaseModel)
+ResponseDataT = typing.TypeVar('ResponseDataT')
 
 
-class SessionCommandRequest(GenericModel, typing.Generic[RequestDataT]):
+class SessionCommandRequest(
+    GenericModel,
+    typing.Generic[CommandT, RequestDataT, ResponseDataT]
+):
     """A session command"""
-    command: CommandDefinitionType = Field(
+    command: CommandT = Field(
         ...,
         description="The command description")
-    data: RequestDataT
+    data: RequestDataT = Field(
+        ...,
+        description="The command data"
+    )
+
+    def make_response(
+            self,
+            identifier: str,
+            status: CommandStatus,
+            created_at: datetime,
+            started_at: typing.Optional[datetime],
+            completed_at: typing.Optional[datetime],
+            result: typing.Optional[ResponseDataT]
+    ) -> 'SessionCommandResponse[CommandT, RequestDataT, ResponseDataT]':
+        return SessionCommandResponse(
+            command=self.command,
+            data=self.data,
+            id=identifier,
+            status=status,
+            createdAt=created_at,
+            startedAt=started_at,
+            completedAt=completed_at,
+            result=result)
 
 
-class RobotCommandRequest(SessionCommandRequest[EmptyModel]):
-    command: Literal[
-        RobotCommand.home_all_motors,
-        RobotCommand.home_pipette,
-        RobotCommand.toggle_lights
-    ]
-
-
-class ProtocolCommandRequest(SessionCommandRequest[EmptyModel]):
-    command: Literal[
-        ProtocolCommand.start_run,
-        ProtocolCommand.start_simulate,
-        ProtocolCommand.cancel,
-        ProtocolCommand.pause,
-        ProtocolCommand.resume
-    ]
-
-
-class LoadLabwareRequest(SessionCommandRequest[LoadLabwareRequestData]):
-    command: Literal[EquipmentCommand.load_labware]
-
-
-class LoadInstrumentRequest(SessionCommandRequest[LoadInstrumentRequestData]):
-    command: Literal[EquipmentCommand.load_instrument]
-
-
-class LiquidRequest(SessionCommandRequest[LiquidRequestData]):
-    command: Literal[
-        PipetteCommand.aspirate,
-        PipetteCommand.dispense
-    ]
-
-
-class TipRequest(SessionCommandRequest[PipetteRequestDataBase]):
-    command: Literal[
-        PipetteCommand.drop_tip,
-        PipetteCommand.pick_up_tip
-    ]
-
-
-class CalibrationRequest(SessionCommandRequest[EmptyModel]):
-    command: Literal[
-        CalibrationCommand.load_labware,
-        CalibrationCommand.move_to_tip_rack,
-        CalibrationCommand.move_to_point_one,
-        CalibrationCommand.move_to_deck,
-        CalibrationCommand.move_to_reference_point,
-        CalibrationCommand.pick_up_tip,
-        CalibrationCommand.confirm_tip_attached,
-        CalibrationCommand.invalidate_tip,
-        CalibrationCommand.save_offset,
-        CalibrationCommand.exit,
-        CalibrationCommand.invalidate_last_action,
-    ]
-
-
-class JogRequest(SessionCommandRequest[JogPosition]):
-    command: Literal[CalibrationCommand.jog]
-
-
-class SetHasCalibrationBlockRequestM(
-    SessionCommandRequest[SetHasCalibrationBlockRequestData]
+class SessionCommandResponse(
+    ResponseDataModel,
+    GenericModel,
+    typing.Generic[CommandT, RequestDataT, ResponseDataT]
 ):
-    command: Literal[CalibrationCommand.set_has_calibration_block]
-
-
-class DeckCalibrationCommandRequest(SessionCommandRequest[EmptyModel]):
-    command: Literal[
-        DeckCalibrationCommand.move_to_point_two,
-        DeckCalibrationCommand.move_to_point_three
-    ]
-
-
-class CheckCalibrationCommandRequest(SessionCommandRequest[EmptyModel]):
-    command: Literal[
-        CheckCalibrationCommand.compare_point,
-        CheckCalibrationCommand.switch_pipette,
-        CheckCalibrationCommand.return_tip,
-        CheckCalibrationCommand.transition
-    ]
-
-
-class SessionCommand(ResponseDataModel):
     """A session command response"""
-    command: CommandDefinitionType
-    data: CommandDataType
+    command: CommandT
+    data: RequestDataT
     status: CommandStatus
     createdAt: datetime = Field(..., default_factory=utc_now)
     startedAt: typing.Optional[datetime]
     completedAt: typing.Optional[datetime]
-    result: typing.Optional[CommandResultType] = None
+    result: typing.Optional[ResponseDataT] = None
+
+
+# The command definitions requiring no data and result types.
+CommandsEmptyData = Literal[
+    ProtocolCommand.start_run,
+    ProtocolCommand.start_simulate,
+    ProtocolCommand.cancel,
+    ProtocolCommand.pause,
+    ProtocolCommand.resume,
+    CalibrationCommand.load_labware,
+    CalibrationCommand.move_to_tip_rack,
+    CalibrationCommand.move_to_point_one,
+    CalibrationCommand.move_to_deck,
+    CalibrationCommand.move_to_reference_point,
+    CalibrationCommand.pick_up_tip,
+    CalibrationCommand.confirm_tip_attached,
+    CalibrationCommand.invalidate_tip,
+    CalibrationCommand.save_offset,
+    CalibrationCommand.exit,
+    CalibrationCommand.invalidate_last_action,
+    DeckCalibrationCommand.move_to_point_two,
+    DeckCalibrationCommand.move_to_point_three,
+    CheckCalibrationCommand.compare_point,
+    CheckCalibrationCommand.switch_pipette,
+    CheckCalibrationCommand.return_tip,
+    CheckCalibrationCommand.transition
+]
+
+
+class SimpleCommandRequest(
+    SessionCommandRequest[CommandsEmptyData,
+                          EmptyModel,
+                          EmptyModel]):
+    """A command containing no data and result type"""
+    pass
+
+
+SimpleCommandResponse = SessionCommandResponse[
+    CommandsEmptyData,
+    EmptyModel,
+    EmptyModel
+]
+
+
+LoadLabwareRequest = SessionCommandRequest[
+    Literal[EquipmentCommand.load_labware],
+    LoadLabwareRequestData,
+    LoadLabwareResponseData
+]
+
+
+LoadLabwareResponse = SessionCommandResponse[
+    Literal[EquipmentCommand.load_labware],
+    LoadLabwareRequestData,
+    LoadLabwareResponseData
+]
+
+
+LoadInstrumentRequest = SessionCommandRequest[
+    Literal[EquipmentCommand.load_instrument],
+    LoadInstrumentRequestData,
+    LoadInstrumentResponseData
+]
+
+
+LoadInstrumentResponse = SessionCommandResponse[
+    Literal[EquipmentCommand.load_instrument],
+    LoadInstrumentRequestData,
+    LoadInstrumentResponseData
+]
+
+
+LiquidRequest = SessionCommandRequest[
+    Literal[PipetteCommand.aspirate,
+            PipetteCommand.dispense],
+    LiquidRequestData,
+    EmptyModel
+]
+
+
+LiquidResponse = SessionCommandResponse[
+    Literal[PipetteCommand.aspirate,
+            PipetteCommand.dispense],
+    LiquidRequestData,
+    EmptyModel
+]
+
+
+TipRequest = SessionCommandRequest[
+    Literal[PipetteCommand.drop_tip,
+            PipetteCommand.pick_up_tip],
+    PipetteRequestDataBase,
+    EmptyModel
+]
+
+
+TipResponse = SessionCommandResponse[
+    Literal[PipetteCommand.drop_tip,
+            PipetteCommand.pick_up_tip],
+    PipetteRequestDataBase,
+    EmptyModel
+]
+
+
+JogRequest = SessionCommandRequest[
+    Literal[CalibrationCommand.jog],
+    JogPosition,
+    EmptyModel
+]
+
+
+JogResponse = SessionCommandResponse[
+    Literal[CalibrationCommand.jog],
+    JogPosition,
+    EmptyModel
+]
+
+
+SetHasCalibrationBlockRequest = SessionCommandRequest[
+    Literal[CalibrationCommand.set_has_calibration_block],
+    SetHasCalibrationBlockRequestData,
+    EmptyModel
+]
+
+
+SetHasCalibrationBlockResponse = SessionCommandResponse[
+    Literal[
+        CalibrationCommand.set_has_calibration_block],
+    SetHasCalibrationBlockRequestData,
+    EmptyModel]
 
 
 RequestTypes = typing.Union[
-    RobotCommandRequest,
-    ProtocolCommandRequest,
+    SimpleCommandRequest,
     LoadLabwareRequest,
     LoadInstrumentRequest,
     LiquidRequest,
     TipRequest,
-    CalibrationRequest,
     JogRequest,
-    SetHasCalibrationBlockRequestM,
-    DeckCalibrationCommandRequest,
-    CheckCalibrationCommandRequest
+    SetHasCalibrationBlockRequest,
+]
+
+ResponseTypes = typing.Union[
+    SimpleCommandResponse,
+    LoadLabwareResponse,
+    LoadInstrumentResponse,
+    LiquidResponse,
+    TipResponse,
+    JogResponse,
+    SetHasCalibrationBlockResponse,
 ]
 
 # Session command requests/responses
@@ -235,5 +320,5 @@ CommandRequest = RequestModel[
     RequestTypes
 ]
 CommandResponse = ResponseModel[
-    SessionCommand
+    ResponseTypes
 ]

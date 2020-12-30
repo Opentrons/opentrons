@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from opentrons import types
 
-from robot_server.service.session.models import command_definitions
+from robot_server.service.session.models import command_definitions as cmddef
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.session.models import command as models
 from robot_server.service.session.command_execution \
@@ -16,7 +16,7 @@ def test_handle_command_request():
     store = StateStore()
     command = create_command(
         request=models.LoadLabwareRequest(
-            command=command_definitions.EquipmentCommand.load_labware,
+            command=cmddef.EquipmentCommand.load_labware,
             data=models.LoadLabwareRequestData(
                 location=1,
                 loadName="labware-load-name",
@@ -36,7 +36,7 @@ def test_store_has_handle_command_response_method():
         store = StateStore()
         command = create_command(
             request=models.LoadLabwareRequest(
-                command=command_definitions.EquipmentCommand.load_labware,
+                command=cmddef.EquipmentCommand.load_labware,
                 data=models.LoadLabwareRequestData(
                     location=1,
                     loadName="labware-load-name",
@@ -61,7 +61,7 @@ def test_store_has_handle_command_response_method():
     argnames="command_request, handler",
     argvalues=[[
                 models.LoadLabwareRequest(
-                    command=command_definitions.EquipmentCommand.load_labware,
+                    command=cmddef.EquipmentCommand.load_labware,
                     data=models.LoadLabwareRequestData(
                         location=1,
                         loadName="a",
@@ -73,7 +73,7 @@ def test_store_has_handle_command_response_method():
                 "handle_load_labware"],
                [
                 models.LoadInstrumentRequest(
-                    command=command_definitions.EquipmentCommand.load_instrument,
+                    command=cmddef.EquipmentCommand.load_instrument,
                     data=models.LoadInstrumentRequestData(
                         instrumentName="p50_multi",
                         mount=Mount.left,
@@ -96,10 +96,9 @@ def test_command_result_state_handler(command_request, handler):
 
 def test_load_labware_update():
     store = StateStore()
-    labware = command_definitions.EquipmentCommand.load_labware
     command = create_command(
         request=models.LoadLabwareRequest(
-            command=labware,
+            command=cmddef.EquipmentCommand.load_labware,
             data=models.LoadLabwareRequestData(
                 location=1,
                 loadName="labware-load-name",
@@ -125,10 +124,9 @@ def test_load_labware_update():
 
 def test_load_instrument_update():
     store = StateStore()
-    instrument = command_definitions.EquipmentCommand.load_instrument
     command = create_command(
         request=models.LoadInstrumentRequest(
-            command=instrument,
+            command=cmddef.EquipmentCommand.load_instrument,
             data=models.LoadInstrumentRequestData(
                 instrumentName='p10_single',
                 mount=Mount.left)

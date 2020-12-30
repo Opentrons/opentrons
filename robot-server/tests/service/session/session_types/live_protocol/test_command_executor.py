@@ -6,7 +6,7 @@ from robot_server.service.legacy.models.control import Mount
 from robot_server.service.session.command_execution.command import \
     CommandResult
 from robot_server.service.session.models.command import LoadLabwareRequest, \
-    LiquidRequest, TipRequest, RobotCommandRequest, LoadInstrumentRequest
+    LiquidRequest, TipRequest, SimpleCommandRequest, LoadInstrumentRequest
 from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types.live_protocol.command_executor\
     import LiveProtocolCommandExecutor
@@ -180,15 +180,15 @@ def state_store_command_executor(command_executor) \
 
     # Mock out the command handler map
     command_executor._handler_map = {
-        command_definitions.RobotCommand.toggle_lights: handle_command}
+        command_definitions.ProtocolCommand.start_run: handle_command}
     return command_executor
 
 
 async def test_create_command_in_state_store(state_store_command_executor,
                                              mock_state_store):
     c = Command(
-        request=RobotCommandRequest(
-            command=command_definitions.RobotCommand.toggle_lights,
+        request=SimpleCommandRequest(
+            command=command_definitions.ProtocolCommand.start_run,
             data=EmptyModel()))
     await state_store_command_executor.execute(c)
 
@@ -197,8 +197,8 @@ async def test_create_command_in_state_store(state_store_command_executor,
 
 async def test_command_result_in_state_store(state_store_command_executor,
                                              mock_state_store):
-    c = Command(request=RobotCommandRequest(
-            command=command_definitions.RobotCommand.toggle_lights,
+    c = Command(request=SimpleCommandRequest(
+            command=command_definitions.ProtocolCommand.start_run,
             data=EmptyModel()))
 
     await state_store_command_executor.execute(c)

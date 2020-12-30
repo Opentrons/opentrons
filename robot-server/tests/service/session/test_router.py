@@ -14,7 +14,7 @@ from robot_server.service.session.command_execution.command import \
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedCommandException, CommandExecutionException
 from robot_server.service.session.models.command import JogRequest, \
-    LoadLabwareRequest, CalibrationRequest
+    SimpleCommandRequest
 from robot_server.service.session.models.common import EmptyModel, JogPosition
 from robot_server.service.session.models.command_definitions import \
     CalibrationCommand
@@ -372,7 +372,7 @@ def test_execute_command_no_body(api_client,
 
     mock_command_executor.execute.assert_called_once_with(
         Command(
-            request=CalibrationRequest(
+            request=SimpleCommandRequest(
                 command=CalibrationCommand.load_labware,
                 data=EmptyModel()),
             meta=CommandMeta(command_id, command_created_at)
