@@ -49,6 +49,13 @@ const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
 const mockId = 'SOMEID'
 
+const mockClickEvent = {
+  shiftKey: false,
+  metaKey: false,
+  ctrlKey: false,
+  persist: jest.fn(),
+}
+
 describe('ConnectedStepItem', () => {
   let store
   beforeEach(() => {
@@ -121,14 +128,7 @@ describe('ConnectedStepItem', () => {
     describe('when clicked normally', () => {
       it('should select a single step when PD not in batch edit mode', () => {
         const props = { stepId: mockId, stepNumber: 1 }
-        const mockClickEvent = {
-          shiftKey: false,
-          metaKey: false,
-          ctrlKey: false,
-          persist: jest.fn(),
-        }
         const wrapper = render(props)
-
         wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
         const actions = store.getActions()
         const selectStepAction = { type: 'SELECT_STEP', payload: mockId }
@@ -144,12 +144,6 @@ describe('ConnectedStepItem', () => {
             .mockReturnValue(['ANOTHER_ID', mockId])
 
           const props = { stepId: mockId, stepNumber: 1 }
-          const mockClickEvent = {
-            shiftKey: false,
-            metaKey: false,
-            ctrlKey: false,
-            persist: jest.fn(),
-          }
           const wrapper = render(props)
           wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
           const actions = store.getActions()
@@ -171,12 +165,6 @@ describe('ConnectedStepItem', () => {
             .mockReturnValue(['ANOTHER_ID', mockId])
 
           const props = { stepId: mockId, stepNumber: 1 }
-          const mockClickEvent = {
-            shiftKey: false,
-            metaKey: false,
-            ctrlKey: false,
-            persist: jest.fn(),
-          }
           const wrapper = render(props)
           wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
           const actions = store.getActions()
@@ -419,11 +407,9 @@ describe('ConnectedStepItem', () => {
             stepId: mockId,
             stepNumber: 1,
           }
-          const mockClickEvent = {
-            shiftKey: false,
+          const clickEvent = {
+            ...mockClickEvent,
             metaKey: true,
-            ctrlKey: false,
-            persist: jest.fn(),
           }
 
           UAParser.mockImplementation(() => {
@@ -433,7 +419,7 @@ describe('ConnectedStepItem', () => {
           })
 
           const wrapper = render(props)
-          wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+          wrapper.find(StepItem).prop('handleClick')(clickEvent)
           const actions = store.getActions()
           expect(actions[0]).toEqual({ payload: 'SOMEID', type: 'SELECT_STEP' })
         })
@@ -443,11 +429,9 @@ describe('ConnectedStepItem', () => {
           {
             name: 'should enter batch edit mode with just step',
             props: { stepId: mockId, stepNumber: 1 },
-            mockClickEvent: {
-              shiftKey: false,
+            clickEvent: {
+              ...mockClickEvent,
               metaKey: true,
-              ctrlKey: false,
-              persist: jest.fn(),
             },
             setupMocks: null,
             expectedAction: {
@@ -461,11 +445,9 @@ describe('ConnectedStepItem', () => {
           {
             name: 'should enter batch edit mode with multiple steps',
             props: { stepId: mockId, stepNumber: 1 },
-            mockClickEvent: {
-              shiftKey: false,
+            clickEvent: {
+              ...mockClickEvent,
               metaKey: true,
-              ctrlKey: false,
-              persist: jest.fn(),
             },
             setupMocks: () => {
               when(getMultiSelectItemIdsMock)
@@ -484,11 +466,9 @@ describe('ConnectedStepItem', () => {
             name:
               'should do nothing if deselecting the step item results in 0 steps being selected',
             props: { stepId: mockId, stepNumber: 1 },
-            mockClickEvent: {
-              shiftKey: false,
+            clickEvent: {
+              ...mockClickEvent,
               metaKey: true,
-              ctrlKey: false,
-              persist: jest.fn(),
             },
             setupMocks: () => {
               when(getMultiSelectItemIdsMock)
@@ -500,7 +480,7 @@ describe('ConnectedStepItem', () => {
         ]
 
         testCases.forEach(
-          ({ name, props, mockClickEvent, setupMocks, expectedAction }) => {
+          ({ name, props, clickEvent, setupMocks, expectedAction }) => {
             it(name, () => {
               setupMocks && setupMocks()
               UAParser.mockImplementation(() => {
@@ -512,7 +492,7 @@ describe('ConnectedStepItem', () => {
                 }
               })
               const wrapper = render(props)
-              wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+              wrapper.find(StepItem).prop('handleClick')(clickEvent)
               const actions = store.getActions()
               expect(actions[0]).toEqual(expectedAction)
             })
@@ -527,11 +507,9 @@ describe('ConnectedStepItem', () => {
             stepId: mockId,
             stepNumber: 1,
           }
-          const mockClickEvent = {
-            shiftKey: false,
-            metaKey: false,
+          const clickEvent = {
+            ...mockClickEvent,
             ctrlKey: true,
-            persist: jest.fn(),
           }
 
           UAParser.mockImplementation(() => {
@@ -541,7 +519,7 @@ describe('ConnectedStepItem', () => {
           })
 
           const wrapper = render(props)
-          wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+          wrapper.find(StepItem).prop('handleClick')(clickEvent)
           const actions = store.getActions()
           expect(actions[0]).toEqual({ payload: 'SOMEID', type: 'SELECT_STEP' })
         })
@@ -551,11 +529,9 @@ describe('ConnectedStepItem', () => {
           {
             name: 'should enter batch edit mode with just step',
             props: { stepId: mockId, stepNumber: 1 },
-            mockClickEvent: {
-              shiftKey: false,
-              metaKey: false,
+            clickEvent: {
+              ...mockClickEvent,
               ctrlKey: true,
-              persist: jest.fn(),
             },
             setupMocks: null,
             expectedAction: {
@@ -569,11 +545,9 @@ describe('ConnectedStepItem', () => {
           {
             name: 'should enter batch edit mode with multiple steps',
             props: { stepId: mockId, stepNumber: 1 },
-            mockClickEvent: {
-              shiftKey: false,
-              metaKey: false,
+            clickEvent: {
+              ...mockClickEvent,
               ctrlKey: true,
-              persist: jest.fn(),
             },
             setupMocks: () => {
               when(getMultiSelectItemIdsMock)
@@ -592,11 +566,9 @@ describe('ConnectedStepItem', () => {
             name:
               'should do nothing if deselecting the step item results in 0 steps being selected',
             props: { stepId: mockId, stepNumber: 1 },
-            mockClickEvent: {
-              shiftKey: false,
-              metaKey: false,
+            clickEvent: {
+              ...mockClickEvent,
               ctrlKey: true,
-              persist: jest.fn(),
             },
             setupMocks: () => {
               when(getMultiSelectItemIdsMock)
@@ -608,7 +580,7 @@ describe('ConnectedStepItem', () => {
         ]
 
         testCases.forEach(
-          ({ name, props, mockClickEvent, setupMocks, expectedAction }) => {
+          ({ name, props, clickEvent, setupMocks, expectedAction }) => {
             it(name, () => {
               setupMocks && setupMocks()
               UAParser.mockImplementation(() => {
@@ -620,7 +592,7 @@ describe('ConnectedStepItem', () => {
                 }
               })
               const wrapper = render(props)
-              wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+              wrapper.find(StepItem).prop('handleClick')(clickEvent)
               const actions = store.getActions()
               expect(actions[0]).toEqual(expectedAction)
             })
