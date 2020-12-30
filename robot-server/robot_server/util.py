@@ -1,9 +1,11 @@
 import hashlib
 from dataclasses import dataclass
+from functools import wraps
 from pathlib import Path
 
 from fastapi import UploadFile
 from opentrons.util.helpers import utc_now
+from typing_extensions import Final
 
 
 class duration:
@@ -35,3 +37,26 @@ def save_upload(directory: Path, upload_file: UploadFile) -> FileMeta:
         p.write(contents)
 
     return FileMeta(path=path, content_hash=content_hash)
+
+
+CACHED_RESULT_ATTR: Final = "_cached_result"
+
+
+def cache_result(fn):
+    """
+    Decorator used to cache the result of an async function. Intended for use
+    in initializing a singleton.
+
+    The wrapped function will be called once regardless of arguments.
+
+    :param fn: a coroutine
+    """
+    @wraps(fn)
+    async def wrapped(*args, **kwargs):
+        if not hasattr(wrapped, CACHED_RESULT_ATTR):
+            result = await fn(*args, **kwargs)
+            setattr(wrapped, CACHED_RESULT_ATTR, result)
+
+        return getattr(wrapped, CACHED_RESULT_ATTR)
+
+    return wrapped

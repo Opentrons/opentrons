@@ -105,14 +105,20 @@ def patch_create_session(mock_session):
 
 @pytest.fixture
 @pytest.mark.asyncio
-async def session_manager_with_session(loop, patch_create_session):
-    manager = get_session_manager()
-    session = await manager.add(SessionType.live_protocol,
-                                SessionMetaData())
+async def session_manager(loop, patch_create_session):
+    manager = await get_session_manager()
 
     yield manager
 
-    await manager.remove(session.meta.identifier)
+    await manager.remove_all()
+
+
+@pytest.fixture
+@pytest.mark.asyncio
+async def session_manager_with_session(loop, session_manager):
+    await session_manager.add(SessionType.live_protocol, SessionMetaData())
+
+    yield session_manager
 
 
 def test_create_session_error(api_client,
@@ -139,7 +145,7 @@ def test_create_session_error(api_client,
 
 
 def test_create_session(api_client,
-                        patch_create_session,
+                        session_manager,
                         mock_session_meta,
                         session_response):
     response = api_client.post("/sessions", json={
@@ -167,8 +173,6 @@ def test_create_session(api_client,
         }
     }
     assert response.status_code == 201
-    # Clean up
-    get_session_manager()._sessions = {}
 
 
 def test_delete_session_not_found(api_client):

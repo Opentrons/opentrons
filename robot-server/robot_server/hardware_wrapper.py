@@ -2,6 +2,7 @@ import asyncio
 import typing
 from pathlib import Path
 
+from notify_server.clients.publisher import Publisher
 from opentrons import ThreadManager, initialize as initialize_api
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.hardware_control.types import HardwareEvent, HardwareEventType
@@ -18,9 +19,10 @@ class HardwareWrapper:
     """Wrapper to support initializing the opentrons api hardware
     controller"""
 
-    def __init__(self):
+    def __init__(self, event_publisher: Publisher):
         self._tm: typing.Optional[ThreadManager] = None
         self._hardware_event_watcher = None
+        self._event_publisher = event_publisher
 
     async def initialize(self) -> ThreadManager:
         """Initialize the API"""
@@ -60,20 +62,19 @@ class HardwareWrapper:
                         "when one already exists")
 
     def _publish_hardware_event(self, hw_event: HardwareEvent):
-        from robot_server.service.dependencies import get_event_publisher
         if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
             payload = DoorStatePayload(state=hw_event.new_state)
         else:
             return
 
-        event_publisher = get_event_publisher()
         topic = topics.RobotEventTopics.HARDWARE_EVENTS
         publisher = self._publish_hardware_event.__qualname__
-        event_publisher.send_nowait(topic,
-                                    event.Event(
-                                        createdOn=utc_now(),
-                                        publisher=publisher,
-                                        data=payload))
+        self._event_publisher.send_nowait(
+            topic,
+            event.Event(
+                createdOn=utc_now(),
+                publisher=publisher,
+                data=payload))
 
     def async_initialize(self):
         """Create task to initialize hardware."""

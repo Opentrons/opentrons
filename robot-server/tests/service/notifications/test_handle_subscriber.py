@@ -1,7 +1,7 @@
 from typing import AsyncGenerator
 
 import pytest
-from mock import MagicMock, patch
+from mock import MagicMock, patch, DEFAULT
 from starlette.websockets import WebSocket
 from robot_server.service.notifications import handle_subscriber
 from robot_server.settings import get_settings
@@ -13,17 +13,20 @@ def mock_socket() -> MagicMock:
     return MagicMock(spec=WebSocket)
 
 
-async def test_create_subscriber(
-        mock_socket: MagicMock) -> None:
+async def test_create_subscriber(mock_socket: MagicMock) -> None:
     """Test that a subscriber is created correctly."""
-    with patch.object(handle_subscriber, "create") as mock_create_sub:
-        with patch.object(handle_subscriber, "route_events") as mock_route:
+    # Why two patch calls? `create` is the name of an arg to `patch.multiple`.
+    with patch.object(handle_subscriber, "create") as mock_create:
+        with patch.multiple(handle_subscriber,
+                            route_events=DEFAULT,
+                            receive=DEFAULT) as values:
             await handle_subscriber.handle_socket(mock_socket, ["a", "b"])
-            mock_create_sub.assert_called_once_with(
-                get_settings().notification_server_subscriber_address,
-                ["a", "b"]
-            )
-            mock_route.assert_called_once()
+            mock_create.assert_called_once_with(
+                        get_settings().notification_server_subscriber_address,
+                        ["a", "b"]
+                    )
+            values['route_events'].assert_called_once()
+            values['receive'].assert_called_once()
 
 
 async def test_route_events(

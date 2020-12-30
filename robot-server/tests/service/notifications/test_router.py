@@ -41,3 +41,4 @@ def test_integration(
         event = sock.receive()
         assert event["text"] == topic_event.json()
         assert event["type"] == "websocket.send"
+        sock.close()

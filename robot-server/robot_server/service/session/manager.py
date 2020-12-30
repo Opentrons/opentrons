@@ -89,7 +89,10 @@ class SessionManager:
 
     async def remove_all(self):
         """Remove all sessions"""
-        for session in self._sessions.keys():
+        # a copy must be made because self._session is altered during
+        # iteration
+        keys = list(self._sessions.keys())
+        for session in keys:
             try:
                 await self.remove(session)
             except SessionException:
