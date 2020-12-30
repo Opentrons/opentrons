@@ -413,105 +413,220 @@ describe('ConnectedStepItem', () => {
       )
     })
     describe('when command + clicked', () => {
-      const testCases = [
-        {
-          name: 'should enter batch edit mode with just step when OS is mac',
-          props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: {
+      describe('on non mac OS', () => {
+        it('should select a single step', () => {
+          const props = {
+            stepId: mockId,
+            stepNumber: 1,
+          }
+          const mockClickEvent = {
             shiftKey: false,
             metaKey: true,
             ctrlKey: false,
             persist: jest.fn(),
-          },
-          setupMocks: null,
-          expectedAction: {
-            type: 'SELECT_MULTIPLE_STEPS',
-            payload: {
-              stepIds: [mockId],
-              lastSelected: mockId,
+          }
+
+          UAParser.mockImplementation(() => {
+            return {
+              getOS: () => ({ name: 'NOT Mac OS', version: 'mockVersion' }),
+            }
+          })
+
+          const wrapper = render(props)
+          wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+          const actions = store.getActions()
+          expect(actions[0]).toEqual({ payload: 'SOMEID', type: 'SELECT_STEP' })
+        })
+      })
+      describe('on mac OS', () => {
+        const testCases = [
+          {
+            name: 'should enter batch edit mode with just step',
+            props: { stepId: mockId, stepNumber: 1 },
+            mockClickEvent: {
+              shiftKey: false,
+              metaKey: true,
+              ctrlKey: false,
+              persist: jest.fn(),
+            },
+            setupMocks: null,
+            expectedAction: {
+              type: 'SELECT_MULTIPLE_STEPS',
+              payload: {
+                stepIds: [mockId],
+                lastSelected: mockId,
+              },
             },
           },
-        },
-        {
-          name:
-            'should enter batch edit mode with just step when OS is not mac',
-          props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: {
+          {
+            name: 'should enter batch edit mode with multiple steps',
+            props: { stepId: mockId, stepNumber: 1 },
+            mockClickEvent: {
+              shiftKey: false,
+              metaKey: true,
+              ctrlKey: false,
+              persist: jest.fn(),
+            },
+            setupMocks: () => {
+              when(getMultiSelectItemIdsMock)
+                .calledWith(expect.anything())
+                .mockReturnValue(['ANOTHER_ID'])
+            },
+            expectedAction: {
+              type: 'SELECT_MULTIPLE_STEPS',
+              payload: {
+                stepIds: ['ANOTHER_ID', mockId],
+                lastSelected: mockId,
+              },
+            },
+          },
+          {
+            name:
+              'should do nothing if deselecting the step item results in 0 steps being selected',
+            props: { stepId: mockId, stepNumber: 1 },
+            mockClickEvent: {
+              shiftKey: false,
+              metaKey: true,
+              ctrlKey: false,
+              persist: jest.fn(),
+            },
+            setupMocks: () => {
+              when(getMultiSelectItemIdsMock)
+                .calledWith(expect.anything())
+                .mockReturnValue([mockId])
+            },
+            expectedAction: undefined, // no action should be dispatched
+          },
+        ]
+
+        testCases.forEach(
+          ({ name, props, mockClickEvent, setupMocks, expectedAction }) => {
+            it(name, () => {
+              setupMocks && setupMocks()
+              UAParser.mockImplementation(() => {
+                return {
+                  getOS: () => ({
+                    name: 'Mac OS',
+                    version: 'mockVersion',
+                  }),
+                }
+              })
+              const wrapper = render(props)
+              wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+              const actions = store.getActions()
+              expect(actions[0]).toEqual(expectedAction)
+            })
+          }
+        )
+      })
+    })
+    describe('when ctrl + clicked', () => {
+      describe('on mac OS', () => {
+        it('should select a single step', () => {
+          const props = {
+            stepId: mockId,
+            stepNumber: 1,
+          }
+          const mockClickEvent = {
             shiftKey: false,
             metaKey: false,
             ctrlKey: true,
             persist: jest.fn(),
-          },
-          setupMocks: () => {
-            UAParser.mockImplementation(() => {
-              return {
-                getOS: () => ({
-                  name: 'Any OS that is not a mac',
-                  version: 'mockVersion',
-                }),
-              }
-            })
-          },
-          expectedAction: {
-            type: 'SELECT_MULTIPLE_STEPS',
-            payload: {
-              stepIds: [mockId],
-              lastSelected: mockId,
-            },
-          },
-        },
-        {
-          name: 'should enter batch edit mode with multiple steps',
-          props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: {
-            shiftKey: false,
-            metaKey: true,
-            ctrlKey: false,
-            persist: jest.fn(),
-          },
-          setupMocks: () => {
-            when(getMultiSelectItemIdsMock)
-              .calledWith(expect.anything())
-              .mockReturnValue(['ANOTHER_ID'])
-          },
-          expectedAction: {
-            type: 'SELECT_MULTIPLE_STEPS',
-            payload: {
-              stepIds: ['ANOTHER_ID', mockId],
-              lastSelected: mockId,
-            },
-          },
-        },
-        {
-          name:
-            'should do nothing if deselecting the step item results in 0 steps being selected',
-          props: { stepId: mockId, stepNumber: 1 },
-          mockClickEvent: {
-            shiftKey: false,
-            metaKey: true,
-            ctrlKey: false,
-            persist: jest.fn(),
-          },
-          setupMocks: () => {
-            when(getMultiSelectItemIdsMock)
-              .calledWith(expect.anything())
-              .mockReturnValue([mockId])
-          },
-          expectedAction: undefined, // no action should be dispatched
-        },
-      ]
+          }
 
-      testCases.forEach(
-        ({ name, props, mockClickEvent, setupMocks, expectedAction }) => {
-          it(name, () => {
-            setupMocks && setupMocks()
-            const wrapper = render(props)
-            wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
-            const actions = store.getActions()
-            expect(actions[0]).toEqual(expectedAction)
+          UAParser.mockImplementation(() => {
+            return {
+              getOS: () => ({ name: 'Mac OS', version: 'mockVersion' }),
+            }
           })
-        }
-      )
+
+          const wrapper = render(props)
+          wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+          const actions = store.getActions()
+          expect(actions[0]).toEqual({ payload: 'SOMEID', type: 'SELECT_STEP' })
+        })
+      })
+      describe('on non mac OS', () => {
+        const testCases = [
+          {
+            name: 'should enter batch edit mode with just step',
+            props: { stepId: mockId, stepNumber: 1 },
+            mockClickEvent: {
+              shiftKey: false,
+              metaKey: false,
+              ctrlKey: true,
+              persist: jest.fn(),
+            },
+            setupMocks: null,
+            expectedAction: {
+              type: 'SELECT_MULTIPLE_STEPS',
+              payload: {
+                stepIds: [mockId],
+                lastSelected: mockId,
+              },
+            },
+          },
+          {
+            name: 'should enter batch edit mode with multiple steps',
+            props: { stepId: mockId, stepNumber: 1 },
+            mockClickEvent: {
+              shiftKey: false,
+              metaKey: false,
+              ctrlKey: true,
+              persist: jest.fn(),
+            },
+            setupMocks: () => {
+              when(getMultiSelectItemIdsMock)
+                .calledWith(expect.anything())
+                .mockReturnValue(['ANOTHER_ID'])
+            },
+            expectedAction: {
+              type: 'SELECT_MULTIPLE_STEPS',
+              payload: {
+                stepIds: ['ANOTHER_ID', mockId],
+                lastSelected: mockId,
+              },
+            },
+          },
+          {
+            name:
+              'should do nothing if deselecting the step item results in 0 steps being selected',
+            props: { stepId: mockId, stepNumber: 1 },
+            mockClickEvent: {
+              shiftKey: false,
+              metaKey: false,
+              ctrlKey: true,
+              persist: jest.fn(),
+            },
+            setupMocks: () => {
+              when(getMultiSelectItemIdsMock)
+                .calledWith(expect.anything())
+                .mockReturnValue([mockId])
+            },
+            expectedAction: undefined, // no action should be dispatched
+          },
+        ]
+
+        testCases.forEach(
+          ({ name, props, mockClickEvent, setupMocks, expectedAction }) => {
+            it(name, () => {
+              setupMocks && setupMocks()
+              UAParser.mockImplementation(() => {
+                return {
+                  getOS: () => ({
+                    name: 'NOT Mac OS',
+                    version: 'mockVersion',
+                  }),
+                }
+              })
+              const wrapper = render(props)
+              wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+              const actions = store.getActions()
+              expect(actions[0]).toEqual(expectedAction)
+            })
+          }
+        )
+      })
     })
   })
 })
