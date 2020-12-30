@@ -247,6 +247,61 @@ describe('ConnectedStepItem', () => {
           },
         },
         {
+          name:
+            'should select a range when the selected step is earlier than the last selected step (single => multi)',
+          props: { stepId: mockId, stepNumber: 1 },
+          mockClickEvent: {
+            shiftKey: true,
+            metaKey: false,
+            ctrlKey: false,
+            persist: jest.fn(),
+          },
+          setupMocks: () => {
+            when(getOrderedStepIdsMock)
+              .calledWith(expect.anything())
+              .mockReturnValue([mockId, 'ANOTHER_ID', 'YET_ANOTHER_ID'])
+            when(getSelectedStepIdMock)
+              .calledWith(expect.anything())
+              .mockReturnValue('YET_ANOTHER_ID')
+          },
+          expectedAction: {
+            type: 'SELECT_MULTIPLE_STEPS',
+            payload: {
+              stepIds: [mockId, 'ANOTHER_ID', 'YET_ANOTHER_ID'],
+              lastSelected: mockId,
+            },
+          },
+        },
+        {
+          name:
+            'should select a range when the selected step is earlier than the last selected step (multi => multi)',
+          props: { stepId: mockId, stepNumber: 1 },
+          mockClickEvent: {
+            shiftKey: true,
+            metaKey: false,
+            ctrlKey: false,
+            persist: jest.fn(),
+          },
+          setupMocks: () => {
+            when(getMultiSelectItemIdsMock)
+              .calledWith(expect.anything())
+              .mockReturnValue(['FOURTH_ID'])
+            when(getOrderedStepIdsMock)
+              .calledWith(expect.anything())
+              .mockReturnValue([mockId, 'SECOND_ID', 'THIRD_ID', 'FOURTH_ID'])
+            when(getMultiSelectLastSelectedMock)
+              .calledWith(expect.anything())
+              .mockReturnValue('FOURTH_ID')
+          },
+          expectedAction: {
+            type: 'SELECT_MULTIPLE_STEPS',
+            payload: {
+              stepIds: ['FOURTH_ID', mockId, 'SECOND_ID', 'THIRD_ID'],
+              lastSelected: mockId,
+            },
+          },
+        },
+        {
           name: 'should select a range when some of them are already selected',
           props: { stepId: mockId, stepNumber: 1 },
           mockClickEvent: {

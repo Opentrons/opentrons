@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import uniq from 'lodash/uniq'
 import UAParser from 'ua-parser-js'
 import { useConditionalConfirm } from '@opentrons/components'
 
@@ -240,19 +241,16 @@ function getShiftSelectedSteps(
 ) {
   let stepsToSelect: Array<StepIdType>
   if (selectedStepId) {
-    const startIndex: number = orderedStepIds.indexOf(selectedStepId)
-    const endIndex: number = orderedStepIds.indexOf(stepId)
-    stepsToSelect = orderedStepIds.slice(startIndex, endIndex + 1)
-  } else if (multiSelectItemIds?.length) {
-    const prevIndex: number = orderedStepIds.indexOf(lastMultiSelectedStepId)
-    const currentIndex: number = orderedStepIds.indexOf(stepId)
-
-    const [startIndex, endIndex] = [prevIndex, currentIndex].sort(
-      (a, b) => a - b
+    stepsToSelect = getOrderedStepsInRange(
+      selectedStepId,
+      stepId,
+      orderedStepIds
     )
-    const potentialStepsToSelect = orderedStepIds.slice(
-      startIndex,
-      endIndex + 1
+  } else if (multiSelectItemIds?.length && lastMultiSelectedStepId) {
+    const potentialStepsToSelect = getOrderedStepsInRange(
+      lastMultiSelectedStepId,
+      stepId,
+      orderedStepIds
     )
 
     const allSelected: boolean = potentialStepsToSelect
@@ -270,12 +268,23 @@ function getShiftSelectedSteps(
         stepsToSelect = [potentialStepsToSelect[0]]
       }
     } else {
-      stepsToSelect = [
-        ...new Set([...multiSelectItemIds, ...potentialStepsToSelect]),
-      ]
+      stepsToSelect = uniq([...multiSelectItemIds, ...potentialStepsToSelect])
     }
   } else {
     stepsToSelect = [stepId]
   }
   return stepsToSelect
+}
+
+function getOrderedStepsInRange(
+  lastSelectedStepId: StepIdType,
+  stepId: StepIdType,
+  orderedStepIds: Array<StepIdType>
+) {
+  const prevIndex: number = orderedStepIds.indexOf(lastSelectedStepId)
+  const currentIndex: number = orderedStepIds.indexOf(stepId)
+
+  const [startIndex, endIndex] = [prevIndex, currentIndex].sort((a, b) => a - b)
+  const orderedSteps = orderedStepIds.slice(startIndex, endIndex + 1)
+  return orderedSteps
 }
