@@ -19,7 +19,7 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
-    "@hot-loader/react-dom": "16.8.6",
+    "@hot-loader/react-dom": "17.0.1",
     "@opentrons/components": "4.0.0",
     "@typeform/embed": "0.16.0",
     "ajv": "6.10.2",
@@ -33,16 +33,17 @@
     "immer": "5.1.0",
     "lodash": "4.17.15",
     "query-string": "6.2.0",
-    "react": "16.8.6",
+    "react": "17.0.1",
     "react-dnd": "6.0.0",
     "react-dnd-mouse-backend": "0.1.2",
-    "react-dom": "16.8.6",
+    "react-dom": "17.0.1",
     "react-hot-loader": "4.12.19",
     "react-redux": "7.2.1",
     "redux": "4.0.5",
     "redux-actions": "2.2.1",
     "redux-thunk": "2.2.0",
     "reselect": "4.0.0",
+    "ua-parser-js": "^0.7.23",
     "uuid": "3.3.2",
     "yup": "0.26.6"
   }
