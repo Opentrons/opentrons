@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
+import { act } from 'react-dom/test-utils'
 import UAParser from 'ua-parser-js'
 import { mount } from 'enzyme'
 import { when, resetAllWhenMocks } from 'jest-when'
@@ -9,6 +10,11 @@ import thunk from 'redux-thunk'
 
 import { ConnectedStepItem } from '../ConnectedStepItem'
 import { StepItem } from '../../components/steplist'
+import {
+  ConfirmDeleteModal,
+  CLOSE_UNSAVED_STEP_FORM,
+  CLOSE_STEP_FORM_WITH_CHANGES,
+} from '../../components/modals/ConfirmDeleteModal'
 
 import * as stepFormSelectors from '../../step-forms/selectors/index.js'
 import * as dismissSelectors from '../../dismiss/selectors.js'
@@ -134,6 +140,42 @@ describe('ConnectedStepItem', () => {
         const selectStepAction = { type: 'SELECT_STEP', payload: mockId }
         expect(actions[0]).toEqual(selectStepAction)
       })
+
+      it('should display the "close unsaved form" modal when form has not yet been saved', () => {
+        when(getCurrentFormIsPresavedMock)
+          .calledWith(expect.anything())
+          .mockReturnValue(true)
+        const props = { stepId: mockId, stepNumber: 1 }
+        const wrapper = render(props)
+        act(() => {
+          wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+        })
+        wrapper.update()
+        const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
+        expect(confirmDeleteModal).toHaveLength(1)
+        expect(confirmDeleteModal.prop('modalType')).toBe(
+          CLOSE_UNSAVED_STEP_FORM
+        )
+        expect(store.getActions().length).toBe(0)
+      })
+
+      it('should display the "close form with changes" modal when form has unsaved changes', () => {
+        when(getCurrentFormHasUnsavedChangesMock)
+          .calledWith(expect.anything())
+          .mockReturnValue(true)
+        const props = { stepId: mockId, stepNumber: 1 }
+        const wrapper = render(props)
+        act(() => {
+          wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+        })
+        wrapper.update()
+        const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
+        expect(confirmDeleteModal).toHaveLength(1)
+        expect(confirmDeleteModal.prop('modalType')).toBe(
+          CLOSE_STEP_FORM_WITH_CHANGES
+        )
+        expect(store.getActions().length).toBe(0)
+      })
       describe('when PD in batch edit mode', () => {
         it('should select a multiple steps', () => {
           when(getMultiSelectItemIdsMock)
@@ -180,6 +222,51 @@ describe('ConnectedStepItem', () => {
       })
     })
     describe('when shift + clicked', () => {
+      describe('modal prompts', () => {
+        it('should display the "close unsaved form" modal when form has not yet been saved', () => {
+          when(getCurrentFormIsPresavedMock)
+            .calledWith(expect.anything())
+            .mockReturnValue(true)
+          const props = { stepId: mockId, stepNumber: 1 }
+          const clickEvent = {
+            ...mockClickEvent,
+            shiftKey: true,
+          }
+          const wrapper = render(props)
+          act(() => {
+            wrapper.find(StepItem).prop('handleClick')(clickEvent)
+          })
+          wrapper.update()
+          const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
+          expect(confirmDeleteModal).toHaveLength(1)
+          expect(confirmDeleteModal.prop('modalType')).toBe(
+            CLOSE_UNSAVED_STEP_FORM
+          )
+          expect(store.getActions().length).toBe(0)
+        })
+
+        it('should display the "close form with changes" modal when form has unsaved changes', () => {
+          when(getCurrentFormHasUnsavedChangesMock)
+            .calledWith(expect.anything())
+            .mockReturnValue(true)
+          const props = { stepId: mockId, stepNumber: 1 }
+          const clickEvent = {
+            ...mockClickEvent,
+            shiftKey: true,
+          }
+          const wrapper = render(props)
+          act(() => {
+            wrapper.find(StepItem).prop('handleClick')(clickEvent)
+          })
+          wrapper.update()
+          const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
+          expect(confirmDeleteModal).toHaveLength(1)
+          expect(confirmDeleteModal.prop('modalType')).toBe(
+            CLOSE_STEP_FORM_WITH_CHANGES
+          )
+          expect(store.getActions().length).toBe(0)
+        })
+      })
       const testCases = [
         {
           name: 'should select just one step (in batch edit mode)',
@@ -401,6 +488,51 @@ describe('ConnectedStepItem', () => {
       )
     })
     describe('when command + clicked', () => {
+      describe('modal prompts', () => {
+        it('should display the "close unsaved form" modal when form has not yet been saved', () => {
+          when(getCurrentFormIsPresavedMock)
+            .calledWith(expect.anything())
+            .mockReturnValue(true)
+          const props = { stepId: mockId, stepNumber: 1 }
+          const clickEvent = {
+            ...mockClickEvent,
+            shiftKey: true,
+          }
+          const wrapper = render(props)
+          act(() => {
+            wrapper.find(StepItem).prop('handleClick')(clickEvent)
+          })
+          wrapper.update()
+          const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
+          expect(confirmDeleteModal).toHaveLength(1)
+          expect(confirmDeleteModal.prop('modalType')).toBe(
+            CLOSE_UNSAVED_STEP_FORM
+          )
+          expect(store.getActions().length).toBe(0)
+        })
+
+        it('should display the "close form with changes" modal when form has unsaved changes', () => {
+          when(getCurrentFormHasUnsavedChangesMock)
+            .calledWith(expect.anything())
+            .mockReturnValue(true)
+          const props = { stepId: mockId, stepNumber: 1 }
+          const clickEvent = {
+            ...mockClickEvent,
+            shiftKey: true,
+          }
+          const wrapper = render(props)
+          act(() => {
+            wrapper.find(StepItem).prop('handleClick')(clickEvent)
+          })
+          wrapper.update()
+          const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
+          expect(confirmDeleteModal).toHaveLength(1)
+          expect(confirmDeleteModal.prop('modalType')).toBe(
+            CLOSE_STEP_FORM_WITH_CHANGES
+          )
+          expect(store.getActions().length).toBe(0)
+        })
+      })
       describe('on non mac OS', () => {
         it('should select a single step', () => {
           const props = {
