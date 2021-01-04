@@ -11,7 +11,7 @@ Protocols and Instruments
 
 .. autoclass:: opentrons.protocol_api.contexts.ProtocolContext
    :members:
-   :exclude-members: location_cache
+   :exclude-members: location_cache, _hw_manager
 
 .. autoclass:: opentrons.protocol_api.contexts.InstrumentContext
    :members:
@@ -22,6 +22,7 @@ Labware and Wells
 -----------------
 .. automodule:: opentrons.protocol_api.labware
    :members:
+   :exclude-members: _depth, _width, _length
 
 .. _protocol-api-modules:
 

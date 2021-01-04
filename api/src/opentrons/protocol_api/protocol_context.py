@@ -117,6 +117,15 @@ class ProtocolContext(CommandPublisher):
         """
         return self._api_version
 
+    @property
+    def _hw_manager(self):
+        # TODO (lc 01-05-2021) remove this once we have a more
+        # user facing hardware control http api.
+        self._log.warning(
+            "This function will be deprecated in later versions."
+            "Please use with caution.")
+        return self._implementation.get_hardware()
+
     @property  # type: ignore
     @requires_version(2, 0)
     def bundled_data(self) -> Dict[str, bytes]:

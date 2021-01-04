@@ -340,3 +340,71 @@ For example:
         pipette.move_to(adjusted_location)
 
 .. versionadded:: 2.0
+
+
+Well Properties
+^^^^^^^^^^^^^^^
+
+
+Sometimes you may need access to information about a given well in a labware, such as the depth or diameter.
+
+Depth
+-----
+The depth of a given well
+
+.. code-block:: python
+    :substitutions:
+
+    metadata = {'apiLevel': '|apiLevel|'}
+
+    def run(protocol):
+        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
+        depth = plate['A1'].depth
+
+Diameter
+--------
+The diameter of a given well, which is only relevant for labware with circular wells.
+
+.. code-block:: python
+    :substitutions:
+
+    metadata = {'apiLevel': '|apiLevel|'}
+
+    def run(protocol):
+        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
+        depth = plate['A1'].diameter
+
+
+Length
+------
+The length of a given well, which is only relevant for labware with square wells.
+
+.. code-block:: python
+    :substitutions:
+
+    metadata = {'apiLevel': '|apiLevel|'}
+
+    def run(protocol):
+        plate = protocol.load_labware('nest_12_reservoir_15ml', '1')
+        length = plate['A1'].length
+
+
+Width
+-----
+The width of a given well, which is only relevant for labware with square wells.
+
+.. code-block:: python
+    :substitutions:
+
+    metadata = {'apiLevel': '|apiLevel|'}
+
+    def run(protocol):
+        plate = protocol.load_labware('nest_12_reservoir_15ml', '1')
+        width = plate['A1'].width
+
+
+These properties can be used for different applications, such as customizing tip location
+or calculating the volume of a well.
+
+
+.. versionadded:: 2.9
