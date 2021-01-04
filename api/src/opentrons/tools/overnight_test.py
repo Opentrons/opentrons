@@ -29,8 +29,8 @@ start_time_minutes = int(time.time() / 60)
 attempts_to_home = 1
 too_many_attempts_to_home = 3
 
-XY_TOLERANCE = 30
-ZA_TOLERANCE = 10
+XY_TOLERANCE = 30.0
+ZA_TOLERANCE = 10.0
 
 AXIS_TEST_SKIPPING_TOLERANCE = 0.5
 

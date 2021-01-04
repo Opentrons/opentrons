@@ -5,7 +5,6 @@ import logging
 from threading import Event
 from typing import (Dict, Optional, List, Tuple,
                     TYPE_CHECKING, Sequence)
-from typing_extensions import Final
 from contextlib import contextmanager
 
 from opentrons_shared_data.pipette import dummy_model_for_name
@@ -17,6 +16,7 @@ from opentrons.config.pipette_config import (config_models,
                                              load)
 from opentrons.config.types import RobotConfig
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
+
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
 from . import modules
@@ -34,10 +34,6 @@ if TYPE_CHECKING:
 
 
 MODULE_LOG = logging.getLogger(__name__)
-
-
-_HOME_POSITION = {'X': 418.0, 'Y': 353.0, 'Z': 218.0,
-                  'A': 218.0, 'B': 19.0, 'C': 19.0}
 
 
 class Simulator:
@@ -116,7 +112,8 @@ class Simulator:
         """
         self.config = config
         self._loop = loop
-        self._gpio_chardev: Final = gpio_chardev
+        self._smoothie_driver = SimulatingDriver()
+        self._gpio_chardev = gpio_chardev
 
         def _sanitize_attached_instrument(
                 passed_ai: Dict[str, Optional[str]] = None)\
@@ -139,13 +136,13 @@ class Simulator:
             m: _sanitize_attached_instrument(attached_instruments.get(m))
             for m in types.Mount}
         self._stubbed_attached_modules = attached_modules
-        self._position = copy.copy(_HOME_POSITION)
+        self._position = copy.copy(self._smoothie_driver.homed_position)
         # Engaged axes start all true in smoothie for some reason so we
         # imitate that here
         # TODO(LC2642019) Create a simulating driver for smoothie instead of
         # using a flag
-        self._smoothie_driver = SimulatingDriver()
-        self._engaged_axes = {ax: True for ax in _HOME_POSITION}
+
+        self._engaged_axes = {ax: True for ax in self._smoothie_driver.homed_position}
         self._lights = {'button': False, 'rails': False}
         self._run_flag = Event()
         self._run_flag.set()
@@ -169,7 +166,7 @@ class Simulator:
     def home(self, axes: List[str] = None) -> Dict[str, float]:
         # driver_3_0-> HOMED_POSITION
         checked_axes = axes or 'XYZABC'
-        self._position.update({ax: _HOME_POSITION[ax]
+        self._position.update({ax: self._smoothie_driver.homed_position[ax]
                                for ax in checked_axes})
         self._engaged_axes.update({ax: True
                                    for ax in checked_axes})
@@ -178,7 +175,7 @@ class Simulator:
     def fast_home(
             self, axis: Sequence[str], margin: float) -> Dict[str, float]:
         for ax in axis:
-            self._position[ax] = _HOME_POSITION[ax]
+            self._position[ax] = self._smoothie_driver.homed_position[ax]
             self._engaged_axes[ax] = True
         return self._position
 
@@ -288,7 +285,8 @@ class Simulator:
     @property
     def axis_bounds(self) -> Dict[Axis, Tuple[float, float]]:
         """ The (minimum, maximum) bounds for each axis. """
-        return {Axis[ax]: (0, pos) for ax, pos in _HOME_POSITION.items()
+        return {Axis[ax]: (0, pos) for ax, pos
+                in self._smoothie_driver.axis_bounds.items()
                 if ax not in 'BC'}
 
     @property
