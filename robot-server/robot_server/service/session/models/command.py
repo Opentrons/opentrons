@@ -1,3 +1,21 @@
+"""Modeling of session commands.
+
+Creating a new command type requires these steps:
+1) Creation of a CommandDefinition enum identifying the command
+type.
+
+2) If necessary, define a data payload model.
+
+3) If necessary, define a result payload model.
+
+4) Create specialized `SessionCommandRequest` and `SessionCommandResponse`
+types using the CommandDefinition Literal(s), data, and result payload models.
+If there are no data and result models, then add the CommandDefinition to
+`CommandsEmptyData` type.
+
+5) If not using `CommandsEmptyData` then add specialized request and response
+types to `RequestTypes` and `ResponseTypes`.
+"""
 from datetime import datetime
 from enum import Enum
 import typing
