@@ -9,6 +9,7 @@ from typing import Dict, List, Optional
 import pytest
 
 from opentrons.config import robot_configs
+from opentrons.config.types import RobotConfig
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis, CriticalPoint
@@ -227,7 +228,7 @@ async def test_complex_method(hc_stream_server, loop, monkeypatch):
         (Point, Point(1, 2, 3), [1, 2, 3]),
         (Dict[Mount, str], {Mount.LEFT: 'way hay'}, {'LEFT': 'way hay'}),
         (Dict[Axis, bool], {Axis.X: True}, {'X': True}),
-        (robot_configs.robot_config,
+        (RobotConfig,
          robot_configs.load(),
          robot_configs.config_to_save(robot_configs.load())),
         (Dict[Mount, Pipette.DictType],

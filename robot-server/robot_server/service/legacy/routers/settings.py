@@ -1,3 +1,4 @@
+from dataclasses import asdict
 import logging
 from typing import Dict
 
@@ -174,7 +175,7 @@ async def post_settings_reset_options(
             response_model=RobotConfigs)
 async def get_robot_settings(
         hardware: ThreadManager = Depends(get_hardware)) -> RobotConfigs:
-    return hardware.config._asdict()  # type: ignore
+    return asdict(hardware.config)
 
 
 @router.get("/settings/pipettes",

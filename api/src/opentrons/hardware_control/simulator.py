@@ -5,6 +5,7 @@ import logging
 from threading import Event
 from typing import (Dict, Optional, List, Tuple,
                     TYPE_CHECKING, Sequence)
+from typing_extensions import Final
 from contextlib import contextmanager
 
 from opentrons_shared_data.pipette import dummy_model_for_name
@@ -14,6 +15,7 @@ from opentrons.config.pipette_config import (config_models,
                                              config_names,
                                              configs,
                                              load)
+from opentrons.config.types import RobotConfig
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
@@ -44,13 +46,18 @@ class Simulator:
     a robot with no smoothie connected.
     """
 
-    def __init__(
-            self,
+    @classmethod
+    async def build(
+            cls,
             attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
             attached_modules: List[str],
-            config, loop,
-            strict_attached_instruments=True) -> None:
+            config: RobotConfig,
+            loop: asyncio.AbstractEventLoop,
+            strict_attached_instruments: bool = True) -> Simulator:
         """ Build the simulator.
+
+        Use this factory method rather than the initializer to handle proper GPIO
+        initialization.
 
         :param attached_instruments: A dictionary describing the instruments
                                      the simulator should consider attached.
@@ -84,8 +91,32 @@ class Simulator:
                                             requesting instruments that _are_
                                             present get the full number.
         """
+        gpio = SimulatingGPIOCharDev('gpiochip0')
+        await gpio.setup()
+        return cls(
+            attached_instruments,
+            attached_modules,
+            config,
+            loop,
+            gpio,
+            strict_attached_instruments)
+
+    def __init__(
+            self,
+            attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
+            attached_modules: List[str],
+            config: RobotConfig, loop: asyncio.AbstractEventLoop,
+            gpio_chardev: GPIODriverLike,
+            strict_attached_instruments: bool = True) -> None:
+        """ Initialize the simulator.
+
+        Always prefer using :py:meth:`.build` to create an instance of this class. For
+        more information on arguments, see that method. If you want to use this
+        directly, you must pass in an initialized _and set up_ GPIO driver instance.
+        """
         self.config = config
         self._loop = loop
+        self._gpio_chardev: Final = gpio_chardev
 
         def _sanitize_attached_instrument(
                 passed_ai: Dict[str, Optional[str]] = None)\
@@ -120,14 +151,10 @@ class Simulator:
         self._run_flag.set()
         self._log = MODULE_LOG.getChild(repr(self))
         self._strict_attached = bool(strict_attached_instruments)
-        self._gpio_chardev = SimulatingGPIOCharDev('gpiochip0')
 
     @property
     def gpio_chardev(self) -> GPIODriverLike:
         return self._gpio_chardev
-
-    async def setup_gpio_chardev(self):
-        await self.gpio_chardev.setup()
 
     def update_position(self) -> Dict[str, float]:
         return self._position

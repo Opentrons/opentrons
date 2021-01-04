@@ -4,6 +4,7 @@ from contextlib import contextmanager, ExitStack
 import logging
 from typing import (Any, Dict, List, Optional,
                     Tuple, TYPE_CHECKING, Union, Sequence)
+from typing_extensions import Final
 try:
     import aionotify  # type: ignore
 except OSError:
@@ -13,6 +14,7 @@ from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.drivers.rpi_drivers import build_gpio_chardev
 import opentrons.config
 from opentrons.config import pipette_config
+from opentrons.config.types import RobotConfig
 from opentrons.types import Mount
 
 from . import modules
@@ -37,12 +39,26 @@ class Controller:
     hardware.
     """
 
-    def __init__(self, config):
+    @classmethod
+    async def build(cls, config: RobotConfig) -> Controller:
         """ Build a Controller instance.
 
-        If another controller is already instantiated on the system (or if
-        this is instantiated somewhere other than a robot) then this method
-        will raise a RuntimeError.
+        Use this factory method rather than the initializer to handle proper
+        GPIO initialization.
+
+        :param config: A loaded robot config.
+        """
+        gpio = build_gpio_chardev('gpiochip0')
+        gpio.config_by_board_rev()
+        await gpio.setup()
+        return cls(config, gpio)
+
+    def __init__(self, config: RobotConfig, gpio: GPIODriverLike):
+        """ Build a Controller instance.
+
+        Always prefer using :py:meth:`.build` to create an instance of this class. For
+        more information on arguments, see that method. If you want to use this
+        directly, you must pass in an initialized _and set up_ GPIO driver instance.
         """
         if not opentrons.config.IS_ROBOT:
             MODULE_LOG.warning(
@@ -55,8 +71,8 @@ class Controller:
 
         self.config = config or opentrons.config.robot_configs.load()
 
-        self._gpio_chardev = build_gpio_chardev('gpiochip0')
-        self._board_revision = BoardRevision.UNKNOWN
+        self._gpio_chardev: Final = gpio
+        self._board_revision: Final = self.gpio_chardev.board_rev
         # We handle our own locks in the hardware controller thank you
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config, gpio_chardev=self._gpio_chardev,
@@ -80,11 +96,6 @@ class Controller:
     @property
     def board_revision(self) -> BoardRevision:
         return self._board_revision
-
-    async def setup_gpio_chardev(self):
-        self.gpio_chardev.config_by_board_rev()
-        self._board_revision = self.gpio_chardev.board_rev
-        await self.gpio_chardev.setup()
 
     def start_gpio_door_watcher(self, **kargs):
         self.gpio_chardev.start_door_switch_watcher(**kargs)

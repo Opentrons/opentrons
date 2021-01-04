@@ -14,6 +14,7 @@ import jsonrpcserver  # type: ignore
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs
+from opentrons.config.types import RobotConfig
 
 from . import API, types, pipette
 
@@ -65,7 +66,7 @@ _SERDES = {
             for ax, engaged in namedict.items()
         }
     ),
-    robot_configs.robot_config: SerDes(
+    RobotConfig: SerDes(
         serializer=lambda config: robot_configs.config_to_save(config),
         deserializer=lambda clist: robot_configs.build_config(clist)
     ),
