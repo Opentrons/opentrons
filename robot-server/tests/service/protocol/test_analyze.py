@@ -7,7 +7,7 @@ from robot_server.service.protocol.analyze import _analyze
 from robot_server.util import FileMeta
 
 
-def test_():
+def test_analyze():
     """"""
     proto = """
 metadata = {
@@ -48,75 +48,76 @@ def run(ctx):
         )
         assert sorted(r.required_equipment.labware, key=lambda x: x.slot) == [
             models.LoadedLabware(
-                name='elution plate',
-                type="opentrons_96_aluminumblock_nest_wellplate_100ul",
+                label='elution plate',
+                uri=
+                "opentrons/opentrons_96_aluminumblock_nest_wellplate_100ul/1",
                 slot=1
             ),
             models.LoadedLabware(
-                type='nest_12_reservoir_15ml',
+                uri="opentrons/nest_12_reservoir_15ml/1",
                 slot=2,
-                name='reagent reservoir 1'
+                label='reagent reservoir 1'
             ),
             models.LoadedLabware(
-                type='nest_12_reservoir_15ml',
+                uri="opentrons/nest_12_reservoir_15ml/1",
                 slot=3,
-                name='reagent reservoir 2'),
+                label='reagent reservoir 2'),
             models.LoadedLabware(
-                type='opentrons_96_tiprack_300ul',
+                uri="opentrons/opentrons_96_tiprack_300ul/1",
                 slot=4,
-                name='200µl filtertiprack'),
+                label='200µl filtertiprack'),
             models.LoadedLabware(
-                type='opentrons_96_tiprack_300ul',
+                uri="opentrons/opentrons_96_tiprack_300ul/1",
                 slot=5,
-                name='tiprack for parking'),
+                label='tiprack for parking'),
             models.LoadedLabware(
-                type='nest_96_wellplate_2ml_deep',
+                uri="opentrons/nest_96_wellplate_2ml_deep/1",
                 slot=6,
-                name='deepwell plate'),
+                label='deepwell plate'),
             models.LoadedLabware(
-                type='opentrons_96_tiprack_300ul',
+                uri="opentrons/opentrons_96_tiprack_300ul/1",
                 slot=7,
-                name='200µl filtertiprack'),
+                label='200µl filtertiprack'),
             models.LoadedLabware(
-                type='opentrons_96_tiprack_300ul',
+                uri="opentrons/opentrons_96_tiprack_300ul/1",
                 slot=8,
-                name='200µl filtertiprack'),
+                label='200µl filtertiprack'),
             models.LoadedLabware(
-                type='nest_1_reservoir_195ml',
+                uri="opentrons/nest_1_reservoir_195ml/1",
                 slot=9,
-                name='Liquid Waste'),
+                label='Liquid Waste'),
             models.LoadedLabware(
-                type='opentrons_96_tiprack_300ul',
+                uri="opentrons/opentrons_96_tiprack_300ul/1",
                 slot=10,
-                name='200µl filtertiprack'),
+                label='200µl filtertiprack'),
             models.LoadedLabware(
-                type='opentrons_96_tiprack_300ul',
+                uri="opentrons/opentrons_96_tiprack_300ul/1",
                 slot=11,
-                name='200µl filtertiprack'),
+                label='200µl filtertiprack'),
             models.LoadedLabware(
-                type="opentrons_1_trash_1100ml_fixed",
+                uri="opentrons/opentrons_1_trash_1100ml_fixed/1",
                 slot=12,
-                name="opentrons_1_trash_1100ml_fixed"
+                label="opentrons_1_trash_1100ml_fixed"
             )
         ]
 
         assert len(r.required_equipment.pipettes) == 2
         assert models.LoadedPipette(mount=Mount.left,
-                                    name="p300_multi_gen2",
+                                    requestedAs="p300_multi_gen2",
                                     pipetteName="p300_multi_gen2",
                                     channels=8) \
                in r.required_equipment.pipettes
         assert models.LoadedPipette(mount=Mount.right,
-                                    name="p20_single_gen2",
+                                    requestedAs="p20_single_gen2",
                                     pipetteName="p20_single_gen2",
                                     channels=1) \
                in r.required_equipment.pipettes
         assert len(r.required_equipment.modules) == 2
-        assert models.LoadedModule(name='temperatureModuleV2',
+        assert models.LoadedModule(type='temperatureModuleType',
                                    slot=1,
-                                   model="TEMPERATURE_V2") \
+                                   model="temperatureModuleV2") \
                in r.required_equipment.modules
-        assert models.LoadedModule(name="magneticModuleV2",
+        assert models.LoadedModule(type="magneticModuleType",
                                    slot=6,
-                                   model="MAGNETIC_V2") \
+                                   model="magneticModuleV2") \
                in r.required_equipment.modules

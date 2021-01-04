@@ -1,6 +1,8 @@
 import typing
 from datetime import datetime
 
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
 from pydantic import BaseModel, Field
 
 from opentrons.hardware_control.dev_types import ONE_CHANNEL, EIGHT_CHANNELS
@@ -14,28 +16,28 @@ class LoadedPipette(BaseModel):
     """Model of a pipette required by protocol."""
     mount: Mount = \
         Field(..., description="The mount to which this pipette is attached.")
-    name: str = \
+    requestedAs: str = \
         Field(..., description="The user supplied name.")
-    pipetteName: str = \
+    pipetteName: PipetteName = \
         Field(..., description="The pipette name.")
     channels: typing.Union[ONE_CHANNEL, EIGHT_CHANNELS]
 
 
 class LoadedLabware(BaseModel):
     """Model of labware loaded by protocol."""
-    name: str = \
-        Field(..., description="The user supplied name.")
-    type: str = \
-        Field(..., description="The labware type.")
+    label: str = \
+        Field(..., description="The display name of the labware.")
+    uri: str = \
+        Field(..., description="The uri (namespace/loadname/version).")
     slot: int = \
         Field(..., description="The slot in which this labware is located.")
 
 
 class LoadedModule(BaseModel):
     """Model of module loaded by protocol."""
-    name: str = \
+    type: ModuleType = \
         Field(..., description="The name of the module.")
-    model: str = \
+    model: ModuleModel = \
         Field(..., description="The module model.")
     slot: int = \
         Field(..., description="The slot in which this module is located.")
