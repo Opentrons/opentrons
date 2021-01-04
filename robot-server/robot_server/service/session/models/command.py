@@ -21,6 +21,8 @@ from robot_server.service.json_api import (
 
 
 class LoadLabwareRequestData(BaseModel):
+    """Data field in an equipment.loadLabware command request."""
+
     location: int = Field(
         ...,
         description="Deck slot", ge=1, lt=12)
@@ -39,12 +41,16 @@ class LoadLabwareRequestData(BaseModel):
 
 
 class LoadLabwareResponseData(BaseModel):
+    """Result field in an equipment.loadLabware command response."""
+
     labwareId: IdentifierType
     definition: LabwareDefinition
     calibration: OffsetVector
 
 
 class LoadInstrumentRequestData(BaseModel):
+    """Data field in an equipment.loadInstrument command request."""
+
     instrumentName: PipetteName = Field(
         ...,
         description="The name of the instrument model")
@@ -52,6 +58,8 @@ class LoadInstrumentRequestData(BaseModel):
 
 
 class LoadInstrumentResponseData(BaseModel):
+    """Result field in an equipment.loadInstrument command response."""
+
     instrumentId: IdentifierType
 
 
@@ -88,25 +96,8 @@ class SetHasCalibrationBlockRequestData(BaseModel):
         description="whether or not there is a calibration block present")
 
 
-CommandDataType = typing.Union[
-    SetHasCalibrationBlockRequestData,
-    JogPosition,
-    LiquidRequestData,
-    PipetteRequestDataBase,
-    LoadLabwareRequestData,
-    LoadInstrumentRequestData,
-    EmptyModel
-]
-
-# A Union of all command result types
-CommandResultType = typing.Union[
-    LoadLabwareResponseData,
-    LoadInstrumentResponseData,
-]
-
-
 class CommandStatus(str, Enum):
-    """The command status"""
+    """The command status."""
     executed = "executed"
     queued = "queued"
     failed = "failed"
@@ -121,7 +112,7 @@ class SessionCommandRequest(
     GenericModel,
     typing.Generic[CommandT, RequestDataT, ResponseDataT]
 ):
-    """A session command"""
+    """A session command request."""
     command: CommandT = Field(
         ...,
         description="The command description")
@@ -139,6 +130,7 @@ class SessionCommandRequest(
             completed_at: typing.Optional[datetime],
             result: typing.Optional[ResponseDataT]
     ) -> 'SessionCommandResponse[CommandT, RequestDataT, ResponseDataT]':
+        """Create a SessionCommandResponse object."""
         return SessionCommandResponse(
             command=self.command,
             data=self.data,
@@ -155,7 +147,7 @@ class SessionCommandResponse(
     GenericModel,
     typing.Generic[CommandT, RequestDataT, ResponseDataT]
 ):
-    """A session command response"""
+    """A session command response."""
     command: CommandT
     data: RequestDataT
     status: CommandStatus
@@ -165,7 +157,6 @@ class SessionCommandResponse(
     result: typing.Optional[ResponseDataT] = None
 
 
-# The command definitions requiring no data and result types.
 CommandsEmptyData = Literal[
     ProtocolCommand.start_run,
     ProtocolCommand.start_simulate,
@@ -190,14 +181,14 @@ CommandsEmptyData = Literal[
     CheckCalibrationCommand.return_tip,
     CheckCalibrationCommand.transition
 ]
+"""The command definitions requiring no data and result types."""
 
 
-class SimpleCommandRequest(
-    SessionCommandRequest[CommandsEmptyData,
-                          EmptyModel,
-                          EmptyModel]):
-    """A command containing no data and result type"""
-    pass
+SimpleCommandRequest = SessionCommandRequest[
+    CommandsEmptyData,
+    EmptyModel,
+    EmptyModel]
+"""A command request containing no data and result type."""
 
 
 SimpleCommandResponse = SessionCommandResponse[
@@ -205,6 +196,7 @@ SimpleCommandResponse = SessionCommandResponse[
     EmptyModel,
     EmptyModel
 ]
+"""Response to :class:`~SimpleCommandRequest`"""
 
 
 LoadLabwareRequest = SessionCommandRequest[
@@ -289,8 +281,7 @@ SetHasCalibrationBlockRequest = SessionCommandRequest[
 
 
 SetHasCalibrationBlockResponse = SessionCommandResponse[
-    Literal[
-        CalibrationCommand.set_has_calibration_block],
+    Literal[CalibrationCommand.set_has_calibration_block],
     SetHasCalibrationBlockRequestData,
     EmptyModel]
 
@@ -304,6 +295,7 @@ RequestTypes = typing.Union[
     JogRequest,
     SetHasCalibrationBlockRequest,
 ]
+"""Union of all request types"""
 
 ResponseTypes = typing.Union[
     SimpleCommandResponse,
@@ -314,11 +306,15 @@ ResponseTypes = typing.Union[
     JogResponse,
     SetHasCalibrationBlockResponse,
 ]
+"""Union of all response types"""
 
-# Session command requests/responses
+
 CommandRequest = RequestModel[
     RequestTypes
 ]
+"""The command request model."""
+
 CommandResponse = ResponseModel[
     ResponseTypes
 ]
+"""The command response model."""
