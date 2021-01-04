@@ -1,8 +1,9 @@
 import typing
 from datetime import datetime
 
+from opentrons.protocols.geometry.module_geometry import ModuleModel
 from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
+from opentrons_shared_data.module.dev_types import ModuleType
 from pydantic import BaseModel, Field
 
 from opentrons.hardware_control.dev_types import ONE_CHANNEL, EIGHT_CHANNELS
