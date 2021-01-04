@@ -26,6 +26,7 @@ def analyze_protocol(protocol_contents: contents.Contents) -> AnalysisResult:
 
 
 def _analyze(protocol_contents: contents.Contents) -> AnalysisResult:
+    """Analyze the protocol to extract equipment requirements."""
     # Parse the contents.
     protocol = parse(
         contents.get_protocol_contents(protocol_contents),
@@ -52,20 +53,20 @@ def _analyze(protocol_contents: contents.Contents) -> AnalysisResult:
         pipettes=[
             models.LoadedPipette(
                 mount=Mount(k.lower()),
-                pipetteName=v.requested_as,
+                pipetteName=v.name,
                 channels=v.channels,
-                name=v.name) for k, v in ctx.loaded_instruments.items()
-            if v],
+                requestedAs=v.requested_as)
+            for k, v in ctx.loaded_instruments.items() if v],
         labware=[
             models.LoadedLabware(
-                name=v.name,
-                type=v.load_name,
+                label=v.name,
+                uri=v.uri,
                 slot=k) for k, v in ctx.loaded_labwares.items()
         ],
         modules=[
             models.LoadedModule(
-                name=v.geometry.load_name,
-                model=v.geometry.model.name,
+                type=v.geometry.module_type.value,
+                model=v.geometry.model.value,
                 slot=int(v.geometry.location.labware.first_parent())
             ) for k, v in ctx.loaded_modules.items()
         ]
