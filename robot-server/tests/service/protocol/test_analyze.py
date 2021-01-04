@@ -49,8 +49,8 @@ def run(ctx):
         assert sorted(r.required_equipment.labware, key=lambda x: x.slot) == [
             models.LoadedLabware(
                 label='elution plate',
-                uri=
-                "opentrons/opentrons_96_aluminumblock_nest_wellplate_100ul/1",
+                uri="opentrons/"
+                    "opentrons_96_aluminumblock_nest_wellplate_100ul/1",
                 slot=1
             ),
             models.LoadedLabware(
