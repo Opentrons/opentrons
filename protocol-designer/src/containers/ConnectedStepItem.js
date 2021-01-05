@@ -111,8 +111,13 @@ export const ConnectedStepItem = (props: Props): React.Node => {
 
     let stepsToSelect: Array<StepIdType> = []
 
+    // if user clicked on the last multi-selected step, shift/meta keys don't matter
+    const toggledLastSelected = stepId === lastMultiSelectedStepId
+    const noModifierKeys =
+      nonePressed([isShiftKeyPressed, isMetaKeyPressed]) || toggledLastSelected
+
     if (isBatchEditEnabled) {
-      if (nonePressed([isShiftKeyPressed, isMetaKeyPressed])) {
+      if (noModifierKeys) {
         if (multiSelectItemIds) {
           const alreadySelected = multiSelectItemIds.includes(stepId)
           if (alreadySelected) {

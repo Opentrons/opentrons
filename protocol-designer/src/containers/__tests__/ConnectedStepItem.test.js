@@ -471,6 +471,35 @@ describe('ConnectedStepItem', () => {
             },
           },
         },
+        {
+          name:
+            'should ignore modifier key when clicking step that is already lastSelected',
+          props: { stepId: mockId, stepNumber: 1 },
+          mockClickEvent: {
+            shiftKey: true,
+            metaKey: false,
+            ctrlKey: false,
+            persist: jest.fn(),
+          },
+          setupMocks: () => {
+            when(getMultiSelectItemIdsMock)
+              .calledWith(expect.anything())
+              .mockReturnValue(['YET_ANOTHER_ID'])
+            when(getOrderedStepIdsMock)
+              .calledWith(expect.anything())
+              .mockReturnValue(['ANOTHER_ID', 'YET_ANOTHER_ID', mockId])
+            when(getMultiSelectLastSelectedMock)
+              .calledWith(expect.anything())
+              .mockReturnValue(mockId)
+          },
+          expectedAction: {
+            type: 'SELECT_MULTIPLE_STEPS',
+            payload: {
+              stepIds: ['YET_ANOTHER_ID', mockId],
+              lastSelected: mockId,
+            },
+          },
+        },
       ]
 
       testCases.forEach(
