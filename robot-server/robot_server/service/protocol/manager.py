@@ -33,13 +33,12 @@ class ProtocolManager:
                 f"Upload limit of {ProtocolManager.MAX_COUNT} has "
                 f"been reached.")
 
-        try:
-            new_protocol = UploadedProtocol.create(
-                protocol_id, protocol_file, support_files)
-            log.debug(f"Created new protocol: {new_protocol.data}")
-        except (TypeError, IOError) as e:
-            log.exception("Failed to create protocol")
-            raise errors.ProtocolIOException(str(e))
+        new_protocol = UploadedProtocol.create(
+            protocol_id=protocol_id,
+            protocol_file=protocol_file,
+            support_files=support_files
+        )
+        log.debug(f"Created new protocol: {new_protocol.data}")
 
         self._protocols[new_protocol.data.identifier] = new_protocol
         return new_protocol

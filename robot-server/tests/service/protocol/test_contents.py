@@ -1,9 +1,10 @@
 from pathlib import Path
+from unittest.mock import patch, MagicMock
 
 import pytest
 from fastapi import UploadFile
 
-from robot_server.service.protocol import contents
+from robot_server.service.protocol import contents, errors
 from robot_server.service.protocol.errors import ProtocolAlreadyExistsException
 
 
@@ -40,3 +41,35 @@ def test_add(contents_fixture):
 def test_cleanup(contents_fixture):
     contents.clean_up(contents_fixture)
     assert Path(contents_fixture.directory.name).exists() is False
+
+
+@patch.object(contents, "TemporaryDirectory")
+def test_create_temp_dir_error(mock_tempdir_constructor):
+    """Test that create raises a ProtocolIOException if TemporyDirectory
+    raises IOError"""
+    def raiser(*args, **kwargs):
+        raise IOError("failed")
+    mock_tempdir_constructor.side_effect = raiser
+    with pytest.raises(errors.ProtocolIOException):
+        contents.create(None, None)
+
+
+@patch.object(contents, "TemporaryDirectory")
+@patch.object(contents, "save_upload")
+def test_create_save_upload_error(mock_save_upload,
+                                  mock_tempdir_constructor):
+    """Test that save_upload raising IOError results in ProtocolIOException
+    and removal of temporary directory."""
+    # Mock created temporary directory
+    mock_temp_dir = MagicMock()
+    mock_temp_dir.name = "name"
+    mock_tempdir_constructor.return_value = mock_temp_dir
+
+    def raiser(*args, **kwargs):
+        raise IOError("failed")
+    # Save upload raises IOError
+    mock_save_upload.side_effect = raiser
+
+    with pytest.raises(errors.ProtocolIOException):
+        contents.create(None, None)
+    mock_temp_dir.cleanup.assert_called_once()

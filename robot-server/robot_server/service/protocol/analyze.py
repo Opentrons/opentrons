@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 
 from opentrons.protocol_api import ProtocolContext
@@ -10,6 +11,10 @@ from opentrons.protocols.types import PythonProtocol
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.protocol import contents, models
 from robot_server.service.protocol.environment import protocol_environment
+from robot_server.service.protocol.errors import ProtocolAnalysisException
+
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -26,18 +31,27 @@ def analyze_protocol(protocol_contents: contents.Contents) -> AnalysisResult:
 
 
 def _analyze(protocol_contents: contents.Contents) -> AnalysisResult:
-    """Analyze the protocol to extract equipment requirements."""
-    # Parse the contents.
-    protocol = parse(
-        contents.get_protocol_contents(protocol_contents),
-        filename=protocol_contents.protocol_file.path.name)
-    # Create the simulating protocol context
-    ctx = ProtocolContext.build_using(
-        implementation=SimProtocolContext.build_using(protocol),
-        protocol=protocol,
-    )
-    # Run the protocol
-    run_protocol(protocol, context=ctx)
+    """
+    Analyze the protocol to extract equipment requirements.
+
+    :raise ProtocolAnalysisException:
+    """
+    try:
+        # Parse the contents.
+        protocol = parse(
+            contents.get_protocol_contents(protocol_contents),
+            filename=protocol_contents.protocol_file.path.name)
+        # Create the simulating protocol context
+        ctx = ProtocolContext.build_using(
+            implementation=SimProtocolContext.build_using(protocol),
+            protocol=protocol,
+        )
+        # Run the protocol
+        run_protocol(protocol, context=ctx)
+    except Exception as e:
+        log.exception("Failed to analyze protocol")
+        raise ProtocolAnalysisException(msg=str(e))
+
     # Analyze the metadata
     metadata = protocol.metadata \
         if isinstance(protocol, PythonProtocol) else {}
