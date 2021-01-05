@@ -115,7 +115,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
             currentStep=uf.current_state,
             labware=uf.get_required_labware(),
             shouldPerformTipLength=uf.should_perform_tip_length,
-            supportedCommands=uf.get_supported_commands()
+            supportedCommands=uf.supported_commands
         )
 
     async def clean_up(self):

@@ -2,7 +2,7 @@ import typing
 
 from opentrons.types import Mount
 from enum import Enum
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from pydantic import BaseModel, Field
 from opentrons.protocol_api import labware
 from opentrons.types import DeckLocation
@@ -66,6 +66,26 @@ class PipetteInfo:
     channels: int
     tip_rack: 'Labware'
     default_tipracks: typing.List['LabwareDefinition']
+
+
+@dataclass
+class SupportedCommands:
+    """
+    A class that allows you to set currently supported
+    commands depending on the current state.
+    """
+    loadLabware: bool = False
+
+    def __init__(self, namespace: str):
+        self._namespace = namespace
+
+    def supported(self):
+        commands = []
+        for field in fields(self):
+            result = getattr(self, field.name)
+            if result:
+                commands.append(f"{self._namespace}.{field.name}")
+        return commands
 
 
 # TODO: BC: the mount field here is typed as a string

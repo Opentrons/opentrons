@@ -104,7 +104,7 @@ class TipLengthCalibration(BaseSession):
             instrument=self._tip_cal_user_flow.get_pipette(),
             currentStep=self._tip_cal_user_flow.current_state,
             labware=self._tip_cal_user_flow.get_required_labware(),
-            supportedCommands=self._tip_cal_user_flow.get_supported_commands()
+            supportedCommands=self._tip_cal_user_flow.supported_commands
         )
 
     async def clean_up(self):

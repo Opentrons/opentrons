@@ -14,7 +14,8 @@ from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command_definitions import \
     CalibrationCommand
 from ..errors import CalibrationError
-from ..helper_classes import RequiredLabware, AttachedPipette
+from ..helper_classes import (
+    RequiredLabware, AttachedPipette, SupportedCommands)
 from ..constants import (
     TIP_RACK_LOOKUP_BY_MAX_VOL,
     SHORT_TRASH_DECK,
@@ -82,6 +83,7 @@ class TipCalibrationUserFlow:
         }
         self._default_tipracks =\
             util.get_default_tipracks(self.hw_pipette.config.default_tipracks)
+        self._supported_commands = SupportedCommands(namespace='calibration')
 
     def _set_current_state(self, to_state: State):
         self._current_state = to_state
@@ -117,9 +119,9 @@ class TipCalibrationUserFlow:
     def reset_tip_origin(self):
         self._tip_origin_pt = None
 
-    @staticmethod
-    def get_supported_commands() -> List:
-        return []
+    @property
+    def supported_commands(self) -> List:
+        return self._supported_commands.supported()
 
     @property
     def current_state(self) -> State:

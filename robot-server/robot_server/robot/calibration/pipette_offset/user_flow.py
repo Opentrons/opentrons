@@ -26,7 +26,8 @@ from robot_server.robot.calibration.constants import (
     CAL_BLOCK_SETUP_BY_MOUNT,
     JOG_TO_DECK_SLOT)
 from ..errors import CalibrationError
-from ..helper_classes import (RequiredLabware, AttachedPipette)
+from ..helper_classes import (
+    RequiredLabware, AttachedPipette, SupportedCommands)
 from .constants import (
     PipetteOffsetCalibrationState as POCState,
     PipetteOffsetWithTipLengthCalibrationState as POWTState,
@@ -135,6 +136,8 @@ class PipetteOffsetCalibrationUserFlow:
             robot_cal.load_pipette_offset(pip_id=None, mount=self._mount))
         self._default_tipracks =\
             util.get_default_tipracks(self.hw_pipette.config.default_tipracks)
+        self._supported_commands = SupportedCommands(namespace='calibration')
+        self._supported_commands.loadLabware = True
 
     @property
     def deck(self) -> Deck:
@@ -241,7 +244,8 @@ class PipetteOffsetCalibrationUserFlow:
         return await self._hardware.gantry_position(self._mount,
                                                     critical_point)
 
-    async def load_labware(self, tiprackDefinition: Optional[dict]):
+    async def load_labware(self, tiprackDefinition: Optional[dict] = None):
+        self._supported_commands.loadLabware = False
         if tiprackDefinition:
             verified_definition = labware.verify_definition(tiprackDefinition)
             existing_offset_calibration = self._get_stored_pipette_offset_cal()
@@ -274,9 +278,9 @@ class PipetteOffsetCalibrationUserFlow:
     def reset_tip_origin(self):
         self._tip_origin_pt = None
 
-    @staticmethod
-    def get_supported_commands() -> List:
-        return ['loadLabware']
+    @property
+    def supported_commands(self) -> List:
+        return self._supported_commands.supported()
 
     async def move_to_tip_rack(self):
         if self._sm.current_state == self._sm.state.labwareLoaded and \

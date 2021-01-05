@@ -115,7 +115,7 @@ class CheckSession(BaseSession):
             labware=self._calibration_check.get_required_labware(),
             activePipette=self._calibration_check.get_active_pipette(),
             activeTipRack=self._calibration_check.get_active_tiprack(),
-            supportedCommands=self._calibration_check.get_supported_commands()
+            supportedCommands=self._calibration_check.supported_commands
         )
 
     @property

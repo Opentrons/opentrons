@@ -37,7 +37,8 @@ from .state_machine import DeckCalibrationStateMachine
 from ..errors import CalibrationError
 from ..helper_classes import (
     RequiredLabware,
-    AttachedPipette)
+    AttachedPipette,
+    SupportedCommands)
 
 if TYPE_CHECKING:
     from .dev_types import SavedPoints, ExpectedPoints
@@ -106,6 +107,8 @@ class DeckCalibrationUserFlow:
             robot_cal.build_temporary_identity_calibration())
         self._hw_pipette.update_pipette_offset(
             robot_cal.load_pipette_offset(pip_id=None, mount=self._mount))
+        self._supported_commands = SupportedCommands(namespace='calibration')
+        self._supported_commands.loadLabware = True
 
     @property
     def deck(self) -> Deck:
@@ -138,9 +141,9 @@ class DeckCalibrationUserFlow:
     def reset_tip_origin(self):
         self._tip_origin_pt = None
 
-    @staticmethod
-    def get_supported_commands() -> List:
-        return ['loadLabware']
+    @property
+    def supported_commands(self) -> List:
+        return self._supported_commands.supported()
 
     @property
     def current_state(self) -> State:
@@ -253,7 +256,8 @@ class DeckCalibrationUserFlow:
         return await self._hardware.gantry_position(self._mount,
                                                     critical_point)
 
-    async def load_labware(self, tiprackDefinition: Optional[dict] = None):
+    async def load_labware(self, tiprackDefinition: dict):
+        self._supported_commands.loadLabware = False
         if tiprackDefinition:
             verified_definition = labware.verify_definition(tiprackDefinition)
             self._tip_rack = self._get_tip_rack_lw(

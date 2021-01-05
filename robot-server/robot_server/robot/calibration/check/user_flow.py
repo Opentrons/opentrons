@@ -22,7 +22,7 @@ from robot_server.robot.calibration.constants import (
 import robot_server.robot.calibration.util as uf
 from robot_server.robot.calibration.helper_classes import (
     RobotHealthCheck, PipetteRank, PipetteInfo,
-    RequiredLabware)
+    RequiredLabware, SupportedCommands)
 
 from robot_server.service.session.models.command_definitions import \
     CalibrationCommand, DeckCalibrationCommand, CheckCalibrationCommand
@@ -115,6 +115,7 @@ class CheckCalibrationUserFlow:
             CalibrationCommand.invalidate_last_action: self.invalidate_last_action,  # noqa: E501
             CalibrationCommand.exit: self.exit_session,
         }
+        self._supported_commands = SupportedCommands(namespace='calibration')
 
     @property
     def deck(self) -> Deck:
@@ -163,9 +164,9 @@ class CheckCalibrationUserFlow:
     def hw_pipette(self) -> Pipette:
         return self._get_hw_pipettes()[0]
 
-    @staticmethod
-    def get_supported_commands() -> List:
-        return []
+    @property
+    def supported_commands(self) -> List:
+        return self._supported_commands.supported()
 
     async def transition(self, tiprackDefinition: Optional[dict] = None):
         pass
