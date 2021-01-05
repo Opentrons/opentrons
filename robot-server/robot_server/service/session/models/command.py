@@ -58,7 +58,7 @@ class LoadLabwareRequestData(BaseModel):
         description="The labware definition version")
 
 
-class LoadTiprackRequest(BaseModel):
+class LoadLabwareByDefinitionRequestData(BaseModel):
     tiprackDefinition: typing.Optional[dict] = Field(
         None,
         description="The tiprack definition to load into a user flow")
@@ -186,7 +186,6 @@ CommandsEmptyData = Literal[
     ProtocolCommand.cancel,
     ProtocolCommand.pause,
     ProtocolCommand.resume,
-    CalibrationCommand.load_labware,
     CalibrationCommand.move_to_tip_rack,
     CalibrationCommand.move_to_point_one,
     CalibrationCommand.move_to_deck,
@@ -289,16 +288,25 @@ JogRequest = SessionCommandRequest[
 ]
 
 
-class LoadTiprackRequestM(BasicSessionCommand):
-    command: Literal[CalibrationCommand.load_labware]
-    data: LoadTiprackRequest
+JogResponse = SessionCommandResponse[
+    Literal[CalibrationCommand.jog],
+    JogPosition,
+    EmptyModel
+]
 
 
-class DeckCalibrationCommandRequest(EmptySessionCommand):
-    command: Literal[
-        DeckCalibrationCommand.move_to_point_two,
-        DeckCalibrationCommand.move_to_point_three
-    ]
+LabwareByDefinitionRequest = SessionCommandRequest[
+    Literal[CalibrationCommand.load_labware],
+    LoadLabwareByDefinitionRequestData,
+    EmptyModel
+]
+
+
+LabwareByDefinitionResponse = SessionCommandResponse[
+    Literal[CalibrationCommand.load_labware],
+    LoadLabwareByDefinitionRequestData,
+    EmptyModel
+]
 
 
 SetHasCalibrationBlockRequest = SessionCommandRequest[
@@ -322,6 +330,7 @@ RequestTypes = typing.Union[
     TipRequest,
     JogRequest,
     SetHasCalibrationBlockRequest,
+    LabwareByDefinitionRequest
 ]
 """Union of all request types"""
 
@@ -333,6 +342,7 @@ ResponseTypes = typing.Union[
     TipResponse,
     JogResponse,
     SetHasCalibrationBlockResponse,
+    LabwareByDefinitionResponse
 ]
 """Union of all response types"""
 

@@ -373,7 +373,7 @@ def test_execute_command_no_body(api_client,
     mock_command_executor.execute.assert_called_once_with(
         Command(
             request=SimpleCommandRequest(
-                command=CalibrationCommand.load_labware,
+                command=CalibrationCommand.move_to_tip_rack,
                 data=EmptyModel()),
             meta=CommandMeta(command_id, command_created_at)
         )
