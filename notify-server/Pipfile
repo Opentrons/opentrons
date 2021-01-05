@@ -10,6 +10,7 @@ python_version = "3.7"
 pyzmq = "==19.*,>=19.0.2"
 pydantic = "==1.4"
 opentrons = {editable = true, path = "./../api"}
+opentrons-shared-data = {editable = true, path = "./../shared-data/python"}
 
 [dev-packages]
 flake8 = "==3.*,>=3.8.4"
