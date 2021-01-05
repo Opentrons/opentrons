@@ -1,10 +1,15 @@
 from functools import lru_cache
 
 from starlette import status
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Header
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
+from starlette.requests import Request
+from starlette.status import HTTP_400_BAD_REQUEST
 
+from robot_server import constants
 from robot_server.hardware_wrapper import HardwareWrapper
+from robot_server.service.errors import BaseRobotServerError
+from robot_server.service.json_api import Error
 from robot_server.service.session.manager import SessionManager
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.legacy.rpc import RPCServer
@@ -86,3 +91,42 @@ def get_session_manager(
             motion_lock=motion_lock,
             protocol_manager=protocol_manager)
     return _session_manager_inst
+
+
+async def check_version_header(
+        request: Request,
+        opentrons_version: str = Header(
+            ...,
+            description=f"The requested HTTP API version which must be "
+                        f"'{constants.MIN_API_VERSION}' or higher. To use the "
+                        f"latest version specify "
+                        f"'{constants.API_VERSION_LATEST}'.")
+) -> None:
+    """Dependency that will check that Opentrons-Version header meets
+    requirements."""
+    # Get the maximum version accepted by client
+    header_value = opentrons_version
+    requested_version = (
+        int(opentrons_version)
+        if header_value != constants.API_VERSION_LATEST else
+        constants.API_VERSION
+    )
+
+    if requested_version < constants.MIN_API_VERSION:
+        error = Error(
+            id="OutdatedAPIVersion",
+            title="Requested HTTP API version no longer supported",
+            detail=(
+                f"HTTP API version {constants.MIN_API_VERSION - 1} is "
+                "no longer supported. Please upgrade your Opentrons "
+                "App or other HTTP API client."
+            ),
+        )
+        raise BaseRobotServerError(
+            status_code=HTTP_400_BAD_REQUEST,
+            error=error
+        )
+    else:
+        # Attach the api version to request's state dict
+        request.state.api_version = min(requested_version,
+                                        constants.API_VERSION)
