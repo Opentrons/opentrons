@@ -1,9 +1,12 @@
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.protocol import contents, models
 from robot_server.service.protocol.analyze import _analyze
+from robot_server.service.protocol.errors import ProtocolAnalysisException
 from robot_server.util import FileMeta
 
 
@@ -161,3 +164,55 @@ def run(ctx):
                                    location=7,
                                    model="thermocyclerModuleV1") \
                in r.required_equipment.modules
+
+
+def test_python_parse_error():
+    """Test that a python parse error yields a ProtocolAnalysisException."""
+    proto = """
+there's nothing here
+    """
+    c = contents.Contents(
+        protocol_file=FileMeta(path=Path("abc.py"), content_hash=""),
+        support_files=[],
+        directory=None)
+    with patch.object(contents,
+                      "get_protocol_contents", return_value=proto):
+        with pytest.raises(ProtocolAnalysisException):
+            _analyze(c)
+
+
+def test_json_parse_error():
+    """Test that a JSON parse error yields a ProtocolAnalysisException."""
+    proto = """
+there's nothing here
+    """
+    c = contents.Contents(
+        protocol_file=FileMeta(path=Path("abc.json"), content_hash=""),
+        support_files=[],
+        directory=None)
+    with patch.object(contents,
+                      "get_protocol_contents", return_value=proto):
+        with pytest.raises(ProtocolAnalysisException):
+            _analyze(c)
+
+
+def test_python_run_error():
+    """Test that python runtime error yields a ProtocolAnalysisException."""
+    proto = """
+metadata = {
+    'protocolName': 'Zymo Extraction',
+    'author': 'Opentrons <protocols@opentrons.com>',
+    'apiLevel': '2.4'
+}
+
+def run(ctx):
+    magdeck = ctx.load_module('pickle maker', '6')
+    """
+    c = contents.Contents(
+        protocol_file=FileMeta(path=Path("abc.py"), content_hash=""),
+        support_files=[],
+        directory=None)
+    with patch.object(contents,
+                      "get_protocol_contents", return_value=proto):
+        with pytest.raises(ProtocolAnalysisException):
+            _analyze(c)

@@ -10,7 +10,7 @@ class CommandExecutor:
         """
         Execute a command
 
-        :raises: SessionCommandException
+        :raise SessionCommandException:
         """
         raise UnsupportedCommandException(
             f"'{command.content.name}' is not supported"

@@ -36,11 +36,14 @@ class UploadedProtocol:
             protocol_file: UploadFile,
             support_files: typing.List[UploadFile]) -> 'UploadedProtocol':
         """
-        create
+        Save the protocol files and
 
         :param protocol_id: The id assigned to this protocol
         :param protocol_file: The uploaded protocol file
         :param support_files: Optional support files
+
+        :raise ProtocolIOException: On failure to save uploaded files.
+        :raise ProtocolAnalysisException: On failure to analyze the protocol.
         """
         protocol_contents = contents.create(
             protocol_file=protocol_file,
@@ -57,9 +60,15 @@ class UploadedProtocol:
         )
 
     def add(self, support_file: UploadFile):
-        """Add a support file to protocol temp directory"""
+        """
+        Add a support file to protocol temp directory
+
+        :raise ProtocolIOException: On failure to save uploaded files.
+        :raise ProtocolAnalysisException: On failure to analyze the protocol.
+        """
         c = contents.add(self._data.contents, support_file)
 
+        # Re-analyze protocol
         self._data.analysis_result = analyze.analyze_protocol(c)
         self._data.last_modified_at = utc_now()
         self._data.contents = c
