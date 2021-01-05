@@ -108,7 +108,9 @@ describe('PipetteInfo', () => {
     const { wrapper } = render()
     wrapper.find('button[title="pipetteOffsetCalButton"]').invoke('onClick')()
     wrapper.update()
-    expect(startWizard).toHaveBeenCalledWith({ withIntent: 'pipette-offset' })
+    expect(startWizard).toHaveBeenCalledWith({
+      withIntent: 'recalibrate-pipette-offset',
+    })
   })
 
   it('launch POC w/ cal block modal denied if POC button clicked and no existing data and no cal block pref saved', () => {
@@ -125,7 +127,7 @@ describe('PipetteInfo', () => {
         hasCalibrationBlock: true,
         shouldRecalibrateTipLength: false,
       },
-      withIntent: 'pipette-offset',
+      withIntent: 'recalibrate-pipette-offset',
     })
   })
 
@@ -141,7 +143,7 @@ describe('PipetteInfo', () => {
         hasCalibrationBlock: false,
         shouldRecalibrateTipLength: false,
       },
-      withIntent: 'pipette-offset',
+      withIntent: 'recalibrate-pipette-offset',
     })
   })
 

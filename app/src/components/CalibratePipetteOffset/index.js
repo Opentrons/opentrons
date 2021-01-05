@@ -184,6 +184,7 @@ export function CalibratePipetteOffset(
           sessionType={session.sessionType}
           shouldPerformTipLength={shouldPerformTipLength}
           intent={intent}
+          robotName={robotName}
         />
       </ModalPage>
       {showConfirmExit && (

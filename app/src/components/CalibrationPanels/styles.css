@@ -14,3 +14,10 @@
   padding: 1rem;
   max-width: 64rem;
 }
+
+.select_tiprack_menu {
+  & :global(.ot_select__menu) {
+    max-height: 200px;
+    overflow: scroll;
+  }
+}

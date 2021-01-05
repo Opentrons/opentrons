@@ -19,7 +19,7 @@ import type { PipetteOffsetIntent } from '../CalibrationPanels/types'
 
 import { Portal } from '../portal'
 import { CalibratePipetteOffset } from '../CalibratePipetteOffset'
-import { INTENT_PIPETTE_OFFSET } from '../CalibrationPanels'
+import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../CalibrationPanels'
 import { pipetteOffsetCalibrationStarted } from '../../analytics'
 
 // pipette calibration commands for which the full page spinner should not appear
@@ -121,7 +121,7 @@ export function useCalibratePipetteOffset(
   }, [shouldClose, onComplete])
 
   const [intent, setIntent] = React.useState<PipetteOffsetIntent>(
-    INTENT_PIPETTE_OFFSET
+    INTENT_CALIBRATE_PIPETTE_OFFSET
   )
 
   const {
@@ -133,7 +133,7 @@ export function useCalibratePipetteOffset(
   const handleStartPipOffsetCalSession: Invoker = (props = {}) => {
     const {
       overrideParams = ({}: $Shape<PipetteOffsetCalibrationSessionParams>),
-      withIntent = INTENT_PIPETTE_OFFSET,
+      withIntent = INTENT_CALIBRATE_PIPETTE_OFFSET,
     } = props
     setIntent(withIntent)
     dispatchRequests(
@@ -173,7 +173,7 @@ export function useCalibratePipetteOffset(
           <SpinnerModalPage
             titleBar={{
               title:
-                intent === INTENT_PIPETTE_OFFSET
+                intent === INTENT_CALIBRATE_PIPETTE_OFFSET
                   ? PIPETTE_OFFSET_TITLE
                   : TIP_LENGTH_TITLE,
               back: {

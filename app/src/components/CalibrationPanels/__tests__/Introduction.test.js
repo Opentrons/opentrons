@@ -15,6 +15,8 @@ describe('Introduction', () => {
 
   const getContinueButton = wrapper =>
     wrapper.find('button[data-test="continueButton"]')
+  const getUseDiffTipRackButton = wrapper =>
+    wrapper.find('button[data-test="chooseTipRackButton"]')
 
   beforeEach(() => {
     render = (props: $Shape<React.ElementProps<typeof Introduction>> = {}) => {
@@ -27,7 +29,7 @@ describe('Introduction', () => {
         currentStep = Sessions.DECK_STEP_SESSION_STARTED,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
         shouldPerformTipLength = false,
-        intent = Constants.INTENT_PIPETTE_OFFSET,
+        intent = Constants.INTENT_CALIBRATE_PIPETTE_OFFSET,
       } = props
       return mount(
         <Introduction
@@ -52,11 +54,21 @@ describe('Introduction', () => {
   const PIP_OFFSET_SPECS = [
     {
       when: 'doing offset only with pipette offset intent',
-      intent: Constants.INTENT_PIPETTE_OFFSET,
+      intent: Constants.INTENT_CALIBRATE_PIPETTE_OFFSET,
       shouldPerformTipLength: false,
       header: 'pipette offset calibration',
       body: /calibrating pipette offset/i,
       note: /using the Opentrons tips/i,
+      showTipRackButton: false,
+    },
+    {
+      when: 'doing offset only with recalibrate intent',
+      intent: Constants.INTENT_RECALIBRATE_PIPETTE_OFFSET,
+      shouldPerformTipLength: false,
+      header: 'pipette offset calibration',
+      body: /calibrating pipette offset/i,
+      note: /using the Opentrons tips/i,
+      showTipRackButton: false,
     },
     {
       when: 'doing offset only with tip length in proto intent',
@@ -65,6 +77,7 @@ describe('Introduction', () => {
       header: 'pipette offset calibration',
       body: /calibrating pipette offset/i,
       note: /using the Opentrons tips/i,
+      showTipRackButton: false,
     },
     {
       when: 'doing offset only with tip length outside proto intent',
@@ -73,22 +86,34 @@ describe('Introduction', () => {
       header: 'pipette offset calibration',
       body: /calibrating pipette offset/i,
       note: /using the Opentrons tips/i,
+      showTipRackButton: false,
     },
     {
       when: 'doing fused with pipette offset intent',
-      intent: Constants.INTENT_PIPETTE_OFFSET,
+      intent: Constants.INTENT_CALIBRATE_PIPETTE_OFFSET,
       shouldPerformTipLength: true,
       header: 'tip length and pipette offset calibration',
       body: /calibrating pipette offset.*tip length calibration/i,
       note: /using the Opentrons tips/i,
+      showTipRackButton: true,
     },
     {
-      when: 'doing fused with tip length in proto intent',
+      when: 'doing fused with recalibrate pipette offset intent',
+      intent: Constants.INTENT_RECALIBRATE_PIPETTE_OFFSET,
+      shouldPerformTipLength: true,
+      header: 'tip length and pipette offset calibration',
+      body: /calibrating pipette offset.*tip length calibration/i,
+      note: /using the Opentrons tips/i,
+      showTipRackButton: true,
+    },
+    {
+      when: 'doing fused with tip length outside proto intent',
       intent: Constants.INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
       shouldPerformTipLength: true,
       header: 'tip length and pipette offset calibration',
       body: /calibrating pipette offset.*tip length calibration/i,
       note: /using the Opentrons tips/i,
+      showTipRackButton: true,
     },
     {
       when: 'doing fused with tip length in proto intent',
@@ -97,6 +122,7 @@ describe('Introduction', () => {
       header: 'tip length and pipette offset calibration',
       body: /calibrating pipette offset.*tip length calibration/i,
       note: /using the exact tips/i,
+      showTipRackButton: false,
     },
   ]
   PIP_OFFSET_SPECS.forEach(spec => {
@@ -110,6 +136,9 @@ describe('Introduction', () => {
       expect(allText).toContain(spec.header)
       expect(allText).toMatch(spec.body)
       expect(allText).toMatch(spec.note)
+      expect(getUseDiffTipRackButton(wrapper).exists()).toBe(
+        spec.showTipRackButton
+      )
 
       getContinueButton(wrapper).invoke('onClick')()
       wrapper.update()
@@ -128,6 +157,7 @@ describe('Introduction', () => {
     expect(allText).toContain('Deck calibration ensures positional accuracy')
     expect(allText).toContain('start deck calibration')
 
+    expect(getUseDiffTipRackButton(wrapper).exists()).toBe(true)
     getContinueButton(wrapper).invoke('onClick')()
     wrapper.update()
     expect(mockSendCommands).toHaveBeenCalledWith({
@@ -160,6 +190,7 @@ describe('Introduction', () => {
       )
       expect(allText).toContain('start tip length calibration')
       expect(allText).toMatch(spec.note)
+      expect(getUseDiffTipRackButton(wrapper).exists()).toBe(false)
 
       getContinueButton(wrapper).invoke('onClick')()
       wrapper.update()
@@ -179,6 +210,7 @@ describe('Introduction', () => {
     expect(allText).toMatch(/diagnoses calibration problems with tip length/i)
     expect(allText).toMatch(/you will manually guide each attached pipette/i)
     expect(allText).toMatch(/you will be prompted to recalibrate/i)
+    expect(getUseDiffTipRackButton(wrapper).exists()).toBe(false)
   })
 
   it('renders need help link', () => {
