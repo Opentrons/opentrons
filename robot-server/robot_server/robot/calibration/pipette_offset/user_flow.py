@@ -181,10 +181,10 @@ class PipetteOffsetCalibrationUserFlow:
         return AttachedPipette(  # type: ignore[call-arg]
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
-            tip_length=self._hw_pipette.config.tip_length,
+            tipLength=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
             serial=self._hw_pipette.pipette_id,
-            default_tipracks=self._default_tipracks)
+            defaultTipracks=self._default_tipracks)
 
     def get_required_labware(self) -> List[RequiredLabware]:
         slots = self._deck.get_non_fixture_slots()
