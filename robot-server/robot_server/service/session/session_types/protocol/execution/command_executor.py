@@ -99,7 +99,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
 
     async def execute(self, command: Command) -> CompletedCommand:
         """Command processing"""
-        command_def = command.content.name
+        command_def = command.request.command
         if command_def not in self.STATE_COMMAND_MAP.get(
                 self.current_state, {}
         ):
@@ -119,14 +119,14 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         self._events.append(
             models.ProtocolSessionEvent(
                 source=models.EventSource.session_command,
-                event=command.content.name,
+                event=command.request.command,
                 commandId=command.meta.identifier,
                 timestamp=timed.end,
             )
         )
 
         return CompletedCommand(
-            content=command.content,
+            request=command.request,
             meta=command.meta,
             result=CommandResult(started_at=timed.start,
                                  completed_at=timed.end))

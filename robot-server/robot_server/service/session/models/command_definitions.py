@@ -1,8 +1,14 @@
+"""
+Command type definitions.
+
+Definitions should be grouped into thematic namespaces.
+"""
 import typing
 from enum import Enum
 
 
 class CommandDefinition(str, Enum):
+    """The base of command definition enumerations."""
     def __new__(cls, value):
         """Create a string enum."""
         namespace = cls.namespace()
@@ -17,9 +23,9 @@ class CommandDefinition(str, Enum):
     @staticmethod
     def namespace():
         """
-        This is primarily for allowing  definitions to define a
-        namespace. The name space will be used to make the value of the
-        enum. It will be "{namespace}.{value}"
+        Override to create a namespoce for the member definitions. The
+         name.space will be used to make the value of the enum. It will
+         be "{namespace}.{value}"
         """
         return None
 

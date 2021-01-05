@@ -24,14 +24,14 @@ class CallableExecutor(CommandExecutor):
     async def execute(self, command: Command) -> CompletedCommand:
         """Execute command"""
         with duration() as time_it:
-            name_arg = command.content.name
-            data = command.content.data
+            name_arg = command.request.command
+            data = command.request.data
             data_arg = data.dict() if data else {}
 
             await self._callable(name_arg, data_arg)
 
         return CompletedCommand(
-            content=command.content,
+            request=command.request,
             meta=command.meta,
             result=CommandResult(started_at=time_it.start,
                                  completed_at=time_it.end)
