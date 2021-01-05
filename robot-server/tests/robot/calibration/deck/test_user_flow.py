@@ -6,6 +6,7 @@ from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
+from opentrons.protocol_api import labware
 from robot_server.robot.calibration.deck.user_flow import \
     DeckCalibrationUserFlow, tuplefy_cal_point_dicts
 from robot_server.service.session.models.command_definitions import \
@@ -161,6 +162,17 @@ async def test_return_tip(mock_user_flow):
     ]
     uf._hardware.move_to.assert_has_calls(move_calls)
     uf._hardware.drop_tip.assert_called()
+
+
+async def test_load_labware(mock_user_flow):
+    old_tiprack = mock_user_flow._tip_rack
+    new_def = labware.get_labware_definition(
+        load_name='opentrons_96_filtertiprack_200ul',
+        namespace='opentrons', version=1)
+    await mock_user_flow.load_labware(new_def)
+    assert mock_user_flow._tip_rack.uri ==\
+        'opentrons/opentrons_96_filtertiprack_200ul/1'
+    assert mock_user_flow._tip_rack != old_tiprack
 
 
 async def test_jog(mock_user_flow):

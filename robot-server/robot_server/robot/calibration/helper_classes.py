@@ -2,7 +2,7 @@ import typing
 
 from opentrons.types import Mount
 from enum import Enum
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from pydantic import BaseModel, Field
 from opentrons.protocol_api import labware
 from opentrons.types import DeckLocation
@@ -10,6 +10,7 @@ from opentrons.types import DeckLocation
 
 if typing.TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
+    from opentrons_shared_data.labware import LabwareDefinition
 
 
 class RobotHealthCheck(Enum):
@@ -64,6 +65,27 @@ class PipetteInfo:
     max_volume: int
     channels: int
     tip_rack: 'Labware'
+    default_tipracks: typing.List['LabwareDefinition']
+
+
+@dataclass
+class SupportedCommands:
+    """
+    A class that allows you to set currently supported
+    commands depending on the current state.
+    """
+    loadLabware: bool = False
+
+    def __init__(self, namespace: str):
+        self._namespace = namespace
+
+    def supported(self):
+        commands = []
+        for field in fields(self):
+            result = getattr(self, field.name)
+            if result:
+                commands.append(f"{self._namespace}.{field.name}")
+        return commands
 
 
 # TODO: BC: the mount field here is typed as a string
@@ -87,6 +109,8 @@ class AttachedPipette(BaseModel):
         Field(None, description="The mount this pipette attached to")
     serial: str =\
         Field(None, description="The serial number of the attached pipette")
+    defaultTipracks: typing.List[dict] =\
+        Field(None, description="A list of default tipracks for this pipette")
 
 
 class RequiredLabware(BaseModel):

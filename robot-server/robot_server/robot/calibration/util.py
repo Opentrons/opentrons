@@ -1,6 +1,6 @@
 import logging
 import contextlib
-from typing import Set, Dict, Any, Union, TYPE_CHECKING
+from typing import Set, Dict, Any, Union, List, TYPE_CHECKING
 
 from opentrons.hardware_control import Pipette
 from opentrons.hardware_control.util import plan_arc
@@ -8,7 +8,7 @@ from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.geometry.deck import Deck
-from opentrons.calibration_storage import modify
+from opentrons.calibration_storage import modify, helpers
 from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError
@@ -28,6 +28,8 @@ if TYPE_CHECKING:
     from .tip_length.user_flow import TipCalibrationUserFlow
     from .pipette_offset.user_flow import PipetteOffsetCalibrationUserFlow
     from .check.user_flow import CheckCalibrationUserFlow
+    from opentrons_shared_data.pipette.dev_types import LabwareUri
+    from opentrons_shared_data.labware import LabwareDefinition
 
 ValidState = Union[TipCalibrationState, DeckCalibrationState,
                    PipetteOffsetCalibrationState, CalibrationCheckState,
@@ -195,3 +197,16 @@ def save_tip_length_calibration(pipette_id: str,
         tip_length_offset
     )
     modify.save_tip_length_calibration(pipette_id, tip_length_data)
+
+
+def get_default_tipracks(
+        default_uris: List['LabwareUri']) -> List['LabwareDefinition']:
+    definitions = []
+    for rack in default_uris:
+        details = helpers.details_from_uri(rack)
+        rack_def = labware.get_labware_definition(
+            details.load_name,
+            details.namespace,
+            details.version)
+        definitions.append(rack_def)
+    return definitions

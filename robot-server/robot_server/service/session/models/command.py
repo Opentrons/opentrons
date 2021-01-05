@@ -58,9 +58,14 @@ class LoadLabwareRequestData(BaseModel):
         description="The labware definition version")
 
 
+class LoadLabwareByDefinitionRequestData(BaseModel):
+    tiprackDefinition: typing.Optional[dict] = Field(
+        None,
+        description="The tiprack definition to load into a user flow")
+
+
 class LoadLabwareResponseData(BaseModel):
     """Result field in an equipment.loadLabware command response."""
-
     labwareId: IdentifierType
     definition: LabwareDefinition
     calibration: OffsetVector
@@ -181,7 +186,6 @@ CommandsEmptyData = Literal[
     ProtocolCommand.cancel,
     ProtocolCommand.pause,
     ProtocolCommand.resume,
-    CalibrationCommand.load_labware,
     CalibrationCommand.move_to_tip_rack,
     CalibrationCommand.move_to_point_one,
     CalibrationCommand.move_to_deck,
@@ -291,6 +295,20 @@ JogResponse = SessionCommandResponse[
 ]
 
 
+LabwareByDefinitionRequest = SessionCommandRequest[
+    Literal[CalibrationCommand.load_labware],
+    LoadLabwareByDefinitionRequestData,
+    EmptyModel
+]
+
+
+LabwareByDefinitionResponse = SessionCommandResponse[
+    Literal[CalibrationCommand.load_labware],
+    LoadLabwareByDefinitionRequestData,
+    EmptyModel
+]
+
+
 SetHasCalibrationBlockRequest = SessionCommandRequest[
     Literal[CalibrationCommand.set_has_calibration_block],
     SetHasCalibrationBlockRequestData,
@@ -312,6 +330,7 @@ RequestTypes = typing.Union[
     TipRequest,
     JogRequest,
     SetHasCalibrationBlockRequest,
+    LabwareByDefinitionRequest
 ]
 """Union of all request types"""
 
@@ -323,6 +342,7 @@ ResponseTypes = typing.Union[
     TipResponse,
     JogResponse,
     SetHasCalibrationBlockResponse,
+    LabwareByDefinitionResponse
 ]
 """Union of all response types"""
 
