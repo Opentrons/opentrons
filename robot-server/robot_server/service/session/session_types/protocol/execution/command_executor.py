@@ -89,7 +89,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         protocol_runner = ProtocolRunner(
             protocol=protocol,
             loop=loop,
-            hardware=configuration.hardware.sync,
+            hardware=configuration.hardware,
             motion_lock=configuration.motion_lock)
         # The async worker to which all commands are delegated.
         return _Worker(
