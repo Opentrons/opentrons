@@ -70,7 +70,7 @@ jobs:
             buildComplexEnvVars(core, context)
       - name: Test
         run: make -C shared-data/python test
-  deploy:
+  python:
     name: 'shared-data package deploy'
     needs: [python-test]
     runs-on: 'ubuntu-latest'
