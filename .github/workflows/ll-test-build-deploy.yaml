@@ -58,7 +58,7 @@ jobs:
         run: |
           yarn jest --coverage=true --ci=true labware-library/
   e2e-test:
-    name: 'lablib e2e tests'
+    name: 'labware library e2e tests on ${{ matrix.os }}'
     strategy:
       matrix:
         os: ['ubuntu-latest', 'macos-latest']
