@@ -23,7 +23,7 @@ jobs:
   include:
     # test, build, and upload for JavaScript projects
     - stage: test
-      name: 'JS unit tests; build Protocol Designer, Labware Library, Components Library'
+      name: 'JS unit tests; build Components Library'
       # node version pulled from .nvmrc
       language: node_js
       install:
@@ -40,11 +40,6 @@ jobs:
       after_success:
         - make coverage
       deploy:
-        - # upload labware library artifacts to S3
-          <<: *deploy_s3
-          local-dir: labware-library/dist
-          bucket: $OT_LL_DEPLOY_BUCKET
-          upload-dir: $TRAVIS_BRANCH
 
         - # upload components library artifacts to S3
           <<: *deploy_s3
