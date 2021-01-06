@@ -61,13 +61,13 @@ def _analyze(protocol_contents: contents.Contents) -> AnalysisResult:
             models.LoadedLabware(
                 label=v.name,
                 uri=v.uri,
-                slot=k) for k, v in ctx.loaded_labwares.items()
+                location=k) for k, v in ctx.loaded_labwares.items()
         ],
         modules=[
             models.LoadedModule(
                 type=v.geometry.module_type.value,
                 model=v.geometry.model.value,
-                slot=int(v.geometry.location.labware.first_parent())
+                location=int(v.geometry.location.labware.first_parent())
             ) for k, v in ctx.loaded_modules.items()
         ]
     )

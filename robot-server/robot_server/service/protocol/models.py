@@ -30,7 +30,7 @@ class LoadedLabware(BaseModel):
         Field(..., description="The display name of the labware.")
     uri: str = \
         Field(..., description="The uri (namespace/loadname/version).")
-    slot: int = \
+    location: int = \
         Field(..., description="The slot in which this labware is located.")
 
 
@@ -40,7 +40,7 @@ class LoadedModule(BaseModel):
         Field(..., description="The name of the module.")
     model: ModuleModel = \
         Field(..., description="The module model.")
-    slot: int = \
+    location: int = \
         Field(..., description="The slot in which this module is located.")
 
 
