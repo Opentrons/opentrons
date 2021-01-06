@@ -46,57 +46,58 @@ def run(ctx):
             author="Opentrons <protocols@opentrons.com>",
             apiLevel="2.4"
         )
-        assert sorted(r.required_equipment.labware, key=lambda x: x.slot) == [
+        assert sorted(r.required_equipment.labware,
+                      key=lambda x: x.location) == [
             models.LoadedLabware(
                 label='elution plate',
                 uri="opentrons/"
                     "opentrons_96_aluminumblock_nest_wellplate_100ul/1",
-                slot=1
+                location=1
             ),
             models.LoadedLabware(
                 uri="opentrons/nest_12_reservoir_15ml/1",
-                slot=2,
+                location=2,
                 label='reagent reservoir 1'
             ),
             models.LoadedLabware(
                 uri="opentrons/nest_12_reservoir_15ml/1",
-                slot=3,
+                location=3,
                 label='reagent reservoir 2'),
             models.LoadedLabware(
                 uri="opentrons/opentrons_96_tiprack_300ul/1",
-                slot=4,
+                location=4,
                 label='200µl filtertiprack'),
             models.LoadedLabware(
                 uri="opentrons/opentrons_96_tiprack_300ul/1",
-                slot=5,
+                location=5,
                 label='tiprack for parking'),
             models.LoadedLabware(
                 uri="opentrons/nest_96_wellplate_2ml_deep/1",
-                slot=6,
+                location=6,
                 label='deepwell plate'),
             models.LoadedLabware(
                 uri="opentrons/opentrons_96_tiprack_300ul/1",
-                slot=7,
+                location=7,
                 label='200µl filtertiprack'),
             models.LoadedLabware(
                 uri="opentrons/opentrons_96_tiprack_300ul/1",
-                slot=8,
+                location=8,
                 label='200µl filtertiprack'),
             models.LoadedLabware(
                 uri="opentrons/nest_1_reservoir_195ml/1",
-                slot=9,
+                location=9,
                 label='Liquid Waste'),
             models.LoadedLabware(
                 uri="opentrons/opentrons_96_tiprack_300ul/1",
-                slot=10,
+                location=10,
                 label='200µl filtertiprack'),
             models.LoadedLabware(
                 uri="opentrons/opentrons_96_tiprack_300ul/1",
-                slot=11,
+                location=11,
                 label='200µl filtertiprack'),
             models.LoadedLabware(
                 uri="opentrons/opentrons_1_trash_1100ml_fixed/1",
-                slot=12,
+                location=12,
                 label="opentrons_1_trash_1100ml_fixed"
             )
         ]
@@ -114,11 +115,11 @@ def run(ctx):
                in r.required_equipment.pipettes
         assert len(r.required_equipment.modules) == 2
         assert models.LoadedModule(type='temperatureModuleType',
-                                   slot=1,
+                                   location=1,
                                    model="temperatureModuleV2") \
                in r.required_equipment.modules
         assert models.LoadedModule(type="magneticModuleType",
-                                   slot=6,
+                                   location=6,
                                    model="magneticModuleV2") \
                in r.required_equipment.modules
 
@@ -143,19 +144,20 @@ def run(ctx):
     with patch.object(contents,
                       "get_protocol_contents", return_value=proto):
         r = _analyze(c)
-        assert sorted(r.required_equipment.labware, key=lambda x: x.slot) == [
+        assert sorted(r.required_equipment.labware,
+                      key=lambda x: x.location) == [
                 models.LoadedLabware(
                     uri="opentrons/nest_96_wellplate_2ml_deep/1",
-                    slot=7,
+                    location=7,
                     label='deepwell plate'),
                 models.LoadedLabware(
                     uri="opentrons/opentrons_1_trash_1100ml_fixed/1",
-                    slot=12,
+                    location=12,
                     label="opentrons_1_trash_1100ml_fixed"
                 )
             ]
 
         assert models.LoadedModule(type='thermocyclerModuleType',
-                                   slot=7,
+                                   location=7,
                                    model="thermocyclerModuleV1") \
                in r.required_equipment.modules
