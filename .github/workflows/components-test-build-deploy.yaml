@@ -1,4 +1,4 @@
-# Run tests, build labware library, and deploy it to sandbox
+# Run tests, build components bundle, and deploy it to sandbox
 
 name: 'Components test, build, and deploy'
 
@@ -53,7 +53,7 @@ jobs:
       - name: 'run components unit tests'
         run: |
           yarn jest --coverage=true --ci=true components/
-  build-ll:
+  build-components:
     name: 'build components artifact'
     runs-on: 'ubuntu-latest'
     if: github.event_name != 'pull_request'
@@ -76,7 +76,7 @@ jobs:
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
           make setup-js
-      - name: 'build LL'
+      - name: 'build components'
         run: |
           make -C components
       - name: 'upload github artifact'
@@ -84,7 +84,7 @@ jobs:
         with:
           name: 'components-artifact'
           path: components/dist
-  deploy-ll:
+  deploy-components:
     name: 'deploy components artifact to S3'
     runs-on: 'ubuntu-latest'
     needs: ["js-unit-test", "build-components"]
