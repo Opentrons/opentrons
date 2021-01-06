@@ -13,6 +13,10 @@
   }
 }
 
+.step_item_wrapper {
+  user-select: none;
+}
+
 .emphasized_cell {
   text-transform: capitalize;
   font-weight: var(--fw-semibold);

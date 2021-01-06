@@ -49,7 +49,7 @@ export type StepItemProps = {|
 
   highlightStep: () => mixed,
   onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
-  selectStep?: () => mixed,
+  handleClick?: (event: SyntheticMouseEvent<>) => mixed,
   toggleStepCollapsed: () => mixed,
   unhighlightStep: (event?: SyntheticEvent<>) => mixed,
   children?: React.Node,
@@ -67,7 +67,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
     hovered,
 
     unhighlightStep,
-    selectStep,
+    handleClick,
     onStepContextMenu,
     toggleStepCollapsed,
     highlightStep,
@@ -86,13 +86,14 @@ export const StepItem = (props: StepItemProps): React.Node => {
 
   return (
     <PDTitledList
+      className={cx(styles.step_item_wrapper)}
       description={Description}
       iconName={error || warning ? 'alert-circle' : iconName}
       iconProps={{ className: iconClassName }}
       data-test={`StepItem_${stepNumber}`}
       title={`${stepNumber}. ${props.title ||
         i18n.t(`application.stepType.${stepType}`)}`}
-      onClick={selectStep}
+      onClick={handleClick}
       onContextMenu={onStepContextMenu}
       onMouseEnter={highlightStep}
       onMouseLeave={unhighlightStep}
