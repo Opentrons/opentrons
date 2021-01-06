@@ -20,7 +20,7 @@ export type DeleteModalType =
 
 type Props = {|
   modalType: DeleteModalType,
-  onCancelClick: (...args: Array<mixed>) => mixed,
+  onCancelClick: (event: ?SyntheticMouseEvent<>) => mixed,
   onContinueClick: (event: SyntheticMouseEvent<>) => mixed,
 |}
 

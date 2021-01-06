@@ -43,6 +43,16 @@ const nonePressed = (keysPressed: Array<boolean>): boolean =>
 
 const getUserOS = () => new UAParser().getOS().name
 
+const getMouseClickKeyInfo = (
+  event: SyntheticMouseEvent<>
+): {| isShiftKeyPressed: boolean, isMetaKeyPressed: boolean |} => {
+  const isMac: boolean = getUserOS() === 'Mac OS'
+  const isShiftKeyPressed: boolean = event.shiftKey
+  const isMetaKeyPressed: boolean =
+    (isMac && event.metaKey) || (!isMac && event.ctrlKey)
+  return { isShiftKeyPressed, isMetaKeyPressed }
+}
+
 export const ConnectedStepItem = (props: Props): React.Node => {
   const { stepId, stepNumber } = props
 
@@ -103,12 +113,8 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
 
-  const handleStepItemSelection = (e: SyntheticMouseEvent<>): void => {
-    const isMac: boolean = getUserOS() === 'Mac OS'
-    const isShiftKeyPressed: boolean = e.shiftKey
-    const isMetaKeyPressed: boolean =
-      (isMac && e.metaKey) || (!isMac && e.ctrlKey)
-
+  const handleStepItemSelection = (event: SyntheticMouseEvent<>): void => {
+    const { isShiftKeyPressed, isMetaKeyPressed } = getMouseClickKeyInfo(event)
     let stepsToSelect: Array<StepIdType> = []
 
     // if user clicked on the last multi-selected step, shift/meta keys don't matter
