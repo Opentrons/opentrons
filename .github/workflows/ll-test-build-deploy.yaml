@@ -1,0 +1,148 @@
+# Run tests, build labware library, and deploy it to sandbox
+
+name: 'Labware Library test, build, and deploy'
+
+on:
+  pull_request:
+    paths:
+      - 'labware-library/**'
+      - 'shared-data/labware/**'
+      - 'components/**'
+      - 'webpack-config/**'
+      - 'package.json'
+      - '.github/workflows/ll-test-build-deploy.yaml'
+  push:
+    paths:
+      - 'labware-library/**'
+      - 'shared-data/labware/**'
+      - 'components/**'
+      - 'webpack-config/**'
+      - 'package.json'
+      - '.github/workflows/ll-test-build-deploy.yaml'
+    branches:
+      - '*'
+    tags:
+      - 'labware-library*'
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: true
+
+jobs:
+  js-unit-test:
+    name: 'labware library unit tests'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
+      - name: 'run labware library unit tests'
+        run: |
+          yarn jest --coverage=true --ci=true labware-library/
+  e2e-test:
+    name: 'labware library e2e tests on ${{ matrix.os }}'
+    strategy:
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest']
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
+      - name: 'test-e2e'
+        run: make -C labware-library test-e2e
+  build-ll:
+    name: 'build labware library artifact'
+    runs-on: 'ubuntu-latest'
+    if: github.event_name != 'pull_request'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
+      - name: 'build LL'
+        run: |
+          make -C labware-library
+      - name: 'upload github artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'll-artifact'
+          path: labware-library/dist
+  deploy-ll:
+    name: 'deploy LL artifact to S3'
+    runs-on: 'ubuntu-latest'
+    needs: ["js-unit-test", "e2e-test", "build-ll"]
+    if: github.event_name != 'pull_request'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'set complex environment variables'
+        id: 'set-vars'
+        uses: actions/github-script@v3.1
+        with:
+          script: |
+            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - name: 'download LL build'
+        uses: 'actions/download-artifact@v2'
+        with:
+          name: ll-artifact
+          path: ./dist
+      - name: 'deploy builds to s3'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
+        uses: './.github/actions/webstack/deploy-to-sandbox'
+        with:
+          domain: 'labware.opentrons.com'
+          distPath: './dist'
+          destPrefix: ${{ env.OT_BRANCH }}
