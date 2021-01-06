@@ -18,10 +18,12 @@ export const mockDeckCalibrationSessionDetails: DeckCalibrationSessionDetails = 
   instrument: {
     model: 'fake_pipette_model',
     name: 'fake_pipette_name',
-    tip_length: 42,
+    tipLength: 42,
     mount: 'right',
     serial: 'fake serial 1',
+    defaultTipracks: [],
   },
   currentStep: 'sessionStarted',
   labware: [mockDeckCalTipRack],
+  supportedCommands: [],
 }

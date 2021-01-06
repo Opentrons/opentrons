@@ -25,9 +25,10 @@ export type TipLengthCalibrationStep =
 export type TipLengthCalibrationInstrument = {|
   model: string,
   name: string,
-  tip_length: number,
+  tipLength: number,
   mount: string,
   serial: string,
+  defaultTipracks: Array<LabwareDefinition2>,
 |}
 
 export type TipLengthCalibrationSessionParams = {|

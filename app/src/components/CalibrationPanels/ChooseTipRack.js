@@ -28,6 +28,7 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   ALIGN_CENTER,
   SecondaryBtn,
+  SIZE_5,
 } from '@opentrons/components'
 import * as Sessions from '../../sessions'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -40,7 +41,6 @@ import {
   getTipLengthForPipetteAndTiprack,
 } from '../../calibration/'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { findLabwareDefWithCustom } from '../../findLabware'
 import styles from './styles.css'
 
 import type { TipRackMap } from './ChosenTipRackRender'
@@ -76,20 +76,6 @@ const introContentByType: SessionType => string = sessionType => {
   }
 }
 
-function getLabwareDefinitionFromUri(
-  uri: string,
-  customTipRacks: Array<LabwareDefinition2>
-): LabwareDefinition2 | null {
-  const [namespace, loadName, version] = uri.split('/')
-  const labwareDef = findLabwareDefWithCustom(
-    namespace,
-    loadName,
-    version,
-    customTipRacks
-  )
-  return labwareDef
-}
-
 function formatOptionsFromLabwareDef(lw: LabwareDefinition2): SelectOption {
   return {
     value: getLabwareDefURI(lw),
@@ -105,6 +91,7 @@ type ChooseTipRackProps = {|
   handleChosenTipRack: (arg: LabwareDefinition2 | null) => mixed,
   closeModal: () => mixed,
   robotName?: string | null,
+  defaultTipracks?: Array<LabwareDefinition2> | null,
 |}
 
 export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
@@ -116,6 +103,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
     handleChosenTipRack,
     closeModal,
     robotName,
+    defaultTipracks,
   } = props
 
   const pipSerial = useSelector(
@@ -143,19 +131,9 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
   )
   const customTipRacks = useSelector(getCustomTipRackDefinitions)
 
-  const opentronsTipRacks: Array<LabwareDefinition2> = [
-    'opentrons/opentrons_96_tiprack_10ul/1',
-    'opentrons/opentrons_96_tiprack_20ul/1',
-    'opentrons/opentrons_96_tiprack_300ul/1',
-  ].reduce((acc, tr) => {
-    const def = getLabwareDefinitionFromUri(tr, customTipRacks)
-    if (def) {
-      acc.push(def)
-    }
-    return acc
-  }, []) // TODO: Actually get the default tipracks from user flow
-
-  const allTipRackDefs = opentronsTipRacks.concat(customTipRacks)
+  const allTipRackDefs = defaultTipracks
+    ? defaultTipracks.concat(customTipRacks)
+    : customTipRacks
   const tipRackByUriMap: TipRackMap = allTipRackDefs.reduce((obj, lw) => {
     if (lw) {
       obj[getLabwareDefURI(lw)] = {
@@ -180,9 +158,9 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
     return obj
   }, {})
 
-  const opentronsTipRacksOptions: Array<SelectOption> = opentronsTipRacks.map(
-    lw => formatOptionsFromLabwareDef(lw)
-  )
+  const opentronsTipRacksOptions: Array<SelectOption> = defaultTipracks
+    ? defaultTipracks.map(lw => formatOptionsFromLabwareDef(lw))
+    : []
   const customTipRacksOptions: Array<SelectOption> = customTipRacks.map(lw =>
     formatOptionsFromLabwareDef(lw)
   )
@@ -220,7 +198,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
   const introText = introContentByType(sessionType)
   return (
     <Flex
-      key={'chooseTipRack'}
+      key="chooseTipRack"
       marginTop={SPACING_2}
       marginBottom={SPACING_3}
       flexDirection={DIRECTION_COLUMN}
@@ -254,7 +232,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
         alignSelf={ALIGN_CENTER}
       >
         <Flex
-          height="16rem"
+          height={SIZE_5}
           border={BORDER_SOLID_MEDIUM}
           paddingTop={SPACING_4}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -290,7 +268,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
         <SecondaryBtn
           data-test="useThisTipRackButton"
           width="25%"
-          marginRight="1rem"
+          marginRight={SPACING_3}
           onClick={() => closeModal()}
         >
           Cancel

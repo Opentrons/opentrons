@@ -105,7 +105,8 @@ export function CalibratePipetteOffset(
     isJogging,
     intent,
   } = props
-  const { currentStep, instrument, labware } = session?.details || {}
+  const { currentStep, instrument, labware, supportedCommands } =
+    session?.details || {}
 
   const {
     showConfirmation: showConfirmExit,
@@ -185,6 +186,8 @@ export function CalibratePipetteOffset(
           shouldPerformTipLength={shouldPerformTipLength}
           intent={intent}
           robotName={robotName}
+          supportedCommands={supportedCommands}
+          defaultTipracks={instrument?.defaultTipracks}
         />
       </ModalPage>
       {showConfirmExit && (

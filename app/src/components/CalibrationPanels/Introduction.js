@@ -393,6 +393,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
     shouldPerformTipLength,
     intent,
     instruments,
+    supportedCommands,
   } = props
 
   const [showChooseTipRack, setShowChooseTipRack] = React.useState(false)
@@ -411,8 +412,19 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
     instruments?.map(instr => instr.tipRackLoadName)
   )
 
-  const proceed = () =>
-    sendCommands({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
+  const proceed = () => {
+    if (
+      supportedCommands &&
+      supportedCommands.includes(Sessions.sharedCalCommands.LOAD_LABWARE)
+    ) {
+      sendCommands({
+        command: Sessions.sharedCalCommands.LOAD_LABWARE,
+        data: { tiprackDefinition: chosenTipRack ?? tipRack.definition },
+      })
+    } else {
+      sendCommands({ command: Sessions.sharedCalCommands.LOAD_LABWARE })
+    }
+  }
 
   const {
     headerText,
@@ -434,6 +446,7 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
       handleChosenTipRack={handleChosenTipRack}
       closeModal={() => setShowChooseTipRack(false)}
       robotName={props.robotName}
+      defaultTipracks={props.defaultTipracks}
     />
   ) : (
     <>

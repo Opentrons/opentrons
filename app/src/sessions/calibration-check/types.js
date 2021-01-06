@@ -1,6 +1,7 @@
 // @flow
 import type { CalibrationLabware } from '../types'
 import type { Mount } from '../../pipettes/types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 // calibration check session types
 
@@ -54,13 +55,14 @@ export type RobotCalibrationCheckStatus =
 export type CalibrationCheckInstrument = {|
   model: string,
   name: string,
-  tip_length: number,
+  tipLength: number,
   mount: Mount,
   rank: RobotCalibrationCheckPipetteRank,
   tipRackLoadName: string,
   tipRackDisplay: string,
   tipRackUri: string,
   serial: string,
+  defaultTipracks: Array<LabwareDefinition2>,
 |}
 
 export type CalibrationCheckComparison = {|

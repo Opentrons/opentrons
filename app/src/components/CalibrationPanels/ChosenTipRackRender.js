@@ -13,6 +13,7 @@ import {
   FONT_SIZE_BODY_2,
   FONT_STYLE_ITALIC,
   JUSTIFY_CENTER,
+  SIZE_4,
   SPACING_2,
   SPACING_3,
   TEXT_ALIGN_CENTER,
@@ -51,7 +52,7 @@ export function ChosenTipRackRender(
   const { showCalibrationText, selectedValue, tipRackByUriMap } = props
   const loadName = selectedValue.value.split('/')[1]
   const displayName = selectedValue.label
-  const calibrationData = tipRackByUriMap[selectedValue.value].calibration
+  const calibrationData = tipRackByUriMap[selectedValue.value]?.calibration
 
   const imageSrc =
     loadName in labwareImages
@@ -69,11 +70,11 @@ export function ChosenTipRackRender(
     >
       <img
         css={css`
-          max-width: 8rem;
+          max-width: ${SIZE_4};
           max-height: 6rem;
           flex: 0 1 5rem;
           display: block;
-          margin-bottom: 1rem;
+          margin-bottom: ${SPACING_3};
         `}
         src={imageSrc}
       />
