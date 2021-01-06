@@ -111,4 +111,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
         run: |
-          aws s3 sync ./dist s3://opentrons-components/${{ env.OT_BRANCH}}
+          aws s3 sync ./dist s3://opentrons-components/${{ env.OT_BRANCH}} --acl public-read
