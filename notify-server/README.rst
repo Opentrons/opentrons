@@ -9,7 +9,7 @@ The notification server is a pub/sub service for the OT2.
 
 Development Environment
 -----------------------------------
-- `poetry <https://python-poetry.org>`_ is used as the package manager. Follow these `installation instructions <https://python-poetry.org/docs/#installation>`_.
+- `pipenv <https://github.com/pypa/pipenv>`_ is the package manager.
 - ``make setup`` will setup the project.
 - ``make test`` will run the unit tests.
 - ``make lint`` will run type checking and linting.
@@ -67,7 +67,7 @@ To start from the command line:
 
 .. code-block:: bash
 
-   python -m notify_server.subscriber -s tcp://localhost:5555 topic1 topic2
+   python -m notify_server.app_sub -s tcp://localhost:5555 topic1 topic2
 
 models
 =======
