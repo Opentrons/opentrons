@@ -1,10 +1,10 @@
+import typing
 from functools import lru_cache
 
 from starlette import status
 from fastapi import Depends, HTTPException, Header
-from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 from starlette.requests import Request
-from starlette.status import HTTP_400_BAD_REQUEST
+from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server import constants
 from robot_server.hardware_wrapper import HardwareWrapper
@@ -95,11 +95,13 @@ def get_session_manager(
 
 async def check_version_header(
         request: Request,
-        opentrons_version: str = Header(
+        opentrons_version: typing.Union[
+            int, constants.API_VERSION_LATEST_TYPE
+        ] = Header(
             ...,
-            description=f"The requested HTTP API version which must be "
-                        f"'{constants.MIN_API_VERSION}' or higher. To use the "
-                        f"latest version specify "
+            description=f"The requested HTTP API version which must be at "
+                        f"least '{constants.MIN_API_VERSION}' or higher. To "
+                        f"use the latest version specify "
                         f"'{constants.API_VERSION_LATEST}'.")
 ) -> None:
     """Dependency that will check that Opentrons-Version header meets
@@ -122,7 +124,7 @@ async def check_version_header(
             ),
         )
         raise BaseRobotServerError(
-            status_code=HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_400_BAD_REQUEST,
             error=error
         )
     else:
