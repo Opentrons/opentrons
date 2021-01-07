@@ -1,5 +1,4 @@
 import logging
-import re
 import traceback
 
 from opentrons import __version__
@@ -9,7 +8,6 @@ from starlette.responses import Response, JSONResponse
 from starlette.requests import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.status import (
-    HTTP_400_BAD_REQUEST,
     HTTP_422_UNPROCESSABLE_ENTITY
 )
 
@@ -19,9 +17,9 @@ from .errors import V1HandlerError, \
     transform_http_exception_to_json_api_errors, \
     transform_validation_error_to_json_api_errors, \
     consolidate_fastapi_response, BaseRobotServerError, ErrorResponse, \
-    Error, build_unhandled_exception_response
+    build_unhandled_exception_response
 from .dependencies import get_rpc_server, get_protocol_manager, api_wrapper, \
-    verify_hardware, get_session_manager
+    verify_hardware, get_session_manager, check_version_header
 from robot_server import constants
 from robot_server.service.legacy.routers import legacy_routes
 from robot_server.service.session.router import router as session_router
@@ -71,16 +69,16 @@ routes.include_router(router=tl_router,
                       tags=["Tip Length Calibration Management"])
 routes.include_router(router=notifications_router,
                       tags=["Notification Server Management"])
+routes.include_router(router=system_router,
+                      tags=["System Control"])
 
 app.include_router(router=routes,
                    responses={
                        HTTP_422_UNPROCESSABLE_ENTITY: {
                            "model": ErrorResponse
                        }
-                   })
-
-app.include_router(router=system_router,
-                   tags=["System Control"])
+                   },
+                   dependencies=[Depends(check_version_header)])
 
 
 @app.on_event("startup")
@@ -102,66 +100,19 @@ async def on_shutdown():
     get_protocol_manager().remove_all()
 
 
-NON_VERSIONED_RE = re.compile('|'.join(constants.NON_VERSIONED_ROUTES))
-
-
 @app.middleware("http")
-async def api_version_check(request: Request, call_next) -> Response:
-    """Middleware to perform version check."""
-    error = None
-    requested_version = constants.API_VERSION
+async def api_version_response_header(request: Request, call_next) -> Response:
+    """Middleware to attach opentrons version headers to the response."""
+    # Attach the version the request state. Optional dependency
+    #  check_version_header will override this value if check passes.
+    request.state.api_version = constants.API_VERSION
 
-    # TODO(mc, 2020-11-05): allow routes to opt-in to versionsing and request +
-    # response migrations via decorator. Puting an allow-list in place for now
-    # because allowing an endpoint to bypass versioning requirements in the
-    # future is not a breaking change
-    if not NON_VERSIONED_RE.fullmatch(request.url.path):
-        try:
-            # Get the maximum version accepted by client
-            header_value = request.headers.get(constants.API_VERSION_HEADER)
-            requested_version = (
-                int(header_value)
-                if header_value != constants.API_VERSION_LATEST else
-                constants.API_VERSION
-            )
-
-            if requested_version < constants.MIN_API_VERSION:
-                error = Error(
-                    id="OutdatedAPIVersion",
-                    title="Requested HTTP API version no longer supported",
-                    detail=(
-                        f"HTTP API version {constants.MIN_API_VERSION - 1} is "
-                        "no longer supported. Please upgrade your Opentrons "
-                        "App or other HTTP API client."
-                    ),
-                )
-        except (ValueError, TypeError):
-            error = Error(
-                id="InvalidAPIVersion",
-                title="Missing or invalid HTTP API version header",
-                detail=(
-                    "Requests must define the Opentrons-Version "
-                    "header. You may need to upgrade your Opentrons "
-                    "App or other HTTP API client."
-                ),
-            )
-
-    if error is None:
-        api_version = min(requested_version, constants.API_VERSION)
-        # Attach the api version to request's state dict
-        request.state.api_version = api_version
-        response: Response = await call_next(request)
-    else:
-        api_version = constants.API_VERSION
-        response = JSONResponse(
-            status_code=HTTP_400_BAD_REQUEST,
-            content=ErrorResponse(
-                errors=[error]
-            ).dict(exclude_unset=True, exclude_none=True)
-        )
+    response: Response = await call_next(request)
 
     # Put the api version in the response header
-    response.headers[constants.API_VERSION_HEADER] = str(api_version)
+    response.headers[constants.API_VERSION_HEADER] = str(
+        request.state.api_version
+    )
     response.headers[constants.MIN_API_VERSION_HEADER] = str(
         constants.MIN_API_VERSION
     )
