@@ -162,7 +162,7 @@ class PipetteOffsetCalibrationUserFlow:
         # using python's built-in typing methods
         # correctly reveals that this is an enum,
         # mypy believes it is a string.
-        return self._current_state
+        return self._sm.current_state
 
     @property
     def has_calibrated_tip_length(self) -> bool:
@@ -200,9 +200,6 @@ class PipetteOffsetCalibrationUserFlow:
         elif hasBlock and not self._has_calibration_block:
             self._load_calibration_block()
         self._has_calibration_block = hasBlock
-
-    def _set_current_state(self, to_state: PipetteOffsetState):
-        self._current_state = to_state
 
     def _get_tip_rack_lw(self) -> labware.Labware:
         pip_vol = self._hw_pipette.config.max_volume
@@ -253,12 +250,6 @@ class PipetteOffsetCalibrationUserFlow:
             self._load_tip_rack(
                 verified_definition,
                 existing_offset_calibration)
-            perform_tip_length = not self._get_stored_tip_length_cal()
-            self._sm =\
-                self._determine_state_machine(perform_tip_length)
-            self._set_current_state(self._sm.state.labwareLoaded)
-
-            self.should_perform_tip_length = perform_tip_length
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,

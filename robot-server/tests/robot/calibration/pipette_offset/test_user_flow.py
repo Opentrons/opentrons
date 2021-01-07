@@ -408,7 +408,9 @@ async def test_load_labware(mock_user_flow, monkeypatch):
     assert mock_user_flow._tip_rack.uri ==\
         'opentrons/opentrons_96_tiprack_300ul/1'
     assert mock_user_flow._tip_rack != old_tiprack
-    assert mock_user_flow.should_perform_tip_length is True
+    # We should explicitly not change whether to perform tip length
+    # as that will be decided by the client.
+    assert mock_user_flow.should_perform_tip_length is False
 
 
 @pytest.mark.parametrize(argnames="mount",
