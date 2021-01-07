@@ -2,6 +2,7 @@
 import pytest
 from datetime import datetime, timedelta
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
+from decoy import Decoy
 
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
@@ -33,6 +34,12 @@ from opentrons.protocol_engine.resources import (
 
 
 @pytest.fixture
+def decoy() -> Decoy:
+    """Get a fresh Decoy state container."""
+    return Decoy()
+
+
+@pytest.fixture
 def now() -> datetime:
     """Get the current UTC time."""
     return utc_now()
@@ -59,26 +66,38 @@ def mock_state_store() -> MagicMock:
 @pytest.fixture
 def mock_state_view() -> MagicMock:
     """Get a mock in the shape of a StateView."""
+    # TODO(mc, 2021-01-04): Replace with mock_state_view in execution/conftest.py
     return MagicMock(spec=StateView)
 
 
 @pytest.fixture
 def mock_hardware() -> AsyncMock:
     """Get an asynchronous mock in the shape of a HardwareController."""
+    # TODO(mc, 2021-01-04): Replace with mock_hw_controller
     return AsyncMock(spec=HardwareController)
 
 
 @pytest.fixture
 def mock_handlers() -> AsyncMock:
     """Get an asynchronous mock in the shape of CommandHandlers."""
-    # TODO(mc, 2020-11-17): AsyncMock around CommandHandlers doesn't propagate
-    # async. mock downwards into children properly, so this has to be manually
-    # set up this way for now
+    # TODO(mc, 2021-01-04): Replace with mock_cmd_handlers
     return CommandHandlers(
         equipment=AsyncMock(spec=EquipmentHandler),
         movement=AsyncMock(spec=MovementHandler),
         pipetting=AsyncMock(spec=PipettingHandler),
     )
+
+
+@pytest.fixture
+def mock_cmd_handlers(decoy: Decoy) -> CommandHandlers:
+    """Get a mock in the shape of a CommandHandlers container."""
+    return decoy.create_decoy(spec=CommandHandlers)
+
+
+@pytest.fixture
+def mock_hw_controller(decoy: Decoy) -> HardwareController:
+    """Get a mock in the shape of a HardwareController."""
+    return decoy.create_decoy(spec=HardwareController)
 
 
 @pytest.fixture

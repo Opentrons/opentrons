@@ -30,6 +30,7 @@ mock = "~=4.0.2"
 flake8 = "~=3.8.4"
 flake8-annotations = "~=2.4.1"
 flake8-docstrings = "~=1.5.0"
+decoy = "~=1.2.0"
 
 [packages]
 aionotify = "==0.2.0"

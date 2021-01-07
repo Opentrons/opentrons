@@ -5,12 +5,17 @@ from typing import cast, Dict, Optional
 
 from opentrons.types import MountType, Mount as HwMount
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocol_engine import commands as cmd, errors, StateStore
+from opentrons.protocol_engine import commands as cmd, errors, StateStore, WellLocation
 
 
 CompletedLoadLabware = cmd.CompletedCommand[
     cmd.LoadPipetteRequest,
     cmd.LoadPipetteResult
+]
+
+CompletedAspirate = cmd.CompletedCommand[
+    cmd.AspirateRequest,
+    cmd.AspirateResult
 ]
 
 
@@ -22,11 +27,39 @@ def load_pipette_command(now: datetime) -> CompletedLoadLabware:
             pipetteName="p300_single",
             mount=MountType.LEFT,
         ),
-        result=cmd.LoadPipetteResult(pipetteId='pipette-id'),
+        result=cmd.LoadPipetteResult(pipetteId="pipette-id"),
         created_at=now,
         started_at=now,
         completed_at=now,
     )
+
+
+@pytest.fixture
+def aspirate_command(now: datetime) -> CompletedAspirate:
+    """Get a completed aspirate command."""
+    return cmd.CompletedCommand(
+        request=cmd.AspirateRequest(
+            pipetteId="pipette-id",
+            labwareId="labware-id",
+            wellName="C2",
+            wellLocation=WellLocation(),
+            volume=50,
+        ),
+        result=cmd.AspirateResult(volume=50),
+        created_at=now,
+        started_at=now,
+        completed_at=now,
+    )
+
+
+@pytest.fixture
+def loaded_store(
+    store: StateStore,
+    load_pipette_command: CompletedLoadLabware,
+) -> StateStore:
+    """Get a state store with a pipette pre-loaded."""
+    store.handle_command(load_pipette_command, command_id="unique-id")
+    return store
 
 
 def test_initial_pipette_data_by_id(store: StateStore) -> None:
@@ -112,3 +145,73 @@ def test_get_hardware_pipette_raises_with_name_mismatch(
             pipette_id="pipette-id",
             attached_pipettes=attached_pipettes,
         )
+
+
+def test_initial_pipette_volume_data_by_id(loaded_store: StateStore) -> None:
+    """get_aspirated_volume should return 0 for a new pipette."""
+    volume = loaded_store.pipettes.get_aspirated_volume("pipette-id")
+    assert volume == 0
+
+
+def test_pipette_volume_adds_aspirate(
+    loaded_store: StateStore,
+    aspirate_command: CompletedAspirate,
+) -> None:
+    """get_aspirated_volume should return volume after an aspirate."""
+    loaded_store.handle_command(aspirate_command, "aspirate-command-1")
+    volume = loaded_store.pipettes.get_aspirated_volume("pipette-id")
+    assert volume == 50
+
+    loaded_store.handle_command(aspirate_command, "aspirate-command-2")
+    volume = loaded_store.pipettes.get_aspirated_volume("pipette-id")
+    assert volume == 100
+
+
+def test_pipette_volume_raises_if_bad_id(store: StateStore) -> None:
+    """get_aspirated_volume should return 0 for a new pipette."""
+    with pytest.raises(errors.PipetteDoesNotExistError):
+        store.pipettes.get_aspirated_volume("not-a-pipette-id")
+
+
+def test_pipette_is_ready_to_aspirate_if_has_volume(
+    loaded_store: StateStore,
+    aspirate_command: CompletedAspirate,
+) -> None:
+    """Pipettes should be ready to aspirate if its already got volume."""
+    pipette_config = cast(PipetteDict, {"ready_to_aspirate": False})
+
+    loaded_store.handle_command(aspirate_command, "aspirate-command-1")
+    is_ready = loaded_store.pipettes.get_is_ready_to_aspirate(
+        pipette_id="pipette-id",
+        pipette_config=pipette_config
+    )
+
+    assert is_ready is True
+
+
+def test_pipette_is_ready_to_aspirate_if_no_volume_and_hc_says_ready(
+    loaded_store: StateStore,
+) -> None:
+    """Pipettes should be ready to aspirate if HC says it is."""
+    pipette_config = cast(PipetteDict, {"ready_to_aspirate": True})
+
+    is_ready = loaded_store.pipettes.get_is_ready_to_aspirate(
+        pipette_id="pipette-id",
+        pipette_config=pipette_config
+    )
+
+    assert is_ready is True
+
+
+def test_pipette_not_ready_to_aspirate_if_no_volume_and_hc_says_not_ready(
+    loaded_store: StateStore,
+) -> None:
+    """Pipettes should be ready to aspirate if HC says it is."""
+    pipette_config = cast(PipetteDict, {"ready_to_aspirate": False})
+
+    is_ready = loaded_store.pipettes.get_is_ready_to_aspirate(
+        pipette_id="pipette-id",
+        pipette_config=pipette_config
+    )
+
+    assert is_ready is False

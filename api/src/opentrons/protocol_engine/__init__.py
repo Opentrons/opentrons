@@ -10,6 +10,7 @@ from .protocol_engine import ProtocolEngine
 from .state import StateStore, StateView
 from .execution import CommandHandlers
 from .resources import ResourceProviders
+from .types import WellLocation, WellOrigin
 
 __all__ = [
     "ProtocolEngine",
@@ -17,4 +18,6 @@ __all__ = [
     "StateView",
     "CommandHandlers",
     "ResourceProviders",
+    "WellLocation",
+    "WellOrigin",
 ]

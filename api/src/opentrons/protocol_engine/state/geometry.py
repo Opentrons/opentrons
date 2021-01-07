@@ -89,8 +89,6 @@ class GeometryState:
         well_location: Optional[WellLocation] = None,
     ) -> Point:
         """Get the absolute position of a well in a labware."""
-        # TODO(mc, 2020-10-29): implement CSS-style key point + offset option
-        # rather than defaulting to well top
         labware_data = self._labware_store.state.get_labware_data_by_id(
             labware_id
         )
