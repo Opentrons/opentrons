@@ -12,8 +12,7 @@ legacy_routes.include_router(router=health.router,
                                            Depends(check_version_header)])
 legacy_routes.include_router(router=networking.router,
                              tags=["Networking"],
-                             dependencies=[Depends(check_version_header),
-                                           Depends(check_version_header)])
+                             dependencies=[Depends(check_version_header)])
 legacy_routes.include_router(router=control.router,
                              tags=["Control"],
                              dependencies=[Depends(verify_hardware),
@@ -40,8 +39,7 @@ legacy_routes.include_router(router=motors.router,
                                            Depends(check_version_header)])
 legacy_routes.include_router(router=camera.router,
                              tags=["Camera"],
-                             dependencies=[Depends(check_version_header),
-                                           Depends(check_version_header)])
+                             dependencies=[Depends(check_version_header)])
 legacy_routes.include_router(router=logs.router,
                              tags=["Logs"])
 legacy_routes.include_router(router=rpc.router,

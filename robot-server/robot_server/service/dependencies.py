@@ -105,10 +105,9 @@ async def check_version_header(
     """Dependency that will check that Opentrons-Version header meets
     requirements."""
     # Get the maximum version accepted by client
-    header_value = opentrons_version
     requested_version = (
         int(opentrons_version)
-        if header_value != constants.API_VERSION_LATEST else
+        if opentrons_version != constants.API_VERSION_LATEST else
         constants.API_VERSION
     )
 
