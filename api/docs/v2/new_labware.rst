@@ -344,13 +344,12 @@ For example:
 
 Well Properties
 ^^^^^^^^^^^^^^^
-
-
 Sometimes you may need access to information about a given well in a labware, such as the depth or diameter.
 
 Depth
 -----
-The depth of a given well
+The distance, in mm, between the very top of the well and the very bottom. For example, if you have a conical
+shaped well the depth is measured from the top to bottom-center of the cone well.
 
 .. code-block:: python
     :substitutions:
@@ -363,7 +362,8 @@ The depth of a given well
 
 Diameter
 --------
-The diameter of a given well, which is only relevant for labware with circular wells.
+The diameter of a given well, in mm, which is only relevant for labware with circular wells. If
+the well is not circular, the value returned will be ``None``.
 
 .. code-block:: python
     :substitutions:
@@ -377,7 +377,8 @@ The diameter of a given well, which is only relevant for labware with circular w
 
 Length
 ------
-The length of a given well, which is only relevant for labware with square wells.
+The length of a given well, which is only relevant for labware with square wells. If
+the well is not rectangular, the value returned will be ``None``.
 
 .. code-block:: python
     :substitutions:
@@ -391,7 +392,8 @@ The length of a given well, which is only relevant for labware with square wells
 
 Width
 -----
-The width of a given well, which is only relevant for labware with square wells.
+The width of a given well, which is only relevant for labware with square wells. If
+the well is not rectangular, the value returned will be ``None``.
 
 .. code-block:: python
     :substitutions:

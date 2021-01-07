@@ -125,23 +125,6 @@ class Well:
         return self._geometry._depth
 
     @property
-    def _depth(self) -> float:
-        MODULE_LOG.warning("This attribute is deprecated."
-                           "Please use 'depth' instead.")
-        return self.depth
-
-    @property
-    def _width(self) -> float:
-        MODULE_LOG.warning("This attribute is deprecated."
-                           "Please use 'width' instead.")
-        return self.width
-
-    def _length(self) -> float:
-        MODULE_LOG.warning("This attribute is deprecated."
-                           "Please use 'length' instead.")
-        return self.length
-
-    @property
     def display_name(self):
         return self._impl.get_display_name()
 
