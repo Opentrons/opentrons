@@ -253,12 +253,6 @@ class PipetteOffsetCalibrationUserFlow:
             self._load_tip_rack(
                 verified_definition,
                 existing_offset_calibration)
-            perform_tip_length = not self._get_stored_tip_length_cal()
-            self._sm =\
-                self._determine_state_machine(perform_tip_length)
-            self._set_current_state(self._sm.state.labwareLoaded)
-
-            self.should_perform_tip_length = perform_tip_length
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount,
