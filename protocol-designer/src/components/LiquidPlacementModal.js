@@ -100,14 +100,14 @@ const mapStateToProps = (state: BaseState): SP => {
     )
     return {
       selectedWells: {},
-      wellContents: {},
+      wellContents: null,
       labwareDef: null,
       liquidNamesById: {},
     }
   }
 
   const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]?.def
-  let wellContents: ContentsByWell = {}
+  let wellContents: ContentsByWell = null
 
   // selection for deck setup: shows initial state of liquids
   wellContents = wellContentsSelectors.getWellContentsAllLabware(state)[
