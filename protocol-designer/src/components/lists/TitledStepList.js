@@ -75,7 +75,7 @@ export function TitledStepList(props: TitledListProps): React.Node {
     child => child
   )
 
-  const className = cx(styles.titled_list, props.className, {
+  const className = cx(styles.pd_titled_list, props.className, {
     [styles.disabled]: disabled || inert,
     [styles.titled_list_selected]: !disabled && props.selected,
     [styles.hover_border]: !disabled && props.hovered,

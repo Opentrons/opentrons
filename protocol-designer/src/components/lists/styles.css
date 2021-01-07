@@ -1,15 +1,12 @@
 @import '@opentrons/components';
 
 .step_title_bar {
-  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
   text-decoration: none;
-  padding: var(--list-padding-large) var(--list-padding-small);
-  margin: 0.4rem 0.125rem;
-  color: var(--c-dark-gray);
-  box-shadow: var(--shadow-lvl-1);
+  padding-left: var(--list-padding-small);
+  min-height: 3.5rem;
 }
 
 .titled_list_selected .step_title_bar {
@@ -46,12 +43,10 @@
 }
 
 .title_bar_carat {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
+  margin-left: auto;
   padding: calc(var(--list-padding-small) - var(--bd-width-default));
   padding-top: 1rem;
+  align-self: stretch;
 
   &:hover {
     background-color: color-mod(var(--c-black) alpha(5%));
