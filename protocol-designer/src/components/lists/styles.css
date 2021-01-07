@@ -1,5 +1,63 @@
 @import '@opentrons/components';
 
+.step_title_bar {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-decoration: none;
+  padding: var(--list-padding-large) var(--list-padding-small);
+  margin: 0.4rem 0.125rem;
+  color: var(--c-dark-gray);
+  box-shadow: var(--shadow-lvl-1);
+}
+
+.titled_list_selected .step_title_bar {
+  background-color: var(--c-bg-selected);
+
+  & * {
+    color: var(--c-selected-dark);
+    font-weight: var(--fw-semibold);
+  }
+}
+
+.title {
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-regular);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.title_enabled {
+  color: var(--c-font-dark);
+}
+
+.title_disabled {
+  color: var(--c-font-disabled);
+}
+
+.title_bar_icon {
+  color: var(--c-font-dark);
+  height: 1.5rem;
+}
+
+.icon_left_of_title {
+  margin-right: 0.5rem;
+}
+
+.title_bar_carat {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  padding: calc(var(--list-padding-small) - var(--bd-width-default));
+  padding-top: 1rem;
+
+  &:hover {
+    background-color: color-mod(var(--c-black) alpha(5%));
+  }
+}
+
 .pd_titled_list {
   margin: 0.4rem 0.125rem;
   color: var(--c-dark-gray);

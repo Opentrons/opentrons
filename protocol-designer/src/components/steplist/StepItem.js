@@ -12,7 +12,7 @@ import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
 import { stepIconsByType, PROFILE_CYCLE } from '../../form-types'
 import { i18n } from '../../localization'
 import { makeLidLabelText, makeTemperatureText } from '../../utils'
-import { PDListItem, PDTitledList } from '../lists'
+import { PDListItem, TitledStepList } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
 import { MixHeader } from './MixHeader'
@@ -85,7 +85,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
   ) : null
 
   return (
-    <PDTitledList
+    <TitledStepList
       className={cx(styles.step_item_wrapper)}
       description={Description}
       iconName={error || warning ? 'alert-circle' : iconName}
@@ -101,7 +101,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
       {...{ selected, collapsed, hovered }}
     >
       {props.children}
-    </PDTitledList>
+    </TitledStepList>
   )
 }
 
