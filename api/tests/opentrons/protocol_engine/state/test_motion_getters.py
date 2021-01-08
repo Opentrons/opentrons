@@ -1,4 +1,6 @@
 """Test state getters for retrieving motion planning views of state."""
+# TODO(mc, 2020-01-08): rewrite tests using Decoy
+
 import pytest
 from dataclasses import dataclass, field
 from mock import MagicMock
@@ -8,13 +10,8 @@ from opentrons.types import Point, MountType
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocols.geometry.planning import MoveType, get_waypoints
 
-from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import WellLocation, WellOrigin
-from opentrons.protocol_engine.state import (
-    PipetteData,
-    LocationData,
-    PipetteLocationData,
-)
+from opentrons.protocol_engine import errors, DeckLocation, WellLocation, WellOrigin
+from opentrons.protocol_engine.state import PipetteData, PipetteLocationData
 from opentrons.protocol_engine.state.labware import LabwareStore
 from opentrons.protocol_engine.state.pipettes import PipetteStore
 from opentrons.protocol_engine.state.geometry import GeometryStore
@@ -55,11 +52,11 @@ def motion_store(
 
 def mock_location_data(
     motion_store: MotionStore,
-    data: Optional[LocationData]
+    data: Optional[DeckLocation]
 ) -> None:
     """Insert mock location data into the store."""
     motion_store.state._current_location = data
-    assert motion_store.state.get_current_location_data() == data
+    assert motion_store.state.get_current_deck_location() == data
 
 
 def test_get_pipette_location_with_no_current_location(
@@ -91,7 +88,7 @@ def test_get_pipette_location_with_current_location_with_quirks(
     """It should return cp=XY_CENTER if location labware has center quirk."""
     mock_location_data(
         motion_store,
-        LocationData(
+        DeckLocation(
             pipette_id="pipette-id",
             labware_id="reservoir-id",
             well_name="A1"
@@ -124,7 +121,7 @@ def test_get_pipette_location_with_current_location_different_pipette(
     """It should return mount and cp=None if location used other pipette."""
     mock_location_data(
         motion_store,
-        LocationData(
+        DeckLocation(
             pipette_id="other-pipette-id",
             labware_id="reservoir-id",
             well_name="A1"
@@ -145,6 +142,39 @@ def test_get_pipette_location_with_current_location_different_pipette(
     )
 
 
+def test_get_pipette_location_override_current_location(
+    mock_pipette_store: MagicMock,
+    mock_labware_store: MagicMock,
+    motion_store: MotionStore
+) -> None:
+    """It should calculate pipette location from a passed in deck location."""
+    current_location = DeckLocation(
+        pipette_id="pipette-id",
+        labware_id="reservoir-id",
+        well_name="A1"
+    )
+
+    mock_labware_store.state.get_labware_has_quirk.return_value = True
+    mock_pipette_store.state.get_pipette_data_by_id.return_value = PipetteData(
+        mount=MountType.RIGHT,
+        pipette_name="p300_single"
+    )
+
+    result = motion_store.state.get_pipette_location(
+        pipette_id="pipette-id",
+        current_location=current_location,
+    )
+
+    mock_labware_store.state.get_labware_has_quirk.assert_called_with(
+        "reservoir-id",
+        "centerMultichannelOnWells",
+    )
+    assert result == PipetteLocationData(
+        mount=MountType.RIGHT,
+        critical_point=CriticalPoint.XY_CENTER,
+    )
+
+
 @dataclass(frozen=True)
 class WaypointSpec:
     """Spec data for testing the get_movement_waypoints selector."""
@@ -158,7 +188,7 @@ class WaypointSpec:
     origin: Point = field(default_factory=lambda: Point(1, 2, 3))
     dest: Point = field(default_factory=lambda: Point(4, 5, 6))
     origin_cp: Optional[CriticalPoint] = None
-    location: Optional[LocationData] = None
+    location: Optional[DeckLocation] = None
     expected_dest_cp: Optional[CriticalPoint] = None
     has_center_multichannel_quirk: bool = False
     labware_z: Optional[float] = None
@@ -174,25 +204,25 @@ class WaypointSpec:
     ),
     WaypointSpec(
         name="General arc if moving from other labware",
-        location=LocationData("pipette-id", "other-labware-id", "A1"),
+        location=DeckLocation("pipette-id", "other-labware-id", "A1"),
         all_labware_z=20,
         expected_move_type=MoveType.GENERAL_ARC,
     ),
     WaypointSpec(
         name="In-labware arc if moving to same labware",
-        location=LocationData("pipette-id", "labware-id", "B2"),
+        location=DeckLocation("pipette-id", "labware-id", "B2"),
         labware_z=10,
         expected_move_type=MoveType.IN_LABWARE_ARC,
     ),
     WaypointSpec(
         name="General arc if moving to same labware with different pipette",
-        location=LocationData("other-pipette-id", "labware-id", "A1"),
+        location=DeckLocation("other-pipette-id", "labware-id", "A1"),
         all_labware_z=20,
         expected_move_type=MoveType.GENERAL_ARC,
     ),
     WaypointSpec(
         name="Direct movement from well to same well",
-        location=LocationData("pipette-id", "labware-id", "A1"),
+        location=DeckLocation("pipette-id", "labware-id", "A1"),
         labware_z=10,
         expected_move_type=MoveType.DIRECT,
     ),
@@ -209,6 +239,7 @@ class WaypointSpec:
         well_location=WellLocation(origin=WellOrigin.TOP, offset=(0, 0, 1)),
         expected_move_type=MoveType.GENERAL_ARC,
     ),
+    # TODO(mc, 2020-01-06): add test for override current location
 ])
 def test_get_movement_waypoints(
     mock_labware_store: MagicMock,
