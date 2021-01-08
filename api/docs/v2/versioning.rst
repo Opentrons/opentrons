@@ -110,6 +110,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.8     |          4.0.0              |
 +-------------+-----------------------------+
+|     2.9     |          4.1.0              |
++-------------+-----------------------------+
 
 
 Changes in API Versions
@@ -193,3 +195,8 @@ Version 2.8
 - :py:meth:`.Well.from_center_cartesian` can be used to find a point within a well using normalized distance from the center in each axis.
 - You can now pass in a blowout location to transfer, distribute, and consolidate 
   with the ``blowout_location`` parameter. See :py:meth:`.InstrumentContext.transfer` for more detail!
+
+
+Version 2.9
++++++++++++
+- You can now access certain geometry data regarding a labware's well via a Well Object. See :ref:`new-labware-well-properties` for more information.
