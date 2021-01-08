@@ -342,6 +342,8 @@ For example:
 .. versionadded:: 2.0
 
 
+.. _new-labware-well-properties:
+
 Well Properties
 ^^^^^^^^^^^^^^^
 Sometimes you may need access to information about a given well in a labware, such as the depth or diameter.
