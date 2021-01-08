@@ -2,6 +2,7 @@
 import type {
   SessionCommandParams,
   SessionType,
+  SessionCommandString,
   CalibrationSessionStep,
   CalibrationLabware,
   CalibrationCheckInstrument,
@@ -16,6 +17,8 @@ import typeof {
   INTENT_DECK_CALIBRATION,
   INTENT_HEALTH_CHECK,
 } from './constants'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 /*
  * Intents capture the context in which a calibration flow is invoked.
@@ -68,4 +71,6 @@ export type CalibrationPanelProps = {|
   activePipette?: CalibrationCheckInstrument,
   intent?: Intent,
   robotName?: string | null,
+  supportedCommands?: Array<SessionCommandString> | null,
+  defaultTipracks?: Array<LabwareDefinition2> | null,
 |}

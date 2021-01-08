@@ -78,7 +78,9 @@ export type VectorTuple = [number, number, number]
 export type SessionCommandData =
   | {| vector: VectorTuple |}
   | {| hasBlock: boolean |}
+  | {| tiprackDefinition: LabwareDefinition2 |}
   | {||}
+
 export type SessionCommandParams = {
   command: SessionCommandString,
   data?: SessionCommandData,

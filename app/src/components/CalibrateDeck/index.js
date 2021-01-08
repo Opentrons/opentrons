@@ -94,7 +94,8 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 }
 export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
   const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
-  const { currentStep, instrument, labware } = session?.details || {}
+  const { currentStep, instrument, labware, supportedCommands } =
+    session?.details || {}
 
   const {
     showConfirmation: showConfirmExit,
@@ -165,6 +166,8 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
           currentStep={currentStep}
           sessionType={session.sessionType}
           intent={INTENT_DECK_CALIBRATION}
+          supportedCommands={supportedCommands}
+          defaultTipracks={instrument?.defaultTipracks}
         />
       </ModalPage>
       {showConfirmExit && (
