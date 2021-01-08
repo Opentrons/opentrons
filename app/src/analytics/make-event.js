@@ -21,7 +21,7 @@ import {
   getAnalyticsHealthCheckData,
   getAnalyticsDeckCalibrationData,
   getAnalyticsSessionExitDetails,
-  getTipRackSelectAnalyticsData,
+  getSessionInstrumentAnalyticsData,
 } from './selectors'
 
 import type { State, Action } from '../types'
@@ -332,17 +332,17 @@ export function makeEvent(
         case sharedCalCommands.LOAD_LABWARE:
           const commandData = action.payload.command.data
           if (commandData) {
-            const tipRackSelectData = getTipRackSelectAnalyticsData(
+            const instrData = getSessionInstrumentAnalyticsData(
               state,
               action.payload.robotName,
               action.payload.sessionId
             )
             return Promise.resolve(
-              tipRackSelectData
+              instrData
                 ? {
-                    name: `${tipRackSelectData.sessionType}TipRackSelect`,
+                    name: `${instrData.sessionType}TipRackSelect`,
                     properties: {
-                      pipetteModel: tipRackSelectData.pipetteModel,
+                      pipetteModel: instrData.pipetteModel,
                       tipRackDisplayName: commandData.tiprackDefinition
                         ? commandData.tiprackDefinition.metadata.displayName
                         : null,

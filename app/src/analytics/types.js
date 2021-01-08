@@ -123,7 +123,7 @@ export type AnalyticsTriggerAction =
   | PipetteOffsetStartedAnalyticsAction
   | TipLengthStartedAnalyticsAction
 
-export type TipRackSelectAnalyticsData = {|
+export type SessionInstrumentAnalyticsData = {|
   sessionType: string,
   pipetteModel: string,
 |}

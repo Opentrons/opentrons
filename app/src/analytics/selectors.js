@@ -59,7 +59,7 @@ import type {
   CalibrationHealthCheckAnalyticsData,
   ModelsByMount,
   AnalyticsSessionExitDetails,
-  TipRackSelectAnalyticsData,
+  SessionInstrumentAnalyticsData,
 } from './types'
 
 type ProtocolDataSelector = OutputSelector<State, void, ProtocolAnalyticsData>
@@ -293,21 +293,21 @@ export function getAnalyticsSessionExitDetails(
   return null
 }
 
-export function getTipRackSelectAnalyticsData(
+export function getSessionInstrumentAnalyticsData(
   state: State,
   robotName: string,
   sessionId: string
-): TipRackSelectAnalyticsData | null {
+): SessionInstrumentAnalyticsData | null {
   const session = getRobotSessionById(state, robotName, sessionId)
   if (session) {
-    if (
+    const pipModel =
       session.sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
-    ) {
-      return null
-    }
+        ? session.details.activePipette.model
+        : session.details.instrument.model
+
     return {
       sessionType: session.sessionType,
-      pipetteModel: session.details.instrument.model,
+      pipetteModel: pipModel,
     }
   }
   return null

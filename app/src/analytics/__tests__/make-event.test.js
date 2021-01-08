@@ -390,7 +390,7 @@ describe('analytics events map', () => {
           },
         },
       }
-      selectors.getTipRackSelectAnalyticsData.mockReturnValue({
+      selectors.getSessionInstrumentAnalyticsData.mockReturnValue({
         sessionType: 'my-session-type',
         pipetteModel: 'my-pipette-model',
       })
