@@ -41,6 +41,8 @@ export type TitledListProps = {|
   disabled?: boolean,
   /** appear disabled, but preserve collapsibility */
   inert?: boolean,
+  /** show checkbox icons if true */
+  isMultiSelectMode?: boolean,
 |}
 
 /**
@@ -57,6 +59,7 @@ export function TitledStepList(props: TitledListProps): React.Node {
     onMouseEnter,
     onMouseLeave,
     onContextMenu,
+    isMultiSelectMode,
   } = props
   const collapsible = onCollapseToggle != null
 
@@ -91,6 +94,10 @@ export function TitledStepList(props: TitledListProps): React.Node {
     iconProps && iconProps.className
   )
 
+  const multiSelectIconName = props.selected
+    ? 'checkbox-marked'
+    : 'checkbox-blank-outline'
+
   return (
     <div
       className={className}
@@ -98,6 +105,12 @@ export function TitledStepList(props: TitledListProps): React.Node {
       {...{ onMouseEnter, onMouseLeave, onContextMenu }}
     >
       <div onClick={onClick} className={titleBarClass}>
+        {isMultiSelectMode && (
+          <Icon
+            name={multiSelectIconName}
+            className={styles.icon_multiselect}
+          />
+        )}
         {iconName && (
           <Icon {...iconProps} className={iconClass} name={iconName} />
         )}

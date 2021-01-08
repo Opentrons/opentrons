@@ -10,10 +10,12 @@ import { END_TERMINAL_ITEM_ID } from '../../steplist'
 
 import { StepCreationButton } from '../StepCreationButton'
 import { DraggableStepItems } from './DraggableStepItems'
+import { MultiSelectToolbar } from './MultiSelectToolbar'
 
 import type { StepIdType } from '../../form-types'
 
 type Props = {|
+  isMultiSelectMode: ?boolean,
   orderedStepIds: Array<StepIdType>,
   reorderSelectedStep: (delta: number) => mixed,
   reorderSteps: (Array<StepIdType>) => mixed,
@@ -49,6 +51,7 @@ export class StepList extends React.Component<Props> {
     return (
       <React.Fragment>
         <SidePanel title="Protocol Timeline">
+          {this.props.isMultiSelectMode && <MultiSelectToolbar />}
           <StartingDeckStateTerminalItem />
           <DraggableStepItems
             orderedStepIds={this.props.orderedStepIds.slice()}

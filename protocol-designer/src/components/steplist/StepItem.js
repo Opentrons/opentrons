@@ -46,6 +46,7 @@ export type StepItemProps = {|
   warning?: ?boolean,
   selected?: boolean,
   hovered?: boolean,
+  isMultiSelectMode?: boolean,
 
   highlightStep: () => mixed,
   onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
@@ -71,6 +72,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
     onStepContextMenu,
     toggleStepCollapsed,
     highlightStep,
+    isMultiSelectMode,
   } = props
 
   const iconName = stepIconsByType[stepType]
@@ -98,7 +100,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
       onMouseEnter={highlightStep}
       onMouseLeave={unhighlightStep}
       onCollapseToggle={toggleStepCollapsed}
-      {...{ selected, collapsed, hovered }}
+      {...{ selected, collapsed, hovered, isMultiSelectMode }}
     >
       {props.children}
     </TitledStepList>

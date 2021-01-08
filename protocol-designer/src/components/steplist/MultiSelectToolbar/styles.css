@@ -1,0 +1,24 @@
+@import '@opentrons/components';
+
+.toolbar_container {
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  min-height: 2rem;
+  color: var(--c-dark-gray);
+  box-shadow: var(--shadow-lvl-1);
+}
+
+.toolbar_icon {
+  margin-right: 0.5rem;
+  width: 1.25rem;
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.icon_right {
+  margin-left: auto;
+  width: 1.5rem;
+}
