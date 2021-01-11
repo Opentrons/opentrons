@@ -96,3 +96,7 @@
     @apply --outline-highlight;
   }
 }
+
+.hover_border {
+  @apply --outline-highlight;
+}
