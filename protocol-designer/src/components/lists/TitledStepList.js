@@ -1,11 +1,11 @@
 // @flow
-// TitledList component
+
 import * as React from 'react'
 import cx from 'classnames'
 import { type IconName, Icon } from '@opentrons/components'
 import styles from './styles.css'
 
-export type TitledListProps = {|
+export type Props = {|
   /** text of title */
   title: string,
   /** optional icon left of the title */
@@ -14,7 +14,6 @@ export type TitledListProps = {|
   iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: mixed }>,
   /** optional data test id for the container */
   'data-test'?: string,
-  // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
   /** children must all be `<li>` */
   children?: React.Node,
   /** additional classnames */
@@ -33,18 +32,15 @@ export type TitledListProps = {|
   onCollapseToggle?: (event: SyntheticMouseEvent<>) => mixed,
   /** collapse the list if true (false by default) */
   collapsed?: boolean,
-  /** set to true when TitledList is selected (eg, user clicked it) */
+  /** set to true when Step is selected (eg, user clicked it) */
   selected?: boolean,
-  /** set to true when TitledList is hovered (but not when its contents are hovered) */
+  /** set to true when Step is hovered (but not when its contents are hovered) */
   hovered?: boolean,
   /** show checkbox icons if true */
   isMultiSelectMode?: boolean,
 |}
 
-/**
- * An ordered list with optional title, icon, and description.
- */
-export function TitledStepList(props: TitledListProps): React.Node {
+export function TitledStepList(props: Props): React.Node {
   const {
     iconName,
     'data-test': dataTest,
