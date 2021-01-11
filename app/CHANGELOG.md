@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0-alpha.0) (2021-01-11)
+
+
+### Bug Fixes
+
+* **app:** prompt whether to replace pipette after detach ([#7025](https://github.com/Opentrons/opentrons/issues/7025)) ([dfa92c3](https://github.com/Opentrons/opentrons/commit/dfa92c3))
+
+
+### Features
+
+* **app:** allow custom tiprack selection in deck cal & pipette offset cal ([#7155](https://github.com/Opentrons/opentrons/issues/7155)) ([c8fc9f2](https://github.com/Opentrons/opentrons/commit/c8fc9f2)), closes [#7087](https://github.com/Opentrons/opentrons/issues/7087)
+* **app:** Allow Z jog in save-xy-point ([#7117](https://github.com/Opentrons/opentrons/issues/7117)) ([50865f0](https://github.com/Opentrons/opentrons/commit/50865f0)), closes [#7094](https://github.com/Opentrons/opentrons/issues/7094)
+* **app:** track deck & pipette offset cal tiprack selection ([#7205](https://github.com/Opentrons/opentrons/issues/7205)) ([b2bfec5](https://github.com/Opentrons/opentrons/commit/b2bfec5)), closes [#7147](https://github.com/Opentrons/opentrons/issues/7147)
+* **shared-data:** add default tipracks to each pipette name spec ([#7108](https://github.com/Opentrons/opentrons/issues/7108)) ([757ca85](https://github.com/Opentrons/opentrons/commit/757ca85))
+
+
+
+
+
 # [4.0.0](https://github.com/Opentrons/opentrons/compare/v3.21.2...v4.0.0) (2020-11-20)
 
 

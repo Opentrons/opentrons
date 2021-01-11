@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0-alpha.0) (2021-01-11)
+
+
+### Bug Fixes
+
+* **api:** bump y max bounds to match robot geometry ([#7140](https://github.com/Opentrons/opentrons/issues/7140)) ([85b3d6b](https://github.com/Opentrons/opentrons/commit/85b3d6b)), closes [#6886](https://github.com/Opentrons/opentrons/issues/6886)
+* **api:** ensure exact delay floats are preserved in command log ([#7078](https://github.com/Opentrons/opentrons/issues/7078)) ([8ebb2dc](https://github.com/Opentrons/opentrons/commit/8ebb2dc)), closes [#7066](https://github.com/Opentrons/opentrons/issues/7066)
+* **api:** fixed `axis` variable renaming in final `driver_3_0.home` block of code ([#7015](https://github.com/Opentrons/opentrons/issues/7015)) ([65abcb1](https://github.com/Opentrons/opentrons/commit/65abcb1))
+* **api:** get correct instrument max height ([#7095](https://github.com/Opentrons/opentrons/issues/7095)) ([074f222](https://github.com/Opentrons/opentrons/commit/074f222))
+* **api:** Labware.__hash__ fix ([#7023](https://github.com/Opentrons/opentrons/issues/7023)) ([cf4034c](https://github.com/Opentrons/opentrons/commit/cf4034c)), closes [#6992](https://github.com/Opentrons/opentrons/issues/6992)
+* **api:** Specify correct channels for a paired pipette during pick up tip ([#6903](https://github.com/Opentrons/opentrons/issues/6903)) ([047a909](https://github.com/Opentrons/opentrons/commit/047a909))
+* **robot-server:** ProtocolManager expects a ThreadManager and not a SynchronousAdapter. ([#7175](https://github.com/Opentrons/opentrons/issues/7175)) ([c0c9225](https://github.com/Opentrons/opentrons/commit/c0c9225))
+
+
+### Features
+
+* **api:** add aspirate handling to protocol engine ([#7191](https://github.com/Opentrons/opentrons/issues/7191)) ([18bfdea](https://github.com/Opentrons/opentrons/commit/18bfdea))
+* **api:** add deck and deck fixture loading to ProtocolEngine factory ([#7031](https://github.com/Opentrons/opentrons/issues/7031)) ([509b7b7](https://github.com/Opentrons/opentrons/commit/509b7b7))
+* **api:** add drop tip command to engine ([#7034](https://github.com/Opentrons/opentrons/issues/7034)) ([2922158](https://github.com/Opentrons/opentrons/commit/2922158)), closes [#6596](https://github.com/Opentrons/opentrons/issues/6596)
+* **api:** add move-to-well to protocol engine ([#6943](https://github.com/Opentrons/opentrons/issues/6943)) ([779acb4](https://github.com/Opentrons/opentrons/commit/779acb4))
+* **api:** add pick up tip handling to protocol_engine ([#6985](https://github.com/Opentrons/opentrons/issues/6985)) ([3b511f4](https://github.com/Opentrons/opentrons/commit/3b511f4)), closes [#6595](https://github.com/Opentrons/opentrons/issues/6595)
+* **api:** fast instrument simulation ([#7114](https://github.com/Opentrons/opentrons/issues/7114)) ([384ecad](https://github.com/Opentrons/opentrons/commit/384ecad))
+* **shared-data:** add default tipracks to each pipette name spec ([#7108](https://github.com/Opentrons/opentrons/issues/7108)) ([757ca85](https://github.com/Opentrons/opentrons/commit/757ca85))
+
+
+### Performance Improvements
+
+* **api:** more (small) simulation improvements ([#7132](https://github.com/Opentrons/opentrons/issues/7132)) ([6ad1477](https://github.com/Opentrons/opentrons/commit/6ad1477))
+* **api:** simulation optimizations ([#7124](https://github.com/Opentrons/opentrons/issues/7124)) ([d8ea3b2](https://github.com/Opentrons/opentrons/commit/d8ea3b2))
+
+
+
+
+
 # [4.0.0](https://github.com/Opentrons/opentrons/compare/v3.21.2...v4.0.0) (2020-11-20)
 
 

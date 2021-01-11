@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0-alpha.0) (2021-01-11)
+
+
+### Features
+
+* **protocol-designer:** enable multi step selection ([#7168](https://github.com/Opentrons/opentrons/issues/7168)) ([9d97186](https://github.com/Opentrons/opentrons/commit/9d97186))
+* **protocol-designer:** implement step selection banner ([#7159](https://github.com/Opentrons/opentrons/issues/7159)) ([777bc88](https://github.com/Opentrons/opentrons/commit/777bc88)), closes [#7081](https://github.com/Opentrons/opentrons/issues/7081)
+
+
+
+
+
 # [4.0.0](https://github.com/Opentrons/opentrons/compare/v3.21.2...v4.0.0) (2020-11-20)
 
 

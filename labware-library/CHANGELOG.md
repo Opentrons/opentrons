@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0-alpha.0) (2021-01-11)
+
+
+### Bug Fixes
+
+* **labware-library:** Render custom labware footprint diagram correctly ([#7111](https://github.com/Opentrons/opentrons/issues/7111)) ([33cec5b](https://github.com/Opentrons/opentrons/commit/33cec5b)), closes [#6983](https://github.com/Opentrons/opentrons/issues/6983)
+
+
+
+
+
 # [4.0.0](https://github.com/Opentrons/opentrons/compare/v3.21.2...v4.0.0) (2020-11-20)
 
 

@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0-alpha.0) (2021-01-11)
+
+
+### Bug Fixes
+
+* **api:** bump y max bounds to match robot geometry ([#7140](https://github.com/Opentrons/opentrons/issues/7140)) ([85b3d6b](https://github.com/Opentrons/opentrons/commit/85b3d6b)), closes [#6886](https://github.com/Opentrons/opentrons/issues/6886)
+* **api:** ensure exact delay floats are preserved in command log ([#7078](https://github.com/Opentrons/opentrons/issues/7078)) ([8ebb2dc](https://github.com/Opentrons/opentrons/commit/8ebb2dc)), closes [#7066](https://github.com/Opentrons/opentrons/issues/7066)
+* **api:** fixed `axis` variable renaming in final `driver_3_0.home` block of code ([#7015](https://github.com/Opentrons/opentrons/issues/7015)) ([65abcb1](https://github.com/Opentrons/opentrons/commit/65abcb1))
+* **api:** get correct instrument max height ([#7095](https://github.com/Opentrons/opentrons/issues/7095)) ([074f222](https://github.com/Opentrons/opentrons/commit/074f222))
+* **api:** Labware.__hash__ fix ([#7023](https://github.com/Opentrons/opentrons/issues/7023)) ([cf4034c](https://github.com/Opentrons/opentrons/commit/cf4034c)), closes [#6992](https://github.com/Opentrons/opentrons/issues/6992)
+* **api:** Specify correct channels for a paired pipette during pick up tip ([#6903](https://github.com/Opentrons/opentrons/issues/6903)) ([047a909](https://github.com/Opentrons/opentrons/commit/047a909))
+* **app:** prompt whether to replace pipette after detach ([#7025](https://github.com/Opentrons/opentrons/issues/7025)) ([dfa92c3](https://github.com/Opentrons/opentrons/commit/dfa92c3))
+* **build:** proper prod pypi deploys ([#7080](https://github.com/Opentrons/opentrons/issues/7080)) ([ace49be](https://github.com/Opentrons/opentrons/commit/ace49be)), closes [#7049](https://github.com/Opentrons/opentrons/issues/7049)
+* **labware-library:** Render custom labware footprint diagram correctly ([#7111](https://github.com/Opentrons/opentrons/issues/7111)) ([33cec5b](https://github.com/Opentrons/opentrons/commit/33cec5b)), closes [#6983](https://github.com/Opentrons/opentrons/issues/6983)
+* **notify-server:** fix errors in readme. ([#7176](https://github.com/Opentrons/opentrons/issues/7176)) ([986cb24](https://github.com/Opentrons/opentrons/commit/986cb24))
+* **protocol-designer:** fix lastModified when exporting ([#7024](https://github.com/Opentrons/opentrons/issues/7024)) ([50096cd](https://github.com/Opentrons/opentrons/commit/50096cd)), closes [#6636](https://github.com/Opentrons/opentrons/issues/6636)
+* **protocol-designer:** include custom tiprack defs... ([#7099](https://github.com/Opentrons/opentrons/issues/7099)) ([b98e621](https://github.com/Opentrons/opentrons/commit/b98e621)), closes [#6875](https://github.com/Opentrons/opentrons/issues/6875)
+* **protocol-designer:** skip 10000s of redundant state updates ([#7053](https://github.com/Opentrons/opentrons/issues/7053)) ([f2d5cb2](https://github.com/Opentrons/opentrons/commit/f2d5cb2))
+* **robot-server:** do not update state machine for tiprack select ([#7190](https://github.com/Opentrons/opentrons/issues/7190)) ([f2fc9f5](https://github.com/Opentrons/opentrons/commit/f2fc9f5))
+* **robot-server:** health endpoint tavern test didn't actually perform validation of response. ([#7186](https://github.com/Opentrons/opentrons/issues/7186)) ([07ea7ff](https://github.com/Opentrons/opentrons/commit/07ea7ff))
+* **robot-server:** ProtocolManager expects a ThreadManager and not a SynchronousAdapter. ([#7175](https://github.com/Opentrons/opentrons/issues/7175)) ([c0c9225](https://github.com/Opentrons/opentrons/commit/c0c9225))
+
+
+### Features
+
+* **api:** add aspirate handling to protocol engine ([#7191](https://github.com/Opentrons/opentrons/issues/7191)) ([18bfdea](https://github.com/Opentrons/opentrons/commit/18bfdea))
+* **api:** add deck and deck fixture loading to ProtocolEngine factory ([#7031](https://github.com/Opentrons/opentrons/issues/7031)) ([509b7b7](https://github.com/Opentrons/opentrons/commit/509b7b7))
+* **api:** add drop tip command to engine ([#7034](https://github.com/Opentrons/opentrons/issues/7034)) ([2922158](https://github.com/Opentrons/opentrons/commit/2922158)), closes [#6596](https://github.com/Opentrons/opentrons/issues/6596)
+* **api:** add move-to-well to protocol engine ([#6943](https://github.com/Opentrons/opentrons/issues/6943)) ([779acb4](https://github.com/Opentrons/opentrons/commit/779acb4))
+* **api:** add pick up tip handling to protocol_engine ([#6985](https://github.com/Opentrons/opentrons/issues/6985)) ([3b511f4](https://github.com/Opentrons/opentrons/commit/3b511f4)), closes [#6595](https://github.com/Opentrons/opentrons/issues/6595)
+* **api:** fast instrument simulation ([#7114](https://github.com/Opentrons/opentrons/issues/7114)) ([384ecad](https://github.com/Opentrons/opentrons/commit/384ecad))
+* **app:** allow custom tiprack selection in deck cal & pipette offset cal ([#7155](https://github.com/Opentrons/opentrons/issues/7155)) ([c8fc9f2](https://github.com/Opentrons/opentrons/commit/c8fc9f2)), closes [#7087](https://github.com/Opentrons/opentrons/issues/7087)
+* **app:** Allow Z jog in save-xy-point ([#7117](https://github.com/Opentrons/opentrons/issues/7117)) ([50865f0](https://github.com/Opentrons/opentrons/commit/50865f0)), closes [#7094](https://github.com/Opentrons/opentrons/issues/7094)
+* **app:** track deck & pipette offset cal tiprack selection ([#7205](https://github.com/Opentrons/opentrons/issues/7205)) ([b2bfec5](https://github.com/Opentrons/opentrons/commit/b2bfec5)), closes [#7147](https://github.com/Opentrons/opentrons/issues/7147)
+* **chore:** remove e2e tests from travis ([#7033](https://github.com/Opentrons/opentrons/issues/7033)) ([8a5c159](https://github.com/Opentrons/opentrons/commit/8a5c159)), closes [#7032](https://github.com/Opentrons/opentrons/issues/7032)
+* **protocol designer:** bump pd version for hotfix release ([#6896](https://github.com/Opentrons/opentrons/issues/6896)) ([2ba7e1f](https://github.com/Opentrons/opentrons/commit/2ba7e1f))
+* **protocol-designer:** add "batch edit" feature flag ([#7079](https://github.com/Opentrons/opentrons/issues/7079)) ([350be43](https://github.com/Opentrons/opentrons/commit/350be43)), closes [#7058](https://github.com/Opentrons/opentrons/issues/7058)
+* **protocol-designer:** add labware to modules allowlists ([#6901](https://github.com/Opentrons/opentrons/issues/6901)) ([65792d9](https://github.com/Opentrons/opentrons/commit/65792d9)), closes [#6876](https://github.com/Opentrons/opentrons/issues/6876) [#6860](https://github.com/Opentrons/opentrons/issues/6860)
+* **protocol-designer:** Add mount designation for matching pipettes ([#6959](https://github.com/Opentrons/opentrons/issues/6959)) ([ee8abac](https://github.com/Opentrons/opentrons/commit/ee8abac)), closes [#6783](https://github.com/Opentrons/opentrons/issues/6783)
+* **protocol-designer:** add pipette min to warnings ([#6974](https://github.com/Opentrons/opentrons/issues/6974)) ([cdea661](https://github.com/Opentrons/opentrons/commit/cdea661)), closes [#6493](https://github.com/Opentrons/opentrons/issues/6493)
+* **protocol-designer:** add redux infra for batch edit mode ([#7125](https://github.com/Opentrons/opentrons/issues/7125)) ([86eb355](https://github.com/Opentrons/opentrons/commit/86eb355)), closes [#7122](https://github.com/Opentrons/opentrons/issues/7122)
+* **protocol-designer:** Add spacing to file details page ([#6969](https://github.com/Opentrons/opentrons/issues/6969)) ([b6e8104](https://github.com/Opentrons/opentrons/commit/b6e8104)), closes [#6885](https://github.com/Opentrons/opentrons/issues/6885)
+* **protocol-designer:** clean up IngredientsList card ([#6949](https://github.com/Opentrons/opentrons/issues/6949)) ([44cc58f](https://github.com/Opentrons/opentrons/commit/44cc58f)), closes [#6834](https://github.com/Opentrons/opentrons/issues/6834)
+* **protocol-designer:** enable multi step selection ([#7168](https://github.com/Opentrons/opentrons/issues/7168)) ([9d97186](https://github.com/Opentrons/opentrons/commit/9d97186))
+* **protocol-designer:** implement step selection banner ([#7159](https://github.com/Opentrons/opentrons/issues/7159)) ([777bc88](https://github.com/Opentrons/opentrons/commit/777bc88)), closes [#7081](https://github.com/Opentrons/opentrons/issues/7081)
+* **protocol-designer:** increment numbers of added tip racks ([#6998](https://github.com/Opentrons/opentrons/issues/6998)) ([af3487e](https://github.com/Opentrons/opentrons/commit/af3487e)), closes [#5632](https://github.com/Opentrons/opentrons/issues/5632)
+* **protocol-designer:** remove dispense > air gap FF and bump PD version ([#6858](https://github.com/Opentrons/opentrons/issues/6858)) ([c48a600](https://github.com/Opentrons/opentrons/commit/c48a600)), closes [#6654](https://github.com/Opentrons/opentrons/issues/6654) [#6865](https://github.com/Opentrons/opentrons/issues/6865)
+* **protocol-designer:** reorder labware dropdown options ([#6940](https://github.com/Opentrons/opentrons/issues/6940)) ([7214f22](https://github.com/Opentrons/opentrons/commit/7214f22)), closes [#1449](https://github.com/Opentrons/opentrons/issues/1449)
+* **protocol-designer:** update no tip error copy ([#6789](https://github.com/Opentrons/opentrons/issues/6789)) ([268223c](https://github.com/Opentrons/opentrons/commit/268223c)), closes [#6712](https://github.com/Opentrons/opentrons/issues/6712)
+* **robot-server:** add hardware events publisher ([#7042](https://github.com/Opentrons/opentrons/issues/7042)) ([9943acc](https://github.com/Opentrons/opentrons/commit/9943acc))
+* **robot-server:** expose uvicorn logs ([#7118](https://github.com/Opentrons/opentrons/issues/7118)) ([571eb1e](https://github.com/Opentrons/opentrons/commit/571eb1e)), closes [#7097](https://github.com/Opentrons/opentrons/issues/7097)
+* **robot-server:** notifications service websocket subscriber client ([#7107](https://github.com/Opentrons/opentrons/issues/7107)) ([3986b0a](https://github.com/Opentrons/opentrons/commit/3986b0a)), closes [#6911](https://github.com/Opentrons/opentrons/issues/6911) [#6909](https://github.com/Opentrons/opentrons/issues/6909)
+* **shared-data:** add default tipracks to each pipette name spec ([#7108](https://github.com/Opentrons/opentrons/issues/7108)) ([757ca85](https://github.com/Opentrons/opentrons/commit/757ca85))
+
+
+### Performance Improvements
+
+* **api:** more (small) simulation improvements ([#7132](https://github.com/Opentrons/opentrons/issues/7132)) ([6ad1477](https://github.com/Opentrons/opentrons/commit/6ad1477))
+* **api:** simulation optimizations ([#7124](https://github.com/Opentrons/opentrons/issues/7124)) ([d8ea3b2](https://github.com/Opentrons/opentrons/commit/d8ea3b2))
+
+
+
+
+
 # [4.0.0](https://github.com/Opentrons/opentrons/compare/v3.21.2...v4.0.0) (2020-11-20)
 
 ### Bug Fixes
