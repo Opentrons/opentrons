@@ -20,5 +20,8 @@
 
 .icon_right {
   margin-left: auto;
+}
+
+.toolbar_delete {
   width: 1.5rem;
 }

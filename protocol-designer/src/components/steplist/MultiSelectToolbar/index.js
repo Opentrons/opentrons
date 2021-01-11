@@ -44,11 +44,11 @@ const DeleteIcon = () => {
     placement: 'top',
   })
   return (
-    <div {...targetProps}>
+    <div {...targetProps} className={styles.icon_right}>
       <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
       <Icon
         name="delete"
-        className={cx(styles.toolbar_icon, styles.icon_right)}
+        className={cx(styles.toolbar_icon, styles.toolbar_delete)}
       />
     </div>
   )

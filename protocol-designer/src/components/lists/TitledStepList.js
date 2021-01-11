@@ -37,10 +37,6 @@ export type TitledListProps = {|
   selected?: boolean,
   /** set to true when TitledList is hovered (but not when its contents are hovered) */
   hovered?: boolean,
-  /** disables the whole TitledList if true */
-  disabled?: boolean,
-  /** appear disabled, but preserve collapsibility */
-  inert?: boolean,
   /** show checkbox icons if true */
   isMultiSelectMode?: boolean,
 |}
@@ -51,8 +47,6 @@ export type TitledListProps = {|
 export function TitledStepList(props: TitledListProps): React.Node {
   const {
     iconName,
-    disabled,
-    inert,
     'data-test': dataTest,
     onCollapseToggle,
     iconProps,
@@ -63,12 +57,12 @@ export function TitledStepList(props: TitledListProps): React.Node {
   } = props
   const collapsible = onCollapseToggle != null
 
-  const onClick = !disabled ? props.onClick : undefined
+  const onClick = props.onClick
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
   const handleCollapseToggle = (e: SyntheticMouseEvent<>) => {
-    if (onCollapseToggle && !disabled) {
+    if (onCollapseToggle) {
       e.stopPropagation()
       onCollapseToggle(e)
     }
@@ -79,9 +73,8 @@ export function TitledStepList(props: TitledListProps): React.Node {
   )
 
   const className = cx(styles.pd_titled_list, props.className, {
-    [styles.disabled]: disabled || inert,
-    [styles.titled_list_selected]: !disabled && props.selected,
-    [styles.hover_border]: !disabled && props.hovered,
+    [styles.titled_list_selected]: props.selected,
+    [styles.hover_border]: props.hovered,
   })
 
   const titleBarClass = cx(styles.step_title_bar, {
@@ -114,14 +107,7 @@ export function TitledStepList(props: TitledListProps): React.Node {
         {iconName && (
           <Icon {...iconProps} className={iconClass} name={iconName} />
         )}
-        <h3
-          className={cx(styles.title, {
-            [styles.title_enabled]: !(disabled || inert),
-            [styles.title_disabled]: disabled || inert,
-          })}
-        >
-          {props.title}
-        </h3>
+        <h3 className={styles.title}>{props.title}</h3>
         {collapsible && (
           <div
             onClick={handleCollapseToggle}
