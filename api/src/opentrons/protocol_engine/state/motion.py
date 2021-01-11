@@ -12,20 +12,11 @@ from opentrons.motion_planning import (
 )
 
 from .. import commands, errors
-from ..types import WellLocation
+from ..types import WellLocation, DeckLocation
 from .substore import Substore, CommandReactive
 from .labware import LabwareStore
 from .pipettes import PipetteStore
 from .geometry import GeometryStore
-
-
-@dataclass(frozen=True)
-class LocationData:
-    """Last used pipette, labware, and well."""
-
-    pipette_id: str
-    labware_id: str
-    well_name: str
 
 
 @dataclass(frozen=True)
@@ -42,7 +33,7 @@ class MotionState:
     _labware_store: LabwareStore
     _pipette_store: PipetteStore
     _geometry_store: GeometryStore
-    _current_location: Optional[LocationData]
+    _current_location: Optional[DeckLocation]
 
     def __init__(
         self,
@@ -56,13 +47,17 @@ class MotionState:
         self._geometry_store = geometry_store
         self._current_location = None
 
-    def get_current_location_data(self) -> Optional[LocationData]:
+    def get_current_deck_location(self) -> Optional[DeckLocation]:
         """Get the current pipette and deck location the protocol is at."""
         return self._current_location
 
-    def get_pipette_location(self, pipette_id: str) -> PipetteLocationData:
+    def get_pipette_location(
+        self,
+        pipette_id: str,
+        current_location: Optional[DeckLocation] = None,
+    ) -> PipetteLocationData:
         """Get the critical point of a pipette given the current location."""
-        current_loc = self.get_current_location_data()
+        current_loc = current_location or self.get_current_deck_location()
         pipette_data = self._pipette_store.state.get_pipette_data_by_id(
             pipette_id
         )
@@ -92,10 +87,11 @@ class MotionState:
         well_location: Optional[WellLocation],
         origin: Point,
         origin_cp: Optional[CriticalPoint],
-        max_travel_z: float
+        max_travel_z: float,
+        current_location: Optional[DeckLocation] = None,
     ) -> List[Waypoint]:
         """Get the movement waypoints from an origin to a given location."""
-        location = self.get_current_location_data()
+        location = current_location or self.get_current_deck_location()
         center_dest = self._labware_store.state.get_labware_has_quirk(
             labware_id,
             "centerMultichannelOnWells",
@@ -127,6 +123,7 @@ class MotionState:
                 get_all_labware_highest_z()
 
         try:
+            # TODO(mc, 2021-01-08): inject `get_waypoints` via constructor
             return get_waypoints(
                 move_type=move_type,
                 origin=origin,
@@ -172,7 +169,7 @@ class MotionStore(Substore[MotionState], CommandReactive):
                 commands.DropTipResult,
             ),
         ):
-            self._state._current_location = LocationData(
+            self._state._current_location = DeckLocation(
                 pipette_id=command.request.pipetteId,
                 labware_id=command.request.labwareId,
                 well_name=command.request.wellName,

@@ -1,13 +1,13 @@
 """Tests for equipment state in the protocol_engine state store."""
 import pytest
 from datetime import datetime
-from opentrons.protocol_engine import StateStore, commands as cmd
-from opentrons.protocol_engine.state import LocationData
+
+from opentrons.protocol_engine import commands as cmd, StateStore, DeckLocation
 
 
 def test_initial_location(store: StateStore) -> None:
     """get_current_location should return None initially."""
-    assert store.motion.get_current_location_data() is None
+    assert store.motion.get_current_deck_location() is None
 
 
 @pytest.mark.parametrize("req,res", [
@@ -53,7 +53,7 @@ def test_handles_move_to_well_result(
         )
 
     store.handle_command(command, "command-id")
-    assert store.motion.get_current_location_data() == LocationData(
+    assert store.motion.get_current_deck_location() == DeckLocation(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="B4"

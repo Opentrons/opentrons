@@ -34,3 +34,17 @@ class WellLocation:
 
     origin: WellOrigin = WellOrigin.TOP
     offset: Tuple[float, float, float] = (0, 0, 0)
+
+
+@dataclass(frozen=True)
+class DeckLocation:
+    """A symbolic reference to a location on the deck.
+
+    Specified as the pipette, labware, and well. A `DeckLocation` may be
+    combined with a `WellLocation` to produce an absolute position in deck
+    coordinates.
+    """
+
+    pipette_id: str
+    labware_id: str
+    well_name: str

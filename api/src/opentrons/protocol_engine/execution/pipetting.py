@@ -2,6 +2,7 @@
 from opentrons.hardware_control.api import API as HardwareAPI
 
 from ..state import StateView
+from ..types import DeckLocation, WellLocation, WellOrigin
 from .movement import MovementHandler
 
 
@@ -102,3 +103,51 @@ class PipettingHandler:
             # TODO(mc, 2020-11-12): include this parameter in the request
             home_after=True
         )
+
+    async def aspirate(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+        volume: float,
+    ) -> float:
+        """Aspirate liquid from a well."""
+        # get mount and config data from state and hardware controller
+        hw_pipette = self._state.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware.attached_instruments
+        )
+
+        ready_to_aspirate = self._state.pipettes.get_is_ready_to_aspirate(
+            pipette_id=pipette_id,
+            pipette_config=hw_pipette.config,
+        )
+
+        current_location = None
+
+        if not ready_to_aspirate:
+            await self._movement_handler.move_to_well(
+                pipette_id=pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
+                well_location=WellLocation(origin=WellOrigin.TOP, offset=(0, 0, 0)),
+            )
+
+            await self._hardware.prepare_for_aspirate(mount=hw_pipette.mount)
+
+            # set our current deck location to the well now that we've made
+            # an intermediate move for the "prepare for aspirate" step
+            current_location = DeckLocation(pipette_id, labware_id, well_name)
+
+        await self._movement_handler.move_to_well(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+            current_location=current_location,
+        )
+
+        await self._hardware.aspirate(mount=hw_pipette.mount, volume=volume)
+
+        return volume
