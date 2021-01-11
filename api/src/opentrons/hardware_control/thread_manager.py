@@ -4,7 +4,7 @@ import threading
 import logging
 import asyncio
 import functools
-from typing import Generic, TypeVar, Any
+from typing import Generic, TypeVar, Any, Optional
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
 
@@ -105,7 +105,7 @@ class ThreadManager:
         self._loop = None
         self.managed_obj = None
         self.bridged_obj = None
-        self._sync_managed_obj = None
+        self._sync_managed_obj: Optional[SynchronousAdapter] = None
         is_running = threading.Event()
         self._is_running = is_running
 
@@ -159,8 +159,12 @@ class ThreadManager:
             loop.close()
 
     @property
-    def sync(self):
-        return self._sync_managed_obj
+    def sync(self) -> SynchronousAdapter:
+        # Why the ignore?
+        # While self._sync_managed_obj is initialized None, a failure to build
+        # the managed_obj and _sync_managed_obj is a catastrophic failure.
+        # All callers of this property assume it to be valid.
+        return self._sync_managed_obj  # type: ignore
 
     def __repr__(self):
         return '<ThreadManager>'

@@ -4,7 +4,9 @@ import pytest
 from robot_server.service.session.models import command_definitions
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.session.command_execution.command import \
-    CommandContent, CommandResult
+    CommandResult
+from robot_server.service.session.models.command import LoadLabwareRequest, \
+    LiquidRequest, TipRequest, SimpleCommandRequest, LoadInstrumentRequest
 from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types.live_protocol.command_executor\
     import LiveProtocolCommandExecutor
@@ -48,36 +50,38 @@ def command_executor(mock_command_interface, mock_state_store)\
 
 
 async def test_load_labware(command_executor, mock_command_interface):
-    expected_response = models.LoadLabwareResponse(labwareId="your labware",
-                                                   definition={},
-                                                   calibration=(1, 2, 3))
+    expected_response = models.LoadLabwareResponseData(
+        labwareId="your labware",
+        definition={},
+        calibration=(1, 2, 3))
 
     async def handler(command):
         return expected_response
 
     mock_command_interface.handle_load_labware.side_effect = handler
 
-    command = models.LoadLabwareRequest(location=1,
-                                        loadName="hello",
-                                        displayName="niceName",
-                                        version=1,
-                                        namespace="test")
+    command = models.LoadLabwareRequestData(location=1,
+                                            loadName="hello",
+                                            displayName="niceName",
+                                            version=1,
+                                            namespace="test")
     result = await command_executor.execute(
-        Command(content=CommandContent(
-            name=command_definitions.EquipmentCommand.load_labware,
-            data=command))
+        Command(
+            request=LoadLabwareRequest(
+                command=command_definitions.EquipmentCommand.load_labware,
+                data=command))
     )
 
     mock_command_interface.handle_load_labware.assert_called_once_with(command)
 
     assert result.result.data == expected_response
-    assert result.content == CommandContent(
-            name=command_definitions.EquipmentCommand.load_labware,
+    assert result.request == LoadLabwareRequest(
+            command=command_definitions.EquipmentCommand.load_labware,
             data=command)
 
 
 async def test_load_instrument(command_executor, mock_command_interface):
-    expected_response = models.LoadInstrumentResponse(
+    expected_response = models.LoadInstrumentResponseData(
         instrumentId="your instrument")
 
     async def handler(command):
@@ -85,11 +89,11 @@ async def test_load_instrument(command_executor, mock_command_interface):
 
     mock_command_interface.handle_load_instrument.side_effect = handler
 
-    command = models.LoadInstrumentRequest(instrumentName="p1000_single",
-                                           mount=Mount.left)
+    command = models.LoadInstrumentRequestData(instrumentName="p1000_single",
+                                               mount=Mount.left)
     result = await command_executor.execute(
-        Command(content=CommandContent(
-            name=command_definitions.EquipmentCommand.load_instrument,
+        Command(request=LoadInstrumentRequest(
+            command=command_definitions.EquipmentCommand.load_instrument,
             data=command))
     )
 
@@ -97,8 +101,8 @@ async def test_load_instrument(command_executor, mock_command_interface):
         command)
 
     assert result.result.data == expected_response
-    assert result.content == CommandContent(
-            name=command_definitions.EquipmentCommand.load_instrument,
+    assert result.request == LoadInstrumentRequest(
+            command=command_definitions.EquipmentCommand.load_instrument,
             data=command)
 
 
@@ -113,7 +117,7 @@ async def test_liquid_commands(command_executor, mock_command_interface,
     async def handler(command):
         return None
 
-    command_data = models.LiquidRequest(
+    command_data = models.LiquidRequestData(
         pipetteId="", labwareId="", wellId="",
         flowRate=2, volume=1, offsetFromBottom=2)
 
@@ -121,8 +125,8 @@ async def test_liquid_commands(command_executor, mock_command_interface,
     mock_command_interface.handle_dispense.side_effect = handler
 
     result = await command_executor.execute(
-        Command(content=CommandContent(
-            name=command_type,
+        Command(request=LiquidRequest(
+            command=command_type,
             data=command_data))
     )
 
@@ -130,8 +134,8 @@ async def test_liquid_commands(command_executor, mock_command_interface,
         command_data)
 
     assert result.result.data is None
-    assert result.content == CommandContent(
-            name=command_type,
+    assert result.request == LiquidRequest(
+            command=command_type,
             data=command_data)
 
 
@@ -146,15 +150,15 @@ async def test_tip_commands(command_executor, mock_command_interface,
     async def handler(command):
         return None
 
-    command_data = models.PipetteRequestBase(
+    command_data = models.PipetteRequestDataBase(
         pipetteId="", labwareId="", wellId="")
 
     mock_command_interface.handle_pick_up_tip.side_effect = handler
     mock_command_interface.handle_drop_tip.side_effect = handler
 
     result = await command_executor.execute(
-        Command(content=CommandContent(
-            name=command_type,
+        Command(request=TipRequest(
+            command=command_type,
             data=command_data))
     )
 
@@ -162,8 +166,8 @@ async def test_tip_commands(command_executor, mock_command_interface,
         command_data)
 
     assert result.result.data is None
-    assert result.content == CommandContent(
-            name=command_type,
+    assert result.request == TipRequest(
+            command=command_type,
             data=command_data)
 
 
@@ -175,16 +179,17 @@ def state_store_command_executor(command_executor) \
         return 23
 
     # Mock out the command handler map
-    command_executor._handler_map = {"test_command": handle_command}
+    command_executor._handler_map = {
+        command_definitions.ProtocolCommand.start_run: handle_command}
     return command_executor
 
 
 async def test_create_command_in_state_store(state_store_command_executor,
                                              mock_state_store):
-    c = Command(content=CommandContent(
-        name="test_command",
-        data=EmptyModel()
-    ))
+    c = Command(
+        request=SimpleCommandRequest(
+            command=command_definitions.ProtocolCommand.start_run,
+            data=EmptyModel()))
     await state_store_command_executor.execute(c)
 
     mock_state_store.handle_command_request.assert_called_once_with(c)
@@ -192,10 +197,10 @@ async def test_create_command_in_state_store(state_store_command_executor,
 
 async def test_command_result_in_state_store(state_store_command_executor,
                                              mock_state_store):
-    c = Command(content=CommandContent(
-        name="test_command",
-        data=EmptyModel()
-    ))
+    c = Command(request=SimpleCommandRequest(
+            command=command_definitions.ProtocolCommand.start_run,
+            data=EmptyModel()))
+
     await state_store_command_executor.execute(c)
 
     mock_state_store.handle_command_result.assert_called()

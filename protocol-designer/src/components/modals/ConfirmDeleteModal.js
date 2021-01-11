@@ -20,8 +20,8 @@ export type DeleteModalType =
 
 type Props = {|
   modalType: DeleteModalType,
-  onCancelClick: () => mixed,
-  onContinueClick: () => mixed,
+  onCancelClick: (event: ?SyntheticMouseEvent<>) => mixed,
+  onContinueClick: (event: SyntheticMouseEvent<>) => mixed,
 |}
 
 export function ConfirmDeleteModal(props: Props): React.Node {

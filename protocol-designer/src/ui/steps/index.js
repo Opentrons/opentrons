@@ -8,6 +8,7 @@ export {
   getSelectedStepTitleInfo,
   getSelectedStepId,
   getMultiSelectItemIds,
+  getMultiSelectLastSelected,
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
   getHoveredStepId,

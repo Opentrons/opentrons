@@ -107,6 +107,7 @@ def test_api_version_too_low(api_client):
         {
             "id": "OutdatedAPIVersion",
             "title": "Requested HTTP API version no longer supported",
+            "status": "400",
             "detail": (
                 "HTTP API version 1 is no longer supported. Please upgrade "
                 "your Opentrons App or other HTTP API client."
@@ -115,20 +116,18 @@ def test_api_version_too_low(api_client):
     ]
 
 
-def test_api_version_missing(api_client):
+@pytest.mark.parametrize(
+    argnames="path",
+    argvalues=[
+        "/sessions",
+        "/protocols",
+        "/system/time",
+        "/calibration/pipette_offset",
+        "/calibration/tip_length",
+    ])
+def test_api_version_missing(api_client, path):
     """It should reject any request without an version header."""
     del api_client.headers["Opentrons-Version"]
-    resp = api_client.get('/settings')
+    resp = api_client.get(path)
 
-    assert resp.status_code == HTTPStatus.BAD_REQUEST
-    assert resp.headers.get(API_VERSION_HEADER) == str(API_VERSION)
-    assert resp.json()["errors"] == [
-        {
-            "id": "InvalidAPIVersion",
-            "title": "Missing or invalid HTTP API version header",
-            "detail": (
-                "Requests must define the Opentrons-Version header. You may "
-                "need to upgrade your Opentrons App or other HTTP API client."
-            )
-        }
-    ]
+    assert resp.status_code == HTTPStatus.UNPROCESSABLE_ENTITY

@@ -37,7 +37,7 @@ import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibrat
 import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import {
-  INTENT_PIPETTE_OFFSET,
+  INTENT_RECALIBRATE_PIPETTE_OFFSET,
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
 } from '../CalibrationPanels'
 import { formatLastModified } from '../CalibrationPanels/utils'
@@ -143,7 +143,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
           shouldRecalibrateTipLength: !keepTipLength,
         },
         withIntent: keepTipLength
-          ? INTENT_PIPETTE_OFFSET
+          ? INTENT_RECALIBRATE_PIPETTE_OFFSET
           : INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
       })
       setCalBlockModalState(CAL_BLOCK_MODAL_CLOSED)
@@ -230,7 +230,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
           pipetteOffsetCalibration
             ? () =>
                 startPipetteOffsetCalibration({
-                  withIntent: INTENT_PIPETTE_OFFSET,
+                  withIntent: INTENT_RECALIBRATE_PIPETTE_OFFSET,
                 })
             : () => startPipetteOffsetPossibleTLC({ keepTipLength: true })
         }

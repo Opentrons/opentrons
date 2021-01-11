@@ -101,6 +101,8 @@ class CalibrationCheckSessionStatus(BaseModel):
     comparisonsByPipette: ComparisonStatePerPipette
     labware: List[RequiredLabware]
     activeTipRack: RequiredLabware
+    supportedCommands: List[Optional[str]] = Field(
+        ..., description="A list of supported commands for this user flow")
 
     class Config:
         arbitrary_types_allowed = True

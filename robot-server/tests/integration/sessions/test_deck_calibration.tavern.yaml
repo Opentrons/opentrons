@@ -36,6 +36,7 @@ stages:
             currentStep: sessionStarted
             instrument: !anydict
             labware: !anylist
+            supportedCommands: !anylist
 
   - name: Load labware
     request: &post_command
@@ -44,7 +45,8 @@ stages:
       json:
         data:
           command: calibration.loadLabware
-          data: {}
+          data:
+            tiprackDefinition: !include fixture_tiprack_300_ul.json
     response:
       status_code: 200
   - name: Check the effect of command

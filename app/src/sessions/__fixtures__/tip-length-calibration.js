@@ -29,9 +29,10 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
   instrument: {
     model: 'fake_pipette_model',
     name: 'fake_pipette_name',
-    tip_length: 42,
+    tipLength: 42,
     mount: 'right',
     serial: 'fake serial 2',
+    defaultTipracks: [],
   },
   currentStep: 'labwareLoaded',
   labware: [mockTipLengthTipRack, mockTipLengthCalBlock],

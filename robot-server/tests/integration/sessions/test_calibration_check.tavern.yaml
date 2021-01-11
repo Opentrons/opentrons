@@ -47,6 +47,8 @@ stages:
             activeTipRack: !anydict
             labware: !anylist
             comparisonsByPipette: !anydict
+            supportedCommands: !anylist
+
 
   - name: Load labware
     request: &post_command

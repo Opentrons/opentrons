@@ -43,6 +43,7 @@
     "redux-actions": "2.2.1",
     "redux-thunk": "2.2.0",
     "reselect": "4.0.0",
+    "ua-parser-js": "^0.7.23",
     "uuid": "3.3.2",
     "yup": "0.26.6"
   }

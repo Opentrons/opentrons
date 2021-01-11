@@ -13,5 +13,5 @@ class CommandExecutor:
         :raises: SessionCommandException
         """
         raise UnsupportedCommandException(
-            f"'{command.content.name}' is not supported"
+            f"'{command.request.command}' is not supported"
         )

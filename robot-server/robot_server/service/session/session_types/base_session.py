@@ -64,20 +64,17 @@ class BaseSession(ABC):
         pass
 
     async def execute_command(self, command: command_models.RequestTypes) -> \
-            command_models.SessionCommand:
+            command_models.ResponseTypes:
         """Execute a command."""
-        command_obj = create_command(command.command,
-                                     command.data)
+        command_obj = create_command(command)
         command_result = await self.command_executor.execute(command_obj)
 
-        return command_models.SessionCommand(
-            id=command_obj.meta.identifier,
-            data=command.data,
-            command=command.command,
+        return command.make_response(
+            identifier=command_obj.meta.identifier,
             status=command_result.result.status,
-            createdAt=command_obj.meta.created_at,
-            startedAt=command_result.result.started_at,
-            completedAt=command_result.result.completed_at,
+            created_at=command_obj.meta.created_at,
+            started_at=command_result.result.started_at,
+            completed_at=command_result.result.completed_at,
             result=command_result.result.data,
         )
 

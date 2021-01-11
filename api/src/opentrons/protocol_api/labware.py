@@ -98,6 +98,32 @@ class Well:
     def diameter(self) -> Optional[float]:
         return self._geometry.diameter
 
+    @property  # type: ignore
+    @requires_version(2, 9)
+    def length(self) -> Optional[float]:
+        """
+        The length of a well, if the labware has
+        square wells.
+        """
+        return self._geometry._length
+
+    @property  # type: ignore
+    @requires_version(2, 9)
+    def width(self) -> Optional[float]:
+        """
+        The width of a well, if the labware has
+        square wells.
+        """
+        return self._geometry._width
+
+    @property  # type: ignore
+    @requires_version(2, 9)
+    def depth(self) -> float:
+        """
+        The depth of a well in a labware.
+        """
+        return self._geometry._depth
+
     @property
     def display_name(self):
         return self._impl.get_display_name()

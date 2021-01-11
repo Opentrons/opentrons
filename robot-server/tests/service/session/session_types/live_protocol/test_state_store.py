@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from opentrons import types
 
-from robot_server.service.session.models import command_definitions
+from robot_server.service.session.models import command_definitions as cmddef
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.session.models import command as models
 from robot_server.service.session.command_execution \
@@ -15,14 +15,16 @@ from robot_server.service.session.session_types.live_protocol.state_store \
 def test_handle_command_request():
     store = StateStore()
     command = create_command(
-        name=command_definitions.EquipmentCommand.load_labware,
-        data=models.LoadLabwareRequest(
-            location=1,
-            loadName="labware-load-name",
-            displayName="labware display name",
-            namespace="opentrons test",
-            version=1,
-        ),
+        request=models.LoadLabwareRequest(
+            command=cmddef.EquipmentCommand.load_labware,
+            data=models.LoadLabwareRequestData(
+                location=1,
+                loadName="labware-load-name",
+                displayName="labware display name",
+                namespace="opentrons test",
+                version=1,
+            ),
+        )
     )
     store.handle_command_request(command)
 
@@ -33,14 +35,16 @@ def test_store_has_handle_command_response_method():
     with patch.object(StateStore, "handle_load_labware"):
         store = StateStore()
         command = create_command(
-            name=command_definitions.EquipmentCommand.load_labware,
-            data=models.LoadLabwareRequest(
-                location=1,
-                loadName="labware-load-name",
-                displayName="labware display name",
-                namespace="opentrons test",
-                version=1,
-            ),
+            request=models.LoadLabwareRequest(
+                command=cmddef.EquipmentCommand.load_labware,
+                data=models.LoadLabwareRequestData(
+                    location=1,
+                    loadName="labware-load-name",
+                    displayName="labware display name",
+                    namespace="opentrons test",
+                    version=1,
+                ),
+            )
         )
         command_result = CommandResult(
             started_at=command.meta.created_at,
@@ -54,19 +58,34 @@ def test_store_has_handle_command_response_method():
 
 
 @pytest.mark.parametrize(
-    argnames="command_name, handler",
+    argnames="command_request, handler",
     argvalues=[[
-                command_definitions.EquipmentCommand.load_labware,
+                models.LoadLabwareRequest(
+                    command=cmddef.EquipmentCommand.load_labware,
+                    data=models.LoadLabwareRequestData(
+                        location=1,
+                        loadName="a",
+                        displayName="a",
+                        namespace="a",
+                        version=1
+                    )
+                ),
                 "handle_load_labware"],
                [
-                command_definitions.EquipmentCommand.load_instrument,
+                models.LoadInstrumentRequest(
+                    command=cmddef.EquipmentCommand.load_instrument,
+                    data=models.LoadInstrumentRequestData(
+                        instrumentName="p50_multi",
+                        mount=Mount.left,
+                    )
+                ),
                 "handle_load_instrument"]]
 )
-def test_command_result_state_handler(command_name, handler):
+def test_command_result_state_handler(command_request, handler):
 
     with patch.object(StateStore, handler) as handler_mock:
         store = StateStore()
-        command = create_command(name=command_name, data=None)
+        command = create_command(request=command_request)
         command_result = CommandResult(
             started_at=command.meta.created_at,
             completed_at=command.meta.created_at,
@@ -77,21 +96,24 @@ def test_command_result_state_handler(command_name, handler):
 
 def test_load_labware_update():
     store = StateStore()
-    labware = command_definitions.EquipmentCommand.load_labware
-    command = create_command(name=labware,
-                             data=models.LoadLabwareRequest(
-                                    location=1,
-                                    loadName="labware-load-name",
-                                    displayName="labware display name",
-                                    namespace="opentrons test",
-                                    version=1,
-                                    ))
+    command = create_command(
+        request=models.LoadLabwareRequest(
+            command=cmddef.EquipmentCommand.load_labware,
+            data=models.LoadLabwareRequestData(
+                location=1,
+                loadName="labware-load-name",
+                displayName="labware display name",
+                namespace="opentrons test",
+                version=1,
+            ))
+    )
     command_result = CommandResult(
         started_at=command.meta.created_at,
         completed_at=command.meta.created_at,
-        data=models.LoadLabwareResponse(labwareId="1234",
-                                        definition={"myLabware": "definition"},
-                                        calibration=(1, 2, 3)))
+        data=models.LoadLabwareResponseData(
+            labwareId="1234",
+            definition={"myLabware": "definition"},
+            calibration=(1, 2, 3)))
     assert store.get_labware_by_id(command_result.data.labwareId) is None
     store.handle_command_result(command, command_result)
     assert store.get_labware_by_id(command_result.data.labwareId) == \
@@ -102,20 +124,22 @@ def test_load_labware_update():
 
 def test_load_instrument_update():
     store = StateStore()
-    instrument = command_definitions.EquipmentCommand.load_instrument
-    command = create_command(name=instrument,
-                             data=models.LoadInstrumentRequest(
-                                 instrumentName='p10_single',
-                                 mount=Mount.left)
-                             )
+    command = create_command(
+        request=models.LoadInstrumentRequest(
+            command=cmddef.EquipmentCommand.load_instrument,
+            data=models.LoadInstrumentRequestData(
+                instrumentName='p10_single',
+                mount=Mount.left)
+        )
+    )
     command_result = CommandResult(
         started_at=command.meta.created_at,
         completed_at=command.meta.created_at,
-        data=models.LoadInstrumentResponse(instrumentId="1234"))
+        data=models.LoadInstrumentResponseData(instrumentId="1234"))
 
     assert store.get_instrument_by_id(command_result.data.instrumentId) is None
     assert store.get_instrument_by_mount(
-        command.content.data.mount.to_hw_mount()
+        command.request.data.mount.to_hw_mount()
     ) is None
     store.handle_command_result(command, command_result)
 
@@ -125,5 +149,5 @@ def test_load_instrument_update():
     assert store.get_instrument_by_id(command_result.data.instrumentId) == \
            expected_instrument
     assert store.get_instrument_by_mount(
-        command.content.data.mount.to_hw_mount()
+        command.request.data.mount.to_hw_mount()
     ) == expected_instrument

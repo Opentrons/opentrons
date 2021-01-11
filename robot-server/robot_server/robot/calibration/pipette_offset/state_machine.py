@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Type
 
 from robot_server.service.session.models.command_definitions import \
     CommandDefinition, CalibrationCommand
@@ -108,6 +108,19 @@ class PipetteOffsetCalibrationStateMachine:
             states=set(s for s in POCState),
             transitions=PIP_OFFSET_CAL_TRANSITIONS
         )
+        self._state = POCState
+        self._current_state = POCState.sessionStarted
+
+    @property
+    def state(self) -> Type[POCState]:
+        return self._state
+
+    @property
+    def current_state(self) -> POCState:
+        return self._current_state
+
+    def set_state(self, state: POCState):
+        self._current_state = state
 
     def get_next_state(self, from_state: POCState, command: CommandDefinition):
         next_state = self._state_machine.get_next_state(from_state, command)
@@ -123,6 +136,19 @@ class PipetteOffsetWithTipLengthStateMachine:
             states=set(s for s in POWTState),
             transitions=PIP_OFFSET_WITH_TL_TRANSITIONS,
         )
+        self._state = POWTState
+        self._current_state = POWTState.sessionStarted
+
+    @property
+    def state(self) -> Type[POWTState]:
+        return self._state
+
+    @property
+    def current_state(self) -> POWTState:
+        return self._current_state
+
+    def set_state(self, state: POWTState):
+        self._current_state = state
 
     def get_next_state(
             self, from_state: POWTState, command: CommandDefinition):

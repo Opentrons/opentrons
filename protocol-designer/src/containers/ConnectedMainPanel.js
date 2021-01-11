@@ -12,6 +12,7 @@ import { Hints } from '../components/Hints'
 import { LiquidPlacementModal } from '../components/LiquidPlacementModal.js'
 import { LabwareSelectionModal } from '../components/LabwareSelectionModal'
 import { StepEditForm } from '../components/StepEditForm'
+import { StepSelectionBanner } from '../components/StepSelectionBanner'
 import { TimelineAlerts } from '../components/alerts/TimelineAlerts'
 
 import { getSelectedTerminalItemId } from '../ui/steps'
@@ -45,6 +46,7 @@ function MainPanelComponent(props: Props) {
             <TimelineAlerts />
             <Hints />
             {startTerminalItemSelected && <LabwareSelectionModal />}
+            <StepSelectionBanner />
             <StepEditForm />
             {startTerminalItemSelected && ingredSelectionMode && (
               <LiquidPlacementModal />

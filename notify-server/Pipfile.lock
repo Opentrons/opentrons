@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3d0bec4df82ac37e64314a71110a5df214213548d4083159f729a29c7dcc7ea8"
+            "sha256": "2bbe0011067a6ca7af45fe3b92abfdbfed3fd4b423beba695384144045bc5a09"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -91,11 +91,8 @@
             "path": "./../api"
         },
         "opentrons-shared-data": {
-            "hashes": [
-                "sha256:47a34843aa11e0e1e9211de62309dd9668045427135bf3d962cc5e61e18c793e"
-            ],
-            "markers": "python_version >= '3.7'",
-            "version": "==3.21.2"
+            "editable": true,
+            "path": "./../shared-data/python"
         },
         "pydantic": {
             "hashes": [

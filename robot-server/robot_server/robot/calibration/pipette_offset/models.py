@@ -14,6 +14,8 @@ class PipetteOffsetCalibrationSessionStatus(BaseModel):
     shouldPerformTipLength: bool =\
         Field(None, description="Does tip length calibration data exist for "
                                 "this pipette and tip rack combination")
+    supportedCommands: List[Optional[str]] = Field(
+        ..., description="A list of supported commands for this user flow")
     nextSteps: Optional[NextSteps] =\
         Field(None, description="Next Available Steps in Session")
 

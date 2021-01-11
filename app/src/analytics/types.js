@@ -122,3 +122,8 @@ export type TipLengthStartedAnalyticsAction = {|
 export type AnalyticsTriggerAction =
   | PipetteOffsetStartedAnalyticsAction
   | TipLengthStartedAnalyticsAction
+
+export type SessionInstrumentAnalyticsData = {|
+  sessionType: string,
+  pipetteModel: string,
+|}

@@ -2,6 +2,7 @@
 import type {
   SessionCommandParams,
   SessionType,
+  SessionCommandString,
   CalibrationSessionStep,
   CalibrationLabware,
   CalibrationCheckInstrument,
@@ -11,10 +12,13 @@ import type {
 import typeof {
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
   INTENT_TIP_LENGTH_IN_PROTOCOL,
-  INTENT_PIPETTE_OFFSET,
+  INTENT_CALIBRATE_PIPETTE_OFFSET,
+  INTENT_RECALIBRATE_PIPETTE_OFFSET,
   INTENT_DECK_CALIBRATION,
   INTENT_HEALTH_CHECK,
 } from './constants'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 /*
  * Intents capture the context in which a calibration flow is invoked.
@@ -35,13 +39,14 @@ import typeof {
 export type Intent =
   | INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL
   | INTENT_TIP_LENGTH_IN_PROTOCOL
-  | INTENT_PIPETTE_OFFSET
+  | INTENT_CALIBRATE_PIPETTE_OFFSET
+  | INTENT_RECALIBRATE_PIPETTE_OFFSET
   | INTENT_DECK_CALIBRATION
   | INTENT_HEALTH_CHECK
 export type PipetteOffsetIntent =
   | INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL
   | INTENT_TIP_LENGTH_IN_PROTOCOL
-  | INTENT_PIPETTE_OFFSET
+  | INTENT_CALIBRATE_PIPETTE_OFFSET
 export type TipLengthIntent =
   | INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL
   | INTENT_TIP_LENGTH_IN_PROTOCOL
@@ -65,4 +70,7 @@ export type CalibrationPanelProps = {|
   comparisonsByPipette?: CalibrationCheckComparisonByPipette | null,
   activePipette?: CalibrationCheckInstrument,
   intent?: Intent,
+  robotName?: string | null,
+  supportedCommands?: Array<SessionCommandString> | null,
+  defaultTipracks?: Array<LabwareDefinition2> | null,
 |}
