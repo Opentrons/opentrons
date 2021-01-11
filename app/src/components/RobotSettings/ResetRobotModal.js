@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
 
@@ -107,7 +106,7 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
             {buttons.filter(Boolean).map((button, index) => (
               <OutlineButton
                 {...button}
-                className={cx(styles.alert_modal_button, button.className)}
+                className={styles.alert_modal_button}
                 key={index}
               />
             ))}
