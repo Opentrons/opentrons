@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
 
@@ -16,8 +17,20 @@ import {
   resetConfig,
 } from '../../robot-admin'
 
-import { AlertModal, LabeledCheckbox } from '@opentrons/components'
+import {
+  AlertModal,
+  LabeledCheckbox,
+  Box,
+  Flex,
+  OutlineButton,
+  OVERFLOW_SCROLL,
+  JUSTIFY_FLEX_END,
+  DIRECTION_COLUMN,
+  SIZE_5,
+} from '@opentrons/components'
 import { Portal } from '../portal'
+
+import styles from './styles.css'
 
 import type { State, Dispatch } from '../../types'
 import type { ResetConfigRequest } from '../../robot-admin/types'
@@ -65,25 +78,41 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
 
   return (
     <Portal>
-      <AlertModal heading={TITLE} buttons={buttons} alertOverlay>
+      <AlertModal heading={TITLE} alertOverlay>
         <p>
           Warning! Clicking <strong>restart</strong> will erase your selected
           configurations and <strong>restart your robot</strong>. This cannot be
           undone
         </p>
-        {options.map(o => (
-          <LabeledCheckbox
-            label={o.name}
-            onChange={() => {
-              setResetOptions({ ...resetOptions, [o.id]: !resetOptions[o.id] })
-            }}
-            name={o.id}
-            value={resetOptions[o.id]}
-            key={o.id}
-          >
-            <p>{o.description}</p>
-          </LabeledCheckbox>
-        ))}
+        <Flex maxHeight={SIZE_5} flexDirection={DIRECTION_COLUMN}>
+          <Box overflow={OVERFLOW_SCROLL}>
+            {options.map(o => (
+              <LabeledCheckbox
+                label={o.name}
+                onChange={() => {
+                  setResetOptions({
+                    ...resetOptions,
+                    [o.id]: !resetOptions[o.id],
+                  })
+                }}
+                name={o.id}
+                value={resetOptions[o.id]}
+                key={o.id}
+              >
+                <p>{o.description}</p>
+              </LabeledCheckbox>
+            ))}
+          </Box>
+          <Flex justifyContent={JUSTIFY_FLEX_END}>
+            {buttons.filter(Boolean).map((button, index) => (
+              <OutlineButton
+                {...button}
+                className={cx(styles.alert_modal_button, button.className)}
+                key={index}
+              />
+            ))}
+          </Flex>
+        </Flex>
       </AlertModal>
     </Portal>
   )

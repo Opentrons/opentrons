@@ -92,3 +92,7 @@
 .confirm_start_deck_cal_modal {
   padding: 4rem 2rem;
 }
+
+.alert_modal_button {
+  margin-right: 1rem;
+}
