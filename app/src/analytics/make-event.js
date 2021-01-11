@@ -21,6 +21,7 @@ import {
   getAnalyticsHealthCheckData,
   getAnalyticsDeckCalibrationData,
   getAnalyticsSessionExitDetails,
+  getSessionInstrumentAnalyticsData,
 } from './selectors'
 
 import type { State, Action } from '../types'
@@ -311,24 +312,49 @@ export function makeEvent(
     }
 
     case Sessions.CREATE_SESSION_COMMAND: {
-      if (action.payload.command.command === sharedCalCommands.EXIT) {
-        const sessionDetails = getAnalyticsSessionExitDetails(
-          state,
-          action.payload.robotName,
-          action.payload.sessionId
-        )
-        return Promise.resolve(
-          sessionDetails
-            ? {
-                name: `${sessionDetails.sessionType}Exit`,
-                properties: {
-                  step: sessionDetails.step,
-                },
-              }
-            : null
-        )
-      } else {
-        return Promise.resolve(null)
+      switch (action.payload.command.command) {
+        case sharedCalCommands.EXIT:
+          const sessionDetails = getAnalyticsSessionExitDetails(
+            state,
+            action.payload.robotName,
+            action.payload.sessionId
+          )
+          return Promise.resolve(
+            sessionDetails
+              ? {
+                  name: `${sessionDetails.sessionType}Exit`,
+                  properties: {
+                    step: sessionDetails.step,
+                  },
+                }
+              : null
+          )
+        case sharedCalCommands.LOAD_LABWARE:
+          const commandData = action.payload.command.data
+          if (commandData) {
+            const instrData = getSessionInstrumentAnalyticsData(
+              state,
+              action.payload.robotName,
+              action.payload.sessionId
+            )
+            return Promise.resolve(
+              instrData
+                ? {
+                    name: `${instrData.sessionType}TipRackSelect`,
+                    properties: {
+                      pipetteModel: instrData.pipetteModel,
+                      tipRackDisplayName: commandData.tiprackDefinition
+                        ? commandData.tiprackDefinition.metadata.displayName
+                        : null,
+                    },
+                  }
+                : null
+            )
+          } else {
+            return Promise.resolve(null)
+          }
+        default:
+          return Promise.resolve(null)
       }
     }
 

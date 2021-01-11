@@ -372,5 +372,36 @@ describe('analytics events map', () => {
         properties: { step: 'session-step' },
       })
     })
+
+    it('sessions:CREATE_SESSION_COMMAND for loadLabware -> {type}Exit', () => {
+      const state = {}
+      const action = {
+        type: 'sessions:CREATE_SESSION_COMMAND',
+        payload: {
+          robotName: 'my-robot',
+          sessionId: 'seshid',
+          command: {
+            command: 'calibration.loadLabware',
+            data: {
+              tiprackDefinition: {
+                metadata: { displayName: 'some display name' },
+              },
+            },
+          },
+        },
+      }
+      selectors.getSessionInstrumentAnalyticsData.mockReturnValue({
+        sessionType: 'my-session-type',
+        pipetteModel: 'my-pipette-model',
+      })
+
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'my-session-typeTipRackSelect',
+        properties: {
+          pipetteModel: 'my-pipette-model',
+          tipRackDisplayName: 'some display name',
+        },
+      })
+    })
   })
 })

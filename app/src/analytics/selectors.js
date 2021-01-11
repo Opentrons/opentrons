@@ -2,6 +2,7 @@
 import { createSelector } from 'reselect'
 import pick from 'lodash/pick'
 import some from 'lodash/some'
+import * as Sessions from '../sessions'
 
 import {
   getProtocolType,
@@ -58,6 +59,7 @@ import type {
   CalibrationHealthCheckAnalyticsData,
   ModelsByMount,
   AnalyticsSessionExitDetails,
+  SessionInstrumentAnalyticsData,
 } from './types'
 
 type ProtocolDataSelector = OutputSelector<State, void, ProtocolAnalyticsData>
@@ -286,6 +288,26 @@ export function getAnalyticsSessionExitDetails(
     return {
       step: session.details.currentStep,
       sessionType: session.sessionType,
+    }
+  }
+  return null
+}
+
+export function getSessionInstrumentAnalyticsData(
+  state: State,
+  robotName: string,
+  sessionId: string
+): SessionInstrumentAnalyticsData | null {
+  const session = getRobotSessionById(state, robotName, sessionId)
+  if (session) {
+    const pipModel =
+      session.sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+        ? session.details.activePipette.model
+        : session.details.instrument.model
+
+    return {
+      sessionType: session.sessionType,
+      pipetteModel: pipModel,
     }
   }
   return null
