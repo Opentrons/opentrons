@@ -7,6 +7,7 @@
   text-decoration: none;
   padding-left: var(--list-padding-small);
   min-height: 3.5rem;
+  background-color: var(--c-white);
 }
 
 .title {
@@ -91,10 +92,8 @@
   border-top: var(--bd-light);
 }
 
-.hoverable {
-  &:hover {
-    @apply --outline-highlight;
-  }
+.hoverable:hover {
+  @apply --outline-highlight;
 }
 
 .hover_border {
