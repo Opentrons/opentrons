@@ -314,7 +314,7 @@ export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> 
         const isFieldValueIndeterminant = forms.some(
           form =>
             form[fieldName] !== firstFieldValue ||
-            (dependentField && !form[dependentField])
+            (dependentField && form[dependentField] !== true)
         )
 
         if (isFieldValueIndeterminant) {
