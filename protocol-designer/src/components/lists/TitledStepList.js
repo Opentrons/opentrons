@@ -2,14 +2,15 @@
 
 import * as React from 'react'
 import cx from 'classnames'
-import { type IconName, Icon } from '@opentrons/components'
+import { Icon } from '@opentrons/components'
 import styles from './styles.css'
+import type { IconName } from '@opentrons/components'
 
 export type Props = {|
   /** text of title */
   title: string,
-  /** optional icon left of the title */
-  iconName?: ?IconName,
+  /** icon left of the step */
+  iconName: IconName,
   /** props passed down to icon (`className` and `name` are ignored) */
   iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: mixed }>,
   /** optional data test id for the container */
