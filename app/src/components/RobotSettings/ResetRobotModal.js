@@ -23,7 +23,7 @@ import {
   Flex,
   Text,
   Icon,
-  OutlineButton,
+  SecondaryBtn,
   JUSTIFY_FLEX_END,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
@@ -31,10 +31,9 @@ import {
   FONT_SIZE_HEADER,
   FONT_WEIGHT_REGULAR,
   SPACING_2,
+  SIZE_2,
 } from '@opentrons/components'
 import { Portal } from '../portal'
-
-import styles from './styles.css'
 
 import type { State, Dispatch } from '../../types'
 import type { ResetConfigRequest } from '../../robot-admin/types'
@@ -71,14 +70,9 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
     if (resetRequestStatus === SUCCESS) closeModal()
   }, [resetRequestStatus, closeModal])
 
-  const buttons = [
-    { onClick: closeModal, children: 'close' },
-    {
-      onClick: triggerReset,
-      disabled: resetRequestStatus === PENDING,
-      children: 'restart',
-    },
-  ]
+  const CLOSE = 'close'
+  const RESTART = 'restart'
+  const PENDING_STATUS = resetRequestStatus === PENDING
 
   return (
     <Portal>
@@ -91,19 +85,22 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
             fontSize={FONT_SIZE_HEADER}
             fontWeight={FONT_WEIGHT_REGULAR}
           >
-            <Icon name="alert" width="2rem" marginRight={SPACING_2} />
+            <Icon name="alert" width={SIZE_2} marginRight={SPACING_2} />
             {TITLE}
           </Text>
         }
         footer={
           <Flex justifyContent={JUSTIFY_FLEX_END}>
-            {buttons.filter(Boolean).map((button, index) => (
-              <OutlineButton
-                {...button}
-                className={styles.alert_modal_button}
-                key={index}
-              />
-            ))}
+            <SecondaryBtn marginLeft={SPACING_2} onClick={closeModal}>
+              {CLOSE}
+            </SecondaryBtn>
+            <SecondaryBtn
+              marginLeft={SPACING_2}
+              onClick={triggerReset}
+              disabled={PENDING_STATUS}
+            >
+              {RESTART}
+            </SecondaryBtn>
           </Flex>
         }
       >
