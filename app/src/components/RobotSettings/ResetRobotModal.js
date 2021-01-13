@@ -17,15 +17,20 @@ import {
 } from '../../robot-admin'
 
 import {
-  AlertModal,
+  BaseModal,
   LabeledCheckbox,
   Box,
   Flex,
+  Text,
+  Icon,
   OutlineButton,
-  OVERFLOW_SCROLL,
   JUSTIFY_FLEX_END,
   DIRECTION_COLUMN,
-  SIZE_5,
+  DISPLAY_FLEX,
+  ALIGN_CENTER,
+  FONT_SIZE_HEADER,
+  FONT_WEIGHT_REGULAR,
+  SPACING_2,
 } from '@opentrons/components'
 import { Portal } from '../portal'
 
@@ -77,14 +82,38 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
 
   return (
     <Portal>
-      <AlertModal heading={TITLE} alertOverlay>
+      <BaseModal
+        header={
+          <Text
+            as="h2"
+            display={DISPLAY_FLEX}
+            alignItems={ALIGN_CENTER}
+            fontSize={FONT_SIZE_HEADER}
+            fontWeight={FONT_WEIGHT_REGULAR}
+          >
+            <Icon name="alert" width="2rem" marginRight={SPACING_2} />
+            {TITLE}
+          </Text>
+        }
+        footer={
+          <Flex justifyContent={JUSTIFY_FLEX_END}>
+            {buttons.filter(Boolean).map((button, index) => (
+              <OutlineButton
+                {...button}
+                className={styles.alert_modal_button}
+                key={index}
+              />
+            ))}
+          </Flex>
+        }
+      >
         <p>
           Warning! Clicking <strong>restart</strong> will erase your selected
           configurations and <strong>restart your robot</strong>. This cannot be
           undone
         </p>
-        <Flex maxHeight={SIZE_5} flexDirection={DIRECTION_COLUMN}>
-          <Box overflow={OVERFLOW_SCROLL}>
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <Box>
             {options.map(o => (
               <LabeledCheckbox
                 label={o.name}
@@ -102,17 +131,8 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
               </LabeledCheckbox>
             ))}
           </Box>
-          <Flex justifyContent={JUSTIFY_FLEX_END}>
-            {buttons.filter(Boolean).map((button, index) => (
-              <OutlineButton
-                {...button}
-                className={styles.alert_modal_button}
-                key={index}
-              />
-            ))}
-          </Flex>
         </Flex>
-      </AlertModal>
+      </BaseModal>
     </Portal>
   )
 }
