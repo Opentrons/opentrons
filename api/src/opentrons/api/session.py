@@ -587,7 +587,8 @@ class Session(RobotBusy):
                   user_message: str = None,
                   duration: float = None) -> None:
         log.info(f"Session.set_state state={state} "
-                 f"user_message={user_message} duration={duration}")
+                 f"user_message={user_message} duration={duration} "
+                 f"reason={reason}")
         if state not in VALID_STATES:
             raise ValueError(
                 'Invalid state: {0}. Valid states are: {1}'
