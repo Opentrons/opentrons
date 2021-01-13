@@ -720,7 +720,7 @@ class InstrumentContext(CommandPublisher):
                 Only set ``home_after=False`` if:
 
                 * You're using a GEN2 pipette, not a GEN1 pipette.
-                * You've tested ``home_after=False` extensively with your
+                * You've tested ``home_after=False`` extensively with your
                   particular pipette and your particular tips.
                 * You understand the risks described below.
 
@@ -744,7 +744,7 @@ class InstrumentContext(CommandPublisher):
             should never set ``home_after=False`` with a GEN1 pipette.
 
             Even on GEN2 pipettes, the motor can still skip. So, always
-            extensively test ``home_after=False` with your particular pipette
+            extensively test ``home_after=False`` with your particular pipette
             and your particular tips before relying on it.
 
         :returns: This instance
