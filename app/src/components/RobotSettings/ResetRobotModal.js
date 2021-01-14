@@ -19,13 +19,11 @@ import {
 import {
   BaseModal,
   LabeledCheckbox,
-  Box,
   Flex,
   Text,
   Icon,
   SecondaryBtn,
   JUSTIFY_FLEX_END,
-  DIRECTION_COLUMN,
   DISPLAY_FLEX,
   ALIGN_CENTER,
   FONT_SIZE_HEADER,
@@ -109,26 +107,22 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
           configurations and <strong>restart your robot</strong>. This cannot be
           undone
         </p>
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <Box>
-            {options.map(o => (
-              <LabeledCheckbox
-                label={o.name}
-                onChange={() => {
-                  setResetOptions({
-                    ...resetOptions,
-                    [o.id]: !resetOptions[o.id],
-                  })
-                }}
-                name={o.id}
-                value={resetOptions[o.id]}
-                key={o.id}
-              >
-                <p>{o.description}</p>
-              </LabeledCheckbox>
-            ))}
-          </Box>
-        </Flex>
+        {options.map(o => (
+          <LabeledCheckbox
+            label={o.name}
+            onChange={() => {
+              setResetOptions({
+                ...resetOptions,
+                [o.id]: !resetOptions[o.id],
+              })
+            }}
+            name={o.id}
+            value={resetOptions[o.id]}
+            key={o.id}
+          >
+            <p>{o.description}</p>
+          </LabeledCheckbox>
+        ))}
       </BaseModal>
     </Portal>
   )
