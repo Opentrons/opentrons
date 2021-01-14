@@ -201,3 +201,136 @@ export const getWellSelectionLabwareKey: Selector<
   rootSelector,
   (state: StepsState) => state.wellSelectionLabwareKey
 )
+
+type MultiSelectFieldName =
+  | 'aspirate_flowRate'
+  | 'aspirate_mmFromBottom'
+  | 'aspirate_wellOrder_first'
+  | 'aspirate_wellOrder_second'
+  | 'preWetTip'
+  | 'aspirate_mix_checkbox'
+  | 'aspirate_mix_volume'
+  | 'aspirate_mix_times'
+  | 'aspirate_delay_checkbox'
+  | 'aspirate_delay_seconds'
+  | 'aspirate_delay_mmFromBottom'
+  | 'aspirate_airGap_checkbox'
+  | 'aspirate_airGap_volume'
+  | 'aspirate_touchTip_checkbox'
+  | 'aspirate_touchTip_mmFromBottom'
+  | 'dispense_flowRate'
+  | 'dispense_mmFromBottom'
+  | 'dispense_wellOrder_first'
+  | 'dispense_wellOrder_second'
+  | 'dispense_mix_checkbox'
+  | 'dispense_mix_volume'
+  | 'dispense_mix_times'
+  | 'dispense_delay_checkbox'
+  | 'dispense_delay_seconds'
+  | 'dispense_delay_mmFromBottom'
+  | 'dispense_airGap_checkbox'
+  | 'dispense_airGap_volume'
+  | 'dispense_touchTip_checkbox'
+  | 'dispense_touchTip_mmFromBottom'
+  | 'blowout_checkbox'
+  | 'blowout_location'
+
+type MultiselectFieldValues = {
+  [fieldName: MultiSelectFieldName]: {|
+    value?: any,
+    isIndeterminate: boolean,
+  |},
+  ...,
+}
+
+const BATCH_EDIT_TRANSFER_FORM_FIELDS: Array<MultiSelectFieldName> = [
+  'aspirate_flowRate',
+  'aspirate_mmFromBottom',
+  'aspirate_wellOrder_first',
+  'aspirate_wellOrder_second',
+  'preWetTip',
+  'aspirate_mix_checkbox',
+  'aspirate_mix_volume',
+  'aspirate_mix_times',
+  'aspirate_delay_checkbox',
+  'aspirate_delay_seconds',
+  'aspirate_delay_mmFromBottom',
+  'aspirate_airGap_checkbox',
+  'aspirate_airGap_volume',
+  'aspirate_touchTip_checkbox',
+  'aspirate_touchTip_mmFromBottom',
+
+  'dispense_flowRate',
+  'dispense_mmFromBottom',
+  'dispense_wellOrder_first',
+  'dispense_wellOrder_second',
+  'dispense_mix_checkbox',
+  'dispense_mix_volume',
+  'dispense_mix_times',
+  'dispense_delay_checkbox',
+  'dispense_delay_seconds',
+  'dispense_delay_mmFromBottom',
+  'dispense_airGap_checkbox',
+  'dispense_airGap_volume',
+  'dispense_touchTip_checkbox',
+  'dispense_touchTip_mmFromBottom',
+
+  'blowout_checkbox',
+  'blowout_location',
+]
+
+const dependentFieldCheckboxMap: {
+  [MultiSelectFieldName]: MultiSelectFieldName,
+} = {
+  aspirate_mix_times: 'aspirate_mix_checkbox',
+  aspirate_mix_volume: 'aspirate_mix_checkbox',
+  aspirate_delay_seconds: 'aspirate_delay_checkbox',
+  aspirate_delay_mmFromBottom: 'aspirate_delay_checkbox',
+  aspirate_airGap_volume: 'aspirate_airGap_checkbox',
+  aspirate_touchTip_mmFromBottom: 'aspirate_touchTip_checkbox',
+  dispense_mix_times: 'dispense_mix_checkbox',
+  dispense_mix_volume: 'dispense_mix_checkbox',
+  dispense_delay_seconds: 'dispense_delay_checkbox',
+  dispense_delay_mmFromBottom: 'dispense_delay_checkbox',
+  dispense_airGap_volume: 'dispense_airGap_checkbox',
+  dispense_touchTip_mmFromBottom: 'dispense_touchTip_checkbox',
+  blowout_location: 'blowout_checkbox',
+}
+
+export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
+  stepFormSelectors.getSavedStepForms,
+  getMultiSelectItemIds,
+  (savedStepForms, multiSelectItemIds) => {
+    if (!multiSelectItemIds) return null
+    const forms = multiSelectItemIds.map(id => savedStepForms[id])
+    if (forms.some(form => form.stepType !== 'moveLiquid')) {
+      return null
+    }
+
+    return BATCH_EDIT_TRANSFER_FORM_FIELDS.reduce(
+      (acc: MultiselectFieldValues, fieldName: MultiSelectFieldName) => {
+        const firstFieldValue = forms[0][fieldName]
+        const dependentField = dependentFieldCheckboxMap[fieldName]
+        const isFieldValueIndeterminant = forms.some(
+          form =>
+            form[fieldName] !== firstFieldValue ||
+            (dependentField && form[dependentField] !== true)
+        )
+
+        if (isFieldValueIndeterminant) {
+          acc[fieldName] = {
+            isIndeterminate: true,
+          }
+          return acc
+        } else {
+          acc[fieldName] = {
+            value: firstFieldValue,
+            isIndeterminate: false,
+          }
+          return acc
+        }
+      },
+      {}
+    )
+  }
+)
