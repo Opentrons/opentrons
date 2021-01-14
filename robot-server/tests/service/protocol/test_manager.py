@@ -78,7 +78,6 @@ class TestCreate:
 
     @pytest.mark.parametrize(argnames="exception", argvalues=[
         errors.ProtocolIOException,
-        errors.ProtocolAnalysisException
     ])
     def test_create_raises(self,
                            exception,
