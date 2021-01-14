@@ -19,6 +19,13 @@ import {
   TERMINAL_ITEM_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
 } from './reducers'
+import {
+  getAspirateLabwareDisabledFields,
+  getDispenseLabwareDisabledFields,
+  getMultiAspiratePathDisabledFields,
+  getMultiDispensePathDisabledFields,
+  getPipetteDisabledFields,
+} from './utils'
 import type { FormData, StepIdType, StepType } from '../../form-types'
 import type { BaseState, Selector } from '../../types'
 
@@ -332,5 +339,102 @@ export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> 
       },
       {}
     )
+  }
+)
+
+const BATCH_EDIT_TRANSFER_FORM_FIELD_DISABLED_MAP = {
+  aspirate_flowRate: 'pipette',
+  aspirate_mmFromBottom: 'aspirate_labware',
+  aspirate_wellOrder_first: null,
+  aspirate_wellOrder_second: null,
+  preWetTip: null,
+  aspirate_mix_checkbox: ['pipette', 'path must not be n:1'],
+  aspirate_mix_volume: ['pipette', 'path must not be n:1'],
+  aspirate_mix_times: ['pipette', 'path must not be n:1'],
+  aspirate_delay_checkbox: 'aspirate_labware',
+  aspirate_delay_seconds: 'aspirate_labware',
+  aspirate_delay_mmFromBottom: 'aspirate_labware',
+  aspirate_airGap_checkbox: 'pipette',
+  aspirate_airGap_volume: 'pipette',
+  aspirate_touchTip_checkbox: null,
+  aspirate_touchTip_mmFromBottom: null,
+
+  dispense_flowRate: 'pipette',
+  dispense_mmFromBottom: 'dispense_labware',
+  dispense_wellOrder_first: null,
+  dispense_wellOrder_second: null,
+  dispense_mix_checkbox: ['pipette', 'path must not be 1:n'],
+  dispense_mix_volume: ['pipette', 'path must not be 1:n'],
+  dispense_mix_times: ['pipette', 'path must not be 1:n'],
+  dispense_delay_checkbox: 'dispense_labware',
+  dispense_delay_seconds: 'dispense_labware',
+  dispense_delay_mmFromBottom: 'dispense_labware',
+  dispense_airGap_checkbox: 'pipette',
+  dispense_airGap_volume: 'pipette',
+  dispense_touchTip_checkbox: null,
+  dispense_touchTip_mmFromBottom: null,
+
+  blowout_checkbox: 'path must not be 1:n',
+  blowout_location: 'path must not be 1:n',
+}
+
+type DisabledFields = {
+  [fieldName: string]: string,
+}
+export const getMultiselectDisabledFields: Selector<DisabledFields | null> = createSelector(
+  stepFormSelectors.getSavedStepForms,
+  getMultiSelectItemIds,
+  (savedStepForms, multiSelectItemIds) => {
+    if (!multiSelectItemIds) return null
+    const forms = multiSelectItemIds.map(id => savedStepForms[id])
+    if (forms.some(form => form.stepType !== 'moveLiquid')) {
+      return null
+    }
+    const {
+      pipettesDifferent,
+      aspirateLabwareDifferent,
+      dispenseLabwareDifferent,
+      includesMultiAspirate,
+      includesMultiDispense,
+    } = forms.reduce(
+      (acc, form) => ({
+        lastPipette: form.pipette,
+        lastAspirateLabware: form.aspirate_labware,
+        lastDispenseLabware: form.dispense_labware,
+        pipettesDifferent:
+          form.pipette !== acc.lastPipette || acc.pipettesDifferent,
+        aspirateLabwareDifferent:
+          form.aspirate_labware !== acc.lastAspirateLabware ||
+          acc.aspirateLabwareDifferent,
+        dispenseLabwareDifferent:
+          form.dispense_labware !== acc.lastDispenseLabware ||
+          acc.dispenseLabwareDifferent,
+        includesMultiAspirate:
+          form.path === 'multiAspirate' || acc.includesMultiAspirate,
+        includesMultiDispense:
+          form.path === 'multiDispense' || acc.includesMultiDispense,
+      }),
+      {
+        lastPipette: forms[0].pipette,
+        lastAspirateLabware: forms[0].aspirate_labware,
+        lastDispenseLabware: forms[0].dispense_labware,
+        pipettesDifferent: false,
+        aspirateLabwareDifferent: false,
+        dispenseLabwareDifferent: false,
+        includesMultiAspirate: false,
+        includesMultiDispense: false,
+      }
+    )
+
+    const disabledFields: DisabledFields = {
+      ...(pipettesDifferent && getPipetteDisabledFields()),
+      ...(aspirateLabwareDifferent && getAspirateLabwareDisabledFields()),
+      // $FlowIssue(sa, 2021-01-13): https://github.com/facebook/flow/issues/8186
+      ...(dispenseLabwareDifferent && getDispenseLabwareDisabledFields()),
+      ...(includesMultiAspirate && getMultiAspiratePathDisabledFields()),
+      ...(includesMultiDispense && getMultiDispensePathDisabledFields()),
+    }
+
+    return disabledFields
   }
 )

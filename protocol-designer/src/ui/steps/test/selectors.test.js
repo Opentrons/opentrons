@@ -1,5 +1,6 @@
 // @flow
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
+import { i18n } from '../../../localization'
 import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
@@ -16,6 +17,7 @@ import {
   getActiveItem,
   getMultiSelectLastSelected,
   getMultiSelectFieldValues,
+  getMultiselectDisabledFields,
 } from '../selectors'
 import { getMockMoveLiquidStep } from '../__fixtures__'
 
@@ -633,6 +635,212 @@ describe('getMultiSelectFieldValues', () => {
         blowout_location: {
           isIndeterminate: true,
         },
+      })
+    })
+  })
+})
+
+describe('getMultiSelectDisabledFields', () => {
+  let mockSavedStepForms
+  let mockmultiSelectItemIds
+
+  beforeEach(() => {
+    mockSavedStepForms = {
+      ...getMockMoveLiquidStep(),
+      // just doing this so the ids are not the exact same
+      another_move_liquid_step_id: {
+        ...getMockMoveLiquidStep().move_liquid_step_id,
+      },
+    }
+    mockmultiSelectItemIds = [
+      'move_liquid_step_id',
+      'another_move_liquid_step_id',
+    ]
+  })
+  it('should return null if any of the forms are not moveLiquid type', () => {
+    const savedStepForms = {
+      ...mockSavedStepForms,
+      another_move_liquid_step_id: {
+        ...mockSavedStepForms.another_move_liquid_step_id,
+        stepType: 'notMoveLiquid',
+      },
+    }
+    expect(
+      getMultiSelectFieldValues.resultFunc(
+        savedStepForms,
+        mockmultiSelectItemIds
+      )
+    ).toBe(null)
+  })
+
+  describe('when pipettes are different', () => {
+    let savedStepForms
+    beforeEach(() => {
+      savedStepForms = {
+        ...mockSavedStepForms,
+        another_move_liquid_step_id: {
+          ...mockSavedStepForms.another_move_liquid_step_id,
+          pipette: 'different_pipette_id',
+        },
+      }
+    })
+    it('should return fields being disabled with associated reasons', () => {
+      expect(
+        getMultiselectDisabledFields.resultFunc(
+          savedStepForms,
+          mockmultiSelectItemIds
+        )
+      ).toEqual({
+        aspirate_flowRate: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_flowRate.disabled.pipette-different'
+        ),
+        aspirate_airGap_checkbox: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_airGap_checkbox.disabled.pipette-different'
+        ),
+        aspirate_airGap_volume: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_airGap_volume.disabled.pipette-different'
+        ),
+        dispense_flowRate: i18n.t(
+          'tooltip.step_fields.batch_edit.dispense_flowRate.disabled.pipette-different'
+        ),
+        dispense_airGap_checkbox: i18n.t(
+          'tooltip.step_fields.batch_edit.dispense_airGap_checkbox.disabled.pipette-different'
+        ),
+        dispense_airGap_volume: i18n.t(
+          'tooltip.step_fields.batch_edit.dispense_airGap_volume.disabled.pipette-different'
+        ),
+      })
+    })
+  })
+  describe('when aspirate labware are different', () => {
+    let savedStepForms
+    beforeEach(() => {
+      savedStepForms = {
+        ...mockSavedStepForms,
+        another_move_liquid_step_id: {
+          ...mockSavedStepForms.another_move_liquid_step_id,
+          aspirate_labware: 'different_aspirate_labware',
+        },
+      }
+    })
+    it('should return fields being disabled with associated reasons', () => {
+      expect(
+        getMultiselectDisabledFields.resultFunc(
+          savedStepForms,
+          mockmultiSelectItemIds
+        )
+      ).toEqual({
+        aspirate_mmFromBottom: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_mmFromBottom.disabled.aspirate-labware-different'
+        ),
+        aspirate_delay_checkbox: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_delay_checkbox.disabled.aspirate-labware-different'
+        ),
+        aspirate_delay_seconds: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_delay_seconds.disabled.aspirate-labware-different'
+        ),
+        aspirate_delay_mmFromBottom: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_delay_mmFromBottom.disabled.aspirate-labware-different'
+        ),
+      })
+    })
+  })
+  describe('when dispense labware are different', () => {
+    let savedStepForms
+    beforeEach(() => {
+      savedStepForms = {
+        ...mockSavedStepForms,
+        another_move_liquid_step_id: {
+          ...mockSavedStepForms.another_move_liquid_step_id,
+          dispense_labware: 'different_dispense_labware',
+        },
+      }
+    })
+    it('should return fields being disabled with associated reasons', () => {
+      expect(
+        getMultiselectDisabledFields.resultFunc(
+          savedStepForms,
+          mockmultiSelectItemIds
+        )
+      ).toEqual({
+        dispense_mmFromBottom: i18n.t(
+          'tooltip.step_fields.batch_edit.dispense_mmFromBottom.disabled.dispense-labware-different'
+        ),
+        dispense_delay_checkbox: i18n.t(
+          'tooltip.step_fields.batch_edit.dispense_delay_checkbox.disabled.dispense-labware-different'
+        ),
+        dispense_delay_seconds: i18n.t(
+          'tooltip.step_fields.batch_edit.dispense_delay_seconds.disabled.dispense-labware-different'
+        ),
+        dispense_delay_mmFromBottom: i18n.t(
+          'tooltip.step_fields.batch_edit.dispense_delay_mmFromBottom.disabled.dispense-labware-different'
+        ),
+      })
+    })
+  })
+  describe('when a form includes a multi aspirate path', () => {
+    let savedStepForms
+    beforeEach(() => {
+      savedStepForms = {
+        ...mockSavedStepForms,
+        another_move_liquid_step_id: {
+          ...mockSavedStepForms.another_move_liquid_step_id,
+          path: 'multiAspirate',
+        },
+      }
+    })
+    it('should return fields being disabled with associated reasons', () => {
+      expect(
+        getMultiselectDisabledFields.resultFunc(
+          savedStepForms,
+          mockmultiSelectItemIds
+        )
+      ).toEqual({
+        aspirate_mix_checkbox: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_mix_checkbox.disabled.multi-aspirate'
+        ),
+        aspirate_mix_volume: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_mix_volume.disabled.multi-aspirate'
+        ),
+        aspirate_mix_times: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_mix_times.disabled.multi-aspirate'
+        ),
+      })
+    })
+  })
+  describe('when a form includes a multi dispense path', () => {
+    let savedStepForms
+    beforeEach(() => {
+      savedStepForms = {
+        ...mockSavedStepForms,
+        another_move_liquid_step_id: {
+          ...mockSavedStepForms.another_move_liquid_step_id,
+          path: 'multiDispense',
+        },
+      }
+    })
+    it('should return fields being disabled with associated reasons', () => {
+      expect(
+        getMultiselectDisabledFields.resultFunc(
+          savedStepForms,
+          mockmultiSelectItemIds
+        )
+      ).toEqual({
+        dispense_mix_checkbox: i18n.t(
+          'tooltip.step_fields.batch_edit.dispense_mix_checkbox.disabled.multi-dispense'
+        ),
+        dispense_mix_volume: i18n.t(
+          'tooltip.step_fields.batch_edit.dispense_mix_volume.disabled.multi-dispense'
+        ),
+        dispense_mix_times: i18n.t(
+          'tooltip.step_fields.batch_edit.dispense_mix_times.disabled.multi-dispense'
+        ),
+        blowout_checkbox: i18n.t(
+          'tooltip.step_fields.batch_edit.blowout_checkbox.disabled.multi-dispense'
+        ),
+        blowout_location: i18n.t(
+          'tooltip.step_fields.batch_edit.blowout_location.disabled.multi-dispense'
+        ),
       })
     })
   })
