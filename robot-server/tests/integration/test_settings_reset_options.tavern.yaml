@@ -14,7 +14,7 @@ stages:
         options:
         - id: labwareCalibration
           name: Labware Calibration
-          description: !re_search "Clear labware calibration and Protocol API v1 custom labware"
+          description: !re_search "Clear labware calibration"
         - id: bootScripts
           name: Boot Scripts
           description: Clear custom boot scripts

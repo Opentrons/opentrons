@@ -35,7 +35,7 @@ _settings_reset_options = {
     ResetOptionId.labware_calibration:
         CommonResetOption(
             name='Labware Calibration',
-            description='Clear labware calibration and Protocol API v1 custom labware (created with labware.create())'   # noqa(E501)
+            description='Clear labware calibration'
         ),
     ResetOptionId.boot_scripts:
         CommonResetOption(
