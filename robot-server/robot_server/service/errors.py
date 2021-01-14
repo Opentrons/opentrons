@@ -170,8 +170,3 @@ class CommonErrorDef(ErrorDef):
         title='Resource Exists',
         format_string="A '{resource}' with id '{id}' already exists"
     )
-    BAD_REQUEST = ErrorCreateDef(
-        status_code=status_codes.HTTP_400_BAD_REQUEST,
-        title="Bad request",
-        format_string='{reason}'
-    )

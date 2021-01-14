@@ -58,6 +58,14 @@ class RequiredEquipment(BaseModel):
     modules: typing.List[LoadedModule]
 
 
+class ProtocolError(BaseModel):
+    """An error created during analysis of the uploaded protocol."""
+    type: str
+    description: str
+    lineNumber: typing.Optional[int] = None
+    fileName: typing.Optional[str] = None
+
+
 class FileAttributes(BaseModel):
     basename: str
 
@@ -65,10 +73,22 @@ class FileAttributes(BaseModel):
 class ProtocolResponseAttributes(ResponseDataModel):
     protocolFile: FileAttributes
     supportFiles: typing.List[FileAttributes]
-    lastModifiedAt: datetime
-    createdAt: datetime
-    requiredEquipment: RequiredEquipment
-    metadata: Meta
+    lastModifiedAt: datetime =\
+        Field(...,
+              description="When the protocol was last modified.")
+    createdAt: datetime =\
+        Field(...,
+              description="When the protocol was uploaded.")
+    requiredEquipment: RequiredEquipment =\
+        Field(...,
+              description="The equipment required by the protocol.")
+    metadata: Meta =\
+        Field(...,
+              description="Metadata extracted from the protocol file.")
+    errors: typing.List[ProtocolError] = \
+        Field([],
+              description="Errors that must be addressed before the protocol "
+                          "can be run.")
 
 
 ProtocolResponse = ResponseModel[ProtocolResponseAttributes]

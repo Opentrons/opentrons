@@ -34,9 +34,3 @@ class ProtocolUploadCountLimitReached(ProtocolException):
     def __init__(self, msg: str):
         super().__init__(definition=CommonErrorDef.ACTION_FORBIDDEN,
                          reason=msg)
-
-
-class ProtocolAnalysisException(ProtocolException):
-    def __init__(self, msg: str):
-        super().__init__(definition=CommonErrorDef.BAD_REQUEST,
-                         reason=msg)
