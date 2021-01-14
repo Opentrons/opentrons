@@ -26,7 +26,12 @@ import {
   getMultiDispensePathDisabledFields,
   getPipetteDisabledFields,
 } from './utils'
-import type { FormData, StepIdType, StepType } from '../../form-types'
+import type {
+  FormData,
+  MultiSelectFieldName,
+  StepIdType,
+  StepType,
+} from '../../form-types'
 import type { BaseState, Selector } from '../../types'
 
 export const rootSelector = (state: BaseState): StepsState => state.ui.steps
@@ -208,40 +213,6 @@ export const getWellSelectionLabwareKey: Selector<
   rootSelector,
   (state: StepsState) => state.wellSelectionLabwareKey
 )
-
-type MultiSelectFieldName =
-  | 'aspirate_flowRate'
-  | 'aspirate_mmFromBottom'
-  | 'aspirate_wellOrder_first'
-  | 'aspirate_wellOrder_second'
-  | 'preWetTip'
-  | 'aspirate_mix_checkbox'
-  | 'aspirate_mix_volume'
-  | 'aspirate_mix_times'
-  | 'aspirate_delay_checkbox'
-  | 'aspirate_delay_seconds'
-  | 'aspirate_delay_mmFromBottom'
-  | 'aspirate_airGap_checkbox'
-  | 'aspirate_airGap_volume'
-  | 'aspirate_touchTip_checkbox'
-  | 'aspirate_touchTip_mmFromBottom'
-  | 'dispense_flowRate'
-  | 'dispense_mmFromBottom'
-  | 'dispense_wellOrder_first'
-  | 'dispense_wellOrder_second'
-  | 'dispense_mix_checkbox'
-  | 'dispense_mix_volume'
-  | 'dispense_mix_times'
-  | 'dispense_delay_checkbox'
-  | 'dispense_delay_seconds'
-  | 'dispense_delay_mmFromBottom'
-  | 'dispense_airGap_checkbox'
-  | 'dispense_airGap_volume'
-  | 'dispense_touchTip_checkbox'
-  | 'dispense_touchTip_mmFromBottom'
-  | 'blowout_checkbox'
-  | 'blowout_location'
-
 type MultiselectFieldValues = {
   [fieldName: MultiSelectFieldName]: {|
     value?: any,
@@ -341,42 +312,6 @@ export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> 
     )
   }
 )
-
-const BATCH_EDIT_TRANSFER_FORM_FIELD_DISABLED_MAP = {
-  aspirate_flowRate: 'pipette',
-  aspirate_mmFromBottom: 'aspirate_labware',
-  aspirate_wellOrder_first: null,
-  aspirate_wellOrder_second: null,
-  preWetTip: null,
-  aspirate_mix_checkbox: ['pipette', 'path must not be n:1'],
-  aspirate_mix_volume: ['pipette', 'path must not be n:1'],
-  aspirate_mix_times: ['pipette', 'path must not be n:1'],
-  aspirate_delay_checkbox: 'aspirate_labware',
-  aspirate_delay_seconds: 'aspirate_labware',
-  aspirate_delay_mmFromBottom: 'aspirate_labware',
-  aspirate_airGap_checkbox: 'pipette',
-  aspirate_airGap_volume: 'pipette',
-  aspirate_touchTip_checkbox: null,
-  aspirate_touchTip_mmFromBottom: null,
-
-  dispense_flowRate: 'pipette',
-  dispense_mmFromBottom: 'dispense_labware',
-  dispense_wellOrder_first: null,
-  dispense_wellOrder_second: null,
-  dispense_mix_checkbox: ['pipette', 'path must not be 1:n'],
-  dispense_mix_volume: ['pipette', 'path must not be 1:n'],
-  dispense_mix_times: ['pipette', 'path must not be 1:n'],
-  dispense_delay_checkbox: 'dispense_labware',
-  dispense_delay_seconds: 'dispense_labware',
-  dispense_delay_mmFromBottom: 'dispense_labware',
-  dispense_airGap_checkbox: 'pipette',
-  dispense_airGap_volume: 'pipette',
-  dispense_touchTip_checkbox: null,
-  dispense_touchTip_mmFromBottom: null,
-
-  blowout_checkbox: 'path must not be 1:n',
-  blowout_location: 'path must not be 1:n',
-}
 
 type DisabledFields = {
   [fieldName: string]: string,
