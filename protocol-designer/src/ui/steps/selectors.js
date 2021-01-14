@@ -316,7 +316,7 @@ export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> 
 type DisabledFields = {
   [fieldName: string]: string,
 }
-export const getMultiselectDisabledFields: Selector<DisabledFields | null> = createSelector(
+export const getMultiSelectDisabledFields: Selector<DisabledFields | null> = createSelector(
   stepFormSelectors.getSavedStepForms,
   getMultiSelectItemIds,
   (savedStepForms, multiSelectItemIds) => {

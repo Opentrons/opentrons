@@ -17,7 +17,7 @@ import {
   getActiveItem,
   getMultiSelectLastSelected,
   getMultiSelectFieldValues,
-  getMultiselectDisabledFields,
+  getMultiSelectDisabledFields,
 } from '../selectors'
 import { getMockMoveLiquidStep } from '../__fixtures__'
 
@@ -666,11 +666,19 @@ describe('getMultiSelectDisabledFields', () => {
       },
     }
     expect(
-      getMultiSelectFieldValues.resultFunc(
+      getMultiSelectDisabledFields.resultFunc(
         savedStepForms,
         mockmultiSelectItemIds
       )
     ).toBe(null)
+  })
+  it('should return an empty object when no fields are different and path is single', () => {
+    expect(
+      getMultiSelectDisabledFields.resultFunc(
+        mockSavedStepForms,
+        mockmultiSelectItemIds
+      )
+    ).toEqual({})
   })
 
   describe('when pipettes are different', () => {
@@ -686,7 +694,7 @@ describe('getMultiSelectDisabledFields', () => {
     })
     it('should return fields being disabled with associated reasons', () => {
       expect(
-        getMultiselectDisabledFields.resultFunc(
+        getMultiSelectDisabledFields.resultFunc(
           savedStepForms,
           mockmultiSelectItemIds
         )
@@ -725,7 +733,7 @@ describe('getMultiSelectDisabledFields', () => {
     })
     it('should return fields being disabled with associated reasons', () => {
       expect(
-        getMultiselectDisabledFields.resultFunc(
+        getMultiSelectDisabledFields.resultFunc(
           savedStepForms,
           mockmultiSelectItemIds
         )
@@ -758,7 +766,7 @@ describe('getMultiSelectDisabledFields', () => {
     })
     it('should return fields being disabled with associated reasons', () => {
       expect(
-        getMultiselectDisabledFields.resultFunc(
+        getMultiSelectDisabledFields.resultFunc(
           savedStepForms,
           mockmultiSelectItemIds
         )
@@ -791,7 +799,7 @@ describe('getMultiSelectDisabledFields', () => {
     })
     it('should return fields being disabled with associated reasons', () => {
       expect(
-        getMultiselectDisabledFields.resultFunc(
+        getMultiSelectDisabledFields.resultFunc(
           savedStepForms,
           mockmultiSelectItemIds
         )
@@ -821,7 +829,7 @@ describe('getMultiSelectDisabledFields', () => {
     })
     it('should return fields being disabled with associated reasons', () => {
       expect(
-        getMultiselectDisabledFields.resultFunc(
+        getMultiSelectDisabledFields.resultFunc(
           savedStepForms,
           mockmultiSelectItemIds
         )
