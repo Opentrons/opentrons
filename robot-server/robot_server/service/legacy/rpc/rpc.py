@@ -193,6 +193,8 @@ class RPCServer(object):
                 'Attribute {0} of {1} is not a function'
                 .format(name, type(obj)))
 
+        log.info(f"rpc built call {name} on {obj}")
+
         return functools.partial(function, obj, *args, **kwargs)
 
     def resolve_args(self, args):
