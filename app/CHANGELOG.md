@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.2...v4.1.0-alpha.3) (2021-01-14)
+
+
+### Bug Fixes
+
+* **app:** restrict size of reset config modal ([#7212](https://github.com/Opentrons/opentrons/issues/7212)) ([01ca11e](https://github.com/Opentrons/opentrons/commit/01ca11e))
+
+
+
+
+
 # [4.1.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.1...v4.1.0-alpha.2) (2021-01-12)
 
 **Note:** Version bump only for package @opentrons/app
