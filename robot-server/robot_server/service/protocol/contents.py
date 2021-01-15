@@ -62,7 +62,7 @@ def create(
 
 def add(
         contents: Contents,
-        support_file: UploadFile):
+        support_file: UploadFile) -> Contents:
     """
     Add a support file to protocol temp directory
 
@@ -86,6 +86,39 @@ def add(
         contents,
         support_files=contents.support_files + [file_meta],
     )
+
+
+def update(
+        contents: Contents,
+        upload_file: UploadFile) -> Contents:
+    """
+    Update the contents of the protocol temp directory.
+
+    Existing files are replaced and new files are added.
+
+    :raise ProtocolIOException:
+    """
+    temp_dir = Path(contents.directory.name)
+    try:
+        file_meta = save_upload(directory=temp_dir, upload_file=upload_file)
+    except IOError as e:
+        log.exception("Failed to save uploaded file")
+        raise ProtocolIOException(str(e))
+
+    if file_meta.path == contents.protocol_file.path:
+        # The protocol file has been replaced
+        return replace(
+            contents,
+            protocol_file=file_meta)
+    else:
+        # A support file has been added or replaces.
+        # Omit the file being replaced from existing support files (if found).
+        filtered_files = [f for f in contents.support_files
+                          if f.path != file_meta.path]
+        return replace(
+            contents,
+            support_files=filtered_files + [file_meta],
+        )
 
 
 def get_protocol_contents(contents: Contents) -> str:

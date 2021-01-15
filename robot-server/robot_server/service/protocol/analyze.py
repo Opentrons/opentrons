@@ -70,7 +70,7 @@ def _analyze(protocol_contents: contents.Contents) -> AnalysisResult:
         author=str(author) if author else None,
         apiLevel=str(protocol.api_level) if protocol else None
     )
-    # Extract required equipment.
+
     equipment = models.RequiredEquipment(
         pipettes=[
             models.LoadedPipette(
