@@ -7,8 +7,7 @@ from tempfile import TemporaryDirectory
 
 from fastapi import UploadFile
 
-from robot_server.service.protocol.errors import (
-    ProtocolAlreadyExistsException, ProtocolIOException)
+from robot_server.service.protocol.errors import ProtocolIOException
 from robot_server.util import FileMeta, save_upload
 
 
