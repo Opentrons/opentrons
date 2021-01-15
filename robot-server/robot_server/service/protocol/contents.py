@@ -60,34 +60,6 @@ def create(
     )
 
 
-def add(
-        contents: Contents,
-        support_file: UploadFile) -> Contents:
-    """
-    Add a support file to protocol temp directory
-
-    :raise ProtocolIOException:
-    """
-    temp_dir = Path(contents.directory.name)
-
-    path = temp_dir / support_file.filename
-    if path.exists():
-        raise ProtocolAlreadyExistsException(
-            f"File {support_file.filename} already exists"
-        )
-
-    try:
-        file_meta = save_upload(directory=temp_dir, upload_file=support_file)
-    except IOError as e:
-        log.exception("Failed to save uploaded file")
-        raise ProtocolIOException(str(e))
-
-    return replace(
-        contents,
-        support_files=contents.support_files + [file_meta],
-    )
-
-
 def update(
         contents: Contents,
         upload_file: UploadFile) -> Contents:

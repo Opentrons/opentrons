@@ -59,21 +59,20 @@ class UploadedProtocol:
             )
         )
 
-    def add(self, support_file: UploadFile):
+    def update(self, support_file: UploadFile) -> None:
         """
-        Add a support file to protocol temp directory
+        Add or replace a file in the protocol temp directory.
 
-        :raise ProtocolIOException: On failure to save uploaded files.
-        :raise ProtocolAnalysisException: On failure to analyze the protocol.
+        :raise ProtocolIOException: On failure to save uploaded file.
         """
-        c = contents.add(self._data.contents, support_file)
+        c = contents.update(self._data.contents, support_file)
 
         # Re-analyze protocol
         self._data.analysis_result = analyze.analyze_protocol(c)
         self._data.last_modified_at = utc_now()
         self._data.contents = c
 
-    def clean_up(self):
+    def clean_up(self) -> None:
         """Protocol is being removed. Perform any clean up required."""
         contents.clean_up(self._data.contents)
 

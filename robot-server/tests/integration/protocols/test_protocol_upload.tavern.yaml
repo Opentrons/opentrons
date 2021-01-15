@@ -121,11 +121,11 @@ stages:
   - name: Upload a data file
     request:
       url: "{host:s}:{port:d}/protocols/phony_proto"
-      method: POST
+      method: PATCH
       files:
         file: "tests/integration/protocols/data.csv"
     response:
-      status_code: 201
+      status_code: 200
       json:
         data: *response_data
         links:
