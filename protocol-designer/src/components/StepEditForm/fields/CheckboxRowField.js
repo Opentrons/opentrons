@@ -1,36 +1,53 @@
 // @flow
 import * as React from 'react'
-import { CheckboxField } from '@opentrons/components'
+import {
+  CheckboxField,
+  useHoverTooltip,
+  Tooltip,
+  TOOLTIP_TOP,
+  TOOLTIP_FIXED,
+} from '@opentrons/components'
 import cx from 'classnames'
-
-import type { StepFieldName } from '../../../steplist/fieldLevel'
 import styles from '../StepEditForm.css'
-import { FieldConnector } from './FieldConnector'
+import type { FieldProps } from './useSingleEditFieldProps'
 
-type CheckboxRowProps = {
-  label?: string,
-  name: StepFieldName,
-  children?: ?React.Node,
+type CheckboxRowProps = {|
+  ...FieldProps,
+  children?: React.Node,
   className?: string,
-  disabled?: boolean,
-  tooltipComponent?: React.Node,
-}
-export const CheckboxRowField = (props: CheckboxRowProps): React.Node => (
-  <FieldConnector
-    name={props.name}
-    tooltipComponent={props.tooltipComponent}
-    render={({ value, updateValue, hoverTooltipHandlers, disabled }) => (
+  label?: string,
+  tooltipContent?: React.Node,
+|}
+
+export const CheckboxRowField = (props: CheckboxRowProps): React.Node => {
+  const {
+    children,
+    className,
+    disabled,
+    label,
+    tooltipContent,
+    updateValue,
+    value,
+  } = props
+
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP,
+  })
+
+  return (
+    <>
+      <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
       <div className={styles.checkbox_row}>
         <CheckboxField
-          label={props.label}
-          hoverTooltipHandlers={hoverTooltipHandlers}
-          disabled={disabled || props.disabled}
-          className={cx(styles.checkbox_field, props.className)}
+          hoverTooltipHandlers={targetProps}
+          label={label}
+          disabled={disabled}
+          className={cx(styles.checkbox_field, className)}
           value={!!value}
           onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)}
         />
-        {value && !disabled ? props.children : null}
+        {value && !disabled ? children : null}
       </div>
-    )}
-  />
-)
+    </>
+  )
+}

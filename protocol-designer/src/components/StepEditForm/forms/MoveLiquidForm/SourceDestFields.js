@@ -14,6 +14,7 @@ import {
   WellOrderField,
   DelayFields,
 } from '../../fields'
+import { useSingleEditFieldProps } from '../../fields/useSingleEditFieldProps'
 
 import styles from '../../StepEditForm.css'
 
@@ -29,11 +30,15 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 
 export const SourceDestFields = (props: Props): React.Node => {
   const { className, focusHandlers, prefix } = props
+
+  const propsForFields = useSingleEditFieldProps({})
+  if (propsForFields === null) return null
+
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
   const getMixFields = () => (
     <CheckboxRowField
-      name={addFieldNamePrefix('mix_checkbox')}
+      {...propsForFields[addFieldNamePrefix('mix_checkbox')]}
       label={i18n.t('form.step_edit_form.field.mix.label')}
       className={styles.small_field}
     >
@@ -80,7 +85,7 @@ export const SourceDestFields = (props: Props): React.Node => {
         {prefix === 'aspirate' && (
           <React.Fragment>
             <CheckboxRowField
-              name="preWetTip"
+              {...propsForFields['preWetTip']}
               label={i18n.t('form.step_edit_form.field.preWetTip.label')}
               className={styles.small_field}
             />
@@ -95,8 +100,8 @@ export const SourceDestFields = (props: Props): React.Node => {
           </React.Fragment>
         )}
         <CheckboxRowField
-          name={addFieldNamePrefix('touchTip_checkbox')}
-          tooltipComponent={i18n.t(
+          {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
+          tooltipContent={i18n.t(
             `tooltip.step_fields.defaults.${addFieldNamePrefix(
               'touchTip_checkbox'
             )}`
@@ -111,7 +116,7 @@ export const SourceDestFields = (props: Props): React.Node => {
 
         {prefix === 'dispense' && (
           <CheckboxRowField
-            name="blowout_checkbox"
+            {...propsForFields['blowout_checkbox']}
             label={i18n.t('form.step_edit_form.field.blowout.label')}
             className={styles.small_field}
           >
@@ -123,12 +128,12 @@ export const SourceDestFields = (props: Props): React.Node => {
           </CheckboxRowField>
         )}
         <CheckboxRowField
-          tooltipComponent={i18n.t(
+          {...propsForFields[addFieldNamePrefix('airGap_checkbox')]}
+          tooltipContent={i18n.t(
             `tooltip.step_fields.defaults.${addFieldNamePrefix(
               'airGap_checkbox'
             )}`
           )}
-          name={addFieldNamePrefix('airGap_checkbox')}
           label={i18n.t('form.step_edit_form.field.airGap.label')}
           className={styles.small_field}
         >

@@ -17,6 +17,7 @@ import {
   WellOrderField,
   DelayFields,
 } from '../fields'
+import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import { AspDispSection } from './AspDispSection'
 
 import type { FocusHandlers } from '../types'
@@ -28,6 +29,9 @@ export const MixForm = (props: Props): React.Node => {
   const { focusHandlers } = props
 
   const [collapsed, setCollapsed] = React.useState(true)
+
+  const propsForFields = useSingleEditFieldProps({})
+  if (propsForFields === null) return null
 
   const toggleCollapsed = (): void =>
     setCollapsed(prevCollapsed => !prevCollapsed)
@@ -128,20 +132,20 @@ export const MixForm = (props: Props): React.Node => {
                 focusHandlers={focusHandlers}
               />
               <CheckboxRowField
+                {...propsForFields['mix_touchTip_checkbox']}
                 className={styles.small_field}
                 label={i18n.t('form.step_edit_form.field.touchTip.label')}
-                tooltipComponent={i18n.t(
+                tooltipContent={i18n.t(
                   'tooltip.step_fields.defaults.mix_touchTip_checkbox'
                 )}
-                name={'mix_touchTip_checkbox'}
               >
                 <TipPositionField fieldName={'mix_touchTip_mmFromBottom'} />
               </CheckboxRowField>
 
               <CheckboxRowField
+                {...propsForFields['blowout_checkbox']}
                 className={styles.small_field}
                 label={i18n.t('form.step_edit_form.field.blowout.label')}
-                name="blowout_checkbox"
               >
                 <BlowoutLocationField
                   className={styles.full_width}

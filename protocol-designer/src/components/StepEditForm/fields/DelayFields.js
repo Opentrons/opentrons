@@ -4,6 +4,7 @@ import { i18n } from '../../../localization'
 import { TextField } from './TextField'
 import { CheckboxRowField } from './CheckboxRowField'
 import { TipPositionField } from './TipPositionField'
+import { useSingleEditFieldProps } from './useSingleEditFieldProps'
 import styles from '../StepEditForm.css'
 
 import type { FocusHandlers } from '../types'
@@ -27,12 +28,16 @@ export const DelayFields = (props: DelayFieldProps): React.Node => {
     tipPositionFieldName,
     focusHandlers,
   } = props
+
+  const propsForFields = useSingleEditFieldProps({})
+  if (propsForFields === null) return null
+
   return (
     <CheckboxRowField
-      name={checkboxFieldName}
+      {...propsForFields[checkboxFieldName]}
       label={i18n.t('form.step_edit_form.field.delay.label')}
       className={styles.small_field}
-      tooltipComponent={i18n.t(
+      tooltipContent={i18n.t(
         `tooltip.step_fields.defaults.${checkboxFieldName}`
       )}
     >
