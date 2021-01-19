@@ -8,10 +8,10 @@ from robot_server.util import FileMeta
 
 
 def test_analyze():
-    """Test Zymo Extraction equipment requirement analysis."""
+    """Test equipment requirement analysis."""
     proto = """
 metadata = {
-    'protocolName': 'Zymo Extraction',
+    'protocolName': 'Extraction',
     'author': 'Opentrons <protocols@opentrons.com>',
     'apiLevel': '2.4'
 }
@@ -42,7 +42,7 @@ def run(ctx):
                       "get_protocol_contents", return_value=proto):
         r = _analyze(c)
         assert r.meta == models.Meta(
-            name="Zymo Extraction",
+            name="Extraction",
             author="Opentrons <protocols@opentrons.com>",
             apiLevel="2.4"
         )
@@ -128,7 +128,7 @@ def test_analyze_thermocycler():
     """Test analysis of protocol with loaded thermocycler."""
     proto = """
 metadata = {
-    'protocolName': 'Zymo Extraction',
+    'protocolName': ' Extraction',
     'author': 'Opentrons <protocols@opentrons.com>',
     'apiLevel': '2.4'
 }
