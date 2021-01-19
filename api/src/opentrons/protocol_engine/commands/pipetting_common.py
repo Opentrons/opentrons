@@ -1,6 +1,8 @@
 """Common pipetting command base models."""
 from pydantic import BaseModel, Field
 
+from ..types import WellLocation
+
 
 class BasePipettingRequest(BaseModel):
     """Base class for pipetting requests that interact with wells."""
@@ -15,7 +17,7 @@ class BasePipettingRequest(BaseModel):
     )
     wellName: str = Field(
         ...,
-        description="Identifier of well to use.",
+        description="Name of well to use in labware.",
     )
 
 
@@ -28,10 +30,17 @@ class BaseLiquidHandlingRequest(BasePipettingRequest):
                     "than a pipette-specific maximum volume.",
         gt=0,
     )
-    flowRate: float = Field(
+    wellLocation: WellLocation = Field(
         ...,
-        description="The absolute flow rate in uL/second. Must be greater "
-                    "than 0 and less than a pipette-specific maximum flow "
-                    "rate.",
-        gt=0
+        description="Relative well location at which to perform the operation",
+    )
+
+
+class BaseLiquidHandlingResult(BaseModel):
+    """Base properties of a liquid handling result."""
+
+    volume: float = Field(
+        ...,
+        description="Amount of liquid in uL handled in the operation.",
+        gt=0,
     )

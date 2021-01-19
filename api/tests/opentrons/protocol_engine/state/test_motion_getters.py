@@ -1,5 +1,5 @@
 """Test state getters for retrieving motion planning views of state."""
-# TODO(mc, 2020-01-08): rewrite tests using Decoy
+# TODO(mc, 2021-01-08): rewrite tests using Decoy
 
 import pytest
 from dataclasses import dataclass, field
@@ -50,6 +50,10 @@ def motion_store(
     )
 
 
+# TODO(mc, 2021-01-14): this testing pain is code smell and probably an
+# indication that the "current deck location" data needs to be in a
+# different store. Alternatively, this data should be fed in via a public
+# interface, like handling a MoveToWellResult.
 def mock_location_data(
     motion_store: MotionStore,
     data: Optional[DeckLocation]
@@ -196,6 +200,9 @@ class WaypointSpec:
     max_travel_z: float = 50
 
 
+# TODO(mc, 2021-01-14): these tests probably need to be rethought; this fixture
+# is impossible to reason with. The test is really just trying to be a collaborator
+# test for the `get_waypoints` function, so we should rewrite it as such.
 @pytest.mark.parametrize("spec", [
     WaypointSpec(
         name="General arc if moving from unknown location",
@@ -239,7 +246,7 @@ class WaypointSpec:
         well_location=WellLocation(origin=WellOrigin.TOP, offset=(0, 0, 1)),
         expected_move_type=MoveType.GENERAL_ARC,
     ),
-    # TODO(mc, 2020-01-06): add test for override current location
+    # TODO(mc, 2021-01-08): add test for override current location
 ])
 def test_get_movement_waypoints(
     mock_labware_store: MagicMock,

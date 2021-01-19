@@ -151,3 +151,28 @@ class PipettingHandler:
         await self._hardware.aspirate(mount=hw_pipette.mount, volume=volume)
 
         return volume
+
+    async def dispense(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+        volume: float,
+    ) -> float:
+        """Dispense liquid to a well."""
+        hw_pipette = self._state.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware.attached_instruments
+        )
+
+        await self._movement_handler.move_to_well(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
+
+        await self._hardware.dispense(mount=hw_pipette.mount, volume=volume)
+
+        return volume

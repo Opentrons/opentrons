@@ -1,38 +1,28 @@
 """Aspirate command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel, Field
+from typing_extensions import final
 
-from ..types import WellLocation
 from .command import CommandImplementation, CommandHandlers
-from .pipetting_common import BasePipettingRequest
+from .pipetting_common import BaseLiquidHandlingRequest, BaseLiquidHandlingResult
 
 
-class AspirateRequest(BasePipettingRequest):
+@final
+class AspirateRequest(BaseLiquidHandlingRequest):
     """A request to aspirate from a specific well."""
-
-    wellLocation: WellLocation = Field(
-        ...,
-        description="Relative well location to aspirate from.",
-    )
-    volume: float = Field(
-        ...,
-        description="Volume of liquid to aspirate.",
-    )
 
     def get_implementation(self) -> AspirateImplementation:
         """Get the execution implementation of the AspirateRequest."""
         return AspirateImplementation(self)
 
 
-class AspirateResult(BaseModel):
+@final
+class AspirateResult(BaseLiquidHandlingResult):
     """Result data from the execution of a AspirateRequest."""
 
-    volume: float = Field(
-        ...,
-        description="Volume of liquid aspirated.",
-    )
+    pass
 
 
+@final
 class AspirateImplementation(
     CommandImplementation[AspirateRequest, AspirateResult]
 ):

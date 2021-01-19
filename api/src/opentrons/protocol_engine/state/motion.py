@@ -167,6 +167,8 @@ class MotionStore(Substore[MotionState], CommandReactive):
                 commands.MoveToWellResult,
                 commands.PickUpTipResult,
                 commands.DropTipResult,
+                commands.AspirateResult,
+                commands.DispenseResult,
             ),
         ):
             self._state._current_location = DeckLocation(

@@ -18,6 +18,11 @@ CompletedAspirate = cmd.CompletedCommand[
     cmd.AspirateResult
 ]
 
+CompletedDispense = cmd.CompletedCommand[
+    cmd.DispenseRequest,
+    cmd.DispenseResult
+]
+
 
 @pytest.fixture
 def load_pipette_command(now: datetime) -> CompletedLoadLabware:
@@ -46,6 +51,24 @@ def aspirate_command(now: datetime) -> CompletedAspirate:
             volume=50,
         ),
         result=cmd.AspirateResult(volume=50),
+        created_at=now,
+        started_at=now,
+        completed_at=now,
+    )
+
+
+@pytest.fixture
+def dispense_command(now: datetime) -> CompletedDispense:
+    """Get a completed aspirate command."""
+    return cmd.CompletedCommand(
+        request=cmd.DispenseRequest(
+            pipetteId="pipette-id",
+            labwareId="labware-id",
+            wellName="C2",
+            wellLocation=WellLocation(),
+            volume=25,
+        ),
+        result=cmd.DispenseResult(volume=25),
         created_at=now,
         started_at=now,
         completed_at=now,
@@ -165,6 +188,29 @@ def test_pipette_volume_adds_aspirate(
     loaded_store.handle_command(aspirate_command, "aspirate-command-2")
     volume = loaded_store.pipettes.get_aspirated_volume("pipette-id")
     assert volume == 100
+
+
+def test_pipette_volume_subtracts_dispense(
+    loaded_store: StateStore,
+    aspirate_command: CompletedAspirate,
+    dispense_command: CompletedDispense,
+) -> None:
+    """get_aspirated_volume should return volume after a dispense."""
+    loaded_store.handle_command(aspirate_command, "aspirate-command-1")
+    volume = loaded_store.pipettes.get_aspirated_volume("pipette-id")
+    assert volume == 50
+
+    loaded_store.handle_command(dispense_command, "dispense-command-1")
+    volume = loaded_store.pipettes.get_aspirated_volume("pipette-id")
+    assert volume == 25
+
+    loaded_store.handle_command(dispense_command, "dispense-command-2")
+    volume = loaded_store.pipettes.get_aspirated_volume("pipette-id")
+    assert volume == 0
+
+    loaded_store.handle_command(dispense_command, "dispense-command-3")
+    volume = loaded_store.pipettes.get_aspirated_volume("pipette-id")
+    assert volume == 0
 
 
 def test_pipette_volume_raises_if_bad_id(store: StateStore) -> None:

@@ -296,3 +296,47 @@ async def test_handle_aspirate_request_with_prep(
         ),
         await mock_hw_controller.aspirate(mount=Mount.LEFT, volume=25),
     )
+
+
+async def test_handle_dispense_request(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_hw_controller: HardwareAPI,
+    mock_movement_handler: MovementHandler,
+    mock_hw_pipettes: MockPipettes,
+    handler: PipettingHandler,
+) -> None:
+    """It should be able to dispense to a well."""
+    well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
+
+    decoy.when(
+        mock_state_view.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.RIGHT,
+            config=mock_hw_pipettes.right_config,
+        )
+    )
+
+    volume = await handler.dispense(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="C6",
+        well_location=well_location,
+        volume=25,
+    )
+
+    assert volume == 25
+
+    decoy.verify(
+        await mock_movement_handler.move_to_well(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="C6",
+            well_location=well_location,
+        ),
+        await mock_hw_controller.dispense(mount=Mount.RIGHT, volume=25),
+    )

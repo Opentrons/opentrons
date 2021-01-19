@@ -8,7 +8,12 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..commands import CompletedCommandType, LoadPipetteResult, AspirateResult
+from ..commands import (
+    CompletedCommandType,
+    LoadPipetteResult,
+    AspirateResult,
+    DispenseResult,
+)
 from .substore import Substore, CommandReactive
 
 
@@ -133,5 +138,12 @@ class PipetteStore(Substore[PipetteState], CommandReactive):
             pipette_id = command.request.pipetteId
             previous_volume = self._state._aspirated_volume_by_id[pipette_id]
             next_volume = previous_volume + command.result.volume
+
+            self._state._aspirated_volume_by_id[pipette_id] = next_volume
+
+        elif isinstance(command.result, DispenseResult):
+            pipette_id = command.request.pipetteId
+            previous_volume = self._state._aspirated_volume_by_id[pipette_id]
+            next_volume = max(0, previous_volume - command.result.volume)
 
             self._state._aspirated_volume_by_id[pipette_id] = next_volume
