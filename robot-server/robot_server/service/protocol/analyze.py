@@ -61,43 +61,61 @@ def _analyze(protocol_contents: contents.Contents) -> AnalysisResult:
     except AnalyzeError as e:
         errors.append(e.error)
 
+    meta = _extract_metadata(protocol)
+    equipment = _extract_equipment(ctx)
+
+    return AnalysisResult(
+        meta=meta,
+        required_equipment=equipment,
+        errors=errors
+    )
+
+
+def _extract_metadata(protocol: typing.Optional[Protocol]) -> models.Meta:
+    """Extract protocol metadata"""
     metadata = protocol.metadata \
         if isinstance(protocol, PythonProtocol) else {}
     protocol_name = metadata.get('protocolName')
     author = metadata.get('author')
-    meta = models.Meta(
+    return models.Meta(
         name=str(protocol_name) if protocol_name else None,
         author=str(author) if author else None,
         apiLevel=str(protocol.api_level) if protocol else None
     )
 
-    equipment = models.RequiredEquipment(
+
+def _extract_equipment(ctx: typing.Optional[ProtocolContext]) -> \
+        models.RequiredEquipment:
+    """Extract required equipment"""
+    if not ctx:
+        return models.RequiredEquipment(
+            pipettes=[],
+            labware=[],
+            modules=[]
+        )
+
+    return models.RequiredEquipment(
         pipettes=[
             models.LoadedPipette(
                 mount=Mount(k.lower()),
                 pipetteName=v.name,
                 channels=v.channels,
                 requestedAs=v.requested_as)
-            for k, v in ctx.loaded_instruments.items() if v
-        ] if ctx else [],
+            for k, v in sorted(ctx.loaded_instruments.items()) if v
+        ],
         labware=[
             models.LoadedLabware(
                 label=v.name,
                 uri=v.uri,
-                location=k) for k, v in ctx.loaded_labwares.items()
-        ] if ctx else [],
+                location=k) for k, v in sorted(ctx.loaded_labwares.items())
+        ],
         modules=[
             models.LoadedModule(
                 type=v.geometry.module_type.value,
                 model=v.geometry.model.value,
                 location=int(v.geometry.location.labware.first_parent())
-            ) for k, v in ctx.loaded_modules.items()
-        ] if ctx else []
-    )
-    return AnalysisResult(
-        meta=meta,
-        required_equipment=equipment,
-        errors=errors
+            ) for k, v in sorted(ctx.loaded_modules.items())
+        ]
     )
 
 

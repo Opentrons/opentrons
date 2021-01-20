@@ -53,9 +53,12 @@ class Meta(BaseModel):
 
 class RequiredEquipment(BaseModel):
     """Results of analysis of protocol."""
-    pipettes: typing.List[LoadedPipette]
-    labware: typing.List[LoadedLabware]
-    modules: typing.List[LoadedModule]
+    pipettes: typing.List[LoadedPipette] = \
+        Field(..., description="The pipettes required by the protocol.")
+    labware: typing.List[LoadedLabware] = \
+        Field(..., description="The labware required by the protocol.")
+    modules: typing.List[LoadedModule] = \
+        Field(..., description="The modules required by the protocol.")
 
 
 class ProtocolError(BaseModel):

@@ -223,3 +223,273 @@ stages:
             href: '/protocols'
           protocolById:
             href: '/protocols/{{protocolId}}'
+---
+test_name: Invalid JSON
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload invalid json protocol
+    request:
+      url: "{host:s}:{port:d}/protocols"
+      method: POST
+      files:
+        protocolFile: "tests/integration/protocols/invalid_json.json"
+    response:
+      status_code: 201
+      json:
+        data:
+          id: invalid_json
+          protocolFile:
+            basename: invalid_json.json
+          supportFiles: []
+          lastModifiedAt: *dt
+          createdAt: *dt
+          metadata:
+            author: null
+            apiLevel: null
+            name: null
+          requiredEquipment:
+            pipettes: []
+            labware: []
+            modules: []
+          errors:
+          - type: JSONDecodeError
+            description: !anystr
+            lineNumber: 1
+            fileName: invalid_json.json
+        links:
+          self:
+            href: '/protocols/invalid_json'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+  - name: Delete the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/invalid_json"
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        data: !anydict
+        links:
+          self:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+---
+test_name: Load unknown module
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload python protocol with unknown module
+    request:
+      url: "{host:s}:{port:d}/protocols"
+      method: POST
+      files:
+        protocolFile: "tests/integration/protocols/load_unknown_module.py"
+    response:
+      status_code: 201
+      json:
+        data:
+          id: load_unknown_module
+          protocolFile:
+            basename: load_unknown_module.py
+          supportFiles: []
+          lastModifiedAt: *dt
+          createdAt: *dt
+          metadata:
+            author: Opentrons <protocols@opentrons.com>
+            apiLevel: '2.4'
+            name: Extraction
+          requiredEquipment:
+            pipettes: []
+            labware: []
+            modules: []
+          errors:
+          - type: ExceptionInProtocolError
+            description: !anystr
+            lineNumber: 9
+        links:
+          self:
+            href: '/protocols/load_unknown_module'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+  - name: Delete the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/load_unknown_module"
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        data: !anydict
+        links:
+          self:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+---
+test_name: Load labware, pipettes, and modules
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload python protocol labware, pipettes, and modules
+    request:
+      url: "{host:s}:{port:d}/protocols"
+      method: POST
+      files:
+        protocolFile: "tests/integration/protocols/labware_pipettes_modules.py"
+    response:
+      status_code: 201
+      json:
+        data:
+          id: labware_pipettes_modules
+          protocolFile:
+            basename: labware_pipettes_modules.py
+          supportFiles: []
+          lastModifiedAt: *dt
+          createdAt: *dt
+          metadata:
+            author: Opentrons <protocols@opentrons.com>
+            apiLevel: '2.4'
+            name: Extraction
+          requiredEquipment:
+            pipettes:
+            - mount: 'left'
+              requestedAs: "p300_multi_gen2"
+              pipetteName: "p300_multi_gen2"
+              channels: 8
+            - mount: 'right'
+              requestedAs: "p20_single_gen2"
+              pipetteName: "p20_single_gen2"
+              channels: 1
+            labware:
+            - label: 'elution plate'
+              uri: "opentrons/opentrons_96_aluminumblock_nest_wellplate_100ul/1"
+              location: 1
+            - uri: "opentrons/nest_12_reservoir_15ml/1"
+              location: 2
+              label: 'reagent reservoir 1'
+            - uri: "opentrons/nest_12_reservoir_15ml/1"
+              location: 3
+              label: 'reagent reservoir 2'
+            - uri: "opentrons/opentrons_96_tiprack_300ul/1"
+              location: 4
+              label: '200µl filtertiprack'
+            - uri: "opentrons/opentrons_96_tiprack_300ul/1"
+              location: 5
+              label: 'tiprack for parking'
+            - uri: "opentrons/nest_96_wellplate_2ml_deep/1"
+              location: 6
+              label: 'deepwell plate'
+            - uri: "opentrons/opentrons_96_tiprack_300ul/1"
+              location: 7
+              label: '200µl filtertiprack'
+            - uri: "opentrons/opentrons_96_tiprack_300ul/1"
+              location: 8
+              label: '200µl filtertiprack'
+            - uri: "opentrons/nest_1_reservoir_195ml/1"
+              location: 9
+              label: 'Liquid Waste'
+            - uri: "opentrons/opentrons_96_tiprack_300ul/1"
+              location: 10
+              label: '200µl filtertiprack'
+            - uri: "opentrons/opentrons_96_tiprack_300ul/1"
+              location: 11
+              label: '200µl filtertiprack'
+            - uri: "opentrons/opentrons_1_trash_1100ml_fixed/1"
+              location: 12
+              label: "opentrons_1_trash_1100ml_fixed"
+            modules:
+            - type: 'temperatureModuleType'
+              location: 1
+              model: "temperatureModuleV2"
+            - type: "magneticModuleType"
+              location: 6
+              model: "magneticModuleV2"
+          errors: []
+        links:
+          self:
+            href: '/protocols/labware_pipettes_modules'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+  - name: Delete the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/labware_pipettes_modules"
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        data: !anydict
+        links:
+          self:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+---
+test_name: Load thermocycler
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload python protocol with thermocycler
+    request:
+      url: "{host:s}:{port:d}/protocols"
+      method: POST
+      files:
+        protocolFile: "tests/integration/protocols/thermocycler.py"
+    response:
+      status_code: 201
+      json:
+        data:
+          id: thermocycler
+          protocolFile:
+            basename: thermocycler.py
+          supportFiles: []
+          lastModifiedAt: *dt
+          createdAt: *dt
+          metadata:
+            author: Opentrons <protocols@opentrons.com>
+            apiLevel: '2.4'
+            name: Thermocycler test
+          requiredEquipment:
+            pipettes: []
+            labware:
+            - uri: "opentrons/nest_96_wellplate_2ml_deep/1"
+              location: 7
+              label: 'deepwell plate'
+            - uri: "opentrons/opentrons_1_trash_1100ml_fixed/1"
+              location: 12
+              label: "opentrons_1_trash_1100ml_fixed"
+            modules:
+            - type: 'thermocyclerModuleType'
+              location: 7
+              model: "thermocyclerModuleV1"
+          errors: []
+        links:
+          self:
+            href: '/protocols/thermocycler'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+  - name: Delete the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/thermocycler"
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        data: !anydict
+        links:
+          self:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
