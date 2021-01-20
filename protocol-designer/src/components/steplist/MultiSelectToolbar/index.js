@@ -27,7 +27,7 @@ type ClickableIconProps = {
   isLast?: boolean,
 }
 
-const ClickableIcon = (props: ClickableIconProps): React.Node => {
+export const ClickableIcon = (props: ClickableIconProps): React.Node => {
   const { iconName, tooltipText, width } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'top',
