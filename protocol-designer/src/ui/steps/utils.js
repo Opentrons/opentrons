@@ -25,6 +25,15 @@ type DisabledFields = {
 }
 
 export const getPipetteDisabledFields = (): DisabledFields => ({
+  aspirate_mix_checkbox: i18n.t(
+    'tooltip.step_fields.batch_edit.aspirate_mix_checkbox.disabled.pipette-different'
+  ),
+  aspirate_mix_volume: i18n.t(
+    'tooltip.step_fields.batch_edit.aspirate_mix_volume.disabled.pipette-different'
+  ),
+  aspirate_mix_times: i18n.t(
+    'tooltip.step_fields.batch_edit.aspirate_mix_times.disabled.pipette-different'
+  ),
   aspirate_flowRate: i18n.t(
     'tooltip.step_fields.batch_edit.aspirate_flowRate.disabled.pipette-different'
   ),
@@ -102,5 +111,29 @@ export const getMultiDispensePathDisabledFields = (): DisabledFields => ({
   ),
   blowout_location: i18n.t(
     'tooltip.step_fields.batch_edit.blowout_location.disabled.multi-dispense'
+  ),
+})
+
+export const getPipetteDifferentAndMultiAspiratePathFields = (): DisabledFields => ({
+  aspirate_mix_checkbox: i18n.t(
+    'tooltip.step_fields.batch_edit.aspirate_mix_checkbox.disabled.multi-aspirate-pipette-different'
+  ),
+  aspirate_mix_volume: i18n.t(
+    'tooltip.step_fields.batch_edit.aspirate_mix_volume.disabled.multi-aspirate-pipette-different'
+  ),
+  aspirate_mix_times: i18n.t(
+    'tooltip.step_fields.batch_edit.aspirate_mix_times.disabled.multi-aspirate-pipette-different'
+  ),
+})
+
+export const getPipetteDifferentAndMultiDispensePathFields = (): DisabledFields => ({
+  dispense_mix_checkbox: i18n.t(
+    'tooltip.step_fields.batch_edit.dispense_mix_checkbox.disabled.multi-dispense-pipette-different'
+  ),
+  dispense_mix_volume: i18n.t(
+    'tooltip.step_fields.batch_edit.dispense_mix_volume.disabled.multi-dispense-pipette-different'
+  ),
+  dispense_mix_times: i18n.t(
+    'tooltip.step_fields.batch_edit.dispense_mix_times.disabled.multi-dispense-pipette-different'
   ),
 })

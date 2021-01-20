@@ -25,6 +25,8 @@ import {
   getMultiAspiratePathDisabledFields,
   getMultiDispensePathDisabledFields,
   getPipetteDisabledFields,
+  getPipetteDifferentAndMultiAspiratePathFields,
+  getPipetteDifferentAndMultiDispensePathFields,
 } from './utils'
 import type {
   FormData,
@@ -368,6 +370,12 @@ export const getMultiSelectDisabledFields: Selector<DisabledFields | null> = cre
       ...(dispenseLabwareDifferent && getDispenseLabwareDisabledFields()),
       ...(includesMultiAspirate && getMultiAspiratePathDisabledFields()),
       ...(includesMultiDispense && getMultiDispensePathDisabledFields()),
+      ...(includesMultiAspirate &&
+        pipettesDifferent &&
+        getPipetteDifferentAndMultiAspiratePathFields()),
+      ...(includesMultiDispense &&
+        pipettesDifferent &&
+        getPipetteDifferentAndMultiDispensePathFields()),
     }
 
     return disabledFields

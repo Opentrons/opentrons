@@ -699,6 +699,15 @@ describe('getMultiSelectDisabledFields', () => {
           mockmultiSelectItemIds
         )
       ).toEqual({
+        aspirate_mix_checkbox: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_mix_checkbox.disabled.pipette-different'
+        ),
+        aspirate_mix_volume: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_mix_volume.disabled.pipette-different'
+        ),
+        aspirate_mix_times: i18n.t(
+          'tooltip.step_fields.batch_edit.aspirate_mix_times.disabled.pipette-different'
+        ),
         aspirate_flowRate: i18n.t(
           'tooltip.step_fields.batch_edit.aspirate_flowRate.disabled.pipette-different'
         ),
@@ -850,6 +859,72 @@ describe('getMultiSelectDisabledFields', () => {
           'tooltip.step_fields.batch_edit.blowout_location.disabled.multi-dispense'
         ),
       })
+    })
+  })
+  describe('when pipettes are different AND a form includes a multi aspirate path', () => {
+    let savedStepForms
+    beforeEach(() => {
+      savedStepForms = {
+        ...mockSavedStepForms,
+        another_move_liquid_step_id: {
+          ...mockSavedStepForms.another_move_liquid_step_id,
+          path: 'multiAspirate',
+          pipette: 'different_pipette_id',
+        },
+      }
+    })
+    it('should return aspirate mix being disabled for both reasons', () => {
+      expect(
+        getMultiSelectDisabledFields.resultFunc(
+          savedStepForms,
+          mockmultiSelectItemIds
+        )
+      ).toEqual(
+        expect.objectContaining({
+          aspirate_mix_checkbox: i18n.t(
+            'tooltip.step_fields.batch_edit.aspirate_mix_checkbox.disabled.multi-aspirate-pipette-different'
+          ),
+          aspirate_mix_volume: i18n.t(
+            'tooltip.step_fields.batch_edit.aspirate_mix_volume.disabled.multi-aspirate-pipette-different'
+          ),
+          aspirate_mix_times: i18n.t(
+            'tooltip.step_fields.batch_edit.aspirate_mix_times.disabled.multi-aspirate-pipette-different'
+          ),
+        })
+      )
+    })
+  })
+  describe('when pipettes are different AND a form includes a multi dispense path', () => {
+    let savedStepForms
+    beforeEach(() => {
+      savedStepForms = {
+        ...mockSavedStepForms,
+        another_move_liquid_step_id: {
+          ...mockSavedStepForms.another_move_liquid_step_id,
+          path: 'multiDispense',
+          pipette: 'different_pipette_id',
+        },
+      }
+    })
+    it('should return aspirate mix being disabled for both reasons', () => {
+      expect(
+        getMultiSelectDisabledFields.resultFunc(
+          savedStepForms,
+          mockmultiSelectItemIds
+        )
+      ).toEqual(
+        expect.objectContaining({
+          dispense_mix_checkbox: i18n.t(
+            'tooltip.step_fields.batch_edit.dispense_mix_checkbox.disabled.multi-dispense-pipette-different'
+          ),
+          dispense_mix_volume: i18n.t(
+            'tooltip.step_fields.batch_edit.dispense_mix_volume.disabled.multi-dispense-pipette-different'
+          ),
+          dispense_mix_times: i18n.t(
+            'tooltip.step_fields.batch_edit.dispense_mix_times.disabled.multi-dispense-pipette-different'
+          ),
+        })
+      )
     })
   })
 })
