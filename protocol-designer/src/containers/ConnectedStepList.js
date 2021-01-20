@@ -5,19 +5,23 @@ import type { BaseState, ThunkDispatch } from '../types'
 import type { StepIdType } from '../form-types'
 
 import { actions as steplistActions } from '../steplist'
-import { actions as stepsActions } from '../ui/steps'
+import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { StepList } from '../components/steplist'
 
 type Props = React.ElementProps<typeof StepList>
 
-type SP = {| orderedStepIds: $PropertyType<Props, 'orderedStepIds'> |}
+type SP = {|
+  orderedStepIds: $PropertyType<Props, 'orderedStepIds'>,
+  isMultiSelectMode: ?boolean,
+|}
 
 type DP = $Diff<$Exact<Props>, SP>
 
 function mapStateToProps(state: BaseState): SP {
   return {
     orderedStepIds: stepFormSelectors.getOrderedStepIds(state),
+    isMultiSelectMode: getIsMultiSelectMode(state),
   }
 }
 

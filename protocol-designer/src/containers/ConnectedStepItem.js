@@ -17,6 +17,7 @@ import {
   getSelectedStepId,
   getMultiSelectItemIds,
   getMultiSelectLastSelected,
+  getIsMultiSelectMode,
   actions as stepsActions,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
@@ -79,6 +80,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
   const lastMultiSelectedStepId = useSelector(getMultiSelectLastSelected)
+  const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const selected: boolean = multiSelectItemIds?.length
     ? multiSelectItemIds.includes(stepId)
     : selectedStepId === stepId
@@ -196,6 +198,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     handleClick: confirmWithPersistedEvent,
     toggleStepCollapsed,
     unhighlightStep,
+    isMultiSelectMode,
   }
 
   const stepItemContentsProps = {

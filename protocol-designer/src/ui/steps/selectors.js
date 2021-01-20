@@ -54,6 +54,13 @@ export const getSelectedTerminalItemId: Selector<TerminalItemId | null> = create
   item => (item.selectionType === TERMINAL_ITEM_SELECTION_TYPE ? item.id : null)
 )
 
+export const getIsMultiSelectMode: Selector<boolean> = createSelector(
+  getSelectedItem,
+  item => {
+    return item.selectionType === MULTI_STEP_SELECTION_TYPE
+  }
+)
+
 export const getMultiSelectItemIds: Selector<Array<StepIdType> | null> = createSelector(
   getSelectedItem,
   item => {

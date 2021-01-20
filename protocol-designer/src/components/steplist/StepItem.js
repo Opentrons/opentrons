@@ -12,7 +12,7 @@ import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
 import { stepIconsByType, PROFILE_CYCLE } from '../../form-types'
 import { i18n } from '../../localization'
 import { makeLidLabelText, makeTemperatureText } from '../../utils'
-import { PDListItem, PDTitledList } from '../lists'
+import { PDListItem, TitledStepList } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
 import { MixHeader } from './MixHeader'
@@ -46,6 +46,7 @@ export type StepItemProps = {|
   warning?: ?boolean,
   selected?: boolean,
   hovered?: boolean,
+  isMultiSelectMode?: boolean,
 
   highlightStep: () => mixed,
   onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
@@ -71,6 +72,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
     onStepContextMenu,
     toggleStepCollapsed,
     highlightStep,
+    isMultiSelectMode,
   } = props
 
   const iconName = stepIconsByType[stepType]
@@ -85,7 +87,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
   ) : null
 
   return (
-    <PDTitledList
+    <TitledStepList
       className={cx(styles.step_item_wrapper)}
       description={Description}
       iconName={error || warning ? 'alert-circle' : iconName}
@@ -98,10 +100,10 @@ export const StepItem = (props: StepItemProps): React.Node => {
       onMouseEnter={highlightStep}
       onMouseLeave={unhighlightStep}
       onCollapseToggle={toggleStepCollapsed}
-      {...{ selected, collapsed, hovered }}
+      {...{ selected, collapsed, hovered, isMultiSelectMode }}
     >
       {props.children}
-    </PDTitledList>
+    </TitledStepList>
   )
 }
 
