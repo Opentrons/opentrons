@@ -3,49 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.1.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.3...v4.1.0-alpha.4) (2021-01-20)
+# [4.1.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0) (2021-01-20)
 
-**Note:** Version bump only for package protocol-designer
-
-
-
-
-
-# [4.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.2...v4.1.0-alpha.3) (2021-01-14)
-
-**Note:** Version bump only for package protocol-designer
-
-
-
-
-
-# [4.1.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.1...v4.1.0-alpha.2) (2021-01-12)
-
-**Note:** Version bump only for package protocol-designer
-
-
-
-
-
-# [4.1.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.0...v4.1.0-alpha.1) (2021-01-12)
-
-**Note:** Version bump only for package protocol-designer
-
-
-
-
-
-# [4.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0-alpha.0) (2021-01-11)
-
-
-### Bug Fixes
+## Bug Fixes
 
 * **protocol-designer:** fix lastModified when exporting ([#7024](https://github.com/Opentrons/opentrons/issues/7024)) ([50096cd](https://github.com/Opentrons/opentrons/commit/50096cd)), closes [#6636](https://github.com/Opentrons/opentrons/issues/6636)
 * **protocol-designer:** include custom tiprack defs... ([#7099](https://github.com/Opentrons/opentrons/issues/7099)) ([b98e621](https://github.com/Opentrons/opentrons/commit/b98e621)), closes [#6875](https://github.com/Opentrons/opentrons/issues/6875)
 * **protocol-designer:** skip 10000s of redundant state updates ([#7053](https://github.com/Opentrons/opentrons/issues/7053)) ([f2d5cb2](https://github.com/Opentrons/opentrons/commit/f2d5cb2))
 
 
-### Features
+## Features
 
 * **protocol designer:** bump pd version for hotfix release ([#6896](https://github.com/Opentrons/opentrons/issues/6896)) ([2ba7e1f](https://github.com/Opentrons/opentrons/commit/2ba7e1f))
 * **protocol-designer:** add "batch edit" feature flag ([#7079](https://github.com/Opentrons/opentrons/issues/7079)) ([350be43](https://github.com/Opentrons/opentrons/commit/350be43)), closes [#7058](https://github.com/Opentrons/opentrons/issues/7058)
