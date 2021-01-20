@@ -20,8 +20,8 @@ type OP = {|
 
 type SP = {|
   wellContents: ContentsByWell,
-  missingTips: WellGroup,
-  highlightedWells: WellGroup,
+  missingTips: ?WellGroup,
+  highlightedWells: ?WellGroup,
 |}
 
 type Props = { ...OP, ...SP }
@@ -54,13 +54,13 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   return {
     wellContents: allWellContentsForActiveItem
       ? allWellContentsForActiveItem[labwareOnDeck.id]
-      : {}, // TODO(IL, 2020-12-15): null instead of {}? See #7135
+      : null,
     highlightedWells: highlightSelectors.wellHighlightsByLabwareId(state)[
       labwareOnDeck.id
     ],
     missingTips: missingTipsByLabwareId
       ? missingTipsByLabwareId[labwareOnDeck.id]
-      : {}, // TODO(IL, 2020-12-15): null instead of {}? See #7135
+      : null,
   }
 }
 

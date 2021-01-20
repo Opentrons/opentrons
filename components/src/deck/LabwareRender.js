@@ -18,9 +18,9 @@ import type {
 export type LabwareRenderProps = {|
   definition: LabwareDefinition2,
   showLabels?: boolean,
-  missingTips?: WellGroup,
-  highlightedWells?: WellGroup,
-  selectedWells?: WellGroup,
+  missingTips?: ?WellGroup,
+  highlightedWells?: ?WellGroup,
+  selectedWells?: ?WellGroup,
   /** CSS color to fill specified wells */
   wellFill?: WellFill,
   /** Optional callback, called with WellMouseEvent args onMouseEnter */

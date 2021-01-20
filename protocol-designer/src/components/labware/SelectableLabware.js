@@ -129,7 +129,7 @@ export class SelectableLabware extends React.Component<Props> {
     // For rendering, show all wells not just primary wells
     const allSelectedWells =
       pipetteChannels === 8
-        ? reduce(
+        ? reduce<WellGroup, WellGroup>(
             selectedPrimaryWells,
             (acc, _, wellName): WellGroup => {
               const wellSet = getWellSetForMultichannel(
@@ -163,11 +163,13 @@ export class SelectableLabware extends React.Component<Props> {
               }}
               selectableWellClass={SELECTABLE_WELL_CLASS}
               onMouseEnterWell={({ wellName, event }) => {
-                this.handleMouseEnterWell({ wellName, event })
-                makeHandleMouseEnterWell(
-                  wellName,
-                  wellContents[wellName]?.ingreds
-                )(event)
+                if (wellContents !== null) {
+                  this.handleMouseEnterWell({ wellName, event })
+                  makeHandleMouseEnterWell(
+                    wellName,
+                    wellContents[wellName]?.ingreds
+                  )(event)
+                }
               }}
             />
           )}

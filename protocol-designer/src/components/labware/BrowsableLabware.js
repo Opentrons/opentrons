@@ -36,16 +36,25 @@ export function BrowsableLabware(props: Props): React.Node {
           definition={definition}
           showLabels
           wellFill={wellFillFromWellContents(wellContents)}
-          highlightedWells={reduce(
-            wellContents,
-            (acc, _, wellName): WellGroup =>
-              tooltipWellName === wellName ? { ...acc, [wellName]: null } : acc,
-            {}
-          )}
+          highlightedWells={
+            wellContents === null
+              ? null
+              : reduce(
+                  wellContents,
+                  (acc, _, wellName): WellGroup =>
+                    tooltipWellName === wellName
+                      ? { ...acc, [wellName]: null }
+                      : acc,
+                  {}
+                )
+          }
           onMouseEnterWell={({ event, wellName }) =>
-            makeHandleMouseEnterWell(wellName, wellContents[wellName].ingreds)(
-              event
-            )
+            wellContents === null
+              ? null
+              : makeHandleMouseEnterWell(
+                  wellName,
+                  wellContents[wellName].ingreds
+                )(event)
           }
           onMouseLeaveWell={handleMouseLeaveWell}
         />

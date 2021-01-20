@@ -28,7 +28,7 @@ export type WellContents = {|
 export type ContentsByWell = {
   [wellName: string]: WellContents,
   ...,
-}
+} | null
 
 export type WellContentsByLabware = {
   [labwareId: string]: ContentsByWell,
@@ -37,10 +37,10 @@ export type WellContentsByLabware = {
 
 // ==== INGREDIENTS ====
 
-export type OrderedLiquids = Array<{
+export type OrderedLiquids = Array<{|
   ingredientId: string,
   name: ?string,
-}>
+|}>
 
 // TODO: Ian 2018-10-15 audit & rename these confusing types
 export type LiquidGroup = {|
