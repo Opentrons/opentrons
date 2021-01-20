@@ -681,6 +681,27 @@ describe('getMultiSelectDisabledFields', () => {
     ).toEqual({})
   })
 
+  describe('disabled field tooltips', () => {
+    it('should exist', () => {
+      const baseText = 'tooltip.step_fields.batch_edit.disabled'
+      const disabledReasons = [
+        'pipette-different',
+        'aspirate-labware-different',
+        'dispense-labware-different',
+        'multi-aspirate-present',
+        'multi-aspirate-present-pipette-different',
+        'multi-dispense-present',
+        'multi-dispense-present-pipette-different',
+      ]
+
+      expect.assertions(7)
+      disabledReasons.forEach(reason => {
+        const searchText = `${baseText}.${reason}`
+        expect(i18n.t(`${baseText}.${reason}`) !== searchText).toBe(true)
+      })
+    })
+  })
+
   describe('when pipettes are different', () => {
     let savedStepForms
     beforeEach(() => {
@@ -700,31 +721,40 @@ describe('getMultiSelectDisabledFields', () => {
         )
       ).toEqual({
         aspirate_mix_checkbox: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_mix_checkbox.disabled.pipette-different'
+          'tooltip.step_fields.batch_edit.disabled.pipette-different'
         ),
         aspirate_mix_volume: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_mix_volume.disabled.pipette-different'
+          'tooltip.step_fields.batch_edit.disabled.pipette-different'
         ),
         aspirate_mix_times: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_mix_times.disabled.pipette-different'
+          'tooltip.step_fields.batch_edit.disabled.pipette-different'
         ),
         aspirate_flowRate: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_flowRate.disabled.pipette-different'
+          'tooltip.step_fields.batch_edit.disabled.pipette-different'
         ),
         aspirate_airGap_checkbox: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_airGap_checkbox.disabled.pipette-different'
+          'tooltip.step_fields.batch_edit.disabled.pipette-different'
         ),
         aspirate_airGap_volume: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_airGap_volume.disabled.pipette-different'
+          'tooltip.step_fields.batch_edit.disabled.pipette-different'
+        ),
+        dispense_mix_checkbox: i18n.t(
+          'tooltip.step_fields.batch_edit.disabled.pipette-different'
+        ),
+        dispense_mix_volume: i18n.t(
+          'tooltip.step_fields.batch_edit.disabled.pipette-different'
+        ),
+        dispense_mix_times: i18n.t(
+          'tooltip.step_fields.batch_edit.disabled.pipette-different'
         ),
         dispense_flowRate: i18n.t(
-          'tooltip.step_fields.batch_edit.dispense_flowRate.disabled.pipette-different'
+          'tooltip.step_fields.batch_edit.disabled.pipette-different'
         ),
         dispense_airGap_checkbox: i18n.t(
-          'tooltip.step_fields.batch_edit.dispense_airGap_checkbox.disabled.pipette-different'
+          'tooltip.step_fields.batch_edit.disabled.pipette-different'
         ),
         dispense_airGap_volume: i18n.t(
-          'tooltip.step_fields.batch_edit.dispense_airGap_volume.disabled.pipette-different'
+          'tooltip.step_fields.batch_edit.disabled.pipette-different'
         ),
       })
     })
@@ -748,16 +778,16 @@ describe('getMultiSelectDisabledFields', () => {
         )
       ).toEqual({
         aspirate_mmFromBottom: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_mmFromBottom.disabled.aspirate-labware-different'
+          'tooltip.step_fields.batch_edit.disabled.aspirate-labware-different'
         ),
         aspirate_delay_checkbox: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_delay_checkbox.disabled.aspirate-labware-different'
+          'tooltip.step_fields.batch_edit.disabled.aspirate-labware-different'
         ),
         aspirate_delay_seconds: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_delay_seconds.disabled.aspirate-labware-different'
+          'tooltip.step_fields.batch_edit.disabled.aspirate-labware-different'
         ),
         aspirate_delay_mmFromBottom: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_delay_mmFromBottom.disabled.aspirate-labware-different'
+          'tooltip.step_fields.batch_edit.disabled.aspirate-labware-different'
         ),
       })
     })
@@ -781,16 +811,16 @@ describe('getMultiSelectDisabledFields', () => {
         )
       ).toEqual({
         dispense_mmFromBottom: i18n.t(
-          'tooltip.step_fields.batch_edit.dispense_mmFromBottom.disabled.dispense-labware-different'
+          'tooltip.step_fields.batch_edit.disabled.dispense-labware-different'
         ),
         dispense_delay_checkbox: i18n.t(
-          'tooltip.step_fields.batch_edit.dispense_delay_checkbox.disabled.dispense-labware-different'
+          'tooltip.step_fields.batch_edit.disabled.dispense-labware-different'
         ),
         dispense_delay_seconds: i18n.t(
-          'tooltip.step_fields.batch_edit.dispense_delay_seconds.disabled.dispense-labware-different'
+          'tooltip.step_fields.batch_edit.disabled.dispense-labware-different'
         ),
         dispense_delay_mmFromBottom: i18n.t(
-          'tooltip.step_fields.batch_edit.dispense_delay_mmFromBottom.disabled.dispense-labware-different'
+          'tooltip.step_fields.batch_edit.disabled.dispense-labware-different'
         ),
       })
     })
@@ -814,13 +844,13 @@ describe('getMultiSelectDisabledFields', () => {
         )
       ).toEqual({
         aspirate_mix_checkbox: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_mix_checkbox.disabled.multi-aspirate'
+          'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present'
         ),
         aspirate_mix_volume: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_mix_volume.disabled.multi-aspirate'
+          'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present'
         ),
         aspirate_mix_times: i18n.t(
-          'tooltip.step_fields.batch_edit.aspirate_mix_times.disabled.multi-aspirate'
+          'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present'
         ),
       })
     })
@@ -844,19 +874,19 @@ describe('getMultiSelectDisabledFields', () => {
         )
       ).toEqual({
         dispense_mix_checkbox: i18n.t(
-          'tooltip.step_fields.batch_edit.dispense_mix_checkbox.disabled.multi-dispense'
+          'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
         ),
         dispense_mix_volume: i18n.t(
-          'tooltip.step_fields.batch_edit.dispense_mix_volume.disabled.multi-dispense'
+          'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
         ),
         dispense_mix_times: i18n.t(
-          'tooltip.step_fields.batch_edit.dispense_mix_times.disabled.multi-dispense'
+          'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
         ),
         blowout_checkbox: i18n.t(
-          'tooltip.step_fields.batch_edit.blowout_checkbox.disabled.multi-dispense'
+          'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
         ),
         blowout_location: i18n.t(
-          'tooltip.step_fields.batch_edit.blowout_location.disabled.multi-dispense'
+          'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
         ),
       })
     })
@@ -882,13 +912,13 @@ describe('getMultiSelectDisabledFields', () => {
       ).toEqual(
         expect.objectContaining({
           aspirate_mix_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.aspirate_mix_checkbox.disabled.multi-aspirate-pipette-different'
+            'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present-pipette-different'
           ),
           aspirate_mix_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.aspirate_mix_volume.disabled.multi-aspirate-pipette-different'
+            'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present-pipette-different'
           ),
           aspirate_mix_times: i18n.t(
-            'tooltip.step_fields.batch_edit.aspirate_mix_times.disabled.multi-aspirate-pipette-different'
+            'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present-pipette-different'
           ),
         })
       )
@@ -915,13 +945,13 @@ describe('getMultiSelectDisabledFields', () => {
       ).toEqual(
         expect.objectContaining({
           dispense_mix_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.dispense_mix_checkbox.disabled.multi-dispense-pipette-different'
+            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present-pipette-different'
           ),
           dispense_mix_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.dispense_mix_volume.disabled.multi-dispense-pipette-different'
+            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present-pipette-different'
           ),
           dispense_mix_times: i18n.t(
-            'tooltip.step_fields.batch_edit.dispense_mix_times.disabled.multi-dispense-pipette-different'
+            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present-pipette-different'
           ),
         })
       )

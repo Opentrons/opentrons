@@ -47,127 +47,14 @@
       }
     },
     "batch_edit": {
-      "aspirate_flowRate": {
-        "disabled": {
-          "pipette-different": "Cannot edit unless selected steps share the same pipette."
-        }
-      },
-      "aspirate_airGap_checkbox": {
-        "disabled": {
-          "pipette-different": "Cannot edit unless selected steps share the same pipette."
-        }
-      },
-      "aspirate_airGap_volume": {
-        "disabled": {
-          "pipette-different": "Cannot edit unless selected steps share the same pipette."
-        }
-      },
-      "dispense_flowRate": {
-        "disabled": {
-          "pipette-different": "Cannot edit unless selected steps share the same pipette."
-        }
-      },
-      "dispense_airGap_checkbox": {
-        "disabled": {
-          "pipette-different": "Cannot edit unless selected steps share the same pipette."
-        }
-      },
-      "dispense_airGap_volume": {
-        "disabled": {
-          "pipette-different": "Cannot edit unless selected steps share the same pipette."
-        }
-      },
-      "aspirate_delay_checkbox": {
-        "disabled": {
-          "aspirate-labware-different": "Cannot edit unless selected steps share the same type of source labware."
-        }
-      },
-      "aspirate_delay_seconds": {
-        "disabled": {
-          "aspirate-labware-different": "Cannot edit unless selected steps share the same type of source labware."
-        }
-      },
-      "aspirate_delay_mmFromBottom": {
-        "disabled": {
-          "aspirate-labware-different": "Cannot edit unless selected steps share the same type of source labware."
-        }
-      },
-      "aspirate_mmFromBottom": {
-        "disabled": {
-          "aspirate-labware-different": "Cannot edit unless selected steps share the same type of source labware."
-        }
-      },
-      "dispense_delay_checkbox": {
-        "disabled": {
-          "dispense-labware-different": "Cannot edit unless selected steps share the same type of destination labware."
-        }
-      },
-      "dispense_delay_seconds": {
-        "disabled": {
-          "dispense-labware-different": "Cannot edit unless selected steps share the same type of destination labware."
-        }
-      },
-      "dispense_delay_mmFromBottom": {
-        "disabled": {
-          "dispense-labware-different": "Cannot edit unless selected steps share the same type of destination labware."
-        }
-      },
-      "dispense_mmFromBottom": {
-        "disabled": {
-          "dispense-labware-different": "Cannot edit unless selected steps share the same type of destination labware."
-        }
-      },
-      "aspirate_mix_checkbox": {
-        "disabled": {
-          "pipette-different": "Cannot edit unless selected steps share the same pipette.",
-          "multi-aspirate": "Cannot edit while one or more selected steps uses the multi-aspirate path.",
-          "multi-aspirate-pipette-different": "Cannot edit while one or more selected steps uses the multi-aspirate path. Selected steps must also share the same pipette."
-        }
-      },
-      "aspirate_mix_volume": {
-        "disabled": {
-          "pipette-different": "Cannot edit unless selected steps share the same pipette.",
-          "multi-aspirate": "Cannot edit while one or more selected steps uses the multi-aspirate path.",
-          "multi-aspirate-pipette-different": "Cannot edit while one or more selected steps uses the multi-aspirate path. Selected steps must also share the same pipette."
-        }
-      },
-      "aspirate_mix_times": {
-        "disabled": {
-          "pipette-different": "Cannot edit unless selected steps share the same pipette.",
-          "multi-aspirate": "Cannot edit while one or more selected steps uses the multi-aspirate path.",
-          "multi-aspirate-pipette-different": "Cannot edit while one or more selected steps uses the multi-aspirate path. Selected steps must also share the same pipette."
-        }
-      },
-      "dispense_mix_checkbox": {
-        "disabled": {
-          "pipette-different": "Cannot edit unless selected steps share the same pipette.",
-          "multi-dispense": "Cannot edit while one or more selected steps uses the multi-dispense path.",
-          "multi-dispense-pipette-different": "Cannot edit while one or more selected steps uses the multi-dispense path. Selected steps must also share the same pipette."
-        }
-      },
-      "dispense_mix_volume": {
-        "disabled": {
-          "pipette-different": "Cannot edit unless selected steps share the same pipette.",
-          "multi-dispense": "Cannot edit while one or more selected steps uses the multi-dispense path.",
-          "multi-dispense-pipette-different": "Cannot edit while one or more selected steps uses the multi-dispense path. Selected steps must also share the same pipette."
-        }
-      },
-      "dispense_mix_times": {
-        "disabled": {
-          "pipette-different": "Cannot edit unless selected steps share the same pipette.",
-          "multi-dispense": "Cannot edit while one or more selected steps uses the multi-dispense path.",
-          "multi-dispense-pipette-different": "Cannot edit while one or more selected steps uses the multi-dispense path. Selected steps must also share the same pipette."
-        }
-      },
-      "blowout_checkbox": {
-        "disabled": {
-          "multi-dispense": "Cannot edit while one or more selected steps uses the multi-dispense path."
-        }
-      },
-      "blowout_location": {
-        "disabled": {
-          "multi-dispense": "Cannot edit while one or more selected steps uses the multi-dispense path."
-        }
+      "disabled": {
+        "pipette-different": "Cannot edit unless selected steps share the same pipette.",
+        "aspirate-labware-different": "Cannot edit unless selected steps share the same type of source labware.",
+        "dispense-labware-different": "Cannot edit unless selected steps share the same type of destination labware.",
+        "multi-aspirate-present": "Cannot edit while one or more selected steps uses the multi-aspirate path.",
+        "multi-aspirate-present-pipette-different": "Cannot edit while one or more selected steps uses the multi-aspirate path. Selected steps must also share the same pipette.",
+        "multi-dispense-present": "Cannot edit while one or more selected steps uses the multi-dispense path.",
+        "multi-dispense-present-pipette-different": "Cannot edit while one or more selected steps uses the multi-dispense path. Selected steps must also share the same pipette."
       }
     },
     "pauseAction": {

@@ -24,7 +24,7 @@ import {
   getDispenseLabwareDisabledFields,
   getMultiAspiratePathDisabledFields,
   getMultiDispensePathDisabledFields,
-  getPipetteDisabledFields,
+  getPipetteDifferentDisabledFields,
   getPipetteDifferentAndMultiAspiratePathFields,
   getPipetteDifferentAndMultiDispensePathFields,
 } from './utils'
@@ -364,7 +364,7 @@ export const getMultiSelectDisabledFields: Selector<DisabledFields | null> = cre
     )
 
     const disabledFields: DisabledFields = {
-      ...(pipettesDifferent && getPipetteDisabledFields()),
+      ...(pipettesDifferent && getPipetteDifferentDisabledFields()),
       ...(aspirateLabwareDifferent && getAspirateLabwareDisabledFields()),
       // $FlowIssue(sa, 2021-01-13): https://github.com/facebook/flow/issues/8186
       ...(dispenseLabwareDifferent && getDispenseLabwareDisabledFields()),
