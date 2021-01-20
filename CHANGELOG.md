@@ -3,51 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.1.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.3...v4.1.0-alpha.4) (2021-01-20)
+# [4.1.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0) (2021-01-20)
 
 
-### Bug Fixes
+## Bug Fixes
 
 * **robot-server:** disable overlap for custom tips ([#7229](https://github.com/Opentrons/opentrons/issues/7229)) ([1e180c8](https://github.com/Opentrons/opentrons/commit/1e180c8))
 * **robot-server:** save custom tiprack def on robot during tip length cal ([#7231](https://github.com/Opentrons/opentrons/issues/7231)) ([4fe2b37](https://github.com/Opentrons/opentrons/commit/4fe2b37))
-
-
-
-
-
-# [4.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.2...v4.1.0-alpha.3) (2021-01-14)
-
-
-### Bug Fixes
-
 * **api:** do not call a method dependent on the Python API Version directly ([#7220](https://github.com/Opentrons/opentrons/issues/7220)) ([2382ac6](https://github.com/Opentrons/opentrons/commit/2382ac6))
 * **app:** restrict size of reset config modal ([#7212](https://github.com/Opentrons/opentrons/issues/7212)) ([01ca11e](https://github.com/Opentrons/opentrons/commit/01ca11e))
-
-
-
-
-
-# [4.1.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.1...v4.1.0-alpha.2) (2021-01-12)
-
-**Note:** Version bump only for package opentrons
-
-
-
-
-
-# [4.1.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.0...v4.1.0-alpha.1) (2021-01-12)
-
-**Note:** Version bump only for package opentrons
-
-
-
-
-
-# [4.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0-alpha.0) (2021-01-11)
-
-
-### Bug Fixes
-
 * **api:** bump y max bounds to match robot geometry ([#7140](https://github.com/Opentrons/opentrons/issues/7140)) ([85b3d6b](https://github.com/Opentrons/opentrons/commit/85b3d6b)), closes [#6886](https://github.com/Opentrons/opentrons/issues/6886)
 * **api:** ensure exact delay floats are preserved in command log ([#7078](https://github.com/Opentrons/opentrons/issues/7078)) ([8ebb2dc](https://github.com/Opentrons/opentrons/commit/8ebb2dc)), closes [#7066](https://github.com/Opentrons/opentrons/issues/7066)
 * **api:** fixed `axis` variable renaming in final `driver_3_0.home` block of code ([#7015](https://github.com/Opentrons/opentrons/issues/7015)) ([65abcb1](https://github.com/Opentrons/opentrons/commit/65abcb1))
@@ -66,7 +30,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **robot-server:** ProtocolManager expects a ThreadManager and not a SynchronousAdapter. ([#7175](https://github.com/Opentrons/opentrons/issues/7175)) ([c0c9225](https://github.com/Opentrons/opentrons/commit/c0c9225))
 
 
-### Features
+## Features
 
 * **api:** add aspirate handling to protocol engine ([#7191](https://github.com/Opentrons/opentrons/issues/7191)) ([18bfdea](https://github.com/Opentrons/opentrons/commit/18bfdea))
 * **api:** add deck and deck fixture loading to ProtocolEngine factory ([#7031](https://github.com/Opentrons/opentrons/issues/7031)) ([509b7b7](https://github.com/Opentrons/opentrons/commit/509b7b7))
@@ -98,7 +62,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **shared-data:** add default tipracks to each pipette name spec ([#7108](https://github.com/Opentrons/opentrons/issues/7108)) ([757ca85](https://github.com/Opentrons/opentrons/commit/757ca85))
 
 
-### Performance Improvements
+## Performance Improvements
 
 * **api:** more (small) simulation improvements ([#7132](https://github.com/Opentrons/opentrons/issues/7132)) ([6ad1477](https://github.com/Opentrons/opentrons/commit/6ad1477))
 * **api:** simulation optimizations ([#7124](https://github.com/Opentrons/opentrons/issues/7124)) ([d8ea3b2](https://github.com/Opentrons/opentrons/commit/d8ea3b2))

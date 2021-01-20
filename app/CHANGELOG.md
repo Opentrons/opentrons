@@ -3,50 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.1.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.3...v4.1.0-alpha.4) (2021-01-20)
+# [4.1.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0) (2021-01-20)
 
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [4.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.2...v4.1.0-alpha.3) (2021-01-14)
-
-
-### Bug Fixes
+## Bug Fixes
 
 * **app:** restrict size of reset config modal ([#7212](https://github.com/Opentrons/opentrons/issues/7212)) ([01ca11e](https://github.com/Opentrons/opentrons/commit/01ca11e))
-
-
-
-
-
-# [4.1.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.1...v4.1.0-alpha.2) (2021-01-12)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [4.1.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.0...v4.1.0-alpha.1) (2021-01-12)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [4.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0-alpha.0) (2021-01-11)
-
-
-### Bug Fixes
-
 * **app:** prompt whether to replace pipette after detach ([#7025](https://github.com/Opentrons/opentrons/issues/7025)) ([dfa92c3](https://github.com/Opentrons/opentrons/commit/dfa92c3))
 
 
-### Features
+## Features
 
 * **app:** allow custom tiprack selection in deck cal & pipette offset cal ([#7155](https://github.com/Opentrons/opentrons/issues/7155)) ([c8fc9f2](https://github.com/Opentrons/opentrons/commit/c8fc9f2)), closes [#7087](https://github.com/Opentrons/opentrons/issues/7087)
 * **app:** Allow Z jog in save-xy-point ([#7117](https://github.com/Opentrons/opentrons/issues/7117)) ([50865f0](https://github.com/Opentrons/opentrons/commit/50865f0)), closes [#7094](https://github.com/Opentrons/opentrons/issues/7094)

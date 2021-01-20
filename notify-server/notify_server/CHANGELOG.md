@@ -3,42 +3,9 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.1.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.3...v4.1.0-alpha.4) (2021-01-20)
+# [4.1.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0) (2021-01-20)
 
-**Note:** Version bump only for package @opentrons/notify-server
-
-
-
-
-
-# [4.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.2...v4.1.0-alpha.3) (2021-01-14)
-
-**Note:** Version bump only for package @opentrons/notify-server
-
-
-
-
-
-# [4.1.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.1...v4.1.0-alpha.2) (2021-01-12)
-
-**Note:** Version bump only for package @opentrons/notify-server
-
-
-
-
-
-# [4.1.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.0...v4.1.0-alpha.1) (2021-01-12)
-
-**Note:** Version bump only for package @opentrons/notify-server
-
-
-
-
-
-# [4.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0-alpha.0) (2021-01-11)
-
-
-### Features
+## Features
 
 * **robot-server:** add hardware events publisher ([#7042](https://github.com/Opentrons/opentrons/issues/7042)) ([9943acc](https://github.com/Opentrons/opentrons/commit/9943acc))
 * **robot-server:** notifications service websocket subscriber client ([#7107](https://github.com/Opentrons/opentrons/issues/7107)) ([3986b0a](https://github.com/Opentrons/opentrons/commit/3986b0a)), closes [#6911](https://github.com/Opentrons/opentrons/issues/6911) [#6909](https://github.com/Opentrons/opentrons/issues/6909)
