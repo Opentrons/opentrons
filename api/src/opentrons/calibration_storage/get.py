@@ -282,3 +282,25 @@ def get_all_pipette_offset_calibrations() \
                         source=_get_calibration_source(data),
                         status=_get_calibration_status(data)))
     return all_calibrations
+
+
+def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> 'LabwareDefinition':
+    """
+    Return the custom tiprack definition saved in the custom tiprack directory
+    during tip length calibration
+    """
+    import logging
+    MOD = logging.getLogger(__name__)
+    custom_tiprack_dir = config.get_custom_tiprack_def_path()
+    custom_tiprack_path = custom_tiprack_dir / f'{labware_uri}.json'
+    MOD.info(f'path: {custom_tiprack_path}')
+    try:
+        with open(custom_tiprack_path, 'rb') as f:
+            return json.loads(f.read().decode('utf-8'))
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            f'Custom tiprack {labware_uri} not found in the custom tiprack'
+            'directory on the robot. Please recalibrate tip length and '
+            'pipette offset with this tiprack before performing calibration '
+            'health check.'
+        )

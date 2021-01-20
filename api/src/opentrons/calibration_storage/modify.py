@@ -11,6 +11,7 @@ from dataclasses import asdict
 from opentrons import config
 from opentrons.types import Mount, Point
 
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.util.helpers import utc_now
 
 from . import (
@@ -140,8 +141,22 @@ def create_tip_length_data(
         'uri': labware_uri
     }
 
+    if not definition.get('namespace') == OPENTRONS_NAMESPACE:
+        _save_custom_tiprack_definition(labware_uri, definition)
+
     data = {labware_hash + parent: tip_length_data}
     return data
+
+
+def _save_custom_tiprack_definition(
+        labware_uri: str, definition: 'LabwareDefinition'):
+    namespace, load_name, version = labware_uri.split('/')
+    custom_tr_dir_path = config.get_custom_tiprack_def_path()
+    custom_namespace_dir = custom_tr_dir_path/f'{namespace}/{load_name}'
+    custom_namespace_dir.mkdir(parents=True, exist_ok=True)
+
+    custom_tr_def_path = custom_namespace_dir/f'{version}.json'
+    io.save_to_file(custom_tr_def_path, definition)
 
 
 def _helper_offset_data_format(filepath: str, delta: Point) -> dict:

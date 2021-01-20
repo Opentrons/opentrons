@@ -256,9 +256,9 @@ def test_clear_tip_length_calibration_data(monkeypatch):
         }
         json.dump(test_offset, offset_file)
 
-    assert len(os.listdir(calpath)) > 0
+    assert len([f for f in os.listdir(calpath) if f.endswith('.json')]) > 0
     delete.clear_tip_length_calibration()
-    assert len(os.listdir(calpath)) == 0
+    assert len([f for f in os.listdir(calpath) if f.endswith('.json')]) == 0
 
 
 def test_schema_shape(monkeypatch, clear_calibration):
