@@ -314,9 +314,9 @@ class CheckCalibrationUserFlow:
         position = self._deck.position_for(TIPRACK_SLOT)
         if details.namespace == OPENTRONS_NAMESPACE:
             tiprack = labware.load(load_name=details.load_name,
-                                namespace=details.namespace,
-                                version=details.version,
-                                parent=position)
+                                   namespace=details.namespace,
+                                   version=details.version,
+                                   parent=position)
             tiprack_def = tiprack._implementation.get_definition()
         else:
             tiprack_def = get.get_custom_tiprack_definition_for_tlc(
