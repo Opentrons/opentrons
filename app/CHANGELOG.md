@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.3...v4.1.0-alpha.4) (2021-01-20)
+
+**Note:** Version bump only for package @opentrons/app
+
+
+
+
+
 # [4.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.2...v4.1.0-alpha.3) (2021-01-14)
 
 

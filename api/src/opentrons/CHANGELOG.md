@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.3...v4.1.0-alpha.4) (2021-01-20)
+
+
+### Bug Fixes
+
+* **robot-server:** save custom tiprack def on robot during tip length cal ([#7231](https://github.com/Opentrons/opentrons/issues/7231)) ([4fe2b37](https://github.com/Opentrons/opentrons/commit/4fe2b37))
+
+
+
+
+
 # [4.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.1.0-alpha.2...v4.1.0-alpha.3) (2021-01-14)
 
 
