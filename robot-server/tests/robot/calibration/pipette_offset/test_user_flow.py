@@ -1,8 +1,9 @@
 import datetime
-
+import os
 import pytest
 from unittest.mock import MagicMock, call, patch
 from typing import List, Tuple, Dict, Any
+from opentrons import config
 from opentrons.calibration_storage import helpers, types as CSTypes
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
@@ -464,6 +465,26 @@ async def test_save_tip_length(
     )
     mock_delete_pipette.assert_called_with(
         uf._hw_pipette.pipette_id, uf.mount)
+
+
+async def test_save_custom_tiprack_def(
+        mock_user_flow_fused,
+        custom_tiprack_def,
+        clear_custom_tiprack_def_dir):
+    uf = mock_user_flow_fused
+    uf._load_tip_rack(custom_tiprack_def, uf._get_stored_pipette_offset_cal())
+    uf._sm.set_state(uf._sm.state.measuringTipOffset)
+    uf._nozzle_height_at_reference = 10
+    uf._hw_pipette.add_tip(50)
+    await uf._hardware.move_to(mount=uf._mount,
+                               abs_poition=Point(x=10, y=10, z=40),
+                               critical_point=uf.critical_point_override)
+
+    assert not os.path.exists(config.get_custom_tiprack_def_path()
+                              / 'custom/minimal_labware_def/1.json')
+    await uf.save_offset()
+    assert os.path.exists(config.get_custom_tiprack_def_path()
+                          / 'custom/minimal_labware_def/1.json')
 
 
 async def test_save_pipette_calibration(mock_user_flow, mock_save_pipette):

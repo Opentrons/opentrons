@@ -20,6 +20,7 @@ from opentrons.util.helpers import utc_now
 
 MOCK_HASH = 'mock_hash'
 PIPETTE_ID = 'pipette_id'
+URI = 'custom/minimal_labware_def/1'
 
 minimalLabwareDef = {
     "metadata": {
@@ -62,7 +63,7 @@ minimalLabwareDef = {
         "yDimension": 2.0,
         "zDimension": 3.0
     },
-    "namespace": "opentrons",
+    "namespace": "custom",
     "version": 1
 }
 
@@ -78,6 +79,11 @@ def tlc_path(pip_id):
         / '{}.json'.format(pip_id)
 
 
+def custom_tiprack_path(uri):
+    return config.get_custom_tiprack_def_path() \
+        / '{}.json'.format(uri)
+
+
 def mock_hash_labware(labware_def):
     return MOCK_HASH
 
@@ -91,6 +97,19 @@ def clear_calibration(monkeypatch):
     yield
     try:
         os.remove(path(MOCK_HASH))
+    except FileNotFoundError:
+        pass
+
+
+@pytest.fixture
+def clear_custom_tiprack_dir(monkeypatch):
+    try:
+        os.remove(custom_tiprack_path(URI))
+    except FileNotFoundError:
+        pass
+    yield
+    try:
+        os.remove(custom_tiprack_path(URI))
     except FileNotFoundError:
         pass
 
@@ -139,7 +158,7 @@ def test_json_datetime_encoder():
     assert decoded == original
 
 
-def test_create_tip_length_calibration_data(monkeypatch):
+def test_create_tip_length_calibration_data(monkeypatch, clear_custom_tiprack_dir):
 
     fake_time = utc_now()
 
@@ -157,15 +176,18 @@ def test_create_tip_length_calibration_data(monkeypatch):
             'lastModified': fake_time,
             'source': cs_types.SourceType.user,
             'status': {'markedBad': False},
-            'uri': 'opentrons/minimal_labware_def/1'
+            'uri': URI
         }
     }
+    assert not os.path.exists(custom_tiprack_path(URI))
     result = modify.create_tip_length_data(
         minimalLabwareDef, parent, tip_length)
     assert result == expected_data
+    assert os.path.exists(custom_tiprack_path(URI))
 
 
-def test_save_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
+def test_save_tip_length_calibration_data(monkeypatch,
+                                          clear_tlc_calibration):
     assert not os.path.exists(tlc_path(PIPETTE_ID))
 
     test_data = {
@@ -239,7 +261,7 @@ def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
         source=cs_types.SourceType.user,
         status=cs_types.CalibrationStatus(markedBad=False),
         tiprack=MOCK_HASH,
-        uri='opentrons/minimal_labware_def/1',
+        uri='custom/minimal_labware_def/1',
         last_modified=test_data[MOCK_HASH]['lastModified']
     )
     assert result == expected
@@ -256,9 +278,9 @@ def test_clear_tip_length_calibration_data(monkeypatch):
         }
         json.dump(test_offset, offset_file)
 
-    assert len(os.listdir(calpath)) > 0
+    assert len([f for f in os.listdir(calpath) if f.endswith('.json')]) > 0
     delete.clear_tip_length_calibration()
-    assert len(os.listdir(calpath)) == 0
+    assert len([f for f in os.listdir(calpath) if f.endswith('.json')]) == 0
 
 
 def test_schema_shape(monkeypatch, clear_calibration):
