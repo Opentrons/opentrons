@@ -26,9 +26,9 @@ stages:
         data:
           command: equipment.loadLabware
           data: &labware_data
-            location: 2
+            location:
+              slot: 2
             loadName: corning_96_wellplate_360ul_flat
-            displayName: my well plate
             namespace: Opentrons
             version: 1
     response:
@@ -55,9 +55,9 @@ stages:
         data:
           command: equipment.loadLabware
           data: &tiprack_data
-            location: 1
+            location:
+              slot: 1
             loadName: opentrons_96_tiprack_300ul
-            displayName: my tip rack
             namespace: Opentrons
             version: 1
     response:
@@ -84,8 +84,8 @@ stages:
         data:
           command: equipment.loadInstrument
           data: &create_instrument_data
-            instrumentName: p300_single
-            mount: left
+            pipetteName: p300_single
+            mount: right
     response:
       status_code: 200
       json:
@@ -99,7 +99,7 @@ stages:
           startedAt: !anystr
           completedAt: !anystr
           result:
-            instrumentId: !anystr
+            pipetteId: !anystr
   - name: Delete the session
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}"

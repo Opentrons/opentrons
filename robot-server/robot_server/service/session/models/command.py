@@ -24,93 +24,22 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons.util.helpers import utc_now
+from opentrons.protocol_engine import commands
 
 from robot_server.service.session.models.command_definitions import (
     ProtocolCommand, EquipmentCommand, PipetteCommand, CalibrationCommand,
     DeckCalibrationCommand, CheckCalibrationCommand, CommandDefinitionType)
 from robot_server.service.session.models.common import (
-    EmptyModel, JogPosition, IdentifierType, OffsetVector)
-from robot_server.service.legacy.models.control import Mount
+    EmptyModel, JogPosition)
 from robot_server.service.json_api import (
     ResponseModel, RequestModel, ResponseDataModel)
-
-
-class LoadLabwareRequestData(BaseModel):
-    """Data field in an equipment.loadLabware command request."""
-
-    location: int = Field(
-        ...,
-        description="Deck slot", ge=1, lt=12)
-    loadName: str = Field(
-        ...,
-        description="Name used to reference a labware definition")
-    displayName: typing.Optional[str] = Field(
-        ...,
-        description="User-readable name for labware")
-    namespace: str = Field(
-        ...,
-        description="The namespace the labware definition belongs to")
-    version: int = Field(
-        ...,
-        description="The labware definition version")
 
 
 class LoadLabwareByDefinitionRequestData(BaseModel):
     tiprackDefinition: typing.Optional[dict] = Field(
         None,
         description="The tiprack definition to load into a user flow")
-
-
-class LoadLabwareResponseData(BaseModel):
-    """Result field in an equipment.loadLabware command response."""
-    labwareId: IdentifierType
-    definition: LabwareDefinition
-    calibration: OffsetVector
-
-
-class LoadInstrumentRequestData(BaseModel):
-    """Data field in an equipment.loadInstrument command request."""
-
-    instrumentName: PipetteName = Field(
-        ...,
-        description="The name of the instrument model")
-    mount: Mount
-
-
-class LoadInstrumentResponseData(BaseModel):
-    """Result field in an equipment.loadInstrument command response."""
-
-    instrumentId: IdentifierType
-
-
-class PipetteRequestDataBase(BaseModel):
-    pipetteId: str
-    labwareId: str
-    wellId: str
-
-
-class LiquidRequestData(PipetteRequestDataBase):
-    volume: float = Field(
-        ...,
-        description="Amount of liquid in uL. Must be greater than 0 and less "
-                    "than a pipette-specific maximum volume.",
-        gt=0,
-    )
-    offsetFromBottom: float = Field(
-        ...,
-        description="Offset from the bottom of the well in mm",
-        gt=0,
-    )
-    flowRate: float = Field(
-        ...,
-        description="The absolute flow rate in uL/second. Must be greater "
-                    "than 0 and less than a pipette-specific maximum flow "
-                    "rate.",
-        gt=0
-    )
 
 
 class SetHasCalibrationBlockRequestData(BaseModel):
@@ -223,61 +152,85 @@ SimpleCommandResponse = SessionCommandResponse[
 
 LoadLabwareRequest = SessionCommandRequest[
     Literal[EquipmentCommand.load_labware],
-    LoadLabwareRequestData,
-    LoadLabwareResponseData
+    commands.LoadLabwareRequest,
+    commands.LoadLabwareResult
 ]
 
 
 LoadLabwareResponse = SessionCommandResponse[
     Literal[EquipmentCommand.load_labware],
-    LoadLabwareRequestData,
-    LoadLabwareResponseData
+    commands.LoadLabwareRequest,
+    commands.LoadLabwareResult
 ]
 
 
 LoadInstrumentRequest = SessionCommandRequest[
     Literal[EquipmentCommand.load_instrument],
-    LoadInstrumentRequestData,
-    LoadInstrumentResponseData
+    commands.LoadPipetteRequest,
+    commands.LoadPipetteResult
 ]
 
 
 LoadInstrumentResponse = SessionCommandResponse[
     Literal[EquipmentCommand.load_instrument],
-    LoadInstrumentRequestData,
-    LoadInstrumentResponseData
+    commands.LoadPipetteRequest,
+    commands.LoadPipetteResult
 ]
 
 
-LiquidRequest = SessionCommandRequest[
-    Literal[PipetteCommand.aspirate,
-            PipetteCommand.dispense],
-    LiquidRequestData,
-    EmptyModel
+AspirateRequest = SessionCommandRequest[
+    Literal[PipetteCommand.aspirate],
+    commands.AspirateRequest,
+    commands.AspirateResult
 ]
 
 
-LiquidResponse = SessionCommandResponse[
-    Literal[PipetteCommand.aspirate,
-            PipetteCommand.dispense],
-    LiquidRequestData,
-    EmptyModel
+AspirateResponse = SessionCommandResponse[
+    Literal[PipetteCommand.aspirate],
+    commands.AspirateRequest,
+    commands.AspirateResult
 ]
 
 
-TipRequest = SessionCommandRequest[
-    Literal[PipetteCommand.drop_tip,
-            PipetteCommand.pick_up_tip],
-    PipetteRequestDataBase,
-    EmptyModel
+DispenseRequest = SessionCommandRequest[
+    Literal[PipetteCommand.dispense],
+    commands.DispenseRequest,
+    commands.DispenseResult
 ]
 
 
-TipResponse = SessionCommandResponse[
-    Literal[PipetteCommand.drop_tip,
-            PipetteCommand.pick_up_tip],
-    PipetteRequestDataBase,
-    EmptyModel
+DispenseResponse = SessionCommandResponse[
+    Literal[PipetteCommand.dispense],
+    commands.DispenseRequest,
+    commands.DispenseResult
+]
+
+
+PickUpTipRequest = SessionCommandRequest[
+    Literal[PipetteCommand.pick_up_tip],
+    commands.PickUpTipRequest,
+    commands.PickUpTipResult
+]
+
+
+PickUpTipResponse = SessionCommandResponse[
+    Literal[PipetteCommand.pick_up_tip],
+    commands.PickUpTipRequest,
+    commands.PickUpTipResult
+]
+
+
+DropTipRequest = SessionCommandRequest[
+    Literal[PipetteCommand.drop_tip],
+    commands.DropTipRequest,
+    commands.DropTipResult
+]
+
+
+DropTipResponse = SessionCommandResponse[
+    Literal[PipetteCommand.drop_tip],
+    commands.DropTipRequest,
+    commands.DropTipResult
 ]
 
 
@@ -326,8 +279,10 @@ RequestTypes = typing.Union[
     SimpleCommandRequest,
     LoadLabwareRequest,
     LoadInstrumentRequest,
-    LiquidRequest,
-    TipRequest,
+    AspirateRequest,
+    DispenseRequest,
+    PickUpTipRequest,
+    DropTipRequest,
     JogRequest,
     SetHasCalibrationBlockRequest,
     LabwareByDefinitionRequest
@@ -338,8 +293,10 @@ ResponseTypes = typing.Union[
     SimpleCommandResponse,
     LoadLabwareResponse,
     LoadInstrumentResponse,
-    LiquidResponse,
-    TipResponse,
+    AspirateResponse,
+    DispenseResponse,
+    PickUpTipResponse,
+    DropTipResponse,
     JogResponse,
     SetHasCalibrationBlockResponse,
     LabwareByDefinitionResponse

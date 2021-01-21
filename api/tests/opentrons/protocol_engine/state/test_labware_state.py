@@ -57,7 +57,7 @@ def test_handles_load_labware(
     command = load_labware(
         store=store,
         labware_id="plate-id",
-        location=DeckSlotLocation(DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -101,7 +101,7 @@ def test_get_all_labware(
     load_labware(
         store=store,
         labware_id="plate-id",
-        location=DeckSlotLocation(DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -109,7 +109,7 @@ def test_get_all_labware(
     load_labware(
         store=store,
         labware_id="reservoir-id",
-        location=DeckSlotLocation(DeckSlotName.SLOT_2),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
         definition=reservoir_def,
         calibration=(4, 5, 6),
     )
@@ -131,7 +131,7 @@ def test_get_labware_has_quirk(
     load_labware(
         store=store,
         labware_id="plate-id",
-        location=DeckSlotLocation(DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -139,7 +139,7 @@ def test_get_labware_has_quirk(
     load_labware(
         store=store,
         labware_id="reservoir-id",
-        location=DeckSlotLocation(DeckSlotName.SLOT_2),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
         definition=reservoir_def,
         calibration=(4, 5, 6),
     )
@@ -166,7 +166,7 @@ def test_get_well_definition_bad_id(
     load_labware(
         store=store,
         labware_id="uid",
-        location=DeckSlotLocation(DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -183,7 +183,7 @@ def test_get_well_definition(
     load_labware(
         store=store,
         labware_id="plate-id",
-        location=DeckSlotLocation(DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -205,7 +205,7 @@ def test_get_tip_length_raises_with_non_tip_rack(
     load_labware(
         store=store,
         labware_id="plate-id",
-        location=DeckSlotLocation(DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
         definition=well_plate_def,
         calibration=(1, 2, 3),
     )
@@ -222,7 +222,7 @@ def test_get_tip_length_gets_length_from_definition(
     load_labware(
         store=store,
         labware_id="tip-rack-id",
-        location=DeckSlotLocation(DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
         definition=tip_rack_def,
         calibration=(1, 2, 3),
     )
@@ -239,7 +239,7 @@ def test_get_labware_uri_from_definition(
     load_labware(
         store=store,
         labware_id="tip-rack-id",
-        location=DeckSlotLocation(DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
         definition=tip_rack_def,
         calibration=(1, 2, 3),
     )

@@ -138,7 +138,10 @@ class PipettingHandler:
 
             # set our current deck location to the well now that we've made
             # an intermediate move for the "prepare for aspirate" step
-            current_location = DeckLocation(pipette_id, labware_id, well_name)
+            current_location = DeckLocation(
+                pipette_id=pipette_id,
+                labware_id=labware_id,
+                well_name=well_name)
 
         await self._movement_handler.move_to_well(
             pipette_id=pipette_id,

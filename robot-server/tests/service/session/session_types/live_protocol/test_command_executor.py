@@ -1,213 +1,171 @@
+from datetime import datetime
 from unittest.mock import MagicMock
+from mock import AsyncMock
 import pytest
+from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine import commands as pe_commands
+from opentrons.protocol_engine.errors import ProtocolEngineError
+from opentrons.protocol_engine.types import DeckSlotLocation
+from opentrons.types import DeckSlotName, MountType
 
+from robot_server.service.session.command_execution.command import CommandMeta, \
+    CompletedCommand
+from robot_server.service.session.errors import UnsupportedCommandException, \
+    CommandExecutionException
 from robot_server.service.session.models import command_definitions
-from robot_server.service.legacy.models.control import Mount
-from robot_server.service.session.command_execution.command import \
-    CommandResult
-from robot_server.service.session.models.command import LoadLabwareRequest, \
-    LiquidRequest, TipRequest, SimpleCommandRequest, LoadInstrumentRequest
+from robot_server.service.session.models import command as command_models
 from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types.live_protocol.command_executor\
     import LiveProtocolCommandExecutor
-from robot_server.service.session.models import command as models
-from robot_server.service.session.command_execution import Command
-from robot_server.service.session.session_types.live_protocol.command_interface import CommandInterface  # noqa: E501
-from robot_server.service.session.session_types.live_protocol.state_store import StateStore  # noqa: E501
+from robot_server.service.session.command_execution import Command, CommandResult
 
 
 @pytest.fixture
-def mock_command_interface() -> MagicMock:
-    m = MagicMock(spec=CommandInterface)
-
-    async def handler(command):
-        pass
-
-    m.handle_load_labware.side_effect = handler
-    m.handle_load_instrument.side_effect = handler
-    m.handle_aspirate.side_effect = handler
-    m.handle_dispense.side_effect = handler
-    m.handle_pick_up_tip.side_effect = handler
-    m.handle_drop_tip.side_effect = handler
-
+def mock_protocol_engine() -> MagicMock:
+    m = AsyncMock(spec=ProtocolEngine)
     return m
 
 
 @pytest.fixture
-def mock_state_store() -> StateStore:
-    s = StateStore()
-    s.handle_command_request = MagicMock()
-    s.handle_command_result = MagicMock()
-    return s
-
-
-@pytest.fixture
-def command_executor(mock_command_interface, mock_state_store)\
+def command_executor(mock_protocol_engine)\
         -> LiveProtocolCommandExecutor:
-    return LiveProtocolCommandExecutor(
-        command_interface=mock_command_interface,
-        state_store=mock_state_store)
+    return LiveProtocolCommandExecutor(protocol_engine=mock_protocol_engine)
 
 
-async def test_load_labware(command_executor, mock_command_interface):
-    expected_response = models.LoadLabwareResponseData(
-        labwareId="your labware",
-        definition={},
-        calibration=(1, 2, 3))
+@pytest.mark.parametrize(
+    argnames="command_type",
+    argvalues=[
+        command_definitions.CalibrationCommand.pick_up_tip,
+        command_definitions.ProtocolCommand.start_run,
+        command_definitions.CheckCalibrationCommand.compare_point
+    ])
+async def test_unsupported_commands(command_type,
+                                    command_executor,
+                                    mock_protocol_engine):
+    """Test that non live protocol commands are rejected."""
+    command_object = Command(
+        meta=CommandMeta(identifier="1234"),
+        request=command_models.SimpleCommandRequest(
+            command=command_type,
+            data=EmptyModel()))
 
-    async def handler(command):
-        return expected_response
+    with pytest.raises(UnsupportedCommandException, match="is not supported"):
+        await command_executor.execute(command_object)
 
-    mock_command_interface.handle_load_labware.side_effect = handler
 
-    command = models.LoadLabwareRequestData(location=1,
-                                            loadName="hello",
-                                            displayName="niceName",
-                                            version=1,
-                                            namespace="test")
-    result = await command_executor.execute(
-        Command(
-            request=LoadLabwareRequest(
-                command=command_definitions.EquipmentCommand.load_labware,
-                data=command))
+async def test_failed_command(command_executor, mock_protocol_engine):
+    """Test that protocol engine failures are caught."""
+    request_body = pe_commands.LoadLabwareRequest(
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
+        loadName="hello",
+        version=1,
+        namespace="test"
     )
 
-    mock_command_interface.handle_load_labware.assert_called_once_with(command)
-
-    assert result.result.data == expected_response
-    assert result.request == LoadLabwareRequest(
+    command_object = Command(
+        meta=CommandMeta(identifier="1234"),
+        request=command_models.LoadLabwareRequest(
             command=command_definitions.EquipmentCommand.load_labware,
-            data=command)
+            data=request_body))
+
+    protocol_engine_response = pe_commands.FailedCommand(
+        request=request_body,
+        created_at=datetime(2000, 1, 1),
+        started_at=datetime(2000, 1, 2),
+        failed_at=datetime(2000, 1, 3),
+        error=ProtocolEngineError("failure"),
+    )
+
+    mock_protocol_engine.execute_command.return_value = protocol_engine_response
+
+    with pytest.raises(CommandExecutionException):
+        await command_executor.execute(command_object)
 
 
-async def test_load_instrument(command_executor, mock_command_interface):
-    expected_response = models.LoadInstrumentResponseData(
-        instrumentId="your instrument")
+async def test_load_labware(command_executor, mock_protocol_engine):
+    """Test that load labware command is executed."""
+    request_body = pe_commands.LoadLabwareRequest(
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
+        loadName="hello",
+        version=1,
+        namespace="test"
+    )
 
-    async def handler(command):
-        return expected_response
+    protocol_engine_response = pe_commands.CompletedCommand(
+        result=pe_commands.LoadLabwareResult(
+            labwareId="your labware",
+            definition={},
+            calibration=(1, 2, 3)),
+        request=request_body,
+        created_at=datetime(2000, 1, 1),
+        started_at=datetime(2000, 1, 2),
+        completed_at=datetime(2000, 1, 3)
+    )
 
-    mock_command_interface.handle_load_instrument.side_effect = handler
+    mock_protocol_engine.execute_command.return_value = protocol_engine_response
 
-    command = models.LoadInstrumentRequestData(instrumentName="p1000_single",
-                                               mount=Mount.left)
-    result = await command_executor.execute(
-        Command(request=LoadInstrumentRequest(
+    command_object = Command(
+        meta=CommandMeta(identifier="1234"),
+        request=command_models.LoadLabwareRequest(
+            command=command_definitions.EquipmentCommand.load_labware,
+            data=request_body))
+
+    result = await command_executor.execute(command_object)
+
+    mock_protocol_engine.execute_command.assert_called_once_with(
+        request=request_body,
+        command_id="1234"
+    )
+
+    assert result == CompletedCommand(
+        request=command_object.request,
+        meta=command_object.meta,
+        result=CommandResult(
+            started_at=protocol_engine_response.started_at,
+            completed_at=protocol_engine_response.completed_at,
+            data=protocol_engine_response.result
+        )
+    )
+
+
+async def test_load_instrument(command_executor, mock_protocol_engine):
+    """Test that load pipette command is executed."""
+    request_body = pe_commands.LoadPipetteRequest(
+        pipetteName="p10_single",
+        mount=MountType.LEFT,
+    )
+
+    protocol_engine_response = pe_commands.CompletedCommand(
+        result=pe_commands.LoadPipetteResult(
+            pipetteId="4321"
+        ),
+        request=request_body,
+        created_at=datetime(2000, 1, 1),
+        started_at=datetime(2000, 1, 2),
+        completed_at=datetime(2000, 1, 3)
+    )
+
+    mock_protocol_engine.execute_command.return_value = protocol_engine_response
+
+    command_object = Command(
+        meta=CommandMeta(identifier="1234"),
+        request=command_models.LoadInstrumentRequest(
             command=command_definitions.EquipmentCommand.load_instrument,
-            data=command))
+            data=request_body))
+
+    result = await command_executor.execute(command_object)
+
+    mock_protocol_engine.execute_command.assert_called_once_with(
+        request=request_body,
+        command_id="1234"
     )
 
-    mock_command_interface.handle_load_instrument.assert_called_once_with(
-        command)
-
-    assert result.result.data == expected_response
-    assert result.request == LoadInstrumentRequest(
-            command=command_definitions.EquipmentCommand.load_instrument,
-            data=command)
-
-
-@pytest.mark.parametrize(
-    argnames=['handler_name', 'command_type'],
-    argvalues=[
-        ['handle_aspirate', command_definitions.PipetteCommand.aspirate],
-        ['handle_dispense', command_definitions.PipetteCommand.dispense]
-    ])
-async def test_liquid_commands(command_executor, mock_command_interface,
-                               handler_name, command_type):
-    async def handler(command):
-        return None
-
-    command_data = models.LiquidRequestData(
-        pipetteId="", labwareId="", wellId="",
-        flowRate=2, volume=1, offsetFromBottom=2)
-
-    mock_command_interface.handle_aspirate.side_effect = handler
-    mock_command_interface.handle_dispense.side_effect = handler
-
-    result = await command_executor.execute(
-        Command(request=LiquidRequest(
-            command=command_type,
-            data=command_data))
+    assert result == CompletedCommand(
+        request=command_object.request,
+        meta=command_object.meta,
+        result=CommandResult(
+            started_at=protocol_engine_response.started_at,
+            completed_at=protocol_engine_response.completed_at,
+            data=protocol_engine_response.result
+        )
     )
-
-    getattr(mock_command_interface, handler_name).assert_called_once_with(
-        command_data)
-
-    assert result.result.data is None
-    assert result.request == LiquidRequest(
-            command=command_type,
-            data=command_data)
-
-
-@pytest.mark.parametrize(
-    argnames=['handler_name', 'command_type'],
-    argvalues=[
-        ['handle_pick_up_tip', command_definitions.PipetteCommand.pick_up_tip],
-        ['handle_drop_tip', command_definitions.PipetteCommand.drop_tip]
-    ])
-async def test_tip_commands(command_executor, mock_command_interface,
-                            handler_name, command_type):
-    async def handler(command):
-        return None
-
-    command_data = models.PipetteRequestDataBase(
-        pipetteId="", labwareId="", wellId="")
-
-    mock_command_interface.handle_pick_up_tip.side_effect = handler
-    mock_command_interface.handle_drop_tip.side_effect = handler
-
-    result = await command_executor.execute(
-        Command(request=TipRequest(
-            command=command_type,
-            data=command_data))
-    )
-
-    getattr(mock_command_interface, handler_name).assert_called_once_with(
-        command_data)
-
-    assert result.result.data is None
-    assert result.request == TipRequest(
-            command=command_type,
-            data=command_data)
-
-
-@pytest.fixture
-def state_store_command_executor(command_executor) \
-        -> LiveProtocolCommandExecutor:
-    """A fixture for use with testing state store calls"""
-    async def handle_command(c):
-        return 23
-
-    # Mock out the command handler map
-    command_executor._handler_map = {
-        command_definitions.ProtocolCommand.start_run: handle_command}
-    return command_executor
-
-
-async def test_create_command_in_state_store(state_store_command_executor,
-                                             mock_state_store):
-    c = Command(
-        request=SimpleCommandRequest(
-            command=command_definitions.ProtocolCommand.start_run,
-            data=EmptyModel()))
-    await state_store_command_executor.execute(c)
-
-    mock_state_store.handle_command_request.assert_called_once_with(c)
-
-
-async def test_command_result_in_state_store(state_store_command_executor,
-                                             mock_state_store):
-    c = Command(request=SimpleCommandRequest(
-            command=command_definitions.ProtocolCommand.start_run,
-            data=EmptyModel()))
-
-    await state_store_command_executor.execute(c)
-
-    mock_state_store.handle_command_result.assert_called()
-    assert mock_state_store.handle_command_result.call_args[0][0] == c
-    # Check that the result is the correct type
-    assert isinstance(mock_state_store.handle_command_result.call_args[0][1],
-                      CommandResult)
-    # Check that the data field in CommandResult is what was returned from
-    # the handler
-    assert mock_state_store.handle_command_result.call_args[0][1].data == 23

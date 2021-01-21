@@ -211,25 +211,37 @@ class WaypointSpec:
     ),
     WaypointSpec(
         name="General arc if moving from other labware",
-        location=DeckLocation("pipette-id", "other-labware-id", "A1"),
+        location=DeckLocation(
+            pipette_id="pipette-id",
+            labware_id="other-labware-id",
+            well_name="A1"),
         all_labware_z=20,
         expected_move_type=MoveType.GENERAL_ARC,
     ),
     WaypointSpec(
         name="In-labware arc if moving to same labware",
-        location=DeckLocation("pipette-id", "labware-id", "B2"),
+        location=DeckLocation(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="B2"),
         labware_z=10,
         expected_move_type=MoveType.IN_LABWARE_ARC,
     ),
     WaypointSpec(
         name="General arc if moving to same labware with different pipette",
-        location=DeckLocation("other-pipette-id", "labware-id", "A1"),
+        location=DeckLocation(
+            pipette_id="other-pipette-id",
+            labware_id="labware-id",
+            well_name="A1"),
         all_labware_z=20,
         expected_move_type=MoveType.GENERAL_ARC,
     ),
     WaypointSpec(
         name="Direct movement from well to same well",
-        location=DeckLocation("pipette-id", "labware-id", "A1"),
+        location=DeckLocation(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="A1"),
         labware_z=10,
         expected_move_type=MoveType.DIRECT,
     ),
