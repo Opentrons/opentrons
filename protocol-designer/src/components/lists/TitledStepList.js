@@ -39,6 +39,8 @@ export type Props = {|
   hovered?: boolean,
   /** show checkbox icons if true */
   isMultiSelectMode?: boolean,
+  /** set to true when Step is the last selected in multi select mode */
+  isLastSelected?: boolean,
 |}
 
 export function TitledStepList(props: Props): React.Node {
@@ -51,6 +53,7 @@ export function TitledStepList(props: Props): React.Node {
     onMouseLeave,
     onContextMenu,
     isMultiSelectMode,
+    isLastSelected,
   } = props
   const collapsible = onCollapseToggle != null
 
@@ -76,6 +79,7 @@ export function TitledStepList(props: Props): React.Node {
 
   const titleBarClass = cx(styles.step_title_bar, {
     [styles.clickable]: props.onClick,
+    [styles.multiselect_title_bar]: props.isMultiSelectMode,
   })
 
   const iconClass = cx(
@@ -96,10 +100,16 @@ export function TitledStepList(props: Props): React.Node {
     >
       <div onClick={onClick} className={titleBarClass}>
         {isMultiSelectMode && (
-          <Icon
-            name={multiSelectIconName}
-            className={styles.icon_multiselect}
-          />
+          <div
+            className={cx(styles.multiselect_wrapper, {
+              [styles.last_selected]: isLastSelected,
+            })}
+          >
+            <Icon
+              name={multiSelectIconName}
+              className={styles.icon_multiselect}
+            />
+          </div>
         )}
         {iconName && (
           <Icon {...iconProps} className={iconClass} name={iconName} />
