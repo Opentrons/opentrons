@@ -123,6 +123,11 @@ async def add(request: web.Request) -> web.Response:
     pubkey = body['key']
     # Do some fairly minor sanitization; dropbear will ignore invalid keys but
     # we still don’t want to have a bunch of invalid data in there
+    if len(pubkey.split()) == 0:
+        return web.json_response(
+            data={'error': 'bad-key',
+                  'message': 'Key is empty'},
+            status=400)
     alg = pubkey.split()[0]
     # We don’t allow dss so this has to be rsa or ecdsa and shouldn’t start
     # with restrictions
