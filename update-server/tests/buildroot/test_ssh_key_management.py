@@ -85,6 +85,45 @@ async def test_add_key(test_cli, dummy_authorized_keys):
         'md5', dummy_key.encode()).hexdigest()
     assert open(dummy_authorized_keys).read() == dummy_key + '\n'
 
+    # TODO: Valid-ish key but with duplicated whitespace?
+    # TODO: Refactor
+    
+    # Send a request with a missing key
+    resp = await test_cli.post('/server/ssh_keys',
+                               json={},
+                               headers={'X-Host-IP': '169.254.1.1'})
+    assert resp.status == 400
+    body = await resp.json()
+    assert body['error'] == 'no-key'
+    assert 'message' in body
+    
+    # Send a request with a non-string key
+    resp = await test_cli.post('/server/ssh_keys',
+                               json={key: 123},
+                               headers={'X-Host-IP': '169.254.1.1'})
+    assert resp.status == 400
+    body = await resp.json()
+    assert body['error'] == 'no-key'
+    assert 'message' in body
+    
+    # Send an empty key
+    resp = await test_cli.post('/server/ssh_keys',
+                               json={'key': ''},
+                               headers={'X-Host-IP': '169.254.1.1'})
+    assert resp.status == 400
+    body = await resp.json()
+    assert body['error'] == 'bad-key'
+    assert 'message' in body
+    
+    # Send a whitespace-only key
+    resp = await test_cli.post('/server/ssh_keys',
+                               json={'key': '          '},
+                               headers={'X-Host-IP': '169.254.1.1'})
+    assert resp.status == 400
+    body = await resp.json()
+    assert body['error'] == 'bad-key'
+    assert 'message' in body
+        
     # Send something that looks nothing like a key
     resp = await test_cli.post('/server/ssh_keys',
                                json={'key': 'not even close to a pubkey'},
