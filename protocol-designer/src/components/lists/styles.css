@@ -48,8 +48,9 @@
   width: 1.25rem;
 }
 
-.last_selected {
-  background-color: color-mod(var(--c-black) alpha(5%));
+.last_selected svg {
+  background-color: color-mod(var(--c-black) alpha(10%));
+  outline: 2px solid color-mod(var(--c-black) alpha(15%));
 }
 
 .title_bar_carat {
