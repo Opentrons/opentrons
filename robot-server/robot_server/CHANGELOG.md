@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0) (2021-01-20)
+
+## Bug Fixes
+
+* **robot-server:** disable overlap for custom tips ([#7229](https://github.com/Opentrons/opentrons/issues/7229)) ([1e180c8](https://github.com/Opentrons/opentrons/commit/1e180c8))
+* **robot-server:** save custom tiprack def on robot during tip length cal ([#7231](https://github.com/Opentrons/opentrons/issues/7231)) ([4fe2b37](https://github.com/Opentrons/opentrons/commit/4fe2b37))
+* **robot-server:** do not update state machine for tiprack select ([#7190](https://github.com/Opentrons/opentrons/issues/7190)) ([f2fc9f5](https://github.com/Opentrons/opentrons/commit/f2fc9f5))
+* **robot-server:** ProtocolManager expects a ThreadManager and not a SynchronousAdapter. ([#7175](https://github.com/Opentrons/opentrons/issues/7175)) ([c0c9225](https://github.com/Opentrons/opentrons/commit/c0c9225))
+
+
+## Features
+
+* **robot-server:** add hardware events publisher ([#7042](https://github.com/Opentrons/opentrons/issues/7042)) ([9943acc](https://github.com/Opentrons/opentrons/commit/9943acc))
+* **robot-server:** expose uvicorn logs ([#7118](https://github.com/Opentrons/opentrons/issues/7118)) ([571eb1e](https://github.com/Opentrons/opentrons/commit/571eb1e)), closes [#7097](https://github.com/Opentrons/opentrons/issues/7097)
+* **robot-server:** notifications service websocket subscriber client ([#7107](https://github.com/Opentrons/opentrons/issues/7107)) ([3986b0a](https://github.com/Opentrons/opentrons/commit/3986b0a)), closes [#6911](https://github.com/Opentrons/opentrons/issues/6911) [#6909](https://github.com/Opentrons/opentrons/issues/6909)
+
+
+
+
+
 # [4.0.0](https://github.com/Opentrons/opentrons/compare/v3.21.2...v4.0.0) (2020-11-20)
 
 ### Bug Fixes

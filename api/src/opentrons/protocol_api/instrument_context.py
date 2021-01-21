@@ -575,11 +575,10 @@ class InstrumentContext(CommandPublisher):
         if not isinstance(loc, Well):
             raise TypeError('Last tip location should be a Well but it is: '
                             '{}'.format(loc))
+        return_height = self._implementation.get_return_height()
         drop_loc = determine_drop_target(self.api_version,
                                          loc,
-                                         self.hw_pipette.get(
-                                             'return_tip_height', 0.5
-                                         ),
+                                         return_height,
                                          APIVersion(2, 3))
         self.drop_tip(drop_loc, home_after=home_after)
 
@@ -764,9 +763,10 @@ class InstrumentContext(CommandPublisher):
             if LabwareLike(location).is_fixed_trash():
                 target = location.top()
             else:
+                return_height = self._implementation.get_return_height()
                 target = determine_drop_target(self.api_version,
                                                location,
-                                               self.return_height)
+                                               return_height)
         elif not location:
             target = self.trash_container.wells()[0].top()
         else:

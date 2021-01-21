@@ -1,6 +1,8 @@
+import os
 import pytest
 from unittest.mock import MagicMock, ANY, patch, call
 from typing import List, Tuple, Dict, Any
+from opentrons import config
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import pipette
 from opentrons.protocol_api.labware import get_labware_definition
@@ -123,6 +125,20 @@ def mock_user_flow(mock_hw, request):
         mount=mount,
         has_calibration_block=has_calibration_block,
         tip_rack=tip_rack)
+
+    yield m
+
+
+@pytest.fixture(params=[True, False])
+def mock_user_flow_with_custom_tiprack(mock_hw, custom_tiprack_def, request):
+    has_calibration_block = request.param
+    mount = next(k for k, v in
+                 mock_hw._attached_instruments.items() if v)
+    m = TipCalibrationUserFlow(
+        hardware=mock_hw,
+        mount=mount,
+        has_calibration_block=has_calibration_block,
+        tip_rack=custom_tiprack_def)
 
     yield m
 
@@ -324,6 +340,22 @@ async def test_save_offsets(mock_user_flow):
             critical_point=uf.critical_point_override)
         await uf.save_offset()
         create_tip_length_data_patch.assert_called_with(ANY, '', 30)
+
+
+async def test_save_custom_tiprack_def(
+        mock_user_flow_with_custom_tiprack,
+        clear_custom_tiprack_def_dir):
+    uf = mock_user_flow_with_custom_tiprack
+    uf._current_state = 'measuringTipOffset'
+    uf._hw_pipette._has_tip = True
+    uf._nozzle_height_at_reference = 0
+
+    assert not os.path.exists(config.get_custom_tiprack_def_path()
+                              / 'custom/minimal_labware_def/1.json')
+
+    await uf.save_offset()
+    assert os.path.exists(config.get_custom_tiprack_def_path()
+                          / 'custom/minimal_labware_def/1.json')
 
 
 @pytest.mark.parametrize(argnames="mount",

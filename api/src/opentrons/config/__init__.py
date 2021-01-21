@@ -201,7 +201,13 @@ CONFIG_ELEMENTS = (
                   'Pipette Calibration Directory',
                   Path('robot') / 'pipettes',
                   ConfigElementType.DIR,
-                  'The dir where pipette calibration is stored')
+                  'The dir where pipette calibration is stored'),
+    ConfigElement('custom_tiprack_dir',
+                  'Custom Tiprack Directory',
+                  Path('tip_lengths') / 'custom_tiprack_definitions',
+                  ConfigElementType.DIR,
+                  'The dir where custom tiprack definitions for tip length '
+                  'calibration are stored')
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,
@@ -506,3 +512,7 @@ CONFIG = load_and_migrate()
 
 def get_tip_length_cal_path():
     return get_opentrons_path('tip_length_calibration_dir')
+
+
+def get_custom_tiprack_def_path():
+    return get_opentrons_path('custom_tiprack_dir')

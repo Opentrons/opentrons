@@ -16,7 +16,21 @@ import {
   resetConfig,
 } from '../../robot-admin'
 
-import { AlertModal, LabeledCheckbox } from '@opentrons/components'
+import {
+  BaseModal,
+  LabeledCheckbox,
+  Flex,
+  Text,
+  Icon,
+  SecondaryBtn,
+  JUSTIFY_FLEX_END,
+  DISPLAY_FLEX,
+  ALIGN_CENTER,
+  FONT_SIZE_HEADER,
+  FONT_WEIGHT_REGULAR,
+  SPACING_2,
+  SIZE_2,
+} from '@opentrons/components'
 import { Portal } from '../portal'
 
 import type { State, Dispatch } from '../../types'
@@ -54,18 +68,40 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
     if (resetRequestStatus === SUCCESS) closeModal()
   }, [resetRequestStatus, closeModal])
 
-  const buttons = [
-    { onClick: closeModal, children: 'close' },
-    {
-      onClick: triggerReset,
-      disabled: resetRequestStatus === PENDING,
-      children: 'restart',
-    },
-  ]
+  const CLOSE = 'close'
+  const RESTART = 'restart'
+  const PENDING_STATUS = resetRequestStatus === PENDING
 
   return (
     <Portal>
-      <AlertModal heading={TITLE} buttons={buttons} alertOverlay>
+      <BaseModal
+        header={
+          <Text
+            as="h2"
+            display={DISPLAY_FLEX}
+            alignItems={ALIGN_CENTER}
+            fontSize={FONT_SIZE_HEADER}
+            fontWeight={FONT_WEIGHT_REGULAR}
+          >
+            <Icon name="alert" width={SIZE_2} marginRight={SPACING_2} />
+            {TITLE}
+          </Text>
+        }
+        footer={
+          <Flex justifyContent={JUSTIFY_FLEX_END}>
+            <SecondaryBtn marginLeft={SPACING_2} onClick={closeModal}>
+              {CLOSE}
+            </SecondaryBtn>
+            <SecondaryBtn
+              marginLeft={SPACING_2}
+              onClick={triggerReset}
+              disabled={PENDING_STATUS}
+            >
+              {RESTART}
+            </SecondaryBtn>
+          </Flex>
+        }
+      >
         <p>
           Warning! Clicking <strong>restart</strong> will erase your selected
           configurations and <strong>restart your robot</strong>. This cannot be
@@ -75,7 +111,10 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
           <LabeledCheckbox
             label={o.name}
             onChange={() => {
-              setResetOptions({ ...resetOptions, [o.id]: !resetOptions[o.id] })
+              setResetOptions({
+                ...resetOptions,
+                [o.id]: !resetOptions[o.id],
+              })
             }}
             name={o.id}
             value={resetOptions[o.id]}
@@ -84,7 +123,7 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
             <p>{o.description}</p>
           </LabeledCheckbox>
         ))}
-      </AlertModal>
+      </BaseModal>
     </Portal>
   )
 }

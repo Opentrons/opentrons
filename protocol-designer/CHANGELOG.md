@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0) (2021-01-20)
+
+## Bug Fixes
+
+* **protocol-designer:** fix lastModified when exporting ([#7024](https://github.com/Opentrons/opentrons/issues/7024)) ([50096cd](https://github.com/Opentrons/opentrons/commit/50096cd)), closes [#6636](https://github.com/Opentrons/opentrons/issues/6636)
+* **protocol-designer:** include custom tiprack defs... ([#7099](https://github.com/Opentrons/opentrons/issues/7099)) ([b98e621](https://github.com/Opentrons/opentrons/commit/b98e621)), closes [#6875](https://github.com/Opentrons/opentrons/issues/6875)
+* **protocol-designer:** skip 10000s of redundant state updates ([#7053](https://github.com/Opentrons/opentrons/issues/7053)) ([f2d5cb2](https://github.com/Opentrons/opentrons/commit/f2d5cb2))
+
+
+## Features
+
+* **protocol designer:** bump pd version for hotfix release ([#6896](https://github.com/Opentrons/opentrons/issues/6896)) ([2ba7e1f](https://github.com/Opentrons/opentrons/commit/2ba7e1f))
+* **protocol-designer:** add "batch edit" feature flag ([#7079](https://github.com/Opentrons/opentrons/issues/7079)) ([350be43](https://github.com/Opentrons/opentrons/commit/350be43)), closes [#7058](https://github.com/Opentrons/opentrons/issues/7058)
+* **protocol-designer:** add labware to modules allowlists ([#6901](https://github.com/Opentrons/opentrons/issues/6901)) ([65792d9](https://github.com/Opentrons/opentrons/commit/65792d9)), closes [#6876](https://github.com/Opentrons/opentrons/issues/6876) [#6860](https://github.com/Opentrons/opentrons/issues/6860)
+* **protocol-designer:** Add mount designation for matching pipettes ([#6959](https://github.com/Opentrons/opentrons/issues/6959)) ([ee8abac](https://github.com/Opentrons/opentrons/commit/ee8abac)), closes [#6783](https://github.com/Opentrons/opentrons/issues/6783)
+* **protocol-designer:** add pipette min to warnings ([#6974](https://github.com/Opentrons/opentrons/issues/6974)) ([cdea661](https://github.com/Opentrons/opentrons/commit/cdea661)), closes [#6493](https://github.com/Opentrons/opentrons/issues/6493)
+* **protocol-designer:** add redux infra for batch edit mode ([#7125](https://github.com/Opentrons/opentrons/issues/7125)) ([86eb355](https://github.com/Opentrons/opentrons/commit/86eb355)), closes [#7122](https://github.com/Opentrons/opentrons/issues/7122)
+* **protocol-designer:** Add spacing to file details page ([#6969](https://github.com/Opentrons/opentrons/issues/6969)) ([b6e8104](https://github.com/Opentrons/opentrons/commit/b6e8104)), closes [#6885](https://github.com/Opentrons/opentrons/issues/6885)
+* **protocol-designer:** clean up IngredientsList card ([#6949](https://github.com/Opentrons/opentrons/issues/6949)) ([44cc58f](https://github.com/Opentrons/opentrons/commit/44cc58f)), closes [#6834](https://github.com/Opentrons/opentrons/issues/6834)
+* **protocol-designer:** enable multi step selection ([#7168](https://github.com/Opentrons/opentrons/issues/7168)) ([9d97186](https://github.com/Opentrons/opentrons/commit/9d97186))
+* **protocol-designer:** implement step selection banner ([#7159](https://github.com/Opentrons/opentrons/issues/7159)) ([777bc88](https://github.com/Opentrons/opentrons/commit/777bc88)), closes [#7081](https://github.com/Opentrons/opentrons/issues/7081)
+* **protocol-designer:** increment numbers of added tip racks ([#6998](https://github.com/Opentrons/opentrons/issues/6998)) ([af3487e](https://github.com/Opentrons/opentrons/commit/af3487e)), closes [#5632](https://github.com/Opentrons/opentrons/issues/5632)
+* **protocol-designer:** remove dispense > air gap FF and bump PD version ([#6858](https://github.com/Opentrons/opentrons/issues/6858)) ([c48a600](https://github.com/Opentrons/opentrons/commit/c48a600)), closes [#6654](https://github.com/Opentrons/opentrons/issues/6654) [#6865](https://github.com/Opentrons/opentrons/issues/6865)
+* **protocol-designer:** reorder labware dropdown options ([#6940](https://github.com/Opentrons/opentrons/issues/6940)) ([7214f22](https://github.com/Opentrons/opentrons/commit/7214f22)), closes [#1449](https://github.com/Opentrons/opentrons/issues/1449)
+* **protocol-designer:** update no tip error copy ([#6789](https://github.com/Opentrons/opentrons/issues/6789)) ([268223c](https://github.com/Opentrons/opentrons/commit/268223c)), closes [#6712](https://github.com/Opentrons/opentrons/issues/6712)
+
+
+
+
+
 # [4.0.0](https://github.com/Opentrons/opentrons/compare/v3.21.2...v4.0.0) (2020-11-20)
 
 ### Features

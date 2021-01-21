@@ -194,8 +194,7 @@ class TipCalibrationUserFlow:
         full_length = tiprack.tip_length
         overlap_dict: Dict = \
             self._hw_pipette.config.tip_overlap
-        default = overlap_dict['default']
-        overlap = overlap_dict.get(tiprack.uri, default)
+        overlap = overlap_dict.get(tiprack.uri, 0)
         return full_length - overlap
 
     @property

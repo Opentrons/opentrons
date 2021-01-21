@@ -4,7 +4,7 @@ from unittest.mock import call, MagicMock, patch
 import pytest
 from opentrons.hardware_control import pipette
 from opentrons.types import Mount, Point
-from opentrons.calibration_storage import get, types as CSTypes
+from opentrons.calibration_storage import get, modify, types as CSTypes
 from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
 
@@ -140,6 +140,14 @@ def build_mock_stored_pipette_offset(kind='normal'):
                 uri='opentrons/opentrons_96_filtertiprack_200ul/1',
                 source=CSTypes.SourceType.user,
                 status=CSTypes.CalibrationStatus(markedBad=False)))
+    elif kind == 'custom_tiprack':
+        return MagicMock(
+            return_value=CSTypes.PipetteOffsetByPipetteMount(
+                offset=[0, 1, 2],
+                tiprack='tiprack-id',
+                uri='custom/minimal_labware_def/1',
+                source=CSTypes.SourceType.user,
+                status=CSTypes.CalibrationStatus(markedBad=False)))
     else:
         return MagicMock(return_value=None)
 
@@ -154,6 +162,16 @@ def build_mock_stored_tip_length(kind='normal'):
             source=CSTypes.SourceType.user,
             status=CSTypes.CalibrationStatus(markedBad=False),
             uri='path/to_my_labware/1')
+        return MagicMock(return_value=tip_length)
+    elif kind == 'custom_tiprack':
+        tip_length = CSTypes.TipLengthCalibration(
+            tip_length=30,
+            pipette='fake id',
+            tiprack='fake_hash',
+            last_modified='some time',
+            source=CSTypes.SourceType.user,
+            status=CSTypes.CalibrationStatus(markedBad=False),
+            uri='custom/minimal_labware_def/1')
         return MagicMock(return_value=tip_length)
     else:
         return MagicMock(return_value=None)
@@ -198,6 +216,33 @@ def test_load_labware(mock_hw):
             hardware=mock_hw, has_calibration_block=True)
         assert uf.active_tiprack._implementation.get_display_name() ==\
             'Opentrons 96 Filter Tip Rack 200 µL on 8'
+        assert len(uf.get_required_labware()) == 2
+
+
+def test_load_custom_tiprack(mock_hw,
+                             custom_tiprack_def,
+                             clear_custom_tiprack_def_dir):
+    # save custom tiprack definition to custom tiprack directory
+    modify._save_custom_tiprack_definition(
+        'custom/minimal_labware_def/1',
+        custom_tiprack_def
+    )
+    # load a labware with calibrations
+    with patch.object(
+            get,
+            'get_robot_deck_attitude',
+            new=build_mock_deck_calibration()),\
+            patch.object(
+                get,
+                'load_tip_length_calibration',
+                new=build_mock_stored_tip_length('custom_tiprack')),\
+            patch.object(
+                get, 'get_pipette_offset',
+                new=build_mock_stored_pipette_offset('custom_tiprack')):
+        uf = CheckCalibrationUserFlow(
+            hardware=mock_hw, has_calibration_block=True)
+        assert uf.active_tiprack._implementation.get_display_name() ==\
+            'minimal labware on 8'
         assert len(uf.get_required_labware()) == 2
 
 
