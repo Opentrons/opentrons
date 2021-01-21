@@ -94,16 +94,16 @@ export const StepSelectionBannerComponent = (props: Props): React.Node => {
             key={stepType}
           />
         ))}
+        <Box flex="0 1 auto" marginLeft={SPACING_3}>
+          <SecondaryBtn
+            color={C_SELECTED_DARK}
+            backgroundColor={C_TRANSPARENT}
+            onClick={handleExitBatchEdit}
+          >
+            {i18n.t('application.exit_batch_edit')}
+          </SecondaryBtn>
+        </Box>
       </Flex>
-      <Box flex="0 1 auto">
-        <SecondaryBtn
-          color={C_SELECTED_DARK}
-          backgroundColor={C_TRANSPARENT}
-          onClick={handleExitBatchEdit}
-        >
-          {i18n.t('application.exit_batch_edit')}
-        </SecondaryBtn>
-      </Box>
     </Flex>
   )
 }

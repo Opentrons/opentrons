@@ -11,6 +11,7 @@ import {
   SIZE_2,
   SPACING_2,
   C_DARK_GRAY,
+  BORDER_SOLID_MEDIUM,
 } from '@opentrons/components'
 import { useConditionalConfirm } from '../../../../../components/src/hooks/useConditionalConfirm'
 import { selectors as stepFormSelectors } from '../../../step-forms'
@@ -144,7 +145,12 @@ export const MultiSelectToolbar = (): React.Node => {
           onCancelClick={cancel}
         />
       )}
-      <Flex alignItems={ALIGN_CENTER} height={SIZE_2} padding={'0 0.75rem'}>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        height={SIZE_2}
+        padding={'0 0.75rem'}
+        borderBottom={BORDER_SOLID_MEDIUM}
+      >
         <ClickableIcon {...selectProps} />
         <ClickableIcon {...deleteProps} />
         <ClickableIcon {...copyProps} />
