@@ -115,38 +115,39 @@ async def add(request: web.Request) -> web.Response:
 
     If the key string doesn't look like an openssh public key, rejects with 400
     """
-    body = await request.json()
-    if 'key' not in body or not isinstance(body['key'], str):
+    def key_error(error: str, message: str) -> web.Response:
         return web.json_response(
-            data={'error': 'no-key', 'message': 'No "key" element in body'},
+            data={'error': error, 'message': message},
             status=400)
+
+    body = await request.json()
+
+    if 'key' not in body or not isinstance(body['key'], str):
+        return key_error('no-key', 'No "key" element in body')
     pubkey = body['key']
+
     # Do some fairly minor sanitization; dropbear will ignore invalid keys but
     # we still don’t want to have a bunch of invalid data in there
-    if len(pubkey.split()) == 0:
-        return web.json_response(
-            data={'error': 'bad-key',
-                  'message': 'Key is empty'},
-            status=400)
-    alg = pubkey.split()[0]
+
+    pubkey_parts = pubkey.split()
+    if len(pubkey_parts) == 0:
+        return key_error('bad-key', 'Key is empty')
+
+    alg = pubkey_parts[0]
+
     # We don’t allow dss so this has to be rsa or ecdsa and shouldn’t start
     # with restrictions
     if alg != 'ssh-rsa' and not alg.startswith('ecdsa'):
         LOG.warning(f"weird keyfile uploaded: starts with {alg}")
-        return web.json_response(
-            data={'error': 'bad-key',
-                  'message': f'Key starts with invalid algorithm {alg}'},
-            status=400)
+        return key_error('bad-key', f'Key starts with invalid algorithm {alg}')
+
     if '\n' in pubkey[:-1]:
         LOG.warning("Newlines in keyfile that shouldn't be there")
-        return web.json_response(
-            data={'error': 'bad-key', 'message': 'Key has a newline'},
-            status=400)
-
-    if '\n' == pubkey[-1]:
-        pubkey = pubkey[:-1]
+        return key_error('bad-key', 'Key has a newline')
 
     # This is a more or less correct key we can write
+    if '\n' == pubkey[-1]:
+        pubkey = pubkey[:-1]
     hashval = hashlib.new('md5', pubkey.encode()).hexdigest()
     if not key_present(hashval):
         with authorized_keys('a') as ak:
