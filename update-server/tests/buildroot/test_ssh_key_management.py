@@ -99,7 +99,7 @@ async def test_add_key(test_cli, dummy_authorized_keys):
     
     # Send a request with a non-string key
     resp = await test_cli.post('/server/ssh_keys',
-                               json={key: 123},
+                               json={'key': 123},
                                headers={'X-Host-IP': '169.254.1.1'})
     assert resp.status == 400
     body = await resp.json()
