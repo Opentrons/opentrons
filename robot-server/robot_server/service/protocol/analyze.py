@@ -97,24 +97,26 @@ def _extract_equipment(ctx: typing.Optional[ProtocolContext]) -> \
     return models.RequiredEquipment(
         pipettes=[
             models.LoadedPipette(
-                mount=Mount(k.lower()),
-                pipetteName=v.name,
-                channels=v.channels,
-                requestedAs=v.requested_as)
-            for k, v in sorted(ctx.loaded_instruments.items()) if v
+                mount=Mount(slot.lower()),
+                pipetteName=pipette.name,
+                channels=pipette.channels,
+                requestedAs=pipette.requested_as)
+            for slot, pipette in sorted(ctx.loaded_instruments.items())
+            if pipette
         ],
         labware=[
             models.LoadedLabware(
-                label=v.name,
-                uri=v.uri,
-                location=k) for k, v in sorted(ctx.loaded_labwares.items())
+                label=labware.name,
+                uri=labware.uri,
+                location=slot)
+            for slot, labware in sorted(ctx.loaded_labwares.items())
         ],
         modules=[
             models.LoadedModule(
-                type=v.geometry.module_type.value,
-                model=v.geometry.model.value,
-                location=int(v.geometry.location.labware.first_parent())
-            ) for k, v in sorted(ctx.loaded_modules.items())
+                type=module.geometry.module_type.value,
+                model=module.geometry.model.value,
+                location=int(module.geometry.location.labware.first_parent())
+            ) for slot, module in sorted(ctx.loaded_modules.items())
         ]
     )
 
