@@ -93,10 +93,10 @@ async def test_add_key_successes(test_cli, dummy_authorized_keys):
         ('bad-key', {'key': ''}),
         ('bad-key', {'key': '     '}),
         ('bad-key', {'key': 'not even close to a pubkey'}),
-        ('bad-key', {'key': 'ssh-rsa \ngotcha'}) # Bad because of embedded \n.
+        ('bad-key', {'key': 'ssh-rsa \ngotcha'})  # Bad because of embedded \n.
     ])
 async def test_add_key_errors(
-        test_cli, dummy_authorized_keys, expected_error, body):  
+        test_cli, dummy_authorized_keys, expected_error, body):
     resp = await test_cli.post('/server/ssh_keys',
                                json=body,
                                headers={'X-Host-IP': '169.254.1.1'})
