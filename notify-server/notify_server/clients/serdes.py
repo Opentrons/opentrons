@@ -55,7 +55,7 @@ def from_frames(frames: List[bytes]) -> TopicEvent:
     """
     try:
         return TopicEvent(
-            topic=frames[0].decode(),
+            topic=frames[0].decode('utf-8'),
             event=Event.parse_raw((frames[1]))
         )
     except (ValueError, IndexError, AttributeError) as e:
