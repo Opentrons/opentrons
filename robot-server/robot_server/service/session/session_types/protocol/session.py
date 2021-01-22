@@ -56,7 +56,7 @@ class ProtocolSession(BaseSession):
             createParams=cast(ProtocolCreateParams, self.meta.create_params),
             createdAt=self.meta.created_at,
             details=ProtocolSessionDetails(
-                protocolId=self._uploaded_protocol.meta.identifier,
+                protocolId=self._uploaded_protocol.data.identifier,
                 currentState=self._command_executor.current_state,
                 events=self._command_executor.events
             )

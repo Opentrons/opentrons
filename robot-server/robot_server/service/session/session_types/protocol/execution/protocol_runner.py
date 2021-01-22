@@ -1,7 +1,5 @@
 import asyncio
 import logging
-import os
-import sys
 import typing
 
 from opentrons.broker import Broker
@@ -60,9 +58,9 @@ class ProtocolRunner:
 
     def load(self):
         """Create and simulate the api protocol session"""
-        with ProtocolRunnerContext(self._protocol):
+        with self._protocol.protocol_environment():
             self._session = ApiProtocolSession.build_and_prep(
-                name=self._protocol.meta.protocol_file.path.name,
+                name=self._protocol.data.contents.protocol_file.path.name,
                 contents=self._protocol.get_contents(),
                 hardware=self._hardware.sync,
                 loop=self._loop,
@@ -74,13 +72,13 @@ class ProtocolRunner:
     def run(self):
         """Run the protocol"""
         if self._session:
-            with ProtocolRunnerContext(self._protocol):
+            with self._protocol.protocol_environment():
                 self._session.run()
 
     def simulate(self):
         """Simulate the protocol"""
         if self._session:
-            with ProtocolRunnerContext(self._protocol):
+            with self._protocol.protocol_environment():
                 self._session.refresh()
 
     def cancel(self):
@@ -102,26 +100,3 @@ class ProtocolRunner:
         """Dispatch the events"""
         for listener in self._listeners:
             listener(msg)
-
-
-class ProtocolRunnerContext:
-    def __init__(self, protocol: UploadedProtocol):
-        self._protocol = protocol
-        self._cwd: typing.Optional[str] = None
-        self._path: typing.Optional[typing.List[str]] = None
-
-    def __enter__(self):
-        self._cwd = os.getcwd()
-        # Change working directory to temp dir
-        os.chdir(self._protocol.meta.directory.name)
-        # Add temp dir to path after caching path
-        self._path = sys.path.copy()
-        sys.path.append(self._protocol.meta.directory.name)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        # Undo working directory and path modifications
-        if self._cwd:
-            os.chdir(self._cwd)
-        if self._path:
-            sys.path = self._path

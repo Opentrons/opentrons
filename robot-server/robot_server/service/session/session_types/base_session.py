@@ -49,7 +49,7 @@ class BaseSession(ABC):
         :param configuration: Data and utilities common to all session types
         :param instance_meta: Session metadata
         :return: A new session
-        :raises: SessionCreationException
+        :raise SessionCreationException:
         """
         return cls(configuration=configuration,
                    instance_meta=instance_meta)

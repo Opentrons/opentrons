@@ -4,9 +4,10 @@ import pytest
 from unittest.mock import MagicMock, patch
 
 from robot_server.service.protocol import errors
+from robot_server.service.protocol.contents import Contents
 from robot_server.service.protocol.manager import ProtocolManager, UploadFile
-from robot_server.service.protocol.protocol import UploadedProtocolMeta, \
-    UploadedProtocol
+from robot_server.service.protocol.protocol import UploadedProtocol, \
+    UploadedProtocolData
 
 
 @pytest.fixture
@@ -17,19 +18,23 @@ def mock_upload_file():
 
 
 @pytest.fixture
-def mock_uploaded_protocol(mock_upload_file):
+def mock_uploaded_protocol():
     m = MagicMock(spec=UploadedProtocol)
     return m
 
 
 @pytest.fixture
 def mock_uploaded_control_constructor(mock_uploaded_protocol):
-    with patch("robot_server.service.protocol.manager.UploadedProtocol") as p:
+    with patch("robot_server.service.protocol."
+               "manager.UploadedProtocol.create") as p:
         def side_effect(protocol_id, protocol_file, support_files):
-            mock_uploaded_protocol.meta = UploadedProtocolMeta(
+            mock_uploaded_protocol.data = UploadedProtocolData(
                 identifier=protocol_id,
-                protocol_file=None,
-                directory=None)
+                contents=Contents(
+                    protocol_file=None,
+                    directory=None),
+                analysis_result=None
+            )
             return mock_uploaded_protocol
 
         p.side_effect = side_effect
@@ -50,9 +55,11 @@ class TestCreate:
         manager = ProtocolManager()
         p = manager.create(mock_upload_file, [])
         mock_uploaded_control_constructor.assert_called_once_with(
-            Path(mock_upload_file.filename).stem, mock_upload_file, [])
+            protocol_id=Path(mock_upload_file.filename).stem,
+            protocol_file=mock_upload_file,
+            support_files=[])
         assert p == mock_uploaded_protocol
-        assert manager._protocols[mock_uploaded_protocol.meta.identifier] == p
+        assert manager._protocols[mock_uploaded_protocol.data.identifier] == p
 
     def test_create_already_exists(self,
                                    mock_upload_file,
@@ -70,20 +77,21 @@ class TestCreate:
             manager_with_mock_protocol.create(m, [])
 
     @pytest.mark.parametrize(argnames="exception", argvalues=[
-        TypeError, IOError
+        errors.ProtocolIOException,
     ])
     def test_create_raises(self,
                            exception,
                            mock_upload_file,
                            mock_uploaded_protocol):
-        with patch("robot_server.service.protocol.manager.UploadedProtocol") \
+        with patch("robot_server.service.protocol."
+                   "manager.UploadedProtocol.create") \
                 as mock_construct:
             def raiser(*args, **kwargs):
-                raise exception()
+                raise exception("error")
 
             mock_construct.side_effect = raiser
 
-            with pytest.raises(errors.ProtocolIOException):
+            with pytest.raises(errors.ProtocolException):
                 manager = ProtocolManager()
                 manager.create(mock_upload_file, [])
 
@@ -91,7 +99,7 @@ class TestCreate:
 class TestGet:
     def test_get(self, manager_with_mock_protocol, mock_uploaded_protocol):
         assert manager_with_mock_protocol.get(
-            mock_uploaded_protocol.meta.identifier
+            mock_uploaded_protocol.data.identifier
         ) == mock_uploaded_protocol
 
     def test_not_found(self, manager_with_mock_protocol):
@@ -112,8 +120,8 @@ class TestGetAll:
 class TestRemove:
     def test_remove(self, manager_with_mock_protocol, mock_uploaded_protocol):
         manager_with_mock_protocol.remove(
-            mock_uploaded_protocol.meta.identifier)
-        assert mock_uploaded_protocol.meta.identifier not in \
+            mock_uploaded_protocol.data.identifier)
+        assert mock_uploaded_protocol.data.identifier not in \
                manager_with_mock_protocol._protocols
         mock_uploaded_protocol.clean_up.assert_called_once()
 

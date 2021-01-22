@@ -8,6 +8,8 @@
 <PROJECT_ROOT>/compute/.*
 <PROJECT_ROOT>/update-server/.*
 <PROJECT_ROOT>/shared-data/python/.*
+<PROJECT_ROOT>/robot-server/.*
+<PROJECT_ROOT>/notify-server/.*
 
 [untyped]
 ; TODO(mc, 2019-06-28): react-select uses an old version of flow
