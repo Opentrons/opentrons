@@ -36,7 +36,8 @@ class UploadedProtocol:
             protocol_file: UploadFile,
             support_files: typing.List[UploadFile]) -> 'UploadedProtocol':
         """
-        Save the protocol files and
+        Create the UploadedProtocol object. The protocol is analyzed after the
+         files are saved.
 
         :param protocol_id: The id assigned to this protocol
         :param protocol_file: The uploaded protocol file
