@@ -55,7 +55,9 @@ class TestCreate:
         manager = ProtocolManager()
         p = manager.create(mock_upload_file, [])
         mock_uploaded_control_constructor.assert_called_once_with(
-            Path(mock_upload_file.filename).stem, mock_upload_file, [])
+            protocol_id=Path(mock_upload_file.filename).stem,
+            protocol_file=mock_upload_file,
+            support_files=[])
         assert p == mock_uploaded_protocol
         assert manager._protocols[mock_uploaded_protocol.data.identifier] == p
 
@@ -75,7 +77,7 @@ class TestCreate:
             manager_with_mock_protocol.create(m, [])
 
     @pytest.mark.parametrize(argnames="exception", argvalues=[
-        TypeError, IOError
+        errors.ProtocolIOException,
     ])
     def test_create_raises(self,
                            exception,
@@ -85,11 +87,11 @@ class TestCreate:
                    "manager.UploadedProtocol.create") \
                 as mock_construct:
             def raiser(*args, **kwargs):
-                raise exception()
+                raise exception("error")
 
             mock_construct.side_effect = raiser
 
-            with pytest.raises(errors.ProtocolIOException):
+            with pytest.raises(errors.ProtocolException):
                 manager = ProtocolManager()
                 manager.create(mock_upload_file, [])
 

@@ -1,14 +1,17 @@
 """Functions and models of the contents and location of uploaded protocol."""
+import logging
+import typing
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import typing
-
 from fastapi import UploadFile
 
-from robot_server.service.protocol.errors import ProtocolAlreadyExistsException
+from robot_server.service.protocol.errors import ProtocolIOException
 from robot_server.util import FileMeta, save_upload
+
+
+log = logging.getLogger(__name__)
 
 
 DIR_PREFIX = 'opentrons_'
@@ -30,14 +33,24 @@ def create(
 
     :param protocol_file: The uploaded protocol file
     :param support_files: Optional support files
+    :raise ProtocolIOException:
     """
-    temp_dir = TemporaryDirectory(suffix=DIR_SUFFIX,
-                                  prefix=DIR_PREFIX)
+    try:
+        temp_dir = TemporaryDirectory(suffix=DIR_SUFFIX,
+                                      prefix=DIR_PREFIX)
 
-    temp_dir_path = Path(temp_dir.name)
-    protocol_file_meta = save_upload(temp_dir_path, protocol_file)
-    support_files_meta = [save_upload(temp_dir_path, s)
-                          for s in support_files]
+        try:
+            temp_dir_path = Path(temp_dir.name)
+            protocol_file_meta = save_upload(temp_dir_path, protocol_file)
+            support_files_meta = [save_upload(temp_dir_path, s)
+                                  for s in support_files]
+        except IOError:
+            # File saving failed. Remove the temporary directory and reraise.
+            temp_dir.cleanup()
+            raise
+    except IOError as e:
+        log.exception("Failed to save uploaded files.")
+        raise ProtocolIOException(str(e))
 
     return Contents(
         protocol_file=protocol_file_meta,
@@ -46,24 +59,37 @@ def create(
     )
 
 
-def add(
+def update(
         contents: Contents,
-        support_file: UploadFile):
-    """Add a support file to protocol temp directory"""
+        upload_file: UploadFile) -> Contents:
+    """
+    Update the contents of the protocol temp directory.
+
+    Existing files are replaced and new files are added.
+
+    :raise ProtocolIOException:
+    """
     temp_dir = Path(contents.directory.name)
+    try:
+        file_meta = save_upload(directory=temp_dir, upload_file=upload_file)
+    except IOError as e:
+        log.exception("Failed to save uploaded file")
+        raise ProtocolIOException(str(e))
 
-    path = temp_dir / support_file.filename
-    if path.exists():
-        raise ProtocolAlreadyExistsException(
-            f"File {support_file.filename} already exists"
+    if file_meta.path == contents.protocol_file.path:
+        # The protocol file has been replaced
+        return replace(
+            contents,
+            protocol_file=file_meta)
+    else:
+        # A support file has been added or replaces.
+        # Omit the file being replaced from existing support files (if found).
+        filtered_files = [f for f in contents.support_files
+                          if f.path != file_meta.path]
+        return replace(
+            contents,
+            support_files=filtered_files + [file_meta],
         )
-
-    file_meta = save_upload(directory=temp_dir, upload_file=support_file)
-
-    return replace(
-        contents,
-        support_files=contents.support_files + [file_meta],
-    )
 
 
 def get_protocol_contents(contents: Contents) -> str:
