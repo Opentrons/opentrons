@@ -1,6 +1,9 @@
 from datetime import datetime
 import pytest
+from opentrons.types import MountType
 from pydantic import ValidationError
+
+from opentrons.protocol_engine import commands as pe_commands
 
 from robot_server.service.session.models import command, command_definitions
 
@@ -49,16 +52,16 @@ def test_not_empty():
         "data": {
             "command": "equipment.loadInstrument",
             "data": {
-                "instrumentName": "p10_single",
+                "pipetteName": "p10_single",
                 "mount": "left"
             }
         }
     })
     assert request.data.command == \
            command_definitions.EquipmentCommand.load_instrument
-    assert request.data.data == command.LoadInstrumentRequestData(
-        instrumentName="p10_single",
-        mount=command.Mount.left
+    assert request.data.data == pe_commands.LoadPipetteRequest(
+        pipetteName="p10_single",
+        mount=MountType.LEFT
     )
 
     dt = datetime(2000, 1, 1)
@@ -69,23 +72,23 @@ def test_not_empty():
         created_at=dt,
         started_at=None,
         completed_at=None,
-        result=command.LoadInstrumentResponseData(
-            instrumentId=command.IdentifierType("123")
+        result=pe_commands.LoadPipetteResult(
+            pipetteId="123"
         )
     )
 
     assert response.command == \
            command_definitions.EquipmentCommand.load_instrument
-    assert response.data == command.LoadInstrumentRequestData(
-        instrumentName="p10_single",
-        mount=command.Mount.left
+    assert response.data == pe_commands.LoadPipetteRequest(
+        pipetteName="p10_single",
+        mount=MountType.LEFT
     )
     assert response.id == "id"
     assert response.createdAt == dt
     assert response.startedAt is None
     assert response.completedAt is None
-    assert response.result == command.LoadInstrumentResponseData(
-        instrumentId=command.IdentifierType("123")
+    assert response.result == pe_commands.LoadPipetteResult(
+        pipetteId="123"
     )
 
 

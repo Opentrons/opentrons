@@ -1,15 +1,11 @@
 import asyncio
-from unittest.mock import patch, MagicMock
+from mock import patch, MagicMock, AsyncMock
 import pytest
 
 from robot_server.service.session.errors import SessionCreationException
 from robot_server.service.session.manager import SessionMetaData, BaseSession
 from robot_server.service.session.models.common import create_identifier
 from robot_server.service.session.models.session import SessionType
-
-
-async def side_effect(*args, **kwargs):
-    return MagicMock()
 
 
 @pytest.fixture
@@ -22,8 +18,8 @@ async def session(session_manager, loop) -> BaseSession:
 @pytest.fixture
 def mock_session_create():
     """Patch of Session.create"""
-    with patch("robot_server.service.session.manager.BaseSession.create") as m:
-        m.side_effect = side_effect
+    with patch("robot_server.service.session.manager.LiveProtocolSession.create") as m:
+        m.return_value = AsyncMock()
         yield m
 
 
@@ -65,7 +61,7 @@ async def test_remove_removes(session_manager, session):
 async def test_remove_calls_cleanup(session_manager):
     session = await session_manager.add(SessionType.live_protocol,
                                         SessionMetaData())
-    session.clean_up = MagicMock(side_effect=side_effect)
+    session.clean_up = AsyncMock()
     await session_manager.remove(session.meta.identifier)
     session.clean_up.assert_called_once()
 
