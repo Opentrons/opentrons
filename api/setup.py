@@ -52,7 +52,7 @@ DESCRIPTION = (
     "writing automated biology lab protocols easy.")
 PACKAGES = find_packages(where='src')
 INSTALL_REQUIRES = [
-    'pyserial==3.4',
+    'pyserial==3.5',
     'numpy>=1.15.1',
     'jsonschema>=3.0.2,<4',
     'aionotify==0.2.0',
