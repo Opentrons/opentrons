@@ -24,12 +24,18 @@ def mock_utc(mock_time):
 
 
 @pytest.fixture
-def simulating_wrapper():
+def mock_event_publisher():
+    return AsyncMock(spec=dependencies.publisher.Publisher)
+
+
+@pytest.fixture
+def simulating_wrapper(mock_event_publisher):
     with patch.object(hardware_wrapper, 'get_settings',
                       return_value=RobotServerSettings(
                           simulator_configuration_file_path='simulators'
                                                             '/test.json')):
-        return hardware_wrapper.HardwareWrapper()
+        return hardware_wrapper.HardwareWrapper(
+            event_publisher=mock_event_publisher)
 
 
 async def test_init_hw_event(simulating_wrapper):
@@ -45,7 +51,10 @@ async def test_init_hw_event(simulating_wrapper):
     simulating_wrapper._tm.reset_mock()
 
 
-async def test_door_event(simulating_wrapper, mock_utc, mock_time):
+async def test_door_event(simulating_wrapper,
+                          mock_utc,
+                          mock_time,
+                          mock_event_publisher):
     """ Verify that a door event is published on hw event. """
 
     hw_event = DoorStateNotification(
@@ -54,7 +63,8 @@ async def test_door_event(simulating_wrapper, mock_utc, mock_time):
     pub_event = Event(createdOn=mock_time,
                       publisher='HardwareWrapper._publish_hardware_event',
                       data=DoorStatePayload(state=DoorState.OPEN))
-    with patch.object(dependencies, 'get_event_publisher') as pub:
-        simulating_wrapper._publish_hardware_event(hw_event)
-        pub().send_nowait.assert_called_once_with('hardware_events',
-                                                  pub_event)
+    simulating_wrapper._publish_hardware_event(hw_event)
+    mock_event_publisher.send_nowait.assert_called_once_with(
+        'hardware_events',
+        pub_event
+    )

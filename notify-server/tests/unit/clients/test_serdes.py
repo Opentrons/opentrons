@@ -2,14 +2,14 @@
 from typing import List
 
 import pytest
-from notify_server.clients.queue_entry import QueueEntry, MalformedFrames
+from notify_server.clients.serdes import (
+    TopicEvent, MalformedFrames, to_frames, from_frames)
 from notify_server.models.event import Event
 
 
-def test_entry_to_frames(event: Event) -> None:
-    """Test that to frames method creates a list of byte frames."""
-    entry = QueueEntry(topic="topic", event=event)
-    assert entry.to_frames() == [
+def test_to_frames(event: Event) -> None:
+    """Test that to_frames method creates a list of byte frames."""
+    assert to_frames(topic="topic", event=event) == [
         b'topic', event.json().encode('utf-8')
     ]
 
@@ -23,10 +23,10 @@ def test_entry_to_frames(event: Event) -> None:
 def test_entry_from_frames_fail(frames: List[bytes]) -> None:
     """Test that an exception is raised on bad message."""
     with pytest.raises(MalformedFrames):
-        QueueEntry.from_frames(frames)
+        from_frames(frames)
 
 
 def test_entry_from_frames(event: Event) -> None:
-    """Test that a QueueEntry is created from frames."""
-    q_entry = QueueEntry.from_frames([b"topic", event.json().encode('utf-8')])
-    assert q_entry == QueueEntry(topic="topic", event=event)
+    """Test that an object is created from_frames."""
+    entry = from_frames([b"topic", event.json().encode('utf-8')])
+    assert entry == TopicEvent(topic="topic", event=event)

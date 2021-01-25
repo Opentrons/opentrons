@@ -17,31 +17,33 @@ TOPICS = 'topic1', 'topic2'
 async def two_publishers(settings: Settings) -> \
         AsyncGenerator[Tuple[publisher.Publisher, publisher.Publisher], None]:
     """Create two publishers."""
-    pub1 = publisher.create(settings.publisher_address.connection_string())
-    pub2 = publisher.create(settings.publisher_address.connection_string())
+    pub1 = publisher.create(
+        settings.publisher_address.connection_string())
+    pub2 = publisher.create(
+        settings.publisher_address.connection_string())
     yield pub1, pub2
-    await pub1.stop()
-    await pub2.stop()
+    pub1.close()
+    pub2.close()
 
 
 @pytest.fixture
 async def subscriber_all_topics(settings: Settings) ->\
         AsyncGenerator[subscriber.Subscriber, None]:
     """Create subscriber for all topics."""
-    sub = subscriber.create(settings.subscriber_address.connection_string(),
-                            TOPICS)
+    sub = subscriber.create(
+        settings.subscriber_address.connection_string(), TOPICS)
     yield sub
-    await sub.stop()
+    sub.close()
 
 
 @pytest.fixture
 async def subscriber_first_topic(settings: Settings) ->\
         AsyncGenerator[subscriber.Subscriber, None]:
     """Create subscriber for first topic."""
-    sub = subscriber.create(settings.subscriber_address.connection_string(),
-                            (TOPICS[0],))
+    sub = subscriber.create(
+        settings.subscriber_address.connection_string(), (TOPICS[0],))
     yield sub
-    await sub.stop()
+    sub.close()
 
 
 async def test_two_pub_two_sub_two_topics(

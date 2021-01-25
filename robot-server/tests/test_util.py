@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from robot_server import util
 
@@ -48,3 +48,20 @@ def test_duration_raises(mock_utc_now, mock_start_time):
 
     assert t.start == mock_start_time
     assert t.end == mock_start_time + timedelta(days=1)
+
+
+async def test_call_once():
+    return_value = dict()
+    mock = MagicMock(return_value=return_value)
+
+    @util.call_once
+    async def f(arg1):
+        return mock(arg1)
+
+    # Call wrapped twice
+    a = await f(1)
+    b = await f(2)
+    # Results are the same object
+    assert a is b is return_value
+    # Mock is only called once.
+    mock.assert_called_once_with(1)
