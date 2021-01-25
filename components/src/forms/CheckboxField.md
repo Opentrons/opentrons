@@ -29,7 +29,7 @@ const [state, setState] = React.useState({
 })
 ;<div>
   <CheckboxField
-    label="Shared Feild Check Box"
+    label="Shared Field Check Box"
     className="display-block"
     onChange={() =>
       setState({

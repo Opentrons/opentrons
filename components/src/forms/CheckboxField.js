@@ -47,7 +47,7 @@ export function CheckboxField(props: CheckboxFieldProps): React.Node {
       <div className={innerDivClassName}>
         <Icon
           name={
-            props.isIndeterminate === true
+            props.isIndeterminate
               ? 'minus-box'
               : props.value
               ? 'checkbox-marked'
@@ -64,6 +64,7 @@ export function CheckboxField(props: CheckboxFieldProps): React.Node {
         disabled={props.disabled}
         onChange={props.onChange}
         tabIndex={props.tabIndex}
+        indeterminate={props.isIndeterminate}
       />
       <div
         {...props.hoverTooltipHandlers}
