@@ -27,6 +27,8 @@ export type CheckboxFieldProps = {|
   tabIndex?: number,
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
+  /** if true, render indeterminate icon */
+  isIndeterminate?: boolean,
 |}
 
 export function CheckboxField(props: CheckboxFieldProps): React.Node {
@@ -44,7 +46,13 @@ export function CheckboxField(props: CheckboxFieldProps): React.Node {
     <label className={outerClassName}>
       <div className={innerDivClassName}>
         <Icon
-          name={props.value ? 'checkbox-marked' : 'checkbox-blank-outline'}
+          name={
+            props.isIndeterminate === true
+              ? 'minus-box'
+              : props.value
+              ? 'checkbox-marked'
+              : 'checkbox-blank-outline'
+          }
           width="100%"
         />
       </div>
@@ -52,7 +60,7 @@ export function CheckboxField(props: CheckboxFieldProps): React.Node {
         className={cx(styles.input_field, styles.accessibly_hidden)}
         type="checkbox"
         name={props.name}
-        checked={props.value || false}
+        checked={props.value}
         disabled={props.disabled}
         onChange={props.onChange}
         tabIndex={props.tabIndex}
