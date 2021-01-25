@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.1.0...v4.1.1-alpha.0) (2021-01-25)
+
+
+### Bug Fixes
+
+* **api:** bump pyserial dependency in setup.py ([#7250](https://github.com/Opentrons/opentrons/issues/7250)) ([052b783](https://github.com/Opentrons/opentrons/commit/052b783))
+
+
+
+
+
 # [4.1.0](https://github.com/Opentrons/opentrons/compare/v4.0.0...v4.1.0) (2021-01-20)
 
 
