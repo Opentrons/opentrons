@@ -80,7 +80,6 @@ exports[`CheckboxField renders correctly when unchecked 1`] = `
     </svg>
   </div>
   <input
-    checked={false}
     className="input_field accessibly_hidden"
     type="checkbox"
   />
