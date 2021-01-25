@@ -1,5 +1,6 @@
 import logging
 
+import typing
 from opentrons.protocol_engine import ProtocolEngine, commands
 
 from robot_server.service.session.command_execution import (
@@ -16,7 +17,7 @@ class LiveProtocolCommandExecutor(CommandExecutor):
 
     ACCEPTED_COMMANDS = {
         models.EquipmentCommand.load_labware,
-        models.EquipmentCommand.load_instrument,
+        models.EquipmentCommand.load_pipette,
         models.PipetteCommand.aspirate,
         models.PipetteCommand.dispense,
         models.PipetteCommand.pick_up_tip,
@@ -36,7 +37,10 @@ class LiveProtocolCommandExecutor(CommandExecutor):
             )
 
         data = await self._protocol_engine.execute_command(
-            request=command.request.data,
+            request=typing.cast(
+                commands.CommandRequestType,
+                command.request.data
+            ),
             command_id=command.meta.identifier)
 
         if isinstance(data, commands.FailedCommand):

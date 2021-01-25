@@ -76,14 +76,14 @@ stages:
             labwareId: !anystr
             definition: !anydict
             calibration: !anylist
-  - name: Load instrument command
+  - name: Load pipette command
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
-          command: equipment.loadInstrument
-          data: &create_instrument_data
+          command: equipment.loadPipette
+          data: &create_pipette_data
             pipetteName: p300_single
             mount: right
     response:
@@ -92,8 +92,8 @@ stages:
         links: !anydict
         data:
           id: !anystr
-          data: *create_instrument_data
-          command: equipment.loadInstrument
+          data: *create_pipette_data
+          command: equipment.loadPipette
           status: executed
           createdAt: !anystr
           startedAt: !anystr

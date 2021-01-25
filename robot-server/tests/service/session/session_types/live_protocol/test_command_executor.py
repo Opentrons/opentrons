@@ -150,7 +150,7 @@ async def test_load_instrument(command_executor, mock_protocol_engine):
     command_object = Command(
         meta=CommandMeta(identifier="1234"),
         request=command_models.LoadInstrumentRequest(
-            command=command_definitions.EquipmentCommand.load_instrument,
+            command=command_definitions.EquipmentCommand.load_pipette,
             data=request_body))
 
     result = await command_executor.execute(command_object)

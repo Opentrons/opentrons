@@ -50,7 +50,7 @@ def test_not_empty():
     """Test that command request with data and result are created properly."""
     request = command.CommandRequest.parse_obj({
         "data": {
-            "command": "equipment.loadInstrument",
+            "command": "equipment.loadPipette",
             "data": {
                 "pipetteName": "p10_single",
                 "mount": "left"
@@ -58,7 +58,7 @@ def test_not_empty():
         }
     })
     assert request.data.command == \
-           command_definitions.EquipmentCommand.load_instrument
+           command_definitions.EquipmentCommand.load_pipette
     assert request.data.data == pe_commands.LoadPipetteRequest(
         pipetteName="p10_single",
         mount=MountType.LEFT
@@ -78,7 +78,7 @@ def test_not_empty():
     )
 
     assert response.command == \
-           command_definitions.EquipmentCommand.load_instrument
+           command_definitions.EquipmentCommand.load_pipette
     assert response.data == pe_commands.LoadPipetteRequest(
         pipetteName="p10_single",
         mount=MountType.LEFT
@@ -96,7 +96,7 @@ def test_not_empty():
     argnames="command_def",
     argvalues=[
         command_definitions.EquipmentCommand.load_labware,
-        command_definitions.EquipmentCommand.load_instrument,
+        command_definitions.EquipmentCommand.load_pipette,
         command_definitions.PipetteCommand.aspirate,
         command_definitions.PipetteCommand.dispense,
         command_definitions.PipetteCommand.drop_tip,

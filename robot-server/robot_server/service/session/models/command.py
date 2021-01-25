@@ -165,14 +165,14 @@ LoadLabwareResponse = SessionCommandResponse[
 
 
 LoadInstrumentRequest = SessionCommandRequest[
-    Literal[EquipmentCommand.load_instrument],
+    Literal[EquipmentCommand.load_pipette],
     commands.LoadPipetteRequest,
     commands.LoadPipetteResult
 ]
 
 
 LoadInstrumentResponse = SessionCommandResponse[
-    Literal[EquipmentCommand.load_instrument],
+    Literal[EquipmentCommand.load_pipette],
     commands.LoadPipetteRequest,
     commands.LoadPipetteResult
 ]
