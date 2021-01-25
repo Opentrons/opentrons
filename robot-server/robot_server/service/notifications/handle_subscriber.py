@@ -34,7 +34,7 @@ async def receive(websocket: WebSocket, subscriber: Subscriber) -> None:
         while True:
             await websocket.receive_json()
     except WebSocketDisconnect:
-        log.exception("Websocket subscriber disconnected.")
+        log.info("Websocket subscriber disconnected.")
         subscriber.close()
 
 
