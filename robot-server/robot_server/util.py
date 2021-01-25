@@ -39,24 +39,24 @@ def save_upload(directory: Path, upload_file: UploadFile) -> FileMeta:
     return FileMeta(path=path, content_hash=content_hash)
 
 
-CACHED_RESULT_ATTR: Final = "_cached_result"
+CALL_ONCE_RESULT_ATTR: Final = "_call_once_result"
 
 
-def cache_result(fn):
+def call_once(fn):
     """
-    Decorator used to cache the result of an async function. Intended for use
-    in initializing a singleton.
+    Decorator used to ensure an async function is called only once. Subsequent
+     calls will return the result of ths initial call regardless of arguments.
 
-    The wrapped function will be called once regardless of arguments.
+     Intended for use in initializing a singleton.
 
     :param fn: a coroutine
     """
     @wraps(fn)
     async def wrapped(*args, **kwargs):
-        if not hasattr(wrapped, CACHED_RESULT_ATTR):
+        if not hasattr(wrapped, CALL_ONCE_RESULT_ATTR):
             result = await fn(*args, **kwargs)
-            setattr(wrapped, CACHED_RESULT_ATTR, result)
+            setattr(wrapped, CALL_ONCE_RESULT_ATTR, result)
 
-        return getattr(wrapped, CACHED_RESULT_ATTR)
+        return getattr(wrapped, CALL_ONCE_RESULT_ATTR)
 
     return wrapped

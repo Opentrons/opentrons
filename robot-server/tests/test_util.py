@@ -50,11 +50,11 @@ def test_duration_raises(mock_utc_now, mock_start_time):
     assert t.end == mock_start_time + timedelta(days=1)
 
 
-async def test_cache_result():
+async def test_call_once():
     return_value = dict()
     mock = MagicMock(return_value=return_value)
 
-    @util.cache_result
+    @util.call_once
     async def f(arg1):
         return mock(arg1)
 

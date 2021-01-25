@@ -17,7 +17,7 @@ from notify_server.clients import publisher
 from notify_server.settings import Settings as NotifyServerSettings
 
 
-@util.cache_result
+@util.call_once
 async def get_event_publisher() -> publisher.Publisher:
     """A dependency creating a single notify-server event
     publisher instance."""
@@ -28,7 +28,7 @@ async def get_event_publisher() -> publisher.Publisher:
     return event_publisher
 
 
-@util.cache_result
+@util.call_once
 async def get_hardware_wrapper(
         event_publisher: publisher.Publisher = Depends(get_event_publisher)) \
         -> HardwareWrapper:
@@ -54,7 +54,7 @@ async def get_hardware(
     return api_wrapper.get_hardware()
 
 
-@util.cache_result
+@util.call_once
 async def get_motion_lock() -> ThreadedAsyncLock:
     """
     Get the single motion lock.
@@ -64,7 +64,7 @@ async def get_motion_lock() -> ThreadedAsyncLock:
     return ThreadedAsyncLock()
 
 
-@util.cache_result
+@util.call_once
 async def get_rpc_server(
         hardware: ThreadManager = Depends(get_hardware),
         lock: ThreadedAsyncLock = Depends(get_motion_lock)
@@ -75,13 +75,13 @@ async def get_rpc_server(
     return RPCServer(None, root)
 
 
-@util.cache_result
+@util.call_once
 async def get_protocol_manager() -> ProtocolManager:
     """The single protocol manager instance"""
     return ProtocolManager()
 
 
-@util.cache_result
+@util.call_once
 async def get_session_manager(
         hardware: ThreadManager = Depends(get_hardware),
         motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
