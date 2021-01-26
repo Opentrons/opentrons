@@ -10,8 +10,9 @@ import type { StepFieldName } from '../../../form-types'
 
 export type FieldProps = {|
   disabled: boolean,
-  value: mixed,
+  name: string,
   updateValue: mixed => void,
+  value: mixed,
   errorToShow: ?string,
   tooltipContent?: React.Node,
   onFieldBlur?: () => mixed,
@@ -75,6 +76,7 @@ export const useSingleEditFieldProps = (
     const fieldProps: FieldProps = {
       disabled,
       errorToShow,
+      name,
       tooltipContent,
       updateValue,
       value,
