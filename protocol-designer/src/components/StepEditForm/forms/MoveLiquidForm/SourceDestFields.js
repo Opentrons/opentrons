@@ -3,7 +3,6 @@ import * as React from 'react'
 import { i18n } from '../../../../localization'
 
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { FocusHandlers } from '../../types'
 
 import {
   TextField,
@@ -20,7 +19,6 @@ import styles from '../../StepEditForm.css'
 
 type Props = {
   className?: ?string,
-  focusHandlers: FocusHandlers,
   prefix: 'aspirate' | 'dispense',
 }
 
@@ -29,7 +27,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 ): StepFieldName => `${prefix}_${fieldName}`
 
 export const SourceDestFields = (props: Props): React.Node => {
-  const { className, focusHandlers, prefix } = props
+  const { className, prefix } = props
 
   const propsForFields = useSingleEditFieldProps({})
   if (propsForFields === null) return null
@@ -43,16 +41,14 @@ export const SourceDestFields = (props: Props): React.Node => {
       className={styles.small_field}
     >
       <TextField
-        name={addFieldNamePrefix('mix_volume')}
-        units={i18n.t('application.units.microliter')}
+        {...propsForFields[addFieldNamePrefix('mix_volume')]}
         className={styles.small_field}
-        {...focusHandlers}
+        units={i18n.t('application.units.microliter')}
       />
       <TextField
-        name={addFieldNamePrefix('mix_times')}
-        units={i18n.t('application.units.times')}
+        {...propsForFields[addFieldNamePrefix('mix_times')]}
         className={styles.small_field}
-        {...focusHandlers}
+        units={i18n.t('application.units.times')}
       />
     </CheckboxRowField>
   )
@@ -62,7 +58,6 @@ export const SourceDestFields = (props: Props): React.Node => {
       checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
       secondsFieldName={addFieldNamePrefix('delay_seconds')}
       tipPositionFieldName={addFieldNamePrefix('delay_mmFromBottom')}
-      focusHandlers={focusHandlers}
     />
   )
 
@@ -121,9 +116,8 @@ export const SourceDestFields = (props: Props): React.Node => {
             className={styles.small_field}
           >
             <BlowoutLocationField
-              name="blowout_location"
+              {...propsForFields['blowout_location']}
               className={styles.full_width}
-              {...focusHandlers}
             />
           </CheckboxRowField>
         )}
@@ -138,10 +132,9 @@ export const SourceDestFields = (props: Props): React.Node => {
           className={styles.small_field}
         >
           <TextField
+            {...propsForFields[addFieldNamePrefix('airGap_volume')]}
             className={styles.small_field}
-            name={addFieldNamePrefix('airGap_volume')}
             units={i18n.t('application.units.microliter')}
-            {...focusHandlers}
           />
         </CheckboxRowField>
       </div>

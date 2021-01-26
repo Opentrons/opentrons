@@ -7,8 +7,8 @@ import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { i18n } from '../../../localization'
 import { maskField } from '../../../steplist/fieldLevel'
-
 import { ConditionalOnField, TextField, RadioGroupField } from '../fields'
+import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import styles from '../StepEditForm.css'
 
 import type { FormData } from '../../../form-types'
@@ -16,8 +16,9 @@ import type { FocusHandlers } from '../types'
 
 type MagnetFormProps = { focusHandlers: FocusHandlers, formData: FormData }
 
-export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
-  const { focusHandlers } = props
+export const MagnetForm = (props: MagnetFormProps): React.Node => {
+  const { focusHandlers } = props // TODO IMMEDIATELY remove
+
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getMagneticLabwareOptions
   )
@@ -34,6 +35,9 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
   const engageHeightCaption = defaultEngageHeight
     ? `Recommended: ${String(maskField('engageHeight', defaultEngageHeight))}`
     : null
+
+  const propsForFields = useSingleEditFieldProps({})
+  if (propsForFields === null) return null
 
   return (
     <div className={styles.form_wrapper}>
@@ -88,10 +92,9 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
             className={styles.magnet_form_group}
           >
             <TextField
-              name="engageHeight"
-              className={styles.small_field}
+              {...propsForFields['engageHeight']}
               caption={engageHeightCaption}
-              {...focusHandlers}
+              className={styles.small_field}
             />
           </FormGroup>
         </ConditionalOnField>

@@ -14,6 +14,8 @@ export type FieldProps = {|
   updateValue: mixed => void,
   errorToShow: ?string,
   tooltipContent?: React.Node,
+  onFieldBlur?: () => mixed,
+  onFieldFocus?: () => mixed,
 |}
 
 type FieldPropsByName = {
@@ -48,7 +50,7 @@ export const useSingleEditFieldProps = (
 
   if (formData == null) return null
 
-  // TODO IMMEDIATELY: explicit names, this omit is a HACK
+  // TODO IMMEDIATELY: explicit names, this omit is a HACK. Must support all stepTypes.
   const fieldNames: Array<string> = Object.keys(formData).filter(
     k => !['id', 'stepType'].includes(k)
   )
@@ -76,6 +78,12 @@ export const useSingleEditFieldProps = (
       tooltipContent,
       updateValue,
       value,
+      onFieldBlur: () => {
+        console.log('todo immed: blur ' + name)
+      },
+      onFieldFocus: () => {
+        console.log('todo immed: focus ' + name)
+      },
     }
     return {
       ...acc,

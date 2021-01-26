@@ -4,15 +4,16 @@ import * as React from 'react'
 import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { TextField } from '../../fields'
+import { useSingleEditFieldProps } from '../../fields/useSingleEditFieldProps'
 
 import styles from '../../StepEditForm.css'
-
 import type { FocusHandlers } from '../../types'
 
 type Props = {| focusHandlers: FocusHandlers |}
 
 export const ProfileSettings = (props: Props): React.Node => {
-  const { focusHandlers } = props
+  const propsForFields = useSingleEditFieldProps({})
+  if (propsForFields === null) return null
 
   return (
     <div className={styles.form_row}>
@@ -21,10 +22,9 @@ export const ProfileSettings = (props: Props): React.Node => {
         className={styles.profile_settings_group}
       >
         <TextField
-          name="profileVolume"
+          {...propsForFields['profileVolume']}
           className={styles.small_field}
           units={i18n.t('application.units.microliter')}
-          {...focusHandlers}
         />
       </FormGroup>
       <FormGroup
@@ -32,10 +32,9 @@ export const ProfileSettings = (props: Props): React.Node => {
         className={styles.profile_settings_group}
       >
         <TextField
-          name="profileTargetLidTemp"
+          {...propsForFields['profileTargetLidTemp']}
           className={styles.small_field}
           units={i18n.t('application.units.degrees')}
-          {...focusHandlers}
         />
       </FormGroup>
       <FormGroup

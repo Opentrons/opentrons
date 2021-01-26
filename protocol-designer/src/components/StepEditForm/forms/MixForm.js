@@ -44,10 +44,10 @@ export const MixForm = (props: Props): React.Node => {
         </span>
       </div>
       <div className={styles.form_row}>
-        <PipetteField name="pipette" {...focusHandlers} />
+        <PipetteField {...propsForFields['pipette']} />
         <VolumeField
+          {...propsForFields['volume']}
           label={i18n.t('form.step_edit_form.mixVolumeLabel')}
-          focusHandlers={focusHandlers}
           stepType="mix"
           className={styles.small_field}
         />
@@ -56,9 +56,8 @@ export const MixForm = (props: Props): React.Node => {
           label={i18n.t('form.step_edit_form.mixRepetitions')}
         >
           <TextField
-            name="times"
+            {...propsForFields['times']}
             units={i18n.t('application.units.times')}
-            {...focusHandlers}
           />
         </FormGroup>
       </div>
@@ -148,9 +147,8 @@ export const MixForm = (props: Props): React.Node => {
                 label={i18n.t('form.step_edit_form.field.blowout.label')}
               >
                 <BlowoutLocationField
+                  {...propsForFields['blowout_location']}
                   className={styles.full_width}
-                  name="blowout_location"
-                  {...focusHandlers}
                 />
               </CheckboxRowField>
             </div>

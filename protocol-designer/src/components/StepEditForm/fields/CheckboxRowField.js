@@ -5,7 +5,6 @@ import {
   useHoverTooltip,
   Tooltip,
   TOOLTIP_TOP,
-  TOOLTIP_FIXED,
 } from '@opentrons/components'
 import cx from 'classnames'
 import styles from '../StepEditForm.css'
@@ -39,7 +38,8 @@ export const CheckboxRowField = (props: CheckboxRowProps): React.Node => {
       <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
       <div className={styles.checkbox_row}>
         <CheckboxField
-          hoverTooltipHandlers={targetProps}
+          // TODO IMMEDIATELY: update CheckboxField props type to include UseHoverTooltipHoverProps stuff
+          labelProps={targetProps}
           label={label}
           disabled={disabled}
           className={cx(styles.checkbox_field, className)}

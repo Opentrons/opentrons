@@ -5,33 +5,37 @@ import { i18n } from '../../../localization'
 import { getTooltipForField } from '../utils'
 import { TextField } from './TextField'
 import type { StepType } from '../../../form-types'
-import type { FocusHandlers } from '../types'
+import type { FieldProps } from './useSingleEditFieldProps'
 import styles from '../StepEditForm.css'
 
 type Props = {|
+  ...FieldProps,
   stepType: StepType,
-  focusHandlers: FocusHandlers,
   label: string,
   className: string,
 |}
-export const VolumeField = (props: Props): React.Node => (
-  <HoverTooltip
-    tooltipComponent={getTooltipForField(props.stepType, 'volume', false)}
-    placement="top-start"
-  >
-    {hoverTooltipHandlers => (
-      <FormGroup
-        label={props.label}
-        className={props.className}
-        hoverTooltipHandlers={hoverTooltipHandlers}
-      >
-        <TextField
-          className={styles.small_field}
-          name="volume"
-          units={i18n.t('application.units.microliter')}
-          {...props.focusHandlers}
-        />
-      </FormGroup>
-    )}
-  </HoverTooltip>
-)
+export const VolumeField = (props: Props): React.Node => {
+  const { stepType, label, className, ...propsForVolumeField } = props
+
+  // TODO IMMEDIATELY tooltip from hook
+  return (
+    <HoverTooltip
+      tooltipComponent={getTooltipForField(stepType, 'volume', false)}
+      placement="top-start"
+    >
+      {hoverTooltipHandlers => (
+        <FormGroup
+          label={label}
+          className={className}
+          hoverTooltipHandlers={hoverTooltipHandlers}
+        >
+          <TextField
+            {...propsForVolumeField}
+            className={styles.small_field}
+            units={i18n.t('application.units.microliter')}
+          />
+        </FormGroup>
+      )}
+    </HoverTooltip>
+  )
+}

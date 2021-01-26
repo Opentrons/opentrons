@@ -1,50 +1,37 @@
 // @flow
 import * as React from 'react'
 import { InputField } from '@opentrons/components'
-import type { StepFieldName } from '../../../steplist/fieldLevel'
-import type { FocusHandlers } from '../types'
-import { FieldConnector } from './FieldConnector'
+import type { FieldProps } from './useSingleEditFieldProps'
 
 type TextFieldProps = {|
-  ...FocusHandlers,
+  ...FieldProps,
   className?: string,
-  name: StepFieldName,
+
+  // TODO IMMEDIATELY
+  caption?: ?string,
+  units?: ?string,
 |}
 
-export const TextField = (props: {|
-  ...TextFieldProps,
-  ...React.ElementProps<typeof InputField>,
-|}): React.Node => {
+export const TextField = (props: TextFieldProps): React.Node => {
   const {
-    name,
-    focusedField,
-    dirtyFields,
+    updateValue,
     onFieldFocus,
     onFieldBlur,
-    ...inputProps
+    errorToShow,
+    tooltipContent,
+    value,
+    ...otherProps
   } = props
 
+  // TODO IMMEDIATELY: tooltip here
   return (
-    <FieldConnector
-      name={name}
-      focusedField={focusedField}
-      dirtyFields={dirtyFields}
-      render={({ value, updateValue, errorToShow, hoverTooltipHandlers }) => (
-        <InputField
-          {...inputProps}
-          error={errorToShow}
-          onBlur={() => {
-            onFieldBlur(name)
-          }}
-          onFocus={() => {
-            onFieldFocus(name)
-          }}
-          onChange={(e: SyntheticInputEvent<*>) =>
-            updateValue(e.currentTarget.value)
-          }
-          value={value ? String(value) : null}
-        />
-      )}
+    <InputField
+      {...otherProps}
+      error={errorToShow}
+      onBlur={onFieldBlur}
+      onFocus={onFieldFocus}
+      onChange={e => updateValue(e.currentTarget.value)}
+      value={value ? String(value) : null}
     />
   )
 }

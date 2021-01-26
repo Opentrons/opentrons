@@ -17,6 +17,7 @@ import {
   RadioGroupField,
   StepFormDropdown,
 } from '../fields'
+import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import { FieldConnector } from '../fields/FieldConnector'
 import styles from '../StepEditForm.css'
 
@@ -24,7 +25,7 @@ import type { FocusHandlers } from '../types'
 
 type PauseFormProps = {| focusHandlers: FocusHandlers |}
 
-export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
+export const PauseForm = (props: PauseFormProps): React.Node => {
   const { focusHandlers } = props
 
   const moduleLabwareOptions = useSelector(
@@ -47,6 +48,9 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
       props.focusHandlers.onFieldBlur(timeUnitFieldName)
     )
   }
+
+  const propsForFields = useSingleEditFieldProps({})
+  if (propsForFields === null) return null
 
   return (
     <div className={styles.form_wrapper}>
@@ -92,25 +96,22 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
           >
             <div className={styles.form_row}>
               <TextField
-                {...focusHandlers}
+                {...propsForFields['pauseHour']}
                 onFieldBlur={blurAllTimeUnitFields}
                 className={styles.small_field}
                 units={i18n.t('application.units.hours')}
-                name="pauseHour"
               />
               <TextField
-                {...focusHandlers}
+                {...propsForFields['pauseMinute']}
                 onFieldBlur={blurAllTimeUnitFields}
                 className={styles.small_field}
                 units={i18n.t('application.units.minutes')}
-                name="pauseMinute"
               />
               <TextField
-                {...focusHandlers}
+                {...propsForFields['pauseSecond']}
                 onFieldBlur={blurAllTimeUnitFields}
                 className={styles.small_field}
                 units={i18n.t('application.units.seconds')}
-                name="pauseSecond"
               />
             </div>
           </ConditionalOnField>
@@ -162,10 +163,9 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
                       )}
                     >
                       <TextField
-                        name="pauseTemperature"
+                        {...propsForFields['pauseTemperature']}
                         className={styles.small_field}
                         units={i18n.t('application.units.degrees')}
-                        {...focusHandlers}
                       />
                     </FormGroup>
                   </div>

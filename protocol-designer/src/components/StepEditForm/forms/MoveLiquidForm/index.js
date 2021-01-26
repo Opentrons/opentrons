@@ -13,6 +13,7 @@ import {
   DisposalVolumeField,
   PathField,
 } from '../../fields'
+import { useSingleEditFieldProps } from '../../fields/useSingleEditFieldProps'
 import styles from '../../StepEditForm.css'
 import type { FocusHandlers } from '../../types'
 import { SourceDestFields } from './SourceDestFields'
@@ -24,104 +25,89 @@ type Props = {|
   formData: HydratedMoveLiquidFormDataLegacy,
 |}
 
-type State = {|
-  collapsed: boolean,
-|}
-
 // TODO: BC 2019-01-25 instead of passing path from here, put it in connect fields where needed
 // or question if it even needs path
 
-export class MoveLiquidForm extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = { collapsed: true }
-  }
+export const MoveLiquidForm = (props: Props): React.Node => {
+  const [collapsed, _setCollapsed] = React.useState<boolean>(true)
 
-  toggleCollapsed: () => void = () =>
-    this.setState({ collapsed: !this.state.collapsed })
+  const toggleCollapsed = () => _setCollapsed(!collapsed)
 
-  render(): React.Node {
-    const { focusHandlers, stepType } = this.props
-    const { collapsed } = this.state
-    const { path } = this.props.formData
+  const { focusHandlers, stepType } = props
+  const { path } = props.formData
 
-    return (
-      <div className={styles.form_wrapper}>
-        <div className={styles.section_header}>
-          <span className={styles.section_header_text}>
-            {i18n.t('application.stepType.moveLiquid')}
-          </span>
-        </div>
-        <div className={styles.form_row}>
-          <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
-          <VolumeField
-            label={i18n.t('form.step_edit_form.field.volume.label')}
-            focusHandlers={focusHandlers}
-            stepType={stepType}
-            className={styles.large_field}
-          />
-        </div>
+  const propsForFields = useSingleEditFieldProps({})
+  if (propsForFields === null) return null
 
-        <div className={styles.section_wrapper}>
-          <SourceDestHeaders
+  return (
+    <div className={styles.form_wrapper}>
+      <div className={styles.section_header}>
+        <span className={styles.section_header_text}>
+          {i18n.t('application.stepType.moveLiquid')}
+        </span>
+      </div>
+      <div className={styles.form_row}>
+        <PipetteField {...propsForFields['pipette']} />
+        <VolumeField
+          {...propsForFields['volume']}
+          label={i18n.t('form.step_edit_form.field.volume.label')}
+          stepType={stepType}
+          className={styles.large_field}
+        />
+      </div>
+
+      <div className={styles.section_wrapper}>
+        <SourceDestHeaders
+          className={styles.section_column}
+          focusHandlers={focusHandlers}
+          collapsed={collapsed}
+          toggleCollapsed={toggleCollapsed}
+          prefix="aspirate"
+        />
+        <SourceDestHeaders
+          className={styles.section_column}
+          focusHandlers={focusHandlers}
+          collapsed={collapsed}
+          toggleCollapsed={toggleCollapsed}
+          prefix="dispense"
+        />
+      </div>
+
+      {!collapsed && (
+        <div
+          className={cx(styles.section_wrapper, styles.advanced_settings_panel)}
+        >
+          <SourceDestFields
             className={styles.section_column}
             focusHandlers={focusHandlers}
             collapsed={collapsed}
-            toggleCollapsed={this.toggleCollapsed}
+            toggleCollapsed={toggleCollapsed}
             prefix="aspirate"
           />
-          <SourceDestHeaders
+          <SourceDestFields
             className={styles.section_column}
             focusHandlers={focusHandlers}
             collapsed={collapsed}
-            toggleCollapsed={this.toggleCollapsed}
+            toggleCollapsed={toggleCollapsed}
             prefix="dispense"
           />
         </div>
+      )}
 
-        {!collapsed && (
-          <div
-            className={cx(
-              styles.section_wrapper,
-              styles.advanced_settings_panel
-            )}
-          >
-            <SourceDestFields
-              className={styles.section_column}
-              focusHandlers={focusHandlers}
-              collapsed={collapsed}
-              toggleCollapsed={this.toggleCollapsed}
-              prefix="aspirate"
-            />
-            <SourceDestFields
-              className={styles.section_column}
-              focusHandlers={focusHandlers}
-              collapsed={collapsed}
-              toggleCollapsed={this.toggleCollapsed}
-              prefix="dispense"
-            />
-          </div>
-        )}
-
-        <div className={styles.section_header}>
-          <span className={styles.section_header_text}>
-            {i18n.t('form.step_edit_form.section.sterility&motion')}
-          </span>
+      <div className={styles.section_header}>
+        <span className={styles.section_header_text}>
+          {i18n.t('form.step_edit_form.section.sterility&motion')}
+        </span>
+      </div>
+      <div className={styles.section_wrapper}>
+        <div className={cx(styles.form_row, styles.section_column)}>
+          <ChangeTipField name="changeTip" />
+          <PathField focusHandlers={focusHandlers} />
         </div>
-        <div className={styles.section_wrapper}>
-          <div className={cx(styles.form_row, styles.section_column)}>
-            <ChangeTipField name="changeTip" />
-            <PathField focusHandlers={focusHandlers} />
-          </div>
-          <div
-            className={cx(styles.section_column, styles.disposal_vol_wrapper)}
-          >
-            {path === 'multiDispense' && (
-              <DisposalVolumeField focusHandlers={focusHandlers} />
-            )}
-          </div>
+        <div className={cx(styles.section_column, styles.disposal_vol_wrapper)}>
+          {path === 'multiDispense' && <DisposalVolumeField />}
         </div>
       </div>
-    )
-  }
+    </div>
+  )
 }

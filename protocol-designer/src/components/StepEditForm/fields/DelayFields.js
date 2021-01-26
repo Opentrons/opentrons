@@ -7,7 +7,6 @@ import { TipPositionField } from './TipPositionField'
 import { useSingleEditFieldProps } from './useSingleEditFieldProps'
 import styles from '../StepEditForm.css'
 
-import type { FocusHandlers } from '../types'
 import type {
   DelayCheckboxFields,
   DelaySecondFields,
@@ -18,16 +17,10 @@ type DelayFieldProps = {
   checkboxFieldName: DelayCheckboxFields,
   secondsFieldName: DelaySecondFields,
   tipPositionFieldName?: TipOffsetFields,
-  focusHandlers: FocusHandlers,
 }
 
 export const DelayFields = (props: DelayFieldProps): React.Node => {
-  const {
-    checkboxFieldName,
-    secondsFieldName,
-    tipPositionFieldName,
-    focusHandlers,
-  } = props
+  const { checkboxFieldName, secondsFieldName, tipPositionFieldName } = props
 
   const propsForFields = useSingleEditFieldProps({})
   if (propsForFields === null) return null
@@ -42,10 +35,9 @@ export const DelayFields = (props: DelayFieldProps): React.Node => {
       )}
     >
       <TextField
-        name={secondsFieldName}
-        units={i18n.t('application.units.seconds')}
+        {...propsForFields[secondsFieldName]}
         className={styles.small_field}
-        {...focusHandlers}
+        units={i18n.t('application.units.seconds')}
       />
       {tipPositionFieldName && (
         <TipPositionField fieldName={tipPositionFieldName} />

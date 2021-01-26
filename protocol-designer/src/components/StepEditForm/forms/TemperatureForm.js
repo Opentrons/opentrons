@@ -11,15 +11,14 @@ import {
   ConditionalOnField,
   TextField,
 } from '../fields'
+import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import styles from '../StepEditForm.css'
 
 import type { FocusHandlers } from '../types'
 
 type TemperatureFormProps = { focusHandlers: FocusHandlers }
 
-export const TemperatureForm = (
-  props: TemperatureFormProps
-): React.Element<'div'> => {
+export const TemperatureForm = (props: TemperatureFormProps): React.Node => {
   const { focusHandlers } = props
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
@@ -27,6 +26,9 @@ export const TemperatureForm = (
   const temperatureModuleId = useSelector(
     uiModuleSelectors.getSingleTemperatureModuleId
   )
+
+  const propsForFields = useSingleEditFieldProps({})
+  if (propsForFields === null) return null
 
   return (
     <div className={styles.form_wrapper}>
@@ -80,10 +82,9 @@ export const TemperatureForm = (
               condition={val => val === 'true'}
             >
               <TextField
-                name="targetTemperature"
+                {...propsForFields['targetTemperature']}
                 className={styles.small_field}
                 units={i18n.t('application.units.degrees')}
-                {...focusHandlers}
               />
             </ConditionalOnField>
           </div>
