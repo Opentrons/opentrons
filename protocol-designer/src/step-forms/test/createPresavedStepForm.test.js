@@ -203,7 +203,9 @@ describe('createPresavedStepForm', () => {
         changeTip: 'always',
         stepDetails: '',
         stepName: 'mix',
-        // TODO(IL, 2020-04-27): mix defaults are missing volume, etc!!! Investigate in #3161
+        mix_touchTip_checkbox: false,
+        times: null,
+        volume: undefined,
       })
     })
   })

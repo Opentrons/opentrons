@@ -80,8 +80,10 @@ describe('getDefaultsForStepType', () => {
         blowout_checkbox: false,
         blowout_location: FIXED_TRASH_ID,
         mix_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`, // NOTE: mix uses dispense for both asp + disp, for now
+        mix_touchTip_checkbox: false,
         pipette: null,
         volume: undefined,
+        times: null,
         wells: [],
       })
     })
