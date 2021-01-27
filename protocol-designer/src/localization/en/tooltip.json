@@ -46,6 +46,17 @@
         "blowout_checkbox": "Redundant with disposal volume"
       }
     },
+    "batch_edit": {
+      "disabled": {
+        "pipette-different": "Cannot edit unless selected steps share the same pipette.",
+        "aspirate-labware-different": "Cannot edit unless selected steps share the same type of source labware.",
+        "dispense-labware-different": "Cannot edit unless selected steps share the same type of destination labware.",
+        "multi-aspirate-present": "Cannot edit while one or more selected steps uses the multi-aspirate path.",
+        "multi-aspirate-present-pipette-different": "Cannot edit while one or more selected steps uses the multi-aspirate path. Selected steps must also share the same pipette.",
+        "multi-dispense-present": "Cannot edit while one or more selected steps uses the multi-dispense path.",
+        "multi-dispense-present-pipette-different": "Cannot edit while one or more selected steps uses the multi-dispense path. Selected steps must also share the same pipette."
+      }
+    },
     "pauseAction": {
       "disabled": {
         "wait_until_temp": "There is no temperature module on the deck"
