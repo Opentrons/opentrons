@@ -80,7 +80,9 @@ def _parse_json(
     version, validated = validate_json(protocol_json)
     return JsonProtocol(
         text=protocol_contents, filename=filename, contents=validated,
-        schema_version=version, api_level=API_VERSION_FOR_JSON_V5_AND_BELOW)
+        schema_version=version, api_level=API_VERSION_FOR_JSON_V5_AND_BELOW,
+        metadata=validated['metadata']
+    )
 
 
 def _parse_python(

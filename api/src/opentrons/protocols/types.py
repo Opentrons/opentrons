@@ -1,30 +1,34 @@
 from typing import Any, Dict, NamedTuple, Optional, Union, TYPE_CHECKING
+from dataclasses import dataclass
 from .api_support.definitions import MIN_SUPPORTED_VERSION
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from opentrons_shared_data.protocol.dev_types import (
-        JsonProtocol as JsonProtocolDef
+        JsonProtocol as JsonProtocolDef, Metadata as JsonProtocolMetadata
     )
     from .api_support.types import APIVersion
 
 Metadata = Dict[str, Union[str, int]]
 
 
-class JsonProtocol(NamedTuple):
+@dataclass(frozen=True)
+class ProtocolCommon:
     text: str
     filename: Optional[str]
-    contents: 'JsonProtocolDef'
+    api_level: 'APIVersion'
+    metadata: Union[Metadata, 'JsonProtocolMetadata']
+
+
+@dataclass(frozen=True)
+class JsonProtocol(ProtocolCommon):
     schema_version: int
-    api_level: 'APIVersion'
+    contents: 'JsonProtocolDef'
 
 
-class PythonProtocol(NamedTuple):
-    text: str
-    filename: Optional[str]
+@dataclass(frozen=True)
+class PythonProtocol(ProtocolCommon):
     contents: Any  # This is the output of compile() which we can't type
-    metadata: Metadata
-    api_level: 'APIVersion'
     # these 'bundled_' attrs should only be included when the protocol is a zip
     bundled_labware: Optional[Dict[str, 'LabwareDefinition']]
     bundled_data: Optional[Dict[str, bytes]]
