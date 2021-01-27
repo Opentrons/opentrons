@@ -53,13 +53,13 @@ describe('MultiSelectToolbar', () => {
     const expandIcon = icons.at(3)
 
     expect(deleteIcon.prop('iconName')).toBe('delete')
-    expect(deleteIcon.prop('tooltipText')).toBe('delete')
+    expect(deleteIcon.prop('tooltipText')).toBe('Delete')
 
     expect(copyIcon.prop('iconName')).toBe('content-copy')
-    expect(copyIcon.prop('tooltipText')).toBe('duplicate')
+    expect(copyIcon.prop('tooltipText')).toBe('Duplicate')
 
     expect(expandIcon.prop('iconName')).toBe('unfold-more-horizontal')
-    expect(expandIcon.prop('tooltipText')).toBe('expand')
+    expect(expandIcon.prop('tooltipText')).toBe('Expand')
   })
   it('should have a checked checkbox when all steps are selected, and deselect them all when clicked', () => {
     when(getOrderedStepIdsMock)
@@ -128,14 +128,14 @@ describe('MultiSelectToolbar', () => {
       const wrapper = render()
       const expandIcon = wrapper.find(ClickableIcon).at(3)
       expect(expandIcon.prop('iconName')).toBe('unfold-more-horizontal')
-      expect(expandIcon.prop('tooltipText')).toBe('expand')
+      expect(expandIcon.prop('tooltipText')).toBe('Expand')
       act(() => {
         expandIcon.prop('onClick')()
       })
       wrapper.update()
       const expandIconUpdated = wrapper.find(ClickableIcon).at(3)
       expect(expandIconUpdated.prop('iconName')).toBe('unfold-less-horizontal')
-      expect(expandIconUpdated.prop('tooltipText')).toBe('collapse')
+      expect(expandIconUpdated.prop('tooltipText')).toBe('Collapse')
     })
   })
 })

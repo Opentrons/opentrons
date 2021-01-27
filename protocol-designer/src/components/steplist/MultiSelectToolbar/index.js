@@ -84,21 +84,21 @@ export const MultiSelectToolbar = (): React.Node => {
 
   const deleteProps = {
     iconName: 'delete',
-    tooltipText: 'delete',
+    tooltipText: 'Delete',
     width: '1.5rem',
     alignRight: true,
   }
 
   const copyProps = {
     iconName: 'content-copy',
-    tooltipText: 'duplicate',
+    tooltipText: 'Duplicate',
   }
 
   const expandProps = {
     iconName: isExpandState
       ? 'unfold-more-horizontal'
       : 'unfold-less-horizontal',
-    tooltipText: isExpandState ? 'expand' : 'collapse',
+    tooltipText: isExpandState ? 'Expand' : 'Collapse',
     onClick: () => {
       if (selectedStepIds) {
         dispatch(stepActions.toggleMultipleStepsCollapsed(selectedStepIds))
