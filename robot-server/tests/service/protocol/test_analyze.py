@@ -181,7 +181,8 @@ def test__extract_metadata_json():
         api_level=APIVersion(major=2, minor=2),
         filename="",
         contents={},
-        schema_version=2
+        schema_version=2,
+        metadata={}
     )
 
     assert analyze._extract_metadata(protocol) == models.Meta(
