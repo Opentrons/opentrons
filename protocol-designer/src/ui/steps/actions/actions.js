@@ -2,7 +2,7 @@
 import last from 'lodash/last'
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { selectors as stepFormSelectors } from '../../../step-forms'
-import { getMultiSelectLastSelected } from '..'
+import { getMultiSelectLastSelected } from '../selectors'
 import { resetScrollElements } from '../utils'
 import type { StepIdType, StepType } from '../../../form-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
