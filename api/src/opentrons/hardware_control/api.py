@@ -551,9 +551,16 @@ class API(HardwareAPILike):
         """
         Resume motion after a call to :py:meth:`pause`.
         """
+        # Resume must be called immediately to awaken thread running hardware
+        #  methods (ThreadManager)
         self._backend.resume()
-        asyncio.run_coroutine_threadsafe(self._execution_manager.resume(),
-                                         self._loop)
+
+        async def _chained_calls():
+            # mirror what happens API.pause.
+            await self._execution_manager.resume()
+            self._backend.resume()
+
+        asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
     def halt(self):
         """ Immediately stop motion.
