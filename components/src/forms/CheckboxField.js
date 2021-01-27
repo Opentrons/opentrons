@@ -42,6 +42,8 @@ export function CheckboxField(props: CheckboxFieldProps): React.Node {
     [styles.checkbox_disabled]: props.disabled,
   })
 
+  const indeterminate = props.isIndeterminate ? 'true' : undefined
+
   return (
     <label className={outerClassName}>
       <div className={innerDivClassName}>
@@ -60,11 +62,11 @@ export function CheckboxField(props: CheckboxFieldProps): React.Node {
         className={cx(styles.input_field, styles.accessibly_hidden)}
         type="checkbox"
         name={props.name}
-        checked={props.value}
+        checked={props.value || false}
         disabled={props.disabled}
         onChange={props.onChange}
         tabIndex={props.tabIndex}
-        indeterminate={props.isIndeterminate}
+        indeterminate={indeterminate}
       />
       <div
         {...props.hoverTooltipHandlers}
