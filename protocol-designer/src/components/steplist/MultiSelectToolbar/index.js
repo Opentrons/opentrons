@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-
+import { useDispatch, useSelector } from 'react-redux'
 import {
   Flex,
   Box,
@@ -13,22 +12,31 @@ import {
   SPACING_2,
   C_DARK_GRAY,
 } from '@opentrons/components'
-
+import { useConditionalConfirm } from '../../../../../components/src/hooks/useConditionalConfirm'
 import { selectors as stepFormSelectors } from '../../../step-forms'
-import { getMultiSelectItemIds } from '../../../ui/steps'
+import {
+  getMultiSelectItemIds,
+  actions as stepActions,
+} from '../../../ui/steps'
+import { getBatchEditFormHasUnsavedChanges } from '../../../step-forms/selectors'
+import {
+  CLOSE_STEP_FORM_WITH_CHANGES,
+  ConfirmDeleteModal,
+} from '../../modals/ConfirmDeleteModal'
 
 import type { IconName } from '@opentrons/components'
 
-type ClickableIconProps = {
+type ClickableIconProps = {|
   iconName: IconName,
   tooltipText: string,
   width?: string,
   alignRight?: boolean,
   isLast?: boolean,
-}
+  onClick?: (event: SyntheticMouseEvent<>) => mixed,
+|}
 
 export const ClickableIcon = (props: ClickableIconProps): React.Node => {
-  const { iconName, tooltipText, width } = props
+  const { iconName, onClick, tooltipText, width } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'top',
   })
@@ -41,19 +49,37 @@ export const ClickableIcon = (props: ClickableIconProps): React.Node => {
   return (
     <Box {...boxStyles} {...targetProps}>
       <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
-      <Icon name={iconName} width={width || '1.25rem'} color={C_DARK_GRAY} />
+      <Box onClick={onClick}>
+        <Icon name={iconName} width={width || '1.25rem'} color={C_DARK_GRAY} />
+      </Box>
     </Box>
   )
 }
 
 export const MultiSelectToolbar = (): React.Node => {
+  const dispatch = useDispatch()
+  const [isExpandState, setIsExpandState] = React.useState<boolean>(true)
   const stepCount = useSelector(stepFormSelectors.getOrderedStepIds).length
   const selectedStepCount = useSelector(getMultiSelectItemIds)?.length
+  const batchEditFormHasUnsavedChanges = useSelector(
+    getBatchEditFormHasUnsavedChanges
+  )
+  const selectedStepIds = useSelector(getMultiSelectItemIds)
   const isAllStepsSelected = stepCount === selectedStepCount
+
+  const onClickAction = isAllStepsSelected
+    ? () => dispatch(stepActions.deselectAllSteps())
+    : () => dispatch(stepActions.selectAllSteps())
+
+  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
+    onClickAction,
+    batchEditFormHasUnsavedChanges
+  )
 
   const selectProps = {
     iconName: isAllStepsSelected ? 'checkbox-marked' : 'minus-box',
     tooltipText: isAllStepsSelected ? 'deselect' : 'select',
+    onClick: confirm,
   }
 
   const deleteProps = {
@@ -69,17 +95,38 @@ export const MultiSelectToolbar = (): React.Node => {
   }
 
   const expandProps = {
-    iconName: 'unfold-less-horizontal',
-    tooltipText: 'collapse',
+    iconName: isExpandState
+      ? 'unfold-more-horizontal'
+      : 'unfold-less-horizontal',
+    tooltipText: isExpandState ? 'expand' : 'collapse',
+    onClick: () => {
+      if (selectedStepIds) {
+        dispatch(stepActions.toggleMultipleStepsCollapsed(selectedStepIds))
+        setIsExpandState(!isExpandState)
+      } else {
+        console.warn(
+          'something went wrong, you cannot toggle multiple steps if none are selected'
+        )
+      }
+    },
     isLast: true,
   }
 
   return (
-    <Flex alignItems={ALIGN_CENTER} height={SIZE_2} padding={'0 0.75rem'}>
-      <ClickableIcon {...selectProps} />
-      <ClickableIcon {...deleteProps} />
-      <ClickableIcon {...copyProps} />
-      <ClickableIcon {...expandProps} />
-    </Flex>
+    <>
+      {showConfirmation && (
+        <ConfirmDeleteModal
+          modalType={CLOSE_STEP_FORM_WITH_CHANGES}
+          onContinueClick={confirm}
+          onCancelClick={cancel}
+        />
+      )}
+      <Flex alignItems={ALIGN_CENTER} height={SIZE_2} padding={'0 0.75rem'}>
+        <ClickableIcon {...selectProps} />
+        <ClickableIcon {...deleteProps} />
+        <ClickableIcon {...copyProps} />
+        <ClickableIcon {...expandProps} />
+      </Flex>
+    </>
   )
 }

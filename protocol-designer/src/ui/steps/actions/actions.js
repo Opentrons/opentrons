@@ -1,6 +1,8 @@
 // @flow
+import last from 'lodash/last'
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { selectors as stepFormSelectors } from '../../../step-forms'
+import { getMultiSelectLastSelected } from '..'
 import { resetScrollElements } from '../utils'
 import type { StepIdType, StepType } from '../../../form-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
@@ -10,6 +12,7 @@ import type {
   AddStepAction,
   ExpandAddStepButtonAction,
   ToggleStepCollapsedAction,
+  ToggleMultipleStepsCollapsedAction,
   HoverOnStepAction,
   HoverOnSubstepAction,
   SelectTerminalItemAction,
@@ -51,6 +54,13 @@ export const toggleStepCollapsed = (
 ): ToggleStepCollapsedAction => ({
   type: 'TOGGLE_STEP_COLLAPSED',
   payload: stepId,
+})
+
+export const toggleMultipleStepsCollapsed = (
+  stepIds: Array<StepIdType>
+): ToggleMultipleStepsCollapsedAction => ({
+  type: 'TOGGLE_MULTIPLE_STEPS_COLLAPSED',
+  payload: stepIds,
 })
 
 export const hoverOnSubstep = (
@@ -122,4 +132,35 @@ export const selectMultipleSteps = (
     payload: { stepIds, lastSelected },
   }
   dispatch(selectStepAction)
+}
+
+export const selectAllSteps = (): ThunkAction<*> => (
+  dispatch: ThunkDispatch<*>,
+  getState: GetState
+) => {
+  const allStepIds = stepFormSelectors.getOrderedStepIds(getState())
+
+  const selectStepAction: SelectMultipleStepsAction = {
+    type: 'SELECT_MULTIPLE_STEPS',
+    payload: { stepIds: allStepIds, lastSelected: last(allStepIds) },
+  }
+  dispatch(selectStepAction)
+}
+
+export const deselectAllSteps = (): ThunkAction<*> => (
+  dispatch: ThunkDispatch<*>,
+  getState: GetState
+) => {
+  const lastSelectedStepId = getMultiSelectLastSelected(getState())
+  if (lastSelectedStepId) {
+    const selectStepAction: SelectStepAction = {
+      type: 'SELECT_STEP',
+      payload: lastSelectedStepId,
+    }
+    dispatch(selectStepAction)
+  } else {
+    console.warn(
+      'something went wrong, cannot deselect all steps if not in multi select mode'
+    )
+  }
 }

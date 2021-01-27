@@ -71,6 +71,24 @@ describe('collapsedSteps reducer', () => {
       '4': true,
     })
   })
+  it('should toggle multiple steps upon TOGGLE_MULTIPLE_STEPS_COLLAPSED', () => {
+    const state = {
+      '1': true,
+      '2': false,
+      '3': true,
+      '4': false,
+    }
+    const action = {
+      type: 'TOGGLE_MULTIPLE_STEPS_COLLAPSED',
+      payload: ['1', '2', '3', '4'],
+    }
+    expect(collapsedSteps(state, action)).toEqual({
+      '1': false,
+      '2': true,
+      '3': false,
+      '4': true,
+    })
+  })
 })
 
 describe('selectedItem reducer', () => {

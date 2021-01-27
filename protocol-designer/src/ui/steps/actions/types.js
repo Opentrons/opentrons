@@ -33,6 +33,11 @@ export type ToggleStepCollapsedAction = {|
   payload: StepIdType,
 |}
 
+export type ToggleMultipleStepsCollapsedAction = {|
+  type: 'TOGGLE_MULTIPLE_STEPS_COLLAPSED',
+  payload: Array<StepIdType>,
+|}
+
 export type HoverOnSubstepAction = {|
   type: 'HOVER_ON_SUBSTEP',
   payload: SubstepIdentifier,

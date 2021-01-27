@@ -1,5 +1,9 @@
 // @flow
-import { _hasFieldLevelErrors, getEquippedPipetteOptions } from '../selectors'
+import {
+  _hasFieldLevelErrors,
+  getEquippedPipetteOptions,
+  getBatchEditFormHasUnsavedChanges,
+} from '../selectors'
 import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 jest.mock('../../steplist/fieldLevel')
@@ -120,5 +124,12 @@ describe('getEquippedPipetteOptions', () => {
 
     const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
     expect(result).toEqual(expected)
+  })
+})
+
+describe('getBatchEditFormHasUnsavedChanges', () => {
+  // TODO(sa, 2021-01-22): update tests when this selector actually gets implemented
+  it('should always return false', () => {
+    expect(getBatchEditFormHasUnsavedChanges()).toBe(false)
   })
 })

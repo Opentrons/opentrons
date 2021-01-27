@@ -23,6 +23,7 @@ import type {
   SelectMultipleStepsAction,
   SelectTerminalItemAction,
   ToggleStepCollapsedAction,
+  ToggleMultipleStepsCollapsedAction,
 } from './actions/types'
 
 export type CollapsedStepsState = { [StepIdType]: boolean }
@@ -49,6 +50,17 @@ const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions(
       ...state,
       [payload]: !state[payload],
     }),
+    TOGGLE_MULTIPLE_STEPS_COLLAPSED: (
+      state: CollapsedStepsState,
+      { payload }: ToggleMultipleStepsCollapsedAction
+    ) =>
+      payload.reduce(
+        (acc, stepId) => ({
+          ...acc,
+          [stepId]: !acc[stepId],
+        }),
+        state
+      ),
     LOAD_FILE: (state: CollapsedStepsState, action: LoadFileAction) =>
       // default all steps to collapsed
       getPDMetadata(action.payload.file).orderedStepIds.reduce(
