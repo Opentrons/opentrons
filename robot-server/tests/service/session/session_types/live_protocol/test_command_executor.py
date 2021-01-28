@@ -8,16 +8,17 @@ from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.types import DeckSlotName, MountType
 
-from robot_server.service.session.command_execution.command import CommandMeta, \
-    CompletedCommand
-from robot_server.service.session.errors import UnsupportedCommandException, \
-    CommandExecutionException
+from robot_server.service.session.command_execution.command import (
+    CommandMeta, CompletedCommand)
+from robot_server.service.session.errors import (
+    UnsupportedCommandException, CommandExecutionException)
 from robot_server.service.session.models import command_definitions
 from robot_server.service.session.models import command as command_models
 from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types.live_protocol.command_executor\
     import LiveProtocolCommandExecutor
-from robot_server.service.session.command_execution import Command, CommandResult
+from robot_server.service.session.command_execution import (
+    Command, CommandResult)
 
 
 @pytest.fixture
@@ -76,7 +77,8 @@ async def test_failed_command(command_executor, mock_protocol_engine):
         error=ProtocolEngineError("failure"),
     )
 
-    mock_protocol_engine.execute_command.return_value = protocol_engine_response
+    mock_protocol_engine.execute_command.return_value =\
+        protocol_engine_response
 
     with pytest.raises(CommandExecutionException):
         await command_executor.execute(command_object)
@@ -102,7 +104,8 @@ async def test_load_labware(command_executor, mock_protocol_engine):
         completed_at=datetime(2000, 1, 3)
     )
 
-    mock_protocol_engine.execute_command.return_value = protocol_engine_response
+    mock_protocol_engine.execute_command.return_value =\
+        protocol_engine_response
 
     command_object = Command(
         meta=CommandMeta(identifier="1234"),
@@ -145,7 +148,8 @@ async def test_load_instrument(command_executor, mock_protocol_engine):
         completed_at=datetime(2000, 1, 3)
     )
 
-    mock_protocol_engine.execute_command.return_value = protocol_engine_response
+    mock_protocol_engine.execute_command.return_value =\
+        protocol_engine_response
 
     command_object = Command(
         meta=CommandMeta(identifier="1234"),

@@ -5,14 +5,16 @@ from datetime import datetime
 
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError
-from robot_server.service.session.errors import SessionCreationException, \
-    UnsupportedCommandException, CommandExecutionException
+from robot_server.service.session.errors import (
+    SessionCreationException, UnsupportedCommandException,
+    CommandExecutionException)
 from robot_server.service.session.manager import SessionManager
 from robot_server.service.session.models.command import (
     SimpleCommandRequest, SimpleCommandResponse, CommandStatus
 )
 from robot_server.service.session.models.common import EmptyModel
-from robot_server.service.session.models.command_definitions import ProtocolCommand
+from robot_server.service.session.models.command_definitions import (
+    ProtocolCommand)
 from robot_server.service.session import router
 from robot_server.service.session.session_types import BaseSession
 
@@ -161,9 +163,11 @@ def test_sessions_delete(
     """It deletes a found session."""
     mock_session_manager.get_by_id.return_value = mock_session
 
-    response = sessions_api_client.delete(f"/sessions/{mock_session.meta.identifier}")
+    response = sessions_api_client.delete(
+        f"/sessions/{mock_session.meta.identifier}")
 
-    mock_session_manager.remove.assert_called_once_with(mock_session.meta.identifier)
+    mock_session_manager.remove.assert_called_once_with(
+        mock_session.meta.identifier)
     assert response.json() == {
         'data': {
             'details': {},
@@ -212,7 +216,8 @@ def test_sessions_get(
     """It returns the found session."""
     mock_session_manager.get_by_id.return_value = mock_session
 
-    response = sessions_api_client.get(f"/sessions/{mock_session.meta.identifier}")
+    response = sessions_api_client.get(
+        f"/sessions/{mock_session.meta.identifier}")
     assert response.json() == {
         'data': {
             'details': {},
@@ -283,7 +288,7 @@ def test_sessions_execute_command_no_session(
     mock_session_manager.get_by_id.return_value = None
 
     response = sessions_api_client.post(
-        f"/sessions/1234/commands/execute",
+        "/sessions/1234/commands/execute",
         json={
             "data": {
                 "command": "protocol.pause",
@@ -309,8 +314,7 @@ def test_sessions_execute_command_no_session(
 def test_sessions_execute_command(
         sessions_api_client,
         mock_session_manager,
-        mock_session,
-    ):
+        mock_session):
     """It accepts the session command"""
     mock_session_manager.get_by_id.return_value = mock_session
     mock_session.execute_command.return_value = SimpleCommandResponse(
@@ -430,7 +434,8 @@ def test_execute_command_session_inactive(
         }
     )
 
-    mock_session_manager.is_active.assert_called_once_with(mock_session.meta.identifier)
+    mock_session_manager.is_active.assert_called_once_with(
+        mock_session.meta.identifier)
     assert response.json() == {
         'errors': [
             {

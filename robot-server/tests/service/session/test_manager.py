@@ -1,5 +1,5 @@
 import asyncio
-from mock import patch, MagicMock, AsyncMock
+from mock import patch, AsyncMock
 import pytest
 
 from robot_server.service.session.errors import SessionCreationException
@@ -18,7 +18,8 @@ async def session(session_manager, loop) -> BaseSession:
 @pytest.fixture
 def mock_session_create():
     """Patch of Session.create"""
-    with patch("robot_server.service.session.manager.LiveProtocolSession.create") as m:
+    with patch("robot_server.service.session."
+               "manager.LiveProtocolSession.create") as m:
         m.return_value = AsyncMock()
         yield m
 
