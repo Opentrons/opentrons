@@ -19,15 +19,10 @@ export type FieldProps = {|
   onFieldFocus?: () => mixed,
 |}
 
-type FieldPropsByName = {
+export type FieldPropsByName = {
   [name: StepFieldName]: FieldProps,
   ...,
 }
-
-type Args = {|
-  dirtyFields?: Array<StepFieldName>,
-  focusedField?: StepFieldName,
-|}
 
 type ShowFieldErrorParams = {
   name: StepFieldName,
@@ -41,10 +36,9 @@ export const showFieldErrors = ({
 }: ShowFieldErrorParams): boolean | void | Array<StepFieldName> =>
   !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
 
-export const useSingleEditFieldProps = (
-  args: Args
-): FieldPropsByName | null => {
-  const { dirtyFields, focusedField } = args
+export const useSingleEditFieldProps = (): FieldPropsByName | null => {
+  const [dirtyFields, setDirtyFields] = React.useState<Array<StepFieldName>>([])
+  const [focusedField, setFocusedField] = React.useState<StepFieldName>(null)
 
   const dispatch = useDispatch()
   const formData = useSelector(stepFormSelectors.getUnsavedForm)
@@ -73,6 +67,14 @@ export const useSingleEditFieldProps = (
     const stepType = formData.stepType
     const tooltipContent = getTooltipForField(stepType, name, disabled)
 
+    const onFieldBlur = () => {
+      setFocusedField(null)
+    }
+
+    const onFieldFocus = () => {
+      setDirtyFields([...dirtyFields, name])
+    }
+
     const fieldProps: FieldProps = {
       disabled,
       errorToShow,
@@ -80,12 +82,8 @@ export const useSingleEditFieldProps = (
       tooltipContent,
       updateValue,
       value,
-      onFieldBlur: () => {
-        console.log('todo immed: blur ' + name)
-      },
-      onFieldFocus: () => {
-        console.log('todo immed: focus ' + name)
-      },
+      onFieldBlur,
+      onFieldFocus,
     }
     return {
       ...acc,

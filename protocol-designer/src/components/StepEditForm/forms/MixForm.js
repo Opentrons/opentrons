@@ -30,7 +30,7 @@ export const MixForm = (props: Props): React.Node => {
 
   const [collapsed, setCollapsed] = React.useState(true)
 
-  const propsForFields = useSingleEditFieldProps({})
+  const propsForFields = useSingleEditFieldProps()
   if (propsForFields === null) return null
 
   const toggleCollapsed = (): void =>
@@ -112,7 +112,7 @@ export const MixForm = (props: Props): React.Node => {
             <DelayFields
               checkboxFieldName={'aspirate_delay_checkbox'}
               secondsFieldName={'aspirate_delay_seconds'}
-              focusHandlers={focusHandlers}
+              propsForFields={propsForFields}
             />
           </div>
 
@@ -128,7 +128,7 @@ export const MixForm = (props: Props): React.Node => {
               <DelayFields
                 checkboxFieldName={'dispense_delay_checkbox'}
                 secondsFieldName={'dispense_delay_seconds'}
-                focusHandlers={focusHandlers}
+                propsForFields={propsForFields}
               />
               <CheckboxRowField
                 {...propsForFields['mix_touchTip_checkbox']}

@@ -2,11 +2,10 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { SourceDestFields } from '../MoveLiquidForm/SourceDestFields'
-import { CheckboxRowField } from '../../fields'
-
-import type { BaseState } from '../../../../types'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { CheckboxRowField } from '../../fields'
+import { SourceDestFields } from '../MoveLiquidForm/SourceDestFields'
+import type { BaseState } from '../../../../types'
 
 jest.mock('../../../../step-forms')
 jest.mock('../../utils')
@@ -19,11 +18,9 @@ describe('SourceDestFields', () => {
   let props
   beforeEach(() => {
     props = {
-      focusHandlers: {
-        focusedField: '',
-        dirtyFields: [],
-        onFieldFocus: jest.fn(),
-        onFieldBlur: jest.fn(),
+      propsForFields: {
+        onFieldFocus: (jest.fn(): any),
+        onFieldBlur: (jest.fn(): any),
       },
       prefix: 'aspirate',
     }
@@ -32,7 +29,20 @@ describe('SourceDestFields', () => {
       subscribe: jest.fn(),
       getState: () => ({}),
     }
-    getUnsavedFormMock.mockReturnValue({})
+    getUnsavedFormMock.mockReturnValue({
+      stepType: 'moveLiquid',
+
+      preWetTip: 'blah',
+      aspirate_mix_checkbox: 'blah',
+      aspirate_delay_checkbox: 'blah',
+      aspirate_touchTip_checkbox: 'blah',
+      aspirate_airGap_checkbox: 'blah',
+      dispense_delay_checkbox: 'blah',
+      dispense_mix_checkbox: 'blah',
+      dispense_touchTip_checkbox: 'blah',
+      blowout_checkbox: 'blah',
+      dispense_airGap_checkbox: 'blah',
+    })
   })
 
   const render = props =>

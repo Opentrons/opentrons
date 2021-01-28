@@ -49,7 +49,7 @@ export const PauseForm = (props: PauseFormProps): React.Node => {
     )
   }
 
-  const propsForFields = useSingleEditFieldProps({})
+  const propsForFields = useSingleEditFieldProps()
   if (propsForFields === null) return null
 
   return (

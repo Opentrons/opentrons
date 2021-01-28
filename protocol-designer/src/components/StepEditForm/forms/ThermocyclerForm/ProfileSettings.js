@@ -4,16 +4,15 @@ import * as React from 'react'
 import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { TextField } from '../../fields'
-import { useSingleEditFieldProps } from '../../fields/useSingleEditFieldProps'
 
 import styles from '../../StepEditForm.css'
-import type { FocusHandlers } from '../../types'
 
-type Props = {| focusHandlers: FocusHandlers |}
+import type { FieldPropsByName } from '../../fields/useSingleEditFieldProps'
+
+type Props = {| propsForFields: FieldPropsByName |}
 
 export const ProfileSettings = (props: Props): React.Node => {
-  const propsForFields = useSingleEditFieldProps({})
-  if (propsForFields === null) return null
+  const { propsForFields } = props
 
   return (
     <div className={styles.form_row}>

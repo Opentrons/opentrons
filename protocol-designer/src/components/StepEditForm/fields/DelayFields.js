@@ -4,26 +4,28 @@ import { i18n } from '../../../localization'
 import { TextField } from './TextField'
 import { CheckboxRowField } from './CheckboxRowField'
 import { TipPositionField } from './TipPositionField'
-import { useSingleEditFieldProps } from './useSingleEditFieldProps'
 import styles from '../StepEditForm.css'
-
+import type { FieldPropsByName } from './useSingleEditFieldProps'
 import type {
   DelayCheckboxFields,
   DelaySecondFields,
   TipOffsetFields,
 } from '../../../form-types'
 
-type DelayFieldProps = {
+export type DelayFieldProps = {|
   checkboxFieldName: DelayCheckboxFields,
   secondsFieldName: DelaySecondFields,
   tipPositionFieldName?: TipOffsetFields,
-}
+  propsForFields: FieldPropsByName,
+|}
 
 export const DelayFields = (props: DelayFieldProps): React.Node => {
-  const { checkboxFieldName, secondsFieldName, tipPositionFieldName } = props
-
-  const propsForFields = useSingleEditFieldProps({})
-  if (propsForFields === null) return null
+  const {
+    checkboxFieldName,
+    secondsFieldName,
+    tipPositionFieldName,
+    propsForFields,
+  } = props
 
   return (
     <CheckboxRowField

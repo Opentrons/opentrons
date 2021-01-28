@@ -4,29 +4,40 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import FormTooltipText from '../../../../localization/en/tooltip'
 import ApplicationText from '../../../../localization/en/application'
-
-import { DelayFields } from '../DelayFields'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { CheckboxRowField, TextField, TipPositionField } from '../../fields'
+import { DelayFields, type DelayFieldProps } from '../DelayFields'
+import type { BaseState } from '../../../../types'
+
+const getUnsavedFormMock: JestMockFn<[BaseState], any> =
+  stepFormSelectors.getUnsavedForm
 
 describe('DelayFields', () => {
-  const render = props => shallow(<DelayFields {...props} />)
+  const render = (props: DelayFieldProps) => shallow(<DelayFields {...props} />)
   describe('Aspirate Delay', () => {
-    let props
+    let props: DelayFieldProps
     beforeEach(() => {
       props = {
         checkboxFieldName: 'aspirate_delay_checkbox',
         secondsFieldName: 'aspirate_delay_seconds',
-        focusHandlers: {
-          focusedField: '',
-          dirtyFields: [],
-          onFieldFocus: jest.fn(),
-          onFieldBlur: jest.fn(),
+        propsForFields: {
+          onFieldFocus: (jest.fn(): any),
+          onFieldBlur: (jest.fn(): any),
         },
       }
+
+      getUnsavedFormMock.mockReturnValue({
+        stepType: 'delay',
+        aspirate_delay_checkbox: 'blah',
+        aspirate_delay_seconds: 'blah',
+      })
     })
 
     it('should render an aspirate delay field with a tip position field', () => {
-      props = { ...props, tipPositionFieldName: 'aspirate_mmFromBottom' }
+      props = {
+        ...props,
+        tipPositionFieldName: 'aspirate_mmFromBottom',
+      }
 
       const wrapper = render(props)
       const checkboxField = wrapper.find(CheckboxRowField)
@@ -67,13 +78,17 @@ describe('DelayFields', () => {
       props = {
         checkboxFieldName: 'dispense_delay_checkbox',
         secondsFieldName: 'dispense_delay_seconds',
-        focusHandlers: {
-          focusedField: '',
-          dirtyFields: [],
-          onFieldFocus: jest.fn(),
-          onFieldBlur: jest.fn(),
+        propsForFields: {
+          onFieldFocus: (jest.fn(): any),
+          onFieldBlur: (jest.fn(): any),
         },
       }
+
+      getUnsavedFormMock.mockReturnValue({
+        stepType: 'delay',
+        dispense_delay_checkbox: 'blah',
+        dispense_delay_seconds: 'blah',
+      })
     })
 
     it('should render an dispense delay field with a tip position field', () => {

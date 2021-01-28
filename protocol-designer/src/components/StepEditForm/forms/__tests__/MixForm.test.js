@@ -4,6 +4,11 @@ import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
 import { MixForm } from '../MixForm'
 import { AspDispSection } from '../AspDispSection'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import type { BaseState } from '../../../../types'
+
+const getUnsavedFormMock: JestMockFn<[BaseState], any> =
+  stepFormSelectors.getUnsavedForm
 
 const { DelayFields } = jest.requireActual('../../fields')
 
@@ -58,6 +63,10 @@ describe('MixForm', () => {
         onFieldBlur: jest.fn(),
       },
     }
+
+    getUnsavedFormMock.mockReturnValue({
+      stepType: 'mix',
+    })
   })
   it('should NOT render delay fields initially', () => {
     const wrapper = render(props)

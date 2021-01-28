@@ -36,7 +36,7 @@ export const MoveLiquidForm = (props: Props): React.Node => {
   const { focusHandlers, stepType } = props
   const { path } = props.formData
 
-  const propsForFields = useSingleEditFieldProps({})
+  const propsForFields = useSingleEditFieldProps()
   if (propsForFields === null) return null
 
   return (
@@ -83,6 +83,7 @@ export const MoveLiquidForm = (props: Props): React.Node => {
             collapsed={collapsed}
             toggleCollapsed={toggleCollapsed}
             prefix="aspirate"
+            propsForFields={propsForFields}
           />
           <SourceDestFields
             className={styles.section_column}
@@ -90,6 +91,7 @@ export const MoveLiquidForm = (props: Props): React.Node => {
             collapsed={collapsed}
             toggleCollapsed={toggleCollapsed}
             prefix="dispense"
+            propsForFields={propsForFields}
           />
         </div>
       )}
@@ -105,7 +107,9 @@ export const MoveLiquidForm = (props: Props): React.Node => {
           <PathField focusHandlers={focusHandlers} />
         </div>
         <div className={cx(styles.section_column, styles.disposal_vol_wrapper)}>
-          {path === 'multiDispense' && <DisposalVolumeField />}
+          {path === 'multiDispense' && (
+            <DisposalVolumeField propsForFields={propsForFields} />
+          )}
         </div>
       </div>
     </div>

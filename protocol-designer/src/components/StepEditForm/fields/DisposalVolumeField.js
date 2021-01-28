@@ -14,10 +14,9 @@ import { getMaxDisposalVolumeForMultidispense } from '../../../steplist/formLeve
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
-import { useSingleEditFieldProps } from './useSingleEditFieldProps'
 import { TextField } from './TextField'
 
-import type { FieldProps } from './useSingleEditFieldProps'
+import type { FieldProps, FieldPropsByName } from './useSingleEditFieldProps'
 import type { BaseState } from '../../../types'
 
 import styles from '../StepEditForm.css'
@@ -44,12 +43,11 @@ type SP = {|
   disposalDestinationOptions: Options,
   maxDisposalVolume: ?number,
 |}
-
-type Props = {| ...SP, dispatch: mixed |}
+type OP = {| propsForFields: FieldPropsByName |}
+type Props = { ...SP, ...OP }
 
 const DisposalVolumeFieldComponent = (props: Props) => {
-  const propsForFields = useSingleEditFieldProps({})
-  if (propsForFields === null) return null
+  const { propsForFields } = props
 
   const { maxDisposalVolume } = props
   const volumeBoundsCaption =
@@ -114,9 +112,9 @@ const mapSTP = (state: BaseState): SP => {
   }
 }
 
-export const DisposalVolumeField: React.AbstractComponent<{||}> = connect<
+export const DisposalVolumeField: React.AbstractComponent<OP> = connect<
   Props,
-  {||},
+  OP,
   SP,
   _,
   _,

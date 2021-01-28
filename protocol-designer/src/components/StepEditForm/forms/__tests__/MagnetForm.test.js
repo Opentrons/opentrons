@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
 import { selectors as uiModuleSelectors } from '../../../../ui/modules'
+import { selectors as stepFormSelectors } from '../../.././step-forms/selectors'
 import * as fields from '../../fields'
 import { MagnetForm } from '../MagnetForm'
 
@@ -49,6 +50,8 @@ describe('MagnetForm', () => {
     uiModuleSelectors.getMagneticLabwareOptions.mockReturnValue([
       { name: 'magnet module', value: 'magnet123', disabled: false },
     ])
+
+    stepFormSelectors.getUnsavedForm.mockReturnValue({ stepType: 'magnet' })
   })
 
   it('engage height caption is displayed with proper height to decimal scale', () => {

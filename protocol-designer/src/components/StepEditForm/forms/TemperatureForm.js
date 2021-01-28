@@ -27,7 +27,7 @@ export const TemperatureForm = (props: TemperatureFormProps): React.Node => {
     uiModuleSelectors.getSingleTemperatureModuleId
   )
 
-  const propsForFields = useSingleEditFieldProps({})
+  const propsForFields = useSingleEditFieldProps()
   if (propsForFields === null) return null
 
   return (

@@ -2,8 +2,6 @@
 import * as React from 'react'
 import { i18n } from '../../../../localization'
 
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
-
 import {
   TextField,
   CheckboxRowField,
@@ -13,13 +11,16 @@ import {
   WellOrderField,
   DelayFields,
 } from '../../fields'
-import { useSingleEditFieldProps } from '../../fields/useSingleEditFieldProps'
+
+import type { StepFieldName } from '../../../../steplist/fieldLevel'
+import type { FieldPropsByName } from '../../fields/useSingleEditFieldProps'
 
 import styles from '../../StepEditForm.css'
 
 type Props = {
   className?: ?string,
   prefix: 'aspirate' | 'dispense',
+  propsForFields: FieldPropsByName,
 }
 
 const makeAddFieldNamePrefix = (prefix: string) => (
@@ -27,10 +28,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 ): StepFieldName => `${prefix}_${fieldName}`
 
 export const SourceDestFields = (props: Props): React.Node => {
-  const { className, prefix } = props
-
-  const propsForFields = useSingleEditFieldProps({})
-  if (propsForFields === null) return null
+  const { className, prefix, propsForFields } = props
 
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
@@ -58,6 +56,7 @@ export const SourceDestFields = (props: Props): React.Node => {
       checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
       secondsFieldName={addFieldNamePrefix('delay_seconds')}
       tipPositionFieldName={addFieldNamePrefix('delay_mmFromBottom')}
+      propsForFields={propsForFields}
     />
   )
 

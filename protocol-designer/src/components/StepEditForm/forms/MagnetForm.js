@@ -36,7 +36,7 @@ export const MagnetForm = (props: MagnetFormProps): React.Node => {
     ? `Recommended: ${String(maskField('engageHeight', defaultEngageHeight))}`
     : null
 
-  const propsForFields = useSingleEditFieldProps({})
+  const propsForFields = useSingleEditFieldProps()
   if (propsForFields === null) return null
 
   return (

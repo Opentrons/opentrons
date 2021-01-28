@@ -15,14 +15,18 @@ import {
 import { StateFields } from './StateFields'
 import { ProfileSettings } from './ProfileSettings'
 import styles from '../../StepEditForm.css'
-
+import { useSingleEditFieldProps } from '../../fields/useSingleEditFieldProps'
 import type { FormData } from '../../../../form-types'
 import type { FocusHandlers } from '../../types'
 
 type TCFormProps = {| focusHandlers: FocusHandlers, formData: FormData |}
 
-export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
+export const ThermocyclerForm = (props: TCFormProps): React.Node => {
   const { focusHandlers } = props
+
+  const propsForFields = useSingleEditFieldProps()
+  if (propsForFields === null) return null
+
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -50,7 +54,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
           name={'thermocyclerFormType'}
           condition={val => val === THERMOCYCLER_STATE}
         >
-          <StateFields focusHandlers={focusHandlers} />
+          <StateFields propsForFields={propsForFields} />
         </ConditionalOnField>
         <div className={styles.checkbox_row}>
           <RadioGroupField
@@ -79,7 +83,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
               {i18n.t('application.stepType.profile_settings')}
             </span>
           </div>
-          <ProfileSettings focusHandlers={focusHandlers} />
+          <ProfileSettings propsForFields={propsForFields} />
           <div className={styles.section_header}>
             <span className={styles.section_header_text}>
               {i18n.t('application.stepType.profile_steps')}
@@ -91,7 +95,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
               {i18n.t('application.stepType.ending_hold')}
             </span>
           </div>
-          <StateFields focusHandlers={focusHandlers} isEndingHold />
+          <StateFields propsForFields={propsForFields} isEndingHold />
         </div>
       </ConditionalOnField>
     </div>
