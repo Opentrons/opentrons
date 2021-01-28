@@ -174,7 +174,19 @@ def test__extract_metadata_python():
     )
 
 
-def test__extract_metadata_json():
+@pytest.mark.parametrize(
+    argnames="metadata",
+    argvalues=[
+        {
+            "author": "some author",
+            "protocolName": "my protocol"
+        },
+        {
+            "author": "some author",
+            "protocol-name": "my protocol"
+        }
+    ])
+def test__extract_metadata_json(metadata):
     """It returns complete metadata when passed JSONProtocol"""
     protocol = JsonProtocol(
         text="abc",
@@ -182,12 +194,12 @@ def test__extract_metadata_json():
         filename="",
         contents={},
         schema_version=2,
-        metadata={}
+        metadata=metadata
     )
 
     assert analyze._extract_metadata(protocol) == models.Meta(
-        name=None,
-        author=None,
+        name="my protocol",
+        author="some author",
         apiLevel="2.2"
     )
 
