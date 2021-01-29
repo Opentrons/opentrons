@@ -25,7 +25,7 @@ module.exports = {
     'no-extra-boolean-cast': 'off',
     'import/no-default-export': 'error',
 
-    // TODO(mc, 2021-01-29): fix these are remove warning overrides
+    // TODO(mc, 2021-01-29): fix these and remove warning overrides
     'dot-notation': 'warn',
     'lines-between-class-members': 'warn',
     'array-callback-return': 'warn',
@@ -70,7 +70,7 @@ module.exports = {
         'jest/no-disabled-tests': 'error',
         'jest/consistent-test-it': 'error',
 
-        // TODO(mc, 2021-01-29): fix these are remove warning overrides
+        // TODO(mc, 2021-01-29): fix these and remove warning overrides
         'jest/no-deprecated-functions': 'warn',
         'jest/valid-title': 'warn',
         'jest/no-conditional-expect': 'warn',
@@ -101,12 +101,7 @@ module.exports = {
           'error',
           { allowExpressions: true, allowTypedFunctionExpressions: true },
         ],
-        // 'no-useless-constructor': 'off',
-        // '@typescript-eslint/no-useless-constructor': 'error',
         '@typescript-eslint/no-empty-function': 'off',
-      },
-      globals: {
-        NodeJS: true,
       },
     },
   ],
