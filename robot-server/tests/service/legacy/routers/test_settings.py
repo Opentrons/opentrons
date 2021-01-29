@@ -393,9 +393,6 @@ def mock_is_restart_required():
 @pytest.fixture
 def mock_set_adv_setting():
     with patch("robot_server.service.legacy.routers.settings.advanced_settings.set_adv_setting") as p:  # noqa: E501
-        async def f(i, v):
-            pass
-        # p.side_effect = f
         yield p
 
 
