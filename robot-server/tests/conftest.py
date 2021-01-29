@@ -1,3 +1,4 @@
+import signal
 import subprocess
 import time
 import sys
@@ -95,11 +96,18 @@ def server_temp_directory():
 
 @pytest.fixture(scope="session")
 def run_server(request_session, server_temp_directory):
-    with subprocess.Popen([sys.executable, "-m", "robot_server.main"],
+    """Run the robot server in a background process."""
+    # In order to collect coverage we run using `coverage`.
+    # `-a` is to append to existing `.coverage` file.
+    # `--source` is the source code folder to collect coverage stats on.
+    with subprocess.Popen([sys.executable, "-m", "coverage", "run", "-a",
+                           "--source", "robot_server",
+                           "-m", "robot_server.main"],
                           env={'OT_ROBOT_SERVER_DOT_ENV_PATH': "test.env",
                                'OT_API_CONFIG_DIR': server_temp_directory},
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE) as proc:
+        # Wait for a bit to get started by polling /health
         from requests.exceptions import ConnectionError
         while True:
             try:
@@ -112,7 +120,8 @@ def run_server(request_session, server_temp_directory):
         request_session.post("http://localhost:31950/robot/home",
                              json={"target": "robot"})
         yield proc
-        proc.kill()
+        proc.send_signal(signal.SIGTERM)
+        proc.wait()
 
 
 @pytest.fixture
