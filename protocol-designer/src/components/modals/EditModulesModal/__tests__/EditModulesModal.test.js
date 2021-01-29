@@ -147,34 +147,23 @@ describe('Edit Modules Modal', () => {
     it('should error when labware is incompatible', () => {
       getLabwareIsCompatibleMock.mockReturnValue(false)
       const wrapper = render(props)
-      expect(
-        wrapper
-          .find(SlotDropdown)
-          .childAt(0)
-          .prop('error')
-      ).toMatch('labware incompatible')
+      expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
+        'labware incompatible'
+      )
     })
 
     it('should error when slot is empty but blocked', () => {
       getSlotIsEmptyMock.mockReturnValueOnce(true)
       getSlotsBlockedBySpanningMock.mockReturnValue(['1']) // 1 is default slot
       const wrapper = render(props)
-      expect(
-        wrapper
-          .find(SlotDropdown)
-          .childAt(0)
-          .prop('error')
-      ).toMatch('labware incompatible')
+      expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
+        'labware incompatible'
+      )
     })
     it('should NOT error when labware is compatible', () => {
       getLabwareIsCompatibleMock.mockReturnValue(true)
       const wrapper = render(props)
-      expect(
-        wrapper
-          .find(SlotDropdown)
-          .childAt(0)
-          .prop('error')
-      ).toBeFalsy()
+      expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toBeFalsy()
     })
   })
 
@@ -223,10 +212,7 @@ describe('Edit Modules Modal', () => {
   describe('Cancel Button', () => {
     it('calls onCloseClick when pressed', () => {
       const wrapper = render(props)
-      wrapper
-        .find(OutlineButton)
-        .at(0)
-        .prop('onClick')()
+      wrapper.find(OutlineButton).at(0).prop('onClick')()
       expect(props.onCloseClick).toHaveBeenCalled()
     })
   })

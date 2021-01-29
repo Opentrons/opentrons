@@ -107,10 +107,7 @@ describe('Testing calibrate tip length control', () => {
   it('check dispatch session and dispatch analytics are called with a tip length session', () => {
     const { wrapper, store } = render()
     const { dispatch } = store
-    const beginButton = wrapper
-      .find('UncalibratedInfo')
-      .find('button')
-      .at(0)
+    const beginButton = wrapper.find('UncalibratedInfo').find('button').at(0)
     beginButton.invoke('onClick')()
     wrapper.update()
     const continueButton = wrapper
@@ -143,10 +140,7 @@ describe('Testing calibrate tip length control', () => {
   it('check dispatch session and dispatch analytics are called with a pipette offset session', () => {
     const { wrapper, store } = render({ isExtendedPipOffset: true })
     const { dispatch } = store
-    const beginButton = wrapper
-      .find('UncalibratedInfo')
-      .find('button')
-      .at(0)
+    const beginButton = wrapper.find('UncalibratedInfo').find('button').at(0)
     beginButton.invoke('onClick')()
     wrapper.update()
     const continueButton = wrapper

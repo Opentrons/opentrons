@@ -399,8 +399,8 @@ const SPECS = [
       },
     },
     expected: {
-      '1': { mockDefinition1: true },
-      '2': { mockDefinition2: true },
+      1: { mockDefinition1: true },
+      2: { mockDefinition2: true },
     },
   },
   {
@@ -431,8 +431,8 @@ const SPECS = [
       },
     },
     expected: {
-      '1': { mockDefinition1: true },
-      '2': { mockDefinition2: true },
+      1: { mockDefinition1: true },
+      2: { mockDefinition2: true },
     },
   },
   {
@@ -463,8 +463,8 @@ const SPECS = [
       },
     },
     expected: {
-      '1': { mockDefinition1: true },
-      '7': { mockDefinition2: true },
+      1: { mockDefinition1: true },
+      7: { mockDefinition2: true },
     },
   },
 ]

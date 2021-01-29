@@ -55,7 +55,7 @@ export type JsonWellData = {
 export type VolumeJson = {
   locations: {
     [wellName: string]: JsonWellData,
-    ...,
+    ...
   },
   ...
 }

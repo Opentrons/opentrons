@@ -22,18 +22,11 @@ const ALL_DISPLAY_NAMES = new Set(
 
 const REQUIRED_FIELD = '${label} is required' // eslint-disable-line no-template-curly-in-string
 const requiredString = (label: string) =>
-  Yup.string()
-    .label(label)
-    .typeError(REQUIRED_FIELD)
-    .required()
+  Yup.string().label(label).typeError(REQUIRED_FIELD).required()
 const MUST_BE_A_NUMBER = '${label} must be a number' // eslint-disable-line no-template-curly-in-string
 
 const requiredPositiveNumber = (label: string) =>
-  Yup.number()
-    .label(label)
-    .typeError(MUST_BE_A_NUMBER)
-    .moreThan(0)
-    .required()
+  Yup.number().label(label).typeError(MUST_BE_A_NUMBER).moreThan(0).required()
 
 const requiredPositiveInteger = (label: string) =>
   Yup.number()

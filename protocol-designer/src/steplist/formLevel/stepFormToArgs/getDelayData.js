@@ -19,8 +19,10 @@ export function getMoveLiquidDelayData<F: any>(
 
   if (
     checkbox &&
-    (typeof seconds === 'number' && seconds > 0) &&
-    (typeof mmFromBottom === 'number' && mmFromBottom > 0)
+    typeof seconds === 'number' &&
+    seconds > 0 &&
+    typeof mmFromBottom === 'number' &&
+    mmFromBottom > 0
   ) {
     return { seconds, mmFromBottom }
   }
@@ -35,7 +37,7 @@ export function getMixDelayData<F: any>(
   const checkbox = hydratedFormData[checkboxField]
   const seconds = hydratedFormData[secondsField]
 
-  if (checkbox && (typeof seconds === 'number' && seconds > 0)) {
+  if (checkbox && typeof seconds === 'number' && seconds > 0) {
     return seconds
   }
   return null

@@ -15,7 +15,7 @@ jest.mock('mdns-js', () => ({
     description: '',
   }),
   createBrowser: jest.fn(),
-  ServiceType: function() {},
+  ServiceType: function () {},
 }))
 
 const createBrowser: JestMockFn<[MdnsServiceType], Browser> = Mdns.createBrowser

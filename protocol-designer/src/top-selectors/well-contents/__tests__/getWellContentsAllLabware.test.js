@@ -31,7 +31,7 @@ describe('getWellContentsAllLabware', () => {
 
     ingredsByLabwareXXSingleIngred = {
       container1Id: {
-        '0': {
+        0: {
           ...baseIngredFields,
           wells: {
             A1: { volume: 100 },

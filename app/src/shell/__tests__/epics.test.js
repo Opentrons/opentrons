@@ -62,9 +62,7 @@ describe('shell epics', () => {
   // test. `toPromise` based expectation should be sufficient
   it('catches actions from main', () => {
     const shellAction = { type: 'bar' }
-    const result = shellEpic(EMPTY, EMPTY)
-      .pipe(take(1))
-      .toPromise()
+    const result = shellEpic(EMPTY, EMPTY).pipe(take(1)).toPromise()
 
     ;(mockIpc: any).emit('dispatch', {}, shellAction)
 

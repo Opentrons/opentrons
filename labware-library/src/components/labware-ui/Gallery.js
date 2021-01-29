@@ -26,9 +26,9 @@ export function Gallery(props: GalleryProps): React.Node {
     </RobotWorkSpace>
   )
 
-  const staticImages = (labwareImages[params.loadName] || []).map(
-    (src, key) => <img key={key} src={src} />
-  )
+  const staticImages = (
+    labwareImages[params.loadName] || []
+  ).map((src, key) => <img key={key} src={src} />)
 
   const images = [render, ...staticImages]
 

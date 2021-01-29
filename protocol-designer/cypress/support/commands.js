@@ -29,18 +29,14 @@ import 'cypress-file-upload'
 // General Custom Commands
 //
 Cypress.Commands.add('closeAnnouncementModal', () => {
-  cy.get('button')
-    .contains('Got It!')
-    .click()
+  cy.get('button').contains('Got It!').click()
 })
 
 //
 // File Page Actions
 //
 Cypress.Commands.add('openFilePage', () => {
-  cy.get('button[class*="navbar__tab__"]')
-    .contains('FILE')
-    .click()
+  cy.get('button[class*="navbar__tab__"]').contains('FILE').click()
 })
 
 //
@@ -71,18 +67,14 @@ Cypress.Commands.add('selectTipRacks', (left, right) => {
 Cypress.Commands.add(
   'addLiquid',
   (liquidName, liquidDesc, serializeLiquid = false) => {
-    cy.get('button')
-      .contains('New Liquid')
-      .click()
+    cy.get('button').contains('New Liquid').click()
     cy.get("input[name='name']").type(liquidName)
     cy.get("input[name='description']").type(liquidDesc)
     if (serializeLiquid) {
       // force option used because checkbox is hidden
       cy.get("input[name='serialize']").check({ force: true })
     }
-    cy.get('button')
-      .contains('save')
-      .click()
+    cy.get('button').contains('save').click()
   }
 )
 
@@ -90,25 +82,16 @@ Cypress.Commands.add(
 // Design Page Actions
 //
 Cypress.Commands.add('openDesignPage', () => {
-  cy.get('button[class*="navbar__tab__"]')
-    .contains('DESIGN')
-    .parent()
-    .click()
+  cy.get('button[class*="navbar__tab__"]').contains('DESIGN').parent().click()
 })
 Cypress.Commands.add('addStep', stepName => {
-  cy.get('button')
-    .contains('Add Step')
-    .click()
-  cy.get('button')
-    .contains(stepName, { matchCase: false })
-    .click()
+  cy.get('button').contains('Add Step').click()
+  cy.get('button').contains(stepName, { matchCase: false }).click()
 })
 
 //
 // Settings Page Actions
 //
 Cypress.Commands.add('openSettingsPage', () => {
-  cy.get('button[class*="navbar__tab__"]')
-    .contains('Settings')
-    .click()
+  cy.get('button[class*="navbar__tab__"]').contains('Settings').click()
 })
