@@ -7,11 +7,11 @@ import { StepFormDropdown } from './StepFormDropdownField'
 import type { Options } from '@opentrons/components'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { BaseState } from '../../../types'
-import type { FocusHandlers } from '../types'
+import type { FieldProps } from './useSingleEditFieldProps'
 import type { StepFormDropdownProps } from './StepFormDropdownField'
 
 type OP = {|
-  ...$Exact<FocusHandlers>,
+  ...FieldProps,
   name: StepFieldName,
   className?: string,
 |}

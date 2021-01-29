@@ -37,6 +37,7 @@ import styles from './StepEditForm.css'
 import type { BaseState } from '../../types'
 import type { FormData, StepType, StepFieldName } from '../../form-types'
 
+// TODO IMMEDIATELY: don't any-type this.
 const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<any> } = {
   mix: MixForm,
   pause: PauseForm,
@@ -97,6 +98,7 @@ export const StepEditFormComponent = (props: Props): React.Node => {
         <FormComponent
           stepType={formData.stepType} // TODO: Ian 2019-01-17 deprecate passing this during #2916, it's in formData
           formData={formData}
+          // TODO IMMEDIATELY: deprecate use of focusHandlers
           focusHandlers={{
             focusedField,
             dirtyFields,

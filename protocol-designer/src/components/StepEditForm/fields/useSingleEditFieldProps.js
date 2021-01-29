@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getTooltipForField } from '../utils'
@@ -43,7 +44,13 @@ export const useSingleEditFieldProps = (): FieldPropsByName | null => {
   const dispatch = useDispatch()
   const formData = useSelector(stepFormSelectors.getUnsavedForm)
 
-  if (formData == null) return null
+  if (formData == null) {
+    assert(
+      false,
+      'useSingleEditFieldProps expected getUnsavedForm to not be null'
+    )
+    return null
+  }
 
   // TODO IMMEDIATELY: explicit names, this omit is a HACK. Must support all stepTypes.
   const fieldNames: Array<string> = Object.keys(formData).filter(

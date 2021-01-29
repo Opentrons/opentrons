@@ -59,14 +59,14 @@ export const MoveLiquidForm = (props: Props): React.Node => {
       <div className={styles.section_wrapper}>
         <SourceDestHeaders
           className={styles.section_column}
-          focusHandlers={focusHandlers}
+          propsForFields={propsForFields}
           collapsed={collapsed}
           toggleCollapsed={toggleCollapsed}
           prefix="aspirate"
         />
         <SourceDestHeaders
           className={styles.section_column}
-          focusHandlers={focusHandlers}
+          propsForFields={propsForFields}
           collapsed={collapsed}
           toggleCollapsed={toggleCollapsed}
           prefix="dispense"

@@ -28,12 +28,6 @@ describe('MagnetForm', () => {
       formData: {
         meta: { module: { model: MAGNETIC_MODULE_V1 } },
       },
-      focusHandlers: {
-        focusedField: 'magnet',
-        dirtyFields: [],
-        onFieldFocus: jest.fn(),
-        onFieldBlur: jest.fn(),
-      },
     }
     store = {
       dispatch: jest.fn(),

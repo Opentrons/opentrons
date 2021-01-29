@@ -14,12 +14,9 @@ import {
 import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import styles from '../StepEditForm.css'
 
-import type { FocusHandlers } from '../types'
-
-type TemperatureFormProps = { focusHandlers: FocusHandlers }
+type TemperatureFormProps = {||}
 
 export const TemperatureForm = (props: TemperatureFormProps): React.Node => {
-  const { focusHandlers } = props
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )
@@ -43,8 +40,7 @@ export const TemperatureForm = (props: TemperatureFormProps): React.Node => {
           className={styles.temperature_form_group}
         >
           <StepFormDropdown
-            {...focusHandlers}
-            name="moduleId"
+            {...propsForFields['moduleId']}
             options={moduleLabwareOptions}
           />
         </FormGroup>
@@ -66,7 +62,7 @@ export const TemperatureForm = (props: TemperatureFormProps): React.Node => {
         >
           <div className={styles.checkbox_row}>
             <RadioGroupField
-              name="setTemperature"
+              {...propsForFields['setTemperature']}
               options={[
                 {
                   name: i18n.t(
@@ -75,7 +71,6 @@ export const TemperatureForm = (props: TemperatureFormProps): React.Node => {
                   value: 'true',
                 },
               ]}
-              {...focusHandlers}
             />
             <ConditionalOnField
               name={'setTemperature'}
@@ -90,7 +85,7 @@ export const TemperatureForm = (props: TemperatureFormProps): React.Node => {
           </div>
           <div className={styles.checkbox_row}>
             <RadioGroupField
-              name="setTemperature"
+              {...propsForFields['setTemperature']}
               options={[
                 {
                   name: i18n.t(
@@ -99,7 +94,6 @@ export const TemperatureForm = (props: TemperatureFormProps): React.Node => {
                   value: 'false',
                 },
               ]}
-              {...focusHandlers}
             />
           </div>
         </ConditionalOnField>

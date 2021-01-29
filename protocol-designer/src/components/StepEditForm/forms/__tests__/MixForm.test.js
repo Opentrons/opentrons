@@ -52,24 +52,13 @@ describe('MixForm', () => {
       .invoke('toggleCollapsed')()
   }
 
-  let props
-
   beforeEach(() => {
-    props = {
-      focusHandlers: {
-        focusedField: '',
-        dirtyFields: [],
-        onFieldFocus: jest.fn(),
-        onFieldBlur: jest.fn(),
-      },
-    }
-
     getUnsavedFormMock.mockReturnValue({
       stepType: 'mix',
     })
   })
   it('should NOT render delay fields initially', () => {
-    const wrapper = render(props)
+    const wrapper = render()
 
     const delayFields = wrapper.find(DelayFields)
     expect(delayFields).toHaveLength(0)
@@ -77,7 +66,7 @@ describe('MixForm', () => {
 
   describe('when advanced settings are visible', () => {
     it('should render the aspirate delay fields when advanced settings are visible', () => {
-      const wrapper = render(props)
+      const wrapper = render()
 
       showAdvancedSettings(wrapper)
       wrapper.update()
@@ -95,7 +84,7 @@ describe('MixForm', () => {
       expect(aspirateDelayFields.prop('tipPositionFieldName')).toBe(undefined)
     })
     it('should render the dispense delay fields', () => {
-      const wrapper = render(props)
+      const wrapper = render()
       showAdvancedSettings(wrapper)
       const delayFields = wrapper.find(DelayFields)
       const aspirateDelayFields = delayFields.at(1)

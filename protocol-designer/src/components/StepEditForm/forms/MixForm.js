@@ -20,14 +20,11 @@ import {
 import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import { AspDispSection } from './AspDispSection'
 
-import type { FocusHandlers } from '../types'
 import styles from '../StepEditForm.css'
 
-type Props = {| focusHandlers: FocusHandlers |}
+type Props = {||}
 
 export const MixForm = (props: Props): React.Node => {
-  const { focusHandlers } = props
-
   const [collapsed, setCollapsed] = React.useState(true)
 
   const propsForFields = useSingleEditFieldProps()
@@ -66,13 +63,12 @@ export const MixForm = (props: Props): React.Node => {
           label={i18n.t('form.step_edit_form.labwareLabel.mixLabware')}
           className={styles.large_field}
         >
-          <LabwareField name="labware" {...focusHandlers} />
+          <LabwareField {...propsForFields['labware']} />
         </FormGroup>
         <WellSelectionField
-          name="wells"
+          {...propsForFields['wells']}
           labwareFieldName="labware"
           pipetteFieldName="pipette"
-          {...focusHandlers}
         />
       </div>
       <div className={styles.section_divider} />

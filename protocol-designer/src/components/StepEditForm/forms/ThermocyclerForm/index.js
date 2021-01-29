@@ -37,7 +37,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Node => {
       <div className={styles.tc_step_group}>
         <div className={styles.checkbox_row}>
           <RadioGroupField
-            name="thermocyclerFormType"
+            {...propsForFields['thermocyclerFormType']}
             className={styles.tc_step_option}
             options={[
               {
@@ -47,7 +47,6 @@ export const ThermocyclerForm = (props: TCFormProps): React.Node => {
                 value: THERMOCYCLER_STATE,
               },
             ]}
-            {...focusHandlers}
           />
         </div>
         <ConditionalOnField
@@ -58,7 +57,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Node => {
         </ConditionalOnField>
         <div className={styles.checkbox_row}>
           <RadioGroupField
-            name="thermocyclerFormType"
+            {...propsForFields['thermocyclerFormType']}
             className={styles.tc_step_option}
             options={[
               {
@@ -68,7 +67,6 @@ export const ThermocyclerForm = (props: TCFormProps): React.Node => {
                 value: THERMOCYCLER_PROFILE,
               },
             ]}
-            {...focusHandlers}
           />
         </div>
       </div>

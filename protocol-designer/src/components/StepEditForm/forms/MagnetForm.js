@@ -12,13 +12,10 @@ import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import styles from '../StepEditForm.css'
 
 import type { FormData } from '../../../form-types'
-import type { FocusHandlers } from '../types'
 
-type MagnetFormProps = { focusHandlers: FocusHandlers, formData: FormData }
+type MagnetFormProps = {| formData: FormData |}
 
 export const MagnetForm = (props: MagnetFormProps): React.Node => {
-  const { focusHandlers } = props // TODO IMMEDIATELY remove
-
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getMagneticLabwareOptions
   )
@@ -59,7 +56,7 @@ export const MagnetForm = (props: MagnetFormProps): React.Node => {
           className={styles.magnet_form_group}
         >
           <RadioGroupField
-            name="magnetAction"
+            {...propsForFields['magnetAction']}
             options={[
               {
                 name: i18n.t(
@@ -68,10 +65,9 @@ export const MagnetForm = (props: MagnetFormProps): React.Node => {
                 value: 'engage',
               },
             ]}
-            {...focusHandlers}
           />
           <RadioGroupField
-            name="magnetAction"
+            {...propsForFields['magnetAction']}
             options={[
               {
                 name: i18n.t(
@@ -80,7 +76,6 @@ export const MagnetForm = (props: MagnetFormProps): React.Node => {
                 value: 'disengage',
               },
             ]}
-            {...focusHandlers}
           />
         </FormGroup>
         <ConditionalOnField

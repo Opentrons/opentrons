@@ -42,6 +42,7 @@ export const PauseForm = (props: PauseFormProps): React.Node => {
     </div>
   )
 
+  // TODO IMMEDIATELY deprecate focusHandlers
   // time fields blur together
   const blurAllTimeUnitFields = () => {
     ;['pauseHour', 'pauseMinute', 'pauseSecond'].forEach(timeUnitFieldName =>
@@ -64,7 +65,7 @@ export const PauseForm = (props: PauseFormProps): React.Node => {
         <div className={styles.section_column}>
           <div className={styles.checkbox_row}>
             <RadioGroupField
-              name="pauseAction"
+              {...propsForFields['pauseAction']}
               options={[
                 {
                   name: i18n.t(
@@ -73,12 +74,11 @@ export const PauseForm = (props: PauseFormProps): React.Node => {
                   value: PAUSE_UNTIL_RESUME,
                 },
               ]}
-              {...focusHandlers}
             />
           </div>
           <div className={styles.checkbox_row}>
             <RadioGroupField
-              name="pauseAction"
+              {...propsForFields['pauseAction']}
               options={[
                 {
                   name: i18n.t(
@@ -87,7 +87,6 @@ export const PauseForm = (props: PauseFormProps): React.Node => {
                   value: PAUSE_UNTIL_TIME,
                 },
               ]}
-              {...focusHandlers}
             />
           </div>
           <ConditionalOnField
@@ -126,10 +125,10 @@ export const PauseForm = (props: PauseFormProps): React.Node => {
               <div {...hoverTooltipHandlers}>
                 <div className={styles.checkbox_row}>
                   <RadioGroupField
+                    {...propsForFields['pauseAction']}
                     className={cx({
                       [styles.disabled]: !pauseUntilTempEnabled,
                     })}
-                    name="pauseAction"
                     options={[
                       {
                         name: i18n.t(
@@ -138,7 +137,6 @@ export const PauseForm = (props: PauseFormProps): React.Node => {
                         value: PAUSE_UNTIL_TEMP,
                       },
                     ]}
-                    {...focusHandlers}
                   />
                 </div>
                 <ConditionalOnField
@@ -152,8 +150,7 @@ export const PauseForm = (props: PauseFormProps): React.Node => {
                       )}
                     >
                       <StepFormDropdown
-                        {...focusHandlers}
-                        name="moduleId"
+                        {...propsForFields['moduleId']}
                         options={moduleLabwareOptions}
                       />
                     </FormGroup>
