@@ -15,13 +15,13 @@ from opentrons.protocol_engine.commands import (
 def test_load_labware_request() -> None:
     """It should have a LoadLabwareRequest model."""
     request = LoadLabwareRequest(
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1
     )
 
-    assert request.location == DeckSlotLocation(DeckSlotName.SLOT_3)
+    assert request.location == DeckSlotLocation(slot=DeckSlotName.SLOT_3)
     assert request.loadName == "some-load-name"
     assert request.namespace == "opentrons-test"
     assert request.version == 1
@@ -52,7 +52,7 @@ async def test_load_labware_implementation(
     )
 
     request = LoadLabwareRequest(
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1
@@ -67,7 +67,7 @@ async def test_load_labware_implementation(
         calibration=(1, 2, 3),
     )
     mock_handlers.equipment.load_labware.assert_called_with(
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         load_name="some-load-name",
         namespace="opentrons-test",
         version=1

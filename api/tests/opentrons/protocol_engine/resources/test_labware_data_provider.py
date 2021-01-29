@@ -38,7 +38,7 @@ async def test_labware_data_gets_calibration(
 
         result = await LabwareDataProvider().get_labware_calibration(
             minimal_labware_def,
-            DeckSlotLocation(DeckSlotName.SLOT_5),
+            DeckSlotLocation(slot=DeckSlotName.SLOT_5),
         )
 
         assert result == (1, 2, 3)

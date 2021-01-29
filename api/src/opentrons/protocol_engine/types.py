@@ -1,15 +1,13 @@
 """Base protocol engine types and interfaces."""
 from enum import Enum
-from pydantic.dataclasses import dataclass
+from pydantic import BaseModel
 from typing import Union, Tuple
 from typing_extensions import final
 
 from opentrons.types import DeckSlotName
 
 
-@final
-@dataclass(frozen=True)
-class DeckSlotLocation:
+class DeckSlotLocation(BaseModel):
     """Location for labware placed in a single slot."""
 
     slot: DeckSlotName
@@ -27,17 +25,14 @@ class WellOrigin(str, Enum):
     BOTTOM = "bottom"
 
 
-@final
-@dataclass(frozen=True)
-class WellLocation:
+class WellLocation(BaseModel):
     """A relative location in reference to a well's location."""
 
     origin: WellOrigin = WellOrigin.TOP
     offset: Tuple[float, float, float] = (0, 0, 0)
 
 
-@dataclass(frozen=True)
-class DeckLocation:
+class DeckLocation(BaseModel):
     """A symbolic reference to a location on the deck.
 
     Specified as the pipette, labware, and well. A `DeckLocation` may be

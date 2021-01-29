@@ -1,136 +1,87 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from mock import AsyncMock
 from datetime import datetime
 
-import typing
-
-from pydantic.main import BaseModel
-
 from robot_server.service.dependencies import get_session_manager
-from robot_server.service.session.command_execution import CommandExecutor, \
-    Command
-from robot_server.service.session.command_execution.command import \
-    CommandResult, CompletedCommand, CommandMeta, CommandStatus
-from robot_server.service.session.errors import SessionCreationException, \
-    UnsupportedCommandException, CommandExecutionException
-from robot_server.service.session.models.command import JogRequest, \
-    SimpleCommandRequest
-from robot_server.service.session.models.common import EmptyModel, JogPosition
-from robot_server.service.session.models.command_definitions import \
-    CalibrationCommand
-from robot_server.service.session.models.session import SessionType
-from robot_server.service.session.session_types import (
-    LiveProtocolSession, SessionMetaData)
+from robot_server.service.errors import RobotServerError
+from robot_server.service.session.errors import (
+    SessionCreationException, UnsupportedCommandException,
+    CommandExecutionException)
+from robot_server.service.session.manager import SessionManager
+from robot_server.service.session.models.command import (
+    SimpleCommandRequest, SimpleCommandResponse, CommandStatus
+)
+from robot_server.service.session.models.common import EmptyModel
+from robot_server.service.session.models.command_definitions import (
+    ProtocolCommand)
+from robot_server.service.session import router
+from robot_server.service.session.session_types import BaseSession
 
 
 @pytest.fixture
-def mock_session_meta():
-    return SessionMetaData(identifier="some_id",
-                           created_at=datetime(2000, 1, 1, 0, 0, 0))
+def mock_session_manager():
+    return AsyncMock(spec=SessionManager)
 
 
 @pytest.fixture
-def session_response(mock_session_meta):
-    return {
-        'details': {
-        },
-        'sessionType': 'liveProtocol',
-        'createdAt': mock_session_meta.created_at.isoformat(),
-        'createParams': None,
-        'id': mock_session_meta.identifier,
+def mock_session():
+    session = AsyncMock(spec=BaseSession)
+    session.meta.identifier = "some id"
+    session.meta.created_at = datetime(2020, 1, 1)
+    session.meta.create_params = None
+    session.get_response_model.return_value = {
+        "createdAt": session.meta.created_at,
+        "details": EmptyModel(),
+        "id": session.meta.identifier,
+        "createParams": session.meta.create_params
     }
-
-
-@pytest.fixture
-def command_id():
-    return "123"
-
-
-@pytest.fixture
-def command_created_at():
-    return datetime(2000, 1, 1)
-
-
-@pytest.fixture
-def patch_create_command(command_id, command_created_at):
-    session_path = "robot_server.service.session.session_types"
-    with patch(f"{session_path}.base_session.create_command") as p:
-        p.side_effect = lambda c: Command(
-            request=c,
-            meta=CommandMeta(command_id, command_created_at))
-        yield p
-
-
-@pytest.fixture
-def mock_command_executor():
-    mock = MagicMock(spec=CommandExecutor)
-
-    async def func(command):
-        return CompletedCommand(request=command.request,
-                                meta=command.meta,
-                                result=CommandResult(
-                                    status=CommandStatus.executed,
-                                    started_at=datetime(2019, 1, 1),
-                                    completed_at=datetime(2020, 1, 1))
-                                )
-
-    mock.execute.side_effect = func
-    return mock
-
-
-@pytest.fixture
-def mock_session(mock_session_meta, mock_command_executor):
-    session = LiveProtocolSession(
-        configuration=MagicMock(),
-        instance_meta=mock_session_meta)
-
-    session._executor = mock_command_executor
-
-    async def func(*args, **kwargs):
-        pass
-
-    session.clean_up = MagicMock(side_effect=func)
     return session
 
 
 @pytest.fixture
-def patch_create_session(mock_session):
-    r = "robot_server.service.session.session_types.BaseSession.create"
-    with patch(r) as p:
-        async def mock_build(*args, **kwargs):
-            return mock_session
-        p.side_effect = mock_build
-        yield p
+def sessions_api_client(mock_session_manager, api_client):
+    """Test api client that overrides get_session_manager dependency."""
+    async def get():
+        return mock_session_manager
+    api_client.app.dependency_overrides[get_session_manager] = get
+    return api_client
 
 
-@pytest.fixture
-@pytest.mark.asyncio
-async def session_manager(loop, patch_create_session):
-    manager = await get_session_manager()
+def test_get_session(mock_session_manager):
+    """It gets the session from session manager"""
+    session_id = "sess"
+    mock_session = MagicMock()
+    mock_session_manager.get_by_id.return_value = mock_session
 
-    yield manager
+    session = router.get_session(mock_session_manager, session_id)
 
-    await manager.remove_all()
+    mock_session_manager.get_by_id.called_once_with(session_id)
 
-
-@pytest.fixture
-@pytest.mark.asyncio
-async def session_manager_with_session(loop, session_manager):
-    await session_manager.add(SessionType.live_protocol, SessionMetaData())
-
-    yield session_manager
+    assert session is mock_session
 
 
-def test_create_session_error(api_client,
-                              patch_create_session):
+def test_get_session_not_found(mock_session_manager):
+    """It raises an exception if session is not found"""
+    session_id = "sess"
+    mock_session_manager.get_by_id.return_value = None
+
+    with pytest.raises(RobotServerError):
+        router.get_session(mock_session_manager, session_id)
+
+
+def test_sessions_create_error(
+        sessions_api_client,
+        mock_session_manager):
+    """It raises an error if session manager raises an exception."""
     async def raiser(*args, **kwargs):
         raise SessionCreationException(
             "Please attach pipettes before proceeding"
         )
 
-    patch_create_session.side_effect = raiser
+    mock_session_manager.add.side_effect = raiser
 
-    response = api_client.post("/sessions", json={
+    response = sessions_api_client.post("/sessions", json={
         "data": {
             "sessionType": "liveProtocol"
         }
@@ -144,24 +95,33 @@ def test_create_session_error(api_client,
     assert response.status_code == 403
 
 
-def test_create_session(api_client,
-                        session_manager,
-                        mock_session_meta,
-                        session_response):
-    response = api_client.post("/sessions", json={
+def test_sessions_create(
+        sessions_api_client,
+        mock_session_manager,
+        mock_session):
+    """It creates a session."""
+    mock_session_manager.add.return_value = mock_session
+
+    response = sessions_api_client.post("/sessions", json={
         "data": {
             "sessionType": "liveProtocol"
         }
     })
     assert response.json() == {
-        'data': session_response,
+        'data': {
+            'details': {},
+            'sessionType': 'liveProtocol',
+            'createdAt': mock_session.meta.created_at.isoformat(),
+            'createParams': None,
+            'id': mock_session.meta.identifier,
+        },
         'links': {
             'commandExecute': {
-                'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: E501
+                'href': f'/sessions/{mock_session.meta.identifier}/commands/execute',  # noqa: E501
                 'meta': None,
             },
             'self': {
-                'href': f'/sessions/{mock_session_meta.identifier}',
+                'href': f'/sessions/{mock_session.meta.identifier}',
                 'meta': None,
             },
             'sessions': {
@@ -175,8 +135,13 @@ def test_create_session(api_client,
     assert response.status_code == 201
 
 
-def test_delete_session_not_found(api_client):
-    response = api_client.delete("/sessions/check")
+def test_sessions_delete_not_found(
+        sessions_api_client,
+        mock_session_manager):
+    """It fails when session is not found"""
+    mock_session_manager.get_by_id.return_value = None
+
+    response = sessions_api_client.delete("/sessions/check")
     assert response.json() == {
         'errors': [{
             'detail': "Resource type 'session' with id 'check' was not found",
@@ -191,15 +156,26 @@ def test_delete_session_not_found(api_client):
     assert response.status_code == 404
 
 
-def test_delete_session(api_client,
-                        session_manager_with_session,
-                        mock_session,
-                        mock_session_meta,
-                        session_response):
-    response = api_client.delete(f"/sessions/{mock_session_meta.identifier}")
-    # mock_session.clean_up.assert_called_once()
+def test_sessions_delete(
+        sessions_api_client,
+        mock_session_manager,
+        mock_session):
+    """It deletes a found session."""
+    mock_session_manager.get_by_id.return_value = mock_session
+
+    response = sessions_api_client.delete(
+        f"/sessions/{mock_session.meta.identifier}")
+
+    mock_session_manager.remove.assert_called_once_with(
+        mock_session.meta.identifier)
     assert response.json() == {
-        'data': session_response,
+        'data': {
+            'details': {},
+            'sessionType': 'liveProtocol',
+            'createdAt': mock_session.meta.created_at.isoformat(),
+            'createParams': None,
+            'id': mock_session.meta.identifier
+        },
         'links': {
             'self': {
                 'href': '/sessions', 'meta': None,
@@ -212,8 +188,13 @@ def test_delete_session(api_client,
     assert response.status_code == 200
 
 
-def test_get_session_not_found(api_client):
-    response = api_client.get("/sessions/1234")
+def test_sessions_get_not_found(
+        mock_session_manager,
+        sessions_api_client):
+    """It returns an error when session is not found."""
+    mock_session_manager.get_by_id.return_value = None
+
+    response = sessions_api_client.get("/sessions/1234")
     assert response.json() == {
         'errors': [{
             'detail': "Resource type 'session' with id '1234' was not found",
@@ -228,20 +209,30 @@ def test_get_session_not_found(api_client):
     assert response.status_code == 404
 
 
-def test_get_session(api_client,
-                     mock_session_meta,
-                     session_manager_with_session,
-                     session_response):
-    response = api_client.get(f"/sessions/{mock_session_meta.identifier}")
+def test_sessions_get(
+        sessions_api_client,
+        mock_session_manager,
+        mock_session):
+    """It returns the found session."""
+    mock_session_manager.get_by_id.return_value = mock_session
+
+    response = sessions_api_client.get(
+        f"/sessions/{mock_session.meta.identifier}")
     assert response.json() == {
-        'data': session_response,
+        'data': {
+            'details': {},
+            'sessionType': 'liveProtocol',
+            'createdAt': mock_session.meta.created_at.isoformat(),
+            'createParams': None,
+            'id': mock_session.meta.identifier
+        },
         'links': {
             'commandExecute': {
-                'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: e5011
+                'href': f'/sessions/{mock_session.meta.identifier}/commands/execute',  # noqa: e5011
                 'meta': None,
             },
             'self': {
-                'href': f'/sessions/{mock_session_meta.identifier}',
+                'href': f'/sessions/{mock_session.meta.identifier}',
                 'meta': None,
             },
             'sessions': {
@@ -257,43 +248,58 @@ def test_get_session(api_client,
     assert response.status_code == 200
 
 
-def test_get_sessions_no_sessions(api_client):
-    response = api_client.get("/sessions")
+def test_sessions_get_all_no_sessions(
+        sessions_api_client,
+        mock_session_manager):
+    """It returns a response when there are no sessions."""
+    mock_session_manager.get.return_value = []
+
+    response = sessions_api_client.get("/sessions")
     assert response.json() == {
         'data': [], 'links': None
     }
     assert response.status_code == 200
 
 
-def test_get_sessions(api_client,
-                      session_manager_with_session,
-                      session_response):
-    response = api_client.get("/sessions")
+def test_sessions_get_all(
+        sessions_api_client,
+        mock_session_manager,
+        mock_session):
+    """It returns the sessions."""
+    mock_session_manager.get.return_value = [mock_session]
+
+    response = sessions_api_client.get("/sessions")
     assert response.json() == {
-        'data': [session_response], 'links': None
+        'data': [{
+            'details': {},
+            'sessionType': 'liveProtocol',
+            'createdAt': mock_session.meta.created_at.isoformat(),
+            'createParams': None,
+            'id': mock_session.meta.identifier
+        }], 'links': None
     }
     assert response.status_code == 200
 
 
-def command(command_type: str, body: typing.Optional[BaseModel]):
-    """Helper to create command"""
-    return {
-        "data": {
-            "command": command_type,
-            "data": body.dict(exclude_unset=True) if body else {}
+def test_sessions_execute_command_no_session(
+        sessions_api_client,
+        mock_session_manager):
+    """It rejects command if there's no session"""
+    mock_session_manager.get_by_id.return_value = None
+
+    response = sessions_api_client.post(
+        "/sessions/1234/commands/execute",
+        json={
+            "data": {
+                "command": "protocol.pause",
+                "data": {}
+            }
         }
-    }
-
-
-def test_execute_command_no_session(api_client, mock_session_meta):
-    """Test that command is rejected if there's no session"""
-    response = api_client.post(
-        f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("calibration.jog",
-                     JogPosition(vector=(1, 2, 3,))))
+    )
+    mock_session_manager.get_by_id.assert_called_once_with("1234")
     assert response.json() == {
         'errors': [{
-            'detail': f"Resource type 'session' with id '{mock_session_meta.identifier}' was not found",  # noqa: e5011
+            'detail': f"Resource type 'session' with id '1234' was not found",  # noqa: e5011
             'links': {
                 'self': {'href': '/sessions'},
                 'sessionById': {'href': '/sessions/{sessionId}'}
@@ -305,102 +311,55 @@ def test_execute_command_no_session(api_client, mock_session_meta):
     assert response.status_code == 404
 
 
-def test_execute_command(api_client,
-                         session_manager_with_session,
-                         mock_session_meta,
-                         mock_command_executor,
-                         command_id,
-                         command_created_at,
-                         patch_create_command):
-    response = api_client.post(
-        f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("calibration.jog",
-                     JogPosition(vector=(1, 2, 3,))))
+def test_sessions_execute_command(
+        sessions_api_client,
+        mock_session_manager,
+        mock_session):
+    """It accepts the session command"""
+    mock_session_manager.get_by_id.return_value = mock_session
+    mock_session.execute_command.return_value = SimpleCommandResponse(
+        id="44",
+        command=ProtocolCommand.pause,
+        data=EmptyModel(),
+        createdAt=datetime(2020, 1, 2),
+        startedAt=datetime(2020, 1, 3),
+        completedAt=datetime(2020, 1, 4),
+        status=CommandStatus.executed
+    )
 
-    mock_command_executor.execute.assert_called_once_with(
-        Command(
-            request=JogRequest(
-                command=CalibrationCommand.jog,
-                data=JogPosition(vector=(1, 2, 3,))
-            ),
-            meta=CommandMeta(identifier=command_id,
-                             created_at=command_created_at)
-        )
+    response = sessions_api_client.post(
+        f"/sessions/{mock_session.meta.identifier}/commands/execute",
+        json={
+            "data": {
+                "command": "protocol.pause",
+                "data": {}
+            }
+        }
+    )
+
+    mock_session.execute_command.assert_called_once_with(
+        SimpleCommandRequest(command=ProtocolCommand.pause,
+                             data=EmptyModel())
     )
 
     assert response.json() == {
         'data': {
-            'command': 'calibration.jog',
-            'data': {'vector': [1.0, 2.0, 3.0]},
-            'status': 'executed',
-            'createdAt': '2000-01-01T00:00:00',
-            'startedAt': '2019-01-01T00:00:00',
-            'completedAt': '2020-01-01T00:00:00',
-            'result': None,
-            'id': command_id,
-        },
-        'links': {
-            'commandExecute': {
-                'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: e501
-                'meta': None,
-            },
-            'self': {
-                'href': f'/sessions/{mock_session_meta.identifier}',
-                'meta': None,
-            },
-            'sessions': {
-                'href': '/sessions',
-                'meta': None,
-            },
-            'sessionById': {
-                'href': '/sessions/{sessionId}',
-                'meta': None,
-            },
-        },
-    }
-    assert response.status_code == 200
-
-
-def test_execute_command_no_body(api_client,
-                                 session_manager_with_session,
-                                 mock_session_meta,
-                                 patch_create_command,
-                                 command_id,
-                                 command_created_at,
-                                 mock_command_executor):
-    """Test that a command with empty body can be accepted"""
-    response = api_client.post(
-        f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("calibration.moveToTipRack", None)
-    )
-
-    mock_command_executor.execute.assert_called_once_with(
-        Command(
-            request=SimpleCommandRequest(
-                command=CalibrationCommand.move_to_tip_rack,
-                data=EmptyModel()),
-            meta=CommandMeta(command_id, command_created_at)
-        )
-    )
-
-    assert response.json() == {
-        'data': {
-            'command': 'calibration.moveToTipRack',
+            'command': 'protocol.pause',
             'data': {},
             'status': 'executed',
-            'createdAt': '2000-01-01T00:00:00',
-            'startedAt': '2019-01-01T00:00:00',
-            'completedAt': '2020-01-01T00:00:00',
+            'createdAt': '2020-01-02T00:00:00',
+            'startedAt': '2020-01-03T00:00:00',
+            'completedAt': '2020-01-04T00:00:00',
             'result': None,
-            'id': command_id
+            'id': "44",
         },
         'links': {
             'commandExecute': {
-                'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: e501
+                'href': f'/sessions/{mock_session.meta.identifier}/commands/execute',  # noqa: e501
                 'meta': None,
             },
             'self': {
-                'href': f'/sessions/{mock_session_meta.identifier}',
+                'href': f'/sessions/{mock_session.meta.identifier}',
                 'meta': None,
             },
             'sessions': {
@@ -421,22 +380,27 @@ def test_execute_command_no_body(api_client,
                              [UnsupportedCommandException, 403],
                              [CommandExecutionException, 403],
                          ])
-def test_execute_command_error(api_client,
-                               session_manager_with_session,
-                               mock_session_meta,
-                               mock_command_executor,
+def test_execute_command_error(sessions_api_client,
+                               mock_session_manager,
+                               mock_session,
                                exception,
                                expected_status):
     """Test that we handle executor errors correctly"""
+    mock_session_manager.get_by_id.return_value = mock_session
+
     async def raiser(*args, **kwargs):
         raise exception("Cannot do it")
 
-    mock_command_executor.execute.side_effect = raiser
+    mock_session.execute_command.side_effect = raiser
 
-    response = api_client.post(
-        f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("calibration.jog",
-                     JogPosition(vector=(1, 2, 3,)))
+    response = sessions_api_client.post(
+        f"/sessions/{mock_session.meta.identifier}/commands/execute",
+        json={
+            'data': {
+                'command': 'protocol.pause',
+                'data': {}
+            }
+        }
     )
 
     assert response.json() == {
@@ -452,25 +416,32 @@ def test_execute_command_error(api_client,
 
 
 def test_execute_command_session_inactive(
-        api_client,
-        session_manager_with_session,
-        mock_session_meta,
-        mock_command_executor):
+        sessions_api_client,
+        mock_session_manager,
+        mock_session,
+        ):
     """Test that only the active session can execute commands"""
-    session_manager_with_session._active.active_id = None
+    mock_session_manager.get_by_id.return_value = mock_session
+    mock_session_manager.is_active.return_value = False
 
-    response = api_client.post(
-        f"/sessions/{mock_session_meta.identifier}/commands/execute",
-        json=command("calibration.jog",
-                     JogPosition(vector=(1, 2, 3,)))
+    response = sessions_api_client.post(
+        f"/sessions/{mock_session.meta.identifier}/commands/execute",
+        json={
+            'data': {
+                'command': 'protocol.pause',
+                'data': {}
+            }
+        }
     )
 
+    mock_session_manager.is_active.assert_called_once_with(
+        mock_session.meta.identifier)
     assert response.json() == {
         'errors': [
             {
                 'title': 'Action Forbidden',
                 'status': '403',
-                'detail': f"Session '{mock_session_meta.identifier}'"
+                'detail': f"Session '{mock_session.meta.identifier}'"
                          f" is not active. Only the active session can "
                          f"execute commands"
             }

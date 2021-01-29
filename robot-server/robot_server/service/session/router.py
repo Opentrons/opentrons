@@ -27,15 +27,14 @@ PATH_SESSION_BY_ID = "/sessions/{sessionId}"
 
 
 def get_session(manager: SessionManager,
-                session_id: IdentifierType,
-                api_router: APIRouter) -> BaseSession:
+                session_id: IdentifierType) -> BaseSession:
     """Get the session or raise a RobotServerError"""
     found_session = manager.get_by_id(session_id)
     if not found_session:
         # There is no session raise error
         raise RobotServerError(
             definition=CommonErrorDef.RESOURCE_NOT_FOUND,
-            links=get_sessions_links(api_router),
+            links=get_sessions_links(),
             resource='session',
             id=session_id
         )
@@ -73,13 +72,12 @@ async def delete_session_handler(
         -> SessionResponse:
     """Delete a session"""
     session_obj = get_session(manager=session_manager,
-                              session_id=sessionId,
-                              api_router=router)
+                              session_id=sessionId)
     await session_manager.remove(session_obj.meta.identifier)
 
     return SessionResponse(
         data=session_obj.get_response_model(),
-        links=get_sessions_links(router),
+        links=get_sessions_links(),
     )
 
 
@@ -91,8 +89,7 @@ async def get_session_handler(
         session_manager: SessionManager = Depends(get_session_manager))\
         -> SessionResponse:
     session_obj = get_session(manager=session_manager,
-                              session_id=sessionId,
-                              api_router=router)
+                              session_id=sessionId)
 
     return SessionResponse(
         data=session_obj.get_response_model(),
@@ -128,8 +125,7 @@ async def session_command_execute_handler(
     Execute a session command
     """
     session_obj = get_session(manager=session_manager,
-                              session_id=sessionId,
-                              api_router=router)
+                              session_id=sessionId)
     if not session_manager.is_active(session_obj.meta.identifier):
         raise CommandExecutionException(
             reason=f"Session '{sessionId}' is not active. "
@@ -169,7 +165,7 @@ def get_valid_session_links(session_id: IdentifierType,
     }
 
 
-def get_sessions_links(api_router: APIRouter) -> ResourceLinks:
+def get_sessions_links() -> ResourceLinks:
     """Get the valid links for the /sessions"""
     return {
         ResourceLinkKey.self: ROOT_RESOURCE,

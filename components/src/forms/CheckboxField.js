@@ -2,6 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
+import type { HoverTooltipHandlers } from '../tooltips'
 
 import styles from './forms.css'
 
@@ -12,7 +13,7 @@ export type CheckboxFieldProps = {|
   value?: boolean,
   /** classes to apply */
   className?: string,
-  /** classes to apply to inner label text div. Deprecated. use labelProps.className */
+  /** classes to apply to inner label text div */
   labelTextClassName?: ?string,
   /** name of field in form */
   name?: string,
@@ -24,8 +25,10 @@ export type CheckboxFieldProps = {|
   disabled?: boolean,
   /** html tabindex property */
   tabIndex?: number,
-  /** props passed into label div. TODO IMMEDIATELY what is the Flow type? */
-  labelProps?: { [string]: any },
+  /** handlers for HoverTooltipComponent */
+  hoverTooltipHandlers?: ?HoverTooltipHandlers,
+  /** if true, render indeterminate icon */
+  isIndeterminate?: boolean,
 |}
 
 export function CheckboxField(props: CheckboxFieldProps): React.Node {
@@ -39,11 +42,19 @@ export function CheckboxField(props: CheckboxFieldProps): React.Node {
     [styles.checkbox_disabled]: props.disabled,
   })
 
+  const indeterminate = props.isIndeterminate ? 'true' : undefined
+
   return (
     <label className={outerClassName}>
       <div className={innerDivClassName}>
         <Icon
-          name={props.value ? 'checkbox-marked' : 'checkbox-blank-outline'}
+          name={
+            props.isIndeterminate
+              ? 'minus-box'
+              : props.value
+              ? 'checkbox-marked'
+              : 'checkbox-blank-outline'
+          }
           width="100%"
         />
       </div>
@@ -55,14 +66,11 @@ export function CheckboxField(props: CheckboxFieldProps): React.Node {
         disabled={props.disabled}
         onChange={props.onChange}
         tabIndex={props.tabIndex}
+        indeterminate={indeterminate}
       />
       <div
-        {...props.labelProps}
-        className={cx(
-          props.labelTextClassName,
-          props.labelProps?.className,
-          styles.label_text
-        )}
+        {...props.hoverTooltipHandlers}
+        className={cx(props.labelTextClassName, styles.label_text)}
       >
         {props.label}
       </div>
