@@ -6,7 +6,7 @@ import os
 import shutil
 import json
 import pathlib
-from unittest.mock import MagicMock
+from mock import MagicMock
 
 import requests
 from fastapi import routing

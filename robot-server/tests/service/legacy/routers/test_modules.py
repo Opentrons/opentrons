@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import patch, PropertyMock, MagicMock
+from mock import patch, PropertyMock, MagicMock
 
 import pytest
 import asyncio
@@ -384,15 +384,12 @@ def test_post_serial_timeout_error(api_client, hardware, magdeck):
 
 
 def test_post_serial_update(api_client, hardware, tempdeck):
-    async def update(*args, **kwargs):
-        pass
-
     hardware.attached_modules = [tempdeck]
 
     tempdeck._bundled_fw = BundledFirmware("1234", Path("c:/aaa"))
 
     with patch("opentrons.hardware_control.modules.update_firmware") as p:
-        p.side_effect = update
+        # p.side_effect = update
 
         resp = api_client.post('/modules/dummySerialTD/update')
 

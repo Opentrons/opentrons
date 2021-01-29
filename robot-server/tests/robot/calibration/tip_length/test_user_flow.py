@@ -1,6 +1,6 @@
 import os
 import pytest
-from unittest.mock import MagicMock, ANY, patch, call
+from unittest.mock import ANY, patch, call
 from typing import List, Tuple, Dict, Any
 from opentrons import config
 from opentrons.types import Mount, Point
@@ -52,13 +52,6 @@ def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
     hardware._attached_instruments = {mount: mock_hw_pipette_all_combos}
     hardware._current_pos = Point(0, 0, 0)
 
-    async def async_mock(*args, **kwargs):
-        pass
-
-    async def async_mock_move_rel(*args, **kwargs):
-        delta = kwargs.get('delta', Point(0, 0, 0))
-        hardware._current_pos += delta
-
     async def async_mock_move_to(*args, **kwargs):
         to_pt = kwargs.get('abs_position', Point(0, 0, 0))
         hardware._current_pos = to_pt
@@ -66,12 +59,8 @@ def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
     async def gantry_pos_mock(*args, **kwargs):
         return hardware._current_pos
 
-    hardware.move_rel = MagicMock(side_effect=async_mock)
-    hardware.pick_up_tip = MagicMock(side_effect=async_mock)
-    hardware.drop_tip = MagicMock(side_effect=async_mock)
-    hardware.gantry_position = MagicMock(side_effect=gantry_pos_mock)
-    hardware.move_to = MagicMock(side_effect=async_mock_move_to)
-    hardware.home_plunger = MagicMock(side_effect=async_mock)
+    hardware.gantry_position.side_effect = gantry_pos_mock
+    hardware.move_to.side_effect = async_mock_move_to
     hardware.get_instrument_max_height.return_value = 180
     return hardware
 
@@ -83,9 +72,6 @@ def mock_hw(hardware):
                           'testId')
     hardware._attached_instruments = {Mount.RIGHT: pip}
     hardware._current_pos = Point(0, 0, 0)
-
-    async def async_mock(*args, **kwargs):
-        pass
 
     async def async_mock_move_rel(*args, **kwargs):
         delta = kwargs.get('delta', Point(0, 0, 0))
@@ -101,15 +87,11 @@ def mock_hw(hardware):
     async def async_mock_home_plunger(*args, **kwargs):
         pass
 
-    hardware.move_rel = MagicMock(side_effect=async_mock_move_rel)
-    hardware.pick_up_tip = MagicMock(side_effect=async_mock)
-    hardware.drop_tip = MagicMock(side_effect=async_mock)
-    hardware.gantry_position = MagicMock(side_effect=gantry_pos_mock)
-    hardware.move_to = MagicMock(side_effect=async_mock_move_to)
+    hardware.move_rel.side_effect = async_mock_move_rel
+    hardware.gantry_position.side_effect = gantry_pos_mock
+    hardware.move_to.side_effect = async_mock_move_to
     hardware.get_instrument_max_height.return_value = 180
-    hardware.home_plunger = MagicMock(side_effect=async_mock_home_plunger)
-    hardware.drop_tip = MagicMock(side_effect=async_mock)
-    hardware.home = MagicMock(side_effect=async_mock)
+    hardware.home_plunger.side_effect = async_mock_home_plunger
     return hardware
 
 

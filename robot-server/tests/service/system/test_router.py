@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch
+from mock import patch
 from datetime import datetime, timezone
 from robot_server.system import time, errors
 
@@ -65,10 +65,7 @@ def test_raise_system_exception(api_client,
 
 def test_set_system_time(api_client, mock_system_time,
                          mock_set_system_time, response_links):
-    async def mock_side_effect(*args, **kwargs):
-        return mock_system_time
-
-    mock_set_system_time.side_effect = mock_side_effect
+    mock_set_system_time.return_value = mock_system_time
 
     # Correct request
     response = api_client.put("/system/time",
