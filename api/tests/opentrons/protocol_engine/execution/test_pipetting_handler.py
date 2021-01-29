@@ -292,7 +292,10 @@ async def test_handle_aspirate_request_with_prep(
             labware_id="labware-id",
             well_name="C6",
             well_location=well_location,
-            current_location=DeckLocation("pipette-id", "labware-id", "C6"),
+            current_location=DeckLocation(
+                pipette_id="pipette-id",
+                labware_id="labware-id",
+                well_name="C6"),
         ),
         await mock_hw_controller.aspirate(mount=Mount.LEFT, volume=25),
     )

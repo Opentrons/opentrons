@@ -51,7 +51,7 @@ async def test_load_labware_assigns_id(
 ) -> None:
     """Loading labware should create a resource ID for the labware."""
     res = await handler.load_labware(
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         load_name="load-name",
         namespace="opentrons-test",
         version=1
@@ -68,7 +68,7 @@ async def test_load_labware_gets_labware_def(
 ) -> None:
     """Loading labware should load the labware's defintion."""
     res = await handler.load_labware(
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         load_name="load-name",
         namespace="opentrons-test",
         version=1
@@ -90,7 +90,7 @@ async def test_load_labware_gets_labware_cal_data(
 ) -> None:
     """Loading labware should load the labware's calibration data."""
     res = await handler.load_labware(
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         load_name="load-name",
         namespace="opentrons-test",
         version=1
@@ -100,7 +100,7 @@ async def test_load_labware_gets_labware_cal_data(
     assert res.calibration == (1, 2, 3)
     mock_resources_with_data.labware_data.get_labware_calibration.assert_called_with(
         definition=minimal_labware_def,
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
     )
 
 

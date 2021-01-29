@@ -58,14 +58,8 @@ class SessionManager:
                   session_type: SessionType,
                   session_meta_data: SessionMetaData,
                   ) -> BaseSession:
-        """Add a new session"""
-        cls = SessionTypeToClass.get(session_type)
-        if not cls:
-            raise SessionCreationException(
-                "Session type is not supported"
-            )
-        session = await cls.create(configuration=self._session_common,
-                                   instance_meta=session_meta_data)
+        """Add a new session."""
+        session = await self._create_session(session_meta_data, session_type)
         if session.meta.identifier in self._sessions:
             raise RobotServerError(
                 definition=CommonErrorDef.RESOURCE_ALREADY_EXISTS,
@@ -135,6 +129,17 @@ class SessionManager:
         if identifier == self._active.active_id:
             self._active.active_id = None
         return self.get_by_id(identifier)
+
+    async def _create_session(self, session_meta_data, session_type):
+        """Create a new session."""
+        cls = SessionTypeToClass.get(session_type)
+        if not cls:
+            raise SessionCreationException(
+                "Session type is not supported"
+            )
+        session = await cls.create(configuration=self._session_common,
+                                   instance_meta=session_meta_data)
+        return session
 
 
 class ActiveSessionId:
