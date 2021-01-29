@@ -52,6 +52,8 @@ export const useSingleEditFieldProps = (): FieldPropsByName | null => {
     return null
   }
 
+  console.log({ dirtyFields, focusedField })
+
   // TODO IMMEDIATELY: explicit names, this omit is a HACK. Must support all stepTypes.
   const fieldNames: Array<string> = Object.keys(formData).filter(
     k => !['id', 'stepType'].includes(k)
@@ -79,6 +81,7 @@ export const useSingleEditFieldProps = (): FieldPropsByName | null => {
     }
 
     const onFieldFocus = () => {
+      setFocusedField(name)
       setDirtyFields([...dirtyFields, name])
     }
 
