@@ -9,7 +9,7 @@ from opentrons.protocols.execution.execute import run_protocol
 from opentrons.protocols.implementations.simulators.protocol_context import \
     SimProtocolContext
 from opentrons.protocols.parse import parse
-from opentrons.protocols.types import PythonProtocol, Protocol
+from opentrons.protocols.types import Protocol
 
 from robot_server.service.legacy.models.control import Mount
 from robot_server.service.protocol import contents, models
@@ -73,9 +73,10 @@ def _analyze(protocol_contents: contents.Contents) -> AnalysisResult:
 
 def _extract_metadata(protocol: typing.Optional[Protocol]) -> models.Meta:
     """Extract protocol metadata"""
-    metadata = protocol.metadata \
-        if isinstance(protocol, PythonProtocol) else {}
-    protocol_name = metadata.get('protocolName')
+    metadata = protocol.metadata if protocol else {}
+    # Two alternatives for protocol name key
+    protocol_name = metadata.get('protocolName',
+                                 metadata.get('protocol-name'))
     author = metadata.get('author')
     return models.Meta(
         name=str(protocol_name) if protocol_name else None,
