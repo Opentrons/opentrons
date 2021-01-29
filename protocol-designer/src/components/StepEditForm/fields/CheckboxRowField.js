@@ -38,7 +38,6 @@ export const CheckboxRowField = (props: CheckboxRowProps): React.Node => {
       <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
       <div className={styles.checkbox_row}>
         <CheckboxField
-          // TODO IMMEDIATELY: update CheckboxField props type to include UseHoverTooltipHoverProps stuff
           labelProps={targetProps}
           label={label}
           disabled={disabled}
