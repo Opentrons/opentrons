@@ -255,6 +255,7 @@ def test_parse_json_details(get_json_protocol_fixture,
     assert isinstance(parsed, JsonProtocol)
     assert parsed.filename == fname
     assert parsed.contents == json.loads(protocol)
+    assert parsed.metadata == parsed.contents['metadata']
     assert parsed.schema_version == int(protocol_details[0])
     # TODO(IL, 2020-10-07): if schema v6 declares its own api_level,
     # then those v6 fixtures will need to be asserted differently
