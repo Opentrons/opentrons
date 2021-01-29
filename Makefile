@@ -181,7 +181,7 @@ lint-py:
 
 .PHONY: lint-js
 lint-js:
-	eslint ".*.js" "**/*.js"
+	eslint ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-json
 lint-json:
@@ -194,6 +194,10 @@ lint-css:
 .PHONY: check-js
 check-js:
 	flow $(if $(CI),check,status)
+
+.PHONY: check-ts
+check-ts:
+	tsc --noEmit
 
 # TODO: Ian 2019-12-17 gradually add components and shared-data
 .PHONY: circular-dependencies-js

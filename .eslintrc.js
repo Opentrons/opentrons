@@ -1,14 +1,14 @@
 'use strict'
 
 module.exports = {
-  parser: 'babel-eslint',
+  root: true,
+
+  parser: '@babel/eslint-parser',
 
   extends: [
     'standard',
     'plugin:react/recommended',
-    'plugin:flowtype/recommended',
     'plugin:prettier/recommended',
-    'prettier/flowtype',
     'prettier/react',
     'prettier/standard',
   ],
@@ -24,6 +24,16 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     'no-extra-boolean-cast': 'off',
     'import/no-default-export': 'error',
+
+    // TODO(mc, 2021-01-29): fix these are remove warning overrides
+    'dot-notation': 'warn',
+    'lines-between-class-members': 'warn',
+    'array-callback-return': 'warn',
+    'no-prototype-builtins': 'warn',
+    'no-import-assign': 'warn',
+    'default-case-last': 'warn',
+    'no-case-declarations': 'warn',
+    'react/prop-types': 'warn',
   },
 
   globals: {},
@@ -36,7 +46,7 @@ module.exports = {
   settings: {
     react: {
       version: '16.8',
-      flowVersion: '0.102',
+      flowVersion: '0.125.1',
     },
   },
 
@@ -44,11 +54,11 @@ module.exports = {
     {
       files: [
         '**/test/**.js',
-        '**/__tests__/**.js',
-        '**/__mocks__/**.js',
-        '**/__utils__/**.js',
-        '**/__fixtures__/**.js',
-        'scripts/*.js',
+        '**/__tests__/**.@(js|ts|tsx)',
+        '**/__mocks__/**.@(js|ts|tsx)',
+        '**/__utils__/**.@(js|ts|tsx)',
+        '**/__fixtures__/**.@(js|ts|tsx)',
+        'scripts/*.@(js|ts|tsx)',
       ],
       env: {
         jest: true,
@@ -59,11 +69,45 @@ module.exports = {
         'jest/no-standalone-expect': 'off',
         'jest/no-disabled-tests': 'error',
         'jest/consistent-test-it': 'error',
+
+        // TODO(mc, 2021-01-29): fix these are remove warning overrides
+        'jest/no-deprecated-functions': 'warn',
+        'jest/valid-title': 'warn',
+        'jest/no-conditional-expect': 'warn',
+        'jest/no-done-callback': 'warn',
       },
     },
     {
       files: ['**/cypress/**'],
       extends: ['plugin:cypress/recommended'],
+    },
+    {
+      files: ['**/*.js'],
+      parser: '@babel/eslint-parser',
+      extends: ['plugin:flowtype/recommended', 'prettier/flowtype'],
+    },
+    {
+      files: ['**/*.@(ts|tsx)'],
+      extends: [
+        'plugin:@typescript-eslint/recommended',
+        'prettier/@typescript-eslint',
+      ],
+      rules: {
+        '@typescript-eslint/no-use-before-define': [
+          'error',
+          { functions: false, classes: true },
+        ],
+        '@typescript-eslint/explicit-function-return-type': [
+          'error',
+          { allowExpressions: true, allowTypedFunctionExpressions: true },
+        ],
+        // 'no-useless-constructor': 'off',
+        // '@typescript-eslint/no-useless-constructor': 'error',
+        '@typescript-eslint/no-empty-function': 'off',
+      },
+      globals: {
+        NodeJS: true,
+      },
     },
   ],
 }

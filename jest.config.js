@@ -12,7 +12,7 @@ module.exports = {
     '\\.(css)$': 'identity-obj-proxy',
   },
   transform: {
-    '^.+\\.js$': 'babel-jest',
+    '^.+\\.(js|ts|tsx)$': 'babel-jest',
     '\\.(jpg|png|gif|svg|woff|woff2|webm)$':
       '@opentrons/components/src/__mocks__/file.js',
   },
