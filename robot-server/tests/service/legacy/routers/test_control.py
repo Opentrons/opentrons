@@ -1,5 +1,5 @@
 from asyncio import Event
-from unittest.mock import call, MagicMock
+from mock import call, MagicMock
 
 import pytest
 from opentrons.hardware_control.types import Axis, CriticalPoint

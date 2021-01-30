@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, call
+from mock import MagicMock, call
 from typing import List, Tuple
 from opentrons.calibration_storage import types as cal_types
 from opentrons.types import Mount, Point

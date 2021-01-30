@@ -1,6 +1,6 @@
 import os
 import pytest
-from unittest.mock import ANY, patch, call
+from mock import ANY, patch, call
 from typing import List, Tuple, Dict, Any
 from opentrons import config
 from opentrons.types import Mount, Point

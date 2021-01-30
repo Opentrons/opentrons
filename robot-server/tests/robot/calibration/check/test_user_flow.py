@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from unittest.mock import call, MagicMock, patch
+from mock import call, MagicMock, patch
 
 import pytest
 from opentrons.hardware_control import pipette

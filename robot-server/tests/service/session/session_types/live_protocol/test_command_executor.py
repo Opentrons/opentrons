@@ -1,5 +1,5 @@
 from datetime import datetime
-from unittest.mock import MagicMock
+from mock import MagicMock
 from mock import AsyncMock
 import pytest
 from opentrons.protocol_engine import ProtocolEngine

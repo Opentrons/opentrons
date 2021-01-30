@@ -1,7 +1,7 @@
 import datetime
 import os
 import pytest
-from unittest.mock import MagicMock, call, patch
+from mock import MagicMock, call, patch
 from typing import List, Tuple, Dict, Any
 from opentrons import config
 from opentrons.calibration_storage import helpers, types as CSTypes

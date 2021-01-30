@@ -389,8 +389,6 @@ def test_post_serial_update(api_client, hardware, tempdeck):
     tempdeck._bundled_fw = BundledFirmware("1234", Path("c:/aaa"))
 
     with patch("opentrons.hardware_control.modules.update_firmware") as p:
-        # p.side_effect = update
-
         resp = api_client.post('/modules/dummySerialTD/update')
 
         p.assert_called_once_with(tempdeck,
