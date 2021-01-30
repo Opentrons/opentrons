@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch, PropertyMock
+from mock import MagicMock, patch, PropertyMock, AsyncMock
 from datetime import datetime
 import pytest
 
@@ -18,16 +18,7 @@ from robot_server.service.session.session_types.protocol.models import \
 
 @pytest.fixture()
 def mock_worker():
-    async def async_mock():
-        pass
-
-    m = MagicMock(spec=_Worker)
-    m.handle_run.side_effect = async_mock
-    m.handle_simulate.side_effect = async_mock
-    m.handle_cancel.side_effect = async_mock
-    m.handle_pause.side_effect = async_mock
-    m.handle_resume.side_effect = async_mock
-    m.close.side_effect = async_mock
+    m = AsyncMock(spec=_Worker)
     return m
 
 

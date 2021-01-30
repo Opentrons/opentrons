@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from unittest.mock import MagicMock, patch
+from mock import MagicMock, patch
 
 from robot_server.service.protocol import errors
 from robot_server.service.protocol.contents import Contents

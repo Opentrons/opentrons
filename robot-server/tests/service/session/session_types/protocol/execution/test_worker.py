@@ -1,6 +1,6 @@
 import asyncio
 import typing
-from unittest.mock import MagicMock
+from mock import MagicMock
 import pytest
 
 from robot_server.service.session.session_types.protocol \
@@ -14,16 +14,16 @@ class DelegatingWorkerListener(WorkerListener):
         self._delegate = delegate
 
     async def on_directive(self, directive: 'WorkerDirective'):
-        self._delegate.on_directive(directive)
+        await self._delegate.on_directive(directive)
 
     async def on_ready(self):
-        self._delegate.on_ready()
+        await self._delegate.on_ready()
 
     async def on_error(self, err):
-        self._delegate.on_error()
+        await self._delegate.on_error()
 
     async def on_protocol_event(self, cmd: typing.Any):
-        self._delegate.on_protocol_event(cmd)
+        await self._delegate.on_protocol_event(cmd)
 
 
 @pytest.fixture

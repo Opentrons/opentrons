@@ -1,6 +1,6 @@
 import os
 import sys
-from unittest.mock import patch, MagicMock, PropertyMock
+from mock import patch, MagicMock, PropertyMock
 
 import pytest
 
