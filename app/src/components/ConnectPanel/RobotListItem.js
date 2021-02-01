@@ -51,13 +51,22 @@ export function RobotListItem(props: RobotListItemProps): React.Node {
         )}
       </RobotLink>
       {isConnectable && isSelected && (
-        <RobotLink
-          url={`/robots/${name}/instruments`}
-          className={styles.instrument_item}
-        >
-          <p className={styles.link_text}>{t('pipettes_and_modules')}</p>
-          <Icon name="chevron-right" className={styles.robot_item_icon} />
-        </RobotLink>
+        <>
+          <RobotLink
+            url={`/robots/${name}/instruments`}
+            className={styles.instrument_item}
+          >
+            <p className={styles.link_text}>{t('pipettes')}</p>
+            <Icon name="chevron-right" className={styles.robot_item_icon} />
+          </RobotLink>
+          <RobotLink
+            url={`/robots/${name}/modules`}
+            className={styles.instrument_item}
+          >
+            <p className={styles.link_text}>{t('modules')}</p>
+            <Icon name="chevron-right" className={styles.robot_item_icon} />
+          </RobotLink>
+        </>
       )}
     </li>
   )
