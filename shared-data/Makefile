@@ -24,6 +24,8 @@ setup-py:
 	$(MAKE) -C python setup-py
 
 
+
+
 .PHONY: setup
 setup: setup-py setup-js
 
@@ -48,7 +50,9 @@ clean-py:
 clean: clean-py
 	shx rm -rf $(BUILD_DIR)
 
-
+.PHONY: teardown-py
+teardown-py:
+	$(MAKE) -C python teardown
 
 .PHONY: lint-py
 lint-py:
