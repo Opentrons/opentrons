@@ -17,17 +17,21 @@ import {
   RadioGroupField,
   StepFormDropdown,
 } from '../fields'
-import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
-import { FieldConnector } from '../fields/FieldConnector'
 import styles from '../StepEditForm.css'
 
+import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
+
 import type { FocusHandlers } from '../types'
+
+const PauseUntilTempTooltip = () => (
+  <div>
+    {i18n.t(`tooltip.step_fields.pauseAction.disabled.wait_until_temp`)}
+  </div>
+)
 
 type PauseFormProps = {| focusHandlers: FocusHandlers |}
 
 export const PauseForm = (props: PauseFormProps): React.Node => {
-  const { focusHandlers } = props
-
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )
@@ -36,22 +40,8 @@ export const PauseForm = (props: PauseFormProps): React.Node => {
     uiModuleSelectors.getTempModuleIsOnDeck
   )
 
-  const pauseUntilTempTooltip = (
-    <div>
-      {i18n.t(`tooltip.step_fields.pauseAction.disabled.wait_until_temp`)}
-    </div>
-  )
-
-  // TODO IMMEDIATELY deprecate focusHandlers
-  // time fields blur together
-  const blurAllTimeUnitFields = () => {
-    ;['pauseHour', 'pauseMinute', 'pauseSecond'].forEach(timeUnitFieldName =>
-      props.focusHandlers.onFieldBlur(timeUnitFieldName)
-    )
-  }
-
-  const propsForFields = useSingleEditFieldProps()
-  if (propsForFields === null) return null
+  const propsForFields = useSingleEditFieldProps(props.focusHandlers)
+  if (propsForFields == null) return null
 
   return (
     <div className={styles.form_wrapper}>
@@ -96,19 +86,16 @@ export const PauseForm = (props: PauseFormProps): React.Node => {
             <div className={styles.form_row}>
               <TextField
                 {...propsForFields['pauseHour']}
-                onFieldBlur={blurAllTimeUnitFields}
                 className={styles.small_field}
                 units={i18n.t('application.units.hours')}
               />
               <TextField
                 {...propsForFields['pauseMinute']}
-                onFieldBlur={blurAllTimeUnitFields}
                 className={styles.small_field}
                 units={i18n.t('application.units.minutes')}
               />
               <TextField
                 {...propsForFields['pauseSecond']}
-                onFieldBlur={blurAllTimeUnitFields}
                 className={styles.small_field}
                 units={i18n.t('application.units.seconds')}
               />
@@ -118,7 +105,7 @@ export const PauseForm = (props: PauseFormProps): React.Node => {
           <HoverTooltip
             placement="bottom"
             tooltipComponent={
-              pauseUntilTempEnabled ? null : pauseUntilTempTooltip
+              pauseUntilTempEnabled ? null : <PauseUntilTempTooltip />
             }
           >
             {hoverTooltipHandlers => (
@@ -174,25 +161,20 @@ export const PauseForm = (props: PauseFormProps): React.Node => {
         <div className={styles.section_column}>
           <div className={styles.form_row}>
             {/* TODO: Ian 2019-03-25 consider making this a component eg `TextAreaField.js` if used anywhere else */}
-            <FieldConnector
-              dirtyFields={focusHandlers.dirtyFields}
-              focusedField={focusHandlers.focusedField}
-              name="pauseMessage"
-              render={({ value, updateValue }) => (
-                <FormGroup
-                  className={styles.full_width_field}
-                  label={i18n.t('form.step_edit_form.field.pauseMessage.label')}
-                >
-                  <textarea
-                    className={styles.textarea_field}
-                    value={value}
-                    onChange={(e: SyntheticInputEvent<*>) =>
-                      updateValue(e.currentTarget.value)
-                    }
-                  />
-                </FormGroup>
-              )}
-            />
+            <FormGroup
+              className={styles.full_width_field}
+              label={i18n.t('form.step_edit_form.field.pauseMessage.label')}
+            >
+              <textarea
+                className={styles.textarea_field}
+                value={propsForFields['pauseMessage'].value}
+                onChange={(e: SyntheticInputEvent<*>) =>
+                  propsForFields['pauseMessage'].updateValue(
+                    e.currentTarget.value
+                  )
+                }
+              />
+            </FormGroup>
           </div>
         </div>
       </div>

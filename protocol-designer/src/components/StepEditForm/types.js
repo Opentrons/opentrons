@@ -5,6 +5,7 @@ import type { StepFieldName } from '../../form-types'
 export type FocusHandlers = {|
   focusedField: StepFieldName,
   dirtyFields: Array<StepFieldName>,
-  onFieldFocus: StepFieldName => void,
-  onFieldBlur: StepFieldName => void,
+  // NOTE: focus & blur take a field name as an arg, unlike onFieldBlur/onFieldFocus
+  focus: StepFieldName => void,
+  blur: StepFieldName => void,
 |}

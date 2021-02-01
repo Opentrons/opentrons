@@ -24,7 +24,7 @@ type TCFormProps = {| focusHandlers: FocusHandlers, formData: FormData |}
 export const ThermocyclerForm = (props: TCFormProps): React.Node => {
   const { focusHandlers } = props
 
-  const propsForFields = useSingleEditFieldProps()
+  const propsForFields = useSingleEditFieldProps(focusHandlers)
   if (propsForFields === null) return null
 
   return (

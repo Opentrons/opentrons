@@ -36,7 +36,7 @@ export const MoveLiquidForm = (props: Props): React.Node => {
   const { focusHandlers, stepType } = props
   const { path } = props.formData
 
-  const propsForFields = useSingleEditFieldProps()
+  const propsForFields = useSingleEditFieldProps(props.focusHandlers)
   if (propsForFields === null) return null
 
   return (

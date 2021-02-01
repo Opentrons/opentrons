@@ -20,14 +20,16 @@ import {
 import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import { AspDispSection } from './AspDispSection'
 
+import type { FocusHandlers } from '../types'
+
 import styles from '../StepEditForm.css'
 
-type Props = {||}
+export type MixFormProps = {| focusHandlers: FocusHandlers |}
 
-export const MixForm = (props: Props): React.Node => {
+export const MixForm = (props: MixFormProps): React.Node => {
   const [collapsed, setCollapsed] = React.useState(true)
 
-  const propsForFields = useSingleEditFieldProps()
+  const propsForFields = useSingleEditFieldProps(props.focusHandlers)
   if (propsForFields === null) return null
 
   const toggleCollapsed = (): void =>

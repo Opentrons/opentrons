@@ -541,6 +541,7 @@ export const getFormLevelErrorsForUnsavedForm: Selector<StepFormErrors> = create
   hydratedForm => {
     if (!hydratedForm) return []
     const errors = _formLevelErrors(hydratedForm)
+    console.log('getFormLevelErrorsForUnsavedForm', errors)
     return errors
   }
 )

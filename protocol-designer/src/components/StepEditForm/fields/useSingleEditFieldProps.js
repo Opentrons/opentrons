@@ -6,8 +6,12 @@ import { getTooltipForField } from '../utils'
 import { actions } from '../../../steplist'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getFieldErrors, maskField } from '../../../steplist/fieldLevel'
-import { getDisabledFields } from '../../../steplist/formLevel'
+import {
+  getDisabledFields,
+  getDefaultsForStepType,
+} from '../../../steplist/formLevel'
 import type { StepFieldName } from '../../../form-types'
+import type { FocusHandlers } from '../types'
 
 export type FieldProps = {|
   disabled: boolean,
@@ -25,11 +29,11 @@ export type FieldPropsByName = {
   ...,
 }
 
-type ShowFieldErrorParams = {
+type ShowFieldErrorParams = {|
   name: StepFieldName,
   focusedField?: StepFieldName,
   dirtyFields?: Array<StepFieldName>,
-}
+|}
 export const showFieldErrors = ({
   name,
   focusedField,
@@ -37,9 +41,10 @@ export const showFieldErrors = ({
 }: ShowFieldErrorParams): boolean | void | Array<StepFieldName> =>
   !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
 
-export const useSingleEditFieldProps = (): FieldPropsByName | null => {
-  const [dirtyFields, setDirtyFields] = React.useState<Array<StepFieldName>>([])
-  const [focusedField, setFocusedField] = React.useState<StepFieldName>(null)
+export const useSingleEditFieldProps = (
+  focusHandlers: FocusHandlers
+): FieldPropsByName | null => {
+  const { dirtyFields, blur, focusedField, focus } = focusHandlers
 
   const dispatch = useDispatch()
   const formData = useSelector(stepFormSelectors.getUnsavedForm)
@@ -52,11 +57,8 @@ export const useSingleEditFieldProps = (): FieldPropsByName | null => {
     return null
   }
 
-  console.log({ dirtyFields, focusedField })
-
-  // TODO IMMEDIATELY: explicit names, this omit is a HACK. Must support all stepTypes.
-  const fieldNames: Array<string> = Object.keys(formData).filter(
-    k => !['id', 'stepType'].includes(k)
+  const fieldNames: Array<string> = Object.keys(
+    getDefaultsForStepType(formData.stepType)
   )
 
   return fieldNames.reduce<FieldPropsByName>((acc, name) => {
@@ -77,12 +79,11 @@ export const useSingleEditFieldProps = (): FieldPropsByName | null => {
     const tooltipContent = getTooltipForField(stepType, name, disabled)
 
     const onFieldBlur = () => {
-      setFocusedField(null)
+      blur(name)
     }
 
     const onFieldFocus = () => {
-      setFocusedField(name)
-      setDirtyFields([...dirtyFields, name])
+      focus(name)
     }
 
     const fieldProps: FieldProps = {

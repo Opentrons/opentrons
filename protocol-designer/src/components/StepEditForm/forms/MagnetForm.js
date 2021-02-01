@@ -12,8 +12,12 @@ import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import styles from '../StepEditForm.css'
 
 import type { FormData } from '../../../form-types'
+import type { FocusHandlers } from '../types'
 
-type MagnetFormProps = {| formData: FormData |}
+export type MagnetFormProps = {|
+  formData: FormData,
+  focusHandlers: FocusHandlers,
+|}
 
 export const MagnetForm = (props: MagnetFormProps): React.Node => {
   const moduleLabwareOptions = useSelector(
@@ -33,7 +37,7 @@ export const MagnetForm = (props: MagnetFormProps): React.Node => {
     ? `Recommended: ${String(maskField('engageHeight', defaultEngageHeight))}`
     : null
 
-  const propsForFields = useSingleEditFieldProps()
+  const propsForFields = useSingleEditFieldProps(props.focusHandlers)
   if (propsForFields === null) return null
 
   return (

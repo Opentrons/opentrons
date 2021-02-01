@@ -55,8 +55,8 @@ type Props = {|
   handleSave: () => mixed,
   showMoreOptionsModal: boolean,
   focusedField: string | null,
-  onFieldBlur: StepFieldName => mixed,
-  onFieldFocus: StepFieldName => mixed,
+  blur: StepFieldName => mixed,
+  focus: StepFieldName => mixed,
   toggleMoreOptionsModal: () => mixed,
   dirtyFields: Array<string>,
 |}
@@ -72,8 +72,8 @@ export const StepEditFormComponent = (props: Props): React.Node => {
     showMoreOptionsModal,
     toggleMoreOptionsModal,
     focusedField,
-    onFieldFocus,
-    onFieldBlur,
+    focus,
+    blur,
   } = props
 
   const FormComponent: $Values<typeof STEP_FORM_MAP> = get(
@@ -98,12 +98,11 @@ export const StepEditFormComponent = (props: Props): React.Node => {
         <FormComponent
           stepType={formData.stepType} // TODO: Ian 2019-01-17 deprecate passing this during #2916, it's in formData
           formData={formData}
-          // TODO IMMEDIATELY: deprecate use of focusHandlers
           focusHandlers={{
             focusedField,
             dirtyFields,
-            onFieldFocus,
-            onFieldBlur,
+            focus,
+            blur,
           }}
         />
         <ButtonRow
@@ -180,11 +179,12 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     setShowMoreOptionsModal(!showMoreOptionsModal)
   }
 
-  const onFieldFocus = (fieldName: StepFieldName) => {
+  // TODO IMMEDIATELY: this is just renaming, maybe actually rename focus instead?
+  const focus = (fieldName: StepFieldName) => {
     setFocusedField(fieldName)
   }
 
-  const onFieldBlur = (fieldName: StepFieldName) => {
+  const blur = (fieldName: StepFieldName) => {
     if (fieldName === focusedField) {
       setFocusedField(null)
     }
@@ -270,8 +270,8 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
             ? confirmAddPauseUntilTempStep
             : saveStepForm,
           focusedField,
-          onFieldBlur,
-          onFieldFocus,
+          blur,
+          focus,
           showMoreOptionsModal,
           toggleMoreOptionsModal,
         }}

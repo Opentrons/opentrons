@@ -2,15 +2,17 @@
 import React from 'react'
 import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
-import { MixForm } from '../MixForm'
+import { MixForm, type MixFormProps } from '../MixForm'
 import { AspDispSection } from '../AspDispSection'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
+import * as stepFormSelectors from '../../../../step-forms/selectors'
 import type { BaseState } from '../../../../types'
+
+const { DelayFields } = jest.requireActual('../../fields')
+
+jest.mock('../../../../step-forms/selectors')
 
 const getUnsavedFormMock: JestMockFn<[BaseState], any> =
   stepFormSelectors.getUnsavedForm
-
-const { DelayFields } = jest.requireActual('../../fields')
 
 jest.mock('../../fields/', () => {
   const actualFields = jest.requireActual('../../fields')
@@ -39,8 +41,10 @@ const mockStore = {
 }
 
 describe('MixForm', () => {
-  const render = props =>
-    mount(<MixForm {...props} />, {
+  let props: MixFormProps
+
+  const render = _props =>
+    mount(<MixForm {..._props} />, {
       wrappingComponent: Provider,
       wrappingComponentProps: { store: mockStore },
     })
@@ -56,9 +60,23 @@ describe('MixForm', () => {
     getUnsavedFormMock.mockReturnValue({
       stepType: 'mix',
     })
+
+    props = {
+      focusHandlers: {
+        blur: jest.fn(),
+        focus: jest.fn(),
+        dirtyFields: [],
+        focusedField: null,
+      },
+    }
   })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   it('should NOT render delay fields initially', () => {
-    const wrapper = render()
+    const wrapper = render(props)
 
     const delayFields = wrapper.find(DelayFields)
     expect(delayFields).toHaveLength(0)
@@ -66,7 +84,7 @@ describe('MixForm', () => {
 
   describe('when advanced settings are visible', () => {
     it('should render the aspirate delay fields when advanced settings are visible', () => {
-      const wrapper = render()
+      const wrapper = render(props)
 
       showAdvancedSettings(wrapper)
       wrapper.update()
@@ -84,7 +102,7 @@ describe('MixForm', () => {
       expect(aspirateDelayFields.prop('tipPositionFieldName')).toBe(undefined)
     })
     it('should render the dispense delay fields', () => {
-      const wrapper = render()
+      const wrapper = render(props)
       showAdvancedSettings(wrapper)
       const delayFields = wrapper.find(DelayFields)
       const aspirateDelayFields = delayFields.at(1)
