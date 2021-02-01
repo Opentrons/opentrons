@@ -1,6 +1,12 @@
 // @flow
+import { getOrderedStepIds } from '../../step-forms/selectors'
+import type { GetState, ThunkAction, ThunkDispatch } from '../../types'
 import type { StepIdType, FormData } from '../../form-types'
 import type { ChangeFormPayload } from './types'
+import type {
+  ClearSelectedItemAction,
+  SelectMultipleStepsAction,
+} from '../../ui/steps'
 
 export type ChangeSavedStepFormAction = {|
   type: 'CHANGE_SAVED_STEP_FORM',
@@ -35,6 +41,51 @@ export const deleteStep = (stepId: StepIdType): DeleteStepAction => ({
   type: 'DELETE_STEP',
   payload: stepId,
 })
+
+export type DeleteMultipleStepsAction = {|
+  type: 'DELETE_MULTIPLE_STEPS',
+  payload: Array<StepIdType>,
+|}
+
+// delete the steps, then update the selection
+export const deleteMultipleSteps = (
+  stepIds: Array<StepIdType>
+): ThunkAction<*> => (dispatch: ThunkDispatch<*>, getState: GetState) => {
+  const orderedStepIds = getOrderedStepIds(getState())
+  const deleteMultipleStepsAction: DeleteMultipleStepsAction = {
+    type: 'DELETE_MULTIPLE_STEPS',
+    payload: stepIds,
+  }
+  dispatch(deleteMultipleStepsAction)
+  if (stepIds.length === orderedStepIds.length) {
+    // if we are deleting all the steps we need to clear out the selected item
+    const clearSelectedItemAction: ClearSelectedItemAction = {
+      type: 'CLEAR_SELECTED_ITEM',
+    }
+    dispatch(clearSelectedItemAction)
+  } else {
+    // select the next non terminal item in multi select mode
+    let highestDeletedIndex = stepIds.reduce((highestIndex, val) => {
+      const currentStepIndex = orderedStepIds.indexOf(val)
+      return Math.max(currentStepIndex, highestIndex)
+    }, 0)
+    // const nextStepId = orderedStepIds[highestDeletedIndex + 1]
+    let nextStepId = orderedStepIds[highestDeletedIndex + 1]
+    while (!nextStepId) {
+      highestDeletedIndex -= 1
+      const potentialNextStepId = orderedStepIds[highestDeletedIndex]
+      if (stepIds.includes(potentialNextStepId)) {
+        continue
+      }
+      nextStepId = potentialNextStepId
+    }
+    const selectMultipleStepsAction: SelectMultipleStepsAction = {
+      type: 'SELECT_MULTIPLE_STEPS',
+      payload: { stepIds: [nextStepId], lastSelected: nextStepId },
+    }
+    dispatch(selectMultipleStepsAction)
+  }
+}
 
 export type CancelStepFormAction = {| type: 'CANCEL_STEP_FORM', payload: null |}
 export const cancelStepForm = (): CancelStepFormAction => ({

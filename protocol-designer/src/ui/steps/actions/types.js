@@ -51,6 +51,10 @@ export type ReorderSelectedStepAction = {|
   |},
 |}
 
+export type ClearSelectedItemAction = {|
+  type: 'CLEAR_SELECTED_ITEM',
+|}
+
 export type SelectTerminalItemAction = {|
   type: 'SELECT_TERMINAL_ITEM',
   payload: TerminalItemId,

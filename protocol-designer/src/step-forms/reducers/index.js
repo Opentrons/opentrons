@@ -75,6 +75,7 @@ import type {
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
   DeleteStepAction,
+  DeleteMultipleStepsAction,
   PopulateFormAction,
   ReorderStepsAction,
   AddProfileCycleAction,
@@ -119,6 +120,7 @@ type UnsavedFormActions =
   | CancelStepFormAction
   | SaveStepFormAction
   | DeleteStepAction
+  | DeleteMultipleStepsAction
   | CreateModuleAction
   | DeleteModuleAction
   | SelectTerminalItemAction
@@ -187,6 +189,7 @@ export const unsavedForm = (
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
     case 'DELETE_STEP':
+    case 'DELETE_MULTIPLE_STEPS':
     case 'EDIT_MODULE':
     case 'SAVE_STEP_FORM':
     case 'SELECT_TERMINAL_ITEM':
@@ -460,6 +463,7 @@ export const initialSavedStepFormsState: SavedStepFormState = {
 type SavedStepFormsActions =
   | SaveStepFormAction
   | DeleteStepAction
+  | DeleteMultipleStepsAction
   | LoadFileAction
   | CreateContainerAction
   | DeleteContainerAction
@@ -553,6 +557,9 @@ export const savedStepForms = (
       }
     }
     case 'DELETE_STEP': {
+      return omit(savedStepForms, action.payload)
+    }
+    case 'DELETE_MULTIPLE_STEPS': {
       return omit(savedStepForms, action.payload)
     }
     case 'LOAD_FILE': {
@@ -1185,6 +1192,10 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
     },
     DELETE_STEP: (state: OrderedStepIdsState, action: DeleteStepAction) =>
       state.filter(stepId => stepId !== action.payload),
+    DELETE_MULTIPLE_STEPS: (
+      state: OrderedStepIdsState,
+      action: DeleteMultipleStepsAction
+    ) => state.filter(id => !action.payload.includes(id)),
     LOAD_FILE: (
       state: OrderedStepIdsState,
       action: LoadFileAction
@@ -1235,6 +1246,7 @@ type PresavedStepFormAction =
   | AddStepAction
   | CancelStepFormAction
   | DeleteStepAction
+  | DeleteMultipleStepsAction
   | SaveStepFormAction
   | SelectTerminalItemAction
   | SelectStepAction
@@ -1249,6 +1261,7 @@ export const presavedStepForm = (
       return action.payload === PRESAVED_STEP_ID ? state : null
     case 'CANCEL_STEP_FORM':
     case 'DELETE_STEP':
+    case 'DELETE_MULTIPLE_STEPS':
     case 'SAVE_STEP_FORM':
     case 'SELECT_STEP':
       return null

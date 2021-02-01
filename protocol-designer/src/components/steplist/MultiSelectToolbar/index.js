@@ -19,6 +19,7 @@ import {
   actions as stepActions,
 } from '../../../ui/steps'
 import { getBatchEditFormHasUnsavedChanges } from '../../../step-forms/selectors'
+import { deleteMultipleSteps } from '../../../steplist/actions'
 import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   ConfirmDeleteModal,
@@ -87,6 +88,8 @@ export const MultiSelectToolbar = (): React.Node => {
     tooltipText: 'Delete',
     width: '1.5rem',
     alignRight: true,
+    onClick: () =>
+      selectedStepIds && dispatch(deleteMultipleSteps(selectedStepIds)),
   }
 
   const copyProps = {

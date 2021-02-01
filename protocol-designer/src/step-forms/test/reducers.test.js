@@ -95,6 +95,21 @@ describe('orderedStepIds reducer', () => {
     expect(orderedStepIds(state, action)).toBe(state)
   })
 
+  it('should remove a saved step when the step is deleted', () => {
+    const state = ['1', '2', '3']
+    const action = {
+      type: 'DELETE_STEP',
+      payload: '2',
+    }
+    expect(orderedStepIds(state, action)).toEqual(['1', '3'])
+  })
+
+  it('should remove multiple saved steps when multiple steps are deleted', () => {
+    const state = ['1', '2', '3']
+    const action = { type: 'DELETE_MULTIPLE_STEPS', payload: ['1', '3'] }
+    expect(orderedStepIds(state, action)).toEqual(['2'])
+  })
+
   describe('reorder steps', () => {
     const state = ['1', '2', '3', '4']
     const testCases = [
@@ -1005,6 +1020,39 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       })
     })
   })
+  describe('deleting steps', () => {
+    let savedStepFormsState
+    beforeEach(() => {
+      savedStepFormsState = {
+        [INITIAL_DECK_SETUP_STEP_ID]: makeDeckSetupStep({
+          moduleLocationUpdate: {
+            [moduleId]: '1',
+            [otherModuleId]: '2',
+          },
+        }),
+        id1: { id: 'id1' },
+        id2: { id: 'id2' },
+        id3: { id: 'id3' },
+      }
+    })
+    it('should delete one step', () => {
+      const action = { type: 'DELETE_STEP', payload: 'id1' }
+      const expectedState = { ...savedStepFormsState }
+      delete expectedState.id1
+      expect(
+        savedStepForms({ savedStepForms: savedStepFormsState }, action)
+      ).toEqual(expectedState)
+    })
+    it('should delete multiple steps', () => {
+      const action = { type: 'DELETE_MULTIPLE_STEPS', payload: ['id1', 'id2'] }
+      const expectedState = { ...savedStepFormsState }
+      delete expectedState.id1
+      delete expectedState.id2
+      expect(
+        savedStepForms({ savedStepForms: savedStepFormsState }, action)
+      ).toEqual(expectedState)
+    })
+  })
 
   describe('EDIT_MODULE', () => {
     it('should set engageHeight to null for all Magnet > Engage steps when a magnet module has its model changed, unless height matches default', () => {
@@ -1085,7 +1133,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
 })
 
 describe('unsavedForm reducer', () => {
-  const someState: any = { something: 'foo' }
+  const someState: any = { unsavedForm: 'foo' }
 
   it('should take on the payload of the POPULATE_FORM action', () => {
     const payload = { formStuff: 'example' }
@@ -1169,6 +1217,7 @@ describe('unsavedForm reducer', () => {
     'CREATE_MODULE',
     'DELETE_MODULE',
     'DELETE_STEP',
+    'DELETE_MULTIPLE_STEPS',
     'EDIT_MODULE',
     'SAVE_STEP_FORM',
     'SELECT_TERMINAL_ITEM',
@@ -1555,6 +1604,7 @@ describe('presavedStepForm reducer', () => {
   const clearingActions = [
     'CANCEL_STEP_FORM',
     'DELETE_STEP',
+    'DELETE_MULTIPLE_STEPS',
     'SAVE_STEP_FORM',
     'SELECT_STEP',
   ]

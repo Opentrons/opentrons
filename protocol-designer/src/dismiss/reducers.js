@@ -12,6 +12,7 @@ import type { LoadFileAction } from '../load-file'
 import type {
   CancelStepFormAction,
   DeleteStepAction,
+  DeleteMultipleStepsAction,
 } from '../steplist/actions'
 import type { StepIdType } from '../form-types'
 
@@ -66,6 +67,16 @@ const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
       return {
         form: omit(state.form, stepId),
         timeline: omit(state.timeline, stepId),
+      }
+    },
+    DELETE_MULTIPLE_STEPS: (
+      state: DismissedWarningState,
+      action: DeleteMultipleStepsAction
+    ): DismissedWarningState => {
+      const stepIds = action.payload
+      return {
+        form: omit(state.form, stepIds),
+        timeline: omit(state.timeline, stepIds),
       }
     },
     LOAD_FILE: (

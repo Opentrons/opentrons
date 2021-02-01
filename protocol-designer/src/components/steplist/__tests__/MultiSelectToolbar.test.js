@@ -10,6 +10,7 @@ import { act } from 'react-dom/test-utils'
 import { actions as stepActions } from '../../../ui/steps'
 import * as stepFormSelectors from '../../../step-forms/selectors'
 import * as stepSelectors from '../../../ui/steps/selectors'
+import * as stepListActions from '../../../steplist/actions/actions'
 
 import { MultiSelectToolbar, ClickableIcon } from '../MultiSelectToolbar'
 
@@ -136,6 +137,30 @@ describe('MultiSelectToolbar', () => {
       const expandIconUpdated = wrapper.find(ClickableIcon).at(3)
       expect(expandIconUpdated.prop('iconName')).toBe('unfold-less-horizontal')
       expect(expandIconUpdated.prop('tooltipText')).toBe('Collapse')
+    })
+  })
+  describe('when clicking on delete', () => {
+    it('should delete all of the steps selected', () => {
+      when(getOrderedStepIdsMock)
+        .calledWith(expect.anything())
+        .mockReturnValue(['id_1', 'id_2'])
+
+      when(getMultiSelectItemIdsMock)
+        .calledWith(expect.anything())
+        .mockReturnValue(['id_1'])
+
+      const deleteMultipleStepsSpy = jest.spyOn(
+        stepListActions,
+        'deleteMultipleSteps'
+      )
+
+      const wrapper = render()
+
+      const deleteIcon = wrapper.find(ClickableIcon).at(1)
+      act(() => {
+        deleteIcon.prop('onClick')()
+      })
+      expect(deleteMultipleStepsSpy).toHaveBeenCalledWith(['id_1'])
     })
   })
 })

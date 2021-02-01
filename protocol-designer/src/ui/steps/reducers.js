@@ -13,7 +13,10 @@ import type { Action } from '../../types'
 import type { LoadFileAction } from '../../load-file'
 import type { StepIdType } from '../../form-types'
 import type { SaveStepFormAction } from '../steps/actions/thunks'
-import type { DeleteStepAction } from '../../steplist/actions'
+import type {
+  DeleteStepAction,
+  DeleteMultipleStepsAction,
+} from '../../steplist/actions'
 import type {
   AddStepAction,
   HoverOnStepAction,
@@ -43,6 +46,10 @@ const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions(
     },
     DELETE_STEP: (state: CollapsedStepsState, action: DeleteStepAction) =>
       omit(state, action.payload.toString()),
+    DELETE_MULTIPLE_STEPS: (
+      state: CollapsedStepsState,
+      action: DeleteMultipleStepsAction
+    ) => omit(state, action.payload),
     TOGGLE_STEP_COLLAPSED: (
       state: CollapsedStepsState,
       { payload }: ToggleStepCollapsedAction
@@ -131,6 +138,7 @@ const selectedItem: Reducer<SelectedItemState, *> = handleActions(
       action: SelectTerminalItemAction
     ) => terminalItemIdHelper(action.payload),
     DELETE_STEP: () => null,
+    CLEAR_SELECTED_ITEM: () => null,
     SELECT_MULTIPLE_STEPS: (
       state: SelectedItemState,
       action: SelectMultipleStepsAction
