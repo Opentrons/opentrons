@@ -1,5 +1,6 @@
 // @flow
 import assert from 'assert'
+import last from 'lodash/last'
 import {
   getUnsavedForm,
   getUnsavedFormIsPristineSetTempForm,
@@ -19,10 +20,14 @@ import {
 
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import * as fileDataSelectors from '../../../../file-data/selectors'
-import type { DuplicateStepAction } from '../types'
 
 import type { StepType, StepIdType, FormData } from '../../../../form-types'
 import type { ThunkAction } from '../../../../types'
+import type {
+  DuplicateStepAction,
+  DuplicateMultipleStepsAction,
+  SelectMultipleStepsAction,
+} from '../types'
 
 export const addAndSelectStepWithHints: ({
   stepType: StepType,
@@ -100,6 +105,34 @@ export const duplicateStep: (
       payload: { stepId, duplicateStepId },
     })
   }
+}
+
+export const duplicateMultipleSteps: (
+  stepIds: Array<StepIdType>
+) => ThunkAction<
+  DuplicateMultipleStepsAction | SelectMultipleStepsAction
+> = stepIds => (dispatch, getState) => {
+  const duplicateIdsZipped = stepIds.map(stepId => ({
+    stepId: stepId,
+    duplicateStepId: uuid(),
+  }))
+
+  const duplicateIds = duplicateIdsZipped.map(
+    ({ duplicateStepId }) => duplicateStepId
+  )
+
+  const duplicateMultipleStepsAction = {
+    type: 'DUPLICATE_MULTIPLE_STEPS',
+    payload: duplicateIdsZipped,
+  }
+
+  const selectMultipleStepsAction = {
+    type: 'SELECT_MULTIPLE_STEPS',
+    payload: { stepIds: duplicateIds, lastSelected: last(duplicateIds) },
+  }
+
+  dispatch(duplicateMultipleStepsAction)
+  dispatch(selectMultipleStepsAction)
 }
 
 export const SAVE_STEP_FORM: 'SAVE_STEP_FORM' = 'SAVE_STEP_FORM'

@@ -15,12 +15,18 @@ export type ClearWellSelectionLabwareKeyAction = {|
   payload: null,
 |}
 
+type DuplicateStepPayload = {|
+  stepId: StepIdType,
+  duplicateStepId: StepIdType,
+|}
 export type DuplicateStepAction = {|
   type: 'DUPLICATE_STEP',
-  payload: {
-    stepId: StepIdType,
-    duplicateStepId: StepIdType,
-  },
+  payload: DuplicateStepPayload,
+|}
+
+export type DuplicateMultipleStepsAction = {|
+  type: 'DUPLICATE_MULTIPLE_STEPS',
+  payload: Array<DuplicateStepPayload>,
 |}
 
 export type ExpandAddStepButtonAction = {|

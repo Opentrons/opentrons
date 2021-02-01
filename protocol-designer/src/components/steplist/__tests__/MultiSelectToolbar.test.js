@@ -163,4 +163,28 @@ describe('MultiSelectToolbar', () => {
       expect(deleteMultipleStepsSpy).toHaveBeenCalledWith(['id_1'])
     })
   })
+  describe('when clicking on duplicate', () => {
+    it('should duplicate all of the steps selected', () => {
+      when(getOrderedStepIdsMock)
+        .calledWith(expect.anything())
+        .mockReturnValue(['id_1', 'id_2'])
+
+      when(getMultiSelectItemIdsMock)
+        .calledWith(expect.anything())
+        .mockReturnValue(['id_1'])
+
+      const duplicateMultipleStepsSpy = jest.spyOn(
+        stepActions,
+        'duplicateMultipleSteps'
+      )
+
+      const wrapper = render()
+
+      const copyIcon = wrapper.find(ClickableIcon).at(2)
+      act(() => {
+        copyIcon.prop('onClick')()
+      })
+      expect(duplicateMultipleStepsSpy).toHaveBeenCalledWith(['id_1'])
+    })
+  })
 })

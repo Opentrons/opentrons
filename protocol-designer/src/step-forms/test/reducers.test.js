@@ -110,6 +110,35 @@ describe('orderedStepIds reducer', () => {
     expect(orderedStepIds(state, action)).toEqual(['2'])
   })
 
+  it('should add a new step when the step is duplicated', () => {
+    const state = ['1', '2', '3']
+    const action = {
+      type: 'DUPLICATE_STEP',
+      payload: { stepId: '1', duplicateStepId: 'dup_1' },
+    }
+    expect(orderedStepIds(state, action)).toEqual(['1', 'dup_1', '2', '3'])
+  })
+
+  it('should add multiple new steps when multiple steps are duplicated', () => {
+    const state = ['1', '2', '3']
+    const action = {
+      type: 'DUPLICATE_MULTIPLE_STEPS',
+      payload: [
+        { stepId: 'id1', duplicateStepId: 'dup_1' },
+        { stepId: 'id2', duplicateStepId: 'dup_2' },
+        { stepId: 'id3', duplicateStepId: 'dup_3' },
+      ],
+    }
+    expect(orderedStepIds(state, action)).toEqual([
+      '1',
+      '2',
+      '3',
+      'dup_1',
+      'dup_2',
+      'dup_3',
+    ])
+  })
+
   describe('reorder steps', () => {
     const state = ['1', '2', '3', '4']
     const testCases = [
@@ -1048,6 +1077,54 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       const expectedState = { ...savedStepFormsState }
       delete expectedState.id1
       delete expectedState.id2
+      expect(
+        savedStepForms({ savedStepForms: savedStepFormsState }, action)
+      ).toEqual(expectedState)
+    })
+  })
+  describe('duplicating steps', () => {
+    let savedStepFormsState
+    beforeEach(() => {
+      savedStepFormsState = {
+        [INITIAL_DECK_SETUP_STEP_ID]: makeDeckSetupStep({
+          moduleLocationUpdate: {
+            [moduleId]: '1',
+            [otherModuleId]: '2',
+          },
+        }),
+        id1: { id: 'id1' },
+        id2: { id: 'id2' },
+        id3: { id: 'id3' },
+      }
+    })
+    it('should duplicate one step', () => {
+      const action = {
+        type: 'DUPLICATE_STEP',
+        payload: { stepId: 'id1', duplicateStepId: 'dup_1' },
+      }
+      const expectedState = {
+        ...savedStepFormsState,
+        dup_1: { id: 'dup_1' },
+      }
+      expect(
+        savedStepForms({ savedStepForms: savedStepFormsState }, action)
+      ).toEqual(expectedState)
+    })
+    it('should duplicate multiple steps', () => {
+      const action = {
+        type: 'DUPLICATE_MULTIPLE_STEPS',
+        payload: [
+          { stepId: 'id1', duplicateStepId: 'dup_1' },
+          { stepId: 'id2', duplicateStepId: 'dup_2' },
+          { stepId: 'id3', duplicateStepId: 'dup_3' },
+        ],
+      }
+      const expectedState = {
+        ...savedStepFormsState,
+        dup_1: { id: 'dup_1' },
+        dup_2: { id: 'dup_2' },
+        dup_3: { id: 'dup_3' },
+      }
       expect(
         savedStepForms({ savedStepForms: savedStepFormsState }, action)
       ).toEqual(expectedState)

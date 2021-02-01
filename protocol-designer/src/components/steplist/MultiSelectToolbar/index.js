@@ -95,6 +95,9 @@ export const MultiSelectToolbar = (): React.Node => {
   const copyProps = {
     iconName: 'content-copy',
     tooltipText: 'Duplicate',
+    onClick: () =>
+      selectedStepIds &&
+      dispatch(stepActions.duplicateMultipleSteps(selectedStepIds)),
   }
 
   const expandProps = {

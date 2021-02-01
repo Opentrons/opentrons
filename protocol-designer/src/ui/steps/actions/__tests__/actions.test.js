@@ -3,9 +3,11 @@ import last from 'lodash/last'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import { when, resetAllWhenMocks } from 'jest-when'
+import * as utils from '../../../../utils'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getMultiSelectLastSelected } from '../../selectors'
 import { selectStep, selectAllSteps, deselectAllSteps } from '../actions'
+import { duplicateStep, duplicateMultipleSteps } from '../thunks'
 
 jest.mock('../../../../step-forms')
 jest.mock('../../selectors')
@@ -113,6 +115,57 @@ describe('steps actions', () => {
       )
       expect(store.getActions()).toEqual([])
       consoleWarnSpy.mockRestore()
+    })
+  })
+  describe('duplicateStep', () => {
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+    it('should duplicate a step with a new step id', () => {
+      jest.spyOn(utils, 'uuid').mockReturnValue('duplicate_id')
+      const store = mockStore()
+      // $FlowFixMe(SA, 2021-02-01): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      store.dispatch(duplicateStep('id_1'))
+      expect(store.getActions()).toEqual([
+        {
+          type: 'DUPLICATE_STEP',
+          payload: { stepId: 'id_1', duplicateStepId: 'duplicate_id' },
+        },
+      ])
+    })
+  })
+  describe('duplicateMultipleSteps', () => {
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+    it('should duplicate multiple steps with a new step ids, and select the new duplicated steps', () => {
+      jest
+        .spyOn(utils, 'uuid')
+        .mockReturnValueOnce('dup_1')
+        .mockReturnValueOnce('dup_2')
+        .mockReturnValueOnce('dup_3')
+      const store = mockStore()
+      // $FlowFixMe(SA, 2021-02-01): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      store.dispatch(duplicateMultipleSteps(['id_1', 'id_2', 'id_3']))
+      const duplicateStepsAction = {
+        type: 'DUPLICATE_MULTIPLE_STEPS',
+        payload: [
+          { stepId: 'id_1', duplicateStepId: 'dup_1' },
+          { stepId: 'id_2', duplicateStepId: 'dup_2' },
+          { stepId: 'id_3', duplicateStepId: 'dup_3' },
+        ],
+      }
+      const selectMultipleStepsAction = {
+        type: 'SELECT_MULTIPLE_STEPS',
+        payload: {
+          stepIds: ['dup_1', 'dup_2', 'dup_3'],
+          lastSelected: 'dup_3',
+        },
+      }
+      expect(store.getActions()).toEqual([
+        duplicateStepsAction,
+        selectMultipleStepsAction,
+      ])
     })
   })
 })

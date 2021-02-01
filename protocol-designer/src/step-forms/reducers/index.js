@@ -88,6 +88,7 @@ import type {
 import type {
   AddStepAction,
   DuplicateStepAction,
+  DuplicateMultipleStepsAction,
   ReorderSelectedStepAction,
   SelectStepAction,
   SelectTerminalItemAction,
@@ -472,6 +473,7 @@ type SavedStepFormsActions =
   | CreateModuleAction
   | DeleteModuleAction
   | DuplicateStepAction
+  | DuplicateMultipleStepsAction
   | ChangeSavedStepFormAction
   | DuplicateLabwareAction
   | SwapSlotContentsAction
@@ -934,6 +936,18 @@ export const savedStepForms = (
         },
       }
     }
+    case 'DUPLICATE_MULTIPLE_STEPS': {
+      return action.payload.reduce(
+        (acc, { stepId, duplicateStepId }) => ({
+          ...acc,
+          [duplicateStepId]: {
+            ...cloneDeep(savedStepForms[stepId]),
+            id: duplicateStepId,
+          },
+        }),
+        { ...savedStepForms }
+      )
+    }
     case 'REPLACE_CUSTOM_LABWARE_DEF': {
       // no mismatch, it's safe to keep all steps as they are
       if (!action.payload.isOverwriteMismatched) return savedStepForms
@@ -1230,6 +1244,15 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
         duplicateStepId,
         ...state.slice(selectedIndex + 1, state.length),
       ]
+    },
+    DUPLICATE_MULTIPLE_STEPS: (
+      state: OrderedStepIdsState,
+      action: DuplicateMultipleStepsAction
+    ): OrderedStepIdsState => {
+      const duplicateStepIds = action.payload.map(
+        ({ duplicateStepId }) => duplicateStepId
+      )
+      return [...state, ...duplicateStepIds]
     },
     REORDER_STEPS: (
       state: OrderedStepIdsState,
