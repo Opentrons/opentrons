@@ -77,6 +77,13 @@ teardown:
 	$(MAKE) -C $(API_DIR) clean teardown
 	shx rm -rf '**/node_modules'
 
+.PHONY: teardown-py
+teardown-py:
+	$(MAKE) -C $(API_DIR) clean teardown
+	$(MAKE) -C $(ROBOT_SERVER_DIR) clean teardown
+	$(MAKE) -C $(NOTIFY_SERVER_DIR) clean teardown
+	$(MAKE) -C $(SHARED_DATA_DIR) clean-py teardown-py
+
 .PHONY: deploy-py
 deploy-py: export twine_repository_url = $(twine_repository_url)
 deploy-py: export pypi_username = $(pypi_username)
