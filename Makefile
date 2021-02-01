@@ -151,6 +151,7 @@ test-py-windows:
 test-py: test-py-windows
 	$(MAKE) -C $(UPDATE_SERVER_DIR) test
 	$(MAKE) -C $(ROBOT_SERVER_DIR) test
+	$(MAKE) -C $(NOTIFY_SERVER_DIR) test
 
 .PHONY: test-js
 test-js:
@@ -178,6 +179,7 @@ lint-py:
 	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
 	$(MAKE) -C $(ROBOT_SERVER_DIR) lint
 	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
+	$(MAKE) -C $(NOTIFY_SERVER_DIR) lint
 
 .PHONY: lint-js
 lint-js:
