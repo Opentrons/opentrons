@@ -1,6 +1,6 @@
 from json import JSONDecodeError
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from mock import patch, MagicMock
 
 import pytest
 from opentrons.protocols.api_support.types import APIVersion

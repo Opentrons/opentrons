@@ -199,7 +199,7 @@ export function CalibrateTipLengthControl({
           mount={mount}
           showSpinner={showSpinner}
           hasCalibrated={hasCalibrated}
-          handleStart={confirm}
+          handleStart={() => confirm(null)} // hasBlockModalResponse === null when TLC started from this button
         />
         {showConfirmation && (
           <Portal>

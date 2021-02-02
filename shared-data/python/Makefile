@@ -54,6 +54,13 @@ setup-py:
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 
+.PHONY: teardown
+teardown: teardown-py
+
+.PHONY: teardown-py
+teardown-py:
+	$(pipenv) --rm
+
 
 .PHONY: clean
 clean:

@@ -6,21 +6,21 @@ from notify_server import logging
 
 
 @pytest.fixture
-def patch_production_log_config() -> Generator[None, MagicMock, None]:
+def patch_production_log_config() -> Generator[MagicMock, None, None]:
     """Patch _production_log_config."""
     with patch.object(logging, '_production_log_config') as p:
         yield p
 
 
 @pytest.fixture
-def patch_dev_log_config() -> Generator[None, MagicMock, None]:
+def patch_dev_log_config() -> Generator[MagicMock, None, None]:
     """Patch _dev_log_config."""
     with patch.object(logging, '_dev_log_config') as p:
         yield p
 
 
 @pytest.fixture
-def patch_dictconfig() -> Generator[None, MagicMock, None]:
+def patch_dictconfig() -> Generator[MagicMock, None, None]:
     """Patch dictConfig."""
     with patch.object(logging, 'dictConfig') as p:
         yield p
