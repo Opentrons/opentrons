@@ -88,16 +88,29 @@ export const MultiSelectToolbar = (): React.Node => {
     tooltipText: 'Delete',
     width: '1.5rem',
     alignRight: true,
-    onClick: () =>
-      selectedStepIds && dispatch(deleteMultipleSteps(selectedStepIds)),
+    onClick: () => {
+      if (selectedStepIds) {
+        dispatch(deleteMultipleSteps(selectedStepIds))
+      } else {
+        console.warn(
+          'something went wrong, you cannot delete multiple steps if none are selected'
+        )
+      }
+    },
   }
 
   const copyProps = {
     iconName: 'content-copy',
     tooltipText: 'Duplicate',
-    onClick: () =>
-      selectedStepIds &&
-      dispatch(stepActions.duplicateMultipleSteps(selectedStepIds)),
+    onClick: () => {
+      if (selectedStepIds) {
+        dispatch(stepActions.duplicateMultipleSteps(selectedStepIds))
+      } else {
+        console.warn(
+          'something went wrong, you cannot duplicate multiple steps if none are selected'
+        )
+      }
+    },
   }
 
   const expandProps = {
