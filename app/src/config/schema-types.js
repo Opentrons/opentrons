@@ -58,7 +58,7 @@ export type ConfigV0 = $ReadOnly<{|
   // deprecated
   p10WarningSeen: $ReadOnly<{
     [id: string]: ?boolean,
-    ...,
+    ...
   }>,
 
   support: $ReadOnly<{|

@@ -48,8 +48,10 @@ export function getMixData(
 
   if (
     checkbox &&
-    (typeof volume === 'number' && volume > 0) &&
-    (typeof times === 'number' && times > 0)
+    typeof volume === 'number' &&
+    volume > 0 &&
+    typeof times === 'number' &&
+    times > 0
   ) {
     return { volume, times }
   }

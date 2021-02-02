@@ -5,7 +5,7 @@ export const PD_VERSION = '5.0.0'
 
 export const migrateSavedStepForms = (savedStepForms: {
   [string]: any,
-  ...,
+  ...
 }): { [string]: any, ... } => {
   // NOTE: intentionally not importing constants or getDefaultsForStepType
   // to protect this particular migration fn from breaking if those values are ever changed.

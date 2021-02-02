@@ -72,7 +72,7 @@ export const mockFetchPipetteSettingsSuccess = {
   host: mockRobot,
   body: ({ abc: mockPipetteSettings }: {
     [string]: PipetteSettings,
-    ...,
+    ...
   }),
 }
 

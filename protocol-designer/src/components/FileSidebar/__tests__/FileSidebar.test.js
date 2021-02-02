@@ -129,10 +129,7 @@ describe('FileSidebar', () => {
     expect(alertModal).toHaveLength(1)
     expect(alertModal.prop('heading')).toEqual('Your protocol has no steps')
 
-    const continueButton = alertModal
-      .dive()
-      .find(OutlineButton)
-      .at(1)
+    const continueButton = alertModal.dive().find(OutlineButton).at(1)
     continueButton.simulate('click')
     expect(props.onDownload).toHaveBeenCalled()
   })
@@ -157,10 +154,7 @@ describe('FileSidebar', () => {
       pipettesOnDeck.pipetteLeftId.spec.displayName
     )
 
-    const continueButton = alertModal
-      .dive()
-      .find(OutlineButton)
-      .at(1)
+    const continueButton = alertModal.dive().find(OutlineButton).at(1)
     continueButton.simulate('click')
     expect(props.onDownload).toHaveBeenCalled()
   })
@@ -179,10 +173,7 @@ describe('FileSidebar', () => {
     expect(alertModal.prop('heading')).toEqual('Unused module')
     expect(alertModal.html()).toContain('Magnetic module')
 
-    const continueButton = alertModal
-      .dive()
-      .find(OutlineButton)
-      .at(1)
+    const continueButton = alertModal.dive().find(OutlineButton).at(1)
     continueButton.simulate('click')
     expect(props.onDownload).toHaveBeenCalled()
   })
@@ -209,10 +200,7 @@ describe('FileSidebar', () => {
       pipettesOnDeck.pipetteLeftId.spec.displayName
     )
 
-    const continueButton = alertModal
-      .dive()
-      .find(OutlineButton)
-      .at(1)
+    const continueButton = alertModal.dive().find(OutlineButton).at(1)
     continueButton.simulate('click')
     expect(props.onDownload).toHaveBeenCalled()
   })
