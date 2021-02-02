@@ -49,10 +49,7 @@ export function client(dispatch) {
 
     switch (type) {
       case 'robot:CONNECT':
-        return connect(
-          state,
-          action
-        )
+        return connect(state, action)
       case 'robot:DISCONNECT':
         return disconnect(state, action)
       case 'protocol:UPLOAD':

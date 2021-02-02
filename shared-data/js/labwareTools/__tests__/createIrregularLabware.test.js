@@ -44,7 +44,10 @@ describe('test helper functions', () => {
   it('XYZ generates correctly for each grid', () => {
     const grid = { row: 1, column: 5 }
     const offset = { x: 1, y: 0.5, z: 55.5 }
-    const spacing = [{ row: 10, column: 10 }, { row: 5, column: 14 }]
+    const spacing = [
+      { row: 10, column: 10 },
+      { row: 5, column: 14 },
+    ]
     const well = [
       omit(exampleLabware1.wells.A1, ['x', 'y', 'z']),
       omit(exampleLabware1.wells.B1, ['x', 'y', 'z']),
@@ -118,9 +121,18 @@ describe('test createIrregularLabware function', () => {
           totalLiquidVolume: 10000,
         },
       ],
-      offset: [{ x: 10, y: 10, z: 69.48 }, { x: 15, y: 15, z: 69.48 }],
-      grid: [{ row: 5, column: 10 }, { row: 1, column: 5 }],
-      spacing: [{ row: 5, column: 10 }, { row: 5, column: 10 }],
+      offset: [
+        { x: 10, y: 10, z: 69.48 },
+        { x: 15, y: 15, z: 69.48 },
+      ],
+      grid: [
+        { row: 5, column: 10 },
+        { row: 1, column: 5 },
+      ],
+      spacing: [
+        { row: 5, column: 10 },
+        { row: 5, column: 10 },
+      ],
       gridStart: [
         { rowStart: 'A', colStart: '1', rowStride: 2, colStride: 1 },
         { rowStart: 'B', colStart: '1', rowStride: 1, colStride: 1 },
@@ -141,7 +153,10 @@ describe('test createIrregularLabware function', () => {
 
   it('labware loadName generated correctly for multi-grid labware', () => {
     const loadName = _generateIrregularLoadName({
-      grid: [{ row: 3, column: 2 }, { row: 1, column: 4 }],
+      grid: [
+        { row: 3, column: 2 },
+        { row: 1, column: 4 },
+      ],
       well: [
         {
           depth: 20,
@@ -180,7 +195,10 @@ describe('test createIrregularLabware function', () => {
     const args = {
       ...labware1Args,
       // negative y offset should fail schema validation by making well `y` negative
-      offset: [{ x: 10, y: -9999, z: 69.48 }, { x: 15, y: -9999, z: 69.48 }],
+      offset: [
+        { x: 10, y: -9999, z: 69.48 },
+        { x: 15, y: -9999, z: 69.48 },
+      ],
     }
 
     expect(() => createIrregularLabware(args)).toThrowErrorMatchingSnapshot()

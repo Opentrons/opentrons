@@ -78,7 +78,8 @@ export const SlotControlsComponent = (props: Props): React.Node => {
     isOver &&
     moduleType != null &&
     draggedDef != null &&
-    (!getLabwareIsCompatible(draggedDef, moduleType) && !isCustomLabware)
+    !getLabwareIsCompatible(draggedDef, moduleType) &&
+    !isCustomLabware
   ) {
     slotBlocked = 'Labware incompatible with this module'
   }
@@ -178,7 +179,9 @@ export const SlotControls: React.AbstractComponent<OP> = connect<
   mapStateToProps,
   mapDispatchToProps
 )(
-  DropTarget(DND_TYPES.LABWARE, slotTarget, collectSlotTarget)(
-    SlotControlsComponent
-  )
+  DropTarget(
+    DND_TYPES.LABWARE,
+    slotTarget,
+    collectSlotTarget
+  )(SlotControlsComponent)
 )

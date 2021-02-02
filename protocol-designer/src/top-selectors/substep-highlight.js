@@ -108,8 +108,9 @@ function _getSelectedWellsForStep(
         wells.push(...wellSet)
       } else {
         console.error(
-          `Unexpected number of channels: ${pipetteSpec.channels ||
-            '?'}. Could not get tip highlight state`
+          `Unexpected number of channels: ${
+            pipetteSpec.channels || '?'
+          }. Could not get tip highlight state`
         )
       }
     }

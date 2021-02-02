@@ -33,9 +33,9 @@ const pipettes = {
   },
 }
 
-export const pipetteNameOptions: Options = Object.keys(pipettes).map(
-  loadName => ({ name: pipettes[loadName].displayName, value: loadName })
-)
+export const pipetteNameOptions: Options = Object.keys(
+  pipettes
+).map(loadName => ({ name: pipettes[loadName].displayName, value: loadName }))
 
 type LabwareTestProtocolArgs = {|
   pipetteName: string,

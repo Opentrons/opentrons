@@ -1,5 +1,9 @@
 {
-  "ordering": [["A1", "B1"], ["A2", "B2"], ["A3", "B3"]],
+  "ordering": [
+    ["A1", "B1"],
+    ["A2", "B2"],
+    ["A3", "B3"]
+  ],
   "brand": {
     "brand": "Opentrons",
     "brandId": [],

@@ -284,27 +284,24 @@ function _getPipettesSame(
 // (for when we support multiple deck setup steps)
 export const getEquippedPipetteOptions: Selector<
   Array<DropdownOption>
-> = createSelector(
-  getInitialDeckSetup,
-  initialDeckSetup => {
-    const pipettes = initialDeckSetup.pipettes
-    const pipettesSame = _getPipettesSame(pipettes)
-    return reduce(
-      pipettes,
-      (acc: Array<DropdownOption>, pipette: PipetteOnDeck, id: string) => {
-        const mountLabel = i18n.t(`form.pipette_mount_label.${pipette.mount}`)
-        const nextOption = {
-          name: pipettesSame
-            ? `${_getPipetteDisplayName(pipette.name)} ${mountLabel}`
-            : _getPipetteDisplayName(pipette.name),
-          value: id,
-        }
-        return [...acc, nextOption]
-      },
-      []
-    )
-  }
-)
+> = createSelector(getInitialDeckSetup, initialDeckSetup => {
+  const pipettes = initialDeckSetup.pipettes
+  const pipettesSame = _getPipettesSame(pipettes)
+  return reduce(
+    pipettes,
+    (acc: Array<DropdownOption>, pipette: PipetteOnDeck, id: string) => {
+      const mountLabel = i18n.t(`form.pipette_mount_label.${pipette.mount}`)
+      const nextOption = {
+        name: pipettesSame
+          ? `${_getPipetteDisplayName(pipette.name)} ${mountLabel}`
+          : _getPipetteDisplayName(pipette.name),
+        value: id,
+      }
+      return [...acc, nextOption]
+    },
+    []
+  )
+})
 
 // Formats pipette data specifically for file page InstrumentGroup component
 type PipettesForInstrumentGroup = ElementProps<InstrumentGroupProps>
@@ -526,15 +523,12 @@ export const getHydratedUnsavedForm: Selector<any> = createSelector(
 
 export const getDynamicFieldFormErrorsForUnsavedForm: Selector<
   Array<ProfileFormError>
-> = createSelector(
-  getHydratedUnsavedForm,
-  hydratedForm => {
-    if (!hydratedForm) return []
+> = createSelector(getHydratedUnsavedForm, hydratedForm => {
+  if (!hydratedForm) return []
 
-    const errors = _dynamicFieldFormErrors(hydratedForm)
-    return errors
-  }
-)
+  const errors = _dynamicFieldFormErrors(hydratedForm)
+  return errors
+})
 
 export const getFormLevelErrorsForUnsavedForm: Selector<StepFormErrors> = createSelector(
   getHydratedUnsavedForm,

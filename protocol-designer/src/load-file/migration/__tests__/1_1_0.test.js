@@ -112,7 +112,7 @@ describe('updateStepFormKeys', () => {
       'designer-application': {
         data: {
           savedStepForms: {
-            '1': {
+            1: {
               id: 1,
               stepType: 'distribute',
               'step-name': 'FakeStepName',
@@ -138,7 +138,7 @@ describe('updateStepFormKeys', () => {
               volume: 30,
               offsetFromBottomMm: 2,
             },
-            '2': {
+            2: {
               id: 2,
               stepType: 'transfer',
               'step-name': 'FakeStepName',
@@ -164,7 +164,7 @@ describe('updateStepFormKeys', () => {
               volume: 30,
               offsetFromBottomMm: 2,
             },
-            '3': {
+            3: {
               id: 3,
               stepType: 'consolidate',
               'step-name': 'FakeStepName',
@@ -251,7 +251,7 @@ describe('updateStepFormKeys', () => {
       'designer-application': {
         data: {
           savedStepForms: {
-            '1': {
+            1: {
               id: 1,
               stepType: 'mix',
               'step-name': 'Mix',

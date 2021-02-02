@@ -50,10 +50,7 @@ describe('MixForm', () => {
     })
 
   const showAdvancedSettings = wrapper => {
-    wrapper
-      .find(AspDispSection)
-      .first()
-      .invoke('toggleCollapsed')()
+    wrapper.find(AspDispSection).first().invoke('toggleCollapsed')()
   }
 
   beforeEach(() => {

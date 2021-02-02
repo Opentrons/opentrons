@@ -17,8 +17,8 @@ describe('DELETE_CONTAINER action', () => {
     expect(
       containers(
         {
-          '1': 'blah',
-          '999': 'blaaah',
+          1: 'blah',
+          999: 'blaaah',
         },
         {
           type: 'DELETE_CONTAINER',
@@ -26,8 +26,8 @@ describe('DELETE_CONTAINER action', () => {
         }
       )
     ).toEqual({
-      '1': 'blah',
-      '999': 'blaaah',
+      1: 'blah',
+      999: 'blaaah',
     })
   })
 
@@ -35,9 +35,9 @@ describe('DELETE_CONTAINER action', () => {
     expect(
       containers(
         {
-          '1': 'blah',
-          '123': 'delete this',
-          '999': 'blaaah',
+          1: 'blah',
+          123: 'delete this',
+          999: 'blaaah',
         },
         {
           type: 'DELETE_CONTAINER',
@@ -45,8 +45,8 @@ describe('DELETE_CONTAINER action', () => {
         }
       )
     ).toEqual({
-      '1': 'blah',
-      '999': 'blaaah',
+      1: 'blah',
+      999: 'blaaah',
     })
   })
 })

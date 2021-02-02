@@ -139,11 +139,12 @@ describe('RPC API client - session creation', () => {
       payload: { contents: '# protocol', data: null },
       meta: { robot: true },
     }).then(() => {
-      expect(mockSessionManager.create_with_extra_labware).toHaveBeenCalledWith(
-        mockProtocolFile.name,
-        '# protocol',
-        [{ v: { mockLabware: 1 } }, { v: { mockLabware: 2 } }]
-      )
+      expect(
+        mockSessionManager.create_with_extra_labware
+      ).toHaveBeenCalledWith(mockProtocolFile.name, '# protocol', [
+        { v: { mockLabware: 1 } },
+        { v: { mockLabware: 2 } },
+      ])
     })
   })
 
