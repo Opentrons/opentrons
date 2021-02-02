@@ -78,6 +78,7 @@ describe('MultiSelectToolbar', () => {
     const wrapper = render()
     const selectIcon = wrapper.find(ClickableIcon).first()
     expect(selectIcon.prop('iconName')).toBe('checkbox-marked')
+    expect(selectIcon.prop('tooltipText')).toBe('Deselect All')
     act(() => {
       selectIcon.prop('onClick')()
     })
@@ -97,6 +98,7 @@ describe('MultiSelectToolbar', () => {
     const wrapper = render()
     const selectIcon = wrapper.find(ClickableIcon).first()
     expect(selectIcon.prop('iconName')).toBe('minus-box')
+    expect(selectIcon.prop('tooltipText')).toBe('Select All')
     act(() => {
       selectIcon.prop('onClick')()
     })

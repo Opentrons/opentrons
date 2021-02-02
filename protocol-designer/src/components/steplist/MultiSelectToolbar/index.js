@@ -79,7 +79,7 @@ export const MultiSelectToolbar = (): React.Node => {
 
   const selectProps = {
     iconName: isAllStepsSelected ? 'checkbox-marked' : 'minus-box',
-    tooltipText: isAllStepsSelected ? 'deselect' : 'select',
+    tooltipText: isAllStepsSelected ? 'Deselect All' : 'Select All',
     onClick: confirm,
   }
 
