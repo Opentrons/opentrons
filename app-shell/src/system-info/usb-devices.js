@@ -52,10 +52,7 @@ export function createUsbDeviceMonitor(
 }
 
 const decToHex = (number: number) =>
-  number
-    .toString(16)
-    .toUpperCase()
-    .padStart(4, '0')
+  number.toString(16).toUpperCase().padStart(4, '0')
 
 export function getWindowsDriverVersion(
   device: Device

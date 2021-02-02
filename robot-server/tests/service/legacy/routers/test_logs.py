@@ -1,7 +1,7 @@
 import json
 
 import pytest
-from unittest.mock import patch
+from mock import patch
 
 from opentrons.system.log_control import MAX_RECORDS, DEFAULT_RECORDS
 

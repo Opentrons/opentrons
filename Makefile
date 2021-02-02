@@ -77,6 +77,13 @@ teardown:
 	$(MAKE) -C $(API_DIR) clean teardown
 	shx rm -rf '**/node_modules'
 
+.PHONY: teardown-py
+teardown-py:
+	$(MAKE) -C $(API_DIR) clean teardown
+	$(MAKE) -C $(ROBOT_SERVER_DIR) clean teardown
+	$(MAKE) -C $(NOTIFY_SERVER_DIR) clean teardown
+	$(MAKE) -C $(SHARED_DATA_DIR) clean-py teardown-py
+
 .PHONY: deploy-py
 deploy-py: export twine_repository_url = $(twine_repository_url)
 deploy-py: export pypi_username = $(pypi_username)
@@ -151,6 +158,7 @@ test-py-windows:
 test-py: test-py-windows
 	$(MAKE) -C $(UPDATE_SERVER_DIR) test
 	$(MAKE) -C $(ROBOT_SERVER_DIR) test
+	$(MAKE) -C $(NOTIFY_SERVER_DIR) test
 
 .PHONY: test-js
 test-js:
@@ -178,6 +186,7 @@ lint-py:
 	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
 	$(MAKE) -C $(ROBOT_SERVER_DIR) lint
 	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
+	$(MAKE) -C $(NOTIFY_SERVER_DIR) lint
 
 .PHONY: lint-js
 lint-js:

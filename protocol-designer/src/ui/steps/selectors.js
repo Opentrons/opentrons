@@ -227,7 +227,7 @@ type MultiselectFieldValues = {
     value?: any,
     isIndeterminate: boolean,
   |},
-  ...,
+  ...
 }
 
 const BATCH_EDIT_TRANSFER_FORM_FIELDS: Array<MultiSelectFieldName> = [

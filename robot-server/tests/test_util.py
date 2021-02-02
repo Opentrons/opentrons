@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 
 import pytest
-from unittest.mock import patch, MagicMock
+from mock import patch, MagicMock
 
 from robot_server import util
 

@@ -54,8 +54,9 @@ export class Labware extends React.Component<LabwareProps> {
         {map(labwareDefinition.wells, (wellDef, wellName) => {
           assert(
             wellDef,
-            `No well definition for labware ${labwareType ||
-              'unknown labware'}, well ${wellName}`
+            `No well definition for labware ${
+              labwareType || 'unknown labware'
+            }, well ${wellName}`
           )
           // NOTE x + 1, y + 3 HACK offset from old getWellDefsForSVG has been purposefully
           // left out here; it's intention was to make the well viz offset less "off"

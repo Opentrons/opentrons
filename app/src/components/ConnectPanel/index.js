@@ -77,8 +77,14 @@ function ConnectPanelComponent(props: Props) {
   )
 }
 
-const robotOrder = [['connected', 'local', 'name'], ['desc', 'desc', 'asc']]
-const reachableOrder = [['local', 'name'], ['desc', 'asc']]
+const robotOrder = [
+  ['connected', 'local', 'name'],
+  ['desc', 'desc', 'asc'],
+]
+const reachableOrder = [
+  ['local', 'name'],
+  ['desc', 'asc'],
+]
 const unreachableOrder = [['name'], ['asc']]
 
 function mapStateToProps(state: State): SP {

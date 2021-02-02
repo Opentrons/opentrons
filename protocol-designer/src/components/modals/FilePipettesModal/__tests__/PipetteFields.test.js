@@ -170,10 +170,7 @@ describe('PipetteFields', () => {
     const uploadButton = wrapper.find(OutlineButton).at(0)
     expect(uploadButton.text()).toMatch('Upload custom tip rack')
 
-    uploadButton
-      .find('input')
-      .at(0)
-      .simulate('change')
+    uploadButton.find('input').at(0).simulate('change')
     expect(createCustomTiprackDefMock).toHaveBeenCalled()
   })
 })

@@ -52,11 +52,6 @@ def test_get_pipettes_refresh_true(api_client, hardware, attached_pipettes):
     """Test that cache instruments is called when refresh is true"""
     hardware.attached_instruments = attached_pipettes
 
-    async def mock_cache_instruments():
-        pass
-
-    hardware.cache_instruments.side_effect = mock_cache_instruments
-
     resp = api_client.get('/pipettes?refresh=true')
 
     hardware.cache_instruments.assert_called_once()

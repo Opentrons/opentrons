@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock
+from mock import patch, MagicMock
 import logging
 import pytest
 from robot_server.service import logging as rs_logging
