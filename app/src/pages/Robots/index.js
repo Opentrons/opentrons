@@ -17,10 +17,12 @@ import { Splash } from '@opentrons/components'
 import { Page } from '../../components/Page'
 import { RobotSettings } from './RobotSettings'
 import { InstrumentSettings } from './InstrumentSettings'
+import { ModuleSettings } from './ModuleSettings'
 
 export function Robots(): React.Node {
   const { path, url, params } = useRouteMatch()
   const instrumentsMatch = useRouteMatch(`${path}/instruments`)
+  const modulesMatch = useRouteMatch(`${path}/modules`)
   const location = useLocation()
   const { name } = params
 
@@ -55,6 +57,11 @@ export function Robots(): React.Node {
       url={instrumentsMatch.url}
       path={instrumentsMatch.path}
       pathname={location && location.pathname}
+    />
+  ) : robot.status === CONNECTABLE && modulesMatch ? (
+    <ModuleSettings
+      robotName={robot.name}
+      robotDisplayName={robot.displayName}
     />
   ) : (
     <RobotSettings robot={robot} appUpdate={appUpdate} />
