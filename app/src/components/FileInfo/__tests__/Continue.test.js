@@ -5,13 +5,13 @@ import { StaticRouter } from 'react-router-dom'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
 
-import * as navigation from '../../../nav'
+import * as navigation from '../../../redux/nav'
 import { Tooltip } from '@opentrons/components'
 import { Continue } from '../Continue'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
-jest.mock('../../../nav')
+jest.mock('../../../redux/nav')
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 

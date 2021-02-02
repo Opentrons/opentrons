@@ -4,10 +4,10 @@ import { useSelector, useDispatch } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import uniqBy from 'lodash/uniqBy'
 
-import { selectors as robotSelectors } from '../../robot'
-import { PIPETTE_MOUNTS, getAttachedPipettes } from '../../pipettes'
-import { getCalibratePipettesLocations } from '../../nav'
-import { fetchTipLengthCalibrations } from '../../calibration'
+import { selectors as robotSelectors } from '../../redux/robot'
+import { PIPETTE_MOUNTS, getAttachedPipettes } from '../../redux/pipettes'
+import { getCalibratePipettesLocations } from '../../redux/nav'
+import { fetchTipLengthCalibrations } from '../../redux/calibration'
 import {
   TitledList,
   Flex,
@@ -21,8 +21,8 @@ import {
 } from '@opentrons/components'
 import { PipetteTiprackListItem } from './PipetteTiprackListItem'
 
-import type { BaseProtocolLabware } from '../../calibration/types'
-import type { Dispatch, State } from '../../types'
+import type { BaseProtocolLabware } from '../../redux/calibration/types'
+import type { Dispatch, State } from '../../redux/types'
 
 // TODO(mc, 2019-12-10): i18n
 const TIP_LENGTH_CALIBRATION = 'Tip Length Calibration'

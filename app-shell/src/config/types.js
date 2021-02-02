@@ -1,6 +1,6 @@
 // @flow
 
-import type { Config } from '@opentrons/app/src/config/types'
+import type { Config } from '@opentrons/app/src/redux/config/types'
 
 export type { Config }
 

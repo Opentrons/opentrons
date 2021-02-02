@@ -2,7 +2,7 @@
 import os from 'os'
 import isEqual from 'lodash/isEqual'
 
-import type { NetworkInterface } from '@opentrons/app/src/system-info/types'
+import type { NetworkInterface } from '@opentrons/app/src/redux/system-info/types'
 
 export type { NetworkInterface }
 

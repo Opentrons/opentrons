@@ -10,13 +10,13 @@ import {
   getLabwareDisplayName,
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
-import * as RobotApi from '../../robot-api'
-import * as Sessions from '../../sessions'
-import * as Config from '../../config'
+import * as RobotApi from '../../redux/robot-api'
+import * as Sessions from '../../redux/sessions'
+import * as Config from '../../redux/config'
 
-import { getUncalibratedTipracksByMount } from '../../pipettes'
-import { getTipLengthCalibrationSession } from '../../sessions/tip-length-calibration/selectors'
-import { getPipetteOffsetCalibrationSession } from '../../sessions/pipette-offset-calibration/selectors'
+import { getUncalibratedTipracksByMount } from '../../redux/pipettes'
+import { getTipLengthCalibrationSession } from '../../redux/sessions/tip-length-calibration/selectors'
+import { getPipetteOffsetCalibrationSession } from '../../redux/sessions/pipette-offset-calibration/selectors'
 
 import {
   CalibrateTipLength,
@@ -32,16 +32,16 @@ import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../components/CalibrationPanel
 import {
   tipLengthCalibrationStarted,
   pipetteOffsetCalibrationStarted,
-} from '../../analytics'
+} from '../../redux/analytics'
 
-import type { State } from '../../types'
+import type { State } from '../../redux/types'
 import type {
   SessionCommandString,
   PipetteOffsetCalibrationSession,
   TipLengthCalibrationSession,
-} from '../../sessions/types'
-import type { RequestState } from '../../robot-api/types'
-import type { TipracksByMountMap } from '../../robot'
+} from '../../redux/sessions/types'
+import type { RequestState } from '../../redux/robot-api/types'
+import type { TipracksByMountMap } from '../../redux/robot'
 
 const TIP_LENGTH_CALIBRATION = 'tip length calibration'
 const EXIT = 'exit'

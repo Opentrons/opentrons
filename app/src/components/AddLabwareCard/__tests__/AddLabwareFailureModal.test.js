@@ -9,7 +9,7 @@ import {
   AddLabwareFailureModalTemplate,
 } from '../AddLabwareFailureModal'
 
-import * as LabwareFixtures from '../../../custom-labware/__fixtures__'
+import * as LabwareFixtures from '../../../redux/custom-labware/__fixtures__'
 
 describe('AddLabwareFailureModal', () => {
   const mockDirectory = '/path/to/labware'

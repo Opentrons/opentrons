@@ -19,8 +19,8 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { selectors as robotSelectors } from '../../robot'
-import { getAttachedModules } from '../../modules'
+import { selectors as robotSelectors } from '../../redux/robot'
+import { getAttachedModules } from '../../redux/modules'
 
 import { InfoSection } from './InfoSection'
 import { SectionContentHalf } from '../layout'
@@ -28,10 +28,10 @@ import { MissingItemWarning } from './MissingItemWarning'
 
 import styles from './styles.css'
 
-import type { State, Dispatch } from '../../types'
-import type { SessionModule } from '../../robot/types'
-import type { Robot } from '../../discovery/types'
-import type { AttachedModule } from '../../modules/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { SessionModule } from '../../redux/robot/types'
+import type { Robot } from '../../redux/discovery/types'
+import type { AttachedModule } from '../../redux/modules/types'
 
 const NOT_ATTACHED = 'Not attached'
 

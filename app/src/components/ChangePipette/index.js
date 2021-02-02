@@ -8,10 +8,10 @@ import {
   getRequestById,
   SUCCESS,
   PENDING,
-} from '../../robot-api'
-import * as Config from '../../config'
-import { getCalibrationForPipette } from '../../calibration'
-import { getAttachedPipettes } from '../../pipettes'
+} from '../../redux/robot-api'
+import * as Config from '../../redux/config'
+import { getCalibrationForPipette } from '../../redux/calibration'
+import { getAttachedPipettes } from '../../redux/pipettes'
 import {
   home,
   move,
@@ -22,7 +22,7 @@ import {
   PIPETTE,
   CHANGE_PIPETTE,
   HOME,
-} from '../../robot-controls'
+} from '../../redux/robot-controls'
 
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
@@ -43,8 +43,8 @@ import {
   CALIBRATE_PIPETTE,
 } from './constants'
 
-import type { State, Dispatch } from '../../types'
-import type { Mount } from '../../robot/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { Mount } from '../../redux/robot/types'
 import type { WizardStep } from './types'
 
 type Props = {|

@@ -9,7 +9,7 @@ import {
   Link,
   useToggle,
 } from '@opentrons/components'
-import { useTrackEvent } from '../../analytics'
+import { useTrackEvent } from '../../redux/analytics'
 import {
   U2E_DRIVER_UPDATE_URL,
   U2E_DRIVER_OUTDATED_MESSAGE,
@@ -17,7 +17,7 @@ import {
   U2E_DRIVER_OUTDATED_CTA,
   EVENT_U2E_DRIVER_ALERT_DISMISSED,
   EVENT_U2E_DRIVER_LINK_CLICKED,
-} from '../../system-info'
+} from '../../redux/system-info'
 import type { AlertProps } from './types'
 
 // TODO(mc, 2020-05-07): i18n

@@ -5,15 +5,15 @@ import { connect } from 'react-redux'
 import {
   actions as robotActions,
   selectors as robotSelectors,
-} from '../../robot'
-import { getMissingModules } from '../../modules'
+} from '../../redux/robot'
+import { getMissingModules } from '../../redux/modules'
 
 import { SidePanel, SidePanelGroup } from '@opentrons/components'
 import { RunTimer } from './RunTimer'
 import { RunControls } from './RunControls'
 import { ModuleLiveStatusCards } from '../ModuleLiveStatusCards'
 
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 
 type SP = {|
   isRunning: boolean,

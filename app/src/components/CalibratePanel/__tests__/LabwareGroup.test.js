@@ -5,14 +5,14 @@ import { Provider } from 'react-redux'
 
 import wellPlate96Def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import type { State } from '../../../types'
-import type { BaseProtocolLabware } from '../../../calibration/labware/types'
-import { selectors as robotSelectors } from '../../../robot'
-import { fetchLabwareCalibrations } from '../../../calibration/labware'
+import type { State } from '../../../redux/types'
+import type { BaseProtocolLabware } from '../../../redux/calibration/labware/types'
+import { selectors as robotSelectors } from '../../../redux/robot'
+import { fetchLabwareCalibrations } from '../../../redux/calibration/labware'
 import { LabwareGroup } from '../LabwareGroup'
 
-jest.mock('../../../robot/selectors')
-jest.mock('../../../calibration/labware/selectors')
+jest.mock('../../../redux/robot/selectors')
+jest.mock('../../../redux/calibration/labware/selectors')
 
 const mockGetCalibratorMount: JestMockFn<
   [State],

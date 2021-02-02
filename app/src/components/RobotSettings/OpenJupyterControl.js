@@ -12,7 +12,7 @@ import {
   SPACING_4,
   SIZE_4,
 } from '@opentrons/components'
-import { useTrackEvent } from '../../analytics'
+import { useTrackEvent } from '../../redux/analytics'
 import { LabeledValue } from '../structure'
 
 const EVENT_JUPYTER_OPEN = { name: 'jupyterOpen', properties: {} }

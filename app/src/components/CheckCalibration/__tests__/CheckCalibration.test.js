@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 
-import * as Sessions from '../../../sessions'
+import * as Sessions from '../../../redux/sessions'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import { CheckCalibration } from '../index'
@@ -19,12 +19,12 @@ import {
   SaveZPoint,
 } from '../../CalibrationPanels'
 
-import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
+import { mockCalibrationCheckSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
-import type { RobotCalibrationCheckStep } from '../../../sessions/types'
+import type { RobotCalibrationCheckStep } from '../../../redux/sessions/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
-jest.mock('../../../calibration/selectors')
+jest.mock('../../../redux/calibration/selectors')
 
 type CheckCalibrationSpec = {
   component: React.AbstractComponent<any>,

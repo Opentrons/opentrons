@@ -7,13 +7,13 @@ import { withRouter, type ContextRouter } from 'react-router-dom'
 import {
   actions as RobotActions,
   selectors as RobotSelectors,
-} from '../../robot'
-import { getBuildrootUpdateAvailable, UPGRADE } from '../../buildroot'
-import { CONNECTABLE } from '../../discovery'
+} from '../../redux/robot'
+import { getBuildrootUpdateAvailable, UPGRADE } from '../../redux/buildroot'
+import { CONNECTABLE } from '../../redux/discovery'
 import { RobotListItem } from './RobotListItem.js'
 
-import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { ViewableRobot } from '../../redux/discovery/types'
 
 export type RobotItemProps = {|
   ...ContextRouter,

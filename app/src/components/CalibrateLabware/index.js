@@ -8,7 +8,7 @@ import { InfoBox } from './InfoBox'
 import styles from './styles.css'
 
 import type { ContextRouter } from 'react-router-dom'
-import type { Labware } from '../../robot/types'
+import type { Labware } from '../../redux/robot/types'
 
 type Props = {| ...ContextRouter, labware: ?Labware |}
 

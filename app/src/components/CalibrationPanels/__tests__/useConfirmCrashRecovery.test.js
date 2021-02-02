@@ -5,7 +5,7 @@ import { mount } from 'enzyme'
 
 import { useConfirmCrashRecovery } from '../useConfirmCrashRecovery'
 import type { Props } from '../useConfirmCrashRecovery'
-import type { CalibrationLabware } from '../../../sessions/types'
+import type { CalibrationLabware } from '../../../redux/sessions/types'
 import type {
   LabwareDefinition2,
   LabwareMetadata,

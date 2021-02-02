@@ -4,8 +4,11 @@ import cx from 'classnames'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import type { ThermocyclerModule, ModuleCommand } from '../../modules/types'
-import { formatSeconds } from '../../robot/selectors' // TODO: move helper from robot selector to helper file
+import type {
+  ThermocyclerModule,
+  ModuleCommand,
+} from '../../redux/modules/types'
+import { formatSeconds } from '../../redux/robot/selectors' // TODO: move helper from robot selector to helper file
 import { TemperatureControl, TemperatureData } from '../ModuleControls'
 
 import { StatusCard } from './StatusCard'

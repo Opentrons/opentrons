@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { AlertItem } from '@opentrons/components'
 
-import type { Robot } from '../../discovery/types'
+import type { Robot } from '../../redux/discovery/types'
 
 type Props = Robot
 

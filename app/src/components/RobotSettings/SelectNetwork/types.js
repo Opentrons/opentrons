@@ -1,7 +1,11 @@
 // @flow
 import type { FormikErrors } from 'formik'
 
-import type { WifiNetwork, EapOption, WifiKey } from '../../../networking/types'
+import type {
+  WifiNetwork,
+  EapOption,
+  WifiKey,
+} from '../../../redux/networking/types'
 
 import typeof {
   CONNECT,
@@ -20,7 +24,7 @@ export type {
   WifiConfigureRequest,
   WifiKey,
   EapOption,
-} from '../../../networking/types'
+} from '../../../redux/networking/types'
 
 export type NetworkChangeType = CONNECT | DISCONNECT | JOIN_OTHER
 

@@ -2,17 +2,17 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import { getMissingModules, fetchModules } from '../../modules'
+import { getMissingModules, fetchModules } from '../../redux/modules'
 import {
   selectors as robotSelectors,
   actions as robotActions,
-} from '../../robot'
+} from '../../redux/robot'
 
 import { DeckMap } from '../DeckMap'
 import { Prompt } from './Prompt'
 import styles from './styles.css'
 
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 
 type OP = {| robotName: string |}
 

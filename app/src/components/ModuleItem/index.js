@@ -6,11 +6,11 @@ import { ModuleInfo } from './ModuleInfo'
 import { ModuleUpdate } from './ModuleUpdate'
 import { ModuleControls } from '../ModuleControls'
 import styles from './styles.css'
-import type { AttachedModule } from '../../modules/types'
+import type { AttachedModule } from '../../redux/modules/types'
 import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-} from '../../modules'
+} from '../../redux/modules'
 
 type Props = {|
   module: AttachedModule,

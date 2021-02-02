@@ -6,7 +6,7 @@ import { Icon, HoverTooltip } from '@opentrons/components'
 import { RobotLink } from './RobotLink'
 import styles from './styles.css'
 
-import type { UnreachableRobot } from '../../discovery/types'
+import type { UnreachableRobot } from '../../redux/discovery/types'
 
 export function UnreachableRobotItem(props: UnreachableRobot): React.Node {
   const { displayName } = props

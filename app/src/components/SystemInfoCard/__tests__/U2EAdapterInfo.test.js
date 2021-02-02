@@ -4,20 +4,20 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
 
-import * as Fixtures from '../../../system-info/__fixtures__'
-import * as SystemInfo from '../../../system-info'
+import * as Fixtures from '../../../redux/system-info/__fixtures__'
+import * as SystemInfo from '../../../redux/system-info'
 import { U2EAdapterInfo } from '../U2EAdapterInfo'
 import { U2EDriverWarning } from '../U2EDriverWarning'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 import type {
   UsbDevice,
   DriverStatus,
   U2EInterfaceMap,
-} from '../../../system-info/types'
+} from '../../../redux/system-info/types'
 
-jest.mock('../../../system-info/selectors')
-jest.mock('../../../analytics')
+jest.mock('../../../redux/system-info/selectors')
+jest.mock('../../../redux/analytics')
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 

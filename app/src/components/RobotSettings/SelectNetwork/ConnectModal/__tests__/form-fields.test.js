@@ -1,6 +1,6 @@
 // @flow
 
-import * as Fixtures from '../../../../../networking/__fixtures__'
+import * as Fixtures from '../../../../../redux/networking/__fixtures__'
 
 import {
   CONFIGURE_FIELD_SSID,
@@ -9,7 +9,7 @@ import {
   SECURITY_WPA_EAP,
   SECURITY_WPA_PSK,
   SECURITY_NONE,
-} from '../../../../../networking'
+} from '../../../../../redux/networking'
 
 import {
   FIELD_TYPE_TEXT,

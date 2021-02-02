@@ -11,12 +11,12 @@ import {
   LabeledToggle,
 } from '@opentrons/components'
 
-import * as Config from '../../config'
-import * as Calibration from '../../calibration'
+import * as Config from '../../redux/config'
+import * as Calibration from '../../redux/calibration'
 
 import type { DropdownOption } from '@opentrons/components'
-import type { DevInternalFlag } from '../../config/types'
-import type { Dispatch } from '../../types'
+import type { DevInternalFlag } from '../../redux/config/types'
+import type { Dispatch } from '../../redux/types'
 
 const TITLE = 'Advanced Settings'
 

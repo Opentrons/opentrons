@@ -36,12 +36,12 @@ import {
   getShellUpdateState,
   downloadShellUpdate,
   applyShellUpdate,
-} from '../../shell'
+} from '../../redux/shell'
 
 import { ErrorModal } from '../modals'
 import { ReleaseNotes } from '../ReleaseNotes'
 
-import type { Dispatch } from '../../types'
+import type { Dispatch } from '../../redux/types'
 
 export type UpdateAppModalProps = {|
   dismissAlert?: (remember: boolean) => mixed,

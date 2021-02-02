@@ -9,14 +9,14 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 
-import { CONNECTABLE, REACHABLE } from '../../discovery'
+import { CONNECTABLE, REACHABLE } from '../../redux/discovery'
 import { CardContentHalf } from '../layout'
 import styles from './styles.css'
 
 import type {
   InternetStatus,
   SimpleInterfaceStatus,
-} from '../../networking/types'
+} from '../../redux/networking/types'
 
 const USB: 'USB' = 'USB'
 const WI_FI: 'Wi-Fi' = 'Wi-Fi'

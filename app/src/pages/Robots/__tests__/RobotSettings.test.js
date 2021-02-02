@@ -6,16 +6,16 @@ import { mountWithStore } from '@opentrons/components/__utils__'
 import {
   mockConnectableRobot,
   mockReachableRobot,
-} from '../../../discovery/__fixtures__'
+} from '../../../redux/discovery/__fixtures__'
 
-import * as Buildroot from '../../../buildroot'
-import * as Admin from '../../../robot-admin'
-import * as Controls from '../../../robot-controls'
-import * as Settings from '../../../robot-settings'
+import * as Buildroot from '../../../redux/buildroot'
+import * as Admin from '../../../redux/robot-admin'
+import * as Controls from '../../../redux/robot-controls'
+import * as Settings from '../../../redux/robot-settings'
 import {
   actions as RobotActions,
   selectors as RobotSelectors,
-} from '../../../robot'
+} from '../../../redux/robot'
 
 import { SpinnerModalPage } from '@opentrons/components'
 import { Page } from '../../../components/Page'
@@ -31,14 +31,14 @@ import { UpdateBuildroot } from '../../../components/RobotSettings/UpdateBuildro
 import { ResetRobotModal } from '../../../components/RobotSettings/ResetRobotModal'
 import { RobotSettings } from '../RobotSettings'
 
-import type { State } from '../../../types'
-import type { ViewableRobot } from '../../../discovery/types'
+import type { State } from '../../../redux/types'
+import type { ViewableRobot } from '../../../redux/discovery/types'
 
-jest.mock('../../../buildroot/selectors')
-jest.mock('../../../robot-admin/selectors')
-jest.mock('../../../robot-controls/selectors')
-jest.mock('../../../robot-settings/selectors')
-jest.mock('../../../robot/selectors')
+jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/robot-admin/selectors')
+jest.mock('../../../redux/robot-controls/selectors')
+jest.mock('../../../redux/robot-settings/selectors')
+jest.mock('../../../redux/robot/selectors')
 
 // emulate shallow render
 jest.mock('../../../components/RobotSettings', () => ({

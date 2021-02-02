@@ -13,7 +13,7 @@ import {
   NACK,
   NOTIFICATION,
   CONTROL_MESSAGE,
-} from '../../rpc/message-types'
+} from '../message-types'
 
 jest.mock('../remote-object')
 

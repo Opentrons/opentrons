@@ -5,7 +5,7 @@ import * as React from 'react'
 import { PrimaryButton } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { Labware, Pipette } from '../../robot/types'
+import type { Labware, Pipette } from '../../redux/robot/types'
 
 export type ConfirmPickupPromptProps = {|
   labware: Labware,

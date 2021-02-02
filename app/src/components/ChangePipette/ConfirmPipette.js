@@ -12,8 +12,8 @@ import type {
   PipetteModelSpecs,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../pipettes/types'
-import type { PipetteOffsetCalibration } from '../../calibration/types'
+import type { Mount } from '../../redux/pipettes/types'
+import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
 const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'

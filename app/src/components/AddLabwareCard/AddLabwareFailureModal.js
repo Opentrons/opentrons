@@ -9,12 +9,12 @@ import {
   INVALID_LABWARE_FILE,
   DUPLICATE_LABWARE_FILE,
   OPENTRONS_LABWARE_FILE,
-} from '../../custom-labware'
+} from '../../redux/custom-labware'
 
 import type {
   FailedLabwareFile,
   DuplicateLabwareFile,
-} from '../../custom-labware/types'
+} from '../../redux/custom-labware/types'
 
 // TODO(mc, 2019-11-20): i18n
 // buttons

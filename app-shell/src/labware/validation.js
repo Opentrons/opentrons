@@ -9,7 +9,7 @@ import {
   DUPLICATE_LABWARE_FILE,
   OPENTRONS_LABWARE_FILE,
   VALID_LABWARE_FILE,
-} from '@opentrons/app/src/custom-labware/selectors'
+} from '@opentrons/app/src/redux/custom-labware/selectors'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
@@ -17,7 +17,7 @@ import type {
   CheckedLabwareFile,
   ValidLabwareFile,
   OpentronsLabwareFile,
-} from '@opentrons/app/src/custom-labware/types'
+} from '@opentrons/app/src/redux/custom-labware/types'
 
 const ajv = new Ajv()
 const validateDefinition = ajv.compile(labwareSchema)

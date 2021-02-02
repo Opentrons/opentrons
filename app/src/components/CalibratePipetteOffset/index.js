@@ -17,7 +17,7 @@ import {
   C_WHITE,
 } from '@opentrons/components'
 
-import * as Sessions from '../../sessions'
+import * as Sessions from '../../redux/sessions'
 import {
   Introduction,
   DeckSetup,
@@ -35,7 +35,7 @@ import type { StyleProps } from '@opentrons/components'
 import type {
   CalibrationLabware,
   SessionCommandParams,
-} from '../../sessions/types'
+} from '../../redux/sessions/types'
 import type { CalibratePipetteOffsetParentProps } from './types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 

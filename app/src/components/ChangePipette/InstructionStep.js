@@ -5,7 +5,7 @@ import type {
   PipetteChannels,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../robot'
+import type { Mount } from '../../redux/robot'
 import type { Direction } from './types'
 
 import screwdriverSrc from '../../assets/images/change-pip/screwdriver.svg'

@@ -27,12 +27,12 @@ import {
   OVERLAY_LIGHT_GRAY_50,
 } from '@opentrons/components'
 
-import * as Config from '../../config'
-import * as CustomLabware from '../../custom-labware'
+import * as Config from '../../redux/config'
+import * as CustomLabware from '../../redux/custom-labware'
 import {
   getCalibrationForPipette,
   getTipLengthForPipetteAndTiprack,
-} from '../../calibration'
+} from '../../redux/calibration'
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { InlineCalibrationWarning } from '../InlineCalibrationWarning'
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
@@ -44,8 +44,8 @@ import { formatLastModified } from '../CalibrationPanels/utils'
 import { Portal } from '../portal'
 import { getDisplayNameForTipRack } from './utils'
 
-import type { Mount } from '../../pipettes/types'
-import type { State } from '../../types'
+import type { Mount } from '../../redux/pipettes/types'
+import type { State } from '../../redux/types'
 
 const NO_PIPETTE_ATTACHED = 'No pipette attached'
 const PIPETTE_OFFSET_MISSING = 'Pipette offset calibration missing.'

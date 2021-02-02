@@ -8,7 +8,7 @@ import styles from './styles.css'
 import type {
   BuildrootUpdateSession,
   RobotSystemType,
-} from '../../../buildroot/types'
+} from '../../../redux/buildroot/types'
 
 export type InstallModalContentsProps = {|
   robotSystemType: RobotSystemType | null,

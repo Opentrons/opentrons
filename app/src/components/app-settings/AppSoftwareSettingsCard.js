@@ -19,14 +19,14 @@ import {
   CURRENT_VERSION,
   getAvailableShellUpdate,
   checkShellUpdate,
-} from '../../shell'
+} from '../../redux/shell'
 
 import { Portal } from '../portal'
 import { UpdateAppModal } from './UpdateAppModal'
 import { UpdateNotificationsControl } from './UpdateNotificationsControl'
 import { DowngradeAppControl } from './DowngradeAppControl'
 
-import type { Dispatch } from '../../types'
+import type { Dispatch } from '../../redux/types'
 
 const APP_SOFTWARE_SETTINGS = 'App Software Settings'
 const VERSION_LABEL = 'Software Version'

@@ -2,8 +2,8 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { LabeledToggle } from '@opentrons/components'
-import type { State, Dispatch } from '../../types'
-import { getConfig, toggleConfigValue } from '../../config'
+import type { State, Dispatch } from '../../redux/types'
+import { getConfig, toggleConfigValue } from '../../redux/config'
 
 export const DisableDiscoveryCache = (): React.Node => {
   const dispatch = useDispatch<Dispatch>()

@@ -1,5 +1,5 @@
 // @flow
-import * as Cfg from '@opentrons/app/src/config'
+import * as Cfg from '@opentrons/app/src/redux/config'
 import { shouldUpdate, getNextValue } from '../update'
 
 import type { Config } from '../types'

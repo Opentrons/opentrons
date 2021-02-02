@@ -11,8 +11,8 @@ import {
   SPACING_2,
 } from '@opentrons/components'
 
-import { IFACE_FAMILY_IPV4 } from '../../system-info'
-import type { UsbDevice, NetworkInterface } from '../../system-info/types'
+import { IFACE_FAMILY_IPV4 } from '../../redux/system-info'
+import type { UsbDevice, NetworkInterface } from '../../redux/system-info/types'
 
 // TODO(mc, 2020-04-28): i18n
 const U2E_ADAPTER_DESCRIPTION =

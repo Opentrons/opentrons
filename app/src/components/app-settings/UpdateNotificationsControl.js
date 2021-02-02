@@ -9,14 +9,14 @@ import {
   getAlertIsPermanentlyIgnored,
   alertPermanentlyIgnored,
   alertUnignored,
-} from '../../alerts'
+} from '../../redux/alerts'
 
-import { useTrackEvent } from '../../analytics'
+import { useTrackEvent } from '../../redux/analytics'
 import { TitledControl } from '../TitledControl'
 import { ToggleBtn } from '../ToggleBtn'
 
 import type { StyleProps } from '@opentrons/components'
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 
 const APP_UPDATE_ALERTS = 'App Update Alerts'
 

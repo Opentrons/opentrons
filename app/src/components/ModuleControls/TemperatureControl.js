@@ -14,8 +14,8 @@ import type {
   ThermocyclerModule,
   TemperatureModule,
   ModuleCommand,
-} from '../../modules/types'
-import { THERMOCYCLER_MODULE_TYPE } from '../../modules'
+} from '../../redux/modules/types'
+import { THERMOCYCLER_MODULE_TYPE } from '../../redux/modules'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 const TC_BLOCK = 'Block'

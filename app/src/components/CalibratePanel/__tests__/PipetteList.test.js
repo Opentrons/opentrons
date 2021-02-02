@@ -4,23 +4,23 @@ import { StaticRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
-import * as PipettesSelectors from '../../../pipettes/selectors'
-import * as robotSelectors from '../../../robot/selectors'
-import * as calibrateSelectors from '../../../nav/calibrate-selectors'
+import * as PipettesSelectors from '../../../redux/pipettes/selectors'
+import * as robotSelectors from '../../../redux/robot/selectors'
+import * as calibrateSelectors from '../../../redux/nav/calibrate-selectors'
 
-import type { BaseProtocolLabware } from '../../../calibration/types'
+import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { fetchTipLengthCalibrations } from '../../../calibration/'
+import { fetchTipLengthCalibrations } from '../../../redux/calibration/'
 import {
   PipetteListComponent,
   type PipetteListComponentProps,
 } from '../PipetteList'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
-jest.mock('../../../robot/selectors')
-jest.mock('../../../nav/calibrate-selectors')
-jest.mock('../../../pipettes/selectors')
+jest.mock('../../../redux/robot/selectors')
+jest.mock('../../../redux/nav/calibrate-selectors')
+jest.mock('../../../redux/pipettes/selectors')
 
 const mockGetProtocolPipettes: JestMockFn<
   [State],

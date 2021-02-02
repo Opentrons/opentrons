@@ -2,13 +2,13 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { PIPETTE_MOUNTS } from '../../pipettes'
+import { PIPETTE_MOUNTS } from '../../redux/pipettes'
 import { InstrumentGroup } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { InstrumentInfoProps } from '@opentrons/components'
-import type { Pipette, Labware } from '../../robot/types'
-import type { Mount } from '../../pipettes/types'
+import type { Pipette, Labware } from '../../redux/robot/types'
+import type { Mount } from '../../redux/pipettes/types'
 
 export type PipettesProps = {|
   currentMount: Mount | null,

@@ -15,13 +15,13 @@ import {
 } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { AttachedPipette } from '../../pipettes/types'
-import type { BaseProtocolLabware } from '../../calibration/types'
-import type { State } from '../../types'
+import type { AttachedPipette } from '../../redux/pipettes/types'
+import type { BaseProtocolLabware } from '../../redux/calibration/types'
+import type { State } from '../../redux/types'
 
 import { TipLengthCalibrationData } from './TipLengthCalibrationData'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { getTipLengthForPipetteAndTiprack } from '../../calibration'
+import { getTipLengthForPipetteAndTiprack } from '../../redux/calibration'
 
 const MARGIN_LEFT_SIZE = '1.6rem'
 

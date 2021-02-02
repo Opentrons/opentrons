@@ -6,8 +6,8 @@ import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
-import * as Sessions from '../../../sessions'
-import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
+import * as Sessions from '../../../redux/sessions'
+import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
 import { CalibratePipetteOffset } from '../index'
 import {
@@ -21,11 +21,11 @@ import {
   INTENT_CALIBRATE_PIPETTE_OFFSET,
 } from '../../CalibrationPanels'
 
-import type { PipetteOffsetCalibrationStep } from '../../../sessions/types'
+import type { PipetteOffsetCalibrationStep } from '../../../redux/sessions/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
-jest.mock('../../../sessions/selectors')
-jest.mock('../../../robot-api/selectors')
+jest.mock('../../../redux/sessions/selectors')
+jest.mock('../../../redux/robot-api/selectors')
 
 type CalibratePipetteOffsetSpec = {
   component: React.AbstractComponent<any>,

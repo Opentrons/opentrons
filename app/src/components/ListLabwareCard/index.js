@@ -8,9 +8,9 @@ import {
   fetchCustomLabware,
   getCustomLabware,
   getListLabwareErrorMessage,
-} from '../../custom-labware'
+} from '../../redux/custom-labware'
 
-import type { Dispatch } from '../../types'
+import type { Dispatch } from '../../redux/types'
 
 const LABWARE_REFRESH_INTERVAL_MS = 5000
 

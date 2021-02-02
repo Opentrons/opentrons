@@ -4,8 +4,8 @@ import { useDispatch } from 'react-redux'
 import { push } from 'connected-react-router'
 import { AlertModal } from '@opentrons/components'
 
-import type { Dispatch } from '../../types'
-import { actions as robotActions } from '../../robot'
+import type { Dispatch } from '../../redux/types'
+import { actions as robotActions } from '../../redux/robot'
 
 const HEADING = 'Are you sure you want to cancel this run?'
 const CANCEL_TEXT = 'cancel run'

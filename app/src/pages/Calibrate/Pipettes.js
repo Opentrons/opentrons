@@ -5,17 +5,17 @@ import { useSelector, useDispatch } from 'react-redux'
 import head from 'lodash/head'
 import omit from 'lodash/omit'
 
-import { selectors as robotSelectors } from '../../robot'
+import { selectors as robotSelectors } from '../../redux/robot'
 import {
   PIPETTE_MOUNTS,
   fetchPipettes,
   getProtocolPipettesInfo,
-} from '../../pipettes'
-import { getConnectedRobot } from '../../discovery'
+} from '../../redux/pipettes'
+import { getConnectedRobot } from '../../redux/discovery'
 import {
   getTipLengthForPipetteAndTiprack,
   getCalibrationForPipette,
-} from '../../calibration'
+} from '../../redux/calibration'
 
 import { Page } from '../../components/Page'
 
@@ -26,9 +26,9 @@ import {
 import { SessionHeader } from '../../components/SessionHeader'
 
 import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch } from '../../types'
-import type { Mount } from '../../pipettes/types'
-import type { Labware } from '../../robot/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { Mount } from '../../redux/pipettes/types'
+import type { Labware } from '../../redux/robot/types'
 import { CalibrateTipLengthControl } from './CalibrateTipLengthControl'
 
 type Props = ContextRouter

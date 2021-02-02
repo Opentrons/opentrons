@@ -5,8 +5,8 @@ import { act } from 'react-dom/test-utils'
 import {
   mockTipLengthCalBlock,
   mockTipLengthTipRack,
-} from '../../../sessions/__fixtures__'
-import * as Sessions from '../../../sessions'
+} from '../../../redux/sessions/__fixtures__'
+import * as Sessions from '../../../redux/sessions'
 
 import { MeasureTip } from '../MeasureTip'
 

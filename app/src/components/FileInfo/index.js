@@ -10,7 +10,7 @@ import { ProtocolLabwareCard } from './ProtocolLabwareCard'
 import { Continue } from './Continue'
 import { UploadError } from '../UploadError'
 
-import type { Robot } from '../../discovery/types'
+import type { Robot } from '../../redux/discovery/types'
 
 const NO_STEPS_MESSAGE = `This protocol has no steps in it - there's nothing for your robot to do! Your protocol needs at least one aspirate/dispense to import properly`
 

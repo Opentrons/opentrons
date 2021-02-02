@@ -3,7 +3,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import type { Labware } from '../../robot'
+import type { Labware } from '../../redux/robot'
 
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { ModalPage } from '@opentrons/components'

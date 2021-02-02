@@ -24,8 +24,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
-import * as Sessions from '../../sessions'
-import type { SessionType } from '../../sessions/types'
+import * as Sessions from '../../redux/sessions'
+import type { SessionType } from '../../redux/sessions/types'
 import type { Axis, Sign, StepSize } from '../JogControls/types'
 import type { CalibrationPanelProps } from './types'
 import { JogControls, HORIZONTAL_PLANE, VERTICAL_PLANE } from '../JogControls'

@@ -1,6 +1,6 @@
 // @flow
-import type { Action } from '../../types'
-import type { DeckCalibrationSession } from '../../sessions/types'
+import type { Action } from '../../redux/types'
+import type { DeckCalibrationSession } from '../../redux/sessions/types'
 
 export type CalibrateDeckParentProps = {|
   robotName: string,

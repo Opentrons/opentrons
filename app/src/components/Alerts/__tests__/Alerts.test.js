@@ -2,15 +2,15 @@
 import * as React from 'react'
 
 import { mountWithStore } from '@opentrons/components/__utils__'
-import * as AppAlerts from '../../../alerts'
+import * as AppAlerts from '../../../redux/alerts'
 import { Alerts } from '..'
 import { LostConnectionAlert } from '../../LostConnectionAlert'
 import { AnalyticsSettingsModal } from '../../analytics-settings'
 import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
 import { UpdateAppModal } from '../../app-settings'
 
-import type { State } from '../../../types'
-import type { AlertId } from '../../../alerts/types'
+import type { State } from '../../../redux/types'
+import type { AlertId } from '../../../redux/alerts/types'
 
 jest.mock('../../LostConnectionAlert', () => ({
   LostConnectionAlert: () => <></>,
@@ -28,7 +28,7 @@ jest.mock('../../app-settings', () => ({
   UpdateAppModal: () => <></>,
 }))
 
-jest.mock('../../../alerts/selectors')
+jest.mock('../../../redux/alerts/selectors')
 
 const getActiveAlerts: JestMockFn<[State], $ReadOnlyArray<AlertId>> =
   AppAlerts.getActiveAlerts

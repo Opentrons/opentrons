@@ -21,8 +21,8 @@ import type { StyleProps } from '@opentrons/components'
 import type {
   SessionCommandParams,
   CalibrationLabware,
-} from '../../sessions/types'
-import * as Sessions from '../../sessions'
+} from '../../redux/sessions/types'
+import * as Sessions from '../../redux/sessions'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 import {

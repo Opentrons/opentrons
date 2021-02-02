@@ -27,12 +27,12 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 import styles from './styles.css'
-import { getRobotByName } from '../../discovery'
-import { getIsRunning } from '../../robot/selectors'
+import { getRobotByName } from '../../redux/discovery'
+import { getIsRunning } from '../../redux/robot/selectors'
 import { PipetteCalibrationInfo } from './PipetteCalibrationInfo'
 
-import type { State } from '../../types'
-import type { Mount, AttachedPipette } from '../../pipettes/types'
+import type { State } from '../../redux/types'
+import type { Mount, AttachedPipette } from '../../redux/pipettes/types'
 
 export type PipetteInfoProps = {|
   robotName: string,

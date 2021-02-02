@@ -8,7 +8,7 @@ import {
   getBuildrootUpdateInfo,
   getBuildrootDownloadProgress,
   getBuildrootDownloadError,
-} from '../../../buildroot'
+} from '../../../redux/buildroot'
 
 import { MigrationWarningModal } from './MigrationWarningModal'
 import { DownloadUpdateModal } from './DownloadUpdateModal'
@@ -17,7 +17,7 @@ import { ReleaseNotesModal } from './ReleaseNotesModal'
 import type {
   BuildrootUpdateType,
   RobotSystemType,
-} from '../../../buildroot/types'
+} from '../../../redux/buildroot/types'
 
 export type ViewUpdateModalProps = {|
   robotName: string,

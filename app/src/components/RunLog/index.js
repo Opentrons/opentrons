@@ -5,12 +5,12 @@ import { connect } from 'react-redux'
 import {
   actions as robotActions,
   selectors as robotSelectors,
-} from '../../robot'
+} from '../../redux/robot'
 
 import { CommandList } from './CommandList'
 
-import type { State, Dispatch } from '../../types'
-import type { SessionStatus, SessionStatusInfo } from '../../robot'
+import type { State, Dispatch } from '../../redux/types'
+import type { SessionStatus, SessionStatusInfo } from '../../redux/robot'
 import type { CommandListProps } from './CommandList'
 
 export { ConfirmCancelModal } from './ConfirmCancelModal'

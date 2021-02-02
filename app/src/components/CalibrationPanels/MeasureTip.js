@@ -22,7 +22,7 @@ import {
   SPACING_4,
 } from '@opentrons/components'
 
-import * as Sessions from '../../sessions'
+import * as Sessions from '../../redux/sessions'
 import { JogControls, VERTICAL_PLANE } from '../JogControls'
 import type { Axis, Sign, StepSize } from '../JogControls/types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'

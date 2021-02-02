@@ -10,8 +10,11 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-import * as Sessions from '../../sessions'
-import type { SessionType, SessionCommandString } from '../../sessions/types'
+import * as Sessions from '../../redux/sessions'
+import type {
+  SessionType,
+  SessionCommandString,
+} from '../../redux/sessions/types'
 import type { CalibrationPanelProps } from './types'
 
 const CONFIRM_TIP_BODY = 'Did pipette pick up tip successfully?'

@@ -18,7 +18,7 @@ import {
   C_WHITE,
 } from '@opentrons/components'
 import { CalibrationData } from './CalibrationData'
-import type { BaseProtocolLabware } from '../../calibration/labware/types'
+import type { BaseProtocolLabware } from '../../redux/calibration/labware/types'
 import styles from './styles.css'
 
 export type LabwareListItemProps = {|

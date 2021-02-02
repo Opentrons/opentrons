@@ -2,9 +2,9 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import * as RobotApi from '../../robot-api'
-import * as Sessions from '../../sessions'
-import * as Config from '../../config'
+import * as RobotApi from '../../redux/robot-api'
+import * as Sessions from '../../redux/sessions'
+import * as Config from '../../redux/config'
 
 import {
   Icon,
@@ -20,10 +20,10 @@ import { CheckCalibration } from '../CheckCalibration'
 import { TitledControl } from '../TitledControl'
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 
-import type { SessionCommandString } from '../../sessions/types'
-import type { RequestState } from '../../robot-api/types'
+import type { SessionCommandString } from '../../redux/sessions/types'
+import type { RequestState } from '../../redux/robot-api/types'
 
-import type { State } from '../../types'
+import type { State } from '../../redux/types'
 
 export type CheckCalibrationControlProps = {|
   robotName: string,

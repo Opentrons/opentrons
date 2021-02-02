@@ -5,7 +5,7 @@ import { act } from 'react-dom/test-utils'
 
 import { AskForCalibrationBlockModal } from '../AskForCalibrationBlockModal'
 import { CheckboxField } from '@opentrons/components'
-import { setUseTrashSurfaceForTipCal } from '../../../calibration'
+import { setUseTrashSurfaceForTipCal } from '../../../redux/calibration'
 
 describe('AskForCalibrationBlockModal', () => {
   let onResponse

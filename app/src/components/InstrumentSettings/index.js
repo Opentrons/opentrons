@@ -5,7 +5,7 @@ import * as React from 'react'
 import { AttachedPipettesCard } from './AttachedPipettesCard'
 import { CardContainer, CardRow } from '../layout'
 
-import type { Mount } from '../../pipettes/types'
+import type { Mount } from '../../redux/pipettes/types'
 
 type Props = {|
   robotName: string,

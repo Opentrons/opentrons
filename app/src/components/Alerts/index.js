@@ -3,14 +3,14 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import head from 'lodash/head'
 
-import * as AppAlerts from '../../alerts'
+import * as AppAlerts from '../../redux/alerts'
 import { LostConnectionAlert } from '../LostConnectionAlert'
 import { AnalyticsSettingsModal } from '../analytics-settings'
 import { UpdateAppModal } from '../app-settings'
 import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 
-import type { State, Dispatch } from '../../types'
-import type { AlertId } from '../../alerts/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { AlertId } from '../../redux/alerts/types'
 
 export function Alerts(): React.Node {
   const dispatch = useDispatch<Dispatch>()

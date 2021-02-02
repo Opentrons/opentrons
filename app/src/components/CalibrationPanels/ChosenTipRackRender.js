@@ -23,7 +23,7 @@ import { formatLastModified } from './utils'
 
 import type { SelectOption } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { TipLengthCalibration } from '../../calibration/api-types'
+import type { TipLengthCalibration } from '../../redux/calibration/api-types'
 
 const TIP_LENGTH_CALIBRATED_PROMPT = 'Calibrated on'
 const OVERRIDE_TIP_LENGTH_CALIBRATED_PROMPT =

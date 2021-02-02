@@ -3,10 +3,10 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import type { Dispatch } from '../../types'
-import type { Pipette, Labware } from '../../robot'
+import type { Dispatch } from '../../redux/types'
+import type { Pipette, Labware } from '../../redux/robot'
 
-import { actions as robotActions } from '../../robot'
+import { actions as robotActions } from '../../redux/robot'
 import { PrimaryButton } from '@opentrons/components'
 import { ConfirmPositionDiagram } from './ConfirmPositionDiagram'
 import { JogControls } from '../JogControls'

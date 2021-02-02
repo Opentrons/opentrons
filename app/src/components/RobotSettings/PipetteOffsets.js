@@ -5,9 +5,9 @@ import { useSelector } from 'react-redux'
 import { Link as RRDLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import type { State } from '../../types'
-import * as Pipettes from '../../pipettes'
-import * as CustomLabware from '../../custom-labware'
+import type { State } from '../../redux/types'
+import * as Pipettes from '../../redux/pipettes'
+import * as CustomLabware from '../../redux/custom-labware'
 
 import { TitledControl } from '../TitledControl'
 
@@ -21,7 +21,7 @@ import {
   SecondaryBtn,
 } from '@opentrons/components'
 
-import type { ViewableRobot } from '../../discovery/types'
+import type { ViewableRobot } from '../../redux/discovery/types'
 
 import { PipetteOffsetItem } from './PipetteOffsetItem'
 

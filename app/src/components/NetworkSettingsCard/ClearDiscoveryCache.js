@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
-import { clearDiscoveryCache } from '../../discovery'
+import { clearDiscoveryCache } from '../../redux/discovery'
 import { LabeledButton } from '@opentrons/components'
-import type { Dispatch } from '../../types'
+import type { Dispatch } from '../../redux/types'
 
 // TODO(spp, 2020-05-08): i18n
 const CLEAR = 'clear'

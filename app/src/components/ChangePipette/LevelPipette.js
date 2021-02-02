@@ -18,8 +18,8 @@ import type {
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 
-import type { Mount } from '../../pipettes/types'
-import type { PipetteOffsetCalibration } from '../../calibration/types'
+import type { Mount } from '../../redux/pipettes/types'
+import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
 
 // TODO: i18n
 const EXIT_BUTTON_MESSAGE = 'confirm pipette is leveled'

@@ -4,16 +4,16 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 
-import { selectors as robotSelectors } from '../../robot'
-import { getProtocolFilename } from '../../protocol'
-import { getConnectedRobot } from '../../discovery'
-import { getCustomLabware } from '../../custom-labware'
+import { selectors as robotSelectors } from '../../redux/robot'
+import { getProtocolFilename } from '../../redux/protocol'
+import { getConnectedRobot } from '../../redux/discovery'
+import { getCustomLabware } from '../../redux/custom-labware'
 
 import { FileInfo } from './FileInfo'
 
 import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch } from '../../types'
-import type { Robot } from '../../discovery/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { Robot } from '../../redux/discovery/types'
 
 type OP = ContextRouter
 

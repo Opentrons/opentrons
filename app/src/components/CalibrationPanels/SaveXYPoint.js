@@ -24,14 +24,14 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 
-import * as Sessions from '../../sessions'
+import * as Sessions from '../../redux/sessions'
 import type { Axis, Sign, StepSize } from '../JogControls/types'
 import type { CalibrationPanelProps } from './types'
 import type {
   SessionType,
   CalibrationSessionStep,
   SessionCommandString,
-} from '../../sessions/types'
+} from '../../redux/sessions/types'
 import { JogControls, HORIZONTAL_PLANE, VERTICAL_PLANE } from '../JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'

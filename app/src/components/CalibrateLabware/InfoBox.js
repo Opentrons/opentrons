@@ -7,10 +7,10 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
-import { selectors as robotSelectors } from '../../robot'
+import { selectors as robotSelectors } from '../../redux/robot'
 import { InfoBoxButton } from './InfoBoxButton'
 
-import type { Labware, LabwareType } from '../../robot/types'
+import type { Labware, LabwareType } from '../../redux/robot/types'
 
 export type InfoBoxProps = {| labware: ?Labware |}
 
