@@ -1,5 +1,4 @@
 from opentrons.hardware_control.types import Axis
-import pytest
 
 
 def test_engage_axes(api_client, hardware):
@@ -39,53 +38,42 @@ def test_engage_invalid_axes(api_client, hardware):
     assert res0.status_code == 500
 
 
-@pytest.fixture
-def hardware_with_disengage_axes(hardware):
-    async def mock_disengage_axes(*args, **kwargs):
-        pass
-
-    hardware.disengage_axes.side_effect = mock_disengage_axes
-    return hardware
-
-
-def test_disengage_axes(api_client, hardware_with_disengage_axes):
+def test_disengage_axes(api_client, hardware):
     postres = api_client.post(
         '/motors/disengage', json={'axes': ['x', 'b']})
 
-    hardware_with_disengage_axes.disengage_axes.assert_called_once_with(
-        [Axis.X, Axis.B])
+    hardware.disengage_axes.assert_called_once_with([Axis.X, Axis.B])
 
     assert postres.status_code == 200
     assert postres.json() == {"message": "Disengaged axes: x, b"}
 
 
 def test_disengage_axes_case_insensitive(api_client,
-                                         hardware_with_disengage_axes):
+                                         hardware):
 
     postres = api_client.post(
         '/motors/disengage', json={'axes': ['Y', 'A']})
 
-    hardware_with_disengage_axes.disengage_axes.assert_called_once_with(
-        [Axis.Y, Axis.A])
+    hardware.disengage_axes.assert_called_once_with([Axis.Y, Axis.A])
 
     assert postres.status_code == 200
     assert postres.json() == {"message": "Disengaged axes: y, a"}
 
 
-def test_disengage_invalid_axes(api_client, hardware_with_disengage_axes):
+def test_disengage_invalid_axes(api_client, hardware):
     postres = api_client.post(
         '/motors/disengage', json={'axes': ['u']})
 
-    hardware_with_disengage_axes.disengage_axes.assert_not_called()
+    hardware.disengage_axes.assert_not_called()
 
     assert postres.status_code == 422
 
 
-def test_disengage_no_axes(api_client, hardware_with_disengage_axes):
+def test_disengage_no_axes(api_client, hardware):
     postres = api_client.post(
         '/motors/disengage', json={'axes': []})
 
-    hardware_with_disengage_axes.disengage_axes.assert_called_once_with([])
+    hardware.disengage_axes.assert_called_once_with([])
 
     assert postres.status_code == 200
     assert postres.json() == {"message": "Disengaged axes: "}

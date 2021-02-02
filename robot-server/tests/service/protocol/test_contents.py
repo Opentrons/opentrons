@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from mock import patch, MagicMock
 
 import pytest
 from fastapi import UploadFile

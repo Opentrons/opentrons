@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import MagicMock, patch, PropertyMock
+from mock import MagicMock, patch, PropertyMock
 import pytest
 from opentrons.api import Session
 from opentrons.hardware_control import ThreadedAsyncLock

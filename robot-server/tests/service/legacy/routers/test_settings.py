@@ -1,6 +1,6 @@
 import logging
 import pytest
-from unittest.mock import patch, call
+from mock import patch, call
 from dataclasses import make_dataclass
 
 from opentrons.config.reset import ResetOptionId
@@ -61,11 +61,8 @@ def test_post_log_level_upstream(
     syslog_level,
     expected_message
 ):
-    async def mock_set_syslog_level(syslog_level):
-        return 0, "stdout", "stderr"
-
     with patch("opentrons.system.log_control.set_syslog_level") as m:
-        m.side_effect = mock_set_syslog_level
+        m.return_value = 0, "stdout", "stderr"
         response = api_client.post(
             "/settings/log_level/upstream", json={"log_level": log_level}
         )
@@ -78,11 +75,8 @@ def test_post_log_level_upstream(
 def test_post_log_level_upstream_fails_reload(api_client):
     log_level = "debug"
 
-    async def mock_set_syslog_level(syslog_level):
-        return 1, "stdout", "stderr"
-
     with patch("opentrons.system.log_control.set_syslog_level") as m:
-        m.side_effect = mock_set_syslog_level
+        m.return_value = 1, "stdout", "stderr"
         response = api_client.post(
             "/settings/log_level/upstream", json={"log_level": log_level}
         )
@@ -316,15 +310,6 @@ def test_reset_invalid_option(api_client, mock_reset):
     # assert 'aksgjajhadjasl' in body['message']
 
 
-@pytest.fixture
-def hardware_log_level(hardware):
-    async def update_config(*args, **kwargs):
-        pass
-
-    hardware.update_config.side_effect = update_config
-    return hardware
-
-
 @pytest.fixture()
 def mock_robot_configs():
     with patch("robot_server.service.legacy.routers."
@@ -345,12 +330,12 @@ def mock_logging_set_level():
                              [{'log_level': 'oafajhshda'}]
                          ])
 def test_set_log_level_invalid(api_client, body,
-                               hardware_log_level, mock_logging_set_level,
+                               hardware, mock_logging_set_level,
                                mock_robot_configs):
     resp = api_client.post('/settings/log_level/local', json=body)
     assert resp.status_code == 422
     mock_logging_set_level.assert_not_called()
-    hardware_log_level.update_config.assert_not_called()
+    hardware.update_config.assert_not_called()
     mock_robot_configs.save_robot_settings.assert_not_called()
 
 
@@ -375,7 +360,7 @@ def test_set_log_level_invalid(api_client, body,
                              [{'log_level': 'ERROR'},
                               logging.ERROR, "ERROR"],
                          ])
-def test_set_log_level(api_client, hardware_log_level,
+def test_set_log_level(api_client, hardware,
                        mock_robot_configs, mock_logging_set_level,
                        body, expected_log_level, expected_log_level_name):
     resp = api_client.post('/settings/log_level/local', json=body)
@@ -384,7 +369,7 @@ def test_set_log_level(api_client, hardware_log_level,
     mock_logging_set_level.assert_has_calls([call(expected_log_level),
                                              call(expected_log_level),
                                              call(expected_log_level)])
-    hardware_log_level.update_config.assert_called_once_with(
+    hardware.update_config.assert_called_once_with(
         log_level=expected_log_level_name)
     mock_robot_configs.save_robot_settings.assert_called_once()
 
@@ -408,9 +393,6 @@ def mock_is_restart_required():
 @pytest.fixture
 def mock_set_adv_setting():
     with patch("robot_server.service.legacy.routers.settings.advanced_settings.set_adv_setting") as p:  # noqa: E501
-        async def f(i, v):
-            pass
-        p.side_effect = f
         yield p
 
 

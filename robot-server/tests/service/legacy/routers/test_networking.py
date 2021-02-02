@@ -1,7 +1,7 @@
 import os
 import random
 import tempfile
-from unittest.mock import patch
+from mock import patch
 
 import pytest
 from opentrons.system import nmcli, wifi
@@ -87,13 +87,8 @@ def test_wifi_configure(api_client):
     msg = "Device 'wlan0' successfully activated with" \
           " '076aa998-0275-4aa0-bf85-e9629021e267'."  # noqa
 
-    async def mock_configure(ssid, eapConfig, securityType=None,
-                             psk=None, hidden=False):
-        # Command: nmcli device wifi connect "{ssid}" password "{psk}"
-        return True, msg
-
     with patch("opentrons.system.nmcli.configure") as m:
-        m.side_effect = mock_configure
+        m.return_value = True, msg
 
         expected = {'ssid': 'Opentrons', 'message': msg}
 
