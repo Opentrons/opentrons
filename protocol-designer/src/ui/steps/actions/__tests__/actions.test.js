@@ -4,12 +4,12 @@ import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import { when, resetAllWhenMocks } from 'jest-when'
 import * as utils from '../../../../utils'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
+import * as stepFormSelectors from '../../../../step-forms/selectors'
 import { getMultiSelectLastSelected } from '../../selectors'
 import { selectStep, selectAllSteps, deselectAllSteps } from '../actions'
 import { duplicateStep, duplicateMultipleSteps } from '../thunks'
 
-jest.mock('../../../../step-forms')
+jest.mock('../../../../step-forms/selectors')
 jest.mock('../../selectors')
 
 const mockStore = configureMockStore([thunk])
@@ -135,7 +135,16 @@ describe('steps actions', () => {
     })
   })
   describe('duplicateMultipleSteps', () => {
+    let ids
+    beforeEach(() => {
+      ids = ['id_1', 'id_2', 'id_3']
+      when(mockGetOrderedStepIds)
+        .calledWith(expect.anything())
+        .mockReturnValue(ids)
+    })
+
     afterEach(() => {
+      resetAllWhenMocks()
       jest.restoreAllMocks()
     })
     it('should duplicate multiple steps with a new step ids, and select the new duplicated steps', () => {
@@ -147,6 +156,35 @@ describe('steps actions', () => {
       const store = mockStore()
       // $FlowFixMe(SA, 2021-02-01): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
       store.dispatch(duplicateMultipleSteps(['id_1', 'id_2', 'id_3']))
+      const duplicateStepsAction = {
+        type: 'DUPLICATE_MULTIPLE_STEPS',
+        payload: [
+          { stepId: 'id_1', duplicateStepId: 'dup_1' },
+          { stepId: 'id_2', duplicateStepId: 'dup_2' },
+          { stepId: 'id_3', duplicateStepId: 'dup_3' },
+        ],
+      }
+      const selectMultipleStepsAction = {
+        type: 'SELECT_MULTIPLE_STEPS',
+        payload: {
+          stepIds: ['dup_1', 'dup_2', 'dup_3'],
+          lastSelected: 'dup_3',
+        },
+      }
+      expect(store.getActions()).toEqual([
+        duplicateStepsAction,
+        selectMultipleStepsAction,
+      ])
+    })
+    it('should duplicate multiple steps with a new step ids, and select the new duplicated steps even when provided in a non linear order', () => {
+      jest
+        .spyOn(utils, 'uuid')
+        .mockReturnValueOnce('dup_1')
+        .mockReturnValueOnce('dup_2')
+        .mockReturnValueOnce('dup_3')
+      const store = mockStore()
+      // $FlowFixMe(SA, 2021-02-01): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      store.dispatch(duplicateMultipleSteps(['id_3', 'id_1', 'id_2']))
       const duplicateStepsAction = {
         type: 'DUPLICATE_MULTIPLE_STEPS',
         payload: [

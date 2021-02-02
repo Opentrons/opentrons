@@ -4,6 +4,7 @@ import last from 'lodash/last'
 import {
   getUnsavedForm,
   getUnsavedFormIsPristineSetTempForm,
+  getOrderedStepIds,
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
 import { PRESAVED_STEP_ID } from '../../../../steplist/types'
@@ -112,6 +113,10 @@ export const duplicateMultipleSteps: (
 ) => ThunkAction<
   DuplicateMultipleStepsAction | SelectMultipleStepsAction
 > = stepIds => (dispatch, getState) => {
+  const orderedStepIds = getOrderedStepIds(getState())
+
+  stepIds.sort((a, b) => orderedStepIds.indexOf(a) - orderedStepIds.indexOf(b))
+
   const duplicateIdsZipped = stepIds.map(stepId => ({
     stepId: stepId,
     duplicateStepId: uuid(),
