@@ -85,9 +85,7 @@ describe('ConnectedStepItem', () => {
       .calledWith(expect.anything())
       .mockReturnValue(false)
 
-    when(getErrorStepId)
-      .calledWith(expect.anything())
-      .mockReturnValue(false)
+    when(getErrorStepId).calledWith(expect.anything()).mockReturnValue(false)
 
     when(getArgsAndErrorsByStepIdMock)
       .calledWith(expect.anything())

@@ -179,7 +179,9 @@ export const SlotControls: React.AbstractComponent<OP> = connect<
   mapStateToProps,
   mapDispatchToProps
 )(
-  DropTarget(DND_TYPES.LABWARE, slotTarget, collectSlotTarget)(
-    SlotControlsComponent
-  )
+  DropTarget(
+    DND_TYPES.LABWARE,
+    slotTarget,
+    collectSlotTarget
+  )(SlotControlsComponent)
 )

@@ -19,7 +19,7 @@ export type WarningType = string
 
 export type DismissedWarningsAllSteps = {
   [stepId: StepIdType]: ?Array<WarningType>,
-  ...,
+  ...
 }
 export type DismissedWarningState = {|
   form: DismissedWarningsAllSteps,

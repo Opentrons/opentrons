@@ -11,7 +11,7 @@ export const PD_VERSION = '4.0.0'
 
 export const migrateSavedStepForms = (savedStepForms: {
   [string]: any,
-  ...,
+  ...
 }): { [string]: any, ... } => {
   // NOTE: intentionally not importing PAUSE_UNTIL_TIME / PAUSE_UNTIL_TEMP from constants.js
   // to protect this particular migration fn from breaking if those values are ever changed.

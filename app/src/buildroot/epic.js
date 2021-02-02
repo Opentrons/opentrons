@@ -393,10 +393,7 @@ export const removeMigratedRobotsEpic: Epic = (_, state$) => {
 }
 
 export const disconnectRpcOnStartEpic: Epic = action$ => {
-  return action$.pipe(
-    ofType(BR_START_UPDATE),
-    mapTo(robotActions.disconnect())
-  )
+  return action$.pipe(ofType(BR_START_UPDATE), mapTo(robotActions.disconnect()))
 }
 
 export const buildrootEpic: Epic = combineEpics(

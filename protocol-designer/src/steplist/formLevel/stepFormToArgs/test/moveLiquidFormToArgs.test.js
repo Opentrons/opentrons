@@ -389,7 +389,14 @@ describe('getMixData', () => {
   })
 
   it('return null if either number fields <= 0 / null', () => {
-    const cases = [[0, 5], [null, 5], [10, 0], [10, null], [-1, 2], [2, -1]]
+    const cases = [
+      [0, 5],
+      [null, 5],
+      [10, 0],
+      [10, null],
+      [-1, 2],
+      [2, -1],
+    ]
 
     cases.forEach(testCase => {
       const [volumeValue, timesValue] = testCase

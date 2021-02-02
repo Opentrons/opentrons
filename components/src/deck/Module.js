@@ -68,8 +68,9 @@ export function Module(props: ModuleProps): React.Node {
       x={x}
       y={y - height}
       transformWithSVG
-      extraTransform={`rotate(${shouldFlip ? 180 : 0}, ${slot.boundingBox
-        .xDimension / 2}, ${slot.boundingBox.yDimension / -2})`}
+      extraTransform={`rotate(${shouldFlip ? 180 : 0}, ${
+        slot.boundingBox.xDimension / 2
+      }, ${slot.boundingBox.yDimension / -2})`}
       innerDivProps={{
         className: cx(styles.module, { [styles.flipped]: shouldFlip }),
       }}

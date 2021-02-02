@@ -15,7 +15,7 @@ type TypeKey =
 
 const DIAGRAMS: {
   [TypeKey]: { [Channels]: { [Step]: string, ... }, ... },
-  ...,
+  ...
 } = {
   tiprack: {
     single: {
@@ -91,7 +91,7 @@ const DIAGRAMS: {
 
 const DIAGRAMS_BOTTOM: {
   [TypeKey]: { [Channels]: { [Step]: string, ... }, ... },
-  ...,
+  ...
 } = {
   tiprack: {
     single: {
@@ -167,7 +167,7 @@ const DIAGRAMS_BOTTOM: {
 
 const INSTRUCTIONS: {
   [TypeKey]: { [Channels]: { [Step]: React.Node, ... }, ... },
-  ...,
+  ...
 } = {
   tiprack: {
     single: {
@@ -304,7 +304,7 @@ const INSTRUCTIONS: {
 
 const INSTRUCTIONS_BOTTOM: {
   [TypeKey]: { [Channels]: { [Step]: React.Node, ... }, ... },
-  ...,
+  ...
 } = {
   tiprack: {
     single: {
