@@ -40,16 +40,25 @@ export type DropdownFieldProps = {|
   tabIndex?: number,
   /** automatically focus field on render */
   autoFocus?: boolean,
+  /** if true, render indeterminate unselecatble option */
+  isIndeterminate?: boolean,
 |}
 
 const BLANK_OPTION: DropdownOption = { name: '', value: '' }
+const INDETERMINATE_OPTION: DropdownOption = {
+  name: '-',
+  value: '',
+  disabled: true,
+}
 
 export function DropdownField(props: DropdownFieldProps): React.Node {
+  // add in disabled, unselectable "-" mixed option when isIndeterminate is true
   // add in "blank" option if there is no `value`, unless `options` already has a blank option
-  const options =
-    props.value || props.options.some(opt => opt.value === '')
-      ? props.options
-      : [BLANK_OPTION, ...props.options]
+  const options = props.isIndeterminate
+    ? [INDETERMINATE_OPTION, ...props.options]
+    : props.value || props.options.some(opt => opt.value === '')
+    ? props.options
+    : [BLANK_OPTION, ...props.options]
 
   const error = props.error != null
   const className = cx(props.className, {
