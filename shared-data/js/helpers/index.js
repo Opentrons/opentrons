@@ -92,9 +92,8 @@ function _parseWell(well: string): [string, number] {
 
   if (!letters || number == null || Number.isNaN(number)) {
     console.warn(
-      `Could not parse well ${well}. Got letters: "${
-        letters || 'void'
-      }", number: "${number || 'void'}"`
+      `Could not parse well ${well}. Got letters: "${letters ||
+        'void'}", number: "${number || 'void'}"`
     )
     return ['', NaN]
   }

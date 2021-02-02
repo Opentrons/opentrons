@@ -45,7 +45,9 @@ describe('Desktop Navigation', () => {
   })
 
   it('returns to the file controls when the file button is clicked', () => {
-    cy.get("button[class*='navbar__tab__']").contains('FILE').click()
+    cy.get("button[class*='navbar__tab__']")
+      .contains('FILE')
+      .click()
     cy.contains('Protocol File')
   })
 })

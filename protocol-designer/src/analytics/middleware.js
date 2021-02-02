@@ -47,7 +47,7 @@ export const reduxActionToAnalyticsEvent = (
 
       if (stepArgs.pipette) {
         additionalProperties.__pipetteName =
-          pipetteEntities[stepArgs?.pipette].name
+          pipetteEntities[(stepArgs?.pipette)].name
       }
 
       return {

@@ -20,9 +20,12 @@ test('message is displayed when message exists', () => {
 
   expect(wrapper.find('PDListItem')).toHaveLength(1)
   // TODO 2020-2-4 JF maybe use data attributes when implemented
-  expect(wrapper.find('.step-item-message').render().text()).toContain(
-    props.message
-  )
+  expect(
+    wrapper
+      .find('.step-item-message')
+      .render()
+      .text()
+  ).toContain(props.message)
 })
 
 test('message is not displayed when no message', () => {

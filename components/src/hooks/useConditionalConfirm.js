@@ -40,11 +40,11 @@ import { useState } from 'react'
 export const useConditionalConfirm = <T>(
   handleContinue: (...Array<T>) => mixed,
   shouldBlock: boolean
-): ({|
+): {|
   confirm: (...Array<T>) => mixed,
   showConfirmation: boolean,
   cancel: () => mixed,
-|}) => {
+|} => {
   const [pendingArgs, setPendingArgs] = useState<Array<T> | null>(null)
   const pendingConfirm = pendingArgs !== null
   const confirm = (...confirmArgs) => {

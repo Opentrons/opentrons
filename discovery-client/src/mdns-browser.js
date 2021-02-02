@@ -105,7 +105,7 @@ function monkeyPatchThrowers() {
   // this method can throw (without emitting), so we need to patch this up
   const originalServiceTypeFromString = ServiceType.prototype.fromString
 
-  ServiceType.prototype.fromString = function (...args) {
+  ServiceType.prototype.fromString = function(...args) {
     try {
       originalServiceTypeFromString.apply(this, args)
     } catch (error) {

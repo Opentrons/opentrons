@@ -10,37 +10,71 @@ describe('Desktop Navigation', () => {
     })
 
     it('clicks the "CREATE NEW" button', () => {
-      cy.get('button').contains('Create New').click()
+      cy.get('button')
+        .contains('Create New')
+        .click()
     })
 
     it('displays the setup form', () => {
       // Check to make sure all the form elements are present
       cy.get("input[placeholder='Untitled']").should('exist')
-      cy.contains('Left Pipette').next().contains('None').should('exist')
-      cy.contains('Right Pipette').next().contains('None').should('exist')
-      cy.contains('Left Tiprack').next().get('select').should('be.disabled')
-      cy.contains('Right Tiprack').next().get('select').should('be.disabled')
-      cy.get('button').contains('save').should('be.disabled')
-      cy.get('button').contains('cancel').should('not.be.disabled')
+      cy.contains('Left Pipette')
+        .next()
+        .contains('None')
+        .should('exist')
+      cy.contains('Right Pipette')
+        .next()
+        .contains('None')
+        .should('exist')
+      cy.contains('Left Tiprack')
+        .next()
+        .get('select')
+        .should('be.disabled')
+      cy.contains('Right Tiprack')
+        .next()
+        .get('select')
+        .should('be.disabled')
+      cy.get('button')
+        .contains('save')
+        .should('be.disabled')
+      cy.get('button')
+        .contains('cancel')
+        .should('not.be.disabled')
     })
 
     it('cancel the setup form', () => {
       // Click cancel
-      cy.get('button').contains('cancel').click()
+      cy.get('button')
+        .contains('cancel')
+        .click()
       // The form goes away
       cy.contains('Create New Protocol').should('not.exist')
     })
 
     it('completes the setup form', () => {
       // Get the form back
-      cy.get('button').contains('Create New').click()
+      cy.get('button')
+        .contains('Create New')
+        .click()
       // Give it a name
       cy.get("input[placeholder='Untitled']").type('Cypress Test Protocol')
       // Choose pipette types
-      cy.contains('Left Pipette').next().contains('None').click()
-      cy.contains('Left Pipette').next().contains('P20').click()
-      cy.contains('Right Pipette').next().contains('None').click()
-      cy.contains('Right Pipette').next().contains('P300').click()
+      cy.contains('Left Pipette')
+        .next()
+        .contains('None')
+        .click()
+      cy.contains('Left Pipette')
+        .next()
+        .contains('P20')
+        .click()
+      cy.contains('Right Pipette')
+        .next()
+        .contains('None')
+        .click()
+      cy.contains('Right Pipette')
+        .next()
+        .contains('P300')
+        .click()
       // Diagrams of the pipettes are displayed
       cy.get("div[class*='FilePipettesModal__left_pipette__']")
         .get('img')
@@ -49,7 +83,10 @@ describe('Desktop Navigation', () => {
         .get('img')
         .should('exist')
       // The tiprack dropdowns are now available
-      cy.contains('Left Tiprack').next().get('select').should('not.be.disabled')
+      cy.contains('Left Tiprack')
+        .next()
+        .get('select')
+        .should('not.be.disabled')
       cy.contains('Right Tiprack')
         .next()
         .get('select')
@@ -62,9 +99,13 @@ describe('Desktop Navigation', () => {
         'Opentrons 96 Filter Tip Rack 20 µL'
       )
       // The save button is now available...
-      cy.get('button').contains('save').should('not.be.disabled')
+      cy.get('button')
+        .contains('save')
+        .should('not.be.disabled')
       // ...so click it
-      cy.get('button').contains('save').click()
+      cy.get('button')
+        .contains('save')
+        .click()
       // And now the "file details" form is displayed
       cy.contains('File Details').should('exist')
     })
@@ -75,11 +116,15 @@ describe('Desktop Navigation', () => {
       // Check to make sure all the form elements are present
       const todaysDate = Cypress.moment().format('MMM DD, YYYY')
       cy.contains(todaysDate).should('exist')
-      cy.contains('Last Exported').next().should('not.exist')
+      cy.contains('Last Exported')
+        .next()
+        .should('not.exist')
       cy.get("input[value='Cypress Test Protocol']").should('exist')
       cy.get("input[name='author']").should('exist')
       cy.get("input[name='description']").should('exist')
-      cy.get('button').contains('UPDATED').should('be.disabled')
+      cy.get('button')
+        .contains('UPDATED')
+        .should('be.disabled')
       // We should see the pipette info we entered earlier
       cy.contains('left pipette')
         .next()
@@ -114,13 +159,19 @@ describe('Desktop Navigation', () => {
       cy.get("input[name='description']").type(
         'This protocol was created via automated cypress.io tests'
       )
-      cy.get('button').contains('UPDATE').should('not.be.disabled')
-      cy.get('button').contains('UPDATE').click()
+      cy.get('button')
+        .contains('UPDATE')
+        .should('not.be.disabled')
+      cy.get('button')
+        .contains('UPDATE')
+        .click()
     })
 
     describe('exporting what we have got', () => {
       it('displays a warning modal', () => {
-        cy.get('button').contains('Export').click()
+        cy.get('button')
+          .contains('Export')
+          .click()
         // We are shown a warning modal
         cy.contains('Your protocol has no steps').should('exist')
         // It has a link to help
@@ -132,19 +183,29 @@ describe('Desktop Navigation', () => {
             'https://support.opentrons.com/en/collections/493886-protocol-designer#building-a-protocol-steps'
           )
         // And buttons to get out
-        cy.get('button').contains('CANCEL').should('exist')
-        cy.get('button').contains('CONTINUE WITH EXPORT').should('exist')
+        cy.get('button')
+          .contains('CANCEL')
+          .should('exist')
+        cy.get('button')
+          .contains('CONTINUE WITH EXPORT')
+          .should('exist')
       })
 
       it('goes away when we click cancel', () => {
-        cy.get('button').contains('CANCEL').click()
+        cy.get('button')
+          .contains('CANCEL')
+          .click()
         // No more modal
         cy.contains('Your protocol has no steps').should('not.exist')
       })
 
       it('downloads a file when we continue', () => {
-        cy.get('button').contains('Export').click()
-        cy.get('button').contains('CONTINUE WITH EXPORT').click()
+        cy.get('button')
+          .contains('Export')
+          .click()
+        cy.get('button')
+          .contains('CONTINUE WITH EXPORT')
+          .click()
         //
         // TODO Cypress doesn't handle file downloads very well.
         // Perhaps the app can be modified to react more directly
@@ -160,15 +221,23 @@ describe('Desktop Navigation', () => {
     // Use the edit button to make changes to our pipettes
     it('edits the pipettes', () => {
       cy.get("button[name='editPipettes']").click()
-      cy.contains('Right Pipette').next().contains('P300').click()
-      cy.contains('Right Pipette').next().contains('P1000').click()
+      cy.contains('Right Pipette')
+        .next()
+        .contains('P300')
+        .click()
+      cy.contains('Right Pipette')
+        .next()
+        .contains('P1000')
+        .click()
       cy.get("select[name*='right.tiprack']").select(
         'Opentrons 96 Filter Tip Rack 10 µL'
       )
     })
 
     it('cancels the edits', () => {
-      cy.get('button').contains('cancel').click()
+      cy.get('button')
+        .contains('cancel')
+        .click()
       // Our tentative edits were not saved
       cy.contains('left pipette')
         .next()
@@ -197,15 +266,23 @@ describe('Desktop Navigation', () => {
     it('edits the pipettes again', () => {
       // Same edits as above
       cy.get("button[name='editPipettes']").click()
-      cy.contains('Right Pipette').next().contains('P300').click()
-      cy.contains('Right Pipette').next().contains('P1000').click()
+      cy.contains('Right Pipette')
+        .next()
+        .contains('P300')
+        .click()
+      cy.contains('Right Pipette')
+        .next()
+        .contains('P1000')
+        .click()
       cy.get("select[name*='right.tiprack']").select(
         'Opentrons 96 Filter Tip Rack 10 µL'
       )
     })
 
     it('saves the edits', () => {
-      cy.get('button').contains('save').click()
+      cy.get('button')
+        .contains('save')
+        .click()
     })
 
     it('displays a confirmation modal', () => {
@@ -215,7 +292,9 @@ describe('Desktop Navigation', () => {
         .next()
         .contains('cancel')
         .should('exist')
-      cy.get('button').contains('continue').should('exist')
+      cy.get('button')
+        .contains('continue')
+        .should('exist')
     })
 
     it('cancels the changes from the confirmation modal', () => {
@@ -229,9 +308,13 @@ describe('Desktop Navigation', () => {
 
     it('saves the changes for real', () => {
       // Click save
-      cy.get('button').contains('save').click()
+      cy.get('button')
+        .contains('save')
+        .click()
       // Click continue
-      cy.get('button').contains('continue').click({ force: true })
+      cy.get('button')
+        .contains('continue')
+        .click({ force: true })
       // See our edits
       cy.contains('left pipette')
         .next()
@@ -296,20 +379,30 @@ describe('Desktop Navigation', () => {
         .contains('New Liquid')
         .should('exist')
         .and('not.be.disabled')
-      cy.get('button').contains('New Liquid').click()
+      cy.get('button')
+        .contains('New Liquid')
+        .click()
       cy.get("input[name='name']").should('exist')
       cy.get("input[name='description']").should('exist')
       cy.get("input[name='serialize']").should('exist')
-      cy.get('button').contains('delete').should('be.disabled')
-      cy.get('button').contains('cancel').should('not.be.disabled')
-      cy.get('button').contains('save').should('be.disabled')
+      cy.get('button')
+        .contains('delete')
+        .should('be.disabled')
+      cy.get('button')
+        .contains('cancel')
+        .should('not.be.disabled')
+      cy.get('button')
+        .contains('save')
+        .should('be.disabled')
     })
 
     it('fills out the new liquid form', () => {
       // No error message yet
       cy.contains('Liquid name is required').should('not.exist')
       // Touch the name and leave to trigger an error message
-      cy.get("input[name='name']").focus().blur()
+      cy.get("input[name='name']")
+        .focus()
+        .blur()
       cy.contains('Liquid name is required').should('exist')
       // Type a name to see the error message go away
       cy.get("input[name='name']").type('Water')
@@ -318,25 +411,35 @@ describe('Desktop Navigation', () => {
       cy.get("input[name='description']").type('It is just water')
       // force option used because checkbox is hidden
       cy.get("input[name='serialize']").check({ force: true })
-      cy.get('button').contains('save').click()
+      cy.get('button')
+        .contains('save')
+        .click()
     })
 
     it('adds a second liquid', () => {
       // Make another. Why not?
-      cy.get('button').contains('New Liquid').click()
+      cy.get('button')
+        .contains('New Liquid')
+        .click()
       cy.get("input[name='name']").type('Orange Juice')
       cy.get("input[name='description']").type('Mmmmm... orange juice!')
-      cy.get('button').contains('save').click()
+      cy.get('button')
+        .contains('save')
+        .click()
     })
 
     it('adds a third liquid', () => {
       // We're on a roll
-      cy.get('button').contains('New Liquid').click()
+      cy.get('button')
+        .contains('New Liquid')
+        .click()
     })
 
     it('cancels the third liquid', () => {
       // Never mind
-      cy.get('button').contains('cancel').click()
+      cy.get('button')
+        .contains('cancel')
+        .click()
       // The form goes away
       cy.contains('Define your liquids').should('exist')
     })
@@ -348,7 +451,9 @@ describe('Desktop Navigation', () => {
         .contains('DESIGN')
         .parent()
         .click()
-      cy.get('button').contains('ok').click()
+      cy.get('button')
+        .contains('ok')
+        .click()
     })
   })
 })

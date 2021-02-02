@@ -173,7 +173,10 @@ describe('EditModulesCard', () => {
     const wrapper = render(props)
 
     expect(
-      wrapper.find(ModuleRow).filter({ type: MAGNETIC_MODULE_TYPE }).props()
+      wrapper
+        .find(ModuleRow)
+        .filter({ type: MAGNETIC_MODULE_TYPE })
+        .props()
     ).toEqual({
       type: MAGNETIC_MODULE_TYPE,
       moduleOnDeck: crashableMagneticModule,
@@ -188,7 +191,10 @@ describe('EditModulesCard', () => {
     expect(wrapper.find(ModuleRow)).toHaveLength(3)
     SUPPORTED_MODULE_TYPES.forEach(moduleType => {
       expect(
-        wrapper.find(ModuleRow).filter({ type: moduleType }).props()
+        wrapper
+          .find(ModuleRow)
+          .filter({ type: moduleType })
+          .props()
       ).toEqual({
         type: moduleType,
         openEditModuleModal: props.openEditModuleModal,

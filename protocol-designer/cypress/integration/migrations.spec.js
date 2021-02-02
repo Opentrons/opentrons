@@ -102,7 +102,9 @@ describe('Protocol fixtures migrate and match snapshots', () => {
                 'Updating the file may make changes to liquid handling actions'
               )
               .should('exist')
-            cy.get('button').contains('ok', { matchCase: false }).click()
+            cy.get('button')
+              .contains('ok', { matchCase: false })
+              .click()
           } else if (migrationModal === 'newLabwareDefs') {
             cy.get('div')
               .contains('Update protocol to use new labware definitions')
@@ -116,23 +118,33 @@ describe('Protocol fixtures migrate and match snapshots', () => {
                 'We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior'
               )
               .should('exist')
-            cy.get('button').contains('ok', { matchCase: false }).click()
+            cy.get('button')
+              .contains('ok', { matchCase: false })
+              .click()
           }
         }
 
         cy.fixture(expectedExportFixture).then(expectedExportProtocol => {
-          cy.get('button').contains('Export').click()
+          cy.get('button')
+            .contains('Export')
+            .click()
 
           if (unusedPipettes) {
-            cy.get('div').contains('Unused pipette').should('exist')
+            cy.get('div')
+              .contains('Unused pipette')
+              .should('exist')
             cy.get('button')
               .contains('continue with export', { matchCase: false })
               .click()
           }
 
           if (exportModalCopy) {
-            cy.get('div').contains(exportModalCopy).should('exist')
-            cy.get('button').contains('continue', { matchCase: false }).click()
+            cy.get('div')
+              .contains(exportModalCopy)
+              .should('exist')
+            cy.get('button')
+              .contains('continue', { matchCase: false })
+              .click()
           }
 
           cy.window()

@@ -106,7 +106,9 @@ class RpcContext extends EventEmitter {
       const handleSuccess = result => {
         cleanup()
 
-        RemoteObject(this, result).then(resolve).catch(reject)
+        RemoteObject(this, result)
+          .then(resolve)
+          .catch(reject)
       }
 
       function cleanup() {

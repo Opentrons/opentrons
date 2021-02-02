@@ -49,7 +49,9 @@ describe('Custom Tip Racks', () => {
 
   describe('build a new protocol with a custom tip rack', () => {
     it('sets up pipettes', () => {
-      cy.get('button').contains('Create New').click()
+      cy.get('button')
+        .contains('Create New')
+        .click()
       cy.get("input[placeholder='Untitled']").type(protocolTitle)
       cy.choosePipettes(pipette, pipette)
     })
@@ -66,7 +68,9 @@ describe('Custom Tip Racks', () => {
         if (expectedText) {
           // Verify expected text in error modals
           cy.contains(expectedText).should('exist')
-          cy.get('button').contains('OK').click()
+          cy.get('button')
+            .contains('OK')
+            .click()
         } else {
           // Select custom tip racks on successful upload
           cy.selectTipRacks(customTipRackTitle, customTipRackTitle)
@@ -74,9 +78,13 @@ describe('Custom Tip Racks', () => {
       })
     })
     it('Verifies the tip rack on the deck', () => {
-      cy.get('button').contains('save', { matchCase: false }).click()
+      cy.get('button')
+        .contains('save', { matchCase: false })
+        .click()
       cy.openDesignPage()
-      cy.get('button').contains('ok').click()
+      cy.get('button')
+        .contains('ok')
+        .click()
       cy.contains(customTipRackTitleWithotMicro, { matchCase: false })
     })
     it('Duplicates the tip rack on the deck', () => {
@@ -89,7 +97,9 @@ describe('Custom Tip Racks', () => {
     })
     it('Adds tip rack with add labware button', () => {
       cy.get(slotThree).click()
-      cy.get('h3').contains('Custom Labware').click()
+      cy.get('h3')
+        .contains('Custom Labware')
+        .click()
       cy.get('#main-page-modal-portal-root').within(() => {
         cy.contains(customTipRackTitle).click()
       })

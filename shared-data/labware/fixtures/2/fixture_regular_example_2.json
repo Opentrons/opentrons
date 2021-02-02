@@ -21,10 +21,7 @@
     "yDimension": 40,
     "zDimension": 40
   },
-  "ordering": [
-    ["A1", "B1", "C1"],
-    ["A2", "B2", "C2"]
-  ],
+  "ordering": [["A1", "B1", "C1"], ["A2", "B2", "C2"]],
   "wells": {
     "A1": {
       "depth": 30,

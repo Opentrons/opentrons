@@ -161,7 +161,10 @@ export function getTooltipForField(
 
   const prefixes = ['aspirate_', 'dispense_']
   const nameWithoutPrefix = prefixes.some(prefix => name.startsWith(prefix))
-    ? name.split('_').slice(1).join('_')
+    ? name
+        .split('_')
+        .slice(1)
+        .join('_')
     : name
 
   // NOTE: this is a temporary solution until we want to be able to choose from

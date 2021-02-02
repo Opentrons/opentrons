@@ -213,15 +213,7 @@ describe('repeatArray', () => {
   })
 
   it('repeat array of arrays', () => {
-    expect(
-      repeatArray(
-        [
-          [1, 2],
-          [3, 4],
-        ],
-        4
-      )
-    ).toEqual([
+    expect(repeatArray([[1, 2], [3, 4]], 4)).toEqual([
       [1, 2],
       [3, 4],
       [1, 2],

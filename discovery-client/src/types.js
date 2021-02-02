@@ -31,7 +31,7 @@ export type Capability =
 
 export type CapabilityMap = {
   [capabilityName: Capability]: ?string,
-  ...
+  ...,
 }
 
 export type ServerHealthResponse = {

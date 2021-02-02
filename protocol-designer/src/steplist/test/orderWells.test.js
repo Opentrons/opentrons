@@ -14,10 +14,7 @@ describe('orderWells', () => {
   ]
 
   describe('regular labware', () => {
-    const regularOrdering = [
-      ['A1', 'B1'],
-      ['A2', 'B2'],
-    ]
+    const regularOrdering = [['A1', 'B1'], ['A2', 'B2']]
     const regularAnswerMap = {
       t2b: {
         l2r: ['A1', 'B1', 'A2', 'B2'],

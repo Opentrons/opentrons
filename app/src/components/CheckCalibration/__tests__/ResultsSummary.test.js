@@ -136,40 +136,62 @@ describe('ResultsSummary', () => {
     const leftPipResults = getLeftPipResultsParent(wrapper)
     const rightPipResults = getRightPipResultsParent(wrapper)
     // left pipette & tip length comparison
-    expect(leftPipParent.find(Text).at(0).text()).toEqual('left mount')
+    expect(
+      leftPipParent
+        .find(Text)
+        .at(0)
+        .text()
+    ).toEqual('left mount')
     expect(leftPipResults.text()).toEqual(
       expect.stringContaining('pipette offset calibration')
     )
-    expect(leftPipResults.find('RenderResult').at(0).text()).toEqual(
-      expect.stringContaining('Good calibration')
-    )
+    expect(
+      leftPipResults
+        .find('RenderResult')
+        .at(0)
+        .text()
+    ).toEqual(expect.stringContaining('Good calibration'))
     expect(leftPipResults.text()).toEqual(
       expect.stringContaining('tip length calibration')
     )
     expect(leftPipResults.text()).toEqual(
       expect.stringContaining('mock pipette display name')
     )
-    expect(leftPipResults.find('RenderResult').at(1).text()).toEqual(
-      expect.stringContaining('Good calibration')
-    )
+    expect(
+      leftPipResults
+        .find('RenderResult')
+        .at(1)
+        .text()
+    ).toEqual(expect.stringContaining('Good calibration'))
 
     // right pipette & tip length comparison
-    expect(rightPipParent.find(Text).at(0).text()).toEqual('right mount')
+    expect(
+      rightPipParent
+        .find(Text)
+        .at(0)
+        .text()
+    ).toEqual('right mount')
     expect(rightPipResults.text()).toEqual(
       expect.stringContaining('pipette offset calibration')
     )
-    expect(rightPipResults.find('RenderResult').at(0).text()).toEqual(
-      expect.stringContaining('Recalibration recommended')
-    )
+    expect(
+      rightPipResults
+        .find('RenderResult')
+        .at(0)
+        .text()
+    ).toEqual(expect.stringContaining('Recalibration recommended'))
     expect(rightPipResults.text()).toEqual(
       expect.stringContaining('tip length calibration')
     )
     expect(rightPipResults.text()).toEqual(
       expect.stringContaining('mock pipette display name')
     )
-    expect(rightPipResults.find('RenderResult').at(1).text()).toEqual(
-      expect.stringContaining('Recalibration recommended')
-    )
+    expect(
+      rightPipResults
+        .find('RenderResult')
+        .at(1)
+        .text()
+    ).toEqual(expect.stringContaining('Recalibration recommended'))
   })
 
   it('summarizes neither pipette if no comparisons have been made', () => {

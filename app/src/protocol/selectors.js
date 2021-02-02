@@ -45,7 +45,7 @@ export const getProtocolFilename: State => string | null = createSelector(
 
 type LabwareDefinitionBySlotMap = {
   [slot: string]: LabwareDefinition2 | void,
-  ...
+  ...,
 }
 
 export const getLabwareDefBySlot: State => LabwareDefinitionBySlotMap = createSelector(
@@ -170,12 +170,15 @@ export const getProtocolType: State => ProtocolType | null = createSelector(
 export const getProtocolCreatorApp: State => {|
   name: string | null,
   version: string | null,
-|} = createSelector(getProtocolDisplayData, displayData => {
-  return {
-    name: displayData.appName,
-    version: displayData.appVersion,
+|} = createSelector(
+  getProtocolDisplayData,
+  displayData => {
+    return {
+      name: displayData.appName,
+      version: displayData.appVersion,
+    }
   }
-})
+)
 
 export const getProtocolApiVersion = (state: State): string | null => {
   // TODO(mc, 2019-11-26): did not import due to circular dependency

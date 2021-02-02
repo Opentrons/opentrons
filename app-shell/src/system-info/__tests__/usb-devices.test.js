@@ -76,9 +76,7 @@ describe('app-shell::system-info::usb-devices', () => {
     }
 
     return getWindowsDriverVersion(device).then(version => {
-      expect(
-        execa.command
-      ).toHaveBeenCalledWith(
+      expect(execa.command).toHaveBeenCalledWith(
         'Get-PnpDeviceProperty -InstanceID "USB\\VID_0123&PID_ABCD\\abcdefg" -KeyName "DEVPKEY_Device_DriverVersion" | % { $_.Data }',
         { shell: 'PowerShell.exe' }
       )

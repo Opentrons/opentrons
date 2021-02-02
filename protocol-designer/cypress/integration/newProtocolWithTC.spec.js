@@ -37,7 +37,9 @@ describe('Protocols with Modules', () => {
 
   describe('builds a new protocol with mag deck', () => {
     it('sets up pipettes, tips, and module', () => {
-      cy.get('button').contains('Create New').click()
+      cy.get('button')
+        .contains('Create New')
+        .click()
       // Give it a name
       cy.get("input[placeholder='Untitled']").type(protocolTitle)
       // Choose pipette types and tip racks
@@ -55,7 +57,9 @@ describe('Protocols with Modules', () => {
       cy.get('select[name="modulesByType.thermocyclerModuleType.model"]')
         .contains('GEN1')
         .should('exist')
-      cy.get('button').contains('save', { matchCase: false }).click()
+      cy.get('button')
+        .contains('save', { matchCase: false })
+        .click()
 
       // Verify modules were added
       cy.contains('File Details').should('exist')
@@ -71,8 +75,12 @@ describe('Protocols with Modules', () => {
       cy.get(editThermocycler).click()
       cy.get(editModuleModal).within(() => {
         cy.contains('Position').should('not.exist')
-        cy.get(moduleModelDropdown).contains('GEN2').should('not.exist')
-        cy.get('button').contains('cancel', { matchCase: false }).click()
+        cy.get(moduleModelDropdown)
+          .contains('GEN2')
+          .should('not.exist')
+        cy.get('button')
+          .contains('cancel', { matchCase: false })
+          .click()
       })
 
       // Remove thermocycler
@@ -82,11 +90,15 @@ describe('Protocols with Modules', () => {
 
       // Re-add thermocycler
       cy.get(addThermocycler).click()
-      cy.get('button').contains('save', { matchCase: false }).click()
+      cy.get('button')
+        .contains('save', { matchCase: false })
+        .click()
     })
 
     it('adds two liquids', () => {
-      cy.get('button').contains('Continue to Liquids').click()
+      cy.get('button')
+        .contains('Continue to Liquids')
+        .click()
       cy.addLiquid('Water', 'pure H2O', true)
     })
 
@@ -103,7 +115,9 @@ describe('Protocols with Modules', () => {
       cy.contains('Setting up your protocol').should('exist')
       // force option used because checkbox is hidden
       cy.get('input[type="checkbox"]').click({ force: true })
-      cy.get('button').contains('ok').click()
+      cy.get('button')
+        .contains('ok')
+        .click()
       // verify design tab contents
       cy.get('[class*="list_selected"] h3')
         .contains('STARTING DECK STATE')
@@ -111,11 +125,15 @@ describe('Protocols with Modules', () => {
       cy.get('[class*="list_selected"] h3')
         .contains('FINAL DECK STATE')
         .should('not.exist')
-      cy.get('h3').contains('FINAL DECK STATE').should('exist')
+      cy.get('h3')
+        .contains('FINAL DECK STATE')
+        .should('exist')
       cy.get('button[class*="button_primary"]')
         .contains('Add Step')
         .should('exist')
-      cy.get('header').contains(protocolTitle).should('exist')
+      cy.get('header')
+        .contains(protocolTitle)
+        .should('exist')
       // verify deckmap contents
       cy.get(deckMap).within(() => {
         cy.contains('Thermocycler').should('exist')
@@ -155,7 +173,9 @@ describe('Protocols with Modules', () => {
 
       // Add Thermocycler State Step
       cy.addStep('thermocycler')
-      cy.get(sidePanel).contains('thermocycler').should('exist')
+      cy.get(sidePanel)
+        .contains('thermocycler')
+        .should('exist')
       cy.get(designPageModal).within(() => {
         cy.get('[class*="section_header"]')
           .contains('thermocycler')
@@ -168,26 +188,44 @@ describe('Protocols with Modules', () => {
           })
         cy.get(thermocyclerToggleGroups + ':first-child').within(() => {
           cy.get('input[type="checkbox"]').click({ force: true })
-          cy.get(temperatureFieldInput).type('1').blur()
+          cy.get(temperatureFieldInput)
+            .type('1')
+            .blur()
           cy.contains(acceptableBlockTemp).should('exist')
-          cy.get(temperatureFieldInput).clear().type('110').blur()
+          cy.get(temperatureFieldInput)
+            .clear()
+            .type('110')
+            .blur()
           cy.contains(acceptableBlockTemp).should('exist')
-          cy.get(temperatureFieldInput).clear().type('50').blur()
+          cy.get(temperatureFieldInput)
+            .clear()
+            .type('50')
+            .blur()
         })
         // Verify acceptable lid temperature range
         cy.get(thermocyclerToggleGroups + ':nth-child(2)').within(() => {
           cy.get('input[type="checkbox"]').click({ force: true })
-          cy.get(temperatureFieldInput).type('10').blur()
+          cy.get(temperatureFieldInput)
+            .type('10')
+            .blur()
           cy.contains(acceptableLidTemp).should('exist')
-          cy.get(temperatureFieldInput).clear().type('135').blur()
+          cy.get(temperatureFieldInput)
+            .clear()
+            .type('135')
+            .blur()
           cy.contains(acceptableLidTemp).should('exist')
-          cy.get(temperatureFieldInput).clear().type('50').blur()
+          cy.get(temperatureFieldInput)
+            .clear()
+            .type('50')
+            .blur()
         })
         // Open Lid
         cy.get(thermocyclerToggleGroups + ':last-child').within(() => {
           cy.get('input[type="checkbox"]').click({ force: true })
         })
-        cy.get('button').contains('save').click()
+        cy.get('button')
+          .contains('save')
+          .click()
       })
       // Verify State Added
       cy.get(sidePanel).within(() => {
@@ -201,7 +239,10 @@ describe('Protocols with Modules', () => {
       })
 
       // Verify thermocycler block settings
-      cy.get('[data-test="StepItem_1"]').children().first().click()
+      cy.get('[data-test="StepItem_1"]')
+        .children()
+        .first()
+        .click()
       cy.get(designPageModal).within(() => {
         cy.get(thermocyclerFormOption)
           .first()
@@ -232,7 +273,9 @@ describe('Protocols with Modules', () => {
         cy.get(thermocyclerToggleGroups + ':last-child').within(() => {
           cy.get('input[type="checkbox"]').click({ force: true })
         })
-        cy.get('button').contains('save').click()
+        cy.get('button')
+          .contains('save')
+          .click()
       })
       // Verify Second State Added
       cy.get(sidePanel).within(() => {
@@ -253,18 +296,26 @@ describe('Protocols with Modules', () => {
       cy.get('[class*="error_icon"]').should('exist')
 
       // Re-add Thermocycler
-      cy.get('h3').contains('starting deck state', { matchCase: false }).click()
-      cy.get(slotSeven).contains('Delete').click()
+      cy.get('h3')
+        .contains('starting deck state', { matchCase: false })
+        .click()
+      cy.get(slotSeven)
+        .contains('Delete')
+        .click()
       cy.openFilePage()
       cy.get(addThermocycler).click()
-      cy.get('button').contains('save', { matchCase: false }).click()
+      cy.get('button')
+        .contains('save', { matchCase: false })
+        .click()
       cy.openDesignPage()
       cy.get('[class*="alert_title"]').should('not.exist')
       cy.get('[class*="error_icon"]').should('not.exist')
       // Re-add TC well
       cy.get(thermocyclerSlot).click()
       cy.get(designPageModal).within(() => {
-        cy.get('ul').contains('Well Plate').click()
+        cy.get('ul')
+          .contains('Well Plate')
+          .click()
         cy.get('ul').within(() => {
           cy.get('li')
             .contains('Nest 96 Well Plate', { matchCase: false })
@@ -295,13 +346,17 @@ describe('Protocols with Modules', () => {
         cy.get(profileSettingsGroup + ':first-child').type('20')
         cy.get(profileSettingsGroup + ':nth-child(2)').type('40')
         // Add Step
-        cy.get('button').contains('Step').click()
+        cy.get('button')
+          .contains('Step')
+          .click()
         cy.get(profileStepRow + title).type('initial step')
         cy.get(profileStepRow + temperature).type('60')
         cy.get(profileStepRow + minutes).type('5')
         cy.get(profileStepRow + seconds).type('30')
         // Add Cycle (should have 1 step by default)
-        cy.get('button').contains('Cycle').click()
+        cy.get('button')
+          .contains('Cycle')
+          .click()
         cy.get(profileCycleFields + title).type('cycle step 1')
         cy.get(profileCycleFields + temperature).type('30')
         cy.get(profileCycleFields + minutes).type('1')
@@ -330,11 +385,15 @@ describe('Protocols with Modules', () => {
         cy.get(profileCycleFields).should('have.length', 3)
 
         // Delete that new cycle step
-        cy.get('[class*=cycle_step_delete]').last().click()
+        cy.get('[class*=cycle_step_delete]')
+          .last()
+          .click()
         cy.get(profileCycleFields).should('have.length', 2)
 
         // save form
-        cy.get('button').contains('save').click()
+        cy.get('button')
+          .contains('save')
+          .click()
       })
       // Verify Profile Step Added
       cy.get(sidePanel).within(() => {
@@ -344,15 +403,23 @@ describe('Protocols with Modules', () => {
       })
 
       // Add liquids to well
-      cy.get('h3').contains('starting deck state', { matchCase: false }).click()
-      cy.get(thermocyclerSlot).contains('Name & Liquids').click()
+      cy.get('h3')
+        .contains('starting deck state', { matchCase: false })
+        .click()
+      cy.get(thermocyclerSlot)
+        .contains('Name & Liquids')
+        .click()
       rowLetters.forEach(element => {
         cy.get(`[data-wellname="${element}1"]`).click()
       })
       cy.get('[name="selectedLiquidId"]').select('Water')
       cy.get('[name="volume"]').type('50')
-      cy.get('button').contains('save', { matchCase: false }).click()
-      cy.get('button').contains('Deck').click()
+      cy.get('button')
+        .contains('save', { matchCase: false })
+        .click()
+      cy.get('button')
+        .contains('Deck')
+        .click()
 
       // Add transfer step
       cy.addStep('transfer')
@@ -383,7 +450,9 @@ describe('Protocols with Modules', () => {
         cy.get('button')
           .contains('save selection', { matchCase: false })
           .click()
-        cy.get('button').contains('save', { matchCase: false }).click()
+        cy.get('button')
+          .contains('save', { matchCase: false })
+          .click()
       })
       // Verify error message
       cy.get('[class*="alert_title"]')

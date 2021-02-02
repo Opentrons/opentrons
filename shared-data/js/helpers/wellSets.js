@@ -53,7 +53,7 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
       labwareDef: LabwareDefinition2,
       wellSetByPrimaryWell: WellSetByPrimaryWell,
     |},
-    ...
+    ...,
   } = {}
 
   const getAllWellSetsForLabware = (

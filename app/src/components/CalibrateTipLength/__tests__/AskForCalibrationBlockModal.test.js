@@ -40,7 +40,9 @@ describe('AskForCalibrationBlockModal', () => {
   const findUseTrash = wrapper =>
     findCalBlockModal(wrapper).find('button[children="Use trash bin"]')
   const findRemember = wrapper =>
-    findCalBlockModal(wrapper).find(CheckboxField).first()
+    findCalBlockModal(wrapper)
+      .find(CheckboxField)
+      .first()
 
   const SPECS = [
     {

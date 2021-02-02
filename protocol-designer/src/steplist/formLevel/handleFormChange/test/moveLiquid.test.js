@@ -184,10 +184,7 @@ describe('path should update...', () => {
 
   describe('if new changeTip option is incompatible...', () => {
     // cases are: [changeTip, pathThatIsIncompatibleWithChangeTip]
-    const cases = [
-      ['perSource', 'multiAspirate'],
-      ['perDest', 'multiDispense'],
-    ]
+    const cases = [['perSource', 'multiAspirate'], ['perDest', 'multiDispense']]
 
     cases.forEach(([changeTip, badPath]) => {
       it(`"${changeTip}" selected: path → single`, () => {

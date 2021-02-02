@@ -119,11 +119,7 @@ describe('DeckCalibrationControl', () => {
       const { wrapper } = render({
         deckCalData: {
           type: 'affine',
-          matrix: [
-            [1, 2, 3],
-            [5, 6, 7],
-            [8, 9, 10],
-          ],
+          matrix: [[1, 2, 3], [5, 6, 7], [8, 9, 10]],
           lastModified: '2020-10-19T00:01:02+00:00',
           pipetteCalibratedWith: null,
           tiprack: null,
@@ -234,12 +230,7 @@ describe('DeckCalibrationControl', () => {
     const { wrapper } = render({
       deckCalData: {
         type: 'affine',
-        matrix: [
-          [1, 2, 3, 4],
-          [5, 6, 7, 8],
-          [9, 10, 11, 12],
-          [13, 14, 15, 16],
-        ],
+        matrix: [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
         lastModified: null,
         pipetteCalibratedWith: null,
         tiprack: null,

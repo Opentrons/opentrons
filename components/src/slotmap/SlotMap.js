@@ -40,9 +40,8 @@ export function SlotMap(props: SlotMapProps): React.Node {
           return (
             <g
               key={slot}
-              transform={`translate(${colIndex * slotWidth} ${
-                rowIndex * slotHeight
-              })`}
+              transform={`translate(${colIndex * slotWidth} ${rowIndex *
+                slotHeight})`}
             >
               <rect
                 className={cx(styles.slot_rect, {

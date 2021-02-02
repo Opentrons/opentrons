@@ -66,7 +66,9 @@ export function CalibrationBlockRender(
     case 'opentrons_calibrationblock_short_side_right': {
       return (
         <g
-          transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`}
+          transform={`translate(${slotDef.position[0]}, ${
+            slotDef.position[1]
+          })`}
         >
           <rect
             width={labwareDef.dimensions.xDimension}
@@ -114,7 +116,9 @@ export function CalibrationBlockRender(
     case 'opentrons_calibrationblock_short_side_left': {
       return (
         <g
-          transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`}
+          transform={`translate(${slotDef.position[0]}, ${
+            slotDef.position[1]
+          })`}
         >
           <rect
             width={labwareDef.dimensions.xDimension}

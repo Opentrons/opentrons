@@ -145,10 +145,16 @@ describe('ModuleRow', () => {
     const wrapper = render(props)
 
     expect(
-      wrapper.find(LabeledValue).filter({ label: 'Model' }).prop('value')
+      wrapper
+        .find(LabeledValue)
+        .filter({ label: 'Model' })
+        .prop('value')
     ).toBe('GEN1')
     expect(
-      wrapper.find(LabeledValue).filter({ label: 'Position' }).prop('value')
+      wrapper
+        .find(LabeledValue)
+        .filter({ label: 'Position' })
+        .prop('value')
     ).toBe('Slot 1')
   })
 

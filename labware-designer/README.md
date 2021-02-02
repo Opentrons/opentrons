@@ -186,18 +186,9 @@ const options = {
     yDimension: 85.5,
     zDimension: 123.76,
   },
-  offset: [
-    { x: 13.88, y: 17.75, z: 123.76 },
-    { x: 71.38, y: 25.25, z: 119.8 },
-  ],
-  grid: [
-    { row: 3, column: 2 },
-    { row: 2, column: 2 },
-  ],
-  spacing: [
-    { row: 25, column: 25 },
-    { row: 35, column: 35 },
-  ],
+  offset: [{ x: 13.88, y: 17.75, z: 123.76 }, { x: 71.38, y: 25.25, z: 119.8 }],
+  grid: [{ row: 3, column: 2 }, { row: 2, column: 2 }],
+  spacing: [{ row: 25, column: 25 }, { row: 35, column: 35 }],
   well: [
     {
       totalLiquidVolume: 15000,

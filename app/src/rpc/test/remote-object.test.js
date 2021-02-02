@@ -111,10 +111,7 @@ describe('rpc remote object factory', () => {
       expect(remote).toEqual({
         _id: 1,
         foo: 'bar',
-        children: [
-          { _id: 3, baz: 'qux' },
-          { _id: 2, fizz: 'buzz' },
-        ],
+        children: [{ _id: 3, baz: 'qux' }, { _id: 2, fizz: 'buzz' }],
       })
     })
   })

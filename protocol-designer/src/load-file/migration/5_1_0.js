@@ -5,7 +5,7 @@ export const PD_VERSION = '5.1.0'
 
 export const migrateSavedStepForms = (savedStepForms: {
   [string]: any,
-  ...
+  ...,
 }): { [string]: any, ... } => {
   return mapValues(savedStepForms, stepForm => {
     if (stepForm.stepType === 'mix') {

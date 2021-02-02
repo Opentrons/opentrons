@@ -127,7 +127,7 @@ describe('CalibrationCard', () => {
 
   const realBlob = global.Blob
   beforeAll(() => {
-    global.Blob = function (content, options) {
+    global.Blob = function(content, options) {
       return { content, options }
     }
   })

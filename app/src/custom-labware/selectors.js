@@ -34,10 +34,10 @@ export const getCustomLabware: State => Array<CheckedLabwareFile> = createSelect
   state => state.labware.filenames,
   state => state.labware.filesByName,
   (filenames, filesByName) =>
-    sortBy(
-      filenames.map(name => filesByName[name]),
-      ['definition.metadata.displayCategory', 'definition.metadata.displayName']
-    )
+    sortBy(filenames.map(name => filesByName[name]), [
+      'definition.metadata.displayCategory',
+      'definition.metadata.displayName',
+    ])
 )
 
 // $FlowFixMe: flow unable to do type refinements via filter

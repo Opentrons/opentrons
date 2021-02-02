@@ -85,7 +85,9 @@ function DeckMapComponent(props: Props) {
             <React.Fragment key={slotId}>
               {moduleInSlot && (
                 <g
-                  transform={`translate(${slot.position[0]}, ${slot.position[1]})`}
+                  transform={`translate(${slot.position[0]}, ${
+                    slot.position[1]
+                  })`}
                 >
                   <ModuleItem
                     model={moduleInSlot.model}

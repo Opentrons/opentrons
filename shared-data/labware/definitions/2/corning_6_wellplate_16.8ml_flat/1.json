@@ -1,9 +1,5 @@
 {
-  "ordering": [
-    ["A1", "B1"],
-    ["A2", "B2"],
-    ["A3", "B3"]
-  ],
+  "ordering": [["A1", "B1"], ["A2", "B2"], ["A3", "B3"]],
   "metadata": {
     "displayName": "Corning 6 Well Plate 16.8 mL Flat",
     "displayVolumeUnits": "mL",

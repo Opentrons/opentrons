@@ -100,14 +100,18 @@ export class URLDeck extends React.Component<{||}> {
               <React.Fragment key={slotId}>
                 {moduleModel && (
                   <g
-                    transform={`translate(${slot.position[0]}, ${slot.position[1]})`}
+                    transform={`translate(${slot.position[0]}, ${
+                      slot.position[1]
+                    })`}
                   >
                     <Module model={moduleModel} mode={'default'} slot={slot} />
                   </g>
                 )}
                 {labware && (
                   <g
-                    transform={`translate(${slot.position[0]}, ${slot.position[1]})`}
+                    transform={`translate(${slot.position[0]}, ${
+                      slot.position[1]
+                    })`}
                   >
                     {labwareDefV2 ? (
                       <LabwareRender definition={labwareDefV2} />

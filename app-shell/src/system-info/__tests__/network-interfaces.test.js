@@ -48,10 +48,7 @@ describe('system-info::network-interfaces', () => {
     networkInterfaces.mockReturnValue({
       en0: [mockV4, mockV6],
       en1: [mockV6],
-      lo0: [
-        { ...mockV4, internal: true },
-        { ...mockV6, internal: true },
-      ],
+      lo0: [{ ...mockV4, internal: true }, { ...mockV6, internal: true }],
     })
 
     expect(getActiveInterfaces()).toEqual([

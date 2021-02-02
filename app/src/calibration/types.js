@@ -65,5 +65,5 @@ export type PerRobotCalibrationState = $ReadOnly<{|
 
 export type CalibrationState = $ReadOnly<{
   [robotName: string]: PerRobotCalibrationState,
-  ...
+  ...,
 }>

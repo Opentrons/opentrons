@@ -32,7 +32,7 @@ export function forPickUpTip(
       // TODO Ian 2018-04-30 return {errors}, don't throw
       throw new Error('Invalid primary well for tip pickup: ' + well)
     }
-    allWells.forEach(function (well) {
+    allWells.forEach(function(well) {
       tipState.tipracks[labware][well] = false
     })
   }

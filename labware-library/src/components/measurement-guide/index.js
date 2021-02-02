@@ -47,7 +47,7 @@ const ALUM_BLOCK_FOOTPRINTS: { [category: string]: Array<string>, ... } = {
 
 const RESERVOIR_SPACING_DIAGRAMS: {
   [rows: string]: Array<string>,
-  ...
+  ...,
 } = {
   singleRow: [
     require('./images/offset/offset-reservoir@3x.png'),
@@ -61,7 +61,7 @@ const RESERVOIR_SPACING_DIAGRAMS: {
 
 const SPACING_DIAGRAMS: {
   [shape: string]: Array<string>,
-  ...
+  ...,
 } = {
   circular: [
     require('./images/offset/offset-well-circular@3x.png'),
@@ -80,7 +80,7 @@ const TIPRACK_MEASUREMENT_DIAGRAMS: Array<string> = [
 
 const PLATE_MEASUREMENT_DIAGRAMS: {
   [wellBottomShape: string]: { [shape: string]: Array<string>, ... },
-  ...
+  ...,
 } = {
   flat: {
     circular: [
@@ -115,7 +115,7 @@ const PLATE_MEASUREMENT_DIAGRAMS: {
 }
 const MEASUREMENT_DIAGRAMS: {
   [wellBottomShape: string]: { [shape: string]: Array<string>, ... },
-  ...
+  ...,
 } = {
   flat: {
     circular: [

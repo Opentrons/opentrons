@@ -27,7 +27,7 @@ export function ConfigFormGroup(props: ConfigFormGroupProps): React.Node {
   const { groupLabel, groupError, formFields } = props
   const formattedError =
     groupError &&
-    groupError.split('\n').map(function (item, key) {
+    groupError.split('\n').map(function(item, key) {
       return (
         <span key={key}>
           {item}

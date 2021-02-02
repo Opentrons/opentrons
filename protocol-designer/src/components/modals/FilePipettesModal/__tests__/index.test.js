@@ -190,7 +190,10 @@ describe('FilePipettesModal', () => {
       })
 
       expect(
-        wrapper.find(Formik).dive().find(StepChangesConfirmModal)
+        wrapper
+          .find(Formik)
+          .dive()
+          .find(StepChangesConfirmModal)
       ).toHaveLength(1)
     })
 

@@ -56,7 +56,9 @@ export const orderWells = (
     if (second === 't2b') {
       orderedWells = _orderingColsToRows(defaultOrdering)
     } else if (second === 'b2t') {
-      orderedWells = _orderingColsToRows(defaultOrdering).slice().reverse()
+      orderedWells = _orderingColsToRows(defaultOrdering)
+        .slice()
+        .reverse()
     }
   } else if (first === 'r2l') {
     if (second === 't2b') {

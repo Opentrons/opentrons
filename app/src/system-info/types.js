@@ -37,7 +37,7 @@ export type NetworkInterface = {|
 
 export type U2EInterfaceMap = {
   [deviceSerialNumber: string]: Array<NetworkInterface>,
-  ...
+  ...,
 }
 
 export type DriverStatus = NOT_APPLICABLE | UNKNOWN | UP_TO_DATE | OUTDATED

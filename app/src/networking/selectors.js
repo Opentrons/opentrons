@@ -56,10 +56,7 @@ export const getNetworkInterfaces: (
   }
 )
 
-const LIST_ORDER = [
-  ['active', 'ssid'],
-  ['desc', 'asc'],
-]
+const LIST_ORDER = [['active', 'ssid'], ['desc', 'asc']]
 
 export const getWifiList: (
   state: State,

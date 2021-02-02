@@ -66,9 +66,12 @@ describe('MultiSelectToolbar', () => {
       .mockReturnValue(['id_1', 'id_2'])
 
     const wrapper = render()
-    expect(wrapper.find(ClickableIcon).first().prop('iconName')).toBe(
-      'checkbox-marked'
-    )
+    expect(
+      wrapper
+        .find(ClickableIcon)
+        .first()
+        .prop('iconName')
+    ).toBe('checkbox-marked')
   })
 
   it('should have a minus box when all steps are not selected', () => {
@@ -81,8 +84,11 @@ describe('MultiSelectToolbar', () => {
       .mockReturnValue(['id_1'])
 
     const wrapper = render()
-    expect(wrapper.find(ClickableIcon).first().prop('iconName')).toBe(
-      'minus-box'
-    )
+    expect(
+      wrapper
+        .find(ClickableIcon)
+        .first()
+        .prop('iconName')
+    ).toBe('minus-box')
   })
 })

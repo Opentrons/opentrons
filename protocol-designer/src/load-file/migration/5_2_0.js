@@ -5,7 +5,7 @@ export const PD_VERSION = '5.2.0'
 
 export const migrateSavedStepForms = (savedStepForms: {
   [string]: any,
-  ...
+  ...,
 }): { [string]: any, ... } => {
   // Add keys for new fields introduced in PD v5.2.0, with default values
   return mapValues(savedStepForms, stepForm => {

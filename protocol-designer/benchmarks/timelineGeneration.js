@@ -57,9 +57,11 @@ bench(`commandCreatorsTimeline: mix ${times} times`, b => {
   if (timeline.errors !== null) {
     assert(
       false,
-      `Expected no timeline errors but got ${
-        JSON.stringify(timeline.errors, null, 4) ?? 'undefined'
-      }`
+      `Expected no timeline errors but got ${JSON.stringify(
+        timeline.errors,
+        null,
+        4
+      ) ?? 'undefined'}`
     )
   }
 })
