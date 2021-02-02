@@ -69,7 +69,6 @@ export const deleteMultipleSteps = (
       const currentStepIndex = orderedStepIds.indexOf(val)
       return Math.max(currentStepIndex, highestIndex)
     }, 0)
-    // const nextStepId = orderedStepIds[highestDeletedIndex + 1]
     let nextStepId = orderedStepIds[highestDeletedIndex + 1]
     while (!nextStepId) {
       highestDeletedIndex -= 1
