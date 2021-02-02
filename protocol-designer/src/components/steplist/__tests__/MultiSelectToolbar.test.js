@@ -106,24 +106,36 @@ describe('MultiSelectToolbar', () => {
     afterEach(() => {
       jest.restoreAllMocks()
     })
-    it('should toggle the collapsed state of the selected steps ', () => {
+    it('should expand/collapse the selected steps ', () => {
       when(getMultiSelectItemIdsMock)
         .calledWith(expect.anything())
         .mockReturnValue(['id_1', 'id_2'])
 
-      const toggleMultipleStepsCollapsedSpy = jest.spyOn(
+      const expandMultipleStepsSpy = jest.spyOn(
         stepActions,
-        'toggleMultipleStepsCollapsed'
+        'expandMultipleSteps'
       )
+
       const wrapper = render()
       const expandIcon = wrapper.find(ClickableIcon).at(3)
       act(() => {
         expandIcon.prop('onClick')()
       })
-      expect(toggleMultipleStepsCollapsedSpy).toHaveBeenCalledWith([
-        'id_1',
-        'id_2',
-      ])
+      expect(expandMultipleStepsSpy).toHaveBeenCalledWith(['id_1', 'id_2'])
+
+      wrapper.update()
+
+      const collapseMultipleStepsSpy = jest.spyOn(
+        stepActions,
+        'collapseMultipleSteps'
+      )
+
+      const collapseIcon = wrapper.find(ClickableIcon).at(3)
+
+      act(() => {
+        collapseIcon.prop('onClick')()
+      })
+      expect(collapseMultipleStepsSpy).toHaveBeenCalledWith(['id_1', 'id_2'])
     })
     it('should toggle the expand/collapse icon', () => {
       const wrapper = render()

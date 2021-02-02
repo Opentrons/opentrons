@@ -39,8 +39,13 @@ export type ToggleStepCollapsedAction = {|
   payload: StepIdType,
 |}
 
-export type ToggleMultipleStepsCollapsedAction = {|
-  type: 'TOGGLE_MULTIPLE_STEPS_COLLAPSED',
+export type ExpandMultipleStepsAction = {|
+  type: 'EXPAND_MULTIPLE_STEPS',
+  payload: Array<StepIdType>,
+|}
+
+export type CollapseMultipleStepsAction = {|
+  type: 'COLLAPSE_MULTIPLE_STEPS',
   payload: Array<StepIdType>,
 |}
 

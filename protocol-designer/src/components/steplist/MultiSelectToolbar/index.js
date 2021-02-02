@@ -120,7 +120,11 @@ export const MultiSelectToolbar = (): React.Node => {
     tooltipText: isExpandState ? 'Expand' : 'Collapse',
     onClick: () => {
       if (selectedStepIds) {
-        dispatch(stepActions.toggleMultipleStepsCollapsed(selectedStepIds))
+        if (isExpandState) {
+          dispatch(stepActions.expandMultipleSteps(selectedStepIds))
+        } else {
+          dispatch(stepActions.collapseMultipleSteps(selectedStepIds))
+        }
         setIsExpandState(!isExpandState)
       } else {
         console.warn(

@@ -104,7 +104,7 @@ describe('collapsedSteps reducer', () => {
       '4': true,
     })
   })
-  it('should toggle multiple steps upon TOGGLE_MULTIPLE_STEPS_COLLAPSED', () => {
+  it('should expand multiple steps upon EXPAND_MULTIPLE_STEPS', () => {
     const state = {
       '1': true,
       '2': false,
@@ -112,13 +112,31 @@ describe('collapsedSteps reducer', () => {
       '4': false,
     }
     const action = {
-      type: 'TOGGLE_MULTIPLE_STEPS_COLLAPSED',
+      type: 'EXPAND_MULTIPLE_STEPS',
       payload: ['1', '2', '3', '4'],
     }
     expect(collapsedSteps(state, action)).toEqual({
       '1': false,
-      '2': true,
+      '2': false,
       '3': false,
+      '4': false,
+    })
+  })
+  it('should collapse multiple steps upon COLLAPSE_MULTIPLE_STEPS', () => {
+    const state = {
+      '1': true,
+      '2': false,
+      '3': true,
+      '4': false,
+    }
+    const action = {
+      type: 'COLLAPSE_MULTIPLE_STEPS',
+      payload: ['1', '2', '3', '4'],
+    }
+    expect(collapsedSteps(state, action)).toEqual({
+      '1': true,
+      '2': true,
+      '3': true,
       '4': true,
     })
   })

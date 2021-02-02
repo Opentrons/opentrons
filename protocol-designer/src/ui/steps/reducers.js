@@ -26,7 +26,8 @@ import type {
   SelectMultipleStepsAction,
   SelectTerminalItemAction,
   ToggleStepCollapsedAction,
-  ToggleMultipleStepsCollapsedAction,
+  ExpandMultipleStepsAction,
+  CollapseMultipleStepsAction,
 } from './actions/types'
 
 export type CollapsedStepsState = { [StepIdType]: boolean }
@@ -57,14 +58,25 @@ const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions(
       ...state,
       [payload]: !state[payload],
     }),
-    TOGGLE_MULTIPLE_STEPS_COLLAPSED: (
+    EXPAND_MULTIPLE_STEPS: (
       state: CollapsedStepsState,
-      { payload }: ToggleMultipleStepsCollapsedAction
+      { payload }: ExpandMultipleStepsAction
     ) =>
       payload.reduce(
         (acc, stepId) => ({
           ...acc,
-          [stepId]: !acc[stepId],
+          [stepId]: false,
+        }),
+        state
+      ),
+    COLLAPSE_MULTIPLE_STEPS: (
+      state: CollapsedStepsState,
+      { payload }: CollapseMultipleStepsAction
+    ) =>
+      payload.reduce(
+        (acc, stepId) => ({
+          ...acc,
+          [stepId]: true,
         }),
         state
       ),

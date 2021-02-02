@@ -12,7 +12,8 @@ import type {
   AddStepAction,
   ExpandAddStepButtonAction,
   ToggleStepCollapsedAction,
-  ToggleMultipleStepsCollapsedAction,
+  ExpandMultipleStepsAction,
+  CollapseMultipleStepsAction,
   HoverOnStepAction,
   HoverOnSubstepAction,
   SelectTerminalItemAction,
@@ -56,10 +57,17 @@ export const toggleStepCollapsed = (
   payload: stepId,
 })
 
-export const toggleMultipleStepsCollapsed = (
+export const expandMultipleSteps = (
   stepIds: Array<StepIdType>
-): ToggleMultipleStepsCollapsedAction => ({
-  type: 'TOGGLE_MULTIPLE_STEPS_COLLAPSED',
+): ExpandMultipleStepsAction => ({
+  type: 'EXPAND_MULTIPLE_STEPS',
+  payload: stepIds,
+})
+
+export const collapseMultipleSteps = (
+  stepIds: Array<StepIdType>
+): CollapseMultipleStepsAction => ({
+  type: 'COLLAPSE_MULTIPLE_STEPS',
   payload: stepIds,
 })
 
