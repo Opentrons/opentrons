@@ -1,6 +1,6 @@
 // @flow
 import { getOrderedStepIds } from '../../step-forms/selectors'
-import { getNextNonTerminalItemStepId } from '../utils'
+import { getNextNonTerminalItemId } from '../utils'
 import type { GetState, ThunkAction, ThunkDispatch } from '../../types'
 import type { StepIdType, FormData } from '../../form-types'
 import type { ChangeFormPayload } from './types'
@@ -68,12 +68,18 @@ export const deleteMultipleSteps = (
     }
     dispatch(clearSelectedItemAction)
   } else {
-    const nextStepId = getNextNonTerminalItemStepId(orderedStepIds, stepIds)
-    const selectMultipleStepsAction: SelectMultipleStepsAction = {
-      type: 'SELECT_MULTIPLE_STEPS',
-      payload: { stepIds: [nextStepId], lastSelected: nextStepId },
+    const nextStepId = getNextNonTerminalItemId(orderedStepIds, stepIds)
+    if (nextStepId) {
+      const selectMultipleStepsAction: SelectMultipleStepsAction = {
+        type: 'SELECT_MULTIPLE_STEPS',
+        payload: { stepIds: [nextStepId], lastSelected: nextStepId },
+      }
+      dispatch(selectMultipleStepsAction)
+    } else {
+      console.warn(
+        'something went wrong, could not find the next non terminal item'
+      )
     }
-    dispatch(selectMultipleStepsAction)
   }
 }
 

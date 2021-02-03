@@ -27,22 +27,25 @@ export function getWellRatio(sourceWells: mixed, destWells: mixed): ?WellRatio {
   return null
 }
 
-export const getNextNonTerminalItemStepId = (
+export const getNextNonTerminalItemId = (
   orderedStepIds: Array<StepIdType>,
   stepsToDelete: Array<StepIdType>
 ): StepIdType => {
-  let highestDeletedIndex = orderedStepIds.reduce((highestIndex, val) => {
+  let highestDeletedIndex = stepsToDelete.reduce((highestIndex, val) => {
     const currentStepIndex = orderedStepIds.indexOf(val)
     return Math.max(currentStepIndex, highestIndex)
   }, 0)
   let nextStepId = orderedStepIds[highestDeletedIndex + 1]
-  while (!nextStepId) {
+  let attemptsLeft = orderedStepIds.length
+  while (!nextStepId && attemptsLeft > 0) {
+    attemptsLeft -= 1
     highestDeletedIndex -= 1
     const potentialNextStepId = orderedStepIds[highestDeletedIndex]
-    if (orderedStepIds.includes(potentialNextStepId)) {
+    if (stepsToDelete.includes(potentialNextStepId)) {
+      // if the step id is being deleted, it does not count
       continue
     }
     nextStepId = potentialNextStepId
   }
-  return nextStepId
+  return nextStepId ?? null
 }
