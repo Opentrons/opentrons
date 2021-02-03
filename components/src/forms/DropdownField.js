@@ -52,13 +52,16 @@ const INDETERMINATE_OPTION: DropdownOption = {
 }
 
 export function DropdownField(props: DropdownFieldProps): React.Node {
+  let options = []
   // add in disabled, unselectable "-" mixed option when isIndeterminate is true
   // add in "blank" option if there is no `value`, unless `options` already has a blank option
-  const options = props.isIndeterminate
-    ? [INDETERMINATE_OPTION, ...props.options]
-    : props.value || props.options.some(opt => opt.value === '')
-    ? props.options
-    : [BLANK_OPTION, ...props.options]
+  if (props.isIndeterminate) {
+    options = [INDETERMINATE_OPTION, ...props.options]
+  } else if (props.value || props.options.some(opt => opt.value === '')) {
+    options = props.options
+  } else {
+    options = [BLANK_OPTION, ...props.options]
+  }
 
   const error = props.error != null
   const className = cx(props.className, {
