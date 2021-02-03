@@ -1,7 +1,7 @@
 // @flow
 import { getOrderedStepIds } from '../../step-forms/selectors'
 import { getNextNonTerminalItemId } from '../utils'
-import type { GetState, ThunkAction, ThunkDispatch } from '../../types'
+import type { ThunkAction } from '../../types'
 import type { StepIdType, FormData } from '../../form-types'
 import type { ChangeFormPayload } from './types'
 import type {
