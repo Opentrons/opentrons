@@ -68,6 +68,7 @@
   margin: 0.4rem 0.125rem;
   color: var(--c-dark-gray);
   box-shadow: var(--shadow-lvl-1);
+  background-color: var(--c-white);
 }
 
 .pd_titled_list_title {

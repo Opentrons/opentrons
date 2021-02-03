@@ -16,11 +16,11 @@ import {
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_FLEX_START,
-  JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_UPPERCASE,
   SIZE_1,
   SIZE_2,
   SPACING_3,
+  POSITION_STICKY,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { stepIconsByType } from '../../form-types'
@@ -71,7 +71,9 @@ export const StepSelectionBannerComponent = (props: Props): React.Node => {
       backgroundColor={C_BG_SELECTED}
       padding={SPACING_3}
       color={C_SELECTED_DARK}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      justifyContent={JUSTIFY_FLEX_START}
+      position={POSITION_STICKY}
+      border={`2px solid ${C_SELECTED_DARK}`}
     >
       <Box flex="0 1 auto">
         <Flex alignItems={ALIGN_CENTER}>
@@ -86,7 +88,12 @@ export const StepSelectionBannerComponent = (props: Props): React.Node => {
           </Text>
         </Flex>
       </Box>
-      <Flex justifyContent={JUSTIFY_FLEX_START} flexWrap="wrap" flex="1">
+      <Flex
+        justifyContent={JUSTIFY_FLEX_START}
+        flexWrap="wrap"
+        flex="1"
+        maxWidth="42.25rem"
+      >
         {stepTypes.map(stepType => (
           <StepPill
             count={countPerType[stepType]}
@@ -94,7 +101,7 @@ export const StepSelectionBannerComponent = (props: Props): React.Node => {
             key={stepType}
           />
         ))}
-        <Box flex="0 1 auto" marginLeft={SPACING_3}>
+        <Box flex="0 1 auto" marginLeft="auto">
           <SecondaryBtn
             color={C_SELECTED_DARK}
             backgroundColor={C_TRANSPARENT}

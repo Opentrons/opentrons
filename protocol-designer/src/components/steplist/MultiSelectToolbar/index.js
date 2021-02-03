@@ -2,7 +2,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 
 import {
   Flex,
@@ -14,9 +13,11 @@ import {
   SIZE_2,
   SPACING_1,
   SPACING_2,
+  C_NEAR_WHITE,
   C_LIGHT_GRAY,
   C_DARK_GRAY,
   BORDER_SOLID_MEDIUM,
+  POSITION_STICKY,
 } from '@opentrons/components'
 import { useConditionalConfirm } from '../../../../../components/src/hooks/useConditionalConfirm'
 import { selectors as stepFormSelectors } from '../../../step-forms'
@@ -165,6 +166,10 @@ export const MultiSelectToolbar = (): React.Node => {
         height={SIZE_2}
         padding={`0 ${SPACING_2}`}
         borderBottom={BORDER_SOLID_MEDIUM}
+        position={POSITION_STICKY}
+        top="0"
+        backgroundColor={C_NEAR_WHITE}
+        zIndex="100"
       >
         <ClickableIcon {...selectProps} />
         <ClickableIcon {...deleteProps} />
