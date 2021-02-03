@@ -23,14 +23,14 @@ beforeEach(() => {
 
   ingredLocs = {
     wellPlateId: {
-      A1: { '0': { volume: 100 } },
-      B1: { '0': { volume: 150 } },
+      A1: { 0: { volume: 100 } },
+      B1: { 0: { volume: 150 } },
     },
     troughId: {
-      A1: { '0': { volume: 105 } },
-      A2: { '0': { volume: 155 } },
-      A3: { '1': { volume: 115 } },
-      A6: { '1': { volume: 111 } },
+      A1: { 0: { volume: 105 } },
+      A2: { 0: { volume: 155 } },
+      A3: { 1: { volume: 115 } },
+      A6: { 1: { volume: 111 } },
     },
   }
 })

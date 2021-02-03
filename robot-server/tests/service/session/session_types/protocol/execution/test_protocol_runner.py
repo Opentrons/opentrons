@@ -1,49 +1,50 @@
-import os
-import sys
 from pathlib import Path
-from unittest.mock import MagicMock, patch, PropertyMock
+from mock import MagicMock, patch, PropertyMock
 import pytest
 from opentrons.api import Session
 from opentrons.hardware_control import ThreadedAsyncLock
 
-from robot_server.service.protocol.protocol import UploadedProtocol, \
-    UploadedProtocolMeta, FileMeta
+from robot_server.service.protocol.analyze import AnalysisResult, models
+from robot_server.service.protocol.contents import Contents
+from robot_server.service.protocol.protocol import (
+    UploadedProtocol, UploadedProtocolData)
 from robot_server.service.session.session_types.protocol.execution. \
-    protocol_runner import ProtocolRunnerContext, ProtocolRunner
+    protocol_runner import ProtocolRunner
+from robot_server.util import FileMeta
 
 
 @pytest.fixture
-def mock_os_chdir():
-    with patch.object(os, "chdir") as p:
-        yield p
-
-
-@pytest.fixture
-def uploaded_protocol_meta():
+def uploaded_protocol_meta() -> UploadedProtocolData:
     mock_temp_dir = MagicMock()
     type(mock_temp_dir).name = PropertyMock(return_value="some_path")
-    return UploadedProtocolMeta(identifier="None",
-                                protocol_file=FileMeta(
-                                    path=Path("/some_path/abc.py"),
-                                    content_hash=""
-                                ),
-                                directory=mock_temp_dir
-                                )
+    return UploadedProtocolData(
+        identifier="None",
+        contents=Contents(
+            protocol_file=FileMeta(
+                path=Path("/some_path/abc.py"),
+                content_hash=""
+            ),
+            directory=mock_temp_dir
+        ),
+        analysis_result=AnalysisResult(
+            meta=models.Meta(apiLevel="123"),
+            required_equipment=models.RequiredEquipment(
+                pipettes=[], labware=[], modules=[])
+        )
+    )
 
 
 @pytest.fixture
 def mock_protocol(uploaded_protocol_meta):
     m = MagicMock(spec=UploadedProtocol)
-    type(m).meta = PropertyMock(return_value=uploaded_protocol_meta)
+    type(m).data = PropertyMock(return_value=uploaded_protocol_meta)
     m.get_contents.return_value = "my contents"
     return m
 
 
 @pytest.fixture
-def mock_context():
-    with patch('robot_server.service.session.session_types.protocol'
-               '.execution.protocol_runner.ProtocolRunnerContext') as p:
-        yield p
+def mock_context(mock_protocol):
+    return mock_protocol.protocol_environment
 
 
 @pytest.fixture
@@ -61,7 +62,7 @@ def test_load(protocol_runner, mock_context,
         protocol_runner.load()
         mock_context.assert_called_once()
         mock.assert_called_once_with(
-            name=uploaded_protocol_meta.protocol_file.path.name,
+            name=uploaded_protocol_meta.contents.protocol_file.path.name,
             contents=mock_protocol.get_contents(),
             hardware=protocol_runner._hardware.sync,
             loop=protocol_runner._loop,
@@ -106,19 +107,3 @@ def test_listeners(protocol_runner):
     protocol_runner._on_message(3)
     assert results1 == [1, 2, 3]
     assert results2 == [1, 2]
-
-
-def test_protocol_runner_context(mock_protocol, uploaded_protocol_meta,
-                                 mock_os_chdir):
-    with ProtocolRunnerContext(mock_protocol) as context:
-        # We are changing directory to the temp directory
-        mock_os_chdir.assert_called_with(
-            uploaded_protocol_meta.directory.name
-        )
-        # Adding it to sys.path
-        assert uploaded_protocol_meta.directory.name in sys.path
-
-    # Done with context manager. Let's make sure we clean up
-    assert uploaded_protocol_meta.directory.name not in sys.path
-    assert sys.path == context._path
-    mock_os_chdir.assert_called_with(context._cwd)

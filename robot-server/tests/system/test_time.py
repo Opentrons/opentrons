@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from mock import MagicMock, patch
 from datetime import datetime, timezone
 from robot_server.system import time
 from robot_server.system import errors

@@ -32,7 +32,7 @@ class ErrorCreateDef:
 
 class ErrorDef(ErrorCreateDef, Enum):
     """An enumeration of ErrorCreateDef Error definitions for use by
-    RobotServerErrorDefined"""
+    RobotServerError"""
     def __init__(self, e) -> None:
         super().__init__(**(asdict(e)))
 
@@ -40,7 +40,7 @@ class ErrorDef(ErrorCreateDef, Enum):
 class RobotServerError(BaseRobotServerError):
     """A BaseRobotServerError that uses an ErrorDef enum"""
     def __init__(self,
-                 definition: ErrorDef,
+                 definition: ErrorCreateDef,
                  error_id: str = None,
                  links: Optional[ResourceLinks] = None,
                  source: Optional[ErrorSource] = None,

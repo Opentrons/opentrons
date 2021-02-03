@@ -9,8 +9,6 @@ describe('The Desktop Home Page', () => {
   })
 
   it('has the right charset', () => {
-    cy.document()
-      .should('have.property', 'charset')
-      .and('eq', 'UTF-8')
+    cy.document().should('have.property', 'charset').and('eq', 'UTF-8')
   })
 })

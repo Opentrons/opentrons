@@ -295,7 +295,7 @@ export const unsavedForm = (
 
       const omitTopLevelSteps = (profileItemsById: {
         [string]: ProfileItem,
-        ...,
+        ...
       }) =>
         omitBy(
           profileItemsById,
@@ -307,7 +307,7 @@ export const unsavedForm = (
       // not top-level, must be nested inside a cycle
       const omitCycleSteps = (profileItemsById: {
         [string]: ProfileItem,
-        ...,
+        ...
       }) =>
         mapValues(profileItemsById, (item: ProfileItem): ProfileItem => {
           if (item.type === PROFILE_CYCLE) {

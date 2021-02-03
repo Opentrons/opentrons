@@ -20,9 +20,8 @@ export const getU2EAdapterDevice: (
 
 export const getU2EWindowsDriverStatus: (
   state: State
-) => DriverStatus = createSelector(
-  getU2EAdapterDevice,
-  device => (device !== null ? getDriverStatus(device) : NOT_APPLICABLE)
+) => DriverStatus = createSelector(getU2EAdapterDevice, device =>
+  device !== null ? getDriverStatus(device) : NOT_APPLICABLE
 )
 
 export const getU2EInterfacesMap: (
@@ -36,10 +35,7 @@ export const getU2EInterfacesMap: (
     return ue2Adapters.reduce((interfacesBySerial, device) => {
       interfacesBySerial[device.serialNumber] = networkInterfaces.filter(
         iface => {
-          const expectedSerial = iface.mac
-            .split(':')
-            .join('')
-            .toLowerCase()
+          const expectedSerial = iface.mac.split(':').join('').toLowerCase()
 
           return device.serialNumber.toLowerCase() === expectedSerial
         }

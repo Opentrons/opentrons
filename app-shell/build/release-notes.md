@@ -4,6 +4,10 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
+# Opentrons App Changes in 4.1.1
+
+There are no changes to the Opentrons App in 4.1.1; it is a bugfix release for an issue with installing Python packages on the OT-2.
+
 # Opentrons App Changes in 4.1.0
 
 Opentrons App 4.1.0 brings some new features to robot calibration.

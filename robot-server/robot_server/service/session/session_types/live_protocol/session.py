@@ -1,3 +1,8 @@
+from typing import cast
+
+from opentrons import API
+from opentrons.protocol_engine import ProtocolEngine
+
 from robot_server.service.session.models import session as models
 from robot_server.service.session.command_execution import CommandQueue, \
     CommandExecutor
@@ -6,26 +11,32 @@ from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types import BaseSession, \
     SessionMetaData
 from robot_server.service.session.session_types.live_protocol.command_executor import LiveProtocolCommandExecutor    # noqa: E501
-from robot_server.service.session.session_types.live_protocol.command_interface import CommandInterface  # noqa: E501
-from robot_server.service.session.session_types.live_protocol.state_store import StateStore  # noqa: E501
 
 
 class LiveProtocolSession(BaseSession):
 
     def __init__(self,
                  configuration: SessionConfiguration,
-                 instance_meta: SessionMetaData):
+                 instance_meta: SessionMetaData,
+                 protocol_engine: ProtocolEngine):
         """Constructor"""
         super(self.__class__, self).__init__(configuration, instance_meta)
 
-        state_store = StateStore()
-        command_interface = CommandInterface(
-            hardware=configuration.hardware,
-            state_store=state_store
-        )
         self._executor = LiveProtocolCommandExecutor(
-            command_interface=command_interface,
-            state_store=state_store
+            protocol_engine=protocol_engine
+        )
+
+    @classmethod
+    async def create(cls,
+                     configuration: SessionConfiguration,
+                     instance_meta: SessionMetaData) -> 'LiveProtocolSession':
+        return LiveProtocolSession(
+            configuration=configuration,
+            instance_meta=instance_meta,
+            protocol_engine=await ProtocolEngine.create(
+                # Cast the ThreadManager to the wrapped API object.
+                cast(API, configuration.hardware)
+            )
         )
 
     @property

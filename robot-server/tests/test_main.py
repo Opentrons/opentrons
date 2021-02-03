@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from mock import patch
 from robot_server.main import run
 from robot_server.service.app import app
 

@@ -1,0 +1,14 @@
+{
+  "plate": "corning_96_wellplate_360ul_flat",
+  "tiprack": "opentrons_96_tiprack_300ul",
+  "instrument": {
+    "model": "p300_single",
+    "mount": "right"
+  },
+  "transfers": [
+    {
+      "source_well": "A1",
+      "target_well": "B1",
+      "ml": 100
+    }]
+}

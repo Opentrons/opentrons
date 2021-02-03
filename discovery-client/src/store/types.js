@@ -73,12 +73,12 @@ export type HostState = $ReadOnly<{|
 
 export type RobotsByNameMap = $ReadOnly<{
   [robotName: string]: RobotState,
-  ...,
+  ...
 }>
 
 export type HostsByIpMap = $ReadOnly<{
   [ipAddress: string]: HostState,
-  ...,
+  ...
 }>
 
 export type State = $ReadOnly<{|

@@ -6,6 +6,14 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+# OT-2 Software Changes in 4.1.1
+
+This is a hotfix for an issue with package installation; it does not include any behavioral changes for the OT-2.
+
+## Bugfixes
+
+- Fixed an issue where the version of the pyserial dependency in the `opentrons` package metadata did not match the version installed on the OT-2, which would cause installation of Python packages that depend on the `opentrons` package to the robot to fail ([#7250](https://github.com/Opentrons/opentrons/pull/7250))
+
 # OT-2 Software Changes in 4.1.0
 
 Opentrons Robot Software 4.1.0 brings support for some new robot calibration features and some bugfixes. It also brings a new Protocol API level.
@@ -19,7 +27,7 @@ Opentrons Robot Software 4.1.0 brings support for some new robot calibration fea
 
 - In Python Protocol API Level 2.9, we added accessors for well properties that had previously been undocumented. To see more details, see [the documentation](http://docs.opentrons.com/v2/new_labware.html#new-labware-well-properties).
 
-### Bugfixes
+## Bugfixes
 
 - Fixed an issue that prevented calibration of labware in slots 10 and 11 while using a single channel pipette ([#6886](https://github.com/opentrons/opentrons/issues/6886))
 - Protocol upload should be much faster

@@ -1,37 +1,56 @@
 ---
-test_name: Protocol lifecycle
+test_name: Basic Transfer Upload
 marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Upload a protocol with support file
+  - name: Upload basic_transfer_standalone protocol
     request:
       url: "{host:s}:{port:d}/protocols"
       method: POST
       files:
-        protocolFile: "tests/integration/protocols/phony_proto.py"
-        supportFiles: "tests/integration/protocols/data.csv"
+        protocolFile: "tests/integration/protocols/basic_transfer_standalone.py"
     response:
       status_code: 201
       json:
         data: &response_data
-          id: phony_proto
+          id: basic_transfer_standalone
           protocolFile:
-            basename: phony_proto.py
-          supportFiles:
-            - basename: data.csv
-          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            basename: basic_transfer_standalone.py
+          supportFiles: []
+          lastModifiedAt: &dt
+            !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: *dt
+          metadata:
+            author: engineer@opentrons.com
+            apiLevel: "2.6"
+            name: basic_transfer_standalone
+          requiredEquipment:
+            pipettes:
+              - mount: right
+                requestedAs: p300_single
+                pipetteName: p300_single
+                channels: 1
+            labware:
+              - label: corning_96_wellplate_360ul_flat
+                uri: opentrons/corning_96_wellplate_360ul_flat/1
+                location: 1
+              - label: opentrons_96_tiprack_300ul
+                uri: opentrons/opentrons_96_tiprack_300ul/1
+                location: 2
+              - !anydict
+            modules: []
+          errors: []
         links:
           self:
-            href: '/protocols/phony_proto'
+            href: '/protocols/basic_transfer_standalone'
           protocols:
             href: '/protocols'
           protocolById:
             href: '/protocols/{{protocolId}}'
   - name: Get the protocol
     request:
-      url: "{host:s}:{port:d}/protocols/phony_proto"
+      url: "{host:s}:{port:d}/protocols/basic_transfer_standalone"
       method: GET
     response:
       status_code: 200
@@ -39,14 +58,14 @@ stages:
         data: *response_data
         links:
           self:
-            href: '/protocols/phony_proto'
+            href: '/protocols/basic_transfer_standalone'
           protocols:
             href: '/protocols'
           protocolById:
             href: '/protocols/{{protocolId}}'
   - name: Delete the protocol
     request:
-      url: "{host:s}:{port:d}/protocols/phony_proto"
+      url: "{host:s}:{port:d}/protocols/basic_transfer_standalone"
       method: DELETE
     response:
       status_code: 200
@@ -57,7 +76,7 @@ stages:
             href: '/protocols'
           protocolById:
             href: '/protocols/{{protocolId}}'
-  - name: Get all protocols to see that there are none
+  - name: Get all protocols to verify that there are none
     request:
       url: "{host:s}:{port:d}/protocols"
       method: GET
@@ -71,107 +90,404 @@ stages:
           protocolById:
             href: '/protocols/{{protocolId}}'
 ---
-test_name: Protocol lifecycle upload support
+test_name: Basic Transfer With Config
 marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Upload a protocol
+  - name: Upload just the protocol file.
     request:
       url: "{host:s}:{port:d}/protocols"
       method: POST
       files:
-        protocolFile: "tests/integration/protocols/phony_proto.py"
+        protocolFile: "tests/integration/protocols/basic_transfer_with_config.py"
     response:
       status_code: 201
       json:
         data:
-          id: phony_proto
+          id: basic_transfer_with_config
           protocolFile:
-            basename: phony_proto.py
+            basename: basic_transfer_with_config.py
           supportFiles: []
-          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          lastModifiedAt: *dt
+          createdAt: *dt
+          metadata:
+            author: null
+            apiLevel: "2.6"
+            name: null
+          requiredEquipment:
+            pipettes: []
+            labware: []
+            modules: []
+          errors:
+            - type: ModuleNotFoundError
+              description: No module named 'helpers'
         links:
           self:
-            href: '/protocols/phony_proto'
+            href: '/protocols/basic_transfer_with_config'
           protocols:
             href: '/protocols'
           protocolById:
             href: '/protocols/{{protocolId}}'
-  - name: Get the protocol
+  - name: Upload the missing helpers.py file
     request:
-      url: "{host:s}:{port:d}/protocols/phony_proto"
-      method: GET
+      url: "{host:s}:{port:d}/protocols/basic_transfer_with_config"
+      method: PATCH
+      files:
+        file: "tests/integration/protocols/helpers.py"
     response:
       status_code: 200
       json:
         data:
-          id: phony_proto
+          id: basic_transfer_with_config
           protocolFile:
-            basename: phony_proto.py
-          supportFiles: []
-          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            basename: basic_transfer_with_config.py
+          supportFiles:
+            - basename: helpers.py
+          lastModifiedAt: *dt
+          createdAt: *dt
+          metadata:
+            author: null
+            apiLevel: "2.6"
+            name: null
+          requiredEquipment:
+            pipettes: [ ]
+            labware: [ ]
+            modules: [ ]
+          errors:
+            - type: ExceptionInProtocolError
+              description: "[Errno 2] No such file or directory: 'basic_transfer_config.json'"
+              lineNumber: 8
         links:
           self:
-            href: '/protocols/phony_proto'
+            href: '/protocols/basic_transfer_with_config'
           protocols:
             href: '/protocols'
           protocolById:
             href: '/protocols/{{protocolId}}'
-  - name: Upload a data file
+  - name: Upload the missing basic_transfer_config.json file
     request:
-      url: "{host:s}:{port:d}/protocols/phony_proto"
-      method: POST
+      url: "{host:s}:{port:d}/protocols/basic_transfer_with_config"
+      method: PATCH
       files:
-        file: "tests/integration/protocols/data.csv"
+        file: "tests/integration/protocols/basic_transfer_config.json"
     response:
-      status_code: 201
+      status_code: 200
       json:
-        data:
-          id: phony_proto
+        data: &basic_transfer_with_config_response
+          id: basic_transfer_with_config
           protocolFile:
-            basename: phony_proto.py
+            basename: basic_transfer_with_config.py
           supportFiles:
-          - basename: 'data.csv'
-          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            - basename: helpers.py
+            - basename: basic_transfer_config.json
+          lastModifiedAt: *dt
+          createdAt: *dt
+          metadata:
+            author: null
+            apiLevel: "2.6"
+            name: null
+          requiredEquipment:
+            pipettes:
+              - mount: right
+                requestedAs: p300_single
+                pipetteName: p300_single
+                channels: 1
+            labware:
+              - label: corning_96_wellplate_360ul_flat
+                uri: opentrons/corning_96_wellplate_360ul_flat/1
+                location: 1
+              - label: opentrons_96_tiprack_300ul
+                uri: opentrons/opentrons_96_tiprack_300ul/1
+                location: 2
+              - !anydict
+            modules: [ ]
+          errors: []
         links:
           self:
-            href: '/protocols/phony_proto'
+            href: '/protocols/basic_transfer_with_config'
           protocols:
             href: '/protocols'
           protocolById:
             href: '/protocols/{{protocolId}}'
   - name: Delete the protocol
     request:
-      url: "{host:s}:{port:d}/protocols/phony_proto"
+      url: "{host:s}:{port:d}/protocols/basic_transfer_with_config"
       method: DELETE
     response:
       status_code: 200
       json:
-        data:
-          id: phony_proto
-          protocolFile:
-            basename: phony_proto.py
-          supportFiles:
-          - basename: 'data.csv'
-          lastModifiedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+        data: *basic_transfer_with_config_response
         links:
           self:
             href: '/protocols'
           protocolById:
             href: '/protocols/{{protocolId}}'
-  - name: Get all protocols to see that there are none
+---
+test_name: Invalid JSON
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload invalid json protocol
     request:
       url: "{host:s}:{port:d}/protocols"
-      method: GET
+      method: POST
+      files:
+        protocolFile: "tests/integration/protocols/invalid_json.json"
+    response:
+      status_code: 201
+      json:
+        data:
+          id: invalid_json
+          protocolFile:
+            basename: invalid_json.json
+          supportFiles: []
+          lastModifiedAt: *dt
+          createdAt: *dt
+          metadata:
+            author: null
+            apiLevel: null
+            name: null
+          requiredEquipment:
+            pipettes: []
+            labware: []
+            modules: []
+          errors:
+          - type: JSONDecodeError
+            description: !anystr
+            lineNumber: 1
+            fileName: invalid_json.json
+        links:
+          self:
+            href: '/protocols/invalid_json'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+  - name: Delete the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/invalid_json"
+      method: DELETE
     response:
       status_code: 200
       json:
-        data: []
+        data: !anydict
+        links:
+          self:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+---
+test_name: Load unknown module
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload python protocol with unknown module
+    request:
+      url: "{host:s}:{port:d}/protocols"
+      method: POST
+      files:
+        protocolFile: "tests/integration/protocols/load_unknown_module.py"
+    response:
+      status_code: 201
+      json:
+        data:
+          id: load_unknown_module
+          protocolFile:
+            basename: load_unknown_module.py
+          supportFiles: []
+          lastModifiedAt: *dt
+          createdAt: *dt
+          metadata:
+            author: Opentrons <protocols@opentrons.com>
+            apiLevel: '2.4'
+            name: Extraction
+          requiredEquipment:
+            pipettes: []
+            labware: []
+            modules: []
+          errors:
+          - type: ExceptionInProtocolError
+            description: !anystr
+            lineNumber: 9
+        links:
+          self:
+            href: '/protocols/load_unknown_module'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+  - name: Delete the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/load_unknown_module"
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        data: !anydict
+        links:
+          self:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+---
+test_name: Load labware, pipettes, and modules
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload python protocol labware, pipettes, and modules
+    request:
+      url: "{host:s}:{port:d}/protocols"
+      method: POST
+      files:
+        protocolFile: "tests/integration/protocols/labware_pipettes_modules.py"
+    response:
+      status_code: 201
+      json:
+        data:
+          id: labware_pipettes_modules
+          protocolFile:
+            basename: labware_pipettes_modules.py
+          supportFiles: []
+          lastModifiedAt: *dt
+          createdAt: *dt
+          metadata:
+            author: Opentrons <protocols@opentrons.com>
+            apiLevel: '2.4'
+            name: Extraction
+          requiredEquipment:
+            pipettes:
+            - mount: 'left'
+              requestedAs: "p300_multi_gen2"
+              pipetteName: "p300_multi_gen2"
+              channels: 8
+            - mount: 'right'
+              requestedAs: "p20_single_gen2"
+              pipetteName: "p20_single_gen2"
+              channels: 1
+            labware:
+            - label: 'elution plate'
+              uri: "opentrons/opentrons_96_aluminumblock_nest_wellplate_100ul/1"
+              location: 1
+            - uri: "opentrons/nest_12_reservoir_15ml/1"
+              location: 2
+              label: 'reagent reservoir 1'
+            - uri: "opentrons/nest_12_reservoir_15ml/1"
+              location: 3
+              label: 'reagent reservoir 2'
+            - uri: "opentrons/opentrons_96_tiprack_300ul/1"
+              location: 4
+              label: '200µl filtertiprack'
+            - uri: "opentrons/opentrons_96_tiprack_300ul/1"
+              location: 5
+              label: 'tiprack for parking'
+            - uri: "opentrons/nest_96_wellplate_2ml_deep/1"
+              location: 6
+              label: 'deepwell plate'
+            - uri: "opentrons/opentrons_96_tiprack_300ul/1"
+              location: 7
+              label: '200µl filtertiprack'
+            - uri: "opentrons/opentrons_96_tiprack_300ul/1"
+              location: 8
+              label: '200µl filtertiprack'
+            - uri: "opentrons/nest_1_reservoir_195ml/1"
+              location: 9
+              label: 'Liquid Waste'
+            - uri: "opentrons/opentrons_96_tiprack_300ul/1"
+              location: 10
+              label: '200µl filtertiprack'
+            - uri: "opentrons/opentrons_96_tiprack_300ul/1"
+              location: 11
+              label: '200µl filtertiprack'
+            - uri: "opentrons/opentrons_1_trash_1100ml_fixed/1"
+              location: 12
+              label: "opentrons_1_trash_1100ml_fixed"
+            modules:
+            - type: 'temperatureModuleType'
+              location: 1
+              model: "temperatureModuleV2"
+            - type: "magneticModuleType"
+              location: 6
+              model: "magneticModuleV2"
+          errors: []
+        links:
+          self:
+            href: '/protocols/labware_pipettes_modules'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+  - name: Delete the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/labware_pipettes_modules"
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        data: !anydict
+        links:
+          self:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+---
+test_name: Load thermocycler
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload python protocol with thermocycler
+    request:
+      url: "{host:s}:{port:d}/protocols"
+      method: POST
+      files:
+        protocolFile: "tests/integration/protocols/thermocycler.py"
+    response:
+      status_code: 201
+      json:
+        data:
+          id: thermocycler
+          protocolFile:
+            basename: thermocycler.py
+          supportFiles: []
+          lastModifiedAt: *dt
+          createdAt: *dt
+          metadata:
+            author: Opentrons <protocols@opentrons.com>
+            apiLevel: '2.4'
+            name: Thermocycler test
+          requiredEquipment:
+            pipettes: []
+            labware:
+            - uri: "opentrons/nest_96_wellplate_2ml_deep/1"
+              location: 7
+              label: 'deepwell plate'
+            - uri: "opentrons/opentrons_1_trash_1100ml_fixed/1"
+              location: 12
+              label: "opentrons_1_trash_1100ml_fixed"
+            modules:
+            - type: 'thermocyclerModuleType'
+              location: 7
+              model: "thermocyclerModuleV1"
+          errors: []
+        links:
+          self:
+            href: '/protocols/thermocycler'
+          protocols:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+  - name: Delete the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/thermocycler"
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        data: !anydict
         links:
           self:
             href: '/protocols'

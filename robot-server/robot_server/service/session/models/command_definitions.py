@@ -61,7 +61,7 @@ class ProtocolCommand(CommandDefinition):
 
 class EquipmentCommand(CommandDefinition):
     load_labware = "loadLabware"
-    load_instrument = "loadInstrument"
+    load_pipette = "loadPipette"
 
     @staticmethod
     def namespace():

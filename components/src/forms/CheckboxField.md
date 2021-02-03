@@ -19,3 +19,27 @@ const [state, setState] = React.useState({
   />
 </div>
 ```
+
+Optional interminate prop for mixed values
+
+```js
+const [state, setState] = React.useState({
+  isChecked: false,
+  isIndeterminate: true,
+})
+;<div>
+  <CheckboxField
+    label="Shared Field Check Box"
+    className="display-block"
+    onChange={() =>
+      setState({
+        ...state,
+        isChecked: !state.isChecked,
+        isIndeterminate: false,
+      })
+    }
+    value={state.isChecked}
+    isIndeterminate={state.isIndeterminate}
+  />
+</div>
+```

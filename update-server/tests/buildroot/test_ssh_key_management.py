@@ -61,7 +61,7 @@ async def test_list_keys(test_cli, dummy_authorized_keys):
          'key': dummy_key}]
 
 
-async def test_add_key(test_cli, dummy_authorized_keys):
+async def test_add_key_successes(test_cli, dummy_authorized_keys):
     dummy_key = "ssh-rsa ahaubsfalsijdbalsjdhbfajsdbfafasdk test@opentrons.com"
     resp = await test_cli.post('/server/ssh_keys',
                                json={'key': dummy_key},
@@ -85,22 +85,24 @@ async def test_add_key(test_cli, dummy_authorized_keys):
         'md5', dummy_key.encode()).hexdigest()
     assert open(dummy_authorized_keys).read() == dummy_key + '\n'
 
-    # Send something that looks nothing like a key
-    resp = await test_cli.post('/server/ssh_keys',
-                               json={'key': 'not even close to a pubkey'},
-                               headers={'X-Host-IP': '169.254.1.1'})
-    assert resp.status == 400
-    body = await resp.json()
-    assert body['error'] == 'bad-key'
-    assert 'message' in body
 
-    # Send something that looks kinda like a key but with a newline
+@pytest.mark.parametrize(
+    'expected_error, body', [
+        ('no-key', {}),
+        ('no-key', {'key': 123}),
+        ('bad-key', {'key': ''}),
+        ('bad-key', {'key': '     '}),
+        ('bad-key', {'key': 'not even close to a pubkey'}),
+        ('bad-key', {'key': 'ssh-rsa \ngotcha'})  # Bad because of embedded \n.
+    ])
+async def test_add_key_errors(
+        test_cli, dummy_authorized_keys, expected_error, body):
     resp = await test_cli.post('/server/ssh_keys',
-                               json={'key': 'ssh-rsa \ngotcha'},
+                               json=body,
                                headers={'X-Host-IP': '169.254.1.1'})
     assert resp.status == 400
     body = await resp.json()
-    assert body['error'] == 'bad-key'
+    assert body['error'] == expected_error
     assert 'message' in body
 
 

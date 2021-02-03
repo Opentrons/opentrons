@@ -69,7 +69,7 @@ describe('ConnectPanel RobotListItem', () => {
     let wrapper = render({ isConnectable: true, isSelected: true })
     let link = wrapper.find('RobotLink[url="/robots/robot-name/instruments"]')
 
-    expect(link.find('p').html()).toMatch(/pipettes.+modules/i)
+    expect(link.find('p').html()).toMatch(/pipettes/i)
 
     wrapper = render({ isConnectable: true, isSelected: false })
     link = wrapper.find('RobotLink[url="/robots/robot-name/instruments"]')
@@ -78,6 +78,23 @@ describe('ConnectPanel RobotListItem', () => {
 
     wrapper = render({ isConnectable: false, isSelected: true })
     link = wrapper.find('RobotLink[url="/robots/robot-name/instruments"]')
+
+    expect(link).toHaveLength(0)
+  })
+
+  it('renders a modules link if connectable and selected', () => {
+    let wrapper = render({ isConnectable: true, isSelected: true })
+    let link = wrapper.find('RobotLink[url="/robots/robot-name/modules"]')
+
+    expect(link.find('p').html()).toMatch(/modules/i)
+
+    wrapper = render({ isConnectable: true, isSelected: false })
+    link = wrapper.find('RobotLink[url="/robots/robot-name/modules"]')
+
+    expect(link).toHaveLength(0)
+
+    wrapper = render({ isConnectable: false, isSelected: true })
+    link = wrapper.find('RobotLink[url="/robots/robot-name/modules"]')
 
     expect(link).toHaveLength(0)
   })

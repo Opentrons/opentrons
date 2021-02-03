@@ -18,8 +18,9 @@ from .errors import V1HandlerError, \
     transform_validation_error_to_json_api_errors, \
     consolidate_fastapi_response, BaseRobotServerError, ErrorResponse, \
     build_unhandled_exception_response
-from .dependencies import get_rpc_server, get_protocol_manager, api_wrapper, \
-    verify_hardware, get_session_manager, check_version_header
+from .dependencies import (
+    get_rpc_server, get_protocol_manager, get_hardware_wrapper,
+    verify_hardware, get_session_manager, check_version_header)
 from robot_server import constants
 from robot_server.service.legacy.routers import legacy_routes
 from robot_server.service.session.router import router as session_router
@@ -44,6 +45,7 @@ app = FastAPI(
                 "`patternProperties` behavior.",
     version=__version__,
 )
+
 
 # Legacy routes
 app.include_router(router=legacy_routes,
@@ -86,7 +88,7 @@ async def on_startup():
     """App startup handler"""
     initialize_logging()
     # Initialize api
-    api_wrapper.async_initialize()
+    (await get_hardware_wrapper()).async_initialize()
 
 
 @app.on_event("shutdown")
@@ -95,9 +97,9 @@ async def on_shutdown():
     s = await get_rpc_server()
     await s.on_shutdown()
     # Remove all sessions
-    await get_session_manager().remove_all()
+    await (await get_session_manager()).remove_all()
     # Remove all uploaded protocols
-    get_protocol_manager().remove_all()
+    (await get_protocol_manager()).remove_all()
 
 
 @app.middleware("http")

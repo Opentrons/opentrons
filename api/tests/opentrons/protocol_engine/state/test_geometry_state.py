@@ -86,7 +86,7 @@ def test_get_labware_highest_z(
     """It should get the absolute location of a labware's highest Z point."""
     labware_data = LabwareData(
         definition=well_plate_def,
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         calibration=(1, -2, 3)
     )
 
@@ -115,12 +115,12 @@ def test_get_all_labware_highest_z(
     """It should get the highest Z amongst all labware."""
     plate_data = LabwareData(
         definition=well_plate_def,
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         calibration=(1, -2, 3)
     )
     reservoir_data = LabwareData(
         definition=reservoir_def,
-        location=DeckSlotLocation(DeckSlotName.SLOT_4),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_4),
         calibration=(1, -2, 3)
     )
 
@@ -155,7 +155,7 @@ def test_get_well_position(
     """It should be able to get the position of a well top in a labware."""
     labware_data = LabwareData(
         definition=well_plate_def,
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         calibration=(1, -2, 3)
     )
     well_def = well_plate_def["wells"]["B2"]
@@ -189,7 +189,7 @@ def test_get_well_position_with_top_offset(
     """It should be able to get the position of a well top in a labware."""
     labware_data = LabwareData(
         definition=well_plate_def,
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         calibration=(1, -2, 3)
     )
     well_def = well_plate_def["wells"]["B2"]
@@ -220,7 +220,7 @@ def test_get_well_position_with_bottom_offset(
     """It should be able to get the position of a well top in a labware."""
     labware_data = LabwareData(
         definition=well_plate_def,
-        location=DeckSlotLocation(DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         calibration=(1, -2, 3)
     )
     well_def = well_plate_def["wells"]["B2"]

@@ -52,9 +52,8 @@ const getNextLiquidGroupId: MemoizedSelector<string> = createSelector(
 
 const getLiquidNamesById: MemoizedSelector<{
   [ingredId: string]: string,
-}> = createSelector(
-  getLiquidGroupsById,
-  ingredGroups => mapValues(ingredGroups, (ingred: LiquidGroup) => ingred.name)
+}> = createSelector(getLiquidGroupsById, ingredGroups =>
+  mapValues(ingredGroups, (ingred: LiquidGroup) => ingred.name)
 )
 
 const getLiquidSelectionOptions: MemoizedSelector<Options> = createSelector(

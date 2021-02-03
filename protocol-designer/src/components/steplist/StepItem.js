@@ -93,8 +93,9 @@ export const StepItem = (props: StepItemProps): React.Node => {
       iconName={error || warning ? 'alert-circle' : iconName}
       iconProps={{ className: iconClassName }}
       data-test={`StepItem_${stepNumber}`}
-      title={`${stepNumber}. ${props.title ||
-        i18n.t(`application.stepType.${stepType}`)}`}
+      title={`${stepNumber}. ${
+        props.title || i18n.t(`application.stepType.${stepType}`)
+      }`}
       onClick={handleClick}
       onContextMenu={onStepContextMenu}
       onMouseEnter={highlightStep}
