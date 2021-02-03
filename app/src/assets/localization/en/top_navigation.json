@@ -1,3 +1,4 @@
 {
-  "pipettes_and_modules": "pipettes & modules"
+  "pipettes": "pipettes",
+  "modules": "modules"
 }

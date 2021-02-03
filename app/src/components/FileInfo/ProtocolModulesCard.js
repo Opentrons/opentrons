@@ -151,6 +151,6 @@ function mapStateToProps(state: State, ownProps: OP): SP {
     actualModules,
     modules: robotSelectors.getModules(state),
     // TODO(mc, 2018-10-10): pass this prop down from page
-    attachModulesUrl: `/robots/${robot.name}/instruments`,
+    attachModulesUrl: `/robots/${robot.name}/modules`,
   }
 }

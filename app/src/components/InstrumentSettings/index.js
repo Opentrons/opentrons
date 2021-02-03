@@ -3,7 +3,6 @@
 import * as React from 'react'
 
 import { AttachedPipettesCard } from './AttachedPipettesCard'
-import { AttachedModulesCard } from './AttachedModulesCard'
 import { CardContainer, CardRow } from '../layout'
 
 import type { Mount } from '../../pipettes/types'
@@ -32,9 +31,6 @@ export function InstrumentSettings(props: Props): React.Node {
           makeConfigureUrl={makeConfigurePipetteUrl}
           isChangingOrConfiguringPipette={isChangingOrConfiguringPipette}
         />
-      </CardRow>
-      <CardRow>
-        <AttachedModulesCard robotName={robotName} />
       </CardRow>
     </CardContainer>
   )

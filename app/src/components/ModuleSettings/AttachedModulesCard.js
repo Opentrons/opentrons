@@ -10,7 +10,7 @@ import {
   getModuleControlsDisabled,
 } from '../../modules'
 import { getConnectedRobotName } from '../../robot/selectors'
-import { ModulesCardContents } from './ModulesCardContents'
+import { ModulesCardContents } from '../InstrumentSettings/ModulesCardContents'
 
 import type { State, Dispatch } from '../../types'
 
