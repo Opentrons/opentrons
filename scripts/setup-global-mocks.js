@@ -10,7 +10,7 @@ jest.mock('../components/src/deck/getDeckDefinitions')
 jest.mock('../app/src/getLabware')
 jest.mock('../app/src/logger')
 jest.mock('../app/src/components/portal')
-jest.mock('../app/src/shell/remote')
+jest.mock('../app/src/redux/shell/remote')
 jest.mock('../app-shell/src/config')
 jest.mock('../app-shell/src/log')
 
