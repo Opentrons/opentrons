@@ -1,10 +1,10 @@
-// @flow
 import * as Actions from '../actions'
 import { reducer, manualAddressesReducer } from '../reducer'
+import type { Action } from '../types'
 
 describe('manual addresses reducer', () => {
   it('should return an empty initial array under manualAddresses in the root reducer', () => {
-    const state = reducer(undefined, ({}: any))
+    const state = reducer(undefined, {} as Action)
     expect(state.manualAddresses).toEqual([])
   })
 

@@ -1,6 +1,3 @@
-// @flow
-import { last } from 'lodash'
-
 import { mockHealthResponse, mockServerHealthResponse } from '../__fixtures__'
 import { HEALTH_STATUS_OK } from '../constants'
 import * as HealthPollerModule from '../health-poller'
@@ -9,10 +6,7 @@ import { createDiscoveryClient } from '..'
 
 import type {
   HealthPoller,
-  HealthPollerOptions,
-  HealthPollerConfig,
   HealthPollerResult,
-  MdnsBrowserOptions,
   MdnsBrowser,
   MdnsBrowserService,
   Logger,
@@ -21,40 +15,46 @@ import type {
 jest.mock('../health-poller')
 jest.mock('../mdns-browser')
 
-const createHealthPoller: JestMockFn<[HealthPollerOptions], HealthPoller> =
-  HealthPollerModule.createHealthPoller
+const createHealthPoller = HealthPollerModule.createHealthPoller as jest.MockedFunction<
+  typeof HealthPollerModule.createHealthPoller
+>
 
-const createMdnsBrowser: JestMockFn<[MdnsBrowserOptions], MdnsBrowser> =
-  MdnsBrowserModule.createMdnsBrowser
+const createMdnsBrowser = MdnsBrowserModule.createMdnsBrowser as jest.MockedFunction<
+  typeof MdnsBrowserModule.createMdnsBrowser
+>
 
-const logger: $Shape<Logger> = {}
+const logger = ({} as unknown) as Logger
 
 describe('discovery client', () => {
   const onListChange = jest.fn()
 
-  const healthPoller: {|
-    start: JestMockFn<[HealthPollerConfig | void], void>,
-    stop: JestMockFn<[], void>,
-  |} = {
+  const healthPoller: {
+    start: jest.MockedFunction<HealthPoller['start']>
+    stop: jest.MockedFunction<HealthPoller['stop']>
+  } = {
     start: jest.fn(),
     stop: jest.fn(),
   }
 
-  const mdnsBrowser: {|
-    start: JestMockFn<[], void>,
-    stop: JestMockFn<[], void>,
-  |} = {
+  const mdnsBrowser: {
+    start: jest.MockedFunction<MdnsBrowser['start']>
+    stop: jest.MockedFunction<MdnsBrowser['stop']>
+  } = {
     start: jest.fn(),
     stop: jest.fn(),
   }
 
-  const emitPollResult = (result: HealthPollerResult) => {
-    const { onPollResult } = last(createHealthPoller.mock.calls)[0]
+  const emitPollResult = (result: HealthPollerResult): void => {
+    const { onPollResult } = createHealthPoller.mock.calls[
+      createHealthPoller.mock.calls.length - 1
+    ][0]
     onPollResult(result)
   }
 
-  const emitService = (service: MdnsBrowserService) => {
-    const { onService } = last(createMdnsBrowser.mock.calls)[0]
+  const emitService = (service: MdnsBrowserService): void => {
+    const { onService } = createMdnsBrowser.mock.calls[
+      createMdnsBrowser.mock.calls.length - 1
+    ][0]
     onService(service)
   }
 

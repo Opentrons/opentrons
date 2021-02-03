@@ -8,7 +8,7 @@ export {
   RE_HOSTNAME_IPV4_LL,
   RE_HOSTNAME_LOCALHOST,
   RE_HOSTNAME_LOOPBACK,
-} from '@opentrons/discovery-client/src/constants'
+} from '@opentrons/discovery-client'
 
 export const CONNECTABLE: 'connectable' = 'connectable'
 export const REACHABLE: 'reachable' = 'reachable'

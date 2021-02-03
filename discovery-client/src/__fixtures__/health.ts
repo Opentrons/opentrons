@@ -1,5 +1,3 @@
-// @flow
-
 export const mockHealthResponse = {
   name: 'opentrons-dev',
   api_version: '1.2.3',

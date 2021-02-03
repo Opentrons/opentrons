@@ -1,4 +1,3 @@
-// @flow
 // discovery client reducer
 import {
   mockHealthResponse,
@@ -8,10 +7,12 @@ import {
 
 import * as Actions from '../actions'
 import { reducer, robotsByNameReducer } from '../reducer'
+import type { HealthResponse, ServerHealthResponse } from '../../types'
+import type { Action, RobotsByNameMap } from '../types'
 
 describe('robotsByName reducer', () => {
   it('should return an empty initial state under robotsByName in the root reducer', () => {
-    const state = reducer(undefined, ({}: any))
+    const state = reducer(undefined, {} as Action)
     expect(state.robotsByName).toEqual({})
   })
 
@@ -104,11 +105,13 @@ describe('robotsByName reducer', () => {
       ip: '127.0.0.1',
       port: 31950,
     })
-    const initialState = {
+    const initialState: RobotsByNameMap = {
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: ({ mockHealth: true }: any),
-        serverHealth: ({ mockServerHealth: true }: any),
+        health: ({ mockHealth: true } as unknown) as HealthResponse,
+        serverHealth: ({
+          mockServerHealth: true,
+        } as unknown) as ServerHealthResponse,
       },
     }
     const nextState = robotsByNameReducer(initialState, action)

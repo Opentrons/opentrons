@@ -1,4 +1,3 @@
-// @flow
 import { DEFAULT_PORT } from './constants'
 import { createHealthPoller } from './health-poller'
 import { createMdnsBrowser } from './mdns-browser'
@@ -9,6 +8,8 @@ import type {
   DiscoveryClient,
   DiscoveryClientConfig,
   DiscoveryClientOptions,
+  Address,
+  DiscoveryClientRobot,
 } from './types'
 
 export function createDiscoveryClient(
@@ -16,8 +17,8 @@ export function createDiscoveryClient(
 ): DiscoveryClient {
   const { onListChange, logger } = options
   const { getState, dispatch, subscribe } = Store.createStore()
-  const getAddresses = () => Store.getAddresses(getState())
-  const getRobots = () => Store.getRobots(getState())
+  const getAddresses = (): Address[] => Store.getAddresses(getState())
+  const getRobots = (): DiscoveryClientRobot[] => Store.getRobots(getState())
   let unsubscribe: (() => void) | null = null
 
   const healthPoller = createHealthPoller({
@@ -46,7 +47,7 @@ export function createDiscoveryClient(
     healthPoller.start({ list: prevAddrs, interval: healthPollInterval })
     mdnsBrowser.start()
 
-    if (!unsubscribe) {
+    if (unsubscribe === null) {
       unsubscribe = subscribe(() => {
         const addrs = getAddresses()
         const robots = getRobots()
@@ -63,7 +64,7 @@ export function createDiscoveryClient(
   const stop = (): void => {
     mdnsBrowser.stop()
     healthPoller.stop()
-    if (unsubscribe) {
+    if (typeof unsubscribe === 'function') {
       unsubscribe()
       unsubscribe = null
     }

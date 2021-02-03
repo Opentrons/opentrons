@@ -1,4 +1,3 @@
-// @flow
 import {
   mockHealthResponse,
   mockServerHealthResponse,
@@ -192,25 +191,31 @@ describe('discovery client state selectors', () => {
   })
 
   describe('IP address sorting', () => {
-    const sort = arr => arr.sort(Selectors.compareHostsByConnectability)
+    const sort = (arr: Array<Partial<HostState>>): Array<Partial<HostState>> =>
+      arr.sort(
+        Selectors.compareHostsByConnectability as (
+          a: Partial<HostState>,
+          b: Partial<HostState>
+        ) => number
+      )
 
     it('should sort addresses with "ok" /health endpoints the highest', () => {
-      const ok: $Shape<HostState> = {
+      const ok: Partial<HostState> = {
         ip: '127.0.0.1',
         healthStatus: HEALTH_STATUS_OK,
       }
 
-      const notOk: $Shape<HostState> = {
+      const notOk: Partial<HostState> = {
         ip: '127.0.0.2',
         healthStatus: HEALTH_STATUS_NOT_OK,
       }
 
-      const unreachable: $Shape<HostState> = {
+      const unreachable: Partial<HostState> = {
         ip: '127.0.0.3',
         healthStatus: HEALTH_STATUS_UNREACHABLE,
       }
 
-      const unknown: $Shape<HostState> = {
+      const unknown: Partial<HostState> = {
         ip: '127.0.0.4',
         healthStatus: null,
       }
@@ -220,25 +225,25 @@ describe('discovery client state selectors', () => {
     })
 
     it('should fall back to /server/update/health status if /health is the same the highest', () => {
-      const ok: $Shape<HostState> = {
+      const ok: Partial<HostState> = {
         ip: '127.0.0.1',
         healthStatus: HEALTH_STATUS_NOT_OK,
         serverHealthStatus: HEALTH_STATUS_OK,
       }
 
-      const notOk: $Shape<HostState> = {
+      const notOk: Partial<HostState> = {
         ip: '127.0.0.2',
         healthStatus: HEALTH_STATUS_NOT_OK,
         serverHealthStatus: HEALTH_STATUS_NOT_OK,
       }
 
-      const unreachable: $Shape<HostState> = {
+      const unreachable: Partial<HostState> = {
         ip: '127.0.0.3',
         healthStatus: HEALTH_STATUS_NOT_OK,
         serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
       }
 
-      const unknown: $Shape<HostState> = {
+      const unknown: Partial<HostState> = {
         ip: '127.0.0.4',
         healthStatus: HEALTH_STATUS_NOT_OK,
         serverHealthStatus: null,
@@ -249,31 +254,31 @@ describe('discovery client state selectors', () => {
     })
 
     it('should prefer more local "ip" addresses', () => {
-      const home: $Shape<HostState> = {
+      const home: Partial<HostState> = {
         ip: '127.0.0.1',
         healthStatus: HEALTH_STATUS_OK,
         serverHealthStatus: HEALTH_STATUS_OK,
       }
 
-      const localhost: $Shape<HostState> = {
+      const localhost: Partial<HostState> = {
         ip: 'localhost',
         healthStatus: HEALTH_STATUS_OK,
         serverHealthStatus: HEALTH_STATUS_OK,
       }
 
-      const linkLocalV4: $Shape<HostState> = {
+      const linkLocalV4: Partial<HostState> = {
         ip: '169.254.24.42',
         healthStatus: HEALTH_STATUS_OK,
         serverHealthStatus: HEALTH_STATUS_OK,
       }
 
-      const linkLocalV6: $Shape<HostState> = {
+      const linkLocalV6: Partial<HostState> = {
         ip: 'fd00:0:cafe:fefe::1',
         healthStatus: HEALTH_STATUS_OK,
         serverHealthStatus: HEALTH_STATUS_OK,
       }
 
-      const regular: $Shape<HostState> = {
+      const regular: Partial<HostState> = {
         ip: '192.168.1.100',
         healthStatus: HEALTH_STATUS_OK,
         serverHealthStatus: HEALTH_STATUS_OK,
@@ -290,14 +295,14 @@ describe('discovery client state selectors', () => {
     })
 
     it('should prefer more seen "ip" addresses', () => {
-      const unseen: $Shape<HostState> = {
+      const unseen: Partial<HostState> = {
         ip: '192.168.1.1',
         healthStatus: HEALTH_STATUS_OK,
         serverHealthStatus: HEALTH_STATUS_OK,
         seen: false,
       }
 
-      const seen: $Shape<HostState> = {
+      const seen: Partial<HostState> = {
         ip: '192.168.1.2',
         healthStatus: HEALTH_STATUS_OK,
         serverHealthStatus: HEALTH_STATUS_OK,
