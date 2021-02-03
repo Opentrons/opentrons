@@ -47,14 +47,13 @@ export type DeleteMultipleStepsAction = {|
   payload: Array<StepIdType>,
 |}
 
-// delete the steps, then update the selection
 export const deleteMultipleSteps = (
   stepIds: Array<StepIdType>
 ): ThunkAction<
   | DeleteMultipleStepsAction
   | ClearSelectedItemAction
   | SelectMultipleStepsAction
-> => (dispatch: ThunkDispatch<*>, getState: GetState) => {
+> => (dispatch, getState) => {
   const orderedStepIds = getOrderedStepIds(getState())
   const deleteMultipleStepsAction: DeleteMultipleStepsAction = {
     type: 'DELETE_MULTIPLE_STEPS',
