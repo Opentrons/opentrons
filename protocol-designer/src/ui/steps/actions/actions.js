@@ -134,7 +134,10 @@ export const selectStep = (stepId: StepIdType): ThunkAction<*> => (
 export const selectMultipleSteps = (
   stepIds: Array<StepIdType>,
   lastSelected: StepIdType
-): ThunkAction<*> => (dispatch: ThunkDispatch<*>, getState: GetState) => {
+): ThunkAction<SelectMultipleStepsAction> => (
+  dispatch: ThunkDispatch<*>,
+  getState: GetState
+) => {
   const selectStepAction: SelectMultipleStepsAction = {
     type: 'SELECT_MULTIPLE_STEPS',
     payload: { stepIds, lastSelected },
@@ -143,7 +146,7 @@ export const selectMultipleSteps = (
 }
 
 export const selectAllSteps = (): ThunkAction<*> => (
-  dispatch: ThunkDispatch<*>,
+  dispatch: ThunkDispatch<SelectMultipleStepsAction>,
   getState: GetState
 ) => {
   const allStepIds = stepFormSelectors.getOrderedStepIds(getState())
@@ -156,7 +159,7 @@ export const selectAllSteps = (): ThunkAction<*> => (
 }
 
 export const deselectAllSteps = (): ThunkAction<*> => (
-  dispatch: ThunkDispatch<*>,
+  dispatch: ThunkDispatch<SelectStepAction>,
   getState: GetState
 ) => {
   const lastSelectedStepId = getMultiSelectLastSelected(getState())

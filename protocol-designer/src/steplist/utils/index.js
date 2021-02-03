@@ -1,6 +1,7 @@
 // @flow
 import { mergeWhen } from './mergeWhen'
 import { orderWells, getOrderedWells } from './orderWells'
+import type { StepIdType } from '../../form-types'
 
 export { mergeWhen, orderWells, getOrderedWells }
 
@@ -24,4 +25,24 @@ export function getWellRatio(sourceWells: mixed, destWells: mixed): ?WellRatio {
     return 'many:1'
   }
   return null
+}
+
+export const getNextNonTerminalItemStepId = (
+  orderedStepIds: Array<StepIdType>,
+  stepsToDelete: Array<StepIdType>
+): StepIdType => {
+  let highestDeletedIndex = orderedStepIds.reduce((highestIndex, val) => {
+    const currentStepIndex = orderedStepIds.indexOf(val)
+    return Math.max(currentStepIndex, highestIndex)
+  }, 0)
+  let nextStepId = orderedStepIds[highestDeletedIndex + 1]
+  while (!nextStepId) {
+    highestDeletedIndex -= 1
+    const potentialNextStepId = orderedStepIds[highestDeletedIndex]
+    if (orderedStepIds.includes(potentialNextStepId)) {
+      continue
+    }
+    nextStepId = potentialNextStepId
+  }
+  return nextStepId
 }
