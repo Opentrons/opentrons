@@ -2,10 +2,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { i18n } from '../../../../localization'
-import type {
-  StepType,
-  HydratedMoveLiquidFormDataLegacy,
-} from '../../../../form-types'
 import {
   VolumeField,
   PipetteField,
@@ -15,26 +11,20 @@ import {
 } from '../../fields'
 import { useSingleEditFieldProps } from '../../fields/useSingleEditFieldProps'
 import styles from '../../StepEditForm.css'
-import type { FocusHandlers } from '../../types'
+import type { StepFormProps } from '../../types'
 import { SourceDestFields } from './SourceDestFields'
 import { SourceDestHeaders } from './SourceDestHeaders'
-
-type Props = {|
-  focusHandlers: FocusHandlers,
-  stepType: StepType,
-  formData: HydratedMoveLiquidFormDataLegacy,
-|}
 
 // TODO: BC 2019-01-25 instead of passing path from here, put it in connect fields where needed
 // or question if it even needs path
 
-export const MoveLiquidForm = (props: Props): React.Node => {
+export const MoveLiquidForm = (props: StepFormProps): React.Node => {
   const [collapsed, _setCollapsed] = React.useState<boolean>(true)
 
   const toggleCollapsed = () => _setCollapsed(!collapsed)
 
-  const { focusHandlers, stepType } = props
-  const { path } = props.formData
+  const { focusHandlers } = props
+  const { stepType, path } = props.formData
 
   const propsForFields = useSingleEditFieldProps(props.focusHandlers)
   if (propsForFields === null) return null

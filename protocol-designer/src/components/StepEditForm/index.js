@@ -33,12 +33,11 @@ import {
 import { FormAlerts } from './FormAlerts'
 import { ButtonRow } from './ButtonRow'
 import styles from './StepEditForm.css'
-
+import type { StepFormProps } from './types'
 import type { BaseState } from '../../types'
 import type { FormData, StepType, StepFieldName } from '../../form-types'
 
-// TODO IMMEDIATELY: don't any-type this.
-const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<any> } = {
+const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<StepFormProps> } = {
   mix: MixForm,
   pause: PauseForm,
   moveLiquid: MoveLiquidForm,
@@ -55,8 +54,8 @@ type Props = {|
   handleSave: () => mixed,
   showMoreOptionsModal: boolean,
   focusedField: string | null,
-  blur: StepFieldName => mixed,
-  focus: StepFieldName => mixed,
+  blur: StepFieldName => void,
+  focus: StepFieldName => void,
   toggleMoreOptionsModal: () => mixed,
   dirtyFields: Array<string>,
 |}
@@ -96,7 +95,6 @@ export const StepEditFormComponent = (props: Props): React.Node => {
       <FormAlerts focusedField={focusedField} dirtyFields={dirtyFields} />
       <div className={cx(formStyles.form, styles[formData.stepType])}>
         <FormComponent
-          stepType={formData.stepType} // TODO: Ian 2019-01-17 deprecate passing this during #2916, it's in formData
           formData={formData}
           focusHandlers={{
             focusedField,

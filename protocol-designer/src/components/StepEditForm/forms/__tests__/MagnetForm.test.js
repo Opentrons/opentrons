@@ -1,12 +1,12 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
 import { selectors as uiModuleSelectors } from '../../../../ui/modules'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
 import * as _fields from '../../fields'
-import { MagnetForm, type MagnetFormProps } from '../MagnetForm'
+import { MagnetForm } from '../MagnetForm'
 import type { Options } from '@opentrons/components'
 import type { BaseState } from '../../../../types'
 
@@ -23,8 +23,8 @@ jest.mock('../../fields')
 
 describe('MagnetForm', () => {
   let store
-  let props: MagnetFormProps
-  function render(_props: MagnetFormProps) {
+  let props: React.ElementProps<typeof MagnetForm>
+  function render(_props: React.ElementProps<typeof MagnetForm>) {
     // enzyme seems to have trouble shallow rendering with hooks and redux
     // https://github.com/airbnb/enzyme/issues/2202
     return mount(
@@ -36,11 +36,11 @@ describe('MagnetForm', () => {
 
   beforeEach(() => {
     props = {
-      formData: {
+      formData: ({
         id: 'formId',
         stepType: 'magnet',
         meta: { module: { model: MAGNETIC_MODULE_V1 } },
-      },
+      }: any),
       focusHandlers: {
         blur: jest.fn(),
         focus: jest.fn(),

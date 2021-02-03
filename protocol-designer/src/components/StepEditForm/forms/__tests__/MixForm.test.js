@@ -1,8 +1,8 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
-import { MixForm, type MixFormProps } from '../MixForm'
+import { MixForm } from '../MixForm'
 import { AspDispSection } from '../AspDispSection'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
 import type { BaseState } from '../../../../types'
@@ -41,7 +41,7 @@ const mockStore = {
 }
 
 describe('MixForm', () => {
-  let props: MixFormProps
+  let props: React.ElementProps<typeof MixForm>
 
   const render = _props =>
     mount(<MixForm {..._props} />, {
@@ -59,6 +59,9 @@ describe('MixForm', () => {
     })
 
     props = {
+      formData: ({
+        stepType: 'mix',
+      }: any),
       focusHandlers: {
         blur: jest.fn(),
         focus: jest.fn(),

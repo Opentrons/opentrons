@@ -26,7 +26,7 @@ export type FieldProps = {|
 
 export type FieldPropsByName = {
   [name: StepFieldName]: FieldProps,
-  ...,
+  ...
 }
 
 type ShowFieldErrorParams = {|

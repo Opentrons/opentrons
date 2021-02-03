@@ -13,11 +13,9 @@ import {
 } from '../fields'
 import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import styles from '../StepEditForm.css'
-import type { FocusHandlers } from '../types'
+import type { StepFormProps } from '../types'
 
-type TemperatureFormProps = {| focusHandlers: FocusHandlers |}
-
-export const TemperatureForm = (props: TemperatureFormProps): React.Node => {
+export const TemperatureForm = (props: StepFormProps): React.Node => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )

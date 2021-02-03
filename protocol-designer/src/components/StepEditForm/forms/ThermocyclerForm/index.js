@@ -16,12 +16,9 @@ import { StateFields } from './StateFields'
 import { ProfileSettings } from './ProfileSettings'
 import styles from '../../StepEditForm.css'
 import { useSingleEditFieldProps } from '../../fields/useSingleEditFieldProps'
-import type { FormData } from '../../../../form-types'
-import type { FocusHandlers } from '../../types'
+import type { StepFormProps } from '../../types'
 
-type TCFormProps = {| focusHandlers: FocusHandlers, formData: FormData |}
-
-export const ThermocyclerForm = (props: TCFormProps): React.Node => {
+export const ThermocyclerForm = (props: StepFormProps): React.Node => {
   const { focusHandlers } = props
 
   const propsForFields = useSingleEditFieldProps(focusHandlers)

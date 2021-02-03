@@ -20,13 +20,11 @@ import {
 import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import { AspDispSection } from './AspDispSection'
 
-import type { FocusHandlers } from '../types'
+import type { StepFormProps } from '../types'
 
 import styles from '../StepEditForm.css'
 
-export type MixFormProps = {| focusHandlers: FocusHandlers |}
-
-export const MixForm = (props: MixFormProps): React.Node => {
+export const MixForm = (props: StepFormProps): React.Node => {
   const [collapsed, setCollapsed] = React.useState(true)
 
   const propsForFields = useSingleEditFieldProps(props.focusHandlers)

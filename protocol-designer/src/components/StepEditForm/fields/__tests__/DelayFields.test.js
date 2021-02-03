@@ -44,6 +44,15 @@ describe('DelayFields', () => {
             updateValue: (jest.fn(): any),
             value: true,
           },
+          aspirate_delay_seconds: {
+            onFieldFocus: (jest.fn(): any),
+            onFieldBlur: (jest.fn(): any),
+            errorToShow: null,
+            disabled: false,
+            name: 'aspirate_delay_seconds',
+            updateValue: (jest.fn(): any),
+            value: '1',
+          },
           preWetTip: {
             onFieldFocus: (jest.fn(): any),
             onFieldBlur: (jest.fn(): any),
@@ -58,7 +67,7 @@ describe('DelayFields', () => {
 
       getUnsavedFormMock.mockReturnValue({
         id: 'stepId',
-        stepType: 'delay',
+        stepType: 'pause',
         aspirate_delay_checkbox: 'blah',
         aspirate_delay_seconds: 'blah',
       })
@@ -77,7 +86,7 @@ describe('DelayFields', () => {
       expect(checkboxField.prop('tooltipContent')).toBe(
         FormTooltipText.step_fields.defaults.aspirate_delay_checkbox
       )
-      // TODO IMMEDIATELY name is not being passed down into checkbox's textfield children!
+      // TODO IMMEDIATELY need to use better selectors in this test, childAt is too brittle w/ all the wrappers
       console.log('DEBUG, ' + props.secondsFieldName)
       console.log(checkboxField.debug())
       const secondsField = checkboxField.childAt(0)
@@ -121,7 +130,7 @@ describe('DelayFields', () => {
 
       getUnsavedFormMock.mockReturnValue({
         id: 'stepId',
-        stepType: 'delay',
+        stepType: 'pause',
         dispense_delay_checkbox: 'blah',
         dispense_delay_seconds: 'blah',
       })

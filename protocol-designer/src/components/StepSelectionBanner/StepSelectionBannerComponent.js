@@ -62,9 +62,11 @@ export const StepSelectionBannerComponent = (props: Props): React.Node => {
   const countPerType = selectedSteps.reduce((acc, step) => {
     const { stepType } = step
     const newCount = acc[stepType] ? acc[stepType] + 1 : 1
-    return { ...acc, [stepType]: newCount }
+    acc[stepType] = newCount
+    return acc
   }, {})
-  const stepTypes = Object.keys(countPerType).sort()
+  // $FlowFixMe(IL, 2020-02-03): Flow can't figure out that the keys are StepType rather than string
+  const stepTypes: Array<StepType> = Object.keys(countPerType).sort()
 
   return (
     <Flex

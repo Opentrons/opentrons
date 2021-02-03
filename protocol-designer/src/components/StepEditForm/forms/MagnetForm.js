@@ -11,19 +11,14 @@ import { ConditionalOnField, TextField, RadioGroupField } from '../fields'
 import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import styles from '../StepEditForm.css'
 
-import type { FormData } from '../../../form-types'
-import type { FocusHandlers } from '../types'
+import type { StepFormProps } from '../types'
 
-export type MagnetFormProps = {|
-  formData: FormData,
-  focusHandlers: FocusHandlers,
-|}
-
-export const MagnetForm = (props: MagnetFormProps): React.Node => {
+export const MagnetForm = (props: StepFormProps): React.Node => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getMagneticLabwareOptions
   )
 
+  // TODO IMMEDIATELY
   const moduleModel: ?string = props.formData?.meta?.module?.model
   const moduleOption: ?string = moduleLabwareOptions[0]
     ? moduleLabwareOptions[0].name

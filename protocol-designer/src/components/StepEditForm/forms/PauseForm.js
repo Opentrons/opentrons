@@ -21,7 +21,7 @@ import styles from '../StepEditForm.css'
 
 import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 
-import type { FocusHandlers } from '../types'
+import type { StepFormProps } from '../types'
 
 const PauseUntilTempTooltip = () => (
   <div>
@@ -29,9 +29,7 @@ const PauseUntilTempTooltip = () => (
   </div>
 )
 
-type PauseFormProps = {| focusHandlers: FocusHandlers |}
-
-export const PauseForm = (props: PauseFormProps): React.Node => {
+export const PauseForm = (props: StepFormProps): React.Node => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )
