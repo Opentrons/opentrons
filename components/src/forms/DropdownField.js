@@ -40,7 +40,7 @@ export type DropdownFieldProps = {|
   tabIndex?: number,
   /** automatically focus field on render */
   autoFocus?: boolean,
-  /** if true, render indeterminate unselecatble option */
+  /** if true, render indeterminate unselectable option */
   isIndeterminate?: boolean,
 |}
 
