@@ -145,7 +145,7 @@ export const selectMultipleSteps = (
   dispatch(selectStepAction)
 }
 
-export const selectAllSteps = (): ThunkAction<*> => (
+export const selectAllSteps = (): ThunkAction<SelectMultipleStepsAction> => (
   dispatch: ThunkDispatch<SelectMultipleStepsAction>,
   getState: GetState
 ) => {
@@ -158,7 +158,7 @@ export const selectAllSteps = (): ThunkAction<*> => (
   dispatch(selectStepAction)
 }
 
-export const deselectAllSteps = (): ThunkAction<*> => (
+export const deselectAllSteps = (): ThunkAction<SelectStepAction> => (
   dispatch: ThunkDispatch<SelectStepAction>,
   getState: GetState
 ) => {
