@@ -64,7 +64,7 @@ const [state, setState] = React.useState({
 })
 
 function handleChange(e) {
-  setState({ inputValue: e.target.value, isIndetermiante: false })
+  setState({ inputValue: e.target.value, isIndeterminate: false })
 }
 
 ;<InputField
