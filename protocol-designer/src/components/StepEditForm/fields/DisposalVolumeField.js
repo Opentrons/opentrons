@@ -27,7 +27,6 @@ type DropdownFormFieldProps = {|
   options: Options,
 |}
 const DropdownFormField = (props: DropdownFormFieldProps) => {
-  // TODO IMMEDIATELY: tooltip here
   return (
     <DropdownField
       options={props.options}

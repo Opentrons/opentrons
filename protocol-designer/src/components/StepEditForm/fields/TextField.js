@@ -18,12 +18,11 @@ export const TextField = (props: TextFieldProps): React.Node => {
     onFieldFocus,
     onFieldBlur,
     errorToShow,
-    tooltipContent,
+    tooltipContent, // NOTE: this is not used, just stripped from otherProps here
     value,
     ...otherProps
   } = props
 
-  // TODO IMMEDIATELY: tooltip here
   return (
     <InputField
       {...otherProps}

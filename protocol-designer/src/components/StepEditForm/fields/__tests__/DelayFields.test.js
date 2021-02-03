@@ -73,7 +73,7 @@ describe('DelayFields', () => {
       })
     })
 
-    it.only('should render an aspirate delay field with a tip position field', () => {
+    it('should render an aspirate delay field with a tip position field', () => {
       props = {
         ...props,
         tipPositionFieldName: 'aspirate_mmFromBottom',
@@ -86,15 +86,13 @@ describe('DelayFields', () => {
       expect(checkboxField.prop('tooltipContent')).toBe(
         FormTooltipText.step_fields.defaults.aspirate_delay_checkbox
       )
-      // TODO IMMEDIATELY need to use better selectors in this test, childAt is too brittle w/ all the wrappers
-      console.log('DEBUG, ' + props.secondsFieldName)
-      console.log(checkboxField.debug())
-      const secondsField = checkboxField.childAt(0)
+
+      const secondsField = wrapper.find(TextField)
       expect(secondsField.is(TextField)).toBe(true)
       expect(secondsField.prop('name')).toBe(props.secondsFieldName)
       expect(secondsField.prop('units')).toBe(ApplicationText.units.seconds)
 
-      const tipPosField = checkboxField.childAt(1)
+      const tipPosField = wrapper.find(TipPositionField)
       expect(tipPosField.is(TipPositionField)).toBe(true)
       expect(tipPosField.prop('fieldName')).toBe(props.tipPositionFieldName)
     })
@@ -107,7 +105,7 @@ describe('DelayFields', () => {
       expect(checkboxField.prop('tooltipContent')).toBe(
         FormTooltipText.step_fields.defaults.aspirate_delay_checkbox
       )
-      const secondsField = checkboxField.childAt(0)
+      const secondsField = wrapper.find(TextField)
       expect(secondsField.is(TextField)).toBe(true)
       expect(secondsField.prop('name')).toBe(props.secondsFieldName)
       expect(secondsField.prop('units')).toBe(ApplicationText.units.seconds)
@@ -123,8 +121,33 @@ describe('DelayFields', () => {
         checkboxFieldName: 'dispense_delay_checkbox',
         secondsFieldName: 'dispense_delay_seconds',
         propsForFields: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          dispense_delay_checkbox: {
+            onFieldFocus: (jest.fn(): any),
+            onFieldBlur: (jest.fn(): any),
+            errorToShow: null,
+            disabled: false,
+            name: 'dispense_delay_checkbox',
+            updateValue: (jest.fn(): any),
+            value: true,
+          },
+          dispense_delay_seconds: {
+            onFieldFocus: (jest.fn(): any),
+            onFieldBlur: (jest.fn(): any),
+            errorToShow: null,
+            disabled: false,
+            name: 'dispense_delay_seconds',
+            updateValue: (jest.fn(): any),
+            value: '1',
+          },
+          preWetTip: {
+            onFieldFocus: (jest.fn(): any),
+            onFieldBlur: (jest.fn(): any),
+            errorToShow: null,
+            disabled: false,
+            name: 'preWetTip',
+            updateValue: (jest.fn(): any),
+            value: true,
+          },
         },
       }
 
@@ -147,12 +170,12 @@ describe('DelayFields', () => {
       expect(checkboxField.prop('tooltipContent')).toBe(
         FormTooltipText.step_fields.defaults.dispense_delay_checkbox
       )
-      const secondsField = checkboxField.childAt(0)
+      const secondsField = wrapper.find(TextField)
       expect(secondsField.is(TextField)).toBe(true)
       expect(secondsField.prop('name')).toBe(props.secondsFieldName)
       expect(secondsField.prop('units')).toBe(ApplicationText.units.seconds)
 
-      const tipPosField = checkboxField.childAt(1)
+      const tipPosField = wrapper.find(TipPositionField)
       expect(tipPosField.is(TipPositionField)).toBe(true)
       expect(tipPosField.prop('fieldName')).toBe(props.tipPositionFieldName)
     })
@@ -166,7 +189,7 @@ describe('DelayFields', () => {
       expect(checkboxField.prop('tooltipContent')).toBe(
         FormTooltipText.step_fields.defaults.dispense_delay_checkbox
       )
-      const secondsField = checkboxField.childAt(0)
+      const secondsField = wrapper.find(TextField)
       expect(secondsField.is(TextField)).toBe(true)
       expect(secondsField.prop('name')).toBe(props.secondsFieldName)
       expect(secondsField.prop('units')).toBe(ApplicationText.units.seconds)

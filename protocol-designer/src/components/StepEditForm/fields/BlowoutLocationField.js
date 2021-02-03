@@ -56,7 +56,6 @@ export const BlowoutLocationField: React.AbstractComponent<BlowoutLocationDropdo
     updateValue,
   } = props
   return (
-    // TODO IMMEDIATELY: TOOLTIP CONTENT (see CheckboxRowField)
     <DropdownField
       className={cx(styles.large_field, className)}
       options={options}

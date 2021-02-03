@@ -177,7 +177,6 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     setShowMoreOptionsModal(!showMoreOptionsModal)
   }
 
-  // TODO IMMEDIATELY: this is just renaming, maybe actually rename focus instead?
   const focus = (fieldName: StepFieldName) => {
     setFocusedField(fieldName)
   }

@@ -22,6 +22,7 @@ export type FieldProps = {|
   tooltipContent?: React.Node,
   onFieldBlur?: () => mixed,
   onFieldFocus?: () => mixed,
+  // isIndeterminate?: boolean, // TODO IMMEDIATELY this will be needed in useBatchEditFieldProps
 |}
 
 export type FieldPropsByName = {
