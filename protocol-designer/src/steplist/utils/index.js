@@ -30,7 +30,7 @@ export function getWellRatio(sourceWells: mixed, destWells: mixed): ?WellRatio {
 export const getNextNonTerminalItemId = (
   orderedStepIds: Array<StepIdType>,
   stepsToDelete: Array<StepIdType>
-): StepIdType => {
+): StepIdType | null => {
   let highestDeletedIndex = stepsToDelete.reduce((highestIndex, val) => {
     const currentStepIndex = orderedStepIds.indexOf(val)
     return Math.max(currentStepIndex, highestIndex)
