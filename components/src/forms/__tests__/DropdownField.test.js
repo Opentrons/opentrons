@@ -35,12 +35,7 @@ describe('DropdownField', () => {
     )
     const select = wrapper.find('select')
     expect(select.prop('value')).toBe('')
-    expect(
-      select
-        .find('option')
-        .first()
-        .text()
-    ).toBe('')
+    expect(select.find('option').first().text()).toBe('')
   })
 
   it('populates and selects the dropdown with disabled option when isIndeterminate === true ', () => {
@@ -57,17 +52,7 @@ describe('DropdownField', () => {
     )
     const select = wrapper.find('select')
     expect(select.prop('value')).toBe('')
-    expect(
-      select
-        .find('option')
-        .first()
-        .text()
-    ).toBe('-')
-    expect(
-      select
-        .find('option')
-        .first()
-        .prop('disabled')
-    ).toBeTruthy()
+    expect(select.find('option').first().text()).toBe('-')
+    expect(select.find('option').first().prop('disabled')).toBeTruthy()
   })
 })
