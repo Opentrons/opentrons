@@ -102,45 +102,32 @@ describe('UncalibratedInfo', () => {
   })
   it('renders calibrate tip length button if hasCalibrated is truthy', () => {
     const wrapper = render({ hasCalibrated: false })
-    const component = wrapper.find(`CalibrationInfoContent`)
     expect(
-      component.find(`CalibrateButton[title='Calibrate tip length']`).exists()
+      wrapper.find(`CalibrateButton[title='Calibrate tip length']`).exists()
     ).toBe(true)
   })
 
   it('renders re-calibrate tip length button if hasCalibrated is truthy', () => {
     const wrapper = render()
-    const component = wrapper.find(`CalibrationInfoContent`)
     expect(
-      component
-        .find(`CalibrateButton[title='Re-Calibrate tip length']`)
-        .exists()
+      wrapper.find(`CalibrateButton[title='Re-Calibrate tip length']`).exists()
     ).toBe(true)
   })
 
   it('renders move to next labware button if hasCalibrated is truthy and no unconfirmed tipracks', () => {
     const wrapper = render()
-    const component = wrapper.find(`CalibrationInfoContent`)
-    expect(component.find(PrimaryBtn).prop('children')).toEqual(
-      'Continue to labware calibration'
-    )
+    expect(wrapper.text()).toContain('Continue to labware calibration')
   })
 
   it('renders move to next labware button if hasCalibrated is truthy and there is a unconfirmed tipracks in the same mount', () => {
     mockUncalibratedInfo = { left: [leftTiprack], right: [] }
     const wrapper = render()
-    const component = wrapper.find(`CalibrationInfoContent`)
-    expect(component.find(PrimaryBtn).prop('children')).toEqual(
-      'Continue to next tip type'
-    )
+    expect(wrapper.text()).toContain('Continue to next tip type')
   })
 
   it('renders move to next labware button if hasCalibrated is truthy and there is a unconfirmed tipracks in the other mount', () => {
     mockUncalibratedInfo = { left: [], right: [rightTiprack] }
     const wrapper = render()
-    const component = wrapper.find(`CalibrationInfoContent`)
-    expect(component.find(PrimaryBtn).prop('children')).toEqual(
-      'Continue to next pipette'
-    )
+    expect(wrapper.text()).toContain('Continue to next pipette')
   })
 })
