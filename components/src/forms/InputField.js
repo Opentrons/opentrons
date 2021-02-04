@@ -50,6 +50,8 @@ export type InputFieldProps = {|
   tabIndex?: number,
   /** automatically focus field on render */
   autoFocus?: boolean,
+  /** if true, clear out value and add '-' placeholder */
+  isIndeterminate?: boolean,
 |}
 
 export function InputField(props: InputFieldProps): React.Node {
@@ -85,6 +87,8 @@ export function InputField(props: InputFieldProps): React.Node {
 // TODO(mc, 2018-02-21): maybe simplify further and split out?
 function Input(props: InputFieldProps) {
   const error = props.error != null
+  const value = props.isIndeterminate ? '' : props.value ?? ''
+  const placeHolder = props.isIndeterminate ? '-' : props.placeholder
 
   return (
     <div className={styles.input_field_container}>
@@ -92,9 +96,9 @@ function Input(props: InputFieldProps) {
         <input
           id={props.id}
           type={props.type ?? INPUT_TYPE_TEXT}
-          value={props.value ?? ''}
+          value={value}
           name={props.name}
-          placeholder={props.placeholder}
+          placeholder={placeHolder}
           onChange={props.disabled ? undefined : props.onChange}
           onFocus={props.disabled ? undefined : props.onFocus}
           onBlur={props.onBlur}

@@ -54,3 +54,24 @@ function handleChange(e) {
   units="Times"
 />
 ```
+
+Optional isIndeterminate prop and placeholder/value override when true
+
+```js
+const [state, setState] = React.useState({
+  inputValue: 'mixed values',
+  isIndeterminate: true,
+})
+
+function handleChange(e) {
+  setState({ inputValue: e.target.value, isIndeterminate: false })
+}
+
+;<InputField
+  placeholder="Placeholder Text"
+  onChange={handleChange}
+  value={state.inputValue}
+  units="Times"
+  isIndeterminate={state.isIndeterminate}
+/>
+```
