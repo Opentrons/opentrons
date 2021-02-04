@@ -51,3 +51,27 @@ const [state, setState] = React.useState({ selectedValue: '' })
   ]}
 />
 ```
+
+When `isIndeterminate` prop is present and true, prepopulate the dropdown with the '-' placeholder, disabled value. This value can not be selected or returned to once changed.
+
+```js
+import { FlatButton } from '@opentrons/components'
+const [state, setState] = React.useState({
+  selectedValue: null,
+  isIndeterminate: true,
+})
+;<div>
+  <DropdownField
+    onChange={e =>
+      setState({ selectedValue: e.target.value, isIndeterminate: false })
+    }
+    value={state.selectedValue}
+    options={[
+      { name: 'DNA', value: 'dna' },
+      { name: 'RNA', value: 'rna' },
+      { name: 'Protein', value: 'protein' },
+    ]}
+    isIndeterminate={state.isIndeterminate}
+  />
+</div>
+```
