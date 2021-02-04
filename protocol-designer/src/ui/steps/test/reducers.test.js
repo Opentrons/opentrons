@@ -34,6 +34,39 @@ describe('collapsedSteps reducer', () => {
     }
     expect(collapsedSteps(state, action)).toBe(state)
   })
+  it('should remove the collapsed step when deleted', () => {
+    const state = {
+      '1': true,
+      '2': false,
+      '3': true,
+      '4': true,
+    }
+    const action = {
+      type: 'DELETE_STEP',
+      payload: '3',
+    }
+    expect(collapsedSteps(state, action)).toEqual({
+      '1': true,
+      '2': false,
+      '4': true,
+    })
+  })
+  it('should remove multiple collapsed steps when multiple steps get deleted', () => {
+    const state = {
+      '1': true,
+      '2': false,
+      '3': true,
+      '4': true,
+    }
+    const action = {
+      type: 'DELETE_MULTIPLE_STEPS',
+      payload: ['2', '3'],
+    }
+    expect(collapsedSteps(state, action)).toEqual({
+      '1': true,
+      '4': true,
+    })
+  })
   it('should toggle step on->off upon TOGGLE_STEP_COLLAPSED', () => {
     const state = {
       '1': true,
@@ -63,6 +96,42 @@ describe('collapsedSteps reducer', () => {
     const action = {
       type: 'TOGGLE_STEP_COLLAPSED',
       payload: '2',
+    }
+    expect(collapsedSteps(state, action)).toEqual({
+      '1': true,
+      '2': true,
+      '3': true,
+      '4': true,
+    })
+  })
+  it('should expand multiple steps upon EXPAND_MULTIPLE_STEPS', () => {
+    const state = {
+      '1': true,
+      '2': false,
+      '3': true,
+      '4': false,
+    }
+    const action = {
+      type: 'EXPAND_MULTIPLE_STEPS',
+      payload: ['1', '2', '3', '4'],
+    }
+    expect(collapsedSteps(state, action)).toEqual({
+      '1': false,
+      '2': false,
+      '3': false,
+      '4': false,
+    })
+  })
+  it('should collapse multiple steps upon COLLAPSE_MULTIPLE_STEPS', () => {
+    const state = {
+      '1': true,
+      '2': false,
+      '3': true,
+      '4': false,
+    }
+    const action = {
+      type: 'COLLAPSE_MULTIPLE_STEPS',
+      payload: ['1', '2', '3', '4'],
     }
     expect(collapsedSteps(state, action)).toEqual({
       '1': true,
@@ -119,6 +188,13 @@ describe('selectedItem reducer', () => {
       selectionType: TERMINAL_ITEM_SELECTION_TYPE,
       id: terminalId,
     })
+  })
+
+  it('should clear selected item on CLEAR_SELECTED_ITEM', () => {
+    const action = {
+      type: 'CLEAR_SELECTED_ITEM',
+    }
+    expect(selectedItem(null, action)).toBe(null)
   })
 
   describe('multi-step selection', () => {

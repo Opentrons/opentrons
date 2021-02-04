@@ -1,8 +1,10 @@
 // @flow
 import assert from 'assert'
+import last from 'lodash/last'
 import {
   getUnsavedForm,
   getUnsavedFormIsPristineSetTempForm,
+  getOrderedStepIds,
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
 import { PRESAVED_STEP_ID } from '../../../../steplist/types'
@@ -10,7 +12,7 @@ import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 import { PAUSE_UNTIL_TEMP } from '../../../../constants'
 import { uuid } from '../../../../utils'
 import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
-import { getSelectedStepId } from '../../selectors'
+import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
 import { addStep } from '../actions'
 import {
   actions as tutorialActions,
@@ -19,10 +21,14 @@ import {
 
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import * as fileDataSelectors from '../../../../file-data/selectors'
-import type { DuplicateStepAction } from '../types'
 
 import type { StepType, StepIdType, FormData } from '../../../../form-types'
 import type { ThunkAction } from '../../../../types'
+import type {
+  DuplicateStepAction,
+  DuplicateMultipleStepsAction,
+  SelectMultipleStepsAction,
+} from '../types'
 
 export const addAndSelectStepWithHints: ({
   stepType: StepType,
@@ -100,6 +106,43 @@ export const duplicateStep: (
       payload: { stepId, duplicateStepId },
     })
   }
+}
+
+export const duplicateMultipleSteps: (
+  stepIds: Array<StepIdType>
+) => ThunkAction<
+  DuplicateMultipleStepsAction | SelectMultipleStepsAction
+> = stepIds => (dispatch, getState) => {
+  const orderedStepIds = getOrderedStepIds(getState())
+  const lastSelectedItemId = getMultiSelectLastSelected(getState())
+  const indexOfLastSelected = orderedStepIds.indexOf(lastSelectedItemId)
+
+  stepIds.sort((a, b) => orderedStepIds.indexOf(a) - orderedStepIds.indexOf(b))
+
+  const duplicateIdsZipped = stepIds.map(stepId => ({
+    stepId: stepId,
+    duplicateStepId: uuid(),
+  }))
+
+  const duplicateIds = duplicateIdsZipped.map(
+    ({ duplicateStepId }) => duplicateStepId
+  )
+
+  const duplicateMultipleStepsAction = {
+    type: 'DUPLICATE_MULTIPLE_STEPS',
+    payload: {
+      steps: duplicateIdsZipped,
+      indexToInsert: indexOfLastSelected + 1,
+    },
+  }
+
+  const selectMultipleStepsAction = {
+    type: 'SELECT_MULTIPLE_STEPS',
+    payload: { stepIds: duplicateIds, lastSelected: last(duplicateIds) },
+  }
+
+  dispatch(duplicateMultipleStepsAction)
+  dispatch(selectMultipleStepsAction)
 }
 
 export const SAVE_STEP_FORM: 'SAVE_STEP_FORM' = 'SAVE_STEP_FORM'
