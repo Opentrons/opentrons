@@ -68,8 +68,6 @@ describe('DelayFields', () => {
       getUnsavedFormMock.mockReturnValue({
         id: 'stepId',
         stepType: 'pause',
-        aspirate_delay_checkbox: 'blah',
-        aspirate_delay_seconds: 'blah',
       })
     })
 
@@ -154,8 +152,6 @@ describe('DelayFields', () => {
       getUnsavedFormMock.mockReturnValue({
         id: 'stepId',
         stepType: 'pause',
-        dispense_delay_checkbox: 'blah',
-        dispense_delay_seconds: 'blah',
       })
     })
 
