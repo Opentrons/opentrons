@@ -3,7 +3,7 @@
 // Actions for triggering analytics events that don't work well as epics looking
 // for unrelated events
 
-import * as CalUITypes from '../../components/CalibrationPanels/types'
+import * as CalUITypes from '../../bolecules/CalibrationPanels/types'
 import * as Types from './types'
 import * as Constants from './constants'
 

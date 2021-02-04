@@ -14,7 +14,7 @@ import { getBuildrootRobot } from '../../redux/buildroot'
 import { getShellUpdateState } from '../../redux/shell'
 
 import { Splash } from '@opentrons/components'
-import { Page } from '../../components/Page'
+import { Page } from '../../atoms/Page'
 import { RobotSettings } from './RobotSettings'
 import { InstrumentSettings } from './InstrumentSettings'
 import { ModuleSettings } from './ModuleSettings'

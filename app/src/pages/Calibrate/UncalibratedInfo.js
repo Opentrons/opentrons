@@ -16,7 +16,6 @@ import {
   FONT_BODY_2_DARK,
 } from '@opentrons/components'
 
-import { CalibrationInfoContent } from '../../components/CalibrationInfoContent'
 import { PIPETTE_MOUNTS } from '../../redux/pipettes'
 import { selectors as robotSelectors } from '../../redux/robot'
 

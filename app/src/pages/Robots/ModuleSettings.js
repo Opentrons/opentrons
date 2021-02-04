@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 
-import { ModuleSettings as SettingsContent } from '../../components/ModuleSettings'
-import { Page } from '../../components/Page'
+import { ModuleSettings as SettingsContent } from '../../chunks/ModuleSettings'
+import { Page } from '../../atoms/Page'
 
 export type ModuleSettingsProps = {|
   robotName: string,

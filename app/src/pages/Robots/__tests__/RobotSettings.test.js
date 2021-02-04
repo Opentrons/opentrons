@@ -18,17 +18,17 @@ import {
 } from '../../../redux/robot'
 
 import { SpinnerModalPage } from '@opentrons/components'
-import { Page } from '../../../components/Page'
-import { ErrorModal } from '../../../components/modals'
-import { ReachableRobotBanner } from '../../../components/RobotSettings/ReachableRobotBanner'
-import { ConnectBanner } from '../../../components/RobotSettings/ConnectBanner'
-import { RestartRequiredBanner } from '../../../components/RobotSettings/RestartRequiredBanner'
+import { Page } from '../../../atoms/Page'
+import { ErrorModal } from '../../../bolecules/modals'
+import { ReachableRobotBanner } from '../../../chunks/RobotSettings/ReachableRobotBanner'
+import { ConnectBanner } from '../../../chunks/RobotSettings/ConnectBanner'
+import { RestartRequiredBanner } from '../../../chunks/RobotSettings/RestartRequiredBanner'
 import {
   RobotSettings as RobotSettingsContents,
   ConnectAlertModal,
-} from '../../../components/RobotSettings'
-import { UpdateBuildroot } from '../../../components/RobotSettings/UpdateBuildroot'
-import { ResetRobotModal } from '../../../components/RobotSettings/ResetRobotModal'
+} from '../../../chunks/RobotSettings'
+import { UpdateBuildroot } from '../../../chunks/RobotSettings/UpdateBuildroot'
+import { ResetRobotModal } from '../../../chunks/RobotSettings/ResetRobotModal'
 import { RobotSettings } from '../RobotSettings'
 
 import type { State } from '../../../redux/types'

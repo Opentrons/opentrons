@@ -27,17 +27,17 @@ import {
 import { getRobotRestartRequired } from '../../redux/robot-settings'
 
 import { SpinnerModalPage } from '@opentrons/components'
-import { ErrorModal } from '../../components/modals'
-import { Page } from '../../components/Page'
+import { ErrorModal } from '../../bolecules/modals'
+import { Page } from '../../atoms/Page'
 import {
   RobotSettings as RobotSettingsContents,
   ConnectAlertModal,
-} from '../../components/RobotSettings'
-import { UpdateBuildroot } from '../../components/RobotSettings/UpdateBuildroot'
-import { ConnectBanner } from '../../components/RobotSettings/ConnectBanner'
-import { ReachableRobotBanner } from '../../components/RobotSettings/ReachableRobotBanner'
-import { RestartRequiredBanner } from '../../components/RobotSettings/RestartRequiredBanner'
-import { ResetRobotModal } from '../../components/RobotSettings/ResetRobotModal'
+} from '../../chunks/RobotSettings'
+import { UpdateBuildroot } from '../../chunks/RobotSettings/UpdateBuildroot'
+import { ConnectBanner } from '../../chunks/RobotSettings/ConnectBanner'
+import { ReachableRobotBanner } from '../../chunks/RobotSettings/ReachableRobotBanner'
+import { RestartRequiredBanner } from '../../chunks/RobotSettings/RestartRequiredBanner'
+import { ResetRobotModal } from '../../chunks/RobotSettings/ResetRobotModal'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../redux/types'

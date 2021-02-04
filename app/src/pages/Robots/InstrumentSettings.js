@@ -3,10 +3,10 @@ import * as React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
 import { LEFT, RIGHT } from '../../redux/pipettes'
-import { InstrumentSettings as SettingsContent } from '../../components/InstrumentSettings'
-import { ChangePipette } from '../../components/ChangePipette'
-import { ConfigurePipette } from '../../components/ConfigurePipette'
-import { Page } from '../../components/Page'
+import { InstrumentSettings as SettingsContent } from '../../chunks/InstrumentSettings'
+import { ChangePipette } from '../../chunks/ChangePipette'
+import { ConfigurePipette } from '../../chunks/ConfigurePipette'
+import { Page } from '../../atoms/Page'
 
 export type InstrumentSettingsProps = {|
   robotName: string,
