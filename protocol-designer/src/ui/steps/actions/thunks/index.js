@@ -12,7 +12,7 @@ import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 import { PAUSE_UNTIL_TEMP } from '../../../../constants'
 import { uuid } from '../../../../utils'
 import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
-import { getSelectedStepId } from '../../selectors'
+import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
 import { addStep } from '../actions'
 import {
   actions as tutorialActions,
@@ -114,6 +114,8 @@ export const duplicateMultipleSteps: (
   DuplicateMultipleStepsAction | SelectMultipleStepsAction
 > = stepIds => (dispatch, getState) => {
   const orderedStepIds = getOrderedStepIds(getState())
+  const lastSelectedItemId = getMultiSelectLastSelected(getState())
+  const indexOfLastSelected = orderedStepIds.indexOf(lastSelectedItemId)
 
   stepIds.sort((a, b) => orderedStepIds.indexOf(a) - orderedStepIds.indexOf(b))
 
@@ -128,7 +130,10 @@ export const duplicateMultipleSteps: (
 
   const duplicateMultipleStepsAction = {
     type: 'DUPLICATE_MULTIPLE_STEPS',
-    payload: duplicateIdsZipped,
+    payload: {
+      steps: duplicateIdsZipped,
+      indexToInsert: indexOfLastSelected + 1,
+    },
   }
 
   const selectMultipleStepsAction = {

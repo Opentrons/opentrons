@@ -937,7 +937,7 @@ export const savedStepForms = (
       }
     }
     case 'DUPLICATE_MULTIPLE_STEPS': {
-      return action.payload.reduce(
+      return action.payload.steps.reduce(
         (acc, { stepId, duplicateStepId }) => ({
           ...acc,
           [duplicateStepId]: {
@@ -1249,10 +1249,15 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
       state: OrderedStepIdsState,
       action: DuplicateMultipleStepsAction
     ): OrderedStepIdsState => {
-      const duplicateStepIds = action.payload.map(
+      const duplicateStepIds = action.payload.steps.map(
         ({ duplicateStepId }) => duplicateStepId
       )
-      return [...state, ...duplicateStepIds]
+      const { indexToInsert } = action.payload
+      return [
+        ...state.slice(0, indexToInsert),
+        ...duplicateStepIds,
+        ...state.slice(indexToInsert, state.length),
+      ]
     },
     REORDER_STEPS: (
       state: OrderedStepIdsState,

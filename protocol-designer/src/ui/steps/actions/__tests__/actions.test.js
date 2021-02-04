@@ -141,6 +141,10 @@ describe('steps actions', () => {
       when(mockGetOrderedStepIds)
         .calledWith(expect.anything())
         .mockReturnValue(ids)
+
+      when(mockGetMultiSelectLastSelected)
+        .calledWith(expect.anything())
+        .mockReturnValue('id_3')
     })
 
     afterEach(() => {
@@ -158,11 +162,14 @@ describe('steps actions', () => {
       store.dispatch(duplicateMultipleSteps(['id_1', 'id_2', 'id_3']))
       const duplicateStepsAction = {
         type: 'DUPLICATE_MULTIPLE_STEPS',
-        payload: [
-          { stepId: 'id_1', duplicateStepId: 'dup_1' },
-          { stepId: 'id_2', duplicateStepId: 'dup_2' },
-          { stepId: 'id_3', duplicateStepId: 'dup_3' },
-        ],
+        payload: {
+          steps: [
+            { stepId: 'id_1', duplicateStepId: 'dup_1' },
+            { stepId: 'id_2', duplicateStepId: 'dup_2' },
+            { stepId: 'id_3', duplicateStepId: 'dup_3' },
+          ],
+          indexToInsert: 3,
+        },
       }
       const selectMultipleStepsAction = {
         type: 'SELECT_MULTIPLE_STEPS',
@@ -187,11 +194,14 @@ describe('steps actions', () => {
       store.dispatch(duplicateMultipleSteps(['id_3', 'id_1', 'id_2']))
       const duplicateStepsAction = {
         type: 'DUPLICATE_MULTIPLE_STEPS',
-        payload: [
-          { stepId: 'id_1', duplicateStepId: 'dup_1' },
-          { stepId: 'id_2', duplicateStepId: 'dup_2' },
-          { stepId: 'id_3', duplicateStepId: 'dup_3' },
-        ],
+        payload: {
+          steps: [
+            { stepId: 'id_1', duplicateStepId: 'dup_1' },
+            { stepId: 'id_2', duplicateStepId: 'dup_2' },
+            { stepId: 'id_3', duplicateStepId: 'dup_3' },
+          ],
+          indexToInsert: 3,
+        },
       }
       const selectMultipleStepsAction = {
         type: 'SELECT_MULTIPLE_STEPS',

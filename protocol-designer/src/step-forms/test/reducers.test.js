@@ -119,24 +119,55 @@ describe('orderedStepIds reducer', () => {
     expect(orderedStepIds(state, action)).toEqual(['1', 'dup_1', '2', '3'])
   })
 
-  it('should add multiple new steps when multiple steps are duplicated', () => {
-    const state = ['1', '2', '3']
-    const action = {
-      type: 'DUPLICATE_MULTIPLE_STEPS',
-      payload: [
-        { stepId: 'id1', duplicateStepId: 'dup_1' },
-        { stepId: 'id2', duplicateStepId: 'dup_2' },
-        { stepId: 'id3', duplicateStepId: 'dup_3' },
-      ],
-    }
-    expect(orderedStepIds(state, action)).toEqual([
-      '1',
-      '2',
-      '3',
-      'dup_1',
-      'dup_2',
-      'dup_3',
-    ])
+  describe('duplicating multiple steps', () => {
+    const steps = [
+      { stepId: 'id1', duplicateStepId: 'dup_1' },
+      { stepId: 'id2', duplicateStepId: 'dup_2' },
+      { stepId: 'id3', duplicateStepId: 'dup_3' },
+    ]
+    const testCases = [
+      {
+        name: 'should add new steps at the 0th index',
+        state: ['1', '2', '3'],
+        action: {
+          type: 'DUPLICATE_MULTIPLE_STEPS',
+          payload: {
+            steps: [...steps],
+            indexToInsert: 0,
+          },
+        },
+        expected: ['dup_1', 'dup_2', 'dup_3', '1', '2', '3'],
+      },
+      {
+        name: 'should add new steps at the 2nd index',
+        state: ['1', '2', '3'],
+        action: {
+          type: 'DUPLICATE_MULTIPLE_STEPS',
+          payload: {
+            steps: [...steps],
+            indexToInsert: 2,
+          },
+        },
+        expected: ['1', '2', 'dup_1', 'dup_2', 'dup_3', '3'],
+      },
+      {
+        name: 'should add new steps at the last index',
+        state: ['1', '2', '3'],
+        action: {
+          type: 'DUPLICATE_MULTIPLE_STEPS',
+          payload: {
+            steps: [...steps],
+            indexToInsert: 3,
+          },
+        },
+        expected: ['1', '2', '3', 'dup_1', 'dup_2', 'dup_3'],
+      },
+    ]
+    testCases.forEach(({ name, state, action, expected }) => {
+      it(name, () => {
+        expect(orderedStepIds(state, action)).toEqual(expected)
+      })
+    })
   })
 
   describe('reorder steps', () => {
@@ -1113,11 +1144,14 @@ describe('savedStepForms reducer: initial deck setup step', () => {
     it('should duplicate multiple steps', () => {
       const action = {
         type: 'DUPLICATE_MULTIPLE_STEPS',
-        payload: [
-          { stepId: 'id1', duplicateStepId: 'dup_1' },
-          { stepId: 'id2', duplicateStepId: 'dup_2' },
-          { stepId: 'id3', duplicateStepId: 'dup_3' },
-        ],
+        payload: {
+          steps: [
+            { stepId: 'id1', duplicateStepId: 'dup_1' },
+            { stepId: 'id2', duplicateStepId: 'dup_2' },
+            { stepId: 'id3', duplicateStepId: 'dup_3' },
+          ],
+          indexToInsert: 0, // this does not matter for this reducer
+        },
       }
       const expectedState = {
         ...savedStepFormsState,

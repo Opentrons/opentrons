@@ -26,7 +26,10 @@ export type DuplicateStepAction = {|
 
 export type DuplicateMultipleStepsAction = {|
   type: 'DUPLICATE_MULTIPLE_STEPS',
-  payload: Array<DuplicateStepPayload>,
+  payload: {|
+    steps: Array<DuplicateStepPayload>,
+    indexToInsert: number,
+  |},
 |}
 
 export type ExpandAddStepButtonAction = {|
