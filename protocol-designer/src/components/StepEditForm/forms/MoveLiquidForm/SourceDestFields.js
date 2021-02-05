@@ -13,7 +13,7 @@ import {
 } from '../../fields'
 
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { FieldPropsByName } from '../../fields/useSingleEditFieldProps'
+import type { FieldPropsByName } from '../../fields/makeSingleEditFieldProps'
 
 import styles from '../../StepEditForm.css'
 

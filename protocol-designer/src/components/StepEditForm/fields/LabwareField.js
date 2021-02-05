@@ -7,7 +7,7 @@ import { StepFormDropdown } from './StepFormDropdownField'
 import type { Options } from '@opentrons/components'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { BaseState } from '../../../types'
-import type { FieldProps } from './useSingleEditFieldProps'
+import type { FieldProps } from './makeSingleEditFieldProps'
 import type { StepFormDropdownProps } from './StepFormDropdownField'
 
 type OP = {|

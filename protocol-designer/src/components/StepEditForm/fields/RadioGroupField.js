@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { RadioGroup } from '@opentrons/components'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
-import type { FieldProps } from './useSingleEditFieldProps'
+import type { FieldProps } from './makeSingleEditFieldProps'
 
 type RadioGroupFieldProps = {|
   ...FieldProps,

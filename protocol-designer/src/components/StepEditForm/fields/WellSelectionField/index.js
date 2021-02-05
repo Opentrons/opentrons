@@ -6,7 +6,7 @@ import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getDisabledFields } from '../../../../steplist/formLevel'
 import type { BaseState, ThunkDispatch } from '../../../../types'
 import type { StepFieldName } from '../../../../form-types'
-import type { FieldProps } from '../useSingleEditFieldProps'
+import type { FieldProps } from '../makeSingleEditFieldProps'
 
 type Props = React.ElementConfig<typeof WellSelectionInput>
 

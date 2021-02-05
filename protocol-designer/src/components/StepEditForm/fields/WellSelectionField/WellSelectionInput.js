@@ -15,7 +15,7 @@ import styles from '../../StepEditForm.css'
 import type { Dispatch } from 'redux'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
-import type { FieldProps } from '../useSingleEditFieldProps'
+import type { FieldProps } from '../makeSingleEditFieldProps'
 
 type SP = {|
   stepId: ?StepIdType,

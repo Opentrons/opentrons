@@ -5,7 +5,7 @@ import { i18n } from '../../../localization'
 import { getTooltipForField } from '../utils'
 import { TextField } from './TextField'
 import type { StepType } from '../../../form-types'
-import type { FieldProps } from './useSingleEditFieldProps'
+import type { FieldProps } from './makeSingleEditFieldProps'
 import styles from '../StepEditForm.css'
 
 type Props = {|

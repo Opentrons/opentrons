@@ -1,6 +1,6 @@
 // @flow
 import type { FormData, StepFieldName } from '../../form-types'
-import type { FieldPropsByName } from './fields/useSingleEditFieldProps'
+import type { FieldPropsByName } from './fields/makeSingleEditFieldProps'
 
 export type FocusHandlers = {|
   focusedField: StepFieldName,

@@ -6,7 +6,7 @@ import { i18n } from '../../../localization'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import type { BaseState } from '../../../types'
 import styles from '../StepEditForm.css'
-import type { FieldProps } from './useSingleEditFieldProps'
+import type { FieldProps } from './makeSingleEditFieldProps'
 
 type OP = {|
   ...FieldProps,

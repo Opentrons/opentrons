@@ -5,7 +5,7 @@ import { TextField } from './TextField'
 import { CheckboxRowField } from './CheckboxRowField'
 import { TipPositionField } from './TipPositionField'
 import styles from '../StepEditForm.css'
-import type { FieldPropsByName } from './useSingleEditFieldProps'
+import type { FieldPropsByName } from './makeSingleEditFieldProps'
 import type {
   DelayCheckboxFields,
   DelaySecondFields,

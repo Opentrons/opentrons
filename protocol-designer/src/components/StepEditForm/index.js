@@ -14,7 +14,7 @@ import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
 } from '../modals/ConfirmDeleteModal'
-import { makeSingleEditFieldProps } from './fields/useSingleEditFieldProps'
+import { makeSingleEditFieldProps } from './fields/makeSingleEditFieldProps'
 import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
 import type { BaseState, ThunkDispatch } from '../../types'
