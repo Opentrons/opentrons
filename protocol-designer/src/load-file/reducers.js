@@ -53,6 +53,7 @@ const unsavedChanges = (
     case 'SET_WELL_CONTENTS':
     case 'ADD_STEP':
     case 'DELETE_STEP':
+    case 'DELETE_MULTIPLE_STEPS':
     case 'SAVE_STEP_FORM':
     case 'SAVE_FILE_METADATA':
     case 'REPLACE_CUSTOM_LABWARE_DEF':

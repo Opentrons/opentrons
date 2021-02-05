@@ -13,7 +13,10 @@ import type { Action } from '../../types'
 import type { LoadFileAction } from '../../load-file'
 import type { StepIdType } from '../../form-types'
 import type { SaveStepFormAction } from '../steps/actions/thunks'
-import type { DeleteStepAction } from '../../steplist/actions'
+import type {
+  DeleteStepAction,
+  DeleteMultipleStepsAction,
+} from '../../steplist/actions'
 import type {
   AddStepAction,
   HoverOnStepAction,
@@ -23,6 +26,8 @@ import type {
   SelectMultipleStepsAction,
   SelectTerminalItemAction,
   ToggleStepCollapsedAction,
+  ExpandMultipleStepsAction,
+  CollapseMultipleStepsAction,
 } from './actions/types'
 
 export type CollapsedStepsState = { [StepIdType]: boolean }
@@ -42,6 +47,10 @@ const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions(
     },
     DELETE_STEP: (state: CollapsedStepsState, action: DeleteStepAction) =>
       omit(state, action.payload.toString()),
+    DELETE_MULTIPLE_STEPS: (
+      state: CollapsedStepsState,
+      action: DeleteMultipleStepsAction
+    ) => omit(state, action.payload),
     TOGGLE_STEP_COLLAPSED: (
       state: CollapsedStepsState,
       { payload }: ToggleStepCollapsedAction
@@ -49,6 +58,28 @@ const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions(
       ...state,
       [payload]: !state[payload],
     }),
+    EXPAND_MULTIPLE_STEPS: (
+      state: CollapsedStepsState,
+      { payload }: ExpandMultipleStepsAction
+    ) =>
+      payload.reduce(
+        (acc, stepId) => ({
+          ...acc,
+          [stepId]: false,
+        }),
+        state
+      ),
+    COLLAPSE_MULTIPLE_STEPS: (
+      state: CollapsedStepsState,
+      { payload }: CollapseMultipleStepsAction
+    ) =>
+      payload.reduce(
+        (acc, stepId) => ({
+          ...acc,
+          [stepId]: true,
+        }),
+        state
+      ),
     LOAD_FILE: (state: CollapsedStepsState, action: LoadFileAction) =>
       // default all steps to collapsed
       getPDMetadata(action.payload.file).orderedStepIds.reduce(
@@ -119,6 +150,7 @@ const selectedItem: Reducer<SelectedItemState, *> = handleActions(
       action: SelectTerminalItemAction
     ) => terminalItemIdHelper(action.payload),
     DELETE_STEP: () => null,
+    CLEAR_SELECTED_ITEM: () => null,
     SELECT_MULTIPLE_STEPS: (
       state: SelectedItemState,
       action: SelectMultipleStepsAction
