@@ -8,7 +8,7 @@ import {
 } from '@opentrons/components'
 import cx from 'classnames'
 import styles from '../StepEditForm.css'
-import type { FieldProps } from './makeSingleEditFieldProps'
+import type { FieldProps } from '../types'
 
 type CheckboxRowProps = {|
   ...FieldProps,

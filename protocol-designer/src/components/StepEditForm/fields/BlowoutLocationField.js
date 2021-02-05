@@ -8,7 +8,7 @@ import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 import styles from '../StepEditForm.css'
 import type { BaseState } from '../../../types'
-import type { FieldProps } from './makeSingleEditFieldProps'
+import type { FieldProps } from '../types'
 
 type BlowoutLocationDropdownOP = {|
   ...FieldProps,

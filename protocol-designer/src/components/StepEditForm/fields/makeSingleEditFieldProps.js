@@ -1,5 +1,4 @@
 // @flow
-import * as React from 'react'
 import { getTooltipForField } from '../utils'
 import { getFieldErrors } from '../../../steplist/fieldLevel'
 import {
@@ -7,19 +6,7 @@ import {
   getDefaultsForStepType,
 } from '../../../steplist/formLevel'
 import type { StepFieldName, FormData } from '../../../form-types'
-import type { FocusHandlers } from '../types'
-
-export type FieldProps = {|
-  disabled: boolean,
-  name: string,
-  updateValue: mixed => void,
-  value: mixed,
-  errorToShow: ?string,
-  tooltipContent?: React.Node,
-  onFieldBlur?: () => mixed,
-  onFieldFocus?: () => mixed,
-  // isIndeterminate?: boolean, // TODO IMMEDIATELY this will be needed in useBatchEditFieldProps
-|}
+import type { FieldProps, FocusHandlers } from '../types'
 
 export type FieldPropsByName = {
   [name: StepFieldName]: FieldProps,
