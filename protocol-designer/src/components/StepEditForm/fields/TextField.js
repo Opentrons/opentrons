@@ -16,7 +16,6 @@ export const TextField = (props: TextFieldProps): React.Node => {
     onFieldFocus,
     onFieldBlur,
     errorToShow,
-    tooltipContent, // NOTE: this is not used, just stripped from otherProps here
     value,
     ...otherProps
   } = props

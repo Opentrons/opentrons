@@ -1,5 +1,4 @@
 // @flow
-import type { Node } from 'react'
 import type { FormData, StepFieldName } from '../../form-types'
 import type { FieldPropsByName } from './fields/makeSingleEditFieldProps'
 
@@ -26,7 +25,6 @@ export type FieldProps = {|
   updateValue: mixed => void,
   value: mixed,
   errorToShow: ?string,
-  tooltipContent?: Node,
   onFieldBlur?: () => mixed,
   onFieldFocus?: () => mixed,
   isIndeterminate?: boolean,

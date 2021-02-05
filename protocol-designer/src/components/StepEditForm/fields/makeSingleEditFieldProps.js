@@ -1,5 +1,4 @@
 // @flow
-import { getTooltipForField } from '../utils'
 import { getFieldErrors } from '../../../steplist/fieldLevel'
 import {
   getDisabledFields,
@@ -49,9 +48,6 @@ export const makeSingleEditFieldProps = (
       handleChangeFormInput(name, value)
     }
 
-    const stepType = formData.stepType
-    const tooltipContent = getTooltipForField(stepType, name, disabled)
-
     const onFieldBlur = () => {
       blur(name)
     }
@@ -64,7 +60,6 @@ export const makeSingleEditFieldProps = (
       disabled,
       errorToShow,
       name,
-      tooltipContent,
       updateValue,
       value,
       onFieldBlur,

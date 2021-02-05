@@ -22,7 +22,6 @@ export const RadioGroupField = (props: RadioGroupFieldProps): React.Node => {
     className,
     isIndeterminate, // TODO(IL, 2021-02-05): if we need indeterminate RadioGroupField, we'll want to pass this down into RadioGroup
     disabled, // NOTE: not used
-    tooltipContent, // NOTE: not used
     ...radioGroupProps
   } = props
   return (
