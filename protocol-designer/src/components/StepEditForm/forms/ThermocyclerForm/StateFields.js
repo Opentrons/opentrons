@@ -7,7 +7,7 @@ import { FormGroup } from '@opentrons/components'
 import { ConditionalOnField, ToggleRowField, TextField } from '../../fields'
 import styles from '../../StepEditForm.css'
 
-import type { FieldPropsByName } from '../../fields/makeSingleEditFieldProps'
+import type { FieldPropsByName } from '../../types'
 
 type Props = {|
   propsForFields: FieldPropsByName,

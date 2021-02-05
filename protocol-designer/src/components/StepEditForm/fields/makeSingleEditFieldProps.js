@@ -5,12 +5,7 @@ import {
   getDefaultsForStepType,
 } from '../../../steplist/formLevel'
 import type { StepFieldName, FormData } from '../../../form-types'
-import type { FieldProps, FocusHandlers } from '../types'
-
-export type FieldPropsByName = {
-  [name: StepFieldName]: FieldProps,
-  ...
-}
+import type { FieldProps, FieldPropsByName, FocusHandlers } from '../types'
 
 type ShowFieldErrorParams = {|
   name: StepFieldName,

@@ -16,8 +16,7 @@ import { ButtonRow } from './ButtonRow'
 import formStyles from '../forms/forms.css'
 import styles from './StepEditForm.css'
 import type { FormData, StepType } from '../../form-types'
-import type { FieldPropsByName } from './fields/makeSingleEditFieldProps'
-import type { StepFormProps, FocusHandlers } from './types'
+import type { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
 
 const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<StepFormProps> } = {
   mix: MixForm,
