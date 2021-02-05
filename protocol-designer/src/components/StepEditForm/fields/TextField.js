@@ -6,8 +6,6 @@ import type { FieldProps } from '../types'
 type TextFieldProps = {|
   ...FieldProps,
   className?: string,
-
-  // TODO IMMEDIATELY
   caption?: ?string,
   units?: ?string,
 |}

@@ -17,11 +17,11 @@ import type { FieldPropsByName } from '../../fields/makeSingleEditFieldProps'
 
 import styles from '../../StepEditForm.css'
 
-type Props = {
+type Props = {|
   className?: ?string,
   prefix: 'aspirate' | 'dispense',
   propsForFields: FieldPropsByName,
-}
+|}
 
 const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string

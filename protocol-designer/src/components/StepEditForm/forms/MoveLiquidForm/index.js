@@ -22,7 +22,7 @@ export const MoveLiquidForm = (props: StepFormProps): React.Node => {
 
   const toggleCollapsed = () => _setCollapsed(!collapsed)
 
-  const { focusHandlers, propsForFields } = props
+  const { propsForFields } = props
   const { stepType, path } = props.formData
 
   return (
@@ -65,17 +65,11 @@ export const MoveLiquidForm = (props: StepFormProps): React.Node => {
         >
           <SourceDestFields
             className={styles.section_column}
-            focusHandlers={focusHandlers}
-            collapsed={collapsed}
-            toggleCollapsed={toggleCollapsed}
             prefix="aspirate"
             propsForFields={propsForFields}
           />
           <SourceDestFields
             className={styles.section_column}
-            focusHandlers={focusHandlers}
-            collapsed={collapsed}
-            toggleCollapsed={toggleCollapsed}
             prefix="dispense"
             propsForFields={propsForFields}
           />
@@ -90,7 +84,7 @@ export const MoveLiquidForm = (props: StepFormProps): React.Node => {
       <div className={styles.section_wrapper}>
         <div className={cx(styles.form_row, styles.section_column)}>
           <ChangeTipField name="changeTip" />
-          <PathField focusHandlers={focusHandlers} />
+          <PathField />
         </div>
         <div className={cx(styles.section_column, styles.disposal_vol_wrapper)}>
           {path === 'multiDispense' && (

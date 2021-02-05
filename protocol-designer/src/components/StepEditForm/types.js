@@ -6,7 +6,7 @@ import type { FieldPropsByName } from './fields/makeSingleEditFieldProps'
 export type FocusHandlers = {|
   focusedField: StepFieldName,
   dirtyFields: Array<StepFieldName>,
-  // NOTE: focus & blur take a field name as an arg, unlike onFieldBlur/onFieldFocus
+  // NOTE: focus & blur take a field name as an arg, unlike onFieldBlur/onFieldFocus in FieldProps
   focus: StepFieldName => void,
   blur: StepFieldName => void,
 |}
@@ -29,5 +29,5 @@ export type FieldProps = {|
   tooltipContent?: Node,
   onFieldBlur?: () => mixed,
   onFieldFocus?: () => mixed,
-  // isIndeterminate?: boolean, // TODO: this will be needed in useBatchEditFieldProps #7222
+  isIndeterminate?: boolean,
 |}
