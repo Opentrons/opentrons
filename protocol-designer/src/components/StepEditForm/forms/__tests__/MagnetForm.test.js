@@ -47,6 +47,17 @@ describe('MagnetForm', () => {
         dirtyFields: [],
         focusedField: null,
       },
+      propsForFields: {
+        magnetAction: {
+          onFieldFocus: (jest.fn(): any),
+          onFieldBlur: (jest.fn(): any),
+          errorToShow: null,
+          disabled: false,
+          name: 'magnetAction',
+          updateValue: (jest.fn(): any),
+          value: null,
+        },
+      },
     }
     store = {
       dispatch: jest.fn(),

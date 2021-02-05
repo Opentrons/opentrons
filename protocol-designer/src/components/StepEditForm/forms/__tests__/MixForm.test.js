@@ -68,6 +68,17 @@ describe('MixForm', () => {
         dirtyFields: [],
         focusedField: null,
       },
+      propsForFields: {
+        pipette: {
+          onFieldFocus: (jest.fn(): any),
+          onFieldBlur: (jest.fn(): any),
+          errorToShow: null,
+          disabled: false,
+          name: 'pipette',
+          updateValue: (jest.fn(): any),
+          value: null,
+        },
+      },
     }
   })
 
