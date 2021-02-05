@@ -1,19 +1,12 @@
 // @flow
-import * as React from 'react'
-import { useDispatch, connect } from 'react-redux'
-import get from 'lodash/get'
-import isEqual from 'lodash/isEqual'
-import without from 'lodash/without'
-import cx from 'classnames'
-
 import { useConditionalConfirm } from '@opentrons/components'
+import * as React from 'react'
+import { connect } from 'react-redux'
 import { actions } from '../../steplist'
 import { actions as stepsActions } from '../../ui/steps'
 import { resetScrollElements } from '../../ui/steps/utils'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
-import formStyles from '../forms/forms.css'
-import { MoreOptionsModal } from '../modals/MoreOptionsModal'
+import { maskField } from '../../steplist/fieldLevel'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
 import {
   ConfirmDeleteModal,
@@ -21,146 +14,43 @@ import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
 } from '../modals/ConfirmDeleteModal'
+import { makeSingleEditFieldProps } from './fields/useSingleEditFieldProps'
+import { StepEditFormComponent } from './StepEditFormComponent'
+import { getDirtyFields } from './utils'
+import type { BaseState, ThunkDispatch } from '../../types'
+import type { FormData, StepFieldName } from '../../form-types'
 
-import {
-  MixForm,
-  MoveLiquidForm,
-  PauseForm,
-  MagnetForm,
-  TemperatureForm,
-  ThermocyclerForm,
-} from './forms'
-import { FormAlerts } from './FormAlerts'
-import { ButtonRow } from './ButtonRow'
-import styles from './StepEditForm.css'
-import type { StepFormProps } from './types'
-import type { BaseState } from '../../types'
-import type { FormData, StepType, StepFieldName } from '../../form-types'
-
-const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<StepFormProps> } = {
-  mix: MixForm,
-  pause: PauseForm,
-  moveLiquid: MoveLiquidForm,
-  magnet: MagnetForm,
-  temperature: TemperatureForm,
-  thermocycler: ThermocyclerForm,
-}
-
-type Props = {|
-  formData: FormData,
-  handleClose: () => mixed,
+type SP = {|
   canSave: boolean,
-  handleDelete: () => mixed,
-  handleSave: () => mixed,
-  showMoreOptionsModal: boolean,
-  focusedField: string | null,
-  blur: StepFieldName => void,
-  focus: StepFieldName => void,
-  toggleMoreOptionsModal: () => mixed,
-  dirtyFields: Array<string>,
-|}
-
-export const StepEditFormComponent = (props: Props): React.Node => {
-  const {
-    formData,
-    canSave,
-    handleClose,
-    handleDelete,
-    dirtyFields,
-    handleSave,
-    showMoreOptionsModal,
-    toggleMoreOptionsModal,
-    focusedField,
-    focus,
-    blur,
-  } = props
-
-  const FormComponent: $Values<typeof STEP_FORM_MAP> = get(
-    STEP_FORM_MAP,
-    formData.stepType
-  )
-  if (!FormComponent) {
-    // early-exit if step form doesn't exist
-    return (
-      <div className={formStyles.form}>
-        <div>Todo: support {formData && formData.stepType} step</div>
-      </div>
-    )
-  }
-  return (
-    <>
-      {showMoreOptionsModal && (
-        <MoreOptionsModal formData={formData} close={toggleMoreOptionsModal} />
-      )}
-      <FormAlerts focusedField={focusedField} dirtyFields={dirtyFields} />
-      <div className={cx(formStyles.form, styles[formData.stepType])}>
-        <FormComponent
-          formData={formData}
-          focusHandlers={{
-            focusedField,
-            dirtyFields,
-            focus,
-            blur,
-          }}
-        />
-        <ButtonRow
-          handleClickMoreOptions={toggleMoreOptionsModal}
-          handleClose={handleClose}
-          handleSave={handleSave}
-          handleDelete={handleDelete}
-          canSave={canSave}
-        />
-      </div>
-    </>
-  )
-}
-
-// TODO: type fieldNames, don't use `string`
-const getDirtyFields = (
-  isNewStep: boolean,
-  formData: ?FormData
-): Array<string> => {
-  let dirtyFields = []
-  if (formData == null) {
-    return []
-  }
-  if (!isNewStep) {
-    dirtyFields = Object.keys(formData)
-  } else {
-    const data = formData
-    // new step, but may have auto-populated fields.
-    // "Dirty" any fields that differ from default new form values
-    const defaultFormData = getDefaultsForStepType(formData.stepType)
-    dirtyFields = Object.keys(defaultFormData).reduce(
-      (acc, fieldName: StepFieldName) => {
-        const currentValue = data[fieldName]
-        const initialValue = defaultFormData[fieldName]
-
-        return isEqual(currentValue, initialValue) ? acc : [...acc, fieldName]
-      },
-      []
-    )
-  }
-  // exclude form "metadata" (not really fields)
-  return without(dirtyFields, 'stepType', 'id')
-}
-
-type StepEditFormManagerProps = {|
-  // TODO(IL, 2020-04-22): use HydratedFormData type see #3161
-  canSave: boolean,
-  formData: ?FormData,
+  formData: ?FormData, // TODO(IL, 2020-04-22): use HydratedFormData type see #3161
   formHasChanges: boolean,
   isNewStep: boolean,
   isPristineSetTempForm: boolean,
+|}
+type DP = {|
+  deleteStep: (stepId: string) => mixed,
+  handleClose: () => mixed,
+  saveSetTempFormWithAddedPauseUntilTemp: () => mixed,
+  saveStepForm: () => mixed,
+  handleChangeFormInput: (name: string, value: mixed) => void,
+|}
+type StepEditFormManagerProps = {|
+  ...SP,
+  ...DP,
 |}
 
 const StepEditFormManager = (props: StepEditFormManagerProps) => {
   const {
     canSave,
+    deleteStep,
     formData,
-    isNewStep,
     formHasChanges,
+    handleChangeFormInput,
+    handleClose,
+    isNewStep,
     isPristineSetTempForm,
+    saveSetTempFormWithAddedPauseUntilTemp,
+    saveStepForm,
   } = props
 
   const [
@@ -177,9 +67,7 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     setShowMoreOptionsModal(!showMoreOptionsModal)
   }
 
-  const focus = (fieldName: StepFieldName) => {
-    setFocusedField(fieldName)
-  }
+  const focus = setFocusedField
 
   const blur = (fieldName: StepFieldName) => {
     if (fieldName === focusedField) {
@@ -190,21 +78,16 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     }
   }
 
-  const dispatch = useDispatch()
   const stepId = formData?.id
   const handleDelete = () => {
     if (stepId != null) {
-      dispatch(actions.deleteStep(stepId))
+      deleteStep(stepId)
     } else {
       console.error(
         `StepEditForm: tried to delete step with no step id, this should not happen`
       )
     }
   }
-  const handleClose = () => dispatch(actions.cancelStepForm())
-  const saveSetTempFormWithAddedPauseUntilTemp = () =>
-    dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
-  const saveStepForm = () => dispatch(stepsActions.saveStepForm())
 
   const {
     confirm: confirmDelete,
@@ -230,6 +113,19 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
   if (formData == null) {
     return null
   }
+
+  const focusHandlers = {
+    focusedField,
+    dirtyFields,
+    focus,
+    blur,
+  }
+
+  const propsForFields = makeSingleEditFieldProps(
+    focusHandlers,
+    formData,
+    handleChangeFormInput
+  )
 
   return (
     <>
@@ -259,16 +155,16 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
       <StepEditFormComponent
         {...{
           canSave,
-          formData,
           dirtyFields,
+          focusedField,
+          focusHandlers,
+          formData,
           handleClose: confirmClose,
           handleDelete: confirmDelete,
           handleSave: isPristineSetTempForm
             ? confirmAddPauseUntilTempStep
             : saveStepForm,
-          focusedField,
-          blur,
-          focus,
+          propsForFields,
           showMoreOptionsModal,
           toggleMoreOptionsModal,
         }}
@@ -277,7 +173,7 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
   )
 }
 
-const mapStateToProps = (state: BaseState): StepEditFormManagerProps => {
+const mapStateToProps = (state: BaseState): SP => {
   return {
     canSave: stepFormSelectors.getCurrentFormCanBeSaved(state),
     formData: stepFormSelectors.getHydratedUnsavedForm(state),
@@ -286,6 +182,27 @@ const mapStateToProps = (state: BaseState): StepEditFormManagerProps => {
     isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
       state
     ),
+  }
+}
+
+const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => {
+  const deleteStep = stepId => dispatch(actions.deleteStep(stepId))
+  const handleClose = () => dispatch(actions.cancelStepForm())
+  const saveSetTempFormWithAddedPauseUntilTemp = () =>
+    dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
+  const saveStepForm = () => dispatch(stepsActions.saveStepForm())
+
+  const handleChangeFormInput = (name: string, value: mixed) => {
+    const maskedValue = maskField(name, value)
+    dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
+  }
+
+  return {
+    deleteStep,
+    handleChangeFormInput,
+    handleClose,
+    saveSetTempFormWithAddedPauseUntilTemp,
+    saveStepForm,
   }
 }
 
@@ -305,7 +222,7 @@ export const StepEditForm: React.AbstractComponent<{||}> = connect<
   _
 >(
   mapStateToProps,
-  () => ({}) // no `dispatch` prop
+  mapDispatchToProps
 )((props: StepEditFormManagerProps) => (
   // key by ID so manager state doesn't persist across different forms
   <StepEditFormManager key={props.formData?.id ?? 'empty'} {...props} />

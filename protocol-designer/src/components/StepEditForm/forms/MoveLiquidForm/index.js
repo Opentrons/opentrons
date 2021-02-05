@@ -9,7 +9,6 @@ import {
   DisposalVolumeField,
   PathField,
 } from '../../fields'
-import { useSingleEditFieldProps } from '../../fields/useSingleEditFieldProps'
 import styles from '../../StepEditForm.css'
 import type { StepFormProps } from '../../types'
 import { SourceDestFields } from './SourceDestFields'
@@ -23,11 +22,8 @@ export const MoveLiquidForm = (props: StepFormProps): React.Node => {
 
   const toggleCollapsed = () => _setCollapsed(!collapsed)
 
-  const { focusHandlers } = props
+  const { focusHandlers, propsForFields } = props
   const { stepType, path } = props.formData
-
-  const propsForFields = useSingleEditFieldProps(props.focusHandlers)
-  if (propsForFields === null) return null
 
   return (
     <div className={styles.form_wrapper}>

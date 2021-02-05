@@ -8,7 +8,6 @@ import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { i18n } from '../../../localization'
 import { maskField } from '../../../steplist/fieldLevel'
 import { ConditionalOnField, TextField, RadioGroupField } from '../fields'
-import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import styles from '../StepEditForm.css'
 
 import type { StepFormProps } from '../types'
@@ -18,7 +17,8 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
     uiModuleSelectors.getMagneticLabwareOptions
   )
 
-  // TODO IMMEDIATELY
+  // TODO(IL, 2021-02-04) once FormData is correctly typed as HydratedFormData,
+  // the meta.module.model should be able to be properly inferred as ?string. See #3161
   const moduleModel: ?string = props.formData?.meta?.module?.model
   const moduleOption: ?string = moduleLabwareOptions[0]
     ? moduleLabwareOptions[0].name
@@ -32,8 +32,7 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
     ? `Recommended: ${String(maskField('engageHeight', defaultEngageHeight))}`
     : null
 
-  const propsForFields = useSingleEditFieldProps(props.focusHandlers)
-  if (propsForFields === null) return null
+  const { propsForFields } = props
 
   return (
     <div className={styles.form_wrapper}>

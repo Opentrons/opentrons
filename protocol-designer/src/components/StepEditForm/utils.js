@@ -2,18 +2,21 @@
 import assert from 'assert'
 import * as React from 'react'
 import difference from 'lodash/difference'
+import isEqual from 'lodash/isEqual'
+import without from 'lodash/without'
 import { i18n } from '../../localization'
 import { PROFILE_CYCLE } from '../../form-types'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../../step-generation/utils'
+import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
 import styles from './StepEditForm.css'
 import type { Options } from '@opentrons/components'
 import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { FormWarning } from '../../steplist/formLevel/warnings'
 import type { StepFormErrors } from '../../steplist/types'
-import type { FormData, ProfileItem } from '../../form-types'
+import type { FormData, ProfileItem, StepFieldName } from '../../form-types'
 
 export function getBlowoutLocationOptionsForForm(
   disposalLabwareOptions: Options,
@@ -66,6 +69,36 @@ export function getBlowoutLocationOptionsForForm(
     }
   }
   return disposalLabwareOptions
+}
+
+// TODO: type fieldNames, don't use `string`
+export const getDirtyFields = (
+  isNewStep: boolean,
+  formData: ?FormData
+): Array<string> => {
+  let dirtyFields = []
+  if (formData == null) {
+    return []
+  }
+  if (!isNewStep) {
+    dirtyFields = Object.keys(formData)
+  } else {
+    const data = formData
+    // new step, but may have auto-populated fields.
+    // "Dirty" any fields that differ from default new form values
+    const defaultFormData = getDefaultsForStepType(formData.stepType)
+    dirtyFields = Object.keys(defaultFormData).reduce(
+      (acc, fieldName: StepFieldName) => {
+        const currentValue = data[fieldName]
+        const initialValue = defaultFormData[fieldName]
+
+        return isEqual(currentValue, initialValue) ? acc : [...acc, fieldName]
+      },
+      []
+    )
+  }
+  // exclude form "metadata" (not really fields)
+  return without(dirtyFields, 'stepType', 'id')
 }
 
 export const getVisibleFormErrors = (args: {

@@ -19,8 +19,6 @@ import {
 } from '../fields'
 import styles from '../StepEditForm.css'
 
-import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
-
 import type { StepFormProps } from '../types'
 
 const PauseUntilTempTooltip = () => (
@@ -38,8 +36,7 @@ export const PauseForm = (props: StepFormProps): React.Node => {
     uiModuleSelectors.getTempModuleIsOnDeck
   )
 
-  const propsForFields = useSingleEditFieldProps(props.focusHandlers)
-  if (propsForFields == null) return null
+  const { propsForFields } = props
 
   return (
     <div className={styles.form_wrapper}>

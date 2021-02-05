@@ -1,5 +1,6 @@
 // @flow
 import type { FormData, StepFieldName } from '../../form-types'
+import type { FieldPropsByName } from './fields/useSingleEditFieldProps'
 
 export type FocusHandlers = {|
   focusedField: StepFieldName,
@@ -11,6 +12,9 @@ export type FocusHandlers = {|
 
 // Shared props across all step forms
 export type StepFormProps = {|
-  focusHandlers: FocusHandlers,
+  // TODO(IL, 2021-02-04) type this as HydratedFormData. See #3161
   formData: FormData,
+
+  focusHandlers: FocusHandlers,
+  propsForFields: FieldPropsByName,
 |}

@@ -1,16 +1,12 @@
 // @flow
-import assert from 'assert'
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { getTooltipForField } from '../utils'
-import { actions } from '../../../steplist'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import { getFieldErrors, maskField } from '../../../steplist/fieldLevel'
+import { getFieldErrors } from '../../../steplist/fieldLevel'
 import {
   getDisabledFields,
   getDefaultsForStepType,
 } from '../../../steplist/formLevel'
-import type { StepFieldName } from '../../../form-types'
+import type { StepFieldName, FormData } from '../../../form-types'
 import type { FocusHandlers } from '../types'
 
 export type FieldProps = {|
@@ -42,21 +38,12 @@ export const showFieldErrors = ({
 }: ShowFieldErrorParams): boolean | void | Array<StepFieldName> =>
   !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
 
-export const useSingleEditFieldProps = (
-  focusHandlers: FocusHandlers
-): FieldPropsByName | null => {
+export const makeSingleEditFieldProps = (
+  focusHandlers: FocusHandlers,
+  formData: FormData, // TODO(IL, 2021-02-04) type this as HydratedFormData. See #3161
+  handleChangeFormInput: (name: string, value: mixed) => void
+): FieldPropsByName => {
   const { dirtyFields, blur, focusedField, focus } = focusHandlers
-
-  const dispatch = useDispatch()
-  const formData = useSelector(stepFormSelectors.getUnsavedForm)
-
-  if (formData == null) {
-    assert(
-      false,
-      'useSingleEditFieldProps expected getUnsavedForm to not be null'
-    )
-    return null
-  }
 
   const fieldNames: Array<string> = Object.keys(
     getDefaultsForStepType(formData.stepType)
@@ -71,9 +58,8 @@ export const useSingleEditFieldProps = (
     const errorToShow =
       showErrors && errors.length > 0 ? errors.join(', ') : null
 
-    const updateValue = val => {
-      const maskedValue = maskField(name, val)
-      dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
+    const updateValue = value => {
+      handleChangeFormInput(name, value)
     }
 
     const stepType = formData.stepType

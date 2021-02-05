@@ -15,14 +15,10 @@ import {
 import { StateFields } from './StateFields'
 import { ProfileSettings } from './ProfileSettings'
 import styles from '../../StepEditForm.css'
-import { useSingleEditFieldProps } from '../../fields/useSingleEditFieldProps'
 import type { StepFormProps } from '../../types'
 
 export const ThermocyclerForm = (props: StepFormProps): React.Node => {
-  const { focusHandlers } = props
-
-  const propsForFields = useSingleEditFieldProps(focusHandlers)
-  if (propsForFields === null) return null
+  const { focusHandlers, propsForFields } = props
 
   return (
     <div className={styles.form_wrapper}>
@@ -84,6 +80,7 @@ export const ThermocyclerForm = (props: StepFormProps): React.Node => {
               {i18n.t('application.stepType.profile_steps')}
             </span>
           </div>
+          {/* TODO IMMEDIATLY: confirm this use of focusHandlers works and is tested */}
           <ProfileItemRows focusHandlers={focusHandlers} />
           <div className={styles.section_header}>
             <span className={styles.section_header_text}>

@@ -17,7 +17,6 @@ import {
   WellOrderField,
   DelayFields,
 } from '../fields'
-import { useSingleEditFieldProps } from '../fields/useSingleEditFieldProps'
 import { AspDispSection } from './AspDispSection'
 
 import type { StepFormProps } from '../types'
@@ -27,8 +26,7 @@ import styles from '../StepEditForm.css'
 export const MixForm = (props: StepFormProps): React.Node => {
   const [collapsed, setCollapsed] = React.useState(true)
 
-  const propsForFields = useSingleEditFieldProps(props.focusHandlers)
-  if (propsForFields === null) return null
+  const { propsForFields } = props
 
   const toggleCollapsed = (): void =>
     setCollapsed(prevCollapsed => !prevCollapsed)
