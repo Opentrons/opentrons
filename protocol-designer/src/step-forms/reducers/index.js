@@ -75,6 +75,7 @@ import type {
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
   DeleteStepAction,
+  DeleteMultipleStepsAction,
   PopulateFormAction,
   ReorderStepsAction,
   AddProfileCycleAction,
@@ -87,6 +88,7 @@ import type {
 import type {
   AddStepAction,
   DuplicateStepAction,
+  DuplicateMultipleStepsAction,
   ReorderSelectedStepAction,
   SelectStepAction,
   SelectTerminalItemAction,
@@ -119,6 +121,7 @@ type UnsavedFormActions =
   | CancelStepFormAction
   | SaveStepFormAction
   | DeleteStepAction
+  | DeleteMultipleStepsAction
   | CreateModuleAction
   | DeleteModuleAction
   | SelectTerminalItemAction
@@ -187,6 +190,7 @@ export const unsavedForm = (
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
     case 'DELETE_STEP':
+    case 'DELETE_MULTIPLE_STEPS':
     case 'EDIT_MODULE':
     case 'SAVE_STEP_FORM':
     case 'SELECT_TERMINAL_ITEM':
@@ -460,6 +464,7 @@ export const initialSavedStepFormsState: SavedStepFormState = {
 type SavedStepFormsActions =
   | SaveStepFormAction
   | DeleteStepAction
+  | DeleteMultipleStepsAction
   | LoadFileAction
   | CreateContainerAction
   | DeleteContainerAction
@@ -468,6 +473,7 @@ type SavedStepFormsActions =
   | CreateModuleAction
   | DeleteModuleAction
   | DuplicateStepAction
+  | DuplicateMultipleStepsAction
   | ChangeSavedStepFormAction
   | DuplicateLabwareAction
   | SwapSlotContentsAction
@@ -553,6 +559,9 @@ export const savedStepForms = (
       }
     }
     case 'DELETE_STEP': {
+      return omit(savedStepForms, action.payload)
+    }
+    case 'DELETE_MULTIPLE_STEPS': {
       return omit(savedStepForms, action.payload)
     }
     case 'LOAD_FILE': {
@@ -927,6 +936,18 @@ export const savedStepForms = (
         },
       }
     }
+    case 'DUPLICATE_MULTIPLE_STEPS': {
+      return action.payload.steps.reduce(
+        (acc, { stepId, duplicateStepId }) => ({
+          ...acc,
+          [duplicateStepId]: {
+            ...cloneDeep(savedStepForms[stepId]),
+            id: duplicateStepId,
+          },
+        }),
+        { ...savedStepForms }
+      )
+    }
     case 'REPLACE_CUSTOM_LABWARE_DEF': {
       // no mismatch, it's safe to keep all steps as they are
       if (!action.payload.isOverwriteMismatched) return savedStepForms
@@ -1185,6 +1206,10 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
     },
     DELETE_STEP: (state: OrderedStepIdsState, action: DeleteStepAction) =>
       state.filter(stepId => stepId !== action.payload),
+    DELETE_MULTIPLE_STEPS: (
+      state: OrderedStepIdsState,
+      action: DeleteMultipleStepsAction
+    ) => state.filter(id => !action.payload.includes(id)),
     LOAD_FILE: (
       state: OrderedStepIdsState,
       action: LoadFileAction
@@ -1220,6 +1245,20 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
         ...state.slice(selectedIndex + 1, state.length),
       ]
     },
+    DUPLICATE_MULTIPLE_STEPS: (
+      state: OrderedStepIdsState,
+      action: DuplicateMultipleStepsAction
+    ): OrderedStepIdsState => {
+      const duplicateStepIds = action.payload.steps.map(
+        ({ duplicateStepId }) => duplicateStepId
+      )
+      const { indexToInsert } = action.payload
+      return [
+        ...state.slice(0, indexToInsert),
+        ...duplicateStepIds,
+        ...state.slice(indexToInsert, state.length),
+      ]
+    },
     REORDER_STEPS: (
       state: OrderedStepIdsState,
       action: ReorderStepsAction
@@ -1235,6 +1274,7 @@ type PresavedStepFormAction =
   | AddStepAction
   | CancelStepFormAction
   | DeleteStepAction
+  | DeleteMultipleStepsAction
   | SaveStepFormAction
   | SelectTerminalItemAction
   | SelectStepAction
@@ -1249,6 +1289,7 @@ export const presavedStepForm = (
       return action.payload === PRESAVED_STEP_ID ? state : null
     case 'CANCEL_STEP_FORM':
     case 'DELETE_STEP':
+    case 'DELETE_MULTIPLE_STEPS':
     case 'SAVE_STEP_FORM':
     case 'SELECT_STEP':
       return null

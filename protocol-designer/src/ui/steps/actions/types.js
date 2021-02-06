@@ -15,12 +15,21 @@ export type ClearWellSelectionLabwareKeyAction = {|
   payload: null,
 |}
 
+type DuplicateStepPayload = {|
+  stepId: StepIdType,
+  duplicateStepId: StepIdType,
+|}
 export type DuplicateStepAction = {|
   type: 'DUPLICATE_STEP',
-  payload: {
-    stepId: StepIdType,
-    duplicateStepId: StepIdType,
-  },
+  payload: DuplicateStepPayload,
+|}
+
+export type DuplicateMultipleStepsAction = {|
+  type: 'DUPLICATE_MULTIPLE_STEPS',
+  payload: {|
+    steps: Array<DuplicateStepPayload>,
+    indexToInsert: number,
+  |},
 |}
 
 export type ExpandAddStepButtonAction = {|
@@ -31,6 +40,16 @@ export type ExpandAddStepButtonAction = {|
 export type ToggleStepCollapsedAction = {|
   type: 'TOGGLE_STEP_COLLAPSED',
   payload: StepIdType,
+|}
+
+export type ExpandMultipleStepsAction = {|
+  type: 'EXPAND_MULTIPLE_STEPS',
+  payload: Array<StepIdType>,
+|}
+
+export type CollapseMultipleStepsAction = {|
+  type: 'COLLAPSE_MULTIPLE_STEPS',
+  payload: Array<StepIdType>,
 |}
 
 export type HoverOnSubstepAction = {|
@@ -44,6 +63,10 @@ export type ReorderSelectedStepAction = {|
     delta: number,
     stepId: StepIdType,
   |},
+|}
+
+export type ClearSelectedItemAction = {|
+  type: 'CLEAR_SELECTED_ITEM',
 |}
 
 export type SelectTerminalItemAction = {|
