@@ -3,14 +3,17 @@
 module.exports = {
   root: true,
 
-  parser: '@babel/eslint-parser',
+  parserOptions: {
+    project: './tsconfig.json',
+  },
 
   extends: [
-    'standard',
+    'standard-with-typescript',
     'plugin:react/recommended',
     'plugin:prettier/recommended',
     'prettier/react',
     'prettier/standard',
+    'prettier/@typescript-eslint',
   ],
 
   plugins: ['flowtype', 'react', 'react-hooks', 'json', 'prettier', 'jest'],
@@ -24,6 +27,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     'no-extra-boolean-cast': 'off',
     'import/no-default-export': 'error',
+    '@typescript-eslint/promise-function-async': 'off',
 
     // TODO(mc, 2021-01-29): fix these and remove warning overrides
     'dot-notation': 'warn',
@@ -52,6 +56,11 @@ module.exports = {
 
   overrides: [
     {
+      files: ['**/*.js'],
+      parser: '@babel/eslint-parser',
+      extends: ['plugin:flowtype/recommended', 'prettier/flowtype'],
+    },
+    {
       files: [
         '**/test/**.js',
         '**/__tests__/**.@(js|ts|tsx)',
@@ -69,6 +78,7 @@ module.exports = {
         'jest/no-standalone-expect': 'off',
         'jest/no-disabled-tests': 'error',
         'jest/consistent-test-it': 'error',
+        '@typescript-eslint/consistent-type-assertions': 'off',
 
         // TODO(mc, 2021-01-29): fix these and remove warning overrides
         'jest/no-deprecated-functions': 'warn',
@@ -80,29 +90,6 @@ module.exports = {
     {
       files: ['**/cypress/**'],
       extends: ['plugin:cypress/recommended'],
-    },
-    {
-      files: ['**/*.js'],
-      parser: '@babel/eslint-parser',
-      extends: ['plugin:flowtype/recommended', 'prettier/flowtype'],
-    },
-    {
-      files: ['**/*.@(ts|tsx)'],
-      extends: [
-        'plugin:@typescript-eslint/recommended',
-        'prettier/@typescript-eslint',
-      ],
-      rules: {
-        '@typescript-eslint/no-use-before-define': [
-          'error',
-          { functions: false, classes: true },
-        ],
-        '@typescript-eslint/explicit-function-return-type': [
-          'error',
-          { allowExpressions: true, allowTypedFunctionExpressions: true },
-        ],
-        '@typescript-eslint/no-empty-function': 'off',
-      },
     },
   ],
 }
