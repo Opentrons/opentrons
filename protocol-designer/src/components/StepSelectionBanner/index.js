@@ -2,12 +2,12 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import { actions as stepActions, getMultiSelectItemIds } from '../../ui/steps'
 import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   ConfirmDeleteModal,
 } from '../modals/ConfirmDeleteModal'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { actions as stepActions, getMultiSelectItemIds } from '../../ui/steps'
 import { StepSelectionBannerComponent } from './StepSelectionBannerComponent'
 
 const MemoizedStepSelectionBannerComponent = React.memo(
