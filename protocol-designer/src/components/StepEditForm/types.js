@@ -15,8 +15,8 @@ export type FieldProps = {|
   updateValue: mixed => void,
   value: mixed,
   errorToShow: ?string,
-  onFieldBlur?: () => mixed,
-  onFieldFocus?: () => mixed,
+  onFieldBlur: () => mixed,
+  onFieldFocus: () => mixed,
   isIndeterminate?: boolean,
 |}
 
@@ -29,7 +29,6 @@ export type FieldPropsByName = {
 export type StepFormProps = {|
   // TODO(IL, 2021-02-04) type this as HydratedFormData. See #3161
   formData: FormData,
-
   focusHandlers: FocusHandlers,
   propsForFields: FieldPropsByName,
 |}

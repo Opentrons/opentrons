@@ -17,7 +17,7 @@ type Props = {|
 export const VolumeField = (props: Props): React.Node => {
   const { stepType, label, className, ...propsForVolumeField } = props
 
-  // TODO IMMEDIATELY tooltip from hook
+  // TODO(IL, 2021-02-08): use the useHoverTooltip hook instead of deprecated HoverTooltip (see #7295)
   return (
     <HoverTooltip
       tooltipComponent={getTooltipForField(stepType, 'volume', false)}

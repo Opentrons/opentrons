@@ -22,7 +22,6 @@ type SP = {|
   primaryWellCount: $PropertyType<Props, 'primaryWellCount'>,
   _pipetteId: ?string,
   _selectedLabwareId: ?string,
-  // _wellFieldErrors: Array<string>,
 |}
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
@@ -41,8 +40,6 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     disabled,
     _pipetteId: pipetteId,
     _selectedLabwareId: formData && formData[ownProps.labwareFieldName],
-    // TODO IMMEDIATELY: trace this out
-    // _wellFieldErrors: getFieldErrors(ownProps.name, selectedWells) || [],
     primaryWellCount: selectedWells && selectedWells.length,
     isMulti,
   }

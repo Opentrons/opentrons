@@ -80,7 +80,6 @@ export const ThermocyclerForm = (props: StepFormProps): React.Node => {
               {i18n.t('application.stepType.profile_steps')}
             </span>
           </div>
-          {/* TODO IMMEDIATELY: confirm this use of focusHandlers works and is tested */}
           <ProfileItemRows focusHandlers={focusHandlers} />
           <div className={styles.section_header}>
             <span className={styles.section_header_text}>
