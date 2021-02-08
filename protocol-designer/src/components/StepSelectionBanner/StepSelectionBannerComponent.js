@@ -56,6 +56,20 @@ const StepPill = (props: StepPillProps): React.Node => {
   )
 }
 
+export const ExitBatchEditButton = (props: {
+  handleExitBatchEdit: $PropertyType<Props, 'handleExitBatchEdit'>,
+}): React.Node => (
+  <Box flex="0 1 auto">
+    <SecondaryBtn
+      color={C_SELECTED_DARK}
+      backgroundColor={C_TRANSPARENT}
+      onClick={props.handleExitBatchEdit}
+    >
+      {i18n.t('application.exit_batch_edit')}
+    </SecondaryBtn>
+  </Box>
+)
+
 export const StepSelectionBannerComponent = (props: Props): React.Node => {
   const { selectedSteps, handleExitBatchEdit } = props
   const numSteps = selectedSteps.length
@@ -95,15 +109,7 @@ export const StepSelectionBannerComponent = (props: Props): React.Node => {
           />
         ))}
       </Flex>
-      <Box flex="0 1 auto">
-        <SecondaryBtn
-          color={C_SELECTED_DARK}
-          backgroundColor={C_TRANSPARENT}
-          onClick={handleExitBatchEdit}
-        >
-          {i18n.t('application.exit_batch_edit')}
-        </SecondaryBtn>
-      </Box>
+      <ExitBatchEditButton handleExitBatchEdit={handleExitBatchEdit} />
     </Flex>
   )
 }
