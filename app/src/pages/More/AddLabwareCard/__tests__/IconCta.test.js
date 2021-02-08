@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { Icon } from '@opentrons/components'
-import { IconCta } from '..'
+import { IconCta } from '../IconCta'
 
 const NAME = 'some-call-to-action'
 const ICON_NAME = 'flask-outline'

@@ -2,7 +2,6 @@
 import React from 'react'
 import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
-import { PrimaryBtn } from '@opentrons/components'
 import type { State } from '../../../redux/types'
 
 import wellPlate96Def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
