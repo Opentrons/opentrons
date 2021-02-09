@@ -4,22 +4,25 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
 import { selectors as uiModuleSelectors } from '../../../../ui/modules'
-import * as stepFormSelectors from '../../../../step-forms/selectors'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
 import * as _fields from '../../fields'
 import { MagnetForm } from '../MagnetForm'
 import type { Options } from '@opentrons/components'
 import type { BaseState } from '../../../../types'
+import type { ModuleEntities } from '../../../../step-forms/types'
+
+jest.mock('../../../../step-forms/selectors')
+jest.mock('../../../../ui/modules')
+jest.mock('../../fields')
 
 // TODO(IL, 2021-02-01): don't any-type, follow mocking pattern in MixForm.test.js ?
 const fields: any = _fields
 
-jest.mock('../../../../step-forms/selectors')
-
 const getUnsavedFormMock: JestMockFn<[BaseState], any> =
   stepFormSelectors.getUnsavedForm
 
-jest.mock('../../../../ui/modules')
-jest.mock('../../fields')
+const getModuleEntitiesMock: JestMockFn<[BaseState], ModuleEntities> =
+  stepFormSelectors.getModuleEntities
 
 describe('MagnetForm', () => {
   let store
@@ -39,7 +42,6 @@ describe('MagnetForm', () => {
       formData: ({
         id: 'formId',
         stepType: 'magnet',
-        meta: { module: { model: MAGNETIC_MODULE_V1 } },
       }: any),
       focusHandlers: {
         blur: jest.fn(),
@@ -74,10 +76,24 @@ describe('MagnetForm', () => {
       [BaseState],
       Options
     >).mockReturnValue([
-      { name: 'magnet module', value: 'magnet123', disabled: false },
+      { name: 'magnet module v1', value: 'magnetV1', disabled: false },
+      { name: 'magnet module v2', value: 'magnetV2', disabled: false },
     ])
 
     getUnsavedFormMock.mockReturnValue({ stepType: 'magnet' })
+
+    getModuleEntitiesMock.mockReturnValue({
+      magnetV1: {
+        id: 'magnetV1',
+        type: 'magneticModuleType',
+        model: 'magneticModuleV1',
+      },
+      magnetV2: {
+        id: 'magnetV2',
+        type: 'magneticModuleType',
+        model: 'magneticModuleV2',
+      },
+    })
   })
 
   it('engage height caption is displayed with proper height to decimal scale', () => {
@@ -114,7 +130,7 @@ describe('MagnetForm', () => {
         ...props,
         formData: {
           ...props.formData,
-          meta: { module: { model } },
+          moduleId: `magnetV${modelNum}`,
         },
       })
       expect(
