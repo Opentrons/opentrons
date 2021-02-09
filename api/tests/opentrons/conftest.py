@@ -187,22 +187,10 @@ def protocol(request):
     file = open(filename)
     text = ''.join(list(file))
     file.seek(0)
-    return Protocol(text=text, filename=filename, filelike=file)
 
+    yield Protocol(text=text, filename=filename, filelike=file)
 
-@pytest.fixture(params=["no_clear_tips.py"])
-def tip_clear_protocol(request):
-    try:
-        root = request.getfixturevalue('protocol_file')
-    except Exception:
-        root = request.param
-
-    filename = os.path.join(os.path.dirname(__file__), 'data', root)
-
-    file = open(filename)
-    text = ''.join(list(file))
-    return Protocol(text=text, filename=filename, filelike=file)
-
+    file.close()
 
 @pytest.fixture
 def session_manager(main_router):

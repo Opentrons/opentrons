@@ -104,7 +104,8 @@ async def test_list_keys(loop, wifi_keys_tempdir):
     dummy_names = ['ad12d1df199bc912', 'cbdda8124128cf', '812410990c5412']
     for dn in dummy_names:
         os.mkdir(os.path.join(wifi_keys_tempdir, dn))
-        open(os.path.join(wifi_keys_tempdir, dn, 'test.pem'), 'w').write('hi')
+        with open(os.path.join(wifi_keys_tempdir, dn, 'test.pem'), 'w') as file:
+            file.write('hi')
 
     keys = list(wifi.list_keys())
     assert len(keys) == 3
