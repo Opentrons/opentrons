@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { FormGroup } from '@opentrons/components'
 import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
+import { selectors as stepFormSelectors } from '../../../step-forms'
 import { i18n } from '../../../localization'
 import { maskField } from '../../../steplist/fieldLevel'
 import { ConditionalOnField, TextField, RadioGroupField } from '../fields'
@@ -17,9 +18,10 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
     uiModuleSelectors.getMagneticLabwareOptions
   )
 
-  // TODO(IL, 2021-02-04) once FormData is correctly typed as HydratedFormData,
-  // the meta.module.model should be able to be properly inferred as ?string. See #3161
-  const moduleModel: ?string = props.formData?.meta?.module?.model
+  const moduleEntities = useSelector(stepFormSelectors.getModuleEntities)
+  const { moduleId } = props.formData
+  const moduleModel = moduleId ? moduleEntities[moduleId]?.model : null
+
   const moduleOption: ?string = moduleLabwareOptions[0]
     ? moduleLabwareOptions[0].name
     : 'No magnetic module'

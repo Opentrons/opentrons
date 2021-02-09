@@ -176,7 +176,7 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
 const mapStateToProps = (state: BaseState): SP => {
   return {
     canSave: stepFormSelectors.getCurrentFormCanBeSaved(state),
-    formData: stepFormSelectors.getHydratedUnsavedForm(state),
+    formData: stepFormSelectors.getUnsavedForm(state),
     formHasChanges: stepFormSelectors.getCurrentFormHasUnsavedChanges(state),
     isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
     isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
