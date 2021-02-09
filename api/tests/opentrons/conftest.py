@@ -192,6 +192,7 @@ def protocol(request):
 
     file.close()
 
+
 @pytest.fixture
 def session_manager(main_router):
     return main_router.session_manager
@@ -271,9 +272,9 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
 
 
 @pytest.fixture
-def ctx(loop) -> ProtocolContext:
+async def ctx(loop, hardware) -> ProtocolContext:
     return ProtocolContext(
-        implementation=ProtocolContextImplementation(),
+        implementation=ProtocolContextImplementation(hardware=hardware),
         loop=loop
     )
 
