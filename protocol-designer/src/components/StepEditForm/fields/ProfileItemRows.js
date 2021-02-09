@@ -273,10 +273,10 @@ const ProfileField = (props: ProfileFieldProps) => {
   //   props.tooltipComponent || getTooltipForField(stepType, name, disabled)
 
   const onBlur = () => {
-    focusHandlers.onFieldBlur(fieldId)
+    focusHandlers.blur(fieldId)
   }
   const onFocus = () => {
-    focusHandlers.onFieldFocus(fieldId)
+    focusHandlers.focus(fieldId)
   }
   return (
     <div className={styles.step_input_wrapper}>

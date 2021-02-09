@@ -5,15 +5,17 @@ import cx from 'classnames'
 import { i18n } from '../../../../localization'
 import { FormGroup } from '@opentrons/components'
 import { ConditionalOnField, ToggleRowField, TextField } from '../../fields'
-
 import styles from '../../StepEditForm.css'
 
-import type { FocusHandlers } from '../../types'
+import type { FieldPropsByName } from '../../types'
 
-type Props = {| focusHandlers: FocusHandlers, isEndingHold?: boolean |}
+type Props = {|
+  propsForFields: FieldPropsByName,
+  isEndingHold?: boolean,
+|}
 
 export const StateFields = (props: Props): React.Node => {
-  const { focusHandlers, isEndingHold } = props
+  const { isEndingHold, propsForFields } = props
 
   // Append 'Hold' to field names if component is used for an ending hold in a TC profile
   const blockActiveName = isEndingHold ? 'blockIsActiveHold' : 'blockIsActive'
@@ -45,13 +47,12 @@ export const StateFields = (props: Props): React.Node => {
             condition={val => val === true}
           >
             <TextField
-              name={blockTempName}
+              {...propsForFields[blockTempName]}
               className={cx(
                 styles.small_field,
                 styles.toggle_temperature_field
               )}
               units={i18n.t('application.units.degrees')}
-              {...focusHandlers}
             />
           </ConditionalOnField>
         </div>
@@ -76,13 +77,12 @@ export const StateFields = (props: Props): React.Node => {
             condition={val => val === true}
           >
             <TextField
-              name={lidTempName}
+              {...propsForFields[lidTempName]}
               className={cx(
                 styles.small_field,
                 styles.toggle_temperature_field
               )}
               units={i18n.t('application.units.degrees')}
-              {...focusHandlers}
             />
           </ConditionalOnField>
         </div>

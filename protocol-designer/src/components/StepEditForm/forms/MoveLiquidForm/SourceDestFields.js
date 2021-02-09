@@ -2,9 +2,6 @@
 import * as React from 'react'
 import { i18n } from '../../../../localization'
 
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { FocusHandlers } from '../../types'
-
 import {
   TextField,
   CheckboxRowField,
@@ -15,39 +12,44 @@ import {
   DelayFields,
 } from '../../fields'
 
+import type { StepFieldName } from '../../../../steplist/fieldLevel'
+import type { FieldPropsByName } from '../../types'
+
 import styles from '../../StepEditForm.css'
 
-type Props = {
+type Props = {|
   className?: ?string,
-  focusHandlers: FocusHandlers,
   prefix: 'aspirate' | 'dispense',
-}
+  propsForFields: FieldPropsByName,
+|}
 
 const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string
 ): StepFieldName => `${prefix}_${fieldName}`
 
 export const SourceDestFields = (props: Props): React.Node => {
-  const { className, focusHandlers, prefix } = props
+  const { className, prefix, propsForFields } = props
+
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
   const getMixFields = () => (
     <CheckboxRowField
-      name={addFieldNamePrefix('mix_checkbox')}
+      {...propsForFields[addFieldNamePrefix('mix_checkbox')]}
       label={i18n.t('form.step_edit_form.field.mix.label')}
       className={styles.small_field}
+      tooltipContent={i18n.t(
+        `tooltip.step_fields.defaults.${addFieldNamePrefix('mix_checkbox')}`
+      )}
     >
       <TextField
-        name={addFieldNamePrefix('mix_volume')}
-        units={i18n.t('application.units.microliter')}
+        {...propsForFields[addFieldNamePrefix('mix_volume')]}
         className={styles.small_field}
-        {...focusHandlers}
+        units={i18n.t('application.units.microliter')}
       />
       <TextField
-        name={addFieldNamePrefix('mix_times')}
-        units={i18n.t('application.units.times')}
+        {...propsForFields[addFieldNamePrefix('mix_times')]}
         className={styles.small_field}
-        {...focusHandlers}
+        units={i18n.t('application.units.times')}
       />
     </CheckboxRowField>
   )
@@ -57,7 +59,7 @@ export const SourceDestFields = (props: Props): React.Node => {
       checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
       secondsFieldName={addFieldNamePrefix('delay_seconds')}
       tipPositionFieldName={addFieldNamePrefix('delay_mmFromBottom')}
-      focusHandlers={focusHandlers}
+      propsForFields={propsForFields}
     />
   )
 
@@ -80,9 +82,10 @@ export const SourceDestFields = (props: Props): React.Node => {
         {prefix === 'aspirate' && (
           <React.Fragment>
             <CheckboxRowField
-              name="preWetTip"
+              {...propsForFields['preWetTip']}
               label={i18n.t('form.step_edit_form.field.preWetTip.label')}
               className={styles.small_field}
+              tooltipContent={i18n.t(`tooltip.step_fields.defaults.preWetTip`)}
             />
             {getMixFields()}
             {getDelayFields()}
@@ -95,8 +98,8 @@ export const SourceDestFields = (props: Props): React.Node => {
           </React.Fragment>
         )}
         <CheckboxRowField
-          name={addFieldNamePrefix('touchTip_checkbox')}
-          tooltipComponent={i18n.t(
+          {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
+          tooltipContent={i18n.t(
             `tooltip.step_fields.defaults.${addFieldNamePrefix(
               'touchTip_checkbox'
             )}`
@@ -111,32 +114,33 @@ export const SourceDestFields = (props: Props): React.Node => {
 
         {prefix === 'dispense' && (
           <CheckboxRowField
-            name="blowout_checkbox"
+            {...propsForFields['blowout_checkbox']}
             label={i18n.t('form.step_edit_form.field.blowout.label')}
             className={styles.small_field}
+            tooltipContent={i18n.t(
+              `tooltip.step_fields.defaults.blowout_checkbox`
+            )}
           >
             <BlowoutLocationField
-              name="blowout_location"
+              {...propsForFields['blowout_location']}
               className={styles.full_width}
-              {...focusHandlers}
             />
           </CheckboxRowField>
         )}
         <CheckboxRowField
-          tooltipComponent={i18n.t(
+          {...propsForFields[addFieldNamePrefix('airGap_checkbox')]}
+          tooltipContent={i18n.t(
             `tooltip.step_fields.defaults.${addFieldNamePrefix(
               'airGap_checkbox'
             )}`
           )}
-          name={addFieldNamePrefix('airGap_checkbox')}
           label={i18n.t('form.step_edit_form.field.airGap.label')}
           className={styles.small_field}
         >
           <TextField
+            {...propsForFields[addFieldNamePrefix('airGap_volume')]}
             className={styles.small_field}
-            name={addFieldNamePrefix('airGap_volume')}
             units={i18n.t('application.units.microliter')}
-            {...focusHandlers}
           />
         </CheckboxRowField>
       </div>

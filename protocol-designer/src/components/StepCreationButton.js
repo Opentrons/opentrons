@@ -64,7 +64,7 @@ const StepCreationButtonComponent = (props: StepButtonComponentProps) => {
 type StepButtonItemProps = {|
   onClick: () => mixed,
   disabled: boolean,
-  stepType: string,
+  stepType: StepType,
 |}
 
 function StepButtonItem(props: StepButtonItemProps) {

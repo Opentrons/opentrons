@@ -190,6 +190,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     error: hasError,
     warning: hasWarnings,
     selected,
+    isLastSelected: lastMultiSelectedStepId === stepId,
     // no double-highlighting: whole step is only "hovered" when
     // user is not hovering on substep.
     hovered: hoveredStep === stepId && !hoveredSubstep,

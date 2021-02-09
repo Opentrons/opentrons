@@ -1,11 +1,18 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
 import { MixForm } from '../MixForm'
 import { AspDispSection } from '../AspDispSection'
+import * as stepFormSelectors from '../../../../step-forms/selectors'
+import type { BaseState } from '../../../../types'
 
 const { DelayFields } = jest.requireActual('../../fields')
+
+jest.mock('../../../../step-forms/selectors')
+
+const getUnsavedFormMock: JestMockFn<[BaseState], any> =
+  stepFormSelectors.getUnsavedForm
 
 jest.mock('../../fields/', () => {
   const actualFields = jest.requireActual('../../fields')
@@ -34,8 +41,10 @@ const mockStore = {
 }
 
 describe('MixForm', () => {
-  const render = props =>
-    mount(<MixForm {...props} />, {
+  let props: React.ElementProps<typeof MixForm>
+
+  const render = _props =>
+    mount(<MixForm {..._props} />, {
       wrappingComponent: Provider,
       wrappingComponentProps: { store: mockStore },
     })
@@ -44,18 +53,39 @@ describe('MixForm', () => {
     wrapper.find(AspDispSection).first().invoke('toggleCollapsed')()
   }
 
-  let props
-
   beforeEach(() => {
+    getUnsavedFormMock.mockReturnValue({
+      stepType: 'mix',
+    })
+
     props = {
+      formData: ({
+        stepType: 'mix',
+      }: any),
       focusHandlers: {
-        focusedField: '',
+        blur: jest.fn(),
+        focus: jest.fn(),
         dirtyFields: [],
-        onFieldFocus: jest.fn(),
-        onFieldBlur: jest.fn(),
+        focusedField: null,
+      },
+      propsForFields: {
+        pipette: {
+          onFieldFocus: (jest.fn(): any),
+          onFieldBlur: (jest.fn(): any),
+          errorToShow: null,
+          disabled: false,
+          name: 'pipette',
+          updateValue: (jest.fn(): any),
+          value: null,
+        },
       },
     }
   })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   it('should NOT render delay fields initially', () => {
     const wrapper = render(props)
 

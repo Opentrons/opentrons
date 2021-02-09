@@ -3,15 +3,17 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import { StepFormDropdown } from './StepFormDropdownField'
+import {
+  StepFormDropdown,
+  type StepFormDropdownProps,
+} from './StepFormDropdownField'
 import type { Options } from '@opentrons/components'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { BaseState } from '../../../types'
-import type { FocusHandlers } from '../types'
-import type { StepFormDropdownProps } from './StepFormDropdownField'
+import type { FieldProps } from '../types'
 
 type OP = {|
-  ...$Exact<FocusHandlers>,
+  ...FieldProps,
   name: StepFieldName,
   className?: string,
 |}
