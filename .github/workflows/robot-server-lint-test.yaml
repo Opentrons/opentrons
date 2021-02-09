@@ -35,6 +35,7 @@ defaults:
 jobs:
   lint-test:
     name: 'robot server package linting and tests'
+    timeout-minutes: '20'
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
