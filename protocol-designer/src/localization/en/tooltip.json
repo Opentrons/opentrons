@@ -2,6 +2,8 @@
   "not_in_beta": "ⓘ Coming Soon",
   "advanced_settings": "Advanced Settings",
 
+  "disabled_step_creation": "New steps cannot be added in Batch Edit mode.",
+
   "step_description": {
     "mix": "Mix contents of wells/tubes.",
     "pause": "Enable pause within protocol.",
