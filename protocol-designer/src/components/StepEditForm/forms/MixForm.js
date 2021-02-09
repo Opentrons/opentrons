@@ -139,6 +139,9 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 {...propsForFields['blowout_checkbox']}
                 className={styles.small_field}
                 label={i18n.t('form.step_edit_form.field.blowout.label')}
+                tooltipContent={i18n.t(
+                  'tooltip.step_fields.defaults.blowout_checkbox'
+                )}
               >
                 <BlowoutLocationField
                   {...propsForFields['blowout_location']}
