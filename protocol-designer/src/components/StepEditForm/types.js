@@ -27,7 +27,6 @@ export type FieldPropsByName = {
 
 // Shared props across all step forms
 export type StepFormProps = {|
-  // TODO(IL, 2021-02-04) type this as HydratedFormData. See #3161
   formData: FormData,
   focusHandlers: FocusHandlers,
   propsForFields: FieldPropsByName,

@@ -22,7 +22,7 @@ import type { FormData, StepFieldName } from '../../form-types'
 
 type SP = {|
   canSave: boolean,
-  formData: ?FormData, // TODO(IL, 2020-04-22): use HydratedFormData type see #3161
+  formData: ?FormData,
   formHasChanges: boolean,
   isNewStep: boolean,
   isPristineSetTempForm: boolean,

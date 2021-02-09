@@ -21,7 +21,7 @@ export const showFieldErrors = ({
 
 export const makeSingleEditFieldProps = (
   focusHandlers: FocusHandlers,
-  formData: FormData, // TODO(IL, 2021-02-04) type this as HydratedFormData. See #3161
+  formData: FormData,
   handleChangeFormInput: (name: string, value: mixed) => void
 ): FieldPropsByName => {
   const { dirtyFields, blur, focusedField, focus } = focusHandlers
