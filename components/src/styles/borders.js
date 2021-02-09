@@ -11,3 +11,6 @@ export const BORDER_STYLE_SOLID = 'solid'
 
 export const BORDER_SOLID_LIGHT = `${BORDER_WIDTH_DEFAULT} ${BORDER_STYLE_SOLID} ${C_LIGHT_GRAY}`
 export const BORDER_SOLID_MEDIUM = `${BORDER_WIDTH_DEFAULT} ${BORDER_STYLE_SOLID} ${C_MED_GRAY}`
+
+export const SHADOW_LIGHT =
+  '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.2)'

@@ -45,6 +45,7 @@ export type StepItemProps = {|
   error?: ?boolean,
   warning?: ?boolean,
   selected?: boolean,
+  isLastSelected?: boolean,
   hovered?: boolean,
   isMultiSelectMode?: boolean,
 
@@ -65,6 +66,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
     error,
     warning,
     selected,
+    isLastSelected,
     hovered,
 
     unhighlightStep,
@@ -101,7 +103,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
       onMouseEnter={highlightStep}
       onMouseLeave={unhighlightStep}
       onCollapseToggle={toggleStepCollapsed}
-      {...{ selected, collapsed, hovered, isMultiSelectMode }}
+      {...{ selected, collapsed, hovered, isMultiSelectMode, isLastSelected }}
     >
       {props.children}
     </TitledStepList>

@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
 import {
   Flex,
   Box,
@@ -9,8 +11,13 @@ import {
   Icon,
   ALIGN_CENTER,
   SIZE_2,
+  SPACING_1,
   SPACING_2,
+  C_NEAR_WHITE,
+  C_LIGHT_GRAY,
   C_DARK_GRAY,
+  BORDER_SOLID_MEDIUM,
+  POSITION_STICKY,
 } from '@opentrons/components'
 import { useConditionalConfirm } from '../../../../../components/src/hooks/useConditionalConfirm'
 import { selectors as stepFormSelectors } from '../../../step-forms'
@@ -36,6 +43,16 @@ type ClickableIconProps = {|
   onClick?: (event: SyntheticMouseEvent<>) => mixed,
 |}
 
+const iconBoxStyles = css`
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background-color: ${C_LIGHT_GRAY};
+  }
+`
+
 export const ClickableIcon = (props: ClickableIconProps): React.Node => {
   const { iconName, onClick, tooltipText, width } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
@@ -43,12 +60,12 @@ export const ClickableIcon = (props: ClickableIconProps): React.Node => {
   })
 
   const boxStyles = {
-    marginRight: props.isLast ? 0 : SPACING_2,
+    padding: SPACING_1,
     marginLeft: props.alignRight ? 'auto' : 0,
   }
 
   return (
-    <Box {...boxStyles} {...targetProps}>
+    <Box {...boxStyles} {...targetProps} css={iconBoxStyles}>
       <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
       <Box onClick={onClick}>
         <Icon name={iconName} width={width || '1.25rem'} color={C_DARK_GRAY} />
@@ -144,7 +161,16 @@ export const MultiSelectToolbar = (): React.Node => {
           onCancelClick={cancel}
         />
       )}
-      <Flex alignItems={ALIGN_CENTER} height={SIZE_2} padding={'0 0.75rem'}>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        height={SIZE_2}
+        padding={`0 ${SPACING_2}`}
+        borderBottom={BORDER_SOLID_MEDIUM}
+        position={POSITION_STICKY}
+        top="0"
+        backgroundColor={C_NEAR_WHITE}
+        zIndex="100"
+      >
         <ClickableIcon {...selectProps} />
         <ClickableIcon {...deleteProps} />
         <ClickableIcon {...copyProps} />
