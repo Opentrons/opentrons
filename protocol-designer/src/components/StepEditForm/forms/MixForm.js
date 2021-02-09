@@ -19,15 +19,14 @@ import {
 } from '../fields'
 import { AspDispSection } from './AspDispSection'
 
-import type { FocusHandlers } from '../types'
+import type { StepFormProps } from '../types'
+
 import styles from '../StepEditForm.css'
 
-type Props = {| focusHandlers: FocusHandlers |}
-
-export const MixForm = (props: Props): React.Node => {
-  const { focusHandlers } = props
-
+export const MixForm = (props: StepFormProps): React.Node => {
   const [collapsed, setCollapsed] = React.useState(true)
+
+  const { propsForFields } = props
 
   const toggleCollapsed = (): void =>
     setCollapsed(prevCollapsed => !prevCollapsed)
@@ -40,10 +39,10 @@ export const MixForm = (props: Props): React.Node => {
         </span>
       </div>
       <div className={styles.form_row}>
-        <PipetteField name="pipette" {...focusHandlers} />
+        <PipetteField {...propsForFields['pipette']} />
         <VolumeField
+          {...propsForFields['volume']}
           label={i18n.t('form.step_edit_form.mixVolumeLabel')}
-          focusHandlers={focusHandlers}
           stepType="mix"
           className={styles.small_field}
         />
@@ -52,9 +51,8 @@ export const MixForm = (props: Props): React.Node => {
           label={i18n.t('form.step_edit_form.mixRepetitions')}
         >
           <TextField
-            name="times"
+            {...propsForFields['times']}
             units={i18n.t('application.units.times')}
-            {...focusHandlers}
           />
         </FormGroup>
       </div>
@@ -63,13 +61,12 @@ export const MixForm = (props: Props): React.Node => {
           label={i18n.t('form.step_edit_form.labwareLabel.mixLabware')}
           className={styles.large_field}
         >
-          <LabwareField name="labware" {...focusHandlers} />
+          <LabwareField {...propsForFields['labware']} />
         </FormGroup>
         <WellSelectionField
-          name="wells"
+          {...propsForFields['wells']}
           labwareFieldName="labware"
           pipetteFieldName="pipette"
-          {...focusHandlers}
         />
       </div>
       <div className={styles.section_divider} />
@@ -109,7 +106,7 @@ export const MixForm = (props: Props): React.Node => {
             <DelayFields
               checkboxFieldName={'aspirate_delay_checkbox'}
               secondsFieldName={'aspirate_delay_seconds'}
-              focusHandlers={focusHandlers}
+              propsForFields={propsForFields}
             />
           </div>
 
@@ -125,28 +122,30 @@ export const MixForm = (props: Props): React.Node => {
               <DelayFields
                 checkboxFieldName={'dispense_delay_checkbox'}
                 secondsFieldName={'dispense_delay_seconds'}
-                focusHandlers={focusHandlers}
+                propsForFields={propsForFields}
               />
               <CheckboxRowField
+                {...propsForFields['mix_touchTip_checkbox']}
                 className={styles.small_field}
                 label={i18n.t('form.step_edit_form.field.touchTip.label')}
-                tooltipComponent={i18n.t(
+                tooltipContent={i18n.t(
                   'tooltip.step_fields.defaults.mix_touchTip_checkbox'
                 )}
-                name={'mix_touchTip_checkbox'}
               >
                 <TipPositionField fieldName={'mix_touchTip_mmFromBottom'} />
               </CheckboxRowField>
 
               <CheckboxRowField
+                {...propsForFields['blowout_checkbox']}
                 className={styles.small_field}
                 label={i18n.t('form.step_edit_form.field.blowout.label')}
-                name="blowout_checkbox"
+                tooltipContent={i18n.t(
+                  'tooltip.step_fields.defaults.blowout_checkbox'
+                )}
               >
                 <BlowoutLocationField
+                  {...propsForFields['blowout_location']}
                   className={styles.full_width}
-                  name="blowout_location"
-                  {...focusHandlers}
                 />
               </CheckboxRowField>
             </div>

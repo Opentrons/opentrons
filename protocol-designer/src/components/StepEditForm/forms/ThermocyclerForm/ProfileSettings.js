@@ -7,12 +7,12 @@ import { TextField } from '../../fields'
 
 import styles from '../../StepEditForm.css'
 
-import type { FocusHandlers } from '../../types'
+import type { FieldPropsByName } from '../../types'
 
-type Props = {| focusHandlers: FocusHandlers |}
+type Props = {| propsForFields: FieldPropsByName |}
 
 export const ProfileSettings = (props: Props): React.Node => {
-  const { focusHandlers } = props
+  const { propsForFields } = props
 
   return (
     <div className={styles.form_row}>
@@ -21,10 +21,9 @@ export const ProfileSettings = (props: Props): React.Node => {
         className={styles.profile_settings_group}
       >
         <TextField
-          name="profileVolume"
+          {...propsForFields['profileVolume']}
           className={styles.small_field}
           units={i18n.t('application.units.microliter')}
-          {...focusHandlers}
         />
       </FormGroup>
       <FormGroup
@@ -32,10 +31,9 @@ export const ProfileSettings = (props: Props): React.Node => {
         className={styles.profile_settings_group}
       >
         <TextField
-          name="profileTargetLidTemp"
+          {...propsForFields['profileTargetLidTemp']}
           className={styles.small_field}
           units={i18n.t('application.units.degrees')}
-          {...focusHandlers}
         />
       </FormGroup>
       <FormGroup

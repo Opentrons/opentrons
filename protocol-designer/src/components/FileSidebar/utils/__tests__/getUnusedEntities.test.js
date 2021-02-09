@@ -19,7 +19,7 @@ describe('getUnusedEntities', () => {
       step123: {
         pipette: 'pipette123',
         id: 'step123',
-        stepType: 'transfer',
+        stepType: 'moveLiquid',
       },
     }
     const pipettesOnDeck = {
