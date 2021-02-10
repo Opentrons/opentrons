@@ -28,7 +28,7 @@ async def test_home_specific_sim(hardware_api, monkeypatch, is_robot):
     assert hardware_api._current_position == {Axis.X: 0,
                                               Axis.Y: 10,
                                               Axis.Z: 218,
-                                              Axis.A: 20,
+                                              Axis.A: -10,
                                               Axis.B: 19,
                                               Axis.C: 19}
 
@@ -51,7 +51,7 @@ async def test_move(hardware_api, is_robot, toggle_new_calibration):
     target_position1 = {Axis.X: 30,
                         Axis.Y: 20,
                         Axis.Z: 218,
-                        Axis.A: 10,
+                        Axis.A: -20,
                         Axis.B: 19,
                         Axis.C: 19}
     await hardware_api.home()
@@ -104,7 +104,7 @@ async def test_mount_offset_applied(
     mount = types.Mount.LEFT
     target_position = {Axis.X: 64,
                        Axis.Y: 20,
-                       Axis.Z: 10,
+                       Axis.Z: -20,
                        Axis.A: 218,
                        Axis.B: 19,
                        Axis.C: 19}
@@ -139,7 +139,7 @@ async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
                                critical_point=CriticalPoint.MOUNT)
     assert hardware_api._current_position == {Axis.X: 0.0, Axis.Y: 0.0,
                                               Axis.Z: 218,
-                                              Axis.A: 0,
+                                              Axis.A: -30,
                                               Axis.B: 19, Axis.C: 19}
     assert await hardware_api.current_position(
         types.Mount.RIGHT, critical_point=CriticalPoint.MOUNT)\
@@ -205,7 +205,7 @@ async def test_new_critical_point_applied(
                                critical_point=CriticalPoint.MOUNT)
     assert hardware_api._current_position == {Axis.X: 0.0, Axis.Y: 0.0,
                                               Axis.Z: 218,
-                                              Axis.A: 0,
+                                              Axis.A: -30,
                                               Axis.B: 19, Axis.C: 19}
     assert await hardware_api.current_position(
         types.Mount.RIGHT, critical_point=CriticalPoint.MOUNT)\
@@ -269,12 +269,12 @@ async def test_attitude_deck_cal_applied(
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     assert called_with['X'] == 0.0
     assert called_with['Y'] == 0.0
-    assert called_with['A'] == 0.0
+    assert called_with['A'] == -30.0
     # Check that mount offset is also applied
     await hardware_api.move_to(types.Mount.LEFT, types.Point(0, 0, 0))
     assert round(called_with['X'], 2) == 34.16
     assert round(called_with['Y'], 2) == 0.04
-    assert round(called_with['Z'], 2) == 0.0
+    assert round(called_with['Z'], 2) == -30.0
 
 
 async def test_other_mount_retracted(
@@ -285,7 +285,7 @@ async def test_other_mount_retracted(
         == types.Point(0, 0, 0)
     await hardware_api.move_to(types.Mount.LEFT, types.Point(20, 20, 0))
     assert await hardware_api.gantry_position(types.Mount.RIGHT) \
-        == types.Point(54, 20, 218)
+        == types.Point(54, 20, 248)
 
 
 async def test_shake_during_pick_up(

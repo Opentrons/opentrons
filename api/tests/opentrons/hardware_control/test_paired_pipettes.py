@@ -31,7 +31,7 @@ async def test_move_z_axis(hardware_api, monkeypatch):
     await hardware_api.home()
     await hardware_api.move_to(mount,
                                types.Point(0, 0, 0))
-    expected = {'X': 0.0, 'Y': 0.0, 'A': 0.0, 'Z': 0.0}
+    expected = {'X': 0.0, 'Y': 0.0, 'A': -30.0, 'Z': -30.0}
     assert mock_be_move.call_args_list[0][0][0] == expected
     mock_be_move.reset_mock()
 
@@ -39,7 +39,7 @@ async def test_move_z_axis(hardware_api, monkeypatch):
     await hardware_api.home()
     await hardware_api.move_to(mount,
                                types.Point(0, 0, 0))
-    expected = {'X': 34.0, 'Y': 0.0, 'A': 0.0, 'Z': 0.0}
+    expected = {'X': 34.0, 'Y': 0.0, 'A': -30.0, 'Z': -30.0}
     assert mock_be_move.call_args_list[0][0][0] == expected
 
 
@@ -48,8 +48,8 @@ async def test_move_gantry(hardware_api, is_robot, toggle_new_calibration):
     mount = PipettePair.PRIMARY_RIGHT
     target_position1 = {Axis.X: 30,
                         Axis.Y: 20,
-                        Axis.Z: 10,
-                        Axis.A: 10,
+                        Axis.Z: -20,
+                        Axis.A: -20,
                         Axis.B: 19,
                         Axis.C: 19}
     await hardware_api.home()
@@ -62,8 +62,8 @@ async def test_move_gantry(hardware_api, is_robot, toggle_new_calibration):
     mount2 = PipettePair.PRIMARY_LEFT
     target_position2 = {Axis.X: 60,
                         Axis.Y: 40,
-                        Axis.Z: 0,
-                        Axis.A: 0,
+                        Axis.Z: -30,
+                        Axis.A: -30,
                         Axis.B: 19,
                         Axis.C: 19}
     await hardware_api.move_rel(mount2, rel_position)
