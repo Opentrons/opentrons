@@ -26,16 +26,14 @@ on:
       - 'v*'
   workflow_dispatch:
 
-
 defaults:
   run:
     shell: bash
 
-
 jobs:
   lint:
     name: 'opentrons package linting'
-    timeout-minutes: '10'
+    timeout-minutes: 10
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
@@ -53,7 +51,7 @@ jobs:
         run: make -C api lint
   test:
     name: 'opentrons package tests'
-    timeout-minutes: '30'
+    timeout-minutes: 30
     needs: [lint]
     strategy:
       matrix:

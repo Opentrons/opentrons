@@ -34,7 +34,7 @@ env:
 jobs:
   js-unit-test:
     name: 'labware library unit tests'
-    timeout-minutes: '20'
+    timeout-minutes: 20
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
@@ -60,7 +60,7 @@ jobs:
           yarn jest --coverage=true --ci=true labware-library/
   e2e-test:
     name: 'labware library e2e tests on ${{ matrix.os }}'
-    timeout-minutes: '30'
+    timeout-minutes: 30
     strategy:
       matrix:
         os: ['ubuntu-latest', 'macos-latest']

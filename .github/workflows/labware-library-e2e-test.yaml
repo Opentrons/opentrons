@@ -32,7 +32,7 @@ env:
 jobs:
   checks:
     name: 'LL e2e tests'
-    timeout-minutes: '40'
+    timeout-minutes: 40
     strategy:
       matrix:
         os: ['ubuntu-latest', 'macos-latest']
