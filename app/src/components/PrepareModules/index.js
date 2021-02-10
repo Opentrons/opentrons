@@ -12,13 +12,13 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   sendModuleCommand,
   getModuleType,
-} from '../../modules'
+} from '../../redux/modules'
 import { DeckMap } from '../DeckMap'
 import { Portal } from '../portal'
 import styles from './styles.css'
 
-import type { Dispatch } from '../../types'
-import type { AttachedModule } from '../../modules/types'
+import type { Dispatch } from '../../redux/types'
+import type { AttachedModule } from '../../redux/modules/types'
 
 const LID_OPEN_DELAY_MS = 30 * 1000
 type Props = {| robotName: string, modules: Array<AttachedModule> |}

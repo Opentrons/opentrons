@@ -30,12 +30,12 @@ import {
   SecondaryBtn,
 } from '@opentrons/components'
 
-import * as Sessions from '../../sessions'
+import * as Sessions from '../../redux/sessions'
 import { labwareImages } from './labwareImages'
 import { NeedHelpLink } from './NeedHelpLink'
 import { ChooseTipRack } from './ChooseTipRack'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { SessionType } from '../../sessions/types'
+import type { SessionType } from '../../redux/sessions/types'
 import type { CalibrationPanelProps, Intent } from './types'
 import {
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,

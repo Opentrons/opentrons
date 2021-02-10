@@ -4,7 +4,7 @@ import path from 'path'
 import { readFile, ensureDir } from 'fs-extra'
 import { app } from 'electron'
 
-import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
+import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from '../log'
 import { getConfig } from '../config'
 import { CURRENT_VERSION } from '../update'
@@ -21,7 +21,7 @@ import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
 import type {
   BuildrootUpdateInfo,
   BuildrootAction,
-} from '@opentrons/app/src/buildroot/types'
+} from '@opentrons/app/src/redux/buildroot/types'
 
 const log = createLogger('buildroot/index')
 

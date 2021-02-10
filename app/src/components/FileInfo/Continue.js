@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { getCalibrateLocation } from '../../nav'
+import { getCalibrateLocation } from '../../redux/nav'
 
 import {
   useHoverTooltip,

@@ -3,8 +3,8 @@ import * as React from 'react'
 import { mount } from 'enzyme'
 import type { Mount } from '@opentrons/components'
 
-import { mockDeckCalTipRack } from '../../../sessions/__fixtures__'
-import * as Sessions from '../../../sessions'
+import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
+import * as Sessions from '../../../redux/sessions'
 import { SaveXYPoint } from '../SaveXYPoint'
 
 const currentStepBySlot = {

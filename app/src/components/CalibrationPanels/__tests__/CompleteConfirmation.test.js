@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { mockDeckCalTipRack } from '../../../sessions/__fixtures__'
-import * as Sessions from '../../../sessions'
+import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
+import * as Sessions from '../../../redux/sessions'
 
 import { CompleteConfirmation } from '../CompleteConfirmation'
 

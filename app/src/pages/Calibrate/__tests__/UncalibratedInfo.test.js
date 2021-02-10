@@ -3,16 +3,16 @@ import React from 'react'
 import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
 import { PrimaryBtn } from '@opentrons/components'
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
 import wellPlate96Def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { UncalibratedInfo } from '../UncalibratedInfo'
-import { selectors as robotSelectors } from '../../../robot'
+import { selectors as robotSelectors } from '../../../redux/robot'
 
-import type { TipracksByMountMap, Labware } from '../../../robot/types'
+import type { TipracksByMountMap, Labware } from '../../../redux/robot/types'
 
-jest.mock('../../../robot/selectors')
+jest.mock('../../../redux/robot/selectors')
 
 const mockGetUnconfirmedLabware: JestMockFn<
   [State],

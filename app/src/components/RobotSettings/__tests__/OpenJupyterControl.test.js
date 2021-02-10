@@ -4,12 +4,12 @@ import { mountWithProviders } from '@opentrons/components/__utils__'
 import { SecondaryBtn } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import * as Analytics from '../../../analytics'
+import * as Analytics from '../../../redux/analytics'
 import { OpenJupyterControl } from '../OpenJupyterControl'
 
-import type { AnalyticsEvent } from '../../../analytics/types'
+import type { AnalyticsEvent } from '../../../redux/analytics/types'
 
-jest.mock('../../../analytics')
+jest.mock('../../../redux/analytics')
 
 const useTrackEvent: JestMockFn<[], (AnalyticsEvent) => void> =
   Analytics.useTrackEvent

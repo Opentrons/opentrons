@@ -5,7 +5,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import { LabeledValue } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { AttachedModule } from '../../modules/types'
+import type { AttachedModule } from '../../redux/modules/types'
 
 type Props = {|
   module: AttachedModule,

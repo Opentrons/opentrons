@@ -7,7 +7,7 @@ import type {
   CalibrationLabware,
   CalibrationCheckInstrument,
   CalibrationCheckComparisonByPipette,
-} from '../../sessions/types'
+} from '../../redux/sessions/types'
 
 import typeof {
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,

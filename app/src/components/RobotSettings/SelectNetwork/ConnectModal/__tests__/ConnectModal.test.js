@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Formik } from 'formik'
 import { shallow, mount } from 'enzyme'
 
-import * as Fixtures from '../../../../../networking/__fixtures__'
+import * as Fixtures from '../../../../../redux/networking/__fixtures__'
 import * as FormFields from '../form-fields'
 
 import { ConnectModal, ConnectModalComponent } from '..'

@@ -3,20 +3,20 @@ import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../i18n'
-import * as RobotControls from '../../../robot-controls'
-import * as RobotAdmin from '../../../robot-admin'
-import * as RobotSelectors from '../../../robot/selectors'
+import * as RobotControls from '../../../redux/robot-controls'
+import * as RobotAdmin from '../../../redux/robot-admin'
+import * as RobotSelectors from '../../../redux/robot/selectors'
 
 import { ControlsCard } from '../ControlsCard'
-import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
+import { CONNECTABLE, UNREACHABLE } from '../../../redux/discovery'
 
-import type { State, Action } from '../../../types'
-import type { ViewableRobot } from '../../../discovery/types'
+import type { State, Action } from '../../../redux/types'
+import type { ViewableRobot } from '../../../redux/discovery/types'
 
-jest.mock('../../../robot-controls/selectors')
-jest.mock('../../../robot/selectors')
-jest.mock('../../../sessions/selectors')
-jest.mock('../../../calibration/selectors')
+jest.mock('../../../redux/robot-controls/selectors')
+jest.mock('../../../redux/robot/selectors')
+jest.mock('../../../redux/sessions/selectors')
+jest.mock('../../../redux/calibration/selectors')
 
 jest.mock('../CheckCalibrationControl', () => ({
   CheckCalibrationControl: () => <></>,

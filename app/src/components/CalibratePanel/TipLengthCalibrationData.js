@@ -7,7 +7,7 @@ import {
   DIRECTION_COLUMN,
   SPACING_2,
 } from '@opentrons/components'
-import type { TipLengthCalibration } from '../../calibration/api-types'
+import type { TipLengthCalibration } from '../../redux/calibration/api-types'
 
 // TODO(bc, 2020-08-03): i18n
 const NOT_CALIBRATED = 'Not yet calibrated'

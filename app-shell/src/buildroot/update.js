@@ -5,7 +5,7 @@
 import path from 'path'
 
 import { fetch, postFile } from '../http'
-import type { RobotHost } from '@opentrons/app/src/robot-api/types'
+import type { RobotHost } from '@opentrons/app/src/redux/robot-api/types'
 
 const PREMIGRATION_WHL_DIR = path.join(
   // NOTE: __dirname refers to output directory

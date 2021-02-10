@@ -11,14 +11,14 @@ import {
   addCustomLabware,
   clearAddCustomLabwareFailure,
   getAddLabwareFailure,
-} from '../../custom-labware'
+} from '../../redux/custom-labware'
 
 import { CardCopy } from '../layout'
 import { ManagePath } from './ManagePath'
 import { AddLabware } from './AddLabware'
 import { AddLabwareFailureModal } from './AddLabwareFailureModal'
 
-import type { Dispatch } from '../../types'
+import type { Dispatch } from '../../redux/types'
 
 // TODO(mc, 2019-10-17): i18n
 const LABWARE_MANAGEMENT = 'Labware Management'

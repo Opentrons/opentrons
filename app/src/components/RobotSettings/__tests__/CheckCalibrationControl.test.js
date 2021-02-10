@@ -3,18 +3,18 @@ import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../i18n'
-import * as Sessions from '../../../sessions'
+import * as Sessions from '../../../redux/sessions'
 
 import { Tooltip, PrimaryBtn, SecondaryBtn } from '@opentrons/components'
 import { TitledControl } from '../../TitledControl'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
-import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
+import { mockCalibrationCheckSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
-jest.mock('../../../robot-api/selectors')
-jest.mock('../../../sessions/selectors')
+jest.mock('../../../redux/robot-api/selectors')
+jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../CheckCalibration', () => ({
   CheckCalibration: () => <></>,
 }))

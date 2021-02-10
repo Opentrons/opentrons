@@ -24,7 +24,7 @@ import type {
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
   PipetteSettingsFieldsUpdate,
-} from '../../pipettes/types'
+} from '../../redux/pipettes/types'
 
 import type { FormValues } from './ConfigFormGroup'
 

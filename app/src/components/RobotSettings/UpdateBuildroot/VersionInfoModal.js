@@ -2,8 +2,8 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
-import { getRobotApiVersion } from '../../../discovery'
-import { CURRENT_VERSION, getAvailableShellUpdate } from '../../../shell'
+import { getRobotApiVersion } from '../../../redux/discovery'
+import { CURRENT_VERSION, getAvailableShellUpdate } from '../../../redux/shell'
 
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../portal'
@@ -14,8 +14,8 @@ import { SkipAppUpdateMessage } from './SkipAppUpdateMessage'
 import { SyncRobotMessage } from './SyncRobotMessage'
 import styles from './styles.css'
 
-import type { BuildrootUpdateType } from '../../../buildroot/types'
-import type { ViewableRobot } from '../../../discovery/types'
+import type { BuildrootUpdateType } from '../../../redux/buildroot/types'
+import type { ViewableRobot } from '../../../redux/discovery/types'
 
 export type VersionInfoModalProps = {|
   robot: ViewableRobot,

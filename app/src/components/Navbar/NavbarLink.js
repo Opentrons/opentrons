@@ -24,7 +24,7 @@ import {
 } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
-import type { NavLocation } from '../../nav/types'
+import type { NavLocation } from '../../redux/nav/types'
 
 export type NavbarLinkProps = {|
   ...NavLocation,

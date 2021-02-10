@@ -4,8 +4,8 @@ import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../i18n'
 
-import * as Sessions from '../../../sessions'
-import * as RobotApi from '../../../robot-api'
+import * as Sessions from '../../../redux/sessions'
+import * as RobotApi from '../../../redux/robot-api'
 
 import {
   DECK_CAL_STATUS_OK,
@@ -16,14 +16,14 @@ import {
   CALIBRATION_SOURCE_FACTORY,
   CALIBRATION_SOURCE_LEGACY,
   CALIBRATION_SOURCE_UNKNOWN,
-} from '../../../calibration'
+} from '../../../redux/calibration'
 import { DeckCalibrationControl } from '../DeckCalibrationControl'
 import { InlineCalibrationWarning } from '../../InlineCalibrationWarning'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
-jest.mock('../../../robot-api/selectors')
-jest.mock('../../../sessions/selectors')
+jest.mock('../../../redux/robot-api/selectors')
+jest.mock('../../../redux/sessions/selectors')
 
 const mockGetRequestById: JestMockFn<
   [State, string],

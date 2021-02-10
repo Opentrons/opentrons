@@ -6,9 +6,9 @@ import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 
-import * as Networking from '../../../../networking'
-import * as RobotApi from '../../../../robot-api'
-import * as Fixtures from '../../../../networking/__fixtures__'
+import * as Networking from '../../../../redux/networking'
+import * as RobotApi from '../../../../redux/robot-api'
+import * as Fixtures from '../../../../redux/networking/__fixtures__'
 import * as Constants from '../constants'
 
 import { Portal } from '../../../portal'
@@ -18,10 +18,10 @@ import { DisconnectModal } from '../DisconnectModal'
 import { ResultModal } from '../ResultModal'
 import { SelectNetwork } from '..'
 
-import type { State } from '../../../../types'
+import type { State } from '../../../../redux/types'
 
-jest.mock('../../../../networking/selectors')
-jest.mock('../../../../robot-api/selectors')
+jest.mock('../../../../redux/networking/selectors')
+jest.mock('../../../../redux/robot-api/selectors')
 
 // mock out ConnectModal to prevent warning logs from async formik
 // validation happening outside an `act`

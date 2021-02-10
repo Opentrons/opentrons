@@ -10,11 +10,11 @@ import {
   COLOR_WARNING,
 } from '@opentrons/components'
 
-import * as Analytics from '../../../analytics'
-import { U2E_DRIVER_UPDATE_URL } from '../../../system-info'
+import * as Analytics from '../../../redux/analytics'
+import { U2E_DRIVER_UPDATE_URL } from '../../../redux/system-info'
 import { U2EDriverWarning } from '../U2EDriverWarning'
 
-jest.mock('../../../analytics')
+jest.mock('../../../redux/analytics')
 
 const useTrackEvent: JestMockFn<[], $Call<typeof Analytics.useTrackEvent>> =
   Analytics.useTrackEvent

@@ -1,9 +1,9 @@
 // @flow
 import noop from 'lodash/noop'
 import { app } from 'electron'
-import * as Fixtures from '@opentrons/app/src/system-info/__fixtures__'
-import * as SystemInfo from '@opentrons/app/src/system-info'
-import { uiInitialized } from '@opentrons/app/src/shell'
+import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
+import * as SystemInfo from '@opentrons/app/src/redux/system-info'
+import { uiInitialized } from '@opentrons/app/src/redux/shell'
 import * as OS from '../../os'
 import * as UsbDevices from '../usb-devices'
 import * as NetworkInterfaces from '../network-interfaces'

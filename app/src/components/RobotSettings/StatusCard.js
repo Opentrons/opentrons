@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import {
   selectors as robotSelectors,
   actions as robotActions,
-} from '../../robot'
+} from '../../redux/robot'
 
 import {
   Card,
@@ -18,11 +18,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING_3,
 } from '@opentrons/components'
-import { CONNECTABLE } from '../../discovery'
+import { CONNECTABLE } from '../../redux/discovery'
 import { LabeledValue } from '../structure'
 
-import type { Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery/types'
+import type { Dispatch } from '../../redux/types'
+import type { ViewableRobot } from '../../redux/discovery/types'
 
 type Props = {| robot: ViewableRobot |}
 

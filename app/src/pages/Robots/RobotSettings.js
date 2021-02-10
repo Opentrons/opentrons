@@ -7,24 +7,24 @@ import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 import {
   selectors as robotSelectors,
   actions as robotActions,
-} from '../../robot'
-import { CONNECTABLE, REACHABLE } from '../../discovery'
+} from '../../redux/robot'
+import { CONNECTABLE, REACHABLE } from '../../redux/discovery'
 import {
   UPGRADE,
   getBuildrootUpdateSeen,
   getBuildrootUpdateDisplayInfo,
   getBuildrootUpdateInProgress,
   getBuildrootUpdateAvailable,
-} from '../../buildroot'
+} from '../../redux/buildroot'
 
-import { getRobotRestarting } from '../../robot-admin'
+import { getRobotRestarting } from '../../redux/robot-admin'
 import {
   getMovementStatus,
   getMovementError,
   clearMovementStatus,
   HOMING,
-} from '../../robot-controls'
-import { getRobotRestartRequired } from '../../robot-settings'
+} from '../../redux/robot-controls'
+import { getRobotRestartRequired } from '../../redux/robot-settings'
 
 import { SpinnerModalPage } from '@opentrons/components'
 import { ErrorModal } from '../../components/modals'
@@ -40,9 +40,9 @@ import { RestartRequiredBanner } from '../../components/RobotSettings/RestartReq
 import { ResetRobotModal } from '../../components/RobotSettings/ResetRobotModal'
 
 import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery/types'
-import type { ShellUpdateState } from '../../shell/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { ViewableRobot } from '../../redux/discovery/types'
+import type { ShellUpdateState } from '../../redux/shell/types'
 
 type OP = {|
   ...ContextRouter,

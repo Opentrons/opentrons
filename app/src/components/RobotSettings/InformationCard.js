@@ -20,17 +20,17 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-import { getBuildrootUpdateDisplayInfo } from '../../buildroot'
-import { checkShellUpdate } from '../../shell'
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { checkShellUpdate } from '../../redux/shell'
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
-} from '../../discovery'
+} from '../../redux/discovery'
 import { LabeledValue } from '../structure'
 
-import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { ViewableRobot } from '../../redux/discovery/types'
 
 export type InformationCardProps = {|
   robot: ViewableRobot,

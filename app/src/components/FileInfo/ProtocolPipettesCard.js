@@ -12,7 +12,7 @@ import {
   getProtocolPipettesMatching,
   getProtocolPipettesCalibrated,
   getSomeProtocolPipettesInexact,
-} from '../../pipettes'
+} from '../../redux/pipettes'
 import { InstrumentItem } from './InstrumentItem'
 import { SectionContentHalf } from '../layout'
 import { InfoSection } from './InfoSection'
@@ -20,7 +20,7 @@ import { MissingItemWarning } from './MissingItemWarning'
 
 import styles from './styles.css'
 
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 
 export type ProtocolPipettesCardProps = {| robotName: string |}
 

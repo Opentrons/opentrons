@@ -5,13 +5,13 @@ import { mount } from 'enzyme'
 
 import { ListLabwareCard } from '..'
 import { LabwareList } from '../LabwareList'
-import * as LabwareFixtures from '../../../custom-labware/__fixtures__'
-import * as LabwareSelectors from '../../../custom-labware/selectors'
-import * as LabwareActions from '../../../custom-labware/actions'
+import * as LabwareFixtures from '../../../redux/custom-labware/__fixtures__'
+import * as LabwareSelectors from '../../../redux/custom-labware/selectors'
+import * as LabwareActions from '../../../redux/custom-labware/actions'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
-jest.mock('../../../custom-labware/selectors')
+jest.mock('../../../redux/custom-labware/selectors')
 
 const mockGetCustomLabware: JestMockFn<
   [State],

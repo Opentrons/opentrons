@@ -5,17 +5,17 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import { Card, useInterval } from '@opentrons/components'
-import { CONNECTABLE } from '../../discovery'
+import { CONNECTABLE } from '../../redux/discovery'
 import {
   fetchStatus,
   getInternetStatus,
   getNetworkInterfaces,
-} from '../../networking'
+} from '../../redux/networking'
 import { SelectNetwork } from './SelectNetwork'
 import { ConnectionStatusMessage, ConnectionInfo } from './connection'
 
-import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { ViewableRobot } from '../../redux/discovery/types'
 
 type Props = {|
   robot: ViewableRobot,

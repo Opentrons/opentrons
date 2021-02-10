@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import { ModuleItem, NoModulesMessage } from '../ModuleItem'
 
-import type { AttachedModule } from '../../modules/types'
+import type { AttachedModule } from '../../redux/modules/types'
 
 type Props = {|
   modules: Array<AttachedModule>,

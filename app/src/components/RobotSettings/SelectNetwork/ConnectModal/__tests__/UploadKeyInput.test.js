@@ -4,13 +4,13 @@ import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 
-import * as Fixtures from '../../../../../networking/__fixtures__'
-import * as Networking from '../../../../../networking'
+import * as Fixtures from '../../../../../redux/networking/__fixtures__'
+import * as Networking from '../../../../../redux/networking'
 import { UploadKeyInput } from '../UploadKeyInput'
 
-import type { State } from '../../../../../types'
+import type { State } from '../../../../../redux/types'
 
-jest.mock('../../../../../networking/selectors')
+jest.mock('../../../../../redux/networking/selectors')
 
 const mockState = { state: true, mock: true }
 const mockRobotName = 'robot-name'

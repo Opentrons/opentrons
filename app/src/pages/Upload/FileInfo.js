@@ -5,7 +5,7 @@ import { Splash, SpinnerModal, AlertItem } from '@opentrons/components'
 import { Page } from '../../components/Page'
 import { FileInfo as FileInfoContents } from '../../components/FileInfo'
 
-import type { Robot } from '../../discovery/types'
+import type { Robot } from '../../redux/discovery/types'
 
 // TODO(mc, 2019-11-25): i18n
 const UPLOAD_AND_SIMULATE_PROTOCOL = 'Upload and Simulate Protocol'

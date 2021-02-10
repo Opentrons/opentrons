@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { OutlineButton } from '@opentrons/components'
-import { selectors as robotSelectors, type Labware } from '../../robot'
+import { selectors as robotSelectors, type Labware } from '../../redux/robot'
 
 import styles from './styles.css'
 

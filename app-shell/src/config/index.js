@@ -6,8 +6,8 @@ import get from 'lodash/get'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
 
-import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
-import * as Cfg from '@opentrons/app/src/config'
+import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import * as Cfg from '@opentrons/app/src/redux/config'
 
 import { createLogger } from '../log'
 import { DEFAULTS_V0, migrate } from './migrate'

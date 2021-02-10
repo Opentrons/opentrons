@@ -8,11 +8,11 @@ import {
   fetchModules,
   getAttachedModules,
   getModuleControlsDisabled,
-} from '../../modules'
-import { getConnectedRobotName } from '../../robot/selectors'
+} from '../../redux/modules'
+import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { ModulesCardContents } from '../InstrumentSettings/ModulesCardContents'
 
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 
 type Props = {| robotName: string |}
 

@@ -6,19 +6,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { saveAs } from 'file-saver'
 import { Trans, useTranslation } from 'react-i18next'
 
-import type { Dispatch, State } from '../../types'
-import * as Calibration from '../../calibration'
-import * as PipetteOffset from '../../calibration/pipette-offset'
-import * as Pipettes from '../../pipettes'
-import * as TipLength from '../../calibration/tip-length'
-import { CONNECTABLE } from '../../discovery'
-import type { ViewableRobot } from '../../discovery/types'
+import type { Dispatch, State } from '../../redux/types'
+import * as Calibration from '../../redux/calibration'
+import * as PipetteOffset from '../../redux/calibration/pipette-offset'
+import * as Pipettes from '../../redux/pipettes'
+import * as TipLength from '../../redux/calibration/tip-length'
+import { CONNECTABLE } from '../../redux/discovery'
+import type { ViewableRobot } from '../../redux/discovery/types'
 import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
-} from '../../pipettes/types'
-import { selectors as robotSelectors } from '../../robot'
-import { useTrackEvent } from '../../analytics'
+} from '../../redux/pipettes/types'
+import { selectors as robotSelectors } from '../../redux/robot'
+import { useTrackEvent } from '../../redux/analytics'
 
 import {
   useInterval,

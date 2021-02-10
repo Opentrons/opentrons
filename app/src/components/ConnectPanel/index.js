@@ -9,9 +9,9 @@ import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
-} from '../../discovery'
+} from '../../redux/discovery'
 
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 
 import { SidePanel } from '@opentrons/components'
 import { RobotList } from './RobotList'
@@ -23,7 +23,7 @@ import type {
   Robot,
   ReachableRobot,
   UnreachableRobot,
-} from '../../discovery/types'
+} from '../../redux/discovery/types'
 
 type SP = {|
   robots: Array<Robot>,

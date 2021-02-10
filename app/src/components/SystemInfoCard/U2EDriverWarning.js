@@ -18,9 +18,9 @@ import {
   EVENT_U2E_DRIVER_LINK_CLICKED,
   U2E_DRIVER_OUTDATED_MESSAGE,
   U2E_DRIVER_OUTDATED_CTA,
-} from '../../system-info'
+} from '../../redux/system-info'
 
-import { useTrackEvent } from '../../analytics'
+import { useTrackEvent } from '../../redux/analytics'
 
 const GET_UPDATE = 'get update'
 

@@ -2,31 +2,31 @@
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
-import * as Config from '../../../config'
+import * as Config from '../../../redux/config'
 import {
   getCalibrationForPipette,
   getTipLengthForPipetteAndTiprack,
-} from '../../../calibration'
+} from '../../../redux/calibration'
 import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalibratePipetteOffset'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
 import { PipetteInfo } from '../PipetteInfo'
 import { mockAttachedPipette } from '../__fixtures__'
-import { mockConnectedRobot } from '../../../discovery/__fixtures__'
-import { mockPipetteOffsetCalibration1 } from '../../../calibration/pipette-offset/__fixtures__'
-import { mockTipLengthCalibration1 } from '../../../calibration/tip-length/__fixtures__'
-import { getCustomLabwareDefinitions } from '../../../custom-labware'
-import { getRobotByName } from '../../../discovery'
-import { getIsRunning } from '../../../robot/selectors'
+import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import { mockPipetteOffsetCalibration1 } from '../../../redux/calibration/pipette-offset/__fixtures__'
+import { mockTipLengthCalibration1 } from '../../../redux/calibration/tip-length/__fixtures__'
+import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
+import { getRobotByName } from '../../../redux/discovery'
+import { getIsRunning } from '../../../redux/robot/selectors'
 
-jest.mock('../../../calibration')
-jest.mock('../../../config')
-jest.mock('../../../custom-labware')
+jest.mock('../../../redux/calibration')
+jest.mock('../../../redux/config')
+jest.mock('../../../redux/custom-labware')
 jest.mock('../../CalibratePipetteOffset/useCalibratePipetteOffset')
 jest.mock('react-router-dom', () => ({ Link: () => <></> }))
-jest.mock('../../../discovery')
-jest.mock('../../../robot/selectors')
+jest.mock('../../../redux/discovery')
+jest.mock('../../../redux/robot/selectors')
 
 const mockGetCustomLabwareDefinitions: JestMockFn<
   [State],

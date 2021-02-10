@@ -7,7 +7,7 @@ import { ConfirmPipette } from '../ConfirmPipette'
 import { CheckPipettesButton } from '../CheckPipettesButton'
 import { TitleBar, Icon } from '@opentrons/components'
 
-import type { PipetteOffsetCalibration } from '../../../calibration/types'
+import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'
 import type { Props } from '../ConfirmPipette'
 import type {
   PipetteNameSpecs,

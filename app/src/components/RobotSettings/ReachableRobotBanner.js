@@ -7,9 +7,9 @@ import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
   HEALTH_STATUS_UNREACHABLE,
-} from '../../discovery'
+} from '../../redux/discovery'
 
-import type { ReachableRobot, HealthStatus } from '../../discovery/types'
+import type { ReachableRobot, HealthStatus } from '../../redux/discovery/types'
 
 type State = {| dismissed: boolean |}
 

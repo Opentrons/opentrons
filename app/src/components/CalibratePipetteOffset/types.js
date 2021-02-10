@@ -1,13 +1,13 @@
 // @flow
-import type { Action } from '../../types'
+import type { Action } from '../../redux/types'
 import type {
   SessionCommandParams,
   PipetteOffsetCalibrationSession,
   CalibrationLabware,
-} from '../../sessions/types'
+} from '../../redux/sessions/types'
 import type { PipetteOffsetIntent } from '../CalibrationPanels/types'
 
-import type { PipetteOffsetCalibrationStep } from '../../sessions/pipette-offset-calibration/types'
+import type { PipetteOffsetCalibrationStep } from '../../redux/sessions/pipette-offset-calibration/types'
 
 export type CalibratePipetteOffsetParentProps = {|
   robotName: string,

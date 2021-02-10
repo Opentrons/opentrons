@@ -4,19 +4,19 @@ import uniqueId from 'lodash/uniqueId'
 import { mountWithStore } from '@opentrons/components/__utils__'
 import { act } from 'react-dom/test-utils'
 
-import * as RobotApi from '../../../robot-api'
-import * as Sessions from '../../../sessions'
-import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
+import * as RobotApi from '../../../redux/robot-api'
+import * as Sessions from '../../../redux/sessions'
+import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
 import { useCalibratePipetteOffset } from '../useCalibratePipetteOffset'
 import { INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL } from '../../CalibrationPanels'
-import { pipetteOffsetCalibrationStarted } from '../../../analytics'
+import { pipetteOffsetCalibrationStarted } from '../../../redux/analytics'
 
-import type { State } from '../../../types'
-import type { SessionType } from '../../../sessions'
+import type { State } from '../../../redux/types'
+import type { SessionType } from '../../../redux/sessions'
 
-jest.mock('../../../sessions/selectors')
-jest.mock('../../../robot-api/selectors')
+jest.mock('../../../redux/sessions/selectors')
+jest.mock('../../../redux/robot-api/selectors')
 jest.mock('lodash/uniqueId')
 
 const mockUniqueId: JestMockFn<[string | void], string> = uniqueId

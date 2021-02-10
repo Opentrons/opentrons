@@ -3,14 +3,14 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { SidePanelGroup, TitledList } from '@opentrons/components'
-import { fetchLabwareCalibrations } from '../../calibration'
+import { fetchLabwareCalibrations } from '../../redux/calibration'
 import {
   selectors as robotSelectors,
   actions as robotActions,
-} from '../../robot'
+} from '../../redux/robot'
 import { LabwareListItem } from './LabwareListItem'
-import type { BaseProtocolLabware } from '../../calibration/types'
-import type { Dispatch } from '../../types'
+import type { BaseProtocolLabware } from '../../redux/calibration/types'
+import type { Dispatch } from '../../redux/types'
 
 // TODO(bc, 2019-08-03): i18n
 const TITLE = 'Labware Calibration'

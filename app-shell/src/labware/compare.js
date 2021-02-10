@@ -1,6 +1,6 @@
 // @flow
 
-import type { CheckedLabwareFile } from '@opentrons/app/src/custom-labware/types'
+import type { CheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
 
 export function sameIdentity(
   a: CheckedLabwareFile,

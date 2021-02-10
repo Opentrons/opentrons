@@ -22,10 +22,10 @@ import {
   fetchSettings,
   updateSetting,
   getRobotSettings,
-} from '../../robot-settings'
-import { CONNECTABLE } from '../../discovery'
-import { downloadLogs } from '../../shell/robot-logs/actions'
-import { getRobotLogsDownloading } from '../../shell/robot-logs/selectors'
+} from '../../redux/robot-settings'
+import { CONNECTABLE } from '../../redux/discovery'
+import { downloadLogs } from '../../redux/shell/robot-logs/actions'
+import { getRobotLogsDownloading } from '../../redux/shell/robot-logs/selectors'
 import { Portal } from '../portal'
 import { LabeledValue, Divider } from '../structure'
 import { ToggleBtn } from '../ToggleBtn'
@@ -33,9 +33,9 @@ import { ToggleBtn } from '../ToggleBtn'
 import { UpdateFromFileControl } from './UpdateFromFileControl'
 import { OpenJupyterControl } from './OpenJupyterControl'
 
-import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery/types'
-import type { RobotSettings } from '../../robot-settings/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { ViewableRobot } from '../../redux/discovery/types'
+import type { RobotSettings } from '../../redux/robot-settings/types'
 
 export type AdvancedSettingsCardProps = {|
   robot: ViewableRobot,

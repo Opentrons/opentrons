@@ -4,13 +4,17 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { useRouteMatch, Switch, Route, Redirect } from 'react-router-dom'
 
-import type { State, Dispatch } from '../../types'
-import type { Pipette, Labware, NextTiprackPipetteInfo } from '../../robot'
+import type { State, Dispatch } from '../../redux/types'
+import type {
+  Pipette,
+  Labware,
+  NextTiprackPipetteInfo,
+} from '../../redux/robot'
 
-import { getConnectedRobot } from '../../discovery'
+import { getConnectedRobot } from '../../redux/discovery'
 
-import { selectors as robotSelectors } from '../../robot'
-import { getUncalibratedTipracksByMount } from '../../pipettes/selectors'
+import { selectors as robotSelectors } from '../../redux/robot'
+import { getUncalibratedTipracksByMount } from '../../redux/pipettes/selectors'
 import { Pipettes as CalibratePipettes } from './Pipettes'
 import { Labware as CalibrateLabware } from './Labware'
 

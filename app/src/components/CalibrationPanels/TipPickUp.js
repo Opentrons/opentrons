@@ -24,7 +24,7 @@ import {
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import * as Sessions from '../../sessions'
+import * as Sessions from '../../redux/sessions'
 import type { Axis, Sign, StepSize } from '../JogControls/types'
 import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'

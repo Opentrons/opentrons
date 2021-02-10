@@ -4,23 +4,23 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import { SpinnerModalPage } from '@opentrons/components'
 
-import * as RobotApi from '../../robot-api'
-import * as Sessions from '../../sessions'
-import { getPipetteOffsetCalibrationSession } from '../../sessions/pipette-offset-calibration/selectors'
+import * as RobotApi from '../../redux/robot-api'
+import * as Sessions from '../../redux/sessions'
+import { getPipetteOffsetCalibrationSession } from '../../redux/sessions/pipette-offset-calibration/selectors'
 
-import type { State } from '../../types'
+import type { State } from '../../redux/types'
 import type {
   SessionCommandString,
   PipetteOffsetCalibrationSession,
   PipetteOffsetCalibrationSessionParams,
-} from '../../sessions/types'
-import type { RequestState } from '../../robot-api/types'
+} from '../../redux/sessions/types'
+import type { RequestState } from '../../redux/robot-api/types'
 import type { PipetteOffsetIntent } from '../CalibrationPanels/types'
 
 import { Portal } from '../portal'
 import { CalibratePipetteOffset } from '../CalibratePipetteOffset'
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../CalibrationPanels'
-import { pipetteOffsetCalibrationStarted } from '../../analytics'
+import { pipetteOffsetCalibrationStarted } from '../../redux/analytics'
 
 // pipette calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: Array<SessionCommandString> = [

@@ -3,16 +3,16 @@ import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 import { i18n } from '../../../i18n'
 
-import * as Networking from '../../../networking'
-import { CONNECTABLE } from '../../../discovery'
+import * as Networking from '../../../redux/networking'
+import { CONNECTABLE } from '../../../redux/discovery'
 import { ConnectionCard } from '../ConnectionCard'
 import { SelectNetwork } from '../SelectNetwork'
 import { ConnectionStatusMessage } from '../connection'
 
-import type { State } from '../../../types'
-import type { ViewableRobot } from '../../../discovery/types'
+import type { State } from '../../../redux/types'
+import type { ViewableRobot } from '../../../redux/discovery/types'
 
-jest.mock('../../../networking/selectors')
+jest.mock('../../../redux/networking/selectors')
 jest.mock('../../../components/RobotSettings/SelectNetwork', () => ({
   SelectNetwork: () => {
     return <></>

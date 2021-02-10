@@ -22,13 +22,13 @@ import {
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import * as Sessions from '../../sessions'
+import * as Sessions from '../../redux/sessions'
 import type {
   SessionType,
   SessionCommandString,
   CalibrationCheckInstrument,
   CalibrationLabware,
-} from '../../sessions/types'
+} from '../../redux/sessions/types'
 import type { CalibrationPanelProps } from './types'
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 import styles from './styles.css'

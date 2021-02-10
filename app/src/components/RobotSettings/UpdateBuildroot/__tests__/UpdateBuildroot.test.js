@@ -2,15 +2,15 @@
 import * as React from 'react'
 
 import { mountWithStore } from '@opentrons/components/__utils__'
-import { mockConnectableRobot as mockRobot } from '../../../../discovery/__fixtures__'
-import * as Buildroot from '../../../../buildroot'
+import { mockConnectableRobot as mockRobot } from '../../../../redux/discovery/__fixtures__'
+import * as Buildroot from '../../../../redux/buildroot'
 import { UpdateBuildroot } from '..'
 import { VersionInfoModal } from '../VersionInfoModal'
 import { ViewUpdateModal } from '../ViewUpdateModal'
 import { InstallModal } from '../InstallModal'
 
-import type { State } from '../../../../types'
-import type { ViewableRobot } from '../../../../discovery/types'
+import type { State } from '../../../../redux/types'
+import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 // shallow render connected children
 jest.mock('../VersionInfoModal', () => ({
@@ -21,7 +21,7 @@ jest.mock('../ViewUpdateModal', () => ({
   ViewUpdateModal: () => <></>,
 }))
 
-jest.mock('../../../../buildroot/selectors')
+jest.mock('../../../../redux/buildroot/selectors')
 
 const getBuildrootUpdateAvailable: JestMockFn<
   [State, ViewableRobot],

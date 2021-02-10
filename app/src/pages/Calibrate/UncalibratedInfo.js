@@ -13,11 +13,11 @@ import {
 } from '@opentrons/components'
 
 import { CalibrationInfoContent } from '../../components/CalibrationInfoContent'
-import { PIPETTE_MOUNTS } from '../../pipettes'
-import { selectors as robotSelectors } from '../../robot'
+import { PIPETTE_MOUNTS } from '../../redux/pipettes'
+import { selectors as robotSelectors } from '../../redux/robot'
 
-import type { TipracksByMountMap } from '../../robot'
-import type { Dispatch } from '../../types'
+import type { TipracksByMountMap } from '../../redux/robot'
+import type { Dispatch } from '../../redux/types'
 
 const IS_CALIBRATED = 'Pipette tip length is calibrated.'
 const IS_NOT_CALIBRATED = 'Pipette tip length is not calibrated.'

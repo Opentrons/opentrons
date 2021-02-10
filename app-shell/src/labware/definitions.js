@@ -4,7 +4,7 @@ import fs from 'fs-extra'
 import { shell } from 'electron'
 
 import type { Dirent } from '../types'
-import type { UncheckedLabwareFile } from '@opentrons/app/src/custom-labware/types'
+import type { UncheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
 
 const RE_JSON_EXT = /\.json$/i
 

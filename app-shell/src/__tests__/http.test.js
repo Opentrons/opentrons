@@ -1,7 +1,7 @@
 import mockFetch from 'node-fetch'
 import isError from 'lodash/isError'
 
-import { HTTP_API_VERSION } from '@opentrons/app/src/robot-api/constants'
+import { HTTP_API_VERSION } from '@opentrons/app/src/redux/robot-api/constants'
 import * as Http from '../http'
 
 jest.mock('../config')

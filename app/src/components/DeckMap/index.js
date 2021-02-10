@@ -11,14 +11,14 @@ import type { ContextRouter } from 'react-router-dom'
 import { RobotWorkSpace, Module as ModuleItem } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 import {
   selectors as robotSelectors,
   type Labware,
   type SessionModule,
-} from '../../robot'
+} from '../../redux/robot'
 
-import { getMissingModules } from '../../modules'
+import { getMissingModules } from '../../redux/modules'
 
 import { LabwareItem } from './LabwareItem'
 

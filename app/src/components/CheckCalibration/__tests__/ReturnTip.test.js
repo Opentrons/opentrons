@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import * as Fixtures from '../../../sessions/__fixtures__'
-import * as Sessions from '../../../sessions'
+import * as Fixtures from '../../../redux/sessions/__fixtures__'
+import * as Sessions from '../../../redux/sessions'
 import { ReturnTip } from '../ReturnTip'
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails

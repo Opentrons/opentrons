@@ -6,12 +6,12 @@ import { push } from 'connected-react-router'
 import { PrimaryButton, AlertModal, SpinnerModal } from '@opentrons/components'
 import some from 'lodash/some'
 
-import { selectors as robotSelectors } from '../../robot'
-import type { Dispatch } from '../../types'
+import { selectors as robotSelectors } from '../../redux/robot'
+import type { Dispatch } from '../../redux/types'
 import pcrSealSrc from '../../assets/images/place_pcr_seal.png'
 import { Portal } from '../portal'
 import styles from './styles.css'
-import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../modules'
+import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../redux/modules'
 
 const IS_HOMING_MESSAGE = 'Returning tip and homing robot'
 

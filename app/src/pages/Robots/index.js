@@ -8,10 +8,10 @@ import {
   CONNECTABLE,
   getConnectedRobot,
   getViewableRobots,
-} from '../../discovery'
+} from '../../redux/discovery'
 
-import { getBuildrootRobot } from '../../buildroot'
-import { getShellUpdateState } from '../../shell'
+import { getBuildrootRobot } from '../../redux/buildroot'
+import { getShellUpdateState } from '../../redux/shell'
 
 import { Splash } from '@opentrons/components'
 import { Page } from '../../components/Page'

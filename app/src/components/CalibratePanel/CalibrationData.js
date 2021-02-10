@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Flex, Text, DIRECTION_COLUMN, SPACING_2 } from '@opentrons/components'
 import { CalibrationValues } from '../CalibrateLabware/CalibrationValues'
-import type { LabwareCalibrationData } from '../../calibration/labware/types'
+import type { LabwareCalibrationData } from '../../redux/calibration/labware/types'
 
 // TODO(bc, 2020-08-03): i18n
 const NOT_CALIBRATED = 'Not yet calibrated'

@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { PipetteCompatibility } from '../../pipettes/types'
+import type { PipetteCompatibility } from '../../redux/pipettes/types'
 
 const NOT_CALIBRATED = 'Not yet calibrated'
 const NOT_ATTACHED = 'Not attached'

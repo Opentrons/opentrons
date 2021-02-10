@@ -17,7 +17,7 @@ import {
   TOOLTIP_TOP_START,
 } from '@opentrons/components'
 
-import type { LabwareSummary } from '../../calibration/types'
+import type { LabwareSummary } from '../../redux/calibration/types'
 
 // TODO(mc, 2020-07-27): i18n
 const TYPE = 'Type'
