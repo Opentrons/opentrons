@@ -166,18 +166,26 @@ def test_override_save(ot_config_tempdir):
     assert new_pconf.quirks == []
 
 
-def test_mutable_configs_only(monkeypatch):
+@pytest.fixture
+def new_id_for_save() -> str:
+    """Fixture to provide a pipette id then delete it's generated file."""
+    r = 'aoa2109j09cj2a'
+    yield r
+
+    (CONFIG['pipette_config_overrides_dir'] / f'{r}.json').unlink()
+
+
+def test_mutable_configs_only(monkeypatch, new_id_for_save):
     # Test that only set mutable configs are populated in this dictionary
 
     monkeypatch.setattr(
         pipette_config, 'MUTABLE_CONFIGS', ['tipLength', 'plungerCurrent'])
 
-    new_id = 'aoa2109j09cj2a'
     model = 'p300_multi_v1'
 
-    pipette_config.save_overrides(new_id, {}, model)
+    pipette_config.save_overrides(new_id_for_save, {}, model)
 
-    config = pipette_config.list_mutable_configs(new_id)
+    config = pipette_config.list_mutable_configs(new_id_for_save)
     # instead of dealing with unordered lists, convert to set and check whether
     # these lists have a difference between them
     difference = set(list(config.keys())) - \
@@ -269,8 +277,12 @@ async def attached_pipettes(hardware, request):
             }
     }
     await hardware.cache_instruments()
-    return {k.name.lower(): v
-            for k, v in hardware._backend._attached_instruments.items()}
+    yield {k.name.lower(): v for k, v in
+           hardware._backend._attached_instruments.items()}
+
+    # Delete created config files
+    (CONFIG['pipette_config_overrides_dir'] / 'abc123.json').unlink()
+    (CONFIG['pipette_config_overrides_dir'] / 'abcd123.json').unlink()
 
 
 async def test_override(attached_pipettes):
