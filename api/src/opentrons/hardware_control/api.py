@@ -1152,12 +1152,9 @@ class API(HardwareAPILike):
         if pip is not None and cp_override != CriticalPoint.MOUNT:
             return pip.critical_point(cp_override)
         else:
-            # TODO: The smoothie’s z/a home position is calculated to provide
-            # the offset for a P300 single. Here we should decide whether we
-            # implicitly accept this as correct (by returning a null offset)
-            # or not (by returning an offset calculated to move back up the
-            # length of the P300 single).
-            return top_types.Point(0, 0, 0)
+            # This offset is required because the motor driver coordinate system is
+            # configured such that the end of a p300 single gen1's tip is 0.
+            return top_types.Point(0, 0, 30)
 
     # Gantry/frame (i.e. not pipette) config API
     def get_config(self) -> RobotConfig:
