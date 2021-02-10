@@ -79,7 +79,7 @@ stages:
       json:
         fields:
           dropTip:
-            value: -3.0
+            value: 1.0
     response:
       status_code: 200
       json: 
@@ -92,7 +92,7 @@ stages:
             min: -6.0
             max: 2.0
             default: -2.0
-            value: -3.0
+            value: 1.0
           dropTipCurrent: !anydict
           dropTipSpeed: !anydict
           pickUpCurrent: !anydict
