@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   useHoverTooltip,
@@ -18,14 +19,6 @@ import {
 } from '@opentrons/components'
 
 import type { LabwareSummary } from '../../redux/calibration/types'
-
-// TODO(mc, 2020-07-27): i18n
-const TYPE = 'Type'
-const QUANTITY = 'Quantity'
-const CALIBRATION_DATA = 'Calibration Data'
-const LEGACY_DEFINITION = 'N/A'
-const NOT_CALIBRATED = 'Not yet calibrated'
-const CALIBRATION_DESCRIPTION = 'Calibrated offset from labware origin point'
 
 export type ProtocolLabwareListProps = {|
   labware: Array<LabwareSummary>,
@@ -50,6 +43,7 @@ export function ProtocolLabwareList(
   props: ProtocolLabwareListProps
 ): React.Node {
   const { labware } = props
+  const { t } = useTranslation(['protocol_info', 'protocol_calibration'])
   const [calDescTooltipTargetProps, calDescTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP_START,
   })
@@ -57,11 +51,17 @@ export function ProtocolLabwareList(
   return (
     <Box fontSize={FONT_SIZE_BODY_1}>
       <Flex fontWeight={FONT_WEIGHT_SEMIBOLD}>
-        <Text {...TYPE_COL_STYLE}>{TYPE}</Text>
-        <Text {...QUANTITY_COL_STYLE}>{QUANTITY}</Text>
+        <Text {...TYPE_COL_STYLE}>
+          {t('protocol_info:required_type_title')}
+        </Text>
+        <Text {...QUANTITY_COL_STYLE}>
+          {t('protocol_info:required_quantity_title')}
+        </Text>
         <Flex {...CAL_DATA_COL_STYLE} {...calDescTooltipTargetProps}>
-          <Text>{CALIBRATION_DATA}</Text>
-          <Tooltip {...calDescTooltipProps}>{CALIBRATION_DESCRIPTION}</Tooltip>
+          <Text>{t('protocol_info:required_cal_data_title')}</Text>
+          <Tooltip {...calDescTooltipProps}>
+            {t('protocol_info:labware_cal_description')}
+          </Tooltip>
         </Flex>
       </Flex>
       <ul>
@@ -89,7 +89,7 @@ export function ProtocolLabwareList(
               <Text {...QUANTITY_COL_STYLE}>x {quantity}</Text>
               <Text {...CAL_DATA_COL_STYLE}>
                 {!calDataAvailable ? (
-                  LEGACY_DEFINITION
+                  t('protocol_info:labware_legacy_definition')
                 ) : calibration !== null ? (
                   <>
                     {renderCalValue('x', calibration.x)}
@@ -97,7 +97,7 @@ export function ProtocolLabwareList(
                     {renderCalValue('z', calibration.z)}
                   </>
                 ) : (
-                  NOT_CALIBRATED
+                  t('protocol_calibration:cal_data_not_calibrated')
                 )}
               </Text>
             </Flex>

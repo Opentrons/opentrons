@@ -132,7 +132,9 @@ function mapStateToProps(state: State, ownProps: OP): SP {
     modulesBySlot = mapValues(
       robotSelectors.getModulesBySlot(state),
       module => {
-        const present = !missingModules.some(mm => mm.model === module.model)
+        const present = !missingModules.some(
+          mm => mm.model === module.model && mm.slot === module.slot
+        )
         return { ...module, mode: present ? 'present' : 'missing' }
       }
     )

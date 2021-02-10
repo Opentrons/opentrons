@@ -154,6 +154,37 @@ const SPECS: Array<SelectorSpec> = [
     ],
   },
   {
+    name: 'getMissingModules handles multiples of a module correctly',
+    selector: Selectors.getMissingModules,
+    state: {
+      modules: {
+        robotName: {
+          modulesById: {
+            abc123: ({
+              ...Fixtures.mockMagneticModule,
+              serial: 'abc123',
+            }: Types.MagneticModule),
+            def456: Fixtures.mockMagneticModule,
+          },
+        },
+      },
+    },
+    args: [],
+    before: () => {
+      mockGetConnectedRobotName.mockReturnValue('robotName')
+      mockGetProtocolModules.mockReturnValue([
+        { _id: 0, slot: '1', model: 'magneticModuleV2' },
+        { _id: 1, slot: '2', model: 'magneticModuleV1' },
+        { _id: 2, slot: '3', model: 'magneticModuleV1' },
+        { _id: 3, slot: '4', model: 'magneticModuleV1' },
+      ])
+    },
+    expected: [
+      { _id: 0, slot: '1', model: 'magneticModuleV2' },
+      { _id: 3, slot: '4', model: 'magneticModuleV1' },
+    ],
+  },
+  {
     name: 'getModuleControlsDisabled returns connect message if not connected',
     selector: Selectors.getModuleControlsDisabled,
     state: { modules: {} },

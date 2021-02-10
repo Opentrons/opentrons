@@ -14,7 +14,6 @@ import {
   getModuleType,
   checkModuleCompatibility,
 } from '@opentrons/shared-data'
-import type { ModuleModel } from '@opentrons/shared-data'
 
 export { getModuleType } from '@opentrons/shared-data'
 
@@ -65,19 +64,20 @@ export const getMissingModules: (
   getAttachedModulesForConnectedRobot,
   RobotSelectors.getModules,
   (attachedModules, protocolModules) => {
-    const compatibleCount: { [ModuleModel]: number } = Object.fromEntries(
-      protocolModules.map(pmod => {
-        const compatible = attachedModules
-          .map((amod): Types.AttachedModule | null => {
-            return checkModuleCompatibility(amod.model, pmod.model)
-              ? amod
-              : null
-          })
-          .filter(a => a !== null)
-        return [pmod.model, compatible.length]
-      })
-    )
-    return protocolModules.filter(m => compatibleCount[m.model] === 0)
+    const matchedAmod = []
+    const matchedPmod = []
+    protocolModules.map(pmod => {
+      const compatible = attachedModules.find(
+        amod =>
+          checkModuleCompatibility(amod.model, pmod.model) &&
+          !matchedAmod.includes(amod)
+      )
+      if (compatible) {
+        matchedPmod.push(pmod)
+        matchedAmod.push(compatible)
+      }
+    })
+    return protocolModules.filter(m => !matchedPmod.includes(m))
   }
 )
 
