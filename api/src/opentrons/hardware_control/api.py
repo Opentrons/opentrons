@@ -1154,7 +1154,7 @@ class API(HardwareAPILike):
         else:
             # This offset is required because the motor driver coordinate system is
             # configured such that the end of a p300 single gen1's tip is 0.
-            return top_types.Point(0, 0, -30)
+            return top_types.Point(0, 0, 30)
 
     # Gantry/frame (i.e. not pipette) config API
     def get_config(self) -> RobotConfig:
