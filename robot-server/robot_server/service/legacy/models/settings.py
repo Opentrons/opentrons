@@ -5,7 +5,7 @@ from typing import Optional, List, Dict, Any, Union
 
 from pydantic import BaseModel, Field, create_model, validator
 
-from opentrons.config.pipette_config import MUTABLE_CONFIGS
+from opentrons.config.pipette_config import MUTABLE_CONFIGS, VALID_QUIRKS
 from opentrons.config.reset import ResetOptionId
 
 
@@ -195,7 +195,7 @@ MultiPipetteSettings = Dict[str, PipetteSettings]
 class PipetteUpdateField(BaseModel):
     value: Union[None, bool, float] = \
         Field(...,
-              description="Boolean if the format if this is a quirk.  The "
+              description="Must be a boolean if this is a quirk. The "
                           "format if this is not a quirk. Must be between max "
                           "and min for this property. Null means reset.")
 
@@ -203,3 +203,21 @@ class PipetteUpdateField(BaseModel):
 class PipetteSettingsUpdate(BaseModel):
     setting_fields: Optional[Dict[str, Optional[PipetteUpdateField]]] = \
         Field(None, alias="fields")
+
+    @validator('setting_fields')
+    def validate_fields(cls, v):
+        """A validator to ensure that values for mutable configs are
+         floats and booleans for quirks."""
+        for key, value in v.items():
+            if value is None:
+                pass
+            elif key in MUTABLE_CONFIGS:
+                if value.value is not None:
+                    # Make sure it's a float for
+                    value.value = float(value.value)
+            elif key in VALID_QUIRKS:
+                if not isinstance(value.value, bool):
+                    raise ValueError(f"{key} quirk value must be a boolean. Got {value.value}")
+            else:
+                raise ValueError(f"{key} is not a valid field or quirk name")
+        return v
