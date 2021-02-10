@@ -20,7 +20,6 @@ type OP = {|
 type SP = {|
   innerKey: string,
   defaultFlowRate: ?number,
-  formFlowRate: number,
   minFlowRate: number,
   maxFlowRate: number,
   pipetteDisplayName: string,
@@ -56,15 +55,12 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
     }
   }
 
-  const formFlowRate = formData && formData[name]
-
   // force each field to have a new instance created when value is changed
-  const innerKey = `${name}:${formFlowRate || 0}`
+  const innerKey = `${name}:${String(ownProps.value || 0)}`
 
   return {
     innerKey,
     defaultFlowRate,
-    formFlowRate,
     minFlowRate: 0,
     // NOTE: since we only have rule-of-thumb, max is entire volume in 1 second
     maxFlowRate: pipette ? pipette.spec.maxVolume : Infinity,

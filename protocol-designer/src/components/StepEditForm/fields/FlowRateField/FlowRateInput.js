@@ -21,7 +21,6 @@ const DECIMALS_ALLOWED = 1
 export type FlowRateInputProps = {|
   ...FieldProps,
   defaultFlowRate: ?number,
-  formFlowRate: ?number,
   flowRateType: 'aspirate' | 'dispense',
   label: ?string,
   minFlowRate: number,
@@ -44,11 +43,11 @@ export class FlowRateInput extends React.Component<FlowRateInputProps, State> {
   }
 
   getStateFromProps: (props: FlowRateInputProps) => State = props => {
-    const { formFlowRate } = props
+    const { value } = props
     return {
       showModal: false,
-      modalFlowRate: formFlowRate ? formFlowRate.toString() : null,
-      modalUseDefault: !formFlowRate,
+      modalFlowRate: value ? String(value) : null,
+      modalUseDefault: !value,
       pristine: true,
     }
   }
@@ -97,7 +96,7 @@ export class FlowRateInput extends React.Component<FlowRateInputProps, State> {
     const {
       defaultFlowRate,
       disabled,
-      formFlowRate,
+      value,
       flowRateType,
       label,
       minFlowRate,
@@ -196,7 +195,7 @@ export class FlowRateInput extends React.Component<FlowRateInputProps, State> {
             disabled={disabled}
             onClick={this.openModal}
             className={this.props.className || stepFormStyles.small_field}
-            value={formFlowRate ? `${formFlowRate}` : 'default'}
+            value={value ? String(value) : 'default'}
           />
         </FormGroup>
 
