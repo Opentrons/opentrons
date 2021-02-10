@@ -217,7 +217,8 @@ class PipetteSettingsUpdate(BaseModel):
                     value.value = float(value.value)
             elif key in VALID_QUIRKS:
                 if not isinstance(value.value, bool):
-                    raise ValueError(f"{key} quirk value must be a boolean. Got {value.value}")
+                    raise ValueError(f"{key} quirk value must "
+                                     f"be a boolean. Got {value.value}")
             else:
                 raise ValueError(f"{key} is not a valid field or quirk name")
         return v

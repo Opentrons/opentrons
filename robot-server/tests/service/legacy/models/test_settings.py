@@ -60,5 +60,6 @@ def test_pipette_settings_update_none(mutable_config: str):
 
 def test_pipette_settings_update_none_value(mutable_config: str):
     """Should accept none values."""
-    s = settings.PipetteSettingsUpdate(fields={mutable_config: {'value': None}})
+    s = settings.PipetteSettingsUpdate(
+        fields={mutable_config: {'value': None}})
     assert s.setting_fields[mutable_config].value is None
