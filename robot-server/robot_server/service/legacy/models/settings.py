@@ -213,7 +213,7 @@ class PipetteSettingsUpdate(BaseModel):
                 pass
             elif key in MUTABLE_CONFIGS:
                 if value.value is not None:
-                    # Make sure it's a float for
+                    # Must be a float for overriding a config field
                     value.value = float(value.value)
             elif key in VALID_QUIRKS:
                 if not isinstance(value.value, bool):
