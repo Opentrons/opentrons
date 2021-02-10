@@ -269,7 +269,8 @@ def _load_with_overrides(base) -> Dict[str, str]:
     should_write = False
     overrides = _get_environ_overrides()
     try:
-        index = json.load((base / _CONFIG_FILENAME).open())
+        with (base / _CONFIG_FILENAME).open() as file:
+            index = json.load(file)
     except (OSError, json.JSONDecodeError):
         should_write = True
         index = generate_config_index(overrides)
@@ -338,7 +339,8 @@ def _legacy_index() -> Union[None, Dict[str, str]]:
     for index in _LEGACY_INDICES:
         if index.exists():
             try:
-                return json.load(open(index))
+                with open(index) as file:
+                    return json.load(file)
             except (OSError, json.JSONDecodeError):
                 return None
     return None

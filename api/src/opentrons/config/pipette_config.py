@@ -335,7 +335,8 @@ def save_overrides(pipette_id: str,
             existing[key] = model_config_value
     assert model in config_models
     existing['model'] = model
-    json.dump(existing, (override_dir/f'{pipette_id}.json').open('w'))
+    with (override_dir/f'{pipette_id}.json').open('w') as file:
+        json.dump(existing, file)
 
 
 def change_quirks(override_quirks, existing, model_configs):
@@ -356,9 +357,9 @@ def change_quirks(override_quirks, existing, model_configs):
 
 def load_overrides(pipette_id: str) -> Dict[str, Any]:
     overrides = config.CONFIG['pipette_config_overrides_dir']
-    fi = (overrides/f'{pipette_id}.json').open()
     try:
-        return json.load(fi)
+        with (overrides/f'{pipette_id}.json').open() as fi:
+            return json.load(fi)
     except json.JSONDecodeError as e:
         log.warning(f'pipette override for {pipette_id} is corrupt: {e}')
         (overrides/f'{pipette_id}.json').unlink()
