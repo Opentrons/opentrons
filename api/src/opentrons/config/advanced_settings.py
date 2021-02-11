@@ -170,7 +170,7 @@ settings = [
     ),
     SettingDefinition(
         _id='enableFastProtocolUpload',
-        title='Enable Fast Protocol Upload',
+        title='Enable Experimental Fast Protocol Upload',
         description='Enabling this flag will skip simulation for a faster '
                     'upload. The protocol will be analyzed for syntax errors, '
                     'run steps, and equipment requirements. This feature '
