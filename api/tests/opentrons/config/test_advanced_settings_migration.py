@@ -1,6 +1,7 @@
 from typing import Dict, Optional
 
 import pytest
+from pytest_lazyfixture import lazy_fixture
 from opentrons.config.advanced_settings import _migrate, _ensure
 
 
@@ -28,10 +29,12 @@ def default_file_settings() -> Dict[str, Optional[bool]]:
     }
 
 
+@pytest.fixture
 def empty_settings():
     return {}
 
 
+@pytest.fixture
 def version_less():
     return {
       'shortFixedTrash': True,
@@ -42,6 +45,7 @@ def version_less():
     }
 
 
+@pytest.fixture
 def v1_config():
     return {
       '_version': 1,
@@ -54,8 +58,9 @@ def v1_config():
     }
 
 
-def v2_config():
-    r = v1_config()
+@pytest.fixture
+def v2_config(v1_config):
+    r = v1_config
     r.update({
         '_version': 2,
         'disableLogAggregation': True,
@@ -63,8 +68,9 @@ def v2_config():
     return r
 
 
-def v3_config():
-    r = v2_config()
+@pytest.fixture
+def v3_config(v2_config):
+    r = v2_config
     r.update({
         '_version': 3,
         'enableApi1BackCompat': False
@@ -72,8 +78,9 @@ def v3_config():
     return r
 
 
-def v4_config():
-    r = v3_config()
+@pytest.fixture
+def v4_config(v3_config):
+    r = v3_config
     r.update({
         '_version': 4,
         'useV1HttpApi': False
@@ -81,8 +88,9 @@ def v4_config():
     return r
 
 
-def v5_config():
-    r = v4_config()
+@pytest.fixture
+def v5_config(v4_config):
+    r = v4_config
     r.update({
         '_version': 5,
         'enableDoorSafetySwitch': True,
@@ -93,20 +101,21 @@ def v5_config():
 @pytest.fixture(
     scope="session",
     params=[
-        empty_settings(),
-        version_less(),
-        v1_config(),
-        v2_config(),
-        v3_config(),
-        v4_config(),
-        v5_config()
+        lazy_fixture("empty_settings"),
+        lazy_fixture("version_less"),
+        lazy_fixture("v1_config"),
+        lazy_fixture("v2_config"),
+        lazy_fixture("v3_config"),
+        lazy_fixture("v4_config"),
+        lazy_fixture("v5_config")
     ]
 )
 def old_settings(request):
     return request.param
 
 
-def test_migrations(old_settings, migrated_file_version, default_file_settings):
+def test_migrations(
+        old_settings, migrated_file_version, default_file_settings):
     settings, version = _migrate(old_settings)
 
     expected = default_file_settings
@@ -118,7 +127,8 @@ def test_migrations(old_settings, migrated_file_version, default_file_settings):
     assert settings == expected
 
 
-def test_migrates_versionless_old_config(migrated_file_version, default_file_settings):
+def test_migrates_versionless_old_config(
+        migrated_file_version, default_file_settings):
     settings, version = _migrate({
       'short-fixed-trash': False,
       'calibrate-to-bottom': False,
