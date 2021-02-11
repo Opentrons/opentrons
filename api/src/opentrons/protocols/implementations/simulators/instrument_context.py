@@ -13,7 +13,7 @@ from opentrons.protocols.implementations.interfaces.protocol_context import \
 from opentrons.protocols.implementations.well import WellImplementation
 
 
-class SimInstrumentContext(InstrumentContextInterface):
+class InstrumentContextSimulation(InstrumentContextInterface):
     """A simulation of an instrument context."""
 
     def __init__(self,
