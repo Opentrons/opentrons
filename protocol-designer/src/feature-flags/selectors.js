@@ -19,5 +19,5 @@ export const getDisableModuleRestrictions: Selector<?boolean> = createSelector(
 
 export const getBatchEditEnabled: Selector<?boolean> = createSelector(
   getFeatureFlagData,
-  flags => flags.BATCH_EDIT_ENABLED
+  flags => true // DO NOT MERGE
 )
