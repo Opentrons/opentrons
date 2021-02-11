@@ -2,8 +2,10 @@ import typing
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds, \
     Clearances
+from opentrons.protocols.geometry import planning
 from opentrons.protocols.implementations.interfaces.instrument_context import \
     InstrumentContextInterface
 from opentrons.protocols.implementations.interfaces.protocol_context import \
@@ -28,6 +30,9 @@ class SimInstrumentContext(InstrumentContextInterface):
         self._default_speed = default_speed
         self._flow_rate = FlowRates(self)
         self._plunger_speeds = PlungerSpeeds(self)
+        # Cache the maximum instrument height
+        self._instrument_max_height = protocol_interface\
+            .get_hardware().hardware.get_instrument_max_height(self._mount)
 
     def get_default_speed(self) -> float:
         return self._default_speed
@@ -70,6 +75,21 @@ class SimInstrumentContext(InstrumentContextInterface):
     def move_to(self, location: types.Location, force_direct: bool = False,
                 minimum_z_height: typing.Optional[float] = None,
                 speed: typing.Optional[float] = None) -> None:
+        """Simulation of only the motion planning portion of move_to."""
+        last_location = self._protocol_interface.get_last_location()
+        if last_location:
+            from_loc = last_location
+        else:
+            from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
+
+        # We just want to catch planning errors.
+        planning.plan_moves(from_loc,
+                            location,
+                            self._protocol_interface.get_deck(),
+                            self._instrument_max_height,
+                            force_direct=force_direct,
+                            minimum_z_height=minimum_z_height)
+
         self._protocol_interface.set_last_location(location)
 
     def get_mount(self) -> types.Mount:
