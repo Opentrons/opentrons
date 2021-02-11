@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
-import { mount } from 'enzyme'
+import { mountWithProviders } from '@opentrons/components/__utils__'
 
+import { i18n } from '../../../i18n'
 import { Tooltip, Text } from '@opentrons/components'
 import { ProtocolLabwareList } from '../ProtocolLabwareList'
 
@@ -31,18 +32,20 @@ const LABWARE = [
 
 describe('ProtocolLabwareList Component', () => {
   const render = () => {
-    return mount(<ProtocolLabwareList labware={LABWARE} />)
+    return mountWithProviders(<ProtocolLabwareList labware={LABWARE} />, {
+      i18n,
+    })
   }
 
   it('renders a list with one item per labware', () => {
-    const wrapper = render()
+    const { wrapper } = render()
     const list = wrapper.find('ul')
     const items = list.find('li')
     expect(items).toHaveLength(LABWARE.length)
   })
 
   it('renders a "table header"', () => {
-    const wrapper = render()
+    const { wrapper } = render()
     // cast Tooltip to any so we can use it in the matcher below without props
     const Tt: any = Tooltip
 
@@ -59,7 +62,7 @@ describe('ProtocolLabwareList Component', () => {
   })
 
   it('renders labware props', () => {
-    const wrapper = render()
+    const { wrapper } = render()
 
     const item0 = wrapper.find('li').at(0)
     const item1 = wrapper.find('li').at(1)

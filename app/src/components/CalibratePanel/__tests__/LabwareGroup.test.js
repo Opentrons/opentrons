@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
-import { mount } from 'enzyme'
-import { Provider } from 'react-redux'
+import { mountWithProviders } from '@opentrons/components/__utils__'
 
+import { i18n } from '../../../i18n'
 import wellPlate96Def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import type { State } from '../../../redux/types'
@@ -96,18 +96,8 @@ const stubOtherLabware = [
 
 describe('LabwareGroup', () => {
   let render
-  let mockStore
-  let dispatch
 
   beforeEach(() => {
-    dispatch = jest.fn()
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        robotApi: {},
-      }),
-      dispatch,
-    }
     mockGetConnectedRobotName.mockReturnValue('robotName')
     mockGetCalibratorMount.mockReturnValue('left')
     mockGetDeckPopulated.mockReturnValue(true)
@@ -120,16 +110,13 @@ describe('LabwareGroup', () => {
         tipracks = stubTipRacks,
         otherLabware = stubOtherLabware,
       } = props
-      return mount(
+      return mountWithProviders(
         <LabwareGroup
           robotName={robotName}
           tipracks={tipracks}
           otherLabware={otherLabware}
         />,
-        {
-          wrappingComponent: Provider,
-          wrappingComponentProps: { store: mockStore },
-        }
+        { i18n }
       )
     }
   })
@@ -139,29 +126,29 @@ describe('LabwareGroup', () => {
   })
 
   it('dispatches fetch labware calibration action on render', () => {
-    render()
+    const { store } = render()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
+    expect(store.dispatch).toHaveBeenCalledWith(
       fetchLabwareCalibrations('robotName')
     )
   })
 
   it('is enabled if robot is not running', () => {
     mockGetIsRunning.mockReturnValue(false)
-    const wrapper = render()
+    const { wrapper } = render()
 
     expect(wrapper.find('SidePanelGroup[disabled=false]').exists()).toBe(true)
   })
 
   it('is disabled if robot is running', () => {
     mockGetIsRunning.mockReturnValue(true)
-    const wrapper = render()
+    const { wrapper } = render()
 
     expect(wrapper.find('SidePanelGroup[disabled=true]').exists()).toBe(true)
   })
 
   it('is renders tipracks and labware if present', () => {
-    const wrapper = render()
+    const { wrapper } = render()
 
     stubTipRacks.forEach(lw => {
       expect(wrapper.find(`LabwareListItem[name="${lw.name}"]`).exists()).toBe(

@@ -1,0 +1,16 @@
+{
+  "cal_data_not_calibrated": "Not yet calibrated",
+  "cal_data_updated_data": "Updated data",
+  "cal_data_existing_data": "Existing data",
+  "cal_data_legacy_definition": "Calibration Data N/A",
+  "cal_panel_title": "Placement and Calibration",
+  "labware_cal_title": "Labware Calibration",
+  "labware_cal_tipracks_title": "tipracks",
+  "labware_cal_labware_title": "labware",
+  "modules_deck_slot_title": "deck slot",
+  "modules_module_title": "module",
+  "modules_usb_port_title": "USB port",
+  "modules_update_software_tooltip": "Update robot software to see USB port information",
+  "modules_title": "modules",
+  "tip_length_cal_title": "Tip Length Calibration"
+}

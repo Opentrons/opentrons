@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { withRouter } from 'react-router-dom'
 import uniqBy from 'lodash/uniqBy'
 
@@ -24,9 +25,6 @@ import { PipetteTiprackListItem } from './PipetteTiprackListItem'
 import type { BaseProtocolLabware } from '../../redux/calibration/types'
 import type { Dispatch, State } from '../../redux/types'
 
-// TODO(mc, 2019-12-10): i18n
-const TIP_LENGTH_CALIBRATION = 'Tip Length Calibration'
-
 export type PipetteListComponentProps = {|
   robotName: string | null,
   tipracks: Array<BaseProtocolLabware>,
@@ -39,6 +37,7 @@ export const PipetteList: React.AbstractComponent<PipetteListComponentProps> = w
 export function PipetteListComponent(
   props: PipetteListComponentProps
 ): React.Node {
+  const { t } = useTranslation('protocol_calibration')
   const dispatch = useDispatch<Dispatch>()
 
   const { robotName, tipracks } = props
@@ -53,7 +52,10 @@ export function PipetteListComponent(
   }, [dispatch, robotName])
 
   return (
-    <TitledList key={TIP_LENGTH_CALIBRATION} title={TIP_LENGTH_CALIBRATION}>
+    <TitledList
+      key={t('tip_length_cal_title')}
+      title={t('tip_length_cal_title')}
+    >
       {PIPETTE_MOUNTS.map(mount => {
         const protocolPipette =
           protocolPipettes.find(i => i.mount === mount) || null
