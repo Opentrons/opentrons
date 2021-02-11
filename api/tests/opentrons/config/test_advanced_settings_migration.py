@@ -1,57 +1,124 @@
+from typing import Dict, Optional
+
+import pytest
 from opentrons.config.advanced_settings import _migrate, _ensure
 
 
-good_file_version = 7
-good_file_settings = {
-    'shortFixedTrash': None,
-    'calibrateToBottom': None,
-    'deckCalibrationDots': None,
-    'disableHomeOnBoot': None,
-    'useOldAspirationFunctions': None,
-    'disableLogAggregation': None,
-    'enableApi1BackCompat': None,
-    'useProtocolApi2': None,
-    'useV1HttpApi': None,
-    'enableDoorSafetySwitch': None,
-    'enableTipLengthCalibration': None,
-    'enableHttpProtocolSessions': None,
-}
+@pytest.fixture
+def migrated_file_version() -> int:
+    return 8
 
 
-def test_migrates_empty_object():
-    settings, version = _migrate({})
-
-    assert version == good_file_version
-    assert settings == good_file_settings
-
-
-def test_migrates_versionless_new_config():
-    settings, version = _migrate({
-      'shortFixedTrash': True,
-      'calibrateToBottom': True,
-      'deckCalibrationDots': False,
-      'disableHomeOnBoot': True,
-      'useOldAspirationFunctions': True,
-    })
-
-    assert version == good_file_version
-    assert settings == {
-      'shortFixedTrash': True,
-      'calibrateToBottom': True,
-      'deckCalibrationDots': None,
-      'disableHomeOnBoot': True,
-      'useOldAspirationFunctions': True,
-      'disableLogAggregation': None,
-      'enableApi1BackCompat': None,
-      'useProtocolApi2': None,
-      'useV1HttpApi': None,
-      'enableDoorSafetySwitch': None,
-      'enableTipLengthCalibration': None,
-      'enableHttpProtocolSessions': None,
+@pytest.fixture
+def default_file_settings() -> Dict[str, Optional[bool]]:
+    return {
+        'shortFixedTrash': None,
+        'calibrateToBottom': None,
+        'deckCalibrationDots': None,
+        'disableHomeOnBoot': None,
+        'useOldAspirationFunctions': None,
+        'disableLogAggregation': None,
+        'enableApi1BackCompat': None,
+        'useProtocolApi2': None,
+        'useV1HttpApi': None,
+        'enableDoorSafetySwitch': None,
+        'enableTipLengthCalibration': None,
+        'enableHttpProtocolSessions': None,
+        'enableFastProtocolUpload': None,
     }
 
 
-def test_migrates_versionless_old_config():
+def empty_settings():
+    return {}
+
+
+def version_less():
+    return {
+      'shortFixedTrash': True,
+      'calibrateToBottom': True,
+      'deckCalibrationDots': True,
+      'disableHomeOnBoot': True,
+      'useOldAspirationFunctions': True,
+    }
+
+
+def v1_config():
+    return {
+      '_version': 1,
+      'shortFixedTrash': True,
+      'calibrateToBottom': True,
+      'deckCalibrationDots': True,
+      'disableHomeOnBoot': True,
+      'useProtocolApi2': None,
+      'useOldAspirationFunctions': True,
+    }
+
+
+def v2_config():
+    r = v1_config()
+    r.update({
+        '_version': 2,
+        'disableLogAggregation': True,
+    })
+    return r
+
+
+def v3_config():
+    r = v2_config()
+    r.update({
+        '_version': 3,
+        'enableApi1BackCompat': False
+    })
+    return r
+
+
+def v4_config():
+    r = v3_config()
+    r.update({
+        '_version': 4,
+        'useV1HttpApi': False
+    })
+    return r
+
+
+def v5_config():
+    r = v4_config()
+    r.update({
+        '_version': 5,
+        'enableDoorSafetySwitch': True,
+    })
+    return r
+
+
+@pytest.fixture(
+    scope="session",
+    params=[
+        empty_settings(),
+        version_less(),
+        v1_config(),
+        v2_config(),
+        v3_config(),
+        v4_config(),
+        v5_config()
+    ]
+)
+def old_settings(request):
+    return request.param
+
+
+def test_migrations(old_settings, migrated_file_version, default_file_settings):
+    settings, version = _migrate(old_settings)
+
+    expected = default_file_settings
+    expected.update({
+        k: v for k, v in old_settings.items() if k != '_version'
+    })
+
+    assert version == migrated_file_version
+    assert settings == expected
+
+
+def test_migrates_versionless_old_config(migrated_file_version, default_file_settings):
     settings, version = _migrate({
       'short-fixed-trash': False,
       'calibrate-to-bottom': False,
@@ -59,181 +126,29 @@ def test_migrates_versionless_old_config():
       'disable-home-on-boot': False,
     })
 
-    assert version == good_file_version
-    assert settings == {
-      'shortFixedTrash': None,
-      'calibrateToBottom': None,
-      'deckCalibrationDots': True,
-      'disableHomeOnBoot': None,
-      'useOldAspirationFunctions': None,
-      'disableLogAggregation': None,
-      'enableApi1BackCompat': None,
-      'useProtocolApi2': None,
-      'useV1HttpApi': None,
-      'enableDoorSafetySwitch': None,
-      'enableTipLengthCalibration': None,
-      'enableHttpProtocolSessions': None,
-    }
+    expected = default_file_settings
+    expected.update({
+        'shortFixedTrash': None,
+        'calibrateToBottom': None,
+        'deckCalibrationDots': True,
+        'disableHomeOnBoot': None,
+    })
+
+    assert version == migrated_file_version
+    assert settings == expected
 
 
-def test_ignores_invalid_keys():
+def test_ignores_invalid_keys(migrated_file_version, default_file_settings):
     settings, version = _migrate({
       'split-labware-def': True,
       'splitLabwareDefinitions': True
     })
 
-    assert version == good_file_version
-    assert settings == good_file_settings
+    assert version == migrated_file_version
+    assert settings == default_file_settings
 
 
-def test_migrates_v1_config():
-    settings, version = _migrate({
-      '_version': 1,
-      'shortFixedTrash': True,
-      'calibrateToBottom': True,
-      'deckCalibrationDots': False,
-      'disableHomeOnBoot': True,
-      'useProtocolApi2': None,
-      'useOldAspirationFunctions': True,
-    })
-    assert version == good_file_version
-    assert settings == {
-        'shortFixedTrash': True,
-        'calibrateToBottom': True,
-        'deckCalibrationDots': False,
-        'disableHomeOnBoot': True,
-        'useOldAspirationFunctions': True,
-        'disableLogAggregation': None,
-        'useProtocolApi2': None,
-        'enableApi1BackCompat': None,
-        'useV1HttpApi': None,
-        'enableDoorSafetySwitch': None,
-        'enableTipLengthCalibration': None,
-        'enableHttpProtocolSessions': None,
-    }
-
-
-def test_migrates_v2_config():
-    settings, version = _migrate({
-        '_version': 2,
-        'shortFixedTrash': True,
-        'calibrateToBottom': True,
-        'deckCalibrationDots': False,
-        'disableHomeOnBoot': True,
-        'useProtocolApi2': None,
-        'enableApi1BackCompat': False,
-        'useOldAspirationFunctions': True,
-        'disableLogAggregation': False,
-    })
-
-    assert version == good_file_version
-    assert settings == {
-        'shortFixedTrash': True,
-        'calibrateToBottom': True,
-        'deckCalibrationDots': False,
-        'disableHomeOnBoot': True,
-        'useOldAspirationFunctions': True,
-        'disableLogAggregation': False,
-        'useProtocolApi2': None,
-        'enableApi1BackCompat': None,
-        'useV1HttpApi': None,
-        'enableDoorSafetySwitch': None,
-        'enableTipLengthCalibration': None,
-        'enableHttpProtocolSessions': None,
-    }
-
-
-def test_migrates_v3_config():
-    settings, version = _migrate({
-        '_version': 3,
-        'shortFixedTrash': True,
-        'calibrateToBottom': True,
-        'deckCalibrationDots': False,
-        'disableHomeOnBoot': True,
-        'useProtocolApi2': None,
-        'useOldAspirationFunctions': True,
-        'disableLogAggregation': False,
-        'enableApi1BackCompat': False
-    })
-    assert version == good_file_version
-    assert settings == {
-        'shortFixedTrash': True,
-        'calibrateToBottom': True,
-        'deckCalibrationDots': False,
-        'disableHomeOnBoot': True,
-        'useOldAspirationFunctions': True,
-        'disableLogAggregation': False,
-        'useProtocolApi2': None,
-        'enableApi1BackCompat': False,
-        'useV1HttpApi': None,
-        'enableDoorSafetySwitch': None,
-        'enableTipLengthCalibration': None,
-        'enableHttpProtocolSessions': None,
-    }
-
-
-def test_migrates_v4_config():
-    settings, version = _migrate({
-        '_version': 4,
-        'shortFixedTrash': True,
-        'calibrateToBottom': True,
-        'deckCalibrationDots': False,
-        'disableHomeOnBoot': True,
-        'useProtocolApi2': None,
-        'useOldAspirationFunctions': True,
-        'disableLogAggregation': False,
-        'enableApi1BackCompat': False,
-        'useV1HttpApi': False
-    })
-    assert version == good_file_version
-    assert settings == {
-        'shortFixedTrash': True,
-        'calibrateToBottom': True,
-        'deckCalibrationDots': False,
-        'disableHomeOnBoot': True,
-        'useOldAspirationFunctions': True,
-        'disableLogAggregation': False,
-        'useProtocolApi2': None,
-        'enableApi1BackCompat': False,
-        'useV1HttpApi': False,
-        'enableDoorSafetySwitch': None,
-        'enableTipLengthCalibration': None,
-        'enableHttpProtocolSessions': None,
-    }
-
-
-def test_migrates_v5_config():
-    settings, version = _migrate({
-        '_version': 5,
-        'shortFixedTrash': True,
-        'calibrateToBottom': True,
-        'deckCalibrationDots': False,
-        'disableHomeOnBoot': True,
-        'useProtocolApi2': None,
-        'useOldAspirationFunctions': True,
-        'disableLogAggregation': False,
-        'enableApi1BackCompat': False,
-        'useV1HttpApi': False,
-        'enableDoorSafetySwitch': True,
-    })
-    assert version == good_file_version
-    assert settings == {
-        'shortFixedTrash': True,
-        'calibrateToBottom': True,
-        'deckCalibrationDots': False,
-        'disableHomeOnBoot': True,
-        'useOldAspirationFunctions': True,
-        'disableLogAggregation': False,
-        'useProtocolApi2': None,
-        'enableApi1BackCompat': False,
-        'useV1HttpApi': False,
-        'enableDoorSafetySwitch': True,
-        'enableTipLengthCalibration': None,
-        'enableHttpProtocolSessions': None,
-    }
-
-
-def test_ensures_config():
+def test_ensures_config(default_file_settings):
     assert _ensure(
         {'_version': 3,
          'shortFixedTrash': False,
@@ -250,4 +165,5 @@ def test_ensures_config():
              'enableDoorSafetySwitch': None,
              'enableTipLengthCalibration': None,
              'enableHttpProtocolSessions': None,
+             'enableFastProtocolUpload': None,
          }
