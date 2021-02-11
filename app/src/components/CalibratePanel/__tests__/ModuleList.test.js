@@ -4,14 +4,14 @@ import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../i18n'
 import { ListItem, Tooltip } from '@opentrons/components'
-import * as robotSelectors from '../../../robot/selectors'
-import * as moduleSelectors from '../../../modules/selectors'
+import * as robotSelectors from '../../../redux/robot/selectors'
+import * as moduleSelectors from '../../../redux/modules/selectors'
 import { ModuleList } from '../ModuleList'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
-jest.mock('../../../robot/selectors')
-jest.mock('../../../modules/selectors')
+jest.mock('../../../redux/robot/selectors')
+jest.mock('../../../redux/modules/selectors')
 
 const mockGetModules: JestMockFn<
   [State],
@@ -63,7 +63,7 @@ describe('ModuleList', () => {
     mockModules.forEach((m, index) => {
       const listItem = titledList.find(ListItem).at(index)
       const allText = listItem.text()
-      const toolTip = listItem.find('RenderPort').find(Tooltip)
+      const toolTip = listItem.find('UsbPortInfo').find(Tooltip)
 
       expect(listItem.prop('iconName')).toBe('check-circle')
       expect(allText).toContain(`Magnetic Module GEN${index === 0 ? 1 : 2}`)
@@ -85,7 +85,7 @@ describe('ModuleList', () => {
     mockModules.forEach((m, index) => {
       const listItem = titledList.find(ListItem).at(index)
       const allText = listItem.text()
-      const toolTip = listItem.find('RenderPort').find(Tooltip)
+      const toolTip = listItem.find('UsbPortInfo').find(Tooltip)
 
       expect(allText).toContain(`Magnetic Module GEN${index === 0 ? 1 : 2}`)
 
@@ -117,7 +117,7 @@ describe('ModuleList', () => {
     mockModules.forEach((m, index) => {
       const listItem = titledList.find(ListItem).at(index)
       const allText = listItem.text()
-      const toolTip = listItem.find('RenderPort').find(Tooltip)
+      const toolTip = listItem.find('UsbPortInfo').find(Tooltip)
 
       expect(allText).toContain(`Magnetic Module GEN${index === 0 ? 1 : 2}`)
       expect(listItem.prop('iconName')).toBe('checkbox-blank-circle-outline')

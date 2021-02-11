@@ -66,7 +66,7 @@ export const getMissingModules: (
   (attachedModules, protocolModules) => {
     const matchedAmod = []
     const matchedPmod = []
-    protocolModules.map(pmod => {
+    protocolModules.forEach(pmod => {
       const compatible = attachedModules.find(
         amod =>
           checkModuleCompatibility(amod.model, pmod.model) &&

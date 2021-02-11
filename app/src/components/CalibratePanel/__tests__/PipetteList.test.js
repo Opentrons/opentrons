@@ -4,9 +4,9 @@ import { StaticRouter } from 'react-router-dom'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../i18n'
-import * as PipettesSelectors from '../../../pipettes/selectors'
-import * as robotSelectors from '../../../robot/selectors'
-import * as calibrateSelectors from '../../../nav/calibrate-selectors'
+import * as PipettesSelectors from '../../../redux/pipettes/selectors'
+import * as robotSelectors from '../../../redux/robot/selectors'
+import * as calibrateSelectors from '../../../redux/nav/calibrate-selectors'
 
 import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'

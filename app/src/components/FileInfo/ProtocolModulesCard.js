@@ -15,11 +15,11 @@ import {
   SPACING_AUTO,
   FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
-import { selectors as robotSelectors } from '../../robot'
+import { selectors as robotSelectors } from '../../redux/robot'
 import { InfoSection } from './InfoSection'
 
-import type { State } from '../../types'
-import type { SessionModule } from '../../robot/types'
+import type { State } from '../../redux/types'
+import type { SessionModule } from '../../redux/robot/types'
 import type { ModuleModel } from '@opentrons/shared-data'
 
 const TYPE_COL_STYLE = { marginRight: SPACING_AUTO }

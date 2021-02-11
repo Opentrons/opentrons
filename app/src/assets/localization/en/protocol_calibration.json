@@ -10,6 +10,7 @@
   "modules_deck_slot_title": "deck slot",
   "modules_module_title": "module",
   "modules_usb_port_title": "USB port",
+  "modules_update_software_tooltip": "Update robot software to see USB port information",
   "modules_title": "modules",
   "tip_length_cal_title": "Tip Length Calibration"
 }
