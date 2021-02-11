@@ -31,3 +31,7 @@ def enable_door_safety_switch():
 
 def enable_http_protocol_sessions():
     return advs.get_setting_with_env_overload('enableHttpProtocolSessions')
+
+
+def enable_fast_protocol_upload():
+    return advs.get_setting_with_env_overload('enableFastProtocolUpload')
