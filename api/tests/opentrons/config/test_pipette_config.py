@@ -203,7 +203,7 @@ def test_mutable_configs_unknown_pipette_id():
 
 @pytest.fixture
 def mock_pipette_config_model():
-    return {
+    model = {
         'fieldName': {
             "min": 1,
             "max": 2,
@@ -213,6 +213,9 @@ def mock_pipette_config_model():
             "quirk2": True
         }
     }
+    # Patch VALID_QUIRKS to reflect quirks in the mock pipette config model
+    with patch.object(pipette_config, "VALID_QUIRKS", new=list(model['quirks'].keys())):
+        yield model
 
 
 @pytest.mark.parametrize(argnames=["override_field", "expected_error"],
@@ -224,6 +227,7 @@ def mock_pipette_config_model():
                             [{'fieldName': "hello"}, 'is invalid for'],
                             [{'fieldName': 0}, 'out of range'],
                             [{'fieldName': 5}, 'out of range'],
+                            [{'fieldName': True}, 'is invalid for'],
                          ])
 def test_validate_overrides_fail(override_field,
                                  expected_error,

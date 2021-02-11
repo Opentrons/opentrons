@@ -186,9 +186,9 @@ def test_modify_pipette_settings_call_override(api_client,
     changes = {
         'fields': {
             'pickUpCurrent': {'value': 1},
-            'otherField': {'value': True},
-            'noneField': {'value': None},
-            'otherNoneField': None
+            'dropTipShake': {'value': True},
+            'pickUpSpeed': {'value': None},
+            'pickUpDistance': None
         }
     }
 
@@ -197,8 +197,8 @@ def test_modify_pipette_settings_call_override(api_client,
         f'/settings/pipettes/{pipette_id}',
         json=changes)
     mock_pipette_config.override.assert_called_once_with(
-        fields={'pickUpCurrent': 1, 'otherField': True,
-                'noneField': None, 'otherNoneField': None},
+        fields={'pickUpCurrent': 1, 'dropTipShake': True,
+                'pickUpSpeed': None, 'pickUpDistance': None},
         pipette_id=pipette_id)
     patch_body = resp.json()
     assert resp.status_code == 200
@@ -235,9 +235,10 @@ def test_modify_pipette_settings_failure(api_client, mock_pipette_config):
 
     resp = api_client.patch(
         f'/settings/pipettes/{test_id}',
-        json={'fields': {'a': {'value': 1}}})
-    mock_pipette_config.override.assert_called_once_with(pipette_id=test_id,
-                                                         fields={'a': 1})
+        json={'fields': {'pickUpCurrent': {'value': 1}}})
+    mock_pipette_config.override.assert_called_once_with(
+        pipette_id=test_id,
+        fields={'pickUpCurrent': 1})
     patch_body = resp.json()
     assert resp.status_code == 412
     assert patch_body == {'message': "Failed!"}
