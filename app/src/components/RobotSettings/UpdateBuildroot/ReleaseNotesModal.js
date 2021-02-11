@@ -2,14 +2,14 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 
-import { buildrootChangelogSeen } from '../../../buildroot'
+import { buildrootChangelogSeen } from '../../../redux/buildroot'
 import { ScrollableAlertModal } from '../../modals'
 import { ReleaseNotes } from '../../ReleaseNotes'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
-import type { Dispatch } from '../../../types'
-import type { RobotSystemType } from '../../../buildroot/types'
+import type { Dispatch } from '../../../redux/types'
+import type { RobotSystemType } from '../../../redux/buildroot/types'
 
 export type ReleaseNotesModalProps = {|
   robotName: string,

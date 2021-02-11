@@ -6,8 +6,8 @@ import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
-import * as Sessions from '../../../sessions'
-import { mockTipLengthCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
+import * as Sessions from '../../../redux/sessions'
+import { mockTipLengthCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
 import { CalibrateTipLength } from '../index'
 import {
@@ -20,11 +20,11 @@ import {
   MeasureTip,
 } from '../../CalibrationPanels'
 
-import type { TipLengthCalibrationStep } from '../../../sessions/types'
+import type { TipLengthCalibrationStep } from '../../../redux/sessions/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
-jest.mock('../../../sessions/selectors')
-jest.mock('../../../robot-api/selectors')
+jest.mock('../../../redux/sessions/selectors')
+jest.mock('../../../redux/robot-api/selectors')
 
 type CalibrateTipLengthSpec = {
   component: React.AbstractComponent<any>,

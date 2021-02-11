@@ -2,15 +2,15 @@
 import * as React from 'react'
 import { shallow, mount } from 'enzyme'
 
-import * as CustomLabwareFixtures from '../../../custom-labware/__fixtures__'
-import * as CustomLabware from '../../../custom-labware'
+import * as CustomLabwareFixtures from '../../../redux/custom-labware/__fixtures__'
+import * as CustomLabware from '../../../redux/custom-labware'
 import { LabwareItem } from '../LabwareItem'
 import { Warning } from '../Warning'
 
 import type {
   InvalidLabwareFile,
   ValidLabwareFile,
-} from '../../../custom-labware/types'
+} from '../../../redux/custom-labware/types'
 
 describe('LabwareItem', () => {
   const invalidFile: InvalidLabwareFile = {

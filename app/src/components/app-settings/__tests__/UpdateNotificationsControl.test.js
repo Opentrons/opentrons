@@ -3,19 +3,19 @@ import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
 import { BORDER_SOLID_LIGHT } from '@opentrons/components'
-import * as Alerts from '../../../alerts'
-import * as Analytics from '../../../analytics'
+import * as Alerts from '../../../redux/alerts'
+import * as Analytics from '../../../redux/analytics'
 import { TitledControl } from '../../TitledControl'
 import { ToggleBtn } from '../../ToggleBtn'
 import { UpdateNotificationsControl } from '../UpdateNotificationsControl'
 
 import type { StyleProps } from '@opentrons/components'
-import type { State } from '../../../types'
-import type { AlertId } from '../../../alerts/types'
-import type { AnalyticsEvent } from '../../../analytics/types'
+import type { State } from '../../../redux/types'
+import type { AlertId } from '../../../redux/alerts/types'
+import type { AnalyticsEvent } from '../../../redux/analytics/types'
 
-jest.mock('../../../alerts/selectors')
-jest.mock('../../../analytics/hooks')
+jest.mock('../../../redux/alerts/selectors')
+jest.mock('../../../redux/analytics/hooks')
 
 const getAlertIsPermanentlyIgnored: JestMockFn<
   [State, AlertId],

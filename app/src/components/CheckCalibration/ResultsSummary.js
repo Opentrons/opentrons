@@ -36,18 +36,18 @@ import {
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import find from 'lodash/find'
-import { PIPETTE_MOUNTS, LEFT, RIGHT } from '../../pipettes'
+import { PIPETTE_MOUNTS, LEFT, RIGHT } from '../../redux/pipettes'
 import { saveAs } from 'file-saver'
 
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 import {
   CHECK_STATUS_OUTSIDE_THRESHOLD,
   CHECK_STATUS_IN_THRESHOLD,
-} from '../../sessions'
+} from '../../redux/sessions'
 import type {
   CalibrationCheckInstrument,
   CalibrationCheckComparisonsPerCalibration,
-} from '../../sessions/types'
+} from '../../redux/sessions/types'
 
 const GOOD_CALIBRATION = 'Good calibration'
 const BAD_CALIBRATION = 'Recalibration recommended'

@@ -14,7 +14,7 @@ import type {
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 import { shouldLevel } from '@opentrons/shared-data'
-import type { Mount } from '../../pipettes/types'
+import type { Mount } from '../../redux/pipettes/types'
 import type { Direction } from './types'
 
 const ATTACH_CONFIRM = 'have robot check connection'

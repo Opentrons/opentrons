@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 import uniq from 'lodash/uniq'
 
-import * as Sessions from '../../sessions'
+import * as Sessions from '../../redux/sessions'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
 const CONFIRM_RETURN_BODY = 'Return tip and '

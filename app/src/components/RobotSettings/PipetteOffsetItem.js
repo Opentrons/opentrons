@@ -32,11 +32,14 @@ import {
   REQUIRED,
 } from '../InlineCalibrationWarning'
 import { formatLastModified } from '../CalibrationPanels/utils'
-import type { AttachedPipette, PipetteCalibrations } from '../../pipettes/types'
+import type {
+  AttachedPipette,
+  PipetteCalibrations,
+} from '../../redux/pipettes/types'
 import type {
   PipetteOffsetCalibration,
   TipLengthCalibration,
-} from '../../calibration/types'
+} from '../../redux/calibration/types'
 
 type Props = {|
   mount: 'left' | 'right',

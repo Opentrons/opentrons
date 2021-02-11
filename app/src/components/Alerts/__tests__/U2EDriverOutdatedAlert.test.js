@@ -4,10 +4,10 @@ import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 
 import { AlertModal } from '@opentrons/components'
-import * as Analytics from '../../../analytics'
+import * as Analytics from '../../../redux/analytics'
 import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
 
-jest.mock('../../../analytics')
+jest.mock('../../../redux/analytics')
 
 jest.mock('react-router-dom', () => ({
   // TODO(mc, 2020-05-07): create a tested Link wrapper that's safe to mock
@@ -15,7 +15,7 @@ jest.mock('react-router-dom', () => ({
 }))
 
 // TODO(mc, 2020-05-07): remove this feature flag
-jest.mock('../../../config/hooks', () => ({
+jest.mock('../../../redux/config/hooks', () => ({
   useFeatureFlag: flag => flag === 'systemInfoEnabled',
 }))
 

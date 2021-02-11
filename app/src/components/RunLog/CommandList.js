@@ -7,7 +7,7 @@ import { SessionAlert } from './SessionAlert'
 import { Portal } from '../portal'
 import styles from './styles.css'
 
-import type { SessionStatus, SessionStatusInfo } from '../../robot'
+import type { SessionStatus, SessionStatusInfo } from '../../redux/robot'
 
 export type CommandListProps = {|
   commands: Array<any>,

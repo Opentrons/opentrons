@@ -12,7 +12,7 @@ import {
   BORDER_SOLID_LIGHT,
 } from '@opentrons/components'
 
-import { getNavbarLocations } from '../../nav'
+import { getNavbarLocations } from '../../redux/nav'
 import { NavbarLink } from './NavbarLink'
 
 export function Navbar(): React.Node {

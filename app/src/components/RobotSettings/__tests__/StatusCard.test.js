@@ -3,18 +3,18 @@ import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 import { i18n } from '../../../i18n'
 
-import * as Fixtures from '../../../discovery/__fixtures__'
+import * as Fixtures from '../../../redux/discovery/__fixtures__'
 import {
   actions as RobotActions,
   selectors as RobotSelectors,
-} from '../../../robot'
+} from '../../../redux/robot'
 import { SecondaryBtn, Icon } from '@opentrons/components'
 import { StatusCard } from '../StatusCard'
 
-import type { State } from '../../../types'
-import type { ViewableRobot } from '../../../discovery/types'
+import type { State } from '../../../redux/types'
+import type { ViewableRobot } from '../../../redux/discovery/types'
 
-jest.mock('../../../robot/selectors')
+jest.mock('../../../redux/robot/selectors')
 
 const getSessionStatus: JestMockFn<
   [State],

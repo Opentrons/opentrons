@@ -4,7 +4,10 @@ import Store from 'electron-store'
 import { noop, last } from 'lodash'
 
 import { createDiscoveryClient } from '@opentrons/discovery-client'
-import { startDiscovery, finishDiscovery } from '@opentrons/app/src/discovery'
+import {
+  startDiscovery,
+  finishDiscovery,
+} from '@opentrons/app/src/redux/discovery'
 import { registerDiscovery } from '../discovery'
 import { getFullConfig, getOverrides, handleConfigChange } from '../config'
 import { createNetworkInterfaceMonitor } from '../system-info'

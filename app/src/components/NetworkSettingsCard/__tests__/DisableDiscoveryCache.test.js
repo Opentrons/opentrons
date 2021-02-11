@@ -4,14 +4,14 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
 
-import * as Cfg from '../../../config'
+import * as Cfg from '../../../redux/config'
 import { LabeledToggle } from '@opentrons/components'
 import { DisableDiscoveryCache } from '../DisableDiscoveryCache'
 
-import type { State } from '../../../types'
-import type { Config } from '../../../config/types'
+import type { State } from '../../../redux/types'
+import type { Config } from '../../../redux/config/types'
 
-jest.mock('../../../config/selectors')
+jest.mock('../../../redux/config/selectors')
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 

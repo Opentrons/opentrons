@@ -4,11 +4,11 @@ import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import { InstallModalContents } from './InstallModalContents'
 
-import type { ViewableRobot } from '../../../discovery/types'
+import type { ViewableRobot } from '../../../redux/discovery/types'
 import type {
   BuildrootUpdateSession,
   RobotSystemType,
-} from '../../../buildroot/types'
+} from '../../../redux/buildroot/types'
 
 export type InstallModalProps = {|
   robot: ViewableRobot,

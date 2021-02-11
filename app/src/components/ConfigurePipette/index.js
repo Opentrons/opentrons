@@ -9,22 +9,25 @@ import {
   PENDING,
   useDispatchApiRequest,
   getRequestById,
-} from '../../robot-api'
+} from '../../redux/robot-api'
 import {
   getAttachedPipettes,
   getAttachedPipetteSettings,
   updatePipetteSettings,
-} from '../../pipettes'
-import { useFeatureFlag } from '../../config'
+} from '../../redux/pipettes'
+import { useFeatureFlag } from '../../redux/config'
 
 import { ScrollableAlertModal } from '../modals'
 import { ConfigMessage } from './ConfigMessage'
 import { ConfigForm } from './ConfigForm'
 import { ConfigErrorBanner } from './ConfigErrorBanner'
 
-import type { State } from '../../types'
+import type { State } from '../../redux/types'
 
-import type { Mount, PipetteSettingsFieldsUpdate } from '../../pipettes/types'
+import type {
+  Mount,
+  PipetteSettingsFieldsUpdate,
+} from '../../redux/pipettes/types'
 
 // TODO(mc, 2019-12-09): i18n
 const PIPETTE_SETTINGS = 'Pipette Settings'

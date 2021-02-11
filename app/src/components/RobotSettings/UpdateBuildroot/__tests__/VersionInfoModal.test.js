@@ -3,9 +3,9 @@ import * as React from 'react'
 
 import { mountWithStore } from '@opentrons/components/__utils__'
 import { AlertModal, OutlineButton } from '@opentrons/components'
-import { mockReachableRobot } from '../../../../discovery/__fixtures__'
-import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../buildroot'
-import * as Shell from '../../../../shell'
+import { mockReachableRobot } from '../../../../redux/discovery/__fixtures__'
+import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../redux/buildroot'
+import * as Shell from '../../../../redux/shell'
 import { Portal } from '../../../portal'
 import { UpdateAppModal } from '../../../app-settings'
 import { VersionList } from '../VersionList'
@@ -13,9 +13,9 @@ import { SyncRobotMessage } from '../SyncRobotMessage'
 import { SkipAppUpdateMessage } from '../SkipAppUpdateMessage'
 import { VersionInfoModal } from '../VersionInfoModal'
 
-import type { State } from '../../../../types'
+import type { State } from '../../../../redux/types'
 
-jest.mock('../../../../shell/update')
+jest.mock('../../../../redux/shell/update')
 jest.mock('../../../app-settings', () => ({ UpdateAppModal: () => null }))
 
 const MOCK_STATE: $Shape<State> = {}

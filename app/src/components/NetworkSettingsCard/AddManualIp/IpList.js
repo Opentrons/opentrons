@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { getConfig, removeManualIp } from '../../../config'
-import { getViewableRobots } from '../../../discovery'
+import { getConfig, removeManualIp } from '../../../redux/config'
+import { getViewableRobots } from '../../../redux/discovery'
 import { IpItem } from './IpItem'
 
-import type { State, Dispatch } from '../../../types'
-import type { DiscoveryCandidates } from '../../../config/types'
-import type { Robot, ReachableRobot } from '../../../discovery/types'
+import type { State, Dispatch } from '../../../redux/types'
+import type { DiscoveryCandidates } from '../../../redux/config/types'
+import type { Robot, ReachableRobot } from '../../../redux/discovery/types'
 
 type OP = {||}
 

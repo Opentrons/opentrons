@@ -4,19 +4,19 @@ import { StaticRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
-import * as Fixtures from '../../../discovery/__fixtures__'
+import * as Fixtures from '../../../redux/discovery/__fixtures__'
 import {
   actions as RobotActions,
   selectors as RobotSelectors,
-} from '../../../robot'
-import * as Buildroot from '../../../buildroot'
+} from '../../../redux/robot'
+import * as Buildroot from '../../../redux/buildroot'
 import { RobotItem } from '../RobotItem'
 import { RobotListItem } from '../RobotListItem'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
-jest.mock('../../../buildroot/selectors')
-jest.mock('../../../robot/selectors')
+jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/robot/selectors')
 
 const getBuildrootUpdateAvailable: JestMockFn<
   [State, any],

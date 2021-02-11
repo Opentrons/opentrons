@@ -2,11 +2,17 @@
 import * as React from 'react'
 
 import { TemperatureControl } from './TemperatureControl'
-import { THERMOCYCLER_MODULE_TYPE, useSendModuleCommand } from '../../modules'
+import {
+  THERMOCYCLER_MODULE_TYPE,
+  useSendModuleCommand,
+} from '../../redux/modules'
 import { TemperatureData } from './TemperatureData'
 import styles from './styles.css'
 
-import type { TemperatureModule, ThermocyclerModule } from '../../modules/types'
+import type {
+  TemperatureModule,
+  ThermocyclerModule,
+} from '../../redux/modules/types'
 
 type Props = {|
   module: TemperatureModule | ThermocyclerModule,

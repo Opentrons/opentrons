@@ -7,13 +7,13 @@ import { push } from 'connected-react-router'
 import {
   selectors as robotSelectors,
   actions as robotActions,
-} from '../../robot'
+} from '../../redux/robot'
 
 import { PrimaryButton } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { Mount, Labware } from '../../robot'
-import type { Dispatch } from '../../types'
+import type { Mount, Labware } from '../../redux/robot'
+import type { Dispatch } from '../../redux/types'
 
 import { ProceedToRun } from './ProceedToRun'
 

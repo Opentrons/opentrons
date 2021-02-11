@@ -5,7 +5,7 @@ import { css } from 'styled-components'
 
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import * as Sessions from '../../sessions'
+import * as Sessions from '../../redux/sessions'
 import {
   Flex,
   Text,

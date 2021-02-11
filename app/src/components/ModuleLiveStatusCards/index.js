@@ -9,7 +9,7 @@ import {
   useSendModuleCommand,
   getAttachedModulesForConnectedRobot,
   getModuleControlsDisabled,
-} from '../../modules'
+} from '../../redux/modules'
 
 import { TempDeckCard } from './TempDeckCard'
 import { MagDeckCard } from './MagDeckCard'

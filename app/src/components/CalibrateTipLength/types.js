@@ -1,7 +1,7 @@
 // @flow
 
-import type { TipLengthCalibrationSession } from '../../sessions/types'
-import type { Action } from '../../types'
+import type { TipLengthCalibrationSession } from '../../redux/sessions/types'
+import type { Action } from '../../redux/types'
 
 export type CalibrateTipLengthParentProps = {|
   robotName: string,

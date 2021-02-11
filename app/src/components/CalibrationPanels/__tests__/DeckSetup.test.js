@@ -6,8 +6,8 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 import {
   mockDeckCalTipRack,
   mockTipLengthCalBlock,
-} from '../../../sessions/__fixtures__'
-import * as Sessions from '../../../sessions'
+} from '../../../redux/sessions/__fixtures__'
+import * as Sessions from '../../../redux/sessions'
 
 import { DeckSetup } from '../DeckSetup'
 

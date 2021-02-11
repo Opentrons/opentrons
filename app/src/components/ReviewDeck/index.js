@@ -5,13 +5,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import some from 'lodash/some'
 import { PrimaryButton, AlertModal } from '@opentrons/components'
 
-import type { Dispatch } from '../../types'
+import type { Dispatch } from '../../redux/types'
 import {
   actions as robotActions,
   selectors as robotSelectors,
-} from '../../robot'
+} from '../../redux/robot'
 import secureTCLatchSrc from '../../assets/images/secure_tc_latch.png'
-import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../modules'
+import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../redux/modules'
 
 import { Portal } from '../portal'
 import { DeckMap } from '../DeckMap'

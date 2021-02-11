@@ -4,14 +4,14 @@ import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
 import noop from 'lodash/noop'
 
-import * as Calibration from '../../../calibration'
+import * as Calibration from '../../../redux/calibration'
 import { ProtocolLabwareCard } from '../ProtocolLabwareCard'
 import { ProtocolLabwareList } from '../ProtocolLabwareList'
 import { InfoSection } from '../InfoSection'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
-jest.mock('../../../calibration')
+jest.mock('../../../redux/calibration')
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 

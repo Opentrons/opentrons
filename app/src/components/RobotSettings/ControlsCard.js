@@ -19,15 +19,15 @@ import {
   updateLights,
   getLightsOn,
   ROBOT,
-} from '../../robot-controls'
-import { restartRobot } from '../../robot-admin'
-import { selectors as robotSelectors } from '../../robot'
-import { CONNECTABLE } from '../../discovery'
+} from '../../redux/robot-controls'
+import { restartRobot } from '../../redux/robot-admin'
+import { selectors as robotSelectors } from '../../redux/robot'
+import { CONNECTABLE } from '../../redux/discovery'
 import { LabeledValue, Divider } from '../structure'
 import { ToggleBtn } from '../ToggleBtn'
 
-import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { ViewableRobot } from '../../redux/discovery/types'
 
 type Props = {|
   robot: ViewableRobot,

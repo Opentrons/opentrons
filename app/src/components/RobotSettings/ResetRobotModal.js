@@ -8,13 +8,13 @@ import {
   getRequestById,
   PENDING,
   SUCCESS,
-} from '../../robot-api'
+} from '../../redux/robot-api'
 
 import {
   fetchResetConfigOptions,
   getResetConfigOptions,
   resetConfig,
-} from '../../robot-admin'
+} from '../../redux/robot-admin'
 
 import {
   BaseModal,
@@ -33,8 +33,8 @@ import {
 } from '@opentrons/components'
 import { Portal } from '../portal'
 
-import type { State, Dispatch } from '../../types'
-import type { ResetConfigRequest } from '../../robot-admin/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { ResetConfigRequest } from '../../redux/robot-admin/types'
 
 export type ResetRobotModalProps = {|
   robotName: string,

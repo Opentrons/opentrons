@@ -4,8 +4,8 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
-import { getCalibratePipettesLocations } from '../../nav'
-import { PIPETTE_MOUNTS } from '../../pipettes'
+import { getCalibratePipettesLocations } from '../../redux/nav'
+import { PIPETTE_MOUNTS } from '../../redux/pipettes'
 import { PageTabs } from '@opentrons/components'
 
 export type PipetteTabsProps = {|

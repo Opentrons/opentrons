@@ -13,9 +13,9 @@ import {
 import styles from '../../StepEditForm.css'
 
 import type { Dispatch } from 'redux'
-import type { StepIdType, StepFieldName } from '../../../../form-types'
+import type { StepIdType } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
-import type { FocusHandlers } from '../../types'
+import type { FieldProps } from '../../types'
 
 type SP = {|
   stepId: ?StepIdType,
@@ -28,31 +28,33 @@ type DP = {|
 |}
 
 type OP = {|
-  name: StepFieldName,
+  ...FieldProps,
   primaryWellCount?: number,
-  disabled: boolean,
-  errorToShow: ?string,
   isMulti: ?boolean,
   pipetteId: ?string,
   labwareId: ?string,
-  onFieldBlur: $PropertyType<FocusHandlers, 'onFieldBlur'>,
-  onFieldFocus: $PropertyType<FocusHandlers, 'onFieldFocus'>,
 |}
 
 type Props = {| ...OP, ...SP, ...DP |}
 
 class WellSelectionInputComponent extends React.Component<Props> {
   handleOpen = () => {
-    const { labwareId, pipetteId, name } = this.props
-    this.props.onFieldFocus(name)
+    const { labwareId, pipetteId, onFieldFocus } = this.props
+
+    if (onFieldFocus) {
+      onFieldFocus()
+    }
     if (labwareId && pipetteId) {
       this.props.onOpen(this.getModalKey())
     }
   }
 
   handleClose = () => {
-    this.props.onFieldBlur(this.props.name)
-    this.props.onClose()
+    const { onFieldBlur, onClose } = this.props
+    if (onFieldBlur) {
+      onFieldBlur()
+    }
+    onClose()
   }
 
   getModalKey = () => {

@@ -2,16 +2,16 @@
 import * as React from 'react'
 
 import { mountWithStore } from '@opentrons/components/__utils__'
-import * as Buildroot from '../../../../buildroot'
+import * as Buildroot from '../../../../redux/buildroot'
 
 import { DownloadUpdateModal } from '../DownloadUpdateModal'
 import { ReleaseNotesModal } from '../ReleaseNotesModal'
 import { MigrationWarningModal } from '../MigrationWarningModal'
 import { ViewUpdateModal } from '../ViewUpdateModal'
 
-import type { State } from '../../../../types'
+import type { State } from '../../../../redux/types'
 
-jest.mock('../../../../buildroot')
+jest.mock('../../../../redux/buildroot')
 
 const getBuildrootUpdateInfo: JestMockFn<
   [State],

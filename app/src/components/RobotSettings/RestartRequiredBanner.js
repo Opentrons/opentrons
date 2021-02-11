@@ -3,10 +3,10 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { AlertItem, OutlineButton } from '@opentrons/components'
 
-import { restartRobot } from '../../robot-admin'
+import { restartRobot } from '../../redux/robot-admin'
 import styles from './styles.css'
 
-import type { Dispatch } from '../../types'
+import type { Dispatch } from '../../redux/types'
 
 export type RestartRequiredBannerProps = {|
   robotName: string,

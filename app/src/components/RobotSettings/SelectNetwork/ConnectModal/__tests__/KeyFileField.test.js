@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import * as Fixtures from '../../../../../networking/__fixtures__'
+import * as Fixtures from '../../../../../redux/networking/__fixtures__'
 import { SelectField } from '@opentrons/components'
 import { UploadKeyInput } from '../UploadKeyInput'
 import { KeyFileField } from '../KeyFileField'

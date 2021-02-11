@@ -8,7 +8,10 @@ import { StatusItem } from './StatusItem'
 import { TemperatureControl } from '../ModuleControls'
 import styles from './styles.css'
 
-import type { TemperatureModule, ModuleCommand } from '../../modules/types'
+import type {
+  TemperatureModule,
+  ModuleCommand,
+} from '../../redux/modules/types'
 
 type Props = {|
   module: TemperatureModule,

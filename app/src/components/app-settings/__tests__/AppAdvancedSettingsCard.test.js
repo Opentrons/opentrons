@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
-import * as Config from '../../../config'
+import * as Config from '../../../redux/config'
 import { AppAdvancedSettingsCard } from '../AppAdvancedSettingsCard'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
-jest.mock('../../../config/selectors')
+jest.mock('../../../redux/config/selectors')
 
 const getUseTrashSurfaceForTipCal: JestMockFn<
   [State],

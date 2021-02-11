@@ -7,14 +7,14 @@ import {
   getRequestById,
   PENDING,
   SUCCESS,
-} from '../../robot-api'
+} from '../../redux/robot-api'
 
-import { fetchPipettes, FETCH_PIPETTES } from '../../pipettes'
+import { fetchPipettes, FETCH_PIPETTES } from '../../redux/pipettes'
 import { PrimaryButton, Icon } from '@opentrons/components'
 
-import type { State } from '../../types'
-import type { RequestState } from '../../robot-api/types'
-import type { FetchPipettesAction } from '../../pipettes/types'
+import type { State } from '../../redux/types'
+import type { RequestState } from '../../redux/robot-api/types'
+import type { FetchPipettesAction } from '../../redux/pipettes/types'
 
 export type CheckPipetteButtonProps = {|
   robotName: string,

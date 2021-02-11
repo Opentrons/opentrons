@@ -4,19 +4,19 @@ import { Link as InternalLink } from 'react-router-dom'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
 import { BaseModal, Flex, Icon } from '@opentrons/components'
-import * as Shell from '../../../shell'
+import * as Shell from '../../../redux/shell'
 import { ErrorModal } from '../../modals'
 import { ReleaseNotes } from '../../ReleaseNotes'
 import { UpdateAppModal } from '../UpdateAppModal'
 
-import type { State } from '../../../types'
-import type { ShellUpdateState, UpdateInfo } from '../../../shell/types'
+import type { State } from '../../../redux/types'
+import type { ShellUpdateState, UpdateInfo } from '../../../redux/shell/types'
 import type { UpdateAppModalProps } from '../UpdateAppModal'
 
 // TODO(mc, 2020-10-06): this is a partial mock because shell/update
 // needs some reorg to split actions and selectors
-jest.mock('../../../shell/update', () => ({
-  ...jest.requireActual('../../../shell/update'),
+jest.mock('../../../redux/shell/update', () => ({
+  ...jest.requireActual('../../../redux/shell/update'),
   getShellUpdateState: jest.fn(),
 }))
 

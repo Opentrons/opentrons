@@ -14,7 +14,7 @@ import { findLabwareDefWithCustom } from '../../../findLabware'
 import type {
   PipetteOffsetCalibration,
   TipLengthCalibration,
-} from '../../../calibration/types'
+} from '../../../redux/calibration/types'
 
 jest.mock('../../../findLabware')
 

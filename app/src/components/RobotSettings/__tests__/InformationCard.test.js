@@ -7,22 +7,22 @@ import { mountWithProviders } from '@opentrons/components/__utils__'
 import { SecondaryBtn, Tooltip } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 
-import * as Buildroot from '../../../buildroot'
-import * as Discovery from '../../../discovery'
-import { mockConnectableRobot } from '../../../discovery/__fixtures__'
-import { checkShellUpdate } from '../../../shell'
+import * as Buildroot from '../../../redux/buildroot'
+import * as Discovery from '../../../redux/discovery'
+import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import { checkShellUpdate } from '../../../redux/shell'
 import { LabeledValue } from '../../structure'
 import { InformationCard } from '../InformationCard'
 
-import type { State } from '../../../types'
-import type { DiscoveredRobot } from '../../../discovery/types'
+import type { State } from '../../../redux/types'
+import type { DiscoveredRobot } from '../../../redux/discovery/types'
 
 jest.mock('react-router-dom', () => ({
   Link: 'a',
 }))
 
-jest.mock('../../../buildroot/selectors')
-jest.mock('../../../discovery/selectors')
+jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/discovery/selectors')
 
 const getBuildrootUpdateDisplayInfo: JestMockFn<
   [State, string],

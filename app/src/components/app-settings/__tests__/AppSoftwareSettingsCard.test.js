@@ -4,19 +4,19 @@ import * as React from 'react'
 
 import { mountWithStore } from '@opentrons/components/__utils__'
 import { Card, LabeledValue, Link, SecondaryBtn } from '@opentrons/components'
-import * as Shell from '../../../shell'
+import * as Shell from '../../../redux/shell'
 import { Portal } from '../../portal'
 import { TitledControl } from '../../TitledControl'
 import { AppSoftwareSettingsCard } from '../AppSoftwareSettingsCard'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { UpdateNotificationsControl } from '../UpdateNotificationsControl'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
 // TODO(mc, 2020-10-08): this is a partial mock because shell/update
 // needs some reorg to split actions and selectors
-jest.mock('../../../shell/update', () => ({
-  ...jest.requireActual('../../../shell/update'),
+jest.mock('../../../redux/shell/update', () => ({
+  ...jest.requireActual('../../../redux/shell/update'),
   getAvailableShellUpdate: jest.fn(),
 }))
 

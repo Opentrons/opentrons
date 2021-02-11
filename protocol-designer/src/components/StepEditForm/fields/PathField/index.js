@@ -133,4 +133,4 @@ export const PathField: React.AbstractComponent<OP> = connect<
   _,
   _,
   _
->(mapSTP)(Path)
+>(mapSTP, () => ({}))(Path)

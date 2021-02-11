@@ -30,22 +30,25 @@ import {
   SecondaryBtn,
   SIZE_5,
 } from '@opentrons/components'
-import * as Sessions from '../../sessions'
+import * as Sessions from '../../redux/sessions'
 import { NeedHelpLink } from './NeedHelpLink'
 import { ChosenTipRackRender } from './ChosenTipRackRender'
-import { getCustomTipRackDefinitions } from '../../custom-labware'
-import { getAttachedPipettes } from '../../pipettes'
+import { getCustomTipRackDefinitions } from '../../redux/custom-labware'
+import { getAttachedPipettes } from '../../redux/pipettes'
 import {
   getCalibrationForPipette,
   getTipLengthCalibrations,
   getTipLengthForPipetteAndTiprack,
-} from '../../calibration/'
+} from '../../redux/calibration/'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import styles from './styles.css'
 
 import type { TipRackMap } from './ChosenTipRackRender'
-import type { SessionType, CalibrationLabware } from '../../sessions/types'
-import type { State } from '../../types'
+import type {
+  SessionType,
+  CalibrationLabware,
+} from '../../redux/sessions/types'
+import type { State } from '../../redux/types'
 import type { SelectOption, SelectOptionOrGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 

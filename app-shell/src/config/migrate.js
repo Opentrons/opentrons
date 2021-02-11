@@ -2,7 +2,7 @@
 import path from 'path'
 import { app } from 'electron'
 import uuid from 'uuid/v4'
-import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/config'
+import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/redux/config'
 
 import pkg from '../../package.json'
 
@@ -12,7 +12,7 @@ import type {
   ConfigV1,
   ConfigV2,
   ConfigV3,
-} from '@opentrons/app/src/config/types'
+} from '@opentrons/app/src/redux/config/types'
 
 // base config v0 defaults
 // any default values for later config versions are specified in the migration

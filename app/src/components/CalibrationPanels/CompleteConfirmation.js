@@ -17,8 +17,8 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 import type { CalibrationPanelProps } from './types'
-import type { SessionType } from '../../sessions/types'
-import * as Sessions from '../../sessions'
+import type { SessionType } from '../../redux/sessions/types'
+import * as Sessions from '../../redux/sessions'
 
 import slotOneRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
 import slotThreeRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'

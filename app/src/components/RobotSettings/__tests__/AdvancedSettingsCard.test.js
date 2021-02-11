@@ -4,13 +4,13 @@ import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../i18n'
 
-import * as RobotSettings from '../../../robot-settings'
-import { mockConnectableRobot } from '../../../discovery/__fixtures__'
+import * as RobotSettings from '../../../redux/robot-settings'
+import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { AdvancedSettingsCard } from '../AdvancedSettingsCard'
 import { UpdateFromFileControl } from '../UpdateFromFileControl'
 import { OpenJupyterControl } from '../OpenJupyterControl'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
 jest.mock('react-router-dom', () => ({ Link: 'a' }))
 
@@ -18,9 +18,9 @@ jest.mock('../UpdateFromFileControl', () => ({
   UpdateFromFileControl: () => <></>,
 }))
 
-jest.mock('../../../analytics')
-jest.mock('../../../robot-settings/selectors')
-jest.mock('../../../shell/robot-logs/selectors')
+jest.mock('../../../redux/analytics')
+jest.mock('../../../redux/robot-settings/selectors')
+jest.mock('../../../redux/shell/robot-logs/selectors')
 
 const getRobotSettings: JestMockFn<
   [State, string],

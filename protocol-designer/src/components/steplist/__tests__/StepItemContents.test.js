@@ -118,8 +118,8 @@ describe('StepItemContents', () => {
 
   describe('awaitTemperature step type', () => {
     let awaitTemperatureProps: StepItemContentsProps
-    const stepType: 'awaitTemperature' = 'awaitTemperature'
-
+    // TODO(IL, 2021-02-04) that's not a stepType?!? See #7285
+    const stepType: any = 'awaitTemperature'
     beforeEach(() => {
       awaitTemperatureProps = {
         ...props,
@@ -154,7 +154,8 @@ describe('StepItemContents', () => {
 
   describe('thermocyclerState substep type', () => {
     let thermocyclerStateProps: StepItemContentsProps
-    const stepType = THERMOCYCLER_STATE
+    // TODO(IL, 2021-02-04) that's not a stepType?!? See #7285
+    const stepType: any = THERMOCYCLER_STATE
 
     beforeEach(() => {
       thermocyclerStateProps = {

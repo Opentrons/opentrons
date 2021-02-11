@@ -109,19 +109,27 @@ Substeps are the visual elements on the Step List that are displayed when a Step
 
 Substeps use command creator args, eg via `getArgsAndErrorsById`. This ties substeps to command creator args, it's not just command creators.
 
-# Hooking up step field components with `FieldConnector`
+## `StepFormProps`
 
-Form state of a step form that is being edited lives in Redux at `stepForms.unsavedForm` and all changes require dispatching a `CHANGE_FORM_INPUT` action. It may or may not make sense to keep unsaved form state in Redux, depending on PD's evolving requirements. So the best we can do is to preserve optionality by separating concerns. When we're dealing with the form field components, any form updates should be hooked up into some general function `updateValue`, and any form values should be provided without being tied to implementation details of where that value is from.
+`StepFormProps` is a common props interface shared between step form components (the component for the actual form, ie `MagnetForm`). These are passed into the form component by `StepEditFormManager`.
 
-We also want to avoid boilerplate. Most field components in step forms need the same things:
+## Hooking up step field components with `FieldProps`
 
-- a `value`
-- an `updateValue` function
-- current errors to display, and functionality about field pristinity & focus state
-- tooltip on mouse hover
+The common `StepFormProps` interface includes `propsForFields: FieldPropsByName` which is a dictionary-like object `{'name_of_field': FieldProps}`.
+
+The `FieldProps` type is a common set of props that we use as an interface for step form field UI components. For example, you can spread `FieldProps` into a `TextField` or a `RadioGroupField`. Supplying `<SomeUIField {...propsForFields['name_of_field']} />` should give the field everything it needs for common field behaviors:
+
+- a `value` to display
+- an `updateValue` function usually wired into the component's `onChange` event
+- current errors to display, and functionality about field pristinity & focus state (including blur + focus callbacks)
 - disabled/enabled status
+- the field's `name` for semantics/accessibility/tests
 
-We use the `FieldConnector` component in PD to pass in these props to step form field components. Given the `name` of the field, it contains all the machinery to pick out the correct props, and in general to interface the presentational field component(s) with all the relevant business logic that it should be associated with.
+### `FocusHandlers`
+
+`FocusHandlers` is a props interface used for step edit forms. It's part of the `StepFormProps` common interface, but most forms don't need to use `FocusHandlers` and can achieve all focus/blur/pristinity logic by just spreading `FieldProps` into appropriate fields.
+
+Some forms, like the Thermocycler form, have dynamic fields (you can add and delete fields arbitrarily to a TC profile) and the pristinity of dynamic fields is currently handled by direct use of the `FocusHandlers` props.
 
 ## Field Error Display & Pristine/Dirty State
 
@@ -129,17 +137,23 @@ On a new step form, we only want to show field errors for fields that have alrea
 
 Also on the currently focused field, we don't want to show errors. Otherwise as a user types a series of characters into a field, transient errors may come and go in a way that would be confusing and distracting.
 
-Step forms have the concept of "pristine" vs "dirty" state for fields. A field starts pristine and when it is blurred it is made "dirty". This state is held in `StepEditForm` React component state. A prop called `focusHandlers` is spread into individual field components to hook them up to this `StepEditForm` state.
+Step forms have the concept of "pristine" vs "dirty" state for fields. A field starts pristine and when it is blurred it is made "dirty". This state is held in `StepEditFormManager` React component state, and the setters/getters for this state are passed into the `makeSingleEditFieldProps` utility. Once we have the `FieldProps` interface, the pristinity logic has been abstracted away from the UI components themselves.
 
 Initially, a newly-created Step Form will have all of its fields marked as pristine, unless they don't match the default values for that step form type (which can happen for auto-populated fields) in which case they are marked as dirty. When an existing Step Form is opened (user is editing an existing step), then all the fields are marked as dirty immediately.
 
-`FieldConnector` instances receive `focusHandlers` that are passed down into them from `StepEditForm`. `FieldConnector` uses those props to mask field-level errors based on pristinity. `FieldConnector` will pass down the prop `errorToShow` to its child, where any errors related to fields that are still pristine are excluded.
-
 ## Form Error/Warning Display
 
-`FormAlerts` is used in `StepEditForm` to show form-level errors and warnings. It uses the same pristine/dirty state held by `StepEditForm`.
+`FormAlerts` is used in `StepEditForm` to show form-level errors and warnings. It uses the same pristine/dirty state held by `StepEditFormManager`. The main difference is that form-level errors/warnings tend to care about multiple fields, in a pattern like "only if field A **and** field B are dirtied, show any errors relevant to those fields".
 
-# Step form manipulation in Protocol Designer
+## Single-edit mode
+
+`FieldProps` is the same interface, but different implementation, between single-edit and batch-edit mode. In single-edit mode, `makeSingleEditFieldProps` utility is responsible for generating the `FieldProps` interface, together with the some selectors and state managed by `StepEditFormManager`. The form state of a step form that is being edited lives in Redux at `stepForms.unsavedForm` and all changes require dispatching a `CHANGE_FORM_INPUT` action.
+
+## Batch-edit mode
+
+TODO(IL, 2021-02-08): write this documentation as part of #7222
+
+# Step form manipulation in Protocol Designer (Documentation WIP)
 
 (TODO: IL 2019-11-15) write this section after `legacySteps` reducer and the "saved but pristine" form concept is removed.
 

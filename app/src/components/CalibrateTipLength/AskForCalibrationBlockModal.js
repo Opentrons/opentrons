@@ -23,10 +23,10 @@ import { useDispatch } from 'react-redux'
 
 import styles from './styles.css'
 import { labwareImages } from '../CalibrationPanels/labwareImages'
-import { setUseTrashSurfaceForTipCal } from '../../calibration'
+import { setUseTrashSurfaceForTipCal } from '../../redux/calibration'
 import { NeedHelpLink } from '../CalibrationPanels/NeedHelpLink'
 
-import type { Dispatch } from '../../types'
+import type { Dispatch } from '../../redux/types'
 
 const EXIT = 'exit'
 const ALERT_TIP_LENGTH_CAL_HEADER = 'Do you have a calibration block?'

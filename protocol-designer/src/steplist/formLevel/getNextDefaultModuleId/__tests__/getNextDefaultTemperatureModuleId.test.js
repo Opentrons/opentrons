@@ -96,7 +96,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
           },
           tcStepId: {
             id: 'tcStepId',
-            stepType: THERMOCYCLER_MODULE_TYPE,
+            stepType: 'thermocycler',
             stepName: THERMOCYCLER_MODULE_TYPE,
             moduleId: 'tcId',
           },
@@ -111,18 +111,18 @@ describe('getNextDefaultTemperatureModuleId', () => {
           tempId: getTemp(),
         },
         savedForms: {
-          tempStepId: {
+          tempStepId: ({
             id: 'tempStepId',
             stepType: 'temperature',
             stepName: 'temperature',
             moduleId: 'tempId',
-          },
-          magStepId: {
+          }: any),
+          magStepId: ({
             id: 'magStepId',
             stepType: 'magnet',
             stepName: 'magnet',
             moduleId: 'magdeckId',
-          },
+          }: any),
         },
         orderedStepIds: ['tempStepId', 'magStepId'],
         expected: 'tempId',

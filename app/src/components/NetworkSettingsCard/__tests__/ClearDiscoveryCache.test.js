@@ -5,7 +5,7 @@ import { mount } from 'enzyme'
 import noop from 'lodash/noop'
 import { LabeledButton } from '@opentrons/components'
 import { ClearDiscoveryCache } from '../ClearDiscoveryCache'
-import { clearDiscoveryCache } from '../../../discovery'
+import { clearDiscoveryCache } from '../../../redux/discovery'
 
 describe('ClearDiscoveryCache', () => {
   const dispatch = jest.fn()

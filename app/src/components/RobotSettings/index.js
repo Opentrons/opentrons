@@ -9,7 +9,7 @@ import { ControlsCard } from './ControlsCard'
 import { ConnectionCard } from './ConnectionCard'
 import { AdvancedSettingsCard } from './AdvancedSettingsCard'
 import { CalibrationCard } from './CalibrationCard'
-import type { ViewableRobot } from '../../discovery/types'
+import type { ViewableRobot } from '../../redux/discovery/types'
 
 export { ConnectAlertModal } from './ConnectAlertModal'
 

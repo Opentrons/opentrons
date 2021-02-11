@@ -5,43 +5,43 @@ import { mountWithProviders } from '@opentrons/components/__utils__'
 import { saveAs } from 'file-saver'
 
 import { i18n } from '../../../i18n'
-import * as PipetteOffset from '../../../calibration/pipette-offset'
-import * as TipLength from '../../../calibration/tip-length'
-import * as Calibration from '../../../calibration'
-import * as Pipettes from '../../../pipettes'
-import * as Config from '../../../config'
-import * as RobotSelectors from '../../../robot/selectors'
+import * as PipetteOffset from '../../../redux/calibration/pipette-offset'
+import * as TipLength from '../../../redux/calibration/tip-length'
+import * as Calibration from '../../../redux/calibration'
+import * as Pipettes from '../../../redux/pipettes'
+import * as Config from '../../../redux/config'
+import * as RobotSelectors from '../../../redux/robot/selectors'
 
 import { CalibrationCard } from '../CalibrationCard'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 import { PipetteOffsets } from '../PipetteOffsets'
-import { mockAttachedPipette } from '../../../pipettes/__fixtures__'
-import { mockPipetteOffsetCalibration1 } from '../../../calibration/pipette-offset/__fixtures__'
-import { mockTipLengthCalibration1 } from '../../../calibration/tip-length/__fixtures__'
+import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
+import { mockPipetteOffsetCalibration1 } from '../../../redux/calibration/pipette-offset/__fixtures__'
+import { mockTipLengthCalibration1 } from '../../../redux/calibration/tip-length/__fixtures__'
 
-import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
+import { CONNECTABLE, UNREACHABLE } from '../../../redux/discovery'
 
-import type { State, Action } from '../../../types'
-import type { ViewableRobot } from '../../../discovery/types'
-import type { AnalyticsEvent } from '../../../analytics/types'
+import type { State, Action } from '../../../redux/types'
+import type { ViewableRobot } from '../../../redux/discovery/types'
+import type { AnalyticsEvent } from '../../../redux/analytics/types'
 import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
-} from '../../../pipettes/types'
+} from '../../../redux/pipettes/types'
 
 const mockCallTrackEvent: JestMockFn<[AnalyticsEvent], void> = jest.fn()
 
 jest.mock('react-router-dom', () => ({ Link: 'a' }))
 jest.mock('file-saver')
 
-jest.mock('../../../robot/selectors')
-jest.mock('../../../config/selectors')
-jest.mock('../../../pipettes/selectors')
-jest.mock('../../../calibration/selectors')
-jest.mock('../../../calibration/tip-length/selectors')
-jest.mock('../../../calibration/pipette-offset/selectors')
-jest.mock('../../../sessions/selectors')
-jest.mock('../../../analytics', () => ({
+jest.mock('../../../redux/robot/selectors')
+jest.mock('../../../redux/config/selectors')
+jest.mock('../../../redux/pipettes/selectors')
+jest.mock('../../../redux/calibration/selectors')
+jest.mock('../../../redux/calibration/tip-length/selectors')
+jest.mock('../../../redux/calibration/pipette-offset/selectors')
+jest.mock('../../../redux/sessions/selectors')
+jest.mock('../../../redux/analytics', () => ({
   useTrackEvent: () => mockCallTrackEvent,
 }))
 

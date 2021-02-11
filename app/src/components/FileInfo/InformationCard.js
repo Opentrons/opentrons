@@ -9,13 +9,13 @@ import {
   getProtocolLastUpdated,
   getProtocolMethod,
   getProtocolDescription,
-} from '../../protocol'
+} from '../../redux/protocol'
 
 import { LabeledValue } from '@opentrons/components'
 import { InfoSection } from './InfoSection'
 import { SectionContentHalf, CardRow } from '../layout'
 
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 
 type OP = {||}
 

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { shallow, mount } from 'enzyme'
 
-import * as Fixtures from '../../../custom-labware/__fixtures__'
+import * as Fixtures from '../../../redux/custom-labware/__fixtures__'
 import { LabwareList } from '../LabwareList'
 import { LabwareItem } from '../LabwareItem'
 

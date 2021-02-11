@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import * as Sessions from '../../../sessions'
+import * as Sessions from '../../../redux/sessions'
 
 import { ConfirmExitModal } from '../ConfirmExitModal'
 

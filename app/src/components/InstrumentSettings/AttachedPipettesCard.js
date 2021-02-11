@@ -17,16 +17,16 @@ import {
   fetchPipetteSettings,
   getAttachedPipettes,
   getAttachedPipetteSettings,
-} from '../../pipettes'
+} from '../../redux/pipettes'
 
 import { PipetteInfo } from './PipetteInfo'
 
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 import {
   fetchPipetteOffsetCalibrations,
   fetchTipLengthCalibrations,
-} from '../../calibration'
-import type { Mount } from '../../pipettes/types'
+} from '../../redux/calibration'
+import type { Mount } from '../../redux/pipettes/types'
 
 type Props = {|
   robotName: string,

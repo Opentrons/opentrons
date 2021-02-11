@@ -6,23 +6,23 @@ import wellPlate96Def from '@opentrons/shared-data/labware/fixtures/2/fixture_96
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-import { getHasCalibrationBlock } from '../../../config'
-import { selectors as robotSelectors } from '../../../robot'
-import { useDispatchApiRequests } from '../../../robot-api'
-import { getUncalibratedTipracksByMount } from '../../../pipettes'
-import * as Sessions from '../../../sessions'
+import { getHasCalibrationBlock } from '../../../redux/config'
+import { selectors as robotSelectors } from '../../../redux/robot'
+import { useDispatchApiRequests } from '../../../redux/robot-api'
+import { getUncalibratedTipracksByMount } from '../../../redux/pipettes'
+import * as Sessions from '../../../redux/sessions'
 import { CalibrateTipLengthControl } from '../CalibrateTipLengthControl'
-import * as Analytics from '../../../analytics/actions'
+import * as Analytics from '../../../redux/analytics/actions'
 
-import type { Labware } from '../../../robot/types'
-import type { State } from '../../../types'
+import type { Labware } from '../../../redux/robot/types'
+import type { State } from '../../../redux/types'
 
-jest.mock('../../../robot-api')
-jest.mock('../../../robot/selectors')
-jest.mock('../../../sessions/selectors')
-jest.mock('../../../config/selectors')
-jest.mock('../../../pipettes/selectors')
-jest.mock('../../../analytics/actions')
+jest.mock('../../../redux/robot-api')
+jest.mock('../../../redux/robot/selectors')
+jest.mock('../../../redux/sessions/selectors')
+jest.mock('../../../redux/config/selectors')
+jest.mock('../../../redux/pipettes/selectors')
+jest.mock('../../../redux/analytics/actions')
 
 const mockGetUncalibratedTipracksByMount: JestMockFn<
   [State, string],

@@ -11,11 +11,11 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-import * as SystemInfo from '../../system-info'
+import * as SystemInfo from '../../redux/system-info'
 import { U2EDriverWarning } from './U2EDriverWarning'
 import { U2EDeviceDetails } from './U2EDeviceDetails'
 
-import type { State } from '../../types'
+import type { State } from '../../redux/types'
 
 const U2E_ADAPTER_INFORMATION = 'USB-to-Ethernet Adapter Information'
 

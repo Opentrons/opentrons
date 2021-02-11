@@ -6,8 +6,8 @@ import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
-import * as Sessions from '../../../sessions'
-import { mockDeckCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
+import * as Sessions from '../../../redux/sessions'
+import { mockDeckCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
 import { CalibrateDeck } from '../index'
 import {
@@ -20,11 +20,11 @@ import {
   CompleteConfirmation,
 } from '../../CalibrationPanels'
 
-import type { DeckCalibrationStep } from '../../../sessions/types'
+import type { DeckCalibrationStep } from '../../../redux/sessions/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
-jest.mock('../../../sessions/selectors')
-jest.mock('../../../robot-api/selectors')
+jest.mock('../../../redux/sessions/selectors')
+jest.mock('../../../redux/robot-api/selectors')
 
 type CalibrateDeckSpec = {
   component: React.AbstractComponent<any>,

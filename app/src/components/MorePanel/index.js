@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { SidePanel, ListItem, Icon } from '@opentrons/components'
 
-import { MORE } from '../../nav'
+import { MORE } from '../../redux/nav'
 import styles from './styles.css'
 
 // TODO(mc, 2019-12-03): i18n

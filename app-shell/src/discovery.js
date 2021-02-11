@@ -10,13 +10,13 @@ import {
   DEFAULT_PORT,
 } from '@opentrons/discovery-client'
 
-import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
+import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import {
   DISCOVERY_START,
   DISCOVERY_FINISH,
   DISCOVERY_REMOVE,
   CLEAR_CACHE,
-} from '@opentrons/app/src/discovery/actions'
+} from '@opentrons/app/src/redux/discovery/actions'
 
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'

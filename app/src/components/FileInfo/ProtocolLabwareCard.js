@@ -8,9 +8,9 @@ import { ProtocolLabwareList } from './ProtocolLabwareList'
 import {
   fetchLabwareCalibrations,
   getUniqueProtocolLabwareSummaries,
-} from '../../calibration'
+} from '../../redux/calibration'
 
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 
 export type ProtocolLabwareProps = {|
   robotName: string,

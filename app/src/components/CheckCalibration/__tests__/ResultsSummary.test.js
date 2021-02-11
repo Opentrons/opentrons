@@ -3,11 +3,11 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
-import * as Calibration from '../../../calibration'
-import { mockCalibrationStatus } from '../../../calibration/__fixtures__'
-import * as Fixtures from '../../../sessions/__fixtures__'
-import * as Sessions from '../../../sessions'
-import type { State } from '../../../types'
+import * as Calibration from '../../../redux/calibration'
+import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
+import * as Fixtures from '../../../redux/sessions/__fixtures__'
+import * as Sessions from '../../../redux/sessions'
+import type { State } from '../../../redux/types'
 import { ResultsSummary } from '../ResultsSummary'
 import { saveAs } from 'file-saver'
 import { PrimaryBtn, Flex, Text } from '@opentrons/components'
@@ -15,7 +15,7 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 jest.mock('file-saver')
-jest.mock('../../../calibration/selectors')
+jest.mock('../../../redux/calibration/selectors')
 jest.mock('@opentrons/shared-data', () => ({
   getAllPipetteNames: jest.fn(
     jest.requireActual('@opentrons/shared-data').getAllPipetteNames

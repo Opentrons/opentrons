@@ -3,9 +3,12 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { LabeledToggle } from '@opentrons/components'
 
-import { toggleAnalyticsOptedIn, getAnalyticsOptedIn } from '../../analytics'
+import {
+  toggleAnalyticsOptedIn,
+  getAnalyticsOptedIn,
+} from '../../redux/analytics'
 
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 
 type OP = {||}
 

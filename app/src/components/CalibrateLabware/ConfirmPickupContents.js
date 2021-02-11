@@ -3,11 +3,11 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import { actions as robotActions } from '../../robot'
+import { actions as robotActions } from '../../redux/robot'
 import { ConfirmPickupPrompt } from './ConfirmPickupPrompt'
 
-import type { Dispatch } from '../../types'
-import type { Labware, Pipette } from '../../robot'
+import type { Dispatch } from '../../redux/types'
+import type { Labware, Pipette } from '../../redux/robot'
 
 type OP = {|
   labware: Labware,

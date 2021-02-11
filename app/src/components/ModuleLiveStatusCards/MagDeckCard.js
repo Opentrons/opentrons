@@ -6,7 +6,7 @@ import { StatusCard } from './StatusCard'
 import { StatusItem } from './StatusItem'
 import styles from './styles.css'
 
-import type { MagneticModule } from '../../modules/types'
+import type { MagneticModule } from '../../redux/modules/types'
 
 type Props = {|
   module: MagneticModule,

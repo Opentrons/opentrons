@@ -17,16 +17,17 @@ import {
   RadioGroupField,
   StepFormDropdown,
 } from '../fields'
-import { FieldConnector } from '../fields/FieldConnector'
 import styles from '../StepEditForm.css'
 
-import type { FocusHandlers } from '../types'
+import type { StepFormProps } from '../types'
 
-type PauseFormProps = {| focusHandlers: FocusHandlers |}
+const PauseUntilTempTooltip = () => (
+  <div>
+    {i18n.t(`tooltip.step_fields.pauseAction.disabled.wait_until_temp`)}
+  </div>
+)
 
-export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
-  const { focusHandlers } = props
-
+export const PauseForm = (props: StepFormProps): React.Node => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )
@@ -35,18 +36,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
     uiModuleSelectors.getTempModuleIsOnDeck
   )
 
-  const pauseUntilTempTooltip = (
-    <div>
-      {i18n.t(`tooltip.step_fields.pauseAction.disabled.wait_until_temp`)}
-    </div>
-  )
-
-  // time fields blur together
-  const blurAllTimeUnitFields = () => {
-    ;['pauseHour', 'pauseMinute', 'pauseSecond'].forEach(timeUnitFieldName =>
-      props.focusHandlers.onFieldBlur(timeUnitFieldName)
-    )
-  }
+  const { propsForFields } = props
 
   return (
     <div className={styles.form_wrapper}>
@@ -60,7 +50,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
         <div className={styles.section_column}>
           <div className={styles.checkbox_row}>
             <RadioGroupField
-              name="pauseAction"
+              {...propsForFields['pauseAction']}
               options={[
                 {
                   name: i18n.t(
@@ -69,12 +59,11 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
                   value: PAUSE_UNTIL_RESUME,
                 },
               ]}
-              {...focusHandlers}
             />
           </div>
           <div className={styles.checkbox_row}>
             <RadioGroupField
-              name="pauseAction"
+              {...propsForFields['pauseAction']}
               options={[
                 {
                   name: i18n.t(
@@ -83,7 +72,6 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
                   value: PAUSE_UNTIL_TIME,
                 },
               ]}
-              {...focusHandlers}
             />
           </div>
           <ConditionalOnField
@@ -92,25 +80,19 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
           >
             <div className={styles.form_row}>
               <TextField
-                {...focusHandlers}
-                onFieldBlur={blurAllTimeUnitFields}
+                {...propsForFields['pauseHour']}
                 className={styles.small_field}
                 units={i18n.t('application.units.hours')}
-                name="pauseHour"
               />
               <TextField
-                {...focusHandlers}
-                onFieldBlur={blurAllTimeUnitFields}
+                {...propsForFields['pauseMinute']}
                 className={styles.small_field}
                 units={i18n.t('application.units.minutes')}
-                name="pauseMinute"
               />
               <TextField
-                {...focusHandlers}
-                onFieldBlur={blurAllTimeUnitFields}
+                {...propsForFields['pauseSecond']}
                 className={styles.small_field}
                 units={i18n.t('application.units.seconds')}
-                name="pauseSecond"
               />
             </div>
           </ConditionalOnField>
@@ -118,17 +100,17 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
           <HoverTooltip
             placement="bottom"
             tooltipComponent={
-              pauseUntilTempEnabled ? null : pauseUntilTempTooltip
+              pauseUntilTempEnabled ? null : <PauseUntilTempTooltip />
             }
           >
             {hoverTooltipHandlers => (
               <div {...hoverTooltipHandlers}>
                 <div className={styles.checkbox_row}>
                   <RadioGroupField
+                    {...propsForFields['pauseAction']}
                     className={cx({
                       [styles.disabled]: !pauseUntilTempEnabled,
                     })}
-                    name="pauseAction"
                     options={[
                       {
                         name: i18n.t(
@@ -137,7 +119,6 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
                         value: PAUSE_UNTIL_TEMP,
                       },
                     ]}
-                    {...focusHandlers}
                   />
                 </div>
                 <ConditionalOnField
@@ -151,8 +132,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
                       )}
                     >
                       <StepFormDropdown
-                        {...focusHandlers}
-                        name="moduleId"
+                        {...propsForFields['moduleId']}
                         options={moduleLabwareOptions}
                       />
                     </FormGroup>
@@ -162,10 +142,9 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
                       )}
                     >
                       <TextField
-                        name="pauseTemperature"
+                        {...propsForFields['pauseTemperature']}
                         className={styles.small_field}
                         units={i18n.t('application.units.degrees')}
-                        {...focusHandlers}
                       />
                     </FormGroup>
                   </div>
@@ -177,25 +156,20 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
         <div className={styles.section_column}>
           <div className={styles.form_row}>
             {/* TODO: Ian 2019-03-25 consider making this a component eg `TextAreaField.js` if used anywhere else */}
-            <FieldConnector
-              dirtyFields={focusHandlers.dirtyFields}
-              focusedField={focusHandlers.focusedField}
-              name="pauseMessage"
-              render={({ value, updateValue }) => (
-                <FormGroup
-                  className={styles.full_width_field}
-                  label={i18n.t('form.step_edit_form.field.pauseMessage.label')}
-                >
-                  <textarea
-                    className={styles.textarea_field}
-                    value={value}
-                    onChange={(e: SyntheticInputEvent<*>) =>
-                      updateValue(e.currentTarget.value)
-                    }
-                  />
-                </FormGroup>
-              )}
-            />
+            <FormGroup
+              className={styles.full_width_field}
+              label={i18n.t('form.step_edit_form.field.pauseMessage.label')}
+            >
+              <textarea
+                className={styles.textarea_field}
+                value={propsForFields['pauseMessage'].value}
+                onChange={(e: SyntheticInputEvent<*>) =>
+                  propsForFields['pauseMessage'].updateValue(
+                    e.currentTarget.value
+                  )
+                }
+              />
+            </FormGroup>
           </div>
         </div>
       </div>

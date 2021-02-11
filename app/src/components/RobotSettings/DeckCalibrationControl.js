@@ -16,15 +16,15 @@ import {
   AlertModal,
 } from '@opentrons/components'
 
-import * as RobotApi from '../../robot-api'
-import * as Sessions from '../../sessions'
-import * as Calibration from '../../calibration'
+import * as RobotApi from '../../redux/robot-api'
+import * as Sessions from '../../redux/sessions'
+import * as Calibration from '../../redux/calibration'
 
 import { Portal } from '../portal'
 import { CalibrateDeck } from '../CalibrateDeck'
 import { TitledControl } from '../TitledControl'
 import { ConfirmStartDeckCalModal } from './ConfirmStartDeckCalModal'
-import { getDeckCalibrationSession } from '../../sessions/deck-calibration/selectors'
+import { getDeckCalibrationSession } from '../../redux/sessions/deck-calibration/selectors'
 import {
   InlineCalibrationWarning,
   REQUIRED,
@@ -32,16 +32,16 @@ import {
 } from '../InlineCalibrationWarning'
 import { formatLastModified } from '../CalibrationPanels/utils'
 
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 import type {
   DeckCalibrationStatus,
   DeckCalibrationData,
-} from '../../calibration/types'
+} from '../../redux/calibration/types'
 import type {
   SessionCommandString,
   DeckCalibrationSession,
-} from '../../sessions/types'
-import type { RequestState } from '../../robot-api/types'
+} from '../../redux/sessions/types'
+import type { RequestState } from '../../redux/robot-api/types'
 
 // deck calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: Array<SessionCommandString> = [

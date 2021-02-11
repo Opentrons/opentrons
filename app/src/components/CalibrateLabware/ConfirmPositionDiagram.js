@@ -2,7 +2,7 @@
 // diagram and instructions for ConfirmPositionContents
 import * as React from 'react'
 
-import type { Labware, Pipette } from '../../robot'
+import type { Labware, Pipette } from '../../redux/robot'
 
 import { InstructionStep } from '../InstructionStep'
 import { getInstructionsByType, getDiagramSrc } from './instructions-data'

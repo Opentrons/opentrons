@@ -10,11 +10,11 @@ import {
   RESET_VALUE,
   ADD_UNIQUE_VALUE,
   SUBTRACT_VALUE,
-} from '@opentrons/app/src/config'
+} from '@opentrons/app/src/redux/config'
 
 import { DEFAULTS } from './migrate'
 
-import type { ConfigValueChangeAction } from '@opentrons/app/src/config/types'
+import type { ConfigValueChangeAction } from '@opentrons/app/src/redux/config/types'
 import type { Config, Overrides } from './types'
 
 export function shouldUpdate(path: string, overrides: Overrides): boolean {

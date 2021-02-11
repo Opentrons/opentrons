@@ -9,12 +9,12 @@ import {
   INVALID_LABWARE_FILE,
   DUPLICATE_LABWARE_FILE,
   OPENTRONS_LABWARE_FILE,
-} from '../../custom-labware'
+} from '../../redux/custom-labware'
 
 import { Warning } from './Warning'
 import styles from './styles.css'
 
-import type { CheckedLabwareFile } from '../../custom-labware/types'
+import type { CheckedLabwareFile } from '../../redux/custom-labware/types'
 
 // TODO(mc, 2019-11-21): i18n
 const NA = 'N/A'

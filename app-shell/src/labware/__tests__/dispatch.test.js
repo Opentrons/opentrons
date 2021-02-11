@@ -8,16 +8,16 @@ import * as Defs from '../definitions'
 import * as Val from '../validation'
 import { registerLabware } from '..'
 
-import { uiInitialized } from '@opentrons/app/src/shell/actions'
-import * as CustomLabware from '@opentrons/app/src/custom-labware'
-import * as CustomLabwareFixtures from '@opentrons/app/src/custom-labware/__fixtures__'
+import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
+import * as CustomLabware from '@opentrons/app/src/redux/custom-labware'
+import * as CustomLabwareFixtures from '@opentrons/app/src/redux/custom-labware/__fixtures__'
 
-import type { Config } from '@opentrons/app/src/config/types'
+import type { Config } from '@opentrons/app/src/redux/config/types'
 import type {
   UncheckedLabwareFile,
   CheckedLabwareFile,
   DuplicateLabwareFile,
-} from '@opentrons/app/src/custom-labware/types'
+} from '@opentrons/app/src/redux/custom-labware/types'
 
 jest.mock('fs-extra')
 jest.mock('electron')

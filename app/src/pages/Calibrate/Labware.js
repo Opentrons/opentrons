@@ -4,9 +4,9 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { Route, Redirect, withRouter } from 'react-router-dom'
 
-import { selectors as robotSelectors } from '../../robot'
-import { getRobotSettings } from '../../robot-settings'
-import { getUnpreparedModules } from '../../modules'
+import { selectors as robotSelectors } from '../../redux/robot'
+import { getRobotSettings } from '../../redux/robot-settings'
+import { getUnpreparedModules } from '../../redux/modules'
 
 import { Page } from '../../components/Page'
 import { CalibrateLabware } from '../../components/CalibrateLabware'
@@ -17,9 +17,9 @@ import { ConnectModules } from '../../components/ConnectModules'
 import { PrepareModules } from '../../components/PrepareModules'
 
 import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch } from '../../types'
-import type { Labware as RobotLabware } from '../../robot/types'
-import type { AttachedModule } from '../../modules/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { Labware as RobotLabware } from '../../redux/robot/types'
+import type { AttachedModule } from '../../redux/modules/types'
 
 type OP = ContextRouter
 

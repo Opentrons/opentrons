@@ -1,37 +1,64 @@
-import React from 'react'
+// @flow
+import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
 import { selectors as uiModuleSelectors } from '../../../../ui/modules'
-import * as fields from '../../fields'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import * as _fields from '../../fields'
 import { MagnetForm } from '../MagnetForm'
+import type { Options } from '@opentrons/components'
+import type { BaseState } from '../../../../types'
+import type { ModuleEntities } from '../../../../step-forms/types'
 
+jest.mock('../../../../step-forms/selectors')
 jest.mock('../../../../ui/modules')
 jest.mock('../../fields')
 
+// TODO(IL, 2021-02-01): don't any-type, follow mocking pattern in MixForm.test.js ?
+const fields: any = _fields
+
+const getUnsavedFormMock: JestMockFn<[BaseState], any> =
+  stepFormSelectors.getUnsavedForm
+
+const getModuleEntitiesMock: JestMockFn<[BaseState], ModuleEntities> =
+  stepFormSelectors.getModuleEntities
+
 describe('MagnetForm', () => {
   let store
-  let props
-  function render(props) {
+  let props: React.ElementProps<typeof MagnetForm>
+  function render(_props: React.ElementProps<typeof MagnetForm>) {
     // enzyme seems to have trouble shallow rendering with hooks and redux
     // https://github.com/airbnb/enzyme/issues/2202
     return mount(
       <Provider store={store}>
-        <MagnetForm {...props} />
+        <MagnetForm {..._props} />
       </Provider>
     )
   }
 
   beforeEach(() => {
     props = {
-      formData: {
-        meta: { module: { model: MAGNETIC_MODULE_V1 } },
-      },
+      formData: ({
+        id: 'formId',
+        stepType: 'magnet',
+      }: any),
       focusHandlers: {
-        focusedField: 'magnet',
+        blur: jest.fn(),
+        focus: jest.fn(),
         dirtyFields: [],
-        onFieldFocus: jest.fn(),
-        onFieldBlur: jest.fn(),
+        focusedField: null,
+      },
+      propsForFields: {
+        magnetAction: {
+          onFieldFocus: (jest.fn(): any),
+          onFieldBlur: (jest.fn(): any),
+          errorToShow: null,
+          disabled: false,
+          name: 'magnetAction',
+          updateValue: (jest.fn(): any),
+          value: null,
+        },
       },
     }
     store = {
@@ -45,14 +72,35 @@ describe('MagnetForm', () => {
       .mockImplementation(props => <div>{props.children}</div>)
     fields.TextField = jest.fn().mockImplementation(props => <div />)
     fields.RadioGroupField = jest.fn().mockImplementation(props => <div />)
-
-    uiModuleSelectors.getMagneticLabwareOptions.mockReturnValue([
-      { name: 'magnet module', value: 'magnet123', disabled: false },
+    ;(uiModuleSelectors.getMagneticLabwareOptions: JestMockFn<
+      [BaseState],
+      Options
+    >).mockReturnValue([
+      { name: 'magnet module v1', value: 'magnetV1', disabled: false },
+      { name: 'magnet module v2', value: 'magnetV2', disabled: false },
     ])
+
+    getUnsavedFormMock.mockReturnValue({ stepType: 'magnet' })
+
+    getModuleEntitiesMock.mockReturnValue({
+      magnetV1: {
+        id: 'magnetV1',
+        type: 'magneticModuleType',
+        model: 'magneticModuleV1',
+      },
+      magnetV2: {
+        id: 'magnetV2',
+        type: 'magneticModuleType',
+        model: 'magneticModuleV2',
+      },
+    })
   })
 
   it('engage height caption is displayed with proper height to decimal scale', () => {
-    uiModuleSelectors.getMagnetLabwareEngageHeight.mockReturnValue('10.9444')
+    ;(uiModuleSelectors.getMagnetLabwareEngageHeight: JestMockFn<
+      [BaseState],
+      number | null
+    >).mockReturnValue(10.9444)
 
     const wrapper = render(props)
 
@@ -62,7 +110,10 @@ describe('MagnetForm', () => {
   })
 
   it('engage height caption is null when no engage height', () => {
-    uiModuleSelectors.getMagnetLabwareEngageHeight.mockReturnValue(null)
+    ;(uiModuleSelectors.getMagnetLabwareEngageHeight: JestMockFn<
+      [BaseState],
+      number | null
+    >).mockReturnValue(null)
 
     const wrapper = render(props)
 
@@ -78,7 +129,8 @@ describe('MagnetForm', () => {
       const wrapper = render({
         ...props,
         formData: {
-          meta: { module: { model } },
+          ...props.formData,
+          moduleId: `magnetV${modelNum}`,
         },
       })
       expect(

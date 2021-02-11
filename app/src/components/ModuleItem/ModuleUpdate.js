@@ -9,7 +9,7 @@ import {
   AlertModal,
 } from '@opentrons/components'
 import { Portal } from '../portal'
-import { getConnectedRobotName } from '../../robot/selectors'
+import { getConnectedRobotName } from '../../redux/robot/selectors'
 import {
   useDispatchApiRequest,
   getRequestById,
@@ -17,11 +17,11 @@ import {
   PENDING,
   FAILURE,
   dismissRequest,
-} from '../../robot-api'
-import { updateModule } from '../../modules'
-import type { UpdateModuleAction } from '../../modules/types'
-import type { State, Dispatch } from '../../types'
-import type { RequestState } from '../../robot-api/types'
+} from '../../redux/robot-api'
+import { updateModule } from '../../redux/modules'
+import type { UpdateModuleAction } from '../../redux/modules/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { RequestState } from '../../redux/robot-api/types'
 import styles from './styles.css'
 
 const FW_IS_UP_TO_DATE = 'Module Firmware is up to date'

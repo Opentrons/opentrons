@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Box,
   Icon,
@@ -17,11 +18,8 @@ import {
 } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { PipetteCompatibility } from '../../pipettes/types'
+import type { PipetteCompatibility } from '../../redux/pipettes/types'
 
-const NOT_CALIBRATED = 'Not yet calibrated'
-const NOT_ATTACHED = 'Not attached'
-const CALIBRATION_DATA = 'Calibration data:'
 const AXIS_NAMES = ['x', 'y', 'z']
 
 export type InstrumentItemProps = {|
@@ -42,6 +40,7 @@ export function InstrumentItem(props: InstrumentItemProps): React.Node {
     needsOffsetCalibration,
     pipetteOffsetData = null,
   } = props
+  const { t } = useTranslation(['protocol_calibration', 'protocol_info'])
   if (hidden) return null
   const match = ['match', 'inexact_match'].includes(compatibility)
   return (
@@ -67,7 +66,7 @@ export function InstrumentItem(props: InstrumentItemProps): React.Node {
           </Flex>
           {!match ? (
             <Text fontSize={FONT_SIZE_BODY_1} fontStyle={FONT_STYLE_ITALIC}>
-              {NOT_ATTACHED}
+              {t('protocol_info:instrument_not_attached')}
             </Text>
           ) : !!pipetteOffsetData ? (
             <BuildOffsetText offsetData={pipetteOffsetData} />
@@ -77,7 +76,7 @@ export function InstrumentItem(props: InstrumentItemProps): React.Node {
               fontStyle={FONT_STYLE_ITALIC}
               color={COLOR_ERROR}
             >
-              {NOT_CALIBRATED}
+              {t('protocol_calibration:cal_data_not_calibrated')}
             </Text>
           )}
         </Box>
@@ -98,9 +97,10 @@ function BuildOffsetText(props: {|
   offsetData: [number, number, number],
 |}): React.Node {
   const { offsetData } = props
+  const { t } = useTranslation('protocol_info')
   return (
     <Flex css={FONT_BODY_1_DARK}>
-      <Text marginRight={SPACING_2}>{CALIBRATION_DATA}</Text>
+      <Text marginRight={SPACING_2}>{t('instrument_cal_data_title')}:</Text>
       {AXIS_NAMES.map((key, index) => (
         <React.Fragment key={key}>
           <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>{key.toUpperCase()}</Text>

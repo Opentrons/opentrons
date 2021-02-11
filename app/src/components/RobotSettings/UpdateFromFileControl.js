@@ -21,11 +21,11 @@ import {
 import {
   getBuildrootUpdateDisplayInfo,
   startBuildrootUpdate,
-} from '../../buildroot'
+} from '../../redux/buildroot'
 
 import { LabeledValue } from '../structure'
 
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch } from '../../redux/types'
 
 const HIDDEN_CSS = css`
   position: fixed;

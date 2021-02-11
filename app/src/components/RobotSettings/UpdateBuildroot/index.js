@@ -13,10 +13,10 @@ import {
   clearBuildrootSession,
   getRobotSystemType,
   getBuildrootUpdateAvailable,
-} from '../../../buildroot'
+} from '../../../redux/buildroot'
 
-import type { State, Dispatch } from '../../../types'
-import type { ViewableRobot } from '../../../discovery/types'
+import type { State, Dispatch } from '../../../redux/types'
+import type { ViewableRobot } from '../../../redux/discovery/types'
 
 export type UpdateBuildrootProps = {|
   robot: ViewableRobot,

@@ -1,26 +1,26 @@
 // @flow
 import * as React from 'react'
 import { StaticRouter } from 'react-router-dom'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
+import { mountWithProviders } from '@opentrons/components/__utils__'
 
-import * as PipettesSelectors from '../../../pipettes/selectors'
-import * as robotSelectors from '../../../robot/selectors'
-import * as calibrateSelectors from '../../../nav/calibrate-selectors'
+import { i18n } from '../../../i18n'
+import * as PipettesSelectors from '../../../redux/pipettes/selectors'
+import * as robotSelectors from '../../../redux/robot/selectors'
+import * as calibrateSelectors from '../../../redux/nav/calibrate-selectors'
 
-import type { BaseProtocolLabware } from '../../../calibration/types'
+import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { fetchTipLengthCalibrations } from '../../../calibration/'
+import { fetchTipLengthCalibrations } from '../../../redux/calibration/'
 import {
   PipetteListComponent,
   type PipetteListComponentProps,
 } from '../PipetteList'
 
-import type { State } from '../../../types'
+import type { State } from '../../../redux/types'
 
-jest.mock('../../../robot/selectors')
-jest.mock('../../../nav/calibrate-selectors')
-jest.mock('../../../pipettes/selectors')
+jest.mock('../../../redux/robot/selectors')
+jest.mock('../../../redux/nav/calibrate-selectors')
+jest.mock('../../../redux/pipettes/selectors')
 
 const mockGetProtocolPipettes: JestMockFn<
   [State],
@@ -109,32 +109,19 @@ const mockAttachedPipettes = {
 }
 
 describe('PipetteListComponent', () => {
-  let dispatch
-  let mockStore
   let render
 
   beforeEach(() => {
-    dispatch = jest.fn()
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        robotApi: {},
-      }),
-      dispatch,
-    }
     mockGetProtocolPipettes.mockReturnValue([mockLeftProtoPipette])
     mockGetCalibratePipetteLocations.mockReturnValue(mockPipetteLocations)
     mockGetAttachedPipettes.mockReturnValue(mockAttachedPipettes)
 
     render = (props: PipetteListComponentProps, location: string = '/') => {
-      return mount(
-        <Provider store={mockStore}>
-          <PipetteListComponent {...props} />
-        </Provider>,
-        {
-          wrappingComponent: StaticRouter,
-          wrappingComponentProps: { location, context: {} },
-        }
+      return mountWithProviders(
+        <StaticRouter context={{}} location={location}>
+          <PipetteListComponent {...props} />,
+        </StaticRouter>,
+        { i18n }
       )
     }
   })
@@ -144,18 +131,18 @@ describe('PipetteListComponent', () => {
   })
 
   it('dispatches fetch tip length calibration action on render', () => {
-    render({
+    const { store } = render({
       robotName: 'robotName',
       tipracks: stubTipRacks,
     })
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
+    expect(store.dispatch).toHaveBeenCalledWith(
       fetchTipLengthCalibrations('robotName')
     )
   })
 
   it('renders tip length calibration', () => {
-    const wrapper = render({
+    const { wrapper } = render({
       robotName: 'robotName',
       tipracks: stubTipRacks,
     })

@@ -1,7 +1,7 @@
 // @flow
 import { format } from 'date-fns'
 import type { Axis } from '../JogControls/types'
-import type { VectorTuple } from '../../sessions/types'
+import type { VectorTuple } from '../../redux/sessions/types'
 
 const ORDERED_AXES: [Axis, Axis, Axis] = ['x', 'y', 'z']
 

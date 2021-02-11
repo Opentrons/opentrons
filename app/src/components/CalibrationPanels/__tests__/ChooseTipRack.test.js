@@ -2,26 +2,26 @@
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
-import { mockAttachedPipette } from '../../../pipettes/__fixtures__'
-import { mockDeckCalTipRack } from '../../../sessions/__fixtures__'
-import { mockTipRackDefinition } from '../../../custom-labware/__fixtures__'
-import * as Sessions from '../../../sessions'
+import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
+import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
+import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
+import * as Sessions from '../../../redux/sessions'
 
 import {
   getCalibrationForPipette,
   getTipLengthForPipetteAndTiprack,
   getTipLengthCalibrations,
-} from '../../../calibration'
-import { getCustomTipRackDefinitions } from '../../../custom-labware'
-import { getAttachedPipettes } from '../../../pipettes'
+} from '../../../redux/calibration'
+import { getCustomTipRackDefinitions } from '../../../redux/custom-labware'
+import { getAttachedPipettes } from '../../../redux/pipettes'
 
 import { ChooseTipRack } from '../ChooseTipRack'
-import type { State } from '../../../types'
-import type { AttachedPipettesByMount } from '../../../pipettes/types'
+import type { State } from '../../../redux/types'
+import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
-jest.mock('../../../pipettes/selectors')
-jest.mock('../../../calibration/')
-jest.mock('../../../custom-labware/selectors')
+jest.mock('../../../redux/pipettes/selectors')
+jest.mock('../../../redux/calibration/')
+jest.mock('../../../redux/custom-labware/selectors')
 
 const mockAttachedPipettes: AttachedPipettesByMount = ({
   left: mockAttachedPipette,
