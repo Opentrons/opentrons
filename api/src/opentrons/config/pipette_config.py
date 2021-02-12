@@ -263,7 +263,7 @@ def validate_overrides(data: TypeOverrides,
     """
     for key, value in data.items():
         field_config = config_model.get(key)
-        is_quirk = key in config_model['quirks']
+        is_quirk = key in config_model['quirks'] and key in VALID_QUIRKS
 
         if is_quirk:
             # If it's a quirk it must be a bool or None
@@ -274,7 +274,7 @@ def validate_overrides(data: TypeOverrides,
             raise ValueError(f'Unknown field {key}')
         elif value is not None:
             # If value is not None it must be numeric and between min and max
-            if not isinstance(value, numbers.Number):
+            if isinstance(value, bool) or not isinstance(value, numbers.Number):
                 raise ValueError(f'{value} is invalid for {key}')
             elif value < field_config['min'] or value > field_config['max']:
                 raise ValueError(f'{key} out of range with {value}')
@@ -426,6 +426,14 @@ def load_config_dict(pipette_id: str) -> Tuple[
 
     if 'quirks' not in override.keys():
         override['quirks'] = {key: True for key in config['quirks']}
+    else:
+        # 20210210 AL - There have been bugs that allow settings invalid
+        # quirks. Sanitize quirks by removing invalid ones that may have
+        # been saved erroneously.
+        override['quirks'] = {
+            key: value for key, value
+            in override['quirks'].items() if key in VALID_QUIRKS
+        }
 
     for top_level_key in config.keys():
         if top_level_key != 'quirks':
