@@ -4,7 +4,7 @@ module.exports = {
   root: true,
 
   parserOptions: {
-    project: './tsconfig.json',
+    project: './*/tsconfig.json',
   },
 
   extends: [
@@ -37,6 +37,7 @@ module.exports = {
     'no-import-assign': 'warn',
     'default-case-last': 'warn',
     'no-case-declarations': 'warn',
+    'prefer-regex-literals': 'warn',
     'react/prop-types': 'warn',
   },
 
