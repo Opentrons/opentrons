@@ -67,11 +67,11 @@ setup-py:
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
 
 # front-end dependecies handled by yarn
+# TODO(mc, 2021-02-12): add `$(MAKE) build-ts` after `yarn` when we have TS
 .PHONY: setup-js
 setup-js:
 	yarn config set network-timeout 60000
 	yarn
-	$(MAKE) build-ts
 	$(MAKE) -j 1 -C $(APP_SHELL_DIR) setup
 	$(MAKE) -j 1 -C $(SHARED_DATA_DIR) setup-js
 
