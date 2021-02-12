@@ -22,6 +22,8 @@ from opentrons.commands import types as command_types, introspection
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.implementations.protocol_context import \
     ProtocolContextImplementation
+from opentrons.protocols.implementations.simulators.protocol_context import \
+    ProtocolContextSimulation
 from opentrons.protocols.parse import parse
 from opentrons.protocols.types import Protocol
 from opentrons.calibration_storage import helpers
@@ -393,7 +395,14 @@ class Session(RobotBusy):
                     strict_attached_instruments=False
                     ).sync
             sync_sim.home()
-            ctx_impl = ProtocolContextImplementation.build_using(
+
+            # Use feature flag to determine ProtocolContext implementation
+            # class: real or simulating.
+            impl_class = ProtocolContextImplementation \
+                if not ff.enable_fast_protocol_upload() \
+                else ProtocolContextSimulation
+
+            ctx_impl = impl_class.build_using(
                 self._protocol,
                 hardware=sync_sim,
                 extra_labware=getattr(self._protocol, 'extra_labware', {}))

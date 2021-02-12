@@ -7,7 +7,7 @@ from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.execution.execute import run_protocol
 from opentrons.protocols.implementations.simulators.protocol_context import \
-    SimProtocolContext
+    ProtocolContextSimulation
 from opentrons.protocols.parse import parse
 from opentrons.protocols.types import Protocol
 
@@ -164,7 +164,7 @@ def _simulate_protocol(protocol: Protocol) -> ProtocolContext:
     """
     try:
         ctx = ProtocolContext.build_using(
-            implementation=SimProtocolContext.build_using(protocol),
+            implementation=ProtocolContextSimulation.build_using(protocol),
             protocol=protocol,
         )
         run_protocol(protocol, context=ctx)
