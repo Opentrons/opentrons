@@ -37,8 +37,10 @@ def serial_with_temp_timeout(serial_connection, timeout):
     saved_timeout = serial_connection.timeout
     if timeout is not None:
         serial_connection.timeout = timeout
-    yield serial_connection
-    serial_connection.timeout = saved_timeout
+    try:
+        yield serial_connection
+    finally:
+        serial_connection.timeout = saved_timeout
 
 
 def _parse_serial_response(response, ack):
