@@ -83,7 +83,8 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
 
     // if xor (symmetric difference) returns values, then elements exist in
     // one list and not the other and need to be added to and/or removed from the queue
-    if (nextList != null && xorBy(pollQueue, nextList, 'ip').length > 0) {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (nextList && xorBy(pollQueue, nextList, 'ip').length > 0) {
       // keeping the order of `pollQueue`, remove all elements that aren't
       // in the new list via `intersection`, then add new elements via `union`
       pollQueue = unionBy(
@@ -96,11 +97,10 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
 
     if (needsNewInterval && pollQueue.length > 0 && interval > 0) {
       const handlePoll = (): void => {
-        const head = pollQueue.shift()
-
         // since we're using a mutable array as a queue, guard against unsafe
         // array access before we start pushing
-        if (head != null) {
+        if (pollQueue.length > 0) {
+          const head = pollQueue.shift() as HealthPollerTarget
           // take the head of the queue out and put it back in at the end
           pollQueue.push(head)
           // eslint-disable-next-line no-void
@@ -119,11 +119,9 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
   function stop(): void {
     log('debug', 'stopping health poller')
     lastCompletedPollTimeByIp = {}
-
-    if (pollIntervalId !== null) {
-      clearInterval(pollIntervalId)
-      pollIntervalId = null
-    }
+    // @ts-expect-error(mc, 2021-02-16): guard with a null check for pollIntervalId
+    clearInterval(pollIntervalId)
+    pollIntervalId = null
   }
 
   return { start, stop }

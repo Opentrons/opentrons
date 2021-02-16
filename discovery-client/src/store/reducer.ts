@@ -55,8 +55,10 @@ const getHealthStatus = (
   responseData: HealthResponse | ServerHealthResponse | null,
   error: HealthErrorResponse | null
 ): HealthStatus => {
-  if (responseData !== null) return HEALTH_STATUS_OK
-  if (error !== null && error.status >= 400) return HEALTH_STATUS_NOT_OK
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  if (responseData) return HEALTH_STATUS_OK
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  if (error && error.status >= 400) return HEALTH_STATUS_NOT_OK
   return HEALTH_STATUS_UNREACHABLE
 }
 
@@ -68,7 +70,8 @@ export const robotsByNameReducer = (
   switch (action.type) {
     case Actions.INITIALIZE_STATE: {
       const { initialRobots } = action.payload
-      if (initialRobots == null) return state
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+      if (!initialRobots) return state
 
       const states = initialRobots.map(
         ({ addresses, ...robotState }) => robotState
@@ -95,7 +98,8 @@ export const robotsByNameReducer = (
     case Actions.HEALTH_POLLED: {
       const { health, serverHealth } = action.payload
       const name = serverHealth?.name ?? health?.name ?? null
-      if (name === null) return state
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+      if (!name) return state
 
       const nextRobotState = {
         name,
@@ -120,7 +124,8 @@ export const hostsByIpReducer = (
   switch (action.type) {
     case Actions.INITIALIZE_STATE: {
       const { initialRobots } = action.payload
-      if (initialRobots == null) return state
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+      if (!initialRobots) return state
 
       const states = initialRobots.flatMap<HostState>(({ name, addresses }) => {
         return addresses.map(({ ip, port }) => makeHostState(ip, port, name))
@@ -177,7 +182,8 @@ export const hostsByIpReducer = (
         serverHealthError
       )
       const seen =
-        host?.seen ||
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
+        host?.seen === true ||
         healthStatus !== HEALTH_STATUS_UNREACHABLE ||
         serverHealthStatus !== HEALTH_STATUS_UNREACHABLE
 
@@ -210,7 +216,8 @@ export const hostsByIpReducer = (
             return (
               targetIp !== ip &&
               targetRobotName === robotName &&
-              !targetSeen &&
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
+              targetSeen === false &&
               targetHealthStatus === HEALTH_STATUS_UNREACHABLE &&
               targetServerHealthStatus === HEALTH_STATUS_UNREACHABLE
             )

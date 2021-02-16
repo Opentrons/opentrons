@@ -52,6 +52,9 @@ const createLogger = (argv: Argv): Logger => {
 const debugLogArgvMiddleware: MiddlewareFunction<Argv> = (argv): void => {
   const log = createLogger(argv)
   log.debug(`Calling ${argv.$0} with argv:`, argv)
+
+  // @ts-expect-error(mc, 2021-02-16): this return is probably unnecessary, remove
+  return argv
 }
 
 const passesFilters = (argv: Argv) => (robot: DiscoveryClientRobot) => {
@@ -107,7 +110,8 @@ const find = (argv: FindArgv): void => {
   const log = createLogger(argv)
   const client = createClient(argv, robots => {
     robots
-      .filter(robot => name == null || robot.name === name)
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+      .filter(robot => !name || robot.name === name)
       .flatMap<DiscoveryClientRobotAddress>(robot => robot.addresses)
       .filter(
         ({ ip }) =>
@@ -121,9 +125,8 @@ const find = (argv: FindArgv): void => {
   })
 
   log.warn(
-    `Finding ${
-      argv.name != null ? `robot "${argv.name}"` : 'first available robot'
-    }`
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    `Finding ${argv.name ? `robot "${argv.name}"` : 'first available robot'}`
   )
 
   setTimeout(() => {
@@ -161,7 +164,7 @@ Yargs.options({
   logLevel: {
     describe: 'Log level',
     alias: 'l',
-    choices: LOG_LVLS,
+    choices: [...LOG_LVLS, 'off'],
     default: 'info',
   },
 })

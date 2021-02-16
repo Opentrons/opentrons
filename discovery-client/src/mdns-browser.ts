@@ -56,7 +56,8 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
   }
 
   function stop(): void {
-    if (browser !== null) {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (browser) {
       log('debug', 'Stopping mDNS browser')
       browser.stop()
       browser.removeAllListeners('ready')

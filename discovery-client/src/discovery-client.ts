@@ -47,7 +47,8 @@ export function createDiscoveryClient(
     healthPoller.start({ list: prevAddrs, interval: healthPollInterval })
     mdnsBrowser.start()
 
-    if (unsubscribe === null) {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (!unsubscribe) {
       unsubscribe = subscribe(() => {
         const addrs = getAddresses()
         const robots = getRobots()
@@ -64,7 +65,8 @@ export function createDiscoveryClient(
   const stop = (): void => {
     mdnsBrowser.stop()
     healthPoller.stop()
-    if (typeof unsubscribe === 'function') {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (unsubscribe) {
       unsubscribe()
       unsubscribe = null
     }
