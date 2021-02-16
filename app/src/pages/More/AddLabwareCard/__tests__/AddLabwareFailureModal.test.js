@@ -3,7 +3,7 @@ import * as React from 'react'
 import { shallow, mount } from 'enzyme'
 
 import { AlertModal } from '@opentrons/components'
-import { Portal } from '../../../../scaffolding/portal'
+import { Portal } from '../../../../App/portal'
 import {
   AddLabwareFailureModal,
   AddLabwareFailureModalTemplate,

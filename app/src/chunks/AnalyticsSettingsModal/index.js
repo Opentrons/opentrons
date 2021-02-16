@@ -10,7 +10,7 @@ import {
 import { Modal } from '@opentrons/components'
 import { ModalButton } from '../../pages/More/AppSettings/ModalButton'
 import { AnalyticsToggle } from '../../pages/More/AppSettings/AnalyticsToggle'
-import { Portal } from '../../scaffolding/portal'
+import { Portal } from '../../App/portal'
 import type { Dispatch } from '../../redux/types'
 
 // TODO(bc, 2021-02-04): i18n

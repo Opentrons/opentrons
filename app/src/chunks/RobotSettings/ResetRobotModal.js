@@ -31,7 +31,7 @@ import {
   SPACING_2,
   SIZE_2,
 } from '@opentrons/components'
-import { Portal } from '../../scaffolding/portal'
+import { Portal } from '../../App/portal'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { ResetConfigRequest } from '../../redux/robot-admin/types'

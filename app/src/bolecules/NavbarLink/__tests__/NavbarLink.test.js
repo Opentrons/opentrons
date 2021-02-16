@@ -4,8 +4,8 @@ import { mount } from 'enzyme'
 import { NavLink, StaticRouter } from 'react-router-dom'
 import { Tooltip, NotificationIcon } from '@opentrons/components'
 
-import { NavbarLink } from '../NavbarLink'
-import type { NavbarLinkProps } from '../NavbarLink'
+import { NavbarLink } from '..'
+import type { NavbarLinkProps } from '..'
 
 jest.mock('@opentrons/components/src/tooltips/useTooltip', () => ({
   useTooltip: () => [{}, {}],

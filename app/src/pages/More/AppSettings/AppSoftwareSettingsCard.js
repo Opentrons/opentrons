@@ -21,7 +21,7 @@ import {
   checkShellUpdate,
 } from '../../../redux/shell'
 
-import { Portal } from '../../../scaffolding/portal'
+import { Portal } from '../../../App/portal'
 import { UpdateAppModal } from '../../../chunks/UpdateAppModal'
 import { UpdateNotificationsControl } from './UpdateNotificationsControl'
 import { DowngradeAppControl } from './DowngradeAppControl'

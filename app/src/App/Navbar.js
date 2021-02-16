@@ -12,8 +12,8 @@ import {
   BORDER_SOLID_LIGHT,
 } from '@opentrons/components'
 
-import { getNavbarLocations } from '../../redux/nav'
-import { NavbarLink } from './NavbarLink'
+import { getNavbarLocations } from '../redux/nav'
+import { NavbarLink } from '../bolecules/NavbarLink'
 
 export function Navbar(): React.Node {
   const locations = useSelector(getNavbarLocations)

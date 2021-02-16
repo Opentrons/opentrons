@@ -41,7 +41,7 @@ import {
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
 } from '../../bolecules/CalibrationPanels'
 import { formatLastModified } from '../../bolecules/CalibrationPanels/utils'
-import { Portal } from '../../scaffolding/portal'
+import { Portal } from '../../App/portal'
 import { getDisplayNameForTipRack } from './utils'
 
 import type { Mount } from '../../redux/pipettes/types'

@@ -4,7 +4,7 @@ import cx from 'classnames'
 
 import { SpinnerModal } from '@opentrons/components'
 import { SessionAlert } from './SessionAlert'
-import { Portal } from '../../../scaffolding/portal'
+import { Portal } from '../../../App/portal'
 import styles from './styles.css'
 
 import type { SessionStatus, SessionStatusInfo } from '../../../redux/robot'

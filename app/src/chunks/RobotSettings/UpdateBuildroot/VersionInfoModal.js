@@ -6,7 +6,7 @@ import { getRobotApiVersion } from '../../../redux/discovery'
 import { CURRENT_VERSION, getAvailableShellUpdate } from '../../../redux/shell'
 
 import { AlertModal } from '@opentrons/components'
-import { Portal } from '../../../scaffolding/portal'
+import { Portal } from '../../../App/portal'
 import { UpdateAppModal } from '../../UpdateAppModal'
 import { UpdateAppMessage } from './UpdateAppMessage'
 import { VersionList } from './VersionList'

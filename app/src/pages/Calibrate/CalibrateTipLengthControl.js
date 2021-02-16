@@ -26,7 +26,7 @@ import { AskForCalibrationBlockModal } from '../../chunks/CalibrateTipLength/Ask
 
 import { UncalibratedInfo } from './UncalibratedInfo'
 import { TipLengthCalibrationInfoBox } from '../../chunks/CalibrateTipLength/TipLengthCalibrationInfoBox'
-import { Portal } from '../../scaffolding/portal'
+import { Portal } from '../../App/portal'
 import { CalibratePipetteOffset } from '../../chunks/CalibratePipetteOffset'
 import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../bolecules/CalibrationPanels'
 import {

@@ -17,7 +17,7 @@ import type {
 import type { RequestState } from '../../redux/robot-api/types'
 import type { PipetteOffsetIntent } from '../../bolecules/CalibrationPanels/types'
 
-import { Portal } from '../../scaffolding/portal'
+import { Portal } from '../../App/portal'
 import { CalibratePipetteOffset } from '../CalibratePipetteOffset'
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../bolecules/CalibrationPanels'
 import { pipetteOffsetCalibrationStarted } from '../../redux/analytics'

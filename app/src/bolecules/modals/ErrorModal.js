@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { AlertModal } from '@opentrons/components'
-import { Portal } from '../../scaffolding/portal'
+import { Portal } from '../../App/portal'
 
 import styles from './styles.css'
 

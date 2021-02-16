@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
-import { Portal } from '../../../scaffolding/portal'
+import { Portal } from '../../../App/portal'
 
 // TODO(mc, 2019-11-20): i18n
 // buttons

@@ -20,7 +20,7 @@ import * as RobotApi from '../../redux/robot-api'
 import * as Sessions from '../../redux/sessions'
 import * as Calibration from '../../redux/calibration'
 
-import { Portal } from '../../scaffolding/portal'
+import { Portal } from '../../App/portal'
 import { TitledControl } from '../../atoms/TitledControl'
 import { getDeckCalibrationSession } from '../../redux/sessions/deck-calibration/selectors'
 import {

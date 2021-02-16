@@ -10,12 +10,12 @@ import {
   FLEX_NONE,
   SIZE_3,
 } from '@opentrons/components'
-import * as Nav from '../../../redux/nav'
-import { Navbar } from '..'
-import { NavbarLink } from '../NavbarLink'
+import * as Nav from '../../redux/nav'
+import { Navbar } from '../Navbar'
+import { NavbarLink } from '../../bolecules/NavbarLink'
 
-import type { State } from '../../../redux/types'
-import type { NavLocation } from '../../../redux/nav/types'
+import type { State } from '../../redux/types'
+import type { NavLocation } from '../../redux/nav/types'
 
 jest.mock('react-router-dom', () => ({ NavLink: 'a' }))
 jest.mock('../../../redux/nav/selectors')

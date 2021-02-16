@@ -14,7 +14,7 @@ import {
   getModuleType,
 } from '../../../redux/modules'
 import { DeckMap } from '../../../bolecules/DeckMap'
-import { Portal } from '../../../scaffolding/portal'
+import { Portal } from '../../../App/portal'
 import styles from './styles.css'
 
 import type { Dispatch } from '../../../redux/types'

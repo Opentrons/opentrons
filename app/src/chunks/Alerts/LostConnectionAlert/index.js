@@ -9,7 +9,7 @@ import {
 } from '../../../redux/robot'
 import { getConnectedRobot, CONNECTABLE } from '../../../redux/discovery'
 import { AlertModal } from '@opentrons/components'
-import { Portal } from '../../../scaffolding/portal'
+import { Portal } from '../../../App/portal'
 import { ModalCopy } from './ModalCopy'
 
 import type { State, Dispatch } from '../../../redux/types'

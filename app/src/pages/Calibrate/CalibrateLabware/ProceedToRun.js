@@ -9,7 +9,7 @@ import some from 'lodash/some'
 import { selectors as robotSelectors } from '../../../redux/robot'
 import type { Dispatch } from '../../../redux/types'
 import pcrSealSrc from '../../../assets/images/place_pcr_seal.png'
-import { Portal } from '../../../scaffolding/portal'
+import { Portal } from '../../../App/portal'
 import styles from './styles.css'
 import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../../redux/modules'
 

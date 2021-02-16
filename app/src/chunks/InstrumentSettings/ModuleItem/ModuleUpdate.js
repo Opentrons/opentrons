@@ -8,7 +8,7 @@ import {
   Icon,
   AlertModal,
 } from '@opentrons/components'
-import { Portal } from '../../../scaffolding/portal'
+import { Portal } from '../../../App/portal'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import {
   useDispatchApiRequest,

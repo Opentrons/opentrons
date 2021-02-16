@@ -26,7 +26,7 @@ import {
 import { CONNECTABLE } from '../../redux/discovery'
 import { downloadLogs } from '../../redux/shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../redux/shell/robot-logs/selectors'
-import { Portal } from '../../scaffolding/portal'
+import { Portal } from '../../App/portal'
 import { LabeledValue, Divider } from '../../atoms/structure'
 import { ToggleBtn } from '../../atoms/ToggleBtn'
 

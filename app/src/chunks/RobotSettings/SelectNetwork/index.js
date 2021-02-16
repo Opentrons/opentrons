@@ -7,7 +7,7 @@ import * as RobotApi from '../../../redux/robot-api'
 import * as Networking from '../../../redux/networking'
 
 import { useInterval } from '@opentrons/components'
-import { Portal } from '../../../scaffolding/portal'
+import { Portal } from '../../../App/portal'
 import { SelectSsid } from './SelectSsid'
 import { ConnectModal } from './ConnectModal'
 import { DisconnectModal } from './DisconnectModal'

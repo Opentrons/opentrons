@@ -11,7 +11,7 @@ import * as RobotApi from '../../../../redux/robot-api'
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
 import * as Constants from '../constants'
 
-import { Portal } from '../../../../scaffolding/portal'
+import { Portal } from '../../../../App/portal'
 import { SelectSsid } from '../SelectSsid'
 import { ConnectModal } from '../ConnectModal'
 import { DisconnectModal } from '../DisconnectModal'

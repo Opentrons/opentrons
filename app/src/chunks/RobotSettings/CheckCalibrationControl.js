@@ -15,7 +15,7 @@ import {
   SpinnerModalPage,
 } from '@opentrons/components'
 
-import { Portal } from '../../scaffolding/portal'
+import { Portal } from '../../App/portal'
 import { CheckCalibration } from '../CheckCalibration'
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import { TitledControl } from '../../atoms/TitledControl'
