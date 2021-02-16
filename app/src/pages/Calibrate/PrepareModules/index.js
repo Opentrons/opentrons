@@ -13,7 +13,7 @@ import {
   sendModuleCommand,
   getModuleType,
 } from '../../../redux/modules'
-import { DeckMap } from '../../../bolecules/DeckMap'
+import { DeckMap } from '../../../molecules/DeckMap'
 import { Portal } from '../../../App/portal'
 import styles from './styles.css'
 

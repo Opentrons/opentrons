@@ -9,7 +9,7 @@ import { getRobotSettings } from '../../redux/robot-settings'
 import { getUnpreparedModules } from '../../redux/modules'
 
 import { Page } from '../../atoms/Page'
-import { SessionHeader } from '../../chunks/SessionHeader'
+import { SessionHeader } from '../../organisms/SessionHeader'
 import { CalibrateLabware } from './CalibrateLabware'
 import { ReviewDeck } from './ReviewDeck'
 import { ConfirmModal } from './CalibrateLabware/ConfirmModal'

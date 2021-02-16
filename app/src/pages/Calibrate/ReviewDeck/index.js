@@ -13,7 +13,7 @@ import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../../redux/modules'
 import secureTCLatchSrc from '../../../assets/images/secure_tc_latch.png'
 
 import { Portal } from '../../../App/portal'
-import { DeckMap } from '../../../bolecules/DeckMap'
+import { DeckMap } from '../../../molecules/DeckMap'
 import { Prompt } from './Prompt'
 import styles from './styles.css'
 

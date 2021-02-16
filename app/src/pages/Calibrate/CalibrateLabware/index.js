@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { withRouter } from 'react-router-dom'
 
-import { DeckMap } from '../../../bolecules/DeckMap'
+import { DeckMap } from '../../../molecules/DeckMap'
 import { InfoBox } from './InfoBox'
 import styles from './styles.css'
 

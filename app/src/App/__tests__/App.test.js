@@ -18,7 +18,7 @@ import { MorePanel } from '../../pages/More/MorePanel'
 
 import { Navbar } from '../Navbar'
 import { TopPortalRoot, PortalRoot } from '../portal'
-import { Alerts } from '../../chunks/Alerts'
+import { Alerts } from '../../organisms/Alerts'
 
 jest.mock('../../../pages/Robots', () => ({ Robots: () => <></> }))
 jest.mock('../../../pages/Upload', () => ({ Upload: () => <></> }))

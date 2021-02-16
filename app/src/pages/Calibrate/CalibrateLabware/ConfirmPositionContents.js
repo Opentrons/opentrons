@@ -9,9 +9,9 @@ import type { Pipette, Labware } from '../../../redux/robot'
 import { actions as robotActions } from '../../../redux/robot'
 import { PrimaryButton } from '@opentrons/components'
 import { ConfirmPositionDiagram } from './ConfirmPositionDiagram'
-import { JogControls } from '../../../bolecules/JogControls'
+import { JogControls } from '../../../molecules/JogControls'
 
-import type { Jog } from '../../../bolecules/JogControls'
+import type { Jog } from '../../../molecules/JogControls'
 
 type OP = {|
   labware: Labware,

@@ -10,11 +10,13 @@ import {
   getModuleControlsDisabled,
 } from '../../../redux/modules'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
-import { ModulesCardContents } from '../../../chunks/InstrumentSettings/ModulesCardContents'
+import { ModuleItem, NoModulesMessage } from './ModuleItem'
 
 import type { State, Dispatch } from '../../../redux/types'
 
 type Props = {| robotName: string |}
+
+// TODO(bc, 2021-02-16): i18n
 
 const TITLE = 'Modules'
 const POLL_MODULE_INTERVAL_MS = 5000
@@ -41,10 +43,17 @@ export function AttachedModulesCard(props: Props): React.Node {
 
   return (
     <Card title={TITLE}>
-      <ModulesCardContents
-        modules={modules}
-        controlDisabledReason={controlDisabledReason}
-      />
+      {modules.length === 0 ? (
+        <NoModulesMessage />
+      ) : (
+        modules.map(mod => (
+          <ModuleItem
+            key={mod.serial}
+            module={mod}
+            controlDisabledReason={controlDisabledReason}
+          />
+        ))
+      )}
     </Card>
   )
 }

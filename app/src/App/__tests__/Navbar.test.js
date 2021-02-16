@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 import * as Nav from '../../redux/nav'
 import { Navbar } from '../Navbar'
-import { NavbarLink } from '../../bolecules/NavbarLink'
+import { NavbarLink } from '../../molecules/NavbarLink'
 
 import type { State } from '../../redux/types'
 import type { NavLocation } from '../../redux/nav/types'

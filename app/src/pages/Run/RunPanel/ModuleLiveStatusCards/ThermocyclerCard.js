@@ -12,7 +12,7 @@ import { formatSeconds } from '../../../../redux/robot/selectors' // TODO: move 
 import {
   TemperatureControl,
   TemperatureData,
-} from '../../../../bolecules/ModuleControls'
+} from '../../../../molecules/ModuleControls'
 
 import { StatusCard } from './StatusCard'
 import { StatusItem } from './StatusItem'

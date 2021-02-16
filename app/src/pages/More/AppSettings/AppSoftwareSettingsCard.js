@@ -22,7 +22,7 @@ import {
 } from '../../../redux/shell'
 
 import { Portal } from '../../../App/portal'
-import { UpdateAppModal } from '../../../chunks/UpdateAppModal'
+import { UpdateAppModal } from '../../../organisms/UpdateAppModal'
 import { UpdateNotificationsControl } from './UpdateNotificationsControl'
 import { DowngradeAppControl } from './DowngradeAppControl'
 

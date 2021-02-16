@@ -8,7 +8,7 @@ import * as Shell from '../../../../redux/shell'
 import { Portal } from '../../../../App/portal'
 import { TitledControl } from '../../../../atoms/TitledControl'
 import { AppSoftwareSettingsCard } from '../AppSoftwareSettingsCard'
-import { UpdateAppModal } from '../../../../chunks/UpdateAppModal'
+import { UpdateAppModal } from '../../../../organisms/UpdateAppModal'
 import { UpdateNotificationsControl } from '../UpdateNotificationsControl'
 
 import type { State } from '../../../../redux/types'

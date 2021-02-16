@@ -18,7 +18,7 @@ import {
 } from '../../../redux/calibration'
 
 import { Page } from '../../../atoms/Page'
-import { SessionHeader } from '../../../chunks/SessionHeader'
+import { SessionHeader } from '../../../organisms/SessionHeader'
 import { PipetteTabs } from './PipetteTabs'
 import { PipettesContents } from './PipettesContents'
 

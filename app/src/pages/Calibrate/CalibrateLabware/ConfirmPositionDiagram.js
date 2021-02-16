@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import type { Labware, Pipette } from '../../../redux/robot'
 
-import { InstructionStep } from '../../../bolecules/InstructionStep'
+import { InstructionStep } from '../../../molecules/InstructionStep'
 import { getInstructionsByType, getDiagramSrc } from './instructions-data'
 import styles from '../InstructionStep/styles.css'
 

@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { getNavbarLocations } from '../redux/nav'
-import { NavbarLink } from '../bolecules/NavbarLink'
+import { NavbarLink } from '../molecules/NavbarLink'
 
 export function Navbar(): React.Node {
   const locations = useSelector(getNavbarLocations)

@@ -8,7 +8,7 @@ import {
   actions as robotActions,
 } from '../../../redux/robot'
 
-import { DeckMap } from '../../../bolecules/DeckMap'
+import { DeckMap } from '../../../molecules/DeckMap'
 import { Prompt } from './Prompt'
 import styles from './styles.css'
 

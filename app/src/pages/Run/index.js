@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { Route } from 'react-router-dom'
 import { Page } from '../../atoms/Page'
-import { SessionHeader } from '../../chunks/SessionHeader'
+import { SessionHeader } from '../../organisms/SessionHeader'
 import { RunLog, ConfirmCancelModal } from './RunLog'
 
 export function Run(): React.Node {

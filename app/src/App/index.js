@@ -15,7 +15,7 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 
-import { Alerts } from '../chunks/Alerts'
+import { Alerts } from '../organisms/Alerts'
 
 import { Robots } from '../pages/Robots'
 import { Upload } from '../pages/Upload'

@@ -21,14 +21,14 @@ import { getPipetteOffsetCalibrationSession } from '../../redux/sessions/pipette
 import {
   CalibrateTipLength,
   ConfirmRecalibrationModal,
-} from '../../chunks/CalibrateTipLength'
-import { AskForCalibrationBlockModal } from '../../chunks/CalibrateTipLength/AskForCalibrationBlockModal'
+} from '../../organisms/CalibrateTipLength'
+import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 
 import { UncalibratedInfo } from './UncalibratedInfo'
-import { TipLengthCalibrationInfoBox } from '../../chunks/CalibrateTipLength/TipLengthCalibrationInfoBox'
+import { TipLengthCalibrationInfoBox } from '../../organisms/CalibrateTipLength/TipLengthCalibrationInfoBox'
 import { Portal } from '../../App/portal'
-import { CalibratePipetteOffset } from '../../chunks/CalibratePipetteOffset'
-import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../bolecules/CalibrationPanels'
+import { CalibratePipetteOffset } from '../../organisms/CalibratePipetteOffset'
+import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../organisms/CalibrationPanels'
 import {
   tipLengthCalibrationStarted,
   pipetteOffsetCalibrationStarted,

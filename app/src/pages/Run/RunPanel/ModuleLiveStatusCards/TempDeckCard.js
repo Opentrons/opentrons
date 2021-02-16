@@ -3,7 +3,7 @@ import * as React from 'react'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { TemperatureControl } from '../../../../bolecules/ModuleControls'
+import { TemperatureControl } from '../../../../molecules/ModuleControls'
 import { StatusCard } from './StatusCard'
 import { StatusItem } from './StatusItem'
 import styles from './styles.css'
