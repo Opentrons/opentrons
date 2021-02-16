@@ -14,11 +14,12 @@ import {
 
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { FieldPropsByName } from '../../types'
-
+import type { FormData } from '../../../../form-types'
 import styles from '../../StepEditForm.css'
 
 type Props = {|
   className?: ?string,
+  formData: FormData,
   prefix: 'aspirate' | 'dispense',
   propsForFields: FieldPropsByName,
 |}
@@ -28,7 +29,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 ): StepFieldName => `${prefix}_${fieldName}`
 
 export const SourceDestFields = (props: Props): React.Node => {
-  const { className, prefix, propsForFields } = props
+  const { className, formData, prefix, propsForFields } = props
 
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
@@ -60,6 +61,7 @@ export const SourceDestFields = (props: Props): React.Node => {
       secondsFieldName={addFieldNamePrefix('delay_seconds')}
       tipPositionFieldName={addFieldNamePrefix('delay_mmFromBottom')}
       propsForFields={propsForFields}
+      formData={formData}
     />
   )
 
@@ -71,7 +73,10 @@ export const SourceDestFields = (props: Props): React.Node => {
           pipetteFieldName="pipette"
           flowRateType={prefix}
         />
-        <TipPositionField fieldName={addFieldNamePrefix('mmFromBottom')} />
+        <TipPositionField
+          {...propsForFields[addFieldNamePrefix('mmFromBottom')]}
+          formData={formData}
+        />
         <WellOrderField
           prefix={prefix}
           label={i18n.t('form.step_edit_form.field.well_order.label')}
@@ -108,7 +113,8 @@ export const SourceDestFields = (props: Props): React.Node => {
           className={styles.small_field}
         >
           <TipPositionField
-            fieldName={addFieldNamePrefix('touchTip_mmFromBottom')}
+            {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}
+            formData={formData}
           />
         </CheckboxRowField>
 

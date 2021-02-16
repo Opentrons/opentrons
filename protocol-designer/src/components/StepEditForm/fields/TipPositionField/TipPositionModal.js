@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { connect } from 'react-redux'
 import clamp from 'lodash/clamp'
 import round from 'lodash/round'
 import {
@@ -16,28 +15,22 @@ import {
 import { i18n } from '../../../../localization'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
-import { actions } from '../../../../steplist'
 import { TipPositionZAxisViz } from './TipPositionZAxisViz'
 
 import styles from './TipPositionInput.css'
 import * as utils from './utils'
-import {
-  getIsTouchTipField,
-  type TipOffsetFields,
-} from '../../../../form-types'
-
-import type { ThunkDispatch } from '../../../../types'
+import { getIsTouchTipField, type StepFieldName } from '../../../../form-types'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10
 const DECIMALS_ALLOWED = 1
 
 type OP = {|
-  mmFromBottom: number | null,
-  wellDepthMm: number | null,
-  isOpen: boolean,
   closeModal: () => mixed,
-  fieldName: TipOffsetFields,
+  isOpen: boolean,
+  mmFromBottom: number | null,
+  name: StepFieldName,
+  wellDepthMm: number | null,
 |}
 
 type DP = {| updateValue: (?number) => mixed |}
@@ -48,7 +41,7 @@ type State = { value: number | null }
 const roundValue = (value: number | string): number =>
   round(Number(value), DECIMALS_ALLOWED)
 
-class TipPositionModalComponent extends React.Component<Props, State> {
+export class TipPositionModal extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     const initialValue =
@@ -64,29 +57,29 @@ class TipPositionModalComponent extends React.Component<Props, State> {
     }
   }
 
-  applyChanges = () => {
+  applyChanges: () => void = () => {
     const { value } = this.state
     this.props.updateValue(value == null ? null : roundValue(value))
     this.props.closeModal()
   }
 
-  getDefaultMmFromBottom = (): number => {
-    const { fieldName } = this.props
+  getDefaultMmFromBottom: () => number = () => {
+    const { name } = this.props
     const wellDepthMm = this.getWellDepthMm()
-    return utils.getDefaultMmFromBottom({ fieldName, wellDepthMm })
+    return utils.getDefaultMmFromBottom({ name, wellDepthMm })
   }
 
-  getMmFromBottom = () =>
+  getMmFromBottom: () => number = () =>
     this.props.mmFromBottom ?? this.getDefaultMmFromBottom()
 
-  getWellDepthMm = () => this.props.wellDepthMm ?? 0
+  getWellDepthMm: () => number = () => this.props.wellDepthMm ?? 0
 
-  getMinMaxMmFromBottom = (): {
+  getMinMaxMmFromBottom: () => {|
     maxMmFromBottom: number,
     minMmFromBottom: number,
-  } => {
+  |} = () => {
     const wellDepthMm = this.getWellDepthMm()
-    if (getIsTouchTipField(this.props.fieldName)) {
+    if (getIsTouchTipField(this.props.name)) {
       return {
         maxMmFromBottom: roundValue(wellDepthMm),
         minMmFromBottom: roundValue(wellDepthMm / 2),
@@ -98,20 +91,20 @@ class TipPositionModalComponent extends React.Component<Props, State> {
     }
   }
 
-  handleReset = () => {
+  handleReset: () => void = () => {
     this.setState({ value: null }, this.applyChanges)
   }
-  handleCancel = () => {
+  handleCancel: () => void = () => {
     this.setState(
       { value: roundValue(this.getMmFromBottom()) },
       this.props.closeModal
     )
   }
-  handleDone = () => {
+  handleDone: () => void = () => {
     this.applyChanges()
   }
 
-  handleChange = (newValueRaw: string | number) => {
+  handleChange: (newValueRaw: string | number) => void = newValueRaw => {
     const { maxMmFromBottom, minMmFromBottom } = this.getMinMaxMmFromBottom()
     // if string, strip non-number characters from string and cast to number
     const valueFloatUnrounded =
@@ -133,11 +126,11 @@ class TipPositionModalComponent extends React.Component<Props, State> {
     })
   }
 
-  handleInputFieldChange = (e: SyntheticEvent<HTMLInputElement>) => {
+  handleInputFieldChange: (e: SyntheticEvent<HTMLInputElement>) => void = e => {
     this.handleChange(e.currentTarget.value)
   }
 
-  handleIncrementDecrement = (delta: number) => {
+  handleIncrementDecrement: (delta: number) => void = delta => {
     const { value } = this.state
     const prevValue =
       this.state.value == null ? this.getDefaultMmFromBottom() : value
@@ -145,18 +138,18 @@ class TipPositionModalComponent extends React.Component<Props, State> {
     this.handleChange(prevValue + delta)
   }
 
-  makeHandleIncrement = (step: number) => () => {
+  makeHandleIncrement: (step: number) => () => void = step => () => {
     this.handleIncrementDecrement(step)
   }
 
-  makeHandleDecrement = (step: number) => () => {
+  makeHandleDecrement: (step: number) => () => void = step => () => {
     this.handleIncrementDecrement(step * -1)
   }
 
-  render() {
+  render(): React.Node {
     if (!this.props.isOpen) return null
     const { value } = this.state
-    const { fieldName } = this.props
+    const { name } = this.props
     const wellDepthMm = this.getWellDepthMm()
     const { maxMmFromBottom, minMmFromBottom } = this.getMinMaxMmFromBottom()
 
@@ -194,7 +187,7 @@ class TipPositionModalComponent extends React.Component<Props, State> {
           >
             <div className={styles.modal_header}>
               <h4>{i18n.t('modal.tip_position.title')}</h4>
-              <p>{i18n.t(`modal.tip_position.body.${fieldName}`)}</p>
+              <p>{i18n.t(`modal.tip_position.body.${name}`)}</p>
             </div>
             <div className={styles.main_row}>
               <div className={styles.leftHalf}>
@@ -266,27 +259,3 @@ class TipPositionModalComponent extends React.Component<Props, State> {
     )
   }
 }
-
-const mapDTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => {
-  return {
-    updateValue: value => {
-      dispatch(
-        actions.changeFormInput({
-          update: { [(ownProps.fieldName: string)]: value },
-        })
-      )
-    },
-  }
-}
-
-export const TipPositionModal: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  {||},
-  DP,
-  _,
-  _
->(
-  null,
-  mapDTP
-)(TipPositionModalComponent)

@@ -22,7 +22,7 @@ export const MoveLiquidForm = (props: StepFormProps): React.Node => {
 
   const toggleCollapsed = () => _setCollapsed(!collapsed)
 
-  const { propsForFields } = props
+  const { propsForFields, formData } = props
   const { stepType, path } = props.formData
 
   return (
@@ -67,11 +67,13 @@ export const MoveLiquidForm = (props: StepFormProps): React.Node => {
             className={styles.section_column}
             prefix="aspirate"
             propsForFields={propsForFields}
+            formData={formData}
           />
           <SourceDestFields
             className={styles.section_column}
             prefix="dispense"
             propsForFields={propsForFields}
+            formData={formData}
           />
         </div>
       )}
