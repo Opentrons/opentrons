@@ -10,13 +10,13 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { i18n } from '../../../../i18n'
 import { PipetteOffsetItem } from '../PipetteOffsetItem'
 import { InlineCalibrationWarning } from '../../../../molecules/InlineCalibrationWarning'
-import { findLabwareDefWithCustom } from '../../../../findLabware'
+import { findLabwareDefWithCustom } from '../../../../assets/labware/findLabware'
 import type {
   PipetteOffsetCalibration,
   TipLengthCalibration,
 } from '../../../../redux/calibration/types'
 
-jest.mock('../../../findLabware')
+jest.mock('../../../assets/labware/findLabware')
 
 jest.mock('@opentrons/shared-data', () => ({
   getAllPipetteNames: jest.fn(

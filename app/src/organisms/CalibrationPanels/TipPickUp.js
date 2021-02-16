@@ -26,7 +26,7 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../redux/sessions'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import { getLatestLabwareDef } from '../../getLabware'
+import { getLatestLabwareDef } from '../../assets/labware/getLabware'
 import { JogControls } from '../../molecules/JogControls'
 import type { CalibrationPanelProps } from './types'
 import { formatJogVector } from './utils'

@@ -18,7 +18,7 @@ import {
 } from '@opentrons/components'
 
 import { type Labware } from '../../redux/robot'
-import { getLegacyLabwareDef } from '../../getLabware'
+import { getLegacyLabwareDef } from '../../assets/labware/getLabware'
 
 import styles from './styles.css'
 

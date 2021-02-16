@@ -1,6 +1,6 @@
 // @flow
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { findLabwareDefWithCustom } from '../../../findLabware'
+import { findLabwareDefWithCustom } from '../../../assets/labware/findLabware'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 

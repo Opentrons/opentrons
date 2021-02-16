@@ -11,7 +11,7 @@ import * as Sessions from '../../../redux/sessions'
 
 import { DeckSetup } from '../DeckSetup'
 
-jest.mock('../../../getLabware')
+jest.mock('../../../assets/labware/getLabware')
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('@opentrons/components/src/deck/RobotWorkSpace', () => ({
   RobotWorkSpace: () => <></>,

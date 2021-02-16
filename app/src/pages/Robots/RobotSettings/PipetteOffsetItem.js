@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { findLabwareDefWithCustom } from '../../../findLabware'
+import { findLabwareDefWithCustom } from '../../../assets/labware/findLabware'
 
 import {
   Box,
