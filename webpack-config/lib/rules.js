@@ -35,9 +35,9 @@ const POSTCSS_LOADER = {
 }
 
 module.exports = {
-  // babel loader for JS
+  // babel loader for JS and TS
   js: {
-    test: /\.js$/,
+    test: /\.(?:js|ts|tsx)$/,
     exclude: /node_modules/,
     use: {
       loader: 'babel-loader',

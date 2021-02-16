@@ -48,6 +48,7 @@ module.exports = {
     alias: {
       'react-dom': '@hot-loader/react-dom',
     },
+    extensions: ['.wasm', '.mjs', '.js', '.ts', '.tsx', '.json'],
   },
 
   optimization: {
