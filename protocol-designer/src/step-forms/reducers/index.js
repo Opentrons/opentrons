@@ -99,6 +99,10 @@ import type {
   NormalizedLabware,
   NormalizedLabwareById,
   ModuleEntities,
+  BatchEditFormChangesState,
+  ChangeBatchEditFieldAction,
+  ResetBatchEditFieldChangesAction,
+  SaveStepFormsMultiAction,
 } from '../types'
 import type {
   CreateModuleAction,
@@ -1022,6 +1026,34 @@ export const savedStepForms = (
 
     default:
       return savedStepForms
+  }
+}
+
+type BatchEditFormActions =
+  | ChangeBatchEditFieldAction
+  | ResetBatchEditFieldChangesAction
+  | SaveStepFormsMultiAction
+  | SelectStepAction
+
+export const batchEditFormChanges = (
+  state: BatchEditFormChangesState,
+  action: BatchEditFormActions
+): BatchEditFormChangesState => {
+  switch (action.type) {
+    case 'CHANGE_BATCH_EDIT_FIELD': {
+      return {
+        ...state,
+        ...action.payload,
+      }
+    }
+    case 'SELECT_STEP':
+    case 'SAVE_STEP_FORMS_MULTI':
+    case 'RESET_BATCH_EDIT_FIELD_CHANGES': {
+      return {}
+    }
+    default: {
+      return state
+    }
   }
 }
 
