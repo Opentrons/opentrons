@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '../../../../i18n'
 import { Tooltip, Text } from '@opentrons/components'
 import { ProtocolLabwareList } from '../ProtocolLabwareList'
 

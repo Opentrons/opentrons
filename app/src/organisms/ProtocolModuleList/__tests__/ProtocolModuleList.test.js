@@ -6,12 +6,12 @@ import { i18n } from '../../../i18n'
 import { ListItem, Tooltip } from '@opentrons/components'
 import * as robotSelectors from '../../../redux/robot/selectors'
 import * as moduleSelectors from '../../../redux/modules/selectors'
-import { ModuleList } from '../ModuleList'
+import { ProtocolModuleList } from '..'
 
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../redux/robot/selectors')
-jest.mock('../../../redux/modules/selectors')
+jest.mock('../../../../redux/robot/selectors')
+jest.mock('../../../../redux/modules/selectors')
 
 const mockGetModules: JestMockFn<
   [State],
@@ -44,7 +44,7 @@ describe('ModuleList', () => {
     mockGetModules.mockReturnValue(mockModules)
 
     render = () => {
-      return mountWithProviders(<ModuleList />, { i18n })
+      return mountWithProviders(<ProtocolModuleList />, { i18n })
     }
   })
 

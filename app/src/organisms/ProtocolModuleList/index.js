@@ -32,7 +32,7 @@ const DECK_SLOT_STYLE = { width: '4.5rem' }
 const MODULE_STYLE = { width: '7rem', paddingRight: SPACING_3 }
 const USB_PORT_STYLE = { width: SPACING_AUTO }
 
-export function ModuleList(): React.Node {
+export function ProtocolModuleList(): React.Node {
   const { t } = useTranslation('protocol_calibration')
   const modulesRequired = useSelector((state: State) =>
     robotSelectors.getModules(state)

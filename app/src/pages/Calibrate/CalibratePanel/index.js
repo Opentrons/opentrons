@@ -4,14 +4,15 @@ import { useSelector } from 'react-redux'
 import partition from 'lodash/partition'
 import { useTranslation } from 'react-i18next'
 
-import type { State } from '../../../redux/types'
-
 import { SidePanel } from '@opentrons/components'
 import { selectors as robotSelectors } from '../../../redux/robot'
 import { getProtocolLabwareList } from '../../../redux/calibration/labware'
+import { ProtocolModuleList } from '../../../organisms/ProtocolModuleList'
 import { PipetteList } from './PipetteList'
 import { LabwareGroup } from './LabwareGroup'
 import styles from './styles.css'
+
+import type { State } from '../../../redux/types'
 
 export function CalibratePanel(): React.Node {
   const { t } = useTranslation('protocol_calibration')
@@ -30,7 +31,7 @@ export function CalibratePanel(): React.Node {
     <SidePanel title={t('cal_panel_title')}>
       <div className={styles.setup_panel}>
         <PipetteList robotName={robotName} tipracks={tipracks} />
-        <ModuleList />
+        <ProtocolModuleList />
         <LabwareGroup
           robotName={robotName}
           tipracks={tipracks}

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { useTranslation } from 'react-i18n'
+import { useTranslation } from 'react-i18next'
 import {
   Splash,
   SpinnerModal,
@@ -70,7 +70,7 @@ export function FileInfo(props: FileInfoProps): React.Node {
         >
           <InformationCard />
           <ProtocolPipettesCard robotName={robot.name} />
-          <ProtocolModulesCard robot={robot} />
+          <ProtocolModulesCard />
           {sessionLoaded && <ProtocolLabwareCard robotName={robot.name} />}
           {uploadError && <UploadError uploadError={uploadError} />}
           {sessionLoaded && !uploadError && <Continue />}

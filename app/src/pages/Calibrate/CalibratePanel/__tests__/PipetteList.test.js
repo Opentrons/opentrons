@@ -3,6 +3,7 @@ import * as React from 'react'
 import { StaticRouter } from 'react-router-dom'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 
+import { i18n } from '../../../../i18n'
 import * as PipettesSelectors from '../../../../redux/pipettes/selectors'
 import * as robotSelectors from '../../../../redux/robot/selectors'
 import * as calibrateSelectors from '../../../../redux/nav/calibrate-selectors'
