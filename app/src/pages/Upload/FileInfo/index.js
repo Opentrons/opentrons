@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-
+import { useTranslation } from 'react-i18n'
 import {
   Splash,
   SpinnerModal,
@@ -22,19 +22,6 @@ import { ProtocolLabwareCard } from './ProtocolLabwareCard'
 import { Continue } from './Continue'
 import { UploadError } from '../UploadError'
 
-const NO_STEPS_MESSAGE = `This protocol has no steps in it - there's nothing for your robot to do! Your protocol needs at least one aspirate/dispense to import properly`
-
-// TODO(mc, 2019-11-25): i18n
-const UPLOAD_AND_SIMULATE_PROTOCOL = 'Upload and Simulate Protocol'
-
-const SIMULATION_IN_PROGRESS = 'Simulation in Progress'
-
-const ROBOT_DOESNT_SUPPORT_CUSTOM_LABWARE =
-  "Robot doesn't support custom labware"
-
-const YOU_HAVE_CUSTOM_LABWARE_BUT_THIS_ROBOT_NEEDS_UPDATE =
-  'You have custom labware definitions saved to your app, but this robot needs to be updated before you can use these definitions with Python protocols'
-
 export type FileInfoProps = {|
   robot: Robot,
   filename: ?string,
@@ -54,24 +41,25 @@ export function FileInfo(props: FileInfoProps): React.Node {
     sessionHasSteps,
     showCustomLabwareWarning,
   } = props
+  const { t } = useTranslation('protocol_info')
 
   const titleBarProps = filename
     ? { title: filename, subtitle: 'overview' }
-    : { title: UPLOAD_AND_SIMULATE_PROTOCOL }
+    : { title: t('upload_and_simulate') }
 
   let uploadError = props.uploadError
 
   const sessionLoadedSuccessfully = sessionLoaded && !uploadError
 
   if (sessionLoadedSuccessfully && !sessionHasSteps) {
-    uploadError = { message: NO_STEPS_MESSAGE }
+    uploadError = { message: t('error_message_no_steps') }
   }
 
   return (
     <Page titleBarProps={titleBarProps}>
       {showCustomLabwareWarning && !sessionLoadedSuccessfully && (
-        <AlertItem type="warning" title={ROBOT_DOESNT_SUPPORT_CUSTOM_LABWARE}>
-          {YOU_HAVE_CUSTOM_LABWARE_BUT_THIS_ROBOT_NEEDS_UPDATE}
+        <AlertItem type="warning" title={t('custom_labware_not_supported')}>
+          {t('update_robot_for_custom_labware')}
         </AlertItem>
       )}
       {filename ? (
@@ -90,7 +78,9 @@ export function FileInfo(props: FileInfoProps): React.Node {
       ) : (
         <Splash />
       )}
-      {uploadInProgress && <SpinnerModal message={SIMULATION_IN_PROGRESS} />}
+      {uploadInProgress && (
+        <SpinnerModal message={t('simulation_in_progress')} />
+      )}
     </Page>
   )
 }
