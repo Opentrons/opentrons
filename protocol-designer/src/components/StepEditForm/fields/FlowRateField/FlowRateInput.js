@@ -12,23 +12,22 @@ import { Portal } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './FlowRateInput.css'
+import type { FieldProps } from '../../types'
 
 const DEFAULT_LABEL = 'Flow Rate'
 const DECIMALS_ALLOWED = 1
 
-type Props = {
-  /** When flow rate is falsey (including 0), it means 'use default' */
+/** When flow rate is falsey (including 0), it means 'use default' */
+export type FlowRateInputProps = {|
+  ...FieldProps,
   defaultFlowRate: ?number,
-  disabled?: boolean,
-  formFlowRate: ?number,
   flowRateType: 'aspirate' | 'dispense',
   label: ?string,
   minFlowRate: number,
   maxFlowRate: number,
-  updateValue: (flowRate: ?number) => mixed,
   pipetteDisplayName: ?string,
   className?: string,
-}
+|}
 
 type State = {
   showModal: boolean,
@@ -37,18 +36,18 @@ type State = {
   pristine: boolean,
 }
 
-export class FlowRateInput extends React.Component<Props, State> {
-  constructor(props: Props) {
+export class FlowRateInput extends React.Component<FlowRateInputProps, State> {
+  constructor(props: FlowRateInputProps) {
     super(props)
     this.state = this.getStateFromProps(props)
   }
 
-  getStateFromProps: (props: Props) => State = props => {
-    const { formFlowRate } = props
+  getStateFromProps: (props: FlowRateInputProps) => State = props => {
+    const { value } = props
     return {
       showModal: false,
-      modalFlowRate: formFlowRate ? formFlowRate.toString() : null,
-      modalUseDefault: !formFlowRate,
+      modalFlowRate: value ? String(value) : null,
+      modalUseDefault: !value,
       pristine: true,
     }
   }
@@ -97,7 +96,7 @@ export class FlowRateInput extends React.Component<Props, State> {
     const {
       defaultFlowRate,
       disabled,
-      formFlowRate,
+      value,
       flowRateType,
       label,
       minFlowRate,
@@ -196,7 +195,7 @@ export class FlowRateInput extends React.Component<Props, State> {
             disabled={disabled}
             onClick={this.openModal}
             className={this.props.className || stepFormStyles.small_field}
-            value={formFlowRate ? `${formFlowRate}` : 'default'}
+            value={value ? String(value) : 'default'}
           />
         </FormGroup>
 

@@ -64,11 +64,13 @@ export const MoveLiquidForm = (props: StepFormProps): React.Node => {
           className={cx(styles.section_wrapper, styles.advanced_settings_panel)}
         >
           <SourceDestFields
+            formData={props.formData}
             className={styles.section_column}
             prefix="aspirate"
             propsForFields={propsForFields}
           />
           <SourceDestFields
+            formData={props.formData}
             className={styles.section_column}
             prefix="dispense"
             propsForFields={propsForFields}

@@ -1,33 +1,34 @@
 // @flow
 import * as React from 'react'
-import { FlowRateInput } from './FlowRateInput'
+import { FlowRateInput, type FlowRateInputProps } from './FlowRateInput'
 import { connect } from 'react-redux'
-import { actions as steplistActions } from '../../../../steplist'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { getDisabledFields } from '../../../../steplist/formLevel'
+import type { FieldProps } from '../../types'
+import type { FormData } from '../../../../form-types'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { BaseState, ThunkDispatch } from '../../../../types'
-
-type Props = {|
-  ...$Exact<React.ElementProps<typeof FlowRateInput>>,
-  name: StepFieldName,
-  pipetteFieldName: StepFieldName,
-  innerKey: string,
-|}
+import type { BaseState } from '../../../../types'
 
 type OP = {|
-  name: StepFieldName,
+  ...FieldProps,
   pipetteFieldName: StepFieldName,
-  flowRateType: $PropertyType<Props, 'flowRateType'>,
-  label?: $PropertyType<Props, 'label'>,
-  className?: string,
+  formData: FormData,
+  className?: $PropertyType<FlowRateInputProps, 'className'>,
+  flowRateType: $PropertyType<FlowRateInputProps, 'flowRateType'>,
+  label?: $PropertyType<FlowRateInputProps, 'label'>,
 |}
 
-type DP = {|
-  updateValue: $PropertyType<Props, 'updateValue'>,
+type SP = {|
+  innerKey: string,
+  defaultFlowRate: ?number,
+  minFlowRate: number,
+  maxFlowRate: number,
+  pipetteDisplayName: string,
 |}
 
-type SP = $Rest<Props, {| ...OP, ...DP |}>
+type Props = {|
+  ...FlowRateInputProps,
+  innerKey: string,
+|}
 
 // Add a key to force re-constructing component when values change
 function FlowRateInputWithKey(props: Props) {
@@ -36,9 +37,7 @@ function FlowRateInputWithKey(props: Props) {
 }
 
 function mapStateToProps(state: BaseState, ownProps: OP): SP {
-  const { flowRateType, pipetteFieldName, name } = ownProps
-
-  const formData = stepFormSelectors.getUnsavedForm(state)
+  const { flowRateType, pipetteFieldName, name, formData } = ownProps
 
   const pipetteId = formData ? formData[pipetteFieldName] : null
   const pipette =
@@ -56,16 +55,12 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
     }
   }
 
-  const formFlowRate = formData && formData[name]
-
   // force each field to have a new instance created when value is changed
-  const innerKey = `${name}:${formFlowRate || 0}`
+  const innerKey = `${name}:${String(ownProps.value || 0)}`
 
   return {
     innerKey,
     defaultFlowRate,
-    disabled: formData ? getDisabledFields(formData).has(name) : false,
-    formFlowRate,
     minFlowRate: 0,
     // NOTE: since we only have rule-of-thumb, max is entire volume in 1 second
     maxFlowRate: pipette ? pipette.spec.maxVolume : Infinity,
@@ -73,27 +68,20 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>, ownProps: OP): DP {
-  return {
-    updateValue: (flowRate: ?number) =>
-      dispatch(
-        steplistActions.changeFormInput({
-          update: {
-            [ownProps.name]: flowRate,
-          },
-        })
-      ),
-  }
+const mergeProps = (stateProps: SP, dispatchProps, ownProps: OP): Props => {
+  const { formData, pipetteFieldName, ...passThruProps } = ownProps
+  return { ...stateProps, ...passThruProps }
 }
 
 export const FlowRateField: React.AbstractComponent<OP> = connect<
   Props,
   OP,
   SP,
-  DP,
+  {||},
   _,
   _
 >(
   mapStateToProps,
-  mapDispatchToProps
+  null,
+  mergeProps
 )(FlowRateInputWithKey)

@@ -206,6 +206,8 @@ describe('createPresavedStepForm', () => {
         mix_touchTip_checkbox: false,
         times: null,
         volume: undefined,
+        aspirate_flowRate: null,
+        dispense_flowRate: null,
       })
     })
   })

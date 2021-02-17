@@ -75,7 +75,9 @@
           "aspirate_delay_checkbox": false,
           "aspirate_delay_seconds": "1",
           "dispense_delay_checkbox": false,
-          "dispense_delay_seconds": "1"
+          "dispense_delay_seconds": "1",
+          "aspirate_flowRate": null,
+          "dispense_flowRate": null
         }
       },
       "orderedStepIds": [

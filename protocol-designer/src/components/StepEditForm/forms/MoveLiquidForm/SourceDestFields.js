@@ -12,6 +12,7 @@ import {
   DelayFields,
 } from '../../fields'
 
+import type { FormData } from '../../../../form-types'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { FieldPropsByName } from '../../types'
 
@@ -21,6 +22,7 @@ type Props = {|
   className?: ?string,
   prefix: 'aspirate' | 'dispense',
   propsForFields: FieldPropsByName,
+  formData: FormData,
 |}
 
 const makeAddFieldNamePrefix = (prefix: string) => (
@@ -67,7 +69,8 @@ export const SourceDestFields = (props: Props): React.Node => {
     <div className={className}>
       <div className={styles.form_row}>
         <FlowRateField
-          name={addFieldNamePrefix('flowRate')}
+          {...propsForFields[addFieldNamePrefix('flowRate')]}
+          formData={props.formData}
           pipetteFieldName="pipette"
           flowRateType={prefix}
         />
