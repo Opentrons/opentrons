@@ -467,6 +467,7 @@ export const initialSavedStepFormsState: SavedStepFormState = {
 }
 type SavedStepFormsActions =
   | SaveStepFormAction
+  | SaveStepFormsMultiAction
   | DeleteStepAction
   | DeleteMultipleStepsAction
   | LoadFileAction
@@ -561,6 +562,20 @@ export const savedStepForms = (
         ...savedStepForms,
         [action.payload.id]: action.payload,
       }
+    }
+    case 'SAVE_STEP_FORMS_MULTI': {
+      const { editedFields, stepIds } = action.payload
+      return stepIds.reduce(
+        (acc, stepId) => ({
+          ...acc,
+          // $FlowFixMe(sa, 2021-02-16): spreading editedFields can overwrite properties with explicit keys in a way that Flow cannot track
+          [stepId]: {
+            ...savedStepForms[stepId],
+            ...editedFields,
+          },
+        }),
+        { ...savedStepForms }
+      )
     }
     case 'DELETE_STEP': {
       return omit(savedStepForms, action.payload)
@@ -1339,6 +1354,7 @@ export type RootState = {
   presavedStepForm: PresavedStepFormState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
+  batchEditFormChanges: BatchEditFormChangesState,
 }
 
 // TODO Ian 2018-12-13: find some existing util to do this
@@ -1368,6 +1384,10 @@ export const rootReducer: Reducer<RootState, any> = (state, action) => {
     unsavedForm: unsavedForm(state, action),
     presavedStepForm: presavedStepForm(
       prevStateFallback.presavedStepForm,
+      action
+    ),
+    batchEditFormChanges: batchEditFormChanges(
+      prevStateFallback.batchEditFormChanges,
       action
     ),
   }

@@ -65,6 +65,7 @@ import type {
   FormPipettesByMount,
   TemperatureModuleState,
   ThermocyclerModuleState,
+  BatchEditFormChangesState,
 } from '../types'
 import type {
   PresavedStepFormState,
@@ -419,6 +420,11 @@ export const getCurrentFormHasUnsavedChanges: Selector<boolean> = createSelector
 )
 
 export const getBatchEditFormHasUnsavedChanges = (): boolean => false
+
+export const getBatchEditFieldChanges: Selector<BatchEditFormChangesState> = createSelector(
+  rootSelector,
+  state => state.batchEditFormChanges
+)
 
 const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
   return state.moduleEntities[id]

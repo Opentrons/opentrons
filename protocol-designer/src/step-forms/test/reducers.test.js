@@ -1242,6 +1242,54 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       })
     })
   })
+  describe('saving multiple steps', () => {
+    it('should apply the form patch to all of the step ids', () => {
+      const prevState = {
+        savedStepForms: {
+          some_transfer_step_id: {
+            stepType: 'moveLiquid',
+            blowout_location: 'someLocation',
+            dispense_mix_checkbox: true,
+            dispense_mix_volume: '10',
+          },
+          another_transfer_step_id: {
+            stepType: 'moveLiquid',
+            blowout_location: 'anotherLocation',
+            dispense_mix_checkbox: true,
+            dispense_mix_volume: '20',
+          },
+        },
+      }
+      const action = {
+        type: 'SAVE_STEP_FORMS_MULTI',
+        payload: {
+          editedFields: {
+            blowout_location: 'newLocation',
+            dispense_mix_volume: '30',
+          },
+          stepIds: ['some_transfer_step_id', 'another_transfer_step_id'],
+        },
+      }
+
+      const expectedSavedStepFormState = {
+        some_transfer_step_id: {
+          stepType: 'moveLiquid',
+          blowout_location: 'newLocation',
+          dispense_mix_checkbox: true,
+          dispense_mix_volume: '30',
+        },
+        another_transfer_step_id: {
+          stepType: 'moveLiquid',
+          blowout_location: 'newLocation',
+          dispense_mix_checkbox: true,
+          dispense_mix_volume: '30',
+        },
+      }
+      expect(savedStepForms(prevState, action)).toEqual(
+        expectedSavedStepFormState
+      )
+    })
+  })
 })
 
 describe('unsavedForm reducer', () => {
