@@ -1,4 +1,3 @@
-// @flow
 import fse from 'fs-extra'
 import { app, shell } from 'electron'
 import { getFullConfig, handleConfigChange } from '../config'
@@ -17,11 +16,12 @@ import type {
   CustomLabwareListActionSource as ListSource,
 } from '@opentrons/app/src/redux/custom-labware/types'
 
+import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch } from '../types'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
-const fetchCustomLabware = (): Promise<Array<UncheckedLabwareFile>> => {
+const fetchCustomLabware = (): Promise<UncheckedLabwareFile[]> => {
   const { labware: config } = getFullConfig()
 
   return ensureDir(config.directory)
@@ -68,7 +68,7 @@ const overwriteLabware = (
 
 const copyLabware = (
   dispatch: Dispatch,
-  filePaths: Array<string>
+  filePaths: string[]
 ): Promise<void> => {
   return Promise.all([
     fetchCustomLabware(),
@@ -90,9 +90,10 @@ const copyLabware = (
 
 export function registerLabware(
   dispatch: Dispatch,
-  mainWindow: { ... }
-): Action => void {
+  mainWindow: BrowserWindow
+): Dispatch {
   handleConfigChange(CustomLabware.LABWARE_DIRECTORY_CONFIG_PATH, () => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchAndValidateCustomLabware(dispatch, CustomLabware.CHANGE_DIRECTORY)
   })
 
@@ -104,6 +105,7 @@ export function registerLabware(
           action.type === CustomLabware.FETCH_CUSTOM_LABWARE
             ? CustomLabware.POLL
             : CustomLabware.INITIAL
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         fetchAndValidateCustomLabware(dispatch, source)
         break
       }
@@ -112,6 +114,7 @@ export function registerLabware(
         const { labware: config } = getFullConfig()
         const dialogOptions = { defaultPath: config.directory }
 
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         showOpenDirectoryDialog(mainWindow, dialogOptions).then(filePaths => {
           if (filePaths.length > 0) {
             const dir = filePaths[0]
@@ -124,8 +127,12 @@ export function registerLabware(
       case CustomLabware.ADD_CUSTOM_LABWARE: {
         let addLabwareTask
 
-        if (action.payload.overwrite) {
-          addLabwareTask = overwriteLabware(dispatch, action.payload.overwrite)
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if ((action.payload as { overwrite: DuplicateLabwareFile }).overwrite) {
+          addLabwareTask = overwriteLabware(
+            dispatch,
+            (action.payload as { overwrite: DuplicateLabwareFile }).overwrite
+          )
         } else {
           const dialogOptions = {
             defaultPath: app.getPath('downloads'),

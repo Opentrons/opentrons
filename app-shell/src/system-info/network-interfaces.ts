@@ -1,4 +1,3 @@
-// @flow
 import os from 'os'
 import isEqual from 'lodash/isEqual'
 
@@ -6,16 +5,16 @@ import type { NetworkInterface } from '@opentrons/app/src/redux/system-info/type
 
 export type { NetworkInterface }
 
-export type NetworkInterfaceMonitorOptions = {|
-  pollInterval: number,
-  onInterfaceChange: (ifaces: Array<NetworkInterface>) => mixed,
-|}
+export interface NetworkInterfaceMonitorOptions {
+  pollInterval: number
+  onInterfaceChange: (ifaces: NetworkInterface[]) => unknown
+}
 
-export type NetworkInterfaceMonitor = {|
-  stop: () => void,
-|}
+export interface NetworkInterfaceMonitor {
+  stop: () => void
+}
 
-export function getActiveInterfaces(): Array<NetworkInterface> {
+export function getActiveInterfaces(): NetworkInterface[] {
   const ifaces = os.networkInterfaces()
 
   return Object.keys(ifaces).flatMap<NetworkInterface>((name: string) => {
@@ -36,7 +35,7 @@ export function createNetworkInterfaceMonitor(
 
   return { stop: () => clearInterval(pollId) }
 
-  function monitorActiveInterfaces() {
+  function monitorActiveInterfaces(): void {
     const nextIfaces = getActiveInterfaces()
     if (!isEqual(ifaces, nextIfaces)) {
       ifaces = nextIfaces

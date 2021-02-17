@@ -1,4 +1,3 @@
-// @flow
 // app updater
 import { autoUpdater as updater } from 'electron-updater'
 
@@ -14,7 +13,9 @@ updater.autoDownload = false
 
 export const CURRENT_VERSION: string = updater.currentVersion.version
 
-export function registerUpdate(dispatch: Dispatch): Action => mixed {
+export function registerUpdate(
+  dispatch: Dispatch
+): (action: Action) => unknown {
   return function handleAction(action: Action) {
     switch (action.type) {
       case UI_INITIALIZED:
@@ -30,19 +31,31 @@ export function registerUpdate(dispatch: Dispatch): Action => mixed {
   }
 }
 
-function checkUpdate(dispatch: Dispatch) {
-  const onAvailable = (info: UpdateInfo) => done({ info, available: true })
-  const onNotAvailable = (info: UpdateInfo) => done({ info, available: false })
-  const onError = (error: Error) => done({ error: PlainObjectError(error) })
+function checkUpdate(dispatch: Dispatch): void {
+  const onAvailable = (info: UpdateInfo): void => {
+    done({ info, available: true })
+  }
+  const onNotAvailable = (info: UpdateInfo): void => {
+    done({ info, available: false })
+  }
+  const onError = (error: Error): void => {
+    done({ error: PlainObjectError(error) })
+  }
 
   updater.once('update-available', onAvailable)
   updater.once('update-not-available', onNotAvailable)
   updater.once('error', onError)
 
+  // @ts-expect-error(mc, 2021-02-16): do not use dot-path notation
   updater.channel = getConfig('update.channel')
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   updater.checkForUpdates()
 
-  function done(payload) {
+  function done(payload: {
+    info?: UpdateInfo
+    available?: boolean
+    error?: PlainError
+  }): void {
     updater.removeListener('update-available', onAvailable)
     updater.removeListener('update-not-available', onNotAvailable)
     updater.removeListener('error', onError)
@@ -50,15 +63,18 @@ function checkUpdate(dispatch: Dispatch) {
   }
 }
 
-function downloadUpdate(dispatch: Dispatch) {
-  const onDownloaded = () => done({})
-  const onError = (error: Error) => done({ error: PlainObjectError(error) })
+function downloadUpdate(dispatch: Dispatch): void {
+  const onDownloaded = (): void => done({})
+  const onError = (error: Error): void => {
+    done({ error: PlainObjectError(error) })
+  }
 
   updater.once('update-downloaded', onDownloaded)
   updater.once('error', onError)
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   updater.downloadUpdate()
 
-  function done(payload) {
+  function done(payload: { error?: PlainError }): void {
     updater.removeListener('update-downloaded', onDownloaded)
     updater.removeListener('error', onError)
     dispatch({ type: 'shell:DOWNLOAD_UPDATE_RESULT', payload })

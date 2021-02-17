@@ -1,10 +1,7 @@
-// @flow
 import path from 'path'
 import { app } from 'electron'
 import uuid from 'uuid/v4'
 import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/redux/config'
-
-import pkg from '../../package.json'
 
 import type {
   Config,
@@ -24,7 +21,7 @@ export const DEFAULTS_V0: ConfigV0 = {
 
   // app update config
   update: {
-    channel: pkg.version.includes('beta') ? 'beta' : 'latest',
+    channel: _PKG_VERSION_.includes('beta') ? 'beta' : 'latest',
   },
 
   buildroot: {
@@ -92,6 +89,7 @@ const toVersion1 = (prevConfig: ConfigV0): ConfigV1 => {
     ...prevConfig,
     version: 1,
     discovery: {
+      //  @ts-expect-error(mc, 2021-02-16): will be fixed by config TS types from app
       ...prevConfig.discovery,
       disableCache: false,
     },
@@ -119,6 +117,7 @@ const toVersion3 = (prevConfig: ConfigV2): ConfigV3 => {
     ...prevConfig,
     version: 3,
     support: {
+      //  @ts-expect-error(mc, 2021-02-16): will be fixed by config TS types from app
       ...prevConfig.support,
       // name and email were never changed by the app, and its default values
       // were causing problems. Null them out for future implementations
@@ -131,9 +130,9 @@ const toVersion3 = (prevConfig: ConfigV2): ConfigV3 => {
 }
 
 const MIGRATIONS: [
-  (ConfigV0) => ConfigV1,
-  (ConfigV1) => ConfigV2,
-  (ConfigV2) => ConfigV3
+  (prefConfig: ConfigV0) => ConfigV1,
+  (prefConfig: ConfigV1) => ConfigV2,
+  (prefConfig: ConfigV2) => ConfigV3
 ] = [toVersion1, toVersion2, toVersion3]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -148,7 +147,7 @@ export function migrate(
   for (let i = prevVersion; i < MIGRATIONS.length; i++) {
     // NOTE(mc, 2020-05-22): Flow will always be unable to resolve this type
     // ensure good unit test coverage for this logic
-    const migrateVersion = (MIGRATIONS: any)[i]
+    const migrateVersion = MIGRATIONS[i]
     result = migrateVersion(result)
   }
 
@@ -158,5 +157,6 @@ export function migrate(
     )
   }
 
-  return ((result: any): Config)
+  //  @ts-expect-error(mc, 2021-02-16): will be fixed by config TS types from app
+  return result
 }

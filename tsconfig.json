@@ -2,7 +2,10 @@
   "files": [],
   "references": [
     {
+      "path": "./app-shell"
+    },
+    {
       "path": "./discovery-client"
-    }
+    },
   ]
 }

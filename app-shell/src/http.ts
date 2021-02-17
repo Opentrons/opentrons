@@ -1,4 +1,3 @@
-// @flow
 // fetch wrapper to throw if response is not ok
 import fs from 'fs'
 import { Transform, Readable } from 'stream'
@@ -12,7 +11,10 @@ import type { Request, RequestInit, Response } from 'node-fetch'
 
 type RequestInput = Request | string
 
-export type DownloadProgress = {| downloaded: number, size: number | null |}
+export interface DownloadProgress {
+  downloaded: number
+  size: number | null
+}
 
 export function fetch(
   input: RequestInput,
@@ -43,22 +45,24 @@ export function fetchText(input: Request): Promise<string> {
 export function fetchToFile(
   input: RequestInput,
   destination: string,
-  options?: $Shape<{ onProgress: (progress: DownloadProgress) => mixed }>
+  options?: Partial<{ onProgress: (progress: DownloadProgress) => unknown }>
 ): Promise<string> {
   return fetch(input).then(response => {
     let downloaded = 0
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const size = Number(response.headers.get('Content-Length')) || null
 
     // with node-fetch, response.body will be a Node.js readable stream
     // rather than a browser-land ReadableStream
-    const inputStream: Readable = (response.body: any)
+    const inputStream = response.body
     const outputStream = fs.createWriteStream(destination)
 
     // pass-through stream to report read progress
     const onProgress = options?.onProgress
     const progressReader = new Transform({
-      transform(chunk, encoding, next) {
+      transform(chunk: string | Buffer, encoding, next) {
         downloaded += chunk.length
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (onProgress) onProgress({ downloaded, size })
         next(null, chunk)
       },
@@ -70,6 +74,7 @@ export function fetchToFile(
       // pump calls stream.pipe, handles teardown if streams error, and calls
       // its callbacks when the streams are done
       pump(inputStream, progressReader, outputStream, error => {
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (error) return reject(error)
         resolve(destination)
       })
@@ -97,12 +102,12 @@ function createReadStream(source: string): Promise<Readable> {
 
     readStream.once('error', handleError)
 
-    function handleSuccess() {
+    function handleSuccess(): void {
       readStream.removeListener('error', handleError)
       resolve(readStream)
     }
 
-    function handleError(error: Error) {
+    function handleError(error: Error): void {
       clearTimeout(scheduledResolve)
       reject(error)
     }

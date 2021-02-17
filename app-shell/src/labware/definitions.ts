@@ -1,40 +1,37 @@
-// @flow
 import path from 'path'
 import fs from 'fs-extra'
 import { shell } from 'electron'
 
-import type { Dirent } from '../types'
+import type { Dirent } from 'fs'
 import type { UncheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
 
 const RE_JSON_EXT = /\.json$/i
 
-export function readLabwareDirectory(dir: string): Promise<Array<string>> {
-  const absoluteName = e => path.join(dir, e.name)
+export function readLabwareDirectory(dir: string): Promise<string[]> {
+  const absoluteName = (e: Dirent): string => path.join(dir, e.name)
 
-  return fs
-    .readdir(dir, { withFileTypes: true })
-    .then((entries: Array<Dirent>) => {
-      const jsonFiles = entries
-        .filter(e => e.isFile() && RE_JSON_EXT.test(e.name))
+  return fs.readdir(dir, { withFileTypes: true }).then((entries: Dirent[]) => {
+    const jsonFiles = entries
+      .filter(e => e.isFile() && RE_JSON_EXT.test(e.name))
+      .map(absoluteName)
+
+    const getNestedFiles = Promise.all(
+      entries
+        .filter(e => e.isDirectory())
         .map(absoluteName)
+        .map(readLabwareDirectory)
+    )
 
-      const getNestedFiles = Promise.all(
-        entries
-          .filter(e => e.isDirectory())
-          .map(absoluteName)
-          .map(readLabwareDirectory)
-      )
-
-      return getNestedFiles.then(nested => {
-        const nestedFiles: Array<string> = nested.flat()
-        return [...jsonFiles, ...nestedFiles]
-      })
+    return getNestedFiles.then(nested => {
+      const nestedFiles: string[] = nested.flat()
+      return [...jsonFiles, ...nestedFiles]
     })
+  })
 }
 
 export function parseLabwareFiles(
-  files: Array<string>
-): Promise<Array<UncheckedLabwareFile>> {
+  files: string[]
+): Promise<UncheckedLabwareFile[]> {
   const tasks = files.map(f => {
     const readTask = fs.readJson(f, { throws: false })
     const statTask = fs.stat(f)
@@ -56,6 +53,7 @@ const getFileName = (
   ext: string,
   count = 0
 ): Promise<string> => {
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const basename = `${base}${count || ''}${ext}`
   const name = path.join(dir, basename)
 

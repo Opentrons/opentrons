@@ -1,11 +1,6 @@
-// @flow
+// import type { CheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
 
-import type { CheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
-
-export function sameIdentity(
-  a: CheckedLabwareFile,
-  b: CheckedLabwareFile
-): boolean {
+export function sameIdentity(a: any, b: any): boolean {
   return (
     a.definition != null &&
     b.definition != null &&

@@ -8,6 +8,9 @@ import winston from 'winston'
 
 import { getConfig } from './config'
 
+import type Transport from 'winston-transport'
+import type { Config } from './config'
+
 export const LOG_DIR = path.join(app.getPath('userData'), 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')
 const COMBINED_LOG = path.join(LOG_DIR, 'combined.log')
@@ -22,38 +25,42 @@ const FILE_OPTIONS = {
   tailable: true,
 }
 
-let config
-let transports
-let log
+let config: Config['log']
+let transports: Transport[]
+let log: winston.Logger
 
-export function createLogger(filename) {
+export function createLogger(filename: string): winston.Logger {
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!config) config = getConfig('log')
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!transports) initializeTransports()
 
   return createWinstonLogger(filename)
 }
 
-function initializeTransports() {
+function initializeTransports(): void {
   let error = null
 
   // sync is ok here because this only happens once
   try {
     fse.ensureDirSync(LOG_DIR)
-  } catch (e) {
+  } catch (e: unknown) {
     error = e
   }
 
   transports = createTransports()
   log = createWinstonLogger('log')
 
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (error) log.error('Could not create log directory', { error })
   log.info(`Level "error" and higher logging to ${ERROR_LOG}`)
   log.info(`Level "${config.level.file}" and higher logging to ${COMBINED_LOG}`)
   log.info(`Level "${config.level.console}" and higher logging to console`)
 }
 
-function createTransports() {
-  const timeFromStamp = ts => dateFormat(new Date(ts), 'HH:MM:ss.l')
+function createTransports(): Transport[] {
+  const timeFromStamp = (ts: string): string =>
+    dateFormat(new Date(ts), 'HH:MM:ss.l')
 
   return [
     // error file log
@@ -85,6 +92,7 @@ function createTransports() {
         winston.format.printf(info => {
           const { level, message, timestamp, label } = info
           const time = timeFromStamp(timestamp)
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           const print = `${time} [${label}] ${level}: ${message}`
           const meta = inspect(info.meta, { depth: 6 })
 
@@ -97,7 +105,8 @@ function createTransports() {
   ]
 }
 
-function createWinstonLogger(label) {
+function createWinstonLogger(label: string): winston.Logger {
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-optional-chain
   log && log.debug(`Creating logger for ${label}`)
 
   const formats = [

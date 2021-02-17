@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import execa from 'execa'
 import usbDetection from 'usb-detection'
@@ -9,15 +8,15 @@ import type { Device } from 'usb-detection'
 
 export type { Device }
 
-export type UsbDeviceMonitorOptions = $Shape<{|
-  onDeviceAdd?: (device: Device) => mixed,
-  onDeviceRemove?: (device: Device) => mixed,
-|}>
+export type UsbDeviceMonitorOptions = Partial<{
+  onDeviceAdd?: (device: Device) => unknown
+  onDeviceRemove?: (device: Device) => unknown
+}>
 
-export type UsbDeviceMonitor = {|
-  getAllDevices: () => Promise<Array<Device>>,
-  stop: () => void,
-|}
+export interface UsbDeviceMonitor {
+  getAllDevices: () => Promise<Device[]>
+  stop: () => void
+}
 
 const log = createLogger('usb-devices')
 
@@ -51,7 +50,7 @@ export function createUsbDeviceMonitor(
   }
 }
 
-const decToHex = (number: number) =>
+const decToHex = (number: number): string =>
   number.toString(16).toUpperCase().padStart(4, '0')
 
 export function getWindowsDriverVersion(

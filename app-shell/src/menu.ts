@@ -1,31 +1,33 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 // application menu
 import { Menu } from 'electron'
+import type { MenuItemConstructorOptions } from 'electron'
 
-import pkg from '../package.json'
 import { LOG_DIR } from './log'
 
 // file or application menu
-const firstMenu = {
+const firstMenu: MenuItemConstructorOptions = {
   role: process.platform === 'darwin' ? 'appMenu' : 'fileMenu',
 }
 
-const editMenu = { role: 'editMenu' }
+const editMenu: MenuItemConstructorOptions = { role: 'editMenu' }
 
-const viewMenu = { role: 'viewMenu' }
+const viewMenu: MenuItemConstructorOptions = { role: 'viewMenu' }
 
-const windowMenu = { role: 'windowMenu' }
+const windowMenu: MenuItemConstructorOptions = { role: 'windowMenu' }
 
-const helpMenu = {
+const helpMenu: MenuItemConstructorOptions = {
   role: 'help',
   submenu: [
     {
       label: 'Learn More',
       click: () => {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         require('electron').shell.openExternal('https://opentrons.com/')
       },
     },
     {
-      label: `View ${pkg.productName} App Logs`,
+      label: `View ${_PKG_PRODUCT_NAME_} App Logs`,
       click: () => {
         require('electron').shell.openItem(LOG_DIR)
       },
@@ -33,7 +35,8 @@ const helpMenu = {
     {
       label: 'Report an Issue',
       click: () => {
-        require('electron').shell.openExternal(pkg.bugs.url)
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        require('electron').shell.openExternal(_PKG_BUGS_URL_)
       },
     },
   ],
@@ -41,6 +44,6 @@ const helpMenu = {
 
 const template = [firstMenu, editMenu, viewMenu, windowMenu, helpMenu]
 
-export function initializeMenu() {
+export function initializeMenu(): void {
   Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }

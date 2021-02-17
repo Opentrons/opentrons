@@ -1,19 +1,25 @@
 // download robot logs manager
-
 import { download } from 'electron-dl'
 import { createLogger } from './log'
 
+import type { BrowserWindow } from 'electron'
+import type { Action, Dispatch } from './types'
+
 const log = createLogger('robot-logs')
 
-export function registerRobotLogs(dispatch, mainWindow) {
-  return function handleIncomingAction(action) {
+export function registerRobotLogs(
+  dispatch: Dispatch,
+  mainWindow: BrowserWindow
+): (action: Action) => unknown {
+  return function handleIncomingAction(action: Action): void {
     if (action.type === 'shell:DOWNLOAD_LOGS') {
-      const { logUrls } = action.payload
+      const { logUrls } = action.payload as { logUrls: string[] }
 
       log.debug('Downloading robot logs', { logUrls })
 
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       logUrls
-        .reduce((result, url, index) => {
+        .reduce<Promise<unknown>>((result, url, index) => {
           return result.then(() => {
             return download(mainWindow, url, {
               saveAs: true,
@@ -21,7 +27,9 @@ export function registerRobotLogs(dispatch, mainWindow) {
             })
           })
         }, Promise.resolve())
-        .catch(error => log.error('Error downloading robot logs', { error }))
+        .catch((error: unknown) => {
+          log.error('Error downloading robot logs', { error })
+        })
         .then(() => dispatch({ type: 'shell:DOWNLOAD_LOGS_DONE' }))
     }
   }

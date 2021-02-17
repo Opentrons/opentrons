@@ -1,4 +1,3 @@
-// @flow
 import get from 'lodash/get'
 import has from 'lodash/has'
 import union from 'lodash/union'
@@ -24,7 +23,7 @@ export function shouldUpdate(path: string, overrides: Overrides): boolean {
 export function getNextValue(
   action: ConfigValueChangeAction,
   config: Config
-): mixed {
+): unknown {
   switch (action.type) {
     case UPDATE_VALUE: {
       return action.payload.value
@@ -37,7 +36,7 @@ export function getNextValue(
     case TOGGLE_VALUE: {
       const value = get(config, action.payload.path)
       return typeof value === 'boolean' || typeof value === 'undefined'
-        ? !value
+        ? !value // eslint-disable-line @typescript-eslint/strict-boolean-expressions
         : value
     }
 

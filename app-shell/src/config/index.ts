@@ -1,4 +1,3 @@
-// @flow
 // app configuration and settings
 // TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
 import Store from 'electron-store'
@@ -13,10 +12,15 @@ import { createLogger } from '../log'
 import { DEFAULTS_V0, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
 
+import type {
+  ConfigV0,
+  ConfigValueChangeAction,
+} from '@opentrons/app/src/redux/config/types'
+
 import type { Action, Dispatch, Logger } from '../types'
 import type { Config, Overrides } from './types'
 
-export type * from './types'
+export * from './types'
 
 // make sure all arguments are included in production
 const argv =
@@ -30,15 +34,15 @@ const PARSE_ARGS_OPTS = {
 }
 
 // lazy load store, overrides, and log because of config/log interdependency
-let _store
-let _over: Overrides | void
-let _log: Logger | void
+let _store: Store<Config>
+let _over: Overrides | undefined
+let _log: Logger | undefined
 
-const store = () => {
+const store = (): Store => {
   if (_store == null) {
     // perform store migration if loading for the first time
-    _store = new Store({ defaults: DEFAULTS_V0 })
-    _store.store = migrate(_store.store)
+    _store = (new Store({ defaults: DEFAULTS_V0 }) as unknown) as Store<Config>
+    _store.store = migrate((_store.store as unknown) as ConfigV0)
   }
   return _store
 }
@@ -50,7 +54,7 @@ const overrides = (): Overrides => {
 const log = (): Logger => _log ?? (_log = createLogger('config'))
 
 // initialize and register the config module with dispatches from the UI
-export function registerConfig(dispatch: Dispatch): Action => void {
+export function registerConfig(dispatch: Dispatch): (action: Action) => void {
   return function handleIncomingAction(action: Action) {
     if (action.type === UI_INITIALIZED) {
       dispatch(Cfg.configInitialized(getFullConfig()))
@@ -61,10 +65,13 @@ export function registerConfig(dispatch: Dispatch): Action => void {
       action.type === Cfg.ADD_UNIQUE_VALUE ||
       action.type === Cfg.SUBTRACT_VALUE
     ) {
-      const { path } = action.payload
+      const { path } = action.payload as { path: string }
 
       if (shouldUpdate(path, overrides())) {
-        const nextValue = getNextValue(action, getFullConfig())
+        const nextValue = getNextValue(
+          action as ConfigValueChangeAction,
+          getFullConfig()
+        )
 
         log().debug('Updating config', { path, nextValue })
         store().set(path, nextValue)
@@ -80,13 +87,13 @@ export function getStore(): Config {
   return store().store
 }
 
-export function getOverrides(path?: string): mixed {
+export function getOverrides(path?: string): unknown {
   return path != null ? get(overrides(), path) : overrides()
 }
 
-// TODO(mc, 2010-07-01): getConfig with path parameter can't be typed
-// Remove the path parameter
-export function getConfig(path?: string): any {
+export function getConfig<P extends keyof Config>(path: P): Config[P]
+export function getConfig(): Config
+export function getConfig(path?: any): any {
   const result = store().get(path)
   const over = getOverrides(path)
 
@@ -107,7 +114,7 @@ export function getFullConfig(): Config {
 
 export function handleConfigChange(
   path: string,
-  changeHandler: (newValue: any, oldValue: any) => mixed
-) {
+  changeHandler: (newValue: any, oldValue: any) => unknown
+): void {
   store().onDidChange(path, changeHandler)
 }

@@ -1,4 +1,3 @@
-// @flow
 // functions for downloading and storing release files
 import assert from 'assert'
 import path from 'path'
@@ -16,21 +15,22 @@ import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'
 const VERSION_FILENAME = 'VERSION.json'
 
 const log = createLogger('buildroot/release-files')
-const outPath = (dir: string, url: string) => path.join(dir, path.basename(url))
+const outPath = (dir: string, url: string): string =>
+  path.join(dir, path.basename(url))
 
 // checks `directory` for buildroot files matching the given `urls`, and
 // download them if they can't be found
 export function getReleaseFiles(
   urls: ReleaseSetUrls,
   directory: string,
-  onProgress: (progress: DownloadProgress) => mixed
+  onProgress: (progress: DownloadProgress) => unknown
 ): Promise<ReleaseSetFilepaths> {
   return readdir(directory)
     .catch(error => {
       log.warn('Error retrieving files from filesystem', { error })
       return []
     })
-    .then((files: Array<string>) => {
+    .then((files: string[]) => {
       log.debug('Files in buildroot download directory', { files })
       const system = outPath(directory, urls.system)
       const releaseNotes = outPath(directory, urls.releaseNotes)
@@ -55,7 +55,7 @@ export function downloadReleaseFiles(
   urls: ReleaseSetUrls,
   directory: string,
   // `onProgress` will be called with download progress as the files are read
-  onProgress: (progress: DownloadProgress) => mixed
+  onProgress: (progress: DownloadProgress) => unknown
 ): Promise<ReleaseSetFilepaths> {
   const tempDir: string = tempy.directory()
   const tempSystemPath = outPath(tempDir, urls.system)
@@ -83,23 +83,23 @@ export function downloadReleaseFiles(
 }
 
 export function readUserFileInfo(systemFile: string): Promise<UserFileInfo> {
-  const openZip = new Promise((resolve, reject) => {
+  const openZip = new Promise<StreamZip>((resolve, reject) => {
     const zip = new StreamZip({ file: systemFile, storeEntries: true })
       .once('ready', handleReady)
       .once('error', handleError)
 
-    function handleReady() {
+    function handleReady(): void {
       cleanup()
       resolve(zip)
     }
 
-    function handleError(error: Error) {
+    function handleError(error: Error): void {
       cleanup()
       zip.close()
       reject(error)
     }
 
-    function cleanup() {
+    function cleanup(): void {
       zip.removeListener('ready', handleReady)
       zip.removeListener('error', handleError)
     }
@@ -112,6 +112,7 @@ export function readUserFileInfo(systemFile: string): Promise<UserFileInfo> {
     assert(VERSION_FILENAME in entries, `${VERSION_FILENAME} not in archive`)
 
     const result = streamFromZip(VERSION_FILENAME)
+      // @ts-expect-error(mc, 2021-02-17): stream may be undefined
       .then(getStream)
       .then(JSON.parse)
       .then(versionInfo => ({
@@ -128,7 +129,7 @@ export function readUserFileInfo(systemFile: string): Promise<UserFileInfo> {
 export function cleanupReleaseFiles(
   downloadsDir: string,
   currentRelease: string
-): void {
+): Promise<unknown> {
   return readdir(downloadsDir, { withFileTypes: true })
     .then(files => {
       return files

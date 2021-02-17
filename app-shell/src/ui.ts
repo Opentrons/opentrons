@@ -30,7 +30,7 @@ const WINDOW_OPTS = {
   ),
 }
 
-export function createUi() {
+export function createUi(): BrowserWindow {
   log.debug('Creating main window', { options: WINDOW_OPTS })
 
   const mainWindow = new BrowserWindow(WINDOW_OPTS).once(
@@ -42,12 +42,14 @@ export function createUi() {
   )
 
   log.info(`Loading ${url}`)
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
 
   // open new windows (<a target="_blank" ...) in browser windows
   mainWindow.webContents.on('new-window', (event, url) => {
     log.debug('Opening external link', { url })
     event.preventDefault()
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     shell.openExternal(url)
   })
 

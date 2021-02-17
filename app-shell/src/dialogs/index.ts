@@ -1,59 +1,63 @@
-// @flow
 import { dialog } from 'electron'
+import type {
+  BrowserWindow,
+  OpenDialogOptions,
+  OpenDialogReturnValue,
+} from 'electron'
 
-type DialogResult = {| canceled: boolean, filePaths: Array<string> |}
+interface BaseDialogOptions {
+  defaultPath: string
+}
 
-type BaseDialogOptions = $Shape<{|
-  defaultPath: string,
-|}>
-
-type FileDialogOptions = $Shape<{|
-  ...BaseDialogOptions,
-  filters: Array<{| name: string, extensions: Array<string> |}>,
-|}>
+interface FileDialogOptions extends BaseDialogOptions {
+  filters: Array<{ name: string; extensions: string[] }>
+}
 
 const BASE_DIRECTORY_OPTS = {
-  properties: ['openDirectory', 'createDirectory'],
+  properties: ['openDirectory' as const, 'createDirectory' as const],
 }
 
 const BASE_FILE_OPTS = {
-  properties: ['openFile'],
+  properties: ['openFile' as const],
 }
 
 export function showOpenDirectoryDialog(
-  browserWindow: mixed,
-  options: BaseDialogOptions = {}
-): Promise<Array<String>> {
-  let openDialogOpts = BASE_DIRECTORY_OPTS
+  browserWindow: BrowserWindow,
+  options: Partial<BaseDialogOptions> = {}
+): Promise<String[]> {
+  let openDialogOpts: OpenDialogOptions = BASE_DIRECTORY_OPTS
 
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (options.defaultPath) {
     openDialogOpts = { ...openDialogOpts, defaultPath: options.defaultPath }
   }
 
   return dialog
     .showOpenDialog(browserWindow, openDialogOpts)
-    .then((result: DialogResult) => {
-      return result.canceled ? [] : result.filePaths
+    .then((result: OpenDialogReturnValue) => {
+      return result.canceled ? [] : (result.filePaths as string[])
     })
 }
 
 export function showOpenFileDialog(
-  browserWindow: mixed,
-  options: FileDialogOptions = {}
-): Promise<Array<string>> {
-  let openDialogOpts = BASE_FILE_OPTS
+  browserWindow: BrowserWindow,
+  options: Partial<FileDialogOptions> = {}
+): Promise<string[]> {
+  let openDialogOpts: OpenDialogOptions = BASE_FILE_OPTS
 
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (options.defaultPath) {
     openDialogOpts = { ...openDialogOpts, defaultPath: options.defaultPath }
   }
 
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (options.filters) {
     openDialogOpts = { ...openDialogOpts, filters: options.filters }
   }
 
   return dialog
     .showOpenDialog(browserWindow, openDialogOpts)
-    .then((result: DialogResult) => {
-      return result.canceled ? [] : result.filePaths
+    .then((result: OpenDialogReturnValue) => {
+      return result.canceled ? [] : (result.filePaths as string[])
     })
 }

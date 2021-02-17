@@ -1,4 +1,3 @@
-// @flow
 import Ajv from 'ajv'
 import sortBy from 'lodash/sortBy'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
@@ -15,8 +14,6 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   UncheckedLabwareFile,
   CheckedLabwareFile,
-  ValidLabwareFile,
-  OpentronsLabwareFile,
 } from '@opentrons/app/src/redux/custom-labware/types'
 
 const ajv = new Ajv()
@@ -26,16 +23,18 @@ const validateDefinition = ajv.compile(labwareSchema)
 // shared-data, but the shared-data validation function isn't geared towards
 // this use case because it either throws or passes invalid files; align them
 const validateLabwareDefinition = (data: any): LabwareDefinition2 | null =>
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   validateDefinition(data) ? data : null
 
 // validate a collection of unchecked labware files
 export function validateLabwareFiles(
-  files: Array<UncheckedLabwareFile>
-): Array<CheckedLabwareFile> {
+  files: UncheckedLabwareFile[]
+): CheckedLabwareFile[] {
   const validated = files.map<CheckedLabwareFile>(file => {
     const { filename, data, modified } = file
 
     // check file against the schema
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const definition = data && validateLabwareDefinition(data)
 
     if (definition === null) {
@@ -45,8 +44,8 @@ export function validateLabwareFiles(
     const props = { filename, modified, definition }
 
     return definition.namespace !== 'opentrons'
-      ? ({ ...props, type: VALID_LABWARE_FILE }: ValidLabwareFile)
-      : ({ ...props, type: OPENTRONS_LABWARE_FILE }: OpentronsLabwareFile)
+      ? { ...props, type: VALID_LABWARE_FILE }
+      : { ...props, type: OPENTRONS_LABWARE_FILE }
   })
 
   return validated.map(v => {
@@ -69,7 +68,7 @@ export function validateLabwareFiles(
 
 // validate a new unchecked file against a collection of already checked files
 export function validateNewLabwareFile(
-  existing: Array<CheckedLabwareFile>,
+  existing: CheckedLabwareFile[],
   newFile: UncheckedLabwareFile
 ): CheckedLabwareFile {
   const [checkedNewFile] = validateLabwareFiles([newFile])

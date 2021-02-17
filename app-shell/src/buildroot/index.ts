@@ -1,4 +1,3 @@
-// @flow
 // buildroot update files
 import path from 'path'
 import { readFile, ensureDir } from 'fs-extra'
@@ -16,12 +15,14 @@ import {
 } from './release-files'
 import { startPremigration, uploadSystemFile } from './update'
 
+import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
 import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
 import type {
   BuildrootUpdateInfo,
   BuildrootAction,
 } from '@opentrons/app/src/redux/buildroot/types'
+import type { RobotHost } from '@opentrons/app/src/redux/robot-api/types'
 
 const log = createLogger('buildroot/index')
 
@@ -31,13 +32,14 @@ const MANIFEST_CACHE = path.join(DIRECTORY, 'releases.json')
 let checkingForUpdates = false
 let updateSet: ReleaseSetFilepaths | null = null
 
-export function registerBuildrootUpdate(dispatch: Dispatch): Action => void {
+export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
   return function handleAction(action: Action) {
     switch (action.type) {
       case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
         if (!checkingForUpdates) {
           checkingForUpdates = true
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           checkForBuildrootUpdate(dispatch).then(
             () => (checkingForUpdates = false)
           )
@@ -45,26 +47,35 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Action => void {
         break
 
       case 'buildroot:START_PREMIGRATION': {
-        const robot = action.payload
+        const robot = action.payload as RobotHost
 
         log.info('Starting robot premigration', { robot })
 
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         startPremigration(robot)
-          .then((): BuildrootAction => ({
-            type: 'buildroot:PREMIGRATION_DONE',
-            payload: robot.name,
-          }))
-          .catch((error: Error): BuildrootAction => ({
-            type: 'buildroot:PREMIGRATION_ERROR',
-            payload: { message: error.message },
-          }))
+          .then(
+            (): BuildrootAction => ({
+              type: 'buildroot:PREMIGRATION_DONE',
+              payload: robot.name,
+            })
+          )
+          .catch(
+            (error: Error): BuildrootAction => ({
+              type: 'buildroot:PREMIGRATION_ERROR',
+              payload: { message: error.message },
+            })
+          )
           .then(dispatch)
 
         break
       }
 
       case 'buildroot:UPLOAD_FILE': {
-        const { host, path, systemFile } = action.payload
+        const { host, path, systemFile } = action.payload as {
+          host: RobotHost
+          path: string
+          systemFile: string | null
+        }
         const file = systemFile !== null ? systemFile : updateSet?.system
 
         if (file == null) {
@@ -74,6 +85,7 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Action => void {
           })
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         uploadSystemFile(host, path, file)
           .then(() => ({
             type: 'buildroot:FILE_UPLOAD_DONE',
@@ -95,8 +107,9 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Action => void {
       }
 
       case 'buildroot:READ_USER_FILE': {
-        const { systemFile } = action.payload
+        const { systemFile } = action.payload as { systemFile: string }
 
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         readUserFileInfo(systemFile)
           .then(userFile => ({
             type: 'buildroot:USER_FILE_INFO',
@@ -150,10 +163,10 @@ export function getBuildrootUpdateUrls(): Promise<ReleaseSetUrls | null> {
 //      a. If the files need downloading, dispatch progress updates to UI
 //   4. Cache the filepaths of the update files in memory
 //   5. Dispatch info or error to UI
-export function checkForBuildrootUpdate(dispatch: Dispatch): Promise<mixed> {
+export function checkForBuildrootUpdate(dispatch: Dispatch): Promise<unknown> {
   const fileDownloadDir = path.join(DIRECTORY, CURRENT_VERSION)
 
-  return (ensureDir(fileDownloadDir): Promise<void>)
+  return ensureDir(fileDownloadDir)
     .then(getBuildrootUpdateUrls)
     .then(urls => {
       if (urls === null) return Promise.resolve()
@@ -162,7 +175,7 @@ export function checkForBuildrootUpdate(dispatch: Dispatch): Promise<mixed> {
 
       let prevPercentDone = 0
 
-      const handleProgress = progress => {
+      const handleProgress = (progress: DownloadProgress): void => {
         const { downloaded, size } = progress
         if (size !== null) {
           const percentDone = Math.round((downloaded / size) * 100)

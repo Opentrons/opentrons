@@ -1,4 +1,3 @@
-// @flow
 // app shell discovery module
 import { app } from 'electron'
 import Store from 'electron-store'
@@ -23,10 +22,15 @@ import { createLogger } from './log'
 import { createNetworkInterfaceMonitor } from './system-info'
 
 import type {
+  Address,
   DiscoveryClientRobot,
   LegacyService,
+  DiscoveryClient,
 } from '@opentrons/discovery-client'
+
 import type { Action, Dispatch } from './types'
+import type { Config } from './config'
+import type { NetworkInterfaceMonitor } from './system-info'
 
 const log = createLogger('discovery')
 
@@ -37,20 +41,25 @@ const UPDATE_THROTTLE_MS = 500
 const IFACE_MONITOR_SLOW_INTERVAL_MS = 30000
 const IFACE_MONITOR_FAST_INTERVAL_MS = 5000
 
-let config
-let store
-let client
+interface DiscoveryStore {
+  robots: DiscoveryClientRobot[]
+  services?: LegacyService[]
+}
 
-const makeManualAddresses = (addrs: string | Array<string>) => {
+let config: Config['discovery']
+let store: Store<DiscoveryStore>
+let client: DiscoveryClient
+
+const makeManualAddresses = (addrs: string | string[]): Address[] => {
   return ['fd00:0:cafe:fefe::1']
     .concat(addrs)
     .map(ip => ({ ip, port: DEFAULT_PORT }))
 }
 
 const migrateLegacyServices = (
-  legacyServices: Array<LegacyService>
-): Array<DiscoveryClientRobot> => {
-  const servicesByName = groupBy<string, LegacyService>(legacyServices, 'name')
+  legacyServices: LegacyService[]
+): DiscoveryClientRobot[] => {
+  const servicesByName = groupBy<LegacyService>(legacyServices, 'name')
 
   return Object.keys(servicesByName).map((name: string) => {
     const services = servicesByName[name]
@@ -75,21 +84,29 @@ const migrateLegacyServices = (
   })
 }
 
-export function registerDiscovery(dispatch: Dispatch): Action => mixed {
+export function registerDiscovery(
+  dispatch: Dispatch
+): (action: Action) => unknown {
   const handleRobotListChange = throttle(handleRobots, UPDATE_THROTTLE_MS)
 
   config = getFullConfig().discovery
-  store = new Store({ name: 'discovery', defaults: { robots: [] } })
+  store = new Store({
+    name: 'discovery',
+    defaults: { robots: [] as DiscoveryClientRobot[] },
+  })
 
   let disableCache = config.disableCache
-  let initialRobots: Array<DiscoveryClientRobot> = []
+  let initialRobots: DiscoveryClientRobot[] = []
 
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!disableCache) {
-    const legacyCachedServices: Array<LegacyService> | null = store.get(
+    const legacyCachedServices: LegacyService[] | undefined = store.get(
       'services',
+      // @ts-expect-error(mc, 2021-02-16): tweak these type definitions
       null
     )
 
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (legacyCachedServices) {
       initialRobots = migrateLegacyServices(legacyCachedServices)
       store.delete('services')
@@ -109,14 +126,12 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
     manualAddresses: makeManualAddresses(config.candidates),
   })
 
-  handleConfigChange(
-    'discovery.candidates',
-    (value: string | Array<string>) => {
-      client.start({ manualAddresses: makeManualAddresses(value) })
-    }
-  )
+  handleConfigChange('discovery.candidates', (value: string | string[]) => {
+    client.start({ manualAddresses: makeManualAddresses(value) })
+  })
 
   handleConfigChange('discovery.disableCache', (value: boolean) => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
     if (value === true) {
       disableCache = value
       store.set('robots', [])
@@ -124,8 +139,9 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
     }
   })
 
-  let ifaceMonitor
-  const startIfaceMonitor = pollInterval => {
+  let ifaceMonitor: NetworkInterfaceMonitor | undefined
+  const startIfaceMonitor = (pollInterval: number): void => {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-optional-chain
     ifaceMonitor && ifaceMonitor.stop()
     ifaceMonitor = createNetworkInterfaceMonitor({
       pollInterval,
@@ -134,6 +150,7 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
   }
 
   app.once('will-quit', () => {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-optional-chain
     ifaceMonitor && ifaceMonitor.stop()
     client.stop()
   })
@@ -155,14 +172,16 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
         return client.start({ healthPollInterval: SLOW_POLL_INTERVAL_MS })
 
       case DISCOVERY_REMOVE:
-        return client.removeRobot(action.payload.robotName)
+        return client.removeRobot(
+          (action.payload as { robotName: string }).robotName
+        )
 
       case CLEAR_CACHE:
         return clearCache()
     }
   }
 
-  function handleRobots() {
+  function handleRobots(): void {
     const robots = client.getRobots()
 
     if (!disableCache) store.set('robots', robots)
@@ -173,7 +192,7 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
     })
   }
 
-  function clearCache() {
+  function clearCache(): void {
     client.start({ initialRobots: [] })
   }
 }
