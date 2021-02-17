@@ -21,14 +21,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
   TEXT_TRANSFORM_UPPERCASE,
-  SIZE_1,
   SIZE_2,
   SPACING_3,
-  SPACING_4,
   POSITION_STICKY,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-import { stepIconsByType } from '../../form-types'
+
 import type { FormData, StepType } from '../../form-types'
 
 type Props = {|
@@ -61,10 +59,7 @@ const StepPill = (props: StepPillProps): React.Node => {
   )} (${count})`
   return (
     <Flex css={stepPillStyles} key={stepType}>
-      <Icon name={stepIconsByType[stepType]} width={SIZE_1} />
-      <Text fontSize={FONT_SIZE_BODY_1} paddingLeft="0.5rem">
-        {label}
-      </Text>
+      <Text fontSize={FONT_SIZE_BODY_1}>{label}</Text>
     </Flex>
   )
 }
@@ -122,7 +117,7 @@ export const StepSelectionBannerComponent = (props: Props): React.Node => {
             justifyContent={JUSTIFY_FLEX_START}
             flexWrap="wrap"
             flex="1"
-            paddingLeft={SPACING_4}
+            paddingLeft="1.5rem"
           >
             {stepTypes.map(stepType => (
               <StepPill
