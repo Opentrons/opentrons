@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
-import { mount } from 'enzyme'
+import { mountWithProviders } from '@opentrons/components/__utils__'
 
+import { i18n } from '../../../i18n'
 import { CalibrationData } from '../CalibrationData'
 
 describe('CalibrationData', () => {
@@ -14,23 +15,24 @@ describe('CalibrationData', () => {
         calibratedThisSession = false,
         calDataAvailable = true,
       } = props
-      return mount(
+      return mountWithProviders(
         <CalibrationData
           calibrationData={calibrationData}
           calibratedThisSession={calibratedThisSession}
           calDataAvailable={calDataAvailable}
-        />
+        />,
+        { i18n }
       )
     }
   })
 
   it('displays not calibrated if no existing data and not calibrated in this session', () => {
-    const wrapper = render()
+    const { wrapper } = render()
     expect(wrapper.text().includes('Not yet calibrated')).toBe(true)
   })
 
   it('displays existing data if present and not calibrated in this session', () => {
-    const wrapper = render({
+    const { wrapper } = render({
       calibrationData: { x: 1, y: 0, z: 0 },
       calibratedThisSession: false,
     })
@@ -38,7 +40,7 @@ describe('CalibrationData', () => {
   })
 
   it('displays updated data if calibrated in this session', () => {
-    const wrapper = render({
+    const { wrapper } = render({
       calibrationData: { x: 1, y: 2, z: 0 },
       calibratedThisSession: true,
     })
@@ -46,7 +48,7 @@ describe('CalibrationData', () => {
   })
 
   it('displays updated data if calibrated in this session with same data', () => {
-    const wrapper = render({
+    const { wrapper } = render({
       calibrationData: { x: 1, y: 0, z: 0 },
       calibratedThisSession: true,
     })
@@ -54,7 +56,7 @@ describe('CalibrationData', () => {
   })
 
   it('displays calibration data n/a when labware is calDataAvailable', () => {
-    const wrapper = render({
+    const { wrapper } = render({
       calDataAvailable: false,
     })
     expect(wrapper.text().includes('Calibration Data N/A')).toBe(true)

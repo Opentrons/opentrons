@@ -418,6 +418,8 @@ export const getCurrentFormHasUnsavedChanges: Selector<boolean> = createSelector
   }
 )
 
+export const getBatchEditFormHasUnsavedChanges = (): boolean => false
+
 const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
   return state.moduleEntities[id]
 }

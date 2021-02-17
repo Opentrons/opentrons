@@ -5,24 +5,23 @@ import { useSelector } from 'react-redux'
 import { FormGroup } from '@opentrons/components'
 import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
+import { selectors as stepFormSelectors } from '../../../step-forms'
 import { i18n } from '../../../localization'
 import { maskField } from '../../../steplist/fieldLevel'
-
 import { ConditionalOnField, TextField, RadioGroupField } from '../fields'
 import styles from '../StepEditForm.css'
 
-import type { FormData } from '../../../form-types'
-import type { FocusHandlers } from '../types'
+import type { StepFormProps } from '../types'
 
-type MagnetFormProps = { focusHandlers: FocusHandlers, formData: FormData }
-
-export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
-  const { focusHandlers } = props
+export const MagnetForm = (props: StepFormProps): React.Node => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getMagneticLabwareOptions
   )
 
-  const moduleModel: ?string = props.formData?.meta?.module?.model
+  const moduleEntities = useSelector(stepFormSelectors.getModuleEntities)
+  const { moduleId } = props.formData
+  const moduleModel = moduleId ? moduleEntities[moduleId]?.model : null
+
   const moduleOption: ?string = moduleLabwareOptions[0]
     ? moduleLabwareOptions[0].name
     : 'No magnetic module'
@@ -34,6 +33,8 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
   const engageHeightCaption = defaultEngageHeight
     ? `Recommended: ${String(maskField('engageHeight', defaultEngageHeight))}`
     : null
+
+  const { propsForFields } = props
 
   return (
     <div className={styles.form_wrapper}>
@@ -55,7 +56,7 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
           className={styles.magnet_form_group}
         >
           <RadioGroupField
-            name="magnetAction"
+            {...propsForFields['magnetAction']}
             options={[
               {
                 name: i18n.t(
@@ -64,10 +65,9 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
                 value: 'engage',
               },
             ]}
-            {...focusHandlers}
           />
           <RadioGroupField
-            name="magnetAction"
+            {...propsForFields['magnetAction']}
             options={[
               {
                 name: i18n.t(
@@ -76,7 +76,6 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
                 value: 'disengage',
               },
             ]}
-            {...focusHandlers}
           />
         </FormGroup>
         <ConditionalOnField
@@ -88,10 +87,9 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
             className={styles.magnet_form_group}
           >
             <TextField
-              name="engageHeight"
-              className={styles.small_field}
+              {...propsForFields['engageHeight']}
               caption={engageHeightCaption}
-              {...focusHandlers}
+              className={styles.small_field}
             />
           </FormGroup>
         </ConditionalOnField>

@@ -181,6 +181,7 @@ export const pauseForTimeOrUntilTold = (
     const minutes = parseFloat(pauseMinute) || 0
     const seconds = parseFloat(pauseSecond) || 0
     const totalSeconds = hours * 3600 + minutes * 60 + seconds
+
     return totalSeconds <= 0 ? FORM_ERRORS.TIME_PARAM_REQUIRED : null
   } else if (pauseAction === PAUSE_UNTIL_TEMP) {
     // user selected pause until temperature reached

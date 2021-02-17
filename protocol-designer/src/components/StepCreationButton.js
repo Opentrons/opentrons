@@ -7,6 +7,7 @@ import {
   PrimaryButton,
   useHoverTooltip,
   TOOLTIP_RIGHT,
+  TOOLTIP_TOP,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
 import {
@@ -15,7 +16,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { i18n } from '../localization'
-import { actions as stepsActions } from '../ui/steps'
+import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
 import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
@@ -31,6 +32,7 @@ import styles from './listButtons.css'
 type StepButtonComponentProps = {|
   children: React.Node,
   expanded: boolean,
+  disabled: boolean,
   setExpanded: boolean => mixed,
 |}
 
@@ -45,14 +47,23 @@ const getSupportedSteps = () => [
 ]
 
 const StepCreationButtonComponent = (props: StepButtonComponentProps) => {
-  const { children, expanded, setExpanded } = props
-
+  const { children, expanded, setExpanded, disabled } = props
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP,
+    strategy: TOOLTIP_FIXED,
+  })
   return (
     <div
       className={styles.list_item_button}
       onMouseLeave={() => setExpanded(false)}
+      {...targetProps}
     >
-      <PrimaryButton onClick={() => setExpanded(!expanded)}>
+      {disabled && (
+        <Tooltip {...tooltipProps}>
+          {i18n.t(`tooltip.disabled_step_creation`)}
+        </Tooltip>
+      )}
+      <PrimaryButton onClick={() => setExpanded(!expanded)} disabled={disabled}>
         {i18n.t('button.add_step')}
       </PrimaryButton>
 
@@ -64,7 +75,7 @@ const StepCreationButtonComponent = (props: StepButtonComponentProps) => {
 type StepButtonItemProps = {|
   onClick: () => mixed,
   disabled: boolean,
-  stepType: string,
+  stepType: StepType,
 |}
 
 function StepButtonItem(props: StepButtonItemProps) {
@@ -100,6 +111,7 @@ export const StepCreationButton = (): React.Node => {
   const formHasChanges = useSelector(
     stepFormSelectors.getCurrentFormHasUnsavedChanges
   )
+  const isStepCreationDisabled = useSelector(getIsMultiSelectMode)
   const modules = useSelector(stepFormSelectors.getInitialDeckSetup).modules
   const isStepTypeEnabled = {
     moveLiquid: true,
@@ -156,6 +168,7 @@ export const StepCreationButton = (): React.Node => {
       <StepCreationButtonComponent
         expanded={expanded}
         setExpanded={setExpanded}
+        disabled={isStepCreationDisabled}
       >
         {items}
       </StepCreationButtonComponent>

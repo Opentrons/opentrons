@@ -167,6 +167,16 @@ settings = [
                     'Activating this will disable protocol running from the '
                     'Opentrons application.',
         restart_required=True,
+    ),
+    SettingDefinition(
+        _id='enableFastProtocolUpload',
+        title='Enable Experimental Fast Protocol Upload',
+        description='Enabling this flag will skip simulation for a faster '
+                    'upload. The protocol will be analyzed for syntax errors, '
+                    'run steps, and equipment requirements. This feature '
+                    'should only be used if a protocol has been simulated '
+                    'before.',
+        restart_required=False,
     )
 ]
 
@@ -353,8 +363,18 @@ def _migrate6to7(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate7to8(previous: SettingsMap) -> SettingsMap:
+    """
+    Migration to version 8 of the feature flags file. Adds the
+    enableFastProtocolUpload config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap['enableFastProtocolUpload'] = None
+    return newmap
+
+
 _MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4,
-               _migrate4to5, _migrate5to6, _migrate6to7]
+               _migrate4to5, _migrate5to6, _migrate6to7, _migrate7to8]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should

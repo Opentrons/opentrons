@@ -119,3 +119,6 @@ calibrations/
 # recent versions of setuptools create pyproject.toml automatically
 # we're ignoring the file for now to avoid confusion
 api/pyproject.toml
+
+# typescript incremental files
+*.tsbuildinfo

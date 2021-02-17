@@ -2,6 +2,7 @@
 // setup pipettes component
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 import { Icon } from '@opentrons/components'
 import {
@@ -26,12 +27,12 @@ export type ProtocolPipettesCardProps = {| robotName: string |}
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
-const TITLE = 'Required Pipettes'
 
 export function ProtocolPipettesCard(
   props: ProtocolPipettesCardProps
 ): React.Node {
   const { robotName } = props
+  const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
   const infoByMount = useSelector((state: State) =>
     getProtocolPipettesInfo(state, robotName)
@@ -74,7 +75,7 @@ export function ProtocolPipettesCard(
   if (pipetteItemProps.length === 0) return null
 
   return (
-    <InfoSection title={TITLE}>
+    <InfoSection title={t('instruments_title')}>
       <SectionContentHalf>
         {pipetteItemProps.map(itemProps => (
           <InstrumentItem

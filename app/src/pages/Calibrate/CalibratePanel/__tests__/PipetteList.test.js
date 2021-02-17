@@ -1,8 +1,7 @@
 // @flow
 import * as React from 'react'
 import { StaticRouter } from 'react-router-dom'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
+import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import * as PipettesSelectors from '../../../../redux/pipettes/selectors'
 import * as robotSelectors from '../../../../redux/robot/selectors'
@@ -109,32 +108,19 @@ const mockAttachedPipettes = {
 }
 
 describe('PipetteListComponent', () => {
-  let dispatch
-  let mockStore
   let render
 
   beforeEach(() => {
-    dispatch = jest.fn()
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        robotApi: {},
-      }),
-      dispatch,
-    }
     mockGetProtocolPipettes.mockReturnValue([mockLeftProtoPipette])
     mockGetCalibratePipetteLocations.mockReturnValue(mockPipetteLocations)
     mockGetAttachedPipettes.mockReturnValue(mockAttachedPipettes)
 
     render = (props: PipetteListComponentProps, location: string = '/') => {
-      return mount(
-        <Provider store={mockStore}>
-          <PipetteListComponent {...props} />
-        </Provider>,
-        {
-          wrappingComponent: StaticRouter,
-          wrappingComponentProps: { location, context: {} },
-        }
+      return mountWithProviders(
+        <StaticRouter context={{}} location={location}>
+          <PipetteListComponent {...props} />,
+        </StaticRouter>,
+        { i18n }
       )
     }
   })
@@ -144,18 +130,18 @@ describe('PipetteListComponent', () => {
   })
 
   it('dispatches fetch tip length calibration action on render', () => {
-    render({
+    const { store } = render({
       robotName: 'robotName',
       tipracks: stubTipRacks,
     })
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
+    expect(store.dispatch).toHaveBeenCalledWith(
       fetchTipLengthCalibrations('robotName')
     )
   })
 
   it('renders tip length calibration', () => {
-    const wrapper = render({
+    const { wrapper } = render({
       robotName: 'robotName',
       tipracks: stubTipRacks,
     })

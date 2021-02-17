@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
-import { mount } from 'enzyme'
+import { mountWithProviders } from '@opentrons/components/__utils__'
 
+import { i18n } from '../../../i18n'
 import { TipLengthCalibrationData } from '../TipLengthCalibrationData'
 
 describe('TipLengthCalibrationData', () => {
@@ -10,22 +11,23 @@ describe('TipLengthCalibrationData', () => {
   beforeEach(() => {
     render = (props = {}) => {
       const { calibrationData = null, calDataAvailable = true } = props
-      return mount(
+      return mountWithProviders(
         <TipLengthCalibrationData
           calibrationData={calibrationData}
           calDataAvailable={calDataAvailable}
-        />
+        />,
+        { i18n }
       )
     }
   })
 
   it('displays not calibrated if no existing data and not calibrated in this session', () => {
-    const wrapper = render()
+    const { wrapper } = render()
     expect(wrapper.text().includes('Not yet calibrated')).toBe(true)
   })
 
   it('displays existing data if present and not calibrated in this session', () => {
-    const wrapper = render({
+    const { wrapper } = render({
       calibrationData: {
         id: '1',
         tipLength: 30,
@@ -44,7 +46,7 @@ describe('TipLengthCalibrationData', () => {
   })
 
   it('displays calibration data n/a when labware is calDataAvailable', () => {
-    const wrapper = render({
+    const { wrapper } = render({
       calDataAvailable: false,
     })
     expect(wrapper.text().includes('Calibration Data N/A')).toBe(true)

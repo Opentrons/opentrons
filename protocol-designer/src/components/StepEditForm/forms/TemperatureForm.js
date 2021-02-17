@@ -12,21 +12,17 @@ import {
   TextField,
 } from '../fields'
 import styles from '../StepEditForm.css'
+import type { StepFormProps } from '../types'
 
-import type { FocusHandlers } from '../types'
-
-type TemperatureFormProps = { focusHandlers: FocusHandlers }
-
-export const TemperatureForm = (
-  props: TemperatureFormProps
-): React.Element<'div'> => {
-  const { focusHandlers } = props
+export const TemperatureForm = (props: StepFormProps): React.Node => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )
   const temperatureModuleId = useSelector(
     uiModuleSelectors.getSingleTemperatureModuleId
   )
+
+  const { propsForFields } = props
 
   return (
     <div className={styles.form_wrapper}>
@@ -41,8 +37,7 @@ export const TemperatureForm = (
           className={styles.temperature_form_group}
         >
           <StepFormDropdown
-            {...focusHandlers}
-            name="moduleId"
+            {...propsForFields['moduleId']}
             options={moduleLabwareOptions}
           />
         </FormGroup>
@@ -64,7 +59,7 @@ export const TemperatureForm = (
         >
           <div className={styles.checkbox_row}>
             <RadioGroupField
-              name="setTemperature"
+              {...propsForFields['setTemperature']}
               options={[
                 {
                   name: i18n.t(
@@ -73,23 +68,21 @@ export const TemperatureForm = (
                   value: 'true',
                 },
               ]}
-              {...focusHandlers}
             />
             <ConditionalOnField
               name={'setTemperature'}
               condition={val => val === 'true'}
             >
               <TextField
-                name="targetTemperature"
+                {...propsForFields['targetTemperature']}
                 className={styles.small_field}
                 units={i18n.t('application.units.degrees')}
-                {...focusHandlers}
               />
             </ConditionalOnField>
           </div>
           <div className={styles.checkbox_row}>
             <RadioGroupField
-              name="setTemperature"
+              {...propsForFields['setTemperature']}
               options={[
                 {
                   name: i18n.t(
@@ -98,7 +91,6 @@ export const TemperatureForm = (
                   value: 'false',
                 },
               ]}
-              {...focusHandlers}
             />
           </div>
         </ConditionalOnField>

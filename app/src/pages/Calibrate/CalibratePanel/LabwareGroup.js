@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 import { SidePanelGroup, TitledList } from '@opentrons/components'
 import { fetchLabwareCalibrations } from '../../../redux/calibration'
@@ -25,6 +26,8 @@ export type LabwareGroupProps = {|
 
 export function LabwareGroup(props: LabwareGroupProps): React.Node {
   const { robotName, tipracks, otherLabware } = props
+
+  const { t } = useTranslation('protocol_calibration')
   const dispatch = useDispatch<Dispatch>()
 
   const calibratorMount = useSelector(robotSelectors.getCalibratorMount)
@@ -45,8 +48,11 @@ export function LabwareGroup(props: LabwareGroupProps): React.Node {
   }
 
   return (
-    <SidePanelGroup title={TITLE} disabled={isRunning}>
-      <TitledList title={TIPRACKS_TITLE} disabled={tipracksConfirmed}>
+    <SidePanelGroup title={t('labware_cal_title')} disabled={isRunning}>
+      <TitledList
+        title={t('labware_cal_tipracks_title')}
+        disabled={tipracksConfirmed}
+      >
         {tipracks.map(tr => (
           <LabwareListItem
             {...tr}
@@ -56,7 +62,7 @@ export function LabwareGroup(props: LabwareGroupProps): React.Node {
           />
         ))}
       </TitledList>
-      <TitledList title={LABWARE_TITLE}>
+      <TitledList title={t('labware_cal_labware_title')}>
         {otherLabware.map(lw => (
           <LabwareListItem
             {...lw}

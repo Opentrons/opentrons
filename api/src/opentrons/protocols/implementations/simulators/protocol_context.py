@@ -4,10 +4,10 @@ from opentrons.protocols.implementations.interfaces.instrument_context import \
 from opentrons.protocols.implementations.protocol_context import \
     ProtocolContextImplementation
 from opentrons.protocols.implementations.simulators.instrument_context import \
-    SimInstrumentContext
+    InstrumentContextSimulation
 
 
-class SimProtocolContext(ProtocolContextImplementation):
+class ProtocolContextSimulation(ProtocolContextImplementation):
     def load_instrument(self,
                         instrument_name: str,
                         mount: types.Mount,
@@ -26,7 +26,7 @@ class SimProtocolContext(ProtocolContextImplementation):
         attached[mount] = instrument_name
         self._hw_manager.hardware.cache_instruments(attached)
 
-        new_instr = SimInstrumentContext(
+        new_instr = InstrumentContextSimulation(
             protocol_interface=self,
             pipette_dict=self._hw_manager.hardware.get_attached_instruments()[
                 mount

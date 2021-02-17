@@ -29,6 +29,7 @@ defaults:
 jobs:
   python-lint:
     name: 'shared-data package python lint'
+    timeout-minutes: 10
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
@@ -46,6 +47,7 @@ jobs:
         run: make -C shared-data/python lint
   python-test:
     name: 'shared-data package python tests'
+    timeout-minutes: 20
     needs: [python-lint]
     strategy:
       matrix:

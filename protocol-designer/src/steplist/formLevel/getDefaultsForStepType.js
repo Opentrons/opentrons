@@ -16,6 +16,7 @@ export function getDefaultsForStepType(
   switch (stepType) {
     case 'mix':
       return {
+        times: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         labware: null,
         mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
@@ -30,6 +31,7 @@ export function getDefaultsForStepType(
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_delay_checkbox: false,
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
+        mix_touchTip_checkbox: false,
       }
     case 'moveLiquid':
       return {

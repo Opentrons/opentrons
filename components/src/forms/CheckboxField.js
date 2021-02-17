@@ -2,9 +2,9 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
-import type { HoverTooltipHandlers } from '../tooltips'
 
 import styles from './forms.css'
+import type { HoverTooltipHandlers } from '../tooltips'
 
 export type CheckboxFieldProps = {|
   /** change handler */
@@ -13,7 +13,7 @@ export type CheckboxFieldProps = {|
   value?: boolean,
   /** classes to apply */
   className?: string,
-  /** classes to apply to inner label text div */
+  /** classes to apply to inner label text div. Deprecated. use labelProps.className */
   labelTextClassName?: ?string,
   /** name of field in form */
   name?: string,
@@ -25,6 +25,8 @@ export type CheckboxFieldProps = {|
   disabled?: boolean,
   /** html tabindex property */
   tabIndex?: number,
+  /** props passed into label div. TODO IMMEDIATELY what is the Flow type? */
+  labelProps?: { [string]: any },
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
   /** if true, render indeterminate icon */
@@ -69,8 +71,12 @@ export function CheckboxField(props: CheckboxFieldProps): React.Node {
         indeterminate={indeterminate}
       />
       <div
-        {...props.hoverTooltipHandlers}
-        className={cx(props.labelTextClassName, styles.label_text)}
+        {...props.labelProps}
+        className={cx(
+          props.labelTextClassName,
+          props.labelProps?.className,
+          styles.label_text
+        )}
       >
         {props.label}
       </div>

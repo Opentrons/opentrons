@@ -97,6 +97,31 @@ describe('dismissedWarnings reducer', () => {
     })
   })
 
+  it('should forget all warnings for multiple forms upon DELETE_MULTIPLE_STEPS', () => {
+    const state = {
+      form: {
+        firstStepId: ['firstStepId form warning'],
+        secondStepId: ['secondStepId form warning'],
+        thirdStepId: ['thirdStepId form warning'],
+      },
+      timeline: {
+        firstStepId: ['firstStepId timeline warning'],
+        secondStepId: ['secondStepId timeline warning'],
+        thirdStepId: ['thirdStepId timeline warning'],
+      },
+    }
+
+    const action = {
+      type: 'DELETE_MULTIPLE_STEPS',
+      payload: ['secondStepId', 'firstStepId'],
+    }
+
+    expect(dismissedWarnings(state, action)).toEqual({
+      form: { thirdStepId: ['thirdStepId form warning'] },
+      timeline: { thirdStepId: ['thirdStepId timeline warning'] },
+    })
+  })
+
   it('should forget all warnings for an unsaved form upon CANCEL_STEP_FORM', () => {
     const state = {
       form: {

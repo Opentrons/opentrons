@@ -15,14 +15,11 @@ import {
 import { StateFields } from './StateFields'
 import { ProfileSettings } from './ProfileSettings'
 import styles from '../../StepEditForm.css'
+import type { StepFormProps } from '../../types'
 
-import type { FormData } from '../../../../form-types'
-import type { FocusHandlers } from '../../types'
+export const ThermocyclerForm = (props: StepFormProps): React.Node => {
+  const { focusHandlers, propsForFields } = props
 
-type TCFormProps = {| focusHandlers: FocusHandlers, formData: FormData |}
-
-export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
-  const { focusHandlers } = props
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -33,7 +30,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
       <div className={styles.tc_step_group}>
         <div className={styles.checkbox_row}>
           <RadioGroupField
-            name="thermocyclerFormType"
+            {...propsForFields['thermocyclerFormType']}
             className={styles.tc_step_option}
             options={[
               {
@@ -43,18 +40,17 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
                 value: THERMOCYCLER_STATE,
               },
             ]}
-            {...focusHandlers}
           />
         </div>
         <ConditionalOnField
           name={'thermocyclerFormType'}
           condition={val => val === THERMOCYCLER_STATE}
         >
-          <StateFields focusHandlers={focusHandlers} />
+          <StateFields propsForFields={propsForFields} />
         </ConditionalOnField>
         <div className={styles.checkbox_row}>
           <RadioGroupField
-            name="thermocyclerFormType"
+            {...propsForFields['thermocyclerFormType']}
             className={styles.tc_step_option}
             options={[
               {
@@ -64,7 +60,6 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
                 value: THERMOCYCLER_PROFILE,
               },
             ]}
-            {...focusHandlers}
           />
         </div>
       </div>
@@ -79,7 +74,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
               {i18n.t('application.stepType.profile_settings')}
             </span>
           </div>
-          <ProfileSettings focusHandlers={focusHandlers} />
+          <ProfileSettings propsForFields={propsForFields} />
           <div className={styles.section_header}>
             <span className={styles.section_header_text}>
               {i18n.t('application.stepType.profile_steps')}
@@ -91,7 +86,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
               {i18n.t('application.stepType.ending_hold')}
             </span>
           </div>
-          <StateFields focusHandlers={focusHandlers} isEndingHold />
+          <StateFields propsForFields={propsForFields} isEndingHold />
         </div>
       </ConditionalOnField>
     </div>

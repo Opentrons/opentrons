@@ -106,7 +106,15 @@ export type MultiSelectFieldName =
   | 'blowout_location'
 
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
-export const stepIconsByType: { [string]: IconName } = {
+export type StepType =
+  | 'moveLiquid'
+  | 'mix'
+  | 'pause'
+  | 'manualIntervention'
+  | 'magnet'
+  | 'temperature'
+  | 'thermocycler'
+export const stepIconsByType: { [StepType]: IconName } = {
   moveLiquid: 'ot-transfer',
   mix: 'ot-mix',
   pause: 'pause',
@@ -115,8 +123,6 @@ export const stepIconsByType: { [string]: IconName } = {
   temperature: 'ot-temperature',
   thermocycler: 'ot-thermocycler',
 }
-
-export type StepType = $Keys<typeof stepIconsByType>
 
 // ===== Unprocessed form types =====
 

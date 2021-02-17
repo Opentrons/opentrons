@@ -95,6 +95,81 @@ describe('orderedStepIds reducer', () => {
     expect(orderedStepIds(state, action)).toBe(state)
   })
 
+  it('should remove a saved step when the step is deleted', () => {
+    const state = ['1', '2', '3']
+    const action = {
+      type: 'DELETE_STEP',
+      payload: '2',
+    }
+    expect(orderedStepIds(state, action)).toEqual(['1', '3'])
+  })
+
+  it('should remove multiple saved steps when multiple steps are deleted', () => {
+    const state = ['1', '2', '3']
+    const action = { type: 'DELETE_MULTIPLE_STEPS', payload: ['1', '3'] }
+    expect(orderedStepIds(state, action)).toEqual(['2'])
+  })
+
+  it('should add a new step when the step is duplicated', () => {
+    const state = ['1', '2', '3']
+    const action = {
+      type: 'DUPLICATE_STEP',
+      payload: { stepId: '1', duplicateStepId: 'dup_1' },
+    }
+    expect(orderedStepIds(state, action)).toEqual(['1', 'dup_1', '2', '3'])
+  })
+
+  describe('duplicating multiple steps', () => {
+    const steps = [
+      { stepId: 'id1', duplicateStepId: 'dup_1' },
+      { stepId: 'id2', duplicateStepId: 'dup_2' },
+      { stepId: 'id3', duplicateStepId: 'dup_3' },
+    ]
+    const testCases = [
+      {
+        name: 'should add new steps at the 0th index',
+        state: ['1', '2', '3'],
+        action: {
+          type: 'DUPLICATE_MULTIPLE_STEPS',
+          payload: {
+            steps: [...steps],
+            indexToInsert: 0,
+          },
+        },
+        expected: ['dup_1', 'dup_2', 'dup_3', '1', '2', '3'],
+      },
+      {
+        name: 'should add new steps at the 2nd index',
+        state: ['1', '2', '3'],
+        action: {
+          type: 'DUPLICATE_MULTIPLE_STEPS',
+          payload: {
+            steps: [...steps],
+            indexToInsert: 2,
+          },
+        },
+        expected: ['1', '2', 'dup_1', 'dup_2', 'dup_3', '3'],
+      },
+      {
+        name: 'should add new steps at the last index',
+        state: ['1', '2', '3'],
+        action: {
+          type: 'DUPLICATE_MULTIPLE_STEPS',
+          payload: {
+            steps: [...steps],
+            indexToInsert: 3,
+          },
+        },
+        expected: ['1', '2', '3', 'dup_1', 'dup_2', 'dup_3'],
+      },
+    ]
+    testCases.forEach(({ name, state, action, expected }) => {
+      it(name, () => {
+        expect(orderedStepIds(state, action)).toEqual(expected)
+      })
+    })
+  })
+
   describe('reorder steps', () => {
     const state = ['1', '2', '3', '4']
     const testCases = [
@@ -1005,6 +1080,90 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       })
     })
   })
+  describe('deleting steps', () => {
+    let savedStepFormsState
+    beforeEach(() => {
+      savedStepFormsState = {
+        [INITIAL_DECK_SETUP_STEP_ID]: makeDeckSetupStep({
+          moduleLocationUpdate: {
+            [moduleId]: '1',
+            [otherModuleId]: '2',
+          },
+        }),
+        id1: { id: 'id1' },
+        id2: { id: 'id2' },
+        id3: { id: 'id3' },
+      }
+    })
+    it('should delete one step', () => {
+      const action = { type: 'DELETE_STEP', payload: 'id1' }
+      const expectedState = { ...savedStepFormsState }
+      delete expectedState.id1
+      expect(
+        savedStepForms({ savedStepForms: savedStepFormsState }, action)
+      ).toEqual(expectedState)
+    })
+    it('should delete multiple steps', () => {
+      const action = { type: 'DELETE_MULTIPLE_STEPS', payload: ['id1', 'id2'] }
+      const expectedState = { ...savedStepFormsState }
+      delete expectedState.id1
+      delete expectedState.id2
+      expect(
+        savedStepForms({ savedStepForms: savedStepFormsState }, action)
+      ).toEqual(expectedState)
+    })
+  })
+  describe('duplicating steps', () => {
+    let savedStepFormsState
+    beforeEach(() => {
+      savedStepFormsState = {
+        [INITIAL_DECK_SETUP_STEP_ID]: makeDeckSetupStep({
+          moduleLocationUpdate: {
+            [moduleId]: '1',
+            [otherModuleId]: '2',
+          },
+        }),
+        id1: { id: 'id1' },
+        id2: { id: 'id2' },
+        id3: { id: 'id3' },
+      }
+    })
+    it('should duplicate one step', () => {
+      const action = {
+        type: 'DUPLICATE_STEP',
+        payload: { stepId: 'id1', duplicateStepId: 'dup_1' },
+      }
+      const expectedState = {
+        ...savedStepFormsState,
+        dup_1: { id: 'dup_1' },
+      }
+      expect(
+        savedStepForms({ savedStepForms: savedStepFormsState }, action)
+      ).toEqual(expectedState)
+    })
+    it('should duplicate multiple steps', () => {
+      const action = {
+        type: 'DUPLICATE_MULTIPLE_STEPS',
+        payload: {
+          steps: [
+            { stepId: 'id1', duplicateStepId: 'dup_1' },
+            { stepId: 'id2', duplicateStepId: 'dup_2' },
+            { stepId: 'id3', duplicateStepId: 'dup_3' },
+          ],
+          indexToInsert: 0, // this does not matter for this reducer
+        },
+      }
+      const expectedState = {
+        ...savedStepFormsState,
+        dup_1: { id: 'dup_1' },
+        dup_2: { id: 'dup_2' },
+        dup_3: { id: 'dup_3' },
+      }
+      expect(
+        savedStepForms({ savedStepForms: savedStepFormsState }, action)
+      ).toEqual(expectedState)
+    })
+  })
 
   describe('EDIT_MODULE', () => {
     it('should set engageHeight to null for all Magnet > Engage steps when a magnet module has its model changed, unless height matches default', () => {
@@ -1085,7 +1244,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
 })
 
 describe('unsavedForm reducer', () => {
-  const someState: any = { something: 'foo' }
+  const someState: any = { unsavedForm: 'foo' }
 
   it('should take on the payload of the POPULATE_FORM action', () => {
     const payload = { formStuff: 'example' }
@@ -1169,6 +1328,7 @@ describe('unsavedForm reducer', () => {
     'CREATE_MODULE',
     'DELETE_MODULE',
     'DELETE_STEP',
+    'DELETE_MULTIPLE_STEPS',
     'EDIT_MODULE',
     'SAVE_STEP_FORM',
     'SELECT_TERMINAL_ITEM',
@@ -1555,6 +1715,7 @@ describe('presavedStepForm reducer', () => {
   const clearingActions = [
     'CANCEL_STEP_FORM',
     'DELETE_STEP',
+    'DELETE_MULTIPLE_STEPS',
     'SAVE_STEP_FORM',
     'SELECT_STEP',
   ]

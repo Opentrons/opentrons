@@ -1,6 +1,8 @@
 // @flow
+import last from 'lodash/last'
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { selectors as stepFormSelectors } from '../../../step-forms'
+import { getMultiSelectLastSelected } from '../selectors'
 import { resetScrollElements } from '../utils'
 import type { StepIdType, StepType } from '../../../form-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
@@ -10,6 +12,8 @@ import type {
   AddStepAction,
   ExpandAddStepButtonAction,
   ToggleStepCollapsedAction,
+  ExpandMultipleStepsAction,
+  CollapseMultipleStepsAction,
   HoverOnStepAction,
   HoverOnSubstepAction,
   SelectTerminalItemAction,
@@ -51,6 +55,20 @@ export const toggleStepCollapsed = (
 ): ToggleStepCollapsedAction => ({
   type: 'TOGGLE_STEP_COLLAPSED',
   payload: stepId,
+})
+
+export const expandMultipleSteps = (
+  stepIds: Array<StepIdType>
+): ExpandMultipleStepsAction => ({
+  type: 'EXPAND_MULTIPLE_STEPS',
+  payload: stepIds,
+})
+
+export const collapseMultipleSteps = (
+  stepIds: Array<StepIdType>
+): CollapseMultipleStepsAction => ({
+  type: 'COLLAPSE_MULTIPLE_STEPS',
+  payload: stepIds,
 })
 
 export const hoverOnSubstep = (
@@ -116,10 +134,44 @@ export const selectStep = (stepId: StepIdType): ThunkAction<*> => (
 export const selectMultipleSteps = (
   stepIds: Array<StepIdType>,
   lastSelected: StepIdType
-): ThunkAction<*> => (dispatch: ThunkDispatch<*>, getState: GetState) => {
+): ThunkAction<SelectMultipleStepsAction> => (
+  dispatch: ThunkDispatch<*>,
+  getState: GetState
+) => {
   const selectStepAction: SelectMultipleStepsAction = {
     type: 'SELECT_MULTIPLE_STEPS',
     payload: { stepIds, lastSelected },
   }
   dispatch(selectStepAction)
+}
+
+export const selectAllSteps = (): ThunkAction<SelectMultipleStepsAction> => (
+  dispatch: ThunkDispatch<SelectMultipleStepsAction>,
+  getState: GetState
+) => {
+  const allStepIds = stepFormSelectors.getOrderedStepIds(getState())
+
+  const selectStepAction: SelectMultipleStepsAction = {
+    type: 'SELECT_MULTIPLE_STEPS',
+    payload: { stepIds: allStepIds, lastSelected: last(allStepIds) },
+  }
+  dispatch(selectStepAction)
+}
+
+export const deselectAllSteps = (): ThunkAction<SelectStepAction> => (
+  dispatch: ThunkDispatch<SelectStepAction>,
+  getState: GetState
+) => {
+  const lastSelectedStepId = getMultiSelectLastSelected(getState())
+  if (lastSelectedStepId) {
+    const selectStepAction: SelectStepAction = {
+      type: 'SELECT_STEP',
+      payload: lastSelectedStepId,
+    }
+    dispatch(selectStepAction)
+  } else {
+    console.warn(
+      'something went wrong, cannot deselect all steps if not in multi select mode'
+    )
+  }
 }

@@ -309,6 +309,7 @@ HardwareToManage = Union[ThreadManager,
 class HardwareManager:
     def __init__(self, hardware: Optional[HardwareToManage]):
         if hardware is None:
+            # TODO AL 20210209. This is a highly dangerous thread leak.
             self._current = ThreadManager(API.build_hardware_simulator).sync
         elif isinstance(hardware, SynchronousAdapter):
             self._current = hardware
@@ -335,6 +336,7 @@ class HardwareManager:
         return self._current
 
     def reset_hw(self):
+        # TODO AL 20210209. This is a highly dangerous thread leak.
         self._current = ThreadManager(API.build_hardware_simulator).sync
         return self._current
 

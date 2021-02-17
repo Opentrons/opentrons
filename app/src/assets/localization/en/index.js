@@ -1,6 +1,8 @@
 // @flow
 
 import shared from './shared.json'
+import protocol_calibration from './protocol_calibration.json'
+import protocol_info from './protocol_info.json'
 import robot_advanced_settings from './robot_advanced_settings.json'
 import robot_calibration from './robot_calibration.json'
 import robot_connection from './robot_connection.json'
@@ -10,6 +12,8 @@ import top_navigation from './top_navigation.json'
 
 export const en = {
   shared,
+  protocol_calibration,
+  protocol_info,
   robot_advanced_settings,
   robot_calibration,
   robot_connection,

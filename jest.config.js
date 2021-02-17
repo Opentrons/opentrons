@@ -12,7 +12,7 @@ module.exports = {
     '\\.(css)$': 'identity-obj-proxy',
   },
   transform: {
-    '^.+\\.js$': 'babel-jest',
+    '^.+\\.(js|ts|tsx)$': 'babel-jest',
     '\\.(jpg|png|gif|svg|woff|woff2|webm)$':
       '@opentrons/components/src/__mocks__/file.js',
   },
@@ -38,7 +38,12 @@ module.exports = {
     '!**/test/**',
     '!**/scripts/**',
   ],
-  testPathIgnorePatterns: ['cypress/', '/node_modules/'],
+  testPathIgnorePatterns: [
+    'cypress/',
+    '/node_modules/',
+    '.*.d.ts',
+    '.*.flow.js',
+  ],
   coverageReporters: ['lcov', 'text-summary'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
   watchPathIgnorePatterns: ['/node_modules/'],

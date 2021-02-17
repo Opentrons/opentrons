@@ -5,7 +5,6 @@ import { FormGroup, HoverTooltip } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { FieldConnector } from '../FieldConnector'
 import styles from '../../StepEditForm.css'
-import type { FocusHandlers } from '../../types'
 import type { PathOption } from '../../../../form-types'
 import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
 import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
@@ -32,10 +31,9 @@ const ALL_PATH_OPTIONS = [
   },
 ]
 
-type PathFieldProps = {
-  focusHandlers: FocusHandlers,
+type PathFieldProps = {|
   disabledPathMap: ?{ [PathOption]: string },
-}
+|}
 
 type ButtonProps = {
   children?: React.Node,
