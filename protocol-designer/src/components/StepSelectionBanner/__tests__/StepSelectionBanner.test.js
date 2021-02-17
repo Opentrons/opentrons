@@ -40,8 +40,8 @@ describe('StepSelectionBanner', () => {
     jest.restoreAllMocks()
   })
 
-  const render = store =>
-    mount(<StepSelectionBanner />, {
+  const render = (store, props) =>
+    mount(<StepSelectionBanner {...props} />, {
       wrappingComponent: Provider,
       wrappingComponentProps: {
         store: store,
@@ -58,7 +58,8 @@ describe('StepSelectionBanner', () => {
         .spyOn(stepActions, 'deselectAllSteps')
         .mockImplementation(() => () => null)
 
-      const wrapper = render(store)
+      const props = { countPerType: { magnet: 1 } }
+      const wrapper = render(store, props)
       expect(deselectAllStepsSpy).not.toHaveBeenCalled()
       act(() => {
         wrapper.find(ExitBatchEditButton).prop('handleExitBatchEdit')()
@@ -75,7 +76,8 @@ describe('StepSelectionBanner', () => {
         .mockImplementation(() => () => null)
       expect(deselectAllStepsSpy).not.toHaveBeenCalled()
 
-      const wrapper = render(store)
+      const props = { countPerType: { magnet: 1 } }
+      const wrapper = render(store, props)
       expect(wrapper.find(ConfirmDeleteModal).length).toBe(0)
       expect(deselectAllStepsSpy).not.toHaveBeenCalled()
 

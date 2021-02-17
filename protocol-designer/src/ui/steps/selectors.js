@@ -222,7 +222,7 @@ export const getWellSelectionLabwareKey: Selector<
   rootSelector,
   (state: StepsState) => state.wellSelectionLabwareKey
 )
-type MultiselectFieldValues = {
+export type MultiselectFieldValues = {
   [fieldName: MultiSelectFieldName]: {|
     value?: any,
     isIndeterminate: boolean,
