@@ -13,6 +13,7 @@ import {
   presavedStepForm,
   savedStepForms,
   unsavedForm,
+  batchEditFormChanges,
 } from '../reducers'
 import {
   _getPipetteEntitiesRootState,
@@ -1241,6 +1242,54 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       })
     })
   })
+  describe('saving multiple steps', () => {
+    it('should apply the form patch to all of the step ids', () => {
+      const prevState = {
+        savedStepForms: {
+          some_transfer_step_id: {
+            stepType: 'moveLiquid',
+            blowout_location: 'someLocation',
+            dispense_mix_checkbox: true,
+            dispense_mix_volume: '10',
+          },
+          another_transfer_step_id: {
+            stepType: 'moveLiquid',
+            blowout_location: 'anotherLocation',
+            dispense_mix_checkbox: true,
+            dispense_mix_volume: '20',
+          },
+        },
+      }
+      const action = {
+        type: 'SAVE_STEP_FORMS_MULTI',
+        payload: {
+          editedFields: {
+            blowout_location: 'newLocation',
+            dispense_mix_volume: '30',
+          },
+          stepIds: ['some_transfer_step_id', 'another_transfer_step_id'],
+        },
+      }
+
+      const expectedSavedStepFormState = {
+        some_transfer_step_id: {
+          stepType: 'moveLiquid',
+          blowout_location: 'newLocation',
+          dispense_mix_checkbox: true,
+          dispense_mix_volume: '30',
+        },
+        another_transfer_step_id: {
+          stepType: 'moveLiquid',
+          blowout_location: 'newLocation',
+          dispense_mix_checkbox: true,
+          dispense_mix_volume: '30',
+        },
+      }
+      expect(savedStepForms(prevState, action)).toEqual(
+        expectedSavedStepFormState
+      )
+    })
+  })
 })
 
 describe('unsavedForm reducer', () => {
@@ -1724,5 +1773,50 @@ describe('presavedStepForm reducer', () => {
       const prevState = { id: 'someId', stepType: 'transfer' }
       expect(presavedStepForm(prevState, { type: actionType })).toEqual(null)
     })
+  })
+})
+
+describe('batchEditFormChanges reducer', () => {
+  it('should add the new fields into empty state on CHANGE_BATCH_EDIT_FIELD', () => {
+    const state = {}
+    const action = {
+      type: 'CHANGE_BATCH_EDIT_FIELD',
+      payload: { someFieldName: 'someFieldValue' },
+    }
+    expect(batchEditFormChanges(state, { ...action })).toEqual({
+      someFieldName: 'someFieldValue',
+    })
+  })
+  it('should add the new fields into existing state on CHANGE_BATCH_EDIT_FIELD', () => {
+    const state = { someFieldName: 'someFieldValue' }
+    const action = {
+      type: 'CHANGE_BATCH_EDIT_FIELD',
+      payload: { anotherFieldName: 'anotherFieldValue' },
+    }
+    expect(batchEditFormChanges(state, { ...action })).toEqual({
+      someFieldName: 'someFieldValue',
+      anotherFieldName: 'anotherFieldValue',
+    })
+  })
+  it('should reset state on RESET_BATCH_EDIT_FIELD_CHANGES', () => {
+    const state = { someFieldName: 'someFieldValue' }
+    const action = {
+      type: 'RESET_BATCH_EDIT_FIELD_CHANGES',
+    }
+    expect(batchEditFormChanges(state, { ...action })).toEqual({})
+  })
+  it('should reset state on SAVE_STEP_FORMS_MULTI', () => {
+    const state = { someFieldName: 'someFieldValue' }
+    const action = {
+      type: 'SAVE_STEP_FORMS_MULTI',
+    }
+    expect(batchEditFormChanges(state, { ...action })).toEqual({})
+  })
+  it('should reset state on SELECT_STEP', () => {
+    const state = { someFieldName: 'someFieldValue' }
+    const action = {
+      type: 'SELECT_STEP',
+    }
+    expect(batchEditFormChanges(state, { ...action })).toEqual({})
   })
 })

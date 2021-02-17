@@ -17,7 +17,8 @@ import typeof {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
+import type { FormPatch } from '../steplist/actions'
+import type { StepIdType, StepFieldName } from '../form-types'
 export type FormPipette = {| pipetteName: ?string, tiprackDefURI: ?string |}
 export type FormPipettesByMount = {|
   left: FormPipette,
@@ -163,3 +164,21 @@ export type InitialDeckSetup = {
     [moduleId: string]: ModuleOnDeck,
   },
 }
+
+export type BatchEditFormChangesState = FormPatch
+
+export type ChangeBatchEditFieldAction = {|
+  type: 'CHANGE_BATCH_EDIT_FIELD',
+  payload: BatchEditFormChangesState,
+|}
+
+export type ResetBatchEditFieldChangesAction = {|
+  type: 'RESET_BATCH_EDIT_FIELD_CHANGES',
+|}
+
+export type EditedFields = { [StepFieldName]: mixed }
+
+export type SaveStepFormsMultiAction = {|
+  type: 'SAVE_STEP_FORMS_MULTI',
+  payload: { stepIds: Array<StepIdType>, editedFields: EditedFields },
+|}
