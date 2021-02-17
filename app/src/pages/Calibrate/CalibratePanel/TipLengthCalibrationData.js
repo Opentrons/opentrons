@@ -10,11 +10,6 @@ import {
 } from '@opentrons/components'
 import type { TipLengthCalibration } from '../../../redux/calibration/api-types'
 
-// TODO(bc, 2020-08-03): i18n
-const NOT_CALIBRATED = 'Not yet calibrated'
-const EXISTING_DATA = 'Existing data'
-const LEGACY_DEFINITION = 'Calibration Data N/A'
-
 export type TipLengthCalibrationDataProps = {|
   calibrationData: TipLengthCalibration | null,
   calDataAvailable: boolean,

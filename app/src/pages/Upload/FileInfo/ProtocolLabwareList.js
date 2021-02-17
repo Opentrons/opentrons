@@ -20,14 +20,6 @@ import {
 
 import type { LabwareSummary } from '../../../redux/calibration/types'
 
-// TODO(mc, 2020-07-27): i18n
-const TYPE = 'Type'
-const QUANTITY = 'Quantity'
-const CALIBRATION_DATA = 'Calibration Data'
-const LEGACY_DEFINITION = 'N/A'
-const NOT_CALIBRATED = 'Not yet calibrated'
-const CALIBRATION_DESCRIPTION = 'Calibrated offset from labware origin point'
-
 export type ProtocolLabwareListProps = {|
   labware: Array<LabwareSummary>,
 |}

@@ -25,9 +25,6 @@ import { PipetteTiprackListItem } from './PipetteTiprackListItem'
 import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import type { Dispatch, State } from '../../../redux/types'
 
-// TODO(mc, 2019-12-10): i18n
-const TIP_LENGTH_CALIBRATION = 'Tip Length Calibration'
-
 export type PipetteListComponentProps = {|
   robotName: string | null,
   tipracks: Array<BaseProtocolLabware>,

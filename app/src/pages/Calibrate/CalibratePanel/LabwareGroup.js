@@ -13,11 +13,6 @@ import { LabwareListItem } from './LabwareListItem'
 import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import type { Dispatch } from '../../../redux/types'
 
-// TODO(bc, 2019-08-03): i18n
-const TITLE = 'Labware Calibration'
-const TIPRACKS_TITLE = 'tipracks'
-const LABWARE_TITLE = 'labware'
-
 export type LabwareGroupProps = {|
   robotName: string | null,
   tipracks: Array<BaseProtocolLabware>,

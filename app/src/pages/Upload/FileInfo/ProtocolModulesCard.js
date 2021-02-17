@@ -16,21 +16,12 @@ import {
   FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
 import { selectors as robotSelectors } from '../../../redux/robot'
-import { getAttachedModules } from '../../../redux/modules'
 
 import { InfoSection } from './InfoSection'
-import { SectionContentHalf } from '../../../atoms/layout'
-import { MissingItemWarning } from './MissingItemWarning'
-
-import styles from './styles.css'
 
 import type { ModuleModel } from '@opentrons/shared-data'
-import type { State, Dispatch } from '../../../redux/types'
+import type { State } from '../../../redux/types'
 import type { SessionModule } from '../../../redux/robot/types'
-import type { Robot } from '../../../redux/discovery/types'
-import type { AttachedModule } from '../../../redux/modules/types'
-
-const NOT_ATTACHED = 'Not attached'
 
 const TYPE_COL_STYLE = { marginRight: SPACING_AUTO }
 const QUANTITY_COL_STYLE = { width: '37.5%', marginX: SPACING_3 }
