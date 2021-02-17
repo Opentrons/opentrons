@@ -1,18 +1,24 @@
 // app-shell self-update tests
-import {
-  autoUpdater,
-  __mockReset as __updaterMockReset,
-} from 'electron-updater'
+import * as ElectronUpdater from 'electron-updater'
 import { registerUpdate } from '../update'
-import { getConfig } from '../config'
+import * as Cfg from '../config'
 
+import type { Dispatch } from '../types'
+
+jest.unmock('electron-updater')
 jest.mock('electron-updater')
 jest.mock('../log')
 jest.mock('../config')
 
+const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
+
+const autoUpdater = ElectronUpdater.autoUpdater as jest.Mocked<
+  typeof ElectronUpdater.autoUpdater
+>
+
 describe('update', () => {
-  let dispatch
-  let handleAction
+  let dispatch: Dispatch
+  let handleAction: Dispatch
 
   beforeEach(() => {
     dispatch = jest.fn()
@@ -20,12 +26,12 @@ describe('update', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    __updaterMockReset()
+    jest.resetAllMocks()
+    ;(ElectronUpdater as any).__mockReset()
   })
 
   it('handles shell:CHECK_UPDATE with available update', () => {
-    getConfig.mockReturnValue('dev')
+    getConfig.mockReturnValue('dev' as any)
     handleAction({ type: 'shell:CHECK_UPDATE' })
 
     expect(getConfig).toHaveBeenCalledWith('update.channel')

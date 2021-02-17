@@ -1,4 +1,3 @@
-// @flow
 // TODO(mc, 2020-06-11): test all release-files functions
 import path from 'path'
 import { promises as fs } from 'fs'

@@ -1,5 +1,3 @@
-// @flow
-
 import fse from 'fs-extra'
 import electron from 'electron'
 import * as Cfg from '../../config'
@@ -13,11 +11,7 @@ import * as CustomLabware from '@opentrons/app/src/redux/custom-labware'
 import * as CustomLabwareFixtures from '@opentrons/app/src/redux/custom-labware/__fixtures__'
 
 import type { Config } from '@opentrons/app/src/redux/config/types'
-import type {
-  UncheckedLabwareFile,
-  CheckedLabwareFile,
-  DuplicateLabwareFile,
-} from '@opentrons/app/src/redux/custom-labware/types'
+import type { Dispatch } from '../../types'
 
 jest.mock('fs-extra')
 jest.mock('electron')
@@ -26,65 +20,65 @@ jest.mock('../../dialogs')
 jest.mock('../definitions')
 jest.mock('../validation')
 
-const ensureDir: JestMockFn<[string], void> = fse.ensureDir
+const ensureDir = fse.ensureDir as jest.MockedFunction<typeof fse.ensureDir>
 
-const getFullConfig: JestMockFn<[], $Shape<Config>> = Cfg.getFullConfig
+const getFullConfig = Cfg.getFullConfig as jest.MockedFunction<
+  typeof Cfg.getFullConfig
+>
 
-const handleConfigChange: JestMockFn<[string, (any, any) => mixed], mixed> =
-  Cfg.handleConfigChange
+const handleConfigChange = Cfg.handleConfigChange as jest.MockedFunction<
+  typeof Cfg.handleConfigChange
+>
 
-const showOpenDirectoryDialog: JestMockFn<
-  Array<any>,
-  Array<string>
-> = (Dialogs.showOpenDirectoryDialog: any)
+const showOpenDirectoryDialog = Dialogs.showOpenDirectoryDialog as jest.MockedFunction<
+  typeof Dialogs.showOpenDirectoryDialog
+>
 
-const showOpenFileDialog: JestMockFn<
-  Array<any>,
-  Array<string>
-> = (Dialogs.showOpenFileDialog: any)
+const showOpenFileDialog = Dialogs.showOpenFileDialog as jest.MockedFunction<
+  typeof Dialogs.showOpenFileDialog
+>
 
-const readLabwareDirectory: JestMockFn<
-  [string],
-  Array<string>
-> = (Defs.readLabwareDirectory: any)
+const readLabwareDirectory = Defs.readLabwareDirectory as jest.MockedFunction<
+  typeof Defs.readLabwareDirectory
+>
 
-const parseLabwareFiles: JestMockFn<
-  [Array<string>],
-  Array<UncheckedLabwareFile>
-> = (Defs.parseLabwareFiles: any)
+const parseLabwareFiles = Defs.parseLabwareFiles as jest.MockedFunction<
+  typeof Defs.parseLabwareFiles
+>
 
-const addLabwareFile: JestMockFn<
-  [string, string],
-  void
-> = (Defs.addLabwareFile: any)
+const addLabwareFile = Defs.addLabwareFile as jest.MockedFunction<
+  typeof Defs.addLabwareFile
+>
 
-const removeLabwareFile: JestMockFn<
-  [string],
-  void
-> = (Defs.removeLabwareFile: any)
+const removeLabwareFile = Defs.removeLabwareFile as jest.MockedFunction<
+  typeof Defs.removeLabwareFile
+>
 
-const validateLabwareFiles: JestMockFn<
-  [Array<UncheckedLabwareFile>],
-  Array<CheckedLabwareFile>
-> = Val.validateLabwareFiles
+const validateLabwareFiles = Val.validateLabwareFiles as jest.MockedFunction<
+  typeof Val.validateLabwareFiles
+>
 
-const validateNewLabwareFile: JestMockFn<
-  [Array<CheckedLabwareFile>, UncheckedLabwareFile],
-  CheckedLabwareFile
-> = Val.validateNewLabwareFile
+const validateNewLabwareFile = Val.validateNewLabwareFile as jest.MockedFunction<
+  typeof Val.validateNewLabwareFile
+>
 
 // wait a few ticks to let the mock Promises clear
-const flush = () => new Promise(resolve => setTimeout(resolve, 0))
+const flush = (): Promise<void> =>
+  new Promise(resolve => setTimeout(resolve, 0))
 
 describe('labware module dispatches', () => {
   const labwareDir = '/path/to/somewhere'
-  const mockMainWindow = { browserWindow: true }
-  let dispatch
-  let handleAction
+  const mockMainWindow = ({
+    browserWindow: true,
+  } as unknown) as electron.BrowserWindow
+  let dispatch: jest.MockedFunction<Dispatch>
+  let handleAction: Dispatch
 
   beforeEach(() => {
-    getFullConfig.mockReturnValue({ labware: { directory: labwareDir } })
-    ensureDir.mockResolvedValue()
+    getFullConfig.mockReturnValue({
+      labware: { directory: labwareDir },
+    } as Config)
+    ensureDir.mockResolvedValue(undefined as never)
     addLabwareFile.mockResolvedValue()
     removeLabwareFile.mockResolvedValue()
     readLabwareDirectory.mockResolvedValue([])
@@ -162,7 +156,7 @@ describe('labware module dispatches', () => {
   })
 
   it('dispatches CUSTOM_LABWARE_LIST_FAILURE if read fails', () => {
-    readLabwareDirectory.mockRejectedValue((new Error('AH'): any))
+    readLabwareDirectory.mockRejectedValue(new Error('AH'))
 
     handleAction(CustomLabware.fetchCustomLabware())
 
@@ -205,7 +199,7 @@ describe('labware module dispatches', () => {
     )
     const changeHandler = handleConfigChange.mock.calls[0][1]
 
-    changeHandler()
+    changeHandler('old', 'new')
 
     return flush().then(() => {
       expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)
@@ -218,8 +212,8 @@ describe('labware module dispatches', () => {
   it('dispatches labware directory list error on config change', () => {
     const changeHandler = handleConfigChange.mock.calls[0][1]
 
-    readLabwareDirectory.mockRejectedValue((new Error('AH'): any))
-    changeHandler()
+    readLabwareDirectory.mockRejectedValue(new Error('AH'))
+    changeHandler('old', 'new')
 
     return flush().then(() => {
       expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)
@@ -256,7 +250,7 @@ describe('labware module dispatches', () => {
     // existing files mock return
     parseLabwareFiles.mockResolvedValue([])
     // new file mock return
-    parseLabwareFiles.mockReturnValue([mockNewUncheckedFile])
+    parseLabwareFiles.mockResolvedValue([mockNewUncheckedFile])
     // new file (not needed for this test except to prevent a type error)
     validateNewLabwareFile.mockReturnValueOnce(mockValidatedFiles[0])
 
@@ -319,7 +313,7 @@ describe('labware module dispatches', () => {
     showOpenFileDialog.mockResolvedValue(['a.json'])
     validateNewLabwareFile.mockReturnValueOnce(mockValidFile)
     validateLabwareFiles.mockReturnValueOnce([])
-    addLabwareFile.mockRejectedValue((new Error('AH'): any))
+    addLabwareFile.mockRejectedValue(new Error('AH'))
 
     handleAction(CustomLabware.addCustomLabware())
 
@@ -331,8 +325,8 @@ describe('labware module dispatches', () => {
   it('skips file picker on ADD_CUSTOM_LABWARE with overwrite', () => {
     const duplicate = CustomLabwareFixtures.mockDuplicateLabware
     const mockExisting = [
-      ({ ...duplicate, filename: '/duplicate1.json' }: DuplicateLabwareFile),
-      ({ ...duplicate, filename: '/duplicate2.json' }: DuplicateLabwareFile),
+      { ...duplicate, filename: '/duplicate1.json' },
+      { ...duplicate, filename: '/duplicate2.json' },
     ]
     const mockAfterDeletes = [CustomLabwareFixtures.mockValidLabware]
     const expectedAction = CustomLabware.customLabwareList(
@@ -361,13 +355,13 @@ describe('labware module dispatches', () => {
   it('sends ADD_CUSTOM_LABWARE_FAILURE if a something rejects', () => {
     const duplicate = CustomLabwareFixtures.mockDuplicateLabware
     const mockExisting = [
-      ({ ...duplicate, filename: '/duplicate1.json' }: DuplicateLabwareFile),
-      ({ ...duplicate, filename: '/duplicate2.json' }: DuplicateLabwareFile),
+      { ...duplicate, filename: '/duplicate1.json' },
+      { ...duplicate, filename: '/duplicate2.json' },
     ]
     const expectedAction = CustomLabware.addCustomLabwareFailure(null, 'AH')
 
     validateLabwareFiles.mockReturnValueOnce(mockExisting)
-    removeLabwareFile.mockRejectedValue((new Error('AH'): any))
+    removeLabwareFile.mockRejectedValue(new Error('AH'))
 
     handleAction(CustomLabware.addCustomLabware(duplicate))
 

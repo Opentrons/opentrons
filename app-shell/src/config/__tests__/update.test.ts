@@ -1,14 +1,13 @@
-// @flow
 import * as Cfg from '@opentrons/app/src/redux/config'
 import { shouldUpdate, getNextValue } from '../update'
 
 import type { Config } from '../types'
 
-const CONFIG: $Shape<Config> = {
+const CONFIG = ({
   devtools: false,
   alerts: { ignored: ['someAlert'] },
   devInternal: {},
-}
+} as unknown) as Config
 
 describe('config updates', () => {
   describe('shouldUpdate', () => {

@@ -1,4 +1,3 @@
-// @flow
 import fse from 'fs-extra'
 import tempy from 'tempy'
 import * as Http from '../../http'
@@ -6,10 +5,10 @@ import { downloadManifest } from '../release-manifest'
 
 jest.mock('../../http')
 
-const fetchJson: JestMockFn<[string], mixed> = Http.fetchJson
+const fetchJson = Http.fetchJson as jest.MockedFunction<typeof Http.fetchJson>
 
 describe('release manifest utilities', () => {
-  let manifestFile
+  let manifestFile: string
 
   beforeEach(() => {
     manifestFile = tempy.file({ extension: 'json' })
@@ -23,9 +22,12 @@ describe('release manifest utilities', () => {
     const result = { mockResult: true }
     const manifestUrl = 'http://example.com/releases.json'
 
-    fetchJson.mockImplementation(url => {
-      if (url === manifestUrl) return Promise.resolve(result)
-    })
+    fetchJson.mockImplementation(
+      (url: unknown): Promise<unknown> => {
+        if (url === manifestUrl) return Promise.resolve(result)
+        return Promise.resolve()
+      }
+    )
 
     return expect(downloadManifest(manifestUrl, manifestFile)).resolves.toBe(
       result

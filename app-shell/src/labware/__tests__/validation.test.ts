@@ -1,8 +1,9 @@
-// @flow
 import { validateLabwareFiles, validateNewLabwareFile } from '../validation'
 
 import validLabwareA from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import validLabwareB from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+
+import type { CheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
 
 describe('validateLabwareFiles', () => {
   it('handles unparseable and invalid labware files', () => {
@@ -96,7 +97,7 @@ describe('validateLabwareFiles', () => {
 
 describe('validateNewLabwareFile', () => {
   it('validates a new file', () => {
-    const existing = []
+    const existing: CheckedLabwareFile[] = []
     const newFile = {
       filename: 'a.json',
       data: validLabwareA,
@@ -112,7 +113,7 @@ describe('validateNewLabwareFile', () => {
   })
 
   it('returns a duplicate if new file conflicts with existing', () => {
-    const existing = [
+    const existing: CheckedLabwareFile[] = [
       {
         type: 'VALID_LABWARE_FILE',
         filename: 'a.json',

@@ -1,22 +1,49 @@
 // tests for the app-shell's discovery module
 import { app } from 'electron'
 import Store from 'electron-store'
-import { noop, last } from 'lodash'
+import { noop } from 'lodash'
+import { when } from 'jest-when'
 
-import { createDiscoveryClient } from '@opentrons/discovery-client'
+import * as DiscoveryClient from '@opentrons/discovery-client'
 import {
   startDiscovery,
   finishDiscovery,
 } from '@opentrons/app/src/redux/discovery'
 import { registerDiscovery } from '../discovery'
-import { getFullConfig, getOverrides, handleConfigChange } from '../config'
-import { createNetworkInterfaceMonitor } from '../system-info'
+import * as Cfg from '../config'
+import * as SysInfo from '../system-info'
+
+import type { Dispatch } from '../types'
 
 jest.mock('electron')
 jest.mock('electron-store')
 jest.mock('@opentrons/discovery-client')
 jest.mock('../config')
 jest.mock('../system-info')
+
+const createDiscoveryClient = DiscoveryClient.createDiscoveryClient as jest.MockedFunction<
+  typeof DiscoveryClient.createDiscoveryClient
+>
+
+const getFullConfig = Cfg.getFullConfig as jest.MockedFunction<
+  typeof Cfg.getFullConfig
+>
+
+const getOverrides = Cfg.getOverrides as jest.MockedFunction<
+  typeof Cfg.getOverrides
+>
+
+const handleConfigChange = Cfg.handleConfigChange as jest.MockedFunction<
+  typeof Cfg.handleConfigChange
+>
+
+const createNetworkInterfaceMonitor = SysInfo.createNetworkInterfaceMonitor as jest.MockedFunction<
+  typeof SysInfo.createNetworkInterfaceMonitor
+>
+
+const appOnce = app.once as jest.MockedFunction<typeof app.once>
+
+const MockStore = Store as jest.MockedClass<typeof Store>
 
 describe('app-shell/discovery', () => {
   const dispatch = jest.fn()
@@ -27,26 +54,28 @@ describe('app-shell/discovery', () => {
     removeRobot: jest.fn(),
   }
 
-  const emitListChange = () => {
-    const lastCall = last(createDiscoveryClient.mock.calls)
+  const emitListChange = (): void => {
+    const lastCall =
+      createDiscoveryClient.mock.calls[
+        createDiscoveryClient.mock.calls.length - 1
+      ]
     const { onListChange } = lastCall[0]
-    onListChange()
+    onListChange([])
   }
 
   beforeEach(() => {
-    getFullConfig.mockReturnValue({
+    getFullConfig.mockReturnValue(({
       discovery: { disableCache: false, candidates: [] },
-    })
+    } as unknown) as Cfg.Config)
 
     getOverrides.mockReturnValue({})
     createNetworkInterfaceMonitor.mockReturnValue({ stop: noop })
     createDiscoveryClient.mockReturnValue(mockClient)
 
-    Store.__mockReset()
-    Store.__store.get.mockImplementation(key => {
-      if (key === 'services') return []
-      return null
-    })
+    when(MockStore.prototype.get).calledWith('robots', []).mockReturnValue([])
+    when(MockStore.prototype.get)
+      .calledWith('services', null)
+      .mockReturnValue(null)
   })
 
   afterEach(() => {
@@ -76,14 +105,14 @@ describe('app-shell/discovery', () => {
   })
 
   it('calls client.stop when electron app emits "will-quit"', () => {
-    expect(app.once).toHaveBeenCalledTimes(0)
+    expect(appOnce).toHaveBeenCalledTimes(0)
 
     registerDiscovery(dispatch)
 
     expect(mockClient.stop).toHaveBeenCalledTimes(0)
-    expect(app.once).toHaveBeenCalledTimes(1)
+    expect(appOnce).toHaveBeenCalledTimes(1)
 
-    const [event, handler] = app.once.mock.calls[0]
+    const [event, handler] = appOnce.mock.calls[0]
     expect(event).toEqual('will-quit')
 
     // trigger event handler
@@ -148,7 +177,7 @@ describe('app-shell/discovery', () => {
       mockClient.getRobots.mockReturnValue([{ name: 'foo' }, { name: 'bar' }])
       emitListChange()
 
-      expect(Store.__store.set).toHaveBeenLastCalledWith('robots', [
+      expect(MockStore.prototype.set).toHaveBeenLastCalledWith('robots', [
         { name: 'foo' },
         { name: 'bar' },
       ])
@@ -157,7 +186,7 @@ describe('app-shell/discovery', () => {
     it('loads robots from cache on client initialization', () => {
       const mockRobot = { name: 'foo' }
 
-      Store.__store.get.mockImplementation(key => {
+      MockStore.prototype.get.mockImplementation(key => {
         if (key === 'robots') return [mockRobot]
         return null
       })
@@ -242,13 +271,13 @@ describe('app-shell/discovery', () => {
         },
       ]
 
-      Store.__store.get.mockImplementation(key => {
+      MockStore.prototype.get.mockImplementation(key => {
         if (key === 'services') return services
         return null
       })
 
       registerDiscovery(dispatch)
-      expect(Store.__store.delete).toHaveBeenCalledWith('services')
+      expect(MockStore.prototype.delete).toHaveBeenCalledWith('services')
       expect(mockClient.start).toHaveBeenCalledWith(
         expect.objectContaining({
           initialRobots: [
@@ -315,15 +344,15 @@ describe('app-shell/discovery', () => {
 
     it('does not update services from store when caching disabled', () => {
       // cache has been disabled
-      getFullConfig.mockReturnValue({
+      getFullConfig.mockReturnValue(({
         discovery: {
           candidates: [],
           disableCache: true,
         },
-      })
+      } as unknown) as Cfg.Config)
 
       // discovery.json contains 1 entry
-      Store.__store.get.mockImplementation(key => {
+      MockStore.prototype.get.mockImplementation(key => {
         if (key === 'robots') return [{ name: 'foo' }]
         return null
       })
@@ -340,14 +369,15 @@ describe('app-shell/discovery', () => {
 
     it('should clear cache and suspend caching when caching becomes disabled', () => {
       // Cache enabled initially
-      getFullConfig.mockReturnValue({
+      getFullConfig.mockReturnValue(({
         discovery: {
           candidates: [],
           disableCache: false,
         },
-      })
+      } as unknown) as Cfg.Config)
+
       // discovery.json contains 1 entry
-      Store.__store.get.mockImplementation(key => {
+      MockStore.prototype.get.mockImplementation(key => {
         if (key === 'robots') return [{ name: 'foo' }]
         return null
       })
@@ -357,25 +387,25 @@ describe('app-shell/discovery', () => {
       // the 'discovery.disableCache' change handler
       const changeHandler = handleConfigChange.mock.calls[1][1]
       const disableCache = true
-      changeHandler(disableCache)
+      changeHandler(disableCache, false)
 
-      expect(Store.__store.set).toHaveBeenCalledWith('robots', [])
+      expect(MockStore.prototype.set).toHaveBeenCalledWith('robots', [])
 
       // new services discovered
-      Store.__store.set.mockClear()
+      MockStore.prototype.set.mockClear()
       mockClient.getRobots.mockReturnValue([{ name: 'foo' }, { name: 'bar' }])
       emitListChange()
 
       // but discovery.json should not update
-      expect(Store.__store.set).toHaveBeenCalledTimes(0)
+      expect(MockStore.prototype.set).toHaveBeenCalledTimes(0)
     })
   })
 
   describe('manual addresses', () => {
     it('loads candidates from config on client initialization', () => {
-      getFullConfig.mockReturnValue({
+      getFullConfig.mockReturnValue(({
         discovery: { cacheDisabled: false, candidates: ['1.2.3.4'] },
-      })
+      } as unknown) as Cfg.Config)
 
       registerDiscovery(dispatch)
 
@@ -390,9 +420,9 @@ describe('app-shell/discovery', () => {
 
     // ensures config override works with only one candidate specified
     it('candidates in config can be single string value', () => {
-      getFullConfig.mockReturnValue({
+      getFullConfig.mockReturnValue(({
         discovery: { cacheDisabled: false, candidates: '1.2.3.4' },
-      })
+      } as unknown) as Cfg.Config)
 
       registerDiscovery(dispatch)
 
@@ -409,9 +439,9 @@ describe('app-shell/discovery', () => {
   // TODO(mc, 2020-06-16): move this functionality into discovery-client
   describe('network interface monitoring', () => {
     const stopMonitor = jest.fn()
-    let interfacePollInterval
-    let handleInterfaceChange
-    let handleAction
+    let interfacePollInterval: number
+    let handleInterfaceChange: (ifaces: SysInfo.NetworkInterface[]) => unknown
+    let handleAction: Dispatch
 
     beforeEach(() => {
       createNetworkInterfaceMonitor.mockImplementation(options => {
@@ -436,7 +466,7 @@ describe('app-shell/discovery', () => {
     })
 
     it('calls stops the interface monitor when electron app emits "will-quit"', () => {
-      const [event, handler] = app.once.mock.calls[0]
+      const [event, handler] = appOnce.mock.calls[0]
       expect(event).toEqual('will-quit')
 
       // trigger event handler

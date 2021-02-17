@@ -1,59 +1,53 @@
-// @flow
 import noop from 'lodash/noop'
 import { app } from 'electron'
 import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import * as SystemInfo from '@opentrons/app/src/redux/system-info'
-import { uiInitialized } from '@opentrons/app/src/redux/shell'
+import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
 import * as OS from '../../os'
 import * as UsbDevices from '../usb-devices'
 import * as NetworkInterfaces from '../network-interfaces'
 import { registerSystemInfo } from '..'
 
-import type {
-  Device,
-  UsbDeviceMonitor,
-  UsbDeviceMonitorOptions,
-} from '../usb-devices'
-
-import type {
-  NetworkInterface,
-  NetworkInterfaceMonitor,
-  NetworkInterfaceMonitorOptions,
-} from '../network-interfaces'
+import type { Dispatch } from '../../types'
+import type { UsbDeviceMonitor } from '../usb-devices'
+import type { NetworkInterfaceMonitor } from '../network-interfaces'
 
 jest.mock('../../os')
 jest.mock('../usb-devices')
 jest.mock('../network-interfaces')
 
-const createUsbDeviceMonitor: JestMockFn<
-  [UsbDeviceMonitorOptions | void],
-  UsbDeviceMonitor
-> = UsbDevices.createUsbDeviceMonitor
+const createUsbDeviceMonitor = UsbDevices.createUsbDeviceMonitor as jest.MockedFunction<
+  typeof UsbDevices.createUsbDeviceMonitor
+>
 
-const getWindowsDriverVersion: JestMockFn<[Device], any> =
-  UsbDevices.getWindowsDriverVersion
+const getWindowsDriverVersion = UsbDevices.getWindowsDriverVersion as jest.MockedFunction<
+  typeof UsbDevices.getWindowsDriverVersion
+>
 
-const getActiveInterfaces: JestMockFn<[], Array<NetworkInterface>> =
-  NetworkInterfaces.getActiveInterfaces
+const getActiveInterfaces = NetworkInterfaces.getActiveInterfaces as jest.MockedFunction<
+  typeof NetworkInterfaces.getActiveInterfaces
+>
 
-const createNetworkInterfaceMonitor: JestMockFn<
-  [NetworkInterfaceMonitorOptions],
-  NetworkInterfaceMonitor
-> = NetworkInterfaces.createNetworkInterfaceMonitor
+const createNetworkInterfaceMonitor = NetworkInterfaces.createNetworkInterfaceMonitor as jest.MockedFunction<
+  typeof NetworkInterfaces.createNetworkInterfaceMonitor
+>
 
-const isWindows: JestMockFn<[], boolean> = OS.isWindows
+const isWindows = OS.isWindows as jest.MockedFunction<typeof OS.isWindows>
 
-const flush = () => new Promise(resolve => setTimeout(resolve, 0))
+const appOnce = app.once as jest.MockedFunction<typeof app.once>
+
+const flush = (): Promise<void> =>
+  new Promise(resolve => setTimeout(resolve, 0))
 
 describe('app-shell::system-info module action tests', () => {
   const dispatch = jest.fn()
-  const getAllDevices: JestMockFn<[], any> = jest.fn()
+  const getAllDevices = jest.fn()
   const usbMonitor: UsbDeviceMonitor = { getAllDevices, stop: jest.fn() }
   const ifaceMonitor: NetworkInterfaceMonitor = { stop: jest.fn() }
   const { windowsDriverVersion: _, ...notRealtek } = Fixtures.mockUsbDevice
   const realtek0 = { ...notRealtek, manufacturer: 'Realtek' }
   const realtek1 = { ...notRealtek, manufacturer: 'realtek' }
-  let handler
+  let handler: Dispatch
 
   beforeEach(() => {
     handler = registerSystemInfo(dispatch)
@@ -150,12 +144,13 @@ describe('app-shell::system-info module action tests', () => {
   it('stops monitoring on app quit', () => {
     handler(uiInitialized())
 
-    const appQuitHandler = app.once.mock.calls.find(
+    const appQuitHandler = appOnce.mock.calls.find(
+      // @ts-expect-error(mc, 2021-02-17): event strings don't match, investigate
       ([event, handler]) => event === 'will-quit'
     )?.[1]
 
     expect(typeof appQuitHandler).toBe('function')
-    appQuitHandler()
+    ;(appQuitHandler as Function)()
     expect(usbMonitor.stop).toHaveBeenCalled()
     expect(ifaceMonitor.stop).toHaveBeenCalled()
   })

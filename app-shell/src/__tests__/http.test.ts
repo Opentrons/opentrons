@@ -1,11 +1,15 @@
-import mockFetch from 'node-fetch'
+import fetch from 'node-fetch'
 import isError from 'lodash/isError'
 
 import { HTTP_API_VERSION } from '@opentrons/app/src/redux/robot-api/constants'
 import * as Http from '../http'
 
+import type { Request, Response } from 'node-fetch'
+
 jest.mock('../config')
-jest.mock('node-fetch', () => jest.fn())
+jest.mock('node-fetch')
+
+const mockFetch = fetch as jest.MockedFunction<typeof fetch>
 
 describe('app-shell main http module', () => {
   beforeEach(() => {
@@ -79,10 +83,12 @@ describe('app-shell main http module', () => {
   SUCCESS_SPECS.forEach(spec => {
     const { name, method, request, requestOptions, response, expected } = spec
 
-    it(name, () => {
-      mockFetch.mockResolvedValueOnce(response)
+    it(`it should handle when ${name}`, () => {
+      mockFetch.mockResolvedValueOnce((response as unknown) as Response)
 
-      return method(request).then(result => {
+      // @ts-expect-error(mc, 2021-02-17): reqwrite as integration tests and
+      // avoid mocking node-fetch
+      return method((request as unknown) as Request).then((result: string) => {
         expect(mockFetch).toHaveBeenCalledWith(request, requestOptions)
         expect(result).toEqual(expected)
       })
@@ -92,14 +98,16 @@ describe('app-shell main http module', () => {
   FAILURE_SPECS.forEach(spec => {
     const { name, method, request, response, expected } = spec
 
-    it(name, () => {
+    it(`it should handle when ${name}`, () => {
       if (isError(response)) {
         mockFetch.mockRejectedValueOnce(response)
       } else {
-        mockFetch.mockResolvedValueOnce(response)
+        mockFetch.mockResolvedValueOnce((response as unknown) as Response)
       }
 
-      return expect(method(request)).rejects.toThrow(expected)
+      return expect(method((request as unknown) as Request)).rejects.toThrow(
+        expected
+      )
     })
   })
 })

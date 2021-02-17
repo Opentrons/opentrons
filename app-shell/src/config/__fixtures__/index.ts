@@ -1,5 +1,3 @@
-// @flow
-
 import type {
   ConfigV0,
   ConfigV1,
@@ -68,6 +66,7 @@ export const MOCK_CONFIG_V1: ConfigV1 = {
   ...MOCK_CONFIG_V0,
   version: 1,
   discovery: {
+    // @ts-expect-error(mc, 2021-02-17): will be fixed by app in TS
     ...MOCK_CONFIG_V0.discovery,
     disableCache: false,
   },
@@ -85,6 +84,7 @@ export const MOCK_CONFIG_V3: ConfigV3 = {
   ...MOCK_CONFIG_V2,
   version: 3,
   support: {
+    // @ts-expect-error(mc, 2021-02-17): will be fixed by app in TS
     ...MOCK_CONFIG_V2.support,
     name: null,
     email: null,

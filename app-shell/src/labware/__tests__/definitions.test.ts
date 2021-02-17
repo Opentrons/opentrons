@@ -1,4 +1,3 @@
-// @flow
 // tests for labware directory utilities
 
 import path from 'path'
@@ -15,8 +14,12 @@ import {
 
 jest.mock('electron')
 
+const moveItemToTrash = Electron.shell.moveItemToTrash as jest.MockedFunction<
+  typeof Electron.shell.moveItemToTrash
+>
+
 describe('labware directory utilities', () => {
-  const tempDirs: Array<string> = []
+  const tempDirs: string[] = []
   const makeEmptyDir = (): string => {
     const dir: string = tempy.directory()
     tempDirs.push(dir)
@@ -214,7 +217,7 @@ describe('labware directory utilities', () => {
       const dir = makeEmptyDir()
       const filename = path.join(dir, 'foo.json')
 
-      Electron.shell.moveItemToTrash.mockReturnValue(true)
+      moveItemToTrash.mockReturnValue(true)
 
       return removeLabwareFile(filename).then(() => {
         expect(Electron.shell.moveItemToTrash).toHaveBeenCalledWith(filename)
@@ -226,7 +229,7 @@ describe('labware directory utilities', () => {
       const filename = path.join(dir, 'foo.json')
       const setup = fs.writeJson(filename, { name: 'a' })
 
-      Electron.shell.moveItemToTrash.mockReturnValue(false)
+      moveItemToTrash.mockReturnValue(false)
 
       return setup
         .then(() => removeLabwareFile(filename))

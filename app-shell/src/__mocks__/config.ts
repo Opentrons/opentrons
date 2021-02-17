@@ -1,2 +1,2 @@
 // mock config
-module.exports = jest.genMockFromModule('../config')
+module.exports = jest.createMockFromModule('../config')

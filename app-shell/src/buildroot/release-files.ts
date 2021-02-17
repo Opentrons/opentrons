@@ -130,11 +130,16 @@ export function cleanupReleaseFiles(
   downloadsDir: string,
   currentRelease: string
 ): Promise<unknown> {
+  // @ts-expect-error(2021-02-17): upgrade fse and see if this is still a problem
   return readdir(downloadsDir, { withFileTypes: true })
     .then(files => {
-      return files
-        .filter(f => f.isDirectory() && f.name !== currentRelease)
-        .map(f => path.join(downloadsDir, f.name))
+      return (
+        files
+          // @ts-expect-error(2021-02-17): upgrade fse and see if this is still a problem
+          .filter(f => f.isDirectory() && f.name !== currentRelease)
+          // @ts-expect-error(2021-02-17): upgrade fse and see if this is still a problem
+          .map(f => path.join(downloadsDir, f.name))
+      )
     })
     .then(removals => Promise.all(removals.map(f => remove(f))))
 }

@@ -19,7 +19,7 @@ import type {
 } from './network-interfaces'
 
 export { createNetworkInterfaceMonitor }
-export type { NetworkInterfaceMonitor }
+export type { NetworkInterface, NetworkInterfaceMonitor }
 
 const RE_REALTEK = /realtek/i
 const IFACE_POLL_INTERVAL_MS = 30000

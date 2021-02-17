@@ -1,4 +1,3 @@
-// @flow
 import os from 'os'
 import noop from 'lodash/noop'
 
@@ -9,12 +8,11 @@ import {
 
 jest.mock('os')
 
-const networkInterfaces: JestMockFn<
-  [],
-  { [ifName: string]: Array<os$NetIFAddr>, ... }
-> = os.networkInterfaces
+const networkInterfaces = os.networkInterfaces as jest.MockedFunction<
+  typeof os.networkInterfaces
+>
 
-const mockV4 = {
+const mockV4: os.NetworkInterfaceInfoIPv4 = {
   address: '192.168.1.17',
   netmask: '255.255.255.0',
   family: 'IPv4',
@@ -23,7 +21,7 @@ const mockV4 = {
   cidr: '192.168.1.17/24',
 }
 
-const mockV6 = {
+const mockV6: os.NetworkInterfaceInfoIPv6 = {
   address: 'fe80::8e0:61a3:8bde:7385',
   netmask: 'ffff:ffff:ffff:ffff::',
   family: 'IPv6',

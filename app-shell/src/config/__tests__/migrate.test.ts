@@ -1,4 +1,3 @@
-// @flow
 // config migration tests
 import {
   MOCK_CONFIG_V0,
@@ -37,6 +36,7 @@ describe('config migration', () => {
     const v3Config = {
       ...MOCK_CONFIG_V3,
       support: {
+        // @ts-expect-error(mc, 2021-02-17): will be fixed by app in TS
         ...MOCK_CONFIG_V3.support,
         name: 'Known Kname',
         email: 'hello@example.com',

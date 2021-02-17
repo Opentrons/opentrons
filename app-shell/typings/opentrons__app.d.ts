@@ -17,10 +17,18 @@ declare module '@opentrons/app/src/logger' {
   export type Logger = Record<LogLevel, Log>
 }
 
+declare module '@opentrons/app/src/__mocks__/logger' {
+  import type { Logger } from '@opentrons/app/src/logger'
+
+  export function createLogger(filename: string): Logger
+  export function useLogger(filename: string): Logger
+}
+
 declare module '@opentrons/app/src/redux/types' {
   export interface Action {
     type: string
     payload?: unknown | Record<string, unknown>
+    meta?: Record<string, unknown>
   }
 
   export interface Error {
@@ -91,6 +99,12 @@ declare module '@opentrons/app/src/redux/config/types' {
     }
     labware: {
       directory: string
+    }
+    alerts: {
+      ignored: string[]
+    }
+    devInternal?: {
+      [featureFlag: string]: boolean | undefined
     }
   }
 }
@@ -182,7 +196,10 @@ declare module '@opentrons/app/src/redux/system-info/types' {
 
 declare module '@opentrons/app/src/redux/config' {
   import type { Action } from '@opentrons/app/src/redux/types'
-  import type { Config } from '@opentrons/app/src/redux/config/types'
+  import type {
+    Config,
+    ConfigValueChangeAction,
+  } from '@opentrons/app/src/redux/config/types'
 
   export const CONFIG_VERSION_LATEST: number
   export const INITIALIZED: 'config:INITIALIZED'
@@ -195,7 +212,24 @@ declare module '@opentrons/app/src/redux/config' {
 
   export function configInitialized(config: Config): Action
   export function configValueUpdated(path: string, value: unknown): Action
-  export function updateConfigValue(path: string, value: unknown): Action
+
+  export function updateConfigValue(
+    path: string,
+    value: unknown
+  ): ConfigValueChangeAction
+
+  export function resetConfigValue(path: string): ConfigValueChangeAction
+  export function toggleConfigValue(path: string): ConfigValueChangeAction
+
+  export function addUniqueConfigValue(
+    path: string,
+    value: unknown
+  ): ConfigValueChangeAction
+
+  export function subtractConfigValue(
+    path: string,
+    value: unknown
+  ): ConfigValueChangeAction
 }
 
 // NOTE(mc, 2021-02-17): intentionally duplicated to avoid correcting a
@@ -210,6 +244,7 @@ declare module '@opentrons/app/src/redux/custom-labware/selectors' {
 declare module '@opentrons/app/src/redux/custom-labware' {
   import type { Action } from '@opentrons/app/src/redux/types'
   import type {
+    DuplicateLabwareFile,
     FailedLabwareFile,
     CheckedLabwareFile,
     CustomLabwareListActionSource,
@@ -247,6 +282,30 @@ declare module '@opentrons/app/src/redux/custom-labware' {
     message: string,
     source?: CustomLabwareListActionSource
   ): Action
+
+  export function fetchCustomLabware(): Action
+  export function changeCustomLabwareDirectory(): Action
+  export function openCustomLabwareDirectory(): Action
+  export function addCustomLabware(
+    overwrite?: DuplicateLabwareFile | null
+  ): Action
+}
+
+declare module '@opentrons/app/src/redux/custom-labware/__fixtures__' {
+  import type { LabwareDefinition2 } from '@opentrons/shared-data'
+  import {
+    ValidLabwareFile,
+    InvalidLabwareFile,
+    OpentronsLabwareFile,
+    DuplicateLabwareFile,
+  } from '@opentrons/app/src/redux/custom-labware/types'
+
+  export const mockDefinition: LabwareDefinition2
+  export const mockValidLabware: ValidLabwareFile
+  export const mockInvalidLabware: InvalidLabwareFile
+  export const mockOpentronsLabware: OpentronsLabwareFile
+  export const mockDuplicateLabware: DuplicateLabwareFile
+  export const mockTipRackDefinition: LabwareDefinition2
 }
 
 declare module '@opentrons/app/src/redux/robot-api/constants' {
@@ -271,6 +330,19 @@ declare module '@opentrons/app/src/redux/system-info' {
   ): Action
 }
 
+declare module '@opentrons/app/src/redux/system-info/__fixtures__' {
+  import type {
+    UsbDevice,
+    NetworkInterface,
+  } from '@opentrons/app/src/redux/system-info/types'
+
+  export const mockUsbDevice: UsbDevice
+  export const mockRealtekDevice: UsbDevice
+  export const mockWindowsRealtekDevice: UsbDevice
+  export const mockNetworkInterface: NetworkInterface
+  export const mockNetworkInterfaceV6: NetworkInterface
+}
+
 declare module '@opentrons/app/src/redux/discovery' {
   import type { Action } from '@opentrons/app/src/redux/types'
 
@@ -286,5 +358,9 @@ declare module '@opentrons/app/src/redux/discovery/actions' {
 }
 
 declare module '@opentrons/app/src/redux/shell/actions' {
+  import type { Action } from '@opentrons/app/src/redux/types'
+
   export const UI_INITIALIZED: 'shell:UI_INITIALIZED'
+
+  export function uiInitialized(): Action
 }

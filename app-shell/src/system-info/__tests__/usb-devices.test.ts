@@ -1,5 +1,3 @@
-// @flow
-
 import execa from 'execa'
 import usbDetection from 'usb-detection'
 
@@ -9,7 +7,11 @@ import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 jest.mock('execa')
 jest.mock('usb-detection')
 
-const usbDetectionFind: JestMockFn<[], any> = (usbDetection.find: any)
+const usbDetectionFind = usbDetection.find as jest.MockedFunction<
+  typeof usbDetection.find
+>
+
+const execaCommand = execa.command as jest.MockedFunction<typeof execa.command>
 
 describe('app-shell::system-info::usb-devices', () => {
   const { windowsDriverVersion: _, ...mockDevice } = Fixtures.mockUsbDevice
@@ -63,7 +65,7 @@ describe('app-shell::system-info::usb-devices', () => {
   })
 
   it('can get the Windows driver version of a device', () => {
-    execa.command.mockResolvedValue({ stdout: '1.2.3' })
+    execaCommand.mockResolvedValue({ stdout: '1.2.3' } as any)
 
     const device = {
       ...mockDevice,
@@ -87,7 +89,7 @@ describe('app-shell::system-info::usb-devices', () => {
   })
 
   it('returns null for unknown if command errors out', () => {
-    execa.command.mockRejectedValue('AH!')
+    execaCommand.mockRejectedValue('AH!')
 
     return getWindowsDriverVersion(mockDevice).then(version => {
       expect(version).toBe(null)

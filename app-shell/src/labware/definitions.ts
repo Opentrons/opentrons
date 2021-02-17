@@ -10,6 +10,7 @@ const RE_JSON_EXT = /\.json$/i
 export function readLabwareDirectory(dir: string): Promise<string[]> {
   const absoluteName = (e: Dirent): string => path.join(dir, e.name)
 
+  // @ts-expect-error(mc, 2021-02-17): figure out how to type this
   return fs.readdir(dir, { withFileTypes: true }).then((entries: Dirent[]) => {
     const jsonFiles = entries
       .filter(e => e.isFile() && RE_JSON_EXT.test(e.name))

@@ -1,17 +1,15 @@
-// @flow
-
 import Electron from 'electron'
 
 import * as Dialogs from '..'
 
 jest.mock('electron')
 
-const mockShowOpenDialog: JestMockFn<
-  Array<any>,
-  {| canceled: boolean, filePaths: Array<string> |}
-> = Electron.dialog.showOpenDialog
+const mockShowOpenDialog = Electron.dialog
+  .showOpenDialog as jest.MockedFunction<typeof Electron.dialog.showOpenDialog>
 
-const mockMainWindow = { mainWindow: true }
+const mockMainWindow = ({
+  mainWindow: true,
+} as unknown) as Electron.BrowserWindow
 
 describe('dialog boxes', () => {
   describe('showOpenDirectoryDialog', () => {
