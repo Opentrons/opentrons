@@ -50,7 +50,7 @@ type Props = {|
   robot: ViewableRobot,
 |}
 
-// TODO(bc,2021-02-16): i18n
+// TODO(bc, 2021-02-16): i18n
 const UPDATE_FRAGMENT = 'update'
 const RESET_FRAGMENT = 'reset'
 const INSTRUMENTS_FRAGMENT = 'instruments'

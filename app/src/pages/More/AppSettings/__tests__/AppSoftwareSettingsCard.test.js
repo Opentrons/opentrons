@@ -20,7 +20,9 @@ jest.mock('../../../../redux/shell/update', () => ({
   getAvailableShellUpdate: jest.fn(),
 }))
 
-jest.mock('../UpdateAppModal', () => ({ UpdateAppModal: () => null }))
+jest.mock('../../../../organisms/UpdateAppModal', () => ({
+  UpdateAppModal: () => null,
+}))
 
 const getAvailableShellUpdate: JestMockFn<[State], string | null> =
   Shell.getAvailableShellUpdate

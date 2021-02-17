@@ -10,8 +10,8 @@ import { ProtocolModuleList } from '..'
 
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../../redux/robot/selectors')
-jest.mock('../../../../redux/modules/selectors')
+jest.mock('../../../redux/robot/selectors')
+jest.mock('../../../redux/modules/selectors')
 
 const mockGetModules: JestMockFn<
   [State],

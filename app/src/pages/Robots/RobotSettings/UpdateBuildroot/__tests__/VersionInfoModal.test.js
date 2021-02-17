@@ -16,7 +16,9 @@ import { VersionInfoModal } from '../VersionInfoModal'
 import type { State } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/shell/update')
-jest.mock('../../../app-settings', () => ({ UpdateAppModal: () => null }))
+jest.mock('../../../../../organisms/UpdateAppModal', () => ({
+  UpdateAppModal: () => null,
+}))
 
 const MOCK_STATE: $Shape<State> = {}
 

@@ -16,7 +16,7 @@ import type {
   TipLengthCalibration,
 } from '../../../../redux/calibration/types'
 
-jest.mock('../../../assets/labware/findLabware')
+jest.mock('../../../../assets/labware/findLabware')
 
 jest.mock('@opentrons/shared-data', () => ({
   getAllPipetteNames: jest.fn(

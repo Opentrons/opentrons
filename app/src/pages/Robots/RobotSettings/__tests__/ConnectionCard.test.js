@@ -13,7 +13,7 @@ import type { State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 jest.mock('../../../../redux/networking/selectors')
-jest.mock('../../../components/RobotSettings/SelectNetwork', () => ({
+jest.mock('../SelectNetwork', () => ({
   SelectNetwork: () => {
     return <></>
   },

@@ -11,7 +11,7 @@ import * as LabwareActions from '../../../../redux/custom-labware/actions'
 
 import type { State } from '../../../../redux/types'
 
-jest.mock('../../../redux/custom-labware/selectors')
+jest.mock('../../../../redux/custom-labware/selectors')
 
 const mockGetCustomLabware: JestMockFn<
   [State],

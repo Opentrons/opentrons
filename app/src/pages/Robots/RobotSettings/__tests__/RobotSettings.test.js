@@ -2,7 +2,8 @@
 import * as React from 'react'
 import { StaticRouter, Route, Redirect } from 'react-router-dom'
 
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithProviders } from '@opentrons/components/__utils__'
+import { i18n } from '../../../../i18n'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -31,24 +32,42 @@ import { RobotSettings } from '..'
 import type { State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
-jest.mock('../../../redux/buildroot/selectors')
-jest.mock('../../../redux/robot-admin/selectors')
-jest.mock('../../../redux/robot-controls/selectors')
-jest.mock('../../../redux/robot-settings/selectors')
-jest.mock('../../../redux/robot/selectors')
+jest.mock('../../../../redux/buildroot/selectors')
+jest.mock('../../../../redux/robot-admin/selectors')
+jest.mock('../../../../redux/robot-controls/selectors')
+jest.mock('../../../../redux/robot-settings/selectors')
+jest.mock('../../../../redux/robot/selectors')
 
 // emulate shallow render
-jest.mock('../../../components/RobotSettings', () => ({
-  RobotSettings: () => <></>,
+jest.mock('../ConnectAlertModal', () => ({
   ConnectAlertModal: () => <></>,
 }))
 
-jest.mock('../../../components/RobotSettings/UpdateBuildroot', () => ({
+jest.mock('../UpdateBuildroot', () => ({
   UpdateBuildroot: () => <></>,
 }))
 
-jest.mock('../../../components/RobotSettings/ResetRobotModal', () => ({
+jest.mock('../ResetRobotModal', () => ({
   ResetRobotModal: () => <></>,
+}))
+
+jest.mock('../StatusCard', () => ({
+  StatusCard: () => <></>,
+}))
+jest.mock('../InformationCard', () => ({
+  InformationCard: () => <></>,
+}))
+jest.mock('../CalibrationCard', () => ({
+  CalibrationCard: () => <></>,
+}))
+jest.mock('../ControlsCard', () => ({
+  ControlsCard: () => <></>,
+}))
+jest.mock('../ConnectionCard', () => ({
+  ConnectionCard: () => <></>,
+}))
+jest.mock('../AdvancedSettingsCard', () => ({
+  AdvancedSettingsCard: () => <></>,
 }))
 
 const MOCK_STATE: State = ({ mockState: true }: any)
@@ -95,13 +114,13 @@ const getRobotRestarting: JestMockFn<[State, string], boolean> =
 
 describe('/robots/:robotName page component', () => {
   const render = (robot = mockConnectableRobot, url = ROBOT_URL) => {
-    return mountWithStore(
+    return mountWithProviders(
       <StaticRouter location={url} context={{}}>
         <Route path="/robots/:name?">
           <RobotSettings robot={robot} />
         </Route>
       </StaticRouter>,
-      { initialState: MOCK_STATE }
+      { initialState: MOCK_STATE, i18n }
     )
   }
 
@@ -163,12 +182,16 @@ describe('/robots/:robotName page component', () => {
 
   it('should render RobotSettings contents', () => {
     const { wrapper } = render()
-    const contents = wrapper.find(RobotSettings)
 
-    expect(contents.prop('robot')).toBe(mockConnectableRobot)
-    expect(contents.prop('updateUrl')).toBe(`${ROBOT_URL}/update`)
-    expect(contents.prop('resetUrl')).toBe(`${ROBOT_URL}/reset`)
-    expect(contents.prop('pipettesPageUrl')).toBe(`${ROBOT_URL}/instruments`)
+    const infoCard = wrapper.find('InformationCard')
+    expect(infoCard.prop('robot')).toBe(mockConnectableRobot)
+    expect(infoCard.prop('updateUrl')).toBe(`${ROBOT_URL}/update`)
+
+    const calCard = wrapper.find('CalibrationCard')
+    expect(calCard.prop('pipettesPageUrl')).toBe(`${ROBOT_URL}/instruments`)
+
+    const advancedSettingsCard = wrapper.find('AdvancedSettingsCard')
+    expect(advancedSettingsCard.prop('resetUrl')).toBe(`${ROBOT_URL}/reset`)
   })
 
   it('should render an UpdateBuildroot wizard if the route matches', () => {

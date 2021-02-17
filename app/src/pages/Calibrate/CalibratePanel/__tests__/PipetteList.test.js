@@ -18,9 +18,9 @@ import {
 
 import type { State } from '../../../../redux/types'
 
-jest.mock('../../../redux/robot/selectors')
-jest.mock('../../../redux/nav/calibrate-selectors')
-jest.mock('../../../redux/pipettes/selectors')
+jest.mock('../../../../redux/robot/selectors')
+jest.mock('../../../../redux/nav/calibrate-selectors')
+jest.mock('../../../../redux/pipettes/selectors')
 
 const mockGetProtocolPipettes: JestMockFn<
   [State],

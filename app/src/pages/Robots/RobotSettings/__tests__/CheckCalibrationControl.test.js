@@ -15,7 +15,7 @@ import { mockCalibrationCheckSessionAttributes } from '../../../../redux/session
 
 jest.mock('../../../../redux/robot-api/selectors')
 jest.mock('../../../../redux/sessions/selectors')
-jest.mock('../../CheckCalibration', () => ({
+jest.mock('../../../../organisms/CheckCalibration', () => ({
   CheckCalibration: () => <></>,
 }))
 

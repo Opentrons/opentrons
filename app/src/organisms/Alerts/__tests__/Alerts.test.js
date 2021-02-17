@@ -12,11 +12,11 @@ import { UpdateAppModal } from '../../UpdateAppModal'
 import type { State } from '../../../redux/types'
 import type { AlertId } from '../../../redux/alerts/types'
 
-jest.mock('../../LostConnectionAlert', () => ({
+jest.mock('../LostConnectionAlert', () => ({
   LostConnectionAlert: () => <></>,
 }))
 
-jest.mock('../../analytics-settings', () => ({
+jest.mock('../../AnalyticsSettingsModal', () => ({
   AnalyticsSettingsModal: () => <></>,
 }))
 
@@ -24,7 +24,7 @@ jest.mock('../U2EDriverOutdatedAlert', () => ({
   U2EDriverOutdatedAlert: () => <></>,
 }))
 
-jest.mock('../../app-settings', () => ({
+jest.mock('../../UpdateAppModal', () => ({
   UpdateAppModal: () => <></>,
 }))
 

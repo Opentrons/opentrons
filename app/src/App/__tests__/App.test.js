@@ -20,24 +20,24 @@ import { Navbar } from '../Navbar'
 import { TopPortalRoot, PortalRoot } from '../portal'
 import { Alerts } from '../../organisms/Alerts'
 
-jest.mock('../../../pages/Robots', () => ({ Robots: () => <></> }))
-jest.mock('../../../pages/Upload', () => ({ Upload: () => <></> }))
-jest.mock('../../../pages/Calibrate', () => ({ Calibrate: () => <></> }))
-jest.mock('../../../pages/Run', () => ({ Run: () => <></> }))
-jest.mock('../../../pages/More', () => ({ More: () => <></> }))
-jest.mock('../../../pages/Robots/ConnectPanel', () => ({
+jest.mock('../../pages/Robots', () => ({ Robots: () => <></> }))
+jest.mock('../../pages/Upload', () => ({ Upload: () => <></> }))
+jest.mock('../../pages/Calibrate', () => ({ Calibrate: () => <></> }))
+jest.mock('../../pages/Run', () => ({ Run: () => <></> }))
+jest.mock('../../pages/More', () => ({ More: () => <></> }))
+jest.mock('../../pages/Robots/ConnectPanel', () => ({
   ConnectPanel: () => <></>,
 }))
-jest.mock('../../../pages/Upload/UploadPanel', () => ({
+jest.mock('../../pages/Upload/UploadPanel', () => ({
   UploadPanel: () => <></>,
 }))
-jest.mock('../../../pages/Calibrate/CalibratePanel', () => ({
+jest.mock('../../pages/Calibrate/CalibratePanel', () => ({
   CalibratePanel: () => <></>,
 }))
-jest.mock('../../../pages/Run/RunPanel', () => ({ RunPanel: () => <></> }))
-jest.mock('../../../pages/More/MorePanel', () => ({ MorePanel: () => <></> }))
-jest.mock('../../Navbar', () => ({ Navbar: () => <></> }))
-jest.mock('../../Alerts', () => ({ Alerts: () => <></> }))
+jest.mock('../../pages/Run/RunPanel', () => ({ RunPanel: () => <></> }))
+jest.mock('../../pages/More/MorePanel', () => ({ MorePanel: () => <></> }))
+jest.mock('../Navbar', () => ({ Navbar: () => <></> }))
+jest.mock('../../organisms/Alerts', () => ({ Alerts: () => <></> }))
 
 describe('top level App component', () => {
   const render = (url = '/') => {

@@ -23,7 +23,9 @@ import { getIsRunning } from '../../../../redux/robot/selectors'
 jest.mock('../../../../redux/calibration')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/custom-labware')
-jest.mock('../../CalibratePipetteOffset/useCalibratePipetteOffset')
+jest.mock(
+  '../../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
+)
 jest.mock('react-router-dom', () => ({ Link: () => <></> }))
 jest.mock('../../../../redux/discovery')
 jest.mock('../../../../redux/robot/selectors')

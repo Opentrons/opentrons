@@ -15,8 +15,8 @@ import type { UpdateAppModalProps } from '..'
 
 // TODO(mc, 2020-10-06): this is a partial mock because shell/update
 // needs some reorg to split actions and selectors
-jest.mock('../../../../redux/shell/update', () => ({
-  ...jest.requireActual('../../../../redux/shell/update'),
+jest.mock('../../../redux/shell/update', () => ({
+  ...jest.requireActual('../../../redux/shell/update'),
   getShellUpdateState: jest.fn(),
 }))
 
