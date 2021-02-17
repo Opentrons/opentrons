@@ -82,8 +82,8 @@ def _write_to_device_and_return(cmd, ack, device_connection, tag=None):
 
 
 def _connect(port_name, baudrate):
-    ser = serial.Serial(
-        port=port_name,
+    ser = serial.serial_for_url(port_name,
+        # port=port_name,
         baudrate=baudrate,
         timeout=DEFAULT_SERIAL_TIMEOUT
     )
