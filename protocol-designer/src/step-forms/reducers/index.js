@@ -1051,7 +1051,7 @@ type BatchEditFormActions =
   | SelectStepAction
 
 export const batchEditFormChanges = (
-  state: BatchEditFormChangesState,
+  state: BatchEditFormChangesState = {},
   action: BatchEditFormActions
 ): BatchEditFormChangesState => {
   switch (action.type) {
