@@ -3,6 +3,7 @@ import re
 import logging
 
 from opentrons.hardware_control.emulation.magdeck import MagDeck
+from opentrons.hardware_control.emulation.tempdeck import TempDeck
 
 from .base import CommandProcessor
 
@@ -16,7 +17,7 @@ LINE_REGEX = re.compile("(\S+) (.+)")
 class ConnectionHandler:
     def __init__(self, command_processor: CommandProcessor,
                  terminator: bytes = b'\r\n\r\n',
-                 ack: bytes = b'ok\r\rok\r\n'):
+                 ack: bytes = b'ok\r\nok\r\n'):
         """"""
         self._command_processor = command_processor
         self._terminator = terminator
@@ -25,7 +26,7 @@ class ConnectionHandler:
     async def __call__(self, reader: asyncio.StreamReader,
                        writer: asyncio.StreamWriter) -> None:
         """"""
-        logger.info("Connected")
+        logger.info("Connected.")
         while True:
             line = await reader.readuntil(self._terminator)
             logger.debug("Received: %s", line)
@@ -34,22 +35,34 @@ class ConnectionHandler:
             if m:
                 cmd = m.groups()[0]
                 payload = m.groups()[1]
+                logger.debug("Command: %s, Payload: %s", cmd, payload)
                 response = self._command_processor.handle(cmd, payload)
                 if response:
-                    writer.write(f'{response}\r\n'.encode())
+                    response = f'{response}\r\n'
+                    logger.debug("Sending: %s", response)
+                    writer.write(response.encode())
 
             writer.write(self._ack)
             await writer.drain()
 
 
-async def run():
-    HOST, PORT = "127.0.0.1", 9999
+async def run_server(HOST: str, PORT: int, handler: ConnectionHandler) -> None:
+    """"""
 
-    mag_deck = MagDeck()
-    server = await asyncio.start_server(ConnectionHandler(mag_deck), HOST, PORT)
+    server = await asyncio.start_server(handler, HOST, PORT)
 
     async with server:
         await server.serve_forever()
+
+
+async def run() -> None:
+    """"""
+    HOST = "127.0.0.1"
+
+    await asyncio.gather(
+        run_server(HOST=HOST, PORT=9999, handler=ConnectionHandler(MagDeck())),
+        run_server(HOST=HOST, PORT=9998, handler=ConnectionHandler(TempDeck())),
+    )
 
 
 if __name__ == "__main__":

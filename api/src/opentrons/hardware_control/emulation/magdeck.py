@@ -1,16 +1,17 @@
 import logging
 from typing import Optional
+from opentrons.drivers.mag_deck.driver import GCODES
 from .base import CommandProcessor
 
 logger = logging.getLogger(__name__)
 
-GCODE_HOME = "G28.2"
-GCODE_MOVE = "G0"
-GCODE_PROBE = "G38.2"
-GCODE_GET_PROBED_DISTANCE = "M836"
-GCODE_GET_POSITION = "M114.2"
-GCODE_DEVICE_INFO = "M115"
-GCODE_DFU = "dfu"
+GCODE_HOME = GCODES['HOME']
+GCODE_MOVE = GCODES['MOVE']
+GCODE_PROBE = GCODES['PROBE_PLATE']
+GCODE_GET_PROBED_DISTANCE = GCODES['GET_PLATE_HEIGHT']
+GCODE_GET_POSITION = GCODES['GET_CURRENT_POSITION']
+GCODE_DEVICE_INFO = GCODES['DEVICE_INFO']
+GCODE_DFU = GCODES['PROGRAMMING_MODE']
 
 SERIAL = "fake_serial"
 MODEL = "magdeck_emulator"
@@ -19,6 +20,10 @@ VERSION = 1
 
 class MagDeck(CommandProcessor):
     """"""
+    def __init__(self):
+        self.height = 0
+        self.position = 0
+
     def handle(self, cmd: str, payload: str) -> Optional[str]:
         """"""
         logger.info(f"Got command {cmd}")
@@ -29,11 +34,9 @@ class MagDeck(CommandProcessor):
         elif cmd == GCODE_PROBE:
             pass
         elif cmd == GCODE_GET_PROBED_DISTANCE:
-            height = 321
-            return f"height:{height}"
+            return f"height:{self.height}"
         elif cmd == GCODE_GET_POSITION:
-            pos = 3.2
-            return f"Z:{pos}"
+            return f"Z:{self.position}"
         elif cmd == GCODE_DEVICE_INFO:
             return f"serial:{SERIAL} model:{MODEL} version:{VERSION}"
         elif cmd == GCODE_DFU:
