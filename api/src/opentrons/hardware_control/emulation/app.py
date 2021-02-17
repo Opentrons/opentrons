@@ -4,6 +4,7 @@ import logging
 
 from opentrons.hardware_control.emulation.magdeck import MagDeck
 from opentrons.hardware_control.emulation.tempdeck import TempDeck
+from opentrons.hardware_control.emulation.thermocycler import Thermocycler
 
 from .base import CommandProcessor
 
@@ -60,8 +61,16 @@ async def run() -> None:
     HOST = "127.0.0.1"
 
     await asyncio.gather(
-        run_server(HOST=HOST, PORT=9999, handler=ConnectionHandler(MagDeck())),
-        run_server(HOST=HOST, PORT=9998, handler=ConnectionHandler(TempDeck())),
+        run_server(HOST=HOST,
+                   PORT=9999,
+                   handler=ConnectionHandler(MagDeck())),
+        run_server(HOST=HOST,
+                   PORT=9998,
+                   handler=ConnectionHandler(TempDeck())),
+        run_server(HOST=HOST,
+                   PORT=9997,
+                   handler=ConnectionHandler(Thermocycler(),
+                                             terminator=b'\r\n')),
     )
 
 
