@@ -18,7 +18,7 @@ describe('saveStepFormsMulti', () => {
       .mockReturnValue({ someField: 'someVal' })
   })
   afterEach(() => resetAllWhenMocks())
-  it('should dispatch SAVE_STEP_FORMS_MULTI with edited fields and step ids when step ids are passed in', () => {
+  it('should dispatch SAVE_STEP_FORMS_MULTI with edited fields and step ids', () => {
     const stepIds = ['1', '2']
     store.dispatch(saveStepFormsMulti(stepIds))
     expect(store.getActions()).toEqual([
@@ -31,7 +31,7 @@ describe('saveStepFormsMulti', () => {
       },
     ])
   })
-  it('should dispatch SAVE_STEP_FORMS_MULTI with edited fields and step ids when step ids are NOT passed in', () => {
+  it('should dispatch SAVE_STEP_FORMS_MULTI with step ids as empty list when step ids are NOT passed in', () => {
     store.dispatch(saveStepFormsMulti())
     expect(store.getActions()).toEqual([
       {
