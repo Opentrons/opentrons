@@ -1812,4 +1812,11 @@ describe('batchEditFormChanges reducer', () => {
     }
     expect(batchEditFormChanges(state, { ...action })).toEqual({})
   })
+  it('should reset state on SELECT_STEP', () => {
+    const state = { someFieldName: 'someFieldValue' }
+    const action = {
+      type: 'SELECT_STEP',
+    }
+    expect(batchEditFormChanges(state, { ...action })).toEqual({})
+  })
 })
