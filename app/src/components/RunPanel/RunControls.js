@@ -1,9 +1,9 @@
 // @flow
 // play pause run buttons for sidepanel
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 import { OutlineButton, HoverTooltip } from '@opentrons/components'
 
+import { ConfirmCancelModal } from '../RunLog'
 import styles from './styles.css'
 
 const MISSING_MODULES =
@@ -40,9 +40,15 @@ export function RunControls(props: RunControlsProps): React.Node {
     onResetClick,
   } = props
 
+  const [isConfirmCancelOpen, setConfirmCancelOpen] = React.useState(false)
   const onPauseResumeClick = isPaused ? onResumeClick : onPauseClick
-
   const pauseResumeText = isPaused ? 'Resume' : 'Pause'
+  const controlsDisabled = isConfirmCancelOpen || disabled
+
+  const handleCancelClick = () => {
+    onPauseClick()
+    setConfirmCancelOpen(true)
+  }
 
   let runButton
   let pauseResumeButton
@@ -75,7 +81,7 @@ export function RunControls(props: RunControlsProps): React.Node {
       </HoverTooltip>
     )
   } else if (isRunning) {
-    const pauseDisabled = disabled || isBlocked
+    const pauseDisabled = disabled || isBlocked || controlsDisabled
     const pauseTooltip = isBlocked ? DOOR_OPEN_RESUME : null
 
     pauseResumeButton = (
@@ -95,11 +101,9 @@ export function RunControls(props: RunControlsProps): React.Node {
     )
     cancelButton = (
       <OutlineButton
-        Component={Link}
-        to={'/run/cancel'}
-        onClick={onPauseClick}
+        onClick={handleCancelClick}
         className={styles.run_button}
-        disabled={disabled}
+        disabled={controlsDisabled}
       >
         Cancel Run
       </OutlineButton>
@@ -122,6 +126,9 @@ export function RunControls(props: RunControlsProps): React.Node {
       {pauseResumeButton}
       {cancelButton}
       {resetButton}
+      {isConfirmCancelOpen === true ? (
+        <ConfirmCancelModal onClose={() => setConfirmCancelOpen(false)} />
+      ) : null}
     </>
   )
 }
