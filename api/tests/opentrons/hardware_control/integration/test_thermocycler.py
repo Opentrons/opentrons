@@ -2,6 +2,7 @@ import asyncio
 
 import pytest
 from mock import AsyncMock, patch
+from opentrons.config import IS_WIN
 from opentrons.drivers.thermocycler.driver import TCPoller
 from opentrons.hardware_control.emulation.app import THERMOCYCLER_PORT
 from opentrons.hardware_control.modules import Thermocycler
@@ -31,6 +32,7 @@ async def thermocycler(
     td._driver.disconnect()
 
 
+@pytest.mark.skipif(IS_WIN, reason="Cannot be run on Windows")
 def test_device_info(thermocycler: Thermocycler):
     """"""
     assert {'model': 'thermocycler_emulator', 'serial': 'fake_serial',
