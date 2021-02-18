@@ -1,7 +1,10 @@
 import pytest
 
 from mock import patch, MagicMock
+<<<<<<< HEAD
 from opentrons.hardware_control.modules.types import ModuleAtPort
+=======
+>>>>>>> feat(api): add physical USB Port information to the hardware controller
 from opentrons.drivers.rpi_drivers.usb import USBBus
 from opentrons.drivers.rpi_drivers.types import USBPort
 
@@ -10,7 +13,11 @@ fake_bus = [
     '/sys/bus/usb/devices/usb1/1-1/1-1.3/1-1.3:1.0/tty/ttyACM1/dev',
     '/sys/bus/usb/devices/usb1/1-1/1-1.5/1-1.5:1.0/tty/ttyAMA0/dev',
     '/sys/bus/usb/devices/usb1/1-1/1-1.4/1-1.4/1-1.4.1/1-1.4.1:1.0/tty/ttyAMA1/dev',
+<<<<<<< HEAD
     '/sys/bus/usb/devices/usb1/1-1/1-1.4/1-1.4/1-1.4.3/1-1.4.3:1.0/tty/ttyACM2/dev',
+=======
+    '/sys/bus/usb/devices/usb1/1-1/1-1.4/1-1.4/1-1.4.3/1-1.4.3:1.0/tty/ttyACM1/dev',
+>>>>>>> feat(api): add physical USB Port information to the hardware controller
     '/sys/bus/usb/devices/usb1/1-1/1-1.3/dev',
     '/sys/bus/usb/devices/usb1/1-1/1-1.1/dev',
     '/sys/bus/usb/devices/usb1/1-1/dev',
@@ -23,7 +30,11 @@ filtered_ports = [
     '1-1.3/1-1.3:1.0/tty/ttyACM1/dev',
     '1-1.5/1-1.5:1.0/tty/ttyAMA0/dev',
     '1-1.4/1-1.4/1-1.4.1/1-1.4.1:1.0/tty/ttyAMA1/dev',
+<<<<<<< HEAD
     '1-1.4/1-1.4/1-1.4.3/1-1.4.3:1.0/tty/ttyACM2/dev'
+=======
+    '1-1.4/1-1.4/1-1.4.3/1-1.4.3:1.0/tty/ttyACM1/dev'
+>>>>>>> feat(api): add physical USB Port information to the hardware controller
 ]
 
 
