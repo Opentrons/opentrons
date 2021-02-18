@@ -18,14 +18,15 @@ MODEL = "magdeck_emulator"
 VERSION = 1
 
 
-class MagDeck(CommandProcessor):
-    """"""
-    def __init__(self):
+class MagDeckEmulator(CommandProcessor):
+    """Magdeck emulator"""
+
+    def __init__(self) -> None:
         self.height = 0
         self.position = 0
 
     def handle(self, cmd: str, payload: str) -> Optional[str]:
-        """"""
+        """Handle a command."""
         logger.info(f"Got command {cmd}")
         if cmd == GCODE_HOME:
             pass

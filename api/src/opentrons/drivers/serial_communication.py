@@ -15,7 +15,7 @@ class SerialNoResponse(Exception):
 
 
 def get_ports_by_name(device_name):
-    '''Returns all serial devices with a given name'''
+    """Returns all serial devices with a given name"""
     filtered_devices = filter(
         lambda device: device_name in device[1],
         list_ports.comports()
@@ -25,7 +25,7 @@ def get_ports_by_name(device_name):
 
 
 def get_port_by_VID(vid):
-    '''Returns first serial device with a given VID'''
+    """Returns first serial device with a given VID"""
     for d in list_ports.comports():
         if d.vid == vid:
             return d[0]
@@ -33,7 +33,7 @@ def get_port_by_VID(vid):
 
 @contextlib.contextmanager
 def serial_with_temp_timeout(serial_connection, timeout):
-    '''Implements a temporary timeout for a serial connection'''
+    """Implements a temporary timeout for a serial connection"""
     saved_timeout = serial_connection.timeout
     if timeout is not None:
         serial_connection.timeout = timeout
@@ -56,10 +56,10 @@ def clear_buffer(serial_connection):
 
 
 def _write_to_device_and_return(cmd, ack, device_connection, tag=None):
-    '''Writes to a serial device.
+    """Writes to a serial device.
     - Formats command
     - Wait for ack return
-    - return parsed response'''
+    - return parsed response"""
 
     if not tag:
         tag = device_connection.port
@@ -82,8 +82,8 @@ def _write_to_device_and_return(cmd, ack, device_connection, tag=None):
 
 
 def _connect(port_name, baudrate):
-    ser = serial.serial_for_url(port_name,
-        # port=port_name,
+    ser = serial.serial_for_url(
+        url=port_name,
         baudrate=baudrate,
         timeout=DEFAULT_SERIAL_TIMEOUT
     )
@@ -92,7 +92,7 @@ def _connect(port_name, baudrate):
 
 
 def _attempt_command_recovery(command, ack, serial_conn, tag=None):
-    '''Recovery after following a failed write_and_return() atempt'''
+    """Recovery after following a failed write_and_return() attempt"""
     if not tag:
         tag = serial_conn.port
     with serial_with_temp_timeout(serial_conn, RECOVERY_TIMEOUT) as device:
@@ -109,7 +109,7 @@ def _attempt_command_recovery(command, ack, serial_conn, tag=None):
 def write_and_return(
         command, ack, serial_connection,
         timeout=DEFAULT_WRITE_TIMEOUT, tag=None):
-    '''Write a command and return the response'''
+    """Write a command and return the response"""
     clear_buffer(serial_connection)
     with serial_with_temp_timeout(
             serial_connection, timeout) as device_connection:
@@ -119,12 +119,12 @@ def write_and_return(
 
 
 def connect(device_name=None, port=None, baudrate=115200):
-    '''
+    """
     Creates a serial connection
     :param device_name: defaults to 'Smoothieboard'
     :param baudrate: integer frequency for serial communication
     :return: serial.Serial connection
-    '''
+    """
     if not port:
         port = get_ports_by_name(device_name=device_name)[0]
     log.debug("Device name: {}, Port: {}".format(device_name, port))

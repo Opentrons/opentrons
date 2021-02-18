@@ -33,9 +33,10 @@ class LidStatus(str, enum.Enum):
     MAX = 'max'
 
 
-class Thermocycler(CommandProcessor):
-    """"""
-    def __init__(self):
+class ThermocyclerEmulator(CommandProcessor):
+    """Thermocycler emulator"""
+
+    def __init__(self) -> None:
         self.target_temp = 0
         self.current_temp = 0
         self.lid_status = LidStatus.CLOSED
@@ -43,8 +44,12 @@ class Thermocycler(CommandProcessor):
         self.total_hold_time = None
         self.time_remaining = None
 
-    def handle(self, cmd: str, payload: str) -> Optional[str]:
-        """"""
+    def handle(self, cmd: str, payload: str) -> Optional[str]:  # noqa(C901)
+        """
+        Handle a command.
+
+        TODO: AL 20210218 create dispatch map annd remove 'noqa(C901)'
+        """
         logger.info(f"Got command {cmd}")
         if cmd == GCODE_OPEN_LID:
             pass
@@ -55,13 +60,16 @@ class Thermocycler(CommandProcessor):
         elif cmd == GCODE_SET_LID_TEMP:
             pass
         elif cmd == GCODE_GET_LID_TEMP:
-            return f"T:{self.target_temp} C:{self.current_temp} H:none Total_H:none At_target?:0"
+            return f"T:{self.target_temp} C:{self.current_temp} " \
+                   f"H:none Total_H:none At_target?:0"
         elif cmd == GCODE_EDIT_PID_PARAMS:
             pass
         elif cmd == GCODE_SET_PLATE_TEMP:
             pass
         elif cmd == GCODE_GET_PLATE_TEMP:
-            return f"T:{self.target_temp} C:{self.current_temp} H:{self.time_remaining} Total_H:{self.total_hold_time} At_target?:{self.at_target}"
+            return f"T:{self.target_temp} C:{self.current_temp} " \
+                   f"H:{self.time_remaining} Total_H:{self.total_hold_time} " \
+                   f"At_target?:{self.at_target}"
         elif cmd == GCODE_SET_RAMP_RATE:
             pass
         elif cmd == GCODE_DEACTIVATE_ALL:

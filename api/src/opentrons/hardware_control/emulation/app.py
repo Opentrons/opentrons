@@ -2,9 +2,9 @@ import asyncio
 import re
 import logging
 
-from opentrons.hardware_control.emulation.magdeck import MagDeck
-from opentrons.hardware_control.emulation.tempdeck import TempDeck
-from opentrons.hardware_control.emulation.thermocycler import Thermocycler
+from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
+from opentrons.hardware_control.emulation.tempdeck import TempDeckEmulator
+from opentrons.hardware_control.emulation.thermocycler import ThermocyclerEmulator
 
 from .base import CommandProcessor
 
@@ -16,8 +16,8 @@ TEMPDECK_PORT = 9998
 MAGDECK_PORT = 9999
 
 
-LINE_REGEX = re.compile("(\S+) (.+)")
-"""Split the line to command and payload"""
+LINE_REGEX = re.compile(r"([MGdfu]+[0-9\.]*) (.+)")
+"""Split the line into command and payload"""
 
 
 class ConnectionHandler:
@@ -68,13 +68,13 @@ async def run() -> None:
     await asyncio.gather(
         run_server(host=host,
                    port=MAGDECK_PORT,
-                   handler=ConnectionHandler(MagDeck())),
+                   handler=ConnectionHandler(MagDeckEmulator())),
         run_server(host=host,
                    port=TEMPDECK_PORT,
-                   handler=ConnectionHandler(TempDeck())),
+                   handler=ConnectionHandler(TempDeckEmulator())),
         run_server(host=host,
                    port=THERMOCYCLER_PORT,
-                   handler=ConnectionHandler(Thermocycler(),
+                   handler=ConnectionHandler(ThermocyclerEmulator(),
                                              terminator=b'\r\n')),
     )
 
