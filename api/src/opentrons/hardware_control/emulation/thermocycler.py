@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 import enum
 from opentrons.drivers.thermocycler.driver import GCODES
-from .base import CommandProcessor
+from .command_processor import CommandProcessor
 
 logger = logging.getLogger(__name__)
 

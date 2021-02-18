@@ -6,7 +6,7 @@ from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
 from opentrons.hardware_control.emulation.tempdeck import TempDeckEmulator
 from opentrons.hardware_control.emulation.thermocycler import ThermocyclerEmulator
 
-from .base import CommandProcessor
+from .command_processor import CommandProcessor
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 from opentrons.drivers.mag_deck.driver import GCODES
-from .base import CommandProcessor
+from .command_processor import CommandProcessor
 
 logger = logging.getLogger(__name__)
 

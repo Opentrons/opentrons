@@ -3,7 +3,7 @@ from typing import Optional
 
 from opentrons.drivers.temp_deck.driver import GCODES
 
-from .base import CommandProcessor
+from .command_processor import CommandProcessor
 
 logger = logging.getLogger(__name__)
 
