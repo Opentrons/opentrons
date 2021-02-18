@@ -7,7 +7,7 @@ import tempy from 'tempy'
 import { cleanupReleaseFiles } from '../release-files'
 
 describe('buildroot release files utilities', () => {
-  const tempDirs: Array<string> = []
+  const tempDirs: string[] = []
   const makeEmptyDir = (): string => {
     const dir: string = tempy.directory()
     tempDirs.push(dir)

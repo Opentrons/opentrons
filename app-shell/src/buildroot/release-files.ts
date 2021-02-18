@@ -136,6 +136,7 @@ export function cleanupReleaseFiles(
       return (
         files
           // @ts-expect-error(2021-02-17): upgrade fse and see if this is still a problem
+          // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
           .filter(f => f.isDirectory() && f.name !== currentRelease)
           // @ts-expect-error(2021-02-17): upgrade fse and see if this is still a problem
           .map(f => path.join(downloadsDir, f.name))
