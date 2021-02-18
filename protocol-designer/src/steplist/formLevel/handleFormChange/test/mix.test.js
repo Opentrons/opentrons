@@ -57,12 +57,22 @@ describe('well selection should update', () => {
 
   it('pipette cleared', () => {
     const patch = { pipette: null }
-    expect(handleFormHelper(patch, form)).toEqual({ ...patch, wells: [] })
+    expect(handleFormHelper(patch, form)).toEqual({
+      ...patch,
+      wells: [],
+      aspirate_flowRate: null,
+      dispense_flowRate: null,
+    })
   })
 
   it('pipette single -> multi', () => {
     const patch = { pipette: 'pipetteMultiId' }
-    expect(handleFormHelper(patch, form)).toEqual({ ...patch, wells: [] })
+    expect(handleFormHelper(patch, form)).toEqual({
+      ...patch,
+      wells: [],
+      aspirate_flowRate: null,
+      dispense_flowRate: null,
+    })
   })
 
   it('pipette multi -> single', () => {
@@ -75,6 +85,8 @@ describe('well selection should update', () => {
     expect(handleFormHelper(patch, multiChForm)).toEqual({
       ...patch,
       wells: ['A10', 'B10', 'C10', 'D10', 'E10', 'F10', 'G10', 'H10'],
+      aspirate_flowRate: null,
+      dispense_flowRate: null,
     })
   })
 

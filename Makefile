@@ -8,6 +8,7 @@ include ./scripts/python.mk
 SHELL := bash
 
 # add node_modules/.bin to PATH
+# TODO(mc, 2021-02-12): remove in favor of `yarn run` directly
 PATH := $(shell yarn bin):$(PATH)
 
 API_DIR := api
@@ -52,6 +53,10 @@ clean-py:
 	$(MAKE) -C $(ROBOT_SERVER_DIR) clean
 	$(MAKE) -C $(SHARED_DATA_DIR) clean
 
+.PHONY: clean-js
+clean-js: clean-ts
+	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
+
 .PHONY: setup-py
 setup-py:
 	$(OT_PYTHON) -m pip install pipenv==2020.8.13
@@ -62,20 +67,17 @@ setup-py:
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
 
 # front-end dependecies handled by yarn
+# TODO(mc, 2021-02-12): add `$(MAKE) build-ts` after `yarn` when we have TS
 .PHONY: setup-js
 setup-js:
 	yarn config set network-timeout 60000
 	yarn
 	$(MAKE) -j 1 -C $(APP_SHELL_DIR) setup
 	$(MAKE) -j 1 -C $(SHARED_DATA_DIR) setup-js
-	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR) setup
 
 # uninstall all project dependencies
-# TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
 .PHONY: teardown
-teardown:
-	$(MAKE) -C $(API_DIR) clean teardown
-	shx rm -rf '**/node_modules'
+teardown: teardown-py teardown-js
 
 .PHONY: teardown-py
 teardown-py:
@@ -83,6 +85,10 @@ teardown-py:
 	$(MAKE) -C $(ROBOT_SERVER_DIR) clean teardown
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) clean teardown
 	$(MAKE) -C $(SHARED_DATA_DIR) clean-py teardown-py
+
+.PHONY: teardown-js
+teardown-js: clean-js
+	yarn shx rm -rf "**/node_modules"
 
 .PHONY: deploy-py
 deploy-py: export twine_repository_url = $(twine_repository_url)
@@ -127,7 +133,6 @@ push:
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) push
 	sleep 1
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push
-
 
 
 .PHONY: term
@@ -190,7 +195,7 @@ lint-py:
 
 .PHONY: lint-js
 lint-js:
-	eslint ".*.js" "**/*.js"
+	eslint ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 
 .PHONY: lint-json
 lint-json:
@@ -202,7 +207,15 @@ lint-css:
 
 .PHONY: check-js
 check-js:
-	flow $(if $(CI),check,status)
+	yarn flow $(if $(CI),check,status)
+
+.PHONY: build-ts
+build-ts:
+	yarn tsc --build
+
+.PHONY: clean-ts
+clean-ts:
+	yarn tsc --build --clean
 
 # TODO: Ian 2019-12-17 gradually add components and shared-data
 .PHONY: circular-dependencies-js
@@ -210,11 +223,6 @@ circular-dependencies-js:
 	madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.js
 	madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.js
 	madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.js
-
-# upload coverage reports
-.PHONY: coverage
-coverage:
-	codecov
 
 .PHONY: bump
 bump:

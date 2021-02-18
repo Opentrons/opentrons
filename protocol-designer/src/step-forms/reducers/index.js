@@ -84,6 +84,7 @@ import type {
   DeleteProfileStepAction,
   EditProfileCycleAction,
   EditProfileStepAction,
+  FormPatch,
 } from '../../steplist/actions'
 import type {
   AddStepAction,
@@ -107,6 +108,9 @@ import type {
   DeletePipettesAction,
   EditModuleAction,
   SubstituteStepFormPipettesAction,
+  ChangeBatchEditFieldAction,
+  ResetBatchEditFieldChangesAction,
+  SaveStepFormsMultiAction,
 } from '../actions'
 
 type FormState = FormData | null
@@ -463,6 +467,7 @@ export const initialSavedStepFormsState: SavedStepFormState = {
 }
 type SavedStepFormsActions =
   | SaveStepFormAction
+  | SaveStepFormsMultiAction
   | DeleteStepAction
   | DeleteMultipleStepsAction
   | LoadFileAction
@@ -557,6 +562,20 @@ export const savedStepForms = (
         ...savedStepForms,
         [action.payload.id]: action.payload,
       }
+    }
+    case 'SAVE_STEP_FORMS_MULTI': {
+      const { editedFields, stepIds } = action.payload
+      return stepIds.reduce(
+        (acc, stepId) => ({
+          ...acc,
+          // $FlowFixMe(sa, 2021-02-16): spreading editedFields can overwrite properties with explicit keys in a way that Flow cannot track
+          [stepId]: {
+            ...savedStepForms[stepId],
+            ...editedFields,
+          },
+        }),
+        { ...savedStepForms }
+      )
     }
     case 'DELETE_STEP': {
       return omit(savedStepForms, action.payload)
@@ -1025,6 +1044,36 @@ export const savedStepForms = (
   }
 }
 
+export type BatchEditFormChangesState = FormPatch
+
+type BatchEditFormActions =
+  | ChangeBatchEditFieldAction
+  | ResetBatchEditFieldChangesAction
+  | SaveStepFormsMultiAction
+  | SelectStepAction
+
+export const batchEditFormChanges = (
+  state: BatchEditFormChangesState = {},
+  action: BatchEditFormActions
+): BatchEditFormChangesState => {
+  switch (action.type) {
+    case 'CHANGE_BATCH_EDIT_FIELD': {
+      return {
+        ...state,
+        ...action.payload,
+      }
+    }
+    case 'SELECT_STEP':
+    case 'SAVE_STEP_FORMS_MULTI':
+    case 'RESET_BATCH_EDIT_FIELD_CHANGES': {
+      return {}
+    }
+    default: {
+      return state
+    }
+  }
+}
+
 const initialLabwareState: NormalizedLabwareById = {
   [FIXED_TRASH_ID]: {
     labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
@@ -1307,6 +1356,7 @@ export type RootState = {
   presavedStepForm: PresavedStepFormState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
+  batchEditFormChanges: BatchEditFormChangesState,
 }
 
 // TODO Ian 2018-12-13: find some existing util to do this
@@ -1336,6 +1386,10 @@ export const rootReducer: Reducer<RootState, any> = (state, action) => {
     unsavedForm: unsavedForm(state, action),
     presavedStepForm: presavedStepForm(
       prevStateFallback.presavedStepForm,
+      action
+    ),
+    batchEditFormChanges: batchEditFormChanges(
+      prevStateFallback.batchEditFormChanges,
       action
     ),
   }

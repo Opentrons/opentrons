@@ -38,6 +38,7 @@ describe('SourceDestFields', () => {
   let props
   beforeEach(() => {
     props = {
+      formData: ({}: any),
       propsForFields: {
         aspirate_delay_checkbox: {
           onFieldFocus: (jest.fn(): any),

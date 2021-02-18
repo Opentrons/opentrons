@@ -15,17 +15,21 @@ import {
 } from '../../../../form-types'
 import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { getDisabledFields } from '../../../../steplist/formLevel'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './TipPositionInput.css'
 import { TipPositionModal } from './TipPositionModal'
 
 import { getDefaultMmFromBottom } from './utils'
 import type { BaseState } from '../../../../types'
-import type { StepFieldName, TipOffsetFields } from '../../../../form-types'
+import type { FieldProps } from '../../types'
+import type {
+  FormData,
+  StepFieldName,
+  TipOffsetFields,
+} from '../../../../form-types'
 
 function getLabwareFieldForPositioningField(
-  fieldName: TipOffsetFields
+  name: StepFieldName
 ): StepFieldName {
   const fieldMap: { [TipOffsetFields]: StepFieldName } = {
     aspirate_mmFromBottom: 'aspirate_labware',
@@ -37,18 +41,21 @@ function getLabwareFieldForPositioningField(
     mix_mmFromBottom: 'labware',
     mix_touchTip_mmFromBottom: 'labware',
   }
-  return fieldMap[fieldName]
+  return fieldMap[name]
 }
 
-type OP = {| fieldName: TipOffsetFields, className?: string |}
+type OP = {|
+  ...FieldProps,
+  formData: FormData,
+  className?: string,
+|}
 
 type SP = {|
-  disabled: boolean,
   mmFromBottom: number | null,
   wellDepthMm: number | null,
 |}
 
-type Props = { ...OP, ...SP }
+type Props = {| ...OP, ...SP |}
 
 function TipPositionInput(props: Props) {
   const [isModalOpen, setModalOpen] = React.useState(false)
@@ -62,16 +69,16 @@ function TipPositionInput(props: Props) {
     setModalOpen(false)
   }
 
-  const { disabled, fieldName, mmFromBottom, wellDepthMm } = props
-  const isTouchTipField = getIsTouchTipField(props.fieldName)
-  const isDelayPositionField = getIsDelayPositionField(props.fieldName)
+  const { disabled, name, mmFromBottom, wellDepthMm, updateValue } = props
+  const isTouchTipField = getIsTouchTipField(name)
+  const isDelayPositionField = getIsDelayPositionField(name)
   let value = ''
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
     value =
       mmFromBottom !== null
         ? mmFromBottom
-        : getDefaultMmFromBottom({ fieldName, wellDepthMm })
+        : getDefaultMmFromBottom({ name, wellDepthMm })
   }
 
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -82,11 +89,12 @@ function TipPositionInput(props: Props) {
         {i18n.t('tooltip.step_fields.defaults.tipPosition')}
       </Tooltip>
       <TipPositionModal
-        fieldName={fieldName}
+        name={name}
         closeModal={handleClose}
         wellDepthMm={wellDepthMm}
         mmFromBottom={mmFromBottom}
         isOpen={isModalOpen}
+        updateValue={updateValue}
       />
       <Wrapper
         targetProps={targetProps}
@@ -130,14 +138,12 @@ const Wrapper = (props: WrapperProps) =>
   )
 
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const rawForm = stepFormSelectors.getUnsavedForm(state)
-  const { fieldName } = ownProps
-  const labwareFieldName = getLabwareFieldForPositioningField(
-    ownProps.fieldName
-  )
+  const { formData } = ownProps
+  const { name } = ownProps
+  const labwareFieldName = getLabwareFieldForPositioningField(name)
 
   let wellDepthMm = null
-  const labwareId: ?string = rawForm && rawForm[labwareFieldName]
+  const labwareId: ?string = formData?.[labwareFieldName]
   if (labwareId != null) {
     const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]
       .def
@@ -148,9 +154,8 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 
   return {
-    disabled: rawForm ? getDisabledFields(rawForm).has(fieldName) : false,
     wellDepthMm,
-    mmFromBottom: rawForm?.[fieldName] ?? null,
+    mmFromBottom: formData?.[name] ?? null,
   }
 }
 
@@ -161,4 +166,4 @@ export const TipPositionField: React.AbstractComponent<OP> = connect<
   _,
   _,
   _
->(mapSTP)(TipPositionInput)
+>(mapSTP, () => ({}))(TipPositionInput)

@@ -128,8 +128,12 @@ describe('getEquippedPipetteOptions', () => {
 })
 
 describe('getBatchEditFormHasUnsavedChanges', () => {
-  // TODO(sa, 2021-01-22): update tests when this selector actually gets implemented
-  it('should always return false', () => {
-    expect(getBatchEditFormHasUnsavedChanges()).toBe(false)
+  it('should return true if there are unsaved changes ', () => {
+    expect(
+      getBatchEditFormHasUnsavedChanges.resultFunc({ someField: 'someVal' })
+    ).toBe(true)
+  })
+  it('should return false if there are no unsaved changes ', () => {
+    expect(getBatchEditFormHasUnsavedChanges.resultFunc({})).toBe(false)
   })
 })

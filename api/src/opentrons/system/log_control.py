@@ -58,4 +58,8 @@ async def set_syslog_level(level: str) -> Tuple[int, str, str]:
         'syslog-ng-ctl', 'reload',
         stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
     stdout, stderr = await proc.communicate()
-    return int(proc.returncode or -1), stdout.decode(), stderr.decode()
+    if proc.returncode is None:
+        snc_reload_result = -1
+    else:
+        snc_reload_result: int = proc.returncode  # type: ignore
+    return snc_reload_result, stdout.decode(), stderr.decode()
