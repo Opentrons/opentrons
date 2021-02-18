@@ -15,12 +15,10 @@ import {
 import type { FormData } from '../../../../form-types'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { FieldPropsByName } from '../../types'
-import type { FormData } from '../../../../form-types'
 import styles from '../../StepEditForm.css'
 
 type Props = {|
   className?: ?string,
-  formData: FormData,
   prefix: 'aspirate' | 'dispense',
   propsForFields: FieldPropsByName,
   formData: FormData,
