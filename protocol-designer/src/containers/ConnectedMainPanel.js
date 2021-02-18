@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Splash } from '@opentrons/components'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../steplist'
 import { Portal as MainPageModalPortal } from '../components/portals/MainPageModalPortal'
-import { DeckSetup } from '../components/DeckSetup'
+import { DeckSetupManager } from '../components/DeckSetupManager'
 import { ConnectedFilePage } from '../containers/ConnectedFilePage'
 import { SettingsPage } from '../components/SettingsPage'
 import { LiquidsPage } from '../components/LiquidsPage'
@@ -50,7 +50,7 @@ function MainPanelComponent(props: Props) {
               <LiquidPlacementModal />
             )}
           </MainPageModalPortal>
-          <DeckSetup />
+          <DeckSetupManager />
         </>
       )
     }
