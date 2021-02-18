@@ -66,12 +66,12 @@ import type {
   FormPipettesByMount,
   TemperatureModuleState,
   ThermocyclerModuleState,
-  BatchEditFormChangesState,
 } from '../types'
 import type {
   PresavedStepFormState,
   RootState,
   SavedStepFormState,
+  BatchEditFormChangesState,
 } from '../reducers'
 import type { InvariantContext } from '../../step-generation'
 

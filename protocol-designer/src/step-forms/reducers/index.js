@@ -84,6 +84,7 @@ import type {
   DeleteProfileStepAction,
   EditProfileCycleAction,
   EditProfileStepAction,
+  FormPatch,
 } from '../../steplist/actions'
 import type {
   AddStepAction,
@@ -99,10 +100,6 @@ import type {
   NormalizedLabware,
   NormalizedLabwareById,
   ModuleEntities,
-  BatchEditFormChangesState,
-  ChangeBatchEditFieldAction,
-  ResetBatchEditFieldChangesAction,
-  SaveStepFormsMultiAction,
 } from '../types'
 import type {
   CreateModuleAction,
@@ -111,6 +108,9 @@ import type {
   DeletePipettesAction,
   EditModuleAction,
   SubstituteStepFormPipettesAction,
+  ChangeBatchEditFieldAction,
+  ResetBatchEditFieldChangesAction,
+  SaveStepFormsMultiAction,
 } from '../actions'
 
 type FormState = FormData | null
@@ -1043,6 +1043,8 @@ export const savedStepForms = (
       return savedStepForms
   }
 }
+
+export type BatchEditFormChangesState = FormPatch
 
 type BatchEditFormActions =
   | ChangeBatchEditFieldAction
