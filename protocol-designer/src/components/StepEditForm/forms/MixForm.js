@@ -26,7 +26,7 @@ import styles from '../StepEditForm.css'
 export const MixForm = (props: StepFormProps): React.Node => {
   const [collapsed, setCollapsed] = React.useState(true)
 
-  const { propsForFields } = props
+  const { propsForFields, formData } = props
 
   const toggleCollapsed = (): void =>
     setCollapsed(prevCollapsed => !prevCollapsed)
@@ -98,7 +98,10 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 flowRateType="aspirate"
                 formData={props.formData}
               />
-              <TipPositionField fieldName="mix_mmFromBottom" />
+              <TipPositionField
+                {...propsForFields['mix_mmFromBottom']}
+                formData={formData}
+              />
               <WellOrderField
                 prefix="mix"
                 label={i18n.t('form.step_edit_form.field.well_order.label')}
@@ -108,6 +111,7 @@ export const MixForm = (props: StepFormProps): React.Node => {
               checkboxFieldName={'aspirate_delay_checkbox'}
               secondsFieldName={'aspirate_delay_seconds'}
               propsForFields={propsForFields}
+              formData={formData}
             />
           </div>
 
@@ -125,6 +129,7 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 checkboxFieldName={'dispense_delay_checkbox'}
                 secondsFieldName={'dispense_delay_seconds'}
                 propsForFields={propsForFields}
+                formData={formData}
               />
               <CheckboxRowField
                 {...propsForFields['mix_touchTip_checkbox']}
@@ -134,7 +139,10 @@ export const MixForm = (props: StepFormProps): React.Node => {
                   'tooltip.step_fields.defaults.mix_touchTip_checkbox'
                 )}
               >
-                <TipPositionField fieldName={'mix_touchTip_mmFromBottom'} />
+                <TipPositionField
+                  {...propsForFields['mix_touchTip_mmFromBottom']}
+                  formData={formData}
+                />
               </CheckboxRowField>
 
               <CheckboxRowField
