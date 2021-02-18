@@ -18,6 +18,7 @@ from opentrons.config.types import RobotConfig
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
+from opentrons.drivers.rpi_drivers import types as usb_types, usb_simulator
 
 from . import modules
 from .execution_manager import ExecutionManager
@@ -148,6 +149,7 @@ class Simulator:
         self._run_flag.set()
         self._log = MODULE_LOG.getChild(repr(self))
         self._strict_attached = bool(strict_attached_instruments)
+        self._usb = usb_simulator.USBBusSimulator()
 
     @property
     def gpio_chardev(self) -> GPIODriverLike:
@@ -267,6 +269,7 @@ class Simulator:
     async def build_module(
             self,
             port: str,
+            usb_port: usb_types.USBPort,
             model: str,
             interrupt_callback: modules.InterruptCallback,
             loop: asyncio.AbstractEventLoop,
@@ -275,6 +278,7 @@ class Simulator:
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
+            usb_port=usb_port,
             which=model,
             simulating=True,
             interrupt_callback=interrupt_callback,
