@@ -8,7 +8,7 @@ import { act } from 'react-dom/test-utils'
 import { when, resetAllWhenMocks } from 'jest-when'
 import * as stepFormSelectors from '../../../step-forms/selectors'
 import { actions as stepActions } from '../../../ui/steps'
-import { getMultiSelectItemIds } from '../../../ui/steps/selectors'
+import { getCountPerStepType } from '../../../ui/steps/selectors'
 import { ConfirmDeleteModal } from '../../modals/ConfirmDeleteModal'
 import { ExitBatchEditButton } from '../StepSelectionBannerComponent'
 import { StepSelectionBanner } from '..'
@@ -20,28 +20,20 @@ const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
 const getBatchEditFormHasUnsavedChangesMock =
   stepFormSelectors.getBatchEditFormHasUnsavedChanges
-const getSavedStepFormsMock = stepFormSelectors.getSavedStepForms
-const getMultiSelectItemIdsMock = getMultiSelectItemIds
+const getCountPerStepTypeMock: JestMockFn<any, any> = getCountPerStepType
 
 describe('StepSelectionBanner', () => {
   let store
   beforeEach(() => {
     store = mockStore()
-    when(getMultiSelectItemIdsMock)
-      .calledWith(expect.anything())
-      .mockReturnValue([])
-
-    when(getSavedStepFormsMock)
-      .calledWith(expect.anything())
-      .mockReturnValue({})
   })
   afterEach(() => {
     resetAllWhenMocks()
     jest.restoreAllMocks()
   })
 
-  const render = (store, props) =>
-    mount(<StepSelectionBanner {...props} />, {
+  const render = store =>
+    mount(<StepSelectionBanner />, {
       wrappingComponent: Provider,
       wrappingComponentProps: {
         store: store,
@@ -58,8 +50,12 @@ describe('StepSelectionBanner', () => {
         .spyOn(stepActions, 'deselectAllSteps')
         .mockImplementation(() => () => null)
 
-      const props = { countPerStepType: { magnet: 1 } }
-      const wrapper = render(store, props)
+      const countPerStepType = { magnet: 1 }
+      when(getCountPerStepTypeMock)
+        .calledWith(expect.anything())
+        .mockReturnValue(countPerStepType)
+
+      const wrapper = render(store)
       expect(deselectAllStepsSpy).not.toHaveBeenCalled()
       act(() => {
         wrapper.find(ExitBatchEditButton).prop('handleExitBatchEdit')()
@@ -76,8 +72,12 @@ describe('StepSelectionBanner', () => {
         .mockImplementation(() => () => null)
       expect(deselectAllStepsSpy).not.toHaveBeenCalled()
 
-      const props = { countPerStepType: { magnet: 1 } }
-      const wrapper = render(store, props)
+      const countPerStepType = { magnet: 1 }
+      when(getCountPerStepTypeMock)
+        .calledWith(expect.anything())
+        .mockReturnValue(countPerStepType)
+
+      const wrapper = render(store)
       expect(wrapper.find(ConfirmDeleteModal).length).toBe(0)
       expect(deselectAllStepsSpy).not.toHaveBeenCalled()
 

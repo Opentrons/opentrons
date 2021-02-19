@@ -4,13 +4,13 @@ import { i18n } from '../../localization'
 import { CheckboxRowField, TextField } from '../StepEditForm/fields'
 import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
 import type { MultiselectFieldValues } from '../../ui/steps/selectors'
-import type { CountPerStepType } from '../../form-types'
+import type { StepType } from '../../form-types'
 import type { FieldPropsByName } from '../StepEditForm/types'
 import styles from '../StepEditForm/StepEditForm.css'
 
 export type BatchEditFormProps = {|
-  countPerStepType: CountPerStepType,
-  fieldValues: MultiselectFieldValues,
+  stepTypes: Array<StepType>,
+  fieldValues: MultiselectFieldValues | null,
   handleChangeFormInput: (name: string, value: mixed) => void,
 |}
 
@@ -53,23 +53,13 @@ export const BatchEditMoveLiquid = (
 }
 
 export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
-  const { countPerStepType, fieldValues, handleChangeFormInput } = props
+  const { stepTypes, fieldValues, handleChangeFormInput } = props
 
-  // TODO IMMEDIATELY some unit-tested util for this line
-  const selectedStepTypes = Object.keys(countPerStepType).filter(
-    stepType => countPerStepType[stepType] > 0
-  )
-  if (selectedStepTypes.length !== 1) {
-    return (
-      <div>
-        Multiple step types not supported. Select only transfers etc (TODO real
-        message goes here)
-      </div>
-    )
-  }
-
-  const selectedSingleStepType = selectedStepTypes[0]
-  if (selectedSingleStepType === 'moveLiquid') {
+  if (
+    stepTypes.length === 1 &&
+    stepTypes.includes('moveLiquid') &&
+    fieldValues !== null
+  ) {
     // Valid state for using makeBatchEditFieldProps
     const propsForFields = makeBatchEditFieldProps(
       fieldValues,
@@ -88,7 +78,6 @@ export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
       />
     )
   }
-  return (
-    <div>{`${selectedSingleStepType} not supported (TODO real message goes here)`}</div>
-  )
+
+  return null
 }
