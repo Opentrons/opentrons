@@ -17,7 +17,6 @@ import typeof {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
 export type FormPipette = {| pipetteName: ?string, tiprackDefURI: ?string |}
 export type FormPipettesByMount = {|
   left: FormPipette,

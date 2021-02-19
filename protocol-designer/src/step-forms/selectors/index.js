@@ -4,6 +4,7 @@ import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
+import isEmpty from 'lodash/isEmpty'
 import { createSelector } from 'reselect'
 import {
   getPipetteNameSpecs,
@@ -70,6 +71,7 @@ import type {
   PresavedStepFormState,
   RootState,
   SavedStepFormState,
+  BatchEditFormChangesState,
 } from '../reducers'
 import type { InvariantContext } from '../../step-generation'
 
@@ -418,7 +420,15 @@ export const getCurrentFormHasUnsavedChanges: Selector<boolean> = createSelector
   }
 )
 
-export const getBatchEditFormHasUnsavedChanges = (): boolean => false
+export const getBatchEditFieldChanges: Selector<BatchEditFormChangesState> = createSelector(
+  rootSelector,
+  state => state.batchEditFormChanges
+)
+
+export const getBatchEditFormHasUnsavedChanges: Selector<boolean> = createSelector(
+  getBatchEditFieldChanges,
+  changes => !isEmpty(changes)
+)
 
 const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
   return state.moduleEntities[id]

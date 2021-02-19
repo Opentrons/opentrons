@@ -10,13 +10,15 @@ import type {
   DelayCheckboxFields,
   DelaySecondFields,
   TipOffsetFields,
+  FormData,
 } from '../../../form-types'
 
 export type DelayFieldProps = {|
   checkboxFieldName: DelayCheckboxFields,
+  formData: FormData,
+  propsForFields: FieldPropsByName,
   secondsFieldName: DelaySecondFields,
   tipPositionFieldName?: TipOffsetFields,
-  propsForFields: FieldPropsByName,
 |}
 
 export const DelayFields = (props: DelayFieldProps): React.Node => {
@@ -25,6 +27,7 @@ export const DelayFields = (props: DelayFieldProps): React.Node => {
     secondsFieldName,
     tipPositionFieldName,
     propsForFields,
+    formData,
   } = props
 
   return (
@@ -42,7 +45,10 @@ export const DelayFields = (props: DelayFieldProps): React.Node => {
         units={i18n.t('application.units.seconds')}
       />
       {tipPositionFieldName && (
-        <TipPositionField fieldName={tipPositionFieldName} />
+        <TipPositionField
+          {...propsForFields[tipPositionFieldName]}
+          formData={formData}
+        />
       )}
     </CheckboxRowField>
   )

@@ -85,6 +85,8 @@ describe('getDefaultsForStepType', () => {
         volume: undefined,
         times: null,
         wells: [],
+        aspirate_flowRate: null,
+        dispense_flowRate: null,
       })
     })
   })
