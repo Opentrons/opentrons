@@ -58,7 +58,7 @@ describe('StepSelectionBanner', () => {
         .spyOn(stepActions, 'deselectAllSteps')
         .mockImplementation(() => () => null)
 
-      const props = { countPerType: { magnet: 1 } }
+      const props = { countPerStepType: { magnet: 1 } }
       const wrapper = render(store, props)
       expect(deselectAllStepsSpy).not.toHaveBeenCalled()
       act(() => {
@@ -76,7 +76,7 @@ describe('StepSelectionBanner', () => {
         .mockImplementation(() => () => null)
       expect(deselectAllStepsSpy).not.toHaveBeenCalled()
 
-      const props = { countPerType: { magnet: 1 } }
+      const props = { countPerStepType: { magnet: 1 } }
       const wrapper = render(store, props)
       expect(wrapper.find(ConfirmDeleteModal).length).toBe(0)
       expect(deselectAllStepsSpy).not.toHaveBeenCalled()

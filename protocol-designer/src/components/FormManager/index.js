@@ -5,36 +5,27 @@ import { StepEditForm } from '../StepEditForm'
 import { BatchEditForm } from '../BatchEditForm'
 import { StepSelectionBanner } from '../StepSelectionBanner'
 import {
-  getMultiSelectItemIds,
+  getCountPerStepType,
   getMultiSelectFieldValues,
 } from '../../ui/steps/selectors'
-import { selectors as stepFormSelectors } from '../../step-forms'
 
 export const FormManager = (): React.Node => {
   const fieldValues = useSelector(getMultiSelectFieldValues)
-  const stepIds = useSelector(getMultiSelectItemIds)
-  const allSteps = useSelector(stepFormSelectors.getSavedStepForms)
+  const countPerStepType = useSelector(getCountPerStepType)
 
   // TODO(IL, 2021-02-17): dispatch changeBatchEditField here in #7222
   const handleChangeFormInput = (name, value) => {
     console.log(`TODO: update ${name}: ${String(value)}`)
   }
 
-  if (fieldValues !== null && stepIds !== null) {
+  if (fieldValues !== null) {
     // batch edit mode
-    const steps = stepIds.map(id => allSteps[id])
-    const countPerType = steps.reduce((acc, step) => {
-      const { stepType } = step
-      const newCount = acc[stepType] ? acc[stepType] + 1 : 1
-      acc[stepType] = newCount
-      return acc
-    }, {})
 
     return (
       <>
-        <StepSelectionBanner countPerType={countPerType} />
+        <StepSelectionBanner countPerStepType={countPerStepType} />
         <BatchEditForm
-          countPerType={countPerType}
+          countPerStepType={countPerStepType}
           fieldValues={fieldValues}
           handleChangeFormInput={handleChangeFormInput}
         />

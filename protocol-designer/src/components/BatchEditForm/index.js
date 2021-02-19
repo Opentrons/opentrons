@@ -9,7 +9,7 @@ import type { FieldPropsByName } from '../StepEditForm/types'
 import styles from '../StepEditForm/StepEditForm.css'
 
 export type BatchEditFormProps = {|
-  countPerType: CountPerStepType,
+  countPerStepType: CountPerStepType,
   fieldValues: MultiselectFieldValues,
   handleChangeFormInput: (name: string, value: mixed) => void,
 |}
@@ -53,11 +53,11 @@ export const BatchEditMoveLiquid = (
 }
 
 export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
-  const { countPerType, fieldValues, handleChangeFormInput } = props
+  const { countPerStepType, fieldValues, handleChangeFormInput } = props
 
   // TODO IMMEDIATELY some unit-tested util for this line
-  const selectedStepTypes = Object.keys(countPerType).filter(
-    stepType => countPerType[stepType] > 0
+  const selectedStepTypes = Object.keys(countPerStepType).filter(
+    stepType => countPerStepType[stepType] > 0
   )
   if (selectedStepTypes.length !== 1) {
     return (

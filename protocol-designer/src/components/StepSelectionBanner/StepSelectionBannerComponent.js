@@ -26,7 +26,6 @@ import {
   POSITION_STICKY,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-import { stepIconsByType } from '../../form-types'
 import type { CountPerStepType, StepType } from '../../form-types'
 
 type StepPillProps = {| stepType: StepType, count: number |}
@@ -77,21 +76,20 @@ export const ExitBatchEditButton = (props: {
 )
 
 export type StepSelectionBannerProps = {|
-  countPerType: CountPerStepType,
+  countPerStepType: CountPerStepType,
   handleExitBatchEdit: () => mixed,
 |}
 
 export const StepSelectionBannerComponent = (
   props: StepSelectionBannerProps
 ): React.Node => {
-  const { countPerType, handleExitBatchEdit } = props
-  const numSteps = Object.keys(countPerType).reduce<number>(
-    (acc, stepType) => acc + countPerType[stepType],
+  const { countPerStepType, handleExitBatchEdit } = props
+  const numSteps = Object.keys(countPerStepType).reduce<number>(
+    (acc, stepType) => acc + countPerStepType[stepType],
     0
   )
 
-  // $FlowFixMe(IL, 2020-02-03): Flow can't figure out that the keys are StepType rather than string
-  const stepTypes: Array<StepType> = Object.keys(countPerType).sort()
+  const stepTypes: Array<StepType> = Object.keys(countPerStepType).sort()
 
   return (
     <Box
@@ -124,7 +122,7 @@ export const StepSelectionBannerComponent = (
           >
             {stepTypes.map(stepType => (
               <StepPill
-                count={countPerType[stepType]}
+                count={countPerStepType[stepType]}
                 stepType={stepType}
                 key={stepType}
               />

@@ -18,6 +18,8 @@ import {
   getMultiSelectLastSelected,
   getMultiSelectFieldValues,
   getMultiSelectDisabledFields,
+  getCountPerStepType,
+  getBatchEditSelectedStepTypes,
 } from '../selectors'
 import { getMockMoveLiquidStep } from '../__fixtures__'
 
@@ -956,5 +958,48 @@ describe('getMultiSelectDisabledFields', () => {
         })
       )
     })
+  })
+})
+
+describe('getCountPerStepType', () => {
+  it('should return an object representing counts of all selected step types', () => {
+    const multiSelectItemIds = ['a', 'b', 'd']
+    const savedStepForms = {
+      a: { stepType: 'magnet' },
+      b: { stepType: 'magnet' },
+      c: { stepType: 'mix' }, // not selected! 'mix' should not show in result
+      d: { stepType: 'moveLiquid' },
+    }
+    const result = getCountPerStepType.resultFunc(
+      multiSelectItemIds,
+      savedStepForms
+    )
+    expect(result).toEqual({ magnet: 2, moveLiquid: 1 })
+  })
+
+  it('should return an empty object when not in multi-select mode', () => {
+    const result = getCountPerStepType.resultFunc(null, {})
+    expect(result).toEqual({})
+  })
+
+  it('should return an empty object when no steps are multi-selected', () => {
+    const result = getCountPerStepType.resultFunc([], {})
+    expect(result).toEqual({})
+  })
+})
+
+describe('getBatchEditSelectedStepTypes', () => {
+  it('should return a sorted array of selected step types that are in the multi-selection', () => {
+    const result = getBatchEditSelectedStepTypes.resultFunc({
+      magnet: 1,
+      mix: 3,
+      moveLiquid: 0,
+    })
+    expect(result).toEqual(['magnet', 'mix'])
+  })
+
+  it('should return an empty array when no steps are multi-selected', () => {
+    const result = getBatchEditSelectedStepTypes.resultFunc({})
+    expect(result).toEqual([])
   })
 })

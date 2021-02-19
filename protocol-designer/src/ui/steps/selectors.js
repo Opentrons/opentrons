@@ -1,6 +1,7 @@
 // @flow
 import { createSelector } from 'reselect'
 import last from 'lodash/last'
+import uniq from 'lodash/uniq'
 
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
@@ -29,6 +30,7 @@ import {
   getPipetteDifferentAndMultiDispensePathFields,
 } from './utils'
 import type {
+  CountPerStepType,
   FormData,
   MultiSelectFieldName,
   StepIdType,
@@ -388,3 +390,32 @@ export const getMultiSelectDisabledFields: Selector<DisabledFields | null> = cre
     return disabledFields
   }
 )
+
+export const getCountPerStepType: Selector<CountPerStepType> = createSelector(
+  getMultiSelectItemIds,
+  stepFormSelectors.getSavedStepForms,
+  (stepIds, allSteps) => {
+    if (stepIds === null) return {}
+
+    const steps = stepIds.map(id => allSteps[id])
+
+    const countPerStepType = steps.reduce<CountPerStepType>((acc, step) => {
+      const { stepType } = step
+      const newCount = acc[stepType] ? acc[stepType] + 1 : 1
+      acc[stepType] = newCount
+      return acc
+    }, {})
+
+    return countPerStepType
+  }
+)
+
+export const getBatchEditSelectedStepTypes: Selector<
+  Array<StepType>
+> = createSelector(getCountPerStepType, countPerStepType => {
+  return uniq(
+    Object.keys(countPerStepType).filter(
+      stepType => countPerStepType[stepType] > 0
+    )
+  ).sort()
+})

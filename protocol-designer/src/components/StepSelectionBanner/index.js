@@ -18,9 +18,9 @@ const MemoizedStepSelectionBannerComponent = React.memo(
 )
 
 export const StepSelectionBanner = (props: {|
-  countPerType: $PropertyType<StepSelectionBannerProps, 'countPerType'>,
+  countPerStepType: $PropertyType<StepSelectionBannerProps, 'countPerStepType'>,
 |}): React.Node => {
-  const { countPerType } = props
+  const { countPerStepType } = props
   const dispatch = useDispatch()
 
   const batchEditFormHasUnsavedChanges = useSelector(
@@ -42,7 +42,7 @@ export const StepSelectionBanner = (props: {|
         />
       )}
       <MemoizedStepSelectionBannerComponent
-        countPerType={countPerType}
+        countPerStepType={countPerStepType}
         handleExitBatchEdit={confirm}
       />
     </>
