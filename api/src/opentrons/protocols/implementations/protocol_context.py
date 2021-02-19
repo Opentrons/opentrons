@@ -25,7 +25,6 @@ from opentrons.protocols.labware import load_from_definition, \
     get_labware_definition
 from opentrons.protocols.types import Protocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.drivers.rpi_drivers.types import USBPort
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -201,12 +200,10 @@ class ProtocolContextImplementation(ProtocolContextInterface):
                 module_geometry.ModuleType.TEMPERATURE: TempDeck,
                 module_geometry.ModuleType.THERMOCYCLER: Thermocycler
                 }[resolved_type]
-            usb_port = USBPort(name='', sub_names=[], hub=None,
-                               port_number=None, device_path='')
             hc_mod_instance = SynchronousAdapter(
                 mod_type(
                     port='',
-                    usb_port=usb_port,
+                    usb_port=self._hw_manager.hardware._backend._usb.find_port(''),
                     simulating=True,
                     loop=self._hw_manager.hardware.loop,
                     execution_manager=ExecutionManager(
