@@ -28,7 +28,8 @@ async def get_modules(hardware: ThreadManager = Depends(get_hardware))\
             model=mod.device_info.get('model'),  # TODO legacy, remove
             moduleModel=mod.model(),
             port=mod.port,  # /dev/ttyS0
-            usbPort=PhysicalPort(hub=mod.usb_port.hub, port=mod.usb_port.port_number),
+            usbPort=PhysicalPort(
+                hub=mod.usb_port.hub, port=mod.usb_port.port_number),
             serial=mod.device_info.get('serial'),
             revision=mod.device_info.get('model'),
             fwVersion=mod.device_info.get('version'),
