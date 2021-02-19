@@ -93,6 +93,7 @@ import type {
   ReorderSelectedStepAction,
   SelectStepAction,
   SelectTerminalItemAction,
+  SelectMultipleStepsAction,
 } from '../../ui/steps/actions/types'
 import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
 import type {
@@ -136,6 +137,7 @@ type UnsavedFormActions =
   | DeleteProfileCycleAction
   | EditProfileCycleAction
   | EditProfileStepAction
+  | SelectMultipleStepsAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -195,6 +197,7 @@ export const unsavedForm = (
     case 'DELETE_MODULE':
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
+    case 'SELECT_MULTIPLE_STEPS':
     case 'EDIT_MODULE':
     case 'SAVE_STEP_FORM':
     case 'SELECT_TERMINAL_ITEM':
