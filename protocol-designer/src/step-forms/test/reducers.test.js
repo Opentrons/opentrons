@@ -1381,6 +1381,7 @@ describe('unsavedForm reducer', () => {
     'EDIT_MODULE',
     'SAVE_STEP_FORM',
     'SELECT_TERMINAL_ITEM',
+    'SELECT_MULTIPLE_STEPS',
   ]
   actionTypes.forEach(actionType => {
     it(`should clear the unsaved form when any ${actionType} action is dispatched`, () => {
