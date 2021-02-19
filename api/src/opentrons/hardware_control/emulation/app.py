@@ -5,18 +5,20 @@ import logging
 from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
 from opentrons.hardware_control.emulation.tempdeck import TempDeckEmulator
 from opentrons.hardware_control.emulation.thermocycler import ThermocyclerEmulator
+from opentrons.hardware_control.emulation.smoothie import SmoothieEmulator
 
 from .command_processor import CommandProcessor
 
 logger = logging.getLogger(__name__)
 
 
+SMOOTHIE_PORT = 9996
 THERMOCYCLER_PORT = 9997
 TEMPDECK_PORT = 9998
 MAGDECK_PORT = 9999
 
 
-LINE_REGEX = re.compile(r"([MGdfu]+[0-9\.]*) (.+)")
+LINE_REGEX = re.compile(r"(\S+)(.+)")
 """Split the line into command and payload"""
 
 
@@ -76,6 +78,9 @@ async def run() -> None:
                    port=THERMOCYCLER_PORT,
                    handler=ConnectionHandler(ThermocyclerEmulator(),
                                              terminator=b'\r\n')),
+        run_server(host=host,
+                   port=SMOOTHIE_PORT,
+                   handler=ConnectionHandler(SmoothieEmulator())),
     )
 
 
