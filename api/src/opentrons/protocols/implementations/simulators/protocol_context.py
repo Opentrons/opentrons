@@ -1,7 +1,7 @@
 from opentrons import types
 from opentrons.protocols.implementations.interfaces.instrument_context import \
     InstrumentContextInterface
-from opentrons.protocols.implementations.protocol_context import \
+from opentrons.protocols.implementations.protocol_api.protocol_context import \
     ProtocolContextImplementation
 from opentrons.protocols.implementations.simulators.instrument_context import \
     InstrumentContextSimulation

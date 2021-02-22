@@ -6,7 +6,8 @@ from opentrons.protocol_api import (
     labware, MAX_SUPPORTED_VERSION)
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.implementations.labware import LabwareImplementation
+from opentrons.protocols.implementations.protocol_api.labware import\
+    LabwareImplementation
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.protocols.labware.definition import _get_parent_identifier
 
