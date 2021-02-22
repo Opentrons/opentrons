@@ -361,3 +361,5 @@ export function getIsDelayPositionField(fieldName: string): boolean {
   ]
   return delayPositionFields.includes(fieldName)
 }
+
+export type CountPerStepType = { [StepType]: number }

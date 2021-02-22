@@ -4,15 +4,14 @@ import { connect } from 'react-redux'
 import { Splash } from '@opentrons/components'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../steplist'
 import { Portal as MainPageModalPortal } from '../components/portals/MainPageModalPortal'
-import { DeckSetup } from '../components/DeckSetup'
+import { DeckSetupManager } from '../components/DeckSetupManager'
 import { ConnectedFilePage } from '../containers/ConnectedFilePage'
 import { SettingsPage } from '../components/SettingsPage'
 import { LiquidsPage } from '../components/LiquidsPage'
 import { Hints } from '../components/Hints'
 import { LiquidPlacementModal } from '../components/LiquidPlacementModal.js'
 import { LabwareSelectionModal } from '../components/LabwareSelectionModal'
-import { StepEditForm } from '../components/StepEditForm'
-import { StepSelectionBanner } from '../components/StepSelectionBanner'
+import { FormManager } from '../components/FormManager'
 import { TimelineAlerts } from '../components/alerts/TimelineAlerts'
 
 import { getSelectedTerminalItemId } from '../ui/steps'
@@ -46,13 +45,12 @@ function MainPanelComponent(props: Props) {
             <TimelineAlerts />
             <Hints />
             {startTerminalItemSelected && <LabwareSelectionModal />}
-            <StepSelectionBanner />
-            <StepEditForm />
+            <FormManager />
             {startTerminalItemSelected && ingredSelectionMode && (
               <LiquidPlacementModal />
             )}
           </MainPageModalPortal>
-          <DeckSetup />
+          <DeckSetupManager />
         </>
       )
     }

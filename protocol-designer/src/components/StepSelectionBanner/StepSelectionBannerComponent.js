@@ -26,13 +26,7 @@ import {
   POSITION_STICKY,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-
-import type { FormData, StepType } from '../../form-types'
-
-type Props = {|
-  selectedSteps: Array<FormData>,
-  handleExitBatchEdit: () => mixed,
-|}
+import type { CountPerStepType, StepType } from '../../form-types'
 
 type StepPillProps = {| stepType: StepType, count: number |}
 
@@ -65,7 +59,10 @@ const StepPill = (props: StepPillProps): React.Node => {
 }
 
 export const ExitBatchEditButton = (props: {
-  handleExitBatchEdit: $PropertyType<Props, 'handleExitBatchEdit'>,
+  handleExitBatchEdit: $PropertyType<
+    StepSelectionBannerProps,
+    'handleExitBatchEdit'
+  >,
 }): React.Node => (
   <Box flex="0 1 auto">
     <SecondaryBtn
@@ -78,17 +75,21 @@ export const ExitBatchEditButton = (props: {
   </Box>
 )
 
-export const StepSelectionBannerComponent = (props: Props): React.Node => {
-  const { selectedSteps, handleExitBatchEdit } = props
-  const numSteps = selectedSteps.length
-  const countPerType = selectedSteps.reduce((acc, step) => {
-    const { stepType } = step
-    const newCount = acc[stepType] ? acc[stepType] + 1 : 1
-    acc[stepType] = newCount
-    return acc
-  }, {})
-  // $FlowFixMe(IL, 2020-02-03): Flow can't figure out that the keys are StepType rather than string
-  const stepTypes: Array<StepType> = Object.keys(countPerType).sort()
+export type StepSelectionBannerProps = {|
+  countPerStepType: CountPerStepType,
+  handleExitBatchEdit: () => mixed,
+|}
+
+export const StepSelectionBannerComponent = (
+  props: StepSelectionBannerProps
+): React.Node => {
+  const { countPerStepType, handleExitBatchEdit } = props
+  const numSteps = Object.keys(countPerStepType).reduce<number>(
+    (acc, stepType) => acc + countPerStepType[stepType],
+    0
+  )
+
+  const stepTypes: Array<StepType> = Object.keys(countPerStepType).sort()
 
   return (
     <Box
@@ -121,7 +122,7 @@ export const StepSelectionBannerComponent = (props: Props): React.Node => {
           >
             {stepTypes.map(stepType => (
               <StepPill
-                count={countPerType[stepType]}
+                count={countPerStepType[stepType]}
                 stepType={stepType}
                 key={stepType}
               />
