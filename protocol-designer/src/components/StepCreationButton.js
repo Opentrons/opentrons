@@ -46,7 +46,9 @@ const getSupportedSteps = () => [
   'thermocycler',
 ]
 
-const StepCreationButtonComponent = (props: StepButtonComponentProps) => {
+export const StepCreationButtonComponent = (
+  props: StepButtonComponentProps
+): React.Node => {
   const { children, expanded, setExpanded, disabled } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -72,13 +74,13 @@ const StepCreationButtonComponent = (props: StepButtonComponentProps) => {
   )
 }
 
-type StepButtonItemProps = {|
+export type StepButtonItemProps = {|
   onClick: () => mixed,
   disabled: boolean,
   stepType: StepType,
 |}
 
-function StepButtonItem(props: StepButtonItemProps) {
+export function StepButtonItem(props: StepButtonItemProps): React.Node {
   const { onClick, disabled, stepType } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_RIGHT,
