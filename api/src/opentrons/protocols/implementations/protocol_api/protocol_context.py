@@ -11,7 +11,7 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.implementations.instrument_context import \
+from opentrons.protocols.implementations.protocol_api.instrument_context import \
     InstrumentContextImplementation
 from opentrons.protocols.implementations.interfaces.instrument_context import \
     InstrumentContextInterface
