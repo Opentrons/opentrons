@@ -1,24 +1,11 @@
-// @flow
 // mdns browser wrapper
 import net from 'net'
 import { createBrowser, tcp, ServiceType } from 'mdns-js'
-import keys from 'lodash/keys'
-import flatMap from 'lodash/flatMap'
 
-import type {
-  Browser as BaseBrowser,
-  BrowserService,
-  NetworkConnection,
-} from 'mdns-js'
-
+import type { Browser as BaseBrowser, BrowserService } from 'mdns-js'
 import type { MdnsBrowser, MdnsBrowserOptions, LogLevel } from './types'
 
 monkeyPatchThrowers()
-
-// TODO(mc, 2020-07-14): remove the function in favor of createMdnsBrowser
-export function createMdnsBrowserLegacy(): BaseBrowser {
-  return createBrowser(tcp('http'))
-}
 
 /**
  * Create a mDNS browser wrapper can be started and stopped and calls
@@ -26,13 +13,17 @@ export function createMdnsBrowserLegacy(): BaseBrowser {
  */
 export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
   const { onService, ports, logger } = options
-  const log = (level: LogLevel, msg: string, meta: {} = {}) => {
+  const log = (
+    level: LogLevel,
+    msg: string,
+    meta: Record<string, unknown> = {}
+  ): void => {
     typeof logger?.[level] === 'function' && logger[level](msg, meta)
   }
 
   let browser: BaseBrowser | null = null
 
-  const start = () => {
+  const start = (): void => {
     stop()
 
     log('debug', 'Creating _http._tcp mDNS browser', { ports })
@@ -64,7 +55,8 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
     browser = baseBrowser
   }
 
-  const stop = () => {
+  function stop(): void {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (browser) {
       log('debug', 'Stopping mDNS browser')
       browser.stop()
@@ -78,30 +70,13 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
   return { start, stop }
 }
 
-// TODO(mc, 2020-07-14): remove the function because it's part of the mDNS
-// "rediscovery" logic that doesn't work well
-// https://github.com/Opentrons/opentrons/issues/5985
-export function getKnownIps(maybeBrowser: ?BaseBrowser): Array<string> {
-  if (!maybeBrowser) return []
-  const browser: BaseBrowser = maybeBrowser
-
-  return flatMap<NetworkConnection, string>(
-    browser.networking.connections,
-    (connection: NetworkConnection, i: number, _: Array<NetworkConnection>) => {
-      const { addresses } =
-        browser.connections[connection.networkInterface] || {}
-      return keys(addresses)
-    }
-  )
-}
-
 /**
  * The `ServiceType` class in mdns-js can throw in an uncatchable way when
  * it receives certain types of advertisements that happen in real life. This
  * function monkeypatches the ServiceType prototype to catch the throws
  * https://github.com/mdns-js/node-mdns-js/issues/82
  */
-function monkeyPatchThrowers() {
+function monkeyPatchThrowers(): void {
   // this method can throw (without emitting), so we need to patch this up
   const originalServiceTypeFromString = ServiceType.prototype.fromString
 

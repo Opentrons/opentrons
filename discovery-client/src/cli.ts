@@ -1,10 +1,8 @@
-// @flow
 import Yargs from 'yargs'
 import noop from 'lodash/noop'
 import { createDiscoveryClient, DEFAULT_PORT } from '.'
-import { version } from '../package.json'
 
-import type { Argv as YargsArgv } from 'yargs'
+import type { MiddlewareFunction } from 'yargs'
 
 import type {
   DiscoveryClient,
@@ -14,27 +12,31 @@ import type {
   Logger,
 } from './types'
 
-const LOG_LVLS = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly']
+const LOG_LVLS: LogLevel[] = [
+  'error',
+  'warn',
+  'info',
+  'http',
+  'verbose',
+  'debug',
+  'silly',
+]
 
-type Argv = {
-  ...YargsArgv,
-  pollInterval: number,
-  nameFilter: Array<string>,
-  ipFilter: Array<string>,
-  candidates: Array<string>,
-  logLevel: LogLevel | 'off',
-  ...
+interface Argv {
+  pollInterval: number
+  nameFilter: string[]
+  ipFilter: string[]
+  candidates: string[]
+  logLevel: LogLevel | string
 }
 
-type FindArgv = {
-  ...Argv,
-  name?: string,
-  timeout: number,
-  ...
+interface FindArgv extends Argv {
+  name?: string
+  timeout: number
 }
 
 const createLogger = (argv: Argv): Logger => {
-  const level = LOG_LVLS.indexOf(argv.logLevel)
+  const level = (LOG_LVLS as string[]).indexOf(argv.logLevel)
 
   return {
     error: level >= 0 ? console.error : noop,
@@ -47,9 +49,11 @@ const createLogger = (argv: Argv): Logger => {
   }
 }
 
-const debugLogArgvMiddleware = (argv: Argv) => {
+const debugLogArgvMiddleware: MiddlewareFunction<Argv> = (argv): void => {
   const log = createLogger(argv)
   log.debug(`Calling ${argv.$0} with argv:`, argv)
+
+  // @ts-expect-error(mc, 2021-02-16): this return is probably unnecessary, remove
   return argv
 }
 
@@ -72,7 +76,7 @@ const passesFilters = (argv: Argv) => (robot: DiscoveryClientRobot) => {
 
 const createClient = (
   argv: Argv,
-  onListChange: (robots: $ReadOnlyArray<DiscoveryClientRobot>) => mixed
+  onListChange: (robots: DiscoveryClientRobot[]) => unknown
 ): DiscoveryClient => {
   const logger = createLogger(argv)
   const { pollInterval, candidates } = argv
@@ -91,7 +95,7 @@ const createClient = (
   return client
 }
 
-const browse = (argv: Argv) => {
+const browse = (argv: Argv): void => {
   const log = createLogger(argv)
 
   createClient(argv, robots => {
@@ -101,11 +105,12 @@ const browse = (argv: Argv) => {
   log.warn('Browsing for services')
 }
 
-const find = (argv: FindArgv) => {
+const find = (argv: FindArgv): void => {
   const { name, timeout, ipFilter } = argv
   const log = createLogger(argv)
   const client = createClient(argv, robots => {
     robots
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       .filter(robot => !name || robot.name === name)
       .flatMap<DiscoveryClientRobotAddress>(robot => robot.addresses)
       .filter(
@@ -120,6 +125,7 @@ const find = (argv: FindArgv) => {
   })
 
   log.warn(
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     `Finding ${argv.name ? `robot "${argv.name}"` : 'first available robot'}`
   )
 
@@ -182,6 +188,6 @@ Yargs.options({
     },
     find
   )
-  .version(version)
+  .version(_PKG_VERSION_)
   .help()
   .parse()

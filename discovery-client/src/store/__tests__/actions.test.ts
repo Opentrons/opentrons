@@ -1,5 +1,3 @@
-// @flow
-
 import * as Actions from '../actions'
 
 describe('discovery client action creators', () => {

@@ -1,19 +1,16 @@
-// @flow
 import nodeFetch from 'node-fetch'
 import { isError } from 'lodash'
 
 import * as Fixtures from '../__fixtures__'
 import { createHealthPoller } from '../health-poller'
 
-import type { Request, RequestInit, Response } from 'node-fetch'
+import type { RequestInit, Response } from 'node-fetch'
+import type { HealthPoller } from '../types'
 
 // TODO(mc, 2020-07-13): remove __mocks__/node-fetch
 jest.mock('node-fetch', () => ({ __esModule: true, default: jest.fn() }))
 
-const fetch: JestMockFn<
-  [string | Request, ?RequestInit],
-  $Call<typeof nodeFetch, any, any>
-> = nodeFetch
+const fetch = nodeFetch as jest.MockedFunction<typeof nodeFetch>
 
 const EXPECTED_FETCH_OPTS = {
   timeout: 10000,
@@ -23,22 +20,22 @@ const EXPECTED_FETCH_OPTS = {
 const stubFetchOnce = (
   stubUrl: string,
   stubOptions: RequestInit = EXPECTED_FETCH_OPTS
-) => (response: $Shape<Response> | Error) => {
+) => (response: Partial<Response> | Error) => {
   fetch.mockImplementationOnce((url, options) => {
     expect(url).toBe(stubUrl)
     expect(options).toEqual(stubOptions)
 
     return isError(response)
       ? Promise.reject(response)
-      : Promise.resolve(((response: any): Response))
+      : Promise.resolve(response as Response)
   })
 }
 
 const makeMockJsonResponse = (
-  body: any,
+  body: unknown,
   ok = true,
   status = 200
-): $Shape<Response> => {
+): Partial<Response> => {
   return { ok, status, text: () => Promise.resolve(JSON.stringify(body)) }
 }
 
@@ -46,21 +43,21 @@ const HOST_1 = { ip: '127.0.0.1', port: 31950 }
 const HOST_2 = { ip: '127.0.0.2', port: 31950 }
 const HOST_3 = { ip: '127.0.0.3', port: 31950 }
 
-const flush = () => new Promise(resolve => setImmediate(resolve))
+const ISE_RESPONSE: Response = {
+  ok: false,
+  status: 500,
+  text: () => Promise.resolve('AH'),
+} as any
+
+const flush = (): Promise<void> => new Promise(resolve => setImmediate(resolve))
 
 describe('health poller', () => {
   const onPollResult = jest.fn()
-  let poller
+  let poller: HealthPoller
 
   beforeEach(() => {
     jest.useFakeTimers()
-    fetch.mockResolvedValue(
-      ({
-        ok: false,
-        status: 500,
-        text: () => Promise.resolve('AH'),
-      }: any)
-    )
+    fetch.mockResolvedValue(ISE_RESPONSE)
 
     poller = createHealthPoller({ onPollResult })
   })
@@ -369,7 +366,7 @@ describe('health poller', () => {
   // })
 
   it('should ignore responses after stop()', () => {
-    const mockErrorImpl = () => {
+    const mockErrorImpl = (): Promise<Response> => {
       return new Promise((resolve, reject) => {
         setTimeout(() => reject(new Error('Oh no eventual error!')), 25)
       })

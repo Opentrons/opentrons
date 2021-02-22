@@ -67,7 +67,6 @@ setup-py:
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
 
 # front-end dependecies handled by yarn
-# TODO(mc, 2021-02-12): add `$(MAKE) build-ts` after `yarn` when we have TS
 .PHONY: setup-js
 setup-js:
 	yarn config set network-timeout 60000
@@ -206,7 +205,7 @@ lint-css:
 	stylelint "**/*.css" "**/*.js"
 
 .PHONY: check-js
-check-js:
+check-js: build-ts
 	yarn flow $(if $(CI),check,status)
 
 .PHONY: build-ts

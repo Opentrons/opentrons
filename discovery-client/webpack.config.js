@@ -2,12 +2,19 @@
 
 const path = require('path')
 const webpackMerge = require('webpack-merge')
+const { DefinePlugin } = require('webpack')
 const { nodeBaseConfig } = require('@opentrons/webpack-config')
+const pkg = require('./package.json')
 
-const ENTRY_CLI = path.join(__dirname, 'src/cli.js')
+const ENTRY_INDEX = path.join(__dirname, 'src/index.ts')
+const ENTRY_CLI = path.join(__dirname, 'src/cli.ts')
 const OUTPUT_PATH = path.join(__dirname, 'lib')
 
 module.exports = webpackMerge(nodeBaseConfig, {
-  entry: { cli: ENTRY_CLI },
+  entry: {
+    index: ENTRY_INDEX,
+    cli: ENTRY_CLI,
+  },
   output: { path: OUTPUT_PATH },
+  plugins: [new DefinePlugin({ _PKG_VERSION_: JSON.stringify(pkg.version) })],
 })

@@ -1,4 +1,3 @@
-// @flow
 // discovery client reducer
 import {
   mockHealthResponse,
@@ -11,9 +10,11 @@ import * as Constants from '../../constants'
 import * as Actions from '../actions'
 import { reducer, hostsByIpReducer } from '../reducer'
 
+import type { Action } from '../types'
+
 describe('hostsByIp reducer', () => {
   it('should return an empty initial state under hostsByIp in the root reducer', () => {
-    const state = reducer(undefined, ({}: any))
+    const state = reducer(undefined, {} as Action)
     expect(state.hostsByIp).toEqual({})
   })
 
