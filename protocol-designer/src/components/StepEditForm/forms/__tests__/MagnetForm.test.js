@@ -43,7 +43,7 @@ describe('MagnetForm', () => {
         id: 'formId',
         stepType: 'magnet',
         moduleId: 'magnetV1',
-        engageHeight: 'engage',
+        magnetAction: 'engage',
       }: any),
       focusHandlers: {
         blur: jest.fn(),

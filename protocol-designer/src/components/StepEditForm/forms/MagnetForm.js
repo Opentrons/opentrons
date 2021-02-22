@@ -19,7 +19,7 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
   )
 
   const moduleEntities = useSelector(stepFormSelectors.getModuleEntities)
-  const { moduleId, engageHeight } = props.formData
+  const { magnetAction, moduleId } = props.formData
   const moduleModel = moduleId ? moduleEntities[moduleId]?.model : null
 
   const moduleOption: ?string = moduleLabwareOptions[0]
@@ -78,7 +78,7 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
             ]}
           />
         </FormGroup>
-        {engageHeight === 'engage' && (
+        {magnetAction === 'engage' && (
           <FormGroup
             label={i18n.t('form.step_edit_form.field.engageHeight.label')}
             className={styles.magnet_form_group}
@@ -91,7 +91,7 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
           </FormGroup>
         )}
       </div>
-      {engageHeight === 'engage' && (
+      {magnetAction === 'engage' && (
         <div className={styles.diagram_row}>
           <div
             className={cx(
