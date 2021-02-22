@@ -345,7 +345,7 @@ export type DelaySecondFields =
   | 'aspirate_delay_seconds'
   | 'dispense_delay_seconds'
 
-export function getIsTouchTipField(fieldName: string): boolean {
+export function getIsTouchTipField(fieldName: StepFieldName): boolean {
   const touchTipFields = [
     'aspirate_touchTip_mmFromBottom',
     'dispense_touchTip_mmFromBottom',
@@ -361,3 +361,5 @@ export function getIsDelayPositionField(fieldName: string): boolean {
   ]
   return delayPositionFields.includes(fieldName)
 }
+
+export type CountPerStepType = { [StepType]: number }

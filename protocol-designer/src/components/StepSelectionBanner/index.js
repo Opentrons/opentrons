@@ -3,7 +3,8 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { actions as stepActions, getMultiSelectItemIds } from '../../ui/steps'
+import { actions as stepActions } from '../../ui/steps'
+import { getCountPerStepType } from '../../ui/steps/selectors'
 import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   ConfirmDeleteModal,
@@ -14,22 +15,17 @@ const MemoizedStepSelectionBannerComponent = React.memo(
   StepSelectionBannerComponent
 )
 
-export const StepSelectionBanner: React.AbstractComponent<{||}> = () => {
-  const dispatch = useDispatch()
-  const stepIds = useSelector(getMultiSelectItemIds)
-  const allSteps = useSelector(stepFormSelectors.getSavedStepForms)
-
+export const StepSelectionBanner = (): React.Node => {
+  const countPerStepType = useSelector(getCountPerStepType)
   const batchEditFormHasUnsavedChanges = useSelector(
     stepFormSelectors.getBatchEditFormHasUnsavedChanges
   )
+  const dispatch = useDispatch()
 
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     () => dispatch(stepActions.deselectAllSteps()),
     batchEditFormHasUnsavedChanges
   )
-
-  if (!stepIds) return null
-  const steps = stepIds.map(id => allSteps[id])
 
   return (
     <>
@@ -41,7 +37,7 @@ export const StepSelectionBanner: React.AbstractComponent<{||}> = () => {
         />
       )}
       <MemoizedStepSelectionBannerComponent
-        selectedSteps={steps}
+        countPerStepType={countPerStepType}
         handleExitBatchEdit={confirm}
       />
     </>

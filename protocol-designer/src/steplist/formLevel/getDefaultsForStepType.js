@@ -27,6 +27,8 @@ export function getDefaultsForStepType(
         pipette: null,
         volume: undefined,
         wells: [],
+        aspirate_flowRate: null,
+        dispense_flowRate: null,
         aspirate_delay_checkbox: false,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_delay_checkbox: false,
