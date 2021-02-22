@@ -19,7 +19,13 @@ MAGDECK_PORT = 9999
 
 
 LINE_REGEX = re.compile(r"(\S+)(.+)")
-"""Split the line into command and payload"""
+"""Split the line into command and payload.
+
+TODO AL 20210222 This regex is a very naive approach and should be revisited
+ if we are going to expand emulator support.
+We can use a regex like "[A-Z][0-9]+\\.*[0-9]*" to match gcodes (i think). And
+handle our custom directives like 'version' and 'dfu' separately.
+"""
 
 
 class ConnectionHandler:
