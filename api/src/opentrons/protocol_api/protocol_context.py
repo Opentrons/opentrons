@@ -227,8 +227,8 @@ class ProtocolContext(CommandPublisher):
         old_hw = hardware_manager.hardware
         old_tc = None
         tc_context = None
-        # Cache the current instrument contexts.
-        old_instrument_contexts = {
+        # Cache the current instrument context implementations.
+        old_instrument_impls = {
             k: v._implementation for k, v in self._instruments.items() if v
         }
         try:
@@ -248,7 +248,7 @@ class ProtocolContext(CommandPublisher):
             # simulation.
             # InstrumentContext objects using a InstrumentContextSimulation
             # must create InstrumentContextSimulation in order to actually
-            # use the hardware connnction.
+            # use the hardware connection.
             for instrument_ctx in self._instruments.values():
                 if not instrument_ctx:
                     continue
@@ -269,7 +269,7 @@ class ProtocolContext(CommandPublisher):
             if tc_context is not None and old_tc is not None:
                 tc_context._module = old_tc
             # reset the instrument context implementations.
-            for mount, instrument_impl in old_instrument_contexts.items():
+            for mount, instrument_impl in old_instrument_impls.items():
                 instrument_context = self._instruments[mount]
                 if instrument_context:
                     instrument_context._implementation = instrument_impl
