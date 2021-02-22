@@ -7,18 +7,14 @@ import {
   THERMOCYCLER_PROFILE,
 } from '../../../../constants.js'
 
-import {
-  ConditionalOnField,
-  ProfileItemRows,
-  RadioGroupField,
-} from '../../fields'
+import { ProfileItemRows, RadioGroupField } from '../../fields'
 import { StateFields } from './StateFields'
 import { ProfileSettings } from './ProfileSettings'
 import styles from '../../StepEditForm.css'
 import type { StepFormProps } from '../../types'
 
 export const ThermocyclerForm = (props: StepFormProps): React.Node => {
-  const { focusHandlers, propsForFields } = props
+  const { focusHandlers, propsForFields, formData } = props
 
   return (
     <div className={styles.form_wrapper}>
@@ -42,12 +38,10 @@ export const ThermocyclerForm = (props: StepFormProps): React.Node => {
             ]}
           />
         </div>
-        <ConditionalOnField
-          name={'thermocyclerFormType'}
-          condition={val => val === THERMOCYCLER_STATE}
-        >
-          <StateFields propsForFields={propsForFields} />
-        </ConditionalOnField>
+        {propsForFields['thermocyclerFormType']?.value ===
+          THERMOCYCLER_STATE && (
+          <StateFields propsForFields={propsForFields} formData={formData} />
+        )}
         <div className={styles.checkbox_row}>
           <RadioGroupField
             {...propsForFields['thermocyclerFormType']}
@@ -64,10 +58,8 @@ export const ThermocyclerForm = (props: StepFormProps): React.Node => {
         </div>
       </div>
 
-      <ConditionalOnField
-        name={'thermocyclerFormType'}
-        condition={val => val === THERMOCYCLER_PROFILE}
-      >
+      {propsForFields['thermocyclerFormType']?.value ===
+        THERMOCYCLER_PROFILE && (
         <div className={styles.profile_form}>
           <div className={styles.section_header}>
             <span className={styles.section_header_text}>
@@ -86,9 +78,13 @@ export const ThermocyclerForm = (props: StepFormProps): React.Node => {
               {i18n.t('application.stepType.ending_hold')}
             </span>
           </div>
-          <StateFields propsForFields={propsForFields} isEndingHold />
+          <StateFields
+            propsForFields={propsForFields}
+            formData={formData}
+            isEndingHold
+          />
         </div>
-      </ConditionalOnField>
+      )}
     </div>
   )
 }

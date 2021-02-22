@@ -5,12 +5,7 @@ import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'
 
-import {
-  StepFormDropdown,
-  RadioGroupField,
-  ConditionalOnField,
-  TextField,
-} from '../fields'
+import { StepFormDropdown, RadioGroupField, TextField } from '../fields'
 import styles from '../StepEditForm.css'
 import type { StepFormProps } from '../types'
 
@@ -23,6 +18,7 @@ export const TemperatureForm = (props: StepFormProps): React.Node => {
   )
 
   const { propsForFields } = props
+  const { setTemperature, moduleId } = props.formData
 
   return (
     <div className={styles.form_wrapper}>
@@ -47,53 +43,50 @@ export const TemperatureForm = (props: StepFormProps): React.Node => {
           Rather than defaulting to one or the other when null,
           display a message (copy, design, etc TBD) that you need to select a module to continue
         */}
-        <ConditionalOnField name={'moduleId'} condition={val => val === null}>
+
+        {moduleId === null && (
           <p className={styles.select_module_message}>
             Please ensure a compatible module is present on the deck and
             selected to create a temperature step.
           </p>
-        </ConditionalOnField>
-        <ConditionalOnField
-          name={'moduleId'}
-          condition={val => val === temperatureModuleId && val != null}
-        >
-          <div className={styles.checkbox_row}>
-            <RadioGroupField
-              {...propsForFields['setTemperature']}
-              options={[
-                {
-                  name: i18n.t(
-                    'form.step_edit_form.field.setTemperature.options.true'
-                  ),
-                  value: 'true',
-                },
-              ]}
-            />
-            <ConditionalOnField
-              name={'setTemperature'}
-              condition={val => val === 'true'}
-            >
-              <TextField
-                {...propsForFields['targetTemperature']}
-                className={styles.small_field}
-                units={i18n.t('application.units.degrees')}
+        )}
+        {moduleId === temperatureModuleId && temperatureModuleId != null && (
+          <>
+            <div className={styles.checkbox_row}>
+              <RadioGroupField
+                {...propsForFields['setTemperature']}
+                options={[
+                  {
+                    name: i18n.t(
+                      'form.step_edit_form.field.setTemperature.options.true'
+                    ),
+                    value: 'true',
+                  },
+                ]}
               />
-            </ConditionalOnField>
-          </div>
-          <div className={styles.checkbox_row}>
-            <RadioGroupField
-              {...propsForFields['setTemperature']}
-              options={[
-                {
-                  name: i18n.t(
-                    'form.step_edit_form.field.setTemperature.options.false'
-                  ),
-                  value: 'false',
-                },
-              ]}
-            />
-          </div>
-        </ConditionalOnField>
+              {setTemperature === 'true' && (
+                <TextField
+                  {...propsForFields['targetTemperature']}
+                  className={styles.small_field}
+                  units={i18n.t('application.units.degrees')}
+                />
+              )}
+            </div>
+            <div className={styles.checkbox_row}>
+              <RadioGroupField
+                {...propsForFields['setTemperature']}
+                options={[
+                  {
+                    name: i18n.t(
+                      'form.step_edit_form.field.setTemperature.options.false'
+                    ),
+                    value: 'false',
+                  },
+                ]}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
