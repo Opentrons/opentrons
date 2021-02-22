@@ -8,9 +8,12 @@ import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
 from opentrons.protocols.implementations.protocol_context import \
     ProtocolContextImplementation
+from opentrons.protocols.implementations.simulators.protocol_context import \
+    ProtocolContextSimulation
 from opentrons_shared_data import load_shared_data
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
-from opentrons.hardware_control import API, NoTipAttachedError
+from opentrons.hardware_control import API, NoTipAttachedError, \
+    SynchronousAdapter
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocol_api import paired_instrument_context as paired
@@ -988,3 +991,38 @@ def test_move_to_with_thermocycler(ctx):
     instr = ctx.load_instrument('p1000_single', 'left')
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
+
+
+@pytest.mark.parametrize(
+    argnames=["implementation_class"],
+    argvalues=[
+        [ProtocolContextImplementation],
+        [ProtocolContextSimulation],
+    ])
+def test_temp_connect(implementation_class):
+    """Test that temp_connect can be used to assign hardware controller to
+    protocol implementation."""
+    has_loop = mock.MagicMock()
+    has_loop.loop = None
+    has_loop.get_attached_instrument.return_value = {
+        'default_aspirate_flow_rates': {'2.0': 100},
+        'default_dispense_flow_rates': {'2.0': 100},
+        'default_blow_out_flow_rates': {'2.0': 100}
+    }
+
+    hardware = SynchronousAdapter(has_loop)
+
+    ctx = papi.ProtocolContext(implementation=implementation_class(),
+                               api_version=APIVersion(2, 0))
+    instr = ctx.load_instrument('p1000_single', 'left')
+
+    with ctx.temp_connect(hardware):
+        instr.home()
+    hardware.home_z.assert_called_once_with(Mount.LEFT)
+
+    hardware.home_z.reset_mock()
+
+    # Calling. outside context manager will not call temp hardware method.
+    instr.home()
+
+    hardware.home_z.assert_not_called()
