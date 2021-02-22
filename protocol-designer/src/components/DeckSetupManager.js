@@ -1,6 +1,14 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { i18n } from '../localization'
+import {
+  Flex,
+  Text,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  C_DARK_GRAY,
+} from '@opentrons/components'
 import { getBatchEditSelectedStepTypes } from '../ui/steps/selectors'
 import { DeckSetup } from './DeckSetup'
 import type { StepType } from '../form-types'
@@ -15,8 +23,17 @@ const hasSharedBatchEditSettings: (
 }
 
 const NoBatchEditSharedSettings = (): React.Node => {
-  // TOOD IMMEDIATELY: style & use i18n
-  return 'No advanced settings shared between selected steps'
+  return (
+    <Flex
+      justifyContent={JUSTIFY_CENTER}
+      alignItems={ALIGN_CENTER}
+      height="75%"
+    >
+      <Text color={C_DARK_GRAY}>
+        {i18n.t('application.no_batch_edit_shared_settings')}
+      </Text>
+    </Flex>
+  )
 }
 
 export const DeckSetupManager = (): React.Node => {
