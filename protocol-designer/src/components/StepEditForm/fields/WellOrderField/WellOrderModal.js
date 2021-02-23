@@ -30,7 +30,10 @@ type Props = {|
   closeModal: () => mixed,
   prefix: 'aspirate' | 'dispense' | 'mix',
   formData: FormData,
-  updateValues: (firstValue: ?WellOrderOption, ?WellOrderOption) => void,
+  updateValues: (
+    firstValue: ?WellOrderOption,
+    secondValue: ?WellOrderOption
+  ) => void,
 |}
 
 type State = {
