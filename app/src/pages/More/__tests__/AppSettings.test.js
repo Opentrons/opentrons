@@ -3,12 +3,10 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import { Page } from '../../../components/Page'
-import { AnalyticsSettingsCard } from '../../../components/analytics-settings'
-import {
-  AppSoftwareSettingsCard,
-  AppAdvancedSettingsCard,
-} from '../../../components/app-settings'
+import { Page } from '../../../atoms/Page'
+import { AnalyticsSettingsCard } from '../AppSettings/AnalyticsSettingsCard'
+import { AppSoftwareSettingsCard } from '../AppSettings/AppSoftwareSettingsCard'
+import { AppAdvancedSettingsCard } from '../AppSettings/AppAdvancedSettingsCard'
 
 import { AppSettings } from '../AppSettings'
 

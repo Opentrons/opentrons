@@ -7,12 +7,15 @@ import {
   Icon,
   PrimaryBtn,
   SecondaryBtn,
+  Flex,
+  Box,
   Text,
   SPACING_2,
   type Mount,
+  SPACING_3,
+  FONT_BODY_2_DARK,
 } from '@opentrons/components'
 
-import { CalibrationInfoContent } from '../../components/CalibrationInfoContent'
 import { PIPETTE_MOUNTS } from '../../redux/pipettes'
 import { selectors as robotSelectors } from '../../redux/robot'
 
@@ -94,30 +97,33 @@ export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
       continueButtonOnClick = `/calibrate/labware/${slot}`
     }
   }
-  const leftChildren = (
-    <div>
-      <Text>{!hasCalibrated ? IS_NOT_CALIBRATED : IS_CALIBRATED}</Text>
-      <CalibrateButton
-        title={buttonText}
-        hasCalibrated={hasCalibrated}
-        marginBottom={SPACING_2}
-        width={BTN_WIDTH}
-        onClick={handleStart}
-      >
-        {spinnerOrText}
-      </CalibrateButton>
-      {hasCalibrated ? (
-        <PrimaryBtn
-          width={BTN_WIDTH}
-          onClick={() => {
-            dispatch(push(continueButtonOnClick))
-          }}
-        >
-          {continueText}
-        </PrimaryBtn>
-      ) : null}
-    </div>
-  )
 
-  return <CalibrationInfoContent leftChildren={leftChildren} />
+  return (
+    <Flex>
+      <Box flex="0 0 50%" padding={SPACING_3}>
+        <Text css={FONT_BODY_2_DARK} marginBottom={SPACING_3}>
+          {!hasCalibrated ? IS_NOT_CALIBRATED : IS_CALIBRATED}
+        </Text>
+        <CalibrateButton
+          title={buttonText}
+          hasCalibrated={hasCalibrated}
+          marginBottom={SPACING_2}
+          width={BTN_WIDTH}
+          onClick={handleStart}
+        >
+          {spinnerOrText}
+        </CalibrateButton>
+        {hasCalibrated ? (
+          <PrimaryBtn
+            width={BTN_WIDTH}
+            onClick={() => {
+              dispatch(push(continueButtonOnClick))
+            }}
+          >
+            {continueText}
+          </PrimaryBtn>
+        ) : null}
+      </Box>
+    </Flex>
+  )
 }

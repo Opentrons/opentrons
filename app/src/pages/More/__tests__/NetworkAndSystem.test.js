@@ -2,9 +2,9 @@
 import React from 'react'
 import { shallow } from 'enzyme'
 
-import { Page } from '../../../components/Page'
-import { NetworkSettingsCard } from '../../../components/NetworkSettingsCard'
-import { SystemInfoCard } from '../../../components/SystemInfoCard'
+import { Page } from '../../../atoms/Page'
+import { NetworkSettingsCard } from '../NetworkSettingsCard'
+import { SystemInfoCard } from '../SystemInfoCard'
 import { NetworkAndSystem } from '../NetworkAndSystem'
 
 describe('/more/network-and-system page component', () => {

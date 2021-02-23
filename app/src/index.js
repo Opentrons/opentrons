@@ -14,8 +14,8 @@ import { uiInitialized } from './redux/shell'
 import { history } from './redux/reducer'
 import { store } from './redux/store'
 
-// components
-import { App } from './components/App'
+// component tree
+import { App } from './App'
 
 const log = createLogger(__filename)
 
