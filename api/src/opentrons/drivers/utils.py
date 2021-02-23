@@ -94,7 +94,7 @@ def parse_temperature_response(
     return data
 
 
-KEY_VALUE_REGEX = re.compile(r"((?P<key>\w+):(?P<value>\w+))")
+KEY_VALUE_REGEX = re.compile(r"((?P<key>\S+):(?P<value>\S+))")
 
 
 def parse_device_information(

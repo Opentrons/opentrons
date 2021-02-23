@@ -6,12 +6,12 @@ from opentrons.drivers import utils
 @pytest.mark.parametrize(
     argnames=['input_str', 'expected_result'],
     argvalues=[
-        ['version:123 serial:serial_v model:m',
-         {'version': '123', 'serial': 'serial_v', 'model': 'm'}],
-        ['serial:serial_v model:m version:123 ',
-         {'version': '123', 'serial': 'serial_v', 'model': 'm'}],
-        ['   serial:serial_v model:m    version:123   ',
-         {'version': '123', 'serial': 'serial_v', 'model': 'm'}]
+        ['version:123-2 serial:serial_v model:m',
+         {'version': '123-2', 'serial': 'serial_v', 'model': 'm'}],
+        ['serial:serial_v model:m version:123-2 ',
+         {'version': '123-2', 'serial': 'serial_v', 'model': 'm'}],
+        ['   serial:serial_v model:m    version:123-2   ',
+         {'version': '123-2', 'serial': 'serial_v', 'model': 'm'}]
     ]
 )
 def test_parse_device_information_success(
