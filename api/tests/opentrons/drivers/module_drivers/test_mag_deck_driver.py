@@ -27,7 +27,7 @@ def test_parse_distance_response_success(
         [''],
     ]
 )
-def test_parse_distance_response_success(input_str: str) -> None:
+def test_parse_distance_response_failure(input_str: str) -> None:
     """Test failed parsing"""
     with pytest.raises(ParseError):
         driver._parse_distance_response(input_str)

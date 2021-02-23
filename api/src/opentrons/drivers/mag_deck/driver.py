@@ -3,6 +3,8 @@ import logging
 from threading import Event, Lock
 from time import sleep
 from typing import Dict, Optional, Mapping, Tuple
+
+from opentrons.drivers.utils import ParseError
 from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication, utils
@@ -352,7 +354,7 @@ class MagDeck:
         self._mag_position = distance
         return ''
 
-    def _recursive_get_info(self, retries) -> Mapping[str, str]:
+    def _recursive_get_info(self, retries) -> Dict[str, str]:
         try:
             device_info = self._send_command(GCODES['DEVICE_INFO'])
             return utils.parse_device_information(device_info)

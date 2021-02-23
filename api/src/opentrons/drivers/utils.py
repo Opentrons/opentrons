@@ -69,7 +69,7 @@ def parse_key_from_substring(substring) -> str:
 
 def parse_temperature_response(
         temperature_string: str, rounding_val: int
-        ) -> Mapping[str, Optional[float]]:
+        ) -> Dict[str, Optional[float]]:
     """Example input: "T:none C:25"""
     data = parse_key_values(temperature_string)
     if 'C' not in data or 'T' not in data:
@@ -85,7 +85,7 @@ def parse_temperature_response(
 
 
 def parse_device_information(
-        device_info_string: str) -> Mapping[str, str]:
+        device_info_string: str) -> Dict[str, str]:
     """
     Parse the modules's device information response.
 
