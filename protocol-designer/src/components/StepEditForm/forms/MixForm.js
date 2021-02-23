@@ -163,6 +163,7 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 <BlowoutLocationField
                   {...propsForFields['blowout_location']}
                   className={styles.full_width}
+                  formData={formData}
                 />
               </CheckboxRowField>
             </div>
