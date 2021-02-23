@@ -5,7 +5,7 @@ from time import sleep
 from typing import Dict, Optional, Mapping, Tuple
 from serial.serialutil import SerialException  # type: ignore
 
-from opentrons.drivers import serial_communication
+from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
 
 """
@@ -109,31 +109,6 @@ def _parse_key_from_substring(substring) -> str:
         raise ParseError(
             'Unexpected argument to _parse_key_from_substring: {}'.format(
                 substring))
-
-
-def _parse_device_information(device_info_string) -> Dict[str, str]:
-    """
-    Parse the magnetic module's device information response.
-    Example response from magnetic module:
-    "serial:aa11 model:bb22 version:cc33"
-    """
-    error_msg = 'Unexpected argument to _parse_device_information: {}'.format(
-        device_info_string)
-    if not device_info_string or \
-            not isinstance(device_info_string, str):
-        raise ParseError(error_msg)
-    parsed_values = device_info_string.strip().split(' ')
-    if len(parsed_values) < 3:
-        log.error(error_msg)
-        raise ParseError(error_msg)
-    res = {
-        _parse_key_from_substring(s): _parse_string_value_from_substring(s)
-        for s in parsed_values[:3]
-    }
-    for key in ['model', 'version', 'serial']:
-        if key not in res:
-            raise ParseError(error_msg)
-    return res
 
 
 def _parse_distance_response(distance_string) -> float:
@@ -431,10 +406,10 @@ class MagDeck:
         self._mag_position = distance
         return ''
 
-    def _recursive_get_info(self, retries) -> dict:
+    def _recursive_get_info(self, retries) -> Mapping[str, str]:
         try:
             device_info = self._send_command(GCODES['DEVICE_INFO'])
-            return _parse_device_information(device_info)
+            return utils.parse_device_information(device_info)
         except ParseError as e:
             retries -= 1
             if retries <= 0:

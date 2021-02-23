@@ -1,6 +1,7 @@
 import logging
 import time
 from typing import Dict, Optional, Mapping, Iterable, Sequence
+import re
 
 log = logging.getLogger(__name__)
 
@@ -93,6 +94,9 @@ def parse_temperature_response(
     return data
 
 
+KEY_VALUE_REGEX = re.compile(r"((?P<key>\w+):(?P<value>\w+))")
+
+
 def parse_device_information(
         device_info_string: str) -> Mapping[str, str]:
     """
@@ -100,22 +104,18 @@ def parse_device_information(
 
         Example response from temp-deck: "serial:aa11 model:bb22 version:cc33"
     """
-    error_msg = 'Unexpected argument to parse_device_information: {}'.format(
-        device_info_string)
     if not device_info_string or \
             not isinstance(device_info_string, str):
-        raise ParseError(error_msg)
-    parsed_values = device_info_string.strip().split(' ')
-    if len(parsed_values) < 3:
-        log.error(error_msg)
-        raise ParseError(error_msg)
-    res = {
-        parse_key_from_substring(s): parse_string_value_from_substring(s)
-        for s in parsed_values[:3]
-    }
+        raise ParseError(f'Unexpected argument to parse_device_information: '
+                         f'{device_info_string}')
+
+    res = {g.groupdict()['key']: g.groupdict()['value']
+           for g in KEY_VALUE_REGEX.finditer(device_info_string)}
+
     for key in ['model', 'version', 'serial']:
         if key not in res:
-            raise ParseError(error_msg)
+            raise ParseError(f'Missing key {key} from device info '
+                             f'string {device_info_string}.')
     return res
 
 
