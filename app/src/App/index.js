@@ -2,19 +2,16 @@
 import * as React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import { hot } from 'react-hot-loader/root'
-import { createGlobalStyle } from 'styled-components'
-
-import 'typeface-open-sans'
 
 import {
   Flex,
   Box,
-  C_DARK_GRAY,
   POSITION_RELATIVE,
   POSITION_FIXED,
   DIRECTION_ROW,
 } from '@opentrons/components'
 
+import { GlobalStyle } from '../atoms/GlobalStyle'
 import { Alerts } from '../organisms/Alerts'
 
 import { Robots } from '../pages/Robots'
@@ -31,35 +28,6 @@ import { MorePanel } from '../pages/More/MorePanel'
 
 import { Navbar } from './Navbar'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
-
-const GlobalStyle = createGlobalStyle`
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Open Sans', sans-serif;
-  }
-
-  html,
-  body {
-    width: 100%;
-    height: 100%;
-    color: ${C_DARK_GRAY};
-  }
-
-  a {
-    text-decoration: none;
-  }
-
-  button {
-    border: none;
-
-    &:focus,
-    &:active {
-      outline: 0;
-    }
-  }
-`
 
 const stopEvent = (event: SyntheticEvent<>) => event.preventDefault()
 

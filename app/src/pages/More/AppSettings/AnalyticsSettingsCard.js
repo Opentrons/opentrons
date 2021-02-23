@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { Card } from '@opentrons/components'
-import { AnalyticsToggle } from './AnalyticsToggle'
+import { AnalyticsToggle } from '../../../organisms/AnalyticsSettingsModal/AnalyticsToggle'
 
 const TITLE = 'Privacy Settings'
 

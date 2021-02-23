@@ -3,6 +3,10 @@ import * as React from 'react'
 import ReactDom from 'react-dom'
 import { Box } from '@opentrons/components'
 
+// TODO(bc, 2021-02-23): this component should probably be named
+// something else for clarity, and may belong better in a
+// different directory than app/src/App/
+
 type PortalLevel = 'page' | 'top'
 
 type Props = {|

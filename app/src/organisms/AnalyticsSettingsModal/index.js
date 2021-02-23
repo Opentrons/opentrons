@@ -7,9 +7,8 @@ import {
   setAnalyticsOptInSeen,
 } from '../../redux/analytics'
 
-import { Modal } from '@opentrons/components'
-import { ModalButton } from '../../pages/More/AppSettings/ModalButton'
-import { AnalyticsToggle } from '../../pages/More/AppSettings/AnalyticsToggle'
+import { Modal, OutlineButton } from '@opentrons/components'
+import { AnalyticsToggle } from './AnalyticsToggle'
 import { Portal } from '../../App/portal'
 import type { Dispatch } from '../../redux/types'
 
@@ -28,7 +27,9 @@ export function AnalyticsSettingsModal(): React.Node {
       <Portal>
         <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
           <AnalyticsToggle />
-          <ModalButton onClick={setSeen}>{CONTINUE}</ModalButton>
+          <OutlineButton onClick={setSeen} float="right" margin="0.75rem">
+            {CONTINUE}
+          </OutlineButton>
         </Modal>
       </Portal>
     )

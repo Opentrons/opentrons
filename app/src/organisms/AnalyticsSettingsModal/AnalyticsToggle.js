@@ -6,9 +6,9 @@ import { LabeledToggle } from '@opentrons/components'
 import {
   toggleAnalyticsOptedIn,
   getAnalyticsOptedIn,
-} from '../../../redux/analytics'
+} from '../../redux/analytics'
 
-import type { State, Dispatch } from '../../../redux/types'
+import type { State, Dispatch } from '../../redux/types'
 
 type OP = {||}
 
