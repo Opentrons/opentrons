@@ -2,6 +2,9 @@
   "files": [],
   "references": [
     {
+      "path": "./components"
+    },
+    {
       "path": "./discovery-client"
     }
   ]

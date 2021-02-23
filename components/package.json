@@ -2,7 +2,8 @@
   "name": "@opentrons/components",
   "version": "4.1.1",
   "description": "React components library for Opentrons' projects",
-  "main": "src/index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "style": "src/index.css",
   "repository": {
     "type": "git",
