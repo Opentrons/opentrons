@@ -13,8 +13,8 @@ const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 0
 
 export type HoverTooltipHandlers = TooltipChildProps<{
-  onMouseEnter: (SyntheticMouseEvent<*>) => void,
-  onMouseLeave: (SyntheticMouseEvent<*>) => void,
+  onMouseEnter: (React.MouseEvent) => void,
+  onMouseLeave: (React.MouseEvent) => void,
 }>
 
 export type HoverTooltipProps = DeprecatedTooltipProps<HoverTooltipHandlers>
@@ -29,8 +29,8 @@ type HoverTooltipState = { isOpen: boolean }
  * ```js
  * type HoverTooltipHandlers = {
  *   ref: React.Ref<*>,
- *   onMouseEnter: (SyntheticMouseEvent<*>) => void,
- *   onMouseLeave: (SyntheticMouseEvent<*>) => void,
+ *   onMouseEnter: (React.MouseEvent) => void,
+ *   onMouseLeave: (React.MouseEvent) => void,
  * }
  * ```
  *

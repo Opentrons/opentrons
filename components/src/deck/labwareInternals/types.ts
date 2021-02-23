@@ -1,7 +1,8 @@
+import * as React from 'react'
 
 export type WellMouseEvent = {
   wellName: string,
-  event: SyntheticMouseEvent<Element>,
+  event: React.MouseEvent,
 }
 
 // wellName to CSS color, eg {'A1': '#123456'}

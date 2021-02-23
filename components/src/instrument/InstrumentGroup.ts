@@ -6,7 +6,7 @@ import styles from './instrument.css'
 
 import type { InstrumentInfoProps } from './InstrumentInfo'
 
-export type InstrumentGroupProps = $Shape<{
+export type InstrumentGroupProps = Partial<{
   showMountLabel: ?boolean,
   left: ?InstrumentInfoProps,
   right: ?InstrumentInfoProps,

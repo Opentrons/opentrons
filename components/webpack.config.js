@@ -13,4 +13,22 @@ module.exports = webpackMerge(baseConfig, {
   },
   output: { path: OUTPUT_PATH },
   plugins: [new DefinePlugin({ _PKG_VERSION_: JSON.stringify(pkg.version) })],
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        include: path.join(__dirname, 'src'),
+        use: [
+          'style-loader',
+          {
+            loader: 'typings-for-css-modules-loader',
+            options: {
+              modules: true,
+              namedExport: true,
+            },
+          },
+        ],
+      },
+    ],
+  },
 })

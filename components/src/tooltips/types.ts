@@ -17,8 +17,8 @@ export type { PopperInstance, PopperOptions }
 export type HandleStateUpdate = (
   placement: Placement,
   styles: {
-    popper?: $Shape<CSSStyleDeclaration>,
-    arrow?: $Shape<CSSStyleDeclaration>,
+    popper?: Partial<CSSStyleDeclaration>,
+    arrow?: Partial<CSSStyleDeclaration>,
   }
 ) => void
 
@@ -34,7 +34,7 @@ export type UsePopperOptions = {
 
 export type UsePopperResult = PopperInstance | null
 
-export type UseTooltipOptions = $Shape<{
+export type UseTooltipOptions = Partial<{
   placement?: Placement,
   strategy?: Strategy,
   offset?: number,
@@ -49,9 +49,9 @@ export type UseTooltipResultTooltipProps = {
   id: string,
   ref: (HTMLElement | null) => unknown,
   placement: Placement | null,
-  style: $Shape<CSSStyleDeclaration>,
+  style: Partial<CSSStyleDeclaration>,
   arrowRef: (HTMLElement | null) => unknown,
-  arrowStyle: $Shape<CSSStyleDeclaration>,
+  arrowStyle: Partial<CSSStyleDeclaration>,
 }
 
 export type UseTooltipResult = [
@@ -59,7 +59,7 @@ export type UseTooltipResult = [
   UseTooltipResultTooltipProps
 ]
 
-export type UseHoverTooltipOptions = $Shape<{
+export type UseHoverTooltipOptions = Partial<{
   ...UseTooltipOptions,
   ...UseHoverOptions,
 }>

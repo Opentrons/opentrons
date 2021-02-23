@@ -47,7 +47,7 @@ export function usePopper(options: UsePopperOptions): UsePopperResult {
   // useLayoutEffect instead of useEffect to avoid positioning flash
   useLayoutEffect(() => {
     if (target && tooltip) {
-      const options: $Shape<PopperOptions> = {
+      const options: Partial<PopperOptions> = {
         modifiers: [
           DISABLED_APPLY_STYLES_MODIFIER,
           makeUpdateStateModifier(onStateUpdate),

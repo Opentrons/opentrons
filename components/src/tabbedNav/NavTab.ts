@@ -3,7 +3,7 @@ import * as React from 'react'
 import { NavLink } from 'react-router-dom'
 import classnames from 'classnames'
 
-import styles from './navbar.css'
+import * as styles from './navbar.css'
 import { Button } from '../buttons'
 import { NotificationIcon } from '../icons'
 
@@ -11,7 +11,7 @@ import type { IconName } from '../icons'
 
 export type NavTabProps = {
   /** optional click event for nav button */
-  onClick?: (event: SyntheticEvent<>) => void,
+  onClick?: (event: React.SyntheticEvent) => void,
   /** optional url for nav button route */
   url?: string,
   /** position a single button on the bottom of the page */

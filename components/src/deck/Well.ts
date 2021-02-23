@@ -21,9 +21,9 @@ export type WellProps = {
   ...SingleWell,
   selectable?: boolean,
   wellDef: WellDefinition,
-  onMouseOver?: (e: SyntheticMouseEvent<Element>) => unknown,
-  onMouseLeave?: (e: SyntheticMouseEvent<Element>) => unknown,
-  onMouseMove?: (e: SyntheticMouseEvent<Element>) => unknown,
+  onMouseOver?: (e: React.MouseEvent) => unknown,
+  onMouseLeave?: (e: React.MouseEvent) => unknown,
+  onMouseMove?: (e: React.MouseEvent) => unknown,
 }
 
 export class Well extends React.Component<WellProps> {

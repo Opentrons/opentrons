@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react'
 import assert from 'assert'
 
-export type UseOnClickOutsideOptions = $Shape<{
+export type UseOnClickOutsideOptions = Partial<{
   onClickOutside?: MouseEvent => unknown,
 }>
 

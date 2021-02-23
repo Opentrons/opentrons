@@ -33,5 +33,8 @@
     "react-remove-scroll": "1.0.8",
     "react-select": "3.0.8",
     "styled-components": "5.1.1"
+  },
+  "devDependencies": {
+    "typings-for-css-modules-loader": "^1.7.0"
   }
 }

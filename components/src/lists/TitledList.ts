@@ -23,15 +23,15 @@ export type TitledListProps = {
   /** component with descriptive text about the list */
   description?,
   /** optional click action (on title div, not children) */
-  onClick?: (event: SyntheticMouseEvent<>) => unknown,
+  onClick?: (event: React.MouseEvent) => unknown,
   /** optional right click action (on wrapping div) */
-  onContextMenu?: (event: SyntheticMouseEvent<>) => unknown,
+  onContextMenu?: (event: React.MouseEvent) => unknown,
   /** optional mouseEnter action */
-  onMouseEnter?: (event: SyntheticMouseEvent<>) => unknown,
+  onMouseEnter?: (event: React.MouseEvent) => unknown,
   /** optional mouseLeave action */
-  onMouseLeave?: (event: SyntheticMouseEvent<>) => unknown,
+  onMouseLeave?: (event: React.MouseEvent) => unknown,
   /** caret click action; if defined, list is expandable and carat is visible */
-  onCollapseToggle?: (event: SyntheticMouseEvent<>) => unknown,
+  onCollapseToggle?: (event: React.MouseEvent) => unknown,
   /** collapse the list if true (false by default) */
   collapsed?: boolean,
   /** set to true when TitledList is selected (eg, user clicked it) */
@@ -65,7 +65,7 @@ export function TitledList(props: TitledListProps) {
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
-  const handleCollapseToggle = (e: SyntheticMouseEvent<>) => {
+  const handleCollapseToggle = (e: React.MouseEvent) => {
     if (onCollapseToggle && !disabled) {
       e.stopPropagation()
       onCollapseToggle(e)

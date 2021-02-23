@@ -31,11 +31,11 @@ export type TooltipProps = {
   /** Actual tooltip placement, if known (provided by useTooltip) */
   placement: Placement | null,
   /** Inline styles to apply to the tooltip element (provided by useTooltip) */
-  style: $Shape<CSSStyleDeclaration>,
+  style: Partial<CSSStyleDeclaration>,
   /** React function ref for tooltip's arrow element (provided by useTooltip) */
   arrowRef: (HTMLElement | null) => unknown,
   /** Inline styles to apply to arrow element (provided by useTooltip) */
-  arrowStyle: $Shape<CSSStyleDeclaration>,
+  arrowStyle: Partial<CSSStyleDeclaration>,
 }
 
 /**
@@ -117,7 +117,7 @@ const ARROW_CSS_BY_PLACEMENT_BASE: { [string]: CSSRules | void } = {
 export type ArrowProps = {
   placement: Placement | null,
   arrowRef: (HTMLElement | null) => unknown,
-  arrowStyle: $Shape<CSSStyleDeclaration>,
+  arrowStyle: Partial<CSSStyleDeclaration>,
 }
 
 export function Arrow(props: ArrowProps) {

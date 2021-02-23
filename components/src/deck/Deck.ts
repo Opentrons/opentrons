@@ -52,7 +52,7 @@ export class Deck extends React.Component<DeckProps> {
   getXY: (
     rawX: number,
     rawY: number
-  ) => $Shape<{ scaledX?: number, scaledY?: number }> = (rawX, rawY) => {
+  ) => Partial<{ scaledX?: number, scaledY?: number }> = (rawX, rawY) => {
     if (!this.parentRef) return {}
     const clientRect: {
       width: number,

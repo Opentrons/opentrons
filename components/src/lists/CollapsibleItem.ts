@@ -10,11 +10,11 @@ export type CollapsibleItemProps = {
   /** text of title */
   title: string,
   /** children nodes */
-  children?,
+  children?: React.ReactNode,
   /** additional classnames */
   className?: string,
   /** caret click action; if defined, list is expandable and carat is visible */
-  onCollapseToggle: (event: SyntheticMouseEvent<>) => unknown,
+  onCollapseToggle: (event: React.MouseEvent) => unknown,
   /** collapse the list if true (false by default) */
   collapsed: boolean,
 }
@@ -28,7 +28,7 @@ export function CollapsibleItem(props: CollapsibleItemProps) {
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
-  const handleCollapseToggle = (e: SyntheticMouseEvent<>) => {
+  const handleCollapseToggle = (e: React.MouseEvent) => {
     e.stopPropagation()
     onCollapseToggle(e)
   }

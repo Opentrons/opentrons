@@ -13,7 +13,7 @@ export type InputFieldProps = {
   /** field is disabled if value is true */
   disabled?: boolean,
   /** change handler */
-  onChange?: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
+  onChange?: (event: React.SyntheticEvent<HTMLInputElement>) => unknown,
   /** classes to apply to outer element */
   className?: string,
   /** inline label text. DEPRECATED */
@@ -39,11 +39,11 @@ export type InputFieldProps = {
   /** optional input type (default "text") */
   type?: typeof INPUT_TYPE_TEXT | typeof INPUT_TYPE_PASSWORD,
   /** mouse click handler */
-  onClick?: (event: SyntheticMouseEvent<HTMLInputElement>) => unknown,
+  onClick?: (event: React.MouseEvent<HTMLInputElement>) => unknown,
   /** focus handler */
-  onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => unknown,
+  onFocus?: (event: React.FocusEvent<HTMLInputElement>) => unknown,
   /** blur handler */
-  onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => unknown,
+  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => unknown,
   /** makes input field read-only */
   readOnly?: ?boolean,
   /** html tabindex property */

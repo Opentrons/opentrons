@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-export type UseHoverOptions = $Shape<{
+export type UseHoverOptions = Partial<{
   enterDelay?: number,
   leaveDelay?: number,
 }>

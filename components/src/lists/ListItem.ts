@@ -5,19 +5,20 @@ import { NavLink } from 'react-router-dom'
 import classnames from 'classnames'
 
 import styles from './lists.css'
-import { type IconName, Icon } from '../icons'
+import { Icon } from '../icons'
+import  type { IconName } from '../icons'
 
 type ListItemProps = {
   /** click handler */
-  onClick?: (event: SyntheticEvent<>) => unknown,
+  onClick?: (event: React.SyntheticEvent) => unknown,
   /** mouse enter handler */
-  onMouseEnter?: (event: SyntheticMouseEvent<>) => unknown,
+  onMouseEnter?: (event: React.MouseEvent) => unknown,
   /** mouse leave handler */
-  onMouseLeave?: (event: SyntheticMouseEvent<>) => unknown,
+  onMouseLeave?: (event: React.MouseEvent) => unknown,
   /** mouse enter handler */
-  onPointerEnter?: (event: SyntheticPointerEvent<>) => unknown,
+  onPointerEnter?: (event: React.PointerEvent) => unknown,
   /** mouse leave handler */
-  onPointerLeave?: (event: SyntheticPointerEvent<>) => unknown,
+  onPointerLeave?: (event: React.PointerEvent) => unknown,
   /** if URL is specified, ListItem is wrapped in a React Router NavLink */
   url?: string | null,
   /** if URL is specified NavLink can receive an active class name */
@@ -32,7 +33,7 @@ type ListItemProps = {
   iconName?: IconName,
   'aria-describedby'?: string,
   ref?: { current: Element | null } | ((current: Element | null) => unknown),
-  children,
+  children: React.ReactNode,
 }
 
 /**

@@ -16,7 +16,7 @@ import type {IconName } from '../icons'
 
 export type ButtonProps = {
   /** click handler */
-  onClick?: (event: SyntheticMouseEvent<>) => unknown,
+  onClick?: (event: React.MouseEvent) => unknown,
   /** name attribute */
   name?: string,
   /** title attribute */
@@ -43,7 +43,7 @@ export type ButtonProps = {
   /** custom element or component to use instead of `<button>` */
   Component?: string | React.AbstractComponent<any>,
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: ?$Shape<{
+  hoverTooltipHandlers?: ?Partial<{
     ref: (Element | null) => unknown,
     'aria-describedby': string,
     onMouseEnter: () => unknown,
