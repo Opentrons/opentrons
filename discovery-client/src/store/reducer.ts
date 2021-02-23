@@ -1,4 +1,3 @@
-// @flow
 import { combineReducers } from 'redux'
 import isEqual from 'lodash/isEqual'
 import keyBy from 'lodash/keyBy'
@@ -15,6 +14,12 @@ import * as Actions from './actions'
 import type { Reducer } from 'redux'
 
 import type {
+  HealthResponse,
+  ServerHealthResponse,
+  HealthErrorResponse,
+} from '../types'
+
+import type {
   State,
   Action,
   RobotState,
@@ -22,6 +27,7 @@ import type {
   RobotsByNameMap,
   HostsByIpMap,
   Address,
+  HealthStatus,
 } from './types'
 
 const INITIAL_STATE: State = {
@@ -30,7 +36,11 @@ const INITIAL_STATE: State = {
   manualAddresses: [],
 }
 
-const makeHostState = (ip, port, robotName) => ({
+const makeHostState = (
+  ip: string,
+  port: number,
+  robotName: string
+): HostState => ({
   ip,
   port,
   robotName,
@@ -41,19 +51,26 @@ const makeHostState = (ip, port, robotName) => ({
   serverHealthError: null,
 })
 
-const getHealthStatus = (responseData, error) => {
+const getHealthStatus = (
+  responseData: HealthResponse | ServerHealthResponse | null,
+  error: HealthErrorResponse | null
+): HealthStatus => {
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (responseData) return HEALTH_STATUS_OK
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (error && error.status >= 400) return HEALTH_STATUS_NOT_OK
   return HEALTH_STATUS_UNREACHABLE
 }
 
 export const robotsByNameReducer = (
+  // eslint-disable-next-line @typescript-eslint/default-param-last
   state: RobotsByNameMap = INITIAL_STATE.robotsByName,
   action: Action
 ): RobotsByNameMap => {
   switch (action.type) {
     case Actions.INITIALIZE_STATE: {
       const { initialRobots } = action.payload
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (!initialRobots) return state
 
       const states = initialRobots.map(
@@ -69,7 +86,7 @@ export const robotsByNameReducer = (
 
     case Actions.SERVICE_FOUND: {
       const { name } = action.payload
-      const robot: RobotState | void = state[name]
+      const robot: RobotState | undefined = state[name]
       const health = robot?.health ?? null
       const serverHealth = robot?.serverHealth ?? null
 
@@ -81,6 +98,7 @@ export const robotsByNameReducer = (
     case Actions.HEALTH_POLLED: {
       const { health, serverHealth } = action.payload
       const name = serverHealth?.name ?? health?.name ?? null
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (!name) return state
 
       const nextRobotState = {
@@ -99,12 +117,14 @@ export const robotsByNameReducer = (
 }
 
 export const hostsByIpReducer = (
+  // eslint-disable-next-line @typescript-eslint/default-param-last
   state: HostsByIpMap = INITIAL_STATE.hostsByIp,
   action: Action
 ): HostsByIpMap => {
   switch (action.type) {
     case Actions.INITIALIZE_STATE: {
       const { initialRobots } = action.payload
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (!initialRobots) return state
 
       const states = initialRobots.flatMap<HostState>(({ name, addresses }) => {
@@ -126,7 +146,7 @@ export const hostsByIpReducer = (
 
     case Actions.SERVICE_FOUND: {
       const { ip, port, name: robotName } = action.payload
-      const host: HostState | void = state[ip]
+      const host: HostState | undefined = state[ip]
       const newHost = host?.robotName !== robotName
       const nextHostState = {
         ip,
@@ -153,7 +173,7 @@ export const hostsByIpReducer = (
         healthError,
         serverHealthError,
       } = action.payload
-      const host: HostState | void = state[ip]
+      const host: HostState | undefined = state[ip]
       const robotName =
         serverHealth?.name ?? health?.name ?? host?.robotName ?? null
       const healthStatus = getHealthStatus(health, healthError)
@@ -162,6 +182,7 @@ export const hostsByIpReducer = (
         serverHealthError
       )
       const seen =
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
         host?.seen === true ||
         healthStatus !== HEALTH_STATUS_UNREACHABLE ||
         serverHealthStatus !== HEALTH_STATUS_UNREACHABLE
@@ -183,7 +204,7 @@ export const hostsByIpReducer = (
         healthStatus === HEALTH_STATUS_OK &&
         serverHealthStatus === HEALTH_STATUS_OK
 
-      const removals: Array<string> = ipIsGood
+      const removals: string[] = ipIsGood
         ? Object.keys(state).filter((targetIp: string) => {
             const {
               seen: targetSeen,
@@ -195,6 +216,7 @@ export const hostsByIpReducer = (
             return (
               targetIp !== ip &&
               targetRobotName === robotName &&
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
               targetSeen === false &&
               targetHealthStatus === HEALTH_STATUS_UNREACHABLE &&
               targetServerHealthStatus === HEALTH_STATUS_UNREACHABLE
@@ -212,9 +234,10 @@ export const hostsByIpReducer = (
 }
 
 export const manualAddressesReducer = (
-  state: $ReadOnlyArray<Address> = INITIAL_STATE.manualAddresses,
+  // eslint-disable-next-line @typescript-eslint/default-param-last
+  state: Address[] = INITIAL_STATE.manualAddresses,
   action: Action
-): $ReadOnlyArray<Address> => {
+): Address[] => {
   switch (action.type) {
     case Actions.INITIALIZE_STATE: {
       return action.payload.manualAddresses ?? state

@@ -27,7 +27,7 @@ module.exports = {
     'app/src/**/*.js',
     'app-shell/src/**/*.js',
     'components/src/**/*.js',
-    'discovery-client/src/**/*.js',
+    'discovery-client/src/**/*.ts',
     'labware-library/src/**/*.js',
     'protocol-designer/src/**/*.js',
     'shared-data/js/**/*.js',

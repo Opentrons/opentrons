@@ -1,4 +1,3 @@
-// @flow
 import net from 'net'
 import fetch from 'node-fetch'
 import intersectionBy from 'lodash/intersectionBy'
@@ -36,16 +35,20 @@ const DEFAULT_REQUEST_OPTS = {
  */
 export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
   const { onPollResult, logger } = options
-  const log = (level: LogLevel, msg: string, meta: {} = {}) => {
+  const log = (
+    level: LogLevel,
+    msg: string,
+    meta: Record<string, unknown> = {}
+  ): void => {
     typeof logger?.[level] === 'function' && logger[level](msg, meta)
   }
 
   let interval = 0
-  let pollQueue: Array<HealthPollerTarget> = []
-  let pollIntervalId: IntervalID | null = null
-  let lastCompletedPollTimeByIp: { [ip: string]: number | void, ... } = {}
+  let pollQueue: HealthPollerTarget[] = []
+  let pollIntervalId: NodeJS.Timeout | null = null
+  let lastCompletedPollTimeByIp: { [ip: string]: number | undefined } = {}
 
-  const pollAndNotify = (ip, port) => {
+  const pollAndNotify = (ip: string, port: number): Promise<void> => {
     log('silly', 'Polling health', { ip, port })
 
     const pollTime = Date.now()
@@ -69,7 +72,7 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
       })
   }
 
-  const start = (config?: HealthPollerConfig) => {
+  const start = (config?: HealthPollerConfig): void => {
     const { interval: nextInterval, list: nextList } = config ?? {}
     let needsNewInterval = pollIntervalId === null
 
@@ -80,6 +83,7 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
 
     // if xor (symmetric difference) returns values, then elements exist in
     // one list and not the other and need to be added to and/or removed from the queue
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (nextList && xorBy(pollQueue, nextList, 'ip').length > 0) {
       // keeping the order of `pollQueue`, remove all elements that aren't
       // in the new list via `intersection`, then add new elements via `union`
@@ -92,14 +96,15 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
     }
 
     if (needsNewInterval && pollQueue.length > 0 && interval > 0) {
-      const handlePoll = () => {
+      const handlePoll = (): void => {
         // since we're using a mutable array as a queue, guard against unsafe
-        // array access before we start shifting and pushing
+        // array access before we start pushing
         if (pollQueue.length > 0) {
+          const head = pollQueue.shift() as HealthPollerTarget
           // take the head of the queue out and put it back in at the end
-          const head = pollQueue.shift()
           pollQueue.push(head)
-          pollAndNotify(head.ip, head.port)
+          // eslint-disable-next-line no-void
+          void pollAndNotify(head.ip, head.port)
         }
       }
 
@@ -111,9 +116,10 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
     }
   }
 
-  const stop = () => {
+  function stop(): void {
     log('debug', 'stopping health poller')
     lastCompletedPollTimeByIp = {}
+    // @ts-expect-error(mc, 2021-02-16): guard with a null check for pollIntervalId
     clearInterval(pollIntervalId)
     pollIntervalId = null
   }
@@ -122,8 +128,8 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
 }
 
 type FetchAndParseResult<SuccessBody> =
-  | {| ok: true, status: number, body: SuccessBody |}
-  | {| ok: false, status: number, body: string | { ... } |}
+  | { ok: true; status: number; body: SuccessBody }
+  | { ok: false; status: number; body: string | Record<string, unknown> }
 
 /**
  * Fetch a URL and parse its response to JSON if possible. If the body can't
@@ -146,9 +152,9 @@ function fetchAndParse<SuccessBody>(
             return text
           }
         })
-        .then(body => ({ ok, status, body }: any))
+        .then(body => ({ ok, status, body }))
     })
-    .catch((error: { type?: string, code?: string, message: string, ... }) => {
+    .catch((error: { type?: string; code?: string; message: string }) => {
       // error.type === 'system' means error came from Node.js (e.g. EHOSTDOWN).
       // if it was a system error, skip error.message and attach the error code.
       // error.message may have timestamps or other frequently changing info

@@ -1,5 +1,3 @@
-// @flow
-
 import type { MdnsBrowserService, HealthPollerResult } from '../types'
 
 import * as Types from './types'
@@ -19,7 +17,7 @@ export const REMOVE_IP_ADDRESS: 'client:REMOVE_IP_ADDRESS' =
 export const REMOVE_ROBOT: 'client:REMOVE_ROBOT' = 'client:REMOVE_ROBOT'
 
 export const initializeState = (
-  payload: $PropertyType<Types.InitializeStateAction, 'payload'>
+  payload: Types.InitializeStateAction['payload']
 ): Types.InitializeStateAction => ({
   type: INITIALIZE_STATE,
   payload,

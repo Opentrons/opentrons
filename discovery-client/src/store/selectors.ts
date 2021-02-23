@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import unionBy from 'lodash/unionBy'
 import {
@@ -12,19 +11,25 @@ import {
 } from '../constants'
 
 import type { DiscoveryClientRobot } from '../types'
-import type { State, RobotState, HostState, Address } from './types'
+import type {
+  State,
+  RobotState,
+  HostState,
+  Address,
+  HealthStatus,
+} from './types'
 
-export const getRobotStates: State => $ReadOnlyArray<RobotState> = createSelector(
+export const getRobotStates: (state: State) => RobotState[] = createSelector(
   state => state.robotsByName,
   robotsMap => Object.keys(robotsMap).map((name: string) => robotsMap[name])
 )
 
-export const getHostStates: State => $ReadOnlyArray<HostState> = createSelector(
+export const getHostStates: (state: State) => HostState[] = createSelector(
   state => state.hostsByIp,
   hostsMap => Object.keys(hostsMap).map((ip: string) => hostsMap[ip])
 )
 
-export const getAddresses: State => $ReadOnlyArray<Address> = createSelector(
+export const getAddresses: (state: State) => Address[] = createSelector(
   state => state.manualAddresses,
   getHostStates,
   (manualAddresses, hosts) => {
@@ -33,7 +38,9 @@ export const getAddresses: State => $ReadOnlyArray<Address> = createSelector(
   }
 )
 
-export const getRobots: State => $ReadOnlyArray<DiscoveryClientRobot> = createSelector(
+export const getRobots: (
+  state: State
+) => DiscoveryClientRobot[] = createSelector(
   getRobotStates,
   getHostStates,
   (robots, hosts) => {
@@ -65,19 +72,19 @@ const IP_PRIORITY_MATCH = [
 ]
 
 // compare hosts in decending priority order
-export const compareHostsByConnectability = (
+export function compareHostsByConnectability(
   a: HostState,
   b: HostState
-): number => {
+): number {
   const healthSort =
-    HEALTH_PRIORITY.indexOf(b.healthStatus) -
-    HEALTH_PRIORITY.indexOf(a.healthStatus)
+    HEALTH_PRIORITY.indexOf(b.healthStatus as HealthStatus) -
+    HEALTH_PRIORITY.indexOf(a.healthStatus as HealthStatus)
 
   if (healthSort !== 0) return healthSort
 
   const serverHealthSort =
-    HEALTH_PRIORITY.indexOf(b.serverHealthStatus) -
-    HEALTH_PRIORITY.indexOf(a.serverHealthStatus)
+    HEALTH_PRIORITY.indexOf(b.serverHealthStatus as HealthStatus) -
+    HEALTH_PRIORITY.indexOf(a.serverHealthStatus as HealthStatus)
 
   if (serverHealthSort !== 0) return serverHealthSort
 

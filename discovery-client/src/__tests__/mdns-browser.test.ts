@@ -1,11 +1,10 @@
-// @flow
 import EventEmitter from 'events'
 import Mdns from 'mdns-js'
 
 import { mockBrowserService } from '../__fixtures__'
 import { createMdnsBrowser } from '../mdns-browser'
 
-import type { MdnsServiceType, Browser } from 'mdns-js'
+import type { Browser } from 'mdns-js'
 
 jest.mock('mdns-js', () => ({
   tcp: (name: string) => ({
@@ -18,12 +17,14 @@ jest.mock('mdns-js', () => ({
   ServiceType: function () {},
 }))
 
-const createBrowser: JestMockFn<[MdnsServiceType], Browser> = Mdns.createBrowser
+const createBrowser = Mdns.createBrowser as jest.MockedFunction<
+  typeof Mdns.createBrowser
+>
 
-const baseBrowser: Browser = (Object.assign(
-  new EventEmitter(),
-  ({ discover: jest.fn(), stop: jest.fn() }: any)
-): any)
+const baseBrowser: Browser = Object.assign(new EventEmitter(), {
+  discover: jest.fn(),
+  stop: jest.fn(),
+}) as any
 
 describe('mdns browser', () => {
   const onService = jest.fn()
