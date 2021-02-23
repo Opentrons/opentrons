@@ -5,10 +5,10 @@ import styles from './SidePanel.css'
 
 export type SidePanelProps = {
   title: string,
-  children: React.Node,
+  children,
 }
 
-export function SidePanel(props: SidePanelProps): React.Node {
+export function SidePanel(props: SidePanelProps) {
   return (
     <div className={styles.panel}>
       <div className={styles.title_bar}>

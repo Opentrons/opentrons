@@ -112,7 +112,7 @@ const CLEAR_STYLES = {
   // valueContainer: _ => _,
 }
 
-export function Select(props: SelectProps): React.Node {
+export function Select(props: SelectProps) {
   return (
     <ReactSelect
       {...props}
@@ -136,7 +136,7 @@ const DropdownIndicator = (props: SelectComponentProps) => (
   </reactSelectComponents.DropdownIndicator>
 )
 
-const Menu = (props: { ...SelectComponentProps, children: React.Node }) => (
+const Menu = (props: { ...SelectComponentProps, children }) => (
   <reactSelectComponents.Menu {...props}>
     <div className={styles.menu}>{props.children}</div>
     <div className={styles.menu_control_bridge} />

@@ -14,11 +14,11 @@ export type AlertModalProps = {
   /** optional handler for overlay click */
   onCloseClick?: () => unknown,
   /** optional modal heading */
-  heading?: React.Node,
+  heading?,
   /** optional array of `ButtonProps` for `OutlineButton`s at bottom of modal */
   buttons?: Array<?ButtonProps>,
   /** modal contents */
-  children: React.Node,
+  children,
   /** optional classes to apply */
   className?: string,
   /** optional classes to apply */
@@ -34,7 +34,7 @@ export type AlertModalProps = {
 /**
  * Generic alert modal with a heading and a set of buttons at the bottom
  */
-export function AlertModal(props: AlertModalProps): React.Node {
+export function AlertModal(props: AlertModalProps) {
   const {
     heading,
     buttons,

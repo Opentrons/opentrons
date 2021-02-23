@@ -11,11 +11,11 @@ export type LabeledCheckboxProps = {
   name: string,
   value: boolean,
   className?: string,
-  children: React.Node,
+  children,
   onChange: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
 }
 
-export function LabeledCheckbox(props: LabeledCheckboxProps): React.Node {
+export function LabeledCheckbox(props: LabeledCheckboxProps) {
   const { label, value, name, onChange } = props
   const checkboxClass = cx(styles.labeled_checkbox, props.className)
   return (

@@ -26,7 +26,7 @@ const iconSize = 20
 const numRows = 4
 const numCols = 3
 
-export function SlotMap(props: SlotMapProps): React.Node {
+export function SlotMap(props: SlotMapProps) {
   const { collisionSlots, occupiedSlots, isError } = props
   return (
     <svg

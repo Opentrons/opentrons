@@ -17,11 +17,11 @@ export type TitledListProps = {
   'data-test'?: string,
   // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
   /** children must all be `<li>` */
-  children?: React.Node,
+  children?,
   /** additional classnames */
   className?: string,
   /** component with descriptive text about the list */
-  description?: React.Node,
+  description?,
   /** optional click action (on title div, not children) */
   onClick?: (event: SyntheticMouseEvent<>) => unknown,
   /** optional right click action (on wrapping div) */
@@ -47,7 +47,7 @@ export type TitledListProps = {
 /**
  * An ordered list with optional title, icon, and description.
  */
-export function TitledList(props: TitledListProps): React.Node {
+export function TitledList(props: TitledListProps) {
   const {
     iconName,
     disabled,

@@ -49,7 +49,7 @@ export class ClickOutside extends React.Component<ClickOutsideProps> {
     }
   }
 
-  render(): React.Node {
+  render() {
     return this.props.children({ ref: this.setWrapperRef })
   }
 }

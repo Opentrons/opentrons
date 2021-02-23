@@ -6,13 +6,13 @@ import styles from './styles.css'
 
 export type StackedLabeledControlProps = {
   label: string,
-  control: React.Node,
-  children?: React.Node,
+  control,
+  children?,
 }
 
 export function StackedLabeledControl(
   props: StackedLabeledControlProps
-): React.Node {
+) {
   const { label, control, children } = props
 
   return (

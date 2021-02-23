@@ -71,7 +71,7 @@ export class HoverTooltip extends React.Component<
     )
   }
 
-  render(): React.Node {
+  render() {
     return (
       <DeprecatedTooltip
         open={this.state.isOpen}

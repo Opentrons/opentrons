@@ -14,13 +14,13 @@ export type ModalPageProps = {
   /** Props for title bar at top of modal page */
   titleBar: TitleBarProps,
   contentsClassName?: string,
-  heading?: React.Node,
-  children?: React.Node,
+  heading?,
+  children?,
   innerProps?: React.ElementProps<typeof Box>,
   outerProps?: React.ElementProps<typeof Box>,
 }
 
-export function ModalPage(props: ModalPageProps): React.Node {
+export function ModalPage(props: ModalPageProps) {
   const { titleBar, heading, innerProps = {}, outerProps = {} } = props
 
   return (

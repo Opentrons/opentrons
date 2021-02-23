@@ -3,14 +3,14 @@
 import * as React from 'react'
 
 export type CenteredTextSvgProps = {
-  text: React.Node,
+  text,
   className?: string,
 }
 
 /**
  * @deprecated Use {@link RobotCoordsText}
  */
-export function CenteredTextSvg(props: CenteredTextSvgProps): React.Node {
+export function CenteredTextSvg(props: CenteredTextSvgProps) {
   const { text, className } = props
 
   // TODO(mc, 2018-07-23): add `fill='currentColor'`

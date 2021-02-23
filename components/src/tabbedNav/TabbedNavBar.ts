@@ -5,11 +5,11 @@ import styles from './navbar.css'
 
 export type TabbedNavBarProps = {
   className?: string,
-  topChildren?: React.Node,
-  bottomChildren?: React.Node,
+  topChildren?,
+  bottomChildren?,
 }
 
-export function TabbedNavBar(props: TabbedNavBarProps): React.Node {
+export function TabbedNavBar(props: TabbedNavBarProps) {
   const className = cx(styles.navbar, props.className)
 
   return (

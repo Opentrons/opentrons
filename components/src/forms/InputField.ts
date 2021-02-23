@@ -27,7 +27,7 @@ export type InputFieldProps = {
   /** placeholder text */
   placeholder?: string,
   /** optional suffix component, appears to the right of input text */
-  units?: React.Node, // TODO: Ian 2018-10-30 rename to 'suffix'
+  units?, // TODO: Ian 2018-10-30 rename to 'suffix'
   /** current value of text in box, defaults to '' */
   value?: ?string,
   /** if included, InputField will use error style and display error instead of caption */
@@ -54,7 +54,7 @@ export type InputFieldProps = {
   isIndeterminate?: boolean,
 }
 
-export function InputField(props: InputFieldProps): React.Node {
+export function InputField(props: InputFieldProps) {
   const error = props.error != null
   const labelClass = cx(styles.form_field, props.className, {
     [styles.error]: error,

@@ -13,7 +13,7 @@ export type InfoItemProps = {
  * Used by `InstrumentInfo` for its titled values.
  * But if you're using this, you probably want `LabeledValue` instead.
  */
-export function InfoItem(props: InfoItemProps): React.Node {
+export function InfoItem(props: InfoItemProps) {
   const { title, value, className } = props
 
   return (

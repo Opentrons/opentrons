@@ -18,7 +18,7 @@ export type DeprecatedTooltipProps<ChildProps: {}> = {
   /** show or hide the tooltip */
   open?: boolean,
   /** contents of the tooltip */
-  tooltipComponent?: React.Node,
+  tooltipComponent?,
   /** optional portal to place the tooltipComponent inside */
   portal?: React.ComponentType<*>,
   /** <https://github.com/FezVrasta/react-popper#placement> */
@@ -49,7 +49,7 @@ export type DeprecatedTooltipProps<ChildProps: {}> = {
  */
 export function DeprecatedTooltip<ChildProps: {}>(
   props: DeprecatedTooltipProps<ChildProps>
-): React.Node {
+) {
   if (!props.tooltipComponent) return props.children()
 
   return (

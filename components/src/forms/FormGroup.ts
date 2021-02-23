@@ -9,7 +9,7 @@ export type FormGroupProps = {
   /** text label */
   label?: string,
   /** form content */
-  children?: React.Node,
+  children?,
   /** classes to apply */
   className?: ?string,
   /** if is included, FormGroup title will use error style. The content of the string is ignored. */
@@ -20,7 +20,7 @@ export type FormGroupProps = {
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
 }
 
-export function FormGroup(props: FormGroupProps): React.Node {
+export function FormGroup(props: FormGroupProps) {
   const error = props.error != null
   const className = cx(props.className, {
     [styles.error]: error,

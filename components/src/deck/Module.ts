@@ -27,7 +27,7 @@ export type ModuleProps = {
   slot: DeckSlot,
 }
 
-export function Module(props: ModuleProps): React.Node {
+export function Module(props: ModuleProps) {
   const { model, slot } = props
   let x = 0
   let y = 0

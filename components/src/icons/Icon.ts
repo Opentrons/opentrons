@@ -28,7 +28,7 @@ export type IconProps = {
   /** inline style passed into the icon svg */
   style?: { [string]: string | number, ... },
   /** optional children */
-  children?: React.Node,
+  children?,
   /** primitive styling props */
   ...StyleProps,
 }
@@ -54,7 +54,7 @@ const spinStyle = css`
  * import type { IconName } from '@opentrons/components'
  * ```
  */
-export function Icon(props: IconProps): React.Node {
+export function Icon(props: IconProps) {
   const { name, children, className, spin, ...svgProps } = props
 
   if (!(name in ICON_DATA_BY_NAME)) {

@@ -32,7 +32,7 @@ type ListItemProps = {
   iconName?: IconName,
   'aria-describedby'?: string,
   ref?: { current: Element | null } | ((current: Element | null) => unknown),
-  children: React.Node,
+  children,
 }
 
 /**

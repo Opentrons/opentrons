@@ -19,7 +19,7 @@ const COLUMN_OFFSET = -4
 /**
  * @deprecated No longer necessary, do not use
  */
-export function LabwareLabels(props: LabwareLabelsProps): React.Node {
+export function LabwareLabels(props: LabwareLabelsProps) {
   const { labwareType } = props
   const labwareDef = getLabwareV1Def(labwareType)
   if (!labwareDef) {

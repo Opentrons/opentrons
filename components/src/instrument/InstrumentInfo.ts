@@ -30,10 +30,10 @@ export type InstrumentInfoProps = {
   /** classes to apply to the info group child */
   infoClassName?: string,
   /** children to display under the info */
-  children?: React.Node,
+  children?,
 }
 
-export function InstrumentInfo(props: InstrumentInfoProps): React.Node {
+export function InstrumentInfo(props: InstrumentInfoProps) {
   const className = cx(
     styles.pipette,
     styles[props.mount],

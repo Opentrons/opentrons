@@ -14,7 +14,7 @@ export type SidePanelGroupProps = {
   /** optional icon left of the title */
   iconName?: IconName,
   /** children, most likely one or more TitledList */
-  children?: React.Node,
+  children?,
   /** additional classnames */
   className?: string,
   /** disables the whole SidePanelGroup if true */
@@ -24,7 +24,7 @@ export type SidePanelGroupProps = {
 /**
  * A component for grouping and titling multiple lists
  */
-export function SidePanelGroup(props: SidePanelGroupProps): React.Node {
+export function SidePanelGroup(props: SidePanelGroupProps) {
   const { iconName, disabled } = props
 
   const className = cx(styles.panel_group, props.className, {

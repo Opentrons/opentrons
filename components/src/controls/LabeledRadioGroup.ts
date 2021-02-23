@@ -9,11 +9,11 @@ import type { RadioGroupProps } from '../forms'
 export type LabeledRadioGroupProps = {
   ...RadioGroupProps,
   label: string,
-  children: React.Node,
+  children,
   'data-test'?: string,
 }
 
-export function LabeledRadioGroup(props: LabeledRadioGroupProps): React.Node {
+export function LabeledRadioGroup(props: LabeledRadioGroupProps) {
   const { label, value, options, onChange } = props
 
   return (

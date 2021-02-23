@@ -12,13 +12,13 @@ export type LabwareWrapperProps = {
   height?: number,
   width?: number,
   highlighted?: boolean,
-  children?: React.Node,
+  children?,
 }
 
 /**
  * @deprecated Use {@link RobotWorkSpace}
  */
-export function LabwareWrapper(props: LabwareWrapperProps): React.Node {
+export function LabwareWrapper(props: LabwareWrapperProps) {
   const { x, y, highlighted, children } = props
   const height = props.height || SLOT_RENDER_HEIGHT
   const width = props.width || SLOT_RENDER_WIDTH

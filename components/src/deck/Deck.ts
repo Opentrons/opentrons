@@ -73,7 +73,7 @@ export class Deck extends React.Component<DeckProps> {
     const scaledY = (rawY - clientRect.top) * heightCoefficient + scaledYOffset
     return { scaledX, scaledY }
   }
-  render(): React.Node {
+  render() {
     const { className, LabwareComponent, DragPreviewLayer } = this.props
 
     return (
@@ -101,7 +101,7 @@ function renderLabware(
   return flatMap(
     SLOTNAME_MATRIX,
     (columns: Array<DeckSlotId>, row: number): Array<React.Node> => {
-      return columns.map((slot: DeckSlotId, col: number): React.Node => {
+      return columns.map((slot: DeckSlotId, col: number) => {
         if (slot === TRASH_SLOTNAME) return null
 
         const props = {
@@ -135,7 +135,7 @@ export type DeckFromDataProps = {
 }
 
 export class DeckFromData extends React.PureComponent<DeckFromDataProps> {
-  render(): React.Node {
+  render() {
     const { def, layerBlocklist } = this.props
     return (
       <g>

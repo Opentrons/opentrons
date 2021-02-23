@@ -16,7 +16,7 @@ export type RadioGroupProps = {
   options?: Array<{
     name: string,
     value: string,
-    children?: React.Node,
+    children?,
   }>,
   /** Show radio buttons inline instead of stacked */
   inline?: boolean,
@@ -30,7 +30,7 @@ export type RadioGroupProps = {
   name?: string,
 }
 
-export function RadioGroup(props: RadioGroupProps): React.Node {
+export function RadioGroup(props: RadioGroupProps) {
   const error = props.error != null
 
   const outerClassName = cx({

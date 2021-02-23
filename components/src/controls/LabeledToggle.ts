@@ -9,13 +9,13 @@ export type LabeledToggleProps = {
   label: string,
   toggledOn: boolean,
   disabled?: boolean,
-  children?: React.Node,
+  children?,
   onClick: () => unknown,
   /** optional data test id for the container */
   'data-test'?: string,
 }
 
-export function LabeledToggle(props: LabeledToggleProps): React.Node {
+export function LabeledToggle(props: LabeledToggleProps) {
   const { label, toggledOn, disabled, onClick } = props
 
   return (

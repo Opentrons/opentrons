@@ -34,7 +34,7 @@ export class Well extends React.Component<WellProps> {
       this.props.fillColor !== nextProps.fillColor
     )
   }
-  render(): React.Node {
+  render() {
     const {
       wellName,
       selectable,

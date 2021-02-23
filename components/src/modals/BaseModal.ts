@@ -49,11 +49,11 @@ export type BaseModalProps = {
   /** Overlay color, defaults to `OVERLAY_GRAY_90` */
   overlayColor?: string,
   /** Optional sticky header */
-  header?: React.Node,
+  header?,
   /** Optional sticky footer */
-  footer?: React.Node,
+  footer?,
   /** Modal content */
-  children?: React.Node,
+  children?,
   ...StyleProps,
 }
 
@@ -66,7 +66,7 @@ export type BaseModalProps = {
  * - An optional sticky header
  * - An optional sticky footer
  */
-export function BaseModal(props: BaseModalProps): React.Node {
+export function BaseModal(props: BaseModalProps) {
   const {
     overlayColor = Styles.OVERLAY_GRAY_90,
     zIndex = 10,

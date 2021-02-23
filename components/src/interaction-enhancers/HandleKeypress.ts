@@ -15,7 +15,7 @@ export type HandleKeypressProps = {
   /** optionally call event.preventDefault if keypress is handled */
   preventDefault?: ?boolean,
   /** wrapped children */
-  children?: React.Node,
+  children?,
 }
 
 const matchHandler = e => h =>
@@ -52,7 +52,7 @@ export class HandleKeypress extends React.Component<HandleKeypressProps> {
     window.removeEventListener('keydown', this.preventDefaultIfKey)
   }
 
-  render(): React.Node {
+  render() {
     return <>{this.props.children}</>
   }
 }

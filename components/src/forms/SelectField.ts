@@ -28,7 +28,7 @@ export type SelectFieldProps = {
   /** optional className */
   className?: string,
   /** optional caption. hidden when `error` is given */
-  caption?: React.Node,
+  caption?,
   /** if included, use error style and display error instead of caption */
   error?: ?string,
   /** change handler called with (name, value) */
@@ -37,7 +37,7 @@ export type SelectFieldProps = {
   onLoseFocus?: (name: string) => unknown,
 }
 
-export function SelectField(props: SelectFieldProps): React.Node {
+export function SelectField(props: SelectFieldProps) {
   const {
     id,
     name,

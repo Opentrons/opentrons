@@ -6,11 +6,11 @@ import styles from './styles.css'
 
 export type LabeledControlProps = {
   label: string,
-  control: React.Node,
-  children?: React.Node,
+  control,
+  children?,
 }
 
-export function LabeledControl(props: LabeledControlProps): React.Node {
+export function LabeledControl(props: LabeledControlProps) {
   const { label, control, children } = props
 
   return (

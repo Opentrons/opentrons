@@ -10,9 +10,9 @@ import * as styles from '../styles'
 
 export type CardProps = {
   /** Title for card, all cards should receive a title. */
-  title?: React.Node,
+  title?,
   /** Card contents */
-  children?: React.Node,
+  children?,
   /** If card can not be used, gray it out and remove pointer events */
   disabled?: boolean,
   /** Additional class names */
@@ -24,7 +24,7 @@ export type CardProps = {
  *
  * Titles and other children handle their own styles and layout.
  */
-export function Card(props: CardProps): React.Node {
+export function Card(props: CardProps) {
   const { title, children, className, disabled } = props
 
   return (

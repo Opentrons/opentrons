@@ -10,8 +10,8 @@ import styles from './structure.css'
 import type { ButtonProps } from '../buttons'
 
 export type TitleBarProps = {
-  title: React.Node,
-  subtitle?: React.Node,
+  title,
+  subtitle?,
   back?: ButtonProps,
   className?: string,
 
@@ -21,7 +21,7 @@ export type TitleBarProps = {
   backButtonLabel?: string,
 }
 
-export function TitleBar(props: TitleBarProps): React.Node {
+export function TitleBar(props: TitleBarProps) {
   const {
     title,
     subtitle,

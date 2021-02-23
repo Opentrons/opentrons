@@ -13,7 +13,7 @@ export type AlertItemProps = {
   /** title/main message of colored alert bar */
   title: string | React.Node,
   /** Alert message body contents */
-  children?: React.Node,
+  children?,
   /** Additional class name */
   className?: string,
   /** optional handler to show close button/clear alert  */
@@ -48,7 +48,7 @@ const ALERT_PROPS_BY_TYPE = {
 
 export type AlertType = $Keys<typeof ALERT_PROPS_BY_TYPE>
 
-export function AlertItem(props: AlertItemProps): React.Node {
+export function AlertItem(props: AlertItemProps) {
   const alertProps = ALERT_PROPS_BY_TYPE[props.type]
   const icon = props.icon ? props.icon : alertProps.icon
   const className = cx(styles.alert, alertProps.className, props.className)

@@ -10,12 +10,12 @@ import type { DropdownFieldProps } from '../forms'
 export type LabeledSelectProps = {
   ...DropdownFieldProps,
   label: string,
-  children: React.Node,
+  children,
   /** optional data test id for the container */
   'data-test'?: string,
 }
 
-export function LabeledSelect(props: LabeledSelectProps): React.Node {
+export function LabeledSelect(props: LabeledSelectProps) {
   const { label, value, options, onChange } = props
 
   return (

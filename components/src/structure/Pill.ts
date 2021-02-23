@@ -14,7 +14,7 @@ export type PillProps = {
   /** additional class name */
   className?: string,
   /** contents of the pill */
-  children?: React.Node,
+  children?,
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: ?$ElementType<UseHoverTooltipResult, 0>,
 }
@@ -22,7 +22,7 @@ export type PillProps = {
 /**
  * Colored Pill containing text or other contents
  */
-export function Pill(props: PillProps): React.Node {
+export function Pill(props: PillProps) {
   const className = cx(styles.pill, props.className, {
     [styles.invert_text]: props.invertTextColor,
   })

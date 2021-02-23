@@ -28,7 +28,7 @@ export type LabwareProps = {
  * @deprecated Use {@link LabwareRender instead}
  */
 export class Labware extends React.Component<LabwareProps> {
-  render(): React.Node {
+  render() {
     const { labwareType, definition } = this.props
 
     const labwareDefinition =

@@ -12,7 +12,7 @@ export type ModalProps = {
   /** Optional styled heading **/
   heading?: string,
   /** modal contents */
-  children: React.Node,
+  children,
   /** classes to apply */
   className?: string,
   /** classes to apply to the contents box */
@@ -30,7 +30,7 @@ export type ModalProps = {
  * Base modal component that fills its nearest `display:relative` ancestor
  * with a dark overlay and displays `children` as its contents in a white box
  */
-export function Modal(props: ModalProps): React.Node {
+export function Modal(props: ModalProps) {
   const {
     contentsClassName,
     alertOverlay,

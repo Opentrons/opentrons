@@ -21,7 +21,7 @@ const SCALE_FACTOR = 3
  * Inline SVG icon component with additional nested notification icon. Takes
  * all the same props as Icon in addition to the ones listed above.
  */
-export function NotificationIcon(props: NotificationIconProps): React.Node {
+export function NotificationIcon(props: NotificationIconProps) {
   const { childName, childColor, ...iconProps } = props
   const { viewBox } = ICON_DATA_BY_NAME[iconProps.name]
   const [x, y, width, height] = viewBox.split(' ').map(Number)

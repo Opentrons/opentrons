@@ -17,7 +17,7 @@ const PADDING_LEFT = 4
 /**
  * @deprecated No longer necessary, do not use
  */
-export function ModuleNameOverlay(props: ModuleNameOverlayProps): React.Node {
+export function ModuleNameOverlay(props: ModuleNameOverlayProps) {
   const displayName = getModuleDisplayName(props.name)
   return (
     <React.Fragment>

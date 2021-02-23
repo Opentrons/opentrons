@@ -10,7 +10,7 @@ export type CollapsibleItemProps = {
   /** text of title */
   title: string,
   /** children nodes */
-  children?: React.Node,
+  children?,
   /** additional classnames */
   className?: string,
   /** caret click action; if defined, list is expandable and carat is visible */
@@ -22,7 +22,7 @@ export type CollapsibleItemProps = {
 /**
  * A list item with title, and collapsible children.
  */
-export function CollapsibleItem(props: CollapsibleItemProps): React.Node {
+export function CollapsibleItem(props: CollapsibleItemProps) {
   const { onCollapseToggle } = props
   const collapsible = onCollapseToggle != null
 

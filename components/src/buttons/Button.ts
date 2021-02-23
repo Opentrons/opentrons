@@ -32,7 +32,7 @@ export type ButtonProps = {
   /** inverts the default color/background/border of default button style */
   inverted?: boolean,
   /** contents of the button */
-  children?: React.Node,
+  children?,
   /** type of button (default "button") */
   type?:
     | typeof BUTTON_TYPE_SUBMIT
@@ -75,7 +75,7 @@ const STRIP_PROPS = [
  * import {type ButtonProps} from '@opentrons/components'
  * ```
  */
-export function Button(props: ButtonProps): React.Node {
+export function Button(props: ButtonProps) {
   const { name, title, disabled, hover, tabIndex, form } = props
   const className = cx(props.className, { [styles.hover]: hover })
   const onClick = !disabled ? props.onClick : undefined
