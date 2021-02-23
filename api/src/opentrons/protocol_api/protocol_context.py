@@ -246,9 +246,10 @@ class ProtocolContext(CommandPublisher):
             # InstrumentContextSimulation is an implementation that has no
             # interaction with hardware controller. This is our fast
             # simulation.
-            # InstrumentContext objects using a InstrumentContextSimulation
-            # must create InstrumentContextSimulation in order to actually
-            # use the hardware connection.
+            # InstrumentContext objects using an InstrumentContextSimulation
+            # must create an InstrumentContextImplementation in order to
+            # actually connect the InstrumentContext to the hardware
+            # connection.
             for instrument_ctx in self._instruments.values():
                 if not instrument_ctx:
                     continue
