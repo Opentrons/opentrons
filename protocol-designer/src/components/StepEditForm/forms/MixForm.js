@@ -103,8 +103,15 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 formData={formData}
               />
               <WellOrderField
+                updateFirstWellOrder={
+                  propsForFields['mix_wellOrder_first'].updateValue
+                }
+                updateSecondWellOrder={
+                  propsForFields['mix_wellOrder_second'].updateValue
+                }
                 prefix="mix"
                 label={i18n.t('form.step_edit_form.field.well_order.label')}
+                formData={props.formData}
               />
             </div>
             <DelayFields

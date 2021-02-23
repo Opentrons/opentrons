@@ -1,29 +1,26 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
 import { FormGroup, Tooltip, useHoverTooltip } from '@opentrons/components'
 import cx from 'classnames'
 import { i18n } from '../../../../localization'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
 import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
 import { WellOrderModal } from './WellOrderModal'
-
-import type { BaseState } from '../../../../types'
-
 import stepEditStyles from '../../StepEditForm.css'
 import styles from './WellOrderInput.css'
+import type { FormData } from '../../../../form-types'
+import type { FieldProps } from '../../types'
 
-type OP = {|
+type Props = {|
   className?: ?string,
   label?: string,
   prefix: 'aspirate' | 'dispense' | 'mix',
+  formData: FormData,
+  updateFirstWellOrder: $PropertyType<FieldProps, 'updateValue'>,
+  updateSecondWellOrder: $PropertyType<FieldProps, 'updateValue'>,
 |}
 
-type SP = {| iconClassNames: Array<string> |}
-
-type Props = { ...OP, ...SP }
-
-function WellOrderInput(props: Props) {
+export const WellOrderField = (props: Props): React.Node => {
+  const { formData, updateFirstWellOrder, updateSecondWellOrder } = props
   const [isModalOpen, setModalOpen] = React.useState(false)
 
   const handleOpen = () => {
@@ -31,6 +28,21 @@ function WellOrderInput(props: Props) {
   }
   const handleClose = () => {
     setModalOpen(false)
+  }
+
+  const updateValues = (firstValue, secondValue) => {
+    updateFirstWellOrder(firstValue)
+    updateSecondWellOrder(secondValue)
+  }
+
+  const getIconClassNames = () => {
+    let iconClassNames = []
+    if (formData) {
+      const first = formData[`${props.prefix}_wellOrder_first`]
+      const second = formData[`${props.prefix}_wellOrder_second`]
+      iconClassNames = [styles[`${first}_first`], styles[`${second}_second`]]
+    }
+    return iconClassNames
   }
 
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -51,6 +63,8 @@ function WellOrderInput(props: Props) {
             prefix={props.prefix}
             closeModal={handleClose}
             isOpen={isModalOpen}
+            formData={formData}
+            updateValues={updateValues}
           />
           <img
             onClick={handleOpen}
@@ -58,7 +72,7 @@ function WellOrderInput(props: Props) {
             className={cx(
               styles.well_order_icon,
               { [styles.icon_with_label]: props.label },
-              ...props.iconClassNames
+              getIconClassNames()
             )}
           />
         </FormGroup>
@@ -66,24 +80,3 @@ function WellOrderInput(props: Props) {
     </>
   )
 }
-
-const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const formData = stepFormSelectors.getUnsavedForm(state)
-
-  let iconClassNames = []
-  if (formData) {
-    const first = formData[`${ownProps.prefix}_wellOrder_first`]
-    const second = formData[`${ownProps.prefix}_wellOrder_second`]
-    iconClassNames = [styles[`${first}_first`], styles[`${second}_second`]]
-  }
-  return { iconClassNames }
-}
-
-export const WellOrderField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapSTP)(WellOrderInput)
