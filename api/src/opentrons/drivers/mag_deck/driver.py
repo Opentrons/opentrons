@@ -58,59 +58,6 @@ class MagDeckError(Exception):
     pass
 
 
-class ParseError(Exception):
-    pass
-
-
-def _parse_string_value_from_substring(substring) -> str:
-    """
-    Returns the ascii value in the expected string "N:aa11bb22", where "N" is
-    the key, and "aa11bb22" is string value to be returned
-    """
-    try:
-        value = substring.split(':')[1]
-        return str(value)
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected arg to _parse_string_value_from_substring:')
-        raise ParseError(
-            'Unexpected arg to _parse_string_value_from_substring: {}'.format(
-                substring))
-
-
-def _parse_number_from_substring(substring) -> Optional[float]:
-    """
-    Returns the number in the expected string "N:12.3", where "N" is the
-    key, and "12.3" is a floating point value
-
-    For the magnetic module's height response like "height:12.34" "
-    "height:none" should return a None value
-    """
-    try:
-        value = substring.split(':')[1]
-        if value.strip().lower() == 'none':
-            return None
-        return round(float(value), GCODE_ROUNDING_PRECISION)
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to _parse_number_from_substring:')
-        raise ParseError(
-            'Unexpected argument to _parse_number_from_substring: {}'.format(
-                substring))
-
-
-def _parse_key_from_substring(substring) -> str:
-    """
-    Returns the key in the expected string "N:12.3", where "N" is the
-    key, and "12.3" is a floating point value
-    """
-    try:
-        return substring.split(':')[0]
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to _parse_key_from_substring:')
-        raise ParseError(
-            'Unexpected argument to _parse_key_from_substring: {}'.format(
-                substring))
-
-
 def _parse_distance_response(distance_string) -> float:
     """
     Parse responses of 'GET_PLATE_HEIGHT' & 'GET_CURRENT_POSITION'
@@ -118,15 +65,14 @@ def _parse_distance_response(distance_string) -> float:
     GET_PLATE_HEIGHT: "height:12.34"
     GET_CURRENT_POSITION: "Z:12.34"
     """
-    err_msg = 'Unexpected argument to _parse_distance_response: {}'.format(
-        distance_string)
-    if not distance_string or \
-            not isinstance(distance_string, str):
-        raise ParseError(err_msg)
-    if 'Z' not in distance_string and 'height' not in distance_string:
-        raise ParseError(err_msg)
-    return _parse_number_from_substring(  # type: ignore
-        distance_string.strip())          # (preconditions checked above)
+    data = utils.parse_key_values(distance_string)
+    val = data.get('Z', data.get('height'))
+    if val is None:
+        raise utils.ParseError(
+            f'Unexpected argument to _parse_distance_response: '
+            f'{distance_string}')
+
+    return utils.parse_number(val, GCODE_ROUNDING_PRECISION)
 
 
 class SimulatingDriver:

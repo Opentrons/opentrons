@@ -78,8 +78,8 @@ def parse_temperature_response(
             f'{temperature_string}'
         )
     result = {
-        'current': parse_number(data['C'], rounding_val),
-        'target': parse_number(data['T'], rounding_val)
+        'current': parse_optional_number(data['C'], rounding_val),
+        'target': parse_optional_number(data['T'], rounding_val)
     }
     return result
 
@@ -116,11 +116,14 @@ def parse_key_values(value: str) -> Dict[str, str]:
     return res
 
 
-def parse_number(value: str, rounding_val: int) -> Optional[float]:
-    """Convert number to float. A value of 'none' will yield None"""
+def parse_optional_number(value: str, rounding_val) -> Optional[float]:
+    """Convert number to float. 'none' will be converted to None"""
+    return None if value == "none" else parse_number(value, rounding_val)
+
+
+def parse_number(value: str, rounding_val: int) -> float:
+    """Convert string to float."""
     try:
-        if value == 'none':
-            return None
         return round(float(value), rounding_val)
     except (ValueError, IndexError, TypeError, AttributeError):
         err = f'Unexpected argument to parse_number: {value}'
