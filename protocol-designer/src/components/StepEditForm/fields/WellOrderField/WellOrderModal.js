@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { connect } from 'react-redux'
-
 import { i18n } from '../../../../localization'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import {
@@ -13,10 +11,7 @@ import {
   DropdownField,
 } from '@opentrons/components'
 import modalStyles from '../../../modals/modal.css'
-import { actions } from '../../../../steplist'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import type { BaseState, ThunkDispatch } from '../../../../types'
-import type { WellOrderOption } from '../../../../form-types'
+import type { WellOrderOption, FormData } from '../../../../form-types'
 
 import { WellOrderViz } from './WellOrderViz'
 import styles from './WellOrderInput.css'
@@ -30,66 +25,73 @@ const WELL_ORDER_VALUES: Array<WellOrderOption> = [
   ...VERTICAL_VALUES,
   ...HORIZONTAL_VALUES,
 ]
-
-type SP = {|
-  initialFirstValue: ?WellOrderOption,
-  initialSecondValue: ?WellOrderOption,
-|}
-
-type DP = {|
-  updateValues: (
-    firstValue: ?WellOrderOption,
-    secondValue: ?WellOrderOption
-  ) => mixed,
-|}
-
-type OP = {|
+type Props = {|
   isOpen: boolean,
   closeModal: () => mixed,
   prefix: 'aspirate' | 'dispense' | 'mix',
+  formData: FormData,
+  updateValues: (firstValue: ?WellOrderOption, ?WellOrderOption) => void,
 |}
-
-type Props = {| ...OP, ...SP, ...DP |}
 
 type State = {
   firstValue: ?WellOrderOption,
   secondValue: ?WellOrderOption,
 }
 
-class WellOrderModalComponent extends React.Component<Props, State> {
+export class WellOrderModal extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
+    const {
+      initialFirstValue,
+      initialSecondValue,
+    } = this.getInitialFirstValues()
     this.state = {
-      firstValue: props.initialFirstValue,
-      secondValue: props.initialSecondValue,
+      firstValue: initialFirstValue,
+      secondValue: initialSecondValue,
     }
   }
-  applyChanges = () => {
+
+  getInitialFirstValues: () => {|
+    initialFirstValue: ?WellOrderOption,
+    initialSecondValue: ?WellOrderOption,
+  |} = () => {
+    const { formData, prefix } = this.props
+    return {
+      initialFirstValue: formData && formData[`${prefix}_wellOrder_first`],
+      initialSecondValue: formData && formData[`${prefix}_wellOrder_second`],
+    }
+  }
+  applyChanges: () => void = () => {
     this.props.updateValues(this.state.firstValue, this.state.secondValue)
   }
-  handleReset = () => {
+  handleReset: () => void = () => {
     this.setState(
       { firstValue: DEFAULT_FIRST, secondValue: DEFAULT_SECOND },
       this.applyChanges
     )
     this.props.closeModal()
   }
-  handleCancel = () => {
-    const { initialFirstValue, initialSecondValue } = this.props
+  handleCancel: () => void = () => {
+    const {
+      initialFirstValue,
+      initialSecondValue,
+    } = this.getInitialFirstValues()
     this.setState(
       { firstValue: initialFirstValue, secondValue: initialSecondValue },
       this.applyChanges
     )
     this.props.closeModal()
   }
-  handleDone = () => {
+  handleDone: () => void = () => {
     this.applyChanges()
     this.props.closeModal()
   }
-  makeOnChange = (ordinality: 'first' | 'second') => (
-    e: SyntheticEvent<HTMLSelectElement>
-  ) => {
-    const { value } = e.currentTarget
+  makeOnChange: (
+    ordinality: 'first' | 'second'
+  ) => (
+    event: SyntheticEvent<HTMLSelectElement>
+  ) => void = ordinality => event => {
+    const { value } = event.currentTarget
     let nextState = { [`${ordinality}Value`]: value }
     if (ordinality === 'first') {
       if (
@@ -106,14 +108,18 @@ class WellOrderModalComponent extends React.Component<Props, State> {
     }
     this.setState(nextState)
   }
-  isSecondOptionDisabled = (value: WellOrderOption) => {
+  isSecondOptionDisabled: WellOrderOption => boolean = (
+    value: WellOrderOption
+  ) => {
     if (VERTICAL_VALUES.includes(this.state.firstValue)) {
       return VERTICAL_VALUES.includes(value)
     } else if (HORIZONTAL_VALUES.includes(this.state.firstValue)) {
       return HORIZONTAL_VALUES.includes(value)
+    } else {
+      return false
     }
   }
-  render() {
+  render(): React.Node {
     if (!this.props.isOpen) return null
     const { firstValue, secondValue } = this.state
     return (
@@ -202,38 +208,3 @@ class WellOrderModalComponent extends React.Component<Props, State> {
     )
   }
 }
-
-const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const formData = stepFormSelectors.getUnsavedForm(state)
-  return {
-    initialFirstValue:
-      formData && formData[`${ownProps.prefix}_wellOrder_first`],
-    initialSecondValue:
-      formData && formData[`${ownProps.prefix}_wellOrder_second`],
-  }
-}
-
-const mapDTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
-  updateValues: (firstValue, secondValue) => {
-    dispatch(
-      actions.changeFormInput({
-        update: {
-          [`${ownProps.prefix}_wellOrder_first`]: firstValue,
-          [`${ownProps.prefix}_wellOrder_second`]: secondValue,
-        },
-      })
-    )
-  },
-})
-
-export const WellOrderModal: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  DP,
-  _,
-  _
->(
-  mapSTP,
-  mapDTP
-)(WellOrderModalComponent)
