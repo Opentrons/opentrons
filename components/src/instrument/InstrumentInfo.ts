@@ -12,7 +12,7 @@ import { InstrumentDiagram } from './InstrumentDiagram'
 
 import styles from './instrument.css'
 
-export type InstrumentInfoProps = {|
+export type InstrumentInfoProps = {
   /** 'left' or 'right' */
   mount: Mount,
   /** if true, show labels 'LEFT PIPETTE' / 'RIGHT PIPETTE' */
@@ -31,7 +31,7 @@ export type InstrumentInfoProps = {|
   infoClassName?: string,
   /** children to display under the info */
   children?: React.Node,
-|}
+}
 
 export function InstrumentInfo(props: InstrumentInfoProps): React.Node {
   const className = cx(

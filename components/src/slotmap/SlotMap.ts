@@ -4,14 +4,14 @@ import cx from 'classnames'
 import { Icon } from '../icons'
 import styles from './styles.css'
 
-export type SlotMapProps = {|
+export type SlotMapProps = {
   /** Slot(s) to highlight */
   occupiedSlots: Array<string>,
   /** Optional collision warning */
   collisionSlots?: Array<string>,
   /** Optional error styling */
   isError?: boolean,
-|}
+}
 
 const SLOT_MAP_SLOTS = [
   ['10', '11'],

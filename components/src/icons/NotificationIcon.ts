@@ -7,13 +7,13 @@ import { ICON_DATA_BY_NAME } from './icon-data'
 
 import type { IconProps, IconName } from './Icon'
 
-export type NotificationIconProps = {|
+export type NotificationIconProps = {
   ...IconProps,
   /** name constant of the optional notifcation icon to display */
   childName: IconName | null,
   /** color to apply to notification icon (defaults to COLOR_WARNING) */
   childColor?: string,
-|}
+}
 
 const SCALE_FACTOR = 3
 

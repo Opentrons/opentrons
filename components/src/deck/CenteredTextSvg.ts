@@ -2,10 +2,10 @@
 // TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 
-export type CenteredTextSvgProps = {|
+export type CenteredTextSvgProps = {
   text: React.Node,
   className?: string,
-|}
+}
 
 /**
  * @deprecated Use {@link RobotCoordsText}

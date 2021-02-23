@@ -9,12 +9,12 @@ const DISTANCE_FROM_REFERENCE = 8
 
 type PopperProps = React.ElementProps<typeof Popper>
 
-export type TooltipChildProps<ChildProps: {}> = {|
+export type TooltipChildProps<ChildProps: {}> = {
   ...$Exact<ChildProps>,
   ref: React.Ref<*>,
-|}
+}
 
-export type DeprecatedTooltipProps<ChildProps: {}> = {|
+export type DeprecatedTooltipProps<ChildProps: {}> = {
   /** show or hide the tooltip */
   open?: boolean,
   /** contents of the tooltip */
@@ -31,16 +31,16 @@ export type DeprecatedTooltipProps<ChildProps: {}> = {|
   children: (props?: TooltipChildProps<ChildProps>) => React.Node,
   /** extra props to pass to the children render function */
   childProps?: ChildProps,
-|}
+}
 
 /**
  *  Basic, fully controlled Tooltip component.
  *
  * `props.children` is a function that receives the following props object:
  * ```js
- * type TooltipChildProps = {|
+ * type TooltipChildProps = {
  *   ref: React.Ref<*>,
- * |}
+ * }
  * ```
  *
  * `props.childProps` can be used to add extra fields to the child props object

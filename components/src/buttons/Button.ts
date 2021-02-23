@@ -3,7 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import omit from 'lodash/omit'
 
-import { Icon, type IconName } from '../icons'
+import { Icon } from '../icons'
 import styles from './buttons.css'
 
 import {
@@ -12,9 +12,11 @@ import {
   BUTTON_TYPE_BUTTON,
 } from '../primitives'
 
+import type {IconName } from '../icons'
+
 export type ButtonProps = {
   /** click handler */
-  onClick?: (event: SyntheticMouseEvent<>) => mixed,
+  onClick?: (event: SyntheticMouseEvent<>) => unknown,
   /** name attribute */
   name?: string,
   /** title attribute */
@@ -42,12 +44,12 @@ export type ButtonProps = {
   Component?: string | React.AbstractComponent<any>,
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: ?$Shape<{
-    ref: (Element | null) => mixed,
+    ref: (Element | null) => unknown,
     'aria-describedby': string,
-    onMouseEnter: () => mixed,
-    onMouseLeave: () => mixed,
-    onPointerEnter: () => mixed,
-    onPointerLeave: () => mixed,
+    onMouseEnter: () => unknown,
+    onMouseLeave: () => unknown,
+    onPointerEnter: () => unknown,
+    onPointerLeave: () => unknown,
     ...
   }>,
   /** html tabindex property */

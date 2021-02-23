@@ -14,11 +14,11 @@ import styles from './PipetteSelect.css'
 import type { SelectOption } from '../forms'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 
-export type PipetteSelectProps = {|
+export type PipetteSelectProps = {
   /** currently selected value, optional in case selecting triggers immediate action */
   pipetteName?: string | null,
   /** react-select change handler */
-  onPipetteChange: (pipetteName: string | null) => mixed,
+  onPipetteChange: (pipetteName: string | null) => unknown,
   /** list of pipette names to omit */
   nameBlocklist?: Array<string>,
   /** whether or not "None" shows up as the default option */
@@ -29,7 +29,7 @@ export type PipetteSelectProps = {|
   className?: string,
   /** custom id to be applied. likely to be used as a data test id for e2e testing */
   id?: string,
-|}
+}
 
 // TODO(mc, 2019-10-14): i18n
 const NONE = 'None'

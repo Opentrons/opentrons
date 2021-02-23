@@ -18,7 +18,7 @@ const TOOLTIP_CSS = css`
   cursor: pointer;
 `
 
-export type TooltipProps = {|
+export type TooltipProps = {
   /** Whether or not the tooltip should be rendered */
   visible: boolean,
   /** Contents of the tooltip */
@@ -33,10 +33,10 @@ export type TooltipProps = {|
   /** Inline styles to apply to the tooltip element (provided by useTooltip) */
   style: $Shape<CSSStyleDeclaration>,
   /** React function ref for tooltip's arrow element (provided by useTooltip) */
-  arrowRef: (HTMLElement | null) => mixed,
+  arrowRef: (HTMLElement | null) => unknown,
   /** Inline styles to apply to arrow element (provided by useTooltip) */
   arrowStyle: $Shape<CSSStyleDeclaration>,
-|}
+}
 
 /**
  * Tooltip component that renders based on its `visible` prop. For use with the
@@ -114,11 +114,11 @@ const ARROW_CSS_BY_PLACEMENT_BASE: { [string]: CSSRules | void } = {
   left: ARROW_CSS_LEFT,
 }
 
-export type ArrowProps = {|
+export type ArrowProps = {
   placement: Placement | null,
-  arrowRef: (HTMLElement | null) => mixed,
+  arrowRef: (HTMLElement | null) => unknown,
   arrowStyle: $Shape<CSSStyleDeclaration>,
-|}
+}
 
 export function Arrow(props: ArrowProps): React.Node {
   const placement = props.placement ?? ''

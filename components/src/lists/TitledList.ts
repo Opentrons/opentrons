@@ -6,7 +6,7 @@ import cx from 'classnames'
 import styles from './lists.css'
 import { type IconName, Icon } from '../icons'
 
-export type TitledListProps = {|
+export type TitledListProps = {
   /** text of title */
   title: string,
   /** optional icon left of the title */
@@ -23,15 +23,15 @@ export type TitledListProps = {|
   /** component with descriptive text about the list */
   description?: React.Node,
   /** optional click action (on title div, not children) */
-  onClick?: (event: SyntheticMouseEvent<>) => mixed,
+  onClick?: (event: SyntheticMouseEvent<>) => unknown,
   /** optional right click action (on wrapping div) */
-  onContextMenu?: (event: SyntheticMouseEvent<>) => mixed,
+  onContextMenu?: (event: SyntheticMouseEvent<>) => unknown,
   /** optional mouseEnter action */
-  onMouseEnter?: (event: SyntheticMouseEvent<>) => mixed,
+  onMouseEnter?: (event: SyntheticMouseEvent<>) => unknown,
   /** optional mouseLeave action */
-  onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed,
+  onMouseLeave?: (event: SyntheticMouseEvent<>) => unknown,
   /** caret click action; if defined, list is expandable and carat is visible */
-  onCollapseToggle?: (event: SyntheticMouseEvent<>) => mixed,
+  onCollapseToggle?: (event: SyntheticMouseEvent<>) => unknown,
   /** collapse the list if true (false by default) */
   collapsed?: boolean,
   /** set to true when TitledList is selected (eg, user clicked it) */
@@ -42,7 +42,7 @@ export type TitledListProps = {|
   disabled?: boolean,
   /** appear disabled, but preserve collapsibility */
   inert?: boolean,
-|}
+}
 
 /**
  * An ordered list with optional title, icon, and description.

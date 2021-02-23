@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
@@ -8,7 +7,7 @@ import { useToggle } from '../useToggle'
 describe('useToggle hook', () => {
   let result
 
-  const TestUseToggle = (props: {| initialValue: boolean | void |}) => {
+  const TestUseToggle = (props: { initialValue: boolean | void }) => {
     result = useToggle(props.initialValue)
     return <></>
   }

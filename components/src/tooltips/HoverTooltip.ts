@@ -19,7 +19,7 @@ export type HoverTooltipHandlers = TooltipChildProps<{
 
 export type HoverTooltipProps = DeprecatedTooltipProps<HoverTooltipHandlers>
 
-type HoverTooltipState = {| isOpen: boolean |}
+type HoverTooltipState = { isOpen: boolean }
 
 /**
  * Tooltip component that triggers on `MouseEnter` and `MouseLeave`. See
@@ -27,11 +27,11 @@ type HoverTooltipState = {| isOpen: boolean |}
  *
  * `props.children` is a function that receives the following props object:
  * ```js
- * type HoverTooltipHandlers = {|
+ * type HoverTooltipHandlers = {
  *   ref: React.Ref<*>,
  *   onMouseEnter: (SyntheticMouseEvent<*>) => void,
  *   onMouseLeave: (SyntheticMouseEvent<*>) => void,
- * |}
+ * }
  * ```
  *
  * @deprecated Use `Tooltip` and `useHoverTooltip` instead

@@ -7,13 +7,13 @@ import styles from './styles.css'
 
 import type { DropdownFieldProps } from '../forms'
 
-export type LabeledSelectProps = {|
+export type LabeledSelectProps = {
   ...DropdownFieldProps,
   label: string,
   children: React.Node,
   /** optional data test id for the container */
   'data-test'?: string,
-|}
+}
 
 export function LabeledSelect(props: LabeledSelectProps): React.Node {
   const { label, value, options, onChange } = props

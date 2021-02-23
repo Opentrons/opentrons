@@ -1,11 +1,13 @@
 
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon, type IconProps } from '../icons'
+import { Icon } from '../icons'
 import { IconButton } from '../buttons'
 import styles from './alerts.css'
 
-export type AlertItemProps = {|
+import type { IconProps } from '../icons'
+
+export type AlertItemProps = {
   /** name constant of the icon to display */
   type: 'success' | 'warning' | 'error' | 'info',
   /** title/main message of colored alert bar */
@@ -15,10 +17,10 @@ export type AlertItemProps = {|
   /** Additional class name */
   className?: string,
   /** optional handler to show close button/clear alert  */
-  onCloseClick?: () => mixed,
+  onCloseClick?: () => unknown,
   /** Override the default Alert Icon */
   icon?: IconProps,
-|}
+}
 
 /**
  * Alert overlay,

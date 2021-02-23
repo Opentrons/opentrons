@@ -2,14 +2,17 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { OutlineButton, type ButtonProps } from '../buttons'
-import { Icon, type IconName } from '../icons'
+import { OutlineButton } from '../buttons'
+import { Icon } from '../icons'
 import { Modal } from './Modal'
 import styles from './modals.css'
 
-export type AlertModalProps = {|
+import type { ButtonProps } from '../buttons'
+import type { IconName } from '../icons'
+
+export type AlertModalProps = {
   /** optional handler for overlay click */
-  onCloseClick?: () => mixed,
+  onCloseClick?: () => unknown,
   /** optional modal heading */
   heading?: React.Node,
   /** optional array of `ButtonProps` for `OutlineButton`s at bottom of modal */
@@ -26,7 +29,7 @@ export type AlertModalProps = {|
   iconName?: ?IconName,
   /** restricts scroll outside of Modal when open, true by default */
   restrictOuterScroll?: boolean,
-|}
+}
 
 /**
  * Generic alert modal with a heading and a set of buttons at the bottom

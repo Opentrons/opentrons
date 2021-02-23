@@ -9,17 +9,17 @@ import styles from './structure.css'
 
 import type { ButtonProps } from '../buttons'
 
-export type TitleBarProps = {|
+export type TitleBarProps = {
   title: React.Node,
   subtitle?: React.Node,
   back?: ButtonProps,
   className?: string,
 
   // TODO(mc, 2018-04-13): deprecate these props
-  onBackClick?: () => mixed,
+  onBackClick?: () => unknown,
   backClickDisabled?: boolean,
   backButtonLabel?: string,
-|}
+}
 
 export function TitleBar(props: TitleBarProps): React.Node {
   const {

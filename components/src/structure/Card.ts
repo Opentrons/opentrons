@@ -8,7 +8,7 @@ import type { StyledComponent } from 'styled-components'
 
 import * as styles from '../styles'
 
-export type CardProps = {|
+export type CardProps = {
   /** Title for card, all cards should receive a title. */
   title?: React.Node,
   /** Card contents */
@@ -17,7 +17,7 @@ export type CardProps = {|
   disabled?: boolean,
   /** Additional class names */
   className?: string,
-|}
+}
 
 /**
  * Renders a basic card element with a white background, dropshadow, and zero padding.
@@ -36,8 +36,8 @@ export function Card(props: CardProps): React.Node {
 }
 
 const Section: StyledComponent<
-  {| disabled?: boolean |},
-  {||},
+  { disabled?: boolean },
+  {},
   HTMLElement
 > = styled.section`
   font-size: ${styles.FONT_SIZE_BODY_2};

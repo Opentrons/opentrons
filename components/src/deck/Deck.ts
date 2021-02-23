@@ -22,19 +22,19 @@ import type {
   DeckSlotId,
 } from '@opentrons/shared-data'
 
-export type LabwareComponentProps = {|
+export type LabwareComponentProps = {
   slot: DeckSlotId,
   width: number,
   height: number,
-|}
+}
 
 export type LabwareComponentType = React.ComponentType<LabwareComponentProps>
 
-export type DeckProps = {|
+export type DeckProps = {
   className?: string,
   LabwareComponent?: LabwareComponentType,
   DragPreviewLayer?: any, // TODO: BC 2019-01-03 flow doesn't like portals
-|}
+}
 
 const VIEW_BOX_WIDTH = 427
 const VIEW_BOX_HEIGHT = 390
@@ -52,7 +52,7 @@ export class Deck extends React.Component<DeckProps> {
   getXY: (
     rawX: number,
     rawY: number
-  ) => $Shape<{| scaledX?: number, scaledY?: number |}> = (rawX, rawY) => {
+  ) => $Shape<{ scaledX?: number, scaledY?: number }> = (rawX, rawY) => {
     if (!this.parentRef) return {}
     const clientRect: {
       width: number,
@@ -129,10 +129,10 @@ function renderLabware(
 // TODO: BC 2019-05-03 we should migrate to only using the DeckFromData
 // component; once Deck is removed, we should rename it Deck
 
-export type DeckFromDataProps = {|
+export type DeckFromDataProps = {
   def: DeckDefinition,
   layerBlocklist: Array<string>,
-|}
+}
 
 export class DeckFromData extends React.PureComponent<DeckFromDataProps> {
   render(): React.Node {

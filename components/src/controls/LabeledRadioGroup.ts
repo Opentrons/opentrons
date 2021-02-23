@@ -6,12 +6,12 @@ import { RadioGroup } from '../forms'
 
 import type { RadioGroupProps } from '../forms'
 
-export type LabeledRadioGroupProps = {|
+export type LabeledRadioGroupProps = {
   ...RadioGroupProps,
   label: string,
   children: React.Node,
   'data-test'?: string,
-|}
+}
 
 export function LabeledRadioGroup(props: LabeledRadioGroupProps): React.Node {
   const { label, value, options, onChange } = props

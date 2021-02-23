@@ -6,11 +6,11 @@ import * as Styles from './styles'
 
 import type { UseTooltipOptions, UseTooltipResult, Placement } from './types'
 
-type TooltipState = {|
+type TooltipState = {
   placement: Placement | null,
   tooltipStyle: $Shape<CSSStyleDeclaration>,
   arrowStyle: $Shape<CSSStyleDeclaration>,
-|}
+}
 
 const TOOLTIP_ID_PREFIX = 'Tooltip__'
 

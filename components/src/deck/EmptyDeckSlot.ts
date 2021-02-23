@@ -8,10 +8,10 @@ import styles from './LabwareWrapper.css'
 
 import type { LabwareWrapperProps } from './LabwareWrapper'
 
-export type EmptyDeckSlotProps = {|
+export type EmptyDeckSlotProps = {
   ...LabwareWrapperProps,
   slot: string,
-|}
+}
 
 /**
  * @deprecated Use {@link RobotWorkSpace}

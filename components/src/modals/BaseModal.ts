@@ -45,7 +45,7 @@ const CONTENT_STYLE = {
   paddingY: Styles.SPACING_3,
 }
 
-export type BaseModalProps = {|
+export type BaseModalProps = {
   /** Overlay color, defaults to `OVERLAY_GRAY_90` */
   overlayColor?: string,
   /** Optional sticky header */
@@ -55,7 +55,7 @@ export type BaseModalProps = {|
   /** Modal content */
   children?: React.Node,
   ...StyleProps,
-|}
+}
 
 /**
  * A BaseModal is a layout component for building more specific modals.

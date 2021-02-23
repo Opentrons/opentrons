@@ -6,14 +6,14 @@ import { CheckboxField } from '../forms'
 import { LabeledControl } from './LabeledControl'
 import styles from './styles.css'
 
-export type LabeledCheckboxProps = {|
+export type LabeledCheckboxProps = {
   label: string,
   name: string,
   value: boolean,
   className?: string,
   children: React.Node,
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
-|}
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
+}
 
 export function LabeledCheckbox(props: LabeledCheckboxProps): React.Node {
   const { label, value, name, onChange } = props

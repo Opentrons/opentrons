@@ -6,9 +6,9 @@ import { RemoveScroll } from 'react-remove-scroll'
 import { Overlay } from './Overlay'
 import styles from './modals.css'
 
-export type ModalProps = {|
+export type ModalProps = {
   /** handler to close the modal (attached to `Overlay` onClick) */
-  onCloseClick?: (event: SyntheticEvent<>) => mixed,
+  onCloseClick?: (event: SyntheticEvent<>) => unknown,
   /** Optional styled heading **/
   heading?: string,
   /** modal contents */
@@ -22,9 +22,9 @@ export type ModalProps = {|
   /** restricts scroll outside of Modal when open, true by default */
   restrictOuterScroll?: boolean,
   innerRef?:
-    | {| current: HTMLElement | null |}
-    | ((current: HTMLElement | null) => mixed),
-|}
+    | { current: HTMLElement | null }
+    | ((current: HTMLElement | null) => unknown),
+}
 
 /**
  * Base modal component that fills its nearest `display:relative` ancestor

@@ -3,10 +3,10 @@
 import * as React from 'react'
 import styles from './SidePanel.css'
 
-export type SidePanelProps = {|
+export type SidePanelProps = {
   title: string,
   children: React.Node,
-|}
+}
 
 export function SidePanel(props: SidePanelProps): React.Node {
   return (

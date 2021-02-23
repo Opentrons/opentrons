@@ -5,12 +5,12 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
 import styles from './Labware.css'
 
-export type LabwareOutlineProps = {|
+export type LabwareOutlineProps = {
   definition?: LabwareDefinition2,
   width?: number,
   height?: number,
   isTiprack?: boolean,
-|}
+}
 
 const OUTLINE_THICKNESS_MM = 1
 

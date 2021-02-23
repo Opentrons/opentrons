@@ -5,11 +5,11 @@ import { AlertModal } from './AlertModal'
 
 import type { AlertModalProps } from './AlertModal'
 
-export type ContinueModalProps = {|
+export type ContinueModalProps = {
   ...$Diff<AlertModalProps, { buttons: mixed }>,
-  onCancelClick: () => mixed,
-  onContinueClick: () => mixed,
-|}
+  onCancelClick: () => unknown,
+  onContinueClick: () => unknown,
+}
 
 const CANCEL = 'Cancel'
 const CONTINUE = 'Continue'

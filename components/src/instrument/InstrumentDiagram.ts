@@ -13,11 +13,11 @@ import singleGEN2Src from './pipetteGEN2Single.png'
 import multiGEN2Src from './pipetteGEN2Multi.png'
 import styles from './instrument.css'
 
-export type InstrumentDiagramProps = {|
+export type InstrumentDiagramProps = {
   pipetteSpecs?: PipetteNameSpecs | PipetteModelSpecs | null,
   className?: string,
   mount: Mount,
-|}
+}
 
 export function InstrumentDiagram(props: InstrumentDiagramProps): React.Node {
   const { pipetteSpecs, mount } = props

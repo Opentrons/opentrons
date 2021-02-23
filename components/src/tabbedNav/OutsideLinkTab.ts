@@ -8,9 +8,9 @@ import { NotificationIcon } from '../icons'
 
 import type { IconName } from '../icons'
 
-export type OutsideLinkTabProps = {|
+export type OutsideLinkTabProps = {
   /** optional click event for nav button */
-  onClick?: (event: SyntheticEvent<>) => mixed,
+  onClick?: (event: SyntheticEvent<>) => unknown,
   /** link to outside URL */
   to: string,
   /** position a single button on the bottom of the page */
@@ -27,7 +27,7 @@ export type OutsideLinkTabProps = {|
   notification?: boolean,
   /** selected styling (can also use react-router & `activeClassName`) */
   selected?: boolean,
-|}
+}
 
 /** Very much like NavTab, but used for opening external links in a new tab/window */
 export function OutsideLinkTab(props: OutsideLinkTabProps): React.Node {

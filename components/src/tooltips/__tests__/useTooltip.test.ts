@@ -15,10 +15,10 @@ jest.mock('../usePopper')
 const usePopper: JestMockFn<[Types.UsePopperOptions], Types.UsePopperResult> =
   UsePopper.usePopper
 
-type TestUseTooltipProps = {|
+type TestUseTooltipProps = {
   ...Types.UseTooltipOptions,
   visible: boolean,
-|}
+}
 
 describe('useTooltip hook', () => {
   const render = (options: TestUseTooltipProps) => {

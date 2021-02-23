@@ -6,13 +6,13 @@ import { useEffect, useRef } from 'react'
  * https://overreacted.io/making-setinterval-declarative-with-react-hooks/
  *
  * @template T (type of the input value)
- * @param {() => mixed} callback (function to call on an interval)
+ * @param {() => unknown} callback (function to call on an interval)
  * @param {number | null} delay (interval delay, or null to stop interval)
  * @param {boolean} [immediate=false] (trigger the callback immediately before starting the interval)
  * @returns {void}
  */
 export function useInterval(
-  callback: () => mixed,
+  callback: () => unknown,
   delay: number | null,
   immediate: boolean = false
 ): void {

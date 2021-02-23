@@ -6,11 +6,11 @@ import { styleProps, isntStyleProp } from './style-props'
 import type { StyledComponent } from 'styled-components'
 import type { StyleProps } from './types'
 
-export type LinkProps = {|
+export type LinkProps = {
   /** render link with target="_blank" */
   external?: boolean,
   ...StyleProps,
-|}
+}
 
 /**
  * Link primitive
@@ -19,7 +19,7 @@ export type LinkProps = {|
  */
 export const Link: StyledComponent<
   LinkProps,
-  {||},
+  {},
   HTMLAnchorElement
 > = styled.a
   .withConfig({

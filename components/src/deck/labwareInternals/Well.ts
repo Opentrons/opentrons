@@ -7,7 +7,7 @@ import styles from './Well.css'
 import type { LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 
-export type WellProps = {|
+export type WellProps = {
   /** if included, overrides the default classname */
   className?: ?string,
   /** fill inline style */
@@ -19,9 +19,9 @@ export type WellProps = {|
   /** special class used for drag-to-select functionality. Should not be used for styling */
   selectableWellClass?: string,
   /** Optional callback, called with WellMouseEvent args onMouseOver */
-  onMouseEnterWell?: WellMouseEvent => mixed,
-  onMouseLeaveWell?: WellMouseEvent => mixed,
-|}
+  onMouseEnterWell?: WellMouseEvent => unknown,
+  onMouseLeaveWell?: WellMouseEvent => unknown,
+}
 
 function WellComponent(props: WellProps) {
   const { well, wellName, fill, onMouseEnterWell, onMouseLeaveWell } = props

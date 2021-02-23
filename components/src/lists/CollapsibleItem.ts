@@ -6,7 +6,7 @@ import cx from 'classnames'
 import styles from './lists.css'
 import { Icon } from '../icons'
 
-export type CollapsibleItemProps = {|
+export type CollapsibleItemProps = {
   /** text of title */
   title: string,
   /** children nodes */
@@ -14,10 +14,10 @@ export type CollapsibleItemProps = {|
   /** additional classnames */
   className?: string,
   /** caret click action; if defined, list is expandable and carat is visible */
-  onCollapseToggle: (event: SyntheticMouseEvent<>) => mixed,
+  onCollapseToggle: (event: SyntheticMouseEvent<>) => unknown,
   /** collapse the list if true (false by default) */
   collapsed: boolean,
-|}
+}
 
 /**
  * A list item with title, and collapsible children.

@@ -5,19 +5,19 @@ import { Icon } from '../icons'
 
 import styles from './forms.css'
 
-export type RadioGroupProps = {|
+export type RadioGroupProps = {
   /** blur handler */
-  onBlur?: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
+  onBlur?: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
   /** change handler */
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
   /** value that is checked */
   value?: string,
   /** Array of {name, value} data with optional children */
-  options?: Array<{|
+  options?: Array<{
     name: string,
     value: string,
     children?: React.Node,
-  |}>,
+  }>,
   /** Show radio buttons inline instead of stacked */
   inline?: boolean,
   /** classes to apply to outer div */
@@ -28,7 +28,7 @@ export type RadioGroupProps = {|
   error?: ?string,
   /** 'name' attr of input */
   name?: string,
-|}
+}
 
 export function RadioGroup(props: RadioGroupProps): React.Node {
   const error = props.error != null

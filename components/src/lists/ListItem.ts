@@ -7,17 +7,17 @@ import classnames from 'classnames'
 import styles from './lists.css'
 import { type IconName, Icon } from '../icons'
 
-type ListItemProps = {|
+type ListItemProps = {
   /** click handler */
-  onClick?: (event: SyntheticEvent<>) => mixed,
+  onClick?: (event: SyntheticEvent<>) => unknown,
   /** mouse enter handler */
-  onMouseEnter?: (event: SyntheticMouseEvent<>) => mixed,
+  onMouseEnter?: (event: SyntheticMouseEvent<>) => unknown,
   /** mouse leave handler */
-  onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed,
+  onMouseLeave?: (event: SyntheticMouseEvent<>) => unknown,
   /** mouse enter handler */
-  onPointerEnter?: (event: SyntheticPointerEvent<>) => mixed,
+  onPointerEnter?: (event: SyntheticPointerEvent<>) => unknown,
   /** mouse leave handler */
-  onPointerLeave?: (event: SyntheticPointerEvent<>) => mixed,
+  onPointerLeave?: (event: SyntheticPointerEvent<>) => unknown,
   /** if URL is specified, ListItem is wrapped in a React Router NavLink */
   url?: string | null,
   /** if URL is specified NavLink can receive an active class name */
@@ -31,9 +31,9 @@ type ListItemProps = {|
   /** name constant of the icon to display */
   iconName?: IconName,
   'aria-describedby'?: string,
-  ref?: {| current: Element | null |} | ((current: Element | null) => mixed),
+  ref?: { current: Element | null } | ((current: Element | null) => unknown),
   children: React.Node,
-|}
+}
 
 /**
  * A styled `<li>` with an optional icon, and an optional url for a React Router `NavLink`

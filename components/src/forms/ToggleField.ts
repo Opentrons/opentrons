@@ -5,9 +5,9 @@ import { Icon } from '../icons'
 
 import styles from './forms.css'
 
-export type ToggleFieldProps = {|
+export type ToggleFieldProps = {
   /** change handler */
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
   /** checkbox is checked if value is true */
   value?: boolean,
   /** classes to apply */
@@ -24,7 +24,7 @@ export type ToggleFieldProps = {|
   disabled?: boolean,
   /** html tabindex property */
   tabIndex?: number,
-|}
+}
 
 export function ToggleField(props: ToggleFieldProps): React.Node {
   const outerClassName = cx(styles.form_field, props.className, {

@@ -5,12 +5,12 @@ import cx from 'classnames'
 import type { WellDefinition } from '@opentrons/shared-data'
 import styles from './Well.css'
 
-export type TipProps = {|
+export type TipProps = {
   wellDef: WellDefinition,
   tipVolume: ?number,
   empty?: ?boolean,
   highlighted?: ?boolean,
-|}
+}
 
 export function Tip(props: TipProps): React.Node {
   const { wellDef, empty, highlighted, tipVolume } = props

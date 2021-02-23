@@ -2,15 +2,17 @@
 // TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon, type IconName } from '../icons'
+import { Icon } from '../icons'
 
 import styles from './SlotOverlay.css'
 
-export type SlotOverlayProps = {|
+import type { IconName } from '../icons'
+
+export type SlotOverlayProps = {
   text?: string,
   icon?: IconName,
   className?: string,
-|}
+}
 
 /**
  * @deprecated No longer necessary, do not use

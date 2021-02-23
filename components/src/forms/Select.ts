@@ -27,15 +27,15 @@ export type ChangeAction =
   | 'clear'
   | 'create-option'
 
-export type SelectOption = {|
+export type SelectOption = {
   value: string,
   label?: string,
   isDisabled?: boolean,
-|}
+}
 
 export type SelectOptionOrGroup =
   | SelectOption
-  | {| options: Array<SelectOption>, label?: string |}
+  | { options: Array<SelectOption>, label?: string }
 
 export type SelectPlacement =
   | typeof PLACEMENT_AUTO
@@ -47,13 +47,13 @@ export type SelectPosition = typeof POSITION_ABSOLUTE | typeof POSITION_FIXED
 export type SelectOptionContext = typeof CONTEXT_MENU | typeof CONTEXT_VALUE
 
 // this object is not exhaustive because react-select's documentation is bad
-type SelectComponentProps = {|
+type SelectComponentProps = {
   innerRef: any,
   innerProps: any,
-  selectProps: {| menuIsOpen: boolean |},
-|}
+  selectProps: { menuIsOpen: boolean },
+}
 
-export type SelectProps = {|
+export type SelectProps = {
   options: Array<SelectOptionOrGroup>,
   value?: SelectOption | null,
   defaultValue?: SelectOption | null,
@@ -72,16 +72,16 @@ export type SelectProps = {|
   tabIndex?: string | number,
   formatOptionLabel?: (
     option: SelectOption,
-    data: {|
+    data: {
       context: SelectOptionContext,
       inputValue: string,
       selectValue: Array<SelectOption> | SelectOption | null | void,
-    |}
+    }
   ) => React.Node,
-  onBlur?: (SyntheticFocusEvent<HTMLElement>) => mixed,
-  onChange?: (value: SelectOption | null, action: ChangeAction) => mixed,
-  onFocus?: (SyntheticFocusEvent<HTMLElement>) => mixed,
-|}
+  onBlur?: (SyntheticFocusEvent<HTMLElement>) => unknown,
+  onChange?: (value: SelectOption | null, action: ChangeAction) => unknown,
+  onFocus?: (SyntheticFocusEvent<HTMLElement>) => unknown,
+}
 
 const NO_STYLE = () => null
 
@@ -136,7 +136,7 @@ const DropdownIndicator = (props: SelectComponentProps) => (
   </reactSelectComponents.DropdownIndicator>
 )
 
-const Menu = (props: {| ...SelectComponentProps, children: React.Node |}) => (
+const Menu = (props: { ...SelectComponentProps, children: React.Node }) => (
   <reactSelectComponents.Menu {...props}>
     <div className={styles.menu}>{props.children}</div>
     <div className={styles.menu_control_bridge} />

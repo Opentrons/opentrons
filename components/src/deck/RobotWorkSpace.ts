@@ -6,13 +6,13 @@ import type { DeckDefinition } from '@opentrons/shared-data'
 import styles from './RobotWorkSpace.css'
 import type { RobotWorkSpaceRenderProps } from './types'
 
-export type RobotWorkSpaceProps = {|
+export type RobotWorkSpaceProps = {
   deckDef?: DeckDefinition,
   viewBox?: string,
   className?: string,
   children?: RobotWorkSpaceRenderProps => React.Node,
   deckLayerBlocklist?: Array<string>,
-|}
+}
 
 type GetRobotCoordsFromDOMCoords = $PropertyType<
   RobotWorkSpaceRenderProps,
@@ -21,7 +21,7 @@ type GetRobotCoordsFromDOMCoords = $PropertyType<
 
 export function RobotWorkSpace(props: RobotWorkSpaceProps): React.Node {
   const { children, deckDef, deckLayerBlocklist = [], viewBox } = props
-  const wrapperRef: {| current: Element | null |} = React.useRef(null)
+  const wrapperRef: { current: Element | null } = React.useRef(null)
 
   // NOTE: getScreenCTM in Chrome a DOMMatrix type,
   // in Firefox the same fn returns a deprecated SVGMatrix.

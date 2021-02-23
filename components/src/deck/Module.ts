@@ -18,14 +18,14 @@ import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
 import styles from './Module.css'
 
 const FLIPPED_SLOTS = ['3', '6', '9']
-export type ModuleProps = {|
+export type ModuleProps = {
   /** module model */
   model: ModuleModel,
   /** display mode: 'default', 'present', 'missing', or 'info' */
   mode: 'default' | 'present' | 'missing' | 'info',
   /** slot details of the location of this module */
   slot: DeckSlot,
-|}
+}
 
 export function Module(props: ModuleProps): React.Node {
   const { model, slot } = props
@@ -80,7 +80,7 @@ export function Module(props: ModuleProps): React.Node {
   )
 }
 
-type ModuleItemContentsProps = {| ...ModuleProps, shouldFlip: boolean |}
+type ModuleItemContentsProps = { ...ModuleProps, shouldFlip: boolean }
 function ModuleItemContents(props: ModuleItemContentsProps) {
   const { mode, model, shouldFlip } = props
   const displayName = getModuleDisplayName(model)

@@ -8,7 +8,7 @@ import { Icon } from '../icons'
 
 import type { IconName } from '../icons'
 
-export type SidePanelGroupProps = {|
+export type SidePanelGroupProps = {
   /** text of title */
   title?: string,
   /** optional icon left of the title */
@@ -19,7 +19,7 @@ export type SidePanelGroupProps = {|
   className?: string,
   /** disables the whole SidePanelGroup if true */
   disabled?: boolean,
-|}
+}
 
 /**
  * A component for grouping and titling multiple lists

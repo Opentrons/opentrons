@@ -3,13 +3,13 @@
 
 import type { StyledComponent } from 'styled-components'
 
-export type ColorProps = {|
+export type ColorProps = {
   color?: string,
   backgroundColor?: string,
   opacity?: string | number,
-|}
+}
 
-export type TypographyProps = {|
+export type TypographyProps = {
   fontSize?: string | number,
   fontWeight?: string | number,
   fontStyle?: string,
@@ -17,9 +17,9 @@ export type TypographyProps = {|
   textAlign?: string,
   textTransform?: string,
   textDecoration?: string,
-|}
+}
 
-export type SpacingProps = {|
+export type SpacingProps = {
   margin?: string | number,
   marginX?: string | number,
   marginY?: string | number,
@@ -34,9 +34,9 @@ export type SpacingProps = {|
   paddingRight?: string | number,
   paddingBottom?: string | number,
   paddingLeft?: string | number,
-|}
+}
 
-export type BorderProps = {|
+export type BorderProps = {
   border?: string,
   borderTop?: string,
   borderRight?: string,
@@ -45,26 +45,26 @@ export type BorderProps = {|
   borderRadius?: string | number,
   borderWidth?: string | number,
   borderColor?: string,
-|}
+}
 
-export type FlexboxProps = {|
+export type FlexboxProps = {
   flex?: string | number,
   alignItems?: string,
   alignSelf?: string,
   justifyContent?: string,
   flexDirection?: string,
   flexWrap?: string,
-|}
+}
 
-export type GridProps = {|
+export type GridProps = {
   gridGap?: string | number,
   gridTemplateRows?: string,
   gridTemplateColumns?: string,
   gridRow?: string | number,
   gridColumn?: string | number,
-|}
+}
 
-export type LayoutProps = {|
+export type LayoutProps = {
   display?: string,
   size?: string | number,
   width?: string | number,
@@ -74,18 +74,18 @@ export type LayoutProps = {|
   minHeight?: string | number,
   maxHeight?: string | number,
   wordSpacing?: string | number,
-|}
+}
 
-export type PositionProps = {|
+export type PositionProps = {
   position?: string,
   zIndex?: string | number,
   top?: string | number,
   right?: string | number,
   bottom?: string | number,
   left?: string | number,
-|}
+}
 
-export type StyleProps = {|
+export type StyleProps = {
   ...ColorProps,
   ...TypographyProps,
   ...SpacingProps,
@@ -95,10 +95,10 @@ export type StyleProps = {|
   ...LayoutProps,
   ...PositionProps,
   className?: string,
-|}
+}
 
 export type PrimitiveComponent<Instance> = StyledComponent<
   StyleProps,
-  {||},
+  {},
   Instance
 >

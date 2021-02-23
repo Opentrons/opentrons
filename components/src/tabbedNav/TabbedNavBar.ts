@@ -3,11 +3,11 @@ import * as React from 'react'
 import cx from 'classnames'
 import styles from './navbar.css'
 
-export type TabbedNavBarProps = {|
+export type TabbedNavBarProps = {
   className?: string,
   topChildren?: React.Node,
   bottomChildren?: React.Node,
-|}
+}
 
 export function TabbedNavBar(props: TabbedNavBarProps): React.Node {
   const className = cx(styles.navbar, props.className)

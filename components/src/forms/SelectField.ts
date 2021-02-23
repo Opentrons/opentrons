@@ -8,7 +8,7 @@ import styles from './SelectField.css'
 
 import type { SelectProps } from './Select'
 
-export type SelectFieldProps = {|
+export type SelectFieldProps = {
   /** optional HTML id for container */
   id?: $PropertyType<SelectProps, 'id'>,
   /** field name */
@@ -32,10 +32,10 @@ export type SelectFieldProps = {|
   /** if included, use error style and display error instead of caption */
   error?: ?string,
   /** change handler called with (name, value) */
-  onValueChange?: (name: string, value: string) => mixed,
+  onValueChange?: (name: string, value: string) => unknown,
   /** blur handler called with (name) */
-  onLoseFocus?: (name: string) => mixed,
-|}
+  onLoseFocus?: (name: string) => unknown,
+}
 
 export function SelectField(props: SelectFieldProps): React.Node {
   const {

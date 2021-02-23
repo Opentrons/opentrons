@@ -5,15 +5,15 @@ import { LabeledControl } from './LabeledControl'
 import { ToggleButton } from './ToggleButton'
 import styles from './styles.css'
 
-export type LabeledToggleProps = {|
+export type LabeledToggleProps = {
   label: string,
   toggledOn: boolean,
   disabled?: boolean,
   children?: React.Node,
-  onClick: () => mixed,
+  onClick: () => unknown,
   /** optional data test id for the container */
   'data-test'?: string,
-|}
+}
 
 export function LabeledToggle(props: LabeledToggleProps): React.Node {
   const { label, toggledOn, disabled, onClick } = props

@@ -15,7 +15,7 @@ import type {
   WellGroup,
 } from './labwareInternals/types'
 
-export type LabwareRenderProps = {|
+export type LabwareRenderProps = {
   definition: LabwareDefinition2,
   showLabels?: boolean,
   missingTips?: ?WellGroup,
@@ -24,13 +24,13 @@ export type LabwareRenderProps = {|
   /** CSS color to fill specified wells */
   wellFill?: WellFill,
   /** Optional callback, called with WellMouseEvent args onMouseEnter */
-  onMouseEnterWell?: WellMouseEvent => mixed,
+  onMouseEnterWell?: WellMouseEvent => unknown,
   /** Optional callback, called with WellMouseEvent args onMouseLeave */
-  onMouseLeaveWell?: WellMouseEvent => mixed,
+  onMouseLeaveWell?: WellMouseEvent => unknown,
   /** Special class which, together with 'data-wellname' on the well elements,
     allows drag-to-select behavior */
   selectableWellClass?: string,
-|}
+}
 
 export function LabwareRender(props: LabwareRenderProps): React.Node {
   const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot

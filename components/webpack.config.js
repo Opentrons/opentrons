@@ -1,15 +1,13 @@
-'use strict'
-
 const path = require('path')
 const webpackMerge = require('webpack-merge')
 const { DefinePlugin } = require('webpack')
-const { nodeBaseConfig } = require('@opentrons/webpack-config')
+const { baseConfig } = require('@opentrons/webpack-config')
 const pkg = require('./package.json')
 
 const ENTRY_INDEX = path.join(__dirname, 'src/index.ts')
 const OUTPUT_PATH = path.join(__dirname, 'lib')
 
-module.exports = webpackMerge(nodeBaseConfig, {
+module.exports = webpackMerge(baseConfig, {
   entry: {
     index: ENTRY_INDEX,
   },

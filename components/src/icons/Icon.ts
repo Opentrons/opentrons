@@ -10,7 +10,7 @@ import type { StyleProps } from '../primitives'
 
 export type IconName = $Keys<typeof ICON_DATA_BY_NAME>
 
-export type IconProps = {|
+export type IconProps = {
   /** name constant of the icon to display */
   name: IconName,
   /** classes to apply */
@@ -31,7 +31,7 @@ export type IconProps = {|
   children?: React.Node,
   /** primitive styling props */
   ...StyleProps,
-|}
+}
 
 const spinAnimation = keyframes`
   100% {

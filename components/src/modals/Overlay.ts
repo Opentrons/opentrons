@@ -4,11 +4,11 @@ import cx from 'classnames'
 
 import styles from './modals.css'
 
-export type OverlayProps = {|
+export type OverlayProps = {
   /** optional onClick handler */
-  onClick?: (event: SyntheticEvent<>) => mixed,
+  onClick?: (event: SyntheticEvent<>) => unknown,
   alertOverlay?: ?boolean,
-|}
+}
 
 /**
  * Dark, semi-transparent overlay for the background of a modal. If you need

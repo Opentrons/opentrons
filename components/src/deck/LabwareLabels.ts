@@ -11,7 +11,7 @@ import {
 import { wellNameSplit } from '../utils'
 import styles from './LabwareLabels.css'
 
-export type LabwareLabelsProps = {| labwareType: string |}
+export type LabwareLabelsProps = { labwareType: string }
 
 const ROW_OFFSET = -4
 const COLUMN_OFFSET = -4

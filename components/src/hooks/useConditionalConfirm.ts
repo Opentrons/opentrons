@@ -8,7 +8,7 @@ import { useState } from 'react'
  * used to call handleContinue. Ex. a click event is being deferred by a modal. When the
  * user confirms, the initial click event passed as an argument will be used as the argument in
  * the callback.
- * @param {() => mixed)} handleContinue (the action we may want to require confirmation for)
+ * @param {() => unknown)} handleContinue (the action we may want to require confirmation for)
  * @param {boolean} shouldBlock (if no confirmation is needed, we will avoid the modal and immediately call handleContinue)
  * @example
  * ```js
@@ -38,13 +38,13 @@ import { useState } from 'react'
  */
 
 export const useConditionalConfirm = <T>(
-  handleContinue: (...Array<T>) => mixed,
+  handleContinue: (...Array<T>) => unknown,
   shouldBlock: boolean
-): ({|
-  confirm: (...Array<T>) => mixed,
+): ({
+  confirm: (...Array<T>) => unknown,
   showConfirmation: boolean,
-  cancel: () => mixed,
-|}) => {
+  cancel: () => unknown,
+}) => {
   const [pendingArgs, setPendingArgs] = useState<Array<T> | null>(null)
   const pendingConfirm = pendingArgs !== null
   const confirm = (...confirmArgs) => {

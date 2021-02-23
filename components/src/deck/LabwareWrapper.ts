@@ -6,14 +6,14 @@ import styles from './LabwareWrapper.css'
 
 const defs = { roundSlotClipPath: 'roundSlotClipPath' } // TODO: import these defs instead of hard-coding in applications? Or should they be passed to children?
 
-export type LabwareWrapperProps = {|
+export type LabwareWrapperProps = {
   x?: number,
   y?: number,
   height?: number,
   width?: number,
   highlighted?: boolean,
   children?: React.Node,
-|}
+}
 
 /**
  * @deprecated Use {@link RobotWorkSpace}

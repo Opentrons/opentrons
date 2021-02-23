@@ -10,11 +10,11 @@ import styles from './buttons.css'
 import type { IconProps } from '../icons'
 import type { ButtonProps } from './Button'
 
-type Props = {|
+type Props = {
   ...$Exact<ButtonProps>,
   name: $PropertyType<IconProps, 'name'>,
   spin?: $PropertyType<IconProps, 'spin'>,
-|}
+}
 
 /**
  * FlatButton variant for a button that is a single icon. Takes props of

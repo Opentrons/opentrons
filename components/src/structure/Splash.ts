@@ -8,12 +8,12 @@ import styles from './Splash.css'
 
 import type { IconName } from '../icons'
 
-export type SplashProps = {|
+export type SplashProps = {
   /** optional alternative icon name. Defaults to 'logo'. */
   iconName?: IconName,
   /** additional className for Splash */
   className?: string,
-|}
+}
 
 export function Splash(props: SplashProps): React.Node {
   return (

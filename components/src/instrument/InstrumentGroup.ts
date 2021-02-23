@@ -6,11 +6,11 @@ import styles from './instrument.css'
 
 import type { InstrumentInfoProps } from './InstrumentInfo'
 
-export type InstrumentGroupProps = $Shape<{|
+export type InstrumentGroupProps = $Shape<{
   showMountLabel: ?boolean,
   left: ?InstrumentInfoProps,
   right: ?InstrumentInfoProps,
-|}>
+}>
 
 const EMPTY_INSTRUMENT_PROPS = {
   description: 'None',

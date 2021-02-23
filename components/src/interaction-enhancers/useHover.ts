@@ -1,15 +1,15 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-export type UseHoverOptions = $Shape<{|
+export type UseHoverOptions = $Shape<{
   enterDelay?: number,
   leaveDelay?: number,
-|}>
+}>
 
-export type HoverHandlers = {|
-  onPointerEnter: () => mixed,
-  onPointerLeave: () => mixed,
-|}
+export type HoverHandlers = {
+  onPointerEnter: () => unknown,
+  onPointerLeave: () => unknown,
+}
 
 export type UseHoverResult = [boolean, HoverHandlers]
 

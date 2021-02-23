@@ -2,15 +2,15 @@
 import { useEffect, useRef } from 'react'
 import assert from 'assert'
 
-export type UseOnClickOutsideOptions = $Shape<{|
-  onClickOutside?: MouseEvent => mixed,
-|}>
+export type UseOnClickOutsideOptions = $Shape<{
+  onClickOutside?: MouseEvent => unknown,
+}>
 
 export const useOnClickOutside = <E: Element>(
   options: UseOnClickOutsideOptions
-): {| current: E | null |} => {
+): { current: E | null } => {
   const { onClickOutside } = options
-  const node: {| current: E | null |} = useRef(null)
+  const node: { current: E | null } = useRef(null)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

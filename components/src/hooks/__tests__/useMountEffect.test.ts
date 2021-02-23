@@ -5,9 +5,9 @@ import { mount } from 'enzyme'
 import { useMountEffect } from '../useMountEffect'
 
 describe('useMountEffect hook', () => {
-  const TestUseMountEffect = (props: {|
+  const TestUseMountEffect = (props: {
     onMount: () => void | (() => void),
-  |}) => {
+  }) => {
     useMountEffect(props.onMount)
     return <></>
   }

@@ -6,7 +6,7 @@ import { styleProps, isntStyleProp } from './style-props'
 import type { StyledComponent } from 'styled-components'
 import type { StyleProps } from './types'
 
-export type SvgProps = {|
+export type SvgProps = {
   /** attach a width attribute to the <svg> element */
   svgWidth?: string | number,
   /** attach a height attribute to the <svg> element */
@@ -22,7 +22,7 @@ export type SvgProps = {|
    */
   _cssHeight?: string | number,
   ...StyleProps,
-|}
+}
 
 const SVG_VERSION = '1.1'
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg'
@@ -34,7 +34,7 @@ const SVG_PROPS = ['svgWidth', 'svgHeight', '_cssWidth', '_cssHeight']
  *
  * @component
  */
-export const Svg: StyledComponent<SvgProps, {||}, Element> = styled.svg
+export const Svg: StyledComponent<SvgProps, {}, Element> = styled.svg
   .withConfig({
     shouldForwardProp: p => {
       return (

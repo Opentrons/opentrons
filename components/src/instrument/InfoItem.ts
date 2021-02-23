@@ -3,11 +3,11 @@ import * as React from 'react'
 
 import styles from './instrument.css'
 
-export type InfoItemProps = {|
+export type InfoItemProps = {
   title: string,
   value: string,
   className?: string,
-|}
+}
 
 /**
  * Used by `InstrumentInfo` for its titled values.

@@ -6,9 +6,9 @@ import { Icon } from '../icons'
 import styles from './forms.css'
 import type { HoverTooltipHandlers } from '../tooltips'
 
-export type CheckboxFieldProps = {|
+export type CheckboxFieldProps = {
   /** change handler */
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
   /** checkbox is checked if value is true */
   value?: boolean,
   /** classes to apply */
@@ -31,7 +31,7 @@ export type CheckboxFieldProps = {|
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
   /** if true, render indeterminate icon */
   isIndeterminate?: boolean,
-|}
+}
 
 export function CheckboxField(props: CheckboxFieldProps): React.Node {
   const error = props.error != null

@@ -4,11 +4,11 @@ import * as React from 'react'
 import { ControlInfo } from './ControlInfo'
 import styles from './styles.css'
 
-export type StackedLabeledControlProps = {|
+export type StackedLabeledControlProps = {
   label: string,
   control: React.Node,
   children?: React.Node,
-|}
+}
 
 export function StackedLabeledControl(
   props: StackedLabeledControlProps

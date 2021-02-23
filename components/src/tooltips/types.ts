@@ -16,13 +16,13 @@ export type { PopperInstance, PopperOptions }
 
 export type HandleStateUpdate = (
   placement: Placement,
-  styles: {|
+  styles: {
     popper?: $Shape<CSSStyleDeclaration>,
     arrow?: $Shape<CSSStyleDeclaration>,
-  |}
+  }
 ) => void
 
-export type UsePopperOptions = {|
+export type UsePopperOptions = {
   target: Element | null,
   tooltip: HTMLElement | null,
   arrow: HTMLElement | null,
@@ -30,46 +30,46 @@ export type UsePopperOptions = {|
   placement?: Placement | null,
   strategy?: Strategy | null,
   offset?: number,
-|}
+}
 
 export type UsePopperResult = PopperInstance | null
 
-export type UseTooltipOptions = $Shape<{|
+export type UseTooltipOptions = $Shape<{
   placement?: Placement,
   strategy?: Strategy,
   offset?: number,
-|}>
+}>
 
-export type UseTooltipResultTargetProps = {|
-  ref: (Element | null) => mixed,
+export type UseTooltipResultTargetProps = {
+  ref: (Element | null) => unknown,
   'aria-describedby': string,
-|}
+}
 
-export type UseTooltipResultTooltipProps = {|
+export type UseTooltipResultTooltipProps = {
   id: string,
-  ref: (HTMLElement | null) => mixed,
+  ref: (HTMLElement | null) => unknown,
   placement: Placement | null,
   style: $Shape<CSSStyleDeclaration>,
-  arrowRef: (HTMLElement | null) => mixed,
+  arrowRef: (HTMLElement | null) => unknown,
   arrowStyle: $Shape<CSSStyleDeclaration>,
-|}
+}
 
 export type UseTooltipResult = [
   UseTooltipResultTargetProps,
   UseTooltipResultTooltipProps
 ]
 
-export type UseHoverTooltipOptions = $Shape<{|
+export type UseHoverTooltipOptions = $Shape<{
   ...UseTooltipOptions,
   ...UseHoverOptions,
-|}>
+}>
 
-export type UseHoverTooltipTargetProps = {|
+export type UseHoverTooltipTargetProps = {
   ...UseTooltipResultTargetProps,
   ...HoverHandlers,
-|}
+}
 
 export type UseHoverTooltipResult = [
   UseHoverTooltipTargetProps,
-  {| ...UseTooltipResultTooltipProps, visible: boolean |}
+  { ...UseTooltipResultTooltipProps, visible: boolean }
 ]

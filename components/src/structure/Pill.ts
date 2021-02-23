@@ -6,7 +6,7 @@ import styles from './Pill.css'
 
 import type { UseHoverTooltipResult } from '../tooltips'
 
-export type PillProps = {|
+export type PillProps = {
   /** background color of pill (any CSS color string) */
   color?: ?string,
   /** text black, instead of default white */
@@ -17,7 +17,7 @@ export type PillProps = {|
   children?: React.Node,
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: ?$ElementType<UseHoverTooltipResult, 0>,
-|}
+}
 
 /**
  * Colored Pill containing text or other contents

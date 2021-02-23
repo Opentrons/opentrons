@@ -7,10 +7,10 @@ import styles from './styles.css'
 
 import type { ButtonProps } from '../buttons'
 
-export type ToggleButtonProps = {|
+export type ToggleButtonProps = {
   ...$Exact<ButtonProps>,
   toggledOn: boolean,
-|}
+}
 
 export function ToggleButton(props: ToggleButtonProps): React.Node {
   // TODO(mc, 2020-02-04): destructuring `name` to avoid flow error

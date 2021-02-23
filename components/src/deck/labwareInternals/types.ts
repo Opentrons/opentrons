@@ -1,8 +1,8 @@
 
-export type WellMouseEvent = {|
+export type WellMouseEvent = {
   wellName: string,
   event: SyntheticMouseEvent<Element>,
-|}
+}
 
 // wellName to CSS color, eg {'A1': '#123456'}
 export type WellFill = { [wellName: string]: string, ... }

@@ -9,7 +9,7 @@ import { NotificationIcon } from '../icons'
 
 import type { IconName } from '../icons'
 
-export type NavTabProps = {|
+export type NavTabProps = {
   /** optional click event for nav button */
   onClick?: (event: SyntheticEvent<>) => void,
   /** optional url for nav button route */
@@ -28,7 +28,7 @@ export type NavTabProps = {|
   notification?: boolean,
   /** selected styling (can also use react-router & `activeClassName`) */
   selected?: boolean,
-|}
+}
 
 export function NavTab(props: NavTabProps): React.Node {
   const { url } = props

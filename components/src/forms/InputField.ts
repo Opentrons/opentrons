@@ -9,11 +9,11 @@ export const INPUT_TYPE_PASSWORD: 'password' = 'password'
 
 // TODO: Ian 2018-09-14 remove 'label' prop when IngredientPropertiesForm gets updated
 
-export type InputFieldProps = {|
+export type InputFieldProps = {
   /** field is disabled if value is true */
   disabled?: boolean,
   /** change handler */
-  onChange?: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
+  onChange?: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
   /** classes to apply to outer element */
   className?: string,
   /** inline label text. DEPRECATED */
@@ -39,11 +39,11 @@ export type InputFieldProps = {|
   /** optional input type (default "text") */
   type?: typeof INPUT_TYPE_TEXT | typeof INPUT_TYPE_PASSWORD,
   /** mouse click handler */
-  onClick?: (event: SyntheticMouseEvent<HTMLInputElement>) => mixed,
+  onClick?: (event: SyntheticMouseEvent<HTMLInputElement>) => unknown,
   /** focus handler */
-  onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => mixed,
+  onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => unknown,
   /** blur handler */
-  onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => mixed,
+  onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => unknown,
   /** makes input field read-only */
   readOnly?: ?boolean,
   /** html tabindex property */
@@ -52,7 +52,7 @@ export type InputFieldProps = {|
   autoFocus?: boolean,
   /** if true, clear out value and add '-' placeholder */
   isIndeterminate?: boolean,
-|}
+}
 
 export function InputField(props: InputFieldProps): React.Node {
   const error = props.error != null

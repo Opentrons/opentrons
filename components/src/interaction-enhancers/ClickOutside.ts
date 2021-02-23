@@ -1,12 +1,12 @@
 
 import * as React from 'react'
 
-export type ClickOutsideProps = {|
-  onClickOutside: ?(MouseEvent) => mixed,
+export type ClickOutsideProps = {
+  onClickOutside: ?(MouseEvent) => unknown,
   children: ({
-    ref: {| current: Element | null |} | ((current: Element | null) => mixed),
+    ref: { current: Element | null } | ((current: Element | null) => unknown),
   }) => React.Node,
-|}
+}
 
 // TODO: BC: 2019-05-10 this would be much cleaner as a custom hook
 export class ClickOutside extends React.Component<ClickOutsideProps> {

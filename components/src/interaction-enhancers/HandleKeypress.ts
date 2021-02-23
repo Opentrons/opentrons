@@ -3,20 +3,20 @@ import * as React from 'react'
 
 type KeypressEvent = SyntheticKeyboardEvent<HTMLElement>
 
-export type KeypressHandler = {|
+export type KeypressHandler = {
   key: string,
   shiftKey?: ?boolean,
-  onPress: () => mixed,
-|}
+  onPress: () => unknown,
+}
 
-export type HandleKeypressProps = {|
+export type HandleKeypressProps = {
   /** array of keypress handlers to attach to the window */
   handlers: Array<KeypressHandler>,
   /** optionally call event.preventDefault if keypress is handled */
   preventDefault?: ?boolean,
   /** wrapped children */
   children?: React.Node,
-|}
+}
 
 const matchHandler = e => h =>
   h.key === e.key && (h.shiftKey == null || h.shiftKey === e.shiftKey)

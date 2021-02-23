@@ -5,9 +5,9 @@ import { mount } from 'enzyme'
 import { useConditionalConfirm } from '../useConditionalConfirm'
 
 describe('useConditionalConfirm', () => {
-  let confirm: () => mixed
+  let confirm: () => unknown
   let showConfirmation: boolean
-  let cancel: () => mixed
+  let cancel: () => unknown
 
   const TestUseConditionalConfirm = options => {
     ;({ confirm, showConfirmation, cancel } = useConditionalConfirm(

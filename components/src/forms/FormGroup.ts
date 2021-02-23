@@ -5,7 +5,7 @@ import { Icon } from '../icons'
 import styles from './forms.css'
 import type { HoverTooltipHandlers } from '../tooltips'
 
-export type FormGroupProps = {|
+export type FormGroupProps = {
   /** text label */
   label?: string,
   /** form content */
@@ -18,7 +18,7 @@ export type FormGroupProps = {|
   disabled?: ?boolean,
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
-|}
+}
 
 export function FormGroup(props: FormGroupProps): React.Node {
   const error = props.error != null

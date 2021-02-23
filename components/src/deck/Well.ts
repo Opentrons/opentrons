@@ -2,27 +2,29 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { wellIsRect, type WellDefinition } from '@opentrons/shared-data'
+import { wellIsRect } from '@opentrons/shared-data'
 import styles from './Well.css'
 import { SELECTABLE_WELL_CLASS } from '../constants.js'
 
-export type SingleWell = {|
+import type { WellDefinition } from '@opentrons/shared-data'
+
+export type SingleWell = {
   wellName: string,
   highlighted?: ?boolean, // highlighted is the same as hovered
   selected?: ?boolean,
   error?: ?boolean,
   maxVolume?: number,
   fillColor?: ?string,
-|}
+}
 
-export type WellProps = {|
+export type WellProps = {
   ...SingleWell,
   selectable?: boolean,
   wellDef: WellDefinition,
-  onMouseOver?: (e: SyntheticMouseEvent<Element>) => mixed,
-  onMouseLeave?: (e: SyntheticMouseEvent<Element>) => mixed,
-  onMouseMove?: (e: SyntheticMouseEvent<Element>) => mixed,
-|}
+  onMouseOver?: (e: SyntheticMouseEvent<Element>) => unknown,
+  onMouseLeave?: (e: SyntheticMouseEvent<Element>) => unknown,
+  onMouseMove?: (e: SyntheticMouseEvent<Element>) => unknown,
+}
 
 export class Well extends React.Component<WellProps> {
   shouldComponentUpdate(nextProps: WellProps): boolean {

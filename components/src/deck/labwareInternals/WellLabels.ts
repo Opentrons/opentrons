@@ -9,9 +9,9 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const LETTER_COLUMN_X = 4
 const NUMBER_COLUMN_Y_FROM_TOP = 5
 
-export type WellLabelsProps = {|
+export type WellLabelsProps = {
   definition: LabwareDefinition2,
-|}
+}
 
 const Labels = (props: {
   definition: LabwareDefinition2,

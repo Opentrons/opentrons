@@ -4,11 +4,11 @@ import { Well } from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellGroup } from './types'
 
-export type StyledWellProps = {|
+export type StyledWellProps = {
   className: string,
   definition: LabwareDefinition2,
   wells: WellGroup,
-|}
+}
 
 function StyledWellsComponent(props: StyledWellProps) {
   const { className, definition, wells } = props

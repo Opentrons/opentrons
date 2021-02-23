@@ -5,21 +5,21 @@ import cx from 'classnames'
 import { Icon } from '..'
 import styles from './forms.css'
 
-export type DropdownOption = {|
+export type DropdownOption = {
   name: string,
   value: string,
   disabled?: boolean,
-|}
+}
 
 export type Options = Array<DropdownOption>
 
-export type DropdownFieldProps = {|
+export type DropdownFieldProps = {
   /** change handler */
-  onChange: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
+  onChange: (event: SyntheticInputEvent<HTMLSelectElement>) => unknown,
   /** focus handler */
-  onFocus?: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
+  onFocus?: (event: SyntheticFocusEvent<HTMLSelectElement>) => unknown,
   /** blur handler */
-  onBlur?: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
+  onBlur?: (event: SyntheticFocusEvent<HTMLSelectElement>) => unknown,
   /** value that is selected */
   value?: ?string,
   /** optional id for the <select> element */
@@ -42,7 +42,7 @@ export type DropdownFieldProps = {|
   autoFocus?: boolean,
   /** if true, render indeterminate unselectable option */
   isIndeterminate?: boolean,
-|}
+}
 
 const BLANK_OPTION: DropdownOption = { name: '', value: '' }
 const INDETERMINATE_OPTION: DropdownOption = {
