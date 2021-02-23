@@ -97,7 +97,7 @@ def test_remove_serial_echo(smoothie, monkeypatch):
 
 
 def test_parse_position_response(smoothie):
-    good_data = 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
+    good_data = 'ok M114.2 X:10 Y:20 Z:30 A:40 B:50 C:60'
     bad_data = 'ok M114.2 X:10 Y:20: Z:30A:40 B:50 C:60'
     res = driver_3_0._parse_position_response(good_data)
     expected = {
@@ -594,7 +594,7 @@ def test_clear_limit_switch(smoothie, monkeypatch):
         if driver_3_0.GCODES['MOVE'] in command:
             return "ALARM: Hard limit +C"
         elif driver_3_0.GCODES['CURRENT_POSITION'] in command:
-            return 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
+            return 'ok M114.2 X:10 Y:20 Z:30 A:40 B:50 C:60'
         else:
             return "ok"
 

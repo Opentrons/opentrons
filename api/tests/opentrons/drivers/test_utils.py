@@ -44,6 +44,8 @@ def test_parse_device_information_failure(input_str: str) -> None:
          {'target': 321.4, 'current': None}],
         ['T:123.566 C:123.446',
          {'target': 123.57, 'current': 123.45}],
+        ['T:-123.566 C:-123.446',
+         {'target': -123.57, 'current': -123.45}],
     ]
 )
 def test_parse_temperature_response_success(
