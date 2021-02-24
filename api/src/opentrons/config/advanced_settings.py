@@ -177,6 +177,16 @@ settings = [
                     'should only be used if a protocol has been simulated '
                     'before.',
         restart_required=False,
+    ),
+    SettingDefinition(
+        _id="enableProtocolEngine",
+        title="Enable Experimental Protocol Engine",
+        description=(
+            "Do not enable. This is an Opentrons-internal setting to test "
+            "new protocol execution logic. This feature is not yet complete; "
+            "your protocols will break if you enable this setting."
+        ),
+        restart_required=False,
     )
 ]
 
@@ -373,8 +383,19 @@ def _migrate7to8(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate8to9(previous: SettingsMap) -> SettingsMap:
+    """
+    Migration to version 8 of the feature flags file. Adds the
+    enableFastProtocolUpload config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableProtocolEngine"] = None
+    return newmap
+
+
 _MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4,
-               _migrate4to5, _migrate5to6, _migrate6to7, _migrate7to8]
+               _migrate4to5, _migrate5to6, _migrate6to7, _migrate7to8,
+               _migrate8to9]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should
@@ -416,7 +437,7 @@ def _ensure(data: Mapping[str, Any]) -> SettingsMap:
     return newdata
 
 
-def get_setting_with_env_overload(setting_name):
+def get_setting_with_env_overload(setting_name) -> bool:
     env_name = 'OT_API_FF_' + setting_name
     if env_name in os.environ:
         return os.environ[env_name].lower() in {'1', 'true', 'on'}

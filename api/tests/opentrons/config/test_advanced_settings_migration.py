@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 8
+    return 9
 
 
 @pytest.fixture
@@ -26,6 +26,7 @@ def default_file_settings() -> Dict[str, Optional[bool]]:
         'enableTipLengthCalibration': None,
         'enableHttpProtocolSessions': None,
         'enableFastProtocolUpload': None,
+        'enableProtocolEngine': None,
     }
 
 
@@ -37,24 +38,24 @@ def empty_settings():
 @pytest.fixture
 def version_less():
     return {
-      'shortFixedTrash': True,
-      'calibrateToBottom': True,
-      'deckCalibrationDots': True,
-      'disableHomeOnBoot': True,
-      'useOldAspirationFunctions': True,
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': True,
+        'disableHomeOnBoot': True,
+        'useOldAspirationFunctions': True,
     }
 
 
 @pytest.fixture
 def v1_config():
     return {
-      '_version': 1,
-      'shortFixedTrash': True,
-      'calibrateToBottom': True,
-      'deckCalibrationDots': True,
-      'disableHomeOnBoot': True,
-      'useProtocolApi2': None,
-      'useOldAspirationFunctions': True,
+        '_version': 1,
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': True,
+        'disableHomeOnBoot': True,
+        'useProtocolApi2': None,
+        'useOldAspirationFunctions': True,
     }
 
 
@@ -98,6 +99,46 @@ def v5_config(v4_config):
     return r
 
 
+@pytest.fixture
+def v6_config(v5_config):
+    r = v5_config
+    r.update({
+        '_version': 6,
+        'enableTipLengthCalibration': True,
+    })
+    return r
+
+
+@pytest.fixture
+def v7_config(v6_config):
+    r = v6_config
+    r.update({
+        '_version': 7,
+        'enableHttpProtocolSessions': True,
+    })
+    return r
+
+
+@pytest.fixture
+def v8_config(v7_config):
+    r = v7_config
+    r.update({
+        '_version': 8,
+        'enableFastProtocolUpload': True,
+    })
+    return r
+
+
+@pytest.fixture
+def v9_config(v8_config):
+    r = v8_config
+    r.update({
+        '_version': 9,
+        'enableProtocolEngine': True,
+    })
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -107,7 +148,11 @@ def v5_config(v4_config):
         lazy_fixture("v2_config"),
         lazy_fixture("v3_config"),
         lazy_fixture("v4_config"),
-        lazy_fixture("v5_config")
+        lazy_fixture("v5_config"),
+        lazy_fixture("v6_config"),
+        lazy_fixture("v7_config"),
+        lazy_fixture("v8_config"),
+        lazy_fixture("v9_config"),
     ]
 )
 def old_settings(request):
@@ -130,10 +175,10 @@ def test_migrations(
 def test_migrates_versionless_old_config(
         migrated_file_version, default_file_settings):
     settings, version = _migrate({
-      'short-fixed-trash': False,
-      'calibrate-to-bottom': False,
-      'dots-deck-type': True,
-      'disable-home-on-boot': False,
+        'short-fixed-trash': False,
+        'calibrate-to-bottom': False,
+        'dots-deck-type': True,
+        'disable-home-on-boot': False,
     })
 
     expected = default_file_settings
@@ -150,8 +195,8 @@ def test_migrates_versionless_old_config(
 
 def test_ignores_invalid_keys(migrated_file_version, default_file_settings):
     settings, version = _migrate({
-      'split-labware-def': True,
-      'splitLabwareDefinitions': True
+        'split-labware-def': True,
+        'splitLabwareDefinitions': True,
     })
 
     assert version == migrated_file_version
@@ -159,21 +204,22 @@ def test_ignores_invalid_keys(migrated_file_version, default_file_settings):
 
 
 def test_ensures_config(default_file_settings):
-    assert _ensure(
-        {'_version': 3,
-         'shortFixedTrash': False,
-         'disableLogAggregation': True})\
-         == {
-             '_version': 3,
-             'shortFixedTrash': False,
-             'calibrateToBottom': None,
-             'deckCalibrationDots': None,
-             'disableHomeOnBoot': None,
-             'useOldAspirationFunctions': None,
-             'disableLogAggregation': True,
-             'useProtocolApi2': None,
-             'enableDoorSafetySwitch': None,
-             'enableTipLengthCalibration': None,
-             'enableHttpProtocolSessions': None,
-             'enableFastProtocolUpload': None,
-         }
+    assert _ensure({
+        '_version': 3,
+        'shortFixedTrash': False,
+        'disableLogAggregation': True
+    }) == {
+        '_version': 3,
+        'shortFixedTrash': False,
+        'calibrateToBottom': None,
+        'deckCalibrationDots': None,
+        'disableHomeOnBoot': None,
+        'useOldAspirationFunctions': None,
+        'disableLogAggregation': True,
+        'useProtocolApi2': None,
+        'enableDoorSafetySwitch': None,
+        'enableTipLengthCalibration': None,
+        'enableHttpProtocolSessions': None,
+        'enableFastProtocolUpload': None,
+        'enableProtocolEngine': None,
+    }
