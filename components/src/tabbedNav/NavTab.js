@@ -18,6 +18,8 @@ export type NavTabProps = {|
   isBottom?: boolean,
   /** classes to apply */
   className?: string,
+  /** name */
+  name?: string,
   /** disabled attribute (setting disabled removes onClick) */
   disabled?: boolean,
   /** optional title to display below the icon */
@@ -39,6 +41,7 @@ export function NavTab(props: NavTabProps): React.Node {
   })
 
   let buttonProps = {
+    name: props.name,
     className: className,
     disabled: props.disabled,
     onClick: props.onClick,
