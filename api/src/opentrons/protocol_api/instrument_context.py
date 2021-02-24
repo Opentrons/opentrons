@@ -146,10 +146,11 @@ class InstrumentContext(CommandPublisher):
                          robot will aspirate from the exact specified location.
                          If unspecified, the robot will aspirate from the
                          current position.
-        :param rate: The relative plunger speed for this aspirate. During
-                     this aspirate, the speed of the plunger will be
-                     `rate` * :py:attr:`aspirate_speed`. If not specified,
-                     defaults to 1.0 (speed will not be modified).
+        :param rate: A relative modifier for how quickly to aspirate liquid.
+                     The flow rate for this aspirate will be
+                     `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`.
+                     If not specified, defaults to 1.0.
+                     
         :type rate: float
         :returns: This instance.
 
@@ -245,10 +246,10 @@ class InstrumentContext(CommandPublisher):
                          robot will dispense into the exact specified location.
                          If unspecified, the robot will dispense into the
                          current position.
-        :param rate: The relative plunger speed for this dispense. During
-                     this dispense, the speed of the plunger will be
-                     `rate` * :py:attr:`dispense_speed`. If not specified,
-                     defaults to 1.0 (speed will not be modified).
+        :param rate: A relative modifier for how quickly to dispense liquid.
+                     The flow rate for this dispense will be
+                     `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
+                     If not specified, defaults to 1.0.
         :type rate: float
 
         :returns: This instance.
@@ -315,8 +316,12 @@ class InstrumentContext(CommandPublisher):
                          e.g, `plate.rows()[0][0].bottom()`.  If unspecified,
                          the pipette will mix from its current position.
         :type location: types.Location
-        :param rate: Set plunger speed for this mix, where,
-                     ``speed = rate * (aspirate_speed or dispense_speed)``
+        :param rate: A relative modifier for how quickly to aspirate and
+                     dispense liquid during this mix. When aspirating, the flow
+                     rate will be
+                     `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`,
+                     and when dispensing, it will be
+                     `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
         :raises NoTipAttachedError: If no tip is attached to the pipette.
         :returns: This instance
 
