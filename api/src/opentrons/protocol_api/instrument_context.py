@@ -150,7 +150,6 @@ class InstrumentContext(CommandPublisher):
                      The flow rate for this aspirate will be
                      `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`.
                      If not specified, defaults to 1.0.
-                     
         :type rate: float
         :returns: This instance.
 
