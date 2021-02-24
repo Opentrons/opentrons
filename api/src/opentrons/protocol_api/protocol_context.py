@@ -10,6 +10,10 @@ from opentrons.hardware_control import API
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.implementations.instrument_context import \
+    InstrumentContextImplementation
+from opentrons.protocols.implementations.simulators.instrument_context import \
+    InstrumentContextSimulation
 from opentrons.protocols.types import Protocol
 from .labware import Labware
 from opentrons.protocols.implementations.interfaces.labware import \
@@ -223,6 +227,10 @@ class ProtocolContext(CommandPublisher):
         old_hw = hardware_manager.hardware
         old_tc = None
         tc_context = None
+        # Cache the current instrument context implementations.
+        old_instrument_impls = {
+            k: v._implementation for k, v in self._instruments.items() if v
+        }
         try:
             hardware_manager.set_hw(hardware)
             for mod_ctx in self._modules:
@@ -234,11 +242,38 @@ class ProtocolContext(CommandPublisher):
                     if hw_tc:
                         old_tc = mod_ctx._module
                         mod_ctx._module = hw_tc
+
+            # InstrumentContextSimulation is an implementation that has no
+            # interaction with hardware controller. This is our fast
+            # simulation.
+            # InstrumentContext objects using an InstrumentContextSimulation
+            # must create an InstrumentContextImplementation in order to
+            # actually connect the InstrumentContext to the hardware
+            # connection.
+            for instrument_ctx in self._instruments.values():
+                if not instrument_ctx:
+                    continue
+                impl = instrument_ctx._implementation
+                if isinstance(impl, InstrumentContextSimulation):
+                    instrument_ctx._implementation = \
+                        InstrumentContextImplementation(
+                            protocol_interface=self._implementation,
+                            mount=impl.get_mount(),
+                            default_speed=impl.get_default_speed(),
+                            instrument_name=impl.get_instrument_name(),
+                            api_version=self._api_version
+                        )
+
             yield self
         finally:
             hardware_manager.set_hw(old_hw)
             if tc_context is not None and old_tc is not None:
                 tc_context._module = old_tc
+            # reset the instrument context implementations.
+            for mount, instrument_impl in old_instrument_impls.items():
+                instrument_context = self._instruments[mount]
+                if instrument_context:
+                    instrument_context._implementation = instrument_impl
 
     @requires_version(2, 0)
     def connect(self, hardware: API):
