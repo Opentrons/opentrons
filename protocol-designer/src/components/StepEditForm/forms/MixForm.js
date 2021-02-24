@@ -178,7 +178,13 @@ export const MixForm = (props: StepFormProps): React.Node => {
       </div>
       <div className={styles.section_wrapper}>
         <div className={styles.form_row}>
-          <ChangeTipField name="changeTip" />
+          <ChangeTipField
+            {...propsForFields['changeTip']}
+            aspirateWells={formData.aspirate_wells}
+            dispenseWells={formData.dispense_wells}
+            path={formData.path}
+            stepType={formData.stepType}
+          />
         </div>
       </div>
     </div>
