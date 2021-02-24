@@ -22,7 +22,7 @@ export type TooltipProps = {
   /** Whether or not the tooltip should be rendered */
   visible: boolean,
   /** Contents of the tooltip */
-  children?,
+  children?: React.ReactNode,
   /**
    * Tooltip element ID (provided by useTooltip). Will match
    * targetProps.aria-describedby

@@ -12,7 +12,7 @@ export type LabwareWrapperProps = {
   height?: number,
   width?: number,
   highlighted?: boolean,
-  children?,
+  children?: React.ReactNode,
 }
 
 /**

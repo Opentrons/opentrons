@@ -7,7 +7,7 @@ import styles from './styles.css'
 export type StackedLabeledControlProps = {
   label: string,
   control,
-  children?,
+  children?: React.ReactNode,
 }
 
 export function StackedLabeledControl(

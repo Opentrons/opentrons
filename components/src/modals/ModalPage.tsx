@@ -15,7 +15,7 @@ export type ModalPageProps = {
   titleBar: TitleBarProps,
   contentsClassName?: string,
   heading?,
-  children?,
+  children?: React.ReactNode,
   innerProps?: React.ElementProps<typeof Box>,
   outerProps?: React.ElementProps<typeof Box>,
 }

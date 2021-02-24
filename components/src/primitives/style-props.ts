@@ -6,7 +6,7 @@ import pick from 'lodash/pick'
 
 import * as Types from './types'
 
-import type { Styles } from 'styled-components'
+import type { StyledComponentProps } from 'styled-components'
 
 const COLOR_PROPS = ['color', 'backgroundColor', 'opacity']
 
@@ -127,20 +127,20 @@ const spacingStyles = (props: { ...Types.SpacingProps, ... }) => {
   return styles
 }
 
-const borderStyles = (props: { ...Types.BorderProps, ... }) => {
-  return (pick(props, BORDER_PROPS): Types.BorderProps)
+const borderStyles = (props: Partial<Types.BorderProps>) => {
+  return (pick(props, BORDER_PROPS) as Types.BorderProps)
 }
 
-const flexboxStyles = (props: { ...Types.FlexboxProps, ... }) => {
-  return (pick(props, FLEXBOX_PROPS): Types.FlexboxProps)
+const flexboxStyles = (props: Partial<Types.FlexboxProps>) => {
+  return (pick(props, FLEXBOX_PROPS) as Types.FlexboxProps)
 }
 
-const gridStyles = (props: { ...Types.GridProps, ... }) => {
-  return (pick(props, GRID_PROPS): Types.GridProps)
+const gridStyles = (props: Partial<Types.GridProps>) => {
+  return (pick(props, GRID_PROPS) as Types.GridProps)
 }
 
-const layoutStyles = (props: { ...Types.LayoutProps, ... }) => {
-  const { size, ...styles } = (pick(props, LAYOUT_PROPS): Types.LayoutProps)
+const layoutStyles = (props: Partial<Types.LayoutProps>) => {
+  const { size, ...styles } = (pick(props, LAYOUT_PROPS) as Types.LayoutProps)
 
   if (size != null) {
     styles.width = styles.width ?? size
@@ -150,11 +150,11 @@ const layoutStyles = (props: { ...Types.LayoutProps, ... }) => {
   return styles
 }
 
-const positionStyles = (props: { ...Types.PositionProps, ... }) => {
-  return (pick(props, POSITION_PROPS): Types.PositionProps)
+const positionStyles = (props: Partial<Types.PositionProps>) => {
+  return (pick(props, POSITION_PROPS) as Types.PositionProps)
 }
 
-export const styleProps = (props: { ...Types.StyleProps, ... }): Styles => ({
+export const styleProps = (props: Partial<Types.StyleProps>): StyledComponentProps => ({
   ...colorStyles(props),
   ...typographyStyles(props),
   ...spacingStyles(props),

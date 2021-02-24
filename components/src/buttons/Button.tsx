@@ -32,7 +32,7 @@ export type ButtonProps = {
   /** inverts the default color/background/border of default button style */
   inverted?: boolean,
   /** contents of the button */
-  children?,
+  children?: React.ReactNode,
   /** type of button (default "button") */
   type?:
     | typeof BUTTON_TYPE_SUBMIT

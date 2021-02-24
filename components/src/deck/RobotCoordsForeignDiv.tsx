@@ -7,7 +7,7 @@ export type RobotCoordsForeignDivProps = {
   height?: string | number,
   x?: string | number,
   y?: string | number,
-  children?,
+  children?: React.ReactNode,
   className?: string,
   innerDivProps?: React.ElementProps<'div'>,
   transformWithSVG?: boolean,

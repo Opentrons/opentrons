@@ -14,7 +14,7 @@ export type SidePanelGroupProps = {
   /** optional icon left of the title */
   iconName?: IconName,
   /** children, most likely one or more TitledList */
-  children?,
+  children?: React.ReactNode,
   /** additional classnames */
   className?: string,
   /** disables the whole SidePanelGroup if true */

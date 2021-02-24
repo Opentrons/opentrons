@@ -4,7 +4,7 @@ import * as React from 'react'
 export type RobotCoordsTextProps = {
   x: number,
   y: number,
-  children?,
+  children?: React.ReactNode,
 }
 
 /** SVG text reflected to use take robot coordinates as props */

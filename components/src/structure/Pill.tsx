@@ -14,7 +14,7 @@ export type PillProps = {
   /** additional class name */
   className?: string,
   /** contents of the pill */
-  children?,
+  children?: React.ReactNode,
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: ?$ElementType<UseHoverTooltipResult, 0>,
 }

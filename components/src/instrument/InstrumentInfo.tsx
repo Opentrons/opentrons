@@ -30,7 +30,7 @@ export type InstrumentInfoProps = {
   /** classes to apply to the info group child */
   infoClassName?: string,
   /** children to display under the info */
-  children?,
+  children?: React.ReactNode,
 }
 
 export function InstrumentInfo(props: InstrumentInfoProps) {

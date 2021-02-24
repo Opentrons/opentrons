@@ -8,9 +8,9 @@ import { ICON_DATA_BY_NAME } from './icon-data'
 
 import type { StyleProps } from '../primitives'
 
-export type IconName = $Keys<typeof ICON_DATA_BY_NAME>
+export type IconName = keyof typeof ICON_DATA_BY_NAME
 
-export type IconProps = {
+export interface IconProps {
   /** name constant of the icon to display */
   name: IconName,
   /** classes to apply */
@@ -26,9 +26,9 @@ export type IconProps = {
   /** height as a number or string (for nesting inside another SVG) */
   svgWidth?: number | string,
   /** inline style passed into the icon svg */
-  style?: { [string]: string | number, ... },
+  style?: Record<string, string | number>,
   /** optional children */
-  children?,
+  children?: React.ReactNode,
   /** primitive styling props */
   ...StyleProps,
 }

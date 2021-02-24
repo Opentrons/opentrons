@@ -9,7 +9,7 @@ export type LabeledToggleProps = {
   label: string,
   toggledOn: boolean,
   disabled?: boolean,
-  children?,
+  children?: React.ReactNode,
   onClick: () => unknown,
   /** optional data test id for the container */
   'data-test'?: string,

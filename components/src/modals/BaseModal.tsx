@@ -53,7 +53,7 @@ export type BaseModalProps = {
   /** Optional sticky footer */
   footer?,
   /** Modal content */
-  children?,
+  children?: React.ReactNode,
   ...StyleProps,
 }
 

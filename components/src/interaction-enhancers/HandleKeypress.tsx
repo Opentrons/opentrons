@@ -15,7 +15,7 @@ export type HandleKeypressProps = {
   /** optionally call event.preventDefault if keypress is handled */
   preventDefault?: ?boolean,
   /** wrapped children */
-  children?,
+  children?: React.ReactNode,
 }
 
 const matchHandler = e => h =>

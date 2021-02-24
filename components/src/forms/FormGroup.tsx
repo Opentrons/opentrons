@@ -9,7 +9,7 @@ export type FormGroupProps = {
   /** text label */
   label?: string,
   /** form content */
-  children?,
+  children?: React.ReactNode,
   /** classes to apply */
   className?: ?string,
   /** if is included, FormGroup title will use error style. The content of the string is ignored. */
