@@ -29,5 +29,6 @@
     "validation_server_failure": "There was a problem communicating with the Opentrons validation server. Please make sure you are still connected to the internet and try again. If this problem persists, please contact Opentrons support."
   },
   "exit_batch_edit": "exit batch edit",
-  "n_steps_selected": "{{n}} steps selected"
+  "n_steps_selected": "{{n}} steps selected",
+  "no_batch_edit_shared_settings": "No advanced settings shared between selected steps"
 }

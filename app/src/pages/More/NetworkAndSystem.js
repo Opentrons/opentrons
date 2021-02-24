@@ -3,9 +3,9 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import { Page } from '../../components/Page'
-import { NetworkSettingsCard } from '../../components/NetworkSettingsCard'
-import { SystemInfoCard } from '../../components/SystemInfoCard'
+import { Page } from '../../atoms/Page'
+import { NetworkSettingsCard } from './NetworkSettingsCard'
+import { SystemInfoCard } from './SystemInfoCard'
 
 // TODO(mc, 2020-04-27): i18n
 const NETWORK_AND_SYSTEM = 'Network & System'

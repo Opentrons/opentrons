@@ -81,6 +81,13 @@ export const SourceDestFields = (props: Props): React.Node => {
         <WellOrderField
           prefix={prefix}
           label={i18n.t('form.step_edit_form.field.well_order.label')}
+          formData={formData}
+          updateFirstWellOrder={
+            propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
+          }
+          updateSecondWellOrder={
+            propsForFields[addFieldNamePrefix('wellOrder_second')].updateValue
+          }
         />
       </div>
 
@@ -131,6 +138,7 @@ export const SourceDestFields = (props: Props): React.Node => {
             <BlowoutLocationField
               {...propsForFields['blowout_location']}
               className={styles.full_width}
+              formData={formData}
             />
           </CheckboxRowField>
         )}

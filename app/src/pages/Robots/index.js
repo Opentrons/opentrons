@@ -11,10 +11,9 @@ import {
 } from '../../redux/discovery'
 
 import { getBuildrootRobot } from '../../redux/buildroot'
-import { getShellUpdateState } from '../../redux/shell'
 
 import { Splash } from '@opentrons/components'
-import { Page } from '../../components/Page'
+import { Page } from '../../atoms/Page'
 import { RobotSettings } from './RobotSettings'
 import { InstrumentSettings } from './InstrumentSettings'
 import { ModuleSettings } from './ModuleSettings'
@@ -26,7 +25,6 @@ export function Robots(): React.Node {
   const location = useLocation()
   const { name } = params
 
-  const appUpdate = useSelector(getShellUpdateState)
   const viewableRobots = useSelector(getViewableRobots)
   const connectedRobot = useSelector(getConnectedRobot)
   const buildrootRobot = useSelector(getBuildrootRobot)
@@ -64,6 +62,6 @@ export function Robots(): React.Node {
       robotDisplayName={robot.displayName}
     />
   ) : (
-    <RobotSettings robot={robot} appUpdate={appUpdate} />
+    <RobotSettings robot={robot} />
   )
 }

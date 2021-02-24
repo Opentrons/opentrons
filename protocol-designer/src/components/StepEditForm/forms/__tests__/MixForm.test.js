@@ -5,6 +5,7 @@ import { Provider } from 'react-redux'
 import { MixForm } from '../MixForm'
 import { AspDispSection } from '../AspDispSection'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
+import { WellOrderField } from '../../fields'
 import type { BaseState } from '../../../../types'
 
 const { DelayFields } = jest.requireActual('../../fields')
@@ -78,6 +79,24 @@ describe('MixForm', () => {
           updateValue: (jest.fn(): any),
           value: null,
         },
+        mix_wellOrder_first: {
+          onFieldFocus: (jest.fn(): any),
+          onFieldBlur: (jest.fn(): any),
+          errorToShow: null,
+          disabled: false,
+          name: 'mix_wellOrder_first',
+          updateValue: (jest.fn(): any),
+          value: null,
+        },
+        mix_wellOrder_second: {
+          onFieldFocus: (jest.fn(): any),
+          onFieldBlur: (jest.fn(): any),
+          errorToShow: null,
+          disabled: false,
+          name: 'mix_wellOrder_second',
+          updateValue: (jest.fn(): any),
+          value: null,
+        },
       },
     }
   })
@@ -94,7 +113,7 @@ describe('MixForm', () => {
   })
 
   describe('when advanced settings are visible', () => {
-    it('should render the aspirate delay fields when advanced settings are visible', () => {
+    it('should render the aspirate delay fields', () => {
       const wrapper = render(props)
 
       showAdvancedSettings(wrapper)
@@ -125,6 +144,20 @@ describe('MixForm', () => {
       )
       // no tip position field
       expect(aspirateDelayFields.prop('tipPositionFieldName')).toBe(undefined)
+    })
+    it('should render the mix well order field', () => {
+      const wrapper = render(props)
+      showAdvancedSettings(wrapper)
+      const wellOrderField = wrapper.find(WellOrderField)
+      expect(wellOrderField.props()).toMatchObject({
+        prefix: 'mix',
+        label: 'Well order',
+        formData: props.formData,
+        updateFirstWellOrder:
+          props.propsForFields['mix_wellOrder_first'].updateValue,
+        updateSecondWellOrder:
+          props.propsForFields['mix_wellOrder_second'].updateValue,
+      })
     })
   })
 })

@@ -2,7 +2,10 @@
   "name": "@opentrons/discovery-client",
   "version": "4.1.1",
   "description": "Node.js client for discovering Opentrons robots on the network",
-  "main": "src/index.js",
+  "main": "lib/index.js",
+  "flow:main": "lib/index.flow.js",
+  "types": "lib/index.d.ts",
+  "source": "src/index.ts",
   "bin": {
     "discovery": "bin/index.js",
     "discovery-ssh": "bin/discovery-ssh"
@@ -18,6 +21,8 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "dependencies": {
+    "@types/lodash": "^4.14.168",
+    "@types/node-fetch": "^2.5.8",
     "escape-string-regexp": "1.0.5",
     "lodash": "4.17.15",
     "mdns-js": "1.0.1",

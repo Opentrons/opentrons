@@ -5,7 +5,7 @@ import typeof {
   ANALYTICS_PIPETTE_OFFSET_STARTED,
   ANALYTICS_TIP_LENGTH_STARTED,
 } from './constants'
-import * as CalUITypes from '../../components/CalibrationPanels/types'
+import * as CalUITypes from '../../organisms/CalibrationPanels/types'
 
 import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
 import type { DeckCalibrationStatus } from '../calibration/types'
