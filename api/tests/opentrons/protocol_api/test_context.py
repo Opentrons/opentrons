@@ -1002,15 +1002,18 @@ def test_move_to_with_thermocycler(ctx):
 def test_temp_connect(implementation_class):
     """Test that temp_connect can be used to assign hardware controller to
     protocol implementation."""
-    has_loop = mock.MagicMock()
-    has_loop.loop = None
-    has_loop.get_attached_instrument.return_value = {
+
+    # Create the mock API object that can be wrapped by SynchronousAdapter
+    wrappable_hardware = mock.MagicMock()
+    # Must mock result of get_attached_instrument for temp_connect to work.
+    wrappable_hardware.get_attached_instrument.return_value = {
         'default_aspirate_flow_rates': {'2.0': 100},
         'default_dispense_flow_rates': {'2.0': 100},
         'default_blow_out_flow_rates': {'2.0': 100}
     }
 
-    hardware = SynchronousAdapter(has_loop)
+    # Create the SynchronousAdapter wrapping the wrappable_hardware.
+    hardware = SynchronousAdapter(wrappable_hardware)
 
     ctx = papi.ProtocolContext(implementation=implementation_class(),
                                api_version=APIVersion(2, 0))
@@ -1018,8 +1021,11 @@ def test_temp_connect(implementation_class):
 
     with ctx.temp_connect(hardware):
         instr.home()
+
+    # Was home_z called on the hardware passed to temp_connect?
     hardware.home_z.assert_called_once_with(Mount.LEFT)
 
+    # Clear mock history.
     hardware.home_z.reset_mock()
 
     # Calling. outside context manager will not call temp hardware method.
