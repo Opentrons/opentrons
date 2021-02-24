@@ -3,7 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
 import { IconButton } from '../buttons'
-import styles from './alerts.css'
+import * as styles from './alerts.css'
 
 import type { IconProps } from '../icons'
 
@@ -11,9 +11,9 @@ export type AlertItemProps = {
   /** name constant of the icon to display */
   type: 'success' | 'warning' | 'error' | 'info',
   /** title/main message of colored alert bar */
-  title: string | React.Node,
+  title: string | React.ReactNode,
   /** Alert message body contents */
-  children?,
+  children?: React.ReactNode,
   /** Additional class name */
   className?: string,
   /** optional handler to show close button/clear alert  */
@@ -46,7 +46,7 @@ const ALERT_PROPS_BY_TYPE = {
   },
 }
 
-export type AlertType = $Keys<typeof ALERT_PROPS_BY_TYPE>
+export type AlertType = keyof typeof ALERT_PROPS_BY_TYPE
 
 export function AlertItem(props: AlertItemProps) {
   const alertProps = ALERT_PROPS_BY_TYPE[props.type]
