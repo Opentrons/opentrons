@@ -7,19 +7,19 @@ import * as styles from './alerts.css'
 
 import type { IconProps } from '../icons'
 
-export type AlertItemProps = {
+export interface AlertItemProps {
   /** name constant of the icon to display */
-  type: 'success' | 'warning' | 'error' | 'info',
+  type: 'success' | 'warning' | 'error' | 'info'
   /** title/main message of colored alert bar */
-  title: string | React.ReactNode,
+  title: string | React.ReactNode
   /** Alert message body contents */
-  children?: React.ReactNode,
+  children?: React.ReactNode
   /** Additional class name */
-  className?: string,
+  className?: string
   /** optional handler to show close button/clear alert  */
-  onCloseClick?: () => unknown,
+  onCloseClick?: () => unknown
   /** Override the default Alert Icon */
-  icon?: IconProps,
+  icon?: IconProps
 }
 
 /**
@@ -48,7 +48,7 @@ const ALERT_PROPS_BY_TYPE = {
 
 export type AlertType = keyof typeof ALERT_PROPS_BY_TYPE
 
-export function AlertItem(props: AlertItemProps) {
+export function AlertItem(props: AlertItemProps): React.ReactNode {
   const alertProps = ALERT_PROPS_BY_TYPE[props.type]
   const icon = props.icon ? props.icon : alertProps.icon
   const className = cx(styles.alert, alertProps.className, props.className)

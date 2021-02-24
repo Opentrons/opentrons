@@ -7,7 +7,7 @@ import type {
 } from '@opentrons/shared-data'
 
 import type { Mount } from '../robot-types'
-import { InfoItem } from './InfoItem.js'
+import { InfoItem } from './InfoItem'
 import { InstrumentDiagram } from './InstrumentDiagram'
 
 import styles from './instrument.css'

@@ -12,10 +12,8 @@ const CSS_LOADER = {
 }
 
 const CSS_MODULE_LOADER = Object.assign({}, CSS_LOADER, {
-  loader: 'typing-for-css-modules-loader',
   options: Object.assign({}, CSS_LOADER.options, {
     sourceMap: true,
-    namedExport: true,
     modules: {
       localIdentName: '[name]__[local]__[hash:base64:5]',
     },
