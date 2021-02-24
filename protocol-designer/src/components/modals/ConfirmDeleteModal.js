@@ -10,6 +10,7 @@ export const CLOSE_STEP_FORM_WITH_CHANGES: 'closeStepFormWithChanges' =
   'closeStepFormWithChanges'
 export const CLOSE_UNSAVED_STEP_FORM: 'closeUnsavedStepForm' =
   'closeUnsavedStepForm'
+export const CLOSE_BATCH_EDIT_FORM: 'closeBatchEditForm' = 'closeBatchEditForm'
 export const DELETE_STEP_FORM: 'deleteStepForm' = 'deleteStepForm'
 
 export type DeleteModalType =
@@ -17,6 +18,7 @@ export type DeleteModalType =
   | typeof CLOSE_STEP_FORM_WITH_CHANGES
   | typeof CLOSE_UNSAVED_STEP_FORM
   | typeof DELETE_STEP_FORM
+  | typeof CLOSE_UNSAVED_STEP_FORM
 
 type Props = {|
   modalType: DeleteModalType,

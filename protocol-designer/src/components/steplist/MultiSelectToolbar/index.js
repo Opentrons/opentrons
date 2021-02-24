@@ -28,7 +28,7 @@ import {
 import { getBatchEditFormHasUnsavedChanges } from '../../../step-forms/selectors'
 import { deleteMultipleSteps } from '../../../steplist/actions'
 import {
-  CLOSE_STEP_FORM_WITH_CHANGES,
+  CLOSE_BATCH_EDIT_FORM,
   ConfirmDeleteModal,
 } from '../../modals/ConfirmDeleteModal'
 
@@ -156,7 +156,7 @@ export const MultiSelectToolbar = (): React.Node => {
     <>
       {showConfirmation && (
         <ConfirmDeleteModal
-          modalType={CLOSE_STEP_FORM_WITH_CHANGES}
+          modalType={CLOSE_BATCH_EDIT_FORM}
           onContinueClick={confirm}
           onCancelClick={cancel}
         />

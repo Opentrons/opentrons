@@ -87,6 +87,11 @@
       "body": "You have not saved this step form. If you navigate away without saving, this step will be deleted.",
       "confirm_button": "delete step"
     },
+    "closeBatchEditForm": {
+      "title": "Unsaved changes to multiple steps",
+      "body": "You have unsaved changes in this form. If you change your step selection without saving you will lose these changes.",
+      "confirm_button": "discard changes"
+    },
     "closeStepFormWithChanges": {
       "title": "Unsaved changes to step",
       "body": "You have unsaved changes in this step. If you navigate away without saving you will lose these changes.",
