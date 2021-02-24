@@ -12,13 +12,16 @@ export const CLOSE_UNSAVED_STEP_FORM: 'closeUnsavedStepForm' =
   'closeUnsavedStepForm'
 export const CLOSE_BATCH_EDIT_FORM: 'closeBatchEditForm' = 'closeBatchEditForm'
 export const DELETE_STEP_FORM: 'deleteStepForm' = 'deleteStepForm'
+export const DELETE_MULTIPLE_STEP_FORMS: 'deleteMultipleStepForms' =
+  'deleteMultipleStepForms'
 
 export type DeleteModalType =
   | typeof DELETE_PROFILE_CYCLE
   | typeof CLOSE_STEP_FORM_WITH_CHANGES
   | typeof CLOSE_UNSAVED_STEP_FORM
   | typeof DELETE_STEP_FORM
-  | typeof CLOSE_UNSAVED_STEP_FORM
+  | typeof CLOSE_BATCH_EDIT_FORM
+  | typeof DELETE_MULTIPLE_STEP_FORMS
 
 type Props = {|
   modalType: DeleteModalType,

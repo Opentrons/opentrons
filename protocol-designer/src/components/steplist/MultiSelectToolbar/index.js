@@ -30,6 +30,7 @@ import { deleteMultipleSteps } from '../../../steplist/actions'
 import {
   CLOSE_BATCH_EDIT_FORM,
   ConfirmDeleteModal,
+  DELETE_MULTIPLE_STEP_FORMS,
 } from '../../modals/ConfirmDeleteModal'
 
 import type { IconName } from '@opentrons/components'
@@ -85,19 +86,55 @@ export const MultiSelectToolbar = (): React.Node => {
   const selectedStepIds = useSelector(getMultiSelectItemIds)
   const isAllStepsSelected = stepCount === selectedStepCount
 
-  const onClickAction = isAllStepsSelected
+  const onSelectClickAction = isAllStepsSelected
     ? () => dispatch(stepActions.deselectAllSteps())
     : () => dispatch(stepActions.selectAllSteps())
 
-  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
-    onClickAction,
+  const onDuplicateClickAction = () => {
+    if (selectedStepIds) {
+      dispatch(stepActions.duplicateMultipleSteps(selectedStepIds))
+    } else {
+      console.warn(
+        'something went wrong, you cannot duplicate multiple steps if none are selected'
+      )
+    }
+  }
+
+  const onDeleteClickAction = () => {
+    if (selectedStepIds) {
+      dispatch(deleteMultipleSteps(selectedStepIds))
+    } else {
+      console.warn(
+        'something went wrong, you cannot delete multiple steps if none are selected'
+      )
+    }
+  }
+
+  const {
+    confirm: confirmSelect,
+    showConfirmation: showSelectConfirmation,
+    cancel: cancelSelect,
+  } = useConditionalConfirm(onSelectClickAction, batchEditFormHasUnsavedChanges)
+
+  const {
+    confirm: confirmDuplicate,
+    showConfirmation: showDuplicateConfirmation,
+    cancel: cancelDuplicate,
+  } = useConditionalConfirm(
+    onDuplicateClickAction,
     batchEditFormHasUnsavedChanges
   )
+
+  const {
+    confirm: confirmDelete,
+    showConfirmation: showDeleteConfirmation,
+    cancel: cancelDelete,
+  } = useConditionalConfirm(onDeleteClickAction, batchEditFormHasUnsavedChanges)
 
   const selectProps = {
     iconName: isAllStepsSelected ? 'checkbox-marked' : 'minus-box',
     tooltipText: isAllStepsSelected ? 'Deselect All' : 'Select All',
-    onClick: confirm,
+    onClick: confirmSelect,
   }
 
   const deleteProps = {
@@ -105,29 +142,13 @@ export const MultiSelectToolbar = (): React.Node => {
     tooltipText: 'Delete',
     width: '1.5rem',
     alignRight: true,
-    onClick: () => {
-      if (selectedStepIds) {
-        dispatch(deleteMultipleSteps(selectedStepIds))
-      } else {
-        console.warn(
-          'something went wrong, you cannot delete multiple steps if none are selected'
-        )
-      }
-    },
+    onClick: confirmDelete,
   }
 
   const copyProps = {
     iconName: 'content-copy',
     tooltipText: 'Duplicate',
-    onClick: () => {
-      if (selectedStepIds) {
-        dispatch(stepActions.duplicateMultipleSteps(selectedStepIds))
-      } else {
-        console.warn(
-          'something went wrong, you cannot duplicate multiple steps if none are selected'
-        )
-      }
-    },
+    onClick: confirmDuplicate,
   }
 
   const expandProps = {
@@ -154,11 +175,25 @@ export const MultiSelectToolbar = (): React.Node => {
 
   return (
     <>
-      {showConfirmation && (
+      {showSelectConfirmation && (
         <ConfirmDeleteModal
           modalType={CLOSE_BATCH_EDIT_FORM}
-          onContinueClick={confirm}
-          onCancelClick={cancel}
+          onContinueClick={confirmSelect}
+          onCancelClick={cancelSelect}
+        />
+      )}
+      {showDuplicateConfirmation && (
+        <ConfirmDeleteModal
+          modalType={CLOSE_BATCH_EDIT_FORM}
+          onContinueClick={confirmDuplicate}
+          onCancelClick={cancelDuplicate}
+        />
+      )}
+      {showDeleteConfirmation && (
+        <ConfirmDeleteModal
+          modalType={DELETE_MULTIPLE_STEP_FORMS}
+          onContinueClick={confirmDelete}
+          onCancelClick={cancelDelete}
         />
       )}
       <Flex
