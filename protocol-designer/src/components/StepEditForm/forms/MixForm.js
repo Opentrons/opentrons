@@ -103,8 +103,15 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 formData={formData}
               />
               <WellOrderField
+                updateFirstWellOrder={
+                  propsForFields['mix_wellOrder_first'].updateValue
+                }
+                updateSecondWellOrder={
+                  propsForFields['mix_wellOrder_second'].updateValue
+                }
                 prefix="mix"
                 label={i18n.t('form.step_edit_form.field.well_order.label')}
+                formData={props.formData}
               />
             </div>
             <DelayFields
@@ -156,6 +163,7 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 <BlowoutLocationField
                   {...propsForFields['blowout_location']}
                   className={styles.full_width}
+                  formData={formData}
                 />
               </CheckboxRowField>
             </div>
@@ -170,7 +178,13 @@ export const MixForm = (props: StepFormProps): React.Node => {
       </div>
       <div className={styles.section_wrapper}>
         <div className={styles.form_row}>
-          <ChangeTipField name="changeTip" />
+          <ChangeTipField
+            {...propsForFields['changeTip']}
+            aspirateWells={formData.aspirate_wells}
+            dispenseWells={formData.dispense_wells}
+            path={formData.path}
+            stepType={formData.stepType}
+          />
         </div>
       </div>
     </div>

@@ -1,4 +1,11 @@
 {
   "files": [],
-  "references": []
+  "references": [
+    {
+      "path": "./app-shell"
+    },
+    {
+      "path": "./discovery-client"
+    }
+  ]
 }

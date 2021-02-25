@@ -32,7 +32,7 @@ const DropdownFormField = (props: DropdownFormFieldProps) => {
       options={props.options}
       value={props.value ? String(props.value) : null}
       onBlur={props.onFieldBlur}
-      onChange={props.updateValue}
+      onChange={e => props.updateValue(e.currentTarget.value)}
       onFocus={props.onFieldFocus}
     />
   )

@@ -10,7 +10,7 @@ import { format } from 'date-fns'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getCustomLabwareDefinitions } from '../custom-labware/selectors'
 import { getLabwareDefBySlot } from '../protocol/selectors'
-import { getLatestLabwareDef } from '../../getLabware'
+import { getLatestLabwareDef } from '../../assets/labware/getLabware'
 import * as Constants from './constants'
 
 import type { State } from '../types'

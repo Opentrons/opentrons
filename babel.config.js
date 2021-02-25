@@ -20,7 +20,19 @@ module.exports = {
       ],
     },
   },
-  plugins: ['@babel/plugin-proposal-class-properties'],
+  plugins: [
+    '@babel/plugin-proposal-class-properties',
+    // ensure opentrons packages written in TS resolve to source code in
+    // unit tests and bundling by rewriting import statements with babel
+    [
+      'babel-plugin-module-resolver',
+      {
+        alias: {
+          '^@opentrons/discovery-client$': `@opentrons/discovery-client/src/index.ts`,
+        },
+      },
+    ],
+  ],
   presets: [
     '@babel/preset-flow',
     '@babel/preset-react',

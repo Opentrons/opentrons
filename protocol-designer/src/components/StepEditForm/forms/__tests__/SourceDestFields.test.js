@@ -3,7 +3,7 @@ import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { CheckboxRowField, DelayFields } from '../../fields'
+import { CheckboxRowField, DelayFields, WellOrderField } from '../../fields'
 import { SourceDestFields } from '../MoveLiquidForm/SourceDestFields'
 import type { BaseState } from '../../../../types'
 
@@ -76,6 +76,24 @@ describe('SourceDestFields', () => {
           updateValue: (jest.fn(): any),
           value: true,
         },
+        aspirate_wellOrder_first: {
+          onFieldFocus: (jest.fn(): any),
+          onFieldBlur: (jest.fn(): any),
+          errorToShow: null,
+          disabled: false,
+          name: 'aspirate_wellOrder_first',
+          updateValue: (jest.fn(): any),
+          value: true,
+        },
+        aspirate_wellOrder_second: {
+          onFieldFocus: (jest.fn(): any),
+          onFieldBlur: (jest.fn(): any),
+          errorToShow: null,
+          disabled: false,
+          name: 'aspirate_wellOrder_second',
+          updateValue: (jest.fn(): any),
+          value: true,
+        },
         dispense_airGap_checkbox: {
           onFieldFocus: (jest.fn(): any),
           onFieldBlur: (jest.fn(): any),
@@ -109,6 +127,24 @@ describe('SourceDestFields', () => {
           errorToShow: null,
           disabled: false,
           name: 'dispense_touchTip_checkbox',
+          updateValue: (jest.fn(): any),
+          value: true,
+        },
+        dispense_wellOrder_first: {
+          onFieldFocus: (jest.fn(): any),
+          onFieldBlur: (jest.fn(): any),
+          errorToShow: null,
+          disabled: false,
+          name: 'dispense_wellOrder_first',
+          updateValue: (jest.fn(): any),
+          value: true,
+        },
+        dispense_wellOrder_second: {
+          onFieldFocus: (jest.fn(): any),
+          onFieldBlur: (jest.fn(): any),
+          errorToShow: null,
+          disabled: false,
+          name: 'dispense_wellOrder_second',
           updateValue: (jest.fn(): any),
           value: true,
         },
@@ -167,10 +203,26 @@ describe('SourceDestFields', () => {
       expect(checkboxes.at(2).prop('name')).toBe('aspirate_touchTip_checkbox')
       expect(checkboxes.at(3).prop('name')).toBe('aspirate_airGap_checkbox')
     })
+    it('should render a well order field', () => {
+      const wrapper = render(props)
+      const wellOrderField = wrapper.find(WellOrderField)
+
+      expect(wellOrderField.props()).toMatchObject({
+        prefix: 'aspirate',
+        label: 'Well order',
+        formData: props.formData,
+        updateFirstWellOrder:
+          props.propsForFields['aspirate_wellOrder_first'].updateValue,
+        updateSecondWellOrder:
+          props.propsForFields['aspirate_wellOrder_second'].updateValue,
+      })
+    })
   })
   describe('Dispense section', () => {
+    beforeEach(() => {
+      props = { ...props, prefix: 'dispense' }
+    })
     it('should render the correct checkboxes', () => {
-      props.prefix = 'dispense'
       const wrapper = render(props)
       const checkboxes = wrapper.find(CheckboxRowField)
 
@@ -184,6 +236,20 @@ describe('SourceDestFields', () => {
       expect(checkboxes.at(1).prop('name')).toBe('dispense_touchTip_checkbox')
       expect(checkboxes.at(2).prop('name')).toBe('blowout_checkbox')
       expect(checkboxes.at(3).prop('name')).toBe('dispense_airGap_checkbox')
+    })
+    it('should render a well order field', () => {
+      const wrapper = render(props)
+      const wellOrderField = wrapper.find(WellOrderField)
+
+      expect(wellOrderField.props()).toMatchObject({
+        prefix: 'dispense',
+        label: 'Well order',
+        formData: props.formData,
+        updateFirstWellOrder:
+          props.propsForFields['dispense_wellOrder_first'].updateValue,
+        updateSecondWellOrder:
+          props.propsForFields['dispense_wellOrder_second'].updateValue,
+      })
     })
   })
 })
