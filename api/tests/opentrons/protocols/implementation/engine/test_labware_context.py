@@ -1,28 +1,81 @@
 import pytest
+from decoy import Decoy
+from opentrons.protocol_engine import StateView
+from opentrons.protocol_engine.state import LabwareData
+from opentrons.protocol_engine.types import DeckSlotLocation
 
 from opentrons.protocols.implementations.engine.labware_context import \
     LabwareContext
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
 @pytest.fixture
-def labware_context() -> LabwareContext:
-    return LabwareContext()
+def decoy() -> Decoy:
+    """Create a decoy fixture."""
+    return Decoy()
 
 
-def test_get_uri(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_uri()
+@pytest.fixture
+def mock_state_view(decoy: Decoy) -> StateView:
+    """Mock state view."""
+    return decoy.create_decoy(spec=StateView)
 
 
-def test_get_display_name(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_display_name()
+@pytest.fixture
+def labware_id() -> str:
+    """The labware id fixture."""
+    return "labware id"
 
 
-def test_get_name(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_name()
+@pytest.fixture
+def labware_data(minimal_labware_def: LabwareDefinition) -> LabwareData:
+    """LabwareData fixture."""
+    return LabwareData(
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        calibration=(1.2, 3.2, 3.1,),
+        definition=minimal_labware_def
+    )
+
+
+@pytest.fixture
+def labware_context(labware_id: str,
+                    mock_state_view: StateView) -> LabwareContext:
+    """LabwareContext fixture"""
+    return LabwareContext(labware_id=labware_id, state_view=mock_state_view)
+
+
+def test_get_uri(decoy: Decoy, labware_id: str, mock_state_view: StateView,
+                 labware_context: LabwareContext) -> None:
+    """Should return the labware uri."""
+    decoy.when(
+        mock_state_view.labware.get_definition_uri(labware_id=labware_id)
+    ).then_return("some uri")
+    assert labware_context.get_uri() == "some uri"
+
+
+def test_get_display_name(
+        decoy: Decoy, labware_id: str, mock_state_view:
+        StateView, labware_context: LabwareContext, labware_data: LabwareData
+) -> None:
+    """Should return the labware's display name."""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert labware_context.get_display_name() == "minimal labware on 3"
+
+
+def test_get_name(
+        decoy: Decoy, labware_id: str, mock_state_view:
+        StateView, labware_context: LabwareContext, labware_data: LabwareData
+) -> None:
+    """Should return the labware's name."""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert labware_context.get_name() == "minimal_labware_def"
 
 
 def test_set_name(labware_context: LabwareContext) -> None:
@@ -31,19 +84,43 @@ def test_set_name(labware_context: LabwareContext) -> None:
         labware_context.set_name(name)
 
 
-def test_get_definition(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_definition()
+def test_get_definition(
+        decoy: Decoy, labware_id: str, mock_state_view:
+        StateView, labware_context: LabwareContext, labware_data: LabwareData,
+        minimal_labware_def: LabwareDefinition
+) -> None:
+    """Should return the labware's definition."""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert labware_context.get_definition() == minimal_labware_def
 
 
-def test_get_parameters(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_parameters()
+def test_get_parameters(
+        decoy: Decoy, labware_id: str, mock_state_view:
+        StateView, labware_context: LabwareContext, labware_data: LabwareData,
+        minimal_labware_def: LabwareDefinition
+) -> None:
+    """Should return the labware definition's parameters"""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert labware_context.get_parameters() == minimal_labware_def['parameters']
 
 
-def test_get_quirks(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_quirks()
+def test_get_quirks(
+        decoy: Decoy, labware_id: str, mock_state_view:
+        StateView, labware_context: LabwareContext, labware_data: LabwareData,
+        minimal_labware_def: LabwareDefinition
+) -> None:
+    """Should return the labware quirks."""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert labware_context.get_quirks() == minimal_labware_def['parameters']['quirks']
 
 
 def test_set_calibration(labware_context: LabwareContext) -> None:
@@ -52,19 +129,41 @@ def test_set_calibration(labware_context: LabwareContext) -> None:
         labware_context.set_calibration(point)
 
 
-def test_get_calibrated_offset(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_calibrated_offset()
+def test_get_calibrated_offset(
+        decoy: Decoy, labware_id: str, mock_state_view:
+        StateView, labware_context: LabwareContext, labware_data: LabwareData,
+) -> None:
+    """Should return the calibrated offset."""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert Point(*labware_data.calibration) == labware_context.get_calibrated_offset()
 
 
-def test_is_tiprack(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.is_tiprack()
+def test_is_tiprack(
+        decoy: Decoy, labware_id: str, mock_state_view:
+        StateView, labware_context: LabwareContext, labware_data: LabwareData,
+        minimal_labware_def: LabwareDefinition
+) -> None:
+    """Should return whether labware is a tiprack"""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert labware_context.is_tiprack() == labware_data.definition['parameters']['isTiprack']
 
 
-def test_get_tip_length(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_tip_length()
+def test_get_tip_length(
+        decoy: Decoy, labware_id: str, mock_state_view:
+        StateView, labware_context: LabwareContext, labware_data: LabwareData,
+) -> None:
+    """Should return the tip length."""
+    decoy.when(
+        mock_state_view.labware.get_tip_length(labware_id=labware_id)
+    ).then_return(22)
+
+    assert labware_context.get_tip_length() == 22
 
 
 def test_set_tip_length(labware_context: LabwareContext):
@@ -113,6 +212,14 @@ def test_separate_calibration(labware_context: LabwareContext) -> None:
         s = labware_context.separate_calibration
 
 
-def test_load_name(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        ln = labware_context.load_name
+def test_load_name(
+        decoy: Decoy, labware_id: str, mock_state_view:
+        StateView, labware_context: LabwareContext, labware_data: LabwareData,
+        minimal_labware_def: LabwareDefinition
+) -> None:
+    """Should return the load name."""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert labware_context.load_name == minimal_labware_def['parameters']['loadName']
