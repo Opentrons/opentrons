@@ -1054,6 +1054,9 @@ type BatchEditFormActions =
   | ResetBatchEditFieldChangesAction
   | SaveStepFormsMultiAction
   | SelectStepAction
+  | SelectMultipleStepsAction
+  | DuplicateMultipleStepsAction
+  | DeleteMultipleStepsAction
 
 export const batchEditFormChanges = (
   state: BatchEditFormChangesState = {},
@@ -1068,6 +1071,9 @@ export const batchEditFormChanges = (
     }
     case 'SELECT_STEP':
     case 'SAVE_STEP_FORMS_MULTI':
+    case 'SELECT_MULTIPLE_STEPS':
+    case 'DUPLICATE_MULTIPLE_STEPS':
+    case 'DELETE_MULTIPLE_STEPS':
     case 'RESET_BATCH_EDIT_FIELD_CHANGES': {
       return {}
     }
