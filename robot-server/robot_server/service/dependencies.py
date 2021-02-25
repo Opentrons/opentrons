@@ -1,3 +1,5 @@
+import hashlib
+import pathlib
 import typing
 
 from starlette import status
@@ -132,3 +134,18 @@ async def check_version_header(
         # Attach the api version to request's state dict
         request.state.api_version = min(requested_version,
                                         constants.API_VERSION)
+
+async def get_boot_id() -> str:
+    # FIXME: Bail if not running on a real robot.
+    
+    
+    p = pathlib.Path("/proc/sys/kernel/random/boot_id")
+    
+    
+    # Hash to obfuscate so no one accidentally relies on this specifically
+    # being the kernel-provided boot ID. Choice of hash function is arbitrary.
+    return hashlib.sha256(p.read_bytes)
+
+# Tests:
+# - It should be stable as long as the underlying file doesn't change.
+# - It should change when the boot ID changes and the server restarts.
