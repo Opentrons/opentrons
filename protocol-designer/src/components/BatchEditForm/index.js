@@ -16,19 +16,19 @@ export type BatchEditFormProps = {|
   stepTypes: Array<StepType>,
   fieldValues: MultiselectFieldValues | null,
   handleChangeFormInput: (name: string, value: mixed) => void,
-  handleClose: () => mixed,
+  handleCancel: () => mixed,
   handleSave: () => mixed,
 |}
 
 type BatchEditMoveLiquidProps = {|
   propsForFields: FieldPropsByName,
-  handleClose: () => mixed,
+  handleCancel: () => mixed,
   handleSave: () => mixed,
 |}
 export const BatchEditMoveLiquid = (
   props: BatchEditMoveLiquidProps
 ): React.Node => {
-  const { propsForFields, handleClose, handleSave } = props
+  const { propsForFields, handleCancel, handleSave } = props
   return (
     // TOOD IMMEDIATELY copied from SourceDestFields. Refactor to be DRY
     <div>
@@ -49,7 +49,7 @@ export const BatchEditMoveLiquid = (
         />
       </CheckboxRowField>
       <p>TODO batch edit form for Transfer step goes here</p>
-      <button onClick={handleClose}>Close</button>
+      <button onClick={handleCancel}>Cancel</button>
       <button onClick={handleSave}>Save</button>
     </div>
   )
@@ -61,7 +61,7 @@ export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
     stepTypes,
     fieldValues,
     handleChangeFormInput,
-    handleClose,
+    handleCancel,
     handleSave,
   } = props
 
@@ -78,7 +78,7 @@ export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
       handleChangeFormInput
     )
     return (
-      <BatchEditMoveLiquid {...{ propsForFields, handleClose, handleSave }} />
+      <BatchEditMoveLiquid {...{ propsForFields, handleCancel, handleSave }} />
     )
   }
 

@@ -33,7 +33,7 @@ export const FormManager = (): React.Node => {
     dispatch(saveStepFormsMulti(selectedStepIds))
   }
 
-  const handleClose = () => dispatch(resetBatchEditFieldChanges())
+  const handleCancel = () => dispatch(resetBatchEditFieldChanges())
 
   if (isMultiSelectMode) {
     return (
@@ -44,7 +44,7 @@ export const FormManager = (): React.Node => {
           disabledFields={disabledFields}
           handleChangeFormInput={handleChangeFormInput}
           stepTypes={stepTypes}
-          handleClose={handleClose}
+          handleCancel={handleCancel}
           handleSave={handleSaveMultiSelect}
         />
       </>
