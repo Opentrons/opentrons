@@ -151,7 +151,8 @@ def test_is_tiprack(
         mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
     ).then_return(labware_data)
 
-    assert labware_context.is_tiprack() == labware_data.definition['parameters']['isTiprack']
+    assert labware_context.is_tiprack() ==\
+           labware_data.definition['parameters']['isTiprack']
 
 
 def test_get_tip_length(
@@ -204,12 +205,12 @@ def test_get_geometry(labware_context: LabwareContext) -> None:
 
 def test_highest_z(labware_context: LabwareContext) -> None:
     with pytest.raises(NotImplementedError):
-        h = labware_context.highest_z
+        h = labware_context.highest_z  # noqa(F841)
 
 
 def test_separate_calibration(labware_context: LabwareContext) -> None:
     with pytest.raises(NotImplementedError):
-        s = labware_context.separate_calibration
+        s = labware_context.separate_calibration  # noqa(F841)
 
 
 def test_load_name(
