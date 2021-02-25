@@ -286,7 +286,7 @@ const dependentFieldCheckboxMap: {
   blowout_location: 'blowout_checkbox',
 }
 
-export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
+export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
   stepFormSelectors.getSavedStepForms,
   getMultiSelectItemIds,
   (savedStepForms, multiSelectItemIds) => {
@@ -321,6 +321,21 @@ export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> 
       },
       {}
     )
+  }
+)
+
+export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
+  _getSavedMultiSelectFieldValues,
+  stepFormSelectors.getBatchEditFieldChanges,
+  (savedValues, changes) => {
+    const multiselectChanges = Object.keys(changes).reduce((acc, name) => {
+      acc[name] = {
+        value: changes[name],
+        isIndeterminate: false,
+      }
+      return acc
+    }, {})
+    return { ...savedValues, ...multiselectChanges }
   }
 )
 

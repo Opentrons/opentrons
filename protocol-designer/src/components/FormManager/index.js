@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { StepEditForm } from '../StepEditForm'
 import { BatchEditForm } from '../BatchEditForm'
 import { StepSelectionBanner } from '../StepSelectionBanner'
@@ -10,16 +10,17 @@ import {
   getMultiSelectDisabledFields,
   getMultiSelectFieldValues,
 } from '../../ui/steps/selectors'
+import { changeBatchEditField } from '../../step-forms/actions'
 
 export const FormManager = (): React.Node => {
   const fieldValues = useSelector(getMultiSelectFieldValues)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const stepTypes = useSelector(getBatchEditSelectedStepTypes)
   const disabledFields = useSelector(getMultiSelectDisabledFields)
+  const dispatch = useDispatch()
 
-  // TODO(IL, 2021-02-17): dispatch changeBatchEditField here in #7222
   const handleChangeFormInput = (name, value) => {
-    console.log(`TODO: update ${name}: ${String(value)}`)
+    dispatch(changeBatchEditField({ [name]: value }))
   }
 
   if (isMultiSelectMode) {
