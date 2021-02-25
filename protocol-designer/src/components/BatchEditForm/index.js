@@ -16,6 +16,8 @@ export type BatchEditFormProps = {|
   stepTypes: Array<StepType>,
   fieldValues: MultiselectFieldValues | null,
   handleChangeFormInput: (name: string, value: mixed) => void,
+  handleClose: () => mixed,
+  handleSave: () => mixed,
 |}
 
 type BatchEditMoveLiquidProps = {|
@@ -59,6 +61,8 @@ export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
     stepTypes,
     fieldValues,
     handleChangeFormInput,
+    handleClose,
+    handleSave,
   } = props
 
   if (
@@ -74,16 +78,7 @@ export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
       handleChangeFormInput
     )
     return (
-      <BatchEditMoveLiquid
-        propsForFields={propsForFields}
-        handleClose={() => {
-          // TODO(IL, 2021-02-17): implement in #7138
-          console.log('TODO: close')
-        }}
-        handleSave={() => {
-          console.log('TODO: save')
-        }}
-      />
+      <BatchEditMoveLiquid {...{ propsForFields, handleClose, handleSave }} />
     )
   }
 

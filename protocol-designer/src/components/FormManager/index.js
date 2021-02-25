@@ -9,8 +9,13 @@ import {
   getIsMultiSelectMode,
   getMultiSelectDisabledFields,
   getMultiSelectFieldValues,
+  getMultiSelectItemIds,
 } from '../../ui/steps/selectors'
-import { changeBatchEditField } from '../../step-forms/actions'
+import {
+  changeBatchEditField,
+  resetBatchEditFieldChanges,
+  saveStepFormsMulti,
+} from '../../step-forms/actions'
 
 export const FormManager = (): React.Node => {
   const fieldValues = useSelector(getMultiSelectFieldValues)
@@ -18,10 +23,17 @@ export const FormManager = (): React.Node => {
   const stepTypes = useSelector(getBatchEditSelectedStepTypes)
   const disabledFields = useSelector(getMultiSelectDisabledFields)
   const dispatch = useDispatch()
+  const selectedStepIds = useSelector(getMultiSelectItemIds)
 
   const handleChangeFormInput = (name, value) => {
     dispatch(changeBatchEditField({ [name]: value }))
   }
+
+  const handleSaveMultiSelect = () => {
+    dispatch(saveStepFormsMulti(selectedStepIds))
+  }
+
+  const handleClose = () => dispatch(resetBatchEditFieldChanges())
 
   if (isMultiSelectMode) {
     return (
@@ -32,6 +44,8 @@ export const FormManager = (): React.Node => {
           disabledFields={disabledFields}
           handleChangeFormInput={handleChangeFormInput}
           stepTypes={stepTypes}
+          handleClose={handleClose}
+          handleSave={handleSaveMultiSelect}
         />
       </>
     )
