@@ -11,13 +11,14 @@ export type FocusHandlers = {|
 
 export type FieldProps = {|
   disabled: boolean,
-  name: string,
-  updateValue: mixed => void,
-  value: mixed,
   errorToShow: ?string,
+  isIndeterminate?: boolean,
+  name: string,
   onFieldBlur: () => mixed,
   onFieldFocus: () => mixed,
-  isIndeterminate?: boolean,
+  tooltipContent?: ?string,
+  updateValue: mixed => void,
+  value: mixed,
 |}
 
 export type FieldPropsByName = {

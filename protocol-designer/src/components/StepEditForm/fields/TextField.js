@@ -12,10 +12,11 @@ type TextFieldProps = {|
 
 export const TextField = (props: TextFieldProps): React.Node => {
   const {
-    updateValue,
-    onFieldFocus,
-    onFieldBlur,
     errorToShow,
+    onFieldBlur,
+    onFieldFocus,
+    tooltipContent,
+    updateValue,
     value,
     ...otherProps
   } = props

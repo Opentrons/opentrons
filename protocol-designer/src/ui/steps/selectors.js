@@ -324,8 +324,10 @@ export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> 
   }
 )
 
-type DisabledFields = {
-  [fieldName: string]: string,
+// NOTE: the value is the tooltip text explaining why the field is disabled
+type TooltipText = string
+export type DisabledFields = {
+  [fieldName: string]: TooltipText,
 }
 export const getMultiSelectDisabledFields: Selector<DisabledFields | null> = createSelector(
   stepFormSelectors.getSavedStepForms,

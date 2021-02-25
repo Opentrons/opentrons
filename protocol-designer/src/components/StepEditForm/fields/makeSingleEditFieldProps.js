@@ -4,6 +4,7 @@ import {
   getDisabledFields,
   getDefaultsForStepType,
 } from '../../../steplist/formLevel'
+import { getFieldDefaultTooltip } from '../utils'
 import type { StepFieldName, FormData } from '../../../form-types'
 import type { FieldProps, FieldPropsByName, FocusHandlers } from '../types'
 
@@ -59,6 +60,7 @@ export const makeSingleEditFieldProps = (
       value,
       onFieldBlur,
       onFieldFocus,
+      tooltipContent: getFieldDefaultTooltip(name),
     }
     return {
       ...acc,

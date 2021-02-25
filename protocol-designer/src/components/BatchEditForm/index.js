@@ -3,12 +3,16 @@ import * as React from 'react'
 import { i18n } from '../../localization'
 import { CheckboxRowField, TextField } from '../StepEditForm/fields'
 import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
-import type { MultiselectFieldValues } from '../../ui/steps/selectors'
+import type {
+  DisabledFields,
+  MultiselectFieldValues,
+} from '../../ui/steps/selectors'
 import type { StepType } from '../../form-types'
 import type { FieldPropsByName } from '../StepEditForm/types'
 import styles from '../StepEditForm/StepEditForm.css'
 
 export type BatchEditFormProps = {|
+  disabledFields: DisabledFields | null,
   stepTypes: Array<StepType>,
   fieldValues: MultiselectFieldValues | null,
   handleChangeFormInput: (name: string, value: mixed) => void,
@@ -30,9 +34,6 @@ export const BatchEditMoveLiquid = (
         {...propsForFields['aspirate_mix_checkbox']}
         label={i18n.t('form.step_edit_form.field.mix.label')}
         className={styles.small_field}
-        tooltipContent={i18n.t(
-          `tooltip.step_fields.defaults.${'aspirate_mix_checkbox'}`
-        )}
       >
         <TextField
           {...propsForFields['aspirate_mix_volume']}
@@ -53,16 +54,23 @@ export const BatchEditMoveLiquid = (
 }
 
 export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
-  const { stepTypes, fieldValues, handleChangeFormInput } = props
+  const {
+    disabledFields,
+    stepTypes,
+    fieldValues,
+    handleChangeFormInput,
+  } = props
 
   if (
     stepTypes.length === 1 &&
     stepTypes.includes('moveLiquid') &&
-    fieldValues !== null
+    fieldValues !== null &&
+    disabledFields !== null
   ) {
     // Valid state for using makeBatchEditFieldProps
     const propsForFields = makeBatchEditFieldProps(
       fieldValues,
+      disabledFields,
       handleChangeFormInput
     )
     return (
