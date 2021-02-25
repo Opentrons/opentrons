@@ -47,7 +47,7 @@ export type TitledListProps = {
 /**
  * An ordered list with optional title, icon, and description.
  */
-export function TitledList(props: TitledListProps) {
+export function TitledList(props: TitledListProps): React.ReactNode {
   const {
     iconName,
     disabled,

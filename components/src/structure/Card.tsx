@@ -24,7 +24,7 @@ export type CardProps = {
  *
  * Titles and other children handle their own styles and layout.
  */
-export function Card(props: CardProps) {
+export function Card(props: CardProps): React.ReactNode {
   const { title, children, className, disabled } = props
 
   return (

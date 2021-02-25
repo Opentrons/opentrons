@@ -13,7 +13,7 @@ export type LabeledRadioGroupProps = {
   'data-test'?: string,
 }
 
-export function LabeledRadioGroup(props: LabeledRadioGroupProps) {
+export function LabeledRadioGroup(props: LabeledRadioGroupProps): React.ReactNode {
   const { label, value, options, onChange } = props
 
   return (

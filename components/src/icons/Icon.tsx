@@ -12,25 +12,23 @@ export type IconName = keyof typeof ICON_DATA_BY_NAME
 
 export interface IconProps {
   /** name constant of the icon to display */
-  name: IconName,
+  name: IconName
   /** classes to apply */
-  className?: string,
+  className?: string
   /** spin the icon with a CSS animation */
-  spin?: boolean,
+  spin?: boolean
   /** x attribute as a number or string (for nesting inside another SVG) */
-  x?: number | string,
+  x?: number | string
   /** y attribute as a number or string (for nesting inside another SVG) */
-  y?: number | string,
+  y?: number | string
   /** width as a number or string (for nesting inside another SVG) */
-  svgHeight?: number | string,
+  svgHeight?: number | string
   /** height as a number or string (for nesting inside another SVG) */
-  svgWidth?: number | string,
+  svgWidth?: number | string
   /** inline style passed into the icon svg */
-  style?: Record<string, string | number>,
+  style?: Record<string, string | number>
   /** optional children */
-  children?: React.ReactNode,
-  /** primitive styling props */
-  ...StyleProps,
+  children?: React.ReactNode
 }
 
 const spinAnimation = keyframes`
@@ -54,7 +52,7 @@ const spinStyle = css`
  * import type { IconName } from '@opentrons/components'
  * ```
  */
-export function Icon(props: IconProps) {
+export function Icon(props: IconProps & Partial<StyleProps>) {
   const { name, children, className, spin, ...svgProps } = props
 
   if (!(name in ICON_DATA_BY_NAME)) {

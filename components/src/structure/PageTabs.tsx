@@ -18,7 +18,7 @@ export type PageTabProps = {
   pages: Array<TabProps>,
 }
 
-export function PageTabs(props: PageTabProps) {
+export function PageTabs(props: PageTabProps): React.ReactNode {
   return (
     <nav className={styles.page_tabs}>
       {props.pages.map(page => (
@@ -28,7 +28,7 @@ export function PageTabs(props: PageTabProps) {
   )
 }
 
-function Tab(props: TabProps) {
+function Tab(props: TabProps): React.ReactNode {
   const { isDisabled } = props
   const tabLinkClass = classnames(styles.tab_link, {
     [styles.active_tab_link]: props.isActive,

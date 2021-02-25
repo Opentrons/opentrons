@@ -9,7 +9,7 @@ export type FilledWellsProps = {
   fillByWell: { [wellName: string]: string },
 }
 
-function FilledWellsComponent(props: FilledWellsProps) {
+function FilledWellsComponent(props: FilledWellsProps): React.ReactNode {
   const { definition, fillByWell } = props
   return (
     <>

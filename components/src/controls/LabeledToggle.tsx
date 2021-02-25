@@ -15,7 +15,7 @@ export type LabeledToggleProps = {
   'data-test'?: string,
 }
 
-export function LabeledToggle(props: LabeledToggleProps) {
+export function LabeledToggle(props: LabeledToggleProps): React.ReactNode {
   const { label, toggledOn, disabled, onClick } = props
 
   return (

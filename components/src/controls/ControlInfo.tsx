@@ -8,7 +8,7 @@ export type ControlInfoProps = {
   className?: string,
 }
 
-export function ControlInfo(props: ControlInfoProps) {
+export function ControlInfo(props: ControlInfoProps): React.ReactNode {
   const { children, className = styles.control_info } = props
   return <div className={className}>{children}</div>
 }

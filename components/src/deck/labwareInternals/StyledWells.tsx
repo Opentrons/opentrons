@@ -10,7 +10,7 @@ export type StyledWellProps = {
   wells: WellGroup,
 }
 
-function StyledWellsComponent(props: StyledWellProps) {
+function StyledWellsComponent(props: StyledWellProps): React.ReactNode {
   const { className, definition, wells } = props
   return (
     <>

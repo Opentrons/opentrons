@@ -120,7 +120,7 @@ export type ArrowProps = {
   arrowStyle: Partial<CSSStyleDeclaration>,
 }
 
-export function Arrow(props: ArrowProps) {
+export function Arrow(props: ArrowProps): React.ReactNode {
   const placement = props.placement ?? ''
   const placementBase = placement.split('-')[0]
   const arrowCss = ARROW_CSS_BY_PLACEMENT_BASE[placementBase]

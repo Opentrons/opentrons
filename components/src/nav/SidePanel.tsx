@@ -8,7 +8,7 @@ export type SidePanelProps = {
   children,
 }
 
-export function SidePanel(props: SidePanelProps) {
+export function SidePanel(props: SidePanelProps): React.ReactNode {
   return (
     <div className={styles.panel}>
       <div className={styles.title_bar}>

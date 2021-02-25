@@ -33,7 +33,7 @@ export type InstrumentInfoProps = {
   children?: React.ReactNode,
 }
 
-export function InstrumentInfo(props: InstrumentInfoProps) {
+export function InstrumentInfo(props: InstrumentInfoProps): React.ReactNode {
   const className = cx(
     styles.pipette,
     styles[props.mount],

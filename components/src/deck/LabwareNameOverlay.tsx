@@ -9,7 +9,7 @@ export type LabwareNameOverlayProps = {
   className?: string,
 }
 
-export function LabwareNameOverlay(props: LabwareNameOverlayProps) {
+export function LabwareNameOverlay(props: LabwareNameOverlayProps): React.ReactNode {
   const { title, subtitle, className } = props
 
   return (

@@ -51,7 +51,7 @@ const INDETERMINATE_OPTION: DropdownOption = {
   disabled: true,
 }
 
-export function DropdownField(props: DropdownFieldProps) {
+export function DropdownField(props: DropdownFieldProps): React.ReactNode {
   let options = []
   // add in disabled, unselectable "-" mixed option when isIndeterminate is true
   // add in "blank" option if there is no `value`, unless `options` already has a blank option

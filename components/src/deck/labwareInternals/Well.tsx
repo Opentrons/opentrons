@@ -23,7 +23,7 @@ export type WellProps = {
   onMouseLeaveWell?: WellMouseEvent => unknown,
 }
 
-function WellComponent(props: WellProps) {
+function WellComponent(props: WellProps): React.ReactNode {
   const { well, wellName, fill, onMouseEnterWell, onMouseLeaveWell } = props
   assert(well, `expected 'well' prop for well "${wellName}"`)
   if (!well) return null

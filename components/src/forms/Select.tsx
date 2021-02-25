@@ -112,7 +112,7 @@ const CLEAR_STYLES = {
   // valueContainer: _ => _,
 }
 
-export function Select(props: SelectProps) {
+export function Select(props: SelectProps): React.ReactNode {
   return (
     <ReactSelect
       {...props}
@@ -124,7 +124,7 @@ export function Select(props: SelectProps) {
   )
 }
 
-const DropdownIndicator = (props: SelectComponentProps) => (
+const DropdownIndicator = (props: SelectComponentProps): React.ReactNode => (
   <reactSelectComponents.DropdownIndicator {...props}>
     <div
       className={cx(styles.dropdown_indicator, {

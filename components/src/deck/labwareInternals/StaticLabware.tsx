@@ -33,7 +33,7 @@ const TipDecoration = React.memo(function TipDecoration(props: {
   return null
 })
 
-function StaticLabwareComponent(props: StaticLabwareProps) {
+function StaticLabwareComponent(props: StaticLabwareProps): React.ReactNode {
   const { isTiprack } = props.definition.parameters
 
   return (

@@ -20,7 +20,7 @@ export type ModalPageProps = {
   outerProps?: React.ElementProps<typeof Box>,
 }
 
-export function ModalPage(props: ModalPageProps) {
+export function ModalPage(props: ModalPageProps): React.ReactNode {
   const { titleBar, heading, innerProps = {}, outerProps = {} } = props
 
   return (

@@ -15,7 +15,7 @@ export type LabeledSelectProps = {
   'data-test'?: string,
 }
 
-export function LabeledSelect(props: LabeledSelectProps) {
+export function LabeledSelect(props: LabeledSelectProps): React.ReactNode {
   const { label, value, options, onChange } = props
 
   return (

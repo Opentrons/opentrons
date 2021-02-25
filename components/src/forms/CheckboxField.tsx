@@ -33,7 +33,7 @@ export type CheckboxFieldProps = {
   isIndeterminate?: boolean,
 }
 
-export function CheckboxField(props: CheckboxFieldProps) {
+export function CheckboxField(props: CheckboxFieldProps): React.ReactNode {
   const error = props.error != null
   const outerClassName = cx(styles.form_field, props.className, {
     [styles.checkbox_disabled]: props.disabled,

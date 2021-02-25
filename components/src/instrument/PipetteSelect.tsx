@@ -49,7 +49,7 @@ const specToOption = ({ name, displayName }: PipetteNameSpecs) => ({
   label: displayName,
 })
 
-export const PipetteSelect = (props: PipetteSelectProps) => {
+export const PipetteSelect = (props: PipetteSelectProps): React.ReactNode => {
   const {
     tabIndex,
     className,

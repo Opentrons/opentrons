@@ -12,7 +12,7 @@ export type TipProps = {
   highlighted?: ?boolean,
 }
 
-export function Tip(props: TipProps) {
+export function Tip(props: TipProps): React.ReactNode {
   const { wellDef, empty, highlighted, tipVolume } = props
   const circleProps = {
     cx: wellDef.x,

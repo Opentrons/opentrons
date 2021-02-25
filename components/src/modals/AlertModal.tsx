@@ -34,7 +34,7 @@ export type AlertModalProps = {
 /**
  * Generic alert modal with a heading and a set of buttons at the bottom
  */
-export function AlertModal(props: AlertModalProps) {
+export function AlertModal(props: AlertModalProps): React.ReactNode {
   const {
     heading,
     buttons,

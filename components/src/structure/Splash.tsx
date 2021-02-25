@@ -15,7 +15,7 @@ export type SplashProps = {
   className?: string,
 }
 
-export function Splash(props: SplashProps) {
+export function Splash(props: SplashProps): React.ReactNode {
   return (
     <div className={cx(styles.splash, props.className)}>
       <Icon name={props.iconName || 'ot-logo'} />

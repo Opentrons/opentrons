@@ -12,49 +12,48 @@ import {
   BUTTON_TYPE_BUTTON,
 } from '../primitives'
 
-import type {IconName } from '../icons'
+import type { IconName } from '../icons'
 
-export type ButtonProps = {
+interface HoverTooltipHandlers {
+  ref: React.Ref<Element>
+  'aria-describedby': string
+  onMouseEnter: () => unknown
+  onMouseLeave: () => unknown
+  onPointerEnter: () => unknown
+  onPointerLeave: () => unknown
+}
+export interface ButtonProps {
   /** click handler */
-  onClick?: (event: React.MouseEvent) => unknown,
+  onClick?: (event: React.MouseEvent) => unknown
   /** name attribute */
-  name?: string,
+  name?: string
   /** title attribute */
-  title?: string,
+  title?: string
   /** disabled attribute (setting disabled removes onClick) */
-  disabled?: ?boolean,
+  disabled?: boolean | null | undefined
   /** use hover style even when not hovered */
-  hover?: ?boolean,
+  hover?: boolean | null | undefined
   /** optional Icon name */
-  iconName?: IconName,
+  iconName?: IconName
   /** classes to apply */
-  className?: string,
+  className?: string
   /** inverts the default color/background/border of default button style */
-  inverted?: boolean,
+  inverted?: boolean
   /** contents of the button */
-  children?: React.ReactNode,
+  children?: React.ReactNode
   /** type of button (default "button") */
   type?:
     | typeof BUTTON_TYPE_SUBMIT
     | typeof BUTTON_TYPE_RESET
-    | typeof BUTTON_TYPE_BUTTON,
+    | typeof BUTTON_TYPE_BUTTON
   /** ID of form that button is for */
-  form?: string,
+  form?: string
   /** custom element or component to use instead of `<button>` */
-  Component?: string | React.AbstractComponent<any>,
+  Component?: string | React.Component
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: ?Partial<{
-    ref: (Element | null) => unknown,
-    'aria-describedby': string,
-    onMouseEnter: () => unknown,
-    onMouseLeave: () => unknown,
-    onPointerEnter: () => unknown,
-    onPointerLeave: () => unknown,
-    ...
-  }>,
+  hoverTooltipHandlers?: Partial<HoverTooltipHandlers> | null | undefined
   /** html tabindex property */
-  tabIndex?: number,
-  ...
+  tabIndex?: number
 }
 
 // props to strip if using a custom component
@@ -75,14 +74,16 @@ const STRIP_PROPS = [
  * import {type ButtonProps} from '@opentrons/components'
  * ```
  */
-export function Button(props: ButtonProps) {
+export function Button(props: ButtonProps): React.ReactNode {
   const { name, title, disabled, hover, tabIndex, form } = props
   const className = cx(props.className, { [styles.hover]: hover })
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const onClick = !disabled ? props.onClick : undefined
   const Component = props.Component ?? 'button'
   const type = props.type ?? BUTTON_TYPE_BUTTON
 
   // pass all props if using a custom component
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const buttonProps = !props.Component
     ? { name, type, form, title, disabled, onClick, className, tabIndex }
     : {
@@ -96,6 +97,7 @@ export function Button(props: ButtonProps) {
   // ref forwarder
   return (
     <Component {...props.hoverTooltipHandlers} {...buttonProps}>
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       {props.iconName && <Icon name={props.iconName} className={styles.icon} />}
       {props.children}
     </Component>

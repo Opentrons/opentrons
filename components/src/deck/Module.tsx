@@ -27,7 +27,7 @@ export type ModuleProps = {
   slot: DeckSlot,
 }
 
-export function Module(props: ModuleProps) {
+export function Module(props: ModuleProps): React.ReactNode {
   const { model, slot } = props
   let x = 0
   let y = 0
@@ -81,7 +81,7 @@ export function Module(props: ModuleProps) {
 }
 
 type ModuleItemContentsProps = { ...ModuleProps, shouldFlip: boolean }
-function ModuleItemContents(props: ModuleItemContentsProps) {
+function ModuleItemContents(props: ModuleItemContentsProps): React.ReactNode {
   const { mode, model, shouldFlip } = props
   const displayName = getModuleDisplayName(model)
 

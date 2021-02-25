@@ -19,7 +19,7 @@ type GetRobotCoordsFromDOMCoords = $PropertyType<
   'getRobotCoordsFromDOMCoords'
 >
 
-export function RobotWorkSpace(props: RobotWorkSpaceProps) {
+export function RobotWorkSpace(props: RobotWorkSpaceProps): React.ReactNode {
   const { children, deckDef, deckLayerBlocklist = [], viewBox } = props
   const wrapperRef: { current: Element | null } = React.useRef(null)
 

@@ -5,15 +5,18 @@ module.exports = {
 
   parserOptions: {
     project: './*/tsconfig.json',
+    ecmaFeatures: {
+      jsx: true,
+    },
   },
 
   extends: [
     'standard-with-typescript',
     'plugin:react/recommended',
-    'plugin:prettier/recommended',
     'prettier/react',
     'prettier/standard',
     'prettier/@typescript-eslint',
+    'plugin:prettier/recommended',
   ],
 
   plugins: ['flowtype', 'react', 'react-hooks', 'json', 'prettier', 'jest'],

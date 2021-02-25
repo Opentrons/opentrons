@@ -46,7 +46,7 @@ export const Svg: StyledComponent<SvgProps, {}, Element> = styled.svg
       )
     },
   })
-  .attrs((props: SvgProps) => ({
+  .attrs((props: SvgProps): React.ReactNode => ({
     version: SVG_VERSION,
     xmlns: SVG_NAMESPACE,
     // map the explicit svgWidth/Height props to width/height attrs

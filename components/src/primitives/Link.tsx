@@ -25,7 +25,7 @@ export const Link: StyledComponent<
   .withConfig({
     shouldForwardProp: p => isntStyleProp(p) && p !== 'external',
   })
-  .attrs((props: LinkProps) => {
+  .attrs((props: LinkProps): React.ReactNode => {
     return props.external === true
       ? { target: '_blank', rel: 'noopener noreferrer' }
       : {}

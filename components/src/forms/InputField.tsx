@@ -54,7 +54,7 @@ export type InputFieldProps = {
   isIndeterminate?: boolean,
 }
 
-export function InputField(props: InputFieldProps) {
+export function InputField(props: InputFieldProps): React.ReactNode {
   const error = props.error != null
   const labelClass = cx(styles.form_field, props.className, {
     [styles.error]: error,
@@ -85,7 +85,7 @@ export function InputField(props: InputFieldProps) {
 }
 
 // TODO(mc, 2018-02-21): maybe simplify further and split out?
-function Input(props: InputFieldProps) {
+function Input(props: InputFieldProps): React.ReactNode {
   const error = props.error != null
   const value = props.isIndeterminate ? '' : props.value ?? ''
   const placeHolder = props.isIndeterminate ? '-' : props.placeholder

@@ -42,7 +42,7 @@ const Labels = (props: {
   </>
 )
 
-function WellLabelsComponent(props: WellLabelsProps) {
+function WellLabelsComponent(props: WellLabelsProps): React.ReactNode {
   const { definition } = props
   const letterColumn = definition.ordering[0]
   const numberRow = definition.ordering.map(wellCol => wellCol[0])
