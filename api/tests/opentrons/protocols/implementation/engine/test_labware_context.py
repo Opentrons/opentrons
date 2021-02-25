@@ -205,12 +205,12 @@ def test_get_geometry(labware_context: LabwareContext) -> None:
 
 def test_highest_z(labware_context: LabwareContext) -> None:
     with pytest.raises(NotImplementedError):
-        h = labware_context.highest_z  # noqa(F841)
+        h = labware_context.highest_z  # noqa: F841
 
 
 def test_separate_calibration(labware_context: LabwareContext) -> None:
     with pytest.raises(NotImplementedError):
-        s = labware_context.separate_calibration  # noqa(F841)
+        s = labware_context.separate_calibration  # noqa: F841
 
 
 def test_load_name(
