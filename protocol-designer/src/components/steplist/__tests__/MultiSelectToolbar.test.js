@@ -165,33 +165,7 @@ describe('MultiSelectToolbar', () => {
     })
   })
   describe('when clicking on delete', () => {
-    it('should delete all of the steps selected when there are NO changes to the batch edit form', () => {
-      when(getOrderedStepIdsMock)
-        .calledWith(expect.anything())
-        .mockReturnValue(['id_1', 'id_2'])
-
-      when(getMultiSelectItemIdsMock)
-        .calledWith(expect.anything())
-        .mockReturnValue(['id_1'])
-
-      const deleteMultipleStepsSpy = jest.spyOn(
-        stepListActions,
-        'deleteMultipleSteps'
-      )
-
-      const wrapper = render()
-
-      const deleteIcon = wrapper.find(ClickableIcon).at(1)
-      act(() => {
-        deleteIcon.prop('onClick')()
-      })
-      expect(deleteMultipleStepsSpy).toHaveBeenCalledWith(['id_1'])
-    })
-    it('should show a confirm delete modal when there are changes to the batch edit form', () => {
-      when(getBatchEditFormHasUnsavedChangesMock)
-        .calledWith(expect.anything())
-        .mockReturnValue(true)
-
+    it('should show a confirm delete modal before deleting the steps', () => {
       when(getOrderedStepIdsMock)
         .calledWith(expect.anything())
         .mockReturnValue(['id_1', 'id_2'])

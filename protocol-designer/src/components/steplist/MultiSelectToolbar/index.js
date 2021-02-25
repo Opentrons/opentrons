@@ -129,7 +129,7 @@ export const MultiSelectToolbar = (): React.Node => {
     confirm: confirmDelete,
     showConfirmation: showDeleteConfirmation,
     cancel: cancelDelete,
-  } = useConditionalConfirm(onDeleteClickAction, batchEditFormHasUnsavedChanges)
+  } = useConditionalConfirm(onDeleteClickAction, true)
 
   const selectProps = {
     iconName: isAllStepsSelected ? 'checkbox-marked' : 'minus-box',
