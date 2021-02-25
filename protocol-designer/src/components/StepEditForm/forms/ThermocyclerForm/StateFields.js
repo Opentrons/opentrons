@@ -4,18 +4,20 @@ import cx from 'classnames'
 
 import { i18n } from '../../../../localization'
 import { FormGroup } from '@opentrons/components'
-import { ConditionalOnField, ToggleRowField, TextField } from '../../fields'
+import { ToggleRowField, TextField } from '../../fields'
 import styles from '../../StepEditForm.css'
 
 import type { FieldPropsByName } from '../../types'
+import type { FormData } from '../../../../form-types'
 
 type Props = {|
   propsForFields: FieldPropsByName,
   isEndingHold?: boolean,
+  formData: FormData,
 |}
 
 export const StateFields = (props: Props): React.Node => {
-  const { isEndingHold, propsForFields } = props
+  const { isEndingHold, propsForFields, formData } = props
 
   // Append 'Hold' to field names if component is used for an ending hold in a TC profile
   const blockActiveName = isEndingHold ? 'blockIsActiveHold' : 'blockIsActive'
@@ -42,10 +44,7 @@ export const StateFields = (props: Props): React.Node => {
               'form.step_edit_form.field.thermocyclerState.block.toggleOn'
             )}
           />
-          <ConditionalOnField
-            name={blockActiveName}
-            condition={val => val === true}
-          >
+          {formData[blockActiveName] === true && (
             <TextField
               {...propsForFields[blockTempName]}
               className={cx(
@@ -54,7 +53,7 @@ export const StateFields = (props: Props): React.Node => {
               )}
               units={i18n.t('application.units.degrees')}
             />
-          </ConditionalOnField>
+          )}
         </div>
       </FormGroup>
 
@@ -72,10 +71,7 @@ export const StateFields = (props: Props): React.Node => {
               'form.step_edit_form.field.thermocyclerState.lid.toggleOn'
             )}
           />
-          <ConditionalOnField
-            name={lidActiveName}
-            condition={val => val === true}
-          >
+          {formData[lidActiveName] === true && (
             <TextField
               {...propsForFields[lidTempName]}
               className={cx(
@@ -84,7 +80,7 @@ export const StateFields = (props: Props): React.Node => {
               )}
               units={i18n.t('application.units.degrees')}
             />
-          </ConditionalOnField>
+          )}
         </div>
       </FormGroup>
 
