@@ -1,10 +1,10 @@
 """Module containing protocol context interface that interacts with
 Protocol Engine"""
-
+from __future__ import annotations
 from typing import Optional, Dict
 
 from opentrons import types, API
-from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine import ProtocolEngine, StateView
 from opentrons.protocols.api_support.util import HardwareManager, AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
@@ -16,15 +16,36 @@ from opentrons.protocols.implementations.interfaces.protocol_context import \
     ProtocolContextInterface, InstrumentDict, LoadModuleResult
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
+from .sync_engine import SyncProtocolEngine
+
 
 class ProtocolEngineContext(ProtocolContextInterface):
     """ProtocolContextInterface that interacts with Protocol Engine"""
 
-    _protocol_engine: ProtocolEngine
+    _sync_engine: SyncProtocolEngine
+    _state_view: StateView
 
-    def __init__(self, protocol_engine: ProtocolEngine) -> None:
-        """Constructor."""
-        self._protocol_engine = protocol_engine
+    def __init__(
+        self,
+        sync_engine: SyncProtocolEngine,
+        state_view: StateView,
+    ) -> None:
+        """Initialize a ProtocolEngineContext. Prefer `create` classmethod."""
+        self._sync_engine = sync_engine
+        self._state_view = state_view
+
+    @classmethod
+    def create(cls, protocol_engine: ProtocolEngine) -> ProtocolEngineContext:
+        """Create a ProtocolEngine context.
+
+        Args:
+            protocol_engine: A ProtocolEngine to manage protocol state and
+                handle command execution.
+
+        Returns:
+            A ready to use, concrete ProtocolContextInterface.
+        """
+        raise NotImplementedError()
 
     def get_bundled_data(self) -> Dict[str, bytes]:
         raise NotImplementedError()
