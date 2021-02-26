@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { FormGroup, HoverTooltip } from '@opentrons/components'
 import { i18n } from '../../../localization'
-import { getTooltipForField } from '../utils'
+import { getFieldDefaultTooltip } from '../utils'
 import { TextField } from './TextField'
 import type { StepType } from '../../../form-types'
 import type { FieldProps } from '../types'
@@ -20,7 +20,7 @@ export const VolumeField = (props: Props): React.Node => {
   // TODO(IL, 2021-02-08): use the useHoverTooltip hook instead of deprecated HoverTooltip (see #7295)
   return (
     <HoverTooltip
-      tooltipComponent={getTooltipForField(stepType, 'volume', false)}
+      tooltipComponent={getFieldDefaultTooltip(propsForVolumeField.name)}
       placement="top-start"
     >
       {hoverTooltipHandlers => (
