@@ -8,9 +8,9 @@ import type {
 
 import type { UseHoverOptions, HoverHandlers } from '../interaction-enhancers'
 
-export type Placement = $PropertyType<PopperOptions, 'placement'>
+export type Placement = PopperOptions['placement']
 
-export type Strategy = $PropertyType<PopperOptions, 'strategy'>
+export type Strategy = PopperOptions['strategy']
 
 export type { PopperInstance, PopperOptions }
 
@@ -41,16 +41,16 @@ export type UseTooltipOptions = Partial<{
 }>
 
 export type UseTooltipResultTargetProps = {
-  ref: (Element | null) => unknown,
+  ref: React.Ref<Element>,
   'aria-describedby': string,
 }
 
 export type UseTooltipResultTooltipProps = {
   id: string,
-  ref: (HTMLElement | null) => unknown,
+  ref: React.Ref<HTMLElement>,
   placement: Placement | null,
   style: Partial<CSSStyleDeclaration>,
-  arrowRef: (HTMLElement | null) => unknown,
+  arrowRef: React.Ref<HTMLElement>,
   arrowStyle: Partial<CSSStyleDeclaration>,
 }
 
