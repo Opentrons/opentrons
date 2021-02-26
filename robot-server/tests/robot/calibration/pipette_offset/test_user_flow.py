@@ -423,7 +423,7 @@ def mock_delete_pipette():
 
 @pytest.fixture
 def mock_save_tip_length():
-    with patch('robot_server.robot.calibration.util.save_tip_length_calibration',  # noqa(E501)
+    with patch('robot_server.robot.calibration.util.save_tip_length_calibration',  # noqa: E501
                autospec=True) as mock_save:
         yield mock_save
 
