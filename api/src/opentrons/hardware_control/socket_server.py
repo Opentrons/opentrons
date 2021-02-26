@@ -78,7 +78,7 @@ _SERDES = {
 }
 
 
-def _build_serializable_method(method_name, method):  # noqa(C901)
+def _build_serializable_method(method_name, method):  # noqa: C901
     """ Build the method to actually server over jsonrpc.
 
     To serve over jsonrpc, we need to have an interface that is fully
@@ -111,7 +111,7 @@ def _build_serializable_method(method_name, method):  # noqa(C901)
     if signature.return_annotation in _SERDES:
         return_transformer = _SERDES[signature.return_annotation].serializer
     else:
-        return_transformer = lambda ret: ret  # noqa(E371)
+        return_transformer = lambda ret: ret  # noqa: E731
 
     @functools.wraps(async_wrapper)
     async def wrapper(**kwargs):
@@ -246,7 +246,7 @@ class JsonRpcProtocol(asyncio.Protocol):
     def resume_writing(self):
         self._log.debug('resume writing')
 
-    def data_received(self, data: bytes):  # noqa(C901)
+    def data_received(self, data: bytes):  # noqa: C901
         self._log.debug(f'data received: {data!r}')
         self._buffer += data.decode()  # hope this isn't incomplete
         try:

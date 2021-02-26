@@ -514,7 +514,7 @@ class Session(RobotBusy):
         else:
             self.blocked = False
 
-    @robot_is_busy  # noqa(C901)
+    @robot_is_busy  # noqa: C901
     def _run(self) -> None:
         def on_command(message: command_types.CommandMessage) -> None:
             if message['$'] == 'before':

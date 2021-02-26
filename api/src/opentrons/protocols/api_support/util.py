@@ -17,7 +17,7 @@ if TYPE_CHECKING:
         InstrumentContextInterface
     from opentrons.protocol_api.labware import Well, Labware
     from opentrons.protocols.geometry.deck import Deck
-    from opentrons.hardware_control.dev_types import HasLoop # noqa (F501)
+    from opentrons.hardware_control.dev_types import HasLoop  # noqa: F501
 
 
 MODULE_LOG = logging.getLogger(__name__)
