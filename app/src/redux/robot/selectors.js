@@ -34,6 +34,7 @@ import type {
 
 import type { ConnectionState } from './reducer/connection'
 import type { CalibrationRequest } from './reducer/calibration'
+import type { ModuleModel } from '@opentrons/shared-data'
 
 const calibration = (state: State) => state.robot.calibration
 const connection = (state: State) => state.robot.connection
@@ -319,6 +320,18 @@ export const getModules: State => Array<SessionModule> = createSelector(
   (modulesBySlot, config) =>
     Object.keys(modulesBySlot).map((slot: Slot) => modulesBySlot[slot])
 )
+
+export const getModulesByModel: State => {
+  [ModuleModel]: Array<SessionModule>,
+} = createSelector(getModules, modules => {
+  return modules.reduce((acc, val) => {
+    if (!acc[val.model]) {
+      acc[val.model] = []
+    }
+    acc[val.model].push(val)
+    return acc
+  }, {})
+})
 
 export function getLabwareBySlot(state: State): { [Slot]: StateLabware, ... } {
   return session(state).labwareBySlot

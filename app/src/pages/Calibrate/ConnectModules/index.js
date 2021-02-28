@@ -16,7 +16,11 @@ import type { State, Dispatch } from '../../../redux/types'
 
 type OP = {| robotName: string |}
 
-type SP = {| modulesRequired: boolean, modulesMissing: boolean |}
+type SP = {|
+  modulesRequired: boolean,
+  modulesMissing: boolean,
+  hasDuplicateModules: boolean,
+|}
 
 type DP = {| setReviewed: () => mixed, fetchModules: () => mixed |}
 
@@ -37,12 +41,20 @@ export const ConnectModules: React.AbstractComponent<OP> = connect<
 function ConnectModulesComponent(props: Props) {
   if (!props.modulesRequired) return null
 
-  const { modulesMissing, setReviewed, fetchModules } = props
-  const onPromptClick = modulesMissing ? fetchModules : setReviewed
+  const {
+    modulesMissing,
+    setReviewed,
+    fetchModules,
+    hasDuplicateModules,
+  } = props
 
+  if (modulesMissing) {
+    fetchModules()
+  }
+  console.log(hasDuplicateModules)
   return (
     <div className={styles.page_content_dark}>
-      <Prompt modulesMissing={modulesMissing} onClick={onPromptClick} />
+      <Prompt onPromptClick={setReviewed} modulesMissing={modulesMissing} hasDuplicateModules={hasDuplicateModules} />
       <div className={styles.deck_map_wrapper}>
         <DeckMap className={styles.deck_map} modulesRequired />
       </div>
@@ -54,6 +66,9 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   return {
     modulesRequired: robotSelectors.getModules(state).length > 0,
     modulesMissing: getMissingModules(state).length > 0,
+    hasDuplicateModules: Object.values(robotSelectors.getModulesByModel(state)).some(
+      m => Array.isArray(m) && m.length > 1
+    ),
   }
 }
 
