@@ -2,6 +2,7 @@
 // prompt for ReviewModulesModal of labware calibration page
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { push } from 'connected-react-router'
 
 import {
@@ -34,30 +35,12 @@ export type PromptProps = {|
   hasDuplicateModules: boolean,
 |}
 
-const missingAlertProps = {
-  type: 'warning',
-  title: 'Module Missing',
-  className: styles.alert,
-}
-
-const connectedAlertProps = {
-  type: 'success',
-  title: 'Module succesfully detected.',
-  className: styles.alert,
-}
-
 export function Prompt(props: PromptProps): React.Node {
   const { modulesMissing, onPromptClick, hasDuplicateModules } = props
+  const { t } = useTranslation('protocol_calibration')
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const dispatch = useDispatch<Dispatch>()
-
-  const message =
-    'Plug in and power up the required module(s) via the OT-2 USB Ports. Place the modules as show in the deck map.'
-  const message2 =
-    'Duplicate modules should be plugged in to the USB ports with the lowest deck slot number corresponding to the left-most USB port. Check out our help docs for more information on using duplicate modules.'
-  const buttonText = 'continue to labware setup'
-  const tooltipText = 'Connect module(s) to proceed to labware calibration'
 
   const nextUnconfirmedLabware = useSelector(
     robotSelectors.getUnconfirmedLabware
@@ -74,7 +57,7 @@ export function Prompt(props: PromptProps): React.Node {
         color={C_WHITE}
         marginX={SPACING_3}
       >
-        {message}
+        {t('module_connect_description')}
       </Text>
       <Flex {...targetProps}>
         <LightSecondaryBtn
@@ -86,15 +69,14 @@ export function Prompt(props: PromptProps): React.Node {
           }}
           disabled={modulesMissing}
         >
-          {buttonText}
+          {t('module_connect_proceed_button')}
         </LightSecondaryBtn>
-        <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
+        {modulesMissing && <Tooltip {...tooltipProps}>{t('module_connect_missing_tooltip')}</Tooltip>}
       </Flex>
-      {hasDuplicateModules
-      ? <Text paddingX={SPACING_4} marginBottom={SPACING_2} fontSize={FONT_SIZE_BODY_2} textAlign={TEXT_ALIGN_CENTER} color={C_WHITE}>
-          {message2}
-        </Text>
-      : null}
+      {hasDuplicateModules &&
+        <Text paddingX={SPACING_4} marginBottom={SPACING_2} fontSize={FONT_SIZE_BODY_2} textAlign={TEXT_ALIGN_CENTER} color={C_WHITE}>
+          {t('module_connect_duplicate_description')}
+        </Text>}
     </Flex>
   )
 }
