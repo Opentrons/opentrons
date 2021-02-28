@@ -2,7 +2,7 @@
 // prompt for ReviewModulesModal of labware calibration page
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { push } from 'connected-react-router'
 
 import {
@@ -12,9 +12,11 @@ import {
   Text,
   SPACING_3,
   Flex,
+  Link,
   FONT_SIZE_BODY_2,
   FONT_SIZE_HEADER,
   C_WHITE,
+  C_BLUE,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   SIZE_3,
@@ -28,6 +30,8 @@ import { selectors as robotSelectors } from '../../../redux/robot'
 
 import type { Dispatch } from '../../../redux/types'
 import styles from './styles.css'
+
+const SUPPORT_PAGE = 'https://support.opentrons.com/en/'  // TODO: update link to correct doc
 
 export type PromptProps = {|
   modulesMissing: boolean,
@@ -75,7 +79,13 @@ export function Prompt(props: PromptProps): React.Node {
       </Flex>
       {hasDuplicateModules &&
         <Text paddingX={SPACING_4} marginBottom={SPACING_2} fontSize={FONT_SIZE_BODY_2} textAlign={TEXT_ALIGN_CENTER} color={C_WHITE}>
-          {t('module_connect_duplicate_description')}
+          <Trans
+            t={t}
+            i18nKey="module_connect_duplicate_description"
+            components={{
+              a: <Link color={C_BLUE} external href={SUPPORT_PAGE} />,
+            }}
+          />
         </Text>}
     </Flex>
   )
