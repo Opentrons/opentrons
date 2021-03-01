@@ -1363,7 +1363,7 @@ class SmoothieDriver_3_0_0:
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
-    def move(self, target: Dict[str, float], home_flagged_axes: bool = False,  # noqa(C901)
+    def move(self, target: Dict[str, float], home_flagged_axes: bool = False,  # noqa: C901, E501
              speed: float = None):
         """
         Move to the `target` Smoothieware coordinate, along any of the size
@@ -1960,7 +1960,7 @@ class SmoothieDriver_3_0_0:
             sleep(0.25)
             self.run_flag.set()
 
-    async def update_firmware(self,  # noqa(C901)
+    async def update_firmware(self,  # noqa: C901
                               filename: str,
                               loop: asyncio.AbstractEventLoop = None,
                               explicit_modeset: bool = True) -> str:

@@ -37,7 +37,7 @@ STANDARD_MAGDECK_LABWARE = [
 MODULE_LOG = logging.getLogger(__name__)
 
 GeometryType = TypeVar('GeometryType', bound=ModuleGeometry)
-class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
+class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa: E302
     """ An object representing a connected module.
 
 

@@ -7,8 +7,8 @@ from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
 
 if TYPE_CHECKING:
-    from opentrons.protocol_api.contexts import InstrumentContext  # noqa (F501)
-    from opentrons.protocols.execution.dev_types import Dictable  # noqa(F501)
+    from opentrons.protocol_api.contexts import InstrumentContext  # noqa: F501
+    from opentrons.protocols.execution.dev_types import Dictable  # noqa: F501
 
 
 class MixStrategy(enum.Enum):
@@ -591,7 +591,7 @@ class TransferPlan:
         yield from self._new_tip_action()
 
     Target = TypeVar('Target')
-    @staticmethod  # noqa(E301)
+    @staticmethod  # noqa: E301
     def _expand_for_volume_constraints(
             volumes: Iterator[float],
             targets: Iterator[Target],
@@ -710,7 +710,7 @@ class TransferPlan:
         if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
             yield self._format_dict('touch_tip', kwargs=self._touch_tip_opts)
 
-    def _after_dispense(self, dest, src, is_disp_next=False):  # noqa(C901)
+    def _after_dispense(self, dest, src, is_disp_next=False):  # noqa: C901
         # This sequence of actions is subject to change
         if not is_disp_next:
             # If the next command is an aspirate, we are switching

@@ -589,7 +589,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def pick_up_tip(  # noqa(C901)
+    def pick_up_tip(  # noqa: C901
             self, location: Union[types.Location, Well] = None,
             presses: Optional[int] = None,
             increment: Optional[float] = None) -> InstrumentContext:
@@ -679,7 +679,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def drop_tip(  # noqa(C901)
+    def drop_tip(  # noqa: C901
             self,
             location: Union[types.Location, Well] = None,
             home_after: bool = True)\
@@ -889,7 +889,7 @@ class InstrumentContext(CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @publish.both(command=cmds.transfer)  # noqa(C901)
+    @publish.both(command=cmds.transfer)  # noqa: C901
     @requires_version(2, 0)
     def transfer(self,
                  volume: Union[float, Sequence[float]],

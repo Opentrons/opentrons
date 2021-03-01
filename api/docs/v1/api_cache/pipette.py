@@ -88,7 +88,7 @@ class Pipette:
     ...     tip_racks=[tip_rack_300ul]) # doctest: +SKIP
     """
 
-    def __init__(  # noqa(C901)
+    def __init__(  # noqa: C901
             self,
             robot,
             model_offset=(0, 0, 0),

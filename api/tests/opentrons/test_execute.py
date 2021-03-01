@@ -52,8 +52,8 @@ def test_execute_function_apiv2(protocol,
     assert [item['payload']['text'] for item in entries
             if item['$'] == 'before'] == [
         'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1',
-        'Aspirating 10.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 150.0 uL/sec',  # noqa(E501),
-        'Dispensing 10.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 300.0 uL/sec',  # noqa(E501),
+        'Aspirating 10.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 150.0 uL/sec',  # noqa: E501,
+        'Dispensing 10.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 300.0 uL/sec',  # noqa: E501,
         'Dropping tip into H12 of Opentrons 96 Tip Rack 300 µL on 1'
         ]
 
@@ -152,20 +152,20 @@ def test_execute_function_bundle_apiv2(get_bundle_fixture,
         bundle['filelike'], 'simple_bundle.zip', emit_runlog=emit_runlog)
     assert [item['payload']['text']
             for item in entries if item['$'] == 'before'] == [
-        'Transferring 1.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
+        'Transferring 1.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa: E501
         'Picking up tip from A1 of Opentrons 96 Tip Rack 10 µL on 3',
         "Aspirating 1.0 uL from A1 of FAKE example labware on 1 at" \
         " 5.0 uL/sec",
         "Dispensing 1.0 uL into A4 of FAKE example labware on 1 at" \
         " 10.0 uL/sec",
         'Dropping tip into A1 of Opentrons Fixed Trash on 12',
-        'Transferring 2.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
+        'Transferring 2.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa: E501
         'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 3',
         'Aspirating 2.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec',
         "Dispensing 2.0 uL into A4 of FAKE example labware on 1 at" \
         " 10.0 uL/sec",
         'Dropping tip into A1 of Opentrons Fixed Trash on 12',
-        'Transferring 3.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
+        'Transferring 3.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa: E501
         'Picking up tip from C1 of Opentrons 96 Tip Rack 10 µL on 3',
         'Aspirating 3.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec',
         "Dispensing 3.0 uL into A4 of FAKE example labware on 1 at" \

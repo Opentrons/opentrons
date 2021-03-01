@@ -32,7 +32,7 @@ def _find_storage_device():
     if os.path.ismount(USB_MOUNT_FILEPATH) is False:
         sdn1_devices = [
             '/dev/sd{}1'.format(l)
-            for l in 'abcdefgh'  # noqa(E741)
+            for l in 'abcdefgh'  # noqa: E741
             if os.path.exists('/dev/sd{}1'.format(l))
         ]
         if len(sdn1_devices) == 0:

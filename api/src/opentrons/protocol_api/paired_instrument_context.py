@@ -202,10 +202,10 @@ class PairedInstrumentContext(CommandPublisher):
         .. code-block:: python
 
             >>> tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
-            >>> left = ctx.load_instrument('p300_multi', 'left', tip_racks=[tiprack])  # noqa(E501)
-            >>> right = ctx.load_instrument('p300_multi', 'right', tip_racks=[tiprack])  # noqa(E501)
+            >>> left = ctx.load_instrument('p300_multi', 'left', tip_racks=[tiprack])
+            >>> right = ctx.load_instrument('p300_multi', 'right', tip_racks=[tiprack])
             >>> paired = right.pair_with(left)
-            >>> paired.pick_up_tip() # Pick up tips from the first and fifth column  # noqa(E501)
+            >>> paired.pick_up_tip() # Pick up tips from the first and fifth column
             >>> paired.drop_tip()
             >>> left.pick_up_tip() # Pick up tips from the second column
             >>> left.drop_tip()
