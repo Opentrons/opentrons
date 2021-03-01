@@ -90,11 +90,11 @@ def build_edges(
     # Determine the touch_tip edges/points
     offset_pt = top_types.Point(0, 0, offset)
     edge_list = EdgeList(
-        right=where.from_center_cartesian(x=radius, y=0, z=1) + offset_pt,  # noqa E501
-        left=where.from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,  # noqa E501
-        center=where.from_center_cartesian(x=0, y=0, z=1) + offset_pt,  # noqa E501
-        up=where.from_center_cartesian(x=0, y=radius, z=1) + offset_pt,  # noqa E501
-        down=where.from_center_cartesian(x=0, y=-radius, z=1) + offset_pt  # noqa E501
+        right=where.from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
+        left=where.from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
+        center=where.from_center_cartesian(x=0, y=0, z=1) + offset_pt,
+        up=where.from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
+        down=where.from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
     )
 
     if version < APIVersion(2, 4):

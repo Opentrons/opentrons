@@ -271,7 +271,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         'C': 5.55})
     expected = [
         # Set active axes high
-        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+[BC].+'],  # noqa: E501
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+[BC].+'],
         ['M400'],
         # Set plunger current low
         ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005'],
@@ -607,7 +607,7 @@ def test_clear_limit_switch(smoothie, monkeypatch):
 
     assert [c.strip() for c in cmd_list] == [
         # attempt to move and fail
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100',  # noqa: E501
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100',
         # recover from failure
         'M999',
         'M400',
