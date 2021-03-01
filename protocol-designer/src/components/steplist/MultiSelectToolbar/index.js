@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
+  useConditionalConfirm,
   Flex,
   Box,
   Tooltip,
@@ -19,7 +20,6 @@ import {
   BORDER_SOLID_MEDIUM,
   POSITION_STICKY,
 } from '@opentrons/components'
-import { useConditionalConfirm } from '../../../../../components/src/hooks/useConditionalConfirm'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import {
   getMultiSelectItemIds,

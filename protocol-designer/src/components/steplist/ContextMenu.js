@@ -1,12 +1,17 @@
 // @flow
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useConditionalConfirm } from '@opentrons/components'
+import {
+  ConfirmDeleteModal,
+  DELETE_STEP_FORM,
+} from '../modals/ConfirmDeleteModal'
 import { i18n } from '../../localization'
-import { actions as stepsActions } from '../../ui/steps'
+import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
 import { Portal } from '../portals/TopPortal'
-import type { StepIdType } from '../../form-types'
 import styles from './StepItem.css'
+import type { StepIdType } from '../../form-types'
 
 const MENU_OFFSET_PX = 5
 
@@ -35,6 +40,8 @@ export const ContextMenu = (props: Props): React.Node => {
   })
   const menuRoot = React.useRef<?HTMLElement>(null)
 
+  const isMultiSelectMode = useSelector(getIsMultiSelectMode)
+
   React.useEffect(() => {
     global.addEventListener('click', handleClick)
     return () => global.removeEventListener('click', handleClick)
@@ -43,6 +50,7 @@ export const ContextMenu = (props: Props): React.Node => {
   const makeHandleContextMenu = (stepId: StepIdType) => (
     event: SyntheticMouseEvent<*>
   ) => {
+    if (isMultiSelectMode) return
     event.preventDefault()
 
     const clickX = event.clientX
@@ -85,19 +93,36 @@ export const ContextMenu = (props: Props): React.Node => {
   }
 
   const handleDelete = () => {
-    if (stepId != null && confirm(i18n.t('alert.window.confirm_delete_step'))) {
+    if (stepId != null) {
       deleteStep(stepId)
-      setVisible(false)
-      setStepId(null)
+    } else {
+      console.warn(
+        'something went wrong, cannot delete a step without a step id'
+      )
     }
+    setVisible(false)
+    setStepId(null)
   }
+
+  const {
+    confirm: confirmDelete,
+    showConfirmation: showDeleteConfirmation,
+    cancel: cancelDelete,
+  } = useConditionalConfirm(handleDelete, true)
 
   return (
     <div>
+      {showDeleteConfirmation && (
+        <ConfirmDeleteModal
+          modalType={DELETE_STEP_FORM}
+          onCancelClick={cancelDelete}
+          onContinueClick={confirmDelete}
+        />
+      )}
       {props.children({
         makeStepOnContextMenu: makeHandleContextMenu,
       })}
-      {visible && (
+      {!showDeleteConfirmation && visible && (
         <Portal>
           <React.Fragment>
             <div
@@ -111,7 +136,7 @@ export const ContextMenu = (props: Props): React.Node => {
               >
                 {i18n.t('context_menu.step.duplicate')}
               </div>
-              <div onClick={handleDelete} className={styles.context_menu_item}>
+              <div onClick={confirmDelete} className={styles.context_menu_item}>
                 {i18n.t('context_menu.step.delete')}
               </div>
             </div>
