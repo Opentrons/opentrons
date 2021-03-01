@@ -7,13 +7,14 @@ import asyncio
 import hashlib
 import logging
 import subprocess
-import uuid
 from functools import lru_cache
 from typing import Callable, Coroutine, Mapping
 
 from aiohttp import web
 
-from .constants import (RESTART_LOCK_NAME, DEVICE_NAME_VARNAME)
+from .constants import (
+    RESTART_LOCK_NAME, DEVICE_BOOT_ID_NAME, DEVICE_NAME_VARNAME
+)
 
 LOG = logging.getLogger(__name__)
 
@@ -53,7 +54,7 @@ def build_health_endpoint(
                     'buildroot_version', 'unknown'),
                 'capabilities': {'buildrootUpdate': '/server/update/begin',
                                  'restart': '/server/restart'},
-                'boot_id': get_boot_id()
+                'bootId': request.app[DEVICE_BOOT_ID_NAME]
             },
             headers={'Access-Control-Allow-Origin': '*'}
         )

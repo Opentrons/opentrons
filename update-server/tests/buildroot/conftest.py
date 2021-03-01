@@ -118,15 +118,16 @@ def otupdate_config(request, tmpdir, testing_cert):
 
 
 @pytest.fixture
-async def test_client(aiohttp_client, loop, otupdate_config, monkeypatch):
+async def test_cli(aiohttp_client, loop, otupdate_config, monkeypatch):
     """
     Build an app using dummy versions, then build a test client and return it
     """
     app = buildroot.get_app(
-        os.path.join(HERE, "version.json"),
-        otupdate_config,
-        'opentrons-test',
-        loop)
+        system_version_file=os.path.join(HERE, "version.json"),
+        config_file_override=otupdate_config,
+        name_override='opentrons-test',
+        boot_id_override='dummy-boot-id-abc123',
+        loop=loop)
     client = await loop.create_task(aiohttp_client(app))
     return client
 

@@ -34,6 +34,7 @@ def get_version(version_file: str) -> Mapping[str, str]:
 def get_app(system_version_file: str = None,
             config_file_override: str = None,
             name_override: str = None,
+            boot_id_override: str = None,
             loop: asyncio.AbstractEventLoop = None) -> web.Application:
     """ Build and return the aiohttp.web.Application that runs the server
 
@@ -44,6 +45,7 @@ def get_app(system_version_file: str = None,
 
     version = get_version(system_version_file)
     name = name_override or name_management.get_name()
+    boot_id = boot_id_override or control.get_boot_id()
     config_obj = config.load(config_file_override)
 
     LOG.info("Setup: " + '\n\t'.join([
@@ -69,6 +71,7 @@ def get_app(system_version_file: str = None,
     app = web.Application(middlewares=[log_error_middleware])
     app[config.CONFIG_VARNAME] = config_obj
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
+    app[constants.DEVICE_BOOT_ID_NAME] = boot_id
     app[constants.DEVICE_NAME_VARNAME] = name
     app.router.add_routes([
         web.get('/server/update/health',
