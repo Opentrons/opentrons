@@ -70,45 +70,14 @@ def get_serial() -> str:
         return 'unknown'
 
 
-class UnknownBootIDError(Exception):
-    pass
-
-
 def _get_os_boot_id() -> bytes:
     with open('/proc/sys/kernel/random/boot_id', 'rb') as file:
         return file.read()
-    except (FileNotFoundError, PermissionError) as error:
-        raise UnknownBootIDError from error
 
 
 @lru_cache(maxsize=1)
 def get_boot_id() -> str:
-    """Return a random string that changes every time the device boots.
-
-    Clients can poll this to detect when the OT-2 has rebooted. (Including both
-    graceful reboots, like from clicking the soft "Restart" button, and
-    unexpected reboots, like from interrupting the power supply).
-
-    There are no guarantees about the returned ID's length or format. Equality
-    comparison is the only valid thing to do with it.
-
-    This ID should only change when the whole OT-2 operating system reboots.
-    It shouldn't change if some internal process merely crashes and restarts.
-    """
-
-    # FIXME versioning?
-
-    try:
-        # Hash to obfuscate so no one accidentally relies on this specifically
-        # being the kernel-provided boot ID. Choice of hash function is
-        # arbitrary.
-        return hashlib.sha256(_get_os_boot_id()).hexdigest()
-    except UnknownBootIDError:
-        LOG.warning(
-            "Couldn't read the OS's boot ID."
-            " (Are we not running on a real robot?)",
-            exc_info=True
-        )
-        # Rely on function-level memoization for this to be constant
-        # call-to-call.
-        return f'debug-{uuid.uuid4()}'
+    # Hash to obfuscate so no one accidentally relies on this specifically
+    # being the kernel-provided boot ID. Choice of hash function is
+    # arbitrary.
+    return hashlib.sha256(_get_os_boot_id()).hexdigest()
