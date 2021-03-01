@@ -118,7 +118,7 @@ def otupdate_config(request, tmpdir, testing_cert):
 
 
 @pytest.fixture
-async def test_cli(aiohttp_client, loop, otupdate_config, monkeypatch):
+async def test_client(aiohttp_client, loop, otupdate_config, monkeypatch):
     """
     Build an app using dummy versions, then build a test client and return it
     """
