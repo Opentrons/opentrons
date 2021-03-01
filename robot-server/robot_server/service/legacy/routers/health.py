@@ -5,7 +5,7 @@ from opentrons import config, protocol_api
 from opentrons.hardware_control import ThreadManager
 from opentrons import __version__
 from robot_server.service.legacy.models.health import Health, Links
-from robot_server.service.dependencies import get_boot_id, get_hardware
+from robot_server.service.dependencies import get_hardware
 
 router = APIRouter()
 
@@ -21,8 +21,7 @@ router = APIRouter()
                     "version and name.",
             response_description="OT-2 /health response")
 async def get_health(
-        hardware: ThreadManager = Depends(get_hardware),
-        boot_id: str = Depends(get_boot_id)) -> Health:
+        hardware: ThreadManager = Depends(get_hardware)) -> Health:
     static_paths = ['/logs/serial.log', '/logs/api.log', '/logs/server.log']
     # This conditional handles the case where we have just changed
     # the use protocol api v2 feature flag, so it does not match
@@ -42,7 +41,6 @@ async def get_health(
                   system_version=config.OT_SYSTEM_VERSION,
                   maximum_protocol_api_version=list(max_supported),
                   minimum_protocol_api_version=list(min_supported),
-                  boot_id=boot_id
                   links=Links(
                       apiLog='/logs/api.log',
                       serialLog='/logs/serial.log',

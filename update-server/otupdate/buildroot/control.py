@@ -4,8 +4,11 @@ otupdate.buildroot.control: non-update-specific endpoints for otupdate
 This has endpoints like /restart that aren't specific to update tasks.
 """
 import asyncio
+import hashlib
 import logging
 import subprocess
+import uuid
+from functools import lru_cache
 from typing import Callable, Coroutine, Mapping
 
 from aiohttp import web
@@ -49,7 +52,8 @@ def build_health_endpoint(
                 'systemVersion': version_dict.get(
                     'buildroot_version', 'unknown'),
                 'capabilities': {'buildrootUpdate': '/server/update/begin',
-                                 'restart': '/server/restart'}
+                                 'restart': '/server/restart'},
+                'boot_id': get_boot_id()
             },
             headers={'Access-Control-Allow-Origin': '*'}
         )
@@ -63,3 +67,38 @@ def get_serial() -> str:
             return vs.read().strip()
     except OSError:
         return 'unknown'
+
+
+@lru_cache(maxsize=1)
+def get_boot_id() -> str:
+    """Return a random string that changes every time the device boots.
+
+    Clients can poll this to detect when the OT-2 has rebooted. (Including both
+    graceful reboots, like from clicking the soft "Restart" button, and
+    unexpected reboots, like from interrupting the power supply).
+
+    There are no guarantees about the returned ID's length or format. Equality
+    comparison is the only valid thing to do with it.
+
+    This ID should only change when the whole OT-2 operating system reboots.
+    It shouldn't change if some internal process merely crashes and restarts.
+    """
+    # FIXME versioning?
+
+    path = '/proc/sys/kernel/random/boot_id'
+
+    try:
+        with open(path, 'b') as f:
+            raw_id = f.read()
+        # Hash to obfuscate so no one accidentally relies on this specifically
+        # being the kernel-provided boot ID. Choice of hash function is
+        # arbitrary.
+        return hashlib.sha256(raw_id).hexdigest()
+
+    except OSError:
+        LOG.warning(
+            f'{path} unavailable. (Are we not running on a real robot?)'
+        )
+        # Rely on function-level memoization for ID stability.
+        fake_id = uuid.uuid4()
+        return f'debug-{fake_id}'

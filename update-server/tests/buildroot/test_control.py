@@ -8,6 +8,11 @@ from unittest import mock
 from otupdate.buildroot import control
 
 
+# Tests:
+# - It should be stable as long as the underlying file doesn't change.
+# - It should change when the boot ID changes and the server restarts.
+
+
 async def test_health(test_cli):
     resp = await test_cli.get('/server/update/health')
     assert resp.status == 200

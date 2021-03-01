@@ -57,29 +57,6 @@ class Health(BaseModel):
               description="A major.minor minimum Protocol API version",
               min_items=2,
               max_items=2)
-    boot_id: str = \
-        Field(...,
-              summary = "A random string that changes every time the OT-2 "
-                        "reboots.",
-              description="""\
-              You can poll this field to detect when the OT-2 has rebooted.
-              If it changes between successive polls, the OT-2 has rebooted—
-              either unexpectedly, like from disconnecting the power cable, or
-              gracefully, like from clicking "Restart" button in the Opentrons
-              App.
-
-              There are no guarantees about this field's length or format.
-              Equality comparison is the only valid thing to do with it.
-              
-              This field only changes when the whole OT-2 operating system
-              reboots. It won't change if some internal process merely crashes
-              and restarts.
-              
-              Added in robot software version ___.
-              """
-              # FIXME: Versioning?
-              # FIXME: Does this belong in /health?
-              )
     links: Links
 
     class Config:
