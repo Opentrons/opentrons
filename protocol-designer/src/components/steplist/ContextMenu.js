@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
-import type { ThunkDispatch } from '../../types'
+import { useDispatch } from 'react-redux'
 import { i18n } from '../../localization'
 import { actions as stepsActions } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
@@ -11,7 +10,7 @@ import styles from './StepItem.css'
 
 const MENU_OFFSET_PX = 5
 
-type OP = {|
+type Props = {|
   children: ({
     makeStepOnContextMenu: StepIdType => (
       event: SyntheticMouseEvent<>
@@ -19,38 +18,29 @@ type OP = {|
   }) => React.Node,
 |}
 
-type DP = {|
-  deleteStep: StepIdType => {},
-  duplicateStep: StepIdType => {},
-|}
+type Position = {| left: number | null, top: number | null |}
 
-type Props = {| ...DP, ...OP |}
+export const ContextMenu = (props: Props): React.Node => {
+  const dispatch = useDispatch()
+  const deleteStep = (stepId: StepIdType) =>
+    dispatch(steplistActions.deleteStep(stepId))
+  const duplicateStep = (stepId: StepIdType) =>
+    dispatch(stepsActions.duplicateStep(stepId))
 
-type State = {
-  visible: boolean,
-  left: ?number,
-  top: ?number,
-  stepId: ?StepIdType,
-}
-
-class ContextMenuComponent extends React.Component<Props, State> {
-  state = {
-    visible: false,
+  const [visible, setVisible] = React.useState<boolean>(false)
+  const [stepId, setStepId] = React.useState<StepIdType | null>(null)
+  const [position, setPosition] = React.useState<Position>({
     left: null,
     top: null,
-    stepId: null,
-  }
-  menuRoot: ?HTMLElement
+  })
+  const menuRoot = React.useRef<?HTMLElement>(null)
 
-  componentDidMount() {
-    global.addEventListener('click', this.handleClick)
-  }
+  React.useEffect(() => {
+    global.addEventListener('click', handleClick)
+    return () => global.removeEventListener('click', handleClick)
+  })
 
-  componentWillUnmount() {
-    global.removeEventListener('click', this.handleClick)
-  }
-
-  makeHandleContextMenu = (stepId: StepIdType) => (
+  const makeHandleContextMenu = (stepId: StepIdType) => (
     event: SyntheticMouseEvent<*>
   ) => {
     event.preventDefault()
@@ -58,106 +48,76 @@ class ContextMenuComponent extends React.Component<Props, State> {
     const clickX = event.clientX
     const clickY = event.clientY
 
-    this.setState({ visible: true, stepId }, () => {
-      const screenW = window.innerWidth
-      const screenH = window.innerHeight
-      const rootW = this.menuRoot ? this.menuRoot.offsetWidth : 0
-      const rootH = this.menuRoot ? this.menuRoot.offsetHeight : 0
+    const screenW = window.innerWidth
+    const screenH = window.innerHeight
+    const rootW = menuRoot.current ? menuRoot.current.offsetWidth : 0
+    const rootH = menuRoot.current ? menuRoot.current.offsetHeight : 0
 
-      const left =
-        screenW - clickX > rootW
-          ? clickX + MENU_OFFSET_PX
-          : clickX - rootW - MENU_OFFSET_PX
-      const top =
-        screenH - clickY > rootH
-          ? clickY + MENU_OFFSET_PX
-          : clickY - rootH - MENU_OFFSET_PX
-      this.setState({ left, top })
-    })
+    const left =
+      screenW - clickX > rootW
+        ? clickX + MENU_OFFSET_PX
+        : clickX - rootW - MENU_OFFSET_PX
+    const top =
+      screenH - clickY > rootH
+        ? clickY + MENU_OFFSET_PX
+        : clickY - rootH - MENU_OFFSET_PX
+
+    setVisible(true)
+    setStepId(stepId)
+    setPosition({ left, top })
   }
 
-  handleClick = (event: SyntheticMouseEvent<*>) => {
-    const { visible } = this.state
-
+  const handleClick = (event: SyntheticMouseEvent<*>) => {
     const wasOutside = !(
-      this.menuRoot &&
-      event.target instanceof Node &&
-      this.menuRoot.contains(event.target)
+      event.target instanceof Node && menuRoot.current?.contains(event.target)
     )
 
-    if (wasOutside && visible)
-      this.setState({ visible: false, left: null, top: null })
+    if (wasOutside && visible) setVisible(false)
+    setPosition({ left: null, top: null })
   }
 
-  handleDuplicate = () => {
-    if (this.state.stepId != null) {
-      this.props.duplicateStep(this.state.stepId)
-      this.setState({ stepId: null, visible: false })
+  const handleDuplicate = () => {
+    if (stepId != null) {
+      duplicateStep(stepId)
+      setVisible(false)
+      setStepId(null)
     }
   }
 
-  handleDelete = () => {
-    if (
-      this.state.stepId != null &&
-      confirm(i18n.t('alert.window.confirm_delete_step'))
-    ) {
-      this.props.deleteStep(this.state.stepId)
-      this.setState({ stepId: null, visible: false })
+  const handleDelete = () => {
+    if (stepId != null && confirm(i18n.t('alert.window.confirm_delete_step'))) {
+      deleteStep(stepId)
+      setVisible(false)
+      setStepId(null)
     }
   }
 
-  render() {
-    return (
-      <div>
-        {this.props.children({
-          makeStepOnContextMenu: this.makeHandleContextMenu,
-        })}
-        {this.state.visible && (
-          <Portal>
-            <React.Fragment>
+  return (
+    <div>
+      {props.children({
+        makeStepOnContextMenu: makeHandleContextMenu,
+      })}
+      {visible && (
+        <Portal>
+          <React.Fragment>
+            <div
+              ref={menuRoot}
+              style={{ left: position.left, top: position.top }}
+              className={styles.context_menu}
+            >
               <div
-                ref={ref => {
-                  this.menuRoot = ref
-                }}
-                style={{ left: this.state.left, top: this.state.top }}
-                className={styles.context_menu}
+                onClick={handleDuplicate}
+                className={styles.context_menu_item}
               >
-                <div
-                  onClick={this.handleDuplicate}
-                  className={styles.context_menu_item}
-                >
-                  {i18n.t('context_menu.step.duplicate')}
-                </div>
-                <div
-                  onClick={this.handleDelete}
-                  className={styles.context_menu_item}
-                >
-                  {i18n.t('context_menu.step.delete')}
-                </div>
+                {i18n.t('context_menu.step.duplicate')}
               </div>
-            </React.Fragment>
-          </Portal>
-        )}
-      </div>
-    )
-  }
+              <div onClick={handleDelete} className={styles.context_menu_item}>
+                {i18n.t('context_menu.step.delete')}
+              </div>
+            </div>
+          </React.Fragment>
+        </Portal>
+      )}
+    </div>
+  )
 }
-
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
-  deleteStep: (stepId: StepIdType) =>
-    dispatch(steplistActions.deleteStep(stepId)),
-  duplicateStep: (stepId: StepIdType) =>
-    dispatch(stepsActions.duplicateStep(stepId)),
-})
-
-export const ContextMenu: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  {||},
-  DP,
-  _,
-  _
->(
-  null,
-  mapDispatchToProps
-)(ContextMenuComponent)
