@@ -88,7 +88,7 @@ def get_boot_id() -> str:
     path = '/proc/sys/kernel/random/boot_id'
 
     try:
-        with open(path, 'b') as f:
+        with open(path, 'rb') as f:
             raw_id = f.read()
         # Hash to obfuscate so no one accidentally relies on this specifically
         # being the kernel-provided boot ID. Choice of hash function is
