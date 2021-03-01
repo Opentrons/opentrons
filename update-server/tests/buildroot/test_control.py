@@ -8,11 +8,6 @@ from unittest import mock
 from otupdate.buildroot import control
 
 
-# Tests:
-# - It should be stable as long as the underlying file doesn't change.
-# - It should change when the boot ID changes and the server restarts.
-
-
 async def test_health(test_cli):
     resp = await test_cli.get('/server/update/health')
     assert resp.status == 200
@@ -24,6 +19,7 @@ async def test_health(test_cli):
     assert body['apiServerVersion'] == version_dict['opentrons_api_version']
     assert body['smoothieVersion'] == 'unimplemented'
     assert body['systemVersion'] == version_dict['buildroot_version']
+    assert body['bootId'] == 'dummy-boot-id-abc123'
 
 
 async def test_restart(test_cli, monkeypatch):
