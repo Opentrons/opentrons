@@ -1,26 +1,37 @@
 // @flow
 import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  Box,
+  PrimaryButton,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 import { i18n } from '../../localization'
 import { CheckboxRowField, TextField } from '../StepEditForm/fields'
 import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
-import type {
-  DisabledFields,
-  MultiselectFieldValues,
+import {
+  getBatchEditSelectedStepTypes,
+  getMultiSelectDisabledFields,
+  getMultiSelectFieldValues,
+  getMultiSelectItemIds,
 } from '../../ui/steps/selectors'
-import type { StepType } from '../../form-types'
+import { getBatchEditFormHasUnsavedChanges } from '../../step-forms/selectors'
+import {
+  changeBatchEditField,
+  resetBatchEditFieldChanges,
+  saveStepFormsMulti,
+} from '../../step-forms/actions'
 import type { FieldPropsByName } from '../StepEditForm/types'
+// TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
+import formStyles from '../forms/forms.css'
 import styles from '../StepEditForm/StepEditForm.css'
+import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
 
-export type BatchEditFormProps = {|
-  disabledFields: DisabledFields | null,
-  stepTypes: Array<StepType>,
-  fieldValues: MultiselectFieldValues | null,
-  handleChangeFormInput: (name: string, value: mixed) => void,
-  handleCancel: () => mixed,
-  handleSave: () => mixed,
-|}
+export type BatchEditFormProps = {||}
 
 type BatchEditMoveLiquidProps = {|
+  batchEditFormHasChanges: boolean,
   propsForFields: FieldPropsByName,
   handleCancel: () => mixed,
   handleSave: () => mixed,
@@ -29,9 +40,13 @@ export const BatchEditMoveLiquid = (
   props: BatchEditMoveLiquidProps
 ): React.Node => {
   const { propsForFields, handleCancel, handleSave } = props
+  const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip()
+  const [saveButtonTargetProps, saveButtonTooltipProps] = useHoverTooltip()
+  const disableSave = !props.batchEditFormHasChanges
+
   return (
-    // TOOD IMMEDIATELY copied from SourceDestFields. Refactor to be DRY
-    <div>
+    <div className={formStyles.form}>
+      {/* TODO IMMEDIATELY copied from SourceDestFields. Refactor to be DRY */}
       <CheckboxRowField
         {...propsForFields['aspirate_mix_checkbox']}
         label={i18n.t('form.step_edit_form.field.mix.label')}
@@ -48,22 +63,62 @@ export const BatchEditMoveLiquid = (
           units={i18n.t('application.units.times')}
         />
       </CheckboxRowField>
+
       <p>TODO batch edit form for Transfer step goes here</p>
-      <button onClick={handleCancel}>Cancel</button>
-      <button onClick={handleSave}>Save</button>
+
+      <Box textAlign="right" maxWidth="55rem">
+        <Box
+          {...cancelButtonTargetProps}
+          className={buttonStyles.form_button}
+          display="inline-block"
+        >
+          <PrimaryButton
+            className={buttonStyles.form_button}
+            onClick={handleCancel}
+          >
+            {i18n.t('button.cancel')}
+          </PrimaryButton>
+          <Tooltip {...cancelButtonTooltipProps}>
+            {i18n.t('tooltip.cancel_batch_edit')}
+          </Tooltip>
+        </Box>
+
+        <Box
+          {...saveButtonTargetProps}
+          className={buttonStyles.form_button}
+          display="inline-block"
+        >
+          <PrimaryButton disabled={disableSave} onClick={handleSave}>
+            {i18n.t('button.save')}
+          </PrimaryButton>
+          <Tooltip {...saveButtonTooltipProps}>
+            {i18n.t(
+              `tooltip.save_batch_edit.${disableSave ? 'disabled' : 'enabled'}`
+            )}
+          </Tooltip>
+        </Box>
+      </Box>
     </div>
   )
 }
 
 export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
-  const {
-    disabledFields,
-    stepTypes,
-    fieldValues,
-    handleChangeFormInput,
-    handleCancel,
-    handleSave,
-  } = props
+  const dispatch = useDispatch()
+  const fieldValues = useSelector(getMultiSelectFieldValues)
+  const stepTypes = useSelector(getBatchEditSelectedStepTypes)
+  const disabledFields = useSelector(getMultiSelectDisabledFields)
+  const selectedStepIds = useSelector(getMultiSelectItemIds)
+  const batchEditFormHasChanges = useSelector(getBatchEditFormHasUnsavedChanges)
+
+  const handleChangeFormInput = (name, value) => {
+    dispatch(changeBatchEditField({ [name]: value }))
+  }
+
+  const handleSave = () => {
+    dispatch(saveStepFormsMulti(selectedStepIds))
+  }
+
+  const handleCancel = () => dispatch(resetBatchEditFieldChanges())
 
   if (
     stepTypes.length === 1 &&
@@ -78,7 +133,14 @@ export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
       handleChangeFormInput
     )
     return (
-      <BatchEditMoveLiquid {...{ propsForFields, handleCancel, handleSave }} />
+      <BatchEditMoveLiquid
+        {...{
+          propsForFields,
+          handleCancel,
+          handleSave,
+          batchEditFormHasChanges,
+        }}
+      />
     )
   }
 
