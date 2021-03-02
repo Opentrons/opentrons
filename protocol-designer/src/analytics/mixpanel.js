@@ -49,7 +49,7 @@ export function trackEvent(event: AnalyticsEvent, optedIn: boolean) {
 }
 
 export function setMixpanelTracking(optedIn: boolean) {
-  if (MIXPANEL_ID) {
+  if (getIsProduction() && MIXPANEL_ID) {
     if (optedIn) {
       console.debug('User has opted into analytics; tracking with Mixpanel')
       mixpanel.opt_in_tracking()
