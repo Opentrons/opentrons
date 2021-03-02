@@ -8,6 +8,8 @@ import type { StepIdType, StepType } from '../../../form-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
 import type { Timeline } from '../../../step-generation'
 import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
+import type { AnalyticsEvent } from '../../../analytics/mixpanel'
+import type { AnalyticsEventAction } from '../../../analytics/actions'
 import type {
   AddStepAction,
   ExpandAddStepButtonAction,
@@ -23,6 +25,7 @@ import type {
   SelectStepAction,
   SelectMultipleStepsAction,
 } from './types'
+import { analyticsEvent } from '../../../analytics/actions'
 
 // adds an incremental integer ID for Step reducers.
 // NOTE: if this is an "add step" directly performed by the user,
@@ -145,8 +148,10 @@ export const selectMultipleSteps = (
   dispatch(selectStepAction)
 }
 
-export const selectAllSteps = (): ThunkAction<SelectMultipleStepsAction> => (
-  dispatch: ThunkDispatch<SelectMultipleStepsAction>,
+export const selectAllSteps = (): ThunkAction<
+  SelectMultipleStepsAction | AnalyticsEventAction
+> => (
+  dispatch: ThunkDispatch<SelectMultipleStepsAction | AnalyticsEventAction>,
   getState: GetState
 ) => {
   const allStepIds = stepFormSelectors.getOrderedStepIds(getState())
@@ -156,10 +161,20 @@ export const selectAllSteps = (): ThunkAction<SelectMultipleStepsAction> => (
     payload: { stepIds: allStepIds, lastSelected: last(allStepIds) },
   }
   dispatch(selectStepAction)
+  // dispatch an analytics event to indicate all steps have been selected
+  // because there is no 'SELECT_ALL_STEPS' action that middleware can catch
+  const selectAllStepsEvent: AnalyticsEvent = {
+    name: 'selectAllSteps',
+    properties: {},
+  }
+
+  dispatch(analyticsEvent(selectAllStepsEvent))
 }
 
-export const deselectAllSteps = (): ThunkAction<SelectStepAction> => (
-  dispatch: ThunkDispatch<SelectStepAction>,
+export const deselectAllSteps = (): ThunkAction<
+  SelectStepAction | AnalyticsEventAction
+> => (
+  dispatch: ThunkDispatch<SelectStepAction | AnalyticsEventAction>,
   getState: GetState
 ) => {
   const lastSelectedStepId = getMultiSelectLastSelected(getState())
@@ -174,4 +189,12 @@ export const deselectAllSteps = (): ThunkAction<SelectStepAction> => (
       'something went wrong, cannot deselect all steps if not in multi select mode'
     )
   }
+  // dispatch an analytics event to indicate all steps have been deselected
+  // because there is no 'DESELECT_ALL_STEPS' action that middleware can catch
+  const deselectAllStepsEvent: AnalyticsEvent = {
+    name: 'deselectAllSteps',
+    properties: {},
+  }
+
+  dispatch(analyticsEvent(deselectAllStepsEvent))
 }

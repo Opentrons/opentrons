@@ -68,12 +68,22 @@ describe('steps actions', () => {
       const store = mockStore()
       // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
       store.dispatch(selectAllSteps())
-      expect(store.getActions()).toEqual([
-        {
-          type: 'SELECT_MULTIPLE_STEPS',
-          payload: { stepIds: ids, lastSelected: last(ids) },
+      expect(store.getActions()).toContainEqual({
+        type: 'SELECT_MULTIPLE_STEPS',
+        payload: { stepIds: ids, lastSelected: last(ids) },
+      })
+    })
+    it('should register an analytics event', () => {
+      const store = mockStore()
+      // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      store.dispatch(selectAllSteps())
+      expect(store.getActions()).toContainEqual({
+        type: 'ANALYTICS_EVENT',
+        payload: {
+          name: 'selectAllSteps',
+          properties: {},
         },
-      ])
+      })
     })
   })
   describe('deselectAllSteps', () => {
@@ -88,16 +98,26 @@ describe('steps actions', () => {
       resetAllWhenMocks()
     })
 
-    it('should deselect all of the steps when in multi select mode', () => {
+    it('should deselect all of the steps', () => {
       const store = mockStore()
       // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
       store.dispatch(deselectAllSteps())
-      expect(store.getActions()).toEqual([
-        {
-          type: 'SELECT_STEP',
-          payload: id,
+      expect(store.getActions()).toContainEqual({
+        type: 'SELECT_STEP',
+        payload: id,
+      })
+    })
+    it('should register an analytics event', () => {
+      const store = mockStore()
+      // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      store.dispatch(deselectAllSteps())
+      expect(store.getActions()).toContainEqual({
+        type: 'ANALYTICS_EVENT',
+        payload: {
+          name: 'deselectAllSteps',
+          properties: {},
         },
-      ])
+      })
     })
     it('should console warn when NOT in multi select mode', () => {
       when(mockGetMultiSelectLastSelected)
@@ -113,7 +133,6 @@ describe('steps actions', () => {
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         'something went wrong, cannot deselect all steps if not in multi select mode'
       )
-      expect(store.getActions()).toEqual([])
       consoleWarnSpy.mockRestore()
     })
   })
