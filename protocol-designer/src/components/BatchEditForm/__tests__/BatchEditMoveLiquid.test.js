@@ -1,7 +1,6 @@
 // @flow
 import React from 'react'
 import { shallow } from 'enzyme'
-import { act } from 'react-dom/test-utils'
 import { PrimaryButton, Tooltip } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { BatchEditMoveLiquid } from '../'
@@ -27,64 +26,77 @@ describe('BatchEditMoveLiquid', () => {
     jest.resetAllMocks()
   })
 
-  const saveButtonText = 'button.save' // i18n path
+  describe('save button', () => {
+    const saveButtonText = 'button.save' // i18n path
 
-  it('save should be enabled when form has changes', () => {
-    const tooltipPath = 'tooltip.save_batch_edit.enabled'
-    const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
+    it('should be enabled when form has changes and have matching tooltip text', () => {
+      const tooltipPath = 'tooltip.save_batch_edit.enabled'
+      const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
 
-    const saveButton = wrapper
-      .find(PrimaryButton)
-      .filterWhere(el => el.prop('children') === saveButtonText)
+      const saveButton = wrapper
+        .find(PrimaryButton)
+        .filterWhere(el => el.prop('children') === saveButtonText)
 
-    expect(saveButton.prop('disabled')).toBe(false)
+      expect(saveButton.prop('disabled')).toBe(false)
 
-    const saveButtonTooltip = saveButton.parent().dive().find(Tooltip)
-    expect(localizationSpy).toHaveBeenCalledWith(tooltipPath)
-    expect(saveButtonTooltip.prop('children')).toBe(tooltipPath)
+      const saveButtonTooltip = saveButton.parent().dive().find(Tooltip)
+      expect(localizationSpy).toHaveBeenCalledWith(tooltipPath)
+      expect(saveButtonTooltip.prop('children')).toBe(tooltipPath)
 
-    act(() => {
-      saveButton.simulate('click')
+      saveButton.invoke('onClick')()
+      expect(handleSave).toHaveBeenCalled()
     })
-    expect(handleSave).toHaveBeenCalled()
+
+    it('should be disabled when form has no changes and have matching tooltip text', () => {
+      props.batchEditFormHasChanges = false
+      const tooltipPath = 'tooltip.save_batch_edit.disabled'
+      const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
+
+      const saveButton = wrapper
+        .find(PrimaryButton)
+        .filterWhere(el => el.prop('children') === saveButtonText)
+
+      expect(saveButton.prop('disabled')).toBe(true)
+
+      const saveButtonTooltip = saveButton.parent().dive().find(Tooltip)
+      expect(localizationSpy).toHaveBeenCalledWith(tooltipPath)
+      expect(saveButtonTooltip.prop('children')).toBe(tooltipPath)
+
+      // Shallow rendering doesn't honor button disabled attr, see https://github.com/enzymejs/enzyme/issues/386
+      // (though that issue criticises `simulate` and says `invoke` is supposed to be a solution...)
+      //
+      // saveButton.invoke('onClick')()
+      // expect(handleSave).not.toHaveBeenCalled()
+    })
   })
 
-  it('save should be disabled when form has no changes', () => {
-    props.batchEditFormHasChanges = false
-    const tooltipPath = 'tooltip.save_batch_edit.disabled'
-    const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
-
-    const saveButton = wrapper
-      .find(PrimaryButton)
-      .filterWhere(el => el.prop('children') === saveButtonText)
-
-    expect(saveButton.prop('disabled')).toBe(true)
-
-    const saveButtonTooltip = saveButton.parent().dive().find(Tooltip)
-    expect(localizationSpy).toHaveBeenCalledWith(tooltipPath)
-    expect(saveButtonTooltip.prop('children')).toBe(tooltipPath)
-
-    // TODO(IL, 2021-03-01): why is handleSave being called here but IRL it will not be??
-    // expect(handleSave).not.toHaveBeenCalled()
-    // act(() => {
-    //   saveButton.simulate('click')
-    // })
-    // expect(handleSave).not.toHaveBeenCalled()
-  })
-
-  it('clicking cancel button should call handleCancel callback', () => {
-    const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
-
+  describe('cancel button', () => {
     const cancelButtonText = 'button.cancel'
 
-    const cancelButton = wrapper
-      .find(PrimaryButton)
-      .filterWhere(el => el.prop('children') === cancelButtonText)
+    it('should have tooltip', () => {
+      const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
+      const tooltipPath = 'tooltip.cancel_batch_edit'
 
-    expect(handleCancel).not.toHaveBeenCalled()
-    act(() => {
-      cancelButton.simulate('click')
+      const cancelButton = wrapper
+        .find(PrimaryButton)
+        .filterWhere(el => el.prop('children') === cancelButtonText)
+
+      const cancelButtonTooltip = cancelButton.parent().dive().find(Tooltip)
+      expect(localizationSpy).toHaveBeenCalledWith(tooltipPath)
+      expect(cancelButtonTooltip.prop('children')).toBe(tooltipPath)
     })
-    expect(handleCancel).toHaveBeenCalled()
+
+    it('should call handleCancel callback when clicked', () => {
+      const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
+
+      const cancelButton = wrapper
+        .find(PrimaryButton)
+        .filterWhere(el => el.prop('children') === cancelButtonText)
+
+      expect(handleCancel).not.toHaveBeenCalled()
+
+      cancelButton.invoke('onClick')()
+      expect(handleCancel).toHaveBeenCalled()
+    })
   })
 })

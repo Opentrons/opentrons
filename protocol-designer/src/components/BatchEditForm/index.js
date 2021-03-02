@@ -40,6 +40,7 @@ export const BatchEditMoveLiquid = (
   props: BatchEditMoveLiquidProps
 ): React.Node => {
   const { propsForFields, handleCancel, handleSave } = props
+  const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip()
   const [saveButtonTargetProps, saveButtonTooltipProps] = useHoverTooltip()
   const disableSave = !props.batchEditFormHasChanges
 
@@ -66,12 +67,22 @@ export const BatchEditMoveLiquid = (
       <p>TODO batch edit form for Transfer step goes here</p>
 
       <Box textAlign="right" maxWidth="55rem">
-        <PrimaryButton
+        <Box
+          {...cancelButtonTargetProps}
           className={buttonStyles.form_button}
-          onClick={handleCancel}
+          display="inline-block"
         >
-          {i18n.t('button.cancel')}
-        </PrimaryButton>
+          <PrimaryButton
+            className={buttonStyles.form_button}
+            onClick={handleCancel}
+          >
+            {i18n.t('button.cancel')}
+          </PrimaryButton>
+          <Tooltip {...cancelButtonTooltipProps}>
+            {i18n.t('tooltip.cancel_batch_edit')}
+          </Tooltip>
+        </Box>
+
         <Box
           {...saveButtonTargetProps}
           className={buttonStyles.form_button}

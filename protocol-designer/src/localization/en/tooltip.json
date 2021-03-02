@@ -82,5 +82,6 @@
   "save_batch_edit": {
     "enabled": "Apply changes to all selected steps",
     "disabled": "No new changes to save"
-  }
+  },
+  "cancel_batch_edit": "Reset unsaved changes to the form"
 }
