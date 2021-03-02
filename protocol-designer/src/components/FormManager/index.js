@@ -1,24 +1,39 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { StepEditForm } from '../StepEditForm'
 import { BatchEditForm } from '../BatchEditForm'
 import { StepSelectionBanner } from '../StepSelectionBanner'
 import {
   getBatchEditSelectedStepTypes,
   getIsMultiSelectMode,
+  getMultiSelectDisabledFields,
   getMultiSelectFieldValues,
+  getMultiSelectItemIds,
 } from '../../ui/steps/selectors'
+import {
+  changeBatchEditField,
+  resetBatchEditFieldChanges,
+  saveStepFormsMulti,
+} from '../../step-forms/actions'
 
 export const FormManager = (): React.Node => {
   const fieldValues = useSelector(getMultiSelectFieldValues)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const stepTypes = useSelector(getBatchEditSelectedStepTypes)
+  const disabledFields = useSelector(getMultiSelectDisabledFields)
+  const dispatch = useDispatch()
+  const selectedStepIds = useSelector(getMultiSelectItemIds)
 
-  // TODO(IL, 2021-02-17): dispatch changeBatchEditField here in #7222
   const handleChangeFormInput = (name, value) => {
-    console.log(`TODO: update ${name}: ${String(value)}`)
+    dispatch(changeBatchEditField({ [name]: value }))
   }
+
+  const handleSaveMultiSelect = () => {
+    dispatch(saveStepFormsMulti(selectedStepIds))
+  }
+
+  const handleCancel = () => dispatch(resetBatchEditFieldChanges())
 
   if (isMultiSelectMode) {
     return (
@@ -26,8 +41,11 @@ export const FormManager = (): React.Node => {
         <StepSelectionBanner />
         <BatchEditForm
           fieldValues={fieldValues}
+          disabledFields={disabledFields}
           handleChangeFormInput={handleChangeFormInput}
           stepTypes={stepTypes}
+          handleCancel={handleCancel}
+          handleSave={handleSaveMultiSelect}
         />
       </>
     )

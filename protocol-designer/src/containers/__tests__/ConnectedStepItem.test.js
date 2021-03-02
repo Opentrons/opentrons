@@ -14,6 +14,7 @@ import {
   ConfirmDeleteModal,
   CLOSE_UNSAVED_STEP_FORM,
   CLOSE_STEP_FORM_WITH_CHANGES,
+  CLOSE_BATCH_EDIT_FORM,
 } from '../../components/modals/ConfirmDeleteModal'
 
 import * as stepFormSelectors from '../../step-forms/selectors/index.js'
@@ -38,6 +39,8 @@ const getArgsAndErrorsByStepIdMock = stepFormSelectors.getArgsAndErrorsByStepId
 const getCurrentFormIsPresavedMock = stepFormSelectors.getCurrentFormIsPresaved
 const getCurrentFormHasUnsavedChangesMock =
   stepFormSelectors.getCurrentFormHasUnsavedChanges
+const getBatchEditFormHasUnsavedChangesMock =
+  stepFormSelectors.getBatchEditFormHasUnsavedChanges
 const getHasTimelineWarningsPerStepMock =
   timelineWarningSelectors.getHasTimelineWarningsPerStep
 const getHasFormLevelWarningsPerStepMock =
@@ -50,6 +53,7 @@ const getMultiSelectItemIdsMock = uiStepSelectors.getMultiSelectItemIds
 const getSubstepsMock = fileDataSelectors.getSubsteps
 const getErrorStepId = fileDataSelectors.getErrorStepId
 const getBatchEditEnabledMock = featureFlagSelectors.getBatchEditEnabled
+const getIsMultiSelectModeMock = uiStepSelectors.getIsMultiSelectMode
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
@@ -82,6 +86,10 @@ describe('ConnectedStepItem', () => {
       .mockReturnValue(false)
 
     when(getCurrentFormHasUnsavedChangesMock)
+      .calledWith(expect.anything())
+      .mockReturnValue(false)
+
+    when(getIsMultiSelectModeMock)
       .calledWith(expect.anything())
       .mockReturnValue(false)
 
@@ -156,8 +164,26 @@ describe('ConnectedStepItem', () => {
         )
         expect(store.getActions().length).toBe(0)
       })
+      it('should display the "unsaved changes to multiple steps" modal when batch edit form has unsaved changes', () => {
+        when(getBatchEditFormHasUnsavedChangesMock)
+          .calledWith(expect.anything())
+          .mockReturnValue(true)
 
-      it('should display the "close form with changes" modal when form has unsaved changes', () => {
+        when(getIsMultiSelectModeMock)
+          .calledWith(expect.anything())
+          .mockReturnValue(true)
+        const props = { stepId: mockId, stepNumber: 1 }
+        const wrapper = render(props)
+        act(() => {
+          wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+        })
+        wrapper.update()
+        const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
+        expect(confirmDeleteModal).toHaveLength(1)
+        expect(confirmDeleteModal.prop('modalType')).toBe(CLOSE_BATCH_EDIT_FORM)
+        expect(store.getActions().length).toBe(0)
+      })
+      it('should display the "unsaved changes to step" modal when single edit form has unsaved changes', () => {
         when(getCurrentFormHasUnsavedChangesMock)
           .calledWith(expect.anything())
           .mockReturnValue(true)
@@ -243,7 +269,7 @@ describe('ConnectedStepItem', () => {
           expect(store.getActions().length).toBe(0)
         })
 
-        it('should display the "close form with changes" modal when form has unsaved changes', () => {
+        it('should display the "unsaved changes to step" modal when single edit form has unsaved changes', () => {
           when(getCurrentFormHasUnsavedChangesMock)
             .calledWith(expect.anything())
             .mockReturnValue(true)
@@ -538,7 +564,7 @@ describe('ConnectedStepItem', () => {
           expect(store.getActions().length).toBe(0)
         })
 
-        it('should display the "close form with changes" modal when form has unsaved changes', () => {
+        it('should display the "unsaved changes to step" modal when single edit form has unsaved changes', () => {
           when(getCurrentFormHasUnsavedChangesMock)
             .calledWith(expect.anything())
             .mockReturnValue(true)

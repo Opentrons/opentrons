@@ -43,7 +43,7 @@ async def arun(config: RobotConfig = None,
     :param port: Optional smoothie port override
     """
     rconf = config or rc.load()
-    hc = await API.build_hardware_controller(rconf, port) # noqa(F841)
+    hc = await API.build_hardware_controller(rconf, port)  # noqa: F841
 
 
 def run(config: RobotConfig = None,
@@ -68,5 +68,5 @@ if __name__ == '__main__':
         '-s', '--smoothie-port',
         help='Port on which to talk to smoothie, autodetected by default',
         default=None)
-    args = parser.parse_args()  # noqa(F841)
+    args = parser.parse_args()  # noqa: F841
     run(port=args.port)

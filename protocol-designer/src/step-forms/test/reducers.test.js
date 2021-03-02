@@ -1820,4 +1820,25 @@ describe('batchEditFormChanges reducer', () => {
     }
     expect(batchEditFormChanges(state, { ...action })).toEqual({})
   })
+  it('should reset state on SELECT_MULTIPLE_STEPS', () => {
+    const state = { someFieldName: 'someFieldValue' }
+    const action = {
+      type: 'SELECT_MULTIPLE_STEPS',
+    }
+    expect(batchEditFormChanges(state, { ...action })).toEqual({})
+  })
+  it('should reset state on DUPLICATE_MULTIPLE_STEPS', () => {
+    const state = { someFieldName: 'someFieldValue' }
+    const action = {
+      type: 'DUPLICATE_MULTIPLE_STEPS',
+    }
+    expect(batchEditFormChanges(state, { ...action })).toEqual({})
+  })
+  it('should reset state on DELETE_MULTIPLE_STEPS', () => {
+    const state = { someFieldName: 'someFieldValue' }
+    const action = {
+      type: 'DELETE_MULTIPLE_STEPS',
+    }
+    expect(batchEditFormChanges(state, { ...action })).toEqual({})
+  })
 })

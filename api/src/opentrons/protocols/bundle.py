@@ -26,7 +26,7 @@ def _has_files_at_root(zipFile):
     return False
 
 
-def extract_bundle(bundle: ZipFile) -> BundleContents:  # noqa(C901)
+def extract_bundle(bundle: ZipFile) -> BundleContents:  # noqa: C901
     """ Extract a bundle and verify its contents and structure. """
     if not _has_files_at_root(bundle):
         raise RuntimeError(

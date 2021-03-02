@@ -30,7 +30,7 @@ from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION)
 from opentrons.protocols.geometry.deck_item import DeckItem
 if TYPE_CHECKING:
-    from opentrons.protocols.geometry.module_geometry import ModuleGeometry  # noqa(F401)
+    from opentrons.protocols.geometry.module_geometry import ModuleGeometry  # noqa: F401, E501
     from opentrons_shared_data.labware.dev_types import (
         LabwareDefinition, LabwareParameters)
 

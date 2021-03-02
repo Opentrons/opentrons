@@ -177,9 +177,7 @@ export const getVisibleProfileFormLevelErrors = (args: {|
   })
 }
 
-// NOTE: some field components get their tooltips directly from i18n, and do not use `getTooltipForField`.
-// TODO: Ian 2019-03-29 implement tooltip-content-getting in a more organized way
-// once we have more comprehensive requirements about tooltips
+// TODO(IL, 2021-02-25): DEPRECATED. this is only used by FieldConnector. Remove in #7298
 export function getTooltipForField(
   stepType: ?string,
   name: string,
@@ -220,3 +218,6 @@ export function getTooltipForField(
 
   return text ? <div className={styles.tooltip}>{text}</div> : null
 }
+
+export const getFieldDefaultTooltip = (name: string): string =>
+  i18n.t([`tooltip.step_fields.defaults.${name}`, ''])

@@ -38,9 +38,6 @@ export const SourceDestFields = (props: Props): React.Node => {
       {...propsForFields[addFieldNamePrefix('mix_checkbox')]}
       label={i18n.t('form.step_edit_form.field.mix.label')}
       className={styles.small_field}
-      tooltipContent={i18n.t(
-        `tooltip.step_fields.defaults.${addFieldNamePrefix('mix_checkbox')}`
-      )}
     >
       <TextField
         {...propsForFields[addFieldNamePrefix('mix_volume')]}
@@ -98,7 +95,6 @@ export const SourceDestFields = (props: Props): React.Node => {
               {...propsForFields['preWetTip']}
               label={i18n.t('form.step_edit_form.field.preWetTip.label')}
               className={styles.small_field}
-              tooltipContent={i18n.t(`tooltip.step_fields.defaults.preWetTip`)}
             />
             {getMixFields()}
             {getDelayFields()}
@@ -112,11 +108,6 @@ export const SourceDestFields = (props: Props): React.Node => {
         )}
         <CheckboxRowField
           {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
-          tooltipContent={i18n.t(
-            `tooltip.step_fields.defaults.${addFieldNamePrefix(
-              'touchTip_checkbox'
-            )}`
-          )}
           label={i18n.t('form.step_edit_form.field.touchTip.label')}
           className={styles.small_field}
         >
@@ -131,9 +122,6 @@ export const SourceDestFields = (props: Props): React.Node => {
             {...propsForFields['blowout_checkbox']}
             label={i18n.t('form.step_edit_form.field.blowout.label')}
             className={styles.small_field}
-            tooltipContent={i18n.t(
-              `tooltip.step_fields.defaults.blowout_checkbox`
-            )}
           >
             <BlowoutLocationField
               {...propsForFields['blowout_location']}
@@ -144,11 +132,6 @@ export const SourceDestFields = (props: Props): React.Node => {
         )}
         <CheckboxRowField
           {...propsForFields[addFieldNamePrefix('airGap_checkbox')]}
-          tooltipContent={i18n.t(
-            `tooltip.step_fields.defaults.${addFieldNamePrefix(
-              'airGap_checkbox'
-            )}`
-          )}
           label={i18n.t('form.step_edit_form.field.airGap.label')}
           className={styles.small_field}
         >

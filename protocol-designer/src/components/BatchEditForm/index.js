@@ -3,26 +3,32 @@ import * as React from 'react'
 import { i18n } from '../../localization'
 import { CheckboxRowField, TextField } from '../StepEditForm/fields'
 import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
-import type { MultiselectFieldValues } from '../../ui/steps/selectors'
+import type {
+  DisabledFields,
+  MultiselectFieldValues,
+} from '../../ui/steps/selectors'
 import type { StepType } from '../../form-types'
 import type { FieldPropsByName } from '../StepEditForm/types'
 import styles from '../StepEditForm/StepEditForm.css'
 
 export type BatchEditFormProps = {|
+  disabledFields: DisabledFields | null,
   stepTypes: Array<StepType>,
   fieldValues: MultiselectFieldValues | null,
   handleChangeFormInput: (name: string, value: mixed) => void,
+  handleCancel: () => mixed,
+  handleSave: () => mixed,
 |}
 
 type BatchEditMoveLiquidProps = {|
   propsForFields: FieldPropsByName,
-  handleClose: () => mixed,
+  handleCancel: () => mixed,
   handleSave: () => mixed,
 |}
 export const BatchEditMoveLiquid = (
   props: BatchEditMoveLiquidProps
 ): React.Node => {
-  const { propsForFields, handleClose, handleSave } = props
+  const { propsForFields, handleCancel, handleSave } = props
   return (
     // TOOD IMMEDIATELY copied from SourceDestFields. Refactor to be DRY
     <div>
@@ -30,9 +36,6 @@ export const BatchEditMoveLiquid = (
         {...propsForFields['aspirate_mix_checkbox']}
         label={i18n.t('form.step_edit_form.field.mix.label')}
         className={styles.small_field}
-        tooltipContent={i18n.t(
-          `tooltip.step_fields.defaults.${'aspirate_mix_checkbox'}`
-        )}
       >
         <TextField
           {...propsForFields['aspirate_mix_volume']}
@@ -46,36 +49,36 @@ export const BatchEditMoveLiquid = (
         />
       </CheckboxRowField>
       <p>TODO batch edit form for Transfer step goes here</p>
-      <button onClick={handleClose}>Close</button>
+      <button onClick={handleCancel}>Cancel</button>
       <button onClick={handleSave}>Save</button>
     </div>
   )
 }
 
 export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
-  const { stepTypes, fieldValues, handleChangeFormInput } = props
+  const {
+    disabledFields,
+    stepTypes,
+    fieldValues,
+    handleChangeFormInput,
+    handleCancel,
+    handleSave,
+  } = props
 
   if (
     stepTypes.length === 1 &&
     stepTypes.includes('moveLiquid') &&
-    fieldValues !== null
+    fieldValues !== null &&
+    disabledFields !== null
   ) {
     // Valid state for using makeBatchEditFieldProps
     const propsForFields = makeBatchEditFieldProps(
       fieldValues,
+      disabledFields,
       handleChangeFormInput
     )
     return (
-      <BatchEditMoveLiquid
-        propsForFields={propsForFields}
-        handleClose={() => {
-          // TODO(IL, 2021-02-17): implement in #7138
-          console.log('TODO: close')
-        }}
-        handleSave={() => {
-          console.log('TODO: save')
-        }}
-      />
+      <BatchEditMoveLiquid {...{ propsForFields, handleCancel, handleSave }} />
     )
   }
 
