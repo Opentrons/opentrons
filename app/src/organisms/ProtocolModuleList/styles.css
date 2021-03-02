@@ -10,6 +10,6 @@
 }
 
 .active {
-    color: var(--c-highlight);
-    background-color: var(--c-bg-selected);
+  color: var(--c-highlight);
+  background-color: var(--c-bg-selected);
   }
