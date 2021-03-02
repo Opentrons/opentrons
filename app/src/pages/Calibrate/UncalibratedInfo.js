@@ -95,7 +95,7 @@ export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
       defHash = uncalibratedTipracksByMount[otherMount][0].definitionHash || ''
       continueButtonOnClick = `/calibrate/pipettes/${otherMount}/${defHash}`
     } else {
-      if (modules.length > 0 && !allModulesReviewed) {
+      if (modules && modules.length > 0 && !allModulesReviewed) {
         continueText = CONTINUE_TO_MODULE_SETUP
         continueButtonOnClick = `/calibrate/modules`
       } else {

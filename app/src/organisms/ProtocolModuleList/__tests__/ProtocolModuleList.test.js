@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react'
+import { StaticRouter } from 'react-router-dom'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../i18n'
-import { ListItem, Tooltip } from '@opentrons/components'
+import { Box, Icon, Flex, ListItem, Tooltip } from '@opentrons/components'
 import * as robotSelectors from '../../../redux/robot/selectors'
 import * as moduleSelectors from '../../../redux/modules/selectors'
 import { ProtocolModuleList } from '..'
@@ -43,8 +44,13 @@ describe('ModuleList', () => {
   beforeEach(() => {
     mockGetModules.mockReturnValue(mockModules)
 
-    render = () => {
-      return mountWithProviders(<ProtocolModuleList />, { i18n })
+    render = (location: string = '/') => {
+      return mountWithProviders(
+       <StaticRouter context={{}} location={location}>
+        <ProtocolModuleList />,
+       </StaticRouter>,
+       { i18n }
+      )
     }
   })
 
@@ -59,13 +65,14 @@ describe('ModuleList', () => {
 
     expect(wrapper.find('TitledList[title="modules"]').exists()).toBe(true)
     const titledList = wrapper.find('TitledList')
-
+    const listItem = titledList.find(ListItem)
+    const box = listItem.find(Box)
     mockModules.forEach((m, index) => {
-      const listItem = titledList.find(ListItem).at(index)
-      const allText = listItem.text()
-      const toolTip = listItem.find('UsbPortInfo').find(Tooltip)
-
-      expect(listItem.prop('iconName')).toBe('check-circle')
+      const flexbox = box.find(Flex).at(index=== 0 ? 0 : 2)
+      const icon = flexbox.find(`Icon`).at(0)
+      const allText = flexbox.text()
+      const toolTip = flexbox.find('UsbPortInfo').find(Tooltip)
+      expect(icon.prop('name')).toBe('check-circle')
       expect(allText).toContain(`Magnetic Module GEN${index === 0 ? 1 : 2}`)
       expect(allText).toContain('N/A')
       expect(toolTip.prop('children')).toBe(
@@ -81,20 +88,21 @@ describe('ModuleList', () => {
 
     expect(wrapper.find('TitledList[title="modules"]').exists()).toBe(true)
     const titledList = wrapper.find('TitledList')
-
+    const listItem = titledList.find(ListItem)
+    const box = listItem.find(Box)
     mockModules.forEach((m, index) => {
-      const listItem = titledList.find(ListItem).at(index)
-      const allText = listItem.text()
-      const toolTip = listItem.find('UsbPortInfo').find(Tooltip)
-
+      const flexbox = box.find(Flex).at(index=== 0 ? 0 : 1)
+      const icon = flexbox.find(`Icon`).at(0)
+      const allText = flexbox.text()
+      const toolTip = flexbox.find('UsbPortInfo').find(Tooltip)
       expect(allText).toContain(`Magnetic Module GEN${index === 0 ? 1 : 2}`)
 
       if (m.slot === mockMagneticModule1.slot) {
-        expect(listItem.prop('iconName')).toBe('checkbox-blank-circle-outline')
+        expect(icon.prop('name')).toBe('checkbox-blank-circle-outline')
         expect(allText).not.toContain('N/A')
         expect(toolTip.exists()).toBe(false)
       } else {
-        expect(listItem.prop('iconName')).toBe('check-circle')
+        expect(icon.prop('name')).toBe('check-circle')
         expect(allText).toContain('N/A')
         expect(toolTip.prop('children')).toBe(
           'Update robot software to see USB port information'
@@ -113,14 +121,15 @@ describe('ModuleList', () => {
 
     expect(wrapper.find('TitledList[title="modules"]').exists()).toBe(true)
     const titledList = wrapper.find('TitledList')
-
+    const listItem = titledList.find(ListItem)
+    const box = listItem.find(Box)
     mockModules.forEach((m, index) => {
-      const listItem = titledList.find(ListItem).at(index)
-      const allText = listItem.text()
-      const toolTip = listItem.find('UsbPortInfo').find(Tooltip)
-
+      const flexbox = box.find(Flex).at(index=== 0 ? 0 : 1)
+      const icon = flexbox.find(`Icon`).at(0)
+      const allText = flexbox.text()
+      const toolTip = flexbox.find('UsbPortInfo').find(Tooltip)
       expect(allText).toContain(`Magnetic Module GEN${index === 0 ? 1 : 2}`)
-      expect(listItem.prop('iconName')).toBe('checkbox-blank-circle-outline')
+      expect(icon.prop('name')).toBe('checkbox-blank-circle-outline')
       expect(allText).not.toContain('N/A')
       expect(toolTip.exists()).toBe(false)
     })

@@ -63,7 +63,7 @@ export function ProtocolModuleList(): React.Node {
       >
         <Box>
           {modulesRequired.map(m => (
-            <Flex key={m.slot} alignItems={ALIGN_CENTER} padding="0.75rem">
+            <Flex key={m.slot} data-test={m.slot} alignItems={ALIGN_CENTER} padding="0.75rem">
               <Icon
                 name={
                   missingModules.includes(m)

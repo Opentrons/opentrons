@@ -31,7 +31,7 @@ export function LabwareGroup(props: LabwareGroupProps): React.Node {
 
   const modules = useSelector(robotSelectors.getModules)
   const allModulesReviewed = useSelector(robotSelectors.getModulesReviewed)
-  const hasModulesLeftToReview = modules.length > 0 && !allModulesReviewed
+  const hasModulesLeftToReview = modules && modules.length > 0 && !allModulesReviewed
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
 
