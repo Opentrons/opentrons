@@ -14,12 +14,13 @@ export type GateStage =
 
 type GateState = { gateStage: GateStage, errorMessage: ?string }
 
-export const isProduction = global.location.host === 'designer.opentrons.com'
+export const getIsProduction = (): boolean =>
+  global.location.host === 'designer.opentrons.com'
 
-const OPENTRONS_API_BASE_URL = isProduction
+const OPENTRONS_API_BASE_URL = getIsProduction()
   ? 'https://web-api.opentrons.com'
   : 'https://staging.web-api.opentrons.com'
-const PROTOCOL_DESIGNER_VERIFY_URL = isProduction
+const PROTOCOL_DESIGNER_VERIFY_URL = getIsProduction()
   ? global.location.origin
   : 'https://staging.designer.opentrons.com'
 
