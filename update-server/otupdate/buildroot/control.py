@@ -8,6 +8,7 @@ import hashlib
 import logging
 import subprocess
 from functools import lru_cache
+from pathlib import Path
 from typing import Callable, Coroutine, Mapping
 
 from aiohttp import web
@@ -64,15 +65,13 @@ def build_health_endpoint(
 def get_serial() -> str:
     """ Get the device serial number. """
     try:
-        with open('/var/serial') as vs:
-            return vs.read().strip()
+        return Path('/var/serial').read_text().strip()
     except OSError:
         return 'unknown'
 
 
 def _get_os_boot_id() -> bytes:
-    with open('/proc/sys/kernel/random/boot_id', 'rb') as file:
-        return file.read()
+    return Path('/proc/sys/kernel/random/boot_id').read_bytes()
 
 
 @lru_cache(maxsize=1)
