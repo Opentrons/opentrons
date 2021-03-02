@@ -6,12 +6,14 @@ more readable format.
 """
 from typing import List, Set
 
+from .interfaces import USBDriverInterface
 from .types import USBPort
 
 
-class USBBusSimulator:
+class USBBusSimulator(USBDriverInterface):
     def __init__(self):
         self._usb_dev: List[USBPort] = self.read_usb_bus()
+        self._sorted = set()
 
     @staticmethod
     def read_bus() -> List[str]:
@@ -43,7 +45,7 @@ class USBBusSimulator:
         :returns: The list of ports found from
         the usb bus.
         """
-        pass
+        return self._usb_dev
 
     @usb_dev.setter
     def usb_dev(self, ports: List[USBPort]) -> None:
@@ -53,7 +55,7 @@ class USBBusSimulator:
         :param ports: The list of ports found from
         the usb bus.
         """
-        pass
+        self._usb_dev = ports
 
     @property
     def sorted_ports(self) -> Set:
@@ -81,7 +83,7 @@ class USBBusSimulator:
         the paths to the expected port paths for modules.
         :returns: A list of matching ports as dataclasses
         """
-        pass
+        return []
 
     def find_port(self, device_path: str) -> USBPort:
         """

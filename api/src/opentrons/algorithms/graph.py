@@ -101,7 +101,7 @@ class Graph(Generic[VertexName, VertexLike]):
     def __init__(
             self, sorted_graph: List[Vertex],
             lookup_table: Dict[VertexName, Vertex],
-            sort_by: Callable) -> None:
+            sort_by: Callable[[VertexLike], VertexName]) -> None:
         """
         Graph class initializer.
 
@@ -168,7 +168,7 @@ class Graph(Generic[VertexName, VertexLike]):
         if new_vertex not in self._lookup_table.values():
             self._lookup_table[new_vertex.name] = new_vertex
             self._sorted_graph.append(new_vertex)
-            self._sorted_graph.sort(key=self._sort_by)
+        self._sorted_graph.sort(key=self._sort_by)
 
     def remove_vertex(self, vertex: VertexLike) -> None:
         """
@@ -176,9 +176,10 @@ class Graph(Generic[VertexName, VertexLike]):
 
         :param vertex: A node dataclass
         """
-        vertex_to_remove = self._lookup_table[vertex.name]
-        del self._lookup_table[vertex.name]
-        self._sorted_graph.remove(vertex_to_remove)
+        if vertex.name in self._lookup_table.keys():
+            vertex_to_remove = self._lookup_table[vertex.name]
+            del self._lookup_table[vertex.name]
+            self._sorted_graph.remove(vertex_to_remove)
 
     def get_vertex(self, vertex_name: VertexName) -> Vertex:
         """

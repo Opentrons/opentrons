@@ -44,7 +44,7 @@ def load_graph() -> Tuple[Tuple]:
     return (alphabet, 'string'), (numbers, 'integer')
 
 
-@pytest.fixture(params=load_graph())
+@pytest.fixture(scope="session", params=load_graph())
 def dfs_graph(request: Any) -> Tuple[dfs.DFS, str]:
     """
     Build DFS class.

@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from opentrons.config import IS_ROBOT, IS_LINUX
 from opentrons.drivers.rpi_drivers.types import USBPort
-# NOTE: Must import all modules so6hey actually create the subclasses
+# NOTE: Must import all modules so they actually create the subclasses
 from . import update, tempdeck, magdeck, thermocycler, types  # noqa(W0611)
 from .mod_abc import AbstractModule
 from ..execution_manager import ExecutionManager

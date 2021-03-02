@@ -11,6 +11,7 @@ from typing import List, Set
 
 from opentrons.algorithms.dfs import DFS
 
+from .interfaces import USBDriverInterface
 from .types import USBPort
 
 
@@ -23,7 +24,7 @@ DEVICE_PATH = r'\d.\d/tty/tty(\w{4})/dev'
 USB_PORT_INFO = re.compile(PORT_PATTERN + DEVICE_PATH)
 
 
-class USBBus:
+class USBBus(USBDriverInterface):
     def __init__(self):
         self._usb_dev: List[USBPort] = self.read_usb_bus()
         self._dfs: DFS = DFS(self._usb_dev)
