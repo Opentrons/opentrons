@@ -25,7 +25,7 @@ function Nav(props: Props) {
       topChildren={
         <React.Fragment>
           <NavTab
-            name="NavTab_file"
+            id="NavTab_file"
             iconName="ot-file"
             title={i18n.t('nav.tab_name.file')}
             selected={
@@ -37,7 +37,7 @@ function Nav(props: Props) {
             )}
           />
           <NavTab
-            name="NavTab_liquids"
+            id="NavTab_liquids"
             iconName="water"
             title={i18n.t('nav.tab_name.liquids')}
             disabled={noCurrentProtocol}
@@ -45,7 +45,7 @@ function Nav(props: Props) {
             onClick={props.handleClick('liquids')}
           />
           <NavTab
-            name="NavTab_design"
+            id="NavTab_design"
             iconName="ot-design"
             title={i18n.t('nav.tab_name.design')}
             disabled={noCurrentProtocol}
