@@ -4,7 +4,7 @@ import { StaticRouter } from 'react-router-dom'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../i18n'
-import { Box, Icon, Flex, ListItem, Tooltip } from '@opentrons/components'
+import { Box, Flex, ListItem, Tooltip } from '@opentrons/components'
 import * as robotSelectors from '../../../redux/robot/selectors'
 import * as moduleSelectors from '../../../redux/modules/selectors'
 import { ProtocolModuleList } from '..'
@@ -46,10 +46,10 @@ describe('ModuleList', () => {
 
     render = (location: string = '/') => {
       return mountWithProviders(
-       <StaticRouter context={{}} location={location}>
-        <ProtocolModuleList />,
-       </StaticRouter>,
-       { i18n }
+        <StaticRouter context={{}} location={location}>
+          <ProtocolModuleList />,
+        </StaticRouter>,
+        { i18n }
       )
     }
   })
@@ -68,7 +68,7 @@ describe('ModuleList', () => {
     const listItem = titledList.find(ListItem)
     const box = listItem.find(Box)
     mockModules.forEach((m, index) => {
-      const flexbox = box.find(Flex).at(index=== 0 ? 0 : 2)
+      const flexbox = box.find(Flex).at(index === 0 ? 0 : 2)
       const icon = flexbox.find(`Icon`).at(0)
       const allText = flexbox.text()
       const toolTip = flexbox.find('UsbPortInfo').find(Tooltip)
@@ -91,7 +91,7 @@ describe('ModuleList', () => {
     const listItem = titledList.find(ListItem)
     const box = listItem.find(Box)
     mockModules.forEach((m, index) => {
-      const flexbox = box.find(Flex).at(index=== 0 ? 0 : 1)
+      const flexbox = box.find(Flex).at(index === 0 ? 0 : 1)
       const icon = flexbox.find(`Icon`).at(0)
       const allText = flexbox.text()
       const toolTip = flexbox.find('UsbPortInfo').find(Tooltip)
@@ -124,7 +124,7 @@ describe('ModuleList', () => {
     const listItem = titledList.find(ListItem)
     const box = listItem.find(Box)
     mockModules.forEach((m, index) => {
-      const flexbox = box.find(Flex).at(index=== 0 ? 0 : 1)
+      const flexbox = box.find(Flex).at(index === 0 ? 0 : 1)
       const icon = flexbox.find(`Icon`).at(0)
       const allText = flexbox.text()
       const toolTip = flexbox.find('UsbPortInfo').find(Tooltip)

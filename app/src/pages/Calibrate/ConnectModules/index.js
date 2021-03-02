@@ -54,7 +54,11 @@ function ConnectModulesComponent(props: Props) {
   console.log(hasDuplicateModules)
   return (
     <div className={styles.page_content_dark}>
-      <Prompt onPromptClick={setReviewed} modulesMissing={modulesMissing} hasDuplicateModules={hasDuplicateModules} />
+      <Prompt
+        onPromptClick={setReviewed}
+        modulesMissing={modulesMissing}
+        hasDuplicateModules={hasDuplicateModules}
+      />
       <div className={styles.deck_map_wrapper}>
         <DeckMap className={styles.deck_map} modulesRequired />
       </div>
@@ -66,9 +70,9 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   return {
     modulesRequired: robotSelectors.getModules(state).length > 0,
     modulesMissing: getMissingModules(state).length > 0,
-    hasDuplicateModules: Object.values(robotSelectors.getModulesByModel(state)).some(
-      m => Array.isArray(m) && m.length > 1
-    ),
+    hasDuplicateModules: Object.values(
+      robotSelectors.getModulesByModel(state)
+    ).some(m => Array.isArray(m) && m.length > 1),
   }
 }
 

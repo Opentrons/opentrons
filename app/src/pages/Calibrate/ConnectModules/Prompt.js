@@ -7,31 +7,30 @@ import { push } from 'connected-react-router'
 
 import {
   useHoverTooltip,
-  Tooltip,
-  LightSecondaryBtn,
-  Text,
-  SPACING_3,
   Flex,
+  LightSecondaryBtn,
   Link,
+  Text,
+  Tooltip,
+  ALIGN_CENTER,
+  C_BLUE,
+  C_WHITE,
+  DIRECTION_COLUMN,
   FONT_SIZE_BODY_2,
   FONT_SIZE_HEADER,
-  C_WHITE,
-  C_BLUE,
-  DIRECTION_COLUMN,
-  ALIGN_CENTER,
-  SIZE_3,
   FONT_WEIGHT_SEMIBOLD,
-  TEXT_ALIGN_CENTER,
+  SIZE_3,
   SPACING_2,
+  SPACING_3,
   SPACING_4,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
 import { selectors as robotSelectors } from '../../../redux/robot'
 
 import type { Dispatch } from '../../../redux/types'
-import styles from './styles.css'
 
-const SUPPORT_PAGE = 'https://support.opentrons.com/en/'  // TODO: update link to correct doc
+const SUPPORT_PAGE = 'https://support.opentrons.com/en/' // TODO: update link to correct doc
 
 export type PromptProps = {|
   modulesMissing: boolean,
@@ -75,10 +74,20 @@ export function Prompt(props: PromptProps): React.Node {
         >
           {t('module_connect_proceed_button')}
         </LightSecondaryBtn>
-        {modulesMissing && <Tooltip {...tooltipProps}>{t('module_connect_missing_tooltip')}</Tooltip>}
+        {modulesMissing && (
+          <Tooltip {...tooltipProps}>
+            {t('module_connect_missing_tooltip')}
+          </Tooltip>
+        )}
       </Flex>
-      {hasDuplicateModules &&
-        <Text paddingX={SPACING_4} marginBottom={SPACING_2} fontSize={FONT_SIZE_BODY_2} textAlign={TEXT_ALIGN_CENTER} color={C_WHITE}>
+      {hasDuplicateModules && (
+        <Text
+          paddingX={SPACING_4}
+          marginBottom={SPACING_2}
+          fontSize={FONT_SIZE_BODY_2}
+          textAlign={TEXT_ALIGN_CENTER}
+          color={C_WHITE}
+        >
           <Trans
             t={t}
             i18nKey="module_connect_duplicate_description"
@@ -86,7 +95,8 @@ export function Prompt(props: PromptProps): React.Node {
               a: <Link color={C_BLUE} external href={SUPPORT_PAGE} />,
             }}
           />
-        </Text>}
+        </Text>
+      )}
     </Flex>
   )
 }
