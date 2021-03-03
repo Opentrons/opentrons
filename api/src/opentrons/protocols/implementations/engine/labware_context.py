@@ -86,7 +86,7 @@ class LabwareContext(LabwareInterface):
 
     def get_well_grid(self) -> WellGrid:
         """Returns a well grid."""
-        return WellGrid(self._build_wells())
+        return WellGrid(self.get_wells())
 
     def get_wells(self) -> List[WellImplementation]:
         """Return a list of wells."""
@@ -94,7 +94,7 @@ class LabwareContext(LabwareInterface):
 
     def get_wells_by_name(self) -> Dict[str, WellImplementation]:
         """Get a dictionary of wells by name."""
-        return {well.get_name(): well for well in self._build_wells()}
+        return {well.get_name(): well for well in self.get_wells()}
 
     def get_geometry(self) -> LabwareGeometry:
         raise NotImplementedError()
