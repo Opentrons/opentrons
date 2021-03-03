@@ -4,7 +4,7 @@ describe('Batch Edit Transfo', () => {
     cy.closeAnnouncementModal()
   })
 
-  //import the batchEdit.json to PD
+  // import the batchEdit.json to PD
   it('title', () => {
     cy.fixture('../../fixtures/protocol/4/batchEdit.json').then(fileContent => {
       cy.get('input[type=file]').upload({
@@ -20,17 +20,17 @@ describe('Batch Edit Transfo', () => {
       )
     })
 
-    //Goto Design tab and verify the page
+    // Goto Design tab and verify the page
 
     cy.get("button[class*='navbar__tab__']").contains('DESIGN').parent().click()
     cy.get('button').contains('ok').click()
 
-    //Verify the Design Page
+    // Verify the Design Page
     // cy.contains('MULTI SELECT BANNER TEST PROTOCOL')
     // cy.contains('STARTING DECK STATE')
     // cy.contains('ADD STEP')
 
-    //enter into the batch edit mode
+    // enter into the batch edit mode
     cy.get('[data-test="StepItem_1"]').click({
       shiftKey: true,
     })
