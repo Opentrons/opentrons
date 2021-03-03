@@ -3,6 +3,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Box,
+  Flex,
   PrimaryButton,
   Tooltip,
   useHoverTooltip,
@@ -56,8 +57,12 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
   const commonLabwareId = getCommonLabwareId(propsForFields)
 
   return (
-    <Box>
-      <div>TODO settings for {prefix}</div>
+    <Box className={styles.section_column}>
+      <Box className={styles.section_header}>
+        <span className={styles.section_header_text}>
+          {i18n.t('form.batch_edit_form.settings_for', { prefix })}
+        </span>
+      </Box>
       {prefix === 'aspirate' && (
         <CheckboxRowField
           {...propsForFields['preWetTip']}
@@ -136,45 +141,51 @@ export const BatchEditMoveLiquid = (
 
   return (
     <div className={formStyles.form}>
-      <SourceDestBatchEditMoveLiquidFields
-        prefix="aspirate"
-        propsForFields={propsForFields}
-      />
-      <SourceDestBatchEditMoveLiquidFields
-        prefix="dispense"
-        propsForFields={propsForFields}
-      />
-
-      <Box textAlign="right" maxWidth="55rem">
-        <Box
-          {...cancelButtonTargetProps}
-          className={buttonStyles.form_button}
-          display="inline-block"
-        >
-          <PrimaryButton
-            className={buttonStyles.form_button}
-            onClick={handleCancel}
-          >
-            {i18n.t('button.cancel')}
-          </PrimaryButton>
-          <Tooltip {...cancelButtonTooltipProps}>
-            {i18n.t('tooltip.cancel_batch_edit')}
-          </Tooltip>
+      <Box className={styles.form_wrapper}>
+        <Box className={styles.section_wrapper}>
+          <SourceDestBatchEditMoveLiquidFields
+            prefix="aspirate"
+            propsForFields={propsForFields}
+          />
+          <SourceDestBatchEditMoveLiquidFields
+            prefix="dispense"
+            propsForFields={propsForFields}
+          />
         </Box>
 
-        <Box
-          {...saveButtonTargetProps}
-          className={buttonStyles.form_button}
-          display="inline-block"
-        >
-          <PrimaryButton disabled={disableSave} onClick={handleSave}>
-            {i18n.t('button.save')}
-          </PrimaryButton>
-          <Tooltip {...saveButtonTooltipProps}>
-            {i18n.t(
-              `tooltip.save_batch_edit.${disableSave ? 'disabled' : 'enabled'}`
-            )}
-          </Tooltip>
+        <Box textAlign="right" maxWidth="55rem">
+          <Box
+            {...cancelButtonTargetProps}
+            className={buttonStyles.form_button}
+            display="inline-block"
+          >
+            <PrimaryButton
+              className={buttonStyles.form_button}
+              onClick={handleCancel}
+            >
+              {i18n.t('button.cancel')}
+            </PrimaryButton>
+            <Tooltip {...cancelButtonTooltipProps}>
+              {i18n.t('tooltip.cancel_batch_edit')}
+            </Tooltip>
+          </Box>
+
+          <Box
+            {...saveButtonTargetProps}
+            className={buttonStyles.form_button}
+            display="inline-block"
+          >
+            <PrimaryButton disabled={disableSave} onClick={handleSave}>
+              {i18n.t('button.save')}
+            </PrimaryButton>
+            <Tooltip {...saveButtonTooltipProps}>
+              {i18n.t(
+                `tooltip.save_batch_edit.${
+                  disableSave ? 'disabled' : 'enabled'
+                }`
+              )}
+            </Tooltip>
+          </Box>
         </Box>
       </Box>
     </div>
