@@ -1,6 +1,6 @@
 """Module containing labware interface that works with Protocol Engine."""
 from functools import lru_cache
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from opentrons.protocol_engine import StateView
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
@@ -24,6 +24,9 @@ class LabwareContext(LabwareInterface):
         self._id = labware_id
         self._state_view = state_view
         self._parent = parent
+
+    def __eq__(self, other: Any) -> bool:
+        return isinstance(other, LabwareContext) and other._id == self._id
 
     def get_uri(self) -> str:
         """Get the labware uri."""

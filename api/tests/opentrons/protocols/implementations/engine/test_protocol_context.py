@@ -1,10 +1,10 @@
 import pytest
 from decoy import Decoy
-from mock import AsyncMock
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import StateView, DeckSlotLocation
+from opentrons.hardware_control import API as HardwareAPI
 
 from opentrons.protocol_engine.commands import (
     LoadLabwareResult
@@ -22,6 +22,11 @@ from opentrons.types import Mount
 def decoy() -> Decoy:
     """Create a Decoy state container for this test suite."""
     return Decoy()
+
+
+@pytest.fixture
+def hardware_api(decoy: Decoy) -> HardwareAPI:
+    return decoy.create_decoy(spec=HardwareAPI)
 
 
 @pytest.fixture
@@ -82,10 +87,9 @@ def test_get_hardware(subject: ProtocolEngineContext) -> None:
         subject.get_hardware()
 
 
-def test_connect(subject: ProtocolEngineContext) -> None:
-    mock_hardware = AsyncMock()
+def test_connect(hardware_api: HardwareAPI, subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        subject.connect(hardware=mock_hardware)
+        subject.connect(hardware=hardware_api)
 
 
 def test_disconnect(subject: ProtocolEngineContext) -> None:
@@ -104,7 +108,6 @@ def test_load_labware_from_definition(
         subject.load_labware_from_definition({}, "")
 
 
-@pytest.mark.xfail(reason="Not yet implemented", raises=NotImplementedError)
 def test_load_labware(
     decoy: Decoy,
     minimal_labware_def: LabwareDefinition,

@@ -3,8 +3,9 @@ Protocol Engine"""
 from __future__ import annotations
 from typing import Optional, Dict
 
-from opentrons import types, API
-from opentrons.protocol_engine import ProtocolEngine, StateView
+from opentrons import types
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.protocol_engine import ProtocolEngine, StateView, DeckSlotLocation
 from opentrons.protocols.api_support.util import HardwareManager, AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
@@ -17,6 +18,7 @@ from opentrons.protocols.implementations.interfaces.protocol_context import \
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from .sync_engine import SyncProtocolEngine
+from .labware_context import LabwareContext
 
 
 class ProtocolEngineContext(ProtocolContextInterface):
@@ -65,7 +67,7 @@ class ProtocolEngineContext(ProtocolContextInterface):
     def get_hardware(self) -> HardwareManager:
         raise NotImplementedError()
 
-    def connect(self, hardware: API) -> None:
+    def connect(self, hardware: HardwareAPI) -> None:
         raise NotImplementedError()
 
     def disconnect(self) -> None:
@@ -80,11 +82,22 @@ class ProtocolEngineContext(ProtocolContextInterface):
                                          str] = None) -> LabwareInterface:
         raise NotImplementedError()
 
-    def load_labware(self, load_name: str, location: types.DeckLocation,
-                     label: Optional[str] = None,
-                     namespace: Optional[str] = None,
-                     version: Optional[int] = None) -> LabwareInterface:
-        raise NotImplementedError()
+    def load_labware(
+        self,
+        load_name: str,
+        location: types.DeckLocation,
+        label: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> LabwareInterface:
+        result = self._sync_engine.load_labware(
+            load_name=load_name,
+            location=DeckSlotLocation(slot=types.DeckSlotName.from_primitive(location)),
+            namespace=namespace,
+            version=version,
+        )
+
+        return LabwareContext(labware_id=result.labwareId, state_view=self._state_view)
 
     def load_module(self, module_name: str,
                     location: Optional[types.DeckLocation] = None,

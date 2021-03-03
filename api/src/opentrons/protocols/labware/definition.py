@@ -27,8 +27,8 @@ MODULE_LOG = logging.getLogger(__name__)
 
 def get_labware_definition(
     load_name: str,
-    namespace: str = None,
-    version: int = None,
+    namespace: str,
+    version: int,
     bundled_defs: Dict[str, LabwareDefinition] = None,
     extra_defs: Dict[str, LabwareDefinition] = None
 ) -> LabwareDefinition:
@@ -248,7 +248,7 @@ def _get_standard_labware_definition(
                 pass
 
         raise FileNotFoundError(error_msg_string.format(
-                load_name, checked_version, OPENTRONS_NAMESPACE))
+            load_name, checked_version, OPENTRONS_NAMESPACE))
 
     namespace = namespace.lower()
     def_path = _get_path_to_labware(load_name, namespace, checked_version)
@@ -312,11 +312,11 @@ class IndexFileInformation:
 
 def _get_path_to_labware(
         load_name: str, namespace: str, version: int, base_path: Path = None
-        ) -> Path:
+) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is stored in shared data
         return get_shared_data_root() / STANDARD_DEFS_PATH \
-               / load_name / f'{version}.json'
+            / load_name / f'{version}.json'
     if not base_path:
         base_path = USER_DEFS_PATH
     def_path = base_path / namespace / load_name / f'{version}.json'
