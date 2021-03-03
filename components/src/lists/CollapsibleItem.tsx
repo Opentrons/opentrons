@@ -1,4 +1,3 @@
-
 // CollapsibleItem component
 import * as React from 'react'
 import cx from 'classnames'
@@ -6,23 +5,23 @@ import cx from 'classnames'
 import styles from './lists.css'
 import { Icon } from '../icons'
 
-export type CollapsibleItemProps = {
+export interface CollapsibleItemProps {
   /** text of title */
-  title: string,
+  title: string
   /** children nodes */
-  children?: React.ReactNode,
+  children?: React.Children
   /** additional classnames */
-  className?: string,
+  className?: string
   /** caret click action; if defined, list is expandable and carat is visible */
-  onCollapseToggle: (event: React.MouseEvent) => unknown,
+  onCollapseToggle: (event: React.MouseEvent) => unknown
   /** collapse the list if true (false by default) */
-  collapsed: boolean,
+  collapsed: boolean
 }
 
 /**
  * A list item with title, and collapsible children.
  */
-export function CollapsibleItem(props: CollapsibleItemProps): React.ReactNode {
+export function CollapsibleItem(props: CollapsibleItemProps): JSX.Element {
   const { onCollapseToggle } = props
   const collapsible = onCollapseToggle != null
 

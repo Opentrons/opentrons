@@ -14,7 +14,7 @@ export interface EmptyDeckSlotProps extends LabwareWrapperProps {
 /**
  * @deprecated Use {@link RobotWorkSpace}
  */
-export function EmptyDeckSlot(props: EmptyDeckSlotProps): React.ReactNode {
+export function EmptyDeckSlot(props: EmptyDeckSlotProps): JSX.Element {
   const { slot, ...labwareWrapperProps } = props
 
   return (

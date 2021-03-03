@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { css, keyframes } from 'styled-components'
 import cx from 'classnames'
@@ -28,7 +27,7 @@ export interface IconProps {
   /** inline style passed into the icon svg */
   style?: Record<string, string | number>
   /** optional children */
-  children?: React.ReactNode
+  children?: React.Children
 }
 
 const spinAnimation = keyframes`

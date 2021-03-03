@@ -10,7 +10,7 @@ const TARGET_SELECTOR = '[title="target"]'
 describe('useHover hook', () => {
   let result: UseHoverResult
 
-  const TestUseHover = (options: UseHoverOptions): React.ReactNode => {
+  const TestUseHover = (options: UseHoverOptions): JSX.Element => {
     result = useHover(options)
     return <div title="target" {...result[1]} />
   }

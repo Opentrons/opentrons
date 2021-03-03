@@ -1,4 +1,3 @@
-
 // titled modal page component
 import * as React from 'react'
 import cx from 'classnames'
@@ -10,17 +9,17 @@ import styles from './modals.css'
 
 import type { TitleBarProps } from '../structure'
 
-export type ModalPageProps = {
+export interface ModalPageProps {
   /** Props for title bar at top of modal page */
-  titleBar: TitleBarProps,
-  contentsClassName?: string,
-  heading?,
-  children?: React.ReactNode,
-  innerProps?: React.ElementProps<typeof Box>,
-  outerProps?: React.ElementProps<typeof Box>,
+  titleBar: TitleBarProps
+  contentsClassName?: string
+  heading?
+  children?: React.Children
+  innerProps?: React.ElementProps<typeof Box>
+  outerProps?: React.ElementProps<typeof Box>
 }
 
-export function ModalPage(props: ModalPageProps): React.ReactNode {
+export function ModalPage(props: ModalPageProps): JSX.Element {
   const { titleBar, heading, innerProps = {}, outerProps = {} } = props
 
   return (

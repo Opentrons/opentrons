@@ -1,16 +1,15 @@
-
 import * as React from 'react'
 import { Well } from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellGroup } from './types'
 
-export type StyledWellProps = {
-  className: string,
-  definition: LabwareDefinition2,
-  wells: WellGroup,
+export interface StyledWellProps {
+  className: string
+  definition: LabwareDefinition2
+  wells: WellGroup
 }
 
-function StyledWellsComponent(props: StyledWellProps): React.ReactNode {
+function StyledWellsComponent(props: StyledWellProps): JSX.Element {
   const { className, definition, wells } = props
   return (
     <>

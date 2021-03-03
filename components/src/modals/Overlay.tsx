@@ -1,13 +1,12 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 
 import styles from './modals.css'
 
-export type OverlayProps = {
+export interface OverlayProps {
   /** optional onClick handler */
-  onClick?: (event: React.SyntheticEvent) => unknown,
-  alertOverlay?: ?boolean,
+  onClick?: (event: React.SyntheticEvent) => unknown
+  alertOverlay?: ?boolean
 }
 
 /**
@@ -15,7 +14,7 @@ export type OverlayProps = {
  * to make a custom modal component, use `<Overlay>`, otherwise you might
  * just want to use `<Modal>`
  */
-export function Overlay(props: OverlayProps): React.ReactNode {
+export function Overlay(props: OverlayProps): JSX.Element {
   const { alertOverlay, onClick } = props
 
   const className = cx(styles.overlay, {

@@ -20,7 +20,7 @@ export const Link: StyledComponent<LinkProps, {}, HTMLAnchorElement> = styled.a
     shouldForwardProp: p => isntStyleProp(p) && p !== 'external',
   })
   .attrs(
-    (props: LinkProps): React.ReactNode => {
+    (props: LinkProps): JSX.Element => {
       return props.external === true
         ? { target: '_blank', rel: 'noopener noreferrer' }
         : {}

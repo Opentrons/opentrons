@@ -1,15 +1,16 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import styles from './LabwareNameOverlay.css'
 
-export type LabwareNameOverlayProps = {
-  title: string,
-  subtitle?: ?string,
-  className?: string,
+export interface LabwareNameOverlayProps {
+  title: string
+  subtitle?: ?string
+  className?: string
 }
 
-export function LabwareNameOverlay(props: LabwareNameOverlayProps): React.ReactNode {
+export function LabwareNameOverlay(
+  props: LabwareNameOverlayProps
+): JSX.Element {
   const { title, subtitle, className } = props
 
   return (

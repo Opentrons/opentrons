@@ -1,26 +1,25 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
 import styles from './forms.css'
 import type { HoverTooltipHandlers } from '../tooltips'
 
-export type FormGroupProps = {
+export interface FormGroupProps {
   /** text label */
-  label?: string,
+  label?: string
   /** form content */
-  children?: React.ReactNode,
+  children?: React.Children
   /** classes to apply */
-  className?: ?string,
+  className?: ?string
   /** if is included, FormGroup title will use error style. The content of the string is ignored. */
-  error?: ?string,
+  error?: ?string
   /** enable disabled style. Overridden by truthy `error` */
-  disabled?: ?boolean,
+  disabled?: ?boolean
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: ?HoverTooltipHandlers,
+  hoverTooltipHandlers?: ?HoverTooltipHandlers
 }
 
-export function FormGroup(props: FormGroupProps): React.ReactNode {
+export function FormGroup(props: FormGroupProps): JSX.Element {
   const error = props.error != null
   const className = cx(props.className, {
     [styles.error]: error,

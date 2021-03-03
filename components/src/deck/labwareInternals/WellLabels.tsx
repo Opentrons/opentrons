@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import { RobotCoordsText } from '../RobotCoordsText'
@@ -9,14 +8,14 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const LETTER_COLUMN_X = 4
 const NUMBER_COLUMN_Y_FROM_TOP = 5
 
-export type WellLabelsProps = {
-  definition: LabwareDefinition2,
+export interface WellLabelsProps {
+  definition: LabwareDefinition2
 }
 
 const Labels = (props: {
-  definition: LabwareDefinition2,
-  wells: Array<string>,
-  isLetterColumn?: boolean,
+  definition: LabwareDefinition2
+  wells: string[]
+  isLetterColumn?: boolean
 }) => (
   <>
     {props.wells.map(wellName => {
@@ -42,7 +41,7 @@ const Labels = (props: {
   </>
 )
 
-function WellLabelsComponent(props: WellLabelsProps): React.ReactNode {
+function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
   const { definition } = props
   const letterColumn = definition.ordering[0]
   const numberRow = definition.ordering.map(wellCol => wellCol[0])

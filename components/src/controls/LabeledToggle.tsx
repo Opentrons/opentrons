@@ -1,21 +1,20 @@
-
 import * as React from 'react'
 
 import { LabeledControl } from './LabeledControl'
 import { ToggleButton } from './ToggleButton'
 import styles from './styles.css'
 
-export type LabeledToggleProps = {
-  label: string,
-  toggledOn: boolean,
-  disabled?: boolean,
-  children?: React.ReactNode,
-  onClick: () => unknown,
+export interface LabeledToggleProps {
+  label: string
+  toggledOn: boolean
+  disabled?: boolean
+  children?: React.Children
+  onClick: () => unknown
   /** optional data test id for the container */
-  'data-test'?: string,
+  'data-test'?: string
 }
 
-export function LabeledToggle(props: LabeledToggleProps): React.ReactNode {
+export function LabeledToggle(props: LabeledToggleProps): JSX.Element {
   const { label, toggledOn, disabled, onClick } = props
 
   return (

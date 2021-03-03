@@ -1,36 +1,35 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
 
 import styles from './forms.css'
 
-export type RadioGroupProps = {
+export interface RadioGroupProps {
   /** blur handler */
-  onBlur?: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
+  onBlur?: (event: SyntheticInputEvent<HTMLInputElement>) => unknown
   /** change handler */
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => unknown
   /** value that is checked */
-  value?: string,
+  value?: string
   /** Array of {name, value} data with optional children */
   options?: Array<{
-    name: string,
-    value: string,
-    children?: React.ReactNode,
-  }>,
+    name: string
+    value: string
+    children?: React.Children
+  }>
   /** Show radio buttons inline instead of stacked */
-  inline?: boolean,
+  inline?: boolean
   /** classes to apply to outer div */
-  className?: string,
+  className?: string
   /** classes to apply to inner label text div */
-  labelTextClassName?: ?string,
+  labelTextClassName?: ?string
   /** if is included, RadioGroup will use error style. The content of the string is ignored. */
-  error?: ?string,
+  error?: ?string
   /** 'name' attr of input */
-  name?: string,
+  name?: string
 }
 
-export function RadioGroup(props: RadioGroupProps): React.ReactNode {
+export function RadioGroup(props: RadioGroupProps): JSX.Element {
   const error = props.error != null
 
   const outerClassName = cx({

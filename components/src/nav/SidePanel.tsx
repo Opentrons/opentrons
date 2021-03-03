@@ -1,14 +1,13 @@
-
 // collapsable side panel
 import * as React from 'react'
 import styles from './SidePanel.css'
 
-export type SidePanelProps = {
-  title: string,
-  children,
+export interface SidePanelProps {
+  title: string
+  children
 }
 
-export function SidePanel(props: SidePanelProps): React.ReactNode {
+export function SidePanel(props: SidePanelProps): JSX.Element {
   return (
     <div className={styles.panel}>
       <div className={styles.title_bar}>

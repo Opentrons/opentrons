@@ -1,16 +1,15 @@
-
 import * as React from 'react'
 
 import { ControlInfo } from './ControlInfo'
 import styles from './styles.css'
 
-export type LabeledControlProps = {
-  label: string,
-  control,
-  children?: React.ReactNode,
+export interface LabeledControlProps {
+  label: string
+  control
+  children?: React.Children
 }
 
-export function LabeledControl(props: LabeledControlProps): React.ReactNode {
+export function LabeledControl(props: LabeledControlProps): JSX.Element {
   const { label, control, children } = props
 
   return (

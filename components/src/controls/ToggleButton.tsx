@@ -10,7 +10,7 @@ export interface ToggleButtonProps extends ButtonProps {
   toggledOn: boolean
 }
 
-export function ToggleButton(props: ToggleButtonProps): React.ReactNode {
+export function ToggleButton(props: ToggleButtonProps): JSX.Element {
   // TODO(mc, 2020-02-04): destructuring `name` to avoid flow error
   // ButtonProps::name conflicts with IconProps::name, and IconButton
   // has `name` prop to pass to Icon. IconButton will need to be redone

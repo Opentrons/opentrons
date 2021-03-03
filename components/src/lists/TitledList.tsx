@@ -17,7 +17,7 @@ export interface TitledListProps {
   'data-test'?: string
   // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
   /** children must all be `<li>` */
-  children?: React.ReactNode
+  children?: React.Children
   /** additional classnames */
   className?: string
   /** component with descriptive text about the list */
@@ -47,7 +47,7 @@ export interface TitledListProps {
 /**
  * An ordered list with optional title, icon, and description.
  */
-export function TitledList(props: TitledListProps): React.ReactNode {
+export function TitledList(props: TitledListProps): JSX.Element {
   const {
     iconName,
     disabled,

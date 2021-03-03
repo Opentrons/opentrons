@@ -1,4 +1,3 @@
-
 // Card component with drop shadow
 
 import * as React from 'react'
@@ -8,15 +7,15 @@ import type { StyledComponent } from 'styled-components'
 
 import * as styles from '../styles'
 
-export type CardProps = {
+export interface CardProps {
   /** Title for card, all cards should receive a title. */
-  title?,
+  title?
   /** Card contents */
-  children?: React.ReactNode,
+  children?: React.Children
   /** If card can not be used, gray it out and remove pointer events */
-  disabled?: boolean,
+  disabled?: boolean
   /** Additional class names */
-  className?: string,
+  className?: string
 }
 
 /**
@@ -24,7 +23,7 @@ export type CardProps = {
  *
  * Titles and other children handle their own styles and layout.
  */
-export function Card(props: CardProps): React.ReactNode {
+export function Card(props: CardProps): JSX.Element {
   const { title, children, className, disabled } = props
 
   return (

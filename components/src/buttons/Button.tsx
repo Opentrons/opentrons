@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import omit from 'lodash/omit'
@@ -40,7 +39,7 @@ export interface ButtonProps {
   /** inverts the default color/background/border of default button style */
   inverted?: boolean
   /** contents of the button */
-  children?: React.ReactNode
+  children?: React.Children
   /** type of button (default "button") */
   type?:
     | typeof BUTTON_TYPE_SUBMIT
@@ -74,7 +73,7 @@ const STRIP_PROPS = [
  * import {type ButtonProps} from '@opentrons/components'
  * ```
  */
-export function Button(props: ButtonProps): React.ReactNode {
+export function Button(props: ButtonProps): JSX.Element {
   const { name, title, disabled, hover, tabIndex, form } = props
   const className = cx(props.className, { [styles.hover]: hover })
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions

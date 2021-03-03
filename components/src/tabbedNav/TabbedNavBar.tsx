@@ -9,7 +9,7 @@ export type TabbedNavBarProps = {
   bottomChildren?,
 }
 
-export function TabbedNavBar(props: TabbedNavBarProps): React.ReactNode {
+export function TabbedNavBar(props: TabbedNavBarProps): JSX.Element {
   const className = cx(styles.navbar, props.className)
 
   return (

@@ -9,13 +9,13 @@ export interface RobotWorkSpaceProps {
   deckDef?: DeckDefinition
   viewBox?: string
   className?: string
-  children?: (props: RobotWorkSpaceRenderProps) => React.ReactNode
+  children?: (props: RobotWorkSpaceRenderProps) => JSX.Element
   deckLayerBlocklist?: string[]
 }
 
 type GetRobotCoordsFromDOMCoords = RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
 
-export function RobotWorkSpace(props: RobotWorkSpaceProps): React.ReactNode {
+export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element {
   const { children, deckDef, deckLayerBlocklist = [], viewBox } = props
   const wrapperRef: { current: Element | null } = React.useRef(null)
 

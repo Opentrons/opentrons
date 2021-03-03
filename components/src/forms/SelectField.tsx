@@ -37,7 +37,7 @@ export type SelectFieldProps = {
   onLoseFocus?: (name: string) => unknown,
 }
 
-export function SelectField(props: SelectFieldProps): React.ReactNode {
+export function SelectField(props: SelectFieldProps): JSX.Element {
   const {
     id,
     name,

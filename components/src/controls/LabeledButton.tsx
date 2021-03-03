@@ -13,7 +13,7 @@ export type LabeledButtonProps = {
   children,
 }
 
-export function LabeledButton(props: LabeledButtonProps): React.ReactNode {
+export function LabeledButton(props: LabeledButtonProps): JSX.Element {
   const { label, buttonProps } = props
   const buttonClass = cx(styles.labeled_button, buttonProps.className)
 

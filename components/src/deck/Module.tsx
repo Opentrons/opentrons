@@ -26,7 +26,7 @@ export interface ModuleProps {
   slot: DeckSlot
 }
 
-export function Module(props: ModuleProps): React.ReactNode {
+export function Module(props: ModuleProps): JSX.Element {
   const { model, slot } = props
   let x = 0
   let y = 0
@@ -82,7 +82,7 @@ export function Module(props: ModuleProps): React.ReactNode {
 interface ModuleItemContentsProps extends ModuleProps {
   shouldFlip: boolean
 }
-function ModuleItemContents(props: ModuleItemContentsProps): React.ReactNode {
+function ModuleItemContents(props: ModuleItemContentsProps): JSX.Element {
   const { mode, model, shouldFlip } = props
   const displayName = getModuleDisplayName(model)
 

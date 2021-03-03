@@ -1,47 +1,46 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 
 import { Icon } from '..'
 import styles from './forms.css'
 
-export type DropdownOption = {
-  name: string,
-  value: string,
-  disabled?: boolean,
+export interface DropdownOption {
+  name: string
+  value: string
+  disabled?: boolean
 }
 
-export type Options = Array<DropdownOption>
+export type Options = DropdownOption[]
 
-export type DropdownFieldProps = {
+export interface DropdownFieldProps {
   /** change handler */
-  onChange: (event: SyntheticInputEvent<HTMLSelectElement>) => unknown,
+  onChange: (event: SyntheticInputEvent<HTMLSelectElement>) => unknown
   /** focus handler */
-  onFocus?: (event: SyntheticFocusEvent<HTMLSelectElement>) => unknown,
+  onFocus?: (event: SyntheticFocusEvent<HTMLSelectElement>) => unknown
   /** blur handler */
-  onBlur?: (event: SyntheticFocusEvent<HTMLSelectElement>) => unknown,
+  onBlur?: (event: SyntheticFocusEvent<HTMLSelectElement>) => unknown
   /** value that is selected */
-  value?: ?string,
+  value?: ?string
   /** optional id for the <select> element */
-  id?: string,
+  id?: string
   /** name of field in form */
-  name?: string,
+  name?: string
   /** Array of {name, value} data */
-  options: Options,
+  options: Options
   /** classes to apply */
-  className?: string,
+  className?: string
   /** optional caption. hidden when `error` is given */
-  caption?: string,
+  caption?: string
   /** if included, DropdownField will use error style and display error instead of caption */
-  error?: ?string,
+  error?: ?string
   /** dropdown is disabled if value is true */
-  disabled?: boolean,
+  disabled?: boolean
   /** html tabindex property */
-  tabIndex?: number,
+  tabIndex?: number
   /** automatically focus field on render */
-  autoFocus?: boolean,
+  autoFocus?: boolean
   /** if true, render indeterminate unselectable option */
-  isIndeterminate?: boolean,
+  isIndeterminate?: boolean
 }
 
 const BLANK_OPTION: DropdownOption = { name: '', value: '' }
@@ -51,7 +50,7 @@ const INDETERMINATE_OPTION: DropdownOption = {
   disabled: true,
 }
 
-export function DropdownField(props: DropdownFieldProps): React.ReactNode {
+export function DropdownField(props: DropdownFieldProps): JSX.Element {
   let options = []
   // add in disabled, unselectable "-" mixed option when isIndeterminate is true
   // add in "blank" option if there is no `value`, unless `options` already has a blank option

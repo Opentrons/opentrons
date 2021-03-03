@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
@@ -6,34 +5,34 @@ import { Icon } from '../icons'
 import styles from './forms.css'
 import type { HoverTooltipHandlers } from '../tooltips'
 
-export type CheckboxFieldProps = {
+export interface CheckboxFieldProps {
   /** change handler */
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => unknown
   /** checkbox is checked if value is true */
-  value?: boolean,
+  value?: boolean
   /** classes to apply */
-  className?: string,
+  className?: string
   /** classes to apply to inner label text div. Deprecated. use labelProps.className */
-  labelTextClassName?: ?string,
+  labelTextClassName?: ?string
   /** name of field in form */
-  name?: string,
+  name?: string
   /** label text for checkbox */
-  label?: string,
+  label?: string
   /** if is included, checkbox will use error style. The content of the string is ignored. */
-  error?: ?string,
+  error?: ?string
   /** checkbox is disabled if value is true */
-  disabled?: boolean,
+  disabled?: boolean
   /** html tabindex property */
-  tabIndex?: number,
+  tabIndex?: number
   /** props passed into label div. TODO IMMEDIATELY what is the Flow type? */
-  labelProps?: { [string]: any },
+  labelProps?: { [string]: any }
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: ?HoverTooltipHandlers,
+  hoverTooltipHandlers?: ?HoverTooltipHandlers
   /** if true, render indeterminate icon */
-  isIndeterminate?: boolean,
+  isIndeterminate?: boolean
 }
 
-export function CheckboxField(props: CheckboxFieldProps): React.ReactNode {
+export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
   const error = props.error != null
   const outerClassName = cx(styles.form_field, props.className, {
     [styles.checkbox_disabled]: props.disabled,

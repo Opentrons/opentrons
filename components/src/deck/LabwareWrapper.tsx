@@ -1,4 +1,3 @@
-
 // TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
@@ -6,19 +5,19 @@ import styles from './LabwareWrapper.css'
 
 const defs = { roundSlotClipPath: 'roundSlotClipPath' } // TODO: import these defs instead of hard-coding in applications? Or should they be passed to children?
 
-export type LabwareWrapperProps = {
-  x?: number,
-  y?: number,
-  height?: number,
-  width?: number,
-  highlighted?: boolean,
-  children?: React.ReactNode,
+export interface LabwareWrapperProps {
+  x?: number
+  y?: number
+  height?: number
+  width?: number
+  highlighted?: boolean
+  children?: React.Children
 }
 
 /**
  * @deprecated Use {@link RobotWorkSpace}
  */
-export function LabwareWrapper(props: LabwareWrapperProps): React.ReactNode {
+export function LabwareWrapper(props: LabwareWrapperProps): JSX.Element {
   const { x, y, highlighted, children } = props
   const height = props.height || SLOT_RENDER_HEIGHT
   const width = props.width || SLOT_RENDER_WIDTH

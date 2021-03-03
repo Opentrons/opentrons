@@ -17,7 +17,7 @@ export type SlotOverlayProps = {
 /**
  * @deprecated No longer necessary, do not use
  */
-export function SlotOverlay(props: SlotOverlayProps): React.ReactNode {
+export function SlotOverlay(props: SlotOverlayProps): JSX.Element {
   const { icon, text, className } = props
   const leftRightPadding = 3 // LR padding as %
   const topPadding = 33 // as %

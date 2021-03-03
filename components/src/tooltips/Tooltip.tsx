@@ -21,7 +21,7 @@ export interface TooltipProps {
   /** Whether or not the tooltip should be rendered */
   visible: boolean
   /** Contents of the tooltip */
-  children?: React.ReactNode
+  children?: React.Children
   /**
    * Tooltip element ID (provided by useTooltip). Will match
    * targetProps.aria-describedby
@@ -119,7 +119,7 @@ export interface ArrowProps {
   arrowStyle: Partial<CSSStyleDeclaration>
 }
 
-export function Arrow(props: ArrowProps): React.ReactNode {
+export function Arrow(props: ArrowProps): JSX.Element {
   const placement = props.placement ?? ''
   const placementBase = placement.split('-')[0]
   const arrowCss = ARROW_CSS_BY_PLACEMENT_BASE[placementBase]

@@ -1,20 +1,19 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
 import styles from './Labware.css'
 
-export type LabwareOutlineProps = {
-  definition?: LabwareDefinition2,
-  width?: number,
-  height?: number,
-  isTiprack?: boolean,
+export interface LabwareOutlineProps {
+  definition?: LabwareDefinition2
+  width?: number
+  height?: number
+  isTiprack?: boolean
 }
 
 const OUTLINE_THICKNESS_MM = 1
 
-export function LabwareOutline(props: LabwareOutlineProps): React.ReactNode {
+export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
   const {
     definition,
     width = SLOT_RENDER_WIDTH,

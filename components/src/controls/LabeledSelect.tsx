@@ -13,7 +13,7 @@ export interface LabeledSelectProps extends DropdownFieldProps {
   'data-test'?: string
 }
 
-export function LabeledSelect(props: LabeledSelectProps): React.ReactNode {
+export function LabeledSelect(props: LabeledSelectProps): JSX.Element {
   const { label, value, options, onChange } = props
 
   return (

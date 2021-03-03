@@ -19,7 +19,7 @@ export type SpinnerModalProps = {
 /**
  * Spinner Modal with no background and optional message
  */
-export function SpinnerModal(props: SpinnerModalProps): React.ReactNode {
+export function SpinnerModal(props: SpinnerModalProps): JSX.Element {
   return (
     <div className={styles.modal}>
       <Overlay alertOverlay={props.alertOverlay} />

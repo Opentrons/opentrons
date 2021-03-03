@@ -26,7 +26,7 @@ export type ToggleFieldProps = {
   tabIndex?: number,
 }
 
-export function ToggleField(props: ToggleFieldProps): React.ReactNode {
+export function ToggleField(props: ToggleFieldProps): JSX.Element {
   const outerClassName = cx(styles.form_field, props.className, {
     [styles.toggle_disabled]: props.disabled,
   })

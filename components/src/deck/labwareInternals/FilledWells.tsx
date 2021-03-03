@@ -8,13 +8,13 @@ export interface FilledWellsProps {
   fillByWell: { [wellName: string]: string }
 }
 
-function FilledWellsComponent(props: FilledWellsProps): React.ReactNode {
+function FilledWellsComponent(props: FilledWellsProps): JSX.Element {
   const { definition, fillByWell } = props
   return (
     <>
-      {map<Record<string, string>, React.ReactNode>(
+      {map<Record<string, string>, JSX.Element>(
         fillByWell,
-        (color: keyof typeof fillByWell, wellName: string): React.ReactNode => {
+        (color: keyof typeof fillByWell, wellName: string): JSX.Element => {
           return (
             <Well
               key={wellName}

@@ -18,7 +18,7 @@ interface Props extends ButtonProps {
  * FlatButton variant for a button that is a single icon. Takes props of
  * both Button _and_ Icon. Use `name` to specify icon name.
  */
-export function IconButton(props: Props): React.ReactNode {
+export function IconButton(props: Props): JSX.Element {
   // TODO(mc, 2020-02-04): ButtonProps::name conflicts with IconProps::name
   // this component will need to be redone so underlying `button` can still
   // receive an HTML name for a11y

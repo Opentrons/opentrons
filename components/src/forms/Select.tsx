@@ -76,7 +76,7 @@ export interface SelectProps {
       inputValue: string
       selectValue: SelectOption[] | SelectOption | null | void
     }
-  ) => React.ReactNode
+  ) => JSX.Element
   onBlur?: (e: React.FocusEvent<HTMLElement>) => unknown
   onChange?: (value: SelectOption | null, action: ChangeAction) => unknown
   onFocus?: (e: React.FocusEvent<HTMLElement>) => unknown
@@ -111,7 +111,7 @@ const CLEAR_STYLES = {
   // valueContainer: _ => _,
 }
 
-export function Select(props: SelectProps): React.ReactNode {
+export function Select(props: SelectProps): JSX.Element {
   return (
     <ReactSelect
       {...props}
@@ -123,7 +123,7 @@ export function Select(props: SelectProps): React.ReactNode {
   )
 }
 
-const DropdownIndicator = (props: SelectComponentProps): React.ReactNode => (
+const DropdownIndicator = (props: SelectComponentProps): JSX.Element => (
   <reactSelectComponents.DropdownIndicator {...props}>
     <div
       className={cx(styles.dropdown_indicator, {
@@ -137,7 +137,7 @@ const DropdownIndicator = (props: SelectComponentProps): React.ReactNode => (
 
 const Menu = (
   props: React.PropsWithChildren<SelectComponentProps>
-): React.ReactNode => (
+): JSX.Element => (
   <reactSelectComponents.Menu {...props}>
     <div className={styles.menu}>{props.children}</div>
     <div className={styles.menu_control_bridge} />

@@ -1,4 +1,3 @@
-
 // Card component with drop shadow
 
 import * as React from 'react'
@@ -6,18 +5,18 @@ import cx from 'classnames'
 
 import styles from './structure.css'
 
-export type LabeledValueProps = {
+export interface LabeledValueProps {
   /** Label */
-  label,
+  label
   /** Value */
-  value,
+  value
   /** Additional className */
-  className?: string,
+  className?: string
   /** Additional value className */
-  valueClassName?: string,
+  valueClassName?: string
 }
 
-export function LabeledValue(props: LabeledValueProps): React.ReactNode {
+export function LabeledValue(props: LabeledValueProps): JSX.Element {
   const { label, value } = props
   const className = cx(styles.labeled_value, props.className)
 

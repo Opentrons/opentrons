@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 
@@ -6,23 +5,23 @@ import styles from './Pill.css'
 
 import type { UseHoverTooltipResult } from '../tooltips'
 
-export type PillProps = {
+export interface PillProps {
   /** background color of pill (any CSS color string) */
-  color?: ?string,
+  color?: ?string
   /** text black, instead of default white */
-  invertTextColor?: ?boolean,
+  invertTextColor?: ?boolean
   /** additional class name */
-  className?: string,
+  className?: string
   /** contents of the pill */
-  children?: React.ReactNode,
+  children?: React.Children
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: ?$ElementType<UseHoverTooltipResult, 0>,
+  hoverTooltipHandlers?: ?$ElementType<UseHoverTooltipResult, 0>
 }
 
 /**
  * Colored Pill containing text or other contents
  */
-export function Pill(props: PillProps): React.ReactNode {
+export function Pill(props: PillProps): JSX.Element {
   const className = cx(styles.pill, props.className, {
     [styles.invert_text]: props.invertTextColor,
   })

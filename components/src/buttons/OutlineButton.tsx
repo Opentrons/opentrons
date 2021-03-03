@@ -11,7 +11,7 @@ import type { ButtonProps } from './Button'
  * Button with no background fill and a dark border.
  Use inverted prop for buttons on dark backgrounds.
  */
-export function OutlineButton(props: ButtonProps): React.ReactNode {
+export function OutlineButton(props: ButtonProps): JSX.Element {
   const className = cx(styles.button_outline, props.className, {
     [styles.inverted]: props.inverted,
   })

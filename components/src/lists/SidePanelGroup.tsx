@@ -1,4 +1,3 @@
-
 // SidePanelGroup component
 import * as React from 'react'
 import cx from 'classnames'
@@ -8,23 +7,23 @@ import { Icon } from '../icons'
 
 import type { IconName } from '../icons'
 
-export type SidePanelGroupProps = {
+export interface SidePanelGroupProps {
   /** text of title */
-  title?: string,
+  title?: string
   /** optional icon left of the title */
-  iconName?: IconName,
+  iconName?: IconName
   /** children, most likely one or more TitledList */
-  children?: React.ReactNode,
+  children?: React.Children
   /** additional classnames */
-  className?: string,
+  className?: string
   /** disables the whole SidePanelGroup if true */
-  disabled?: boolean,
+  disabled?: boolean
 }
 
 /**
  * A component for grouping and titling multiple lists
  */
-export function SidePanelGroup(props: SidePanelGroupProps): React.ReactNode {
+export function SidePanelGroup(props: SidePanelGroupProps): JSX.Element {
   const { iconName, disabled } = props
 
   const className = cx(styles.panel_group, props.className, {

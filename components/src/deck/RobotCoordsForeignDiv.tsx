@@ -1,22 +1,19 @@
-
 import * as React from 'react'
 import { Box } from '../primitives'
 
-export type RobotCoordsForeignDivProps = {
-  width?: string | number,
-  height?: string | number,
-  x?: string | number,
-  y?: string | number,
-  children?: React.ReactNode,
-  className?: string,
-  innerDivProps?: React.ElementProps<'div'>,
-  transformWithSVG?: boolean,
-  extraTransform?: string,
+export interface RobotCoordsForeignDivProps {
+  width?: string | number
+  height?: string | number
+  x?: string | number
+  y?: string | number
+  children?: React.Children
+  className?: string
+  innerDivProps?: React.ElementProps<'div'>
+  transformWithSVG?: boolean
+  extraTransform?: string
 }
 
-export const RobotCoordsForeignDiv = (
-  props: RobotCoordsForeignDivProps
-) => {
+export const RobotCoordsForeignDiv = (props: RobotCoordsForeignDivProps) => {
   const {
     children,
     x = 0,
