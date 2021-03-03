@@ -1,5 +1,6 @@
 // @flow
 import last from 'lodash/last'
+import { analyticsEvent } from '../../../analytics/actions'
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getMultiSelectLastSelected } from '../selectors'
@@ -25,7 +26,6 @@ import type {
   SelectStepAction,
   SelectMultipleStepsAction,
 } from './types'
-import { analyticsEvent } from '../../../analytics/actions'
 
 // adds an incremental integer ID for Step reducers.
 // NOTE: if this is an "add step" directly performed by the user,
