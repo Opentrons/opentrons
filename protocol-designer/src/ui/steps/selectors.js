@@ -232,12 +232,15 @@ export type MultiselectFieldValues = {
   ...
 }
 
+// TODO IMMEDIATELY: these are all fields in the moveLiquid form, eventually. Not only ones user can edit.
+// Do we really need this array? Or just use getDefaultFieldsForStepType
 const BATCH_EDIT_TRANSFER_FORM_FIELDS: Array<MultiSelectFieldName> = [
   'aspirate_labware',
   'aspirate_flowRate',
   'aspirate_mmFromBottom',
   'aspirate_wellOrder_first',
   'aspirate_wellOrder_second',
+  'path',
   'preWetTip',
   'aspirate_mix_checkbox',
   'aspirate_mix_volume',
@@ -269,24 +272,6 @@ const BATCH_EDIT_TRANSFER_FORM_FIELDS: Array<MultiSelectFieldName> = [
   'blowout_checkbox',
   'blowout_location',
 ]
-
-const dependentFieldCheckboxMap: {
-  [MultiSelectFieldName]: MultiSelectFieldName,
-} = {
-  aspirate_mix_times: 'aspirate_mix_checkbox',
-  aspirate_mix_volume: 'aspirate_mix_checkbox',
-  aspirate_delay_seconds: 'aspirate_delay_checkbox',
-  aspirate_delay_mmFromBottom: 'aspirate_delay_checkbox',
-  aspirate_airGap_volume: 'aspirate_airGap_checkbox',
-  aspirate_touchTip_mmFromBottom: 'aspirate_touchTip_checkbox',
-  dispense_mix_times: 'dispense_mix_checkbox',
-  dispense_mix_volume: 'dispense_mix_checkbox',
-  dispense_delay_seconds: 'dispense_delay_checkbox',
-  dispense_delay_mmFromBottom: 'dispense_delay_checkbox',
-  dispense_airGap_volume: 'dispense_airGap_checkbox',
-  dispense_touchTip_mmFromBottom: 'dispense_touchTip_checkbox',
-  blowout_location: 'blowout_checkbox',
-}
 
 export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
   stepFormSelectors.getSavedStepForms,

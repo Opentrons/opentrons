@@ -12,7 +12,10 @@ import {
   WellOrderField,
 } from '../../fields'
 import { MixFields } from '../../fields/MixFields'
-import { getLabwareFieldForPositioningField } from '../../utils'
+import {
+  getBlowoutLocationOptionsForForm,
+  getLabwareFieldForPositioningField,
+} from '../../utils'
 
 import type { FormData } from '../../../../form-types'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
@@ -136,7 +139,10 @@ export const SourceDestFields = (props: Props): React.Node => {
             <BlowoutLocationField
               {...propsForFields['blowout_location']}
               className={styles.full_width}
-              formData={formData}
+              options={getBlowoutLocationOptionsForForm({
+                path: formData.path,
+                stepType: formData.stepType,
+              })}
             />
           </CheckboxRowField>
         )}

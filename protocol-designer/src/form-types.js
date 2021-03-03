@@ -78,6 +78,7 @@ export type MultiSelectFieldName =
   | 'aspirate_mmFromBottom'
   | 'aspirate_wellOrder_first'
   | 'aspirate_wellOrder_second'
+  | 'path'
   | 'preWetTip'
   | 'aspirate_mix_checkbox'
   | 'aspirate_mix_volume'

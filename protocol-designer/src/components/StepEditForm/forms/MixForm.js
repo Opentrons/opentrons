@@ -17,7 +17,10 @@ import {
   WellOrderField,
   WellSelectionField,
 } from '../fields'
-import { getLabwareFieldForPositioningField } from '../utils'
+import {
+  getBlowoutLocationOptionsForForm,
+  getLabwareFieldForPositioningField,
+} from '../utils'
 import { AspDispSection } from './AspDispSection'
 
 import type { StepFormProps } from '../types'
@@ -180,7 +183,9 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 <BlowoutLocationField
                   {...propsForFields['blowout_location']}
                   className={styles.full_width}
-                  formData={formData}
+                  options={getBlowoutLocationOptionsForForm({
+                    stepType: formData.stepType,
+                  })}
                 />
               </CheckboxRowField>
             </div>

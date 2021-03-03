@@ -13,7 +13,7 @@ export type DelayFieldProps = {|
   labwareId: ?string,
   propsForFields: FieldPropsByName,
   secondsFieldName: StepFieldName, // TODO(IL, 2021-03-03): strictly, could be DelaySecondFields!
-  tipPositionFieldName: StepFieldName, // TODO(IL, 2021-03-03): strictly, could be TipOffsetFields!
+  tipPositionFieldName?: StepFieldName, // TODO(IL, 2021-03-03): strictly, could be TipOffsetFields!
 |}
 
 export const DelayFields = (props: DelayFieldProps): React.Node => {

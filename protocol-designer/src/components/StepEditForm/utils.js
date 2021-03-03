@@ -16,17 +16,20 @@ import type { Options } from '@opentrons/components'
 import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { FormWarning } from '../../steplist/formLevel/warnings'
 import type { StepFormErrors } from '../../steplist/types'
-import type { FormData, ProfileItem, StepFieldName } from '../../form-types'
+import type {
+  FormData,
+  ProfileItem,
+  StepFieldName,
+  StepType,
+  PathOption,
+} from '../../form-types'
 
-export function getBlowoutLocationOptionsForForm(
-  disposalLabwareOptions: Options,
-  rawForm: ?FormData
-): Options {
-  if (!rawForm) {
-    assert(rawForm, `getBlowoutLocationOptionsForForm expected a form`)
-    return disposalLabwareOptions
-  }
-  const { stepType } = rawForm
+// TODO IMMEDIATELY add test
+export function getBlowoutLocationOptionsForForm(args: {|
+  stepType: StepType,
+  path?: ?PathOption,
+|}): Options {
+  const { stepType, path } = args
   // TODO: Ian 2019-02-21 use i18n for names
   const destOption = {
     name: 'Destination Well',
@@ -38,37 +41,29 @@ export function getBlowoutLocationOptionsForForm(
   }
 
   if (stepType === 'mix') {
-    return [...disposalLabwareOptions, destOption]
+    return [destOption]
   } else if (stepType === 'moveLiquid') {
-    const path = rawForm.path
     switch (path) {
       case 'single': {
-        return [...disposalLabwareOptions, sourceOption, destOption]
+        return [sourceOption, destOption]
       }
       case 'multiDispense': {
+        return [sourceOption, { ...destOption, disabled: true }]
+      }
+      case 'multiAspirate': {
+        return [{ ...sourceOption, disabled: true }, destOption]
+      }
+      default: {
+        // is moveLiquid but no path -- assume we're in batch edit mode
+        // with mixed/indeterminate path values
         return [
-          ...disposalLabwareOptions,
-          sourceOption,
+          { ...sourceOption, disabled: true },
           { ...destOption, disabled: true },
         ]
       }
-      case 'multiAspirate': {
-        return [
-          ...disposalLabwareOptions,
-          { ...sourceOption, disabled: true },
-          destOption,
-        ]
-      }
-      default: {
-        assert(
-          false,
-          `getBlowoutLocationOptionsForForm got unexpected path for moveLiquid step: ${path}`
-        )
-        return disposalLabwareOptions
-      }
     }
   }
-  return disposalLabwareOptions
+  return []
 }
 
 // TODO: type fieldNames, don't use `string`

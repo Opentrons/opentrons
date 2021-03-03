@@ -9,12 +9,14 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import {
+  BlowoutLocationField,
   CheckboxRowField,
   DelayFields,
   TipPositionField,
   TextField,
 } from '../StepEditForm/fields'
 import { MixFields } from '../StepEditForm/fields/MixFields'
+import { getBlowoutLocationOptionsForForm } from '../StepEditForm/utils'
 import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
 import {
   getBatchEditSelectedStepTypes,
@@ -99,12 +101,15 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
           label={i18n.t('form.step_edit_form.field.blowout.label')}
           className={styles.small_field}
         >
-          {/* TODO(IL, 2021-03-03): needs formData. Location is supported only with same-pipette, right? */}
-          {/* <BlowoutLocationField
-              {...propsForFields['blowout_location']}
-              className={styles.full_width}
-              formData={formData}
-            /> */}
+          {/* TODO(IL, 2021-03-03): Location is supported only with same-pipette, right? Which options? */}
+          <BlowoutLocationField
+            {...propsForFields['blowout_location']}
+            className={styles.full_width}
+            options={getBlowoutLocationOptionsForForm({
+              path: (propsForFields['path'].value: any),
+              stepType: 'moveLiquid',
+            })}
+          />
         </CheckboxRowField>
       )}
       <CheckboxRowField
