@@ -79,6 +79,30 @@ export const reduxActionToAnalyticsEvent = (
       properties: { ...editedFields, ...additionalProperties },
     }
   }
+  if (action.type === 'DELETE_MULTIPLE_STEPS') {
+    return {
+      name: 'deleteMultipleSteps',
+      properties: {},
+    }
+  }
+  if (action.type === 'DUPLICATE_MULTIPLE_STEPS') {
+    return {
+      name: 'duplicateMultipleSteps',
+      properties: {},
+    }
+  }
+  if (action.type === 'EXPAND_MULTIPLE_STEPS') {
+    return {
+      name: 'expandMultipleSteps',
+      properties: {},
+    }
+  }
+  if (action.type === 'COLLAPSE_MULTIPLE_STEPS') {
+    return {
+      name: 'collapseMultipleSteps',
+      properties: {},
+    }
+  }
   if (action.type === 'ANALYTICS_EVENT') {
     const a: AnalyticsEventAction = action
     return a.payload

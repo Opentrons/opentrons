@@ -171,9 +171,12 @@ export const selectAllSteps = (): ThunkAction<
   dispatch(analyticsEvent(selectAllStepsEvent))
 }
 
-export const deselectAllSteps = (): ThunkAction<
-  SelectStepAction | AnalyticsEventAction
-> => (
+export const EXIT_BATCH_EDIT_MODE_BUTTON_PRESS: 'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS' =
+  'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'
+
+export const deselectAllSteps = (
+  meta?: typeof EXIT_BATCH_EDIT_MODE_BUTTON_PRESS
+): ThunkAction<SelectStepAction | AnalyticsEventAction> => (
   dispatch: ThunkDispatch<SelectStepAction | AnalyticsEventAction>,
   getState: GetState
 ) => {
@@ -190,11 +193,22 @@ export const deselectAllSteps = (): ThunkAction<
     )
   }
   // dispatch an analytics event to indicate all steps have been deselected
-  // because there is no 'DESELECT_ALL_STEPS' action that middleware can catch
-  const deselectAllStepsEvent: AnalyticsEvent = {
-    name: 'deselectAllSteps',
-    properties: {},
-  }
+  // because there is no 'DESELECT_ALL_STEPS'/'EXIT_BATCH_EDIT_MODE' action that middleware can catch
+  if (meta === EXIT_BATCH_EDIT_MODE_BUTTON_PRESS) {
+    // for analytics purposes we want to differentiate between
+    // deselecting all, and using the "exit batch edit mode" button
+    const exitBatchEditModeEvent: AnalyticsEvent = {
+      name: 'exitBatchEditMode',
+      properties: {},
+    }
 
-  dispatch(analyticsEvent(deselectAllStepsEvent))
+    dispatch(analyticsEvent(exitBatchEditModeEvent))
+  } else {
+    const deselectAllStepsEvent: AnalyticsEvent = {
+      name: 'deselectAllSteps',
+      properties: {},
+    }
+
+    dispatch(analyticsEvent(deselectAllStepsEvent))
+  }
 }
