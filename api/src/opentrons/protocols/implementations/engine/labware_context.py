@@ -1,4 +1,5 @@
 """Module containing labware interface that works with Protocol Engine."""
+from functools import lru_cache
 from typing import Dict, List
 
 from opentrons.protocol_engine import StateView
@@ -7,7 +8,7 @@ from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.implementations.tip_tracker import TipTracker
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.protocols.implementations.well_grid import WellGrid
-from opentrons.types import Point
+from opentrons.types import Point, Location
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition, LabwareParameters
 )
@@ -18,10 +19,11 @@ from opentrons.protocols.implementations.interfaces.labware\
 class LabwareContext(LabwareInterface):
     """LabwareInterface implementation that works with the Protocol Engine."""
 
-    def __init__(self, labware_id: str, state_view: StateView):
+    def __init__(self, labware_id: str, state_view: StateView, parent: Location):
         """Construct"""
         self._id = labware_id
         self._state_view = state_view
+        self._parent = parent
 
     def get_uri(self) -> str:
         """Get the labware uri."""
@@ -65,7 +67,7 @@ class LabwareContext(LabwareInterface):
         """Get the calibrated offset."""
         x, y, z = self._state_view.labware.get_labware_data_by_id(
             labware_id=self._id).calibration
-        return Point(x=x, y=y, z=z)
+        return Point(x=x, y=y, z=z) + self.get_geometry().offset
 
     def is_tiprack(self) -> bool:
         """Return whether this labware is a tiprack."""
@@ -84,24 +86,32 @@ class LabwareContext(LabwareInterface):
     def get_tip_tracker(self) -> TipTracker:
         raise NotImplementedError()
 
+    @lru_cache(maxsize=1)
     def get_well_grid(self) -> WellGrid:
         """Returns a well grid."""
         return WellGrid(self.get_wells())
 
+    @lru_cache(maxsize=1)
     def get_wells(self) -> List[WellImplementation]:
         """Return a list of wells."""
         return self._build_wells()
 
+    @lru_cache(maxsize=1)
     def get_wells_by_name(self) -> Dict[str, WellImplementation]:
         """Get a dictionary of wells by name."""
         return {well.get_name(): well for well in self.get_wells()}
 
+    @lru_cache(maxsize=1)
     def get_geometry(self) -> LabwareGeometry:
-        raise NotImplementedError()
+        """Return LabwareGeometry"""
+        return LabwareGeometry(
+            definition=self.get_definition(),
+            parent=self._parent
+        )
 
     @property
     def highest_z(self):
-        raise NotImplementedError()
+        return self.get_geometry().z_dimension + self.get_calibrated_offset().z
 
     @property
     def separate_calibration(self) -> bool:

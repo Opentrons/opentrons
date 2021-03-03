@@ -3,11 +3,12 @@ from decoy import Decoy
 from opentrons.protocol_engine import StateView
 from opentrons.protocol_engine.state import LabwareData
 from opentrons.protocol_engine.types import DeckSlotLocation
+from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 
 from opentrons.protocols.implementations.engine.labware_context import \
     LabwareContext
 from opentrons.protocols.implementations.well_grid import WellGrid
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, Location
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
@@ -40,10 +41,21 @@ def labware_data(minimal_labware_def: LabwareDefinition) -> LabwareData:
 
 
 @pytest.fixture
+def parent() -> Location:
+    """Parent location fixture."""
+    return Location(Point(x=1, y=5, z=20), "4")
+
+
+@pytest.fixture
 def labware_context(labware_id: str,
-                    mock_state_view: StateView) -> LabwareContext:
+                    mock_state_view: StateView,
+                    parent: Location) -> LabwareContext:
     """LabwareContext fixture"""
-    return LabwareContext(labware_id=labware_id, state_view=mock_state_view)
+    return LabwareContext(
+        labware_id=labware_id,
+        state_view=mock_state_view,
+        parent=parent
+    )
 
 
 def test_get_uri(
@@ -135,13 +147,22 @@ def test_set_calibration(labware_context: LabwareContext) -> None:
 def test_get_calibrated_offset(
         decoy: Decoy, labware_id: str, mock_state_view:
         StateView, labware_context: LabwareContext, labware_data: LabwareData,
+        minimal_labware_def: LabwareDefinition, parent: Location
 ) -> None:
     """Should return the calibrated offset."""
     decoy.when(
         mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
     ).then_return(labware_data)
 
-    assert Point(*labware_data.calibration) == labware_context.get_calibrated_offset()
+    corner_offset = minimal_labware_def["cornerOffsetFromSlot"]
+
+    expected = Point(
+        x=parent.point.x + corner_offset["x"] + labware_data.calibration[0],
+        y=parent.point.y + corner_offset["y"] + labware_data.calibration[1],
+        z=parent.point.z + corner_offset["z"] + labware_data.calibration[2],
+    )
+
+    assert expected == labware_context.get_calibrated_offset()
 
 
 def test_is_tiprack(
@@ -224,14 +245,33 @@ def test_get_wells_by_name(
     }
 
 
-def test_get_geometry(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_geometry()
+def test_get_geometry(
+        decoy: Decoy, labware_id: str, mock_state_view: StateView,
+        labware_context: LabwareContext, labware_data: LabwareData) -> None:
+    """Should return a geometry object."""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert isinstance(labware_context.get_geometry(), LabwareGeometry)
 
 
-def test_highest_z(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        h = labware_context.highest_z  # noqa: F841
+def test_highest_z(
+        decoy: Decoy, labware_id: str, mock_state_view: StateView,
+        labware_context: LabwareContext, labware_data: LabwareData,
+        minimal_labware_def: LabwareDefinition, parent: Location) -> None:
+    """Should return the highest z."""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    expected = (
+            labware_data.calibration[2] +
+            parent.point.z +
+            minimal_labware_def['cornerOffsetFromSlot']['z'] +
+            minimal_labware_def['dimensions']['zDimension']
+    )
+    assert expected == labware_context.highest_z
 
 
 def test_separate_calibration(labware_context: LabwareContext) -> None:
