@@ -71,6 +71,7 @@ def get_serial() -> str:
 
 
 def _get_os_boot_id() -> bytes:
+    # See the "/proc Interface" section in man(4) random.
     return Path('/proc/sys/kernel/random/boot_id').read_bytes()
 
 
