@@ -1,17 +1,17 @@
-
 import * as React from 'react'
 
-export type ClickOutsideProps = {
-  onClickOutside: ?(MouseEvent) => unknown,
-  children: ({
-    ref: { current: Element | null } | ((current: Element | null) => unknown),
-  }) => React.Node,
+interface ClickOutsideChildParams {
+  ref: React.Ref<Element>
+}
+export interface ClickOutsideProps {
+  onClickOutside: () => void
+  children: (ClickOutsideChildParams) => JSX.Element
 }
 
 // TODO: BC: 2019-05-10 this would be much cleaner as a custom hook
 export class ClickOutside extends React.Component<ClickOutsideProps> {
   // TODO(mc, 2019-04-19): switch to ref object
-  wrapperRef: ?Element
+  wrapperRef: Element | null
 
   constructor(props: ClickOutsideProps) {
     super(props)
@@ -21,10 +21,12 @@ export class ClickOutside extends React.Component<ClickOutsideProps> {
   componentDidMount() {
     document.addEventListener('mousedown', this.handleClickOutside)
   }
+
   componentWillUnmount() {
     document.removeEventListener('mousedown', this.handleClickOutside)
   }
-  setWrapperRef: (el: ?Element) => void = el => {
+
+  setWrapperRef: (el: Element | null) => void = el => {
     this.wrapperRef = el
   }
 

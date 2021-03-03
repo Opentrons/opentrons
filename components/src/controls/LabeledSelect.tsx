@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 
 import { DropdownField } from '../forms'
@@ -7,12 +6,11 @@ import styles from './styles.css'
 
 import type { DropdownFieldProps } from '../forms'
 
-export type LabeledSelectProps = {
-  ...DropdownFieldProps,
-  label: string,
-  children,
+export interface LabeledSelectProps extends DropdownFieldProps {
+  label: string
+  children: React.ReactChildren
   /** optional data test id for the container */
-  'data-test'?: string,
+  'data-test'?: string
 }
 
 export function LabeledSelect(props: LabeledSelectProps): React.ReactNode {

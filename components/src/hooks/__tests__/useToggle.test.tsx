@@ -5,13 +5,15 @@ import { mount } from 'enzyme'
 import { useToggle } from '../useToggle'
 
 describe('useToggle hook', () => {
-  let result
+  let result: ReturnType<typeof useToggle>
 
-  const TestUseToggle = (props: { initialValue: boolean | void }) => {
+  const TestUseToggle = (props: {
+    initialValue: boolean | undefined
+  }): JSX.Element => {
     result = useToggle(props.initialValue)
     return <></>
   }
-  const render = initialValue => {
+  const render = (initialValue?: boolean): ReturnType<typeof mount> => {
     return mount(<TestUseToggle initialValue={initialValue} />)
   }
 

@@ -1,47 +1,47 @@
-
 // TitledList component
 import * as React from 'react'
 import cx from 'classnames'
 
 import styles from './lists.css'
-import { type IconName, Icon } from '../icons'
+import { Icon } from '../icons'
+import type { IconName } from '../icons'
 
-export type TitledListProps = {
+export interface TitledListProps {
   /** text of title */
-  title: string,
+  title: string
   /** optional icon left of the title */
-  iconName?: ?IconName,
+  iconName?: IconName | null
   /** props passed down to icon (`className` and `name` are ignored) */
-  iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: mixed }>,
+  iconProps?: Omit<React.ComponentProps<typeof Icon>, 'name'>
   /** optional data test id for the container */
-  'data-test'?: string,
+  'data-test'?: string
   // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
   /** children must all be `<li>` */
-  children?: React.ReactNode,
+  children?: React.ReactNode
   /** additional classnames */
-  className?: string,
+  className?: string
   /** component with descriptive text about the list */
-  description?,
+  description?: JSX.Element
   /** optional click action (on title div, not children) */
-  onClick?: (event: React.MouseEvent) => unknown,
+  onClick?: (event: React.MouseEvent) => unknown
   /** optional right click action (on wrapping div) */
-  onContextMenu?: (event: React.MouseEvent) => unknown,
+  onContextMenu?: (event: React.MouseEvent) => unknown
   /** optional mouseEnter action */
-  onMouseEnter?: (event: React.MouseEvent) => unknown,
+  onMouseEnter?: (event: React.MouseEvent) => unknown
   /** optional mouseLeave action */
-  onMouseLeave?: (event: React.MouseEvent) => unknown,
+  onMouseLeave?: (event: React.MouseEvent) => unknown
   /** caret click action; if defined, list is expandable and carat is visible */
-  onCollapseToggle?: (event: React.MouseEvent) => unknown,
+  onCollapseToggle?: (event: React.MouseEvent) => unknown
   /** collapse the list if true (false by default) */
-  collapsed?: boolean,
+  collapsed?: boolean
   /** set to true when TitledList is selected (eg, user clicked it) */
-  selected?: boolean,
+  selected?: boolean
   /** set to true when TitledList is hovered (but not when its contents are hovered) */
-  hovered?: boolean,
+  hovered?: boolean
   /** disables the whole TitledList if true */
-  disabled?: boolean,
+  disabled?: boolean
   /** appear disabled, but preserve collapsibility */
-  inert?: boolean,
+  inert?: boolean
 }
 
 /**

@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import { DeckFromData } from './Deck'
@@ -6,18 +5,15 @@ import type { DeckDefinition } from '@opentrons/shared-data'
 import styles from './RobotWorkSpace.css'
 import type { RobotWorkSpaceRenderProps } from './types'
 
-export type RobotWorkSpaceProps = {
-  deckDef?: DeckDefinition,
-  viewBox?: string,
-  className?: string,
-  children?: RobotWorkSpaceRenderProps => React.Node,
-  deckLayerBlocklist?: Array<string>,
+export interface RobotWorkSpaceProps {
+  deckDef?: DeckDefinition
+  viewBox?: string
+  className?: string
+  children?: (props: RobotWorkSpaceRenderProps) => React.ReactNode
+  deckLayerBlocklist?: string[]
 }
 
-type GetRobotCoordsFromDOMCoords = $PropertyType<
-  RobotWorkSpaceRenderProps,
-  'getRobotCoordsFromDOMCoords'
->
+type GetRobotCoordsFromDOMCoords = RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
 
 export function RobotWorkSpace(props: RobotWorkSpaceProps): React.ReactNode {
   const { children, deckDef, deckLayerBlocklist = [], viewBox } = props

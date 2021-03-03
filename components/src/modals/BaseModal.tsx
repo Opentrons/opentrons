@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 
 import * as Styles from '../styles'
@@ -45,16 +44,15 @@ const CONTENT_STYLE = {
   paddingY: Styles.SPACING_3,
 }
 
-export type BaseModalProps = {
+export interface BaseModalProps extends StyleProps {
   /** Overlay color, defaults to `OVERLAY_GRAY_90` */
-  overlayColor?: string,
+  overlayColor?: string
   /** Optional sticky header */
-  header?,
+  header?: JSX.Element
   /** Optional sticky footer */
-  footer?,
+  footer?: JSX.Element
   /** Modal content */
-  children?: React.ReactNode,
-  ...StyleProps,
+  children?: React.ReactChildren
 }
 
 /**

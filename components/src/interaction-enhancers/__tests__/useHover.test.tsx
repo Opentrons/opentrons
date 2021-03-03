@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
@@ -6,17 +5,17 @@ import { mount } from 'enzyme'
 import { useHover } from '../useHover'
 import type { UseHoverOptions, UseHoverResult } from '../useHover'
 
-const TARGET_SELECTOR = '[data-test="target"]'
+const TARGET_SELECTOR = '[title="target"]'
 
 describe('useHover hook', () => {
   let result: UseHoverResult
 
-  const TestUseHover = (options: UseHoverOptions) => {
+  const TestUseHover = (options: UseHoverOptions): React.ReactNode => {
     result = useHover(options)
-    return <div data-test="target" {...result[1]} />
+    return <div title="target" {...result[1]} />
   }
 
-  const render = (options?: UseHoverOptions) => {
+  const render = (options?: UseHoverOptions): ReturnType<typeof mount> => {
     return mount(<TestUseHover {...options} />)
   }
 

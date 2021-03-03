@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import {
   WellLabels,
@@ -15,21 +14,21 @@ import type {
   WellGroup,
 } from './labwareInternals/types'
 
-export type LabwareRenderProps = {
-  definition: LabwareDefinition2,
-  showLabels?: boolean,
-  missingTips?: ?WellGroup,
-  highlightedWells?: ?WellGroup,
-  selectedWells?: ?WellGroup,
+export interface LabwareRenderProps {
+  definition: LabwareDefinition2
+  showLabels?: boolean
+  missingTips?: WellGroup | null
+  highlightedWells?: WellGroup | null
+  selectedWells?: WellGroup | null
   /** CSS color to fill specified wells */
-  wellFill?: WellFill,
+  wellFill?: WellFill
   /** Optional callback, called with WellMouseEvent args onMouseEnter */
-  onMouseEnterWell?: WellMouseEvent => unknown,
+  onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback, called with WellMouseEvent args onMouseLeave */
-  onMouseLeaveWell?: WellMouseEvent => unknown,
+  onMouseLeaveWell?: (e: WellMouseEvent) => unknown
   /** Special class which, together with 'data-wellname' on the well elements,
     allows drag-to-select behavior */
-  selectableWellClass?: string,
+  selectableWellClass?: string
 }
 
 export function LabwareRender(props: LabwareRenderProps): React.ReactNode {

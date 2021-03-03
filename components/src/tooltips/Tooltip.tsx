@@ -1,11 +1,10 @@
-
 import * as React from 'react'
 import { css } from 'styled-components'
 
 import { FONT_BODY_1_LIGHT, C_DARK_GRAY } from '../styles'
 import { ARROW_SIZE_PX } from './styles'
 
-import type { CSSRules } from 'styled-components'
+import type { CSSObject } from 'styled-components'
 import type { Placement } from './types'
 
 const TOOLTIP_CSS = css`
@@ -18,33 +17,33 @@ const TOOLTIP_CSS = css`
   cursor: pointer;
 `
 
-export type TooltipProps = {
+export interface TooltipProps {
   /** Whether or not the tooltip should be rendered */
-  visible: boolean,
+  visible: boolean
   /** Contents of the tooltip */
-  children?: React.ReactNode,
+  children?: React.ReactNode
   /**
    * Tooltip element ID (provided by useTooltip). Will match
    * targetProps.aria-describedby
    */
-  id: string,
+  id: string
   /** Actual tooltip placement, if known (provided by useTooltip) */
-  placement: Placement | null,
+  placement: Placement | null
   /** Inline styles to apply to the tooltip element (provided by useTooltip) */
-  style: Partial<CSSStyleDeclaration>,
+  style: Partial<CSSStyleDeclaration>
   /** React function ref for tooltip's arrow element (provided by useTooltip) */
-  arrowRef: (HTMLElement | null) => unknown,
+  arrowRef: React.Ref<HTMLElement | null>
   /** Inline styles to apply to arrow element (provided by useTooltip) */
-  arrowStyle: Partial<CSSStyleDeclaration>,
+  arrowStyle: Partial<CSSStyleDeclaration>
 }
 
 /**
  * Tooltip component that renders based on its `visible` prop. For use with the
  * `useTooltip` and `useHoverTooltip` hooks. See examples in `Tooltip.md`.
  */
-export const Tooltip: React.AbstractComponent<
-  TooltipProps,
-  HTMLDivElement
+export const Tooltip: React.RefForwardingComponent<
+  unknown,
+  TooltipProps
 > = React.forwardRef(function TooltipComponent(props: TooltipProps, ref) {
   const {
     visible,
@@ -107,17 +106,17 @@ const ARROW_CSS_LEFT = css`
   border-left-color: ${C_DARK_GRAY};
 `
 
-const ARROW_CSS_BY_PLACEMENT_BASE: { [string]: CSSRules | void } = {
+const ARROW_CSS_BY_PLACEMENT_BASE: Record<string, CSSObject | unknown> = {
   top: ARROW_CSS_TOP,
   right: ARROW_CSS_RIGHT,
   bottom: ARROW_CSS_BOTTOM,
   left: ARROW_CSS_LEFT,
 }
 
-export type ArrowProps = {
-  placement: Placement | null,
-  arrowRef: (HTMLElement | null) => unknown,
-  arrowStyle: Partial<CSSStyleDeclaration>,
+export interface ArrowProps {
+  placement: Placement | null
+  arrowRef: React.Ref<HTMLElement>
+  arrowStyle: Partial<CSSStyleDeclaration>
 }
 
 export function Arrow(props: ArrowProps): React.ReactNode {

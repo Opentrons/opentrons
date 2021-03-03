@@ -1,4 +1,3 @@
-
 import styled, { css } from 'styled-components'
 
 import * as Styles from '../styles'
@@ -50,7 +49,7 @@ export const Btn: BtnComponent = styled.button
   .withConfig({
     shouldForwardProp: isntStyleProp,
   })
-  .attrs((props: { type?: string, ... }) => ({
+  .attrs((props: Partial<{ type?: string }>) => ({
     type: props.type ?? BUTTON_TYPE_BUTTON,
   }))`
   ${BUTTON_BASE_STYLE}

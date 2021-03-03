@@ -1,4 +1,3 @@
-
 import styled from 'styled-components'
 
 import { styleProps, isntStyleProp } from './style-props'
@@ -6,22 +5,21 @@ import { styleProps, isntStyleProp } from './style-props'
 import type { StyledComponent } from 'styled-components'
 import type { StyleProps } from './types'
 
-export type SvgProps = {
+export interface SvgProps extends StyleProps {
   /** attach a width attribute to the <svg> element */
-  svgWidth?: string | number,
+  svgWidth?: string | number
   /** attach a height attribute to the <svg> element */
-  svgHeight?: string | number,
+  svgHeight?: string | number
   /**
    * internal helper prop to remap width style-prop to CSS
    * @internal
    */
-  _cssWidth?: string | number,
+  _cssWidth?: string | number
   /**
    * internal helper prop to remap height style-prop to CSS
    * @internal
    */
-  _cssHeight?: string | number,
-  ...StyleProps,
+  _cssHeight?: string | number
 }
 
 const SVG_VERSION = '1.1'
@@ -46,17 +44,19 @@ export const Svg: StyledComponent<SvgProps, {}, Element> = styled.svg
       )
     },
   })
-  .attrs((props: SvgProps): React.ReactNode => ({
-    version: SVG_VERSION,
-    xmlns: SVG_NAMESPACE,
-    // map the explicit svgWidth/Height props to width/height attrs
-    width: props.svgWidth,
-    height: props.svgHeight,
-    // map width and height style props to internal style props
-    _cssWidth: props.width,
-    _cssHeight: props.height,
-  }))`
-  ${(props: { ...SvgProps, ... }) => {
+  .attrs(
+    (props: SvgProps): React.ReactNode => ({
+      version: SVG_VERSION,
+      xmlns: SVG_NAMESPACE,
+      // map the explicit svgWidth/Height props to width/height attrs
+      width: props.svgWidth,
+      height: props.svgHeight,
+      // map width and height style props to internal style props
+      _cssWidth: props.width,
+      _cssHeight: props.height,
+    })
+  )`
+  ${(props: Partial<SvgProps>) => {
     const { width, height, ...otherProps } = props
 
     // replace width and height attrs with internal style props

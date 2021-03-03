@@ -1,5 +1,3 @@
-
-
 import * as React from 'react'
 import { Manager, Reference, Popper } from 'react-popper'
 import cx from 'classnames'
@@ -7,30 +5,25 @@ import styles from './tooltips.css'
 
 const DISTANCE_FROM_REFERENCE = 8
 
-type PopperProps = React.ElementProps<typeof Popper>
+type PopperProps = React.ComponentProps<typeof Popper>
 
-export type TooltipChildProps<ChildProps: {}> = {
-  ...$Exact<ChildProps>,
-  ref: React.Ref<*>,
-}
-
-export type DeprecatedTooltipProps<ChildProps: {}> = {
+export interface DeprecatedTooltipProps {
   /** show or hide the tooltip */
-  open?: boolean,
+  open?: boolean
   /** contents of the tooltip */
-  tooltipComponent?,
+  tooltipComponent: React.ReactNode | unknown
   /** optional portal to place the tooltipComponent inside */
-  portal?: React.ComponentType<*>,
+  portal?: React.ComponentType<any>
   /** <https://github.com/FezVrasta/react-popper#placement> */
-  placement?: $PropertyType<PopperProps, 'placement'>,
+  placement?: PopperProps['placement']
   /** <https://github.com/FezVrasta/react-popper#positionfixed> */
-  positionFixed?: $PropertyType<PopperProps, 'positionFixed'>,
+  positionFixed?: PopperProps['positionFixed']
   /** <https://github.com/FezVrasta/react-popper#modifiers> */
-  modifiers?: $PropertyType<PopperProps, 'modifiers'>,
+  modifiers?: PopperProps['modifiers']
   /** render function for tooltip'd component */
-  children: (props?: TooltipChildProps<ChildProps>) => React.Node,
+  children: (props?: React.PropsWithRef<any>) => JSX.Element | null
   /** extra props to pass to the children render function */
-  childProps?: ChildProps,
+  childProps?: React.PropsWithRef<any>
 }
 
 /**
@@ -47,9 +40,7 @@ export type DeprecatedTooltipProps<ChildProps: {}> = {
  *
  * @deprecated Use `Tooltip` and `useTooltip` instead
  */
-export function DeprecatedTooltip<ChildProps: {}>(
-  props: DeprecatedTooltipProps<ChildProps>
-) {
+export function DeprecatedTooltip(props: DeprecatedTooltipProps): JSX.Element {
   if (!props.tooltipComponent) return props.children()
 
   return (

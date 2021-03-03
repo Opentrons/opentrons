@@ -1,4 +1,3 @@
-
 // reusable toggle button with on off styling for connect to robot and opt in/out
 import * as React from 'react'
 import cx from 'classnames'
@@ -7,9 +6,8 @@ import styles from './styles.css'
 
 import type { ButtonProps } from '../buttons'
 
-export type ToggleButtonProps = {
-  ...$Exact<ButtonProps>,
-  toggledOn: boolean,
+export interface ToggleButtonProps extends ButtonProps {
+  toggledOn: boolean
 }
 
 export function ToggleButton(props: ToggleButtonProps): React.ReactNode {

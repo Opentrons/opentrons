@@ -1,19 +1,20 @@
-
 import { useEffect, useRef } from 'react'
 import assert from 'assert'
 
-export type UseOnClickOutsideOptions = Partial<{
-  onClickOutside?: MouseEvent => unknown,
-}>
+import type { MouseEvent, ReactNode } from 'react'
 
-export const useOnClickOutside = <E: Element>(
+export interface UseOnClickOutsideOptions {
+  onClickOutside?: () => void
+}
+
+export const useOnClickOutside = <E extends Element>(
   options: UseOnClickOutsideOptions
 ): { current: E | null } => {
   const { onClickOutside } = options
   const node: { current: E | null } = useRef(null)
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent): (() => void) => {
       const clickedElem = event.target
 
       assert(
@@ -26,7 +27,7 @@ export const useOnClickOutside = <E: Element>(
         node &&
         node.current &&
         node.current.contains &&
-        !node.current.contains(((clickedElem: any): Node))
+        !node.current.contains(clickedElem as ReactNode)
       ) {
         onClickOutside(event)
       }

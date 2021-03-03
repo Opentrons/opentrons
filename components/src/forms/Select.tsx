@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import ReactSelect, { components as reactSelectComponents } from 'react-select'
 import cx from 'classnames'
@@ -27,15 +26,15 @@ export type ChangeAction =
   | 'clear'
   | 'create-option'
 
-export type SelectOption = {
-  value: string,
-  label?: string,
-  isDisabled?: boolean,
+export interface SelectOption {
+  value: string
+  label?: string
+  isDisabled?: boolean
 }
 
 export type SelectOptionOrGroup =
   | SelectOption
-  | { options: Array<SelectOption>, label?: string }
+  | { options: SelectOption[]; label?: string }
 
 export type SelectPlacement =
   | typeof PLACEMENT_AUTO
@@ -47,40 +46,40 @@ export type SelectPosition = typeof POSITION_ABSOLUTE | typeof POSITION_FIXED
 export type SelectOptionContext = typeof CONTEXT_MENU | typeof CONTEXT_VALUE
 
 // this object is not exhaustive because react-select's documentation is bad
-type SelectComponentProps = {
-  innerRef: any,
-  innerProps: any,
-  selectProps: { menuIsOpen: boolean },
+interface SelectComponentProps {
+  innerRef: any
+  innerProps: any
+  selectProps: { menuIsOpen: boolean }
 }
 
-export type SelectProps = {
-  options: Array<SelectOptionOrGroup>,
-  value?: SelectOption | null,
-  defaultValue?: SelectOption | null,
-  'aria-label'?: string,
-  'aria-labelledby'?: string,
-  className?: string,
-  id?: string,
-  isDisabled?: boolean,
-  isSearchable?: boolean,
-  name?: string,
-  menuIsOpen?: boolean,
-  menuPlacement?: SelectPlacement,
-  menuPosition?: SelectPosition,
-  menuPortalTarget?: HTMLElement,
-  placeholder?: ?string,
-  tabIndex?: string | number,
+export interface SelectProps {
+  options: SelectOptionOrGroup[]
+  value?: SelectOption | null
+  defaultValue?: SelectOption | null
+  'aria-label'?: string
+  'aria-labelledby'?: string
+  className?: string
+  id?: string
+  isDisabled?: boolean
+  isSearchable?: boolean
+  name?: string
+  menuIsOpen?: boolean
+  menuPlacement?: SelectPlacement
+  menuPosition?: SelectPosition
+  menuPortalTarget?: HTMLElement
+  placeholder?: ?string
+  tabIndex?: string | number
   formatOptionLabel?: (
     option: SelectOption,
     data: {
-      context: SelectOptionContext,
-      inputValue: string,
-      selectValue: Array<SelectOption> | SelectOption | null | void,
+      context: SelectOptionContext
+      inputValue: string
+      selectValue: SelectOption[] | SelectOption | null | void
     }
-  ) => React.Node,
-  onBlur?: (SyntheticFocusEvent<HTMLElement>) => unknown,
-  onChange?: (value: SelectOption | null, action: ChangeAction) => unknown,
-  onFocus?: (SyntheticFocusEvent<HTMLElement>) => unknown,
+  ) => React.ReactNode
+  onBlur?: (e: React.FocusEvent<HTMLElement>) => unknown
+  onChange?: (value: SelectOption | null, action: ChangeAction) => unknown
+  onFocus?: (e: React.FocusEvent<HTMLElement>) => unknown
 }
 
 const NO_STYLE = () => null
@@ -136,7 +135,9 @@ const DropdownIndicator = (props: SelectComponentProps): React.ReactNode => (
   </reactSelectComponents.DropdownIndicator>
 )
 
-const Menu = (props: { ...SelectComponentProps, children }) => (
+const Menu = (
+  props: React.PropsWithChildren<SelectComponentProps>
+): React.ReactNode => (
   <reactSelectComponents.Menu {...props}>
     <div className={styles.menu}>{props.children}</div>
     <div className={styles.menu_control_bridge} />

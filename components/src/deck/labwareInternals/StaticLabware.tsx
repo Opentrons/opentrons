@@ -1,4 +1,3 @@
-
 // Render labware definition to SVG. XY is in robot coordinates.
 import assert from 'assert'
 import * as React from 'react'
@@ -12,15 +11,15 @@ import styles from './StaticLabware.css'
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 
-export type StaticLabwareProps = {
-  definition: LabwareDefinition2,
-  selectableWellClass?: string,
-  onMouseEnterWell?: WellMouseEvent => unknown,
-  onMouseLeaveWell?: WellMouseEvent => unknown,
+export interface StaticLabwareProps {
+  definition: LabwareDefinition2
+  selectableWellClass?: string
+  onMouseEnterWell?: (e: WellMouseEvent) => unknown
+  onMouseLeaveWell?: (e: WellMouseEvent) => unknown
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
-  well: LabwareWell,
+  well: LabwareWell
 }) {
   const { well } = props
   if (well.diameter) {
@@ -55,7 +54,7 @@ function StaticLabwareComponent(props: StaticLabwareProps): React.ReactNode {
       <g>
         {flatMap(
           props.definition.ordering,
-          (row: Array<string>, i: number, c: Array<Array<string>>) => {
+          (row: string[], i: number, c: string[][]) => {
             return row.map(wellName => {
               return (
                 <React.Fragment key={wellName}>

@@ -1,4 +1,3 @@
-
 // TODO(mc, 2020-03-20): Popper build misconfigured, but can import types directly
 // https://github.com/popperjs/popper-core/issues/1031
 import type {
@@ -17,41 +16,41 @@ export type { PopperInstance, PopperOptions }
 export type HandleStateUpdate = (
   placement: Placement,
   styles: {
-    popper?: Partial<CSSStyleDeclaration>,
-    arrow?: Partial<CSSStyleDeclaration>,
+    popper?: Partial<CSSStyleDeclaration>
+    arrow?: Partial<CSSStyleDeclaration>
   }
 ) => void
 
-export type UsePopperOptions = {
-  target: Element | null,
-  tooltip: HTMLElement | null,
-  arrow: HTMLElement | null,
-  onStateUpdate: HandleStateUpdate,
-  placement?: Placement | null,
-  strategy?: Strategy | null,
-  offset?: number,
+export interface UsePopperOptions {
+  target: Element | null
+  tooltip: HTMLElement | null
+  arrow: HTMLElement | null
+  onStateUpdate: HandleStateUpdate
+  placement?: Placement | null
+  strategy?: Strategy | null
+  offset?: number
 }
 
 export type UsePopperResult = PopperInstance | null
 
 export type UseTooltipOptions = Partial<{
-  placement?: Placement,
-  strategy?: Strategy,
-  offset?: number,
+  placement?: Placement
+  strategy?: Strategy
+  offset?: number
 }>
 
-export type UseTooltipResultTargetProps = {
-  ref: React.Ref<Element>,
-  'aria-describedby': string,
+export interface UseTooltipResultTargetProps {
+  ref: React.Ref<Element>
+  'aria-describedby': string
 }
 
-export type UseTooltipResultTooltipProps = {
-  id: string,
-  ref: React.Ref<HTMLElement>,
-  placement: Placement | null,
-  style: Partial<CSSStyleDeclaration>,
-  arrowRef: React.Ref<HTMLElement>,
-  arrowStyle: Partial<CSSStyleDeclaration>,
+export interface UseTooltipResultTooltipProps {
+  id: string
+  ref: React.Ref<HTMLElement>
+  placement: Placement | null
+  style: Partial<CSSStyleDeclaration>
+  arrowRef: React.Ref<HTMLElement>
+  arrowStyle: Partial<CSSStyleDeclaration>
 }
 
 export type UseTooltipResult = [
@@ -59,17 +58,14 @@ export type UseTooltipResult = [
   UseTooltipResultTooltipProps
 ]
 
-export type UseHoverTooltipOptions = Partial<{
-  ...UseTooltipOptions,
-  ...UseHoverOptions,
-}>
+export type UseHoverTooltipOptions = Partial<
+  UseTooltipOptions & UseHoverOptions
+>
 
-export type UseHoverTooltipTargetProps = {
-  ...UseTooltipResultTargetProps,
-  ...HoverHandlers,
-}
+export type UseHoverTooltipTargetProps = UseTooltipResultTargetProps &
+  HoverHandlers
 
 export type UseHoverTooltipResult = [
   UseHoverTooltipTargetProps,
-  { ...UseTooltipResultTooltipProps, visible: boolean }
+  Partial<UseTooltipResultTooltipProps & { visible: boolean }>
 ]

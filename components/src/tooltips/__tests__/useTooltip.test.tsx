@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
@@ -12,17 +11,17 @@ import * as Types from '../types'
 // react complain about wrapping stuff in `act`, which we can't
 jest.mock('../usePopper')
 
-const usePopper: JestMockFn<[Types.UsePopperOptions], Types.UsePopperResult> =
-  UsePopper.usePopper
+const usePopper = UsePopper.usePopper as jest.MockedFunction<
+  typeof UsePopper.usePopper
+>
 
-type TestUseTooltipProps = {
-  ...Types.UseTooltipOptions,
-  visible: boolean,
+interface TestUseTooltipProps extends Types.UseTooltipOptions {
+  visible: boolean
 }
 
 describe('useTooltip hook', () => {
-  const render = (options: TestUseTooltipProps) => {
-    const TestUseTooltip = (props: TestUseTooltipProps) => {
+  const render = (options: TestUseTooltipProps): ReturnType<typeof mount> => {
+    const TestUseTooltip = (props: TestUseTooltipProps): JSX.Element => {
       const { visible, ...hookOptions } = props
       const [targetProps, tooltipProps] = useTooltip(hookOptions)
 

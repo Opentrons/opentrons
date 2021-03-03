@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { mount } from 'enzyme'
 
@@ -14,7 +13,10 @@ const arrowStyle = { position: 'absolute', left: '8px' }
 
 const TOOLTIP_SELECTOR = 'div[role="tooltip"]'
 
-const render = (visible = true, children = <></>) => {
+const render = (
+  visible = true,
+  children = (<></>) as React.ReactNode | string
+): ReturnType<typeof mount> => {
   // NOTE(mc): redundant fragement necessary for enzyme issue with forwardRef
   // https://github.com/enzymejs/enzyme/issues/1852
   return mount(

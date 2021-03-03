@@ -1,4 +1,3 @@
-
 // TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 
@@ -8,9 +7,8 @@ import styles from './LabwareWrapper.css'
 
 import type { LabwareWrapperProps } from './LabwareWrapper'
 
-export type EmptyDeckSlotProps = {
-  ...LabwareWrapperProps,
-  slot: string,
+export interface EmptyDeckSlotProps extends LabwareWrapperProps {
+  slot: string
 }
 
 /**

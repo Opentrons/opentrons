@@ -1,11 +1,8 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 
 import {
   getModuleDisplayName,
-  type ModuleModel,
-  type DeckSlot,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V1,
@@ -17,14 +14,16 @@ import { Icon } from '../icons'
 import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
 import styles from './Module.css'
 
+import type { ModuleModel, DeckSlot } from '@opentrons/shared-data'
+
 const FLIPPED_SLOTS = ['3', '6', '9']
-export type ModuleProps = {
+export interface ModuleProps {
   /** module model */
-  model: ModuleModel,
+  model: ModuleModel
   /** display mode: 'default', 'present', 'missing', or 'info' */
-  mode: 'default' | 'present' | 'missing' | 'info',
+  mode: 'default' | 'present' | 'missing' | 'info'
   /** slot details of the location of this module */
-  slot: DeckSlot,
+  slot: DeckSlot
 }
 
 export function Module(props: ModuleProps): React.ReactNode {
@@ -80,7 +79,9 @@ export function Module(props: ModuleProps): React.ReactNode {
   )
 }
 
-type ModuleItemContentsProps = { ...ModuleProps, shouldFlip: boolean }
+interface ModuleItemContentsProps extends ModuleProps {
+  shouldFlip: boolean
+}
 function ModuleItemContents(props: ModuleItemContentsProps): React.ReactNode {
   const { mode, model, shouldFlip } = props
   const displayName = getModuleDisplayName(model)

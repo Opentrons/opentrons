@@ -1,4 +1,3 @@
-
 // common styling props you can apply to any primitive component
 // props are string type for flexibility, but try to use constants for safety
 
@@ -93,19 +92,25 @@ const STYLE_PROPS = [
   ...POSITION_PROPS,
 ]
 
-const colorStyles = (props: { ...Types.ColorProps, ... }) => {
-  return (pick(props, COLOR_PROPS): Types.ColorProps)
+const colorStyles = (
+  props: Partial<Types.ColorProps>
+): Partial<Types.ColorProps> => {
+  return pick(props, COLOR_PROPS) as Types.ColorProps
 }
 
-const typographyStyles = (props: { ...Types.TypographyProps, ... }) => {
-  return (pick(props, TYPOGRAPHY_PROPS): Types.TypographyProps)
+const typographyStyles = (
+  props: Partial<Types.TypographyProps>
+): Partial<Types.TypographyProps> => {
+  return pick(props, TYPOGRAPHY_PROPS) as Types.TypographyProps
 }
 
-const spacingStyles = (props: { ...Types.SpacingProps, ... }) => {
-  const { marginX, marginY, paddingX, paddingY, ...styles } = (pick(
+const spacingStyles = (
+  props: Partial<Types.SpacingProps>
+): Partial<Types.TypographyProps> => {
+  const { marginX, marginY, paddingX, paddingY, ...styles } = pick(
     props,
     SPACING_PROPS
-  ): Types.SpacingProps)
+  ) as Types.SpacingProps
 
   if (marginX != null) {
     styles.marginRight = styles.marginRight ?? marginX
@@ -127,20 +132,28 @@ const spacingStyles = (props: { ...Types.SpacingProps, ... }) => {
   return styles
 }
 
-const borderStyles = (props: Partial<Types.BorderProps>) => {
-  return (pick(props, BORDER_PROPS) as Types.BorderProps)
+const borderStyles = (
+  props: Partial<Types.BorderProps>
+): Partial<Types.BorderProps> => {
+  return pick(props, BORDER_PROPS) as Types.BorderProps
 }
 
-const flexboxStyles = (props: Partial<Types.FlexboxProps>) => {
-  return (pick(props, FLEXBOX_PROPS) as Types.FlexboxProps)
+const flexboxStyles = (
+  props: Partial<Types.FlexboxProps>
+): Partial<Types.FlexboxProps> => {
+  return pick(props, FLEXBOX_PROPS) as Types.FlexboxProps
 }
 
-const gridStyles = (props: Partial<Types.GridProps>) => {
-  return (pick(props, GRID_PROPS) as Types.GridProps)
+const gridStyles = (
+  props: Partial<Types.GridProps>
+): Partial<Types.GridProps> => {
+  return pick(props, GRID_PROPS) as Types.GridProps
 }
 
-const layoutStyles = (props: Partial<Types.LayoutProps>) => {
-  const { size, ...styles } = (pick(props, LAYOUT_PROPS) as Types.LayoutProps)
+const layoutStyles = (
+  props: Partial<Types.LayoutProps>
+): Partial<Types.LayoutProps> => {
+  const { size, ...styles } = pick(props, LAYOUT_PROPS) as Types.LayoutProps
 
   if (size != null) {
     styles.width = styles.width ?? size
@@ -150,11 +163,15 @@ const layoutStyles = (props: Partial<Types.LayoutProps>) => {
   return styles
 }
 
-const positionStyles = (props: Partial<Types.PositionProps>) => {
-  return (pick(props, POSITION_PROPS) as Types.PositionProps)
+const positionStyles = (
+  props: Partial<Types.PositionProps>
+): Partial<Types.PositionProps> => {
+  return pick(props, POSITION_PROPS) as Types.PositionProps
 }
 
-export const styleProps = (props: Partial<Types.StyleProps>): StyledComponentProps => ({
+export const styleProps = (
+  props: Partial<Types.StyleProps>
+): StyledComponentProps<{}, {}, {}, {}> => ({
   ...colorStyles(props),
   ...typographyStyles(props),
   ...spacingStyles(props),

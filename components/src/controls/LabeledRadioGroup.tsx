@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 
 import { StackedLabeledControl } from './StackedLabeledControl'
@@ -6,14 +5,15 @@ import { RadioGroup } from '../forms'
 
 import type { RadioGroupProps } from '../forms'
 
-export type LabeledRadioGroupProps = {
-  ...RadioGroupProps,
-  label: string,
-  children,
-  'data-test'?: string,
+export interface LabeledRadioGroupProps extends RadioGroupProps {
+  label: string
+  children: React.ReactChildren
+  'data-test'?: string
 }
 
-export function LabeledRadioGroup(props: LabeledRadioGroupProps): React.ReactNode {
+export function LabeledRadioGroup(
+  props: LabeledRadioGroupProps
+): React.ReactNode {
   const { label, value, options, onChange } = props
 
   return (

@@ -1,4 +1,3 @@
-
 import assert from 'assert'
 import * as React from 'react'
 import cx from 'classnames'
@@ -7,20 +6,20 @@ import styles from './Well.css'
 import type { LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 
-export type WellProps = {
+export interface WellProps {
   /** if included, overrides the default classname */
-  className?: ?string,
+  className?: string | null
   /** fill inline style */
-  fill?: ?string,
+  fill?: string | null
   /** Well Name (eg 'A1') */
-  wellName: string,
+  wellName: string
   /** well object from labware definition */
-  well: LabwareWell,
+  well: LabwareWell
   /** special class used for drag-to-select functionality. Should not be used for styling */
-  selectableWellClass?: string,
+  selectableWellClass?: string
   /** Optional callback, called with WellMouseEvent args onMouseOver */
-  onMouseEnterWell?: WellMouseEvent => unknown,
-  onMouseLeaveWell?: WellMouseEvent => unknown,
+  onMouseEnterWell?: (e: WellMouseEvent) => unknown
+  onMouseLeaveWell?: (e: WellMouseEvent) => unknown
 }
 
 function WellComponent(props: WellProps): React.ReactNode {
