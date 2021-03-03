@@ -122,7 +122,7 @@ describe('steps actions', () => {
     it('should register a "exitBatchEditMode" analytics event when given a meta flag', () => {
       const store = mockStore()
       // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
-      store.dispatch(deselectAllSteps("EXIT_BATCH_EDIT_MODE_BUTTON_PRESS"))
+      store.dispatch(deselectAllSteps('EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'))
       expect(store.getActions()).toContainEqual({
         type: 'ANALYTICS_EVENT',
         payload: {
