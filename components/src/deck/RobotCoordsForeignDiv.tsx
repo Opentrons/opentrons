@@ -6,7 +6,7 @@ export interface RobotCoordsForeignDivProps {
   height?: string | number
   x?: string | number
   y?: string | number
-  children?: React.Children
+  children?: React.ReactNode
   className?: string
   innerDivProps?: React.ElementProps<'div'>
   transformWithSVG?: boolean

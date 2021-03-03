@@ -1,4 +1,3 @@
-
 // titled modal page component
 import * as React from 'react'
 import cx from 'classnames'
@@ -7,13 +6,13 @@ import { Icon } from '../icons'
 
 import styles from './modals.css'
 
-export type SpinnerModalProps = {
+export interface SpinnerModalProps {
   /** Additional/Override style */
-  contentsClassName?: string,
+  contentsClassName?: string
   /** Optional message to display as italic text below spinner */
-  message?: string,
+  message?: string
   /** lightens overlay (alert modal over existing modal) */
-  alertOverlay?: boolean,
+  alertOverlay?: boolean
 }
 
 /**

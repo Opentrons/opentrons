@@ -15,7 +15,7 @@ export interface RadioGroupProps {
   options?: Array<{
     name: string
     value: string
-    children?: React.Children
+    children?: React.ReactNode
   }>
   /** Show radio buttons inline instead of stacked */
   inline?: boolean

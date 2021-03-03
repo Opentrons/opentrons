@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
@@ -22,18 +21,18 @@ import type {
   DeckSlotId,
 } from '@opentrons/shared-data'
 
-export type LabwareComponentProps = {
-  slot: DeckSlotId,
-  width: number,
-  height: number,
+export interface LabwareComponentProps {
+  slot: DeckSlotId
+  width: number
+  height: number
 }
 
 export type LabwareComponentType = React.ComponentType<LabwareComponentProps>
 
-export type DeckProps = {
-  className?: string,
-  LabwareComponent?: LabwareComponentType,
-  DragPreviewLayer?: any, // TODO: BC 2019-01-03 flow doesn't like portals
+export interface DeckProps {
+  className?: string
+  LabwareComponent?: LabwareComponentType
+  DragPreviewLayer?: React.ReactPortal
 }
 
 const VIEW_BOX_WIDTH = 427
@@ -45,20 +44,18 @@ const VIEW_BOX_HEIGHT = 390
  * @deprecated Use {@link RobotWorkSpace}
  */
 export class Deck extends React.Component<DeckProps> {
-  // TODO Ian 2018-02-22 No support in Flow for SVGElement yet: https://github.com/facebook/flow/issues/2332
-  // this `parentRef` should be HTMLElement | SVGElement
-  parentRef: ?any
+  parentRef: React.Ref<HTMLElement | SVGAElement> | null | undefined
 
   getXY: (
     rawX: number,
     rawY: number
-  ) => Partial<{ scaledX?: number, scaledY?: number }> = (rawX, rawY) => {
+  ) => Partial<{ scaledX?: number; scaledY?: number }> = (rawX, rawY) => {
     if (!this.parentRef) return {}
     const clientRect: {
-      width: number,
-      height: number,
-      left: number,
-      top: number,
+      width: number
+      height: number
+      left: number
+      top: number
     } = this.parentRef.getBoundingClientRect()
 
     const widthCoefficient =
@@ -73,7 +70,8 @@ export class Deck extends React.Component<DeckProps> {
     const scaledY = (rawY - clientRect.top) * heightCoefficient + scaledYOffset
     return { scaledX, scaledY }
   }
-  render() {
+
+  render(): JSX.Element {
     const { className, LabwareComponent, DragPreviewLayer } = this.props
 
     return (
@@ -96,11 +94,11 @@ export class Deck extends React.Component<DeckProps> {
 }
 
 function renderLabware(
-  LabwareComponent: ?LabwareComponentType
-): Array<React.Node> {
+  LabwareComponent: LabwareComponentType | null
+): React.ReactNode[] {
   return flatMap(
     SLOTNAME_MATRIX,
-    (columns: Array<DeckSlotId>, row: number): Array<React.Node> => {
+    (columns: DeckSlotId[], row: number): React.ReactNode[] => {
       return columns.map((slot: DeckSlotId, col: number) => {
         if (slot === TRASH_SLOTNAME) return null
 
@@ -115,7 +113,6 @@ function renderLabware(
         ].join(',')})`
 
         return (
-          // $FlowFixMe: (mc, 2019-04-18) don't know why flow doesn't like this, don't care because this is going away
           <g key={slot} transform={transform}>
             <EmptyDeckSlot slot={slot} />
             {LabwareComponent && <LabwareComponent {...props} />}
@@ -129,32 +126,30 @@ function renderLabware(
 // TODO: BC 2019-05-03 we should migrate to only using the DeckFromData
 // component; once Deck is removed, we should rename it Deck
 
-export type DeckFromDataProps = {
-  def: DeckDefinition,
-  layerBlocklist: Array<string>,
+export interface DeckFromDataProps {
+  def: DeckDefinition
+  layerBlocklist: string[]
 }
 
-export class DeckFromData extends React.PureComponent<DeckFromDataProps> {
-  render() {
-    const { def, layerBlocklist } = this.props
-    return (
-      <g>
-        {map(def.layers, (layer: DeckLayer, layerId: string) => {
-          if (layerBlocklist.includes(layerId)) return null
-          return (
-            <g id={layerId} key={layerId}>
-              <path
-                className={cx(
-                  styles.deck_outline,
-                  styles[def.otId],
-                  styles[snakeCase(layerId)]
-                )}
-                d={layer.map(l => l.footprint).join(' ')}
-              />
-            </g>
-          )
-        })}
-      </g>
-    )
-  }
+export function DeckFromData(props: DeckFromDataProps): JSX.Element {
+  const { def, layerBlocklist } = props
+  return (
+    <g>
+      {map(def.layers, (layer: DeckLayer, layerId: string) => {
+        if (layerBlocklist.includes(layerId)) return null
+        return (
+          <g id={layerId} key={layerId}>
+            <path
+              className={cx(
+                styles.deck_outline,
+                styles[def.otId],
+                styles[snakeCase(layerId)]
+              )}
+              d={layer.map((l: DeckLayer) => l.footprint).join(' ')}
+            />
+          </g>
+        )
+      })}
+    </g>
+  )
 }

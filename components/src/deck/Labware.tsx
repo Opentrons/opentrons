@@ -1,4 +1,3 @@
-
 // TODO(mc, 2020-02-19): still used but deprecated; remove when able
 import * as React from 'react'
 import map from 'lodash/map'
@@ -15,10 +14,10 @@ import { FallbackLabware } from './FallbackLabware'
 import { Tip } from './Tip'
 import { Well } from './Well'
 
-export type LabwareProps = {
+export interface LabwareProps {
   /** labware type, to get legacy definition from shared-data */
-  labwareType?: string,
-  definition?: ?LabwareDefinition1,
+  labwareType?: string
+  definition?: LabwareDefinition1 | null | undefined
 }
 
 /**
@@ -28,7 +27,7 @@ export type LabwareProps = {
  * @deprecated Use {@link LabwareRender instead}
  */
 export class Labware extends React.Component<LabwareProps> {
-  render() {
+  render(): JSX.Element {
     const { labwareType, definition } = this.props
 
     const labwareDefinition =

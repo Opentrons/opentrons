@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import type {
@@ -13,10 +12,10 @@ import singleGEN2Src from './pipetteGEN2Single.png'
 import multiGEN2Src from './pipetteGEN2Multi.png'
 import styles from './instrument.css'
 
-export type InstrumentDiagramProps = {
-  pipetteSpecs?: PipetteNameSpecs | PipetteModelSpecs | null,
-  className?: string,
-  mount: Mount,
+export interface InstrumentDiagramProps {
+  pipetteSpecs?: PipetteNameSpecs | PipetteModelSpecs | null
+  className?: string
+  mount: Mount
 }
 
 export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
@@ -29,8 +28,8 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
       imgSrc = channels === 1 ? singleGEN2Src : multiGEN2Src
       break
     }
-    default:
-    case 'GEN1': {
+    case 'GEN1':
+    default: {
       imgSrc = channels === 1 ? singleSrc : multiSrc
     }
   }

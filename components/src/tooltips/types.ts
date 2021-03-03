@@ -33,11 +33,11 @@ export interface UsePopperOptions {
 
 export type UsePopperResult = PopperInstance | null
 
-export type UseTooltipOptions = Partial<{
+export interface UseTooltipOptions {
   placement?: Placement
   strategy?: Strategy
   offset?: number
-}>
+}
 
 export interface UseTooltipResultTargetProps {
   ref: React.Ref<Element>

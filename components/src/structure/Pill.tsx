@@ -13,7 +13,7 @@ export interface PillProps {
   /** additional class name */
   className?: string
   /** contents of the pill */
-  children?: React.Children
+  children?: React.ReactNode
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: ?$ElementType<UseHoverTooltipResult, 0>
 }

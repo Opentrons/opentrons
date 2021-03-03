@@ -1,4 +1,3 @@
-
 // titled modal page component
 import * as React from 'react'
 
@@ -9,13 +8,13 @@ import styles from './modals.css'
 import type { TitleBarProps } from '../structure'
 
 // TODO(mc, 2018-06-20): s/titleBar/titleBarProps
-export type SpinnerModalPageProps = {
+export interface SpinnerModalPageProps {
   /** Props for title bar at top of modal page */
-  titleBar: TitleBarProps,
+  titleBar: TitleBarProps
   /** Additional/Override style */
-  contentsClassName?: string,
+  contentsClassName?: string
   /** Optional message to display as italic text below spinner */
-  message?: string,
+  message?: string
 }
 
 /**

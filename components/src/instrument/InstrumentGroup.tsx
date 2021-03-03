@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 
 import { InstrumentInfo } from './InstrumentInfo'
@@ -6,11 +5,11 @@ import styles from './instrument.css'
 
 import type { InstrumentInfoProps } from './InstrumentInfo'
 
-export type InstrumentGroupProps = Partial<{
-  showMountLabel: ?boolean,
-  left: ?InstrumentInfoProps,
-  right: ?InstrumentInfoProps,
-}>
+export interface InstrumentGroupProps {
+  showMountLabel?: boolean | null | undefined
+  left?: InstrumentInfoProps | null | undefined
+  right?: InstrumentInfoProps | null | undefined
+}
 
 const EMPTY_INSTRUMENT_PROPS = {
   description: 'None',

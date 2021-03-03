@@ -1,4 +1,3 @@
-
 // TitleBar component
 
 import * as React from 'react'
@@ -9,16 +8,16 @@ import styles from './structure.css'
 
 import type { ButtonProps } from '../buttons'
 
-export type TitleBarProps = {
-  title,
-  subtitle?,
-  back?: ButtonProps,
-  className?: string,
+export interface TitleBarProps {
+  title: string
+  subtitle?: string
+  back?: ButtonProps
+  className?: string
 
   // TODO(mc, 2018-04-13): deprecate these props
-  onBackClick?: () => unknown,
-  backClickDisabled?: boolean,
-  backButtonLabel?: string,
+  onBackClick?: () => unknown
+  backClickDisabled?: boolean
+  backButtonLabel?: string
 }
 
 export function TitleBar(props: TitleBarProps): JSX.Element {

@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import groupBy from 'lodash/groupBy'
 import { Flex } from '../primitives'
@@ -14,21 +13,21 @@ import styles from './PipetteSelect.css'
 import type { SelectOption } from '../forms'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 
-export type PipetteSelectProps = {
+export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */
-  pipetteName?: string | null,
+  pipetteName?: string | null
   /** react-select change handler */
-  onPipetteChange: (pipetteName: string | null) => unknown,
+  onPipetteChange: (pipetteName: string | null) => unknown
   /** list of pipette names to omit */
-  nameBlocklist?: Array<string>,
+  nameBlocklist?: string[]
   /** whether or not "None" shows up as the default option */
-  enableNoneOption?: boolean,
+  enableNoneOption?: boolean
   /** input tabIndex */
-  tabIndex?: number,
+  tabIndex?: number
   /** classes to apply to the top-level component */
-  className?: string,
+  className?: string
   /** custom id to be applied. likely to be used as a data test id for e2e testing */
-  id?: string,
+  id?: string
 }
 
 // TODO(mc, 2019-10-14): i18n
@@ -36,7 +35,7 @@ const NONE = 'None'
 const OPTION_NONE = { value: '', label: NONE }
 
 const PIPETTE_SORT = ['maxVolume', 'channels']
-const allPipetteNameSpecs: Array<PipetteNameSpecs> = getAllPipetteNames(
+const allPipetteNameSpecs: PipetteNameSpecs[] = getAllPipetteNames(
   ...PIPETTE_SORT
 )
   .map(getPipetteNameSpecs)
@@ -44,7 +43,10 @@ const allPipetteNameSpecs: Array<PipetteNameSpecs> = getAllPipetteNames(
 
 const specsByCategory = groupBy(allPipetteNameSpecs, 'displayCategory')
 
-const specToOption = ({ name, displayName }: PipetteNameSpecs) => ({
+const specToOption = ({
+  name,
+  displayName,
+}: PipetteNameSpecs): { value: string; label: string } => ({
   value: name,
   label: displayName,
 })
@@ -57,7 +59,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     id,
     nameBlocklist = [],
   } = props
-  const allowlist = ({ value }: SelectOption) => {
+  const allowlist = ({ value }: SelectOption): boolean => {
     return !nameBlocklist.some(n => n === value)
   }
   const gen2Options = specsByCategory[GEN2].map(specToOption).filter(allowlist)
@@ -105,7 +107,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
   )
 }
 
-const PipetteNameItem = (props: PipetteNameSpecs) => {
+const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
   const { channels, displayName, displayCategory } = props
   const volumeClassMaybeMatch = displayName && displayName.match(/P\d+/)
   const volumeClass = volumeClassMaybeMatch ? volumeClassMaybeMatch[0] : ''

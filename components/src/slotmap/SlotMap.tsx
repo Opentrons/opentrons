@@ -1,16 +1,15 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
 import styles from './styles.css'
 
-export type SlotMapProps = {
+export interface SlotMapProps {
   /** Slot(s) to highlight */
-  occupiedSlots: Array<string>,
+  occupiedSlots: string[]
   /** Optional collision warning */
-  collisionSlots?: Array<string>,
+  collisionSlots?: string[]
   /** Optional error styling */
-  isError?: boolean,
+  isError?: boolean
 }
 
 const SLOT_MAP_SLOTS = [

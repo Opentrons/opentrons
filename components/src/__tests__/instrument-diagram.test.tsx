@@ -3,10 +3,14 @@ import Renderer from 'react-test-renderer'
 
 import { InstrumentDiagram, InstrumentGroup } from '..'
 
+// TODO(bc, 2021-03-03): unit test this component and split out InstrumentDiagram from InstrumentGroup
+
 describe('InstrumentDiagram', () => {
   it('Single-channel renders correctly', () => {
     const tree = Renderer.create(
-      <InstrumentDiagram channels={1} displayCategory="GEN1" />
+      <InstrumentDiagram
+        pipetteSpecs={{ channels: 1, displayCategory: 'GEN1' }}
+      />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -14,7 +18,9 @@ describe('InstrumentDiagram', () => {
 
   it('Multi-channel renders correctly', () => {
     const tree = Renderer.create(
-      <InstrumentDiagram channels={8} displayCategory="GEN1" />
+      <InstrumentDiagram
+        pipetteSpecs={{ channels: 8, displayCategory: 'GEN1' }}
+      />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -22,7 +28,9 @@ describe('InstrumentDiagram', () => {
 
   it('Single-channel GEN2 renders correctly', () => {
     const tree = Renderer.create(
-      <InstrumentDiagram channels={1} displayCategory="GEN2" />
+      <InstrumentDiagram
+        pipetteSpecs={{ channels: 1, displayCategory: 'GEN2' }}
+      />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -30,7 +38,9 @@ describe('InstrumentDiagram', () => {
 
   it('Multi-channel GEN2 renders correctly', () => {
     const tree = Renderer.create(
-      <InstrumentDiagram channels={8} displayCategory="GEN2" />
+      <InstrumentDiagram
+        pipetteSpecs={{ channels: 8, displayCategory: 'GEN2' }}
+      />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

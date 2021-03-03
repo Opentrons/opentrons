@@ -7,10 +7,10 @@ import styles from './styles.css'
 
 import type { ButtonProps } from '../buttons'
 
-export type LabeledButtonProps = {
-  label: string,
-  buttonProps: ButtonProps,
-  children,
+export interface LabeledButtonProps {
+  label: string
+  buttonProps: ButtonProps
+  children: React.Children
 }
 
 export function LabeledButton(props: LabeledButtonProps): JSX.Element {

@@ -1,4 +1,3 @@
-
 /** A full-page icon in a muted color */
 import * as React from 'react'
 import cx from 'classnames'
@@ -8,11 +7,11 @@ import styles from './Splash.css'
 
 import type { IconName } from '../icons'
 
-export type SplashProps = {
+export interface SplashProps {
   /** optional alternative icon name. Defaults to 'logo'. */
-  iconName?: IconName,
+  iconName?: IconName
   /** additional className for Splash */
-  className?: string,
+  className?: string
 }
 
 export function Splash(props: SplashProps): JSX.Element {

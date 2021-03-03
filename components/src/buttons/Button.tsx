@@ -39,7 +39,7 @@ export interface ButtonProps {
   /** inverts the default color/background/border of default button style */
   inverted?: boolean
   /** contents of the button */
-  children?: React.Children
+  children?: React.ReactNode
   /** type of button (default "button") */
   type?:
     | typeof BUTTON_TYPE_SUBMIT

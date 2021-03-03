@@ -40,7 +40,7 @@ describe('TitledList', () => {
   })
 
   it('renders TitledList with onMouseEnter & onMouseLeave correctly', () => {
-    const noop = () => {}
+    const noop = (): void => {}
 
     const tree = Renderer.create(
       <TitledList title="foo" onMouseEnter={noop} onMouseLeave={noop} />
@@ -60,6 +60,7 @@ describe('TitledList', () => {
   it('renders expanded TitledList correctly', () => {
     const tree = Renderer.create(
       <TitledList
+        title="foo"
         onCollapseToggle={e => {}}
         description={<span>Description</span>}
       >
@@ -74,6 +75,7 @@ describe('TitledList', () => {
   it('renders collapsed TitledList correctly', () => {
     const tree = Renderer.create(
       <TitledList
+        title="foo"
         onCollapseToggle={e => {}}
         description={<span>Description</span>}
         collapsed

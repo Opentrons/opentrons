@@ -1,4 +1,3 @@
-
 // TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 import cx from 'classnames'
@@ -11,7 +10,9 @@ import {
 import { wellNameSplit } from '../utils'
 import styles from './LabwareLabels.css'
 
-export type LabwareLabelsProps = { labwareType: string }
+export interface LabwareLabelsProps {
+  labwareType: string
+}
 
 const ROW_OFFSET = -4
 const COLUMN_OFFSET = -4

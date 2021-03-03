@@ -1,4 +1,3 @@
-
 // TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 
@@ -8,7 +7,9 @@ import styles from './Module.css'
 
 import type { ModuleModel } from '@opentrons/shared-data'
 
-export type ModuleNameOverlayProps = { name: ModuleModel }
+export interface ModuleNameOverlayProps {
+  name: ModuleModel
+}
 
 // TODO (ka 2019-1-7): eventually add option to override with props
 const HEIGHT = 20

@@ -1,14 +1,13 @@
-
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
-export type UseHoverOptions = Partial<{
-  enterDelay?: number,
-  leaveDelay?: number,
-}>
+export interface UseHoverOptions {
+  enterDelay?: number
+  leaveDelay?: number
+}
 
-export type HoverHandlers = {
-  onPointerEnter: () => unknown,
-  onPointerLeave: () => unknown,
+export interface HoverHandlers {
+  onPointerEnter: () => unknown
+  onPointerLeave: () => unknown
 }
 
 export type UseHoverResult = [boolean, HoverHandlers]

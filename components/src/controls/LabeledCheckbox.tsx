@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 
@@ -6,13 +5,13 @@ import { CheckboxField } from '../forms'
 import { LabeledControl } from './LabeledControl'
 import styles from './styles.css'
 
-export type LabeledCheckboxProps = {
-  label: string,
-  name: string,
-  value: boolean,
-  className?: string,
-  children,
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
+export interface LabeledCheckboxProps {
+  label: string
+  name: string
+  value: boolean
+  className?: string
+  children: React.Children
+  onChange: (event: React.SyntheticEvent<HTMLInputElement>) => unknown
 }
 
 export function LabeledCheckbox(props: LabeledCheckboxProps): JSX.Element {

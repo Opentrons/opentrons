@@ -14,7 +14,7 @@ export interface HandleKeypressProps {
   /** optionally call event.preventDefault if keypress is handled */
   preventDefault?: ?boolean
   /** wrapped children */
-  children?: React.Children
+  children?: React.ReactNode
 }
 
 const matchHandler = e => h =>

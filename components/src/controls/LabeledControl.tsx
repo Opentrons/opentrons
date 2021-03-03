@@ -6,7 +6,7 @@ import styles from './styles.css'
 export interface LabeledControlProps {
   label: string
   control
-  children?: React.Children
+  children?: React.ReactNode
 }
 
 export function LabeledControl(props: LabeledControlProps): JSX.Element {

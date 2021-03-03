@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import { RemoveScroll } from 'react-remove-scroll'
@@ -6,24 +5,24 @@ import { RemoveScroll } from 'react-remove-scroll'
 import { Overlay } from './Overlay'
 import styles from './modals.css'
 
-export type ModalProps = {
+export interface ModalProps {
   /** handler to close the modal (attached to `Overlay` onClick) */
-  onCloseClick?: (event: React.SyntheticEvent) => unknown,
+  onCloseClick?: (event: React.SyntheticEvent) => unknown
   /** Optional styled heading **/
-  heading?: string,
+  heading?: string
   /** modal contents */
-  children,
+  children: React.ReactNode
   /** classes to apply */
-  className?: string,
+  className?: string
   /** classes to apply to the contents box */
-  contentsClassName?: string,
+  contentsClassName?: string
   /** lightens overlay (alert modal over existing modal) */
-  alertOverlay?: boolean,
+  alertOverlay?: boolean
   /** restricts scroll outside of Modal when open, true by default */
-  restrictOuterScroll?: boolean,
+  restrictOuterScroll?: boolean
   innerRef?:
     | { current: HTMLElement | null }
-    | ((current: HTMLElement | null) => unknown),
+    | ((current: HTMLElement | null) => unknown)
 }
 
 /**

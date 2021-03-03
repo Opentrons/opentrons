@@ -3,7 +3,7 @@ import * as React from 'react'
 export interface RobotCoordsTextProps {
   x: number
   y: number
-  children?: React.Children
+  children?: React.ReactNode
 }
 
 /** SVG text reflected to use take robot coordinates as props */

@@ -9,7 +9,7 @@ export interface CollapsibleItemProps {
   /** text of title */
   title: string
   /** children nodes */
-  children?: React.Children
+  children?: React.ReactNode
   /** additional classnames */
   className?: string
   /** caret click action; if defined, list is expandable and carat is visible */

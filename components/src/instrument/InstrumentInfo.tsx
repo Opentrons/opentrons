@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import type {
@@ -12,25 +11,25 @@ import { InstrumentDiagram } from './InstrumentDiagram'
 
 import styles from './instrument.css'
 
-export type InstrumentInfoProps = {
+export interface InstrumentInfoProps {
   /** 'left' or 'right' */
-  mount: Mount,
+  mount: Mount
   /** if true, show labels 'LEFT PIPETTE' / 'RIGHT PIPETTE' */
-  showMountLabel?: ?boolean,
+  showMountLabel?: boolean | null | undefined
   /** human-readable description, eg 'p300 Single-channel' */
-  description: string,
+  description: string
   /** paired tiprack model */
-  tiprackModel?: string,
+  tiprackModel?: string
   /** if disabled, pipette & its info are grayed out */
-  isDisabled: boolean,
+  isDisabled: boolean
   /** specs of mounted pipette */
-  pipetteSpecs?: ?PipetteModelSpecs | ?PipetteNameSpecs,
+  pipetteSpecs?: PipetteModelSpecs | PipetteNameSpecs | null | undefined
   /** classes to apply */
-  className?: string,
+  className?: string
   /** classes to apply to the info group child */
-  infoClassName?: string,
+  infoClassName?: string
   /** children to display under the info */
-  children?: React.Children,
+  children?: React.ReactNode
 }
 
 export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {

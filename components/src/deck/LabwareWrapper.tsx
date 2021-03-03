@@ -11,7 +11,7 @@ export interface LabwareWrapperProps {
   height?: number
   width?: number
   highlighted?: boolean
-  children?: React.Children
+  children?: React.ReactNode
 }
 
 /**

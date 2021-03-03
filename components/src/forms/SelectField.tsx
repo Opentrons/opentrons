@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import cx from 'classnames'
 import find from 'lodash/find'
@@ -8,33 +7,33 @@ import styles from './SelectField.css'
 
 import type { SelectProps } from './Select'
 
-export type SelectFieldProps = {
+export interface SelectFieldProps {
   /** optional HTML id for container */
-  id?: $PropertyType<SelectProps, 'id'>,
+  id?: SelectProps['id']
   /** field name */
-  name: $NonMaybeType<$PropertyType<SelectProps, 'name'>>,
+  name: NonNullable<SelectProps['name']>
   /** react-Select option, usually label, value */
-  options: $PropertyType<SelectProps, 'options'>,
+  options: SelectProps['options']
   /** currently selected value */
-  value: string | null | void,
+  value: string | null | undefined
   /** disable the select */
-  disabled?: $PropertyType<SelectProps, 'isDisabled'>,
+  disabled?: SelectProps['isDisabled']
   /** optional placeholder  */
-  placeholder?: $PropertyType<SelectProps, 'placeholder'>,
+  placeholder?: SelectProps['placeholder']
   /** menuPosition prop to send to react-select */
-  menuPosition?: $PropertyType<SelectProps, 'menuPosition'>,
+  menuPosition?: SelectProps['menuPosition']
   /** render function for the option label passed to react-select */
-  formatOptionLabel?: $PropertyType<SelectProps, 'formatOptionLabel'>,
+  formatOptionLabel?: SelectProps['formatOptionLabel']
   /** optional className */
-  className?: string,
+  className?: string
   /** optional caption. hidden when `error` is given */
-  caption?,
+  caption?: string
   /** if included, use error style and display error instead of caption */
-  error?: ?string,
+  error?: string | null | undefined
   /** change handler called with (name, value) */
-  onValueChange?: (name: string, value: string) => unknown,
+  onValueChange?: (name: string, value: string) => unknown
   /** blur handler called with (name) */
-  onLoseFocus?: (name: string) => unknown,
+  onLoseFocus?: (name: string) => unknown
 }
 
 export function SelectField(props: SelectFieldProps): JSX.Element {

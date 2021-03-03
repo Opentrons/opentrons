@@ -11,7 +11,7 @@ export interface CardProps {
   /** Title for card, all cards should receive a title. */
   title?
   /** Card contents */
-  children?: React.Children
+  children?: React.ReactNode
   /** If card can not be used, gray it out and remove pointer events */
   disabled?: boolean
   /** Additional class names */

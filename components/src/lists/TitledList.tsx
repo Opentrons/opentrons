@@ -17,7 +17,7 @@ export interface TitledListProps {
   'data-test'?: string
   // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
   /** children must all be `<li>` */
-  children?: React.Children
+  children?: React.ReactNode
   /** additional classnames */
   className?: string
   /** component with descriptive text about the list */

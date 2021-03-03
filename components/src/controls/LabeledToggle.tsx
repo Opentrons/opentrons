@@ -8,7 +8,7 @@ export interface LabeledToggleProps {
   label: string
   toggledOn: boolean
   disabled?: boolean
-  children?: React.Children
+  children?: React.ReactNode
   onClick: () => unknown
   /** optional data test id for the container */
   'data-test'?: string

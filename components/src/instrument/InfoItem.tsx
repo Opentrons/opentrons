@@ -1,12 +1,11 @@
-
 import * as React from 'react'
 
 import styles from './instrument.css'
 
-export type InfoItemProps = {
-  title: string,
-  value: string,
-  className?: string,
+export interface InfoItemProps {
+  title: string
+  value: string
+  className?: string
 }
 
 /**

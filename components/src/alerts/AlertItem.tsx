@@ -12,7 +12,7 @@ export interface AlertItemProps {
   /** title/main message of colored alert bar */
   title: string | JSX.Element
   /** Alert message body contents */
-  children?: React.Children
+  children?: React.ReactNode
   /** Additional class name */
   className?: string
   /** optional handler to show close button/clear alert  */

@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
@@ -99,9 +98,9 @@ describe('SelectField', () => {
       />
     ).find(Select)
 
-    selectWrapper.invoke('onChange')(options[1])
+    selectWrapper.simulate('onChange', options[1])
     expect(handleValueChange).toHaveBeenCalledWith('field', 'bar')
-    selectWrapper.invoke('onBlur')()
+    selectWrapper.simulate('onBlur')
     expect(handleLoseFocus).toHaveBeenCalledWith('field')
   })
 })

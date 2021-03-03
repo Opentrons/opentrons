@@ -27,7 +27,7 @@ export interface IconProps {
   /** inline style passed into the icon svg */
   style?: Record<string, string | number>
   /** optional children */
-  children?: React.Children
+  children?: React.ReactNode
 }
 
 const spinAnimation = keyframes`

@@ -1,4 +1,3 @@
-
 // page tabs bar
 
 import * as React from 'react'
@@ -7,15 +6,15 @@ import { Link } from 'react-router-dom'
 
 import styles from './structure.css'
 
-type TabProps = {
-  title: string,
-  href: string,
-  isActive: boolean,
-  isDisabled: boolean,
+interface TabProps {
+  title: string
+  href: string
+  isActive: boolean
+  isDisabled: boolean
 }
 
-export type PageTabProps = {
-  pages: Array<TabProps>,
+export interface PageTabProps {
+  pages: TabProps[]
 }
 
 export function PageTabs(props: PageTabProps): JSX.Element {

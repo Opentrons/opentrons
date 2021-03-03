@@ -13,12 +13,13 @@ jest.mock('../useTooltip', () => ({
   useTooltip: jest.fn(jest.requireActual('../useTooltip').useTooltip),
 }))
 
-const useTooltip: JestMockFn<
-  [Types.UseTooltipOptions],
-  Types.UseTooltipResult
-> = UseTooltip.useTooltip
+const useTooltip = UseTooltip.useTooltip as jest.MockedFunction<
+  typeof UseTooltip.useTooltip
+>
 
-const TestUseHoverTooltip = (props: Types.UseHoverTooltipOptions) => {
+const TestUseHoverTooltip = (
+  props: Types.UseHoverTooltipOptions
+): JSX.Element => {
   const [targetProps, tooltipProps] = useHoverTooltip(props)
 
   return (
@@ -31,7 +32,9 @@ const TestUseHoverTooltip = (props: Types.UseHoverTooltipOptions) => {
   )
 }
 
-const render = (props: Types.UseHoverTooltipOptions = {}) => {
+const render = (
+  props: Types.UseHoverTooltipOptions = {}
+): ReturnType<typeof mount> => {
   return mount(<TestUseHoverTooltip {...props} />)
 }
 
@@ -65,7 +68,7 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.invoke('onPointerEnter')({})
+      target.simulate('onPointerEnter')
     })
     wrapper.update()
 
@@ -89,9 +92,9 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.invoke('onPointerEnter')({})
+      target.simulate('onPointerEnter')
       jest.advanceTimersByTime(300)
-      target.invoke('onPointerLeave')({})
+      target.simulate('onPointerLeave')
     })
     wrapper.update()
 
@@ -108,7 +111,7 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.invoke('onPointerEnter')({})
+      target.simulate('onPointerEnter')
       jest.advanceTimersByTime(300)
     })
     wrapper.update()
@@ -133,8 +136,8 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.invoke('onPointerEnter')({})
-      target.invoke('onPointerLeave')({})
+      target.simulate('onPointerEnter')
+      target.simulate('onPointerLeave')
     })
     wrapper.update()
 

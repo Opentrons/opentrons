@@ -13,7 +13,7 @@ export interface SidePanelGroupProps {
   /** optional icon left of the title */
   iconName?: IconName
   /** children, most likely one or more TitledList */
-  children?: React.Children
+  children?: React.ReactNode
   /** additional classnames */
   className?: string
   /** disables the whole SidePanelGroup if true */

@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { NavLink } from 'react-router-dom'
 import classnames from 'classnames'
@@ -9,25 +8,25 @@ import { NotificationIcon } from '../icons'
 
 import type { IconName } from '../icons'
 
-export type NavTabProps = {
+export interface NavTabProps {
   /** optional click event for nav button */
-  onClick?: (event: React.SyntheticEvent) => void,
+  onClick?: React.MouseEventHandler
   /** optional url for nav button route */
-  url?: string,
+  url?: string
   /** position a single button on the bottom of the page */
-  isBottom?: boolean,
+  isBottom?: boolean
   /** classes to apply */
-  className?: string,
+  className?: string
   /** disabled attribute (setting disabled removes onClick) */
-  disabled?: boolean,
+  disabled?: boolean
   /** optional title to display below the icon */
-  title?: string,
+  title?: string
   /** Icon name for button's icon */
-  iconName: IconName,
+  iconName: IconName
   /** Display a notification dot */
-  notification?: boolean,
+  notification?: boolean
   /** selected styling (can also use react-router & `activeClassName`) */
-  selected?: boolean,
+  selected?: boolean
 }
 
 export function NavTab(props: NavTabProps): JSX.Element {
