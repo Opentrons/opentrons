@@ -8,7 +8,6 @@ export { TextField } from './TextField'
 
 /* Specialized Fields */
 
-export { ConditionalOnField } from './ConditionalOnField'
 export { WellSelectionField } from './WellSelectionField'
 export { WellOrderField } from './WellOrderField'
 export { TipPositionField } from './TipPositionField'

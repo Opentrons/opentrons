@@ -17,6 +17,8 @@ export interface NavTabProps {
   isBottom?: boolean
   /** classes to apply */
   className?: string
+  /** id */
+  id?: string
   /** disabled attribute (setting disabled removes onClick) */
   disabled?: boolean
   /** optional title to display below the icon */
@@ -38,6 +40,7 @@ export function NavTab(props: NavTabProps): JSX.Element {
   })
 
   let buttonProps = {
+    id: props.id,
     className: className,
     disabled: props.disabled,
     onClick: props.onClick,

@@ -2,14 +2,14 @@
 
 import * as React from 'react'
 import { makeWidget } from '@typeform/embed'
-import { isProduction } from '../../../networking/opentronsWebApi'
+import { getIsProduction } from '../../../networking/opentronsWebApi'
 import styles from '../modal.css'
 
 // TODO: BC: 2019-03-05 this should be an env var fallback to staging after the initial prod deploy
 
 const STAGING_TYPEFORM_URL = 'https://opentrons-ux.typeform.com/to/Td95E9'
 const PROD_TYPEFORM_URL = 'https://opentrons-ux.typeform.com/to/kr4Bdf'
-const SIGNUP_TYPEFORM_URL = isProduction
+const SIGNUP_TYPEFORM_URL = getIsProduction()
   ? PROD_TYPEFORM_URL
   : STAGING_TYPEFORM_URL
 

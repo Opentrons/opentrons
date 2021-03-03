@@ -6,8 +6,8 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import { actions as stepActions } from '../../ui/steps'
 import { getCountPerStepType } from '../../ui/steps/selectors'
 import {
-  CLOSE_STEP_FORM_WITH_CHANGES,
   ConfirmDeleteModal,
+  CLOSE_BATCH_EDIT_FORM,
 } from '../modals/ConfirmDeleteModal'
 import { StepSelectionBannerComponent } from './StepSelectionBannerComponent'
 
@@ -31,7 +31,7 @@ export const StepSelectionBanner = (): React.Node => {
     <>
       {showConfirmation && (
         <ConfirmDeleteModal
-          modalType={CLOSE_STEP_FORM_WITH_CHANGES}
+          modalType={CLOSE_BATCH_EDIT_FORM}
           onContinueClick={confirm}
           onCancelClick={cancel}
         />

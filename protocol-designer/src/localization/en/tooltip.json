@@ -78,5 +78,10 @@
     "add_step_to_cycle": "Add a step to the cycle",
     "delete_step": "Delete profile step",
     "delete_cycle": "Delete cycle and steps"
-  }
+  },
+  "save_batch_edit": {
+    "enabled": "Apply changes to all selected steps",
+    "disabled": "No new changes to save"
+  },
+  "cancel_batch_edit": "Reset unsaved changes to the form"
 }

@@ -29,7 +29,7 @@ if TYPE_CHECKING:
         RegisterModules, AttachedInstrument, AttachedInstruments,
         InstrumentHardwareConfigs)
     from opentrons.drivers.rpi_drivers.dev_types\
-        import GPIODriverLike # noqa(F501)
+        import GPIODriverLike  # noqa: F501
 
 MODULE_LOG = logging.getLogger(__name__)
 

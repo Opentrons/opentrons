@@ -35,9 +35,6 @@ export const DelayFields = (props: DelayFieldProps): React.Node => {
       {...propsForFields[checkboxFieldName]}
       label={i18n.t('form.step_edit_form.field.delay.label')}
       className={styles.small_field}
-      tooltipContent={i18n.t(
-        `tooltip.step_fields.defaults.${checkboxFieldName}`
-      )}
     >
       <TextField
         {...propsForFields[secondsFieldName]}

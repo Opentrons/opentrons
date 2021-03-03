@@ -29,7 +29,7 @@ try:
 except (FileNotFoundError, OSError):
     __version__ = 'unknown'
 
-from opentrons import config  # noqa(E402)
+from opentrons import config  # noqa: E402
 
 LEGACY_MODULES = [
     'robot', 'reset', 'instruments', 'containers', 'labware', 'modules']

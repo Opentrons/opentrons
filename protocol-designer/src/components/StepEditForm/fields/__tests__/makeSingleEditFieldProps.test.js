@@ -5,9 +5,14 @@ import {
   getDefaultsForStepType,
 } from '../../../../steplist/formLevel'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
-
+import * as stepEditFormUtils from '../../utils'
 jest.mock('../../../../steplist/formLevel')
 jest.mock('../../../../steplist/fieldLevel')
+
+const getFieldDefaultTooltipSpy = jest.spyOn(
+  stepEditFormUtils,
+  'getFieldDefaultTooltip'
+)
 
 const getDisabledFieldsMock: JestMockFn<any, Set<string>> = getDisabledFields
 const getDefaultsForStepTypeMock: JestMockFn<
@@ -19,8 +24,12 @@ const getFieldErrorsMock: JestMockFn<
   Array<string>
 > = getFieldErrors
 
+beforeEach(() => {
+  getFieldDefaultTooltipSpy.mockImplementation(name => `tooltip for ${name}`)
+})
+
 afterEach(() => {
-  jest.resetAllMocks()
+  jest.restoreAllMocks()
 })
 
 describe('makeSingleEditFieldProps', () => {
@@ -93,6 +102,7 @@ describe('makeSingleEditFieldProps', () => {
         onFieldFocus: expect.anything(),
         updateValue: expect.anything(),
         value: '123',
+        tooltipContent: 'tooltip for some_field',
       },
       disabled_field: {
         disabled: true,
@@ -102,6 +112,7 @@ describe('makeSingleEditFieldProps', () => {
         onFieldFocus: expect.anything(),
         updateValue: expect.anything(),
         value: '404',
+        tooltipContent: 'tooltip for disabled_field',
       },
       pristine_error_field: {
         disabled: false,
@@ -111,6 +122,7 @@ describe('makeSingleEditFieldProps', () => {
         onFieldFocus: expect.anything(),
         updateValue: expect.anything(),
         value: '',
+        tooltipContent: 'tooltip for pristine_error_field',
       },
       dirty_error_field: {
         disabled: false,
@@ -120,6 +132,7 @@ describe('makeSingleEditFieldProps', () => {
         onFieldFocus: expect.anything(),
         updateValue: expect.anything(),
         value: '',
+        tooltipContent: 'tooltip for dirty_error_field',
       },
       focused_error_field: {
         disabled: false,
@@ -129,6 +142,7 @@ describe('makeSingleEditFieldProps', () => {
         onFieldFocus: expect.anything(),
         updateValue: expect.anything(),
         value: '',
+        tooltipContent: 'tooltip for focused_error_field',
       },
     })
 

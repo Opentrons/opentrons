@@ -28,7 +28,7 @@ setup:
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	$(python) -m otupdate --debug --port $(port)
+	$(python) -m otupdate --log-level debug --port $(port)
 
 .PHONY: clean
 clean:

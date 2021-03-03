@@ -142,9 +142,6 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 {...propsForFields['mix_touchTip_checkbox']}
                 className={styles.small_field}
                 label={i18n.t('form.step_edit_form.field.touchTip.label')}
-                tooltipContent={i18n.t(
-                  'tooltip.step_fields.defaults.mix_touchTip_checkbox'
-                )}
               >
                 <TipPositionField
                   {...propsForFields['mix_touchTip_mmFromBottom']}
@@ -156,9 +153,6 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 {...propsForFields['blowout_checkbox']}
                 className={styles.small_field}
                 label={i18n.t('form.step_edit_form.field.blowout.label')}
-                tooltipContent={i18n.t(
-                  'tooltip.step_fields.defaults.blowout_checkbox'
-                )}
               >
                 <BlowoutLocationField
                   {...propsForFields['blowout_location']}
@@ -178,7 +172,13 @@ export const MixForm = (props: StepFormProps): React.Node => {
       </div>
       <div className={styles.section_wrapper}>
         <div className={styles.form_row}>
-          <ChangeTipField name="changeTip" />
+          <ChangeTipField
+            {...propsForFields['changeTip']}
+            aspirateWells={formData.aspirate_wells}
+            dispenseWells={formData.dispense_wells}
+            path={formData.path}
+            stepType={formData.stepType}
+          />
         </div>
       </div>
     </div>

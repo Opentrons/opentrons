@@ -13,15 +13,16 @@ type RadioGroupFieldProps = {|
 
 export const RadioGroupField = (props: RadioGroupFieldProps): React.Node => {
   const {
-    name,
-    value,
-    errorToShow,
-    updateValue,
-    onFieldFocus,
-    onFieldBlur,
     className,
-    isIndeterminate, // TODO(IL, 2021-02-05): if we need indeterminate RadioGroupField, we'll want to pass this down into RadioGroup
     disabled, // NOTE: not used
+    errorToShow,
+    isIndeterminate, // TODO(IL, 2021-02-05): if we need indeterminate RadioGroupField, we'll want to pass this down into RadioGroup
+    name,
+    onFieldBlur,
+    onFieldFocus,
+    tooltipContent,
+    updateValue,
+    value,
     ...radioGroupProps
   } = props
   return (

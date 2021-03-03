@@ -16,6 +16,7 @@ import {
   getSelectedStepTitleInfo,
   getActiveItem,
   getMultiSelectLastSelected,
+  _getSavedMultiSelectFieldValues,
   getMultiSelectFieldValues,
   getMultiSelectDisabledFields,
   getCountPerStepType,
@@ -326,7 +327,7 @@ describe('getMultiSelectLastSelected', () => {
   })
 })
 
-describe('getMultiSelectFieldValues', () => {
+describe('_getSavedMultiSelectFieldValues', () => {
   let mockSavedStepForms
   let mockmultiSelectItemIds
 
@@ -353,7 +354,7 @@ describe('getMultiSelectFieldValues', () => {
       },
     }
     expect(
-      getMultiSelectFieldValues.resultFunc(
+      _getSavedMultiSelectFieldValues.resultFunc(
         savedStepForms,
         mockmultiSelectItemIds
       )
@@ -362,7 +363,7 @@ describe('getMultiSelectFieldValues', () => {
   describe('when fields are NOT indeterminate', () => {
     it('should return the fields with the indeterminate boolean', () => {
       expect(
-        getMultiSelectFieldValues.resultFunc(
+        _getSavedMultiSelectFieldValues.resultFunc(
           mockSavedStepForms,
           mockmultiSelectItemIds
         )
@@ -537,7 +538,7 @@ describe('getMultiSelectFieldValues', () => {
     })
     it('should return the fields with the indeterminate boolean', () => {
       expect(
-        getMultiSelectFieldValues.resultFunc(
+        _getSavedMultiSelectFieldValues.resultFunc(
           mockSavedStepFormsIndeterminate,
           mockmultiSelectItemIds
         )
@@ -639,6 +640,22 @@ describe('getMultiSelectFieldValues', () => {
         },
       })
     })
+  })
+})
+
+describe('getMultiSelectFieldValues', () => {
+  it('should pass through saved changes when there are no saved', () => {
+    const savedValues = { a: { value: 'blah', isIndeterminate: true } }
+    const changes = {}
+    const result = getMultiSelectFieldValues.resultFunc(savedValues, changes)
+    expect(result).toEqual(savedValues)
+  })
+
+  it('should apply unsaved changes to override saved changes', () => {
+    const savedValues = { a: { value: 'blah', isIndeterminate: true } }
+    const changes = { a: '123' }
+    const result = getMultiSelectFieldValues.resultFunc(savedValues, changes)
+    expect(result).toEqual({ a: { value: '123', isIndeterminate: false } })
   })
 })
 

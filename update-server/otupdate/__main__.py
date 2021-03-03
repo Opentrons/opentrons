@@ -1,3 +1,3 @@
-from .balena import __main__ as balena_main
+from .buildroot.__main__ import main
 
-balena_main.main()
+main()

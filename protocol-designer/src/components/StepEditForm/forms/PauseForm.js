@@ -11,12 +11,7 @@ import {
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
 } from '../../../constants'
-import {
-  ConditionalOnField,
-  TextField,
-  RadioGroupField,
-  StepFormDropdown,
-} from '../fields'
+import { TextField, RadioGroupField, StepFormDropdown } from '../fields'
 import styles from '../StepEditForm.css'
 
 import type { StepFormProps } from '../types'
@@ -37,6 +32,7 @@ export const PauseForm = (props: StepFormProps): React.Node => {
   )
 
   const { propsForFields } = props
+  const { pauseAction } = props.formData
 
   return (
     <div className={styles.form_wrapper}>
@@ -74,10 +70,7 @@ export const PauseForm = (props: StepFormProps): React.Node => {
               ]}
             />
           </div>
-          <ConditionalOnField
-            name={'pauseAction'}
-            condition={val => val === PAUSE_UNTIL_TIME}
-          >
+          {pauseAction === PAUSE_UNTIL_TIME && (
             <div className={styles.form_row}>
               <TextField
                 {...propsForFields['pauseHour']}
@@ -95,7 +88,7 @@ export const PauseForm = (props: StepFormProps): React.Node => {
                 units={i18n.t('application.units.seconds')}
               />
             </div>
-          </ConditionalOnField>
+          )}
 
           <HoverTooltip
             placement="bottom"
@@ -121,10 +114,7 @@ export const PauseForm = (props: StepFormProps): React.Node => {
                     ]}
                   />
                 </div>
-                <ConditionalOnField
-                  name={'pauseAction'}
-                  condition={val => val === PAUSE_UNTIL_TEMP}
-                >
+                {pauseAction === PAUSE_UNTIL_TEMP && (
                   <div className={styles.form_row}>
                     <FormGroup
                       label={i18n.t(
@@ -148,7 +138,7 @@ export const PauseForm = (props: StepFormProps): React.Node => {
                       />
                     </FormGroup>
                   </div>
-                </ConditionalOnField>
+                )}
               </div>
             )}
           </HoverTooltip>
