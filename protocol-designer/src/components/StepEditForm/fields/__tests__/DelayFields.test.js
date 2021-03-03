@@ -67,7 +67,6 @@ describe('DelayFields', () => {
         checkboxFieldName: 'aspirate_delay_checkbox',
         secondsFieldName: 'aspirate_delay_seconds',
         labwareId: 'labware123asp',
-        tipPositionFieldName: 'aspirate_delay_mmFromBottom',
         propsForFields: {
           aspirate_delay_checkbox: {
             onFieldFocus: (jest.fn(): any),
@@ -142,6 +141,7 @@ describe('DelayFields', () => {
       expect(tipPosField.is(TipPositionField)).toBe(true)
       expect(tipPosField.prop('name')).toBe(props.tipPositionFieldName)
     })
+
     it('should render an aspirate delay field WITHOUT a tip position field', () => {
       const wrapper = render(props)
 
@@ -166,7 +166,6 @@ describe('DelayFields', () => {
       props = {
         checkboxFieldName: 'dispense_delay_checkbox',
         secondsFieldName: 'dispense_delay_seconds',
-        tipPositionFieldName: 'aspirate_delay_mmFromBottom',
         labwareId: 'labware123disp',
         propsForFields: {
           dispense_delay_checkbox: {

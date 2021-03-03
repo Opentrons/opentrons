@@ -502,6 +502,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: 'trashId',
           isIndeterminate: false,
         },
+        path: {
+          isIndeterminate: false,
+          value: 'single',
+        },
       })
     })
   })
@@ -519,6 +523,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           aspirate_wellOrder_first: 'b2t',
           aspirate_wellOrder_second: 'r2l',
           preWetTip: true,
+          path: 'multiAspirate',
           aspirate_mix_checkbox: false,
           // not going to change mix times or mix volumes, so they should NOT be indeterminate
           aspirate_delay_checkbox: false,
@@ -566,6 +571,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: true,
         },
         aspirate_wellOrder_second: {
+          isIndeterminate: true,
+        },
+        path: {
           isIndeterminate: true,
         },
         preWetTip: {

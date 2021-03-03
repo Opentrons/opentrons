@@ -1,5 +1,4 @@
 // @flow
-import assert from 'assert'
 import * as React from 'react'
 import difference from 'lodash/difference'
 import isEqual from 'lodash/isEqual'
