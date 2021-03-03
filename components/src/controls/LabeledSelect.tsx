@@ -8,7 +8,7 @@ import type { DropdownFieldProps } from '../forms'
 
 export interface LabeledSelectProps extends DropdownFieldProps {
   label: string
-  children: React.ReactChildren
+  children: React.ReactNode
   /** optional data test id for the container */
   'data-test'?: string
 }

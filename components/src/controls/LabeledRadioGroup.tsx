@@ -7,7 +7,7 @@ import type { RadioGroupProps } from '../forms'
 
 export interface LabeledRadioGroupProps extends RadioGroupProps {
   label: string
-  children: React.ReactChildren
+  children: React.ReactNode
   'data-test'?: string
 }
 

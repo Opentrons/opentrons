@@ -52,7 +52,7 @@ export interface BaseModalProps extends StyleProps {
   /** Optional sticky footer */
   footer?: JSX.Element
   /** Modal content */
-  children?: React.ReactChildren
+  children?: React.ReactNode
 }
 
 /**

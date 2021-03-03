@@ -13,10 +13,10 @@ const deckDefinitionsContext = require.context(
   'sync' // load every definition into one synchronous chunk
 )
 
-export function getDeckDefinitions(): { [string]: DeckDefinition } {
+export function getDeckDefinitions(): Record<string, DeckDefinition> {
   const deckDefinitions = deckDefinitionsContext
     .keys()
-    .reduce((acc, filename) => {
+    .reduce((acc: Record<string, DeckDefinition>, filename: string) => {
       const def = deckDefinitionsContext(filename)
       return { ...acc, [def.otId]: def }
     }, {})

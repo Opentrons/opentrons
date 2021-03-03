@@ -4,7 +4,7 @@ import styles from './SidePanel.css'
 
 export interface SidePanelProps {
   title: string
-  children: React.ReactChildren
+  children: React.ReactNode
 }
 
 export function SidePanel(props: SidePanelProps): JSX.Element {
