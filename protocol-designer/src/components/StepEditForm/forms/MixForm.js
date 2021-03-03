@@ -122,8 +122,14 @@ export const MixForm = (props: StepFormProps): React.Node => {
             <DelayFields
               checkboxFieldName={'aspirate_delay_checkbox'}
               secondsFieldName={'aspirate_delay_seconds'}
+              labwareId={
+                formData[
+                  getLabwareFieldForPositioningField(
+                    'aspirate_delay_mmFromBottom'
+                  )
+                ]
+              }
               propsForFields={propsForFields}
-              formData={formData}
             />
           </div>
 
@@ -141,7 +147,13 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 checkboxFieldName={'dispense_delay_checkbox'}
                 secondsFieldName={'dispense_delay_seconds'}
                 propsForFields={propsForFields}
-                formData={formData}
+                labwareId={
+                  formData[
+                    getLabwareFieldForPositioningField(
+                      'aspirate_delay_mmFromBottom'
+                    )
+                  ]
+                }
               />
               <CheckboxRowField
                 {...propsForFields['mix_touchTip_checkbox']}

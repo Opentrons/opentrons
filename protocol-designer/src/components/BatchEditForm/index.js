@@ -3,7 +3,6 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Box,
-  Flex,
   PrimaryButton,
   Tooltip,
   useHoverTooltip,
@@ -11,7 +10,7 @@ import {
 import { i18n } from '../../localization'
 import {
   CheckboxRowField,
-  // DelayFields,
+  DelayFields,
   TipPositionField,
   TextField,
 } from '../StepEditForm/fields'
@@ -76,15 +75,13 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
         timesFieldName={addFieldNamePrefix('mix_times')}
         propsForFields={propsForFields}
       />
-      {/* TODO(IL, 2021-03-03): DelayFields uses TipPositionField, which needs FormData 
-        and we don't actually have that. Need to refactor TipPositionField and its consumers. 
-        BUT according to the design, we want to IGNORE the tip position for Delay + Touch Tip! */}
-      {/* <DelayFields
-          checkboxFieldName={addFieldNamePrefix("delay_checkbox")}
-          secondsFieldName={addFieldNamePrefix("delay_seconds")}
-          propsForFields={propsForFields}
-        /> */}
-
+      <DelayFields
+        checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
+        secondsFieldName={addFieldNamePrefix('delay_seconds')}
+        tipPositionFieldName={addFieldNamePrefix('delay_mmFromBottom')}
+        labwareId={commonLabwareId}
+        propsForFields={propsForFields}
+      />
       <CheckboxRowField
         {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
         label={i18n.t('form.step_edit_form.field.touchTip.label')}

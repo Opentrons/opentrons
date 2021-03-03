@@ -66,12 +66,8 @@ describe('DelayFields', () => {
       props = {
         checkboxFieldName: 'aspirate_delay_checkbox',
         secondsFieldName: 'aspirate_delay_seconds',
-        formData: ({
-          stepType: 'moveLiquid',
-          aspirate_labware: 'labware123asp',
-          dispense_labware: 'labware123disp',
-          labware: 'labware123',
-        }: any),
+        labwareId: 'labware123asp',
+        tipPositionFieldName: 'aspirate_delay_mmFromBottom',
         propsForFields: {
           aspirate_delay_checkbox: {
             onFieldFocus: (jest.fn(): any),
@@ -170,7 +166,8 @@ describe('DelayFields', () => {
       props = {
         checkboxFieldName: 'dispense_delay_checkbox',
         secondsFieldName: 'dispense_delay_seconds',
-        formData: ({}: any),
+        tipPositionFieldName: 'aspirate_delay_mmFromBottom',
+        labwareId: 'labware123disp',
         propsForFields: {
           dispense_delay_checkbox: {
             onFieldFocus: (jest.fn(): any),

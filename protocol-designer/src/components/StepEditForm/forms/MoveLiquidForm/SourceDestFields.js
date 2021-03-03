@@ -41,7 +41,13 @@ export const SourceDestFields = (props: Props): React.Node => {
       secondsFieldName={addFieldNamePrefix('delay_seconds')}
       tipPositionFieldName={addFieldNamePrefix('delay_mmFromBottom')}
       propsForFields={propsForFields}
-      formData={formData}
+      labwareId={
+        formData[
+          getLabwareFieldForPositioningField(
+            addFieldNamePrefix('delay_mmFromBottom')
+          )
+        ]
+      }
     />
   )
 
