@@ -233,6 +233,7 @@ export type MultiselectFieldValues = {
 }
 
 const BATCH_EDIT_TRANSFER_FORM_FIELDS: Array<MultiSelectFieldName> = [
+  'aspirate_labware',
   'aspirate_flowRate',
   'aspirate_mmFromBottom',
   'aspirate_wellOrder_first',
@@ -249,6 +250,7 @@ const BATCH_EDIT_TRANSFER_FORM_FIELDS: Array<MultiSelectFieldName> = [
   'aspirate_touchTip_checkbox',
   'aspirate_touchTip_mmFromBottom',
 
+  'dispense_labware',
   'dispense_flowRate',
   'dispense_mmFromBottom',
   'dispense_wellOrder_first',

@@ -221,3 +221,22 @@ export function getTooltipForField(
 
 export const getFieldDefaultTooltip = (name: string): string =>
   i18n.t([`tooltip.step_fields.defaults.${name}`, ''])
+
+// TODO(IL, 2021-03-03): keys for fieldMap are TipOffsetFields, but since
+// utils like addFieldNamePrefix return StepFieldName/string instead
+// of strict TipOffsetFields
+export function getLabwareFieldForPositioningField(
+  name: StepFieldName
+): StepFieldName {
+  const fieldMap: { [StepFieldName]: StepFieldName } = {
+    aspirate_mmFromBottom: 'aspirate_labware',
+    aspirate_touchTip_mmFromBottom: 'aspirate_labware',
+    aspirate_delay_mmFromBottom: 'aspirate_labware',
+    dispense_mmFromBottom: 'dispense_labware',
+    dispense_touchTip_mmFromBottom: 'dispense_labware',
+    dispense_delay_mmFromBottom: 'dispense_labware',
+    mix_mmFromBottom: 'labware',
+    mix_touchTip_mmFromBottom: 'labware',
+  }
+  return fieldMap[name]
+}

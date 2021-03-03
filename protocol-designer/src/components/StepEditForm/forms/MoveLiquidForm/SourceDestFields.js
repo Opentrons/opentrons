@@ -12,6 +12,7 @@ import {
   TipPositionField,
   WellOrderField,
 } from '../../fields'
+import { getLabwareFieldForPositioningField } from '../../utils'
 
 import type { FormData } from '../../../../form-types'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
@@ -58,13 +59,15 @@ export const SourceDestFields = (props: Props): React.Node => {
       <div className={styles.form_row}>
         <FlowRateField
           {...propsForFields[addFieldNamePrefix('flowRate')]}
-          formData={props.formData}
+          formData={formData}
           pipetteFieldName="pipette"
           flowRateType={prefix}
         />
         <TipPositionField
           {...propsForFields[addFieldNamePrefix('mmFromBottom')]}
-          formData={formData}
+          labwareId={getLabwareFieldForPositioningField(
+            addFieldNamePrefix('mmFromBottom')
+          )}
         />
         <WellOrderField
           prefix={prefix}
@@ -104,7 +107,9 @@ export const SourceDestFields = (props: Props): React.Node => {
         >
           <TipPositionField
             {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}
-            formData={formData}
+            labwareId={getLabwareFieldForPositioningField(
+              addFieldNamePrefix('touchTip_mmFromBottom')
+            )}
           />
         </CheckboxRowField>
 

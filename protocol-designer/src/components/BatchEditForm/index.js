@@ -11,6 +11,7 @@ import { i18n } from '../../localization'
 import {
   CheckboxRowField,
   // DelayFields,
+  TipPositionField,
   MixFields,
   TextField,
 } from '../StepEditForm/fields'
@@ -42,6 +43,18 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
   const { prefix, propsForFields } = props
   const addFieldNamePrefix = name => `${prefix}_${name}`
 
+  const getCommonLabwareId = (
+    propsForFields: FieldPropsByName
+  ): string | null => {
+    // TODO IMMEDIATELY: is getting labware field for asp vs dest prefix already a util somewhere??
+    const labwareField =
+      prefix === 'aspirate' ? 'aspirate_labware' : 'dispense_labware'
+
+    const labwareId = propsForFields[labwareField]?.value
+    return labwareId ? String(labwareId) : null
+  }
+  const commonLabwareId = getCommonLabwareId(propsForFields)
+
   return (
     <Box>
       <div>TODO settings for {prefix}</div>
@@ -71,7 +84,12 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
         {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
         label={i18n.t('form.step_edit_form.field.touchTip.label')}
         className={styles.small_field}
-      />
+      >
+        <TipPositionField
+          {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}
+          labwareId={commonLabwareId}
+        />
+      </CheckboxRowField>
 
       {prefix === 'dispense' && (
         <CheckboxRowField
@@ -87,7 +105,6 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
             /> */}
         </CheckboxRowField>
       )}
-
       <CheckboxRowField
         {...propsForFields[addFieldNamePrefix('airGap_checkbox')]}
         label={i18n.t('form.step_edit_form.field.airGap.label')}

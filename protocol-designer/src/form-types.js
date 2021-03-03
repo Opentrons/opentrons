@@ -10,7 +10,7 @@ import type { ChangeTipOptions } from './step-generation'
 
 export type StepIdType = string
 
-export type StepFieldName = any
+export type StepFieldName = string
 // | 'aspirate_airGap_checkbox'
 // | 'aspirate_airGap_volume'
 // | 'aspirate_changeTip'
@@ -73,6 +73,7 @@ export type StepFieldName = any
 // | 'aspirate_disposalVol_volume'
 
 export type MultiSelectFieldName =
+  | 'aspirate_labware'
   | 'aspirate_flowRate'
   | 'aspirate_mmFromBottom'
   | 'aspirate_wellOrder_first'
@@ -88,6 +89,7 @@ export type MultiSelectFieldName =
   | 'aspirate_airGap_volume'
   | 'aspirate_touchTip_checkbox'
   | 'aspirate_touchTip_mmFromBottom'
+  | 'dispense_labware'
   | 'dispense_flowRate'
   | 'dispense_mmFromBottom'
   | 'dispense_wellOrder_first'

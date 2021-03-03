@@ -17,6 +17,7 @@ import {
   WellOrderField,
   DelayFields,
 } from '../fields'
+import { getLabwareFieldForPositioningField } from '../utils'
 import { AspDispSection } from './AspDispSection'
 
 import type { StepFormProps } from '../types'
@@ -100,7 +101,9 @@ export const MixForm = (props: StepFormProps): React.Node => {
               />
               <TipPositionField
                 {...propsForFields['mix_mmFromBottom']}
-                formData={formData}
+                labwareId={getLabwareFieldForPositioningField(
+                  'mix_mmFromBottom'
+                )}
               />
               <WellOrderField
                 updateFirstWellOrder={
@@ -145,7 +148,9 @@ export const MixForm = (props: StepFormProps): React.Node => {
               >
                 <TipPositionField
                   {...propsForFields['mix_touchTip_mmFromBottom']}
-                  formData={formData}
+                  labwareId={getLabwareFieldForPositioningField(
+                    'mix_touchTip_mmFromBottom'
+                  )}
                 />
               </CheckboxRowField>
 
