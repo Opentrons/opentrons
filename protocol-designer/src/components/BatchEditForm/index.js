@@ -8,7 +8,12 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-import { CheckboxRowField, TextField } from '../StepEditForm/fields'
+import {
+  CheckboxRowField,
+  // DelayFields,
+  MixFields,
+  TextField,
+} from '../StepEditForm/fields'
 import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
 import {
   getBatchEditSelectedStepTypes,
@@ -30,6 +35,74 @@ import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
 
 export type BatchEditFormProps = {||}
 
+const SourceDestBatchEditMoveLiquidFields = (props: {|
+  prefix: 'aspirate' | 'dispense',
+  propsForFields: FieldPropsByName,
+|}): React.Node => {
+  const { prefix, propsForFields } = props
+  const addFieldNamePrefix = name => `${prefix}_${name}`
+
+  return (
+    <Box>
+      <div>TODO settings for {prefix}</div>
+      {prefix === 'aspirate' && (
+        <CheckboxRowField
+          {...propsForFields['preWetTip']}
+          label={i18n.t('form.step_edit_form.field.preWetTip.label')}
+          className={styles.small_field}
+        />
+      )}
+      <MixFields
+        checkboxFieldName={addFieldNamePrefix('mix_checkbox')}
+        volumeFieldName={addFieldNamePrefix('mix_volume')}
+        timesFieldName={addFieldNamePrefix('mix_times')}
+        propsForFields={propsForFields}
+      />
+      {/* TODO(IL, 2021-03-03): DelayFields uses TipPositionField, which needs FormData 
+        and we don't actually have that. Need to refactor TipPositionField and its consumers. 
+        BUT according to the design, we want to IGNORE the tip position for Delay + Touch Tip! */}
+      {/* <DelayFields
+          checkboxFieldName={addFieldNamePrefix("delay_checkbox")}
+          secondsFieldName={addFieldNamePrefix("delay_seconds")}
+          propsForFields={propsForFields}
+        /> */}
+
+      <CheckboxRowField
+        {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
+        label={i18n.t('form.step_edit_form.field.touchTip.label')}
+        className={styles.small_field}
+      />
+
+      {prefix === 'dispense' && (
+        <CheckboxRowField
+          {...propsForFields['blowout_checkbox']}
+          label={i18n.t('form.step_edit_form.field.blowout.label')}
+          className={styles.small_field}
+        >
+          {/* TODO(IL, 2021-03-03): needs formData. Location is supported only with same-pipette, right? */}
+          {/* <BlowoutLocationField
+              {...propsForFields['blowout_location']}
+              className={styles.full_width}
+              formData={formData}
+            /> */}
+        </CheckboxRowField>
+      )}
+
+      <CheckboxRowField
+        {...propsForFields[addFieldNamePrefix('airGap_checkbox')]}
+        label={i18n.t('form.step_edit_form.field.airGap.label')}
+        className={styles.small_field}
+      >
+        <TextField
+          {...propsForFields[addFieldNamePrefix('airGap_volume')]}
+          className={styles.small_field}
+          units={i18n.t('application.units.microliter')}
+        />
+      </CheckboxRowField>
+    </Box>
+  )
+}
+
 type BatchEditMoveLiquidProps = {|
   batchEditFormHasChanges: boolean,
   propsForFields: FieldPropsByName,
@@ -46,25 +119,14 @@ export const BatchEditMoveLiquid = (
 
   return (
     <div className={formStyles.form}>
-      {/* TODO IMMEDIATELY copied from SourceDestFields. Refactor to be DRY */}
-      <CheckboxRowField
-        {...propsForFields['aspirate_mix_checkbox']}
-        label={i18n.t('form.step_edit_form.field.mix.label')}
-        className={styles.small_field}
-      >
-        <TextField
-          {...propsForFields['aspirate_mix_volume']}
-          className={styles.small_field}
-          units={i18n.t('application.units.microliter')}
-        />
-        <TextField
-          {...propsForFields['aspirate_mix_times']}
-          className={styles.small_field}
-          units={i18n.t('application.units.times')}
-        />
-      </CheckboxRowField>
-
-      <p>TODO batch edit form for Transfer step goes here</p>
+      <SourceDestBatchEditMoveLiquidFields
+        prefix="aspirate"
+        propsForFields={propsForFields}
+      />
+      <SourceDestBatchEditMoveLiquidFields
+        prefix="dispense"
+        propsForFields={propsForFields}
+      />
 
       <Box textAlign="right" maxWidth="55rem">
         <Box

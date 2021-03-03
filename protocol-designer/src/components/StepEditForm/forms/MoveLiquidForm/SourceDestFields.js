@@ -3,13 +3,14 @@ import * as React from 'react'
 import { i18n } from '../../../../localization'
 
 import {
-  TextField,
-  CheckboxRowField,
   BlowoutLocationField,
-  TipPositionField,
-  FlowRateField,
-  WellOrderField,
+  CheckboxRowField,
   DelayFields,
+  FlowRateField,
+  MixFields,
+  TextField,
+  TipPositionField,
+  WellOrderField,
 } from '../../fields'
 
 import type { FormData } from '../../../../form-types'
@@ -33,25 +34,6 @@ export const SourceDestFields = (props: Props): React.Node => {
 
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
-  const getMixFields = () => (
-    <CheckboxRowField
-      {...propsForFields[addFieldNamePrefix('mix_checkbox')]}
-      label={i18n.t('form.step_edit_form.field.mix.label')}
-      className={styles.small_field}
-    >
-      <TextField
-        {...propsForFields[addFieldNamePrefix('mix_volume')]}
-        className={styles.small_field}
-        units={i18n.t('application.units.microliter')}
-      />
-      <TextField
-        {...propsForFields[addFieldNamePrefix('mix_times')]}
-        className={styles.small_field}
-        units={i18n.t('application.units.times')}
-      />
-    </CheckboxRowField>
-  )
-
   const getDelayFields = () => (
     <DelayFields
       checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
@@ -59,6 +41,15 @@ export const SourceDestFields = (props: Props): React.Node => {
       tipPositionFieldName={addFieldNamePrefix('delay_mmFromBottom')}
       propsForFields={propsForFields}
       formData={formData}
+    />
+  )
+
+  const getMixFields = () => (
+    <MixFields
+      checkboxFieldName={addFieldNamePrefix('mix_checkbox')}
+      volumeFieldName={addFieldNamePrefix('mix_volume')}
+      timesFieldName={addFieldNamePrefix('mix_times')}
+      propsForFields={propsForFields}
     />
   )
 
