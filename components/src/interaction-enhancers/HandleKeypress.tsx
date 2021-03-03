@@ -1,10 +1,10 @@
 import * as React from 'react'
 
-type KeypressEvent = SyntheticKeyboardEvent<HTMLElement>
+type KeypressEvent = React.KeyboardEvent<HTMLElement>
 
 export interface KeypressHandler {
   key: string
-  shiftKey?: ?boolean
+  shiftKey?: boolean | null | undefined
   onPress: () => unknown
 }
 
@@ -12,12 +12,12 @@ export interface HandleKeypressProps {
   /** array of keypress handlers to attach to the window */
   handlers: KeypressHandler[]
   /** optionally call event.preventDefault if keypress is handled */
-  preventDefault?: ?boolean
+  preventDefault?: boolean | null | undefined
   /** wrapped children */
   children?: React.ReactNode
 }
 
-const matchHandler = e => h =>
+const matchHandler = (e: KeypressEvent) => (h: KeypressHandler) =>
   h.key === e.key && (h.shiftKey == null || h.shiftKey === e.shiftKey)
 
 /**
@@ -27,11 +27,13 @@ const matchHandler = e => h =>
  * and `props.preventDefault` is true.
  */
 export class HandleKeypress extends React.Component<HandleKeypressProps> {
-  handlePressIfKey: (event: KeypressEvent) => void = event => {
+  handlePressIfKey: (event: KeypressEvent) => void = (event: KeypressEvent) => {
     this.props.handlers.filter(matchHandler(event)).forEach(h => h.onPress())
   }
 
-  preventDefaultIfKey: (event: KeypressEvent) => void = event => {
+  preventDefaultIfKey: (event: KeypressEvent) => void = (
+    event: KeypressEvent
+  ) => {
     if (!this.props.preventDefault) return
 
     const pressHandled = this.props.handlers.some(matchHandler(event))
@@ -51,7 +53,7 @@ export class HandleKeypress extends React.Component<HandleKeypressProps> {
     window.removeEventListener('keydown', this.preventDefaultIfKey)
   }
 
-  render() {
+  render(): JSX.Element {
     return <>{this.props.children}</>
   }
 }

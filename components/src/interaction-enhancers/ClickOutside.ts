@@ -5,7 +5,7 @@ interface ClickOutsideChildParams {
 }
 export interface ClickOutsideProps {
   onClickOutside: () => void
-  children: (ClickOutsideChildParams) => JSX.Element
+  children: (params: ClickOutsideChildParams) => JSX.Element
 }
 
 // TODO: BC: 2019-05-10 this would be much cleaner as a custom hook

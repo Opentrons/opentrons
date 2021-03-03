@@ -10,7 +10,7 @@ import type { ButtonProps } from '../buttons'
 export interface LabeledButtonProps {
   label: string
   buttonProps: ButtonProps
-  children: React.Children
+  children: React.ReactNode
 }
 
 export function LabeledButton(props: LabeledButtonProps): JSX.Element {

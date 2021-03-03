@@ -39,8 +39,8 @@ export class HoverTooltip extends React.Component<
   HoverTooltipProps,
   HoverTooltipState
 > {
-  openTimeout: number | null
-  closeTimeout: number | null
+  openTimeout: NodeJS.Timeout | null
+  closeTimeout: NodeJS.Timeout | null
 
   constructor(props: HoverTooltipProps) {
     super(props)

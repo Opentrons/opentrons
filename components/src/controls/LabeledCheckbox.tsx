@@ -10,7 +10,7 @@ export interface LabeledCheckboxProps {
   name: string
   value: boolean
   className?: string
-  children: React.Children
+  children: React.ReactNode
   onChange: (event: React.SyntheticEvent<HTMLInputElement>) => unknown
 }
 

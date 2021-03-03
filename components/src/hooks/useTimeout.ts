@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react'
 
 /**
@@ -9,8 +8,13 @@ import { useEffect, useRef } from 'react'
  * @param {number | null} delay (timeout delay, or null to disable the timeout)
  * @returns {void}
  */
-export function useTimeout(callback: () => unknown, delay: number | null): void {
-  const savedCallback = useRef()
+export function useTimeout(
+  callback: () => unknown,
+  delay: number | null
+): void {
+  const savedCallback: React.MutableRefObject<
+    (() => unknown) | undefined
+  > = useRef()
 
   // remember the latest callback
   useEffect(() => {
