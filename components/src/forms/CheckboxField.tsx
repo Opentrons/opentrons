@@ -25,9 +25,9 @@ export interface CheckboxFieldProps {
   /** html tabindex property */
   tabIndex?: number
   /** props passed into label div. TODO IMMEDIATELY what is the Flow type? */
-  labelProps?: { [string]: any }
+  labelProps?: JSX.IntrinsicAttributes<'div'>
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: ?HoverTooltipHandlers
+  hoverTooltipHandlers?: HoverTooltipHandlers
   /** if true, render indeterminate icon */
   isIndeterminate?: boolean
 }

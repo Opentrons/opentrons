@@ -1,5 +1,3 @@
-
-
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
@@ -67,14 +65,14 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.invoke('onPointerEnter')()
+      target.invoke('onPointerEnter')({})
     })
     wrapper.update()
 
     expect(wrapper.find(Tooltip).prop('visible')).toBe(false)
 
     act(() => {
-      jest.runTimersToTime(300)
+      jest.advanceTimersByTime(300)
     })
     wrapper.update()
 
@@ -91,9 +89,9 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.invoke('onPointerEnter')()
-      jest.runTimersToTime(300)
-      target.invoke('onPointerLeave')()
+      target.invoke('onPointerEnter')({})
+      jest.advanceTimersByTime(300)
+      target.invoke('onPointerLeave')({})
     })
     wrapper.update()
 
@@ -110,15 +108,15 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.invoke('onPointerEnter')()
-      jest.runTimersToTime(300)
+      target.invoke('onPointerEnter')({})
+      jest.advanceTimersByTime(300)
     })
     wrapper.update()
 
     expect(wrapper.find(Tooltip).prop('visible')).toBe(false)
 
     act(() => {
-      jest.runTimersToTime(200)
+      jest.advanceTimersByTime(200)
     })
     wrapper.update()
 
@@ -135,15 +133,15 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.invoke('onPointerEnter')()
-      target.invoke('onPointerLeave')()
+      target.invoke('onPointerEnter')({})
+      target.invoke('onPointerLeave')({})
     })
     wrapper.update()
 
     expect(wrapper.find(Tooltip).prop('visible')).toBe(true)
 
     act(() => {
-      jest.runTimersToTime(500)
+      jest.advanceTimersByTime(500)
     })
     wrapper.update()
 
