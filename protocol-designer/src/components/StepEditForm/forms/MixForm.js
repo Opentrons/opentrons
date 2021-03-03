@@ -4,18 +4,18 @@ import cx from 'classnames'
 import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import {
-  TextField,
-  CheckboxRowField,
   BlowoutLocationField,
-  PipetteField,
-  VolumeField,
-  LabwareField,
   ChangeTipField,
-  FlowRateField,
-  WellSelectionField,
-  TipPositionField,
-  WellOrderField,
+  CheckboxRowField,
   DelayFields,
+  FlowRateField,
+  LabwareField,
+  PipetteField,
+  TextField,
+  TipPositionField,
+  VolumeField,
+  WellOrderField,
+  WellSelectionField,
 } from '../fields'
 import { getLabwareFieldForPositioningField } from '../utils'
 import { AspDispSection } from './AspDispSection'

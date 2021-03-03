@@ -369,6 +369,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         )
       ).toEqual({
         // aspirate settings
+        aspirate_labware: {
+          value: 'aspirate_labware_id',
+          isIndeterminate: false,
+        },
         aspirate_flowRate: {
           value: null,
           isIndeterminate: false,
@@ -430,6 +434,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
         },
         // dispense settings
+        dispense_labware: {
+          value: 'dispense_labware_id',
+          isIndeterminate: false,
+        },
         dispense_flowRate: {
           value: null,
           isIndeterminate: false,
@@ -505,6 +513,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
         // just doing this so the ids are not the exact same
         another_move_liquid_step_id: {
           ...getMockMoveLiquidStep().move_liquid_step_id,
+          aspirate_labware: 'other_asp_labware',
           aspirate_flowRate: 2,
           aspirate_mmFromBottom: '2',
           aspirate_wellOrder_first: 'b2t',
@@ -519,6 +528,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           // same thing here with air gap volume
           aspirate_touchTip_checkbox: false,
           // same thing with aspirate_touchTip_mmFromBottom
+          dispense_labware: 'other_disp_labware',
           dispense_flowRate: 2,
           dispense_mmFromBottom: '2',
           dispense_wellOrder_first: 'b2t',
@@ -544,6 +554,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
         )
       ).toEqual({
         // aspirate settings
+        aspirate_labware: {
+          isIndeterminate: true,
+        },
         aspirate_flowRate: {
           isIndeterminate: true,
         },
@@ -590,6 +603,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: true,
         },
         // dispense settings
+        dispense_labware: {
+          isIndeterminate: true,
+        },
         dispense_flowRate: {
           isIndeterminate: true,
         },
