@@ -520,8 +520,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           aspirate_wellOrder_second: 'r2l',
           preWetTip: true,
           aspirate_mix_checkbox: false,
-          // not going to change mix times or mix volumes
-          // if the checkboxes are different the rest of the fields should also be indeterminate
+          // not going to change mix times or mix volumes, so they should NOT be indeterminate
           aspirate_delay_checkbox: false,
           // same thing here for delay seconds and mm from bottom
           aspirate_airGap_checkbox: false,
@@ -576,31 +575,37 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: true,
         },
         aspirate_mix_times: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '2',
         },
         aspirate_mix_volume: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '5',
         },
         aspirate_delay_checkbox: {
           isIndeterminate: true,
         },
         aspirate_delay_seconds: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '2',
         },
         aspirate_delay_mmFromBottom: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '1',
         },
         aspirate_airGap_checkbox: {
           isIndeterminate: true,
         },
         aspirate_airGap_volume: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '30',
         },
         aspirate_touchTip_checkbox: {
           isIndeterminate: true,
         },
         aspirate_touchTip_mmFromBottom: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: 1,
         },
         // dispense settings
         dispense_labware: {
@@ -622,37 +627,44 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: true,
         },
         dispense_mix_times: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: null,
         },
         dispense_mix_volume: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: null,
         },
         dispense_delay_checkbox: {
           isIndeterminate: true,
         },
         dispense_delay_seconds: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '1',
         },
         dispense_delay_mmFromBottom: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '0.5',
         },
         dispense_airGap_checkbox: {
           isIndeterminate: true,
         },
         dispense_airGap_volume: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: null,
         },
         dispense_touchTip_checkbox: {
           isIndeterminate: true,
         },
         dispense_touchTip_mmFromBottom: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: 1,
         },
         blowout_checkbox: {
           isIndeterminate: true,
         },
         blowout_location: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: 'trashId',
         },
       })
     })

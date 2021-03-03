@@ -12,9 +12,9 @@ import {
   CheckboxRowField,
   // DelayFields,
   TipPositionField,
-  MixFields,
   TextField,
 } from '../StepEditForm/fields'
+import { MixFields } from '../StepEditForm/fields/MixFields'
 import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
 import {
   getBatchEditSelectedStepTypes,

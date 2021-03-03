@@ -86,6 +86,7 @@ function TipPositionInput(props: Props) {
           readOnly
           onClick={handleOpen}
           value={String(value)}
+          isIndeterminate={props.isIndeterminate}
           units={i18n.t('application.units.millimeter')}
         />
       </Wrapper>

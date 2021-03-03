@@ -7,11 +7,11 @@ import {
   CheckboxRowField,
   DelayFields,
   FlowRateField,
-  MixFields,
   TextField,
   TipPositionField,
   WellOrderField,
 } from '../../fields'
+import { MixFields } from '../../fields/MixFields'
 import { getLabwareFieldForPositioningField } from '../../utils'
 
 import type { FormData } from '../../../../form-types'
@@ -65,9 +65,13 @@ export const SourceDestFields = (props: Props): React.Node => {
         />
         <TipPositionField
           {...propsForFields[addFieldNamePrefix('mmFromBottom')]}
-          labwareId={getLabwareFieldForPositioningField(
-            addFieldNamePrefix('mmFromBottom')
-          )}
+          labwareId={
+            formData[
+              getLabwareFieldForPositioningField(
+                addFieldNamePrefix('mmFromBottom')
+              )
+            ]
+          }
         />
         <WellOrderField
           prefix={prefix}
@@ -107,9 +111,13 @@ export const SourceDestFields = (props: Props): React.Node => {
         >
           <TipPositionField
             {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}
-            labwareId={getLabwareFieldForPositioningField(
-              addFieldNamePrefix('touchTip_mmFromBottom')
-            )}
+            labwareId={
+              formData[
+                getLabwareFieldForPositioningField(
+                  addFieldNamePrefix('touchTip_mmFromBottom')
+                )
+              ]
+            }
           />
         </CheckboxRowField>
 

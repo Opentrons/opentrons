@@ -301,11 +301,8 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
     return BATCH_EDIT_TRANSFER_FORM_FIELDS.reduce(
       (acc: MultiselectFieldValues, fieldName: MultiSelectFieldName) => {
         const firstFieldValue = forms[0][fieldName]
-        const dependentField = dependentFieldCheckboxMap[fieldName]
         const isFieldValueIndeterminant = forms.some(
-          form =>
-            form[fieldName] !== firstFieldValue ||
-            (dependentField && form[dependentField] !== true)
+          form => form[fieldName] !== firstFieldValue
         )
 
         if (isFieldValueIndeterminant) {

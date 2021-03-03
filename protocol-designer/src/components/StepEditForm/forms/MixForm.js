@@ -101,9 +101,11 @@ export const MixForm = (props: StepFormProps): React.Node => {
               />
               <TipPositionField
                 {...propsForFields['mix_mmFromBottom']}
-                labwareId={getLabwareFieldForPositioningField(
-                  'mix_mmFromBottom'
-                )}
+                labwareId={
+                  formData[
+                    getLabwareFieldForPositioningField('mix_mmFromBottom')
+                  ]
+                }
               />
               <WellOrderField
                 updateFirstWellOrder={
@@ -148,9 +150,13 @@ export const MixForm = (props: StepFormProps): React.Node => {
               >
                 <TipPositionField
                   {...propsForFields['mix_touchTip_mmFromBottom']}
-                  labwareId={getLabwareFieldForPositioningField(
-                    'mix_touchTip_mmFromBottom'
-                  )}
+                  labwareId={
+                    formData[
+                      getLabwareFieldForPositioningField(
+                        'mix_touchTip_mmFromBottom'
+                      )
+                    ]
+                  }
                 />
               </CheckboxRowField>
 
