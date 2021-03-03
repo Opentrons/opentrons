@@ -790,24 +790,22 @@ describe('getMultiSelectDisabledFields', () => {
       }
     })
     it('should return fields being disabled with associated reasons', () => {
+      const aspirateLabwareDifferentText = i18n.t(
+        'tooltip.step_fields.batch_edit.disabled.aspirate-labware-different'
+      )
+
       expect(
         getMultiSelectDisabledFields.resultFunc(
           savedStepForms,
           mockmultiSelectItemIds
         )
       ).toEqual({
-        aspirate_mmFromBottom: i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.aspirate-labware-different'
-        ),
-        aspirate_delay_checkbox: i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.aspirate-labware-different'
-        ),
-        aspirate_delay_seconds: i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.aspirate-labware-different'
-        ),
-        aspirate_delay_mmFromBottom: i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.aspirate-labware-different'
-        ),
+        aspirate_mmFromBottom: aspirateLabwareDifferentText,
+        aspirate_delay_checkbox: aspirateLabwareDifferentText,
+        aspirate_delay_seconds: aspirateLabwareDifferentText,
+        aspirate_delay_mmFromBottom: aspirateLabwareDifferentText,
+        aspirate_touchTip_checkbox: aspirateLabwareDifferentText,
+        aspirate_touchTip_mmFromBottom: aspirateLabwareDifferentText,
       })
     })
   })
@@ -823,24 +821,21 @@ describe('getMultiSelectDisabledFields', () => {
       }
     })
     it('should return fields being disabled with associated reasons', () => {
+      const dispenseLabwareDifferentText = i18n.t(
+        'tooltip.step_fields.batch_edit.disabled.dispense-labware-different'
+      )
       expect(
         getMultiSelectDisabledFields.resultFunc(
           savedStepForms,
           mockmultiSelectItemIds
         )
       ).toEqual({
-        dispense_mmFromBottom: i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.dispense-labware-different'
-        ),
-        dispense_delay_checkbox: i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.dispense-labware-different'
-        ),
-        dispense_delay_seconds: i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.dispense-labware-different'
-        ),
-        dispense_delay_mmFromBottom: i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.dispense-labware-different'
-        ),
+        dispense_mmFromBottom: dispenseLabwareDifferentText,
+        dispense_delay_checkbox: dispenseLabwareDifferentText,
+        dispense_delay_seconds: dispenseLabwareDifferentText,
+        dispense_delay_mmFromBottom: dispenseLabwareDifferentText,
+        dispense_touchTip_checkbox: dispenseLabwareDifferentText,
+        dispense_touchTip_mmFromBottom: dispenseLabwareDifferentText,
       })
     })
   })

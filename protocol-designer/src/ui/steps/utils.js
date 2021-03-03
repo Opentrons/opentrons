@@ -46,6 +46,8 @@ const aspirateLabwareDisabledFieldNames: Array<MultiSelectFieldName> = [
   'aspirate_delay_checkbox',
   'aspirate_delay_seconds',
   'aspirate_delay_mmFromBottom',
+  'aspirate_touchTip_checkbox',
+  'aspirate_touchTip_mmFromBottom'
 ]
 
 const dispenseLabwareDisabledFieldNames: Array<MultiSelectFieldName> = [
@@ -53,6 +55,8 @@ const dispenseLabwareDisabledFieldNames: Array<MultiSelectFieldName> = [
   'dispense_delay_checkbox',
   'dispense_delay_seconds',
   'dispense_delay_mmFromBottom',
+  'dispense_touchTip_checkbox',
+  'dispense_touchTip_mmFromBottom'
 ]
 
 const multiAspiratePathDisabledFieldNames: Array<MultiSelectFieldName> = [
