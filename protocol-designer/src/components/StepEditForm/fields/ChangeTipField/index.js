@@ -1,17 +1,20 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { ChangeTip } from './ChangeTip'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { getWellRatio } from '../../../../steplist/utils'
-
-import type { BaseState } from '../../../../types'
-import type { FormData } from '../../../../form-types'
+import {
+  FormGroup,
+  SelectField,
+  Tooltip,
+  useHoverTooltip,
+  TOOLTIP_FIXED,
+} from '@opentrons/components'
+import { i18n } from '../../../../localization'
+import {
+  getDisabledChangeTipOptions,
+  type DisabledChangeTipArgs,
+} from './getDisabledChangeTipOptions'
 import type { ChangeTipOptions } from '../../../../step-generation/types'
-
-type Props = React.ElementProps<typeof ChangeTip>
-type OP = {| name: $PropertyType<Props, 'name'> |}
-type SP = $Diff<$Exact<Props>, OP>
+import type { FieldProps } from '../../types'
+import styles from '../../StepEditForm.css'
 
 const ALL_CHANGE_TIP_VALUES: Array<ChangeTipOptions> = [
   'always',
@@ -20,53 +23,74 @@ const ALL_CHANGE_TIP_VALUES: Array<ChangeTipOptions> = [
   'perDest',
   'never',
 ]
+type Props = {|
+  ...FieldProps,
+  ...DisabledChangeTipArgs,
+|}
 
-function getDisabledChangeTipOptions(
-  rawForm: FormData
-): ?Set<ChangeTipOptions> {
-  switch (rawForm.stepType) {
-    case 'moveLiquid': {
-      const path = rawForm.path
-      const wellRatio = getWellRatio(
-        rawForm.aspirate_wells,
-        rawForm.dispense_wells
-      )
-      // form with no wells selected treated as 'single'
-      if (!wellRatio || !path || path === 'single') {
-        if (wellRatio === '1:many') {
-          return new Set(['perSource'])
-        }
-        return new Set(['perDest'])
-      }
-      // path is multi
-      return new Set(['perSource', 'perDest'])
-    }
-    case 'mix': {
-      return new Set(['perSource', 'perDest'])
-    }
-    default: {
-      console.warn(
-        `getChangeTipOptions for stepType ${rawForm.stepType} not yet implemented!`
-      )
-      return null
-    }
-  }
+export const ChangeTipField = (props: Props): React.Node => {
+  const {
+    aspirateWells,
+    dispenseWells,
+    name,
+    path,
+    stepType,
+    updateValue,
+    value,
+  } = props
+
+  const disabledOptions = getDisabledChangeTipOptions({
+    aspirateWells,
+    dispenseWells,
+    path,
+    stepType,
+  })
+
+  const options = ALL_CHANGE_TIP_VALUES.map(value => ({
+    value,
+    isDisabled: disabledOptions ? disabledOptions.has(value) : false,
+  }))
+
+  return (
+    <FormGroup
+      label={i18n.t('form.step_edit_form.field.change_tip.label')}
+      className={styles.large_field}
+    >
+      <SelectField
+        name={name}
+        options={options}
+        value={value ? String(value) : null}
+        onValueChange={(name, value) => updateValue(value)}
+        formatOptionLabel={({ value }) => (
+          <ChangeTipOptionLabel value={value} />
+        )}
+      />
+    </FormGroup>
+  )
 }
 
-const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const rawForm = stepFormSelectors.getUnsavedForm(state)
-
-  return {
-    options: ALL_CHANGE_TIP_VALUES, // TODO Ian 2019-01-28 these may vary for different step types
-    disabledOptions: rawForm ? getDisabledChangeTipOptions(rawForm) : null,
-  }
+type LabelProps = {
+  value: string,
 }
 
-export const ChangeTipField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapSTP)(ChangeTip)
+const ChangeTipOptionLabel = (props: LabelProps) => {
+  const { value } = props
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: 'bottom-start',
+    strategy: TOOLTIP_FIXED,
+  })
+  return (
+    <>
+      <div {...targetProps}>
+        {i18n.t(`form.step_edit_form.field.change_tip.option.${value}`)}
+        <Tooltip {...tooltipProps}>
+          <div className={styles.tooltip}>
+            {i18n.t(
+              `form.step_edit_form.field.change_tip.option_tooltip.${value}`
+            )}
+          </div>
+        </Tooltip>
+      </div>
+    </>
+  )
+}

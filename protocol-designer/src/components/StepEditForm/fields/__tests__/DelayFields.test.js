@@ -3,7 +3,6 @@ import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import FormTooltipText from '../../../../localization/en/tooltip'
 import ApplicationText from '../../../../localization/en/application'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
 import { CheckboxRowField, TextField, TipPositionField } from '../../fields'
@@ -82,6 +81,7 @@ describe('DelayFields', () => {
             name: 'aspirate_delay_checkbox',
             updateValue: (jest.fn(): any),
             value: true,
+            tooltipContent: 'tooltip for aspirate_delay_checkbox',
           },
           aspirate_delay_seconds: {
             onFieldFocus: (jest.fn(): any),
@@ -134,7 +134,7 @@ describe('DelayFields', () => {
       expect(checkboxField.prop('name')).toBe(props.checkboxFieldName)
       expect(checkboxField.prop('label')).toBe('delay')
       expect(checkboxField.prop('tooltipContent')).toBe(
-        FormTooltipText.step_fields.defaults.aspirate_delay_checkbox
+        `tooltip for ${props.checkboxFieldName}`
       )
 
       const secondsField = wrapper.find(TextField)
@@ -153,7 +153,7 @@ describe('DelayFields', () => {
       expect(checkboxField.prop('name')).toBe(props.checkboxFieldName)
       expect(checkboxField.prop('label')).toBe('delay')
       expect(checkboxField.prop('tooltipContent')).toBe(
-        FormTooltipText.step_fields.defaults.aspirate_delay_checkbox
+        `tooltip for ${props.checkboxFieldName}`
       )
       const secondsField = wrapper.find(TextField)
       expect(secondsField.is(TextField)).toBe(true)
@@ -180,6 +180,7 @@ describe('DelayFields', () => {
             name: 'dispense_delay_checkbox',
             updateValue: (jest.fn(): any),
             value: true,
+            tooltipContent: 'tooltip for dispense_delay_checkbox',
           },
           dispense_delay_seconds: {
             onFieldFocus: (jest.fn(): any),
@@ -229,7 +230,7 @@ describe('DelayFields', () => {
       expect(checkboxField.prop('name')).toBe(props.checkboxFieldName)
       expect(checkboxField.prop('label')).toBe('delay')
       expect(checkboxField.prop('tooltipContent')).toBe(
-        FormTooltipText.step_fields.defaults.dispense_delay_checkbox
+        `tooltip for ${props.checkboxFieldName}`
       )
       const secondsField = wrapper.find(TextField)
       expect(secondsField.is(TextField)).toBe(true)
@@ -248,7 +249,7 @@ describe('DelayFields', () => {
       expect(checkboxField.prop('name')).toBe(props.checkboxFieldName)
       expect(checkboxField.prop('label')).toBe('delay')
       expect(checkboxField.prop('tooltipContent')).toBe(
-        FormTooltipText.step_fields.defaults.dispense_delay_checkbox
+        `tooltip for ${props.checkboxFieldName}`
       )
       const secondsField = wrapper.find(TextField)
       expect(secondsField.is(TextField)).toBe(true)

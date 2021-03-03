@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from .types import HardwareAPILike
 
 if TYPE_CHECKING:
-    from .dev_types import HasLoop # noqa (F501)
+    from .dev_types import HasLoop  # noqa: F501
 
 
 # TODO: BC 2020-02-25 instead of overwriting __get_attribute__ in this class

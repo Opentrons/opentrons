@@ -13,6 +13,11 @@ import * as stepSelectors from '../../../ui/steps/selectors'
 import * as stepListActions from '../../../steplist/actions/actions'
 
 import { MultiSelectToolbar, ClickableIcon } from '../MultiSelectToolbar'
+import {
+  ConfirmDeleteModal,
+  CLOSE_BATCH_EDIT_FORM,
+  DELETE_MULTIPLE_STEP_FORMS,
+} from '../../modals/ConfirmDeleteModal'
 
 jest.mock('../../../step-forms/selectors')
 jest.mock('../../../ui/steps/selectors')
@@ -21,6 +26,8 @@ const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
 const getOrderedStepIdsMock = stepFormSelectors.getOrderedStepIds
 const getMultiSelectItemIdsMock = stepSelectors.getMultiSelectItemIds
+const getBatchEditFormHasUnsavedChangesMock =
+  stepFormSelectors.getBatchEditFormHasUnsavedChanges
 
 describe('MultiSelectToolbar', () => {
   let store
@@ -33,11 +40,15 @@ describe('MultiSelectToolbar', () => {
     when(getMultiSelectItemIdsMock)
       .calledWith(expect.anything())
       .mockReturnValue([])
+
+    when(getBatchEditFormHasUnsavedChangesMock)
+      .calledWith(expect.anything())
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
     resetAllWhenMocks()
-    jest.resetAllMocks()
+    jest.restoreAllMocks()
   })
   const render = () =>
     mount(
@@ -154,7 +165,7 @@ describe('MultiSelectToolbar', () => {
     })
   })
   describe('when clicking on delete', () => {
-    it('should delete all of the steps selected', () => {
+    it('should show a confirm delete modal before deleting the steps', () => {
       when(getOrderedStepIdsMock)
         .calledWith(expect.anything())
         .mockReturnValue(['id_1', 'id_2'])
@@ -169,16 +180,30 @@ describe('MultiSelectToolbar', () => {
       )
 
       const wrapper = render()
-
       const deleteIcon = wrapper.find(ClickableIcon).at(1)
+
       act(() => {
         deleteIcon.prop('onClick')()
       })
+
+      wrapper.update()
+      const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
+      expect(deleteMultipleStepsSpy).not.toHaveBeenCalled()
+      expect(confirmDeleteModal.prop('modalType')).toBe(
+        DELETE_MULTIPLE_STEP_FORMS
+      )
+
+      act(() => {
+        confirmDeleteModal.prop('onContinueClick')()
+      })
+      wrapper.update()
+
+      expect(wrapper.find(ConfirmDeleteModal).length).toBe(0)
       expect(deleteMultipleStepsSpy).toHaveBeenCalledWith(['id_1'])
     })
   })
   describe('when clicking on duplicate', () => {
-    it('should duplicate all of the steps selected', () => {
+    it('should duplicate all of the steps selected when there are NO changes to the batch edit form', () => {
       when(getOrderedStepIdsMock)
         .calledWith(expect.anything())
         .mockReturnValue(['id_1', 'id_2'])
@@ -198,6 +223,46 @@ describe('MultiSelectToolbar', () => {
       act(() => {
         copyIcon.prop('onClick')()
       })
+
+      expect(duplicateMultipleStepsSpy).toHaveBeenCalledWith(['id_1'])
+    })
+
+    it('should show a confirm delete modal when there are changes to the batch edit form', () => {
+      when(getBatchEditFormHasUnsavedChangesMock)
+        .calledWith(expect.anything())
+        .mockReturnValue(true)
+
+      when(getOrderedStepIdsMock)
+        .calledWith(expect.anything())
+        .mockReturnValue(['id_1', 'id_2'])
+
+      when(getMultiSelectItemIdsMock)
+        .calledWith(expect.anything())
+        .mockReturnValue(['id_1'])
+
+      const duplicateMultipleStepsSpy = jest.spyOn(
+        stepActions,
+        'duplicateMultipleSteps'
+      )
+
+      const wrapper = render()
+      const copyIcon = wrapper.find(ClickableIcon).at(2)
+
+      act(() => {
+        copyIcon.prop('onClick')()
+      })
+
+      wrapper.update()
+      const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
+      expect(duplicateMultipleStepsSpy).not.toHaveBeenCalled()
+      expect(confirmDeleteModal.prop('modalType')).toBe(CLOSE_BATCH_EDIT_FORM)
+
+      act(() => {
+        confirmDeleteModal.prop('onContinueClick')()
+      })
+      wrapper.update()
+
+      expect(wrapper.find(ConfirmDeleteModal).length).toBe(0)
       expect(duplicateMultipleStepsSpy).toHaveBeenCalledWith(['id_1'])
     })
   })

@@ -8,7 +8,7 @@ import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { i18n } from '../../../localization'
 import { maskField } from '../../../steplist/fieldLevel'
-import { ConditionalOnField, TextField, RadioGroupField } from '../fields'
+import { TextField, RadioGroupField } from '../fields'
 import styles from '../StepEditForm.css'
 
 import type { StepFormProps } from '../types'
@@ -19,7 +19,7 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
   )
 
   const moduleEntities = useSelector(stepFormSelectors.getModuleEntities)
-  const { moduleId } = props.formData
+  const { magnetAction, moduleId } = props.formData
   const moduleModel = moduleId ? moduleEntities[moduleId]?.model : null
 
   const moduleOption: ?string = moduleLabwareOptions[0]
@@ -78,10 +78,7 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
             ]}
           />
         </FormGroup>
-        <ConditionalOnField
-          name={'magnetAction'}
-          condition={val => val === 'engage'}
-        >
+        {magnetAction === 'engage' && (
           <FormGroup
             label={i18n.t('form.step_edit_form.field.engageHeight.label')}
             className={styles.magnet_form_group}
@@ -92,12 +89,9 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
               className={styles.small_field}
             />
           </FormGroup>
-        </ConditionalOnField>
+        )}
       </div>
-      <ConditionalOnField
-        name={'magnetAction'}
-        condition={val => val === 'engage'}
-      >
+      {magnetAction === 'engage' && (
         <div className={styles.diagram_row}>
           <div
             className={cx(
@@ -108,7 +102,7 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
             )}
           />
         </div>
-      </ConditionalOnField>
+      )}
     </div>
   )
 }

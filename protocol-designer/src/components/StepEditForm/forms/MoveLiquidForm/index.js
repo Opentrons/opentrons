@@ -85,7 +85,13 @@ export const MoveLiquidForm = (props: StepFormProps): React.Node => {
       </div>
       <div className={styles.section_wrapper}>
         <div className={cx(styles.form_row, styles.section_column)}>
-          <ChangeTipField name="changeTip" />
+          <ChangeTipField
+            {...propsForFields['changeTip']}
+            aspirateWells={formData.aspirate_wells}
+            dispenseWells={formData.dispense_wells}
+            path={formData.path}
+            stepType={formData.stepType}
+          />
           <PathField />
         </div>
         <div className={cx(styles.section_column, styles.disposal_vol_wrapper)}>

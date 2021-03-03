@@ -8,9 +8,12 @@ import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
 from opentrons.protocols.implementations.protocol_context import \
     ProtocolContextImplementation
+from opentrons.protocols.implementations.simulators.protocol_context import \
+    ProtocolContextSimulation
 from opentrons_shared_data import load_shared_data
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
-from opentrons.hardware_control import API, NoTipAttachedError
+from opentrons.hardware_control import API, NoTipAttachedError, \
+    SynchronousAdapter
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocol_api import paired_instrument_context as paired
@@ -988,3 +991,44 @@ def test_move_to_with_thermocycler(ctx):
     instr = ctx.load_instrument('p1000_single', 'left')
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
+
+
+@pytest.mark.parametrize(
+    argnames=["implementation_class"],
+    argvalues=[
+        [ProtocolContextImplementation],
+        [ProtocolContextSimulation],
+    ])
+def test_temp_connect(implementation_class):
+    """Test that temp_connect can be used to assign hardware controller to
+    protocol implementation."""
+
+    # Create the mock API object that can be wrapped by SynchronousAdapter
+    wrappable_hardware = mock.MagicMock()
+    # Must mock result of get_attached_instrument for temp_connect to work.
+    wrappable_hardware.get_attached_instrument.return_value = {
+        'default_aspirate_flow_rates': {'2.0': 100},
+        'default_dispense_flow_rates': {'2.0': 100},
+        'default_blow_out_flow_rates': {'2.0': 100}
+    }
+
+    # Create the SynchronousAdapter wrapping the wrappable_hardware.
+    hardware = SynchronousAdapter(wrappable_hardware)
+
+    ctx = papi.ProtocolContext(implementation=implementation_class(),
+                               api_version=APIVersion(2, 0))
+    instr = ctx.load_instrument('p1000_single', 'left')
+
+    with ctx.temp_connect(hardware):
+        instr.home()
+
+    # Was home_z called on the hardware passed to temp_connect?
+    hardware.home_z.assert_called_once_with(Mount.LEFT)
+
+    # Clear mock history.
+    hardware.home_z.reset_mock()
+
+    # Calling. outside context manager will not call temp hardware method.
+    instr.home()
+
+    hardware.home_z.assert_not_called()

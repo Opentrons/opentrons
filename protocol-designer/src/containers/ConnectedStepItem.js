@@ -28,6 +28,8 @@ import {
   ConfirmDeleteModal,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
+  type DeleteModalType,
+  CLOSE_BATCH_EDIT_FORM,
 } from '../components/modals/ConfirmDeleteModal'
 
 import type { SubstepIdentifier } from '../steplist/types'
@@ -94,8 +96,11 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
-  const formHasChanges = useSelector(
+  const singleEditFormHasUnsavedChanges = useSelector(
     stepFormSelectors.getCurrentFormHasUnsavedChanges
+  )
+  const batchEditFormHasUnsavedChanges = useSelector(
+    stepFormSelectors.getBatchEditFormHasUnsavedChanges
   )
 
   const isBatchEditEnabled = useSelector(getBatchEditEnabled)
@@ -170,7 +175,9 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   // step selection is gated when showConfirmation is true
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     handleStepItemSelection,
-    currentFormIsPresaved || formHasChanges
+    isMultiSelectMode
+      ? batchEditFormHasUnsavedChanges
+      : currentFormIsPresaved || singleEditFormHasUnsavedChanges
   )
   // (SA 2020/12/23): This will not be needed once we update to React 17
   // since event pooling will be eliminated
@@ -214,15 +221,21 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     hoveredSubstep,
   }
 
+  const getModalType = (): DeleteModalType => {
+    if (isMultiSelectMode) {
+      return CLOSE_BATCH_EDIT_FORM
+    } else if (currentFormIsPresaved) {
+      return CLOSE_UNSAVED_STEP_FORM
+    } else {
+      return CLOSE_STEP_FORM_WITH_CHANGES
+    }
+  }
+
   return (
     <>
       {showConfirmation && (
         <ConfirmDeleteModal
-          modalType={
-            currentFormIsPresaved
-              ? CLOSE_UNSAVED_STEP_FORM
-              : CLOSE_STEP_FORM_WITH_CHANGES
-          }
+          modalType={getModalType()}
           onContinueClick={confirmWithPersistedEvent}
           onCancelClick={cancel}
         />

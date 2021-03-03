@@ -6,11 +6,11 @@ from typing import Any, NamedTuple, TYPE_CHECKING, Union
 from opentrons.protocols.api_support.labware_like import LabwareLike
 
 if TYPE_CHECKING:
-    from typing import (Optional,       # noqa(F401) Used for typechecking
+    from typing import (Optional,       # noqa: F401 Used for typechecking
                         Tuple)
-    from .protocol_api.labware import (  # noqa(F401) Used for typechecking
+    from .protocol_api.labware import (  # noqa: F401 Used for typechecking
         Labware, Well)
-    from opentrons.protocols.geometry.module_geometry import ModuleGeometry  # noqa(F401)
+    from opentrons.protocols.geometry.module_geometry import ModuleGeometry  # noqa: F401, E501
 
 
 class PipetteNotAttachedError(KeyError):
