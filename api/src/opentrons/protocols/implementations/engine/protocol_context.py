@@ -90,11 +90,12 @@ class ProtocolEngineContext(ProtocolContextInterface):
         namespace: Optional[str] = None,
         version: Optional[int] = None,
     ) -> LabwareInterface:
+        # TODO(mc, 2021-03-04): handle optional namespace and version
         result = self._sync_engine.load_labware(
             load_name=load_name,
             location=DeckSlotLocation(slot=types.DeckSlotName.from_primitive(location)),
-            namespace=namespace,
-            version=version,
+            namespace=namespace,  # type: ignore[arg-type]
+            version=version,  # type: ignore[arg-type]
         )
 
         return LabwareContext(labware_id=result.labwareId, state_view=self._state_view)

@@ -71,6 +71,7 @@ class ProtocolEngine:
         command_id: str,
     ) -> Union[CompletedCommandType, FailedCommandType]:
         """Execute a command request, waiting for it to complete."""
+        print("hello!", request, command_id)
         cmd_impl = request.get_implementation()
         created_at = utc_now()
         cmd = cmd_impl.create_command(created_at).to_running(created_at)
