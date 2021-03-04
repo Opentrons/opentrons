@@ -16,7 +16,10 @@ import {
   TextField,
 } from '../StepEditForm/fields'
 import { MixFields } from '../StepEditForm/fields/MixFields'
-import { getBlowoutLocationOptionsForForm } from '../StepEditForm/utils'
+import {
+  getBlowoutLocationOptionsForForm,
+  getLabwareFieldForPositioningField,
+} from '../StepEditForm/utils'
 import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
 import {
   getBatchEditSelectedStepTypes,
@@ -45,17 +48,11 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
   const { prefix, propsForFields } = props
   const addFieldNamePrefix = name => `${prefix}_${name}`
 
-  const getCommonLabwareId = (
-    propsForFields: FieldPropsByName
-  ): string | null => {
-    // TODO IMMEDIATELY: is getting labware field for asp vs dest prefix already a util somewhere??
-    const labwareField =
-      prefix === 'aspirate' ? 'aspirate_labware' : 'dispense_labware'
-
+  const getLabwareIdForField = (name: string): string | null => {
+    const labwareField = getLabwareFieldForPositioningField(name)
     const labwareId = propsForFields[labwareField]?.value
     return labwareId ? String(labwareId) : null
   }
-  const commonLabwareId = getCommonLabwareId(propsForFields)
 
   return (
     <Box className={styles.section_column}>
@@ -81,7 +78,9 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
         checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
         secondsFieldName={addFieldNamePrefix('delay_seconds')}
         tipPositionFieldName={addFieldNamePrefix('delay_mmFromBottom')}
-        labwareId={commonLabwareId}
+        labwareId={getLabwareIdForField(
+          addFieldNamePrefix('delay_mmFromBottom')
+        )}
         propsForFields={propsForFields}
       />
       <CheckboxRowField
@@ -91,7 +90,9 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
       >
         <TipPositionField
           {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}
-          labwareId={commonLabwareId}
+          labwareId={getLabwareIdForField(
+            addFieldNamePrefix('touchTip_mmFromBottom')
+          )}
         />
       </CheckboxRowField>
 

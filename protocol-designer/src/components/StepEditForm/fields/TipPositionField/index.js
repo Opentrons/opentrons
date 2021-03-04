@@ -132,7 +132,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
 
   return {
     wellDepthMm,
-    mmFromBottom: value == null ? null : Number(value), // TODO IMMEDIATELY is this really supposed to return a number? Probably a string '1.23'
+    mmFromBottom: typeof value === 'number' ? value : null,
   }
 }
 
