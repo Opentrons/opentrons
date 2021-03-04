@@ -123,7 +123,11 @@ class LabwareContext(LabwareInterface):
 
     @property
     def separate_calibration(self) -> bool:
-        raise NotImplementedError()
+        # TODO AL 20210304 What does this mean? It is used in
+        #  opentrons.protocols.labware.definition._get_parent_identifier to
+        #  indicate that a DeckItem is a module?
+        #  ModuleGeometry.separate_calibration returns True.
+        return False
 
     @property
     def load_name(self) -> str:

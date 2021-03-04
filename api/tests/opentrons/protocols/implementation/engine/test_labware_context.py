@@ -95,6 +95,7 @@ def test_get_name(
 
 
 def test_set_name(labware_context: LabwareContext) -> None:
+    """Should not be implemented."""
     with pytest.raises(NotImplementedError):
         name = "some_name"
         labware_context.set_name(name)
@@ -140,6 +141,7 @@ def test_get_quirks(
 
 
 def test_set_calibration(labware_context: LabwareContext) -> None:
+    """Should not be implemented."""
     with pytest.raises(NotImplementedError):
         point = Point(1, 2, 3)
         labware_context.set_calibration(point)
@@ -193,6 +195,7 @@ def test_get_tip_length(
 
 
 def test_set_tip_length(labware_context: LabwareContext):
+    """Should not be implemented."""
     with pytest.raises(NotImplementedError):
         length = 1.2
         labware_context.set_tip_length(length)
@@ -213,17 +216,6 @@ def test_get_tip_tracker(
     ).then_return(labware_data)
 
     assert isinstance(labware_context.get_tip_tracker(), TipTracker)
-
-
-def test_get_well_grid(
-        decoy: Decoy, labware_id: str, mock_state_view: StateView,
-        labware_context: LabwareContext, labware_data: LabwareData) -> None:
-    """Should return a well grid instance."""
-    decoy.when(
-        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
-    ).then_return(labware_data)
-
-    assert isinstance(labware_context.get_well_grid(), WellGrid)
 
 
 def test_get_wells(
@@ -283,8 +275,8 @@ def test_highest_z(
 
 
 def test_separate_calibration(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        s = labware_context.separate_calibration  # noqa: F841
+    """Should return false."""
+    assert labware_context.separate_calibration is False
 
 
 def test_load_name(
