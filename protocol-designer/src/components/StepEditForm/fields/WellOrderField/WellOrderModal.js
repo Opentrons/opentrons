@@ -37,10 +37,10 @@ type Props = {|
   ) => void,
 |}
 
-type State = {
-  firstValue: ?WellOrderOption,
-  secondValue: ?WellOrderOption,
-}
+type State = {|
+  firstValue: WellOrderOption,
+  secondValue: WellOrderOption,
+|}
 
 export class WellOrderModal extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -56,18 +56,26 @@ export class WellOrderModal extends React.Component<Props, State> {
   }
 
   getInitialFirstValues: () => {|
-    initialFirstValue: ?WellOrderOption,
-    initialSecondValue: ?WellOrderOption,
+    initialFirstValue: WellOrderOption,
+    initialSecondValue: WellOrderOption,
   |} = () => {
     const { firstValue, secondValue } = this.props
+    if (firstValue == null || secondValue == null) {
+      return {
+        initialFirstValue: DEFAULT_FIRST,
+        initialSecondValue: DEFAULT_SECOND,
+      }
+    }
     return {
       initialFirstValue: firstValue,
       initialSecondValue: secondValue,
     }
   }
+
   applyChanges: () => void = () => {
     this.props.updateValues(this.state.firstValue, this.state.secondValue)
   }
+
   handleReset: () => void = () => {
     this.setState(
       { firstValue: DEFAULT_FIRST, secondValue: DEFAULT_SECOND },
@@ -75,6 +83,7 @@ export class WellOrderModal extends React.Component<Props, State> {
     )
     this.props.closeModal()
   }
+
   handleCancel: () => void = () => {
     const {
       initialFirstValue,
@@ -86,10 +95,12 @@ export class WellOrderModal extends React.Component<Props, State> {
     )
     this.props.closeModal()
   }
+
   handleDone: () => void = () => {
     this.applyChanges()
     this.props.closeModal()
   }
+
   makeOnChange: (
     ordinality: 'first' | 'second'
   ) => (
@@ -175,11 +186,7 @@ export class WellOrderModal extends React.Component<Props, State> {
               </div>
             </FormGroup>
             <FormGroup label={i18n.t('modal.well_order.viz_label')}>
-              <WellOrderViz
-                prefix={this.props.prefix}
-                firstValue={firstValue}
-                secondValue={secondValue}
-              />
+              <WellOrderViz firstValue={firstValue} secondValue={secondValue} />
             </FormGroup>
           </div>
           <div className={modalStyles.button_row_divided}>

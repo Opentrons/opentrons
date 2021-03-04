@@ -1,6 +1,13 @@
 // @flow
 import * as React from 'react'
-import { FormGroup, Tooltip, useHoverTooltip } from '@opentrons/components'
+import {
+  Text,
+  FormGroup,
+  Tooltip,
+  useHoverTooltip,
+  FONT_WEIGHT_SEMIBOLD,
+  FONT_SIZE_BODY_1,
+} from '@opentrons/components'
 import cx from 'classnames'
 import { i18n } from '../../../../localization'
 import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
@@ -74,15 +81,26 @@ export const WellOrderField = (props: Props): React.Node => {
             firstValue={firstValue}
             secondValue={secondValue}
           />
-          <img
-            onClick={handleOpen}
-            src={ZIG_ZAG_IMAGE}
-            className={cx(
-              styles.well_order_icon,
-              { [styles.icon_with_label]: props.label },
-              getIconClassNames()
-            )}
-          />
+          {firstValue != null && secondValue != null ? (
+            <img
+              onClick={handleOpen}
+              src={ZIG_ZAG_IMAGE}
+              className={cx(
+                styles.well_order_icon,
+                { [styles.icon_with_label]: props.label },
+                getIconClassNames()
+              )}
+            />
+          ) : (
+            <Text
+              onClick={handleOpen}
+              fontWeight={FONT_WEIGHT_SEMIBOLD}
+              fontSize={FONT_SIZE_BODY_1}
+              paddingTop="0.5rem"
+            >
+              {i18n.t('form.step_edit_form.field.well_order.mixed')}
+            </Text>
+          )}
         </FormGroup>
       </div>
     </>

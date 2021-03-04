@@ -66,7 +66,6 @@ export const SourceDestFields = (props: Props): React.Node => {
   return (
     <div className={className}>
       <div className={styles.form_row}>
-        {/* TODO IMMEDIATELY extract and reuse in Batch Edit Form!!! Might need very explicit props, no formData there. */}
         <FlowRateField
           {...propsForFields[addFieldNamePrefix('flowRate')]}
           pipetteId={formData.pipette}
