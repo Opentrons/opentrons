@@ -7,6 +7,7 @@ from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 
 from opentrons.protocols.implementations.engine.labware_context import \
     LabwareContext
+from opentrons.protocols.implementations.tip_tracker import TipTracker
 from opentrons.protocols.implementations.well_grid import WellGrid
 from opentrons.types import Point, DeckSlotName, Location
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -202,9 +203,16 @@ def test_reset_tips(labware_context: LabwareContext) -> None:
         labware_context.reset_tips()
 
 
-def test_get_tip_tracker(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_tip_tracker()
+def test_get_tip_tracker(
+        decoy: Decoy, labware_id: str, mock_state_view: StateView,
+        labware_context: LabwareContext, labware_data: LabwareData
+) -> None:
+    """Should return a tip tracker"""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert isinstance(labware_context.get_tip_tracker(), TipTracker)
 
 
 def test_get_well_grid(

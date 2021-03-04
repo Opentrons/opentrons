@@ -45,6 +45,7 @@ class LabwareContext(LabwareInterface):
         return self.get_parameters()['loadName']
 
     def set_name(self, new_name: str) -> None:
+        # TODO AL 2020304 - Is Labware.name setter necessary?
         raise NotImplementedError()
 
     def get_definition(self) -> LabwareDefinition:
@@ -61,6 +62,8 @@ class LabwareContext(LabwareInterface):
         return self.get_parameters()['quirks']
 
     def set_calibration(self, delta: Point) -> None:
+        # TODO AL 2020304 - Is this only here to support labware
+        #  calibration over RPC
         raise NotImplementedError()
 
     def get_calibrated_offset(self) -> Point:
@@ -78,13 +81,18 @@ class LabwareContext(LabwareInterface):
         return self._state_view.labware.get_tip_length(labware_id=self._id)
 
     def set_tip_length(self, length: float):
+        # TODO AL 2020304 - Is Labware.tip_length setter necessary?
         raise NotImplementedError()
 
     def reset_tips(self) -> None:
+        # TODO AL 2020304 - Tip tracking should only happen within
+        #  protocol engine's command processing
         raise NotImplementedError()
 
+    @lru_cache(maxsize=1)
     def get_tip_tracker(self) -> TipTracker:
-        raise NotImplementedError()
+        """Returns a tip tracker."""
+        return TipTracker(columns=self.get_well_grid().get_columns())
 
     @lru_cache(maxsize=1)
     def get_well_grid(self) -> WellGrid:
