@@ -2,6 +2,7 @@ describe('Batch Edit Transfo', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.closeAnnouncementModal()
+    // cy.wait(30000)
   })
 
   // import the batchEdit.json to PD
@@ -22,7 +23,7 @@ describe('Batch Edit Transfo', () => {
 
     // Goto Design tab and verify the page
 
-    cy.get("button[class*='navbar__tab__']").contains('DESIGN').parent().click()
+    cy.get('button[id=NavTab_design]').click()
     cy.get('button').contains('ok').click()
 
     // Verify the Design Page
