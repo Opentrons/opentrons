@@ -369,6 +369,17 @@ describe('_getSavedMultiSelectFieldValues', () => {
         )
       ).toEqual({
         // aspirate settings
+        aspirate_labware: {
+          value: 'aspirate_labware_id',
+          isIndeterminate: false,
+        },
+        aspirate_wells: {
+          isIndeterminate: true,
+        },
+        aspirate_wells_grouped: {
+          isIndeterminate: false,
+          value: false,
+        },
         aspirate_flowRate: {
           value: null,
           isIndeterminate: false,
@@ -430,6 +441,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
         },
         // dispense settings
+        dispense_labware: {
+          value: 'dispense_labware_id',
+          isIndeterminate: false,
+        },
         dispense_flowRate: {
           value: null,
           isIndeterminate: false,
@@ -494,6 +509,33 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: 'trashId',
           isIndeterminate: false,
         },
+        changeTip: {
+          isIndeterminate: false,
+          value: 'always',
+        },
+        dispense_wells: {
+          isIndeterminate: true,
+        },
+        disposalVolume_checkbox: {
+          isIndeterminate: false,
+          value: true,
+        },
+        disposalVolume_volume: {
+          isIndeterminate: false,
+          value: '20',
+        },
+        pipette: {
+          isIndeterminate: false,
+          value: 'some_pipette_id',
+        },
+        volume: {
+          isIndeterminate: false,
+          value: '30',
+        },
+        path: {
+          isIndeterminate: false,
+          value: 'single',
+        },
       })
     })
   })
@@ -505,20 +547,22 @@ describe('_getSavedMultiSelectFieldValues', () => {
         // just doing this so the ids are not the exact same
         another_move_liquid_step_id: {
           ...getMockMoveLiquidStep().move_liquid_step_id,
+          aspirate_labware: 'other_asp_labware',
           aspirate_flowRate: 2,
           aspirate_mmFromBottom: '2',
           aspirate_wellOrder_first: 'b2t',
           aspirate_wellOrder_second: 'r2l',
           preWetTip: true,
+          path: 'multiAspirate',
           aspirate_mix_checkbox: false,
-          // not going to change mix times or mix volumes
-          // if the checkboxes are different the rest of the fields should also be indeterminate
+          // not going to change mix times or mix volumes, so they should NOT be indeterminate
           aspirate_delay_checkbox: false,
           // same thing here for delay seconds and mm from bottom
           aspirate_airGap_checkbox: false,
           // same thing here with air gap volume
           aspirate_touchTip_checkbox: false,
           // same thing with aspirate_touchTip_mmFromBottom
+          dispense_labware: 'other_disp_labware',
           dispense_flowRate: 2,
           dispense_mmFromBottom: '2',
           dispense_wellOrder_first: 'b2t',
@@ -544,6 +588,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
         )
       ).toEqual({
         // aspirate settings
+        aspirate_labware: {
+          isIndeterminate: true,
+        },
         aspirate_flowRate: {
           isIndeterminate: true,
         },
@@ -556,6 +603,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
         aspirate_wellOrder_second: {
           isIndeterminate: true,
         },
+        path: {
+          isIndeterminate: true,
+        },
         preWetTip: {
           isIndeterminate: true,
         },
@@ -563,33 +613,42 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: true,
         },
         aspirate_mix_times: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '2',
         },
         aspirate_mix_volume: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '5',
         },
         aspirate_delay_checkbox: {
           isIndeterminate: true,
         },
         aspirate_delay_seconds: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '2',
         },
         aspirate_delay_mmFromBottom: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '1',
         },
         aspirate_airGap_checkbox: {
           isIndeterminate: true,
         },
         aspirate_airGap_volume: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '30',
         },
         aspirate_touchTip_checkbox: {
           isIndeterminate: true,
         },
         aspirate_touchTip_mmFromBottom: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: 1,
         },
         // dispense settings
+        dispense_labware: {
+          isIndeterminate: true,
+        },
         dispense_flowRate: {
           isIndeterminate: true,
         },
@@ -606,37 +665,74 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: true,
         },
         dispense_mix_times: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: null,
         },
         dispense_mix_volume: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: null,
         },
         dispense_delay_checkbox: {
           isIndeterminate: true,
         },
         dispense_delay_seconds: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '1',
         },
         dispense_delay_mmFromBottom: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: '0.5',
         },
         dispense_airGap_checkbox: {
           isIndeterminate: true,
         },
         dispense_airGap_volume: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: null,
         },
         dispense_touchTip_checkbox: {
           isIndeterminate: true,
         },
         dispense_touchTip_mmFromBottom: {
-          isIndeterminate: true,
+          isIndeterminate: false,
+          value: 1,
         },
         blowout_checkbox: {
           isIndeterminate: true,
         },
         blowout_location: {
+          isIndeterminate: false,
+          value: 'trashId',
+        },
+        aspirate_wells: {
           isIndeterminate: true,
+        },
+        dispense_wells: {
+          isIndeterminate: true,
+        },
+        aspirate_wells_grouped: {
+          isIndeterminate: false,
+          value: false,
+        },
+        changeTip: {
+          isIndeterminate: false,
+          value: 'always',
+        },
+        disposalVolume_checkbox: {
+          isIndeterminate: false,
+          value: true,
+        },
+        disposalVolume_volume: {
+          isIndeterminate: false,
+          value: '20',
+        },
+        pipette: {
+          isIndeterminate: false,
+          value: 'some_pipette_id',
+        },
+        volume: {
+          isIndeterminate: false,
+          value: '30',
         },
       })
     })

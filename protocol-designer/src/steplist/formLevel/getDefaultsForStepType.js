@@ -53,6 +53,7 @@ export function getDefaultsForStepType(
         aspirate_mix_volume: null,
         aspirate_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_ASPIRATE}`,
         aspirate_touchTip_checkbox: false,
+        aspirate_touchTip_mmFromBottom: null,
 
         dispense_flowRate: null,
         dispense_labware: null,
@@ -64,6 +65,7 @@ export function getDefaultsForStepType(
         dispense_mix_volume: null,
         dispense_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,
         dispense_touchTip_checkbox: false,
+        dispense_touchTip_mmFromBottom: null,
 
         disposalVolume_checkbox: false,
         disposalVolume_volume: null,
