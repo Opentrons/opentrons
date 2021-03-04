@@ -84,19 +84,18 @@ export interface PositionProps {
   left?: string | number
 }
 
-export type StyleProps = ColorProps &
-  TypographyProps &
-  SpacingProps &
-  BorderProps &
-  FlexboxProps &
-  GridProps &
-  LayoutProps &
-  PositionProps & {
-    className?: string
-  }
+export interface StyleProps
+  extends ColorProps,
+    TypographyProps,
+    SpacingProps,
+    BorderProps,
+    FlexboxProps,
+    GridProps,
+    LayoutProps,
+    PositionProps {
+  className?: string
+}
 
-export type PrimitiveComponent<Instance> = StyledComponent<
-  StyleProps,
-  {},
-  Instance
->
+export type PrimitiveComponent<
+  Instance extends keyof JSX.IntrinsicElements | React.ComponentType<any>
+> = StyledComponent<Instance, {}, StyleProps>

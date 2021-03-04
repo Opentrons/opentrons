@@ -5,9 +5,9 @@ import pick from 'lodash/pick'
 
 import * as Types from './types'
 
-import type { StyledComponentProps } from 'styled-components'
+import type { CSSObject } from 'styled-components'
 
-const COLOR_PROPS = ['color', 'backgroundColor', 'opacity']
+const COLOR_PROPS = ['color', 'backgroundColor', 'opacity'] as const
 
 const TYPOGRAPHY_PROPS = [
   'fontSize',
@@ -17,7 +17,7 @@ const TYPOGRAPHY_PROPS = [
   'textAlign',
   'textTransform',
   'textDecoration',
-]
+] as const
 
 const SPACING_PROPS = [
   'margin',
@@ -34,7 +34,7 @@ const SPACING_PROPS = [
   'paddingRight',
   'paddingBottom',
   'paddingLeft',
-]
+] as const
 
 const BORDER_PROPS = [
   'border',
@@ -45,7 +45,7 @@ const BORDER_PROPS = [
   'borderRadius',
   'borderWidth',
   'borderColor',
-]
+] as const
 
 const FLEXBOX_PROPS = [
   'flex',
@@ -54,7 +54,7 @@ const FLEXBOX_PROPS = [
   'flexDirection',
   'flexWrap',
   'alignSelf',
-]
+] as const
 
 const GRID_PROPS = [
   'gridGap',
@@ -62,7 +62,7 @@ const GRID_PROPS = [
   'gridTemplateColumns',
   'gridRow',
   'gridColumn',
-]
+] as const
 
 const LAYOUT_PROPS = [
   'display',
@@ -77,9 +77,16 @@ const LAYOUT_PROPS = [
   'overflowX',
   'overflowY',
   'wordSpacing',
-]
+] as const
 
-const POSITION_PROPS = ['position', 'zIndex', 'top', 'right', 'bottom', 'left']
+const POSITION_PROPS = [
+  'position',
+  'zIndex',
+  'top',
+  'right',
+  'bottom',
+  'left',
+] as const
 
 const STYLE_PROPS = [
   ...COLOR_PROPS,
@@ -92,25 +99,19 @@ const STYLE_PROPS = [
   ...POSITION_PROPS,
 ]
 
-const colorStyles = (
-  props: Partial<Types.ColorProps>
-): Partial<Types.ColorProps> => {
-  return pick(props, COLOR_PROPS) as Types.ColorProps
+const colorStyles = (props: Types.StyleProps): CSSObject => {
+  return pick(props, COLOR_PROPS) as CSSObject
 }
 
-const typographyStyles = (
-  props: Partial<Types.TypographyProps>
-): Partial<Types.TypographyProps> => {
-  return pick(props, TYPOGRAPHY_PROPS) as Types.TypographyProps
+const typographyStyles = (props: Types.StyleProps): CSSObject => {
+  return pick(props, TYPOGRAPHY_PROPS) as CSSObject
 }
 
-const spacingStyles = (
-  props: Partial<Types.SpacingProps>
-): Partial<Types.TypographyProps> => {
+const spacingStyles = (props: Types.StyleProps): CSSObject => {
   const { marginX, marginY, paddingX, paddingY, ...styles } = pick(
     props,
     SPACING_PROPS
-  ) as Types.SpacingProps
+  ) as CSSObject
 
   if (marginX != null) {
     styles.marginRight = styles.marginRight ?? marginX
@@ -132,28 +133,20 @@ const spacingStyles = (
   return styles
 }
 
-const borderStyles = (
-  props: Partial<Types.BorderProps>
-): Partial<Types.BorderProps> => {
-  return pick(props, BORDER_PROPS) as Types.BorderProps
+const borderStyles = (props: Types.StyleProps): CSSObject => {
+  return pick(props, BORDER_PROPS) as CSSObject
 }
 
-const flexboxStyles = (
-  props: Partial<Types.FlexboxProps>
-): Partial<Types.FlexboxProps> => {
-  return pick(props, FLEXBOX_PROPS) as Types.FlexboxProps
+const flexboxStyles = (props: Types.StyleProps): CSSObject => {
+  return pick(props, FLEXBOX_PROPS) as CSSObject
 }
 
-const gridStyles = (
-  props: Partial<Types.GridProps>
-): Partial<Types.GridProps> => {
-  return pick(props, GRID_PROPS) as Types.GridProps
+const gridStyles = (props: Types.StyleProps): CSSObject => {
+  return pick(props, GRID_PROPS) as CSSObject
 }
 
-const layoutStyles = (
-  props: Partial<Types.LayoutProps>
-): Partial<Types.LayoutProps> => {
-  const { size, ...styles } = pick(props, LAYOUT_PROPS) as Types.LayoutProps
+const layoutStyles = (props: Types.StyleProps): CSSObject => {
+  const { size, ...styles } = pick(props, LAYOUT_PROPS) as CSSObject
 
   if (size != null) {
     styles.width = styles.width ?? size
@@ -163,15 +156,11 @@ const layoutStyles = (
   return styles
 }
 
-const positionStyles = (
-  props: Partial<Types.PositionProps>
-): Partial<Types.PositionProps> => {
-  return pick(props, POSITION_PROPS) as Types.PositionProps
+const positionStyles = (props: Types.StyleProps): CSSObject => {
+  return pick(props, POSITION_PROPS) as CSSObject
 }
 
-export const styleProps = (
-  props: Partial<Types.StyleProps>
-): StyledComponentProps<{}, {}, {}, {}> => ({
+export const styleProps = (props: Types.StyleProps): CSSObject => ({
   ...colorStyles(props),
   ...typographyStyles(props),
   ...spacingStyles(props),
@@ -182,5 +171,5 @@ export const styleProps = (
   ...positionStyles(props),
 })
 
-export const isntStyleProp = (prop: string): boolean =>
-  !STYLE_PROPS.includes(prop)
+export const isntStyleProp = (prop: string | React.ReactText): boolean =>
+  !STYLE_PROPS.includes(prop as any)

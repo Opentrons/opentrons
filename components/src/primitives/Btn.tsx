@@ -38,7 +38,7 @@ const BUTTON_VARIANT_STYLE = css`
   text-transform: ${Styles.TEXT_TRANSFORM_UPPERCASE};
 `
 
-type BtnComponent = PrimitiveComponent<HTMLButtonElement>
+type BtnComponent = PrimitiveComponent<'button'>
 
 /**
  * Button primitive
