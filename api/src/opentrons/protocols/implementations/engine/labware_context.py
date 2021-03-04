@@ -3,6 +3,7 @@ from typing import Dict, List
 
 from opentrons.protocol_engine import StateView
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
+from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.implementations.tip_tracker import TipTracker
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.protocols.implementations.well_grid import WellGrid
@@ -18,6 +19,7 @@ class LabwareContext(LabwareInterface):
     """LabwareInterface implementation that works with the Protocol Engine."""
 
     def __init__(self, labware_id: str, state_view: StateView):
+        """Construct"""
         self._id = labware_id
         self._state_view = state_view
 
@@ -83,13 +85,16 @@ class LabwareContext(LabwareInterface):
         raise NotImplementedError()
 
     def get_well_grid(self) -> WellGrid:
-        raise NotImplementedError()
+        """Returns a well grid."""
+        return WellGrid(self.get_wells())
 
     def get_wells(self) -> List[WellImplementation]:
-        raise NotImplementedError()
+        """Return a list of wells."""
+        return self._build_wells()
 
     def get_wells_by_name(self) -> Dict[str, WellImplementation]:
-        raise NotImplementedError()
+        """Get a dictionary of wells by name."""
+        return {well.get_name(): well for well in self.get_wells()}
 
     def get_geometry(self) -> LabwareGeometry:
         raise NotImplementedError()
@@ -106,3 +111,21 @@ class LabwareContext(LabwareInterface):
     def load_name(self) -> str:
         """Get the load name."""
         return self.get_parameters()['loadName']
+
+    def _build_wells(self) -> List[WellImplementation]:
+        """Create well objects."""
+        definition = self.get_definition()
+        flat_wells = (well for column in definition['ordering'] for well in column)
+        return [
+            WellImplementation(
+                well_geometry=WellGeometry(
+                    well_props=definition['wells'][well_name],
+                    parent_point=self.get_calibrated_offset(),
+                    parent_object=self
+                ),
+                display_name=f"{well_name} of {self.get_display_name()}",
+                name=well_name,
+                has_tip=self.is_tiprack()
+            )
+            for well_name in flat_wells
+        ]

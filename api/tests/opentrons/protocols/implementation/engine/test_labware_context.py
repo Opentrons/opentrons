@@ -6,6 +6,7 @@ from opentrons.protocol_engine.types import DeckSlotLocation
 
 from opentrons.protocols.implementations.engine.labware_context import \
     LabwareContext
+from opentrons.protocols.implementations.well_grid import WellGrid
 from opentrons.types import Point, DeckSlotName
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -45,12 +46,14 @@ def labware_context(labware_id: str,
     return LabwareContext(labware_id=labware_id, state_view=mock_state_view)
 
 
-def test_get_uri(decoy: Decoy, labware_id: str, mock_state_view: StateView,
-                 labware_context: LabwareContext) -> None:
+def test_get_uri(
+        decoy: Decoy, labware_id: str, mock_state_view: StateView,
+        labware_context: LabwareContext) -> None:
     """Should return the labware uri."""
     decoy.when(
         mock_state_view.labware.get_definition_uri(labware_id=labware_id)
     ).then_return("some uri")
+
     assert labware_context.get_uri() == "some uri"
 
 
@@ -183,19 +186,42 @@ def test_get_tip_tracker(labware_context: LabwareContext) -> None:
         labware_context.get_tip_tracker()
 
 
-def test_get_well_grid(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_well_grid()
+def test_get_well_grid(
+        decoy: Decoy, labware_id: str, mock_state_view: StateView,
+        labware_context: LabwareContext, labware_data: LabwareData) -> None:
+    """Should return a well grid instance."""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert isinstance(labware_context.get_well_grid(), WellGrid)
 
 
-def test_get_wells(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_wells()
+def test_get_wells(
+        decoy: Decoy, labware_id: str, mock_state_view: StateView,
+        labware_context: LabwareContext, labware_data: LabwareData) -> None:
+    """Should return the well list."""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert [str(s) for s in labware_context.get_wells()] == \
+           ["A1 of minimal labware on 3", "A2 of minimal labware on 3"]
 
 
-def test_get_wells_by_name(labware_context: LabwareContext) -> None:
-    with pytest.raises(NotImplementedError):
-        labware_context.get_wells_by_name()
+def test_get_wells_by_name(
+        decoy: Decoy, labware_id: str, mock_state_view: StateView,
+        labware_context: LabwareContext, labware_data: LabwareData) -> None:
+    """Should return a mapping of well name to well."""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert {
+        name: str(well) for (name, well) in labware_context.get_wells_by_name().items()
+           } == {
+        "A1": "A1 of minimal labware on 3", "A2": "A2 of minimal labware on 3"
+    }
 
 
 def test_get_geometry(labware_context: LabwareContext) -> None:
@@ -214,8 +240,8 @@ def test_separate_calibration(labware_context: LabwareContext) -> None:
 
 
 def test_load_name(
-        decoy: Decoy, labware_id: str, mock_state_view:
-        StateView, labware_context: LabwareContext, labware_data: LabwareData,
+        decoy: Decoy, labware_id: str, mock_state_view: StateView,
+        labware_context: LabwareContext, labware_data: LabwareData,
         minimal_labware_def: LabwareDefinition
 ) -> None:
     """Should return the load name."""
@@ -224,3 +250,15 @@ def test_load_name(
     ).then_return(labware_data)
 
     assert labware_context.load_name == minimal_labware_def['parameters']['loadName']
+
+
+def test_build_wells(
+        decoy: Decoy, labware_id: str, mock_state_view: StateView,
+        labware_context: LabwareContext, labware_data: LabwareData) -> None:
+    """Should return an ordered list of wells."""
+    decoy.when(
+        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
+    ).then_return(labware_data)
+
+    assert [str(w) for w in labware_context._build_wells()] == \
+           ["A1 of minimal labware on 3", "A2 of minimal labware on 3"]
