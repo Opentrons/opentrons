@@ -204,7 +204,7 @@ function mergeProps(
 }
 
 const StickyTitleBar = (props: TitleBarProps) => (
-  <TitleBar {...props} className={styles.sticky_bar} />
+  <TitleBar id="TitleBar_main" {...props} className={styles.sticky_bar} />
 )
 
 export const ConnectedTitleBar: React.AbstractComponent<{||}> = connect<
