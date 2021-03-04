@@ -1,4 +1,3 @@
-
 import styled from 'styled-components'
 
 import { styleProps, isntStyleProp } from './style-props'
@@ -13,9 +12,9 @@ import type { PrimitiveComponent } from './types'
  *
  * @component
  */
-export const Text: PrimitiveComponent<HTMLParagraphElement> = styled.p.withConfig(
-  { shouldForwardProp: isntStyleProp }
-)`
+export const Text: PrimitiveComponent<'p'> = styled.p.withConfig({
+  shouldForwardProp: isntStyleProp,
+})`
   margin-top: 0;
   margin-bottom: 0;
   ${styleProps}

@@ -2,8 +2,7 @@ import styled from 'styled-components'
 
 import { styleProps, isntStyleProp } from './style-props'
 
-import type { StyledComponent } from 'styled-components'
-import type { StyleProps } from './types'
+import type { StyleProps, PrimitiveComponent } from './types'
 
 export interface SvgProps extends StyleProps {
   /** attach a width attribute to the <svg> element */
@@ -32,7 +31,7 @@ const SVG_PROPS = ['svgWidth', 'svgHeight', '_cssWidth', '_cssHeight']
  *
  * @component
  */
-export const Svg: StyledComponent<SvgProps, {}, Element> = styled.svg
+export const Svg: PrimitiveComponent<'svg'> = styled.svg
   .withConfig({
     shouldForwardProp: p => {
       return (
@@ -45,7 +44,7 @@ export const Svg: StyledComponent<SvgProps, {}, Element> = styled.svg
     },
   })
   .attrs(
-    (props: SvgProps): JSX.Element => ({
+    (props: SvgProps): React.ComponentProps<PrimitiveComponent<'svg'>> => ({
       version: SVG_VERSION,
       xmlns: SVG_NAMESPACE,
       // map the explicit svgWidth/Height props to width/height attrs

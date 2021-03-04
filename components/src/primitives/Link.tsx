@@ -2,8 +2,7 @@ import styled from 'styled-components'
 
 import { styleProps, isntStyleProp } from './style-props'
 
-import type { StyledComponent } from 'styled-components'
-import type { StyleProps } from './types'
+import type { StyleProps, PrimitiveComponent } from './types'
 
 export interface LinkProps extends StyleProps {
   /** render link with target="_blank" */
@@ -15,12 +14,12 @@ export interface LinkProps extends StyleProps {
  *
  * @component
  */
-export const Link: StyledComponent<LinkProps, {}, HTMLAnchorElement> = styled.a
+export const Link: PrimitiveComponent<'a'> = styled.a
   .withConfig({
     shouldForwardProp: p => isntStyleProp(p) && p !== 'external',
   })
   .attrs(
-    (props: LinkProps): JSX.Element => {
+    (props: LinkProps): React.ComponentProps<PrimitiveComponent<'a'>> => {
       return props.external === true
         ? { target: '_blank', rel: 'noopener noreferrer' }
         : {}
