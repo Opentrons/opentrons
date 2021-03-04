@@ -373,6 +373,13 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: 'aspirate_labware_id',
           isIndeterminate: false,
         },
+        aspirate_wells: {
+          isIndeterminate: true,
+        },
+        aspirate_wells_grouped: {
+          isIndeterminate: false,
+          value: false,
+        },
         aspirate_flowRate: {
           value: null,
           isIndeterminate: false,
@@ -501,6 +508,29 @@ describe('_getSavedMultiSelectFieldValues', () => {
         blowout_location: {
           value: 'trashId',
           isIndeterminate: false,
+        },
+        changeTip: {
+          isIndeterminate: false,
+          value: 'always',
+        },
+        dispense_wells: {
+          isIndeterminate: true,
+        },
+        disposalVolume_checkbox: {
+          isIndeterminate: false,
+          value: true,
+        },
+        disposalVolume_volume: {
+          isIndeterminate: false,
+          value: '20',
+        },
+        pipette: {
+          isIndeterminate: false,
+          value: 'some_pipette_id',
+        },
+        volume: {
+          isIndeterminate: false,
+          value: '30',
         },
         path: {
           isIndeterminate: false,
@@ -673,6 +703,36 @@ describe('_getSavedMultiSelectFieldValues', () => {
         blowout_location: {
           isIndeterminate: false,
           value: 'trashId',
+        },
+        aspirate_wells: {
+          isIndeterminate: true,
+        },
+        dispense_wells: {
+          isIndeterminate: true,
+        },
+        aspirate_wells_grouped: {
+          isIndeterminate: false,
+          value: false,
+        },
+        changeTip: {
+          isIndeterminate: false,
+          value: 'always',
+        },
+        disposalVolume_checkbox: {
+          isIndeterminate: false,
+          value: true,
+        },
+        disposalVolume_volume: {
+          isIndeterminate: false,
+          value: '20',
+        },
+        pipette: {
+          isIndeterminate: false,
+          value: 'some_pipette_id',
+        },
+        volume: {
+          isIndeterminate: false,
+          value: '30',
         },
       })
     })

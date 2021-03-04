@@ -23,7 +23,6 @@ import type {
   PathOption,
 } from '../../form-types'
 
-// TODO IMMEDIATELY add test
 export function getBlowoutLocationOptionsForForm(args: {|
   stepType: StepType,
   path?: ?PathOption,
@@ -216,9 +215,9 @@ export function getTooltipForField(
 export const getFieldDefaultTooltip = (name: string): string =>
   i18n.t([`tooltip.step_fields.defaults.${name}`, ''])
 
-// TODO(IL, 2021-03-03): keys for fieldMap are TipOffsetFields, but since
-// utils like addFieldNamePrefix return StepFieldName/string instead
-// of strict TipOffsetFields
+// TODO(IL, 2021-03-03): keys for fieldMap are more strictly of TipOffsetFields type,
+// but since utils like addFieldNamePrefix return StepFieldName/string instead
+// of strict TipOffsetFields, we have to be more lenient with the types
 export function getLabwareFieldForPositioningField(
   name: StepFieldName
 ): StepFieldName {
