@@ -4,7 +4,6 @@ otupdate.buildroot.control: non-update-specific endpoints for otupdate
 This has endpoints like /restart that aren't specific to update tasks.
 """
 import asyncio
-import hashlib
 import logging
 import subprocess
 from functools import lru_cache
@@ -70,14 +69,7 @@ def get_serial() -> str:
         return 'unknown'
 
 
-def _get_os_boot_id() -> bytes:
-    # See the "/proc Interface" section in man(4) random.
-    return Path('/proc/sys/kernel/random/boot_id').read_bytes()
-
-
 @lru_cache(maxsize=1)
 def get_boot_id() -> str:
-    # Hash to obfuscate so no one accidentally relies on this specifically
-    # being the kernel-provided boot ID. Choice of hash function is
-    # arbitrary.
-    return hashlib.sha256(_get_os_boot_id()).hexdigest()
+    # See the "/proc Interface" section in man(4) random.
+    return Path('/proc/sys/kernel/random/boot_id').read_text()
