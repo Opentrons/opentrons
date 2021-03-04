@@ -114,20 +114,27 @@ const spacingStyles = (props: Types.StyleProps): CSSObject => {
   ) as CSSObject
 
   if (marginX != null) {
-    styles.marginRight = styles.marginRight ?? marginX
-    styles.marginLeft = styles.marginLeft ?? marginX
+    styles.marginRight =
+      styles.marginRight ?? (marginX as typeof styles.marginRight)
+    styles.marginLeft =
+      styles.marginLeft ?? (marginX as typeof styles.marginLeft)
   }
   if (marginY != null) {
-    styles.marginTop = styles.marginTop ?? marginY
-    styles.marginBottom = styles.marginBottom ?? marginY
+    styles.marginTop = styles.marginTop ?? (marginY as typeof styles.marginTop)
+    styles.marginBottom =
+      styles.marginBottom ?? (marginY as typeof styles.marginBottom)
   }
   if (paddingX != null) {
-    styles.paddingRight = styles.paddingRight ?? paddingX
-    styles.paddingLeft = styles.paddingLeft ?? paddingX
+    styles.paddingRight =
+      styles.paddingRight ?? (paddingX as typeof styles.paddingRight)
+    styles.paddingLeft =
+      styles.paddingLeft ?? (paddingX as typeof styles.paddingLeft)
   }
   if (paddingY != null) {
-    styles.paddingTop = styles.paddingTop ?? paddingY
-    styles.paddingBottom = styles.paddingBottom ?? paddingY
+    styles.paddingTop =
+      styles.paddingTop ?? (paddingY as typeof styles.paddingTop)
+    styles.paddingBottom =
+      styles.paddingBottom ?? (paddingY as typeof styles.paddingBottom)
   }
 
   return styles
@@ -149,8 +156,8 @@ const layoutStyles = (props: Types.StyleProps): CSSObject => {
   const { size, ...styles } = pick(props, LAYOUT_PROPS) as CSSObject
 
   if (size != null) {
-    styles.width = styles.width ?? size
-    styles.height = styles.height ?? size
+    styles.width = styles.width ?? (size as typeof styles.width)
+    styles.height = styles.height ?? (size as typeof styles.height)
   }
 
   return styles

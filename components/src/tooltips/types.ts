@@ -22,9 +22,9 @@ export type HandleStateUpdate = (
 ) => void
 
 export interface UsePopperOptions {
-  target: Element | null
-  tooltip: HTMLElement | null
-  arrow: HTMLElement | null
+  target: JSX.Element | null
+  tooltip: JSX.Element | null
+  arrow: JSX.Element | null
   onStateUpdate: HandleStateUpdate
   placement?: Placement | null
   strategy?: Strategy | null
@@ -40,16 +40,16 @@ export interface UseTooltipOptions {
 }
 
 export interface UseTooltipResultTargetProps {
-  ref: React.Ref<Element>
+  ref: React.Ref<JSX.Element | null>
   'aria-describedby': string
 }
 
 export interface UseTooltipResultTooltipProps {
   id: string
-  ref: React.Ref<HTMLElement>
+  ref: React.Ref<JSX.Element | null>
   placement: Placement | null
   style: Partial<CSSStyleDeclaration>
-  arrowRef: React.Ref<HTMLElement>
+  arrowRef: React.Ref<JSX.Element | null>
   arrowStyle: Partial<CSSStyleDeclaration>
 }
 

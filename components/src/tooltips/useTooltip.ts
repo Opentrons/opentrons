@@ -1,15 +1,15 @@
-
 import { useState, useCallback, useRef } from 'react'
 import uniqueId from 'lodash/uniqueId'
 import { usePopper } from './usePopper'
 import * as Styles from './styles'
 
 import type { UseTooltipOptions, UseTooltipResult, Placement } from './types'
+import { JUSTIFY_FLEX_START } from '../styles'
 
-type TooltipState = {
-  placement: Placement | null,
-  tooltipStyle: Partial<CSSStyleDeclaration>,
-  arrowStyle: Partial<CSSStyleDeclaration>,
+interface TooltipState {
+  placement: Placement | null
+  tooltipStyle: Partial<CSSStyleDeclaration>
+  arrowStyle: Partial<CSSStyleDeclaration>
 }
 
 const TOOLTIP_ID_PREFIX = 'Tooltip__'
@@ -46,9 +46,9 @@ const TOOLTIP_ID_PREFIX = 'Tooltip__'
 export function useTooltip(options: UseTooltipOptions = {}): UseTooltipResult {
   const { placement, strategy, offset = Styles.TOOLTIP_OFFSET_PX } = options
   const tooltipId = useRef(uniqueId(TOOLTIP_ID_PREFIX)).current
-  const [target, targetRef] = useState<Element | null>(null)
-  const [tooltip, tooltipRef] = useState<HTMLElement | null>(null)
-  const [arrow, arrowRef] = useState<HTMLElement | null>(null)
+  const [target, targetRef] = useState<JSX.Element | null>(null)
+  const [tooltip, tooltipRef] = useState<JSX.Element | null>(null)
+  const [arrow, arrowRef] = useState<JSX.Element | null>(null)
   const [tooltipState, setTooltipState] = useState<TooltipState>({
     placement: null,
     tooltipStyle: Styles.INITIAL_TOOLTIP_STYLE,
@@ -74,17 +74,17 @@ export function useTooltip(options: UseTooltipOptions = {}): UseTooltipResult {
   })
 
   const targetProps = {
-    ref: targetRef,
+    ref: targetRef as React.Ref<JSX.Element | null>,
     'aria-describedby': tooltipId,
   }
 
   const tooltipProps = {
     id: tooltipId,
-    ref: tooltipRef,
+    ref: tooltipRef as React.Ref<JSX.Element | null>,
     style: tooltipState.tooltipStyle,
     arrowStyle: tooltipState.arrowStyle,
     placement: tooltipState.placement,
-    arrowRef,
+    arrowRef: arrowRef as React.Ref<JSX.Element | null>,
   }
 
   return [targetProps, tooltipProps]
