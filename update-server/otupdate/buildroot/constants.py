@@ -17,7 +17,8 @@ DEVICE_BOOT_ID_NAME = APP_VARIABLE_PREFIX + "boot_id"
 #: unexpected reboots, like from interrupting the power supply).
 #:
 #: There are no guarantees about the returned ID's length or format. Equality
-#: comparison is the only valid thing to do with it.
+#: comparison with other IDs returned from this endpoint is the only valid
+#: thing to do with it.
 #:
-#: This ID should only change when the whole OT-2 operating system reboots.
-#: It shouldn't change if some internal process merely crashes and restarts.
+#: This ID only changes when the whole OT-2 operating system reboots.
+#: It doesn't change if some internal process merely crashes and restarts.
