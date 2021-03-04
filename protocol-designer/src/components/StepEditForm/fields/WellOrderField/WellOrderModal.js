@@ -11,7 +11,7 @@ import {
   DropdownField,
 } from '@opentrons/components'
 import modalStyles from '../../../modals/modal.css'
-import type { WellOrderOption, FormData } from '../../../../form-types'
+import type { WellOrderOption } from '../../../../form-types'
 
 import { WellOrderViz } from './WellOrderViz'
 import styles from './WellOrderInput.css'
@@ -29,7 +29,8 @@ type Props = {|
   isOpen: boolean,
   closeModal: () => mixed,
   prefix: 'aspirate' | 'dispense' | 'mix',
-  formData: FormData,
+  firstValue: ?WellOrderOption,
+  secondValue: ?WellOrderOption,
   updateValues: (
     firstValue: ?WellOrderOption,
     secondValue: ?WellOrderOption
@@ -58,10 +59,10 @@ export class WellOrderModal extends React.Component<Props, State> {
     initialFirstValue: ?WellOrderOption,
     initialSecondValue: ?WellOrderOption,
   |} = () => {
-    const { formData, prefix } = this.props
+    const { firstValue, secondValue } = this.props
     return {
-      initialFirstValue: formData && formData[`${prefix}_wellOrder_first`],
-      initialSecondValue: formData && formData[`${prefix}_wellOrder_second`],
+      initialFirstValue: firstValue,
+      initialSecondValue: secondValue,
     }
   }
   applyChanges: () => void = () => {
