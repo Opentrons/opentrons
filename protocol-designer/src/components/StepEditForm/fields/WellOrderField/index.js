@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 import {
-  Text,
   FormGroup,
+  Text,
   Tooltip,
   useHoverTooltip,
   FONT_WEIGHT_SEMIBOLD,
@@ -97,6 +97,7 @@ export const WellOrderField = (props: Props): React.Node => {
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               fontSize={FONT_SIZE_BODY_1}
               paddingTop="0.5rem"
+              paddingBottom="0.325rem"
             >
               {i18n.t('form.step_edit_form.field.well_order.mixed')}
             </Text>
