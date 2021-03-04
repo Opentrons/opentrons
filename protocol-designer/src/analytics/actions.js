@@ -30,6 +30,7 @@ export const optOut = (): SetOptIn => _setOptIn(false)
 export type AnalyticsEventAction = {|
   type: 'ANALYTICS_EVENT',
   payload: AnalyticsEvent,
+  meta?: mixed,
 |}
 
 // NOTE: this action creator should only be used for special cases where you want to
