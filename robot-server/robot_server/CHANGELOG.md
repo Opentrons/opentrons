@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.1.1...v4.2.0-alpha.0) (2021-03-05)
+
+
+### Bug Fixes
+
+* **api, robot-server:** fix a comical cascade of pipette config bugs ([#7316](https://github.com/Opentrons/opentrons/issues/7316)) ([98d0ddf](https://github.com/Opentrons/opentrons/commit/98d0ddf)), closes [#7305](https://github.com/Opentrons/opentrons/issues/7305)
+* **robot-server:** Do not save the z offset for pipette calibration ([#7417](https://github.com/Opentrons/opentrons/issues/7417)) ([3873f17](https://github.com/Opentrons/opentrons/commit/3873f17))
+
+
+### Features
+
+* **api:** upload using fast sim if feature flag enables feature ([#7322](https://github.com/Opentrons/opentrons/issues/7322)) ([f7e8283](https://github.com/Opentrons/opentrons/commit/f7e8283)), closes [#7286](https://github.com/Opentrons/opentrons/issues/7286)
+* **robot-server:** extract author and protocol name from JSON protocol metadata. ([#7267](https://github.com/Opentrons/opentrons/issues/7267)) ([4c10907](https://github.com/Opentrons/opentrons/commit/4c10907))
+* **robot-server:** protocol http api uses fast sim ([#7146](https://github.com/Opentrons/opentrons/issues/7146)) ([ce636c0](https://github.com/Opentrons/opentrons/commit/ce636c0)), closes [#6104](https://github.com/Opentrons/opentrons/issues/6104)
+
+
+
+
+
 ## [4.1.1](https://github.com/Opentrons/opentrons/compare/v4.1.0...v4.1.1) (2021-01-25)
 
 **Note:** Version bump only for package @opentrons/robot-server

@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.1.1...v4.2.0-alpha.0) (2021-03-05)
+
+
+### Bug Fixes
+
+* **api:** Correctly restore serial timeouts in the face of exceptions ([#7344](https://github.com/Opentrons/opentrons/issues/7344)) ([9aeda16](https://github.com/Opentrons/opentrons/commit/9aeda16))
+* **api:** fix mount critical point ([#7314](https://github.com/Opentrons/opentrons/issues/7314)) ([bc8196e](https://github.com/Opentrons/opentrons/commit/bc8196e)), closes [#7092](https://github.com/Opentrons/opentrons/issues/7092)
+* **api:** fix race condition causing pause/running state mismatch. ([#7265](https://github.com/Opentrons/opentrons/issues/7265)) ([cf62256](https://github.com/Opentrons/opentrons/commit/cf62256)), closes [#7216](https://github.com/Opentrons/opentrons/issues/7216)
+* **api:** fix return code of set_syslog_level ([#7351](https://github.com/Opentrons/opentrons/issues/7351)) ([7ec7a6b](https://github.com/Opentrons/opentrons/commit/7ec7a6b))
+* **api:** labware calibration can be completed when using fast simulation. ([#7371](https://github.com/Opentrons/opentrons/issues/7371)) ([d4f436f](https://github.com/Opentrons/opentrons/commit/d4f436f)), closes [#7365](https://github.com/Opentrons/opentrons/issues/7365)
+* **api, robot-server:** fix a comical cascade of pipette config bugs ([#7316](https://github.com/Opentrons/opentrons/issues/7316)) ([98d0ddf](https://github.com/Opentrons/opentrons/commit/98d0ddf)), closes [#7305](https://github.com/Opentrons/opentrons/issues/7305)
+
+
+### Features
+
+* **api:** add dispense command to the Protocol Engine ([#7221](https://github.com/Opentrons/opentrons/issues/7221)) ([31b1e67](https://github.com/Opentrons/opentrons/commit/31b1e67)), closes [#6599](https://github.com/Opentrons/opentrons/issues/6599)
+* **api:** add enableProtocolEngine feature flag to opentrons.config ([#7389](https://github.com/Opentrons/opentrons/issues/7389)) ([faf871e](https://github.com/Opentrons/opentrons/commit/faf871e)), closes [#7333](https://github.com/Opentrons/opentrons/issues/7333)
+* **api:** create ProtocolEngineImplementation class ([#7377](https://github.com/Opentrons/opentrons/issues/7377)) ([e78ae41](https://github.com/Opentrons/opentrons/commit/e78ae41)), closes [#7323](https://github.com/Opentrons/opentrons/issues/7323)
+* **api:** fast protocol upload feature flag ([#7321](https://github.com/Opentrons/opentrons/issues/7321)) ([6aa9249](https://github.com/Opentrons/opentrons/commit/6aa9249)), closes [#7288](https://github.com/Opentrons/opentrons/issues/7288)
+* **api:** SimInstrumentContext.move_to calls plan_moves. ([#7120](https://github.com/Opentrons/opentrons/issues/7120)) ([8990100](https://github.com/Opentrons/opentrons/commit/8990100))
+* **api:** upload using fast sim if feature flag enables feature ([#7322](https://github.com/Opentrons/opentrons/issues/7322)) ([f7e8283](https://github.com/Opentrons/opentrons/commit/f7e8283)), closes [#7286](https://github.com/Opentrons/opentrons/issues/7286)
+
+
+
+
+
 ## [4.1.1](https://github.com/Opentrons/opentrons/compare/v4.1.0...v4.1.1) (2021-01-25)
 
 **Note:** Version bump only for package @opentrons/api-server

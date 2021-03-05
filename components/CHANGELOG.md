@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.1.1...v4.2.0-alpha.0) (2021-03-05)
+
+
+### Bug Fixes
+
+* **components:** forward "id" prop in Button ([#7421](https://github.com/Opentrons/opentrons/issues/7421)) ([6f432d1](https://github.com/Opentrons/opentrons/commit/6f432d1)), closes [#7384](https://github.com/Opentrons/opentrons/issues/7384) [#7382](https://github.com/Opentrons/opentrons/issues/7382)
+
+
+### Features
+
+* **components:** add id prop to NavTab ([#7382](https://github.com/Opentrons/opentrons/issues/7382)) ([5da3238](https://github.com/Opentrons/opentrons/commit/5da3238)), closes [#7384](https://github.com/Opentrons/opentrons/issues/7384)
+* **components:** Add isIndeterminate options prop to InputField ([#7280](https://github.com/Opentrons/opentrons/issues/7280)) ([4304677](https://github.com/Opentrons/opentrons/commit/4304677)), closes [#7255](https://github.com/Opentrons/opentrons/issues/7255)
+* **components:** Add isIndeterminate prop to DropdownField ([#7282](https://github.com/Opentrons/opentrons/issues/7282)) ([284fd79](https://github.com/Opentrons/opentrons/commit/284fd79)), closes [#7256](https://github.com/Opentrons/opentrons/issues/7256)
+* **components:** Add optional isIndeterminate prop to CheckBoxField ([#7259](https://github.com/Opentrons/opentrons/issues/7259)) ([b06974c](https://github.com/Opentrons/opentrons/commit/b06974c)), closes [#7257](https://github.com/Opentrons/opentrons/issues/7257) [#7154](https://github.com/Opentrons/opentrons/issues/7154)
+* **protocol-designer:** Add multiselect mode UI ([#7211](https://github.com/Opentrons/opentrons/issues/7211)) ([9387073](https://github.com/Opentrons/opentrons/commit/9387073))
+* **protocol-designer:** Update Multiselect UI based off feedback ([#7293](https://github.com/Opentrons/opentrons/issues/7293)) ([1094d03](https://github.com/Opentrons/opentrons/commit/1094d03)), closes [#7270](https://github.com/Opentrons/opentrons/issues/7270)
+
+
+
+
+
 ## [4.1.1](https://github.com/Opentrons/opentrons/compare/v4.1.0...v4.1.1) (2021-01-25)
 
 **Note:** Version bump only for package @opentrons/components

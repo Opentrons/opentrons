@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.1.1...v4.2.0-alpha.0) (2021-03-05)
+
+
+### Bug Fixes
+
+* For requests to upload an empty SSH key, respond with a helpful error message ([#7244](https://github.com/Opentrons/opentrons/issues/7244)) ([2dad642](https://github.com/Opentrons/opentrons/commit/2dad642)), closes [#7173](https://github.com/Opentrons/opentrons/issues/7173)
+
+
+### Features
+
+* **update-server:** Add bootId field to GET /server/update/health ([#7404](https://github.com/Opentrons/opentrons/issues/7404)) ([061a580](https://github.com/Opentrons/opentrons/commit/061a580))
+
+
+
+
+
 ## [4.1.1](https://github.com/Opentrons/opentrons/compare/v4.1.0...v4.1.1) (2021-01-25)
 
 **Note:** Version bump only for package @opentrons/update-server
