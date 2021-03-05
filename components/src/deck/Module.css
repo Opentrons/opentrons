@@ -49,7 +49,7 @@
 
 .module_port_text {
   fill: currentColor;
-  color: var(--c-white);
+  color: var(--c-med-gray);
   font-size: 0.75rem;
   font-weight: var(--fw-semibold);
   text-transform: uppercase;
