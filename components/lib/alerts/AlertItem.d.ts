@@ -4,7 +4,7 @@ export interface AlertItemProps {
     /** name constant of the icon to display */
     type: 'success' | 'warning' | 'error' | 'info';
     /** title/main message of colored alert bar */
-    title: string | JSX.Element;
+    title: React.ReactNode;
     /** Alert message body contents */
     children?: React.ReactNode;
     /** Additional class name */

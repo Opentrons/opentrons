@@ -4,7 +4,6 @@ import { usePopper } from './usePopper'
 import * as Styles from './styles'
 
 import type { UseTooltipOptions, UseTooltipResult, Placement } from './types'
-import { JUSTIFY_FLEX_START } from '../styles'
 
 interface TooltipState {
   placement: Placement | null
@@ -46,9 +45,9 @@ const TOOLTIP_ID_PREFIX = 'Tooltip__'
 export function useTooltip(options: UseTooltipOptions = {}): UseTooltipResult {
   const { placement, strategy, offset = Styles.TOOLTIP_OFFSET_PX } = options
   const tooltipId = useRef(uniqueId(TOOLTIP_ID_PREFIX)).current
-  const [target, targetRef] = useState<JSX.Element | null>(null)
-  const [tooltip, tooltipRef] = useState<JSX.Element | null>(null)
-  const [arrow, arrowRef] = useState<JSX.Element | null>(null)
+  const [target, targetRef] = useState<HTMLElement | null>(null)
+  const [tooltip, tooltipRef] = useState<HTMLElement | null>(null)
+  const [arrow, arrowRef] = useState<HTMLElement | null>(null)
   const [tooltipState, setTooltipState] = useState<TooltipState>({
     placement: null,
     tooltipStyle: Styles.INITIAL_TOOLTIP_STYLE,
@@ -74,17 +73,17 @@ export function useTooltip(options: UseTooltipOptions = {}): UseTooltipResult {
   })
 
   const targetProps = {
-    ref: targetRef as React.Ref<JSX.Element | null>,
+    ref: targetRef,
     'aria-describedby': tooltipId,
   }
 
   const tooltipProps = {
     id: tooltipId,
-    ref: tooltipRef as React.Ref<JSX.Element | null>,
+    ref: tooltipRef,
     style: tooltipState.tooltipStyle,
     arrowStyle: tooltipState.arrowStyle,
     placement: tooltipState.placement,
-    arrowRef: arrowRef as React.Ref<JSX.Element | null>,
+    arrowRef: arrowRef,
   }
 
   return [targetProps, tooltipProps]

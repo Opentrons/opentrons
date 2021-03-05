@@ -6,4 +6,6 @@ export interface FilledWellsProps {
         [wellName: string]: string;
     };
 }
-export declare const FilledWells: React.Component<FilledWellsProps>;
+declare function FilledWellsComponent(props: FilledWellsProps): JSX.Element;
+export declare const FilledWells: React.MemoExoticComponent<typeof FilledWellsComponent>;
+export {};

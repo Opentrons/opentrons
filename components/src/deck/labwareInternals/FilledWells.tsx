@@ -29,6 +29,6 @@ function FilledWellsComponent(props: FilledWellsProps): JSX.Element {
   )
 }
 
-export const FilledWells: React.Component<FilledWellsProps> = React.memo(
-  FilledWellsComponent
-)
+export const FilledWells: React.MemoExoticComponent<
+  typeof FilledWellsComponent
+> = React.memo(FilledWellsComponent)

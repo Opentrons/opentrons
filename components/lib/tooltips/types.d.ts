@@ -9,9 +9,9 @@ export declare type HandleStateUpdate = (placement: Placement, styles: {
     arrow?: Partial<CSSStyleDeclaration>;
 }) => void;
 export interface UsePopperOptions {
-    target: JSX.Element | null;
-    tooltip: JSX.Element | null;
-    arrow: JSX.Element | null;
+    target: HTMLElement | null;
+    tooltip: HTMLElement | null;
+    arrow: HTMLElement | null;
     onStateUpdate: HandleStateUpdate;
     placement?: Placement | null;
     strategy?: Strategy | null;
@@ -24,15 +24,15 @@ export interface UseTooltipOptions {
     offset?: number;
 }
 export interface UseTooltipResultTargetProps {
-    ref: React.Ref<JSX.Element | null>;
+    ref: React.RefCallback<HTMLElement | null>;
     'aria-describedby': string;
 }
 export interface UseTooltipResultTooltipProps {
     id: string;
-    ref: React.Ref<JSX.Element | null>;
+    ref: React.RefCallback<HTMLElement | null>;
     placement: Placement | null;
     style: Partial<CSSStyleDeclaration>;
-    arrowRef: React.Ref<JSX.Element | null>;
+    arrowRef: React.RefCallback<HTMLElement | null>;
     arrowStyle: Partial<CSSStyleDeclaration>;
 }
 export declare type UseTooltipResult = [

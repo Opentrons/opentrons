@@ -11,9 +11,9 @@ export interface SingleWell {
 export interface WellProps extends SingleWell {
     selectable?: boolean;
     wellDef: WellDefinition;
-    onMouseOver?: (e: React.MouseEvent) => unknown;
-    onMouseLeave?: (e: React.MouseEvent) => unknown;
-    onMouseMove?: (e: React.MouseEvent) => unknown;
+    onMouseOver?: React.MouseEventHandler;
+    onMouseLeave?: React.MouseEventHandler;
+    onMouseMove?: React.MouseEventHandler;
 }
 export declare class Well extends React.Component<WellProps> {
     shouldComponentUpdate(nextProps: WellProps): boolean;

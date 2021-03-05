@@ -32,7 +32,7 @@ export interface TooltipProps {
   /** Inline styles to apply to the tooltip element (provided by useTooltip) */
   style: Partial<CSSStyleDeclaration>
   /** React function ref for tooltip's arrow element (provided by useTooltip) */
-  arrowRef: React.Ref<HTMLElement | null>
+  arrowRef: React.RefCallback<HTMLElement | null>
   /** Inline styles to apply to arrow element (provided by useTooltip) */
   arrowStyle: Partial<CSSStyleDeclaration>
 }
@@ -115,7 +115,7 @@ const ARROW_CSS_BY_PLACEMENT_BASE: Record<string, CSSObject | unknown> = {
 
 export interface ArrowProps {
   placement: Placement | null
-  arrowRef: React.Ref<HTMLElement>
+  arrowRef: React.RefCallback<HTMLElement>
   arrowStyle: Partial<CSSStyleDeclaration>
 }
 

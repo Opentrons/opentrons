@@ -17,9 +17,9 @@ import type {
 export interface LabwareRenderProps {
   definition: LabwareDefinition2
   showLabels?: boolean
-  missingTips?: WellGroup | null
-  highlightedWells?: WellGroup | null
-  selectedWells?: WellGroup | null
+  missingTips?: WellGroup | null | undefined
+  highlightedWells?: WellGroup | null | undefined
+  selectedWells?: WellGroup | null | undefined
   /** CSS color to fill specified wells */
   wellFill?: WellFill
   /** Optional callback, called with WellMouseEvent args onMouseEnter */
