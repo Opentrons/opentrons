@@ -2,7 +2,7 @@ import { css } from 'styled-components'
 
 import { C_DARK_GRAY, C_WHITE } from './colors'
 
-import type { CSSProp } from 'styled-components'
+import type { FlattenSimpleInterpolation } from 'styled-components'
 
 // font size values
 export const FONT_SIZE_HUGE = '3rem'
@@ -46,25 +46,25 @@ export const TEXT_TRANSFORM_LOWERCASE = 'lowercase'
 export const TEXT_DECORATION_UNDERLINE = 'underline'
 
 // font property sets
-export const FONT_HEADER_DARK: CSSProp = css`
+export const FONT_HEADER_DARK: FlattenSimpleInterpolation = css`
   font-size: ${FONT_SIZE_HEADER};
   font-weight: ${FONT_WEIGHT_SEMIBOLD};
   color: ${C_DARK_GRAY};
 `
 
-export const FONT_BODY_1_DARK: CSSProp = css`
+export const FONT_BODY_1_DARK: FlattenSimpleInterpolation = css`
   font-size: ${FONT_SIZE_BODY_1};
   font-weight: ${FONT_WEIGHT_REGULAR};
   color: ${C_DARK_GRAY};
 `
 
-export const FONT_BODY_1_LIGHT: CSSProp = css`
+export const FONT_BODY_1_LIGHT: FlattenSimpleInterpolation = css`
   font-size: ${FONT_SIZE_BODY_1};
   font-weight: ${FONT_WEIGHT_REGULAR};
   color: ${C_WHITE};
 `
 
-export const FONT_BODY_2_DARK: CSSProp = css`
+export const FONT_BODY_2_DARK: FlattenSimpleInterpolation = css`
   font-size: ${FONT_SIZE_BODY_2};
   font-weight: ${FONT_WEIGHT_REGULAR};
   color: ${C_DARK_GRAY};

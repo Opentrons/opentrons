@@ -48,7 +48,7 @@ export interface ButtonProps {
   /** ID of form that button is for */
   form?: string
   /** custom element or component to use instead of `<button>` */
-  Component?: string | React.Component
+  Component?: React.ReactComponentElement<any>
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: Partial<HoverTooltipHandlers> | null | undefined
   /** html tabindex property */
@@ -78,7 +78,8 @@ export function Button(props: ButtonProps): JSX.Element {
   const className = cx(props.className, { [styles.hover]: hover })
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const onClick = !disabled ? props.onClick : undefined
-  const Component = props.Component ?? 'button'
+  const Component: React.ReactComponentElement<any> =
+    props.Component ?? 'button'
   const type = props.type ?? BUTTON_TYPE_BUTTON
 
   // pass all props if using a custom component
@@ -96,7 +97,6 @@ export function Button(props: ButtonProps): JSX.Element {
   // ref forwarder
   return (
     <Component {...props.hoverTooltipHandlers} {...buttonProps}>
-      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       {props.iconName && <Icon name={props.iconName} className={styles.icon} />}
       {props.children}
     </Component>

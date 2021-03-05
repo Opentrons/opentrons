@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 export interface CenteredTextSvgProps {
-  text
+  text: React.ReactNode
   className?: string
 }
 

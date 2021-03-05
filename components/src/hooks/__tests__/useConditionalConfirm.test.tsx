@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
@@ -9,7 +8,7 @@ describe('useConditionalConfirm', () => {
   let showConfirmation: boolean
   let cancel: () => unknown
 
-  const TestUseConditionalConfirm = options => {
+  const TestUseConditionalConfirm = (options: any): JSX.Element => {
     ;({ confirm, showConfirmation, cancel } = useConditionalConfirm(
       options.handleContinue,
       options.shouldBlock
@@ -81,7 +80,7 @@ describe('useConditionalConfirm', () => {
         expect(showConfirmation).toBe(true)
       })
 
-      it('should NOT call handleContinue after calling confirm ', () => {
+      it('should NOT call handleContinue after calling confirm', () => {
         const props = {
           handleContinue: jest.fn(),
           shouldBlock: true,
@@ -155,7 +154,7 @@ describe('useConditionalConfirm', () => {
       expect(props.handleContinue).toHaveBeenCalled()
     })
 
-    it('should NOT set showConfirmation to true after calling confirm ', () => {
+    it('should NOT set showConfirmation to true after calling confirm', () => {
       const props = {
         handleContinue: jest.fn(),
         shouldBlock: false,

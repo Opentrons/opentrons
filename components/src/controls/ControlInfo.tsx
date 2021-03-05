@@ -3,7 +3,7 @@ import * as React from 'react'
 import styles from './styles.css'
 
 export interface ControlInfoProps {
-  children
+  children: React.ReactNode
   className?: string
 }
 

@@ -180,7 +180,7 @@ import { styleProps, isntStyleProp, C_DARK_GRAY } from '@opentrons/components'
 
 import type { PrimitiveComponent } from '@opentrons/components'
 
-export const Gray: PrimitiveComponent<HTMLDivElement> = styled.div.withConfig({
+export const Gray: PrimitiveComponent<'div'> = styled.div.withConfig({
   shouldForwardProp: isntStyleProp,
 })`
   color: ${C_DARK_GRAY};

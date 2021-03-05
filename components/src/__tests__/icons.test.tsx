@@ -5,14 +5,15 @@ import Renderer from 'react-test-renderer'
 import { Icon, NotificationIcon } from '..'
 
 import { ICON_DATA_BY_NAME } from '../icons/icon-data'
+import type { IconName } from '../icons'
 
-const icons = Object.keys(ICON_DATA_BY_NAME)
+const icons = Object.keys(ICON_DATA_BY_NAME) as IconName[]
 
 describe('icons', () => {
   icons.forEach(icon =>
     it(`${icon} renders correctly`, () => {
       const tree = Renderer.create(
-        <Icon name={`${icon}`} className="foo" />
+        <Icon name={icon} className="foo" />
       ).toJSON()
 
       expect(tree).toMatchSnapshot()

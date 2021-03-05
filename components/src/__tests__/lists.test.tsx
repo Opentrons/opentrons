@@ -51,7 +51,7 @@ describe('TitledList', () => {
 
   it('renders TitledList with optional icon correctly', () => {
     const tree = Renderer.create(
-      <TitledList title="foo" icon="flask-outline" />
+      <TitledList title="foo" iconName="flask-outline" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

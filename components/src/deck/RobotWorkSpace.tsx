@@ -15,9 +15,9 @@ export interface RobotWorkSpaceProps {
 
 type GetRobotCoordsFromDOMCoords = RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
 
-export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element {
+export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
   const { children, deckDef, deckLayerBlocklist = [], viewBox } = props
-  const wrapperRef: { current: Element | null } = React.useRef(null)
+  const wrapperRef = React.useRef<SVGSVGElement>(null)
 
   // NOTE: getScreenCTM in Chrome a DOMMatrix type,
   // in Firefox the same fn returns a deprecated SVGMatrix.
@@ -26,15 +26,13 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element {
   const getRobotCoordsFromDOMCoords: GetRobotCoordsFromDOMCoords = (x, y) => {
     if (!wrapperRef.current) return { x: 0, y: 0 }
 
-    // $FlowFixMe(mc, 2020-06-01): Flow has no SVGElement
     const cursorPoint = wrapperRef.current.createSVGPoint()
 
     cursorPoint.x = x
     cursorPoint.y = y
 
     return cursorPoint.matrixTransform(
-      // $FlowFixMe(mc, 2020-06-01): Flow has no SVGElement
-      wrapperRef.current.getScreenCTM().inverse()
+      wrapperRef.current.getScreenCTM()?.inverse()
     )
   }
   if (!deckDef && !viewBox) return null

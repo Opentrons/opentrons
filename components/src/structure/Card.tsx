@@ -3,13 +3,13 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 
-import type { StyledComponent } from 'styled-components'
+import type { PrimitiveComponent } from '../primitives/types'
 
 import * as styles from '../styles'
 
 export interface CardProps {
   /** Title for card, all cards should receive a title. */
-  title?
+  title?: React.ReactNode
   /** Card contents */
   children?: React.ReactNode
   /** If card can not be used, gray it out and remove pointer events */
@@ -34,11 +34,7 @@ export function Card(props: CardProps): JSX.Element {
   )
 }
 
-const Section: StyledComponent<
-  { disabled?: boolean },
-  {},
-  HTMLElement
-> = styled.section`
+const Section: PrimitiveComponent<'section'> = styled.section`
   font-size: ${styles.FONT_SIZE_BODY_2};
   position: relative;
   overflow: visible;

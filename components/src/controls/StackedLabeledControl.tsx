@@ -5,11 +5,13 @@ import styles from './styles.css'
 
 export interface StackedLabeledControlProps {
   label: string
-  control
+  control: React.ReactNode
   children?: React.ReactNode
 }
 
-export function StackedLabeledControl(props: StackedLabeledControlProps) {
+export function StackedLabeledControl(
+  props: StackedLabeledControlProps
+): JSX.Element {
   const { label, control, children } = props
 
   return (

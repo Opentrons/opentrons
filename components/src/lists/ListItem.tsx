@@ -1,4 +1,3 @@
-
 // ListItem component to be used as a child of TitledList
 import * as React from 'react'
 import { NavLink } from 'react-router-dom'
@@ -6,45 +5,45 @@ import classnames from 'classnames'
 
 import styles from './lists.css'
 import { Icon } from '../icons'
-import  type { IconName } from '../icons'
+import type { IconName } from '../icons'
+import { List } from 'lodash'
 
-type ListItemProps = {
+interface ListItemProps {
   /** click handler */
-  onClick?: (event: React.SyntheticEvent) => unknown,
+  onClick?: (event: React.SyntheticEvent) => unknown
   /** mouse enter handler */
-  onMouseEnter?: (event: React.MouseEvent) => unknown,
+  onMouseEnter?: (event: React.MouseEvent) => unknown
   /** mouse leave handler */
-  onMouseLeave?: (event: React.MouseEvent) => unknown,
+  onMouseLeave?: (event: React.MouseEvent) => unknown
   /** mouse enter handler */
-  onPointerEnter?: (event: React.PointerEvent) => unknown,
+  onPointerEnter?: (event: React.PointerEvent) => unknown
   /** mouse leave handler */
-  onPointerLeave?: (event: React.PointerEvent) => unknown,
+  onPointerLeave?: (event: React.PointerEvent) => unknown
   /** if URL is specified, ListItem is wrapped in a React Router NavLink */
-  url?: string | null,
+  url?: string | null
   /** if URL is specified NavLink can receive an active class name */
-  activeClassName?: string,
+  activeClassName?: string
   /** if URL is specified NavLink can receive an exact property for matching routes */
-  exact?: boolean,
+  exact?: boolean
   /** Additional class name */
-  className?: string,
+  className?: string
   /** if disabled, the onClick handler / NavLink will be disabled */
-  isDisabled?: boolean,
+  isDisabled?: boolean
   /** name constant of the icon to display */
-  iconName?: IconName,
-  'aria-describedby'?: string,
-  ref?: { current: Element | null } | ((current: Element | null) => unknown),
-  children: JSX.Element,
+  iconName?: IconName
+  'aria-describedby'?: string
+  ref?: { current: Element | null } | ((current: Element | null) => unknown)
+  children: React.ReactNode
 }
 
 /**
  * A styled `<li>` with an optional icon, and an optional url for a React Router `NavLink`
  *
  */
-export const ListItem: React.AbstractComponent<ListItemProps> = React.forwardRef(
-  ListItemComponent
-)
-
-function ListItemComponent(props: ListItemProps, ref) {
+export const ListItem = React.forwardRef<
+  React.RefObject<Element>,
+  ListItemProps
+>((props: ListItemProps, ref: React.ForwardRefRenderFunction) => {
   const { url, isDisabled, iconName, activeClassName, exact } = props
   const onClick = props.onClick && !isDisabled ? props.onClick : undefined
 
@@ -91,4 +90,4 @@ function ListItemComponent(props: ListItemProps, ref) {
       {props.children}
     </li>
   )
-}
+})

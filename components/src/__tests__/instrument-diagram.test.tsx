@@ -9,6 +9,7 @@ describe('InstrumentDiagram', () => {
   it('Single-channel renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentDiagram
+        mount="left"
         pipetteSpecs={{ channels: 1, displayCategory: 'GEN1' }}
       />
     ).toJSON()
@@ -19,6 +20,7 @@ describe('InstrumentDiagram', () => {
   it('Multi-channel renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentDiagram
+        mount="left"
         pipetteSpecs={{ channels: 8, displayCategory: 'GEN1' }}
       />
     ).toJSON()
@@ -29,6 +31,7 @@ describe('InstrumentDiagram', () => {
   it('Single-channel GEN2 renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentDiagram
+        mount="right"
         pipetteSpecs={{ channels: 1, displayCategory: 'GEN2' }}
       />
     ).toJSON()
@@ -39,6 +42,7 @@ describe('InstrumentDiagram', () => {
   it('Multi-channel GEN2 renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentDiagram
+        mount="right"
         pipetteSpecs={{ channels: 8, displayCategory: 'GEN2' }}
       />
     ).toJSON()
@@ -54,14 +58,13 @@ describe('InstrumentGroup', () => {
         left={{
           mount: 'left',
           description: 'p300 8-Channel',
-          tipType: '150',
           pipetteSpecs: { channels: 8, displayCategory: 'GEN1' },
+          isDisabled: false,
           className: 'foo',
         }}
         right={{
           mount: 'right',
           description: 'p10 Single',
-          tipType: '10',
           pipetteSpecs: { channels: 1, displayCategory: 'GEN1' },
           isDisabled: true,
           className: 'blah',

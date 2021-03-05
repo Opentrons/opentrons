@@ -12,10 +12,17 @@ declare module '@opentrons/shared-data' {
     zDimension: number
   }
 
+  export const SLOT_RENDER_WIDTH = 'stub' // stubbed
+  export const SLOT_RENDER_HEIGHT = 'stub' // stubbed
+
   // LABWARE DEF TYPES
 
-  export type LabwareDefinition2 = Record<string, unknown> // stubbed
-  export type LabwareWell = Record<string, unknown> // stubbed
+  export type wellIsRect = () => any // stubbed
+  export type getWellPropsForSVGLabwareV1 = () => any // stubbed
+  export type getLabwareV1Def = () => any // stubbed
+  export type LabwareDefinition1 = Record<string, any> // stubbed
+  export type LabwareDefinition2 = Record<string, any> // stubbed
+  export type LabwareWell = Record<string, any> // stubbed
 
   export interface WellDefinition {
     diameter?: number // NOTE: presence of diameter indicates a circular well
@@ -29,14 +36,31 @@ declare module '@opentrons/shared-data' {
     'total-liquid-volume': number
   }
 
+  // PIPETTE DEF TYPES
+
+  export type PipetteNameSpecs = Record<string, any> // stubbed
+  export type PipetteModelSpecs = Record<string, any> // stubbed
+  export type getAllPipetteNames = () => any // stubbed
+  export type getPipetteNameSpecs = () => any // stubbed
+  export const GEN1 = 'stub' // stubbed
+  export const GEN2 = 'stub' // stubbed
+
   // MODULE DEF TYPES
 
-  export type ModuleModel = string // stubbed
+  export const ModuleModel = 'stub' // stubbed
+  export type getModuleDisplayName = () => any // stubbed
+  export const MAGNETIC_MODULE_V1 = 'stub' // stubbed
+  export const MAGNETIC_MODULE_V2 = 'stub' // stubbed
+  export const TEMPERATURE_MODULE_V1 = 'stub' // stubbed
+  export const TEMPERATURE_MODULE_V2 = 'stub' // stubbed
+  export const THERMOCYCLER_MODULE_V1 = 'stub' // stubbed
 
   // DECK DEF TYPES
 
+  export type DeckSlotId = string
+
   export interface DeckSlot {
-    id: string
+    id: DeckSlotId
     position: CoordinateTuple
     matingSurfaceUnitVector?: UnitVectorTuple
     boundingBox: Dimensions

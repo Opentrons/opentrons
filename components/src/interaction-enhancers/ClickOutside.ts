@@ -4,7 +4,9 @@ interface ClickOutsideChildParams {
   ref: React.Ref<Element>
 }
 export interface ClickOutsideProps {
-  onClickOutside: () => void
+  onClickOutside: (
+    e?: React.MouseEvent | EventListenerOrEventListenerObject
+  ) => void
   children: (params: ClickOutsideChildParams) => JSX.Element
 }
 
@@ -18,20 +20,23 @@ export class ClickOutside extends React.Component<ClickOutsideProps> {
     this.wrapperRef = null
   }
 
-  componentDidMount() {
-    document.addEventListener('mousedown', this.handleClickOutside)
+  componentDidMount(): void {
+    document.addEventListener('mousedown', (e: any) => this.handleClickOutside)
   }
 
-  componentWillUnmount() {
-    document.removeEventListener('mousedown', this.handleClickOutside)
+  componentWillUnmount(): void {
+    document.removeEventListener(
+      'mousedown',
+      (e: any) => this.handleClickOutside
+    )
   }
 
   setWrapperRef: (el: Element | null) => void = el => {
     this.wrapperRef = el
   }
 
-  handleClickOutside: (event: MouseEvent) => void = event => {
-    const clickedElem = event.target
+  handleClickOutside = (event?: any): void => {
+    const clickedElem = event?.target
 
     if (!(clickedElem instanceof Node)) {
       // NOTE: this is some flow type checking funkiness
@@ -51,7 +56,7 @@ export class ClickOutside extends React.Component<ClickOutsideProps> {
     }
   }
 
-  render() {
+  render(): JSX.Element {
     return this.props.children({ ref: this.setWrapperRef })
   }
 }

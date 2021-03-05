@@ -1,4 +1,3 @@
-
 // test concrete implementations of primitive components to ensure that they:
 // - Apply the style props to CSS
 // - Don't pass the style props down to the DOM
@@ -19,7 +18,14 @@ const COMPONENTS = [
 
 describe('primitive components with style props', () => {
   COMPONENTS.forEach(({ Component, name }) => {
-    const render = props => {
+    const render = (
+      props:
+        | React.ComponentProps<typeof Box>
+        | React.ComponentProps<typeof Flex>
+        | React.ComponentProps<typeof Text>
+        | React.ComponentProps<typeof Link>
+        | React.ComponentProps<typeof Svg>
+    ): [ReturnType<typeof shallow>, any] => {
       const wrapper = shallow(<Component {...props} />)
       const domNode = wrapper.hostNodes()
 

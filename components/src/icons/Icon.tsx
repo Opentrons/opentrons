@@ -51,7 +51,9 @@ const spinStyle = css`
  * import type { IconName } from '@opentrons/components'
  * ```
  */
-export function Icon(props: IconProps & Partial<StyleProps>) {
+export function Icon(
+  props: IconProps & Partial<StyleProps>
+): JSX.Element | null {
   const { name, children, className, spin, ...svgProps } = props
 
   if (!(name in ICON_DATA_BY_NAME)) {

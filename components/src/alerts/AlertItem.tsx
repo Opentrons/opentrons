@@ -2,7 +2,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
 import { IconButton } from '../buttons'
-import * as styles from './alerts.css'
+import styles from './alerts.css'
 
 import type { IconProps } from '../icons'
 
@@ -26,7 +26,10 @@ export interface AlertItemProps {
  * change style and icon by using type 'success' 'warning' 'error'
  */
 
-const ALERT_PROPS_BY_TYPE = {
+const ALERT_PROPS_BY_TYPE: Record<
+  AlertItemProps['type'],
+  Pick<AlertItemProps, 'icon' | 'className'>
+> = {
   success: {
     icon: { name: 'check-circle' },
     className: styles.success,

@@ -67,14 +67,14 @@ export interface SelectProps {
   menuPlacement?: SelectPlacement
   menuPosition?: SelectPosition
   menuPortalTarget?: HTMLElement
-  placeholder?: ?string
+  placeholder?: string | null | undefined
   tabIndex?: string | number
   formatOptionLabel?: (
     option: SelectOption,
     data: {
       context: SelectOptionContext
       inputValue: string
-      selectValue: SelectOption[] | SelectOption | null | void
+      selectValue: SelectOption[] | SelectOption | null | undefined
     }
   ) => JSX.Element
   onBlur?: (e: React.FocusEvent<HTMLElement>) => unknown
@@ -82,7 +82,7 @@ export interface SelectProps {
   onFocus?: (e: React.FocusEvent<HTMLElement>) => unknown
 }
 
-const NO_STYLE = () => null
+const NO_STYLE = (): null => null
 
 const CLEAR_STYLES = {
   clearIndicator: NO_STYLE,

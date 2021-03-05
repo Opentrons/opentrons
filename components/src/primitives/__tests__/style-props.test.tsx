@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { shallow } from 'enzyme'
 import styled from 'styled-components'
@@ -8,7 +7,7 @@ import { styleProps, isntStyleProp } from '..'
 
 import type { PrimitiveComponent } from '..'
 
-const TestStyles: PrimitiveComponent<HTMLDivElement> = styled.div.withConfig({
+const TestStyles: PrimitiveComponent<'div'> = styled.div.withConfig({
   shouldForwardProp: isntStyleProp,
 })(styleProps)
 

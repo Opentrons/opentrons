@@ -6,9 +6,9 @@ import styles from './Well.css'
 
 export interface TipProps {
   wellDef: WellDefinition
-  tipVolume: ?number
-  empty?: ?boolean
-  highlighted?: ?boolean
+  tipVolume: number | null | undefined
+  empty?: boolean | null | undefined
+  highlighted?: boolean | null | undefined
 }
 
 export function Tip(props: TipProps): JSX.Element {

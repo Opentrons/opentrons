@@ -4,7 +4,7 @@ import styles from './LabwareNameOverlay.css'
 
 export interface LabwareNameOverlayProps {
   title: string
-  subtitle?: ?string
+  subtitle?: string | null | undefined
   className?: string
 }
 

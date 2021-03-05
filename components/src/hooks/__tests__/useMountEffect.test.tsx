@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { mount } from 'enzyme'
 
@@ -6,12 +5,12 @@ import { useMountEffect } from '../useMountEffect'
 
 describe('useMountEffect hook', () => {
   const TestUseMountEffect = (props: {
-    onMount: () => void | (() => void),
-  }) => {
+    onMount: () => void | (() => void)
+  }): JSX.Element => {
     useMountEffect(props.onMount)
     return <></>
   }
-  const render = handleMount => {
+  const render = (handleMount: () => void): ReturnType<typeof mount> => {
     return mount(<TestUseMountEffect onMount={handleMount} />)
   }
 
@@ -42,7 +41,7 @@ describe('useMountEffect hook', () => {
 
   it('should run a cleanup function', () => {
     const handleUnmount = jest.fn()
-    const handleMount = () => handleUnmount
+    const handleMount = (): unknown => handleUnmount
     const wrapper = render(handleMount)
 
     expect(handleUnmount).toHaveBeenCalledTimes(0)

@@ -29,18 +29,18 @@ export function SlotOverlay(props: SlotOverlayProps): JSX.Element {
     <g className={cx(styles.overlay, className)}>
       <rect
         className={styles.overlay_background}
-        x={leftRightPadding + '%'}
-        y={topPadding + '%'}
+        x={`${leftRightPadding}%`}
+        y={`${topPadding}%`}
         height="33%"
-        width={100 - leftRightPadding * 2 + '%'}
+        width={`${100 - leftRightPadding * 2}%`}
         rx="6"
       />
 
       {/* TODO: control icon x y and size */}
       {icon && (
         <Icon
-          x={leftRightPadding + 6 + '%'}
-          y={topPadding + 6 + '%'}
+          x={`${leftRightPadding + 6}%`}
+          y={`${topPadding + 6}%`}
           svgHeight={iconSize}
           svgWidth={iconSize}
           name={icon}
@@ -48,7 +48,7 @@ export function SlotOverlay(props: SlotOverlayProps): JSX.Element {
         />
       )}
 
-      <text {...textProps} y={topPadding + 20 + '%'}>
+      <text {...textProps} y={`${topPadding + 20}%`}>
         {text}
       </text>
     </g>

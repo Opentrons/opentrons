@@ -13,10 +13,10 @@ export interface ModalPageProps {
   /** Props for title bar at top of modal page */
   titleBar: TitleBarProps
   contentsClassName?: string
-  heading?
+  heading?: React.ReactNode
   children?: React.ReactNode
-  innerProps?: React.ElementProps<typeof Box>
-  outerProps?: React.ElementProps<typeof Box>
+  innerProps?: React.ComponentProps<typeof Box>
+  outerProps?: React.ComponentProps<typeof Box>
 }
 
 export function ModalPage(props: ModalPageProps): JSX.Element {

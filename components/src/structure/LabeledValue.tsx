@@ -7,9 +7,9 @@ import styles from './structure.css'
 
 export interface LabeledValueProps {
   /** Label */
-  label
+  label: string
   /** Value */
-  value
+  value: string
   /** Additional className */
   className?: string
   /** Additional value className */

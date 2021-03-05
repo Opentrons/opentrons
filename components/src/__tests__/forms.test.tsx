@@ -13,7 +13,7 @@ import {
 describe('CheckboxField', () => {
   it('renders correctly when unchecked', () => {
     const tree = Renderer.create(
-      <CheckboxField label="Check Box 1" className="foo" />
+      <CheckboxField onChange={jest.fn()} label="Check Box 1" className="foo" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -21,7 +21,12 @@ describe('CheckboxField', () => {
 
   it('renders correctly when checked', () => {
     const tree = Renderer.create(
-      <CheckboxField label="Check Box 1" className="foo" value />
+      <CheckboxField
+        onChange={jest.fn()}
+        label="Check Box 1"
+        className="foo"
+        value
+      />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -32,6 +37,7 @@ describe('DropdownField', () => {
   it('renders correctly with a value', () => {
     const tree = Renderer.create(
       <DropdownField
+        onChange={jest.fn()}
         className="foo"
         value={'rna'}
         options={[
@@ -48,8 +54,9 @@ describe('DropdownField', () => {
   it('renders correctly with a falsey value', () => {
     const tree = Renderer.create(
       <DropdownField
+        onChange={jest.fn()}
         className="foo"
-        value={false}
+        value={null}
         options={[
           { name: 'DNA', value: 'dna' },
           { name: 'RNA', value: 'rna' },
@@ -94,6 +101,7 @@ describe('RadioGroup', () => {
   it('renders correctly with no checked value', () => {
     const tree = Renderer.create(
       <RadioGroup
+        onChange={jest.fn()}
         options={[
           { name: 'Hazelnut', value: 'hazelnut' },
           { name: 'Chocolate', value: 'chocolate' },
@@ -108,6 +116,7 @@ describe('RadioGroup', () => {
   it('renders correctly with checked value', () => {
     const tree = Renderer.create(
       <RadioGroup
+        onChange={jest.fn()}
         value="chocolate"
         options={[
           { name: 'Hazelnut', value: 'hazelnut' },
@@ -123,6 +132,7 @@ describe('RadioGroup', () => {
   it('renders correctly inline', () => {
     const tree = Renderer.create(
       <RadioGroup
+        onChange={jest.fn()}
         value={'chocolate'}
         options={[
           { name: 'Hazelnut', value: 'hazelnut' },

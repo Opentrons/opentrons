@@ -5,8 +5,8 @@ import styles from './modals.css'
 
 export interface OverlayProps {
   /** optional onClick handler */
-  onClick?: (event: React.SyntheticEvent) => unknown
-  alertOverlay?: ?boolean
+  onClick?: React.MouseEventHandler
+  alertOverlay?: boolean | null | undefined
 }
 
 /**

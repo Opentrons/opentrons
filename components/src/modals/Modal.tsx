@@ -7,7 +7,7 @@ import styles from './modals.css'
 
 export interface ModalProps {
   /** handler to close the modal (attached to `Overlay` onClick) */
-  onCloseClick?: (event: React.SyntheticEvent) => unknown
+  onCloseClick?: React.MouseEventHandler
   /** Optional styled heading **/
   heading?: string
   /** modal contents */

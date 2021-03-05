@@ -14,13 +14,13 @@ export type Options = DropdownOption[]
 
 export interface DropdownFieldProps {
   /** change handler */
-  onChange: (event: SyntheticInputEvent<HTMLSelectElement>) => unknown
+  onChange: React.ChangeEventHandler
   /** focus handler */
-  onFocus?: (event: SyntheticFocusEvent<HTMLSelectElement>) => unknown
+  onFocus?: React.FocusEventHandler
   /** blur handler */
-  onBlur?: (event: SyntheticFocusEvent<HTMLSelectElement>) => unknown
+  onBlur?: React.FocusEventHandler
   /** value that is selected */
-  value?: ?string
+  value?: string | null | undefined
   /** optional id for the <select> element */
   id?: string
   /** name of field in form */
@@ -32,7 +32,7 @@ export interface DropdownFieldProps {
   /** optional caption. hidden when `error` is given */
   caption?: string
   /** if included, DropdownField will use error style and display error instead of caption */
-  error?: ?string
+  error?: string | null | undefined
   /** dropdown is disabled if value is true */
   disabled?: boolean
   /** html tabindex property */
