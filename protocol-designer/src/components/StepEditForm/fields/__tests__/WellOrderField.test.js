@@ -14,6 +14,8 @@ describe('WellOrderField', () => {
       prefix: 'aspirate',
       firstValue: null,
       secondValue: null,
+      firstName: 'example_wellOrder_first',
+      secondName: 'example_wellOrder_second',
       updateFirstWellOrder: jest.fn(),
       updateSecondWellOrder: jest.fn(),
     }

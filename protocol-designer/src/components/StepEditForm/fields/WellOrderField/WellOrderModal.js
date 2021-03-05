@@ -31,6 +31,8 @@ type Props = {|
   prefix: 'aspirate' | 'dispense' | 'mix',
   firstValue: ?WellOrderOption,
   secondValue: ?WellOrderOption,
+  firstName: string,
+  secondName: string,
   updateValues: (
     firstValue: ?WellOrderOption,
     secondValue: ?WellOrderOption
@@ -136,7 +138,10 @@ export class WellOrderModal extends React.Component<Props, State> {
   }
   render(): React.Node {
     if (!this.props.isOpen) return null
+
     const { firstValue, secondValue } = this.state
+    const { firstName, secondName } = this.props
+
     return (
       <Portal>
         <Modal
@@ -152,6 +157,7 @@ export class WellOrderModal extends React.Component<Props, State> {
             <FormGroup label={i18n.t('modal.well_order.field_label')}>
               <div className={styles.field_row}>
                 <DropdownField
+                  name={firstName}
                   value={firstValue}
                   className={cx(
                     stepEditStyles.field,
@@ -169,6 +175,7 @@ export class WellOrderModal extends React.Component<Props, State> {
                   {i18n.t('modal.well_order.then')}
                 </span>
                 <DropdownField
+                  name={secondName}
                   value={secondValue}
                   className={cx(
                     stepEditStyles.field,

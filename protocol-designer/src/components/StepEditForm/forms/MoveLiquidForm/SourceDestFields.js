@@ -92,6 +92,8 @@ export const SourceDestFields = (props: Props): React.Node => {
           }
           firstValue={formData[addFieldNamePrefix('wellOrder_first')]}
           secondValue={formData[addFieldNamePrefix('wellOrder_second')]}
+          firstName={addFieldNamePrefix('wellOrder_first')}
+          secondName={addFieldNamePrefix('wellOrder_second')}
         />
       </div>
 
