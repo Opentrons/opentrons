@@ -9,7 +9,7 @@ import type { IconName } from '../icons'
 
 export interface OutsideLinkTabProps {
   /** optional click event for nav button */
-  onClick?: (event: React.SyntheticEvent) => unknown
+  onClick?: React.MouseEventHandler
   /** link to outside URL */
   to: string
   /** position a single button on the bottom of the page */

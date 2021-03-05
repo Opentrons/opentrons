@@ -1,4 +1,3 @@
-s
 import assert from 'assert'
 import path from 'path'
 // replace webpack-specific require.context with Node-based glob in tests
