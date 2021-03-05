@@ -4,14 +4,11 @@ import { FlowRateInput, type FlowRateInputProps } from './FlowRateInput'
 import { connect } from 'react-redux'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import type { FieldProps } from '../../types'
-import type { FormData } from '../../../../form-types'
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { BaseState } from '../../../../types'
 
 type OP = {|
   ...FieldProps,
-  pipetteFieldName: StepFieldName,
-  formData: FormData,
+  pipetteId: ?string,
   className?: $PropertyType<FlowRateInputProps, 'className'>,
   flowRateType: $PropertyType<FlowRateInputProps, 'flowRateType'>,
   label?: $PropertyType<FlowRateInputProps, 'label'>,
@@ -37,9 +34,8 @@ function FlowRateInputWithKey(props: Props) {
 }
 
 function mapStateToProps(state: BaseState, ownProps: OP): SP {
-  const { flowRateType, pipetteFieldName, name, formData } = ownProps
+  const { flowRateType, pipetteId, name } = ownProps
 
-  const pipetteId = formData ? formData[pipetteFieldName] : null
   const pipette =
     pipetteId != null
       ? stepFormSelectors.getPipetteEntities(state)[pipetteId]
@@ -69,7 +65,7 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
 }
 
 const mergeProps = (stateProps: SP, dispatchProps, ownProps: OP): Props => {
-  const { formData, pipetteFieldName, ...passThruProps } = ownProps
+  const { pipetteId, ...passThruProps } = ownProps
   return { ...stateProps, ...passThruProps }
 }
 

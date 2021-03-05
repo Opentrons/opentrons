@@ -11,7 +11,7 @@ import {
   DropdownField,
 } from '@opentrons/components'
 import modalStyles from '../../../modals/modal.css'
-import type { WellOrderOption, FormData } from '../../../../form-types'
+import type { WellOrderOption } from '../../../../form-types'
 
 import { WellOrderViz } from './WellOrderViz'
 import styles from './WellOrderInput.css'
@@ -29,17 +29,18 @@ type Props = {|
   isOpen: boolean,
   closeModal: () => mixed,
   prefix: 'aspirate' | 'dispense' | 'mix',
-  formData: FormData,
+  firstValue: ?WellOrderOption,
+  secondValue: ?WellOrderOption,
   updateValues: (
     firstValue: ?WellOrderOption,
     secondValue: ?WellOrderOption
   ) => void,
 |}
 
-type State = {
-  firstValue: ?WellOrderOption,
-  secondValue: ?WellOrderOption,
-}
+type State = {|
+  firstValue: WellOrderOption,
+  secondValue: WellOrderOption,
+|}
 
 export class WellOrderModal extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -55,18 +56,26 @@ export class WellOrderModal extends React.Component<Props, State> {
   }
 
   getInitialFirstValues: () => {|
-    initialFirstValue: ?WellOrderOption,
-    initialSecondValue: ?WellOrderOption,
+    initialFirstValue: WellOrderOption,
+    initialSecondValue: WellOrderOption,
   |} = () => {
-    const { formData, prefix } = this.props
+    const { firstValue, secondValue } = this.props
+    if (firstValue == null || secondValue == null) {
+      return {
+        initialFirstValue: DEFAULT_FIRST,
+        initialSecondValue: DEFAULT_SECOND,
+      }
+    }
     return {
-      initialFirstValue: formData && formData[`${prefix}_wellOrder_first`],
-      initialSecondValue: formData && formData[`${prefix}_wellOrder_second`],
+      initialFirstValue: firstValue,
+      initialSecondValue: secondValue,
     }
   }
+
   applyChanges: () => void = () => {
     this.props.updateValues(this.state.firstValue, this.state.secondValue)
   }
+
   handleReset: () => void = () => {
     this.setState(
       { firstValue: DEFAULT_FIRST, secondValue: DEFAULT_SECOND },
@@ -74,6 +83,7 @@ export class WellOrderModal extends React.Component<Props, State> {
     )
     this.props.closeModal()
   }
+
   handleCancel: () => void = () => {
     const {
       initialFirstValue,
@@ -85,10 +95,12 @@ export class WellOrderModal extends React.Component<Props, State> {
     )
     this.props.closeModal()
   }
+
   handleDone: () => void = () => {
     this.applyChanges()
     this.props.closeModal()
   }
+
   makeOnChange: (
     ordinality: 'first' | 'second'
   ) => (
@@ -174,11 +186,7 @@ export class WellOrderModal extends React.Component<Props, State> {
               </div>
             </FormGroup>
             <FormGroup label={i18n.t('modal.well_order.viz_label')}>
-              <WellOrderViz
-                prefix={this.props.prefix}
-                firstValue={firstValue}
-                secondValue={secondValue}
-              />
+              <WellOrderViz firstValue={firstValue} secondValue={secondValue} />
             </FormGroup>
           </div>
           <div className={modalStyles.button_row_divided}>

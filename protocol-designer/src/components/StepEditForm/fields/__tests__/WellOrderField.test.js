@@ -12,7 +12,8 @@ describe('WellOrderField', () => {
   beforeEach(() => {
     props = {
       prefix: 'aspirate',
-      formData: ({}: any),
+      firstValue: null,
+      secondValue: null,
       updateFirstWellOrder: jest.fn(),
       updateSecondWellOrder: jest.fn(),
     }

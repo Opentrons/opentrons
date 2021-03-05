@@ -12,8 +12,10 @@ import {
   BlowoutLocationField,
   CheckboxRowField,
   DelayFields,
-  TipPositionField,
+  FlowRateField,
   TextField,
+  TipPositionField,
+  WellOrderField,
 } from '../StepEditForm/fields'
 import { MixFields } from '../StepEditForm/fields/MixFields'
 import {
@@ -34,6 +36,7 @@ import {
   saveStepFormsMulti,
 } from '../../step-forms/actions'
 import type { FieldPropsByName } from '../StepEditForm/types'
+import type { WellOrderOption } from '../../form-types'
 // TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
 import formStyles from '../forms/forms.css'
 import styles from '../StepEditForm/StepEditForm.css'
@@ -48,10 +51,24 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
   const { prefix, propsForFields } = props
   const addFieldNamePrefix = name => `${prefix}_${name}`
 
-  const getLabwareIdForField = (name: string): string | null => {
+  const getLabwareIdForPositioningField = (name: string): string | null => {
     const labwareField = getLabwareFieldForPositioningField(name)
     const labwareId = propsForFields[labwareField]?.value
     return labwareId ? String(labwareId) : null
+  }
+
+  const getPipetteIdForForm = (): string | null => {
+    const pipetteId = propsForFields.pipette?.value
+    return pipetteId ? String(pipetteId) : null
+  }
+
+  const getWellOrderFieldValue = (name: string): ?WellOrderOption => {
+    const val = propsForFields[name]?.value
+    if (val === 'l2r' || val === 'r2l' || val === 't2b' || val === 'b2t') {
+      return val
+    } else {
+      return null
+    }
   }
 
   return (
@@ -61,6 +78,37 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
           {i18n.t('form.batch_edit_form.settings_for', { prefix })}
         </span>
       </Box>
+
+      <Box className={styles.form_row}>
+        <FlowRateField
+          {...propsForFields[addFieldNamePrefix('flowRate')]}
+          pipetteId={getPipetteIdForForm()}
+          flowRateType={prefix}
+        />
+        <TipPositionField
+          {...propsForFields[addFieldNamePrefix('mmFromBottom')]}
+          labwareId={getLabwareIdForPositioningField(
+            addFieldNamePrefix('mmFromBottom')
+          )}
+        />
+        <WellOrderField
+          prefix={prefix}
+          label={i18n.t('form.step_edit_form.field.well_order.label')}
+          firstValue={getWellOrderFieldValue(
+            addFieldNamePrefix('wellOrder_first')
+          )}
+          secondValue={getWellOrderFieldValue(
+            addFieldNamePrefix('wellOrder_second')
+          )}
+          updateFirstWellOrder={
+            propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
+          }
+          updateSecondWellOrder={
+            propsForFields[addFieldNamePrefix('wellOrder_second')].updateValue
+          }
+        />
+      </Box>
+
       {prefix === 'aspirate' && (
         <CheckboxRowField
           {...propsForFields['preWetTip']}
@@ -78,7 +126,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
         checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
         secondsFieldName={addFieldNamePrefix('delay_seconds')}
         tipPositionFieldName={addFieldNamePrefix('delay_mmFromBottom')}
-        labwareId={getLabwareIdForField(
+        labwareId={getLabwareIdForPositioningField(
           addFieldNamePrefix('delay_mmFromBottom')
         )}
         propsForFields={propsForFields}
@@ -90,7 +138,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
       >
         <TipPositionField
           {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}
-          labwareId={getLabwareIdForField(
+          labwareId={getLabwareIdForPositioningField(
             addFieldNamePrefix('touchTip_mmFromBottom')
           )}
         />

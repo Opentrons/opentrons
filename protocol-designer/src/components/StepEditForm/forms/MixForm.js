@@ -98,9 +98,8 @@ export const MixForm = (props: StepFormProps): React.Node => {
             <div className={styles.form_row}>
               <FlowRateField
                 {...propsForFields['aspirate_flowRate']}
-                pipetteFieldName="pipette"
+                pipetteId={formData.pipette}
                 flowRateType="aspirate"
-                formData={props.formData}
               />
               <TipPositionField
                 {...propsForFields['mix_mmFromBottom']}
@@ -119,7 +118,8 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 }
                 prefix="mix"
                 label={i18n.t('form.step_edit_form.field.well_order.label')}
-                formData={props.formData}
+                firstValue={formData['mix_wellOrder_first']}
+                secondValue={formData['mix_wellOrder_second']}
               />
             </div>
             <DelayFields
@@ -140,9 +140,8 @@ export const MixForm = (props: StepFormProps): React.Node => {
             <div className={styles.form_row}>
               <FlowRateField
                 {...propsForFields['dispense_flowRate']}
-                pipetteFieldName="pipette"
+                pipetteId={formData.pipette}
                 flowRateType="dispense"
-                formData={props.formData}
               />
             </div>
             <div className={styles.checkbox_column}>

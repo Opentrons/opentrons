@@ -68,8 +68,7 @@ export const SourceDestFields = (props: Props): React.Node => {
       <div className={styles.form_row}>
         <FlowRateField
           {...propsForFields[addFieldNamePrefix('flowRate')]}
-          formData={formData}
-          pipetteFieldName="pipette"
+          pipetteId={formData.pipette}
           flowRateType={prefix}
         />
         <TipPositionField
@@ -85,13 +84,14 @@ export const SourceDestFields = (props: Props): React.Node => {
         <WellOrderField
           prefix={prefix}
           label={i18n.t('form.step_edit_form.field.well_order.label')}
-          formData={formData}
           updateFirstWellOrder={
             propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
           }
           updateSecondWellOrder={
             propsForFields[addFieldNamePrefix('wellOrder_second')].updateValue
           }
+          firstValue={formData[addFieldNamePrefix('wellOrder_first')]}
+          secondValue={formData[addFieldNamePrefix('wellOrder_second')]}
         />
       </div>
 
