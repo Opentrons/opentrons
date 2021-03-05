@@ -1,8 +1,16 @@
 // @flow
 
+// overall status constants
 export const CONNECTABLE: 'connectable' = 'connectable'
 export const REACHABLE: 'reachable' = 'reachable'
 export const UNREACHABLE: 'unreachable' = 'unreachable'
+
+// restart status constants
+export const RESTART_PENDING_STATUS: 'restart-pending' = 'restart-pending'
+export const RESTARTING_STATUS: 'restarting' = 'restarting'
+// export const RESTART_FAILED_STATUS: 'restart-failed' = 'restart-failed'
+// export const UP_STATUS: 'up' = 'up'
+// export const DOWN_STATUS: 'down' = 'down'
 
 // TODO(mc, 2021-02-17): values below duplicated from Discovery Client source
 // discovery-client/src/constants.ts

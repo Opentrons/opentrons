@@ -84,3 +84,6 @@ export const resetConfigFailure = (
   payload: { robotName, error },
   meta,
 })
+
+// TODO(mc, 2021-04-05): add an action creator for discovery
+// list

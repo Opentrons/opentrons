@@ -11,15 +11,25 @@ import typeof {
   CONNECTABLE,
   REACHABLE,
   UNREACHABLE,
+  RESTART_PENDING_STATUS,
+  RESTARTING_STATUS,
 } from './constants'
 
 export type { DiscoveryClientRobot, HealthStatus }
 
 export type RobotsMap = $Shape<{| [name: string]: DiscoveryClientRobot |}>
 
+export type RestartingMap = {
+  [name: string]: {|
+    bootId: string | null,
+    status: RESTART_PENDING_STATUS | RESTARTING_STATUS | null,
+  |},
+  ...
+}
 export type DiscoveryState = {|
   scanning: boolean,
   robotsByName: RobotsMap,
+  restartingByName: RestartingMap,
 |}
 
 export type BaseRobot = {|

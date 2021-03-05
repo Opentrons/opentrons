@@ -74,6 +74,7 @@ export type ServerHealthResponse = {
   smoothieVersion: string,
   systemVersion: string,
   capabilities?: CapabilityMap,
+  bootId?: string,
   ...
 }
 

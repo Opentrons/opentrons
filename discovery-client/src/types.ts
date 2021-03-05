@@ -37,6 +37,7 @@ export interface ServerHealthResponse {
   smoothieVersion: string
   systemVersion: string
   capabilities?: CapabilityMap
+  bootId?: string
 }
 
 export interface HealthErrorResponse {
