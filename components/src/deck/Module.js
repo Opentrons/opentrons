@@ -100,9 +100,9 @@ function ModuleItemContents(props: ModuleItemContentsProps) {
   return (
     <>
       <div className={styles.module_wrapper}>
-        <p key="portInfo" className={styles.module_port_text}>
+        {/* <p key="portInfo" className={styles.module_port_text}>
           no usb port yet
-        </p>
+        </p> */}
         <p key="displayName" className={styles.module_review_text}>
           {displayName}
         </p>
