@@ -19,6 +19,7 @@ async def test_health(test_cli):
     assert body['apiServerVersion'] == version_dict['opentrons_api_version']
     assert body['smoothieVersion'] == 'unimplemented'
     assert body['systemVersion'] == version_dict['buildroot_version']
+    assert body['bootId'] == 'dummy-boot-id-abc123'
 
 
 async def test_restart(test_cli, monkeypatch):
