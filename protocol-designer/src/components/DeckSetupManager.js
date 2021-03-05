@@ -29,7 +29,7 @@ const NoBatchEditSharedSettings = (): React.Node => {
       alignItems={ALIGN_CENTER}
       height="75%"
     >
-      <Text color={C_DARK_GRAY}>
+      <Text id="Text_noSharedSettings" color={C_DARK_GRAY}>
         {i18n.t('application.no_batch_edit_shared_settings')}
       </Text>
     </Flex>

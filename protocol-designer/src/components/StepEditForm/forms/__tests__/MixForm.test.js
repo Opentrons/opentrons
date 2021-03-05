@@ -62,6 +62,8 @@ describe('MixForm', () => {
     props = {
       formData: ({
         stepType: 'mix',
+        mix_wellOrder_first: 'r2l',
+        mix_wellOrder_second: 'b2t',
       }: any),
       focusHandlers: {
         blur: jest.fn(),
@@ -152,7 +154,8 @@ describe('MixForm', () => {
       expect(wellOrderField.props()).toMatchObject({
         prefix: 'mix',
         label: 'Well order',
-        formData: props.formData,
+        firstValue: 'r2l',
+        secondValue: 'b2t',
         updateFirstWellOrder:
           props.propsForFields['mix_wellOrder_first'].updateValue,
         updateSecondWellOrder:

@@ -469,6 +469,11 @@ async def test_save_custom_tiprack_def(
 
 async def test_save_pipette_calibration(mock_user_flow, mock_save_pipette):
     uf = mock_user_flow
+    uf._sm.set_state(uf._sm.state.joggingToDeck)
+    assert uf._cal_ref_point == Point(12.13, 9.0, 0.0)
+    await uf.jog(vector=(0, 0, 10))
+    await uf.save_offset()
+    assert uf._cal_ref_point == Point(12.13, 9.0, 10.0)
 
     uf._sm.set_state(uf._sm.state.savingPointOne)
     await uf._hardware.move_to(

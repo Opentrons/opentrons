@@ -4,19 +4,23 @@ import cx from 'classnames'
 import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import {
-  TextField,
-  CheckboxRowField,
   BlowoutLocationField,
-  PipetteField,
-  VolumeField,
-  LabwareField,
   ChangeTipField,
-  FlowRateField,
-  WellSelectionField,
-  TipPositionField,
-  WellOrderField,
+  CheckboxRowField,
   DelayFields,
+  FlowRateField,
+  LabwareField,
+  PipetteField,
+  TextField,
+  TipPositionField,
+  VolumeField,
+  WellOrderField,
+  WellSelectionField,
 } from '../fields'
+import {
+  getBlowoutLocationOptionsForForm,
+  getLabwareFieldForPositioningField,
+} from '../utils'
 import { AspDispSection } from './AspDispSection'
 
 import type { StepFormProps } from '../types'
@@ -94,13 +98,16 @@ export const MixForm = (props: StepFormProps): React.Node => {
             <div className={styles.form_row}>
               <FlowRateField
                 {...propsForFields['aspirate_flowRate']}
-                pipetteFieldName="pipette"
+                pipetteId={formData.pipette}
                 flowRateType="aspirate"
-                formData={props.formData}
               />
               <TipPositionField
                 {...propsForFields['mix_mmFromBottom']}
-                formData={formData}
+                labwareId={
+                  formData[
+                    getLabwareFieldForPositioningField('mix_mmFromBottom')
+                  ]
+                }
               />
               <WellOrderField
                 updateFirstWellOrder={
@@ -111,14 +118,23 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 }
                 prefix="mix"
                 label={i18n.t('form.step_edit_form.field.well_order.label')}
-                formData={props.formData}
+                firstValue={formData['mix_wellOrder_first']}
+                secondValue={formData['mix_wellOrder_second']}
+                firstName={'mix_wellOrder_first'}
+                secondName={'mix_wellOrder_second'}
               />
             </div>
             <DelayFields
               checkboxFieldName={'aspirate_delay_checkbox'}
               secondsFieldName={'aspirate_delay_seconds'}
+              labwareId={
+                formData[
+                  getLabwareFieldForPositioningField(
+                    'aspirate_delay_mmFromBottom'
+                  )
+                ]
+              }
               propsForFields={propsForFields}
-              formData={formData}
             />
           </div>
 
@@ -126,9 +142,8 @@ export const MixForm = (props: StepFormProps): React.Node => {
             <div className={styles.form_row}>
               <FlowRateField
                 {...propsForFields['dispense_flowRate']}
-                pipetteFieldName="pipette"
+                pipetteId={formData.pipette}
                 flowRateType="dispense"
-                formData={props.formData}
               />
             </div>
             <div className={styles.checkbox_column}>
@@ -136,7 +151,13 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 checkboxFieldName={'dispense_delay_checkbox'}
                 secondsFieldName={'dispense_delay_seconds'}
                 propsForFields={propsForFields}
-                formData={formData}
+                labwareId={
+                  formData[
+                    getLabwareFieldForPositioningField(
+                      'aspirate_delay_mmFromBottom'
+                    )
+                  ]
+                }
               />
               <CheckboxRowField
                 {...propsForFields['mix_touchTip_checkbox']}
@@ -145,7 +166,13 @@ export const MixForm = (props: StepFormProps): React.Node => {
               >
                 <TipPositionField
                   {...propsForFields['mix_touchTip_mmFromBottom']}
-                  formData={formData}
+                  labwareId={
+                    formData[
+                      getLabwareFieldForPositioningField(
+                        'mix_touchTip_mmFromBottom'
+                      )
+                    ]
+                  }
                 />
               </CheckboxRowField>
 
@@ -157,7 +184,9 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 <BlowoutLocationField
                   {...propsForFields['blowout_location']}
                   className={styles.full_width}
-                  formData={formData}
+                  options={getBlowoutLocationOptionsForForm({
+                    stepType: formData.stepType,
+                  })}
                 />
               </CheckboxRowField>
             </div>

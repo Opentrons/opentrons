@@ -15,6 +15,8 @@ export type TitledListProps = {|
   iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: mixed }>,
   /** optional data test id for the container */
   'data-test'?: string,
+  /** id attribute */
+  id?: string,
   // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
   /** children must all be `<li>` */
   children?: React.Node,
@@ -49,6 +51,7 @@ export type TitledListProps = {|
  */
 export function TitledList(props: TitledListProps): React.Node {
   const {
+    id,
     iconName,
     disabled,
     inert,
@@ -94,6 +97,7 @@ export function TitledList(props: TitledListProps): React.Node {
 
   return (
     <div
+      id={id}
       className={className}
       data-test={dataTest}
       {...{ onMouseEnter, onMouseLeave, onContextMenu }}

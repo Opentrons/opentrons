@@ -102,6 +102,7 @@
           "dispense_mix_volume": "3",
           "dispense_mmFromBottom": 2.5,
           "dispense_touchTip_checkbox": true,
+          "dispense_touchTip_mmFromBottom": null,
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "1",
           "blowout_checkbox": true,

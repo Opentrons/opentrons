@@ -91,13 +91,6 @@ describe('Protocols with Modules', () => {
     })
 
     it('designs protocol with thermocycler', () => {
-      // Avoid failing the test on uncaught exception
-      // Happens when writing a nickname for the labware
-      Cypress.on('uncaught:exception', (err, runnable) => {
-        console.log(err.name)
-        return false
-      })
-
       cy.openDesignPage()
       // close "setting up" modal
       cy.contains('Setting up your protocol').should('exist')
