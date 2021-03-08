@@ -1,2 +1,2 @@
 /// <reference types="jest" />
-export declare const getDeckDefinitions: jest.Mock<any, []>;
+export declare const getDeckDefinitions: jest.Mock<{}, []>;

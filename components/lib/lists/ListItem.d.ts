@@ -33,5 +33,5 @@ interface ListItemProps {
  * A styled `<li>` with an optional icon, and an optional url for a React Router `NavLink`
  *
  */
-export declare const ListItem: React.ForwardRefExoticComponent<Pick<ListItemProps, "className" | "children" | "onClick" | "onMouseEnter" | "onMouseLeave" | "onPointerEnter" | "onPointerLeave" | "url" | "activeClassName" | "exact" | "isDisabled" | "iconName" | "aria-describedby"> & React.RefAttributes<React.RefObject<Element>>>;
+export declare const ListItem: React.ForwardRefExoticComponent<Pick<ListItemProps, "exact" | "children" | "url" | "className" | "aria-describedby" | "onClick" | "onMouseEnter" | "onMouseLeave" | "onPointerEnter" | "onPointerLeave" | "iconName" | "isDisabled" | "activeClassName"> & React.RefAttributes<React.RefObject<Element>>>;
 export {};
