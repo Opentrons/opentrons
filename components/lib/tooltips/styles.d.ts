@@ -1,11 +1,11 @@
 export declare const INITIAL_TOOLTIP_STYLE: {
-    position: string;
-    left: string;
-    top: string;
-    margin: string;
+    readonly position: "absolute";
+    readonly left: "0";
+    readonly top: "0";
+    readonly margin: "0";
 };
 export declare const INITIAL_ARROW_STYLE: {
-    position: string;
+    readonly position: "absolute";
 };
 export declare const TOOLTIP_OFFSET_PX = 8;
 export declare const ARROW_OFFSET_PX = 2;

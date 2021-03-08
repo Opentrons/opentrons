@@ -1,15 +1,15 @@
-/// <reference types="react" />
-import type { Instance as PopperInstance, Options as PopperOptions } from '@popperjs/core/lib/types';
+import type { CSSProperties } from 'react';
+import type { Instance as PopperInstance, Options as PopperOptions, Modifier as PopperModifer } from '@popperjs/core';
 import type { UseHoverOptions, HoverHandlers } from '../interaction-enhancers';
 export declare type Placement = PopperOptions['placement'];
 export declare type Strategy = PopperOptions['strategy'];
-export type { PopperInstance, PopperOptions };
+export type { PopperInstance, PopperOptions, PopperModifer };
 export declare type HandleStateUpdate = (placement: Placement, styles: {
-    popper?: Partial<CSSStyleDeclaration>;
-    arrow?: Partial<CSSStyleDeclaration>;
+    popper?: CSSProperties;
+    arrow?: CSSProperties;
 }) => void;
 export interface UsePopperOptions {
-    target: HTMLElement | null;
+    target: Element | null;
     tooltip: HTMLElement | null;
     arrow: HTMLElement | null;
     onStateUpdate: HandleStateUpdate;
@@ -31,9 +31,9 @@ export interface UseTooltipResultTooltipProps {
     id: string;
     ref: React.RefCallback<HTMLElement | null>;
     placement: Placement | null;
-    style: Partial<CSSStyleDeclaration>;
+    style: CSSProperties;
     arrowRef: React.RefCallback<HTMLElement | null>;
-    arrowStyle: Partial<CSSStyleDeclaration>;
+    arrowStyle: CSSProperties;
 }
 export declare type UseTooltipResult = [
     UseTooltipResultTargetProps,
@@ -43,7 +43,7 @@ export declare type UseHoverTooltipOptions = Partial<UseTooltipOptions & UseHove
 export declare type UseHoverTooltipTargetProps = UseTooltipResultTargetProps & HoverHandlers;
 export declare type UseHoverTooltipResult = [
     UseHoverTooltipTargetProps,
-    Partial<UseTooltipResultTooltipProps & {
+    UseTooltipResultTooltipProps & {
         visible: boolean;
-    }>
+    }
 ];

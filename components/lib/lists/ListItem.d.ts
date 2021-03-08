@@ -27,11 +27,11 @@ interface ListItemProps {
     ref?: {
         current: Element | null;
     } | ((current: Element | null) => unknown);
-    children: React.ReactNode;
+    children?: React.ReactNode;
 }
 /**
  * A styled `<li>` with an optional icon, and an optional url for a React Router `NavLink`
  *
  */
-export declare const ListItem: React.ForwardRefExoticComponent<Pick<ListItemProps, "children" | "className" | "aria-describedby" | "onClick" | "onMouseEnter" | "onMouseLeave" | "onPointerEnter" | "onPointerLeave" | "url" | "exact" | "iconName" | "activeClassName" | "isDisabled"> & React.RefAttributes<React.RefObject<Element>>>;
+export declare const ListItem: React.ForwardRefExoticComponent<Pick<ListItemProps, "className" | "children" | "onClick" | "onMouseEnter" | "onMouseLeave" | "onPointerEnter" | "onPointerLeave" | "url" | "activeClassName" | "exact" | "isDisabled" | "iconName" | "aria-describedby"> & React.RefAttributes<React.RefObject<Element>>>;
 export {};

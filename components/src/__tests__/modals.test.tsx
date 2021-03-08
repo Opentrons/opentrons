@@ -151,9 +151,7 @@ describe('modals', () => {
             disabled: true,
           },
         }}
-      >
-        children
-      </SpinnerModalPage>
+      />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

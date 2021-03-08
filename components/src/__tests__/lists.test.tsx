@@ -117,16 +117,14 @@ describe('ListItem', () => {
 
   it('renders ListItem with icon correctly', () => {
     const tree = Renderer.create(
-      <ListItem to="/hello" iconName="check-circle" isDisabled="false" />
+      <ListItem iconName="check-circle" isDisabled={false} />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
   it('renders ListItem without icon correctly', () => {
-    const tree = Renderer.create(
-      <ListItem to="/hello" isDisabled="false" />
-    ).toJSON()
+    const tree = Renderer.create(<ListItem isDisabled={false} />).toJSON()
 
     expect(tree).toMatchSnapshot()
   })

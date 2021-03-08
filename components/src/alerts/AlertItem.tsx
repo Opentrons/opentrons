@@ -28,7 +28,7 @@ export interface AlertItemProps {
 
 const ALERT_PROPS_BY_TYPE: Record<
   AlertItemProps['type'],
-  Pick<AlertItemProps, 'icon' | 'className'>
+  { icon: IconProps; className: AlertItemProps['className'] }
 > = {
   success: {
     icon: { name: 'check-circle' },

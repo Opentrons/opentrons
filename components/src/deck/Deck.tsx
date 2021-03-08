@@ -18,6 +18,7 @@ import styles from './Deck.css'
 import type {
   DeckDefinition,
   DeckLayer,
+  DeckLayerFeature,
   DeckSlotId,
 } from '@opentrons/shared-data'
 
@@ -87,6 +88,7 @@ export class Deck extends React.Component<DeckProps> {
         >
           {renderLabware(LabwareComponent)}
         </g>
+        {/* @ts-expect-error this is deprecated unused and slated for removal */}
         {DragPreviewLayer && <DragPreviewLayer getXY={this.getXY} />}
       </svg>
     )
@@ -145,7 +147,7 @@ export function DeckFromData(props: DeckFromDataProps): JSX.Element {
                 styles[def.otId],
                 styles[snakeCase(layerId)]
               )}
-              d={layer.map((l: DeckLayer) => l.footprint).join(' ')}
+              d={layer.map((l: DeckLayerFeature) => l.footprint).join(' ')}
             />
           </g>
         )

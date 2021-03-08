@@ -6,7 +6,6 @@ import classnames from 'classnames'
 import styles from './lists.css'
 import { Icon } from '../icons'
 import type { IconName } from '../icons'
-import { List } from 'lodash'
 
 interface ListItemProps {
   /** click handler */
@@ -33,7 +32,7 @@ interface ListItemProps {
   iconName?: IconName
   'aria-describedby'?: string
   ref?: { current: Element | null } | ((current: Element | null) => unknown)
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 /**

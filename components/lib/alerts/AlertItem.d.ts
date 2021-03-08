@@ -18,7 +18,10 @@ export interface AlertItemProps {
  * Alert overlay,
  * change style and icon by using type 'success' 'warning' 'error'
  */
-declare const ALERT_PROPS_BY_TYPE: Record<AlertItemProps['type'], Pick<AlertItemProps, 'icon' | 'className'>>;
+declare const ALERT_PROPS_BY_TYPE: Record<AlertItemProps['type'], {
+    icon: IconProps;
+    className: AlertItemProps['className'];
+}>;
 export declare type AlertType = keyof typeof ALERT_PROPS_BY_TYPE;
 export declare function AlertItem(props: AlertItemProps): JSX.Element;
 export {};
