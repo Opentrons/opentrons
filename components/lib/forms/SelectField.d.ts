@@ -1,4 +1,4 @@
-/// <reference types="react" />
+import * as React from 'react';
 import type { SelectProps } from './Select';
 export interface SelectFieldProps {
     /** optional HTML id for container */
@@ -20,7 +20,7 @@ export interface SelectFieldProps {
     /** optional className */
     className?: string;
     /** optional caption. hidden when `error` is given */
-    caption?: string;
+    caption?: React.ReactNode;
     /** if included, use error style and display error instead of caption */
     error?: string | null | undefined;
     /** change handler called with (name, value) */

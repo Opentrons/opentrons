@@ -16,7 +16,7 @@ const Labels = (props: {
   definition: LabwareDefinition2
   wells: string[]
   isLetterColumn?: boolean
-}) => (
+}): JSX.Element => (
   <>
     {props.wells.map(wellName => {
       const well = props.definition.wells[wellName]
@@ -44,7 +44,8 @@ const Labels = (props: {
 function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
   const { definition } = props
   const letterColumn = definition.ordering[0]
-  const numberRow = definition.ordering.map(wellCol => wellCol[0])
+  // TODO(bc, 2021-03-08): replace types here with real ones once shared data is in TS
+  const numberRow = definition.ordering.map((wellCol: any[]) => wellCol[0])
 
   return (
     <g>
@@ -54,6 +55,6 @@ function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
   )
 }
 
-export const WellLabels: React.AbstractComponent<WellLabelsProps> = React.memo(
-  WellLabelsComponent
-)
+export const WellLabels: React.MemoExoticComponent<
+  typeof WellLabelsComponent
+> = React.memo(WellLabelsComponent)

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { PrimitiveComponent } from '../primitives';
 export interface RobotCoordsForeignDivProps {
     width?: string | number;
     height?: string | number;
@@ -6,7 +7,7 @@ export interface RobotCoordsForeignDivProps {
     y?: string | number;
     children?: React.ReactNode;
     className?: string;
-    innerDivProps?: React.ElementProps<'div'>;
+    innerDivProps?: React.ComponentProps<PrimitiveComponent<'div'>>;
     transformWithSVG?: boolean;
     extraTransform?: string;
 }
