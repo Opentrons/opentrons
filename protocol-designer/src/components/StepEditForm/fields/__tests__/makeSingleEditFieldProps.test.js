@@ -31,7 +31,9 @@ const getFieldErrorsMock: JestMockFn<
 
 beforeEach(() => {
   getFieldDefaultTooltipSpy.mockImplementation(name => `tooltip for ${name}`)
-  getSingleSelectDisabledTooltipSpy.mockImplementation(name => `disabled tooltip for ${name}`)
+  getSingleSelectDisabledTooltipSpy.mockImplementation(
+    name => `disabled tooltip for ${name}`
+  )
 })
 
 afterEach(() => {
