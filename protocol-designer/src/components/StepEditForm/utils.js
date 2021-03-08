@@ -215,6 +215,15 @@ export function getTooltipForField(
 export const getFieldDefaultTooltip = (name: string): string =>
   i18n.t([`tooltip.step_fields.defaults.${name}`, ''])
 
+export const getSingleSelectDisabledTooltip = (
+  name: string,
+  stepType: string
+): string =>
+  i18n.t([
+    `tooltip.step_fields.${stepType}.disabled.${name}`,
+    `tooltip.step_fields.${stepType}.disabled.$generic`,
+    '',
+  ])
 // TODO(IL, 2021-03-03): keys for fieldMap are more strictly of TipOffsetFields type,
 // but since utils like addFieldNamePrefix return StepFieldName/string instead
 // of strict TipOffsetFields, we have to be more lenient with the types

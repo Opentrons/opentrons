@@ -12,14 +12,13 @@ import {
   PAUSE_UNTIL_TEMP,
 } from '../../../constants'
 import { TextField, RadioGroupField, StepFormDropdown } from '../fields'
+import { getSingleSelectDisabledTooltip } from '../utils'
 import styles from '../StepEditForm.css'
 
 import type { StepFormProps } from '../types'
 
 const PauseUntilTempTooltip = () => (
-  <div>
-    {i18n.t(`tooltip.step_fields.pauseAction.disabled.wait_until_temp`)}
-  </div>
+  <div>{getSingleSelectDisabledTooltip('wait_until_temp', 'pauseAction')}</div>
 )
 
 export const PauseForm = (props: StepFormProps): React.Node => {
