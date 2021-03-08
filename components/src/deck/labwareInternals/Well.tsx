@@ -22,7 +22,7 @@ export interface WellProps {
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
 }
 
-function WellComponent(props: WellProps): JSX.Element {
+function WellComponent(props: WellProps): JSX.Element | null {
   const { well, wellName, fill, onMouseEnterWell, onMouseLeaveWell } = props
   assert(well, `expected 'well' prop for well "${wellName}"`)
   if (!well) return null
@@ -36,10 +36,10 @@ function WellComponent(props: WellProps): JSX.Element {
     style: { fill },
     'data-wellname': wellName,
     onMouseEnter: onMouseEnterWell
-      ? event => onMouseEnterWell({ wellName, event })
+      ? (event: React.MouseEvent) => onMouseEnterWell({ wellName, event })
       : null,
     onMouseLeave: onMouseLeaveWell
-      ? event => onMouseLeaveWell({ wellName, event })
+      ? (event: React.MouseEvent) => onMouseLeaveWell({ wellName, event })
       : null,
   }
   const _noMouseProps = {
@@ -75,6 +75,6 @@ function WellComponent(props: WellProps): JSX.Element {
   return null
 }
 
-export const Well: React.AbstractComponent<WellProps> = React.memo(
+export const Well: React.MemoExoticComponent<typeof WellComponent> = React.memo(
   WellComponent
 )

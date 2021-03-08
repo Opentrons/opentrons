@@ -16,4 +16,6 @@ export interface WellProps {
     onMouseEnterWell?: (e: WellMouseEvent) => unknown;
     onMouseLeaveWell?: (e: WellMouseEvent) => unknown;
 }
-export declare const Well: React.AbstractComponent<WellProps>;
+declare function WellComponent(props: WellProps): JSX.Element | null;
+export declare const Well: React.MemoExoticComponent<typeof WellComponent>;
+export {};

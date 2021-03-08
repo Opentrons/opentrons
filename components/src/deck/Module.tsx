@@ -14,6 +14,7 @@ import { Icon } from '../icons'
 import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
 import styles from './Module.css'
 
+import type { IconName } from '../icons'
 import type { ModuleModel, DeckSlot } from '@opentrons/shared-data'
 
 const FLIPPED_SLOTS = ['3', '6', '9']
@@ -112,7 +113,7 @@ function ModuleItemContents(props: ModuleItemContentsProps): JSX.Element {
     [styles.right_icon]: shouldFlip,
   })
 
-  const iconNameByMode = {
+  const iconNameByMode: Record<string, IconName> = {
     missing: 'alert-circle',
     present: 'check-circle',
     info: 'usb',
