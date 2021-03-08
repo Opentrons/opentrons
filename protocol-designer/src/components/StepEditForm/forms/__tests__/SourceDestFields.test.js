@@ -38,7 +38,12 @@ describe('SourceDestFields', () => {
   let props
   beforeEach(() => {
     props = {
-      formData: ({}: any),
+      formData: ({
+        aspirate_wellOrder_first: 'r2l',
+        aspirate_wellOrder_second: 'b2t',
+        dispense_wellOrder_first: 'l2r',
+        dispense_wellOrder_second: 't2b',
+      }: any),
       propsForFields: {
         aspirate_delay_checkbox: {
           onFieldFocus: (jest.fn(): any),
@@ -210,7 +215,8 @@ describe('SourceDestFields', () => {
       expect(wellOrderField.props()).toMatchObject({
         prefix: 'aspirate',
         label: 'Well order',
-        formData: props.formData,
+        firstValue: 'r2l',
+        secondValue: 'b2t',
         updateFirstWellOrder:
           props.propsForFields['aspirate_wellOrder_first'].updateValue,
         updateSecondWellOrder:
@@ -244,7 +250,8 @@ describe('SourceDestFields', () => {
       expect(wellOrderField.props()).toMatchObject({
         prefix: 'dispense',
         label: 'Well order',
-        formData: props.formData,
+        firstValue: 'l2r',
+        secondValue: 't2b',
         updateFirstWellOrder:
           props.propsForFields['dispense_wellOrder_first'].updateValue,
         updateSecondWellOrder:

@@ -23,7 +23,10 @@ export const StepSelectionBanner = (): React.Node => {
   const dispatch = useDispatch()
 
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
-    () => dispatch(stepActions.deselectAllSteps()),
+    () =>
+      dispatch(
+        stepActions.deselectAllSteps('EXIT_BATCH_EDIT_MODE_BUTTON_PRESS')
+      ),
     batchEditFormHasUnsavedChanges
   )
 

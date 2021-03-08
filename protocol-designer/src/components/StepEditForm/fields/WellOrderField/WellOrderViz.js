@@ -9,22 +9,25 @@ import type { WellOrderOption } from '../../../../form-types'
 
 import styles from './WellOrderInput.css'
 
-type Props = {
-  prefix: 'aspirate' | 'dispense' | 'mix',
-  firstValue: ?WellOrderOption,
-  secondValue: ?WellOrderOption,
-}
+type Props = {|
+  firstValue: WellOrderOption,
+  secondValue: WellOrderOption,
+|}
 
-export const WellOrderViz = (props: Props): React.Node => (
-  <div className={styles.viz_wrapper}>
-    <img src={WELLS_IMAGE} className={styles.wells_image} />
-    <img
-      src={PATH_IMAGE}
-      className={cx(
-        styles.path_image,
-        styles[`${props.firstValue || ''}_first`],
-        styles[`${props.secondValue || ''}_second`]
-      )}
-    />
-  </div>
-)
+export const WellOrderViz = (props: Props): React.Node => {
+  const { firstValue, secondValue } = props
+
+  return (
+    <div className={styles.viz_wrapper}>
+      <img src={WELLS_IMAGE} className={styles.wells_image} />
+      <img
+        src={PATH_IMAGE}
+        className={cx(
+          styles.path_image,
+          styles[`${firstValue || ''}_first`],
+          styles[`${secondValue || ''}_second`]
+        )}
+      />
+    </div>
+  )
+}

@@ -1,7 +1,7 @@
 // @flow
 import { i18n } from '../../localization'
 import forEach from 'lodash/forEach'
-import type { MultiSelectFieldName } from '../../form-types'
+import type { StepFieldName } from '../../form-types'
 export const MAIN_CONTENT_FORCED_SCROLL_CLASSNAME = 'main_content_forced_scroll'
 
 // scroll to top of all elements with the special class (probably the main page wrapper)
@@ -24,7 +24,7 @@ type DisabledFields = {
   [fieldName: string]: string,
 }
 
-const pipetteDifferentDisabledFieldNames: Array<MultiSelectFieldName> = [
+const pipetteDifferentDisabledFieldNames: Array<StepFieldName> = [
   // aspirate
   'aspirate_mix_checkbox',
   'aspirate_mix_volume',
@@ -41,7 +41,7 @@ const pipetteDifferentDisabledFieldNames: Array<MultiSelectFieldName> = [
   'dispense_flowRate',
 ]
 
-const aspirateLabwareDisabledFieldNames: Array<MultiSelectFieldName> = [
+const aspirateLabwareDisabledFieldNames: Array<StepFieldName> = [
   'aspirate_mmFromBottom',
   'aspirate_delay_checkbox',
   'aspirate_delay_seconds',
@@ -50,7 +50,7 @@ const aspirateLabwareDisabledFieldNames: Array<MultiSelectFieldName> = [
   'aspirate_touchTip_mmFromBottom',
 ]
 
-const dispenseLabwareDisabledFieldNames: Array<MultiSelectFieldName> = [
+const dispenseLabwareDisabledFieldNames: Array<StepFieldName> = [
   'dispense_mmFromBottom',
   'dispense_delay_checkbox',
   'dispense_delay_seconds',
@@ -59,13 +59,13 @@ const dispenseLabwareDisabledFieldNames: Array<MultiSelectFieldName> = [
   'dispense_touchTip_mmFromBottom',
 ]
 
-const multiAspiratePathDisabledFieldNames: Array<MultiSelectFieldName> = [
+const multiAspiratePathDisabledFieldNames: Array<StepFieldName> = [
   'aspirate_mix_checkbox',
   'aspirate_mix_volume',
   'aspirate_mix_times',
 ]
 
-const multiDispensePathDisabledFieldNames: Array<MultiSelectFieldName> = [
+const multiDispensePathDisabledFieldNames: Array<StepFieldName> = [
   'dispense_mix_checkbox',
   'dispense_mix_volume',
   'dispense_mix_times',
@@ -73,20 +73,20 @@ const multiDispensePathDisabledFieldNames: Array<MultiSelectFieldName> = [
   'blowout_location',
 ]
 
-const pipetteDifferentAndMultiAspiratePathDisabledFieldNames: Array<MultiSelectFieldName> = [
+const pipetteDifferentAndMultiAspiratePathDisabledFieldNames: Array<StepFieldName> = [
   'aspirate_mix_checkbox',
   'aspirate_mix_volume',
   'aspirate_mix_times',
 ]
 
-const pipetteDifferentAndMultiDispensePathDisabledFieldNames: Array<MultiSelectFieldName> = [
+const pipetteDifferentAndMultiDispensePathDisabledFieldNames: Array<StepFieldName> = [
   'dispense_mix_checkbox',
   'dispense_mix_volume',
   'dispense_mix_times',
 ]
 
 const fieldsWithDisabledTooltipText = (
-  fieldNames: Array<MultiSelectFieldName>,
+  fieldNames: Array<StepFieldName>,
   disabledReason: string
 ): DisabledFields =>
   fieldNames.reduce(

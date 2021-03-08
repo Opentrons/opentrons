@@ -402,18 +402,15 @@ class PipetteOffsetCalibrationUserFlow:
         self._should_perform_tip_length = False
 
     async def move_to_point_one(self):
-        assert self._z_height_reference is not None, \
-            "saveOffset has not been called yet"
         target_loc = Location(self._cal_ref_point, None)
-        target = target_loc.move(
-                point=Point(0, 0, self._z_height_reference))
-        await self._move(target)
+        await self._move(target_loc)
 
     async def save_offset(self):
         cur_pt = await self.get_current_point(critical_point=None)
         current_state = self._sm.current_state
         if current_state == self._sm.state.joggingToDeck:
-            self._z_height_reference = cur_pt.z
+            updated_z = Point(0, 0, cur_pt.z)
+            self._cal_ref_point = self._cal_ref_point + updated_z
         elif current_state == self._sm.state.savingPointOne:
             if self._hw_pipette.config.channels > 1:
                 cur_pt = await self.get_current_point(
