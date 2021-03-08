@@ -1,4 +1,3 @@
-
 import { useRef, useLayoutEffect } from 'react'
 import { createPopper } from '@popperjs/core'
 
@@ -6,6 +5,7 @@ import type {
   UsePopperOptions,
   UsePopperResult,
   PopperOptions,
+  PopperModifer,
   HandleStateUpdate,
 } from './types'
 
@@ -14,19 +14,21 @@ const DISABLED_APPLY_STYLES_MODIFIER = {
   enabled: false,
 }
 
-const makeUpdateStateModifier = (handleStateUpdate: HandleStateUpdate) => ({
+const makeUpdateStateModifier = (
+  handleStateUpdate: HandleStateUpdate
+): PopperModifer<{}> => ({
   name: 'updateUsePopperState',
   enabled: true,
   phase: 'write',
   fn: ({ state }) => handleStateUpdate(state.placement, state.styles),
 })
 
-const makeOffsetModifier = (offset: number) => ({
+const makeOffsetModifier = (offset: number): Partial<PopperModifer<{}>> => ({
   name: 'offset',
   options: { offset: [0, offset] },
 })
 
-const makeArrowModifier = (arrow: Element) => ({
+const makeArrowModifier = (arrow: Element): Partial<PopperModifer<{}>> => ({
   name: 'arrow',
   options: { element: arrow },
 })
@@ -47,7 +49,8 @@ export function usePopper(options: UsePopperOptions): UsePopperResult {
   // useLayoutEffect instead of useEffect to avoid positioning flash
   useLayoutEffect(() => {
     if (target && tooltip) {
-      const options: Partial<PopperOptions> = {
+      const options: Partial<PopperOptions> &
+        Pick<PopperOptions, 'modifiers'> = {
         modifiers: [
           DISABLED_APPLY_STYLES_MODIFIER,
           makeUpdateStateModifier(onStateUpdate),

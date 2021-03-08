@@ -1,5 +1,3 @@
-
-
 // placement constants
 // NOTE: these aren't exported from Popper, but they are copied from:
 // @popperjs/core/src/enums.js

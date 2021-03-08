@@ -4,7 +4,8 @@ import { css } from 'styled-components'
 import { FONT_BODY_1_LIGHT, C_DARK_GRAY } from '../styles'
 import { ARROW_SIZE_PX } from './styles'
 
-import type { CSSObject } from 'styled-components'
+import type { CSSProperties } from 'react'
+import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Placement } from './types'
 
 const TOOLTIP_CSS = css`
@@ -30,21 +31,21 @@ export interface TooltipProps {
   /** Actual tooltip placement, if known (provided by useTooltip) */
   placement: Placement | null
   /** Inline styles to apply to the tooltip element (provided by useTooltip) */
-  style: Partial<CSSStyleDeclaration>
+  style: CSSProperties
   /** React function ref for tooltip's arrow element (provided by useTooltip) */
   arrowRef: React.RefCallback<HTMLElement | null>
   /** Inline styles to apply to arrow element (provided by useTooltip) */
-  arrowStyle: Partial<CSSStyleDeclaration>
+  arrowStyle: CSSProperties
 }
 
 /**
  * Tooltip component that renders based on its `visible` prop. For use with the
  * `useTooltip` and `useHoverTooltip` hooks. See examples in `Tooltip.md`.
  */
-export const Tooltip: React.RefForwardingComponent<
-  unknown,
-  TooltipProps
-> = React.forwardRef(function TooltipComponent(props: TooltipProps, ref) {
+export const Tooltip = React.forwardRef(function TooltipComponent(
+  props: TooltipProps,
+  ref: React.ForwardedRef<HTMLDivElement>
+) {
   const {
     visible,
     placement,
@@ -106,7 +107,10 @@ const ARROW_CSS_LEFT = css`
   border-left-color: ${C_DARK_GRAY};
 `
 
-const ARROW_CSS_BY_PLACEMENT_BASE: Record<string, CSSObject | unknown> = {
+const ARROW_CSS_BY_PLACEMENT_BASE: Record<
+  string,
+  FlattenSimpleInterpolation
+> = {
   top: ARROW_CSS_TOP,
   right: ARROW_CSS_RIGHT,
   bottom: ARROW_CSS_BOTTOM,
@@ -116,7 +120,7 @@ const ARROW_CSS_BY_PLACEMENT_BASE: Record<string, CSSObject | unknown> = {
 export interface ArrowProps {
   placement: Placement | null
   arrowRef: React.RefCallback<HTMLElement>
-  arrowStyle: Partial<CSSStyleDeclaration>
+  arrowStyle: CSSProperties
 }
 
 export function Arrow(props: ArrowProps): JSX.Element {

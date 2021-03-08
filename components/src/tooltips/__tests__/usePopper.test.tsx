@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { usePopper } from '../usePopper'
@@ -10,7 +9,9 @@ const onStateUpdate = jest.fn()
 describe('usePopper hook', () => {
   let result: null | Types.UsePopperResult = null
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const render = (options: Types.UsePopperOptions) => {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     const TestUsePopper = (props: Types.UsePopperOptions) => {
       result = usePopper(props)
       return null
@@ -101,7 +102,7 @@ describe('usePopper hook', () => {
 
     const wrapper = render({ target, tooltip, arrow, onStateUpdate })
     const prevResult = result
-    const destroy = jest.spyOn(prevResult, 'destroy')
+    const destroy = jest.spyOn(prevResult as Types.PopperInstance, 'destroy')
 
     // force re-render with tooltip no longer rendered
     // re-render again to propagate effects

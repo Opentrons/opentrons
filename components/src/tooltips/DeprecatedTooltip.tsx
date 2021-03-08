@@ -40,7 +40,9 @@ export interface DeprecatedTooltipProps {
  *
  * @deprecated Use `Tooltip` and `useTooltip` instead
  */
-export function DeprecatedTooltip(props: DeprecatedTooltipProps): JSX.Element {
+export function DeprecatedTooltip(
+  props: DeprecatedTooltipProps
+): JSX.Element | null {
   if (!props.tooltipComponent) return props.children()
 
   return (

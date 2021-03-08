@@ -1,4 +1,3 @@
-
 // tooltip components
 
 export * from './DeprecatedTooltip'

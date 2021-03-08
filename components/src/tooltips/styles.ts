@@ -1,4 +1,3 @@
-
 // common style constants
 
 export const INITIAL_TOOLTIP_STYLE = {
@@ -7,12 +6,12 @@ export const INITIAL_TOOLTIP_STYLE = {
   left: '0',
   top: '0',
   margin: '0',
-}
+} as const
 
 export const INITIAL_ARROW_STYLE = {
   // copied from @popperjs/core/src/modifiers/applyStyles.js
   position: 'absolute',
-}
+} as const
 
 export const TOOLTIP_OFFSET_PX = 8
 

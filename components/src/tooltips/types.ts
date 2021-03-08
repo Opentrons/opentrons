@@ -1,9 +1,10 @@
-// TODO(mc, 2020-03-20): Popper build misconfigured, but can import types directly
-// https://github.com/popperjs/popper-core/issues/1031
+import type { CSSProperties } from 'react'
+
 import type {
   Instance as PopperInstance,
   Options as PopperOptions,
-} from '@popperjs/core/lib/types'
+  Modifier as PopperModifer,
+} from '@popperjs/core'
 
 import type { UseHoverOptions, HoverHandlers } from '../interaction-enhancers'
 
@@ -11,18 +12,18 @@ export type Placement = PopperOptions['placement']
 
 export type Strategy = PopperOptions['strategy']
 
-export type { PopperInstance, PopperOptions }
+export type { PopperInstance, PopperOptions, PopperModifer }
 
 export type HandleStateUpdate = (
   placement: Placement,
   styles: {
-    popper?: Partial<CSSStyleDeclaration>
-    arrow?: Partial<CSSStyleDeclaration>
+    popper?: CSSProperties
+    arrow?: CSSProperties
   }
 ) => void
 
 export interface UsePopperOptions {
-  target: HTMLElement | null
+  target: Element | null
   tooltip: HTMLElement | null
   arrow: HTMLElement | null
   onStateUpdate: HandleStateUpdate
@@ -48,9 +49,9 @@ export interface UseTooltipResultTooltipProps {
   id: string
   ref: React.RefCallback<HTMLElement | null>
   placement: Placement | null
-  style: Partial<CSSStyleDeclaration>
+  style: CSSProperties
   arrowRef: React.RefCallback<HTMLElement | null>
-  arrowStyle: Partial<CSSStyleDeclaration>
+  arrowStyle: CSSProperties
 }
 
 export type UseTooltipResult = [
@@ -67,5 +68,5 @@ export type UseHoverTooltipTargetProps = UseTooltipResultTargetProps &
 
 export type UseHoverTooltipResult = [
   UseHoverTooltipTargetProps,
-  Partial<UseTooltipResultTooltipProps & { visible: boolean }>
+  UseTooltipResultTooltipProps & { visible: boolean }
 ]

@@ -7,9 +7,9 @@ import { Tooltip, Arrow } from '../Tooltip'
 const placement = TOOLTIP_TOP
 const tooltipId = 'tooltip-id'
 const tooltipRef = jest.fn()
-const tooltipStyle = { position: 'absolute', left: '2px' }
+const tooltipStyle = { position: 'absolute', left: '2px' } as const
 const arrowRef = jest.fn()
-const arrowStyle = { position: 'absolute', left: '8px' }
+const arrowStyle = { position: 'absolute', left: '8px' } as const
 
 const TOOLTIP_SELECTOR = 'div[role="tooltip"]'
 
@@ -69,7 +69,7 @@ describe('hook-based Tooltip', () => {
   it('attaches styles to the tooltip', () => {
     const wrapper = render(true)
     const tooltip = wrapper.find(TOOLTIP_SELECTOR)
-    const style = tooltip.getDOMNode().style
+    const style = tooltip.getDOMNode<HTMLElement>().style
     expect(style.getPropertyValue('position')).toEqual(tooltipStyle.position)
     expect(style.getPropertyValue('left')).toEqual(tooltipStyle.left)
   })
@@ -85,7 +85,7 @@ describe('hook-based Tooltip', () => {
   it('attaches styles to the arrow', () => {
     const wrapper = render(true)
     const arrow = wrapper.find(Arrow)
-    const style = arrow.getDOMNode().style
+    const style = arrow.getDOMNode<HTMLElement>().style
     expect(style.getPropertyValue('position')).toEqual(arrowStyle.position)
     expect(style.getPropertyValue('left')).toEqual(arrowStyle.left)
   })
