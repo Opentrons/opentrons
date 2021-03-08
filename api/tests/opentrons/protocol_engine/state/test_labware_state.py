@@ -246,3 +246,35 @@ def test_get_labware_uri_from_definition(
 
     uri = store.labware.get_definition_uri("tip-rack-id")
     assert uri == "opentrons/opentrons_96_tiprack_300ul/1"
+
+
+def test_is_tiprack_true(
+    tip_rack_def: LabwareDefinition,
+    store: StateStore
+) -> None:
+    """It should return true."""
+    load_labware(
+        store=store,
+        labware_id="tip-rack-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        definition=tip_rack_def,
+        calibration=(1, 2, 3),
+    )
+
+    assert store.labware.is_tiprack("tip-rack-id") is True
+
+
+def test_is_tiprack_false(
+    reservoir_def: LabwareDefinition,
+    store: StateStore
+) -> None:
+    """It should return false."""
+    load_labware(
+        store=store,
+        labware_id="res-rack-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        definition=reservoir_def,
+        calibration=(1, 2, 3),
+    )
+
+    assert store.labware.is_tiprack("res-rack-id") is False

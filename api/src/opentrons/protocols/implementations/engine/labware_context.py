@@ -74,7 +74,7 @@ class LabwareContext(LabwareInterface):
 
     def is_tiprack(self) -> bool:
         """Return whether this labware is a tiprack."""
-        return self.get_parameters()['isTiprack']
+        return self._state_view.labware.is_tiprack(labware_id=self._id)
 
     def get_tip_length(self) -> float:
         """Get the tip length."""
@@ -118,7 +118,7 @@ class LabwareContext(LabwareInterface):
         )
 
     @property
-    def highest_z(self):
+    def highest_z(self) -> float:
         return self._state_view.geometry.get_labware_highest_z(labware_id=self._id)
 
     @property

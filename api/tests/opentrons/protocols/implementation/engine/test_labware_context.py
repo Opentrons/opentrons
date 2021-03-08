@@ -173,11 +173,10 @@ def test_is_tiprack(
 ) -> None:
     """Should return whether labware is a tiprack"""
     decoy.when(
-        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
-    ).then_return(labware_data)
+        mock_state_view.labware.is_tiprack(labware_id=labware_id)
+    ).then_return(True)
 
-    assert labware_context.is_tiprack() ==\
-           labware_data.definition['parameters']['isTiprack']
+    assert labware_context.is_tiprack() is True
 
 
 def test_get_tip_length(

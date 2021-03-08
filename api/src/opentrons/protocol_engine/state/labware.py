@@ -86,6 +86,11 @@ class LabwareState:
         """Get a labware's definition URI."""
         return uri_from_definition(self.get_labware_data_by_id(labware_id).definition)
 
+    def is_tiprack(self, labware_id: str) -> bool:
+        """Get whether labware is a tiprack."""
+        labware_data = self.get_labware_data_by_id(labware_id)
+        return labware_data.definition["parameters"]["isTiprack"]
+
 
 class LabwareStore(Substore[LabwareState], CommandReactive):
     """Labware state container."""
