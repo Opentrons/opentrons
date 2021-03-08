@@ -42,9 +42,10 @@ class LabwareContext(LabwareInterface):
         # TODO AL 20210225 - this is not consistent with reference
         #  implementation. It is either the supplied label or loadName in
         #  definition.
-        return self.get_parameters()['loadName']
+        return self._state_view.labware.get_load_name(labware_id=self._id)
 
     def set_name(self, new_name: str) -> None:
+        # TODO AL 2020304 - Is Labware.name setter necessary?
         raise NotImplementedError()
 
     def get_definition(self) -> LabwareDefinition:
@@ -58,33 +59,38 @@ class LabwareContext(LabwareInterface):
 
     def get_quirks(self) -> List[str]:
         """Get the labware quirks."""
-        return self.get_parameters()['quirks']
+        return self._state_view.labware.get_quirks(labware_id=self._id)
 
     def set_calibration(self, delta: Point) -> None:
+        # TODO AL 2020304 - Is this only here to support labware
+        #  calibration over RPC
         raise NotImplementedError()
 
     def get_calibrated_offset(self) -> Point:
         """Get the calibrated offset."""
-        x, y, z = self._state_view.labware.get_labware_data_by_id(
-            labware_id=self._id).calibration
-        return Point(x=x, y=y, z=z) + self.get_geometry().offset
+        return self._state_view.geometry.get_labware_position(labware_id=self._id)
 
     def is_tiprack(self) -> bool:
         """Return whether this labware is a tiprack."""
-        return self.get_parameters()['isTiprack']
+        return self._state_view.labware.is_tiprack(labware_id=self._id)
 
     def get_tip_length(self) -> float:
         """Get the tip length."""
         return self._state_view.labware.get_tip_length(labware_id=self._id)
 
     def set_tip_length(self, length: float):
+        # TODO AL 2020304 - Is Labware.tip_length setter necessary?
         raise NotImplementedError()
 
     def reset_tips(self) -> None:
+        # TODO AL 2020304 - Tip tracking should only happen within
+        #  protocol engine's command processing
         raise NotImplementedError()
 
+    @lru_cache(maxsize=1)
     def get_tip_tracker(self) -> TipTracker:
-        raise NotImplementedError()
+        """Returns a tip tracker."""
+        return TipTracker(columns=self.get_well_grid().get_columns())
 
     @lru_cache(maxsize=1)
     def get_well_grid(self) -> WellGrid:
@@ -110,17 +116,21 @@ class LabwareContext(LabwareInterface):
         )
 
     @property
-    def highest_z(self):
-        return self.get_geometry().z_dimension + self.get_calibrated_offset().z
+    def highest_z(self) -> float:
+        return self._state_view.geometry.get_labware_highest_z(labware_id=self._id)
 
     @property
     def separate_calibration(self) -> bool:
-        raise NotImplementedError()
+        # TODO AL 20210304 What does this mean? It is used in
+        #  opentrons.protocols.labware.definition._get_parent_identifier to
+        #  indicate that a DeckItem is a module?
+        #  ModuleGeometry.separate_calibration returns True.
+        return False
 
     @property
     def load_name(self) -> str:
         """Get the load name."""
-        return self.get_parameters()['loadName']
+        return self._state_view.labware.get_load_name(labware_id=self._id)
 
     def _build_wells(self) -> List[WellImplementation]:
         """Create well objects."""
