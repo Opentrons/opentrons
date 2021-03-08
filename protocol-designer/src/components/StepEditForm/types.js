@@ -2,7 +2,7 @@
 import type { FormData, StepFieldName } from '../../form-types'
 
 export type FocusHandlers = {|
-  focusedField: StepFieldName,
+  focusedField: StepFieldName | null,
   dirtyFields: Array<StepFieldName>,
   // NOTE: focus & blur take a field name as an arg, unlike onFieldBlur/onFieldFocus in FieldProps
   focus: StepFieldName => void,

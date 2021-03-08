@@ -13,7 +13,7 @@ import type { FieldProps, FieldPropsByName, FocusHandlers } from '../types'
 
 type ShowFieldErrorParams = {|
   name: StepFieldName,
-  focusedField?: StepFieldName,
+  focusedField: StepFieldName | null,
   dirtyFields?: Array<StepFieldName>,
 |}
 export const showFieldErrors = ({

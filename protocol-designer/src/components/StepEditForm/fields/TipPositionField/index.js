@@ -22,31 +22,10 @@ import { TipPositionModal } from './TipPositionModal'
 import { getDefaultMmFromBottom } from './utils'
 import type { BaseState } from '../../../../types'
 import type { FieldProps } from '../../types'
-import type {
-  FormData,
-  StepFieldName,
-  TipOffsetFields,
-} from '../../../../form-types'
-
-function getLabwareFieldForPositioningField(
-  name: StepFieldName
-): StepFieldName {
-  const fieldMap: { [TipOffsetFields]: StepFieldName } = {
-    aspirate_mmFromBottom: 'aspirate_labware',
-    aspirate_touchTip_mmFromBottom: 'aspirate_labware',
-    aspirate_delay_mmFromBottom: 'aspirate_labware',
-    dispense_mmFromBottom: 'dispense_labware',
-    dispense_touchTip_mmFromBottom: 'dispense_labware',
-    dispense_delay_mmFromBottom: 'dispense_labware',
-    mix_mmFromBottom: 'labware',
-    mix_touchTip_mmFromBottom: 'labware',
-  }
-  return fieldMap[name]
-}
 
 type OP = {|
   ...FieldProps,
-  formData: FormData,
+  labwareId: ?string,
   className?: string,
 |}
 
@@ -107,6 +86,7 @@ function TipPositionInput(props: Props) {
           readOnly
           onClick={handleOpen}
           value={String(value)}
+          isIndeterminate={props.isIndeterminate}
           units={i18n.t('application.units.millimeter')}
         />
       </Wrapper>
@@ -138,12 +118,9 @@ const Wrapper = (props: WrapperProps) =>
   )
 
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const { formData } = ownProps
-  const { name } = ownProps
-  const labwareFieldName = getLabwareFieldForPositioningField(name)
+  const { labwareId, value } = ownProps
 
   let wellDepthMm = null
-  const labwareId: ?string = formData?.[labwareFieldName]
   if (labwareId != null) {
     const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]
       .def
@@ -155,7 +132,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
 
   return {
     wellDepthMm,
-    mmFromBottom: formData?.[name] ?? null,
+    mmFromBottom: typeof value === 'number' ? value : null,
   }
 }
 

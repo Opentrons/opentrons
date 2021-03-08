@@ -69,6 +69,7 @@
       "volume": { "label": "volume per well" },
       "well_order": {
         "label": "Well order",
+        "mixed": "mixed",
         "option": {
           "l2r": "Left to right",
           "r2l": "Right to left",
@@ -160,5 +161,8 @@
         "add_step_button": "+ Step"
       }
     }
+  },
+  "batch_edit_form": {
+    "settings_for": "settings for {{prefix}}"
   }
 }

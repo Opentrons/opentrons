@@ -25,7 +25,7 @@ export class StepList extends React.Component<Props> {
   handleKeyDown: (e: SyntheticKeyboardEvent<>) => void = e => {
     const { reorderSelectedStep } = this.props
     const key = e.key
-    const altIsPressed = e.getModifierState('Alt')
+    const altIsPressed = e.altKey
 
     if (altIsPressed) {
       let delta = 0

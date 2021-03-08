@@ -3,14 +3,19 @@ import * as React from 'react'
 import { i18n } from '../../../../localization'
 
 import {
-  TextField,
-  CheckboxRowField,
   BlowoutLocationField,
-  TipPositionField,
-  FlowRateField,
-  WellOrderField,
+  CheckboxRowField,
   DelayFields,
+  FlowRateField,
+  TextField,
+  TipPositionField,
+  WellOrderField,
 } from '../../fields'
+import { MixFields } from '../../fields/MixFields'
+import {
+  getBlowoutLocationOptionsForForm,
+  getLabwareFieldForPositioningField,
+} from '../../utils'
 
 import type { FormData } from '../../../../form-types'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
@@ -33,32 +38,28 @@ export const SourceDestFields = (props: Props): React.Node => {
 
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
-  const getMixFields = () => (
-    <CheckboxRowField
-      {...propsForFields[addFieldNamePrefix('mix_checkbox')]}
-      label={i18n.t('form.step_edit_form.field.mix.label')}
-      className={styles.small_field}
-    >
-      <TextField
-        {...propsForFields[addFieldNamePrefix('mix_volume')]}
-        className={styles.small_field}
-        units={i18n.t('application.units.microliter')}
-      />
-      <TextField
-        {...propsForFields[addFieldNamePrefix('mix_times')]}
-        className={styles.small_field}
-        units={i18n.t('application.units.times')}
-      />
-    </CheckboxRowField>
-  )
-
   const getDelayFields = () => (
     <DelayFields
       checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
       secondsFieldName={addFieldNamePrefix('delay_seconds')}
       tipPositionFieldName={addFieldNamePrefix('delay_mmFromBottom')}
       propsForFields={propsForFields}
-      formData={formData}
+      labwareId={
+        formData[
+          getLabwareFieldForPositioningField(
+            addFieldNamePrefix('delay_mmFromBottom')
+          )
+        ]
+      }
+    />
+  )
+
+  const getMixFields = () => (
+    <MixFields
+      checkboxFieldName={addFieldNamePrefix('mix_checkbox')}
+      volumeFieldName={addFieldNamePrefix('mix_volume')}
+      timesFieldName={addFieldNamePrefix('mix_times')}
+      propsForFields={propsForFields}
     />
   )
 
@@ -67,24 +68,30 @@ export const SourceDestFields = (props: Props): React.Node => {
       <div className={styles.form_row}>
         <FlowRateField
           {...propsForFields[addFieldNamePrefix('flowRate')]}
-          formData={props.formData}
-          pipetteFieldName="pipette"
+          pipetteId={formData.pipette}
           flowRateType={prefix}
         />
         <TipPositionField
           {...propsForFields[addFieldNamePrefix('mmFromBottom')]}
-          formData={formData}
+          labwareId={
+            formData[
+              getLabwareFieldForPositioningField(
+                addFieldNamePrefix('mmFromBottom')
+              )
+            ]
+          }
         />
         <WellOrderField
           prefix={prefix}
           label={i18n.t('form.step_edit_form.field.well_order.label')}
-          formData={formData}
           updateFirstWellOrder={
             propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
           }
           updateSecondWellOrder={
             propsForFields[addFieldNamePrefix('wellOrder_second')].updateValue
           }
+          firstValue={formData[addFieldNamePrefix('wellOrder_first')]}
+          secondValue={formData[addFieldNamePrefix('wellOrder_second')]}
         />
       </div>
 
@@ -113,7 +120,13 @@ export const SourceDestFields = (props: Props): React.Node => {
         >
           <TipPositionField
             {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}
-            formData={formData}
+            labwareId={
+              formData[
+                getLabwareFieldForPositioningField(
+                  addFieldNamePrefix('touchTip_mmFromBottom')
+                )
+              ]
+            }
           />
         </CheckboxRowField>
 
@@ -126,7 +139,10 @@ export const SourceDestFields = (props: Props): React.Node => {
             <BlowoutLocationField
               {...propsForFields['blowout_location']}
               className={styles.full_width}
-              formData={formData}
+              options={getBlowoutLocationOptionsForForm({
+                path: formData.path,
+                stepType: formData.stepType,
+              })}
             />
           </CheckboxRowField>
         )}
