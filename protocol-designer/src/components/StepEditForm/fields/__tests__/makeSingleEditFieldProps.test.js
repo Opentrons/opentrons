@@ -14,6 +14,11 @@ const getFieldDefaultTooltipSpy = jest.spyOn(
   'getFieldDefaultTooltip'
 )
 
+const getSingleSelectDisabledTooltipSpy = jest.spyOn(
+  stepEditFormUtils,
+  'getSingleSelectDisabledTooltip'
+)
+
 const getDisabledFieldsMock: JestMockFn<any, Set<string>> = getDisabledFields
 const getDefaultsForStepTypeMock: JestMockFn<
   [any],
@@ -26,6 +31,7 @@ const getFieldErrorsMock: JestMockFn<
 
 beforeEach(() => {
   getFieldDefaultTooltipSpy.mockImplementation(name => `tooltip for ${name}`)
+  getSingleSelectDisabledTooltipSpy.mockImplementation(name => `disabled tooltip for ${name}`)
 })
 
 afterEach(() => {
@@ -112,7 +118,7 @@ describe('makeSingleEditFieldProps', () => {
         onFieldFocus: expect.anything(),
         updateValue: expect.anything(),
         value: '404',
-        tooltipContent: 'tooltip for disabled_field',
+        tooltipContent: 'disabled tooltip for disabled_field',
       },
       pristine_error_field: {
         disabled: false,
