@@ -222,8 +222,12 @@ export function getTooltipForField(
 export const getFieldDefaultTooltip = (name: string): string =>
   i18n.t([`tooltip.step_fields.defaults.${name}`, ''])
 
-export const getSingleSelectDisabledTooltip = (name: string, stepType: string): string =>
+export const getSingleSelectDisabledTooltip = (
+  name: string,
+  stepType: string
+): string =>
   i18n.t([
     `tooltip.step_fields.${stepType}.disabled.${name}`,
     `tooltip.step_fields.${stepType}.disabled.$generic`,
+    '',
   ])
