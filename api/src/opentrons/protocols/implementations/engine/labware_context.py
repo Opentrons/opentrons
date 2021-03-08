@@ -68,9 +68,7 @@ class LabwareContext(LabwareInterface):
 
     def get_calibrated_offset(self) -> Point:
         """Get the calibrated offset."""
-        x, y, z = self._state_view.labware.get_labware_data_by_id(
-            labware_id=self._id).calibration
-        return Point(x=x, y=y, z=z) + self.get_geometry().offset
+        return self._state_view.geometry.get_labware_position(labware_id=self._id)
 
     def is_tiprack(self) -> bool:
         """Return whether this labware is a tiprack."""

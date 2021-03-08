@@ -146,23 +146,14 @@ def test_set_calibration(labware_context: LabwareContext) -> None:
 
 def test_get_calibrated_offset(
         decoy: Decoy, labware_id: str, mock_state_view:
-        StateView, labware_context: LabwareContext, labware_data: LabwareData,
-        minimal_labware_def: LabwareDefinition, parent: Location
+        StateView, labware_context: LabwareContext
 ) -> None:
     """Should return the calibrated offset."""
     decoy.when(
-        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
-    ).then_return(labware_data)
+        mock_state_view.geometry.get_labware_position(labware_id=labware_id)
+    ).then_return(Point(x=1, y=2, z=3))
 
-    corner_offset = minimal_labware_def["cornerOffsetFromSlot"]
-
-    expected = Point(
-        x=parent.point.x + corner_offset["x"] + labware_data.calibration[0],
-        y=parent.point.y + corner_offset["y"] + labware_data.calibration[1],
-        z=parent.point.z + corner_offset["z"] + labware_data.calibration[2],
-    )
-
-    assert expected == labware_context.get_calibrated_offset()
+    assert labware_context.get_calibrated_offset() == Point(x=1, y=2, z=3)
 
 
 def test_is_tiprack(
@@ -210,6 +201,10 @@ def test_get_wells(
         mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
     ).then_return(labware_data)
 
+    decoy.when(
+        mock_state_view.geometry.get_labware_position(labware_id=labware_id)
+    ).then_return(Point(x=1, y=2, z=3))
+
     assert [str(s) for s in labware_context.get_wells()] == \
            ["A1 of minimal labware on 3", "A2 of minimal labware on 3"]
 
@@ -221,6 +216,10 @@ def test_get_wells_by_name(
     decoy.when(
         mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
     ).then_return(labware_data)
+
+    decoy.when(
+        mock_state_view.geometry.get_labware_position(labware_id=labware_id)
+    ).then_return(Point(x=1, y=2, z=3))
 
     assert {
         name: str(well) for (name, well) in labware_context.get_wells_by_name().items()
@@ -275,6 +274,10 @@ def test_build_wells(
     decoy.when(
         mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
     ).then_return(labware_data)
+
+    decoy.when(
+        mock_state_view.geometry.get_labware_position(labware_id=labware_id)
+    ).then_return(Point(x=1, y=2, z=3))
 
     assert [str(w) for w in labware_context._build_wells()] == \
            ["A1 of minimal labware on 3", "A2 of minimal labware on 3"]

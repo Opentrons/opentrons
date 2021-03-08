@@ -147,13 +147,14 @@ def test_get_all_labware_highest_z(
 
 
 def test_get_labware_position(
+    minimal_labware_def: LabwareDefinition,
     standard_deck_def: DeckDefinitionV2,
     mock_labware_store: MagicMock,
     geometry_store: GeometryStore,
 ) -> None:
     """It should return the slot position plus calibrated offset."""
     labware_data = LabwareData(
-        definition={},
+        definition=minimal_labware_def,
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_4),
         calibration=(1, -2, 3)
     )
