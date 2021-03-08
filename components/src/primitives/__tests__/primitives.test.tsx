@@ -14,7 +14,7 @@ const COMPONENTS = [
   { Component: Text, name: 'Text' },
   { Component: Link, name: 'Link' },
   { Component: Svg, name: 'Svg' },
-]
+] as const
 
 describe('primitive components with style props', () => {
   COMPONENTS.forEach(({ Component, name }) => {
@@ -26,6 +26,7 @@ describe('primitive components with style props', () => {
         | React.ComponentProps<typeof Link>
         | React.ComponentProps<typeof Svg>
     ): [ReturnType<typeof shallow>, any] => {
+      // @ts-expect-error(mc, 2021-03-08): not sure how to type this!
       const wrapper = shallow(<Component {...props} />)
       const domNode = wrapper.hostNodes()
 

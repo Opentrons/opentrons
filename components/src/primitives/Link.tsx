@@ -14,8 +14,8 @@ export interface LinkProps extends StyleProps {
  *
  * @component
  */
-export const Link: PrimitiveComponent<'a'> = styled.a
-  .withConfig({
+export const Link: PrimitiveComponent<'a', LinkProps> = styled.a
+  .withConfig<LinkProps>({
     shouldForwardProp: p => isntStyleProp(p) && p !== 'external',
   })
   .attrs(

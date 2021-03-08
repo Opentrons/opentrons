@@ -31,7 +31,7 @@ const SVG_PROPS = ['svgWidth', 'svgHeight', '_cssWidth', '_cssHeight']
  *
  * @component
  */
-export const Svg: PrimitiveComponent<'svg'> = styled.svg
+export const Svg: PrimitiveComponent<'svg', SvgProps> = styled.svg
   .withConfig({
     shouldForwardProp: p => {
       return (
