@@ -42,7 +42,7 @@ class LabwareContext(LabwareInterface):
         # TODO AL 20210225 - this is not consistent with reference
         #  implementation. It is either the supplied label or loadName in
         #  definition.
-        return self.get_parameters()['loadName']
+        return self._state_view.labware.get_load_name(labware_id=self._id)
 
     def set_name(self, new_name: str) -> None:
         # TODO AL 2020304 - Is Labware.name setter necessary?
@@ -59,7 +59,7 @@ class LabwareContext(LabwareInterface):
 
     def get_quirks(self) -> List[str]:
         """Get the labware quirks."""
-        return self.get_parameters()['quirks']
+        return self._state_view.labware.get_quirks(labware_id=self._id)
 
     def set_calibration(self, delta: Point) -> None:
         # TODO AL 2020304 - Is this only here to support labware
@@ -132,7 +132,7 @@ class LabwareContext(LabwareInterface):
     @property
     def load_name(self) -> str:
         """Get the load name."""
-        return self.get_parameters()['loadName']
+        return self._state_view.labware.get_load_name(labware_id=self._id)
 
     def _build_wells(self) -> List[WellImplementation]:
         """Create well objects."""

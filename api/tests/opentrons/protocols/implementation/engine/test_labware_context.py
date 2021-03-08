@@ -82,14 +82,14 @@ def test_get_display_name(
 
 def test_get_name(
         decoy: Decoy, labware_id: str, mock_state_view:
-        StateView, labware_context: LabwareContext, labware_data: LabwareData
+        StateView, labware_context: LabwareContext
 ) -> None:
     """Should return the labware's name."""
     decoy.when(
-        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
-    ).then_return(labware_data)
+        mock_state_view.labware.get_load_name(labware_id=labware_id)
+    ).then_return("some name")
 
-    assert labware_context.get_name() == "minimal_labware_def"
+    assert labware_context.get_name() == "some name"
 
 
 def test_set_name(labware_context: LabwareContext) -> None:
@@ -127,15 +127,14 @@ def test_get_parameters(
 
 def test_get_quirks(
         decoy: Decoy, labware_id: str, mock_state_view:
-        StateView, labware_context: LabwareContext, labware_data: LabwareData,
-        minimal_labware_def: LabwareDefinition
+        StateView, labware_context: LabwareContext
 ) -> None:
     """Should return the labware quirks."""
     decoy.when(
-        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
-    ).then_return(labware_data)
+        mock_state_view.labware.get_quirks(labware_id=labware_id)
+    ).then_return(['a', 'b'])
 
-    assert labware_context.get_quirks() == minimal_labware_def['parameters']['quirks']
+    assert labware_context.get_quirks() == ['a', 'b']
 
 
 def test_set_calibration(labware_context: LabwareContext) -> None:
@@ -243,8 +242,7 @@ def test_get_geometry(
 
 def test_highest_z(
         decoy: Decoy, labware_id: str, mock_state_view: StateView,
-        labware_context: LabwareContext, labware_data: LabwareData,
-        minimal_labware_def: LabwareDefinition, parent: Location) -> None:
+        labware_context: LabwareContext) -> None:
     """Should return the highest z."""
     decoy.when(
         mock_state_view.geometry.get_labware_highest_z(labware_id=labware_id)
@@ -260,15 +258,14 @@ def test_separate_calibration(labware_context: LabwareContext) -> None:
 
 def test_load_name(
         decoy: Decoy, labware_id: str, mock_state_view: StateView,
-        labware_context: LabwareContext, labware_data: LabwareData,
-        minimal_labware_def: LabwareDefinition
+        labware_context: LabwareContext
 ) -> None:
     """Should return the load name."""
     decoy.when(
-        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
-    ).then_return(labware_data)
+        mock_state_view.labware.get_load_name(labware_id=labware_id)
+    ).then_return("load name")
 
-    assert labware_context.load_name == minimal_labware_def['parameters']['loadName']
+    assert labware_context.load_name == "load name"
 
 
 def test_build_wells(
