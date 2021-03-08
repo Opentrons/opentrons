@@ -25,6 +25,7 @@ export const CheckboxRowField = (props: CheckboxRowProps): React.Node => {
     disabled,
     isIndeterminate,
     label,
+    name,
     tooltipContent,
     updateValue,
     value,
@@ -44,6 +45,7 @@ export const CheckboxRowField = (props: CheckboxRowProps): React.Node => {
           isIndeterminate={isIndeterminate}
           label={label}
           labelProps={targetProps}
+          name={name}
           onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)}
           value={Boolean(value)}
         />

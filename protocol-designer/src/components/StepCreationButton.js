@@ -65,7 +65,11 @@ export const StepCreationButtonComponent = (
           {i18n.t(`tooltip.disabled_step_creation`)}
         </Tooltip>
       )}
-      <PrimaryButton onClick={() => setExpanded(!expanded)} disabled={disabled}>
+      <PrimaryButton
+        id="StepCreationButton"
+        onClick={() => setExpanded(!expanded)}
+        disabled={disabled}
+      >
         {i18n.t('button.add_step')}
       </PrimaryButton>
 

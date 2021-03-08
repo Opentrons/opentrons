@@ -100,6 +100,8 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
           secondValue={getWellOrderFieldValue(
             addFieldNamePrefix('wellOrder_second')
           )}
+          firstName={addFieldNamePrefix('wellOrder_first')}
+          secondName={addFieldNamePrefix('wellOrder_second')}
           updateFirstWellOrder={
             propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
           }

@@ -23,6 +23,8 @@ type Props = {|
   prefix: 'aspirate' | 'dispense' | 'mix',
   firstValue: ?WellOrderOption,
   secondValue: ?WellOrderOption,
+  firstName: string,
+  secondName: string,
   updateFirstWellOrder: $PropertyType<FieldProps, 'updateValue'>,
   updateSecondWellOrder: $PropertyType<FieldProps, 'updateValue'>,
 |}
@@ -31,6 +33,8 @@ export const WellOrderField = (props: Props): React.Node => {
   const {
     firstValue,
     secondValue,
+    firstName,
+    secondName,
     updateFirstWellOrder,
     updateSecondWellOrder,
   } = props
@@ -80,6 +84,8 @@ export const WellOrderField = (props: Props): React.Node => {
             updateValues={updateValues}
             firstValue={firstValue}
             secondValue={secondValue}
+            firstName={firstName}
+            secondName={secondName}
           />
           {firstValue != null && secondValue != null ? (
             <img

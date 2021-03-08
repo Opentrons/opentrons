@@ -120,6 +120,8 @@ export const MixForm = (props: StepFormProps): React.Node => {
                 label={i18n.t('form.step_edit_form.field.well_order.label')}
                 firstValue={formData['mix_wellOrder_first']}
                 secondValue={formData['mix_wellOrder_second']}
+                firstName={'mix_wellOrder_first'}
+                secondName={'mix_wellOrder_second'}
               />
             </div>
             <DelayFields

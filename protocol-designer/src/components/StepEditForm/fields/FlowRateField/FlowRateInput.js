@@ -101,6 +101,7 @@ export class FlowRateInput extends React.Component<FlowRateInputProps, State> {
       label,
       minFlowRate,
       maxFlowRate,
+      name,
       pipetteDisplayName,
     } = this.props
 
@@ -132,6 +133,7 @@ export class FlowRateInput extends React.Component<FlowRateInputProps, State> {
 
     const FlowRateInput = (
       <InputField
+        name={`${name}_customFlowRate`}
         value={`${this.state.modalFlowRate || ''}`}
         units={i18n.t('application.units.microliterPerSec')}
         caption={rangeDescription}
@@ -190,6 +192,7 @@ export class FlowRateInput extends React.Component<FlowRateInputProps, State> {
       <React.Fragment>
         <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
           <InputField
+            name={name}
             units="μL/s"
             readOnly
             disabled={disabled}

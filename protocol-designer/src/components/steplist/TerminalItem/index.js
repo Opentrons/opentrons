@@ -63,6 +63,7 @@ export const TerminalItem = (props: Props): React.Node => {
       )}
       <PDTitledList
         {...{
+          id: `TerminalItem_${id}`,
           hovered,
           selected,
           title,
