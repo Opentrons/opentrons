@@ -36,6 +36,7 @@ import {
 import type { IconName } from '@opentrons/components'
 
 type ClickableIconProps = {|
+  id?: string,
   iconName: IconName,
   tooltipText: string,
   width?: string,
@@ -55,7 +56,7 @@ const iconBoxStyles = css`
 `
 
 export const ClickableIcon = (props: ClickableIconProps): React.Node => {
-  const { iconName, onClick, tooltipText, width } = props
+  const { id, iconName, onClick, tooltipText, width } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'top',
   })
@@ -66,7 +67,7 @@ export const ClickableIcon = (props: ClickableIconProps): React.Node => {
   }
 
   return (
-    <Box {...boxStyles} {...targetProps} css={iconBoxStyles}>
+    <Box id={id} {...boxStyles} {...targetProps} css={iconBoxStyles}>
       <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
       <Box onClick={onClick}>
         <Icon name={iconName} width={width || '1.25rem'} color={C_DARK_GRAY} />
@@ -206,10 +207,10 @@ export const MultiSelectToolbar = (): React.Node => {
         backgroundColor={C_NEAR_WHITE}
         zIndex="100"
       >
-        <ClickableIcon {...selectProps} />
-        <ClickableIcon {...deleteProps} />
-        <ClickableIcon {...copyProps} />
-        <ClickableIcon {...expandProps} />
+        <ClickableIcon id="ClickableIcon_select" {...selectProps} />
+        <ClickableIcon id="ClickableIcon_delete" {...deleteProps} />
+        <ClickableIcon id="ClickableIcon_duplicate" {...copyProps} />
+        <ClickableIcon id="ClickableIcon_expand" {...expandProps} />
       </Flex>
     </>
   )
