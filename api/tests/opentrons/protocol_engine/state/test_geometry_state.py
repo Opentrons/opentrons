@@ -146,6 +146,30 @@ def test_get_all_labware_highest_z(
     assert all_z == max(plate_z, reservoir_z)
 
 
+def test_get_labware_position(
+    standard_deck_def: DeckDefinitionV2,
+    mock_labware_store: MagicMock,
+    geometry_store: GeometryStore,
+) -> None:
+    """It should return the slot position plus calibrated offset."""
+    labware_data = LabwareData(
+        definition={},
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_4),
+        calibration=(1, -2, 3)
+    )
+    slot_pos = standard_deck_def["locations"]["orderedSlots"][3]["position"]
+
+    mock_labware_store.state.get_labware_data_by_id.return_value = labware_data
+
+    position = geometry_store.state.get_labware_position(labware_id="abc")
+
+    assert position == Point(
+        x=slot_pos[0] + 1,
+        y=slot_pos[1] - 2,
+        z=slot_pos[2] + 3,
+    )
+
+
 def test_get_well_position(
     well_plate_def: LabwareDefinition,
     standard_deck_def: DeckDefinitionV2,
