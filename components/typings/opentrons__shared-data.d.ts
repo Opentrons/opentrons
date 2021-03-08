@@ -12,8 +12,8 @@ declare module '@opentrons/shared-data' {
     zDimension: number
   }
 
-  export const SLOT_RENDER_WIDTH: 'stub' // stubbed
-  export const SLOT_RENDER_HEIGHT: 'stub' // stubbed
+  export const SLOT_RENDER_WIDTH: number // stubbed
+  export const SLOT_RENDER_HEIGHT: number // stubbed
 
   // LABWARE DEF TYPES
 

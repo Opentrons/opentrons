@@ -1,7 +1,5 @@
-import type { SyntheticEvent } from 'react';
+import type { RefObject } from 'react';
 export interface UseOnClickOutsideOptions {
-    onClickOutside?: (e: SyntheticEvent) => void;
+    onClickOutside?: (e: MouseEvent) => void;
 }
-export declare const useOnClickOutside: <E extends Element>(options: UseOnClickOutsideOptions) => {
-    current: E | null;
-};
+export declare const useOnClickOutside: <E extends Element>(options: UseOnClickOutsideOptions) => RefObject<E>;

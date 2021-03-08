@@ -1,5 +1,4 @@
 import * as React from 'react';
-declare type KeypressEvent = React.KeyboardEvent<HTMLElement>;
 export interface KeypressHandler {
     key: string;
     shiftKey?: boolean | null | undefined;
@@ -20,10 +19,9 @@ export interface HandleKeypressProps {
  * and `props.preventDefault` is true.
  */
 export declare class HandleKeypress extends React.Component<HandleKeypressProps> {
-    handlePressIfKey: (event: KeypressEvent) => void;
-    preventDefaultIfKey: (event: KeypressEvent) => void;
+    handlePressIfKey: (event: KeyboardEvent) => void;
+    preventDefaultIfKey: (event: KeyboardEvent) => void;
     componentDidMount(): void;
     componentWillUnmount(): void;
     render(): JSX.Element;
 }
-export {};

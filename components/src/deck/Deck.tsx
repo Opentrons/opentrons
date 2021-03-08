@@ -44,7 +44,7 @@ const VIEW_BOX_HEIGHT = 390
  * @deprecated Use {@link RobotWorkSpace}
  */
 export class Deck extends React.Component<DeckProps> {
-  parentRef: React.Ref<HTMLElement | SVGAElement> | null | undefined
+  parentRef: HTMLElement | SVGGElement | null | undefined
 
   getXY: (
     rawX: number,
@@ -94,7 +94,7 @@ export class Deck extends React.Component<DeckProps> {
 }
 
 function renderLabware(
-  LabwareComponent: LabwareComponentType | null
+  LabwareComponent: LabwareComponentType | null | undefined
 ): React.ReactNode[] {
   return flatMap(
     SLOTNAME_MATRIX,

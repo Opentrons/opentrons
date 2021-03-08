@@ -15,7 +15,7 @@ export interface DeckProps {
  * @deprecated Use {@link RobotWorkSpace}
  */
 export declare class Deck extends React.Component<DeckProps> {
-    parentRef: React.Ref<HTMLElement | SVGAElement> | null | undefined;
+    parentRef: HTMLElement | SVGGElement | null | undefined;
     getXY: (rawX: number, rawY: number) => Partial<{
         scaledX?: number;
         scaledY?: number;
