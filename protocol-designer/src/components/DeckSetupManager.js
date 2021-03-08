@@ -9,7 +9,10 @@ import {
   JUSTIFY_CENTER,
   C_DARK_GRAY,
 } from '@opentrons/components'
-import { getBatchEditSelectedStepTypes } from '../ui/steps/selectors'
+import {
+  getBatchEditSelectedStepTypes,
+  getHoveredItem,
+} from '../ui/steps/selectors'
 import { DeckSetup } from './DeckSetup'
 import type { StepType } from '../form-types'
 
@@ -38,9 +41,10 @@ const NoBatchEditSharedSettings = (): React.Node => {
 
 export const DeckSetupManager = (): React.Node => {
   const batchEditSelectedStepTypes = useSelector(getBatchEditSelectedStepTypes)
+  const hoveredItem = useSelector(getHoveredItem)
 
-  if (batchEditSelectedStepTypes.length === 0) {
-    // not batch edit mode, show the deck
+  if (batchEditSelectedStepTypes.length === 0 || hoveredItem !== null) {
+    // not batch edit mode, or batch edit while item is hovered: show the deck
     return <DeckSetup />
   } else if (hasSharedBatchEditSettings(batchEditSelectedStepTypes)) {
     return null
