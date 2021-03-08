@@ -20,4 +20,4 @@ export interface SvgProps extends StyleProps {
  *
  * @component
  */
-export declare const Svg: PrimitiveComponent<'svg'>;
+export declare const Svg: PrimitiveComponent<'svg', SvgProps>;

@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import type { StyledComponent } from 'styled-components';
+import type { StyledComponent, CSSProperties } from 'styled-components';
 export interface ColorProps {
     color?: string;
     backgroundColor?: string;
@@ -64,6 +64,9 @@ export interface LayoutProps {
     height?: string | number;
     minHeight?: string | number;
     maxHeight?: string | number;
+    overflow?: CSSProperties['overflow'];
+    overflowX?: CSSProperties['overflowX'];
+    overflowY?: CSSProperties['overflowY'];
     wordSpacing?: string | number;
 }
 export interface PositionProps {
@@ -77,4 +80,4 @@ export interface PositionProps {
 export interface StyleProps extends ColorProps, TypographyProps, SpacingProps, BorderProps, FlexboxProps, GridProps, LayoutProps, PositionProps {
     className?: string;
 }
-export declare type PrimitiveComponent<Instance extends keyof JSX.IntrinsicElements | React.ComponentType<any>> = StyledComponent<Instance, {}, StyleProps>;
+export declare type PrimitiveComponent<Instance extends keyof JSX.IntrinsicElements | React.ComponentType<any>, Props extends StyleProps = StyleProps> = StyledComponent<Instance, {}, Props>;

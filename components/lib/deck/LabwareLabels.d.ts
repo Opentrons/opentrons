@@ -5,4 +5,4 @@ export interface LabwareLabelsProps {
 /**
  * @deprecated No longer necessary, do not use
  */
-export declare function LabwareLabels(props: LabwareLabelsProps): JSX.Element;
+export declare function LabwareLabels(props: LabwareLabelsProps): JSX.Element | null;

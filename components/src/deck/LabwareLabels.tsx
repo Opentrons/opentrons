@@ -20,7 +20,7 @@ const COLUMN_OFFSET = -4
 /**
  * @deprecated No longer necessary, do not use
  */
-export function LabwareLabels(props: LabwareLabelsProps): JSX.Element {
+export function LabwareLabels(props: LabwareLabelsProps): JSX.Element | null {
   const { labwareType } = props
   const labwareDef = getLabwareV1Def(labwareType)
   if (!labwareDef) {

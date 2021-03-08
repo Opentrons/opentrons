@@ -90,7 +90,7 @@ function ModuleItemContents(props: ModuleItemContentsProps): JSX.Element {
     mode === 'missing' ? (
       <>
         <p className={styles.module_review_text}>Missing:</p>
-        {displayName.split(' ').map((chunk, i) => (
+        {displayName.split(' ').map((chunk: string, i: number) => (
           <p key={i} className={styles.module_review_text}>
             {chunk}
           </p>
@@ -98,7 +98,7 @@ function ModuleItemContents(props: ModuleItemContentsProps): JSX.Element {
       </>
     ) : (
       <>
-        {displayName.split(' ').map((chunk, i) => (
+        {displayName.split(' ').map((chunk: string, i: number) => (
           <p key={i} className={styles.module_review_text}>
             {chunk}
           </p>

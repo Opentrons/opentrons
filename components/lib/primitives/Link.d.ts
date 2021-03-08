@@ -8,4 +8,4 @@ export interface LinkProps extends StyleProps {
  *
  * @component
  */
-export declare const Link: PrimitiveComponent<'a'>;
+export declare const Link: PrimitiveComponent<'a', LinkProps>;
