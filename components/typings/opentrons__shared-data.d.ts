@@ -12,14 +12,14 @@ declare module '@opentrons/shared-data' {
     zDimension: number
   }
 
-  export const SLOT_RENDER_WIDTH = 'stub' // stubbed
-  export const SLOT_RENDER_HEIGHT = 'stub' // stubbed
+  export const SLOT_RENDER_WIDTH: 'stub' // stubbed
+  export const SLOT_RENDER_HEIGHT: 'stub' // stubbed
 
   // LABWARE DEF TYPES
 
-  export type wellIsRect = () => any // stubbed
-  export type getWellPropsForSVGLabwareV1 = () => any // stubbed
-  export type getLabwareV1Def = () => any // stubbed
+  export function wellIsRect(well: {}): any // stubbed
+  export function getWellPropsForSVGLabwareV1(def: {}): any // stubbed
+  export function getLabwareV1Def(type: string): any // stubbed
   export type LabwareDefinition1 = Record<string, any> // stubbed
   export type LabwareDefinition2 = Record<string, any> // stubbed
   export type LabwareWell = Record<string, any> // stubbed
@@ -37,23 +37,48 @@ declare module '@opentrons/shared-data' {
   }
 
   // PIPETTE DEF TYPES
+  export const GEN1: 'stub' // stubbed
+  export const GEN2: 'stub' // stubbed
 
-  export type PipetteNameSpecs = Record<string, any> // stubbed
+  export type PipetteChannels = 1 | 8
+
+  export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2
+  export interface FlowRateSpec {
+    value: number
+    min: number
+    max: number
+  }
+  export interface PipetteNameSpecs {
+    name: string
+    displayName: string
+    displayCategory: PipetteDisplayCategory
+    minVolume: number
+    maxVolume: number
+    channels: PipetteChannels
+    defaultAspirateFlowRate: FlowRateSpec
+    defaultDispenseFlowRate: FlowRateSpec
+    defaultBlowOutFlowRate: FlowRateSpec
+    defaultTipracks: string[]
+    smoothieConfigs?: {
+      stepsPerMM: number
+      homePosition: number
+      travelDistance: number
+    }
+  }
+
   export type PipetteModelSpecs = Record<string, any> // stubbed
-  export type getAllPipetteNames = () => any // stubbed
-  export type getPipetteNameSpecs = () => any // stubbed
-  export const GEN1 = 'stub' // stubbed
-  export const GEN2 = 'stub' // stubbed
+  export function getAllPipetteNames(...a: any[]): any // stubbed
+  export function getPipetteNameSpecs(s: string): any // stubbed
 
   // MODULE DEF TYPES
 
-  export const ModuleModel = 'stub' // stubbed
-  export type getModuleDisplayName = () => any // stubbed
-  export const MAGNETIC_MODULE_V1 = 'stub' // stubbed
-  export const MAGNETIC_MODULE_V2 = 'stub' // stubbed
-  export const TEMPERATURE_MODULE_V1 = 'stub' // stubbed
-  export const TEMPERATURE_MODULE_V2 = 'stub' // stubbed
-  export const THERMOCYCLER_MODULE_V1 = 'stub' // stubbed
+  export type ModuleModel = string // stubbed
+  export function getModuleDisplayName(type: string): any // stubbed
+  export const MAGNETIC_MODULE_V1: 'stub' // stubbed
+  export const MAGNETIC_MODULE_V2: 'stub' // stubbed
+  export const TEMPERATURE_MODULE_V1: 'stub' // stubbed
+  export const TEMPERATURE_MODULE_V2: 'stub' // stubbed
+  export const THERMOCYCLER_MODULE_V1: 'stub' // stubbed
 
   // DECK DEF TYPES
 
