@@ -1,5 +1,3 @@
-
-
 export * from './ClickOutside'
 export * from './HandleKeypress'
 export * from './useOnClickOutside'

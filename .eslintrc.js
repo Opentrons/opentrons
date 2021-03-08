@@ -39,6 +39,7 @@ module.exports = {
     'no-case-declarations': 'warn',
     'prefer-regex-literals': 'warn',
     'react/prop-types': 'warn',
+    '@typescript-eslint/strict-boolean-expressions': 'warn',
   },
 
   globals: {},

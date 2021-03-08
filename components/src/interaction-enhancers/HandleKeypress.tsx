@@ -1,7 +1,4 @@
 import * as React from 'react'
-
-type KeypressEvent = React.KeyboardEvent<HTMLElement>
-
 export interface KeypressHandler {
   key: string
   shiftKey?: boolean | null | undefined
@@ -17,7 +14,7 @@ export interface HandleKeypressProps {
   children?: React.ReactNode
 }
 
-const matchHandler = (e: KeypressEvent) => (h: KeypressHandler) =>
+const matchHandler = (e: KeyboardEvent) => (h: KeypressHandler) =>
   h.key === e.key && (h.shiftKey == null || h.shiftKey === e.shiftKey)
 
 /**
@@ -27,13 +24,11 @@ const matchHandler = (e: KeypressEvent) => (h: KeypressHandler) =>
  * and `props.preventDefault` is true.
  */
 export class HandleKeypress extends React.Component<HandleKeypressProps> {
-  handlePressIfKey: (event: KeypressEvent) => void = (event: KeypressEvent) => {
+  handlePressIfKey = (event: KeyboardEvent): void => {
     this.props.handlers.filter(matchHandler(event)).forEach(h => h.onPress())
   }
 
-  preventDefaultIfKey: (event: KeypressEvent) => void = (
-    event: KeypressEvent
-  ) => {
+  preventDefaultIfKey = (event: KeyboardEvent): void => {
     if (!this.props.preventDefault) return
 
     const pressHandled = this.props.handlers.some(matchHandler(event))

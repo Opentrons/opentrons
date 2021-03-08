@@ -1,20 +1,20 @@
 import { useEffect, useRef } from 'react'
 import assert from 'assert'
 
-import type { SyntheticEvent } from 'react'
+import type { RefObject } from 'react'
 
 export interface UseOnClickOutsideOptions {
-  onClickOutside?: (e: SyntheticEvent) => void
+  onClickOutside?: (e: MouseEvent) => void
 }
 
 export const useOnClickOutside = <E extends Element>(
   options: UseOnClickOutsideOptions
-): { current: E | null } => {
+): RefObject<E> => {
   const { onClickOutside } = options
-  const node: { current: E | null } = useRef(null)
+  const node = useRef<E>(null)
 
   useEffect(() => {
-    const handleClickOutside = (event: SyntheticEvent): void => {
+    const handleClickOutside = (event: MouseEvent): void => {
       const clickedElem = event.target
 
       assert(
