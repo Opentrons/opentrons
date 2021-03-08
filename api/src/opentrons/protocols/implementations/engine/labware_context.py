@@ -119,7 +119,7 @@ class LabwareContext(LabwareInterface):
 
     @property
     def highest_z(self):
-        return self.get_geometry().z_dimension + self.get_calibrated_offset().z
+        return self._state_view.geometry.get_labware_highest_z(labware_id=self._id)
 
     @property
     def separate_calibration(self) -> bool:

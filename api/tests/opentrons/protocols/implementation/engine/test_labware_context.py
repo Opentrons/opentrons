@@ -248,16 +248,10 @@ def test_highest_z(
         minimal_labware_def: LabwareDefinition, parent: Location) -> None:
     """Should return the highest z."""
     decoy.when(
-        mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
-    ).then_return(labware_data)
+        mock_state_view.geometry.get_labware_highest_z(labware_id=labware_id)
+    ).then_return(312.0)
 
-    expected = (
-            labware_data.calibration[2] +
-            parent.point.z +
-            minimal_labware_def['cornerOffsetFromSlot']['z'] +
-            minimal_labware_def['dimensions']['zDimension']
-    )
-    assert expected == labware_context.highest_z
+    assert 312.0 == labware_context.highest_z
 
 
 def test_separate_calibration(labware_context: LabwareContext) -> None:
