@@ -97,7 +97,7 @@ def test_get_all_labware(
     reservoir_def: LabwareDefinition,
     store: StateStore,
 ) -> None:
-    """It should return whether a labware by ID has a given quirk."""
+    """It should return all labware."""
     load_labware(
         store=store,
         labware_id="plate-id",
@@ -156,6 +156,35 @@ def test_get_labware_has_quirk(
 
     assert well_plate_has_center_quirk is False
     assert reservoir_has_center_quirk is True
+
+
+def test_quirks(
+    well_plate_def: LabwareDefinition,
+    reservoir_def: LabwareDefinition,
+    store: StateStore,
+) -> None:
+    """It should return a labware's quirks."""
+    load_labware(
+        store=store,
+        labware_id="plate-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        definition=well_plate_def,
+        calibration=(1, 2, 3),
+    )
+
+    load_labware(
+        store=store,
+        labware_id="reservoir-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
+        definition=reservoir_def,
+        calibration=(4, 5, 6),
+    )
+
+    well_plate_quirks = store.labware.get_quirks("plate-id")
+    reservoir_quirks = store.labware.get_quirks("reservoir-id")
+
+    assert well_plate_quirks == []
+    assert reservoir_quirks == ['centerMultichannelOnWells', 'touchTipDisabled']
 
 
 def test_get_well_definition_bad_id(
@@ -246,3 +275,51 @@ def test_get_labware_uri_from_definition(
 
     uri = store.labware.get_definition_uri("tip-rack-id")
     assert uri == "opentrons/opentrons_96_tiprack_300ul/1"
+
+
+def test_is_tiprack_true(
+    tip_rack_def: LabwareDefinition,
+    store: StateStore
+) -> None:
+    """It should return true."""
+    load_labware(
+        store=store,
+        labware_id="tip-rack-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        definition=tip_rack_def,
+        calibration=(1, 2, 3),
+    )
+
+    assert store.labware.is_tiprack("tip-rack-id") is True
+
+
+def test_is_tiprack_false(
+    reservoir_def: LabwareDefinition,
+    store: StateStore
+) -> None:
+    """It should return false."""
+    load_labware(
+        store=store,
+        labware_id="res-rack-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        definition=reservoir_def,
+        calibration=(1, 2, 3),
+    )
+
+    assert store.labware.is_tiprack("res-rack-id") is False
+
+
+def test_get_load_name(
+    reservoir_def: LabwareDefinition,
+    store: StateStore
+) -> None:
+    """It should return the load name."""
+    load_labware(
+        store=store,
+        labware_id="res-rack-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        definition=reservoir_def,
+        calibration=(1, 2, 3),
+    )
+
+    assert store.labware.get_load_name("res-rack-id") == 'nest_12_reservoir_15ml'

@@ -534,7 +534,8 @@ def minimal_labware_def():
         },
         "parameters": {
             "isTiprack": False,
-            "loadName": "minimal_labware_def"
+            "loadName": "minimal_labware_def",
+            "quirks": ["a quirk"]
         },
         "ordering": [["A1"], ["A2"]],
         "wells": {

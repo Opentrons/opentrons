@@ -82,6 +82,24 @@ class GeometryState:
             for uid, lw_data in self._labware_store.state.get_all_labware()
         ])
 
+    def get_labware_position(
+        self,
+        labware_id: str
+    ) -> Point:
+        """Get the calibrated position of the labware."""
+        labware_data = self._labware_store.state.get_labware_data_by_id(
+            labware_id
+        )
+
+        slot_pos = self.get_slot_position(labware_data.location.slot)
+        cal_offset = labware_data.calibration
+
+        return Point(
+            x=slot_pos.x + cal_offset[0],
+            y=slot_pos.y + cal_offset[1],
+            z=slot_pos.z + cal_offset[2]
+        )
+
     def get_well_position(
         self,
         labware_id: str,
@@ -89,7 +107,7 @@ class GeometryState:
         well_location: Optional[WellLocation] = None,
     ) -> Point:
         """Get the absolute position of a well in a labware."""
-        labware_data = self._labware_store.state.get_labware_data_by_id(
+        labware_pos = self.get_labware_position(
             labware_id
         )
         well_def = self._labware_store.state.get_well_definition(
@@ -97,8 +115,6 @@ class GeometryState:
             well_name
         )
         well_depth = well_def["depth"]
-        slot_pos = self.get_slot_position(labware_data.location.slot)
-        cal_offset = labware_data.calibration
 
         if well_location is not None:
             offset = well_location.offset
@@ -110,9 +126,9 @@ class GeometryState:
             offset = (0, 0, well_depth)
 
         return Point(
-            x=slot_pos[0] + cal_offset[0] + offset[0] + well_def["x"],
-            y=slot_pos[1] + cal_offset[1] + offset[1] + well_def["y"],
-            z=slot_pos[2] + cal_offset[2] + offset[2] + well_def["z"],
+            x=labware_pos.x + offset[0] + well_def["x"],
+            y=labware_pos.y + offset[1] + well_def["y"],
+            z=labware_pos.z + offset[2] + well_def["z"],
         )
 
     def _get_highest_z_from_labware_data(self, lw_data: LabwareData) -> float:
