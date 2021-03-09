@@ -3,6 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { DragDropContext } from 'react-dnd'
 import MouseBackEnd from 'react-dnd-mouse-backend'
+import { Box, DISPLAY_FLEX, DIRECTION_COLUMN } from '@opentrons/components'
 import { ComputingSpinner } from '../components/ComputingSpinner'
 import { ConnectedNav } from '../containers/ConnectedNav'
 import { ConnectedSidebar } from '../containers/ConnectedSidebar'
@@ -45,10 +46,16 @@ function ProtocolEditorComponent() {
             <AnnouncementModal />
             <NewFileModal showProtocolFields />
             <FileUploadMessageModal />
-            {/* TODO: Ian 2018-06-28 All main page modals will go here */}
-            <MainPageModalPortalRoot />
-            <LabwareUploadMessageModal />
-            <ConnectedMainPanel />
+
+            <Box
+              display={DISPLAY_FLEX}
+              flexDirection={DIRECTION_COLUMN}
+              height="100%"
+            >
+              <MainPageModalPortalRoot />
+              <LabwareUploadMessageModal />
+              <ConnectedMainPanel />
+            </Box>
           </div>
         </div>
       </div>
