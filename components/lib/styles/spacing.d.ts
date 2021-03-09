@@ -1,9 +1,0 @@
-export declare const SPACING_AUTO = "auto";
-export declare const SPACING_1 = "0.25rem";
-export declare const SPACING_2 = "0.5rem";
-export declare const SPACING_3 = "1rem";
-export declare const SPACING_4 = "2rem";
-export declare const SPACING_5 = "4rem";
-export declare const SPACING_6 = "8rem";
-export declare const SPACING_7 = "16rem";
-export declare const SPACING_8 = "32rem";
