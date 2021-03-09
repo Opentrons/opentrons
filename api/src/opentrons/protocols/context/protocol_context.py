@@ -1,3 +1,5 @@
+"""The interface that implements ProtocolContext."""
+
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
@@ -10,11 +12,11 @@ from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry, ModuleType)
-from opentrons.protocols.context.interfaces.instrument_context \
+from opentrons.protocols.context.instrument_context \
     import InstrumentContextInterface
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds, HardwareManager)
-from opentrons.protocols.context.interfaces.labware import \
+from opentrons.protocols.context.labware import \
     LabwareInterface
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 

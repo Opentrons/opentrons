@@ -14,7 +14,7 @@ from fastapi import routing
 import pytest
 from datetime import datetime
 
-from opentrons.protocols.implementations.protocol_api.labware import \
+from opentrons.protocols.context.protocol_api.labware import \
     LabwareImplementation
 from starlette.testclient import TestClient
 from robot_server.constants import API_VERSION_HEADER, API_VERSION_LATEST

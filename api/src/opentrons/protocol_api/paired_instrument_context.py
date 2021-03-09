@@ -10,7 +10,7 @@ from opentrons.commands import paired_commands as cmds
 from opentrons.commands.publisher import (
     CommandPublisher, publish_paired, publish)
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.context.paired_instrument import\
+from opentrons.protocols.context.protocol_api.paired_instrument import\
     PairedInstrument
 
 from opentrons.protocols.api_support.util import (

@@ -3,7 +3,7 @@ from typing import List, Dict, Optional
 from opentrons.calibration_storage import helpers
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.context.interfaces.labware import \
+from opentrons.protocols.context.labware import \
     LabwareInterface
 from opentrons.protocols.geometry.tip_tracker import TipTracker
 from opentrons.protocols.context.well import WellImplementation

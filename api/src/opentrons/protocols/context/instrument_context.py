@@ -1,3 +1,5 @@
+"""The interface that implements InstrumentContext."""
+
 from __future__ import annotations
 
 from abc import abstractmethod, ABC

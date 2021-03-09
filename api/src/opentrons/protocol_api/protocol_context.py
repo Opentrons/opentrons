@@ -16,9 +16,9 @@ from opentrons.protocols.context.simulator.instrument_context import \
     InstrumentContextSimulation
 from opentrons.protocols.types import Protocol
 from .labware import Labware
-from opentrons.protocols.context.interfaces.labware import \
+from opentrons.protocols.context.labware import \
     LabwareInterface
-from opentrons.protocols.context.interfaces.protocol_context import \
+from opentrons.protocols.context.protocol_context import \
     ProtocolContextInterface
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry, ModuleType)

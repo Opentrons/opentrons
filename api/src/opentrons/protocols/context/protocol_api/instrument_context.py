@@ -9,9 +9,9 @@ from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import Clearances, build_edges, \
     FlowRates, PlungerSpeeds
 from opentrons.protocols.geometry import planning
-from opentrons.protocols.context.interfaces.instrument_context import \
+from opentrons.protocols.context.instrument_context import \
     InstrumentContextInterface
-from opentrons.protocols.context.interfaces.protocol_context import \
+from opentrons.protocols.context.protocol_context import \
     ProtocolContextInterface
 from opentrons.protocols.context.well import WellImplementation
 

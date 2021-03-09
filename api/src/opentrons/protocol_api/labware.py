@@ -19,7 +19,7 @@ from typing import (
 
 from opentrons.protocols.api_support.util import (
     requires_version, labware_column_shift)
-from opentrons.protocols.context.interfaces.labware import \
+from opentrons.protocols.context.labware import \
     LabwareInterface
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols import labware as labware_module

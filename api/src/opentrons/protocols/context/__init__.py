@@ -1,1 +1,4 @@
-"""The ProtocolContext, InstrumentContext, and related class implementations."""
+"""
+This package defines the interfaces that implement the ProtocolContext,
+ InstrumentContext, and related classes.
+"""

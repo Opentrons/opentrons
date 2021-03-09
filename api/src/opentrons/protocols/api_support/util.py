@@ -13,12 +13,11 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import (types, SynchronousAdapter, API,
                                         HardwareAPILike, ThreadManager)
 if TYPE_CHECKING:
-    from opentrons.protocols.context.interfaces.instrument_context import \
+    from opentrons.protocols.context.instrument_context import \
         InstrumentContextInterface
     from opentrons.protocol_api.labware import Well, Labware
     from opentrons.protocols.geometry.deck import Deck
     from opentrons.hardware_control.dev_types import HasLoop  # noqa: F501
-
 
 MODULE_LOG = logging.getLogger(__name__)
 

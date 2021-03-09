@@ -1,3 +1,5 @@
+"""The interface that implements InstrumentContext."""
+
 from abc import abstractmethod
 from typing import List, Dict
 

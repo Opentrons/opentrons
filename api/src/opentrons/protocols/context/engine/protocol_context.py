@@ -10,11 +10,11 @@ from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocols.api_support.util import HardwareManager, AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.context.interfaces.instrument_context import \
+from opentrons.protocols.context.instrument_context import \
     InstrumentContextInterface
-from opentrons.protocols.context.interfaces.labware import \
+from opentrons.protocols.context.labware import \
     LabwareInterface
-from opentrons.protocols.context.interfaces.protocol_context import \
+from opentrons.protocols.context.protocol_context import \
     ProtocolContextInterface, InstrumentDict, LoadModuleResult
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 

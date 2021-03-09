@@ -1,5 +1,5 @@
 from opentrons import types
-from opentrons.protocols.context.interfaces.instrument_context import \
+from opentrons.protocols.context.instrument_context import \
     InstrumentContextInterface
 from opentrons.protocols.context.protocol_api.protocol_context import \
     ProtocolContextImplementation

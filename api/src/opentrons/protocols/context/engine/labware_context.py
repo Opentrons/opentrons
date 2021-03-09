@@ -12,7 +12,7 @@ from opentrons.types import Point, Location
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition, LabwareParameters
 )
-from opentrons.protocols.context.interfaces.labware\
+from opentrons.protocols.context.labware \
     import LabwareInterface
 
 
