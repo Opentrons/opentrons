@@ -42,7 +42,7 @@ export interface SelectProps {
         context: SelectOptionContext;
         inputValue: string;
         selectValue: SelectOption[] | SelectOption | null | undefined;
-    }) => JSX.Element;
+    }) => React.ReactNode;
     onBlur?: (e: React.FocusEvent<HTMLElement>) => unknown;
     onChange?: (value: SelectOption | null, action: ChangeAction) => unknown;
     onFocus?: (e: React.FocusEvent<HTMLElement>) => unknown;
