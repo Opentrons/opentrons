@@ -31,7 +31,7 @@ type OP = {|
 
 type SP = {|
   mmFromBottom: number | null,
-  wellDepthMm: number | null,
+  wellDepthMm: number,
 |}
 
 type Props = {| ...OP, ...SP |}
@@ -72,14 +72,15 @@ function TipPositionInput(props: Props) {
   return (
     <>
       <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
-      <TipPositionModal
-        name={name}
-        closeModal={handleClose}
-        wellDepthMm={wellDepthMm}
-        mmFromBottom={mmFromBottom}
-        isOpen={isModalOpen}
-        updateValue={updateValue}
-      />
+      {isModalOpen && (
+        <TipPositionModal
+          name={name}
+          closeModal={handleClose}
+          wellDepthMm={wellDepthMm}
+          mmFromBottom={mmFromBottom}
+          updateValue={updateValue}
+        />
+      )}
       <Wrapper
         targetProps={targetProps}
         disabled={disabled}
@@ -125,7 +126,7 @@ const Wrapper = (props: WrapperProps) =>
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const { labwareId, value } = ownProps
 
-  let wellDepthMm = null
+  let wellDepthMm = 0
   if (labwareId != null) {
     const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]
       .def

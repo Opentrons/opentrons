@@ -10,6 +10,7 @@ import { getIsTouchTipField, type StepFieldName } from '../../../../form-types'
 
 // TODO: Ian + Brian 2019-02-13 this should switch on stepType, not use field
 // name to infer step type!
+// TODO IMMEDIATELY look thru all uses of this util
 export function getDefaultMmFromBottom(args: {
   name: StepFieldName,
   wellDepthMm: number,
