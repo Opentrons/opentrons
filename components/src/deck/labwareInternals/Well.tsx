@@ -37,15 +37,17 @@ function WellComponent(props: WellProps): JSX.Element | null {
     style: { fill },
     'data-wellname': wellName,
     onMouseEnter: onMouseEnterWell
-      ? (event: React.MouseEvent) => onMouseEnterWell({ wellName, event })
-      : null,
+      ? ((event =>
+          onMouseEnterWell({ wellName, event })) as React.MouseEventHandler)
+      : undefined,
     onMouseLeave: onMouseLeaveWell
-      ? (event: React.MouseEvent) => onMouseLeaveWell({ wellName, event })
-      : null,
+      ? ((event =>
+          onMouseLeaveWell({ wellName, event })) as React.MouseEventHandler)
+      : undefined,
   }
   const _noMouseProps = {
     className: baseClassName,
-    style: { fill, pointerEvents: 'none' },
+    style: { fill, pointerEvents: 'none' as CSSProperties['pointerEvents'] },
   }
   // exclude all mouse interactivity props if no event handler props provided
   const commonProps =
