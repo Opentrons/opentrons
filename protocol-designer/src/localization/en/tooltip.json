@@ -34,7 +34,8 @@
 
       "changeTip": "Choose when the robot picks up fresh tips",
       "preWetTip": "Pre-wet pipette tip by aspirating and dispensing 2/3 of the tip's max volume",
-      "tipPosition": "Distance from the bottom of the well",
+      "aspirate_mmFromBottom": "Distance from the bottom of the well",
+      "dispense_mmFromBottom": "Distance from the bottom of the well",
 
       "aspirate_touchTip_checkbox": "Touch tip to each side of well after aspirating",
       "dispense_touchTip_checkbox": "Touch tip to each side of well after dispensing",

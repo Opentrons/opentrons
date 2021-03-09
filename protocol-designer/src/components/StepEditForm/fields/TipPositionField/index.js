@@ -48,7 +48,14 @@ function TipPositionInput(props: Props) {
     setModalOpen(false)
   }
 
-  const { disabled, name, mmFromBottom, wellDepthMm, updateValue } = props
+  const {
+    disabled,
+    name,
+    mmFromBottom,
+    tooltipContent,
+    wellDepthMm,
+    updateValue,
+  } = props
   const isTouchTipField = getIsTouchTipField(name)
   const isDelayPositionField = getIsDelayPositionField(name)
   let value = ''
@@ -64,9 +71,7 @@ function TipPositionInput(props: Props) {
 
   return (
     <>
-      <Tooltip {...tooltipProps}>
-        {i18n.t('tooltip.step_fields.defaults.tipPosition')}
-      </Tooltip>
+      <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
       <TipPositionModal
         name={name}
         closeModal={handleClose}
