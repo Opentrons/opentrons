@@ -2,19 +2,20 @@ import * as React from 'react'
 import map from 'lodash/map'
 import { Well } from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { CSSProperties } from 'styled-components'
 
 export interface FilledWellsProps {
   definition: LabwareDefinition2
-  fillByWell: { [wellName: string]: string }
+  fillByWell: Record<string, CSSProperties['fill']>
 }
 
 function FilledWellsComponent(props: FilledWellsProps): JSX.Element {
   const { definition, fillByWell } = props
   return (
     <>
-      {map<Record<string, string>, JSX.Element>(
+      {map<Record<string, CSSProperties['fill']>, JSX.Element>(
         fillByWell,
-        (color: keyof typeof fillByWell, wellName: string): JSX.Element => {
+        (color: CSSProperties['fill'], wellName: string): JSX.Element => {
           return (
             <Well
               key={wellName}

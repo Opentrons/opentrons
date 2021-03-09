@@ -1,11 +1,12 @@
 import * as React from 'react';
 import type { LabwareWell } from '@opentrons/shared-data';
+import type { CSSProperties } from 'styled-components';
 import type { WellMouseEvent } from './types';
 export interface WellProps {
     /** if included, overrides the default classname */
     className?: string | null;
     /** fill inline style */
-    fill?: string | null;
+    fill?: CSSProperties['fill'];
     /** Well Name (eg 'A1') */
     wellName: string;
     /** well object from labware definition */
