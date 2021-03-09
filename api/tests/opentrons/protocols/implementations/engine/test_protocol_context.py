@@ -3,16 +3,14 @@ from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckSlotName
-from opentrons.protocol_engine import StateView, DeckSlotLocation
+from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.hardware_control import API as HardwareAPI
 
-from opentrons.protocol_engine.commands import (
-    LoadLabwareResult
-)
+from opentrons.protocol_engine.clients import SyncClient
+from opentrons.protocol_engine.commands import LoadLabwareResult
 from opentrons.protocols.implementations.engine import (
     ProtocolEngineContext,
     LabwareContext,
-    SyncProtocolEngine,
 )
 
 from opentrons.types import Mount
@@ -30,28 +28,15 @@ def hardware_api(decoy: Decoy) -> HardwareAPI:
 
 
 @pytest.fixture
-def sync_engine(decoy: Decoy) -> SyncProtocolEngine:
-    """Get a test double SyncProtocolEngine."""
-    return decoy.create_decoy(spec=SyncProtocolEngine)
+def engine_client(decoy: Decoy) -> SyncClient:
+    """Get a test double SyncClient."""
+    return decoy.create_decoy(spec=SyncClient)
 
 
 @pytest.fixture
-def engine_state(decoy: Decoy) -> StateView:
-    """Get a test double ProtocolEngine StateView."""
-    return decoy.create_decoy(spec=StateView)
-
-
-@pytest.fixture
-def subject(
-    decoy: Decoy,
-    sync_engine: SyncProtocolEngine,
-    engine_state: StateView,
-) -> ProtocolEngineContext:
+def subject(decoy: Decoy, engine_client: SyncClient) -> ProtocolEngineContext:
     """Get a ProtocolEngineContext with fake dependencies."""
-    return ProtocolEngineContext(
-        sync_engine=sync_engine,
-        state_view=engine_state,
-    )
+    return ProtocolEngineContext(client=engine_client)
 
 
 def test_get_bundled_data(
@@ -111,13 +96,12 @@ def test_load_labware_from_definition(
 def test_load_labware(
     decoy: Decoy,
     minimal_labware_def: LabwareDefinition,
-    sync_engine: SyncProtocolEngine,
-    engine_state: StateView,
+    engine_client: SyncClient,
     subject: ProtocolEngineContext,
 ) -> None:
     """It should use the engine to load a labware in a slot."""
     decoy.when(
-        sync_engine.load_labware(
+        engine_client.load_labware(
             location=DeckSlotLocation(slot=DeckSlotName.SLOT_5),
             load_name="some_labware",
             namespace="opentrons",
@@ -138,7 +122,7 @@ def test_load_labware(
         version=1,
     )
 
-    assert result == LabwareContext(labware_id="abc123", state_view=engine_state)
+    assert result == LabwareContext(labware_id="abc123", state_view=engine_client.state)
 
 
 def test_load_module(subject: ProtocolEngineContext) -> None:
