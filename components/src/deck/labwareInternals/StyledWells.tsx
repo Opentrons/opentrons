@@ -25,6 +25,6 @@ function StyledWellsComponent(props: StyledWellProps): JSX.Element {
   )
 }
 
-export const StyledWells: React.AbstractComponent<StyledWellProps> = React.memo(
-  StyledWellsComponent
-)
+export const StyledWells: React.MemoExoticComponent<
+  typeof StyledWellsComponent
+> = React.memo(StyledWellsComponent)
