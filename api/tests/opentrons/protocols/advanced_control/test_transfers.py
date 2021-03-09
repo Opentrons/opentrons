@@ -1321,3 +1321,39 @@ def test_blowout_to_dest(_instr_labware):
         {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
     for step, expected in zip(dist_plan, exp):
         assert step == expected
+
+
+def test_error_if_disposal_volume_too_high(_instr_labware):
+    # Test the fix for bug 6170.  If too high a disposal volume was given, the
+    # process would get stuck in an infinite loop.  It should throw an error,
+    # instead.
+
+    expected_max_volumes = {
+        'opentrons_96_tiprack_300ul': 300,
+        'opentrons_96_filtertiprack_200ul': 200}
+
+    for tip_rack_name, expected_max_volume in expected_max_volumes.items():
+        context = papi.ProtocolContext()
+        labware = context.load_labware('biorad_96_wellplate_200ul_pcr', 1)
+        tip_rack = context.load_labware(tip_rack_name, 2)
+        pipette = context.load_instrument(
+            'p300_single',
+            Mount.LEFT,
+            tip_racks=[tip_rack])
+
+        for test_volume in [expected_max_volume, expected_max_volume*10]:
+            options = tx.TransferOptions(
+                tx.Transfer(disposal_volume=test_volume))
+            with pytest.raises(ValueError):
+                plan = tx.TransferPlan(
+                    volume=test_volume,
+                    sources=labware.rows()[0][0],
+                    dests=labware.rows()[1],
+                    instr=pipette,
+                    max_volume=pipette.hw_pipette['working_volume'],
+                    api_version=context.api_version,
+                    options=options)
+                for step in plan:
+                    # Exhaust the iterator in case it raises this exception
+                    # lazily.
+                    pass
