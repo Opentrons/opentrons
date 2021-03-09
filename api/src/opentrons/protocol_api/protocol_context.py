@@ -12,7 +12,7 @@ from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.context.protocol_api.instrument_context import \
     InstrumentContextImplementation
-from opentrons.protocols.context.simulators.instrument_context import \
+from opentrons.protocols.context.simulator.instrument_context import \
     InstrumentContextSimulation
 from opentrons.protocols.types import Protocol
 from .labware import Labware
