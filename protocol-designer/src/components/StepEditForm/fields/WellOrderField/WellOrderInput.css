@@ -12,7 +12,7 @@
 }
 
 .well_order_icon:hover {
-  opacity: 0.7;
+  background-color: color-mod(var(--c-med-gray) alpha(25%));
 }
 
 .modal_header {

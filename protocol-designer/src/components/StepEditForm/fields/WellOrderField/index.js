@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import { css } from 'styled-components'
 import {
   FormGroup,
   Text,
@@ -7,6 +8,7 @@ import {
   useHoverTooltip,
   FONT_WEIGHT_SEMIBOLD,
   FONT_SIZE_BODY_1,
+  C_LIGHT_GRAY,
 } from '@opentrons/components'
 import cx from 'classnames'
 import { i18n } from '../../../../localization'
@@ -70,6 +72,17 @@ export const WellOrderField = (props: Props): React.Node => {
     [stepEditStyles.no_label]: !props.label,
   })
 
+  const mixedWellOrderStyles = css`
+    font-weight: ${FONT_WEIGHT_SEMIBOLD};
+    font-size: ${FONT_SIZE_BODY_1};
+    padding-top: 0.5rem;
+    padding-bottom: 0.325rem;
+
+    &:hover {
+      background-color: ${C_LIGHT_GRAY};
+    }
+  `
+
   return (
     <>
       <Tooltip {...tooltipProps}>
@@ -98,13 +111,7 @@ export const WellOrderField = (props: Props): React.Node => {
               )}
             />
           ) : (
-            <Text
-              onClick={handleOpen}
-              fontWeight={FONT_WEIGHT_SEMIBOLD}
-              fontSize={FONT_SIZE_BODY_1}
-              paddingTop="0.5rem"
-              paddingBottom="0.325rem"
-            >
+            <Text onClick={handleOpen} css={mixedWellOrderStyles}>
               {i18n.t('form.step_edit_form.field.well_order.mixed')}
             </Text>
           )}
