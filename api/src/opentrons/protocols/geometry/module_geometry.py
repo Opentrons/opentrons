@@ -16,7 +16,7 @@ from typing import (Mapping, Optional,
 
 import numpy as np  # type: ignore
 import jsonschema  # type: ignore
-from opentrons.protocols.implementations.protocol_api.labware import\
+from opentrons.protocols.context.protocol_api.labware import\
     LabwareImplementation
 
 from opentrons_shared_data import module

@@ -3,9 +3,9 @@
 # from logging.config import dictConfig
 from opentrons.config import robot_configs
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocols.implementations.protocol_api.labware import\
+from opentrons.protocols.context.protocol_api.labware import\
     LabwareImplementation
-from opentrons.protocols.implementations.protocol_api.protocol_context import \
+from opentrons.protocols.context.protocol_api.protocol_context import \
     ProtocolContextImplementation
 
 try:

@@ -20,9 +20,9 @@ from opentrons.config import feature_flags as ff
 from opentrons.commands.util import from_list
 from opentrons.commands import types as command_types, introspection
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.implementations.protocol_api.protocol_context import \
+from opentrons.protocols.context.protocol_api.protocol_context import \
     ProtocolContextImplementation
-from opentrons.protocols.implementations.simulators.protocol_context import \
+from opentrons.protocols.context.simulators.protocol_context import \
     ProtocolContextSimulation
 from opentrons.protocols.parse import parse
 from opentrons.protocols.types import Protocol

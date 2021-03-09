@@ -19,11 +19,11 @@ from typing import (
 
 from opentrons.protocols.api_support.util import (
     requires_version, labware_column_shift)
-from opentrons.protocols.implementations.interfaces.labware import \
+from opentrons.protocols.context.interfaces.labware import \
     LabwareInterface
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols import labware as labware_module
-from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.context.well import WellImplementation
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import (

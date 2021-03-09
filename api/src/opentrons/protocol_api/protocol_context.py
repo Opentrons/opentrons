@@ -10,15 +10,15 @@ from opentrons.hardware_control import API
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.implementations.instrument_context import \
+from opentrons.protocols.context.protocol_api.instrument_context import \
     InstrumentContextImplementation
-from opentrons.protocols.implementations.simulators.instrument_context import \
+from opentrons.protocols.context.simulators.instrument_context import \
     InstrumentContextSimulation
 from opentrons.protocols.types import Protocol
 from .labware import Labware
-from opentrons.protocols.implementations.interfaces.labware import \
+from opentrons.protocols.context.interfaces.labware import \
     LabwareInterface
-from opentrons.protocols.implementations.interfaces.protocol_context import \
+from opentrons.protocols.context.interfaces.protocol_context import \
     ProtocolContextInterface
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry, ModuleType)

@@ -5,9 +5,9 @@ from opentrons.protocols.labware.definition import (
     IndexFileInformation, get_labware_definition)
 
 from opentrons.calibration_storage import get
-from opentrons.protocols.implementations.interfaces.labware import \
+from opentrons.protocols.context.interfaces.labware import \
     LabwareInterface
-from opentrons.protocols.implementations.protocol_api.labware import \
+from opentrons.protocols.context.protocol_api.labware import \
     LabwareImplementation
 from opentrons.types import Location
 from opentrons_shared_data.labware.dev_types import LabwareDefinition

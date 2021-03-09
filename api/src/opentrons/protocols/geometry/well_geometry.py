@@ -8,7 +8,7 @@ from opentrons_shared_data.labware.dev_types import (
     WellDefinition, CircularWellDefinition, RectangularWellDefinition)
 
 if TYPE_CHECKING:
-    from opentrons.protocols.implementations.interfaces.labware import \
+    from opentrons.protocols.context.interfaces.labware import \
         LabwareInterface
 
 

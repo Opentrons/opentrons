@@ -1,7 +1,7 @@
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.implementations.protocol_api.labware import\
+from opentrons.protocols.context.protocol_api.labware import\
     LabwareImplementation
-from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.context.well import WellImplementation
 
 from unittest import mock
 from copy import deepcopy

@@ -3,9 +3,9 @@ from typing import List, Dict
 
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
-from opentrons.protocols.implementations.tip_tracker import TipTracker
-from opentrons.protocols.implementations.well import WellImplementation
-from opentrons.protocols.implementations.well_grid import WellGrid
+from opentrons.protocols.context.tip_tracker import TipTracker
+from opentrons.protocols.context.well import WellImplementation
+from opentrons.protocols.context.well_grid import WellGrid
 from opentrons.types import Point
 from opentrons_shared_data.labware.dev_types import (
     LabwareParameters, LabwareDefinition)

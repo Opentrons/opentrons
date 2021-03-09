@@ -6,9 +6,9 @@ from unittest import mock
 import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
-from opentrons.protocols.implementations.protocol_api.protocol_context import \
+from opentrons.protocols.context.protocol_api.protocol_context import \
     ProtocolContextImplementation
-from opentrons.protocols.implementations.simulators.protocol_context import \
+from opentrons.protocols.context.simulators.protocol_context import \
     ProtocolContextSimulation
 from opentrons_shared_data import load_shared_data
 from opentrons.types import Mount, Point, Location, TransferTipPolicy

@@ -10,11 +10,11 @@ from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry, ModuleType)
-from opentrons.protocols.implementations.interfaces.instrument_context \
+from opentrons.protocols.context.interfaces.instrument_context \
     import InstrumentContextInterface
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds, HardwareManager)
-from opentrons.protocols.implementations.interfaces.labware import \
+from opentrons.protocols.context.interfaces.labware import \
     LabwareInterface
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 

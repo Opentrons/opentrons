@@ -7,14 +7,10 @@ from opentrons.protocol_engine import (
     Dimensions,
 )
 
-<<<<<<< HEAD:api/tests/opentrons/protocols/implementations/engine/test_labware_context.py
-=======
 from opentrons.protocols.context.engine.labware_context import \
     LabwareContext
->>>>>>> 3c98387df... rename implementations to context:api/tests/opentrons/protocols/context/engine/test_labware_context.py
 from opentrons.types import Point, DeckSlotName, Location
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.protocols.implementations.engine import LabwareContext
 
 
 @pytest.fixture

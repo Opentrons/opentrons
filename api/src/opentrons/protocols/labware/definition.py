@@ -12,7 +12,7 @@ import jsonschema  # type: ignore
 
 from opentrons.protocols.api_support.util import ModifiedList
 from opentrons.calibration_storage import helpers, modify
-from opentrons.protocols.implementations.interfaces.labware import \
+from opentrons.protocols.context.interfaces.labware import \
     LabwareInterface
 from opentrons.types import Point
 from opentrons_shared_data import load_shared_data, get_shared_data_root
