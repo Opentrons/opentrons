@@ -403,7 +403,3 @@ class ModifiedList(list):
             if name == item.replace("-", "_").lower():
                 return True
         return False
-
-
-def convert_door_state_to_bool(door_state: types.DoorState):
-    return True if door_state == types.DoorState.CLOSED else False

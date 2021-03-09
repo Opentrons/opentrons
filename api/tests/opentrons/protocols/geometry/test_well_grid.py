@@ -1,7 +1,7 @@
 from typing import List
 
 import pytest
-from opentrons.protocols.context.well_grid import WellGrid
+from opentrons.protocols.geometry.well_grid import WellGrid
 from opentrons.protocols.context.well import WellImplementation
 
 NONE: list = []
