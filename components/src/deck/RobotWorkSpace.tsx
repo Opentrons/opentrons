@@ -37,7 +37,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
   }
   if (!deckDef && !viewBox) return null
 
-  let wholeDeckViewBox = null
+  let wholeDeckViewBox
   let deckSlotsById = {}
   if (deckDef) {
     const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin

@@ -43,6 +43,9 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
     [styles.checkbox_disabled]: props.disabled,
   })
 
+  // TODO(bc, 2021-03-09): this usage of the indeterminate prop of input
+  // is in react types for input el. Remove ts expect error below and replace with
+  // ref on input el (see: Dan Abramov https://github.com/facebook/react/issues/1798#issuecomment-333414857)
   const indeterminate = props.isIndeterminate ? 'true' : undefined
 
   return (
@@ -67,6 +70,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
         disabled={props.disabled}
         onChange={props.onChange}
         tabIndex={props.tabIndex}
+        /* @ts-expect-error */
         indeterminate={indeterminate}
       />
       <div

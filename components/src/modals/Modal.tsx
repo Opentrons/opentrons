@@ -20,9 +20,7 @@ export interface ModalProps {
   alertOverlay?: boolean
   /** restricts scroll outside of Modal when open, true by default */
   restrictOuterScroll?: boolean
-  innerRef?:
-    | { current: HTMLElement | null }
-    | ((current: HTMLElement | null) => unknown)
+  innerRef?: React.Ref<HTMLDivElement>
 }
 
 /**
