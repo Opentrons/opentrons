@@ -557,6 +557,8 @@ class TransferPlan:
         # the other maintains consistency in default behaviors of all functions
         plan_iter = self._expand_for_volume_constraints(
             self._volumes, self._dests,
+            # todo(mm, 2021-03-09): Is this a bug?
+            # Should this be the *working volume*?
             self._instr.max_volume
             - self._strategy.disposal_volume
             - self._strategy.air_gap)
@@ -603,6 +605,11 @@ class TransferPlan:
         """ Split a sequence of proposed transfers if necessary to keep each
         transfer under the given max volume.
         """
+
+        if max_volume <= 0:
+            raise ValueError(
+                f"max_volume must be greater than 0.  (Got {max_volume}.)")
+
         for volume, target in zip(volumes, targets):
             while volume > max_volume * 2:
                 yield max_volume, target
@@ -651,6 +658,8 @@ class TransferPlan:
                .. Aspirate -> .....*
         """
         plan_iter = self._expand_for_volume_constraints(
+            # todo(mm, 2021-03-09): Is this right?  Why don't we account for
+            # disposal volume?
             self._volumes, self._sources, self._instr.max_volume)
         current_xfer = next(plan_iter)
         if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
