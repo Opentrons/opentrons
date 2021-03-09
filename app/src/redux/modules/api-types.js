@@ -132,3 +132,4 @@ export type ModuleCommand =
   | 'set_lid_temperature'
   | 'deactivate'
   | 'open'
+  | 'engage'

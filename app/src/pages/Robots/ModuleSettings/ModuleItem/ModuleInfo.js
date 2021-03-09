@@ -1,30 +1,40 @@
 // @flow
 import * as React from 'react'
 
+import { Box, Flex, Text, FONT_SIZE_BODY_1, FONT_WEIGHT_SEMIBOLD, SIZE_3, SPACING_1, SPACING_2, SPACING_3 } from '@opentrons/components'
+import { ModuleImage } from './ModuleImage'
+
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { LabeledValue } from '@opentrons/components'
-import styles from './styles.css'
 
 import type { AttachedModule } from '../../../../redux/modules/types'
 
 type Props = {|
   module: AttachedModule,
+  ...props,
 |}
+
 
 export function ModuleInfo(props: Props): React.Node {
   const { model, serial, status, fwVersion } = props.module
   const displayName = getModuleDisplayName(model)
 
   return (
-    <div className={styles.module_info}>
-      <div className={styles.grid_50}>
-        <LabeledValue label="Name" value={displayName} />
-        <LabeledValue label="Serial" value={serial} />
-      </div>
-      <div className={styles.grid_50}>
-        <LabeledValue label="Status" value={status} />
-        <LabeledValue label="Firmware Version" value={fwVersion} />
-      </div>
-    </div>
+    <Flex width="40%">
+      <Box>
+        <ModuleImage model={model} />
+        <Flex marginLeft={SPACING_3} fontSize={FONT_SIZE_BODY_1}>
+          <Text marginRight={SPACING_1} fontWeight={FONT_WEIGHT_SEMIBOLD}>
+            Serial number:
+          </Text>
+          <Text>{serial}</Text>
+        </Flex>
+        <Flex marginLeft={SPACING_3} fontSize={FONT_SIZE_BODY_1}>
+          <Text marginRight={SPACING_1} fontWeight={FONT_WEIGHT_SEMIBOLD}>
+            Firmware version:
+          </Text>
+          <Text>{fwVersion}</Text>
+        </Flex>
+      </Box>
+    </Flex>
   )
 }
