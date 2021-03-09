@@ -1,5 +1,6 @@
 """Base protocol engine types and interfaces."""
 from enum import Enum
+from dataclasses import dataclass
 from pydantic import BaseModel
 from typing import Union, Tuple
 from typing_extensions import final
@@ -43,3 +44,13 @@ class DeckLocation(BaseModel):
     pipette_id: str
     labware_id: str
     well_name: str
+
+
+@final
+@dataclass(frozen=True)
+class Dimensions:
+    """Dimensions of an object in deck-space."""
+
+    x_dimension: float
+    y_dimension: float
+    z_dimension: float

@@ -1,14 +1,15 @@
 import pytest
 from decoy import Decoy
-from opentrons.protocol_engine import StateView
-from opentrons.protocol_engine.state import LabwareData
-from opentrons.protocol_engine.types import DeckSlotLocation
-from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
+from opentrons.protocol_engine import (
+    StateView,
+    LabwareData,
+    DeckSlotLocation,
+    Dimensions,
+)
 
-from opentrons.protocols.implementations.engine.labware_context import \
-    LabwareContext
 from opentrons.types import Point, DeckSlotName, Location
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.implementations.engine import LabwareContext
 
 
 @pytest.fixture
@@ -40,20 +41,11 @@ def labware_data(minimal_labware_def: LabwareDefinition) -> LabwareData:
 
 
 @pytest.fixture
-def parent() -> Location:
-    """Parent location fixture."""
-    return Location(Point(x=1, y=5, z=20), "4")
-
-
-@pytest.fixture
-def labware_context(labware_id: str,
-                    mock_state_view: StateView,
-                    parent: Location) -> LabwareContext:
+def labware_context(labware_id: str, mock_state_view: StateView) -> LabwareContext:
     """LabwareContext fixture"""
     return LabwareContext(
         labware_id=labware_id,
         state_view=mock_state_view,
-        parent=parent
     )
 
 
@@ -223,7 +215,7 @@ def test_get_wells_by_name(
 
     assert {
         name: str(well) for (name, well) in labware_context.get_wells_by_name().items()
-           } == {
+    } == {
         "A1": "A1 of minimal labware on 3", "A2": "A2 of minimal labware on 3"
     }
 
@@ -236,7 +228,28 @@ def test_get_geometry(
         mock_state_view.labware.get_labware_data_by_id(labware_id=labware_id)
     ).then_return(labware_data)
 
-    assert isinstance(labware_context.get_geometry(), LabwareGeometry)
+    decoy.when(
+        mock_state_view.labware.get_dimensions(labware_id=labware_id)
+    ).then_return(Dimensions(100.0, 200.0, 300.0))
+
+    decoy.when(
+        mock_state_view.geometry.get_labware_parent_position(labware_id=labware_id)
+    ).then_return(Point(x=1.0, y=2.0, z=3.0))
+
+    decoy.when(
+        mock_state_view.geometry.get_labware_origin_position(labware_id=labware_id)
+    ).then_return(Point(x=4.0, y=5.0, z=6.0))
+
+    result = labware_context.get_geometry()
+
+    assert result.parent == Location(
+        point=Point(x=1.0, y=2.0, z=3.0),
+        labware="3"
+    )
+    assert result.offset == Point(x=4.0, y=5.0, z=6.0)
+    assert result.x_dimension == 100.0
+    assert result.y_dimension == 200.0
+    assert result.z_dimension == 300.0
 
 
 def test_highest_z(

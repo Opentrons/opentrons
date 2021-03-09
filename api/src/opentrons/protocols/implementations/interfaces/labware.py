@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import List, Dict
 
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
+from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
 from opentrons.protocols.implementations.tip_tracker import TipTracker
 from opentrons.protocols.implementations.well import WellImplementation
 from opentrons.protocols.implementations.well_grid import WellGrid
@@ -83,5 +83,5 @@ class LabwareInterface(DeckItem):
         ...
 
     @abstractmethod
-    def get_geometry(self) -> LabwareGeometry:
+    def get_geometry(self) -> AbstractLabwareGeometry:
         ...

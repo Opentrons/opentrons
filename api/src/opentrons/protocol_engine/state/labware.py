@@ -12,7 +12,7 @@ from opentrons.calibration_storage.helpers import uri_from_definition
 from .. import errors
 from ..resources import DeckFixedLabware
 from ..commands import CompletedCommandType, LoadLabwareResult
-from ..types import LabwareLocation
+from ..types import LabwareLocation, Dimensions
 from .substore import Substore, CommandReactive
 
 
@@ -99,6 +99,17 @@ class LabwareState:
         """Get the labware's load name."""
         labware_data = self.get_labware_data_by_id(labware_id)
         return labware_data.definition["parameters"]["loadName"]
+
+    def get_dimensions(self, labware_id: str) -> Dimensions:
+        """Get the labware's dimensions."""
+        labware_data = self.get_labware_data_by_id(labware_id)
+        dims = labware_data.definition["dimensions"]
+
+        return Dimensions(
+            x_dimension=dims["xDimension"],
+            y_dimension=dims["yDimension"],
+            z_dimension=dims["zDimension"],
+        )
 
 
 class LabwareStore(Substore[LabwareState], CommandReactive):
