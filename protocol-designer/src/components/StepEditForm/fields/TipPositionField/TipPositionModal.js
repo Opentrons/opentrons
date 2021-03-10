@@ -41,7 +41,6 @@ const TOO_MANY_DECIMALS: 'TOO_MANY_DECIMALS' = 'TOO_MANY_DECIMALS'
 const OUT_OF_BOUNDS: 'OUT_OF_BOUNDS' = 'OUT_OF_BOUNDS'
 type Error = typeof TOO_MANY_DECIMALS | typeof OUT_OF_BOUNDS
 
-// TODO IMMEDIATELY: use i18n
 const getErrorText = (args: {|
   errors: Array<Error>,
   maxMmFromBottom: number,
@@ -51,9 +50,12 @@ const getErrorText = (args: {|
   const { errors, minMmFromBottom, maxMmFromBottom, isPristine } = args
 
   if (errors.includes(TOO_MANY_DECIMALS)) {
-    return 'a max of 1 decimal place is allowed'
+    return i18n.t('modal.tip_position.errors.TOO_MANY_DECIMALS')
   } else if (!isPristine && errors.includes(OUT_OF_BOUNDS)) {
-    return `accepted range is ${minMmFromBottom} to ${maxMmFromBottom}`
+    return i18n.t('modal.tip_position.errors.OUT_OF_BOUNDS', {
+      minMmFromBottom,
+      maxMmFromBottom,
+    })
   } else {
     return null
   }
