@@ -1331,7 +1331,8 @@ def test_blowout_to_dest(_instr_labware):
         ('p300_single', 'opentrons_96_tiprack_300ul', 300, 300),
 
         # pipette max != tip max, disposal_volume == tip max
-        # todo(mm, 2021-03-10): These fail unexpectedly, apparently a bug.
+        # todo(mm, 2021-03-10): Apparently a bug, these unexpectedly return
+        # something without raising.
         pytest.param(
             'p300_single', 'opentrons_96_filtertiprack_200ul', 200, 200,
             marks=pytest.mark.xfail
