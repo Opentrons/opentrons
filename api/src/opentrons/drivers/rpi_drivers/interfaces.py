@@ -1,4 +1,3 @@
-import abc
 from typing import List, Set
 from typing_extensions import Protocol
 

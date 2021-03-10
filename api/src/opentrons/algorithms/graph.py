@@ -11,17 +11,6 @@ from typing import List, Dict, Callable, Sequence, Generic
 from .types import VertexLike, VertexName
 
 
-def default_sort(vertex: VertexLike) -> VertexName:
-    """
-    Sort function default for a graph.
-
-    By default, a graph's nodes will be searched
-    by the name of the node. Generally, the name
-    should either be a string or an integer.
-    """
-    return vertex.name
-
-
 class Vertex(Generic[VertexName, VertexLike]):
     """
     Vertex class.
@@ -90,6 +79,17 @@ class Vertex(Generic[VertexName, VertexLike]):
             self._neighbors.remove(vertex_name)
 
 
+def default_sort(vertex: Vertex) -> VertexName:
+    """
+    Sort function default for a graph.
+
+    By default, a graph's nodes will be searched
+    by the name of the node. Generally, the name
+    should either be a string or an integer.
+    """
+    return vertex.name
+
+
 class Graph(Generic[VertexName, VertexLike]):
     """
     Graph class.
@@ -98,10 +98,15 @@ class Graph(Generic[VertexName, VertexLike]):
     graph.
     """
 
+    # Note, the type of sort_by is actually
+    # Callable[[Vertex], VertexName] however there
+    # is an issue when using generics for functions
+    # passed into sort. See
+    # https://github.com/python/typing/issues/760
     def __init__(
             self, sorted_graph: List[Vertex],
             lookup_table: Dict[VertexName, Vertex],
-            sort_by: Callable[[VertexLike], VertexName]) -> None:
+            sort_by: Callable[[Vertex], str]) -> None:
         """
         Graph class initializer.
 
@@ -133,7 +138,7 @@ class Graph(Generic[VertexName, VertexLike]):
             vertex_obj = cls.build_vertex(vertex)
             lookup_table[vertex.name] = vertex_obj
             sorted_graph.append(vertex_obj)
-            sorted_graph.sort(key=sort_by)
+        sorted_graph.sort(key=sort_by)
         return cls(sorted_graph, lookup_table, sort_by)
 
     @property

@@ -150,6 +150,5 @@ class USBBus(USBDriverInterface):
                 self._dfs.graph.remove_vertex(d)
             for d in add_difference:
                 self._dfs.graph.add_vertex(d)
-            self._dfs.reset()
             self.sorted_ports = self._dfs.dfs()
             self.usb_dev = updated_bus
