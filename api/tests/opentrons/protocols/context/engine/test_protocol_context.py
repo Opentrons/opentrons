@@ -1,170 +1,216 @@
 import pytest
-from mock import AsyncMock
+from decoy import Decoy
 
-from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocols.context.engine.protocol_context import \
-    ProtocolEngineContext
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.types import DeckSlotName
+from opentrons.protocol_engine import DeckSlotLocation
+from opentrons.hardware_control import API as HardwareAPI
+
+from opentrons.protocol_engine.clients import SyncClient
+from opentrons.protocol_engine.commands import LoadLabwareResult
+from opentrons.protocols.context.engine import (
+    ProtocolEngineContext,
+    LabwareContext,
+)
+
 from opentrons.types import Mount
 
 
 @pytest.fixture
-def mock_protocol_engine() -> AsyncMock:
-    """Mock of ProtocolEngine"""
-    return AsyncMock(spec=ProtocolEngine)
+def decoy() -> Decoy:
+    """Create a Decoy state container for this test suite."""
+    return Decoy()
 
 
 @pytest.fixture
-def protocol_engine_context(mock_protocol_engine) -> ProtocolEngineContext:
-    """Subject fixture."""
-    return ProtocolEngineContext(protocol_engine=mock_protocol_engine)
+def hardware_api(decoy: Decoy) -> HardwareAPI:
+    return decoy.create_decoy(spec=HardwareAPI)
+
+
+@pytest.fixture
+def engine_client(decoy: Decoy) -> SyncClient:
+    """Get a test double SyncClient."""
+    return decoy.create_decoy(spec=SyncClient)
+
+
+@pytest.fixture
+def subject(decoy: Decoy, engine_client: SyncClient) -> ProtocolEngineContext:
+    """Get a ProtocolEngineContext with fake dependencies."""
+    return ProtocolEngineContext(client=engine_client)
 
 
 def test_get_bundled_data(
-        protocol_engine_context: ProtocolEngineContext) -> None:
+        subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.get_bundled_data()
+        subject.get_bundled_data()
 
 
 def test_get_bundled_labware(
-        protocol_engine_context: ProtocolEngineContext) -> None:
+        subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.get_bundled_labware()
+        subject.get_bundled_labware()
 
 
 def test_get_extra_labware(
-        protocol_engine_context: ProtocolEngineContext) -> None:
+        subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.get_extra_labware()
+        subject.get_extra_labware()
 
 
-def test_cleanup(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_cleanup(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.cleanup()
+        subject.cleanup()
 
 
-def test_get_max_speeds(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_get_max_speeds(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.get_max_speeds()
+        subject.get_max_speeds()
 
 
-def test_get_hardware(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_get_hardware(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.get_hardware()
+        subject.get_hardware()
 
 
-def test_connect(protocol_engine_context: ProtocolEngineContext) -> None:
-    mock_hardware = AsyncMock()
+def test_connect(hardware_api: HardwareAPI, subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.connect(hardware=mock_hardware)
+        subject.connect(hardware=hardware_api)
 
 
-def test_disconnect(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_disconnect(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.disconnect()
+        subject.disconnect()
 
 
-def test_is_simulating(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_is_simulating(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.is_simulating()
+        subject.is_simulating()
 
 
 def test_load_labware_from_definition(
-        protocol_engine_context: ProtocolEngineContext) -> None:
+        subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.load_labware_from_definition({}, "")
+        subject.load_labware_from_definition({}, "")
 
 
-def test_load_labware(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_load_labware(
+    decoy: Decoy,
+    minimal_labware_def: LabwareDefinition,
+    engine_client: SyncClient,
+    subject: ProtocolEngineContext,
+) -> None:
+    """It should use the engine to load a labware in a slot."""
+    decoy.when(
+        engine_client.load_labware(
+            location=DeckSlotLocation(slot=DeckSlotName.SLOT_5),
+            load_name="some_labware",
+            namespace="opentrons",
+            version=1,
+        )
+    ).then_return(
+        LoadLabwareResult(
+            labwareId="abc123",
+            definition=minimal_labware_def,
+            calibration=(1, 2, 3),
+        )
+    )
+
+    result = subject.load_labware(
+        load_name="some_labware",
+        location=5,
+        namespace="opentrons",
+        version=1,
+    )
+
+    assert result == LabwareContext(labware_id="abc123", state_view=engine_client.state)
+
+
+def test_load_module(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.load_labware(load_name="name", location="")
-
-
-def test_load_module(protocol_engine_context: ProtocolEngineContext) -> None:
-    with pytest.raises(NotImplementedError):
-        protocol_engine_context.load_module(module_name="name", location=None,
-                                            configuration="")
+        subject.load_module(module_name="name", location=None,
+                            configuration="")
 
 
 def test_get_loaded_modules(
-        protocol_engine_context: ProtocolEngineContext) -> None:
+        subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.get_loaded_modules()
+        subject.get_loaded_modules()
 
 
 def test_load_instrument(
-        protocol_engine_context: ProtocolEngineContext) -> None:
+        subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.load_instrument(
+        subject.load_instrument(
             instrument_name="", mount=Mount.RIGHT
         )
 
 
 def test_get_loaded_instruments(
-        protocol_engine_context: ProtocolEngineContext) -> None:
+        subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.get_loaded_instruments()
+        subject.get_loaded_instruments()
 
 
-def test_pause(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_pause(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.pause()
+        subject.pause()
 
 
-def test_resume(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_resume(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.resume()
+        subject.resume()
 
 
-def test_comment(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_comment(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.comment(msg="")
+        subject.comment(msg="")
 
 
-def test_delay(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_delay(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.delay(1)
+        subject.delay(1)
 
 
-def test_home(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_home(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.home()
+        subject.home()
 
 
-def test_get_deck(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_get_deck(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.get_deck()
+        subject.get_deck()
 
 
 def test_get_fixed_trash(
-        protocol_engine_context: ProtocolEngineContext) -> None:
+        subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.get_fixed_trash()
+        subject.get_fixed_trash()
 
 
 def test_set_rail_lights(
-        protocol_engine_context: ProtocolEngineContext) -> None:
+        subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.set_rail_lights(True)
+        subject.set_rail_lights(True)
 
 
 def test_get_rail_lights_on(
-        protocol_engine_context: ProtocolEngineContext) -> None:
+        subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.get_rail_lights_on()
+        subject.get_rail_lights_on()
 
 
-def test_door_closed(protocol_engine_context: ProtocolEngineContext) -> None:
+def test_door_closed(subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.door_closed()
+        subject.door_closed()
 
 
 def test_get_last_location(
-        protocol_engine_context: ProtocolEngineContext) -> None:
+        subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.get_last_location()
+        subject.get_last_location()
 
 
 def test_set_last_location(
-        protocol_engine_context: ProtocolEngineContext) -> None:
+        subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
-        protocol_engine_context.set_last_location(None)
+        subject.set_last_location(None)
