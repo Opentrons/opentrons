@@ -39,8 +39,54 @@ const roundValue = (value: number | string | null): number => {
   return round(Number(value), DECIMALS_ALLOWED)
 }
 
+const TOO_MANY_DECIMALS: 'TOO_MANY_DECIMALS' = 'TOO_MANY_DECIMALS'
+const OUT_OF_BOUNDS: 'OUT_OF_BOUNDS' = 'OUT_OF_BOUNDS'
+type Error = typeof TOO_MANY_DECIMALS | typeof OUT_OF_BOUNDS
+
+// TODO IMMEDIATELY: use i18n
+const getErrorText = (args: {|
+  errors: Array<Error>,
+  maxMmFromBottom: number,
+  minMmFromBottom: number,
+  isPristine: boolean,
+|}): string | null => {
+  const { errors, minMmFromBottom, maxMmFromBottom, isPristine } = args
+
+  if (errors.includes(TOO_MANY_DECIMALS)) {
+    return 'a max of 1 decimal place is allowed'
+  } else if (!isPristine && errors.includes(OUT_OF_BOUNDS)) {
+    return `accepted range is ${minMmFromBottom} to ${maxMmFromBottom}`
+  } else {
+    return null
+  }
+}
+
+const getErrors = (args: {|
+  isDefault: boolean,
+  value: string | null,
+  maxMmFromBottom: number,
+  minMmFromBottom: number,
+|}): Array<Error> => {
+  const { isDefault, value, maxMmFromBottom, minMmFromBottom } = args
+  const errors = []
+  if (isDefault) return errors
+
+  const v = Number(value)
+  const correctDecimals = round(v, DECIMALS_ALLOWED) === v
+  const outOfBounds = v > maxMmFromBottom || v < minMmFromBottom
+
+  if (!correctDecimals) {
+    errors.push(TOO_MANY_DECIMALS)
+  }
+  if (outOfBounds) {
+    errors.push(OUT_OF_BOUNDS)
+  }
+  return errors
+}
+
 export const TipPositionModal = (props: Props): React.Node => {
   const { wellDepthMm } = props
+  console.log('TipPositionModal', props)
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
     name: props.name,
     wellDepthMm,
@@ -52,7 +98,8 @@ export const TipPositionModal = (props: Props): React.Node => {
   const [isDefault, setIsDefault] = React.useState<boolean>(
     props.mmFromBottom === null
   )
-  const [pristine, setPristine] = React.useState<boolean>(true)
+  // in this modal, pristinity hides the OUT_OF_BOUNDS error only.
+  const [isPristine, setPristine] = React.useState<boolean>(true)
 
   const getMinMaxMmFromBottom = (): {|
     maxMmFromBottom: number,
@@ -70,35 +117,32 @@ export const TipPositionModal = (props: Props): React.Node => {
     }
   }
   const { maxMmFromBottom, minMmFromBottom } = getMinMaxMmFromBottom()
-
-  const getErrors = (): string | null => {
-    let errors = null
-    if (isDefault) return errors
-
-    const v = Number(value)
-    const correctDecimals = round(v, DECIMALS_ALLOWED) === v
-    const outOfBounds = v > maxMmFromBottom || v < minMmFromBottom
-
-    // TODO IMMEDIATELY: use i18n
-    if (!correctDecimals) {
-      errors = 'a max of 1 decimal place is allowed'
-    }
-    if (outOfBounds) {
-      errors = `accepted range is ${minMmFromBottom} to ${maxMmFromBottom}`
-    }
-    return errors
-  }
+  const errors = getErrors({
+    isDefault,
+    minMmFromBottom,
+    maxMmFromBottom,
+    value,
+  })
+  const hasErrors = errors.length > 0
+  const hasVisibleErrors = isPristine
+    ? errors.includes(TOO_MANY_DECIMALS)
+    : hasErrors
+  const errorText = getErrorText({
+    errors,
+    maxMmFromBottom,
+    minMmFromBottom,
+    isPristine,
+  })
 
   const handleDone = (): void => {
-    if (pristine && getErrors()) {
-      setPristine(false)
-    } else {
+    setPristine(false)
+
+    if (!hasErrors) {
       if (isDefault) {
         props.updateValue(null)
       } else {
         props.updateValue(value === null ? null : Number(value))
       }
-
       props.closeModal()
     }
   }
@@ -143,7 +187,7 @@ export const TipPositionModal = (props: Props): React.Node => {
       onChange={handleInputFieldChange}
       units="mm"
       caption={`between ${minMmFromBottom} and ${maxMmFromBottom}`}
-      error={pristine ? null : getErrors()}
+      error={errorText}
       value={value !== null ? String(value) : ''}
     />
   )
@@ -183,7 +227,7 @@ export const TipPositionModal = (props: Props): React.Node => {
             {
               onClick: handleDone,
               children: i18n.t('button.done'),
-              disabled: !pristine && Boolean(getErrors()),
+              disabled: hasVisibleErrors,
             },
           ]}
           className={modalStyles.modal}

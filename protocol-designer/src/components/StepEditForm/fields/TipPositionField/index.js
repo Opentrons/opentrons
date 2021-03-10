@@ -56,6 +56,7 @@ function TipPositionInput(props: Props) {
     wellDepthMm,
     updateValue,
   } = props
+
   const isTouchTipField = getIsTouchTipField(name)
   const isDelayPositionField = getIsDelayPositionField(name)
   let value = ''
@@ -123,30 +124,35 @@ const Wrapper = (props: WrapperProps) =>
     </span>
   )
 
-const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const { labwareId, value } = ownProps
+export const TipPositionField = props => (
+  <TipPositionInput {...props} wellDepthMm={10} mmFromBottom={3} />
+)
 
-  let wellDepthMm = 0
-  if (labwareId != null) {
-    const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]
-      .def
+// const mapSTP = (state: BaseState, ownProps: OP): SP => {
+//   const { labwareId, value } = ownProps
+//   console.log('ownProps', ownProps)
 
-    // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
-    const firstWell = labwareDef.wells['A1']
-    if (firstWell) wellDepthMm = getWellsDepth(labwareDef, ['A1'])
-  }
+//   let wellDepthMm = 0
+//   if (labwareId != null) {
+//     const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]
+//       .def
 
-  return {
-    wellDepthMm,
-    mmFromBottom: typeof value === 'number' ? value : null,
-  }
-}
+//     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
+//     const firstWell = labwareDef.wells['A1']
+//     if (firstWell) wellDepthMm = getWellsDepth(labwareDef, ['A1'])
+//   }
 
-export const TipPositionField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapSTP, () => ({}))(TipPositionInput)
+//   return {
+//     wellDepthMm,
+//     mmFromBottom: typeof value === 'number' ? value : null,
+//   }
+// }
+
+// export const TipPositionField: React.AbstractComponent<OP> = connect<
+//   Props,
+//   OP,
+//   SP,
+//   _,
+//   _,
+//   _
+// >(mapSTP, () => ({}))(TipPositionInput)
