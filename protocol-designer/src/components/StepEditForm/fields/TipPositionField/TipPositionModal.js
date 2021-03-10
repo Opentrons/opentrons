@@ -24,16 +24,14 @@ const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10
 const DECIMALS_ALLOWED = 1
 
-type OP = {|
+type Props = {|
   closeModal: () => mixed,
+  isIndeterminate?: boolean,
   mmFromBottom: number | null,
   name: StepFieldName,
+  updateValue: (?number) => mixed,
   wellDepthMm: number,
 |}
-
-type DP = {| updateValue: (?number) => mixed |}
-
-type Props = { ...OP, ...DP }
 
 const roundValue = (value: number | string | null): number => {
   return round(Number(value), DECIMALS_ALLOWED)
@@ -96,7 +94,7 @@ export const TipPositionModal = (props: Props): React.Node => {
     props.mmFromBottom === null ? null : String(props.mmFromBottom)
   )
   const [isDefault, setIsDefault] = React.useState<boolean>(
-    props.mmFromBottom === null
+    !props.isIndeterminate && props.mmFromBottom === null
   )
   // in this modal, pristinity hides the OUT_OF_BOUNDS error only.
   const [isPristine, setPristine] = React.useState<boolean>(true)
@@ -183,11 +181,12 @@ export const TipPositionModal = (props: Props): React.Node => {
 
   const TipPositionInput = !isDefault && (
     <InputField
+      caption={`between ${minMmFromBottom} and ${maxMmFromBottom}`}
       className={styles.position_from_bottom_input}
+      error={errorText}
+      isIndeterminate={value === null && props.isIndeterminate}
       onChange={handleInputFieldChange}
       units="mm"
-      caption={`between ${minMmFromBottom} and ${maxMmFromBottom}`}
-      error={errorText}
       value={value !== null ? String(value) : ''}
     />
   )

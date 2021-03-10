@@ -55,6 +55,7 @@ function TipPositionInput(props: Props) {
     tooltipContent,
     wellDepthMm,
     updateValue,
+    isIndeterminate,
   } = props
 
   const isTouchTipField = getIsTouchTipField(name)
@@ -80,6 +81,7 @@ function TipPositionInput(props: Props) {
           wellDepthMm={wellDepthMm}
           mmFromBottom={mmFromBottom}
           updateValue={updateValue}
+          isIndeterminate={isIndeterminate}
         />
       )}
       <Wrapper
@@ -93,7 +95,7 @@ function TipPositionInput(props: Props) {
           readOnly
           onClick={handleOpen}
           value={String(value)}
-          isIndeterminate={props.isIndeterminate}
+          isIndeterminate={isIndeterminate}
           units={i18n.t('application.units.millimeter')}
         />
       </Wrapper>
@@ -124,35 +126,31 @@ const Wrapper = (props: WrapperProps) =>
     </span>
   )
 
-export const TipPositionField = props => (
-  <TipPositionInput {...props} wellDepthMm={10} mmFromBottom={3} />
-)
+const mapSTP = (state: BaseState, ownProps: OP): SP => {
+  const { labwareId, value } = ownProps
+  console.log('ownProps', ownProps)
 
-// const mapSTP = (state: BaseState, ownProps: OP): SP => {
-//   const { labwareId, value } = ownProps
-//   console.log('ownProps', ownProps)
+  let wellDepthMm = 0
+  if (labwareId != null) {
+    const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]
+      .def
 
-//   let wellDepthMm = 0
-//   if (labwareId != null) {
-//     const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]
-//       .def
+    // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
+    const firstWell = labwareDef.wells['A1']
+    if (firstWell) wellDepthMm = getWellsDepth(labwareDef, ['A1'])
+  }
 
-//     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
-//     const firstWell = labwareDef.wells['A1']
-//     if (firstWell) wellDepthMm = getWellsDepth(labwareDef, ['A1'])
-//   }
+  return {
+    wellDepthMm,
+    mmFromBottom: typeof value === 'number' ? value : null,
+  }
+}
 
-//   return {
-//     wellDepthMm,
-//     mmFromBottom: typeof value === 'number' ? value : null,
-//   }
-// }
-
-// export const TipPositionField: React.AbstractComponent<OP> = connect<
-//   Props,
-//   OP,
-//   SP,
-//   _,
-//   _,
-//   _
-// >(mapSTP, () => ({}))(TipPositionInput)
+export const TipPositionField: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  _,
+  _,
+  _
+>(mapSTP, () => ({}))(TipPositionInput)
