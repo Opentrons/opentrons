@@ -608,7 +608,7 @@ class TransferPlan:
 
         if max_volume <= 0:
             raise ValueError(
-                f"max_volume must be greater than 0.  (Got {max_volume}.)")
+                f"max_volume must be greater than 0. (Got {max_volume}.)")
 
         for volume, target in zip(volumes, targets):
             while volume > max_volume * 2:
