@@ -27,10 +27,6 @@
   padding-right: 0.5rem;
 }
 
-.module_image {
-  width: 100%;
-}
-
 .module_info {
   flex-basis: 65%;
 }

@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react'
 
-import { Box, Flex, Text, FONT_WEIGHT_SEMIBOLD, DIRECTION_ROW } from '@opentrons/components'
+import { Box, Flex, Text, FONT_WEIGHT_SEMIBOLD, DIRECTION_ROW, JUSTIFY_SPACE_BETWEEN } from '@opentrons/components'
 
 import { ModuleInfo } from './ModuleInfo'
+import { ModuleImage } from './ModuleImage'
 import { ModuleUpdate } from './ModuleUpdate'
 import { ModuleControls } from '../../../../molecules/ModuleControls'
 import type { AttachedModule } from '../../../../redux/modules/types'
@@ -27,18 +28,21 @@ export function ModuleItem(props: Props): React.Node {
     <Box className={styles.module_item}>
       <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>{getModuleDisplayName(module.model)}</Text>
       <Flex flexDirection={DIRECTION_ROW}>
-        <ModuleInfo module={module} />
-        <Box width="60%">
+        <ModuleImage model={module.model} />
+        <Box width="58%">
           <ModuleControls
             module={module}
             controlDisabledReason={controlDisabledReason}
           />
-          <ModuleUpdate
+        </Box>
+      </Flex>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <ModuleInfo module={module} />
+        <ModuleUpdate
             hasAvailableUpdate={!!module.hasAvailableUpdate}
             controlDisabledReason={controlDisabledReason}
             moduleId={module.serial}
           />
-        </Box>
       </Flex>
     </Box>
   )

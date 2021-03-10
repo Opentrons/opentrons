@@ -19,10 +19,9 @@ export function ModuleInfo(props: Props): React.Node {
   const displayName = getModuleDisplayName(model)
 
   return (
-    <Flex width="40%">
+    <Flex width="45%">
       <Box>
-        <ModuleImage model={model} />
-        <Flex marginLeft={SPACING_3} fontSize={FONT_SIZE_BODY_1}>
+        <Flex marginLeft={SPACING_3} fontSize={FONT_SIZE_BODY_1} marginBottom={SPACING_2}>
           <Text marginRight={SPACING_1} fontWeight={FONT_WEIGHT_SEMIBOLD}>
             Serial number:
           </Text>
