@@ -1392,6 +1392,5 @@ def test_error_if_disposal_volume_too_high(
             max_volume=tip_max_volume,
             api_version=context.api_version,
             options=options)
-        for step in plan:
-            # Exhaust the iterator in case it raises this exception lazily.
-            print(step)
+        # Exhaust the iterator in case it raises the expected exception lazily.
+        list(plan)
