@@ -5,7 +5,7 @@ from typing import Optional, Dict
 
 from opentrons import types
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.protocol_engine import StateView, DeckSlotLocation
+from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocols.api_support.util import HardwareManager, AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
@@ -25,13 +25,12 @@ class ProtocolEngineContext(ProtocolContextInterface):
     """ProtocolContextInterface that interacts with Protocol Engine"""
 
     _client: ProtocolEngineClient
-    _state_view: StateView
 
     def __init__(
         self,
         client: ProtocolEngineClient
     ) -> None:
-        """Initialize a ProtocolEngineContext. Prefer `create` classmethod."""
+        """Initialize a ProtocolEngineContext with a client."""
         self._client = client
 
     def get_bundled_data(self) -> Dict[str, bytes]:

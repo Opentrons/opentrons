@@ -106,9 +106,9 @@ class LabwareState:
         dims = labware_data.definition["dimensions"]
 
         return Dimensions(
-            x_dimension=dims["xDimension"],
-            y_dimension=dims["yDimension"],
-            z_dimension=dims["zDimension"],
+            x=dims["xDimension"],
+            y=dims["yDimension"],
+            z=dims["zDimension"],
         )
 
 

@@ -5,7 +5,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
 class AbstractLabwareGeometry(ABC):
-    """Convencience interface for accessing geometry properties of a labware."""
+    """Convenience interface for accessing geometry properties of a labware."""
 
     @property
     @abstractmethod

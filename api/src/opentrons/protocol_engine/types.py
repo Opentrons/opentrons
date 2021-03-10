@@ -51,6 +51,6 @@ class DeckLocation(BaseModel):
 class Dimensions:
     """Dimensions of an object in deck-space."""
 
-    x_dimension: float
-    y_dimension: float
-    z_dimension: float
+    x: float
+    y: float
+    z: float

@@ -37,15 +37,15 @@ class LabwareGeometry(AbstractLabwareGeometry):
 
     @property
     def x_dimension(self) -> float:
-        return self._state.labware.get_dimensions(labware_id=self._id).x_dimension
+        return self._state.labware.get_dimensions(labware_id=self._id).x
 
     @property
     def y_dimension(self) -> float:
-        return self._state.labware.get_dimensions(labware_id=self._id).y_dimension
+        return self._state.labware.get_dimensions(labware_id=self._id).y
 
     @property
     def z_dimension(self) -> float:
-        return self._state.labware.get_dimensions(labware_id=self._id).z_dimension
+        return self._state.labware.get_dimensions(labware_id=self._id).z
 
 
 class LabwareContext(LabwareInterface):

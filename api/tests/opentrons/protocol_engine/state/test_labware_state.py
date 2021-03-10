@@ -343,7 +343,7 @@ def test_get_dimensions(
     )
 
     assert store.labware.get_dimensions("plate-id") == Dimensions(
-        x_dimension=well_plate_def["dimensions"]["xDimension"],
-        y_dimension=well_plate_def["dimensions"]["yDimension"],
-        z_dimension=well_plate_def["dimensions"]["zDimension"],
+        x=well_plate_def["dimensions"]["xDimension"],
+        y=well_plate_def["dimensions"]["yDimension"],
+        z=well_plate_def["dimensions"]["zDimension"],
     )
