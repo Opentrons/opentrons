@@ -12,16 +12,16 @@ from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry, ModuleType)
-from opentrons.protocols.context.instrument_context \
-    import InstrumentContextInterface
+from opentrons.protocols.context.instrument \
+    import AbstractInstrument
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds, HardwareManager)
 from opentrons.protocols.context.labware import \
-    LabwareInterface
+    AbstractLabware
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
-InstrumentDict = Dict[types.Mount, Optional[InstrumentContextInterface]]
+InstrumentDict = Dict[types.Mount, Optional[AbstractInstrument]]
 
 
 @dataclass(frozen=True)
@@ -32,7 +32,7 @@ class LoadModuleResult:
     module: SynchronousAdapter
 
 
-class ProtocolContextInterface(ABC):
+class AbstractProtocol(ABC):
 
     @abstractmethod
     def get_bundled_data(self) -> Dict[str, bytes]:
@@ -77,7 +77,7 @@ class ProtocolContextInterface(ABC):
             labware_def: LabwareDefinition,
             location: types.DeckLocation,
             label: Optional[str] = None,
-    ) -> LabwareInterface:
+    ) -> AbstractLabware:
         ...
 
     @abstractmethod
@@ -88,7 +88,7 @@ class ProtocolContextInterface(ABC):
             label: Optional[str] = None,
             namespace: Optional[str] = None,
             version: Optional[int] = None,
-    ) -> LabwareInterface:
+    ) -> AbstractLabware:
         ...
 
     @abstractmethod
@@ -108,7 +108,7 @@ class ProtocolContextInterface(ABC):
             self,
             instrument_name: str,
             mount: types.Mount,
-            replace: bool = False) -> InstrumentContextInterface:
+            replace: bool = False) -> AbstractInstrument:
         ...
 
     @abstractmethod

@@ -20,7 +20,7 @@ from typing import (
 from opentrons.protocols.api_support.util import (
     requires_version, labware_column_shift)
 from opentrons.protocols.context.labware import \
-    LabwareInterface
+    AbstractLabware
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols import labware as labware_module
 from opentrons.protocols.context.well import WellImplementation
@@ -241,7 +241,7 @@ class Labware(DeckItem):
     """
     def __init__(
             self,
-            implementation: LabwareInterface,
+            implementation: AbstractLabware,
             api_level: Optional[APIVersion] = None) -> None:
         """
         :param implementation: The class that implements the public interface

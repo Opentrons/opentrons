@@ -13,7 +13,7 @@ from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition, LabwareParameters
 )
 from opentrons.protocols.context.labware \
-    import LabwareInterface
+    import AbstractLabware
 
 
 class LabwareGeometry(AbstractLabwareGeometry):
@@ -48,7 +48,7 @@ class LabwareGeometry(AbstractLabwareGeometry):
         return self._state.labware.get_dimensions(labware_id=self._id).z
 
 
-class LabwareContext(LabwareInterface):
+class LabwareContext(AbstractLabware):
     """LabwareInterface implementation that works with the Protocol Engine."""
 
     def __init__(self, labware_id: str, state_view: StateView) -> None:

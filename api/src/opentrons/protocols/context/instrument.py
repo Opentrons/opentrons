@@ -12,7 +12,7 @@ from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, \
 from opentrons.protocols.context.well import WellImplementation
 
 
-class InstrumentContextInterface(ABC):
+class AbstractInstrument(ABC):
 
     @abstractmethod
     def get_default_speed(self) -> float:

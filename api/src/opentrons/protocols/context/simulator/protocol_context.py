@@ -1,6 +1,6 @@
 from opentrons import types
-from opentrons.protocols.context.instrument_context import \
-    InstrumentContextInterface
+from opentrons.protocols.context.instrument import \
+    AbstractInstrument
 from opentrons.protocols.context.protocol_api.protocol_context import \
     ProtocolContextImplementation
 from opentrons.protocols.context.simulator.instrument_context import \
@@ -11,7 +11,7 @@ class ProtocolContextSimulation(ProtocolContextImplementation):
     def load_instrument(self,
                         instrument_name: str,
                         mount: types.Mount,
-                        replace: bool = False) -> InstrumentContextInterface:
+                        replace: bool = False) -> AbstractInstrument:
         """Create a simulating instrument context."""
         instr = self._instruments[mount]
         if instr and not replace:

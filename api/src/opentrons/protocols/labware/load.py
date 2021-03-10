@@ -6,7 +6,7 @@ from opentrons.protocols.labware.definition import (
 
 from opentrons.calibration_storage import get
 from opentrons.protocols.context.labware import \
-    LabwareInterface
+    AbstractLabware
 from opentrons.protocols.context.protocol_api.labware import \
     LabwareImplementation
 from opentrons.types import Location
@@ -19,7 +19,7 @@ MODULE_LOG = logging.getLogger(__name__)
 def load_from_definition(
         definition: LabwareDefinition,
         parent: Location,
-        label: str = None) -> LabwareInterface:
+        label: str = None) -> AbstractLabware:
     """
     Return a labware object constructed from a provided labware definition dict
 
@@ -54,7 +54,7 @@ def load(
     version: int = 1,
     bundled_defs: Dict[str, LabwareDefinition] = None,
     extra_defs: Dict[str, LabwareDefinition] = None,
-) -> LabwareInterface:
+) -> AbstractLabware:
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the
