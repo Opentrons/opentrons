@@ -26,7 +26,7 @@ interface ListItemProps {
   exact?: boolean
   /** Additional class name */
   className?: string
-  /** if disabled, the onClick handler / NavLink will be disabled */
+  /** if disabled, the onClick handler will be disabled */
   isDisabled?: boolean
   /** name constant of the icon to display */
   iconName?: IconName
@@ -39,54 +39,52 @@ interface ListItemProps {
  * A styled `<li>` with an optional icon, and an optional url for a React Router `NavLink`
  *
  */
-export const ListItem = React.forwardRef<
-  React.RefObject<Element>,
-  ListItemProps
->((props: ListItemProps, ref: React.ForwardRefRenderFunction) => {
-  const { url, isDisabled, iconName, activeClassName, exact } = props
-  const onClick = props.onClick && !isDisabled ? props.onClick : undefined
+export const ListItem = React.forwardRef(
+  (props: ListItemProps, ref: React.ForwardedRef<HTMLLIElement>) => {
+    const { url, isDisabled, iconName, activeClassName, exact } = props
+    const onClick = props.onClick && !isDisabled ? props.onClick : undefined
 
-  const className = classnames(props.className, styles.list_item, {
-    [styles.disabled]: isDisabled,
-    [styles.clickable]: onClick,
-  })
+    const className = classnames(props.className, styles.list_item, {
+      [styles.disabled]: isDisabled,
+      [styles.clickable]: onClick,
+    })
 
-  const itemIcon = iconName && (
-    <Icon className={styles.item_icon} name={iconName} />
-  )
+    const itemIcon = iconName && (
+      <Icon className={styles.item_icon} name={iconName} />
+    )
 
-  if (url != null) {
+    if (url != null) {
+      return (
+        <li
+          onMouseEnter={props.onMouseEnter}
+          onMouseLeave={props.onMouseLeave}
+          ref={ref}
+        >
+          <NavLink
+            to={url}
+            onClick={onClick}
+            className={className}
+            activeClassName={activeClassName}
+            exact={exact}
+          >
+            {itemIcon}
+            {props.children}
+          </NavLink>
+        </li>
+      )
+    }
+
     return (
       <li
+        ref={ref}
+        onClick={onClick}
         onMouseEnter={props.onMouseEnter}
         onMouseLeave={props.onMouseLeave}
-        ref={ref}
+        className={className}
       >
-        <NavLink
-          to={url}
-          onClick={onClick}
-          disabled={isDisabled}
-          className={className}
-          activeClassName={activeClassName}
-          exact={exact}
-        >
-          {itemIcon}
-          {props.children}
-        </NavLink>
+        {itemIcon}
+        {props.children}
       </li>
     )
   }
-
-  return (
-    <li
-      ref={ref}
-      onClick={onClick}
-      onMouseEnter={props.onMouseEnter}
-      onMouseLeave={props.onMouseLeave}
-      className={className}
-    >
-      {itemIcon}
-      {props.children}
-    </li>
-  )
-})
+)

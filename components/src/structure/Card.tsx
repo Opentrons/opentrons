@@ -3,8 +3,6 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 
-import type { PrimitiveComponent } from '../primitives/types'
-
 import * as styles from '../styles'
 
 export interface CardProps {
@@ -34,7 +32,7 @@ export function Card(props: CardProps): JSX.Element {
   )
 }
 
-const Section: PrimitiveComponent<'section'> = styled.section`
+const Section = styled.section<CardProps>`
   font-size: ${styles.FONT_SIZE_BODY_2};
   position: relative;
   overflow: visible;
