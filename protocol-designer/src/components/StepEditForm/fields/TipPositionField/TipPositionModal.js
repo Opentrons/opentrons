@@ -72,6 +72,10 @@ const getErrors = (args: {|
   if (isDefault) return errors
 
   const v = Number(value)
+  if (value === null || Number.isNaN(v)) {
+    // blank or otherwise invalid should show this error as a fallback
+    return [OUT_OF_BOUNDS]
+  }
   const correctDecimals = round(v, DECIMALS_ALLOWED) === v
   const outOfBounds = v > maxMmFromBottom || v < minMmFromBottom
 
@@ -168,8 +172,8 @@ export const TipPositionModal = (props: Props): React.Node => {
 
   const handleIncrementDecrement = (delta: number): void => {
     const prevValue = value === null ? defaultMmFromBottom : Number(value)
-
-    handleChange(prevValue + delta)
+    setIsDefault(false)
+    handleChange(roundValue(prevValue + delta))
   }
 
   const makeHandleIncrement = (step: number): (() => void) => () => {
