@@ -1395,18 +1395,3 @@ def test_error_if_disposal_volume_too_high(
         for step in plan:
             # Exhaust the iterator in case it raises this exception lazily.
             print(step)
-
-# TODO: Also this hangs, for some reason.
-# TODO: Convert this to a unit test.
-# Apparently the same bug for transfers as for distributes, but fixing it in
-# a place I expected to have the common logic only fixed it for distributes,
-# not transfers.
-
-# metadata = {"apiLevel": "2.7"}
-#
-# def run(protocol):
-#     labware = protocol.load_labware('nest_12_reservoir_15ml', 1)
-#     tip_rack = protocol.load_labware('opentrons_96_filtertiprack_200ul', 2)
-#     pipette = protocol.load_instrument('p300_single', mount='left', tip_racks=[tip_rack])
-#     protocol.comment("Begin.")
-#     pipette.transfer(10, labware.wells()[0], labware.wells()[1], disposal_volume=200)
