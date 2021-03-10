@@ -1327,8 +1327,8 @@ def test_blowout_to_dest(_instr_labware):
     'pipette_name,tip_rack_name,tip_max_volume,too_high_disposal_volume',
     [
         # disposal_volume == pipette max == tip max
-        ('p20_single_gen2', 'opentrons_96_filtertiprack_20ul',  20,  20),
-        ('p300_single',     'opentrons_96_tiprack_300ul',       300, 300),
+        ('p20_single_gen2', 'opentrons_96_filtertiprack_20ul', 20, 20),
+        ('p300_single', 'opentrons_96_tiprack_300ul', 300, 300),
 
         # pipette max != tip max, disposal_volume == tip max
         # todo(mm, 2021-03-10): These fail unexpectedly, apparently a bug.
@@ -1342,14 +1342,14 @@ def test_blowout_to_dest(_instr_labware):
         ),
 
         # pipette max != tip max, disposal_volume == pipette max
-        ('p300_single',     'opentrons_96_filtertiprack_200ul', 200, 300),
-        ('p20_single_gen2', 'opentrons_96_filtertiprack_10ul',  10,  20),
+        ('p300_single', 'opentrons_96_filtertiprack_200ul', 200, 300),
+        ('p20_single_gen2', 'opentrons_96_filtertiprack_10ul', 10, 20),
 
         # disposal_volume > both pipette max and tip max
-        ('p20_single_gen2', 'opentrons_96_filtertiprack_10ul',  10,  10000),
-        ('p20_single_gen2', 'opentrons_96_filtertiprack_20ul',  20,  10000),
-        ('p300_single',     'opentrons_96_filtertiprack_200ul', 200, 10000),
-        ('p300_single',     'opentrons_96_tiprack_300ul',       300, 10000),
+        ('p20_single_gen2', 'opentrons_96_filtertiprack_10ul', 10, 10000),
+        ('p20_single_gen2', 'opentrons_96_filtertiprack_20ul', 20, 10000),
+        ('p300_single', 'opentrons_96_filtertiprack_200ul', 200, 10000),
+        ('p300_single', 'opentrons_96_tiprack_300ul', 300, 10000),
     ]
 )
 def test_error_if_disposal_volume_too_high(
@@ -1366,7 +1366,7 @@ def test_error_if_disposal_volume_too_high(
 
     # todo(mm, 2021-03-09): Also test that TransferPlan raises when air_gap,
     # or air_gap + disposal_volume, is too high.
-    
+
     # Boilerplate: TransferPlan wants an InstrumentContext.
     context = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(),
@@ -1374,13 +1374,13 @@ def test_error_if_disposal_volume_too_high(
     labware = context.load_labware('nest_12_reservoir_15ml', 1)
     tip_rack = context.load_labware(tip_rack_name, 2)
     pipette = context.load_instrument(pipette_name, 'left', tip_racks=[tip_rack])
-    
+
     # Make sure, in this test, it's sensible to expect a volume as high as the
     # tip's max volume to work as the transfer's max volume.
     assert tip_rack.wells()[0].max_volume <= pipette.max_volume
-    
+
     options = tx.TransferOptions(tx.Transfer(disposal_volume=too_high_disposal_volume))
-    
+
     with pytest.raises(ValueError):
         # todo(mm, 2021-03-09): Also test consolidates and transfers,
         # not just distributes.
