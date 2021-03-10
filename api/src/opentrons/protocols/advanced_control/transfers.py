@@ -364,6 +364,9 @@ class TransferPlan:
                  volume,
                  sources,
                  dests,
+                 # todo(mm, 2021-03-10):
+                 # Refactor to not need an InstrumentContext, so we can more
+                 # easily test this class's logic on its own.
                  instr: 'InstrumentContext',
                  max_volume: float,
                  api_version: APIVersion,
