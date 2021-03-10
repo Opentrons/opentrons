@@ -128,7 +128,6 @@ const Wrapper = (props: WrapperProps) =>
 
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const { labwareId, value } = ownProps
-  console.log('ownProps', ownProps)
 
   let wellDepthMm = 0
   if (labwareId != null) {

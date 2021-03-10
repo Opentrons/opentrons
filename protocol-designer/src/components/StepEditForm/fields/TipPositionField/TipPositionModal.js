@@ -83,10 +83,9 @@ const getErrors = (args: {|
 }
 
 export const TipPositionModal = (props: Props): React.Node => {
-  const { wellDepthMm } = props
-  console.log('TipPositionModal', props)
+  const { isIndeterminate, name, wellDepthMm } = props
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
-    name: props.name,
+    name,
     wellDepthMm,
   })
 
@@ -94,7 +93,7 @@ export const TipPositionModal = (props: Props): React.Node => {
     props.mmFromBottom === null ? null : String(props.mmFromBottom)
   )
   const [isDefault, setIsDefault] = React.useState<boolean>(
-    !props.isIndeterminate && props.mmFromBottom === null
+    !isIndeterminate && props.mmFromBottom === null
   )
   // in this modal, pristinity hides the OUT_OF_BOUNDS error only.
   const [isPristine, setPristine] = React.useState<boolean>(true)
@@ -103,7 +102,7 @@ export const TipPositionModal = (props: Props): React.Node => {
     maxMmFromBottom: number,
     minMmFromBottom: number,
   |} => {
-    if (getIsTouchTipField(props.name)) {
+    if (getIsTouchTipField(name)) {
       return {
         maxMmFromBottom: roundValue(wellDepthMm),
         minMmFromBottom: roundValue(wellDepthMm / 2),
@@ -184,7 +183,7 @@ export const TipPositionModal = (props: Props): React.Node => {
       caption={`between ${minMmFromBottom} and ${maxMmFromBottom}`}
       className={styles.position_from_bottom_input}
       error={errorText}
-      isIndeterminate={value === null && props.isIndeterminate}
+      isIndeterminate={value === null && isIndeterminate}
       onChange={handleInputFieldChange}
       units="mm"
       value={value !== null ? String(value) : ''}
@@ -235,7 +234,7 @@ export const TipPositionModal = (props: Props): React.Node => {
         >
           <div className={styles.modal_header}>
             <h4>{i18n.t('modal.tip_position.title')}</h4>
-            <p>{i18n.t(`modal.tip_position.body.${props.name}`)}</p>
+            <p>{i18n.t(`modal.tip_position.body.${name}`)}</p>
           </div>
           <div className={styles.main_row}>
             <Flex alignItems="flex-start">
