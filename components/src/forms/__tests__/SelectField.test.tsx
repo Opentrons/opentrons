@@ -35,8 +35,8 @@ describe('SelectField', () => {
     const disabled = false
     const placeholder = 'hello there'
     const menuPosition = 'absolute'
-    const formatOptionLabel: unknown = (opt: SelectOption): Element =>
-      opt.label || opt.value
+    const formatOptionLabel: unknown = (opt: SelectOption): React.ReactNode =>
+      'label' in opt ? opt.label : opt.value
     const className = 'class'
 
     const wrapper = shallow(

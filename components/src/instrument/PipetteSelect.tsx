@@ -23,7 +23,7 @@ export interface PipetteSelectProps {
   /** whether or not "None" shows up as the default option */
   enableNoneOption?: boolean
   /** input tabIndex */
-  tabIndex?: number
+  tabIndex?: string | null | undefined
   /** classes to apply to the top-level component */
   className?: string
   /** custom id to be applied. likely to be used as a data test id for e2e testing */
@@ -87,9 +87,10 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       tabIndex={tabIndex}
       id={id}
       onChange={option => {
-        // TODO(mc, 2020-02-03):  change to `option?.value ?? null`
-        // when we enable that babel functionality
-        const value = option && option.value ? option.value : null
+        const isOptionGroupOrNull = Array.isArray(option) || option == null
+        const value = isOptionGroupOrNull
+          ? null
+          : (option as SelectOption).value
         props.onPipetteChange(value)
       }}
       formatOptionLabel={(option, { context }) => {

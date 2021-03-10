@@ -35,9 +35,14 @@ export interface SelectOption {
   isDisabled?: boolean
 }
 
-export type SelectOptionOrGroup =
-  | SelectOption
-  | { options: SelectOption[]; label?: string }
+export interface SelectOptionGroup {
+  options: SelectOption[]
+  label?: string
+}
+
+// deprecated this type shouldn't be directly needed as the types for react-select
+// combine options and groups for us now
+export type SelectOptionOrGroup = SelectOption | SelectOptionGroup
 
 export type SelectPlacement =
   | typeof PLACEMENT_AUTO
@@ -48,8 +53,7 @@ export type SelectPosition = typeof POSITION_ABSOLUTE | typeof POSITION_FIXED
 
 export type SelectOptionContext = typeof CONTEXT_MENU | typeof CONTEXT_VALUE
 
-export interface SelectProps
-  extends ReactSelect<SelectOptionOrGroup, boolean> {}
+export type SelectProps = React.ComponentProps<typeof Select>
 
 const VOID_STYLE: unknown = undefined
 const NO_STYLE_FN = (): CSSObject => VOID_STYLE as CSSObject
@@ -81,7 +85,11 @@ const CLEAR_STYLES = {
   // valueContainer: _ => _,
 }
 
-export class Select extends ReactSelect<SelectOptionOrGroup, boolean> {
+export class Select extends ReactSelect<
+  SelectOption,
+  boolean,
+  SelectOptionGroup
+> {
   render(): JSX.Element {
     return (
       <ReactSelect
@@ -96,7 +104,7 @@ export class Select extends ReactSelect<SelectOptionOrGroup, boolean> {
 }
 
 function DropdownIndicator(
-  props: IndicatorProps<SelectOptionOrGroup, boolean>
+  props: IndicatorProps<SelectOption, boolean, SelectOptionGroup>
 ): JSX.Element | null {
   return (
     <reactSelectComponents.DropdownIndicator {...props}>
@@ -113,7 +121,9 @@ function DropdownIndicator(
 
 // TODO(bc, 2021-03-09): reactSelectComponents.Menu children type expects single element
 // add do nothing <> fragment around contents to satisfy react select type
-const Menu = (props: MenuProps<SelectOptionOrGroup, boolean>): JSX.Element => (
+const Menu = (
+  props: MenuProps<SelectOption, boolean, SelectOptionGroup>
+): JSX.Element => (
   /* @ts-expect-error */
   <reactSelectComponents.Menu {...props}>
     <div className={styles.menu}>{props.children}</div>

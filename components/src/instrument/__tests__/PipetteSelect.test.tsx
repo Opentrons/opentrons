@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
@@ -21,7 +20,7 @@ describe('PipetteSelect', () => {
   })
 
   it('passes props to Select', () => {
-    const tabIndex = 3
+    const tabIndex = '3'
     const className = 'class'
 
     const selectWrapper = shallow(
@@ -42,7 +41,7 @@ describe('PipetteSelect', () => {
 
   it('passes pipettes as grouped options to Select', () => {
     const wrapper = shallow(<PipetteSelect onPipetteChange={jest.fn()} />)
-    const pipetteSpecs: Array<PipetteNameSpecs> = getAllPipetteNames(
+    const pipetteSpecs: PipetteNameSpecs[] = getAllPipetteNames(
       'maxVolume',
       'channels'
     )
@@ -63,7 +62,7 @@ describe('PipetteSelect', () => {
   })
 
   it('can omit pipettes by name', () => {
-    const pipetteSpecs: Array<PipetteNameSpecs> = getAllPipetteNames(
+    const pipetteSpecs: PipetteNameSpecs[] = getAllPipetteNames(
       'maxVolume',
       'channels'
     )
