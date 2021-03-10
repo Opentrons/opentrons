@@ -7,9 +7,13 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine import commands as cmd, errors, StateStore
-from opentrons.protocol_engine.types import LabwareLocation, DeckSlotLocation
 from opentrons.protocol_engine.resources import DeckFixedLabware
 from opentrons.protocol_engine.state import LabwareData
+from opentrons.protocol_engine.types import (
+    LabwareLocation,
+    DeckSlotLocation,
+    Dimensions,
+)
 
 
 def load_labware(
@@ -323,3 +327,23 @@ def test_get_load_name(
     )
 
     assert store.labware.get_load_name("res-rack-id") == 'nest_12_reservoir_15ml'
+
+
+def test_get_dimensions(
+    well_plate_def: LabwareDefinition,
+    store: StateStore
+) -> None:
+    """It should return the load name."""
+    load_labware(
+        store=store,
+        labware_id="plate-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        definition=well_plate_def,
+        calibration=(1, 2, 3),
+    )
+
+    assert store.labware.get_dimensions("plate-id") == Dimensions(
+        x=well_plate_def["dimensions"]["xDimension"],
+        y=well_plate_def["dimensions"]["yDimension"],
+        z=well_plate_def["dimensions"]["zDimension"],
+    )

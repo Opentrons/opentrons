@@ -77,6 +77,56 @@ def test_get_slot_position(
     assert point == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
 
 
+def test_get_labware_parent_position(
+    standard_deck_def: DeckDefinitionV2,
+    well_plate_def: LabwareDefinition,
+    mock_labware_store: MagicMock,
+    geometry_store: GeometryStore,
+) -> None:
+    """It should return a deck slot position for labware in a deck slot."""
+    labware_data = LabwareData(
+        definition=well_plate_def,
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        calibration=(1, -2, 3)
+    )
+
+    mock_labware_store.state.get_labware_data_by_id.return_value = labware_data
+    expected_point = geometry_store.state.get_slot_position(DeckSlotName.SLOT_3)
+
+    result = geometry_store.state.get_labware_parent_position("labware-id")
+
+    assert result == expected_point
+    mock_labware_store.state.get_labware_data_by_id.assert_called_with("labware-id")
+
+
+def test_get_labware_origin_position(
+    standard_deck_def: DeckDefinitionV2,
+    minimal_labware_def: LabwareDefinition,
+    mock_labware_store: MagicMock,
+    geometry_store: GeometryStore,
+) -> None:
+    """It should return a deck slot position with the labware's offset as its origin."""
+    labware_data = LabwareData(
+        definition=minimal_labware_def,
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        calibration=(1, -2, 3)
+    )
+
+    mock_labware_store.state.get_labware_data_by_id.return_value = labware_data
+    expected_parent = geometry_store.state.get_slot_position(DeckSlotName.SLOT_3)
+    expected_offset = Point(
+        x=minimal_labware_def["cornerOffsetFromSlot"]["x"],
+        y=minimal_labware_def["cornerOffsetFromSlot"]["y"],
+        z=minimal_labware_def["cornerOffsetFromSlot"]["z"],
+    )
+    expected_point = expected_parent + expected_offset
+
+    result = geometry_store.state.get_labware_origin_position("labware-id")
+
+    assert result == expected_point
+    mock_labware_store.state.get_labware_data_by_id.assert_called_with("labware-id")
+
+
 def test_get_labware_highest_z(
     standard_deck_def: DeckDefinitionV2,
     well_plate_def: LabwareDefinition,
@@ -165,9 +215,9 @@ def test_get_labware_position(
     position = geometry_store.state.get_labware_position(labware_id="abc")
 
     assert position == Point(
-        x=slot_pos[0] + 1,
-        y=slot_pos[1] - 2,
-        z=slot_pos[2] + 3,
+        x=slot_pos[0] + minimal_labware_def["cornerOffsetFromSlot"]["x"] + 1,
+        y=slot_pos[1] + minimal_labware_def["cornerOffsetFromSlot"]["y"] - 2,
+        z=slot_pos[2] + minimal_labware_def["cornerOffsetFromSlot"]["z"] + 3,
     )
 
 
