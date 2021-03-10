@@ -48,11 +48,13 @@ export interface ButtonProps {
   /** ID of form that button is for */
   form?: string
   /** custom element or component to use instead of `<button>` */
-  Component?: React.ReactComponentElement<any>
+  Component?: React.ComponentType<any> | keyof JSX.IntrinsicElements
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: Partial<HoverTooltipHandlers> | null | undefined
   /** html tabindex property */
   tabIndex?: number
+  /** catch all prop for pass-through props */
+  [name: string]: any
 }
 
 // props to strip if using a custom component
@@ -72,14 +74,14 @@ const STRIP_PROPS = [
  * ```js
  * import {type ButtonProps} from '@opentrons/components'
  * ```
+ * @deprecated Use {@link Btn}
  */
 export function Button(props: ButtonProps): JSX.Element {
   const { name, title, disabled, hover, tabIndex, form } = props
   const className = cx(props.className, { [styles.hover]: hover })
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const onClick = !disabled ? props.onClick : undefined
-  const Component: React.ReactComponentElement<any> =
-    props.Component ?? 'button'
+  const Component: any = props.Component ?? 'button'
   const type = props.type ?? BUTTON_TYPE_BUTTON
 
   // pass all props if using a custom component

@@ -15,7 +15,7 @@ const BASE_STYLE = {
   width: '100%',
   height: '100%',
   padding: Styles.SPACING_5,
-}
+} as const
 
 const MODAL_STYLE = {
   backgroundColor: Styles.C_WHITE,
@@ -23,26 +23,26 @@ const MODAL_STYLE = {
   overflowY: Styles.OVERFLOW_AUTO,
   maxHeight: '100%',
   width: '100%',
-}
+} as const
 
 const HEADER_STYLE = {
   backgroundColor: Styles.C_LIGHT_GRAY,
   position: Styles.POSITION_STICKY,
   padding: Styles.SPACING_3,
   top: 0,
-}
+} as const
 
 const FOOTER_STYLE = {
   backgroundColor: Styles.C_WHITE,
   position: Styles.POSITION_STICKY,
   padding: Styles.SPACING_3,
   bottom: 0,
-}
+} as const
 
 const CONTENT_STYLE = {
   paddingX: Styles.SPACING_4,
   paddingY: Styles.SPACING_3,
-}
+} as const
 
 export interface BaseModalProps extends StyleProps {
   /** Overlay color, defaults to `OVERLAY_GRAY_90` */

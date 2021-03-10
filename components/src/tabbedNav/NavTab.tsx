@@ -39,7 +39,7 @@ export function NavTab(props: NavTabProps): JSX.Element {
     [styles.selected]: props.selected,
   })
 
-  let buttonProps = {
+  let buttonProps: React.ComponentProps<typeof Button> = {
     id: props.id,
     className: className,
     disabled: props.disabled,

@@ -34,7 +34,7 @@ function Tab(props: TabProps): JSX.Element {
   })
 
   // TODO(mc, 2017-12-14): make a component for proper disabling of links
-  const MaybeLink = !isDisabled ? Link : 'span'
+  const MaybeLink: any = !isDisabled ? Link : 'span'
 
   return (
     <MaybeLink to={props.href} className={tabLinkClass}>
