@@ -1324,24 +1324,26 @@ def test_blowout_to_dest(_instr_labware):
 
 
 @pytest.mark.parametrize(
-    # Each of these should fail with ValueError:
-    #
-    # 1) disposal_volume == tip max volume
-    # 2) disposal_volume == pipette max volume
-    # 3) disposal_volume greater than both max volumes
     'pipette_name,tip_rack_name,tip_max_volume,too_high_disposal_volume',
     [
-        ('p300_single',     'opentrons_96_tiprack_300ul',       300, 300),
-        ('p300_single',     'opentrons_96_tiprack_300ul',       300, 10000),
-        ('p300_single',     'opentrons_96_filtertiprack_200ul', 200, 200), # TODO: This fails unexpectedly, apparently a separate bug.
-        ('p300_single',     'opentrons_96_filtertiprack_200ul', 200, 300),
-        ('p300_single',     'opentrons_96_filtertiprack_200ul', 200, 10000),
-        
+        # disposal_volume == pipette max == tip max
         ('p20_single_gen2', 'opentrons_96_filtertiprack_20ul',  20,  20),
-        ('p20_single_gen2', 'opentrons_96_filtertiprack_20ul',  20,  10000),
-        ('p20_single_gen2', 'opentrons_96_filtertiprack_10ul',  10,  10), # TODO: This fails unexpectedly, apparently a separate bug.
+        ('p300_single',     'opentrons_96_tiprack_300ul',       300, 300),
+
+        # pipette max != tip max, disposal_volume == tip max
+        # todo(mm, 2021-03-10): These fail unexpectedly, apparently a bug.
+        ('p300_single',     'opentrons_96_filtertiprack_200ul', 200, 200),
+        ('p20_single_gen2', 'opentrons_96_filtertiprack_10ul',  10,  10),
+    
+        # pipette max != tip max, disposal_volume == pipette max
+        ('p300_single',     'opentrons_96_filtertiprack_200ul', 200, 300),
         ('p20_single_gen2', 'opentrons_96_filtertiprack_10ul',  10,  20),
+
+        # disposal_volume > both pipette max and tip max
         ('p20_single_gen2', 'opentrons_96_filtertiprack_10ul',  10,  10000),
+        ('p20_single_gen2', 'opentrons_96_filtertiprack_20ul',  20,  10000),
+        ('p300_single',     'opentrons_96_filtertiprack_200ul', 200, 10000),
+        ('p300_single',     'opentrons_96_tiprack_300ul',       300, 10000),
     ]
 )
 def test_error_if_disposal_volume_too_high(
@@ -1349,13 +1351,15 @@ def test_error_if_disposal_volume_too_high(
         tip_rack_name,
         tip_max_volume,
         too_high_disposal_volume):
-    # TODO: Add parametrization for the distribution between disposal volume and air gap.
-    # TODO: Automatically retrieve tip max volume.
-    # TODO: Test consolidate and transfer, too.
-    
-    # Test the fix for bug 6170.  If too high a disposal volume was given, the
-    # process would get stuck in an infinite loop.  It should throw an error,
-    # instead.
+    # TransferPlan should raise ValueError if we ask it to plan a transfer with
+    # a disposal_volume so high, there would be no room left in the tip to
+    # actually transfer liquid and make progress.
+    #
+    # (As opposed to getting stuck in an infinite loop, or returning an empty
+    # list of steps.)
+
+    # todo(mm, 2021-03-09): Also test that TransferPlan raises when air_gap,
+    # or air_gap + disposal_volume, is too high.
     
     # Boilerplate: TransferPlan wants an InstrumentContext.
     context = papi.ProtocolContext(
@@ -1372,8 +1376,10 @@ def test_error_if_disposal_volume_too_high(
     options = tx.TransferOptions(tx.Transfer(disposal_volume=too_high_disposal_volume))
     
     with pytest.raises(ValueError):
+        # todo(mm, 2021-03-09): Also test consolidates and transfers,
+        # not just distributes.
         plan = tx.TransferPlan(
-            volume=2, # This value shouldn't matter. 
+            volume=1.2345,
             sources=labware.rows()[0][0],
             dests=labware.rows()[0],
             instr=pipette,
