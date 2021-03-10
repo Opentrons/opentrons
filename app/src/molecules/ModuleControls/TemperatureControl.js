@@ -1,11 +1,25 @@
 // @flow
 import * as React from 'react'
+import { css } from 'styled-components'
+
 import {
   OutlineButton,
   AlertModal,
   InputField,
   CheckboxField,
   HoverTooltip,
+  SecondaryBtn,
+  useHoverTooltip,
+  Tooltip,
+  SPACING_3,
+  Text,
+  FONT_WEIGHT_SEMIBOLD,
+  SPACING_1,
+  Flex,
+  Box,
+  DIRECTION_COLUMN,
+  FONT_STYLE_ITALIC,
+  FONT_SIZE_BODY_1,
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 import styles from './styles.css'
@@ -40,6 +54,19 @@ export const TemperatureControl = ({
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [isSecondaryTempEnabled, enableSecondaryTemp] = React.useState(false)
 
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
+  const isThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
+  const displayName = getModuleDisplayName(module.model)
+  const alertHeading = `Set ${displayName} Temp`
+  const alertBody = `Pre heat or cool your ${displayName}.`
+  const primaryFieldLabel = `Set ${isThermocycler ? TC_BLOCK : ''} Temp:`
+  const tempRanges = getModuleTemperatureRanges(
+    module.model,
+    isSecondaryTempEnabled
+  )
+  const note = `enter a whole-number between ${tempRanges.min}°C and ${tempRanges.max}°C`
+
   const hasTarget =
     module.status !== 'idle' ||
     (module.type === THERMOCYCLER_MODULE_TYPE && module.data.lidTarget != null)
@@ -52,28 +79,33 @@ export const TemperatureControl = ({
     }
   }
 
+  const handleSecondaryClick = () => {
+    if (isThermocycler && module.data.lidTarget != null) {
+      sendModuleCommand(module.serial, 'deactivate_lid')
+    } else {
+      enableSecondaryTemp(true)
+      setIsModalOpen(true)
+    }
+  }
+
   const handleSubmitTemp = () => {
     if (primaryTempValue != null) {
       sendModuleCommand(module.serial, 'set_temperature', [
         Number(primaryTempValue),
       ])
+      setPrimaryTempValue(null)
     }
     if (secondaryTempValue != null) {
       sendModuleCommand(module.serial, 'set_lid_temperature', [
         Number(secondaryTempValue),
       ])
+      setSecondaryTempValue(null)
     }
     setIsModalOpen(false)
-    setPrimaryTempValue(null)
-    setSecondaryTempValue(null)
   }
-  const isThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
-  const displayName = getModuleDisplayName(module.model)
-  const alertHeading = `Set ${displayName} Temp`
-  const alertBody = `Pre heat or cool ${displayName}.`
-  const primaryFieldLabel = `Set ${isThermocycler ? TC_BLOCK : ''} Temp:`
+
   return (
-    <>
+    <Flex flexDirection={DIRECTION_COLUMN}>
       {!hasTarget && isModalOpen && (
         <Portal>
           <AlertModal
@@ -85,60 +117,99 @@ export const TemperatureControl = ({
                 onClick: () => setIsModalOpen(false),
               },
               {
-                children: 'Save',
+                children: 'Set temp',
                 disabled: primaryTempValue == null,
                 onClick: handleSubmitTemp,
               },
             ]}
             alertOverlay
           >
-            <p>{alertBody}</p>
-            <div className={styles.input_wrapper}>
-              <div className={styles.set_temp_field}>
-                <label className={styles.set_temp_label}>
-                  {primaryFieldLabel}
-                </label>
+            <Text>{alertBody}</Text>
+            <Box>
+              <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>{primaryFieldLabel}</Text>
+              <Flex width="6rem" marginTop={SPACING_1}>
                 <InputField
                   units="°C"
                   value={primaryTempValue}
-                  onChange={e => setPrimaryTempValue(e.target.value)}
+                  onChange={e =>
+                    isSecondaryTempEnabled
+                      ? setSecondaryTempValue(e.target.value)
+                      : setPrimaryTempValue(e.target.value)
+                  }
                 />
-              </div>
-              {isThermocycler && (
-                <div className={styles.lid_temp_field}>
-                  <CheckboxField
-                    value={isSecondaryTempEnabled}
-                    onChange={() =>
-                      enableSecondaryTemp(!isSecondaryTempEnabled)
-                    }
-                  />
-                  <p className={styles.lid_temp_label}>Lid Temp</p>
-                  {isSecondaryTempEnabled && (
-                    <InputField
-                      units="°C"
-                      value={secondaryTempValue}
-                      onChange={e => setSecondaryTempValue(e.target.value)}
-                    />
-                  )}
-                </div>
-              )}
-            </div>
+              </Flex>
+              <Text
+                fontSize={FONT_SIZE_BODY_1}
+                fontStyle={FONT_STYLE_ITALIC}
+                marginTop={SPACING_1}
+              >
+                {note}
+              </Text>
+            </Box>
           </AlertModal>
         </Portal>
       )}
-      <HoverTooltip tooltipComponent={disabledReason}>
-        {hoverTooltipHandlers => (
-          <div {...hoverTooltipHandlers}>
-            <OutlineButton
-              onClick={handleClick}
-              disabled={disabledReason != null}
-              className={styles.temp_control_button}
-            >
-              {hasTarget === true ? 'Deactivate' : 'Set Temp'}
-            </OutlineButton>
-          </div>
-        )}
-      </HoverTooltip>
-    </>
+      {isThermocycler && (
+        <>
+          <SecondaryBtn
+            width="11rem"
+            marginBottom={SPACING_3}
+            onClick={handleClick}
+            disabled={disabledReason != null}
+            {...targetProps}
+          >
+            {hasTarget === true ? 'Deactivate Lid' : 'Set Lid Temp'}
+          </SecondaryBtn>
+          {disabledReason && (
+            <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>
+          )}
+        </>
+      )}
+      <SecondaryBtn
+        css={css`
+          padding-left: 0.5rem;
+          padding-right: 0.5rem;
+        `}
+        width="11rem"
+        onClick={handleClick}
+        disabled={disabledReason != null}
+        {...targetProps}
+      >
+        {hasTarget === true
+          ? `Deactivate ${isThermocycler ? 'block ' : ''}`
+          : `Set ${isThermocycler ? 'block ' : ''}Temp`}
+      </SecondaryBtn>
+      {disabledReason && <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>}
+    </Flex>
   )
+}
+
+type temperatureRanges = {|
+  min: number,
+  max: number,
+|}
+
+function getModuleTemperatureRanges(
+  model: ModuleModel,
+  isSecondaryTempEnabled: boolean
+) {
+  if (isSecondaryTempEnabled && TEMPERATURE_RANGES[model].secondary) {
+    return TEMPERATURE_RANGES[model].secondary
+  } else {
+    return TEMPERATURE_RANGES[model].primary
+  }
+}
+
+const TEMPERATURE_RANGES: {
+  [ModuleModel]: {
+    primary: temperatureRanges,
+    secondary?: temperatureRanges | null,
+  },
+} = {
+  temperatureModuleV1: { primary: { min: 4, max: 96 }, secondary: null },
+  temperatureModuleV2: { primary: { min: 4, max: 96 }, secondary: null },
+  thermocyclerModuleV1: {
+    primary: { min: 4, max: 99 },
+    secondary: { min: 37, max: 110 },
+  },
 }

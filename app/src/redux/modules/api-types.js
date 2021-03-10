@@ -131,5 +131,7 @@ export type ModuleCommand =
   | 'set_block_temperature'
   | 'set_lid_temperature'
   | 'deactivate'
+  | 'deactivate_lid'
+  | 'deactivate_block'
   | 'open'
   | 'engage'

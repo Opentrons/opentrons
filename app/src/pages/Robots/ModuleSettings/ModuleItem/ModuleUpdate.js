@@ -80,7 +80,7 @@ export function ModuleUpdate(props: Props): React.Node {
     <Flex justifyContent={JUSTIFY_FLEX_END}>
       <Flex>
         <SecondaryBtn
-          width="10rem"
+          width="11rem"
           onClick={handleClick}
           disabled={!canControl || !hasAvailableUpdate || isPending}
           {...targetProps}

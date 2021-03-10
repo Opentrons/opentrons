@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import { Flex, ALIGN_CENTER } from '@opentrons/components'
+import { Flex, ALIGN_CENTER, SIZE_4 } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { ModuleModel } from '@opentrons/shared-data'
@@ -18,10 +18,11 @@ export function ModuleImage(props: Props): React.Node {
     <Flex width="42%" alignItems={ALIGN_CENTER}>
       <img
         css={css`
-          max-width: 13rem;
-          max-height: 10rem;
+          max-width: 12rem;
+          max-height: ${SIZE_4};
         `}
-        src={imgSrc}/>
+        src={imgSrc}
+      />
     </Flex>
   )
 }

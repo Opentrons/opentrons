@@ -1,7 +1,14 @@
 // @flow
 import * as React from 'react'
 
-import { Box, Flex, Text, FONT_WEIGHT_SEMIBOLD, DIRECTION_ROW, JUSTIFY_SPACE_BETWEEN } from '@opentrons/components'
+import {
+  Box,
+  Flex,
+  Text,
+  FONT_WEIGHT_SEMIBOLD,
+  DIRECTION_ROW,
+  JUSTIFY_SPACE_BETWEEN,
+} from '@opentrons/components'
 
 import { ModuleInfo } from './ModuleInfo'
 import { ModuleImage } from './ModuleImage'
@@ -26,10 +33,12 @@ export function ModuleItem(props: Props): React.Node {
 
   return (
     <Box className={styles.module_item}>
-      <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>{getModuleDisplayName(module.model)}</Text>
+      <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>
+        {getModuleDisplayName(module.model)}
+      </Text>
       <Flex flexDirection={DIRECTION_ROW}>
         <ModuleImage model={module.model} />
-        <Box width="58%">
+        <Box width="60%">
           <ModuleControls
             module={module}
             controlDisabledReason={controlDisabledReason}
@@ -39,10 +48,10 @@ export function ModuleItem(props: Props): React.Node {
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <ModuleInfo module={module} />
         <ModuleUpdate
-            hasAvailableUpdate={!!module.hasAvailableUpdate}
-            controlDisabledReason={controlDisabledReason}
-            moduleId={module.serial}
-          />
+          hasAvailableUpdate={!!module.hasAvailableUpdate}
+          controlDisabledReason={controlDisabledReason}
+          moduleId={module.serial}
+        />
       </Flex>
     </Box>
   )
