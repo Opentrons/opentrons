@@ -11,8 +11,14 @@
   padding: 0;
 }
 
-.modal_contents p {
+.modal_contents p,
+.modal_contents li {
   margin-bottom: 1rem;
+}
+
+.modal_contents li {
+  margin-left: 2rem;
+  line-height: 1;
 }
 
 .modules_diagrams_row {
