@@ -1,15 +1,8 @@
-<<<<<<< HEAD
 from typing import List, Set
 from typing_extensions import Protocol
 
 from opentrons.hardware_control.modules.types import ModuleAtPort
 
-=======
-import abc
-from typing import List, Set
-from typing_extensions import Protocol
-
->>>>>>> Fixup: add base class, small miscellaneous changes
 from .types import USBPort
 
 
