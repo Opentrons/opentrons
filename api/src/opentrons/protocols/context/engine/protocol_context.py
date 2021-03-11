@@ -10,14 +10,13 @@ from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocols.api_support.util import HardwareManager, AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.context.instrument import \
-    AbstractInstrument
 from opentrons.protocols.context.labware import \
     AbstractLabware
 from opentrons.protocols.context.protocol import \
     AbstractProtocol, InstrumentDict, LoadModuleResult
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
+from .instrument_context import InstrumentContext
 from .labware_context import LabwareContext
 
 
@@ -96,8 +95,8 @@ class ProtocolEngineContext(AbstractProtocol):
         raise NotImplementedError()
 
     def load_instrument(self, instrument_name: str, mount: types.Mount,
-                        replace: bool = False) -> AbstractInstrument:
-        raise NotImplementedError()
+                        replace: bool = False) -> InstrumentContext:
+        return InstrumentContext()
 
     def get_loaded_instruments(self) -> InstrumentDict:
         raise NotImplementedError()
