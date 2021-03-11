@@ -186,12 +186,14 @@ class ProtocolContextImplementation(AbstractProtocol):
             configuration=configuration)
 
         # Try to find in the hardware instance
+
+        available_modules = self._hw_manager.hardware.find_modules(resolved_model)
         hc_mod_instance = None
-        for mod in self._hw_manager.hardware.attached_modules:
+        for mod in available_modules:
             if module_geometry.models_compatible(
                     module_geometry.module_model_from_string(mod.model()),
                     resolved_model):
-                hc_mod_instance = SynchronousAdapter(mod)
+                hc_mod_instance = mod
                 break
 
         if self.is_simulating() and hc_mod_instance is None:

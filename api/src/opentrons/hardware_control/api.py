@@ -1763,6 +1763,40 @@ class API(HardwareAPILike):
             self._log.info(f"Module {mod.name} discovered and attached"
                            f" at port {mod.port}, new_instance: {new_instance}")
 
+    def find_module(self, by_model: str) -> List:
+        """
+        available_modules = self._hw_manager.hardware.find_modules(resolved_model)
+        hc_mod_instance = None
+        for mod in available_modules:
+            if module_geometry.models_compatible(
+                    module_geometry.module_model_from_string(mod.model()),
+                    resolved_model):
+                hc_mod_instance = mod
+                break
+
+        if self.is_simulating() and hc_mod_instance is None:
+            mod_type = {
+                module_geometry.ModuleType.MAGNETIC: MagDeck,
+                module_geometry.ModuleType.TEMPERATURE: TempDeck,
+                module_geometry.ModuleType.THERMOCYCLER: Thermocycler
+                }[resolved_type]
+            hc_mod_instance = SynchronousAdapter(
+                mod_type(
+                    port='',
+                    usb_port=self._hw_manager.hardware._backend._usb.find_port(''),
+                    simulating=True,
+                    loop=self._hw_manager.hardware.loop,
+                    execution_manager=ExecutionManager(
+                        loop=self._hw_manager.hardware.loop),
+                    sim_model=resolved_model.value)
+            )
+            hc_mod_instance._connect()
+
+        if not hc_mod_instance:
+            return None
+        """
+        return []
+
     def get_instrument_max_height(
             self,
             mount: top_types.Mount,
