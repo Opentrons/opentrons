@@ -137,14 +137,6 @@ def test_get_loaded_modules(
         subject.get_loaded_modules()
 
 
-def test_load_instrument(
-        subject: ProtocolEngineContext) -> None:
-    with pytest.raises(NotImplementedError):
-        subject.load_instrument(
-            instrument_name="", mount=Mount.RIGHT
-        )
-
-
 def test_get_loaded_instruments(
         subject: ProtocolEngineContext) -> None:
     with pytest.raises(NotImplementedError):
