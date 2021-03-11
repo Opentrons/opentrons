@@ -1,4 +1,4 @@
-from collections import namedtuple
+from dataclasses import dataclass
 from typing import (
     Dict, NamedTuple, Callable, Any, Tuple, Awaitable, Mapping, Union)
 from pathlib import Path
@@ -10,9 +10,13 @@ InterruptCallback = Callable[[str], None]
 UploadFunction = Callable[[str, str, Dict[str, Any]],
                           Awaitable[Tuple[bool, str]]]
 
-ModuleAtPort = namedtuple('ModuleAtPort', ('port', 'name'))
-
 LiveData = Mapping[str, Union[str, Mapping[str, Union[float, str, None]]]]
+
+
+@dataclass(frozen=True)
+class ModuleAtPort:
+    port: str
+    name: str
 
 
 class BundledFirmware(NamedTuple):

@@ -7,13 +7,18 @@ from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import MagDeck, Thermocycler, TempDeck
 from opentrons.hardware_control.modules import utils, UpdateError, \
     BundledFirmware
+from opentrons.drivers.rpi_drivers.types import USBPort
 
 
 @pytest.fixture
 def magdeck():
+    usb_port = USBPort(
+        name='', sub_names=[], hub=None,
+        port_number=None, device_path='/dev/ot_module_magdeck1')
     m = asyncio.get_event_loop().run_until_complete(
         utils.build(
             port='/dev/ot_module_magdeck1',
+            usb_port=usb_port,
             which='magdeck',
             simulating=True,
             interrupt_callback=lambda x: None,
@@ -28,9 +33,13 @@ def magdeck():
 
 @pytest.fixture
 def tempdeck():
+    usb_port = USBPort(
+        name='', sub_names=[], hub=None,
+        port_number=None, device_path='/dev/ot_module_tempdeck1')
     t = asyncio.get_event_loop().run_until_complete(
         utils.build(
             port='/dev/ot_module_tempdeck1',
+            usb_port=usb_port,
             which='tempdeck',
             simulating=True,
             interrupt_callback=lambda x: None,
@@ -50,9 +59,13 @@ def tempdeck():
 
 @pytest.fixture
 def thermocycler():
+    usb_port = USBPort(
+        name='', sub_names=[], hub=None,
+        port_number=None, device_path='/dev/ot_module_thermocycler1')
     t = asyncio.get_event_loop().run_until_complete(
         utils.build(
             port='/dev/ot_module_thermocycler1',
+            usb_port=usb_port,
             which='thermocycler',
             simulating=True,
             interrupt_callback=lambda x: None,

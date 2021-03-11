@@ -1,10 +1,22 @@
+import pytest
 import asyncio
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.modules import tempdeck
 
 
-async def test_sim_initialization(loop):
+from opentrons.drivers.rpi_drivers.types import USBPort
+
+
+@pytest.fixture
+def usb_port():
+    return USBPort(
+        name='', sub_names=[], hub=None,
+        port_number=None, device_path='/dev/ot_module_sim_tempdeck0')
+
+
+async def test_sim_initialization(loop, usb_port):
     temp = await modules.build(port='/dev/ot_module_sim_tempdeck0',
+                               usb_port=usb_port,
                                which='tempdeck',
                                simulating=True,
                                interrupt_callback=lambda x: None,
@@ -13,8 +25,9 @@ async def test_sim_initialization(loop):
     assert isinstance(temp, modules.AbstractModule)
 
 
-async def test_sim_state(loop):
+async def test_sim_state(loop, usb_port):
     temp = await modules.build(port='/dev/ot_module_sim_tempdeck0',
+                               usb_port=usb_port,
                                which='tempdeck',
                                simulating=True,
                                interrupt_callback=lambda x: None,
@@ -33,8 +46,9 @@ async def test_sim_state(loop):
     assert status['version'] == 'dummyVersionTD'
 
 
-async def test_sim_update(loop):
+async def test_sim_update(loop, usb_port):
     temp = await modules.build(port='/dev/ot_module_sim_tempdeck0',
+                               usb_port=usb_port,
                                which='tempdeck',
                                simulating=True,
                                interrupt_callback=lambda x: None,
@@ -50,9 +64,10 @@ async def test_sim_update(loop):
     assert temp.status == 'idle'
 
 
-async def test_poller(monkeypatch, loop):
+async def test_poller(monkeypatch, loop, usb_port):
     temp = modules.tempdeck.TempDeck(
             port='/dev/ot_module_sim_tempdeck0',
+            usb_port=usb_port,
             execution_manager=ExecutionManager(loop=loop),
             simulating=True,
             loop=loop)
@@ -69,8 +84,8 @@ async def test_poller(monkeypatch, loop):
     assert hit
 
 
-async def test_revision_model_parsing(loop):
-    mag = await modules.build('', 'tempdeck', True, lambda x: None, loop=loop,
+async def test_revision_model_parsing(loop, usb_port):
+    mag = await modules.build('', 'tempdeck', True, usb_port, lambda x: None, loop=loop,
                               execution_manager=ExecutionManager(loop=loop))
     mag._device_info['model'] = 'temp_deck_v20'
     assert mag.model() == 'temperatureModuleV2'

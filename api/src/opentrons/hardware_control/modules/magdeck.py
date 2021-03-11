@@ -4,6 +4,7 @@ from typing import Mapping, Optional, Union
 from opentrons.drivers.mag_deck import (
     SimulatingDriver, MagDeck as MagDeckDriver)
 from opentrons.drivers.mag_deck.driver import mag_locks
+from opentrons.drivers.rpi_drivers.types import USBPort
 from ..execution_manager import ExecutionManager
 from . import update, mod_abc, types
 
@@ -46,6 +47,7 @@ class MagDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
+                    usb_port: USBPort,
                     execution_manager: ExecutionManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating=False,
@@ -54,6 +56,7 @@ class MagDeck(mod_abc.AbstractModule):
         # MagDeck does not currently use interrupts, so the callback is not
         # passed on
         mod = cls(port=port,
+                  usb_port=usb_port,
                   simulating=simulating,
                   loop=loop,
                   execution_manager=execution_manager,
@@ -84,11 +87,13 @@ class MagDeck(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
+                 usb_port: USBPort,
                  execution_manager: ExecutionManager,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None,
                  sim_model: str = None) -> None:
         super().__init__(port=port,
+                         usb_port=usb_port,
                          simulating=simulating,
                          loop=loop,
                          execution_manager=execution_manager,
@@ -167,6 +172,10 @@ class MagDeck(mod_abc.AbstractModule):
     @property
     def port(self) -> str:
         return self._port
+
+    @property
+    def usb_port(self) -> USBPort:
+        return self._usb_port
 
     @property
     def is_simulated(self) -> bool:

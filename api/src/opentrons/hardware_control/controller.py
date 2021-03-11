@@ -11,7 +11,7 @@ except OSError:
     aionotify = None  # type: ignore
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
-from opentrons.drivers.rpi_drivers import build_gpio_chardev
+from opentrons.drivers.rpi_drivers import build_gpio_chardev, types, usb
 import opentrons.config
 from opentrons.config import pipette_config
 from opentrons.config.types import RobotConfig
@@ -78,6 +78,7 @@ class Controller:
             config=self.config, gpio_chardev=self._gpio_chardev,
             handle_locks=False)
         self._cached_fw_version: Optional[str] = None
+        self._usb = usb.USBBus()
         try:
             self._module_watcher = aionotify.Watcher()
             self._module_watcher.watch(
@@ -243,12 +244,14 @@ class Controller:
     async def build_module(
             self,
             port: str,
+            usb_port: types.USBPort,
             model: str,
             interrupt_callback: modules.InterruptCallback,
             loop: asyncio.AbstractEventLoop,
             execution_manager: ExecutionManager) -> modules.AbstractModule:
         return await modules.build(
             port=port,
+            usb_port=usb_port,
             which=model,
             simulating=False,
             interrupt_callback=interrupt_callback,
