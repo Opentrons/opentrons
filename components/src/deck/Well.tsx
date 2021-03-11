@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import { wellIsRect } from '@opentrons/shared-data'
 import styles from './Well.css'
-import { SELECTABLE_WELL_CLASS } from '../constants.js'
+import { SELECTABLE_WELL_CLASS } from '../constants'
 
 import type { WellDefinition } from '@opentrons/shared-data'
 
