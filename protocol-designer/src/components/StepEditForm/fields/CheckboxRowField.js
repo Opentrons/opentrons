@@ -37,7 +37,9 @@ export const CheckboxRowField = (props: CheckboxRowProps): React.Node => {
 
   return (
     <>
-      <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
+      <Tooltip maxWidth="18rem" lineHeight="1.5" {...tooltipProps}>
+        {tooltipContent}
+      </Tooltip>
       <div className={styles.checkbox_row}>
         <CheckboxField
           className={cx(styles.checkbox_field, className)}

@@ -44,6 +44,27 @@ type State = {|
   secondValue: WellOrderOption,
 |}
 
+export const ResetButton = (props: {| onClick: () => void |}): React.Node => (
+  <OutlineButton className={modalStyles.button_medium} onClick={props.onClick}>
+    {i18n.t('button.reset')}
+  </OutlineButton>
+)
+
+export const CancelButton = (props: {| onClick: () => void |}): React.Node => (
+  <PrimaryButton
+    className={cx(modalStyles.button_medium, modalStyles.button_right_of_break)}
+    onClick={props.onClick}
+  >
+    {i18n.t('button.cancel')}
+  </PrimaryButton>
+)
+
+export const DoneButton = (props: {| onClick: () => void |}): React.Node => (
+  <PrimaryButton className={modalStyles.button_medium} onClick={props.onClick}>
+    {i18n.t('button.done')}
+  </PrimaryButton>
+)
+
 export class WellOrderModal extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -91,10 +112,10 @@ export class WellOrderModal extends React.Component<Props, State> {
       initialFirstValue,
       initialSecondValue,
     } = this.getInitialFirstValues()
-    this.setState(
-      { firstValue: initialFirstValue, secondValue: initialSecondValue },
-      this.applyChanges
-    )
+    this.setState({
+      firstValue: initialFirstValue,
+      secondValue: initialSecondValue,
+    })
     this.props.closeModal()
   }
 
@@ -125,6 +146,7 @@ export class WellOrderModal extends React.Component<Props, State> {
     }
     this.setState(nextState)
   }
+
   isSecondOptionDisabled: WellOrderOption => boolean = (
     value: WellOrderOption
   ) => {
@@ -136,6 +158,7 @@ export class WellOrderModal extends React.Component<Props, State> {
       return false
     }
   }
+
   render(): React.Node {
     if (!this.props.isOpen) return null
 
@@ -197,28 +220,10 @@ export class WellOrderModal extends React.Component<Props, State> {
             </FormGroup>
           </div>
           <div className={modalStyles.button_row_divided}>
-            <OutlineButton
-              className={modalStyles.button_medium}
-              onClick={this.handleReset}
-            >
-              {i18n.t('button.reset')}
-            </OutlineButton>
+            <ResetButton onClick={this.handleReset} />
             <div>
-              <PrimaryButton
-                className={cx(
-                  modalStyles.button_medium,
-                  modalStyles.button_right_of_break
-                )}
-                onClick={this.handleCancel}
-              >
-                {i18n.t('button.cancel')}
-              </PrimaryButton>
-              <PrimaryButton
-                className={modalStyles.button_medium}
-                onClick={this.handleDone}
-              >
-                {i18n.t('button.done')}
-              </PrimaryButton>
+              <CancelButton onClick={this.handleCancel} />
+              <DoneButton onClick={this.handleDone} />
             </div>
           </div>
         </Modal>

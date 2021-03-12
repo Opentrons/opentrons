@@ -33,8 +33,8 @@ class LabwareImplementation(LabwareInterface):
                        the front and left most point of the outside of the
                        labware is (often the front-left corner of a slot on the
                        deck).
-        :param str label: An optional label to use instead of the displayName
-                          from the definition's metadata element
+        :param label: An optional label to use instead of the displayName
+                      from the definition's metadata element
         """
         if label:
             dn = label

@@ -48,7 +48,7 @@ jobs:
   js-unit-test:
     # unit tests for js frontend projects (e.g. not app-shell or discovery-client) do not need
     # to run cross-platform
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     name: 'opentrons app frontend unit tests'
     timeout-minutes: 30
     steps:
@@ -86,7 +86,7 @@ jobs:
     # to run cross-platform just like builds, might as well do them in the same job
     strategy:
       matrix:
-        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+        os: ['windows-latest', 'ubuntu-18.04', 'macos-latest']
     name: 'opentrons app backend unit tests and build'
     runs-on: ${{ matrix.os }}
     steps:
@@ -144,7 +144,7 @@ jobs:
           path: app-shell/dist/publish
   deploy-app:
     name: 'Deploy built app artifacts to S3'
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     needs: build-app-test-backend
     if: github.event_name != 'pull_request'
     steps:

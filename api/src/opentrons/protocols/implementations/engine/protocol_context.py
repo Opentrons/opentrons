@@ -1,10 +1,12 @@
 """Module containing protocol context interface that interacts with
 Protocol Engine"""
-
+from __future__ import annotations
 from typing import Optional, Dict
 
-from opentrons import types, API
-from opentrons.protocol_engine import ProtocolEngine
+from opentrons import types
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.protocol_engine import DeckSlotLocation
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocols.api_support.util import HardwareManager, AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
@@ -16,15 +18,20 @@ from opentrons.protocols.implementations.interfaces.protocol_context import \
     ProtocolContextInterface, InstrumentDict, LoadModuleResult
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
+from .labware_context import LabwareContext
+
 
 class ProtocolEngineContext(ProtocolContextInterface):
     """ProtocolContextInterface that interacts with Protocol Engine"""
 
-    _protocol_engine: ProtocolEngine
+    _client: ProtocolEngineClient
 
-    def __init__(self, protocol_engine: ProtocolEngine) -> None:
-        """Constructor."""
-        self._protocol_engine = protocol_engine
+    def __init__(
+        self,
+        client: ProtocolEngineClient
+    ) -> None:
+        """Initialize a ProtocolEngineContext with a client."""
+        self._client = client
 
     def get_bundled_data(self) -> Dict[str, bytes]:
         raise NotImplementedError()
@@ -44,7 +51,7 @@ class ProtocolEngineContext(ProtocolContextInterface):
     def get_hardware(self) -> HardwareManager:
         raise NotImplementedError()
 
-    def connect(self, hardware: API) -> None:
+    def connect(self, hardware: HardwareAPI) -> None:
         raise NotImplementedError()
 
     def disconnect(self) -> None:
@@ -59,11 +66,26 @@ class ProtocolEngineContext(ProtocolContextInterface):
                                          str] = None) -> LabwareInterface:
         raise NotImplementedError()
 
-    def load_labware(self, load_name: str, location: types.DeckLocation,
-                     label: Optional[str] = None,
-                     namespace: Optional[str] = None,
-                     version: Optional[int] = None) -> LabwareInterface:
-        raise NotImplementedError()
+    def load_labware(
+        self,
+        load_name: str,
+        location: types.DeckLocation,
+        label: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> LabwareInterface:
+        # TODO(mc, 2021-03-04): handle optional namespace and version
+        result = self._client.load_labware(
+            load_name=load_name,
+            location=DeckSlotLocation(slot=types.DeckSlotName.from_primitive(location)),
+            namespace=namespace,  # type: ignore[arg-type]
+            version=version,  # type: ignore[arg-type]
+        )
+
+        return LabwareContext(
+            labware_id=result.labwareId,
+            state_view=self._client.state,
+        )
 
     def load_module(self, module_name: str,
                     location: Optional[types.DeckLocation] = None,

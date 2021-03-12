@@ -31,7 +31,7 @@ jobs:
   js-unit-test:
     name: 'components unit tests'
     timeout-minutes: 30
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
@@ -56,7 +56,7 @@ jobs:
           yarn jest --coverage=true --ci=true components/
   build-components:
     name: 'build components artifact'
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v2'
@@ -87,7 +87,7 @@ jobs:
           path: components/dist
   deploy-components:
     name: 'deploy components artifact to S3'
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     needs: ["js-unit-test", "build-components"]
     if: github.event_name != 'pull_request'
     steps:

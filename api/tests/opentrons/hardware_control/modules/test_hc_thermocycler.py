@@ -1,10 +1,21 @@
+import pytest
 import asyncio
 from unittest import mock
 from opentrons.hardware_control import modules, ExecutionManager
 
+from opentrons.drivers.rpi_drivers.types import USBPort
 
-async def test_sim_initialization(loop):
+
+@pytest.fixture
+def usb_port():
+    return USBPort(
+        name='', sub_names=[], hub=None,
+        port_number=None, device_path='/dev/ot_module_sim_thermocycler0')
+
+
+async def test_sim_initialization(loop, usb_port):
     therm = await modules.build(port='/dev/ot_module_sim_thermocycler0',
+                                usb_port=usb_port,
                                 which='thermocycler',
                                 simulating=True,
                                 interrupt_callback=lambda x: None,
@@ -16,6 +27,7 @@ async def test_sim_initialization(loop):
 
 async def test_lid(loop):
     therm = await modules.build(port='/dev/ot_module_sim_thermocycler0',
+                                usb_port=usb_port,
                                 which='thermocycler',
                                 simulating=True,
                                 interrupt_callback=lambda x: None,
@@ -37,8 +49,9 @@ async def test_lid(loop):
     assert therm.lid_status == 'open'
 
 
-async def test_sim_state(loop):
+async def test_sim_state(loop, usb_port):
     therm = await modules.build(port='/dev/ot_module_sim_thermocycler0',
+                                usb_port=usb_port,
                                 which='thermocycler',
                                 simulating=True,
                                 interrupt_callback=lambda x: None,
@@ -57,8 +70,9 @@ async def test_sim_state(loop):
     assert status['version'] == 'dummyVersionTC'
 
 
-async def test_sim_update(loop):
+async def test_sim_update(loop, usb_port):
     therm = await modules.build(port='/dev/ot_module_sim_thermocycler0',
+                                usb_port=usb_port,
                                 which='thermocycler',
                                 simulating=True,
                                 interrupt_callback=lambda x: None,
@@ -102,8 +116,9 @@ async def test_sim_update(loop):
     assert therm.lid_target is None
 
 
-async def test_set_temperature(monkeypatch, loop):
+async def test_set_temperature(monkeypatch, loop, usb_port):
     hw_tc = await modules.build(port='/dev/ot_module_sim_thermocycler0',
+                                usb_port=usb_port,
                                 which='thermocycler',
                                 simulating=True,
                                 interrupt_callback=lambda x: None,
