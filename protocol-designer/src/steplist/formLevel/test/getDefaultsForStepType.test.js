@@ -1,10 +1,11 @@
 // @flow
 import {
   DEFAULT_CHANGE_TIP_OPTION,
+  DEFAULT_DELAY_SECONDS,
+  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
   FIXED_TRASH_ID,
-  DEFAULT_DELAY_SECONDS,
 } from '../../../constants'
 import { getDefaultsForStepType } from '..'
 
@@ -79,7 +80,7 @@ describe('getDefaultsForStepType', () => {
         mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
         blowout_checkbox: false,
         blowout_location: FIXED_TRASH_ID,
-        mix_mmFromBottom: null,
+        mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         mix_touchTip_mmFromBottom: null,
         mix_touchTip_checkbox: false,
         pipette: null,

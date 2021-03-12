@@ -1,6 +1,7 @@
 // @flow
 import {
   DEFAULT_CHANGE_TIP_OPTION,
+  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
   DEFAULT_DELAY_SECONDS,
@@ -21,7 +22,10 @@ export function getDefaultsForStepType(
         mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
         blowout_checkbox: false,
         blowout_location: FIXED_TRASH_ID,
-        mix_mmFromBottom: null,
+        // NOTE(IL, 2021-03-12): mix uses dispense for both asp + disp, unless its falsey.
+        // For now, unlike the other mmFromBottom fields, it's initializing to a constant instead of
+        // using null to represent default (because null becomes 1mm asp, 0.5mm dispense -- see #7470.)
+        mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         pipette: null,
         volume: undefined,
         wells: [],

@@ -1,6 +1,7 @@
 // @flow
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import { DEFAULT_MM_FROM_BOTTOM_DISPENSE } from '../../../../constants'
 import { dependentFieldsUpdateMix } from '../dependentFieldsUpdateMix'
 
 let pipetteEntities
@@ -51,8 +52,8 @@ describe('well selection should update', () => {
       wells: ['A1', 'B1'],
       volume: '2',
       pipette: 'pipetteId',
-      mix_mmFromBottom: '1.2',
-      mix_touchTip_mmFromBottom: '2.3',
+      mix_mmFromBottom: 1.2,
+      mix_touchTip_mmFromBottom: 2.3,
     }
   })
 
@@ -96,7 +97,7 @@ describe('well selection should update', () => {
     expect(handleFormHelper(patch, form)).toEqual({
       ...patch,
       wells: ['A1'],
-      mix_mmFromBottom: null,
+      mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
       mix_touchTip_mmFromBottom: null,
     })
   })
@@ -107,7 +108,7 @@ describe('well selection should update', () => {
     expect(handleFormHelper(patch, trashLabwareForm)).toEqual({
       ...patch,
       wells: [],
-      mix_mmFromBottom: null,
+      mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
       mix_touchTip_mmFromBottom: null,
     })
   })
