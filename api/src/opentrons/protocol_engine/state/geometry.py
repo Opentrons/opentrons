@@ -82,22 +82,44 @@ class GeometryState:
             for uid, lw_data in self._labware_store.state.get_all_labware()
         ])
 
+    def get_labware_parent_position(
+        self,
+        labware_id: str
+    ) -> Point:
+        """Get the position of the labware's parent slot (deck or module)."""
+        labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
+        slot_pos = self.get_slot_position(labware_data.location.slot)
+
+        return slot_pos
+
+    def get_labware_origin_position(
+        self,
+        labware_id: str
+    ) -> Point:
+        """Get the position of the labware's origin, without calibration."""
+        labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
+        slot_pos = self.get_slot_position(labware_data.location.slot)
+        origin_offset = labware_data.definition["cornerOffsetFromSlot"]
+
+        return Point(
+            x=slot_pos.x + origin_offset["x"],
+            y=slot_pos.y + origin_offset["y"],
+            z=slot_pos.z + origin_offset["z"]
+        )
+
     def get_labware_position(
         self,
         labware_id: str
     ) -> Point:
-        """Get the calibrated position of the labware."""
-        labware_data = self._labware_store.state.get_labware_data_by_id(
-            labware_id
-        )
-
-        slot_pos = self.get_slot_position(labware_data.location.slot)
+        """Get the calibrated origin of the labware."""
+        labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
+        origin_pos = self.get_labware_origin_position(labware_id=labware_id)
         cal_offset = labware_data.calibration
 
         return Point(
-            x=slot_pos.x + cal_offset[0],
-            y=slot_pos.y + cal_offset[1],
-            z=slot_pos.z + cal_offset[2]
+            x=origin_pos.x + cal_offset[0],
+            y=origin_pos.y + cal_offset[1],
+            z=origin_pos.z + cal_offset[2]
         )
 
     def get_well_position(

@@ -7,10 +7,10 @@ protocol state and side-effects like robot movements.
 """
 
 from .protocol_engine import ProtocolEngine
-from .state import StateStore, StateView
+from .state import StateStore, StateView, LabwareData
 from .execution import CommandHandlers
 from .resources import ResourceProviders
-from .types import DeckLocation, WellLocation, WellOrigin
+from .types import DeckLocation, DeckSlotLocation, Dimensions, WellLocation, WellOrigin
 
 __all__ = [
     "ProtocolEngine",
@@ -19,6 +19,9 @@ __all__ = [
     "CommandHandlers",
     "ResourceProviders",
     "DeckLocation",
+    "DeckSlotLocation",
+    "Dimensions",
+    "LabwareData",
     "WellLocation",
     "WellOrigin",
 ]

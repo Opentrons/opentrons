@@ -4,6 +4,7 @@ from threading import Thread, Event
 from typing import Mapping, Union, Optional
 from opentrons.drivers.temp_deck import (
     SimulatingDriver, TempDeck as TempDeckDriver)
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.temp_deck.driver import temp_locks
 from ..execution_manager import ExecutionManager
 from . import update, mod_abc, types
@@ -59,6 +60,7 @@ class TempDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
+                    usb_port: USBPort,
                     execution_manager: ExecutionManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
@@ -69,6 +71,7 @@ class TempDeck(mod_abc.AbstractModule):
         # TempDeck does not currently use interrupts, so the callback is not
         # passed on
         mod = cls(port=port,
+                  usb_port=usb_port,
                   simulating=simulating,
                   loop=loop,
                   execution_manager=execution_manager,
@@ -99,11 +102,13 @@ class TempDeck(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
+                 usb_port: USBPort,
                  execution_manager: ExecutionManager,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None,
                  sim_model: str = None) -> None:
         super().__init__(port=port,
+                         usb_port=usb_port,
                          simulating=simulating,
                          loop=loop,
                          execution_manager=execution_manager,
@@ -199,6 +204,10 @@ class TempDeck(mod_abc.AbstractModule):
     @property
     def port(self) -> str:
         return self._port
+
+    @property
+    def usb_port(self) -> USBPort:
+        return self._usb_port
 
     @property
     def is_simulated(self) -> bool:

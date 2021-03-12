@@ -28,7 +28,7 @@ defaults:
 jobs:
   build:
     name: opentrons documentation build
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'

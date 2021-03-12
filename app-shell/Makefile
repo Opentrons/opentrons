@@ -109,6 +109,9 @@ dist-macos-latest: dist-osx
 .PHONY: dist-ubuntu-latest
 dist-ubuntu-latest: dist-linux
 
+.PHONY: dist-ubuntu-18.04
+dist-ubuntu-latest: dist-linux
+
 .PHONY: dist-windows-latest
 dist-windows-latest: dist-win
 

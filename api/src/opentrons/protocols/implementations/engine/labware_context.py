@@ -1,9 +1,9 @@
 """Module containing labware interface that works with Protocol Engine."""
 from functools import lru_cache
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from opentrons.protocol_engine import StateView
-from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
+from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.implementations.tip_tracker import TipTracker
 from opentrons.protocols.implementations.well import WellImplementation
@@ -16,22 +16,59 @@ from opentrons.protocols.implementations.interfaces.labware\
     import LabwareInterface
 
 
+class LabwareGeometry(AbstractLabwareGeometry):
+    """Concrete LabwareGeometry implementation for use with the ProtocolEngine."""
+
+    def __init__(self, labware_id: str, state_view: StateView) -> None:
+        """Initialize the LabwareGeometry with a reference to the engine state."""
+        self._id = labware_id
+        self._state = state_view
+
+    @property
+    def parent(self) -> Location:
+        data = self._state.labware.get_labware_data_by_id(labware_id=self._id)
+        pos = self._state.geometry.get_labware_parent_position(labware_id=self._id)
+
+        return Location(point=pos, labware=str(data.location.slot))
+
+    @property
+    def offset(self) -> Point:
+        return self._state.geometry.get_labware_origin_position(labware_id=self._id)
+
+    @property
+    def x_dimension(self) -> float:
+        return self._state.labware.get_dimensions(labware_id=self._id).x
+
+    @property
+    def y_dimension(self) -> float:
+        return self._state.labware.get_dimensions(labware_id=self._id).y
+
+    @property
+    def z_dimension(self) -> float:
+        return self._state.labware.get_dimensions(labware_id=self._id).z
+
+
 class LabwareContext(LabwareInterface):
     """LabwareInterface implementation that works with the Protocol Engine."""
 
-    def __init__(self, labware_id: str, state_view: StateView, parent: Location):
+    def __init__(self, labware_id: str, state_view: StateView) -> None:
         """Construct"""
         self._id = labware_id
-        self._state_view = state_view
-        self._parent = parent
+        self._state = state_view
+
+    def __hash__(self) -> int:
+        return hash(self._id)
+
+    def __eq__(self, other: Any) -> bool:
+        return isinstance(other, LabwareContext) and self._id == other._id
 
     def get_uri(self) -> str:
         """Get the labware uri."""
-        return self._state_view.labware.get_definition_uri(labware_id=self._id)
+        return self._state.labware.get_definition_uri(labware_id=self._id)
 
     def get_display_name(self) -> str:
         """Get the display name."""
-        lw = self._state_view.labware.get_labware_data_by_id(labware_id=self._id)
+        lw = self._state.labware.get_labware_data_by_id(labware_id=self._id)
         # TODO AL 20210225 - this is not consistent with reference
         #  implementation. It is either the supplied label or displayName in
         #  definition on the location, which is either a slot or module.
@@ -42,7 +79,7 @@ class LabwareContext(LabwareInterface):
         # TODO AL 20210225 - this is not consistent with reference
         #  implementation. It is either the supplied label or loadName in
         #  definition.
-        return self._state_view.labware.get_load_name(labware_id=self._id)
+        return self._state.labware.get_load_name(labware_id=self._id)
 
     def set_name(self, new_name: str) -> None:
         # TODO AL 2020304 - Is Labware.name setter necessary?
@@ -50,7 +87,7 @@ class LabwareContext(LabwareInterface):
 
     def get_definition(self) -> LabwareDefinition:
         """Get the labware definition."""
-        return self._state_view.labware.get_labware_data_by_id(
+        return self._state.labware.get_labware_data_by_id(
             labware_id=self._id).definition
 
     def get_parameters(self) -> LabwareParameters:
@@ -59,7 +96,7 @@ class LabwareContext(LabwareInterface):
 
     def get_quirks(self) -> List[str]:
         """Get the labware quirks."""
-        return self._state_view.labware.get_quirks(labware_id=self._id)
+        return self._state.labware.get_quirks(labware_id=self._id)
 
     def set_calibration(self, delta: Point) -> None:
         # TODO AL 2020304 - Is this only here to support labware
@@ -68,15 +105,15 @@ class LabwareContext(LabwareInterface):
 
     def get_calibrated_offset(self) -> Point:
         """Get the calibrated offset."""
-        return self._state_view.geometry.get_labware_position(labware_id=self._id)
+        return self._state.geometry.get_labware_position(labware_id=self._id)
 
     def is_tiprack(self) -> bool:
         """Return whether this labware is a tiprack."""
-        return self._state_view.labware.is_tiprack(labware_id=self._id)
+        return self._state.labware.is_tiprack(labware_id=self._id)
 
     def get_tip_length(self) -> float:
         """Get the tip length."""
-        return self._state_view.labware.get_tip_length(labware_id=self._id)
+        return self._state.labware.get_tip_length(labware_id=self._id)
 
     def set_tip_length(self, length: float):
         # TODO AL 2020304 - Is Labware.tip_length setter necessary?
@@ -110,14 +147,11 @@ class LabwareContext(LabwareInterface):
     @lru_cache(maxsize=1)
     def get_geometry(self) -> LabwareGeometry:
         """Return LabwareGeometry"""
-        return LabwareGeometry(
-            definition=self.get_definition(),
-            parent=self._parent
-        )
+        return LabwareGeometry(labware_id=self._id, state_view=self._state)
 
     @property
     def highest_z(self) -> float:
-        return self._state_view.geometry.get_labware_highest_z(labware_id=self._id)
+        return self._state.geometry.get_labware_highest_z(labware_id=self._id)
 
     @property
     def separate_calibration(self) -> bool:
@@ -130,7 +164,7 @@ class LabwareContext(LabwareInterface):
     @property
     def load_name(self) -> str:
         """Get the load name."""
-        return self._state_view.labware.get_load_name(labware_id=self._id)
+        return self._state.labware.get_load_name(labware_id=self._id)
 
     def _build_wells(self) -> List[WellImplementation]:
         """Create well objects."""
