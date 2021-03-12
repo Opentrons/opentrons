@@ -589,7 +589,7 @@ class ProtocolContext(CommandPublisher):
 
         :param str msg: A message to echo back to connected clients.
         """
-        self._implementation.pause()
+        self._implementation.pause(msg=msg)
 
     @publish.both(command=cmds.resume)
     @requires_version(2, 0)

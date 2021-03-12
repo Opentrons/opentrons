@@ -76,7 +76,7 @@ class AbstractProtocol(ABC):
             self,
             labware_def: LabwareDefinition,
             location: types.DeckLocation,
-            label: Optional[str] = None,
+            label: Optional[str],
     ) -> AbstractLabware:
         ...
 
@@ -85,9 +85,9 @@ class AbstractProtocol(ABC):
             self,
             load_name: str,
             location: types.DeckLocation,
-            label: Optional[str] = None,
-            namespace: Optional[str] = None,
-            version: Optional[int] = None,
+            label: Optional[str],
+            namespace: Optional[str],
+            version: Optional[int],
     ) -> AbstractLabware:
         ...
 
@@ -95,8 +95,8 @@ class AbstractProtocol(ABC):
     def load_module(
             self,
             module_name: str,
-            location: Optional[types.DeckLocation] = None,
-            configuration: Optional[str] = None) -> Optional[LoadModuleResult]:
+            location: Optional[types.DeckLocation],
+            configuration: Optional[str]) -> Optional[LoadModuleResult]:
         ...
 
     @abstractmethod
@@ -108,7 +108,7 @@ class AbstractProtocol(ABC):
             self,
             instrument_name: str,
             mount: types.Mount,
-            replace: bool = False) -> AbstractInstrument:
+            replace: bool) -> AbstractInstrument:
         ...
 
     @abstractmethod
@@ -117,7 +117,7 @@ class AbstractProtocol(ABC):
 
     @abstractmethod
     def pause(self,
-              msg: Optional[str] = None) -> None:
+              msg: Optional[str]) -> None:
         ...
 
     @abstractmethod
@@ -131,8 +131,8 @@ class AbstractProtocol(ABC):
 
     @abstractmethod
     def delay(self,
-              seconds=0,
-              msg: Optional[str] = None) -> None:
+              seconds: float,
+              msg: Optional[str]) -> None:
         ...
 
     @abstractmethod

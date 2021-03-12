@@ -11,7 +11,7 @@ class ProtocolContextSimulation(ProtocolContextImplementation):
     def load_instrument(self,
                         instrument_name: str,
                         mount: types.Mount,
-                        replace: bool = False) -> AbstractInstrument:
+                        replace: bool) -> AbstractInstrument:
         """Create a simulating instrument context."""
         instr = self._instruments[mount]
         if instr and not replace:
