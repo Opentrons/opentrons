@@ -90,6 +90,7 @@ const getErrors = (args: {|
 
 export const TipPositionModal = (props: Props): React.Node => {
   const { isIndeterminate, name, wellDepthMm } = props
+
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
     name,
     wellDepthMm,
@@ -184,7 +185,7 @@ export const TipPositionModal = (props: Props): React.Node => {
     handleIncrementDecrement(step * -1)
   }
 
-  const TipPositionInput = !isDefault && (
+  const TipPositionInputField = !isDefault && (
     <InputField
       caption={`between ${minMmFromBottom} and ${maxMmFromBottom}`}
       className={styles.position_from_bottom_input}
@@ -195,6 +196,9 @@ export const TipPositionModal = (props: Props): React.Node => {
       value={value !== null ? String(value) : ''}
     />
   )
+
+  // Mix Form's asp/disp tip position field has different default value text
+  const isMixAspDispField = name === 'mix_mmFromBottom'
 
   return (
     <Portal>
@@ -252,7 +256,9 @@ export const TipPositionModal = (props: Props): React.Node => {
                   }}
                   options={[
                     {
-                      name: `${defaultMmFromBottom} mm from the bottom (default)`,
+                      name: isMixAspDispField
+                        ? `Aspirate 1mm, Dispense 0.5mm from the bottom (default)`
+                        : `${defaultMmFromBottom} mm from the bottom (default)`,
                       value: 'default',
                     },
                     {
@@ -261,7 +267,7 @@ export const TipPositionModal = (props: Props): React.Node => {
                     },
                   ]}
                 />
-                {TipPositionInput}
+                {TipPositionInputField}
               </div>
 
               <div className={styles.viz_group}>
