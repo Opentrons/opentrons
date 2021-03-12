@@ -200,6 +200,7 @@ class ProtocolContextImplementation(ProtocolContextInterface):
                 module_geometry.ModuleType.TEMPERATURE: TempDeck,
                 module_geometry.ModuleType.THERMOCYCLER: Thermocycler
                 }[resolved_type]
+
             hc_mod_instance = SynchronousAdapter(
                 mod_type(
                     port='',
