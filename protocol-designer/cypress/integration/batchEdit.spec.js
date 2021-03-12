@@ -2,7 +2,6 @@ describe('Batch Edit Transform', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.closeAnnouncementModal()
-    // cy.wait(30000)
   })
 
   // import the batchEdit.json to PD
@@ -20,13 +19,13 @@ describe('Batch Edit Transform', () => {
       shiftKey: true,
     })
 
-    //Change the Flowrate to 100 and Save
+    // Change the Flowrate to 100 and Save
     cy.get('[name="aspirate_flowRate"]').click()
     cy.get('input[name="aspirate_flowRate_customFlowRate"]').type('100')
     cy.get('button').contains('Done').click()
     cy.get('button').contains('save').click()
 
-    //Verify that transfer and other step selection does not support multistep editing
+    // Verify that transfer and other step selection does not support multistep editing
     cy.get('[data-test="StepItem_4"]').click({
       ctrlKey: true,
     })
@@ -37,17 +36,17 @@ describe('Batch Edit Transform', () => {
       }
     )
 
-    //Dublicate the selected steps
+    // Dublicate the selected steps
     cy.get('#ClickableIcon_duplicate').click()
 
-    //Expand ALL steps
+    // Expand ALL steps
     cy.get('#ClickableIcon_expand').click()
 
-    //Delete the dublicated steps
+    // Delete the dublicated steps
     cy.get('#ClickableIcon_delete').click()
     cy.get('button').contains('delete steps').click()
 
-    //Exit batch edit mode
+    // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
   })
 })
