@@ -74,6 +74,17 @@ ModuleLiveData = typing.Union[
 ]
 
 
+class PhysicalPort(BaseModel):
+    hub: typing.Optional[int] = \
+        Field(...,
+              description="A physical USB external hub that is"
+                          "connected to the raspberry pi")
+    port: typing.Optional[int] = \
+        Field(...,
+              description="The physical port that a module is"
+                          "connected to.")
+
+
 class Module(BaseModel):
     """An object identifying a module"""
     name: str = \
@@ -90,6 +101,9 @@ class Module(BaseModel):
     port: str = \
         Field(...,
               description="The virtual port to which the module is attached", )
+    usbPort: PhysicalPort = \
+        Field(...,
+              description="The physical port to which the module is attached")
     serial: str = \
         Field(...,
               description="The unique serial number of the module", )

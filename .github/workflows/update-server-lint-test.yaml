@@ -34,7 +34,7 @@ jobs:
   lint:
     name: 'update server linting'
     timeout-minutes: 10
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
@@ -53,7 +53,7 @@ jobs:
     name: 'update server package tests'
     timeout-minutes: 10
     needs: [lint]
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'

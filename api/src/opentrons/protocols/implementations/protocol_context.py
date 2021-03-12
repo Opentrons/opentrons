@@ -200,9 +200,11 @@ class ProtocolContextImplementation(ProtocolContextInterface):
                 module_geometry.ModuleType.TEMPERATURE: TempDeck,
                 module_geometry.ModuleType.THERMOCYCLER: Thermocycler
                 }[resolved_type]
+
             hc_mod_instance = SynchronousAdapter(
                 mod_type(
                     port='',
+                    usb_port=self._hw_manager.hardware._backend._usb.find_port(''),
                     simulating=True,
                     loop=self._hw_manager.hardware.loop,
                     execution_manager=ExecutionManager(

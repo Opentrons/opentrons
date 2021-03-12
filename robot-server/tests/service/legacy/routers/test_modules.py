@@ -7,13 +7,18 @@ from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import MagDeck, Thermocycler, TempDeck
 from opentrons.hardware_control.modules import utils, UpdateError, \
     BundledFirmware
+from opentrons.drivers.rpi_drivers.types import USBPort
 
 
 @pytest.fixture
 def magdeck():
+    usb_port = USBPort(
+        name='', sub_names=[], hub=None,
+        port_number=None, device_path='/dev/ot_module_magdeck1')
     m = asyncio.get_event_loop().run_until_complete(
         utils.build(
             port='/dev/ot_module_magdeck1',
+            usb_port=usb_port,
             which='magdeck',
             simulating=True,
             interrupt_callback=lambda x: None,
@@ -28,9 +33,13 @@ def magdeck():
 
 @pytest.fixture
 def tempdeck():
+    usb_port = USBPort(
+        name='', sub_names=[], hub=None,
+        port_number=None, device_path='/dev/ot_module_tempdeck1')
     t = asyncio.get_event_loop().run_until_complete(
         utils.build(
             port='/dev/ot_module_tempdeck1',
+            usb_port=usb_port,
             which='tempdeck',
             simulating=True,
             interrupt_callback=lambda x: None,
@@ -50,9 +59,13 @@ def tempdeck():
 
 @pytest.fixture
 def thermocycler():
+    usb_port = USBPort(
+        name='', sub_names=[], hub=None,
+        port_number=None, device_path='/dev/ot_module_thermocycler1')
     t = asyncio.get_event_loop().run_until_complete(
         utils.build(
             port='/dev/ot_module_thermocycler1',
+            usb_port=usb_port,
             which='thermocycler',
             simulating=True,
             interrupt_callback=lambda x: None,
@@ -90,6 +103,7 @@ def test_get_modules_magdeck(api_client, hardware, magdeck):
                 'moduleModel': 'magneticModuleV1',
                 'name': 'magdeck',
                 'port': '/dev/ot_module_magdeck1',
+                'usbPort': {'hub': None, 'port': None},
                 'revision': 'mag_deck_v1.1',
                 'serial': 'dummySerialMD',
                 'status': 'engaged',
@@ -120,6 +134,7 @@ def test_get_modules_tempdeck(api_client, hardware, tempdeck):
                     'moduleModel': 'temperatureModuleV1',
                     'name': 'tempdeck',
                     'port': '/dev/ot_module_tempdeck1',
+                    'usbPort': {'hub': None, 'port': None},
                     'revision': model,
                     'serial': 'dummySerialTD',
                     'status': 'idle',
@@ -147,6 +162,7 @@ def test_get_modules_thermocycler(api_client, hardware, thermocycler):
             'moduleModel': 'thermocyclerModuleV1',
             'name': 'thermocycler',
             'port': '/dev/ot_module_thermocycler1',
+            'usbPort': {'hub': None, 'port': None},
             'revision': 'dummyModelTC',
             'serial': 'dummySerialTC',
             'status': 'idle',
