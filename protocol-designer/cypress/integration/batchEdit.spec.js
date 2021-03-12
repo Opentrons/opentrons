@@ -52,7 +52,7 @@ describe('Batch Edit Transform', () => {
 })
 
 function importProtocol() {
-  cy.fixture('../../fixtures/protocol/4/batchEdit.json').then(fileContent => {
+  cy.fixture('../../fixtures/protocol/5/batchEdit.json').then(fileContent => {
     cy.get('input[type=file]').upload({
       fileContent: JSON.stringify(fileContent),
       fileName: 'fixture.json',
