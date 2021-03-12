@@ -116,6 +116,7 @@
     "postcss-preset-env": "^6.7.0",
     "prettier": "2.2.1",
     "react": "16.8.6",
+    "react-docgen-typescript": "^1.21.0",
     "react-dom": "16.8.6",
     "react-snap": "^1.23.0",
     "react-styleguidist": "^11.0.5",

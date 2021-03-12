@@ -1,6 +1,7 @@
 'use strict'
 
 const { baseConfig } = require('@opentrons/webpack-config')
+const { withCustomConfig } = require('react-docgen-typescript')
 const path = require('path')
 
 module.exports = {
@@ -10,6 +11,7 @@ module.exports = {
   },
   usageMode: 'expand',
   exampleMode: 'expand',
+  propsParser: withCustomConfig('./tsconfig.json', []).parse,
   // TODO(mc, 2017-12-22): generate these sections automatically by walking src
   sections: [
     {
