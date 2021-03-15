@@ -1,7 +1,6 @@
 // @flow
 import {
   DEFAULT_CHANGE_TIP_OPTION,
-  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
@@ -23,7 +22,10 @@ export function getDefaultsForStepType(
         mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
         blowout_checkbox: false,
         blowout_location: FIXED_TRASH_ID,
-        mix_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`, // NOTE: mix uses dispense for both asp + disp, for now
+        // NOTE(IL, 2021-03-12): mix uses dispense for both asp + disp, unless its falsey.
+        // For now, unlike the other mmFromBottom fields, it's initializing to a constant instead of
+        // using null to represent default (because null becomes 1mm asp, 0.5mm dispense -- see #7470.)
+        mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         pipette: null,
         volume: undefined,
         wells: [],
@@ -34,6 +36,7 @@ export function getDefaultsForStepType(
         dispense_delay_checkbox: false,
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         mix_touchTip_checkbox: false,
+        mix_touchTip_mmFromBottom: null,
       }
     case 'moveLiquid':
       return {
@@ -51,7 +54,7 @@ export function getDefaultsForStepType(
         aspirate_mix_checkbox: false,
         aspirate_mix_times: null,
         aspirate_mix_volume: null,
-        aspirate_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_ASPIRATE}`,
+        aspirate_mmFromBottom: null,
         aspirate_touchTip_checkbox: false,
         aspirate_touchTip_mmFromBottom: null,
 
@@ -63,7 +66,7 @@ export function getDefaultsForStepType(
         dispense_mix_checkbox: false,
         dispense_mix_times: null,
         dispense_mix_volume: null,
-        dispense_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,
+        dispense_mmFromBottom: null,
         dispense_touchTip_checkbox: false,
         dispense_touchTip_mmFromBottom: null,
 
@@ -77,13 +80,13 @@ export function getDefaultsForStepType(
         aspirate_airGap_checkbox: false,
         aspirate_airGap_volume: null,
         aspirate_delay_checkbox: false,
-        aspirate_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_ASPIRATE}`,
+        aspirate_delay_mmFromBottom: null,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_airGap_checkbox: false,
         dispense_airGap_volume: null,
         dispense_delay_checkbox: false,
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
-        dispense_delay_mmFromBottom: `${DEFAULT_MM_FROM_BOTTOM_DISPENSE}`,
+        dispense_delay_mmFromBottom: null,
       }
     case 'pause':
       return {

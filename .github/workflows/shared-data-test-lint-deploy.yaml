@@ -30,7 +30,7 @@ jobs:
   python-lint:
     name: 'shared-data package python lint'
     timeout-minutes: 10
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
@@ -51,7 +51,7 @@ jobs:
     needs: [python-lint]
     strategy:
       matrix:
-        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+        os: ['windows-latest', 'ubuntu-18.04', 'macos-latest']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v2'
@@ -75,7 +75,7 @@ jobs:
   python-deploy:
     name: 'shared-data package deploy'
     needs: [python-test]
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     if: github.event_name == 'push'
     steps:
       - uses: 'actions/checkout@v2'

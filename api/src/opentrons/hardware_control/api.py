@@ -1720,9 +1720,9 @@ class API(HardwareAPILike):
     def _unregister_modules(self,
                             mods_at_ports: List[modules.ModuleAtPort]) -> None:
         removed_modules = []
-        for port, mod in mods_at_ports:  # type: ignore
+        for mod in mods_at_ports:
             for attached_mod in self._attached_modules:
-                if attached_mod.port == port:
+                if attached_mod.port == mod.port:
                     removed_modules.append(attached_mod)
         for removed_mod in removed_modules:
             try:
@@ -1747,18 +1747,20 @@ class API(HardwareAPILike):
 
         # destroy removed mods
         self._unregister_modules(removed_mods_at_ports)
+        self._backend._usb.sort_ports()
 
         # build new mods
-        for port, name in new_mods_at_ports:
+        for mod in new_mods_at_ports:
             new_instance = await self._backend.build_module(
-                    port=port,
-                    model=name,
+                    port=mod.port,
+                    usb_port=self._backend._usb.find_port(mod.port),
+                    model=mod.name,
                     interrupt_callback=self.pause_with_message,
                     loop=self.loop,
                     execution_manager=self._execution_manager)
             self._attached_modules.append(new_instance)
-            self._log.info(f"Module {name} discovered and attached"
-                           f" at port {port}, new_instance: {new_instance}")
+            self._log.info(f"Module {mod.name} discovered and attached"
+                           f" at port {mod.port}, new_instance: {new_instance}")
 
     def get_instrument_max_height(
             self,

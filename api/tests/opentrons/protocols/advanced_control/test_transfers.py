@@ -1,7 +1,7 @@
 """ Test the Transfer class and its functions """
 import pytest
 import opentrons.protocol_api as papi
-from opentrons.protocols.implementations.protocol_context import \
+from opentrons.protocols.context.protocol_api.protocol_context import \
     ProtocolContextImplementation
 from opentrons.types import Mount, TransferTipPolicy
 from opentrons.protocols.advanced_control import transfers as tx

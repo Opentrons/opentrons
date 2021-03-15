@@ -182,7 +182,7 @@ class DeckSlotName(int, enum.Enum):
     FIXED_TRASH = 12
 
     @classmethod
-    def from_string(cls, value: str) -> DeckSlotName:
+    def from_primitive(cls, value: DeckLocation) -> DeckSlotName:
         int_val = int(value)
         return cls(int_val)
 

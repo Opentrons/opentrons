@@ -31,7 +31,7 @@ type OP = {|
 
 type SP = {|
   mmFromBottom: number | null,
-  wellDepthMm: number | null,
+  wellDepthMm: number,
 |}
 
 type Props = {| ...OP, ...SP |}
@@ -48,7 +48,16 @@ function TipPositionInput(props: Props) {
     setModalOpen(false)
   }
 
-  const { disabled, name, mmFromBottom, wellDepthMm, updateValue } = props
+  const {
+    disabled,
+    name,
+    mmFromBottom,
+    tooltipContent,
+    wellDepthMm,
+    updateValue,
+    isIndeterminate,
+  } = props
+
   const isTouchTipField = getIsTouchTipField(name)
   const isDelayPositionField = getIsDelayPositionField(name)
   let value = ''
@@ -64,17 +73,17 @@ function TipPositionInput(props: Props) {
 
   return (
     <>
-      <Tooltip {...tooltipProps}>
-        {i18n.t('tooltip.step_fields.defaults.tipPosition')}
-      </Tooltip>
-      <TipPositionModal
-        name={name}
-        closeModal={handleClose}
-        wellDepthMm={wellDepthMm}
-        mmFromBottom={mmFromBottom}
-        isOpen={isModalOpen}
-        updateValue={updateValue}
-      />
+      <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
+      {isModalOpen && (
+        <TipPositionModal
+          name={name}
+          closeModal={handleClose}
+          wellDepthMm={wellDepthMm}
+          mmFromBottom={mmFromBottom}
+          updateValue={updateValue}
+          isIndeterminate={isIndeterminate}
+        />
+      )}
       <Wrapper
         targetProps={targetProps}
         disabled={disabled}
@@ -86,7 +95,7 @@ function TipPositionInput(props: Props) {
           readOnly
           onClick={handleOpen}
           value={String(value)}
-          isIndeterminate={props.isIndeterminate}
+          isIndeterminate={isIndeterminate}
           units={i18n.t('application.units.millimeter')}
         />
       </Wrapper>
@@ -120,7 +129,7 @@ const Wrapper = (props: WrapperProps) =>
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const { labwareId, value } = ownProps
 
-  let wellDepthMm = null
+  let wellDepthMm = 0
   if (labwareId != null) {
     const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]
       .def

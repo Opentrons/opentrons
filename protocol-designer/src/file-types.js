@@ -19,10 +19,10 @@ export type PDMetadata = {
   orderedStepIds: $PropertyType<StepformRoot, 'orderedStepIds'>,
 
   defaultValues: {
-    aspirate_mmFromBottom: number,
-    dispense_mmFromBottom: number,
-    touchTip_mmFromTop: number,
-    blowout_mmFromTop: number,
+    aspirate_mmFromBottom: number | null,
+    dispense_mmFromBottom: number | null,
+    touchTip_mmFromTop: number | null,
+    blowout_mmFromTop: number | null,
   },
 }
 

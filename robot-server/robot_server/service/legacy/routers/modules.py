@@ -10,7 +10,7 @@ from robot_server.service.dependencies import get_hardware
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.errors import V1HandlerError
 from robot_server.service.legacy.models.modules import Module, ModuleSerial,\
-    Modules, SerialCommandResponse, SerialCommand
+    Modules, SerialCommandResponse, SerialCommand, PhysicalPort
 
 router = APIRouter()
 
@@ -28,6 +28,8 @@ async def get_modules(hardware: ThreadManager = Depends(get_hardware))\
             model=mod.device_info.get('model'),  # TODO legacy, remove
             moduleModel=mod.model(),
             port=mod.port,  # /dev/ttyS0
+            usbPort=PhysicalPort(
+                hub=mod.usb_port.hub, port=mod.usb_port.port_number),
             serial=mod.device_info.get('serial'),
             revision=mod.device_info.get('model'),
             fwVersion=mod.device_info.get('version'),

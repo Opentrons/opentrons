@@ -30,5 +30,5 @@
   },
   "exit_batch_edit": "exit batch edit",
   "n_steps_selected": "{{n}} steps selected",
-  "no_batch_edit_shared_settings": "No advanced settings shared between selected steps"
+  "no_batch_edit_shared_settings": "No editable settings shared between selected steps"
 }

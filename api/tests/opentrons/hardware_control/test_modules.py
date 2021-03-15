@@ -10,6 +10,7 @@ from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import ModuleAtPort
 from opentrons.hardware_control.modules.types import BundledFirmware
 from opentrons.hardware_control.modules import tempdeck, magdeck
+from opentrons.drivers.rpi_drivers.types import USBPort
 
 
 async def test_get_modules_simulating():
@@ -74,9 +75,13 @@ async def test_module_update_integration(monkeypatch, loop):
     }
 
     # test temperature module update with avrdude bootloader
+    usb_port = USBPort(
+        name='', sub_names=[], hub=None,
+        port_number=None, device_path='/dev/ot_module_sim_tempdeck0')
 
     tempdeck = await modules.build(
             port='/dev/ot_module_sim_tempdeck0',
+            usb_port=usb_port,
             which='tempdeck',
             simulating=True,
             interrupt_callback=lambda x: None,
@@ -109,6 +114,7 @@ async def test_module_update_integration(monkeypatch, loop):
 
     magdeck = await modules.build(
             port='/dev/ot_module_sim_magdeck0',
+            usb_port=usb_port,
             which='magdeck',
             simulating=True,
             interrupt_callback=lambda x: None,
@@ -126,6 +132,7 @@ async def test_module_update_integration(monkeypatch, loop):
 
     thermocycler = await modules.build(
             port='/dev/ot_module_sim_thermocycler0',
+            usb_port=usb_port,
             which='thermocycler',
             simulating=True,
             interrupt_callback=lambda x: None,
