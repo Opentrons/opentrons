@@ -1768,6 +1768,7 @@ describe('presavedStepForm reducer', () => {
     'DELETE_MULTIPLE_STEPS',
     'SAVE_STEP_FORM',
     'SELECT_STEP',
+    'SELECT_MULTIPLE_STEPS',
   ]
   clearingActions.forEach(actionType => {
     it(`should clear upon ${actionType}`, () => {
