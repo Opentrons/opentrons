@@ -9,6 +9,8 @@
 
   border-radius: 0;
   padding: 0;
+  max-height: 80vh;
+  overflow-y: scroll;
 }
 
 .modal_contents p,
