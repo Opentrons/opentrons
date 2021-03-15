@@ -40,27 +40,27 @@ class InstrumentContextSimulation(AbstractInstrument):
     def set_default_speed(self, speed: float) -> None:
         self._default_speed = speed
 
-    def aspirate(self, volume: float, rate: float = 1.0) -> None:
+    def aspirate(self, volume: float, rate: float) -> None:
         self._pipette_dict['current_volume'] += volume
 
-    def dispense(self, volume: float, rate: float = 1.0) -> None:
+    def dispense(self, volume: float, rate: float) -> None:
         self._pipette_dict['current_volume'] -= volume
 
     def blow_out(self) -> None:
         self._pipette_dict['current_volume'] = 0
         self._pipette_dict['ready_to_aspirate'] = False
 
-    def touch_tip(self, location: WellImplementation, radius: float = 1.0,
-                  v_offset: float = -1.0, speed: float = 60.0) -> None:
+    def touch_tip(self, location: WellImplementation, radius: float,
+                  v_offset: float, speed: float) -> None:
         pass
 
     def pick_up_tip(self, well: WellImplementation, tip_length: float,
-                    presses: typing.Optional[int] = None,
-                    increment: typing.Optional[float] = None) -> None:
+                    presses: typing.Optional[int],
+                    increment: typing.Optional[float]) -> None:
         self._pipette_dict['has_tip'] = True
         self._pipette_dict['current_volume'] = 0
 
-    def drop_tip(self, home_after: bool = True) -> None:
+    def drop_tip(self, home_after: bool) -> None:
         self._pipette_dict['has_tip'] = False
 
     def home(self) -> None:
@@ -72,9 +72,9 @@ class InstrumentContextSimulation(AbstractInstrument):
     def delay(self) -> None:
         pass
 
-    def move_to(self, location: types.Location, force_direct: bool = False,
-                minimum_z_height: typing.Optional[float] = None,
-                speed: typing.Optional[float] = None) -> None:
+    def move_to(self, location: types.Location, force_direct: bool,
+                minimum_z_height: typing.Optional[float],
+                speed: typing.Optional[float]) -> None:
         """Simulation of only the motion planning portion of move_to."""
         last_location = self._protocol_interface.get_last_location()
         if last_location:

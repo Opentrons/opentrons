@@ -25,13 +25,13 @@ class AbstractInstrument(ABC):
     @abstractmethod
     def aspirate(self,
                  volume: float,
-                 rate: float = 1.0) -> None:
+                 rate: float) -> None:
         ...
 
     @abstractmethod
     def dispense(self,
                  volume: float,
-                 rate: float = 1.0) -> None:
+                 rate: float) -> None:
         ...
 
     @abstractmethod
@@ -41,22 +41,21 @@ class AbstractInstrument(ABC):
     @abstractmethod
     def touch_tip(self,
                   location: WellImplementation,
-                  radius: float = 1.0,
-                  v_offset: float = -1.0,
-                  speed: float = 60.0) -> None:
+                  radius: float,
+                  v_offset: float,
+                  speed: float) -> None:
         ...
 
     @abstractmethod
     def pick_up_tip(self,
                     well: WellImplementation,
                     tip_length: float,
-                    presses: typing.Optional[int] = None,
-                    increment: typing.Optional[float] = None) -> None:
+                    presses: typing.Optional[int],
+                    increment: typing.Optional[float]) -> None:
         ...
 
     @abstractmethod
-    def drop_tip(self,
-                 home_after: bool = True) -> None:
+    def drop_tip(self, home_after: bool) -> None:
         ...
 
     @abstractmethod
@@ -74,9 +73,9 @@ class AbstractInstrument(ABC):
     @abstractmethod
     def move_to(self,
                 location: types.Location,
-                force_direct: bool = False,
-                minimum_z_height: typing.Optional[float] = None,
-                speed: typing.Optional[float] = None) -> None:
+                force_direct: bool,
+                minimum_z_height: typing.Optional[float],
+                speed: typing.Optional[float]) -> None:
         ...
 
     @abstractmethod

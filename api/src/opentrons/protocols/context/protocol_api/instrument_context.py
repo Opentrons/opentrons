@@ -57,17 +57,14 @@ class InstrumentContextImplementation(AbstractInstrument):
         """Sets the speed at which the robot's gantry moves."""
         self._default_speed = speed
 
-    def aspirate(self,
-                 volume: float,
-                 rate: float = 1.0) -> None:
+    def aspirate(self, volume: float, rate: float) -> None:
         """Aspirate a given volume of liquid from the specified location, using
         this pipette."""
         self._protocol_interface.get_hardware().hardware.aspirate(
             self._mount, volume, rate
         )
 
-    def dispense(self, volume: float,
-                 rate: float = 1.0) -> None:
+    def dispense(self, volume: float, rate: float) -> None:
         """Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location."""
         self._protocol_interface.get_hardware().hardware.dispense(
@@ -80,9 +77,9 @@ class InstrumentContextImplementation(AbstractInstrument):
 
     def touch_tip(self,
                   location: WellImplementation,
-                  radius: float = 1.0,
-                  v_offset: float = -1.0,
-                  speed: float = 60.0) -> None:
+                  radius: float,
+                  v_offset: float,
+                  speed: float) -> None:
         """
         Touch the pipette tip to the sides of a well, with the intent of
         removing left-over droplets
@@ -111,8 +108,8 @@ class InstrumentContextImplementation(AbstractInstrument):
     def pick_up_tip(self,
                     well: WellImplementation,
                     tip_length: float,
-                    presses: Optional[int] = None,
-                    increment: Optional[float] = None) -> None:
+                    presses: Optional[int],
+                    increment: Optional[float]) -> None:
         """Pick up a tip for the pipette to run liquid-handling commands."""
         hw = self._protocol_interface.get_hardware().hardware
         geometry = well.get_geometry()
@@ -129,8 +126,7 @@ class InstrumentContextImplementation(AbstractInstrument):
         hw.set_working_volume(
             self._mount, geometry.max_volume)
 
-    def drop_tip(self,
-                 home_after: bool = True) -> None:
+    def drop_tip(self, home_after: bool) -> None:
         """Drop the tip."""
         self._protocol_interface.get_hardware().hardware.drop_tip(
             self._mount,
@@ -150,13 +146,13 @@ class InstrumentContextImplementation(AbstractInstrument):
 
     def delay(self) -> None:
         """Delay protocol execution."""
-        self._protocol_interface.delay()
+        self._protocol_interface.delay(seconds=0, msg=None)
 
     def move_to(self,
                 location: types.Location,
-                force_direct: bool = False,
-                minimum_z_height: Optional[float] = None,
-                speed: Optional[float] = None) -> None:
+                force_direct: bool,
+                minimum_z_height: Optional[float],
+                speed: Optional[float]) -> None:
         """Move the instrument."""
         last_location = self._protocol_interface.get_last_location()
         if last_location:
@@ -266,10 +262,11 @@ class InstrumentContextImplementation(AbstractInstrument):
     def get_speed(self) -> PlungerSpeeds:
         return self._speeds
 
-    def set_flow_rate(self,
-                      aspirate: Optional[float] = None,
-                      dispense: Optional[float] = None,
-                      blow_out: Optional[float] = None) -> None:
+    def set_flow_rate(
+            self,
+            aspirate: Optional[float] = None,
+            dispense: Optional[float] = None,
+            blow_out: Optional[float] = None) -> None:
         """Set the flow rates."""
         self._protocol_interface.get_hardware().hardware.set_flow_rate(
             mount=self._mount,

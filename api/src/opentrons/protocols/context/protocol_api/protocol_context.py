@@ -145,7 +145,7 @@ class ProtocolContextImplementation(AbstractProtocol):
             self,
             labware_def: LabwareDefinition,
             location: types.DeckLocation,
-            label: Optional[str] = None) -> AbstractLabware:
+            label: Optional[str]) -> AbstractLabware:
         """Load a labware from definition"""
         parent = self.get_deck().position_for(location)
         labware_obj = load_from_definition(labware_def, parent, label)
@@ -156,9 +156,9 @@ class ProtocolContextImplementation(AbstractProtocol):
             self,
             load_name: str,
             location: types.DeckLocation,
-            label: Optional[str] = None,
-            namespace: Optional[str] = None,
-            version: Optional[int] = None) -> AbstractLabware:
+            label: Optional[str],
+            namespace: Optional[str],
+            version: Optional[int]) -> AbstractLabware:
         """Load a labware."""
         labware_def = get_labware_definition(
             load_name, namespace, version,
@@ -170,8 +170,8 @@ class ProtocolContextImplementation(AbstractProtocol):
     def load_module(
             self,
             module_name: str,
-            location: Optional[types.DeckLocation] = None,
-            configuration: Optional[str] = None) -> Optional[LoadModuleResult]:
+            location: Optional[types.DeckLocation],
+            configuration: Optional[str]) -> Optional[LoadModuleResult]:
         """Load a module."""
         resolved_model = module_geometry.resolve_module_model(module_name)
         resolved_type = module_geometry.resolve_module_type(resolved_model)
@@ -232,7 +232,7 @@ class ProtocolContextImplementation(AbstractProtocol):
     def load_instrument(self,
                         instrument_name: str,
                         mount: types.Mount,
-                        replace: bool = False) -> AbstractInstrument:
+                        replace: bool) -> AbstractInstrument:
         """Load an instrument."""
         instr = self._instruments[mount]
         if instr and not replace:
@@ -262,7 +262,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         """Get a mapping of mount to instrument."""
         return self._instruments
 
-    def pause(self, msg: Optional[str] = None) -> None:
+    def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
         self._hw_manager.hardware.pause()
 
@@ -274,7 +274,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         """Add comment to run log."""
         pass
 
-    def delay(self, seconds=0, msg: Optional[str] = None) -> None:
+    def delay(self, seconds: float, msg: Optional[str]) -> None:
         """Delay execution for x seconds."""
         self._hw_manager.hardware.delay(seconds)
 
