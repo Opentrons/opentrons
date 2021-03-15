@@ -110,15 +110,12 @@ export const announcements: Array<Announcement> = [
 
         <p>
           To enter multi-select mode, simply hold <strong>SHIFT</strong> or{' '}
-          <strong>CTRL/CMND</strong> and click on a step. You can select a range
-          of steps by <strong>SHIFT-clicking</strong>, or select/deselect
-          individual steps with <strong>CTRL/CMND</strong>, or by clicking on
-          the checkbox.
+          <strong>CTRL/CMND</strong> and click on a step.
         </p>
 
         <p>
-          From here, you can duplicate or delete selected steps, expand for more
-          information, or edit advanced settings for Transfer steps!
+          From here, you can access the control bar at the top of the protocol
+          timeline, or edit advanced settings for Transfer steps!
         </p>
       </>
     ),
