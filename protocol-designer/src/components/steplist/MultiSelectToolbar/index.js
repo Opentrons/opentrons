@@ -89,10 +89,12 @@ export const Accordion = (props: AccordionProps): React.Node => {
   return (
     <Box
       height={props.expanded ? SIZE_2 : 0}
-      transition="height 1s"
+      transition="all 0.5s"
       position={POSITION_STICKY}
       top="0"
       overflow="hidden"
+      borderBottom={props.expanded ? BORDER_SOLID_MEDIUM : 'none'}
+      opacity={props.expanded ? 1 : 0}
     >
       {props.children}
     </Box>
@@ -225,7 +227,6 @@ export const MultiSelectToolbar = (props: Props): React.Node => {
           alignItems={ALIGN_CENTER}
           height={SIZE_2}
           padding={`0 ${SPACING_2}`}
-          borderBottom={BORDER_SOLID_MEDIUM}
           backgroundColor={C_NEAR_WHITE}
           zIndex="100"
         >
