@@ -1,41 +1,70 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { i18n } from '../localization'
 import {
-  Flex,
-  Text,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  C_DARK_GRAY,
+  RobotWorkSpace,
+  RobotCoordsText,
+  FONT_SIZE_BODY_1,
+  FONT_WEIGHT_BOLD,
+  TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
+import { i18n } from '../localization'
 import {
   getBatchEditSelectedStepTypes,
   getHoveredItem,
 } from '../ui/steps/selectors'
 import { DeckSetup } from './DeckSetup'
-import type { StepType } from '../form-types'
 
-// TODO IMMEDIATELY: move to some util file?
-const hasSharedBatchEditSettings: (
-  stepType: Array<StepType>
-) => boolean = stepTypes => {
-  // NOTE(IL, 2021-02-19): if in the future we support batch edit of multiple step types,
-  // we would add more cases here
-  return stepTypes.length === 1
-}
+// TODO IMMEDIATELY cleanup
+import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import styles from './DeckSetup/DeckSetup.css'
 
-const NoBatchEditSharedSettings = (): React.Node => {
+// TODO IMMEDIATELY: DRY this out, copied from DeckSetup.js
+const NullDeckState = (): React.Node => {
+  const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
+
+  // TODO IMMEDIATELY reuse don't copy!!!
+  const VIEWBOX_MIN_X = -64
+  const VIEWBOX_MIN_Y = -10
+  const VIEWBOX_WIDTH = 520
+  const VIEWBOX_HEIGHT = 414
+  const DECK_LAYER_BLOCKLIST = [
+    'calibrationMarkings',
+    'fixedBase',
+    'doorStops',
+    'metalFrame',
+    'removalHandle',
+    'removableDeckOutline',
+    'screwHoles',
+  ]
+
   return (
-    <Flex
-      justifyContent={JUSTIFY_CENTER}
-      alignItems={ALIGN_CENTER}
-      height="75%"
-    >
-      <Text id="Text_noSharedSettings" color={C_DARK_GRAY}>
-        {i18n.t('application.no_batch_edit_shared_settings')}
-      </Text>
-    </Flex>
+    <div className={styles.deck_row}>
+      <div className={styles.deck_wrapper}>
+        <RobotWorkSpace
+          deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+          deckDef={deckDef}
+          viewBox={`${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
+          className={styles.robot_workspace}
+        >
+          {() => (
+            <>
+              {/* TODO(IL, 2021-03-15): use styled-components for RobotCoordsText instead of style prop */}
+              <RobotCoordsText
+                x={5}
+                y={375}
+                style={{ textTransform: TEXT_TRANSFORM_UPPERCASE }}
+                fill="#cccccc"
+                fontWeight={FONT_WEIGHT_BOLD}
+                fontSize={FONT_SIZE_BODY_1}
+              >
+                {i18n.t('deck.inactive_deck')}
+              </RobotCoordsText>
+            </>
+          )}
+        </RobotWorkSpace>
+      </div>
+    </div>
   )
 }
 
@@ -46,9 +75,7 @@ export const DeckSetupManager = (): React.Node => {
   if (batchEditSelectedStepTypes.length === 0 || hoveredItem !== null) {
     // not batch edit mode, or batch edit while item is hovered: show the deck
     return <DeckSetup />
-  } else if (hasSharedBatchEditSettings(batchEditSelectedStepTypes)) {
-    return null
   } else {
-    return <NoBatchEditSharedSettings />
+    return <NullDeckState />
   }
 }

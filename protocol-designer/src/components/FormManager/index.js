@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { Box, POSITION_STICKY, C_SELECTED_DARK } from '@opentrons/components'
 import { StepEditForm } from '../StepEditForm'
 import { BatchEditForm } from '../BatchEditForm'
 import { StepSelectionBanner } from '../StepSelectionBanner'
@@ -11,10 +12,10 @@ export const FormManager = (): React.Node => {
 
   if (isMultiSelectMode) {
     return (
-      <>
+      <Box position={POSITION_STICKY} border={`2px solid ${C_SELECTED_DARK}`}>
         <StepSelectionBanner />
         <BatchEditForm />
-      </>
+      </Box>
     )
   }
   return <StepEditForm />

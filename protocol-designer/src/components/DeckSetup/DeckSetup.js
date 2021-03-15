@@ -157,7 +157,7 @@ export const getSwapBlocked = (args: {
 
 // TODO IL 2020-01-12: to support dynamic labware/module movement during a protocol,
 // don't use initialDeckSetup here. Use some version of timelineFrameForActiveItem
-const DeckSetupContents = (props: ContentsProps) => {
+export const DeckSetupContents = (props: ContentsProps): React.Node => {
   const {
     initialDeckSetup,
     deckSlotsById,

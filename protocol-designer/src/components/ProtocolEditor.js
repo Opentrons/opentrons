@@ -3,8 +3,6 @@ import * as React from 'react'
 import cx from 'classnames'
 import { DragDropContext } from 'react-dnd'
 import MouseBackEnd from 'react-dnd-mouse-backend'
-import { useSelector } from 'react-redux'
-import { Box, DISPLAY_FLEX, DIRECTION_COLUMN } from '@opentrons/components'
 import { ComputingSpinner } from '../components/ComputingSpinner'
 import { ConnectedNav } from '../containers/ConnectedNav'
 import { ConnectedSidebar } from '../containers/ConnectedSidebar'
@@ -19,25 +17,10 @@ import { FileUploadMessageModal } from './modals/FileUploadMessageModal'
 import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal'
 import { GateModal } from './modals/GateModal'
 import { AnnouncementModal } from './modals/AnnouncementModal'
-import { getIsMultiSelectMode } from '../ui/steps'
 import styles from './ProtocolEditor.css'
 
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
-
-const DeckFormWrapper = (props: {| children: React.Node |}): React.Node => {
-  // Make deck shrink to fit in view only in multiselect mode
-  const isMultiSelectMode = useSelector(getIsMultiSelectMode)
-  const shrinkStyles = isMultiSelectMode
-    ? {
-        display: DISPLAY_FLEX,
-        flexDirection: DIRECTION_COLUMN,
-        height: '100%',
-      }
-    : null
-
-  return <Box {...shrinkStyles}>{props.children}</Box>
-}
 
 function ProtocolEditorComponent() {
   return (
@@ -63,11 +46,9 @@ function ProtocolEditorComponent() {
             <NewFileModal showProtocolFields />
             <FileUploadMessageModal />
 
-            <DeckFormWrapper>
-              <MainPageModalPortalRoot />
-              <LabwareUploadMessageModal />
-              <ConnectedMainPanel />
-            </DeckFormWrapper>
+            <MainPageModalPortalRoot />
+            <LabwareUploadMessageModal />
+            <ConnectedMainPanel />
           </div>
         </div>
       </div>

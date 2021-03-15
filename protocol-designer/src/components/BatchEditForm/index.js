@@ -23,6 +23,7 @@ import {
   getLabwareFieldForPositioningField,
 } from '../StepEditForm/utils'
 import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
+import { NoBatchEditSharedSettings } from './NoBatchEditSharedSettings'
 import {
   getBatchEditSelectedStepTypes,
   getMultiSelectDisabledFields,
@@ -285,7 +286,7 @@ export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
         }}
       />
     )
+  } else {
+    return <NoBatchEditSharedSettings />
   }
-
-  return null
 }
