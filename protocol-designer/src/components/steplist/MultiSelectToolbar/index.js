@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   useConditionalConfirm,
@@ -76,7 +76,19 @@ export const ClickableIcon = (props: ClickableIconProps): React.Node => {
   )
 }
 
-export const MultiSelectToolbar = (): React.Node => {
+const AccordionBox = styled.div(props => ({
+  height: `${props.expanded ? SIZE_2 : 0}`,
+  transition: 'height 1s',
+  position: `${POSITION_STICKY}`,
+  top: 0,
+  overflow: 'hidden',
+}))
+
+type Props = {
+  isMultiSelectMode: boolean,
+}
+
+export const MultiSelectToolbar = (props: Props): React.Node => {
   const dispatch = useDispatch()
   const [isExpandState, setIsExpandState] = React.useState<boolean>(true)
   const stepCount = useSelector(stepFormSelectors.getOrderedStepIds).length
@@ -197,21 +209,21 @@ export const MultiSelectToolbar = (): React.Node => {
           onCancelClick={cancelDelete}
         />
       )}
-      <Flex
-        alignItems={ALIGN_CENTER}
-        height={SIZE_2}
-        padding={`0 ${SPACING_2}`}
-        borderBottom={BORDER_SOLID_MEDIUM}
-        position={POSITION_STICKY}
-        top="0"
-        backgroundColor={C_NEAR_WHITE}
-        zIndex="100"
-      >
-        <ClickableIcon id="ClickableIcon_select" {...selectProps} />
-        <ClickableIcon id="ClickableIcon_delete" {...deleteProps} />
-        <ClickableIcon id="ClickableIcon_duplicate" {...copyProps} />
-        <ClickableIcon id="ClickableIcon_expand" {...expandProps} />
-      </Flex>
+      <AccordionBox expanded={props.isMultiSelectMode}>
+        <Flex
+          alignItems={ALIGN_CENTER}
+          height={SIZE_2}
+          padding={`0 ${SPACING_2}`}
+          borderBottom={BORDER_SOLID_MEDIUM}
+          backgroundColor={C_NEAR_WHITE}
+          zIndex="100"
+        >
+          <ClickableIcon id="ClickableIcon_select" {...selectProps} />
+          <ClickableIcon id="ClickableIcon_delete" {...deleteProps} />
+          <ClickableIcon id="ClickableIcon_duplicate" {...copyProps} />
+          <ClickableIcon id="ClickableIcon_expand" {...expandProps} />
+        </Flex>
+      </AccordionBox>
     </>
   )
 }

@@ -21,9 +21,13 @@ describe('StepList', () => {
     const wrapper = render(props)
     expect(wrapper.find(MultiSelectToolbar).exists()).toBe(true)
   })
-  it('should render NOT a MultiSelectToolbar when NOT in multi select mode', () => {
+  // TODO IMMEDIATELY (ka): This component is always present now due to css transitions,
+  // figure out a way to test collapsed style if animation is desired
+  it('should pass isMultiSelectMode prop to MultiSelectToolbar', () => {
     props.isMultiSelectMode = false
     const wrapper = render(props)
-    expect(wrapper.find(MultiSelectToolbar).exists()).toBe(false)
+    expect(wrapper.find(MultiSelectToolbar).prop('isMultiSelectMode')).toBe(
+      false
+    )
   })
 })

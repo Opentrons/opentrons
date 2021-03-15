@@ -53,7 +53,7 @@ describe('MultiSelectToolbar', () => {
   const render = () =>
     mount(
       <Provider store={store}>
-        <MultiSelectToolbar />
+        <MultiSelectToolbar isMultiSelectMode={true} />
       </Provider>
     )
 
@@ -119,7 +119,7 @@ describe('MultiSelectToolbar', () => {
     afterEach(() => {
       jest.restoreAllMocks()
     })
-    it('should expand/collapse the selected steps ', () => {
+    it('should expand/collapse the selected steps', () => {
       when(getMultiSelectItemIdsMock)
         .calledWith(expect.anything())
         .mockReturnValue(['id_1', 'id_2'])

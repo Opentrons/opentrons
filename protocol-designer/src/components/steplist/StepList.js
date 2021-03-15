@@ -51,7 +51,10 @@ export class StepList extends React.Component<Props> {
     return (
       <React.Fragment>
         <SidePanel title="Protocol Timeline">
-          {this.props.isMultiSelectMode && <MultiSelectToolbar />}
+          <MultiSelectToolbar
+            isMultiSelectMode={Boolean(this.props.isMultiSelectMode)}
+          />
+
           <StartingDeckStateTerminalItem />
           <DraggableStepItems
             orderedStepIds={this.props.orderedStepIds.slice()}
