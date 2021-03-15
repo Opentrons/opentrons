@@ -66,6 +66,7 @@
         "label": "delay"
       },
       "tip_position": { "label": "tip position" },
+      "flow_rate": { "label": "Flow Rate" },
       "volume": { "label": "volume per well" },
       "well_order": {
         "label": "Well order",
