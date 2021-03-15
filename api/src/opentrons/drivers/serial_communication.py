@@ -44,7 +44,7 @@ def _parse_serial_response(response, ack):
         return None
 
 
-def clear_buffer(serial_connection):
+def _clear_buffer(serial_connection):
     serial_connection.reset_input_buffer()
 
 
@@ -88,7 +88,7 @@ def write_and_return(
         command, ack, serial_connection,
         timeout=DEFAULT_WRITE_TIMEOUT, tag=None):
     """Write a command and return the response"""
-    clear_buffer(serial_connection)
+    _clear_buffer(serial_connection)
     with serial_with_temp_timeout(
             serial_connection, timeout) as device_connection:
         response = _write_to_device_and_return(
