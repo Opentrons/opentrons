@@ -24,13 +24,6 @@ def get_ports_by_name(device_name):
     return device_ports
 
 
-def get_port_by_VID(vid):
-    """Returns first serial device with a given VID"""
-    for d in list_ports.comports():
-        if d.vid == vid:
-            return d[0]
-
-
 @contextlib.contextmanager
 def serial_with_temp_timeout(serial_connection, timeout):
     """Implements a temporary timeout for a serial connection"""
@@ -89,21 +82,6 @@ def _connect(port_name, baudrate):
     )
     log.debug(ser)
     return ser
-
-
-def _attempt_command_recovery(command, ack, serial_conn, tag=None):
-    """Recovery after following a failed write_and_return() attempt"""
-    if not tag:
-        tag = serial_conn.port
-    with serial_with_temp_timeout(serial_conn, RECOVERY_TIMEOUT) as device:
-        response = _write_to_device_and_return(command, ack, device, tag=tag)
-    if response is None:
-        log.debug(f"{tag}: No valid response during _attempt_command_recovery")
-        raise RuntimeError(
-            "Recovery attempted - no valid serial response "
-            "for command: {} in {} seconds".format(
-                command.encode(), RECOVERY_TIMEOUT))
-    return response
 
 
 def write_and_return(
