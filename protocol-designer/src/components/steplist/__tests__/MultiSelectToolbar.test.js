@@ -12,7 +12,11 @@ import * as stepFormSelectors from '../../../step-forms/selectors'
 import * as stepSelectors from '../../../ui/steps/selectors'
 import * as stepListActions from '../../../steplist/actions/actions'
 
-import { MultiSelectToolbar, ClickableIcon } from '../MultiSelectToolbar'
+import {
+  MultiSelectToolbar,
+  ClickableIcon,
+  Accordion,
+} from '../MultiSelectToolbar'
 import {
   ConfirmDeleteModal,
   CLOSE_BATCH_EDIT_FORM,
@@ -31,8 +35,12 @@ const getBatchEditFormHasUnsavedChangesMock =
 
 describe('MultiSelectToolbar', () => {
   let store
+  let props
   beforeEach(() => {
     store = mockStore()
+    props = {
+      isMultiSelectMode: true,
+    }
     when(getOrderedStepIdsMock)
       .calledWith(expect.anything())
       .mockReturnValue([])
@@ -53,9 +61,23 @@ describe('MultiSelectToolbar', () => {
   const render = () =>
     mount(
       <Provider store={store}>
-        <MultiSelectToolbar isMultiSelectMode={true} />
+        <MultiSelectToolbar {...props} />
       </Provider>
     )
+
+  it('should collapse the toolbar when isMultiSelectMode is FALSE', () => {
+    props.isMultiSelectMode = false
+    const wrapper = render()
+    const accordion = wrapper.find(Accordion)
+    expect(accordion.prop('expanded')).toBe(false)
+  })
+
+  it('should expand the toolbar when isMultiSelectMode is TRUE', () => {
+    props.isMultiSelectMode = true
+    const wrapper = render()
+    const accordion = wrapper.find(Accordion)
+    expect(accordion.prop('expanded')).toBe(true)
+  })
 
   it('should render the delete, copy, and exapand icons with the correct tooltips', () => {
     const wrapper = render()

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import styled, { css } from 'styled-components'
+import { css } from 'styled-components'
 
 import {
   useConditionalConfirm,
@@ -76,16 +76,27 @@ export const ClickableIcon = (props: ClickableIconProps): React.Node => {
   )
 }
 
-const AccordionBox = styled.div(props => ({
-  height: `${props.expanded ? SIZE_2 : 0}`,
-  transition: 'height 1s',
-  position: `${POSITION_STICKY}`,
-  top: 0,
-  overflow: 'hidden',
-}))
-
-type Props = {
+type Props = {|
   isMultiSelectMode: boolean,
+|}
+
+type AccordionProps = {|
+  expanded: boolean,
+  children: React.Node,
+|}
+
+export const Accordion = (props: AccordionProps): React.Node => {
+  return (
+    <Box
+      height={props.expanded ? SIZE_2 : 0}
+      transition="height 1s"
+      position={POSITION_STICKY}
+      top="0"
+      overflow="hidden"
+    >
+      {props.children}
+    </Box>
+  )
 }
 
 export const MultiSelectToolbar = (props: Props): React.Node => {
@@ -209,7 +220,7 @@ export const MultiSelectToolbar = (props: Props): React.Node => {
           onCancelClick={cancelDelete}
         />
       )}
-      <AccordionBox expanded={props.isMultiSelectMode}>
+      <Accordion expanded={props.isMultiSelectMode}>
         <Flex
           alignItems={ALIGN_CENTER}
           height={SIZE_2}
@@ -223,7 +234,7 @@ export const MultiSelectToolbar = (props: Props): React.Node => {
           <ClickableIcon id="ClickableIcon_duplicate" {...copyProps} />
           <ClickableIcon id="ClickableIcon_expand" {...expandProps} />
         </Flex>
-      </AccordionBox>
+      </Accordion>
     </>
   )
 }
