@@ -1,9 +1,9 @@
 from typing import List
 
 import pytest
-from opentrons.protocols.geometry.tip_tracker import TipTracker
+from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocols.context.well import WellImplementation
-from opentrons.protocols.geometry.well_grid import WellGrid
+from opentrons.protocols.api_support.well_grid import WellGrid
 
 
 @pytest.fixture()

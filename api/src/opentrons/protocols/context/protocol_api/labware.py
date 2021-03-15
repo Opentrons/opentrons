@@ -5,9 +5,9 @@ from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.context.labware import \
     AbstractLabware
-from opentrons.protocols.geometry.tip_tracker import TipTracker
+from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocols.context.well import WellImplementation
-from opentrons.protocols.geometry.well_grid import WellGrid
+from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Point, Location
 from opentrons_shared_data.labware.dev_types import LabwareParameters, \
     LabwareDefinition
