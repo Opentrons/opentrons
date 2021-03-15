@@ -7,9 +7,10 @@ from opentrons.protocol_engine import (
     Dimensions,
 )
 
+from opentrons.protocols.context.engine.labware_context import \
+    LabwareContext
 from opentrons.types import Point, DeckSlotName, Location
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.protocols.implementations.engine import LabwareContext
 
 
 @pytest.fixture

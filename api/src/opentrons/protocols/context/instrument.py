@@ -1,3 +1,5 @@
+"""The interface that implements InstrumentContext."""
+
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
@@ -7,10 +9,10 @@ from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, \
     FlowRates
-from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.context.well import WellImplementation
 
 
-class InstrumentContextInterface(ABC):
+class AbstractInstrument(ABC):
 
     @abstractmethod
     def get_default_speed(self) -> float:

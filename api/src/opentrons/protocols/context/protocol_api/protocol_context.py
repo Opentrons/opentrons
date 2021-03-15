@@ -11,14 +11,14 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.implementations.instrument_context import \
+from opentrons.protocols.context.protocol_api.instrument_context import \
     InstrumentContextImplementation
-from opentrons.protocols.implementations.interfaces.instrument_context import \
-    InstrumentContextInterface
-from opentrons.protocols.implementations.interfaces.labware import \
-    LabwareInterface
-from opentrons.protocols.implementations.interfaces.protocol_context import \
-    ProtocolContextInterface, InstrumentDict, LoadModuleResult
+from opentrons.protocols.context.instrument import \
+    AbstractInstrument
+from opentrons.protocols.context.labware import \
+    AbstractLabware
+from opentrons.protocols.context.protocol import \
+    AbstractProtocol, InstrumentDict, LoadModuleResult
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds, HardwareToManage, HardwareManager)
 from opentrons.protocols.labware import load_from_definition, \
@@ -33,7 +33,7 @@ SHORT_TRASH_DECK = 'ot2_short_trash'
 STANDARD_DECK = 'ot2_standard'
 
 
-class ProtocolContextImplementation(ProtocolContextInterface):
+class ProtocolContextImplementation(AbstractProtocol):
 
     def __init__(self,
                  api_version: Optional[APIVersion] = None,
@@ -145,7 +145,7 @@ class ProtocolContextImplementation(ProtocolContextInterface):
             self,
             labware_def: LabwareDefinition,
             location: types.DeckLocation,
-            label: Optional[str] = None) -> LabwareInterface:
+            label: Optional[str] = None) -> AbstractLabware:
         """Load a labware from definition"""
         parent = self.get_deck().position_for(location)
         labware_obj = load_from_definition(labware_def, parent, label)
@@ -158,7 +158,7 @@ class ProtocolContextImplementation(ProtocolContextInterface):
             location: types.DeckLocation,
             label: Optional[str] = None,
             namespace: Optional[str] = None,
-            version: Optional[int] = None) -> LabwareInterface:
+            version: Optional[int] = None) -> AbstractLabware:
         """Load a labware."""
         labware_def = get_labware_definition(
             load_name, namespace, version,
@@ -232,7 +232,7 @@ class ProtocolContextImplementation(ProtocolContextInterface):
     def load_instrument(self,
                         instrument_name: str,
                         mount: types.Mount,
-                        replace: bool = False) -> InstrumentContextInterface:
+                        replace: bool = False) -> AbstractInstrument:
         """Load an instrument."""
         instr = self._instruments[mount]
         if instr and not replace:

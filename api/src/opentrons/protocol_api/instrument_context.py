@@ -18,8 +18,8 @@ from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.util import (
     FlowRates, PlungerSpeeds, Clearances, clamp_value, requires_version)
-from opentrons.protocols.implementations.interfaces.instrument_context import \
-    InstrumentContextInterface
+from opentrons.protocols.context.instrument import \
+    AbstractInstrument
 from opentrons.protocols.api_support.types import APIVersion
 from .labware import (
     Labware, OutOfTipsError, Well, next_available_tip)
@@ -56,7 +56,7 @@ class InstrumentContext(CommandPublisher):
     """
 
     def __init__(self,
-                 implementation: InstrumentContextInterface,
+                 implementation: AbstractInstrument,
                  ctx: ProtocolContext,
                  broker: Broker,
                  log_parent: logging.Logger,

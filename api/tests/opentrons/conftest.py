@@ -1,10 +1,10 @@
 # Uncomment to enable logging during tests
 # import logging
 # from logging.config import dictConfig
-from opentrons.config import robot_configs
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocols.implementations.labware import LabwareImplementation
-from opentrons.protocols.implementations.protocol_context import \
+from opentrons.protocols.context.protocol_api.labware import\
+    LabwareImplementation
+from opentrons.protocols.context.protocol_api.protocol_context import \
     ProtocolContextImplementation
 
 try:
@@ -73,13 +73,6 @@ def log_by_axis(log, axis):
 
 
 @pytest.fixture
-def mock_config():
-    """Robot config setup and teardown"""
-    yield robot_configs.load()
-    robot_configs.clear()
-
-
-@pytest.fixture
 def ot_config_tempdir(tmpdir):
     os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
     config.reload()
@@ -93,14 +86,6 @@ def ot_config_tempdir(tmpdir):
 @pytest.fixture
 def labware_offset_tempdir(ot_config_tempdir):
     yield config.get_opentrons_path('labware_calibration_offsets_dir_v2')
-
-
-@pytest.mark.apiv1
-@pytest.fixture(scope='function')
-def offsets_tempdir(tmpdir, template_db):
-    config.CONFIG['labware_calibration_offsets_dir_v2'] = str(tmpdir)
-    config.reload()
-    yield tmpdir
 
 
 @pytest.fixture(autouse=True)
@@ -230,20 +215,6 @@ async def hardware(request, loop, virtual_smoothie_env):
         config.robot_configs.clear()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
-
-
-@pytest.mark.skipif(aionotify is None,
-                    reason="requires inotify (linux only)")
-@pytest.fixture
-def sync_hardware(request, loop, virtual_smoothie_env, is_robot):
-    thread_manager = ThreadManager(API.build_hardware_controller)
-    hardware = thread_manager.sync
-    try:
-        yield hardware
-    finally:
-        hardware.reset()
-        hardware.set_config(config.robot_configs.load())
-        thread_manager.clean_up()
 
 
 @pytest.fixture

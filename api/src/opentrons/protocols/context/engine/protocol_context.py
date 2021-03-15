@@ -10,18 +10,18 @@ from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocols.api_support.util import HardwareManager, AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.implementations.interfaces.instrument_context import \
-    InstrumentContextInterface
-from opentrons.protocols.implementations.interfaces.labware import \
-    LabwareInterface
-from opentrons.protocols.implementations.interfaces.protocol_context import \
-    ProtocolContextInterface, InstrumentDict, LoadModuleResult
+from opentrons.protocols.context.instrument import \
+    AbstractInstrument
+from opentrons.protocols.context.labware import \
+    AbstractLabware
+from opentrons.protocols.context.protocol import \
+    AbstractProtocol, InstrumentDict, LoadModuleResult
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from .labware_context import LabwareContext
 
 
-class ProtocolEngineContext(ProtocolContextInterface):
+class ProtocolEngineContext(AbstractProtocol):
     """ProtocolContextInterface that interacts with Protocol Engine"""
 
     _client: ProtocolEngineClient
@@ -63,7 +63,7 @@ class ProtocolEngineContext(ProtocolContextInterface):
     def load_labware_from_definition(self, labware_def: LabwareDefinition,
                                      location: types.DeckLocation,
                                      label: Optional[
-                                         str] = None) -> LabwareInterface:
+                                         str] = None) -> AbstractLabware:
         raise NotImplementedError()
 
     def load_labware(
@@ -73,7 +73,7 @@ class ProtocolEngineContext(ProtocolContextInterface):
         label: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
-    ) -> LabwareInterface:
+    ) -> AbstractLabware:
         # TODO(mc, 2021-03-04): handle optional namespace and version
         result = self._client.load_labware(
             load_name=load_name,
@@ -96,7 +96,7 @@ class ProtocolEngineContext(ProtocolContextInterface):
         raise NotImplementedError()
 
     def load_instrument(self, instrument_name: str, mount: types.Mount,
-                        replace: bool = False) -> InstrumentContextInterface:
+                        replace: bool = False) -> AbstractInstrument:
         raise NotImplementedError()
 
     def get_loaded_instruments(self) -> InstrumentDict:

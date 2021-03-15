@@ -4,7 +4,7 @@ import pytest
 from opentrons.protocol_api.labware import Well
 from opentrons.protocols.api_support.instrument import determine_drop_target
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.context.well import WellImplementation
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Point
 

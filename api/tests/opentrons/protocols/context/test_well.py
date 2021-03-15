@@ -1,5 +1,5 @@
 import pytest
-from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.context.well import WellImplementation
 
 
 @pytest.mark.parametrize(argnames=["name", "row", "col"],

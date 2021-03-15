@@ -12,8 +12,8 @@ import jsonschema  # type: ignore
 
 from opentrons.protocols.api_support.util import ModifiedList
 from opentrons.calibration_storage import helpers, modify
-from opentrons.protocols.implementations.interfaces.labware import \
-    LabwareInterface
+from opentrons.protocols.context.labware import \
+    AbstractLabware
 from opentrons.types import Point
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocols.geometry.deck_item import DeckItem
@@ -160,7 +160,7 @@ def delete_all_custom_labware() -> None:
 
 
 def save_calibration(
-        labware: LabwareInterface,
+        labware: AbstractLabware,
         delta: Point) -> None:
     """Save a calibration"""
     index_info = IndexFileInformation.from_labware(labware)
@@ -265,7 +265,7 @@ def _get_standard_labware_definition(
     return labware_def
 
 
-def _get_parent_identifier(labware: LabwareInterface) -> str:
+def _get_parent_identifier(labware: AbstractLabware) -> str:
     """
     Helper function to return whether a labware is on top of a
     module or not.
@@ -281,17 +281,17 @@ def _get_parent_identifier(labware: LabwareInterface) -> str:
         return ''  # treat all slots as same
 
 
-def get_labware_hash(labware: LabwareInterface) -> str:
+def get_labware_hash(labware: AbstractLabware) -> str:
     return helpers.hash_labware_def(labware.get_definition())
 
 
-def get_labware_hash_with_parent(labware: LabwareInterface) -> str:
+def get_labware_hash_with_parent(labware: AbstractLabware) -> str:
     return helpers.hash_labware_def(
         labware.get_definition()
     ) + _get_parent_identifier(labware)
 
 
-def _get_labware_path(labware: LabwareInterface) -> str:
+def _get_labware_path(labware: AbstractLabware) -> str:
     return f'{get_labware_hash_with_parent(labware)}.json'
 
 
@@ -302,7 +302,7 @@ class IndexFileInformation:
     path: str
 
     @classmethod
-    def from_labware(cls, labware: LabwareInterface) -> 'IndexFileInformation':
+    def from_labware(cls, labware: AbstractLabware) -> 'IndexFileInformation':
         return IndexFileInformation(
             definition=labware.get_definition(),
             path=_get_labware_path(labware),

@@ -9,18 +9,18 @@ from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import Clearances, build_edges, \
     FlowRates, PlungerSpeeds
 from opentrons.protocols.geometry import planning
-from opentrons.protocols.implementations.interfaces.instrument_context import \
-    InstrumentContextInterface
-from opentrons.protocols.implementations.interfaces.protocol_context import \
-    ProtocolContextInterface
-from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.context.instrument import \
+    AbstractInstrument
+from opentrons.protocols.context.protocol import \
+    AbstractProtocol
+from opentrons.protocols.context.well import WellImplementation
 
 
-class InstrumentContextImplementation(InstrumentContextInterface):
+class InstrumentContextImplementation(AbstractInstrument):
     """Implementation of the InstrumentContext interface."""
 
     _api_version: APIVersion
-    _protocol_interface: ProtocolContextInterface
+    _protocol_interface: AbstractProtocol
     _mount: types.Mount
     _instrument_name: str
     _default_speed: float
@@ -29,7 +29,7 @@ class InstrumentContextImplementation(InstrumentContextInterface):
     _speeds: PlungerSpeeds
 
     def __init__(self,
-                 protocol_interface: ProtocolContextInterface,
+                 protocol_interface: AbstractProtocol,
                  mount: types.Mount,
                  instrument_name: str,
                  default_speed: float,

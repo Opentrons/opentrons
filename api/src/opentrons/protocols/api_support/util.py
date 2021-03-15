@@ -13,12 +13,11 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import (types, SynchronousAdapter, API,
                                         HardwareAPILike, ThreadManager)
 if TYPE_CHECKING:
-    from opentrons.protocols.implementations.interfaces.instrument_context import \
-        InstrumentContextInterface
+    from opentrons.protocols.context.instrument import \
+        AbstractInstrument
     from opentrons.protocol_api.labware import Well, Labware
     from opentrons.protocols.geometry.deck import Deck
     from opentrons.hardware_control.dev_types import HasLoop  # noqa: F501
-
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -119,7 +118,7 @@ def labware_column_shift(
 class FlowRates:
     """ Utility class for rich setters/getters for flow rates """
     def __init__(self,
-                 instr: InstrumentContextInterface) -> None:
+                 instr: AbstractInstrument) -> None:
         self._instr = instr
 
     def set_defaults(self, api_level: APIVersion):
@@ -184,7 +183,7 @@ def _find_value_for_api_version(for_version: APIVersion,
 class PlungerSpeeds:
     """ Utility class for rich setters/getters for speeds """
     def __init__(self,
-                 instr: InstrumentContextInterface) -> None:
+                 instr: AbstractInstrument) -> None:
         self._instr = instr
 
     @property
@@ -403,7 +402,3 @@ class ModifiedList(list):
             if name == item.replace("-", "_").lower():
                 return True
         return False
-
-
-def convert_door_state_to_bool(door_state: types.DoorState):
-    return True if door_state == types.DoorState.CLOSED else False

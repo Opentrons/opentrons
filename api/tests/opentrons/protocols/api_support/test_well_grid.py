@@ -1,8 +1,8 @@
 from typing import List
 
 import pytest
-from opentrons.protocols.implementations.well_grid import WellGrid
-from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.api_support.well_grid import WellGrid
+from opentrons.protocols.context.well import WellImplementation
 
 NONE: list = []
 ONE_VAL = ["A1"]

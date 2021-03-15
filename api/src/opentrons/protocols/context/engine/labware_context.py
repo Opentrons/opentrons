@@ -5,15 +5,15 @@ from typing import Any, Dict, List
 from opentrons.protocol_engine import StateView
 from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.implementations.tip_tracker import TipTracker
-from opentrons.protocols.implementations.well import WellImplementation
-from opentrons.protocols.implementations.well_grid import WellGrid
+from opentrons.protocols.api_support.tip_tracker import TipTracker
+from opentrons.protocols.context.well import WellImplementation
+from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Point, Location
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition, LabwareParameters
 )
-from opentrons.protocols.implementations.interfaces.labware\
-    import LabwareInterface
+from opentrons.protocols.context.labware \
+    import AbstractLabware
 
 
 class LabwareGeometry(AbstractLabwareGeometry):
@@ -48,7 +48,7 @@ class LabwareGeometry(AbstractLabwareGeometry):
         return self._state.labware.get_dimensions(labware_id=self._id).z
 
 
-class LabwareContext(LabwareInterface):
+class LabwareContext(AbstractLabware):
     """LabwareInterface implementation that works with the Protocol Engine."""
 
     def __init__(self, labware_id: str, state_view: StateView) -> None:

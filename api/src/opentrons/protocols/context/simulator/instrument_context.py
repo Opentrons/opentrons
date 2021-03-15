@@ -6,18 +6,18 @@ from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds, \
     Clearances
 from opentrons.protocols.geometry import planning
-from opentrons.protocols.implementations.interfaces.instrument_context import \
-    InstrumentContextInterface
-from opentrons.protocols.implementations.interfaces.protocol_context import \
-    ProtocolContextInterface
-from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.context.instrument import \
+    AbstractInstrument
+from opentrons.protocols.context.protocol import \
+    AbstractProtocol
+from opentrons.protocols.context.well import WellImplementation
 
 
-class InstrumentContextSimulation(InstrumentContextInterface):
+class InstrumentContextSimulation(AbstractInstrument):
     """A simulation of an instrument context."""
 
     def __init__(self,
-                 protocol_interface: ProtocolContextInterface,
+                 protocol_interface: AbstractProtocol,
                  pipette_dict: PipetteDict,
                  mount: types.Mount,
                  instrument_name: str,

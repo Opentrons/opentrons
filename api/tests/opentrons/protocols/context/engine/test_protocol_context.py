@@ -8,7 +8,7 @@ from opentrons.hardware_control import API as HardwareAPI
 
 from opentrons.protocol_engine.clients import SyncClient
 from opentrons.protocol_engine.commands import LoadLabwareResult
-from opentrons.protocols.implementations.engine import (
+from opentrons.protocols.context.engine import (
     ProtocolEngineContext,
     LabwareContext,
 )
