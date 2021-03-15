@@ -79,7 +79,6 @@ export function ModuleControls(props: Props): React.Node {
           <Box>
             {mod.type === THERMOCYCLER_MODULE_TYPE && (
               <TemperatureData
-                status={mod.status}
                 current={mod.data.lidTemp}
                 target={mod.data.lidTarget}
                 title="lid"

@@ -26,15 +26,15 @@ import styles from './styles.css'
 
 type TemperatureDataProps = {|
   title: string | null,
-  status: TemperatureStatus | ThermocyclerStatus,
   current: number | null,
   target: number | null,
+  status?: TemperatureStatus | ThermocyclerStatus | null,
 |}
 
 export const TemperatureData = ({
   title,
   status,
-  current,
+  current, 
   target,
 }: TemperatureDataProps): React.Node => (
   <Flex flexDirection={DIRECTION_COLUMN} fontSize={FONT_SIZE_BODY_1}>
@@ -47,23 +47,25 @@ export const TemperatureData = ({
         {title}
       </Text>
     )}
-    <Flex marginBottom={SPACING_1}>
-      <Icon
-        name="circle"
-        width="10px"
-        marginRight="0.375rem"
-        color={
-          status.includes('heat')
-            ? COLOR_ERROR
-            : status.includes('cool')
-            ? C_BLUE
-            : status.includes('idle')
-            ? COLOR_WARNING_LIGHT
-            : COLOR_SUCCESS
-        }
-      />
-      <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>{status}</Text>
-    </Flex>
+    {status && (
+      <Flex marginBottom={SPACING_1}>
+        <Icon
+          name="circle"
+          width="10px"
+          marginRight="0.375rem"
+          color={
+            status.includes('heat')
+              ? COLOR_ERROR
+              : status.includes('cool')
+              ? C_BLUE
+              : status.includes('idle')
+              ? COLOR_WARNING_LIGHT
+              : COLOR_SUCCESS
+          }
+        />
+        <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>{status}</Text>
+      </Flex>
+    )}
     <Text marginBottom={SPACING_1}>{`Current: ${
       current != null ? current + ' °C' : 'n/a'
     }`}</Text>

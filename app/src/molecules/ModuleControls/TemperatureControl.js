@@ -67,14 +67,15 @@ export const TemperatureControl = ({
   )
   const note = `enter a whole-number between ${tempRanges.min}°C and ${tempRanges.max}°C`
 
-  const hasTarget =
-    module.status !== 'idle' ||
-    (module.type === THERMOCYCLER_MODULE_TYPE && module.data.lidTarget != null)
+  const hasTarget = module.status !== 'idle'
+  const hasSecondaryTarget =
+    module.type === THERMOCYCLER_MODULE_TYPE && module.data.lidTarget != null
 
   const handleClick = () => {
     if (hasTarget) {
       sendModuleCommand(module.serial, 'deactivate')
     } else {
+      enableSecondaryTemp(false)
       setIsModalOpen(true)
     }
   }
@@ -93,15 +94,21 @@ export const TemperatureControl = ({
       sendModuleCommand(module.serial, 'set_temperature', [
         Number(primaryTempValue),
       ])
-      setPrimaryTempValue(null)
     }
     if (secondaryTempValue != null) {
       sendModuleCommand(module.serial, 'set_lid_temperature', [
         Number(secondaryTempValue),
       ])
-      setSecondaryTempValue(null)
     }
+    setPrimaryTempValue(null)
+    setSecondaryTempValue(null)
     setIsModalOpen(false)
+  }
+
+  const handleCancel = () => {
+    setIsModalOpen(false)
+    setPrimaryTempValue(null)
+    setSecondaryTempValue(null)
   }
 
   return (
@@ -114,11 +121,11 @@ export const TemperatureControl = ({
             buttons={[
               {
                 children: 'Cancel',
-                onClick: () => setIsModalOpen(false),
+                onClick: handleCancel,
               },
               {
                 children: 'Set temp',
-                disabled: primaryTempValue == null,
+                disabled: isSecondaryTempEnabled ? secondaryTempValue == null : primaryTempValue == null,
                 onClick: handleSubmitTemp,
               },
             ]}
@@ -130,7 +137,7 @@ export const TemperatureControl = ({
               <Flex width="6rem" marginTop={SPACING_1}>
                 <InputField
                   units="°C"
-                  value={primaryTempValue}
+                  value={isSecondaryTempEnabled ? secondaryTempValue : primaryTempValue}
                   onChange={e =>
                     isSecondaryTempEnabled
                       ? setSecondaryTempValue(e.target.value)
@@ -154,11 +161,11 @@ export const TemperatureControl = ({
           <SecondaryBtn
             width="11rem"
             marginBottom={SPACING_3}
-            onClick={handleClick}
+            onClick={handleSecondaryClick}
             disabled={disabledReason != null}
             {...targetProps}
           >
-            {hasTarget === true ? 'Deactivate Lid' : 'Set Lid Temp'}
+            {hasSecondaryTarget === true ? 'Deactivate Lid' : 'Set Lid Temp'}
           </SecondaryBtn>
           {disabledReason && (
             <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>
