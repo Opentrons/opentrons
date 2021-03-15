@@ -61,7 +61,6 @@ export const Btn: BtnComponent = styled.button
  *
  * @component
  */
-// $FlowFixMe(mc, 2020-06-19): styled type definition expects PrimitiveComponent<typeof Btn>, but it doesn't work in usage
 export const PrimaryBtn: BtnComponent = styled(Btn)`
   ${BUTTON_VARIANT_STYLE}
   background-color: ${Styles.C_DARK_GRAY};
@@ -92,7 +91,6 @@ export const PrimaryBtn: BtnComponent = styled(Btn)`
  *
  * @component
  */
-// $FlowFixMe(mc, 2020-06-19): styled type definition expects PrimitiveComponent<typeof Btn>, but it doesn't work in usage
 export const SecondaryBtn: BtnComponent = styled(Btn)`
   ${BUTTON_VARIANT_STYLE}
   background-color: ${Styles.C_WHITE};
@@ -122,7 +120,6 @@ export const SecondaryBtn: BtnComponent = styled(Btn)`
  *
  * @component
  */
-// $FlowFixMe(mc, 2020-06-19): styled type definition expects PrimitiveComponent<typeof Btn>, but it doesn't work in usage
 export const LightSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
   background-color: ${Styles.C_TRANSPARENT};
   color: ${Styles.C_WHITE};
@@ -150,7 +147,6 @@ export const LightSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
  *
  * @component
  */
-// $FlowFixMe(mc, 2020-06-19): styled type definition expects PrimitiveComponent<typeof Btn>, but it doesn't work in usage
 export const TertiaryBtn: BtnComponent = styled(LightSecondaryBtn)`
   border-width: 0;
 `
