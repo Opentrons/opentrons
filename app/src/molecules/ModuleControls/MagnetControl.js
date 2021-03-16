@@ -26,6 +26,7 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 import type { MagneticModule, ModuleCommand } from '../../redux/modules/types'
+import type { ModuleModel } from '@opentrons/shared-data'
 
 type ModelContents = {|
   version: string,

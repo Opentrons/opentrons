@@ -15,7 +15,6 @@ import type { AttachedModule } from '../../../../redux/modules/types'
 
 type Props = {|
   module: AttachedModule,
-  ...props,
 |}
 
 export function ModuleInfo(props: Props): React.Node {

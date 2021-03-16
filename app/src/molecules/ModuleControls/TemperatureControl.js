@@ -19,14 +19,15 @@ import {
   FONT_SIZE_BODY_1,
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
+import { THERMOCYCLER_MODULE_TYPE } from '../../redux/modules'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import type {
   ThermocyclerModule,
   TemperatureModule,
   ModuleCommand,
 } from '../../redux/modules/types'
-import { THERMOCYCLER_MODULE_TYPE } from '../../redux/modules'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import type { ModuleModel } from '@opentrons/shared-data'
 
 const TC_BLOCK = 'Block'
 

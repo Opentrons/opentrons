@@ -143,13 +143,11 @@ export const ThermocyclerCard = ({
       </div>
       <div className={styles.card_row}>
         <TemperatureData
-          className={styles.temp_data_item}
           title={BLOCK_TEMP_ABBREV}
           current={currentTemp}
           target={targetTemp}
         />
         <TemperatureData
-          className={styles.temp_data_item}
           title={LID_TEMP_ABBREV}
           current={lidTemp}
           target={lidTarget}
