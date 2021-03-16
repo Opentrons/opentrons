@@ -209,14 +209,12 @@ export const BatchEditMoveLiquid = (
         <Box textAlign="right" maxWidth="55rem">
           <Box
             {...cancelButtonTargetProps}
-            className={buttonStyles.form_button}
+            width="11rem"
+            marginRight="0.625rem"
             display="inline-block"
           >
-            <PrimaryButton
-              className={buttonStyles.form_button}
-              onClick={handleCancel}
-            >
-              {i18n.t('button.cancel')}
+            <PrimaryButton onClick={handleCancel}>
+              {i18n.t('button.discard_changes')}
             </PrimaryButton>
             <Tooltip {...cancelButtonTooltipProps}>
               {i18n.t('tooltip.cancel_batch_edit')}

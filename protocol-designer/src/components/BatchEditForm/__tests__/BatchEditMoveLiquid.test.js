@@ -71,7 +71,7 @@ describe('BatchEditMoveLiquid', () => {
   })
 
   describe('cancel button', () => {
-    const cancelButtonText = 'button.cancel'
+    const cancelButtonText = 'button.discard_changes'
 
     it('should have tooltip', () => {
       const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
