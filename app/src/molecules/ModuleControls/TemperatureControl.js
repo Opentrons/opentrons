@@ -3,11 +3,8 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import {
-  OutlineButton,
   AlertModal,
   InputField,
-  CheckboxField,
-  HoverTooltip,
   SecondaryBtn,
   useHoverTooltip,
   Tooltip,
@@ -22,7 +19,6 @@ import {
   FONT_SIZE_BODY_1,
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
-import styles from './styles.css'
 
 import type {
   ThermocyclerModule,
@@ -125,7 +121,9 @@ export const TemperatureControl = ({
               },
               {
                 children: 'Set temp',
-                disabled: isSecondaryTempEnabled ? secondaryTempValue == null : primaryTempValue == null,
+                disabled: isSecondaryTempEnabled
+                  ? secondaryTempValue == null
+                  : primaryTempValue == null,
                 onClick: handleSubmitTemp,
               },
             ]}
@@ -137,7 +135,11 @@ export const TemperatureControl = ({
               <Flex width="6rem" marginTop={SPACING_1}>
                 <InputField
                   units="°C"
-                  value={isSecondaryTempEnabled ? secondaryTempValue : primaryTempValue}
+                  value={
+                    isSecondaryTempEnabled
+                      ? secondaryTempValue
+                      : primaryTempValue
+                  }
                   onChange={e =>
                     isSecondaryTempEnabled
                       ? setSecondaryTempValue(e.target.value)

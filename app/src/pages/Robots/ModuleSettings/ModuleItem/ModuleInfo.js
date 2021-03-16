@@ -7,15 +7,10 @@ import {
   Text,
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
-  SIZE_3,
   SPACING_1,
   SPACING_2,
   SPACING_3,
 } from '@opentrons/components'
-import { ModuleImage } from './ModuleImage'
-
-import { getModuleDisplayName } from '@opentrons/shared-data'
-
 import type { AttachedModule } from '../../../../redux/modules/types'
 
 type Props = {|
@@ -24,8 +19,7 @@ type Props = {|
 |}
 
 export function ModuleInfo(props: Props): React.Node {
-  const { model, serial, status, fwVersion } = props.module
-  const displayName = getModuleDisplayName(model)
+  const { serial, fwVersion } = props.module
 
   return (
     <Flex width="45%">

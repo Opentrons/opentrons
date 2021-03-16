@@ -3,8 +3,6 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import { Flex, ALIGN_CENTER, SIZE_4 } from '@opentrons/components'
-import styles from './styles.css'
-
 import type { ModuleModel } from '@opentrons/shared-data'
 
 type Props = {|

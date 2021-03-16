@@ -7,16 +7,8 @@ import {
   Flex,
   Icon,
   Text,
-  SIZE_1,
-  JUSTIFY_FLEX_START,
-  ALIGN_FLEX_START,
   TEXT_TRANSFORM_CAPITALIZE,
-  SPACING_3,
-  SPACING_2,
   ALIGN_CENTER,
-  JUSTIFY_END,
-  JUSTIFY_CENTER,
-  JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   COLOR_WARNING_LIGHT,
   FONT_SIZE_BODY_1,
@@ -30,13 +22,11 @@ import {
   useSendModuleCommand,
 } from '../../redux/modules'
 import { TemperatureData } from './TemperatureData'
-import styles from './styles.css'
 
 import type {
   MagneticModule,
   TemperatureModule,
   ThermocyclerModule,
-  MagneticStatus,
 } from '../../redux/modules/types'
 
 type Props = {|

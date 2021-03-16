@@ -22,8 +22,6 @@ import type {
   ThermocyclerStatus,
 } from '../../redux/modules/types'
 
-import styles from './styles.css'
-
 type TemperatureDataProps = {|
   title: string | null,
   current: number | null,
@@ -34,7 +32,7 @@ type TemperatureDataProps = {|
 export const TemperatureData = ({
   title,
   status,
-  current, 
+  current,
   target,
 }: TemperatureDataProps): React.Node => (
   <Flex flexDirection={DIRECTION_COLUMN} fontSize={FONT_SIZE_BODY_1}>

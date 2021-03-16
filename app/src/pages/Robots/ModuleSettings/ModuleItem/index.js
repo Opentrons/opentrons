@@ -16,10 +16,6 @@ import { ModuleUpdate } from './ModuleUpdate'
 import { ModuleControls } from '../../../../molecules/ModuleControls'
 import type { AttachedModule } from '../../../../redux/modules/types'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import {
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-} from '../../../../redux/modules'
 import styles from './styles.css'
 
 type Props = {|

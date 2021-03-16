@@ -25,7 +25,6 @@ import { updateModule } from '../../../../redux/modules'
 import type { UpdateModuleAction } from '../../../../redux/modules/types'
 import type { State, Dispatch } from '../../../../redux/types'
 import type { RequestState } from '../../../../redux/robot-api/types'
-import styles from './styles.css'
 
 const FW_IS_UP_TO_DATE = 'Module Firmware is up to date'
 const OK_TEXT = 'Ok'

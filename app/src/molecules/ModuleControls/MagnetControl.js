@@ -19,12 +19,13 @@ import {
   useHoverTooltip,
   Tooltip,
 } from '@opentrons/components'
-import { sendModuleCommand } from '../../redux/modules'
 import { Portal } from '../../App/portal'
 
-import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
+import {
+  MAGNETIC_MODULE_V1,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 import type { MagneticModule, ModuleCommand } from '../../redux/modules/types'
-import { getModuleDisplayName } from '@opentrons/shared-data'
 
 type ModelContents = {|
   version: string,
