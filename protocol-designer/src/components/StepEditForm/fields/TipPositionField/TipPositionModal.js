@@ -162,7 +162,11 @@ export const TipPositionModal = (props: Props): React.Node => {
         ? newValueRaw.replace(/[^.0-9]/, '')
         : String(newValueRaw)
 
-    setValue(Number(newValue) > 0 ? newValue : '0')
+    if (newValue === '.') {
+      setValue('0.')
+    } else {
+      setValue(Number(newValue) >= 0 ? newValue : '0')
+    }
   }
 
   const handleInputFieldChange = (
