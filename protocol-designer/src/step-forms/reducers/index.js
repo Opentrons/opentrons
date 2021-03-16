@@ -1336,6 +1336,7 @@ type PresavedStepFormAction =
   | SaveStepFormAction
   | SelectTerminalItemAction
   | SelectStepAction
+  | SelectMultipleStepsAction
 export const presavedStepForm = (
   state: PresavedStepFormState = null,
   action: PresavedStepFormAction
@@ -1350,6 +1351,7 @@ export const presavedStepForm = (
     case 'DELETE_MULTIPLE_STEPS':
     case 'SAVE_STEP_FORM':
     case 'SELECT_STEP':
+    case 'SELECT_MULTIPLE_STEPS':
       return null
     default:
       return state
