@@ -9,6 +9,7 @@ import type {
   Pipette,
   Labware,
   NextTiprackPipetteInfo,
+  SessionModule,
 } from '../../redux/robot'
 
 import { getConnectedRobot } from '../../redux/discovery'
@@ -17,6 +18,7 @@ import { selectors as robotSelectors } from '../../redux/robot'
 import { getUncalibratedTipracksByMount } from '../../redux/pipettes/selectors'
 import { Pipettes as CalibratePipettes } from './Pipettes'
 import { Labware as CalibrateLabware } from './Labware'
+import { Modules as ConnectModules } from './Modules'
 
 type OP = {||}
 
@@ -26,6 +28,7 @@ type SP = {|
   nextLabware: Labware | void,
   isTipsProbed: boolean,
   nextPipetteTiprack: NextTiprackPipetteInfo | null,
+  modules: Array<SessionModule>,
 |}
 
 type Props = {| ...OP, ...SP, dispatch: Dispatch |}
@@ -50,6 +53,7 @@ function CalibrateComponent(props: Props) {
         component={CalibratePipettes}
       />
       <Route path={`${path}/labware/:slot`} component={CalibrateLabware} />
+      <Route path={`${path}/modules`} component={ConnectModules} />
     </Switch>
   )
 }
@@ -66,16 +70,20 @@ function mapStateToProps(state: State): SP {
           getUncalibratedTipracksByMount(state, robotName)
         )
       : null,
+    modules: robotSelectors.getModules(state),
   }
 }
 
 function getRedirectUrl(props: Props): string {
-  const { labware, nextLabware, nextPipetteTiprack } = props
+  const { labware, nextLabware, nextPipetteTiprack, modules } = props
 
   if (nextPipetteTiprack && nextPipetteTiprack.tiprack.definitionHash) {
     return `/calibrate/pipettes/${nextPipetteTiprack.mount}/${nextPipetteTiprack.tiprack.definitionHash}`
   }
 
+  if (modules) {
+    return `calibrate/modules`
+  }
   if (nextLabware) return `/calibrate/labware/${nextLabware.slot}`
   if (labware[0]) return `/calibrate/labware/${labware[0].slot}`
 

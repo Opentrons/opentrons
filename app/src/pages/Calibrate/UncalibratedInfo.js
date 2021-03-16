@@ -29,6 +29,7 @@ const RECALIBRATE_TIP_LENGTH = 'Re-Calibrate tip length'
 const CONTINUE_TO_NEXT_TIP_TYPE = 'Continue to next tip type'
 const CONTINUE_TO_NEXT_PIPETTE = 'Continue to next pipette'
 const CONTINUE_TO_LABWARE_CALIBRATION = 'Continue to labware calibration'
+const CONTINUE_TO_MODULE_SETUP = 'Continue to module setup'
 
 const BTN_WIDTH = '23rem'
 
@@ -74,6 +75,8 @@ export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
   )
 
   const otherMount: Mount | null = PIPETTE_MOUNTS.find(m => m !== mount) || null
+  const modules = useSelector(robotSelectors.getModules)
+  const allModulesReviewed = useSelector(robotSelectors.getModulesReviewed)
   const nextUnconfirmedLabware = useSelector(
     robotSelectors.getUnconfirmedLabware
   )
@@ -92,9 +95,14 @@ export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
       defHash = uncalibratedTipracksByMount[otherMount][0].definitionHash || ''
       continueButtonOnClick = `/calibrate/pipettes/${otherMount}/${defHash}`
     } else {
-      continueText = CONTINUE_TO_LABWARE_CALIBRATION
-      const slot = nextUnconfirmedLabware?.[0].slot || nextLabware?.[0].slot
-      continueButtonOnClick = `/calibrate/labware/${slot}`
+      if (modules && modules.length > 0 && !allModulesReviewed) {
+        continueText = CONTINUE_TO_MODULE_SETUP
+        continueButtonOnClick = `/calibrate/modules`
+      } else {
+        continueText = CONTINUE_TO_LABWARE_CALIBRATION
+        const slot = nextUnconfirmedLabware?.[0]?.slot || nextLabware?.[0]?.slot
+        continueButtonOnClick = `/calibrate/labware/${slot}`
+      }
     }
   }
 

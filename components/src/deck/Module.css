@@ -3,23 +3,22 @@
 .module {
   color: var(--c-black);
   background-color: var(--c-black);
+  opacity: 0.9;
   border-radius: 6px;
   width: 100%;
   height: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .module_review_icon {
   color: var(--c-white);
-  margin: 0 1rem 0 0;
-  height: 16px;
-  width: 16px;
+  margin: 0 0.25rem 0 0;
+  height: 12px;
+  width: 12px;
 }
 
 .module_review_icon_missing {
-  color: var(--c-orange);
+  color: var(--c-red);
 }
 
 .module_review_icon_present {
@@ -28,11 +27,12 @@
 
 .module_review_text {
   fill: currentColor;
-  font-size: 0.5rem;
+  font-size: 0.55rem;
   font-weight: var(--fw-semibold);
   color: var(--c-white);
-  text-transform: uppercase;
+  text-transform: capitalize;
   white-space: pre;
+  margin-bottom: 0.75rem;
 }
 
 .module_name_overlay {
@@ -40,11 +40,26 @@
   opacity: 0.7;
 }
 
-.module_text_wrapper {
+.module_connect_info_wrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  font-size: 0.5rem;
+  color: var(--c-white);
+}
+
+.module_port_text {
+  fill: currentColor;
+  color: var(--c-med-gray);
+  font-size: 0.75rem;
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+}
+
+.module_wrapper {
+  display: flex;
   justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  margin: 0.5rem;
 }
 
 .module_name_text {
