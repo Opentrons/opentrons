@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   Box,
   PrimaryButton,
+  OutlineButton,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -207,16 +208,18 @@ export const BatchEditMoveLiquid = (
           />
         </Box>
 
-        <Box textAlign="right" maxWidth="55rem">
+        <Box textAlign="right" maxWidth="55rem" marginTop="2rem">
           <Box
             {...cancelButtonTargetProps}
-            width="11rem"
             marginRight="0.625rem"
             display="inline-block"
           >
-            <PrimaryButton onClick={handleCancel}>
+            <OutlineButton
+              onClick={handleCancel}
+              className={buttonStyles.button_auto}
+            >
               {i18n.t('button.discard_changes')}
-            </PrimaryButton>
+            </OutlineButton>
             <Tooltip {...cancelButtonTooltipProps}>
               {i18n.t('tooltip.cancel_batch_edit')}
             </Tooltip>
