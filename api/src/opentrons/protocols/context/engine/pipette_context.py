@@ -13,7 +13,7 @@ from opentrons.protocols.context.well import WellImplementation
 from opentrons.protocols.context.instrument import AbstractInstrument
 
 
-class InstrumentContext(AbstractInstrument):
+class PipetteContext(AbstractInstrument):
 
     def get_default_speed(self) -> float:
         raise NotImplementedError()
