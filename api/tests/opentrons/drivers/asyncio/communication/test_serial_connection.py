@@ -1,9 +1,10 @@
 import pytest
 from mock import AsyncMock, call
 
-from opentrons.drivers.serial_comms.async_serial import AsyncSerial
-from opentrons.drivers.serial_comms.serial_connection import SerialConnection, \
-    NoResponse
+from opentrons.drivers.asyncio.communication.async_serial import AsyncSerial
+from opentrons.drivers.asyncio.communication.serial_connection import (
+    SerialConnection, NoResponse
+)
 
 
 @pytest.fixture

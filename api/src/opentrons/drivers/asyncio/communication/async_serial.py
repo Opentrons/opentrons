@@ -2,7 +2,7 @@ import asyncio
 from concurrent.futures.thread import ThreadPoolExecutor
 from typing import Optional
 
-from serial import Serial
+from serial import Serial, serial_for_url
 
 
 class AsyncSerial:
@@ -22,7 +22,9 @@ class AsyncSerial:
 
         serial = await asyncio.get_event_loop().run_in_executor(
             executor=executor,
-            func=lambda: Serial(port=port, baudrate=baud_rate, timeout=timeout)
+            func=lambda: serial_for_url(
+                url=port, baudrate=baud_rate, timeout=timeout
+            )
         )
         return cls(serial=serial, executor=executor)
 
