@@ -11,7 +11,7 @@ class AsyncSerial:
     @classmethod
     async def create(cls, port: str, baud_rate: int, timeout: Optional[int] = None):
         """
-        Object creator
+        Create an AsyncSerial instance.
 
         Args:
             port: url or port name
