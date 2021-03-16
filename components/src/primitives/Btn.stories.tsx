@@ -5,7 +5,7 @@ import { Box } from './Box'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Atoms/Btn',
+  title: 'Library/Atoms/Btn',
   argTypes: { onClick: { action: 'clicked' } },
 } as Meta
 
@@ -29,12 +29,15 @@ Secondary.args = {
 
 const LightSecondaryTemplate: Story<
   React.ComponentProps<typeof LightSecondaryBtn>
-> = args => (
-  <Box backgroundColor="black" size="20rem" padding="2rem">
-    <LightSecondaryBtn {...args} />
-  </Box>
-)
+> = args => <LightSecondaryBtn {...args} />
 export const LightSecondary = LightSecondaryTemplate.bind({})
+LightSecondary.decorators = [
+  Story => (
+    <Box backgroundColor="black" size="20rem" padding="2rem">
+      <Story />
+    </Box>
+  ),
+]
 LightSecondary.args = {
   children: 'Cancel',
   title: 'secondary button title',
@@ -43,8 +46,15 @@ LightSecondary.args = {
 const TertiaryTemplate: Story<
   React.ComponentProps<typeof TertiaryBtn>
 > = args => <TertiaryBtn {...args} />
+TertiaryTemplate.decorators = [
+  Story => (
+    <Box backgroundColor="black" size="20rem" padding="2rem">
+      <Story />
+    </Box>
+  ),
+]
 export const Tertiary = TertiaryTemplate.bind({})
 Tertiary.args = {
-  children: 'Button Skeleton',
-  title: 'raw button title',
+  children: 'Perform Side-Effect',
+  title: 'tertiary button title',
 }
