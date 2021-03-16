@@ -59,6 +59,7 @@ export const ClickableIcon = (props: ClickableIconProps): React.Node => {
   const { id, iconName, onClick, tooltipText, width } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'top',
+    strategy: 'fixed',
   })
 
   const boxStyles = {
