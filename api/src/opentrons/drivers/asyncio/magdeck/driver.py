@@ -14,6 +14,7 @@ from enum import Enum
 from opentrons.drivers import utils
 from opentrons.drivers.asyncio.communication import CommandBuilder
 from opentrons.drivers.asyncio.communication.serial_connection import SerialConnection
+from opentrons.drivers.asyncio.magdeck.abstract import AbstractMagDeckDriver
 
 log = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ class MagDeckError(Exception):
     pass
 
 
-class MagDeck:
+class MagDeck(AbstractMagDeckDriver):
 
     @classmethod
     async def create(cls, port: str) -> 'MagDeck':
@@ -78,19 +79,8 @@ class MagDeck:
         """
         self._connection = connection
 
-    async def connect(self, port: str) -> None:
-        """
-        Connect to device
-
-        Args:
-            port: '/dev/ot_module_magdeck[#]'
-                NOTE. Using the symlink above to connect makes sure that the robot
-                connects/reconnects to the module even after a device
-                reset/reconnection
-
-        Returns:
-            None
-        """
+    async def connect(self) -> None:
+        """Connect to device"""
         pass
 
     async def disconnect(self) -> None:
@@ -133,7 +123,8 @@ class MagDeck:
         )
         response = await self._send_command(c)
         data = utils.parse_key_values(response)
-        return utils.parse_number(data.get('height'), GCODE_ROUNDING_PRECISION)
+        return utils.parse_number(str(data.get('height')),
+                                  GCODE_ROUNDING_PRECISION)
 
     async def get_mag_position(self) -> float:
         """
@@ -148,7 +139,7 @@ class MagDeck:
 
         response = await self._send_command(c)
         data = utils.parse_key_values(response)
-        return utils.parse_number(data.get('Z'),
+        return utils.parse_number(str(data.get('Z')),
                                   GCODE_ROUNDING_PRECISION)
 
     async def move(self, position_mm: float) -> None:

@@ -1,6 +1,9 @@
+import logging
 from typing import Optional
 
 from .async_serial import AsyncSerial
+
+log = logging.getLogger(__name__)
 
 
 class SerialException(Exception):
@@ -62,14 +65,23 @@ class SerialConnection:
 
         Raises: NoResponse
         """
-        await self._serial.write(data=data.encode())
+        data_encode = data.encode()
+        log.debug(f'{self.name}: Write -> {data_encode}')
+        await self._serial.write(data=data_encode)
+
         response = await self._serial.read_until(match=self._ack)
+        log.debug(f'{self.name}: Read <- {response}')
+
         if self._ack in response:
             return response.decode()
+
+        log.warning(f'{self.name}: retry number {retries}')
 
         retries -= 1
         if retries < 0:
             raise NoResponse("retry count exhausted")
+
+        self._on_retry()
 
         return await self.send_command(data=data, retries=retries)
 
@@ -84,3 +96,11 @@ class SerialConnection:
     @property
     def name(self) -> str:
         return self._name
+
+    def _on_retry(self) -> None:
+        """
+        Opportunity for derived classes to perform action between retries
+
+        Returns: None
+        """
+        pass
