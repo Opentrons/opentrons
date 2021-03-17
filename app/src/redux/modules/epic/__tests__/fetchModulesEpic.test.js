@@ -110,9 +110,9 @@ describe('fetchModulesEpic', () => {
         a: Actions.fetchModulesSuccess(
           mockRobot.name,
           [
-            Fixtures.mockMagneticModule,
-            Fixtures.mockTemperatureModule,
-            Fixtures.mockThermocycler,
+            { ...Fixtures.mockMagneticModule, usbPort: null },
+            { ...Fixtures.mockTemperatureModule, usbPort: null },
+            { ...Fixtures.mockThermocycler, usbPort: null },
           ],
           { ...meta, response: Fixtures.mockFetchModulesSuccessMeta }
         ),
