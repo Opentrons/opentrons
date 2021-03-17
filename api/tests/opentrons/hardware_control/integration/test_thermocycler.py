@@ -3,6 +3,7 @@ import asyncio
 import pytest
 from mock import AsyncMock, patch
 from opentrons.config import IS_WIN
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler.driver import TCPoller
 from opentrons.hardware_control.emulation.app import THERMOCYCLER_PORT
 from opentrons.hardware_control.modules import Thermocycler
@@ -25,6 +26,8 @@ async def thermocycler(
     td = await Thermocycler.build(
         port=f"socket://127.0.0.1:{THERMOCYCLER_PORT}",
         execution_manager=AsyncMock(),
+        usb_port=USBPort(name="", port_number=1, sub_names=[], device_path="",
+                         hub=1),
         loop=loop
     )
     yield td
