@@ -14,14 +14,6 @@ class CommandBuilder:
         self._terminator = terminator
         self._words: List[str] = []
 
-    def build(self) -> bytes:
-        """
-        Build the command.
-
-        Returns: bytes
-        """
-        return self._build_string().encode()
-
     def with_float(
             self, prefix: str, value: float, precision: int = 3) -> 'CommandBuilder':
         """
@@ -72,7 +64,7 @@ class CommandBuilder:
         self._words.append(word)
         return self
 
-    def _build_string(self) -> str:
+    def build(self) -> str:
         """
         Build command as a string.
 
@@ -81,4 +73,4 @@ class CommandBuilder:
         return " ".join(self._words + [self._terminator])
 
     def __str__(self) -> str:
-        return self._build_string()
+        return self.build()

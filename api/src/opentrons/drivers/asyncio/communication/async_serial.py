@@ -70,3 +70,36 @@ class AsyncSerial:
             executor=self._executor,
             func=lambda: self._serial.write(data=data)
         )
+
+    async def open(self) -> None:
+        """
+        Open the connection.
+
+        Returns: None
+        """
+        return await asyncio.get_event_loop().run_in_executor(
+            executor=self._executor,
+            func=lambda: self._serial.open()
+        )
+
+    async def close(self) -> None:
+        """
+        Close the connection
+
+        Returns: None
+        """
+        return await asyncio.get_event_loop().run_in_executor(
+            executor=self._executor,
+            func=lambda: self._serial.close()
+        )
+
+    async def is_open(self) -> bool:
+        """
+        Check if connection is open.
+
+        Returns: boolean
+        """
+        return await asyncio.get_event_loop().run_in_executor(
+            executor=self._executor,
+            func=lambda: self._serial.is_open()
+        )
