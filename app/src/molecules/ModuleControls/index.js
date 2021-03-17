@@ -37,7 +37,6 @@ type Props = {|
 export function ModuleControls(props: Props): React.Node {
   const { module: mod, controlDisabledReason } = props
   const sendModuleCommand = useSendModuleCommand()
-  console.log(mod)
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
       {mod.type === MAGNETIC_MODULE_TYPE ? (
