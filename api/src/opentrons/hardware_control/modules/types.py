@@ -1,10 +1,13 @@
+from enum import Enum
 from dataclasses import dataclass
 from typing import (
-    Dict, NamedTuple, Callable, Any, Tuple,
-    Awaitable, Mapping, Union)
+    Dict, NamedTuple, Callable, Any, Type, TypeVar,
+    Tuple, Awaitable, Mapping, Union, TYPE_CHECKING)
 from pathlib import Path
 
-from opentrons.drivers.rpi_drivers.types import USBPort
+if TYPE_CHECKING:
+    from opentrons_shared_data.module.dev_types import (
+        ThermocyclerModuleType, MagneticModuleType, TemperatureModuleType)
 
 ThermocyclerStep = Dict[str, float]
 
@@ -16,7 +19,45 @@ UploadFunction = Callable[[str, str, Dict[str, Any]],
 LiveData = Mapping[str, Union[str, Mapping[str, Union[float, str, None]]]]
 
 
-@dataclass
+E = TypeVar('E', bound='_ProvideLookup')
+
+
+class _ProvideLookup(Enum):
+    @classmethod
+    def from_str(cls: Type[E], typename: str) -> 'E':
+        for m in cls.__members__.values():
+            if m.value == typename:
+                return m
+        raise AttributeError(f'No such module type {typename}')
+
+
+class ModuleType(_ProvideLookup):
+    THERMOCYCLER: 'ThermocyclerModuleType' = 'thermocyclerModuleType'
+    TEMPERATURE: 'TemperatureModuleType' = 'temperatureModuleType'
+    MAGNETIC: 'MagneticModuleType' = 'magneticModuleType'
+
+
+class MagneticModuleModel(_ProvideLookup):
+    MAGNETIC_V1: str = 'magneticModuleV1'
+    MAGNETIC_V2: str = 'magneticModuleV2'
+
+
+class TemperatureModuleModel(_ProvideLookup):
+    TEMPERATURE_V1: str = 'temperatureModuleV1'
+    TEMPERATURE_V2: str = 'temperatureModuleV2'
+
+
+class ThermocyclerModuleModel(_ProvideLookup):
+
+    @classmethod
+    def from_str(cls: Type['ThermocyclerModuleModel'],
+                 typename: str) -> 'ThermocyclerModuleModel':
+        return super().from_str(typename)
+
+    THERMOCYCLER_V1: str = 'thermocyclerModuleV1'
+
+
+@dataclass(frozen=True)
 class ModuleAtPort:
     port: str
     name: str
@@ -49,3 +90,7 @@ class ModuleInfo(NamedTuple):
     fw_version: str   # The version of the firmware
     hw_revision: str  # the revision of the hardware
     serial: str       # the serial number
+
+
+ModuleModel = Union[
+    MagneticModuleModel, TemperatureModuleModel, ThermocyclerModuleModel]

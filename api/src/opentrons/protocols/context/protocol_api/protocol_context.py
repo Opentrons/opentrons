@@ -1,11 +1,9 @@
 import logging
-from typing import Dict, Optional, Set
+from typing import Dict, Optional, Set, TYPE_CHECKING
 
 from opentrons import types, API
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.config import feature_flags as fflags
-from opentrons.hardware_control.modules import MagDeck, TempDeck, Thermocycler
-from opentrons.hardware_control import ExecutionManager, SynchronousAdapter
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
@@ -25,6 +23,9 @@ from opentrons.protocols.labware import load_from_definition, \
     get_labware_definition
 from opentrons.protocols.types import Protocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control import SynchronousAdapter
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -84,6 +85,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
         self._last_location: Optional[types.Location] = None
+        self._loaded_modules: Set['SynchronousAdapter'] = set()
 
     @classmethod
     def build_using(cls,
@@ -187,32 +189,18 @@ class ProtocolContextImplementation(AbstractProtocol):
 
         # Try to find in the hardware instance
 
-        available_modules = self._hw_manager.hardware.find_modules(resolved_model)
+        available_modules = self._hw_manager.hardware.find_modules(
+            resolved_model, resolved_type)
+
         hc_mod_instance = None
         for mod in available_modules:
-            if module_geometry.models_compatible(
+            compatible = module_geometry.models_compatible(
                     module_geometry.module_model_from_string(mod.model()),
-                    resolved_model):
+                    resolved_model)
+            if compatible and mod not in self._loaded_modules:
+                self._loaded_modules.add(mod)
                 hc_mod_instance = mod
                 break
-
-        if self.is_simulating() and hc_mod_instance is None:
-            mod_type = {
-                module_geometry.ModuleType.MAGNETIC: MagDeck,
-                module_geometry.ModuleType.TEMPERATURE: TempDeck,
-                module_geometry.ModuleType.THERMOCYCLER: Thermocycler
-                }[resolved_type]
-            hc_mod_instance = SynchronousAdapter(
-                mod_type(
-                    port='',
-                    usb_port=self._hw_manager.hardware._backend._usb.find_port(''),
-                    simulating=True,
-                    loop=self._hw_manager.hardware.loop,
-                    execution_manager=ExecutionManager(
-                        loop=self._hw_manager.hardware.loop),
-                    sim_model=resolved_model.value)
-            )
-            hc_mod_instance._connect()
 
         if not hc_mod_instance:
             return None

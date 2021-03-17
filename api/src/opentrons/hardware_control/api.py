@@ -29,7 +29,7 @@ from .types import (Axis, HardwareAPILike, CriticalPoint,
                     DoorStateNotification, PipettePair, TipAttachedError,
                     HardwareAction, PairedPipetteConfigValueError,
                     MotionChecks)
-from . import modules, robot_calibration as rb_cal
+from . import modules, adapters, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
@@ -1763,39 +1763,42 @@ class API(HardwareAPILike):
             self._log.info(f"Module {mod.name} discovered and attached"
                            f" at port {mod.port}, new_instance: {new_instance}")
 
-    def find_module(self, by_model: str) -> List:
+    def find_modules(
+            self, by_model: modules.types.ModuleModel,
+            resolved_type: modules.types.ModuleType
+            ) -> List[adapters.SynchronousAdapter]:
         """
-        available_modules = self._hw_manager.hardware.find_modules(resolved_model)
-        hc_mod_instance = None
-        for mod in available_modules:
-            if module_geometry.models_compatible(
-                    module_geometry.module_model_from_string(mod.model()),
-                    resolved_model):
-                hc_mod_instance = mod
-                break
+        Find Modules.
 
-        if self.is_simulating() and hc_mod_instance is None:
+        Given a module model and type, find all attached
+        modules that fit this criteria. If there are no
+        modules attached, but the module is being loaded
+        in simulation, then it should return a simulating
+        module of the same type.
+        """
+        matching_modules = []
+        for module in self.attached_modules:
+            if by_model.value == module.model():
+                matching_modules.append(module)
+        if self.is_simulator and not matching_modules:
             mod_type = {
-                module_geometry.ModuleType.MAGNETIC: MagDeck,
-                module_geometry.ModuleType.TEMPERATURE: TempDeck,
-                module_geometry.ModuleType.THERMOCYCLER: Thermocycler
+                modules.types.ModuleType.MAGNETIC: modules.MagDeck,
+                modules.types.ModuleType.TEMPERATURE: modules.TempDeck,
+                modules.types.ModuleType.THERMOCYCLER: modules.Thermocycler
                 }[resolved_type]
-            hc_mod_instance = SynchronousAdapter(
+            simulating_module = adapters.SynchronousAdapter(
                 mod_type(
                     port='',
-                    usb_port=self._hw_manager.hardware._backend._usb.find_port(''),
+                    usb_port=self._backend._usb.find_port(''),
                     simulating=True,
-                    loop=self._hw_manager.hardware.loop,
+                    loop=self.loop,
                     execution_manager=ExecutionManager(
-                        loop=self._hw_manager.hardware.loop),
-                    sim_model=resolved_model.value)
+                        loop=self.loop),
+                    sim_model=by_model.value)
             )
-            hc_mod_instance._connect()
-
-        if not hc_mod_instance:
-            return None
-        """
-        return []
+            simulating_module._connect()
+            matching_modules.append(simulating_module)
+        return matching_modules
 
     def get_instrument_max_height(
             self,
