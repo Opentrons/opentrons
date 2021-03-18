@@ -15,6 +15,10 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
   - If you are experiencing this issue, you should recalibrate your pipettes after updating.
 - Fixed an issue where the OT-2 would be unable to connect to Wi-Fi networks using 802.1x Fast Migration.
 
+## Known Issues
+
+In 4.2.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
+
 ---
 
 ## OT-2 Software Changes in 4.1.1
