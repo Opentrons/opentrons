@@ -978,7 +978,7 @@ def test_multichannel_transfer_old_version(loop):
             {'method': 'aspirate',
              'args': [100, lw1.wells_by_name()['A1'], 1.0], 'kwargs': {}},
             {'method': 'dispense',
-            'args': [100, lw2.wells_by_index()['A2'], 1.0], 'kwargs': {}},
+             'args': [100, lw2.wells_by_index()['A2'], 1.0], 'kwargs': {}},
             {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
     assert xfer_plan_list == exp1
 
@@ -1260,7 +1260,7 @@ def test_blowout_to_source(_instr_labware):
             disposal_volume=_instr_labware['instr'].min_volume,
             blow_out_strategy=tx.BlowOutStrategy.SOURCE))
 
-    dist_plan = tx.TransferPlan(
+    xfer_plan = tx.TransferPlan(
         30, [lw1['A1'], lw1['A2']], [lw2['B1'], lw2['B2']],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
@@ -1277,7 +1277,7 @@ def test_blowout_to_source(_instr_labware):
         {'method': 'dispense', 'args': [30, lw2['B2'], 1.0], 'kwargs': {}},
         {'method': 'blow_out', 'args': [lw1['A2']], 'kwargs': {}},
         {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
-    for step, expected in zip(dist_plan, exp):
+    for step, expected in zip(xfer_plan, exp):
         assert step == expected
 
     # ========== Distribute ===========
@@ -1319,7 +1319,7 @@ def test_blowout_to_dest(_instr_labware):
             disposal_volume=_instr_labware['instr'].min_volume,
             blow_out_strategy=tx.BlowOutStrategy.DEST))
 
-    dist_plan = tx.TransferPlan(
+    xfer_plan = tx.TransferPlan(
         30, [lw1['A1'], lw1['A2']], [lw2['B1'], lw2['B2']],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
@@ -1336,7 +1336,7 @@ def test_blowout_to_dest(_instr_labware):
         {'method': 'dispense', 'args': [30, lw2['B2'], 1.0], 'kwargs': {}},
         {'method': 'blow_out', 'args': [lw2['B2']], 'kwargs': {}},
         {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
-    for step, expected in zip(dist_plan, exp):
+    for step, expected in zip(xfer_plan, exp):
         assert step == expected
 
     # ========== Consolidate ===========
@@ -1345,7 +1345,7 @@ def test_blowout_to_dest(_instr_labware):
         transfer=options.transfer._replace(
             blow_out_strategy=tx.BlowOutStrategy.DEST))
 
-    dist_plan = tx.TransferPlan(
+    consd_plan = tx.TransferPlan(
         30, lw2.rows()[0][1:3], lw1.columns()[0][0],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
@@ -1360,5 +1360,5 @@ def test_blowout_to_dest(_instr_labware):
         {'method': 'dispense', 'args': [60, lw1['A1'], 1.0], 'kwargs': {}},
         {'method': 'blow_out', 'args': [lw1['A1']], 'kwargs': {}},
         {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
-    for step, expected in zip(dist_plan, exp):
+    for step, expected in zip(consd_plan, exp):
         assert step == expected
