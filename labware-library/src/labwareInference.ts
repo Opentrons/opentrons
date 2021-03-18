@@ -1,4 +1,3 @@
-// @flow
 import isEqual from 'lodash/isEqual'
 import uniqWith from 'lodash/uniqWith'
 import round from 'lodash/round'

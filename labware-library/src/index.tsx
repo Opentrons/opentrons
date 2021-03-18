@@ -1,4 +1,3 @@
-// @flow
 // labware library entry
 import * as React from 'react'
 import { hydrate, render } from 'react-dom'
@@ -16,7 +15,7 @@ if (!$root) {
   throw new Error('fatal: #root not found')
 }
 
-const Root = () => (
+const Root = (): React.Node => (
   <BrowserRouter>
     <Switch>
       <Route path={`${getPublicPath()}create`} component={LabwareCreator} />
