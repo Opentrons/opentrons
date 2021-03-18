@@ -1,4 +1,3 @@
-// @flow
 import cookie from 'cookie'
 
 import { initializeMixpanel, mixpanelOptIn, mixpanelOptOut } from './mixpanel'
@@ -9,7 +8,7 @@ const COOKIE_KEY_NAME = 'ot_ll_analytics' // NOTE: cookie is named "LL" but only
 const COOKIE_DOMAIN =
   process.env.NODE_ENV === 'production' ? 'opentrons.com' : undefined
 
-const persistAnalyticsCookie = (cookies: { [key: string]: any }) => {
+const persistAnalyticsCookie = (cookies: Record<string, any>): void => {
   const maxAge = 10 * 365 * 24 * 60 * 60 // 10 years
   const options = { COOKIE_DOMAIN, maxAge }
 
@@ -20,7 +19,7 @@ const persistAnalyticsCookie = (cookies: { [key: string]: any }) => {
   )
 }
 
-const getAnalyticsCookie = (): $Shape<AnalyticsState> => {
+const getAnalyticsCookie = (): AnalyticsState => {
   const cookies = cookie.parse(global.document.cookie)
   const analyticsCookie = cookies[COOKIE_KEY_NAME]
     ? JSON.parse(cookies[COOKIE_KEY_NAME])
@@ -34,7 +33,7 @@ export const getDefaultAnalyticsState = (): AnalyticsState => ({
   seenOptIn: false,
 })
 
-export const initializeAnalytics = (state: AnalyticsState) => {
+export const initializeAnalytics = (state: AnalyticsState): void => {
   // Intended to run only once, to init all analytics.
   // This should NOT depend on opt in/out state.
   console.debug('initializing analytics')
@@ -64,7 +63,7 @@ export const getAnalyticsState = (): AnalyticsState => {
 
 // NOTE: Fullstory has no opt-in/out, control by adding/removing it completely
 
-export const persistAnalyticsState = (state: AnalyticsState) => {
+export const persistAnalyticsState = (state: AnalyticsState): void => {
   persistAnalyticsCookie(state)
 
   if (state.optedIn) {

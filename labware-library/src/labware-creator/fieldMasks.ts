@@ -1,4 +1,3 @@
-// @flow
 export const makeMaskToDecimal: (
   maxDecimals: number
 ) => (prevValue: string, update: string) => string = maxDecimals => (

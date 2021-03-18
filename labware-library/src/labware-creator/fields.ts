@@ -1,4 +1,3 @@
-// @flow
 import type { WellBottomShape } from '@opentrons/shared-data'
 
 export const MAX_X_DIMENSION = 129
@@ -27,17 +26,18 @@ export type ImportErrorKey =
   | 'INVALID_JSON_FILE'
   | 'INVALID_LABWARE_DEF'
   | 'UNSUPPORTED_LABWARE_PROPERTIES'
-export type ImportError = {|
-  key: ImportErrorKey,
-  messages?: Array<string>,
-|}
+export interface ImportError {
+  key: ImportErrorKey
+  messages?: string[]
+}
 
-export type Options = Array<{|
-  name: string,
-  value: string,
-  disabled?: boolean,
-  imgSrc?: string,
-|}>
+interface Option {
+  name: string
+  value: string
+  disabled?: boolean
+  imgSrc?: string
+}
+export type Options = Option[]
 
 export type LabwareType =
   | 'wellPlate'
@@ -70,98 +70,98 @@ export const yesNoOptions = [
   { name: 'No', value: 'false' },
 ]
 
-export type LabwareFields = {|
-  labwareType: ?LabwareType,
-  tubeRackInsertLoadName: ?string,
-  aluminumBlockType: ?string, // eg, '24well' or '96well'
-  aluminumBlockChildType: ?string,
+export interface LabwareFields {
+  labwareType: LabwareType | null | undefined
+  tubeRackInsertLoadName: string | null | undefined
+  aluminumBlockType: string | null | undefined // eg, '24well' or '96well'
+  aluminumBlockChildType: string | null | undefined
 
-  // tubeRackSides: Array<string>, // eg, []
-  footprintXDimension: ?string,
-  footprintYDimension: ?string,
-  labwareZDimension: ?string,
+  // tubeRackSides: string[], // eg, []
+  footprintXDimension: string | null | undefined
+  footprintYDimension: string | null | undefined
+  labwareZDimension: string | null | undefined
 
-  gridRows: ?string,
-  gridColumns: ?string,
-  gridSpacingX: ?string,
-  gridSpacingY: ?string,
-  gridOffsetX: ?string,
-  gridOffsetY: ?string,
+  gridRows: string | null | undefined
+  gridColumns: string | null | undefined
+  gridSpacingX: string | null | undefined
+  gridSpacingY: string | null | undefined
+  gridOffsetX: string | null | undefined
+  gridOffsetY: string | null | undefined
 
-  homogeneousWells: ?BooleanString,
-  regularRowSpacing: ?BooleanString,
-  regularColumnSpacing: ?BooleanString,
+  homogeneousWells: BooleanString | null | undefined
+  regularRowSpacing: BooleanString | null | undefined
+  regularColumnSpacing: BooleanString | null | undefined
 
-  wellVolume: ?string,
-  wellBottomShape: ?WellBottomShape,
-  wellDepth: ?string,
-  wellShape: ?WellShape,
+  wellVolume: string | null | undefined
+  wellBottomShape: WellBottomShape | null | undefined
+  wellDepth: string | null | undefined
+  wellShape: WellShape | null | undefined
 
   // used with circular well shape only
-  wellDiameter: ?string,
+  wellDiameter: string | null | undefined
 
   // used with rectangular well shape only
-  wellXDimension: ?string,
-  wellYDimension: ?string,
+  wellXDimension: string | null | undefined
+  wellYDimension: string | null | undefined
 
-  brand: ?string,
-  brandId: ?string, // comma-separated values
+  brand: string | null | undefined
+  brandId: string | null | undefined // comma-separated values
 
-  loadName: ?string,
-  displayName: ?string,
+  loadName: string | null | undefined
+  displayName: string | null | undefined
 
   // fields for test protocol
-  pipetteName: ?string,
-|}
+  pipetteName: string | null | undefined
+}
 
 // NOTE: these fields & types should be kept in sync with Yup schema `labwareFormSchema`.
 // Also, this type def is simplified -- IRL, wellDiameter is only a number when wellShape === 'circular', and void otherwise.
 // These could be represented by some complex union types, but that wouldn't really get us anywhere.
 // Yup and not Flow is the authority on making sure the data is correct here.
-export type ProcessedLabwareFields = {|
-  labwareType: LabwareType,
-  tubeRackInsertLoadName: string,
-  aluminumBlockType: string,
-  aluminumBlockChildType: string | null,
+export interface ProcessedLabwareFields {
+  labwareType: LabwareType
+  tubeRackInsertLoadName: string
+  aluminumBlockType: string
+  aluminumBlockChildType: string | null
 
-  // tubeRackSides: Array<string>, // eg, []
-  footprintXDimension: number,
-  footprintYDimension: number,
-  labwareZDimension: number,
+  // tubeRackSides: string[], // eg, []
+  footprintXDimension: number
+  footprintYDimension: number
+  labwareZDimension: number
 
-  gridRows: number,
-  gridColumns: number,
-  gridSpacingX: number,
-  gridSpacingY: number,
-  gridOffsetX: number,
-  gridOffsetY: number,
+  gridRows: number
+  gridColumns: number
+  gridSpacingX: number
+  gridSpacingY: number
+  gridOffsetX: number
+  gridOffsetY: number
 
-  homogeneousWells: BooleanString,
-  regularRowSpacing: BooleanString,
-  regularColumnSpacing: BooleanString,
+  homogeneousWells: BooleanString
+  regularRowSpacing: BooleanString
+  regularColumnSpacing: BooleanString
 
-  wellVolume: number,
-  wellBottomShape: WellBottomShape,
-  wellDepth: number,
-  wellShape: WellShape,
+  wellVolume: number
+  wellBottomShape: WellBottomShape
+  wellDepth: number
+  wellShape: WellShape
 
   // used with circular well shape only
-  wellDiameter: number,
+  wellDiameter: number
 
   // used with rectangular well shape only
-  wellXDimension: number,
-  wellYDimension: number,
+  wellXDimension: number
+  wellYDimension: number
 
-  brand: string,
-  brandId: Array<string>,
+  brand: string
+  brandId: string[]
 
   // if loadName or displayName are left blank, Yup schema generates them
-  loadName: string,
-  displayName: string,
+  loadName: string
+  displayName: string
 
   // fields for test protocol
-  pipetteName: string,
-|}
+  pipetteName: string
+}
 
 export const tubeRackInsertOptions: Options = [
   {
@@ -192,7 +192,7 @@ export const tubeRackInsertOptions: Options = [
 // are intentionally duplicated to be the source of truth about the
 // *tube rack inserts* (as opposed to defs that use the insert)
 export const tubeRackAutofills: {
-  [tubeRackInsertLoadName: string]: $Shape<LabwareFields>,
+  [tubeRackInsertLoadName: string]: Partial<LabwareFields>
 } = {
   '6tubes': {
     // NOTE: based on opentrons_6_tuberack_falcon_50ml_conical
@@ -292,9 +292,9 @@ export const aluminumBlockChildTypeOptions: Options = [
 // For DRYness, these values aren't explicitly included in the autofill objects (eg tubeRackAutofills),
 // but should be included in the autofill spread
 export const getImplicitAutofillValues = (
-  preAutofilledValues: LabwareFields
-): $Shape<LabwareFields> => {
-  const result: $Shape<LabwareFields> = {}
+  preAutofilledValues: Partial<LabwareFields>
+): Partial<LabwareFields> => {
+  const result: Partial<LabwareFields> = {}
   if ('gridRows' in preAutofilledValues) {
     result.regularRowSpacing = 'true'
   }
@@ -348,7 +348,8 @@ export const getDefaultFormState = (): LabwareFields => ({
   pipetteName: null,
 })
 
-export const LABELS: { [$Keys<LabwareFields>]: string } = {
+export const LABELS = {
+  // TODO IMMEDIATELY: TS translation of `{ [$Keys<LabwareFields>]: string }` = ???
   labwareType: 'What type of labware are you creating?',
   tubeRackInsertLoadName: 'Which tube rack insert?',
   aluminumBlockType: 'Which aluminum block?',

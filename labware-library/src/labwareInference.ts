@@ -14,7 +14,7 @@ const ROUNDING_PRECISION = 2
 
 export function getUniqueWellProperties(
   definition: LabwareDefinition
-): Array<LabwareWellGroupProperties> {
+): LabwareWellGroupProperties[] {
   const { groups, wells, dimensions } = definition
 
   return groups.map(group => {
@@ -51,13 +51,13 @@ export function getUniqueWellProperties(
   })
 }
 
-export function getIfConsistent<T>(items: Array<T>): T | null {
+export function getIfConsistent<T>(items: T[]): T | null {
   return uniqWith(items, isEqual).length === 1 ? items[0] : null
 }
 
 // returning null means "spacing is irregular"; returning 0 means "there is only 1 well along the given axis"
 export function getSpacingIfUniform(
-  wells: Array<LabwareWell>,
+  wells: LabwareWell[],
   axis: 'x' | 'y'
 ): number | null {
   const wellPositions = sortedUniq(uniq(wells.map(well => well[axis])))

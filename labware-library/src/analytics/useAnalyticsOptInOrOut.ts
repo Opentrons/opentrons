@@ -1,4 +1,3 @@
-// @flow
 // A hook for analytics opt in/out components (eg modals or toggles)
 // Uses cookie as initial source of truth. Will write a cookie if none exists.
 import {
@@ -10,10 +9,10 @@ import {
 import { useState, useCallback, useEffect } from 'react'
 import type { AnalyticsState } from './types'
 
-type UseAnalyticsOptInOrOutResult = {|
-  setAnalyticsOptIn: boolean => void,
-  analyticsState: AnalyticsState,
-|}
+interface UseAnalyticsOptInOrOutResult {
+  setAnalyticsOptIn: (_: boolean) => void
+  analyticsState: AnalyticsState
+}
 
 export const useAnalyticsOptInOrOut = (): UseAnalyticsOptInOrOutResult => {
   const [analyticsState, setAnalyticsState] = useState<AnalyticsState>(

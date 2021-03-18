@@ -1,20 +1,23 @@
-// @flow
 import {
   createRegularLabware,
   //   createIrregularLabware,
-  type LabwareDefinition2,
-  type LabwareDisplayCategory,
 } from '@opentrons/shared-data'
-import { DISPLAY_VOLUME_UNITS, type ProcessedLabwareFields } from './fields'
+import { DISPLAY_VOLUME_UNITS } from './fields'
+
+import type {
+  LabwareDefinition2,
+  LabwareDisplayCategory,
+} from '@opentrons/shared-data'
+import type { ProcessedLabwareFields } from './fields'
 
 // TODO Ian 2019-07-29: move this constant to shared-data?
 // This is the distance from channel 1 to channel 8 of any 8-channel, not tied to name/model
 export const MULTI_CHANNEL_WIDTH_MM = 64
 
-export const _getGroupMetadataDisplayCategory = (args: {|
-  aluminumBlockChildType: ?string,
-  labwareType: string,
-|}): LabwareDisplayCategory | null => {
+export const _getGroupMetadataDisplayCategory = (args: {
+  aluminumBlockChildType: string | null | undefined
+  labwareType: string
+}): LabwareDisplayCategory | null => {
   const { aluminumBlockChildType, labwareType } = args
   if (labwareType === 'tubeRack') {
     return 'tubeRack'
@@ -58,7 +61,7 @@ export function fieldsToLabware(
     // Also note that 'irregular' in `format` just means "not 96/384 standard, not trough, and not trash",
     // it doesn't imply anything about having multiple grids or not.
     const format = 'irregular'
-    let quirks = []
+    let quirks: string[] = []
 
     const heightOrDiameter =
       fields.wellShape === 'circular'
@@ -99,9 +102,9 @@ export function fieldsToLabware(
         format,
         quirks,
 
+        // @ts-expect-error(IL, 2021-03-18): see note below
         isTiprack: fields.labwareType === 'tiprack', // NOTE: 'tiprack' is not a possible labwareType now anyway
         //   tipLength?: number,
-
         // Currently, assume labware is not magnetic module compatible. We don't have the information here.
         isMagneticModuleCompatible: false,
         //   magneticModuleEngageHeight?: number,

@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import Ajv from 'ajv'
 import cx from 'classnames'
@@ -68,14 +67,14 @@ const validateLabwareSchema = ajv.compile(labwareSchema)
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 
-type MakeAutofillOnChangeArgs = {|
-  name: $Keys<LabwareFields>,
-  autofills: { [string]: $Shape<LabwareFields> },
-  values: LabwareFields,
-  touched: Object,
-  setTouched: (FormikTouched<LabwareFields>) => void,
-  setValues: ($Shape<LabwareFields>) => void,
-|}
+interface MakeAutofillOnChangeArgs {
+  name: string // TODO IMMEDIATELY: TS translation for `$Keys<LabwareFields>,` ???
+  autofills: Record<string, Partial<LabwareFields>>
+  values: LabwareFields
+  touched: Object
+  setTouched: (touched: FormikTouched<LabwareFields>) => (null | undefined)
+  setValues: (values: Partial<LabwareFields>) => (null | undefined)
+}
 
 const PDF_URL =
   'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
@@ -86,7 +85,7 @@ const makeAutofillOnChange = ({
   touched,
   setValues,
   setTouched,
-}: MakeAutofillOnChangeArgs) => (name: string, value: ?string) => {
+}: MakeAutofillOnChangeArgs) => (name: string, value: string | null | undefined) => {
   if (value == null) {
     console.log(`no value for ${name}, skipping autofill`)
     return
@@ -115,9 +114,9 @@ const makeAutofillOnChange = ({
   }
 }
 
-type HeightImgProps = {|
-  labwareType: ?LabwareType,
-  aluminumBlockChildType: ?string,
+type HeightImgProps = {
+  labwareType: LabwareType | null | undefined,
+  aluminumBlockChildType: string | null | undefined,
 |}
 
 const HeightImg = (props: HeightImgProps) => {
@@ -140,9 +139,9 @@ const GridImg = () => {
   return <img src={src} />
 }
 
-const WellXYImg = (props: {| wellShape: ?WellShape |}) => {
+const WellXYImg = (props: { wellShape: WellShape | null | undefined}) => {
   const { wellShape } = props
-  const wellShapeToImg: { [WellShape]: string } = {
+  const wellShapeToImg: Record<WellShape, string> = {
     circular: require('./images/wellXY_circular.svg'),
     rectangular: require('./images/wellXY_rectangular.svg'),
   }
@@ -154,11 +153,11 @@ const WellXYImg = (props: {| wellShape: ?WellShape |}) => {
   return null
 }
 
-const XYSpacingImg = (props: {|
-  labwareType: ?LabwareType,
-  wellShape: ?WellShape,
-  gridRows: ?string,
-|}) => {
+const XYSpacingImg = (props: {
+  labwareType: LabwareType | null | undefined,
+  wellShape: WellShape | null | undefined,
+  gridRows: string | null | undefined,
+}) => {
   const { labwareType, wellShape } = props
   const gridRows = Number(props.gridRows)
   // default to this
@@ -178,10 +177,10 @@ const XYSpacingImg = (props: {|
   return <img src={src} />
 }
 
-type DepthImgProps = {|
-  labwareType: ?LabwareType,
-  wellBottomShape: ?WellBottomShape,
-|}
+interface DepthImgProps {
+  labwareType: LabwareType | null | undefined,
+  wellBottomShape: WellBottomShape | null | undefined,
+}
 const DepthImg = (props: DepthImgProps) => {
   const { labwareType, wellBottomShape } = props
   let src
@@ -207,10 +206,10 @@ const DepthImg = (props: DepthImgProps) => {
   return <img src={src} />
 }
 
-const XYOffsetImg = (props: {|
-  labwareType: ?LabwareType,
-  wellShape: ?WellShape,
-|}) => {
+const XYOffsetImg = (props: {
+  labwareType: LabwareType | null | undefined,
+  wellShape: WellShape| null | undefined,
+}) => {
   const { labwareType, wellShape } = props
   let src = require('./images/offset_plate_circular.svg')
   if (labwareType === 'reservoir') {

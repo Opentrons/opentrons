@@ -1,4 +1,3 @@
-// @flow
 // main application wrapper component
 import * as React from 'react'
 import { hot } from 'react-hot-loader/root'
@@ -15,7 +14,7 @@ import styles from './styles.css'
 
 import type { DefinitionRouteRenderProps } from '../../definitions'
 
-export function AppComponent(props: DefinitionRouteRenderProps): React.Node {
+export function AppComponent(props: DefinitionRouteRenderProps): React.ReactNode {
   const { definition, location } = props
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
   const filters = useFilters(location)

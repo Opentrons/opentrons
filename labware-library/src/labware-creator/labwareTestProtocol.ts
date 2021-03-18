@@ -1,8 +1,12 @@
-// @flow
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Options } from './fields'
 
-const pipettes = {
+interface Pipette {
+  displayName: string
+  tiprack: string
+}
+
+const pipettes: Record<string, Pipette> = {
   p20_single_gen2: {
     displayName: 'P20 Single GEN2',
     tiprack: 'opentrons_96_tiprack_20ul',
@@ -37,10 +41,10 @@ export const pipetteNameOptions: Options = Object.keys(
   pipettes
 ).map(loadName => ({ name: pipettes[loadName].displayName, value: loadName }))
 
-type LabwareTestProtocolArgs = {|
-  pipetteName: string,
-  definition: LabwareDefinition2,
-|}
+interface LabwareTestProtocolArgs {
+  pipetteName: string
+  definition: LabwareDefinition2
+}
 
 export const labwareTestProtocol = ({
   pipetteName,

@@ -1,4 +1,3 @@
-// @flow
 // filter helpers
 import { useState, useLayoutEffect } from 'react'
 import queryString from 'query-string'
@@ -14,13 +13,13 @@ import type { FilterParams, LabwareDefinition, LabwareList } from './types'
 
 export const FILTER_OFF = 'all'
 
-export function getAllCategories(): Array<string> {
+export function getAllCategories(): string[] {
   const categories = getAllDefinitions().map(d => d.metadata.displayCategory)
 
   return [FILTER_OFF].concat(uniq(categories))
 }
 
-export function getAllManufacturers(): Array<string> {
+export function getAllManufacturers(): string[] {
   const definitions = getAllDefinitions()
   const brands = definitions.map(d => d.brand.brand)
   const wellGroupBrands = flatMap<LabwareDefinition, string>(

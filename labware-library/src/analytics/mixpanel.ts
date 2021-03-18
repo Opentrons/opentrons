@@ -1,4 +1,3 @@
-// @flow
 // TODO: Ian 2019-10-03 consolidate this with app/src/analytics/mixpanel.js
 // (which this is copied from with slight modification)
 import mixpanel from 'mixpanel-browser'
@@ -12,21 +11,21 @@ const MIXPANEL_OPTS = {
   track_pageview: true,
 }
 
-export function mixpanelOptIn() {
+export function mixpanelOptIn(): void {
   if (MIXPANEL_ID) {
     console.debug('User has opted into analytics; tracking with Mixpanel')
     mixpanel.opt_in_tracking()
   }
 }
 
-export function mixpanelOptOut() {
+export function mixpanelOptOut(): void {
   if (MIXPANEL_ID) {
     console.debug('User has opted out of analytics; stopping tracking')
     mixpanel.opt_out_tracking()
   }
 }
 
-export function initializeMixpanel() {
+export function initializeMixpanel(): void {
   if (MIXPANEL_ID) {
     console.debug('Initializing Mixpanel')
     mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
@@ -35,6 +34,6 @@ export function initializeMixpanel() {
   }
 }
 
-export const trackWithMixpanel = (name: string, properties: Object) => {
+export const trackWithMixpanel = (name: string, properties: any): void => {
   mixpanel.track(name, properties)
 }

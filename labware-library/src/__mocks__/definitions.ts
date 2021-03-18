@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 // replace webpack-specific require.context with Node-based glob in tests
 import path from 'path'
@@ -24,7 +23,7 @@ assert(
   `no labware loadNames found, something broke. ${LABWARE_FIXTURE_PATTERN}`
 )
 
-export const getAllLoadNames: JestMockFn<[], Array<string>> = jest.fn(
+export const getAllLoadNames: JestMockFn<[], string[]> = jest.fn(
   () => allLoadNames
 )
 
@@ -40,7 +39,7 @@ assert(
   `no labware displayNames found, something broke. ${LABWARE_FIXTURE_PATTERN}`
 )
 
-export const getAllDisplayNames: JestMockFn<[], Array<string>> = jest.fn(
+export const getAllDisplayNames: JestMockFn<[], string[]> = jest.fn(
   () => allDisplayNames
 )
 

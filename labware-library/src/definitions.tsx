@@ -84,10 +84,10 @@ export interface DefinitionRouteRenderProps extends ContextRouter {
 }
 
 export interface DefinitionRouteProps {
-  render: (props: DefinitionRouteRenderProps) => React.Node
+  render: (props: DefinitionRouteRenderProps) => React.ReactNode
 }
 
-export function DefinitionRoute(props: DefinitionRouteProps): React.Node {
+export function DefinitionRoute(props: DefinitionRouteProps): React.ReactNode {
   return (
     <Route
       path={`${getPublicPath()}:loadName?`}

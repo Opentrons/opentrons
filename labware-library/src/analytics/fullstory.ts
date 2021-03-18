@@ -1,10 +1,9 @@
-// @flow
 import uniq from 'lodash/uniq'
 
 const FULLSTORY_NAMESPACE = 'FS'
 const FULLSTORY_ORG = process.env.OT_LL_FULLSTORY_ORG
 const LL_VERSION = process.env.OT_LL_VERSION
-const LL_BUILD_DATE = new Date((process.env.OT_LL_BUILD_DATE: any))
+const LL_BUILD_DATE = new Date(process.env.OT_LL_BUILD_DATE as any)
 
 const _getFullstory = (): Object | null => {
   const namespace = global._fs_namespace
@@ -25,7 +24,7 @@ export const shutdownFullstory = () => {
 
 export const inferFsKeyWithSuffix = (
   key: string,
-  value: mixed
+  value: any
 ): string | null => {
   // semi-hacky way to provide FS with type suffix for keys in FS `properties`
   if (typeof value === 'boolean') return 'bool'
@@ -53,8 +52,8 @@ export const inferFsKeyWithSuffix = (
 
 export const fullstoryEvent = (
   name: string,
-  parameters: $Shape<{| [string]: mixed |}> = {}
-) => {
+  parameters: Record<string, any> = {}
+): void => {
   // NOTE: make sure user has opted in before calling this fn
   const fs = _getFullstory()
   if (fs && fs.event) {
@@ -87,7 +86,7 @@ const _setAnalyticsTags = () => {
   }
 }
 
-export const initializeFullstory = () => {
+export const initializeFullstory = (): void => {
   console.debug('initializing Fullstory')
   // NOTE: this code snippet is distributed by Fullstory, last updated 2019-10-04
   global['_fs_debug'] = false

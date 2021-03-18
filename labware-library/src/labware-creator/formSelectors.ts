@@ -1,4 +1,3 @@
-// @flow
 import {
   createRegularLoadName,
   createDefaultDisplayName,
@@ -8,12 +7,11 @@ import {
   getImplicitAutofillValues,
   DISPLAY_VOLUME_UNITS,
   tubeRackAutofills,
-  type LabwareFields,
 } from './fields'
-
+import type { LabwareFields } from './fields'
 // TODO(Ian, 2019-07-24): consolidate `tubeRackAutofills/aluminumBlockAutofills`-getting logic btw here and makeAutofillOnChange
 export const _getIsAutofilled = (
-  name: $Keys<LabwareFields>,
+  name: string, // TODO IMMEDIATELY: `$Keys<LabwareFields>,` === ?
   values: LabwareFields
 ): boolean => {
   const { labwareType, aluminumBlockType, tubeRackInsertLoadName } = values
@@ -24,6 +22,7 @@ export const _getIsAutofilled = (
   if (labwareType === 'aluminumBlock' && aluminumBlockType != null) {
     return (
       isAutofilledByDefault ||
+      // @ts-expect-error(IL, 2021-03-18): aluminumBlockType not strictly typed enough
       Object.keys(aluminumBlockAutofills[aluminumBlockType] || {}).includes(
         name
       )
@@ -41,7 +40,7 @@ export const _getIsAutofilled = (
 
 // any fields that are conditionally defaulted by the Yup schema and do not need to be displayed.
 export const _getIsDefaulted = (
-  name: $Keys<LabwareFields>,
+  name: string, // TODO IMMEDIATELY: `$Keys<LabwareFields>,` === ?
   values: LabwareFields
 ): boolean => {
   if (
@@ -61,18 +60,21 @@ export const _getIsDefaulted = (
 
 // a field should be hidden when it is autofilled or is defaulted
 export const getIsHidden = (
-  name: $Keys<LabwareFields>,
+  name: string, // TODO IMMEDIATELY: `$Keys<LabwareFields>,` === ?
   values: LabwareFields
 ): boolean => _getIsAutofilled(name, values) || _getIsDefaulted(name, values)
 
-const _valuesToCreateNameArgs = (values: LabwareFields) => {
+// TODO(IL, 2021-03-18): _valuesToCreateNameArgs should return RegularNameProps from shared-data/js/labwareTools/index.js
+const _valuesToCreateNameArgs = (values: LabwareFields): any => {
   const gridRows = Number(values.gridRows) || 1
   const gridColumns = Number(values.gridColumns) || 1
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const brand = (values.brand || '').trim()
 
   return {
     gridColumns,
     gridRows,
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     displayCategory: values.labwareType || '',
     displayVolumeUnits: DISPLAY_VOLUME_UNITS,
     brandName: brand === '' ? undefined : brand,

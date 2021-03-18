@@ -1,4 +1,3 @@
-// @flow
 import { getUniqueWellProperties } from '../labwareInference'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareFields, BooleanString } from './fields'
@@ -6,7 +5,9 @@ import type { LabwareFields, BooleanString } from './fields'
 // NOTE: this is just String() with some typing for flow
 const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false')
 
-export function labwareDefToFields(def: LabwareDefinition2): ?LabwareFields {
+export function labwareDefToFields(
+  def: LabwareDefinition2
+): LabwareFields | null {
   const allUniqueWellGroupProps = getUniqueWellProperties(def)
 
   if (allUniqueWellGroupProps.length === 0) {
@@ -42,7 +43,7 @@ export function labwareDefToFields(def: LabwareDefinition2): ?LabwareFields {
   const regularColumnSpacing = xSpacing !== null
   const regularRowSpacing = ySpacing !== null
 
-  let labwareType: $PropertyType<LabwareFields, 'labwareType'> | null = null
+  let labwareType: LabwareFields['labwareType'] | null = null
 
   if (
     def.metadata.displayCategory === 'wellPlate' ||

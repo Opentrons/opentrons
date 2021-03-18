@@ -1,4 +1,3 @@
-// @flow
 // english localizations
 
 export const CATEGORY_LABELS_BY_CATEGORY = {

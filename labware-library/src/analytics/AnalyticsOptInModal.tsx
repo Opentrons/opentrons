@@ -3,12 +3,12 @@ import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import { useAnalyticsOptInOrOut } from './useAnalyticsOptInOrOut'
 
-type Props = {|
-  className?: string,
-  children: React.Node,
-|}
+interface Props {
+  className?: string
+  children: React.ReactNode
+}
 
-export const AnalyticsOptInModal = (props: Props): React.Node => {
+export const AnalyticsOptInModal = (props: Props): React.ReactNode => {
   const { setAnalyticsOptIn, analyticsState } = useAnalyticsOptInOrOut()
 
   return (

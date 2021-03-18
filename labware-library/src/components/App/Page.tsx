@@ -1,17 +1,16 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 
 import styles from './styles.css'
 
-export type PageProps = {|
-  scrollRef: { current: HTMLDivElement | null },
-  detailPage: boolean,
-  sidebar: React.Node,
-  content: React.Node,
-|}
+export interface PageProps {
+  scrollRef: { current: HTMLDivElement | null }
+  detailPage: boolean
+  sidebar: React.ReactNode
+  content: React.ReactNode
+}
 
-export function Page(props: PageProps): React.Node {
+export function Page(props: PageProps): React.ReactNode {
   const { scrollRef, detailPage, sidebar, content } = props
 
   return (
