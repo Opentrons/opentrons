@@ -1,29 +1,38 @@
 import logging
-from queue import Queue
-from typing import Callable, Optional, Mapping, Tuple
+from enum import Enum
+from typing import Optional, Dict
+
+from opentrons.drivers import utils
+from opentrons.drivers.asyncio.communication import CommandBuilder
+from opentrons.drivers.asyncio.communication.serial_connection import \
+    SerialConnection
+from opentrons.drivers.asyncio.thermocycler.abstract import AbstractThermocycler
+from opentrons.drivers.types import Temperature, PlateTemperature, LidStatus
 
 log = logging.getLogger(__name__)
 
-GCODES = {
-    'OPEN_LID': 'M126',
-    'CLOSE_LID': 'M127',
-    'GET_LID_STATUS': 'M119',
-    'SET_LID_TEMP': 'M140',
-    'GET_LID_TEMP': 'M141',
-    'EDIT_PID_PARAMS': 'M301',
-    'SET_PLATE_TEMP': 'M104',
-    'GET_PLATE_TEMP': 'M105',
-    'SET_RAMP_RATE': 'M566',
-    'DEACTIVATE_ALL': 'M18',
-    'DEACTIVATE_LID': 'M108',
-    'DEACTIVATE_BLOCK': 'M14',
-    'DEVICE_INFO': 'M115'
-}
-LID_TARGET_DEFAULT = 105.0    # Degree celsius (floats)
-LID_TARGET_MIN = 37.0
-LID_TARGET_MAX = 110.0
-BLOCK_TARGET_MIN = 0.0
-BLOCK_TARGET_MAX = 99.0
+
+class GCODE(str, Enum):
+    OPEN_LID = "M126"
+    CLOSE_LID = "M127"
+    GET_LID_STATUS = "M119"
+    SET_LID_TEMP = "M140"
+    GET_LID_TEMP = "M141"
+    EDIT_PID_PARAMS = "M301"
+    SET_PLATE_TEMP = "M104"
+    GET_PLATE_TEMP = "M105"
+    SET_RAMP_RATE = "M566"
+    DEACTIVATE_ALL = "M18"
+    DEACTIVATE_LID = "M108"
+    DEACTIVATE_BLOCK = "M14"
+    DEVICE_INFO = "M115"
+
+
+LID_TARGET_DEFAULT = 105    # Degree celsius (floats)
+LID_TARGET_MIN = 37
+LID_TARGET_MAX = 110
+BLOCK_TARGET_MIN = 0
+BLOCK_TARGET_MAX = 99
 TEMP_UPDATE_RETRIES = 50
 TEMP_BUFFER_MAX_LEN = 10
 
@@ -50,99 +59,181 @@ class ThermocyclerError(Exception):
     pass
 
 
-class Thermocycler:
-    def __init__(self):
-        pass
+class Thermocycler(AbstractThermocycler):
+    def __init__(self, connection: SerialConnection) -> None:
+        """
+        Constructor
 
-    async def connect(self, port: str) -> 'Thermocycler':
-        return self
+        Args:
+            connection: SerialConnection to the thermocycler
+        """
+        self._connection = connection
 
-    async def disconnect(self) -> 'Thermocycler':
-        return self
+    async def connect(self) -> None:
+        """Connect to thermocycler"""
+        await self._connection.serial.open()
 
-    async def deactivate_all(self):
-        pass
-
-    async def deactivate_lid(self) -> None:
-        pass
-
-    async def deactivate_block(self):
-        pass
+    async def disconnect(self) -> None:
+        """Disconnect from thermocycler"""
+        await self._connection.serial.close()
 
     async def is_connected(self) -> bool:
-        pass
+        """Check connection"""
+        return await self._connection.serial.is_open()
 
-    async def open(self):
-        pass
+    async def open_lid(self) -> None:
+        """Send open lid command"""
+        c = CommandBuilder(
+            terminator=SERIAL_ACK
+        ).with_gcode(
+            gcode=GCODE.OPEN_LID
+        )
+        await self._connection.send_command(
+            data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
 
-    async def close(self):
-        pass
+    async def close_lid(self) -> None:
+        """Send close lid command"""
+        c = CommandBuilder(
+            terminator=SERIAL_ACK
+        ).with_gcode(
+            gcode=GCODE.CLOSE_LID
+        )
+        await self._connection.send_command(
+            data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
 
-    def hold_time_probably_set(self, new_hold_time: Optional[float]) -> bool:
-        """
-        Since we can only get hold time *remaining* from TC, by the time we
-        read hold_time after a set_temperature, the hold_time in TC could have
-        started counting down. So instead of checking for equality, we will
-        have to check if the hold_time returned from TC is within a few seconds
-        of the new hold time. The number of seconds is determined by status
-        polling frequency.
-        """
-        if new_hold_time is None:
-            return True
-        if self._hold_time is None:
-            return False
-        lower_bound = max(0.0, new_hold_time - HOLD_TIME_FUZZY_SECONDS)
-        return lower_bound <= self._hold_time <= new_hold_time
-
-    async def set_temperature(self,
-                              temp: float,
-                              hold_time: float = None,
-                              ramp_rate: float = None,
-                              volume: float = None) -> None:
-        pass
+    async def get_lid_status(self) -> LidStatus:
+        """Send get lid status command"""
+        c = CommandBuilder(
+            terminator=SERIAL_ACK
+        ).with_gcode(
+            gcode=GCODE.GET_LID_STATUS
+        )
+        response = await self._connection.send_command(
+            data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
+        return LidStatus(utils.parse_key_values(value=response)['Lid'])
 
     async def set_lid_temperature(self, temp: float) -> None:
-        pass
+        """Set the lid temperature"""
+        temp = min(LID_TARGET_MAX, max(LID_TARGET_MIN, temp))
+        c = CommandBuilder(
+            terminator=SERIAL_ACK
+        ).with_gcode(
+            gcode=GCODE.SET_LID_TEMP
+        ).with_float(
+            prefix="S", value=temp
+        )
+        await self._connection.send_command(
+            data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
 
-    @property
-    def temperature(self) -> float:
-        pass
+    async def get_lid_temperature(self) -> Temperature:
+        """Send a get lid temperature command."""
+        c = CommandBuilder(
+            terminator=SERIAL_ACK
+        ).with_gcode(
+            gcode=GCODE.GET_LID_TEMP
+        )
+        response = await self._connection.send_command(
+            data=c.build(), retries=DEFAULT_COMMAND_RETRIES
+        )
+        temp_dict = utils.parse_temperature_response(
+            temperature_string=response, rounding_val=utils.TC_GCODE_ROUNDING_PRECISION)
+        return Temperature(current=temp_dict['current'],
+                           target=temp_dict['target'])
 
-    @property
-    def target(self) -> float:
-        pass
+    async def set_plate_temperature(
+            self,
+            temp: float,
+            hold_time: Optional[float] = None,
+            volume: Optional[float] = None) -> None:
+        """Send set plate temperature command"""
+        temp = min(BLOCK_TARGET_MAX, max(BLOCK_TARGET_MIN, temp))
 
-    @property
-    def hold_time(self) -> float:
-        pass
+        c = CommandBuilder(
+            terminator=SERIAL_ACK
+        ).with_gcode(
+            gcode=GCODE.SET_PLATE_TEMP
+        ).with_float(
+            prefix="S", value=temp
+        )
+        if hold_time is not None:
+            c = c.with_float(prefix="H", value=hold_time)
+        if volume is not None:
+            c = c.with_float(prefix="V", value=volume)
 
-    @property
-    def ramp_rate(self) -> float:
-        pass
+        await self._connection.send_command(
+            data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
 
-    @property
-    def lid_temp_status(self) -> str:
-        pass
+    async def get_plate_temperature(self) -> PlateTemperature:
+        """Send a get plate temperature command."""
+        c = CommandBuilder(
+            terminator=SERIAL_ACK
+        ).with_gcode(
+            gcode=GCODE.GET_PLATE_TEMP
+        )
+        response = await self._connection.send_command(
+            data=c.build(), retries=DEFAULT_COMMAND_RETRIES
+        )
+        key_values = utils.parse_key_values(value=response)
+        return PlateTemperature(
+            current=utils.parse_number(
+                value=key_values.get('C', ""), rounding_val=utils.TC_GCODE_ROUNDING_PRECISION),
+            target=utils.parse_optional_number(
+                value=key_values.get('T', ""), rounding_val=utils.TC_GCODE_ROUNDING_PRECISION),
+            hold=utils.parse_optional_number(
+                value=key_values.get('H', ""), rounding_val=utils.TC_GCODE_ROUNDING_PRECISION)
+            )
 
-    @property
-    def status(self) -> str:
-        pass
+    async def set_ramp_rate(self, ramp_rate: float) -> None:
+        """Send a set ramp rate command"""
+        c = CommandBuilder(
+            terminator=SERIAL_ACK
+        ).with_gcode(
+            gcode=GCODE.SET_RAMP_RATE
+        ).with_float(
+            prefix="S", value=ramp_rate
+        )
+        await self._connection.send_command(
+            data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
 
-    @property
-    def port(self) -> Optional[str]:
-        pass
+    async def deactivate_all(self) -> None:
+        """Send deactivate all command."""
+        c = CommandBuilder(
+            terminator=SERIAL_ACK
+        ).with_gcode(
+            gcode=GCODE.DEACTIVATE_ALL
+        )
+        await self._connection.send_command(
+            data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
 
-    @property
-    def lid_status(self) -> str:
-        pass
+    async def deactivate_lid(self) -> None:
+        """Send deactivate lid command"""
+        c = CommandBuilder(
+            terminator=SERIAL_ACK
+        ).with_gcode(
+            gcode=GCODE.DEACTIVATE_LID
+        )
+        await self._connection.send_command(
+            data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
 
-    @property
-    def lid_temp(self) -> float:
-        pass
+    async def deactivate_block(self) -> None:
+        """Send deactivate block command"""
+        c = CommandBuilder(
+            terminator=SERIAL_ACK
+        ).with_gcode(
+            gcode=GCODE.DEACTIVATE_BLOCK
+        )
+        await self._connection.send_command(
+            data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
 
-    @property
-    def lid_target(self) -> float:
-        pass
-
-    async def get_device_info(self) -> Mapping[str, str]:
-        pass
+    async def get_device_info(self) -> Dict[str, str]:
+        """Send get device info command"""
+        c = CommandBuilder(
+            terminator=SERIAL_ACK
+        ).with_gcode(
+            gcode=GCODE.DEVICE_INFO
+        )
+        response = await self._connection.send_command(
+            data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
+        return utils.parse_device_information(
+            device_info_string=response
+        )

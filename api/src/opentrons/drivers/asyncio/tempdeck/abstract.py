@@ -2,11 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Dict, Optional
 
-
-@dataclass
-class Temperature:
-    current: float
-    target: Optional[float]
+from opentrons.drivers.types import Temperature
 
 
 class AbstractTempDeck(ABC):

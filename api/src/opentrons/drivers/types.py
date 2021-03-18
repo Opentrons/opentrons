@@ -1,6 +1,7 @@
 """ Type definitions for modules in this tree """
-
-from typing import Dict, NamedTuple
+from dataclasses import dataclass
+from typing import Dict, NamedTuple, Optional
+from enum import Enum
 
 
 class MoveSplit(NamedTuple):
@@ -13,3 +14,22 @@ class MoveSplit(NamedTuple):
 
 MoveSplits = Dict[str, MoveSplit]
 #: Dict mapping axes to their split parameters
+
+
+@dataclass
+class Temperature:
+    """Tempdeck temperature and thermocycler plate temperature."""
+    current: float
+    target: Optional[float]
+
+
+@dataclass
+class PlateTemperature(Temperature):
+    """Thermocycler lid temperature"""
+    hold: Optional[float]
+
+
+class LidStatus(str, Enum):
+    OPEN = "open"
+    CLOSED = "closed"
+
