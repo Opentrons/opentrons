@@ -190,8 +190,14 @@ export const BatchEditMoveLiquid = (
   props: BatchEditMoveLiquidProps
 ): React.Node => {
   const { propsForFields, handleCancel, handleSave } = props
-  const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip()
-  const [saveButtonTargetProps, saveButtonTooltipProps] = useHoverTooltip()
+  const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip({
+    placement: 'top',
+    strategy: 'fixed',
+  })
+  const [saveButtonTargetProps, saveButtonTooltipProps] = useHoverTooltip({
+    placement: 'top',
+    strategy: 'fixed',
+  })
   const disableSave = !props.batchEditFormHasChanges
 
   return (
