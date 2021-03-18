@@ -989,9 +989,11 @@ def test_multichannel_transfer_old_version(loop):
             instr_multi,
             max_volume=instr_multi.hw_pipette['working_volume'],
             api_version=ctx.api_version,
-            # todo(mm, 2021-03-17): This should be mode='transfer', but that
-            # raises a division by zero error. Bug in how sources+targets lists
-            # are expanded for 8-channel pipettes?
+            # todo(mm, 2021-03-17): This test intends to test mode='transfer',
+            # but it's always accidentally tested mode='consolidate' because of
+            # a quirk in how TransferPlan used to guess the mode when not
+            # explicitly specified. If this is changed to mode='transfer' now,
+            # it raises ZeroDivisionError instead of IndexError. Bug #7516.
             mode='consolidate')
         xfer_plan_list = []
         for step in xfer_plan:
