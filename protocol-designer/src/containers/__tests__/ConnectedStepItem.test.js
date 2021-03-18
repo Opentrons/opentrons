@@ -337,6 +337,32 @@ describe('ConnectedStepItem', () => {
       },
       {
         name:
+          'should select just one step when the clicked step is already selected',
+        props: { stepId: mockId, stepNumber: 1 },
+        mockClickEvent: {
+          shiftKey: true,
+          metaKey: false,
+          ctrlKey: false,
+          persist: jest.fn(),
+        },
+        setupMocks: () => {
+          when(getSelectedStepIdMock)
+            .calledWith(expect.anything())
+            .mockReturnValue(mockId)
+          when(getOrderedStepIdsMock)
+            .calledWith(expect.anything())
+            .mockReturnValue(['ANOTHER_ID', 'YET_ANOTHER_ID', mockId])
+        },
+        expectedAction: {
+          type: 'SELECT_MULTIPLE_STEPS',
+          payload: {
+            stepIds: [mockId],
+            lastSelected: mockId,
+          },
+        },
+      },
+      {
+        name:
           'should select a range when the selected step is earlier than the last selected step (single => multi)',
         props: { stepId: mockId, stepNumber: 1 },
         mockClickEvent: {
@@ -609,6 +635,27 @@ describe('ConnectedStepItem', () => {
             metaKey: true,
           },
           setupMocks: null,
+          expectedAction: {
+            type: 'SELECT_MULTIPLE_STEPS',
+            payload: {
+              stepIds: [mockId],
+              lastSelected: mockId,
+            },
+          },
+        },
+        {
+          name:
+            'should enter batch edit mode with just step (when clicking the same step that is already selected)',
+          props: { stepId: mockId, stepNumber: 1 },
+          clickEvent: {
+            ...mockClickEvent,
+            metaKey: true,
+          },
+          setupMocks: () => {
+            when(getSelectedStepIdMock)
+              .calledWith(expect.anything())
+              .mockReturnValue(mockId)
+          },
           expectedAction: {
             type: 'SELECT_MULTIPLE_STEPS',
             payload: {

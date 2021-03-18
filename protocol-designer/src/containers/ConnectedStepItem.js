@@ -246,7 +246,8 @@ function getMetaSelectedSteps(multiSelectItemIds, stepId, selectedStepId) {
       ? multiSelectItemIds.filter(id => id !== stepId)
       : [...multiSelectItemIds, stepId]
   } else if (selectedStepId) {
-    stepsToSelect = [selectedStepId, stepId]
+    stepsToSelect =
+      selectedStepId === stepId ? [selectedStepId] : [selectedStepId, stepId]
   } else {
     stepsToSelect = [stepId]
   }
