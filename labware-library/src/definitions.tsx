@@ -1,22 +1,19 @@
-// @flow
 // labware definition helpers
 // TODO(mc, 2019-03-18): move to shared-data?
 import * as React from 'react'
 import { Route } from 'react-router-dom'
 import groupBy from 'lodash/groupBy'
 import uniq from 'lodash/uniq'
-import {
-  LABWAREV2_DO_NOT_LIST,
-  type LabwareDefinition2,
-} from '@opentrons/shared-data'
+import { LABWAREV2_DO_NOT_LIST } from '@opentrons/shared-data'
 import { getPublicPath } from './public-path'
 
 import type { ContextRouter } from 'react-router-dom'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareList, LabwareDefinition } from './types'
 
 // require all definitions in the labware/definitions/2 directory
 // require.context is webpack-specific method
-const definitionsContext = (require: any).context(
+const definitionsContext = require.context(
   '@opentrons/shared-data/labware/definitions/2',
   true, // traverse subdirectories
   /\.json$/, // import filter
@@ -26,8 +23,11 @@ const definitionsContext = (require: any).context(
 const getOnlyLatestDefs = (labwareList: LabwareList): LabwareList => {
   // group by namespace + loadName
   const labwareDefGroups: {
-    [groupKey: string]: Array<LabwareDefinition2>,
-  } = groupBy(labwareList, d => `${d.namespace}/${d.parameters.loadName}`)
+    [groupKey: string]: LabwareDefinition2[]
+  } = groupBy<LabwareDefinition2>(
+    labwareList,
+    d => `${d.namespace}/${d.parameters.loadName}`
+  )
 
   return Object.keys(labwareDefGroups).map((groupKey: string) => {
     const group = labwareDefGroups[groupKey]
@@ -38,22 +38,22 @@ const getOnlyLatestDefs = (labwareList: LabwareList): LabwareList => {
   })
 }
 
-function _getAllDefs(): Array<LabwareDefinition2> {
+function _getAllDefs(): LabwareDefinition2[] {
   return definitionsContext.keys().map(name => definitionsContext(name))
 }
 
-let allLoadNames: Array<string> | null = null
+let allLoadNames: string[] | null = null
 // ALL unique load names, not just the allowed ones
-export function getAllLoadNames(): Array<string> {
+export function getAllLoadNames(): string[] {
   if (!allLoadNames) {
     allLoadNames = uniq(_getAllDefs().map(def => def.parameters.loadName))
   }
   return allLoadNames
 }
 
-let allDisplayNames: Array<string> | null = null
+let allDisplayNames: string[] | null = null
 // ALL unique display names, not just the allowed ones
-export function getAllDisplayNames(): Array<string> {
+export function getAllDisplayNames(): string[] {
   if (!allDisplayNames) {
     allDisplayNames = uniq(_getAllDefs().map(def => def.metadata.displayName))
   }
@@ -79,13 +79,12 @@ export function getDefinition(loadName: ?string): LabwareDefinition | null {
   return def || null
 }
 
-export type DefinitionRouteRenderProps = {|
-  ...ContextRouter,
-  definition: LabwareDefinition | null,
-|}
+export interface DefinitionRouteRenderProps extends ContextRouter {
+  definition: LabwareDefinition | null
+}
 
-export type DefinitionRouteProps = {
-  render: (props: DefinitionRouteRenderProps) => React.Node,
+export interface DefinitionRouteProps {
+  render: (props: DefinitionRouteRenderProps) => React.Node
 }
 
 export function DefinitionRoute(props: DefinitionRouteProps): React.Node {

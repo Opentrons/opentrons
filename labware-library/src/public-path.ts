@@ -1,4 +1,3 @@
-// @flow
 // set the public path at runtime according to deploy location
 // side-effects to make sure public path is set before other imports
 
