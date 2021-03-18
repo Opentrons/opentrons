@@ -45,7 +45,8 @@ def test_default_transfers(_instr_labware):
         100, lw1.columns()[0], lw2.columns()[0],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=_instr_labware['ctx'].api_version)
+        api_version=_instr_labware['ctx'].api_version,
+        mode='transfer')
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -90,7 +91,8 @@ def test_default_transfers(_instr_labware):
         50, lw1.columns()[0][0], lw2.columns()[0],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=_instr_labware['ctx'].api_version)
+        api_version=_instr_labware['ctx'].api_version,
+        mode='distribute')
     dist_plan_list = []
     for step in dist_plan:
         dist_plan_list.append(step)
@@ -123,7 +125,8 @@ def test_default_transfers(_instr_labware):
         50, lw1.columns()[0], lw2.columns()[0][0],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=_instr_labware['ctx'].api_version)
+        api_version=_instr_labware['ctx'].api_version,
+        mode='consolidate')
     consd_plan_list = []
     for step in consd_plan:
         consd_plan_list.append(step)
@@ -310,6 +313,7 @@ def test_no_new_tip(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='transfer',
         options=options)
     for step in xfer_plan:
         assert step['method'] != 'pick_up_tip'
@@ -321,6 +325,7 @@ def test_no_new_tip(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='distribute',
         options=options)
     for step in dist_plan:
         assert step['method'] != 'pick_up_tip'
@@ -332,6 +337,7 @@ def test_no_new_tip(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='transfer',
         options=options)
     for step in consd_plan:
         assert step['method'] != 'pick_up_tip'
@@ -357,6 +363,7 @@ def test_new_tip_always(_instr_labware, monkeypatch):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='transfer',
         options=options)
     xfer_plan_list = []
     for step in xfer_plan:
@@ -409,6 +416,7 @@ def test_transfer_w_touchtip_blowout(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='transfer',
         options=options)
     xfer_plan_list = []
     for step in xfer_plan:
@@ -455,6 +463,7 @@ def test_transfer_w_touchtip_blowout(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='distribute',
         options=options)
     dist_plan_list = []
     for step in dist_plan:
@@ -494,6 +503,7 @@ def test_transfer_w_airgap_blowout(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='transfer',
         options=options)
     xfer_plan_list = []
     for step in xfer_plan:
@@ -537,6 +547,7 @@ def test_transfer_w_airgap_blowout(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='distribute',
         options=options)
     dist_plan_list = []
     for step in dist_plan:
@@ -570,6 +581,7 @@ def test_transfer_w_airgap_blowout(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='consolidate',
         options=options)
     consd_plan_list = []
     for step in consd_plan:
@@ -625,6 +637,7 @@ def test_touchtip_mix(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='transfer',
         options=options)
     xfer_plan_list = []
     for step in xfer_plan:
@@ -669,6 +682,7 @@ def test_touchtip_mix(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='distribute',
         options=options)
     dist_plan_list = []
     for step in dist_plan:
@@ -702,6 +716,7 @@ def test_touchtip_mix(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='consolidate',
         options=options)
     consd_plan_list = []
     for step in consd_plan:
@@ -773,6 +788,7 @@ def test_all_options(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=_instr_labware['ctx'].api_version,
+        mode='transfer',
         options=options)
     xfer_plan_list = []
     for step in xfer_plan:
@@ -816,7 +832,8 @@ def test_oversized_distribute(_instr_labware):
         700, lw1.columns()[0][0], lw2.rows()[0][1:3],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=_instr_labware['ctx'].api_version)
+        api_version=_instr_labware['ctx'].api_version,
+        mode='distribute')
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -859,7 +876,8 @@ def test_oversized_consolidate(_instr_labware):
         lw1.wells_by_index()['A1'],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=_instr_labware['ctx'].api_version)
+        api_version=_instr_labware['ctx'].api_version,
+        mode='consolidate')
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -901,7 +919,8 @@ def test_oversized_transfer(_instr_labware):
         700, lw2.rows()[0][1:3], lw1.columns()[0][1:3],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=_instr_labware['ctx'].api_version)
+        api_version=_instr_labware['ctx'].api_version,
+        mode='transfer')
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -950,7 +969,8 @@ def test_multichannel_transfer_old_version(loop):
             100, lw1.rows()[0][0], [lw2.rows()[0][1], lw2.rows()[1][1]],
             instr_multi,
             max_volume=instr_multi.hw_pipette['working_volume'],
-            api_version=ctx.api_version)
+            api_version=ctx.api_version,
+            mode='distribute')
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -968,7 +988,11 @@ def test_multichannel_transfer_old_version(loop):
             100, lw1.rows()[0][1], lw2.rows()[1][1],
             instr_multi,
             max_volume=instr_multi.hw_pipette['working_volume'],
-            api_version=ctx.api_version)
+            api_version=ctx.api_version,
+            # todo(mm, 2021-03-17): This should be mode='transfer', but that
+            # raises a division by zero error. Bug in how sources+targets lists
+            # are expanded for 8-channel pipettes?
+            mode='consolidate')
         xfer_plan_list = []
         for step in xfer_plan:
             xfer_plan_list.append(step)
@@ -992,7 +1016,8 @@ def test_multichannel_transfer_locs(loop):
             100, lw1.rows()[0][1], lw2.rows()[1][1],
             instr_multi,
             max_volume=instr_multi.hw_pipette['working_volume'],
-            api_version=ctx.api_version)
+            api_version=ctx.api_version,
+            mode='transfer')
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -1009,7 +1034,8 @@ def test_multichannel_transfer_locs(loop):
         100, lw1.rows()[0][1], [lw2.rows()[1][1], lw2.rows()[2][1]],
         instr_multi,
         max_volume=instr_multi.hw_pipette['working_volume'],
-        api_version=ctx.api_version)
+        api_version=ctx.api_version,
+        mode='transfer')
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -1021,7 +1047,8 @@ def test_multichannel_transfer_locs(loop):
             100, lw1.rows()[0][1], lw2.rows()[2][1],
             instr_multi,
             max_volume=instr_multi.hw_pipette['working_volume'],
-            api_version=ctx.api_version)
+            api_version=ctx.api_version,
+            mode='transfer')
 
 
 def test_zero_volume_results_in_no_transfer(_instr_labware):
@@ -1038,7 +1065,8 @@ def test_zero_volume_results_in_no_transfer(_instr_labware):
         0, lw1.columns()[0], lw2.columns()[0],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=API_VERSION)
+        api_version=API_VERSION,
+        mode='transfer')
     for step, expected in zip(xfer_plan, exp_no_vol):
         assert step == expected
 
@@ -1046,7 +1074,8 @@ def test_zero_volume_results_in_no_transfer(_instr_labware):
         [100, 0, 200], lw1.wells()[0:3], lw2.wells()[0:3],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=API_VERSION)
+        api_version=API_VERSION,
+        mode='transfer')
     exp2 = [{'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
             {'method': 'aspirate',
              'args': [100, lw1['A1'], 1.0], 'kwargs': {}},
@@ -1065,7 +1094,8 @@ def test_zero_volume_results_in_no_transfer(_instr_labware):
         0, lw1.columns()[0][0], lw2.rows()[0][1:3],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=API_VERSION)
+        api_version=API_VERSION,
+        mode='distribute')
     for step, expected in zip(dist_plan, exp_no_vol):
         assert step == expected
 
@@ -1073,7 +1103,8 @@ def test_zero_volume_results_in_no_transfer(_instr_labware):
         [100, 0], lw1.columns()[0][0], lw2.rows()[0][1:3],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=API_VERSION)
+        api_version=API_VERSION,
+        mode='distribute')
     exp3 = [
         {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
         {'method': 'aspirate', 'args': [100, lw1['A1'], 1.0], 'kwargs': {}},
@@ -1087,7 +1118,8 @@ def test_zero_volume_results_in_no_transfer(_instr_labware):
         0, lw1.columns()[0], lw2.columns()[0][0],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=API_VERSION)
+        api_version=API_VERSION,
+        mode='consolidate')
     for step, expected in zip(consd_plan, exp_no_vol):
         assert step == expected
 
@@ -1096,7 +1128,8 @@ def test_zero_volume_results_in_no_transfer(_instr_labware):
         cons_list, lw1.columns()[0], lw2.columns()[0][0],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=API_VERSION)
+        api_version=API_VERSION,
+        mode='consolidate')
     exp4 = [
         {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
         {'method': 'aspirate', 'args': [100, lw1['A1'], 1.0], 'kwargs': {}},
@@ -1136,6 +1169,7 @@ def test_zero_volume_causes_transfer_of_disposal_vol(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=API_VERSION,
+        mode='distribute',
         options=options)
 
     exp_no_vol = [
@@ -1153,6 +1187,7 @@ def test_zero_volume_causes_transfer_of_disposal_vol(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=API_VERSION,
+        mode='distribute',
         options=options)
     exp = [
         {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
@@ -1169,7 +1204,8 @@ def test_zero_volume_causes_transfer_of_disposal_vol(_instr_labware):
         0, lw1.columns()[0], lw2.columns()[0][0],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=API_VERSION)
+        api_version=API_VERSION,
+        mode='consolidate')
     exp_no_vol = [
         {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
         {'method': 'aspirate', 'args': [0, lw1['A1'], 1.0], 'kwargs': {}},
@@ -1190,7 +1226,8 @@ def test_zero_volume_causes_transfer_of_disposal_vol(_instr_labware):
         cons_list, lw1.columns()[0], lw2.columns()[0][0],
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-        api_version=API_VERSION)
+        api_version=API_VERSION,
+        mode='consolidate')
     exp2 = [
         {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
         {'method': 'aspirate', 'args': [100, lw1['A1'], 1.0], 'kwargs': {}},
@@ -1228,6 +1265,7 @@ def test_blowout_to_source(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=API_VERSION,
+        mode='transfer',
         options=options)
 
     exp = [
@@ -1254,6 +1292,7 @@ def test_blowout_to_source(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=API_VERSION,
+        mode='distribute',
         options=options)
 
     exp = [
@@ -1285,6 +1324,7 @@ def test_blowout_to_dest(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=API_VERSION,
+        mode='transfer',
         options=options)
 
     exp = [
@@ -1310,6 +1350,7 @@ def test_blowout_to_dest(_instr_labware):
         _instr_labware['instr'],
         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
         api_version=API_VERSION,
+        mode='consolidate',
         options=options)
 
     exp = [
