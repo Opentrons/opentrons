@@ -62,12 +62,14 @@ type Props = {|
     moduleId: string,
     command: ModuleCommand,
     args?: Array<mixed>
-  ) => mixed,
+    ) => mixed,
+  btnWidth?: string | null,
   disabledReason?: string | null,
 |}
 
 export const MagnetControl = ({
   module,
+  btnWidth,
   sendModuleCommand,
   disabledReason,
 }: Props): React.Node => {
@@ -124,7 +126,7 @@ export const MagnetControl = ({
             >
               <Box>
                 <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>
-                  Set Engage Height:{' '}
+                  Set Engage Height:
                 </Text>
                 <Flex width="6rem" marginTop={SPACING_1}>
                   <InputField
@@ -140,7 +142,7 @@ export const MagnetControl = ({
         </Portal>
       )}
       <SecondaryBtn
-        width="11rem"
+        width={btnWidth ?? "11rem"}
         onClick={handleClick}
         disabled={disabledReason != null}
         {...targetProps}

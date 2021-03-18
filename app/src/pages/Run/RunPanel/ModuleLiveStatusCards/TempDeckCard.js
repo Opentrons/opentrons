@@ -3,7 +3,7 @@ import * as React from 'react'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { TemperatureControl } from '../../../../molecules/ModuleControls'
+import { TemperatureControl, TemperatureData } from '../../../../molecules/ModuleControls'
 import { StatusCard } from './StatusCard'
 import { StatusItem } from './StatusItem'
 import styles from './styles.css'
@@ -38,23 +38,17 @@ export const TempDeckCard = ({
     toggleCard={toggleCard}
   >
     <div className={styles.card_row}>
-      <StatusItem status={module.status} />
+      <TemperatureData
+        status={module.status}
+        current={module.data.currentTemp}
+        target={module.data.targetTemp}
+        title={null}
+      />
       <TemperatureControl
         module={module}
         sendModuleCommand={sendModuleCommand}
         disabledReason={controlDisabledReason}
-      />
-    </div>
-    <div className={styles.card_row}>
-      <LabeledValue
-        label="Current Temp"
-        className={styles.temp_data_item}
-        value={`${module.data.currentTemp} °C`}
-      />
-      <LabeledValue
-        label="Target Temp"
-        className={styles.temp_data_item}
-        value={module.data.targetTemp ? `${module.data.targetTemp} °C` : 'None'}
+        btnWidth="9rem"
       />
     </div>
   </StatusCard>

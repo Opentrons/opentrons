@@ -38,11 +38,13 @@ type Props = {|
     command: ModuleCommand,
     args?: Array<mixed>
   ) => mixed,
+  btnWidth?: string | null,
   disabledReason?: string | null,
 |}
 
 export const TemperatureControl = ({
   module,
+  btnWidth,
   sendModuleCommand,
   disabledReason,
 }: Props): React.Node => {
@@ -162,7 +164,7 @@ export const TemperatureControl = ({
       {isThermocycler && (
         <>
           <SecondaryBtn
-            width="11rem"
+            width={btnWidth ?? "11rem"}
             marginBottom={SPACING_3}
             onClick={handleSecondaryClick}
             disabled={disabledReason != null}
@@ -180,7 +182,7 @@ export const TemperatureControl = ({
           padding-left: 0.5rem;
           padding-right: 0.5rem;
         `}
-        width="11rem"
+        width={btnWidth ?? "11rem"}
         onClick={handleClick}
         disabled={disabledReason != null}
         {...targetProps}

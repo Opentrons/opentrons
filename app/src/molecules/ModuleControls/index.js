@@ -16,6 +16,7 @@ import {
 } from '@opentrons/components'
 import { TemperatureControl } from './TemperatureControl'
 import { MagnetControl } from './MagnetControl'
+import { MagnetData } from './MagnetData'
 import {
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -41,27 +42,12 @@ export function ModuleControls(props: Props): React.Node {
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
       {mod.type === MAGNETIC_MODULE_TYPE ? (
         <>
-          <Flex fontSize={FONT_SIZE_BODY_1} alignItems={ALIGN_CENTER}>
-            <Icon
-              name="circle"
-              width="10px"
-              color={
-                mod.status === 'engaged' ? COLOR_SUCCESS : COLOR_WARNING_LIGHT
-              }
-              marginRight="0.375rem"
-            />
-            <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>{mod.status}</Text>
-            {mod.status === 'engaged' && (
-              <Text>{`, ${mod.data.height} mm`}</Text>
-            )}
-          </Flex>
-          <Flex>
-            <MagnetControl
-              module={mod}
-              sendModuleCommand={sendModuleCommand}
-              disabledReason={controlDisabledReason}
-            />
-          </Flex>
+          <MagnetData module={mod} />
+          <MagnetControl
+            module={mod}
+            sendModuleCommand={sendModuleCommand}
+            disabledReason={controlDisabledReason}
+          />
         </>
       ) : (
         <>
@@ -93,4 +79,4 @@ export function ModuleControls(props: Props): React.Node {
   )
 }
 
-export { TemperatureControl, TemperatureData }
+export { TemperatureControl, TemperatureData, MagnetData, MagnetControl }

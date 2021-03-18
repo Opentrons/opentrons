@@ -134,23 +134,23 @@ export const ThermocyclerCard = ({
       toggleCard={toggleCard}
     >
       <div className={styles.card_row}>
-        <StatusItem status={module.status} />
+        <div className={styles.thermocycler_data}>
+          <TemperatureData
+              title="lid"
+              current={lidTemp}
+              target={lidTarget}
+            />
+          <TemperatureData
+            status={module.status}
+            title="block"
+            current={currentTemp}
+            target={targetTemp}
+          />
+        </div>
         <TemperatureControl
           module={module}
           sendModuleCommand={sendModuleCommand}
           disabledReason={controlDisabledReason}
-        />
-      </div>
-      <div className={styles.card_row}>
-        <TemperatureData
-          title={BLOCK_TEMP_ABBREV}
-          current={currentTemp}
-          target={targetTemp}
-        />
-        <TemperatureData
-          title={LID_TEMP_ABBREV}
-          current={lidTemp}
-          target={lidTarget}
         />
       </div>
       {executingProfile && (
