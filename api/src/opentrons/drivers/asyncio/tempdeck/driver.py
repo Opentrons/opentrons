@@ -1,6 +1,3 @@
-import logging
-from typing import Optional, Mapping
-
 """
 - Driver is responsible for providing an interface for the temp-deck
 - Driver is the only system component that knows about the temp-deck's GCODES
@@ -9,6 +6,17 @@ from typing import Optional, Mapping
 - Driver is NOT responsible interpreting the temperatures or states in any way
   or knowing anything about what the device is being used for
 """
+
+import logging
+from typing import Dict
+from enum import Enum
+
+from opentrons.drivers import utils
+from opentrons.drivers.asyncio.communication import CommandBuilder
+from opentrons.drivers.asyncio.communication.serial_connection import \
+    SerialConnection
+from opentrons.drivers.asyncio.tempdeck.abstract import AbstractTempDeck, \
+    Temperature
 
 log = logging.getLogger(__name__)
 
@@ -20,71 +28,119 @@ DEFAULT_TEMP_DECK_TIMEOUT = 1
 DEFAULT_STABILIZE_DELAY = 0.1
 DEFAULT_COMMAND_RETRIES = 3
 
-GCODES = {
-    'GET_TEMP': 'M105',
-    'SET_TEMP': 'M104',
-    'DEVICE_INFO': 'M115',
-    'DISENGAGE': 'M18',
-    'PROGRAMMING_MODE': 'dfu'
-}
+
+class GCODE(str, Enum):
+    GET_TEMP = "M105"
+    SET_TEMP = "M104"
+    DEVICE_INFO = "M115"
+    DISENGAGE = "M18"
+    PROGRAMMING_MODE = "dfu"
+
 
 TEMP_DECK_BAUDRATE = 115200
 
 TEMP_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
 TEMP_DECK_ACK = 'ok\r\nok\r\n'
 
-TEMP_DECK_MODELS = {
-    'temperatureModuleV1': 'temp_deck_v1.1',
-    'temperatureModuleV2': 'temp_deck_v20'
-}
-
 
 class TempDeckError(Exception):
     pass
 
 
-class TempDeck:
-    def __init__(self):
-        pass
+class TempDeck(AbstractTempDeck):
 
-    async def connect(self, port=None) -> None:
-        pass
+    @classmethod
+    async def create(cls, port: str) -> 'TempDeck':
+        """
+        Create a temp deck driver.
+
+        Args:
+            port: port or url of temp deck
+
+        Returns: driver
+        """
+        connection = await SerialConnection.create(
+            port=port, baud_rate=TEMP_DECK_BAUDRATE,
+            timeout=DEFAULT_TEMP_DECK_TIMEOUT, ack=TEMP_DECK_ACK
+        )
+        return cls(connection=connection)
+
+    def __init__(self, connection: SerialConnection) -> None:
+        """
+        Construct a temp deck driver
+        
+        Args:
+            connection: Connection to the temp deck
+        """
+        self._connection = connection
+
+    async def connect(self) -> None:
+        """Connect to the temp deck."""
+        await self._connection.serial.open()
 
     async def disconnect(self) -> None:
-        pass
+        """Disconnect from temp deck"""
+        await self._connection.serial.close()
 
     async def is_connected(self) -> bool:
-        pass
-
-    @property
-    def port(self) -> Optional[str]:
-        pass
+        """Check connected state"""
+        return await self._connection.serial.is_open()
 
     async def deactivate(self) -> None:
-        pass
+        """
+        Send disengage command to temp deck
+
+        Returns: None
+        """
+        c = CommandBuilder(
+            terminator=TEMP_DECK_COMMAND_TERMINATOR
+        ).with_gcode(
+            gcode=GCODE.DISENGAGE
+        )
+        await self._send_command(command=c)
 
     async def set_temperature(self, celsius: float) -> None:
-        pass
+        """
+        Send a set temperate command to temp deck
 
-    async def start_set_temperature(self, celsius: float) -> None:
-        pass
+        Args:
+            celsius: the target temperature
 
-    async def update_temperature(self, default: Optional[float] = None) -> None:
-        pass
+        Returns: None
+        """
+        c = CommandBuilder(
+            terminator=TEMP_DECK_COMMAND_TERMINATOR
+        ).with_gcode(
+            gcode=GCODE.SET_TEMP
+        ).with_float(prefix="S",
+                     value=celsius,
+                     precision=utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+        await self._send_command(command=c)
 
-    @property
-    def target(self) -> Optional[int]:
-        pass
+    async def get_temperature(self) -> Temperature:
+        """
+        Send a get temperature command to the temp deck.
 
-    @property
-    def temperature(self) -> int:
-        pass
+        Returns: Temperature object
 
-    @property
-    def status(self) -> str:
-        pass
+        """
+        c = CommandBuilder(
+            terminator=TEMP_DECK_COMMAND_TERMINATOR
+        ).with_gcode(
+            gcode=GCODE.GET_TEMP
+        )
+        response = await self._send_command(command=c)
+        temperature = utils.parse_temperature_response(
+            temperature_string=response,
+            rounding_val=utils.TEMPDECK_GCODE_ROUNDING_PRECISION
+        )
+        log.debug(f"{temperature}")
+        return Temperature(
+            current=temperature.get("current"),
+            target=temperature.get("target")
+        )
 
-    async def get_device_info(self) -> Mapping[str, str]:
+    async def get_device_info(self) -> Dict[str, str]:
         """
         Queries Temp-Deck for its build version, model, and serial number
 
@@ -101,7 +157,46 @@ class TempDeck:
         Example input from Temp-Deck's serial response:
             "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
         """
-        pass
+        c = CommandBuilder(
+            terminator=TEMP_DECK_COMMAND_TERMINATOR
+        ).with_gcode(
+            gcode=GCODE.DEVICE_INFO
+        )
+        response = await self._send_command(command=c)
+        return utils.parse_device_information(
+            device_info_string=response
+        )
 
     async def enter_programming_mode(self) -> None:
-        pass
+        """
+        Send command to enter programming mode.
+
+        Returns: None
+        """
+        c = CommandBuilder(
+            terminator=TEMP_DECK_COMMAND_TERMINATOR
+        ).with_gcode(
+            gcode=GCODE.PROGRAMMING_MODE
+        )
+        await self._send_command(command=c)
+
+    async def _send_command(self, command: CommandBuilder) -> str:
+        """
+        Send the command
+
+        Args:
+            command: command to send
+
+        Returns:
+            command response
+        """
+        response = await self._connection.send_command(
+            data=command.build(),
+            retries=DEFAULT_COMMAND_RETRIES
+        )
+        response_lower = response.lower()
+        if ERROR_KEYWORD in response_lower or ALARM_KEYWORD in response_lower:
+            log.error(f"Received error message from Temp-Deck: {response}")
+            raise TempDeckError(response)
+
+        return response

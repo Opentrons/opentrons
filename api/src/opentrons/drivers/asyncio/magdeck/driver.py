@@ -23,7 +23,7 @@ ALARM_KEYWORD = 'alarm'
 
 DEFAULT_MAG_DECK_TIMEOUT = 10  # Quite large to account for probe time
 
-DEFAULT_STABILIZE_DELAY = 0.1
+DEFAULT_STABILIZE_DELAY = 0.1  # TODO Amit - Use this to sleep between retries.
 DEFAULT_COMMAND_RETRIES = 3
 
 
@@ -81,13 +81,15 @@ class MagDeck(AbstractMagDeckDriver):
 
     async def connect(self) -> None:
         """Connect to device"""
-        pass
+        await self._connection.serial.open()
 
     async def disconnect(self) -> None:
-        pass
+        """Disconnect from device"""
+        await self._connection.serial.close()
 
     async def is_connected(self) -> bool:
-        pass
+        """Check if connected."""
+        return await self._connection.serial.is_open()
 
     async def home(self) -> None:
         """Homes the magnet"""

@@ -69,7 +69,7 @@ def parse_key_from_substring(substring) -> str:
 
 def parse_temperature_response(
         temperature_string: str, rounding_val: int
-        ) -> Dict[str, Optional[float]]:
+    ) -> Dict[str, Optional[float]]:
     """Example input: "T:none C:25"""
     data = parse_key_values(temperature_string)
     if 'C' not in data or 'T' not in data:
