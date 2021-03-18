@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/Opentrons/opentrons/compare/v4.1.1...v4.2.0) (2021-03-18)
+
+### Bug Fixes
+
+* **app:** do not resume when clicking "back" from confirm cancel modal ([#7342](https://github.com/Opentrons/opentrons/issues/7342)) ([d55cdab](https://github.com/Opentrons/opentrons/commit/d55cdab)), closes [#5924](https://github.com/Opentrons/opentrons/issues/5924) [#5923](https://github.com/Opentrons/opentrons/issues/5923)
+* **app:** ensure cal block prompt appears in pre protocol tlc ([#7278](https://github.com/Opentrons/opentrons/issues/7278)) ([2b55bde](https://github.com/Opentrons/opentrons/commit/2b55bde))
+
+
+### Features
+
+* **app:** add modules as a side panel group to the calibrate page ([#7312](https://github.com/Opentrons/opentrons/issues/7312)) ([8d1f3ab](https://github.com/Opentrons/opentrons/commit/8d1f3ab))
+
+
+
+
+
 ## [4.1.1](https://github.com/Opentrons/opentrons/compare/v4.1.0...v4.1.1) (2021-01-25)
 
 **Note:** Version bump only for package @opentrons/app
