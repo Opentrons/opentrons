@@ -17,7 +17,7 @@ describe('ReturnTip', () => {
   beforeEach(() => {
     mockSendCommands = jest.fn()
 
-    render = (props: $Shape<React.ElementProps<typeof ReturnTip>> = {}) => {
+    render = (props: Partial<React.ElementProps<typeof ReturnTip>> = {}) => {
       const {
         pipMount = 'left',
         isMulti = false,
@@ -54,7 +54,7 @@ describe('ReturnTip', () => {
     jest.resetAllMocks()
   })
 
-  it('on continue, if final pipette, return tip and transition ', () => {
+  it('on continue, if final pipette, return tip and transition', () => {
     const wrapper = render({
       activePipette: {
         ...mockSessionDetails.activePipette,

@@ -45,7 +45,7 @@ export type InterfaceStatus = {
   type: InterfaceType,
 }
 
-export type InterfaceStatusMap = $Shape<{
+export type InterfaceStatusMap = Partial<{
   [device: string]: InterfaceStatus,
 }>
 

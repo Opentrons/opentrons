@@ -19,7 +19,7 @@ describe('ConfirmExitModal', () => {
 
   beforeEach(() => {
     render = (
-      props: $Shape<React.ElementProps<typeof ConfirmExitModal>> = {}
+      props: Partial<React.ElementProps<typeof ConfirmExitModal>> = {}
     ) => {
       const { sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION } = props
       return mount(

@@ -27,7 +27,7 @@ const mockGetProtocolIsRunning: JestMockFn<
 type SelectorSpec = {
   name: string,
   selector: (State, ...Array<any>) => mixed,
-  state: $Shape<State>,
+  state: Partial<State>,
   args?: Array<any>,
   before?: () => mixed,
   expected: mixed,

@@ -40,7 +40,7 @@ const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 
 const mockGetPipetteModelSpecs: JestMockFn<
   [string],
-  ?$Shape<PipetteModelSpecs>
+  ?Partial<PipetteModelSpecs>
 > = getPipetteModelSpecs
 
 describe('ResultsSummary', () => {
@@ -79,7 +79,7 @@ describe('ResultsSummary', () => {
       displayName: 'mock pipette display name',
     })
     render = (
-      props: $Shape<React.ElementProps<typeof ResultsSummary>> = {}
+      props: Partial<React.ElementProps<typeof ResultsSummary>> = {}
     ) => {
       const {
         pipMount = 'left',

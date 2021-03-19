@@ -33,7 +33,7 @@ const getUpdateChannelOptions: JestMockFn<
   $Call<typeof Config.getUpdateChannelOptions, State>
 > = Config.getUpdateChannelOptions
 
-const MOCK_STATE: $Shape<State> = { robotApi: {} }
+const MOCK_STATE: Partial<State> = { robotApi: {} }
 
 describe('AppAdvancedSettingsCard', () => {
   const render = () => {

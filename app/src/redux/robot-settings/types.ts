@@ -22,7 +22,7 @@ export interface PerRobotRobotSettingsState {
   restartPath: string | null
 }
 
-export type RobotSettingsState = $Shape<{
+export type RobotSettingsState = Partial<{
   [robotName: string]: void | PerRobotRobotSettingsState
 }>
 

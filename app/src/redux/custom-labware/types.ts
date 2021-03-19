@@ -54,7 +54,7 @@ export type FailedLabwareFile =
 
 export type CustomLabwareState = $ReadOnly<{
   filenames: Array<string>,
-  filesByName: $Shape<{ [filename: string]: CheckedLabwareFile }>,
+  filesByName: Partial<{ [filename: string]: CheckedLabwareFile }>,
   addFailureFile: FailedLabwareFile | null,
   addFailureMessage: string | null,
   listFailureMessage: string | null,

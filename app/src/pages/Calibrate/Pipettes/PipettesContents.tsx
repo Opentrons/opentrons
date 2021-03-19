@@ -21,7 +21,7 @@ export function PipettesContents(props: PipettesContentsProps): React.Node {
   const { currentMount, pipettes, activeTipracks } = props
 
   const infoByMount = PIPETTE_MOUNTS.reduce<
-    $Shape<{
+    Partial<{
       left?: InstrumentInfoProps,
       right?: InstrumentInfoProps,
     }>

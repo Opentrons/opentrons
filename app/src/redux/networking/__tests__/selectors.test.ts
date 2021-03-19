@@ -17,8 +17,8 @@ const getRobotApiVersionByName: JestMockFn<
 
 type SelectorSpec = {
   name: string,
-  selector: ($Shape<State>, ...Array<any>) => mixed,
-  state: $Shape<State>,
+  selector: (Partial<State>, ...Array<any>) => mixed,
+  state: Partial<State>,
   args?: Array<any>,
   before?: (spec: SelectorSpec) => mixed,
   expected: mixed,

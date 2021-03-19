@@ -62,7 +62,7 @@ describe('PipetteOffsetItem', () => {
           plunger_axis: 'b',
           modelSpecs: ({
             displayName: 'P300 Single GEN2',
-          }: $Shape<PipetteModelSpecs>),
+          }: Partial<PipetteModelSpecs>),
         },
         calibration = {
           offset: {
@@ -120,7 +120,7 @@ describe('PipetteOffsetItem', () => {
           lastModified: '2020-09-10T05:13Z',
           source: 'user',
           id: 'a_pip_id',
-        }: $Shape<PipetteOffsetCalibration>),
+        }: Partial<PipetteOffsetCalibration>),
         tipLength: ({
           id: '1',
           tipLength: 30,
@@ -128,7 +128,7 @@ describe('PipetteOffsetItem', () => {
           pipette: 'pipette-id-11',
           lastModified: '2020-09-10T05:10Z',
           source: 'user',
-        }: $Shape<TipLengthCalibration>),
+        }: Partial<TipLengthCalibration>),
       },
     })
     expect(wrapper.find('PipetteOffsetItem')).not.toBeNull()

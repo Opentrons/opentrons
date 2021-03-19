@@ -146,7 +146,7 @@ export function validateConnectFormFields(
     securityType: formSecurityType,
     psk: formPsk,
   } = values
-  const errors: $Shape<ConnectFormErrors> = {}
+  const errors: Partial<ConnectFormErrors> = {}
 
   if (network === null && !formSsid) {
     errors.ssid = Copy.FIELD_IS_REQUIRED(Copy.LABEL_SSID)

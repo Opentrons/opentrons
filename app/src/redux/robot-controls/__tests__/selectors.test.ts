@@ -6,7 +6,7 @@ import type { State } from '../../types'
 type SelectorSpec = {
   name: string,
   selector: (State, ...Array<any>) => mixed,
-  state: $Shape<State>,
+  state: Partial<State>,
   args?: Array<any>,
   expected: mixed,
 }

@@ -50,11 +50,11 @@ export type PipetteSettings = {
   fields: PipetteSettingsFieldsMap,
 }
 
-export type PipetteSettingsFieldsUpdate = $Shape<{
+export type PipetteSettingsFieldsUpdate = Partial<{
   [fieldId: string]: number | null,
 }>
 
-export type PipetteSettingsById = $Shape<{ [id: string]: PipetteSettings }>
+export type PipetteSettingsById = Partial<{ [id: string]: PipetteSettings }>
 
 export type PipetteSettingsByMount = {
   left: PipetteSettingsFieldsMap | null,
@@ -70,7 +70,7 @@ export type ProtocolPipetteInfo = {
     modelSpecs: ?PipetteModelSpecs,
   },
   protocol: null | {
-    ...$Shape<$Exact<ProtocolPipette>>,
+    ...Partial<$Exact<ProtocolPipette>>,
     displayName: string,
   },
   compatibility: PipetteCompatibility,
@@ -198,7 +198,7 @@ export type PerRobotPipettesState = $ReadOnly<{
   settingsById: FetchPipetteSettingsResponseBody | null,
 }>
 
-export type PipettesState = $Shape<
+export type PipettesState = Partial<
   $ReadOnly<{
     [robotName: string]: void | PerRobotPipettesState,
   }>

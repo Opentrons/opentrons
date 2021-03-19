@@ -151,7 +151,7 @@ export type ModulesAction =
 
 // state types
 
-export type AttachedModulesById = $Shape<
+export type AttachedModulesById = Partial<
   $ReadOnly<{ [moduleId: string]: AttachedModule }>
 >
 
@@ -159,7 +159,7 @@ export type PerRobotModulesState = $ReadOnly<{
   modulesById: AttachedModulesById | null,
 }>
 
-export type ModulesState = $Shape<
+export type ModulesState = Partial<
   $ReadOnly<{
     [robotName: string]: void | PerRobotModulesState,
   }>

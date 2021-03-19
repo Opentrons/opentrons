@@ -220,7 +220,7 @@ function getPipetteModels(state: State, robotName: string): ModelsByMount {
       }
       return obj
     },
-    ({}: $Shape<ModelsByMount>)
+    ({}: Partial<ModelsByMount>)
   )
 }
 
@@ -246,7 +246,7 @@ function getCalibrationCheckData(
       model: model,
     }
     return obj
-  }, ({ left: null, right: null }: $Shape<CalibrationCheckByMount>))
+  }, ({ left: null, right: null }: Partial<CalibrationCheckByMount>))
 }
 
 export function getAnalyticsDeckCalibrationData(

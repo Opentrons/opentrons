@@ -18,7 +18,7 @@ describe('ConfirmCrashRecoveryModal', () => {
 
   beforeEach(() => {
     render = (
-      props: $Shape<React.ElementProps<typeof ConfirmCrashRecoveryModal>> = {}
+      props: Partial<React.ElementProps<typeof ConfirmCrashRecoveryModal>> = {}
     ) => {
       const {
         back = mockBack,

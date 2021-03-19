@@ -14,7 +14,7 @@ jest.mock('../../calibration/pipette-offset/selectors')
 
 interface SelectorSpec {
   name: string
-  state: $Shape<State>
+  state: Partial<State>
   expected: mixed
   matching: boolean
   calibrated: boolean

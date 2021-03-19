@@ -19,7 +19,7 @@ describe('Introduction', () => {
     wrapper.find('button[data-test="chooseTipRackButton"]')
 
   beforeEach(() => {
-    render = (props: $Shape<React.ElementProps<typeof Introduction>> = {}) => {
+    render = (props: Partial<React.ElementProps<typeof Introduction>> = {}) => {
       const {
         pipMount = 'left',
         isMulti = false,

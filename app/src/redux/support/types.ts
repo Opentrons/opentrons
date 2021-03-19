@@ -15,7 +15,7 @@ export type IntercomEventName =
 
 export type SupportConfig = $PropertyType<Config, 'support'>
 
-export type BasicIntercomPayload = $Shape<{
+export type BasicIntercomPayload = Partial<{
   [propertyName: string]: string | number | boolean | null,
 }>
 
@@ -23,7 +23,7 @@ export type IntercomPayload =
   | BasicIntercomPayload
   | CalibrationHealthCheckAnalyticsData
 
-export type SupportProfileUpdate = $Shape<{
+export type SupportProfileUpdate = Partial<{
   [propertyName: string]: string | number | boolean | null,
 }>
 

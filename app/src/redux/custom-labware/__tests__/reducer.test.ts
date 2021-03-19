@@ -7,9 +7,9 @@ import type { CustomLabwareState } from '../types'
 
 interface ReducerSpec {
   name: string
-  state: $Shape<CustomLabwareState>
+  state: Partial<CustomLabwareState>
   action: Action
-  expected: $Shape<CustomLabwareState>
+  expected: Partial<CustomLabwareState>
 }
 
 describe('customLabwareReducer', () => {

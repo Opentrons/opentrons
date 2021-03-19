@@ -312,17 +312,17 @@ export type SessionsAction =
   | EnsureSessionAction
   | ClearAllSessionsAction
 
-export type SessionsById = $Shape<{
+export type SessionsById = Partial<{
   [id: string]: Session,
 }>
 
-export type PerRobotSessionState = $Shape<
+export type PerRobotSessionState = Partial<
   $ReadOnly<{
     robotSessions: SessionsById | null,
   }>
 >
 
-export type SessionState = $Shape<
+export type SessionState = Partial<
   $ReadOnly<{
     [robotName: string]: void | PerRobotSessionState,
   }>

@@ -25,12 +25,12 @@ const getAlertIsPermanentlyIgnored: JestMockFn<
 const useTrackEvent: JestMockFn<[], JestMockFn<[AnalyticsEvent], void>> =
   Analytics.useTrackEvent
 
-const MOCK_STATE: $Shape<State> = {}
+const MOCK_STATE: Partial<State> = {}
 
 describe('UpdateNotificationsControl', () => {
   const trackEvent = jest.fn()
 
-  const render = (styleProps: $Shape<StyleProps> = {}) => {
+  const render = (styleProps: Partial<StyleProps> = {}) => {
     return mountWithStore(<UpdateNotificationsControl {...styleProps} />, {
       initialState: MOCK_STATE,
     })

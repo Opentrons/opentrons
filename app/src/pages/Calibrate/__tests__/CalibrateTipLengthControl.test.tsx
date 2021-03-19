@@ -62,7 +62,7 @@ const stubUnconfirmedLabware = [
     calibration: 'unconfirmed',
     isMoving: false,
     definition: wellPlate96Def,
-  }: $Shape<Labware>),
+  }: Partial<Labware>),
 ]
 
 describe('Testing calibrate tip length control', () => {
@@ -78,7 +78,7 @@ describe('Testing calibrate tip length control', () => {
     mockGetUnconfirmedLabware.mockReturnValue(stubUnconfirmedLabware)
     mockGetHasCalibrationBlock.mockReturnValue(true)
     render = (
-      props: $Shape<React.ElementProps<typeof CalibrateTipLengthControl>> = {}
+      props: Partial<React.ElementProps<typeof CalibrateTipLengthControl>> = {}
     ) => {
       const {
         isExtendedPipOffset = false,

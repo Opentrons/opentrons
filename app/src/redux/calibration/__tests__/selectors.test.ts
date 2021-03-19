@@ -8,12 +8,12 @@ import type { State } from '../../types'
 describe('calibration selectors', () => {
   describe('getCalibrationStatus', () => {
     it('should return null if no robot in state', () => {
-      const state: $Shape<State> = { calibration: {} }
+      const state: Partial<State> = { calibration: {} }
       expect(Selectors.getCalibrationStatus(state, 'robotName')).toBe(null)
     })
 
     it('should return null if robot in state but no status', () => {
-      const state: $Shape<State> = {
+      const state: Partial<State> = {
         calibration: {
           robotName: {
             calibrationStatus: null,
@@ -27,7 +27,7 @@ describe('calibration selectors', () => {
     })
 
     it('should return status if in state', () => {
-      const state: $Shape<State> = {
+      const state: Partial<State> = {
         calibration: {
           robotName: {
             calibrationStatus: Fixtures.mockCalibrationStatus,
@@ -45,12 +45,12 @@ describe('calibration selectors', () => {
 
   describe('getDeckCalibrationStatus', () => {
     it('should return null if no robot in state', () => {
-      const state: $Shape<State> = { calibration: {} }
+      const state: Partial<State> = { calibration: {} }
       expect(Selectors.getDeckCalibrationStatus(state, 'robotName')).toBe(null)
     })
 
     it('should return status if in state', () => {
-      const state: $Shape<State> = {
+      const state: Partial<State> = {
         calibration: {
           robotName: {
             calibrationStatus: Fixtures.mockCalibrationStatus,

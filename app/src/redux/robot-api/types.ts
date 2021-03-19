@@ -33,7 +33,7 @@ export type RobotApiResponse = {
   body: any,
 }
 
-export type RobotApiRequestMeta = $Shape<{
+export type RobotApiRequestMeta = Partial<{
   requestId: string,
   response: {
     method: Method,
@@ -62,10 +62,10 @@ export type RobotApiAction = DismissRequestAction
 // MetaT defaults to void if unspecified
 export type ResourceLink = {
   href: string,
-  meta?: $Shape<{ [string]: string | void }>,
+  meta?: Partial<{ [string]: string | void }>,
 }
 
-export type ResourceLinks = $Shape<{ [string]: ResourceLink | string | void }>
+export type ResourceLinks = Partial<{ [string]: ResourceLink | string | void }>
 
 // generic response data supertype
 export type RobotApiV2ResponseData = {
@@ -110,7 +110,7 @@ export type RequestState =
       error: { message?: string } | RobotApiV2ErrorResponseBody,
     }>
 
-export type RobotApiState = $Shape<
+export type RobotApiState = Partial<
   $ReadOnly<{
     [requestId: string]: void | RequestState,
   }>

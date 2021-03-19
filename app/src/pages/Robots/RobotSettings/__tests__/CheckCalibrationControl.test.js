@@ -38,7 +38,7 @@ describe('CheckCalibrationControl', () => {
       .find('button')
 
   const render = (
-    props: $Shape<React.ElementProps<typeof CheckCalibrationControl>> = {}
+    props: Partial<React.ElementProps<typeof CheckCalibrationControl>> = {}
   ) => {
     const { robotName = 'robot-name', disabledReason = null } = props
     return mountWithProviders(

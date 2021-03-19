@@ -27,7 +27,7 @@ jest.mock('../../../../organisms/UpdateAppModal', () => ({
 const getAvailableShellUpdate: JestMockFn<[State], string | null> =
   Shell.getAvailableShellUpdate
 
-const MOCK_STATE: $Shape<State> = {}
+const MOCK_STATE: Partial<State> = {}
 
 describe('AppSoftwareSettingsCard', () => {
   const render = () => {

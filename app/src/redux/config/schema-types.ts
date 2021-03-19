@@ -9,7 +9,7 @@ export type DiscoveryCandidates = string | Array<string>
 
 export type DevInternalFlag = 'allPipetteConfig' | 'enableBundleUpload'
 
-export type FeatureFlags = $Shape<{
+export type FeatureFlags = Partial<{
   [DevInternalFlag]: boolean | void,
 }>
 

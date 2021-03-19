@@ -69,7 +69,7 @@ describe('ChooseTipRack', () => {
       mockDeckCalTipRack.definition,
     ])
 
-    render = (props: $Shape<React.ElementProps<typeof ChooseTipRack>> = {}) => {
+    render = (props: Partial<React.ElementProps<typeof ChooseTipRack>> = {}) => {
       const {
         tipRack = mockDeckCalTipRack,
         mount = 'left',

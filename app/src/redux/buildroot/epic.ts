@@ -235,7 +235,7 @@ export const statusPollEpic: Epic = (action$, state$) => {
 }
 
 // filter for an active session with given properties
-const passActiveSession = (props: $Shape<BuildrootUpdateSession>) => (
+const passActiveSession = (props: Partial<BuildrootUpdateSession>) => (
   state: State
 ): boolean => {
   const robot = getBuildrootRobot(state)

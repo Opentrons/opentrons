@@ -6,9 +6,9 @@ import type { PerRobotControlsState } from '../types'
 
 type ReducerSpec = {
   name: string,
-  state: $Shape<{ [robotName: string]: $Shape<PerRobotControlsState> }>,
+  state: Partial<{ [robotName: string]: Partial<PerRobotControlsState> }>,
   action: Action,
-  expected: $Shape<{ [robotName: string]: $Shape<PerRobotControlsState> }>,
+  expected: Partial<{ [robotName: string]: Partial<PerRobotControlsState> }>,
 }
 
 const SPECS: Array<ReducerSpec> = [

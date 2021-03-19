@@ -20,7 +20,7 @@ jest.mock('../../../../../organisms/UpdateAppModal', () => ({
   UpdateAppModal: () => null,
 }))
 
-const MOCK_STATE: $Shape<State> = {}
+const MOCK_STATE: Partial<State> = {}
 
 const getAvailableShellUpdate: JestMockFn<[State], string | null> =
   Shell.getAvailableShellUpdate

@@ -55,7 +55,7 @@ const stubTipRacks = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  }: $Shape<BaseProtocolLabware>),
+  }: Partial<BaseProtocolLabware>),
   ({
     type: 'some_other_tiprack',
     definition: null,
@@ -66,7 +66,7 @@ const stubTipRacks = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  }: $Shape<BaseProtocolLabware>),
+  }: Partial<BaseProtocolLabware>),
 ]
 
 const stubOtherLabware = [
@@ -80,7 +80,7 @@ const stubOtherLabware = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  }: $Shape<BaseProtocolLabware>),
+  }: Partial<BaseProtocolLabware>),
   ({
     type: 'some_other_wellplate',
     definition: wellPlate96Def,
@@ -91,7 +91,7 @@ const stubOtherLabware = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  }: $Shape<BaseProtocolLabware>),
+  }: Partial<BaseProtocolLabware>),
 ]
 
 describe('LabwareGroup', () => {

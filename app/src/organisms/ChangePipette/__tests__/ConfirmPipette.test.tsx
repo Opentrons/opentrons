@@ -22,7 +22,7 @@ describe('ConfirmPipette', () => {
   beforeEach(() => {
     jest.resetAllMocks()
   })
-  const render = (props: $Shape<Props>) => {
+  const render = (props: Partial<Props>) => {
     const {
       robotName = 'robot-name',
       mount = 'left',
@@ -33,9 +33,9 @@ describe('ConfirmPipette', () => {
       wantedPipette = ({
         displayName: 'wanted-display-name',
         channels: 1,
-      }: $Shape<PipetteNameSpecs>),
-      actualPipette = ({}: $Shape<PipetteModelSpecs>),
-      actualPipetteOffset = ({}: $Shape<PipetteOffsetCalibration>),
+      }: Partial<PipetteNameSpecs>),
+      actualPipette = ({}: Partial<PipetteModelSpecs>),
+      actualPipetteOffset = ({}: Partial<PipetteOffsetCalibration>),
       displayName = 'actual-display-name',
       displayCategory = 'GEN2',
     } = props
@@ -68,8 +68,8 @@ describe('ConfirmPipette', () => {
       wantedPipette: ({
         displayName: 'wanted',
         channels: 1,
-      }: $Shape<PipetteNameSpecs>),
-      actualPipette: ({}: $Shape<PipetteModelSpecs>),
+      }: Partial<PipetteNameSpecs>),
+      actualPipette: ({}: Partial<PipetteModelSpecs>),
       actualPipetteOffset: null,
       backDisabled: true,
       iconName: 'check-circle',
@@ -86,9 +86,9 @@ describe('ConfirmPipette', () => {
       wantedPipette: ({
         displayName: 'wanted',
         channels: 1,
-      }: $Shape<PipetteNameSpecs>),
-      actualPipette: ({}: $Shape<PipetteModelSpecs>),
-      actualPipetteOffset: ({}: $Shape<PipetteOffsetCalibration>),
+      }: Partial<PipetteNameSpecs>),
+      actualPipette: ({}: Partial<PipetteModelSpecs>),
+      actualPipetteOffset: ({}: Partial<PipetteOffsetCalibration>),
       backDisabled: true,
       iconName: 'check-circle',
       continueMatch: null,
@@ -117,8 +117,8 @@ describe('ConfirmPipette', () => {
       success: false,
       attachedWrong: false,
       wantedPipette: null,
-      actualPipette: ({}: $Shape<PipetteModelSpecs>),
-      actualPipetteOffset: ({}: $Shape<PipetteOffsetCalibration>),
+      actualPipette: ({}: Partial<PipetteModelSpecs>),
+      actualPipetteOffset: ({}: Partial<PipetteOffsetCalibration>),
       backDisabled: false,
       iconName: 'close-circle',
       continueMatch: /confirm pipette is detached/,
@@ -134,8 +134,8 @@ describe('ConfirmPipette', () => {
       wantedPipette: ({
         displayName: 'my-display-name',
         channels: 1,
-      }: $Shape<PipetteNameSpecs>),
-      actualPipette: ({}: $Shape<PipetteModelSpecs>),
+      }: Partial<PipetteNameSpecs>),
+      actualPipette: ({}: Partial<PipetteModelSpecs>),
       actualPipetteOffset: null,
       backDisabled: true,
       iconName: 'close-circle',
@@ -152,9 +152,9 @@ describe('ConfirmPipette', () => {
       wantedPipette: ({
         displayName: 'my-display-name',
         channels: 1,
-      }: $Shape<PipetteNameSpecs>),
-      actualPipette: ({}: $Shape<PipetteModelSpecs>),
-      actualPipetteOffset: ({}: $Shape<PipetteOffsetCalibration>),
+      }: Partial<PipetteNameSpecs>),
+      actualPipette: ({}: Partial<PipetteModelSpecs>),
+      actualPipetteOffset: ({}: Partial<PipetteOffsetCalibration>),
       backDisabled: true,
       iconName: 'close-circle',
       continueMatch: /detach and try again/,

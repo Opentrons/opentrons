@@ -10,7 +10,7 @@ import type { State } from '../../types'
 type SelectorSpec = {
   name: string,
   selector: (State, ...Array<any>) => mixed,
-  state: $Shape<State>,
+  state: Partial<State>,
   args?: Array<any>,
   expected: mixed,
 }
@@ -76,7 +76,7 @@ describe('robot api selectors', () => {
 
 describe('getAttachedPipetteCalibrations', () => {
   it('should get calibrations for attached pipettes if they exist', () => {
-    const mockPipetteState: $Shape<State> = {
+    const mockPipetteState: Partial<State> = {
       pipettes: {
         robotName: {
           attachedByMount: {
@@ -117,7 +117,7 @@ describe('getAttachedPipetteCalibrations', () => {
     })
   })
   it('should return empty obj if a pipette is attached but there is no calibration', () => {
-    const mockPipetteState: $Shape<State> = {
+    const mockPipetteState: Partial<State> = {
       pipettes: {
         robotName: {
           attachedByMount: {
@@ -144,7 +144,7 @@ describe('getAttachedPipetteCalibrations', () => {
     })
   })
   it('should return empty obj if no pipette is attached', () => {
-    const mockPipetteState: $Shape<State> = {
+    const mockPipetteState: Partial<State> = {
       pipettes: {
         robotName: {
           attachedByMount: {

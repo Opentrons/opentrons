@@ -15,7 +15,7 @@ import typeof {
 
 export type { DiscoveryClientRobot, HealthStatus }
 
-export type RobotsMap = $Shape<{ [name: string]: DiscoveryClientRobot }>
+export type RobotsMap = Partial<{ [name: string]: DiscoveryClientRobot }>
 
 export type DiscoveryState = {
   scanning: boolean,

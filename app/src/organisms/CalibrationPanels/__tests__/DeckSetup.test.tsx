@@ -30,7 +30,7 @@ describe('DeckSetup', () => {
 
   beforeEach(() => {
     mockGetDeckDefinitions.mockReturnValue({})
-    render = (props: $Shape<React.ElementProps<typeof DeckSetup>> = {}) => {
+    render = (props: Partial<React.ElementProps<typeof DeckSetup>> = {}) => {
       const {
         pipMount = 'left',
         isMulti = false,

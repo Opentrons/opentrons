@@ -25,7 +25,7 @@ describe('MeasureNozzle', () => {
     wrapper.find(`button[title="${direction}"]`).find('button')
 
   beforeEach(() => {
-    render = (props: $Shape<React.ElementProps<typeof MeasureNozzle>> = {}) => {
+    render = (props: Partial<React.ElementProps<typeof MeasureNozzle>> = {}) => {
       const {
         pipMount = 'left',
         isMulti = false,

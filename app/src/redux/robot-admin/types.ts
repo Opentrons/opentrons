@@ -16,7 +16,7 @@ export type ResetConfigOption = {
   description: string,
 }
 
-export type ResetConfigRequest = $Shape<{
+export type ResetConfigRequest = Partial<{
   [optionId: string]: boolean,
 }>
 
@@ -25,7 +25,7 @@ export type ResetConfigRequest = $Shape<{
 export type RestartRobotAction = {
   type: 'robotAdmin:RESTART',
   payload: { robotName: string },
-  meta: $Shape<{ ...RobotApiRequestMeta, robot: true }>,
+  meta: Partial<{ ...RobotApiRequestMeta, robot: true }>,
 }
 
 export type RestartRobotSuccessAction = {
@@ -89,11 +89,11 @@ export type RobotAdminAction =
 
 // state types
 
-export type PerRobotAdminState = $Shape<{
+export type PerRobotAdminState = Partial<{
   status: RobotAdminStatus,
   resetConfigOptions: Array<ResetConfigOption>,
 }>
 
-export type RobotAdminState = $Shape<{
+export type RobotAdminState = Partial<{
   [robotName: string]: void | PerRobotAdminState,
 }>

@@ -5,7 +5,7 @@ import * as Fixtures from '../__fixtures__'
 
 import type { State } from '../../../types'
 
-const mockState: $Shape<State> = {
+const mockState: Partial<State> = {
   calibration: {
     'robot-name': {
       pipetteOffsetCalibrations: Fixtures.mockAllPipetteOffsetsCalibration,

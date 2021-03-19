@@ -80,7 +80,7 @@ describe('PipetteInfo', () => {
     mockGetIsRunning.mockReturnValue(false)
     mockGetRobotByName.mockReturnValue(mockConnectedRobot)
 
-    render = (props: $Shape<React.ElementProps<typeof PipetteInfo>> = {}) => {
+    render = (props: Partial<React.ElementProps<typeof PipetteInfo>> = {}) => {
       const { pipette = mockAttachedPipette } = props
       return mountWithStore(
         <PipetteInfo

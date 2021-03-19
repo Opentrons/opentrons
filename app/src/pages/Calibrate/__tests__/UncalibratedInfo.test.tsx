@@ -26,7 +26,7 @@ const leftTiprack = ({
   calibratorMount: 'left',
   isTiprack: true,
   confirmed: true,
-}: $Shape<Labware>)
+}: Partial<Labware>)
 
 const rightTiprack = ({
   type: 'some_tiprack',
@@ -36,7 +36,7 @@ const rightTiprack = ({
   calibratorMount: 'right',
   isTiprack: true,
   confirmed: true,
-}: $Shape<Labware>)
+}: Partial<Labware>)
 
 const stubUnconfirmedLabware = [
   ({
@@ -53,7 +53,7 @@ const stubUnconfirmedLabware = [
     calibration: 'unconfirmed',
     isMoving: false,
     definition: wellPlate96Def,
-  }: $Shape<Labware>),
+  }: Partial<Labware>),
 ]
 
 describe('UncalibratedInfo', () => {

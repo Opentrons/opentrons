@@ -20,7 +20,7 @@ describe('TipConfirmation', () => {
 
   beforeEach(() => {
     render = (
-      props: $Shape<React.ElementProps<typeof TipConfirmation>> = {}
+      props: Partial<React.ElementProps<typeof TipConfirmation>> = {}
     ) => {
       const {
         pipMount = 'left',

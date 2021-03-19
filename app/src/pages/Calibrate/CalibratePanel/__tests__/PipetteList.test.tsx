@@ -58,7 +58,7 @@ const stubTipRacks = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  }: $Shape<BaseProtocolLabware>),
+  }: Partial<BaseProtocolLabware>),
   ({
     type: 'some_other_tiprack',
     definition: null,
@@ -69,7 +69,7 @@ const stubTipRacks = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  }: $Shape<BaseProtocolLabware>),
+  }: Partial<BaseProtocolLabware>),
 ]
 
 const mockPipetteLocations = {

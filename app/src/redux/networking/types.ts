@@ -212,16 +212,16 @@ export type WifiKey = {
   requestId?: string,
 }
 
-export type PerRobotNetworkingState = $Shape<{
+export type PerRobotNetworkingState = Partial<{
   internetStatus?: ApiTypes.InternetStatus,
   interfaces?: ApiTypes.InterfaceStatusMap,
   wifiList?: Array<ApiTypes.WifiNetwork>,
   wifiKeyIds?: Array<string>,
-  wifiKeysById?: $Shape<{ [id: string]: WifiKey }>,
+  wifiKeysById?: Partial<{ [id: string]: WifiKey }>,
   eapOptions?: Array<ApiTypes.EapOption>,
 }>
 
-export type NetworkingState = $Shape<{
+export type NetworkingState = Partial<{
   [robotName: string]: void | PerRobotNetworkingState,
 }>
 

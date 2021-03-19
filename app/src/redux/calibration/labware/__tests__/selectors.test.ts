@@ -27,12 +27,12 @@ const getModulesBySlot: JestMockFn<
 describe('labware calibration selectors', () => {
   describe('getLabwareCalibrations', () => {
     it('should return empty array if no robot in state', () => {
-      const state: $Shape<State> = { calibration: {} }
+      const state: Partial<State> = { calibration: {} }
       expect(Selectors.getLabwareCalibrations(state, robotName)).toEqual([])
     })
 
     it('should return empty array if robot in state but no calibrations yet', () => {
-      const state: $Shape<State> = {
+      const state: Partial<State> = {
         calibration: {
           robotName: {
             calibrationStatus: null,
@@ -46,7 +46,7 @@ describe('labware calibration selectors', () => {
     })
 
     it('should return list of calibrations if in state', () => {
-      const state: $Shape<State> = {
+      const state: Partial<State> = {
         calibration: {
           robotName: {
             calibrationStatus: StatusFixtures.mockCalibrationStatus,
@@ -63,7 +63,7 @@ describe('labware calibration selectors', () => {
   })
 
   describe('getProtocolLabwareList', () => {
-    let state: $Shape<State>
+    let state: Partial<State>
 
     afterEach(() => {
       jest.resetAllMocks()
@@ -81,13 +81,13 @@ describe('labware calibration selectors', () => {
             definition: wellPlate96Def,
             slot: '3',
             definitionHash: Fixtures.mockLabwareCalibration1.definitionHash,
-          }: $Shape<ProtocolLabware>),
+          }: Partial<ProtocolLabware>),
           ({
             type: 'some_v1_labware',
             definition: null,
             slot: '1',
             definitionHash: null,
-          }: $Shape<ProtocolLabware>),
+          }: Partial<ProtocolLabware>),
         ]
       })
 
@@ -143,7 +143,7 @@ describe('labware calibration selectors', () => {
             },
           },
         },
-      }: $Shape<State>)
+      }as Partial<State>)
 
       expect(
         Selectors.getUniqueProtocolLabwareSummaries(state, robotName)
@@ -210,7 +210,7 @@ describe('labware calibration selectors', () => {
             },
           },
         },
-      }: $Shape<State>)
+      }as Partial<State>)
 
       expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
         {
@@ -285,7 +285,7 @@ describe('labware calibration selectors', () => {
             },
           },
         },
-      }: $Shape<State>)
+      }as Partial<State>)
 
       expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
         {
@@ -345,7 +345,7 @@ describe('labware calibration selectors', () => {
             },
           },
         },
-      }: $Shape<State>)
+      }as Partial<State>)
 
       expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
         {
@@ -376,7 +376,7 @@ describe('labware calibration selectors', () => {
   })
 
   describe('getUniqueProtocolLabwareSummaries', () => {
-    let state: $Shape<State>
+    let state: Partial<State>
 
     beforeEach(() => {
       state = { calibration: {} }
@@ -390,12 +390,12 @@ describe('labware calibration selectors', () => {
             definition: wellPlate96Def,
             slot: '3',
             definitionHash: Fixtures.mockLabwareCalibration1.definitionHash,
-          }: $Shape<ProtocolLabware>),
+          }: Partial<ProtocolLabware>),
           ({
             type: 'some_v1_labware',
             definition: null,
             slot: '1',
-          }: $Shape<ProtocolLabware>),
+          }: Partial<ProtocolLabware>),
         ]
       })
 
@@ -470,13 +470,13 @@ describe('labware calibration selectors', () => {
           definition: wellPlate96Def,
           definitionHash: '123fakeDefinitionHash',
           slot: '3',
-        }: $Shape<ProtocolLabware>),
+        }: Partial<ProtocolLabware>),
         ({
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
           definitionHash: '123fakeDefinitionHash',
           slot: '4',
-        }: $Shape<ProtocolLabware>),
+        }: Partial<ProtocolLabware>),
       ])
       getModulesBySlot.mockReturnValue({})
 
@@ -500,13 +500,13 @@ describe('labware calibration selectors', () => {
           definition: wellPlate96Def,
           definitionHash: '123fakeDefinitionHash',
           slot: '2',
-        }: $Shape<ProtocolLabware>),
+        }: Partial<ProtocolLabware>),
         ({
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
           definitionHash: '123fakeDefinitionHash',
           slot: '3',
-        }: $Shape<ProtocolLabware>),
+        }: Partial<ProtocolLabware>),
       ])
 
       getModulesBySlot.mockImplementation(calledState => {

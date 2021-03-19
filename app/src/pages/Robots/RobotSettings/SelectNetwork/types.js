@@ -34,7 +34,7 @@ export type NetworkChangeState =
   | { type: JOIN_OTHER, ssid: string | null }
   | { type: null }
 
-export type ConnectFormValues = $Shape<{
+export type ConnectFormValues = Partial<{
   ssid?: string,
   psk?: string,
   // securityType form value may be securityType or eapConfig.eapType
@@ -44,7 +44,7 @@ export type ConnectFormValues = $Shape<{
   },
 }>
 
-export type ConnectFormErrors = $Shape<FormikErrors<ConnectFormValues>>
+export type ConnectFormErrors = Partial<FormikErrors<ConnectFormValues>>
 
 type ConnectFormFieldCommon = {
   name: string,

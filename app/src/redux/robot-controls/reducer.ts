@@ -16,7 +16,7 @@ const INITIAL_CONTROLS_STATE: PerRobotControlsState = {
 const updateRobotState = (
   state: RobotControlsState,
   robotName: string,
-  update: $Shape<PerRobotControlsState>
+  update: Partial<PerRobotControlsState>
 ): RobotControlsState => {
   const robotState = state[robotName] || INITIAL_CONTROLS_STATE
 

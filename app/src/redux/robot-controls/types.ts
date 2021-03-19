@@ -143,7 +143,7 @@ export type PerRobotControlsState = $ReadOnly<{
   movementError: string | null,
 }>
 
-export type RobotControlsState = $Shape<
+export type RobotControlsState = Partial<
   $ReadOnly<{
     [robotName: string]: void | PerRobotControlsState,
   }>

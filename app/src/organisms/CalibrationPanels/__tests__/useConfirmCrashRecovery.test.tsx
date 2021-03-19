@@ -14,13 +14,13 @@ import type {
 describe('useConfirmCrashRecovery', () => {
   let render
   const mockSendCommands = jest.fn()
-  const mockTipRack: $Shape<CalibrationLabware> = {
+  const mockTipRack: Partial<CalibrationLabware> = {
     slot: '4',
     definition: ({
       metadata: ({
         displayName: 'my tiprack',
-      }: $Shape<LabwareMetadata>),
-    }: $Shape<LabwareDefinition2>),
+      }: Partial<LabwareMetadata>),
+    }: Partial<LabwareDefinition2>),
   }
 
   const getStarterLink = wrapper => wrapper.find('a')
@@ -29,7 +29,7 @@ describe('useConfirmCrashRecovery', () => {
     wrapper.find('OutlineButton[children="cancel"]')
   const getRestartButton = wrapper => wrapper.find('OutlineButton').at(1)
 
-  const TestUseConfirmCrashRecovery = (props: $Shape<Props>) => {
+  const TestUseConfirmCrashRecovery = (props: Partial<Props>) => {
     const {
       requiresNewTip = false,
       sendCommands = mockSendCommands,
@@ -49,7 +49,7 @@ describe('useConfirmCrashRecovery', () => {
     )
   }
   beforeEach(() => {
-    render = (props: $Shape<Props> = {}) => {
+    render = (props: Partial<Props> = {}) => {
       return mount(<TestUseConfirmCrashRecovery {...props} />)
     }
   })

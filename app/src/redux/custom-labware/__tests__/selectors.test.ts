@@ -9,7 +9,7 @@ import type { ValidLabwareFile } from '../types'
 type SelectorSpec = {
   name: string,
   selector: State => mixed,
-  state: $Shape<State>,
+  state: Partial<State>,
   expected: mixed,
 }
 

@@ -22,7 +22,7 @@ jest.mock('../../../redux/shell/update', () => ({
 
 jest.mock('react-router-dom', () => ({ Link: () => <></> }))
 
-const getShellUpdateState: JestMockFn<[State], $Shape<ShellUpdateState>> =
+const getShellUpdateState: JestMockFn<[State], Partial<ShellUpdateState>> =
   Shell.getShellUpdateState
 
 const MOCK_STATE: State = ({ mockState: true }: any)
@@ -44,7 +44,7 @@ describe('UpdateAppModal', () => {
         info: ({
           version: '1.2.3',
           releaseNotes: 'this is a release',
-        }: $Shape<UpdateInfo>),
+        }: Partial<UpdateInfo>),
       }
     })
   })
@@ -109,7 +109,7 @@ describe('UpdateAppModal', () => {
       info: ({
         version: '1.2.3',
         releaseNotes: 'this is a release',
-      }: $Shape<UpdateInfo>),
+      }: Partial<UpdateInfo>),
     })
 
     const { wrapper } = render({ closeModal })

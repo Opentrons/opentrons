@@ -26,7 +26,7 @@ import type {
 
 import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
 
-type MockState = $Shape<{ ...State, config: null | $Shape<Config> }>
+type MockState = Partial<{ ...State, config: null | Partial<Config> }>
 
 jest.mock('../../protocol/selectors')
 jest.mock('../../robot/selectors')
@@ -262,14 +262,14 @@ describe('analytics selectors', () => {
 
   describe('analytics calibration selectors', () => {
     const mockGetConnectedRobot: JestMockFn<
-      [$Shape<State>],
-      $Shape<Robot> | null
+      [Partial<State>],
+      Partial<Robot> | null
     > = DiscoverySelectors.getConnectedRobot
     const mockGetAttachedPipettes: JestMockFn<
       [State, string],
       {
-        left: null | $Shape<AttachedPipette>,
-        right: null | $Shape<AttachedPipette>,
+        left: null | Partial<AttachedPipette>,
+        right: null | Partial<AttachedPipette>,
       }
     > = PipetteSelectors.getAttachedPipettes
     describe('getAnalyticsPipetteCalibrationData', () => {
@@ -277,17 +277,17 @@ describe('analytics selectors', () => {
         [State, string],
         {
           left: {
-            offset: $Shape<PipetteOffsetCalibration> | null,
+            offset: Partial<PipetteOffsetCalibration> | null,
             tipLength: any,
           },
           right: {
-            offset: $Shape<PipetteOffsetCalibration> | null,
+            offset: Partial<PipetteOffsetCalibration> | null,
             tipLength: any,
           },
         }
       > = PipetteSelectors.getAttachedPipetteCalibrations
       it('should get data if robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState = ({}as Partial<State>)
         mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
         })
@@ -313,7 +313,7 @@ describe('analytics selectors', () => {
         })
       })
       it('should return null if no robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState = ({}as Partial<State>)
         mockGetConnectedRobot.mockReturnValue(null)
         expect(
           Selectors.getAnalyticsPipetteCalibrationData(mockState, 'right')
@@ -327,17 +327,17 @@ describe('analytics selectors', () => {
         {
           left: {
             offset: any,
-            tipLength: $Shape<TipLengthCalibration> | null,
+            tipLength: Partial<TipLengthCalibration> | null,
           },
           right: {
             offset: any,
-            tipLength: $Shape<TipLengthCalibration> | null,
+            tipLength: Partial<TipLengthCalibration> | null,
           },
         }
       > = PipetteSelectors.getAttachedPipetteCalibrations
 
       it('should get data if robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState = ({}as Partial<State>)
         mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
         })
@@ -363,7 +363,7 @@ describe('analytics selectors', () => {
         })
       })
       it('should return null if no robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState = ({}as Partial<State>)
         mockGetConnectedRobot.mockReturnValue(null)
         expect(
           Selectors.getAnalyticsTipLengthCalibrationData(mockState, 'left')
@@ -380,14 +380,14 @@ describe('analytics selectors', () => {
         DeckCalibrationStatus | null
       > = CalibrationSelectors.getDeckCalibrationStatus
       it('should get data if robot connected and format ok', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState = ({}as Partial<State>)
         mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
         })
         mockGetDeckCalibrationData.mockReturnValue(
           ({
             status: { markedBad: true, markedAt: null, source: null },
-          }: $Shape<DeckCalibrationInfo>)
+          }: Partial<DeckCalibrationInfo>)
         )
         mockGetDeckCalibrationStatus.mockReturnValue('IDENTITY')
         mockGetAttachedPipettes.mockReturnValue({
@@ -404,7 +404,7 @@ describe('analytics selectors', () => {
         })
       })
       it('should return null if no robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState = ({}as Partial<State>)
         mockGetConnectedRobot.mockReturnValue(null)
         expect(Selectors.getAnalyticsDeckCalibrationData(mockState)).toBeNull()
       })
@@ -474,7 +474,7 @@ describe('analytics selectors', () => {
         })
       })
       it('should return null if no robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState = ({}as Partial<State>)
         mockGetConnectedRobot.mockReturnValue(null)
         expect(Selectors.getAnalyticsHealthCheckData(mockState)).toBeNull()
       })
@@ -490,12 +490,12 @@ describe('analytics selectors', () => {
         >
       > = SessionsSelectors.getRobotSessionById
       it('returns data if the session exists', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState = ({}as Partial<State>)
         mockGetRobotSessionById.mockReturnValue({
           sessionType: 'deckCalibration',
           details: ({
             currentStep: 'inspectingTip',
-          }: $Shape<DeckCalibrationSessionDetails>),
+          }: Partial<DeckCalibrationSessionDetails>),
           createParams: {},
           id: 'blah-bloo-blah',
         })
@@ -514,7 +514,7 @@ describe('analytics selectors', () => {
       })
       it('returns null if the session cannot be found', () => {
         mockGetRobotSessionById.mockReturnValue(null)
-        const mockState = ({}: $Shape<State>)
+        const mockState = ({}as Partial<State>)
         expect(
           Selectors.getAnalyticsSessionExitDetails(
             mockState,

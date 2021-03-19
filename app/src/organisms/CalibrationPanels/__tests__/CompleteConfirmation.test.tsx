@@ -17,7 +17,7 @@ describe('CompleteConfirmation', () => {
 
   beforeEach(() => {
     render = (
-      props: $Shape<React.ElementProps<typeof CompleteConfirmation>> = {}
+      props: Partial<React.ElementProps<typeof CompleteConfirmation>> = {}
     ) => {
       const {
         pipMount = 'left',
