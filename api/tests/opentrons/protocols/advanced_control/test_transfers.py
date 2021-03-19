@@ -1336,11 +1336,11 @@ def test_blowout_to_dest(_instr_labware):
         # something without raising.
         pytest.param(
             'p300_single', 'opentrons_96_filtertiprack_200ul', 200, 200,
-            marks=pytest.mark.xfail
+            marks=pytest.mark.xfail(strict=True)
         ),
         pytest.param(
             'p20_single_gen2', 'opentrons_96_filtertiprack_10ul', 10, 10,
-            marks=pytest.mark.xfail
+            marks=pytest.mark.xfail(strict=True)
         ),
 
         # pipette max != tip max; reserved == pipette max
