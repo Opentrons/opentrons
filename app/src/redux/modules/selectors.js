@@ -5,6 +5,7 @@ import sortBy from 'lodash/sortBy'
 import { selectors as RobotSelectors } from '../robot'
 import * as Copy from './i18n'
 import * as Types from './types'
+import * as ApiTypes from './api-types'
 
 import type { State } from '../types'
 import type { SessionModule } from '../robot/types'
@@ -55,6 +56,29 @@ export const getUnpreparedModules: (
     return attachedModules.filter(
       m => preparableSessionModules.includes(m.model) && !isModulePrepared(m)
     )
+  }
+)
+
+export const getMatchedModules: (
+  state: State
+) => Array<{ Types.AttachedModule, slot: string }> = createSelector(
+  getAttachedModulesForConnectedRobot,
+  RobotSelectors.getModules,
+  (attachedModules, protocolModules) => {
+    const matchedAmod: { [slot: string]: Types.AttachedModule } = {}
+    const matchedPmod = []
+    protocolModules.forEach(pmod => {
+      const compatible = attachedModules.find(
+        amod =>
+          checkModuleCompatibility(amod.model, pmod.model) &&
+          !matchedAmod.values.includes(amod)
+      )
+      if (compatible) {
+        matchedPmod.push(pmod)
+        matchedAmod[pmod.slot] = compatible
+      }
+    })
+    return matchedAmod
   }
 )
 

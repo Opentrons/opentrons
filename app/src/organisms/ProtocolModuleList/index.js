@@ -24,7 +24,7 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { selectors as robotSelectors } from '../../redux/robot'
-import { getMissingModules } from '../../redux/modules'
+import { getMatchedModules, getMissingModules } from '../../redux/modules'
 import styles from './styles.css'
 
 import type { State } from '../../redux/types'
@@ -38,6 +38,8 @@ export function ProtocolModuleList(): React.Node {
   const modulesRequired = useSelector((state: State) =>
     robotSelectors.getModules(state)
   )
+  const matched = useSelector((state: State) => getMatchedModules(state))
+  console.log(matched)
   const missingModules = useSelector((state: State) => getMissingModules(state))
 
   if (modulesRequired.length < 1) return null
@@ -96,7 +98,7 @@ function UsbPortInfo(props: UsbPortInfoProps): React.Node {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation('protocol_calibration')
   if (props.moduleMissing) return null
-  // TODO: return the correct port info if it is available
+
   return (
     <>
       <Text marginRight={SPACING_2} {...USB_PORT_STYLE}>

@@ -26,7 +26,7 @@ type Props = {|
 
 export function ModuleItem(props: Props): React.Node {
   const { module, controlDisabledReason } = props
-
+  console.log(module)
   return (
     <Box className={styles.module_item}>
       <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>

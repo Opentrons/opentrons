@@ -164,3 +164,7 @@ export type ModulesState = $Shape<
     [robotName: string]: void | PerRobotModulesState,
   |}>
 >
+
+export type MatchedModuleBySlot = {|
+  [slot: string]: AttachedModule  
+|}
