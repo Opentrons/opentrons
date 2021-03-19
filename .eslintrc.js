@@ -68,13 +68,6 @@ module.exports = {
       },
     },
     {
-      files: ['**/*.stories.tsx'],
-      rules: {
-        'import/no-default-export': 'off',
-        '@typescript-eslint/consistent-type-assertions': 'off',
-      },
-    },
-    {
       files: [
         '**/test/**.js',
         '**/__tests__/**.@(js|ts|tsx)',

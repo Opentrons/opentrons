@@ -27,7 +27,7 @@ export interface CheckboxFieldProps {
   /** props passed into label div. TODO IMMEDIATELY what is the Flow type? */
   labelProps?: React.ComponentProps<'div'>
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: HoverTooltipHandlers
+  hoverTooltipHandlers?: HoverTooltipHandlers | null | undefined
   /** if true, render indeterminate icon */
   isIndeterminate?: boolean
 }

@@ -9,7 +9,7 @@ import type { WellMouseEvent } from './types'
 
 export interface WellProps {
   /** if included, overrides the default classname */
-  className?: string | null
+  className?: string | null | undefined
   /** fill inline style */
   fill?: CSSProperties['fill']
   /** Well Name (eg 'A1') */

@@ -45,12 +45,12 @@ const VIEW_BOX_HEIGHT = 390
  * @deprecated Use {@link RobotWorkSpace}
  */
 export class Deck extends React.Component<DeckProps> {
-  parentRef: HTMLElement | SVGGElement | null | undefined
+  parentRef: Element | null | undefined
 
   getXY: (
     rawX: number,
     rawY: number
-  ) => Partial<{ scaledX?: number; scaledY?: number }> = (rawX, rawY) => {
+  ) => { scaledX?: number; scaledY?: number } = (rawX, rawY) => {
     if (!this.parentRef) return {}
     const clientRect: {
       width: number

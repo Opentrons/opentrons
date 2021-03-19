@@ -87,10 +87,8 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       tabIndex={tabIndex as string}
       id={id}
       onChange={option => {
-        const isOptionGroupOrNull = Array.isArray(option) || option == null
-        const value = isOptionGroupOrNull
-          ? null
-          : (option as SelectOption).value
+        // TODO(mc, 2021-03-19): use optional chaining
+        const value = option && option.value ? option.value : null
         props.onPipetteChange(value)
       }}
       formatOptionLabel={(option, { context }) => {
