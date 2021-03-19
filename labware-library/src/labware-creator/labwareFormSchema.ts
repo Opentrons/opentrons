@@ -1,4 +1,3 @@
-// @flow
 import * as Yup from 'yup'
 import { getAllLoadNames, getAllDisplayNames } from '../definitions'
 import { getDefaultLoadName, getDefaultDisplayName } from './formSelectors'
@@ -13,8 +12,8 @@ import {
   MAX_Y_DIMENSION,
   MIN_Y_DIMENSION,
   MAX_Z_DIMENSION,
-  type ProcessedLabwareFields,
 } from './fields'
+import type { ProcessedLabwareFields } from './fields'
 
 const ALL_DISPLAY_NAMES = new Set(
   getAllDisplayNames().map(n => n.toLowerCase().trim())
@@ -166,15 +165,16 @@ export const labwareFormSchema: Yup.Schema<
     // $FlowFixMe(mc, 2020-06-02): should this be Yup.array() instead of mixed?
     brandId: Yup.mixed()
       .nullable()
-      .transform((currentValue: ?string, originalValue: ?string): $PropertyType<
-        ProcessedLabwareFields,
-        'brandId'
-      > =>
-        (currentValue || '')
-          .trim()
-          .split(',')
-          .map(s => s.trim())
-          .filter(Boolean)
+      .transform(
+        (
+          currentValue: ?string,
+          originalValue: ?string
+        ): $PropertyType<ProcessedLabwareFields, 'brandId'> =>
+          (currentValue || '')
+            .trim()
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean)
       ),
 
     loadName: Yup.string()
