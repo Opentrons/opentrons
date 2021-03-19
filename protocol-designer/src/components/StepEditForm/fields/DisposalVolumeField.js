@@ -99,15 +99,25 @@ const DisposalVolumeFieldComponent = (props: Props) => {
 }
 const mapSTP = (state: BaseState): SP => {
   const rawForm = stepFormSelectors.getUnsavedForm(state)
+  const disposalLabwareOptions = uiLabwareSelectors.getDisposalLabwareOptions(
+    state
+  )
+  const blowoutLocationOptions = rawForm
+    ? getBlowoutLocationOptionsForForm({
+        path: rawForm.path,
+        stepType: rawForm.stepType,
+      })
+    : []
+
   return {
     maxDisposalVolume: getMaxDisposalVolumeForMultidispense(
       rawForm,
       stepFormSelectors.getPipetteEntities(state)
     ),
-    disposalDestinationOptions: getBlowoutLocationOptionsForForm(
-      uiLabwareSelectors.getDisposalLabwareOptions(state),
-      rawForm
-    ),
+    disposalDestinationOptions: [
+      ...disposalLabwareOptions,
+      ...blowoutLocationOptions,
+    ],
   }
 }
 

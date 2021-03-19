@@ -5,6 +5,7 @@ import { useConditionalConfirm } from '@opentrons/components'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
+  getIsMultiSelectMode,
   actions as stepsActions,
 } from '../../../ui/steps'
 import {
@@ -35,6 +36,7 @@ export const TerminalItem = (props: Props): React.Node => {
   const selected = useSelector(getSelectedTerminalItemId) === id
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
   const formHasChanges = useSelector(getCurrentFormHasUnsavedChanges)
+  const isMultiSelectMode = useSelector(getIsMultiSelectMode)
 
   const dispatch = useDispatch()
 
@@ -47,6 +49,8 @@ export const TerminalItem = (props: Props): React.Node => {
     selectItem,
     currentFormIsPresaved || formHasChanges
   )
+
+  const onClick = isMultiSelectMode ? () => null : confirm
 
   return (
     <>
@@ -63,11 +67,12 @@ export const TerminalItem = (props: Props): React.Node => {
       )}
       <PDTitledList
         {...{
+          id: `TerminalItem_${id}`,
           hovered,
           selected,
           title,
           children,
-          onClick: confirm,
+          onClick: onClick,
           onMouseEnter,
           onMouseLeave,
         }}

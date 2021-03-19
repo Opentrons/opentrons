@@ -34,7 +34,7 @@ env:
 jobs:
   js-unit-test:
     name: 'protocol designer unit tests'
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     timeout-minutes: 30
     steps:
       - uses: 'actions/checkout@v2'
@@ -63,7 +63,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        os: ['ubuntu-latest', 'macos-latest']
+        os: ['ubuntu-18.04', 'macos-latest']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v2'
@@ -88,7 +88,7 @@ jobs:
         run: make -C protocol-designer test-e2e
   build-pd:
     name: 'build protocol designer artifact'
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v2'
@@ -110,6 +110,9 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'build PD'
+        env:
+          OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
+          OT_PD_MIXPANEL_DEV_ID: ${{ secrets.OT_PD_MIXPANEL_DEV_ID }}
         run: |
           make -C protocol-designer
       - name: 'upload github artifact'
@@ -119,7 +122,7 @@ jobs:
           path: protocol-designer/dist
   deploy-pd:
     name: 'deploy PD artifact to S3'
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-18.04'
     needs: ["js-unit-test", "build-pd"]
     if: github.event_name != 'pull_request'
     steps:
@@ -143,7 +146,6 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
-          OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
         uses: './.github/actions/webstack/deploy-to-sandbox'
         with:
           domain: 'designer.opentrons.com'

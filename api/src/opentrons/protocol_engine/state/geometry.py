@@ -82,6 +82,46 @@ class GeometryState:
             for uid, lw_data in self._labware_store.state.get_all_labware()
         ])
 
+    def get_labware_parent_position(
+        self,
+        labware_id: str
+    ) -> Point:
+        """Get the position of the labware's parent slot (deck or module)."""
+        labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
+        slot_pos = self.get_slot_position(labware_data.location.slot)
+
+        return slot_pos
+
+    def get_labware_origin_position(
+        self,
+        labware_id: str
+    ) -> Point:
+        """Get the position of the labware's origin, without calibration."""
+        labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
+        slot_pos = self.get_slot_position(labware_data.location.slot)
+        origin_offset = labware_data.definition["cornerOffsetFromSlot"]
+
+        return Point(
+            x=slot_pos.x + origin_offset["x"],
+            y=slot_pos.y + origin_offset["y"],
+            z=slot_pos.z + origin_offset["z"]
+        )
+
+    def get_labware_position(
+        self,
+        labware_id: str
+    ) -> Point:
+        """Get the calibrated origin of the labware."""
+        labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
+        origin_pos = self.get_labware_origin_position(labware_id=labware_id)
+        cal_offset = labware_data.calibration
+
+        return Point(
+            x=origin_pos.x + cal_offset[0],
+            y=origin_pos.y + cal_offset[1],
+            z=origin_pos.z + cal_offset[2]
+        )
+
     def get_well_position(
         self,
         labware_id: str,
@@ -89,7 +129,7 @@ class GeometryState:
         well_location: Optional[WellLocation] = None,
     ) -> Point:
         """Get the absolute position of a well in a labware."""
-        labware_data = self._labware_store.state.get_labware_data_by_id(
+        labware_pos = self.get_labware_position(
             labware_id
         )
         well_def = self._labware_store.state.get_well_definition(
@@ -97,8 +137,6 @@ class GeometryState:
             well_name
         )
         well_depth = well_def["depth"]
-        slot_pos = self.get_slot_position(labware_data.location.slot)
-        cal_offset = labware_data.calibration
 
         if well_location is not None:
             offset = well_location.offset
@@ -110,9 +148,9 @@ class GeometryState:
             offset = (0, 0, well_depth)
 
         return Point(
-            x=slot_pos[0] + cal_offset[0] + offset[0] + well_def["x"],
-            y=slot_pos[1] + cal_offset[1] + offset[1] + well_def["y"],
-            z=slot_pos[2] + cal_offset[2] + offset[2] + well_def["z"],
+            x=labware_pos.x + offset[0] + well_def["x"],
+            y=labware_pos.y + offset[1] + well_def["y"],
+            z=labware_pos.z + offset[2] + well_def["z"],
         )
 
     def _get_highest_z_from_labware_data(self, lw_data: LabwareData) -> float:

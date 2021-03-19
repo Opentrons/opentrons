@@ -10,16 +10,16 @@ from opentrons.hardware_control import API
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.implementations.instrument_context import \
+from opentrons.protocols.context.protocol_api.instrument_context import \
     InstrumentContextImplementation
-from opentrons.protocols.implementations.simulators.instrument_context import \
+from opentrons.protocols.context.simulator.instrument_context import \
     InstrumentContextSimulation
 from opentrons.protocols.types import Protocol
 from .labware import Labware
-from opentrons.protocols.implementations.interfaces.labware import \
-    LabwareInterface
-from opentrons.protocols.implementations.interfaces.protocol_context import \
-    ProtocolContextInterface
+from opentrons.protocols.context.labware import \
+    AbstractLabware
+from opentrons.protocols.context.protocol import \
+    AbstractProtocol
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry, ModuleType)
 from opentrons.protocols.geometry.deck import Deck
@@ -60,7 +60,7 @@ class ProtocolContext(CommandPublisher):
     """
 
     def __init__(self,
-                 implementation: ProtocolContextInterface,
+                 implementation: AbstractProtocol,
                  loop: asyncio.AbstractEventLoop = None,
                  broker=None,
                  api_version: Optional[APIVersion] = None,
@@ -96,7 +96,7 @@ class ProtocolContext(CommandPublisher):
 
     @classmethod
     def build_using(cls,
-                    implementation: ProtocolContextInterface,
+                    implementation: AbstractProtocol,
                     protocol: Protocol,
                     *args, **kwargs):
         """ Build an API instance for the specified parsed protocol
@@ -403,7 +403,7 @@ class ProtocolContext(CommandPublisher):
         def _only_labwares() -> Iterator[
                 Tuple[int, Union[Labware, ModuleGeometry]]]:
             for slotnum, slotitem in self._implementation.get_deck().items():
-                if isinstance(slotitem, LabwareInterface):
+                if isinstance(slotitem, AbstractLabware):
                     yield slotnum, Labware(implementation=slotitem)
                 elif isinstance(slotitem, Labware):
                     yield slotnum, slotitem
@@ -589,7 +589,7 @@ class ProtocolContext(CommandPublisher):
 
         :param str msg: A message to echo back to connected clients.
         """
-        self._implementation.pause()
+        self._implementation.pause(msg=msg)
 
     @publish.both(command=cmds.resume)
     @requires_version(2, 0)
@@ -675,7 +675,7 @@ class ProtocolContext(CommandPublisher):
         trash = self._implementation.get_fixed_trash()
         # TODO AL 20201113 - remove this when DeckLayout only holds
         #  LabwareInterface instances.
-        if isinstance(trash, LabwareInterface):
+        if isinstance(trash, AbstractLabware):
             return Labware(implementation=trash)
         return cast("Labware", trash)
 

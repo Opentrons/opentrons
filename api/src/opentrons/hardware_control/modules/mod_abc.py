@@ -6,6 +6,7 @@ from pkg_resources import parse_version
 from typing import Mapping, Optional
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.hardware_control.util import use_or_initialize_loop
+from opentrons.drivers.rpi_drivers.types import USBPort
 from ..execution_manager import ExecutionManager
 from .types import BundledFirmware, UploadFunction, InterruptCallback, LiveData
 
@@ -19,6 +20,7 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     async def build(cls,
                     port: str,
+                    usb_port: USBPort,
                     execution_manager: ExecutionManager,
                     interrupt_callback: InterruptCallback = None,
                     simulating: bool = False,
@@ -35,11 +37,13 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     def __init__(self,
                  port: str,
+                 usb_port: USBPort,
                  execution_manager: ExecutionManager,
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None,
                  sim_model: str = None) -> None:
         self._port = port
+        self._usb_port = usb_port
         self._loop = use_or_initialize_loop(loop)
         self._execution_manager = execution_manager
         self._device_info: Mapping[str, str]
@@ -111,7 +115,13 @@ class AbstractModule(abc.ABC):
     @property
     @abc.abstractmethod
     def port(self) -> str:
-        """ The port where the module is connected. """
+        """ The virtual port where the module is connected. """
+        pass
+
+    @property
+    @abc.abstractmethod
+    def usb_port(self) -> USBPort:
+        """ The physical port where the module is connected. """
         pass
 
     @abc.abstractmethod

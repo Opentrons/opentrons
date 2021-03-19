@@ -15,6 +15,8 @@ import type { IconName } from '../icons'
 import type { UseHoverTooltipTargetProps } from '../tooltips'
 
 export interface ButtonProps {
+  /** id attribute */
+  id?: string
   /** click handler */
   onClick?: (event: React.MouseEvent) => unknown
   /** name attribute */
@@ -70,7 +72,7 @@ const STRIP_PROPS = [
  * @deprecated Use {@link Btn}
  */
 export function Button(props: ButtonProps): JSX.Element {
-  const { name, title, disabled, hover, tabIndex, form } = props
+  const { id, name, title, disabled, hover, tabIndex, form } = props
   const className = cx(props.className, { [styles.hover]: hover })
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const onClick = !disabled ? props.onClick : undefined
@@ -80,7 +82,7 @@ export function Button(props: ButtonProps): JSX.Element {
   // pass all props if using a custom component
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const buttonProps = !props.Component
-    ? { name, type, form, title, disabled, onClick, className, tabIndex }
+    ? { id, name, type, form, title, disabled, onClick, className, tabIndex }
     : {
         ...omit(props, STRIP_PROPS),
         className: cx(className, { [styles.disabled]: disabled }),

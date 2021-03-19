@@ -1,8 +1,39 @@
+from abc import ABC, abstractmethod
+
 from opentrons.types import Location, Point
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
-class LabwareGeometry:
+class AbstractLabwareGeometry(ABC):
+    """Convenience interface for accessing geometry properties of a labware."""
+
+    @property
+    @abstractmethod
+    def parent(self) -> Location:
+        ...
+
+    @property
+    @abstractmethod
+    def offset(self) -> Point:
+        ...
+
+    @property
+    @abstractmethod
+    def x_dimension(self) -> float:
+        ...
+
+    @property
+    @abstractmethod
+    def y_dimension(self) -> float:
+        ...
+
+    @property
+    @abstractmethod
+    def z_dimension(self) -> float:
+        ...
+
+
+class LabwareGeometry(AbstractLabwareGeometry):
 
     def __init__(self,
                  definition: LabwareDefinition,

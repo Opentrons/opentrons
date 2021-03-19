@@ -1,5 +1,4 @@
 // @flow
-import assert from 'assert'
 import * as React from 'react'
 import difference from 'lodash/difference'
 import isEqual from 'lodash/isEqual'
@@ -16,17 +15,19 @@ import type { Options } from '@opentrons/components'
 import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { FormWarning } from '../../steplist/formLevel/warnings'
 import type { StepFormErrors } from '../../steplist/types'
-import type { FormData, ProfileItem, StepFieldName } from '../../form-types'
+import type {
+  FormData,
+  ProfileItem,
+  StepFieldName,
+  StepType,
+  PathOption,
+} from '../../form-types'
 
-export function getBlowoutLocationOptionsForForm(
-  disposalLabwareOptions: Options,
-  rawForm: ?FormData
-): Options {
-  if (!rawForm) {
-    assert(rawForm, `getBlowoutLocationOptionsForForm expected a form`)
-    return disposalLabwareOptions
-  }
-  const { stepType } = rawForm
+export function getBlowoutLocationOptionsForForm(args: {|
+  stepType: StepType,
+  path?: ?PathOption,
+|}): Options {
+  const { stepType, path } = args
   // TODO: Ian 2019-02-21 use i18n for names
   const destOption = {
     name: 'Destination Well',
@@ -38,37 +39,29 @@ export function getBlowoutLocationOptionsForForm(
   }
 
   if (stepType === 'mix') {
-    return [...disposalLabwareOptions, destOption]
+    return [destOption]
   } else if (stepType === 'moveLiquid') {
-    const path = rawForm.path
     switch (path) {
       case 'single': {
-        return [...disposalLabwareOptions, sourceOption, destOption]
+        return [sourceOption, destOption]
       }
       case 'multiDispense': {
+        return [sourceOption, { ...destOption, disabled: true }]
+      }
+      case 'multiAspirate': {
+        return [{ ...sourceOption, disabled: true }, destOption]
+      }
+      default: {
+        // is moveLiquid but no path -- assume we're in batch edit mode
+        // with mixed/indeterminate path values
         return [
-          ...disposalLabwareOptions,
-          sourceOption,
+          { ...sourceOption, disabled: true },
           { ...destOption, disabled: true },
         ]
       }
-      case 'multiAspirate': {
-        return [
-          ...disposalLabwareOptions,
-          { ...sourceOption, disabled: true },
-          destOption,
-        ]
-      }
-      default: {
-        assert(
-          false,
-          `getBlowoutLocationOptionsForForm got unexpected path for moveLiquid step: ${path}`
-        )
-        return disposalLabwareOptions
-      }
     }
   }
-  return disposalLabwareOptions
+  return []
 }
 
 // TODO: type fieldNames, don't use `string`
@@ -221,3 +214,31 @@ export function getTooltipForField(
 
 export const getFieldDefaultTooltip = (name: string): string =>
   i18n.t([`tooltip.step_fields.defaults.${name}`, ''])
+
+export const getSingleSelectDisabledTooltip = (
+  name: string,
+  stepType: string
+): string =>
+  i18n.t([
+    `tooltip.step_fields.${stepType}.disabled.${name}`,
+    `tooltip.step_fields.${stepType}.disabled.$generic`,
+    '',
+  ])
+// TODO(IL, 2021-03-03): keys for fieldMap are more strictly of TipOffsetFields type,
+// but since utils like addFieldNamePrefix return StepFieldName/string instead
+// of strict TipOffsetFields, we have to be more lenient with the types
+export function getLabwareFieldForPositioningField(
+  name: StepFieldName
+): StepFieldName {
+  const fieldMap: { [StepFieldName]: StepFieldName } = {
+    aspirate_mmFromBottom: 'aspirate_labware',
+    aspirate_touchTip_mmFromBottom: 'aspirate_labware',
+    aspirate_delay_mmFromBottom: 'aspirate_labware',
+    dispense_mmFromBottom: 'dispense_labware',
+    dispense_touchTip_mmFromBottom: 'dispense_labware',
+    dispense_delay_mmFromBottom: 'dispense_labware',
+    mix_mmFromBottom: 'labware',
+    mix_touchTip_mmFromBottom: 'labware',
+  }
+  return fieldMap[name]
+}

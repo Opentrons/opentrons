@@ -9,6 +9,7 @@ import styles from './structure.css'
 import type { ButtonProps } from '../buttons'
 
 export interface TitleBarProps {
+  id?: string
   title: React.ReactNode
   subtitle?: React.ReactNode
   back?: ButtonProps
@@ -28,6 +29,7 @@ export function TitleBar(props: TitleBarProps): JSX.Element {
     onBackClick,
     backClickDisabled,
     backButtonLabel,
+    id,
   } = props
   let { back } = props
 
@@ -51,7 +53,7 @@ export function TitleBar(props: TitleBarProps): JSX.Element {
   }
 
   return (
-    <header className={cx(styles.title_bar, className)}>
+    <header id={id} className={cx(styles.title_bar, className)}>
       {back && (
         <FlatButton
           inverted

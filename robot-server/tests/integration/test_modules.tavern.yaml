@@ -16,6 +16,7 @@ stages:
             displayName: thermocycler
             moduleModel: thermocyclerModuleV1
             port: !anystr
+            usbPort: !anydict
             serial: !anystr
             model: !anystr
             revision: !anystr
@@ -38,6 +39,7 @@ stages:
             displayName: tempdeck
             moduleModel: temperatureModuleV1
             port: !anystr
+            usbPort: !anydict
             serial: !anystr
             model: !anystr
             revision: !anystr
@@ -51,6 +53,7 @@ stages:
             displayName: magdeck
             moduleModel: magneticModuleV1
             port: !anystr
+            usbPort: !anydict
             serial: !anystr
             model: !anystr
             revision: !anystr

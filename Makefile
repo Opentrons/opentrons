@@ -39,7 +39,8 @@ ifeq ($(watch), true)
 endif
 
 # run at usage (=), not on makefile parse (:=)
-usb_host=$(shell yarn run -s discovery find -i 169.254")
+# todo(mm, 2021-03-17): Deduplicate with scripts/python.mk.
+usb_host=$(shell yarn run -s discovery find -i 169.254)
 
 
 # install all project dependencies

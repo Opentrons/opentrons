@@ -13,7 +13,8 @@ from opentrons.calibration_storage import (
     encoder_decoder as ed,
     types as cs_types)
 from opentrons.protocol_api import labware
-from opentrons.protocols.implementations.labware import LabwareImplementation
+from opentrons.protocols.context.protocol_api.labware import\
+    LabwareImplementation
 from opentrons.protocols.labware.definition import _get_labware_path
 from opentrons.types import Point, Location
 from opentrons.util.helpers import utc_now

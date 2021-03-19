@@ -6,14 +6,14 @@ import type {
 } from '../../ui/steps/selectors'
 import { getFieldDefaultTooltip } from '../StepEditForm/utils'
 import type { FieldPropsByName } from '../StepEditForm/types'
-import type { MultiSelectFieldName } from '../../form-types'
+import type { StepFieldName } from '../../form-types'
 
 export const makeBatchEditFieldProps = (
   fieldValues: MultiselectFieldValues,
   disabledFields: DisabledFields,
   handleChangeFormInput: (name: string, value: mixed) => void
 ): FieldPropsByName => {
-  const fieldNames: Array<MultiSelectFieldName> = Object.keys(fieldValues)
+  const fieldNames: Array<StepFieldName> = Object.keys(fieldValues)
   return fieldNames.reduce<FieldPropsByName>((acc, name) => {
     const defaultTooltip = getFieldDefaultTooltip(name)
     acc[name] = {

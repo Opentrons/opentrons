@@ -21,7 +21,6 @@ import {
   actions as stepsActions,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
-import { getBatchEditEnabled } from '../feature-flags/selectors'
 
 import { StepItem, StepItemContents } from '../components/steplist/StepItem'
 import {
@@ -103,8 +102,6 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     stepFormSelectors.getBatchEditFormHasUnsavedChanges
   )
 
-  const isBatchEditEnabled = useSelector(getBatchEditEnabled)
-
   // Actions
   const dispatch = useDispatch()
 
@@ -129,46 +126,42 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     const noModifierKeys =
       nonePressed([isShiftKeyPressed, isMetaKeyPressed]) || toggledLastSelected
 
-    if (isBatchEditEnabled) {
-      if (noModifierKeys) {
-        if (multiSelectItemIds) {
-          const alreadySelected = multiSelectItemIds.includes(stepId)
-          if (alreadySelected) {
-            stepsToSelect = multiSelectItemIds.filter(id => id !== stepId)
-          } else {
-            stepsToSelect = [...multiSelectItemIds, stepId]
-          }
+    if (noModifierKeys) {
+      if (multiSelectItemIds) {
+        const alreadySelected = multiSelectItemIds.includes(stepId)
+        if (alreadySelected) {
+          stepsToSelect = multiSelectItemIds.filter(id => id !== stepId)
         } else {
-          selectStep()
+          stepsToSelect = [...multiSelectItemIds, stepId]
         }
-      } else if (
-        (isMetaKeyPressed || isShiftKeyPressed) &&
-        currentFormIsPresaved
-      ) {
-        // current form is presaved, enter batch edit mode with only the clicked
-        stepsToSelect = [stepId]
       } else {
-        if (isShiftKeyPressed) {
-          stepsToSelect = getShiftSelectedSteps(
-            selectedStepId,
-            orderedStepIds,
-            stepId,
-            multiSelectItemIds,
-            lastMultiSelectedStepId
-          )
-        } else if (isMetaKeyPressed) {
-          stepsToSelect = getMetaSelectedSteps(
-            multiSelectItemIds,
-            stepId,
-            selectedStepId
-          )
-        }
+        selectStep()
       }
-      if (stepsToSelect.length) {
-        selectMultipleSteps(stepsToSelect, stepId)
-      }
+    } else if (
+      (isMetaKeyPressed || isShiftKeyPressed) &&
+      currentFormIsPresaved
+    ) {
+      // current form is presaved, enter batch edit mode with only the clicked
+      stepsToSelect = [stepId]
     } else {
-      selectStep()
+      if (isShiftKeyPressed) {
+        stepsToSelect = getShiftSelectedSteps(
+          selectedStepId,
+          orderedStepIds,
+          stepId,
+          multiSelectItemIds,
+          lastMultiSelectedStepId
+        )
+      } else if (isMetaKeyPressed) {
+        stepsToSelect = getMetaSelectedSteps(
+          multiSelectItemIds,
+          stepId,
+          selectedStepId
+        )
+      }
+    }
+    if (stepsToSelect.length) {
+      selectMultipleSteps(stepsToSelect, stepId)
     }
   }
 
@@ -246,15 +239,25 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     </>
   )
 }
-function getMetaSelectedSteps(multiSelectItemIds, stepId, selectedStepId) {
+export function getMetaSelectedSteps(
+  multiSelectItemIds: Array<StepIdType> | null,
+  stepId: StepIdType,
+  selectedStepId: StepIdType | null
+): Array<StepIdType> {
   let stepsToSelect: Array<StepIdType> = []
   if (multiSelectItemIds?.length) {
+    // already have a selection, add/remove the meta-clicked item
     stepsToSelect = multiSelectItemIds.includes(stepId)
       ? multiSelectItemIds.filter(id => id !== stepId)
       : [...multiSelectItemIds, stepId]
+  } else if (selectedStepId && selectedStepId === stepId) {
+    // meta-clicked on the selected single step
+    stepsToSelect = [selectedStepId]
   } else if (selectedStepId) {
+    // meta-clicked on a different step, multi-select both
     stepsToSelect = [selectedStepId, stepId]
   } else {
+    // meta-clicked on a step when a terminal item was selected
     stepsToSelect = [stepId]
   }
   return stepsToSelect

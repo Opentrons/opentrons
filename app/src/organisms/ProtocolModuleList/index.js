@@ -15,16 +15,17 @@ import {
   C_MED_GRAY,
   FONT_SIZE_CAPTION,
   FONT_WEIGHT_SEMIBOLD,
-  JUSTIFY_CENTER,
   SIZE_1,
   SPACING_AUTO,
   SPACING_2,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
+  Box,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { selectors as robotSelectors } from '../../redux/robot'
 import { getMissingModules } from '../../redux/modules'
+import styles from './styles.css'
 
 import type { State } from '../../redux/types'
 
@@ -38,6 +39,7 @@ export function ProtocolModuleList(): React.Node {
     robotSelectors.getModules(state)
   )
   const missingModules = useSelector((state: State) => getMissingModules(state))
+
   if (modulesRequired.length < 1) return null
   return (
     <TitledList key={t('modules_title')} title={t('modules_title')}>
@@ -47,27 +49,41 @@ export function ProtocolModuleList(): React.Node {
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         marginLeft="2.125rem"
+        marginBottom={SPACING_2}
       >
         <Text {...DECK_SLOT_STYLE}>{t('modules_deck_slot_title')}</Text>
         <Text {...MODULE_STYLE}>{t('modules_module_title')}</Text>
         <Text {...USB_PORT_STYLE}>{t('modules_usb_port_title')}</Text>
       </Flex>
-      {modulesRequired.map(m => (
-        <ListItem
-          iconName={
-            missingModules.includes(m)
-              ? 'checkbox-blank-circle-outline'
-              : 'check-circle'
-          }
-          key={`${m.model} ${m.slot}`}
-        >
-          <Flex justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
-            <Text {...DECK_SLOT_STYLE}>{`Slot ${m.slot}`}</Text>
-            <Text {...MODULE_STYLE}>{getModuleDisplayName(m.model)}</Text>
-            <UsbPortInfo moduleMissing={missingModules.includes(m)} />
-          </Flex>
-        </ListItem>
-      ))}
+      <ListItem
+        key={'module'}
+        url={`/calibrate/modules`}
+        className={styles.module_list_item}
+        activeClassName={styles.active}
+      >
+        <Box>
+          {modulesRequired.map(m => (
+            <Flex
+              key={m.slot}
+              data-test={m.slot}
+              alignItems={ALIGN_CENTER}
+              padding="0.75rem"
+            >
+              <Icon
+                name={
+                  missingModules.includes(m)
+                    ? 'checkbox-blank-circle-outline'
+                    : 'check-circle'
+                }
+                className={styles.module_connect_icon}
+              />
+              <Text {...DECK_SLOT_STYLE}>{`Slot ${m.slot}`}</Text>
+              <Text {...MODULE_STYLE}>{getModuleDisplayName(m.model)}</Text>
+              <UsbPortInfo moduleMissing={missingModules.includes(m)} />
+            </Flex>
+          ))}
+        </Box>
+      </ListItem>
     </TitledList>
   )
 }

@@ -31,7 +31,7 @@ beforeEach(() => {
     mix_wellOrder_second: 't2b',
     blowout_checkbox: false,
     blowout_location: null,
-    mix_mmFromBottom: '0.5',
+    mix_mmFromBottom: 0.5,
     pipette: {
       id: 'pipetteId',
       spec: fixtureP10Single,

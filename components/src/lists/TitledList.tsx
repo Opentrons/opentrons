@@ -7,6 +7,8 @@ import { Icon } from '../icons'
 import type { IconName } from '../icons'
 
 export interface TitledListProps {
+  /** id attribute */
+  id?: string
   /** text of title */
   title: string
   /** optional icon left of the title */
@@ -49,6 +51,7 @@ export interface TitledListProps {
  */
 export function TitledList(props: TitledListProps): JSX.Element {
   const {
+    id,
     iconName,
     disabled,
     inert,
@@ -94,6 +97,7 @@ export function TitledList(props: TitledListProps): JSX.Element {
 
   return (
     <div
+      id={id}
       className={className}
       data-test={dataTest}
       {...{ onMouseEnter, onMouseLeave, onContextMenu }}

@@ -36,6 +36,7 @@ import {
 import type { IconName } from '@opentrons/components'
 
 type ClickableIconProps = {|
+  id?: string,
   iconName: IconName,
   tooltipText: string,
   width?: string,
@@ -55,9 +56,10 @@ const iconBoxStyles = css`
 `
 
 export const ClickableIcon = (props: ClickableIconProps): React.Node => {
-  const { iconName, onClick, tooltipText, width } = props
+  const { id, iconName, onClick, tooltipText, width } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'top',
+    strategy: 'fixed',
   })
 
   const boxStyles = {
@@ -66,7 +68,7 @@ export const ClickableIcon = (props: ClickableIconProps): React.Node => {
   }
 
   return (
-    <Box {...boxStyles} {...targetProps} css={iconBoxStyles}>
+    <Box id={id} {...boxStyles} {...targetProps} css={iconBoxStyles}>
       <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
       <Box onClick={onClick}>
         <Icon name={iconName} width={width || '1.25rem'} color={C_DARK_GRAY} />
@@ -75,7 +77,32 @@ export const ClickableIcon = (props: ClickableIconProps): React.Node => {
   )
 }
 
-export const MultiSelectToolbar = (): React.Node => {
+type Props = {|
+  isMultiSelectMode: boolean,
+|}
+
+type AccordionProps = {|
+  expanded: boolean,
+  children: React.Node,
+|}
+
+export const Accordion = (props: AccordionProps): React.Node => {
+  return (
+    <Box
+      height={props.expanded ? SIZE_2 : 0}
+      transition="all 0.5s"
+      position={POSITION_STICKY}
+      top="0"
+      overflow="hidden"
+      borderBottom={props.expanded ? BORDER_SOLID_MEDIUM : 'none'}
+      opacity={props.expanded ? 1 : 0}
+    >
+      {props.children}
+    </Box>
+  )
+}
+
+export const MultiSelectToolbar = (props: Props): React.Node => {
   const dispatch = useDispatch()
   const [isExpandState, setIsExpandState] = React.useState<boolean>(true)
   const stepCount = useSelector(stepFormSelectors.getOrderedStepIds).length
@@ -196,21 +223,20 @@ export const MultiSelectToolbar = (): React.Node => {
           onCancelClick={cancelDelete}
         />
       )}
-      <Flex
-        alignItems={ALIGN_CENTER}
-        height={SIZE_2}
-        padding={`0 ${SPACING_2}`}
-        borderBottom={BORDER_SOLID_MEDIUM}
-        position={POSITION_STICKY}
-        top="0"
-        backgroundColor={C_NEAR_WHITE}
-        zIndex="100"
-      >
-        <ClickableIcon {...selectProps} />
-        <ClickableIcon {...deleteProps} />
-        <ClickableIcon {...copyProps} />
-        <ClickableIcon {...expandProps} />
-      </Flex>
+      <Accordion expanded={props.isMultiSelectMode}>
+        <Flex
+          alignItems={ALIGN_CENTER}
+          height={SIZE_2}
+          padding={`0 ${SPACING_2}`}
+          backgroundColor={C_NEAR_WHITE}
+          zIndex="100"
+        >
+          <ClickableIcon id="ClickableIcon_select" {...selectProps} />
+          <ClickableIcon id="ClickableIcon_delete" {...deleteProps} />
+          <ClickableIcon id="ClickableIcon_duplicate" {...copyProps} />
+          <ClickableIcon id="ClickableIcon_expand" {...expandProps} />
+        </Flex>
+      </Accordion>
     </>
   )
 }

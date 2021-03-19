@@ -25,7 +25,7 @@ export class StepList extends React.Component<Props> {
   handleKeyDown: (e: SyntheticKeyboardEvent<>) => void = e => {
     const { reorderSelectedStep } = this.props
     const key = e.key
-    const altIsPressed = e.getModifierState('Alt')
+    const altIsPressed = e.altKey
 
     if (altIsPressed) {
       let delta = 0
@@ -51,7 +51,10 @@ export class StepList extends React.Component<Props> {
     return (
       <React.Fragment>
         <SidePanel title="Protocol Timeline">
-          {this.props.isMultiSelectMode && <MultiSelectToolbar />}
+          <MultiSelectToolbar
+            isMultiSelectMode={Boolean(this.props.isMultiSelectMode)}
+          />
+
           <StartingDeckStateTerminalItem />
           <DraggableStepItems
             orderedStepIds={this.props.orderedStepIds.slice()}

@@ -10,7 +10,7 @@ import type { ChangeTipOptions } from './step-generation'
 
 export type StepIdType = string
 
-export type StepFieldName = any
+export type StepFieldName = string
 // | 'aspirate_airGap_checkbox'
 // | 'aspirate_airGap_volume'
 // | 'aspirate_changeTip'
@@ -71,39 +71,6 @@ export type StepFieldName = any
 // | 'dispense_touchTip'
 // | 'aspirate_disposalVol_checkbox'
 // | 'aspirate_disposalVol_volume'
-
-export type MultiSelectFieldName =
-  | 'aspirate_flowRate'
-  | 'aspirate_mmFromBottom'
-  | 'aspirate_wellOrder_first'
-  | 'aspirate_wellOrder_second'
-  | 'preWetTip'
-  | 'aspirate_mix_checkbox'
-  | 'aspirate_mix_volume'
-  | 'aspirate_mix_times'
-  | 'aspirate_delay_checkbox'
-  | 'aspirate_delay_seconds'
-  | 'aspirate_delay_mmFromBottom'
-  | 'aspirate_airGap_checkbox'
-  | 'aspirate_airGap_volume'
-  | 'aspirate_touchTip_checkbox'
-  | 'aspirate_touchTip_mmFromBottom'
-  | 'dispense_flowRate'
-  | 'dispense_mmFromBottom'
-  | 'dispense_wellOrder_first'
-  | 'dispense_wellOrder_second'
-  | 'dispense_mix_checkbox'
-  | 'dispense_mix_volume'
-  | 'dispense_mix_times'
-  | 'dispense_delay_checkbox'
-  | 'dispense_delay_seconds'
-  | 'dispense_delay_mmFromBottom'
-  | 'dispense_airGap_checkbox'
-  | 'dispense_airGap_volume'
-  | 'dispense_touchTip_checkbox'
-  | 'dispense_touchTip_mmFromBottom'
-  | 'blowout_checkbox'
-  | 'blowout_location'
 
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
 export type StepType =

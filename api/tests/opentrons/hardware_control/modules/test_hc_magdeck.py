@@ -1,8 +1,19 @@
+import pytest
 from opentrons.hardware_control import modules, ExecutionManager
 
+from opentrons.drivers.rpi_drivers.types import USBPort
 
-async def test_sim_initialization(loop):
+
+@pytest.fixture
+def usb_port():
+    return USBPort(
+        name='', sub_names=[], hub=None,
+        port_number=None, device_path='/dev/ot_module_sim_magdeck0')
+
+
+async def test_sim_initialization(loop, usb_port):
     mag = await modules.build(port='/dev/ot_module_sim_magdeck0',
+                              usb_port=usb_port,
                               which='magdeck',
                               simulating=True,
                               interrupt_callback=lambda x: None,
@@ -11,8 +22,9 @@ async def test_sim_initialization(loop):
     assert isinstance(mag, modules.AbstractModule)
 
 
-async def test_sim_data(loop):
+async def test_sim_data(loop, usb_port):
     mag = await modules.build(port='/dev/ot_module_sim_magdeck0',
+                              usb_port=usb_port,
                               which='magdeck',
                               simulating=True,
                               interrupt_callback=lambda x: None,
@@ -27,8 +39,9 @@ async def test_sim_data(loop):
     assert 'data' in mag.live_data
 
 
-async def test_sim_state_update(loop):
+async def test_sim_state_update(loop, usb_port):
     mag = await modules.build(port='/dev/ot_module_sim_magdeck0',
+                              usb_port=usb_port,
                               which='magdeck',
                               simulating=True,
                               interrupt_callback=lambda x: None,
@@ -42,8 +55,8 @@ async def test_sim_state_update(loop):
     assert mag.status == 'disengaged'
 
 
-async def test_revision_model_parsing(loop):
-    mag = await modules.build('', 'magdeck', True, lambda x: None, loop=loop,
+async def test_revision_model_parsing(loop, usb_port):
+    mag = await modules.build('', 'magdeck', True, usb_port, lambda x: None, loop=loop,
                               execution_manager=ExecutionManager(loop=loop))
     mag._device_info['model'] = 'mag_deck_v1.1'
     assert mag.model() == 'magneticModuleV1'

@@ -87,6 +87,10 @@ export interface PositionProps {
   left?: string | number
 }
 
+export interface TransitionProps {
+  transition?: string
+}
+
 export interface StyleProps
   extends ColorProps,
     TypographyProps,
@@ -95,7 +99,8 @@ export interface StyleProps
     FlexboxProps,
     GridProps,
     LayoutProps,
-    PositionProps {
+    PositionProps,
+    TransitionProps {
   className?: string
 }
 

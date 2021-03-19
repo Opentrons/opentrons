@@ -54,7 +54,7 @@
     "concurrently": "^4.1.2",
     "core-js": "^3.6.4",
     "css-loader": "^3.2.0",
-    "cypress": "^4.0.2",
+    "cypress": "^6.6.0",
     "cypress-file-upload": "3.5.3",
     "cz-conventional-changelog": "2.1.0",
     "electron": "6.1.10",

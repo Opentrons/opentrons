@@ -1,7 +1,7 @@
 // @flow
 import React from 'react'
 import { shallow } from 'enzyme'
-import { PrimaryButton, Tooltip } from '@opentrons/components'
+import { PrimaryButton, OutlineButton, Tooltip } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { BatchEditMoveLiquid } from '../'
 
@@ -71,14 +71,14 @@ describe('BatchEditMoveLiquid', () => {
   })
 
   describe('cancel button', () => {
-    const cancelButtonText = 'button.cancel'
+    const cancelButtonText = 'button.discard_changes'
 
     it('should have tooltip', () => {
       const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
       const tooltipPath = 'tooltip.cancel_batch_edit'
 
       const cancelButton = wrapper
-        .find(PrimaryButton)
+        .find(OutlineButton)
         .filterWhere(el => el.prop('children') === cancelButtonText)
 
       const cancelButtonTooltip = cancelButton.parent().dive().find(Tooltip)
@@ -90,7 +90,7 @@ describe('BatchEditMoveLiquid', () => {
       const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
 
       const cancelButton = wrapper
-        .find(PrimaryButton)
+        .find(OutlineButton)
         .filterWhere(el => el.prop('children') === cancelButtonText)
 
       expect(handleCancel).not.toHaveBeenCalled()

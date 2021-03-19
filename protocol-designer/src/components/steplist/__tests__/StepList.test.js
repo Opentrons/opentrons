@@ -16,14 +16,18 @@ describe('StepList', () => {
   })
   const render = props => shallow(<StepList {...props} />)
 
-  it('should render a MultiSelectToolbar when in multi select mode', () => {
+  it('should render the MultiSelectToolbar in MultiSelectMode', () => {
     props.isMultiSelectMode = true
     const wrapper = render(props)
-    expect(wrapper.find(MultiSelectToolbar).exists()).toBe(true)
+    expect(wrapper.find(MultiSelectToolbar).prop('isMultiSelectMode')).toBe(
+      true
+    )
   })
-  it('should render NOT a MultiSelectToolbar when NOT in multi select mode', () => {
+  it('should NOT render the MultiSelectToolbar in NOT MultiSelectMode', () => {
     props.isMultiSelectMode = false
     const wrapper = render(props)
-    expect(wrapper.find(MultiSelectToolbar).exists()).toBe(false)
+    expect(wrapper.find(MultiSelectToolbar).prop('isMultiSelectMode')).toBe(
+      false
+    )
   })
 })

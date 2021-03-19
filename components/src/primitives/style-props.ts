@@ -88,6 +88,8 @@ const POSITION_PROPS = [
   'left',
 ] as const
 
+const TRANSITION_PROPS = ['transition'] as const
+
 const STYLE_PROPS = [
   ...COLOR_PROPS,
   ...TYPOGRAPHY_PROPS,
@@ -97,6 +99,7 @@ const STYLE_PROPS = [
   ...GRID_PROPS,
   ...LAYOUT_PROPS,
   ...POSITION_PROPS,
+  ...TRANSITION_PROPS,
 ]
 
 const colorStyles = (props: Types.StyleProps): CSSObject => {
@@ -167,6 +170,10 @@ const positionStyles = (props: Types.StyleProps): CSSObject => {
   return pick(props, POSITION_PROPS) as CSSObject
 }
 
+const transitionStyles = (props: Types.StyleProps): CSSObject => {
+  return pick(props, TRANSITION_PROPS)
+}
+
 export const styleProps = (props: Types.StyleProps): CSSObject => ({
   ...colorStyles(props),
   ...typographyStyles(props),
@@ -176,6 +183,7 @@ export const styleProps = (props: Types.StyleProps): CSSObject => ({
   ...gridStyles(props),
   ...layoutStyles(props),
   ...positionStyles(props),
+  ...transitionStyles(props),
 })
 
 export const isntStyleProp = (prop: string | React.ReactText): boolean =>

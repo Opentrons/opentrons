@@ -1,9 +1,11 @@
 // @flow
+import { when, resetAllWhenMocks } from 'jest-when'
 import { reduxActionToAnalyticsEvent } from '../middleware'
 import { getFileMetadata } from '../../file-data/selectors'
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
+  getBatchEditFieldChanges,
 } from '../../step-forms/selectors'
 import type { FileMetadataFields } from '../../file-data/types'
 
@@ -16,6 +18,10 @@ const getArgsAndErrorsByStepIdMock: JestMockFn<
   any
 > = getArgsAndErrorsByStepId
 const getPipetteEntitiesMock: JestMockFn<any, any> = getPipetteEntities
+const getBatchEditFieldChangesMock: JestMockFn<
+  any,
+  any
+> = getBatchEditFieldChanges
 
 let fooState: any
 beforeEach(() => {
@@ -27,7 +33,8 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.resetAllMocks()
+  jest.restoreAllMocks()
+  resetAllWhenMocks()
 })
 
 describe('reduxActionToAnalyticsEvent', () => {
@@ -74,13 +81,49 @@ describe('reduxActionToAnalyticsEvent', () => {
         id: 'stepId',
         pipette: 'pipetteId',
         otherField: 123,
+        nested: { inner: true },
         // de-nested fields
         __nested__inner: true,
-        nested: { inner: true },
         // additional special properties for analytics
         __dateCreated: '2020-09-13T12:26:40.000Z',
         __protocolName: 'protocol name here',
         __pipetteName: 'some_pipette_spec_name',
+      },
+    })
+  })
+  it('should convert a SAVE_STEP_FORMS_MULTI action into a saveStepsMulti action with additional properties', () => {
+    const changes = {
+      someField: 'someVal',
+      anotherField: 'anotherVal',
+      someNestedField: {
+        innerNestedField: true,
+      },
+    }
+    when(getBatchEditFieldChangesMock)
+      .calledWith(expect.anything())
+      .mockReturnValue(changes)
+    const action = {
+      type: 'SAVE_STEP_FORMS_MULTI',
+      payload: {
+        selectedStepIds: [], // this does not matter
+      },
+    }
+
+    const result = reduxActionToAnalyticsEvent(fooState, action)
+    expect(result).toEqual({
+      name: 'saveStepsMulti',
+      properties: {
+        // existing fields
+        someField: 'someVal',
+        anotherField: 'anotherVal',
+        someNestedField: {
+          innerNestedField: true,
+        },
+        // de-nested fields
+        __someNestedField__innerNestedField: true,
+        // additional special properties for analytics
+        __dateCreated: '2020-09-13T12:26:40.000Z',
+        __protocolName: 'protocol name here',
       },
     })
   })

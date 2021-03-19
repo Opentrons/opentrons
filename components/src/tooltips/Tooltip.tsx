@@ -3,10 +3,12 @@ import { css } from 'styled-components'
 
 import { FONT_BODY_1_LIGHT, C_DARK_GRAY } from '../styles'
 import { ARROW_SIZE_PX } from './styles'
+import { Box } from '../primitives'
 
 import type { CSSProperties } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Placement } from './types'
+import type { StyleProps } from '../primitives'
 
 const TOOLTIP_CSS = css`
   position: absolute;
@@ -18,7 +20,7 @@ const TOOLTIP_CSS = css`
   cursor: pointer;
 `
 
-export interface TooltipProps {
+export interface TooltipProps extends StyleProps {
   /** Whether or not the tooltip should be rendered */
   visible: boolean
   /** Contents of the tooltip */
@@ -54,13 +56,21 @@ export const Tooltip = React.forwardRef(function TooltipComponent(
     arrowRef,
     arrowStyle,
     children,
+    ...boxProps
   } = props
 
   return visible ? (
-    <div role="tooltip" id={id} style={style} ref={ref} css={TOOLTIP_CSS}>
+    <Box
+      role="tooltip"
+      id={id}
+      style={style}
+      ref={ref}
+      css={TOOLTIP_CSS}
+      {...boxProps}
+    >
       {children}
       <Arrow {...{ arrowRef, arrowStyle, placement }} />
-    </div>
+    </Box>
   ) : null
 })
 
