@@ -35,6 +35,24 @@ def test_builder_create_command_with_gcode() -> None:
     ).build() == "G321 terminator"
 
 
+def test_builder_create_command_with_builder() -> None:
+    """It should create a command words in another builder."""
+    terminator = "terminator"
+    builder = CommandBuilder(terminator=terminator)
+    assert builder.with_gcode(
+        gcode='G321'
+    ).build() == "G321 terminator"
+
+    builder2 = CommandBuilder(terminator=terminator)
+    builder2.with_builder(
+        builder=builder
+    ).with_gcode(
+        gcode="G123"
+    ).with_builder(
+        builder=builder
+    ).build() == " G321 G123 G321 terminator"
+
+
 def test_builder_chain() -> None:
     """It should create a command using chaining."""
     terminator = "terminator"

@@ -52,6 +52,18 @@ class CommandBuilder:
         """
         return self.add_word(gcode)
 
+    def with_builder(self, builder: 'CommandBuilder') -> 'CommandBuilder':
+        """
+        Add all words from builder
+
+        Args:
+            builder: a command builder
+
+        Returns: self
+        """
+        self._words += builder._words
+        return self
+
     def add_word(self, word: str) -> 'CommandBuilder':
         """
         Add a word to the command builder
