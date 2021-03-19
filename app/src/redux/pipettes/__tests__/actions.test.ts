@@ -5,12 +5,12 @@ import * as Fixtures from '../__fixtures__'
 
 import type { PipettesAction } from '../types'
 
-type ActionSpec = {|
+type ActionSpec = {
   name: string,
   creator: (...Array<any>) => mixed,
   args: Array<mixed>,
   expected: PipettesAction,
-|}
+}
 
 describe('robot pipettes actions', () => {
   const SPECS: Array<ActionSpec> = [

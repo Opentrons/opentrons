@@ -24,7 +24,7 @@ import { LabeledValue } from '../../../atoms/structure'
 import type { Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-type Props = {| robot: ViewableRobot |}
+type Props = { robot: ViewableRobot }
 
 export function StatusCard(props: Props): React.Node {
   const { robot } = props

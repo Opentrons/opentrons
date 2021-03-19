@@ -24,30 +24,30 @@ import { LabwareItem } from './LabwareItem'
 
 export * from './LabwareItem'
 
-type OP = {|
+type OP = {
   ...ContextRouter,
   modulesRequired?: boolean,
   enableLabwareSelection?: boolean,
   className?: string,
-|}
+}
 
-type DP = {| dispatch: Dispatch |}
+type DP = { dispatch: Dispatch }
 
-type DisplayModule = {|
+type DisplayModule = {
   ...$Exact<SessionModule>,
   mode?: $PropertyType<React.ElementProps<typeof ModuleItem>, 'mode'>,
-|}
+}
 
-type SP = {|
+type SP = {
   labwareBySlot?: { [DeckSlotId]: Array<Labware> },
   modulesBySlot?: {
     [DeckSlotId]: ?DisplayModule,
   },
   selectedSlot?: ?DeckSlotId,
   areTipracksConfirmed?: boolean,
-|}
+}
 
-type Props = {| ...OP, ...SP, ...DP |}
+type Props = { ...OP, ...SP, ...DP }
 
 const deckSetupLayerBlocklist = [
   'calibrationMarkings',

@@ -16,13 +16,13 @@ import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
 import type { FetchPipettesAction } from '../../redux/pipettes/types'
 
-export type CheckPipetteButtonProps = {|
+export type CheckPipetteButtonProps = {
   robotName: string,
   className: string,
   children: React.Node,
   hidden?: boolean,
   onDone?: () => mixed,
-|}
+}
 
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps

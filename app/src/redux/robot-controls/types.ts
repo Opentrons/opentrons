@@ -11,112 +11,112 @@ export type MovePosition = 'changePipette' | 'attachTip'
 
 // http responses
 
-export type PositionsResponse = {|
-  positions: {|
-    change_pipette: {|
+export type PositionsResponse = {
+  positions: {
+    change_pipette: {
       target: 'mount',
       left: [number, number, number],
       right: [number, number, number],
-    |},
-    attach_tip: {| target: 'pipette', point: [number, number, number] |},
-  |},
-|}
+    },
+    attach_tip: { target: 'pipette', point: [number, number, number] },
+  },
+}
 
 // action types
 
 // fetch lights
 
-export type FetchLightsAction = {|
+export type FetchLightsAction = {
   type: 'robotControls:FETCH_LIGHTS',
-  payload: {| robotName: string |},
+  payload: { robotName: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchLightsSuccessAction = {|
+export type FetchLightsSuccessAction = {
   type: 'robotControls:FETCH_LIGHTS_SUCCESS',
-  payload: {| robotName: string, lightsOn: boolean |},
+  payload: { robotName: string, lightsOn: boolean },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchLightsFailureAction = {|
+export type FetchLightsFailureAction = {
   type: 'robotControls:FETCH_LIGHTS_FAILURE',
-  payload: {| robotName: string, error: {| message: string |} |},
+  payload: { robotName: string, error: { message: string } },
   meta: RobotApiRequestMeta,
-|}
+}
 
 // update lights
 
-export type UpdateLightsAction = {|
+export type UpdateLightsAction = {
   type: 'robotControls:UPDATE_LIGHTS',
-  payload: {| robotName: string, lightsOn: boolean |},
+  payload: { robotName: string, lightsOn: boolean },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type UpdateLightsSuccessAction = {|
+export type UpdateLightsSuccessAction = {
   type: 'robotControls:UPDATE_LIGHTS_SUCCESS',
-  payload: {| robotName: string, lightsOn: boolean |},
+  payload: { robotName: string, lightsOn: boolean },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type UpdateLightsFailureAction = {|
+export type UpdateLightsFailureAction = {
   type: 'robotControls:UPDATE_LIGHTS_FAILURE',
-  payload: {| robotName: string, error: {| message: string |} |},
+  payload: { robotName: string, error: { message: string } },
   meta: RobotApiRequestMeta,
-|}
+}
 
 // home
 
-export type HomeAction = {|
+export type HomeAction = {
   type: 'robotControls:HOME',
   payload:
-    | {| robotName: string, target: 'robot' |}
-    | {| robotName: string, target: 'pipette', mount: Mount |},
+    | { robotName: string, target: 'robot' }
+    | { robotName: string, target: 'pipette', mount: Mount },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type HomeSuccessAction = {|
+export type HomeSuccessAction = {
   type: 'robotControls:HOME_SUCCESS',
-  payload: {| robotName: string |},
+  payload: { robotName: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type HomeFailureAction = {|
+export type HomeFailureAction = {
   type: 'robotControls:HOME_FAILURE',
-  payload: {| robotName: string, error: {| message: string |} |},
+  payload: { robotName: string, error: { message: string } },
   meta: RobotApiRequestMeta,
-|}
+}
 
 // move
 
-export type MoveAction = {|
+export type MoveAction = {
   type: 'robotControls:MOVE',
-  payload: {|
+  payload: {
     robotName: string,
     mount: Mount,
     position: MovePosition,
     disengageMotors: boolean,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type MoveSuccessAction = {|
+export type MoveSuccessAction = {
   type: 'robotControls:MOVE_SUCCESS',
-  payload: {| robotName: string |},
+  payload: { robotName: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type MoveFailureAction = {|
+export type MoveFailureAction = {
   type: 'robotControls:MOVE_FAILURE',
-  payload: {| robotName: string, error: {| message: string |} |},
+  payload: { robotName: string, error: { message: string } },
   meta: RobotApiRequestMeta,
-|}
+}
 
 // clear homing and movement status and error
 
-export type ClearMovementStatusAction = {|
+export type ClearMovementStatusAction = {
   type: 'robotControls:CLEAR_MOVEMENT_STATUS',
-  payload: {| robotName: string |},
-|}
+  payload: { robotName: string },
+}
 
 // action union
 
@@ -137,14 +137,14 @@ export type RobotControlsAction =
 
 // state types
 
-export type PerRobotControlsState = $ReadOnly<{|
+export type PerRobotControlsState = $ReadOnly<{
   lightsOn: boolean | null,
   movementStatus: MovementStatus | null,
   movementError: string | null,
-|}>
+}>
 
 export type RobotControlsState = $Shape<
-  $ReadOnly<{|
+  $ReadOnly<{
     [robotName: string]: void | PerRobotControlsState,
-  |}>
+  }>
 >

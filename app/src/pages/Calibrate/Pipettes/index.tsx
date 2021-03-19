@@ -52,10 +52,10 @@ export function Pipettes(props: Props): React.Node {
 
   const currentPipette = currentMount && pipettes && pipettes[currentMount]
 
-  const activeTipracks = PIPETTE_MOUNTS.reduce<{|
+  const activeTipracks = PIPETTE_MOUNTS.reduce<{
     left: Labware | null,
     right: Labware | null,
-  |}>(
+  }>(
     (mapToBuild, m) => {
       const tipracksForMount = tipracksByMount[m]
       if (m === mount) {

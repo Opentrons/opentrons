@@ -12,11 +12,11 @@ import type { ConnectionState } from './connection'
 import type { SessionState } from './session'
 import type { CalibrationState } from './calibration'
 
-export type RobotState = {|
+export type RobotState = {
   connection: ConnectionState,
   session: SessionState,
   calibration: CalibrationState,
-|}
+}
 
 export const robotReducer: Reducer<RobotState, Action> = combineReducers<
   _,

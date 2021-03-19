@@ -5,12 +5,12 @@ import * as Actions from '../actions'
 import * as Fixtures from '../__fixtures__'
 import type { SystemInfoAction } from '../types'
 
-type ActionSpec = {|
+type ActionSpec = {
   should: string,
   creator: (...args: Array<any>) => SystemInfoAction,
   args: Array<any>,
   expected: SystemInfoAction,
-|}
+}
 
 const SPECS: Array<ActionSpec> = [
   {

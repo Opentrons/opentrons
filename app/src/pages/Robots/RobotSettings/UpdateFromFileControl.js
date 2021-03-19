@@ -32,9 +32,9 @@ const HIDDEN_CSS = css`
   clip: rect(1px 1px 1px 1px);
 `
 
-export type UpdateFromFileControlProps = {|
+export type UpdateFromFileControlProps = {
   robotName: string,
-|}
+}
 
 export function UpdateFromFileControl(
   props: UpdateFromFileControlProps

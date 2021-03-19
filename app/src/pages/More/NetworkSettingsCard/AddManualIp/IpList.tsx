@@ -9,18 +9,18 @@ import type { State, Dispatch } from '../../../../redux/types'
 import type { DiscoveryCandidates } from '../../../../redux/config/types'
 import type { Robot, ReachableRobot } from '../../../../redux/discovery/types'
 
-type OP = {||}
+type OP = {}
 
-type SP = {|
+type SP = {
   robots: Array<Robot | ReachableRobot>,
   candidates: DiscoveryCandidates,
-|}
+}
 
-type DP = {|
+type DP = {
   removeManualIp: (ip: string) => mixed,
-|}
+}
 
-type Props = {| ...SP, ...DP |}
+type Props = { ...SP, ...DP }
 
 function IpListComponent(props: Props) {
   const { candidates, removeManualIp, robots } = props

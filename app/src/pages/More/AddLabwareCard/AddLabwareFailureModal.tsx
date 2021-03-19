@@ -45,13 +45,13 @@ const DISPLAY_NAME = 'Name: '
 const API_NAME = 'API name: '
 const FILENAME = 'File name: '
 
-export type AddLabwareFailureModalProps = {|
+export type AddLabwareFailureModalProps = {
   file: FailedLabwareFile | null,
   errorMessage: string | null,
   directory: string,
   onCancel: () => mixed,
   onOverwrite: (file: DuplicateLabwareFile) => mixed,
-|}
+}
 
 const renderFilename = file => (
   <span className={styles.code}>{file.filename}</span>

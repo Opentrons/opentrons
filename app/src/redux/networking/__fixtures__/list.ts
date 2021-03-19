@@ -28,7 +28,7 @@ const {
   failure,
 }: ResponseFixtures<
   WifiListResponse,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: GET,
   path: WIFI_LIST_PATH,

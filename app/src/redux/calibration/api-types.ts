@@ -42,13 +42,13 @@ export type CalibrationSource =
   | CALIBRATION_SOURCE_UNKNOWN
   | CALIBRATION_SOURCE_LEGACY
 
-export type IndividualCalibrationStatus = {|
+export type IndividualCalibrationStatus = {
   markedBad: boolean,
   source: CalibrationSource | null,
   markedAt: string | null,
-|}
+}
 
-export type DeckCalibrationInfo = {|
+export type DeckCalibrationInfo = {
   matrix: AffineMatrix | AttitudeMatrix,
   lastModified: string | null,
   pipetteCalibratedWith: string | null,
@@ -56,43 +56,43 @@ export type DeckCalibrationInfo = {|
   type: string,
   source?: CalibrationSource,
   status?: IndividualCalibrationStatus,
-|}
+}
 
 export type DeckCalibrationData = DeckCalibrationInfo | AffineMatrix
 
-export type CalibrationStatus = {|
-  deckCalibration: {|
+export type CalibrationStatus = {
+  deckCalibration: {
     status: DeckCalibrationStatus,
     data: DeckCalibrationData,
-  |},
-  instrumentCalibration: {|
-    right: {|
+  },
+  instrumentCalibration: {
+    right: {
       single: [number, number, number],
       multi: [number, number, number],
-    |},
-    left: {|
+    },
+    left: {
       single: [number, number, number],
       multi: [number, number, number],
-    |},
-  |},
-|}
+    },
+  },
+}
 
-export type OffsetData = {|
+export type OffsetData = {
   value: [number, number, number],
   lastModified: string,
-|}
+}
 
-export type TipLengthData = {|
+export type TipLengthData = {
   value: number,
   lastModified: string,
-|}
+}
 
-export type CalibrationData = {|
+export type CalibrationData = {
   offset: OffsetData,
   tipLength: TipLengthData | null,
-|}
+}
 
-export type LabwareCalibration = {|
+export type LabwareCalibration = {
   calibrationData: CalibrationData,
   loadName: string,
   namespace: string,
@@ -100,13 +100,13 @@ export type LabwareCalibration = {|
   parent: string,
   definitionHash: string,
   id: string,
-|}
+}
 
-export type AllLabwareCalibrations = {|
+export type AllLabwareCalibrations = {
   data: Array<LabwareCalibration>,
-|}
+}
 
-export type PipetteOffsetCalibration = {|
+export type PipetteOffsetCalibration = {
   pipette: string,
   mount: Mount,
   offset: [number, number, number],
@@ -116,13 +116,13 @@ export type PipetteOffsetCalibration = {|
   source: CalibrationSource,
   status: IndividualCalibrationStatus,
   id: string,
-|}
+}
 
-export type AllPipetteOffsetCalibrations = {|
+export type AllPipetteOffsetCalibrations = {
   data: Array<PipetteOffsetCalibration>,
-|}
+}
 
-export type TipLengthCalibration = {|
+export type TipLengthCalibration = {
   tipLength: number,
   tiprack: string,
   pipette: string,
@@ -131,8 +131,8 @@ export type TipLengthCalibration = {|
   status: IndividualCalibrationStatus,
   id: string,
   uri?: string | null,
-|}
+}
 
-export type AllTipLengthCalibrations = {|
+export type AllTipLengthCalibrations = {
   data: Array<TipLengthCalibration>,
-|}
+}

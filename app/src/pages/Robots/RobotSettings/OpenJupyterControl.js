@@ -17,9 +17,9 @@ import { LabeledValue } from '../../../atoms/structure'
 
 const EVENT_JUPYTER_OPEN = { name: 'jupyterOpen', properties: {} }
 
-export type OpenJupyterControlProps = {|
+export type OpenJupyterControlProps = {
   robotIp: string,
-|}
+}
 
 export function OpenJupyterControl(props: OpenJupyterControlProps): React.Node {
   const { robotIp } = props

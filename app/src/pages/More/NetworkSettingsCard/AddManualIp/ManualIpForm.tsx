@@ -10,13 +10,13 @@ import { IpField } from './IpField'
 import type { State, Dispatch } from '../../../../redux/types'
 import type { DiscoveryCandidates } from '../../../../redux/config/types'
 
-type OP = {||}
+type OP = {}
 
-type SP = {| candidates: DiscoveryCandidates |}
+type SP = { candidates: DiscoveryCandidates }
 
-type DP = {| addManualIp: (ip: string) => mixed |}
+type DP = { addManualIp: (ip: string) => mixed }
 
-type Props = {| ...SP, ...DP |}
+type Props = { ...SP, ...DP }
 
 class ManualIpFormComponent extends React.Component<Props> {
   inputRef: { current: null | HTMLInputElement }

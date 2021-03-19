@@ -40,15 +40,15 @@ type CalibrationRequestType =
   | 'SET_MODULES_REVIEWED'
   | 'RETURN_TIP'
 
-export type CalibrationRequest = $ReadOnly<{|
+export type CalibrationRequest = $ReadOnly<{
   type: CalibrationRequestType,
   mount?: Mount,
   slot?: Slot,
   inProgress: boolean,
   error: Error | null,
-|}>
+}>
 
-export type CalibrationState = $ReadOnly<{|
+export type CalibrationState = $ReadOnly<{
   deckPopulated: ?boolean,
   modulesReviewed: ?boolean,
 
@@ -58,7 +58,7 @@ export type CalibrationState = $ReadOnly<{|
   confirmedBySlot: { [Slot]: boolean },
 
   calibrationRequest: CalibrationRequest,
-|}>
+}>
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {

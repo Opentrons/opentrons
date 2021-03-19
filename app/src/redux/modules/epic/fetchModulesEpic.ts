@@ -51,24 +51,24 @@ const mapActionToRequest: ActionToRequestMapper<FetchModulesAction> = action => 
 })
 
 type IdentifierWithData =
-  | {|
+  | {
       type: typeof MAGNETIC_MODULE_TYPE,
       model: MagneticModuleModel,
       data: MagneticData,
       status: MagneticStatus,
-    |}
-  | {|
+    }
+  | {
       type: typeof TEMPERATURE_MODULE_TYPE,
       model: TemperatureModuleModel,
       data: TemperatureData,
       status: TemperatureStatus,
-    |}
-  | {|
+    }
+  | {
       type: typeof THERMOCYCLER_MODULE_TYPE,
       model: ThermocyclerModuleModel,
       data: ThermocyclerData,
       status: ThermocyclerStatus,
-    |}
+    }
 
 const normalizeModuleInfoLegacy = (
   response: ApiAttachedModuleLegacy

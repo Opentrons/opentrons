@@ -41,17 +41,17 @@ import type {
   TipLengthCalibration,
 } from '../../../redux/calibration/types'
 
-type Props = {|
+type Props = {
   mount: 'left' | 'right',
   pipette: AttachedPipette | null,
   calibration: PipetteCalibrations | null,
   customLabware: Array<LabwareDefinition2>,
-|}
+}
 
-function TipRackDisplayName(props: {|
+function TipRackDisplayName(props: {
   tiprackUri: string,
   customLabware: Array<LabwareDefinition2>,
-|}): React.Node {
+}): React.Node {
   const { t } = useTranslation('robot_calibration')
   const { tiprackUri, customLabware } = props
   const [namespace, loadName] = tiprackUri ? tiprackUri.split('/') : ['', '']
@@ -70,9 +70,9 @@ function TipRackDisplayName(props: {|
   )
 }
 
-function LastCalibrated(props: {|
+function LastCalibrated(props: {
   calibration: PipetteOffsetCalibration | TipLengthCalibration,
-|}): React.Node {
+}): React.Node {
   const { t } = useTranslation('robot_calibration')
   return (
     <Text
@@ -87,10 +87,10 @@ function LastCalibrated(props: {|
   )
 }
 
-type PipetteOffsetSectionProps = {|
+type PipetteOffsetSectionProps = {
   pipette: AttachedPipette,
   calibration: PipetteOffsetCalibration | null,
-|}
+}
 
 function PipetteOffsetSection(props: PipetteOffsetSectionProps): React.Node {
   const { t } = useTranslation('robot_calibration')
@@ -119,10 +119,10 @@ function PipetteOffsetSection(props: PipetteOffsetSectionProps): React.Node {
   )
 }
 
-type TipLengthSectionProps = {|
+type TipLengthSectionProps = {
   calibration: PipetteCalibrations | null,
   customLabware: Array<LabwareDefinition2>,
-|}
+}
 
 export function TipLengthSection(props: TipLengthSectionProps): React.Node {
   const { calibration, customLabware } = props

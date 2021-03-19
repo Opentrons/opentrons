@@ -4,10 +4,10 @@ import styles from './styles.css'
 import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../redux/buildroot'
 import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
 
-export type SyncRobotMessageProps = {|
+export type SyncRobotMessageProps = {
   updateType: BuildrootUpdateType,
   version: string,
-|}
+}
 
 export function SyncRobotMessage(props: SyncRobotMessageProps): React.Node {
   const { updateType, version } = props

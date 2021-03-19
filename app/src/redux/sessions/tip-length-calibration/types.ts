@@ -22,23 +22,23 @@ export type TipLengthCalibrationStep =
   | TIP_LENGTH_STEP_MEASURING_TIP_OFFSET
   | TIP_LENGTH_STEP_CALIBRATION_COMPLETE
 
-export type TipLengthCalibrationInstrument = {|
+export type TipLengthCalibrationInstrument = {
   model: string,
   name: string,
   tipLength: number,
   mount: string,
   serial: string,
   defaultTipracks: Array<LabwareDefinition2>,
-|}
+}
 
-export type TipLengthCalibrationSessionParams = {|
+export type TipLengthCalibrationSessionParams = {
   mount: string,
   hasCalibrationBlock: boolean,
   tipRackDefinition: LabwareDefinition2,
-|}
+}
 
-export type TipLengthCalibrationSessionDetails = {|
+export type TipLengthCalibrationSessionDetails = {
   instrument: TipLengthCalibrationInstrument,
   currentStep: TipLengthCalibrationStep,
   labware: Array<CalibrationLabware>,
-|}
+}

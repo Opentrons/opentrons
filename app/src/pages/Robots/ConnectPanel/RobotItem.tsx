@@ -15,10 +15,10 @@ import { RobotListItem } from './RobotListItem.js'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-export type RobotItemProps = {|
+export type RobotItemProps = {
   ...ContextRouter,
   robot: ViewableRobot,
-|}
+}
 
 export const RobotItem: React.AbstractComponent<
   $Diff<RobotItemProps, ContextRouter>

@@ -21,7 +21,7 @@ const {
   failure,
 }: ResponseFixtures<
   NetworkingDisconnectResponse,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: POST,
   path: '/wifi/disconnect',

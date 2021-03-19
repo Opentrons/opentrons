@@ -9,7 +9,7 @@ import { FormRow } from './FormRow'
 
 import type { EapOption } from '../types'
 
-export type SecurityFieldProps = {|
+export type SecurityFieldProps = {
   id: string,
   name: string,
   placeholder: string,
@@ -17,7 +17,7 @@ export type SecurityFieldProps = {|
   showAllOptions: boolean,
   eapOptions: Array<EapOption>,
   className?: string,
-|}
+}
 
 const ALL_SECURITY_OPTIONS = [
   { options: [{ value: SECURITY_NONE, label: LABEL_SECURITY_NONE }] },

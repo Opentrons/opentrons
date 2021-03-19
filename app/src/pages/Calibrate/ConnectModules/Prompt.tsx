@@ -32,11 +32,11 @@ import type { Dispatch } from '../../../redux/types'
 
 const SUPPORT_PAGE = 'https://support.opentrons.com/en/' // TODO: update link to correct doc
 
-export type PromptProps = {|
+export type PromptProps = {
   modulesMissing: boolean,
   onPromptClick: () => mixed,
   hasDuplicateModules: boolean,
-|}
+}
 
 export function Prompt(props: PromptProps): React.Node {
   const { modulesMissing, onPromptClick, hasDuplicateModules } = props

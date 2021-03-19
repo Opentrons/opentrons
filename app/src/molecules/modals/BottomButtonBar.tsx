@@ -9,11 +9,11 @@ import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
 
-type Props = {|
+type Props = {
   buttons: Array<?ButtonProps>,
   className?: string,
   description?: React.Node,
-|}
+}
 
 export function BottomButtonBar(props: Props): React.Node {
   const buttons = props.buttons.filter(Boolean)

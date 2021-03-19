@@ -12,7 +12,7 @@ import type { DeckCalibrationStatus } from '../calibration/types'
 
 export type AnalyticsConfig = $PropertyType<Config, 'analytics'>
 
-export type ProtocolAnalyticsData = {|
+export type ProtocolAnalyticsData = {
   protocolType: string,
   protocolAppName: string,
   protocolAppVersion: string,
@@ -23,9 +23,9 @@ export type ProtocolAnalyticsData = {|
   protocolText: string,
   pipettes: string,
   modules: string,
-|}
+}
 
-export type RobotAnalyticsData = {|
+export type RobotAnalyticsData = {
   robotApiServerVersion: string,
   robotSmoothieVersion: string,
   robotLeftPipette: string,
@@ -34,39 +34,39 @@ export type RobotAnalyticsData = {|
   // feature flags
   // e.g. robotFF_settingName
   [ffName: string]: boolean,
-|}
+}
 
-export type BuildrootAnalyticsData = {|
+export type BuildrootAnalyticsData = {
   currentVersion: string,
   currentSystem: string,
   updateVersion: string,
   error: string | null,
-|}
+}
 
-export type PipetteOffsetCalibrationAnalyticsData = {|
+export type PipetteOffsetCalibrationAnalyticsData = {
   calibrationExists: boolean,
   markedBad: boolean | null,
   pipetteModel: string,
-|}
+}
 
-export type TipLengthCalibrationAnalyticsData = {|
+export type TipLengthCalibrationAnalyticsData = {
   calibrationExists: boolean,
   markedBad: boolean | null,
   pipetteModel: string,
-|}
+}
 
-export type ModelsByMount = {|
+export type ModelsByMount = {
   left: { model: string } | null,
   right: { model: string } | null,
-|}
+}
 
-export type DeckCalibrationAnalyticsData = {|
+export type DeckCalibrationAnalyticsData = {
   calibrationStatus: DeckCalibrationStatus | null,
   markedBad: boolean | null,
   pipettes: ModelsByMount,
-|}
+}
 
-export type CalibrationCheckByMount = {|
+export type CalibrationCheckByMount = {
   left: {
     model: string,
     comparisons: CalibrationCheckComparisonsPerCalibration,
@@ -77,53 +77,53 @@ export type CalibrationCheckByMount = {|
     comparisons: CalibrationCheckComparisonsPerCalibration,
     succeeded: boolean,
   } | null,
-|}
+}
 
-export type CalibrationHealthCheckAnalyticsData = {|
+export type CalibrationHealthCheckAnalyticsData = {
   pipettes: CalibrationCheckByMount | null,
-|}
+}
 
-export type AnalyticsSessionExitDetails = {|
+export type AnalyticsSessionExitDetails = {
   sessionType: string,
   step: string,
-|}
+}
 
 export type AnalyticsEvent =
-  | {|
+  | {
       name: string,
       properties: { ... },
       superProperties?: { ... },
-    |}
-  | {| superProperties: { ... } |}
+    }
+  | { superProperties: { ... } }
 
 export type TrackEventArgs = [AnalyticsEvent | null, AnalyticsConfig | null]
 
-export type PipetteOffsetStartedAnalyticsAction = {|
+export type PipetteOffsetStartedAnalyticsAction = {
   type: ANALYTICS_PIPETTE_OFFSET_STARTED,
-  payload: {|
+  payload: {
     intent: CalUITypes.PipetteOffsetIntent,
     mount: string,
     calBlock: boolean,
     shouldPerformTipLength: boolean,
     tipRackURI: string | null,
-  |},
-|}
+  },
+}
 
-export type TipLengthStartedAnalyticsAction = {|
+export type TipLengthStartedAnalyticsAction = {
   type: ANALYTICS_TIP_LENGTH_STARTED,
-  payload: {|
+  payload: {
     intent: CalUITypes.PipetteOffsetIntent,
     mount: string,
     calBlock: boolean,
     tipRackURI: string,
-  |},
-|}
+  },
+}
 
 export type AnalyticsTriggerAction =
   | PipetteOffsetStartedAnalyticsAction
   | TipLengthStartedAnalyticsAction
 
-export type SessionInstrumentAnalyticsData = {|
+export type SessionInstrumentAnalyticsData = {
   sessionType: string,
   pipetteModel: string,
-|}
+}

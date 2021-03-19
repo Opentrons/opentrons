@@ -2,11 +2,11 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-export type InstructionStepProps = {|
-  step: 'one' | 'two',
-  children: React.Node,
-  diagram: string,
-|}
+export interface InstructionStepProps {
+  step: 'one' | 'two'
+  children: React.Node
+  diagram: string
+}
 
 export function InstructionStep(props: InstructionStepProps): React.Node {
   return (

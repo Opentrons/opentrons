@@ -2,12 +2,12 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-type TemperatureDataProps = {|
+type TemperatureDataProps = {
   title: string,
   current: number | null,
   target: number | null,
   className: string,
-|}
+}
 
 export const TemperatureData = ({
   title,

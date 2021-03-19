@@ -2,10 +2,10 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-export type InfoSectionProps = {|
-  title: string,
-  children: React.Node,
-|}
+export interface InfoSectionProps {
+  title: string
+  children: React.Node
+}
 
 export function InfoSection(props: InfoSectionProps): React.Node {
   return (

@@ -2,13 +2,13 @@
 import * as Selectors from '../selectors'
 import type { State } from '../../types'
 
-type SelectorSpec = {|
+type SelectorSpec = {
   name: string,
   selector: ($Shape<State>, ...Array<any>) => mixed,
   state: $Shape<State>,
   args?: Array<any>,
   expected: mixed,
-|}
+}
 
 describe('robot admin selectors', () => {
   const SPECS: Array<SelectorSpec> = [

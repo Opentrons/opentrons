@@ -28,12 +28,12 @@ import {
 } from '../../../redux/calibration'
 import type { Mount } from '../../../redux/pipettes/types'
 
-type Props = {|
+type Props = {
   robotName: string,
   makeChangeUrl: (mount: Mount) => string,
   makeConfigureUrl: (mount: Mount) => string,
   isChangingOrConfiguringPipette: boolean,
-|}
+}
 
 // TODO(mc, 2019-12-09): i18n
 const PIPETTES = 'Pipettes'

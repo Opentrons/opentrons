@@ -17,7 +17,7 @@ import { ControlContainer } from './ControlContainer'
 import type { Jog, Plane, Sign, Bearing } from './types'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 
-type Control = {|
+type Control = {
   bearing: Bearing,
   keyName: string,
   shiftKey: boolean,
@@ -26,12 +26,12 @@ type Control = {|
   iconName: IconName,
   axis: 'x' | 'y' | 'z',
   sign: Sign,
-|}
-type ControlsContents = {|
+}
+type ControlsContents = {
   controls: Array<Control>,
   title: string,
   subtitle: string,
-|}
+}
 
 const CONTROLS_CONTENTS_BY_PLANE: { [Plane]: ControlsContents } = {
   [VERTICAL_PLANE]: {
@@ -108,11 +108,11 @@ const CONTROLS_CONTENTS_BY_PLANE: { [Plane]: ControlsContents } = {
   },
 }
 
-type DirectionControlProps = {|
+type DirectionControlProps = {
   plane: Plane,
   jog: Jog,
   stepSize: number,
-|}
+}
 
 export function DirectionControl(props: DirectionControlProps): React.Node {
   const { title, subtitle, controls } = CONTROLS_CONTENTS_BY_PLANE[props.plane]

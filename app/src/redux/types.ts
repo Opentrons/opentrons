@@ -40,7 +40,7 @@ import type { SessionState, SessionsAction } from './sessions/types'
 
 import type { AnalyticsTriggerAction } from './analytics/types'
 
-export type State = $ReadOnly<{|
+export type State = $ReadOnly<{
   robot: RobotState,
   robotApi: RobotApiState,
   robotAdmin: RobotAdminState,
@@ -60,7 +60,7 @@ export type State = $ReadOnly<{|
   sessions: SessionState,
   calibration: CalibrationState,
   router: RouterState,
-|}>
+}>
 
 export type Action =
   | RobotAction

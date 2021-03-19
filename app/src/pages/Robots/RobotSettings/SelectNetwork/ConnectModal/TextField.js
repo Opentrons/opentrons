@@ -12,13 +12,13 @@ import { FormRow } from './FormRow'
 import { useConnectFormField } from './form-state'
 import { LABEL_SHOW_PASSWORD } from '../i18n'
 
-export type TextFieldProps = {|
+export type TextFieldProps = {
   id: string,
   name: string,
   label: string,
   isPassword: boolean,
   className?: string,
-|}
+}
 
 export const TextField = (props: TextFieldProps): React.Node => {
   const { id, name, label, isPassword, className } = props

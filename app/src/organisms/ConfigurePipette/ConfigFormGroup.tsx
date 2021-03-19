@@ -7,9 +7,9 @@ import styles from './styles.css'
 
 import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
 
-export type FormColumnProps = {|
+export type FormColumnProps = {
   children: React.Node,
-|}
+}
 
 export function FormColumn(props: FormColumnProps): React.Node {
   return <div className={styles.form_column}>{props.children}</div>
@@ -17,11 +17,11 @@ export function FormColumn(props: FormColumnProps): React.Node {
 
 export type FormValues = { [string]: ?(string | boolean) }
 
-export type ConfigFormGroupProps = {|
+export type ConfigFormGroupProps = {
   groupLabel: string,
   groupError?: ?string,
   formFields: Array<DisplayFieldProps>,
-|}
+}
 
 export function ConfigFormGroup(props: ConfigFormGroupProps): React.Node {
   const { groupLabel, groupError, formFields } = props
@@ -45,11 +45,11 @@ export function ConfigFormGroup(props: ConfigFormGroupProps): React.Node {
   )
 }
 
-export type ConfigFormRowProps = {|
+export type ConfigFormRowProps = {
   label: string,
   labelFor: string,
   children: React.Node,
-|}
+}
 
 const FIELD_ID_PREFIX = '__PipetteConfig__'
 const makeId = name => `${FIELD_ID_PREFIX}.${name}`
@@ -66,10 +66,10 @@ export function ConfigFormRow(props: ConfigFormRowProps): React.Node {
   )
 }
 
-export type ConfigInputProps = {|
+export type ConfigInputProps = {
   field: DisplayFieldProps,
   className?: string,
-|}
+}
 
 export function ConfigInput(props: ConfigInputProps): React.Node {
   const { field, className } = props
@@ -98,10 +98,10 @@ export function ConfigInput(props: ConfigInputProps): React.Node {
   )
 }
 
-export type ConfigCheckboxProps = {|
+export type ConfigCheckboxProps = {
   field: DisplayQuirkFieldProps,
   className?: string,
-|}
+}
 
 export function ConfigCheckbox(props: ConfigCheckboxProps): React.Node {
   const { field, className } = props
@@ -123,10 +123,10 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): React.Node {
   )
 }
 
-export type ConfigQuirkGroupProps = {|
+export type ConfigQuirkGroupProps = {
   groupLabel: string,
   quirks: Array<DisplayQuirkFieldProps>,
-|}
+}
 
 export function ConfigQuirkGroup(props: ConfigQuirkGroupProps): React.Node {
   const { groupLabel, quirks } = props

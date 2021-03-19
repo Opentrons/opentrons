@@ -31,11 +31,11 @@ export type SessionState = {
   // TODO(aa, 2020-06-01): DoorState is not currently used anywhere yet
   doorState: DoorState,
   blocked: boolean,
-  errors: Array<{|
+  errors: Array<{
     timestamp: number,
     line: number,
     message: string,
-  |}>,
+  }>,
   // TODO(mc, 2018-01-11): command IDs should be strings
   protocolCommands: Array<number>,
   protocolCommandsById: {

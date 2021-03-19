@@ -21,10 +21,10 @@ import type { CalibrationPanelProps } from './types'
 const CONDITION = 'Jog too far or bend a tip?'
 const START_OVER = 'Start over'
 
-export type Props = {|
+export type Props = {
   requiresNewTip: boolean,
   ...CalibrationPanelProps,
-|}
+}
 
 export function useConfirmCrashRecovery(
   props: Props

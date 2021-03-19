@@ -14,10 +14,10 @@ import type {
   ThermocyclerModule,
 } from '../../redux/modules/types'
 
-type Props = {|
+type Props = {
   module: TemperatureModule | ThermocyclerModule,
   controlDisabledReason: string | null,
-|}
+}
 
 const BLOCK_TEMPERATURE = 'Block Temperature:'
 const LID_TEMPERATURE = 'Lid Temperature:'

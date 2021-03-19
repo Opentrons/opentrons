@@ -25,10 +25,10 @@ import { PipetteTiprackListItem } from './PipetteTiprackListItem'
 import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import type { Dispatch, State } from '../../../redux/types'
 
-export type PipetteListComponentProps = {|
+export type PipetteListComponentProps = {
   robotName: string | null,
   tipracks: Array<BaseProtocolLabware>,
-|}
+}
 
 export const PipetteList: React.AbstractComponent<PipetteListComponentProps> = withRouter(
   PipetteListComponent

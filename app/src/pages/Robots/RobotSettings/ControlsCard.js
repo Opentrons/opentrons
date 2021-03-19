@@ -29,9 +29,9 @@ import { ToggleBtn } from '../../../atoms/ToggleBtn'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-type Props = {|
+type Props = {
   robot: ViewableRobot,
-|}
+}
 
 export function ControlsCard(props: Props): React.Node {
   const { t } = useTranslation(['robot_controls', 'shared'])

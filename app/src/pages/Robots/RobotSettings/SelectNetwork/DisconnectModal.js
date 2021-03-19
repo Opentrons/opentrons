@@ -4,11 +4,11 @@ import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import * as Copy from './i18n'
 
-export type DisconnectModalProps = {|
+export type DisconnectModalProps = {
   ssid: string,
   onDisconnect: () => mixed,
   onCancel: () => mixed,
-|}
+}
 
 export const DisconnectModal = ({
   ssid,

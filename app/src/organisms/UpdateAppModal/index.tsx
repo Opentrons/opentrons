@@ -43,10 +43,10 @@ import { ReleaseNotes } from '../../molecules/ReleaseNotes'
 
 import type { Dispatch } from '../../redux/types'
 
-export type UpdateAppModalProps = {|
+export type UpdateAppModalProps = {
   dismissAlert?: (remember: boolean) => mixed,
   closeModal?: () => mixed,
-|}
+}
 
 // TODO(mc, 2020-10-06): i18n
 const APP_VERSION = 'App Version'

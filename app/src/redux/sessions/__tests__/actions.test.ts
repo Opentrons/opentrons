@@ -7,12 +7,12 @@ import type { SessionsAction } from '../types'
 
 import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
 
-type ActionSpec = {|
+type ActionSpec = {
   name: string,
   creator: (...Array<any>) => mixed,
   args: Array<mixed>,
   expected: SessionsAction,
-|}
+}
 
 describe('robot session check actions', () => {
   const SPECS: Array<ActionSpec> = [

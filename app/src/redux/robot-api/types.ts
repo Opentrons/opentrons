@@ -12,36 +12,36 @@ export type RobotHost = {
   ...
 }
 
-export type RobotApiRequestOptions = {|
+export type RobotApiRequestOptions = {
   method: Method,
   path: string,
   body?: { ... },
   query?: { [param: string]: string | boolean | number | null | void, ... },
   form?: FormData,
-|}
+}
 
-export type RobotApiResponseMeta = {|
+export type RobotApiResponseMeta = {
   path: string,
   method: Method,
   status: number,
   ok: boolean,
-|}
+}
 
-export type RobotApiResponse = {|
+export type RobotApiResponse = {
   ...RobotApiResponseMeta,
   host: RobotHost,
   body: any,
-|}
+}
 
-export type RobotApiRequestMeta = $Shape<{|
+export type RobotApiRequestMeta = $Shape<{
   requestId: string,
-  response: {|
+  response: {
     method: Method,
     path: string,
     status: number,
     ok: boolean,
-  |},
-|}>
+  },
+}>
 
 export type RobotApiErrorResponse = {
   message: string,
@@ -50,22 +50,22 @@ export type RobotApiErrorResponse = {
 
 // action types
 
-export type DismissRequestAction = {|
+export type DismissRequestAction = {
   type: 'robotApi:DISMISS_REQUEST',
-  payload: {| requestId: string |},
-|}
+  payload: { requestId: string },
+}
 
 export type RobotApiAction = DismissRequestAction
 
 // parameterized response type
 // DataT parameter must be a subtype of RobotApiV2ResponseData
 // MetaT defaults to void if unspecified
-export type ResourceLink = {|
+export type ResourceLink = {
   href: string,
-  meta?: $Shape<{| [string]: string | void |}>,
-|}
+  meta?: $Shape<{ [string]: string | void }>,
+}
 
-export type ResourceLinks = $Shape<{| [string]: ResourceLink | string | void |}>
+export type ResourceLinks = $Shape<{ [string]: ResourceLink | string | void }>
 
 // generic response data supertype
 export type RobotApiV2ResponseData = {
@@ -75,43 +75,43 @@ export type RobotApiV2ResponseData = {
 
 export type RobotApiV2ResponseBody<
   DataT: RobotApiV2ResponseData | $ReadOnlyArray<RobotApiV2ResponseData>
-> = {|
+> = {
   data: DataT,
   links?: ResourceLinks,
-|}
+}
 
-export type RobotApiV2Error = {|
+export type RobotApiV2Error = {
   id?: string,
   links?: ResourceLinks,
   status?: string,
   title?: string,
   detail?: string,
-  source?: {|
+  source?: {
     pointer?: string,
     parameter?: string,
-  |},
+  },
   meta?: { ... },
-|}
+}
 
-export type RobotApiV2ErrorResponseBody = {|
+export type RobotApiV2ErrorResponseBody = {
   errors: Array<RobotApiV2Error>,
-|}
+}
 
 // API request tracking state
 
 export type RequestStatus = PENDING | SUCCESS | FAILURE
 
 export type RequestState =
-  | $ReadOnly<{| status: PENDING |}>
-  | $ReadOnly<{| status: SUCCESS, response: RobotApiResponseMeta |}>
-  | $ReadOnly<{|
+  | $ReadOnly<{ status: PENDING }>
+  | $ReadOnly<{ status: SUCCESS, response: RobotApiResponseMeta }>
+  | $ReadOnly<{
       status: FAILURE,
       response: RobotApiResponseMeta,
-      error: {| message?: string |} | RobotApiV2ErrorResponseBody,
-    |}>
+      error: { message?: string } | RobotApiV2ErrorResponseBody,
+    }>
 
 export type RobotApiState = $Shape<
-  $ReadOnly<{|
+  $ReadOnly<{
     [requestId: string]: void | RequestState,
-  |}>
+  }>
 >

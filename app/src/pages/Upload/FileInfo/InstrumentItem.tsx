@@ -22,14 +22,14 @@ import type { PipetteCompatibility } from '../../../redux/pipettes/types'
 
 const AXIS_NAMES = ['x', 'y', 'z']
 
-export type InstrumentItemProps = {|
+export type InstrumentItemProps = {
   compatibility?: PipetteCompatibility,
   mount?: string,
   children: React.Node,
   hidden?: boolean,
   needsOffsetCalibration: boolean,
   pipetteOffsetData?: [number, number, number] | null,
-|}
+}
 
 export function InstrumentItem(props: InstrumentItemProps): React.Node {
   const {
@@ -85,7 +85,7 @@ export function InstrumentItem(props: InstrumentItemProps): React.Node {
   )
 }
 
-function StatusIcon(props: {| match: boolean |}) {
+function StatusIcon(props: { match: boolean }) {
   const { match } = props
 
   const iconName = match ? 'check-circle' : 'checkbox-blank-circle-outline'
@@ -93,9 +93,9 @@ function StatusIcon(props: {| match: boolean |}) {
   return <Icon name={iconName} className={styles.status_icon} />
 }
 
-function BuildOffsetText(props: {|
+function BuildOffsetText(props: {
   offsetData: [number, number, number],
-|}): React.Node {
+}): React.Node {
   const { offsetData } = props
   const { t } = useTranslation('protocol_info')
   return (

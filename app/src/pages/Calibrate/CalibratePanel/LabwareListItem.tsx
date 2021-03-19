@@ -21,11 +21,11 @@ import { CalibrationData } from './CalibrationData'
 import type { BaseProtocolLabware } from '../../../redux/calibration/labware/types'
 import styles from './styles.css'
 
-export type LabwareListItemProps = {|
+export type LabwareListItemProps = {
   ...BaseProtocolLabware,
   isDisabled: boolean,
   onClick: () => mixed,
-|}
+}
 
 export function LabwareListItem(props: LabwareListItemProps): React.Node {
   const {

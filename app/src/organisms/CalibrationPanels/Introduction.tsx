@@ -90,13 +90,13 @@ const NOTE_HEALTH_CHECK_OUTCOMES =
 const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 const TRASH_BIN = 'Removable black plastic trash bin'
 
-type BodySpec = {|
+type BodySpec = {
   preFragment: string | null,
   boldFragment: string | null,
   postFragment: string | null,
-|}
+}
 
-type PanelContents = {|
+type PanelContents = {
   headerText: string,
   invalidationText: string | null,
   bodyContentFragments: Array<BodySpec>,
@@ -104,7 +104,7 @@ type PanelContents = {|
   chooseTipRackButtonText: string | null,
   continueButtonText: string,
   noteBody: BodySpec,
-|}
+}
 
 const bodyContentFromFragments: (
   Array<BodySpec>
@@ -568,11 +568,11 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
   )
 }
 
-type RequiredLabwareCardProps = {|
+type RequiredLabwareCardProps = {
   loadName: string,
   displayName: string,
   linkToMeasurements?: boolean,
-|}
+}
 
 const linkStyles = css`
   &:hover {

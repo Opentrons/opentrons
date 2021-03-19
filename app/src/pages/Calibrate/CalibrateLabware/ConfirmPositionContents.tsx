@@ -13,19 +13,19 @@ import { JogControls } from '../../../molecules/JogControls'
 
 import type { Jog } from '../../../molecules/JogControls'
 
-type OP = {|
+type OP = {
   labware: Labware,
   calibrator: Pipette,
   calibrateToBottom: boolean,
   useCenteredTroughs: boolean,
-|}
+}
 
-type DP = {|
+type DP = {
   onConfirmClick: () => mixed,
   jog: Jog,
-|}
+}
 
-type Props = {| ...OP, ...DP |}
+type Props = { ...OP, ...DP }
 
 export const ConfirmPositionContents: React.AbstractComponent<OP> = connect<
   Props,

@@ -8,11 +8,11 @@ import styles from './styles.css'
 
 import type { MagneticModule } from '../../../../redux/modules/types'
 
-type Props = {|
+type Props = {
   module: MagneticModule,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
-|}
+}
 
 export const MagDeckCard = ({
   module,

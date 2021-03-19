@@ -25,7 +25,7 @@ const mockGetRobotByName: JestMockFn<
   RobotHost
 > = (DiscoverySelectors.getRobotByName: any)
 
-export type EpicTestMocks<A, R> = {|
+export type EpicTestMocks<A, R> = {
   state: State,
   action: A,
   response: R | void,
@@ -34,7 +34,7 @@ export type EpicTestMocks<A, R> = {|
   getRobotByName: typeof mockGetRobotByName,
   fetchRobotApi: typeof mockFetchRobotApi,
   testScheduler: any,
-|}
+}
 
 /**
  * Sets up the necessary mocks for robot HTTP API epic testing. Remember to

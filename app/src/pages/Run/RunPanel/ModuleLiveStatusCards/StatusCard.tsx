@@ -3,7 +3,7 @@ import * as React from 'react'
 import styles from './styles.css'
 import { CollapsibleItem } from '@opentrons/components'
 
-type Props = {|
+type Props = {
   /** Title for the card */
   title: string,
   /** Card Content, each child will be separated with a grey bottom border */
@@ -12,7 +12,7 @@ type Props = {|
   className?: string,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
-|}
+}
 
 export function StatusCard(props: Props): React.Node {
   return (

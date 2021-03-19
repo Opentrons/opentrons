@@ -12,13 +12,13 @@ const SIGNAL_LEVEL_LOW = 25
 const SIGNAL_LEVEL_MED = 50
 const SIGNAL_LEVEL_HIGH = 75
 
-const StyledWrapper: StyledComponent<{||}, {||}, HTMLDivElement> = styled.div`
+const StyledWrapper: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   ${FONT_BODY_1_DARK}
   width: 100%;
   display: flex;
 `
 
-const StyledIcon: StyledComponent<IconProps, {||}, typeof Icon> = styled(Icon)`
+const StyledIcon: StyledComponent<IconProps, {}, typeof Icon> = styled(Icon)`
   flex: none;
   height: 1rem;
   width: 1rem;
@@ -27,7 +27,7 @@ const StyledIcon: StyledComponent<IconProps, {||}, typeof Icon> = styled(Icon)`
 
 const StyledConnectedIcon: StyledComponent<
   IconProps,
-  {||},
+  {},
   typeof StyledIcon
 > = styled(StyledIcon)`
   margin-left: -0.5rem;
@@ -35,8 +35,8 @@ const StyledConnectedIcon: StyledComponent<
 `
 
 const StyledName: StyledComponent<
-  {| padLeft?: boolean |},
-  {||},
+  { padLeft?: boolean },
+  {},
   HTMLSpanElement
 > = styled.span`
   flex-basis: 100%;
@@ -48,10 +48,10 @@ const StyledName: StyledComponent<
   `}
 `
 
-export type NetworkOptionLabelProps = {|
+export type NetworkOptionLabelProps = {
   ...WifiNetwork,
   showConnectedIcon: boolean,
-|}
+}
 
 export const NetworkOptionLabel = (
   props: NetworkOptionLabelProps
@@ -72,9 +72,9 @@ export const NetworkOptionLabel = (
 
 export const NetworkActionLabel = ({
   label,
-}: {|
+}: {
   label: string,
-|}): React.Node => <StyledName padLeft={true}>{label}</StyledName>
+}): React.Node => <StyledName padLeft={true}>{label}</StyledName>
 
 const renderSignalIcon = signal => {
   let iconName: IconName

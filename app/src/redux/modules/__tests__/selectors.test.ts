@@ -24,14 +24,14 @@ const mockGetProtocolIsRunning: JestMockFn<
   $Call<typeof RobotSelectors.getIsRunning, State>
 > = RobotSelectors.getIsRunning
 
-type SelectorSpec = {|
+type SelectorSpec = {
   name: string,
   selector: (State, ...Array<any>) => mixed,
   state: $Shape<State>,
   args?: Array<any>,
   before?: () => mixed,
   expected: mixed,
-|}
+}
 
 const SPECS: Array<SelectorSpec> = [
   {

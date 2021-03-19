@@ -8,11 +8,11 @@ import * as LabwareFixtures from '../../custom-labware/__fixtures__'
 import type { State, Action } from '../../types'
 import type { AnalyticsEvent } from '../types'
 
-type EventSpec = {|
+type EventSpec = {
   name: string,
   action: Action,
   expected: AnalyticsEvent,
-|}
+}
 
 const SPECS: Array<EventSpec> = [
   {

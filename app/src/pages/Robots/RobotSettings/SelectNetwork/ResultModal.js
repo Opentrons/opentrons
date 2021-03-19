@@ -9,13 +9,13 @@ import * as Copy from './i18n'
 
 import type { NetworkChangeType } from './types'
 
-export type ResultModalProps = {|
+export type ResultModalProps = {
   type: NetworkChangeType,
   ssid: string | null,
   isPending: boolean,
   error: { message?: string, ... } | null,
   onClose: () => mixed,
-|}
+}
 
 export const ResultModal = (props: ResultModalProps): React.Node => {
   const { type, ssid, isPending, error, onClose } = props

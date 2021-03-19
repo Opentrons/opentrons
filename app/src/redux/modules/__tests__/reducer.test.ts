@@ -5,12 +5,12 @@ import { modulesReducer } from '../reducer'
 import type { Action } from '../../types'
 import type { ModulesState } from '../types'
 
-type ReducerSpec = {|
+type ReducerSpec = {
   name: string,
   state: ModulesState,
   action: Action,
   expected: ModulesState,
-|}
+}
 
 const SPECS: Array<ReducerSpec> = [
   {

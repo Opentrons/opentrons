@@ -43,11 +43,11 @@ const REMEMBER = "Remember my selection for next time and don't ask again"
 const BLOCK_REQUEST_URL = 'https://opentrons-ux.typeform.com/to/DgvBE9Ir'
 const CAL_BLOCK_LOAD_NAME = 'opentrons_calibrationblock_short_side_right'
 
-type Props = {|
+type Props = {
   onResponse: (hasBlock: boolean) => void,
   titleBarTitle: string,
   closePrompt: () => void,
-|}
+}
 export function AskForCalibrationBlockModal(props: Props): React.Node {
   const [rememberPreference, setRememberPreference] = React.useState<boolean>(
     false

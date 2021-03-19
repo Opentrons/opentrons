@@ -11,11 +11,11 @@ import type { StepSize } from './types'
 const STEP_SIZE_TITLE = 'Jump Size'
 const STEP_SIZE_SUBTITLE = 'Change with + and -'
 
-type StepSizeControlProps = {|
+type StepSizeControlProps = {
   stepSizes: Array<StepSize>,
   currentStepSize: StepSize,
   setCurrentStepSize: StepSize => void,
-|}
+}
 export function StepSizeControl(props: StepSizeControlProps): React.Node {
   const { stepSizes, currentStepSize, setCurrentStepSize } = props
 

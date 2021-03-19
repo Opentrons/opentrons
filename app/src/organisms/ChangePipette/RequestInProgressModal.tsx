@@ -16,13 +16,13 @@ const TO_FRONT_AND_RIGHT = 'to front and right'
 const UP = 'up'
 const ROBOT_IS_HOMING = 'Robot is homing'
 
-type Props = {|
+type Props = {
   title: string,
   subtitle: string,
   mount: Mount,
   movementStatus: MovementStatus,
   isPipetteHoming: boolean,
-|}
+}
 
 export function RequestInProgressModal(props: Props): React.Node {
   const { title, subtitle, mount, movementStatus, isPipetteHoming } = props

@@ -5,11 +5,11 @@ import styles from './styles.css'
 
 import type { IconName } from '@opentrons/components'
 
-export type IpItemProps = {|
+export type IpItemProps = {
   candidate: string,
   discovered: boolean,
   removeIp: (ip: string) => mixed,
-|}
+}
 
 export class IpItem extends React.Component<IpItemProps> {
   remove: () => mixed = () => this.props.removeIp(this.props.candidate)
@@ -30,9 +30,9 @@ export class IpItem extends React.Component<IpItemProps> {
   }
 }
 
-type DiscoveryIconProps = {|
+type DiscoveryIconProps = {
   iconName: IconName,
-|}
+}
 
 function DiscoveryIcon(props: DiscoveryIconProps) {
   const spin = props.iconName === 'ot-spinner'

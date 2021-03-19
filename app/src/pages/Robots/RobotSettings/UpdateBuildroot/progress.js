@@ -17,9 +17,9 @@ export function ProgressSpinner(): React.Node {
   )
 }
 
-export type ProgressBarProps = {|
+export type ProgressBarProps = {
   progress: number | null,
-|}
+}
 
 export function ProgressBar(props: ProgressBarProps): React.Node {
   const progress = props.progress || 0

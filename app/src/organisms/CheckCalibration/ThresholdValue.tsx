@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
 
-type Props = {|
-  thresholdVector: [number, number, number],
-|}
+interface Props {
+  thresholdVector: [number, number, number]
+}
 
 export function ThresholdValue(props: Props): React.Node {
   const value = props.thresholdVector.find(axis => axis > 0)

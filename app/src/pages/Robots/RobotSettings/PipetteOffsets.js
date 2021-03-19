@@ -25,10 +25,10 @@ import type { ViewableRobot } from '../../../redux/discovery/types'
 
 import { PipetteOffsetItem } from './PipetteOffsetItem'
 
-type Props = {|
+type Props = {
   pipettesPageUrl: string,
   robot: ViewableRobot,
-|}
+}
 
 export function PipetteOffsets(props: Props): React.Node {
   const { pipettesPageUrl, robot } = props

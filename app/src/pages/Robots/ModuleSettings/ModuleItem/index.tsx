@@ -12,11 +12,11 @@ import {
 } from '../../../../redux/modules'
 import styles from './styles.css'
 
-type Props = {|
+type Props = {
   module: AttachedModule,
   controlDisabledReason: string | null,
   availableUpdate?: ?string,
-|}
+}
 
 export function ModuleItem(props: Props): React.Node {
   const { module, controlDisabledReason } = props

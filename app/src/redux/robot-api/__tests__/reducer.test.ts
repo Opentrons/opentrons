@@ -4,12 +4,12 @@ import { robotApiReducer } from '../reducer'
 import type { RobotApiState } from '../types'
 import { mockFailedRequestState } from '../__fixtures__'
 
-type ReducerSpec = {|
+type ReducerSpec = {
   name: string,
   state: RobotApiState,
   action: any,
   expected: RobotApiState,
-|}
+}
 
 const SPECS: Array<ReducerSpec> = [
   {

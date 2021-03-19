@@ -24,10 +24,10 @@ import styles from './styles.css'
 const SHORT = 'SHORT'
 const TALL = 'TALL'
 
-type CalibrationLabwareRenderProps = {|
+type CalibrationLabwareRenderProps = {
   labwareDef: LabwareDefinition2,
   slotDef: DeckSlot,
-|}
+}
 
 export function CalibrationLabwareRender(
   props: CalibrationLabwareRenderProps

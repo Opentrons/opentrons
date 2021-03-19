@@ -75,7 +75,7 @@ export const {
   failure: mockFetchPipetteOffsetCalibrationsFailure,
 }: ResponseFixtures<
   AllPipetteOffsetCalibrations,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: GET,
   path: PIPETTE_OFFSET_CALIBRATIONS_PATH,

@@ -17,7 +17,7 @@ import type { Dispatch } from '../../../redux/types'
 
 import { ProceedToRun } from './ProceedToRun'
 
-export type InfoBoxButtonProps = {| labware: ?Labware |}
+export type InfoBoxButtonProps = { labware: ?Labware }
 
 export function InfoBoxButton(props: InfoBoxButtonProps): React.Node {
   const { labware } = props

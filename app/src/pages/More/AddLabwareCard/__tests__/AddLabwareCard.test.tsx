@@ -20,7 +20,7 @@ const mockGetCustomLabwareDirectory: JestMockFn<[State], string> =
 
 const mockGetAddLabwareFailure: JestMockFn<
   [State],
-  {| file: FailedLabwareFile | null, errorMessage: string | null |}
+  { file: FailedLabwareFile | null, errorMessage: string | null }
 > = CustomLabware.getAddLabwareFailure
 
 const mockLabwarePath = '/path/to/labware'

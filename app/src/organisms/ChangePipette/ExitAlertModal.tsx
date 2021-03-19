@@ -4,10 +4,10 @@ import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 
-type Props = {|
+type Props = {
   back: () => mixed,
   exit: () => mixed,
-|}
+}
 
 // TODO(mc, 2019-12-18): i18n
 const ARE_YOU_SURE_YOU_WANT_TO_GO_BACK = 'Are you sure you want to go back?'

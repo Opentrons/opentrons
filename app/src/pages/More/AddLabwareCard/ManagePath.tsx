@@ -18,12 +18,12 @@ export const OPEN_SOURCE_NAME = 'open-source'
 export const CHANGE_SOURCE_NAME = 'change-source'
 export const RESET_SOURCE_NAME = 'reset-source'
 
-export type ManagePathProps = {|
+export type ManagePathProps = {
   path: string,
   onChangePath: () => mixed,
   onResetPath: () => mixed,
   onOpenPath: () => mixed,
-|}
+}
 
 const handleFocus = (e: SyntheticFocusEvent<HTMLInputElement>) => {
   e.currentTarget.select()

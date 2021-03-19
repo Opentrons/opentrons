@@ -23,10 +23,10 @@ const LABWARE_FILES_IN_YOUR_CURRENT_DIRECTORY_WILL_NOT_BE_MOVED =
 export const CANCEL_NAME = 'cancel'
 export const RESET_SOURCE_NAME = 'reset-source'
 
-export type ConfirmResetPathModalProps = {|
+export type ConfirmResetPathModalProps = {
   onCancel: () => mixed,
   onConfirm: () => mixed,
-|}
+}
 
 export const ConfirmResetPathModalTemplate = ({
   onCancel,

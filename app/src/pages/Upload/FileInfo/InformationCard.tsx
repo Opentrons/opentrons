@@ -17,17 +17,17 @@ import { SectionContentHalf, CardRow } from '../../../atoms/layout'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-type OP = {||}
+type OP = {}
 
-type SP = {|
+type SP = {
   name: ?string,
   author: ?string,
   lastUpdated: ?number,
   method: ?string,
   description: ?string,
-|}
+}
 
-type Props = {| ...OP, ...SP, dispatch: Dispatch |}
+type Props = { ...OP, ...SP, dispatch: Dispatch }
 
 const INFO_TITLE = 'Information'
 const DESCRIPTION_TITLE = 'Description'

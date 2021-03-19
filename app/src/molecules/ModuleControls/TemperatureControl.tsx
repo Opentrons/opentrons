@@ -20,7 +20,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 
 const TC_BLOCK = 'Block'
 
-type Props = {|
+type Props = {
   module: ThermocyclerModule | TemperatureModule,
   sendModuleCommand: (
     moduleId: string,
@@ -28,7 +28,7 @@ type Props = {|
     args?: Array<mixed>
   ) => mixed,
   disabledReason?: string | null,
-|}
+}
 
 export const TemperatureControl = ({
   module,

@@ -11,13 +11,13 @@ import type { ButtonProps } from '@opentrons/components'
 import type { Dispatch } from '../../../../redux/types'
 import type { RobotSystemType } from '../../../../redux/buildroot/types'
 
-export type ReleaseNotesModalProps = {|
+export type ReleaseNotesModalProps = {
   robotName: string,
   notNowButton: ButtonProps,
   releaseNotes: string,
   systemType: RobotSystemType | null,
   proceed: () => mixed,
-|}
+}
 
 export function ReleaseNotesModal(props: ReleaseNotesModalProps): React.Node {
   const { robotName, notNowButton, releaseNotes, systemType, proceed } = props

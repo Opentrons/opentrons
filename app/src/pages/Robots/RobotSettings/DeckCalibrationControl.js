@@ -47,13 +47,13 @@ const spinnerCommandBlockList: Array<SessionCommandString> = [
   Sessions.sharedCalCommands.JOG,
 ]
 
-export type Props = {|
+export type Props = {
   robotName: string,
   disabledReason: string | null,
   deckCalStatus: DeckCalibrationStatus | null,
   deckCalData: DeckCalibrationData | null,
   pipOffsetDataPresent: boolean,
-|}
+}
 
 export function DeckCalibrationControl(props: Props): React.Node {
   const {

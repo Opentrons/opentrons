@@ -8,10 +8,10 @@ import { selectors as robotSelectors, type Labware } from '../../../redux/robot'
 
 import styles from './styles.css'
 
-export type PromptProps = {|
+export type PromptProps = {
   ...Labware,
   onClick: () => void,
-|}
+}
 
 export function Prompt(props: PromptProps): React.Node {
   const { onClick, ...labware } = props

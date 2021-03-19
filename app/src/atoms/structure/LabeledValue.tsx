@@ -8,13 +8,13 @@ import {
   FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
 
-type Props = {|
+type Props = {
   label: string | React.Node,
   value: string | React.Node,
   labelProps?: React.ElementProps<typeof Text>,
   valueProps?: React.ElementProps<typeof Text>,
   ...React.ElementProps<typeof Box>,
-|}
+}
 
 export function LabeledValue(props: Props): React.Node {
   const {

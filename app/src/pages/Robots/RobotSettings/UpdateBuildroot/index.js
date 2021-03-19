@@ -18,10 +18,10 @@ import {
 import type { State, Dispatch } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
-export type UpdateBuildrootProps = {|
+export type UpdateBuildrootProps = {
   robot: ViewableRobot,
   close: () => mixed,
-|}
+}
 
 export function UpdateBuildroot(props: UpdateBuildrootProps): React.Node {
   const { robot, close } = props

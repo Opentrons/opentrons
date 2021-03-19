@@ -18,7 +18,7 @@ const {
   failure,
 }: ResponseFixtures<
   WifiConfigureResponse,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: POST,
   path: WIFI_CONFIGURE_PATH,

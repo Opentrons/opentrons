@@ -7,12 +7,12 @@ import { robotAdminReducer } from '../reducer'
 import type { Action } from '../../types'
 import type { RobotAdminState } from '../types'
 
-type ReducerSpec = {|
+type ReducerSpec = {
   name: string,
   action: Action,
   state: RobotAdminState,
   expected: RobotAdminState,
-|}
+}
 
 describe('robotAdminReducer', () => {
   const SPECS: Array<ReducerSpec> = [

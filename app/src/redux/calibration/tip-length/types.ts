@@ -13,26 +13,26 @@ import typeof {
   FETCH_TIP_LENGTH_CALIBRATIONS_FAILURE,
 } from './constants'
 
-export type FetchTipLengthCalibrationsAction = {|
+export type FetchTipLengthCalibrationsAction = {
   type: FETCH_TIP_LENGTH_CALIBRATIONS,
-  payload: {| robotName: string |},
+  payload: { robotName: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchTipLengthCalibrationsSuccessAction = {|
+export type FetchTipLengthCalibrationsSuccessAction = {
   type: FETCH_TIP_LENGTH_CALIBRATIONS_SUCCESS,
-  payload: {|
+  payload: {
     robotName: string,
     tipLengthCalibrations: AllTipLengthCalibrations,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchTipLengthCalibrationsFailureAction = {|
+export type FetchTipLengthCalibrationsFailureAction = {
   type: FETCH_TIP_LENGTH_CALIBRATIONS_FAILURE,
-  payload: {| robotName: string, error: RobotApiErrorResponse |},
+  payload: { robotName: string, error: RobotApiErrorResponse },
   meta: RobotApiRequestMeta,
-|}
+}
 
 export type TipLengthCalibrationsAction =
   | FetchTipLengthCalibrationsAction

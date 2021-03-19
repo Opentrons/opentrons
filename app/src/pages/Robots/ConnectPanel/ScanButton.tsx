@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next'
 
 import styles from './styles.css'
 
-export type ScanButtonProps = {|
+export type ScanButtonProps = {
   isScanning: boolean,
   onScanClick: () => mixed,
   found: boolean,
-|}
+}
 
 export function ScanButton(props: ScanButtonProps): React.Node {
   const { isScanning, onScanClick, found } = props

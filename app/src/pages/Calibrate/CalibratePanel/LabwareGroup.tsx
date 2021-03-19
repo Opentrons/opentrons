@@ -13,11 +13,11 @@ import { LabwareListItem } from './LabwareListItem'
 import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import type { Dispatch } from '../../../redux/types'
 
-export type LabwareGroupProps = {|
+export type LabwareGroupProps = {
   robotName: string | null,
   tipracks: Array<BaseProtocolLabware>,
   otherLabware: Array<BaseProtocolLabware>,
-|}
+}
 
 export function LabwareGroup(props: LabwareGroupProps): React.Node {
   const { robotName, tipracks, otherLabware } = props

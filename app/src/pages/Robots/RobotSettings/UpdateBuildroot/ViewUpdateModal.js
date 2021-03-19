@@ -19,13 +19,13 @@ import type {
   RobotSystemType,
 } from '../../../../redux/buildroot/types'
 
-export type ViewUpdateModalProps = {|
+export type ViewUpdateModalProps = {
   robotName: string,
   robotUpdateType: BuildrootUpdateType | null,
   robotSystemType: RobotSystemType | null,
   close: () => mixed,
   proceed: () => mixed,
-|}
+}
 
 export function ViewUpdateModal(props: ViewUpdateModalProps): React.Node {
   const { robotName, robotUpdateType, robotSystemType, close, proceed } = props

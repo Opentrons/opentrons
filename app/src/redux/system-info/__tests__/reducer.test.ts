@@ -8,12 +8,12 @@ import { systemInfoReducer } from '../reducer'
 import type { Action } from '../../types'
 import type { SystemInfoState } from '../types'
 
-type ReducerSpec = {|
+type ReducerSpec = {
   should: string,
   action: Action,
   initialState: SystemInfoState,
   expectedState: SystemInfoState,
-|}
+}
 
 const SPECS: Array<ReducerSpec> = [
   {

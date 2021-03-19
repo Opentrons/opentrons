@@ -25,21 +25,21 @@ import type {
   UnreachableRobot,
 } from '../../../redux/discovery/types'
 
-type SP = {|
+type SP = {
   robots: Array<Robot>,
   reachableRobots: Array<ReachableRobot>,
   unreachableRobots: Array<UnreachableRobot>,
   found: boolean,
   isScanning: boolean,
-|}
+}
 
-type DP = {| onScanClick: () => mixed |}
+type DP = { onScanClick: () => mixed }
 
-type Props = {| ...SP, ...DP |}
+type Props = { ...SP, ...DP }
 
-export const ConnectPanel: React.AbstractComponent<{||}> = connect<
+export const ConnectPanel: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   DP,
   State,

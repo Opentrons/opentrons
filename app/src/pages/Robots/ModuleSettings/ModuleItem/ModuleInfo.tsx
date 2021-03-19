@@ -7,9 +7,9 @@ import styles from './styles.css'
 
 import type { AttachedModule } from '../../../../redux/modules/types'
 
-type Props = {|
+type Props = {
   module: AttachedModule,
-|}
+}
 
 export function ModuleInfo(props: Props): React.Node {
   const { model, serial, status, fwVersion } = props.module

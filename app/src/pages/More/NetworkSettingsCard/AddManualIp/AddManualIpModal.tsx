@@ -6,9 +6,9 @@ import { Portal } from '../../../../App/portal'
 import { ManualIpForm } from './ManualIpForm'
 import { IpList } from './IpList'
 
-export type AddManualIpProps = {|
+export type AddManualIpProps = {
   closeModal: () => mixed,
-|}
+}
 
 export function AddManualIpModal(props: AddManualIpProps): React.Node {
   return (

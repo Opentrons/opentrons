@@ -18,7 +18,7 @@ import { CONNECT, DISCONNECT, JOIN_OTHER } from './constants'
 import type { State, Dispatch } from '../../../../redux/types'
 import type { WifiConfigureRequest, NetworkChangeState } from './types'
 
-type SelectNetworkProps = {| robotName: string |}
+type SelectNetworkProps = { robotName: string }
 
 const LIST_REFRESH_MS = 10000
 

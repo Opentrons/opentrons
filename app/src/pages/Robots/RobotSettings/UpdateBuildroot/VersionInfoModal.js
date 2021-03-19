@@ -20,12 +20,12 @@ import styles from './styles.css'
 import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
-export type VersionInfoModalProps = {|
+export type VersionInfoModalProps = {
   robot: ViewableRobot,
   robotUpdateType: BuildrootUpdateType | null,
   close: () => mixed,
   proceed: () => mixed,
-|}
+}
 
 const REINSTALL_HEADING = 'Robot is up to date'
 const REINSTALL_MESSAGE =

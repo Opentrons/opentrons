@@ -18,9 +18,9 @@ const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create'
 
 export const ADD_LABWARE_NAME = 'add-labware'
 
-export type AddLabwareProps = {|
+export type AddLabwareProps = {
   onAddLabware: () => mixed,
-|}
+}
 
 export function AddLabware(props: AddLabwareProps): React.Node {
   const { onAddLabware } = props

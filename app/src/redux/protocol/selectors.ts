@@ -11,12 +11,12 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { State } from '../types'
 import type { ProtocolData, ProtocolType, ProtocolFile } from './types'
 
-type ProtocolInfoSelector = State => {|
+type ProtocolInfoSelector = State => {
   protocolName: string | null,
   lastModified: number | null,
   appName: string | null,
   appVersion: string | null,
-|}
+}
 
 const log = createLogger(__filename)
 const stripDirAndExtension = f => path.basename(f, path.extname(f))
@@ -167,10 +167,10 @@ export const getProtocolType: State => ProtocolType | null = createSelector(
   file => file?.type || null
 )
 
-export const getProtocolCreatorApp: State => {|
+export const getProtocolCreatorApp: State => {
   name: string | null,
   version: string | null,
-|} = createSelector(getProtocolDisplayData, displayData => {
+} = createSelector(getProtocolDisplayData, displayData => {
   return {
     name: displayData.appName,
     version: displayData.appVersion,

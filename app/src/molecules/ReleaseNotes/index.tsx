@@ -4,9 +4,9 @@ import remark from 'remark'
 import reactRenderer from 'remark-react'
 import styles from './styles.css'
 
-export type ReleaseNotesProps = {|
+export type ReleaseNotesProps = {
   source: ?string,
-|}
+}
 
 const renderer = remark().use(reactRenderer, {
   remarkReactComponents: {

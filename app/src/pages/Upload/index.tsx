@@ -17,7 +17,7 @@ import type { Robot } from '../../redux/discovery/types'
 
 type OP = ContextRouter
 
-type SP = {|
+type SP = {
   robot: ?Robot,
   filename: ?string,
   uploadInProgress: boolean,
@@ -25,9 +25,9 @@ type SP = {|
   sessionLoaded: boolean,
   sessionHasSteps: boolean,
   showCustomLabwareWarning: boolean,
-|}
+}
 
-type Props = {| ...OP, ...SP, dispatch: Dispatch |}
+type Props = { ...OP, ...SP, dispatch: Dispatch }
 
 export const Upload: React.AbstractComponent<
   $Diff<OP, ContextRouter>

@@ -19,14 +19,14 @@ import type {
   EapOption,
 } from '../types'
 
-export type ConnectModalProps = {|
+export type ConnectModalProps = {
   robotName: string,
   network: WifiNetwork | null,
   wifiKeys: Array<WifiKey>,
   eapOptions: Array<EapOption>,
   onConnect: WifiConfigureRequest => mixed,
   onCancel: () => mixed,
-|}
+}
 
 export const ConnectModal = (props: ConnectModalProps): React.Node => {
   const { network, eapOptions, onConnect } = props

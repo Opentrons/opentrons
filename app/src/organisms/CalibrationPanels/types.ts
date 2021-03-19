@@ -55,7 +55,7 @@ export type TipLengthIntent =
 // keys here now we should split these panel props out
 // into different session types and combine them into
 // a union object
-export type CalibrationPanelProps = {|
+export type CalibrationPanelProps = {
   sendCommands: (...Array<SessionCommandParams>) => void,
   cleanUpAndExit: () => void,
   tipRack: CalibrationLabware,
@@ -73,4 +73,4 @@ export type CalibrationPanelProps = {|
   robotName?: string | null,
   supportedCommands?: Array<SessionCommandString> | null,
   defaultTipracks?: Array<LabwareDefinition2> | null,
-|}
+}

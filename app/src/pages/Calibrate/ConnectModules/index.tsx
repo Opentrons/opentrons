@@ -14,17 +14,17 @@ import styles from './styles.css'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-type OP = {| robotName: string |}
+type OP = { robotName: string }
 
-type SP = {|
+type SP = {
   modulesRequired: boolean,
   modulesMissing: boolean,
   hasDuplicateModules: boolean,
-|}
+}
 
-type DP = {| setReviewed: () => mixed, fetchModules: () => mixed |}
+type DP = { setReviewed: () => mixed, fetchModules: () => mixed }
 
-type Props = {| ...OP, ...SP, ...DP |}
+type Props = { ...OP, ...SP, ...DP }
 
 export const ConnectModules: React.AbstractComponent<OP> = connect<
   Props,

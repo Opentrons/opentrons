@@ -7,7 +7,7 @@ import removeTrashSrc from '../../../assets/images/remove-trash@3x.png'
 import { Portal } from '../../../App/portal'
 import styles from './styles.css'
 
-export type ClearDeckAlertModalProps = {|
+export type ClearDeckAlertModalProps = {
   onContinueClick?: () => mixed,
   onCancelClick?: () => mixed,
   parentUrl?: string,
@@ -15,7 +15,7 @@ export type ClearDeckAlertModalProps = {|
   continueText: string,
   removeTrash?: boolean,
   children?: React.Node,
-|}
+}
 
 const HEADING = 'Before continuing, please remove:'
 

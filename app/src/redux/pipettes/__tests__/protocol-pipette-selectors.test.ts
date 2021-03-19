@@ -12,15 +12,15 @@ jest.mock('@opentrons/shared-data')
 jest.mock('../../robot/selectors')
 jest.mock('../../calibration/pipette-offset/selectors')
 
-type SelectorSpec = {|
-  name: string,
-  state: $Shape<State>,
-  expected: mixed,
-  matching: boolean,
-  calibrated: boolean,
-  before?: () => mixed,
-  after?: () => mixed,
-|}
+interface SelectorSpec {
+  name: string
+  state: $Shape<State>
+  expected: mixed
+  matching: boolean
+  calibrated: boolean
+  before?: () => mixed
+  after?: () => mixed
+}
 
 const mockGetPipetteOffsetCalibrations: JestMockFn<
   [State, string],
@@ -97,7 +97,7 @@ const mockRightPipetteCalibration: any = {
   lastModified: '2020-08-25T20:25',
 }
 
-const SPECS: Array<SelectorSpec> = [
+const SPECS: SelectorSpec[] = [
   {
     name: 'returns nulls by default',
     state: {

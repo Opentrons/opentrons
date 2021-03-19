@@ -3,10 +3,10 @@ import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
 
-export type SectionContentFullProps = {|
-  children: React.Node,
-  className?: string,
-|}
+export interface SectionContentFullProps {
+  children: React.Node
+  className?: string
+}
 
 export function SectionContentFull(props: SectionContentFullProps): React.Node {
   return (

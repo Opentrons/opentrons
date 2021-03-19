@@ -6,12 +6,12 @@ import * as Actions from '../actions'
 import type { Action } from '../../types'
 import type { NetworkingState } from '../types'
 
-type ReducerSpec = {|
+type ReducerSpec = {
   name: string,
   state: NetworkingState,
   action: Action,
   expected: NetworkingState,
-|}
+}
 
 const ROBOT_NAME = 'robotName'
 

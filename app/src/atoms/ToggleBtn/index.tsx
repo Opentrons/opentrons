@@ -13,13 +13,13 @@ import {
 
 import type { StyleProps } from '@opentrons/components'
 
-export type ToggleBtnProps = {|
+export type ToggleBtnProps = {
   label: string,
   toggledOn: boolean,
   disabled?: boolean | null,
   onClick?: (SyntheticMouseEvent<Element>) => mixed,
   ...StyleProps,
-|}
+}
 
 export function ToggleBtn(props: ToggleBtnProps): React.Node {
   const { label, toggledOn, disabled, ...buttonProps } = props

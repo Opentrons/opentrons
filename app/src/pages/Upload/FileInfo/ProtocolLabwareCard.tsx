@@ -12,9 +12,9 @@ import {
 
 import type { State, Dispatch } from '../../../redux/types'
 
-export type ProtocolLabwareProps = {|
+export type ProtocolLabwareProps = {
   robotName: string,
-|}
+}
 
 // TODO(mc, 2020-07-27): i18n
 const REQUIRED_LABWARE = 'Required Labware'

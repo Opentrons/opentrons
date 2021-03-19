@@ -24,7 +24,7 @@ export const fetchLightsSuccess = (
 
 export const fetchLightsFailure = (
   robotName: string,
-  error: {| message: string |},
+  error: { message: string },
   meta: RobotApiRequestMeta
 ): Types.FetchLightsFailureAction => ({
   type: Constants.FETCH_LIGHTS_FAILURE,
@@ -53,7 +53,7 @@ export const updateLightsSuccess = (
 
 export const updateLightsFailure = (
   robotName: string,
-  error: {| message: string |},
+  error: { message: string },
   meta: RobotApiRequestMeta
 ): Types.UpdateLightsFailureAction => ({
   type: Constants.UPDATE_LIGHTS_FAILURE,
@@ -87,7 +87,7 @@ export const homeSuccess = (
 
 export const homeFailure = (
   robotName: string,
-  error: {| message: string |},
+  error: { message: string },
   meta: RobotApiRequestMeta
 ): Types.HomeFailureAction => ({
   type: Constants.HOME_FAILURE,
@@ -117,7 +117,7 @@ export const moveSuccess = (
 
 export const moveFailure = (
   robotName: string,
-  error: {| message: string |},
+  error: { message: string },
   meta: RobotApiRequestMeta
 ): Types.MoveFailureAction => ({
   type: Constants.MOVE_FAILURE,

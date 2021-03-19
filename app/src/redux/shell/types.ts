@@ -2,9 +2,9 @@
 import type { Error } from '../types'
 import type { RobotLogsState, RobotLogsAction } from './robot-logs/types'
 
-export type Remote = {|
-  ipcRenderer: {| send: (string, ...args: Array<mixed>) => void |},
-|}
+export type Remote = {
+  ipcRenderer: { send: (string, ...args: Array<mixed>) => void },
+}
 
 export type UpdateInfo = {
   version: string,
@@ -13,34 +13,34 @@ export type UpdateInfo = {
   releaseNotes?: string,
 }
 
-export type ShellUpdateState = {|
+export type ShellUpdateState = {
   checking: boolean,
   downloading: boolean,
   available: boolean,
   downloaded: boolean,
   error: ?Error,
   info: ?UpdateInfo,
-|}
+}
 
 export type ShellUpdateAction =
-  | {| type: 'shell:CHECK_UPDATE', meta: {| shell: true |} |}
-  | {|
+  | { type: 'shell:CHECK_UPDATE', meta: { shell: true } }
+  | {
       type: 'shell:CHECK_UPDATE_RESULT',
-      payload: {| available?: boolean, info?: UpdateInfo, error?: Error |},
-    |}
-  | {| type: 'shell:DOWNLOAD_UPDATE', meta: {| shell: true |} |}
-  | {| type: 'shell:DOWNLOAD_UPDATE_RESULT', payload: {| error?: Error |} |}
-  | {| type: 'shell:APPLY_UPDATE', meta: {| shell: true |} |}
+      payload: { available?: boolean, info?: UpdateInfo, error?: Error },
+    }
+  | { type: 'shell:DOWNLOAD_UPDATE', meta: { shell: true } }
+  | { type: 'shell:DOWNLOAD_UPDATE_RESULT', payload: { error?: Error } }
+  | { type: 'shell:APPLY_UPDATE', meta: { shell: true } }
 
-export type ShellState = {|
+export type ShellState = {
   update: ShellUpdateState,
   robotLogs: RobotLogsState,
-|}
+}
 
-export type UiInitializedAction = {|
+export type UiInitializedAction = {
   type: 'shell:UI_INITIALIZED',
-  meta: {| shell: true |},
-|}
+  meta: { shell: true },
+}
 
 export type ShellAction =
   | UiInitializedAction

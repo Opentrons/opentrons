@@ -34,11 +34,11 @@ const FAILED_UPDATE_HEADER = 'Failed to update Module Firmware'
 const FAILED_UPDATE_BODY =
   'An error occurred while attempting to update your robot.'
 
-type Props = {|
+type Props = {
   hasAvailableUpdate: boolean,
   controlDisabledReason: string | null,
   moduleId: string,
-|}
+}
 
 export function ModuleUpdate(props: Props): React.Node {
   const { hasAvailableUpdate, moduleId, controlDisabledReason } = props

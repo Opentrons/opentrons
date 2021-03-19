@@ -27,12 +27,12 @@ const boldProps: React.ElementProps<typeof Text> = {
   textTransform: TEXT_TRANSFORM_CAPITALIZE,
 }
 
-type ConnectionStatusProps = {|
+type ConnectionStatusProps = {
   type: typeof USB | typeof WI_FI,
   ipAddress: string,
   status: typeof CONNECTABLE | typeof REACHABLE,
   internetStatus: InternetStatus | null,
-|}
+}
 
 export function ConnectionStatusMessage(
   props: ConnectionStatusProps

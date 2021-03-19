@@ -15,19 +15,19 @@ export type IntercomEventName =
 
 export type SupportConfig = $PropertyType<Config, 'support'>
 
-export type BasicIntercomPayload = $Shape<{|
+export type BasicIntercomPayload = $Shape<{
   [propertyName: string]: string | number | boolean | null,
-|}>
+}>
 
 export type IntercomPayload =
   | BasicIntercomPayload
   | CalibrationHealthCheckAnalyticsData
 
-export type SupportProfileUpdate = $Shape<{|
+export type SupportProfileUpdate = $Shape<{
   [propertyName: string]: string | number | boolean | null,
-|}>
+}>
 
-export type IntercomEvent = {|
+export type IntercomEvent = {
   eventName: IntercomEventName,
   metadata?: IntercomPayload,
-|}
+}

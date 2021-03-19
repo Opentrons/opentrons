@@ -3,10 +3,10 @@ import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
 
-export type CardContentFlexProps = {|
-  children: React.Node,
-  className?: string,
-|}
+export interface CardContentFlexProps {
+  children: React.Node
+  className?: string
+}
 
 export function CardContentFlex(props: CardContentFlexProps): React.Node {
   return (

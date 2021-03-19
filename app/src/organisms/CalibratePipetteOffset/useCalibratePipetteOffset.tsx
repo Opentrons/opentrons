@@ -31,10 +31,10 @@ const PIPETTE_OFFSET_TITLE = 'Pipette offset calibration'
 const TIP_LENGTH_TITLE = 'Tip length calibration'
 const EXIT = 'exit'
 
-export type InvokerProps = {|
+export type InvokerProps = {
   overrideParams?: $Shape<PipetteOffsetCalibrationSessionParams>,
   withIntent?: PipetteOffsetIntent,
-|}
+}
 
 export type Invoker = (InvokerProps | void) => void
 

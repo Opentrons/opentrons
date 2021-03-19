@@ -46,9 +46,9 @@ import { CalibrationCard } from './CalibrationCard'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-type Props = {|
+type Props = {
   robot: ViewableRobot,
-|}
+}
 
 // TODO(bc, 2021-02-16): i18n
 const UPDATE_FRAGMENT = 'update'

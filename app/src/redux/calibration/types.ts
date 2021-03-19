@@ -27,26 +27,26 @@ export type * from './labware/types'
 export type * from './pipette-offset/types'
 export type * from './tip-length/types'
 
-export type FetchCalibrationStatusAction = {|
+export type FetchCalibrationStatusAction = {
   type: FETCH_CALIBRATION_STATUS,
-  payload: {| robotName: string |},
+  payload: { robotName: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchCalibrationStatusSuccessAction = {|
+export type FetchCalibrationStatusSuccessAction = {
   type: FETCH_CALIBRATION_STATUS_SUCCESS,
-  payload: {|
+  payload: {
     robotName: string,
     calibrationStatus: CalibrationStatus,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchCalibrationStatusFailureAction = {|
+export type FetchCalibrationStatusFailureAction = {
   type: FETCH_CALIBRATION_STATUS_FAILURE,
-  payload: {| robotName: string, error: RobotApiErrorResponse |},
+  payload: { robotName: string, error: RobotApiErrorResponse },
   meta: RobotApiRequestMeta,
-|}
+}
 
 export type CalibrationAction =
   | FetchCalibrationStatusAction
@@ -56,12 +56,12 @@ export type CalibrationAction =
   | PipetteOffsetCalibrationsAction
   | TipLengthCalibrationsAction
 
-export type PerRobotCalibrationState = $ReadOnly<{|
+export type PerRobotCalibrationState = $ReadOnly<{
   calibrationStatus: CalibrationStatus | null,
   labwareCalibrations: AllLabwareCalibrations | null,
   pipetteOffsetCalibrations: AllPipetteOffsetCalibrations | null,
   tipLengthCalibrations: AllTipLengthCalibrations | null,
-|}>
+}>
 
 export type CalibrationState = $ReadOnly<{
   [robotName: string]: PerRobotCalibrationState,

@@ -25,26 +25,26 @@ export type PipetteOffsetCalibrationStep =
   | PIP_OFFSET_STEP_CALIBRATION_COMPLETE
   | PIP_OFFSET_STEP_SESSION_EXITED
 
-export type PipetteOffsetCalibrationInstrument = {|
+export type PipetteOffsetCalibrationInstrument = {
   model: string,
   name: string,
   tipLength: number,
   mount: string,
   serial: string,
   defaultTipracks: Array<LabwareDefinition2>,
-|}
+}
 
-export type PipetteOffsetCalibrationSessionParams = {|
+export type PipetteOffsetCalibrationSessionParams = {
   mount: string,
   shouldRecalibrateTipLength: boolean,
   hasCalibrationBlock: boolean,
   tipRackDefinition: LabwareDefinition2 | null,
-|}
+}
 
-export type PipetteOffsetCalibrationSessionDetails = {|
+export type PipetteOffsetCalibrationSessionDetails = {
   instrument: PipetteOffsetCalibrationInstrument,
   currentStep: PipetteOffsetCalibrationStep,
   labware: Array<CalibrationLabware>,
   shouldPerformTipLength: boolean,
   supportedCommands: Array<SessionCommandString>,
-|}
+}

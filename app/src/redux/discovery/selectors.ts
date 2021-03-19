@@ -167,7 +167,7 @@ export const getRobotFirmwareVersion = (
 
 export const getRobotProtocolApiVersion = (
   robot: DiscoveredRobot
-): {| min: string, max: string |} | null => {
+): { min: string, max: string } | null => {
   const healthField = robot.health
   const DEFAULT_API_VERSION = '1.0'
   if (!healthField) {

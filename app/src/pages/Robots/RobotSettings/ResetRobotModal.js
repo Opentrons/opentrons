@@ -36,10 +36,10 @@ import { Portal } from '../../../App/portal'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
 
-export type ResetRobotModalProps = {|
+export type ResetRobotModalProps = {
   robotName: string,
   closeModal: () => mixed,
-|}
+}
 
 // TODO(bc, 2020-12-07): i18n
 const TITLE = 'Robot Configuration Reset'

@@ -4,87 +4,87 @@ import type { Error } from '../types'
 import type { ProtocolData } from '../protocol/types'
 import type { Mount, Slot, Axis, Direction, SessionUpdate } from './types'
 
-export type ConnectAction = {|
+export type ConnectAction = {
   type: 'robot:CONNECT',
-  payload: {|
+  payload: {
     name: string,
-  |},
-  meta: {|
+  },
+  meta: {
     robotCommand: true,
-  |},
-|}
+  },
+}
 
-export type ConnectResponseAction = {|
+export type ConnectResponseAction = {
   type: 'robot:CONNECT_RESPONSE',
-  payload: {|
+  payload: {
     error: ?Error,
     sessionCapabilities: Array<string>,
-  |},
-|}
+  },
+}
 
-export type ReturnTipAction = {|
+export type ReturnTipAction = {
   type: 'robot:RETURN_TIP',
-  payload: {|
+  payload: {
     mount: Mount,
-  |},
-  meta: {|
+  },
+  meta: {
     robotCommand: true,
-  |},
-|}
+  },
+}
 
-export type ReturnTipResponseAction = {|
+export type ReturnTipResponseAction = {
   type: 'robot:RETURN_TIP_RESPONSE',
   error: boolean,
   payload?: Error,
-|}
+}
 
-export type ClearConnectResponseAction = {|
+export type ClearConnectResponseAction = {
   type: 'robot:CLEAR_CONNECT_RESPONSE',
-|}
+}
 
-export type DisconnectAction = {|
+export type DisconnectAction = {
   type: 'robot:DISCONNECT',
-  meta: {|
+  meta: {
     robotCommand: true,
-  |},
-|}
+  },
+}
 
-export type DisconnectResponseAction = {|
+export type DisconnectResponseAction = {
   type: 'robot:DISCONNECT_RESPONSE',
   payload: {},
-|}
+}
 
-export type UnexpectedDisconnectAction = {|
+export type UnexpectedDisconnectAction = {
   type: 'robot:UNEXPECTED_DISCONNECT',
-|}
+}
 
-export type ConfirmProbedAction = {|
+export type ConfirmProbedAction = {
   type: 'robot:CONFIRM_PROBED',
   payload: Mount,
-  meta: {|
+  meta: {
     robotCommand: true,
-  |},
-|}
+  },
+}
 
-export type PipetteCalibrationAction = {|
+export type PipetteCalibrationAction = {
   type: 'robot:JOG',
-  payload: {|
+  payload: {
     mount: Mount,
     axis?: Axis,
     direction?: Direction,
     step?: number,
-  |},
-  meta: {|
+  },
+  meta: {
     robotCommand: true,
-  |},
-|}
+  },
+}
 
-export type SetJogDistanceAction = {|
+export type SetJogDistanceAction = {
   type: 'robot:SET_JOG_DISTANCE',
   payload: number,
-|}
+}
 
-export type LabwareCalibrationAction = {|
+export type LabwareCalibrationAction = {
   type:
     | 'robot:MOVE_TO'
     | 'robot:PICKUP_AND_HOME'
@@ -92,16 +92,16 @@ export type LabwareCalibrationAction = {|
     | 'robot:CONFIRM_TIPRACK'
     | 'robot:UPDATE_OFFSET'
     | 'robot:SET_JOG_DISTANCE',
-  payload: {|
+  payload: {
     mount: Mount,
     slot: Slot,
-  |},
-  meta: {|
+  },
+  meta: {
     robotCommand: true,
-  |},
-|}
+  },
+}
 
-export type CalibrationSuccessAction = {|
+export type CalibrationSuccessAction = {
   type:
     | 'robot:MOVE_TO_SUCCESS'
     | 'robot:JOG_SUCCESS'
@@ -114,9 +114,9 @@ export type CalibrationSuccessAction = {|
     isTiprack?: boolean,
     tipOn?: boolean,
   },
-|}
+}
 
-export type CalibrationFailureAction = {|
+export type CalibrationFailureAction = {
   type:
     | 'robot:MOVE_TO_FAILURE'
     | 'robot:JOG_FAILURE'
@@ -127,9 +127,9 @@ export type CalibrationFailureAction = {|
     | 'robot:RETURN_TIP_FAILURE',
   error: true,
   payload: Error,
-|}
+}
 
-export type SessionResponseAction = {|
+export type SessionResponseAction = {
   type: 'robot:SESSION_RESPONSE',
   // TODO(mc, 2018-09-06): this payload is incomplete
   payload: {
@@ -139,118 +139,118 @@ export type SessionResponseAction = {|
     apiLevel: [number, number],
     ...
   },
-  meta: {| freshUpload: boolean |},
-|}
+  meta: { freshUpload: boolean },
+}
 
-export type SessionErrorAction = {|
+export type SessionErrorAction = {
   type: 'robot:SESSION_ERROR',
-  payload: {| error: Error |},
-  meta: {| freshUpload: boolean |},
-|}
+  payload: { error: Error },
+  meta: { freshUpload: boolean },
+}
 
-export type SessionUpdateAction = {|
+export type SessionUpdateAction = {
   type: 'robot:SESSION_UPDATE',
   payload: SessionUpdate,
-  meta: {| now: number |},
-|}
+  meta: { now: number },
+}
 
-export type RefreshSessionAction = {|
+export type RefreshSessionAction = {
   type: 'robot:REFRESH_SESSION',
-  meta: {| robotCommand: true |},
-|}
+  meta: { robotCommand: true },
+}
 
 export type CalibrationResponseAction =
   | CalibrationSuccessAction
   | CalibrationFailureAction
 
-export type SetModulesReviewedAction = {|
+export type SetModulesReviewedAction = {
   type: 'robot:SET_MODULES_REVIEWED',
   payload: boolean,
-|}
+}
 
-export type ClearCalibrationRequestAction = {|
+export type ClearCalibrationRequestAction = {
   type: 'robot:CLEAR_CALIBRATION_REQUEST',
-|}
+}
 
-export type SetDeckPopulatedAction = {|
+export type SetDeckPopulatedAction = {
   type: 'robot:SET_DECK_POPULATED',
   payload: boolean,
-|}
+}
 
-export type MoveToFrontAction = {|
+export type MoveToFrontAction = {
   type: 'robot:MOVE_TO_FRONT',
-  payload: {| mount: Mount |},
-  meta: {| robotCommand: true |},
-|}
+  payload: { mount: Mount },
+  meta: { robotCommand: true },
+}
 
-export type MoveToFrontResponseAction = {|
+export type MoveToFrontResponseAction = {
   type: 'robot:MOVE_TO_FRONT_RESPONSE',
   error: boolean,
   payload?: Error,
-|}
+}
 
-export type ProbeTipAction = {|
+export type ProbeTipAction = {
   type: 'robot:PROBE_TIP',
-  payload: {| mount: Mount |},
-  meta: {| robotCommand: true |},
-|}
+  payload: { mount: Mount },
+  meta: { robotCommand: true },
+}
 
-export type ProbeTipResponseAction = {|
+export type ProbeTipResponseAction = {
   type: 'robot:PROBE_TIP_RESPONSE',
   error: boolean,
   payload?: Error,
-|}
+}
 
-export type ConfirmLabwareAction = {|
+export type ConfirmLabwareAction = {
   type: 'robot:CONFIRM_LABWARE',
-  payload: {| labware: Slot |},
-|}
+  payload: { labware: Slot },
+}
 
-export type RunAction = {|
+export type RunAction = {
   type: 'robot:RUN',
-  meta: {| robotCommand: true |},
-|}
+  meta: { robotCommand: true },
+}
 
-export type RunResponseAction = {|
+export type RunResponseAction = {
   type: 'robot:RUN_RESPONSE',
   error: boolean,
   payload?: Error,
-|}
+}
 
-export type PauseAction = {|
+export type PauseAction = {
   type: 'robot:PAUSE',
-  meta: {| robotCommand: true |},
-|}
+  meta: { robotCommand: true },
+}
 
-export type PauseResponseAction = {|
+export type PauseResponseAction = {
   type: 'robot:PAUSE_RESPONSE',
   error: boolean,
   payload?: Error,
-|}
+}
 
-export type ResumeAction = {|
+export type ResumeAction = {
   type: 'robot:RESUME',
-  meta: {| robotCommand: true |},
-|}
+  meta: { robotCommand: true },
+}
 
-export type ResumeResponseAction = {|
+export type ResumeResponseAction = {
   type: 'robot:RESUME_RESPONSE',
   error: boolean,
   payload?: Error,
-|}
+}
 
-export type CancelAction = {|
+export type CancelAction = {
   type: 'robot:CANCEL',
-  meta: {| robotCommand: true |},
-|}
+  meta: { robotCommand: true },
+}
 
-export type CancelResponseAction = {|
+export type CancelResponseAction = {
   type: 'robot:CANCEL_RESPONSE',
   error: boolean,
   payload?: Error,
-|}
+}
 
-export type TickRunTimeAction = {| type: 'robot:TICK_RUN_TIME' |}
+export type TickRunTimeAction = { type: 'robot:TICK_RUN_TIME' }
 
 // TODO(mc, 2018-01-23): refactor to use type above
 //   DO NOT ADD NEW ACTIONS HERE

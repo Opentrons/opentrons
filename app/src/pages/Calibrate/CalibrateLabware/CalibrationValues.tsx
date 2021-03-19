@@ -2,11 +2,11 @@
 import * as React from 'react'
 import { Text, FONT_WEIGHT_SEMIBOLD, SPACING_3 } from '@opentrons/components'
 
-type Props = {|
+type Props = {
   x: number | null,
   y: number | null,
   z: number | null,
-|}
+}
 export const CalibrationValues = (props: Props): React.Node => (
   <span>
     {['x', 'y', 'z'].map(key => (

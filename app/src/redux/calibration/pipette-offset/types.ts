@@ -13,26 +13,26 @@ import typeof {
   FETCH_PIPETTE_OFFSET_CALIBRATIONS_FAILURE,
 } from './constants'
 
-export type FetchPipetteOffsetCalibrationsAction = {|
+export type FetchPipetteOffsetCalibrationsAction = {
   type: FETCH_PIPETTE_OFFSET_CALIBRATIONS,
-  payload: {| robotName: string |},
+  payload: { robotName: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchPipetteOffsetCalibrationsSuccessAction = {|
+export type FetchPipetteOffsetCalibrationsSuccessAction = {
   type: FETCH_PIPETTE_OFFSET_CALIBRATIONS_SUCCESS,
-  payload: {|
+  payload: {
     robotName: string,
     pipetteOffsetCalibrations: AllPipetteOffsetCalibrations,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchPipetteOffsetCalibrationsFailureAction = {|
+export type FetchPipetteOffsetCalibrationsFailureAction = {
   type: FETCH_PIPETTE_OFFSET_CALIBRATIONS_FAILURE,
-  payload: {| robotName: string, error: RobotApiErrorResponse |},
+  payload: { robotName: string, error: RobotApiErrorResponse },
   meta: RobotApiRequestMeta,
-|}
+}
 
 export type PipetteOffsetCalibrationsAction =
   | FetchPipetteOffsetCalibrationsAction

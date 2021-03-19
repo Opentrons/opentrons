@@ -75,13 +75,13 @@ type CalBlockModalState =
   | typeof CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC
   | typeof CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC
 
-type Props = {|
+type Props = {
   robotName: string,
   serialNumber: string | null,
   mount: Mount,
   disabledReason: string | null,
   isChangingOrConfiguringPipette: boolean,
-|}
+}
 
 export function PipetteCalibrationInfo(props: Props): React.Node {
   const {
@@ -124,10 +124,10 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
     setCalBlockModalState,
   ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
 
-  type StartWizardOptions = {|
+  type StartWizardOptions = {
     keepTipLength: boolean,
     hasBlockModalResponse?: boolean | null,
-  |}
+  }
   const startPipetteOffsetPossibleTLC = (options: StartWizardOptions) => {
     const { keepTipLength, hasBlockModalResponse = null } = options
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {

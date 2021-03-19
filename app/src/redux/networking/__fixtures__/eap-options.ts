@@ -55,7 +55,7 @@ const {
   failure,
 }: ResponseFixtures<
   FetchEapOptionsResponse,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: GET,
   path: EAP_OPTIONS_PATH,

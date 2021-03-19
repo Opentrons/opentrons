@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next'
 
 import { AlertModal, Text } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
-export type ConnectAlertModalProps = {|
+export type ConnectAlertModalProps = {
   onCloseClick: () => mixed,
-|}
+}
 
 export function ConnectAlertModal(props: ConnectAlertModalProps): React.Node {
   const { onCloseClick } = props

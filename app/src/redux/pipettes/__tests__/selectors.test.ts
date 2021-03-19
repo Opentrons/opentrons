@@ -7,13 +7,13 @@ import * as TLCFixtures from '../../calibration/tip-length/__fixtures__'
 import * as Selectors from '../selectors'
 import type { State } from '../../types'
 
-type SelectorSpec = {|
+type SelectorSpec = {
   name: string,
   selector: (State, ...Array<any>) => mixed,
   state: $Shape<State>,
   args?: Array<any>,
   expected: mixed,
-|}
+}
 
 const SPECS: Array<SelectorSpec> = [
   {

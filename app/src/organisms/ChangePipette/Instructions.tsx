@@ -21,7 +21,7 @@ const ATTACH_CONFIRM = 'have robot check connection'
 const DETACH_CONFIRM = 'confirm pipette is detached'
 const EXIT = 'exit'
 
-type Props = {|
+type Props = {
   title: string,
   subtitle: string,
   robotName: string,
@@ -34,7 +34,7 @@ type Props = {|
   setWantedName: (name: string | null) => mixed,
   confirm: () => mixed,
   exit: () => mixed,
-|}
+}
 
 export function Instructions(props: Props): React.Node {
   const {

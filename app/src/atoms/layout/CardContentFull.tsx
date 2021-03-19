@@ -3,10 +3,10 @@ import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
 
-export type CardContentFullProps = {|
-  children: React.Node,
-  className?: string,
-|}
+export interface CardContentFullProps {
+  children: React.Node
+  className?: string
+}
 
 export function CardContentFull(props: CardContentFullProps): React.Node {
   return (

@@ -77,7 +77,7 @@ export const getWifiKeys: (
   (state, robotName) => state.networking[robotName]?.wifiKeysById,
   (
     ids: Array<string> = [],
-    keysById: $Shape<{| [string]: Types.WifiKey |}> = {}
+    keysById: $Shape<{ [string]: Types.WifiKey }> = {}
   ) => ids.map(id => keysById[id])
 )
 

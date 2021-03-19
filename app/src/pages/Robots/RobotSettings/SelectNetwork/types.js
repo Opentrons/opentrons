@@ -29,61 +29,61 @@ export type {
 export type NetworkChangeType = CONNECT | DISCONNECT | JOIN_OTHER
 
 export type NetworkChangeState =
-  | {| type: CONNECT, ssid: string, network: WifiNetwork |}
-  | {| type: DISCONNECT, ssid: string |}
-  | {| type: JOIN_OTHER, ssid: string | null |}
-  | {| type: null |}
+  | { type: CONNECT, ssid: string, network: WifiNetwork }
+  | { type: DISCONNECT, ssid: string }
+  | { type: JOIN_OTHER, ssid: string | null }
+  | { type: null }
 
-export type ConnectFormValues = $Shape<{|
+export type ConnectFormValues = $Shape<{
   ssid?: string,
   psk?: string,
   // securityType form value may be securityType or eapConfig.eapType
   securityType?: string,
-  eapConfig?: {|
+  eapConfig?: {
     [eapOption: string]: string,
-  |},
-|}>
+  },
+}>
 
 export type ConnectFormErrors = $Shape<FormikErrors<ConnectFormValues>>
 
-type ConnectFormFieldCommon = {|
+type ConnectFormFieldCommon = {
   name: string,
   label: string,
-|}
+}
 
-export type ConnectFormTextField = {|
+export type ConnectFormTextField = {
   ...ConnectFormFieldCommon,
   type: FIELD_TYPE_TEXT,
   isPassword: boolean,
-|}
+}
 
-export type ConnectFormKeyField = {|
+export type ConnectFormKeyField = {
   ...ConnectFormFieldCommon,
   type: FIELD_TYPE_KEY_FILE,
   robotName: string,
   wifiKeys: Array<WifiKey>,
   placeholder: string,
-|}
+}
 
 // UI only auth field; server will never return this field type
-export type ConnectFormSecurityField = {|
+export type ConnectFormSecurityField = {
   ...ConnectFormFieldCommon,
   type: FIELD_TYPE_SECURITY,
   eapOptions: Array<EapOption>,
   showAllOptions: boolean,
   placeholder: string,
-|}
+}
 
 export type ConnectFormField =
   | ConnectFormTextField
   | ConnectFormKeyField
   | ConnectFormSecurityField
 
-export type ConnectFormFieldProps = $ReadOnly<{|
+export type ConnectFormFieldProps = $ReadOnly<{
   value: string | null,
   error: string | null,
   onChange: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
   onBlur: (event: SyntheticFocusEvent<HTMLInputElement>) => mixed,
   setValue: (value: string) => mixed,
   setTouched: (touched: boolean) => mixed,
-|}>
+}>

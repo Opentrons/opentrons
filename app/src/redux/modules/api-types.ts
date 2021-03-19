@@ -10,7 +10,7 @@ import {
   type ModuleModel,
 } from '@opentrons/shared-data'
 
-export type ApiBaseModule = {|
+export type ApiBaseModule = {
   displayName: string,
   serial: string,
   revision: string,
@@ -19,28 +19,28 @@ export type ApiBaseModule = {|
   fwVersion: string,
   port: string,
   hasAvailableUpdate: boolean,
-|}
+}
 
-type ApiBaseModuleLegacy = {|
+type ApiBaseModuleLegacy = {
   displayName: string,
   serial: string,
   model: string,
   fwVersion: string,
   port: string,
   hasAvailableUpdate: boolean,
-|}
+}
 
-export type TemperatureData = {|
+export type TemperatureData = {
   currentTemp: number,
   targetTemp: number | null,
-|}
+}
 
-export type MagneticData = {|
+export type MagneticData = {
   engaged: boolean,
   height: number,
-|}
+}
 
-export type ThermocyclerData = {|
+export type ThermocyclerData = {
   // TODO(mc, 2019-12-12): in_between comes from the thermocycler firmware and
   // will be rare in normal operation due to limitations in current revision
   lid: 'open' | 'closed' | 'in_between',
@@ -54,7 +54,7 @@ export type ThermocyclerData = {|
   currentStepIndex: number | null,
   totalCycleCount: number | null,
   currentCycleIndex: number | null,
-|}
+}
 
 export type TemperatureStatus =
   | 'idle'
@@ -71,50 +71,50 @@ export type ThermocyclerStatus =
 
 export type MagneticStatus = 'engaged' | 'disengaged'
 
-export type ApiTemperatureModule = {|
+export type ApiTemperatureModule = {
   ...ApiBaseModule,
   moduleModel: TemperatureModuleModel,
   name: TEMPDECK,
   data: TemperatureData,
   status: TemperatureStatus,
-|}
+}
 
-export type ApiTemperatureModuleLegacy = {|
+export type ApiTemperatureModuleLegacy = {
   ...ApiBaseModuleLegacy,
   name: TEMPDECK,
   data: TemperatureData,
   status: TemperatureStatus,
-|}
+}
 
-export type ApiMagneticModule = {|
+export type ApiMagneticModule = {
   ...ApiBaseModule,
   moduleModel: MagneticModuleModel,
   name: MAGDECK,
   data: MagneticData,
   status: MagneticStatus,
-|}
+}
 
-export type ApiMagneticModuleLegacy = {|
+export type ApiMagneticModuleLegacy = {
   ...ApiBaseModuleLegacy,
   name: MAGDECK,
   data: MagneticData,
   status: MagneticStatus,
-|}
+}
 
-export type ApiThermocyclerModule = {|
+export type ApiThermocyclerModule = {
   ...ApiBaseModule,
   moduleModel: ThermocyclerModuleModel,
   name: THERMOCYCLER,
   data: ThermocyclerData,
   status: ThermocyclerStatus,
-|}
+}
 
-export type ApiThermocyclerModuleLegacy = {|
+export type ApiThermocyclerModuleLegacy = {
   ...ApiBaseModuleLegacy,
   name: THERMOCYCLER,
   data: ThermocyclerData,
   status: ThermocyclerStatus,
-|}
+}
 
 export type ApiAttachedModule =
   | ApiThermocyclerModule

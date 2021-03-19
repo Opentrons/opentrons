@@ -46,13 +46,13 @@ import type { TipracksByMountMap } from '../../redux/robot'
 const TIP_LENGTH_CALIBRATION = 'tip length calibration'
 const EXIT = 'exit'
 
-export type CalibrateTipLengthControlProps = {|
+export type CalibrateTipLengthControlProps = {
   robotName: string,
   hasCalibrated: boolean,
   mount: Mount,
   tipRackDefinition: LabwareDefinition2,
   isExtendedPipOffset: boolean,
-|}
+}
 
 // tip length calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: Array<SessionCommandString> = [

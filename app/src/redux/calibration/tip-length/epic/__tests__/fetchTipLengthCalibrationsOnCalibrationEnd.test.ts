@@ -23,10 +23,10 @@ const mockGetConnectedRobotName: JestMockFn<[any], ?string> =
 const mockGetRobotSessionById: JestMockFn<[any, string, string], mixed> =
   SessionSelectors.getRobotSessionById
 
-const SPECS: Array<{|
+const SPECS: Array<{
   describe: string,
   robotSession: SessionTypes.Session,
-|}> = [
+}> = [
   {
     describe: 'tip length calibration',
     robotSession: {

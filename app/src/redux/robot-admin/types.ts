@@ -10,71 +10,71 @@ export type RobotAdminStatus =
   | 'restarting'
   | 'restart-failed'
 
-export type ResetConfigOption = {|
+export type ResetConfigOption = {
   id: string,
   name: string,
   description: string,
-|}
+}
 
-export type ResetConfigRequest = $Shape<{|
+export type ResetConfigRequest = $Shape<{
   [optionId: string]: boolean,
-|}>
+}>
 
 // action types
 
-export type RestartRobotAction = {|
+export type RestartRobotAction = {
   type: 'robotAdmin:RESTART',
-  payload: {| robotName: string |},
-  meta: $Shape<{| ...RobotApiRequestMeta, robot: true |}>,
-|}
+  payload: { robotName: string },
+  meta: $Shape<{ ...RobotApiRequestMeta, robot: true }>,
+}
 
-export type RestartRobotSuccessAction = {|
+export type RestartRobotSuccessAction = {
   type: 'robotAdmin:RESTART_SUCCESS',
-  payload: {| robotName: string |},
+  payload: { robotName: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type RestartRobotFailureAction = {|
+export type RestartRobotFailureAction = {
   type: 'robotAdmin:RESTART_FAILURE',
-  payload: {| robotName: string, error: {} |},
+  payload: { robotName: string, error: {} },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchResetConfigOptionsAction = {|
+export type FetchResetConfigOptionsAction = {
   type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS',
-  payload: {| robotName: string |},
+  payload: { robotName: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchResetConfigOptionsSuccessAction = {|
+export type FetchResetConfigOptionsSuccessAction = {
   type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_SUCCESS',
-  payload: {| robotName: string, options: Array<ResetConfigOption> |},
+  payload: { robotName: string, options: Array<ResetConfigOption> },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchResetConfigOptionsFailureAction = {|
+export type FetchResetConfigOptionsFailureAction = {
   type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_FAILURE',
-  payload: {| robotName: string, error: {} |},
+  payload: { robotName: string, error: {} },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type ResetConfigAction = {|
+export type ResetConfigAction = {
   type: 'robotAdmin:RESET_CONFIG',
-  payload: {| robotName: string, resets: ResetConfigRequest |},
+  payload: { robotName: string, resets: ResetConfigRequest },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type ResetConfigSuccessAction = {|
+export type ResetConfigSuccessAction = {
   type: 'robotAdmin:RESET_CONFIG_SUCCESS',
-  payload: {| robotName: string |},
+  payload: { robotName: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type ResetConfigFailureAction = {|
+export type ResetConfigFailureAction = {
   type: 'robotAdmin:RESET_CONFIG_FAILURE',
-  payload: {| robotName: string, error: {} |},
+  payload: { robotName: string, error: {} },
   meta: RobotApiRequestMeta,
-|}
+}
 
 export type RobotAdminAction =
   | RestartRobotAction
@@ -89,11 +89,11 @@ export type RobotAdminAction =
 
 // state types
 
-export type PerRobotAdminState = $Shape<{|
+export type PerRobotAdminState = $Shape<{
   status: RobotAdminStatus,
   resetConfigOptions: Array<ResetConfigOption>,
-|}>
+}>
 
-export type RobotAdminState = $Shape<{|
+export type RobotAdminState = $Shape<{
   [robotName: string]: void | PerRobotAdminState,
-|}>
+}>

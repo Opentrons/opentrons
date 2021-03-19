@@ -20,18 +20,18 @@ import { Pipettes as CalibratePipettes } from './Pipettes'
 import { Labware as CalibrateLabware } from './Labware'
 import { Modules as ConnectModules } from './Modules'
 
-type OP = {||}
+type OP = {}
 
-type SP = {|
+type SP = {
   nextPipette: Pipette | null,
   labware: Array<Labware>,
   nextLabware: Labware | void,
   isTipsProbed: boolean,
   nextPipetteTiprack: NextTiprackPipetteInfo | null,
   modules: Array<SessionModule>,
-|}
+}
 
-type Props = {| ...OP, ...SP, dispatch: Dispatch |}
+type Props = { ...OP, ...SP, dispatch: Dispatch }
 
 export const Calibrate: React.AbstractComponent<OP> = connect<
   Props,

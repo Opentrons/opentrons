@@ -7,13 +7,13 @@ import * as CalibrateSelectors from '../calibrate-selectors'
 
 import type { State } from '../../types'
 
-type SelectorSpec = {|
+type SelectorSpec = {
   name: string,
   selector: State => mixed,
   before?: () => mixed,
   after?: () => mixed,
   expected: mixed,
-|}
+}
 
 jest.mock('../selectors')
 jest.mock('../../robot/selectors')

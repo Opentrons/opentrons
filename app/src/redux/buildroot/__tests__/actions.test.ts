@@ -4,12 +4,12 @@ import * as actions from '../actions'
 
 import type { BuildrootAction } from '../types'
 
-type ActionSpec = {|
+type ActionSpec = {
   name: string,
   creator: (...Array<any>) => BuildrootAction,
   args: Array<mixed>,
   expected: BuildrootAction,
-|}
+}
 
 describe('buildroot action creators', () => {
   const SPECS: Array<ActionSpec> = [

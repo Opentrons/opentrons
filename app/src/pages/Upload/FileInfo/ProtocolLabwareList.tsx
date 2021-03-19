@@ -20,9 +20,9 @@ import {
 
 import type { LabwareSummary } from '../../../redux/calibration/types'
 
-export type ProtocolLabwareListProps = {|
+export type ProtocolLabwareListProps = {
   labware: Array<LabwareSummary>,
-|}
+}
 
 const TYPE_COL_STYLE = { marginRight: SPACING_AUTO }
 const QUANTITY_COL_STYLE = { width: '12.5%', marginX: SPACING_3 }

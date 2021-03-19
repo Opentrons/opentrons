@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next'
 import { AlertModal } from '@opentrons/components'
 import styles from './styles.css'
 
-export type ConfirmStartDeckCalModalProps = {|
+export type ConfirmStartDeckCalModalProps = {
   cancel: () => mixed,
   confirm: () => mixed,
-|}
+}
 
 export function ConfirmStartDeckCalModal(
   props: ConfirmStartDeckCalModalProps

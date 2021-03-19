@@ -16,13 +16,13 @@ import { DECK_CAL_STATUS_OK, DECK_CAL_STATUS_IDENTITY } from '../../calibration'
 import type { State } from '../../types'
 import type { Robot, ViewableRobot } from '../../discovery/types'
 
-type SelectorSpec = {|
+type SelectorSpec = {
   name: string,
   selector: State => mixed,
   before?: () => mixed,
   after?: () => mixed,
   expected: mixed,
-|}
+}
 
 jest.mock('../../calibration/selectors')
 jest.mock('../../discovery/selectors')

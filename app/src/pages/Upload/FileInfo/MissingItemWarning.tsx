@@ -13,12 +13,12 @@ import {
 import styles from './styles.css'
 import { SectionContentHalf } from '../../../atoms/layout'
 
-export type MissingItemWarningProps = {|
+export type MissingItemWarningProps = {
   missingItem: string,
   urlLabel: string,
   url: string,
   isBlocking?: boolean,
-|}
+}
 
 export function MissingItemWarning(props: MissingItemWarningProps): React.Node {
   const { missingItem, urlLabel, url, isBlocking = false } = props

@@ -7,12 +7,12 @@ import styles from './styles.css'
 
 import type { Labware, Pipette } from '../../../redux/robot/types'
 
-export type ConfirmPickupPromptProps = {|
+export type ConfirmPickupPromptProps = {
   labware: Labware,
   calibrator: Pipette,
   onNoClick: () => void,
   onYesClick: () => void,
-|}
+}
 
 export function ConfirmPickupPrompt(
   props: ConfirmPickupPromptProps

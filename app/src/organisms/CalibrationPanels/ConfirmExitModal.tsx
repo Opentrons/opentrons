@@ -5,11 +5,11 @@ import { AlertModal, Text } from '@opentrons/components'
 import * as Sessions from '../../redux/sessions'
 import type { SessionType } from '../../redux/sessions/types'
 
-export type ConfirmExitModalProps = {|
+export type ConfirmExitModalProps = {
   back: () => mixed,
   exit: () => mixed,
   sessionType: SessionType,
-|}
+}
 
 const HEADING = 'Are you sure?'
 const GO_BACK = 'no, go back'

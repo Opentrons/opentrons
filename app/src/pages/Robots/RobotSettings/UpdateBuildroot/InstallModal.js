@@ -10,12 +10,12 @@ import type {
   RobotSystemType,
 } from '../../../../redux/buildroot/types'
 
-export type InstallModalProps = {|
+export type InstallModalProps = {
   robot: ViewableRobot,
   robotSystemType: RobotSystemType | null,
   session: BuildrootUpdateSession,
   close: () => mixed,
-|}
+}
 
 export function InstallModal(props: InstallModalProps): React.Node {
   const { session, close, robotSystemType } = props

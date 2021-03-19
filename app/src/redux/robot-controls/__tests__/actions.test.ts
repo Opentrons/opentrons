@@ -4,12 +4,12 @@ import * as Actions from '../actions'
 
 import type { RobotControlsAction } from '../types'
 
-type ActionSpec = {|
+type ActionSpec = {
   name: string,
   creator: (...Array<any>) => mixed,
   args: Array<mixed>,
   expected: RobotControlsAction,
-|}
+}
 
 const SPECS: Array<ActionSpec> = [
   {

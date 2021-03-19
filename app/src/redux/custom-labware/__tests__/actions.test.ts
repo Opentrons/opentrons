@@ -4,12 +4,12 @@ import * as actions from '../actions'
 
 import type { Action } from '../../types'
 
-type ActionSpec = {|
+type ActionSpec = {
   name: string,
   creator: (...Array<any>) => mixed,
   args?: Array<mixed>,
   expected: Action,
-|}
+}
 
 describe('custom labware actions', () => {
   const SPECS: Array<ActionSpec> = [

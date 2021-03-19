@@ -26,18 +26,18 @@ export type DeckCalibrationStep =
   | DECK_STEP_SAVING_POINT_THREE
   | DECK_STEP_CALIBRATION_COMPLETE
 
-export type DeckCalibrationInstrument = {|
+export type DeckCalibrationInstrument = {
   model: string,
   name: string,
   tipLength: number,
   mount: string,
   serial: string,
   defaultTipracks: Array<LabwareDefinition2>,
-|}
+}
 
-export type DeckCalibrationSessionDetails = {|
+export type DeckCalibrationSessionDetails = {
   instrument: DeckCalibrationInstrument,
   currentStep: DeckCalibrationStep,
   labware: Array<CalibrationLabware>,
   supportedCommands: Array<SessionCommandString>,
-|}
+}

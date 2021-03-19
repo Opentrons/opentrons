@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { RobotLink } from './RobotLink'
 import styles from './styles.css'
 
-export type RobotListItemProps = {|
+export type RobotListItemProps = {
   name: string,
   displayName: string,
   isConnectable: boolean,
@@ -16,7 +16,7 @@ export type RobotListItemProps = {|
   isLocal: boolean,
   isConnected: boolean,
   onToggleConnect: () => mixed,
-|}
+}
 
 export function RobotListItem(props: RobotListItemProps): React.Node {
   const {

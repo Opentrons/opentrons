@@ -17,7 +17,7 @@ export type PythonProtocolMetadata = {
 // NOTE: add union of additional versions after schema is bumped
 export type ProtocolData =
   | JsonProtocolFile
-  | {| metadata: PythonProtocolMetadata |}
+  | { metadata: PythonProtocolMetadata }
 
 export type ProtocolType = TYPE_JSON | TYPE_PYTHON | TYPE_ZIP
 
@@ -30,21 +30,21 @@ export type ProtocolFile = {
 
 // action types
 
-export type OpenProtocolAction = {|
+export type OpenProtocolAction = {
   type: 'protocol:OPEN',
-  payload: {| file: ProtocolFile |},
-|}
+  payload: { file: ProtocolFile },
+}
 
-export type UploadProtocolAction = {|
+export type UploadProtocolAction = {
   type: 'protocol:UPLOAD',
-  payload: {| contents: string, data: ProtocolData | null |},
-  meta: {| robot: true |},
-|}
+  payload: { contents: string, data: ProtocolData | null },
+  meta: { robot: true },
+}
 
-export type InvalidProtocolFileAction = {|
+export type InvalidProtocolFileAction = {
   type: 'protocol:INVALID_FILE',
-  payload: {| file: ProtocolFile, message: string |},
-|}
+  payload: { file: ProtocolFile, message: string },
+}
 
 export type ProtocolAction =
   | OpenProtocolAction
@@ -53,8 +53,8 @@ export type ProtocolAction =
 
 // state types
 
-export type ProtocolState = $ReadOnly<{|
+export type ProtocolState = $ReadOnly<{
   file: ProtocolFile | null,
   contents: string | null,
   data: ProtocolData | null,
-|}>
+}>

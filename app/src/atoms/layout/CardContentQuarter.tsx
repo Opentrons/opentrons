@@ -3,10 +3,10 @@ import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
 
-export type CardContentQuarterProps = {|
-  children: React.Node,
-  className?: string,
-|}
+export interface CardContentQuarterProps {
+  children: React.Node
+  className?: string
+}
 
 export function CardContentQuarter(props: CardContentQuarterProps): React.Node {
   return (

@@ -251,9 +251,9 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
   )
 }
 
-type RenderResultProps = {|
+type RenderResultProps = {
   status: string | null,
-|}
+}
 
 function RenderResult(props: RenderResultProps): React.Node {
   const { status } = props
@@ -278,10 +278,10 @@ function RenderResult(props: RenderResultProps): React.Node {
   }
 }
 
-type PipetteResultProps = {|
+type PipetteResultProps = {
   pipetteInfo: CalibrationCheckInstrument,
   pipetteCalibration: CalibrationCheckComparisonsPerCalibration,
-|}
+}
 
 function PipetteResult(props: PipetteResultProps): React.Node {
   const { pipetteInfo, pipetteCalibration } = props
@@ -324,13 +324,13 @@ function PipetteResult(props: PipetteResultProps): React.Node {
   )
 }
 
-function WarningText(props: {|
+function WarningText(props: {
   deckCalibrationBad: boolean,
-  pipettes: {|
-    left: {| offsetBad: boolean, tipLengthBad: boolean |},
-    right: {| offsetBad: boolean, tipLengthBad: boolean |},
-  |},
-|}): React.Node | null {
+  pipettes: {
+    left: { offsetBad: boolean, tipLengthBad: boolean },
+    right: { offsetBad: boolean, tipLengthBad: boolean },
+  },
+}): React.Node | null {
   const badCount = [
     props.deckCalibrationBad,
     props.pipettes.left.offsetBad,

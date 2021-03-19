@@ -9,13 +9,13 @@ import {
 } from '@opentrons/components'
 import styles from './styles.css'
 
-export type ConfirmCrashRecoveryModalProps = {|
+export type ConfirmCrashRecoveryModalProps = {
   back: () => mixed,
   confirm: () => mixed,
   tipRackDisplayName: string,
   tipRackSlot: string,
   requiresNewTip: boolean,
-|}
+}
 
 const HEADING = 'Start Over?'
 const MAIN_BODY =

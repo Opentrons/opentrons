@@ -10,20 +10,20 @@ import { Upload } from './Upload'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-type SP = {|
+type SP = {
   filename: ?string,
   sessionLoaded: ?boolean,
-|}
+}
 
-type DP = {|
+type DP = {
   createSession: File => mixed,
-|}
+}
 
-type Props = {| ...SP, ...DP |}
+type Props = { ...SP, ...DP }
 
-export const UploadPanel: React.AbstractComponent<{||}> = connect<
+export const UploadPanel: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   _,
   _,
   _,

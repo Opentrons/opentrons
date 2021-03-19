@@ -5,11 +5,11 @@ import { ScanButton } from './ScanButton'
 
 import styles from './styles.css'
 
-export type ScanStatusProps = {|
+export type ScanStatusProps = {
   onScanClick: () => mixed,
   isScanning: boolean,
   found: boolean,
-|}
+}
 
 export function ScanStatus(props: ScanStatusProps): React.Node {
   const { found, isScanning } = props

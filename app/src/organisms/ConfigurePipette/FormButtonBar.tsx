@@ -7,9 +7,9 @@ import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
 
-export type FormButtonBarProps = {|
+export type FormButtonBarProps = {
   buttons: Array<?ButtonProps>,
-|}
+}
 
 export function FormButtonBar(props: FormButtonBarProps): React.Node {
   const className = styles.form_button

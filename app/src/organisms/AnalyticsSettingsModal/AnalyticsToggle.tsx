@@ -10,13 +10,13 @@ import {
 
 import type { State, Dispatch } from '../../redux/types'
 
-type OP = {||}
+type OP = {}
 
-type SP = {| optedIn: boolean |}
+type SP = { optedIn: boolean }
 
-type DP = {| toggleOptedIn: () => mixed |}
+type DP = { toggleOptedIn: () => mixed }
 
-type Props = {| ...SP, ...DP |}
+type Props = { ...SP, ...DP }
 
 export const AnalyticsToggle: React.AbstractComponent<OP> = connect<
   Props,

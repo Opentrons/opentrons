@@ -12,17 +12,17 @@ import { InProgressContents } from './InProgressContents'
 import type { State, Dispatch } from '../../../redux/types'
 import type { Pipette, Labware } from '../../../redux/robot/types'
 
-type OP = {| labware: Labware, calibrateToBottom: boolean |}
+type OP = { labware: Labware, calibrateToBottom: boolean }
 
-type SP = {| calibrator: ?Pipette, useCenteredTroughs: boolean |}
+type SP = { calibrator: ?Pipette, useCenteredTroughs: boolean }
 
-type Props = {| ...OP, ...SP, dispatch: Dispatch |}
+type Props = { ...OP, ...SP, dispatch: Dispatch }
 
 export const ConfirmModalContents: React.AbstractComponent<OP> = connect<
   Props,
   OP,
   SP,
-  {||},
+  {},
   _,
   _
 >(mapStateToProps)(ConfirmModalContentsComponent)

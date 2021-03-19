@@ -25,11 +25,9 @@ const StyledCopy = styled.p`
   margin: 0 1rem 1rem;
 `
 
-const StyledForm: StyledComponent<
-  HTMLFormAttributes,
-  {||},
-  typeof Form
-> = styled(Form)`
+const StyledForm: StyledComponent<HTMLFormAttributes, {}, typeof Form> = styled(
+  Form
+)`
   font-size: ${FONT_SIZE_BODY_1};
   display: table;
   width: 80%;
@@ -38,7 +36,7 @@ const StyledForm: StyledComponent<
 
 const StyledTextField: StyledComponent<
   TextFieldProps,
-  {||},
+  {},
   typeof TextField
 > = styled(TextField)`
   ${fieldStyle}
@@ -46,7 +44,7 @@ const StyledTextField: StyledComponent<
 
 const StyledKeyFileField: StyledComponent<
   KeyFileFieldProps,
-  {||},
+  {},
   typeof KeyFileField
 > = styled(KeyFileField)`
   ${fieldStyle}
@@ -54,19 +52,19 @@ const StyledKeyFileField: StyledComponent<
 
 const StyledSecurityField: StyledComponent<
   SecurityFieldProps,
-  {||},
+  {},
   typeof SecurityField
 > = styled(SecurityField)`
   ${fieldStyle}
 `
 
-export type FormModalProps = {|
+export type FormModalProps = {
   id: string,
   network: WifiNetwork | null,
   fields: Array<ConnectFormField>,
   isValid: boolean,
   onCancel: () => mixed,
-|}
+}
 
 export const FormModal = (props: FormModalProps): React.Node => {
   const { id, network, fields, isValid, onCancel } = props

@@ -23,10 +23,10 @@ const NO_LABWARE_DEFINITIONS_FOUND = 'No labware definitions found'
 const PLEASE_ADD_CUSTOM_LABWARE =
   'Please add custom labware via the Labware Management options above'
 
-export type LabwareListProps = {|
+export type LabwareListProps = {
   labware: Array<CheckedLabwareFile>,
   errorMessage: string | null,
-|}
+}
 
 export function LabwareList(props: LabwareListProps): React.Node {
   const { labware, errorMessage } = props

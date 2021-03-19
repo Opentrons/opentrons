@@ -5,7 +5,7 @@ import * as Selectors from '../selectors'
 import type { State } from '../../types'
 import type { Config } from '../types'
 
-type MockState = $Shape<{| ...State, config: $Shape<Config> | null |}>
+type MockState = $Shape<{ ...State, config: $Shape<Config> | null }>
 
 describe('shell selectors', () => {
   describe('getDevtoolsEnabled', () => {

@@ -9,7 +9,7 @@ import { useConnectFormField } from './form-state'
 
 import type { WifiKey } from '../types'
 
-export type KeyFileFieldProps = {|
+export type KeyFileFieldProps = {
   id: string,
   name: string,
   label: string,
@@ -17,7 +17,7 @@ export type KeyFileFieldProps = {|
   robotName: string,
   wifiKeys: Array<WifiKey>,
   className?: string,
-|}
+}
 
 const ADD_NEW_KEY_VALUE = '__addNewKey__'
 

@@ -47,11 +47,11 @@ import type { State, Dispatch } from '../../redux/types'
 import type { Mount } from '../../redux/robot/types'
 import type { WizardStep } from './types'
 
-type Props = {|
+type Props = {
   robotName: string,
   mount: Mount,
   closeModal: () => mixed,
-|}
+}
 
 // TODO(mc, 2019-12-18): i18n
 const PIPETTE_SETUP = 'Pipette Setup'

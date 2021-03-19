@@ -20,7 +20,7 @@ const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
 const EXIT_WITHOUT_CAL = 'exit without calibrating'
 const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
 
-export type Props = {|
+export type Props = {
   robotName: string,
   mount: Mount,
   title: string,
@@ -36,7 +36,7 @@ export type Props = {|
   back: () => mixed,
   exit: () => mixed,
   startPipetteOffsetCalibration: () => void,
-|}
+}
 
 export function ConfirmPipette(props: Props): React.Node {
   const {

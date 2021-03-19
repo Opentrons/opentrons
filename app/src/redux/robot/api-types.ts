@@ -20,7 +20,7 @@ export type Slot =
   | '10'
   | '11'
 
-export type ApiSessionModule = {|
+export type ApiSessionModule = {
   // resource ID
   _id: number,
   // slot module is installed in
@@ -28,13 +28,13 @@ export type ApiSessionModule = {|
   // name identifier of the module
   name: TEMPDECK | MAGDECK | THERMOCYCLER,
   model: ModuleModel,
-|}
+}
 
-export type ApiSessionModuleLegacy = {|
+export type ApiSessionModuleLegacy = {
   // resource ID
   _id: number,
   // slot module is installed in
   slot: Slot,
   // name identifier of the module
   name: TEMPDECK | MAGDECK | THERMOCYCLER,
-|}
+}

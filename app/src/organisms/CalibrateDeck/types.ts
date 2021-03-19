@@ -2,7 +2,7 @@
 import type { Action } from '../../redux/types'
 import type { DeckCalibrationSession } from '../../redux/sessions/types'
 
-export type CalibrateDeckParentProps = {|
+export type CalibrateDeckParentProps = {
   robotName: string,
   session: DeckCalibrationSession | null,
   dispatchRequests: (
@@ -10,4 +10,4 @@ export type CalibrateDeckParentProps = {|
   ) => void,
   showSpinner: boolean,
   isJogging: boolean,
-|}
+}

@@ -35,10 +35,10 @@ const CONTENT_MAP = {
   },
 }
 
-export type InlineCalibrationWarningProps = {|
+export type InlineCalibrationWarningProps = {
   warningType: WarningType | null,
   ...StyleProps,
-|}
+}
 
 export function InlineCalibrationWarning(
   props: InlineCalibrationWarningProps

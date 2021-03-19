@@ -4,12 +4,12 @@ import * as React from 'react'
 import { PrimaryButton, Icon } from '@opentrons/components'
 import styles from './upload-panel.css'
 
-export type UploadInputProps = {|
+export type UploadInputProps = {
   onUpload: (
     SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<>
   ) => void,
   isButton?: boolean,
-|}
+}
 
 export function UploadInput(props: UploadInputProps): React.Node {
   const { isButton, onUpload } = props

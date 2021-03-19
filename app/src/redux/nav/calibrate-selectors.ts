@@ -21,10 +21,10 @@ type PerTiprackSubnav = {
   [string]: SubnavLocation,
 }
 
-export const getCalibratePipettesLocations: State => {|
+export const getCalibratePipettesLocations: State => {
   left: PerTiprackSubnav,
   right: PerTiprackSubnav,
-|} = createSelector(
+} = createSelector(
   getCalibrateLocation,
   RobotSelectors.getPipettes,
   RobotSelectors.getTipracksByMount,

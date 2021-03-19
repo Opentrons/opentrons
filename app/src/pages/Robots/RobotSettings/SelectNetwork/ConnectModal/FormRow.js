@@ -6,28 +6,24 @@ import { FONT_WEIGHT_SEMIBOLD } from '@opentrons/components'
 
 import type { StyledComponent } from 'styled-components'
 
-export type FormRowProps = {|
+export type FormRowProps = {
   label: string,
   labelFor: string,
   children: React.Node,
-|}
+}
 
-const StyledRow: StyledComponent<{||}, {||}, HTMLDivElement> = styled.div`
+const StyledRow: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   display: table-row;
 `
 
-const StyledLabel: StyledComponent<{||}, {||}, HTMLLabelElement> = styled.label`
+const StyledLabel: StyledComponent<{}, {}, HTMLLabelElement> = styled.label`
   display: table-cell;
   padding-right: 1rem;
   text-align: right;
   font-weight: ${FONT_WEIGHT_SEMIBOLD};
 `
 
-const StyledInputWrapper: StyledComponent<
-  {||},
-  {||},
-  HTMLDivElement
-> = styled.div`
+const StyledInputWrapper: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   padding-bottom: 0.75rem;
   display: table-cell;
 

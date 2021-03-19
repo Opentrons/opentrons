@@ -13,7 +13,7 @@ import type {
   ModuleCommand,
 } from '../../../../redux/modules/types'
 
-type Props = {|
+type Props = {
   module: TemperatureModule,
   sendModuleCommand: (
     moduleId: string,
@@ -23,7 +23,7 @@ type Props = {|
   controlDisabledReason: string | null,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
-|}
+}
 
 export const TempDeckCard = ({
   module,

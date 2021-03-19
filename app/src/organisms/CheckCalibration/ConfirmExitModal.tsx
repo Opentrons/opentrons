@@ -3,10 +3,10 @@ import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
 
-export type ConfirmExitModalProps = {|
+export type ConfirmExitModalProps = {
   back: () => mixed,
   exit: () => mixed,
-|}
+}
 
 const HEADING = 'Are you sure you want to exit?'
 const GO_BACK = 'go back'

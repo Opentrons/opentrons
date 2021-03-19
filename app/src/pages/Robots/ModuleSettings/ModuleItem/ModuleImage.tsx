@@ -5,9 +5,9 @@ import styles from './styles.css'
 
 import type { ModuleModel } from '@opentrons/shared-data'
 
-type Props = {|
+type Props = {
   model: ModuleModel,
-|}
+}
 
 export function ModuleImage(props: Props): React.Node {
   const imgSrc = getModuleImg(props.model)

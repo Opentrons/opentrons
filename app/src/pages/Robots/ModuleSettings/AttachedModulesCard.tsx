@@ -14,7 +14,7 @@ import { ModuleItem, NoModulesMessage } from './ModuleItem'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-type Props = {| robotName: string |}
+type Props = { robotName: string }
 
 // TODO(bc, 2021-02-16): i18n
 

@@ -9,7 +9,7 @@ import type { PipetteOffsetIntent } from '../../organisms/CalibrationPanels/type
 
 import type { PipetteOffsetCalibrationStep } from '../../redux/sessions/pipette-offset-calibration/types'
 
-export type CalibratePipetteOffsetParentProps = {|
+export type CalibratePipetteOffsetParentProps = {
   robotName: string,
   session: PipetteOffsetCalibrationSession | null,
   dispatchRequests: (
@@ -18,13 +18,13 @@ export type CalibratePipetteOffsetParentProps = {|
   showSpinner: boolean,
   isJogging: boolean,
   intent: PipetteOffsetIntent,
-|}
+}
 
-export type CalibratePipetteOffsetChildProps = {|
+export type CalibratePipetteOffsetChildProps = {
   sendSessionCommands: (...Array<SessionCommandParams>) => void,
   deleteSession: () => void,
   tipRack: CalibrationLabware,
   isMulti: boolean,
   mount: string,
   currentStep: PipetteOffsetCalibrationStep,
-|}
+}

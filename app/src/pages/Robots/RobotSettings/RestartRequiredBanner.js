@@ -8,9 +8,9 @@ import styles from './styles.css'
 
 import type { Dispatch } from '../../../redux/types'
 
-export type RestartRequiredBannerProps = {|
+export type RestartRequiredBannerProps = {
   robotName: string,
-|}
+}
 
 // TODO(mc, 2019-10-24): i18n
 const TITLE = 'Robot restart required'

@@ -3,7 +3,7 @@
 import type { TipLengthCalibrationSession } from '../../redux/sessions/types'
 import type { Action } from '../../redux/types'
 
-export type CalibrateTipLengthParentProps = {|
+export type CalibrateTipLengthParentProps = {
   robotName: string,
   session: TipLengthCalibrationSession | null,
   dispatchRequests: (
@@ -11,4 +11,4 @@ export type CalibrateTipLengthParentProps = {|
   ) => void,
   showSpinner: boolean,
   isJogging: boolean,
-|}
+}

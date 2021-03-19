@@ -34,11 +34,11 @@ const PIPETTE_SETTINGS = 'Pipette Settings'
 const AN_ERROR_OCCURRED_WHILE_UPDATING =
   "An error occurred while updating your pipette's settings. Please try again."
 
-type Props = {|
+type Props = {
   robotName: string,
   mount: Mount,
   closeModal: () => mixed,
-|}
+}
 
 export function ConfigurePipette(props: Props): React.Node {
   const { robotName, mount, closeModal } = props

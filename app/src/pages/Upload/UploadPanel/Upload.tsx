@@ -4,15 +4,15 @@ import { UploadInput } from './UploadInput'
 import { ConfirmUploadModal } from './ConfirmUploadModal'
 import { UploadMenu } from './UploadMenu'
 
-export type UploadProps = {|
+export type UploadProps = {
   filename: ?string,
   sessionLoaded: ?boolean,
   createSession: (file: File) => mixed,
-|}
+}
 
-type UploadState = {|
+type UploadState = {
   uploadedFile: ?File,
-|}
+}
 
 export class Upload extends React.Component<UploadProps, UploadState> {
   constructor(props: UploadProps) {

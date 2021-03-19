@@ -15,9 +15,9 @@ import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../../redux/modules'
 
 const IS_HOMING_MESSAGE = 'Returning tip and homing robot'
 
-export type ProceedToRunProps = {|
+export type ProceedToRunProps = {
   returnTip: () => mixed,
-|}
+}
 
 export function ProceedToRun(props: ProceedToRunProps): React.Node {
   const { returnTip } = props

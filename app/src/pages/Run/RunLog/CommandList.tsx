@@ -9,13 +9,13 @@ import styles from './styles.css'
 
 import type { SessionStatus, SessionStatusInfo } from '../../../redux/robot'
 
-export type CommandListProps = {|
+export type CommandListProps = {
   commands: Array<any>,
   sessionStatus: SessionStatus,
   sessionStatusInfo: SessionStatusInfo,
   showSpinner: boolean,
   onResetClick: () => mixed,
-|}
+}
 
 export class CommandList extends React.Component<CommandListProps> {
   componentDidUpdate() {

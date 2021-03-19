@@ -31,20 +31,20 @@ const OVERRIDE_TIP_LENGTH_CALIBRATED_PROMPT =
 const TIP_LENGTH_UNCALIBRATED_PROMPT =
   'Not yet calibrated. You will calibrate this tip length before proceeding to Pipette Offset Calibration.'
 
-type TipRackInfo = {|
+type TipRackInfo = {
   definition: LabwareDefinition2,
   calibration: TipLengthCalibration | null,
-|}
+}
 
-export type TipRackMap = $Shape<{|
+export type TipRackMap = $Shape<{
   [uri: string]: TipRackInfo,
-|}>
+}>
 
-export type ChosenTipRackRenderProps = {|
+export type ChosenTipRackRenderProps = {
   showCalibrationText: boolean,
   selectedValue: SelectOption,
   tipRackByUriMap: TipRackMap,
-|}
+}
 
 export function ChosenTipRackRender(
   props: ChosenTipRackRenderProps

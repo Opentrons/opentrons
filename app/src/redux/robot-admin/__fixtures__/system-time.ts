@@ -18,7 +18,7 @@ export const {
   failure: mockFetchSystemTimeFailure,
 }: ResponseFixtures<
   SystemTimeData,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: GET,
   path: SYSTEM_TIME_PATH,

@@ -13,7 +13,7 @@ const DOOR_OPEN_RUN = 'Please close the robot door before running this protocol'
 
 const DOOR_OPEN_RESUME = 'Please close the robot door before resuming'
 
-export type RunControlsProps = {|
+export type RunControlsProps = {
   disabled: boolean,
   modulesReady: boolean,
   isReadyToRun: boolean,
@@ -24,7 +24,7 @@ export type RunControlsProps = {|
   onPauseClick: () => mixed,
   onResumeClick: () => mixed,
   onResetClick: () => mixed,
-|}
+}
 
 export function RunControls(props: RunControlsProps): React.Node {
   const {

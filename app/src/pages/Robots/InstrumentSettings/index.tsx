@@ -9,13 +9,13 @@ import { ChangePipette } from '../../../organisms/ChangePipette'
 import { ConfigurePipette } from '../../../organisms/ConfigurePipette'
 import { Page } from '../../../atoms/Page'
 
-export type InstrumentSettingsProps = {|
+export type InstrumentSettingsProps = {
   robotName: string,
   robotDisplayName: string,
   url: string,
   path: string,
   pathname: string,
-|}
+}
 
 // used to guarantee mount param in route is left or right
 const RE_MOUNT = `(${LEFT}|${RIGHT})`

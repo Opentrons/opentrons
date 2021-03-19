@@ -9,51 +9,51 @@ export type DiscoveryCandidates = string | Array<string>
 
 export type DevInternalFlag = 'allPipetteConfig' | 'enableBundleUpload'
 
-export type FeatureFlags = $Shape<{|
+export type FeatureFlags = $Shape<{
   [DevInternalFlag]: boolean | void,
-|}>
+}>
 
-export type ConfigV0 = $ReadOnly<{|
+export type ConfigV0 = $ReadOnly<{
   version: 0,
   devtools: boolean,
   reinstallDevtools: boolean,
 
   // app update config
-  update: $ReadOnly<{|
+  update: $ReadOnly<{
     channel: UpdateChannel,
-  |}>,
+  }>,
 
   // robot update config
-  buildroot: $ReadOnly<{|
+  buildroot: $ReadOnly<{
     manifestUrl: string,
-  |}>,
+  }>,
 
   // logging config
-  log: $ReadOnly<{|
-    level: $ReadOnly<{|
+  log: $ReadOnly<{
+    level: $ReadOnly<{
       file: LogLevel,
       console: LogLevel,
-    |}>,
-  |}>,
+    }>,
+  }>,
 
   // ui and browser config
-  ui: $ReadOnly<{|
+  ui: $ReadOnly<{
     width: number,
     height: number,
-    url: $ReadOnly<{|
+    url: $ReadOnly<{
       protocol: UrlProtocol,
       path: string,
-    |}>,
-    webPreferences: $ReadOnly<{|
+    }>,
+    webPreferences: $ReadOnly<{
       webSecurity: boolean,
-    |}>,
-  |}>,
+    }>,
+  }>,
 
-  analytics: $ReadOnly<{|
+  analytics: $ReadOnly<{
     appId: string,
     optedIn: boolean,
     seenOptIn: boolean,
-  |}>,
+  }>,
 
   // deprecated
   p10WarningSeen: $ReadOnly<{
@@ -61,55 +61,55 @@ export type ConfigV0 = $ReadOnly<{|
     ...
   }>,
 
-  support: $ReadOnly<{|
+  support: $ReadOnly<{
     userId: string,
     createdAt: number,
     name: string,
     email: ?string,
-  |}>,
+  }>,
 
-  discovery: $ReadOnly<{|
+  discovery: $ReadOnly<{
     candidates: DiscoveryCandidates,
-  |}>,
+  }>,
 
   // custom labware files
-  labware: $ReadOnly<{|
+  labware: $ReadOnly<{
     directory: string,
-  |}>,
+  }>,
 
   // app wide alerts
-  alerts: $ReadOnly<{| ignored: $ReadOnlyArray<string> |}>,
+  alerts: $ReadOnly<{ ignored: $ReadOnlyArray<string> }>,
 
   // internal development flags
   devInternal?: $ReadOnly<FeatureFlags>,
-|}>
+}>
 
-export type ConfigV1 = $ReadOnly<{|
+export type ConfigV1 = $ReadOnly<{
   ...ConfigV0,
   version: 1,
-  discovery: $ReadOnly<{|
+  discovery: $ReadOnly<{
     candidates: DiscoveryCandidates,
     disableCache: boolean,
-  |}>,
-|}>
+  }>,
+}>
 
-export type ConfigV2 = $ReadOnly<{|
+export type ConfigV2 = $ReadOnly<{
   ...ConfigV1,
   version: 2,
-  calibration: $ReadOnly<{|
+  calibration: $ReadOnly<{
     useTrashSurfaceForTipCal: boolean | null,
-  |}>,
-|}>
+  }>,
+}>
 
 // v3 config changes default values but does not change schema
-export type ConfigV3 = $ReadOnly<{|
+export type ConfigV3 = $ReadOnly<{
   ...ConfigV2,
   version: 3,
-  support: $ReadOnly<{|
+  support: $ReadOnly<{
     ...$PropertyType<ConfigV2, 'support'>,
     name: string | null,
     email: string | null,
-  |}>,
-|}>
+  }>,
+}>
 
 export type Config = ConfigV3

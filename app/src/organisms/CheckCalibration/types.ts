@@ -2,7 +2,7 @@
 import type { Action } from '../../redux/types'
 import type { CalibrationCheckSession } from '../../redux/sessions/types'
 
-export type CalibrationCheckParentProps = {|
+export type CalibrationCheckParentProps = {
   robotName: string,
   session: CalibrationCheckSession | null,
   dispatchRequests: (
@@ -11,4 +11,4 @@ export type CalibrationCheckParentProps = {|
   isJogging: boolean,
   showSpinner: boolean,
   hasBlock?: boolean,
-|}
+}

@@ -86,7 +86,7 @@ function formatOptionsFromLabwareDef(lw: LabwareDefinition2): SelectOption {
   }
 }
 
-type ChooseTipRackProps = {|
+type ChooseTipRackProps = {
   tipRack: CalibrationLabware,
   mount: string,
   sessionType: SessionType,
@@ -95,7 +95,7 @@ type ChooseTipRackProps = {|
   closeModal: () => mixed,
   robotName?: string | null,
   defaultTipracks?: Array<LabwareDefinition2> | null,
-|}
+}
 
 export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
   const {

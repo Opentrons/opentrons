@@ -77,4 +77,4 @@ export const AppComponent = (): React.Node => (
   </>
 )
 
-export const App: React.AbstractComponent<{||}> = hot(AppComponent)
+export const App: React.AbstractComponent<{}> = hot(AppComponent)

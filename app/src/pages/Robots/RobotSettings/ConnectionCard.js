@@ -17,9 +17,9 @@ import { ConnectionStatusMessage, ConnectionInfo } from './connection'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-type Props = {|
+type Props = {
   robot: ViewableRobot,
-|}
+}
 
 const STATUS_REFRESH_MS = 5000
 

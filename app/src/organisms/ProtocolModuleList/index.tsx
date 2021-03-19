@@ -88,9 +88,9 @@ export function ProtocolModuleList(): React.Node {
   )
 }
 
-type UsbPortInfoProps = {|
+type UsbPortInfoProps = {
   moduleMissing: boolean,
-|}
+}
 
 function UsbPortInfo(props: UsbPortInfoProps): React.Node {
   const [targetProps, tooltipProps] = useHoverTooltip()

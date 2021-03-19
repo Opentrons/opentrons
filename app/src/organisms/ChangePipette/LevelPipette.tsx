@@ -28,7 +28,7 @@ const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
 const LEVEL_MESSAGE = (displayName: string) => `Next, level the ${displayName}`
 const CONNECTED_MESSAGE = (displayName: string) => `${displayName} connected`
 
-type Props = {|
+type Props = {
   robotName: string,
   mount: Mount,
   title: string,
@@ -42,7 +42,7 @@ type Props = {|
   back: () => mixed,
   exit: () => mixed,
   startPipetteOffsetCalibration: () => void,
-|}
+}
 
 function Status(props: { displayName: string }) {
   const iconName = 'check-circle'

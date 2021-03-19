@@ -19,7 +19,7 @@ import styles from './styles.css'
 
 import type { Dispatch } from '../../../redux/types'
 
-export type ReviewDeckProps = {| slot: ?string |}
+export type ReviewDeckProps = { slot: ?string }
 
 export function ReviewDeck(props: ReviewDeckProps): React.Node {
   const { slot } = props

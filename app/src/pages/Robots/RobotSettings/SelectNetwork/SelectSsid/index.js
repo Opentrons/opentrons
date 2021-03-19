@@ -13,14 +13,14 @@ import type {
 
 import type { WifiNetwork } from '../types'
 
-export type SelectSsidProps = {|
+export type SelectSsidProps = {
   list: Array<WifiNetwork>,
   value: string | null,
   showWifiDisconnect: boolean,
   onConnect: (ssid: string) => mixed,
   onJoinOther: () => mixed,
   onDisconnect: () => mixed,
-|}
+}
 
 const FIELD_NAME = '__SelectSsid__'
 

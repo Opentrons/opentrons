@@ -6,12 +6,12 @@ import * as selectors from '../selectors'
 import type { State } from '../../types'
 import type { ValidLabwareFile } from '../types'
 
-type SelectorSpec = {|
+type SelectorSpec = {
   name: string,
   selector: State => mixed,
   state: $Shape<State>,
   expected: mixed,
-|}
+}
 
 describe('custom labware selectors', () => {
   const SPECS: Array<SelectorSpec> = [

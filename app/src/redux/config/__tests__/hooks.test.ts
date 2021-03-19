@@ -22,7 +22,7 @@ describe('config hooks', () => {
 
   describe('useFeatureFlag', () => {
     let result: boolean
-    const TestUseFeatureFlag = (props: {| flag: any |}) => {
+    const TestUseFeatureFlag = (props: { flag: any }) => {
       result = useFeatureFlag(props.flag)
       return <></>
     }

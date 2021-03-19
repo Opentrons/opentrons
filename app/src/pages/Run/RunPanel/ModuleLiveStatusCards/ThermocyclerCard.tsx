@@ -28,10 +28,10 @@ const TIME_REMAINING_FOR_STEP = 'Time remaining for step:'
 const TimeRemaining = ({
   holdTime,
   title,
-}: {|
+}: {
   holdTime: ?number,
   title: string,
-|}) => (
+}) => (
   <span
     className={cx(styles.inline_labeled_value, styles.time_remaining_wrapper)}
   >
@@ -40,13 +40,13 @@ const TimeRemaining = ({
   </span>
 )
 
-type CycleInfoProps = {|
+type CycleInfoProps = {
   totalCycleCount: ?number,
   currentCycleIndex: ?number,
   totalStepCount: ?number,
   currentStepIndex: ?number,
   holdTime: ?number,
-|}
+}
 const CycleInfo = ({
   totalCycleCount,
   currentCycleIndex,
@@ -91,7 +91,7 @@ const CycleInfo = ({
   )
 }
 
-type Props = {|
+type Props = {
   module: ThermocyclerModule,
   sendModuleCommand: (
     moduleId: string,
@@ -101,7 +101,7 @@ type Props = {|
   controlDisabledReason: string | null,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
-|}
+}
 
 export const ThermocyclerCard = ({
   module,

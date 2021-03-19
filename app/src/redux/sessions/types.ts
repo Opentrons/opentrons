@@ -55,7 +55,7 @@ export type SessionType =
   | SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
 
 export type SessionParams =
-  | {||}
+  | {}
   | TipLengthCalTypes.TipLengthCalibrationSessionParams
   | PipOffsetCalTypes.PipetteOffsetCalibrationSessionParams
   | CalCheckTypes.CheckCalibrationSessionParams
@@ -76,38 +76,38 @@ export type CalibrationSessionStep =
 export type VectorTuple = [number, number, number]
 
 export type SessionCommandData =
-  | {| vector: VectorTuple |}
-  | {| hasBlock: boolean |}
-  | {| tiprackDefinition: LabwareDefinition2 |}
-  | {||}
+  | { vector: VectorTuple }
+  | { hasBlock: boolean }
+  | { tiprackDefinition: LabwareDefinition2 }
+  | {}
 
 export type SessionCommandParams = {
   command: SessionCommandString,
   data?: SessionCommandData,
 }
 
-export type CalibrationCheckSessionResponseAttributes = {|
+export type CalibrationCheckSessionResponseAttributes = {
   sessionType: SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
   details: CalCheckTypes.CheckCalibrationSessionDetails,
   createParams: CalCheckTypes.CheckCalibrationSessionParams,
-|}
+}
 
-export type TipLengthCalibrationSessionResponseAttributes = {|
+export type TipLengthCalibrationSessionResponseAttributes = {
   sessionType: SESSION_TYPE_TIP_LENGTH_CALIBRATION,
   details: TipLengthCalTypes.TipLengthCalibrationSessionDetails,
   createParams: TipLengthCalTypes.TipLengthCalibrationSessionParams,
-|}
+}
 
-export type DeckCalibrationSessionResponseAttributes = {|
+export type DeckCalibrationSessionResponseAttributes = {
   sessionType: SESSION_TYPE_DECK_CALIBRATION,
   details: DeckCalTypes.DeckCalibrationSessionDetails,
   createParams: {},
-|}
-export type PipetteOffsetCalibrationSessionResponseAttributes = {|
+}
+export type PipetteOffsetCalibrationSessionResponseAttributes = {
   sessionType: SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
   details: PipOffsetCalTypes.PipetteOffsetCalibrationSessionDetails,
   createParams: PipOffsetCalTypes.PipetteOffsetCalibrationSessionParams,
-|}
+}
 
 export type SessionResponseAttributes =
   | CalibrationCheckSessionResponseAttributes
@@ -115,25 +115,25 @@ export type SessionResponseAttributes =
   | DeckCalibrationSessionResponseAttributes
   | PipetteOffsetCalibrationSessionResponseAttributes
 
-export type CalibrationCheckSession = {|
+export type CalibrationCheckSession = {
   ...CalibrationCheckSessionResponseAttributes,
   id: string,
-|}
+}
 
-export type TipLengthCalibrationSession = {|
+export type TipLengthCalibrationSession = {
   ...TipLengthCalibrationSessionResponseAttributes,
   id: string,
-|}
+}
 
-export type DeckCalibrationSession = {|
+export type DeckCalibrationSession = {
   ...DeckCalibrationSessionResponseAttributes,
   id: string,
-|}
+}
 
-export type PipetteOffsetCalibrationSession = {|
+export type PipetteOffsetCalibrationSession = {
   ...PipetteOffsetCalibrationSessionResponseAttributes,
   id: string,
-|}
+}
 
 export type Session =
   | CalibrationCheckSession
@@ -141,18 +141,18 @@ export type Session =
   | DeckCalibrationSession
   | PipetteOffsetCalibrationSession
 
-export type SessionCommandAttributes = {|
+export type SessionCommandAttributes = {
   command: SessionCommandString,
   data: SessionCommandData,
-|}
+}
 
 export type SessionResponseModel = Session
 
-export type SessionCommandResponseModel = {|
+export type SessionCommandResponseModel = {
   ...SessionCommandAttributes,
   id: string,
   status?: string,
-|}
+}
 
 export type SessionResponse = RobotApiV2ResponseBody<SessionResponseModel>
 export type MultiSessionResponse = RobotApiV2ResponseBody<
@@ -161,137 +161,137 @@ export type MultiSessionResponse = RobotApiV2ResponseBody<
 
 export type SessionCommandResponse = RobotApiV2ResponseBody<SessionCommandResponseModel>
 
-export type CreateSessionAction = {|
+export type CreateSessionAction = {
   type: CREATE_SESSION,
-  payload: {|
+  payload: {
     robotName: string,
     sessionType: SessionType,
     params: SessionParams,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type CreateSessionSuccessAction = {|
+export type CreateSessionSuccessAction = {
   type: CREATE_SESSION_SUCCESS,
-  payload: {| robotName: string, ...SessionResponse |},
+  payload: { robotName: string, ...SessionResponse },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type CreateSessionFailureAction = {|
+export type CreateSessionFailureAction = {
   type: CREATE_SESSION_FAILURE,
-  payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
+  payload: { robotName: string, error: RobotApiV2ErrorResponseBody },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type DeleteSessionAction = {|
+export type DeleteSessionAction = {
   type: DELETE_SESSION,
-  payload: {| robotName: string, sessionId: string |},
+  payload: { robotName: string, sessionId: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type DeleteSessionSuccessAction = {|
+export type DeleteSessionSuccessAction = {
   type: DELETE_SESSION_SUCCESS,
-  payload: {| robotName: string, ...SessionResponse |},
+  payload: { robotName: string, ...SessionResponse },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type DeleteSessionFailureAction = {|
+export type DeleteSessionFailureAction = {
   type: DELETE_SESSION_FAILURE,
-  payload: {|
+  payload: {
     robotName: string,
     sessionId: string,
     error: RobotApiV2ErrorResponseBody,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchSessionAction = {|
+export type FetchSessionAction = {
   type: FETCH_SESSION,
-  payload: {| robotName: string, sessionId: string |},
+  payload: { robotName: string, sessionId: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchSessionSuccessAction = {|
+export type FetchSessionSuccessAction = {
   type: FETCH_SESSION_SUCCESS,
-  payload: {| robotName: string, ...SessionResponse |},
+  payload: { robotName: string, ...SessionResponse },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchSessionFailureAction = {|
+export type FetchSessionFailureAction = {
   type: FETCH_SESSION_FAILURE,
-  payload: {|
+  payload: {
     robotName: string,
     sessionId: string,
     error: RobotApiV2ErrorResponseBody,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchAllSessionsAction = {|
+export type FetchAllSessionsAction = {
   type: FETCH_ALL_SESSIONS,
-  payload: {| robotName: string |},
+  payload: { robotName: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchAllSessionsSuccessAction = {|
+export type FetchAllSessionsSuccessAction = {
   type: FETCH_ALL_SESSIONS_SUCCESS,
-  payload: {|
+  payload: {
     robotName: string,
     sessions: $ReadOnlyArray<SessionResponseModel>,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchAllSessionsFailureAction = {|
+export type FetchAllSessionsFailureAction = {
   type: FETCH_ALL_SESSIONS_FAILURE,
-  payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
+  payload: { robotName: string, error: RobotApiV2ErrorResponseBody },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type EnsureSessionAction = {|
+export type EnsureSessionAction = {
   type: ENSURE_SESSION,
-  payload: {|
+  payload: {
     robotName: string,
     sessionType: SessionType,
     params: SessionParams,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type CreateSessionCommandAction = {|
+export type CreateSessionCommandAction = {
   type: CREATE_SESSION_COMMAND,
-  payload: {|
+  payload: {
     robotName: string,
     sessionId: string,
     command: SessionCommandAttributes,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type CreateSessionCommandSuccessAction = {|
+export type CreateSessionCommandSuccessAction = {
   type: CREATE_SESSION_COMMAND_SUCCESS,
-  payload: {|
+  payload: {
     robotName: string,
     sessionId: string,
     ...SessionResponse,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type CreateSessionCommandFailureAction = {|
+export type CreateSessionCommandFailureAction = {
   type: CREATE_SESSION_COMMAND_FAILURE,
-  payload: {|
+  payload: {
     robotName: string,
     sessionId: string,
     error: RobotApiV2ErrorResponseBody,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type ClearAllSessionsAction = {|
+export type ClearAllSessionsAction = {
   type: CLEAR_ALL_SESSIONS,
-  payload: {| robotName: string |},
-|}
+  payload: { robotName: string },
+}
 
 export type SessionsAction =
   | CreateSessionAction
@@ -312,27 +312,27 @@ export type SessionsAction =
   | EnsureSessionAction
   | ClearAllSessionsAction
 
-export type SessionsById = $Shape<{|
+export type SessionsById = $Shape<{
   [id: string]: Session,
-|}>
+}>
 
 export type PerRobotSessionState = $Shape<
-  $ReadOnly<{|
+  $ReadOnly<{
     robotSessions: SessionsById | null,
-  |}>
+  }>
 >
 
 export type SessionState = $Shape<
-  $ReadOnly<{|
+  $ReadOnly<{
     [robotName: string]: void | PerRobotSessionState,
-  |}>
+  }>
 >
 
-export type CalibrationLabware = {|
+export type CalibrationLabware = {
   slot: string,
   loadName: string,
   namespace: string,
   version: number,
   isTiprack: boolean,
   definition: LabwareDefinition2,
-|}
+}

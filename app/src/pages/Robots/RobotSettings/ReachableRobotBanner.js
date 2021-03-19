@@ -14,7 +14,7 @@ import type {
   HealthStatus,
 } from '../../../redux/discovery/types'
 
-type State = {| dismissed: boolean |}
+type State = { dismissed: boolean }
 
 // TODO(bc, 2020-12-07): i18n
 const UNRESPONSIVE_TITLE = 'Unable to establish connection with robot'

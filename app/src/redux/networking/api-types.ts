@@ -37,22 +37,22 @@ export type InterfaceState =
 
 export type InterfaceType = INTERFACE_WIFI | INTERFACE_ETHERNET
 
-export type InterfaceStatus = {|
+export type InterfaceStatus = {
   ipAddress: string | null,
   macAddress: string,
   gatewayAddress: string | null,
   state: InterfaceState,
   type: InterfaceType,
-|}
+}
 
-export type InterfaceStatusMap = $Shape<{|
+export type InterfaceStatusMap = $Shape<{
   [device: string]: InterfaceStatus,
-|}>
+}>
 
-export type NetworkingStatusResponse = {|
+export type NetworkingStatusResponse = {
   status: InternetStatus,
   interfaces: InterfaceStatusMap,
-|}
+}
 
 // GET /wifi/list
 
@@ -61,56 +61,56 @@ export type WifiSecurityType =
   | SECURITY_WPA_PSK
   | SECURITY_WPA_EAP
 
-export type WifiNetwork = {|
+export type WifiNetwork = {
   ssid: string,
   signal: number,
   active: boolean,
   security: string,
   securityType: WifiSecurityType,
-|}
+}
 
-export type WifiListResponse = {|
+export type WifiListResponse = {
   list: Array<WifiNetwork>,
-|}
+}
 
 // POST /wifi/configure
 
-export type WifiEapConfig = {|
+export type WifiEapConfig = {
   [eapOption: string]: string,
   eapType: string,
-|}
+}
 
-export type WifiConfigureRequest = {|
+export type WifiConfigureRequest = {
   ssid: string,
   psk?: string,
   securityType?: WifiSecurityType,
   hidden?: boolean,
   eapConfig?: WifiEapConfig,
-|}
+}
 
-export type WifiConfigureResponse = {|
+export type WifiConfigureResponse = {
   ssid: string,
   message: string,
-|}
+}
 
 // GET /wifi/keys
 
-export type ApiWifiKey = {|
+export type ApiWifiKey = {
   id: string,
   uri: string,
   name: string,
-|}
+}
 
-export type FetchWifiKeysResponse = {|
+export type FetchWifiKeysResponse = {
   keys: Array<ApiWifiKey>,
-|}
+}
 
 // POST /wifi/keys
 
-export type PostWifiKeysResponse = {|
+export type PostWifiKeysResponse = {
   ...ApiWifiKey,
   message?: string,
-|}
+}
 
 // GET /wifi/eap-options
 
@@ -119,20 +119,20 @@ export type WifiAuthFieldType =
   | AUTH_TYPE_PASSWORD
   | AUTH_TYPE_FILE
 
-export type WifiAuthField = {|
+export type WifiAuthField = {
   name: string,
   displayName: string,
   required: boolean,
   type: WifiAuthFieldType,
-|}
+}
 
-export type EapOption = {|
+export type EapOption = {
   name: string,
   // displayName added to response in API v3.4.0
   displayName?: string,
   options: Array<WifiAuthField>,
-|}
+}
 
-export type FetchEapOptionsResponse = {|
+export type FetchEapOptionsResponse = {
   options: Array<EapOption>,
-|}
+}

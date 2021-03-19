@@ -15,14 +15,14 @@ const getRobotApiVersionByName: JestMockFn<
   $Call<typeof Discovery.getRobotApiVersionByName, State, string>
 > = Discovery.getRobotApiVersionByName
 
-type SelectorSpec = {|
+type SelectorSpec = {
   name: string,
   selector: ($Shape<State>, ...Array<any>) => mixed,
   state: $Shape<State>,
   args?: Array<any>,
   before?: (spec: SelectorSpec) => mixed,
   expected: mixed,
-|}
+}
 
 describe('robot settings selectors', () => {
   afterEach(() => {

@@ -69,7 +69,7 @@ export const {
   failure: mockFetchTipLengthCalibrationsFailure,
 }: ResponseFixtures<
   AllTipLengthCalibrations,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: GET,
   path: TIP_LENGTH_CALIBRATIONS_PATH,

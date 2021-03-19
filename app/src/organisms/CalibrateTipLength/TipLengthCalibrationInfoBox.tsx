@@ -9,10 +9,10 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-export type TipLengthCalibrationInfoBoxProps = {|
+export type TipLengthCalibrationInfoBoxProps = {
   title: string,
   children: React.Node,
-|}
+}
 
 export function TipLengthCalibrationInfoBox(
   props: TipLengthCalibrationInfoBoxProps

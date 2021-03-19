@@ -7,14 +7,14 @@ import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
 import type { Action } from '../../types'
 import type { SessionState } from '../types'
 
-type ReducerSpec = {|
-  name: string,
-  state: SessionState,
-  action: Action,
-  expected: SessionState,
-|}
+interface ReducerSpec {
+  name: string
+  state: SessionState
+  action: Action
+  expected: SessionState
+}
 
-const SPECS: Array<ReducerSpec> = [
+const SPECS: ReducerSpec[] = [
   {
     name: 'handles sessions:CREATE_SESSION_SUCCESS',
     action: {

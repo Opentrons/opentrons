@@ -13,19 +13,19 @@ import styles from './styles.css'
 
 type Diagram = 'screws' | 'tab'
 
-type DiagramProps = {|
+type DiagramProps = {
   direction: Direction,
   mount: Mount,
   channels: PipetteChannels,
   diagram: Diagram,
   displayCategory: PipetteDisplayCategory | null,
-|}
+}
 
-type Props = {|
+type Props = {
   ...DiagramProps,
   step: 'one' | 'two',
   children: React.Node,
-|}
+}
 
 export function getDiagramsSrc(props: DiagramProps): string {
   const { channels, displayCategory, direction, mount, diagram } = props

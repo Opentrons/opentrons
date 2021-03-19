@@ -2,7 +2,9 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-type Props = {| status: string |}
+interface Props {
+  status: string
+}
 
 export function StatusItem(props: Props): React.Node {
   return (

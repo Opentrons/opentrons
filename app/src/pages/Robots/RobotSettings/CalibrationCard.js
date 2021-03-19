@@ -43,10 +43,10 @@ import { DeckCalibrationControl } from './DeckCalibrationControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
 import { PipetteOffsets } from './PipetteOffsets'
 
-type Props = {|
+type Props = {
   robot: ViewableRobot,
   pipettesPageUrl: string,
-|}
+}
 
 const DECK_CAL_STATUS_POLL_INTERVAL = 10000
 const CAL_ARTICLE_URL =

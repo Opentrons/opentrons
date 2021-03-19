@@ -6,13 +6,13 @@ import { Portal } from '../../App/portal'
 
 import styles from './styles.css'
 
-type Props = {|
+type Props = {
   heading?: ?string,
   description: string,
   close?: () => mixed,
   closeUrl?: string,
   error: { message?: string, ... },
-|}
+}
 
 const DEFAULT_HEADING = 'Unexpected Error'
 const AN_UNKNOWN_ERROR_OCCURRED = 'An unknown error occurred'

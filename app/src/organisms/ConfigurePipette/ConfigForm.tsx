@@ -28,25 +28,25 @@ import type {
 
 import type { FormValues } from './ConfigFormGroup'
 
-export type DisplayFieldProps = {|
+export type DisplayFieldProps = {
   ...PipetteSettingsField,
   name: string,
   displayName: string,
-|}
+}
 
-export type DisplayQuirkFieldProps = {|
+export type DisplayQuirkFieldProps = {
   [quirkId: string]: boolean,
   name: string,
   displayName: string,
-|}
+}
 
-export type ConfigFormProps = {|
+export type ConfigFormProps = {
   settings: PipetteSettingsFieldsMap,
   updateInProgress: boolean,
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => mixed,
   closeModal: () => mixed,
   __showHiddenFields: boolean,
-|}
+}
 
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
 const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']

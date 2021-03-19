@@ -34,14 +34,14 @@ import { PipetteCalibrationInfo } from './PipetteCalibrationInfo'
 import type { State } from '../../../redux/types'
 import type { Mount, AttachedPipette } from '../../../redux/pipettes/types'
 
-export type PipetteInfoProps = {|
+export type PipetteInfoProps = {
   robotName: string,
   mount: Mount,
   pipette: AttachedPipette | null,
   changeUrl: string,
   settingsUrl: string | null,
   isChangingOrConfiguringPipette: boolean,
-|}
+}
 
 const MOUNT = 'mount'
 const SERIAL_NUMBER = 'Serial number'

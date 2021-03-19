@@ -26,7 +26,7 @@ import type {
 
 import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
 
-type MockState = $Shape<{| ...State, config: null | $Shape<Config> |}>
+type MockState = $Shape<{ ...State, config: null | $Shape<Config> }>
 
 jest.mock('../../protocol/selectors')
 jest.mock('../../robot/selectors')
@@ -267,24 +267,24 @@ describe('analytics selectors', () => {
     > = DiscoverySelectors.getConnectedRobot
     const mockGetAttachedPipettes: JestMockFn<
       [State, string],
-      {|
+      {
         left: null | $Shape<AttachedPipette>,
         right: null | $Shape<AttachedPipette>,
-      |}
+      }
     > = PipetteSelectors.getAttachedPipettes
     describe('getAnalyticsPipetteCalibrationData', () => {
       const mockGetAttachedPipetteCalibrations: JestMockFn<
         [State, string],
-        {|
-          left: {|
+        {
+          left: {
             offset: $Shape<PipetteOffsetCalibration> | null,
             tipLength: any,
-          |},
-          right: {|
+          },
+          right: {
             offset: $Shape<PipetteOffsetCalibration> | null,
             tipLength: any,
-          |},
-        |}
+          },
+        }
       > = PipetteSelectors.getAttachedPipetteCalibrations
       it('should get data if robot connected', () => {
         const mockState = ({}: $Shape<State>)
@@ -324,16 +324,16 @@ describe('analytics selectors', () => {
     describe('getAnalyticsTipLengthCalibrationData', () => {
       const mockGetAttachedPipetteCalibrations: JestMockFn<
         [State, string],
-        {|
-          left: {|
+        {
+          left: {
             offset: any,
             tipLength: $Shape<TipLengthCalibration> | null,
-          |},
-          right: {|
+          },
+          right: {
             offset: any,
             tipLength: $Shape<TipLengthCalibration> | null,
-          |},
-        |}
+          },
+        }
       > = PipetteSelectors.getAttachedPipetteCalibrations
 
       it('should get data if robot connected', () => {

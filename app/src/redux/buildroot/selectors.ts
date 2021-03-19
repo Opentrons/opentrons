@@ -135,11 +135,11 @@ export function getBuildrootUpdateAvailable(
 export const getBuildrootUpdateDisplayInfo: (
   state: State,
   robotName: string
-) => {|
+) => {
   autoUpdateAction: string,
   autoUpdateDisabledReason: string | null,
   updateFromFileDisabledReason: string | null,
-|} = createSelector(
+} = createSelector(
   getRobotByName,
   state => getBuildrootRobot(state),
   state => getBuildrootUpdateVersion(state),

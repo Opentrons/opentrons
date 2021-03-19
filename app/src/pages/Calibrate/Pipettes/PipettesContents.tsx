@@ -10,21 +10,21 @@ import type { InstrumentInfoProps } from '@opentrons/components'
 import type { Pipette, Labware } from '../../../redux/robot/types'
 import type { Mount } from '../../../redux/pipettes/types'
 
-export type PipettesContentsProps = {|
+export type PipettesContentsProps = {
   currentMount: Mount | null,
   pipettes: Array<Pipette>,
-  activeTipracks: {| left: Labware | null, right: Labware | null |},
+  activeTipracks: { left: Labware | null, right: Labware | null },
   changePipetteUrl: string,
-|}
+}
 
 export function PipettesContents(props: PipettesContentsProps): React.Node {
   const { currentMount, pipettes, activeTipracks } = props
 
   const infoByMount = PIPETTE_MOUNTS.reduce<
-    $Shape<{|
+    $Shape<{
       left?: InstrumentInfoProps,
       right?: InstrumentInfoProps,
-    |}>
+    }>
   >((result, mount) => {
     const pipette = pipettes.find(p => p.mount === mount)
     const tiprack = activeTipracks[mount]

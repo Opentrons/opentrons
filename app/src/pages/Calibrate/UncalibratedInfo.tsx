@@ -47,13 +47,13 @@ function CalibrateButton(props: CalibrateButtonProps) {
   }
 }
 
-type UncalibratedInfoProps = {|
+type UncalibratedInfoProps = {
   uncalibratedTipracksByMount: TipracksByMountMap,
   mount: Mount,
   hasCalibrated: boolean,
   handleStart: () => mixed,
   showSpinner: boolean,
-|}
+}
 
 export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
   const {

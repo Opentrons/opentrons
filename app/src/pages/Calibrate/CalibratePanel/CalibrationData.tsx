@@ -6,11 +6,11 @@ import { Flex, Text, DIRECTION_COLUMN, SPACING_2 } from '@opentrons/components'
 import { CalibrationValues } from '../CalibrateLabware/CalibrationValues'
 import type { LabwareCalibrationData } from '../../../redux/calibration/labware/types'
 
-export function CalibrationData(props: {|
+export function CalibrationData(props: {
   calibrationData: LabwareCalibrationData | null,
   calibratedThisSession: boolean,
   calDataAvailable: boolean,
-|}): React.Node {
+}): React.Node {
   const { calibrationData, calibratedThisSession, calDataAvailable } = props
 
   const { t } = useTranslation('protocol_calibration')

@@ -22,7 +22,7 @@ import { ProtocolLabwareCard } from './ProtocolLabwareCard'
 import { Continue } from './Continue'
 import { UploadError } from '../UploadError'
 
-export type FileInfoProps = {|
+export type FileInfoProps = {
   robot: Robot,
   filename: ?string,
   uploadInProgress: boolean,
@@ -30,7 +30,7 @@ export type FileInfoProps = {|
   sessionLoaded: boolean,
   sessionHasSteps: boolean,
   showCustomLabwareWarning: boolean,
-|}
+}
 
 export function FileInfo(props: FileInfoProps): React.Node {
   const {

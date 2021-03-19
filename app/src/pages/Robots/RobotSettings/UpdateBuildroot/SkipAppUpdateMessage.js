@@ -9,9 +9,9 @@ import {
   Text,
 } from '@opentrons/components'
 
-type SkipAppUpdateMessageProps = {|
+type SkipAppUpdateMessageProps = {
   onClick: () => mixed,
-|}
+}
 
 const SKIP_APP_MESSAGE =
   'If you wish to skip this app update and only sync your robot server with your current app version, please '

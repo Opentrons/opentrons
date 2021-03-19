@@ -2,12 +2,12 @@
 import * as Actions from '../actions'
 import type { RobotApiAction } from '../types'
 
-type ActionSpec = {|
+type ActionSpec = {
   name: string,
   creator: (...Array<any>) => mixed,
   args: Array<mixed>,
   expected: RobotApiAction,
-|}
+}
 
 describe('robot admin actions', () => {
   const SPECS: Array<ActionSpec> = [

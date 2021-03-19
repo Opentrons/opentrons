@@ -23,16 +23,16 @@ import type { AttachedModule } from '../../redux/modules/types'
 
 type OP = ContextRouter
 
-type SP = {|
+type SP = {
   deckPopulated: boolean,
   labware: ?RobotLabware,
   calibrateToBottom: boolean,
   robotName: string | null,
   hasModulesLeftToReview: ?boolean,
   unpreparedModules: Array<AttachedModule>,
-|}
+}
 
-type Props = {| ...OP, ...SP, dispatch: Dispatch |}
+type Props = { ...OP, ...SP, dispatch: Dispatch }
 
 export const Labware: React.AbstractComponent<
   $Diff<OP, ContextRouter>

@@ -12,11 +12,11 @@ import {
 
 import type { State } from '../../../../../redux/types'
 
-export type UploadKeyInputProps = {|
+export type UploadKeyInputProps = {
   robotName: string,
   label: string,
   onUpload: (keyId: string) => mixed,
-|}
+}
 
 // TODO(mc, 2020-03-04): create styled HiddenInput in components library
 const HiddenInput = styled.input`

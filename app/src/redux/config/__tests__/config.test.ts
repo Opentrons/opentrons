@@ -11,7 +11,7 @@ jest.mock('../../shell/remote', () => ({
 }))
 
 describe('config', () => {
-  let state: $Shape<{| ...State, config: $Shape<Config> |}>
+  let state: $Shape<{ ...State, config: $Shape<Config> }>
 
   beforeEach(() => {
     jest.clearAllMocks()

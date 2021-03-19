@@ -4,10 +4,10 @@ import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
 
-export type ConfirmUploadModalProps = {|
+export type ConfirmUploadModalProps = {
   confirm: () => mixed,
   cancel: () => mixed,
-|}
+}
 
 export function ConfirmUploadModal(props: ConfirmUploadModalProps): React.Node {
   return (

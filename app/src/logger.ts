@@ -15,7 +15,7 @@ export type LogLevel =
 
 export type Log = (message: string, meta?: {}) => void
 
-export type Logger = {|
+export type Logger = {
   error: Log,
   warn: Log,
   info: Log,
@@ -23,7 +23,7 @@ export type Logger = {|
   verbose: Log,
   debug: Log,
   silly: Log,
-|}
+}
 
 const ERROR: 'error' = 'error'
 const WARN: 'warn' = 'warn'

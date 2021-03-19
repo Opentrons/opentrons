@@ -11,11 +11,11 @@ import {
   FONT_HEADER_DARK,
 } from '@opentrons/components'
 
-type ControlContainerProps = {|
+type ControlContainerProps = {
   title: string,
   subtitle: string,
   children: React.Node,
-|}
+}
 
 export function ControlContainer(props: ControlContainerProps): React.Node {
   return (

@@ -34,13 +34,13 @@ const updateProfile: JestMockFn<[SupportProfileUpdate], void> =
   Profile.updateProfile
 
 const MOCK_ACTION: Action = ({ type: 'MOCK_ACTION' }: any)
-const MOCK_PROFILE_STATE: $Shape<{| ...State, config: $Shape<Config> |}> = {
+const MOCK_PROFILE_STATE: $Shape<{ ...State, config: $Shape<Config> }> = {
   config: {
     support: { userId: 'foo', createdAt: 42, name: 'bar', email: null },
   },
 }
 
-const MOCK_EVENT_STATE: $Shape<{| ...State |}> = {}
+const MOCK_EVENT_STATE: $Shape<{ ...State }> = {}
 
 describe('support profile epic', () => {
   let testScheduler

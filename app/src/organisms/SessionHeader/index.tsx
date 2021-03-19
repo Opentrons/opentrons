@@ -7,13 +7,13 @@ import { getProtocolFilename } from '../../redux/protocol'
 
 import type { State, Dispatch } from '../../redux/types'
 
-type SP = {| sessionName: ?string |}
+type SP = { sessionName: ?string }
 
-type Props = {| ...SP, dispatch: Dispatch |}
+type Props = { ...SP, dispatch: Dispatch }
 
-export const SessionHeader: React.AbstractComponent<{||}> = connect<
+export const SessionHeader: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   _,
   _,
   _,

@@ -12,9 +12,9 @@ const HEADING = 'Are you sure you want to cancel this run?'
 const CANCEL_TEXT = 'cancel run'
 const BACK_TEXT = 'go back'
 
-export type ConfirmCancelModalProps = {|
+export type ConfirmCancelModalProps = {
   onClose: () => mixed,
-|}
+}
 
 export function ConfirmCancelModal(props: ConfirmCancelModalProps): React.Node {
   const { onClose } = props

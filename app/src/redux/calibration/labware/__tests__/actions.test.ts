@@ -4,12 +4,12 @@ import * as Fixtures from '../__fixtures__'
 import * as Actions from '../actions'
 import type { LabwareCalibrationAction } from '../types'
 
-type ActionSpec = {|
+type ActionSpec = {
   should: string,
   creator: (...Array<any>) => LabwareCalibrationAction,
   args: Array<mixed>,
   expected: LabwareCalibrationAction,
-|}
+}
 
 const SPECS: Array<ActionSpec> = [
   {

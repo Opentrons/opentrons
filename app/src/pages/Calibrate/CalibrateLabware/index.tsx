@@ -10,7 +10,7 @@ import styles from './styles.css'
 import type { ContextRouter } from 'react-router-dom'
 import type { Labware } from '../../../redux/robot/types'
 
-type Props = {| ...ContextRouter, labware: ?Labware |}
+type Props = { ...ContextRouter, labware: ?Labware }
 
 export const CalibrateLabware: React.AbstractComponent<
   $Diff<Props, ContextRouter>

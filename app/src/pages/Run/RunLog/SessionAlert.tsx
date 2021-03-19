@@ -15,12 +15,12 @@ const buildPause = (message: ?string): string =>
 const buildPauseUserMessage = (message: ?string) =>
   message && <div className={styles.pause_user_message}>{message}</div>
 
-export type SessionAlertProps = {|
+export type SessionAlertProps = {
   sessionStatus: SessionStatus,
   sessionStatusInfo: SessionStatusInfo,
   className?: string,
   onResetClick: () => mixed,
-|}
+}
 
 export function SessionAlert(props: SessionAlertProps): React.Node {
   const { sessionStatus, sessionStatusInfo, className, onResetClick } = props

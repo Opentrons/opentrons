@@ -52,7 +52,7 @@ export type RobotCalibrationCheckStatus =
   | CHECK_STATUS_IN_THRESHOLD
   | CHECK_STATUS_OUTSIDE_THRESHOLD
 
-export type CalibrationCheckInstrument = {|
+export type CalibrationCheckInstrument = {
   model: string,
   name: string,
   tipLength: number,
@@ -63,13 +63,13 @@ export type CalibrationCheckInstrument = {|
   tipRackUri: string,
   serial: string,
   defaultTipracks: Array<LabwareDefinition2>,
-|}
+}
 
-export type CalibrationCheckComparison = {|
+export type CalibrationCheckComparison = {
   differenceVector: [number, number, number],
   thresholdVector: [number, number, number],
   exceedsThreshold: boolean,
-|}
+}
 
 export type CalibrationCheckComparisonMap = {
   status: RobotCalibrationCheckStatus,
@@ -87,16 +87,16 @@ export type CalibrationCheckComparisonByPipette = {
   second: CalibrationCheckComparisonsPerCalibration,
 }
 
-export type CheckCalibrationSessionDetails = {|
+export type CheckCalibrationSessionDetails = {
   instruments: Array<CalibrationCheckInstrument>,
   currentStep: RobotCalibrationCheckStep,
   comparisonsByPipette: CalibrationCheckComparisonByPipette,
   labware: Array<CalibrationLabware>,
   activePipette: CalibrationCheckInstrument,
   activeTipRack: CalibrationLabware,
-|}
+}
 
-export type CheckCalibrationSessionParams = {|
+export type CheckCalibrationSessionParams = {
   hasCalibrationBlock: boolean,
   tipRacks: Array<CalibrationLabware>,
-|}
+}

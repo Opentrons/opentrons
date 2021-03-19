@@ -87,17 +87,17 @@ export type Command = {
 
 // protocol command graph node
 // contructed from Command
-export type CommandNode = {|
+export type CommandNode = {
   id: number,
   description: string,
   handledAt: ?number,
   isCurrent: boolean,
   isLast: boolean,
   children: Array<CommandNode>,
-|}
+}
 
 // instrument as stored in redux state
-export type StatePipette = {|
+export type StatePipette = {
   // resource ID
   _id: number,
   // robot mount instrument is installed on
@@ -115,17 +115,17 @@ export type StatePipette = {|
   tipRacks: Array<number>,
   // string specified in protocol to load pipette
   requestedAs?: ?string,
-|}
+}
 
-export type Pipette = {|
+export type Pipette = {
   ...StatePipette,
   probed: boolean,
   tipOn: boolean,
   modelSpecs: PipetteModelSpecs | null,
-|}
+}
 
 // labware as stored in redux state
-export type StateLabware = {|
+export type StateLabware = {
   // resource ID
   _id: number,
   // slot labware is installed in
@@ -145,19 +145,19 @@ export type StateLabware = {|
   // string identity of a labware; combines all definition properties that would effect a run
   // will be null if old RPC version or old labware version
   definitionHash: string | null,
-|}
+}
 
-export type Labware = {|
+export type Labware = {
   ...StateLabware,
   calibration: LabwareCalibrationStatus,
   confirmed: boolean,
   isMoving: boolean,
   definition: LabwareDefinition2 | null,
-|}
+}
 
 export type LabwareType = 'tiprack' | 'labware'
 
-export type SessionModule = $Diff<ApiTypes.ApiSessionModule, {| name: mixed |}>
+export type SessionModule = $Diff<ApiTypes.ApiSessionModule, { name: mixed }>
 
 export type SessionStatus =
   | ''
@@ -174,33 +174,33 @@ export type ConnectionStatus =
   | CONNECTED
   | DISCONNECTING
 
-export type SessionStatusInfo = {|
+export type SessionStatusInfo = {
   message: string | null,
   changedAt: number | null,
   estimatedDuration: number | null,
   userMessage: string | null,
-|}
+}
 
 export type DoorState = null | DOOR_OPEN | DOOR_CLOSED
 
-export type SessionUpdate = {|
+export type SessionUpdate = {
   state: SessionStatus,
   statusInfo: SessionStatusInfo,
   startTime: ?number,
   doorState: DoorState,
   blocked: boolean,
-  lastCommand: ?{|
+  lastCommand: ?{
     id: number,
     handledAt: number,
-  |},
-|}
+  },
+}
 
-export type TipracksByMountMap = {|
+export type TipracksByMountMap = {
   left: Array<Labware>,
   right: Array<Labware>,
-|}
+}
 
-export type NextTiprackPipetteInfo = {|
+export type NextTiprackPipetteInfo = {
   mount: Mount,
   tiprack: Labware,
-|}
+}

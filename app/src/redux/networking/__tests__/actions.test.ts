@@ -6,12 +6,12 @@ import * as Fixtures from '../__fixtures__'
 
 import type { NetworkingAction } from '../types'
 
-type ActionSpec = {|
+type ActionSpec = {
   name: string,
   creator: (...Array<any>) => mixed,
   args: Array<mixed>,
   expected: NetworkingAction,
-|}
+}
 
 describe('networking actions', () => {
   const SPECS: Array<ActionSpec> = [

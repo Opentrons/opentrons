@@ -46,10 +46,10 @@ export const getValidCustomLabware: State => Array<ValidLabwareFile> = createSel
   labware => labware.filter(f => f.type === VALID_LABWARE_FILE)
 )
 
-export const getAddLabwareFailure: State => {|
+export const getAddLabwareFailure: State => {
   file: FailedLabwareFile | null,
   errorMessage: string | null,
-|} = createSelector(
+} = createSelector(
   state => state.labware.addFailureFile,
   state => state.labware.addFailureMessage,
   (file, errorMessage) => ({ file, errorMessage })

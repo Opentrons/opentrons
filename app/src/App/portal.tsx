@@ -9,19 +9,19 @@ import { Box } from '@opentrons/components'
 
 type PortalLevel = 'page' | 'top'
 
-type Props = {|
+type Props = {
   children: React.Node,
   level: PortalLevel,
-|}
+}
 
-type State = {|
+type State = {
   hasRoot: boolean,
-|}
+}
 
-type PortalLevelInfo = {|
+type PortalLevelInfo = {
   id: string,
   zIndex: number | string,
-|}
+}
 
 const PORTAL_ROOT_PROPS_BY_LEVEL: { [PortalLevel]: PortalLevelInfo } = {
   page: { id: '__otAppModalPortalRoot', zIndex: 1 },
@@ -43,7 +43,7 @@ export function TopPortalRoot(): React.Node {
 export class Portal extends React.Component<Props, State> {
   $root: ?Element
 
-  static defaultProps: {| level: PortalLevel |} = {
+  static defaultProps: { level: PortalLevel } = {
     level: 'page',
   }
 

@@ -5,12 +5,12 @@ import * as Fixtures from '../__fixtures__'
 
 import type { ModulesAction } from '../types'
 
-type ActionSpec = {|
+type ActionSpec = {
   name: string,
   creator: (...Array<any>) => mixed,
   args: Array<mixed>,
   expected: ModulesAction,
-|}
+}
 
 describe('robot modules actions', () => {
   const SPECS: Array<ActionSpec> = [

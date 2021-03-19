@@ -19,7 +19,7 @@ import type { RequestState } from './types'
  * import { useDispatchApiRequest } from '../../robot-api'
  * import { fetchPipettes } from '../../pipettes'
  *
- * type Props = {| robotName: string |}
+ * type Props = { robotName: string }
  *
  * export function FetchPipettesButton(props: Props) {
  *   const { robotName } = props
@@ -72,7 +72,7 @@ export function useDispatchApiRequest<
  * import { fetchPipettes } from '../../pipettes'
  * import { fetchModules } from '../../modules'
  *
- * type Props = {| robotName: string |}
+ * type Props = { robotName: string }
  *
  * export function FetchPipettesButton(props: Props) {
  *   const { robotName } = props

@@ -15,48 +15,48 @@ import typeof {
 
 import type { AllLabwareCalibrations } from './../api-types'
 
-export type FetchLabwareCalibrationsAction = {|
+export type FetchLabwareCalibrationsAction = {
   type: FETCH_LABWARE_CALIBRATIONS,
-  payload: {| robotName: string |},
+  payload: { robotName: string },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchLabwareCalibrationsSuccessAction = {|
+export type FetchLabwareCalibrationsSuccessAction = {
   type: FETCH_LABWARE_CALIBRATIONS_SUCCESS,
-  payload: {|
+  payload: {
     robotName: string,
     labwareCalibrations: AllLabwareCalibrations,
-  |},
+  },
   meta: RobotApiRequestMeta,
-|}
+}
 
-export type FetchLabwareCalibrationsFailureAction = {|
+export type FetchLabwareCalibrationsFailureAction = {
   type: FETCH_LABWARE_CALIBRATIONS_FAILURE,
-  payload: {| robotName: string, error: RobotApiErrorResponse |},
+  payload: { robotName: string, error: RobotApiErrorResponse },
   meta: RobotApiRequestMeta,
-|}
+}
 
 // selector types
 
-export type LabwareCalibrationData = {| x: number, y: number, z: number |}
-export type LabwareSummary = {|
+export type LabwareCalibrationData = { x: number, y: number, z: number }
+export type LabwareSummary = {
   displayName: string,
   parentDisplayName: string | null,
   quantity: number,
   calibration: LabwareCalibrationData | null,
   calDataAvailable: boolean,
-|}
+}
 
 export type LabwareCalibrationAction =
   | FetchLabwareCalibrationsAction
   | FetchLabwareCalibrationsSuccessAction
   | FetchLabwareCalibrationsFailureAction
 
-export type BaseProtocolLabware = {|
+export type BaseProtocolLabware = {
   ...Labware,
   calibrationData: LabwareCalibrationData | null,
   loadName: string,
   namespace: string | null,
   version: number | null,
   parent: ModuleModel | null,
-|}
+}

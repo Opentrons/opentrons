@@ -77,12 +77,12 @@ describe('AppAdvancedSettingsCard', () => {
     expect(getDevtoolsToggle(wrapper).exists()).toBe(true)
   })
 
-  const SPECS: Array<{|
+  const SPECS: Array<{
     originalSettingValue: boolean | null,
     originalRadioValue: 'always-trash' | 'always-block' | 'always-prompt',
     newSettingValue: boolean | null,
     newRadioValue: 'always-trash' | 'always-block' | 'always-prompt',
-  |}> = [
+  }> = [
     {
       originalSettingValue: true,
       originalRadioValue: 'always-trash',

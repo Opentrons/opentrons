@@ -25,7 +25,7 @@ export const {
   failure: mockFetchWifiKeysFailure,
 }: ResponseFixtures<
   FetchWifiKeysResponse,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: GET,
   path: WIFI_KEYS_PATH,
@@ -42,7 +42,7 @@ export const {
   failure: mockPostWifiKeysFailure,
 }: ResponseFixtures<
   PostWifiKeysResponse,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: POST,
   path: WIFI_KEYS_PATH,

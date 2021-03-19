@@ -15,20 +15,20 @@ import type { CommandListProps } from './CommandList'
 
 export { ConfirmCancelModal } from './ConfirmCancelModal'
 
-type SP = {|
+type SP = {
   commands: Array<any>,
   sessionStatus: SessionStatus,
   sessionStatusInfo: SessionStatusInfo,
   showSpinner: boolean,
-|}
+}
 
-type DP = {|
+type DP = {
   onResetClick: () => mixed,
-|}
+}
 
-export const RunLog: React.AbstractComponent<{||}> = connect<
+export const RunLog: React.AbstractComponent<{}> = connect<
   CommandListProps,
-  {||},
+  {},
   _,
   _,
   _,

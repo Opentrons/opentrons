@@ -17,13 +17,13 @@ import {
 
 import type { StyleProps } from '@opentrons/components'
 
-export type TitledControlProps = {|
+export type TitledControlProps = {
   title: string,
   description: React.Node,
   control?: React.Node,
   children?: React.Node,
   ...StyleProps,
-|}
+}
 
 export function TitledControl({
   title,

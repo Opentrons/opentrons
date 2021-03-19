@@ -10,11 +10,11 @@ import { ModalPage } from '@opentrons/components'
 import { ConfirmModalContents } from './ConfirmModalContents'
 import styles from './styles.css'
 
-export type ConfirmModalProps = {|
+export type ConfirmModalProps = {
   labware: Labware,
   calibrateToBottom: boolean,
   onBackClick: () => mixed,
-|}
+}
 
 export function ConfirmModal(props: ConfirmModalProps): React.Node {
   const { labware, onBackClick, calibrateToBottom } = props

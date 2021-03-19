@@ -6,13 +6,13 @@ import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 import type { IconName } from '@opentrons/components'
 
-export type IconCtaProps = {|
+export type IconCtaProps = {
   name: string,
   iconName: IconName,
   text: string,
   className?: string,
   onClick: () => mixed,
-|}
+}
 
 export const IconCta = ({
   name,
