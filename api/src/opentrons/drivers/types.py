@@ -19,7 +19,7 @@ MoveSplits = Dict[str, MoveSplit]
 @dataclass
 class Temperature:
     """Tempdeck temperature and thermocycler plate temperature."""
-    current: float
+    current: Optional[float]
     target: Optional[float]
 
 

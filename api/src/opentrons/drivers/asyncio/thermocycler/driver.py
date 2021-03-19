@@ -135,10 +135,8 @@ class Thermocycler(AbstractThermocycler):
         response = await self._connection.send_command(
             data=c.build(), retries=DEFAULT_COMMAND_RETRIES
         )
-        temp_dict = utils.parse_temperature_response(
+        return utils.parse_temperature_response(
             temperature_string=response, rounding_val=utils.TC_GCODE_ROUNDING_PRECISION)
-        return Temperature(current=temp_dict['current'],
-                           target=temp_dict['target'])
 
     async def set_plate_temperature(
             self,
@@ -173,15 +171,8 @@ class Thermocycler(AbstractThermocycler):
         response = await self._connection.send_command(
             data=c.build(), retries=DEFAULT_COMMAND_RETRIES
         )
-        key_values = utils.parse_key_values(value=response)
-        return PlateTemperature(
-            current=utils.parse_number(
-                value=key_values.get('C', ""), rounding_val=utils.TC_GCODE_ROUNDING_PRECISION),
-            target=utils.parse_optional_number(
-                value=key_values.get('T', ""), rounding_val=utils.TC_GCODE_ROUNDING_PRECISION),
-            hold=utils.parse_optional_number(
-                value=key_values.get('H', ""), rounding_val=utils.TC_GCODE_ROUNDING_PRECISION)
-            )
+        return utils.parse_plate_temperature_response(
+            temperature_string=response, rounding_val=utils.TC_GCODE_ROUNDING_PRECISION)
 
     async def set_ramp_rate(self, ramp_rate: float) -> None:
         """Send a set ramp rate command"""

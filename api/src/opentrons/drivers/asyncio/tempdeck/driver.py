@@ -130,14 +130,9 @@ class TempDeck(AbstractTempDeck):
             gcode=GCODE.GET_TEMP
         )
         response = await self._send_command(command=c)
-        temperature = utils.parse_temperature_response(
+        return utils.parse_temperature_response(
             temperature_string=response,
             rounding_val=utils.TEMPDECK_GCODE_ROUNDING_PRECISION
-        )
-        log.debug(f"{temperature}")
-        return Temperature(
-            current=temperature.get("current"),
-            target=temperature.get("target")
         )
 
     async def get_device_info(self) -> Dict[str, str]:

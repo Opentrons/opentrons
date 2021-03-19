@@ -3,6 +3,8 @@ import time
 from typing import Dict, Optional, Mapping, Iterable, Sequence
 import re
 
+from opentrons.drivers.types import Temperature, PlateTemperature
+
 log = logging.getLogger(__name__)
 
 # Number of digits after the decimal point for temperatures being sent
@@ -69,19 +71,36 @@ def parse_key_from_substring(substring) -> str:
 
 def parse_temperature_response(
         temperature_string: str, rounding_val: int
-    ) -> Dict[str, Optional[float]]:
+    ) -> Temperature:
     """Example input: "T:none C:25"""
     data = parse_key_values(temperature_string)
-    if 'C' not in data or 'T' not in data:
+    try:
+        return Temperature(
+            current=parse_optional_number(data['C'], rounding_val),
+            target=parse_optional_number(data['T'], rounding_val)
+        )
+    except KeyError:
         raise ParseError(
             f'Unexpected argument to parse_temperature_response: '
             f'{temperature_string}'
         )
-    result = {
-        'current': parse_optional_number(data['C'], rounding_val),
-        'target': parse_optional_number(data['T'], rounding_val)
-    }
-    return result
+
+
+def parse_plate_temperature_response(
+        temperature_string: str, rounding_val: int
+    ) -> PlateTemperature:
+    """Example input: "T:none C:25 H:123"""
+    data = parse_key_values(temperature_string)
+    try:
+        return PlateTemperature(
+            current=parse_optional_number(data['C'], rounding_val),
+            target=parse_optional_number(data['T'], rounding_val),
+            hold=parse_optional_number(data['H'], rounding_val)
+        )
+    except KeyError:
+        raise ParseError(
+            f'Unexpected argument to parse_lid_temperature_response: {temperature_string}'
+        )
 
 
 def parse_device_information(
