@@ -1751,9 +1751,10 @@ class API(HardwareAPILike):
 
         # build new mods
         for mod in new_mods_at_ports:
+            serial_port = self._backend._usb.read_symlink(mod.port)
             new_instance = await self._backend.build_module(
                     port=mod.port,
-                    usb_port=self._backend._usb.find_port(mod.port),
+                    usb_port=self._backend._usb.find_port(serial_port),
                     model=mod.name,
                     interrupt_callback=self.pause_with_message,
                     loop=self.loop,

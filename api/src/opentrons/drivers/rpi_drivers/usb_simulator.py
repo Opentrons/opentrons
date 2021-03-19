@@ -37,6 +37,12 @@ class USBBusSimulator(USBDriverInterface):
         """
         pass
 
+    @staticmethod
+    def read_symlink(virtual_port: str) -> str:
+        """
+        """
+        return ''
+
     @property
     def usb_dev(self) -> List[USBPort]:
         """

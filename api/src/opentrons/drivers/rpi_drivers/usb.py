@@ -47,6 +47,19 @@ class USBBus(USBDriverInterface):
         return read
 
     @staticmethod
+    def read_symlink(virtual_port: str) -> str:
+        """
+        """
+        symlink = ''
+        try:
+            read = subprocess.check_output(
+                ['readlink', virtual_port]).strip().decode()
+            symlink = f'dev/{read}'
+        except Exception:
+            pass
+        return symlink
+
+    @staticmethod
     def convert_port_path(full_port_path: str) -> USBPort:
         """
         Convert port path.

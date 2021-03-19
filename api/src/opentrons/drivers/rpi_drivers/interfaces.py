@@ -14,6 +14,10 @@ class USBDriverInterface(Protocol):
     def convert_port_path(full_port_path: str) -> USBPort:
         ...
 
+    @staticmethod
+    def read_symlink(virtual_port: str) -> str:
+        ...
+
     @property
     def usb_dev(self) -> List[USBPort]:
         ...
