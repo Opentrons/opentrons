@@ -49,7 +49,7 @@ import {
 } from './components/optionsWithImages'
 import styles from './styles.css'
 
-import type { FormikProps, FormikTouched } from 'formik/@flow-typed'
+import type { FormikProps, FormikTouched } from 'formik'
 import type {
   LabwareDefinition2,
   WellBottomShape,
@@ -114,10 +114,10 @@ const makeAutofillOnChange = ({
   }
 }
 
-type HeightImgProps = {
-  labwareType: LabwareType | null | undefined,
-  aluminumBlockChildType: string | null | undefined,
-|}
+interface HeightImgProps {
+  labwareType: LabwareType | null | undefined
+  aluminumBlockChildType: string | null | undefined
+}
 
 const HeightImg = (props: HeightImgProps) => {
   const { labwareType, aluminumBlockChildType } = props
@@ -270,7 +270,7 @@ const getXYDimensionAlerts = (
   ) : null
 }
 
-export const LabwareCreator = (): React.Node => {
+export const LabwareCreator = (): JSX.Element => {
   const [
     showExportErrorModal,
     _setShowExportErrorModal,
