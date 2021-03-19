@@ -8,7 +8,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
-import { ConnectedStepItem } from '../ConnectedStepItem'
+import { ConnectedStepItem, getMetaSelectedSteps } from '../ConnectedStepItem'
 import { StepItem } from '../../components/steplist'
 import {
   ConfirmDeleteModal,
@@ -820,6 +820,55 @@ describe('ConnectedStepItem', () => {
           })
         }
       )
+    })
+  })
+})
+
+describe('getMetaSelectedSteps', () => {
+  describe('when already in multi select mode', () => {
+    it('should return the new steps and the original selected step', () => {
+      const multiSelectItemIds = ['1', '2']
+      const stepId = '3'
+      const singleSelectedId = null
+      expect(
+        getMetaSelectedSteps(multiSelectItemIds, stepId, singleSelectedId)
+      ).toEqual(['1', '2', '3'])
+    })
+    it('should remove the step if its already been selected', () => {
+      const multiSelectItemIds = ['1', '2']
+      const stepId = '2'
+      const singleSelectedId = null
+      expect(
+        getMetaSelectedSteps(multiSelectItemIds, stepId, singleSelectedId)
+      ).toEqual(['1'])
+    })
+  })
+  describe('when one step is selected (in single edit mode)', () => {
+    it('should return the original step and the new step', () => {
+      const multiSelectItemIds = null
+      const stepId = '2'
+      const singleSelectedId = '1'
+      expect(
+        getMetaSelectedSteps(multiSelectItemIds, stepId, singleSelectedId)
+      ).toEqual(['1', '2'])
+    })
+    it('should only return the original step once when it is the same as the selected step id', () => {
+      const multiSelectItemIds = null
+      const stepId = '2'
+      const singleSelectedId = '2'
+      expect(
+        getMetaSelectedSteps(multiSelectItemIds, stepId, singleSelectedId)
+      ).toEqual(['2'])
+    })
+  })
+  describe('when no steps are selected', () => {
+    it('should return the given step id', () => {
+      const multiSelectItemIds = null
+      const stepId = '2'
+      const singleSelectedId = null
+      expect(
+        getMetaSelectedSteps(multiSelectItemIds, stepId, singleSelectedId)
+      ).toEqual(['2'])
     })
   })
 })

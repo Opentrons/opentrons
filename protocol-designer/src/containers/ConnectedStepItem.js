@@ -239,16 +239,25 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     </>
   )
 }
-function getMetaSelectedSteps(multiSelectItemIds, stepId, selectedStepId) {
+export function getMetaSelectedSteps(
+  multiSelectItemIds: Array<StepIdType> | null,
+  stepId: StepIdType,
+  selectedStepId: StepIdType | null
+): Array<StepIdType> {
   let stepsToSelect: Array<StepIdType> = []
   if (multiSelectItemIds?.length) {
+    // already have a selection, add/remove the meta-clicked item
     stepsToSelect = multiSelectItemIds.includes(stepId)
       ? multiSelectItemIds.filter(id => id !== stepId)
       : [...multiSelectItemIds, stepId]
+  } else if (selectedStepId && selectedStepId === stepId) {
+    // meta-clicked on the selected single step
+    stepsToSelect = [selectedStepId]
   } else if (selectedStepId) {
-    stepsToSelect =
-      selectedStepId === stepId ? [selectedStepId] : [selectedStepId, stepId]
+    // meta-clicked on a different step, multi-select both
+    stepsToSelect = [selectedStepId, stepId]
   } else {
+    // meta-clicked on a step when a terminal item was selected
     stepsToSelect = [stepId]
   }
   return stepsToSelect
