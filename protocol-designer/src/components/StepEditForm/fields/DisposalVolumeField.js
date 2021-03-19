@@ -69,7 +69,7 @@ const DisposalVolumeFieldComponent = (props: Props) => {
 
   return (
     <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
-      <React.Fragment>
+      <>
         <div
           className={cx(styles.checkbox_row, {
             [styles.captioned_field]: volumeBoundsCaption,
@@ -93,27 +93,34 @@ const DisposalVolumeFieldComponent = (props: Props) => {
             />
           </div>
         ) : null}
-      </React.Fragment>
+      </>
     </FormGroup>
   )
 }
-const mapSTP = (state: BaseState): SP => {
-  const rawForm = stepFormSelectors.getUnsavedForm(state)
+const mapSTP = (state: BaseState, ownProps: OP): SP => {
+  const formValues = {
+    path: ownProps.path.value,
+    stepType: ownProps.stepType.value,
+    volume: ownProps.volume.value,
+    aspirate_airGap_checkbox: ownProps.aspirate_airGap_checkbox.value,
+    aspirate_airGap_volume: ownProps.aspirate_airGap_volume.value,
+  }
+  const blowoutLocationOptions = getBlowoutLocationOptionsForForm({
+    path: formValues.path,
+    stepType: formValues.stepType,
+  })
+
   const disposalLabwareOptions = uiLabwareSelectors.getDisposalLabwareOptions(
     state
   )
-  const blowoutLocationOptions = rawForm
-    ? getBlowoutLocationOptionsForForm({
-        path: rawForm.path,
-        stepType: rawForm.stepType,
-      })
-    : []
+
+  const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
+    formValues,
+    stepFormSelectors.getPipetteEntities(state)
+  )
 
   return {
-    maxDisposalVolume: getMaxDisposalVolumeForMultidispense(
-      rawForm,
-      stepFormSelectors.getPipetteEntities(state)
-    ),
+    maxDisposalVolume,
     disposalDestinationOptions: [
       ...disposalLabwareOptions,
       ...blowoutLocationOptions,

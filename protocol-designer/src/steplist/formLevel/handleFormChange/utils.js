@@ -57,7 +57,13 @@ export function getChannels(
 export const DISPOSAL_VOL_DIGITS = 1
 
 export function getMaxDisposalVolumeForMultidispense(
-  rawForm: ?FormData,
+  rawForm: {|
+    path: PathType,
+    volume: string | null,
+    pipette: string | null,
+    aspirate_airGap_checkbox?: boolean | null,
+    aspirate_airGap_volume?: string | null,
+  |},
   pipetteEntities: PipetteEntities
 ): ?number {
   // calculate max disposal volume for given volume & pipette. Might be negative!
