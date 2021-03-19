@@ -6,11 +6,27 @@ from tests.opentrons.conftest import fuzzy_assert
 from opentrons.config.robot_configs import (
     DEFAULT_GANTRY_STEPS_PER_MM, DEFAULT_PIPETTE_CONFIGS)
 from opentrons.drivers import serial_communication
-from opentrons.drivers.smoothie_drivers import driver_3_0
+from opentrons.drivers.asyncio.smoothie import driver as driver_3_0
 
 
 def position(x, y, z, a, b, c):
     return {axis: value for axis, value in zip('XYZABC', [x, y, z, a, b, c])}
+
+
+@pytest.fixture
+def smoothie(monkeypatch):
+    from opentrons.config import robot_configs
+
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
+    driver = driver_3_0.SmoothieDriver(robot_configs.load())
+    driver.connect()
+    yield driver
+    try:
+        driver.disconnect()
+    except AttributeError:
+        # if the test disconnected
+        pass
+    monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
 
 
 def test_update_position(smoothie, monkeypatch):
@@ -69,16 +85,16 @@ def test_remove_serial_echo(smoothie, monkeypatch):
     monkeypatch.setattr(serial_communication, 'write_and_return',
                         return_echo_response)
 
-    cmd = 'G28.2B'
+    cmd = driver_3_0._command_builder().with_gcode(gcode='G28.2B')
     res = smoothie._send_command(
         cmd, driver_3_0.SMOOTHIE_ACK)
     assert res == ''
     res = smoothie._send_command(
-        '\r\n' + cmd + '\r\n\r\n',
+        '\r\n' + cmd.build() + '\r\n\r\n',
         driver_3_0.SMOOTHIE_ACK)
     assert res == ''
     res = smoothie._send_command(
-        '\r\n' + cmd + '\r\n\r\nsome-data\r\nok\r\n',
+        '\r\n' + cmd.build() + '\r\n\r\nsome-data\r\nok\r\n',
         driver_3_0.SMOOTHIE_ACK)
     assert res == 'TESTS-RULE'
 
@@ -176,11 +192,11 @@ def test_disable_motor(smoothie, monkeypatch):
     smoothie.disengage_axis('XYZ')
     smoothie.disengage_axis('ABCD')
     expected = [
-        ['M18\s*X'],
+        ['M18 X'],
         ['M400'],
-        ['M18\s*[XYZ]+'],
+        ['M18 [XYZ]+'],
         ['M400'],
-        ['M18\s*[ABC]+'],
+        ['M18 [ABC]+'],
         ['M400'],
     ]
     fuzzy_assert(result=command_log, expected=expected)
@@ -206,37 +222,37 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.home()
     expected = [
-        ['M907 A0.8 B0.05 C0.05 X0.3 Y0.3 Z0.8 G4 P0.005 G28.2.+[ABCZ].+'],
+        ['M907 A0.8 B0.05 C0.05 X0.3 Y0.3 Z0.8 G4P0.005 G28.2.+[ABCZ].+'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
         ['M400'],
         ['M203.1 Y50'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4 P0.005 G91 G0 Y-28 G0 Y10 G90'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4P0.005 G91 G0Y-28 G0Y10 G90'],
         ['M400'],
         ['M203.1 X80'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4 P0.005 G28.2 X'],
+        ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G28.2X'],
         ['M400'],
         ['M203.1 A125 B40 C40 X600 Y400 Z125'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
         ['M400'],
         ['M203.1 Y80'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4 P0.005 G28.2 Y'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4P0.005 G28.2Y'],
         ['M400'],
         ['M203.1 Y8'],
         ['M400'],
-        ['G91 G0 Y-3 G90'],
+        ['G91 G0Y-3 G90'],
         ['M400'],
-        ['G28.2 Y'],
+        ['G28.2Y'],
         ['M400'],
-        ['G91 G0 Y-3 G90'],
+        ['G91 G0Y-3 G90'],
         ['M400'],
         ['M203.1 A125 B40 C40 X600 Y400 Z125'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
         ['M400'],
         ['M114.2'],
         ['M400'],
@@ -246,7 +262,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'A': 3})
     expected = [
-        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005 G0.+'],
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+'],
         ['M400'],
     ]
     fuzzy_assert(result=command_log, expected=expected)
@@ -254,9 +270,9 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'B': 2})
     expected = [
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005 G0B2'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B2'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
         ['M400'],
     ]
     fuzzy_assert(result=command_log, expected=expected)
@@ -271,10 +287,10 @@ def test_plunger_commands(smoothie, monkeypatch):
         'C': 5.55})
     expected = [
         # Set active axes high
-        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005 G0.+[BC].+'],
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+[BC].+'],
         ['M400'],
         # Set plunger current low
-        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005'],
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005'],
         ['M400'],
     ]
     fuzzy_assert(result=command_log, expected=expected)
@@ -309,18 +325,18 @@ def test_set_active_current(smoothie, monkeypatch):
     smoothie.home('BC')
     expected = [
         # move all
-        ['M907 A2 B2 C2 X2 Y2 Z2 G4 P0.005 G0 A0B0C0X0Y0Z0'],
+        ['M907 A2 B2 C2 X2 Y2 Z2 G4P0.005 G0A0B0C0X0Y0Z0'],
         ['M400'],
-        ['M907 A2 B0 C0 X2 Y2 Z2 G4 P0.005'],  # disable BC axes
+        ['M907 A2 B0 C0 X2 Y2 Z2 G4P0.005'],  # disable BC axes
         ['M400'],
         # move BC
-        ['M907 A0 B2 C2 X0 Y0 Z0 G4 P0.005 G0 B1.3 C1.3 G0 B1C1'],
+        ['M907 A0 B2 C2 X0 Y0 Z0 G4P0.005 G0B1.3C1.3 G0B1C1'],
         ['M400'],
-        ['M907 A0 B0 C0 X0 Y0 Z0 G4 P0.005'],  # disable BC axes
+        ['M907 A0 B0 C0 X0 Y0 Z0 G4P0.005'],  # disable BC axes
         ['M400'],
-        ['M907 A0 B0.42 C0.42 X0 Y0 Z0 G4 P0.005 G28.2 BC'],  # home BC
+        ['M907 A0 B0.42 C0.42 X0 Y0 Z0 G4P0.005 G28.2BC'],  # home BC
         ['M400'],
-        ['M907 A0 B0 C0 X0 Y0 Z0 G4 P0.005'],  # dwell all axes after home
+        ['M907 A0 B0 C0 X0 Y0 Z0 G4P0.005'],  # dwell all axes after home
         ['M400'],
         ['M114.2'],  # update the position
         ['M400'],
@@ -445,13 +461,13 @@ def test_read_and_write_pipettes(smoothie, monkeypatch):
     def _new_send_message(
             command, timeout=None, suppress_error_msg=True):
         nonlocal written_id, written_model, mount
-        if driver_3_0.GCODE.READ_INSTRUMENT_ID in command:
+        if driver_3_0.GCODES['READ_INSTRUMENT_ID'] in command:
             return mount + ': ' + written_id
-        elif driver_3_0.GCODE.READ_INSTRUMENT_MODEL in command:
+        elif driver_3_0.GCODES['READ_INSTRUMENT_MODEL'] in command:
             return mount + ': ' + written_model
-        if driver_3_0.GCODE.WRITE_INSTRUMENT_ID in command:
+        if driver_3_0.GCODES['WRITE_INSTRUMENT_ID'] in command:
             written_id = command[command.index(mount) + 1:]
-        elif driver_3_0.GCODE.WRITE_INSTRUMENT_MODEL in command:
+        elif driver_3_0.GCODES['WRITE_INSTRUMENT_MODEL'] in command:
             written_model = command[command.index(mount) + 1:]
 
     monkeypatch.setattr(driver, '_send_command', _new_send_message)
