@@ -26,7 +26,7 @@ import type {
 
 import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
 
-type MockState = Partial<{ ...State, config: null | Partial<Config> }>
+type MockState = Partial<State & ({config: null} | Partial<Config>)>
 
 jest.mock('../../protocol/selectors')
 jest.mock('../../robot/selectors')
@@ -40,7 +40,7 @@ describe('analytics selectors', () => {
   let mockState: MockState
 
   beforeEach(() => {
-    mockState = ({ mockState: true }: any)
+    mockState = ({ mockState: true }as any)
   })
 
   afterEach(() => {

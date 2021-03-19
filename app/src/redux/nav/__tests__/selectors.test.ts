@@ -84,7 +84,7 @@ const mockGetSessionIsLoaded: JestMockFn<
 const mockGetCommands: JestMockFn<
   [State],
   any
-> = (RobotSelectors.getCommands: any)
+> = (RobotSelectors.getCommandsas any)
 
 const mockGetDeckCalibrationStatus: JestMockFn<
   [State, string],
@@ -133,8 +133,8 @@ const EXPECTED_MORE = {
 }
 
 describe('nav selectors', () => {
-  const mockState: State = ({ mockState: true }: any)
-  const mockRobot: Robot = ({ mockRobot: true, name: 'mock-robot' }: any)
+  const mockState: State = ({ mockState: true }as any)
+  const mockRobot: Robot = ({ mockRobot: true, name: 'mock-robot' }as any)
 
   beforeEach(() => {
     mockGetConnectedRobot.mockReturnValue(null)

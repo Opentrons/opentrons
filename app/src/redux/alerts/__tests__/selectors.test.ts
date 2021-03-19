@@ -11,9 +11,9 @@ jest.mock('../../config/selectors')
 
 const getConfig: JestMockFn<[State], Partial<Config> | null> = Cfg.getConfig
 
-const MOCK_ALERT_1: AlertId = ('mockAlert1': any)
-const MOCK_ALERT_2: AlertId = ('mockAlert2': any)
-const MOCK_IGNORED_ALERT: AlertId = ('mockIgnoredAlert': any)
+const MOCK_ALERT_1: AlertId = 'mockAlert1' as any
+const MOCK_ALERT_2: AlertId = 'mockAlert2' as any
+const MOCK_IGNORED_ALERT: AlertId = 'mockIgnoredAlert' as any
 
 const MOCK_CONFIG: Partial<Config> = {
   alerts: { ignored: [MOCK_IGNORED_ALERT] },
@@ -32,9 +32,9 @@ describe('alerts selectors', () => {
   })
 
   it('should be able to get a list of active alerts', () => {
-    const state = ({
+    const state = {
       alerts: { active: [MOCK_ALERT_1, MOCK_ALERT_2], ignored: [] },
-    }as Partial<State>)
+    } as Partial<State>
 
     stubGetConfig(state)
 
@@ -45,9 +45,9 @@ describe('alerts selectors', () => {
   })
 
   it('should show no active alerts until config is loaded', () => {
-    const state = ({
+    const state = {
       alerts: { active: [MOCK_ALERT_1, MOCK_ALERT_2], ignored: [] },
-    }as Partial<State>)
+    } as Partial<State>
 
     stubGetConfig(state, null)
 
@@ -57,9 +57,9 @@ describe('alerts selectors', () => {
   it('should filter ignored alerts from active alerts', () => {
     // the reducer should never let this state happen, but let's protect
     // against it in the selector, too
-    const state = ({
+    const state = {
       alerts: { active: [MOCK_ALERT_1, MOCK_ALERT_2], ignored: [MOCK_ALERT_2] },
-    }as Partial<State>)
+    } as Partial<State>
 
     stubGetConfig(state)
 
@@ -67,9 +67,9 @@ describe('alerts selectors', () => {
   })
 
   it('should filter perma-ignored alerts from active alerts', () => {
-    const state = ({
+    const state = {
       alerts: { active: [MOCK_ALERT_1, MOCK_IGNORED_ALERT], ignored: [] },
-    }as Partial<State>)
+    } as Partial<State>
 
     stubGetConfig(state)
 
@@ -77,7 +77,7 @@ describe('alerts selectors', () => {
   })
 
   it('should be able to tell you if an alert is perma-ignored', () => {
-    const state = ({ alerts: { active: [], ignored: [] } }as Partial<State>)
+    const state = { alerts: { active: [], ignored: [] } } as Partial<State>
 
     stubGetConfig(state)
 
@@ -91,7 +91,7 @@ describe('alerts selectors', () => {
   })
 
   it('should return null for getAlertIsPermanentlyIgnored if config not initialized', () => {
-    const state = ({ alerts: { active: [], ignored: [] } }as Partial<State>)
+    const state = { alerts: { active: [], ignored: [] } } as Partial<State>
 
     stubGetConfig(state, null)
 

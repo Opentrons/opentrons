@@ -11,7 +11,7 @@ import {
 } from '../../__fixtures__'
 import { robotAdminEpic } from '..'
 
-const createConnectAction = robotName => (RobotActions.connect(robotName): any)
+const createConnectAction = robotName => RobotActions.connect(robotName) as any
 
 const createTimeSuccessResponse = (time: Date) => {
   const response = cloneDeep(mockFetchSystemTimeSuccess)

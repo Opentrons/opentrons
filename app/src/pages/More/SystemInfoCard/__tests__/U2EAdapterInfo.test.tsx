@@ -19,7 +19,7 @@ import type {
 jest.mock('../../../../redux/system-info/selectors')
 jest.mock('../../../../redux/analytics')
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = ({ mockState: true }as any)
 
 const MOCK_STORE = {
   getState: () => MOCK_STATE,

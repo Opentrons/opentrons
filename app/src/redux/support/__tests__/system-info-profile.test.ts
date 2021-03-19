@@ -15,7 +15,7 @@ const getU2EDeviceAnalyticsProps: JestMockFn<
   U2EAnalyticsProps | null
 > = SystemInfo.getU2EDeviceAnalyticsProps
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = { mockState: true } as any
 const MOCK_ANALYTICS_PROPS = {
   'U2E Vendor ID': Fixtures.mockRealtekDevice.vendorId,
   'U2E Product ID': Fixtures.mockRealtekDevice.productId,

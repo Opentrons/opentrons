@@ -5,7 +5,7 @@ import * as Selectors from '../selectors'
 import type { State } from '../../types'
 import type { Config } from '../types'
 
-type MockState = Partial<{ ...State, config: Partial<Config> | null }>
+type MockState = Partial<State & { config: Partial<Config> | null }>
 
 describe('shell selectors', () => {
   describe('getDevtoolsEnabled', () => {
@@ -28,7 +28,7 @@ describe('shell selectors', () => {
 
     it('should return config.devInternal if config is known', () => {
       const state: MockState = {
-        config: { devInternal: { [('feature': any)]: true } },
+        config: { devInternal: { ['feature' as any]: true } },
       }
       expect(Selectors.getFeatureFlags(state)).toEqual({ feature: true })
     })

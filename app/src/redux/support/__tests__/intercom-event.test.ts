@@ -22,7 +22,7 @@ const getAnalyticsHealthCheckData: JestMockFn<
 const sendIntercomEvent: JestMockFn<[string, IntercomPayload], void> =
   Binding.sendIntercomEvent
 
-const MOCK_STATE: Partial<{ ...State }> = {}
+const MOCK_STATE: Partial<State> = {}
 
 describe('support event tests', () => {
   afterEach(() => {

@@ -53,7 +53,7 @@ jest.mock('../PipetteOffsets', () => ({
   PipetteOffsets: () => <></>,
 }))
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = ({ mockState: true }as any)
 
 const mockGetIsRunning: JestMockFn<
   [State],
@@ -64,18 +64,18 @@ const mockUnconnectableRobot: ViewableRobot = ({
   name: 'robot-name',
   connected: true,
   status: UNREACHABLE,
-}: any)
+}as any)
 
 const mockRobot: ViewableRobot = ({
   name: 'robot-name',
   connected: true,
   status: CONNECTABLE,
-}: any)
+}as any)
 
 const mockAttachedPipettes: AttachedPipettesByMount = ({
   left: mockAttachedPipette,
   right: null,
-}: any)
+}as any)
 
 const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = ({
   left: {
@@ -86,7 +86,7 @@ const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = ({
     offset: null,
     tipLength: null,
   },
-}: any)
+}as any)
 
 const getAttachedPipettes: JestMockFn<
   [State, string],
@@ -224,7 +224,7 @@ describe('CalibrationCard', () => {
       name: 'robot-name',
       connected: false,
       status: CONNECTABLE,
-    }: any)
+    }as any)
 
     const { wrapper } = render(mockRobotNotConnected)
 

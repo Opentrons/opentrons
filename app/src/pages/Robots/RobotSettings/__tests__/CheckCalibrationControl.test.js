@@ -29,7 +29,7 @@ const getRobotSessionOfType: JestMockFn<
   >
 > = Sessions.getRobotSessionOfType
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = ({ mockState: true }as any)
 
 describe('CheckCalibrationControl', () => {
   const getCalCheckButton = wrapper =>

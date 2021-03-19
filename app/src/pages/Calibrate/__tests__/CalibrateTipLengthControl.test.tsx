@@ -45,7 +45,7 @@ const mockGetHasCalibrationBlock: JestMockFn<
 > = getHasCalibrationBlock
 
 const threehundredtiprack: LabwareDefinition2 = tiprack300Def
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = ({ mockState: true }as any)
 
 const stubUnconfirmedLabware = [
   ({

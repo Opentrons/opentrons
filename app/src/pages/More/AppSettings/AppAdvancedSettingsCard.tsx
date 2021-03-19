@@ -95,7 +95,7 @@ export function AppAdvancedSettingsCard(): React.Node {
             // field whose values are only the elements of BlockSelection; but sadly,
             // neither of us can get Flow to know it
             handleUseTrashSelection(
-              ((event.currentTarget.value: any): BlockSelection)
+              ((event.currentTarget.valueas any): BlockSelection)
             )
           }}
           options={[

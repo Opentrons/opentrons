@@ -26,7 +26,7 @@ jest.mock('../../../redux/custom-labware/selectors')
 const mockAttachedPipettes: AttachedPipettesByMount = ({
   left: mockAttachedPipette,
   right: null,
-}: any)
+}as any)
 
 const mockGetCalibrationForPipette: JestMockFn<
   [State, string, string, string],

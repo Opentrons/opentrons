@@ -150,7 +150,7 @@ describe('PipetteOffsetItem', () => {
 
   it('displays date and tiprack display name from def', () => {
     mockFindLabwareDefWithCustom.mockReturnValue(
-      ({ parameters: { loadName: 'opentrons_96_tiprack_300ul' } }: any)
+      ({ parameters: { loadName: 'opentrons_96_tiprack_300ul' } }as any)
     )
     mockGetLabwareDisplayName.mockReturnValue('Opentrons 96 Tiprack 300 fancy')
 
@@ -175,7 +175,7 @@ describe('PipetteOffsetItem', () => {
 
   it('displays a warning when its offset calibration is marked bad', () => {
     mockFindLabwareDefWithCustom.mockReturnValue(
-      ({ parameters: { loadName: 'opentrons_96_tiprack_300ul' } }: any)
+      ({ parameters: { loadName: 'opentrons_96_tiprack_300ul' } }as any)
     )
     mockGetLabwareDisplayName.mockReturnValue('Opentrons 96 Tiprack 300 fancy')
 
@@ -217,7 +217,7 @@ describe('PipetteOffsetItem', () => {
 
   it('displays a warning when its tip length calibration is marked bad', () => {
     mockFindLabwareDefWithCustom.mockReturnValue(
-      ({ parameters: { loadName: 'opentrons_96_tiprack_300ul' } }: any)
+      ({ parameters: { loadName: 'opentrons_96_tiprack_300ul' } }as any)
     )
     mockGetLabwareDisplayName.mockReturnValue('Opentrons 96 Tiprack 300 fancy')
 

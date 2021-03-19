@@ -38,7 +38,7 @@ const getRobotSystemType: JestMockFn<
   $Call<typeof Buildroot.getRobotSystemType, ViewableRobot>
 > = Buildroot.getRobotSystemType
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = ({ mockState: true }as any)
 
 describe('UpdateBuildroot wizard', () => {
   const closeModal = jest.fn()

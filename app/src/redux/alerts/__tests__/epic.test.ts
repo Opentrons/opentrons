@@ -13,9 +13,9 @@ jest.mock('../../config/selectors')
 
 const getConfig: JestMockFn<[State], Partial<Config> | null> = Cfg.getConfig
 
-const MOCK_STATE: State = ({ mockState: true }: any)
-const MOCK_ALERT_1: AlertId = ('mockAlert1': any)
-const MOCK_ALERT_2: AlertId = ('mockAlert2': any)
+const MOCK_STATE: State = { mockState: true } as any
+const MOCK_ALERT_1: AlertId = 'mockAlert1' as any
+const MOCK_ALERT_2: AlertId = 'mockAlert2' as any
 
 describe('alerts epic', () => {
   let testScheduler

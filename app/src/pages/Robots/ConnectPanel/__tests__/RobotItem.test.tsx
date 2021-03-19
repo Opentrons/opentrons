@@ -38,7 +38,7 @@ describe('ConnectPanel RobotItem', () => {
   const render = (robot = Fixtures.mockConnectableRobot, matchParams = {}) => {
     // TODO(mc, 2020-03-30): upgrade react-router to 5.1 for hooks
     // grab the wrapped component from react-router::withRouter
-    const Component = (RobotItem: any).WrappedComponent
+    const Component = (RobotItemas any).WrappedComponent
 
     const Wrapper = ({ children }: { children: React.Node }) => (
       <Provider store={store}>

@@ -44,7 +44,7 @@ export function InstrumentSettings(props: InstrumentSettingsProps): React.Node {
           render={routeProps => (
             <ChangePipette
               robotName={robotName}
-              mount={(routeProps.match.params.mount: any)}
+              mount={(routeProps.match.params.mountas any)}
               closeModal={routeProps.history.goBack}
             />
           )}
@@ -54,7 +54,7 @@ export function InstrumentSettings(props: InstrumentSettingsProps): React.Node {
           render={routeProps => (
             <ConfigurePipette
               robotName={robotName}
-              mount={(routeProps.match.params.mount: any)}
+              mount={(routeProps.match.params.mountas any)}
               closeModal={routeProps.history.goBack}
             />
           )}

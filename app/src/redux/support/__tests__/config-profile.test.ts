@@ -10,7 +10,7 @@ import type { AlertId } from '../../alerts/types'
 
 jest.mock('../../alerts/selectors')
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = { mockState: true } as any
 
 const getAlertIsPermanentlyIgnored: JestMockFn<
   [State, AlertId],

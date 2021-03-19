@@ -7,7 +7,7 @@ import type {
 
 // require all definitions in the labware/definitions/1 directory
 // require.context is webpack-specific method
-const labwareSchemaV1DefsContext = (require: any).context(
+const labwareSchemaV1DefsContext = (requireas any).context(
   '@opentrons/shared-data/labware/definitions/1',
   true, // traverse subdirectories
   /\.json$/, // import filter
@@ -33,7 +33,7 @@ export function getLegacyLabwareDef(
 
 // require all definitions in the labware/definitions/2 directory
 // require.context is webpack-specific method
-const labwareSchemaV2DefsContext = (require: any).context(
+const labwareSchemaV2DefsContext = (requireas any).context(
   '@opentrons/shared-data/labware/definitions/2',
   true, // traverse subdirectories
   /\.json$/, // import filter

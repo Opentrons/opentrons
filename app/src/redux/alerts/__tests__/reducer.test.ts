@@ -5,7 +5,7 @@ import { alertsReducer } from '../reducer'
 
 import type { AlertId } from '../types'
 
-const MOCK_ALERT_ID: AlertId = ('mockAlert': any)
+const MOCK_ALERT_ID: AlertId = 'mockAlert' as any
 
 describe('alerts reducer', () => {
   it('should handle ALERT_TRIGGERED', () => {

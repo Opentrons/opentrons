@@ -28,7 +28,7 @@ describe('config hooks', () => {
     }
 
     const mockStore = {
-      getState: () => ({ mockState: true }: any),
+      getState: () => ({ mockState: true }as any),
       dispatch: noop,
       subscribe: noop,
     }
@@ -48,28 +48,28 @@ describe('config hooks', () => {
     })
 
     it('should return false if the feature flag is set to false', () => {
-      getFeatureFlags.mockReturnValue(({ someFlag: false }: any))
+      getFeatureFlags.mockReturnValue(({ someFlag: false }as any))
 
       render('someFlag')
       expect(result).toBe(false)
     })
 
     it('should return false if the feature flag is set to falsey', () => {
-      getFeatureFlags.mockReturnValue(({ someFlag: (0: any) }: any))
+      getFeatureFlags.mockReturnValue(({ someFlag: (0as any) }as any))
 
       render('someFlag')
       expect(result).toBe(false)
     })
 
     it('should return true if the feature flag is set', () => {
-      getFeatureFlags.mockReturnValue(({ someFlag: true }: any))
+      getFeatureFlags.mockReturnValue(({ someFlag: true }as any))
 
       render('someFlag')
       expect(result).toBe(true)
     })
 
     it('should return true if the feature flag is set to truthy', () => {
-      getFeatureFlags.mockReturnValue(({ someFlag: (1: any) }: any))
+      getFeatureFlags.mockReturnValue(({ someFlag: (1as any) }as any))
 
       render('someFlag')
       expect(result).toBe(true)

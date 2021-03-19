@@ -191,12 +191,12 @@ describe('networking actions', () => {
     {
       name: 'can create networking:POST_WIFI_KEYS',
       creator: Actions.postWifiKeys,
-      args: [mockRobot.name, (({ name: 'key.crt' }: any): File)],
+      args: [mockRobot.name, (({ name: 'key.crt' }as any): File)],
       expected: {
         type: 'networking:POST_WIFI_KEYS',
         payload: {
           robotName: mockRobot.name,
-          keyFile: (({ name: 'key.crt' }: any): File),
+          keyFile: (({ name: 'key.crt' }as any): File),
         },
         meta: {},
       },

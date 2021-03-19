@@ -26,13 +26,13 @@ const mockRobot: ViewableRobot = ({
   name: 'robot-name',
   connected: true,
   status: CONNECTABLE,
-}: any)
+}as any)
 
 const mockUnconnectableRobot: ViewableRobot = ({
   name: 'robot-name',
   connected: true,
   status: UNREACHABLE,
-}: any)
+}as any)
 
 const mockGetLightsOn: JestMockFn<
   [State, string],
@@ -44,7 +44,7 @@ const mockGetIsRunning: JestMockFn<
   $Call<typeof RobotSelectors.getIsRunning, State>
 > = RobotSelectors.getIsRunning
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = ({ mockState: true }as any)
 
 describe('ControlsCard', () => {
   const render = (robot: ViewableRobot = mockRobot) => {
@@ -134,7 +134,7 @@ describe('ControlsCard', () => {
       name: 'robot-name',
       connected: false,
       status: CONNECTABLE,
-    }: any)
+    }as any)
 
     const { wrapper } = render(mockRobotNotConnected)
 

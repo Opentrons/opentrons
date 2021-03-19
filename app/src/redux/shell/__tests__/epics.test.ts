@@ -64,13 +64,13 @@ describe('shell epics', () => {
     const shellAction = { type: 'bar' }
     const result = shellEpic(EMPTY, EMPTY).pipe(take(1)).toPromise()
 
-    ;(mockIpc: any).emit('dispatch', {}, shellAction)
+    ;(mockIpcas any).emit('dispatch', {}, shellAction)
 
     return expect(result).resolves.toEqual(shellAction)
   })
 
   it('triggers an appUpdateAvailable alert if an app update becomes available', () => {
-    const mockState: State = ({ mockState: true }: any)
+    const mockState: State = ({ mockState: true }as any)
 
     getAvailableShellUpdate.mockReturnValueOnce(null)
     getAvailableShellUpdate.mockReturnValue('1.2.3')
@@ -89,7 +89,7 @@ describe('shell epics', () => {
   })
 
   it('should trigger a shell:CHECK_UPDATE action if the update channel changes', () => {
-    const mockState: State = ({ mockState: true }: any)
+    const mockState: State = ({ mockState: true }as any)
 
     getUpdateChannel.mockReturnValueOnce('latest')
     getUpdateChannel.mockReturnValue('beta')

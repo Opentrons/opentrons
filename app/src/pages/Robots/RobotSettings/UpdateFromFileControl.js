@@ -53,7 +53,7 @@ export function UpdateFromFileControl(
     if (files.length === 1 && !updateDisabled) {
       // NOTE: File.path is Electron-specific
       // https://electronjs.org/docs/api/file-object
-      dispatch(startBuildrootUpdate(robotName, (files[0]: any).path))
+      dispatch(startBuildrootUpdate(robotName, (files[0]as any).path))
     }
     // clear input value to allow same file to be selected again if necessary
     event.target.value = ''

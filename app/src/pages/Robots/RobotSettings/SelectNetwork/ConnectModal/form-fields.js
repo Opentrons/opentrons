@@ -211,7 +211,7 @@ export const connectFormToConfigureRequest = (
     values.securityType === Constants.SECURITY_WPA_PSK
   ) {
     // NOTE(mc, 2020-03-13): Flow v0.119 unable to refine via consts
-    securityType = ((values.securityType: any): WifiSecurityType)
+    securityType = ((values.securityTypeas any): WifiSecurityType)
   }
 
   if (ssid !== null && securityType !== null) {

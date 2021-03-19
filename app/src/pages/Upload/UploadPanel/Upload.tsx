@@ -25,9 +25,9 @@ export class Upload extends React.Component<UploadProps, UploadState> {
   ) => void = event => {
     let files: Array<File> = []
     if (event.dataTransfer && event.dataTransfer.files) {
-      files = (event.dataTransfer.files: any)
+      files = (event.dataTransfer.filesas any)
     } else if (event.target.files) {
-      files = (event.target.files: any)
+      files = (event.target.filesas any)
     }
 
     if (this.props.sessionLoaded) {

@@ -11,7 +11,7 @@ jest.mock('../../shell/remote', () => ({
 }))
 
 describe('config', () => {
-  let state: Partial<{ ...State, config: Partial<Config> }>
+  let state: Partial<State & { config: Partial<Config> }>
 
   beforeEach(() => {
     jest.clearAllMocks()

@@ -4,14 +4,14 @@ import { robotApiReducer } from '../reducer'
 import type { RobotApiState } from '../types'
 import { mockFailedRequestState } from '../__fixtures__'
 
-type ReducerSpec = {
-  name: string,
-  state: RobotApiState,
-  action: any,
-  expected: RobotApiState,
+interface ReducerSpec {
+  name: string
+  state: RobotApiState
+  action: any
+  expected: RobotApiState
 }
 
-const SPECS: Array<ReducerSpec> = [
+const SPECS: ReducerSpec[] = [
   {
     name: 'handles an action with meta.requestId and no response',
     state: { def: { status: 'pending' } },
@@ -30,7 +30,7 @@ const SPECS: Array<ReducerSpec> = [
       meta: { requestId: 'abc', response: { ok: true } },
     },
     expected: {
-      abc: { status: 'success', response: ({ ok: true }: any) },
+      abc: { status: 'success', response: { ok: true } as any },
       def: { status: 'pending' },
     },
   },
@@ -45,7 +45,7 @@ const SPECS: Array<ReducerSpec> = [
     expected: {
       abc: {
         status: 'failure',
-        response: ({ ok: false }: any),
+        response: { ok: false } as any,
         error: { message: 'AH' },
       },
       def: { status: 'pending' },

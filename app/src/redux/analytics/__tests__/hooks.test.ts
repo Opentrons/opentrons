@@ -19,7 +19,7 @@ const getConfig: JestMockFn<[State], Partial<Config> | null> = Cfg.getConfig
 const trackEvent: JestMockFn<[AnalyticsEvent, AnalyticsConfig], void> =
   Mixpanel.trackEvent
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = ({ mockState: true }as any)
 
 const MOCK_ANALYTICS_CONFIG = {
   appId: 'abc',

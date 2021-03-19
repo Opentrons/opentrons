@@ -255,10 +255,10 @@ export const uploadFileEpic: Epic = (_, state$) => {
   return state$.pipe(
     filter(passActiveSession({ stage: AWAITING_FILE, step: GET_TOKEN })),
     map<State, _>(stateWithSession => {
-      const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
+      const host: ViewableRobot = (getBuildrootRobot(stateWithSession)as any)
       const session = getBuildrootSession(stateWithSession)
-      const pathPrefix: string = (session?.pathPrefix: any)
-      const token: string = (session?.token: any)
+      const pathPrefix: string = (session?.pathPrefixas any)
+      const token: string = (session?.tokenas any)
       const systemFile = session?.userFileInfo?.systemFile || null
 
       return uploadBuildrootFile(
@@ -275,10 +275,10 @@ export const commitUpdateEpic: Epic = (_, state$) => {
   return state$.pipe(
     filter(passActiveSession({ stage: DONE, step: PROCESS_FILE })),
     switchMap<State, _, BuildrootAction>(stateWithSession => {
-      const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
+      const host: ViewableRobot = (getBuildrootRobot(stateWithSession)as any)
       const session = getBuildrootSession(stateWithSession)
-      const pathPrefix: string = (session?.pathPrefix: any)
-      const token: string = (session?.token: any)
+      const pathPrefix: string = (session?.pathPrefixas any)
+      const token: string = (session?.tokenas any)
       const path = `${pathPrefix}/${token}/commit`
       const request$ = fetchRobotApi(host, { method: POST, path }).pipe(
         filter(resp => !resp.ok),
@@ -301,7 +301,7 @@ export const restartAfterCommitEpic: Epic = (_, state$) => {
       passActiveSession({ stage: READY_FOR_RESTART, step: COMMIT_UPDATE })
     ),
     switchMap<State, _, _>(stateWithSession => {
-      const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
+      const host: ViewableRobot = (getBuildrootRobot(stateWithSession)as any)
       const path = host.serverHealth?.capabilities?.restart || RESTART_PATH
       const request$ = fetchRobotApi(host, { method: POST, path }).pipe(
         map(resp => {
@@ -348,7 +348,7 @@ export const watchForOnlineAfterRestartEpic: Epic = (_, state$) => {
     }),
     switchMap<State, _, _>(stateWithRobot => {
       const targetVersion = getBuildrootTargetVersion(stateWithRobot)
-      const robot: ViewableRobot = (getBuildrootRobot(stateWithRobot): any)
+      const robot: ViewableRobot = (getBuildrootRobot(stateWithRobot)as any)
       const robotVersion = getRobotApiVersion(robot)
       const actual = robotVersion || UNKNOWN
       const expected = targetVersion || UNKNOWN
@@ -386,7 +386,7 @@ export const removeMigratedRobotsEpic: Epic = (_, state$) => {
       )
     }),
     map<State, _>(stateWithRobotName => {
-      const robotName: string = (getBuildrootRobotName(stateWithRobotName): any)
+      const robotName: string = (getBuildrootRobotName(stateWithRobotName)as any)
       return removeRobot(robotName)
     })
   )

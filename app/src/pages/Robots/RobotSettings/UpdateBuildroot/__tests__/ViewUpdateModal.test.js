@@ -28,7 +28,7 @@ const getBuildrootDownloadError: JestMockFn<
   $Call<typeof Buildroot.getBuildrootDownloadError, State>
 > = Buildroot.getBuildrootDownloadError
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = ({ mockState: true }as any)
 const MOCK_ROBOT_NAME = 'robot-name'
 
 describe('ViewUpdateModal', () => {
