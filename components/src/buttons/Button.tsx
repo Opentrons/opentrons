@@ -12,15 +12,8 @@ import {
 } from '../primitives'
 
 import type { IconName } from '../icons'
+import type { UseHoverTooltipTargetProps } from '../tooltips'
 
-interface HoverTooltipHandlers {
-  ref: React.Ref<Element>
-  'aria-describedby': string
-  onMouseEnter: () => unknown
-  onMouseLeave: () => unknown
-  onPointerEnter: () => unknown
-  onPointerLeave: () => unknown
-}
 export interface ButtonProps {
   /** click handler */
   onClick?: (event: React.MouseEvent) => unknown
@@ -50,7 +43,7 @@ export interface ButtonProps {
   /** custom element or component to use instead of `<button>` */
   Component?: React.ComponentType<any> | keyof JSX.IntrinsicElements
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: Partial<HoverTooltipHandlers> | null | undefined
+  hoverTooltipHandlers?: UseHoverTooltipTargetProps | null | undefined
   /** html tabindex property */
   tabIndex?: number
   /** catch all prop for pass-through props */

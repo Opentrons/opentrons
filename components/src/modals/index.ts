@@ -1,4 +1,3 @@
-
 // modal components
 
 export * from './Modal'

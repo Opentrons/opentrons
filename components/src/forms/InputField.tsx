@@ -26,7 +26,7 @@ export interface InputFieldProps {
   /** placeholder text */
   placeholder?: string
   /** optional suffix component, appears to the right of input text */
-  units?: string // TODO: Ian 2018-10-30 rename to 'suffix'
+  units?: React.ReactNode // TODO: Ian 2018-10-30 rename to 'suffix'
   /** current value of text in box, defaults to '' */
   value?: string | null | undefined
   /** if included, InputField will use error style and display error instead of caption */

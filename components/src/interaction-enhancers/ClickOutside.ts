@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 interface ClickOutsideChildParams {
-  ref: React.Ref<Element>
+  ref: React.RefCallback<Element>
 }
 export interface ClickOutsideProps {
   onClickOutside: (

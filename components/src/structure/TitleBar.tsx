@@ -9,8 +9,8 @@ import styles from './structure.css'
 import type { ButtonProps } from '../buttons'
 
 export interface TitleBarProps {
-  title: string
-  subtitle?: string
+  title: React.ReactNode
+  subtitle?: React.ReactNode
   back?: ButtonProps
   className?: string
 

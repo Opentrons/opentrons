@@ -23,7 +23,7 @@ export interface PipetteSelectProps {
   /** whether or not "None" shows up as the default option */
   enableNoneOption?: boolean
   /** input tabIndex */
-  tabIndex?: string | null | undefined
+  tabIndex?: string | number | null | undefined
   /** classes to apply to the top-level component */
   className?: string
   /** custom id to be applied. likely to be used as a data test id for e2e testing */
@@ -84,7 +84,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       options={groupedOptions}
       value={value}
       defaultValue={defaultValue}
-      tabIndex={tabIndex}
+      tabIndex={tabIndex as string}
       id={id}
       onChange={option => {
         const isOptionGroupOrNull = Array.isArray(option) || option == null

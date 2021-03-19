@@ -1,5 +1,3 @@
-
-
 // ========= SPECIAL SELECTORS ========
 
 // This classname is used to find collisions with SelectionRect in Protocol Designer

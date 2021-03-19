@@ -3,6 +3,8 @@
   "version": "4.1.1",
   "description": "React components library for Opentrons' projects",
   "main": "lib/index.js",
+  "flow:main": "flow-types/index.js.flow",
+  "source": "src/index.ts",
   "types": "lib/index.d.ts",
   "style": "src/index.css",
   "repository": {
@@ -27,12 +29,12 @@
     "@types/react-router-dom": "^5.1.7",
     "@types/react-select": "^4.0.13",
     "@types/styled-components": "^5.1.7",
+    "@types/webpack-env": "^1.16.0",
     "classnames": "2.2.5",
     "lodash": "4.17.15",
     "react-popper": "1.0.0",
     "react-remove-scroll": "1.0.8",
     "react-select": "3.0.8",
     "styled-components": "5.1.1"
-  },
-  "devDependencies": {}
+  }
 }

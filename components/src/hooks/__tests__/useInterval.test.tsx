@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { useInterval } from '..'
@@ -16,7 +15,7 @@ describe('useInterval hook', () => {
     jest.useRealTimers()
   })
 
-  const TestUseInterval = (props: { delay: number | null }) => {
+  const TestUseInterval = (props: { delay: number | null }): JSX.Element => {
     useInterval(callback, props.delay)
     return <span />
   }

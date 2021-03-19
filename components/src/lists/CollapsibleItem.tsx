@@ -27,7 +27,7 @@ export function CollapsibleItem(props: CollapsibleItemProps): JSX.Element {
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
-  const handleCollapseToggle = (e: React.MouseEvent) => {
+  const handleCollapseToggle = (e: React.MouseEvent): void => {
     e.stopPropagation()
     onCollapseToggle(e)
   }

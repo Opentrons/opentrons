@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react'
 
 /**
@@ -9,8 +8,8 @@ import { useEffect, useRef } from 'react'
  * @param {T} value (value to keep track of)
  * @returns {(T | void)} (previous value or undefined if first render)
  */
-export function usePrevious<T>(value: T): T | void {
-  const prevRef = useRef<T | void>()
+export function usePrevious<T>(value: T): T | undefined {
+  const prevRef = useRef<T | undefined>()
 
   useEffect(() => {
     prevRef.current = value

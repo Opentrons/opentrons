@@ -4,7 +4,7 @@ import assert from 'assert'
 import type { RefObject } from 'react'
 
 export interface UseOnClickOutsideOptions {
-  onClickOutside?: (e: MouseEvent) => void
+  onClickOutside?: (e: MouseEvent) => unknown
 }
 
 export const useOnClickOutside = <E extends Element>(

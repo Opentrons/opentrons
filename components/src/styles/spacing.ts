@@ -1,5 +1,3 @@
-
-
 export const SPACING_AUTO = 'auto'
 
 // powers-of-two spacing scale

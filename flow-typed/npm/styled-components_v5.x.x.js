@@ -3,7 +3,11 @@
 
 // @flow
 
+import type { Properties } from 'csstype'
+
 declare module 'styled-components' {
+  declare export type CSSProperties = Properties<>
+
   declare class InterpolatableComponent<P> extends React$Component<P> {
     static +styledComponentId: string;
   }

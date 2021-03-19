@@ -1,4 +1,3 @@
-
 import { useReducer } from 'react'
 
 export type UseToggleResult = [boolean, () => void]

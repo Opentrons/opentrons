@@ -1,18 +1,18 @@
 import type { CSSProperties } from 'react'
 
-import type {
-  Instance as PopperInstance,
-  Options as PopperOptions,
-  Modifier as PopperModifer,
-} from '@popperjs/core'
+import type { Instance, Options, Modifier } from '@popperjs/core/lib/types'
 
 import type { UseHoverOptions, HoverHandlers } from '../interaction-enhancers'
 
-export type Placement = PopperOptions['placement']
+export type Placement = Options['placement']
 
-export type Strategy = PopperOptions['strategy']
+export type Strategy = Options['strategy']
 
-export type { PopperInstance, PopperOptions, PopperModifer }
+export type PopperInstance = Instance
+
+export type PopperOptions = Options
+
+export type PopperModifer<T> = Modifier<T>
 
 export type HandleStateUpdate = (
   placement: Placement,
@@ -32,7 +32,7 @@ export interface UsePopperOptions {
   offset?: number
 }
 
-export type UsePopperResult = PopperInstance | null
+export type UsePopperResult = Instance | null
 
 export interface UseTooltipOptions {
   placement?: Placement
@@ -41,7 +41,7 @@ export interface UseTooltipOptions {
 }
 
 export interface UseTooltipResultTargetProps {
-  ref: React.RefCallback<HTMLElement | null>
+  ref: React.RefCallback<Element | null>
   'aria-describedby': string
 }
 
@@ -63,8 +63,9 @@ export type UseHoverTooltipOptions = Partial<
   UseTooltipOptions & UseHoverOptions
 >
 
-export type UseHoverTooltipTargetProps = UseTooltipResultTargetProps &
-  HoverHandlers
+export interface UseHoverTooltipTargetProps
+  extends UseTooltipResultTargetProps,
+    HoverHandlers {}
 
 export type UseHoverTooltipResult = [
   UseHoverTooltipTargetProps,

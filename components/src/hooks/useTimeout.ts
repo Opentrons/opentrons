@@ -23,7 +23,7 @@ export function useTimeout(
 
   // set up the timeout
   useEffect(() => {
-    const currentCallback = () =>
+    const currentCallback = (): unknown =>
       savedCallback.current && savedCallback.current()
     if (delay !== null) {
       const id = setTimeout(currentCallback, delay)

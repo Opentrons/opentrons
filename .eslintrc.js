@@ -7,16 +7,9 @@ module.exports = {
     project: './*/tsconfig.json',
   },
 
-  extends: [
-    'standard-with-typescript',
-    'plugin:react/recommended',
-    'prettier/react',
-    'prettier/standard',
-    'prettier/@typescript-eslint',
-    'plugin:prettier/recommended',
-  ],
+  extends: ['standard-with-typescript', 'plugin:react/recommended', 'prettier'],
 
-  plugins: ['flowtype', 'react', 'react-hooks', 'json', 'prettier', 'jest'],
+  plugins: ['flowtype', 'react', 'react-hooks', 'json', 'jest'],
 
   rules: {
     camelcase: 'off',
@@ -39,7 +32,6 @@ module.exports = {
     'no-case-declarations': 'warn',
     'prefer-regex-literals': 'warn',
     'react/prop-types': 'warn',
-    '@typescript-eslint/strict-boolean-expressions': 'warn',
   },
 
   globals: {},
@@ -54,13 +46,33 @@ module.exports = {
       version: '16.8',
       flowVersion: '0.125.1',
     },
+    flowtype: {
+      onlyFilesWithFlowAnnotation: true,
+    },
   },
 
   overrides: [
     {
       files: ['**/*.js'],
       parser: '@babel/eslint-parser',
-      extends: ['plugin:flowtype/recommended', 'prettier/flowtype'],
+      extends: ['plugin:flowtype/recommended', 'prettier'],
+    },
+    {
+      // TODO(mc, 2021-03-18): remove to default these rules back to errors
+      files: ['**/*.@(ts|tsx)'],
+      rules: {
+        '@typescript-eslint/strict-boolean-expressions': 'warn',
+        '@typescript-eslint/prefer-nullish-coalescing': 'warn',
+        '@typescript-eslint/prefer-optional-chain': 'warn',
+        '@typescript-eslint/restrict-plus-operands': 'warn',
+      },
+    },
+    {
+      files: ['**/*.stories.tsx'],
+      rules: {
+        'import/no-default-export': 'off',
+        '@typescript-eslint/consistent-type-assertions': 'off',
+      },
     },
     {
       files: [

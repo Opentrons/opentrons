@@ -11,10 +11,13 @@ import {
 } from '..'
 
 describe('buttons', () => {
-  const onClick = () => {}
+  const onClick = jest.fn()
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
 
   it('creates a button with props', () => {
-    const onClick = jest.fn()
     const button = Renderer.create(
       <Button
         onClick={onClick}
@@ -34,7 +37,6 @@ describe('buttons', () => {
   })
 
   it('disabled sets onClick to undefined', () => {
-    const onClick = () => {}
     const button = Renderer.create(
       <Button onClick={onClick} disabled />
     ).root.findByType('button')

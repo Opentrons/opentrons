@@ -1,14 +1,17 @@
 // button component tests
-import React from 'react'
+import * as React from 'react'
 import Renderer from 'react-test-renderer'
 
 import { AlertItem } from '..'
 
 describe('alerts', () => {
-  const onCloseClick = () => {}
+  const onCloseClick = jest.fn()
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
 
   it('creates an alert with close button', () => {
-    const onCloseClick = jest.fn()
     const button = Renderer.create(
       <AlertItem
         type={'warning'}

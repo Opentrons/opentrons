@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import ReactSelect from 'react-select'
 import { shallow } from 'enzyme'

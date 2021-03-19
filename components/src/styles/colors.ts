@@ -1,5 +1,3 @@
-
-
 // gray scale
 export const C_BLACK = '#000000'
 export const C_DARK_GRAY = '#4a4a4a'
