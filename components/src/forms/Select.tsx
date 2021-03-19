@@ -7,7 +7,11 @@ import { POSITION_ABSOLUTE, POSITION_FIXED } from '../styles'
 import styles from './Select.css'
 
 import type { CSSObject } from 'styled-components'
-import type { MenuProps, IndicatorProps } from 'react-select'
+import type {
+  Props as ReactSelectProps,
+  MenuProps,
+  IndicatorProps,
+} from 'react-select'
 
 export { reactSelectComponents }
 
@@ -53,7 +57,7 @@ export type SelectPosition = typeof POSITION_ABSOLUTE | typeof POSITION_FIXED
 
 export type SelectOptionContext = typeof CONTEXT_MENU | typeof CONTEXT_VALUE
 
-export type SelectProps = React.ComponentProps<typeof Select>
+export type SelectProps = ReactSelectProps<SelectOption>
 
 const VOID_STYLE: unknown = undefined
 const NO_STYLE_FN = (): CSSObject => VOID_STYLE as CSSObject
@@ -85,27 +89,21 @@ const CLEAR_STYLES = {
   // valueContainer: _ => _,
 }
 
-export class Select extends ReactSelect<
-  SelectOption,
-  boolean,
-  SelectOptionGroup
-> {
-  render(): JSX.Element {
-    return (
-      <ReactSelect
-        {...this.props}
-        styles={CLEAR_STYLES}
-        classNamePrefix={SELECT_CX_PREFIX}
-        className={cx(styles.select, this.props.className)}
-        components={{ DropdownIndicator, Menu }}
-      />
-    )
-  }
+export function Select(props: SelectProps): JSX.Element {
+  return (
+    <ReactSelect
+      {...props}
+      styles={CLEAR_STYLES}
+      classNamePrefix={SELECT_CX_PREFIX}
+      className={cx(styles.select, props.className)}
+      components={{ DropdownIndicator, Menu }}
+    />
+  )
 }
 
 function DropdownIndicator(
-  props: IndicatorProps<SelectOption, boolean, SelectOptionGroup>
-): JSX.Element | null {
+  props: IndicatorProps<SelectOption, false>
+): JSX.Element {
   return (
     <reactSelectComponents.DropdownIndicator {...props}>
       <div
@@ -121,10 +119,8 @@ function DropdownIndicator(
 
 // TODO(bc, 2021-03-09): reactSelectComponents.Menu children type expects single element
 // add do nothing <> fragment around contents to satisfy react select type
-const Menu = (
-  props: MenuProps<SelectOption, boolean, SelectOptionGroup>
-): JSX.Element => (
-  /* @ts-expect-error */
+const Menu = (props: MenuProps<SelectOption, false>): JSX.Element => (
+  /* @ts-expect-error(mc, 2021-03-19): investigate this error, as Menu might require a single child */
   <reactSelectComponents.Menu {...props}>
     <div className={styles.menu}>{props.children}</div>
     <div className={styles.menu_control_bridge} />

@@ -72,7 +72,7 @@ exports[`alerts warning alert onCloseClick renders correctly 1`] = `
     </span>
     <button
       className="button_flat button_icon close"
-      onClick={[Function]}
+      onClick={[MockFunction]}
       type="button"
     >
       <svg
@@ -165,7 +165,7 @@ exports[`alerts warning alert with message body renders correctly 1`] = `
     </span>
     <button
       className="button_flat button_icon close"
-      onClick={[Function]}
+      onClick={[MockFunction]}
       type="button"
     >
       <svg

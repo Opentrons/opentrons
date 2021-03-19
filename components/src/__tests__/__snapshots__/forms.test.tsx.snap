@@ -36,6 +36,7 @@ exports[`CheckboxField renders correctly when checked 1`] = `
   <input
     checked={true}
     className="input_field accessibly_hidden"
+    onChange={[MockFunction]}
     type="checkbox"
   />
   <div
@@ -82,6 +83,7 @@ exports[`CheckboxField renders correctly when unchecked 1`] = `
   <input
     checked={false}
     className="input_field accessibly_hidden"
+    onChange={[MockFunction]}
     type="checkbox"
   />
   <div
@@ -113,6 +115,7 @@ exports[`DropdownField renders correctly with a falsey value 1`] = `
   >
     <select
       className="dropdown"
+      onChange={[MockFunction]}
       value=""
     >
       <option
@@ -187,6 +190,7 @@ exports[`DropdownField renders correctly with a value 1`] = `
   >
     <select
       className="dropdown"
+      onChange={[MockFunction]}
       value="rna"
     >
       <option
@@ -329,6 +333,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
     <input
       checked={false}
       className="input_field accessibly_hidden"
+      onChange={[MockFunction]}
       type="radio"
       value="hazelnut"
     />
@@ -361,6 +366,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
     <input
       checked={true}
       className="input_field accessibly_hidden"
+      onChange={[MockFunction]}
       type="radio"
       value="chocolate"
     />
@@ -393,6 +399,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
     <input
       checked={false}
       className="input_field accessibly_hidden"
+      onChange={[MockFunction]}
       type="radio"
       value="ginger"
     />
@@ -444,6 +451,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
     <input
       checked={false}
       className="input_field accessibly_hidden"
+      onChange={[MockFunction]}
       type="radio"
       value="hazelnut"
     />
@@ -476,6 +484,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
     <input
       checked={true}
       className="input_field accessibly_hidden"
+      onChange={[MockFunction]}
       type="radio"
       value="chocolate"
     />
@@ -508,6 +517,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
     <input
       checked={false}
       className="input_field accessibly_hidden"
+      onChange={[MockFunction]}
       type="radio"
       value="ginger"
     />
@@ -559,6 +569,7 @@ exports[`RadioGroup renders correctly with no checked value 1`] = `
     <input
       checked={false}
       className="input_field accessibly_hidden"
+      onChange={[MockFunction]}
       type="radio"
       value="hazelnut"
     />
@@ -591,6 +602,7 @@ exports[`RadioGroup renders correctly with no checked value 1`] = `
     <input
       checked={false}
       className="input_field accessibly_hidden"
+      onChange={[MockFunction]}
       type="radio"
       value="chocolate"
     />
@@ -623,6 +635,7 @@ exports[`RadioGroup renders correctly with no checked value 1`] = `
     <input
       checked={false}
       className="input_field accessibly_hidden"
+      onChange={[MockFunction]}
       type="radio"
       value="ginger"
     />

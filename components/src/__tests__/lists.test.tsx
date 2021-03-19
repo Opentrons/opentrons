@@ -104,7 +104,6 @@ describe('ListItem', () => {
 
     const link = root.findByType('a')
     expect(link.props.href).toBe(linkItemProps.url)
-    expect(link.props.disabled).toBe(false)
   })
 
   it('adds an optional svg icon as child', () => {

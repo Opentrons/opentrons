@@ -3,8 +3,8 @@
 exports[`InstrumentDiagram Multi-channel GEN2 renders correctly 1`] = `
 <div>
   <img
-    className=""
-    src="pipetteMulti.png"
+    className="flipped_image"
+    src="pipetteGEN2Multi.png"
   />
 </div>
 `;
@@ -21,8 +21,8 @@ exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
 exports[`InstrumentDiagram Single-channel GEN2 renders correctly 1`] = `
 <div>
   <img
-    className=""
-    src="pipetteMulti.png"
+    className="flipped_image"
+    src="pipetteGEN2Single.png"
   />
 </div>
 `;
@@ -31,7 +31,7 @@ exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
 <div>
   <img
     className=""
-    src="pipetteMulti.png"
+    src="pipetteSingle.png"
   />
 </div>
 `;

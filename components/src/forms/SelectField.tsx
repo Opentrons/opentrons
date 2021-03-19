@@ -13,7 +13,7 @@ export interface SelectFieldProps {
   /** field name */
   name: NonNullable<SelectProps['name']>
   /** react-Select option, usually label, value */
-  options: SelectProps['options']
+  options: NonNullable<SelectProps['options']>
   /** currently selected value */
   value: string | null | undefined
   /** disable the select */
@@ -50,9 +50,8 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
     onValueChange,
     onLoseFocus,
   } = props
-  const allOptions = options?.flatMap(og =>
-    'options' in og ? og.options : [og]
-  )
+  // @ts-expect-error(mc, 2021-03-19): resolve this error
+  const allOptions = options.flatMap(og => og.options || [og])
   const value = find(allOptions, opt => opt.value === props.value) || null
   const caption = error || props.caption
   const captionCx = cx(styles.select_caption, { [styles.error]: error })
@@ -70,10 +69,7 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
         placeholder={placeholder}
         menuPosition={menuPosition}
         formatOptionLabel={formatOptionLabel}
-        onChange={opt =>
-          onValueChange &&
-          onValueChange(name, opt != null && 'value' in opt ? opt.value : '')
-        }
+        onChange={opt => onValueChange && onValueChange(name, opt?.value || '')}
         onBlur={() => onLoseFocus && onLoseFocus(name)}
       />
       {caption && <p className={captionCx}>{caption}</p>}
