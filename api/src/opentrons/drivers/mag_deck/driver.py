@@ -3,9 +3,11 @@ import logging
 from threading import Event, Lock
 from time import sleep
 from typing import Dict, Optional, Mapping, Tuple
+
+from opentrons.drivers.utils import ParseError
 from serial.serialutil import SerialException  # type: ignore
 
-from opentrons.drivers import serial_communication
+from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
 
 """
@@ -58,84 +60,6 @@ class MagDeckError(Exception):
     pass
 
 
-class ParseError(Exception):
-    pass
-
-
-def _parse_string_value_from_substring(substring) -> str:
-    """
-    Returns the ascii value in the expected string "N:aa11bb22", where "N" is
-    the key, and "aa11bb22" is string value to be returned
-    """
-    try:
-        value = substring.split(':')[1]
-        return str(value)
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected arg to _parse_string_value_from_substring:')
-        raise ParseError(
-            'Unexpected arg to _parse_string_value_from_substring: {}'.format(
-                substring))
-
-
-def _parse_number_from_substring(substring) -> Optional[float]:
-    """
-    Returns the number in the expected string "N:12.3", where "N" is the
-    key, and "12.3" is a floating point value
-
-    For the magnetic module's height response like "height:12.34" "
-    "height:none" should return a None value
-    """
-    try:
-        value = substring.split(':')[1]
-        if value.strip().lower() == 'none':
-            return None
-        return round(float(value), GCODE_ROUNDING_PRECISION)
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to _parse_number_from_substring:')
-        raise ParseError(
-            'Unexpected argument to _parse_number_from_substring: {}'.format(
-                substring))
-
-
-def _parse_key_from_substring(substring) -> str:
-    """
-    Returns the key in the expected string "N:12.3", where "N" is the
-    key, and "12.3" is a floating point value
-    """
-    try:
-        return substring.split(':')[0]
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to _parse_key_from_substring:')
-        raise ParseError(
-            'Unexpected argument to _parse_key_from_substring: {}'.format(
-                substring))
-
-
-def _parse_device_information(device_info_string) -> Dict[str, str]:
-    """
-    Parse the magnetic module's device information response.
-    Example response from magnetic module:
-    "serial:aa11 model:bb22 version:cc33"
-    """
-    error_msg = 'Unexpected argument to _parse_device_information: {}'.format(
-        device_info_string)
-    if not device_info_string or \
-            not isinstance(device_info_string, str):
-        raise ParseError(error_msg)
-    parsed_values = device_info_string.strip().split(' ')
-    if len(parsed_values) < 3:
-        log.error(error_msg)
-        raise ParseError(error_msg)
-    res = {
-        _parse_key_from_substring(s): _parse_string_value_from_substring(s)
-        for s in parsed_values[:3]
-    }
-    for key in ['model', 'version', 'serial']:
-        if key not in res:
-            raise ParseError(error_msg)
-    return res
-
-
 def _parse_distance_response(distance_string) -> float:
     """
     Parse responses of 'GET_PLATE_HEIGHT' & 'GET_CURRENT_POSITION'
@@ -143,15 +67,14 @@ def _parse_distance_response(distance_string) -> float:
     GET_PLATE_HEIGHT: "height:12.34"
     GET_CURRENT_POSITION: "Z:12.34"
     """
-    err_msg = 'Unexpected argument to _parse_distance_response: {}'.format(
-        distance_string)
-    if not distance_string or \
-            not isinstance(distance_string, str):
-        raise ParseError(err_msg)
-    if 'Z' not in distance_string and 'height' not in distance_string:
-        raise ParseError(err_msg)
-    return _parse_number_from_substring(  # type: ignore
-        distance_string.strip())          # (preconditions checked above)
+    data = utils.parse_key_values(distance_string)
+    val = data.get('Z', data.get('height'))
+    if val is None:
+        raise utils.ParseError(
+            f'Unexpected argument to _parse_distance_response: '
+            f'{distance_string}')
+
+    return utils.parse_number(val, GCODE_ROUNDING_PRECISION)
 
 
 class SimulatingDriver:
@@ -431,10 +354,10 @@ class MagDeck:
         self._mag_position = distance
         return ''
 
-    def _recursive_get_info(self, retries) -> dict:
+    def _recursive_get_info(self, retries) -> Dict[str, str]:
         try:
             device_info = self._send_command(GCODES['DEVICE_INFO'])
-            return _parse_device_information(device_info)
+            return utils.parse_device_information(device_info)
         except ParseError as e:
             retries -= 1
             if retries <= 0:
