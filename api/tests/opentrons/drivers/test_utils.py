@@ -83,7 +83,7 @@ def test_parse_temperature_response_failure(input_str: str) -> None:
 )
 def test_parse_plate_temperature_response_success(
         input_str: str, expected_result: PlateTemperature
-    ) -> None:
+) -> None:
     """It should parse plate temperature response"""
     assert utils.parse_plate_temperature_response(input_str, 2) == expected_result
 

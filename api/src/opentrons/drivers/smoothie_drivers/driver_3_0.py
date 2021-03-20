@@ -17,7 +17,9 @@ from opentrons.config.robot_configs import current_for_revision
 from opentrons.drivers import serial_communication
 from opentrons.drivers.types import MoveSplits
 from opentrons.drivers.utils import (
-    AxisMoveTimestamp, parse_key_from_substring, parse_number_from_substring)
+    AxisMoveTimestamp, parse_key_from_substring, parse_number_from_substring,
+    parse_key_values, parse_number
+)
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 from opentrons.system import smoothie_update
@@ -192,17 +194,16 @@ def _parse_axis_from_substring(smoothie_substring):
     ).title()  # upper 1st letter
 
 
-def _parse_position_response(raw_axis_values):
-    parsed_values = raw_axis_values.strip().split(' ')
-    if len(parsed_values) < 8:
-        msg = 'Unexpected response in _parse_position_response: {}'.format(
-            raw_axis_values)
+def _parse_position_response(raw_axis_values) -> Dict[str, float]:
+    parsed_values = parse_key_values(raw_axis_values)
+    if len(parsed_values) < 6:
+        msg = f'Unexpected response in _parse_position_response: {raw_axis_values}'
         log.error(msg)
         raise ParseError(msg)
 
     data = {
-        _parse_axis_from_substring(s): _parse_number_from_substring(s)
-        for s in parsed_values[2:]  # remove first two items ('ok', 'MCS:')
+        k.title(): parse_number(v, GCODE_ROUNDING_PRECISION)
+        for k, v in parsed_values.items()
     }
     return data
 
@@ -279,24 +280,19 @@ def _parse_switch_values(raw_switch_values: str) -> Dict[str, bool]:
 
 def _parse_homing_status_values(raw_homing_status_values):
     """
-        Parse the Smoothieware response to a G28.6 command (homing-status)
-        A "1" means it has been homed, and "0" means it has not been homed
+    Parse the Smoothieware response to a G28.6 command (homing-status)
+    A "1" means it has been homed, and "0" means it has not been homed
 
-        Example response after homing just X axis:
-        "X:1 Y:0 Z:0 A:0 B:0 C:0"
+    Example response after homing just X axis:
+    "X:1 Y:0 Z:0 A:0 B:0 C:0"
 
-        returns: dict
-            Key is axis, value is True if the axis needs to be homed
+    returns: dict
+        Key is axis, value is True if the axis needs to be homed
     """
-    if not raw_homing_status_values or \
-            not isinstance(raw_homing_status_values, str):
-        raise ParseError(
-            'Unexpected argument to _parse_homing_status_values: {}'.format(
-                raw_homing_status_values))
-    parsed_values = raw_homing_status_values.strip().split(' ')
+    parsed_values = parse_key_values(raw_homing_status_values)
     res = {
-        _parse_axis_from_substring(s): bool(_parse_number_from_substring(s))
-        for s in parsed_values
+        k.title(): bool(parse_number(v, GCODE_ROUNDING_PRECISION))
+        for k, v in parsed_values.items()
     }
     if len(list(AXES) & res.keys()) != 6:
         raise ParseError(
