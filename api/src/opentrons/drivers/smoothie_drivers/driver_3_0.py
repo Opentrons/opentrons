@@ -994,7 +994,7 @@ class SmoothieDriver_3_0_0:
         This methods writes a sequence of newline characters, which will
         guarantee Smoothieware responds with 'ok\r\nok\r\n' within 3 seconds
         """
-        self._send_command('\r\n', timeout=SMOOTHIE_BOOT_TIMEOUT)
+        self._send_command(_command_builder(), timeout=SMOOTHIE_BOOT_TIMEOUT)
 
     def _reset_from_error(self):
         # smoothieware will ignore new messages for a short time
