@@ -1516,10 +1516,6 @@ class SmoothieDriver_3_0_0:
 
         checked_speed = speed or self._combined_speed
 
-        command = ''
-        split_prefix = ''
-        split_postfix = ''
-
         if split_command_string:
             # set fullstepping if necessary
             step_prefix, step_postfix = self._build_fullstep_configurations(
@@ -1534,35 +1530,56 @@ class SmoothieDriver_3_0_0:
 
             # use the higher current from the split config without changing
             # our global cache
-            split_prefix = step_prefix\
-                + self._build_speed_command(split_speed) + ' '
+            split_prefix = step_prefix.with_builder(
+                self._build_speed_command(split_speed)
+            )
             cached = {}
             for ax in split_target.keys():
                 cached[ax] = self.current[ax]
                 self.current[ax] = self._move_split_config[ax].split_current
-            split_prefix += self._generate_current_command()
+            split_prefix = self._generate_current_command()
             for ax in split_target.keys():
                 self.current[ax] = cached[ax]
 
-            split_postfix = step_postfix.strip()
-            split_command = GCODES['MOVE'] + split_command_string
+            split_postfix = step_postfix
+            split_command = _command_builder().with_gcode(
+                gcode=GCODE.MOVE
+            ).add_word(
+                word=split_command_string
+            )
         else:
-            split_prefix = ''
-            split_command = ''
-            split_postfix = ''
+            split_prefix = _command_builder()
+            split_command = _command_builder()
+            split_postfix = _command_builder()
+
+        command = _command_builder()
 
         if split_command_string or (checked_speed != self._combined_speed):
-            command += self._build_speed_command(checked_speed) + ' '
+            command.with_builder(
+                builder=self._build_speed_command(checked_speed)
+            )
 
         # introduce the standard currents
-        command += self._generate_current_command() + ' '
+        command.with_builder(
+            builder=self._generate_current_command()
+        )
 
         if backlash_command_string:
-            command += GCODES['MOVE'] + backlash_command_string + ' '
+            command.with_gcode(
+                gcode=GCODE.MOVE
+            ).add_word(
+                word=backlash_command_string
+            )
 
-        command += GCODES['MOVE'] + primary_command_string
+        command.with_gcode(
+            GCODE.MOVE
+        ).add_word(
+            primary_command_string
+        )
         if checked_speed != self._combined_speed:
-            command += ' ' + self._build_speed_command(self._combined_speed)
+            command.with_builder(
+                builder=self._build_speed_command(self._combined_speed)
+            )
 
         for axis in target.keys():
             self.engaged_axes[axis] = True

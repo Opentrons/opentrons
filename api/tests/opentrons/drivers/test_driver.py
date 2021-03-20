@@ -445,13 +445,13 @@ def test_read_and_write_pipettes(smoothie, monkeypatch):
     def _new_send_message(
             command, timeout=None, suppress_error_msg=True):
         nonlocal written_id, written_model, mount
-        if driver_3_0.GCODE.READ_INSTRUMENT_ID in command:
+        if driver_3_0.GCODE.READ_INSTRUMENT_ID in command.build():
             return mount + ': ' + written_id
-        elif driver_3_0.GCODE.READ_INSTRUMENT_MODEL in command:
+        elif driver_3_0.GCODE.READ_INSTRUMENT_MODEL in command.build():
             return mount + ': ' + written_model
-        if driver_3_0.GCODE.WRITE_INSTRUMENT_ID in command:
+        if driver_3_0.GCODE.WRITE_INSTRUMENT_ID in command.build():
             written_id = command[command.index(mount) + 1:]
-        elif driver_3_0.GCODE.WRITE_INSTRUMENT_MODEL in command:
+        elif driver_3_0.GCODE.WRITE_INSTRUMENT_MODEL in command.build():
             written_model = command[command.index(mount) + 1:]
 
     monkeypatch.setattr(driver, '_send_command', _new_send_message)
@@ -591,9 +591,9 @@ def test_clear_limit_switch(smoothie, monkeypatch):
     def write_mock(command, ack, serial_connection, timeout, tag=None):
         nonlocal cmd_list
         cmd_list.append(command)
-        if driver_3_0.GCODES['MOVE'] in command:
+        if driver_3_0.GCODE.MOVE in command:
             return "ALARM: Hard limit +C"
-        elif driver_3_0.GCODES['CURRENT_POSITION'] in command:
+        elif driver_3_0.GCODE.CURRENT_POSITION in command:
             return 'ok M114.2 X:10 Y:20 Z:30 A:40 B:50 C:60'
         else:
             return "ok"
