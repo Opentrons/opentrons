@@ -492,8 +492,7 @@ class SmoothieDriver_3_0_0:
             res = '1234567890'
         else:
             try:
-                res = self._read_from_pipette(
-                    GCODES['READ_INSTRUMENT_ID'], mount)
+                res = self._read_from_pipette(GCODE.READ_INSTRUMENT_ID, mount)
             except UnicodeDecodeError:
                 log.exception("Failed to decode pipette ID string:")
                 res = None
@@ -552,8 +551,7 @@ class SmoothieDriver_3_0_0:
         data_string:
             String (str) that is unique to this model of pipette
         """
-        self._write_to_pipette(
-            GCODES['WRITE_INSTRUMENT_MODEL'], mount, data_string)
+        self._write_to_pipette(GCODE.WRITE_INSTRUMENT_MODEL, mount, data_string)
 
     def update_pipette_config(
             self, axis: str, data: Dict[str, float])\
@@ -1074,7 +1072,7 @@ class SmoothieDriver_3_0_0:
                     error_axis = AXES
                 log.info("Homing after alarm/error")
                 self.home(error_axis)
-            raise SmoothieError(se.ret_code, command)
+            raise SmoothieError(se.ret_code, str(command))
 
     def _send_command_unsynchronized(self,
                                      command: CommandBuilder,
@@ -1351,7 +1349,8 @@ class SmoothieDriver_3_0_0:
             self.delay(PIPETTE_READ_DELAY)
             # request from Smoothieware the information from that pipette
             res = self._send_command(
-                gcode + allowed_mount, suppress_error_msg=True)
+                _command_builder().with_gcode(gcode=gcode).add_word(allowed_mount),
+                suppress_error_msg=True)
             if res:
                 res = _parse_instrument_data(res)
                 assert allowed_mount in res
@@ -1393,7 +1392,13 @@ class SmoothieDriver_3_0_0:
         # to avoid firmware weirdness in how it parses GCode arguments
         byte_string = _byte_array_to_hex_string(
             bytearray(data_string.encode()))
-        command = gcode + allowed_mount + byte_string
+        command = _command_builder().with_gcode(
+            gcode=gcode
+        ).add_word(
+            word=allowed_mount
+        ).add_word(
+            word=byte_string
+        )
         log.debug("_write_to_pipette: {}".format(command))
         self._send_command(command)
 

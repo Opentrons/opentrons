@@ -1,4 +1,4 @@
-from opentrons.drivers.asyncio.communication import CommandBuilder
+from opentrons.drivers.command_builder import CommandBuilder
 
 
 def test_builder_create_command_with_terminator() -> None:

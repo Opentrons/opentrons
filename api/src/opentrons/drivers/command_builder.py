@@ -86,3 +86,9 @@ class CommandBuilder:
 
     def __str__(self) -> str:
         return self.build()
+
+    def __iter__(self):
+        return iter(self._words)
+
+    def __bool__(self) -> bool:
+        return len(self._words) != 0

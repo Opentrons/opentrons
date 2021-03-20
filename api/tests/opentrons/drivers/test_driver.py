@@ -254,7 +254,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'B': 2})
     expected = [
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005 G0B2'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005 G0 B2'],
         ['M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
         ['M400'],
@@ -314,7 +314,7 @@ def test_set_active_current(smoothie, monkeypatch):
         ['M907 A2 B0 C0 X2 Y2 Z2 G4 P0.005'],  # disable BC axes
         ['M400'],
         # move BC
-        ['M907 A0 B2 C2 X0 Y0 Z0 G4 P0.005 G0 B1.3 C1.3 G0 B1C1'],
+        ['M907 A0 B2 C2 X0 Y0 Z0 G4 P0.005 G0 B1.3C1.3 G0 B1C1'],
         ['M400'],
         ['M907 A0 B0 C0 X0 Y0 Z0 G4 P0.005'],  # disable BC axes
         ['M400'],
@@ -445,14 +445,16 @@ def test_read_and_write_pipettes(smoothie, monkeypatch):
     def _new_send_message(
             command, timeout=None, suppress_error_msg=True):
         nonlocal written_id, written_model, mount
-        if driver_3_0.GCODE.READ_INSTRUMENT_ID in command.build():
+        if driver_3_0.GCODE.READ_INSTRUMENT_ID in command:
             return mount + ': ' + written_id
-        elif driver_3_0.GCODE.READ_INSTRUMENT_MODEL in command.build():
+        elif driver_3_0.GCODE.READ_INSTRUMENT_MODEL in command:
             return mount + ': ' + written_model
-        if driver_3_0.GCODE.WRITE_INSTRUMENT_ID in command.build():
-            written_id = command[command.index(mount) + 1:]
-        elif driver_3_0.GCODE.WRITE_INSTRUMENT_MODEL in command.build():
-            written_model = command[command.index(mount) + 1:]
+        if driver_3_0.GCODE.WRITE_INSTRUMENT_ID in command:
+            cmdstr = str(command)
+            written_id = cmdstr[cmdstr.index(mount) + 1:]
+        elif driver_3_0.GCODE.WRITE_INSTRUMENT_MODEL in command:
+            cmdstr = str(command)
+            written_model = cmdstr[cmdstr.index(mount) + 1:]
 
     monkeypatch.setattr(driver, '_send_command', _new_send_message)
 
@@ -607,19 +609,19 @@ def test_clear_limit_switch(smoothie, monkeypatch):
 
     assert [c.strip() for c in cmd_list] == [
         # attempt to move and fail
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005 G0 C100.3 G0 C100',
         # recover from failure
         'M999',
         'M400',
         # set current for homing the failed axis (C)
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005 G28.2 C',
         'M400',
         # set current back to idling after home
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005',
         'M400',
         # update position
         'M114.2',
         'M400',
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005',
         'M400',
     ]
