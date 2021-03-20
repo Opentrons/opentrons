@@ -1,6 +1,9 @@
 import logging
 import time
 from typing import Dict, Optional, Mapping, Iterable, Sequence
+import re
+
+from opentrons.drivers.types import Temperature, PlateTemperature
 
 log = logging.getLogger(__name__)
 
@@ -8,6 +11,9 @@ log = logging.getLogger(__name__)
 # to/from Temp-Deck
 TEMPDECK_GCODE_ROUNDING_PRECISION = 0
 TC_GCODE_ROUNDING_PRECISION = 2
+
+
+KEY_VALUE_REGEX = re.compile(r"((?P<key>\S+):(?P<value>\S+))")
 
 
 class ParseError(Exception):
@@ -65,58 +71,83 @@ def parse_key_from_substring(substring) -> str:
 
 def parse_temperature_response(
         temperature_string: str, rounding_val: int
-        ) -> Mapping[str, Optional[float]]:
-    """
-    Example input: "T:none C:25"
-    """
-    err_msg = 'Unexpected argument to parse_temperature_response: {}'.format(
-        temperature_string)
-    if not temperature_string or \
-            not isinstance(temperature_string, str):
-        raise ParseError(err_msg)
-    parsed_values = temperature_string.strip().split(' ')
-    if len(parsed_values) < 2:
-        log.error(err_msg)
-        raise ParseError(err_msg)
+    ) -> Temperature:
+    """Example input: "T:none C:25"""
+    data = parse_key_values(temperature_string)
+    try:
+        return Temperature(
+            current=parse_optional_number(data['C'], rounding_val),
+            target=parse_optional_number(data['T'], rounding_val)
+        )
+    except KeyError:
+        raise ParseError(
+            f'Unexpected argument to parse_temperature_response: '
+            f'{temperature_string}'
+        )
 
-    data = {
-        parse_key_from_substring(s): parse_number_from_substring(s,
-                                                                 rounding_val)
-        for s in parsed_values[:2]
-    }
-    if 'C' not in data or 'T' not in data:
-        raise ParseError(err_msg)
-    data = {
-        'current': data['C'],
-        'target': data['T']
-    }
-    return data
+
+def parse_plate_temperature_response(
+        temperature_string: str, rounding_val: int
+    ) -> PlateTemperature:
+    """Example input: "T:none C:25 H:123"""
+    data = parse_key_values(temperature_string)
+    try:
+        return PlateTemperature(
+            current=parse_optional_number(data['C'], rounding_val),
+            target=parse_optional_number(data['T'], rounding_val),
+            hold=parse_optional_number(data['H'], rounding_val)
+        )
+    except KeyError:
+        raise ParseError(
+            f'Unexpected argument to parse_lid_temperature_response: {temperature_string}'
+        )
 
 
 def parse_device_information(
-        device_info_string: str) -> Mapping[str, str]:
+        device_info_string: str) -> Dict[str, str]:
     """
-        Parse the modules's device information response.
+    Parse the modules's device information response.
 
-        Example response from temp-deck: "serial:aa11 model:bb22 version:cc33"
+    Example response from temp-deck: "serial:aa11 model:bb22 version:cc33"
     """
-    error_msg = 'Unexpected argument to parse_device_information: {}'.format(
-        device_info_string)
-    if not device_info_string or \
-            not isinstance(device_info_string, str):
-        raise ParseError(error_msg)
-    parsed_values = device_info_string.strip().split(' ')
-    if len(parsed_values) < 3:
-        log.error(error_msg)
-        raise ParseError(error_msg)
-    res = {
-        parse_key_from_substring(s): parse_string_value_from_substring(s)
-        for s in parsed_values[:3]
-    }
+    res = parse_key_values(device_info_string)
+
     for key in ['model', 'version', 'serial']:
         if key not in res:
-            raise ParseError(error_msg)
+            raise ParseError(f'Missing key {key} from device info '
+                             f'string {device_info_string}.')
     return res
+
+
+def parse_key_values(value: str) -> Dict[str, str]:
+    """Convert string in the format:
+        'key1:value1 key2:value2'
+        to dict
+        {'key1': 'value1', 'key2': 'value2'}
+    """
+    if not value or not isinstance(value, str):
+        raise ParseError(
+            f'Unexpected argument to parse_key_values: {value}'
+        )
+
+    res = {g.groupdict()['key']: g.groupdict()['value']
+           for g in KEY_VALUE_REGEX.finditer(value)}
+    return res
+
+
+def parse_optional_number(value: str, rounding_val) -> Optional[float]:
+    """Convert number to float. 'none' will be converted to None"""
+    return None if value == "none" else parse_number(value, rounding_val)
+
+
+def parse_number(value: str, rounding_val: int) -> float:
+    """Convert string to float."""
+    try:
+        return round(float(value), rounding_val)
+    except (ValueError, IndexError, TypeError, AttributeError):
+        err = f'Unexpected argument to parse_number: {value}'
+        log.exception(err)
+        raise ParseError(err)
 
 
 class AxisMoveTimestamp:
