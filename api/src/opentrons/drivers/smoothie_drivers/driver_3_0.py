@@ -109,6 +109,7 @@ class GCODE(str, Enum):
     MICROSTEPPING_B_DISABLE = "M53"
     MICROSTEPPING_C_ENABLE = "M54"
     MICROSTEPPING_C_DISABLE = "M55"
+    VERSION = "version"
 
 
 MICROSTEPPING_GCODES = {
@@ -654,7 +655,7 @@ class SmoothieDriver_3_0_0:
         """
         version = 'Virtual Smoothie'
         if not self.simulating:
-            version = self._send_command('version')
+            version = self._send_command(_command_builder().with_gcode(gcode=GCODE.VERSION))
             version = version.split(',')[0].split(':')[-1].strip()
             version = version.replace('NOMSD', '')
         return version
