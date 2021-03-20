@@ -58,41 +58,29 @@ def test_update_position(smoothie, monkeypatch):
     assert driver.position == expected
 
 
-def test_remove_serial_echo(smoothie, monkeypatch):
-    smoothie.simulating = False
-
-    def return_echo_response(command, ack, connection, timeout, tag=None):
-        if 'some-data' in command:
-            return command + 'TESTS-RULE'
-        return command
-
-    monkeypatch.setattr(serial_communication, 'write_and_return',
-                        return_echo_response)
-
-    cmd = 'G28.2B'
-    res = smoothie._send_command(
-        cmd, driver_3_0.SMOOTHIE_ACK)
+def test_remove_serial_echo(smoothie):
+    gcode = 'G28.2B'
+    cmd = gcode
+    res = smoothie._remove_unwanted_characters(
+        cmd, cmd)
     assert res == ''
-    res = smoothie._send_command(
-        '\r\n' + cmd + '\r\n\r\n',
-        driver_3_0.SMOOTHIE_ACK)
+    cmd = f'\r\n{gcode}\r\n\r\n'
+    res = smoothie._remove_unwanted_characters(
+        cmd,
+        cmd)
     assert res == ''
-    res = smoothie._send_command(
-        '\r\n' + cmd + '\r\n\r\nsome-data\r\nok\r\n',
-        driver_3_0.SMOOTHIE_ACK)
+    cmd = f'\r\n{gcode}\r\n\r\nsome-data\r\nok\r\n'
+    response = cmd + "TESTS-RULE"
+    res = smoothie._remove_unwanted_characters(
+        cmd,
+        response)
     assert res == 'TESTS-RULE'
 
-    def return_echo_response(command, ack, connection, timeout, tag=None):
-        if 'some-data' in command:
-            return command.strip() + '\r\nT\r\nESTS-RULE'
-        return command
-
-    monkeypatch.setattr(serial_communication, 'write_and_return',
-                        return_echo_response)
-
-    res = smoothie._send_command(
-        '\r\n' + cmd + '\r\n\r\nsome-data\r\nok\r\n',
-        driver_3_0.SMOOTHIE_ACK)
+    cmd = f'\r\n{gcode}\r\n\r\nsome-data\r\nok\r\n'
+    response = cmd.strip() + '\r\nT\r\nESTS-RULE'
+    res = smoothie._remove_unwanted_characters(
+        cmd,
+        response)
     assert res == 'TESTS-RULE'
 
 
