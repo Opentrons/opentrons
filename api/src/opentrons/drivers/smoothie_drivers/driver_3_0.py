@@ -17,8 +17,7 @@ from opentrons.config.robot_configs import current_for_revision
 from opentrons.drivers import serial_communication
 from opentrons.drivers.types import MoveSplits
 from opentrons.drivers.utils import (
-    AxisMoveTimestamp, parse_key_from_substring, parse_number_from_substring,
-    parse_key_values, parse_number
+    AxisMoveTimestamp, parse_key_values, parse_number, parse_optional_number
 )
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
@@ -175,25 +174,6 @@ class ParseError(Exception):
     pass
 
 
-def _parse_number_from_substring(smoothie_substring):
-    """
-    Returns the number in the expected string "N:12.3", where "N" is the
-    axis, and "12.3" is a floating point value for the axis' position
-    """
-    return parse_number_from_substring(smoothie_substring,
-                                       GCODE_ROUNDING_PRECISION)
-
-
-def _parse_axis_from_substring(smoothie_substring):
-    """
-    Returns the axis in the expected string "N:12.3", where "N" is the
-    axis, and "12.3" is a floating point value for the axis' position
-    """
-    return parse_key_from_substring(
-        smoothie_substring
-    ).title()  # upper 1st letter
-
-
 def _parse_position_response(raw_axis_values) -> Dict[str, float]:
     parsed_values = parse_key_values(raw_axis_values)
     if len(parsed_values) < 6:
@@ -260,11 +240,11 @@ def _parse_switch_values(raw_switch_values: str) -> Dict[str, bool]:
     if 'Probe: ' in raw_switch_values:
         raw_switch_values = raw_switch_values.replace('Probe: ', 'Probe:')
 
-    parsed_values = raw_switch_values.strip().split(' ')
+    parsed_values = parse_key_values(raw_switch_values)
     res = {
-        _parse_axis_from_substring(s): bool(_parse_number_from_substring(s))
-        for s in parsed_values
-        if any([n in s for n in ['max', 'Probe']])
+        k.title(): bool(parse_optional_number(v, rounding_val=GCODE_ROUNDING_PRECISION))
+        for (k, v) in parsed_values.items()
+        if any(n in k for n in ['max', 'Probe'])
     }
     # remove the extra "_max" character from each axis key in the dict
     res = {
@@ -1481,11 +1461,11 @@ class SmoothieDriver_3_0_0:
 
         def create_coords_list(coords_dict: Dict[str, float]) -> str:
             """ Build the gcode string for a move """
-            return ''.join([
+            return ''.join(
                 axis + str(round(coords, GCODE_ROUNDING_PRECISION))
                 for axis, coords in sorted(coords_dict.items())
                 if valid_movement(axis, coords)
-            ])
+            )
 
         moving_target = only_moving(target)
         if not moving_target:
@@ -1548,9 +1528,9 @@ class SmoothieDriver_3_0_0:
             )
 
             # move at the slowest required speed
-            split_speed = min([split.split_speed
-                               for ax, split in self._move_split_config.items()
-                               if ax in split_target])
+            split_speed = min(split.split_speed
+                              for ax, split in self._move_split_config.items()
+                              if ax in split_target)
 
             # use the higher current from the split config without changing
             # our global cache
@@ -1665,11 +1645,9 @@ class SmoothieDriver_3_0_0:
                 for group in HOME_SEQUENCE
             ]))
 
-        non_moving_axes = ''.join([
-            ax
-            for ax in AXES
-            if ax not in home_sequence
-        ])
+        non_moving_axes = ''.join(
+            ax for ax in AXES if ax not in home_sequence
+        )
         self.dwell_axes(non_moving_axes)
         log.info(f"Homing axes {axis} in sequence {home_sequence}")
         for axes in home_sequence:
@@ -1681,7 +1659,7 @@ class SmoothieDriver_3_0_0:
                 # if we are homing neither the X nor Y axes, simple home
                 self.activate_axes(axes)
                 self._do_relative_splits_during_home_for(
-                    ''.join([ax for ax in axes if ax in 'BC']))
+                    ''.join(ax for ax in axes if ax in 'BC'))
 
                 command = self._generate_current_command()
                 command.with_gcode(
@@ -1771,7 +1749,7 @@ class SmoothieDriver_3_0_0:
 
         :param axes: A string that is a sequence of plunger axis names.
         """
-        assert all([ax.lower() in 'bc' for ax in axes]),\
+        assert all(ax.lower() in 'bc' for ax in axes),\
             'only plunger axes may be unstuck'
         since_moved = self._axes_moved_at.time_since_moved()
         split_currents = _command_builder().with_gcode(
@@ -1865,7 +1843,7 @@ class SmoothieDriver_3_0_0:
             pass
 
         # then home once we're closer to the endstop(s)
-        disabled = ''.join([ax for ax in AXES if ax not in axis.upper()])
+        disabled = ''.join(ax for ax in AXES if ax not in axis.upper())
         return self.home(axis=axis, disabled=disabled)
 
     def unstick_axes(
@@ -1908,7 +1886,7 @@ class SmoothieDriver_3_0_0:
             state_of_switches = self.switch_state
 
         # incase axes is pressing endstop, home it slowly instead of moving
-        homing_axes = ''.join([ax for ax in axes if state_of_switches[ax]])
+        homing_axes = ''.join(ax for ax in axes if state_of_switches[ax])
         moving_axes = {
             ax: self.position[ax] - distance  # retract
             for ax in axes

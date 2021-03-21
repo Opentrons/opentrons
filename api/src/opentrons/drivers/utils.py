@@ -35,40 +35,6 @@ def parse_string_value_from_substring(substring) -> str:
                 substring))
 
 
-def parse_number_from_substring(substring, rounding_val) -> Optional[float]:
-    """
-    Returns the number in the expected string "N:12.3", where "N" is the
-    key, and "12.3" is a floating point value
-
-    For the temp-deck or thermocycler's temperature response, one expected
-    input is something like "T:none", where "none" should return a None value
-    """
-    try:
-        value = substring.split(':')[1]
-        if value.strip().lower() == 'none':
-            return None
-        return round(float(value), rounding_val)
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to parse_number_from_substring:')
-        raise ParseError(
-            'Unexpected argument to parse_number_from_substring: {}'.format(
-                substring))
-
-
-def parse_key_from_substring(substring) -> str:
-    """
-    Returns the axis in the expected string "N:12.3", where "N" is the
-    key, and "12.3" is a floating point value
-    """
-    try:
-        return substring.split(':')[0]
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to parse_key_from_substring:')
-        raise ParseError(
-            'Unexpected argument to parse_key_from_substring: {}'.format(
-                substring))
-
-
 def parse_temperature_response(
         temperature_string: str, rounding_val: int
 ) -> Temperature:
