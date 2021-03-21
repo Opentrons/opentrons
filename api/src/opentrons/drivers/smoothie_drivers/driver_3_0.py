@@ -1950,8 +1950,12 @@ class SmoothieDriver_3_0_0:
             self.engaged_axes[axis] = True
             command = _command_builder().with_gcode(
                 gcode=GCODE.PROBE
-            ).with_float(prefix=axis.upper(), value=probing_distance,
-                         precision=GCODE_ROUNDING_PRECISION)
+            ).with_int(
+                prefix="F", value=420   # 420 mm/min (7 mm/sec) to avoid resonance
+            ).with_float(
+                prefix=axis.upper(), value=probing_distance,
+                precision=GCODE_ROUNDING_PRECISION
+            )
             log.debug(f"probe_axis: {command}")
             try:
                 self._send_command(
