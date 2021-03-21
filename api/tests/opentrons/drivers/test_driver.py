@@ -613,3 +613,31 @@ def test_clear_limit_switch(smoothie, monkeypatch):
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005',
         'M400',
     ]
+
+
+def test_update_pipette_config(smoothie, monkeypatch):
+    driver = smoothie
+    cmd_list = []
+
+    def _send_command_mock(command):
+        nonlocal cmd_list
+        cmd_list.append(command)
+        return "ok"
+
+    monkeypatch.setattr(driver, '_send_command', _send_command_mock)
+
+    driver.simulating = False
+
+    driver.update_pipette_config("X", {
+        'retract': 2,
+        'debounce': 3,
+        'max_travel': 4,
+        'home': 5
+    })
+
+    assert [c.build().strip() for c in cmd_list] == [
+        "M365.3 X2",
+        "M365.2 O3",
+        "M365.1 X4",
+        "M365.0 X5"
+    ]

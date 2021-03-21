@@ -463,7 +463,7 @@ class SmoothieDriver_3_0_0:
     def read_pipette_id(self, mount) -> Optional[str]:
         """
         Reads in an attached pipette's ID
-        The ID is unique to this pipette, and is a string of unktimen length
+        The ID is unique to this pipette, and is a string of unknown length
 
         :param mount: string with value 'left' or 'right'
         :return id string, or None
@@ -507,14 +507,14 @@ class SmoothieDriver_3_0_0:
     def write_pipette_id(self, mount: str, data_string: str):
         """
         Writes to an attached pipette's ID memory location
-        The ID is unique to this pipette, and is a string of unktimen length
+        The ID is unique to this pipette, and is a string of unknown length
 
         NOTE: To enable write-access to the pipette, it's button must be held
 
         mount:
             String (str) with value 'left' or 'right'
         data_string:
-            String (str) that is of unktimen length, and should be unique to
+            String (str) that is of unknown length, and should be unique to
             this one pipette
         """
         self._write_to_pipette(
