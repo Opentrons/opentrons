@@ -164,11 +164,11 @@ def test_disable_motor(smoothie, monkeypatch):
     smoothie.disengage_axis('XYZ')
     smoothie.disengage_axis('ABCD')
     expected = [
-        ['M18\s*X'],
+        ['M18 X'],
         ['M400'],
-        ['M18\s*[XYZ]+'],
+        ['M18 [XYZ]+'],
         ['M400'],
-        ['M18\s*[ABC]+'],
+        ['M18 [ABC]+'],
         ['M400'],
     ]
     fuzzy_assert(result=command_log, expected=expected)

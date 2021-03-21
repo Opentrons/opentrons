@@ -1,5 +1,4 @@
 import pytest
-from mock.mock import MagicMock
 from opentrons.drivers.mag_deck import driver
 from opentrons.drivers.utils import ParseError
 

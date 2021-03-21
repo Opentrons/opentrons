@@ -212,12 +212,12 @@ class TempDeck:
         return ''
 
     @property
-    def target(self) -> Optional[int]:
+    def target(self) -> Optional[float]:
         return self._temperature.target
 
     @property
-    def temperature(self) -> int:
-        return self._temperature.current
+    def temperature(self) -> float:
+        return self._temperature.current  # type: ignore
 
     def _get_status(self) -> str:
         # Separate function for testability

@@ -71,7 +71,7 @@ def parse_key_from_substring(substring) -> str:
 
 def parse_temperature_response(
         temperature_string: str, rounding_val: int
-    ) -> Temperature:
+) -> Temperature:
     """Example input: "T:none C:25"""
     data = parse_key_values(temperature_string)
     try:
@@ -88,7 +88,7 @@ def parse_temperature_response(
 
 def parse_plate_temperature_response(
         temperature_string: str, rounding_val: int
-    ) -> PlateTemperature:
+) -> PlateTemperature:
     """Example input: "T:none C:25 H:123"""
     data = parse_key_values(temperature_string)
     try:
@@ -98,9 +98,8 @@ def parse_plate_temperature_response(
             hold=parse_optional_number(data['H'], rounding_val)
         )
     except KeyError:
-        raise ParseError(
-            f'Unexpected argument to parse_lid_temperature_response: {temperature_string}'
-        )
+        raise ParseError(f'Unexpected argument to'
+                         f' parse_lid_temperature_response: {temperature_string}')
 
 
 def parse_device_information(
