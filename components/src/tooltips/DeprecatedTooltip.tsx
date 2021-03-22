@@ -11,7 +11,7 @@ export interface DeprecatedTooltipProps {
   /** show or hide the tooltip */
   open?: boolean
   /** contents of the tooltip */
-  tooltipComponent: JSX.Element | unknown
+  tooltipComponent: React.ReactNode
   /** optional portal to place the tooltipComponent inside */
   portal?: React.ComponentType<any>
   /** <https://github.com/FezVrasta/react-popper#placement> */
@@ -40,7 +40,7 @@ export interface DeprecatedTooltipProps {
  *
  * @deprecated Use `Tooltip` and `useTooltip` instead
  */
-export function DeprecatedTooltip(
+export function DeprecatedTooltip (
   props: DeprecatedTooltipProps
 ): JSX.Element | null {
   if (!props.tooltipComponent) return props.children()

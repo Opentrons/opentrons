@@ -7,6 +7,7 @@ import { Button } from '../buttons'
 import { NotificationIcon } from '../icons'
 
 import type { IconName } from '../icons'
+import type { ButtonProps } from '../buttons'
 
 export interface NavTabProps {
   /** optional click event for nav button */
@@ -31,7 +32,7 @@ export interface NavTabProps {
   selected?: boolean
 }
 
-export function NavTab(props: NavTabProps): JSX.Element {
+export function NavTab (props: NavTabProps): JSX.Element {
   const { url } = props
   const className = classnames(props.className, styles.tab, {
     [styles.disabled]: props.disabled,
@@ -39,7 +40,7 @@ export function NavTab(props: NavTabProps): JSX.Element {
     [styles.selected]: props.selected,
   })
 
-  let buttonProps: React.ComponentProps<typeof Button> = {
+  let buttonProps: ButtonProps = {
     id: props.id,
     className: className,
     disabled: props.disabled,

@@ -49,7 +49,7 @@ export const Btn: BtnComponent = styled.button
   .withConfig({
     shouldForwardProp: isntStyleProp,
   })
-  .attrs((props: Partial<{ type?: string }>) => ({
+  .attrs((props: React.HTMLProps<HTMLButtonElement>) => ({
     type: props.type ?? BUTTON_TYPE_BUTTON,
   }))`
   ${BUTTON_BASE_STYLE}
