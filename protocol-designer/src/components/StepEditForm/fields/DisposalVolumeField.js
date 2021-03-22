@@ -17,6 +17,7 @@ import { getBlowoutLocationOptionsForForm } from '../utils'
 import { TextField } from './TextField'
 
 import type { FieldProps, FieldPropsByName } from '../types'
+import type { PathOption, StepType } from '../../../form-types'
 import type { BaseState } from '../../../types'
 
 import styles from '../StepEditForm.css'
@@ -42,7 +43,15 @@ type SP = {|
   disposalDestinationOptions: Options,
   maxDisposalVolume: ?number,
 |}
-type OP = {| propsForFields: FieldPropsByName |}
+type OP = {|
+  aspirate_airGap_checkbox?: boolean | null,
+  aspirate_airGap_volume?: string | null,
+  path: PathOption,
+  pipette: string | null,
+  propsForFields: FieldPropsByName,
+  stepType: StepType,
+  volume: string | null,
+|}
 type Props = { ...SP, ...OP }
 
 const DisposalVolumeFieldComponent = (props: Props) => {
@@ -98,17 +107,17 @@ const DisposalVolumeFieldComponent = (props: Props) => {
   )
 }
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const { propsForFields } = ownProps
-  const stepType = 'moveLiquid' // TODO IMMEDIATELY -- HACK!
-  const formValues: any = {
-    aspirate_airGap_checkbox: propsForFields.aspirate_airGap_checkbox?.value,
-    aspirate_airGap_volume: propsForFields.aspirate_airGap_volume?.value,
-    path: propsForFields.path?.value,
-    pipette: propsForFields.pipette?.value,
-    volume: propsForFields.volume?.value,
-  }
+  const {
+    aspirate_airGap_checkbox,
+    aspirate_airGap_volume,
+    path,
+    pipette,
+    stepType,
+    volume,
+  } = ownProps
+
   const blowoutLocationOptions = getBlowoutLocationOptionsForForm({
-    path: formValues.path,
+    path,
     stepType,
   })
 
@@ -117,7 +126,13 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   )
 
   const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
-    formValues,
+    {
+      aspirate_airGap_checkbox,
+      aspirate_airGap_volume,
+      path,
+      pipette,
+      volume,
+    },
     stepFormSelectors.getPipetteEntities(state)
   )
 

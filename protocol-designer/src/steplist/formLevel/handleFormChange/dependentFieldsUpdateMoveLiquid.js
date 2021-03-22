@@ -358,7 +358,8 @@ const clampDisposalVolume = (
   if (appliedPatch.path !== 'multiDispense' || isDecimalString) return patch
 
   const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
-    (appliedPatch: any),
+    // $FlowFixMe(IL, 2021-03-22): appliedPath isn't well-typed, address in #3161
+    appliedPatch,
     pipetteEntities
   )
   if (maxDisposalVolume == null) {
