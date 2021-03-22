@@ -298,6 +298,12 @@ class Controller:
             if rails is not None:
                 self.gpio_chardev.set_rail_lights(rails)
 
+    def liquid_detect_state(self, state: Optional[bool]):
+        if state == True:
+            self.gpio_chardev.liquid_detect_status(True)
+        else:
+            self.gpio_chardev.liquid_detect_status(False)
+            
     def get_lights(self) -> Dict[str, bool]:
         if not opentrons.config.IS_ROBOT:
             return {}
@@ -320,6 +326,12 @@ class Controller:
         """ Run a probe and return the new position dict
         """
         return self._smoothie_driver.probe_axis(axis, distance)
+
+    def liquid_sense_detection(self, z_axis: str, p_axis: str,
+                z_dist: float, p_dist: float, speed: float) -> Dict[str, float]:
+        """ run liquid sensing detection, requires a high signal to gpio pin 10
+        """
+        return self._smoothie_driver.liquid_sense_detection(z_axis, p_axis, z_dist, p_dist, speed)
 
     def clean_up(self):
         try:

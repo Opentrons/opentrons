@@ -64,6 +64,9 @@ class SimulatingGPIOCharDev:
     def set_rail_lights(self, on: bool = True):
         pass
 
+    def liquid_detect_status(self, on: bool = True):
+        pass
+
     def set_reset_pin(self, on: bool = True):
         pass
 

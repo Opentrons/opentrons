@@ -172,8 +172,8 @@ class API(HardwareAPILike):
 
             if firmware is not None:
                 if fw_version != firmware[1]:
-                    await backend.update_firmware(
-                        str(firmware[0]), checked_loop, True)
+                    # await backend.update_firmware(
+                    #     str(firmware[0]), checked_loop, True)
                     await backend.connect(port)
             elif firmware is None and fw_version is None:
                 msg = 'Motor controller could not be connected and no '\
@@ -305,6 +305,18 @@ class API(HardwareAPILike):
                       rail lights.
         """
         self._backend.set_lights(button, rails)
+
+    async def liquid_detect_state(self, state: bool = None):
+        """ Control the robot lights.
+
+        :param button: If specified, turn the button light on (`True`) or
+                       off (`False`). If not specified, do not change the
+                       button light.
+        :param rails: If specified, turn the rail lights on (`True`) or
+                      off (`False`). If not specified, do not change the
+                      rail lights.
+        """
+        self._backend.liquid_detect_state(state)
 
     def get_lights(self) -> Dict[str, bool]:
         """ Return the current status of the robot lights.

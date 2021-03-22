@@ -48,6 +48,9 @@ class GPIODriverLike(Protocol):
     def set_rail_lights(self, on: bool = True):
         ...
 
+    def liquid_detect_status(self, on: bool = True):
+        ...
+
     def set_reset_pin(self, on: bool = True):
         ...
 

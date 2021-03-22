@@ -170,6 +170,12 @@ class GPIOCharDev:
         else:
             self.set_low(gpio_group.frame_leds)
 
+    def liquid_detect_status(self, on: bool = True):
+        if on:
+            self.set_high(gpio_group.liquid_detect_switch)
+        else:
+            self.set_low(gpio_group.liquid_detect_switch)
+
     def set_reset_pin(self, on: bool = True):
         if on:
             self.set_high(gpio_group.reset)

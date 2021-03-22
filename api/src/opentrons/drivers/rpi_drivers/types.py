@@ -175,6 +175,7 @@ gpio_group = GPIOGroup([
         GPIOPin.build('isp', PinDir.output, 23),
         GPIOPin.build('reset', PinDir.output, 24),
         GPIOPin.build('red_button', PinDir.output, 26),
+        GPIOPin.build('liquid_detect_switch', PinDir.output, 10),
         # input pins
         GPIOPin.build('button_input', PinDir.input, 5),
         GPIOPin.build_with_rev('door_sw_filt', PinDir.input,

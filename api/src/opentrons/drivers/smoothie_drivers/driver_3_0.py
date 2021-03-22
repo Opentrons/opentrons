@@ -76,7 +76,7 @@ GCODES = {'HOME': 'G28.2',
           'DWELL': 'G4',
           'CURRENT_POSITION': 'M114.2',
           'LIMIT_SWITCH_STATUS': 'M119',
-          'PROBE': 'G38.2 F420',  # 420 mm/min (7 mm/sec) to avoid resonance
+          'PROBE': 'G38.3',  # 420 mm/min (7 mm/sec) to avoid resonance
           'ABSOLUTE_COORDS': 'G90',
           'RELATIVE_COORDS': 'G91',
           'RESET_FROM_ERROR': 'M999',
@@ -1854,6 +1854,26 @@ class SmoothieDriver_3_0_0:
         else:
             raise RuntimeError("Cant probe axis {}".format(axis))
 
+    def liquid_sense_detection(
+            self, z_axis: str, p_axis: str,
+                z_dist: float, p_dist: float, speed: float) -> Dict[str, float]:
+        if z_axis.upper() in AXES and p_axis.upper() in AXES:
+            #self.engaged_axes[z_axis] = True
+            command = GCODES['PROBE'] + p_axis.upper() + str(p_dist) \
+                        + z_axis.upper() + str(z_dist) + 'F' + str(speed*60)
+            #print(command)
+            log.debug("probe_axis: {}".format(command))
+            try:
+                self._send_command(
+                    command=command, ack_timeout=DEFAULT_MOVEMENT_TIMEOUT,
+                    suppress_home_after_error=True)
+            except SmoothieError as se:
+                log.exception("ignore liquid sensing error")
+            self.update_position(self.position)
+            return self.position
+        else:
+            raise RuntimeError("Cant probe axis {}".format(axis))
+
     def turn_on_blue_button_light(self):
         self._gpio_chardev.set_button_light(blue=True)
 
@@ -1872,6 +1892,12 @@ class SmoothieDriver_3_0_0:
 
     def turn_off_rail_lights(self):
         self._gpio_chardev.set_rail_lights(False)
+
+    def liquid_detect_high(self):
+        self._gpio_chardev.liquid_detect_status(True)
+
+    def liquid_detect_low(self):
+        self._gpio_chardev.liquid_detect_status(False)
 
     def get_rail_lights_on(self):
         return self._gpio_chardev.get_rail_lights()
