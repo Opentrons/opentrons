@@ -3,12 +3,13 @@ import * as React from 'react'
 import cx from 'classnames'
 import { FormGroup, HoverTooltip } from '@opentrons/components'
 import { i18n } from '../../../../localization'
-import { FieldConnector } from '../FieldConnector'
-import styles from '../../StepEditForm.css'
-import type { PathOption } from '../../../../form-types'
 import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
 import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
 import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
+import type { PathOption } from '../../../../form-types'
+import type { FieldProps } from '../../types'
+import type { ValuesForPath } from './getDisabledPathMap'
+import styles from '../../StepEditForm.css'
 
 const PATH_ANIMATION_IMAGES = {
   single: require('../../../../images/path_single.gif'),
@@ -32,6 +33,8 @@ const ALL_PATH_OPTIONS = [
 ]
 
 type PathFieldProps = {|
+  ...FieldProps,
+  ...ValuesForPath,
   disabledPathMap: ?{ [PathOption]: string },
 |}
 
@@ -92,30 +95,25 @@ const getSubtitle = (
   return reasonForDisabled || ''
 }
 export const Path = (props: PathFieldProps): React.Node => {
+  const { disabledPathMap, value, updateValue } = props
   return (
     <FormGroup label="Path">
-      <FieldConnector
-        name="path"
-        render={({ value, updateValue }) => (
-          <ul className={styles.path_options}>
-            {ALL_PATH_OPTIONS.map(option => (
-              <PathButton
-                key={option.name}
-                selected={option.name === value}
-                path={option.name}
-                disabled={
-                  props.disabledPathMap &&
-                  props.disabledPathMap.hasOwnProperty(option.name)
-                }
-                subtitle={getSubtitle(option.name, props.disabledPathMap)}
-                onClick={() => updateValue(option.name)}
-              >
-                <img src={option.image} className={styles.path_image} />
-              </PathButton>
-            ))}
-          </ul>
-        )}
-      />
+      <ul className={styles.path_options}>
+        {ALL_PATH_OPTIONS.map(option => (
+          <PathButton
+            key={option.name}
+            selected={option.name === value}
+            path={option.name}
+            disabled={
+              disabledPathMap && disabledPathMap.hasOwnProperty(option.name)
+            }
+            subtitle={getSubtitle(option.name, disabledPathMap)}
+            onClick={() => updateValue(option.name)}
+          >
+            <img src={option.image} className={styles.path_image} />
+          </PathButton>
+        ))}
+      </ul>
     </FormGroup>
   )
 }
