@@ -51,28 +51,37 @@ export function ModuleControls(props: Props): React.Node {
         </>
       ) : (
         <>
-          <Box>
+          <Box width="100%">
             {mod.type === THERMOCYCLER_MODULE_TYPE && (
-              <TemperatureData
-                current={mod.data.lidTemp}
-                target={mod.data.lidTarget}
-                title="lid"
-              />
+              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+                <TemperatureData
+                  current={mod.data.lidTemp}
+                  target={mod.data.lidTarget}
+                  title="lid"
+                />
+                <TemperatureControl
+                  module={mod}
+                  isSecondaryTemp={true}
+                  sendModuleCommand={sendModuleCommand}
+                  disabledReason={controlDisabledReason}
+                />
+              </Flex>
             )}
-            <TemperatureData
-              status={mod.status}
-              current={mod.data.currentTemp}
-              target={mod.data.targetTemp}
-              title={mod.type === THERMOCYCLER_MODULE_TYPE ? 'block' : null}
-            />
+            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+              <TemperatureData
+                status={mod.status}
+                current={mod.data.currentTemp}
+                target={mod.data.targetTemp}
+                title={mod.type === THERMOCYCLER_MODULE_TYPE ? 'block' : null}
+              />
+              <TemperatureControl
+                  module={mod}
+                  isSecondaryTemp={false}
+                  sendModuleCommand={sendModuleCommand}
+                  disabledReason={controlDisabledReason}
+                />
+            </Flex>
           </Box>
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <TemperatureControl
-              module={mod}
-              sendModuleCommand={sendModuleCommand}
-              disabledReason={controlDisabledReason}
-            />
-          </Flex>
         </>
       )}
     </Flex>
