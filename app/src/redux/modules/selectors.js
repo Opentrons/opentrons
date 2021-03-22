@@ -59,28 +59,28 @@ export const getUnpreparedModules: (
   }
 )
 
-export const getMatchedModules: (
-  state: State
-) => Array<{ Types.AttachedModule, slot: string }> = createSelector(
-  getAttachedModulesForConnectedRobot,
-  RobotSelectors.getModules,
-  (attachedModules, protocolModules) => {
-    const matchedAmod: { [slot: string]: Types.AttachedModule } = {}
-    const matchedPmod = []
-    protocolModules.forEach(pmod => {
-      const compatible = attachedModules.find(
-        amod =>
-          checkModuleCompatibility(amod.model, pmod.model) &&
-          !matchedAmod.values.includes(amod)
-      )
-      if (compatible) {
-        matchedPmod.push(pmod)
-        matchedAmod[pmod.slot] = compatible
-      }
-    })
-    return matchedAmod
-  }
-)
+// export const getMatchedModules: (
+//   state: State
+// ) => { [slot: string]: Types.AttachedModule } = createSelector(
+//   getAttachedModulesForConnectedRobot,
+//   RobotSelectors.getModules,
+//   (attachedModules, protocolModules) => {
+//     const matchedAmod: { [slot: string]: Types.AttachedModule } = {}
+//     const matchedPmod = []
+//     protocolModules.forEach(pmod => {
+//       const compatible = attachedModules.find(
+//         amod =>
+//           checkModuleCompatibility(amod.model, pmod.model) &&
+//           !matchedAmod.values.includes(amod)
+//       )
+//       if (compatible) {
+//         matchedPmod.push(pmod)
+//         matchedAmod[pmod.slot] = compatible
+//       }
+//     })
+//     return matchedAmod
+//   }
+// )
 
 export const getMissingModules: (
   state: State
