@@ -9,7 +9,7 @@ import { MagnetData, MagnetControl } from '../../../../molecules/ModuleControls'
 
 import type {
   MagneticModule,
-  ModuleCommand
+  ModuleCommand,
 } from '../../../../redux/modules/types'
 
 type Props = {|
