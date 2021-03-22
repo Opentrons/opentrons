@@ -1174,16 +1174,20 @@ class SmoothieDriver_3_0_0:
 
         # move away from the Y endstop switch, then backward half that distance
         relative_retract_command = _command_builder().with_gcode(
+            # set to relative coordinate system
             gcode=GCODE.RELATIVE_COORDS
         ).with_gcode(
             gcode=GCODE.MOVE
         ).with_int(
+            # move towards front of machine
             prefix="Y", value=int(-Y_SWITCH_BACK_OFF_MM)
         ).with_gcode(
             gcode=GCODE.MOVE
         ).with_int(
+            # move towards back of machine
             prefix="Y", value=int(Y_SWITCH_REVERSE_BACK_OFF_MM)
         ).with_gcode(
+            # set back to abs coordinate system
             gcode=GCODE.ABSOLUTE_COORDS
         )
 
@@ -1233,13 +1237,16 @@ class SmoothieDriver_3_0_0:
 
         # retract, then home, then retract again
         relative_retract_command = _command_builder().with_gcode(
-            gcode=GCODE.RELATIVE_COORDS  # set to relative coordinate system
+            # set to relative coordinate system
+            gcode=GCODE.RELATIVE_COORDS
         ).with_gcode(
-            gcode=GCODE.MOVE  # move 3 millimeters away from switch
+            gcode=GCODE.MOVE
         ).with_int(
+            # move 3 millimeters away from switch
             prefix="Y", value=-Y_RETRACT_DISTANCE
         ).with_gcode(
-            gcode=GCODE.ABSOLUTE_COORDS  # set back to abs coordinate system
+            # set back to abs coordinate system
+            gcode=GCODE.ABSOLUTE_COORDS
         )
         try:
             self._send_command(relative_retract_command)
