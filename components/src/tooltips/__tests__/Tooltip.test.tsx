@@ -15,7 +15,7 @@ const TOOLTIP_SELECTOR = 'div[role="tooltip"]'
 
 const render = (
   visible = true,
-  children = (<></>) as JSX.Element | string
+  children = (<></>) as React.ReactNode
 ): ReturnType<typeof mount> => {
   // NOTE(mc): redundant fragement necessary for enzyme issue with forwardRef
   // https://github.com/enzymejs/enzyme/issues/1852
