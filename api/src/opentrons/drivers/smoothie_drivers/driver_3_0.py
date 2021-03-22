@@ -766,7 +766,7 @@ class SmoothieDriver_3_0_0:
         command = _command_builder().with_gcode(gcode=GCODE.SET_MAX_SPEED)
         for axis, value in sorted(settings.items()):
             command = command.with_float(
-                prefix=axis, value=value, precision=GCODE_ROUNDING_PRECISION
+                prefix=axis, value=value, precision=None
             )
 
         log.debug(f"set_axis_max_speed: {command}")
@@ -794,7 +794,7 @@ class SmoothieDriver_3_0_0:
             prefix="S", value=10000
         )
         for axis, value in sorted(settings.items()):
-            command.with_float(prefix=axis, value=value)
+            command.with_float(prefix=axis, value=value, precision=None)
 
         log.debug(f"set_acceleration: {command}")
         self._send_command(command)
@@ -908,14 +908,12 @@ class SmoothieDriver_3_0_0:
         """
         command = _command_builder().with_gcode(gcode=GCODE.SET_CURRENT)
         for axis, value in sorted(self.current.items()):
-            command.with_float(prefix=axis, value=value,
-                               precision=GCODE_ROUNDING_PRECISION)
+            command.with_float(prefix=axis, value=value, precision=None)
 
         command.with_gcode(
             gcode=GCODE.DWELL
         ).with_float(
-            prefix="P", value=CURRENT_CHANGE_DELAY,
-            precision=GCODE_ROUNDING_PRECISION
+            prefix="P", value=CURRENT_CHANGE_DELAY, precision=None
         )
         log.debug(f"_generate_current_command: {command}")
         return command
@@ -1302,8 +1300,7 @@ class SmoothieDriver_3_0_0:
             gcode=GCODE.STEPS_PER_MM
         )
         for axis, value in data.items():
-            command.with_float(prefix=axis, value=value,
-                               precision=GCODE_ROUNDING_PRECISION)
+            command.with_float(prefix=axis, value=value, precision=None)
         return command
 
     def update_steps_per_mm(self, data: Union[Dict[str, float], str]):
@@ -1728,14 +1725,14 @@ class SmoothieDriver_3_0_0:
             for ax in axes
         })).with_gcode(
             gcode=GCODE.DWELL
-        ).with_float(prefix='P', value=0.01, precision=GCODE_ROUNDING_PRECISION)
+        ).with_float(prefix='P', value=0.01, precision=None)
 
         postfix.with_builder(builder=self._build_steps_per_mm({
             ax: self.steps_per_mm[ax]
             for ax in axes
         })).with_gcode(
             gcode=GCODE.DWELL
-        ).with_float(prefix='P', value=0.01, precision=GCODE_ROUNDING_PRECISION)
+        ).with_float(prefix='P', value=0.01, precision=None)
         return prefix, postfix
 
     def _do_relative_splits_during_home_for(self, axes: str):
@@ -1776,12 +1773,10 @@ class SmoothieDriver_3_0_0:
             if axis in to_unstick:
                 log.debug(f"adding unstick for {axis}")
                 split_currents.with_float(
-                    prefix=axis, value=msc.split_current,
-                    precision=GCODE_ROUNDING_PRECISION
+                    prefix=axis, value=msc.split_current, precision=None
                 )
                 split_moves.with_float(
-                    prefix=axis, value=-msc.split_distance,
-                    precision=GCODE_ROUNDING_PRECISION
+                    prefix=axis, value=-msc.split_distance, precision=None
                 )
                 applicable_speeds.append(msc.split_speed)
         if not applicable_speeds:
@@ -1799,8 +1794,7 @@ class SmoothieDriver_3_0_0:
             ).with_gcode(
                 gcode=GCODE.DWELL
             ).with_float(
-                prefix="P", value=CURRENT_CHANGE_DELAY,
-                precision=GCODE_ROUNDING_PRECISION
+                prefix="P", value=CURRENT_CHANGE_DELAY, precision=None
             ).with_builder(
                 builder=self._build_speed_command(min(applicable_speeds))
             ).with_gcode(gcode=GCODE.RELATIVE_COORDS),
@@ -1916,7 +1910,7 @@ class SmoothieDriver_3_0_0:
         command = _command_builder().with_gcode(
             gcode=GCODE.DWELL
         ).with_float(
-            prefix="P", value=seconds, precision=GCODE_ROUNDING_PRECISION
+            prefix="P", value=seconds, precision=None
         )
 
         log.debug(f"delay: {command}")
@@ -1931,8 +1925,7 @@ class SmoothieDriver_3_0_0:
             ).with_int(
                 prefix="F", value=420   # 420 mm/min (7 mm/sec) to avoid resonance
             ).with_float(
-                prefix=axis.upper(), value=probing_distance,
-                precision=GCODE_ROUNDING_PRECISION
+                prefix=axis.upper(), value=probing_distance, precision=None
             )
             log.debug(f"probe_axis: {command}")
             try:

@@ -1,6 +1,7 @@
 from copy import deepcopy
 from unittest.mock import Mock
 import pytest
+from opentrons.drivers.types import MoveSplit
 
 from tests.opentrons.conftest import fuzzy_assert
 from opentrons.config.robot_configs import (
@@ -640,4 +641,41 @@ def test_update_pipette_config(smoothie, monkeypatch):
         "M365.2 O3",
         "M365.1 X4",
         "M365.0 X5"
+    ]
+
+
+def test_do_relative_splits_during_home_for(smoothie, monkeypatch):
+    """Test command structure when a split configuration is present."""
+    driver = smoothie
+    cmd_list = []
+
+    def _send_command_mock(
+            command, *args, **kwargs):
+        nonlocal cmd_list
+        cmd_list.append(command.build())
+        return "ok"
+
+    monkeypatch.setattr(driver, '_send_command', _send_command_mock)
+
+    driver.simulating = False
+
+    driver.configure_splits_for(
+        {
+            "B": MoveSplit(
+                split_distance=1,
+                split_current=1.75,
+                split_speed=1,
+                after_time=1800,
+                fullstep=True)
+        }
+    )
+    driver._steps_per_mm = {"B": 1.0, "C": 1.0}
+
+    driver._do_relative_splits_during_home_for("BC")
+
+    assert cmd_list == [
+        'M53 M55 M92 B0.03125 C0.03125 G4 P0.01 M907 B1.75 G4 P0.005 G0 F60 '
+        'G91 \r\n\r\n',
+        'G0 B-1 \r\n\r\n',
+        'G90 M52 M54 M92 B1.0 C1.0 G4 P0.01 G0 F24000 \r\n\r\n'
     ]

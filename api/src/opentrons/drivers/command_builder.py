@@ -23,7 +23,7 @@ class CommandBuilder:
         Args:
             prefix: The value prefix.
             value: The float value.
-            precision: Rounding precision
+            precision: Rounding precision. If None, there will be no rounding.
 
         Returns: self
         """
