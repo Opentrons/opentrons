@@ -63,6 +63,7 @@ class WellSelectionInputComponent extends React.Component<Props> {
       labwareId || 'noLabware'
     }`
   }
+
   render() {
     const modalKey = this.getModalKey()
     const label = this.props.isMulti
