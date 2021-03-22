@@ -1,6 +1,5 @@
 {
   "files": [],
-  "exclude": ["./node_modules/@emotion/core"],
   "references": [
     {
       "path": "./components"
