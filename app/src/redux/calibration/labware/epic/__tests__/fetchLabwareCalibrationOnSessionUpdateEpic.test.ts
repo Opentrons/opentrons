@@ -12,10 +12,9 @@ import type { State } from '../../../../types'
 jest.mock('../../actions')
 jest.mock('../../../../robot/selectors')
 
-const mockGetConnectedRobotName: JestMockFn<
-  [State],
-  string
-> = (robotSelectors.getConnectedRobotNameas any)
+const mockGetConnectedRobotName: jest.MockedFunction<
+  typeof robotSelectors.getConnectedRobotName
+> = robotSelectors.getConnectedRobotName as any
 
 describe('fetch labware calibration on rpc cal session update epic', () => {
   beforeEach(() => {
@@ -27,7 +26,7 @@ describe('fetch labware calibration on rpc cal session update epic', () => {
   })
 
   it('dispatches calibration:FETCH_LABWARE_CALIBRATIONS on robot:UPDATE_OFFSET_SUCCESS', () => {
-    const mockState: State = ({ state: true, mock: true }as any)
+    const mockState: State = { state: true, mock: true } as any
 
     const testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
@@ -48,7 +47,7 @@ describe('fetch labware calibration on rpc cal session update epic', () => {
   })
 
   it('dispatches calibration:FETCH_LABWARE_CALIBRATIONS on robot:CONFIRM_TIPRACK_SUCCESS', () => {
-    const mockState: State = ({ state: true, mock: true }as any)
+    const mockState: State = { state: true, mock: true } as any
 
     const testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
