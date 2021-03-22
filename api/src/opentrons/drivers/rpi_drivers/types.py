@@ -14,9 +14,9 @@ class PinDir(enum.Enum):
 
 @dataclass(frozen=True)
 class USBPort(GenericNode):
-    port_number: Optional[int]
-    device_path: str
-    hub: Optional[int]
+    port_number: Optional[int] = None
+    device_path: str = ''
+    hub: Optional[int] = None
 
     @classmethod
     def build(cls, port_path: str) -> 'USBPort':

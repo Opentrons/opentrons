@@ -10,6 +10,7 @@ import re
 from typing import List, Set
 
 from opentrons.algorithms.dfs import DFS
+from opentrons.hardware_control.modules.types import ModuleAtPort
 
 from .interfaces import USBDriverInterface
 from .types import USBPort
@@ -165,3 +166,33 @@ class USBBus(USBDriverInterface):
                 self._dfs.graph.add_vertex(d)
             self.sorted_ports = self._dfs.dfs()
             self.usb_dev = updated_bus
+
+    def match_virtual_ports(
+            self, virtual_ports: List[ModuleAtPort]
+            ) -> List[ModuleAtPort]:
+        """
+        Match Virtual Ports
+
+        Given a list of virtual module ports, look up the
+        symlink to find the device path and link that to
+        the physical usb port information.
+        The virtual port path looks something like:
+        dev/ot_module_[MODULE NAME]
+        :param virtual_ports: A list of ModuleAtPort objects
+        that hold the name and virtual port of each module
+        connected to the robot.
+
+        :returns: The updated list of ModuleAtPort
+        dataclasses with the physical usb port
+        information updated.
+        """
+        self.sort_ports()
+        sorted_virtual_ports = []
+        for p in self.usb_dev:
+            for vp in virtual_ports:
+                serial_port = self.read_symlink(vp.port)
+                if serial_port in p.device_path:
+                    vp.usb_port = p
+                    sorted_virtual_ports.append(vp)
+                    break
+        return sorted_virtual_ports
