@@ -1325,7 +1325,15 @@ def test_blowout_to_dest(_instr_labware):
 
 @pytest.mark.timeout(timeout=5)
 @pytest.mark.parametrize(
-    'pipette_name,tip_rack_name,tip_max_volume,reserved_volume',
+    'transfer_mode, source_indexes, dest_indexes',
+    [
+        ('transfer', 0, 1),
+        ('distribute', 0, slice(1, 8)),
+        ('consolidate', 0, slice(1, 8))
+    ]
+)
+@pytest.mark.parametrize(
+    'pipette_name, tip_rack_name, tip_max_volume, reserved_volume',
     [
         # reserved == pipette max == tip max
         ('p20_single_gen2', 'opentrons_96_filtertiprack_20ul', 20, 20),
@@ -1355,11 +1363,14 @@ def test_blowout_to_dest(_instr_labware):
     ]
 )
 def test_error_if_reserved_volume_too_high(
+        transfer_mode,
+        source_indexes,
+        dest_indexes,
         pipette_name,
         tip_rack_name,
         tip_max_volume,
         reserved_volume):
-    
+
     # TransferPlan should raise ValueError if we ask it to plan a transfer with
     # a disposal_volume so high, there would be no room left in the tip to
     # actually transfer liquid and make progress.
@@ -1390,13 +1401,7 @@ def test_error_if_reserved_volume_too_high(
         labware = context.load_labware('nest_12_reservoir_15ml', 1)
         tip_rack = context.load_labware(tip_rack_name, 2)
         pipette = context.load_instrument(pipette_name, 'left', tip_racks=[tip_rack])
-        
-        modes = [
-            ('transfer', labware.wells()[0], labware.wells()[1]),
-            ('distribute', labware.wells()[0], labware.wells()[1:8]),
-            ('consolidate', labware.wells()[1:8], labware.wells()[0])
-        ]
-        
+
         # Make sure, in this test, it's sensible to expect a volume as high as the
         # tip's max volume to work as the transfer's max volume.
         assert tip_rack.wells()[0].max_volume <= pipette.max_volume
@@ -1405,17 +1410,16 @@ def test_error_if_reserved_volume_too_high(
             air_gap=air_gap,
             disposal_volume=disposal_volume
         ))
-        
-        for mode, sources, dests in modes:
-            with pytest.raises(ValueError):
-                plan = tx.TransferPlan(
-                    volume=1.2345,
-                    sources=sources,
-                    dests=dests,
-                    instr=pipette,
-                    max_volume=tip_max_volume,
-                    api_version=context.api_version,
-                    options=options,
-                    mode=mode)
-                # Exhaust the iterator in case it raises the expected exception lazily.
-                list(plan)
+
+        with pytest.raises(ValueError):
+            plan = tx.TransferPlan(
+                volume=1.2345,
+                sources=labware.wells()[source_indexes],
+                dests=labware.wells()[dest_indexes],
+                instr=pipette,
+                max_volume=tip_max_volume,
+                api_version=context.api_version,
+                options=options,
+                mode=transfer_mode)
+            # Exhaust the iterator in case it raises the expected exception lazily.
+            list(plan)
