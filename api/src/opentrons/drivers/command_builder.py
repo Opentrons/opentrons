@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 
 class CommandBuilder:
@@ -15,7 +15,8 @@ class CommandBuilder:
         self._words: List[str] = []
 
     def with_float(
-            self, prefix: str, value: float, precision: int = 3) -> 'CommandBuilder':
+            self, prefix: str, value: float,
+            precision: Optional[int]) -> 'CommandBuilder':
         """
         Add a float value.
 
@@ -26,8 +27,8 @@ class CommandBuilder:
 
         Returns: self
         """
-        rounded = round(value, precision)
-        return self.add_word(f"{prefix}{rounded}")
+        value = round(value, precision) if precision else value
+        return self.add_word(f"{prefix}{value}")
 
     def with_int(self, prefix: str, value: int) -> 'CommandBuilder':
         """

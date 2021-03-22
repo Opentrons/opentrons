@@ -17,6 +17,16 @@ def test_builder_create_command_with_float() -> None:
     ).build() == "Z1.234 terminator"
 
 
+def test_builder_create_command_with_float_no_round() -> None:
+    """It should create a command with a floating point value that is
+    not rounded."""
+    terminator = "terminator"
+    builder = CommandBuilder(terminator=terminator)
+    assert builder.with_float(
+        prefix='Z', value=1.23442, precision=None
+    ).build() == "Z1.23442 terminator"
+
+
 def test_builder_create_command_with_int() -> None:
     """It should create a command with an integer point value."""
     terminator = "terminator"
@@ -60,7 +70,7 @@ def test_builder_chain() -> None:
     assert builder.with_gcode(
         gcode='G321'
     ).with_float(
-        prefix="X", value=321
+        prefix="X", value=321, precision=3
     ).with_gcode(
         gcode="M321"
     ).with_int(
