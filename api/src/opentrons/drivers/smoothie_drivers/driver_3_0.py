@@ -562,18 +562,15 @@ class SmoothieDriver_3_0_0:
         res_msg: Dict[str, Dict[str, float]] = {axis: {}}
 
         for key, value in data.items():
+            cmd = _command_builder().with_gcode(
+                gcode=gcodes[key]
+            )
             if key == 'debounce':
                 # debounce variable for all axes, so do not specify an axis
-                cmd = f'O{value}'
+                cmd.with_float(prefix='O', value=value, precision=None)
             else:
-                cmd = f'{axis}{value}'
-            res = self._send_command(
-                _command_builder().with_gcode(
-                    gcode=gcodes[key]
-                ).add_word(
-                    word=cmd
-                )
-            )
+                cmd.with_float(prefix=axis, value=value, precision=None)
+            res = self._send_command(cmd)
             if res is None:
                 raise ValueError(
                     f'{key} was not updated to {value} on {axis} axis')
