@@ -1460,13 +1460,14 @@ class SmoothieDriver_3_0_0:
             return {ax: coord for ax, coord in move_target.items()
                     if valid_movement(ax, coord)}
 
-        def create_coords_list(coords_dict: Dict[str, float]) -> str:
+        def create_coords_list(coords_dict: Dict[str, float]) -> CommandBuilder:
             """ Build the gcode string for a move """
-            return ''.join(
-                axis + str(round(coords, GCODE_ROUNDING_PRECISION))
-                for axis, coords in sorted(coords_dict.items())
-                if valid_movement(axis, coords)
-            )
+            cmd = _command_builder()
+            for axis, coords in sorted(coords_dict.items()):
+                if valid_movement(axis, coords):
+                    cmd.with_float(prefix=axis, value=coords,
+                                   precision=GCODE_ROUNDING_PRECISION)
+            return cmd
 
         moving_target = only_moving(target)
         if not moving_target:
@@ -1549,8 +1550,8 @@ class SmoothieDriver_3_0_0:
             split_postfix = step_postfix
             split_command = _command_builder().with_gcode(
                 gcode=GCODE.MOVE
-            ).add_word(
-                word=split_command_string
+            ).with_builder(
+                builder=split_command_string
             )
         else:
             split_prefix = _command_builder()
@@ -1572,14 +1573,14 @@ class SmoothieDriver_3_0_0:
         if backlash_command_string:
             command.with_gcode(
                 gcode=GCODE.MOVE
-            ).add_word(
-                word=backlash_command_string
+            ).with_builder(
+                builder=backlash_command_string
             )
 
         command.with_gcode(
             GCODE.MOVE
-        ).add_word(
-            primary_command_string
+        ).with_builder(
+            builder=primary_command_string
         )
         if checked_speed != self._combined_speed:
             command.with_builder(

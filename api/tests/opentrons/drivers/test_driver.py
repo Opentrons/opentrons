@@ -298,12 +298,12 @@ def test_set_active_current(smoothie, monkeypatch):
     smoothie.home('BC')
     expected = [
         # move all
-        ['M907 A2 B2 C2 X2 Y2 Z2 G4 P0.005 G0 A0B0C0X0Y0Z0'],
+        ['M907 A2 B2 C2 X2 Y2 Z2 G4 P0.005 G0 A0 B0 C0 X0 Y0 Z0'],
         ['M400'],
         ['M907 A2 B0 C0 X2 Y2 Z2 G4 P0.005'],  # disable BC axes
         ['M400'],
         # move BC
-        ['M907 A0 B2 C2 X0 Y0 Z0 G4 P0.005 G0 B1.3C1.3 G0 B1C1'],
+        ['M907 A0 B2 C2 X0 Y0 Z0 G4 P0.005 G0 B1.3 C1.3 G0 B1 C1'],
         ['M400'],
         ['M907 A0 B0 C0 X0 Y0 Z0 G4 P0.005'],  # disable BC axes
         ['M400'],
