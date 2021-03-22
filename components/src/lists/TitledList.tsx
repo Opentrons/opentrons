@@ -49,7 +49,7 @@ export interface TitledListProps {
 /**
  * An ordered list with optional title, icon, and description.
  */
-export function TitledList (props: TitledListProps): JSX.Element {
+export function TitledList(props: TitledListProps): JSX.Element {
   const {
     id,
     iconName,
@@ -125,8 +125,8 @@ export function TitledList (props: TitledListProps): JSX.Element {
                 props.selected
                   ? 'chevron-right'
                   : props.collapsed
-                    ? 'chevron-down'
-                    : 'chevron-up'
+                  ? 'chevron-down'
+                  : 'chevron-up'
               }
             />
           </div>

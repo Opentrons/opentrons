@@ -43,7 +43,7 @@ const TOOLTIP_ID_PREFIX = 'Tooltip__'
  * }
  * ```
  */
-export function useTooltip (options: UseTooltipOptions = {}): UseTooltipResult {
+export function useTooltip(options: UseTooltipOptions = {}): UseTooltipResult {
   const { placement, strategy, offset = Styles.TOOLTIP_OFFSET_PX } = options
   const tooltipId = useRef(uniqueId(TOOLTIP_ID_PREFIX)).current
   const [target, targetRef] = useState<Element | null>(null)

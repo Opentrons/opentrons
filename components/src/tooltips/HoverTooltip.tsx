@@ -36,20 +36,20 @@ interface HoverTooltipState {
  * @deprecated Use `Tooltip` and `useHoverTooltip` instead
  */
 export class HoverTooltip extends React.Component<
-HoverTooltipProps,
-HoverTooltipState
+  HoverTooltipProps,
+  HoverTooltipState
 > {
   openTimeout: number | null
   closeTimeout: number | null
 
-  constructor (props: HoverTooltipProps) {
+  constructor(props: HoverTooltipProps) {
     super(props)
     this.openTimeout = null
     this.closeTimeout = null
     this.state = { isOpen: false }
   }
 
-  componentWillUnmount (): void {
+  componentWillUnmount(): void {
     if (this.closeTimeout) clearTimeout(this.closeTimeout)
     if (this.openTimeout) clearTimeout(this.openTimeout)
   }
@@ -70,7 +70,7 @@ HoverTooltipState
     )
   }
 
-  render (): JSX.Element {
+  render(): JSX.Element {
     return (
       <DeprecatedTooltip
         open={this.state.isOpen}

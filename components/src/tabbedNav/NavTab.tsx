@@ -32,7 +32,7 @@ export interface NavTabProps {
   selected?: boolean
 }
 
-export function NavTab (props: NavTabProps): JSX.Element {
+export function NavTab(props: NavTabProps): JSX.Element {
   const { url } = props
   const className = classnames(props.className, styles.tab, {
     [styles.disabled]: props.disabled,
