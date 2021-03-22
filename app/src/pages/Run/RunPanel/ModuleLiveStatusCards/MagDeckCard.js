@@ -7,7 +7,10 @@ import { StatusCard } from './StatusCard'
 import { MagnetData, MagnetControl } from '../../../../molecules/ModuleControls'
 // import { StatusItem } from './StatusItem'
 
-import type { MagneticModule } from '../../../../redux/modules/types'
+import type {
+  MagneticModule,
+  ModuleCommand
+} from '../../../../redux/modules/types'
 
 type Props = {|
   module: MagneticModule,
