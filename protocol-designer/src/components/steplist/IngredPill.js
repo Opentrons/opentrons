@@ -2,11 +2,12 @@
 import * as React from 'react'
 import { Pill, type UseHoverTooltipResult } from '@opentrons/components'
 import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
-import styles from './StepItem.css'
+import { AIR } from '../../step-generation/utils'
 import type {
   WellIngredientVolumeData,
   WellIngredientNames,
 } from '../../steplist'
+import styles from './StepItem.css'
 
 type Props = {
   ingreds: WellIngredientVolumeData,
@@ -15,16 +16,16 @@ type Props = {
 }
 
 export function IngredPill(props: Props): React.Node {
-  const { ingreds, ingredNames, targetProps } = props
-  if (!ingreds || Object.keys(ingreds).length === 0) {
+  const { ingredNames, targetProps } = props
+  const ingredIds: Array<string> = Object.keys(props.ingreds)
+
+  if (ingredIds.filter(id => id !== AIR).length === 0) {
     // Invisible Pill, but has correct height/margin/etc for spacing
     return <Pill />
   }
 
   const color =
-    Object.keys(ingreds).length === 1
-      ? swatchColors(Number(Object.keys(ingreds)[0]))
-      : MIXED_WELL_COLOR
+    ingredIds.length === 1 ? swatchColors(ingredIds[0]) : MIXED_WELL_COLOR
 
   return (
     <Pill
@@ -32,9 +33,7 @@ export function IngredPill(props: Props): React.Node {
       className={styles.ingred_pill}
       hoverTooltipHandlers={targetProps}
     >
-      {Object.keys(ingreds)
-        .map(groupId => ingredNames[groupId])
-        .join(',')}
+      {ingredIds.map(groupId => ingredNames[groupId]).join(',')}
     </Pill>
   )
 }
