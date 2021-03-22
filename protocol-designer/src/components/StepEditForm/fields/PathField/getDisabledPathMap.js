@@ -11,6 +11,8 @@ import type { ChangeTipOptions } from '../../../../step-generation/types'
 import type { PipetteEntities } from '../../../../step-forms'
 import type { PathOption } from '../../../../form-types'
 
+export type DisabledPathMap = { [PathOption]: string } | null
+
 export type ValuesForPath = {|
   aspirate_airGap_checkbox: ?boolean,
   aspirate_airGap_volume: ?string,
@@ -24,7 +26,7 @@ export type ValuesForPath = {|
 export function getDisabledPathMap(
   values: ValuesForPath,
   pipetteEntities: PipetteEntities
-): ?{ [PathOption]: string } {
+): DisabledPathMap {
   const {
     aspirate_airGap_checkbox,
     aspirate_wells,
