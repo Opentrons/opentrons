@@ -100,12 +100,12 @@ const DisposalVolumeFieldComponent = (props: Props) => {
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const { propsForFields } = ownProps
   const stepType = 'moveLiquid' // TODO IMMEDIATELY -- HACK!
-  const formValues = {
-    path: propsForFields.path.value,
-    volume: propsForFields.volume.value,
-    pipette: propsForFields.pipette.value,
-    aspirate_airGap_checkbox: propsForFields.aspirate_airGap_checkbox.value,
-    aspirate_airGap_volume: propsForFields.aspirate_airGap_volume.value,
+  const formValues: any = {
+    aspirate_airGap_checkbox: propsForFields.aspirate_airGap_checkbox?.value,
+    aspirate_airGap_volume: propsForFields.aspirate_airGap_volume?.value,
+    path: propsForFields.path?.value,
+    pipette: propsForFields.pipette?.value,
+    volume: propsForFields.volume?.value,
   }
   const blowoutLocationOptions = getBlowoutLocationOptionsForForm({
     path: formValues.path,

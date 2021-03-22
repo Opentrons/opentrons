@@ -358,7 +358,7 @@ const clampDisposalVolume = (
   if (appliedPatch.path !== 'multiDispense' || isDecimalString) return patch
 
   const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
-    appliedPatch,
+    (appliedPatch: any),
     pipetteEntities
   )
   if (maxDisposalVolume == null) {

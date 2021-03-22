@@ -9,7 +9,7 @@ import type {
   PipetteChannels,
 } from '@opentrons/shared-data'
 import type { FormPatch } from '../../actions/types'
-import type { FormData, StepFieldName } from '../../../form-types'
+import type { FormData, PathOption, StepFieldName } from '../../../form-types'
 import type { LabwareEntities, PipetteEntities } from '../../../step-forms'
 
 export function chainPatchUpdaters(
@@ -58,21 +58,22 @@ export const DISPOSAL_VOL_DIGITS = 1
 
 export function getMaxDisposalVolumeForMultidispense(
   rawForm: {|
-    path: PathType,
-    volume: string | null,
-    pipette: string | null,
     aspirate_airGap_checkbox?: boolean | null,
     aspirate_airGap_volume?: string | null,
+    path: PathOption,
+    pipette: string | null,
+    volume: string | null,
   |},
   pipetteEntities: PipetteEntities
 ): ?number {
   // calculate max disposal volume for given volume & pipette. Might be negative!
-  if (!rawForm) return null
+  const pipetteId = rawForm?.pipette
+  if (!rawForm || !pipetteId) return null
   assert(
     rawForm.path === 'multiDispense',
     `getMaxDisposalVolumeForMultidispense expected multiDispense, got path ${rawForm.path}`
   )
-  const pipetteEntity = pipetteEntities[rawForm.pipette]
+  const pipetteEntity = pipetteEntities[pipetteId]
   const pipetteCapacity = getPipetteCapacity(pipetteEntity)
 
   const volume = Number(rawForm.volume)
