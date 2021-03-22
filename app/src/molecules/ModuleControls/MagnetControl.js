@@ -62,7 +62,7 @@ type Props = {|
     moduleId: string,
     command: ModuleCommand,
     args?: Array<mixed>
-    ) => mixed,
+  ) => mixed,
   disabledReason?: string | null,
 |}
 
@@ -140,7 +140,7 @@ export const MagnetControl = ({
         </Portal>
       )}
       <SecondaryBtn
-        width={"11rem"}
+        width={'11rem'}
         onClick={handleClick}
         disabled={disabledReason != null}
         {...targetProps}

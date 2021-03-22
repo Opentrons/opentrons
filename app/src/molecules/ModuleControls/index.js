@@ -1,19 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import {
-  COLOR_SUCCESS,
-  Box,
-  Flex,
-  Icon,
-  Text,
-  TEXT_TRANSFORM_CAPITALIZE,
-  ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  COLOR_WARNING_LIGHT,
-  FONT_SIZE_BODY_1,
-  DIRECTION_COLUMN,
-} from '@opentrons/components'
+import { Box, Flex, JUSTIFY_SPACE_BETWEEN } from '@opentrons/components'
 import { TemperatureControl } from './TemperatureControl'
 import { MagnetControl } from './MagnetControl'
 import { MagnetData } from './MagnetData'
@@ -75,11 +63,11 @@ export function ModuleControls(props: Props): React.Node {
                 title={mod.type === THERMOCYCLER_MODULE_TYPE ? 'block' : null}
               />
               <TemperatureControl
-                  module={mod}
-                  isSecondaryTemp={false}
-                  sendModuleCommand={sendModuleCommand}
-                  disabledReason={controlDisabledReason}
-                />
+                module={mod}
+                isSecondaryTemp={false}
+                sendModuleCommand={sendModuleCommand}
+                disabledReason={controlDisabledReason}
+              />
             </Flex>
           </Box>
         </>

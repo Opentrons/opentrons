@@ -1,9 +1,12 @@
 // @flow
 import * as React from 'react'
-import { Box, LabeledValue, SPACING_3 } from '@opentrons/components'
+import { Box, SPACING_3 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { TemperatureControl, TemperatureData } from '../../../../molecules/ModuleControls'
+import {
+  TemperatureControl,
+  TemperatureData,
+} from '../../../../molecules/ModuleControls'
 import { StatusCard } from './StatusCard'
 
 import type {

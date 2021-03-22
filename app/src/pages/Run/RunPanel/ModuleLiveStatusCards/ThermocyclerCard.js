@@ -15,13 +15,10 @@ import {
 } from '../../../../molecules/ModuleControls'
 
 import { StatusCard } from './StatusCard'
-import { StatusItem } from './StatusItem'
 import styles from './styles.css'
 
-const BLOCK_TEMP_ABBREV = 'Block Temp'
 const CYCLE_NUMBER = 'Cycle #'
 const HOLD_TIME_REMAINING = 'Hold time remaining:'
-const LID_TEMP_ABBREV = 'Lid Temp'
 const STEP_NUMBER = 'Step #'
 const TIME_REMAINING_FOR_STEP = 'Time remaining for step:'
 
@@ -134,11 +131,7 @@ export const ThermocyclerCard = ({
       toggleCard={toggleCard}
     >
       <Box padding={SPACING_3}>
-        <TemperatureData
-          title="lid"
-          current={lidTemp}
-          target={lidTarget}
-        />
+        <TemperatureData title="lid" current={lidTemp} target={lidTarget} />
         <TemperatureControl
           module={module}
           isSecondaryTemp={true}

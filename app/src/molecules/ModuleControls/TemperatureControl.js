@@ -8,7 +8,6 @@ import {
   SecondaryBtn,
   useHoverTooltip,
   Tooltip,
-  SPACING_3,
   Text,
   FONT_WEIGHT_SEMIBOLD,
   SPACING_1,
@@ -28,8 +27,6 @@ import type {
   ModuleCommand,
 } from '../../redux/modules/types'
 import type { ModuleModel } from '@opentrons/shared-data'
-
-const TC_BLOCK = 'Block'
 
 type Props = {|
   module: ThermocyclerModule | TemperatureModule,
@@ -54,20 +51,21 @@ export const TemperatureControl = ({
 
   const isThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
   const displayName = getModuleDisplayName(module.model)
-  const modulePartName = isThermocycler ? isSecondaryTemp ? ' Lid' : ' Block' : ''
+  const modulePartName = isThermocycler
+    ? isSecondaryTemp
+      ? ' Lid'
+      : ' Block'
+    : ''
   const alertHeading = `Set ${modulePartName} Temperature for ${displayName}`
   const alertBody = `Pre heat or cool your ${displayName}${modulePartName}.`
   const primaryFieldLabel = `Set Temp:`
-  const tempRanges = getModuleTemperatureRanges(
-    module.model,
-    isSecondaryTemp,
-  )
+  const tempRanges = getModuleTemperatureRanges(module.model, isSecondaryTemp)
   const note = `enter a whole-number between ${tempRanges.min}°C and ${tempRanges.max}°C`
 
-  const hasTarget = module.type === THERMOCYCLER_MODULE_TYPE && isSecondaryTemp
-    ? module.data.lidTarget != null
-    : module.status !== 'idle'
-
+  const hasTarget =
+    module.type === THERMOCYCLER_MODULE_TYPE && isSecondaryTemp
+      ? module.data.lidTarget != null
+      : module.status !== 'idle'
 
   const handleClick = () => {
     if (hasTarget) {
@@ -124,8 +122,7 @@ export const TemperatureControl = ({
                 <InputField
                   units="°C"
                   value={tempValue}
-                  onChange={e => setTempValue(e.target.value)
-                  }
+                  onChange={e => setTempValue(e.target.value)}
                 />
               </Flex>
               <Text
@@ -144,7 +141,7 @@ export const TemperatureControl = ({
           padding-left: 0.5rem;
           padding-right: 0.5rem;
         `}
-        width={"11rem"}
+        width={'11rem'}
         onClick={handleClick}
         disabled={disabledReason != null}
         {...targetProps}

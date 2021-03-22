@@ -35,7 +35,11 @@ export const MagDeckCard = ({
   >
     <Box padding={SPACING_3}>
       <MagnetData module={module} />
-      <MagnetControl module={module} sendModuleCommand={sendModuleCommand} disabledReason={controlDisabledReason} />
+      <MagnetControl
+        module={module}
+        sendModuleCommand={sendModuleCommand}
+        disabledReason={controlDisabledReason}
+      />
     </Box>
   </StatusCard>
 )
