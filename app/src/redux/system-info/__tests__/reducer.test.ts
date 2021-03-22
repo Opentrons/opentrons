@@ -1,4 +1,3 @@
-// @flow
 // system-info reducer tests
 
 import * as Fixtures from '../__fixtures__'

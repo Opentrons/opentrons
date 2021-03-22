@@ -1,4 +1,3 @@
-// @flow
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import * as Fixtures from '../__fixtures__'

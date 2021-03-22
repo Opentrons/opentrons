@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import pick from 'lodash/pick'
 import some from 'lodash/some'

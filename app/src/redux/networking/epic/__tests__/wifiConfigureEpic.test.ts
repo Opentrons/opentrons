@@ -1,4 +1,3 @@
-// @flow
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 
 import * as Discovery from '../../../discovery'

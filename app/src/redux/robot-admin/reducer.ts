@@ -1,4 +1,3 @@
-// @flow
 import fromPairs from 'lodash/fromPairs'
 import mapValues from 'lodash/mapValues'
 import { DISCOVERY_UPDATE_LIST, HEALTH_STATUS_OK } from '../discovery'

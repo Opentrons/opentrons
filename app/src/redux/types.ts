@@ -1,5 +1,4 @@
 /* eslint-disable no-use-before-define */
-// @flow
 // application types
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux'
 import type { RouterState, RouterAction } from 'connected-react-router'

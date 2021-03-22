@@ -1,4 +1,3 @@
-// @flow
 // tip length calibration session constants
 import { sharedCalCommands } from '../common-calibration/constants'
 

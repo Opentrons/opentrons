@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import last from 'lodash/last'
 import { useSelector, useDispatch } from 'react-redux'

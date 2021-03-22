@@ -1,4 +1,3 @@
-// @flow
 import { cloneDeep, set, get } from 'lodash'
 import { subSeconds, differenceInSeconds, parseISO } from 'date-fns'
 

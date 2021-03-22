@@ -1,4 +1,3 @@
-// @flow
 import { of } from 'rxjs'
 import { filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { ofType } from 'redux-observable'

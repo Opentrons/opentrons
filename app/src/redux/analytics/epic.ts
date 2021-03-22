@@ -1,4 +1,3 @@
-// @flow
 // analytics epics
 import { combineEpics, ofType } from 'redux-observable'
 import { of, from, zip } from 'rxjs'

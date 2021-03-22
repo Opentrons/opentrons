@@ -1,4 +1,3 @@
-// @flow
 // list of robots
 import * as React from 'react'
 

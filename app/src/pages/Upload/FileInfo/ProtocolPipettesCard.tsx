@@ -1,4 +1,3 @@
-// @flow
 // setup pipettes component
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'

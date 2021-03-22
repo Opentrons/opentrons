@@ -1,4 +1,3 @@
-// @flow
 // robot connection state and reducer
 import type { Action } from '../../types'
 

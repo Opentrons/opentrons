@@ -1,4 +1,3 @@
-// @flow
 import typeof { PENDING, SUCCESS, FAILURE } from './constants'
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'

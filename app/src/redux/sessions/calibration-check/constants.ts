@@ -1,4 +1,3 @@
-// @flow
 // calibration check session contants
 
 import { sharedCalCommands } from '../common-calibration/constants'

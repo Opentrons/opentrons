@@ -1,4 +1,3 @@
-// @flow
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 
 // common constants

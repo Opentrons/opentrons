@@ -1,4 +1,3 @@
-// @flow
 // view info about the app and update
 import * as React from 'react'
 

@@ -1,4 +1,3 @@
-// @flow
 
 import * as Selectors from '../selectors'
 import * as Fixtures from '../__fixtures__'

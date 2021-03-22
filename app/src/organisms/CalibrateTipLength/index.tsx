@@ -1,4 +1,3 @@
-// @flow
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
 

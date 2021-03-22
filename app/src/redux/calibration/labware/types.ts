@@ -1,4 +1,3 @@
-// @flow
 
 import type { ModuleModel } from '@opentrons/shared-data'
 import type {

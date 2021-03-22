@@ -1,4 +1,3 @@
-// @flow
 // more nav button routes
 import * as React from 'react'
 import { useRouteMatch, Switch, Route, Redirect } from 'react-router-dom'

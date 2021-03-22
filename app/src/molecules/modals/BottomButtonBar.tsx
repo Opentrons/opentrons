@@ -1,4 +1,3 @@
-// @flow
 // bottom button bar for modals
 // TODO(mc, 2018-08-18): maybe make this the default AlertModal behavior
 import * as React from 'react'

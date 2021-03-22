@@ -1,4 +1,3 @@
-// @flow
 // Deck Calibration Orchestration Component
 import * as React from 'react'
 

@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import without from 'lodash/without'
 

@@ -1,4 +1,3 @@
-// @flow
 // setup modules component
 import * as React from 'react'
 import { useSelector } from 'react-redux'

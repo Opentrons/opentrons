@@ -1,4 +1,3 @@
-// @flow
 // system-info UI module
 
 export * from './actions'

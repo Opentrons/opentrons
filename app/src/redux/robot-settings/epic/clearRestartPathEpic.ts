@@ -1,4 +1,3 @@
-// @flow
 import { of } from 'rxjs'
 import { map, filter, switchMap } from 'rxjs/operators'
 import { getRobotAdminStatus, RESTARTING_STATUS } from '../../robot-admin'

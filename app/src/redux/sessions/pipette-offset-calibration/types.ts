@@ -1,4 +1,3 @@
-// @flow
 // pipette offset calibration types
 import typeof {
   PIP_OFFSET_STEP_SESSION_STARTED,

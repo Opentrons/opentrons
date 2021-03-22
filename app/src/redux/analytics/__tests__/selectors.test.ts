@@ -1,4 +1,3 @@
-// @flow
 
 import * as Protocol from '../../protocol'
 import * as RobotSelectors from '../../robot/selectors'

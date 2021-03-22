@@ -1,4 +1,3 @@
-// @flow
 import noop from 'lodash/noop'
 
 import * as RobotSelectors from '../../robot/selectors'

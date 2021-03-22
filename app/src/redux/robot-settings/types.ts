@@ -1,4 +1,3 @@
-// @flow
 
 import type { RobotApiRequestMeta } from '../robot-api/types'
 

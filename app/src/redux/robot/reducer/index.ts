@@ -1,4 +1,3 @@
-// @flow
 // robot reducer
 import { combineReducers } from 'redux'
 

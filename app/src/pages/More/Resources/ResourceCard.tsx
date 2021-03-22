@@ -1,4 +1,3 @@
-// @flow
 // resources page layout
 import * as React from 'react'
 import { Card, OutlineButton } from '@opentrons/components'

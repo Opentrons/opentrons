@@ -1,4 +1,3 @@
-// @flow
 // Page for /more/network-and-system
 import * as React from 'react'
 import { css } from 'styled-components'

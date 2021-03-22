@@ -1,4 +1,3 @@
-// @flow
 
 import { mockRobot, mockRequestMeta } from '../../robot-api/__fixtures__'
 import * as Actions from '../actions'

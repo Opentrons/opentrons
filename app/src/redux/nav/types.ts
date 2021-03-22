@@ -1,4 +1,3 @@
-// @flow
 
 import type { IconName } from '@opentrons/components'
 

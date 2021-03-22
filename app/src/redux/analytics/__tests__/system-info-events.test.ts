@@ -1,4 +1,3 @@
-// @flow
 
 import { makeEvent } from '../make-event'
 

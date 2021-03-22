@@ -1,4 +1,3 @@
-// @flow
 // tip length calibration types
 import typeof {
   TIP_LENGTH_STEP_SESSION_STARTED,

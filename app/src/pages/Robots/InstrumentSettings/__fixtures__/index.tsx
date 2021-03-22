@@ -1,4 +1,3 @@
-// @flow
 
 export const mockAttachedPipette = {
   id: '1234_pip_id',

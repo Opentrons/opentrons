@@ -1,4 +1,3 @@
-// @flow
 import noop from 'lodash/noop'
 import * as Discovery from '../../discovery'
 import * as Selectors from '../selectors'

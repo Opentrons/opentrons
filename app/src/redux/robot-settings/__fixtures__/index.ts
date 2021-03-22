@@ -1,4 +1,3 @@
-// @flow
 // robot settings fixtures
 
 import { mockRobot } from '../../robot-api/__fixtures__'

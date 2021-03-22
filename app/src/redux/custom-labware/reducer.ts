@@ -1,4 +1,3 @@
-// @flow
 // custom labware reducer
 import keyBy from 'lodash/keyBy'
 import * as Actions from './actions'

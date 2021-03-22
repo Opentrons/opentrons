@@ -1,4 +1,3 @@
-// @flow
 // desktop shell module
 
 import pkg from '../../../package.json'

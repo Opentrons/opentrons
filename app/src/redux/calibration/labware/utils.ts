@@ -1,4 +1,3 @@
-// @flow
 
 import round from 'lodash/round'
 import type { LabwareCalibration } from '../types'

@@ -1,4 +1,3 @@
-// @flow
 import { combineReducers } from 'redux'
 
 import { robotLogsReducer } from './robot-logs/reducer'

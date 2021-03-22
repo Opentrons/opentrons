@@ -1,4 +1,3 @@
-// @flow
 // system-info reducer
 
 import * as Constants from './constants'

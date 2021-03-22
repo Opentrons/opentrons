@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Text, FONT_WEIGHT_SEMIBOLD, SPACING_3 } from '@opentrons/components'
 

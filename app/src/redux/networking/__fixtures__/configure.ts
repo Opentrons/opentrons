@@ -1,4 +1,3 @@
-// @flow
 // fixtures for /wifi/configure
 
 import { POST } from '../../robot-api'

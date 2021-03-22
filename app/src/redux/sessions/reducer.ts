@@ -1,4 +1,3 @@
-// @flow
 import omit from 'lodash/omit'
 
 import * as Constants from './constants'

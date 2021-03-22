@@ -1,4 +1,3 @@
-// @flow
 // instrument tabs bar container
 // used for left/right pipette selection during pipette calibration
 import * as React from 'react'

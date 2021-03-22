@@ -1,4 +1,3 @@
-// @flow
 // robot selectors
 import { head } from 'lodash'
 import padStart from 'lodash/padStart'

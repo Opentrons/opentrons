@@ -1,4 +1,3 @@
-// @flow
 import type { Action } from '../../redux/types'
 import type { CalibrationCheckSession } from '../../redux/sessions/types'
 

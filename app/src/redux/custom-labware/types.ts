@@ -1,4 +1,3 @@
-// @flow
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 

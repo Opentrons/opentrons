@@ -1,4 +1,3 @@
-// @flow
 // labware calibration controls modal
 import * as React from 'react'
 import cx from 'classnames'

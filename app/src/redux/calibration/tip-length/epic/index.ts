@@ -1,4 +1,3 @@
-// @flow
 
 import { combineEpics } from 'redux-observable'
 import { fetchTipLengthCalibrationsEpic } from './fetchTipLengthCalibrationsEpic'

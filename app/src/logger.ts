@@ -1,4 +1,3 @@
-// @flow
 // logger
 import { useRef } from 'react'
 import { remote } from './redux/shell/remote'
@@ -23,7 +22,7 @@ export type Logger = {
   verbose: Log,
   debug: Log,
   silly: Log,
-}
+|}
 
 const ERROR: 'error' = 'error'
 const WARN: 'warn' = 'warn'

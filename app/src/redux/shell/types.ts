@@ -1,4 +1,3 @@
-// @flow
 import type { Error } from '../types'
 import type { RobotLogsState, RobotLogsAction } from './robot-logs/types'
 

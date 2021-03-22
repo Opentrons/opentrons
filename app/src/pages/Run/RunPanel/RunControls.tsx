@@ -1,4 +1,3 @@
-// @flow
 // play pause run buttons for sidepanel
 import * as React from 'react'
 import { OutlineButton, HoverTooltip } from '@opentrons/components'

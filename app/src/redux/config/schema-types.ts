@@ -1,4 +1,3 @@
-// @flow
 import type { LogLevel } from '../../logger'
 
 export type UrlProtocol = 'file:' | 'http:'

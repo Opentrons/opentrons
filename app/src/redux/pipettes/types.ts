@@ -1,4 +1,3 @@
-// @flow
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { Pipette as ProtocolPipette } from '../robot/types'

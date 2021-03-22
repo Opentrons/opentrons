@@ -1,4 +1,3 @@
-// @flow
 
 import { resetConfigValue } from '../config'
 import * as Types from './types'

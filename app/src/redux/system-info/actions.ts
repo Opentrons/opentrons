@@ -1,4 +1,3 @@
-// @flow
 // system-info actions
 
 import * as Constants from './constants'

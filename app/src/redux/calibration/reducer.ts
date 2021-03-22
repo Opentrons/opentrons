@@ -1,4 +1,3 @@
-// @flow
 import * as Constants from './constants'
 import * as labware from './labware'
 import * as pipetteOffset from './pipette-offset'

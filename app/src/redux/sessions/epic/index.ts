@@ -1,4 +1,3 @@
-// @flow
 import { combineEpics } from 'redux-observable'
 import { createSessionEpic } from './createSessionEpic'
 import { ensureSessionEpic } from './ensureSessionEpic'

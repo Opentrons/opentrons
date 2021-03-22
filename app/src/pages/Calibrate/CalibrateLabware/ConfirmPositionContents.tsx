@@ -1,4 +1,3 @@
-// @flow
 // container for position confirmation logic in ConfirmationModal
 import * as React from 'react'
 import { connect } from 'react-redux'

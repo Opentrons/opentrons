@@ -1,4 +1,3 @@
-// @flow
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { findLabwareDefWithCustom } from '../../../assets/labware/findLabware'
 

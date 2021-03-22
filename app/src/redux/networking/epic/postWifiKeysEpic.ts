@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 import omit from 'lodash/omit'
 

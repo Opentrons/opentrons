@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { ListItem, Icon } from '@opentrons/components'
 import styles from './upload-panel.css'

@@ -1,4 +1,3 @@
-// @flow
 // hash strings for an amount of anonymity
 // note: values will be _hashed_, not _enctrypted_; hashed values should not be
 // considered secure nor should they ever be released publicly

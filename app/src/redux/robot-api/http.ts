@@ -1,4 +1,3 @@
-// @flow
 // simple fetch wrapper to format URL for robot and parse JSON response
 import { of, from } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'

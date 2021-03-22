@@ -1,4 +1,3 @@
-// @flow
 // mock HTTP responses for pipettes endpoints
 
 import type { PipetteSettings } from '../types'

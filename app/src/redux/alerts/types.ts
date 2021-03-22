@@ -1,4 +1,3 @@
-// @flow
 
 import typeof {
   ALERT_U2E_DRIVER_OUTDATED,

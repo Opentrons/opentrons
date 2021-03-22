@@ -1,4 +1,3 @@
-// @flow
 
 import typeof {
   DECK_CAL_STATUS_OK,

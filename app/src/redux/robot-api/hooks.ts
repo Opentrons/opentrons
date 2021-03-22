@@ -1,4 +1,3 @@
-// @flow
 // hooks for components that depend on API state
 import { useReducer, useCallback, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'

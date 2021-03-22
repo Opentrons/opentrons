@@ -1,4 +1,3 @@
-// @flow
 
 import { of } from 'rxjs'
 import { filter, withLatestFrom, mergeMap } from 'rxjs/operators'

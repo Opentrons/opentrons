@@ -1,4 +1,3 @@
-// @flow
 // tests for the shell module
 import { EMPTY } from 'rxjs'
 import { TestScheduler } from 'rxjs/testing'

@@ -1,4 +1,3 @@
-// @flow
 // info panel for labware calibration page
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'

@@ -1,4 +1,3 @@
-// @flow
 import * as Actions from '../actions'
 import type { RobotApiAction } from '../types'
 

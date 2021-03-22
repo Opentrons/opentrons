@@ -1,4 +1,3 @@
-// @flow
 
 export const TIP_LENGTH_CALIBRATIONS_PATH: '/calibration/tip_length' =
   '/calibration/tip_length'

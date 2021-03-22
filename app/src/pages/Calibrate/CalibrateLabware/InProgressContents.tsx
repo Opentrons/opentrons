@@ -1,4 +1,3 @@
-// @flow
 // in progress spinner for ConfirmModalContents
 import * as React from 'react'
 

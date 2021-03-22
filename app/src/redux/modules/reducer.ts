@@ -1,4 +1,3 @@
-// @flow
 import keyBy from 'lodash/keyBy'
 import * as Constants from './constants'
 

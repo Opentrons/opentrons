@@ -1,4 +1,3 @@
-// @flow
 // info panel and controls for labware calibration page
 import * as React from 'react'
 import { withRouter } from 'react-router-dom'

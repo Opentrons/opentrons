@@ -1,4 +1,3 @@
-// @flow
 // shell update substate
 // TODO(mc, 2020-06-10): move to shell/actions and shell/selectors
 import { createSelector } from 'reselect'

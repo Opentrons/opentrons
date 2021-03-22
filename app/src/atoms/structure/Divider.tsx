@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Box, C_LIGHT_GRAY, SPACING_1 } from '@opentrons/components'
 

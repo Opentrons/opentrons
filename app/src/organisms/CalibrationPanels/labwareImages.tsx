@@ -1,4 +1,3 @@
-// @flow
 // images by labware load name
 
 // TODO: BC 2020-04-01): this mapping should live in shared-data,

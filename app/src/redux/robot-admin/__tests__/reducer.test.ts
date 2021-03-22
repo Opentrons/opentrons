@@ -1,4 +1,3 @@
-// @flow
 
 import { mockDiscoveryClientRobot } from '../../discovery/__fixtures__'
 import { HEALTH_STATUS_NOT_OK } from '../../discovery'

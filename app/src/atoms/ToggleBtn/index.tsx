@@ -1,4 +1,3 @@
-// @flow
 // primitives based toggle button
 // TODO(mc, 2020-10-08): replace ToggleButton in CL with this component
 import * as React from 'react'

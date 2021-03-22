@@ -1,4 +1,3 @@
-// @flow
 // deck calibration types
 
 import typeof {

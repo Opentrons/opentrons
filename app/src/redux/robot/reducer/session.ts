@@ -1,4 +1,3 @@
-// @flow
 // robot session (protocol) state and reducer
 import omit from 'lodash/omit'
 import { actionTypes } from '../actions'

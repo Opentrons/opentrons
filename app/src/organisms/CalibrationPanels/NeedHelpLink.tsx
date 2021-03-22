@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Flex, Link, C_BLUE, FONT_SIZE_BODY_1 } from '@opentrons/components'
 

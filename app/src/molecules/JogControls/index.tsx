@@ -1,4 +1,3 @@
-// @flow
 // jog controls component
 import * as React from 'react'
 

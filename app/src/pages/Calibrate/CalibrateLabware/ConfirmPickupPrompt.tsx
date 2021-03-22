@@ -1,4 +1,3 @@
-// @flow
 // pickup confirmation prompt component for ConfirmPickupContents
 import * as React from 'react'
 

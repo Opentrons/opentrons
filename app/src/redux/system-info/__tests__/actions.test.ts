@@ -1,4 +1,3 @@
-// @flow
 // system-info actions tests
 
 import * as Actions from '../actions'

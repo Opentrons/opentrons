@@ -1,4 +1,3 @@
-// @flow
 // attached pipettes container card
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'

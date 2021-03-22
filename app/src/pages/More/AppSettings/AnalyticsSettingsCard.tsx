@@ -1,4 +1,3 @@
-// @flow
 // info on analytics data collected and toggle to opt in/out
 import * as React from 'react'
 

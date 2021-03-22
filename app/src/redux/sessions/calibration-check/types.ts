@@ -1,4 +1,3 @@
-// @flow
 import type { CalibrationLabware } from '../types'
 import type { Mount } from '../../pipettes/types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

@@ -1,4 +1,3 @@
-// @flow
 
 // intercom api calls
 export const INTERCOM_BOOT = 'boot'

@@ -1,4 +1,3 @@
-// @flow
 // functions for managing the user's Intercom profile
 import { version as appVersion } from '../../../package.json'
 import * as Cfg from '../config'

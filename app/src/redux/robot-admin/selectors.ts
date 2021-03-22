@@ -1,4 +1,3 @@
-// @flow
 import { RESTART_PENDING_STATUS, RESTARTING_STATUS } from './constants'
 
 import type { State } from '../types'

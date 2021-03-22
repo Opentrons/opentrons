@@ -1,4 +1,3 @@
-// @flow
 // robot state module
 // split up into reducer.js, action.js, etc if / when necessary
 import * as selectors from './selectors'

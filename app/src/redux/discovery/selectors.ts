@@ -1,4 +1,3 @@
-// @flow
 import isIp from 'is-ip'
 import concat from 'lodash/concat'
 import find from 'lodash/find'

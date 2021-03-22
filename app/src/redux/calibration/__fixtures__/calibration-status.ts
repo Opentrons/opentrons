@@ -1,4 +1,3 @@
-// @flow
 import { GET } from '../../robot-api'
 import {
   makeResponseFixtures,

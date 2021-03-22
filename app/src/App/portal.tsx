@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import ReactDom from 'react-dom'
 import { Box } from '@opentrons/components'

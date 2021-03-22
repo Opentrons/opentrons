@@ -1,4 +1,3 @@
-// @flow
 // setup labware component
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'

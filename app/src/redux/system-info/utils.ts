@@ -1,4 +1,3 @@
-// @flow
 // system-info helpers and utilities
 
 import { NOT_APPLICABLE, UNKNOWN, UP_TO_DATE, OUTDATED } from './constants'

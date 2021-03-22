@@ -1,4 +1,3 @@
-// @flow
 // support profile epic test
 import { TestScheduler } from 'rxjs/testing'
 import { configInitialized } from '../../config'

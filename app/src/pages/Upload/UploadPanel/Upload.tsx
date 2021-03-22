@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { UploadInput } from './UploadInput'
 import { ConfirmUploadModal } from './ConfirmUploadModal'

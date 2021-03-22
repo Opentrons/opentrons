@@ -1,4 +1,3 @@
-// @flow
 // mock HTTP responses for /robot/lights endpoints
 
 import { mockRobot } from '../../robot-api/__fixtures__'

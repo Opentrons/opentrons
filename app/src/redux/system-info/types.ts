@@ -1,4 +1,3 @@
-// @flow
 // system-info types
 
 import typeof {

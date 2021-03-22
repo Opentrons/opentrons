@@ -1,4 +1,3 @@
-// @flow
 import { version } from '../../../../package.json'
 import { initializeProfile, updateProfile } from '../profile'
 import * as IntercomBinding from '../intercom-binding'

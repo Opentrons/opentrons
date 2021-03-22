@@ -1,4 +1,3 @@
-// @flow
 import semver from 'semver'
 import { createSelector } from 'reselect'
 

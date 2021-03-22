@@ -1,4 +1,3 @@
-// @flow
 // presentational component for an item in a RobotList
 import * as React from 'react'
 import { NotificationIcon, Icon, ToggleButton } from '@opentrons/components'

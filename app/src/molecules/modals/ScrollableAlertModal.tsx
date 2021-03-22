@@ -1,4 +1,3 @@
-// @flow
 // AlertModal with vertical scrolling
 import * as React from 'react'
 import omit from 'lodash/omit'

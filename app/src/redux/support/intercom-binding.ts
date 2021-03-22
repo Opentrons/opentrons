@@ -1,4 +1,3 @@
-// @flow
 // functions for managing the binding to the Intercom js api
 
 import { createLogger } from '../../logger'

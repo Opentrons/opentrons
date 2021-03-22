@@ -1,4 +1,3 @@
-// @flow
 // mixpanel actions
 import mixpanel from 'mixpanel-browser'
 

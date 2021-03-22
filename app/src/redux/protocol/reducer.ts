@@ -1,4 +1,3 @@
-// @flow
 import { filenameToType, parseProtocolData } from './protocol-data'
 
 import type { Action } from '../types'

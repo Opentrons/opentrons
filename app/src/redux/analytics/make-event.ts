@@ -1,4 +1,3 @@
-// @flow
 // redux action types to analytics events map
 import { createLogger } from '../../logger'
 import { selectors as robotSelectors } from '../robot'

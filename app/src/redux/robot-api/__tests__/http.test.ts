@@ -1,4 +1,3 @@
-// @flow
 // tests for the robot-api fetch wrapper
 
 import { promisify } from 'util'

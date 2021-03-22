@@ -1,4 +1,3 @@
-// @flow
 // custom labware selectors
 import { createSelector } from 'reselect'
 import sortBy from 'lodash/sortBy'

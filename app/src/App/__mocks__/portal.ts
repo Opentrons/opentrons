@@ -1,4 +1,3 @@
-// @flow
 // mock portal for enzyme tests
 import * as React from 'react'
 

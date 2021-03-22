@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { PrimaryButton, Icon } from '@opentrons/components'

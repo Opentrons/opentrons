@@ -1,4 +1,3 @@
-// @flow
 import { robotControlsReducer } from '../reducer'
 
 import type { Action } from '../../types'

@@ -1,4 +1,3 @@
-// @flow
 
 // config path
 export const CONFIG_PATH_ALERTS_IGNORED = 'alerts.ignored'

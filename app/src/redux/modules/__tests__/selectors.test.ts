@@ -1,4 +1,3 @@
-// @flow
 import noop from 'lodash/noop'
 import * as Fixtures from '../__fixtures__'
 import * as Selectors from '../selectors'

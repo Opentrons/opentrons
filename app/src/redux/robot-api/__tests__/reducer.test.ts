@@ -1,4 +1,3 @@
-// @flow
 import { robotApiReducer } from '../reducer'
 
 import type { RobotApiState } from '../types'

@@ -1,4 +1,3 @@
-// @flow
 // protocol state and loading actions
 import { getFeatureFlags } from '../config/selectors'
 import {

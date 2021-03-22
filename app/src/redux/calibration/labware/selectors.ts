@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import head from 'lodash/head'
 import uniqWith from 'lodash/uniqWith'

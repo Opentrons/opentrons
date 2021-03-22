@@ -1,4 +1,3 @@
-// @flow
 
 import type { Mount } from './types'
 

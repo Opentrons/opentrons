@@ -1,4 +1,3 @@
-// @flow
 import omit from 'lodash/omit'
 import * as Fixtures from '../__fixtures__'
 import * as StatusFixtures from '../../__fixtures__'

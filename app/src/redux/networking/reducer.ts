@@ -1,4 +1,3 @@
-// @flow
 import intersection from 'lodash/intersection'
 import keyBy from 'lodash/keyBy'
 import union from 'lodash/union'

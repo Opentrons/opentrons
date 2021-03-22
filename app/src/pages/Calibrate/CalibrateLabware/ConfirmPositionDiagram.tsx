@@ -1,4 +1,3 @@
-// @flow
 // diagram and instructions for ConfirmPositionContents
 import * as React from 'react'
 import { ALIGN_STRETCH, Flex } from '@opentrons/components'

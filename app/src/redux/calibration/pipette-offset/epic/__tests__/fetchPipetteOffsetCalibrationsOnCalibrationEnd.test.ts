@@ -1,4 +1,3 @@
-// @flow
 
 import { TestScheduler } from 'rxjs/testing'
 import { selectors as RobotSelectors } from '../../../../robot'

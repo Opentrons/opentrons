@@ -1,4 +1,3 @@
-// @flow
 import * as Fixtures from '../__fixtures__'
 import * as Actions from '../actions'
 import { sessionReducer } from '../reducer'

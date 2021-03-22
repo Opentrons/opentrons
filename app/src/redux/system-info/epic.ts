@@ -1,4 +1,3 @@
-// @flow
 import { map, mapTo, pairwise, filter } from 'rxjs/operators'
 
 import * as Alerts from '../alerts'

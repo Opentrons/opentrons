@@ -1,4 +1,3 @@
-// @flow
 
 import { robotSettingsReducer } from '../reducer'
 import * as Fixtures from '../__fixtures__'

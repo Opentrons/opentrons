@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { LabwareItem } from './LabwareItem'

@@ -1,4 +1,3 @@
-// @flow
 
 import type { Action } from '../../types'
 import type { RobotLogsState } from './types'

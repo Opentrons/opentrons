@@ -1,4 +1,3 @@
-// @flow
 
 import typeof {
   STATUS_NONE,

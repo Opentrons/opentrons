@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'

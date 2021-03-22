@@ -1,4 +1,3 @@
-// @flow
 // protocol type defs
 import type {
   JsonProtocolFile,

@@ -1,4 +1,3 @@
-// @flow
 
 import type { TipLengthCalibrationSession } from '../../redux/sessions/types'
 import type { Action } from '../../redux/types'

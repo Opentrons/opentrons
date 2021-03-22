@@ -1,4 +1,3 @@
-// @flow
 // calibrate sublocations
 import { createSelector } from 'reselect'
 

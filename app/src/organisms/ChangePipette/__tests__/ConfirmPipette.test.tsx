@@ -1,4 +1,3 @@
-// @flow
 
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'

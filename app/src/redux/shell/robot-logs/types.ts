@@ -1,4 +1,3 @@
-// @flow
 
 export type RobotLogsState = $ReadOnly<{
   downloading: boolean

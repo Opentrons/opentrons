@@ -1,4 +1,3 @@
-// @flow
 import { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { sendModuleCommand } from './actions'

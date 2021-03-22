@@ -1,4 +1,3 @@
-// @flow
 
 // TODO(mc, 2020-05-07): move to config when we have config migration
 // https://github.com/Opentrons/opentrons/issues/5587

@@ -1,4 +1,3 @@
-// @flow
 // fixtures for /wifi/eap-options
 
 import { GET } from '../../robot-api'

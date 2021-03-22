@@ -1,4 +1,3 @@
-// @flow
 // custom labware page
 import * as React from 'react'
 import type { ContextRouter } from 'react-router-dom'

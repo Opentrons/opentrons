@@ -1,4 +1,3 @@
-// @flow
 // common robot types
 
 import type {

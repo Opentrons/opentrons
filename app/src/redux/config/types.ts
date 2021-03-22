@@ -1,4 +1,3 @@
-// @flow
 import typeof {
   INITIALIZED,
   VALUE_UPDATED,

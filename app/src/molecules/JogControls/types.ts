@@ -1,4 +1,3 @@
-// @flow
 
 import typeof { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 

@@ -1,4 +1,3 @@
-// @flow
 // Robot and Instrument links specific to RobotListItem
 import * as React from 'react'
 import { NavLink } from 'react-router-dom'

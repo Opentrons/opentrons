@@ -1,4 +1,3 @@
-// @flow
 import * as Fixtures from '../__fixtures__'
 import { networkingReducer } from '../reducer'
 import * as Actions from '../actions'

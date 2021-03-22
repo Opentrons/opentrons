@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Icon, PrimaryButton } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'

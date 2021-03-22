@@ -1,4 +1,3 @@
-// @flow
 // access main process remote modules via attachments to `global`
 import assert from 'assert'
 

@@ -1,4 +1,3 @@
-// @flow
 
 import * as Types from './types'
 

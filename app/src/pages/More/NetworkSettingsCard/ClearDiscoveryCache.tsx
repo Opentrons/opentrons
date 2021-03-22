@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { clearDiscoveryCache } from '../../../redux/discovery'

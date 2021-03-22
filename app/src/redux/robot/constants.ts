@@ -1,4 +1,3 @@
-// @flow
 // robot redux module constants
 import type { Mount, Slot } from './types'
 

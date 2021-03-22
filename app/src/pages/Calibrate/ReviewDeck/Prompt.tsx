@@ -1,4 +1,3 @@
-// @flow
 // prompt for ReviewDeck of labware calibration page
 import * as React from 'react'
 

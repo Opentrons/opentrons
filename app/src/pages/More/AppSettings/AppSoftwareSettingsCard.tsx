@@ -1,4 +1,3 @@
-// @flow
 // app info card with version and updated
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'

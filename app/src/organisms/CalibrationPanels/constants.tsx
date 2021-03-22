@@ -1,4 +1,3 @@
-// @flow
 
 export const INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL: 'tip-length-no-protocol' =
   'tip-length-no-protocol'

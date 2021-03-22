@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import { isRealtekU2EAdapter, getDriverStatus } from './utils'
 import { NOT_APPLICABLE, IFACE_FAMILY_IPV4 } from './constants'

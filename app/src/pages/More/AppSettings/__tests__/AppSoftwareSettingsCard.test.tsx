@@ -1,4 +1,3 @@
-// @flow
 // tests for the AppSoftwareSettingsCard
 import * as React from 'react'
 

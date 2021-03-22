@@ -1,4 +1,3 @@
-// @flow
 // config tests
 import * as Cfg from '..'
 import { configReducer } from '../reducer'

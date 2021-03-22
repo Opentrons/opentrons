@@ -1,4 +1,3 @@
-// @flow
 // fixtures for /networking/status
 
 import { GET } from '../../robot-api'

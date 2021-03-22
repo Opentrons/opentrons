@@ -1,4 +1,3 @@
-// @flow
 
 import type { IntercomPayload } from '../types'
 import type { State } from '../../types'

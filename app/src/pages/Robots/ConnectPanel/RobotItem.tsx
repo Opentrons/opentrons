@@ -1,4 +1,3 @@
-// @flow
 // connected component for an item in a RobotList
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'

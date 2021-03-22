@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Field, type FieldProps } from 'formik'
 import { FormGroup, InputField, CheckboxField } from '@opentrons/components'

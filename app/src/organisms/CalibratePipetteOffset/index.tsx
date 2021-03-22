@@ -1,4 +1,3 @@
-// @flow
 // Pipette Offset Calibration Orchestration Component
 import * as React from 'react'
 

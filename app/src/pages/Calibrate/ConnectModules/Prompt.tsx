@@ -1,4 +1,3 @@
-// @flow
 // prompt for ReviewModulesModal of labware calibration page
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'

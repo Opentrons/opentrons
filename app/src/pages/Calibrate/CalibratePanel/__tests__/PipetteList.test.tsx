@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { StaticRouter } from 'react-router-dom'
 import { mountWithProviders } from '@opentrons/components/__utils__'

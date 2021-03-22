@@ -1,4 +1,3 @@
-// @flow
 import union from 'lodash/union'
 import without from 'lodash/without'
 import * as Constants from './constants'

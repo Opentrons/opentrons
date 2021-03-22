@@ -1,4 +1,3 @@
-// @flow
 // robot actions and action types
 import type { Error } from '../types'
 import type { ProtocolData } from '../protocol/types'

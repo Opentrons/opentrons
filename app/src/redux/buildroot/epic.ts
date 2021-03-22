@@ -1,4 +1,3 @@
-// @flow
 // epics to control the buildroot migration / update flow
 import every from 'lodash/every'
 import { combineEpics, ofType } from 'redux-observable'

@@ -1,4 +1,3 @@
-// @flow
 
 export const LABWARE_CALIBRATION_PATH: '/labware/calibrations' =
   '/labware/calibrations'

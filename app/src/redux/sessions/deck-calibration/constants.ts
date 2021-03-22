@@ -1,4 +1,3 @@
-// @flow
 // deck calibration sessioin constants
 
 import { sharedCalCommands } from '../common-calibration/constants'

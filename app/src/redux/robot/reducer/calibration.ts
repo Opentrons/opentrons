@@ -1,4 +1,3 @@
-// @flow
 // robot calibration state and reducer
 // TODO(mc, 2018-01-10): refactor to use combineReducers
 import mapValues from 'lodash/mapValues'

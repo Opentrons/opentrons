@@ -1,4 +1,3 @@
-// @flow
 
 import type { Config } from '../config/types'
 import typeof {

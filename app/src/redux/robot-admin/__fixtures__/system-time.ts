@@ -1,4 +1,3 @@
-// @flow
 import { GET } from '../../robot-api'
 import { SYSTEM_TIME_PATH } from '../constants'
 import {

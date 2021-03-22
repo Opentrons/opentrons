@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { CardContentFull } from '../../../../atoms/layout'
 import styles from './styles.css'

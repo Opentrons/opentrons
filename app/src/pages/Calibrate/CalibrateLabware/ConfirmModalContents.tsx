@@ -1,4 +1,3 @@
-// @flow
 // contents container for ConfirmModal
 import * as React from 'react'
 import { connect } from 'react-redux'

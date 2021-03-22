@@ -1,4 +1,3 @@
-// @flow
 import type { State } from '../../types'
 import { SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION } from '../constants'
 import type { Session, PipetteOffsetCalibrationSession } from '../types'

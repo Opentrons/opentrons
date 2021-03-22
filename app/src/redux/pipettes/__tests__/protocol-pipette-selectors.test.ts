@@ -1,4 +1,3 @@
-// @flow
 import noop from 'lodash/noop'
 
 import * as SharedData from '@opentrons/shared-data'

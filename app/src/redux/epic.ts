@@ -1,4 +1,3 @@
-// @flow
 // root application epic
 import { combineEpics } from 'redux-observable'
 

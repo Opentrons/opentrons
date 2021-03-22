@@ -1,4 +1,3 @@
-// @flow
 import type { StepSize } from './types'
 
 export const DEFAULT_STEP_SIZES: Array<StepSize> = [0.1, 1, 10]
