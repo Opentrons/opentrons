@@ -120,7 +120,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         ).with_gcode(
             gcode=GCODE.SET_LID_TEMP
         ).with_float(
-            prefix="S", value=temp
+            prefix="S", value=temp, precision=utils.TC_GCODE_ROUNDING_PRECISION
         )
         await self._connection.send_command(
             data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
@@ -151,12 +151,12 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         ).with_gcode(
             gcode=GCODE.SET_PLATE_TEMP
         ).with_float(
-            prefix="S", value=temp
+            prefix="S", value=temp, precision=utils.TC_GCODE_ROUNDING_PRECISION
         )
         if hold_time is not None:
-            c = c.with_float(prefix="H", value=hold_time)
+            c = c.with_float(prefix="H", value=hold_time, precision=utils.TC_GCODE_ROUNDING_PRECISION)
         if volume is not None:
-            c = c.with_float(prefix="V", value=volume)
+            c = c.with_float(prefix="V", value=volume, precision=utils.TC_GCODE_ROUNDING_PRECISION)
 
         await self._connection.send_command(
             data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
@@ -181,7 +181,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         ).with_gcode(
             gcode=GCODE.SET_RAMP_RATE
         ).with_float(
-            prefix="S", value=ramp_rate
+            prefix="S", value=ramp_rate, precision=utils.TC_GCODE_ROUNDING_PRECISION
         )
         await self._connection.send_command(
             data=c.build(), retries=DEFAULT_COMMAND_RETRIES)

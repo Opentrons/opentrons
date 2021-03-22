@@ -27,7 +27,7 @@ class CommandBuilder:
 
         Returns: self
         """
-        value = round(value, precision) if precision else value
+        value = round(value, precision) if precision is not None else value
         return self.add_word(f"{prefix}{value}")
 
     def with_int(self, prefix: str, value: int) -> 'CommandBuilder':

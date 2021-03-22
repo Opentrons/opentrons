@@ -32,4 +32,3 @@ class PlateTemperature(Temperature):
 class LidStatus(str, Enum):
     OPEN = "open"
     CLOSED = "closed"
-

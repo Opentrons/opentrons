@@ -1,3 +1,6 @@
+from typing import Optional
+
+import pytest
 from opentrons.drivers.command_builder import CommandBuilder
 
 
@@ -8,23 +11,22 @@ def test_builder_create_command_with_terminator() -> None:
     assert builder.build() == "terminator"
 
 
-def test_builder_create_command_with_float() -> None:
+@pytest.mark.parametrize(
+    argnames=["value", "precision", "expected_float"],
+    argvalues=[
+        [1.2342, 3, 1.234],
+        [1.2342, None, 1.2342],
+        [1.2342, 0, 1.0],
+    ]
+)
+def test_builder_create_command_with_float(
+        value: float, precision: Optional[int], expected_float: float) -> None:
     """It should create a command with a floating point value."""
     terminator = "terminator"
     builder = CommandBuilder(terminator=terminator)
     assert builder.with_float(
-        prefix='Z', value=1.2342, precision=3
-    ).build() == "Z1.234 terminator"
-
-
-def test_builder_create_command_with_float_no_round() -> None:
-    """It should create a command with a floating point value that is
-    not rounded."""
-    terminator = "terminator"
-    builder = CommandBuilder(terminator=terminator)
-    assert builder.with_float(
-        prefix='Z', value=1.23442, precision=None
-    ).build() == "Z1.23442 terminator"
+        prefix='Z', value=value, precision=precision
+    ).build() == f"Z{expected_float} terminator"
 
 
 def test_builder_create_command_with_int() -> None:

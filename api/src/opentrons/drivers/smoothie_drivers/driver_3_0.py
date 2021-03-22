@@ -17,8 +17,7 @@ from opentrons.config.robot_configs import current_for_revision
 from opentrons.drivers import serial_communication
 from opentrons.drivers.types import MoveSplits
 from opentrons.drivers.utils import (
-    AxisMoveTimestamp, parse_key_from_substring, parse_number_from_substring,
-    parse_key_values, parse_number
+    AxisMoveTimestamp, parse_key_values, parse_number, parse_optional_number
 )
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
@@ -175,30 +174,10 @@ class ParseError(Exception):
     pass
 
 
-def _parse_number_from_substring(smoothie_substring):
-    """
-    Returns the number in the expected string "N:12.3", where "N" is the
-    axis, and "12.3" is a floating point value for the axis' position
-    """
-    return parse_number_from_substring(smoothie_substring,
-                                       GCODE_ROUNDING_PRECISION)
-
-
-def _parse_axis_from_substring(smoothie_substring):
-    """
-    Returns the axis in the expected string "N:12.3", where "N" is the
-    axis, and "12.3" is a floating point value for the axis' position
-    """
-    return parse_key_from_substring(
-        smoothie_substring
-    ).title()  # upper 1st letter
-
-
 def _parse_position_response(raw_axis_values) -> Dict[str, float]:
     parsed_values = parse_key_values(raw_axis_values)
     if len(parsed_values) < 6:
-        msg = 'Unexpected response in _parse_position_response: {}'.format(
-            raw_axis_values)
+        msg = f'Unexpected response in _parse_position_response: {raw_axis_values}'
         log.error(msg)
         raise ParseError(msg)
 
@@ -261,11 +240,11 @@ def _parse_switch_values(raw_switch_values: str) -> Dict[str, bool]:
     if 'Probe: ' in raw_switch_values:
         raw_switch_values = raw_switch_values.replace('Probe: ', 'Probe:')
 
-    parsed_values = raw_switch_values.strip().split(' ')
+    parsed_values = parse_key_values(raw_switch_values)
     res = {
-        _parse_axis_from_substring(s): bool(_parse_number_from_substring(s))
-        for s in parsed_values
-        if any([n in s for n in ['max', 'Probe']])
+        k.title(): bool(parse_optional_number(v, rounding_val=GCODE_ROUNDING_PRECISION))
+        for (k, v) in parsed_values.items()
+        if any(n in k for n in ['max', 'Probe'])
     }
     # remove the extra "_max" character from each axis key in the dict
     res = {
@@ -1938,7 +1917,6 @@ class SmoothieDriver_3_0_0:
             prefix="P", value=seconds, precision=None
         )
         log.debug(f"delay: {command}")
-
         self._send_command(command, timeout=int(seconds) + 1)
 
     def probe_axis(
