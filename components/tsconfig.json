@@ -7,5 +7,4 @@
     "outDir": "lib"
   },
   "include": ["typings", "src"],
-  "exclude": ["**/@emotion/core/**"]
 }
