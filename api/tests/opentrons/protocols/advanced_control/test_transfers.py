@@ -1323,6 +1323,21 @@ def test_blowout_to_dest(_instr_labware):
         assert step == expected
 
 
+# todo(mm, 2021-03-22):
+# 1) Move reserved_volume_breakdowns from test code to these parametrizations,
+#    for finer-grained bug characterization. (TransferPlan might behave
+#    differently between breakdowns, all other parameters being equal, and that
+#    difference might need to be preserved.) Also consider testing what happens
+#    with 8-Channel pipettes.
+# 2) Temporarily remove the fix and audit every parametrization of this test
+#    to see how ransferPlan fails it. Characterize the existing behavior.
+# 3) Port the characterization of the existing behavior to tests for the current
+#    apiLevel. For the cases where TransferPlan currently infinite-loops, if we
+#    change it to raising an explicit exception, we can count that as the same
+#    behavior. But if TransferPlan fails in some other way, that failure
+#    generally will have to be preserved.
+# 4) Make TransferPlan raise an explicit error for all these cases for new
+#    apiLevels.
 @pytest.mark.timeout(timeout=5)
 @pytest.mark.parametrize(
     'transfer_mode, source_indexes, dest_indexes',
@@ -1333,6 +1348,8 @@ def test_blowout_to_dest(_instr_labware):
     ]
 )
 @pytest.mark.parametrize(
+    # todo(mm, 2021-03-22): Is it worth testing two different Single-Channel
+    # pipettes? Testing 8-Channel behavior would probably be more valuable.
     'pipette_name, tip_rack_name, tip_max_volume, reserved_volume',
     [
         # reserved == pipette max == tip max
@@ -1340,16 +1357,8 @@ def test_blowout_to_dest(_instr_labware):
         ('p300_single', 'opentrons_96_tiprack_300ul', 300, 300),
 
         # pipette max != tip max; reserved == tip max
-        # todo(mm, 2021-03-10): Apparently a bug, these unexpectedly return
-        # something without raising.
-        pytest.param(
-            'p300_single', 'opentrons_96_filtertiprack_200ul', 200, 200,
-            marks=pytest.mark.xfail(strict=True)
-        ),
-        pytest.param(
-            'p20_single_gen2', 'opentrons_96_filtertiprack_10ul', 10, 10,
-            marks=pytest.mark.xfail(strict=True)
-        ),
+        ('p300_single', 'opentrons_96_filtertiprack_200ul', 200, 200),
+        ('p20_single_gen2', 'opentrons_96_filtertiprack_10ul', 10, 10),
 
         # pipette max != tip max; reserved == pipette max
         ('p300_single', 'opentrons_96_filtertiprack_200ul', 200, 300),
@@ -1421,5 +1430,8 @@ def test_error_if_reserved_volume_too_high(
                 api_version=context.api_version,
                 options=options,
                 mode=transfer_mode)
-            # Exhaust the iterator in case it raises the expected exception lazily.
-            list(plan)
+            # Exhaust the iterator in case it raises the expected exception
+            # lazily.
+            # fixme(mm, 2021-03-22): print() for debugging, remove before
+            # merging.
+            print(list(plan))
