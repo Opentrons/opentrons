@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import { ALIGN_CENTER, COLOR_SUCCESS, COLOR_WARNING_LIGHT, FONT_SIZE_BODY_1, TEXT_TRANSFORM_CAPITALIZE, Flex, Icon, Text } from '@opentrons/components'
+import { ALIGN_CENTER, COLOR_SUCCESS, COLOR_WARNING_LIGHT, FONT_SIZE_BODY_1, TEXT_TRANSFORM_CAPITALIZE, Flex, Icon, Text, SPACING_3 } from '@opentrons/components'
 import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 
 import type { MagneticModule } from '../../redux/modules/types'
@@ -14,7 +14,7 @@ type Props = {|
 export function MagnetData(props: Props): React.Node {
   const { module } = props 
   return (
-    <Flex fontSize={FONT_SIZE_BODY_1} alignItems={ALIGN_CENTER}>
+    <Flex fontSize={FONT_SIZE_BODY_1} alignItems={ALIGN_CENTER} marginBottom={SPACING_3}>
       <Icon
         name="circle"
         width="10px"

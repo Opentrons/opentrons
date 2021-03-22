@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { LabeledValue } from '@opentrons/components'
+import { Box, LabeledValue, SPACING_3 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import type {
@@ -133,26 +133,33 @@ export const ThermocyclerCard = ({
       isCardExpanded={isCardExpanded}
       toggleCard={toggleCard}
     >
-      <div className={styles.card_row}>
-        <div className={styles.thermocycler_data}>
-          <TemperatureData
-              title="lid"
-              current={lidTemp}
-              target={lidTarget}
-            />
-          <TemperatureData
-            status={module.status}
-            title="block"
-            current={currentTemp}
-            target={targetTemp}
-          />
-        </div>
+      <Box padding={SPACING_3}>
+        <TemperatureData
+          title="lid"
+          current={lidTemp}
+          target={lidTarget}
+        />
         <TemperatureControl
           module={module}
+          isSecondaryTemp={true}
           sendModuleCommand={sendModuleCommand}
           disabledReason={controlDisabledReason}
         />
-      </div>
+      </Box>
+      <Box padding={SPACING_3} paddingTop={0}>
+        <TemperatureData
+          status={module.status}
+          title="block"
+          current={currentTemp}
+          target={targetTemp}
+        />
+        <TemperatureControl
+          module={module}
+          isSecondaryTemp={false}
+          sendModuleCommand={sendModuleCommand}
+          disabledReason={controlDisabledReason}
+        />
+      </Box>
       {executingProfile && (
         <CycleInfo
           holdTime={holdTime}

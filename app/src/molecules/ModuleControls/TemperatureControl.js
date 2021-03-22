@@ -39,13 +39,11 @@ type Props = {|
     args?: Array<mixed>
   ) => mixed,
   isSecondaryTemp: boolean,
-  btnWidth?: string | null,
   disabledReason?: string | null,
 |}
 
 export const TemperatureControl = ({
   module,
-  btnWidth,
   isSecondaryTemp,
   sendModuleCommand,
   disabledReason,
@@ -146,7 +144,7 @@ export const TemperatureControl = ({
           padding-left: 0.5rem;
           padding-right: 0.5rem;
         `}
-        width={btnWidth ?? "11rem"}
+        width={"11rem"}
         onClick={handleClick}
         disabled={disabledReason != null}
         {...targetProps}
