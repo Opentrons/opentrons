@@ -12,7 +12,7 @@ from typing import Dict
 from enum import Enum
 
 from opentrons.drivers import utils
-from opentrons.drivers.asyncio.communication import CommandBuilder
+from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication.serial_connection import SerialConnection
 from opentrons.drivers.asyncio.magdeck.abstract import AbstractMagDeckDriver
 
@@ -52,10 +52,10 @@ class MagDeckError(Exception):
     pass
 
 
-class MagDeck(AbstractMagDeckDriver):
+class MagDeckDriver(AbstractMagDeckDriver):
 
     @classmethod
-    async def create(cls, port: str) -> 'MagDeck':
+    async def create(cls, port: str) -> 'MagDeckDriver':
         """
         Create a mag deck driver.
 

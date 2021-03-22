@@ -3,7 +3,7 @@ import pytest
 
 from opentrons.drivers.asyncio.communication.serial_connection import \
     SerialConnection
-from opentrons.drivers.asyncio.magdeck.driver import MagDeck
+from opentrons.drivers.asyncio.magdeck.driver import MagDeckDriver
 
 
 @pytest.fixture
@@ -12,26 +12,26 @@ def connection() -> AsyncMock:
 
 
 @pytest.fixture
-def driver(connection: AsyncMock) -> MagDeck:
+def driver(connection: AsyncMock) -> MagDeckDriver:
     connection.send_command.return_value = ""
-    return MagDeck(connection)
+    return MagDeckDriver(connection)
 
 
-async def test_home(driver: MagDeck, connection: AsyncMock) -> None:
+async def test_home(driver: MagDeckDriver, connection: AsyncMock) -> None:
     """It should send a home command"""
     await driver.home()
 
     connection.send_command.assert_called_once_with(data="G28.2 \r\n\r\n", retries=3)
 
 
-async def test_probe_plate(driver: MagDeck, connection: AsyncMock) -> None:
+async def test_probe_plate(driver: MagDeckDriver, connection: AsyncMock) -> None:
     """It should send a probe plate command"""
     await driver.probe_plate()
 
     connection.send_command.assert_called_once_with(data="G38.2 \r\n\r\n", retries=3)
 
 
-async def test_get_plate_height(driver: MagDeck, connection: AsyncMock) -> None:
+async def test_get_plate_height(driver: MagDeckDriver, connection: AsyncMock) -> None:
     """It should send a get plate height command and parse response"""
     connection.send_command.return_value = "height:12.34"
 
@@ -42,7 +42,7 @@ async def test_get_plate_height(driver: MagDeck, connection: AsyncMock) -> None:
     assert response == 12.34
 
 
-async def test_get_mag_position(driver: MagDeck, connection: AsyncMock) -> None:
+async def test_get_mag_position(driver: MagDeckDriver, connection: AsyncMock) -> None:
     """It should send a get mag position command and parse response"""
     connection.send_command.return_value = "Z:12.34"
 
@@ -53,13 +53,13 @@ async def test_get_mag_position(driver: MagDeck, connection: AsyncMock) -> None:
     assert response == 12.34
 
 
-async def test_move(driver: MagDeck, connection: AsyncMock) -> None:
+async def test_move(driver: MagDeckDriver, connection: AsyncMock) -> None:
     """It should send a move command"""
     await driver.move(321.2214)
     connection.send_command.assert_called_once_with(data="G0 Z321.221 \r\n\r\n", retries=3)
 
 
-async def test_get_device_info(driver: MagDeck, connection: AsyncMock) -> None:
+async def test_get_device_info(driver: MagDeckDriver, connection: AsyncMock) -> None:
     """It should send a get device info command and parse response"""
     connection.send_command.return_value = "serial:s model:m version:v"
 
@@ -70,7 +70,7 @@ async def test_get_device_info(driver: MagDeck, connection: AsyncMock) -> None:
     assert response == {"serial": "s", "model": "m", "version": "v"}
 
 
-async def test_enter_programming_mode(driver: MagDeck, connection: AsyncMock) -> None:
+async def test_enter_programming_mode(driver: MagDeckDriver, connection: AsyncMock) -> None:
     """It should send an enter programming mode command"""
     await driver.enter_programming_mode()
 

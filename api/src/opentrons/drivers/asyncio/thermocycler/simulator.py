@@ -1,10 +1,10 @@
 from typing import Optional
 
-from opentrons.drivers.asyncio.thermocycler.abstract import AbstractThermocycler
+from opentrons.drivers.asyncio.thermocycler.abstract import AbstractThermocyclerDriver
 from opentrons.drivers.types import Temperature, PlateTemperature, LidStatus
 
 
-class SimulatingDriver(AbstractThermocycler):
+class SimulatingDriver(AbstractThermocyclerDriver):
 
     def __init__(self):
         self._target_temp: Optional[float] = None

@@ -14,12 +14,12 @@ def connection() -> AsyncMock:
 
 
 @pytest.fixture
-def subject(connection: AsyncMock) -> driver.Thermocycler:
+def subject(connection: AsyncMock) -> driver.ThermocyclerDriver:
     connection.send_command.return_value = ""
-    return driver.Thermocycler(connection)
+    return driver.ThermocyclerDriver(connection)
 
 
-async def test_open_lid(subject: driver.Thermocycler,
+async def test_open_lid(subject: driver.ThermocyclerDriver,
                         connection: AsyncMock) -> None:
     """It should send an open lid command."""
     await subject.open_lid()
@@ -27,7 +27,7 @@ async def test_open_lid(subject: driver.Thermocycler,
     connection.send_command.assert_called_once_with(data="M126 \r\n", retries=3)
 
 
-async def test_close_lid(subject: driver.Thermocycler,
+async def test_close_lid(subject: driver.ThermocyclerDriver,
                          connection: AsyncMock) -> None:
     """It should send a close lid command."""
     await subject.close_lid()
@@ -35,7 +35,7 @@ async def test_close_lid(subject: driver.Thermocycler,
     connection.send_command.assert_called_once_with(data="M127 \r\n", retries=3)
 
 
-async def test_get_lid_status(subject: driver.Thermocycler,
+async def test_get_lid_status(subject: driver.ThermocyclerDriver,
                               connection: AsyncMock) -> None:
     """It should send a get lid status command and parse response."""
     connection.send_command.return_value = f'Lid:open\r\nok\r\nok\r\n'
@@ -54,7 +54,7 @@ async def test_get_lid_status(subject: driver.Thermocycler,
         [driver.LID_TARGET_MAX + 5, driver.LID_TARGET_MAX]
     ]
 )
-async def test_set_lid_temp(subject: driver.Thermocycler,
+async def test_set_lid_temp(subject: driver.ThermocyclerDriver,
                             connection: AsyncMock,
                             requested_temp: float,
                             actual_temp: float) -> None:
@@ -66,7 +66,7 @@ async def test_set_lid_temp(subject: driver.Thermocycler,
     connection.send_command.assert_called_once_with(data=expected, retries=3)
 
 
-async def test_get_lid_temp(subject: driver.Thermocycler,
+async def test_get_lid_temp(subject: driver.ThermocyclerDriver,
                             connection: AsyncMock) -> None:
     """It should send a get lid temperate command and parse response."""
     connection.send_command.return_value = "T:100.000 C:22.041\r\nok\r\nok\r\n'"
@@ -89,7 +89,7 @@ async def test_get_lid_temp(subject: driver.Thermocycler,
     ]
 )
 async def test_set_plate_temp(
-        subject: driver.Thermocycler, connection: AsyncMock,
+        subject: driver.ThermocyclerDriver, connection: AsyncMock,
         temp: float, hold_time: Optional[float], volume: Optional[float],
         expected_body: str) -> None:
     """It should send a set plate temperature command."""
@@ -98,7 +98,7 @@ async def test_set_plate_temp(
     connection.send_command.assert_called_once_with(data=f"M104 {expected_body} \r\n", retries=3)
 
 
-async def test_get_plate_temp(subject: driver.Thermocycler,
+async def test_get_plate_temp(subject: driver.ThermocyclerDriver,
                               connection: AsyncMock) -> None:
     """It should send a command to get the plate temperature and parse the response."""
     connection.send_command.return_value = "T:30.000 C:23.317 H:120\r\nok\r\nok\r\n"
@@ -111,7 +111,7 @@ async def test_get_plate_temp(subject: driver.Thermocycler,
     )
 
 
-async def test_set_ramp_rate(subject: driver.Thermocycler,
+async def test_set_ramp_rate(subject: driver.ThermocyclerDriver,
                              connection: AsyncMock) -> None:
     """It should send a set ramp rate command."""
     await subject.set_ramp_rate(ramp_rate=22)
@@ -119,7 +119,7 @@ async def test_set_ramp_rate(subject: driver.Thermocycler,
     connection.send_command.assert_called_once_with(data="M566 S22 \r\n", retries=3)
 
 
-async def test_deactivate_all(subject: driver.Thermocycler,
+async def test_deactivate_all(subject: driver.ThermocyclerDriver,
                               connection: AsyncMock) -> None:
     """It should send a deactivate all command."""
     await subject.deactivate_all()
@@ -127,7 +127,7 @@ async def test_deactivate_all(subject: driver.Thermocycler,
     connection.send_command.assert_called_once_with(data="M18 \r\n", retries=3)
 
 
-async def test_deactivate_lid(subject: driver.Thermocycler,
+async def test_deactivate_lid(subject: driver.ThermocyclerDriver,
                               connection: AsyncMock) -> None:
     """It should send a deactivate lid command."""
     await subject.deactivate_lid()
@@ -135,7 +135,7 @@ async def test_deactivate_lid(subject: driver.Thermocycler,
     connection.send_command.assert_called_once_with(data="M108 \r\n", retries=3)
 
 
-async def test_deactivate_block(subject: driver.Thermocycler,
+async def test_deactivate_block(subject: driver.ThermocyclerDriver,
                                 connection: AsyncMock) -> None:
     """It should send a deactivate block command."""
     await subject.deactivate_block()
@@ -143,7 +143,7 @@ async def test_deactivate_block(subject: driver.Thermocycler,
     connection.send_command.assert_called_once_with(data="M14 \r\n", retries=3)
 
 
-async def test_device_info(subject: driver.Thermocycler,
+async def test_device_info(subject: driver.ThermocyclerDriver,
                            connection: AsyncMock) -> None:
     """It should send a get device info command and parse response."""
     connection.send_command.return_value = "serial:s model:m version:v"

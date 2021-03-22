@@ -1,6 +1,6 @@
 from typing import Optional, Dict
 
-from opentrons.drivers.asyncio.tempdeck.abstract import AbstractTempDeck, \
+from opentrons.drivers.asyncio.tempdeck.abstract import AbstractTempDeckDriver, \
     Temperature
 
 TEMP_DECK_MODELS = {
@@ -9,7 +9,7 @@ TEMP_DECK_MODELS = {
 }
 
 
-class SimulatingDriver(AbstractTempDeck):
+class SimulatingDriver(AbstractTempDeckDriver):
     def __init__(self, sim_model: str = None):
         self._target_temp = 0.0
         self._active = False

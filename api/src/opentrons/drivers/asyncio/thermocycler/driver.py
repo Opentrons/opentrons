@@ -3,10 +3,10 @@ from enum import Enum
 from typing import Optional, Dict
 
 from opentrons.drivers import utils
-from opentrons.drivers.asyncio.communication import CommandBuilder
+from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication.serial_connection import \
     SerialConnection
-from opentrons.drivers.asyncio.thermocycler.abstract import AbstractThermocycler
+from opentrons.drivers.asyncio.thermocycler.abstract import AbstractThermocyclerDriver
 from opentrons.drivers.types import Temperature, PlateTemperature, LidStatus
 
 log = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ class ThermocyclerError(Exception):
     pass
 
 
-class Thermocycler(AbstractThermocycler):
+class ThermocyclerDriver(AbstractThermocyclerDriver):
     def __init__(self, connection: SerialConnection) -> None:
         """
         Constructor

@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict
 
 from opentrons.drivers.types import Temperature
 
 
-class AbstractTempDeck(ABC):
+class AbstractTempDeckDriver(ABC):
 
     @abstractmethod
     async def connect(self) -> None:

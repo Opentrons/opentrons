@@ -4,7 +4,7 @@ from typing import Optional, Dict
 from opentrons.drivers.types import Temperature, LidStatus, PlateTemperature
 
 
-class AbstractThermocycler(ABC):
+class AbstractThermocyclerDriver(ABC):
 
     @abstractmethod
     async def connect(self) -> None:

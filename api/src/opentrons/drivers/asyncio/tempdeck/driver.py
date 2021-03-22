@@ -12,10 +12,10 @@ from typing import Dict
 from enum import Enum
 
 from opentrons.drivers import utils
-from opentrons.drivers.asyncio.communication import CommandBuilder
+from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication.serial_connection import \
     SerialConnection
-from opentrons.drivers.asyncio.tempdeck.abstract import AbstractTempDeck, \
+from opentrons.drivers.asyncio.tempdeck.abstract import AbstractTempDeckDriver, \
     Temperature
 
 log = logging.getLogger(__name__)
@@ -47,10 +47,10 @@ class TempDeckError(Exception):
     pass
 
 
-class TempDeck(AbstractTempDeck):
+class TempDeckDriver(AbstractTempDeckDriver):
 
     @classmethod
-    async def create(cls, port: str) -> 'TempDeck':
+    async def create(cls, port: str) -> 'TempDeckDriver':
         """
         Create a temp deck driver.
 
