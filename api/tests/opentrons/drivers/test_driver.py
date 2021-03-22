@@ -1,6 +1,7 @@
 from copy import deepcopy
 from unittest.mock import Mock
 import pytest
+from opentrons.drivers.types import MoveSplit
 
 from tests.opentrons.conftest import fuzzy_assert
 from opentrons.config.robot_configs import (
@@ -164,11 +165,11 @@ def test_disable_motor(smoothie, monkeypatch):
     smoothie.disengage_axis('XYZ')
     smoothie.disengage_axis('ABCD')
     expected = [
-        ['M18\s*X'],
+        ['M18 X'],
         ['M400'],
-        ['M18\s*[XYZ]+'],
+        ['M18 [XYZ]+'],
         ['M400'],
-        ['M18\s*[ABC]+'],
+        ['M18 [ABC]+'],
         ['M400'],
     ]
     fuzzy_assert(result=command_log, expected=expected)
@@ -297,12 +298,12 @@ def test_set_active_current(smoothie, monkeypatch):
     smoothie.home('BC')
     expected = [
         # move all
-        ['M907 A2 B2 C2 X2 Y2 Z2 G4 P0.005 G0 A0B0C0X0Y0Z0'],
+        ['M907 A2 B2 C2 X2 Y2 Z2 G4 P0.005 G0 A0 B0 C0 X0 Y0 Z0'],
         ['M400'],
         ['M907 A2 B0 C0 X2 Y2 Z2 G4 P0.005'],  # disable BC axes
         ['M400'],
         # move BC
-        ['M907 A0 B2 C2 X0 Y0 Z0 G4 P0.005 G0 B1.3C1.3 G0 B1C1'],
+        ['M907 A0 B2 C2 X0 Y0 Z0 G4 P0.005 G0 B1.3 C1.3 G0 B1 C1'],
         ['M400'],
         ['M907 A0 B0 C0 X0 Y0 Z0 G4 P0.005'],  # disable BC axes
         ['M400'],
@@ -612,4 +613,69 @@ def test_clear_limit_switch(smoothie, monkeypatch):
         'M400',
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005',
         'M400',
+    ]
+
+
+def test_update_pipette_config(smoothie, monkeypatch):
+    driver = smoothie
+    cmd_list = []
+
+    def _send_command_mock(command):
+        nonlocal cmd_list
+        cmd_list.append(command)
+        return "ok"
+
+    monkeypatch.setattr(driver, '_send_command', _send_command_mock)
+
+    driver.simulating = False
+
+    driver.update_pipette_config("X", {
+        'retract': 2,
+        'debounce': 3,
+        'max_travel': 4,
+        'home': 5
+    })
+
+    assert [c.build().strip() for c in cmd_list] == [
+        "M365.3 X2",
+        "M365.2 O3",
+        "M365.1 X4",
+        "M365.0 X5"
+    ]
+
+
+def test_do_relative_splits_during_home_for(smoothie, monkeypatch):
+    """Test command structure when a split configuration is present."""
+    driver = smoothie
+    cmd_list = []
+
+    def _send_command_mock(
+            command, *args, **kwargs):
+        nonlocal cmd_list
+        cmd_list.append(command.build())
+        return "ok"
+
+    monkeypatch.setattr(driver, '_send_command', _send_command_mock)
+
+    driver.simulating = False
+
+    driver.configure_splits_for(
+        {
+            "B": MoveSplit(
+                split_distance=1,
+                split_current=1.75,
+                split_speed=1,
+                after_time=1800,
+                fullstep=True)
+        }
+    )
+    driver._steps_per_mm = {"B": 1.0, "C": 1.0}
+
+    driver._do_relative_splits_during_home_for("BC")
+
+    assert cmd_list == [
+        'M53 M55 M92 B0.03125 C0.03125 G4 P0.01 M907 B1.75 G4 P0.005 G0 F60 '
+        'G91 \r\n\r\n',
+        'G0 B-1 \r\n\r\n',
+        'G90 M52 M54 M92 B1.0 C1.0 G4 P0.01 G0 F24000 \r\n\r\n'
     ]
