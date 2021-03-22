@@ -7,6 +7,7 @@ more readable format.
 
 import subprocess
 import re
+import os
 from typing import List, Set
 
 from opentrons.algorithms.dfs import DFS
@@ -53,10 +54,8 @@ class USBBus(USBDriverInterface):
         """
         symlink = ''
         try:
-            read = subprocess.check_output(
-                ['readlink', virtual_port]).strip().decode()
-            symlink = f'dev/{read}'
-        except Exception:
+            symlink = os.readlink(virtual_port)
+        except OSError:
             pass
         return symlink
 
@@ -195,4 +194,4 @@ class USBBus(USBDriverInterface):
                     vp.usb_port = p
                     sorted_virtual_ports.append(vp)
                     break
-        return sorted_virtual_ports
+        return sorted_virtual_ports or virtual_ports
