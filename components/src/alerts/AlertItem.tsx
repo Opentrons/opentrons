@@ -53,7 +53,7 @@ export type AlertType = keyof typeof ALERT_PROPS_BY_TYPE
 
 export function AlertItem(props: AlertItemProps): JSX.Element {
   const alertProps = ALERT_PROPS_BY_TYPE[props.type]
-  const icon = (props.icon != null) ? props.icon : alertProps.icon
+  const icon = props.icon != null ? props.icon : alertProps.icon
   const className = cx(styles.alert, alertProps.className, props.className)
 
   const iconProps = {
@@ -66,7 +66,7 @@ export function AlertItem(props: AlertItemProps): JSX.Element {
       <div className={styles.title_bar}>
         <Icon {...iconProps} />
         <span className={styles.title}>{props.title}</span>
-        {(props.onCloseClick != null) && (
+        {props.onCloseClick != null && (
           <IconButton
             name="close"
             onClick={props.onCloseClick}
