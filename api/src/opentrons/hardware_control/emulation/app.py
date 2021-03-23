@@ -36,11 +36,15 @@ class ConnectionHandler:
 
             words = line.decode().strip().split(' ')
             if words:
-                response = self._command_processor.handle(words)
-                if response:
-                    response = f'{response}\r\n'
-                    logger.debug("Sending: %s", response)
-                    writer.write(response.encode())
+                try:
+                    response = self._command_processor.handle(words)
+                    if response:
+                        response = f'{response}\r\n'
+                        logger.debug("Sending: %s", response)
+                        writer.write(response.encode())
+                except (IndexError, StopIteration) as e:
+                    logger.exception("exception")
+                    writer.write(f'Error: {str(e)}\r\n'.encode())
 
             writer.write(self._ack)
             await writer.drain()
