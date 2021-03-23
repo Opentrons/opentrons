@@ -6,6 +6,7 @@ import styles from './alerts.css'
 
 import type { IconProps } from '../icons'
 
+// TODO(bc, 2021-03-23): create and use AlertType Enum here and in rest of file
 export interface AlertItemProps {
   /** name constant of the icon to display */
   type: 'success' | 'warning' | 'error' | 'info'
@@ -52,7 +53,7 @@ export type AlertType = keyof typeof ALERT_PROPS_BY_TYPE
 
 export function AlertItem(props: AlertItemProps): JSX.Element {
   const alertProps = ALERT_PROPS_BY_TYPE[props.type]
-  const icon = props.icon ? props.icon : alertProps.icon
+  const icon = (props.icon != null) ? props.icon : alertProps.icon
   const className = cx(styles.alert, alertProps.className, props.className)
 
   const iconProps = {
@@ -65,7 +66,7 @@ export function AlertItem(props: AlertItemProps): JSX.Element {
       <div className={styles.title_bar}>
         <Icon {...iconProps} />
         <span className={styles.title}>{props.title}</span>
-        {props.onCloseClick && (
+        {(props.onCloseClick != null) && (
           <IconButton
             name="close"
             onClick={props.onCloseClick}
