@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Optional, List
 import enum
 from opentrons.drivers.thermocycler.driver import GCODES
 from .command_processor import CommandProcessor
@@ -44,12 +44,13 @@ class ThermocyclerEmulator(CommandProcessor):
         self.total_hold_time = None
         self.time_remaining = None
 
-    def handle(self, cmd: str, payload: str) -> Optional[str]:  # noqa(C901)
+    def handle(self, words: List[str]) -> Optional[str]:  # noqa: C901
         """
         Handle a command.
 
-        TODO: AL 20210218 create dispatch map annd remove 'noqa(C901)'
+        TODO: AL 20210218 create dispatch map and remove 'noqa(C901)'
         """
+        cmd = words[0]
         logger.info(f"Got command {cmd}")
         if cmd == GCODE_OPEN_LID:
             pass

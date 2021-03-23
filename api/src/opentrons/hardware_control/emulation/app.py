@@ -1,5 +1,4 @@
 import asyncio
-import re
 import logging
 
 from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
@@ -16,16 +15,6 @@ SMOOTHIE_PORT = 9996
 THERMOCYCLER_PORT = 9997
 TEMPDECK_PORT = 9998
 MAGDECK_PORT = 9999
-
-
-LINE_REGEX = re.compile(r"(\S+)(.+)")
-"""Split the line into command and payload.
-
-TODO AL 20210222 This regex is a very naive approach and should be revisited
- if we are going to expand emulator support.
-We can use a regex like "[A-Z][0-9]+\\.*[0-9]*" to match gcodes (i think). And
-handle our custom directives like 'version' and 'dfu' separately.
-"""
 
 
 class ConnectionHandler:
@@ -45,13 +34,9 @@ class ConnectionHandler:
             line = await reader.readuntil(self._terminator)
             logger.debug("Received: %s", line)
 
-            m = LINE_REGEX.match(line.decode())
-            if m:
-                groups = m.groups()
-                cmd = groups[0]
-                payload = groups[1]
-                logger.debug("Command: %s, Payload: %s", cmd, payload)
-                response = self._command_processor.handle(cmd, payload)
+            words = line.decode().strip().split(' ')
+            if words:
+                response = self._command_processor.handle(words)
                 if response:
                     response = f'{response}\r\n'
                     logger.debug("Sending: %s", response)

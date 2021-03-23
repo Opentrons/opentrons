@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Optional, List
 
 from opentrons.drivers.temp_deck.driver import GCODES
 
@@ -25,8 +25,9 @@ class TempDeckEmulator(CommandProcessor):
         self.target_temp = 0
         self.current_temp = 0
 
-    def handle(self, cmd: str, payload: str) -> Optional[str]:
+    def handle(self, words: List[str]) -> Optional[str]:
         """Handle a command."""
+        cmd = words[0]
         logger.info(f"Got command {cmd}")
         if cmd == GCODE_GET_TEMP:
             return f"T:{self.target_temp} C:{self.current_temp}"
