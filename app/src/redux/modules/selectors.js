@@ -1,6 +1,7 @@
 // @flow
 import { createSelector } from 'reselect'
 import sortBy from 'lodash/sortBy'
+import isMatch from 'lodash/isMatch'
 
 import { selectors as RobotSelectors } from '../robot'
 import * as Copy from './i18n'
@@ -18,7 +19,6 @@ import {
 
 export { getModuleType } from '@opentrons/shared-data'
 
-
 export const getAttachedModules: (
   state: State,
   robotName: string | null
@@ -26,7 +26,8 @@ export const getAttachedModules: (
   (state, robotName) =>
     robotName !== null ? state.modules[robotName]?.modulesById : {},
   // sort by usbPort info, if they do not exist (robot version below 4.3), sort by serial
-  modulesByPort => sortBy(modulesByPort, ['usbPort.hub', 'usbPort.port', 'serial'])
+  modulesByPort =>
+    sortBy(modulesByPort, ['usbPort.hub', 'usbPort.port', 'serial'])
 )
 
 export const getAttachedModulesForConnectedRobot = (
@@ -61,28 +62,31 @@ export const getUnpreparedModules: (
   }
 )
 
-// export const getMatchedModules: (
-//   state: State
-// ) => { [slot: string]: Types.AttachedModule } = createSelector(
-//   getAttachedModulesForConnectedRobot,
-//   RobotSelectors.getModules,
-//   (attachedModules, protocolModules) => {
-//     const matchedAmod: { [slot: string]: Types.AttachedModule } = {}
-//     const matchedPmod = []
-//     protocolModules.forEach(pmod => {
-//       const compatible = attachedModules.find(
-//         amod =>
-//           checkModuleCompatibility(amod.model, pmod.model) &&
-//           !matchedAmod.values.includes(amod)
-//       )
-//       if (compatible) {
-//         matchedPmod.push(pmod)
-//         matchedAmod[pmod.slot] = compatible
-//       }
-//     })
-//     return matchedAmod
-//   }
-// )
+export const getMatchedModules: (
+  state: State
+) => Array<Types.MatchedModules> = createSelector(
+  getAttachedModulesForConnectedRobot,
+  RobotSelectors.getModules,
+  (attachedModules, protocolModules) => {
+    const matchedAmod: Array<Types.MatchedModule> = []
+    const matchedPmod = []
+    protocolModules.forEach(pmod => {
+      console.log(`protocol modules: ${pmod.model}`)
+      const compatible =
+        attachedModules.find(
+          amod =>
+            checkModuleCompatibility(amod.model, pmod.model) &&
+              !!matchedAmod.filter(m => m.serial === amod.serial)
+        ) ?? null
+      if (compatible !== null) {
+        console.log('we got here')
+        matchedPmod.push(pmod)
+        matchedAmod.push({ slot: pmod.slot, ...compatible })
+      }
+    })
+    return matchedAmod
+  }
+)
 
 export const getMissingModules: (
   state: State

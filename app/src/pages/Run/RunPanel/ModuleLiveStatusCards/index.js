@@ -7,7 +7,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   useSendModuleCommand,
-  getAttachedModulesForConnectedRobot,
+  getMatchedModules,
   getModuleControlsDisabled,
 } from '../../../../redux/modules'
 
@@ -16,7 +16,7 @@ import { MagDeckCard } from './MagDeckCard'
 import { ThermocyclerCard } from './ThermocyclerCard'
 
 export const ModuleLiveStatusCards = (): React.Node => {
-  const modules = useSelector(getAttachedModulesForConnectedRobot)
+  const modules = useSelector(getMatchedModules)
   const sendModuleCommand = useSendModuleCommand()
   const controlDisabledReason = useSelector(getModuleControlsDisabled)
   const [expandedCard, setExpandedCard] = React.useState(

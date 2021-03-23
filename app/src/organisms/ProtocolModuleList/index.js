@@ -27,6 +27,7 @@ import { selectors as robotSelectors } from '../../redux/robot'
 import { getMatchedModules, getMissingModules } from '../../redux/modules'
 import styles from './styles.css'
 
+import type { MatchedModule } from '../../redux/modules/types'
 import type { State } from '../../redux/types'
 
 const DECK_SLOT_STYLE = { width: '4.5rem' }
@@ -39,7 +40,6 @@ export function ProtocolModuleList(): React.Node {
     robotSelectors.getModules(state)
   )
   const matched = useSelector((state: State) => getMatchedModules(state))
-  console.log(matched)
   const missingModules = useSelector((state: State) => getMissingModules(state))
 
   if (modulesRequired.length < 1) return null
@@ -81,7 +81,7 @@ export function ProtocolModuleList(): React.Node {
               />
               <Text {...DECK_SLOT_STYLE}>{`Slot ${m.slot}`}</Text>
               <Text {...MODULE_STYLE}>{getModuleDisplayName(m.model)}</Text>
-              <UsbPortInfo moduleMissing={missingModules.includes(m)} />
+              <UsbPortInfo matchedModule={matched.find(a => a.slot === m.slot)} />
             </Flex>
           ))}
         </Box>
@@ -91,18 +91,22 @@ export function ProtocolModuleList(): React.Node {
 }
 
 type UsbPortInfoProps = {|
-  moduleMissing: boolean,
+  matchedModule: MatchedModule| null,
 |}
 
 function UsbPortInfo(props: UsbPortInfoProps): React.Node {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation('protocol_calibration')
-  if (props.moduleMissing) return null
+
+  // return nothing if module is missing
+  if (props.matchedModule === null) return null
+  const portInfo = props.matchedModule.UsbPortInfo
+  const portText = portInfo ? portInfo.hub ? `Port ${portInfo.hub} via Hub` : `Port ${portInfo.port}` : 'N/A'
 
   return (
     <>
       <Text marginRight={SPACING_2} {...USB_PORT_STYLE}>
-        N/A
+        {portText}
       </Text>
       <Flex {...targetProps}>
         <Icon name="alert-circle" width={SIZE_1} />

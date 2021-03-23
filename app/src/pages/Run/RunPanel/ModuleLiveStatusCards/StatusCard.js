@@ -4,7 +4,7 @@ import styles from './styles.css'
 import { CollapsibleItem } from '@opentrons/components'
 
 type Props = {|
-  header?: string,
+  header: string,
   /** Title for the card */
   title: string,
   /** Card Content, each child will be separated with a grey bottom border */
@@ -20,7 +20,7 @@ export function StatusCard(props: Props): React.Node {
     <CollapsibleItem
       className={styles.status_card}
       onCollapseToggle={() => props.toggleCard(!props.isCardExpanded)}
-      header={props.header}
+      header={`Slot ${props.header}`}
       title={props.title}
       collapsed={!props.isCardExpanded}
     >

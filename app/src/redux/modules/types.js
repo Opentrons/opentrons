@@ -16,6 +16,8 @@ import {
 import * as ApiTypes from './api-types'
 export * from './api-types'
 
+import type { Slot } from '../robot/api-types'
+
 // common types
 
 export type CommonModuleInfo = $Diff<
@@ -52,6 +54,11 @@ export type AttachedModule =
   | MagneticModule
   | ThermocyclerModule
 // action object types
+
+export type MatchedModules = {|
+  slot: Slot,
+  ...AttachedModule,
+|}
 
 // fetch modules
 
@@ -166,5 +173,5 @@ export type ModulesState = $Shape<
 >
 
 export type MatchedModuleBySlot = {|
-  [slot: string]: AttachedModule  
+  [slot: string]: AttachedModule,
 |}
