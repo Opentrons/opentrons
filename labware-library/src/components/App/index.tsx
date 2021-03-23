@@ -49,8 +49,8 @@ export function AppComponent(props: DefinitionRouteRenderProps): React.ReactNode
   )
 }
 
-export function AppWithRoute(): React.Node {
+export function AppWithRoute(): React.ReactNode {
   return <DefinitionRoute render={props => <AppComponent {...props} />} />
 }
 
-export const App: React.AbstractComponent<{||}> = hot(AppWithRoute)
+export const App = hot(AppWithRoute)

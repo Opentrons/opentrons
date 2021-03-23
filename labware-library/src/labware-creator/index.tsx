@@ -372,9 +372,9 @@ export const LabwareCreator = (): JSX.Element => {
     (event: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>) => {
       let files: Array<File> = []
       if (event.dataTransfer && event.dataTransfer.files) {
-        files = (event.dataTransfer.files: any)
+        files = (event.dataTransfer.files as any)
       } else if (event.target.files) {
-        files = (event.target.files: any)
+        files = (event.target.files as any)
       }
 
       const file = files[0]
@@ -387,11 +387,11 @@ export const LabwareCreator = (): JSX.Element => {
         setImportError({ key: 'INVALID_FILE_TYPE' })
       } else {
         reader.onload = readEvent => {
-          const result = ((readEvent.currentTarget: any): FileReader).result
-          let parsedLabwareDef: ?LabwareDefinition2
+          const result = (readEvent.currentTarget as FileReader).result
+          let parsedLabwareDef: LabwareDefinition2 | null | undefined
 
           try {
-            parsedLabwareDef = JSON.parse(((result: any): string))
+            parsedLabwareDef = JSON.parse(result as  string)
           } catch (error) {
             console.error(error)
             setImportError({
