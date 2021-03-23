@@ -56,7 +56,8 @@ async def test_get_mag_position(driver: MagDeckDriver, connection: AsyncMock) ->
 async def test_move(driver: MagDeckDriver, connection: AsyncMock) -> None:
     """It should send a move command"""
     await driver.move(321.2214)
-    connection.send_command.assert_called_once_with(data="G0 Z321.221 \r\n\r\n", retries=3)
+    connection.send_command.assert_called_once_with(
+        data="G0 Z321.221 \r\n\r\n", retries=3)
 
 
 async def test_get_device_info(driver: MagDeckDriver, connection: AsyncMock) -> None:
@@ -70,7 +71,8 @@ async def test_get_device_info(driver: MagDeckDriver, connection: AsyncMock) -> 
     assert response == {"serial": "s", "model": "m", "version": "v"}
 
 
-async def test_enter_programming_mode(driver: MagDeckDriver, connection: AsyncMock) -> None:
+async def test_enter_programming_mode(
+        driver: MagDeckDriver, connection: AsyncMock) -> None:
     """It should send an enter programming mode command"""
     await driver.enter_programming_mode()
 

@@ -154,9 +154,11 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
             prefix="S", value=temp, precision=utils.TC_GCODE_ROUNDING_PRECISION
         )
         if hold_time is not None:
-            c = c.with_float(prefix="H", value=hold_time, precision=utils.TC_GCODE_ROUNDING_PRECISION)
+            c = c.with_float(prefix="H", value=hold_time,
+                             precision=utils.TC_GCODE_ROUNDING_PRECISION)
         if volume is not None:
-            c = c.with_float(prefix="V", value=volume, precision=utils.TC_GCODE_ROUNDING_PRECISION)
+            c = c.with_float(prefix="V", value=volume,
+                             precision=utils.TC_GCODE_ROUNDING_PRECISION)
 
         await self._connection.send_command(
             data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
@@ -172,7 +174,8 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
             data=c.build(), retries=DEFAULT_COMMAND_RETRIES
         )
         return utils.parse_plate_temperature_response(
-            temperature_string=response, rounding_val=utils.TC_GCODE_ROUNDING_PRECISION)
+            temperature_string=response, rounding_val=utils.TC_GCODE_ROUNDING_PRECISION
+        )
 
     async def set_ramp_rate(self, ramp_rate: float) -> None:
         """Send a set ramp rate command"""

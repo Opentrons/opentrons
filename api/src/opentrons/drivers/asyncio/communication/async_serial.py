@@ -2,7 +2,7 @@ import asyncio
 from concurrent.futures.thread import ThreadPoolExecutor
 from typing import Optional
 
-from serial import Serial, serial_for_url
+from serial import Serial, serial_for_url   # type: ignore
 
 
 class AsyncSerial:

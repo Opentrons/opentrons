@@ -28,7 +28,7 @@ class SerialConnection:
         Create a connection.
 
         Args:
-            port: url or port to connect to 
+            port: url or port to connect to
             baud_rate: baud rate
             timeout: timeout in seconds
             ack: the command response ack
@@ -36,7 +36,8 @@ class SerialConnection:
 
         Returns: SerialConnection
         """
-        serial = await AsyncSerial.create(port=port, baud_rate=baud_rate, timeout=timeout)
+        serial = await AsyncSerial.create(port=port, baud_rate=baud_rate,
+                                          timeout=timeout)
         name = name or port
         return cls(serial=serial, port=port, name=name, ack=ack)
 
@@ -66,11 +67,11 @@ class SerialConnection:
         Raises: NoResponse
         """
         data_encode = data.encode()
-        log.debug(f'{self.name}: Write -> {data_encode}')
+        log.debug(f'{self.name}: Write -> {data_encode!r}')
         await self._serial.write(data=data_encode)
 
         response = await self._serial.read_until(match=self._ack)
-        log.debug(f'{self.name}: Read <- {response}')
+        log.debug(f'{self.name}: Read <- {response!r}')
 
         if self._ack in response:
             return response.decode()

@@ -68,7 +68,7 @@ class TempDeckDriver(AbstractTempDeckDriver):
     def __init__(self, connection: SerialConnection) -> None:
         """
         Construct a temp deck driver
-        
+
         Args:
             connection: Connection to the temp deck
         """

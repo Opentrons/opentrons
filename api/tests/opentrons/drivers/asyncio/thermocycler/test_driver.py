@@ -38,7 +38,7 @@ async def test_close_lid(subject: driver.ThermocyclerDriver,
 async def test_get_lid_status(subject: driver.ThermocyclerDriver,
                               connection: AsyncMock) -> None:
     """It should send a get lid status command and parse response."""
-    connection.send_command.return_value = f'Lid:open\r\nok\r\nok\r\n'
+    connection.send_command.return_value = 'Lid:open\r\nok\r\nok\r\n'
 
     response = await subject.get_lid_status()
 
@@ -95,7 +95,8 @@ async def test_set_plate_temp(
     """It should send a set plate temperature command."""
     await subject.set_plate_temperature(temp=temp, hold_time=hold_time, volume=volume)
 
-    connection.send_command.assert_called_once_with(data=f"M104 {expected_body} \r\n", retries=3)
+    connection.send_command.assert_called_once_with(
+        data=f"M104 {expected_body} \r\n", retries=3)
 
 
 async def test_get_plate_temp(subject: driver.ThermocyclerDriver,
