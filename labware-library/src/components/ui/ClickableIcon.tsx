@@ -8,7 +8,7 @@ export interface ClickableIconProps {
   name: IconName
   className?: string
   title?: string
-  onClick?: (e: SyntheticMouseEvent<>) => unknown
+  onClick?: (e: React.MouseEvent) => unknown
 }
 
 export function ClickableIcon(props: ClickableIconProps): JSX.Element {

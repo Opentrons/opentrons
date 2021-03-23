@@ -72,8 +72,8 @@ interface MakeAutofillOnChangeArgs {
   autofills: Record<string, Partial<LabwareFields>>
   values: LabwareFields
   touched: Object
-  setTouched: (touched: FormikTouched<LabwareFields>) => (null | undefined)
-  setValues: (values: Partial<LabwareFields>) => (null | undefined)
+  setTouched: (touched: FormikTouched<LabwareFields>) => null | undefined
+  setValues: (values: Partial<LabwareFields>) => null | undefined
 }
 
 const PDF_URL =
@@ -85,7 +85,10 @@ const makeAutofillOnChange = ({
   touched,
   setValues,
   setTouched,
-}: MakeAutofillOnChangeArgs) => (name: string, value: string | null | undefined) => {
+}: MakeAutofillOnChangeArgs) => (
+  name: string,
+  value: string | null | undefined
+) => {
   if (value == null) {
     console.log(`no value for ${name}, skipping autofill`)
     return
@@ -139,7 +142,7 @@ const GridImg = () => {
   return <img src={src} />
 }
 
-const WellXYImg = (props: { wellShape: WellShape | null | undefined}) => {
+const WellXYImg = (props: { wellShape: WellShape | null | undefined }) => {
   const { wellShape } = props
   const wellShapeToImg: Record<WellShape, string> = {
     circular: require('./images/wellXY_circular.svg'),
@@ -154,9 +157,9 @@ const WellXYImg = (props: { wellShape: WellShape | null | undefined}) => {
 }
 
 const XYSpacingImg = (props: {
-  labwareType: LabwareType | null | undefined,
-  wellShape: WellShape | null | undefined,
-  gridRows: string | null | undefined,
+  labwareType: LabwareType | null | undefined
+  wellShape: WellShape | null | undefined
+  gridRows: string | null | undefined
 }) => {
   const { labwareType, wellShape } = props
   const gridRows = Number(props.gridRows)
@@ -178,8 +181,8 @@ const XYSpacingImg = (props: {
 }
 
 interface DepthImgProps {
-  labwareType: LabwareType | null | undefined,
-  wellBottomShape: WellBottomShape | null | undefined,
+  labwareType: LabwareType | null | undefined
+  wellBottomShape: WellBottomShape | null | undefined
 }
 const DepthImg = (props: DepthImgProps) => {
   const { labwareType, wellBottomShape } = props
@@ -207,8 +210,8 @@ const DepthImg = (props: DepthImgProps) => {
 }
 
 const XYOffsetImg = (props: {
-  labwareType: LabwareType | null | undefined,
-  wellShape: WellShape| null | undefined,
+  labwareType: LabwareType | null | undefined
+  wellShape: WellShape | null | undefined
 }) => {
   const { labwareType, wellShape } = props
   let src = require('./images/offset_plate_circular.svg')
@@ -369,12 +372,12 @@ export const LabwareCreator = (): JSX.Element => {
   }, [showCreatorForm, scrollToForm])
 
   const onUpload = React.useCallback(
-    (event: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>) => {
+    (event: React.FormEvent<HTMLInputElement> | DragEvent) => {
       let files: Array<File> = []
       if (event.dataTransfer && event.dataTransfer.files) {
-        files = (event.dataTransfer.files as any)
+        files = event.dataTransfer.files as any
       } else if (event.target.files) {
-        files = (event.target.files as any)
+        files = event.target.files as any
       }
 
       const file = files[0]
@@ -391,7 +394,7 @@ export const LabwareCreator = (): JSX.Element => {
           let parsedLabwareDef: LabwareDefinition2 | null | undefined
 
           try {
-            parsedLabwareDef = JSON.parse(result as  string)
+            parsedLabwareDef = JSON.parse(result as string)
           } catch (error) {
             console.error(error)
             setImportError({

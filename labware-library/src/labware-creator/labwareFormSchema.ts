@@ -167,9 +167,9 @@ export const labwareFormSchema: Yup.Schema<
       .nullable()
       .transform(
         (
-          currentValue: ?string,
-          originalValue: ?string
-        ): $PropertyType<ProcessedLabwareFields, 'brandId'> =>
+          currentValue: string | null | undefined,
+          originalValue: string | null | undefined
+        ): ProcessedLabwareFields['brandId'] =>
           (currentValue || '')
             .trim()
             .split(',')
@@ -192,13 +192,16 @@ export const labwareFormSchema: Yup.Schema<
       .test(
         'displayNameDoesNotAlreadyExist',
         nameExistsError('display name'),
-        (value: ?string) =>
+        (value: string | null | undefined) =>
           !ALL_DISPLAY_NAMES.has(
             (value == null ? '' : value).toLowerCase().trim()
           ) // case-insensitive and trim-insensitive match
       )
-      .transform((currentValue: ?string, originalValue: ?string) =>
-        currentValue == null ? currentValue : currentValue.trim()
+      .transform(
+        (
+          currentValue: string | null | undefined,
+          originalValue: string | null | undefined
+        ) => (currentValue == null ? currentValue : currentValue.trim())
       ),
     pipetteName: requiredString(LABELS.pipetteName),
   })

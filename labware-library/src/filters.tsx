@@ -65,7 +65,7 @@ export function getFilteredDefinitions(filters: FilterParams): LabwareList {
 }
 
 export function testManufacturer(
-  manufacturer: ?string,
+  manufacturer: string | null | undefined,
   definition: LabwareDefinition
 ): boolean {
   return (
@@ -77,7 +77,7 @@ export function testManufacturer(
 }
 
 export function testCategory(
-  category: ?string,
+  category: string | null | undefined,
   definition: LabwareDefinition
 ): boolean {
   return (

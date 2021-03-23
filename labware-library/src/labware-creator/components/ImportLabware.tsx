@@ -3,9 +3,7 @@ import { PrimaryButton, Icon } from '@opentrons/components'
 import styles from './importLabware.css'
 
 interface Props {
-  onUpload: (
-    e: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>
-  ) => void
+  onUpload: (e: React.FormEvent<HTMLInputElement> | DragEvent) => void
 }
 
 interface UploadInputProps {
@@ -22,7 +20,7 @@ export function ImportLabware(props: Props): JSX.Element {
   )
 }
 
-const stopEvent = (e: SyntheticEvent<>) => e.preventDefault()
+const stopEvent = (e: React.FormEvent) => e.preventDefault()
 
 function UploadInput(props: UploadInputProps) {
   const { isButton, onUpload } = props

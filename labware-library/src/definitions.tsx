@@ -74,7 +74,9 @@ export function getAllDefinitions(): LabwareList {
   return definitions
 }
 
-export function getDefinition(loadName: ?string): LabwareDefinition | null {
+export function getDefinition(
+  loadName: string | null | undefined
+): LabwareDefinition | null {
   const def = getAllDefinitions().find(d => d.parameters.loadName === loadName)
   return def || null
 }
