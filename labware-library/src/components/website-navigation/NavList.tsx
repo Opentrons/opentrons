@@ -1,20 +1,19 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { ClickOutside } from '@opentrons/components'
-
 import { aboutLinkProps, applicationLinkProps } from './nav-data'
 import { NavMenu } from './NavMenu'
 import { ProductMenu } from './ProductMenu'
 import { ProtocolMenu } from './ProtocolMenu'
 import { SupportMenu } from './SupportMenu'
 import styles from './styles.css'
-
 import type { MenuName } from './types'
 
-type State = {| menu: null | MenuName |}
+interface State {
+  menu: null | MenuName
+}
 
-type Props = {||}
+interface Props {}
 
 export class NavList extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -27,7 +26,7 @@ export class NavList extends React.Component<Props, State> {
   toggle: (name: MenuName) => void = name =>
     this.setState({ menu: this.state.menu !== name ? name : null })
 
-  render(): React.Node {
+  render(): JSX.Element {
     const { menu } = this.state
 
     return (
