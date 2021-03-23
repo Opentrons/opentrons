@@ -24,7 +24,7 @@ export type ApiBaseModule = {|
   fwVersion: string,
   port: string,
   hasAvailableUpdate: boolean,
-  usbPort: PhysicalPort | null,
+  usbPort: PhysicalPort,
 |}
 
 type ApiBaseModuleLegacy = {|

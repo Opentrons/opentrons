@@ -1,12 +1,10 @@
 // @flow
 import { createSelector } from 'reselect'
 import sortBy from 'lodash/sortBy'
-import isMatch from 'lodash/isMatch'
 
 import { selectors as RobotSelectors } from '../robot'
 import * as Copy from './i18n'
 import * as Types from './types'
-import * as ApiTypes from './api-types'
 
 import type { State } from '../types'
 import type { SessionModule } from '../robot/types'
@@ -64,24 +62,22 @@ export const getUnpreparedModules: (
 
 export const getMatchedModules: (
   state: State
-) => Array<Types.MatchedModules> = createSelector(
+) => Array<Types.MatchedModule> = createSelector(
   getAttachedModulesForConnectedRobot,
   RobotSelectors.getModules,
   (attachedModules, protocolModules) => {
     const matchedAmod: Array<Types.MatchedModule> = []
     const matchedPmod = []
     protocolModules.forEach(pmod => {
-      console.log(`protocol modules: ${pmod.model}`)
       const compatible =
         attachedModules.find(
           amod =>
             checkModuleCompatibility(amod.model, pmod.model) &&
-              !!matchedAmod.filter(m => m.serial === amod.serial)
+            !!matchedAmod.filter(m => m.module.serial === amod.serial)
         ) ?? null
       if (compatible !== null) {
-        console.log('we got here')
         matchedPmod.push(pmod)
-        matchedAmod.push({ slot: pmod.slot, ...compatible })
+        matchedAmod.push({ slot: pmod.slot, module: compatible })
       }
     })
     return matchedAmod

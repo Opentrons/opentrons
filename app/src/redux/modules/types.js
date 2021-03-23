@@ -6,6 +6,7 @@ import type {
   ThermocyclerModuleModel,
   MagneticModuleModel,
 } from '@opentrons/shared-data'
+import type { Slot } from '../robot/api-types'
 
 import {
   TEMPERATURE_MODULE_TYPE,
@@ -15,8 +16,6 @@ import {
 
 import * as ApiTypes from './api-types'
 export * from './api-types'
-
-import type { Slot } from '../robot/api-types'
 
 // common types
 
@@ -55,9 +54,9 @@ export type AttachedModule =
   | ThermocyclerModule
 // action object types
 
-export type MatchedModules = {|
+export type MatchedModule = {|
   slot: Slot,
-  ...AttachedModule,
+  module: AttachedModule,
 |}
 
 // fetch modules
@@ -171,7 +170,3 @@ export type ModulesState = $Shape<
     [robotName: string]: void | PerRobotModulesState,
   |}>
 >
-
-export type MatchedModuleBySlot = {|
-  [slot: string]: AttachedModule,
-|}

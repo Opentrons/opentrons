@@ -81,7 +81,9 @@ export function ProtocolModuleList(): React.Node {
               />
               <Text {...DECK_SLOT_STYLE}>{`Slot ${m.slot}`}</Text>
               <Text {...MODULE_STYLE}>{getModuleDisplayName(m.model)}</Text>
-              <UsbPortInfo matchedModule={matched.find(a => a.slot === m.slot)} />
+              <UsbPortInfo
+                matchedModule={matched.find(a => a.slot === m.slot) || null}
+              />
             </Flex>
           ))}
         </Box>
@@ -91,7 +93,7 @@ export function ProtocolModuleList(): React.Node {
 }
 
 type UsbPortInfoProps = {|
-  matchedModule: MatchedModule| null,
+  matchedModule: MatchedModule | null,
 |}
 
 function UsbPortInfo(props: UsbPortInfoProps): React.Node {
@@ -100,20 +102,26 @@ function UsbPortInfo(props: UsbPortInfoProps): React.Node {
 
   // return nothing if module is missing
   if (props.matchedModule === null) return null
-  const portInfo = props.matchedModule.UsbPortInfo
-  const portText = portInfo ? portInfo.hub ? `Port ${portInfo.hub} via Hub` : `Port ${portInfo.port}` : 'N/A'
-
+  const portInfo = props.matchedModule.module.usbPort
+  const portText =
+    portInfo && portInfo.hub
+      ? `Port ${portInfo.hub} via Hub`
+      : portInfo && portInfo.port
+      ? `Port ${portInfo.port}`
+      : 'N/A'
   return (
     <>
       <Text marginRight={SPACING_2} {...USB_PORT_STYLE}>
         {portText}
       </Text>
-      <Flex {...targetProps}>
-        <Icon name="alert-circle" width={SIZE_1} />
-        <Tooltip style={{ width: '2rem' }} {...tooltipProps}>
-          {t('modules_update_software_tooltip')}
-        </Tooltip>
-      </Flex>
+      {portText === 'N/A' && (
+        <Flex {...targetProps}>
+          <Icon name="alert-circle" width={SIZE_1} />
+          <Tooltip style={{ width: '2rem' }} {...tooltipProps}>
+            {t('modules_update_software_tooltip')}
+          </Tooltip>
+        </Flex>
+      )}
     </>
   )
 }

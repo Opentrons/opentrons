@@ -13,7 +13,8 @@ import type {
 } from '../../../../redux/modules/types'
 
 type Props = {|
-  module: MatchedModule,
+  module: MagneticModule,
+  slot: string,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
   sendModuleCommand: (
@@ -30,9 +31,10 @@ export const MagDeckCard = ({
   toggleCard,
   sendModuleCommand,
   controlDisabledReason,
+  slot,
 }: Props): React.Node => (
   <StatusCard
-    header={module.slot}
+    header={slot}
     title={getModuleDisplayName(module.model)}
     isCardExpanded={isCardExpanded}
     toggleCard={toggleCard}

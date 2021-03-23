@@ -5,7 +5,7 @@ import { Box, LabeledValue, SPACING_3 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import type {
-  MatchedModule,
+  ThermocyclerModule,
   ModuleCommand,
 } from '../../../../redux/modules/types'
 import { formatSeconds } from '../../../../redux/robot/selectors' // TODO: move helper from robot selector to helper file
@@ -89,12 +89,13 @@ const CycleInfo = ({
 }
 
 type Props = {|
-  module: MatchedModule,
+  module: ThermocyclerModule,
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
     args?: Array<mixed>
   ) => mixed,
+  slot: string,
   controlDisabledReason: string | null,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
@@ -106,6 +107,7 @@ export const ThermocyclerCard = ({
   controlDisabledReason,
   isCardExpanded,
   toggleCard,
+  slot,
 }: Props): React.Node => {
   const {
     currentTemp,
@@ -126,7 +128,7 @@ export const ThermocyclerCard = ({
     currentStepIndex != null
   return (
     <StatusCard
-      header={module.slot}
+      header={slot}
       title={getModuleDisplayName(module.model)}
       isCardExpanded={isCardExpanded}
       toggleCard={toggleCard}

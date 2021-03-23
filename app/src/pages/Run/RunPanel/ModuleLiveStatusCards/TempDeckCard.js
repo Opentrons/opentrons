@@ -10,12 +10,12 @@ import {
 import { StatusCard } from './StatusCard'
 
 import type {
-  MatchedModule,
+  TemperatureModule,
   ModuleCommand,
 } from '../../../../redux/modules/types'
 
 type Props = {|
-  module: MatchedModule,
+  module: TemperatureModule,
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
@@ -24,6 +24,7 @@ type Props = {|
   controlDisabledReason: string | null,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
+  slot: string,
 |}
 
 export const TempDeckCard = ({
@@ -32,9 +33,10 @@ export const TempDeckCard = ({
   controlDisabledReason,
   isCardExpanded,
   toggleCard,
+  slot,
 }: Props): React.Node => (
   <StatusCard
-    header={module.slot}
+    header={slot}
     title={getModuleDisplayName(module.model)}
     isCardExpanded={isCardExpanded}
     toggleCard={toggleCard}
