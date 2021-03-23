@@ -1548,7 +1548,7 @@ class SmoothieDriver_3_0_0:
 
         if split_command_string:
             # set fullstepping if necessary
-            step_prefix, step_postfix = self._build_fullstep_configurations(
+            split_prefix, split_postfix = self._build_fullstep_configurations(
                 ''.join((ax for ax in split_target.keys()
                          if self._move_split_config[ax].fullstep))
             )
@@ -1560,18 +1560,19 @@ class SmoothieDriver_3_0_0:
 
             # use the higher current from the split config without changing
             # our global cache
-            split_prefix = step_prefix.with_builder(
-                self._build_speed_command(split_speed)
+            split_prefix.with_builder(
+                builder=self._build_speed_command(split_speed)
             )
             cached = {}
             for ax in split_target.keys():
                 cached[ax] = self.current[ax]
                 self.current[ax] = self._move_split_config[ax].split_current
-            split_prefix = self._generate_current_command()
+            split_prefix.with_builder(
+                builder=self._generate_current_command()
+            )
             for ax in split_target.keys():
                 self.current[ax] = cached[ax]
 
-            split_postfix = step_postfix
             split_command = _command_builder().with_gcode(
                 gcode=GCODE.MOVE
             ).with_builder(

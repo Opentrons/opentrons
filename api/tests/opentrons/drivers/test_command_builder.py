@@ -14,7 +14,7 @@ def test_builder_create_command_with_float() -> None:
     builder = CommandBuilder(terminator=terminator)
     assert builder.with_float(
         prefix='Z', value=1.2342, precision=3
-    ).build() == "Z1.234 terminator"
+    ).build() == f"Z1.234 {terminator}"
 
 
 def test_builder_create_command_with_float_no_round() -> None:
@@ -24,7 +24,7 @@ def test_builder_create_command_with_float_no_round() -> None:
     builder = CommandBuilder(terminator=terminator)
     assert builder.with_float(
         prefix='Z', value=1.23442, precision=None
-    ).build() == "Z1.23442 terminator"
+    ).build() == f"Z1.23442 {terminator}"
 
 
 def test_builder_create_command_with_int() -> None:
@@ -33,7 +33,7 @@ def test_builder_create_command_with_int() -> None:
     builder = CommandBuilder(terminator=terminator)
     assert builder.with_int(
         prefix='Z', value=15
-    ).build() == "Z15 terminator"
+    ).build() == f"Z15 {terminator}"
 
 
 def test_builder_create_command_with_gcode() -> None:
@@ -42,7 +42,7 @@ def test_builder_create_command_with_gcode() -> None:
     builder = CommandBuilder(terminator=terminator)
     assert builder.with_gcode(
         gcode='G321'
-    ).build() == "G321 terminator"
+    ).build() == f"G321 {terminator}"
 
 
 def test_builder_create_command_with_builder() -> None:
@@ -51,16 +51,16 @@ def test_builder_create_command_with_builder() -> None:
     builder = CommandBuilder(terminator=terminator)
     assert builder.with_gcode(
         gcode='G321'
-    ).build() == "G321 terminator"
+    ).build() == f"G321 {terminator}"
 
     builder2 = CommandBuilder(terminator=terminator)
-    builder2.with_builder(
+    assert builder2.with_builder(
         builder=builder
     ).with_gcode(
         gcode="G123"
     ).with_builder(
         builder=builder
-    ).build() == " G321 G123 G321 terminator"
+    ).build() == f"G321 G123 G321 {terminator}"
 
 
 def test_builder_chain() -> None:
@@ -75,4 +75,4 @@ def test_builder_chain() -> None:
         gcode="M321"
     ).with_int(
         prefix="Z", value=3
-    ).with_gcode("G111").build() == "G321 X321 M321 Z3 G111 terminator"
+    ).with_gcode("G111").build() == f"G321 X321 M321 Z3 G111 {terminator}"
