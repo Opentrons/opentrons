@@ -23,7 +23,7 @@ export interface PipetteSelectProps {
   /** whether or not "None" shows up as the default option */
   enableNoneOption?: boolean
   /** input tabIndex */
-  tabIndex?: string | number | null | undefined
+  tabIndex?: string | number
   /** classes to apply to the top-level component */
   className?: string
   /** custom id to be applied. likely to be used as a data test id for e2e testing */
@@ -88,7 +88,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       id={id}
       onChange={option => {
         // TODO(mc, 2021-03-19): use optional chaining
-        const value = option && option.value ? option.value : null
+        const value = (option != null) && option.value ? option.value : null
         props.onPipetteChange(value)
       }}
       formatOptionLabel={(option, { context }) => {
@@ -96,7 +96,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
         const label = option.label || value
         const specs = allPipetteNameSpecs.find(s => s.name === value)
 
-        return context === CONTEXT_VALUE || value === '' || !specs ? (
+        return context === CONTEXT_VALUE || value === '' || (specs == null) ? (
           label
         ) : (
           <PipetteNameItem {...specs} />
