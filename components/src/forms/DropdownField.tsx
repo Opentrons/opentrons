@@ -14,7 +14,7 @@ export type Options = DropdownOption[]
 
 export interface DropdownFieldProps {
   /** change handler */
-  onChange: React.ChangeEventHandler
+  onChange: React.ChangeEventHandler<HTMLSelectElement>
   /** focus handler */
   onFocus?: React.FocusEventHandler
   /** blur handler */
