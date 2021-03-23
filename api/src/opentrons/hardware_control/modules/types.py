@@ -5,6 +5,8 @@ from typing import (
     Tuple, Awaitable, Mapping, Union, TYPE_CHECKING)
 from pathlib import Path
 
+from opentrons.drivers.rpi_drivers.types import USBPort
+
 if TYPE_CHECKING:
     from opentrons_shared_data.module.dev_types import (
         ThermocyclerModuleType, MagneticModuleType, TemperatureModuleType)
@@ -57,7 +59,7 @@ class ThermocyclerModuleModel(_ProvideLookup):
     THERMOCYCLER_V1: str = 'thermocyclerModuleV1'
 
 
-@dataclass(frozen=True)
+@dataclass
 class ModuleAtPort:
     port: str
     name: str
