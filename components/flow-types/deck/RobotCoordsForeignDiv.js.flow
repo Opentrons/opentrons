@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import type { PrimitiveComponent } from "../primitives";
+import { Box } from "../primitives";
 export type RobotCoordsForeignDivProps = {|
   width?: string | number,
   height?: string | number,
@@ -14,7 +14,7 @@ export type RobotCoordsForeignDivProps = {|
   y?: string | number,
   children?: React.Node,
   className?: string,
-  innerDivProps?: React.ComponentProps<PrimitiveComponent<"div">>,
+  innerDivProps?: React.ComponentProps<typeof Box>,
   transformWithSVG?: boolean,
   extraTransform?: string,
 |};

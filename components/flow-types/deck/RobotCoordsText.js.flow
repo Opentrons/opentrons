@@ -6,11 +6,14 @@
  */
 
 import * as React from "react";
-export type RobotCoordsTextProps = {
+export type RobotCoordsTextProps = {|
+  ...$Exact<React.ComponentProps<"text">>,
+
   x: number,
   y: number,
   children?: React.Node,
-} & $PropertyType<JSX.IntrinsicElements, "text">;
+|};
+
 /**
  * SVG text reflected to use take robot coordinates as props
  */
