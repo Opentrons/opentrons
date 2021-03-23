@@ -1,22 +1,19 @@
-// @flow
 // labware details page title and category
 import * as React from 'react'
-
 import {
   MANUFACTURER,
   MANUFACTURER_NO,
   MANUFACTURER_VALUES,
 } from '../../localization'
 import { ExternalLink, LabelText, Value, LABEL_TOP } from '../ui'
+import type { LabwareBrand } from '../../types'
 import styles from './styles.css'
 
-import type { LabwareBrand } from '../../types'
+export interface ManufacturerStatsProps {
+  brand: LabwareBrand
+}
 
-export type ManufacturerStatsProps = {|
-  brand: LabwareBrand,
-|}
-
-export function ManufacturerStats(props: ManufacturerStatsProps): React.Node {
+export function ManufacturerStats(props: ManufacturerStatsProps): JSX.Element {
   const { brand } = props
   const { brand: brandName, brandId, links } = brand
   const manfacturerValue = MANUFACTURER_VALUES[brandName] || brandName

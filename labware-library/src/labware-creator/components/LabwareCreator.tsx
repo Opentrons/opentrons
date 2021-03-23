@@ -1,14 +1,13 @@
-// @flow
 import * as React from 'react'
 import { Nav, Breadcrumbs } from '../../components/Nav'
 import { AnalyticsOptInModal } from '../../analytics/AnalyticsOptInModal'
 import styles from './LabwareCreator.css'
 
-type Props = {|
-  children: React.Node,
-|}
+interface Props {
+  children: React.ReactNode
+}
 
-export function LabwareCreator(props: Props): React.Node {
+export function LabwareCreator(props: Props): JSX.Element {
   return (
     <>
       <AnalyticsOptInModal className={styles.analytics_modal}>

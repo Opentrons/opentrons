@@ -1,25 +1,23 @@
 // @flow
 // labware load name with copy button
 import * as React from 'react'
-
 import { IconButton, DeprecatedTooltip } from '@opentrons/components'
 import { LabelText, LABEL_TOP } from '../ui'
-
 import { API_NAME, COPIED_TO_CLIPBOARD } from '../../localization'
 import styles from './styles.css'
 
 const COPY_ICON = 'ot-copy-text'
 const SUCCESS_TIMEOUT_MS = 1500
 
-export type LoadNameProps = {|
-  loadName: string,
-|}
+export interface LoadNameProps {
+  loadName: string
+}
 
-export function LoadName(props: LoadNameProps): React.Node {
+export function LoadName(props: LoadNameProps): JSX.Element {
   const { loadName } = props
   const [success, setSuccess] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement | null>(null)
-  const successTimeout = React.useRef<TimeoutID | null>(null)
+  const successTimeout = React.useRef<NodeJS.Timeout | null>(null)
   const cleanupSuccessTimeout = () => {
     if (successTimeout.current) clearTimeout(successTimeout.current)
   }

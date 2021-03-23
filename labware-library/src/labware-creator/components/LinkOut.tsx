@@ -1,14 +1,13 @@
-// @flow
 import * as React from 'react'
 
 // TODO make this a component library component?
-type Props = {|
+interface Props {
   href: string,
-  className?: ?string,
-  children?: React.Node,
-  onClick?: () => mixed,
-|}
-export const LinkOut = (props: Props): React.Node => (
+  className?: string | undefined,
+  children?: React.ReactNode,
+  onClick?: () => unknown,
+}
+export const LinkOut = (props: Props): JSX.Element => (
   <a
     onClick={props.onClick}
     className={props.className}

@@ -1,10 +1,9 @@
-// @flow
 import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import styles from '../styles.css'
 import type { ImportError, ImportErrorKey } from '../fields'
 
-const ERROR_MAP: { [ImportErrorKey]: React.Node } = {
+const ERROR_MAP: Record<ImportErrorKey, React.ReactNode> = {
   INVALID_FILE_TYPE: 'This is not a .json file',
   INVALID_JSON_FILE: 'This is not valid JSON file',
   INVALID_LABWARE_DEF: 'This is not a valid labware definition',
@@ -22,10 +21,10 @@ const ERROR_MAP: { [ImportErrorKey]: React.Node } = {
   ),
 }
 
-export const ImportErrorModal = (props: {|
-  onClose: () => mixed,
+export const ImportErrorModal = (props: {
+  onClose: () => unknown,
   importError: ImportError,
-|}): React.Node => {
+}): JSX.Element => {
   const { importError, onClose } = props
   return (
     <AlertModal

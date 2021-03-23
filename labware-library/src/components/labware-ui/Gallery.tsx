@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
@@ -7,12 +6,12 @@ import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
 
-export type GalleryProps = {|
-  definition: LabwareDefinition,
-  className?: string,
-|}
+export interface GalleryProps {
+  definition: LabwareDefinition
+  className?: string
+}
 
-export function Gallery(props: GalleryProps): React.Node {
+export function Gallery(props: GalleryProps): JSX.Element {
   const { definition, className } = props
   const { parameters: params, dimensions: dims } = definition
   const [currentImage, setCurrentImage] = React.useState(0)
@@ -52,12 +51,12 @@ export function Gallery(props: GalleryProps): React.Node {
   )
 }
 
-type ThumbnailProps = {|
-  onClick: () => mixed,
-  children: React.Node,
-|}
+interface ThumbnailProps {
+  onClick: () => unknown
+  children: React.ReactNode
+}
 
-function Thumbnail(props: ThumbnailProps) {
+function Thumbnail(props: ThumbnailProps): JSX.Element {
   const { onClick, children } = props
 
   return (

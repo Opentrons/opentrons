@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { getPublicPath } from '../../public-path'
@@ -11,7 +10,7 @@ const LINK_CUSTOM_LABWARE_GUIDE =
 
 const LINK_LABWARE_LIBRARY = getPublicPath()
 
-export const IntroCopy = (): React.Node => (
+export const IntroCopy = (): JSX.Element => (
   <>
     <LinkOut
       href={LINK_CUSTOM_LABWARE_GUIDE}

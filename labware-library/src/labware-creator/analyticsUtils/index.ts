@@ -1,8 +1,10 @@
-// @flow
+import { string } from 'yup'
 import { reportEvent } from '../../analytics'
 
-const _prevFieldValues = {}
-export const reportFieldEdit = (args: {| name: string, value: string |}) => {
+type FieldKV = Record<string, string>
+
+const _prevFieldValues: FieldKV = {}
+export const reportFieldEdit = (args: { name: string; value: string }) => {
   // avoid reporting events on field blur unless there's a change
   const { name, value } = args
   const prevValue = _prevFieldValues[name]
@@ -15,24 +17,24 @@ export const reportFieldEdit = (args: {| name: string, value: string |}) => {
   _prevFieldValues[name] = value
 }
 
-let _prevErrors: { [string]: string } = {}
-export const reportErrors = (args: {|
-  values: Object,
-  errors: Object,
-  touched: Object,
-|}) => {
+let _prevErrors: FieldKV = {}
+export const reportErrors = (args: {
+  values: FieldKV
+  errors: FieldKV
+  touched: FieldKV
+}) => {
   const { values, errors, touched } = args
 
   // TODO Ian 2019-10-02: why is there an 'undefined' field in Formik `touched`?
   const dirtyFieldNames = Object.keys(touched).filter(
     name => touched[name] && name !== 'undefined'
   )
-  const activeErrors = dirtyFieldNames.reduce(
+  const activeErrors = dirtyFieldNames.reduce<FieldKV>(
     (acc, name) => (errors[name] ? { ...acc, [name]: errors[name] } : acc),
     {}
   )
 
-  const newErrors = Object.keys(activeErrors).reduce((acc, name) => {
+  const newErrors = Object.keys(activeErrors).reduce<FieldKV>((acc, name) => {
     const prev = _prevErrors[name]
     return prev === undefined || prev !== activeErrors[name]
       ? { ...acc, [name]: activeErrors[name] }

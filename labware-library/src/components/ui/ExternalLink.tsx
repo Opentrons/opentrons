@@ -1,15 +1,13 @@
-// @flow
 import * as React from 'react'
 import { Icon } from '@opentrons/components'
-
 import styles from './styles.css'
 
-export type ExternalLinkProps = {
-  href: string,
-  children: React.Node,
+export interface ExternalLinkProps {
+  href: string
+  children: React.ReactNode
 }
 
-export function ExternalLink(props: ExternalLinkProps): React.Node {
+export function ExternalLink(props: ExternalLinkProps): JSX.Element {
   const { href, children } = props
 
   return (

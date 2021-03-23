@@ -31,7 +31,7 @@ export interface ImportError {
   messages?: string[]
 }
 
-interface Option {
+export interface Option {
   name: string
   value: string
   disabled?: boolean

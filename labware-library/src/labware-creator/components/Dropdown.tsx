@@ -1,34 +1,30 @@
-// @flow
 import * as React from 'react'
 import { SelectField } from '@opentrons/components'
 import { Field } from 'formik'
 import { reportFieldEdit } from '../analyticsUtils'
 import { LABELS } from '../fields'
-import type { LabwareFields, Options } from '../fields'
+import type { LabwareFields, Option, Options } from '../fields'
 import fieldStyles from './fieldStyles.css'
 import styles from './Dropdown.css'
 
-export type DropdownProps = {|
-  name: $Keys<LabwareFields>,
+export interface DropdownProps {
+  name: keyof typeof LABELS,
   options: Options,
   caption?: string,
   /** optionally override the default onValueChange */
-  onValueChange?: $PropertyType<
-    React.ElementProps<typeof SelectField>,
-    'onValueChange'
-  >,
-|}
+  onValueChange?: React.ComponentProps<typeof SelectField>['onValueChange']
+}
 
 export const OptionLabel = (
-  props: $ElementType<Options, number>
-): React.Node => (
+  props: Option
+): JSX.Element => (
   <div className={styles.option_row}>
     {props.imgSrc && <img className={styles.option_image} src={props.imgSrc} />}
     <div className={styles.option_label}>{props.name}</div>
   </div>
 )
 
-export const Dropdown = (props: DropdownProps): React.Node => {
+export const Dropdown = (props: DropdownProps): JSX.Element => {
   const options = React.useMemo(
     () =>
       props.options.map(o => ({

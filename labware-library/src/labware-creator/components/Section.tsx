@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import compact from 'lodash/compact'
 import uniq from 'lodash/uniq'
@@ -7,25 +6,20 @@ import { AlertItem } from '@opentrons/components'
 import { getIsHidden } from '../formSelectors'
 import { LinkOut } from './LinkOut'
 import styles from './Section.css'
-import {
-  IRREGULAR_LABWARE_ERROR,
-  LINK_CUSTOM_LABWARE_FORM,
-  type LabwareFields,
-} from '../fields'
+import { IRREGULAR_LABWARE_ERROR, LINK_CUSTOM_LABWARE_FORM } from '../fields'
+import type { LabwareFields } from '../fields'
 
 // TODO: Make this DRY, don't require fields (in children) and also fieldList.
-type Props = {|
-  label: string,
-  formik: any, // TODO IMMEDIATELY type this??
-  additionalAlerts?: React.Node,
-  fieldList?: Array<$Keys<LabwareFields>>,
-  children?: React.Node,
-  headingClassName?: string,
-|}
+interface Props {
+  label: string
+  formik: any // TODO IMMEDIATELY type this??
+  additionalAlerts?: React.ReactNode
+  fieldList?: Array<keyof LabwareFields>
+  children?: React.ReactNode
+  headingClassName?: string
+}
 
-export const Section: React.AbstractComponent<
-  $Diff<Props, {| formik: mixed |}>
-> = connect((props: Props) => {
+export const Section = connect((props: Props) => {
   const fieldList = props.fieldList || []
   if (props.fieldList != null && fieldList.length > 0) {
     const numFieldsHidden = props.fieldList

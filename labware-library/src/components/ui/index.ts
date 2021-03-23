@@ -1,4 +1,3 @@
-// @flow
 // generic UI components
 // some of these are likely candidates for promotion to components library
 

@@ -1,10 +1,9 @@
-// @flow
 import * as React from 'react'
 import type { LabwareType } from '../fields'
 
-export const HeightGuidingText = (props: {|
-  labwareType: ?LabwareType,
-|}): React.Node => {
+export const HeightGuidingText = (props: {
+  labwareType: LabwareType | null | undefined,
+}): JSX.Element => {
   const { labwareType } = props
   const footer = (
     <p>

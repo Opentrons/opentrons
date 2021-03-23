@@ -1,20 +1,19 @@
-// @flow
 import * as React from 'react'
 import { PrimaryButton, Icon } from '@opentrons/components'
 import styles from './importLabware.css'
 
-type Props = {|
+interface Props {
   onUpload: (
-    SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>
-  ) => void,
-|}
+    e: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>
+  ) => void
+}
 
-type UploadInputProps = {|
-  onUpload: $PropertyType<Props, 'onUpload'>,
-  isButton?: boolean,
-|}
+interface UploadInputProps {
+  onUpload: Props['onUpload']
+  isButton?: boolean
+}
 
-export function ImportLabware(props: Props): React.Node {
+export function ImportLabware(props: Props): JSX.Element {
   return (
     <div className={styles.upload_group}>
       <UploadInput onUpload={props.onUpload} />

@@ -1,13 +1,12 @@
-// @flow
 import * as React from 'react'
 import styles from './styles.css'
 
-export type DetailsBoxProps = {|
-  children: React.Node,
-  aside: React.Node,
-|}
+export interface DetailsBoxProps {
+  children: React.ReactNode
+  aside: React.ReactNode
+}
 
-export function DetailsBox(props: DetailsBoxProps): React.Node {
+export function DetailsBox(props: DetailsBoxProps): JSX.Element {
   const { children, aside } = props
 
   return (

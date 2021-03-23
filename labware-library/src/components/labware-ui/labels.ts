@@ -1,8 +1,5 @@
-// @flow
 import uniqBy from 'lodash/uniqBy'
-
 import { WELL_TYPE_BY_CATEGORY } from '../../localization'
-
 import type { LabwareWellGroupProperties, LabwareDefinition } from '../../types'
 
 export type LabelSpec = LabwareDefinition | LabwareWellGroupProperties
@@ -11,7 +8,7 @@ export const getWellLabel = (spec: LabelSpec, fallback?: LabelSpec): string =>
   getLabel(WELL_TYPE_BY_CATEGORY, spec, fallback)
 
 function getLabel(
-  labelMap: { [string]: string },
+  labelMap: Record<string, string>,
   spec: LabelSpec,
   fallback?: LabelSpec
 ): string {

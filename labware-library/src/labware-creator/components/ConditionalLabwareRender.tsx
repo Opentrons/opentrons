@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cloneDeep from 'lodash/cloneDeep'
 import {
@@ -16,11 +15,11 @@ import { fieldsToLabware } from '../fieldsToLabware'
 import type { LabwareFields, ProcessedLabwareFields } from '../fields'
 import styles from './ConditionalLabwareRender.css'
 
-type Props = {|
+interface Props {
   values: LabwareFields,
-|}
+}
 
-export const ConditionalLabwareRender = (props: Props): React.Node => {
+export const ConditionalLabwareRender = (props: Props): JSX.Element => {
   const definition = React.useMemo(() => {
     const values = cloneDeep(props.values)
 
@@ -45,7 +44,7 @@ export const ConditionalLabwareRender = (props: Props): React.Node => {
     values.regularColumnSpacing = 'true'
     values.pipetteName = 'whatever'
 
-    let castValues: ?ProcessedLabwareFields = null
+    let castValues: ProcessedLabwareFields | null = null
     try {
       castValues = labwareFormSchema.cast(values)
     } catch (error) {}

@@ -1,19 +1,19 @@
-// @flow
 import * as React from 'react'
 import { Field } from 'formik'
 import { RadioGroup } from '@opentrons/components'
 import { reportFieldEdit } from '../analyticsUtils'
 import { getIsHidden } from '../formSelectors'
-import { LABELS, type LabwareFields } from '../fields'
+import { LABELS } from '../fields'
+import type {  LabwareFields } from '../fields'
 import fieldStyles from './fieldStyles.css'
 
-type Props = {|
-  name: $Keys<LabwareFields>,
-  options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>,
-  labelTextClassName?: ?string,
-|}
+interface Props {
+  name: keyof LabwareFields
+  options: React.ComponentProps<typeof RadioGroup>['options']
+  labelTextClassName?: string | null | undefined,
+}
 
-export const RadioField = (props: Props): React.Node => (
+export const RadioField = (props: Props): JSX.Element => (
   <Field name={props.name}>
     {({ form, field }) =>
       getIsHidden(props.name, form.values) ? null : (
@@ -34,7 +34,7 @@ export const RadioField = (props: Props): React.Node => (
                 //
                 // NOTE: onBlur doesn't work on Firefox on Mac for radio fields,
                 // so we can't do `e.currentTarget.blur()`. See https://bugzilla.mozilla.org/show_bug.cgi?id=756028
-                form.setTouched({ [(props.name: string)]: true })
+                form.setTouched({ [(props.name as string)]: true })
               }, 0)
 
               reportFieldEdit({ value: field.value, name: field.name })
