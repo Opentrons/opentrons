@@ -1330,7 +1330,10 @@ def test_blowout_to_dest(_instr_labware):
 #    difference might need to be preserved.) Also consider testing what happens
 #    with 8-Channel pipettes.
 # 2) Temporarily remove the fix and audit every parametrization of this test
-#    to see how ransferPlan fails it. Characterize the existing behavior.
+#    to see how TransferPlan fails it. Characterize the existing behavior. I've
+#    seen some parametrizations fail by infinite-looping (timing out), and some
+#    fail by returning a step list with nothing but a pick_up_tip. There may be
+#    other variants.
 # 3) Port the characterization of the existing behavior to tests for the current
 #    apiLevel. For the cases where TransferPlan currently infinite-loops, if we
 #    change it to raising an explicit exception, we can count that as the same
