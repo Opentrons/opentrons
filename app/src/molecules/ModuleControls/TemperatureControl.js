@@ -27,7 +27,7 @@ type Props = {|
     command: ModuleCommand,
     args?: Array<mixed>
   ) => mixed,
-  disabledReason?: string | null,
+  disabledReason: string | null,
 |}
 
 export const TemperatureControl = ({

@@ -4,6 +4,7 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 
+// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import * as Sessions from '../../../redux/sessions'

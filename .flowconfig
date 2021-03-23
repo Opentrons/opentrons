@@ -11,14 +11,10 @@
 <PROJECT_ROOT>/robot-server/.*
 <PROJECT_ROOT>/notify-server/.*
 
-[untyped]
-; TODO(mc, 2019-06-28): react-select uses an old version of flow
-; https://github.com/JedWatson/react-select/issues/3612
-.*/node_modules/react-select/.*
-
 [declarations]
 ; read type signatures from node_modules but ignore flow errors within
 .*/node_modules/.*
+<PROJECT_ROOT>/components/flow-types/.*
 
 [include]
 
