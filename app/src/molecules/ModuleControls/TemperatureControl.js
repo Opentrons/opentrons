@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { css } from 'styled-components'
 
 import {
   AlertModal,
@@ -16,6 +15,7 @@ import {
   DIRECTION_COLUMN,
   FONT_STYLE_ITALIC,
   FONT_SIZE_BODY_1,
+  SPACING_2,
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 import { THERMOCYCLER_MODULE_TYPE } from '../../redux/modules'
@@ -137,10 +137,7 @@ export const TemperatureControl = ({
         </Portal>
       )}
       <SecondaryBtn
-        css={css`
-          padding-left: 0.5rem;
-          padding-right: 0.5rem;
-        `}
+        paddingX={SPACING_2}
         width={'11rem'}
         onClick={handleClick}
         disabled={disabledReason != null}
