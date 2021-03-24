@@ -20,16 +20,16 @@ import type { LabwareWellGroupProperties, LabwareParameters } from '../../types'
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
-export type WellDimensionsProps = {|
-  labwareParams: LabwareParameters,
-  wellProperties: LabwareWellGroupProperties,
-  wellLabel: string,
-  category: string,
-  labelSuffix?: string,
-  className?: string,
-|}
+export interface WellDimensionsProps {
+  labwareParams: LabwareParameters
+  wellProperties: LabwareWellGroupProperties
+  wellLabel: string
+  category: string
+  labelSuffix?: string
+  className?: string
+}
 
-export function WellDimensions(props: WellDimensionsProps): React.Node {
+export function WellDimensions(props: WellDimensionsProps): JSX.Element {
   const {
     labwareParams,
     wellProperties,

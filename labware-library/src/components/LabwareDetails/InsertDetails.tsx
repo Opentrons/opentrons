@@ -11,11 +11,11 @@ import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
 
-export type InsertDetailsProps = {|
+export interface InsertDetailsProps {
   definition: LabwareDefinition,
-|}
+}
 
-export function InsertDetails(props: InsertDetailsProps): React.Node {
+export function InsertDetails(props: InsertDetailsProps): JSX.Element {
   const { definition } = props
   const { metadata, parameters } = definition
   const { displayVolumeUnits, displayCategory } = metadata

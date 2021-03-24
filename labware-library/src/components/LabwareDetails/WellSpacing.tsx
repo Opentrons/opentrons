@@ -24,7 +24,9 @@ import type { LabwareWellGroupProperties } from '../../types'
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const spacingValue = (spacing: number | null) => {
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (!spacing) {
     return (
       <span className={styles.lighter}>{spacing === null ? VARIOUS : NA}</span>
@@ -34,15 +36,15 @@ const spacingValue = (spacing: number | null) => {
   return toFixed(spacing)
 }
 
-export type WellSpacingProps = {|
-  category?: string,
-  isMultiRow?: boolean,
-  wellProperties: LabwareWellGroupProperties,
-  labelSuffix?: string,
-  className?: string,
-|}
+export interface WellSpacingProps {
+  category?: string
+  isMultiRow?: boolean
+  wellProperties: LabwareWellGroupProperties
+  labelSuffix?: string
+  className?: string
+}
 
-export function WellSpacing(props: WellSpacingProps): React.Node {
+export function WellSpacing(props: WellSpacingProps): JSX.Element {
   const { labelSuffix, wellProperties, className, category, isMultiRow } = props
   const spacing = [
     { label: X_OFFSET, value: toFixed(wellProperties.xOffsetFromLeft) },
@@ -57,7 +59,7 @@ export function WellSpacing(props: WellSpacingProps): React.Node {
     guideType: 'spacing',
     shape: shape,
     isMultiRow: isMultiRow,
-  }).map((src, index) => <img src={src} key={index} />)
+  }).map<JSX.Element>((src, index) => <img src={src} key={index} />)
 
   return (
     <LabeledValueTable

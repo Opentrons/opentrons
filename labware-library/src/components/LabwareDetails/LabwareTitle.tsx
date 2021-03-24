@@ -10,12 +10,12 @@ import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
 
-export type LabwareTitleProps = {|
-  definition: LabwareDefinition,
-  className?: string,
-|}
+export interface LabwareTitleProps {
+  definition: LabwareDefinition
+  className?: string
+}
 
-export function LabwareTitle(props: LabwareTitleProps): React.Node {
+export function LabwareTitle(props: LabwareTitleProps): JSX.Element {
   const { definition, className } = props
   const { metadata } = definition
   const { displayCategory } = definition.metadata

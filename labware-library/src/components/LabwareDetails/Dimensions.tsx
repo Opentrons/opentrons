@@ -17,14 +17,14 @@ import type { LabwareDefinition } from '../../types'
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
-export type DimensionsProps = {|
+export interface DimensionsProps {
   definition: LabwareDefinition,
   className?: string,
   irregular?: boolean,
   insertCategory?: string,
-|}
+}
 
-export function Dimensions(props: DimensionsProps): React.Node {
+export function Dimensions(props: DimensionsProps): JSX.Element {
   const { definition, className, irregular, insertCategory } = props
   const { displayCategory } = definition.metadata
   const { xDimension, yDimension, zDimension } = definition.dimensions

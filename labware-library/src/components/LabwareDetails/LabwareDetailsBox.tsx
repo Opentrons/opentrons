@@ -19,12 +19,12 @@ import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
 
-export type LabwareDetailsBoxProps = {|
+export interface LabwareDetailsBoxProps {
   definition: LabwareDefinition,
   className?: string,
-|}
+}
 
-export function LabwareDetailsBox(props: LabwareDetailsBoxProps): React.Node {
+export function LabwareDetailsBox(props: LabwareDetailsBoxProps): JSX.Element {
   const { definition, className } = props
   const { metadata, parameters, brand, wells, ordering } = definition
   const { displayVolumeUnits } = metadata

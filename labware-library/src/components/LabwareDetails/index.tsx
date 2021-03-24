@@ -1,4 +1,3 @@
-// @flow
 // full-width labware details
 import * as React from 'react'
 
@@ -9,11 +8,11 @@ import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
 
-export type LabwareDetailsProps = {|
+export interface LabwareDetailsProps {
   definition: LabwareDefinition,
-|}
+}
 
-export function LabwareDetails(props: LabwareDetailsProps): React.Node {
+export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const { definition } = props
   const { loadName } = definition.parameters
 
