@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, List
 from opentrons.drivers.mag_deck.driver import GCODES
-from .command_processor import CommandProcessor
+from .abstract_emulator import AbstractEmulator
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ MODEL = "magdeck_emulator"
 VERSION = 1
 
 
-class MagDeckEmulator(CommandProcessor):
+class MagDeckEmulator(AbstractEmulator):
     """Magdeck emulator"""
 
     def __init__(self) -> None:

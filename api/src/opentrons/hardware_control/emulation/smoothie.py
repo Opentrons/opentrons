@@ -3,14 +3,14 @@ from typing import Optional, List
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE
 
-from .command_processor import CommandProcessor
+from .abstract_emulator import AbstractEmulator
 
 logger = logging.getLogger(__name__)
 
 v = """Build version: EMULATOR, Build date: CURRENT, MCU: NONE, System Clock: NONE"""
 
 
-class SmoothieEmulator(CommandProcessor):
+class SmoothieEmulator(AbstractEmulator):
     """Smoothie emulator"""
 
     def __init__(self) -> None:
