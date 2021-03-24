@@ -1,6 +1,7 @@
 // @flow
 import {
   Box,
+  Flex,
   Text,
   FONT_WEIGHT_SEMIBOLD,
   TEXT_TRANSFORM_CAPITALIZE,
