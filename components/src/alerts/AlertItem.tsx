@@ -6,10 +6,12 @@ import styles from './alerts.css'
 
 import type { IconProps } from '../icons'
 
+export type AlertType = 'success' | 'warning' | 'error' | 'info'
+
 // TODO(bc, 2021-03-23): create and use AlertType Enum here and in rest of file
 export interface AlertItemProps {
   /** name constant of the icon to display */
-  type: 'success' | 'warning' | 'error' | 'info'
+  type: AlertType
   /** title/main message of colored alert bar */
   title: React.ReactNode
   /** Alert message body contents */
@@ -28,8 +30,8 @@ export interface AlertItemProps {
  */
 
 const ALERT_PROPS_BY_TYPE: Record<
-  AlertItemProps['type'],
-  { icon: IconProps; className: AlertItemProps['className'] }
+  AlertType,
+  { icon: IconProps; className: string }
 > = {
   success: {
     icon: { name: 'check-circle' },
@@ -48,8 +50,6 @@ const ALERT_PROPS_BY_TYPE: Record<
     className: styles.info,
   },
 }
-
-export type AlertType = keyof typeof ALERT_PROPS_BY_TYPE
 
 export function AlertItem(props: AlertItemProps): JSX.Element {
   const alertProps = ALERT_PROPS_BY_TYPE[props.type]
