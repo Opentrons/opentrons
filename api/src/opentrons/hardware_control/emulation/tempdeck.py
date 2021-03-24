@@ -3,7 +3,7 @@ from typing import Optional, List
 
 from opentrons.drivers.temp_deck.driver import GCODES
 
-from .command_processor import CommandProcessor
+from .abstract_emulator import AbstractEmulator
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ MODEL = "temp_emulator"
 VERSION = 1
 
 
-class TempDeckEmulator(CommandProcessor):
+class TempDeckEmulator(AbstractEmulator):
     """TempDeck emulator"""
 
     def __init__(self) -> None:

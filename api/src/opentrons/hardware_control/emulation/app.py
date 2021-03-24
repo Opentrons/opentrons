@@ -1,12 +1,12 @@
 import asyncio
 import logging
 
+from opentrons.hardware_control.emulation.connection_handler import \
+    ConnectionHandler
 from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
 from opentrons.hardware_control.emulation.tempdeck import TempDeckEmulator
 from opentrons.hardware_control.emulation.thermocycler import ThermocyclerEmulator
 from opentrons.hardware_control.emulation.smoothie import SmoothieEmulator
-
-from .command_processor import CommandProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -15,35 +15,6 @@ SMOOTHIE_PORT = 9996
 THERMOCYCLER_PORT = 9997
 TEMPDECK_PORT = 9998
 MAGDECK_PORT = 9999
-
-
-class ConnectionHandler:
-    def __init__(self, command_processor: CommandProcessor,
-                 terminator: bytes = b'\r\n\r\n',
-                 ack: bytes = b'ok\r\nok\r\n'):
-        """Construct"""
-        self._command_processor = command_processor
-        self._terminator = terminator
-        self._ack = ack
-
-    async def __call__(self, reader: asyncio.StreamReader,
-                       writer: asyncio.StreamWriter) -> None:
-        """New connection callback."""
-        logger.debug("Connected.")
-        while True:
-            line = await reader.readuntil(self._terminator)
-            logger.debug("Received: %s", line)
-
-            words = line.decode().strip().split(' ')
-            if words:
-                response = self._command_processor.handle(words)
-                if response:
-                    response = f'{response}\r\n'
-                    logger.debug("Sending: %s", response)
-                    writer.write(response.encode())
-
-            writer.write(self._ack)
-            await writer.drain()
 
 
 async def run_server(host: str, port: int, handler: ConnectionHandler) -> None:
@@ -67,8 +38,7 @@ async def run() -> None:
                    handler=ConnectionHandler(TempDeckEmulator())),
         run_server(host=host,
                    port=THERMOCYCLER_PORT,
-                   handler=ConnectionHandler(ThermocyclerEmulator(),
-                                             terminator=b'\r\n')),
+                   handler=ConnectionHandler(ThermocyclerEmulator())),
         run_server(host=host,
                    port=SMOOTHIE_PORT,
                    handler=ConnectionHandler(SmoothieEmulator())),

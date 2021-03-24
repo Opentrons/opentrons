@@ -2,7 +2,7 @@ import logging
 from typing import Optional, List
 import enum
 from opentrons.drivers.thermocycler.driver import GCODES
-from .command_processor import CommandProcessor
+from .abstract_emulator import AbstractEmulator
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class LidStatus(str, enum.Enum):
     MAX = 'max'
 
 
-class ThermocyclerEmulator(CommandProcessor):
+class ThermocyclerEmulator(AbstractEmulator):
     """Thermocycler emulator"""
 
     def __init__(self) -> None:
@@ -82,3 +82,7 @@ class ThermocyclerEmulator(CommandProcessor):
         elif cmd == GCODE_DEVICE_INFO:
             return f"serial:{SERIAL} model:{MODEL} version:{VERSION}"
         return None
+
+    @staticmethod
+    def get_terminator() -> bytes:
+        return b'\r\n'
