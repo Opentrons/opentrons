@@ -43,6 +43,7 @@ function UploadInput(props: UploadInputProps) {
 
   return (
     <div className={styles.upload} onDragOver={stopEvent} onDrop={stopEvent}>
+      {/* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion or by using PrimaryBtn */}
       <Label {...labelProps}>
         {!isButton && <Icon name="upload" className={styles.file_drop_icon} />}
         <span className={styles.label_text}>{labelText}</span>

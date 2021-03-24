@@ -197,6 +197,9 @@ class Thermocycler(mod_abc.AbstractModule):
 
         Subject to change without a version bump.
         """
+        if self.is_simulated:
+            return
+
         while self._driver.lid_temp_status != 'holding at target':
             await asyncio.sleep(0.1)
 
@@ -206,6 +209,9 @@ class Thermocycler(mod_abc.AbstractModule):
 
         Subject to change without a version bump.
         """
+        if self.is_simulated:
+            return
+
         while self.status != 'holding at target':
             await asyncio.sleep(0.1)
 
@@ -213,6 +219,9 @@ class Thermocycler(mod_abc.AbstractModule):
         """
         This method returns only when hold time has elapsed
         """
+        if self.is_simulated:
+            return
+
         # If hold time is within the HOLD_TIME_FUZZY_SECONDS time gap, then,
         # because of the driver's status poller delays, it is impossible to
         # know for certain if self.hold_time holds the most recent value.

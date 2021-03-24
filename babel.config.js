@@ -29,6 +29,7 @@ module.exports = {
       {
         alias: {
           '^@opentrons/discovery-client$': `@opentrons/discovery-client/src/index.ts`,
+          '^@opentrons/components$': `@opentrons/components/src/index.ts`,
         },
       },
     ],

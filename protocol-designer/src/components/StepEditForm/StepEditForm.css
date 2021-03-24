@@ -168,6 +168,7 @@
   color: var(--c-light-gray);
   opacity: 0.16;
   cursor: default;
+  pointer-events: inherit;
 }
 
 .path_options {

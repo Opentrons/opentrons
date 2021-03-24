@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import cx from 'classnames'
 import {
   Icon,
@@ -13,7 +13,6 @@ import {
   TOOLTIP_TOP_END,
 } from '@opentrons/components'
 import { i18n } from '../../../localization'
-import { getUnsavedForm } from '../../../step-forms/selectors'
 import * as steplistActions from '../../../steplist/actions'
 import { PROFILE_CYCLE } from '../../../form-types'
 import {
@@ -142,9 +141,16 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
 
 export type ProfileItemRowsProps = {|
   focusHandlers: FocusHandlers,
+  orderedProfileItems: Array<string>,
+  profileItemsById: {
+    [string]: ProfileItem,
+    ...
+  },
 |}
 
 export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
+  const { orderedProfileItems, profileItemsById } = props
+
   const dispatch = useDispatch()
   const addProfileCycle = () => dispatch(steplistActions.addProfileCycle(null))
   const addProfileStep = () => dispatch(steplistActions.addProfileStep(null))
@@ -155,13 +161,6 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
   const [addStepTargetProps, addStepTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
   })
-
-  const unsavedForm = useSelector(getUnsavedForm)
-  if (!unsavedForm) {
-    console.error('ProfileStepRows expected an unsavedForm')
-    return null
-  }
-  const { orderedProfileItems, profileItemsById } = unsavedForm
 
   let counter = 0
 

@@ -1,14 +1,13 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import omit from 'lodash/omit'
 
 import { Modal, OutlineButton, LabeledValue } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 
 import { arrayToWellGroup } from '../../../../utils'
-import { changeFormInput } from '../../../../steplist/actions'
 import { WellSelectionInstructions } from '../../../WellSelectionInstructions'
 import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 
@@ -33,6 +32,8 @@ type WellSelectionModalProps = {|
   name: StepFieldName,
   onCloseClick: (e: ?SyntheticEvent<*>) => mixed,
   pipetteId: ?string,
+  value: mixed,
+  updateValue: (?mixed) => void,
 |}
 
 type WellSelectionModalComponentProps = {|
@@ -45,8 +46,8 @@ type WellSelectionModalComponentProps = {|
   pipetteSpec: ?PipetteNameSpecs,
   selectedPrimaryWells: WellGroup,
   selectWells: WellGroup => mixed,
-  wellContents: ContentsByWell,
   updateHighlightedWells: WellGroup => mixed,
+  wellContents: ContentsByWell,
 |}
 
 const WellSelectionModalComponent = (
@@ -112,15 +113,14 @@ const WellSelectionModalComponent = (
 export const WellSelectionModal = (
   props: WellSelectionModalProps
 ): React.Node => {
-  const { isOpen, labwareId, name, onCloseClick, pipetteId } = props
-
-  const dispatch = useDispatch()
+  const { isOpen, labwareId, onCloseClick, pipetteId } = props
+  const wellFieldData = props.value
 
   // selector data
   const allWellContentsForStep = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
-  const formData = useSelector(stepFormSelectors.getUnsavedForm)
+
   const ingredNames = useSelector(selectors.getLiquidNamesById)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
@@ -129,9 +129,10 @@ export const WellSelectionModal = (
   const labwareDef = (labwareId && labwareEntities[labwareId]?.def) || null
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
 
-  const wellFieldData: ?Array<string> = formData?.[name]
-  const initialSelectedPrimaryWells =
-    wellFieldData != null ? arrayToWellGroup(wellFieldData) : {}
+  const initialSelectedPrimaryWells = Array.isArray(wellFieldData)
+    ? // $FlowFixMe(IL, 2021-03-22): FormData values are poorly typed, address in #3161
+      arrayToWellGroup(wellFieldData)
+    : {}
 
   // component state
   const [
@@ -141,13 +142,6 @@ export const WellSelectionModal = (
   const [highlightedWells, setHighlightedWells] = React.useState<WellGroup>({})
 
   // actions
-  const saveWellSelection = (wells: WellGroup) =>
-    dispatch(
-      changeFormInput({
-        update: { [name]: Object.keys(wells).sort(sortWells) },
-      })
-    )
-
   const selectWells = (wells: WellGroup) => {
     setSelectedPrimaryWells(prev => ({ ...prev, ...wells }))
     setHighlightedWells({})
@@ -159,7 +153,8 @@ export const WellSelectionModal = (
   }
 
   const handleSave = () => {
-    saveWellSelection(selectedPrimaryWells)
+    const sortedWells = Object.keys(selectedPrimaryWells).sort(sortWells)
+    props.updateValue(sortedWells)
     onCloseClick()
   }
 

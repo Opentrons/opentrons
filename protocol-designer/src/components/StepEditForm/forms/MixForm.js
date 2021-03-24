@@ -69,8 +69,8 @@ export const MixForm = (props: StepFormProps): React.Node => {
         </FormGroup>
         <WellSelectionField
           {...propsForFields['wells']}
-          labwareFieldName="labware"
-          pipetteFieldName="pipette"
+          labwareId={formData['labware']}
+          pipetteId={formData['pipette']}
         />
       </div>
       <div className={styles.section_divider} />

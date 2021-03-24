@@ -1,13 +1,11 @@
 # opentrons component library makefile
 
-# using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
-SHELL := bash
-
-# add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
-
 # dev server port
 port ?= 8081
+
+# type definitions
+typedefs := $(shell yarn -s shx find "lib/**/*.d.ts")
+flow_out := $(patsubst lib/%.d.ts,flow-types/%.js.flow,$(typedefs))
 
 # standard targets
 #####################################################################
@@ -21,7 +19,7 @@ setup:
 
 .PHONY: clean
 clean:
-	shx rm -rf dist
+	yarn shx rm -rf dist
 
 # artifacts
 #####################################################################
@@ -29,7 +27,13 @@ clean:
 .PHONY: dist
 dist: export NODE_ENV := development
 dist:
-	styleguidist build
+	yarn styleguidist build
+
+.PHONY: flow-types
+flow-types: $(flow_out)
+
+flow-types/%.js.flow: lib/%.d.ts
+	yarn flowgen $< --add-flow-header --interface-records --no-inexact --output-file $@
 
 # development
 #####################################################################
@@ -37,4 +41,4 @@ dist:
 .PHONY: dev
 build: export NODE_ENV := development
 dev:
-	styleguidist server
+	yarn styleguidist server

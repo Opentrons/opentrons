@@ -1747,13 +1747,14 @@ class API(HardwareAPILike):
 
         # destroy removed mods
         self._unregister_modules(removed_mods_at_ports)
-        self._backend._usb.sort_ports()
+        sorted_mods_at_port =\
+            self._backend._usb.match_virtual_ports(new_mods_at_ports)
 
         # build new mods
-        for mod in new_mods_at_ports:
+        for mod in sorted_mods_at_port:
             new_instance = await self._backend.build_module(
                     port=mod.port,
-                    usb_port=self._backend._usb.find_port(mod.port),
+                    usb_port=mod.usb_port,
                     model=mod.name,
                     interrupt_callback=self.pause_with_message,
                     loop=self.loop,

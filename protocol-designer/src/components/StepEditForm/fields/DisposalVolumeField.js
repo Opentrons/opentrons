@@ -17,6 +17,7 @@ import { getBlowoutLocationOptionsForForm } from '../utils'
 import { TextField } from './TextField'
 
 import type { FieldProps, FieldPropsByName } from '../types'
+import type { PathOption, StepType } from '../../../form-types'
 import type { BaseState } from '../../../types'
 
 import styles from '../StepEditForm.css'
@@ -42,7 +43,15 @@ type SP = {|
   disposalDestinationOptions: Options,
   maxDisposalVolume: ?number,
 |}
-type OP = {| propsForFields: FieldPropsByName |}
+type OP = {|
+  aspirate_airGap_checkbox?: boolean | null,
+  aspirate_airGap_volume?: string | null,
+  path: PathOption,
+  pipette: string | null,
+  propsForFields: FieldPropsByName,
+  stepType: StepType,
+  volume: string | null,
+|}
 type Props = { ...SP, ...OP }
 
 const DisposalVolumeFieldComponent = (props: Props) => {
@@ -69,7 +78,7 @@ const DisposalVolumeFieldComponent = (props: Props) => {
 
   return (
     <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
-      <React.Fragment>
+      <>
         <div
           className={cx(styles.checkbox_row, {
             [styles.captioned_field]: volumeBoundsCaption,
@@ -93,27 +102,42 @@ const DisposalVolumeFieldComponent = (props: Props) => {
             />
           </div>
         ) : null}
-      </React.Fragment>
+      </>
     </FormGroup>
   )
 }
-const mapSTP = (state: BaseState): SP => {
-  const rawForm = stepFormSelectors.getUnsavedForm(state)
+const mapSTP = (state: BaseState, ownProps: OP): SP => {
+  const {
+    aspirate_airGap_checkbox,
+    aspirate_airGap_volume,
+    path,
+    pipette,
+    stepType,
+    volume,
+  } = ownProps
+
+  const blowoutLocationOptions = getBlowoutLocationOptionsForForm({
+    path,
+    stepType,
+  })
+
   const disposalLabwareOptions = uiLabwareSelectors.getDisposalLabwareOptions(
     state
   )
-  const blowoutLocationOptions = rawForm
-    ? getBlowoutLocationOptionsForForm({
-        path: rawForm.path,
-        stepType: rawForm.stepType,
-      })
-    : []
+
+  const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
+    {
+      aspirate_airGap_checkbox,
+      aspirate_airGap_volume,
+      path,
+      pipette,
+      volume,
+    },
+    stepFormSelectors.getPipetteEntities(state)
+  )
 
   return {
-    maxDisposalVolume: getMaxDisposalVolumeForMultidispense(
-      rawForm,
-      stepFormSelectors.getPipetteEntities(state)
-    ),
+    maxDisposalVolume,
     disposalDestinationOptions: [
       ...disposalLabwareOptions,
       ...blowoutLocationOptions,

@@ -10,10 +10,12 @@ shared-data/python/**
 
 # flow
 flow-typed/npm/**
+components/flow-types/**
 
-# compiled
+# typescript
 app-shell/lib/**
 discovery-client/lib/**
+**/lib/**/*.d.ts
 
 # prettier
 **/package.json

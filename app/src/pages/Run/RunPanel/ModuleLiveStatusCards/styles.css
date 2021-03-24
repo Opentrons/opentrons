@@ -19,11 +19,16 @@ updated component library cards after redesign/refactor
   text-transform: uppercase;
 }
 
+.thermocycler_data {
+  flex-direction: column;
+}
+
 .card_row {
   padding: 1rem 0.5rem;
   font-size: var(--fs-body-1);
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .card_row:not(:last-child) {

@@ -6,6 +6,8 @@ more readable format.
 """
 from typing import List, Set
 
+from opentrons.hardware_control.modules.types import ModuleAtPort
+
 from .interfaces import USBDriverInterface
 from .types import USBPort
 
@@ -36,6 +38,12 @@ class USBBusSimulator(USBDriverInterface):
         :returns: The USBPort dataclass
         """
         pass
+
+    @staticmethod
+    def read_symlink(virtual_port: str) -> str:
+        """
+        """
+        return ''
 
     @property
     def usb_dev(self) -> List[USBPort]:
@@ -96,8 +104,12 @@ class USBBusSimulator(USBDriverInterface):
         :returns: The matching port, or an empty port dataclass
         """
         return USBPort(
-            name='', sub_names=[], hub=None,
-            port_number=None, device_path=device_path)
+            name='', sub_names=[], device_path=device_path)
 
     def sort_ports(self) -> None:
         pass
+
+    def match_virtual_ports(
+            self, virtual_port: List[ModuleAtPort]
+            ) -> List[ModuleAtPort]:
+        return virtual_port

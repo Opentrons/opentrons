@@ -6,24 +6,39 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 4.1.1
-
-This is a hotfix for an issue with package installation; it does not include any behavioral changes for the OT-2.
+# OT-2 Software Changes in 4.2.0
 
 ## Bugfixes
 
+- Fixed an issue where the pipette or pipette mount would not descend far enough to access the mounting screws when changing the pipette
+- Fixed an issue that would cause the left and right pipettes to be at different heights, even after executing pipette calibration
+  - If you are experiencing this issue, you should recalibrate your pipettes after updating.
+- Fixed an issue where the OT-2 would be unable to connect to Wi-Fi networks using 802.1x Fast Migration.
+
+## Known Issues
+
+In 4.2.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
+
+---
+
+## OT-2 Software Changes in 4.1.1
+
+This is a hotfix for an issue with package installation; it does not include any behavioral changes for the OT-2.
+
+### Bugfixes
+
 - Fixed an issue where the version of the pyserial dependency in the `opentrons` package metadata did not match the version installed on the OT-2, which would cause installation of Python packages that depend on the `opentrons` package to the robot to fail ([#7250](https://github.com/Opentrons/opentrons/pull/7250))
 
-# OT-2 Software Changes in 4.1.0
+## OT-2 Software Changes in 4.1.0
 
 Opentrons Robot Software 4.1.0 brings support for some new robot calibration features and some bugfixes. It also brings a new Protocol API level.
 
-## Calibration Changes
+### Calibration Changes
 
 - You can now choose any standard or custom tiprack of appropriate volume to use when calibrating your pipette
 - You can now jog in Z when calibrating to deck markings
 
-## Protocol API Level 2.9
+### Protocol API Level 2.9
 
 - In Python Protocol API Level 2.9, we added accessors for well properties that had previously been undocumented. To see more details, see [the documentation](http://docs.opentrons.com/v2/new_labware.html#new-labware-well-properties).
 

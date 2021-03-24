@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useField } from 'formik'
+// $FlowFixMe(bc, 2021-03-22): import should be from '@opentrons/components' make sure no circ deps
 import { DropdownField } from '@opentrons/components/src/forms/DropdownField'
 
 type ModelDropdownProps = {|

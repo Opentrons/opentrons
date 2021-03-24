@@ -1,7 +1,10 @@
 from dataclasses import dataclass
 from typing import (
-    Dict, NamedTuple, Callable, Any, Tuple, Awaitable, Mapping, Union)
+    Dict, NamedTuple, Callable, Any, Tuple,
+    Awaitable, Mapping, Union)
 from pathlib import Path
+
+from opentrons.drivers.rpi_drivers.types import USBPort
 
 ThermocyclerStep = Dict[str, float]
 
@@ -13,10 +16,11 @@ UploadFunction = Callable[[str, str, Dict[str, Any]],
 LiveData = Mapping[str, Union[str, Mapping[str, Union[float, str, None]]]]
 
 
-@dataclass(frozen=True)
+@dataclass
 class ModuleAtPort:
     port: str
     name: str
+    usb_port: USBPort = USBPort(name='', sub_names=[])
 
 
 class BundledFirmware(NamedTuple):

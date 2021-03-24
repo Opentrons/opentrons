@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/Opentrons/opentrons/compare/v4.1.1...v4.2.0) (2021-03-18)
+
+### Bug Fixes
+
+* **protocol-designer:** avoid StepList exception on keydown ([#7442](https://github.com/Opentrons/opentrons/issues/7442)) ([b5bf1c7](https://github.com/Opentrons/opentrons/commit/b5bf1c7))
+* **protocol-designer:** fix DropdownFormField ([#7378](https://github.com/Opentrons/opentrons/issues/7378)) ([8f4e9a1](https://github.com/Opentrons/opentrons/commit/8f4e9a1)), closes [#7376](https://github.com/Opentrons/opentrons/issues/7376)
+* **protocol-designer:** fix syntax error from automerge ([#7357](https://github.com/Opentrons/opentrons/issues/7357)) ([c6732e5](https://github.com/Opentrons/opentrons/commit/c6732e5))
+
+
+### Features
+
+* **components:** add id prop to NavTab ([#7382](https://github.com/Opentrons/opentrons/issues/7382)) ([5da3238](https://github.com/Opentrons/opentrons/commit/5da3238)), closes [#7384](https://github.com/Opentrons/opentrons/issues/7384)
+* **protocol-designer:**  disable context menu in batch edit mode ([#7399](https://github.com/Opentrons/opentrons/issues/7399)) ([3bc2f17](https://github.com/Opentrons/opentrons/commit/3bc2f17))
+* **protocol-designer:** add functionality to multi select toolbar ([#7264](https://github.com/Opentrons/opentrons/issues/7264)) ([926fdbf](https://github.com/Opentrons/opentrons/commit/926fdbf)), closes [#7105](https://github.com/Opentrons/opentrons/issues/7105)
+* **protocol-designer:** add high priority analytics events for batch edit form interactions ([#7409](https://github.com/Opentrons/opentrons/issues/7409)) ([307e072](https://github.com/Opentrons/opentrons/commit/307e072))
+* **protocol-designer:** Add layout styling to no batch shared settings message ([#7367](https://github.com/Opentrons/opentrons/issues/7367)) ([1b48a47](https://github.com/Opentrons/opentrons/commit/1b48a47)), closes [#7129](https://github.com/Opentrons/opentrons/issues/7129)
+* **protocol-designer:** add modal fields ([#7440](https://github.com/Opentrons/opentrons/issues/7440)) ([466bd00](https://github.com/Opentrons/opentrons/commit/466bd00)), closes [#7239](https://github.com/Opentrons/opentrons/issues/7239)
+* **protocol-designer:** Add multiselect mode UI ([#7211](https://github.com/Opentrons/opentrons/issues/7211)) ([9387073](https://github.com/Opentrons/opentrons/commit/9387073))
+* **protocol-designer:** add non-modal batch edit fields to form ([#7420](https://github.com/Opentrons/opentrons/issues/7420)) ([93d7485](https://github.com/Opentrons/opentrons/commit/93d7485)), closes [#7128](https://github.com/Opentrons/opentrons/issues/7128)
+* **protocol-designer:** add redux infrastructure for batch edit form ([#7346](https://github.com/Opentrons/opentrons/issues/7346)) ([5de1696](https://github.com/Opentrons/opentrons/commit/5de1696))
+* **protocol-designer:** add selector for gathering multi select field values ([#7215](https://github.com/Opentrons/opentrons/issues/7215)) ([31deede](https://github.com/Opentrons/opentrons/commit/31deede)), closes [#7187](https://github.com/Opentrons/opentrons/issues/7187)
+* **protocol-designer:** add selector to get batch edit disabled fields ([#7223](https://github.com/Opentrons/opentrons/issues/7223)) ([517ad76](https://github.com/Opentrons/opentrons/commit/517ad76))
+* **protocol-designer:** Add test coverage to StepCreationButton ([#7400](https://github.com/Opentrons/opentrons/issues/7400)) ([218898f](https://github.com/Opentrons/opentrons/commit/218898f)), closes [#7355](https://github.com/Opentrons/opentrons/issues/7355)
+* **protocol-designer:** add user prompts when exiting batch edit form ([#7387](https://github.com/Opentrons/opentrons/issues/7387)) ([0a1392b](https://github.com/Opentrons/opentrons/commit/0a1392b)), closes [#7138](https://github.com/Opentrons/opentrons/issues/7138)
+* **protocol-designer:** clear unsaved form state in batch edit mode ([#7361](https://github.com/Opentrons/opentrons/issues/7361)) ([07475c6](https://github.com/Opentrons/opentrons/commit/07475c6)), closes [#7360](https://github.com/Opentrons/opentrons/issues/7360)
+* **protocol-designer:** create batch edit form skeleton ([#7350](https://github.com/Opentrons/opentrons/issues/7350)) ([ab4e7b2](https://github.com/Opentrons/opentrons/commit/ab4e7b2))
+* **protocol-designer:** disable step creation button when in batch edit ([#7308](https://github.com/Opentrons/opentrons/issues/7308)) ([84a50d3](https://github.com/Opentrons/opentrons/commit/84a50d3)), closes [#7294](https://github.com/Opentrons/opentrons/issues/7294)
+* **protocol-designer:** hook up exit batch edit mode button ([#7299](https://github.com/Opentrons/opentrons/issues/7299)) ([013026c](https://github.com/Opentrons/opentrons/commit/013026c))
+* **protocol-designer:** implement makeBatchEditFieldProps and save/cancel buttons ([#7391](https://github.com/Opentrons/opentrons/issues/7391)) ([31b9217](https://github.com/Opentrons/opentrons/commit/31b9217)), closes [#7222](https://github.com/Opentrons/opentrons/issues/7222)
+* **protocol-designer:** implement save button disabling in batch edit form ([#7405](https://github.com/Opentrons/opentrons/issues/7405)) ([5b729da](https://github.com/Opentrons/opentrons/commit/5b729da)), closes [#7130](https://github.com/Opentrons/opentrons/issues/7130)
+* **protocol-designer:** make CheckboxRowField handle isIndeterminate ([#7393](https://github.com/Opentrons/opentrons/issues/7393)) ([a84255b](https://github.com/Opentrons/opentrons/commit/a84255b)), closes [#7392](https://github.com/Opentrons/opentrons/issues/7392)
+* **protocol-designer:** move batch edit form redux types from shared types into own files ([#7354](https://github.com/Opentrons/opentrons/issues/7354)) ([4f1601f](https://github.com/Opentrons/opentrons/commit/4f1601f))
+* **protocol-designer:** Update Multiselect UI based off feedback ([#7293](https://github.com/Opentrons/opentrons/issues/7293)) ([1094d03](https://github.com/Opentrons/opentrons/commit/1094d03)), closes [#7270](https://github.com/Opentrons/opentrons/issues/7270)
+
+
+
+
+
 ## [4.1.1](https://github.com/Opentrons/opentrons/compare/v4.1.0...v4.1.1) (2021-01-25)
 
 **Note:** Version bump only for package protocol-designer

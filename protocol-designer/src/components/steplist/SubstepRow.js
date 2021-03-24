@@ -52,7 +52,7 @@ export const PillTooltipContents = (
               <td>
                 <div
                   className={styles.liquid_circle}
-                  style={{ backgroundColor: swatchColors(Number(groupId)) }}
+                  style={{ backgroundColor: swatchColors(groupId) }}
                 />
               </td>
               <td className={styles.ingred_name}>

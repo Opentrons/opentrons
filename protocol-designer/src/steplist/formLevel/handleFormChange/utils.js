@@ -9,7 +9,7 @@ import type {
   PipetteChannels,
 } from '@opentrons/shared-data'
 import type { FormPatch } from '../../actions/types'
-import type { FormData, StepFieldName } from '../../../form-types'
+import type { FormData, PathOption, StepFieldName } from '../../../form-types'
 import type { LabwareEntities, PipetteEntities } from '../../../step-forms'
 
 export function chainPatchUpdaters(
@@ -57,22 +57,29 @@ export function getChannels(
 export const DISPOSAL_VOL_DIGITS = 1
 
 export function getMaxDisposalVolumeForMultidispense(
-  rawForm: ?FormData,
+  values: {|
+    aspirate_airGap_checkbox?: boolean | null,
+    aspirate_airGap_volume?: string | null,
+    path: PathOption,
+    pipette: string | null,
+    volume: string | null,
+  |},
   pipetteEntities: PipetteEntities
 ): ?number {
   // calculate max disposal volume for given volume & pipette. Might be negative!
-  if (!rawForm) return null
+  const pipetteId = values?.pipette
+  if (!values || !pipetteId) return null
   assert(
-    rawForm.path === 'multiDispense',
-    `getMaxDisposalVolumeForMultidispense expected multiDispense, got path ${rawForm.path}`
+    values.path === 'multiDispense',
+    `getMaxDisposalVolumeForMultidispense expected multiDispense, got path ${values.path}`
   )
-  const pipetteEntity = pipetteEntities[rawForm.pipette]
+  const pipetteEntity = pipetteEntities[pipetteId]
   const pipetteCapacity = getPipetteCapacity(pipetteEntity)
 
-  const volume = Number(rawForm.volume)
-  const airGapChecked = rawForm['aspirate_airGap_checkbox']
+  const volume = Number(values.volume)
+  const airGapChecked = values['aspirate_airGap_checkbox']
   let airGapVolume = airGapChecked
-    ? Number(rawForm['aspirate_airGap_volume'])
+    ? Number(values['aspirate_airGap_volume'])
     : 0
   airGapVolume = Number.isFinite(airGapVolume) ? airGapVolume : 0
   return round(pipetteCapacity - volume * 2 - airGapVolume, DISPOSAL_VOL_DIGITS)

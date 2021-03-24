@@ -17,6 +17,7 @@ import {
   type DeckSlot as DeckDefSlot,
   type ModuleRealType,
 } from '@opentrons/shared-data'
+// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import {
   PSEUDO_DECK_SLOTS,
