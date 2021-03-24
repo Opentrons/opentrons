@@ -1,17 +1,15 @@
-// @flow
 import * as React from 'react'
-
 import styles from './styles.css'
 
-export type ValueProps = {|
+export interface ValueProps {
   /** contents of the value */
-  children: React.Node,
-|}
+  children: React.ReactNode
+}
 
 /**
  * Value - display a value, sometimes in a <Table> and usually labeled by a
  * <LabelText>
  */
-export function Value(props: ValueProps): React.Node {
+export function Value(props: ValueProps): JSX.Element {
   return <p className={styles.value}>{props.children}</p>
 }

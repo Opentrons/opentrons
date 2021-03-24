@@ -1,4 +1,3 @@
-// @flow
 // filter labware by manufacturer
 import * as React from 'react'
 import { withRouter } from 'react-router-dom'
@@ -8,24 +7,25 @@ import styles from './styles.css'
 
 import { MANUFACTURER, MANUFACTURER_VALUES } from '../../localization'
 
-import type { ContextRouter } from 'react-router-dom'
+import type { RouteComponentProps } from 'react-router-dom'
 import type { FilterParams } from '../../types'
 
-export type FilterManufacturerProps = {|
-  ...ContextRouter,
-  filters: FilterParams,
-|}
+export interface FilterManufacturerProps extends RouteComponentProps {
+  filters: FilterParams
+}
 
 export function FilterManufacturerComponent(
   props: FilterManufacturerProps
-): React.Node {
+): JSX.Element {
   const { history, filters } = props
   const manufacturers = getAllManufacturers()
   const options = manufacturers.map(value => ({
     value,
+    // @ts-ignore(IL, 2021-03-24): MANUFACTURER_VALUES lookup not save in TS
     label: MANUFACTURER_VALUES[value] || value,
   }))
 
+  // @ts-ignore(IL, 2021-03-24): why is there an options key here?? Is the code wrong here? Or the TS?
   options.push({ options: [{ label: 'Other', value: 'other' }] })
 
   return (
@@ -46,6 +46,4 @@ export function FilterManufacturerComponent(
   )
 }
 
-export const FilterManufacturer: React.AbstractComponent<
-  $Diff<FilterManufacturerProps, ContextRouter>
-> = withRouter(FilterManufacturerComponent)
+export const FilterManufacturer = withRouter(FilterManufacturerComponent)

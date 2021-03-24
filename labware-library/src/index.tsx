@@ -15,7 +15,7 @@ if (!$root) {
   throw new Error('fatal: #root not found')
 }
 
-const Root = (): React.Node => (
+const Root = (): JSX.Element => (
   <BrowserRouter>
     <Switch>
       <Route path={`${getPublicPath()}create`} component={LabwareCreator} />

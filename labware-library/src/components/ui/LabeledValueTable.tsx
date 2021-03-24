@@ -1,28 +1,26 @@
 // @flow
 import * as React from 'react'
-
 import { Table, TableEntry, TABLE_COLUMN } from './Table'
 import { LabelText, LABEL_LEFT } from './LabelText'
 import { Value } from './Value'
 import { TableTitle } from './TableTitle'
-
 import type { TableDirection } from './Table'
 
-export type ValueEntry = {|
-  label: React.Node,
-  value: React.Node,
-|}
+export interface ValueEntry {
+  label: React.ReactNode
+  value: React.ReactNode
+}
 
-export type LabledValueTableProps = {|
-  label: React.Node,
-  values: Array<ValueEntry>,
-  direction?: TableDirection,
-  className?: string,
-  children?: React.Node,
-  diagram?: React.Node,
-|}
+export interface LabledValueTableProps {
+  label: React.ReactNode
+  values: Array<ValueEntry>
+  direction?: TableDirection
+  className?: string
+  children?: React.ReactNode
+  diagram?: React.ReactNode
+}
 
-export function LabeledValueTable(props: LabledValueTableProps): React.Node {
+export function LabeledValueTable(props: LabledValueTableProps): JSX.Element {
   const { label, values, direction, className, children, diagram } = props
   return (
     <div className={className}>

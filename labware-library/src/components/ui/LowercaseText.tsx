@@ -1,16 +1,15 @@
-// @flow
 import * as React from 'react'
 
 import styles from './styles.css'
 
-export type LowercaseTextProps = {|
+export interface LowercaseTextProps {
   /** text to display in lowercase */
-  children: React.Node,
-|}
+  children: React.ReactNode
+}
 
 /**
  * LowercaseText - <span> that transforms all text to lowercase
  */
-export function LowercaseText(props: LowercaseTextProps): React.Node {
+export function LowercaseText(props: LowercaseTextProps): JSX.Element {
   return <span className={styles.lowercase_text}>{props.children}</span>
 }

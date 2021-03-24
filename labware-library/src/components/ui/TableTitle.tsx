@@ -1,20 +1,16 @@
-// @flow
-
 // Table Title with expandable measurement diagrams
 import * as React from 'react'
 import cx from 'classnames'
-
 import { LabelText, LABEL_LEFT } from './LabelText'
 import { ClickableIcon } from './ClickableIcon'
-
 import styles from './styles.css'
 
-type TableTitleProps = {|
-  label: React.Node,
-  diagram?: React.Node,
-|}
+interface TableTitleProps {
+  label: React.ReactNode
+  diagram?: React.ReactNode
+}
 
-export function TableTitle(props: TableTitleProps): React.Node {
+export function TableTitle(props: TableTitleProps): JSX.Element {
   const [guideVisible, setGuideVisible] = React.useState<boolean>(false)
   const toggleGuide = () => setGuideVisible(!guideVisible)
   const { label, diagram } = props

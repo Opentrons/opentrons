@@ -1,4 +1,3 @@
-// @flow
 // LabwareList tests
 import * as React from 'react'
 import { shallow } from 'enzyme'
@@ -11,10 +10,9 @@ import type { LabwareList as LabwareListType } from '../../../types'
 
 jest.mock('../../../definitions')
 
-const getAllDefinitions: JestMockFn<
-  Array<void>,
-  LabwareListType
-> = (definitions.getAllDefinitions: any)
+const getAllDefinitions = definitions.getAllDefinitions as jest.MockedFunction<
+  typeof definitions.getAllDefinitions
+>
 
 const filtersOff = { category: 'all', manufacturer: 'all' }
 

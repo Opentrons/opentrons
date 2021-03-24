@@ -1,17 +1,15 @@
-// @flow
 import * as React from 'react'
-
 import { COUNT } from '../../localization'
 import { LabelText, Value, LABEL_LEFT } from '../ui'
 import styles from './styles.css'
 
-export type WellCountProps = {|
-  count: number,
-  wellLabel: string,
-  className?: string,
-|}
+export interface WellCountProps {
+  count: number
+  wellLabel: string
+  className?: string
+}
 
-export function WellCount(props: WellCountProps): React.Node {
+export function WellCount(props: WellCountProps): JSX.Element {
   const { count, wellLabel, className } = props
 
   return (

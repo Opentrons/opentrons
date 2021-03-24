@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-
 import styles from './styles.css'
 
 export type LabelPosition = 'top' | 'left'
@@ -9,17 +8,17 @@ export type LabelPosition = 'top' | 'left'
 export const LABEL_TOP: LabelPosition = 'top'
 export const LABEL_LEFT: LabelPosition = 'left'
 
-export type LabelTextProps = {|
+export interface LabelTextProps {
   /** location of the label to its siblings; defaults to "top" */
-  position?: LabelPosition,
+  position?: LabelPosition
   /** contents of the label */
-  children: React.Node,
-|}
+  children: React.ReactNode
+}
 
 /**
  * LabelText - all-caps text, usually used to label a <Value> or <Table>
  */
-export function LabelText(props: LabelTextProps): React.Node {
+export function LabelText(props: LabelTextProps): JSX.Element {
   const { children } = props
   const position = props.position || LABEL_TOP
   const classes = cx(

@@ -1,8 +1,6 @@
-// @flow
 // labware display card
 import * as React from 'react'
 import uniq from 'lodash/uniq'
-
 import { getPublicPath } from '../../public-path'
 import { Icon } from '@opentrons/components'
 import { Link } from '../ui'
@@ -14,18 +12,18 @@ import {
   WellCount,
   AllWellProperties,
 } from '../labware-ui'
-
 import {
   CATEGORY_LABELS_BY_CATEGORY,
   MANUFACTURER_VALUES,
 } from '../../localization'
 import styles from './styles.css'
-
 import type { LabwareDefinition } from '../../types'
 
-export type LabwareCardProps = {| definition: LabwareDefinition |}
+export interface LabwareCardProps {
+  definition: LabwareDefinition
+}
 
-export function LabwareCard(props: LabwareCardProps): React.Node {
+export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { definition } = props
   const wellLabel = getWellLabel(definition)
 
@@ -53,13 +51,12 @@ export function LabwareCard(props: LabwareCardProps): React.Node {
   )
 }
 
-function TopBar(props: LabwareCardProps) {
+function TopBar(props: LabwareCardProps): JSX.Element {
   const { metadata, brand, groups } = props.definition
-  const groupBrands: Array<string> = groups
-    .map(group => group.brand?.brand)
-    .filter(Boolean)
+  const groupBrands = groups.map(group => group.brand?.brand).filter(Boolean)
 
   const brands = uniq([brand.brand, ...groupBrands])
+    // @ts-ignore(IL, 2021-03-24): groupBrands filtering nulls, and MANUFACTURER_VALUES lookup not understood by TS
     .map(b => MANUFACTURER_VALUES[b] || b)
     .join(', ')
 
@@ -72,7 +69,7 @@ function TopBar(props: LabwareCardProps) {
   )
 }
 
-function Title(props: LabwareCardProps) {
+function Title(props: LabwareCardProps): JSX.Element {
   const { loadName } = props.definition.parameters
   const { displayName } = props.definition.metadata
 

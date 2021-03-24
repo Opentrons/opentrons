@@ -1,4 +1,3 @@
-// @flow
 // labware creator display card
 import * as React from 'react'
 import { Link } from 'react-router-dom'
@@ -11,14 +10,14 @@ import {
 } from '../../localization'
 import styles from './styles.css'
 
-type Props = {
-  isResultsEmpty?: boolean,
+interface Props {
+  isResultsEmpty?: boolean
 }
 
 const SUPPORT_URL =
   'https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions'
 
-export function CustomLabwareCard(props: Props): React.Node {
+export function CustomLabwareCard(props: Props): JSX.Element {
   const PROMPT_TEXT = props.isResultsEmpty
     ? CUSTOM_LABWARE_PROMPT_NO_RESULTS
     : CUSTOM_LABWARE_PROMPT_W_RESULTS

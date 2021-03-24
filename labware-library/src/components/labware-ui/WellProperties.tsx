@@ -1,8 +1,6 @@
-// @flow
 import * as React from 'react'
-
 import { Icon } from '@opentrons/components'
-import { getDisplayVolume } from '@opentrons/shared-data'
+import { getDisplayVolume, WellBottomShape } from '@opentrons/shared-data'
 import { getUniqueWellProperties } from '../../labwareInference'
 import {
   MAX_VOLUME,
@@ -10,31 +8,29 @@ import {
   WELL_BOTTOM_VALUES,
   VARIOUS,
 } from '../../localization'
-
 import { getWellLabel } from './labels'
 import { LabelText, Value, LABEL_TOP } from '../ui'
-
 import styles from './styles.css'
-
+import type { IconName } from '@opentrons/components'
 import type {
   LabwareDefinition,
   LabwareWellGroupProperties,
   LabwareVolumeUnits,
 } from '../../types'
 
-export type AllWellPropertiesProps = {|
-  definition: LabwareDefinition,
-  className?: string,
-|}
+export interface AllWellPropertiesProps {
+  definition: LabwareDefinition
+  className?: string
+}
 
-export type WellPropertiesProps = {|
-  wellProperties: LabwareWellGroupProperties,
-  wellLabel: string,
-  displayVolumeUnits: LabwareVolumeUnits,
-  hideTitle?: boolean,
-|}
+export interface WellPropertiesProps {
+  wellProperties: LabwareWellGroupProperties
+  wellLabel: string
+  displayVolumeUnits: LabwareVolumeUnits
+  hideTitle?: boolean
+}
 
-export function AllWellProperties(props: AllWellPropertiesProps): React.Node {
+export function AllWellProperties(props: AllWellPropertiesProps): JSX.Element {
   const { definition, className } = props
   const { displayVolumeUnits } = definition.metadata
   const uniqueWellProps = getUniqueWellProperties(definition)
@@ -53,13 +49,13 @@ export function AllWellProperties(props: AllWellPropertiesProps): React.Node {
   )
 }
 
-const BOTTOM_SHAPE_TO_ICON = {
+const BOTTOM_SHAPE_TO_ICON: Record<WellBottomShape, IconName> = {
   v: 'ot-v-bottom',
   u: 'ot-u-bottom',
   flat: 'ot-flat-bottom',
 }
 
-export function WellProperties(props: WellPropertiesProps): React.Node {
+export function WellProperties(props: WellPropertiesProps): JSX.Element {
   const {
     hideTitle,
     wellProperties,

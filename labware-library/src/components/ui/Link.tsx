@@ -1,17 +1,15 @@
-// @flow
 // internal link that preserves query parameters
 import * as React from 'react'
 import { withRouter, Link as BaseLink } from 'react-router-dom'
-import type { ContextRouter } from 'react-router-dom'
+import type { RouteComponentProps } from 'react-router-dom'
 
-export type LinkProps = {|
-  ...ContextRouter,
-  to: string,
-  children?: React.Node,
-  className?: string,
-|}
+export interface LinkProps extends RouteComponentProps {
+  to: string
+  children?: React.ReactNode
+  className?: string
+}
 
-export function WrappedLink(props: LinkProps): React.Node {
+export function WrappedLink(props: LinkProps): JSX.Element {
   const { to, children, className, location } = props
 
   return (
@@ -24,6 +22,4 @@ export function WrappedLink(props: LinkProps): React.Node {
   )
 }
 
-export const Link: React.AbstractComponent<
-  $Diff<LinkProps, ContextRouter>
-> = withRouter(WrappedLink)
+export const Link = withRouter(WrappedLink)

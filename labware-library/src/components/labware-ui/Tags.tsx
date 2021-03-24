@@ -1,19 +1,15 @@
-// @flow
-
 import * as React from 'react'
-
 import { LabelText, Value, LABEL_LEFT } from '../ui'
 import { TAGS } from '../../localization'
+import type { LabwareDefinition } from '../../types'
 import styles from './styles.css'
 
-import type { LabwareDefinition } from '../../types'
+export interface TagsProps {
+  definition: LabwareDefinition
+  className?: string
+}
 
-export type TagsProps = {|
-  definition: LabwareDefinition,
-  className?: string,
-|}
-
-export function Tags(props: TagsProps): React.Node {
+export function Tags(props: TagsProps): JSX.Element {
   const { definition, className } = props
   const tags = definition.metadata.tags || []
 

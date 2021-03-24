@@ -4,19 +4,19 @@
 // other types involved (eg RegularNameProps),
 // when we actually convert shared-data we can get rid of the any's
 
-export type createRegularLabware = (args: any) => LabwareDefinition2
+export function createRegularLabware(args: any): LabwareDefinition2
 
 export type LABWAREV2_DO_NOT_LIST = string[]
 
-export type getDisplayVolume = (
+export function getDisplayVolume(
   volumeInMicroliters: number,
   displayUnits?: LabwareVolumeUnits,
   digits?: number
-) => string
-export type getLabwareDefURI = (def: LabwareDefinition2) => string
+): string
+export function getLabwareDefURI(def: LabwareDefinition2): string
 
-export type createRegularLoadName = (args: any) => string
-export type createDefaultDisplayName = (args: any) => string
+export function createRegularLoadName(args: any): string
+export function createDefaultDisplayName(args: any): string
 
 export type SLOT_LENGTH_MM = number
 export type SLOT_WIDTH_MM = number
