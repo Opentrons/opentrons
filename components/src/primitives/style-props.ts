@@ -117,27 +117,20 @@ const spacingStyles = (props: Types.StyleProps): CSSObject => {
   )
 
   if (marginX != null) {
-    styles.marginRight =
-      styles.marginRight ?? marginX
-    styles.marginLeft =
-      styles.marginLeft ?? marginX
+    styles.marginRight = styles.marginRight ?? marginX
+    styles.marginLeft = styles.marginLeft ?? marginX
   }
   if (marginY != null) {
     styles.marginTop = styles.marginTop ?? marginY
-    styles.marginBottom =
-      styles.marginBottom ?? marginY
+    styles.marginBottom = styles.marginBottom ?? marginY
   }
   if (paddingX != null) {
-    styles.paddingRight =
-      styles.paddingRight ?? paddingX
-    styles.paddingLeft =
-      styles.paddingLeft ?? paddingX
+    styles.paddingRight = styles.paddingRight ?? paddingX
+    styles.paddingLeft = styles.paddingLeft ?? paddingX
   }
   if (paddingY != null) {
-    styles.paddingTop =
-      styles.paddingTop ?? paddingY
-    styles.paddingBottom =
-      styles.paddingBottom ?? paddingY
+    styles.paddingTop = styles.paddingTop ?? paddingY
+    styles.paddingBottom = styles.paddingBottom ?? paddingY
   }
 
   return styles as CSSObject
