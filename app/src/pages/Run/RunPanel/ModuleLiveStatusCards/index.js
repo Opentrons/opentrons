@@ -69,6 +69,8 @@ export const ModuleLiveStatusCards = (): React.Node => {
                 module={module}
                 toggleCard={makeToggleCard(module.serial)}
                 isCardExpanded={expandedCard === module.serial}
+                sendModuleCommand={sendModuleCommand}
+                controlDisabledReason={controlDisabledReason}
               />
             )
           default:

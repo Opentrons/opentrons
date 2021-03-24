@@ -29,6 +29,11 @@ export function LabwareGroup(props: LabwareGroupProps): React.Node {
   const deckPopulated = useSelector(robotSelectors.getDeckPopulated)
   const tipracksConfirmed = useSelector(robotSelectors.getTipracksConfirmed)
 
+  const modules = useSelector(robotSelectors.getModules)
+  const allModulesReviewed = useSelector(robotSelectors.getModulesReviewed)
+  const hasModulesLeftToReview =
+    modules && modules.length > 0 && !allModulesReviewed
+
   const isRunning = useSelector(robotSelectors.getIsRunning)
 
   React.useEffect(() => {
@@ -52,7 +57,7 @@ export function LabwareGroup(props: LabwareGroupProps): React.Node {
           <LabwareListItem
             {...tr}
             key={tr.slot}
-            isDisabled={tr.confirmed}
+            isDisabled={tr.confirmed || hasModulesLeftToReview}
             onClick={() => setLabwareToCalibrate(tr)}
           />
         ))}

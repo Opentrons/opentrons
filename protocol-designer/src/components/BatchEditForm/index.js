@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   Box,
   PrimaryButton,
+  OutlineButton,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -23,6 +24,7 @@ import {
   getLabwareFieldForPositioningField,
 } from '../StepEditForm/utils'
 import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
+import { NoBatchEditSharedSettings } from './NoBatchEditSharedSettings'
 import {
   getBatchEditSelectedStepTypes,
   getMultiSelectDisabledFields,
@@ -188,8 +190,14 @@ export const BatchEditMoveLiquid = (
   props: BatchEditMoveLiquidProps
 ): React.Node => {
   const { propsForFields, handleCancel, handleSave } = props
-  const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip()
-  const [saveButtonTargetProps, saveButtonTooltipProps] = useHoverTooltip()
+  const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip({
+    placement: 'top',
+    strategy: 'fixed',
+  })
+  const [saveButtonTargetProps, saveButtonTooltipProps] = useHoverTooltip({
+    placement: 'top',
+    strategy: 'fixed',
+  })
   const disableSave = !props.batchEditFormHasChanges
 
   return (
@@ -206,18 +214,18 @@ export const BatchEditMoveLiquid = (
           />
         </Box>
 
-        <Box textAlign="right" maxWidth="55rem">
+        <Box textAlign="right" maxWidth="55rem" marginTop="2rem">
           <Box
             {...cancelButtonTargetProps}
-            className={buttonStyles.form_button}
+            marginRight="0.625rem"
             display="inline-block"
           >
-            <PrimaryButton
-              className={buttonStyles.form_button}
+            <OutlineButton
               onClick={handleCancel}
+              className={buttonStyles.button_auto}
             >
-              {i18n.t('button.cancel')}
-            </PrimaryButton>
+              {i18n.t('button.discard_changes')}
+            </OutlineButton>
             <Tooltip {...cancelButtonTooltipProps}>
               {i18n.t('tooltip.cancel_batch_edit')}
             </Tooltip>
@@ -285,7 +293,7 @@ export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
         }}
       />
     )
+  } else {
+    return <NoBatchEditSharedSettings />
   }
-
-  return null
 }

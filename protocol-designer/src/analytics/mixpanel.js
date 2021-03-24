@@ -15,7 +15,9 @@ export type AnalyticsEvent =
   | {| superProperties: { ... } |}
 
 // pulled in from environment at build time
-const MIXPANEL_ID = process.env.OT_PD_MIXPANEL_ID
+const MIXPANEL_ID = getIsProduction()
+  ? process.env.OT_PD_MIXPANEL_ID
+  : process.env.OT_PD_MIXPANEL_DEV_ID
 
 const MIXPANEL_OPTS = {
   // opt out by default
@@ -38,7 +40,7 @@ export function initializeMixpanel(state: BaseState) {
 // NOTE: Do not use directly. Used in analytics Redux middleware: trackEventMiddleware.
 export function trackEvent(event: AnalyticsEvent, optedIn: boolean) {
   console.debug('Trackable event', { event, optedIn })
-  if (getIsProduction() && MIXPANEL_ID && optedIn) {
+  if (MIXPANEL_ID && optedIn) {
     if (event.superProperties) {
       mixpanel.register(event.superProperties)
     }
@@ -49,7 +51,7 @@ export function trackEvent(event: AnalyticsEvent, optedIn: boolean) {
 }
 
 export function setMixpanelTracking(optedIn: boolean) {
-  if (getIsProduction() && MIXPANEL_ID) {
+  if (MIXPANEL_ID) {
     if (optedIn) {
       console.debug('User has opted into analytics; tracking with Mixpanel')
       mixpanel.opt_in_tracking()

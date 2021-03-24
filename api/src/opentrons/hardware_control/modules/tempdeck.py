@@ -153,6 +153,9 @@ class TempDeck(mod_abc.AbstractModule):
         Polls temperature module's temperature until
         the specified temperature is reached
         """
+        if self.is_simulated:
+            return
+
         await self.wait_for_is_running()
 
         async def _await_temperature(awaiting_temperature: float):

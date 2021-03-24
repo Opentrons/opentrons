@@ -82,6 +82,8 @@ const LAYOUT_PROPS = [
 
 const POSITION_PROPS = ['position', 'zIndex', 'top', 'right', 'bottom', 'left']
 
+const TRANSITION_PROPS = ['transition']
+
 const STYLE_PROPS = [
   ...COLOR_PROPS,
   ...TYPOGRAPHY_PROPS,
@@ -91,6 +93,7 @@ const STYLE_PROPS = [
   ...GRID_PROPS,
   ...LAYOUT_PROPS,
   ...POSITION_PROPS,
+  ...TRANSITION_PROPS,
 ]
 
 const colorStyles = (props: { ...Types.ColorProps, ... }) => {
@@ -154,6 +157,10 @@ const positionStyles = (props: { ...Types.PositionProps, ... }) => {
   return (pick(props, POSITION_PROPS): Types.PositionProps)
 }
 
+const transitionStyles = (props: { ...Types.TransitionProps, ... }) => {
+  return (pick(props, TRANSITION_PROPS): Types.TransitionProps)
+}
+
 export const styleProps = (props: { ...Types.StyleProps, ... }): Styles => ({
   ...colorStyles(props),
   ...typographyStyles(props),
@@ -163,6 +170,7 @@ export const styleProps = (props: { ...Types.StyleProps, ... }): Styles => ({
   ...gridStyles(props),
   ...layoutStyles(props),
   ...positionStyles(props),
+  ...transitionStyles(props),
 })
 
 export const isntStyleProp = (prop: string): boolean =>

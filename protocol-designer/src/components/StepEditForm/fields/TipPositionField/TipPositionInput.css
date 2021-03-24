@@ -7,14 +7,6 @@
   height: 5rem;
 }
 
-.left_half {
-  flex: 1;
-}
-
-.right_half {
-  flex: 1;
-}
-
 .main_row {
   display: flex;
   flex-direction: row;
@@ -23,7 +15,9 @@
 }
 
 .position_from_bottom_input {
+  padding-left: 1.5rem;
   width: 6rem;
+  white-space: nowrap;
 }
 
 .adjustment_buttons {
@@ -41,7 +35,6 @@
 .viz_group {
   display: flex;
   align-items: flex-end;
-  min-height: 280px;
 }
 
 .viz_wrapper {
@@ -51,6 +44,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  overflow: hidden;
 }
 
 .pipette_tip_image {

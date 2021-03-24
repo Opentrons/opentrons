@@ -18,7 +18,7 @@ type Props = {| robotName: string |}
 
 // TODO(bc, 2021-02-16): i18n
 
-const TITLE = 'Modules'
+const TITLE = 'Connected Modules'
 const POLL_MODULE_INTERVAL_MS = 5000
 
 export function AttachedModulesCard(props: Props): React.Node {

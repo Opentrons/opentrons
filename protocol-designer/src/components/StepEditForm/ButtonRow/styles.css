@@ -15,3 +15,7 @@
 .form_button:not(:last-child) {
   margin-right: var(--form-button-margin);
 }
+
+.button_auto {
+  width: auto;
+}

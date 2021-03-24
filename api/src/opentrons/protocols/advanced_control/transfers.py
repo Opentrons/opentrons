@@ -367,7 +367,7 @@ class TransferPlan:
                  instr: 'InstrumentContext',
                  max_volume: float,
                  api_version: APIVersion,
-                 mode: Optional[str] = None,
+                 mode: str,
                  options: Optional[TransferOptions] = None
                  ) -> None:
         """ Build the transfer plan.
@@ -414,15 +414,7 @@ class TransferPlan:
         self._mix_after_opts = self._options.mix.mix_after
         self._max_volume = max_volume
 
-        if not mode:
-            if len(sources) < len(dests):
-                self._mode = TransferMode.DISTRIBUTE
-            elif len(sources) > len(dests):
-                self._mode = TransferMode.CONSOLIDATE
-            else:
-                self._mode = TransferMode.TRANSFER
-        else:
-            self._mode = TransferMode[mode.upper()]
+        self._mode = TransferMode[mode.upper()]
 
     def __iter__(self):
         if self._strategy.new_tip == types.TransferTipPolicy.ONCE:

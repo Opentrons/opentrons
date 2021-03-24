@@ -1,7 +1,7 @@
 from unittest import mock
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.implementations.well import WellImplementation
+from opentrons.protocols.context.well import WellImplementation
 from opentrons.types import Point
 from opentrons.protocol_api import InstrumentContext, \
     labware, MAX_SUPPORTED_VERSION

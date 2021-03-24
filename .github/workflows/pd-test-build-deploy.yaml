@@ -112,6 +112,7 @@ jobs:
       - name: 'build PD'
         env:
           OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
+          OT_PD_MIXPANEL_DEV_ID: ${{ secrets.OT_PD_MIXPANEL_DEV_ID }}
         run: |
           make -C protocol-designer
       - name: 'upload github artifact'

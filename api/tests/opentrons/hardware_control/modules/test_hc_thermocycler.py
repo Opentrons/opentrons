@@ -1,6 +1,6 @@
 import pytest
 import asyncio
-from unittest import mock
+import mock
 from opentrons.hardware_control import modules, ExecutionManager
 
 from opentrons.drivers.rpi_drivers.types import USBPort
@@ -161,13 +161,11 @@ async def test_set_temperature(monkeypatch, loop, usb_port):
     set_temp_driver_mock.reset_mock()
 
     # Test hold_time < HOLD_TIME_FUZZY_SECONDS. Here we know
-    # that asyncio.sleep will be called with the direct hold
+    # that wait_for_hold will be called with the direct hold
     # time rather than increments of 0.1
-    sleep_mock = mock.Mock()
-    async_sleep_mock = mock.Mock(side_effect=asyncio.coroutine(sleep_mock))
-    monkeypatch.setattr(asyncio, 'sleep', async_sleep_mock)
+    hw_tc.wait_for_hold = mock.AsyncMock()
     await hw_tc.set_temperature(40, hold_time_seconds=2)
-    async_sleep_mock.assert_called_once_with(2)
+    hw_tc.wait_for_hold.assert_called_once_with(2)
     set_temp_driver_mock.assert_called_once_with(temp=40,
                                                  hold_time=2,
                                                  volume=None,

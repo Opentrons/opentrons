@@ -85,6 +85,8 @@ export type PositionProps = {|
   left?: string | number,
 |}
 
+export type TransitionProps = {| transition?: string |}
+
 export type StyleProps = {|
   ...ColorProps,
   ...TypographyProps,
@@ -94,6 +96,7 @@ export type StyleProps = {|
   ...GridProps,
   ...LayoutProps,
   ...PositionProps,
+  ...TransitionProps,
   className?: string,
 |}
 

@@ -4,15 +4,31 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
-# Opentrons App Changes in 4.1.1
+---
+
+# Opentrons App Changes in 4.2.0
+
+## Changes
+
+- Do not automatically resume when the user decides not to confirm cancelling a protocol
+  - If you click the "cancel" button and then click "Go back", the protocol will be paused until you click resume.
+
+## Bugfixes
+
+- Fix several issues that prevented changing the settings of an attached pipette.
+- You will now be asked whether you have a calibration block in pre-protocol tip length calibration if you have not saved your answer.
+
+---
+
+## Opentrons App Changes in 4.1.1
 
 There are no changes to the Opentrons App in 4.1.1; it is a bugfix release for an issue with installing Python packages on the OT-2.
 
-# Opentrons App Changes in 4.1.0
+## Opentrons App Changes in 4.1.0
 
 Opentrons App 4.1.0 brings some new features to robot calibration.
 
-## OT-2 Calibration Changes
+### OT-2 Calibration Changes
 
 - You can now choose any standard or custom tiprack of appropriate volume to use when calibrating your pipette
 - You can now jog in Z when calibrating to deck markings

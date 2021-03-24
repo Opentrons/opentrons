@@ -2,6 +2,7 @@
 
 Generic testing of a depth first search algo
 """
+from pathlib import Path
 
 import pytest
 import json
@@ -29,17 +30,17 @@ def convert_to_vertex(
     return graph
 
 
-def load_graph() -> Tuple[Tuple]:
+def load_graph() -> Tuple[Tuple[List[types.GenericNode], str],
+                          Tuple[List[types.GenericNode], str]]:
     """
     Load Graphs.
 
     Helper function to load the test json graph files.
     """
-    cwd = os.getcwd()
-    test_path = 'tests/opentrons/algorithms'
-    with open(f'{cwd}/{test_path}/fixture_alphabetical_graph.json') as f:
+    path = Path(os.path.abspath(os.path.dirname(__file__)))
+    with (path / 'fixture_alphabetical_graph.json').open() as f:
         alphabet = convert_to_vertex(json.load(f), str)
-    with open(f'{cwd}/{test_path}/fixture_numerical_graph.json') as f:
+    with (path / 'fixture_numerical_graph.json').open() as f:
         numbers = convert_to_vertex(json.load(f), int)
     return (alphabet, 'string'), (numbers, 'integer')
 

@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
+import { css } from 'styled-components'
 
-import styles from './styles.css'
-
+import { Flex, ALIGN_CENTER, SIZE_4 } from '@opentrons/components'
 import type { ModuleModel } from '@opentrons/shared-data'
 
 type Props = {|
@@ -13,9 +13,15 @@ export function ModuleImage(props: Props): React.Node {
   const imgSrc = getModuleImg(props.model)
 
   return (
-    <div className={styles.module_image_wrapper}>
-      <img src={imgSrc} className={styles.module_image} />
-    </div>
+    <Flex width="42%" alignItems={ALIGN_CENTER}>
+      <img
+        css={css`
+          max-width: 12rem;
+          max-height: ${SIZE_4};
+        `}
+        src={imgSrc}
+      />
+    </Flex>
   )
 }
 
