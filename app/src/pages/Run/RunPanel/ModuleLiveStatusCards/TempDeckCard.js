@@ -1,12 +1,13 @@
 // @flow
 import * as React from 'react'
-import { LabeledValue } from '@opentrons/components'
+import { Box, SPACING_3 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { TemperatureControl } from '../../../../molecules/ModuleControls'
+import {
+  TemperatureControl,
+  TemperatureData,
+} from '../../../../molecules/ModuleControls'
 import { StatusCard } from './StatusCard'
-import { StatusItem } from './StatusItem'
-import styles from './styles.css'
 
 import type {
   TemperatureModule,
@@ -37,25 +38,19 @@ export const TempDeckCard = ({
     isCardExpanded={isCardExpanded}
     toggleCard={toggleCard}
   >
-    <div className={styles.card_row}>
-      <StatusItem status={module.status} />
+    <Box padding={SPACING_3}>
+      <TemperatureData
+        status={module.status}
+        current={module.data.currentTemp}
+        target={module.data.targetTemp}
+        title={null}
+      />
       <TemperatureControl
         module={module}
+        isSecondaryTemp={false}
         sendModuleCommand={sendModuleCommand}
         disabledReason={controlDisabledReason}
       />
-    </div>
-    <div className={styles.card_row}>
-      <LabeledValue
-        label="Current Temp"
-        className={styles.temp_data_item}
-        value={`${module.data.currentTemp} °C`}
-      />
-      <LabeledValue
-        label="Target Temp"
-        className={styles.temp_data_item}
-        value={module.data.targetTemp ? `${module.data.targetTemp} °C` : 'None'}
-      />
-    </div>
+    </Box>
   </StatusCard>
 )
