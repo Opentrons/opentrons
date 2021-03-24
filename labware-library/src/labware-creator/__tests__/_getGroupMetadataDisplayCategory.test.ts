@@ -1,5 +1,3 @@
-// @flow
-
 import { _getGroupMetadataDisplayCategory } from '../fieldsToLabware'
 
 describe('_getGroupMetadataDisplayCategory', () => {

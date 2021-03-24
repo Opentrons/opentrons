@@ -1,17 +1,16 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
-type Props = {|
-  name: string,
-  active: boolean,
-  children?: React.Node,
-  onClick: () => mixed,
-|}
+interface Props {
+  name: string
+  active: boolean
+  children?: React.ReactNode
+  onClick: () => unknown
+}
 
-export function MobileMenu(props: Props): React.Node {
+export function MobileMenu(props: Props): JSX.Element {
   const { name, active, onClick } = props
   return (
     <>

@@ -1,4 +1,3 @@
-// @flow
 import type {
   Link,
   Submenu,
@@ -180,6 +179,7 @@ export const protocolLinkProps: ProtocolLinks = {
   },
 }
 
+// @ts-ignore(IL, 2021-03-24): is this supposed to be Partial<SupportLinks> and missing 'protocol'??
 export const supportLinkProps: SupportLinks = {
   start: {
     name: 'OT-2 Start guide',

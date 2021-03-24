@@ -1,4 +1,3 @@
-// @flow
 // app tests
 import * as React from 'react'
 import { shallow } from 'enzyme'
@@ -11,9 +10,9 @@ describe('App', () => {
   it('component renders without definition', () => {
     const tree = shallow(
       <AppComponent
-        location={({ search: '' }: any)}
-        history={({}: any)}
-        match={({}: any)}
+        location={{ search: '' } as any}
+        history={{} as any}
+        match={{} as any}
         definition={null}
       />
     )
@@ -24,14 +23,14 @@ describe('App', () => {
   it('component renders with definition', () => {
     const tree = shallow(
       <AppComponent
-        location={({ search: '' }: any)}
-        history={({}: any)}
-        match={({}: any)}
+        location={{ search: '' } as any}
+        history={{} as any}
+        match={{} as any}
         definition={
-          ({
+          {
             metadata: { displayCategory: 'wellPlate' },
             brand: { brand: 'generic' },
-          }: any)
+          } as any
         }
       />
     )

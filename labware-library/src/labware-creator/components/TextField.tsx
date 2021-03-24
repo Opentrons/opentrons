@@ -5,6 +5,7 @@ import { reportFieldEdit } from '../analyticsUtils'
 import { getIsHidden } from '../formSelectors'
 import { LABELS } from '../fields'
 import type { LabwareFields } from '../fields'
+import type { FieldProps } from 'formik'
 import fieldStyles from './fieldStyles.css'
 
 type InputFieldProps = React.ComponentProps<typeof InputField>
@@ -23,8 +24,9 @@ interface Props {
 export const TextField = (props: Props): JSX.Element => {
   const { caption, name, placeholder, units } = props
   const inputMasks = props.inputMasks || []
+  // @ts-ignore(IL, 2021-03-24): formik types need cleanup w LabwareFields
   const makeHandleChange = ({ field, form }) => (
-    e: SyntheticEvent<HTMLInputElement>
+    e: React.FormEvent<HTMLInputElement>
   ) => {
     const prevValue = field.value
     const rawValue = e.currentTarget.value
@@ -36,7 +38,7 @@ export const TextField = (props: Props): JSX.Element => {
   }
   return (
     <Field name={props.name}>
-      {({ field, form }) =>
+      {({ field, form }: FieldProps) =>
         getIsHidden(props.name, form.values) ? null : (
           <div className={fieldStyles.field_wrapper}>
             <div className={fieldStyles.field_label}>{LABELS[name]}</div>
@@ -46,7 +48,7 @@ export const TextField = (props: Props): JSX.Element => {
               caption={caption}
               placeholder={placeholder}
               onChange={makeHandleChange({ field, form })}
-              onBlur={(e: SyntheticEvent<HTMLInputElement>) => {
+              onBlur={(e: React.FormEvent<HTMLInputElement>) => {
                 reportFieldEdit({ value: field.value, name: field.name })
                 field.onBlur(e)
               }}

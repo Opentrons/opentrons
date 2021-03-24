@@ -1,10 +1,6 @@
-// @flow
 import * as React from 'react'
-import {
-  wellBottomShapeOptions,
-  wellShapeOptions,
-  type Options,
-} from '../../fields'
+import { wellBottomShapeOptions, wellShapeOptions } from '../../fields'
+import type { Options } from '../../fields'
 import styles from './optionsWithImages.css'
 
 const WELL_SHAPE_IMAGES = {
@@ -18,15 +14,17 @@ const WELL_BOTTOM_IMAGES = {
   v: require('../../../images/wellShapeV.svg'),
 }
 
-type OptionsWithImages = Array<{|
-  name: string,
-  value: string,
-  children?: React.Node,
-|}>
+interface ImageOption {
+  name: string
+  value: string
+  children?: React.ReactNode
+}
+
+type OptionsWithImages = Array<ImageOption>
 
 const makeOptionsWithImages = (
   options: Options,
-  imageMap: { [value: string]: string }
+  imageMap: Record<string, string>
 ): OptionsWithImages =>
   options.map(opt => ({
     name: opt.name,

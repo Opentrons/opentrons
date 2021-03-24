@@ -3,7 +3,9 @@ import { labwareDefToFields } from '../labwareDefToFields'
 import { fieldsToLabware } from '../fieldsToLabware'
 import { labwareFormSchema } from '../labwareFormSchema'
 import { DEFAULT_CUSTOM_NAMESPACE } from '@opentrons/shared-data'
+// @ts-ignore(2021-03-24): shared-data fixtures not yet typed
 import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
+// @ts-ignore(2021-03-24): shared-data fixtures not yet typed
 import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough'
 
 jest.mock('../../definitions')

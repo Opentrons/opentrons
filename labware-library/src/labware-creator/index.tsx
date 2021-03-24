@@ -72,8 +72,8 @@ interface MakeAutofillOnChangeArgs {
   autofills: Record<string, Partial<LabwareFields>>
   values: LabwareFields
   touched: Object
-  setTouched: (touched: FormikTouched<LabwareFields>) => null | undefined
-  setValues: (values: Partial<LabwareFields>) => null | undefined
+  setTouched: (touched: FormikTouched<LabwareFields>) => unknown
+  setValues: (values: LabwareFields) => unknown
 }
 
 const PDF_URL =
@@ -128,6 +128,7 @@ const HeightImg = (props: HeightImgProps) => {
   if (labwareType === 'tubeRack') {
     src = require('./images/height_tubeRack.svg')
   } else if (labwareType === 'aluminumBlock') {
+    // @ts-ignore(IL, 2021-03-24): `includes` doesn't want to take null/undefined
     if (['tubes', 'pcrTubeStrip'].includes(aluminumBlockChildType)) {
       src = require('./images/height_aluminumBlock_tubes.svg')
     } else {
@@ -227,6 +228,7 @@ const displayAsTube = (values: LabwareFields) =>
   values.labwareType === 'tubeRack' ||
   (values.labwareType === 'aluminumBlock' &&
     values.aluminumBlockType === '96well' &&
+    // @ts-ignore(IL, 2021-03-24): `includes` doesn't want to take null/undefined
     ['tubes', 'pcrTubeStrip'].includes(values.aluminumBlockChildType))
 
 const getHeightAlerts = (
@@ -359,6 +361,7 @@ export const LabwareCreator = (): JSX.Element => {
     setShowCreatorForm(true)
     window.scrollTo({
       left: 0,
+      // @ts-ignore(IL, 2021-03-24): needs code change to ensure no null to `top`
       top: scrollRef.current && scrollRef.current.offsetTop - 200,
       behavior: 'smooth',
     })
@@ -372,7 +375,9 @@ export const LabwareCreator = (): JSX.Element => {
   }, [showCreatorForm, scrollToForm])
 
   const onUpload = React.useCallback(
-    (event: React.FormEvent<HTMLInputElement> | DragEvent) => {
+    // TODO(IL, 2021-03-24): event should be like `React.FormEvent<HTMLInputElement> | DragEvent`
+    // but TS can't discriminate
+    (event: any) => {
       let files: Array<File> = []
       if (event.dataTransfer && event.dataTransfer.files) {
         files = event.dataTransfer.files as any
@@ -391,7 +396,7 @@ export const LabwareCreator = (): JSX.Element => {
       } else {
         reader.onload = readEvent => {
           const result = (readEvent.currentTarget as FileReader).result
-          let parsedLabwareDef: LabwareDefinition2 | null | undefined
+          let parsedLabwareDef: LabwareDefinition2
 
           try {
             parsedLabwareDef = JSON.parse(result as string)
@@ -409,6 +414,7 @@ export const LabwareCreator = (): JSX.Element => {
 
             setImportError({
               key: 'INVALID_LABWARE_DEF',
+              // @ts-ignore(IL, 2021-03-24): ajv def mixup
               messages: validateLabwareSchema.errors.map(
                 ajvError =>
                   `${ajvError.schemaPath}: ${
@@ -495,6 +501,7 @@ export const LabwareCreator = (): JSX.Element => {
             `test_${loadName}.py`,
             labwareTestProtocol({ pipetteName, definition: def })
           )
+          // @ts-ignore(IL, 2021-03-24): JSZip not typed
           zip.generateAsync({ type: 'blob' }).then(blob => {
             saveAs(blob, `${loadName}.zip`)
           })
@@ -522,6 +529,7 @@ export const LabwareCreator = (): JSX.Element => {
           setTouched,
           setValues,
         }: FormikProps<LabwareFields>) => {
+          // @ts-ignore(IL, 2021-03-24): values/errors/touched not typed for reportErrors to be happy
           reportErrors({ values, errors, touched })
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
           const canProceedToForm = Boolean(
@@ -686,6 +694,7 @@ export const LabwareCreator = (): JSX.Element => {
                   </Section>
                   <Section
                     label={
+                      // @ts-ignore(IL, 2021-03-24): `includes` doesn't want to take null/undefined
                       ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
                         ? 'Total Height'
                         : 'Height'

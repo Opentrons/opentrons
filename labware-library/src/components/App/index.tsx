@@ -14,7 +14,7 @@ import styles from './styles.css'
 
 import type { DefinitionRouteRenderProps } from '../../definitions'
 
-export function AppComponent(props: DefinitionRouteRenderProps): React.ReactNode {
+export function AppComponent(props: DefinitionRouteRenderProps): JSX.Element {
   const { definition, location } = props
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
   const filters = useFilters(location)

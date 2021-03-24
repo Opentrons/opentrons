@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import styles from './styles.css'
 import { MobileMenu } from './MobileMenu'
@@ -11,9 +10,11 @@ import { aboutLinkProps, applicationLinkProps } from './nav-data'
 
 import type { MenuName } from './types'
 
-type State = {| menu: null | MenuName |}
+interface State {
+  menu: null | MenuName
+}
 
-type Props = {||}
+interface Props {}
 
 export class MobileList extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -26,7 +27,7 @@ export class MobileList extends React.Component<Props, State> {
   toggle: (name: MenuName) => void = name =>
     this.setState({ menu: this.state.menu !== name ? name : null })
 
-  render(): React.Node {
+  render(): JSX.Element {
     const { menu } = this.state
     return (
       <ul className={styles.mobile_nav}>

@@ -3348,6 +3348,11 @@
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
+"@types/cookie@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@types/cookie/-/cookie-0.4.0.tgz#14f854c0f93d326e39da6e3b6f34f7d37513d108"
+  integrity sha512-y7mImlc/rNkvCRmg8gC3/lj87S7pTUIJ6QGjwHR9WQJcFs+ZMTOaoPrkdFA/YdbuqVEmEbb5RdhVxMkAcgOnpg==
+
 "@types/dateformat@^3.0.1":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@types/dateformat/-/dateformat-3.0.1.tgz#98d747a2e5e9a56070c6bf14e27bff56204e34cc"

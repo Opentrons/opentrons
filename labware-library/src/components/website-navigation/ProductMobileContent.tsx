@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { NavLink } from './NavLink'
 import styles from './styles.css'
@@ -10,9 +9,9 @@ import {
   productCTALink,
 } from './nav-data'
 
-type Props = {||}
+interface Props {}
 
-export function ProductMobileContent(props: Props): React.Node {
+export function ProductMobileContent(props: Props): JSX.Element {
   return (
     <div className={styles.product_mobile_content}>
       <div className={styles.hardware_group}>

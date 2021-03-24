@@ -1,14 +1,13 @@
-// @flow
 import * as React from 'react'
 import styles from './styles.css'
 import { NavLink } from './NavLink'
 import { protocolLinkProps } from './nav-data'
 
-type Props = {|
-  active: boolean,
-|}
+interface Props {
+  active: boolean
+}
 
-export function ProtocolMenu(props: Props): React.Node {
+export function ProtocolMenu(props: Props): JSX.Element {
   const { active } = props
   const {
     options,

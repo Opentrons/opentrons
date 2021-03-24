@@ -1,17 +1,17 @@
-// @flow
-
 export interface DiagramProps {
-  guideType?: string,
-  category?: string,
-  insertCategory?: string,
-  shape?: string,
-  wellBottomShape?: string,
-  guideVisible?: boolean,
-  irregular?: boolean,
-  isMultiRow?: boolean,
+  guideType?: string
+  category?: string
+  insertCategory?: string
+  shape?: string
+  wellBottomShape?: string
+  guideVisible?: boolean
+  irregular?: boolean
+  isMultiRow?: boolean
 }
 
-const FOOTPRINT_DIAGRAMS: { [category: string]: string[],  } = {
+type Diagrams = Record<string, string[]>
+
+const FOOTPRINT_DIAGRAMS: Diagrams = {
   wellPlate: [
     require('./images/dimensions/footprint@3x.png'),
     require('./images/dimensions/height-plate-and-reservoir@3x.png'),
@@ -34,7 +34,7 @@ const FOOTPRINT_DIAGRAMS: { [category: string]: string[],  } = {
   ],
 }
 
-const ALUM_BLOCK_FOOTPRINTS: { [category: string]: string[],  } = {
+const ALUM_BLOCK_FOOTPRINTS: Diagrams = {
   tubeRack: [
     require('./images/dimensions/footprint@3x.png'),
     require('./images/dimensions/height-alum-block-tubes@3x.png'),
@@ -45,9 +45,7 @@ const ALUM_BLOCK_FOOTPRINTS: { [category: string]: string[],  } = {
   ],
 }
 
-const RESERVOIR_SPACING_DIAGRAMS: {
-  [rows: string]: string[],
-} = {
+const RESERVOIR_SPACING_DIAGRAMS: Diagrams = {
   singleRow: [
     require('./images/offset/offset-reservoir@3x.png'),
     require('./images/spacing/spacing-reservoir@3x.png'),
@@ -58,9 +56,7 @@ const RESERVOIR_SPACING_DIAGRAMS: {
   ],
 }
 
-const SPACING_DIAGRAMS: {
-  [shape: string]: string[],
-} = {
+const SPACING_DIAGRAMS: Diagrams = {
   circular: [
     require('./images/offset/offset-well-circular@3x.png'),
     require('./images/spacing/spacing-well-circular@3x.png'),
@@ -76,9 +72,9 @@ const TIPRACK_MEASUREMENT_DIAGRAMS: string[] = [
   require('./images/shape/shape-circular@3x.png'),
 ]
 
-const PLATE_MEASUREMENT_DIAGRAMS: {
-  [wellBottomShape: string]: { [shape: string]: string[],  },
-} = {
+type NestedDiagrams = Record<string, Record<string, string[]>>
+
+const PLATE_MEASUREMENT_DIAGRAMS: NestedDiagrams = {
   flat: {
     circular: [
       require('./images/depth/depth-plate-flat@3x.png'),
@@ -110,9 +106,7 @@ const PLATE_MEASUREMENT_DIAGRAMS: {
     ],
   },
 }
-const MEASUREMENT_DIAGRAMS: {
-  [wellBottomShape: string]: { [shape: string]: string[], },
-} = {
+const MEASUREMENT_DIAGRAMS: NestedDiagrams = {
   flat: {
     circular: [
       require('./images/depth/depth-reservoir-and-tubes-flat@3x.png'),

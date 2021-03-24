@@ -1,11 +1,9 @@
-// @flow
 // top nav bar logo image
 import * as React from 'react'
-
 import logoSrc from './images/ot-logo-full.png'
 import styles from './styles.css'
 
-export function Logo(): React.Node {
+export function Logo(): JSX.Element {
   return (
     <a
       href="https://opentrons.com/"

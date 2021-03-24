@@ -1,4 +1,3 @@
-// @flow
 // tests for main navbar
 import * as React from 'react'
 import { shallow } from 'enzyme'

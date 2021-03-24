@@ -1,15 +1,12 @@
-// @flow
 import * as React from 'react'
 import { NavLink } from './NavLink'
 import styles from './styles.css'
 
 import type { Submenu } from './types'
 
-type Props = {|
-  ...Submenu,
-|}
+type Props = Submenu
 
-export function MobileContent(props: Props): React.Node {
+export function MobileContent(props: Props): JSX.Element {
   const { links } = props
   return (
     <ul className={styles.mobile_content}>

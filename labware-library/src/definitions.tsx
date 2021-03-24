@@ -89,7 +89,7 @@ export interface DefinitionRouteProps {
   render: (props: DefinitionRouteRenderProps) => React.ReactNode
 }
 
-export function DefinitionRoute(props: DefinitionRouteProps): React.ReactNode {
+export function DefinitionRoute(props: DefinitionRouteProps): JSX.Element {
   return (
     <Route
       path={`${getPublicPath()}:loadName?`}

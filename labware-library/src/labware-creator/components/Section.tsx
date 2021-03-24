@@ -12,7 +12,7 @@ import type { LabwareFields } from '../fields'
 // TODO: Make this DRY, don't require fields (in children) and also fieldList.
 interface Props {
   label: string
-  formik: any // TODO IMMEDIATELY type this??
+  formik?: any // TODO IMMEDIATELY type this??
   additionalAlerts?: React.ReactNode
   fieldList?: Array<keyof LabwareFields>
   children?: React.ReactNode

@@ -1,4 +1,3 @@
-// @flow
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from '../fieldMasks'
 
 // TODO(Ian, 2019-07-23): some fancy util could make these tests much less verbose

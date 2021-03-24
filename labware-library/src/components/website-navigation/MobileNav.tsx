@@ -1,13 +1,12 @@
-// @flow
 import * as React from 'react'
 import { MenuButton } from './MenuButton'
 import { MobileList } from './MobileList'
 
-type State = {|
-  isOpen: boolean,
-|}
+interface State {
+  isOpen: boolean
+}
 
-type Props = {||}
+interface Props {}
 
 export class MobileNav extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -24,7 +23,7 @@ export class MobileNav extends React.Component<Props, State> {
     document.body && document.body.classList.remove('no_scroll')
   }
 
-  render(): React.Node {
+  render(): JSX.Element {
     return (
       <>
         <MenuButton

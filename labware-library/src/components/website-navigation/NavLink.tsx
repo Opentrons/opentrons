@@ -1,16 +1,14 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
 
 import type { Link } from './types'
 
-type Props = {|
-  ...Link,
-  className?: string,
-|}
+type Props = Link & {
+  className?: string
+}
 
-export function NavLink(props: Props): React.Node {
+export function NavLink(props: Props): JSX.Element {
   const {
     gtm: { category, label, action },
   } = props
@@ -34,7 +32,7 @@ export function NavLink(props: Props): React.Node {
   )
 }
 
-export function NavButton(props: Link): React.Node {
+export function NavButton(props: Link): JSX.Element {
   return (
     <a
       href={props.url}

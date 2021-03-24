@@ -314,6 +314,8 @@ export type PipetteChannels = 1 | 8
 
 export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2
 
+export const DEFAULT_CUSTOM_NAMESPACE: string
+
 export interface FlowRateSpec {
   value: number
   min: number

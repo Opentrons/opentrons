@@ -10,7 +10,7 @@ export interface PageProps {
   content: React.ReactNode
 }
 
-export function Page(props: PageProps): React.ReactNode {
+export function Page(props: PageProps): JSX.Element {
   const { scrollRef, detailPage, sidebar, content } = props
 
   return (

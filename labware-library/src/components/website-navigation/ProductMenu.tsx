@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import styles from './styles.css'
 import { NavLink } from './NavLink'
@@ -9,11 +8,11 @@ import {
   productCTALink,
 } from './nav-data'
 
-type Props = {|
-  active: boolean,
-|}
+interface Props {
+  active: boolean
+}
 
-export function ProductMenu(props: Props): React.Node {
+export function ProductMenu(props: Props): JSX.Element {
   const { active } = props
   return (
     <>

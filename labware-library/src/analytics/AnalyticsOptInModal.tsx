@@ -8,21 +8,20 @@ interface Props {
   children: React.ReactNode
 }
 
-export const AnalyticsOptInModal = (props: Props): React.ReactNode => {
+export const AnalyticsOptInModal = (props: Props): JSX.Element | null => {
   const { setAnalyticsOptIn, analyticsState } = useAnalyticsOptInOrOut()
+  if (analyticsState.seenOptIn) return null
 
   return (
-    !analyticsState.seenOptIn && (
-      <AlertModal
-        restrictOuterScroll={false}
-        className={props.className}
-        buttons={[
-          { onClick: () => setAnalyticsOptIn(false), children: 'NO' },
-          { onClick: () => setAnalyticsOptIn(true), children: 'YES' },
-        ]}
-      >
-        {props.children}
-      </AlertModal>
-    )
+    <AlertModal
+      restrictOuterScroll={false}
+      className={props.className}
+      buttons={[
+        { onClick: () => setAnalyticsOptIn(false), children: 'NO' },
+        { onClick: () => setAnalyticsOptIn(true), children: 'YES' },
+      ]}
+    >
+      {props.children}
+    </AlertModal>
   )
 }

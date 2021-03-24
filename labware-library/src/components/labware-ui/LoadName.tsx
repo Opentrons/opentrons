@@ -1,4 +1,3 @@
-// @flow
 // labware load name with copy button
 import * as React from 'react'
 import { IconButton, DeprecatedTooltip } from '@opentrons/components'

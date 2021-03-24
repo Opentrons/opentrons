@@ -1,16 +1,17 @@
-// @flow
 // top subdomain nav bar component
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { getPublicPath } from '../../public-path'
 import styles from './styles.css'
 
-type Links = Array<{|
-  name: string,
-  url: string,
-  gtm: {| action: string, category: string, label: string |},
-  linkout: boolean,
-|}>
+interface LinkItem {
+  name: string
+  url: string
+  gtm: { action: string; category: string; label: string }
+  linkout: boolean
+}
+
+type Links = Array<LinkItem>
 
 export const SUBDOMAIN_NAV_LINKS: Links = [
   {
@@ -55,7 +56,7 @@ export const SUBDOMAIN_NAV_LINKS: Links = [
   },
 ]
 
-export function SubdomainNav(): React.Node {
+export function SubdomainNav(): JSX.Element {
   return (
     <ul className={styles.subdomain_nav_contents}>
       {SUBDOMAIN_NAV_LINKS.map((link, index) => {

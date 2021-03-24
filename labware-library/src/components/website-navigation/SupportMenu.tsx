@@ -1,13 +1,12 @@
-// @flow
 import * as React from 'react'
 import { NavLink, NavButton } from './NavLink'
 import { supportLinkProps, salesLinkProps } from './nav-data'
 import styles from './styles.css'
 
-type Props = {|
-  active: boolean,
-|}
-export function SupportMenu(props: Props): React.Node {
+interface Props {
+  active: boolean
+}
+export function SupportMenu(props: Props): JSX.Element {
   const { active } = props
   const {
     start,
