@@ -1,4 +1,3 @@
-// @flow
 // main application sidebar
 import * as React from 'react'
 import { LabwareGuide } from './LabwareGuide'
@@ -9,11 +8,11 @@ import styles from './styles.css'
 
 import type { FilterParams } from '../../types'
 
-export type SidebarProps = {|
-  filters: FilterParams,
-|}
+export interface SidebarProps {
+  filters: FilterParams
+}
 
-export function Sidebar(props: SidebarProps): React.Node {
+export function Sidebar(props: SidebarProps): JSX.Element {
   const { filters } = props
 
   return (

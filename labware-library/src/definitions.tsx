@@ -7,7 +7,7 @@ import uniq from 'lodash/uniq'
 import { LABWAREV2_DO_NOT_LIST } from '@opentrons/shared-data'
 import { getPublicPath } from './public-path'
 
-import type { ContextRouter } from 'react-router-dom'
+import type { RouteComponentProps } from 'react-router-dom'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareList, LabwareDefinition } from './types'
 
@@ -81,7 +81,7 @@ export function getDefinition(
   return def || null
 }
 
-export interface DefinitionRouteRenderProps extends ContextRouter {
+export interface DefinitionRouteRenderProps extends RouteComponentProps {
   definition: LabwareDefinition | null
 }
 

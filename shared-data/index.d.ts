@@ -6,7 +6,7 @@
 
 export function createRegularLabware(args: any): LabwareDefinition2
 
-export type LABWAREV2_DO_NOT_LIST = string[]
+export const LABWAREV2_DO_NOT_LIST: string[]
 
 export function getDisplayVolume(
   volumeInMicroliters: number,
@@ -18,8 +18,8 @@ export function getLabwareDefURI(def: LabwareDefinition2): string
 export function createRegularLoadName(args: any): string
 export function createDefaultDisplayName(args: any): string
 
-export type SLOT_LENGTH_MM = number
-export type SLOT_WIDTH_MM = number
+export const SLOT_LENGTH_MM: number
+export const SLOT_WIDTH_MM: number
 
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export interface WellDefinition {
@@ -165,44 +165,46 @@ export interface LabwareDefinition2 {
 }
 
 // from constants.js =====
-export type THERMOCYCLER = 'thermocycler'
-export type TEMPDECK = 'tempdeck'
-export type MAGDECK = 'magdeck'
+export const THERMOCYCLER = 'thermocycler'
+export const TEMPDECK = 'tempdeck'
+export const MAGDECK = 'magdeck'
 // these are the Module Def Schema v2 equivalents of the above. They should match the names of JSON definitions
 // in shared-data/module/definitions/2.
-export type MAGNETIC_MODULE_V1 = 'magneticModuleV1'
-export type MAGNETIC_MODULE_V2 = 'magneticModuleV2'
-export type TEMPERATURE_MODULE_V1 = 'temperatureModuleV1'
-export type TEMPERATURE_MODULE_V2 = 'temperatureModuleV2'
-export type THERMOCYCLER_MODULE_V1 = 'thermocyclerModuleV1'
+export const MAGNETIC_MODULE_V1 = 'magneticModuleV1'
+export const MAGNETIC_MODULE_V2 = 'magneticModuleV2'
+export const TEMPERATURE_MODULE_V1 = 'temperatureModuleV1'
+export const TEMPERATURE_MODULE_V2 = 'temperatureModuleV2'
+export const THERMOCYCLER_MODULE_V1 = 'thermocyclerModuleV1'
 
 // pipette display categories
-export type GEN2 = 'GEN2'
-export type GEN1 = 'GEN1'
+export const GEN2 = 'GEN2'
+export const GEN1 = 'GEN1'
 
 // NOTE: these are NOT module MODELs, they are `moduleType`s. Should match ENUM in module definition file.
-export type TEMPERATURE_MODULE_TYPE = 'temperatureModuleType'
-export type MAGNETIC_MODULE_TYPE = 'magneticModuleType'
-export type THERMOCYCLER_MODULE_TYPE = 'thermocyclerModuleType'
+export const TEMPERATURE_MODULE_TYPE = 'temperatureModuleType'
+export const MAGNETIC_MODULE_TYPE = 'magneticModuleType'
+export const THERMOCYCLER_MODULE_TYPE = 'thermocyclerModuleType'
 
 // ======
 
 // Module Type corresponds to `moduleType` key in a module definition. Is NOT model.
 // TODO: IL 2020-02-20 ModuleType is DEPRECATED. Replace all instances with ModuleRealType
 // (then finally rename ModuleRealType -> ModuleType)
-export type ModuleType = MAGDECK | TEMPDECK | THERMOCYCLER
+export type ModuleType = typeof MAGDECK | typeof TEMPDECK | typeof THERMOCYCLER
 export type ModuleRealType =
-  | MAGNETIC_MODULE_TYPE
-  | TEMPERATURE_MODULE_TYPE
-  | THERMOCYCLER_MODULE_TYPE
+  | typeof MAGNETIC_MODULE_TYPE
+  | typeof TEMPERATURE_MODULE_TYPE
+  | typeof THERMOCYCLER_MODULE_TYPE
 
 // ModuleModel corresponds to top-level keys in shared-data/module/definitions/2
 
-export type MagneticModuleModel = MAGNETIC_MODULE_V1 | MAGNETIC_MODULE_V2
+export type MagneticModuleModel =
+  | typeof MAGNETIC_MODULE_V1
+  | typeof MAGNETIC_MODULE_V2
 export type TemperatureModuleModel =
-  | TEMPERATURE_MODULE_V1
-  | TEMPERATURE_MODULE_V2
-export type ThermocyclerModuleModel = THERMOCYCLER_MODULE_V1
+  | typeof TEMPERATURE_MODULE_V1
+  | typeof TEMPERATURE_MODULE_V2
+export type ThermocyclerModuleModel = typeof THERMOCYCLER_MODULE_V1
 
 export type ModuleModel =
   | MagneticModuleModel
@@ -211,9 +213,9 @@ export type ModuleModel =
 
 export type ModuleModelWithLegacy =
   | ModuleModel
-  | THERMOCYCLER
-  | MAGDECK
-  | TEMPDECK
+  | typeof THERMOCYCLER
+  | typeof MAGDECK
+  | typeof TEMPDECK
 
 export interface DeckOffset {
   x: number
@@ -310,7 +312,7 @@ export interface ModuleDefinition {
 
 export type PipetteChannels = 1 | 8
 
-export type PipetteDisplayCategory = GEN1 | GEN2
+export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2
 
 export interface FlowRateSpec {
   value: number

@@ -4,6 +4,7 @@ import path from 'path'
 import glob from 'glob'
 import uniq from 'lodash/uniq'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareList } from '../types'
 
 const LABWARE_FIXTURE_PATTERN = path.join(
@@ -15,7 +16,7 @@ const allLoadNames = uniq(
   glob
     .sync(LABWARE_FIXTURE_PATTERN)
     .map(require)
-    .map(def => def.parameters.loadName)
+    .map((def: any) => (def as LabwareDefinition2).parameters.loadName)
 )
 
 assert(
@@ -23,15 +24,13 @@ assert(
   `no labware loadNames found, something broke. ${LABWARE_FIXTURE_PATTERN}`
 )
 
-export const getAllLoadNames: JestMockFn<[], string[]> = jest.fn(
-  () => allLoadNames
-)
+export const getAllLoadNames = jest.fn(() => allLoadNames)
 
 const allDisplayNames = uniq(
   glob
     .sync(LABWARE_FIXTURE_PATTERN)
     .map(require)
-    .map(def => def.metadata.displayName)
+    .map((def: any) => (def as LabwareDefinition2).metadata.displayName)
 )
 
 assert(
@@ -39,20 +38,18 @@ assert(
   `no labware displayNames found, something broke. ${LABWARE_FIXTURE_PATTERN}`
 )
 
-export const getAllDisplayNames: JestMockFn<[], string[]> = jest.fn(
-  () => allDisplayNames
-)
+export const getAllDisplayNames = jest.fn(() => allDisplayNames)
 
 const allLabware = glob
   .sync(LABWARE_FIXTURE_PATTERN)
   .map(require)
-  .filter(d => d.metadata.displayCategory !== 'trash')
+  .filter(
+    (d: any) => (d as LabwareDefinition2).metadata.displayCategory !== 'trash'
+  )
 
 assert(
   allLabware.length > 0,
   `no labware fixtures found, is the path correct? ${LABWARE_FIXTURE_PATTERN}`
 )
 
-export const getAllDefinitions: JestMockFn<[], LabwareList> = jest.fn(
-  () => allLabware
-)
+export const getAllDefinitions = jest.fn(() => allLabware)

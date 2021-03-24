@@ -2,20 +2,17 @@
 // reset all filters button
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-
-import { buildFiltersUrl, FILTER_OFF } from '../../filters'
 import { Icon } from '@opentrons/components'
-import styles from './styles.css'
-
+import { buildFiltersUrl, FILTER_OFF } from '../../filters'
 import { CLEAR_FILTERS } from '../../localization'
-
+import styles from './styles.css'
 import type { FilterParams } from '../../types'
 
-export type FilterResetProps = {|
-  filters: FilterParams,
-|}
+export interface FilterResetProps {
+  filters: FilterParams
+}
 
-export function FilterReset(props: FilterResetProps): React.Node {
+export function FilterReset(props: FilterResetProps): JSX.Element | null {
   const { filters } = props
   // TODO (ka 2019-3-09):Should this be moved to Sidebar?
   const { manufacturer, category } = filters

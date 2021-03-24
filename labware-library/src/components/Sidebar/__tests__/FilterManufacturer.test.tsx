@@ -1,4 +1,3 @@
-// @flow
 // FilterManufacturer component tests
 import * as React from 'react'
 import { shallow } from 'enzyme'
@@ -8,10 +7,9 @@ import * as filters from '../../../filters'
 
 jest.mock('../../../filters')
 
-const getAllManufacturers: JestMockFn<
-  empty,
-  Array<string>
-> = (filters.getAllManufacturers: any)
+const getAllManufacturers = filters.getAllManufacturers as jest.MockedFunction<
+  typeof filters.getAllManufacturers
+>
 
 describe('FilterManufacturer', () => {
   beforeEach(() => {
@@ -24,9 +22,9 @@ describe('FilterManufacturer', () => {
     const filters = { category: 'all', manufacturer: 'all' }
     const tree = shallow(
       <FilterManufacturerComponent
-        location={({}: any)}
-        history={({}: any)}
-        match={({}: any)}
+        location={{} as any}
+        history={{} as any}
+        match={{} as any}
         filters={filters}
       />
     )

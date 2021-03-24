@@ -1,24 +1,20 @@
-// @flow
 // filter labware by category
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import cx from 'classnames'
-
 import { getAllCategories, buildFiltersUrl } from '../../filters'
-import styles from './styles.css'
-
 import {
   PLURAL_CATEGORY_LABELS_BY_CATEGORY,
   CATEGORY,
 } from '../../localization'
-
+import styles from './styles.css'
 import type { FilterParams } from '../../types'
 
-export type FilterCategoryProps = {|
-  filters: FilterParams,
-|}
+export interface FilterCategoryProps {
+  filters: FilterParams
+}
 
-export function FilterCategory(props: FilterCategoryProps): React.Node {
+export function FilterCategory(props: FilterCategoryProps): JSX.Element {
   const { filters } = props
   const categories = getAllCategories()
 
@@ -34,6 +30,7 @@ export function FilterCategory(props: FilterCategoryProps): React.Node {
                 [styles.selected]: c === filters.category,
               })}
             >
+              {/* @ts-ignore(IL, 2021-03-24): lookup unsafe */}
               {PLURAL_CATEGORY_LABELS_BY_CATEGORY[c]}
             </Link>
           </li>

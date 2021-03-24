@@ -1,4 +1,3 @@
-// @flow
 // Sidebar component tests
 import * as React from 'react'
 import { shallow } from 'enzyme'

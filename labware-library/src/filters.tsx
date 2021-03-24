@@ -8,7 +8,7 @@ import uniq from 'lodash/uniq'
 import { getAllDefinitions } from './definitions'
 import { getPublicPath } from './public-path'
 
-import type { Location } from 'react-router-dom'
+import type { Location } from 'history'
 import type { FilterParams, LabwareDefinition, LabwareList } from './types'
 
 export const FILTER_OFF = 'all'
@@ -22,11 +22,10 @@ export function getAllCategories(): string[] {
 export function getAllManufacturers(): string[] {
   const definitions = getAllDefinitions()
   const brands = definitions.map(d => d.brand.brand)
-  const wellGroupBrands = flatMap<LabwareDefinition, string>(
+  const wellGroupBrands = flatMap<LabwareDefinition, string | undefined>(
     definitions,
-    (d: LabwareDefinition, i: number, c: LabwareList) =>
-      d.groups.map(g => g.brand?.brand).filter(Boolean)
-  )
+    d => d.groups.map(g => g.brand?.brand).filter(Boolean)
+  ) as string[]
 
   return uniq([FILTER_OFF, ...brands, ...wellGroupBrands])
 }
