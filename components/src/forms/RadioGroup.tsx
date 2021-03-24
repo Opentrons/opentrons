@@ -4,6 +4,12 @@ import { Icon } from '../icons'
 
 import styles from './forms.css'
 
+export interface RadioOption {
+  name: string
+  value: string
+  children?: React.ReactNode
+}
+
 export interface RadioGroupProps {
   /** blur handler */
   onBlur?: React.FocusEventHandler
@@ -12,11 +18,7 @@ export interface RadioGroupProps {
   /** value that is checked */
   value?: string
   /** Array of {name, value} data with optional children */
-  options?: Array<{
-    name: string
-    value: string
-    children?: React.ReactNode
-  }>
+  options?: RadioOption[]
   /** Show radio buttons inline instead of stacked */
   inline?: boolean
   /** classes to apply to outer div */

@@ -6,19 +6,14 @@ import { CheckboxRowField } from './CheckboxRowField'
 import { TipPositionField } from './TipPositionField'
 import styles from '../StepEditForm.css'
 import type { FieldPropsByName } from '../types'
-import type {
-  DelayCheckboxFields,
-  DelaySecondFields,
-  TipOffsetFields,
-  FormData,
-} from '../../../form-types'
+import type { StepFieldName } from '../../../form-types'
 
 export type DelayFieldProps = {|
-  checkboxFieldName: DelayCheckboxFields,
-  formData: FormData,
+  checkboxFieldName: StepFieldName, // TODO(IL, 2021-03-03): strictly, could be DelayCheckboxFields!
+  labwareId: ?string,
   propsForFields: FieldPropsByName,
-  secondsFieldName: DelaySecondFields,
-  tipPositionFieldName?: TipOffsetFields,
+  secondsFieldName: StepFieldName, // TODO(IL, 2021-03-03): strictly, could be DelaySecondFields!
+  tipPositionFieldName?: StepFieldName, // TODO(IL, 2021-03-03): strictly, could be TipOffsetFields!
 |}
 
 export const DelayFields = (props: DelayFieldProps): React.Node => {
@@ -27,7 +22,7 @@ export const DelayFields = (props: DelayFieldProps): React.Node => {
     secondsFieldName,
     tipPositionFieldName,
     propsForFields,
-    formData,
+    labwareId,
   } = props
 
   return (
@@ -44,7 +39,7 @@ export const DelayFields = (props: DelayFieldProps): React.Node => {
       {tipPositionFieldName && (
         <TipPositionField
           {...propsForFields[tipPositionFieldName]}
-          formData={formData}
+          labwareId={labwareId}
         />
       )}
     </CheckboxRowField>

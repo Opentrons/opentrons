@@ -104,7 +104,6 @@ describe('ListItem', () => {
 
     const link = root.findByType('a')
     expect(link.props.href).toBe(linkItemProps.url)
-    expect(link.props.disabled).toBe(false)
   })
 
   it('adds an optional svg icon as child', () => {
@@ -116,15 +115,13 @@ describe('ListItem', () => {
   })
 
   it('renders ListItem with icon correctly', () => {
-    const tree = Renderer.create(
-      <ListItem iconName="check-circle" isDisabled={false} />
-    ).toJSON()
+    const tree = Renderer.create(<ListItem iconName="check-circle" />).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
   it('renders ListItem without icon correctly', () => {
-    const tree = Renderer.create(<ListItem isDisabled={false} />).toJSON()
+    const tree = Renderer.create(<ListItem />).toJSON()
 
     expect(tree).toMatchSnapshot()
   })

@@ -48,9 +48,9 @@ export interface BaseModalProps extends StyleProps {
   /** Overlay color, defaults to `OVERLAY_GRAY_90` */
   overlayColor?: string
   /** Optional sticky header */
-  header?: JSX.Element
+  header?: React.ReactNode
   /** Optional sticky footer */
-  footer?: JSX.Element
+  footer?: React.ReactNode
   /** Modal content */
   children?: React.ReactNode
 }

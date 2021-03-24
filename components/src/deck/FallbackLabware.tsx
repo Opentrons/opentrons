@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
 import { LabwareOutline } from './LabwareOutline'
@@ -10,7 +9,7 @@ import styles from './Labware.css'
 /**
  * @deprecated No longer necessary, do not use
  */
-export function FallbackLabware() {
+export function FallbackLabware(): JSX.Element {
   return (
     <g>
       <LabwareOutline width={SLOT_RENDER_WIDTH} height={SLOT_RENDER_HEIGHT} />

@@ -13,7 +13,7 @@ function FilledWellsComponent(props: FilledWellsProps): JSX.Element {
   const { definition, fillByWell } = props
   return (
     <>
-      {map<Record<string, CSSProperties['fill']>, JSX.Element>(
+      {map<Record<string, CSSProperties['fill']>, React.ReactNode>(
         fillByWell,
         (color: CSSProperties['fill'], wellName: string): JSX.Element => {
           return (

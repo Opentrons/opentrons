@@ -6,7 +6,7 @@ from json import JSONDecodeError
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.execution.execute import run_protocol
-from opentrons.protocols.implementations.simulators.protocol_context import \
+from opentrons.protocols.context.simulator.protocol_context import \
     ProtocolContextSimulation
 from opentrons.protocols.parse import parse
 from opentrons.protocols.types import Protocol

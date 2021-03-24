@@ -10,7 +10,10 @@ import {
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul'
 import { getStateAndContextTempTCModules } from '../../step-generation/__fixtures__'
-import { DEFAULT_DELAY_SECONDS } from '../../constants'
+import {
+  DEFAULT_DELAY_SECONDS,
+  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+} from '../../constants'
 import {
   createPresavedStepForm,
   type CreatePresavedStepFormArgs,
@@ -136,18 +139,19 @@ describe('createPresavedStepForm', () => {
       aspirate_airGap_checkbox: false,
       aspirate_airGap_volume: '1',
       aspirate_delay_checkbox: false,
-      aspirate_delay_mmFromBottom: '1',
+      aspirate_delay_mmFromBottom: null,
       aspirate_delay_seconds: '1',
       dispense_delay_checkbox: false,
       dispense_delay_seconds: '1',
-      dispense_delay_mmFromBottom: '0.5',
+      dispense_delay_mmFromBottom: null,
       aspirate_flowRate: null,
       aspirate_labware: null,
       aspirate_mix_checkbox: false,
       aspirate_mix_times: null,
       aspirate_mix_volume: null,
-      aspirate_mmFromBottom: '1',
+      aspirate_mmFromBottom: null,
       aspirate_touchTip_checkbox: false,
+      aspirate_touchTip_mmFromBottom: null,
       aspirate_wellOrder_first: 't2b',
       aspirate_wellOrder_second: 'l2r',
       aspirate_wells: [],
@@ -162,8 +166,9 @@ describe('createPresavedStepForm', () => {
       dispense_mix_checkbox: false,
       dispense_mix_times: null,
       dispense_mix_volume: null,
-      dispense_mmFromBottom: '0.5',
+      dispense_mmFromBottom: null,
       dispense_touchTip_checkbox: false,
+      dispense_touchTip_mmFromBottom: null,
       dispense_wellOrder_first: 't2b',
       dispense_wellOrder_second: 'l2r',
       dispense_wells: [],
@@ -195,7 +200,8 @@ describe('createPresavedStepForm', () => {
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_delay_checkbox: false,
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
-        mix_mmFromBottom: '0.5',
+        mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+        mix_touchTip_mmFromBottom: null,
         mix_wellOrder_first: 't2b',
         mix_wellOrder_second: 'l2r',
         blowout_checkbox: false,

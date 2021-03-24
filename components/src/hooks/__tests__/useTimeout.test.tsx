@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { useTimeout } from '..'
@@ -16,7 +15,7 @@ describe('useTimeouthook', () => {
     jest.useRealTimers()
   })
 
-  const TestUseTimeout = (props: { delay: number | null }) => {
+  const TestUseTimeout = (props: { delay: number | null }): JSX.Element => {
     useTimeout(callback, props.delay)
     return <span />
   }

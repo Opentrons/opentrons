@@ -9,7 +9,7 @@ export interface RobotCoordsForeignDivProps {
   y?: string | number
   children?: React.ReactNode
   className?: string
-  innerDivProps?: React.ComponentProps<PrimitiveComponent<'div'>>
+  innerDivProps?: React.ComponentProps<typeof Box>
   transformWithSVG?: boolean
   extraTransform?: string
 }

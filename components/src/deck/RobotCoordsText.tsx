@@ -1,11 +1,11 @@
 import * as React from 'react'
 import type { PrimitiveComponent } from '../primitives/types'
 
-export type RobotCoordsTextProps = {
+export interface RobotCoordsTextProps extends React.ComponentProps<'text'> {
   x: number
   y: number
   children?: React.ReactNode
-} & React.ComponentProps<PrimitiveComponent<'text'>>
+}
 
 /** SVG text reflected to use take robot coordinates as props */
 // TODO: Ian 2019-05-07 reconcile this with Brian's version

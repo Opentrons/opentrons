@@ -1,31 +1,48 @@
 // @flow
 import * as React from 'react'
+import { Box, SPACING_3 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { StatusCard } from './StatusCard'
-import { StatusItem } from './StatusItem'
-import styles from './styles.css'
+import { MagnetData, MagnetControl } from '../../../../molecules/ModuleControls'
+// import { StatusItem } from './StatusItem'
 
-import type { MagneticModule } from '../../../../redux/modules/types'
+import type {
+  MagneticModule,
+  ModuleCommand,
+} from '../../../../redux/modules/types'
 
 type Props = {|
   module: MagneticModule,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
+  sendModuleCommand: (
+    moduleId: string,
+    command: ModuleCommand,
+    args?: Array<mixed>
+  ) => mixed,
+  controlDisabledReason: string | null,
 |}
 
 export const MagDeckCard = ({
   module,
   isCardExpanded,
   toggleCard,
+  sendModuleCommand,
+  controlDisabledReason,
 }: Props): React.Node => (
   <StatusCard
     title={getModuleDisplayName(module.model)}
     isCardExpanded={isCardExpanded}
     toggleCard={toggleCard}
   >
-    <div className={styles.card_row}>
-      <StatusItem status={module.status} />
-    </div>
+    <Box padding={SPACING_3}>
+      <MagnetData module={module} />
+      <MagnetControl
+        module={module}
+        sendModuleCommand={sendModuleCommand}
+        disabledReason={controlDisabledReason}
+      />
+    </Box>
   </StatusCard>
 )

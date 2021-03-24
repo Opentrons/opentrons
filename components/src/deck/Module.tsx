@@ -75,42 +75,18 @@ export function Module(props: ModuleProps): JSX.Element {
         className: cx(styles.module, { [styles.flipped]: shouldFlip }),
       }}
     >
-      <ModuleItemContents {...props} shouldFlip={shouldFlip} />
+      <ModuleItemContents {...props} />
     </RobotCoordsForeignDiv>
   )
 }
 
-interface ModuleItemContentsProps extends ModuleProps {
-  shouldFlip: boolean
-}
-function ModuleItemContents(props: ModuleItemContentsProps): JSX.Element {
-  const { mode, model, shouldFlip } = props
+function ModuleItemContents(props: ModuleProps): JSX.Element {
+  const { mode, model } = props
   const displayName = getModuleDisplayName(model)
-
-  const message =
-    mode === 'missing' ? (
-      <>
-        <p className={styles.module_review_text}>Missing:</p>
-        {displayName.split(' ').map((chunk: string, i: number) => (
-          <p key={i} className={styles.module_review_text}>
-            {chunk}
-          </p>
-        ))}
-      </>
-    ) : (
-      <>
-        {displayName.split(' ').map((chunk: string, i: number) => (
-          <p key={i} className={styles.module_review_text}>
-            {chunk}
-          </p>
-        ))}
-      </>
-    )
 
   const iconClassName = cx(styles.module_review_icon, {
     [styles.module_review_icon_missing]: mode === 'missing',
     [styles.module_review_icon_present]: mode === 'present',
-    [styles.right_icon]: shouldFlip,
   })
 
   const iconNameByMode: Record<string, IconName> = {
@@ -120,18 +96,29 @@ function ModuleItemContents(props: ModuleItemContentsProps): JSX.Element {
     default: 'usb',
   }
 
-  const contents = [
-    <Icon
-      key="icon"
-      className={iconClassName}
-      x="8"
-      y="0"
-      svgWidth="16"
-      name={iconNameByMode[mode] || 'usb'}
-    />,
-    <div key="label" className={styles.module_text_wrapper}>
-      {message}
-    </div>,
-  ]
-  return <>{shouldFlip ? contents.reverse() : contents}</>
+  return (
+    <>
+      <div className={styles.module_wrapper}>
+        {mode !== 'missing' && (
+          <p key="portInfo" className={styles.module_port_text}>
+            usb info n/a
+          </p>
+        )}
+        <p key="displayName" className={styles.module_review_text}>
+          {displayName}
+        </p>
+        <div className={styles.module_connect_info_wrapper}>
+          <Icon
+            key="icon"
+            className={iconClassName}
+            x="8"
+            y="0"
+            svgWidth="12"
+            name={iconNameByMode[mode] || 'usb'}
+          />
+          <p>{mode === 'missing' ? 'Not connected' : 'Connected'}</p>
+        </div>
+      </div>
+    </>
+  )
 }

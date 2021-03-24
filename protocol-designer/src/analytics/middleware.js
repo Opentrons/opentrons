@@ -2,6 +2,7 @@
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
+  getBatchEditFieldChanges,
 } from '../step-forms/selectors'
 import { getFileMetadata } from '../file-data/selectors'
 import { trackEvent } from './mixpanel'
@@ -54,6 +55,52 @@ export const reduxActionToAnalyticsEvent = (
         name: 'saveStep',
         properties: { ...stepArgs, ...additionalProperties },
       }
+    }
+  }
+  if (action.type === 'SAVE_STEP_FORMS_MULTI') {
+    const fileMetadata = getFileMetadata(state)
+    const dateCreatedTimestamp = fileMetadata.created
+
+    const editedFields = getBatchEditFieldChanges(state)
+    const additionalProperties = flattenNestedProperties(editedFields)
+
+    // (these fields are prefixed with double underscore only to make sure they
+    // never accidentally overlap with actual fields)
+    // Mixpanel wants YYYY-MM-DDTHH:MM:SS for Date type
+    additionalProperties.__dateCreated =
+      dateCreatedTimestamp != null && Number.isFinite(dateCreatedTimestamp)
+        ? new Date(dateCreatedTimestamp).toISOString()
+        : null
+
+    additionalProperties.__protocolName = fileMetadata.protocolName
+
+    return {
+      name: 'saveStepsMulti',
+      properties: { ...editedFields, ...additionalProperties },
+    }
+  }
+  if (action.type === 'DELETE_MULTIPLE_STEPS') {
+    return {
+      name: 'deleteMultipleSteps',
+      properties: {},
+    }
+  }
+  if (action.type === 'DUPLICATE_MULTIPLE_STEPS') {
+    return {
+      name: 'duplicateMultipleSteps',
+      properties: {},
+    }
+  }
+  if (action.type === 'EXPAND_MULTIPLE_STEPS') {
+    return {
+      name: 'expandMultipleSteps',
+      properties: {},
+    }
+  }
+  if (action.type === 'COLLAPSE_MULTIPLE_STEPS') {
+    return {
+      name: 'collapseMultipleSteps',
+      properties: {},
     }
   }
   if (action.type === 'ANALYTICS_EVENT') {

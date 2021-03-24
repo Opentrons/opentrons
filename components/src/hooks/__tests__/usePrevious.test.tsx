@@ -1,10 +1,9 @@
-
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { usePrevious } from '..'
 
 describe('usePrevious hook', () => {
-  const TestUsePrevious = (props: { value: string }) => {
+  const TestUsePrevious = (props: { value: string }): JSX.Element => {
     const prevValue = usePrevious(props.value)
     return (
       <span>{typeof prevValue === 'undefined' ? 'undefined' : prevValue}</span>

@@ -37,6 +37,7 @@ export const AnnouncementModal = (): React.Node => {
         <Modal
           className={cx(modalStyles.modal, styles.announcement_modal)}
           contentsClassName={styles.modal_contents}
+          onCloseClick={handleClick}
         >
           {image && (
             <>

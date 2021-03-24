@@ -7,6 +7,7 @@ import * as UseTooltip from '../useTooltip'
 import { Tooltip } from '../Tooltip'
 import { useHoverTooltip } from '../useHoverTooltip'
 
+import type { ReactWrapper } from 'enzyme'
 import * as Types from '../types'
 
 jest.mock('../useTooltip', () => ({
@@ -34,7 +35,7 @@ const TestUseHoverTooltip = (
 
 const render = (
   props: Types.UseHoverTooltipOptions = {}
-): ReturnType<typeof mount> => {
+): ReactWrapper<Types.UseHoverTooltipOptions> => {
   return mount(<TestUseHoverTooltip {...props} />)
 }
 
@@ -68,7 +69,7 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.simulate('onPointerEnter')
+      target.invoke('onPointerEnter')?.({} as any)
     })
     wrapper.update()
 
@@ -92,9 +93,9 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.simulate('onPointerEnter')
-      jest.advanceTimersByTime(300)
-      target.simulate('onPointerLeave')
+      target.invoke('onPointerEnter')?.({} as any)
+      jest.runTimersToTime(300)
+      target.invoke('onPointerLeave')?.({} as any)
     })
     wrapper.update()
 
@@ -111,8 +112,8 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.simulate('onPointerEnter')
-      jest.advanceTimersByTime(300)
+      target.invoke('onPointerEnter')?.({} as any)
+      jest.runTimersToTime(300)
     })
     wrapper.update()
 
@@ -136,8 +137,8 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.simulate('onPointerEnter')
-      target.simulate('onPointerLeave')
+      target.invoke('onPointerEnter')?.({} as any)
+      target.invoke('onPointerLeave')?.({} as any)
     })
     wrapper.update()
 

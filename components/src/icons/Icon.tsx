@@ -5,11 +5,11 @@ import cx from 'classnames'
 import { Svg } from '../primitives'
 import { ICON_DATA_BY_NAME } from './icon-data'
 
-import type { StyleProps } from '../primitives'
+import type { SvgProps } from '../primitives'
 
 export type IconName = keyof typeof ICON_DATA_BY_NAME
 
-export interface IconProps {
+export interface IconProps extends SvgProps {
   /** name constant of the icon to display */
   name: IconName
   /** classes to apply */
@@ -51,9 +51,7 @@ const spinStyle = css`
  * import type { IconName } from '@opentrons/components'
  * ```
  */
-export function Icon(
-  props: IconProps & Partial<StyleProps>
-): JSX.Element | null {
+export function Icon(props: IconProps): JSX.Element | null {
   const { name, children, className, spin, ...svgProps } = props
 
   if (!(name in ICON_DATA_BY_NAME)) {

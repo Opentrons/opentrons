@@ -26,7 +26,7 @@ export function useInterval(
 
   // set up the interval
   useEffect(() => {
-    const tick = () => savedCallback.current && savedCallback.current()
+    const tick = (): unknown => savedCallback.current && savedCallback.current()
     if (delay !== null && delay > 0) {
       if (immediate) tick()
       const id = setInterval(tick, delay)

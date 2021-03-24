@@ -1,5 +1,3 @@
-
-
 // display
 export const DISPLAY_NONE = 'none'
 export const DISPLAY_INLINE = 'inline'

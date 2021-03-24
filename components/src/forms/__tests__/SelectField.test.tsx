@@ -3,7 +3,7 @@ import { shallow } from 'enzyme'
 
 import { SelectField } from '../SelectField'
 import { Select } from '../Select'
-import type { SelectOption, SelectProps } from '../Select'
+import type { SelectOption } from '../Select'
 
 describe('SelectField', () => {
   it('renders a Select', () => {
@@ -35,8 +35,8 @@ describe('SelectField', () => {
     const disabled = false
     const placeholder = 'hello there'
     const menuPosition = 'absolute'
-    const formatOptionLabel: unknown = (opt: SelectOption): React.ReactNode =>
-      'label' in opt ? opt.label : opt.value
+    const formatOptionLabel = (opt: SelectOption): string =>
+      opt.label || opt.value
     const className = 'class'
 
     const wrapper = shallow(
@@ -102,9 +102,9 @@ describe('SelectField', () => {
       />
     ).find(Select)
 
-    selectWrapper.simulate('onChange', options[1])
+    selectWrapper.invoke('onChange')?.(options[1], {} as any)
     expect(handleValueChange).toHaveBeenCalledWith('field', 'bar')
-    selectWrapper.simulate('onBlur')
+    selectWrapper.invoke('onBlur')?.({} as any)
     expect(handleLoseFocus).toHaveBeenCalledWith('field')
   })
 })

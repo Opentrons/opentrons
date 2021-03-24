@@ -58,7 +58,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): React.Node => {
   return (
     <PDTitledList
       title={ingredGroup.name || i18n.t('card.unnamedLiquid')}
-      iconProps={{ style: { fill: swatchColors(Number(groupId)) } }}
+      iconProps={{ style: { fill: swatchColors(groupId) } }}
       iconName="circle"
       onCollapseToggle={toggleAccordion}
       collapsed={!expanded}

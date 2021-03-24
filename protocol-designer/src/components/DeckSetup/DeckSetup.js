@@ -4,8 +4,12 @@ import { useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
 import {
-  useOnClickOutside,
+  RobotCoordsText,
   RobotWorkSpace,
+  useOnClickOutside,
+  FONT_SIZE_BODY_1,
+  FONT_WEIGHT_BOLD,
+  TEXT_TRANSFORM_UPPERCASE,
   type RobotWorkSpaceRenderProps,
 } from '@opentrons/components'
 import {
@@ -13,13 +17,14 @@ import {
   type DeckSlot as DeckDefSlot,
   type ModuleRealType,
 } from '@opentrons/shared-data'
+// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import {
   PSEUDO_DECK_SLOTS,
   GEN_ONE_MULTI_PIPETTES,
   MODULES_WITH_COLLISION_ISSUES,
 } from '../../constants'
-import type { TerminalItemId } from '../../steplist'
+import { i18n } from '../../localization'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
@@ -39,6 +44,7 @@ import { SlotWarning } from './SlotWarning'
 import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 
+import type { TerminalItemId } from '../../steplist'
 import type {
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
@@ -48,7 +54,7 @@ import type { LabwareDefByDefURI } from '../../labware-defs'
 
 import styles from './DeckSetup.css'
 
-const DECK_LAYER_BLOCKLIST = [
+export const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
   'fixedBase',
   'doorStops',
@@ -72,10 +78,10 @@ type ContentsProps = {|
   showGen1MultichannelCollisionWarnings: boolean,
 |}
 
-const VIEWBOX_MIN_X = -64
-const VIEWBOX_MIN_Y = -10
-const VIEWBOX_WIDTH = 520
-const VIEWBOX_HEIGHT = 414
+export const VIEWBOX_MIN_X = -64
+export const VIEWBOX_MIN_Y = -10
+export const VIEWBOX_WIDTH = 520
+export const VIEWBOX_HEIGHT = 414
 
 const getSlotDefForModuleSlot = (
   moduleOnDeck: ModuleOnDeck,
@@ -157,7 +163,7 @@ export const getSwapBlocked = (args: {
 
 // TODO IL 2020-01-12: to support dynamic labware/module movement during a protocol,
 // don't use initialDeckSetup here. Use some version of timelineFrameForActiveItem
-const DeckSetupContents = (props: ContentsProps) => {
+export const DeckSetupContents = (props: ContentsProps): React.Node => {
   const {
     initialDeckSetup,
     deckSlotsById,
@@ -397,5 +403,38 @@ export const DeckSetup = (props: Props): React.Node => {
         </div>
       </div>
     </React.Fragment>
+  )
+}
+
+export const NullDeckState = (): React.Node => {
+  const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
+
+  return (
+    <div className={styles.deck_row}>
+      <div className={styles.deck_wrapper}>
+        <RobotWorkSpace
+          deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+          deckDef={deckDef}
+          viewBox={`${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
+          className={styles.robot_workspace}
+        >
+          {() => (
+            <>
+              {/* TODO(IL, 2021-03-15): use styled-components for RobotCoordsText instead of style prop */}
+              <RobotCoordsText
+                x={5}
+                y={375}
+                style={{ textTransform: TEXT_TRANSFORM_UPPERCASE }}
+                fill="#cccccc"
+                fontWeight={FONT_WEIGHT_BOLD}
+                fontSize={FONT_SIZE_BODY_1}
+              >
+                {i18n.t('deck.inactive_deck')}
+              </RobotCoordsText>
+            </>
+          )}
+        </RobotWorkSpace>
+      </div>
+    </div>
   )
 }

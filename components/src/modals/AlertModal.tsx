@@ -13,9 +13,9 @@ export interface AlertModalProps {
   /** optional handler for overlay click */
   onCloseClick?: () => unknown
   /** optional modal heading */
-  heading?: string
+  heading?: React.ReactNode
   /** optional array of `ButtonProps` for `OutlineButton`s at bottom of modal */
-  buttons?: ButtonProps[]
+  buttons?: Array<ButtonProps | null | undefined>
   /** modal contents */
   children: React.ReactNode
   /** optional classes to apply */
@@ -74,7 +74,7 @@ export function AlertModal(props: AlertModalProps): JSX.Element {
       <div className={styles.alert_modal_contents}>{props.children}</div>
       {buttons && (
         <div className={styles.alert_modal_buttons}>
-          {buttons.filter(Boolean).map((button, index) => (
+          {(buttons.filter(Boolean) as ButtonProps[]).map((button, index) => (
             <OutlineButton
               {...button}
               className={cx(styles.alert_button, button.className)}

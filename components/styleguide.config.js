@@ -82,7 +82,7 @@ module.exports = {
     return `import { ${name} } from '@opentrons/components'`
   },
   getExampleFilename(componentPath) {
-    return componentPath.replace(/\.ts$/, '.md')
+    return componentPath.replace(/\.tsx?$/, '.md')
   },
   styles: {
     StyleGuide: {

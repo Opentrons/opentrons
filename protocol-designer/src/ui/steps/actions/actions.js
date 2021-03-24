@@ -1,5 +1,6 @@
 // @flow
 import last from 'lodash/last'
+import { analyticsEvent } from '../../../analytics/actions'
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getMultiSelectLastSelected } from '../selectors'
@@ -8,6 +9,8 @@ import type { StepIdType, StepType } from '../../../form-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
 import type { Timeline } from '../../../step-generation'
 import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
+import type { AnalyticsEvent } from '../../../analytics/mixpanel'
+import type { AnalyticsEventAction } from '../../../analytics/actions'
 import type {
   AddStepAction,
   ExpandAddStepButtonAction,
@@ -145,8 +148,10 @@ export const selectMultipleSteps = (
   dispatch(selectStepAction)
 }
 
-export const selectAllSteps = (): ThunkAction<SelectMultipleStepsAction> => (
-  dispatch: ThunkDispatch<SelectMultipleStepsAction>,
+export const selectAllSteps = (): ThunkAction<
+  SelectMultipleStepsAction | AnalyticsEventAction
+> => (
+  dispatch: ThunkDispatch<SelectMultipleStepsAction | AnalyticsEventAction>,
   getState: GetState
 ) => {
   const allStepIds = stepFormSelectors.getOrderedStepIds(getState())
@@ -156,10 +161,23 @@ export const selectAllSteps = (): ThunkAction<SelectMultipleStepsAction> => (
     payload: { stepIds: allStepIds, lastSelected: last(allStepIds) },
   }
   dispatch(selectStepAction)
+  // dispatch an analytics event to indicate all steps have been selected
+  // because there is no 'SELECT_ALL_STEPS' action that middleware can catch
+  const selectAllStepsEvent: AnalyticsEvent = {
+    name: 'selectAllSteps',
+    properties: {},
+  }
+
+  dispatch(analyticsEvent(selectAllStepsEvent))
 }
 
-export const deselectAllSteps = (): ThunkAction<SelectStepAction> => (
-  dispatch: ThunkDispatch<SelectStepAction>,
+export const EXIT_BATCH_EDIT_MODE_BUTTON_PRESS: 'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS' =
+  'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'
+
+export const deselectAllSteps = (
+  meta?: typeof EXIT_BATCH_EDIT_MODE_BUTTON_PRESS
+): ThunkAction<SelectStepAction | AnalyticsEventAction> => (
+  dispatch: ThunkDispatch<SelectStepAction | AnalyticsEventAction>,
   getState: GetState
 ) => {
   const lastSelectedStepId = getMultiSelectLastSelected(getState())
@@ -173,5 +191,24 @@ export const deselectAllSteps = (): ThunkAction<SelectStepAction> => (
     console.warn(
       'something went wrong, cannot deselect all steps if not in multi select mode'
     )
+  }
+  // dispatch an analytics event to indicate all steps have been deselected
+  // because there is no 'DESELECT_ALL_STEPS'/'EXIT_BATCH_EDIT_MODE' action that middleware can catch
+  if (meta === EXIT_BATCH_EDIT_MODE_BUTTON_PRESS) {
+    // for analytics purposes we want to differentiate between
+    // deselecting all, and using the "exit batch edit mode" button
+    const exitBatchEditModeEvent: AnalyticsEvent = {
+      name: 'exitBatchEditMode',
+      properties: {},
+    }
+
+    dispatch(analyticsEvent(exitBatchEditModeEvent))
+  } else {
+    const deselectAllStepsEvent: AnalyticsEvent = {
+      name: 'deselectAllSteps',
+      properties: {},
+    }
+
+    dispatch(analyticsEvent(deselectAllStepsEvent))
   }
 }

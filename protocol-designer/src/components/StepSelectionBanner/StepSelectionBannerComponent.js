@@ -4,26 +4,26 @@ import startCase from 'lodash/startCase'
 import { css } from 'styled-components'
 import {
   Box,
-  Text,
   Flex,
-  SecondaryBtn,
   Icon,
+  SecondaryBtn,
+  Text,
   ALIGN_CENTER,
   BORDER_STYLE_SOLID,
   BORDER_WIDTH_DEFAULT,
   C_BG_SELECTED,
+  C_DARK_GRAY,
   C_SELECTED_DARK,
   C_WHITE,
-  C_DARK_GRAY,
+  DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_COLUMN,
-  TEXT_TRANSFORM_UPPERCASE,
+  POSITION_STICKY,
   SIZE_2,
   SPACING_3,
-  POSITION_STICKY,
+  TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import type { CountPerStepType, StepType } from '../../form-types'
@@ -97,7 +97,6 @@ export const StepSelectionBannerComponent = (
       padding={SPACING_3}
       color={C_SELECTED_DARK}
       position={POSITION_STICKY}
-      border={`2px solid ${C_SELECTED_DARK}`}
     >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} maxWidth="54.5rem">
         <Flex flexDirection={DIRECTION_COLUMN}>

@@ -84,7 +84,7 @@ describe('form casting', () => {
       mix_wellOrder_second: 'l2r',
       blowout_checkbox: false,
       blowout_location: 'trashId',
-      mix_mmFromBottom: '0.5',
+      mix_mmFromBottom: 0.5,
       pipette: 'FAKE_PIPETTE',
       volume: '5',
       wells: ['A1', 'A2'],

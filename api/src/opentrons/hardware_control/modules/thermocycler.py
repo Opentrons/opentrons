@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from typing import Union, Optional, List, Callable
+from opentrons.drivers.rpi_drivers.types import USBPort
 from ..execution_manager import ExecutionManager
 from . import types, update, mod_abc
 from opentrons.drivers.thermocycler.driver import (
@@ -19,6 +20,7 @@ class Thermocycler(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
+                    usb_port: USBPort,
                     execution_manager: ExecutionManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
@@ -28,6 +30,7 @@ class Thermocycler(mod_abc.AbstractModule):
         """
 
         mod = cls(port=port,
+                  usb_port=usb_port,
                   interrupt_callback=interrupt_callback,
                   simulating=simulating,
                   loop=loop,
@@ -60,12 +63,14 @@ class Thermocycler(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
+                 usb_port: USBPort,
                  execution_manager: ExecutionManager,
                  interrupt_callback: types.InterruptCallback = None,
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None,
                  sim_model: str = None) -> None:
         super().__init__(port=port,
+                         usb_port=usb_port,
                          simulating=simulating,
                          loop=loop,
                          execution_manager=execution_manager)
@@ -192,6 +197,9 @@ class Thermocycler(mod_abc.AbstractModule):
 
         Subject to change without a version bump.
         """
+        if self.is_simulated:
+            return
+
         while self._driver.lid_temp_status != 'holding at target':
             await asyncio.sleep(0.1)
 
@@ -201,6 +209,9 @@ class Thermocycler(mod_abc.AbstractModule):
 
         Subject to change without a version bump.
         """
+        if self.is_simulated:
+            return
+
         while self.status != 'holding at target':
             await asyncio.sleep(0.1)
 
@@ -208,6 +219,9 @@ class Thermocycler(mod_abc.AbstractModule):
         """
         This method returns only when hold time has elapsed
         """
+        if self.is_simulated:
+            return
+
         # If hold time is within the HOLD_TIME_FUZZY_SECONDS time gap, then,
         # because of the driver's status poller delays, it is impossible to
         # know for certain if self.hold_time holds the most recent value.
@@ -322,6 +336,10 @@ class Thermocycler(mod_abc.AbstractModule):
     @property
     def port(self):
         return self._port
+
+    @property
+    def usb_port(self) -> USBPort:
+        return self._usb_port
 
     async def prep_for_update(self):
         await self._driver.enter_programming_mode()

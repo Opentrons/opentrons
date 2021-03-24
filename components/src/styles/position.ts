@@ -1,5 +1,3 @@
-
-
 export const POSITION_STATIC: 'static' = 'static'
 export const POSITION_RELATIVE: 'relative' = 'relative'
 export const POSITION_ABSOLUTE: 'absolute' = 'absolute'

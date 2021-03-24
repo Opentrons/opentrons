@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import styles from './Pill.css'
 
-import type { UseHoverTooltipResult } from '../tooltips'
+import type { UseHoverTooltipTargetProps } from '../tooltips'
 
 // TODO(bc, 2021-03-05): can this color prop actually be null or undefined if not present?
 // if no, then remove the cast to string
@@ -17,10 +17,7 @@ export interface PillProps {
   /** contents of the pill */
   children?: React.ReactNode
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?:
-    | React.ElementType<UseHoverTooltipResult>
-    | null
-    | undefined
+  hoverTooltipHandlers?: UseHoverTooltipTargetProps | null | undefined
 }
 
 /**

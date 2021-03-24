@@ -12,7 +12,7 @@ from opentrons.calibration_storage.helpers import uri_from_definition
 from .. import errors
 from ..resources import DeckFixedLabware
 from ..commands import CompletedCommandType, LoadLabwareResult
-from ..types import LabwareLocation
+from ..types import LabwareLocation, Dimensions
 from .substore import Substore, CommandReactive
 
 
@@ -54,8 +54,12 @@ class LabwareState:
 
     def get_labware_has_quirk(self, labware_id: str, quirk: str) -> bool:
         """Get if a labware has a certain quirk."""
+        return quirk in self.get_quirks(labware_id=labware_id)
+
+    def get_quirks(self, labware_id: str) -> List[str]:
+        """Get a labware's quirks."""
         data = self.get_labware_data_by_id(labware_id)
-        return quirk in data.definition["parameters"].get("quirks", ())
+        return data.definition["parameters"].get("quirks", [])
 
     def get_well_definition(
         self,
@@ -85,6 +89,27 @@ class LabwareState:
     def get_definition_uri(self, labware_id: str) -> str:
         """Get a labware's definition URI."""
         return uri_from_definition(self.get_labware_data_by_id(labware_id).definition)
+
+    def is_tiprack(self, labware_id: str) -> bool:
+        """Get whether labware is a tiprack."""
+        labware_data = self.get_labware_data_by_id(labware_id)
+        return labware_data.definition["parameters"]["isTiprack"]
+
+    def get_load_name(self, labware_id: str) -> str:
+        """Get the labware's load name."""
+        labware_data = self.get_labware_data_by_id(labware_id)
+        return labware_data.definition["parameters"]["loadName"]
+
+    def get_dimensions(self, labware_id: str) -> Dimensions:
+        """Get the labware's dimensions."""
+        labware_data = self.get_labware_data_by_id(labware_id)
+        dims = labware_data.definition["dimensions"]
+
+        return Dimensions(
+            x=dims["xDimension"],
+            y=dims["yDimension"],
+            z=dims["zDimension"],
+        )
 
 
 class LabwareStore(Substore[LabwareState], CommandReactive):

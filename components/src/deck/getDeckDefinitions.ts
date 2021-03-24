@@ -5,7 +5,6 @@ import type { DeckDefinition } from '@opentrons/shared-data'
 // fn imported from shared-data, but this relies on a webpack-specific method,
 // and SD is not webpacked
 
-// $FlowFixMe: require.context is webpack-specific method
 const deckDefinitionsContext = require.context(
   '@opentrons/shared-data/deck/definitions/1',
   true, // traverse subdirectories
@@ -17,7 +16,7 @@ export function getDeckDefinitions(): Record<string, DeckDefinition> {
   const deckDefinitions = deckDefinitionsContext
     .keys()
     .reduce((acc: Record<string, DeckDefinition>, filename: string) => {
-      const def = deckDefinitionsContext(filename)
+      const def = deckDefinitionsContext<DeckDefinition>(filename)
       return { ...acc, [def.otId]: def }
     }, {})
 

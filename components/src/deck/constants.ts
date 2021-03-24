@@ -1,4 +1,3 @@
-
 // ========= OT2 DECK ===============
 export const SLOTNAME_MATRIX = [
   // used for deckmap

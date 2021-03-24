@@ -1,4 +1,3 @@
-
 // icon data
 export const ICON_DATA_BY_NAME = {
   alert: {

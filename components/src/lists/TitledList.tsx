@@ -4,15 +4,17 @@ import cx from 'classnames'
 
 import styles from './lists.css'
 import { Icon } from '../icons'
-import type { IconName } from '../icons'
+import type { IconName, IconProps } from '../icons'
 
 export interface TitledListProps {
+  /** id attribute */
+  id?: string
   /** text of title */
   title: string
   /** optional icon left of the title */
-  iconName?: IconName | null
+  iconName?: IconName | null | undefined
   /** props passed down to icon (`className` and `name` are ignored) */
-  iconProps?: Omit<React.ComponentProps<typeof Icon>, 'name'>
+  iconProps?: Omit<IconProps, 'name'>
   /** optional data test id for the container */
   'data-test'?: string
   // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
@@ -21,7 +23,7 @@ export interface TitledListProps {
   /** additional classnames */
   className?: string
   /** component with descriptive text about the list */
-  description?: JSX.Element
+  description?: React.ReactNode
   /** optional click action (on title div, not children) */
   onClick?: (event: React.MouseEvent) => unknown
   /** optional right click action (on wrapping div) */
@@ -49,6 +51,7 @@ export interface TitledListProps {
  */
 export function TitledList(props: TitledListProps): JSX.Element {
   const {
+    id,
     iconName,
     disabled,
     inert,
@@ -65,7 +68,7 @@ export function TitledList(props: TitledListProps): JSX.Element {
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
-  const handleCollapseToggle = (e: React.MouseEvent) => {
+  const handleCollapseToggle = (e: React.MouseEvent): void => {
     if (onCollapseToggle && !disabled) {
       e.stopPropagation()
       onCollapseToggle(e)
@@ -94,6 +97,7 @@ export function TitledList(props: TitledListProps): JSX.Element {
 
   return (
     <div
+      id={id}
       className={className}
       data-test={dataTest}
       {...{ onMouseEnter, onMouseLeave, onContextMenu }}

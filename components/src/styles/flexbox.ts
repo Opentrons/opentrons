@@ -1,5 +1,3 @@
-
-
 export const FLEX_NONE = 'none'
 export const FLEX_AUTO = 'auto'
 export const FLEX_MIN_CONTENT = 'min-content'

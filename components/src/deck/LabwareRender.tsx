@@ -35,6 +35,7 @@ export function LabwareRender(props: LabwareRenderProps): JSX.Element {
   const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
   return (
     <g
+      /* eslint-disable-next-line @typescript-eslint/restrict-template-expressions */
       transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
     >
       <StaticLabware

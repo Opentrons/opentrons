@@ -5,7 +5,7 @@ import { useMountEffect } from '../useMountEffect'
 
 describe('useMountEffect hook', () => {
   const TestUseMountEffect = (props: {
-    onMount: () => void | (() => void)
+    onMount: React.EffectCallback
   }): JSX.Element => {
     useMountEffect(props.onMount)
     return <></>

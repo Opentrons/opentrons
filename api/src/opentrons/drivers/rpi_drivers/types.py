@@ -1,13 +1,106 @@
 import enum
 from itertools import groupby
-from typing import List, Optional
+from dataclasses import dataclass
+from typing import List, Optional, Tuple
 from opentrons.hardware_control.types import BoardRevision
+from opentrons.algorithms.types import GenericNode
 
 
 class PinDir(enum.Enum):
     rev_input = enum.auto()
     input = enum.auto()
     output = enum.auto()
+
+
+@dataclass(frozen=True)
+class USBPort(GenericNode):
+    port_number: Optional[int] = None
+    device_path: str = ''
+    hub: Optional[int] = None
+
+    @classmethod
+    def build(cls, port_path: str) -> 'USBPort':
+        """
+        Build a USBPort dataclass.
+
+        An example port path:
+        `1-1.3/1-1.3:1.0/tty/ttyACM1/dev`
+
+        :param port_path: Full path of a usb device
+        :returns: Tuple of the port number, hub and name
+        """
+        full_name, device_path = port_path.split(':')
+        port_nodes = cls.get_unique_nodes(full_name)
+        hub, port, name = cls.find_hub(port_nodes)
+        return cls(
+            name=name,
+            port_number=port,
+            sub_names=[],
+            device_path=device_path,
+            hub=hub)
+
+    @staticmethod
+    def find_hub(
+            port_nodes: List[str]
+            ) -> Tuple[Optional[int], int, str]:
+        """
+        Find Hub.
+
+        Here we need to determine if a port is a hub
+        or not. A hub path might look like:
+        `1-1.4/1-1.4/1-1.4.1/1-1.4.1`. When this function
+        is used, the nodes will look like: ['1-1.4', '1-1.4.1'].
+        This function will then be used to check if it is a
+        port hub based on the values given. In the case of the
+        example above, it will determine this device is
+        connected to a hub and return both the port and
+        the hub number. The hub would always be the first number,
+        in this case `4` and the port number of the hub would be `1`.
+
+        :param port_nodes: A list of unique port id(s)
+        :returns: Tuple of the port number, hub and name
+        """
+        if len(port_nodes) > 1:
+            port_info = port_nodes[1].split('.')
+            hub: Optional[int] = int(port_info[1])
+            port = int(port_info[2])
+            name = port_nodes[1]
+        else:
+            port = int(port_nodes[0].split('.')[1])
+            hub = None
+            name = port_nodes[0]
+        return hub, port, name
+
+    @staticmethod
+    def get_unique_nodes(full_name: str) -> List[str]:
+        """
+        Get Unique Nodes.
+
+        A path might look like: `1-1.3/1-1.3`. In this
+        instance we know that the device is on Bus 1 and
+        port 3 of the pi. We only need one unique id
+        here, so we will filter it out.
+
+        :param full_name: Full path of the physical
+        USB Path.
+        :returns: List of separated USB port paths
+        """
+        port_nodes = []
+        for node in full_name.split('/'):
+            if node not in port_nodes:
+                port_nodes.append(node)
+        return port_nodes
+
+    def __hash__(self) -> int:
+        """
+        Hash function.
+
+        To have a unique set of nodes, they must
+        all have a unique hash. Lists are not
+        hashable which is why we need to unpack
+        the list here.
+        """
+        return hash((self.name, *self.sub_names))
 
 
 class GPIOPin:

@@ -15,13 +15,11 @@ export const DEPRECATED_FLAGS = [
   'OT_PD_ENABLE_MIX_DELAY',
   'OT_PD_ENABLE_MIX_DELAY',
   'OT_PD_ENABLE_AIR_GAP_DISPENSE',
+  'BATCH_EDIT_ENABLED',
 ]
 
 // union of feature flag string constant IDs
-export type FlagTypes =
-  | 'PRERELEASE_MODE'
-  | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
-  | 'BATCH_EDIT_ENABLED'
+export type FlagTypes = 'PRERELEASE_MODE' | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
 
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: Array<FlagTypes> = [

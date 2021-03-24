@@ -1,6 +1,7 @@
 import pytest
 
-from opentrons.protocols.implementations.labware import LabwareImplementation
+from opentrons.protocols.context.protocol_api.labware import\
+    LabwareImplementation
 from opentrons.types import Point, Location, Mount
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.labware import Labware, get_labware_definition

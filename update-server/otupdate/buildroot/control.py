@@ -6,11 +6,15 @@ This has endpoints like /restart that aren't specific to update tasks.
 import asyncio
 import logging
 import subprocess
+from functools import lru_cache
+from pathlib import Path
 from typing import Callable, Coroutine, Mapping
 
 from aiohttp import web
 
-from .constants import (RESTART_LOCK_NAME, DEVICE_NAME_VARNAME)
+from .constants import (
+    RESTART_LOCK_NAME, DEVICE_BOOT_ID_NAME, DEVICE_NAME_VARNAME
+)
 
 LOG = logging.getLogger(__name__)
 
@@ -49,7 +53,8 @@ def build_health_endpoint(
                 'systemVersion': version_dict.get(
                     'buildroot_version', 'unknown'),
                 'capabilities': {'buildrootUpdate': '/server/update/begin',
-                                 'restart': '/server/restart'}
+                                 'restart': '/server/restart'},
+                'bootId': request.app[DEVICE_BOOT_ID_NAME]
             },
             headers={'Access-Control-Allow-Origin': '*'}
         )
@@ -59,7 +64,12 @@ def build_health_endpoint(
 def get_serial() -> str:
     """ Get the device serial number. """
     try:
-        with open('/var/serial') as vs:
-            return vs.read().strip()
+        return Path('/var/serial').read_text().strip()
     except OSError:
         return 'unknown'
+
+
+@lru_cache(maxsize=1)
+def get_boot_id() -> str:
+    # See the "/proc Interface" section in man(4) random.
+    return Path('/proc/sys/kernel/random/boot_id').read_text().strip()

@@ -39,8 +39,8 @@ export class HoverTooltip extends React.Component<
   HoverTooltipProps,
   HoverTooltipState
 > {
-  openTimeout: NodeJS.Timeout | null
-  closeTimeout: NodeJS.Timeout | null
+  openTimeout: number | null
+  closeTimeout: number | null
 
   constructor(props: HoverTooltipProps) {
     super(props)
@@ -56,7 +56,7 @@ export class HoverTooltip extends React.Component<
 
   delayedOpen: () => void = () => {
     if (this.closeTimeout) clearTimeout(this.closeTimeout)
-    this.openTimeout = setTimeout(
+    this.openTimeout = window.setTimeout(
       () => this.setState({ isOpen: true }),
       OPEN_DELAY_MS
     )
@@ -64,7 +64,7 @@ export class HoverTooltip extends React.Component<
 
   delayedClose: () => void = () => {
     if (this.openTimeout) clearTimeout(this.openTimeout)
-    this.closeTimeout = setTimeout(
+    this.closeTimeout = window.setTimeout(
       () => this.setState({ isOpen: false }),
       CLOSE_DELAY_MS
     )

@@ -27,6 +27,7 @@ export function AnalyticsSettingsModal(): React.Node {
       <Portal>
         <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
           <AnalyticsToggle />
+          {/* $FlowFixMe(mc, 2021-03-18): this should be a SecondaryBtn */}
           <OutlineButton onClick={setSeen} float="right" margin="0.75rem">
             {CONTINUE}
           </OutlineButton>

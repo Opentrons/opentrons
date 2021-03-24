@@ -190,6 +190,8 @@ class SimulatingDriver:
 
 
 class TCPoller(threading.Thread):
+    POLLING_FD_PATH = '/var/run/'
+
     def __init__(self, port, interrupt_callback, temp_status_callback,
                  lid_status_callback, lid_temp_status_callback):
         if not select:
@@ -206,14 +208,16 @@ class TCPoller(threading.Thread):
         # Note: the options and order of operations for opening file
         # descriptors is very specific. For more info, see:
         # http://pubs.opengroup.org/onlinepubs/007908799/xsh/open.html
-        self._send_path = '/var/run/tc_send_fifo_{}'.format(hash(self))
+        self._send_path = os.path.join(
+            self.POLLING_FD_PATH, f"tc_send_fifo_{hash(self)}")
         os.mkfifo(self._send_path)
         send_read_fd = os.open(
             self._send_path, flags=os.O_RDONLY | os.O_NONBLOCK)
         self._send_read_file = os.fdopen(send_read_fd, 'rb')
         self._send_write_fd = open(self._send_path, 'wb', buffering=0)
 
-        self._halt_path = '/var/run/tc_halt_fifo_{}'.format(hash(self))
+        self._halt_path = os.path.join(
+            self.POLLING_FD_PATH, f"tc_halt_fifo_{hash(self)}")
         os.mkfifo(self._halt_path)
         halt_read_fd = os.open(
             self._halt_path, flags=os.O_RDONLY | os.O_NONBLOCK)

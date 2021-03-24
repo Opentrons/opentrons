@@ -7,9 +7,9 @@ import styles from './structure.css'
 
 export interface LabeledValueProps {
   /** Label */
-  label: string
+  label: React.ReactNode
   /** Value */
-  value: string
+  value: React.ReactNode
   /** Additional className */
   className?: string
   /** Additional value className */

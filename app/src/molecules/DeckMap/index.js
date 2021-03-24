@@ -9,6 +9,7 @@ import { type DeckSlotId } from '@opentrons/shared-data'
 import type { ContextRouter } from 'react-router-dom'
 
 import { RobotWorkSpace, Module as ModuleItem } from '@opentrons/components'
+// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import type { State, Dispatch } from '../../redux/types'

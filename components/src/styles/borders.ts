@@ -1,4 +1,3 @@
-
 // border style constants
 import { C_LIGHT_GRAY, C_MED_GRAY } from './colors'
 

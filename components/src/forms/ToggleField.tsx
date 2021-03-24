@@ -6,7 +6,7 @@ import styles from './forms.css'
 
 export interface ToggleFieldProps {
   /** change handler */
-  onChange: (event: React.SyntheticEvent<HTMLInputElement>) => unknown
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => unknown
   /** checkbox is checked if value is true */
   value?: boolean
   /** classes to apply */

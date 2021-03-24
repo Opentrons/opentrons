@@ -1,0 +1,15 @@
+@import '@opentrons/components';
+
+.module_list_item {
+  padding: 0;
+}
+
+.module_connect_icon {
+  width: 15px;
+  margin-right: 0.5rem;
+}
+
+.active {
+  color: var(--c-highlight);
+  background-color: var(--c-bg-selected);
+}
