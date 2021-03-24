@@ -2,18 +2,23 @@ from typing import List, Set
 from typing_extensions import Protocol
 
 from opentrons.hardware_control.modules.types import ModuleAtPort
+from opentrons.hardware_control.types import BoardRevision
 
 from .types import USBPort
 
 
 class USBDriverInterface(Protocol):
 
+    _board_revision: BoardRevision
+
     @staticmethod
     def read_bus() -> List[str]:
         ...
 
     @staticmethod
-    def convert_port_path(full_port_path: str) -> USBPort:
+    def convert_port_path(
+            full_port_path: str,
+            board_revision: BoardRevision) -> USBPort:
         ...
 
     @staticmethod

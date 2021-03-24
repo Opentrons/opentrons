@@ -78,7 +78,7 @@ class Controller:
             config=self.config, gpio_chardev=self._gpio_chardev,
             handle_locks=False)
         self._cached_fw_version: Optional[str] = None
-        self._usb = usb.USBBus()
+        self._usb = usb.USBBus(self._board_revision)
         try:
             self._module_watcher = aionotify.Watcher()
             self._module_watcher.watch(
