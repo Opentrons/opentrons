@@ -22,7 +22,6 @@
     "@types/file-saver": "2.0.1",
     "@types/jszip": "3.4.1",
     "@types/react-router-dom": "^5.1.7",
-    "@types/react": "16.8.6",
     "@types/webpack-env": "^1.16.0",
     "@types/yup": "0.28.0"
   },
