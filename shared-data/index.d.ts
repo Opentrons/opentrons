@@ -1,18 +1,25 @@
 // Temporary defs until shared-data is actually converted
 
-// TODO IMMEDIATELY add these types
-export type createRegularLabware = any
+// TODO(IL, 2021-03-24): I'm any-typing some of these where there are several
+// other types involved (eg RegularNameProps),
+// when we actually convert shared-data we can get rid of the any's
 
-export type LABWAREV2_DO_NOT_LIST = any
+export type createRegularLabware = (args: any) => LabwareDefinition2
 
-export type getDisplayVolume = any
-export type getLabwareDefURI = any
+export type LABWAREV2_DO_NOT_LIST = string[]
 
-export type createRegularLoadName = any
-export type createDefaultDisplayName = any
+export type getDisplayVolume = (
+  volumeInMicroliters: number,
+  displayUnits?: LabwareVolumeUnits,
+  digits?: number
+) => string
+export type getLabwareDefURI = (def: LabwareDefinition2) => string
 
-export type SLOT_LENGTH_MM = any
-export type SLOT_WIDTH_MM = any
+export type createRegularLoadName = (args: any) => string
+export type createDefaultDisplayName = (args: any) => string
+
+export type SLOT_LENGTH_MM = number
+export type SLOT_WIDTH_MM = number
 
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export interface WellDefinition {
@@ -113,14 +120,12 @@ export type LabwareWellShapeProperties =
     }
 
 // well without x,y,z
-export type LabwareWellProperties = {
-  // TODO IMMEDIATELY how to spread / extend this???
-  // ...LabwareWellShapeProperties,
+export type LabwareWellProperties = LabwareWellShapeProperties & {
   depth: number
   totalLiquidVolume: number
 }
 
-export interface LabwareWell extends LabwareWellProperties {
+export type LabwareWell = LabwareWellProperties & {
   x: number
   y: number
   z: number
