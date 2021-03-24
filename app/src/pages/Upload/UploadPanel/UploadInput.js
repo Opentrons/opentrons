@@ -28,6 +28,7 @@ export function UploadInput(props: UploadInputProps): React.Node {
 
   return (
     <div className={styles.upload}>
+      {/* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion */}
       <Label {...labelProps}>
         {!isButton && <Icon name="upload" className={styles.file_drop_icon} />}
         {labelText}
