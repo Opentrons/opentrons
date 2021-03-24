@@ -45,17 +45,19 @@ export const MoveLiquidForm = (props: StepFormProps): React.Node => {
       <div className={styles.section_wrapper}>
         <SourceDestHeaders
           className={styles.section_column}
-          propsForFields={propsForFields}
           collapsed={collapsed}
-          toggleCollapsed={toggleCollapsed}
+          formData={formData}
           prefix="aspirate"
+          propsForFields={propsForFields}
+          toggleCollapsed={toggleCollapsed}
         />
         <SourceDestHeaders
           className={styles.section_column}
-          propsForFields={propsForFields}
           collapsed={collapsed}
-          toggleCollapsed={toggleCollapsed}
+          formData={formData}
           prefix="dispense"
+          propsForFields={propsForFields}
+          toggleCollapsed={toggleCollapsed}
         />
       </div>
 
