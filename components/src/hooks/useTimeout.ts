@@ -12,9 +12,7 @@ export function useTimeout(
   callback: () => unknown,
   delay: number | null
 ): void {
-  const savedCallback: React.MutableRefObject<
-    (() => unknown) | undefined
-  > = useRef()
+  const savedCallback = useRef<() => unknown>()
 
   // remember the latest callback
   useEffect(() => {
