@@ -88,7 +88,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       id={id}
       onChange={option => {
         // TODO(mc, 2021-03-19): use optional chaining
-        const value = option != null && option.value ? option.value : null
+        const value = option && option.value ? option.value : null
         props.onPipetteChange(value)
       }}
       formatOptionLabel={(option, { context }) => {
@@ -96,7 +96,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
         const label = option.label || value
         const specs = allPipetteNameSpecs.find(s => s.name === value)
 
-        return context === CONTEXT_VALUE || value === '' || specs == null ? (
+        return context === CONTEXT_VALUE || value === '' || !specs ? (
           label
         ) : (
           <PipetteNameItem {...specs} />
