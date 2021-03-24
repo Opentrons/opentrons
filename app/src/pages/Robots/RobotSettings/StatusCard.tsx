@@ -25,7 +25,7 @@ import type { ViewableRobot } from '../../../redux/discovery/types'
 
 type Props = { robot: ViewableRobot }
 
-export function StatusCard(props: Props): React.ReactNode {
+export function StatusCard(props: Props): JSX.Element {
   const { robot } = props
   const dispatch = useDispatch<Dispatch>()
   const { t } = useTranslation('robot_connection')

@@ -43,7 +43,7 @@ export const TemperatureControl = ({
   isSecondaryTemp,
   sendModuleCommand,
   disabledReason,
-}: Props): React.ReactNode => {
+}: Props): JSX.Element => {
   const [tempValue, setTempValue] = React.useState(null)
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [targetProps, tooltipProps] = useHoverTooltip()

@@ -5,6 +5,6 @@ export interface CardContainerProps {
   children: React.ReactNode
 }
 
-export function CardContainer(props: CardContainerProps): React.ReactNode {
+export function CardContainer(props: CardContainerProps): JSX.Element {
   return <div className={styles.card_container}>{props.children}</div>
 }

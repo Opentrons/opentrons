@@ -5,7 +5,7 @@ interface Props {
   status: string
 }
 
-export function StatusItem(props: Props): React.ReactNode {
+export function StatusItem(props: Props): JSX.Element {
   return (
     <div className={styles.status_item_wrapper}>
       <span className={styles.label}>Status: </span>

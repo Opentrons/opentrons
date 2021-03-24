@@ -3,7 +3,7 @@ import { Box, C_LIGHT_GRAY, SPACING_1 } from '@opentrons/components'
 
 type Props = React.ElementProps<typeof Box>
 
-export function Divider(props: Props): React.ReactNode {
+export function Divider(props: Props): JSX.Element {
   return (
     <Box
       borderBottom={`1px solid ${C_LIGHT_GRAY}`}

@@ -59,7 +59,7 @@ const DetailItem = ({
 export const U2EDeviceDetails = ({
   device,
   ifaces,
-}: U2EDeviceDetailsProps): React.ReactNode => {
+}: U2EDeviceDetailsProps): JSX.Element => {
   const nwIfaceName = ifaces.length > 0 ? ifaces[0].name : NOT_ASSIGNED
 
   return (

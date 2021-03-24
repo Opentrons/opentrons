@@ -58,7 +58,7 @@ const formatOptions = (
   return options
 }
 
-export function SelectSsid(props: SelectSsidProps): React.ReactNode {
+export function SelectSsid(props: SelectSsidProps): JSX.Element {
   const {
     list,
     value,

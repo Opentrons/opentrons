@@ -4,7 +4,7 @@ import * as React from 'react'
 type Props = { children: React.ReactNode }
 
 // replace Portal with a pass-through React.Fragment
-export const Portal = ({ children }: Props): React.ReactNode => <>{children}</>
+export const Portal = ({ children }: Props): JSX.Element => <>{children}</>
 
 export const PortalRoot = (): React.ReactNode => <></>
 export const TopPortalRoot = (): React.ReactNode => <></>

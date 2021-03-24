@@ -15,7 +15,7 @@ type Props = {
   ...React.ElementProps<typeof Box>,
 }
 
-export function LabeledValue(props: Props): React.ReactNode {
+export function LabeledValue(props: Props): JSX.Element {
   const {
     label,
     value,

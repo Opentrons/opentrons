@@ -70,7 +70,7 @@ export const MagnetControl = ({
   module,
   sendModuleCommand,
   disabledReason,
-}: Props): React.ReactNode => {
+}: Props): JSX.Element => {
   const [engageHeightValue, setEngageHeightValue] = React.useState(null)
   const [isModalOpen, setIsModalOpen] = React.useState(false)
 

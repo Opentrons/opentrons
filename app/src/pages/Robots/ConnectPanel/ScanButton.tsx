@@ -10,7 +10,7 @@ export type ScanButtonProps = {
   found: boolean,
 }
 
-export function ScanButton(props: ScanButtonProps): React.ReactNode {
+export function ScanButton(props: ScanButtonProps): JSX.Element {
   const { isScanning, onScanClick, found } = props
   const { t } = useTranslation()
 

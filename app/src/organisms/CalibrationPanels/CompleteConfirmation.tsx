@@ -46,7 +46,7 @@ const contentsBySessionType: { [SessionType]: { headerText: string } } = {
   },
 }
 
-export function CompleteConfirmation(props: CalibrationPanelProps): React.ReactNode {
+export function CompleteConfirmation(props: CalibrationPanelProps): JSX.Element {
   const {
     sessionType,
     calBlock,

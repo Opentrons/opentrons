@@ -7,7 +7,7 @@ export interface CardContentRowProps {
   className?: string
 }
 
-export function CardContentRow(props: CardContentRowProps): React.ReactNode {
+export function CardContentRow(props: CardContentRowProps): JSX.Element {
   return (
     <div className={cx(styles.card_row, props.className)}>{props.children}</div>
   )

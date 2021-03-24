@@ -30,7 +30,7 @@ export type InstrumentItemProps = {
   pipetteOffsetData?: [number, number, number] | null,
 }
 
-export function InstrumentItem(props: InstrumentItemProps): React.ReactNode {
+export function InstrumentItem(props: InstrumentItemProps): JSX.Element {
   const {
     compatibility,
     mount,

@@ -38,7 +38,7 @@ type Props = {
   tiprackDisplayName: string,
 }
 
-export function ConfirmRecalibrationModal(props: Props): React.ReactNode {
+export function ConfirmRecalibrationModal(props: Props): JSX.Element {
   const { confirm, cancel, tiprackDisplayName } = props
 
   return (

@@ -16,7 +16,7 @@ const renderer = remark().use(reactRenderer, {
 
 const DEFAULT_RELEASE_NOTES = 'We recommend upgrading to the latest version.'
 
-export function ReleaseNotes(props: ReleaseNotesProps): React.ReactNode {
+export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
   const { source } = props
 
   return (

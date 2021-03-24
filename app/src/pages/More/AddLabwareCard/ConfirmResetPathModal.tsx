@@ -30,7 +30,7 @@ export type ConfirmResetPathModalProps = {
 export const ConfirmResetPathModalTemplate = ({
   onCancel,
   onConfirm,
-}: ConfirmResetPathModalProps): React.ReactNode => (
+}: ConfirmResetPathModalProps): JSX.Element => (
   <AlertModal
     alertOverlay
     heading={RESET_CUSTOM_LABWARE_SOURCE}

@@ -90,7 +90,7 @@ type PipetteOffsetSectionProps = {
   calibration: PipetteOffsetCalibration | null,
 }
 
-function PipetteOffsetSection(props: PipetteOffsetSectionProps): React.ReactNode {
+function PipetteOffsetSection(props: PipetteOffsetSectionProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const { pipette, calibration } = props
   return (
@@ -122,7 +122,7 @@ type TipLengthSectionProps = {
   customLabware: Array<LabwareDefinition2>,
 }
 
-export function TipLengthSection(props: TipLengthSectionProps): React.ReactNode {
+export function TipLengthSection(props: TipLengthSectionProps): JSX.Element {
   const { calibration, customLabware } = props
   const { t } = useTranslation('robot_calibration')
   return (
@@ -151,7 +151,7 @@ export function TipLengthSection(props: TipLengthSectionProps): React.ReactNode 
   )
 }
 
-export function PipetteOffsetItem(props: Props): React.ReactNode {
+export function PipetteOffsetItem(props: Props): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const { mount, pipette, calibration, customLabware } = props
   return (

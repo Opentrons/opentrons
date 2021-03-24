@@ -23,7 +23,7 @@ export const RobotItem: React.AbstractComponent<
   $Diff<RobotItemProps, ContextRouter>
 > = withRouter(RobotItemComponent)
 
-export function RobotItemComponent(props: RobotItemProps): React.ReactNode {
+export function RobotItemComponent(props: RobotItemProps): JSX.Element {
   const { robot, match } = props
   const { name, displayName, status, local: isLocal } = robot
   const isUpgradable = useSelector((state: State) => {

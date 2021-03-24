@@ -82,7 +82,7 @@ type Props = {
   isChangingOrConfiguringPipette: boolean,
 }
 
-export function PipetteCalibrationInfo(props: Props): React.ReactNode {
+export function PipetteCalibrationInfo(props: Props): JSX.Element {
   const {
     robotName,
     serialNumber,

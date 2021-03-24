@@ -10,7 +10,7 @@ type Props = {
   url: string,
 }
 
-export function ResourceCard(props: Props): React.ReactNode {
+export function ResourceCard(props: Props): JSX.Element {
   return (
     <Card title={props.title}>
       <div className={styles.card_content}>

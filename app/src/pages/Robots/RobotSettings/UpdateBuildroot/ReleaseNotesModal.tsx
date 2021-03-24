@@ -18,7 +18,7 @@ export type ReleaseNotesModalProps = {
   proceed: () => mixed,
 }
 
-export function ReleaseNotesModal(props: ReleaseNotesModalProps): React.ReactNode {
+export function ReleaseNotesModal(props: ReleaseNotesModalProps): JSX.Element {
   const { robotName, notNowButton, releaseNotes, systemType, proceed } = props
   const dispatch = useDispatch<Dispatch>()
 

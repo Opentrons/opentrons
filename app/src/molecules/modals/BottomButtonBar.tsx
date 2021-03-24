@@ -14,7 +14,7 @@ type Props = {
   description?: React.ReactNode,
 }
 
-export function BottomButtonBar(props: Props): React.ReactNode {
+export function BottomButtonBar(props: Props): JSX.Element {
   const buttons = props.buttons.filter(Boolean)
   const className = cx(styles.bottom_button_bar, props.className)
 

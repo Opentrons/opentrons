@@ -7,7 +7,7 @@ export interface CardContentFullProps {
   className?: string
 }
 
-export function CardContentFull(props: CardContentFullProps): React.ReactNode {
+export function CardContentFull(props: CardContentFullProps): JSX.Element {
   return (
     <div className={cx(styles.card_content_full, props.className)}>
       {props.children}

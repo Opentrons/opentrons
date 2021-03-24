@@ -15,7 +15,7 @@ type StepSizeControlProps = {
   currentStepSize: StepSize,
   setCurrentStepSize: StepSize => void,
 }
-export function StepSizeControl(props: StepSizeControlProps): React.ReactNode {
+export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   const { stepSizes, currentStepSize, setCurrentStepSize } = props
 
   const increaseStepSize: () => void = () => {

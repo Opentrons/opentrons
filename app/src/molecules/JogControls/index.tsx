@@ -30,7 +30,7 @@ export type JogControlsProps = {
 
 export { HORIZONTAL_PLANE, VERTICAL_PLANE }
 
-export function JogControls(props: JogControlsProps): React.ReactNode {
+export function JogControls(props: JogControlsProps): JSX.Element {
   const {
     stepSizes = DEFAULT_STEP_SIZES,
     planes = [HORIZONTAL_PLANE, VERTICAL_PLANE],

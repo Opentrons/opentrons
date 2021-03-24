@@ -15,7 +15,7 @@ export type RobotLinkProps = {
   disabled?: boolean,
 }
 
-export function RobotLink(props: RobotLinkProps): React.ReactNode {
+export function RobotLink(props: RobotLinkProps): JSX.Element {
   const { url } = props
   const className = cx(styles.robot_link, props.className, {
     [styles.disabled]: props.disabled,

@@ -20,7 +20,7 @@ export type OpenJupyterControlProps = {
   robotIp: string,
 }
 
-export function OpenJupyterControl(props: OpenJupyterControlProps): React.ReactNode {
+export function OpenJupyterControl(props: OpenJupyterControlProps): JSX.Element {
   const { robotIp } = props
   const { t } = useTranslation(['robot_advanced_settings', 'shared'])
   const href = `http://${robotIp}:48888`

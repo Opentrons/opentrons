@@ -5,6 +5,6 @@ export interface CardColumnProps {
   children: React.ReactNode
 }
 
-export function CardColumn(props: CardColumnProps): React.ReactNode {
+export function CardColumn(props: CardColumnProps): JSX.Element {
   return <div className={styles.column_50}>{props.children}</div>
 }

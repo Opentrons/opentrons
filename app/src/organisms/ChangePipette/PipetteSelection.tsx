@@ -9,7 +9,7 @@ export type PipetteSelectionProps = {
   ...React.ElementProps<typeof PipetteSelect>,
 }
 
-export function PipetteSelection(props: PipetteSelectionProps): React.ReactNode {
+export function PipetteSelection(props: PipetteSelectionProps): JSX.Element {
   return (
     <label className={styles.pipette_selection}>
       <span className={styles.pipette_selection_label}>{LABEL}</span>

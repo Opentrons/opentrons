@@ -96,7 +96,7 @@ const contentsBySessionType: {
   },
 }
 
-export function SaveZPoint(props: CalibrationPanelProps): React.ReactNode {
+export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
   const { isMulti, mount, sendCommands, sessionType } = props
 
   const { headerText, buttonText, buttonEffectText } = contentsBySessionType[

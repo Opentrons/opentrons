@@ -30,7 +30,7 @@ export function TitledControl({
   control,
   children,
   ...styleProps
-}: TitledControlProps): React.ReactNode {
+}: TitledControlProps): JSX.Element {
   return (
     <Box fontSize={FONT_SIZE_BODY_1} padding={SPACING_3} {...styleProps}>
       <Flex alignItems={ALIGN_CENTER}>

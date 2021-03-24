@@ -23,7 +23,7 @@ const LIST_REFRESH_MS = 10000
 
 export const SelectNetwork = ({
   robotName,
-}: SelectNetworkProps): React.ReactNode => {
+}: SelectNetworkProps): JSX.Element => {
   const list = useSelector((state: State) =>
     Networking.getWifiList(state, robotName)
   )

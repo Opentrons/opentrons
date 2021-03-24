@@ -18,7 +18,7 @@ export type ProceedToRunProps = {
   returnTip: () => mixed,
 }
 
-export function ProceedToRun(props: ProceedToRunProps): React.ReactNode {
+export function ProceedToRun(props: ProceedToRunProps): JSX.Element {
   const { returnTip } = props
   const dispatch = useDispatch<Dispatch>()
   const sessionModules = useSelector(robotSelectors.getModules)

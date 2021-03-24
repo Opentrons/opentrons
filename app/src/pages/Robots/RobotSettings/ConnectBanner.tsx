@@ -6,7 +6,7 @@ import type { Robot } from '../../../redux/discovery/types'
 
 type Props = Robot
 
-export function ConnectBanner(props: Props): React.ReactNode {
+export function ConnectBanner(props: Props): JSX.Element {
   const { displayName, connected } = props
 
   const { t } = useTranslation('robot_connection')

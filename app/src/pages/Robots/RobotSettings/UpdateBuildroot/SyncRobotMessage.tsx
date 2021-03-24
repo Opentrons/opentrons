@@ -8,7 +8,7 @@ export type SyncRobotMessageProps = {
   version: string,
 }
 
-export function SyncRobotMessage(props: SyncRobotMessageProps): React.ReactNode {
+export function SyncRobotMessage(props: SyncRobotMessageProps): JSX.Element {
   const { updateType, version } = props
 
   if (updateType === REINSTALL) return null

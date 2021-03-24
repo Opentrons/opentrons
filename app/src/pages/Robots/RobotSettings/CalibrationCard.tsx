@@ -65,7 +65,7 @@ const attachedPipetteCalPresent: (
   return true
 }
 
-export function CalibrationCard(props: Props): React.ReactNode {
+export function CalibrationCard(props: Props): JSX.Element {
   const { robot, pipettesPageUrl } = props
   const { name: robotName, status } = robot
   const notConnectable = status !== CONNECTABLE

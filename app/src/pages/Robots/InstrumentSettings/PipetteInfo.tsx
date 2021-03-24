@@ -48,7 +48,7 @@ const CHANGE = 'change'
 const ATTACH = 'attach'
 const NONE = 'none'
 
-export function PipetteInfo(props: PipetteInfoProps): React.ReactNode {
+export function PipetteInfo(props: PipetteInfoProps): JSX.Element {
   const {
     robotName,
     mount,

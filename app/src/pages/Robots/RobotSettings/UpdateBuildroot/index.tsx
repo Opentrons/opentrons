@@ -22,7 +22,7 @@ export type UpdateBuildrootProps = {
   close: () => mixed,
 }
 
-export function UpdateBuildroot(props: UpdateBuildrootProps): React.ReactNode {
+export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
   const { robot, close } = props
   const robotName = robot.name
   const [viewUpdateInfo, setViewUpdateInfo] = React.useState(false)

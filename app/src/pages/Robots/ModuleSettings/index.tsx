@@ -9,7 +9,7 @@ export type ModuleSettingsProps = {
   robotDisplayName: string,
 }
 
-export function ModuleSettings(props: ModuleSettingsProps): React.ReactNode {
+export function ModuleSettings(props: ModuleSettingsProps): JSX.Element {
   const { robotName, robotDisplayName } = props
   const titleBarProps = { title: robotDisplayName }
 

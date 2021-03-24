@@ -54,7 +54,7 @@ export type Props = {
   pipOffsetDataPresent: boolean,
 }
 
-export function DeckCalibrationControl(props: Props): React.ReactNode {
+export function DeckCalibrationControl(props: Props): JSX.Element {
   const {
     robotName,
     disabledReason,

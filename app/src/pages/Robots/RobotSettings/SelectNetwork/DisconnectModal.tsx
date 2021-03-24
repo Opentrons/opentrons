@@ -13,7 +13,7 @@ export const DisconnectModal = ({
   ssid,
   onDisconnect,
   onCancel,
-}: DisconnectModalProps): React.ReactNode => (
+}: DisconnectModalProps): JSX.Element => (
   <AlertModal
     alertOverlay
     iconName="wifi"

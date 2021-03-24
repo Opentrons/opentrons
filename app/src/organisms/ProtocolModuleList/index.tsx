@@ -91,7 +91,7 @@ type UsbPortInfoProps = {
   moduleMissing: boolean,
 }
 
-function UsbPortInfo(props: UsbPortInfoProps): React.ReactNode {
+function UsbPortInfo(props: UsbPortInfoProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation('protocol_calibration')
   if (props.moduleMissing) return null

@@ -7,7 +7,7 @@ export interface RunTimerProps {
   runTime: string
 }
 
-export function RunTimer(props: RunTimerProps): React.ReactNode {
+export function RunTimer(props: RunTimerProps): JSX.Element {
   const { startTime, runTime } = props
   const startTimeStamp = startTime ?? ''
 

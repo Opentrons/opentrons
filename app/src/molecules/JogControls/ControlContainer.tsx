@@ -16,7 +16,7 @@ type ControlContainerProps = {
   children: React.ReactNode,
 }
 
-export function ControlContainer(props: ControlContainerProps): React.ReactNode {
+export function ControlContainer(props: ControlContainerProps): JSX.Element {
   return (
     <Flex flex={1} alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
       <Text css={FONT_HEADER_DARK}>{props.title}</Text>

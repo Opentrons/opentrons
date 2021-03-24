@@ -18,7 +18,7 @@ export type ProtocolLabwareProps = {
 // TODO(mc, 2020-07-27): i18n
 const REQUIRED_LABWARE = 'Required Labware'
 
-export function ProtocolLabwareCard(props: ProtocolLabwareProps): React.ReactNode {
+export function ProtocolLabwareCard(props: ProtocolLabwareProps): JSX.Element {
   const { robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const labwareList = useSelector((state: State) => {

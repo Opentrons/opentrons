@@ -16,7 +16,7 @@ type Props = {
   module: AttachedModule,
 }
 
-export function ModuleInfo(props: Props): React.ReactNode {
+export function ModuleInfo(props: Props): JSX.Element {
   const { serial, fwVersion } = props.module
 
   return (

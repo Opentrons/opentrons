@@ -19,7 +19,7 @@ const EXIT_PROGRAM = 'see calibration health check results'
 const CONTINUE = 'continue to the next tiprack'
 const EXIT = 'continue to the result summary'
 
-export function ReturnTip(props: CalibrationPanelProps): React.ReactNode {
+export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
   const { sendCommands, checkBothPipettes, activePipette, instruments } = props
   const onFinalPipette =
     !checkBothPipettes ||

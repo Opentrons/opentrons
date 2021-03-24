@@ -39,7 +39,7 @@ const PIPETTES = 'Pipettes'
 
 const FETCH_PIPETTES_INTERVAL_MS = 5000
 
-export function AttachedPipettesCard(props: Props): React.ReactNode {
+export function AttachedPipettesCard(props: Props): JSX.Element {
   const {
     robotName,
     makeChangeUrl,

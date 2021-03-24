@@ -8,7 +8,7 @@ import styles from './styles.css'
 
 type Props = React.ElementProps<typeof AlertModal>
 
-export function ScrollableAlertModal(props: Props): React.ReactNode {
+export function ScrollableAlertModal(props: Props): JSX.Element {
   return (
     <AlertModal
       {...omit(props, 'buttons', 'children')}

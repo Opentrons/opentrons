@@ -77,7 +77,7 @@ type ConnectionInfoProps = {
   disabled: ?boolean,
 }
 
-export function ConnectionInfo(props: ConnectionInfoProps): React.ReactNode {
+export function ConnectionInfo(props: ConnectionInfoProps): JSX.Element {
   const { connection, title, wired, children, disabled } = props
   const labelStyles = cx(styles.connection_label, {
     [styles.disabled]: disabled,

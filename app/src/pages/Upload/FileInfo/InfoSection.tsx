@@ -6,7 +6,7 @@ export interface InfoSectionProps {
   children: React.ReactNode
 }
 
-export function InfoSection(props: InfoSectionProps): React.ReactNode {
+export function InfoSection(props: InfoSectionProps): JSX.Element {
   return (
     <section className={styles.info_section}>
       <h3 className={styles.title}>{props.title}</h3>

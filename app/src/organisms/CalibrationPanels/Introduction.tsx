@@ -383,7 +383,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
   }
 }
 
-export function Introduction(props: CalibrationPanelProps): React.ReactNode {
+export function Introduction(props: CalibrationPanelProps): JSX.Element {
   const {
     tipRack,
     calBlock,

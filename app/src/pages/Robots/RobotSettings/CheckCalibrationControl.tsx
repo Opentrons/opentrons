@@ -37,7 +37,7 @@ const spinnerCommandBlockList: Array<SessionCommandString> = [
 export function CheckCalibrationControl({
   robotName,
   disabledReason,
-}: CheckCalibrationControlProps): React.ReactNode {
+}: CheckCalibrationControlProps): JSX.Element {
   const { t } = useTranslation(['robot_calibration', 'shared'])
   const [targetProps, tooltipProps] = useHoverTooltip()
 

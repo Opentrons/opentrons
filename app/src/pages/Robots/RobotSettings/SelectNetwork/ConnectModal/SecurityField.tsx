@@ -30,7 +30,7 @@ const makeEapOptionsGroup = (eapOptions: Array<EapOption>) => ({
   })),
 })
 
-export const SecurityField = (props: SecurityFieldProps): React.ReactNode => {
+export const SecurityField = (props: SecurityFieldProps): JSX.Element => {
   const {
     id,
     name,

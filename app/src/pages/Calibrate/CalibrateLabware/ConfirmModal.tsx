@@ -15,7 +15,7 @@ export type ConfirmModalProps = {
   onBackClick: () => mixed,
 }
 
-export function ConfirmModal(props: ConfirmModalProps): React.ReactNode {
+export function ConfirmModal(props: ConfirmModalProps): JSX.Element {
   const { labware, onBackClick, calibrateToBottom } = props
 
   // disable back click if we're moving or if we've loaded up with tips

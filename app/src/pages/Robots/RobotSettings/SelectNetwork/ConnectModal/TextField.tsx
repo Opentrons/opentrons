@@ -19,7 +19,7 @@ export type TextFieldProps = {
   className?: string,
 }
 
-export const TextField = (props: TextFieldProps): React.ReactNode => {
+export const TextField = (props: TextFieldProps): JSX.Element => {
   const { id, name, label, isPassword, className } = props
   const { value, error, onChange, onBlur } = useConnectFormField(name)
   const [showPw, toggleShowPw] = React.useReducer(show => !show, false)

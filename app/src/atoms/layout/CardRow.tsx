@@ -5,6 +5,6 @@ export interface CardRowProps {
   children: React.ReactNode
 }
 
-export function CardRow(props: CardRowProps): React.ReactNode {
+export function CardRow(props: CardRowProps): JSX.Element {
   return <div className={styles.row}>{props.children}</div>
 }

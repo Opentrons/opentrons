@@ -21,7 +21,7 @@ export type SessionAlertProps = {
   onResetClick: () => mixed,
 }
 
-export function SessionAlert(props: SessionAlertProps): React.ReactNode {
+export function SessionAlert(props: SessionAlertProps): JSX.Element {
   const { sessionStatus, sessionStatusInfo, className, onResetClick } = props
   const sessionError = useSelector(getSessionError)
 

@@ -54,7 +54,7 @@ const UPDATE_FRAGMENT = 'update'
 const RESET_FRAGMENT = 'reset'
 const INSTRUMENTS_FRAGMENT = 'instruments'
 
-export function RobotSettings(props: Props): React.ReactNode {
+export function RobotSettings(props: Props): JSX.Element {
   const { robot } = props
   const { name: robotName } = robot
 

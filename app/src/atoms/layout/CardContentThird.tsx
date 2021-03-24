@@ -7,7 +7,7 @@ export interface CardContentThirdProps {
   className?: string
 }
 
-export function CardContentThird(props: CardContentThirdProps): React.ReactNode {
+export function CardContentThird(props: CardContentThirdProps): JSX.Element {
   return (
     <div className={cx(styles.card_content_third, props.className)}>
       {props.children}

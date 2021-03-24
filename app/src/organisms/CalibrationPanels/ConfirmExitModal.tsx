@@ -35,7 +35,7 @@ const warningBySessionType: { [SessionType]: string } = {
     'If you exit now, you will not get any data about your calibration health.',
 }
 
-export function ConfirmExitModal(props: ConfirmExitModalProps): React.ReactNode {
+export function ConfirmExitModal(props: ConfirmExitModalProps): JSX.Element {
   const { back, exit, sessionType } = props
 
   return (

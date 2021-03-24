@@ -20,7 +20,7 @@ export type ToggleBtnProps = {
   ...StyleProps,
 }
 
-export function ToggleBtn(props: ToggleBtnProps): React.ReactNode {
+export function ToggleBtn(props: ToggleBtnProps): JSX.Element {
   const { label, toggledOn, disabled, ...buttonProps } = props
   const iconName = toggledOn ? 'ot-toggle-switch-on' : 'ot-toggle-switch-off'
   let color = C_DARK_GRAY

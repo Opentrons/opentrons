@@ -7,7 +7,7 @@ export interface CardContentHalfProps {
   className?: string
 }
 
-export function CardContentHalf(props: CardContentHalfProps): React.ReactNode {
+export function CardContentHalf(props: CardContentHalfProps): JSX.Element {
   return (
     <div className={cx(styles.card_content_50, props.className)}>
       {props.children}

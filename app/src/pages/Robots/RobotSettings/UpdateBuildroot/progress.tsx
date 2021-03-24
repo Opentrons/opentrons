@@ -20,7 +20,7 @@ export type ProgressBarProps = {
   progress: number | null,
 }
 
-export function ProgressBar(props: ProgressBarProps): React.ReactNode {
+export function ProgressBar(props: ProgressBarProps): JSX.Element {
   const progress = props.progress || 0
   const width = `${progress}%`
 

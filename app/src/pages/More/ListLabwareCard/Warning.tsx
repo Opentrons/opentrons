@@ -7,7 +7,7 @@ export interface WarningProps {
   children: React.ReactNode
 }
 
-export function Warning(props: WarningProps): React.ReactNode {
+export function Warning(props: WarningProps): JSX.Element {
   const { children } = props
 
   return (

@@ -8,7 +8,7 @@ export type ConnectAlertModalProps = {
   onCloseClick: () => mixed,
 }
 
-export function ConnectAlertModal(props: ConnectAlertModalProps): React.ReactNode {
+export function ConnectAlertModal(props: ConnectAlertModalProps): JSX.Element {
   const { onCloseClick } = props
   const { t } = useTranslation('robot_connection')
 

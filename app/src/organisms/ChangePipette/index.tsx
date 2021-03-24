@@ -59,7 +59,7 @@ const CANCEL = 'Cancel'
 const MOUNT = 'mount'
 const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 
-export function ChangePipette(props: Props): React.ReactNode {
+export function ChangePipette(props: Props): JSX.Element {
   const { robotName, mount, closeModal } = props
   const dispatch = useDispatch<Dispatch>()
   const finalRequestId = React.useRef<string | null>(null)

@@ -10,7 +10,7 @@ export type PageProps = {
   children: React.ReactNode,
 }
 
-export function Page(props: PageProps): React.ReactNode {
+export function Page(props: PageProps): JSX.Element {
   const { titleBarProps, children } = props
 
   return (

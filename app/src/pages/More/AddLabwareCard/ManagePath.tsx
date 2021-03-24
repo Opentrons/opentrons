@@ -28,7 +28,7 @@ const handleFocus = (e: SyntheticFocusEvent<HTMLInputElement>) => {
   e.currentTarget.select()
 }
 
-export function ManagePath(props: ManagePathProps): React.ReactNode {
+export function ManagePath(props: ManagePathProps): JSX.Element {
   const { path, onChangePath, onResetPath, onOpenPath } = props
   const [confirmResetIsOpen, toggleConfirmResetIsOpen] = React.useReducer(
     open => !open,

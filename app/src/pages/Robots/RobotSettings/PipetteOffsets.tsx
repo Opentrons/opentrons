@@ -28,7 +28,7 @@ type Props = {
   robot: ViewableRobot,
 }
 
-export function PipetteOffsets(props: Props): React.ReactNode {
+export function PipetteOffsets(props: Props): JSX.Element {
   const { pipettesPageUrl, robot } = props
   const { name: robotName } = robot
 

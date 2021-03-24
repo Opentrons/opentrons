@@ -36,7 +36,7 @@ const PERFORM_A_FULL_UNINSTALL = (
   </>
 )
 
-export function DowngradeAppControl(props: StyleProps): React.ReactNode {
+export function DowngradeAppControl(props: StyleProps): JSX.Element {
   return (
     <TitledControl
       {...props}

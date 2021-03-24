@@ -7,7 +7,7 @@ export interface CardContentFlexProps {
   className?: string
 }
 
-export function CardContentFlex(props: CardContentFlexProps): React.ReactNode {
+export function CardContentFlex(props: CardContentFlexProps): JSX.Element {
   return (
     <div className={cx(styles.card_content_flex, props.className)}>
       {props.children}

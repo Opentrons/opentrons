@@ -20,7 +20,7 @@ import type { Dispatch } from '../../../redux/types'
 
 export type ReviewDeckProps = { slot: ?string }
 
-export function ReviewDeck(props: ReviewDeckProps): React.ReactNode {
+export function ReviewDeck(props: ReviewDeckProps): JSX.Element {
   const { slot } = props
 
   const dispatch = useDispatch<Dispatch>()
