@@ -307,7 +307,8 @@ def test_move_with_split(smoothie, monkeypatch):
 
     smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'C': 3})
     expected = [
-        ['M55 M92 C0.03125 G4 P0.01 G0 F60 M907 A0.1 B0.05 C1.75 X1.25 Y1.25 Z0.8 G4 P0.005'],
+        ['M55 M92 C0.03125 G4 P0.01 G0 F60 M907 A0.1 B0.05 C1.75 X1.25 Y1.25 '
+         'Z0.8 G4 P0.005'],
         ['M400'],
         ['G0 C18.0'],
         ['M400'],
@@ -324,7 +325,8 @@ def test_move_with_split(smoothie, monkeypatch):
     smoothie.move({'B': 2})
 
     expected = [
-        ['M53 M92 B0.03125 G4 P0.01 G0 F60 M907 A0.1 B1.75 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
+        ['M53 M92 B0.03125 G4 P0.01 G0 F60 M907 A0.1 B1.75 C0.05 '
+         'X0.3 Y0.3 Z0.1 G4 P0.005'],
         ['M400'],
         ['G0 B18.0'],
         ['M400'],
