@@ -2,7 +2,6 @@
   "name": "@opentrons/components",
   "version": "4.2.0",
   "description": "React components library for Opentrons' projects",
-  "main": "lib/index.js",
   "flow:main": "flow-types/index.js.flow",
   "source": "src/index.ts",
   "types": "lib/index.d.ts",
