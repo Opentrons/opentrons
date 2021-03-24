@@ -114,33 +114,33 @@ const spacingStyles = (props: Types.StyleProps): CSSObject => {
   const { marginX, marginY, paddingX, paddingY, ...styles } = pick(
     props,
     SPACING_PROPS
-  ) as CSSObject
+  )
 
   if (marginX != null) {
     styles.marginRight =
-      styles.marginRight ?? (marginX as typeof styles.marginRight)
+      styles.marginRight ?? marginX
     styles.marginLeft =
-      styles.marginLeft ?? (marginX as typeof styles.marginLeft)
+      styles.marginLeft ?? marginX
   }
   if (marginY != null) {
-    styles.marginTop = styles.marginTop ?? (marginY as typeof styles.marginTop)
+    styles.marginTop = styles.marginTop ?? marginY
     styles.marginBottom =
-      styles.marginBottom ?? (marginY as typeof styles.marginBottom)
+      styles.marginBottom ?? marginY
   }
   if (paddingX != null) {
     styles.paddingRight =
-      styles.paddingRight ?? (paddingX as typeof styles.paddingRight)
+      styles.paddingRight ?? paddingX
     styles.paddingLeft =
-      styles.paddingLeft ?? (paddingX as typeof styles.paddingLeft)
+      styles.paddingLeft ?? paddingX
   }
   if (paddingY != null) {
     styles.paddingTop =
-      styles.paddingTop ?? (paddingY as typeof styles.paddingTop)
+      styles.paddingTop ?? paddingY
     styles.paddingBottom =
-      styles.paddingBottom ?? (paddingY as typeof styles.paddingBottom)
+      styles.paddingBottom ?? paddingY
   }
 
-  return styles
+  return styles as CSSObject
 }
 
 const borderStyles = (props: Types.StyleProps): CSSObject => {
