@@ -34,29 +34,6 @@ type ContentsByPortProps = {|
   controlDisabledReason: string | null,
 |}
 
-// function ContentsByPort(props: ContentsByPortProps): React.Node {
-//   for (const port in props.modulesByPort) {
-//     var mods = props.modulesByPort[Number(port)]
-//     if (mods.length === 1) {
-//       return (
-//         <ModuleItem
-//           key={mods[0].serial}
-//           module={mods[0]}
-//           controlDisabledReason={props.controlDisabledReason}
-//         />
-//       )
-//     } else {
-//       return (
-//         <UsbHubItem
-//           hub={port}
-//           modules={mods}
-//           controlDisabledReason={props.controlDisabledReason}
-//         />
-//       )
-//     }
-//   }
-// }
-
 type Props = {| robotName: string |}
 
 export function AttachedModulesCard(props: Props): React.Node {
@@ -69,8 +46,6 @@ export function AttachedModulesCard(props: Props): React.Node {
   const controlDisabledReason = useSelector((state: State) =>
     getModuleControlsDisabled(state, robotName)
   )
-  console.log(modules)
-
   const modulesByPort = modules.reduce((portMap, module) => {
     const port = module.usbPort.hub || module.usbPort.port
     if (port !== null) {

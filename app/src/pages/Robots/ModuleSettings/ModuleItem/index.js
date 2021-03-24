@@ -31,16 +31,11 @@ export function ModuleItem(props: Props): React.Node {
 
   return (
     <>
-      <Flex marginBottom={SPACING_1}>
+      <Flex marginBottom={SPACING_1} fontWeight={FONT_WEIGHT_SEMIBOLD}>
         {usbPort && (
-          <Text
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
-            marginRight={SPACING_2}
-          >{`USB Port ${usbPort}:`}</Text>
+          <Text marginRight={SPACING_2}>{`USB Port ${usbPort}:`}</Text>
         )}
-        <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>
-          {getModuleDisplayName(module.model)}
-        </Text>
+        <Text>{getModuleDisplayName(module.model)}</Text>
       </Flex>
       <Flex flexDirection={DIRECTION_ROW}>
         <ModuleImage model={module.model} />
