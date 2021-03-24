@@ -1,4 +1,3 @@
-// @flow
 // top nav bar component
 import * as React from 'react'
 import { SubdomainNav, MainNav } from '../website-navigation'
@@ -6,7 +5,7 @@ import styles from './styles.css'
 
 export { Breadcrumbs } from './Breadcrumbs'
 
-export function Nav(): React.Node {
+export function Nav(): JSX.Element {
   return (
     <>
       <nav className={styles.nav}>
