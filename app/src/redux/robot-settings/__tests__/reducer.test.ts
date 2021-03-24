@@ -1,4 +1,3 @@
-
 import { robotSettingsReducer } from '../reducer'
 import * as Fixtures from '../__fixtures__'
 
@@ -6,14 +5,14 @@ import type { Action } from '../../types'
 import type { RobotSettingsState } from '../types'
 
 type ReducerSpec = {
-  name: string,
-  action: Action,
-  state: RobotSettingsState,
-  expected: RobotSettingsState,
+  name: string
+  action: Action
+  state: RobotSettingsState
+  expected: RobotSettingsState
 }
 
 describe('robotSettingsReducer', () => {
-  const SPECS: Array<ReducerSpec> = [
+  const SPECS: ReducerSpec[] = [
     {
       name: 'handles FETCH_SETTINGS_SUCCESS without restart required',
       action: {

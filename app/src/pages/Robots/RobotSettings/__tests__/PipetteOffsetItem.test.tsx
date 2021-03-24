@@ -28,7 +28,7 @@ jest.mock('@opentrons/shared-data', () => ({
 }))
 
 const mockFindLabwareDefWithCustom: JestMockFn<
-  [string | null, string | null, string | null, Array<LabwareDefinition2>],
+  [string | null, string | null, string | null, LabwareDefinition2[]],
   LabwareDefinition2 | null
 > = findLabwareDefWithCustom
 

@@ -37,7 +37,7 @@ const UPDATE_CHANNEL_OPTS_WITH_ALPHA = [
 
 export const getUpdateChannelOptions = (
   state: State
-): Array<DropdownOption> => {
+): DropdownOption[] => {
   return state.config?.devtools || state.config?.update.channel === 'alpha'
     ? UPDATE_CHANNEL_OPTS_WITH_ALPHA
     : UPDATE_CHANNEL_OPTS

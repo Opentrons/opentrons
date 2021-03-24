@@ -36,7 +36,7 @@ export type SessionState = {
     message: string,
   }>,
   // TODO(mc, 2018-01-11): command IDs should be strings
-  protocolCommands: Array<number>,
+  protocolCommands: number[],
   protocolCommandsById: {
     [number]: Command,
   },
@@ -57,7 +57,7 @@ export type SessionState = {
   startTime: ?number,
   runTime: number,
   apiLevel: [number, number] | null,
-  capabilities: Array<string>,
+  capabilities: string[],
 }
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types

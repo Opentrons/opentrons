@@ -30,7 +30,7 @@ export type PipetteOffsetCalibrationInstrument = {
   tipLength: number,
   mount: string,
   serial: string,
-  defaultTipracks: Array<LabwareDefinition2>,
+  defaultTipracks: LabwareDefinition2[],
 }
 
 export type PipetteOffsetCalibrationSessionParams = {
@@ -43,7 +43,7 @@ export type PipetteOffsetCalibrationSessionParams = {
 export type PipetteOffsetCalibrationSessionDetails = {
   instrument: PipetteOffsetCalibrationInstrument,
   currentStep: PipetteOffsetCalibrationStep,
-  labware: Array<CalibrationLabware>,
+  labware: CalibrationLabware[],
   shouldPerformTipLength: boolean,
-  supportedCommands: Array<SessionCommandString>,
+  supportedCommands: SessionCommandString[],
 }

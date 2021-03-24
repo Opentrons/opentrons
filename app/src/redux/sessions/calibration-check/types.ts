@@ -61,7 +61,7 @@ export type CalibrationCheckInstrument = {
   tipRackDisplay: string,
   tipRackUri: string,
   serial: string,
-  defaultTipracks: Array<LabwareDefinition2>,
+  defaultTipracks: LabwareDefinition2[],
 }
 
 export type CalibrationCheckComparison = {
@@ -87,15 +87,15 @@ export type CalibrationCheckComparisonByPipette = {
 }
 
 export type CheckCalibrationSessionDetails = {
-  instruments: Array<CalibrationCheckInstrument>,
+  instruments: CalibrationCheckInstrument[],
   currentStep: RobotCalibrationCheckStep,
   comparisonsByPipette: CalibrationCheckComparisonByPipette,
-  labware: Array<CalibrationLabware>,
+  labware: CalibrationLabware[],
   activePipette: CalibrationCheckInstrument,
   activeTipRack: CalibrationLabware,
 }
 
 export type CheckCalibrationSessionParams = {
   hasCalibrationBlock: boolean,
-  tipRacks: Array<CalibrationLabware>,
+  tipRacks: CalibrationLabware[],
 }

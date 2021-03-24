@@ -60,7 +60,7 @@ describe('CheckCalibration', () => {
     ResultsSummary,
   ]
 
-  const SPECS: Array<CheckCalibrationSpec> = [
+  const SPECS: CheckCalibrationSpec[] = [
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
     { component: TipPickUp, currentStep: 'preparingPipette' },

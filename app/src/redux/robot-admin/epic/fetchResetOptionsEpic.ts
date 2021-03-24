@@ -22,7 +22,7 @@ const mapResponseToAction: ResponseToActionMapper<FetchResetConfigOptionsAction>
   originalAction
 ) => {
   const { host, body, ...responseMeta } = response
-  const options: Array<ResetConfigOption> = body.options
+  const options: ResetConfigOption[] = body.options
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok

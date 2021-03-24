@@ -98,7 +98,7 @@ type BodySpec = {
 type PanelContents = {
   headerText: string,
   invalidationText: string | null,
-  bodyContentFragments: Array<BodySpec>,
+  bodyContentFragments: BodySpec[],
   outcomeText: string | null,
   chooseTipRackButtonText: string | null,
   continueButtonText: string,
@@ -106,7 +106,7 @@ type PanelContents = {
 }
 
 const bodyContentFromFragments: (
-  Array<BodySpec>
+  BodySpec[]
 ) => React.ReactNode = contentFragments => {
   return (
     <>

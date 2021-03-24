@@ -39,7 +39,7 @@ type DisplayModule = {
 }
 
 type SP = {
-  labwareBySlot?: { [DeckSlotId]: Array<Labware> },
+  labwareBySlot?: { [DeckSlotId]: Labware[] },
   modulesBySlot?: {
     [DeckSlotId]: ?DisplayModule,
   },

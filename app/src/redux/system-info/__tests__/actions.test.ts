@@ -5,13 +5,13 @@ import * as Fixtures from '../__fixtures__'
 import type { SystemInfoAction } from '../types'
 
 type ActionSpec = {
-  should: string,
-  creator: (...args: Array<any>) => SystemInfoAction,
-  args: Array<any>,
-  expected: SystemInfoAction,
+  should: string
+  creator: (...args: any[]) => SystemInfoAction
+  args: any[]
+  expected: SystemInfoAction
 }
 
-const SPECS: Array<ActionSpec> = [
+const SPECS: ActionSpec[] = [
   {
     should: 'create a systemInfo:USB_DEVICE_ADDED action',
     creator: Actions.usbDeviceAdded,

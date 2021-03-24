@@ -12,7 +12,7 @@ import type { RequestState } from './types'
  * React hook to attach a unique request ID to and dispatch an API action
  * Note: dispatching will trigger a re-render of the component
  *
- * @returns {[action => mixed, Array<string>]} tuple of dispatch function and dispatched request IDs
+ * @returns {[action => mixed, string[]]} tuple of dispatch function and dispatched request IDs
  *
  * @example
  * import { useDispatchApiRequest } from '../../robot-api'
@@ -33,11 +33,11 @@ import type { RequestState } from './types'
  */
 export function useDispatchApiRequest<
   A: { ...Action, meta: { requestId: string } }
->(): [(A) => A, Array<string>] {
+>(): [(A) => A, string[]] {
   const dispatch = useDispatch<(A) => void>()
 
   // TODO(mc, 2019-11-06): evaluate whether or not this can be a ref
-  const [requestIds, addRequestId] = useReducer<Array<string>, string>(
+  const [requestIds, addRequestId] = useReducer<string[], string>(
     (ids, next) => [...ids, next],
     []
   )
@@ -64,7 +64,7 @@ export function useDispatchApiRequest<
  * upon dispatch of said action.
  * Note: dispatching will trigger a re-render of the component
  *
- * @returns {[action => mixed, Array<string>]} tuple of dispatch function and dispatched request IDs
+ * @returns {[action => mixed, string[]]} tuple of dispatch function and dispatched request IDs
  *
  * @example
  * import { useDispatchApiRequests } from '../../robot-api'
@@ -88,11 +88,11 @@ export function useDispatchApiRequests<
   A: { ...Action, meta: { requestId: string } }
 >(
   onDispatchedRequest: (A => void) | null = null
-): [(...Array<A>) => void, Array<string>] {
+): [(...A[]) => void, string[]] {
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
 
   const trackedRequestId = useRef<string | null>(null)
-  const [unrequestedQueue, setUnrequestedQueue] = useState<Array<A>>([])
+  const [unrequestedQueue, setUnrequestedQueue] = useState<A[]>([])
 
   const trackedRequestIsPending =
     useSelector<State, RequestState | null>(state => {
@@ -108,7 +108,7 @@ export function useDispatchApiRequests<
     setUnrequestedQueue(unrequestedQueue.slice(1))
   }
 
-  const dispatchApiRequests = (...a: Array<A>) => {
+  const dispatchApiRequests = (...a: A[]) => {
     setUnrequestedQueue([...unrequestedQueue, ...a])
   }
 

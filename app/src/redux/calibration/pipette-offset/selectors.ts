@@ -1,4 +1,3 @@
-
 import { head } from 'lodash'
 
 import type { State } from '../../types'
@@ -7,7 +6,7 @@ import type { PipetteOffsetCalibration } from '../api-types'
 export const getPipetteOffsetCalibrations: (
   state: State,
   robotName: string | null
-) => Array<PipetteOffsetCalibration> = (state, robotName) => {
+) => PipetteOffsetCalibration[] = (state, robotName) => {
   if (!robotName) {
     return []
   }
@@ -32,7 +31,7 @@ export const getCalibrationForPipette: (
 }
 
 export const filterCalibrationForPipette: (
-  calibrations: Array<PipetteOffsetCalibration>,
+  calibrations: PipetteOffsetCalibration[],
   pipetteSerial: string,
   mount: string | null
 ) => PipetteOffsetCalibration | null = (calibrations, pipetteSerial, mount) => {

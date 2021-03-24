@@ -1,4 +1,3 @@
-
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -14,7 +13,7 @@ export const fetchModules = (robotName: string): Types.FetchModulesAction => ({
 
 export const fetchModulesSuccess = (
   robotName: string,
-  modules: Array<Types.AttachedModule>,
+  modules: Types.AttachedModule[],
   meta: RobotApiRequestMeta
 ): Types.FetchModulesSuccessAction => ({
   type: Constants.FETCH_MODULES_SUCCESS,
@@ -38,7 +37,7 @@ export const sendModuleCommand = (
   robotName: string,
   moduleId: string,
   command: Types.ModuleCommand,
-  args: Array<mixed> = []
+  args: unknown[] = []
 ): Types.SendModuleCommandAction => ({
   type: Constants.SEND_MODULE_COMMAND,
   payload: { robotName, moduleId, command, args },

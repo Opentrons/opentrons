@@ -21,15 +21,15 @@ const getConnectFormFields: JestMockFn<
   [
     WifiNetwork | null,
     string,
-    Array<EapOption>,
-    Array<WifiKey>,
+    EapOption[],
+    WifiKey[],
     ConnectFormValues
   ],
   $Call<typeof FormFields.getConnectFormFields, any, any, any, any, any>
 > = FormFields.getConnectFormFields
 
 const validateConnectFormFields: JestMockFn<
-  [WifiNetwork | null, Array<EapOption>, ConnectFormValues],
+  [WifiNetwork | null, EapOption[], ConnectFormValues],
   $Call<typeof FormFields.validateConnectFormFields, any, any, any>
 > = FormFields.validateConnectFormFields
 

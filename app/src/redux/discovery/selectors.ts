@@ -30,11 +30,11 @@ import type {
   ViewableRobot,
 } from './types'
 
-type GetConnectableRobots = State => Array<Robot>
-type GetReachableRobots = State => Array<ReachableRobot>
-type GetUnreachableRobots = State => Array<UnreachableRobot>
-type GetAllRobots = State => Array<DiscoveredRobot>
-type GetViewableRobots = State => Array<ViewableRobot>
+type GetConnectableRobots = State => Robot[]
+type GetReachableRobots = State => ReachableRobot[]
+type GetUnreachableRobots = State => UnreachableRobot[]
+type GetAllRobots = State => DiscoveredRobot[]
+type GetViewableRobots = State => ViewableRobot[]
 type GetConnectedRobot = State => Robot | null
 
 const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
@@ -54,7 +54,7 @@ export function getScanning(state: State): boolean {
   return state.discovery.scanning
 }
 
-export const getDiscoveredRobots: State => Array<DiscoveredRobot> = createSelector(
+export const getDiscoveredRobots: State => DiscoveredRobot[] = createSelector(
   state => state.discovery.robotsByName,
   getConnectedRobotName,
   (robotsMap, connectedRobotName) => {

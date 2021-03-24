@@ -25,14 +25,14 @@ const mockGetProtocolIsRunning: JestMockFn<
 
 type SelectorSpec = {
   name: string,
-  selector: (State, ...Array<any>) => mixed,
+  selector: (State, ...any[]) => mixed,
   state: Partial<State>,
-  args?: Array<any>,
+  args?: any[],
   before?: () => mixed,
   expected: mixed,
 }
 
-const SPECS: Array<SelectorSpec> = [
+const SPECS: SelectorSpec[] = [
   {
     name: 'getAttachedModules returns no attached modules by default',
     selector: Selectors.getAttachedModules,

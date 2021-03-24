@@ -153,7 +153,7 @@ describe('nav selectors', () => {
     jest.resetAllMocks()
   })
 
-  const SPECS: Array<SelectorSpec> = [
+  const SPECS: SelectorSpec[] = [
     {
       name: 'getNavbarLocations without any robot',
       selector: Selectors.getNavbarLocations,

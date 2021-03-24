@@ -31,7 +31,7 @@ const mockFetchRobotApi: JestMockFn<
 const mockGetRobotByName: JestMockFn<[any, string], mixed> =
   DiscoverySelectors.getRobotByName
 
-const mockGetAllRestartRequiredRobots: JestMockFn<[State], Array<string>> =
+const mockGetAllRestartRequiredRobots: JestMockFn<[State], string[]> =
   Selectors.getAllRestartRequiredRobots
 
 describe('updateSettingEpic', () => {

@@ -92,7 +92,7 @@ export type CommandNode = {
   handledAt: ?number,
   isCurrent: boolean,
   isLast: boolean,
-  children: Array<CommandNode>,
+  children: CommandNode[],
 }
 
 // instrument as stored in redux state
@@ -111,7 +111,7 @@ export type StatePipette = {
   name: string,
   // tipracks the pipette uses during the protocol
   // array of RPC object IDs corresponding to `_id` field in StateLabware
-  tipRacks: Array<number>,
+  tipRacks: number[],
   // string specified in protocol to load pipette
   requestedAs?: ?string,
 }
@@ -130,7 +130,7 @@ export type StateLabware = {
   // slot labware is installed in
   slot: ApiTypes.Slot,
   // deck coordinates of la<bware when not in slot
-  position: ?Array<number>,
+  position: ?number[],
   // unique type of the labware
   type: string,
   // user defined name of the labware
@@ -195,8 +195,8 @@ export type SessionUpdate = {
 }
 
 export type TipracksByMountMap = {
-  left: Array<Labware>,
-  right: Array<Labware>,
+  left: Labware[],
+  right: Labware[],
 }
 
 export type NextTiprackPipetteInfo = {

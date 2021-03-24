@@ -54,9 +54,9 @@ const QUIRK_KEY = 'quirks'
 
 export class ConfigForm extends React.Component<ConfigFormProps> {
   getFieldsByKey(
-    keys: Array<string>,
+    keys: string[],
     fields: PipetteSettingsFieldsMap
-  ): Array<DisplayFieldProps> {
+  ): DisplayFieldProps[] {
     return keys.map(k => {
       const field = fields[k]
       const displayName = startCase(k)
@@ -69,7 +69,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     })
   }
 
-  getKnownQuirks: () => Array<DisplayQuirkFieldProps> = () => {
+  getKnownQuirks: () => DisplayQuirkFieldProps[] = () => {
     const quirks = this.props.settings[QUIRK_KEY]
     if (!quirks) return []
     const quirkKeys = Object.keys(quirks)
@@ -93,7 +93,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     ])
   }
 
-  getUnknownKeys: () => Array<string> = () => {
+  getUnknownKeys: () => string[] = () => {
     return keys<string>(
       omit(this.props.settings, [
         ...PLUNGER_KEYS,
@@ -116,7 +116,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
 
   getFieldValue(
     key: string,
-    fields: Array<DisplayFieldProps>,
+    fields: DisplayFieldProps[],
     values: FormValues
   ): number {
     const field = fields.find(f => f.name === key)

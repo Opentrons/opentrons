@@ -8,10 +8,11 @@ import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
 
-type Props = {
-  buttons: Array<?ButtonProps>,
-  className?: string,
-  description?: React.ReactNode,
+type MaybeButtonProps = ButtonProps | null| undefined
+interface Props {
+  buttons: MaybeButtonProps[]
+  className: string | null | undefined
+  description: React.ReactNode | null | undefined
 }
 
 export function BottomButtonBar(props: Props): JSX.Element {

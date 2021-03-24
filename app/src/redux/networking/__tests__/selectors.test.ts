@@ -16,9 +16,9 @@ const getRobotApiVersionByName: JestMockFn<
 
 type SelectorSpec = {
   name: string,
-  selector: (Partial<State>, ...Array<any>) => mixed,
+  selector: (Partial<State>, ...any[]) => mixed,
   state: Partial<State>,
-  args?: Array<any>,
+  args?: any[],
   before?: (spec: SelectorSpec) => mixed,
   expected: mixed,
 }
@@ -28,7 +28,7 @@ describe('robot settings selectors', () => {
     jest.resetAllMocks()
   })
 
-  const SPECS: Array<SelectorSpec> = [
+  const SPECS: SelectorSpec[] = [
     {
       name: 'getInternetStatus returns null if unavailable',
       selector: Selectors.getInternetStatus,

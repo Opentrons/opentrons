@@ -78,7 +78,7 @@ export const getConnectionStatus: State => ConnectionStatus = createSelector(
   }
 )
 
-export function getSessionCapabilities(state: State): Array<string> {
+export function getSessionCapabilities(state: State): string[] {
   return session(state).capabilities
 }
 
@@ -141,7 +141,7 @@ export function getIsDone(state: State): boolean {
 function traverseCommands(
   commandsById,
   parentIsCurrent
-): (id: number, index: number, commands: Array<number>) => CommandNode {
+): (id: number, index: number, commands: number[]) => CommandNode {
   return function mapIdToCommand(id, index, commands) {
     const { description, handledAt, children } = commandsById[id]
     const next = commandsById[commands[index + 1]]
@@ -162,7 +162,7 @@ function traverseCommands(
   }
 }
 
-export const getCommands: State => Array<CommandNode> = createSelector(
+export const getCommands: State => CommandNode[] = createSelector(
   (state: State) => session(state).protocolCommands,
   (state: State) => session(state).protocolCommandsById,
   (commands, commandsById) => commands.map(traverseCommands(commandsById, true))
@@ -250,11 +250,11 @@ export function getPipettesByMount(
   return session(state).pipettesByMount
 }
 
-export const getPipettes: State => Array<Pipette> = createSelector(
+export const getPipettes: State => Pipette[] = createSelector(
   getPipettesByMount,
   (state: State) => calibration(state).probedByMount,
   (state: State) => calibration(state).tipOnByMount,
-  (pipettesByMount, probedByMount, tipOnByMount): Array<Pipette> => {
+  (pipettesByMount, probedByMount, tipOnByMount): Pipette[] => {
     return Constants.PIPETTE_MOUNTS.filter(
       mount => pipettesByMount[mount] != null
     ).map(mount => {
@@ -312,7 +312,7 @@ export function getModulesBySlot(state: State): { [Slot]: SessionModule } {
   return session(state).modulesBySlot
 }
 
-export const getModules: State => Array<SessionModule> = createSelector(
+export const getModules: State => SessionModule[] = createSelector(
   getModulesBySlot,
   // TODO (ka 2019-3-26): can't import getConfig due to circular dependency
   state => state.config,
@@ -321,7 +321,7 @@ export const getModules: State => Array<SessionModule> = createSelector(
 )
 
 export const getModulesByModel: State => {
-  [ModuleModel]: Array<SessionModule>,
+  [ModuleModel]: SessionModule[],
 } = createSelector(getModules, modules => {
   return modules.reduce((acc, val) => {
     if (!acc[val.model]) {
@@ -336,7 +336,7 @@ export function getLabwareBySlot(state: State): { [Slot]: StateLabware, ... } {
   return session(state).labwareBySlot
 }
 
-export const getLabware: State => Array<Labware> = createSelector(
+export const getLabware: State => Labware[] = createSelector(
   getPipettesByMount,
   getLabwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
@@ -438,22 +438,22 @@ export function getDeckPopulated(state: State): boolean | null {
   return deckPopulated != null ? deckPopulated : null
 }
 
-export const getUnconfirmedLabware: State => Array<Labware> = createSelector(
+export const getUnconfirmedLabware: State => Labware[] = createSelector(
   getLabware,
   labware => labware.filter(lw => lw.type && !lw.confirmed)
 )
 
-export const getTipracks: State => Array<Labware> = createSelector(
+export const getTipracks: State => Labware[] = createSelector(
   getLabware,
   labware => labware.filter(lw => lw.type && lw.isTiprack)
 )
 
-export const getNotTipracks: State => Array<Labware> = createSelector(
+export const getNotTipracks: State => Labware[] = createSelector(
   getLabware,
   labware => labware.filter(lw => lw.type && !lw.isTiprack)
 )
 
-export const getUnconfirmedTipracks: State => Array<Labware> = createSelector(
+export const getUnconfirmedTipracks: State => Labware[] = createSelector(
   getUnconfirmedLabware,
   labware => labware.filter(lw => lw.type && lw.isTiprack)
 )

@@ -93,7 +93,7 @@ type ChooseTipRackProps = {
   handleChosenTipRack: (arg: LabwareDefinition2 | null) => mixed,
   closeModal: () => mixed,
   robotName?: string | null,
-  defaultTipracks?: Array<LabwareDefinition2> | null,
+  defaultTipracks?: LabwareDefinition2[] | null,
 }
 
 export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
@@ -160,14 +160,14 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     return obj
   }, {})
 
-  const opentronsTipRacksOptions: Array<SelectOption> = defaultTipracks
+  const opentronsTipRacksOptions: SelectOption[] = defaultTipracks
     ? defaultTipracks.map(lw => formatOptionsFromLabwareDef(lw))
     : []
-  const customTipRacksOptions: Array<SelectOption> = customTipRacks.map(lw =>
+  const customTipRacksOptions: SelectOption[] = customTipRacks.map(lw =>
     formatOptionsFromLabwareDef(lw)
   )
 
-  const groupOptions: Array<SelectOptionOrGroup> =
+  const groupOptions: SelectOptionOrGroup[] =
     customTipRacks.length > 0
       ? [
           {

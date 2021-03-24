@@ -6,13 +6,13 @@ import type { PipettesAction } from '../types'
 
 type ActionSpec = {
   name: string,
-  creator: (...Array<any>) => mixed,
-  args: Array<mixed>,
+  creator: (...any[]) => mixed,
+  args: unknown[],
   expected: PipettesAction,
 }
 
 describe('robot pipettes actions', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'pipettes:FETCH_PIPETTES without refresh',
       creator: Actions.fetchPipettes,

@@ -29,7 +29,7 @@ jest.mock('../../UpdateAppModal', () => ({
 
 jest.mock('../../../redux/alerts/selectors')
 
-const getActiveAlerts: JestMockFn<[State], $ReadOnlyArray<AlertId>> =
+const getActiveAlerts: JestMockFn<[State], $ReadOnlyAlertId[]> =
   AppAlerts.getActiveAlerts
 
 const MOCK_STATE: State = ({ mockState: true }as any)

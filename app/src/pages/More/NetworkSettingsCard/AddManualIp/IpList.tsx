@@ -23,7 +23,7 @@ type Props = { ...SP, ...DP }
 
 function IpListComponent(props: Props) {
   const { candidates, removeManualIp, robots } = props
-  const candidateList: Array<string> = [].concat(candidates)
+  const candidateList: string[] = [].concat(candidates)
 
   return (
     <div>

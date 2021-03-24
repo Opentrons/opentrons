@@ -7,13 +7,13 @@ import type { NetworkingAction } from '../types'
 
 type ActionSpec = {
   name: string,
-  creator: (...Array<any>) => mixed,
-  args: Array<mixed>,
+  creator: (...any[]) => mixed,
+  args: unknown[],
   expected: NetworkingAction,
 }
 
 describe('networking actions', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'can create networking:FETCH_STATUS',
       creator: Actions.fetchStatus,

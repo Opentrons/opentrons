@@ -126,7 +126,7 @@ export function CalibratePipetteOffset(
     return spec ? spec.channels > 1 : false
   }, [instrument])
 
-  function sendCommands(...commands: Array<SessionCommandParams>) {
+  function sendCommands(...commands: SessionCommandParams[]) {
     if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {

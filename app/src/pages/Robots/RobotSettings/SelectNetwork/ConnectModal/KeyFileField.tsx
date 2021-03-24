@@ -14,7 +14,7 @@ export type KeyFileFieldProps = {
   label: string,
   placeholder: string,
   robotName: string,
-  wifiKeys: Array<WifiKey>,
+  wifiKeys: WifiKey[],
   className?: string,
 }
 
@@ -24,7 +24,7 @@ const ADD_NEW_KEY_OPTION_GROUP = {
   options: [{ value: ADD_NEW_KEY_VALUE, label: LABEL_ADD_NEW_KEY }],
 }
 
-const makeKeyOptions = (keys: Array<WifiKey>) => ({
+const makeKeyOptions = (keys: WifiKey[]) => ({
   options: keys.map(k => ({ value: k.id, label: k.name })),
 })
 

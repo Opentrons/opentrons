@@ -30,7 +30,7 @@ export type CheckCalibrationControlProps = {
 }
 
 // pipette calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
+const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 

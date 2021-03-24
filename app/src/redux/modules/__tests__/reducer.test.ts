@@ -5,13 +5,13 @@ import type { Action } from '../../types'
 import type { ModulesState } from '../types'
 
 type ReducerSpec = {
-  name: string,
-  state: ModulesState,
-  action: Action,
-  expected: ModulesState,
+  name: string
+  state: ModulesState
+  action: Action
+  expected: ModulesState
 }
 
-const SPECS: Array<ReducerSpec> = [
+const SPECS: ReducerSpec[] = [
   {
     name: 'handles modules:FETCH_MODULES_SUCCESS',
     action: {

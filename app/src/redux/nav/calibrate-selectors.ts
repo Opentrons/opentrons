@@ -53,9 +53,9 @@ export const getCalibratePipettesLocations: State => {
 
     const buildTiprackPathsForMount: (
       'left' | 'right',
-      Array<Labware>
+      Labware[]
     ) => { [string]: SubnavLocation } = (mount, tipracks) => {
-      const hashes: Array<string> = tipracks
+      const hashes: string[] = tipracks
         .map(tr => tr.definitionHash)
         .filter(Boolean)
       return hashes.reduce((pathMap, hash) => {

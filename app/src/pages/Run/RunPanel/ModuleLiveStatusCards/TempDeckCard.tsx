@@ -18,7 +18,7 @@ type Props = {
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
-    args?: Array<mixed>
+    args?: unknown[]
   ) => mixed,
   controlDisabledReason: string | null,
   isCardExpanded: boolean,

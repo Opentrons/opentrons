@@ -17,7 +17,7 @@ export type ConnectResponseAction = {
   type: 'robot:CONNECT_RESPONSE',
   payload: {
     error: ?Error,
-    sessionCapabilities: Array<string>,
+    sessionCapabilities: string[],
   },
 }
 
@@ -328,7 +328,7 @@ export const actions = {
 
   connectResponse(
     error: Error | null,
-    sessionCapabilities: Array<string> = []
+    sessionCapabilities: string[] = []
   ): ConnectResponseAction {
     return {
       type: 'robot:CONNECT_RESPONSE',

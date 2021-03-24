@@ -77,7 +77,7 @@ export type FinishDiscoveryAction = {
 
 export type UpdateListAction = {
   type: 'discovery:UPDATE_LIST',
-  payload: { robots: Array<DiscoveryClientRobot> },
+  payload: { robots: DiscoveryClientRobot[] },
 }
 
 export type RemoveRobotAction = {

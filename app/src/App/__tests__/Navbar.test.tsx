@@ -19,7 +19,7 @@ import type { NavLocation } from '../../redux/nav/types'
 jest.mock('react-router-dom', () => ({ NavLink: 'a' }))
 jest.mock('../../redux/nav/selectors')
 
-const getNavbarLocations: JestMockFn<[State], Array<NavLocation>> =
+const getNavbarLocations: JestMockFn<[State], NavLocation[]> =
   Nav.getNavbarLocations
 
 const LOCATIONS = [

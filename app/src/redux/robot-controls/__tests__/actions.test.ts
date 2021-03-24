@@ -5,12 +5,12 @@ import type { RobotControlsAction } from '../types'
 
 type ActionSpec = {
   name: string,
-  creator: (...Array<any>) => mixed,
-  args: Array<mixed>,
+  creator: (...any[]) => mixed,
+  args: unknown[],
   expected: RobotControlsAction,
 }
 
-const SPECS: Array<ActionSpec> = [
+const SPECS: ActionSpec[] = [
   {
     name: 'robotControls:FETCH_LIGHTS',
     creator: Actions.fetchLights,

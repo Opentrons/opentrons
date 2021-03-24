@@ -20,6 +20,6 @@ export function getRobotRestarting(state: State, robotName: string): boolean {
 export function getResetConfigOptions(
   state: State,
   robotName: string
-): Array<ResetConfigOption> {
+): ResetConfigOption[] {
   return robotState(state, robotName)?.resetConfigOptions || []
 }

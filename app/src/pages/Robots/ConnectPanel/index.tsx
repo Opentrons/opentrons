@@ -25,9 +25,9 @@ import type {
 } from '../../../redux/discovery/types'
 
 type SP = {
-  robots: Array<Robot>,
-  reachableRobots: Array<ReachableRobot>,
-  unreachableRobots: Array<UnreachableRobot>,
+  robots: Robot[],
+  reachableRobots: ReachableRobot[],
+  unreachableRobots: UnreachableRobot[],
   found: boolean,
   isScanning: boolean,
 }

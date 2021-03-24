@@ -19,7 +19,7 @@ export { getModuleType } from '@opentrons/shared-data'
 export const getAttachedModules: (
   state: State,
   robotName: string | null
-) => Array<Types.AttachedModule> = createSelector(
+) => Types.AttachedModule[] = createSelector(
   (state, robotName) =>
     robotName !== null ? state.modules[robotName]?.modulesById : {},
   modulesById => sortBy(modulesById, 'serial')
@@ -27,7 +27,7 @@ export const getAttachedModules: (
 
 export const getAttachedModulesForConnectedRobot = (
   state: State
-): Array<Types.AttachedModule> => {
+): Types.AttachedModule[] => {
   const robotName = RobotSelectors.getConnectedRobotName(state)
   return getAttachedModules(state, robotName)
 }
@@ -40,7 +40,7 @@ const isModulePrepared = (module: Types.AttachedModule): boolean => {
 
 export const getUnpreparedModules: (
   state: State
-) => Array<Types.AttachedModule> = createSelector(
+) => Types.AttachedModule[] = createSelector(
   getAttachedModulesForConnectedRobot,
   RobotSelectors.getModules,
   (attachedModules, protocolModules) => {
@@ -59,7 +59,7 @@ export const getUnpreparedModules: (
 
 export const getMissingModules: (
   state: State
-) => Array<SessionModule> = createSelector(
+) => SessionModule[] = createSelector(
   getAttachedModulesForConnectedRobot,
   RobotSelectors.getModules,
   (attachedModules, protocolModules) => {

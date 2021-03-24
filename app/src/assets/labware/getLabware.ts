@@ -12,8 +12,8 @@ const labwareSchemaV1DefsContext = (requireas any).context(
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk
 )
-let labwareSchemaV1Defs: $ReadOnlyArray<LabwareDefinition1> | null = null
-function getLegacyLabwareDefs(): $ReadOnlyArray<LabwareDefinition1> {
+let labwareSchemaV1Defs: $ReadOnlyLabwareDefinition1[] | null = null
+function getLegacyLabwareDefs(): $ReadOnlyLabwareDefinition1[] {
   if (!labwareSchemaV1Defs) {
     labwareSchemaV1Defs = labwareSchemaV1DefsContext
       .keys()
@@ -39,8 +39,8 @@ const labwareSchemaV2DefsContext = (requireas any).context(
   'sync' // load every definition into one synchronous chunk
 )
 
-let labwareSchemaV2Defs: $ReadOnlyArray<LabwareDefinition2> | null = null
-function getLatestLabwareDefs(): $ReadOnlyArray<LabwareDefinition2> {
+let labwareSchemaV2Defs: LabwareDefinition2[] | null = null
+function getLatestLabwareDefs(): LabwareDefinition2[] {
   // NOTE: unlike labware-library, no filtering out "do not list labware"
   // also, more convenient & performant to make a map {loadName: def} not an array
   if (!labwareSchemaV2Defs) {
@@ -49,7 +49,7 @@ function getLatestLabwareDefs(): $ReadOnlyArray<LabwareDefinition2> {
       .map(name => labwareSchemaV2DefsContext(name))
     // group by namespace + loadName
     const labwareDefGroups: {
-      [groupKey: string]: Array<LabwareDefinition2>,
+      [groupKey: string]: LabwareDefinition2[],
     } = groupBy(allDefs, d => `${d.namespace}/${d.parameters.loadName}`)
 
     labwareSchemaV2Defs = Object.keys(labwareDefGroups).map(

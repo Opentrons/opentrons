@@ -42,7 +42,7 @@ import type {
 import type { RequestState } from '../../../redux/robot-api/types'
 
 // deck calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
+const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 

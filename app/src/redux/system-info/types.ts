@@ -35,7 +35,7 @@ export type NetworkInterface = {
 }
 
 export type U2EInterfaceMap = {
-  [deviceSerialNumber: string]: Array<NetworkInterface>,
+  [deviceSerialNumber: string]: NetworkInterface[],
   ...
 }
 
@@ -53,16 +53,16 @@ export type U2EAnalyticsProps = {
 
 // TODO(mc, 2020-04-17): add other system info
 export type SystemInfoState = {
-  usbDevices: Array<UsbDevice>,
-  networkInterfaces: Array<NetworkInterface>,
+  usbDevices: UsbDevice[],
+  networkInterfaces: NetworkInterface[],
 }
 
 // TODO(mc, 2020-04-17): add other system info
 export type InitializedAction = {
   type: INITIALIZED,
   payload: {
-    usbDevices: Array<UsbDevice>,
-    networkInterfaces: Array<NetworkInterface>,
+    usbDevices: UsbDevice[],
+    networkInterfaces: NetworkInterface[],
   },
 }
 
@@ -78,7 +78,7 @@ export type UsbDeviceRemovedAction = {
 
 export type NetworkInterfacesChangedAction = {
   type: NETWORK_INTERFACES_CHANGED,
-  payload: { networkInterfaces: Array<NetworkInterface> },
+  payload: { networkInterfaces: NetworkInterface[] },
 }
 
 export type SystemInfoAction =

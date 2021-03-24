@@ -6,13 +6,13 @@ import type { ModulesAction } from '../types'
 
 type ActionSpec = {
   name: string,
-  creator: (...Array<any>) => mixed,
-  args: Array<mixed>,
+  creator: (...any[]) => mixed,
+  args: unknown[],
   expected: ModulesAction,
 }
 
 describe('robot modules actions', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'modules:FETCH_MODULES',
       creator: Actions.fetchModules,

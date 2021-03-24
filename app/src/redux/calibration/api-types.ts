@@ -102,7 +102,7 @@ export type LabwareCalibration = {
 }
 
 export type AllLabwareCalibrations = {
-  data: Array<LabwareCalibration>,
+  data: LabwareCalibration[],
 }
 
 export type PipetteOffsetCalibration = {
@@ -118,7 +118,7 @@ export type PipetteOffsetCalibration = {
 }
 
 export type AllPipetteOffsetCalibrations = {
-  data: Array<PipetteOffsetCalibration>,
+  data: PipetteOffsetCalibration[],
 }
 
 export type TipLengthCalibration = {
@@ -133,5 +133,5 @@ export type TipLengthCalibration = {
 }
 
 export type AllTipLengthCalibrations = {
-  data: Array<TipLengthCalibration>,
+  data: TipLengthCalibration[],
 }

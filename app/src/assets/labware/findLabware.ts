@@ -7,7 +7,7 @@ function filterLabwareDefinitions(
   namespace: string | null,
   loadName: string | null,
   version: string | null,
-  customLabware: Array<LabwareDefinition2>
+  customLabware: LabwareDefinition2[]
 ): LabwareDefinition2 | null {
   return (
     head(
@@ -25,7 +25,7 @@ export function findLabwareDefWithCustom(
   namespace: string | null,
   loadName: string | null,
   version: string | null,
-  customLabware: Array<LabwareDefinition2>
+  customLabware: LabwareDefinition2[]
 ): LabwareDefinition2 | null {
   return namespace === 'opentrons'
     ? getLatestLabwareDef(loadName)

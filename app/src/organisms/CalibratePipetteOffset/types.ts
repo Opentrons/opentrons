@@ -20,7 +20,7 @@ export type CalibratePipetteOffsetParentProps = {
 }
 
 export type CalibratePipetteOffsetChildProps = {
-  sendSessionCommands: (...Array<SessionCommandParams>) => void,
+  sendSessionCommands: (...SessionCommandParams[]) => void,
   deleteSession: () => void,
   tipRack: CalibrationLabware,
   isMulti: boolean,

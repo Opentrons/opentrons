@@ -52,7 +52,7 @@ export function AppAdvancedSettingsCard(): React.ReactNode {
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const devInternalFlags = useSelector(Config.getFeatureFlags)
   const channel = useSelector(Config.getUpdateChannel)
-  const channelOptions: Array<DropdownOption> = useSelector(
+  const channelOptions: DropdownOption[] = useSelector(
     Config.getUpdateChannelOptions
   )
   const dispatch = useDispatch<Dispatch>()

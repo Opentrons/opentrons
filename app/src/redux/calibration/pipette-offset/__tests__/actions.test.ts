@@ -5,12 +5,12 @@ import type { PipetteOffsetCalibrationsAction } from '../types'
 
 type ActionSpec = {
   should: string,
-  creator: (...Array<any>) => PipetteOffsetCalibrationsAction,
-  args: Array<mixed>,
+  creator: (...any[]) => PipetteOffsetCalibrationsAction,
+  args: unknown[],
   expected: PipetteOffsetCalibrationsAction,
 }
 
-const SPECS: Array<ActionSpec> = [
+const SPECS: ActionSpec[] = [
   {
     should: 'create a fetchPipetteOffsetCalibrations action',
     creator: Actions.fetchPipetteOffsetCalibrations,

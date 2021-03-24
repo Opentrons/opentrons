@@ -13,7 +13,7 @@ jest.mock('../../selectors')
 const mockGetRobotAdminStatus: JestMockFn<[State, string], mixed> =
   RobotAdminSelectors.getRobotAdminStatus
 
-const mockGetAllRestartRequiredRobots: JestMockFn<[State], Array<string>> =
+const mockGetAllRestartRequiredRobots: JestMockFn<[State], string[]> =
   Selectors.getAllRestartRequiredRobots
 
 describe('clearRestartPathEpic', () => {

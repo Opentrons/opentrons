@@ -54,7 +54,7 @@ export type CalibrateTipLengthControlProps = {
 }
 
 // tip length calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
+const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 

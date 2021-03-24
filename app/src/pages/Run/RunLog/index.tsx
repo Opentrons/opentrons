@@ -15,7 +15,7 @@ import type { CommandListProps } from './CommandList'
 export { ConfirmCancelModal } from './ConfirmCancelModal'
 
 type SP = {
-  commands: Array<any>,
+  commands: any[],
   sessionStatus: SessionStatus,
   sessionStatusInfo: SessionStatusInfo,
   showSpinner: boolean,

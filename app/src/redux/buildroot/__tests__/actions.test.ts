@@ -5,13 +5,13 @@ import type { BuildrootAction } from '../types'
 
 type ActionSpec = {
   name: string,
-  creator: (...Array<any>) => BuildrootAction,
-  args: Array<mixed>,
+  creator: (...any[]) => BuildrootAction,
+  args: unknown[],
   expected: BuildrootAction,
 }
 
 describe('buildroot action creators', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'buildroot:SET_UPDATE_SEEN',
       creator: actions.setBuildrootUpdateSeen,

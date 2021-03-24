@@ -36,7 +36,7 @@ const FIELD_PSK: ConnectFormTextField = {
 }
 
 const makeSecurityField = (
-  eapOptions: Array<EapOption>,
+  eapOptions: EapOption[],
   showAllOptions: boolean
 ): ConnectFormSecurityField => ({
   type: Constants.FIELD_TYPE_SECURITY,
@@ -60,7 +60,7 @@ const getEapFields = (
   values,
   errors,
   touched
-): Array<WifiAuthField> => {
+): WifiAuthField[] => {
   const eapType = values.securityType
   return eapOptions
     .filter(opt => opt.name === eapType)
@@ -72,10 +72,10 @@ const getEapFieldName = baseName => `eapConfig.${baseName}`
 export function getConnectFormFields(
   network: WifiNetwork | null,
   robotName: string,
-  eapOptions: Array<EapOption>,
-  wifiKeys: Array<WifiKey>,
+  eapOptions: EapOption[],
+  wifiKeys: WifiKey[],
   values: ConnectFormValues
-): Array<ConnectFormField> {
+): ConnectFormField[] {
   const { securityType: formSecurityType } = values
   const fields = []
 
@@ -137,7 +137,7 @@ export function getConnectFormFields(
 
 export function validateConnectFormFields(
   network: WifiNetwork | null,
-  eapOptions: Array<EapOption>,
+  eapOptions: EapOption[],
   values: ConnectFormValues
 ): ConnectFormErrors {
   const {

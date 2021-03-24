@@ -61,7 +61,7 @@ describe('CalibrateTipLength', () => {
     CompleteConfirmation,
   ]
 
-  const SPECS: Array<CalibrateTipLengthSpec> = [
+  const SPECS: CalibrateTipLengthSpec[] = [
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
     { component: MeasureNozzle, currentStep: 'measuringNozzleOffset' },

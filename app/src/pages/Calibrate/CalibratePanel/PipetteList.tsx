@@ -26,7 +26,7 @@ import type { Dispatch, State } from '../../../redux/types'
 
 export type PipetteListComponentProps = {
   robotName: string | null,
-  tipracks: Array<BaseProtocolLabware>,
+  tipracks: BaseProtocolLabware[],
 }
 
 export const PipetteList: React.AbstractComponent<PipetteListComponentProps> = withRouter(

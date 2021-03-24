@@ -22,7 +22,7 @@ export class Upload extends React.Component<UploadProps, UploadState> {
   onUpload: (
     event: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<>
   ) => void = event => {
-    let files: Array<File> = []
+    let files: File[] = []
     if (event.dataTransfer && event.dataTransfer.files) {
       files = (event.dataTransfer.filesas any)
     } else if (event.target.files) {

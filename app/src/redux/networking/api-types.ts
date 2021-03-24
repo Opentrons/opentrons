@@ -69,7 +69,7 @@ export type WifiNetwork = {
 }
 
 export type WifiListResponse = {
-  list: Array<WifiNetwork>,
+  list: WifiNetwork[],
 }
 
 // POST /wifi/configure
@@ -101,7 +101,7 @@ export type ApiWifiKey = {
 }
 
 export type FetchWifiKeysResponse = {
-  keys: Array<ApiWifiKey>,
+  keys: ApiWifiKey[],
 }
 
 // POST /wifi/keys
@@ -129,9 +129,9 @@ export type EapOption = {
   name: string,
   // displayName added to response in API v3.4.0
   displayName?: string,
-  options: Array<WifiAuthField>,
+  options: WifiAuthField[],
 }
 
 export type FetchEapOptionsResponse = {
-  options: Array<EapOption>,
+  options: EapOption[],
 }

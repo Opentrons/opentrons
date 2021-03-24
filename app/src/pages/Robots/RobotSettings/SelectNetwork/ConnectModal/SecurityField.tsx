@@ -14,7 +14,7 @@ export type SecurityFieldProps = {
   placeholder: string,
   label: string,
   showAllOptions: boolean,
-  eapOptions: Array<EapOption>,
+  eapOptions: EapOption[],
   className?: string,
 }
 
@@ -23,7 +23,7 @@ const ALL_SECURITY_OPTIONS = [
   { options: [{ value: SECURITY_WPA_PSK, label: LABEL_SECURITY_PSK }] },
 ]
 
-const makeEapOptionsGroup = (eapOptions: Array<EapOption>) => ({
+const makeEapOptionsGroup = (eapOptions: EapOption[]) => ({
   options: eapOptions.map(opt => ({
     value: opt.name,
     label: opt.displayName ?? opt.name,

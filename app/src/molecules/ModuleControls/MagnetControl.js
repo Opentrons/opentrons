@@ -61,7 +61,7 @@ type Props = {|
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
-    args?: Array<mixed>
+    args?: unknown[]
   ) => mixed,
   disabledReason?: string | null,
 |}

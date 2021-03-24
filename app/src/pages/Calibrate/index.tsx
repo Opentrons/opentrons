@@ -23,11 +23,11 @@ type OP = {}
 
 type SP = {
   nextPipette: Pipette | null,
-  labware: Array<Labware>,
+  labware: Labware[],
   nextLabware: Labware | void,
   isTipsProbed: boolean,
   nextPipetteTiprack: NextTiprackPipetteInfo | null,
-  modules: Array<SessionModule>,
+  modules: SessionModule[],
 }
 
 type Props = { ...OP, ...SP, dispatch: Dispatch }

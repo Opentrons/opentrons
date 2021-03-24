@@ -23,7 +23,7 @@ const PLEASE_ADD_CUSTOM_LABWARE =
   'Please add custom labware via the Labware Management options above'
 
 export type LabwareListProps = {
-  labware: Array<CheckedLabwareFile>,
+  labware: CheckedLabwareFile[],
   errorMessage: string | null,
 }
 

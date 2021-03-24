@@ -22,7 +22,7 @@ import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPane
 import { pipetteOffsetCalibrationStarted } from '../../redux/analytics'
 
 // pipette calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
+const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 

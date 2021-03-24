@@ -21,8 +21,8 @@ import type {
 export type ConnectModalProps = {
   robotName: string,
   network: WifiNetwork | null,
-  wifiKeys: Array<WifiKey>,
-  eapOptions: Array<EapOption>,
+  wifiKeys: WifiKey[],
+  eapOptions: EapOption[],
   onConnect: WifiConfigureRequest => mixed,
   onCancel: () => mixed,
 }

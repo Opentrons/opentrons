@@ -4,13 +4,13 @@ import type { State } from '../../types'
 
 type SelectorSpec = {
   name: string,
-  selector: (State, ...Array<any>) => mixed,
+  selector: (State, ...any[]) => mixed,
   state: Partial<State>,
-  args?: Array<any>,
+  args?: any[],
   expected: mixed,
 }
 
-const SPECS: Array<SelectorSpec> = [
+const SPECS: SelectorSpec[] = [
   {
     name: 'getRequestById returns null by default',
     selector: Selectors.getRequestById,

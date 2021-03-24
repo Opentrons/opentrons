@@ -32,7 +32,7 @@ interface Props {
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
-    args?: Array<mixed>
+    args?: unknown[]
   ) => mixed;
   isSecondaryTemp: boolean;
   disabledReason?: string | null;

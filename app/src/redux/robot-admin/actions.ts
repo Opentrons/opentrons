@@ -38,7 +38,7 @@ export const fetchResetConfigOptions = (
 
 export const fetchResetConfigOptionsSuccess = (
   robotName: string,
-  options: Array<Types.ResetConfigOption>,
+  options: Types.ResetConfigOption[],
   meta: RobotApiRequestMeta
 ): Types.FetchResetConfigOptionsSuccessAction => ({
   type: Constants.FETCH_RESET_CONFIG_OPTIONS_SUCCESS,

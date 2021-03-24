@@ -31,12 +31,12 @@ export type DeckCalibrationInstrument = {
   tipLength: number,
   mount: string,
   serial: string,
-  defaultTipracks: Array<LabwareDefinition2>,
+  defaultTipracks: LabwareDefinition2[],
 }
 
 export type DeckCalibrationSessionDetails = {
   instrument: DeckCalibrationInstrument,
   currentStep: DeckCalibrationStep,
-  labware: Array<CalibrationLabware>,
-  supportedCommands: Array<SessionCommandString>,
+  labware: CalibrationLabware[],
+  supportedCommands: SessionCommandString[],
 }

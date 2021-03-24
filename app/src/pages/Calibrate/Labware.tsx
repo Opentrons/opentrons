@@ -28,7 +28,7 @@ type SP = {
   calibrateToBottom: boolean,
   robotName: string | null,
   hasModulesLeftToReview: ?boolean,
-  unpreparedModules: Array<AttachedModule>,
+  unpreparedModules: AttachedModule[],
 }
 
 type Props = { ...OP, ...SP, dispatch: Dispatch }

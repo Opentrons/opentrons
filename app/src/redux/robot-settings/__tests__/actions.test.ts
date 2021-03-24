@@ -5,13 +5,13 @@ import type { RobotSettingsAction } from '../types'
 
 type ActionSpec = {
   name: string,
-  creator: (...Array<any>) => mixed,
-  args: Array<mixed>,
+  creator: (...any[]) => mixed,
+  args: unknown[],
   expected: RobotSettingsAction,
 }
 
 describe('robot settings actions', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'robotSettings:FETCH_SETTINGS',
       creator: Actions.fetchSettings,

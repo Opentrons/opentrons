@@ -43,12 +43,12 @@ type Props = {
   mount: 'left' | 'right',
   pipette: AttachedPipette | null,
   calibration: PipetteCalibrations | null,
-  customLabware: Array<LabwareDefinition2>,
+  customLabware: LabwareDefinition2[],
 }
 
 function TipRackDisplayName(props: {
   tiprackUri: string,
-  customLabware: Array<LabwareDefinition2>,
+  customLabware: LabwareDefinition2[],
 }): React.ReactNode {
   const { t } = useTranslation('robot_calibration')
   const { tiprackUri, customLabware } = props
@@ -119,7 +119,7 @@ function PipetteOffsetSection(props: PipetteOffsetSectionProps): JSX.Element {
 
 type TipLengthSectionProps = {
   calibration: PipetteCalibrations | null,
-  customLabware: Array<LabwareDefinition2>,
+  customLabware: LabwareDefinition2[],
 }
 
 export function TipLengthSection(props: TipLengthSectionProps): JSX.Element {

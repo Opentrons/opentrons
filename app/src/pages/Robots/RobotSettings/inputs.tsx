@@ -24,7 +24,7 @@ export type InputProps<T> = {
 }
 
 type SelectProps<T> = InputProps<T> & {
-  options: Array<DropdownOption>,
+  options: DropdownOption[],
 }
 
 type TextInputProps<T> = InputProps<T> & {

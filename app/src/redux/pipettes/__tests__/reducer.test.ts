@@ -11,7 +11,7 @@ type ReducerSpec = {
   expected: PipettesState,
 }
 
-const SPECS: Array<ReducerSpec> = [
+const SPECS: ReducerSpec[] = [
   {
     name: 'handles pipettes:FETCH_PIPETTES_SUCCESS',
     action: {

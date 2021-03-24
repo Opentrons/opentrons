@@ -47,7 +47,7 @@ export type FetchResetConfigOptionsAction = {
 
 export type FetchResetConfigOptionsSuccessAction = {
   type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_SUCCESS',
-  payload: { robotName: string, options: Array<ResetConfigOption> },
+  payload: { robotName: string, options: ResetConfigOption[] },
   meta: RobotApiRequestMeta,
 }
 
@@ -90,7 +90,7 @@ export type RobotAdminAction =
 
 export type PerRobotAdminState = Partial<{
   status: RobotAdminStatus,
-  resetConfigOptions: Array<ResetConfigOption>,
+  resetConfigOptions: ResetConfigOption[],
 }>
 
 export type RobotAdminState = Partial<{

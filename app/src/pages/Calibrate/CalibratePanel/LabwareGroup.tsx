@@ -14,8 +14,8 @@ import type { Dispatch } from '../../../redux/types'
 
 export type LabwareGroupProps = {
   robotName: string | null,
-  tipracks: Array<BaseProtocolLabware>,
-  otherLabware: Array<BaseProtocolLabware>,
+  tipracks: BaseProtocolLabware[],
+  otherLabware: BaseProtocolLabware[],
 }
 
 export function LabwareGroup(props: LabwareGroupProps): JSX.Element {

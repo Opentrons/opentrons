@@ -55,7 +55,7 @@ export type TipLengthIntent =
 // into different session types and combine them into
 // a union object
 export type CalibrationPanelProps = {
-  sendCommands: (...Array<SessionCommandParams>) => void,
+  sendCommands: (...SessionCommandParams[]) => void,
   cleanUpAndExit: () => void,
   tipRack: CalibrationLabware,
   isMulti: boolean,
@@ -65,11 +65,11 @@ export type CalibrationPanelProps = {
   calBlock?: CalibrationLabware | null,
   shouldPerformTipLength?: boolean | null,
   checkBothPipettes?: boolean | null,
-  instruments?: Array<CalibrationCheckInstrument> | null,
+  instruments?: CalibrationCheckInstrument[] | null,
   comparisonsByPipette?: CalibrationCheckComparisonByPipette | null,
   activePipette?: CalibrationCheckInstrument,
   intent?: Intent,
   robotName?: string | null,
-  supportedCommands?: Array<SessionCommandString> | null,
-  defaultTipracks?: Array<LabwareDefinition2> | null,
+  supportedCommands?: SessionCommandString[] | null,
+  defaultTipracks?: LabwareDefinition2[] | null,
 }

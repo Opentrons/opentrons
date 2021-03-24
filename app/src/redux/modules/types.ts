@@ -62,7 +62,7 @@ export type FetchModulesAction = {
 
 export type FetchModulesSuccessAction = {
   type: 'modules:FETCH_MODULES_SUCCESS',
-  payload: { robotName: string, modules: Array<AttachedModule> },
+  payload: { robotName: string, modules: AttachedModule[] },
   meta: RobotApiRequestMeta,
 }
 
@@ -80,7 +80,7 @@ export type SendModuleCommandAction = {
     robotName: string,
     moduleId: string,
     command: ApiTypes.ModuleCommand,
-    args: Array<mixed>,
+    args: unknown[],
   },
   meta: RobotApiRequestMeta,
 }

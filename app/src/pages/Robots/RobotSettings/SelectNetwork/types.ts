@@ -60,7 +60,7 @@ export type ConnectFormKeyField = {
   ...ConnectFormFieldCommon,
   type: FIELD_TYPE_KEY_FILE,
   robotName: string,
-  wifiKeys: Array<WifiKey>,
+  wifiKeys: WifiKey[],
   placeholder: string,
 }
 
@@ -68,7 +68,7 @@ export type ConnectFormKeyField = {
 export type ConnectFormSecurityField = {
   ...ConnectFormFieldCommon,
   type: FIELD_TYPE_SECURITY,
-  eapOptions: Array<EapOption>,
+  eapOptions: EapOption[],
   showAllOptions: boolean,
   placeholder: string,
 }

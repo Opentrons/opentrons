@@ -19,7 +19,7 @@ export type FormValues = { [string]: ?(string | boolean) }
 export type ConfigFormGroupProps = {
   groupLabel: string,
   groupError?: ?string,
-  formFields: Array<DisplayFieldProps>,
+  formFields: DisplayFieldProps[],
 }
 
 export function ConfigFormGroup(props: ConfigFormGroupProps): JSX.Element {
@@ -124,7 +124,7 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
 
 export type ConfigQuirkGroupProps = {
   groupLabel: string,
-  quirks: Array<DisplayQuirkFieldProps>,
+  quirks: DisplayQuirkFieldProps[],
 }
 
 export function ConfigQuirkGroup(props: ConfigQuirkGroupProps): JSX.Element {

@@ -3,13 +3,13 @@ import type { RobotAdminAction } from '../types'
 
 type ActionSpec = {
   name: string,
-  creator: (...Array<any>) => mixed,
-  args: Array<mixed>,
+  creator: (...any[]) => mixed,
+  args: unknown[],
   expected: RobotAdminAction,
 }
 
 describe('robot admin actions', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'robotAdmin:RESTART',
       creator: Actions.restartRobot,

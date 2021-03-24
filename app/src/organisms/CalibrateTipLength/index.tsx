@@ -107,7 +107,7 @@ export function CalibrateTipLength(
     ? labware.find(l => !l.isTiprack) ?? null
     : null
 
-  function sendCommands(...commands: Array<SessionCommandParams>) {
+  function sendCommands(...commands: SessionCommandParams[]) {
     if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {

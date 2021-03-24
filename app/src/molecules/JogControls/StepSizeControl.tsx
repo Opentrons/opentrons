@@ -11,7 +11,7 @@ const STEP_SIZE_TITLE = 'Jump Size'
 const STEP_SIZE_SUBTITLE = 'Change with + and -'
 
 type StepSizeControlProps = {
-  stepSizes: Array<StepSize>,
+  stepSizes: StepSize[],
   currentStepSize: StepSize,
   setCurrentStepSize: StepSize => void,
 }

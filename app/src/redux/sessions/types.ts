@@ -155,7 +155,7 @@ export type SessionCommandResponseModel = {
 
 export type SessionResponse = RobotApiV2ResponseBody<SessionResponseModel>
 export type MultiSessionResponse = RobotApiV2ResponseBody<
-  $ReadOnlyArray<SessionResponseModel>
+  $ReadOnlySessionResponseModel[]
 >
 
 export type SessionCommandResponse = RobotApiV2ResponseBody<SessionCommandResponseModel>
@@ -236,7 +236,7 @@ export type FetchAllSessionsSuccessAction = {
   type: FETCH_ALL_SESSIONS_SUCCESS,
   payload: {
     robotName: string,
-    sessions: $ReadOnlyArray<SessionResponseModel>,
+    sessions: $ReadOnlySessionResponseModel[],
   },
   meta: RobotApiRequestMeta,
 }

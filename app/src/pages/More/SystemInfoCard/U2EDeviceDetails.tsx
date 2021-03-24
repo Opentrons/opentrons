@@ -28,7 +28,7 @@ const IPV6_ADDRESS = 'Local IPv6 Address'
 
 export type U2EDeviceDetailsProps = {
   device: UsbDevice | null,
-  ifaces: Array<NetworkInterface>,
+  ifaces: NetworkInterface[],
 }
 
 const DetailText = styled.span`

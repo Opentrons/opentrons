@@ -13,6 +13,8 @@ export type MigrationWarningModalProps = {
   proceed: () => mixed,
 }
 
+type MaybeButtonProps = ButtonProps | null| undefined
+
 const HEADING = 'Robot Operating System Update Available'
 
 export function MigrationWarningModal(
@@ -20,7 +22,7 @@ export function MigrationWarningModal(
 ): React.ReactNode {
   const { notNowButton, updateType, proceed } = props
 
-  const buttons: Array<?ButtonProps> = [
+  const buttons: MaybeButtonProps[] = [
     notNowButton,
     {
       children: updateType === UPGRADE ? 'view robot update' : 'update robot',

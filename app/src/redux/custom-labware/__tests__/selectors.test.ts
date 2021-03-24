@@ -13,7 +13,7 @@ type SelectorSpec = {
 }
 
 describe('custom labware selectors', () => {
-  const SPECS: Array<SelectorSpec> = [
+  const SPECS: SelectorSpec[] = [
     {
       name: 'getCustomLabware',
       selector: selectors.getCustomLabware,

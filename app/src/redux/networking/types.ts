@@ -63,7 +63,7 @@ export type FetchWifiListAction = {
 
 export type FetchWifiListSuccessAction = {
   type: FETCH_WIFI_LIST_SUCCESS,
-  payload: { robotName: string, wifiList: Array<ApiTypes.WifiNetwork> },
+  payload: { robotName: string, wifiList: ApiTypes.WifiNetwork[] },
   meta: RobotApiRequestMeta,
 }
 
@@ -103,7 +103,7 @@ export type FetchWifiKeysAction = {
 
 export type FetchWifiKeysSuccessAction = {
   type: FETCH_WIFI_KEYS_SUCCESS,
-  payload: { robotName: string, wifiKeys: Array<ApiTypes.ApiWifiKey> },
+  payload: { robotName: string, wifiKeys: ApiTypes.ApiWifiKey[] },
   meta: RobotApiRequestMeta,
 }
 
@@ -143,7 +143,7 @@ export type FetchEapOptionsAction = {
 
 export type FetchEapOptionsSuccessAction = {
   type: FETCH_EAP_OPTIONS_SUCCESS,
-  payload: { robotName: string, eapOptions: Array<ApiTypes.EapOption> },
+  payload: { robotName: string, eapOptions: ApiTypes.EapOption[] },
   meta: RobotApiRequestMeta,
 }
 
@@ -214,10 +214,10 @@ export type WifiKey = {
 export type PerRobotNetworkingState = Partial<{
   internetStatus?: ApiTypes.InternetStatus,
   interfaces?: ApiTypes.InterfaceStatusMap,
-  wifiList?: Array<ApiTypes.WifiNetwork>,
-  wifiKeyIds?: Array<string>,
+  wifiList?: ApiTypes.WifiNetwork[],
+  wifiKeyIds?: string[],
   wifiKeysById?: Partial<{ [id: string]: WifiKey }>,
-  eapOptions?: Array<ApiTypes.EapOption>,
+  eapOptions?: ApiTypes.EapOption[],
 }>
 
 export type NetworkingState = Partial<{

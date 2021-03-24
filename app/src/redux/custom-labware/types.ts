@@ -52,7 +52,7 @@ export type FailedLabwareFile =
 // state types
 
 export type CustomLabwareState = $ReadOnly<{
-  filenames: Array<string>,
+  filenames: string[],
   filesByName: Partial<{ [filename: string]: CheckedLabwareFile }>,
   addFailureFile: FailedLabwareFile | null,
   addFailureMessage: string | null,
@@ -75,7 +75,7 @@ export type FetchCustomLabwareAction = {
 
 export type CustomLabwareListAction = {
   type: 'labware:CUSTOM_LABWARE_LIST',
-  payload: Array<CheckedLabwareFile>,
+  payload: CheckedLabwareFile[],
   meta: { source: CustomLabwareListActionSource },
 }
 

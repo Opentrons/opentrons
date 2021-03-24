@@ -35,7 +35,7 @@ const mockGetUnconfirmedLabware: JestMockFn<
 
 const mockUseDispatchApiRequests: JestMockFn<
   [() => void],
-  [() => void, Array<string>]
+  [() => void, string[]]
 > = useDispatchApiRequests
 
 const mockGetHasCalibrationBlock: JestMockFn<

@@ -13,7 +13,7 @@ import type {
 import type { WifiNetwork } from '../types'
 
 export type SelectSsidProps = {
-  list: Array<WifiNetwork>,
+  list: WifiNetwork[],
   value: string | null,
   showWifiDisconnect: boolean,
   onConnect: (ssid: string) => mixed,
@@ -44,9 +44,9 @@ const StyledSelectField: React.ComponentType<SelectFieldProps> = styled(
 `
 
 const formatOptions = (
-  list: Array<WifiNetwork>,
+  list: WifiNetwork[],
   showWifiDisconnect: boolean
-): Array<SelectOptionOrGroup> => {
+): SelectOptionOrGroup[] => {
   const ssidOptionsList = { options: list.map(({ ssid }) => ({ value: ssid })) }
   const options = [ssidOptionsList, SELECT_JOIN_OTHER_GROUP]
 

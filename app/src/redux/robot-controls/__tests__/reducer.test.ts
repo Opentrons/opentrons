@@ -4,13 +4,13 @@ import type { Action } from '../../types'
 import type { PerRobotControlsState } from '../types'
 
 type ReducerSpec = {
-  name: string,
-  state: Partial<{ [robotName: string]: Partial<PerRobotControlsState> }>,
-  action: Action,
-  expected: Partial<{ [robotName: string]: Partial<PerRobotControlsState> }>,
+  name: string
+  state: Partial<{ [robotName: string]: Partial<PerRobotControlsState> }>
+  action: Action
+  expected: Partial<{ [robotName: string]: Partial<PerRobotControlsState> }>
 }
 
-const SPECS: Array<ReducerSpec> = [
+const SPECS: ReducerSpec[] = [
   {
     name: 'handles robotControls:FETCH_LIGHTS_SUCCESS',
     action: {

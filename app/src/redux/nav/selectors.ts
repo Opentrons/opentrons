@@ -210,7 +210,7 @@ export const getMoreLocation: State => NavLocation = createSelector(
   }
 )
 
-export const getNavbarLocations: State => Array<NavLocation> = createSelector(
+export const getNavbarLocations: State => NavLocation[] = createSelector(
   getRobotsLocation,
   getUploadLocation,
   getCalibrateLocation,

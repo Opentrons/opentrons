@@ -11,7 +11,7 @@ import type { Mount } from '../../../redux/pipettes/types'
 
 export type PipettesContentsProps = {
   currentMount: Mount | null,
-  pipettes: Array<Pipette>,
+  pipettes: Pipette[],
   activeTipracks: { left: Labware | null, right: Labware | null },
   changePipetteUrl: string,
 }

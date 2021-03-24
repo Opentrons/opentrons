@@ -4,7 +4,7 @@ export type UrlProtocol = 'file:' | 'http:'
 
 export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
-export type DiscoveryCandidates = string | Array<string>
+export type DiscoveryCandidates = string | string[]
 
 export type DevInternalFlag =
   | 'allPipetteConfig'
@@ -80,7 +80,7 @@ export type ConfigV0 = $ReadOnly<{
   }>,
 
   // app wide alerts
-  alerts: $ReadOnly<{ ignored: $ReadOnlyArray<string> }>,
+  alerts: $ReadOnly<{ ignored: $ReadOnlystring[] }>,
 
   // internal development flags
   devInternal?: $ReadOnly<FeatureFlags>,

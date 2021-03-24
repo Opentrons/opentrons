@@ -9,7 +9,7 @@ import styles from './styles.css'
 import type { SessionStatus, SessionStatusInfo } from '../../../redux/robot'
 
 export type CommandListProps = {
-  commands: Array<any>,
+  commands: any[],
   sessionStatus: SessionStatus,
   sessionStatusInfo: SessionStatusInfo,
   showSpinner: boolean,

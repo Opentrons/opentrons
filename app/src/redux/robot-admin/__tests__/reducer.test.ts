@@ -1,4 +1,3 @@
-
 import { mockDiscoveryClientRobot } from '../../discovery/__fixtures__'
 import { HEALTH_STATUS_NOT_OK } from '../../discovery'
 import { robotAdminReducer } from '../reducer'
@@ -7,14 +6,14 @@ import type { Action } from '../../types'
 import type { RobotAdminState } from '../types'
 
 type ReducerSpec = {
-  name: string,
-  action: Action,
-  state: RobotAdminState,
-  expected: RobotAdminState,
+  name: string
+  action: Action
+  state: RobotAdminState
+  expected: RobotAdminState
 }
 
 describe('robotAdminReducer', () => {
-  const SPECS: Array<ReducerSpec> = [
+  const SPECS: ReducerSpec[] = [
     {
       name: 'handles robotAdmin:RESTART',
       action: {

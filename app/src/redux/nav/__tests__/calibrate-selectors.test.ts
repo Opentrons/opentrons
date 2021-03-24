@@ -58,7 +58,7 @@ describe('calibrate nav selectors', () => {
     jest.resetAllMocks()
   })
 
-  const SPECS: Array<SelectorSpec> = [
+  const SPECS: SelectorSpec[] = [
     {
       name:
         'getCalibratePipettesLocations returns disabled if /calibrate disabled',

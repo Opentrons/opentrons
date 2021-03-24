@@ -21,6 +21,6 @@ export type AlertDismissedAction = {
 export type AlertsAction = AlertTriggeredAction | AlertDismissedAction
 
 export type AlertsState = $ReadOnly<{
-  active: $ReadOnlyArray<AlertId>,
-  ignored: $ReadOnlyArray<AlertId>,
+  active: $ReadOnlyAlertId[],
+  ignored: $ReadOnlyAlertId[],
 }>

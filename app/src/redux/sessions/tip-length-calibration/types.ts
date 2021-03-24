@@ -27,7 +27,7 @@ export type TipLengthCalibrationInstrument = {
   tipLength: number,
   mount: string,
   serial: string,
-  defaultTipracks: Array<LabwareDefinition2>,
+  defaultTipracks: LabwareDefinition2[],
 }
 
 export type TipLengthCalibrationSessionParams = {
@@ -39,5 +39,5 @@ export type TipLengthCalibrationSessionParams = {
 export type TipLengthCalibrationSessionDetails = {
   instrument: TipLengthCalibrationInstrument,
   currentStep: TipLengthCalibrationStep,
-  labware: Array<CalibrationLabware>,
+  labware: CalibrationLabware[],
 }

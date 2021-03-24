@@ -1,21 +1,23 @@
-import typeof { PENDING, SUCCESS, FAILURE } from './constants'
+import { PENDING, SUCCESS, FAILURE } from './constants'
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
 // api call + response types
 
-export type RobotHost = {
-  name: string,
-  ip: string,
-  port: number,
-  ...
+export interface RobotHost {
+  name: string
+  ip: string
+  port: number
+  [key: string]: unknown
 }
 
-export type RobotApiRequestOptions = {
+export interface RobotApiRequestOptions {
   method: Method,
   path: string,
-  body?: { ... },
-  query?: { [param: string]: string | boolean | number | null | void, ... },
+  body?: { },
+  query?: {
+    [param: string]: string | boolean | number | null | void,
+  },
   form?: FormData,
 }
 
@@ -26,32 +28,32 @@ export type RobotApiResponseMeta = {
   ok: boolean,
 }
 
-export type RobotApiResponse = {
-  ...RobotApiResponseMeta,
-  host: RobotHost,
-  body: any,
+export interface RobotApiResponse extends RobotApiResponseMeta {
+  host: RobotHost
+  body: any
 }
 
-export type RobotApiRequestMeta = Partial<{
-  requestId: string,
+export interface RobotApiRequestMeta {
+  requestId: string
   response: {
     method: Method,
     path: string,
     status: number,
     ok: boolean,
   },
-}>
+  [key: string]: unknown
+}
 
-export type RobotApiErrorResponse = {
-  message: string,
-  ...
+export interface RobotApiErrorResponse {
+  message: string
+  [key: string]: unknown
 }
 
 // action types
 
-export type DismissRequestAction = {
-  type: 'robotApi:DISMISS_REQUEST',
-  payload: { requestId: string },
+export interface DismissRequestAction {
+  type: 'robotApi:DISMISS_REQUEST'
+  payload: { requestId: string }
 }
 
 export type RobotApiAction = DismissRequestAction
@@ -59,27 +61,24 @@ export type RobotApiAction = DismissRequestAction
 // parameterized response type
 // DataT parameter must be a subtype of RobotApiV2ResponseData
 // MetaT defaults to void if unspecified
-export type ResourceLink = {
+export interface ResourceLink {
   href: string,
-  meta?: Partial<{ [string]: string | void }>,
+  meta?: Partial<{ [key: string]: string | void }>,
 }
 
-export type ResourceLinks = Partial<{ [string]: ResourceLink | string | void }>
+export interface ResourceLinks { [key: string]: ResourceLink | string | void }
 
 // generic response data supertype
-export type RobotApiV2ResponseData = {
-  id: string,
-  ...
-}
+export type RobotApiV2ResponseData = Partial<{ id: string }>
 
 export type RobotApiV2ResponseBody<
-  DataT: RobotApiV2ResponseData | $ReadOnlyArray<RobotApiV2ResponseData>
+  DataT: RobotApiV2ResponseData | RobotApiV2ResponseData[]
 > = {
   data: DataT,
   links?: ResourceLinks,
 }
 
-export type RobotApiV2Error = {
+export interface RobotApiV2Error {
   id?: string,
   links?: ResourceLinks,
   status?: string,
@@ -89,28 +88,28 @@ export type RobotApiV2Error = {
     pointer?: string,
     parameter?: string,
   },
-  meta?: { ... },
+  meta?: {},
 }
 
-export type RobotApiV2ErrorResponseBody = {
-  errors: Array<RobotApiV2Error>,
+export interface RobotApiV2ErrorResponseBody {
+  errors: RobotApiV2Error[],
 }
 
 // API request tracking state
 
-export type RequestStatus = PENDING | SUCCESS | FAILURE
+export type RequestStatus = typeof PENDING | typeof SUCCESS | typeof FAILURE
 
 export type RequestState =
-  | $ReadOnly<{ status: PENDING }>
-  | $ReadOnly<{ status: SUCCESS, response: RobotApiResponseMeta }>
-  | $ReadOnly<{
-      status: FAILURE,
+  | { status: typeof PENDING }
+  | { status: typeof SUCCESS, response: RobotApiResponseMeta }
+  | {
+      status: typeof FAILURE,
       response: RobotApiResponseMeta,
       error: { message?: string } | RobotApiV2ErrorResponseBody,
-    }>
+    }
 
 export type RobotApiState = Partial<
-  $ReadOnly<{
+  {
     [requestId: string]: void | RequestState,
-  }>
+  }
 >

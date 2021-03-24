@@ -3,14 +3,14 @@ import type { State } from '../../types'
 
 type SelectorSpec = {
   name: string,
-  selector: (Partial<State>, ...Array<any>) => mixed,
+  selector: (Partial<State>, ...any[]) => mixed,
   state: Partial<State>,
-  args?: Array<any>,
+  args?: any[],
   expected: mixed,
 }
 
 describe('robot admin selectors', () => {
-  const SPECS: Array<SelectorSpec> = [
+  const SPECS: SelectorSpec[] = [
     {
       name: 'getRobotAdminStatus returns null by default',
       selector: Selectors.getRobotAdminStatus,

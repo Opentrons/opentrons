@@ -8,13 +8,13 @@ import type { Action } from '../../types'
 import type { SystemInfoState } from '../types'
 
 type ReducerSpec = {
-  should: string,
-  action: Action,
-  initialState: SystemInfoState,
-  expectedState: SystemInfoState,
+  should: string
+  action: Action
+  initialState: SystemInfoState
+  expectedState: SystemInfoState
 }
 
-const SPECS: Array<ReducerSpec> = [
+const SPECS: ReducerSpec[] = [
   {
     should: 'handle systemInfo:INITIALIZED action',
     action: Actions.initialized(

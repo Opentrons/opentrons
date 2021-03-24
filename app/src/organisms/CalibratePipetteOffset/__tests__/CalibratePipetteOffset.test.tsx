@@ -59,7 +59,7 @@ describe('CalibratePipetteOffset', () => {
     CompleteConfirmation,
   ]
 
-  const SPECS: Array<CalibratePipetteOffsetSpec> = [
+  const SPECS: CalibratePipetteOffsetSpec[] = [
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
     { component: TipPickUp, currentStep: 'preparingPipette' },

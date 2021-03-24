@@ -20,7 +20,7 @@ import type { Dispatch } from '../../../redux/types'
 import type { AttachedModule } from '../../../redux/modules/types'
 
 const LID_OPEN_DELAY_MS = 30 * 1000
-type Props = { robotName: string, modules: Array<AttachedModule> }
+type Props = { robotName: string, modules: AttachedModule[] }
 
 export function PrepareModules(props: Props): JSX.Element {
   const { modules, robotName } = props

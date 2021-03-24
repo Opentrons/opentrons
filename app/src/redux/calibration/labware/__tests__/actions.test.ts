@@ -5,12 +5,12 @@ import type { LabwareCalibrationAction } from '../types'
 
 type ActionSpec = {
   should: string,
-  creator: (...Array<any>) => LabwareCalibrationAction,
-  args: Array<mixed>,
+  creator: (...any[]) => LabwareCalibrationAction,
+  args: unknown[],
   expected: LabwareCalibrationAction,
 }
 
-const SPECS: Array<ActionSpec> = [
+const SPECS: ActionSpec[] = [
   {
     should: 'create a fetchLabwareCalibrations action',
     creator: Actions.fetchLabwareCalibrations,

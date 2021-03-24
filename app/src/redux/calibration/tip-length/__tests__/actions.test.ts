@@ -5,12 +5,12 @@ import type { TipLengthCalibrationsAction } from '../types'
 
 type ActionSpec = {
   should: string,
-  creator: (...Array<any>) => TipLengthCalibrationsAction,
-  args: Array<mixed>,
+  creator: (...any[]) => TipLengthCalibrationsAction,
+  args: unknown[],
   expected: TipLengthCalibrationsAction,
 }
 
-const SPECS: Array<ActionSpec> = [
+const SPECS: ActionSpec[] = [
   {
     should: 'create a fetchTipLengthCalibrations action',
     creator: Actions.fetchTipLengthCalibrations,

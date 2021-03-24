@@ -8,13 +8,13 @@ import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
 
 type ActionSpec = {
   name: string,
-  creator: (...Array<any>) => mixed,
-  args: Array<mixed>,
+  creator: (...any[]) => mixed,
+  args: unknown[],
   expected: SessionsAction,
 }
 
 describe('robot session check actions', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'sessions:CREATE_SESSION',
       creator: Actions.createSession,

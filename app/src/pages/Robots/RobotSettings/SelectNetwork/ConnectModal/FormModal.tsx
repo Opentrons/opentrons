@@ -60,7 +60,7 @@ const StyledSecurityField: StyledComponent<
 export type FormModalProps = {
   id: string,
   network: WifiNetwork | null,
-  fields: Array<ConnectFormField>,
+  fields: ConnectFormField[],
   isValid: boolean,
   onCancel: () => mixed,
 }

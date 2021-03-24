@@ -61,7 +61,7 @@ describe('CalibrateDeck', () => {
     CompleteConfirmation,
   ]
 
-  const SPECS: Array<CalibrateDeckSpec> = [
+  const SPECS: CalibrateDeckSpec[] = [
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
     { component: TipPickUp, currentStep: 'preparingPipette' },

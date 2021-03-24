@@ -27,7 +27,7 @@ type Control = {
   sign: Sign,
 }
 type ControlsContents = {
-  controls: Array<Control>,
+  controls: Control[],
   title: string,
   subtitle: string,
 }
