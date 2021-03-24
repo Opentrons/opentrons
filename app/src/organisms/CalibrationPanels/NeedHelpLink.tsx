@@ -7,7 +7,7 @@ const SUPPORT_PAGE =
 
 type Props = React.ElementProps<typeof Flex>
 
-export function NeedHelpLink(props: Props): React.Node {
+export function NeedHelpLink(props: Props): React.ReactNode {
   return (
     <Flex {...props}>
       <Link

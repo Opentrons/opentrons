@@ -4,10 +4,10 @@ import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
 export interface WarningProps {
-  children: React.Node
+  children: React.ReactNode
 }
 
-export function Warning(props: WarningProps): React.Node {
+export function Warning(props: WarningProps): React.ReactNode {
   const { children } = props
 
   return (

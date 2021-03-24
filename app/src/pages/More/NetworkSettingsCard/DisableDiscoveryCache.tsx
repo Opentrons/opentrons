@@ -4,7 +4,7 @@ import { LabeledToggle } from '@opentrons/components'
 import type { State, Dispatch } from '../../../redux/types'
 import { getConfig, toggleConfigValue } from '../../../redux/config'
 
-export const DisableDiscoveryCache = (): React.Node => {
+export const DisableDiscoveryCache = (): React.ReactNode => {
   const dispatch = useDispatch<Dispatch>()
   const cacheDisabled = useSelector((state: State) => {
     return getConfig(state)?.discovery.disableCache ?? false

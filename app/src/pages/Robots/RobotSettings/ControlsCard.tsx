@@ -32,7 +32,7 @@ type Props = {
   robot: ViewableRobot,
 }
 
-export function ControlsCard(props: Props): React.Node {
+export function ControlsCard(props: Props): React.ReactNode {
   const { t } = useTranslation(['robot_controls', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const { robot } = props

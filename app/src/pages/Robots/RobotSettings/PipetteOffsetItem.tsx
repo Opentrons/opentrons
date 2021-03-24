@@ -49,7 +49,7 @@ type Props = {
 function TipRackDisplayName(props: {
   tiprackUri: string,
   customLabware: Array<LabwareDefinition2>,
-}): React.Node {
+}): React.ReactNode {
   const { t } = useTranslation('robot_calibration')
   const { tiprackUri, customLabware } = props
   const [namespace, loadName] = tiprackUri ? tiprackUri.split('/') : ['', '']
@@ -70,7 +70,7 @@ function TipRackDisplayName(props: {
 
 function LastCalibrated(props: {
   calibration: PipetteOffsetCalibration | TipLengthCalibration,
-}): React.Node {
+}): React.ReactNode {
   const { t } = useTranslation('robot_calibration')
   return (
     <Text
@@ -90,7 +90,7 @@ type PipetteOffsetSectionProps = {
   calibration: PipetteOffsetCalibration | null,
 }
 
-function PipetteOffsetSection(props: PipetteOffsetSectionProps): React.Node {
+function PipetteOffsetSection(props: PipetteOffsetSectionProps): React.ReactNode {
   const { t } = useTranslation('robot_calibration')
   const { pipette, calibration } = props
   return (
@@ -122,7 +122,7 @@ type TipLengthSectionProps = {
   customLabware: Array<LabwareDefinition2>,
 }
 
-export function TipLengthSection(props: TipLengthSectionProps): React.Node {
+export function TipLengthSection(props: TipLengthSectionProps): React.ReactNode {
   const { calibration, customLabware } = props
   const { t } = useTranslation('robot_calibration')
   return (
@@ -151,7 +151,7 @@ export function TipLengthSection(props: TipLengthSectionProps): React.Node {
   )
 }
 
-export function PipetteOffsetItem(props: Props): React.Node {
+export function PipetteOffsetItem(props: Props): React.ReactNode {
   const { t } = useTranslation('robot_calibration')
   const { mount, pipette, calibration, customLabware } = props
   return (

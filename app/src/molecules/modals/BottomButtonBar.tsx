@@ -11,10 +11,10 @@ import type { ButtonProps } from '@opentrons/components'
 type Props = {
   buttons: Array<?ButtonProps>,
   className?: string,
-  description?: React.Node,
+  description?: React.ReactNode,
 }
 
-export function BottomButtonBar(props: Props): React.Node {
+export function BottomButtonBar(props: Props): React.ReactNode {
   const buttons = props.buttons.filter(Boolean)
   const className = cx(styles.bottom_button_bar, props.className)
 

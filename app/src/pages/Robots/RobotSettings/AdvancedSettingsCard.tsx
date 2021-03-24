@@ -44,7 +44,7 @@ export type AdvancedSettingsCardProps = {
 const ROBOT_LOGS_OPTOUT_ID = 'disableLogAggregation'
 export function AdvancedSettingsCard(
   props: AdvancedSettingsCardProps
-): React.Node {
+): React.ReactNode {
   const { robot, resetUrl } = props
   const { name, ip, health, status } = robot
   const { t } = useTranslation('robot_advanced_settings')

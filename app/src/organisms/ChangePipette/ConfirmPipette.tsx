@@ -37,7 +37,7 @@ export type Props = {
   startPipetteOffsetCalibration: () => void,
 }
 
-export function ConfirmPipette(props: Props): React.Node {
+export function ConfirmPipette(props: Props): React.ReactNode {
   const {
     title,
     subtitle,

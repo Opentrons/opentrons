@@ -9,7 +9,7 @@ export function CalibrationData(props: {
   calibrationData: LabwareCalibrationData | null,
   calibratedThisSession: boolean,
   calDataAvailable: boolean,
-}): React.Node {
+}): React.ReactNode {
   const { calibrationData, calibratedThisSession, calDataAvailable } = props
 
   const { t } = useTranslation('protocol_calibration')

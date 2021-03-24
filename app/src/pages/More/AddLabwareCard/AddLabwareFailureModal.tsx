@@ -79,7 +79,7 @@ const renderDetails = file => (
 
 export function AddLabwareFailureModalTemplate(
   props: AddLabwareFailureModalProps
-): React.Node {
+): React.ReactNode {
   const { file, errorMessage, directory, onCancel, onOverwrite } = props
   let buttons = [
     { onClick: onCancel, children: CANCEL, className: styles.button },
@@ -143,7 +143,7 @@ export function AddLabwareFailureModalTemplate(
 
 export function AddLabwareFailureModal(
   props: AddLabwareFailureModalProps
-): React.Node {
+): React.ReactNode {
   return (
     <Portal>
       <AddLabwareFailureModalTemplate {...props} />

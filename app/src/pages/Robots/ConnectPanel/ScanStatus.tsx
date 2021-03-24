@@ -10,7 +10,7 @@ export type ScanStatusProps = {
   found: boolean,
 }
 
-export function ScanStatus(props: ScanStatusProps): React.Node {
+export function ScanStatus(props: ScanStatusProps): React.ReactNode {
   const { found, isScanning } = props
 
   const notFoundMessage = !isScanning && !found && (

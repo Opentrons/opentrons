@@ -30,7 +30,7 @@ import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
 const stopEvent = (event: SyntheticEvent<>) => event.preventDefault()
 
-export const AppComponent = (): React.Node => (
+export const AppComponent = (): React.ReactNode => (
   <>
     <GlobalStyle />
     <Flex

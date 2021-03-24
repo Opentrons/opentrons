@@ -6,7 +6,7 @@ type Props = {
   y: number | null,
   z: number | null,
 }
-export const CalibrationValues = (props: Props): React.Node => (
+export const CalibrationValues = (props: Props): React.ReactNode => (
   <span>
     {['x', 'y', 'z'].map(key => (
       <React.Fragment key={key}>

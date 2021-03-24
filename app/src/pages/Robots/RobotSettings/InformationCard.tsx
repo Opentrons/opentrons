@@ -38,7 +38,7 @@ export type InformationCardProps = {
 
 const UPDATE_RECHECK_DELAY_MS = 60000
 
-export function InformationCard(props: InformationCardProps): React.Node {
+export function InformationCard(props: InformationCardProps): React.ReactNode {
   const { robot, updateUrl } = props
   const { t } = useTranslation(['robot_info', 'shared'])
 

@@ -9,7 +9,7 @@ export type AddManualIpProps = {
   closeModal: () => mixed,
 }
 
-export function AddManualIpModal(props: AddManualIpProps): React.Node {
+export function AddManualIpModal(props: AddManualIpProps): React.ReactNode {
   return (
     <Portal>
       <AlertModal

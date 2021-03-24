@@ -17,7 +17,7 @@ export type RobotListItemProps = {
   onToggleConnect: () => mixed,
 }
 
-export function RobotListItem(props: RobotListItemProps): React.Node {
+export function RobotListItem(props: RobotListItemProps): React.ReactNode {
   const {
     name,
     displayName,

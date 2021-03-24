@@ -29,7 +29,7 @@ import { CalibrateTipLengthControl } from '../CalibrateTipLengthControl'
 
 type Props = ContextRouter
 
-export function Pipettes(props: Props): React.Node {
+export function Pipettes(props: Props): React.ReactNode {
   const { mount, definitionHash } = props.match.params
   const dispatch = useDispatch<Dispatch>()
   const robot = useSelector(getConnectedRobot)

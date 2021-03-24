@@ -18,9 +18,9 @@ import type { StyleProps } from '@opentrons/components'
 
 export type TitledControlProps = {
   title: string,
-  description: React.Node,
-  control?: React.Node,
-  children?: React.Node,
+  description: React.ReactNode,
+  control?: React.ReactNode,
+  children?: React.ReactNode,
   ...StyleProps,
 }
 
@@ -30,7 +30,7 @@ export function TitledControl({
   control,
   children,
   ...styleProps
-}: TitledControlProps): React.Node {
+}: TitledControlProps): React.ReactNode {
   return (
     <Box fontSize={FONT_SIZE_BODY_1} padding={SPACING_3} {...styleProps}>
       <Flex alignItems={ALIGN_CENTER}>

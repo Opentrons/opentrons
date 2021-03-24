@@ -3,10 +3,10 @@ import styles from './styles.css'
 
 export interface InfoSectionProps {
   title: string
-  children: React.Node
+  children: React.ReactNode
 }
 
-export function InfoSection(props: InfoSectionProps): React.Node {
+export function InfoSection(props: InfoSectionProps): React.ReactNode {
   return (
     <section className={styles.info_section}>
       <h3 className={styles.title}>{props.title}</h3>

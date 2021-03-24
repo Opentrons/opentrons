@@ -113,7 +113,7 @@ type DirectionControlProps = {
   stepSize: number,
 }
 
-export function DirectionControl(props: DirectionControlProps): React.Node {
+export function DirectionControl(props: DirectionControlProps): React.ReactNode {
   const { title, subtitle, controls } = CONTROLS_CONTENTS_BY_PLANE[props.plane]
 
   return (

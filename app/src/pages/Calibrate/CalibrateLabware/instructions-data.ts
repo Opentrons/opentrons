@@ -165,7 +165,7 @@ const DIAGRAMS_BOTTOM: {
 }
 
 const INSTRUCTIONS: {
-  [TypeKey]: { [Channels]: { [Step]: React.Node, ... }, ... },
+  [TypeKey]: { [Channels]: { [Step]: React.ReactNode, ... }, ... },
   ...
 } = {
   tiprack: {
@@ -302,7 +302,7 @@ const INSTRUCTIONS: {
 }
 
 const INSTRUCTIONS_BOTTOM: {
-  [TypeKey]: { [Channels]: { [Step]: React.Node, ... }, ... },
+  [TypeKey]: { [Channels]: { [Step]: React.ReactNode, ... }, ... },
   ...
 } = {
   tiprack: {
@@ -451,7 +451,7 @@ export function getDiagramSrc(
 
 export function getInstructionsByType(
   props: LabwareCalibrationProps
-): { [Step]: React.Node, ... } {
+): { [Step]: React.ReactNode, ... } {
   const typeKey = getTypeKey(props)
   const channelsKey = getChannelsKey(props)
 

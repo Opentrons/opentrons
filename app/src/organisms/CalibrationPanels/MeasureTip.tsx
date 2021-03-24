@@ -88,7 +88,7 @@ const SAVE_NOZZLE_Z_AXIS = 'Save the tip length'
 const CHECK_NOZZLE_Z_AXIS = 'Check the tip length'
 const SLOT = 'slot'
 
-export function MeasureTip(props: CalibrationPanelProps): React.Node {
+export function MeasureTip(props: CalibrationPanelProps): React.ReactNode {
   const {
     sendCommands,
     calBlock,

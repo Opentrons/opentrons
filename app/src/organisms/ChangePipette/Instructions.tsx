@@ -35,7 +35,7 @@ type Props = {
   exit: () => mixed,
 }
 
-export function Instructions(props: Props): React.Node {
+export function Instructions(props: Props): React.ReactNode {
   const {
     title,
     subtitle,

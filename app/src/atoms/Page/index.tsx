@@ -7,10 +7,10 @@ import type { TitleBarProps } from '@opentrons/components'
 
 export type PageProps = {
   titleBarProps?: TitleBarProps,
-  children: React.Node,
+  children: React.ReactNode,
 }
 
-export function Page(props: PageProps): React.Node {
+export function Page(props: PageProps): React.ReactNode {
   const { titleBarProps, children } = props
 
   return (

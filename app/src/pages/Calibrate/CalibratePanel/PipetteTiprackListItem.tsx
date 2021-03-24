@@ -33,7 +33,7 @@ export type PipetteTiprackListItemProps = {
 
 export function PipetteTiprackListItem(
   props: PipetteTiprackListItemProps
-): React.Node {
+): React.ReactNode {
   const {
     name,
     definition,

@@ -15,7 +15,7 @@ export type ResultModalProps = {
   onClose: () => mixed,
 }
 
-export const ResultModal = (props: ResultModalProps): React.Node => {
+export const ResultModal = (props: ResultModalProps): React.ReactNode => {
   const { type, ssid, isPending, error, onClose } = props
   const isDisconnect = type === DISCONNECT
 

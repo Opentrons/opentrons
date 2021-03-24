@@ -18,7 +18,7 @@ export type LabwareGroupProps = {
   otherLabware: Array<BaseProtocolLabware>,
 }
 
-export function LabwareGroup(props: LabwareGroupProps): React.Node {
+export function LabwareGroup(props: LabwareGroupProps): React.ReactNode {
   const { robotName, tipracks, otherLabware } = props
 
   const { t } = useTranslation('protocol_calibration')

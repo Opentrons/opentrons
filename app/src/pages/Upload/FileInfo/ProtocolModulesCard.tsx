@@ -25,7 +25,7 @@ import type { SessionModule } from '../../../redux/robot/types'
 const TYPE_COL_STYLE = { marginRight: SPACING_AUTO }
 const QUANTITY_COL_STYLE = { width: '37.5%', marginX: SPACING_3 }
 
-export function ProtocolModulesCard(): React.Node {
+export function ProtocolModulesCard(): React.ReactNode {
   const { t } = useTranslation('protocol_info')
   const modules = useSelector((state: State) => {
     return robotSelectors.getModules(state)

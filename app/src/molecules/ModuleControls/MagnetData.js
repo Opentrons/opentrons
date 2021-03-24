@@ -20,7 +20,7 @@ type Props = {|
   module: MagneticModule,
 |}
 
-export function MagnetData(props: Props): React.Node {
+export function MagnetData(props: Props): React.ReactNode {
   const { module } = props
   return (
     <Flex

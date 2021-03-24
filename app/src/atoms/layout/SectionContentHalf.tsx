@@ -3,11 +3,11 @@ import cx from 'classnames'
 import styles from './styles.css'
 
 export interface SectionContentHalfProps {
-  children: React.Node
+  children: React.ReactNode
   className?: string
 }
 
-export function SectionContentHalf(props: SectionContentHalfProps): React.Node {
+export function SectionContentHalf(props: SectionContentHalfProps): React.ReactNode {
   return (
     <div className={cx(styles.section_content_50, props.className)}>
       {props.children}

@@ -11,7 +11,7 @@ import {
 export type FormProps = {
   onSubmit: () => mixed,
   disabled?: boolean,
-  children: React.Node,
+  children: React.ReactNode,
   className?: string,
 }
 
@@ -37,7 +37,7 @@ export class Form extends React.Component<FormProps> {
     event.preventDefault()
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const onSubmit = !this.props.disabled ? this.onSubmit : undefined
 
     return (
@@ -57,7 +57,7 @@ export class Select<T: string> extends React.Component<SelectProps<T>> {
     }
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const { value, options, disabled, className } = this.props
 
     return (
@@ -81,7 +81,7 @@ export class TextInput<T: string> extends React.Component<TextInputProps<T>> {
     }
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const { type, value, disabled, className } = this.props
 
     return (

@@ -75,7 +75,7 @@ const DECK_INVALIDATES =
   'Recalibrating your deck will invalidate Pipette Offsets, and you will need to recalibrate Pipette Offsets after redoing Deck Calibration.'
 const NO_PIPETTE = 'No pipette attached'
 
-export function ResultsSummary(props: CalibrationPanelProps): React.Node {
+export function ResultsSummary(props: CalibrationPanelProps): React.ReactNode {
   const {
     comparisonsByPipette,
     instruments,
@@ -254,7 +254,7 @@ type RenderResultProps = {
   status: string | null,
 }
 
-function RenderResult(props: RenderResultProps): React.Node {
+function RenderResult(props: RenderResultProps): React.ReactNode {
   const { status } = props
   if (!status) {
     return null
@@ -282,7 +282,7 @@ type PipetteResultProps = {
   pipetteCalibration: CalibrationCheckComparisonsPerCalibration,
 }
 
-function PipetteResult(props: PipetteResultProps): React.Node {
+function PipetteResult(props: PipetteResultProps): React.ReactNode {
   const { pipetteInfo, pipetteCalibration } = props
   const displayName =
     getPipetteModelSpecs(pipetteInfo.model)?.displayName || pipetteInfo.model
@@ -329,7 +329,7 @@ function WarningText(props: {
     left: { offsetBad: boolean, tipLengthBad: boolean },
     right: { offsetBad: boolean, tipLengthBad: boolean },
   },
-}): React.Node | null {
+}): React.ReactNode | null {
   const badCount = [
     props.deckCalibrationBad,
     props.pipettes.left.offsetBad,

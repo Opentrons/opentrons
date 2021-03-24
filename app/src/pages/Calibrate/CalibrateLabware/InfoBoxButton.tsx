@@ -18,7 +18,7 @@ import { ProceedToRun } from './ProceedToRun'
 
 export type InfoBoxButtonProps = { labware: ?Labware }
 
-export function InfoBoxButton(props: InfoBoxButtonProps): React.Node {
+export function InfoBoxButton(props: InfoBoxButtonProps): React.ReactNode {
   const { labware } = props
   const dispatch = useDispatch<Dispatch>()
 

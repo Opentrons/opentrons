@@ -33,7 +33,7 @@ export const TemperatureControl = ({
   module,
   sendModuleCommand,
   disabledReason,
-}: Props): React.Node => {
+}: Props): React.ReactNode => {
   const [primaryTempValue, setPrimaryTempValue] = React.useState(null)
   const [secondaryTempValue, setSecondaryTempValue] = React.useState(null)
   const [isModalOpen, setIsModalOpen] = React.useState(false)

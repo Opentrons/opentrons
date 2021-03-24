@@ -10,7 +10,7 @@ const CLEAR_ROBOTS_TITLE = 'Clear Discovered Robots List'
 const CLEAR_ROBOTS_DESCRIPTION =
   'If your app has unused robots in its list, click to clear the cache & remove them.'
 
-export function ClearDiscoveryCache(): React.Node {
+export function ClearDiscoveryCache(): React.ReactNode {
   const dispatch = useDispatch<Dispatch>()
   return (
     <LabeledButton

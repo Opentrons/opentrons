@@ -14,7 +14,7 @@ import {
 import { getNavbarLocations } from '../redux/nav'
 import { NavbarLink } from '../molecules/NavbarLink'
 
-export function Navbar(): React.Node {
+export function Navbar(): React.ReactNode {
   const locations = useSelector(getNavbarLocations)
 
   return (

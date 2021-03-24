@@ -13,14 +13,14 @@ export type ClearDeckAlertModalProps = {
   cancelText: string,
   continueText: string,
   removeTrash?: boolean,
-  children?: React.Node,
+  children?: React.ReactNode,
 }
 
 const HEADING = 'Before continuing, please remove:'
 
 export function ClearDeckAlertModal(
   props: ClearDeckAlertModalProps
-): React.Node {
+): React.ReactNode {
   const {
     onContinueClick,
     onCancelClick,

@@ -37,7 +37,7 @@ export type PromptProps = {
   hasDuplicateModules: boolean,
 }
 
-export function Prompt(props: PromptProps): React.Node {
+export function Prompt(props: PromptProps): React.ReactNode {
   const { modulesMissing, onPromptClick, hasDuplicateModules } = props
   const { t } = useTranslation('protocol_calibration')
   const [targetProps, tooltipProps] = useHoverTooltip()

@@ -7,7 +7,7 @@ import cx from 'classnames'
 import styles from './styles.css'
 
 export type RobotLinkProps = {
-  children: React.Node,
+  children: React.ReactNode,
   url: string,
   className?: string,
   activeClassName?: string,
@@ -15,7 +15,7 @@ export type RobotLinkProps = {
   disabled?: boolean,
 }
 
-export function RobotLink(props: RobotLinkProps): React.Node {
+export function RobotLink(props: RobotLinkProps): React.ReactNode {
   const { url } = props
   const className = cx(styles.robot_link, props.className, {
     [styles.disabled]: props.disabled,

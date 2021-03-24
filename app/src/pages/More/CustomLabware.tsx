@@ -10,7 +10,7 @@ import { ListLabwareCard } from './ListLabwareCard'
 // TODO(mc, 2019-10-17): i18n
 const CUSTOM_LABWARE_PAGE_TITLE = 'Custom Labware'
 
-export function CustomLabware(props: ContextRouter): React.Node {
+export function CustomLabware(props: ContextRouter): React.ReactNode {
   return (
     <Page titleBarProps={{ title: CUSTOM_LABWARE_PAGE_TITLE }}>
       <CardContainer>

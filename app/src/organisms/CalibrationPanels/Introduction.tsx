@@ -107,7 +107,7 @@ type PanelContents = {
 
 const bodyContentFromFragments: (
   Array<BodySpec>
-) => React.Node = contentFragments => {
+) => React.ReactNode = contentFragments => {
   return (
     <>
       {contentFragments
@@ -383,7 +383,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
   }
 }
 
-export function Introduction(props: CalibrationPanelProps): React.Node {
+export function Introduction(props: CalibrationPanelProps): React.ReactNode {
   const {
     tipRack,
     calBlock,

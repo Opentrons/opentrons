@@ -27,7 +27,7 @@ const TYPE_COL_STYLE = { marginRight: SPACING_AUTO }
 const QUANTITY_COL_STYLE = { width: '12.5%', marginX: SPACING_3 }
 const CAL_DATA_COL_STYLE = { width: '25%' }
 
-const renderCalValue = (axis: string, value: number): React.Node => (
+const renderCalValue = (axis: string, value: number): React.ReactNode => (
   <>
     <Text as="span" fontWeight={FONT_WEIGHT_SEMIBOLD}>
       {axis.toUpperCase()}
@@ -40,7 +40,7 @@ const renderCalValue = (axis: string, value: number): React.Node => (
 
 export function ProtocolLabwareList(
   props: ProtocolLabwareListProps
-): React.Node {
+): React.ReactNode {
   const { labware } = props
   const { t } = useTranslation(['protocol_info', 'protocol_calibration'])
   const [calDescTooltipTargetProps, calDescTooltipProps] = useHoverTooltip({

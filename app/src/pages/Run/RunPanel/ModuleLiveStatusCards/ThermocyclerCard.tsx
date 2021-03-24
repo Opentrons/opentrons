@@ -105,7 +105,7 @@ export const ThermocyclerCard = ({
   controlDisabledReason,
   isCardExpanded,
   toggleCard,
-}: Props): React.Node => {
+}: Props): React.ReactNode => {
   const {
     currentTemp,
     targetTemp,

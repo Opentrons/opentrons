@@ -39,7 +39,7 @@ describe('ConnectPanel RobotItem', () => {
     // grab the wrapped component from react-router::withRouter
     const Component = (RobotItemas any).WrappedComponent
 
-    const Wrapper = ({ children }: { children: React.Node }) => (
+    const Wrapper = ({ children }: { children: React.ReactNode }) => (
       <Provider store={store}>
         <StaticRouter location="/" context={{}}>
           {children}

@@ -3,11 +3,11 @@ import cx from 'classnames'
 import styles from './styles.css'
 
 export interface CardContentThirdProps {
-  children: React.Node
+  children: React.ReactNode
   className?: string
 }
 
-export function CardContentThird(props: CardContentThirdProps): React.Node {
+export function CardContentThird(props: CardContentThirdProps): React.ReactNode {
   return (
     <div className={cx(styles.card_content_third, props.className)}>
       {props.children}

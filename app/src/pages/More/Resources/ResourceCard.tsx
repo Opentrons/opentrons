@@ -5,12 +5,12 @@ import { Card, OutlineButton } from '@opentrons/components'
 import styles from './styles.css'
 
 type Props = {
-  title: React.Node,
-  description: React.Node,
+  title: React.ReactNode,
+  description: React.ReactNode,
   url: string,
 }
 
-export function ResourceCard(props: Props): React.Node {
+export function ResourceCard(props: Props): React.ReactNode {
   return (
     <Card title={props.title}>
       <div className={styles.card_content}>

@@ -18,14 +18,14 @@ import type { FetchPipettesAction } from '../../redux/pipettes/types'
 export type CheckPipetteButtonProps = {
   robotName: string,
   className: string,
-  children: React.Node,
+  children: React.ReactNode,
   hidden?: boolean,
   onDone?: () => mixed,
 }
 
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps
-): React.Node {
+): React.ReactNode {
   const { robotName, onDone, className, children, hidden = false } = props
   const fetchPipettesRequestId = React.useRef<string | null>(null)
   const [dispatch] = useDispatchApiRequests<FetchPipettesAction>(

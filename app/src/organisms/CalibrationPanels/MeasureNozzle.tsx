@@ -89,7 +89,7 @@ const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis and move to pick up tip'
 const CHECK_NOZZLE_Z_AXIS = 'Check nozzle z-axis and move to pick up tip'
 const SLOT = 'slot'
 
-export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
+export function MeasureNozzle(props: CalibrationPanelProps): React.ReactNode {
   const { sendCommands, calBlock, mount, isMulti, sessionType } = props
 
   const referencePointStr = calBlock ? (

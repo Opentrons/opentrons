@@ -1,6 +1,16 @@
 {
   "extends": "../tsconfig-base.json",
-  "references": [],
+  "references": [
+    {
+      "path": "../app-shell"
+    },
+    {
+      "path": "../components"
+    },
+    {
+      "path": "../discovery-client"
+    },
+  ],
   "compilerOptions": {
     "composite": true,
     "rootDir": "src",

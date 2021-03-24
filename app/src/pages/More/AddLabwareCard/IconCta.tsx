@@ -19,7 +19,7 @@ export const IconCta = ({
   text,
   className,
   onClick,
-}: IconCtaProps): React.Node => (
+}: IconCtaProps): React.ReactNode => (
   <button
     name={name}
     onClick={onClick}

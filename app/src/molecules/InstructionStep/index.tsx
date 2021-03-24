@@ -3,11 +3,11 @@ import styles from './styles.css'
 
 export interface InstructionStepProps {
   step: 'one' | 'two'
-  children: React.Node
+  children: React.ReactNode
   diagram: string
 }
 
-export function InstructionStep(props: InstructionStepProps): React.Node {
+export function InstructionStep(props: InstructionStepProps): React.ReactNode {
   return (
     <fieldset className={styles.step}>
       <legend className={styles.step_legend}>Step {props.step}</legend>

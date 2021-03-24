@@ -17,7 +17,7 @@ export type LabwareCalibrationProps = {
 
 export function ConfirmPositionDiagram(
   props: LabwareCalibrationProps
-): React.Node {
+): React.ReactNode {
   const instructions = getInstructionsByType(props)
   const diagrams = getDiagramSrc(props)
 

@@ -105,7 +105,7 @@ const SPINNER = (
   </BaseModal>
 )
 
-export function UpdateAppModal(props: UpdateAppModalProps): React.Node {
+export function UpdateAppModal(props: UpdateAppModalProps): React.ReactNode {
   const { dismissAlert, closeModal } = props
   const [updatesIgnored, setUpdatesIgnored] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()

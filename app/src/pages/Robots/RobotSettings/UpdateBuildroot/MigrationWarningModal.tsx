@@ -17,7 +17,7 @@ const HEADING = 'Robot Operating System Update Available'
 
 export function MigrationWarningModal(
   props: MigrationWarningModalProps
-): React.Node {
+): React.ReactNode {
   const { notNowButton, updateType, proceed } = props
 
   const buttons: Array<?ButtonProps> = [

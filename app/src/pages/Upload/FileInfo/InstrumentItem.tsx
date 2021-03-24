@@ -24,13 +24,13 @@ const AXIS_NAMES = ['x', 'y', 'z']
 export type InstrumentItemProps = {
   compatibility?: PipetteCompatibility,
   mount?: string,
-  children: React.Node,
+  children: React.ReactNode,
   hidden?: boolean,
   needsOffsetCalibration: boolean,
   pipetteOffsetData?: [number, number, number] | null,
 }
 
-export function InstrumentItem(props: InstrumentItemProps): React.Node {
+export function InstrumentItem(props: InstrumentItemProps): React.ReactNode {
   const {
     compatibility,
     mount,
@@ -94,7 +94,7 @@ function StatusIcon(props: { match: boolean }) {
 
 function BuildOffsetText(props: {
   offsetData: [number, number, number],
-}): React.Node {
+}): React.ReactNode {
   const { offsetData } = props
   const { t } = useTranslation('protocol_info')
   return (

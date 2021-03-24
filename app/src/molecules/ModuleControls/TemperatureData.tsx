@@ -33,7 +33,7 @@ export const TemperatureData = ({
   status,
   current,
   target,
-}: TemperatureDataProps): React.Node => (
+}: TemperatureDataProps): React.ReactNode => (
   <Flex flexDirection={DIRECTION_COLUMN} fontSize={FONT_SIZE_BODY_1}>
     {title && (
       <Text

@@ -35,7 +35,7 @@ type ConnectionStatusProps = {
 
 export function ConnectionStatusMessage(
   props: ConnectionStatusProps
-): React.Node {
+): React.ReactNode {
   const { type, ipAddress, status, internetStatus } = props
   const { t } = useTranslation(['robot_connection', 'shared'])
 
@@ -73,11 +73,11 @@ type ConnectionInfoProps = {
   connection: SimpleInterfaceStatus | null,
   title: string,
   wired?: boolean,
-  children?: React.Node,
+  children?: React.ReactNode,
   disabled: ?boolean,
 }
 
-export function ConnectionInfo(props: ConnectionInfoProps): React.Node {
+export function ConnectionInfo(props: ConnectionInfoProps): React.ReactNode {
   const { connection, title, wired, children, disabled } = props
   const labelStyles = cx(styles.connection_label, {
     [styles.disabled]: disabled,

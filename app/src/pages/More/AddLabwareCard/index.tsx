@@ -24,7 +24,7 @@ const LABWARE_MANAGEMENT = 'Labware Management'
 const MANAGE_CUSTOM_LABWARE_DEFINITIONS =
   'Manage custom labware definitions for use in your Python Protocol API Version 2 protocols.'
 
-export function AddLabwareCard(): React.Node {
+export function AddLabwareCard(): React.ReactNode {
   const dispatch = useDispatch<Dispatch>()
   const labwarePath = useSelector(getCustomLabwareDirectory)
   const addFailure = useSelector(getAddLabwareFailure)

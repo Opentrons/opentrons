@@ -47,7 +47,7 @@ type Props = {
   titleBarTitle: string,
   closePrompt: () => void,
 }
-export function AskForCalibrationBlockModal(props: Props): React.Node {
+export function AskForCalibrationBlockModal(props: Props): React.ReactNode {
   const [rememberPreference, setRememberPreference] = React.useState<boolean>(
     false
   )

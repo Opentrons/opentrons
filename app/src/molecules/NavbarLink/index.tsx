@@ -49,7 +49,7 @@ const ACTIVE_STYLE = css`
   }
 `
 
-export function NavbarLink(props: NavbarLinkProps): React.Node {
+export function NavbarLink(props: NavbarLinkProps): React.ReactNode {
   const {
     id,
     path,

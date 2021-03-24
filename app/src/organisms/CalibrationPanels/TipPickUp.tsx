@@ -53,7 +53,7 @@ const ASSET_MAP = {
   multi: multiDemoAsset,
   single: singleDemoAsset,
 }
-export function TipPickUp(props: CalibrationPanelProps): React.Node {
+export function TipPickUp(props: CalibrationPanelProps): React.ReactNode {
   const { sendCommands, tipRack, isMulti } = props
 
   const tipRackDef = React.useMemo(

@@ -37,7 +37,7 @@ export type UpdateFromFileControlProps = {
 
 export function UpdateFromFileControl(
   props: UpdateFromFileControlProps
-): React.Node {
+): React.ReactNode {
   const { robotName } = props
   const { t } = useTranslation(['robot_advanced_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()

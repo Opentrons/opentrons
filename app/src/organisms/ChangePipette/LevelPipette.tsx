@@ -84,7 +84,7 @@ function LevelingVideo(props: { pipetteName: string, mount: Mount }) {
   )
 }
 
-export function LevelPipette(props: Props): React.Node {
+export function LevelPipette(props: Props): React.ReactNode {
   const {
     title,
     subtitle,

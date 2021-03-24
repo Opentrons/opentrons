@@ -40,7 +40,7 @@ const IgnoreCheckbox = styled(CheckboxField)`
   bottom: 1.5rem;
 `
 
-export function U2EDriverOutdatedAlert(props: AlertProps): React.Node {
+export function U2EDriverOutdatedAlert(props: AlertProps): React.ReactNode {
   const trackEvent = useTrackEvent()
   const [rememberDismiss, toggleRememberDismiss] = useToggle()
   const { dismissAlert } = props

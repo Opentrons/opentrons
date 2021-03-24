@@ -8,7 +8,7 @@ import type { StyledComponent } from 'styled-components'
 export type FormRowProps = {
   label: string,
   labelFor: string,
-  children: React.Node,
+  children: React.ReactNode,
 }
 
 const StyledRow: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
@@ -31,7 +31,7 @@ const StyledInputWrapper: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   }
 `
 
-export const FormRow = (props: FormRowProps): React.Node => {
+export const FormRow = (props: FormRowProps): React.ReactNode => {
   const { label, labelFor, children } = props
 
   return (

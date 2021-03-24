@@ -13,7 +13,7 @@ export type IpItemProps = {
 export class IpItem extends React.Component<IpItemProps> {
   remove: () => mixed = () => this.props.removeIp(this.props.candidate)
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const iconName = this.props.discovered ? 'check' : 'ot-spinner'
     return (
       <div className={styles.ip_item_group}>

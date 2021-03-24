@@ -6,14 +6,14 @@ type Props = {
   /** Title for the card */
   title: string,
   /** Card Content, each child will be separated with a grey bottom border */
-  children: ?React.Node,
+  children: ?React.ReactNode,
   /** Optional className for card contents */
   className?: string,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
 }
 
-export function StatusCard(props: Props): React.Node {
+export function StatusCard(props: Props): React.ReactNode {
   return (
     <CollapsibleItem
       className={styles.status_card}

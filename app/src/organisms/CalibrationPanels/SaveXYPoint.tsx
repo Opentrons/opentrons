@@ -159,7 +159,7 @@ const contentsBySessionTypeByCurrentStep: {
   },
 }
 
-export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
+export function SaveXYPoint(props: CalibrationPanelProps): React.ReactNode {
   const {
     isMulti,
     mount,

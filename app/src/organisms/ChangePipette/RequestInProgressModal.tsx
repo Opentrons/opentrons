@@ -23,7 +23,7 @@ type Props = {
   isPipetteHoming: boolean,
 }
 
-export function RequestInProgressModal(props: Props): React.Node {
+export function RequestInProgressModal(props: Props): React.ReactNode {
   const { title, subtitle, mount, movementStatus, isPipetteHoming } = props
   let message = `${mount === RIGHT ? RIGHT_PIP : LEFT_PIP} ${CARRIAGE_MOVING}`
 

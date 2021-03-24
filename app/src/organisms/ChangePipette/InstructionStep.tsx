@@ -23,7 +23,7 @@ type DiagramProps = {
 type Props = {
   ...DiagramProps,
   step: 'one' | 'two',
-  children: React.Node,
+  children: React.ReactNode,
 }
 
 export function getDiagramsSrc(props: DiagramProps): string {
@@ -35,7 +35,7 @@ export function getDiagramsSrc(props: DiagramProps): string {
     : require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
 }
 
-export function InstructionStep(props: Props): React.Node {
+export function InstructionStep(props: Props): React.ReactNode {
   const { step, children, ...diagramProps } = props
 
   return (

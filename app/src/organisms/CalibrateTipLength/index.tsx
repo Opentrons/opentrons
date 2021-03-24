@@ -92,7 +92,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 }
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
-): React.Node {
+): React.ReactNode {
   const { session, robotName, showSpinner, dispatchRequests, isJogging } = props
   const { currentStep, instrument, labware } = session?.details || {}
 

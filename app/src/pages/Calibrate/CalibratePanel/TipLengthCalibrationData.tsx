@@ -16,7 +16,7 @@ export type TipLengthCalibrationDataProps = {
 
 export function TipLengthCalibrationData(
   props: TipLengthCalibrationDataProps
-): React.Node {
+): React.ReactNode {
   const { calibrationData, calDataAvailable } = props
   const { t } = useTranslation('protocol_calibration')
 

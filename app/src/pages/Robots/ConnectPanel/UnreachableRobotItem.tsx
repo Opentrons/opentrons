@@ -7,7 +7,7 @@ import styles from './styles.css'
 
 import type { UnreachableRobot } from '../../../redux/discovery/types'
 
-export function UnreachableRobotItem(props: UnreachableRobot): React.Node {
+export function UnreachableRobotItem(props: UnreachableRobot): React.ReactNode {
   const { displayName } = props
   return (
     <li className={styles.robot_group}>

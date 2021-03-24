@@ -22,7 +22,7 @@ interface Props {
   controlDisabledReason: string | null
 }
 
-export function ModuleControls(props: Props): React.Node {
+export function ModuleControls(props: Props): React.ReactNode {
   const { module: mod, controlDisabledReason } = props
   const sendModuleCommand = useSendModuleCommand()
   return (

@@ -27,7 +27,7 @@ export type Props = {
 
 export function useConfirmCrashRecovery(
   props: Props
-): [React.Node, React.Node] {
+): [React.ReactNode, React.ReactNode] {
   const { sendCommands, tipRack, requiresNewTip } = props
   const [showModal, setShowModal] = React.useState(false)
 

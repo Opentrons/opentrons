@@ -15,7 +15,7 @@ export type ConfirmCancelModalProps = {
   onClose: () => mixed,
 }
 
-export function ConfirmCancelModal(props: ConfirmCancelModalProps): React.Node {
+export function ConfirmCancelModal(props: ConfirmCancelModalProps): React.ReactNode {
   const { onClose } = props
   const dispatch = useDispatch<Dispatch>()
 

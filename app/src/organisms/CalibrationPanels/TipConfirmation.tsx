@@ -45,7 +45,7 @@ const contentsBySessionType: {
     moveCommandString: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
   },
 }
-export function TipConfirmation(props: CalibrationPanelProps): React.Node {
+export function TipConfirmation(props: CalibrationPanelProps): React.ReactNode {
   const { sendCommands, sessionType, shouldPerformTipLength } = props
 
   const isExtendedPipOffset =

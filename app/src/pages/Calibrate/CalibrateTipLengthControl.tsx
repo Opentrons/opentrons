@@ -64,7 +64,7 @@ export function CalibrateTipLengthControl({
   mount,
   tipRackDefinition,
   isExtendedPipOffset,
-}: CalibrateTipLengthControlProps): React.Node {
+}: CalibrateTipLengthControlProps): React.ReactNode {
   const createRequestId = React.useRef<string | null>(null)
   const trackedRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)

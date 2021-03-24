@@ -19,7 +19,7 @@ export type InstrumentSettingsProps = {
 // used to guarantee mount param in route is left or right
 const RE_MOUNT = `(${LEFT}|${RIGHT})`
 
-export function InstrumentSettings(props: InstrumentSettingsProps): React.Node {
+export function InstrumentSettings(props: InstrumentSettingsProps): React.ReactNode {
   const { robotName, robotDisplayName, url, path, pathname } = props
   const titleBarProps = { title: robotDisplayName }
 

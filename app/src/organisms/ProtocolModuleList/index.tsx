@@ -32,7 +32,7 @@ const DECK_SLOT_STYLE = { width: '4.5rem' }
 const MODULE_STYLE = { width: '7rem', paddingRight: SPACING_3 }
 const USB_PORT_STYLE = { width: SPACING_AUTO }
 
-export function ProtocolModuleList(): React.Node {
+export function ProtocolModuleList(): React.ReactNode {
   const { t } = useTranslation('protocol_calibration')
   const modulesRequired = useSelector((state: State) =>
     robotSelectors.getModules(state)
@@ -91,7 +91,7 @@ type UsbPortInfoProps = {
   moduleMissing: boolean,
 }
 
-function UsbPortInfo(props: UsbPortInfoProps): React.Node {
+function UsbPortInfo(props: UsbPortInfoProps): React.ReactNode {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation('protocol_calibration')
   if (props.moduleMissing) return null

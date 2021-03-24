@@ -2,7 +2,7 @@ import * as React from 'react'
 import { ListItem, Icon } from '@opentrons/components'
 import styles from './upload-panel.css'
 
-export function UploadMenu(): React.Node {
+export function UploadMenu(): React.ReactNode {
   return (
     <ol className={styles.menu_list}>
       <ListItem

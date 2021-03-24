@@ -22,7 +22,7 @@ type Props = {
 
 const STATUS_REFRESH_MS = 5000
 
-export function ConnectionCard(props: Props): React.Node {
+export function ConnectionCard(props: Props): React.ReactNode {
   const { robot } = props
   const { name: robotName, status, local, ip } = robot
   const { t } = useTranslation('robot_connection')

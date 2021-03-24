@@ -26,7 +26,7 @@ const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
 
 const EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLED = 'appUpdateNotificationsToggled'
 
-export function UpdateNotificationsControl(props: StyleProps): React.Node {
+export function UpdateNotificationsControl(props: StyleProps): React.ReactNode {
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()
 

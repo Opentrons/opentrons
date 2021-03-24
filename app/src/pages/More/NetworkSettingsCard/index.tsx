@@ -8,7 +8,7 @@ import { DisableDiscoveryCache } from './DisableDiscoveryCache'
 // TODO(mc, 2020-04-27): i18n
 const NETWORK_SETTINGS = 'Network Settings'
 
-export const NetworkSettingsCard = (): React.Node => (
+export const NetworkSettingsCard = (): React.ReactNode => (
   <Card title={NETWORK_SETTINGS}>
     <AddManualIp />
     <DisableDiscoveryCache />

@@ -13,7 +13,7 @@ import type { Labware, LabwareType } from '../../../redux/robot/types'
 
 export type InfoBoxProps = { labware: ?Labware }
 
-export function InfoBox(props: InfoBoxProps): React.Node {
+export function InfoBox(props: InfoBoxProps): React.ReactNode {
   const { labware } = props
 
   let title = 'No labware selected'

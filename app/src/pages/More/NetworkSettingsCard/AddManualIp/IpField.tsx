@@ -8,7 +8,7 @@ export type IpFieldProps = {
   inputRef: { current: null | HTMLInputElement },
 }
 
-export function IpField(props: IpFieldProps): React.Node {
+export function IpField(props: IpFieldProps): React.ReactNode {
   const {
     field,
     form: { submitForm, dirty },

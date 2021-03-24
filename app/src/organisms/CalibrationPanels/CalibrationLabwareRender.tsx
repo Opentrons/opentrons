@@ -30,7 +30,7 @@ type CalibrationLabwareRenderProps = {
 
 export function CalibrationLabwareRender(
   props: CalibrationLabwareRenderProps
-): React.Node {
+): React.ReactNode {
   const { labwareDef, slotDef } = props
   const title = getLabwareDisplayName(labwareDef)
   const isTiprack = getIsTiprack(labwareDef)
@@ -58,7 +58,7 @@ export function CalibrationLabwareRender(
 
 export function CalibrationBlockRender(
   props: CalibrationLabwareRenderProps
-): React.Node {
+): React.ReactNode {
   const { labwareDef, slotDef } = props
 
   switch (labwareDef.parameters.loadName) {

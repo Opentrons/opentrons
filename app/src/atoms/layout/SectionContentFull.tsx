@@ -3,11 +3,11 @@ import cx from 'classnames'
 import styles from './styles.css'
 
 export interface SectionContentFullProps {
-  children: React.Node
+  children: React.ReactNode
   className?: string
 }
 
-export function SectionContentFull(props: SectionContentFullProps): React.Node {
+export function SectionContentFull(props: SectionContentFullProps): React.ReactNode {
   return (
     <div className={cx(styles.section_content_full, props.className)}>
       {props.children}

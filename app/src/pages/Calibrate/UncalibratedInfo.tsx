@@ -54,7 +54,7 @@ type UncalibratedInfoProps = {
   showSpinner: boolean,
 }
 
-export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
+export function UncalibratedInfo(props: UncalibratedInfoProps): React.ReactNode {
   const {
     uncalibratedTipracksByMount,
     mount,

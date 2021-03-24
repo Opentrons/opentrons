@@ -8,7 +8,7 @@ type Props = {
   model: ModuleModel,
 }
 
-export function ModuleImage(props: Props): React.Node {
+export function ModuleImage(props: Props): React.ReactNode {
   const imgSrc = getModuleImg(props.model)
 
   return (

@@ -18,7 +18,7 @@ import type { State } from '../../../redux/types'
 
 const U2E_ADAPTER_INFORMATION = 'USB-to-Ethernet Adapter Information'
 
-export const U2EAdapterInfo = (): React.Node => {
+export const U2EAdapterInfo = (): React.ReactNode => {
   const device = useSelector(SystemInfo.getU2EAdapterDevice)
   const ifacesMap = useSelector(SystemInfo.getU2EInterfacesMap)
   const driverOutdated = useSelector((state: State) => {

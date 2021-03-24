@@ -37,7 +37,7 @@ const GetUpdateButton = styled(OutlineButton)`
 
 export function U2EDriverWarning(
   props: React.ElementProps<typeof Flex>
-): React.Node {
+): React.ReactNode {
   const trackEvent = useTrackEvent()
 
   return (

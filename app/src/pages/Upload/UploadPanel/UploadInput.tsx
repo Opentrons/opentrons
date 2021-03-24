@@ -10,7 +10,7 @@ export type UploadInputProps = {
   isButton?: boolean,
 }
 
-export function UploadInput(props: UploadInputProps): React.Node {
+export function UploadInput(props: UploadInputProps): React.ReactNode {
   const { isButton, onUpload } = props
 
   const Label = isButton ? PrimaryButton : 'label'

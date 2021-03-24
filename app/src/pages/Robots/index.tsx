@@ -17,7 +17,7 @@ import { RobotSettings } from './RobotSettings'
 import { InstrumentSettings } from './InstrumentSettings'
 import { ModuleSettings } from './ModuleSettings'
 
-export function Robots(): React.Node {
+export function Robots(): React.ReactNode {
   const { path, url, params } = useRouteMatch()
   const instrumentsMatch = useRouteMatch(`${path}/instruments`)
   const modulesMatch = useRouteMatch(`${path}/modules`)

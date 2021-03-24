@@ -9,7 +9,7 @@ import { Box } from '@opentrons/components'
 type PortalLevel = 'page' | 'top'
 
 type Props = {
-  children: React.Node,
+  children: React.ReactNode,
   level: PortalLevel,
 }
 
@@ -30,11 +30,11 @@ const PORTAL_ROOT_PROPS_BY_LEVEL: { [PortalLevel]: PortalLevelInfo } = {
 const getPortalRoot = level =>
   global.document.getElementById(PORTAL_ROOT_PROPS_BY_LEVEL[level].id)
 
-export function PortalRoot(): React.Node {
+export function PortalRoot(): React.ReactNode {
   return <Box {...PORTAL_ROOT_PROPS_BY_LEVEL.page} />
 }
 
-export function TopPortalRoot(): React.Node {
+export function TopPortalRoot(): React.ReactNode {
   return <Box {...PORTAL_ROOT_PROPS_BY_LEVEL.top} />
 }
 

@@ -10,7 +10,7 @@ export type FormButtonBarProps = {
   buttons: Array<?ButtonProps>,
 }
 
-export function FormButtonBar(props: FormButtonBarProps): React.Node {
+export function FormButtonBar(props: FormButtonBarProps): React.ReactNode {
   const className = styles.form_button
   const buttons = props.buttons.map(button => ({ ...button, className }))
 

@@ -13,7 +13,7 @@ const EXIT = 'continue'
 const WARNING =
   'Doing so will take you to the summary page and prompt you to drop the tip.'
 
-export function ConfirmExitModal(props: ConfirmExitModalProps): React.Node {
+export function ConfirmExitModal(props: ConfirmExitModalProps): React.ReactNode {
   const { back, exit } = props
 
   return (

@@ -12,7 +12,7 @@ export type PromptProps = {
   onClick: () => void,
 }
 
-export function Prompt(props: PromptProps): React.Node {
+export function Prompt(props: PromptProps): React.ReactNode {
   const { onClick, ...labware } = props
   const { name, definition, slot } = labware
   const labwareType = robotSelectors.labwareType(labware)

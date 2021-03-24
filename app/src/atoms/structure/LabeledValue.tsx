@@ -8,14 +8,14 @@ import {
 } from '@opentrons/components'
 
 type Props = {
-  label: string | React.Node,
-  value: string | React.Node,
+  label: string | React.ReactNode,
+  value: string | React.ReactNode,
   labelProps?: React.ElementProps<typeof Text>,
   valueProps?: React.ElementProps<typeof Text>,
   ...React.ElementProps<typeof Box>,
 }
 
-export function LabeledValue(props: Props): React.Node {
+export function LabeledValue(props: Props): React.ReactNode {
   const {
     label,
     value,

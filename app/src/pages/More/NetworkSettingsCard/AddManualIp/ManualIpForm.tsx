@@ -25,7 +25,7 @@ class ManualIpFormComponent extends React.Component<Props> {
     this.inputRef = React.createRef()
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     return (
       <Formik
         initialValues={{ ip: '' }}

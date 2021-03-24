@@ -29,7 +29,7 @@ const inexactPipetteSupportArticle =
 
 export function ProtocolPipettesCard(
   props: ProtocolPipettesCardProps
-): React.Node {
+): React.ReactNode {
   const { robotName } = props
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()

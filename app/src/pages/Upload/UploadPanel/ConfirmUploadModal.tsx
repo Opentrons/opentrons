@@ -8,7 +8,7 @@ export type ConfirmUploadModalProps = {
   cancel: () => mixed,
 }
 
-export function ConfirmUploadModal(props: ConfirmUploadModalProps): React.Node {
+export function ConfirmUploadModal(props: ConfirmUploadModalProps): React.ReactNode {
   return (
     <Portal>
       <AlertModal

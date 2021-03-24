@@ -73,7 +73,7 @@ function HealthCheckText({
 }: {
   activePipette?: CalibrationCheckInstrument | null,
   calBlock?: CalibrationLabware | null,
-}): React.Node {
+}): React.ReactNode {
   if (!activePipette) return null
   const { mount, rank, tipRackDisplay } = activePipette
   const toCheck = rank === 'first' ? FIRST_RANK_TO_CHECK : SECOND_RANK_TO_CHECK
@@ -98,7 +98,7 @@ function HealthCheckText({
   )
 }
 
-export function DeckSetup(props: CalibrationPanelProps): React.Node {
+export function DeckSetup(props: CalibrationPanelProps): React.ReactNode {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
   const {

@@ -10,7 +10,7 @@ export type UploadErrorProps = {
   uploadError: { message: string },
 }
 
-export function UploadError(props: UploadErrorProps): React.Node {
+export function UploadError(props: UploadErrorProps): React.ReactNode {
   const { uploadError } = props
 
   return (

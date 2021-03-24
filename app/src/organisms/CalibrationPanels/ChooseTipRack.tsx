@@ -96,7 +96,7 @@ type ChooseTipRackProps = {
   defaultTipracks?: Array<LabwareDefinition2> | null,
 }
 
-export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
+export function ChooseTipRack(props: ChooseTipRackProps): React.ReactNode {
   const {
     tipRack,
     mount,

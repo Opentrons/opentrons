@@ -29,7 +29,7 @@ export const MagDeckCard = ({
   toggleCard,
   sendModuleCommand,
   controlDisabledReason,
-}: Props): React.Node => (
+}: Props): React.ReactNode => (
   <StatusCard
     title={getModuleDisplayName(module.model)}
     isCardExpanded={isCardExpanded}
