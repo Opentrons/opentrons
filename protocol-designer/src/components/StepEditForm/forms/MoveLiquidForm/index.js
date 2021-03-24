@@ -107,7 +107,15 @@ export const MoveLiquidForm = (props: StepFormProps): React.Node => {
         </div>
         <div className={cx(styles.section_column, styles.disposal_vol_wrapper)}>
           {path === 'multiDispense' && (
-            <DisposalVolumeField propsForFields={propsForFields} />
+            <DisposalVolumeField
+              aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
+              aspirate_airGap_volume={formData.aspirate_airGap_volume}
+              path={formData.path}
+              pipette={formData.pipette}
+              propsForFields={propsForFields}
+              stepType={formData.stepType}
+              volume={formData.volume}
+            />
           )}
         </div>
       </div>
