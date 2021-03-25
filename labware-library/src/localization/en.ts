@@ -22,13 +22,13 @@ export const PLURAL_CATEGORY_LABELS_BY_CATEGORY = {
   other: 'Other',
 }
 
-export const WELL_TYPE_BY_CATEGORY: { [string]: string } = {
+export const WELL_TYPE_BY_CATEGORY = {
   tubeRack: 'tube',
   tipRack: 'tip',
   other: 'well',
 }
 
-export const MANUFACTURER_VALUES = {
+export const MANUFACTURER_VALUES: Record<string, string> = {
   all: 'All',
   generic: 'Generic',
 }

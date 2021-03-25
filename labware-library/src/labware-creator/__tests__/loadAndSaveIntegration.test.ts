@@ -7,6 +7,7 @@ import { DEFAULT_CUSTOM_NAMESPACE } from '@opentrons/shared-data'
 import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
 // @ts-ignore(2021-03-24): shared-data fixtures not yet typed
 import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough'
+import type { ProcessedLabwareFields } from '../fields'
 
 jest.mock('../../definitions')
 
@@ -42,7 +43,9 @@ describe('load and immediately save integrity test', () => {
         ...extraFields,
       }
 
-      const processedFieldValues = labwareFormSchema.cast(rawFieldValues)
+      const processedFieldValues: ProcessedLabwareFields = labwareFormSchema.cast(
+        rawFieldValues
+      )
       const outputDef = fieldsToLabware(processedFieldValues)
 
       // We need to compensate for acceptable differences btw input def & output def.

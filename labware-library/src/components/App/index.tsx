@@ -49,7 +49,7 @@ export function AppComponent(props: DefinitionRouteRenderProps): JSX.Element {
   )
 }
 
-export function AppWithRoute(): React.ReactNode {
+export function AppWithRoute(): JSX.Element {
   return <DefinitionRoute render={props => <AppComponent {...props} />} />
 }
 

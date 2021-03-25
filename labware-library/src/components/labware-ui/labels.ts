@@ -14,8 +14,9 @@ function getLabel(
 ): string {
   let { displayCategory } = spec.metadata
 
-  if (spec.groups && spec.groups.length > 0) {
+  if ('groups' in spec && spec.groups.length > 0) {
     const categories = spec.groups.map(g => g.metadata.displayCategory)
+    // @ts-ignore(IL, 2021-03-25): `uniqBy` 2nd arg should be optional, but TS wants it explicit
     const uniqCats = uniqBy(categories).filter(Boolean)
 
     if (uniqCats.length === 1) {

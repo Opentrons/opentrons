@@ -13,7 +13,7 @@ import {
   MIN_Y_DIMENSION,
   MAX_Z_DIMENSION,
 } from './fields'
-import type { ProcessedLabwareFields } from './fields'
+import type { LabwareType, ProcessedLabwareFields } from './fields'
 
 const ALL_DISPLAY_NAMES = new Set(
   getAllDisplayNames().map(n => n.toLowerCase().trim())
@@ -47,11 +47,8 @@ const nameExistsError = (nameName: string) =>
 
 // NOTE: all IRREGULAR_LABWARE_ERROR messages will be converted to a special 'error' Alert
 
-export const labwareFormSchema: Yup.Schema<
-  ProcessedLabwareFields,
-  any
-  // $FlowFixMe(mc, 2020-06-02): something(s) about this schema don't match the flow type
-> = Yup.object()
+// @ts-ignore(IL, 2021-03-25): something(s) about this schema don't match the flow type (labwareType: string problem??)
+export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = Yup.object()
   .shape({
     labwareType: requiredString(LABELS.labwareType).oneOf(
       labwareTypeOptions.map(o => o.value)
