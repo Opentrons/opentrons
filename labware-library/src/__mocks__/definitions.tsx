@@ -5,7 +5,6 @@ import glob from 'glob'
 import uniq from 'lodash/uniq'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareList } from '../types'
 
 const LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,

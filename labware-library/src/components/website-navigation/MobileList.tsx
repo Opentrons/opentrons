@@ -14,10 +14,8 @@ interface State {
   menu: null | MenuName
 }
 
-interface Props {}
-
-export class MobileList extends React.Component<Props, State> {
-  constructor(props: Props) {
+export class MobileList extends React.Component<{}, State> {
+  constructor(props: {}) {
     super(props)
     this.state = { menu: null }
   }

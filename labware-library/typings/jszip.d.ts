@@ -3,5 +3,6 @@
 
 declare module 'jszip' {
   const JSZip: any
+  // eslint-disable-next-line import/no-default-export
   export default JSZip
 }

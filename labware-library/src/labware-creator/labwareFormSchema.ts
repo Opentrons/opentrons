@@ -47,7 +47,7 @@ const nameExistsError = (nameName: string): string =>
 
 // NOTE: all IRREGULAR_LABWARE_ERROR messages will be converted to a special 'error' Alert
 
-// @ts-ignore(IL, 2021-03-25): something(s) about this schema don't match the flow type (labwareType: string problem??)
+// @ts-expect-error(IL, 2021-03-25): something(s) about this schema don't match the flow type (labwareType: string problem??)
 export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = Yup.object()
   .shape({
     labwareType: requiredString(LABELS.labwareType).oneOf(

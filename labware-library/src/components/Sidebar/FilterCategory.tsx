@@ -30,7 +30,7 @@ export function FilterCategory(props: FilterCategoryProps): JSX.Element {
                 [styles.selected]: c === filters.category,
               })}
             >
-              {/* @ts-ignore(IL, 2021-03-24): lookup unsafe */}
+              {/* @ts-expect-error(IL, 2021-03-24): lookup unsafe */}
               {PLURAL_CATEGORY_LABELS_BY_CATEGORY[c]}
             </Link>
           </li>

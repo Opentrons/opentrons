@@ -17,7 +17,7 @@ export function LoadName(props: LoadNameProps): JSX.Element {
   const [success, setSuccess] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const successTimeout = React.useRef<NodeJS.Timeout | null>(null)
-  const cleanupSuccessTimeout = () => {
+  const cleanupSuccessTimeout = (): void => {
     if (successTimeout.current) clearTimeout(successTimeout.current)
   }
 
@@ -26,7 +26,7 @@ export function LoadName(props: LoadNameProps): JSX.Element {
   // note: we could choose to always copy the entire loadName string here,
   // regardless of what the user selects, but the benefit of catching missed
   // characters doesn't seem to outweigh the annoyance of removing user control
-  const handleCopy = () => {
+  const handleCopy = (): void => {
     setSuccess(true)
     cleanupSuccessTimeout()
     successTimeout.current = setTimeout(
@@ -35,7 +35,7 @@ export function LoadName(props: LoadNameProps): JSX.Element {
     )
   }
 
-  const handleCopyButtonClick = () => {
+  const handleCopyButtonClick = (): void => {
     if (inputRef.current) {
       inputRef.current.select()
       document.execCommand('copy')

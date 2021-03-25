@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import assert from 'assert'
 import Ajv from 'ajv'
 import cx from 'classnames'
@@ -128,7 +129,7 @@ const HeightImg = (props: HeightImgProps): JSX.Element => {
   if (labwareType === 'tubeRack') {
     src = require('./images/height_tubeRack.svg')
   } else if (labwareType === 'aluminumBlock') {
-    // @ts-ignore(IL, 2021-03-24): `includes` doesn't want to take null/undefined
+    // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
     if (['tubes', 'pcrTubeStrip'].includes(aluminumBlockChildType)) {
       src = require('./images/height_aluminumBlock_tubes.svg')
     } else {
@@ -138,7 +139,7 @@ const HeightImg = (props: HeightImgProps): JSX.Element => {
   return <img src={src} />
 }
 
-const GridImg = () => {
+const GridImg = (): JSX.Element => {
   const src = require('./images/grid_row_column.svg')
   return <img src={src} />
 }
@@ -187,7 +188,7 @@ interface DepthImgProps {
   labwareType: LabwareType | null | undefined
   wellBottomShape: WellBottomShape | null | undefined
 }
-const DepthImg = (props: DepthImgProps) => {
+const DepthImg = (props: DepthImgProps): JSX.Element | null => {
   const { labwareType, wellBottomShape } = props
   let src
 
@@ -215,7 +216,7 @@ const DepthImg = (props: DepthImgProps) => {
 const XYOffsetImg = (props: {
   labwareType: LabwareType | null | undefined
   wellShape: WellShape | null | undefined
-}) => {
+}): JSX.Element => {
   const { labwareType, wellShape } = props
   let src = require('./images/offset_plate_circular.svg')
   if (labwareType === 'reservoir') {
@@ -226,17 +227,17 @@ const XYOffsetImg = (props: {
   return <img src={src} />
 }
 
-const displayAsTube = (values: LabwareFields) =>
+const displayAsTube = (values: LabwareFields): boolean =>
   values.labwareType === 'tubeRack' ||
   (values.labwareType === 'aluminumBlock' &&
     values.aluminumBlockType === '96well' &&
-    // @ts-ignore(IL, 2021-03-24): `includes` doesn't want to take null/undefined
+    // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
     ['tubes', 'pcrTubeStrip'].includes(values.aluminumBlockChildType))
 
 const getHeightAlerts = (
   values: LabwareFields,
   touched: FormikTouched<LabwareFields>
-) => {
+): JSX.Element | null => {
   const { labwareZDimension } = values
   const zAsNum = Number(labwareZDimension) // NOTE: if empty string or null, may be cast to 0, but that's fine for `>`
   if (touched.labwareZDimension && zAsNum > MAX_SUGGESTED_Z) {
@@ -262,7 +263,7 @@ const xyMessage = (
 const getXYDimensionAlerts = (
   values: LabwareFields,
   touched: FormikTouched<LabwareFields>
-) => {
+): JSX.Element | null => {
   const xAsNum = Number(values.footprintXDimension)
   const yAsNum = Number(values.footprintYDimension)
   const showXInfo =
@@ -285,6 +286,7 @@ export const LabwareCreator = (): JSX.Element => {
   const setShowExportErrorModal = React.useMemo(
     () => (v: boolean, fieldValues?: LabwareFields) => {
       // NOTE: values that take a default will remain null in this event
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
       if (v === true) {
         assert(
           fieldValues,
@@ -363,7 +365,7 @@ export const LabwareCreator = (): JSX.Element => {
     setShowCreatorForm(true)
     window.scrollTo({
       left: 0,
-      // @ts-ignore(IL, 2021-03-24): needs code change to ensure no null to `top`
+      // @ts-expect-error(IL, 2021-03-24): needs code change to ensure no null to `top`
       top: scrollRef.current && scrollRef.current.offsetTop - 200,
       behavior: 'smooth',
     })
@@ -382,9 +384,9 @@ export const LabwareCreator = (): JSX.Element => {
     (event: any) => {
       let files: File[] = []
       if (event.dataTransfer && event.dataTransfer.files) {
-        files = event.dataTransfer.files as any
+        files = event.dataTransfer.files
       } else if (event.target.files) {
-        files = event.target.files as any
+        files = event.target.files
       }
 
       const file = files[0]
@@ -416,10 +418,11 @@ export const LabwareCreator = (): JSX.Element => {
 
             setImportError({
               key: 'INVALID_LABWARE_DEF',
-              // @ts-ignore(IL, 2021-03-24): ajv def mixup
+              // @ts-expect-error(IL, 2021-03-24): ajv def mixup
               messages: validateLabwareSchema.errors.map(
                 ajvError =>
                   `${ajvError.schemaPath}: ${
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     ajvError.message
                   }. (${JSON.stringify(ajvError.params)})`
               ),
@@ -503,7 +506,7 @@ export const LabwareCreator = (): JSX.Element => {
             `test_${loadName}.py`,
             labwareTestProtocol({ pipetteName, definition: def })
           )
-          // @ts-ignore(IL, 2021-03-24): JSZip not typed
+          // @ts-expect-error(IL, 2021-03-24): JSZip not typed
           zip.generateAsync({ type: 'blob' }).then(blob => {
             saveAs(blob, `${loadName}.zip`)
           })
@@ -531,7 +534,7 @@ export const LabwareCreator = (): JSX.Element => {
           setTouched,
           setValues,
         }: FormikProps<LabwareFields>) => {
-          // @ts-ignore(IL, 2021-03-24): values/errors/touched not typed for reportErrors to be happy
+          // @ts-expect-error(IL, 2021-03-24): values/errors/touched not typed for reportErrors to be happy
           reportErrors({ values, errors, touched })
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
           const canProceedToForm = Boolean(
@@ -696,7 +699,7 @@ export const LabwareCreator = (): JSX.Element => {
                   </Section>
                   <Section
                     label={
-                      // @ts-ignore(IL, 2021-03-24): `includes` doesn't want to take null/undefined
+                      // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
                       ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
                         ? 'Total Height'
                         : 'Height'

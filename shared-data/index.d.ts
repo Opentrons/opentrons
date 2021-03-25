@@ -133,7 +133,7 @@ export type LabwareWell = LabwareWellProperties & {
 
 // TODO(mc, 2019-03-21): exact object is tough to use with the initial value in
 // reduce, so leaving this inexact (e.g. `const a: {||} = {}` errors)
-export type LabwareWellMap = {
+export interface LabwareWellMap {
   [wellName: string]: LabwareWell
 }
 

@@ -21,11 +21,10 @@ export function FilterManufacturerComponent(
   const manufacturers = getAllManufacturers()
   const options = manufacturers.map(value => ({
     value,
-    // @ts-ignore(IL, 2021-03-24): MANUFACTURER_VALUES lookup not save in TS
     label: MANUFACTURER_VALUES[value] || value,
   }))
 
-  // @ts-ignore(IL, 2021-03-24): why is there an options key here?? Is the code wrong here? Or the TS?
+  // @ts-expect-error(IL, 2021-03-24): why is there an options key here?? Is the code wrong here? Or the TS?
   options.push({ options: [{ label: 'Other', value: 'other' }] })
 
   return (

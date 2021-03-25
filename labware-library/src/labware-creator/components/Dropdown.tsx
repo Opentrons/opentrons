@@ -3,7 +3,7 @@ import { SelectField } from '@opentrons/components'
 import { Field } from 'formik'
 import { reportFieldEdit } from '../analyticsUtils'
 import { LABELS } from '../fields'
-import type { LabwareFields, Option, Options } from '../fields'
+import type { Option, Options } from '../fields'
 import fieldStyles from './fieldStyles.css'
 import styles from './Dropdown.css'
 
@@ -36,7 +36,7 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
     <div className={fieldStyles.field_wrapper}>
       <div className={fieldStyles.field_label}>{LABELS[props.name]}</div>
       <Field name={props.name}>
-        {/* @ts-ignore(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
+        {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
         {({ field, form }) => (
           <SelectField
             name={field.name}

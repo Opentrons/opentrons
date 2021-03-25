@@ -3,5 +3,6 @@
 
 declare module 'query-string' {
   const queryString: any
+  // eslint-disable-next-line import/no-default-export
   export default queryString
 }

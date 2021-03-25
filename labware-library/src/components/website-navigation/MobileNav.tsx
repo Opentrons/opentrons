@@ -6,20 +6,20 @@ interface State {
   isOpen: boolean
 }
 
-interface Props {}
-
-export class MobileNav extends React.Component<Props, State> {
-  constructor(props: Props) {
+export class MobileNav extends React.Component<{}, State> {
+  constructor(props: {}) {
     super(props)
     this.state = { isOpen: false }
   }
 
   toggle: () => void = () => {
     this.setState({ isOpen: !this.state.isOpen })
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-optional-chain
     document.body && document.body.classList.toggle('no_scroll')
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-optional-chain
     document.body && document.body.classList.remove('no_scroll')
   }
 

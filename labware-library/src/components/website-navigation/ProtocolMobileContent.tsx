@@ -5,9 +5,7 @@ import styles from './styles.css'
 
 import { protocolLinkProps } from './nav-data'
 
-interface Props {}
-
-export function ProtocolMobileContent(props: Props): JSX.Element {
+export function ProtocolMobileContent(): JSX.Element {
   const links = map(protocolLinkProps)
   return (
     <ul className={styles.mobile_content}>

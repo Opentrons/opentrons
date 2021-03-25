@@ -5,9 +5,7 @@ import styles from './styles.css'
 
 import { supportLinkProps, salesLinkProps } from './nav-data'
 
-interface Props {}
-
-export function SupportMobileContent(props: Props): JSX.Element {
+export function SupportMobileContent(): JSX.Element {
   const supportLinks = map(supportLinkProps)
   const salesLinks = map(salesLinkProps)
   return (

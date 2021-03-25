@@ -15,7 +15,7 @@ interface Props {
 
 export const RadioField = (props: Props): JSX.Element => (
   <Field name={props.name}>
-    {/* @ts-ignore(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
+    {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
     {({ form, field }) =>
       getIsHidden(props.name, form.values) ? null : (
         <div className={fieldStyles.field_wrapper}>

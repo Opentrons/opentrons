@@ -56,7 +56,7 @@ function TopBar(props: LabwareCardProps): JSX.Element {
   const groupBrands = groups.map(group => group.brand?.brand).filter(Boolean)
 
   const brands = uniq([brand.brand, ...groupBrands])
-    // @ts-ignore(IL, 2021-03-24): groupBrands filtering nulls, and MANUFACTURER_VALUES lookup not understood by TS
+    // @ts-expect-error(IL, 2021-03-24): groupBrands filtering nulls, and MANUFACTURER_VALUES lookup not understood by TS
     .map(b => MANUFACTURER_VALUES[b] || b)
     .join(', ')
 

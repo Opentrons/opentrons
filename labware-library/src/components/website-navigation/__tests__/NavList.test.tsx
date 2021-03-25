@@ -14,10 +14,10 @@ describe('NavList', () => {
   it('component handles state changes', () => {
     const tree = shallow(<NavList />)
 
-    // @ts-ignore(IL, 2021-03): state is readonly, but also, this is a weird test??
+    // @ts-expect-error(IL, 2021-03): state is readonly, but also, this is a weird test??
     expect(tree.state().menu).toEqual(null)
     tree.setState({ menu: 'foo' })
-    // @ts-ignore(IL, 2021-03): state is readonly, but also, this is a weird test??
+    // @ts-expect-error(IL, 2021-03): state is readonly, but also, this is a weird test??
     expect(tree.state().menu).toEqual('foo')
   })
 

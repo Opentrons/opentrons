@@ -20,9 +20,9 @@ export function ImportLabware(props: Props): JSX.Element {
   )
 }
 
-const stopEvent = (e: React.FormEvent) => e.preventDefault()
+const stopEvent = (e: React.FormEvent): void => e.preventDefault()
 
-function UploadInput(props: UploadInputProps) {
+function UploadInput(props: UploadInputProps): JSX.Element {
   const { isButton, onUpload } = props
 
   const Label = isButton ? PrimaryButton : 'label'
@@ -40,7 +40,7 @@ function UploadInput(props: UploadInputProps) {
 
   return (
     <div className={styles.upload} onDragOver={stopEvent} onDrop={stopEvent}>
-      {/* @ts-ignore(IL, 2021-03-24): resolve with TS conversion or by using PrimaryBtn */}
+      {/* @ts-expect-error(IL, 2021-03-24): resolve with TS conversion or by using PrimaryBtn */}
       <Label {...labelProps}>
         {!isButton && <Icon name="upload" className={styles.file_drop_icon} />}
         <span className={styles.label_text}>{labelText}</span>

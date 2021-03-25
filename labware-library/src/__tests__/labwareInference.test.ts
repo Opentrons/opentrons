@@ -1,6 +1,6 @@
-// @ts-ignore(2021-03-24): shared-data fixtures not yet typed
+// @ts-expect-error(2021-03-24): shared-data fixtures not yet typed
 import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
-// @ts-ignore(2021-03-24): shared-data fixtures not yet typed
+// @ts-expect-error(2021-03-24): shared-data fixtures not yet typed
 import fixtureIrregular from '@opentrons/shared-data/labware/fixtures/2/fixture_irregular_example_1'
 import {
   getIfConsistent,
