@@ -15,7 +15,7 @@ import {
   C_MED_GRAY,
   FONT_SIZE_CAPTION,
   FONT_WEIGHT_SEMIBOLD,
-  SIZE_1,
+  SPACING_1,
   SPACING_2,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
@@ -119,7 +119,7 @@ function UsbPortInfo(props: UsbPortInfoProps): React.Node {
         <Text>{portText}</Text>
         {portText === 'N/A' && (
           <Flex {...targetProps}>
-            <Icon name="alert-circle" width={SIZE_1} />
+            <Icon name="alert-circle" width={'15px'} paddingLeft={SPACING_1} />
             <Tooltip style={{ width: '2rem' }} {...tooltipProps}>
               {t('modules_update_software_tooltip')}
             </Tooltip>

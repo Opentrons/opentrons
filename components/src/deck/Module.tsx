@@ -77,13 +77,17 @@ export function Module(props: ModuleProps): JSX.Element {
         className: cx(styles.module, { [styles.flipped]: shouldFlip }),
       }}
     >
-      <ModuleItemContents {...props} />
+      <ModuleItemContents {...props} shouldFlip={shouldFlip} />
     </RobotCoordsForeignDiv>
   )
 }
 
-function ModuleItemContents(props: ModuleProps): JSX.Element {
-  const { mode, model, usbInfoString } = props
+interface ModuleItemContentsProps extends ModuleProps {
+  shouldFlip: boolean
+}
+
+function ModuleItemContents(props: ModuleItemContentsProps): JSX.Element {
+  const { mode, model, usbInfoString, shouldFlip } = props
   const displayName = getModuleDisplayName(model)
 
   const iconClassName = cx(styles.module_review_icon, {
@@ -100,7 +104,11 @@ function ModuleItemContents(props: ModuleProps): JSX.Element {
 
   return (
     <>
-      <div className={styles.module_wrapper}>
+      <div
+        className={
+          shouldFlip ? styles.flipped_module_wrapper : styles.module_wrapper
+        }
+      >
         {mode !== 'missing' && usbInfoString && (
           <p
             key="usbPortInfo"
