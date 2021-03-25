@@ -1,4 +1,3 @@
-// @flow
 // labware dimensions for details page
 import * as React from 'react'
 import round from 'lodash/round'
@@ -18,10 +17,10 @@ import type { LabwareDefinition } from '../../types'
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
 export interface DimensionsProps {
-  definition: LabwareDefinition,
-  className?: string,
-  irregular?: boolean,
-  insertCategory?: string,
+  definition: LabwareDefinition
+  className?: string
+  irregular?: boolean
+  insertCategory?: string
 }
 
 export function Dimensions(props: DimensionsProps): JSX.Element {

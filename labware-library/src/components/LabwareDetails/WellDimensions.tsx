@@ -1,4 +1,3 @@
-// @flow
 // well dimensions and spacing for details page
 import * as React from 'react'
 import round from 'lodash/round'

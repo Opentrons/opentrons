@@ -1,4 +1,3 @@
-// @flow
 // full-width labware details
 import * as React from 'react'
 
@@ -12,7 +11,7 @@ import styles from './styles.css'
 import type { LabwareDefinition } from '../../types'
 
 export interface InsertDetailsProps {
-  definition: LabwareDefinition,
+  definition: LabwareDefinition
 }
 
 export function InsertDetails(props: InsertDetailsProps): JSX.Element {

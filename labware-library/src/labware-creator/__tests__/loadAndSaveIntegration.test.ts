@@ -1,4 +1,3 @@
-// @flow
 import { labwareDefToFields } from '../labwareDefToFields'
 import { fieldsToLabware } from '../fieldsToLabware'
 import { labwareFormSchema } from '../labwareFormSchema'

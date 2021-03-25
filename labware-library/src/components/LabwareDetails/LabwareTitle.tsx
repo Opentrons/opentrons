@@ -1,4 +1,3 @@
-// @flow
 // labware details page title and category
 import * as React from 'react'
 

@@ -58,13 +58,13 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = Yup.object(
       then: requiredString(LABELS.tubeRackInsertLoadName),
       otherwise: Yup.mixed().nullable(),
     }),
-    // $FlowFixMe(mc, 2020-06-02): should this be Yup.string() instead of mixed?
+    // TODO(mc, 2020-06-02): should this be Yup.string() instead of mixed?
     aluminumBlockType: Yup.mixed().when('labwareType', {
       is: 'aluminumBlock',
       then: requiredString(LABELS.aluminumBlockType),
       otherwise: Yup.mixed().nullable(),
     }),
-    // $FlowFixMe(mc, 2020-06-02): should this be Yup.string() instead of mixed?
+    // TODO(mc, 2020-06-02): should this be Yup.string() instead of mixed?
     aluminumBlockChildType: Yup.mixed().when(
       ['labwareType', 'aluminumBlockType'],
       {
@@ -96,13 +96,13 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = Yup.object(
 
     gridRows: requiredPositiveInteger(LABELS.gridRows),
     gridColumns: requiredPositiveInteger(LABELS.gridColumns),
-    // $FlowFixMe(mc, 2020-06-02): should this be number() instead of mixed?
+    // TODO(mc, 2020-06-02): should this be number() instead of mixed?
     gridSpacingX: Yup.mixed().when('gridColumns', {
       is: 1,
       then: Yup.mixed().default(0),
       otherwise: requiredPositiveNumber(LABELS.gridSpacingX),
     }),
-    // $FlowFixMe(mc, 2020-06-02): should this be number() instead of mixed()?
+    // TODO(mc, 2020-06-02): should this be number() instead of mixed()?
     gridSpacingY: Yup.mixed().when('gridRows', {
       is: 1,
       then: Yup.mixed().default(0),
@@ -159,7 +159,7 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = Yup.object(
     }),
 
     brand: requiredString(LABELS.brand),
-    // $FlowFixMe(mc, 2020-06-02): should this be Yup.array() instead of mixed?
+    // TODO(mc, 2020-06-02): should this be Yup.array() instead of mixed?
     brandId: Yup.mixed()
       .nullable()
       .transform(
@@ -182,7 +182,7 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = Yup.object(
         /^[a-z0-9._]+$/,
         '${label} can only contain lowercase letters, numbers, dot (.) and underscore (_). Spaces are not allowed.' // eslint-disable-line no-template-curly-in-string
       ),
-    // $FlowFixMe(mc, 2020-06-02): should this be Yup.string() instead of mixed?
+    // TODO(mc, 2020-06-02): should this be Yup.string() instead of mixed?
     displayName: Yup.mixed()
       .nullable()
       .label(LABELS.displayName)

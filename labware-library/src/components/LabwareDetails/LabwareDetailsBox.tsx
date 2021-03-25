@@ -1,4 +1,3 @@
-// @flow
 // full-width labware details
 import * as React from 'react'
 
@@ -20,8 +19,8 @@ import styles from './styles.css'
 import type { LabwareDefinition } from '../../types'
 
 export interface LabwareDetailsBoxProps {
-  definition: LabwareDefinition,
-  className?: string,
+  definition: LabwareDefinition
+  className?: string
 }
 
 export function LabwareDetailsBox(props: LabwareDetailsBoxProps): JSX.Element {
