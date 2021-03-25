@@ -24,9 +24,9 @@ export interface ModuleProps {
   /** display mode: 'default', 'present', 'missing', or 'info' */
   mode: 'default' | 'present' | 'missing' | 'info'
   /** slot details of the location of this module */
-  slot: DeckSlot,
+  slot: DeckSlot
   /** USB port detail of the connected module */
-  usbInfoString?: string,
+  usbInfoString?: string
 }
 
 export function Module(props: ModuleProps): JSX.Element {

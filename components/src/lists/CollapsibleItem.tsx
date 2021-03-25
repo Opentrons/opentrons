@@ -7,7 +7,7 @@ import { Icon } from '../icons'
 
 export interface CollapsibleItemProps {
   /** header */
-  header?: string,
+  header?: string
   /** text of title */
   title: string
   /** children nodes */
