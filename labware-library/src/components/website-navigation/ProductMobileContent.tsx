@@ -9,9 +9,7 @@ import {
   productCTALink,
 } from './nav-data'
 
-interface Props {}
-
-export function ProductMobileContent(props: Props): JSX.Element {
+export function ProductMobileContent(): JSX.Element {
   return (
     <div className={styles.product_mobile_content}>
       <div className={styles.hardware_group}>

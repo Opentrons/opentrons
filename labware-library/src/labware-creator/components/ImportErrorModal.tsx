@@ -22,8 +22,8 @@ const ERROR_MAP: Record<ImportErrorKey, React.ReactNode> = {
 }
 
 export const ImportErrorModal = (props: {
-  onClose: () => unknown,
-  importError: ImportError,
+  onClose: () => unknown
+  importError: ImportError
 }): JSX.Element => {
   const { importError, onClose } = props
   return (

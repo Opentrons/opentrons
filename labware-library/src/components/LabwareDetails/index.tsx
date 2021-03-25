@@ -9,7 +9,7 @@ import styles from './styles.css'
 import type { LabwareDefinition } from '../../types'
 
 export interface LabwareDetailsProps {
-  definition: LabwareDefinition,
+  definition: LabwareDefinition
 }
 
 export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {

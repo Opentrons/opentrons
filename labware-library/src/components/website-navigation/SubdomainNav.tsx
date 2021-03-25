@@ -11,7 +11,7 @@ interface LinkItem {
   linkout: boolean
 }
 
-type Links = Array<LinkItem>
+type Links = LinkItem[]
 
 export const SUBDOMAIN_NAV_LINKS: Links = [
   {

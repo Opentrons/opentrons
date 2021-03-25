@@ -20,7 +20,7 @@ interface ImageOption {
   children?: React.ReactNode
 }
 
-type OptionsWithImages = Array<ImageOption>
+type OptionsWithImages = ImageOption[]
 
 const makeOptionsWithImages = (
   options: Options,

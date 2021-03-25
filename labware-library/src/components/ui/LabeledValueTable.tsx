@@ -12,7 +12,7 @@ export interface ValueEntry {
 
 export interface LabledValueTableProps {
   label: React.ReactNode
-  values: Array<ValueEntry>
+  values: ValueEntry[]
   direction?: TableDirection
   className?: string
   children?: React.ReactNode

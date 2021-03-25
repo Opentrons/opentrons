@@ -122,7 +122,7 @@ interface HeightImgProps {
   aluminumBlockChildType: string | null | undefined
 }
 
-const HeightImg = (props: HeightImgProps) => {
+const HeightImg = (props: HeightImgProps): JSX.Element => {
   const { labwareType, aluminumBlockChildType } = props
   let src = require('./images/height_plate-and-reservoir.svg')
   if (labwareType === 'tubeRack') {
@@ -143,7 +143,9 @@ const GridImg = () => {
   return <img src={src} />
 }
 
-const WellXYImg = (props: { wellShape: WellShape | null | undefined }) => {
+const WellXYImg = (props: {
+  wellShape: WellShape | null | undefined
+}): JSX.Element | null => {
   const { wellShape } = props
   const wellShapeToImg: Record<WellShape, string> = {
     circular: require('./images/wellXY_circular.svg'),
@@ -161,7 +163,7 @@ const XYSpacingImg = (props: {
   labwareType: LabwareType | null | undefined
   wellShape: WellShape | null | undefined
   gridRows: string | null | undefined
-}) => {
+}): JSX.Element => {
   const { labwareType, wellShape } = props
   const gridRows = Number(props.gridRows)
   // default to this
@@ -378,7 +380,7 @@ export const LabwareCreator = (): JSX.Element => {
     // TODO(IL, 2021-03-24): event should be like `React.FormEvent<HTMLInputElement> | DragEvent`
     // but TS can't discriminate
     (event: any) => {
-      let files: Array<File> = []
+      let files: File[] = []
       if (event.dataTransfer && event.dataTransfer.files) {
         files = event.dataTransfer.files as any
       } else if (event.target.files) {

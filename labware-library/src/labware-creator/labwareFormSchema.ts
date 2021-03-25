@@ -13,21 +13,21 @@ import {
   MIN_Y_DIMENSION,
   MAX_Z_DIMENSION,
 } from './fields'
-import type { LabwareType, ProcessedLabwareFields } from './fields'
+import type { ProcessedLabwareFields } from './fields'
 
 const ALL_DISPLAY_NAMES = new Set(
   getAllDisplayNames().map(n => n.toLowerCase().trim())
 )
 
 const REQUIRED_FIELD = '${label} is required' // eslint-disable-line no-template-curly-in-string
-const requiredString = (label: string) =>
+const requiredString = (label: string): Yup.StringSchema =>
   Yup.string().label(label).typeError(REQUIRED_FIELD).required()
 const MUST_BE_A_NUMBER = '${label} must be a number' // eslint-disable-line no-template-curly-in-string
 
-const requiredPositiveNumber = (label: string) =>
+const requiredPositiveNumber = (label: string): Yup.NumberSchema =>
   Yup.number().label(label).typeError(MUST_BE_A_NUMBER).moreThan(0).required()
 
-const requiredPositiveInteger = (label: string) =>
+const requiredPositiveInteger = (label: string): Yup.NumberSchema =>
   Yup.number()
     .label(label)
     .typeError(MUST_BE_A_NUMBER)
@@ -35,14 +35,14 @@ const requiredPositiveInteger = (label: string) =>
     .integer()
     .required()
 
-const unsupportedLabwareIfFalse = (label: string) =>
+const unsupportedLabwareIfFalse = (label: string): Yup.BooleanSchema =>
   Yup.boolean()
     .label(label)
     .typeError(REQUIRED_FIELD)
     .oneOf([true], IRREGULAR_LABWARE_ERROR)
     .required()
 
-const nameExistsError = (nameName: string) =>
+const nameExistsError = (nameName: string): string =>
   `This ${nameName} already exists in the Opentrons default labware library. Please edit the ${nameName} to make it unique.`
 
 // NOTE: all IRREGULAR_LABWARE_ERROR messages will be converted to a special 'error' Alert

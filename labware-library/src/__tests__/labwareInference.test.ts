@@ -66,7 +66,7 @@ describe('getSpacingIfUniform', () => {
   ]
   testCases.forEach(({ wells, expected, testLabel }) =>
     it(testLabel, () =>
-      expect(getSpacingIfUniform(wells as Array<any>, 'x')).toBe(expected)
+      expect(getSpacingIfUniform(wells as any[], 'x')).toBe(expected)
     )
   )
 })

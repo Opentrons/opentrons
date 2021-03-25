@@ -27,7 +27,7 @@ export const aboutLinkProps: Submenu = {
   ],
 }
 
-export const hardwareLinks: Array<Link> = [
+export const hardwareLinks: Link[] = [
   {
     name: 'OT-2 Robot',
     url: 'https://opentrons.com/ot-2',
@@ -55,7 +55,7 @@ export const hardwareLinks: Array<Link> = [
   },
 ]
 
-export const labwareLinks: Array<Link> = [
+export const labwareLinks: Link[] = [
   {
     name: 'Lab Plates',
     url: 'https://shop.opentrons.com/collections/lab-plates',
@@ -73,7 +73,7 @@ export const labwareLinks: Array<Link> = [
   },
 ]
 
-export const consumableLinks: Array<Link> = [
+export const consumableLinks: Link[] = [
   {
     name: 'Tips & Filter Tips',
     url: 'https://shop.opentrons.com/collections/opentrons-tips',

@@ -6,8 +6,6 @@ import { LabwareList } from '..'
 import { LabwareCard } from '../LabwareCard'
 import * as definitions from '../../../definitions'
 
-import type { LabwareList as LabwareListType } from '../../../types'
-
 jest.mock('../../../definitions')
 
 const getAllDefinitions = definitions.getAllDefinitions as jest.MockedFunction<

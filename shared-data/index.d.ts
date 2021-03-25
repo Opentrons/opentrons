@@ -46,7 +46,7 @@ export interface LabwareDefinition1 {
     isTiprack?: boolean
     tipVolume?: number
   }
-  ordering: Array<string[]>
+  ordering: string[][]
   wells: {
     [well: string]: WellDefinition
   }
@@ -159,9 +159,9 @@ export interface LabwareDefinition2 {
   cornerOffsetFromSlot: LabwareOffset
   parameters: LabwareParameters
   brand: LabwareBrand
-  ordering: Array<string[]>
+  ordering: string[][]
   wells: LabwareWellMap
-  groups: Array<LabwareWellGroup>
+  groups: LabwareWellGroup[]
 }
 
 // from constants.js =====
@@ -253,7 +253,7 @@ export interface DeckSlot {
   matingSurfaceUnitVector?: UnitVectorTuple
   boundingBox: Dimensions
   displayName: string
-  compatibleModules: Array<ModuleType>
+  compatibleModules: ModuleType[]
 }
 
 export interface DeckCalibrationPoint {
@@ -263,9 +263,9 @@ export interface DeckCalibrationPoint {
 }
 
 export interface DeckLocations {
-  orderedSlots: Array<DeckSlot>
-  calibrationPoints: Array<DeckCalibrationPoint>
-  fixtures: Array<DeckFixture>
+  orderedSlots: DeckSlot[]
+  calibrationPoints: DeckCalibrationPoint[]
+  fixtures: DeckFixture[]
 }
 
 export interface DeckMetadata {
@@ -277,7 +277,7 @@ export interface DeckLayerFeature {
   footprint: string
 }
 
-export type DeckLayer = Array<DeckLayerFeature>
+export type DeckLayer = DeckLayerFeature[]
 
 export interface DeckDefinition {
   otId: string

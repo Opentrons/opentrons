@@ -36,7 +36,7 @@ export const Section = connect((props: Props) => {
   const dirtyFieldNames = fieldList.filter(
     name => props.formik?.touched?.[name]
   )
-  const allErrors: Array<string> = uniq(
+  const allErrors: string[] = uniq(
     compact(dirtyFieldNames.map(name => props.formik.errors[name]))
   )
 

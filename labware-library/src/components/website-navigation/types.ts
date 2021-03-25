@@ -22,7 +22,7 @@ export interface Link {
 
 export interface Submenu {
   name: MenuName
-  links: Array<Link>
+  links: Link[]
   bottomLink?: Link
 }
 

@@ -16,7 +16,7 @@ import type { LabwareFields, ProcessedLabwareFields } from '../fields'
 import styles from './ConditionalLabwareRender.css'
 
 interface Props {
-  values: LabwareFields,
+  values: LabwareFields
 }
 
 export const ConditionalLabwareRender = (props: Props): JSX.Element => {
