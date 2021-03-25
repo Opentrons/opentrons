@@ -84,3 +84,8 @@ class AbstractThermocyclerDriver(ABC):
     async def get_device_info(self) -> Dict[str, str]:
         """Send get device info command"""
         ...
+
+    @abstractmethod
+    async def enter_programming_mode(self) -> None:
+        ...
+

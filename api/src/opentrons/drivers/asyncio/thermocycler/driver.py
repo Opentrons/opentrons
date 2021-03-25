@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from enum import Enum
 from typing import Optional, Dict
@@ -5,7 +6,7 @@ from typing import Optional, Dict
 from opentrons.drivers import utils
 from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication.serial_connection import \
-    SerialConnection
+    SerialConnection, AsyncSerial
 from opentrons.drivers.asyncio.thermocycler.abstract import AbstractThermocyclerDriver
 from opentrons.drivers.types import Temperature, PlateTemperature, LidStatus
 
@@ -231,3 +232,11 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         return utils.parse_device_information(
             device_info_string=response
         )
+
+    async def enter_programming_mode(self) -> None:
+        """Enter programming mode."""
+        trigger_connection = await AsyncSerial.create(
+            self._connection.port, TC_BOOTLOADER_BAUDRATE, timeout=1)
+        await asyncio.sleep(0.05)
+        await trigger_connection.close()
+        await self._connection.serial.close()
