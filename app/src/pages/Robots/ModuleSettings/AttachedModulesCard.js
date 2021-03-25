@@ -20,7 +20,6 @@ import {
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { ModuleItem, NoModulesMessage } from './ModuleItem'
 
-import type { AttachedModule } from '../../../redux/modules/types'
 import type { State, Dispatch } from '../../../redux/types'
 import { UsbHubItem } from './UsbHubItem'
 
@@ -28,11 +27,6 @@ import { UsbHubItem } from './UsbHubItem'
 
 const TITLE = 'Connected Modules'
 const POLL_MODULE_INTERVAL_MS = 5000
-
-type ContentsByPortProps = {|
-  modulesByPort: {| [slot: number]: Array<AttachedModule> |},
-  controlDisabledReason: string | null,
-|}
 
 type Props = {| robotName: string |}
 

@@ -18,7 +18,6 @@ import { ModuleUpdate } from './ModuleUpdate'
 import { ModuleControls } from '../../../../molecules/ModuleControls'
 import type { AttachedModule } from '../../../../redux/modules/types'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import styles from './styles.css'
 
 type Props = {|
   module: AttachedModule,

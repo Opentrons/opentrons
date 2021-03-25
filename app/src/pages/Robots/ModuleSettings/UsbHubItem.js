@@ -15,7 +15,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { ModuleItem } from './ModuleItem'
 
-import type { AttachedModule } from '../../../../redux/modules/types'
+import type { AttachedModule } from '../../../redux/modules/types'
 
 const MULTIPLE_MODULES = 'Multiple modules connected'
 

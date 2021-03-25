@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import { getMissingModules, fetchModules, getMatchedModules } from '../../../redux/modules'
+import { getMissingModules, fetchModules } from '../../../redux/modules'
 import {
   selectors as robotSelectors,
   actions as robotActions,

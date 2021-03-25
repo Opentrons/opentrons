@@ -100,7 +100,7 @@ describe('ModuleList', () => {
     const listItem = titledList.find(ListItem)
     const box = listItem.find(Box)
     mockModules.forEach((m, index) => {
-      const flexbox = box.find(Flex).at(index)
+      const flexbox = box.find(Flex).at(index === 0 ? 0 : 4)
       const icon = flexbox.find(`Icon`).at(0)
       const allText = flexbox.text()
       const toolTip = flexbox.find('UsbPortInfo').find(Tooltip)
@@ -127,7 +127,7 @@ describe('ModuleList', () => {
     const listItem = titledList.find(ListItem)
     const box = listItem.find(Box)
     mockModules.forEach((m, index) => {
-      const flexbox = box.find(Flex).at(index === 0 ? 0 : 1)
+      const flexbox = box.find(Flex).at(index === 0 ? 0 : 3)
       const icon = flexbox.find(`Icon`).at(0)
       const allText = flexbox.text()
       const toolTip = flexbox.find('UsbPortInfo').find(Tooltip)
@@ -156,7 +156,7 @@ describe('ModuleList', () => {
     const listItem = titledList.find(ListItem)
     const box = listItem.find(Box)
     mockModules.forEach((m, index) => {
-      const flexbox = box.find(Flex).at(index === 0 ? 0 : 1)
+      const flexbox = box.find(Flex).at(index === 0 ? 0 : 3)
       const icon = flexbox.find(`Icon`).at(0)
       const allText = flexbox.text()
       const toolTip = flexbox.find('UsbPortInfo').find(Tooltip)
@@ -190,7 +190,7 @@ describe('ModuleList', () => {
     const listItem = titledList.find(ListItem)
     const box = listItem.find(Box)
     mockModules.forEach((m, index) => {
-      const flexbox = box.find(Flex).at(index === 0 ? 0 : 1)
+      const flexbox = box.find(Flex).at(index === 0 ? 0 : 3)
       const icon = flexbox.find(`Icon`).at(0)
       const allText = flexbox.text()
       const toolTip = flexbox.find('UsbPortInfo').find(Tooltip)
