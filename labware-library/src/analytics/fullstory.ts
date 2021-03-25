@@ -1,24 +1,36 @@
 import uniq from 'lodash/uniq'
 
-const FULLSTORY_NAMESPACE = 'FS'
-const FULLSTORY_ORG = process.env.OT_LL_FULLSTORY_ORG
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  module NodeJS {
+    interface Global {
+      _fs_namespace: string | undefined
+    }
+  }
+}
+
 const LL_VERSION = process.env.OT_LL_VERSION
 const LL_BUILD_DATE = new Date(process.env.OT_LL_BUILD_DATE as any)
 
 const _getFullstory = (): Object | null => {
   const namespace = global._fs_namespace
-  const fs = namespace ? global[namespace] : null
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  const fs = namespace ? (global as any)[namespace] : null
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   return fs || null
 }
 
-export const shutdownFullstory = () => {
+export const shutdownFullstory = (): void => {
   console.debug('shutting down Fullstory')
-  const fs = _getFullstory()
-  if (fs && fs.shutdown) {
+  const fs: any = _getFullstory()
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  if (fs?.shutdown && typeof fs.shutdown === 'function') {
     fs.shutdown()
   }
-  if (global._fs_namespace && global[global._fs_namespace]) {
-    delete global[global._fs_namespace]
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  if (global._fs_namespace && (global as any)[global._fs_namespace]) {
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete (global as any)[(global as any)._fs_namespace]
   }
 }
 
@@ -55,8 +67,9 @@ export const fullstoryEvent = (
   parameters: Record<string, any> = {}
 ): void => {
   // NOTE: make sure user has opted in before calling this fn
-  const fs = _getFullstory()
-  if (fs && fs.event) {
+  const fs: any = _getFullstory()
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  if (fs?.event) {
     // NOTE: fullstory requires property names to have type suffix
     // https://help.fullstory.com/hc/en-us/articles/360020623234#Custom%20Property%20Name%20Requirements
     const _parameters = Object.keys(parameters).reduce((acc, key) => {
@@ -65,17 +78,21 @@ export const fullstoryEvent = (
       const name: string = suffix === null ? key : `${key}_${suffix}`
       return { ...acc, [name]: value }
     }, {})
-    fs.event(name, _parameters)
+    if (typeof fs.event === 'function') {
+      fs.event(name, _parameters)
+    }
   }
 }
 
-export const _setAnalyticsTags = () => {
-  const fs = _getFullstory()
+export const _setAnalyticsTags = (): void => {
+  const fs: any = _getFullstory()
   // NOTE: fullstory expects the keys 'displayName' and 'email' verbatim
   // though all other key names must be fit the schema described here
   // https://help.fullstory.com/hc/en-us/articles/360020623294
-  if (fs && fs.setUserVars) {
+  if (fs !== null && typeof fs.setUserVars === 'function') {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const version_str = LL_VERSION
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const buildDate_date = LL_BUILD_DATE
 
     fs.setUserVars({

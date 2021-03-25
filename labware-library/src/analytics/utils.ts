@@ -1,7 +1,8 @@
 import cookie from 'cookie'
 
 import { initializeMixpanel, mixpanelOptIn, mixpanelOptOut } from './mixpanel'
-import { initializeFullstory, shutdownFullstory } from './fullstory'
+import { initializeFullstory } from './initializeFullstory'
+import { shutdownFullstory } from './fullstory'
 import type { AnalyticsState } from './types'
 
 const COOKIE_KEY_NAME = 'ot_ll_analytics' // NOTE: cookie is named "LL" but only LC uses it now
@@ -10,9 +11,9 @@ const COOKIE_DOMAIN =
 
 const persistAnalyticsCookie = (cookies: Record<string, any>): void => {
   const maxAge = 10 * 365 * 24 * 60 * 60 // 10 years
-  const options = { COOKIE_DOMAIN, maxAge }
+  const options = { COOKIE_DOMAIN, maxAge };
 
-  global.document.cookie = cookie.serialize(
+  (global as any).document.cookie = cookie.serialize(
     COOKIE_KEY_NAME,
     JSON.stringify(cookies),
     options
@@ -20,7 +21,7 @@ const persistAnalyticsCookie = (cookies: Record<string, any>): void => {
 }
 
 const getAnalyticsCookie = (): AnalyticsState => {
-  const cookies = cookie.parse(global.document.cookie)
+  const cookies = cookie.parse((global as any).document.cookie)
   const analyticsCookie = cookies[COOKIE_KEY_NAME]
     ? JSON.parse(cookies[COOKIE_KEY_NAME])
     : {}

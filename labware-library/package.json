@@ -18,9 +18,10 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/classnames": "2.2.5",
-    "@types/cookie": "0.4.0",
+    "@types/cookie": "^0.4.0",
     "@types/file-saver": "2.0.1",
     "@types/jszip": "3.4.1",
+    "@types/mixpanel-browser": "^2.35.6",
     "@types/react-router-dom": "^5.1.7",
     "@types/webpack-env": "^1.16.0",
     "@types/yup": "0.28.0"
