@@ -30,7 +30,7 @@ class _ProvideLookup(Enum):
         for m in cls.__members__.values():
             if m.value == typename:
                 return m
-        raise AttributeError(f'No such module type {typename}')
+        raise AttributeError(f'No such type {typename}')
 
 
 class ModuleType(_ProvideLookup):

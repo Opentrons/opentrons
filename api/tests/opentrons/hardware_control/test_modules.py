@@ -70,7 +70,7 @@ async def test_filtering_modules():
                         attached_modules=mods)
     await asyncio.sleep(0.5)
 
-    filtered_modules = api.find_modules(
+    filtered_modules = await api.find_modules(
         MagneticModuleModel.MAGNETIC_V1, ModuleType.MAGNETIC)
     assert len(filtered_modules) == 2
     assert filtered_modules == api.attached_modules[2:4]
