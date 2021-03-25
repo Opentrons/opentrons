@@ -24,7 +24,9 @@ export interface ModuleProps {
   /** display mode: 'default', 'present', 'missing', or 'info' */
   mode: 'default' | 'present' | 'missing' | 'info'
   /** slot details of the location of this module */
-  slot: DeckSlot
+  slot: DeckSlot,
+  /** USB port detail of the connected module */
+  usbInfoString?: string,
 }
 
 export function Module(props: ModuleProps): JSX.Element {
@@ -81,7 +83,7 @@ export function Module(props: ModuleProps): JSX.Element {
 }
 
 function ModuleItemContents(props: ModuleProps): JSX.Element {
-  const { mode, model } = props
+  const { mode, model, usbInfoString } = props
   const displayName = getModuleDisplayName(model)
 
   const iconClassName = cx(styles.module_review_icon, {
@@ -99,9 +101,16 @@ function ModuleItemContents(props: ModuleProps): JSX.Element {
   return (
     <>
       <div className={styles.module_wrapper}>
-        {mode !== 'missing' && (
-          <p key="portInfo" className={styles.module_port_text}>
-            usb info n/a
+        {mode !== 'missing' && usbInfoString && (
+          <p
+            key="usbPortInfo"
+            className={
+              usbInfoString.includes('N/A')
+                ? styles.module_port_text_na
+                : styles.module_port_text
+            }
+          >
+            {usbInfoString}
           </p>
         )}
         <p key="displayName" className={styles.module_review_text}>

@@ -73,7 +73,7 @@ export const getMatchedModules: (
         attachedModules.find(
           amod =>
             checkModuleCompatibility(amod.model, pmod.model) &&
-            !!matchedAmod.filter(m => m.module.serial === amod.serial)
+            !matchedAmod.find(m => m.module === amod)
         ) ?? null
       if (compatible !== null) {
         matchedPmod.push(pmod)

@@ -19,7 +19,7 @@ import {
   type SessionModule,
 } from '../../redux/robot'
 
-import { getMissingModules } from '../../redux/modules'
+import { getMatchedModules } from '../../redux/modules'
 
 import { LabwareItem } from './LabwareItem'
 
@@ -37,6 +37,10 @@ type DP = {| dispatch: Dispatch |}
 type DisplayModule = {|
   ...$Exact<SessionModule>,
   mode?: $PropertyType<React.ElementProps<typeof ModuleItem>, 'mode'>,
+  usbInfoString?: $PropertyType<
+    React.ElementProps<typeof ModuleItem>,
+    'usbInfoString'
+  >,
 |}
 
 type SP = {|
@@ -92,6 +96,7 @@ function DeckMapComponent(props: Props) {
                     model={moduleInSlot.model}
                     mode={moduleInSlot.mode || 'default'}
                     slot={slot}
+                    usbInfoString={moduleInSlot.usbInfoString}
                   />
                 </g>
               )}
@@ -128,15 +133,26 @@ function mapStateToProps(state: State, ownProps: OP): SP {
 
   // only show necessary modules if still need to connect some
   if (ownProps.modulesRequired === true) {
-    const missingModules = getMissingModules(state)
+    const matchedModules = getMatchedModules(state)
 
     modulesBySlot = mapValues(
       robotSelectors.getModulesBySlot(state),
       module => {
-        const present = !missingModules.some(
-          mm => mm.model === module.model && mm.slot === module.slot
-        )
-        return { ...module, mode: present ? 'present' : 'missing' }
+        const matchedMod =
+          matchedModules.find(mm => mm.slot === module.slot) ?? null
+        console.log('did we not find', matchedMod)
+        const usbInfo =
+          matchedMod && matchedMod.module.usbPort.hub
+            ? `USB Port ${matchedMod.module.usbPort.hub} via Hub`
+            : matchedMod && matchedMod.module.usbPort.port
+            ? `USB Port ${matchedMod.module.usbPort.port}`
+            : 'USB Info N/A'
+        console.log('usb string', usbInfo)
+        return {
+          ...module,
+          mode: matchedMod !== null ? 'present' : 'missing',
+          usbInfoString: usbInfo,
+        }
       }
     )
     return {

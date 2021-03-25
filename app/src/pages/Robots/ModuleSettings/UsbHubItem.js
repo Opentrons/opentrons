@@ -35,9 +35,7 @@ export function UsbHubItem(props: Props): React.Node {
         textTransform={TEXT_TRANSFORM_CAPITALIZE}
         marginBottom={SPACING_2}
       >
-        <Text marginRight={SPACING_2}>
-          {`USB Port ${hub}: ${MULTIPLE_MODULES}`}
-        </Text>
+        <Text marginRight={SPACING_2}>{`USB Port ${hub}:`}</Text>
         <Text>{MULTIPLE_MODULES}</Text>
       </Flex>
       {modules.map(mod => (
@@ -46,7 +44,6 @@ export function UsbHubItem(props: Props): React.Node {
           borderLeft={BORDER_SOLID_MEDIUM}
           borderWidth={BORDER_RADIUS_DEFAULT}
           paddingLeft={SPACING_3}
-          paddingRight={0}
           paddingTop={SPACING_3}
           paddingBottom={SPACING_4}
           css={css`

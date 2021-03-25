@@ -32,7 +32,7 @@ import type { State } from '../../redux/types'
 
 const DECK_SLOT_STYLE = { width: '4.5rem' }
 const MODULE_STYLE = { width: '7rem', paddingRight: SPACING_3 }
-const USB_PORT_STYLE = { width: SPACING_AUTO }
+const USB_PORT_STYLE = { width: '3.5rem' }
 
 export function ProtocolModuleList(): React.Node {
   const { t } = useTranslation('protocol_calibration')
@@ -71,16 +71,21 @@ export function ProtocolModuleList(): React.Node {
               alignItems={ALIGN_CENTER}
               padding="0.75rem"
             >
-              <Icon
-                name={
-                  missingModules.includes(m)
-                    ? 'checkbox-blank-circle-outline'
-                    : 'check-circle'
-                }
-                className={styles.module_connect_icon}
-              />
-              <Text {...DECK_SLOT_STYLE}>{`Slot ${m.slot}`}</Text>
-              <Text {...MODULE_STYLE}>{getModuleDisplayName(m.model)}</Text>
+              <Flex width={'6rem'}>
+                <Icon
+                  name={
+                    missingModules.includes(m)
+                      ? 'checkbox-blank-circle-outline'
+                      : 'check-circle'
+                  }
+                  width={'15px'}
+                  marginRight={SPACING_2}
+                />
+                <Text {...DECK_SLOT_STYLE}>{`Slot ${m.slot}`}</Text>
+              </Flex>
+              <Flex {...MODULE_STYLE}>
+                <Text>{getModuleDisplayName(m.model)}</Text>
+              </Flex>
               <UsbPortInfo
                 matchedModule={matched.find(a => a.slot === m.slot) || null}
               />
@@ -111,17 +116,17 @@ function UsbPortInfo(props: UsbPortInfoProps): React.Node {
       : 'N/A'
   return (
     <>
-      <Text marginRight={SPACING_2} {...USB_PORT_STYLE}>
-        {portText}
-      </Text>
-      {portText === 'N/A' && (
-        <Flex {...targetProps}>
-          <Icon name="alert-circle" width={SIZE_1} />
-          <Tooltip style={{ width: '2rem' }} {...tooltipProps}>
-            {t('modules_update_software_tooltip')}
-          </Tooltip>
-        </Flex>
-      )}
+      <Flex {...USB_PORT_STYLE}>
+        <Text>{portText}</Text>
+        {portText === 'N/A' && (
+          <Flex {...targetProps}>
+            <Icon name="alert-circle" width={SIZE_1} />
+            <Tooltip style={{ width: '2rem' }} {...tooltipProps}>
+              {t('modules_update_software_tooltip')}
+            </Tooltip>
+          </Flex>
+        )}
+      </Flex>
     </>
   )
 }
