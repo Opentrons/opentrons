@@ -1,9 +1,11 @@
+from typing import Type
+
 import pytest
 from mock import AsyncMock, call
 
 from opentrons.drivers.asyncio.communication.async_serial import AsyncSerial
 from opentrons.drivers.asyncio.communication.serial_connection import (
-    SerialConnection, NoResponse
+    SerialConnection, NoResponse, ErrorResponse, AlarmResponse
 )
 
 
@@ -19,6 +21,9 @@ def ack() -> str:
 
 @pytest.fixture
 def subject(mock_serial_port: AsyncMock, ack: str) -> SerialConnection:
+    """Create the test subject."""
+    # No need to sleep during retries.
+    SerialConnection.RETRY_WAIT_TIME = 0
     return SerialConnection(serial=mock_serial_port,
                             ack=ack,
                             name="name",
@@ -62,3 +67,29 @@ async def test_send_command_with_retry_exhausted(mock_serial_port: AsyncMock,
 
     with pytest.raises(NoResponse):
         await subject.send_command(data="send data", retries=2)
+
+
+@pytest.mark.parametrize(
+    argnames=["response", "exception_type"],
+    argvalues=[
+        ["error", ErrorResponse],
+        ["Error", ErrorResponse],
+        ["Error: was found.", ErrorResponse],
+        ["alarm", AlarmResponse],
+        ["ALARM", AlarmResponse],
+        ["This is an Alarm", AlarmResponse],
+    ]
+)
+def test_raise_on_error(response: str, exception_type: Type[Exception]) -> None:
+    """It should raise an exception on error/alarm responses."""
+    with pytest.raises(expected_exception=exception_type, match=response):
+        SerialConnection.raise_on_error(response)
+
+
+async def test_on_retry(mock_serial_port: AsyncMock,
+                        subject: SerialConnection) -> None:
+    """It should try to re-open connection."""
+    await subject._on_retry()
+
+    mock_serial_port.close.assert_called_once()
+    mock_serial_port.open.assert_called_once()

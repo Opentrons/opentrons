@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Optional
 
@@ -14,7 +15,17 @@ class NoResponse(SerialException):
     pass
 
 
+class AlarmResponse(SerialException):
+    pass
+
+
+class ErrorResponse(SerialException):
+    pass
+
+
 class SerialConnection:
+
+    RETRY_WAIT_TIME = 0.1
 
     @classmethod
     async def create(
@@ -74,7 +85,9 @@ class SerialConnection:
         log.debug(f'{self.name}: Read <- {response!r}')
 
         if self._ack in response:
-            return response.decode()
+            str_response = response.decode()
+            self.raise_on_error(response=str_response)
+            return str_response
 
         log.warning(f'{self.name}: retry number {retries}')
 
@@ -82,7 +95,7 @@ class SerialConnection:
         if retries < 0:
             raise NoResponse("retry count exhausted")
 
-        self._on_retry()
+        await self._on_retry()
 
         return await self.send_command(data=data, retries=retries)
 
@@ -98,10 +111,32 @@ class SerialConnection:
     def name(self) -> str:
         return self._name
 
-    def _on_retry(self) -> None:
+    @staticmethod
+    def raise_on_error(response: str) -> None:
         """
-        Opportunity for derived classes to perform action between retries
+        Raise an error if the response contains an error
+
+        Args:
+            response: response
+
+        Returns: None
+
+        Raises: SerialException
+        """
+        lower = response.lower()
+        if "error" in lower:
+            raise ErrorResponse(response)
+
+        if "alarm" in lower:
+            raise AlarmResponse(response)
+
+    async def _on_retry(self) -> None:
+        """
+        Opportunity for derived classes to perform action between retries. Default
+        behaviour is to wait then re-open the connection.
 
         Returns: None
         """
-        pass
+        await asyncio.sleep(self.RETRY_WAIT_TIME)
+        await self._serial.close()
+        await self._serial.open()
