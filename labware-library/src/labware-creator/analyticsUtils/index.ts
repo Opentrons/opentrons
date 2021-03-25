@@ -1,10 +1,12 @@
-import { string } from 'yup'
 import { reportEvent } from '../../analytics'
 
 type FieldKV = Record<string, string>
 
 const _prevFieldValues: FieldKV = {}
-export const reportFieldEdit = (args: { name: string; value: string }) => {
+export const reportFieldEdit = (args: {
+  name: string
+  value: string
+}): void => {
   // avoid reporting events on field blur unless there's a change
   const { name, value } = args
   const prevValue = _prevFieldValues[name]
@@ -22,7 +24,7 @@ export const reportErrors = (args: {
   values: FieldKV
   errors: FieldKV
   touched: FieldKV
-}) => {
+}): void => {
   const { values, errors, touched } = args
 
   // TODO Ian 2019-10-02: why is there an 'undefined' field in Formik `touched`?

@@ -11,9 +11,9 @@ const COOKIE_DOMAIN =
 
 const persistAnalyticsCookie = (cookies: Record<string, any>): void => {
   const maxAge = 10 * 365 * 24 * 60 * 60 // 10 years
-  const options = { COOKIE_DOMAIN, maxAge };
+  const options = { COOKIE_DOMAIN, maxAge }
 
-  (global as any).document.cookie = cookie.serialize(
+  ;(global as any).document.cookie = cookie.serialize(
     COOKIE_KEY_NAME,
     JSON.stringify(cookies),
     options
