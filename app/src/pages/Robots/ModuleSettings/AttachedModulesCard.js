@@ -49,9 +49,6 @@ export function AttachedModulesCard(props: Props): React.Node {
     return portMap
   }, {})
 
-  console.log(`modules: `, modules)
-  console.log('modulesByPort: ', modulesByPort)
-
   // if robot is connected, the modules epic will poll /modules automatically,
   // but we need to poll ourselves if we're viewing this robot without
   // connecting to its RPC server
