@@ -3,10 +3,13 @@ import * as React from 'react'
 import last from 'lodash/last'
 import { useSelector, useDispatch } from 'react-redux'
 import {
-  OutlineButton,
-  HoverTooltip,
+  Flex,
+  SecondaryBtn,
+  useHoverTooltip,
+  Tooltip,
   Icon,
   AlertModal,
+  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
@@ -22,7 +25,6 @@ import { updateModule } from '../../../../redux/modules'
 import type { UpdateModuleAction } from '../../../../redux/modules/types'
 import type { State, Dispatch } from '../../../../redux/types'
 import type { RequestState } from '../../../../redux/robot-api/types'
-import styles from './styles.css'
 
 const FW_IS_UP_TO_DATE = 'Module Firmware is up to date'
 const OK_TEXT = 'Ok'
@@ -68,29 +70,28 @@ export function ModuleUpdate(props: Props): React.Node {
   } else if (controlDisabledReason !== null) {
     tooltipText = controlDisabledReason
   }
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const handleCloseErrorModal = () => {
     dispatch(dismissRequest(latestRequestId))
   }
   return (
-    <div className={styles.module_update_wrapper}>
-      <HoverTooltip tooltipComponent={tooltipText}>
-        {hoverTooltipHandlers => (
-          <div {...hoverTooltipHandlers}>
-            <OutlineButton
-              className={styles.module_update_button}
-              onClick={handleClick}
-              disabled={!canControl || !hasAvailableUpdate || isPending}
-            >
-              {isPending ? (
-                <Icon name="ot-spinner" height="1em" spin />
-              ) : (
-                buttonText
-              )}
-            </OutlineButton>
-          </div>
-        )}
-      </HoverTooltip>
+    <Flex justifyContent={JUSTIFY_FLEX_END}>
+      <Flex>
+        <SecondaryBtn
+          width="11rem"
+          onClick={handleClick}
+          disabled={!canControl || !hasAvailableUpdate || isPending}
+          {...targetProps}
+        >
+          {isPending ? (
+            <Icon name="ot-spinner" height="1em" spin />
+          ) : (
+            buttonText
+          )}
+        </SecondaryBtn>
+        <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
+      </Flex>
       {latestRequest && latestRequest.status === FAILURE && (
         <Portal>
           <AlertModal
@@ -103,6 +104,6 @@ export function ModuleUpdate(props: Props): React.Node {
           </AlertModal>
         </Portal>
       )}
-    </div>
+    </Flex>
   )
 }

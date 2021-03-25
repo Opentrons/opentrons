@@ -1,6 +1,7 @@
 import pytest
 
 from mock import patch, MagicMock
+from opentrons.hardware_control.modules.types import ModuleAtPort
 from opentrons.drivers.rpi_drivers.usb import USBBus
 from opentrons.drivers.rpi_drivers.types import USBPort
 
@@ -9,7 +10,7 @@ fake_bus = [
     '/sys/bus/usb/devices/usb1/1-1/1-1.3/1-1.3:1.0/tty/ttyACM1/dev',
     '/sys/bus/usb/devices/usb1/1-1/1-1.5/1-1.5:1.0/tty/ttyAMA0/dev',
     '/sys/bus/usb/devices/usb1/1-1/1-1.4/1-1.4/1-1.4.1/1-1.4.1:1.0/tty/ttyAMA1/dev',
-    '/sys/bus/usb/devices/usb1/1-1/1-1.4/1-1.4/1-1.4.3/1-1.4.3:1.0/tty/ttyACM1/dev',
+    '/sys/bus/usb/devices/usb1/1-1/1-1.4/1-1.4/1-1.4.3/1-1.4.3:1.0/tty/ttyACM2/dev',
     '/sys/bus/usb/devices/usb1/1-1/1-1.3/dev',
     '/sys/bus/usb/devices/usb1/1-1/1-1.1/dev',
     '/sys/bus/usb/devices/usb1/1-1/dev',
@@ -22,7 +23,7 @@ filtered_ports = [
     '1-1.3/1-1.3:1.0/tty/ttyACM1/dev',
     '1-1.5/1-1.5:1.0/tty/ttyAMA0/dev',
     '1-1.4/1-1.4/1-1.4.1/1-1.4.1:1.0/tty/ttyAMA1/dev',
-    '1-1.4/1-1.4/1-1.4.3/1-1.4.3:1.0/tty/ttyACM1/dev'
+    '1-1.4/1-1.4/1-1.4.3/1-1.4.3:1.0/tty/ttyACM2/dev'
 ]
 
 
@@ -80,3 +81,19 @@ def test_unplug_device(usb_class: USBBus) -> None:
 def test_sorted_usb_class(usb_class: USBBus) -> None:
     expected_sorted = {'1-1.3', '1-1.4.1', '1-1.4.3', '1-1.5'}
     assert usb_class.sorted_ports == expected_sorted
+
+
+def test_modify_module_list(usb_class: USBBus):
+    usb_class.read_symlink = MagicMock(return_value='ttyACM1')
+    mod_at_port_list = [ModuleAtPort(
+        name='temperature module',
+        port='dev/ot_module_temperature_module')]
+    updated_list = usb_class.match_virtual_ports(mod_at_port_list)
+    assert updated_list[0].usb_port == usb_class.usb_dev[0]
+
+    usb_class.read_symlink = MagicMock(return_value='ttyACM2')
+    mod_at_port_list = [ModuleAtPort(
+        name='magnetic module',
+        port='dev/ot_module_magnetic_module')]
+    updated_list = usb_class.match_virtual_ports(mod_at_port_list)
+    assert updated_list[0].usb_port == usb_class.usb_dev[3]

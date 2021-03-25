@@ -3,44 +3,34 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { WellSelectionInput } from './WellSelectionInput'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { getDisabledFields } from '../../../../steplist/formLevel'
 import type { BaseState, ThunkDispatch } from '../../../../types'
-import type { StepFieldName } from '../../../../form-types'
 import type { FieldProps } from '../../types'
 
 type Props = React.ElementConfig<typeof WellSelectionInput>
 
 type OP = {|
   ...FieldProps,
-  pipetteFieldName: StepFieldName,
-  labwareFieldName: StepFieldName,
+  labwareId: ?string,
+  pipetteId: ?string,
 |}
 
 type SP = {|
-  disabled: boolean,
   isMulti: $PropertyType<Props, 'isMulti'>,
   primaryWellCount: $PropertyType<Props, 'primaryWellCount'>,
-  _pipetteId: ?string,
-  _selectedLabwareId: ?string,
 |}
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const formData = stepFormSelectors.getUnsavedForm(state)
-  const pipetteId = formData && formData[ownProps.pipetteFieldName]
-  const selectedWells = formData ? formData[ownProps.name] : []
-  const disabled = formData
-    ? getDisabledFields(formData).has(ownProps.name)
-    : false
+  const { pipetteId } = ownProps
+  const selectedWells = ownProps.value
 
   const pipette =
     pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
   const isMulti = pipette ? pipette.spec.channels > 1 : false
 
   return {
-    disabled,
-    _pipetteId: pipetteId,
-    _selectedLabwareId: formData && formData[ownProps.labwareFieldName],
-    primaryWellCount: selectedWells && selectedWells.length,
+    primaryWellCount: Array.isArray(selectedWells)
+      ? selectedWells.length
+      : undefined,
     isMulti,
   }
 }
@@ -50,28 +40,30 @@ function mergeProps(
   dispatchProps: { dispatch: ThunkDispatch<*> },
   ownProps: OP
 ): Props {
-  const { _pipetteId, _selectedLabwareId } = stateProps
   const {
+    disabled,
+    errorToShow,
+    labwareId,
     name,
     onFieldBlur,
     onFieldFocus,
-    errorToShow,
-    value,
+    pipetteId,
     updateValue,
+    value,
   } = ownProps
 
   return {
-    name,
-    disabled: stateProps.disabled,
-    pipetteId: _pipetteId,
-    labwareId: _selectedLabwareId,
-    isMulti: stateProps.isMulti,
-    primaryWellCount: stateProps.primaryWellCount,
-    value,
+    disabled,
     errorToShow,
+    isMulti: stateProps.isMulti,
+    labwareId,
+    name,
     onFieldBlur,
     onFieldFocus,
+    pipetteId,
+    primaryWellCount: stateProps.primaryWellCount,
     updateValue,
+    value,
   }
 }
 

@@ -16,7 +16,7 @@ export type DropdownFieldProps = {|
   /**
    * change handler
    */
-  onChange: React.ChangeEventHandler<>,
+  onChange: React.ChangeEventHandler<HTMLSelectElement>,
 
   /**
    * focus handler

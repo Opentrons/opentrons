@@ -10,7 +10,7 @@ export type ToggleFieldProps = {|
   /**
    * change handler
    */
-  onChange: (event: React.SyntheticEvent<HTMLInputElement>) => mixed,
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => mixed,
 
   /**
    * checkbox is checked if value is true

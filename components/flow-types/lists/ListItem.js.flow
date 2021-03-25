@@ -77,9 +77,10 @@ declare type ListItemProps = {|
 declare export var ListItem: React.ForwardRefExoticComponent<
   Pick<
     ListItemProps,
-    | "exact"
     | "children"
     | "url"
+    | "activeClassName"
+    | "exact"
     | "className"
     | "aria-describedby"
     | "onClick"
@@ -87,9 +88,8 @@ declare export var ListItem: React.ForwardRefExoticComponent<
     | "onMouseLeave"
     | "onPointerEnter"
     | "onPointerLeave"
-    | "iconName"
     | "isDisabled"
-    | "activeClassName"
+    | "iconName"
   > &
     React.RefAttributes<HTMLLIElement>
 >;

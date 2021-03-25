@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Box } from '../primitives'
-import type { PrimitiveComponent } from '../primitives'
 
 export interface RobotCoordsForeignDivProps {
   width?: string | number
@@ -9,7 +8,7 @@ export interface RobotCoordsForeignDivProps {
   y?: string | number
   children?: React.ReactNode
   className?: string
-  innerDivProps?: React.ComponentProps<PrimitiveComponent<'div'>>
+  innerDivProps?: React.ComponentProps<typeof Box>
   transformWithSVG?: boolean
   extraTransform?: string
 }

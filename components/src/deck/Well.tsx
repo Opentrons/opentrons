@@ -9,7 +9,7 @@ import type { WellDefinition } from '@opentrons/shared-data'
 
 export interface SingleWell {
   wellName: string
-  highlighted?: boolean | null // highlighted is the same as hovered
+  highlighted?: boolean | null | undefined // highlighted is the same as hovered
   selected?: boolean | null
   error?: boolean | null
   maxVolume?: number

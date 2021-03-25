@@ -23,7 +23,7 @@ export interface PipetteSelectProps {
   /** whether or not "None" shows up as the default option */
   enableNoneOption?: boolean
   /** input tabIndex */
-  tabIndex?: string | number | null | undefined
+  tabIndex?: string | number
   /** classes to apply to the top-level component */
   className?: string
   /** custom id to be applied. likely to be used as a data test id for e2e testing */

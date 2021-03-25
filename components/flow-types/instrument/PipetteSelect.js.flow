@@ -29,7 +29,7 @@ export type PipetteSelectProps = {|
   /**
    * input tabIndex
    */
-  tabIndex?: string | number | null | void,
+  tabIndex?: string | number,
 
   /**
    * classes to apply to the top-level component

@@ -1,10 +1,10 @@
 import * as React from 'react'
 
-export type RobotCoordsTextProps = {
+export interface RobotCoordsTextProps extends React.ComponentProps<'text'> {
   x: number
   y: number
   children?: React.ReactNode
-} & JSX.IntrinsicElements['text']
+}
 
 /** SVG text reflected to use take robot coordinates as props */
 // TODO: Ian 2019-05-07 reconcile this with Brian's version

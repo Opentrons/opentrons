@@ -7,11 +7,12 @@
 
 import * as React from "react";
 import type { IconProps } from "../icons";
+export type AlertType = "success" | "warning" | "error" | "info";
 export type AlertItemProps = {|
   /**
    * name constant of the icon to display
    */
-  type: "success" | "warning" | "error" | "info",
+  type: AlertType,
 
   /**
    * title/main message of colored alert bar
@@ -38,17 +39,4 @@ export type AlertItemProps = {|
    */
   icon?: IconProps,
 |};
-
-/**
- * Alert overlay,
- * change style and icon by using type 'success' 'warning' 'error'
- */
-declare var ALERT_PROPS_BY_TYPE: {
-  [key: $PropertyType<AlertItemProps, "type">]: {
-    icon: IconProps,
-    className: $PropertyType<AlertItemProps, "className">,
-  },
-};
-export type AlertType = $Keys<typeof ALERT_PROPS_BY_TYPE>;
 declare export function AlertItem(props: AlertItemProps): React$Node;
-declare export {};

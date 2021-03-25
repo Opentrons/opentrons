@@ -45,17 +45,19 @@ export const MoveLiquidForm = (props: StepFormProps): React.Node => {
       <div className={styles.section_wrapper}>
         <SourceDestHeaders
           className={styles.section_column}
-          propsForFields={propsForFields}
           collapsed={collapsed}
-          toggleCollapsed={toggleCollapsed}
+          formData={formData}
           prefix="aspirate"
+          propsForFields={propsForFields}
+          toggleCollapsed={toggleCollapsed}
         />
         <SourceDestHeaders
           className={styles.section_column}
-          propsForFields={propsForFields}
           collapsed={collapsed}
-          toggleCollapsed={toggleCollapsed}
+          formData={formData}
           prefix="dispense"
+          propsForFields={propsForFields}
+          toggleCollapsed={toggleCollapsed}
         />
       </div>
 
@@ -92,11 +94,28 @@ export const MoveLiquidForm = (props: StepFormProps): React.Node => {
             path={formData.path}
             stepType={formData.stepType}
           />
-          <PathField />
+          <PathField
+            {...propsForFields['path']}
+            aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
+            aspirate_airGap_volume={formData.aspirate_airGap_volume}
+            aspirate_wells={formData.aspirate_wells}
+            changeTip={formData.changeTip}
+            dispense_wells={formData.dispense_wells}
+            pipette={formData.pipette}
+            volume={formData.volume}
+          />
         </div>
         <div className={cx(styles.section_column, styles.disposal_vol_wrapper)}>
           {path === 'multiDispense' && (
-            <DisposalVolumeField propsForFields={propsForFields} />
+            <DisposalVolumeField
+              aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
+              aspirate_airGap_volume={formData.aspirate_airGap_volume}
+              path={formData.path}
+              pipette={formData.pipette}
+              propsForFields={propsForFields}
+              stepType={formData.stepType}
+              volume={formData.volume}
+            />
           )}
         </div>
       </div>
