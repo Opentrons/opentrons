@@ -69,7 +69,7 @@ const validateLabwareSchema = ajv.compile(labwareSchema)
 const maskTo2Decimal = makeMaskToDecimal(2)
 
 interface MakeAutofillOnChangeArgs {
-  name: string // TODO IMMEDIATELY: TS translation for `$Keys<LabwareFields>,` ???
+  name: keyof LabwareFields
   autofills: Record<string, Partial<LabwareFields>>
   values: LabwareFields
   touched: Object

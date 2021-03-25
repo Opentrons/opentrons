@@ -348,8 +348,7 @@ export const getDefaultFormState = (): LabwareFields => ({
   pipetteName: null,
 })
 
-export const LABELS = {
-  // TODO IMMEDIATELY: TS translation of `{ [$Keys<LabwareFields>]: string }` = ???
+export const LABELS: Record<keyof LabwareFields, string> = {
   labwareType: 'What type of labware are you creating?',
   tubeRackInsertLoadName: 'Which tube rack insert?',
   aluminumBlockType: 'Which aluminum block?',

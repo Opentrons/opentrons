@@ -11,7 +11,7 @@ import {
 import type { LabwareFields } from './fields'
 // TODO(Ian, 2019-07-24): consolidate `tubeRackAutofills/aluminumBlockAutofills`-getting logic btw here and makeAutofillOnChange
 export const _getIsAutofilled = (
-  name: string, // TODO IMMEDIATELY: `$Keys<LabwareFields>,` === ?
+  name: keyof LabwareFields,
   values: LabwareFields
 ): boolean => {
   const { labwareType, aluminumBlockType, tubeRackInsertLoadName } = values
@@ -40,7 +40,7 @@ export const _getIsAutofilled = (
 
 // any fields that are conditionally defaulted by the Yup schema and do not need to be displayed.
 export const _getIsDefaulted = (
-  name: string, // TODO IMMEDIATELY: `$Keys<LabwareFields>,` === ?
+  name: keyof LabwareFields,
   values: LabwareFields
 ): boolean => {
   if (
@@ -60,7 +60,7 @@ export const _getIsDefaulted = (
 
 // a field should be hidden when it is autofilled or is defaulted
 export const getIsHidden = (
-  name: string, // TODO IMMEDIATELY: `$Keys<LabwareFields>,` === ?
+  name: keyof LabwareFields,
   values: LabwareFields
 ): boolean => _getIsAutofilled(name, values) || _getIsDefaulted(name, values)
 
