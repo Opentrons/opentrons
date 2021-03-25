@@ -75,7 +75,7 @@ class SerialConnection:
 
         Returns: The command response
 
-        Raises: NoResponse
+        Raises: SerialException
         """
         data_encode = data.encode()
         log.debug(f'{self.name}: Write -> {data_encode!r}')
