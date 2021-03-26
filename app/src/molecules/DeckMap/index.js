@@ -37,10 +37,7 @@ type DP = {| dispatch: Dispatch |}
 type DisplayModule = {|
   ...$Exact<SessionModule>,
   mode?: $PropertyType<React.ElementProps<typeof ModuleItem>, 'mode'>,
-  usbInfoString?: $PropertyType<
-    React.ElementProps<typeof ModuleItem>,
-    'usbInfoString'
-  >,
+  usbInfoString?: string,
 |}
 
 type SP = {|
