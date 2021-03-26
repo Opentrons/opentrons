@@ -1,9 +1,9 @@
 import { labwareDefToFields } from '../labwareDefToFields'
-// @ts-expect-error(2021-03-24): shared-data fixtures not yet typed
+// @ts-expect-error(2021-03-24): shared-data fixtures aren't proper LabwareDefinition2 type!
 import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
-// @ts-expect-error(2021-03-24): shared-data fixtures not yet typed
+// @ts-expect-error(2021-03-24): shared-data fixtures aren't proper LabwareDefinition2 type!
 import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough'
-// @ts-expect-error(2021-03-24): shared-data fixtures not yet typed
+// @ts-expect-error(2021-03-24): shared-data fixtures aren't proper LabwareDefinition2 type!
 import fixtureIrregularExample1 from '@opentrons/shared-data/labware/fixtures/2/fixture_irregular_example_1'
 
 jest.mock('../../definitions')
