@@ -310,6 +310,7 @@ type PipettesForInstrumentGroup = ElementProps<InstrumentGroupProps>
 export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup> = createSelector(
   getInitialDeckSetup,
   initialDeckSetup =>
+    // $FlowFixMe(2021-03-16): fix with TS conversion
     reduce(
       initialDeckSetup.pipettes,
       (

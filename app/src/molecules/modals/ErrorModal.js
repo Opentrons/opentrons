@@ -32,6 +32,7 @@ export function ErrorModal(props: Props): React.Node {
 
   return (
     <Portal>
+      {/* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion or replacement of AlertModal */}
       <AlertModal heading={heading} buttons={[closeButtonProps]} alertOverlay>
         <p className={styles.error_modal_message}>
           {error.message ?? AN_UNKNOWN_ERROR_OCCURRED}

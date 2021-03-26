@@ -63,6 +63,7 @@ class WellSelectionInputComponent extends React.Component<Props> {
       labwareId || 'noLabware'
     }`
   }
+
   render() {
     const modalKey = this.getModalKey()
     const label = this.props.isMulti
@@ -87,12 +88,14 @@ class WellSelectionInputComponent extends React.Component<Props> {
         />
         <Portal>
           <WellSelectionModal
-            key={modalKey}
-            pipetteId={this.props.pipetteId}
-            labwareId={this.props.labwareId}
             isOpen={this.props.wellSelectionLabwareKey === modalKey}
-            onCloseClick={this.handleClose}
+            key={modalKey}
+            labwareId={this.props.labwareId}
             name={this.props.name}
+            onCloseClick={this.handleClose}
+            pipetteId={this.props.pipetteId}
+            updateValue={this.props.updateValue}
+            value={this.props.value}
           />
         </Portal>
       </FormGroup>

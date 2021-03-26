@@ -8,7 +8,7 @@
 }
 
 .module_item {
-  padding: 1.5rem 1rem 0;
+  padding: 1.5rem 1rem;
   border-bottom: 1px solid var(--c-light-gray);
 
   &:last-child {
@@ -23,12 +23,8 @@
 }
 
 .module_image_wrapper {
-  flex-basis: 25%;
+  width: 12rem;
   padding-right: 0.5rem;
-}
-
-.module_image {
-  width: 100%;
 }
 
 .module_info {
