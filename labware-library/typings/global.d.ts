@@ -1,9 +1,6 @@
-export {}
-
-declare global {
-  module NodeJS {
-    export interface Global {
-      _fs_namespace: string | undefined
-    }
+// labware-library/typings/global.d.ts
+declare module NodeJS {
+  interface Global {
+    _fs_namespace: string | undefined
   }
-} 
+}
