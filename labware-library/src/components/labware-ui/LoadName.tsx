@@ -15,7 +15,7 @@ export interface LoadNameProps {
 export function LoadName(props: LoadNameProps): JSX.Element {
   const { loadName } = props
   const [success, setSuccess] = React.useState(false)
-  const inputRef = React.useRef<HTMLInputElement | null>(null)
+  const inputRef = React.useRef<HTMLInputElement>(null)
   const successTimeout = React.useRef<NodeJS.Timeout | null>(null)
   const cleanupSuccessTimeout = (): void => {
     if (successTimeout.current) clearTimeout(successTimeout.current)

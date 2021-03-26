@@ -4,7 +4,7 @@ import styles from './styles.css'
 
 import type { Link } from './types'
 
-type Props = Link & {
+interface Props extends Link {
   className?: string
 }
 

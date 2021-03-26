@@ -7,6 +7,7 @@ import styles from './styles.css'
 
 import { MANUFACTURER, MANUFACTURER_VALUES } from '../../localization'
 
+import type { SelectFieldProps } from '@opentrons/components'
 import type { RouteComponentProps } from 'react-router-dom'
 import type { FilterParams } from '../../types'
 
@@ -19,12 +20,12 @@ export function FilterManufacturerComponent(
 ): JSX.Element {
   const { history, filters } = props
   const manufacturers = getAllManufacturers()
-  const options = manufacturers.map(value => ({
+  const options: SelectFieldProps['options'] = manufacturers.map(value => ({
     value,
     label: MANUFACTURER_VALUES[value] || value,
   }))
 
-  // @ts-expect-error(IL, 2021-03-24): why is there an options key here?? Is the code wrong here? Or the TS?
+  // @ts-expect-error(IL, 2021-03-26): SelectFieldProps is immutable, no `push`
   options.push({ options: [{ label: 'Other', value: 'other' }] })
 
   return (

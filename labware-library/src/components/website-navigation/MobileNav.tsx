@@ -6,8 +6,10 @@ interface State {
   isOpen: boolean
 }
 
-export class MobileNav extends React.Component<{}, State> {
-  constructor(props: {}) {
+type Props = Record<string, never>
+
+export class MobileNav extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props)
     this.state = { isOpen: false }
   }

@@ -5,7 +5,7 @@
   "description": "Opentrons standard labware library",
   "main": "dist/index.js",
   "source": "src/index.tsx",
-  "types": "dist/index.d.ts",
+  "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/Opentrons/opentrons.git",

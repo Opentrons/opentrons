@@ -4,7 +4,7 @@ import cx from 'classnames'
 import styles from './styles.css'
 
 export interface PageProps {
-  scrollRef: { current: HTMLDivElement | null }
+  scrollRef: React.RefObject<HTMLDivElement>
   detailPage: boolean
   sidebar: React.ReactNode
   content: React.ReactNode

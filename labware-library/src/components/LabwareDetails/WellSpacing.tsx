@@ -23,9 +23,7 @@ import type { LabwareWellGroupProperties } from '../../types'
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const spacingValue = (spacing: number | null) => {
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+const spacingValue = (spacing: number | null): JSX.Element | string => {
   if (!spacing) {
     return (
       <span className={styles.lighter}>{spacing === null ? VARIOUS : NA}</span>

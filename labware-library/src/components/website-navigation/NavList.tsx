@@ -13,8 +13,10 @@ interface State {
   menu: null | MenuName
 }
 
-export class NavList extends React.Component<{}, State> {
-  constructor(props: {}) {
+type Props = Record<string, never>
+
+export class NavList extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props)
     this.state = { menu: null }
   }
