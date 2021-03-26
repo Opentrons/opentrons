@@ -30,24 +30,14 @@ class USBBusSimulator(USBDriverInterface):
         return ['']
 
     @staticmethod
-    def convert_port_path(
-            full_port_path: str,
-            board_revision: BoardRevision) -> USBPort:
-        """
-        Convert port path.
-
-        Take the value returned from the USB bus and format
-        that information into a dataclass
-        :param full_port_path: The string port path
-        :returns: The USBPort dataclass
-        """
-        pass
-
-    @staticmethod
     def read_symlink(virtual_port: str) -> str:
         """
         """
         return ''
+
+    @property
+    def board_revision(self) -> BoardRevision:
+        return self._board_revision
 
     @property
     def usb_dev(self) -> List[USBPort]:

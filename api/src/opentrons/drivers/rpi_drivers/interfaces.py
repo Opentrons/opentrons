@@ -9,20 +9,16 @@ from .types import USBPort
 
 class USBDriverInterface(Protocol):
 
-    _board_revision: BoardRevision
-
     @staticmethod
     def read_bus() -> List[str]:
         ...
 
     @staticmethod
-    def convert_port_path(
-            full_port_path: str,
-            board_revision: BoardRevision) -> USBPort:
+    def read_symlink(virtual_port: str) -> str:
         ...
 
-    @staticmethod
-    def read_symlink(virtual_port: str) -> str:
+    @property
+    def board_revision(self) -> BoardRevision:
         ...
 
     @property

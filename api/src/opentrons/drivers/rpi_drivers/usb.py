@@ -61,19 +61,9 @@ class USBBus(USBDriverInterface):
             pass
         return symlink
 
-    @staticmethod
-    def convert_port_path(
-            full_port_path: str,
-            board_revision: BoardRevision) -> USBPort:
-        """
-        Convert port path.
-
-        Take the value returned from the USB bus and format
-        that information into a dataclass
-        :param full_port_path: The string port path
-        :returns: The USBPort dataclass
-        """
-        return USBPort.build(full_port_path.strip('/'), board_revision)
+    @property
+    def board_revision(self) -> BoardRevision:
+        return self._board_revision
 
     @property
     def usb_dev(self) -> List[USBPort]:
@@ -127,8 +117,9 @@ class USBBus(USBDriverInterface):
             match = USB_PORT_INFO.search(port)
             if match:
                 port_matches.append(
-                    self.convert_port_path(
-                        match.group(0), self._board_revision))
+                    USBPort.build(
+                        match.group(0).strip('/'),
+                        self.board_revision))
         return port_matches
 
     def find_port(self, device_path: str) -> USBPort:
