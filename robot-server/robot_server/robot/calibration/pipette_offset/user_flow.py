@@ -68,6 +68,9 @@ class PipetteOffsetCalibrationUserFlow:
 
         self._hardware = hardware
         self._mount = mount
+        
+        MODULE_LOG.info("DECK CAL ATTITUDE: ")
+        MODULE_LOG.info(f"{self._hardware.robot_calibration.deck_calibration.attitude}")
 
         self._hw_pipette = self._hardware._attached_instruments[mount]
         if not self._hw_pipette:

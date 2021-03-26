@@ -736,6 +736,7 @@ class API(HardwareAPILike):
 
         gantry_calibration =\
             self.robot_calibration.deck_calibration.attitude
+        self._log.info(f"The calibration used in deck transform {gantry_calibration}")
         right_deck = linal.apply_reverse(
             gantry_calibration, right)
         left_deck = linal.apply_reverse(
