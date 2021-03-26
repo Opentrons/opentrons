@@ -29,7 +29,7 @@ from .types import (Axis, HardwareAPILike, CriticalPoint,
                     DoorStateNotification, PipettePair, TipAttachedError,
                     HardwareAction, PairedPipetteConfigValueError,
                     MotionChecks)
-from . import modules, adapters, robot_calibration as rb_cal
+from . import modules, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
@@ -1766,7 +1766,7 @@ class API(HardwareAPILike):
     async def find_modules(
             self, by_model: modules.types.ModuleModel,
             resolved_type: modules.types.ModuleType
-            ) -> List[adapters.SynchronousAdapter]:
+            ) -> List[modules.AbstractModule]:
         """
         Find Modules.
 
@@ -1791,8 +1791,7 @@ class API(HardwareAPILike):
                 'tempdeck': modules.TempDeck,
                 'thermocycler': modules.Thermocycler
                 }[mod_type]
-            simulating_module = adapters.SynchronousAdapter(
-                mod_class(
+            simulating_module = mod_class(
                     port='',
                     usb_port=self._backend._usb.find_port(''),
                     simulating=True,
@@ -1800,9 +1799,8 @@ class API(HardwareAPILike):
                     execution_manager=ExecutionManager(
                         loop=self.loop),
                     sim_model=by_model.value)
-            )
-            mod = await simulating_module._connect()
-            matching_modules.append(mod)
+            await simulating_module._connect()
+            matching_modules.append(simulating_module)
         return matching_modules
 
     def get_instrument_max_height(

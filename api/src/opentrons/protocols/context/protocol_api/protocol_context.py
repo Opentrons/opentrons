@@ -5,6 +5,7 @@ from opentrons import types, API
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control.types import DoorState
+from opentrons.hardware_control import SynchronousAdapter
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry import module_geometry
@@ -25,7 +26,7 @@ from opentrons.protocols.types import Protocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 if TYPE_CHECKING:
-    from opentrons.hardware_control import SynchronousAdapter
+    from opentrons.hardware_control.modules import AbstractModule
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -85,7 +86,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
         self._last_location: Optional[types.Location] = None
-        self._loaded_modules: Set['SynchronousAdapter'] = set()
+        self._loaded_modules: Set['AbstractModule'] = set()
 
     @classmethod
     def build_using(cls,
@@ -188,7 +189,6 @@ class ProtocolContextImplementation(AbstractProtocol):
             configuration=configuration)
 
         # Try to find in the hardware instance
-
         available_modules = self._hw_manager.hardware.find_modules(
             resolved_model, resolved_type)
 
@@ -199,7 +199,7 @@ class ProtocolContextImplementation(AbstractProtocol):
                     resolved_model)
             if compatible and mod not in self._loaded_modules:
                 self._loaded_modules.add(mod)
-                hc_mod_instance = mod
+                hc_mod_instance = SynchronousAdapter(mod)
                 break
 
         if not hc_mod_instance:

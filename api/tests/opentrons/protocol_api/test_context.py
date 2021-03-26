@@ -852,9 +852,11 @@ def test_order_of_module_load(loop):
         temp1 = c.load_module('tempdeck', 4)
         c.load_module('thermocycler')
         temp2 = c.load_module('tempdeck', 1)
+        async_temp1 = temp1._module._obj_to_adapt
+        async_temp2 = temp2._module._obj_to_adapt
 
-        assert id(temp1._module) == id(hw_temp1)
-        assert id(temp2._module) == id(hw_temp2)
+        assert id(async_temp1) == id(hw_temp1)
+        assert id(async_temp2) == id(hw_temp2)
 
     # Test that the order remains the same for the
     # hardware modules regardless of the slot it
@@ -868,8 +870,10 @@ def test_order_of_module_load(loop):
         temp1 = c.load_module('tempdeck', 1)
         temp2 = c.load_module('tempdeck', 4)
 
-        assert id(temp1._module) == id(hw_temp1)
-        assert id(temp2._module) == id(hw_temp2)
+        async_temp1 = temp1._module._obj_to_adapt
+        async_temp2 = temp2._module._obj_to_adapt
+        assert id(async_temp1) == id(hw_temp1)
+        assert id(async_temp2) == id(hw_temp2)
 
 
 def test_tip_length_for(ctx, monkeypatch):
