@@ -68,7 +68,7 @@ The rest of this doc will describe the PD-specific side of things: how Step Form
 
 **Masking values**: Masking is a behavior where a field rejects updates when they fail to meet a certain condition -- for example, a field only intended for integers will reject changes to add a decimal point. Maskers are used in the presentational layer (specifically, in the `FieldConnector` component) where they should be applied to all updates.
 
-**Field-level errors**: `steplist/fieldLevel` allows you to specify a `getErrors` function for each field. A field can have multiple "error checker" functions that can be composed together; the final result is an array of strings where each represents an error in the field. (NOTE: if there are multiple field-level errors, `FieldConnector` will just join them with `', '`.)
+**Field-level errors**: `steplist/fieldLevel` allows you to specify a `getErrors` function for each field. A field can have multiple "error checker" functions that can be composed together; the final result is an array of strings where each represents an error in the field. ~~(NOTE: if there are multiple field-level errors, `FieldConnector` will just join them with `', '`.)~~
 
 **Form-level errors & warnings**: When an error is related to the value of more than one field, it should be specified in `steplist/formLevel` under `getErrors` for that form's `stepType`. Also, there's no such thing as field-level warnings in PD; if need a warning in a form, go to `formLevel` and specify a `getWarnings` function. Form-level errors have a `dependentFields` array associated with them, which is used to ensure that all fields have been touched (are not pristine) before showing the error.
 

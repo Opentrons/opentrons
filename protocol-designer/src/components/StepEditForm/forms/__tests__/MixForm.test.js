@@ -31,10 +31,6 @@ jest.mock('../../fields/', () => {
   }
 })
 
-jest.mock('../../fields/FieldConnector', () => ({
-  FieldConnector: () => <div></div>,
-}))
-
 const mockStore = {
   dispatch: jest.fn(),
   subscribe: jest.fn(),
