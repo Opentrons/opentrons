@@ -1,1335 +1,1335 @@
 {
-	'title': 'Model',
-	'type': 'object',
-	'properties': {
-		'schemaVersion': {
-			'title': 'Schemaversion',
-			'description': 'Schema version of a protocol is a single integer',
-			'enum': ['5'],
-			'type': 'string'
+	"title": "Model",
+	"type": "object",
+	"properties": {
+		"schemaVersion": {
+			"title": "Schemaversion",
+			"description": "Schema version of a protocol is a single integer",
+			"enum": ["5"],
+			"type": "string"
 		},
-		'metadata': {
-			'title': 'Metadata',
-			'description': 'Optional metadata about the protocol',
-			'allOf': [{
-				'$ref': '#/definitions/Metadata2'
+		"metadata": {
+			"title": "Metadata",
+			"description": "Optional metadata about the protocol",
+			"allOf": [{
+				"$ref": "#/definitions/Metadata2"
 			}]
 		},
-		'designerApplication': {
-			'title': 'Designerapplication',
-			'description': 'Optional data & metadata not required to execute the protocol, used by the application that created this protocol',
-			'allOf': [{
-				'$ref': '#/definitions/DesignerApplication'
+		"designerApplication": {
+			"title": "Designerapplication",
+			"description": "Optional data & metadata not required to execute the protocol, used by the application that created this protocol",
+			"allOf": [{
+				"$ref": "#/definitions/DesignerApplication"
 			}]
 		},
-		'robot': {
-			'$ref': '#/definitions/Robot'
+		"robot": {
+			"$ref": "#/definitions/Robot"
 		},
-		'pipettes': {
-			'title': 'Pipettes',
-			'description': 'The pipettes used in this protocol, keyed by an arbitrary unique ID',
-			'type': 'object',
-			'additionalProperties': {
-				'$ref': '#/definitions/Pipettes'
+		"pipettes": {
+			"title": "Pipettes",
+			"description": "The pipettes used in this protocol, keyed by an arbitrary unique ID",
+			"type": "object",
+			"additionalProperties": {
+				"$ref": "#/definitions/Pipettes"
 			}
 		},
-		'labwareDefinitions': {
-			'title': 'Labwaredefinitions',
-			'description': 'All labware definitions used by labware in this protocol, keyed by UUID',
-			'type': 'object',
-			'additionalProperties': {
-				'$ref': '#/definitions/LabwareDefinitions'
+		"labwareDefinitions": {
+			"title": "Labwaredefinitions",
+			"description": "All labware definitions used by labware in this protocol, keyed by UUID",
+			"type": "object",
+			"additionalProperties": {
+				"$ref": "#/definitions/LabwareDefinitions"
 			}
 		},
-		'labware': {
-			'title': 'Labware',
-			'description': 'All types of labware used in this protocol, and references to their definitions',
-			'type': 'object',
-			'additionalProperties': {
-				'$ref': '#/definitions/Labware'
+		"labware": {
+			"title": "Labware",
+			"description": "All types of labware used in this protocol, and references to their definitions",
+			"type": "object",
+			"additionalProperties": {
+				"$ref": "#/definitions/Labware"
 			}
 		},
-		'modules': {
-			'title': 'Modules',
-			'description': 'All modules used in this protocol',
-			'type': 'object',
-			'additionalProperties': {
-				'$ref': '#/definitions/Modules'
+		"modules": {
+			"title": "Modules",
+			"description": "All modules used in this protocol",
+			"type": "object",
+			"additionalProperties": {
+				"$ref": "#/definitions/Modules"
 			}
 		},
-		'commands': {
-			'$ref': '#/definitions/AllCommands'
+		"commands": {
+			"$ref": "#/definitions/AllCommands"
 		},
-		'commandAnnotations': {
-			'title': 'Commandannotations',
-			'description': 'An optional object of annotations associated with commands. Its usage has not yet been defined, so its shape is not enforced by this schema.',
-			'type': 'object'
+		"commandAnnotations": {
+			"title": "Commandannotations",
+			"description": "An optional object of annotations associated with commands. Its usage has not yet been defined, so its shape is not enforced by this schema.",
+			"type": "object"
 		}
 	},
-	'required': ['schemaVersion', 'metadata', 'robot', 'pipettes', 'labwareDefinitions', 'labware', 'commands'],
-	'definitions': {
-		'Metadata2': {
-			'title': 'Metadata2',
-			'description': 'Optional metadata about the protocol',
-			'type': 'object',
-			'properties': {
-				'protocolName': {
-					'title': 'Protocolname',
-					'description': 'A short, human-readable name for the protocol',
-					'type': 'string'
+	"required": ["schemaVersion", "metadata", "robot", "pipettes", "labwareDefinitions", "labware", "commands"],
+	"definitions": {
+		"Metadata2": {
+			"title": "Metadata2",
+			"description": "Optional metadata about the protocol",
+			"type": "object",
+			"properties": {
+				"protocolName": {
+					"title": "Protocolname",
+					"description": "A short, human-readable name for the protocol",
+					"type": "string"
 				},
-				'author': {
-					'title': 'Author',
-					'description': 'The author or organization who created the protocol',
-					'type': 'string'
+				"author": {
+					"title": "Author",
+					"description": "The author or organization who created the protocol",
+					"type": "string"
 				},
-				'description': {
-					'title': 'Description',
-					'description': 'A text description of the protocol.',
-					'type': 'string'
+				"description": {
+					"title": "Description",
+					"description": "A text description of the protocol.",
+					"type": "string"
 				},
-				'created': {
-					'title': 'Created',
-					'description': 'UNIX timestamp when this file was created',
-					'type': 'number'
+				"created": {
+					"title": "Created",
+					"description": "UNIX timestamp when this file was created",
+					"type": "number"
 				},
-				'lastModified': {
-					'title': 'Lastmodified',
-					'description': 'UNIX timestamp when this file was last modified',
-					'type': 'number'
+				"lastModified": {
+					"title": "Lastmodified",
+					"description": "UNIX timestamp when this file was last modified",
+					"type": "number"
 				},
-				'category': {
-					'title': 'Category',
-					'description': 'Category of protocol (eg, "Basic Pipetting")',
-					'type': 'string'
+				"category": {
+					"title": "Category",
+					"description": "Category of protocol (eg, \"Basic Pipetting\")",
+					"type": "string"
 				},
-				'subcategory': {
-					'title': 'Subcategory',
-					'description': 'Subcategory of protocol (eg, "Cell Plating")',
-					'type': 'string'
+				"subcategory": {
+					"title": "Subcategory",
+					"description": "Subcategory of protocol (eg, \"Cell Plating\")",
+					"type": "string"
 				},
-				'tags': {
-					'title': 'Tags',
-					'description': 'Tags to be used in searching for this protocol',
-					'type': 'array',
-					'items': {
-						'type': 'string'
+				"tags": {
+					"title": "Tags",
+					"description": "Tags to be used in searching for this protocol",
+					"type": "array",
+					"items": {
+						"type": "string"
 					}
 				}
 			}
 		},
-		'DesignerApplication': {
-			'title': 'DesignerApplication',
-			'description': 'Optional data & metadata not required to execute the protocol, used by the application that created this protocol',
-			'type': 'object',
-			'properties': {
-				'name': {
-					'title': 'Name',
-					'description': 'Name of the application that created the protocol. Should be namespaced under the organization or individual who owns the organization, eg "opentrons/protocol-designer"',
-					'type': 'string'
+		"DesignerApplication": {
+			"title": "DesignerApplication",
+			"description": "Optional data & metadata not required to execute the protocol, used by the application that created this protocol",
+			"type": "object",
+			"properties": {
+				"name": {
+					"title": "Name",
+					"description": "Name of the application that created the protocol. Should be namespaced under the organization or individual who owns the organization, eg \"opentrons/protocol-designer\"",
+					"type": "string"
 				},
-				'version': {
-					'title': 'Version',
-					'description': 'Version of the application that created the protocol',
-					'type': 'string'
+				"version": {
+					"title": "Version",
+					"description": "Version of the application that created the protocol",
+					"type": "string"
 				},
-				'data': {
-					'title': 'Data',
-					'description': 'Any data used by the application that created this protocol',
-					'type': 'object'
+				"data": {
+					"title": "Data",
+					"description": "Any data used by the application that created this protocol",
+					"type": "object"
 				}
 			}
 		},
-		'Robot': {
-			'title': 'Robot',
-			'type': 'object',
-			'properties': {
-				'model': {
-					'title': 'Model',
-					'description': 'Model of the robot this protocol is written for (currently only OT-2 Standard is supported)',
-					'enum': ['OT-2 Standard'],
-					'type': 'string'
+		"Robot": {
+			"title": "Robot",
+			"type": "object",
+			"properties": {
+				"model": {
+					"title": "Model",
+					"description": "Model of the robot this protocol is written for (currently only OT-2 Standard is supported)",
+					"enum": ["OT-2 Standard"],
+					"type": "string"
 				}
 			},
-			'required': ['model']
+			"required": ["model"]
 		},
-		'PipetteName': {
-			'title': 'PipetteName',
-			'description': 'Name of a pipette. Does not contain info about specific model/version. Should match keys in pipetteNameSpecs.json file',
-			'type': 'string'
+		"PipetteName": {
+			"title": "PipetteName",
+			"description": "Name of a pipette. Does not contain info about specific model/version. Should match keys in pipetteNameSpecs.json file",
+			"type": "string"
 		},
-		'Pipettes': {
-			'title': 'Pipettes',
-			'description': 'Fields describing an individual pipette',
-			'type': 'object',
-			'properties': {
-				'mount': {
-					'title': 'Mount',
-					'description': 'Where the pipette is mounted',
-					'enum': ['left', 'right'],
-					'type': 'string'
+		"Pipettes": {
+			"title": "Pipettes",
+			"description": "Fields describing an individual pipette",
+			"type": "object",
+			"properties": {
+				"mount": {
+					"title": "Mount",
+					"description": "Where the pipette is mounted",
+					"enum": ["left", "right"],
+					"type": "string"
 				},
-				'name': {
-					'$ref': '#/definitions/PipetteName'
+				"name": {
+					"$ref": "#/definitions/PipetteName"
 				}
 			},
-			'required': ['mount', 'name']
+			"required": ["mount", "name"]
 		},
-		'SafeString': {
-			'title': 'SafeString',
-			'description': 'a string safe to use for loadName / namespace. Lowercase-only.',
-			'pattern': '^[a-z0-9._]+$',
-			'type': 'string'
+		"SafeString": {
+			"title": "SafeString",
+			"description": "a string safe to use for loadName / namespace. Lowercase-only.",
+			"pattern": "^[a-z0-9._]+$",
+			"type": "string"
 		},
-		'DisplayCategory': {
-			'title': 'DisplayCategory',
-			'description': 'An enumeration.',
-			'enum': ['tipRack', 'tubeRack', 'reservoir', 'trash', 'wellPlate', 'aluminumBlock', 'other']
+		"DisplayCategory": {
+			"title": "DisplayCategory",
+			"description": "An enumeration.",
+			"enum": ["tipRack", "tubeRack", "reservoir", "trash", "wellPlate", "aluminumBlock", "other"]
 		},
-		'Metadata': {
-			'title': 'Metadata',
-			'description': 'Properties used for search and display',
-			'type': 'object',
-			'properties': {
-				'displayName': {
-					'title': 'Displayname',
-					'description': 'Easy to remember name of labware',
-					'type': 'string'
+		"Metadata": {
+			"title": "Metadata",
+			"description": "Properties used for search and display",
+			"type": "object",
+			"properties": {
+				"displayName": {
+					"title": "Displayname",
+					"description": "Easy to remember name of labware",
+					"type": "string"
 				},
-				'displayCategory': {
-					'description': 'Label(s) used in UI to categorize labware',
-					'allOf': [{
-						'$ref': '#/definitions/DisplayCategory'
+				"displayCategory": {
+					"description": "Label(s) used in UI to categorize labware",
+					"allOf": [{
+						"$ref": "#/definitions/DisplayCategory"
 					}]
 				},
-				'displayVolumeUnits': {
-					'title': 'Displayvolumeunits',
-					'description': 'Volume units for display',
-					'enum': ['µL', 'mL', 'L'],
-					'type': 'string'
+				"displayVolumeUnits": {
+					"title": "Displayvolumeunits",
+					"description": "Volume units for display",
+					"enum": ["\u00b5L", "mL", "L"],
+					"type": "string"
 				},
-				'tags': {
-					'title': 'Tags',
-					'description': 'List of descriptions for a given labware',
-					'type': 'array',
-					'items': {
-						'type': 'string'
+				"tags": {
+					"title": "Tags",
+					"description": "List of descriptions for a given labware",
+					"type": "array",
+					"items": {
+						"type": "string"
 					}
 				}
 			},
-			'required': ['displayName', 'displayCategory', 'displayVolumeUnits']
+			"required": ["displayName", "displayCategory", "displayVolumeUnits"]
 		},
-		'BrandData': {
-			'title': 'BrandData',
-			'type': 'object',
-			'properties': {
-				'brand': {
-					'title': 'Brand',
-					'description': 'Brand/manufacturer name',
-					'type': 'string'
+		"BrandData": {
+			"title": "BrandData",
+			"type": "object",
+			"properties": {
+				"brand": {
+					"title": "Brand",
+					"description": "Brand/manufacturer name",
+					"type": "string"
 				},
-				'brandId': {
-					'title': 'Brandid',
-					'description': 'An array of manufacture numbers pertaining to a given labware',
-					'type': 'array',
-					'items': {
-						'type': 'string'
+				"brandId": {
+					"title": "Brandid",
+					"description": "An array of manufacture numbers pertaining to a given labware",
+					"type": "array",
+					"items": {
+						"type": "string"
 					}
 				},
-				'links': {
-					'title': 'Links',
-					'description': 'URLs for manufacturer page(s)',
-					'type': 'array',
-					'items': {
-						'type': 'string'
+				"links": {
+					"title": "Links",
+					"description": "URLs for manufacturer page(s)",
+					"type": "array",
+					"items": {
+						"type": "string"
 					}
 				}
 			},
-			'required': ['brand']
+			"required": ["brand"]
 		},
-		'PositiveNumber': {
-			'title': 'PositiveNumber',
-			'minimum': 0.0,
-			'type': 'number'
+		"PositiveNumber": {
+			"title": "PositiveNumber",
+			"minimum": 0.0,
+			"type": "number"
 		},
-		'Parameters': {
-			'title': 'Parameters',
-			'description': 'Internal describers used to determine pipette movement to labware',
-			'type': 'object',
-			'properties': {
-				'format': {
-					'title': 'Format',
-					'description': 'Property to determine compatibility with multichannel pipette',
-					'enum': ['96Standard', '384Standard', 'trough', 'irregular', 'trash'],
-					'type': 'string'
+		"Parameters": {
+			"title": "Parameters",
+			"description": "Internal describers used to determine pipette movement to labware",
+			"type": "object",
+			"properties": {
+				"format": {
+					"title": "Format",
+					"description": "Property to determine compatibility with multichannel pipette",
+					"enum": ["96Standard", "384Standard", "trough", "irregular", "trash"],
+					"type": "string"
 				},
-				'quirks': {
-					'title': 'Quirks',
-					'description': 'Property to classify a specific behavior this labware should have',
-					'type': 'array',
-					'items': {
-						'type': 'string'
+				"quirks": {
+					"title": "Quirks",
+					"description": "Property to classify a specific behavior this labware should have",
+					"type": "array",
+					"items": {
+						"type": "string"
 					}
 				},
-				'isTiprack': {
-					'title': 'Istiprack',
-					'description': 'Flag marking whether a labware is a tiprack or not',
-					'type': 'boolean'
+				"isTiprack": {
+					"title": "Istiprack",
+					"description": "Flag marking whether a labware is a tiprack or not",
+					"type": "boolean"
 				},
-				'tipLength': {
-					'title': 'Tiplength',
-					'description': 'Required if labware is tiprack, specifies length of tip from drawing or as measured with calipers',
-					'allOf': [{
-						'$ref': '#/definitions/PositiveNumber'
+				"tipLength": {
+					"title": "Tiplength",
+					"description": "Required if labware is tiprack, specifies length of tip from drawing or as measured with calipers",
+					"allOf": [{
+						"$ref": "#/definitions/PositiveNumber"
 					}]
 				},
-				'tipOverlap': {
-					'title': 'Tipoverlap',
-					'description': 'Required if labware is tiprack, specifies the length of the area of the tip that overlaps the nozzle of the pipette',
-					'allOf': [{
-						'$ref': '#/definitions/PositiveNumber'
+				"tipOverlap": {
+					"title": "Tipoverlap",
+					"description": "Required if labware is tiprack, specifies the length of the area of the tip that overlaps the nozzle of the pipette",
+					"allOf": [{
+						"$ref": "#/definitions/PositiveNumber"
 					}]
 				},
-				'loadName': {
-					'title': 'Loadname',
-					'description': 'Name used to reference a labware definition',
-					'allOf': [{
-						'$ref': '#/definitions/SafeString'
+				"loadName": {
+					"title": "Loadname",
+					"description": "Name used to reference a labware definition",
+					"allOf": [{
+						"$ref": "#/definitions/SafeString"
 					}]
 				},
-				'isMagneticModuleCompatible': {
-					'title': 'Ismagneticmodulecompatible',
-					'description': 'Flag marking whether a labware is compatible by default with the Magnetic Module',
-					'type': 'boolean'
+				"isMagneticModuleCompatible": {
+					"title": "Ismagneticmodulecompatible",
+					"description": "Flag marking whether a labware is compatible by default with the Magnetic Module",
+					"type": "boolean"
 				},
-				'magneticModuleEngageHeight': {
-					'title': 'Magneticmoduleengageheight',
-					'description': 'Distance to move magnetic module magnets to engage',
-					'allOf': [{
-						'$ref': '#/definitions/PositiveNumber'
+				"magneticModuleEngageHeight": {
+					"title": "Magneticmoduleengageheight",
+					"description": "Distance to move magnetic module magnets to engage",
+					"allOf": [{
+						"$ref": "#/definitions/PositiveNumber"
 					}]
 				}
 			},
-			'required': ['format', 'isTiprack', 'loadName', 'isMagneticModuleCompatible']
+			"required": ["format", "isTiprack", "loadName", "isMagneticModuleCompatible"]
 		},
-		'OrderingItem': {
-			'title': 'OrderingItem',
-			'minItems': 1,
-			'type': 'array',
-			'items': {}
+		"OrderingItem": {
+			"title": "OrderingItem",
+			"minItems": 1,
+			"type": "array",
+			"items": {}
 		},
-		'CornerOffsetFromSlot': {
-			'title': 'CornerOffsetFromSlot',
-			'description': 'Distance from left-front-bottom corner of slot to left-front-bottom corner of labware bounding box. Used for labware that spans multiple slots. For labware that does not span multiple slots, x/y/z should all be zero.',
-			'type': 'object',
-			'properties': {
-				'x': {
-					'title': 'X',
-					'type': 'number'
+		"CornerOffsetFromSlot": {
+			"title": "CornerOffsetFromSlot",
+			"description": "Distance from left-front-bottom corner of slot to left-front-bottom corner of labware bounding box. Used for labware that spans multiple slots. For labware that does not span multiple slots, x/y/z should all be zero.",
+			"type": "object",
+			"properties": {
+				"x": {
+					"title": "X",
+					"type": "number"
 				},
-				'y': {
-					'title': 'Y',
-					'type': 'number'
+				"y": {
+					"title": "Y",
+					"type": "number"
 				},
-				'z': {
-					'title': 'Z',
-					'type': 'number'
+				"z": {
+					"title": "Z",
+					"type": "number"
 				}
 			},
-			'required': ['x', 'y', 'z']
+			"required": ["x", "y", "z"]
 		},
-		'Dimensions': {
-			'title': 'Dimensions',
-			'description': 'Outer dimensions of a labware',
-			'type': 'object',
-			'properties': {
-				'yDimension': {
-					'$ref': '#/definitions/PositiveNumber'
+		"Dimensions": {
+			"title": "Dimensions",
+			"description": "Outer dimensions of a labware",
+			"type": "object",
+			"properties": {
+				"yDimension": {
+					"$ref": "#/definitions/PositiveNumber"
 				},
-				'zDimension': {
-					'$ref': '#/definitions/PositiveNumber'
+				"zDimension": {
+					"$ref": "#/definitions/PositiveNumber"
 				},
-				'xDimension': {
-					'$ref': '#/definitions/PositiveNumber'
+				"xDimension": {
+					"$ref": "#/definitions/PositiveNumber"
 				}
 			},
-			'required': ['yDimension', 'zDimension', 'xDimension']
+			"required": ["yDimension", "zDimension", "xDimension"]
 		},
-		'Metadata1': {
-			'title': 'Metadata1',
-			'description': 'Metadata specific to a grid of wells in a labware',
-			'type': 'object',
-			'properties': {
-				'displayName': {
-					'title': 'Displayname',
-					'description': 'User-readable name for the well group',
-					'type': 'string'
+		"Metadata1": {
+			"title": "Metadata1",
+			"description": "Metadata specific to a grid of wells in a labware",
+			"type": "object",
+			"properties": {
+				"displayName": {
+					"title": "Displayname",
+					"description": "User-readable name for the well group",
+					"type": "string"
 				},
-				'displayCategory': {
-					'description': 'Label(s) used in UI to categorize well groups',
-					'allOf': [{
-						'$ref': '#/definitions/DisplayCategory'
+				"displayCategory": {
+					"description": "Label(s) used in UI to categorize well groups",
+					"allOf": [{
+						"$ref": "#/definitions/DisplayCategory"
 					}]
 				},
-				'wellBottomShape': {
-					'title': 'Wellbottomshape',
-					'description': 'Bottom shape of the well for UI purposes',
-					'enum': ['flat', 'u', 'v'],
-					'type': 'string'
+				"wellBottomShape": {
+					"title": "Wellbottomshape",
+					"description": "Bottom shape of the well for UI purposes",
+					"enum": ["flat", "u", "v"],
+					"type": "string"
 				}
 			}
 		},
-		'Group': {
-			'title': 'Group',
-			'type': 'object',
-			'properties': {
-				'wells': {
-					'title': 'Wells',
-					'description': 'An array of wells that contain the same metadata',
-					'minItems': 1,
-					'type': 'array',
-					'items': {
-						'type': 'string'
+		"Group": {
+			"title": "Group",
+			"type": "object",
+			"properties": {
+				"wells": {
+					"title": "Wells",
+					"description": "An array of wells that contain the same metadata",
+					"minItems": 1,
+					"type": "array",
+					"items": {
+						"type": "string"
 					}
 				},
-				'metadata': {
-					'title': 'Metadata',
-					'description': 'Metadata specific to a grid of wells in a labware',
-					'allOf': [{
-						'$ref': '#/definitions/Metadata1'
+				"metadata": {
+					"title": "Metadata",
+					"description": "Metadata specific to a grid of wells in a labware",
+					"allOf": [{
+						"$ref": "#/definitions/Metadata1"
 					}]
 				},
-				'brand': {
-					'title': 'Brand',
-					'description': 'Brand data for the well group (e.g. for tubes)',
-					'allOf': [{
-						'$ref': '#/definitions/BrandData'
+				"brand": {
+					"title": "Brand",
+					"description": "Brand data for the well group (e.g. for tubes)",
+					"allOf": [{
+						"$ref": "#/definitions/BrandData"
 					}]
 				}
 			},
-			'required': ['wells', 'metadata']
+			"required": ["wells", "metadata"]
 		},
-		'opentrons_shared_data__generated__opentronsLabwareSchemaV2__Model': {
-			'title': 'Model',
-			'type': 'object',
-			'properties': {
-				'schemaVersion': {
-					'title': 'Schemaversion',
-					'description': 'Which schema version a labware is using',
-					'enum': ['2'],
-					'type': 'string'
+		"opentrons_shared_data__generated__opentronsLabwareSchemaV2__Model": {
+			"title": "Model",
+			"type": "object",
+			"properties": {
+				"schemaVersion": {
+					"title": "Schemaversion",
+					"description": "Which schema version a labware is using",
+					"enum": ["2"],
+					"type": "string"
 				},
-				'version': {
-					'title': 'Version',
-					'description': 'Version of the labware definition itself (eg myPlate v1/v2/v3). An incrementing integer',
-					'minimum': 1.0,
-					'type': 'integer'
+				"version": {
+					"title": "Version",
+					"description": "Version of the labware definition itself (eg myPlate v1/v2/v3). An incrementing integer",
+					"minimum": 1.0,
+					"type": "integer"
 				},
-				'namespace': {
-					'$ref': '#/definitions/SafeString'
+				"namespace": {
+					"$ref": "#/definitions/SafeString"
 				},
-				'metadata': {
-					'title': 'Metadata',
-					'description': 'Properties used for search and display',
-					'allOf': [{
-						'$ref': '#/definitions/Metadata'
+				"metadata": {
+					"title": "Metadata",
+					"description": "Properties used for search and display",
+					"allOf": [{
+						"$ref": "#/definitions/Metadata"
 					}]
 				},
-				'brand': {
-					'title': 'Brand',
-					'description': 'Real-world labware that the definition is modeled from and/or compatible with',
-					'allOf': [{
-						'$ref': '#/definitions/BrandData'
+				"brand": {
+					"title": "Brand",
+					"description": "Real-world labware that the definition is modeled from and/or compatible with",
+					"allOf": [{
+						"$ref": "#/definitions/BrandData"
 					}]
 				},
-				'parameters': {
-					'title': 'Parameters',
-					'description': 'Internal describers used to determine pipette movement to labware',
-					'allOf': [{
-						'$ref': '#/definitions/Parameters'
+				"parameters": {
+					"title": "Parameters",
+					"description": "Internal describers used to determine pipette movement to labware",
+					"allOf": [{
+						"$ref": "#/definitions/Parameters"
 					}]
 				},
-				'ordering': {
-					'title': 'Ordering',
-					'description': 'Generated array that keeps track of how wells should be ordered in a labware',
-					'type': 'array',
-					'items': {
-						'$ref': '#/definitions/OrderingItem'
+				"ordering": {
+					"title": "Ordering",
+					"description": "Generated array that keeps track of how wells should be ordered in a labware",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/OrderingItem"
 					}
 				},
-				'cornerOffsetFromSlot': {
-					'title': 'Corneroffsetfromslot',
-					'description': 'Distance from left-front-bottom corner of slot to left-front-bottom corner of labware bounding box. Used for labware that spans multiple slots. For labware that does not span multiple slots, x/y/z should all be zero.',
-					'allOf': [{
-						'$ref': '#/definitions/CornerOffsetFromSlot'
+				"cornerOffsetFromSlot": {
+					"title": "Corneroffsetfromslot",
+					"description": "Distance from left-front-bottom corner of slot to left-front-bottom corner of labware bounding box. Used for labware that spans multiple slots. For labware that does not span multiple slots, x/y/z should all be zero.",
+					"allOf": [{
+						"$ref": "#/definitions/CornerOffsetFromSlot"
 					}]
 				},
-				'dimensions': {
-					'title': 'Dimensions',
-					'description': 'Outer dimensions of a labware',
-					'allOf': [{
-						'$ref': '#/definitions/Dimensions'
+				"dimensions": {
+					"title": "Dimensions",
+					"description": "Outer dimensions of a labware",
+					"allOf": [{
+						"$ref": "#/definitions/Dimensions"
 					}]
 				},
-				'wells': {
-					'title': 'Wells',
-					'description': 'Unordered object of well objects with position and dimensional information',
-					'type': 'object'
+				"wells": {
+					"title": "Wells",
+					"description": "Unordered object of well objects with position and dimensional information",
+					"type": "object"
 				},
-				'groups': {
-					'title': 'Groups',
-					'description': 'Logical well groupings for metadata/display purposes; changes in groups do not affect protocol execution',
-					'type': 'array',
-					'items': {
-						'$ref': '#/definitions/Group'
+				"groups": {
+					"title": "Groups",
+					"description": "Logical well groupings for metadata/display purposes; changes in groups do not affect protocol execution",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/Group"
 					}
 				}
 			},
-			'required': ['schemaVersion', 'version', 'namespace', 'metadata', 'brand', 'parameters', 'ordering', 'cornerOffsetFromSlot', 'dimensions', 'wells', 'groups']
+			"required": ["schemaVersion", "version", "namespace", "metadata", "brand", "parameters", "ordering", "cornerOffsetFromSlot", "dimensions", "wells", "groups"]
 		},
-		'LabwareDefinitions': {
-			'title': 'LabwareDefinitions',
-			'$ref': '#/definitions/opentrons_shared_data__generated__opentronsLabwareSchemaV2__Model'
+		"LabwareDefinitions": {
+			"title": "LabwareDefinitions",
+			"$ref": "#/definitions/opentrons_shared_data__generated__opentronsLabwareSchemaV2__Model"
 		},
-		'Slot': {
-			'title': 'Slot',
-			'description': "string '1'-'12', or special string 'span7_8_10_11' signify it's a slot on the OT-2 deck. If it's a UUID, it's the slot on the module referenced by that ID.",
-			'type': 'string'
+		"Slot": {
+			"title": "Slot",
+			"description": "string '1'-'12', or special string 'span7_8_10_11' signify it's a slot on the OT-2 deck. If it's a UUID, it's the slot on the module referenced by that ID.",
+			"type": "string"
 		},
-		'Labware': {
-			'title': 'Labware',
-			'description': 'Fields describing a single labware on the deck',
-			'type': 'object',
-			'properties': {
-				'slot': {
-					'$ref': '#/definitions/Slot'
+		"Labware": {
+			"title": "Labware",
+			"description": "Fields describing a single labware on the deck",
+			"type": "object",
+			"properties": {
+				"slot": {
+					"$ref": "#/definitions/Slot"
 				},
-				'definitionId': {
-					'title': 'Definitionid',
-					'description': 'reference to this labware\'s ID in "labwareDefinitions"',
-					'type': 'string'
+				"definitionId": {
+					"title": "Definitionid",
+					"description": "reference to this labware's ID in \"labwareDefinitions\"",
+					"type": "string"
 				},
-				'displayName': {
-					'title': 'Displayname',
-					'description': 'An optional human-readable nickname for this labware. Eg "Buffer Trough"',
-					'type': 'string'
+				"displayName": {
+					"title": "Displayname",
+					"description": "An optional human-readable nickname for this labware. Eg \"Buffer Trough\"",
+					"type": "string"
 				}
 			},
-			'required': ['slot', 'definitionId']
+			"required": ["slot", "definitionId"]
 		},
-		'Modules': {
-			'title': 'Modules',
-			'description': 'Fields describing a single module on the deck',
-			'type': 'object',
-			'properties': {
-				'slot': {
-					'$ref': '#/definitions/Slot'
+		"Modules": {
+			"title": "Modules",
+			"description": "Fields describing a single module on the deck",
+			"type": "object",
+			"properties": {
+				"slot": {
+					"$ref": "#/definitions/Slot"
 				},
-				'model': {
-					'title': 'Model',
-					'description': "model of module. Eg 'magneticModuleV1' or 'magneticModuleV2'. This should match a top-level key in shared-data/module/definitions/2.json",
-					'type': 'string'
+				"model": {
+					"title": "Model",
+					"description": "model of module. Eg 'magneticModuleV1' or 'magneticModuleV2'. This should match a top-level key in shared-data/module/definitions/2.json",
+					"type": "string"
 				}
 			},
-			'required': ['slot', 'model']
+			"required": ["slot", "model"]
 		},
-		'MmOffset': {
-			'title': 'MmOffset',
-			'description': 'Millimeters for pipette location offsets',
-			'type': 'number'
+		"MmOffset": {
+			"title": "MmOffset",
+			"description": "Millimeters for pipette location offsets",
+			"type": "number"
 		},
-		'Params': {
-			'title': 'Params',
-			'description': 'Offset from bottom of well in millimeters',
-			'type': 'object',
-			'properties': {
-				'offsetFromBottomMm': {
-					'$ref': '#/definitions/MmOffset'
+		"Params": {
+			"title": "Params",
+			"description": "Offset from bottom of well in millimeters",
+			"type": "object",
+			"properties": {
+				"offsetFromBottomMm": {
+					"$ref": "#/definitions/MmOffset"
 				},
-				'volume': {
-					'title': 'Volume',
-					'type': 'number'
+				"volume": {
+					"title": "Volume",
+					"type": "number"
 				},
-				'pipette': {
-					'title': 'Pipette',
-					'type': 'string'
+				"pipette": {
+					"title": "Pipette",
+					"type": "string"
 				},
-				'labware': {
-					'title': 'Labware',
-					'type': 'string'
+				"labware": {
+					"title": "Labware",
+					"type": "string"
 				},
-				'well': {
-					'title': 'Well',
-					'type': 'string'
+				"well": {
+					"title": "Well",
+					"type": "string"
 				},
-				'flowRate': {
-					'title': 'Flowrate',
-					'description': 'Flow rate in uL/sec. Must be greater than 0',
-					'minimum': 0.0,
-					'type': 'number'
+				"flowRate": {
+					"title": "Flowrate",
+					"description": "Flow rate in uL/sec. Must be greater than 0",
+					"minimum": 0.0,
+					"type": "number"
 				}
 			},
-			'required': ['offsetFromBottomMm', 'volume', 'pipette', 'labware', 'well', 'flowRate']
+			"required": ["offsetFromBottomMm", "volume", "pipette", "labware", "well", "flowRate"]
 		},
-		'LiquidCommand': {
-			'title': 'LiquidCommand',
-			'description': 'Aspirate / dispense / air gap commands',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['aspirate', 'dispense', 'airGap'],
-					'type': 'string'
+		"LiquidCommand": {
+			"title": "LiquidCommand",
+			"description": "Aspirate / dispense / air gap commands",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["aspirate", "dispense", "airGap"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params'
+				"params": {
+					"$ref": "#/definitions/Params"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'Params1': {
-			'title': 'Params1',
-			'description': 'Offset from bottom of well in millimeters',
-			'type': 'object',
-			'properties': {
-				'offsetFromBottomMm': {
-					'$ref': '#/definitions/MmOffset'
+		"Params1": {
+			"title": "Params1",
+			"description": "Offset from bottom of well in millimeters",
+			"type": "object",
+			"properties": {
+				"offsetFromBottomMm": {
+					"$ref": "#/definitions/MmOffset"
 				},
-				'pipette': {
-					'title': 'Pipette',
-					'type': 'string'
+				"pipette": {
+					"title": "Pipette",
+					"type": "string"
 				},
-				'labware': {
-					'title': 'Labware',
-					'type': 'string'
+				"labware": {
+					"title": "Labware",
+					"type": "string"
 				},
-				'well': {
-					'title': 'Well',
-					'type': 'string'
+				"well": {
+					"title": "Well",
+					"type": "string"
 				},
-				'flowRate': {
-					'title': 'Flowrate',
-					'description': 'Flow rate in uL/sec. Must be greater than 0',
-					'minimum': 0.0,
-					'type': 'number'
+				"flowRate": {
+					"title": "Flowrate",
+					"description": "Flow rate in uL/sec. Must be greater than 0",
+					"minimum": 0.0,
+					"type": "number"
 				}
 			},
-			'required': ['offsetFromBottomMm', 'pipette', 'labware', 'well', 'flowRate']
+			"required": ["offsetFromBottomMm", "pipette", "labware", "well", "flowRate"]
 		},
-		'BlowoutCommand': {
-			'title': 'BlowoutCommand',
-			'description': 'Blowout command',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['blowout'],
-					'type': 'string'
+		"BlowoutCommand": {
+			"title": "BlowoutCommand",
+			"description": "Blowout command",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["blowout"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params1'
+				"params": {
+					"$ref": "#/definitions/Params1"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'Params2': {
-			'title': 'Params2',
-			'description': 'Offset from bottom of well in millimeters',
-			'type': 'object',
-			'properties': {
-				'offsetFromBottomMm': {
-					'$ref': '#/definitions/MmOffset'
+		"Params2": {
+			"title": "Params2",
+			"description": "Offset from bottom of well in millimeters",
+			"type": "object",
+			"properties": {
+				"offsetFromBottomMm": {
+					"$ref": "#/definitions/MmOffset"
 				},
-				'pipette': {
-					'title': 'Pipette',
-					'type': 'string'
+				"pipette": {
+					"title": "Pipette",
+					"type": "string"
 				},
-				'labware': {
-					'title': 'Labware',
-					'type': 'string'
+				"labware": {
+					"title": "Labware",
+					"type": "string"
 				},
-				'well': {
-					'title': 'Well',
-					'type': 'string'
+				"well": {
+					"title": "Well",
+					"type": "string"
 				}
 			},
-			'required': ['offsetFromBottomMm', 'pipette', 'labware', 'well']
+			"required": ["offsetFromBottomMm", "pipette", "labware", "well"]
 		},
-		'TouchTipCommand': {
-			'title': 'TouchTipCommand',
-			'description': 'Touch tip commands',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['touchTip'],
-					'type': 'string'
+		"TouchTipCommand": {
+			"title": "TouchTipCommand",
+			"description": "Touch tip commands",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["touchTip"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params2'
+				"params": {
+					"$ref": "#/definitions/Params2"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'PipetteAccessParams': {
-			'title': 'PipetteAccessParams',
-			'type': 'object',
-			'properties': {
-				'pipette': {
-					'title': 'Pipette',
-					'type': 'string'
+		"PipetteAccessParams": {
+			"title": "PipetteAccessParams",
+			"type": "object",
+			"properties": {
+				"pipette": {
+					"title": "Pipette",
+					"type": "string"
 				},
-				'labware': {
-					'title': 'Labware',
-					'type': 'string'
+				"labware": {
+					"title": "Labware",
+					"type": "string"
 				},
-				'well': {
-					'title': 'Well',
-					'type': 'string'
+				"well": {
+					"title": "Well",
+					"type": "string"
 				}
 			},
-			'required': ['pipette', 'labware', 'well']
+			"required": ["pipette", "labware", "well"]
 		},
-		'PickUpDropTipCommand': {
-			'title': 'PickUpDropTipCommand',
-			'description': 'Pick up tip / drop tip commands',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['pickUpTip', 'dropTip'],
-					'type': 'string'
+		"PickUpDropTipCommand": {
+			"title": "PickUpDropTipCommand",
+			"description": "Pick up tip / drop tip commands",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["pickUpTip", "dropTip"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/PipetteAccessParams'
+				"params": {
+					"$ref": "#/definitions/PipetteAccessParams"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'Offset': {
-			'title': 'Offset',
-			'description': 'Optional offset from slot bottom left corner, in mm',
-			'type': 'object',
-			'properties': {
-				'x': {
-					'title': 'X',
-					'type': 'number'
+		"Offset": {
+			"title": "Offset",
+			"description": "Optional offset from slot bottom left corner, in mm",
+			"type": "object",
+			"properties": {
+				"x": {
+					"title": "X",
+					"type": "number"
 				},
-				'y': {
-					'title': 'Y',
-					'type': 'number'
+				"y": {
+					"title": "Y",
+					"type": "number"
 				},
-				'z': {
-					'title': 'Z',
-					'type': 'number'
+				"z": {
+					"title": "Z",
+					"type": "number"
 				}
 			},
-			'required': ['x', 'y', 'z']
+			"required": ["x", "y", "z"]
 		},
-		'Params3': {
-			'title': 'Params3',
-			'type': 'object',
-			'properties': {
-				'pipette': {
-					'title': 'Pipette',
-					'type': 'string'
+		"Params3": {
+			"title": "Params3",
+			"type": "object",
+			"properties": {
+				"pipette": {
+					"title": "Pipette",
+					"type": "string"
 				},
-				'slot': {
-					'$ref': '#/definitions/Slot'
+				"slot": {
+					"$ref": "#/definitions/Slot"
 				},
-				'offset': {
-					'title': 'Offset',
-					'description': 'Optional offset from slot bottom left corner, in mm',
-					'allOf': [{
-						'$ref': '#/definitions/Offset'
+				"offset": {
+					"title": "Offset",
+					"description": "Optional offset from slot bottom left corner, in mm",
+					"allOf": [{
+						"$ref": "#/definitions/Offset"
 					}]
 				},
-				'minimumZHeight': {
-					'title': 'Minimumzheight',
-					'description': "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead.",
-					'minimum': 0.0,
-					'type': 'number'
+				"minimumZHeight": {
+					"title": "Minimumzheight",
+					"description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead.",
+					"minimum": 0.0,
+					"type": "number"
 				},
-				'forceDirect': {
-					'title': 'Forcedirect',
-					'description': "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
-					'type': 'boolean'
+				"forceDirect": {
+					"title": "Forcedirect",
+					"description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
+					"type": "boolean"
 				}
 			},
-			'required': ['pipette', 'slot']
+			"required": ["pipette", "slot"]
 		},
-		'MoveToSlotCommand': {
-			'title': 'MoveToSlotCommand',
-			'description': 'Move to slot command. NOTE: this is an EXPERIMENTAL command, its behavior is subject to change in future releases.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['moveToSlot'],
-					'type': 'string'
+		"MoveToSlotCommand": {
+			"title": "MoveToSlotCommand",
+			"description": "Move to slot command. NOTE: this is an EXPERIMENTAL command, its behavior is subject to change in future releases.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["moveToSlot"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params3'
+				"params": {
+					"$ref": "#/definitions/Params3"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'Params4': {
-			'title': 'Params4',
-			'type': 'object',
-			'properties': {
-				'wait': {
-					'title': 'Wait',
-					'description': 'either a number of seconds to wait (fractional values OK), or `true` to wait indefinitely until the user manually resumes the protocol',
-					'anyOf': [{
-						'type': 'number'
+		"Params4": {
+			"title": "Params4",
+			"type": "object",
+			"properties": {
+				"wait": {
+					"title": "Wait",
+					"description": "either a number of seconds to wait (fractional values OK), or `true` to wait indefinitely until the user manually resumes the protocol",
+					"anyOf": [{
+						"type": "number"
 					}, {}]
 				},
-				'message': {
-					'title': 'Message',
-					'description': 'optional message describing the delay'
+				"message": {
+					"title": "Message",
+					"description": "optional message describing the delay"
 				}
 			},
-			'required': ['wait']
+			"required": ["wait"]
 		},
-		'DelayCommand': {
-			'title': 'DelayCommand',
-			'description': 'Delay command',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['delay'],
-					'type': 'string'
+		"DelayCommand": {
+			"title": "DelayCommand",
+			"description": "Delay command",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["delay"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params4'
+				"params": {
+					"$ref": "#/definitions/Params4"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'Params5': {
-			'title': 'Params5',
-			'type': 'object',
-			'properties': {
-				'engageHeight': {
-					'title': 'Engageheight',
-					'description': 'Height in mm(*) from bottom plane of labware (above if positive, below if negative). *NOTE: for magneticModuleV1 (aka GEN1), these are not true mm but an arbitrary unit equal to 0.5mm. So `engageHeight: 2` means 1mm above the labware plane if the command is for a GEN1 magnetic module, but would mean 2mm above the labware plane for GEN2 module',
-					'type': 'number'
+		"Params5": {
+			"title": "Params5",
+			"type": "object",
+			"properties": {
+				"engageHeight": {
+					"title": "Engageheight",
+					"description": "Height in mm(*) from bottom plane of labware (above if positive, below if negative). *NOTE: for magneticModuleV1 (aka GEN1), these are not true mm but an arbitrary unit equal to 0.5mm. So `engageHeight: 2` means 1mm above the labware plane if the command is for a GEN1 magnetic module, but would mean 2mm above the labware plane for GEN2 module",
+					"type": "number"
 				},
-				'module': {
-					'title': 'Module',
-					'type': 'string'
+				"module": {
+					"title": "Module",
+					"type": "string"
 				}
 			},
-			'required': ['engageHeight', 'module']
+			"required": ["engageHeight", "module"]
 		},
-		'MagneticModuleEngageCommand': {
-			'title': 'MagneticModuleEngageCommand',
-			'description': 'Magnetic module engage command. Engages magnet to specified height',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['magneticModule/engageMagnet'],
-					'type': 'string'
+		"MagneticModuleEngageCommand": {
+			"title": "MagneticModuleEngageCommand",
+			"description": "Magnetic module engage command. Engages magnet to specified height",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["magneticModule/engageMagnet"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params5'
+				"params": {
+					"$ref": "#/definitions/Params5"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'ModuleOnlyParams': {
-			'title': 'ModuleOnlyParams',
-			'type': 'object',
-			'properties': {
-				'module': {
-					'title': 'Module',
-					'type': 'string'
+		"ModuleOnlyParams": {
+			"title": "ModuleOnlyParams",
+			"type": "object",
+			"properties": {
+				"module": {
+					"title": "Module",
+					"type": "string"
 				}
 			},
-			'required': ['module']
+			"required": ["module"]
 		},
-		'MagneticModuleDisengageCommand': {
-			'title': 'MagneticModuleDisengageCommand',
-			'description': 'Magnetic module disengage command. Moves magnet down to disengaged (home) position',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['magneticModule/disengageMagnet'],
-					'type': 'string'
+		"MagneticModuleDisengageCommand": {
+			"title": "MagneticModuleDisengageCommand",
+			"description": "Magnetic module disengage command. Moves magnet down to disengaged (home) position",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["magneticModule/disengageMagnet"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/ModuleOnlyParams'
+				"params": {
+					"$ref": "#/definitions/ModuleOnlyParams"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'Params6': {
-			'title': 'Params6',
-			'type': 'object',
-			'properties': {
-				'module': {
-					'title': 'Module',
-					'type': 'string'
+		"Params6": {
+			"title": "Params6",
+			"type": "object",
+			"properties": {
+				"module": {
+					"title": "Module",
+					"type": "string"
 				},
-				'temperature': {
-					'title': 'Temperature',
-					'type': 'number'
+				"temperature": {
+					"title": "Temperature",
+					"type": "number"
 				}
 			},
-			'required': ['module', 'temperature']
+			"required": ["module", "temperature"]
 		},
-		'TemperatureModuleSetTargetCommand': {
-			'title': 'TemperatureModuleSetTargetCommand',
-			'description': 'Temperature module set target temperature command. Module will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['temperatureModule/setTargetTemperature'],
-					'type': 'string'
+		"TemperatureModuleSetTargetCommand": {
+			"title": "TemperatureModuleSetTargetCommand",
+			"description": "Temperature module set target temperature command. Module will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["temperatureModule/setTargetTemperature"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params6'
+				"params": {
+					"$ref": "#/definitions/Params6"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'Params7': {
-			'title': 'Params7',
-			'type': 'object',
-			'properties': {
-				'module': {
-					'title': 'Module',
-					'type': 'string'
+		"Params7": {
+			"title": "Params7",
+			"type": "object",
+			"properties": {
+				"module": {
+					"title": "Module",
+					"type": "string"
 				},
-				'temperature': {
-					'title': 'Temperature',
-					'type': 'number'
+				"temperature": {
+					"title": "Temperature",
+					"type": "number"
 				}
 			},
-			'required': ['module', 'temperature']
+			"required": ["module", "temperature"]
 		},
-		'TemperatureModuleAwaitTemperatureCommand': {
-			'title': 'TemperatureModuleAwaitTemperatureCommand',
-			'description': 'Temperature module await temperature command. Delay further protocol execution until the specified temperature is reached.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['temperatureModule/awaitTemperature'],
-					'type': 'string'
+		"TemperatureModuleAwaitTemperatureCommand": {
+			"title": "TemperatureModuleAwaitTemperatureCommand",
+			"description": "Temperature module await temperature command. Delay further protocol execution until the specified temperature is reached.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["temperatureModule/awaitTemperature"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params7'
+				"params": {
+					"$ref": "#/definitions/Params7"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'TemperatureModuleDeactivateCommand': {
-			'title': 'TemperatureModuleDeactivateCommand',
-			'description': 'Temperature module deactivate command. Module will stop actively controlling its temperature and drift to ambient temperature.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['temperatureModule/deactivate'],
-					'type': 'string'
+		"TemperatureModuleDeactivateCommand": {
+			"title": "TemperatureModuleDeactivateCommand",
+			"description": "Temperature module deactivate command. Module will stop actively controlling its temperature and drift to ambient temperature.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["temperatureModule/deactivate"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/ModuleOnlyParams'
+				"params": {
+					"$ref": "#/definitions/ModuleOnlyParams"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'Params8': {
-			'title': 'Params8',
-			'type': 'object',
-			'properties': {
-				'module': {
-					'title': 'Module',
-					'type': 'string'
+		"Params8": {
+			"title": "Params8",
+			"type": "object",
+			"properties": {
+				"module": {
+					"title": "Module",
+					"type": "string"
 				},
-				'temperature': {
-					'title': 'Temperature',
-					'type': 'number'
+				"temperature": {
+					"title": "Temperature",
+					"type": "number"
 				},
-				'volume': {
-					'title': 'Volume',
-					'type': 'number'
+				"volume": {
+					"title": "Volume",
+					"type": "number"
 				}
 			},
-			'required': ['module', 'temperature']
+			"required": ["module", "temperature"]
 		},
-		'ThermocyclerSetTargetBlockTemperatureCommand': {
-			'title': 'ThermocyclerSetTargetBlockTemperatureCommand',
-			'description': 'Thermocycler set target block temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['thermocycler/setTargetBlockTemperature'],
-					'type': 'string'
+		"ThermocyclerSetTargetBlockTemperatureCommand": {
+			"title": "ThermocyclerSetTargetBlockTemperatureCommand",
+			"description": "Thermocycler set target block temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["thermocycler/setTargetBlockTemperature"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params8'
+				"params": {
+					"$ref": "#/definitions/Params8"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'Params9': {
-			'title': 'Params9',
-			'type': 'object',
-			'properties': {
-				'module': {
-					'title': 'Module',
-					'type': 'string'
+		"Params9": {
+			"title": "Params9",
+			"type": "object",
+			"properties": {
+				"module": {
+					"title": "Module",
+					"type": "string"
 				},
-				'temperature': {
-					'title': 'Temperature',
-					'type': 'number'
+				"temperature": {
+					"title": "Temperature",
+					"type": "number"
 				}
 			},
-			'required': ['module', 'temperature']
+			"required": ["module", "temperature"]
 		},
-		'ThermocyclerSetTargetLidTemperatureCommand': {
-			'title': 'ThermocyclerSetTargetLidTemperatureCommand',
-			'description': 'Thermocycler set target lid temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['thermocycler/setTargetLidTemperature'],
-					'type': 'string'
+		"ThermocyclerSetTargetLidTemperatureCommand": {
+			"title": "ThermocyclerSetTargetLidTemperatureCommand",
+			"description": "Thermocycler set target lid temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["thermocycler/setTargetLidTemperature"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params9'
+				"params": {
+					"$ref": "#/definitions/Params9"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'Params10': {
-			'title': 'Params10',
-			'type': 'object',
-			'properties': {
-				'module': {
-					'title': 'Module',
-					'type': 'string'
+		"Params10": {
+			"title": "Params10",
+			"type": "object",
+			"properties": {
+				"module": {
+					"title": "Module",
+					"type": "string"
 				},
-				'temperature': {
-					'title': 'Temperature',
-					'type': 'number'
+				"temperature": {
+					"title": "Temperature",
+					"type": "number"
 				}
 			},
-			'required': ['module', 'temperature']
+			"required": ["module", "temperature"]
 		},
-		'ThermocyclerAwaitBlockTemperatureCommand': {
-			'title': 'ThermocyclerAwaitBlockTemperatureCommand',
-			'description': 'Thermocycler await block temperature command. Delay further protocol execution until the specified temperature is reached.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['thermocycler/awaitBlockTemperature'],
-					'type': 'string'
+		"ThermocyclerAwaitBlockTemperatureCommand": {
+			"title": "ThermocyclerAwaitBlockTemperatureCommand",
+			"description": "Thermocycler await block temperature command. Delay further protocol execution until the specified temperature is reached.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["thermocycler/awaitBlockTemperature"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params10'
+				"params": {
+					"$ref": "#/definitions/Params10"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'Params11': {
-			'title': 'Params11',
-			'type': 'object',
-			'properties': {
-				'module': {
-					'title': 'Module',
-					'type': 'string'
+		"Params11": {
+			"title": "Params11",
+			"type": "object",
+			"properties": {
+				"module": {
+					"title": "Module",
+					"type": "string"
 				},
-				'temperature': {
-					'title': 'Temperature',
-					'type': 'number'
+				"temperature": {
+					"title": "Temperature",
+					"type": "number"
 				}
 			},
-			'required': ['module', 'temperature']
+			"required": ["module", "temperature"]
 		},
-		'ThermocyclerAwaitLidTemperatureCommand': {
-			'title': 'ThermocyclerAwaitLidTemperatureCommand',
-			'description': 'Thermocycler await lid temperature command. Delay further protocol execution until the specified temperature is reached.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['thermocycler/awaitLidTemperature'],
-					'type': 'string'
+		"ThermocyclerAwaitLidTemperatureCommand": {
+			"title": "ThermocyclerAwaitLidTemperatureCommand",
+			"description": "Thermocycler await lid temperature command. Delay further protocol execution until the specified temperature is reached.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["thermocycler/awaitLidTemperature"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params11'
+				"params": {
+					"$ref": "#/definitions/Params11"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'ThermocyclerDeactivateBlockCommand': {
-			'title': 'ThermocyclerDeactivateBlockCommand',
-			'description': 'Thermocycler deactivate block command. Module will stop actively controlling its block temperature.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['thermocycler/deactivateBlock'],
-					'type': 'string'
+		"ThermocyclerDeactivateBlockCommand": {
+			"title": "ThermocyclerDeactivateBlockCommand",
+			"description": "Thermocycler deactivate block command. Module will stop actively controlling its block temperature.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["thermocycler/deactivateBlock"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/ModuleOnlyParams'
+				"params": {
+					"$ref": "#/definitions/ModuleOnlyParams"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'ThermocyclerDeactivateLidCommand': {
-			'title': 'ThermocyclerDeactivateLidCommand',
-			'description': 'Thermocycler deactivate lid command. Module will stop actively controlling its lid temperature.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['thermocycler/deactivateLid'],
-					'type': 'string'
+		"ThermocyclerDeactivateLidCommand": {
+			"title": "ThermocyclerDeactivateLidCommand",
+			"description": "Thermocycler deactivate lid command. Module will stop actively controlling its lid temperature.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["thermocycler/deactivateLid"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/ModuleOnlyParams'
+				"params": {
+					"$ref": "#/definitions/ModuleOnlyParams"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'ThermocyclerOpenLidCommand': {
-			'title': 'ThermocyclerOpenLidCommand',
-			'description': 'Thermocycler open lid command. This command will block until the lid is fully open.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['thermocycler/openLid'],
-					'type': 'string'
+		"ThermocyclerOpenLidCommand": {
+			"title": "ThermocyclerOpenLidCommand",
+			"description": "Thermocycler open lid command. This command will block until the lid is fully open.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["thermocycler/openLid"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/ModuleOnlyParams'
+				"params": {
+					"$ref": "#/definitions/ModuleOnlyParams"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'ThermocyclerCloseLidCommand': {
-			'title': 'ThermocyclerCloseLidCommand',
-			'description': 'Thermocycler close lid command. This command will block until the lid is fully closed.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['thermocycler/closeLid'],
-					'type': 'string'
+		"ThermocyclerCloseLidCommand": {
+			"title": "ThermocyclerCloseLidCommand",
+			"description": "Thermocycler close lid command. This command will block until the lid is fully closed.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["thermocycler/closeLid"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/ModuleOnlyParams'
+				"params": {
+					"$ref": "#/definitions/ModuleOnlyParams"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'ProfileItem': {
-			'title': 'ProfileItem',
-			'type': 'object',
-			'properties': {
-				'temperature': {
-					'title': 'Temperature',
-					'description': 'Target temperature of profile step',
-					'type': 'number'
+		"ProfileItem": {
+			"title": "ProfileItem",
+			"type": "object",
+			"properties": {
+				"temperature": {
+					"title": "Temperature",
+					"description": "Target temperature of profile step",
+					"type": "number"
 				},
-				'holdTime': {
-					'title': 'Holdtime',
-					'description': 'Time (in seconds) to hold once temperature is reached',
-					'type': 'number'
+				"holdTime": {
+					"title": "Holdtime",
+					"description": "Time (in seconds) to hold once temperature is reached",
+					"type": "number"
 				}
 			},
-			'required': ['temperature', 'holdTime']
+			"required": ["temperature", "holdTime"]
 		},
-		'Params12': {
-			'title': 'Params12',
-			'type': 'object',
-			'properties': {
-				'module': {
-					'title': 'Module',
-					'type': 'string'
+		"Params12": {
+			"title": "Params12",
+			"type": "object",
+			"properties": {
+				"module": {
+					"title": "Module",
+					"type": "string"
 				},
-				'profile': {
-					'title': 'Profile',
-					'type': 'array',
-					'items': {
-						'$ref': '#/definitions/ProfileItem'
+				"profile": {
+					"title": "Profile",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/ProfileItem"
 					}
 				},
-				'volume': {
-					'title': 'Volume',
-					'type': 'number'
+				"volume": {
+					"title": "Volume",
+					"type": "number"
 				}
 			},
-			'required': ['module', 'profile', 'volume']
+			"required": ["module", "profile", "volume"]
 		},
-		'ThermocyclerRunProfile': {
-			'title': 'ThermocyclerRunProfile',
-			'description': "Thermocycler run profile command. Begin running the specified profile steps on the thermocycler. This command is non-blocking, it does not delay protocol execution outside of thermocycler steps. No more thermocycler commands should be given until a 'thermocycler/awaitProfileComplete' command is executed.",
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['thermocycler/runProfile'],
-					'type': 'string'
+		"ThermocyclerRunProfile": {
+			"title": "ThermocyclerRunProfile",
+			"description": "Thermocycler run profile command. Begin running the specified profile steps on the thermocycler. This command is non-blocking, it does not delay protocol execution outside of thermocycler steps. No more thermocycler commands should be given until a 'thermocycler/awaitProfileComplete' command is executed.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["thermocycler/runProfile"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params12'
+				"params": {
+					"$ref": "#/definitions/Params12"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'ThermocyclerAwaitProfileCompleteCommand': {
-			'title': 'ThermocyclerAwaitProfileCompleteCommand',
-			'description': 'Thermocycler await profile complete command. Blocks further protocol execution until profile execution is complete.',
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['thermocycler/awaitProfileComplete'],
-					'type': 'string'
+		"ThermocyclerAwaitProfileCompleteCommand": {
+			"title": "ThermocyclerAwaitProfileCompleteCommand",
+			"description": "Thermocycler await profile complete command. Blocks further protocol execution until profile execution is complete.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["thermocycler/awaitProfileComplete"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/ModuleOnlyParams'
+				"params": {
+					"$ref": "#/definitions/ModuleOnlyParams"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'Offset1': {
-			'title': 'Offset1',
-			'description': 'Optional offset from well bottom center, in mm',
-			'type': 'object',
-			'properties': {
-				'x': {
-					'title': 'X',
-					'type': 'number'
+		"Offset1": {
+			"title": "Offset1",
+			"description": "Optional offset from well bottom center, in mm",
+			"type": "object",
+			"properties": {
+				"x": {
+					"title": "X",
+					"type": "number"
 				},
-				'y': {
-					'title': 'Y',
-					'type': 'number'
+				"y": {
+					"title": "Y",
+					"type": "number"
 				},
-				'z': {
-					'title': 'Z',
-					'type': 'number'
+				"z": {
+					"title": "Z",
+					"type": "number"
 				}
 			},
-			'required': ['x', 'y', 'z']
+			"required": ["x", "y", "z"]
 		},
-		'Params13': {
-			'title': 'Params13',
-			'type': 'object',
-			'properties': {
-				'pipette': {
-					'title': 'Pipette',
-					'type': 'string'
+		"Params13": {
+			"title": "Params13",
+			"type": "object",
+			"properties": {
+				"pipette": {
+					"title": "Pipette",
+					"type": "string"
 				},
-				'labware': {
-					'title': 'Labware',
-					'type': 'string'
+				"labware": {
+					"title": "Labware",
+					"type": "string"
 				},
-				'well': {
-					'title': 'Well',
-					'type': 'string'
+				"well": {
+					"title": "Well",
+					"type": "string"
 				},
-				'offset': {
-					'title': 'Offset',
-					'description': 'Optional offset from well bottom center, in mm',
-					'allOf': [{
-						'$ref': '#/definitions/Offset1'
+				"offset": {
+					"title": "Offset",
+					"description": "Optional offset from well bottom center, in mm",
+					"allOf": [{
+						"$ref": "#/definitions/Offset1"
 					}]
 				},
-				'minimumZHeight': {
-					'title': 'Minimumzheight',
-					'description': "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead.",
-					'minimum': 0.0,
-					'type': 'number'
+				"minimumZHeight": {
+					"title": "Minimumzheight",
+					"description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead.",
+					"minimum": 0.0,
+					"type": "number"
 				},
-				'forceDirect': {
-					'title': 'Forcedirect',
-					'description': "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
-					'type': 'boolean'
+				"forceDirect": {
+					"title": "Forcedirect",
+					"description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
+					"type": "boolean"
 				}
 			},
-			'required': ['pipette', 'labware', 'well']
+			"required": ["pipette", "labware", "well"]
 		},
-		'MoveToWellCommand': {
-			'title': 'MoveToWellCommand',
-			'description': "Move to well command. Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.",
-			'type': 'object',
-			'properties': {
-				'command': {
-					'title': 'Command',
-					'enum': ['moveToWell'],
-					'type': 'string'
+		"MoveToWellCommand": {
+			"title": "MoveToWellCommand",
+			"description": "Move to well command. Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.",
+			"type": "object",
+			"properties": {
+				"command": {
+					"title": "Command",
+					"enum": ["moveToWell"],
+					"type": "string"
 				},
-				'params': {
-					'$ref': '#/definitions/Params13'
+				"params": {
+					"$ref": "#/definitions/Params13"
 				}
 			},
-			'required': ['command', 'params']
+			"required": ["command", "params"]
 		},
-		'AllCommands': {
-			'title': 'AllCommands',
-			'description': 'An array of command objects representing steps to be executed on the robot',
-			'type': 'array',
-			'items': {
-				'anyOf': [{
-					'$ref': '#/definitions/LiquidCommand'
+		"AllCommands": {
+			"title": "AllCommands",
+			"description": "An array of command objects representing steps to be executed on the robot",
+			"type": "array",
+			"items": {
+				"anyOf": [{
+					"$ref": "#/definitions/LiquidCommand"
 				}, {
-					'$ref': '#/definitions/BlowoutCommand'
+					"$ref": "#/definitions/BlowoutCommand"
 				}, {
-					'$ref': '#/definitions/TouchTipCommand'
+					"$ref": "#/definitions/TouchTipCommand"
 				}, {
-					'$ref': '#/definitions/PickUpDropTipCommand'
+					"$ref": "#/definitions/PickUpDropTipCommand"
 				}, {
-					'$ref': '#/definitions/MoveToSlotCommand'
+					"$ref": "#/definitions/MoveToSlotCommand"
 				}, {
-					'$ref': '#/definitions/DelayCommand'
+					"$ref": "#/definitions/DelayCommand"
 				}, {
-					'$ref': '#/definitions/MagneticModuleEngageCommand'
+					"$ref": "#/definitions/MagneticModuleEngageCommand"
 				}, {
-					'$ref': '#/definitions/MagneticModuleDisengageCommand'
+					"$ref": "#/definitions/MagneticModuleDisengageCommand"
 				}, {
-					'$ref': '#/definitions/TemperatureModuleSetTargetCommand'
+					"$ref": "#/definitions/TemperatureModuleSetTargetCommand"
 				}, {
-					'$ref': '#/definitions/TemperatureModuleAwaitTemperatureCommand'
+					"$ref": "#/definitions/TemperatureModuleAwaitTemperatureCommand"
 				}, {
-					'$ref': '#/definitions/TemperatureModuleDeactivateCommand'
+					"$ref": "#/definitions/TemperatureModuleDeactivateCommand"
 				}, {
-					'$ref': '#/definitions/ThermocyclerSetTargetBlockTemperatureCommand'
+					"$ref": "#/definitions/ThermocyclerSetTargetBlockTemperatureCommand"
 				}, {
-					'$ref': '#/definitions/ThermocyclerSetTargetLidTemperatureCommand'
+					"$ref": "#/definitions/ThermocyclerSetTargetLidTemperatureCommand"
 				}, {
-					'$ref': '#/definitions/ThermocyclerAwaitBlockTemperatureCommand'
+					"$ref": "#/definitions/ThermocyclerAwaitBlockTemperatureCommand"
 				}, {
-					'$ref': '#/definitions/ThermocyclerAwaitLidTemperatureCommand'
+					"$ref": "#/definitions/ThermocyclerAwaitLidTemperatureCommand"
 				}, {
-					'$ref': '#/definitions/ThermocyclerDeactivateBlockCommand'
+					"$ref": "#/definitions/ThermocyclerDeactivateBlockCommand"
 				}, {
-					'$ref': '#/definitions/ThermocyclerDeactivateLidCommand'
+					"$ref": "#/definitions/ThermocyclerDeactivateLidCommand"
 				}, {
-					'$ref': '#/definitions/ThermocyclerOpenLidCommand'
+					"$ref": "#/definitions/ThermocyclerOpenLidCommand"
 				}, {
-					'$ref': '#/definitions/ThermocyclerCloseLidCommand'
+					"$ref": "#/definitions/ThermocyclerCloseLidCommand"
 				}, {
-					'$ref': '#/definitions/ThermocyclerRunProfile'
+					"$ref": "#/definitions/ThermocyclerRunProfile"
 				}, {
-					'$ref': '#/definitions/ThermocyclerAwaitProfileCompleteCommand'
+					"$ref": "#/definitions/ThermocyclerAwaitProfileCompleteCommand"
 				}, {
-					'$ref': '#/definitions/MoveToWellCommand'
+					"$ref": "#/definitions/MoveToWellCommand"
 				}]
 			}
 		}
