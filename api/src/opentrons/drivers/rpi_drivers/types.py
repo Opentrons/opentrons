@@ -12,6 +12,10 @@ class PinDir(enum.Enum):
     output = enum.auto()
 
 
+REV_OG_USB_PORTS = {'3': 1, '5': 2}
+REV_A_USB_HUB = 3
+
+
 @dataclass(frozen=True)
 class USBPort(GenericNode):
     port_number: Optional[int] = None
@@ -19,7 +23,7 @@ class USBPort(GenericNode):
     hub: Optional[int] = None
 
     @classmethod
-    def build(cls, port_path: str) -> 'USBPort':
+    def build(cls, port_path: str, board_revision: BoardRevision) -> 'USBPort':
         """
         Build a USBPort dataclass.
 
@@ -31,7 +35,8 @@ class USBPort(GenericNode):
         """
         full_name, device_path = port_path.split(':')
         port_nodes = cls.get_unique_nodes(full_name)
-        hub, port, name = cls.find_hub(port_nodes)
+        *port_info, name = cls.find_hub(port_nodes)
+        hub, port = cls.map_to_revision(board_revision, port_info)
         return cls(
             name=name,
             port_number=port,
@@ -90,6 +95,22 @@ class USBPort(GenericNode):
             if node not in port_nodes:
                 port_nodes.append(node)
         return port_nodes
+
+    @staticmethod
+    def map_to_revision(
+            board_revision: BoardRevision,
+            port_info: List) -> Tuple[Optional[int], int]:
+        hub, port = port_info
+        if board_revision == BoardRevision.OG:
+            if hub:
+                return REV_OG_USB_PORTS.get(str(hub), hub), port
+            else:
+                return hub, REV_OG_USB_PORTS.get(str(port), port)
+        else:
+            if hub and hub == REV_A_USB_HUB:
+                return None, port
+            else:
+                return hub, port
 
     def __hash__(self) -> int:
         """
