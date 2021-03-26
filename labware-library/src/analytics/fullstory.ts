@@ -1,14 +1,5 @@
 import uniq from 'lodash/uniq'
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  module NodeJS {
-    interface Global {
-      _fs_namespace: string | undefined
-    }
-  }
-}
-
 const LL_VERSION = process.env.OT_LL_VERSION
 const LL_BUILD_DATE = new Date(process.env.OT_LL_BUILD_DATE as any)
 
@@ -64,12 +55,12 @@ export const inferFsKeyWithSuffix = (
 
 export const fullstoryEvent = (
   name: string,
-  parameters: Record<string, any> = {}
+  parameters: Record<string, unknown> = {}
 ): void => {
   // NOTE: make sure user has opted in before calling this fn
-  const fs: any = _getFullstory()
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  if (fs?.event) {
+  const fs = _getFullstory()
+  // @ts-expect-error(sa, 2021-03-26): add event to _getFullstory return type
+  if (fs && fs.event) {
     // NOTE: fullstory requires property names to have type suffix
     // https://help.fullstory.com/hc/en-us/articles/360020623234#Custom%20Property%20Name%20Requirements
     const _parameters = Object.keys(parameters).reduce((acc, key) => {
@@ -78,9 +69,8 @@ export const fullstoryEvent = (
       const name: string = suffix === null ? key : `${key}_${suffix}`
       return { ...acc, [name]: value }
     }, {})
-    if (typeof fs.event === 'function') {
-      fs.event(name, _parameters)
-    }
+    // @ts-expect-error(sa, 2021-03-26): accurately type _getFullstory return value
+    fs.event(name, _parameters)
   }
 }
 
@@ -89,7 +79,7 @@ export const _setAnalyticsTags = (): void => {
   // NOTE: fullstory expects the keys 'displayName' and 'email' verbatim
   // though all other key names must be fit the schema described here
   // https://help.fullstory.com/hc/en-us/articles/360020623294
-  if (fs !== null && typeof fs.setUserVars === 'function') {
+  if (fs && fs.setUserVars) {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const version_str = LL_VERSION
     // eslint-disable-next-line @typescript-eslint/naming-convention

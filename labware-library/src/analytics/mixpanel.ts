@@ -34,6 +34,9 @@ export function initializeMixpanel(): void {
   }
 }
 
-export const trackWithMixpanel = (name: string, properties: any): void => {
+export const trackWithMixpanel = (
+  name: string,
+  properties?: Record<string, unknown>
+): void => {
   mixpanel.track(name, properties)
 }

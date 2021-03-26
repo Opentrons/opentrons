@@ -10,7 +10,7 @@ import { useState, useCallback, useEffect } from 'react'
 import type { AnalyticsState } from './types'
 
 interface UseAnalyticsOptInOrOutResult {
-  setAnalyticsOptIn: (_: boolean) => void
+  setAnalyticsOptIn: (optIn: boolean) => void
   analyticsState: AnalyticsState
 }
 
