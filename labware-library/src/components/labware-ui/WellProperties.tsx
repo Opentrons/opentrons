@@ -11,7 +11,8 @@ import {
 import { getWellLabel } from './labels'
 import { LabelText, Value, LABEL_TOP } from '../ui'
 import styles from './styles.css'
-import type { IconName, WellBottomShape } from '@opentrons/components'
+import type { IconName } from '@opentrons/components'
+import type { WellBottomShape } from '@opentrons/shared-data'
 import type {
   LabwareDefinition,
   LabwareWellGroupProperties,
