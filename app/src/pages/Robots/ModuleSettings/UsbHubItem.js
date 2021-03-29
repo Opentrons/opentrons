@@ -5,10 +5,8 @@ import {
   Text,
   FONT_WEIGHT_SEMIBOLD,
   TEXT_TRANSFORM_CAPITALIZE,
-  BORDER_SOLID_MEDIUM,
   SPACING_2,
   SPACING_3,
-  BORDER_RADIUS_DEFAULT,
   SPACING_4,
 } from '@opentrons/components'
 import * as React from 'react'
@@ -41,8 +39,6 @@ export function UsbHubItem(props: Props): React.Node {
       {modules.map(mod => (
         <Box
           key={mod.serial}
-          borderLeft={BORDER_SOLID_MEDIUM}
-          borderWidth={BORDER_RADIUS_DEFAULT}
           paddingLeft={SPACING_3}
           paddingTop={SPACING_3}
           paddingBottom={SPACING_4}
