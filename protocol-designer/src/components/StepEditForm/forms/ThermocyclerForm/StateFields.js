@@ -36,7 +36,7 @@ export const StateFields = (props: Props): React.Node => {
       >
         <div className={styles.toggle_row}>
           <ToggleRowField
-            name={blockActiveName}
+            {...propsForFields[blockActiveName]}
             offLabel={i18n.t(
               'form.step_edit_form.field.thermocyclerState.block.toggleOff'
             )}
@@ -63,7 +63,7 @@ export const StateFields = (props: Props): React.Node => {
       >
         <div className={styles.toggle_row}>
           <ToggleRowField
-            name={lidActiveName}
+            {...propsForFields[lidActiveName]}
             offLabel={i18n.t(
               'form.step_edit_form.field.thermocyclerState.lid.toggleOff'
             )}
@@ -91,7 +91,7 @@ export const StateFields = (props: Props): React.Node => {
         className={styles.toggle_form_group}
       >
         <ToggleRowField
-          name={lidOpenName}
+          {...propsForFields[lidOpenName]}
           offLabel={i18n.t(
             'form.step_edit_form.field.thermocyclerState.lidPosition.toggleOff'
           )}
