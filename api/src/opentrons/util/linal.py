@@ -24,31 +24,34 @@ def identity_deck_transform() -> np.ndarray:
     return np.identity(3)
 
 
+def build_attitude_from_parameters(attitude_parameters: Tuple) -> AttitudeMatrix:
+    a11, a12, a13, a21, a22, a23 = attitude_parameters
+    attitude = [
+        [a11, a12, a13],
+        [a21, a22, a23],
+        [0, 0, 1]]
+    return attitude
+
+
 def solve_attitude(
-        expected: SolvePoints,
-        actual: SolvePoints
-        ) -> AttitudeMatrix:
-    ex = np.array([
-        list(point)
-        for point in expected
-    ]).transpose()
-    ac = np.array([
-            list(point)
-            for point in actual
-        ]).transpose()
-    t = np.dot(ac, inv(ex))
+    expected: SolvePoints,
+    actual: SolvePoints) -> AttitudeMatrix:
+    ex_p1 = [*expected[0], 1]
+    ex_p2 = [*expected[1], 1]
+    ex_p3 = [*expected[2], 1]
+    zero = [0, 0, 0]
 
-    mask_transform = np.array([
-        [True, True, False],
-        [True, True, False],
-        [False, False, False]])
-    masked_array = np.ma.masked_array(t, ~mask_transform)
-
-    no_z_component = np.zeros((3, 3))
-    np.put(no_z_component, [8, 8], 1)
-
-    transform = masked_array.filled(0) + no_z_component
-    return transform.round(4).tolist()
+    expected_matrix = np.array([
+        [*ex_p1, *zero],
+        [*zero, *ex_p1],
+        [*ex_p2, *zero],
+        [*zero, *ex_p2],
+        [*ex_p3, *zero],
+        [*zero, *ex_p3]
+    ])
+    coordinate_shift = np.array([v for point in actual for v in point])
+    attitude_params = np.dot(inv(expected_matrix), coordinate_shift)
+    return build_attitude_from_parameters(tuple(attitude_params))
 
 
 def solve(expected: List[Tuple[float, float]],

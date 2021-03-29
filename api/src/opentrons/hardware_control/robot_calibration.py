@@ -101,7 +101,7 @@ def migrate_affine_xy_to_attitude(
 def save_attitude_matrix(
         expected: linal.SolvePoints, actual: linal.SolvePoints,
         pipette_id: str, tiprack_hash: str):
-    attitude = linal.solve_attitude(expected, actual)
+    attitude = linal.solve_attitude_correctly(expected, actual)
     modify.save_robot_deck_attitude(attitude, pipette_id, tiprack_hash)
 
 
