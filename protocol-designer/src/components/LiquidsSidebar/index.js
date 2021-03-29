@@ -34,7 +34,7 @@ function LiquidsSidebarComponent(props: Props) {
           selected={selectedLiquid === ingredientId}
           onClick={() => selectLiquid(ingredientId)}
           iconName="circle"
-          iconProps={{ style: { fill: swatchColors(Number(ingredientId)) } }}
+          iconProps={{ style: { fill: swatchColors(ingredientId) } }}
           title={name || `Unnamed Ingredient ${ingredientId}`} // fallback, should not happen
         />
       ))}

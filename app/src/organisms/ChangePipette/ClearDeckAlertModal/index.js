@@ -36,6 +36,7 @@ export function ClearDeckAlertModal(
       <AlertModal
         heading={HEADING}
         buttons={[
+          /* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion or replacement of AlertModal */
           {
             children: `${cancelText}`,
             onClick: onCancelClick,

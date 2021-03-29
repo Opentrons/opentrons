@@ -52,7 +52,7 @@ export const PillTooltipContents = (
               <td>
                 <div
                   className={styles.liquid_circle}
-                  style={{ backgroundColor: swatchColors(Number(groupId)) }}
+                  style={{ backgroundColor: swatchColors(groupId) }}
                 />
               </td>
               <td className={styles.ingred_name}>
@@ -138,13 +138,19 @@ function SubstepRowComponent(props: SubstepRowProps) {
           ingreds={compactedSourcePreIngreds}
         />
 
-        <span className={styles.emphasized_cell}>
+        <span
+          className={styles.emphasized_cell}
+          data-test="SubstepRow_aspirateWell"
+        >
           {props.source && props.source.well}
         </span>
-        <span className={styles.volume_cell}>{`${formatVolume(
-          props.volume
-        )} μL`}</span>
-        <span className={styles.emphasized_cell}>
+        <span className={styles.volume_cell} data-test="SubstepRow_volume">
+          {`${formatVolume(props.volume)} μL`}
+        </span>
+        <span
+          className={styles.emphasized_cell}
+          data-test="SubstepRow_dispenseWell"
+        >
           {props.dest && props.dest.well}
         </span>
 

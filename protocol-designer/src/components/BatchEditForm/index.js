@@ -7,6 +7,8 @@ import {
   OutlineButton,
   Tooltip,
   useHoverTooltip,
+  TOOLTIP_TOP,
+  TOOLTIP_FIXED,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import {
@@ -191,12 +193,12 @@ export const BatchEditMoveLiquid = (
 ): React.Node => {
   const { propsForFields, handleCancel, handleSave } = props
   const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip({
-    placement: 'top',
-    strategy: 'fixed',
+    placement: TOOLTIP_TOP,
+    strategy: TOOLTIP_FIXED,
   })
   const [saveButtonTargetProps, saveButtonTooltipProps] = useHoverTooltip({
-    placement: 'top',
-    strategy: 'fixed',
+    placement: TOOLTIP_TOP,
+    strategy: TOOLTIP_FIXED,
   })
   const disableSave = !props.batchEditFormHasChanges
 
@@ -214,7 +216,7 @@ export const BatchEditMoveLiquid = (
           />
         </Box>
 
-        <Box textAlign="right" maxWidth="55rem" marginTop="2rem">
+        <Box textAlign="right" maxWidth="55rem" marginTop="3rem">
           <Box
             {...cancelButtonTargetProps}
             marginRight="0.625rem"

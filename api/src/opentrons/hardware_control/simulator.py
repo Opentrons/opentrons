@@ -149,7 +149,8 @@ class Simulator:
         self._run_flag.set()
         self._log = MODULE_LOG.getChild(repr(self))
         self._strict_attached = bool(strict_attached_instruments)
-        self._usb = usb_simulator.USBBusSimulator()
+        self._board_revision = BoardRevision.OG
+        self._usb = usb_simulator.USBBusSimulator(self._board_revision)
 
     @property
     def gpio_chardev(self) -> GPIODriverLike:
@@ -302,7 +303,7 @@ class Simulator:
 
     @property
     def board_revision(self) -> BoardRevision:
-        return BoardRevision.OG
+        return self._board_revision
 
     async def update_firmware(self, filename, loop, modeset) -> str:
         return 'Did nothing (simulating)'

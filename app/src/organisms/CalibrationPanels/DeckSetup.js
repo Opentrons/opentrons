@@ -19,6 +19,7 @@ import {
   SPACING_2,
   SPACING_3,
 } from '@opentrons/components'
+// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 

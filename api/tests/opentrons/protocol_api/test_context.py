@@ -831,6 +831,51 @@ def test_loaded_modules(ctx, monkeypatch):
     assert ctx.loaded_modules[7] == mod2
 
 
+def test_order_of_module_load(loop):
+    import opentrons.hardware_control as hardware_control
+    import opentrons.protocol_api as protocol_api
+
+    mods = [
+        'tempdeck', 'thermocycler', 'tempdeck']
+    thread_manager = hardware_control.ThreadManager(
+        hardware_control.API.build_hardware_simulator, attached_modules=mods)
+    fake_hardware = thread_manager.sync
+
+    attached_modules = fake_hardware.attached_modules
+    hw_temp1 = attached_modules[0]
+    hw_temp2 = attached_modules[2]
+
+    ctx1 = protocol_api.ProtocolContext(
+        implementation=ProtocolContextImplementation(),
+        loop=loop)
+    with ctx1.temp_connect(fake_hardware) as c:
+        temp1 = c.load_module('tempdeck', 4)
+        c.load_module('thermocycler')
+        temp2 = c.load_module('tempdeck', 1)
+        async_temp1 = temp1._module._obj_to_adapt
+        async_temp2 = temp2._module._obj_to_adapt
+
+        assert id(async_temp1) == id(hw_temp1)
+        assert id(async_temp2) == id(hw_temp2)
+
+    # Test that the order remains the same for the
+    # hardware modules regardless of the slot it
+    # was loaded into
+    ctx2 = protocol_api.ProtocolContext(
+        implementation=ProtocolContextImplementation(),
+        loop=loop)
+
+    with ctx2.temp_connect(fake_hardware) as c:
+        c.load_module('thermocycler')
+        temp1 = c.load_module('tempdeck', 1)
+        temp2 = c.load_module('tempdeck', 4)
+
+        async_temp1 = temp1._module._obj_to_adapt
+        async_temp2 = temp2._module._obj_to_adapt
+        assert id(async_temp1) == id(hw_temp1)
+        assert id(async_temp2) == id(hw_temp2)
+
+
 def test_tip_length_for(ctx, monkeypatch):
     instr = ctx.load_instrument('p20_single_gen2', 'left')
     tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')

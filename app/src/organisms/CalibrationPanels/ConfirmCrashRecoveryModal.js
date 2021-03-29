@@ -43,6 +43,7 @@ export function ConfirmCrashRecoveryModal(
       className={styles.confirm_crash_modal}
       buttons={[
         { Component: SecondaryBtn, children: CANCEL, onClick: back },
+        /* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion or replacement of AlertModal */
         {
           Component: SecondaryBtn,
           children: requiresNewTip ? CONFIRM_AND_START_OVER : START_OVER,

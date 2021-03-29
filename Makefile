@@ -32,7 +32,7 @@ watch ?= false
 cover ?= true
 updateSnapshot ?= false
 
-FORMAT_FILE_GLOB = ".*.@(js|yml)" "**/*.@(js|json|md|yml)"
+FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml)" "**/*.@(ts|tsx|js|json|md|yml)"
 
 ifeq ($(watch), true)
 	cover := false
@@ -182,7 +182,7 @@ format:
 ifeq ($(watch),true)
 	onchange $(FORMAT_FILE_GLOB) -- prettier --ignore-path .eslintignore --write {{changed}}
 else
-	prettier --ignore-path .eslintignore $(if $(CI),--check,--write) $(FORMAT_FILE_GLOB)
+	prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 endif
 
 .PHONY: lint-py
@@ -196,6 +196,7 @@ lint-py:
 .PHONY: lint-js
 lint-js:
 	eslint ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+	prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-json
 lint-json:
