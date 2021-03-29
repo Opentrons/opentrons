@@ -5,7 +5,6 @@ import { trackEventMiddleware } from './analytics/middleware'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
 import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
-
 import type { Store } from 'redux'
 import type { BaseState, Action, ThunkDispatch } from './types'
 
@@ -86,7 +85,6 @@ export function configureStore(): Store<
 
   // initial rehydration, and persistence subscriber
   store.dispatch(rehydratePersistedAction())
-
   store.subscribe(makePersistSubscriber(store))
 
   global.enablePrereleaseMode = () => {
