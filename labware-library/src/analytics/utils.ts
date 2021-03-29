@@ -9,7 +9,7 @@ const COOKIE_KEY_NAME = 'ot_ll_analytics' // NOTE: cookie is named "LL" but only
 const COOKIE_DOMAIN =
   process.env.NODE_ENV === 'production' ? 'opentrons.com' : undefined
 
-const persistAnalyticsCookie = (cookies: Record<string, any>): void => {
+const persistAnalyticsCookie = (cookies: AnalyticsState): void => {
   const maxAge = 10 * 365 * 24 * 60 * 60 // 10 years
   const options = { COOKIE_DOMAIN, maxAge }
 
