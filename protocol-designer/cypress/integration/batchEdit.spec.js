@@ -5,13 +5,15 @@ describe('Batch Edit Transform', () => {
   })
 
   // import the batchEdit.json to PD
-  it('Verify Flowrate, dublicate, delete functionality in Batch Edit Mode', () => {
+  it('Verify Flowrate, duplicate, delete functionality in Batch Edit Mode', () => {
     importProtocol()
     openDesignTab()
+    const isMacOSX = Cypress.platform === 'darwin'
 
     // enter into the batch edit mode
+
     cy.get('[data-test="StepItem_1"]').click({
-      metaKey: true,
+      [isMacOSX ? 'metaKey' : 'cmdKey']: true,
     })
 
     cy.get('button').contains('exit batch edit').should('exist')
@@ -39,7 +41,7 @@ describe('Batch Edit Transform', () => {
 
     // Verify that transfer and other step selection does not support multistep editing
     cy.get('[data-test="StepItem_4"]').click({
-      metaKey: true,
+      [isMacOSX ? 'metaKey' : 'cmdKey']: true,
     })
     cy.get('#StepSelectionBannerComponent_numberStepsSelected')
       .contains('2 steps selected')
@@ -64,7 +66,7 @@ describe('Batch Edit Transform', () => {
       .contains('9 steps selected')
       .should('exist')
 
-    // Dublicate the selected steps
+    // Duplicate the selected steps
     cy.get('#ClickableIcon_duplicate').click()
     cy.get('#ClickableIcon_select').click()
     cy.get('#StepSelectionBannerComponent_numberStepsSelected')
@@ -75,7 +77,7 @@ describe('Batch Edit Transform', () => {
       shiftKey: true,
     })
 
-    // Delete the dublicated steps
+    // Delete the duplicated steps
     cy.get('#ClickableIcon_delete').click()
     cy.get('button').contains('delete steps').click()
     cy.get('#StepSelectionBannerComponent_numberStepsSelected')
