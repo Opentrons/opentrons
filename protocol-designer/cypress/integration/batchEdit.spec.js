@@ -37,17 +37,12 @@ describe('Batch Edit Transform', () => {
     })
     cy.get('input[name="aspirate_flowRate"]').should('have.value', 100)
 
-    // Range selection with shift
-    cy.get('[data-test="StepItem_3"]').click({
-      shiftKey: true,
-    })
-
     // Verify that transfer and other step selection does not support multistep editing
     cy.get('[data-test="StepItem_4"]').click({
       metaKey: true,
     })
     cy.get('#StepSelectionBannerComponent_numberStepsSelected')
-      .contains('4 steps selected')
+      .contains('2 steps selected')
       .should('exist')
 
     cy.get('[id=Text_noSharedSettings]').contains(
@@ -71,13 +66,21 @@ describe('Batch Edit Transform', () => {
 
     // Dublicate the selected steps
     cy.get('#ClickableIcon_duplicate').click()
+    cy.get('#ClickableIcon_select').click()
     cy.get('#StepSelectionBannerComponent_numberStepsSelected')
-      .contains('9 steps selected')
+      .contains('18 steps selected')
       .should('exist')
+
+    cy.get('[data-test="StepItem_9"]').click({
+      shiftKey: true,
+    })
 
     // Delete the dublicated steps
     cy.get('#ClickableIcon_delete').click()
     cy.get('button').contains('delete steps').click()
+    cy.get('#StepSelectionBannerComponent_numberStepsSelected')
+      .contains('1 steps selected')
+      .should('exist')
 
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
