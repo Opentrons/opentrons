@@ -31,7 +31,7 @@ describe('Batch Edit Transform', () => {
     cy.get('button').contains('Done').click()
     cy.get('button').contains('save').click()
 
-    //Verify that transfer step 1 has Flowrate value 100
+    // Verify that transfer step 1 has Flowrate value 100
     cy.get('[data-test="StepItem_1"]').click({
       shiftKey: true,
     })
@@ -63,7 +63,7 @@ describe('Batch Edit Transform', () => {
       .contains('A1')
       .should('exist')
 
-    //Select all the steps
+    // Select all the steps
     cy.get('#ClickableIcon_select').click()
     cy.get('#StepSelectionBannerComponent_numberStepsSelected')
       .contains('9 steps selected')
