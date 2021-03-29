@@ -36,6 +36,11 @@ def build_attitude_from_parameters(attitude_parameters: Tuple) -> AttitudeMatrix
 def solve_attitude(
     expected: SolvePoints,
     actual: SolvePoints) -> AttitudeMatrix:
+    """
+    :param expected:
+    :param actual:
+    :returns: 
+    """
     ex_p1 = [*expected[0], 1]
     ex_p2 = [*expected[1], 1]
     ex_p3 = [*expected[2], 1]
