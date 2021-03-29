@@ -26,7 +26,6 @@ class CornerOffsetFromSlot(BaseModel):
     z: float
 
 
-
 class BrandData(BaseModel):
     brand: str = Field(..., description='Brand/manufacturer name')
     brandId: Optional[List[str]] = Field(

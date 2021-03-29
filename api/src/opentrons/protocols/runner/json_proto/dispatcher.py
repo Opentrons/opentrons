@@ -46,13 +46,13 @@ _command_to_method_name: Dict[str, str] = {
     models.CommandThermocyclerDeactivateBlock:
         AbstractCommandHandler.handle_thermocycler_deactivate_block.__name__,
     models.CommandThermocyclerSetTargetLid:
-        AbstractCommandHandler.handle_thermocycler_set_target_lid_temperature.__name__,
+        AbstractCommandHandler.handle_thermocycler_set_target_lid_temperature.__name__,  # noqa: E501
     models.CommandThermocyclerAwaitBlockTemperature:
         AbstractCommandHandler.handle_thermocycler_await_block_temperature.__name__,
     models.CommandThermocyclerAwaitLidTemperature:
         AbstractCommandHandler.handle_thermocycler_await_lid_temperature.__name__,
     models.CommandThermocyclerSetTargetBlock:
-        AbstractCommandHandler.handle_thermocycler_set_target_block_temperature.__name__,
+        AbstractCommandHandler.handle_thermocycler_set_target_block_temperature.__name__,  # noqa: E501
     models.CommandTemperatureModuleDeactivate:
         AbstractCommandHandler.handle_temperature_module_deactivate.__name__,
     models.CommandTemperatureModuleAwait:

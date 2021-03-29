@@ -87,7 +87,8 @@ def magnetic_module_disengage_command() -> models.MagneticModuleDisengageCommand
 
 
 @pytest.fixture
-def temperature_module_set_target_command() -> models.TemperatureModuleSetTargetCommand:
+def temperature_module_set_target_command() \
+        -> models.TemperatureModuleSetTargetCommand:
     return models.TemperatureModuleSetTargetCommand(
         command='temperatureModule/setTargetTemperature',
         params=models.Params6(module="module", temperature=1)
@@ -95,7 +96,8 @@ def temperature_module_set_target_command() -> models.TemperatureModuleSetTarget
 
 
 @pytest.fixture
-def temperature_module_await_temperature_command() -> models.TemperatureModuleAwaitTemperatureCommand:
+def temperature_module_await_temperature_command() \
+        -> models.TemperatureModuleAwaitTemperatureCommand:
     return models.TemperatureModuleAwaitTemperatureCommand(
         command='temperatureModule/awaitTemperature',
         params=models.Params7(module="module", temperature=1)
@@ -103,7 +105,8 @@ def temperature_module_await_temperature_command() -> models.TemperatureModuleAw
 
 
 @pytest.fixture
-def temperature_module_deactivate_command() -> models.TemperatureModuleDeactivateCommand:
+def temperature_module_deactivate_command() \
+        -> models.TemperatureModuleDeactivateCommand:
     return models.TemperatureModuleDeactivateCommand(
         command='temperatureModule/deactivate',
         params=models.ModuleOnlyParams(module="module")
@@ -111,7 +114,8 @@ def temperature_module_deactivate_command() -> models.TemperatureModuleDeactivat
 
 
 @pytest.fixture
-def thermocycler_set_target_block_temperature_command() -> models.ThermocyclerSetTargetBlockTemperatureCommand:
+def thermocycler_set_target_block_temperature_command() \
+        -> models.ThermocyclerSetTargetBlockTemperatureCommand:
     return models.ThermocyclerSetTargetBlockTemperatureCommand(
         command='thermocycler/setTargetBlockTemperature',
         params=models.Params8(module="module", temperature=1)
@@ -119,7 +123,8 @@ def thermocycler_set_target_block_temperature_command() -> models.ThermocyclerSe
 
 
 @pytest.fixture
-def thermocycler_set_target_lid_temperature_command() -> models.ThermocyclerSetTargetLidTemperatureCommand:
+def thermocycler_set_target_lid_temperature_command() \
+        -> models.ThermocyclerSetTargetLidTemperatureCommand:
     return models.ThermocyclerSetTargetLidTemperatureCommand(
         command='thermocycler/setTargetLidTemperature',
         params=models.Params9(module="module", temperature=1)
@@ -127,7 +132,8 @@ def thermocycler_set_target_lid_temperature_command() -> models.ThermocyclerSetT
 
 
 @pytest.fixture
-def thermocycler_await_block_temperature_command() -> models.ThermocyclerAwaitBlockTemperatureCommand:
+def thermocycler_await_block_temperature_command() \
+        -> models.ThermocyclerAwaitBlockTemperatureCommand:
     return models.ThermocyclerAwaitBlockTemperatureCommand(
         command='thermocycler/awaitBlockTemperature',
         params=models.Params10(module="module", temperature=1)
@@ -135,7 +141,8 @@ def thermocycler_await_block_temperature_command() -> models.ThermocyclerAwaitBl
 
 
 @pytest.fixture
-def thermocycler_await_lid_temperature_command() -> models.ThermocyclerAwaitLidTemperatureCommand:
+def thermocycler_await_lid_temperature_command()\
+        -> models.ThermocyclerAwaitLidTemperatureCommand:
     return models.ThermocyclerAwaitLidTemperatureCommand(
         command='thermocycler/awaitLidTemperature',
         params=models.Params11(module="module", temperature=1)
@@ -143,7 +150,8 @@ def thermocycler_await_lid_temperature_command() -> models.ThermocyclerAwaitLidT
 
 
 @pytest.fixture
-def thermocycler_deactivate_block_command() -> models.ThermocyclerDeactivateBlockCommand:
+def thermocycler_deactivate_block_command() \
+        -> models.ThermocyclerDeactivateBlockCommand:
     return models.ThermocyclerDeactivateBlockCommand(
         command='thermocycler/deactivateBlock',
         params=models.ModuleOnlyParams(module="module")
@@ -183,7 +191,8 @@ def thermocycler_run_profile() -> models.ThermocyclerRunProfile:
 
 
 @pytest.fixture
-def thermocycler_await_profile_complete_command() -> models.ThermocyclerAwaitProfileCompleteCommand:
+def thermocycler_await_profile_complete_command() \
+        -> models.ThermocyclerAwaitProfileCompleteCommand:
     return models.ThermocyclerAwaitProfileCompleteCommand(
         command='thermocycler/awaitProfileComplete',
         params=models.ModuleOnlyParams(module="module")

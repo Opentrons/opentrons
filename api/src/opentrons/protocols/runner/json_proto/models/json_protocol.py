@@ -23,21 +23,37 @@ CommandDropTip: dev_types.DropTipCommandId = 'dropTip'
 CommandMoveToSlot: dev_types.MoveToSlotCommandId = 'moveToSlot'
 CommandMoveToWell: dev_types.MoveToWellCommandId = 'moveToWell'
 CommandDelay: dev_types.DelayCommandId = 'delay'
-CommandMagneticModuleEngage: dev_types.MagneticModuleEngageCommandId = 'magneticModule/engageMagnet'
-CommandMagneticModuleDisengage: dev_types.MagneticModuleDisengageCommandId = 'magneticModule/disengageMagnet'
-CommandTemperatureModuleSetTarget: dev_types.TemperatureModuleSetTargetCommandId = 'temperatureModule/setTargetTemperature'
-CommandTemperatureModuleAwait: dev_types.TemperatureModuleAwaitCommandId = 'temperatureModule/awaitTemperature'
-CommandTemperatureModuleDeactivate: dev_types.TemperatureModuleDeactivateCommandId = 'temperatureModule/deactivate'
-CommandThermocyclerSetTargetBlock: dev_types.ThermocyclerSetTargetBlockCommandId = 'thermocycler/setTargetBlockTemperature'
-CommandThermocyclerSetTargetLid: dev_types.ThermocyclerSetTargetLidCommandId = 'thermocycler/setTargetLidTemperature'
-CommandThermocyclerAwaitLidTemperature: dev_types.ThermocyclerAwaitLidTemperatureCommandId = 'thermocycler/awaitLidTemperature'
-CommandThermocyclerAwaitBlockTemperature: dev_types.ThermocyclerAwaitBlockTemperatureCommandId = 'thermocycler/awaitBlockTemperature'
-CommandThermocyclerDeactivateBlock: dev_types.ThermocyclerDeactivateBlockCommandId = 'thermocycler/deactivateBlock'
-CommandThermocyclerDeactivateLid: dev_types.ThermocyclerDeactivateLidCommandId = 'thermocycler/deactivateLid'
-CommandThermocyclerOpenLid: dev_types.ThermocyclerOpenLidCommandId = 'thermocycler/openLid'
-CommandThermocyclerCloseLid: dev_types.ThermocyclerCloseLidCommandId = 'thermocycler/closeLid'
-CommandThermocyclerRunProfile: dev_types.ThermocyclerRunProfileCommandId = 'thermocycler/runProfile'
-CommandThermocyclerAwaitProfile: dev_types.ThermocyclerAwaitProfileCommandId = 'thermocycler/awaitProfileComplete'
+CommandMagneticModuleEngage: \
+    dev_types.MagneticModuleEngageCommandId = 'magneticModule/engageMagnet'
+CommandMagneticModuleDisengage:\
+    dev_types.MagneticModuleDisengageCommandId = 'magneticModule/disengageMagnet'
+CommandTemperatureModuleSetTarget: \
+    dev_types.TemperatureModuleSetTargetCommandId = \
+    'temperatureModule/setTargetTemperature'
+CommandTemperatureModuleAwait: \
+    dev_types.TemperatureModuleAwaitCommandId = 'temperatureModule/awaitTemperature'
+CommandTemperatureModuleDeactivate: \
+    dev_types.TemperatureModuleDeactivateCommandId = 'temperatureModule/deactivate'
+CommandThermocyclerSetTargetBlock: \
+    dev_types.ThermocyclerSetTargetBlockCommandId = 'thermocycler/setTargetBlockTemperature'  # noqa: E501
+CommandThermocyclerSetTargetLid: \
+    dev_types.ThermocyclerSetTargetLidCommandId = 'thermocycler/setTargetLidTemperature'  # noqa: E501
+CommandThermocyclerAwaitLidTemperature:\
+    dev_types.ThermocyclerAwaitLidTemperatureCommandId = 'thermocycler/awaitLidTemperature'  # noqa: E501
+CommandThermocyclerAwaitBlockTemperature:\
+    dev_types.ThermocyclerAwaitBlockTemperatureCommandId = 'thermocycler/awaitBlockTemperature'  # noqa: E501
+CommandThermocyclerDeactivateBlock:\
+    dev_types.ThermocyclerDeactivateBlockCommandId = 'thermocycler/deactivateBlock'
+CommandThermocyclerDeactivateLid:\
+    dev_types.ThermocyclerDeactivateLidCommandId = 'thermocycler/deactivateLid'
+CommandThermocyclerOpenLid:\
+    dev_types.ThermocyclerOpenLidCommandId = 'thermocycler/openLid'
+CommandThermocyclerCloseLid:\
+    dev_types.ThermocyclerCloseLidCommandId = 'thermocycler/closeLid'
+CommandThermocyclerRunProfile:\
+    dev_types.ThermocyclerRunProfileCommandId = 'thermocycler/runProfile'
+CommandThermocyclerAwaitProfile:\
+    dev_types.ThermocyclerAwaitProfileCommandId = 'thermocycler/awaitProfileComplete'
 
 
 class Metadata2(BaseModel):
@@ -204,7 +220,8 @@ class Params3(BaseModel):
                     "the API's default safe Z margin, it will make the arc "
                     "higher. If it's smaller, it will have no effect. Specifying "
                     "this for movements that would not arc (moving within the "
-                    "same well in the same labware) will cause an arc movement instead.",
+                    "same well in the same labware) will cause an arc movement "
+                    "instead.",
         ge=0.0,
     )
     forceDirect: Optional[bool] = Field(
@@ -506,7 +523,8 @@ class MoveToWellCommand(BaseModel):
     reference point on the pipette. The critical point can be one of the following:
     (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel
     pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with
-    a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.
+    a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost
+    nozzle.
     """
 
     command: Literal['moveToWell']
