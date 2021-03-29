@@ -654,5 +654,6 @@ you should load Temperature Module B before Temperature Module A.
          temperature_module_a = protocol.load_module('temperature module gen2', 1)
 
 
-The Opentrons App will display USB Port information while using modules in your protocol, however, you can use the
-guidelines from above to also use this feature in jupyter notebook.
+The Opentrons App will display USB Port information while using modules in your protocol. You can also use the
+guidelines from above to get a predictable module order in Jupyter Notebook, but it will not display USB Port information
+in Jupyter Notebook.
