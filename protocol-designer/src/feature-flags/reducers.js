@@ -3,34 +3,12 @@ import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import {
-  allFlags,
-  DEPRECATED_FLAGS,
-  userFacingFlags,
-  type Flags,
-} from './types'
+import { DEPRECATED_FLAGS, userFacingFlags, type Flags } from './types'
 
 import type { Reducer } from 'redux'
 import type { RehydratePersistedAction } from '../persist'
 import type { SetFeatureFlagAction } from './actions'
 import type { Action } from '../types'
-
-// These flags will get set via query params
-// Ex: https://designer.opentrons.com/?someFF=1&anotherFF=1
-export const getFlagsFromQueryParams = (): Flags => {
-  const urlSearchParams = new URLSearchParams(window.location.search)
-  let flagsToEnable: Flags = {}
-
-  for (const [flagName, flagValue] of urlSearchParams.entries()) {
-    if (allFlags.includes(flagName)) {
-      flagsToEnable = {
-        ...flagsToEnable,
-        [flagName]: flagValue === '1',
-      }
-    }
-  }
-  return flagsToEnable
-}
 
 // NOTE: these values will always be overridden by persisted values,
 // whenever the browser has seen the feature flag before and persisted it.
@@ -48,7 +26,6 @@ const initialFlags: Flags = {
   PRERELEASE_MODE: process.env.OT_PD_PRERELEASE_MODE === '1' || false,
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
-  ...getFlagsFromQueryParams(),
 }
 
 // NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed

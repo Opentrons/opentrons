@@ -1,10 +1,7 @@
 // @flow
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
-import isEmpty from 'lodash/isEmpty'
 import { trackEventMiddleware } from './analytics/middleware'
-import { getFlagsFromQueryParams } from './feature-flags/reducers'
-import { setFeatureFlags } from './feature-flags/actions'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
 import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
@@ -89,11 +86,6 @@ export function configureStore(): Store<
 
   // initial rehydration, and persistence subscriber
   store.dispatch(rehydratePersistedAction())
-  // override feature flags that get passed via query params
-  const flagsFromQueryParams = getFlagsFromQueryParams()
-  if (!isEmpty(flagsFromQueryParams)) {
-    store.dispatch(setFeatureFlags(flagsFromQueryParams))
-  }
 
   store.subscribe(makePersistSubscriber(store))
 
