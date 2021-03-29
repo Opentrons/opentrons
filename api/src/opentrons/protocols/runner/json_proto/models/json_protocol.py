@@ -11,6 +11,33 @@ from pydantic import BaseModel, Extra, Field
 from typing_extensions import Literal
 
 from .labware_definition import Model as LabwareDefinition
+from opentrons_shared_data.protocol import dev_types
+
+CommandAspirate: dev_types.AspirateCommandId = 'aspirate'
+CommandDispense: dev_types.DispenseCommandId = 'dispense'
+CommandAirGap: dev_types.AirGapCommandId = 'airGap'
+CommandBlowout: dev_types.BlowoutCommandId = 'blowout'
+CommandTouchTip: dev_types.TouchTipCommandId = 'touchTip'
+CommandPickUpTip: dev_types.PickUpTipCommandId = 'pickUpTip'
+CommandDropTip: dev_types.DropTipCommandId = 'dropTip'
+CommandMoveToSlot: dev_types.MoveToSlotCommandId = 'moveToSlot'
+CommandMoveToWell: dev_types.MoveToWellCommandId = 'moveToWell'
+CommandDelay: dev_types.DelayCommandId = 'delay'
+CommandMagneticModuleEngage: dev_types.MagneticModuleEngageCommandId = 'magneticModule/engageMagnet'
+CommandMagneticModuleDisengage: dev_types.MagneticModuleDisengageCommandId = 'magneticModule/disengageMagnet'
+CommandTemperatureModuleSetTarget: dev_types.TemperatureModuleSetTargetCommandId = 'temperatureModule/setTargetTemperature'
+CommandTemperatureModuleAwait: dev_types.TemperatureModuleAwaitCommandId = 'temperatureModule/awaitTemperature'
+CommandTemperatureModuleDeactivate: dev_types.TemperatureModuleDeactivateCommandId = 'temperatureModule/deactivate'
+CommandThermocyclerSetTargetBlock: dev_types.ThermocyclerSetTargetBlockCommandId = 'thermocycler/setTargetBlockTemperature'
+CommandThermocyclerSetTargetLid: dev_types.ThermocyclerSetTargetLidCommandId = 'thermocycler/setTargetLidTemperature'
+CommandThermocyclerAwaitLidTemperature: dev_types.ThermocyclerAwaitLidTemperatureCommandId = 'thermocycler/awaitLidTemperature'
+CommandThermocyclerAwaitBlockTemperature: dev_types.ThermocyclerAwaitBlockTemperatureCommandId = 'thermocycler/awaitBlockTemperature'
+CommandThermocyclerDeactivateBlock: dev_types.ThermocyclerDeactivateBlockCommandId = 'thermocycler/deactivateBlock'
+CommandThermocyclerDeactivateLid: dev_types.ThermocyclerDeactivateLidCommandId = 'thermocycler/deactivateLid'
+CommandThermocyclerOpenLid: dev_types.ThermocyclerOpenLidCommandId = 'thermocycler/openLid'
+CommandThermocyclerCloseLid: dev_types.ThermocyclerCloseLidCommandId = 'thermocycler/closeLid'
+CommandThermocyclerRunProfile: dev_types.ThermocyclerRunProfileCommandId = 'thermocycler/runProfile'
+CommandThermocyclerAwaitProfile: dev_types.ThermocyclerAwaitProfileCommandId = 'thermocycler/awaitProfileComplete'
 
 
 class Metadata2(BaseModel):
@@ -60,7 +87,8 @@ class DesignerApplication(BaseModel):
         None, description='Version of the application that created the protocol'
     )
     data: Optional[Dict[str, Any]] = Field(
-        None, description='Any data used by the application that created this protocol'
+        None,
+        description='Any data used by the application that created this protocol'
     )
 
 
@@ -81,7 +109,8 @@ class OffsetFromBottomMm(BaseModel):
     Offset from bottom of well in millimeters
     """
 
-    offsetFromBottomMm: float = Field(..., description='Millimeters for pipette location offsets')
+    offsetFromBottomMm: float = Field(
+        ..., description='Millimeters for pipette location offsets')
 
 
 class PipetteAccessParams(BaseModel):
@@ -100,7 +129,15 @@ class FlowRate(BaseModel):
     )
 
 
-class Params(FlowRate, PipetteAccessParams, VolumeParams, OffsetFromBottomMm):
+class Params2(PipetteAccessParams, OffsetFromBottomMm):
+    pass
+
+
+class Params1(Params2, FlowRate):
+    pass
+
+
+class Params(Params1, Params2, VolumeParams):
     pass
 
 
@@ -113,10 +150,6 @@ class LiquidCommand(BaseModel):
     params: Params
 
 
-class Params1(FlowRate, PipetteAccessParams, OffsetFromBottomMm):
-    pass
-
-
 class BlowoutCommand(BaseModel):
     """
     Blowout command
@@ -124,10 +157,6 @@ class BlowoutCommand(BaseModel):
 
     command: Literal['blowout']
     params: Params1
-
-
-class Params2(PipetteAccessParams, OffsetFromBottomMm):
-    pass
 
 
 class TouchTipCommand(BaseModel):
@@ -543,7 +572,8 @@ class Labware(BaseModel):
                     "slot on the module referenced by that ID.",
     )
     definitionId: str = Field(
-        ..., description='reference to this labware\'s ID in "labwareDefinitions"'
+        ...,
+        description='reference to this labware\'s ID in "labwareDefinitions"'
     )
     displayName: Optional[str] = Field(
         None,

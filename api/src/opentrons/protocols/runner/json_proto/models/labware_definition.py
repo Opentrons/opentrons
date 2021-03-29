@@ -8,8 +8,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Dict, List, Optional
 
-from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
-from pydantic import BaseModel, Extra, Field, constr
+from pydantic import BaseModel, Extra, Field
 from typing_extensions import Literal
 
 SAFE_STRING_REGEX = '^[a-z0-9._]+$'
@@ -249,7 +248,7 @@ class Model(BaseModel):
         ...,
         description='Outer dimensions of a labware'
     )
-    wells: Dict[constr(regex=WELL_NAME_PATTERN), Wells] = Field(
+    wells: Dict[str, Wells] = Field(
         ...,
         description='Unordered object of well objects with position and '
                     'dimensional information',
