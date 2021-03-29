@@ -10,6 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING_2,
   SPACING_1,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 
 import { ModuleInfo } from './ModuleInfo'
@@ -45,7 +46,7 @@ export function ModuleItem(props: Props): React.Node {
           />
         </Box>
       </Flex>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <ModuleInfo module={module} />
         <ModuleUpdate
           hasAvailableUpdate={!!module.hasAvailableUpdate}
