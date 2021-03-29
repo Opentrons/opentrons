@@ -4,6 +4,7 @@ import mapValues from 'lodash/mapValues'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { userFacingFlags, DEPRECATED_FLAGS, type Flags } from './types'
+
 import type { Reducer } from 'redux'
 import type { RehydratePersistedAction } from '../persist'
 import type { SetFeatureFlagAction } from './actions'
