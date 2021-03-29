@@ -19,9 +19,6 @@ import type { Action } from '../types'
 // initial values. Eg `OT_PD_PRERELEASE_MODE=1 make -C protocol-designer dev`
 // will initialize PRERELEASE_MODE to true (but as per the note above, that
 // initial value is only relevant if there is no persisted value already)
-
-/* $FlowFixMe(sa, 2021-03-26): Flow thinks getFlagsFromQueryParams will overwrite explicit properties 
-/* on initialFlags even though the return type of getFlagsFromQueryParams is type Flags */
 const initialFlags: Flags = {
   PRERELEASE_MODE: process.env.OT_PD_PRERELEASE_MODE === '1' || false,
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
