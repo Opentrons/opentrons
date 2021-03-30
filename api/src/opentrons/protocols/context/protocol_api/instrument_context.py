@@ -64,9 +64,60 @@ class InstrumentContextImplementation(AbstractInstrument):
                           force_move_to_top: bool) -> None:
         """Aspirate a given volume of liquid from the specified location, using
         this pipette."""
-        self._protocol_interface.get_hardware().hardware.aspirate(
-            self._mount, volume, rate
-        )
+        self._log.debug("aspirate {} from {} at {}"
+                        .format(volume,
+                                location if location else 'current position',
+                                rate))
+
+        if isinstance(location, Well):
+            dest = location.bottom().move(
+                types.Point(0, 0, self.well_bottom_clearance.aspirate))
+        elif isinstance(location, types.Location):
+            dest = location
+        elif location is not None:
+            raise TypeError(
+                'location should be a Well or Location, but it is {}'
+                .format(location))
+        elif self._ctx.location_cache:
+            dest = self._ctx.location_cache
+        else:
+            raise RuntimeError(
+                "If aspirate is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "dispense) must previously have been called so the robot "
+                "knows where it is.")
+
+        if self.current_volume == 0:
+            # Make sure we're at the top of the labware and clear of any
+            # liquid to prepare the pipette for aspiration
+
+            if self.api_version < APIVersion(2, 3) or \
+                    not self._implementation.is_ready_to_aspirate():
+                if dest.labware.is_well:
+                    self.move_to(dest.labware.as_well().top())
+                else:
+                    # TODO(seth,2019/7/29): This should be a warning exposed
+                    #  via rpc to the runapp
+                    self._log.warning(
+                        "When aspirate is called on something other than a "
+                        "well relative position, we can't move to the top of"
+                        " the well to prepare for aspiration. This might "
+                        "cause over aspiration if the previous command is a "
+                        "blow_out.")
+                self._implementation.prepare_for_aspirate()
+            self.move_to(dest)
+        elif dest != self._ctx.location_cache:
+            self.move_to(dest)
+
+        c_vol = self._implementation.get_available_volume() \
+            if not volume else volume
+
+        do_publish(self.broker, cmds.aspirate, self.aspirate,
+                   'before', None, None, self, c_vol, dest, rate)
+        self._implementation.aspirate(volume=c_vol, rate=rate)
+        do_publish(self.broker, cmds.aspirate, self.aspirate,
+                   'after', self, None, self, c_vol, dest, rate)
+        return self
 
     def dispense(self, volume: float, rate: float) -> None:
         """Dispense a volume of liquid (in microliters/uL) using this pipette
