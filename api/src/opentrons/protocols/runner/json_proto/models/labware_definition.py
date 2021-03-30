@@ -37,7 +37,7 @@ class BrandData(BaseModel):
     )
 
 
-class DisplayCategory(Enum):
+class DisplayCategory(str, Enum):
     tipRack = 'tipRack'
     tubeRack = 'tubeRack'
     reservoir = 'reservoir'
@@ -208,7 +208,7 @@ class Group(BaseModel):
 
 
 class Model(BaseModel):
-    schemaVersion: Literal[2] = Field(
+    schemaVersion: Literal[1, 2] = Field(
         ..., description='Which schema version a labware is using'
     )
     version: int = Field(

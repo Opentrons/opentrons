@@ -56,7 +56,7 @@ CommandThermocyclerAwaitProfile:\
     dev_types.ThermocyclerAwaitProfileCommandId = 'thermocycler/awaitProfileComplete'
 
 
-class Metadata2(BaseModel):
+class Metadata(BaseModel):
     """
     Optional metadata about the protocol
     """
@@ -623,16 +623,18 @@ class Modules(BaseModel):
 
 
 class Model(BaseModel):
-    _otSharedSchema: Literal['#/protocol/schemas/5'] = Field(
-        ...,
+    otSharedSchema: Optional[
+        Literal['#/protocol/schemas/5', '#/protocol/schemas/4']
+    ] = Field(
+        None,
         alias='$otSharedSchema',
         description='The path to a valid Opentrons shared schema relative to '
                     'the shared-data directory, without its extension.',
     )
-    schemaVersion: Literal[5] = Field(
+    schemaVersion: Literal[1, 2, 3, 4, 5] = Field(
         ..., description='Schema version of a protocol is a single integer'
     )
-    metadata: Metadata2 = Field(
+    metadata: Metadata = Field(
         ...,
         description='Optional metadata about the protocol'
     )
