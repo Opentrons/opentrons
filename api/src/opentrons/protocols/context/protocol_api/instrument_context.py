@@ -244,14 +244,6 @@ class InstrumentContextImplementation(AbstractInstrument):
         """Whether a tip is attached."""
         return self.get_pipette()['has_tip']
 
-    def is_ready_to_aspirate(self) -> bool:
-        return self.get_pipette()['ready_to_aspirate']
-
-    def prepare_for_aspirate(self) -> None:
-        self._protocol_interface.get_hardware(
-
-        ).hardware.prepare_for_aspirate(self._mount)
-
     def get_return_height(self) -> float:
         """The height to return a tip to its tiprack."""
         return self.get_pipette().get('return_tip_height', 0.5)
@@ -291,3 +283,21 @@ class InstrumentContextImplementation(AbstractInstrument):
             dispense=dispense,
             blow_out=blow_out,
         )
+    
+    def _plunger_is_prepared_to_aspirate(self) -> bool:
+        return self.get_pipette()['ready_to_aspirate']
+    
+    def _prepare_plunger_to_aspirate(self) -> None:
+        hardware = self._protocol_interface.get_hardware().hardware
+        hardware.prepare_for_aspirate(self._mount)
+
+    def _aspirate_in_place(self, volume: float, rate: float) -> None:
+        """Aspirate without moving the pipette mount at all.
+        
+        Before calling this function, the plunger must already be prepared to
+        aspirate.
+        """
+        assert self._plunger_is_prepared_to_aspirate()
+        hardware = self._protocol_interface.get_hardware().hardware
+        hardware.aspirate(self._mount, volume, rate)
+

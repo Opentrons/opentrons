@@ -136,14 +136,6 @@ class AbstractInstrument(ABC):
         ...
 
     @abstractmethod
-    def is_ready_to_aspirate(self) -> bool:
-        ...
-
-    @abstractmethod
-    def prepare_for_aspirate(self) -> None:
-        ...
-
-    @abstractmethod
     def get_return_height(self) -> float:
         ...
 
