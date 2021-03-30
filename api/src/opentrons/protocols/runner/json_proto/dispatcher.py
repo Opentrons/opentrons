@@ -11,7 +11,7 @@ class DispatchError(Exception):
 
 def dispatch(command: models.AllCommands, handler: AbstractCommandHandler) -> None:
     """
-    Dispactch command to its handler.
+    Dispatch command to its handler.
 
     Args:
         command: A json protocol command
