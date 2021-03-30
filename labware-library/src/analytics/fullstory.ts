@@ -1,24 +1,20 @@
 import uniq from 'lodash/uniq'
 
 const LL_VERSION = process.env.OT_LL_VERSION
-const LL_BUILD_DATE = new Date(process.env.OT_LL_BUILD_DATE as any)
+const LL_BUILD_DATE = new Date(process.env.OT_LL_BUILD_DATE)
 
 const _getFullstory = (): Object | null => {
   const namespace = global._fs_namespace
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const fs = namespace ? (global as any)[namespace] : null
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   return fs || null
 }
 
 export const shutdownFullstory = (): void => {
   console.debug('shutting down Fullstory')
   const fs: any = _getFullstory()
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  if (fs?.shutdown && typeof fs.shutdown === 'function') {
+  if (fs && fs.shutdown) {
     fs.shutdown()
   }
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (global._fs_namespace && (global as any)[global._fs_namespace]) {
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete (global as any)[(global as any)._fs_namespace]
@@ -27,7 +23,7 @@ export const shutdownFullstory = (): void => {
 
 export const inferFsKeyWithSuffix = (
   key: string,
-  value: any
+  value: unknown
 ): string | null => {
   // semi-hacky way to provide FS with type suffix for keys in FS `properties`
   if (typeof value === 'boolean') return 'bool'
