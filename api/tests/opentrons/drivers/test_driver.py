@@ -59,39 +59,40 @@ def test_update_position(smoothie, monkeypatch):
     assert driver.position == expected
 
 
-def test_remove_serial_echo(smoothie):
-    gcode = 'G28.2B'
-    cmd = gcode
-    res = smoothie._remove_unwanted_characters(
-        cmd, cmd)
-    assert res == ''
+@pytest.mark.parametrize(
+    argnames=["cmd", "resp", "expected"],
+    argvalues=[
+        # Remove command from response
+        ["G28.2B", "G28.2B", ""],
+        ["G28.2B G1", "G28.2B G1", " "],
+        ["G28.2B G1", "G1G28.2BG1", ""],
+        # Remove command and whitespace from response
+        ["\r\nG52\r\n\r\n", "\r\nG52\r\n\r\n", ""],
+        ["\r\nG52\r\n\r\nsome-data\r\nok\r\n",
+         "\r\nG52\r\n\r\nsome-data\r\nok\r\nTESTS-RULE",
+         "TESTS-RULE"
+         ],
+        ["\r\nG52\r\n\r\nsome-data\r\nok\r\n",
+         "G52\r\n\r\nsome-data\r\nokT\r\nESTS-RULE",
+         "TESTS-RULE"],
+        # L is not a command echo but a token
+        ["M371 L \r\n\r\n",
+         "L:703130",
+         "L:703130"],
+        # R is not a command echo but a token
+        ["M3 R \r\n\r\n",
+         "M3R:703130",
+         "R:703130"]
 
-    cmd = f'\r\n{gcode}\r\n\r\n'
+    ]
+)
+def test_remove_serial_echo(
+        smoothie: driver_3_0.SmoothieDriver_3_0_0,
+        cmd: str, resp: str, expected: str):
+    """It should remove unwanted characters only."""
     res = smoothie._remove_unwanted_characters(
-        cmd,
-        cmd)
-    assert res == ''
-
-    cmd = f'\r\n{gcode}\r\n\r\nsome-data\r\nok\r\n'
-    response = cmd + "TESTS-RULE"
-    res = smoothie._remove_unwanted_characters(
-        cmd,
-        response)
-    assert res == 'TESTS-RULE'
-
-    cmd = f'\r\n{gcode}\r\n\r\nsome-data\r\nok\r\n'
-    response = cmd.strip() + '\r\nT\r\nESTS-RULE'
-    res = smoothie._remove_unwanted_characters(
-        cmd,
-        response)
-    assert res == 'TESTS-RULE'
-
-    cmd = "M371 L \r\n\r\n"
-    response = "L:70313030305F73696E676C655F76322E30000000000000000000000000000000\r\nok\r\nok\r\n"
-    res = smoothie._remove_unwanted_characters(
-        cmd,
-        response)
-    assert res == "L:70313030305F73696E676C655F76322E30000000000000000000000000000000\r\nok\r\nok\r\n"
+        cmd, resp)
+    assert res == expected
 
 
 def test_parse_position_response(smoothie):

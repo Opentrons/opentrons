@@ -1150,8 +1150,17 @@ class SmoothieDriver_3_0_0:
         # smoothieware can enter a weird state, where it repeats back
         # the sent command at the beginning of its response.
         # Check for this echo, and strips the command from the response
+        def _is_token_command(_s: str) -> bool:
+            """check if token is a command"""
+            # A single letter token cannot be assumed to be a command.
+            # For example: "M369 L" response is "L:2132121212".
+            return len(_s) > 1
+        # Split at spaces.
+        tokens = (c.strip() for c in command.strip().split(' '))
+        # A list of commands to remove from response.
         remove_from_response = [
-            c.strip() for c in command.strip().split(' ') if c.strip()]
+            c for c in tokens if _is_token_command(c)
+        ]
 
         # also removing any inadvertent newline/return characters
         # this is ok because all data we need from Smoothie is returned on
