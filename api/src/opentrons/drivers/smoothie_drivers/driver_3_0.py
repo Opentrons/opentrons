@@ -1037,7 +1037,7 @@ class SmoothieDriver_3_0_0:
         In the case of a limit-switch alarm during any command other than home,
         the robot should home the axis from the alarm and then raise a
         SmoothieError. The robot should *not* recover and continue to run the
-        protocol, as this could result in unpredicable handling of liquids.
+        protocol, as this could result in unpredictable handling of liquids.
         When a SmoothieError is raised, the user should inspect the physical
         configuration of the robot and the protocol and determine why the limit
         switch was hit unexpectedly. This is usually due to an undetected
@@ -1153,7 +1153,7 @@ class SmoothieDriver_3_0_0:
         remove_from_response = [
             c.strip() for c in command.strip().split(' ') if c.strip()]
 
-        # also removing any inadvertant newline/return characters
+        # also removing any inadvertent newline/return characters
         # this is ok because all data we need from Smoothie is returned on
         # the first line in the response
         remove_from_response += ['\r', '\n']

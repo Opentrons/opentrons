@@ -65,11 +65,13 @@ def test_remove_serial_echo(smoothie):
     res = smoothie._remove_unwanted_characters(
         cmd, cmd)
     assert res == ''
+
     cmd = f'\r\n{gcode}\r\n\r\n'
     res = smoothie._remove_unwanted_characters(
         cmd,
         cmd)
     assert res == ''
+
     cmd = f'\r\n{gcode}\r\n\r\nsome-data\r\nok\r\n'
     response = cmd + "TESTS-RULE"
     res = smoothie._remove_unwanted_characters(
@@ -83,6 +85,13 @@ def test_remove_serial_echo(smoothie):
         cmd,
         response)
     assert res == 'TESTS-RULE'
+
+    cmd = "M371 L \r\n\r\n"
+    response = "L:70313030305F73696E676C655F76322E30000000000000000000000000000000\r\nok\r\nok\r\n"
+    res = smoothie._remove_unwanted_characters(
+        cmd,
+        response)
+    assert res == "L:70313030305F73696E676C655F76322E30000000000000000000000000000000\r\nok\r\nok\r\n"
 
 
 def test_parse_position_response(smoothie):
