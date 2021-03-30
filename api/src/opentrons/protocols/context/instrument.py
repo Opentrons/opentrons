@@ -23,10 +23,23 @@ class AbstractInstrument(ABC):
         ...
 
     @abstractmethod
-    def aspirate(self,
-                 volume: float,
-                 rate: float) -> None:
-        ...
+    def move_and_aspirate(self,
+                          volume: float,
+                          rate: float,
+                          location: types.Location,
+                          force_move_to_top: bool) -> None:
+        """Move to a location and then aspirate from it.
+        
+        If the plunger is currently in a blowout position, it needs to be reset
+        to 0 before aspirating. If necessary, this method will do this
+        automatically. If the given location is a well, it will attempt to do
+        it at the top of that well.
+        
+        If ``force_move_to_top`` is ``True``, this method will temporarily move
+        the pipette to the top of the given well even if the plunger doesn't
+        need to be reset. This was the behavior of all aspirates before Python
+        Protocol API v2.3.
+        """
 
     @abstractmethod
     def dispense(self,

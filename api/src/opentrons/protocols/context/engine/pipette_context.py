@@ -21,10 +21,20 @@ class PipetteContext(AbstractInstrument):
     def set_default_speed(self, speed: float) -> None:
         raise NotImplementedError()
 
-    def aspirate(self,
-                 volume: float,
-                 rate: float) -> None:
-        raise NotImplementedError()
+    def move_and_aspirate(self,
+                          volume: float,
+                          rate: float,
+                          location: types.Location,
+                          force_move_to_top: bool) -> None:
+        if rate != 1:
+            raise NotImplementedError(
+                "Protocol Engine does not yet support adjusting flow rate.")
+        if force_move_to_top:
+            # force_move_to_top is only used for emulating
+            # pre-v2.3 Python Protocol API behavior, which Protocol Engine
+            # doesn't attempt.
+            raise NotImplementedError()
+        raise NotImplementedError()  # fix before merging
 
     def dispense(self,
                  volume: float,
