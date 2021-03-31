@@ -1567,8 +1567,8 @@ class SmoothieDriver_3_0_0:
         if 'Y' in axis:
             axis += 'X'
         # If horizontal movement is requested, ensure we raise the instruments
-        if 'X' in axis:
-            axis += 'ZA'
+        # if 'X' in axis:
+        #     axis += 'ZA'
         # These two additions are safe even if they duplicate requested axes
         # because of the use of set operations below, which will de-duplicate
         # characters from the resulting string
