@@ -4,7 +4,7 @@ import styles from './styles.css'
 
 import type { Submenu } from './types'
 
-type Props = Submenu & {
+interface Props extends Submenu {
   active: boolean
 }
 

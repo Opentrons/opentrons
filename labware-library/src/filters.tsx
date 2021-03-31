@@ -22,10 +22,10 @@ export function getAllCategories(): string[] {
 export function getAllManufacturers(): string[] {
   const definitions = getAllDefinitions()
   const brands = definitions.map(d => d.brand.brand)
-  const wellGroupBrands = flatMap<LabwareDefinition, string | undefined>(
+  const wellGroupBrands = flatMap<LabwareDefinition, string>(
     definitions,
-    d => d.groups.map(g => g.brand?.brand).filter(Boolean)
-  ) as string[]
+    d => d.groups.map(g => g.brand?.brand).filter(Boolean) as string[]
+  )
 
   return uniq([FILTER_OFF, ...brands, ...wellGroupBrands])
 }
@@ -40,8 +40,10 @@ export function useFilters(location: Location): FilterParams {
   // before paint if needed
   useLayoutEffect(() => {
     const queryParams = queryString.parse(location.search)
-    const category = queryParams.category || FILTER_OFF
-    const manufacturer = queryParams.manufacturer || FILTER_OFF
+    // TODO(IL, 2021-03-31): handle possible string[] (instead of string) in query param
+    // (eg category=tipRack&category=wellPlate will return ["tipRack", "wellPlate"])
+    const category = (queryParams.category as string) || FILTER_OFF
+    const manufacturer = (queryParams.manufacturer as string) || FILTER_OFF
 
     setParams({ category, manufacturer })
   }, [location.search])

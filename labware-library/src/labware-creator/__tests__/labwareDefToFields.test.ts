@@ -1,10 +1,12 @@
 import { labwareDefToFields } from '../labwareDefToFields'
-// @ts-expect-error(2021-03-24): shared-data fixtures aren't proper LabwareDefinition2 type!
-import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
-// @ts-expect-error(2021-03-24): shared-data fixtures aren't proper LabwareDefinition2 type!
-import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough'
-// @ts-expect-error(2021-03-24): shared-data fixtures aren't proper LabwareDefinition2 type!
-import fixtureIrregularExample1 from '@opentrons/shared-data/labware/fixtures/2/fixture_irregular_example_1'
+import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import _fixtureIrregularExample1 from '@opentrons/shared-data/labware/fixtures/2/fixture_irregular_example_1.json'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
+const fixture96Plate = _fixture96Plate as LabwareDefinition2
+const fixture12Trough = _fixture12Trough as LabwareDefinition2
+const fixtureIrregularExample1 = _fixtureIrregularExample1 as LabwareDefinition2
 
 jest.mock('../../definitions')
 
@@ -38,7 +40,7 @@ describe('labwareDefToFields', () => {
       wellDepth: '10.54',
       wellShape: 'circular',
 
-      wellDiameter: String(def.wells.A1.diameter),
+      wellDiameter: '6.4',
 
       // used with rectangular well shape only
       wellXDimension: null,

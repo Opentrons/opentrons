@@ -16,12 +16,10 @@ export class MobileNav extends React.Component<Props, State> {
 
   toggle: () => void = () => {
     this.setState({ isOpen: !this.state.isOpen })
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-optional-chain
     document.body && document.body.classList.toggle('no_scroll')
   }
 
   componentWillUnmount(): void {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-optional-chain
     document.body && document.body.classList.remove('no_scroll')
   }
 

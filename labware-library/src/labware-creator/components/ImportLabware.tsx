@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { PrimaryButton, Icon } from '@opentrons/components'
 import styles from './importLabware.css'
+import type { ButtonProps } from '@opentrons/components'
 
 interface Props {
   onUpload: (e: React.FormEvent<HTMLInputElement> | DragEvent) => void
@@ -31,7 +32,7 @@ function UploadInput(props: UploadInputProps): JSX.Element {
     ? 'upload labware file'
     : 'Drag and drop labware file here'
 
-  const labelProps = isButton
+  const labelProps: ButtonProps = isButton
     ? {
         Component: 'label',
         className: styles.upload_button,
@@ -40,7 +41,6 @@ function UploadInput(props: UploadInputProps): JSX.Element {
 
   return (
     <div className={styles.upload} onDragOver={stopEvent} onDrop={stopEvent}>
-      {/* @ts-expect-error(IL, 2021-03-24): resolve with TS conversion or by using PrimaryBtn */}
       <Label {...labelProps}>
         {!isButton && <Icon name="upload" className={styles.file_drop_icon} />}
         <span className={styles.label_text}>{labelText}</span>

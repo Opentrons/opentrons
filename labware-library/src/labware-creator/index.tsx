@@ -506,7 +506,9 @@ export const LabwareCreator = (): JSX.Element => {
             `test_${loadName}.py`,
             labwareTestProtocol({ pipetteName, definition: def })
           )
-          // @ts-expect-error(IL, 2021-03-24): JSZip not typed
+
+          // TODO(IL, 2021-03-31): add `catch`
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           zip.generateAsync({ type: 'blob' }).then(blob => {
             saveAs(blob, `${loadName}.zip`)
           })

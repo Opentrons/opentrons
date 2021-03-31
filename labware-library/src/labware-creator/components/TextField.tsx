@@ -4,11 +4,10 @@ import { InputField } from '@opentrons/components'
 import { reportFieldEdit } from '../analyticsUtils'
 import { getIsHidden } from '../formSelectors'
 import { LABELS } from '../fields'
+import type { InputFieldProps } from '@opentrons/components'
 import type { LabwareFields } from '../fields'
 import type { FieldProps } from 'formik'
 import fieldStyles from './fieldStyles.css'
-
-type InputFieldProps = React.ComponentProps<typeof InputField>
 
 interface Props {
   name: keyof LabwareFields

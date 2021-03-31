@@ -2,11 +2,13 @@ import { labwareDefToFields } from '../labwareDefToFields'
 import { fieldsToLabware } from '../fieldsToLabware'
 import { labwareFormSchema } from '../labwareFormSchema'
 import { DEFAULT_CUSTOM_NAMESPACE } from '@opentrons/shared-data'
-// @ts-expect-error(2021-03-24): shared-data fixtures aren't proper LabwareDefinition2 type!
-import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
-// @ts-expect-error(2021-03-24): shared-data fixtures aren't proper LabwareDefinition2 type!
-import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough'
+import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ProcessedLabwareFields } from '../fields'
+
+const fixture96Plate = _fixture96Plate as LabwareDefinition2
+const fixture12Trough = _fixture12Trough as LabwareDefinition2
 
 jest.mock('../../definitions')
 

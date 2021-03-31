@@ -5,11 +5,12 @@ import { reportFieldEdit } from '../analyticsUtils'
 import { getIsHidden } from '../formSelectors'
 import { LABELS } from '../fields'
 import type { LabwareFields } from '../fields'
+import type { RadioGroupProps } from '@opentrons/components'
 import fieldStyles from './fieldStyles.css'
 
 interface Props {
   name: keyof LabwareFields
-  options: React.ComponentProps<typeof RadioGroup>['options']
+  options: RadioGroupProps['options']
   labelTextClassName?: string | null | undefined
 }
 
