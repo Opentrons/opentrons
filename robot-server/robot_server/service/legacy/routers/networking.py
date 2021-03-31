@@ -22,10 +22,10 @@ router = APIRouter()
 
 
 @router.get("/networking/status",
-            description="Query the current network connectivity state",
-            summary="Gets information about the OT-2's network interfaces "
-                    "including their connectivity, their "
-                    "addresses, and their networking info",
+            summary="Query the current network connectivity state",
+            description="Gets information about the OT-2's network interfaces "
+                        "including their connectivity, their "
+                        "addresses, and their networking info",
             response_model=NetworkingStatus)
 async def get_networking_status() -> NetworkingStatus:
     try:
@@ -45,10 +45,10 @@ async def get_networking_status() -> NetworkingStatus:
 
 
 @router.get("/wifi/list",
-            description="Scan for visible WiFi networks",
-            summary="Scans for beaconing WiFi networks and returns the list of"
-                    " visible ones along with some data about their security "
-                    "and strength",
+            summary="Scan for visible Wi-Fi networks",
+            description="Scans for beaconing WiFi networks and returns the list of "
+                        "visible ones along with some data about their security "
+                        "and strength",
             response_model=WifiNetworks)
 async def get_wifi_networks() -> WifiNetworks:
     networks = await nmcli.available_ssids()
@@ -56,9 +56,9 @@ async def get_wifi_networks() -> WifiNetworks:
 
 
 @router.post("/wifi/configure",
-             description="Configure the OT-2's WiFi",
-             summary="Configures the wireless network interface to connect to"
-                     " a network",
+             summary="Configure the OT-2's Wi-Fi",
+             description="Configures the wireless network interface to connect to"
+                         " a network",
              response_model=WifiConfigurationResponse,
              responses={
                  status.HTTP_401_UNAUTHORIZED: {"model": V1BasicResponse}
@@ -181,9 +181,9 @@ async def get_eap_options() -> EapOptions:
 
 
 @router.post("/wifi/disconnect",
-             description="Disconnect the OT-2 from WiFi network",
-             summary="Deactivates the wifi connection and removes it from "
-                     "known connections",
+             summary="Disconnect the OT-2 from Wi-Fi",
+             description="Deactivates the Wi-Fi connection and removes it from "
+                         "known connections",
              response_model=V1BasicResponse,
              responses={status.HTTP_200_OK: {"model": V1BasicResponse}},
              status_code=status.HTTP_207_MULTI_STATUS)

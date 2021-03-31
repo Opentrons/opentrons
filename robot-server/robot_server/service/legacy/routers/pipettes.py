@@ -11,14 +11,14 @@ router = APIRouter()
 
 
 @router.get("/pipettes",
-            description="Get the pipettes currently attached",
-            summary="This endpoint lists properties of the pipettes currently "
-                    "attached to the robot like name, model, and mount. It "
-                    "queries a cached value unless the refresh query parameter"
-                    " is set to true, in which case it will actively scan for "
-                    "pipettes. This requires disabling the pipette motors "
-                    "(which is done automatically) and therefore should only "
-                    "be done through user intent",
+            summary="Get the pipettes currently attached",
+            description="This endpoint lists properties of the pipettes currently "
+                        "attached to the robot like name, model, and mount. It "
+                        "queries a cached value unless the refresh query parameter"
+                        " is set to true, in which case it will actively scan for "
+                        "pipettes. This requires disabling the pipette motors "
+                        "(which is done automatically) and therefore should only "
+                        "be done through user intent",
             response_model=pipettes.PipettesByMount)
 async def get_pipettes(
         refresh: typing.Optional[bool] = Query(
