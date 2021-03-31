@@ -40,6 +40,9 @@ class InstrumentContextSimulation(AbstractInstrument):
     def set_default_speed(self, speed: float) -> None:
         self._default_speed = speed
 
+    # FIX BEFORE MERGE: Ugh. Gotta figure out what it means to "simulate" a
+    # move_and_aspirate(). How much of the prepare_for_aspirate() logic do we
+    # need to reimplement here?
     def aspirate(self, volume: float, rate: float) -> None:
         self._pipette_dict['current_volume'] += volume
 

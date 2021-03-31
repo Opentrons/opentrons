@@ -75,6 +75,8 @@ class InstrumentContextImplementation(AbstractInstrument):
                         speed=None
                     )
                 else:
+                    # FIX BEFORE MERGE: self._log doesn't exist here. What
+                    # should it be?
                     # TODO(seth,2019/7/29): This should be a warning exposed
                     #  via rpc to the runapp
                     self._log.warning(
@@ -101,6 +103,13 @@ class InstrumentContextImplementation(AbstractInstrument):
         c_vol = self.get_available_volume() \
             if not volume else volume
 
+        # FIX BEFORE MERGE: I don't understand what these do_publish things
+        # are, but we presumably need to retain them.
+        #
+        # Give this AbstractInstrument a broker when it's constructed?
+        #
+        # What does "self.aspirate" mean here? Is it safe to change to
+        # "self.aspirate_in_place"?
         do_publish(self.broker, cmds.aspirate, self.aspirate,
                    'before', None, None, self, c_vol, location, rate)
         self._aspirate_in_place(volume=c_vol, rate=rate)
