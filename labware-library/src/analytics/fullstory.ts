@@ -15,9 +15,9 @@ export const shutdownFullstory = (): void => {
   if (fs && fs.shutdown) {
     fs.shutdown()
   }
-  if (global._fs_namespace && (global as any)[global._fs_namespace]) {
+  if (global._fs_namespace && global[global._fs_namespace]) {
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete (global as any)[(global as any)._fs_namespace]
+    delete global[global._fs_namespace]
   }
 }
 

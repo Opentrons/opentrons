@@ -47,7 +47,7 @@ export const TextField = (props: Props): JSX.Element => {
               caption={caption}
               placeholder={placeholder}
               onChange={makeHandleChange({ field, form })}
-              onBlur={(e: React.FormEvent<HTMLInputElement>) => {
+              onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
                 reportFieldEdit({ value: field.value, name: field.name })
                 field.onBlur(e)
               }}

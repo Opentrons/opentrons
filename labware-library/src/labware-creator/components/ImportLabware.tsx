@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { PrimaryButton, Icon } from '@opentrons/components'
 import styles from './importLabware.css'
-import type { ButtonProps } from '@opentrons/components'
 
 interface Props {
-  onUpload: (e: React.FormEvent<HTMLInputElement> | DragEvent) => void
+  onUpload: React.DragEventHandler<HTMLLabelElement> &
+    React.ChangeEventHandler<HTMLInputElement>
 }
 
 interface UploadInputProps {
@@ -21,7 +21,7 @@ export function ImportLabware(props: Props): JSX.Element {
   )
 }
 
-const stopEvent = (e: React.FormEvent): void => e.preventDefault()
+const stopEvent = (e: React.SyntheticEvent): void => e.preventDefault()
 
 function UploadInput(props: UploadInputProps): JSX.Element {
   const { isButton, onUpload } = props
@@ -32,9 +32,9 @@ function UploadInput(props: UploadInputProps): JSX.Element {
     ? 'upload labware file'
     : 'Drag and drop labware file here'
 
-  const labelProps: ButtonProps = isButton
+  const labelProps = isButton
     ? {
-        Component: 'label',
+        Component: 'label' as const,
         className: styles.upload_button,
       }
     : { onDrop: onUpload, className: styles.file_drop }

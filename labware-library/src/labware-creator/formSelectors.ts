@@ -68,13 +68,11 @@ export const getIsHidden = (
 const _valuesToCreateNameArgs = (values: LabwareFields): any => {
   const gridRows = Number(values.gridRows) || 1
   const gridColumns = Number(values.gridColumns) || 1
-  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const brand = (values.brand || '').trim()
 
   return {
     gridColumns,
     gridRows,
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     displayCategory: values.labwareType || '',
     displayVolumeUnits: DISPLAY_VOLUME_UNITS,
     brandName: brand === '' ? undefined : brand,
