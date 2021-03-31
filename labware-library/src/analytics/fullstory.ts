@@ -3,7 +3,7 @@ import uniq from 'lodash/uniq'
 const LL_VERSION = process.env.OT_LL_VERSION
 const LL_BUILD_DATE = new Date(process.env.OT_LL_BUILD_DATE)
 
-const _getFullstory = (): Object | null => {
+const _getFullstory = (): FullStory.FullStory | null => {
   const namespace = global._fs_namespace
   const fs = namespace ? (global as any)[namespace] : null
   return fs || null
@@ -55,7 +55,6 @@ export const fullstoryEvent = (
 ): void => {
   // NOTE: make sure user has opted in before calling this fn
   const fs = _getFullstory()
-  // @ts-expect-error(sa, 2021-03-26): add event to _getFullstory return type
   if (fs && fs.event) {
     // NOTE: fullstory requires property names to have type suffix
     // https://help.fullstory.com/hc/en-us/articles/360020623234#Custom%20Property%20Name%20Requirements
@@ -65,7 +64,6 @@ export const fullstoryEvent = (
       const name: string = suffix === null ? key : `${key}_${suffix}`
       return { ...acc, [name]: value }
     }, {})
-    // @ts-expect-error(sa, 2021-03-26): accurately type _getFullstory return value
     fs.event(name, _parameters)
   }
 }
