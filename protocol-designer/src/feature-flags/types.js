@@ -27,7 +27,6 @@ export type FlagTypes =
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: Array<FlagTypes> = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
-  'OT_PD_ENABLE_BATCH_EDIT_MIX',
 ]
 
 export const allFlags: Array<FlagTypes> = [
