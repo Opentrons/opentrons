@@ -3338,7 +3338,7 @@
   resolved "https://registry.yarnpkg.com/@types/classnames/-/classnames-2.2.5.tgz#62945b24b48dc02fb32e89252bde3daf942c4235"
   integrity sha512-zGjPvgyTSpD+ow5YfWRVGC4HrgAm5L1lF+SBwGyxQyqHwNE/5fXmXDEhdqcIVrpol6FhBehsGYIzJ7FdGvc0BA==
 
-"@types/classnames@^2.2.11", "@types/classnames@^2.2.5":
+"@types/classnames@^2.2.5":
   version "2.2.11"
   resolved "https://registry.yarnpkg.com/@types/classnames/-/classnames-2.2.11.tgz#2521cc86f69d15c5b90664e4829d84566052c1cf"
   integrity sha512-2koNhpWm3DgWRp5tpkiJ8JGc1xTn2q0l+jUNUE7oMKXUf5NpI9AIdC4kbjGNFBdHtcxBD18LAksoudAVhFKCjw==

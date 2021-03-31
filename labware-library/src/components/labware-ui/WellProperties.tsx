@@ -11,8 +11,6 @@ import {
 import { getWellLabel } from './labels'
 import { LabelText, Value, LABEL_TOP } from '../ui'
 import styles from './styles.css'
-import type { IconName } from '@opentrons/components'
-import type { WellBottomShape } from '@opentrons/shared-data'
 import type {
   LabwareDefinition,
   LabwareWellGroupProperties,
@@ -50,11 +48,11 @@ export function AllWellProperties(props: AllWellPropertiesProps): JSX.Element {
   )
 }
 
-const BOTTOM_SHAPE_TO_ICON: Record<WellBottomShape, IconName> = {
+const BOTTOM_SHAPE_TO_ICON = {
   v: 'ot-v-bottom',
   u: 'ot-u-bottom',
   flat: 'ot-flat-bottom',
-}
+} as const
 
 export function WellProperties(props: WellPropertiesProps): JSX.Element {
   const {
