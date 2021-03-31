@@ -14,11 +14,11 @@ router = APIRouter()
             response_model=Health,
             summary="Retrieve some useful information about supported API "
                     "versions, names, and so on",
-            description="The /health endpoint is a good one to check to see if "
-                        "you're communicating with an OT-2 with a properly booted "
-                        "API server. If it returns OK, all is well. It also can "
-                        "be used to pull information like the robot software "
-                        "version and name.",
+            description="The /health endpoint is a good one to check to see "
+                        "if you're communicating with an OT-2 with a properly "
+                        "booted API server. If it returns OK, all is well. "
+                        "It also can be used to pull information like the "
+                        "robot software version and name.",
             response_description="OT-2 /health response")
 async def get_health(
         hardware: ThreadManager = Depends(get_hardware)) -> Health:
