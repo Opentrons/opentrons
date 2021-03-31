@@ -5,13 +5,13 @@ const LL_BUILD_DATE = new Date(process.env.OT_LL_BUILD_DATE)
 
 const _getFullstory = (): FullStory.FullStory | null => {
   const namespace = global._fs_namespace
-  const fs = namespace ? (global as any)[namespace] : null
+  const fs = namespace ? global[namespace] : null
   return fs || null
 }
 
 export const shutdownFullstory = (): void => {
   console.debug('shutting down Fullstory')
-  const fs: any = _getFullstory()
+  const fs = _getFullstory()
   if (fs && fs.shutdown) {
     fs.shutdown()
   }
@@ -69,7 +69,7 @@ export const fullstoryEvent = (
 }
 
 export const _setAnalyticsTags = (): void => {
-  const fs: any = _getFullstory()
+  const fs = _getFullstory()
   // NOTE: fullstory expects the keys 'displayName' and 'email' verbatim
   // though all other key names must be fit the schema described here
   // https://help.fullstory.com/hc/en-us/articles/360020623294
