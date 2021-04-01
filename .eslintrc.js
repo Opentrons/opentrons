@@ -61,6 +61,7 @@ module.exports = {
       // TODO(mc, 2021-03-18): remove to default these rules back to errors
       files: ['**/*.@(ts|tsx)'],
       rules: {
+        '@typescript-eslint/dot-notation': 'warn',
         '@typescript-eslint/strict-boolean-expressions': 'warn',
         '@typescript-eslint/prefer-nullish-coalescing': 'warn',
         '@typescript-eslint/prefer-optional-chain': 'warn',
