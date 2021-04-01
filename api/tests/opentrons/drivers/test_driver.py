@@ -1,6 +1,7 @@
 from copy import deepcopy
 from unittest.mock import Mock
 import pytest
+from opentrons.drivers.types import MoveSplit
 
 from tests.opentrons.conftest import fuzzy_assert
 from opentrons.config.robot_configs import (
@@ -58,46 +59,44 @@ def test_update_position(smoothie, monkeypatch):
     assert driver.position == expected
 
 
-def test_remove_serial_echo(smoothie, monkeypatch):
-    smoothie.simulating = False
+@pytest.mark.parametrize(
+    argnames=["cmd", "resp", "expected"],
+    argvalues=[
+        # Remove command from response
+        ["G28.2B", "G28.2B", ""],
+        ["G28.2B G1", "G28.2B G1", " "],
+        ["G28.2B G1", "G1G28.2BG1", ""],
+        # Remove command and whitespace from response
+        ["\r\nG52\r\n\r\n", "\r\nG52\r\n\r\n", ""],
+        ["\r\nG52\r\n\r\nsome-data\r\nok\r\n",
+         "\r\nG52\r\n\r\nsome-data\r\nok\r\nTESTS-RULE",
+         "TESTS-RULE"
+         ],
+        ["\r\nG52\r\n\r\nsome-data\r\nok\r\n",
+         "G52\r\n\r\nsome-data\r\nokT\r\nESTS-RULE",
+         "TESTS-RULE"],
+        # L is not a command echo but a token
+        ["M371 L \r\n\r\n",
+         "L:703130",
+         "L:703130"],
+        # R is not a command echo but a token
+        ["M3 R \r\n\r\n",
+         "M3R:703130",
+         "R:703130"]
 
-    def return_echo_response(command, ack, connection, timeout, tag=None):
-        if 'some-data' in command:
-            return command + 'TESTS-RULE'
-        return command
-
-    monkeypatch.setattr(serial_communication, 'write_and_return',
-                        return_echo_response)
-
-    cmd = 'G28.2B'
-    res = smoothie._send_command(
-        cmd, driver_3_0.SMOOTHIE_ACK)
-    assert res == ''
-    res = smoothie._send_command(
-        '\r\n' + cmd + '\r\n\r\n',
-        driver_3_0.SMOOTHIE_ACK)
-    assert res == ''
-    res = smoothie._send_command(
-        '\r\n' + cmd + '\r\n\r\nsome-data\r\nok\r\n',
-        driver_3_0.SMOOTHIE_ACK)
-    assert res == 'TESTS-RULE'
-
-    def return_echo_response(command, ack, connection, timeout, tag=None):
-        if 'some-data' in command:
-            return command.strip() + '\r\nT\r\nESTS-RULE'
-        return command
-
-    monkeypatch.setattr(serial_communication, 'write_and_return',
-                        return_echo_response)
-
-    res = smoothie._send_command(
-        '\r\n' + cmd + '\r\n\r\nsome-data\r\nok\r\n',
-        driver_3_0.SMOOTHIE_ACK)
-    assert res == 'TESTS-RULE'
+    ]
+)
+def test_remove_serial_echo(
+        smoothie: driver_3_0.SmoothieDriver_3_0_0,
+        cmd: str, resp: str, expected: str):
+    """It should remove unwanted characters only."""
+    res = smoothie._remove_unwanted_characters(
+        cmd, resp)
+    assert res == expected
 
 
 def test_parse_position_response(smoothie):
-    good_data = 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
+    good_data = 'ok M114.2 X:10 Y:20 Z:30 A:40 B:50 C:60'
     bad_data = 'ok M114.2 X:10 Y:20: Z:30A:40 B:50 C:60'
     res = driver_3_0._parse_position_response(good_data)
     expected = {
@@ -141,15 +140,15 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
     smoothie.dwell_axes('BCY')
     smoothie._set_saved_current()
     expected = [
-        ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4 P0.005'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X1.25 Y1.25 Z0.1 G4P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X1.25 Y1.25 Z0.1 G4 P0.005'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4 P0.005'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
         ['M400'],
     ]
 
@@ -176,11 +175,11 @@ def test_disable_motor(smoothie, monkeypatch):
     smoothie.disengage_axis('XYZ')
     smoothie.disengage_axis('ABCD')
     expected = [
-        ['M18X'],
+        ['M18 X'],
         ['M400'],
-        ['M18[XYZ]+'],
+        ['M18 [XYZ]+'],
         ['M400'],
-        ['M18[ABC]+'],
+        ['M18 [ABC]+'],
         ['M400'],
     ]
     fuzzy_assert(result=command_log, expected=expected)
@@ -206,37 +205,37 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.home()
     expected = [
-        ['M907 A0.8 B0.05 C0.05 X0.3 Y0.3 Z0.8 G4P0.005 G28.2.+[ABCZ].+'],
+        ['M907 A0.8 B0.05 C0.05 X0.3 Y0.3 Z0.8 G4 P0.005 G28.2.+[ABCZ].+'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
         ['M400'],
         ['M203.1 Y50'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4P0.005 G91 G0Y-28 G0Y10 G90'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4 P0.005 G91 G0 Y-28 G0 Y10 G90'],
         ['M400'],
         ['M203.1 X80'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G28.2X'],
+        ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4 P0.005 G28.2 X'],
         ['M400'],
         ['M203.1 A125 B40 C40 X600 Y400 Z125'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
         ['M400'],
         ['M203.1 Y80'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4P0.005 G28.2Y'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4 P0.005 G28.2 Y'],
         ['M400'],
         ['M203.1 Y8'],
         ['M400'],
-        ['G91 G0Y-3 G90'],
+        ['G91 G0 Y-3 G90'],
         ['M400'],
-        ['G28.2Y'],
+        ['G28.2 Y'],
         ['M400'],
-        ['G91 G0Y-3 G90'],
+        ['G91 G0 Y-3 G90'],
         ['M400'],
         ['M203.1 A125 B40 C40 X600 Y400 Z125'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
         ['M400'],
         ['M114.2'],
         ['M400'],
@@ -246,7 +245,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'A': 3})
     expected = [
-        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+'],
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005 G0.+'],
         ['M400'],
     ]
     fuzzy_assert(result=command_log, expected=expected)
@@ -254,9 +253,9 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'B': 2})
     expected = [
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B2'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005 G0 B2'],
         ['M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
         ['M400'],
     ]
     fuzzy_assert(result=command_log, expected=expected)
@@ -271,13 +270,85 @@ def test_plunger_commands(smoothie, monkeypatch):
         'C': 5.55})
     expected = [
         # Set active axes high
-        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+[BC].+'],
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005 G0.+[BC].+'],
         ['M400'],
         # Set plunger current low
-        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005'],
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005'],
         ['M400'],
     ]
     fuzzy_assert(result=command_log, expected=expected)
+
+
+def test_move_with_split(smoothie, monkeypatch):
+    command_log = []
+    smoothie._setup()
+    smoothie.home()
+    smoothie.simulating = False
+
+    smoothie.configure_splits_for(
+        {
+            "B": MoveSplit(
+                split_distance=1,
+                split_current=1.75,
+                split_speed=1,
+                after_time=1800,
+                fullstep=True),
+            "C": MoveSplit(
+                split_distance=1,
+                split_current=1.75,
+                split_speed=1,
+                after_time=1800,
+                fullstep=True)
+        }
+    )
+    smoothie._steps_per_mm = {"B": 1.0, "C": 1.0}
+
+    def write_with_log(command, ack, connection, timeout, tag=None):
+        command_log.append(command.strip())
+        return driver_3_0.SMOOTHIE_ACK
+
+    def _parse_position_response(arg):
+        return smoothie.position
+
+    monkeypatch.setattr(
+        serial_communication, 'write_and_return', write_with_log)
+    monkeypatch.setattr(
+        driver_3_0, '_parse_position_response', _parse_position_response)
+
+    smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'C': 3})
+    expected = [
+        ['M55 M92 C0.03125 G4 P0.01 G0 F60 M907 A0.1 B0.05 C1.75 X1.25 Y1.25 '
+         'Z0.8 G4 P0.005'],
+        ['M400'],
+        ['G0 C18.0'],
+        ['M400'],
+        ['M54 M92 C1.0 G4 P0.01'],
+        ['M400'],
+        ['G0 F24000 M907 A0.1 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005 G0.+'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005'],
+        ['M400'],
+    ]
+    fuzzy_assert(result=command_log, expected=expected)
+    command_log = []
+
+    smoothie.move({'B': 2})
+
+    expected = [
+        ['M53 M92 B0.03125 G4 P0.01 G0 F60 M907 A0.1 B1.75 C0.05 '
+         'X0.3 Y0.3 Z0.1 G4 P0.005'],
+        ['M400'],
+        ['G0 B18.0'],
+        ['M400'],
+        ['M52 M92 B1.0 G4 P0.01'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005 G0 B2'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
+        ['M400'],
+    ]
+    fuzzy_assert(result=command_log, expected=expected)
+    command_log = []
 
 
 def test_set_active_current(smoothie, monkeypatch):
@@ -309,18 +380,18 @@ def test_set_active_current(smoothie, monkeypatch):
     smoothie.home('BC')
     expected = [
         # move all
-        ['M907 A2 B2 C2 X2 Y2 Z2 G4P0.005 G0A0B0C0X0Y0Z0'],
+        ['M907 A2 B2 C2 X2 Y2 Z2 G4 P0.005 G0 A0 B0 C0 X0 Y0 Z0'],
         ['M400'],
-        ['M907 A2 B0 C0 X2 Y2 Z2 G4P0.005'],  # disable BC axes
+        ['M907 A2 B0 C0 X2 Y2 Z2 G4 P0.005'],  # disable BC axes
         ['M400'],
         # move BC
-        ['M907 A0 B2 C2 X0 Y0 Z0 G4P0.005 G0B1.3C1.3 G0B1C1'],
+        ['M907 A0 B2 C2 X0 Y0 Z0 G4 P0.005 G0 B1.3 C1.3 G0 B1 C1'],
         ['M400'],
-        ['M907 A0 B0 C0 X0 Y0 Z0 G4P0.005'],  # disable BC axes
+        ['M907 A0 B0 C0 X0 Y0 Z0 G4 P0.005'],  # disable BC axes
         ['M400'],
-        ['M907 A0 B0.42 C0.42 X0 Y0 Z0 G4P0.005 G28.2BC'],  # home BC
+        ['M907 A0 B0.42 C0.42 X0 Y0 Z0 G4 P0.005 G28.2 BC'],  # home BC
         ['M400'],
-        ['M907 A0 B0 C0 X0 Y0 Z0 G4P0.005'],  # dwell all axes after home
+        ['M907 A0 B0 C0 X0 Y0 Z0 G4 P0.005'],  # dwell all axes after home
         ['M400'],
         ['M114.2'],  # update the position
         ['M400'],
@@ -445,14 +516,16 @@ def test_read_and_write_pipettes(smoothie, monkeypatch):
     def _new_send_message(
             command, timeout=None, suppress_error_msg=True):
         nonlocal written_id, written_model, mount
-        if driver_3_0.GCODES['READ_INSTRUMENT_ID'] in command:
+        if driver_3_0.GCODE.READ_INSTRUMENT_ID in command:
             return mount + ': ' + written_id
-        elif driver_3_0.GCODES['READ_INSTRUMENT_MODEL'] in command:
+        elif driver_3_0.GCODE.READ_INSTRUMENT_MODEL in command:
             return mount + ': ' + written_model
-        if driver_3_0.GCODES['WRITE_INSTRUMENT_ID'] in command:
-            written_id = command[command.index(mount) + 1:]
-        elif driver_3_0.GCODES['WRITE_INSTRUMENT_MODEL'] in command:
-            written_model = command[command.index(mount) + 1:]
+        if driver_3_0.GCODE.WRITE_INSTRUMENT_ID in command:
+            cmdstr = str(command)
+            written_id = cmdstr[cmdstr.index(mount) + 1:]
+        elif driver_3_0.GCODE.WRITE_INSTRUMENT_MODEL in command:
+            cmdstr = str(command)
+            written_model = cmdstr[cmdstr.index(mount) + 1:]
 
     monkeypatch.setattr(driver, '_send_command', _new_send_message)
 
@@ -591,10 +664,10 @@ def test_clear_limit_switch(smoothie, monkeypatch):
     def write_mock(command, ack, serial_connection, timeout, tag=None):
         nonlocal cmd_list
         cmd_list.append(command)
-        if driver_3_0.GCODES['MOVE'] in command:
+        if driver_3_0.GCODE.MOVE in command:
             return "ALARM: Hard limit +C"
-        elif driver_3_0.GCODES['CURRENT_POSITION'] in command:
-            return 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
+        elif driver_3_0.GCODE.CURRENT_POSITION in command:
+            return 'ok M114.2 X:10 Y:20 Z:30 A:40 B:50 C:60'
         else:
             return "ok"
 
@@ -607,19 +680,84 @@ def test_clear_limit_switch(smoothie, monkeypatch):
 
     assert [c.strip() for c in cmd_list] == [
         # attempt to move and fail
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005 G0 C100.3 G0 C100',
         # recover from failure
         'M999',
         'M400',
         # set current for homing the failed axis (C)
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005 G28.2 C',
         'M400',
         # set current back to idling after home
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005',
         'M400',
         # update position
         'M114.2',
         'M400',
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005',
         'M400',
+    ]
+
+
+def test_update_pipette_config(smoothie, monkeypatch):
+    driver = smoothie
+    cmd_list = []
+
+    def _send_command_mock(command):
+        nonlocal cmd_list
+        cmd_list.append(command)
+        return "ok"
+
+    monkeypatch.setattr(driver, '_send_command', _send_command_mock)
+
+    driver.simulating = False
+
+    driver.update_pipette_config("X", {
+        'retract': 2,
+        'debounce': 3,
+        'max_travel': 4,
+        'home': 5
+    })
+
+    assert [c.build().strip() for c in cmd_list] == [
+        "M365.3 X2",
+        "M365.2 O3",
+        "M365.1 X4",
+        "M365.0 X5"
+    ]
+
+
+def test_do_relative_splits_during_home_for(smoothie, monkeypatch):
+    """Test command structure when a split configuration is present."""
+    driver = smoothie
+    cmd_list = []
+
+    def _send_command_mock(
+            command, *args, **kwargs):
+        nonlocal cmd_list
+        cmd_list.append(command.build())
+        return "ok"
+
+    monkeypatch.setattr(driver, '_send_command', _send_command_mock)
+
+    driver.simulating = False
+
+    driver.configure_splits_for(
+        {
+            "B": MoveSplit(
+                split_distance=1,
+                split_current=1.75,
+                split_speed=1,
+                after_time=1800,
+                fullstep=True)
+        }
+    )
+    driver._steps_per_mm = {"B": 1.0, "C": 1.0}
+
+    driver._do_relative_splits_during_home_for("BC")
+
+    assert cmd_list == [
+        'M53 M55 M92 B0.03125 C0.03125 G4 P0.01 M907 B1.75 G4 P0.005 G0 F60 '
+        'G91 \r\n\r\n',
+        'G0 B-1 \r\n\r\n',
+        'G90 M52 M54 M92 B1.0 C1.0 G4 P0.01 G0 F24000 \r\n\r\n'
     ]

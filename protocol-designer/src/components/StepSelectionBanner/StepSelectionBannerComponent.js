@@ -108,6 +108,7 @@ export const StepSelectionBannerComponent = (
                 marginLeft="0.5rem"
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
                 textTransform={TEXT_TRANSFORM_UPPERCASE}
+                id="StepSelectionBannerComponent_numberStepsSelected"
               >
                 {i18n.t('application.n_steps_selected', { n: numSteps })}
               </Text>

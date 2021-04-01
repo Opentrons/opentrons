@@ -26,6 +26,11 @@ export const userFacingFlags: Array<FlagTypes> = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
 ]
 
+export const allFlags: Array<FlagTypes> = [
+  ...userFacingFlags,
+  'PRERELEASE_MODE',
+]
+
 export type Flags = $Shape<{|
   [flag: FlagTypes]: ?boolean,
 |}>

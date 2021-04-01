@@ -20,7 +20,8 @@ from opentrons.protocol_api import paired_instrument_context as paired
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.calibration_storage import get, types as cs_types
+from opentrons.calibration_storage import (
+    get, modify, delete, types as cs_types)
 
 import pytest
 
@@ -908,6 +909,22 @@ def test_tip_length_for_caldata(ctx, monkeypatch, use_new_calibration):
         tiprack._implementation.get_definition()['parameters']['tipLength']
         - instr.hw_pipette['tip_overlap']
         ['opentrons/geb_96_tiprack_10ul/1'])
+
+
+def test_tip_length_for_load_caldata(ctx):
+    instr = ctx.load_instrument('p20_single_gen2', 'left')
+    tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
+    pip_id = instr.hw_pipette['pipette_id']
+    fake_tip_length = 31
+
+    parent = ''
+    test_data = modify.create_tip_length_data(
+        tiprack._implementation.get_definition(),
+        parent, fake_tip_length)
+    modify.save_tip_length_calibration(pip_id, test_data)
+
+    assert instr._tip_length_for(tiprack) == fake_tip_length
+    delete.clear_tip_length_calibration()
 
 
 def test_bundled_labware(loop, get_labware_fixture):
