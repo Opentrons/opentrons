@@ -296,61 +296,13 @@ export const getMultiSelectDisabledFields: Selector<DisabledFields | null> = cre
   (savedStepForms, multiSelectItemIds) => {
     if (!multiSelectItemIds) return null
     const forms = multiSelectItemIds.map(id => savedStepForms[id])
-    if (forms.some(form => form.stepType !== 'moveLiquid')) {
+    if (forms.every(form => form.stepType === 'moveLiquid')) {
+      return getMoveLiquidMultiSelectDisabledFields(forms)
+    } else if (forms.every(form => form.stepType === 'mix')) {
+      return getMixMultiSelectDisabledFields(forms)
+    } else {
       return null
     }
-    const {
-      pipettesDifferent,
-      aspirateLabwareDifferent,
-      dispenseLabwareDifferent,
-      includesMultiAspirate,
-      includesMultiDispense,
-    } = forms.reduce(
-      (acc, form) => ({
-        lastPipette: form.pipette,
-        lastAspirateLabware: form.aspirate_labware,
-        lastDispenseLabware: form.dispense_labware,
-        pipettesDifferent:
-          form.pipette !== acc.lastPipette || acc.pipettesDifferent,
-        aspirateLabwareDifferent:
-          form.aspirate_labware !== acc.lastAspirateLabware ||
-          acc.aspirateLabwareDifferent,
-        dispenseLabwareDifferent:
-          form.dispense_labware !== acc.lastDispenseLabware ||
-          acc.dispenseLabwareDifferent,
-        includesMultiAspirate:
-          form.path === 'multiAspirate' || acc.includesMultiAspirate,
-        includesMultiDispense:
-          form.path === 'multiDispense' || acc.includesMultiDispense,
-      }),
-      {
-        lastPipette: forms[0].pipette,
-        lastAspirateLabware: forms[0].aspirate_labware,
-        lastDispenseLabware: forms[0].dispense_labware,
-        pipettesDifferent: false,
-        aspirateLabwareDifferent: false,
-        dispenseLabwareDifferent: false,
-        includesMultiAspirate: false,
-        includesMultiDispense: false,
-      }
-    )
-
-    const disabledFields: DisabledFields = {
-      ...(pipettesDifferent && getPipetteDifferentDisabledFields()),
-      ...(aspirateLabwareDifferent && getAspirateLabwareDisabledFields()),
-      // $FlowIssue(sa, 2021-01-13): https://github.com/facebook/flow/issues/8186
-      ...(dispenseLabwareDifferent && getDispenseLabwareDisabledFields()),
-      ...(includesMultiAspirate && getMultiAspiratePathDisabledFields()),
-      ...(includesMultiDispense && getMultiDispensePathDisabledFields()),
-      ...(includesMultiAspirate &&
-        pipettesDifferent &&
-        getPipetteDifferentAndMultiAspiratePathFields()),
-      ...(includesMultiDispense &&
-        pipettesDifferent &&
-        getPipetteDifferentAndMultiDispensePathFields()),
-    }
-
-    return disabledFields
   }
 )
 
@@ -382,3 +334,116 @@ export const getBatchEditSelectedStepTypes: Selector<
     )
   ).sort()
 })
+
+function getMoveLiquidMultiSelectDisabledFields(forms) {
+  const {
+    pipettesDifferent,
+    aspirateLabwareDifferent,
+    dispenseLabwareDifferent,
+    includesMultiAspirate,
+    includesMultiDispense,
+  } = forms.reduce(
+    (acc, form) => ({
+      lastPipette: form.pipette,
+      lastAspirateLabware: form.aspirate_labware,
+      lastDispenseLabware: form.dispense_labware,
+      pipettesDifferent:
+        form.pipette !== acc.lastPipette || acc.pipettesDifferent,
+      aspirateLabwareDifferent:
+        form.aspirate_labware !== acc.lastAspirateLabware ||
+        acc.aspirateLabwareDifferent,
+      dispenseLabwareDifferent:
+        form.dispense_labware !== acc.lastDispenseLabware ||
+        acc.dispenseLabwareDifferent,
+      includesMultiAspirate:
+        form.path === 'multiAspirate' || acc.includesMultiAspirate,
+      includesMultiDispense:
+        form.path === 'multiDispense' || acc.includesMultiDispense,
+    }),
+    {
+      lastPipette: forms[0].pipette,
+      lastAspirateLabware: forms[0].aspirate_labware,
+      lastDispenseLabware: forms[0].dispense_labware,
+      pipettesDifferent: false,
+      aspirateLabwareDifferent: false,
+      dispenseLabwareDifferent: false,
+      includesMultiAspirate: false,
+      includesMultiDispense: false,
+    }
+  )
+
+  const disabledFields: DisabledFields = {
+    ...(pipettesDifferent && getPipetteDifferentDisabledFields('moveLiquid')),
+    ...(aspirateLabwareDifferent &&
+      getAspirateLabwareDisabledFields('moveLiquid')),
+    ...(dispenseLabwareDifferent &&
+      // $FlowIssue(sa, 2021-01-13): https://github.com/facebook/flow/issues/8186
+      getDispenseLabwareDisabledFields('moveLiquid')),
+    ...(includesMultiAspirate &&
+      getMultiAspiratePathDisabledFields('moveLiquid')),
+    ...(includesMultiDispense &&
+      getMultiDispensePathDisabledFields('moveLiquid')),
+    ...(includesMultiAspirate &&
+      pipettesDifferent &&
+      getPipetteDifferentAndMultiAspiratePathFields('moveLiquid')),
+    ...(includesMultiDispense &&
+      pipettesDifferent &&
+      getPipetteDifferentAndMultiDispensePathFields('moveLiquid')),
+  }
+
+  return disabledFields
+}
+
+function getMixMultiSelectDisabledFields(forms) {
+  const {
+    pipettesDifferent,
+    aspirateLabwareDifferent,
+    dispenseLabwareDifferent,
+    includesMultiAspirate,
+    includesMultiDispense,
+  } = forms.reduce(
+    (acc, form) => ({
+      lastPipette: form.pipette,
+      lastAspirateLabware: form.aspirate_labware,
+      lastDispenseLabware: form.dispense_labware,
+      pipettesDifferent:
+        form.pipette !== acc.lastPipette || acc.pipettesDifferent,
+      aspirateLabwareDifferent:
+        form.aspirate_labware !== acc.lastAspirateLabware ||
+        acc.aspirateLabwareDifferent,
+      dispenseLabwareDifferent:
+        form.dispense_labware !== acc.lastDispenseLabware ||
+        acc.dispenseLabwareDifferent,
+      includesMultiAspirate:
+        form.path === 'multiAspirate' || acc.includesMultiAspirate,
+      includesMultiDispense:
+        form.path === 'multiDispense' || acc.includesMultiDispense,
+    }),
+    {
+      lastPipette: forms[0].pipette,
+      lastAspirateLabware: forms[0].aspirate_labware,
+      lastDispenseLabware: forms[0].dispense_labware,
+      pipettesDifferent: false,
+      aspirateLabwareDifferent: false,
+      dispenseLabwareDifferent: false,
+      includesMultiAspirate: false,
+      includesMultiDispense: false,
+    }
+  )
+
+  const disabledFields: DisabledFields = {
+    ...(pipettesDifferent && getPipetteDifferentDisabledFields('mix')),
+    // ...(aspirateLabwareDifferent && getAspirateLabwareDisabledFields()),
+    // ...(dispenseLabwareDifferent && getDispenseLabwareDisabledFields()),
+    // ...(includesMultiAspirate && getMultiAspiratePathDisabledFields()),
+    // ...(includesMultiDispense && getMultiDispensePathDisabledFields()),
+    // ...(includesMultiAspirate &&
+    //   pipettesDifferent &&
+    //   getPipetteDifferentAndMultiAspiratePathFields()),
+    // ...(includesMultiDispense &&
+    //   pipettesDifferent &&
+    //   getPipetteDifferentAndMultiDispensePathFields()),
+  }
+
+  return disabledFields
+}
