@@ -1,24 +1,19 @@
 import * as React from 'react'
-import { PipetteSelect } from './PipetteSelect'
+import { PipetteSelect as PipetteSelectComponent } from './PipetteSelect'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Organisms/PipetteSelect',
+  title: 'Library/Organisms/Pipette Select',
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof PipetteSelect>> = ({pipetteName, ...args}) => {
+const Template: Story<React.ComponentProps<typeof PipetteSelectComponent>> = ({pipetteName, ...args}) => {
   const [pipetteNameControlled, setPipetteNameControlled] = React.useState(pipetteName)
   const handleChange = (pipName: string): unknown => setPipetteNameControlled(pipName)
-  return <PipetteSelect {...args} pipetteName={pipetteNameControlled} onPipetteChange={handleChange} />
+  return <PipetteSelectComponent {...args} pipetteName={pipetteNameControlled} onPipetteChange={handleChange} />
 }
-export const Basic = Template.bind({})
-Basic.args = {
-  nameBlocklist: ['p20_multi_gen2', 'p300_multi_gen2'],
-}
-
-export const NoneOptionEnabled = Template.bind({})
-NoneOptionEnabled.args = {
+export const PipetteSelect = Template.bind({})
+PipetteSelect.args = {
   nameBlocklist: ['p20_multi_gen2', 'p300_multi_gen2'],
   enableNoneOption: true,
 }

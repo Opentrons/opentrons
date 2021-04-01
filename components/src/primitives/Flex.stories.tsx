@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Flex } from './Flex'
+import { Flex as FlexComponent} from './Flex'
 import {
   Box,
   DIRECTION_COLUMN,
@@ -12,11 +12,11 @@ export default {
   title: 'Library/Atoms/Flex',
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof Flex>> = args => (
-  <Flex {...args} />
+const Template: Story<React.ComponentProps<typeof FlexComponent>> = args => (
+  <FlexComponent {...args} />
 )
-export const Simple = Template.bind({})
-Simple.args = {
+export const Flex = Template.bind({})
+Flex.args = {
   children: [
     <Box key="1" backgroundColor="red">
       This is a flex child

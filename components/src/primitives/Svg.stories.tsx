@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Svg } from './Svg'
+import { Svg as SvgComponent } from './Svg'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -7,11 +7,11 @@ export default {
   title: 'Library/Atoms/Svg',
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof Svg>> = args => (
-  <Svg {...args} />
+const Template: Story<React.ComponentProps<typeof SvgComponent>> = args => (
+  <SvgComponent {...args} />
 )
-export const Simple = Template.bind({})
-Simple.args = {
+export const Svg= Template.bind({})
+Svg.args = {
   svgWidth: '300',
   svgHeight: '300',
   children: [

@@ -1,18 +1,18 @@
 import * as React from 'react'
 
-import { CheckboxField } from './CheckboxField'
+import { CheckboxField as CheckboxFieldComponent } from './CheckboxField'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Molecules/Forms/CheckboxField',
+  title: 'Library/Molecules/Forms/Checkbox Field',
   argTypes: { onChange: { action: 'clicked' } },
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof CheckboxField>> = args => {
+const Template: Story<React.ComponentProps<typeof CheckboxFieldComponent>> = args => {
   const [isChecked, setIsChecked] = React.useState<boolean>(false)
   return (
-    <CheckboxField
+    <CheckboxFieldComponent
       {...args}
       onChange={e => {
         setIsChecked(!isChecked)
@@ -22,13 +22,8 @@ const Template: Story<React.ComponentProps<typeof CheckboxField>> = args => {
     />
   )
 }
-export const Basic = Template.bind({})
-Basic.args = {
+export const CheckboxField = Template.bind({})
+CheckboxField.args = {
   label: 'Remember this setting?',
-}
-
-export const Indeterminate = Template.bind({})
-Indeterminate.args = {
-  label: 'Shared field check box',
-  isIndeterminate: true,
+  isIndeterminate: false,
 }

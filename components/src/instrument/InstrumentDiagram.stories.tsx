@@ -2,14 +2,14 @@ import * as React from 'react'
 import keyBy from 'lodash/keyBy'
 import { getAllPipetteNames, getPipetteNameSpecs } from '@opentrons/shared-data'
 
-import { InstrumentDiagram } from './InstrumentDiagram'
+import { InstrumentDiagram as InstrumentDiagramComponent } from './InstrumentDiagram'
 
 import type { Story, Meta } from '@storybook/react'
 
 const allPipetteSpecsByDisplayNames = keyBy(getAllPipetteNames().map(getPipetteNameSpecs), 'displayName')
 
 export default {
-  title: 'Library/Organisms/InstrumentDiagram',
+  title: 'Library/Organisms/Instrument Diagram',
   argTypes: {
     mount: {
       control: {
@@ -29,7 +29,7 @@ export default {
 } as Meta
 
 
-const Template: Story<React.ComponentProps<typeof InstrumentDiagram>> = ({pipetteSpecs, ...args}) => (
-  <InstrumentDiagram {...args} pipetteSpecs={allPipetteSpecsByDisplayNames[pipetteSpecs]} />
+const Template: Story<React.ComponentProps<typeof InstrumentDiagramComponent>> = ({pipetteSpecs, ...args}) => (
+  <InstrumentDiagramComponent {...args} pipetteSpecs={allPipetteSpecsByDisplayNames[pipetteSpecs]} />
 )
-export const Basic = Template.bind({})
+export const InstrumentDiagram = Template.bind({})

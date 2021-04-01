@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Splash } from './Splash'
+import { Splash as SplashComponent } from './Splash'
 import { Box } from '@opentrons/components'
 
 import type { Story, Meta } from '@storybook/react'
@@ -13,8 +13,8 @@ export default {
   )]
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof Splash>> = (args) => <Splash {...args}/>
-export const Basic = Template.bind({})
-Basic.args = {
+const Template: Story<React.ComponentProps<typeof SplashComponent>> = (args) => <SplashComponent {...args}/>
+export const Splash = Template.bind({})
+Splash.args = {
   iconName: 'ot-logo'
 }

@@ -11,8 +11,8 @@ export default {
 const Template: Story<React.ComponentProps<typeof TitleBar>> = args => (
   <TitleBar {...args} />
 )
-export const Simple = Template.bind({})
-Simple.args = {
+export const Basic = Template.bind({})
+Basic.args = {
   title: 'Main Title Goes Here',
   subtitle: "I'm the sub-title",
 }

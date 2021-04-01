@@ -24,8 +24,8 @@ export default {
 const Template: Story<React.ComponentProps<typeof Tooltip>> = args => (
   <Tooltip {...args} />
 )
-export const Simple = Template.bind({})
-Simple.args = {
+export const Basic = Template.bind({})
+Basic.args = {
   visible: true,
   children:
     'This is a simple tooltip atom.',

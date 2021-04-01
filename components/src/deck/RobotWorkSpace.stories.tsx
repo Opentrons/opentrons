@@ -28,8 +28,8 @@ const Template: Story<React.ComponentProps<typeof RobotWorkSpace>> = ({
   const resolvedDef: typeof deckDef = allDeckDefs[deckLoadName as string]
   return <RobotWorkSpace deckDef={resolvedDef} {...args} />
 }
-export const Basic = Template.bind({})
-Basic.args = {
+export const Deck = Template.bind({})
+Deck.args = {
   children: ({ deckSlotsById }) => {
     const slotName = '5'
     const divSlot = '3'

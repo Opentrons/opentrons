@@ -10,8 +10,8 @@ export default {
 const Template: Story<React.ComponentProps<typeof Link>> = args => (
   <Link {...args} />
 )
-export const Simple = Template.bind({})
-Simple.args = {
+export const Basic = Template.bind({})
+Basic.args = {
   children: 'hello anchor',
   href: '#',
 }
