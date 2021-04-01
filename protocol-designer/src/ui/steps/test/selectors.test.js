@@ -1104,6 +1104,36 @@ describe('getMultiSelectDisabledFields', () => {
         })
       })
     })
+    describe('when labware are different', () => {
+      let savedStepForms
+      beforeEach(() => {
+        savedStepForms = {
+          ...mockSavedStepForms,
+          another_mix_step_id: {
+            ...mockSavedStepForms.another_mix_step_id,
+            labware: 'different_labware_id',
+          },
+        }
+      })
+      it('should return fields being disabled with associated reasons', () => {
+        const labwareDifferentText = i18n.t(
+          'tooltip.step_fields.batch_edit.disabled.labware-different'
+        )
+
+        expect(
+          getMultiSelectDisabledFields.resultFunc(
+            savedStepForms,
+            mockmultiSelectItemIds
+          )
+        ).toEqual({
+          mix_mmFromBottom: labwareDifferentText,
+          aspirate_delay_checkbox: labwareDifferentText,
+          aspirate_delay_seconds: labwareDifferentText,
+          dispense_delay_checkbox: labwareDifferentText,
+          dispense_delay_seconds: labwareDifferentText,
+        })
+      })
+    })
   })
 
   it('should return null if when forms are not all uniformly moveliquid OR mix', () => {

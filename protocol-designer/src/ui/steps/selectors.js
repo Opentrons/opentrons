@@ -29,6 +29,7 @@ import {
   getPipetteDifferentAndMultiAspiratePathFields,
   getPipetteDifferentAndMultiDispensePathFields,
   getPipetteDifferentDisabledFields,
+  getLabwareDisabledFields,
 } from './utils'
 import type {
   CountPerStepType,
@@ -295,7 +296,9 @@ export const getMultiSelectDisabledFields: Selector<DisabledFields | null> = cre
   getMultiSelectItemIds,
   (savedStepForms, multiSelectItemIds) => {
     if (!multiSelectItemIds) return null
-    const forms = multiSelectItemIds.map(id => savedStepForms[id])
+    const forms: Array<FormData> = multiSelectItemIds.map(
+      id => savedStepForms[id]
+    )
     if (forms.every(form => form.stepType === 'moveLiquid')) {
       return getMoveLiquidMultiSelectDisabledFields(forms)
     } else if (forms.every(form => form.stepType === 'mix')) {
@@ -335,7 +338,7 @@ export const getBatchEditSelectedStepTypes: Selector<
   ).sort()
 })
 
-function getMoveLiquidMultiSelectDisabledFields(forms) {
+function getMoveLiquidMultiSelectDisabledFields(forms: Array<FormData>) {
   const {
     pipettesDifferent,
     aspirateLabwareDifferent,
@@ -374,75 +377,44 @@ function getMoveLiquidMultiSelectDisabledFields(forms) {
 
   const disabledFields: DisabledFields = {
     ...(pipettesDifferent && getPipetteDifferentDisabledFields('moveLiquid')),
-    ...(aspirateLabwareDifferent &&
-      getAspirateLabwareDisabledFields('moveLiquid')),
+    ...(aspirateLabwareDifferent && getAspirateLabwareDisabledFields()),
     ...(dispenseLabwareDifferent &&
       // $FlowIssue(sa, 2021-01-13): https://github.com/facebook/flow/issues/8186
-      getDispenseLabwareDisabledFields('moveLiquid')),
-    ...(includesMultiAspirate &&
-      getMultiAspiratePathDisabledFields('moveLiquid')),
-    ...(includesMultiDispense &&
-      getMultiDispensePathDisabledFields('moveLiquid')),
+      getDispenseLabwareDisabledFields()),
+    ...(includesMultiAspirate && getMultiAspiratePathDisabledFields()),
+    ...(includesMultiDispense && getMultiDispensePathDisabledFields()),
     ...(includesMultiAspirate &&
       pipettesDifferent &&
-      getPipetteDifferentAndMultiAspiratePathFields('moveLiquid')),
+      getPipetteDifferentAndMultiAspiratePathFields()),
     ...(includesMultiDispense &&
       pipettesDifferent &&
-      getPipetteDifferentAndMultiDispensePathFields('moveLiquid')),
+      getPipetteDifferentAndMultiDispensePathFields()),
   }
 
   return disabledFields
 }
 
-function getMixMultiSelectDisabledFields(forms) {
-  const {
-    pipettesDifferent,
-    aspirateLabwareDifferent,
-    dispenseLabwareDifferent,
-    includesMultiAspirate,
-    includesMultiDispense,
-  } = forms.reduce(
+function getMixMultiSelectDisabledFields(forms: Array<FormData>) {
+  const { pipettesDifferent, labwareDifferent } = forms.reduce(
     (acc, form) => ({
       lastPipette: form.pipette,
-      lastAspirateLabware: form.aspirate_labware,
-      lastDispenseLabware: form.dispense_labware,
+      lastLabware: form.labware,
       pipettesDifferent:
         form.pipette !== acc.lastPipette || acc.pipettesDifferent,
-      aspirateLabwareDifferent:
-        form.aspirate_labware !== acc.lastAspirateLabware ||
-        acc.aspirateLabwareDifferent,
-      dispenseLabwareDifferent:
-        form.dispense_labware !== acc.lastDispenseLabware ||
-        acc.dispenseLabwareDifferent,
-      includesMultiAspirate:
-        form.path === 'multiAspirate' || acc.includesMultiAspirate,
-      includesMultiDispense:
-        form.path === 'multiDispense' || acc.includesMultiDispense,
+      labwareDifferent:
+        form.labware !== acc.lastLabware || acc.labwareDifferent,
     }),
     {
       lastPipette: forms[0].pipette,
-      lastAspirateLabware: forms[0].aspirate_labware,
-      lastDispenseLabware: forms[0].dispense_labware,
+      lastLabware: forms[0].labware,
       pipettesDifferent: false,
-      aspirateLabwareDifferent: false,
-      dispenseLabwareDifferent: false,
-      includesMultiAspirate: false,
-      includesMultiDispense: false,
+      labwareDifferent: false,
     }
   )
-
   const disabledFields: DisabledFields = {
+    // $FlowIssue(sa, 2021-04-01): https://github.com/facebook/flow/issues/8186
     ...(pipettesDifferent && getPipetteDifferentDisabledFields('mix')),
-    // ...(aspirateLabwareDifferent && getAspirateLabwareDisabledFields()),
-    // ...(dispenseLabwareDifferent && getDispenseLabwareDisabledFields()),
-    // ...(includesMultiAspirate && getMultiAspiratePathDisabledFields()),
-    // ...(includesMultiDispense && getMultiDispensePathDisabledFields()),
-    // ...(includesMultiAspirate &&
-    //   pipettesDifferent &&
-    //   getPipetteDifferentAndMultiAspiratePathFields()),
-    // ...(includesMultiDispense &&
-    //   pipettesDifferent &&
-    //   getPipetteDifferentAndMultiDispensePathFields()),
+    ...(labwareDifferent && getLabwareDisabledFields()),
   }
 
   return disabledFields

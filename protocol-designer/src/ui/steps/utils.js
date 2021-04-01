@@ -64,6 +64,14 @@ const batchEditMoveLiquidDispenseLabwareDisabledFieldNames: Array<StepFieldName>
   'dispense_touchTip_mmFromBottom',
 ]
 
+const batchEditMixLabwareDifferentDisabledFieldNames: Array<StepFieldName> = [
+  'mix_mmFromBottom',
+  'aspirate_delay_checkbox',
+  'aspirate_delay_seconds',
+  'dispense_delay_checkbox',
+  'dispense_delay_seconds',
+]
+
 const batchEditMoveLiquidMultiAspiratePathDisabledFieldNames: Array<StepFieldName> = [
   'aspirate_mix_checkbox',
   'aspirate_mix_volume',
@@ -104,7 +112,6 @@ const fieldsWithDisabledTooltipText = (
     {}
   )
 
-// add more form types here as batch edit mode expands to new forms
 type BatchEditFormType = 'moveLiquid' | 'mix'
 
 export const getPipetteDifferentDisabledFields = (
@@ -122,110 +129,44 @@ export const getPipetteDifferentDisabledFields = (
   return fieldsWithDisabledTooltipText(disabledFieldNames, 'pipette-different')
 }
 
-export const getAspirateLabwareDisabledFields = (
-  batchEditFormType: BatchEditFormType
-): DisabledFields => {
-  let disabledFieldNames = []
-  switch (batchEditFormType) {
-    case 'moveLiquid':
-      disabledFieldNames = batchEditMoveLiquidAspirateLabwareDisabledFieldNames
-      break
-    case 'mix':
-      // disabledFieldNames = batchEditMixAspirateLabwareDisabledFieldNames
-      break
-  }
-  return fieldsWithDisabledTooltipText(
-    disabledFieldNames,
+export const getLabwareDisabledFields = (): DisabledFields =>
+  fieldsWithDisabledTooltipText(
+    batchEditMixLabwareDifferentDisabledFieldNames,
+    'labware-different'
+  )
+
+export const getAspirateLabwareDisabledFields = (): DisabledFields =>
+  fieldsWithDisabledTooltipText(
+    batchEditMoveLiquidAspirateLabwareDisabledFieldNames,
     'aspirate-labware-different'
   )
-}
 
-export const getDispenseLabwareDisabledFields = (
-  batchEditFormType: BatchEditFormType
-): DisabledFields => {
-  let disabledFieldNames = []
-  switch (batchEditFormType) {
-    case 'moveLiquid':
-      disabledFieldNames = batchEditMoveLiquidDispenseLabwareDisabledFieldNames
-      break
-    case 'mix':
-      // disabledFieldNames = batchEditMIXDispenseLabwareDisabledFieldNames
-      break
-  }
-  return fieldsWithDisabledTooltipText(
-    disabledFieldNames,
+export const getDispenseLabwareDisabledFields = (): DisabledFields =>
+  fieldsWithDisabledTooltipText(
+    batchEditMoveLiquidDispenseLabwareDisabledFieldNames,
     'dispense-labware-different'
   )
-}
 
-export const getMultiAspiratePathDisabledFields = (
-  batchEditFormType: BatchEditFormType
-): DisabledFields => {
-  let disabledFieldNames = []
-  switch (batchEditFormType) {
-    case 'moveLiquid':
-      disabledFieldNames = batchEditMoveLiquidMultiAspiratePathDisabledFieldNames
-      break
-    case 'mix':
-      // path not relevant in mix steps
-      break
-  }
-  return fieldsWithDisabledTooltipText(
-    disabledFieldNames,
+export const getMultiAspiratePathDisabledFields = (): DisabledFields =>
+  fieldsWithDisabledTooltipText(
+    batchEditMoveLiquidMultiAspiratePathDisabledFieldNames,
     'multi-aspirate-present'
   )
-}
 
-export const getMultiDispensePathDisabledFields = (
-  batchEditFormType: BatchEditFormType
-): DisabledFields => {
-  let disabledFieldNames = []
-  switch (batchEditFormType) {
-    case 'moveLiquid':
-      disabledFieldNames = batchEditMoveLiquidMultiDispensePathDisabledFieldNames
-      break
-    case 'mix':
-      // path not relevant in mix steps
-      break
-  }
-  return fieldsWithDisabledTooltipText(
-    disabledFieldNames,
+export const getMultiDispensePathDisabledFields = (): DisabledFields =>
+  fieldsWithDisabledTooltipText(
+    batchEditMoveLiquidMultiDispensePathDisabledFieldNames,
     'multi-dispense-present'
   )
-}
 
-export const getPipetteDifferentAndMultiAspiratePathFields = (
-  batchEditFormType: BatchEditFormType
-): DisabledFields => {
-  let disabledFieldNames = []
-  switch (batchEditFormType) {
-    case 'moveLiquid':
-      disabledFieldNames = batchEditMoveLiquidPipetteDifferentAndMultiAspiratePathDisabledFieldNames
-      break
-    case 'mix':
-      // path not relevant in mix steps
-      break
-  }
-  return fieldsWithDisabledTooltipText(
-    disabledFieldNames,
+export const getPipetteDifferentAndMultiAspiratePathFields = (): DisabledFields =>
+  fieldsWithDisabledTooltipText(
+    batchEditMoveLiquidPipetteDifferentAndMultiAspiratePathDisabledFieldNames,
     'multi-aspirate-present-pipette-different'
   )
-}
 
-export const getPipetteDifferentAndMultiDispensePathFields = (
-  batchEditFormType: BatchEditFormType
-): DisabledFields => {
-  let disabledFieldNames = []
-  switch (batchEditFormType) {
-    case 'moveLiquid':
-      disabledFieldNames = batchEditMoveLiquidPipetteDifferentAndMultiDispensePathDisabledFieldNames
-      break
-    case 'mix':
-      // path not relevant in mix steps
-      break
-  }
-  return fieldsWithDisabledTooltipText(
-    disabledFieldNames,
+export const getPipetteDifferentAndMultiDispensePathFields = (): DisabledFields =>
+  fieldsWithDisabledTooltipText(
+    batchEditMoveLiquidPipetteDifferentAndMultiDispensePathDisabledFieldNames,
     'multi-dispense-present-pipette-different'
   )
-}
