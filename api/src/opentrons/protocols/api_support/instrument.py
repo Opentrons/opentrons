@@ -6,7 +6,6 @@ from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_api.labware import Labware, Well
-from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.protocol.dev_types import LiquidHandlingCommand, \
     BlowoutLocation
