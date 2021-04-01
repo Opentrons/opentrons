@@ -1,11 +1,14 @@
 // @flow
 import { createSelector } from 'reselect'
+import { getFlagsFromQueryParams } from './utils'
 
 import type { BaseState, Selector } from '../types'
 import type { Flags } from './types'
 
-export const getFeatureFlagData = (state: BaseState): Flags =>
-  state.featureFlags.flags
+export const getFeatureFlagData = (state: BaseState): Flags => ({
+  ...state.featureFlags.flags,
+  ...getFlagsFromQueryParams(),
+})
 
 export const getEnabledPrereleaseMode: Selector<?boolean> = createSelector(
   getFeatureFlagData,
