@@ -26,7 +26,7 @@ export default {
       defaultValue: Object.keys(allPipetteSpecsByDisplayNames)[0],
     }
   }
-}
+} as Meta
 
 
 const Template: Story<React.ComponentProps<typeof InstrumentDiagram>> = ({pipetteSpecs, ...args}) => (
