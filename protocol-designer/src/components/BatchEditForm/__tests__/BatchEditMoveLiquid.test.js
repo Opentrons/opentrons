@@ -3,7 +3,7 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import { PrimaryButton, OutlineButton, Tooltip } from '@opentrons/components'
 import { i18n } from '../../../localization'
-import { BatchEditMoveLiquid } from '../'
+import { BatchEditMoveLiquid } from '../BatchEditMoveLiquid'
 
 const localizationSpy = jest.spyOn(i18n, 't')
 

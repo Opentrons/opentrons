@@ -234,17 +234,23 @@ export type MultiselectFieldValues = {
   ...
 }
 
+// TODO IMMEDIATELY: add test
 export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
   stepFormSelectors.getSavedStepForms,
   getMultiSelectItemIds,
   (savedStepForms, multiSelectItemIds) => {
     if (!multiSelectItemIds) return null
     const forms = multiSelectItemIds.map(id => savedStepForms[id])
-    if (forms.some(form => form.stepType !== 'moveLiquid')) {
+    const stepTypes = uniq(forms.map(form => form.stepType))
+    if (stepTypes.length !== 1) {
+      return null
+    }
+    const stepType: StepType = stepTypes[0]
+    if (stepType !== 'moveLiquid' && stepType !== 'mix') {
       return null
     }
 
-    const allFieldNames = Object.keys(getDefaultsForStepType('moveLiquid'))
+    const allFieldNames = Object.keys(getDefaultsForStepType(stepType))
 
     return allFieldNames.reduce(
       (acc: MultiselectFieldValues, fieldName: StepFieldName) => {
@@ -271,10 +277,16 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
   }
 )
 
+// TODO IMMEDIATELY: add test for null return
 export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
   _getSavedMultiSelectFieldValues,
   stepFormSelectors.getBatchEditFieldChanges,
   (savedValues, changes) => {
+    if (savedValues === null) {
+      // multi-selection has an invalid combination of stepTypes
+      return null
+    }
+
     const multiselectChanges = Object.keys(changes).reduce((acc, name) => {
       acc[name] = {
         value: changes[name],
