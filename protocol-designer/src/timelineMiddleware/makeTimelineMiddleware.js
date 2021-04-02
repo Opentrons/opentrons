@@ -12,7 +12,7 @@ import {
 } from '../file-data/actions'
 import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
 import { getFeatureFlagData } from '../feature-flags/selectors'
-import Worker from './worker'
+import TimelineWorkerFactory from './timelineWorker'
 
 import type { Middleware } from 'redux'
 import type { Flags } from '../feature-flags/types'
@@ -46,7 +46,7 @@ const getSubstepsArgs = (state: BaseState): SubstepsArgsNoTimeline => ({
 
 // TODO(IL, 2020-06-15): once we create an Action union for PD, use that instead of `any` for Middleware<S, A>
 export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
-  const worker: TimelineWorker = new Worker()
+  const worker: TimelineWorker = new TimelineWorkerFactory()
 
   let prevTimelineArgs: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}
   let prevFeatureFlags: Flags | null = null // force timeline recompute when feature flags change
