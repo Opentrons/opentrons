@@ -83,7 +83,8 @@ export function mixUtil(args: {|
 export const mix: CommandCreator<MixArgs> = (
   data,
   invariantContext,
-  prevRobotState
+  prevRobotState,
+  config
 ) => {
   /**
     Mix will aspirate and dispense a uniform volume some amount of times from a set of wells
@@ -190,6 +191,7 @@ export const mix: CommandCreator<MixArgs> = (
   return reduceCommandCreators(
     commandCreators,
     invariantContext,
-    prevRobotState
+    prevRobotState,
+    config
   )
 }

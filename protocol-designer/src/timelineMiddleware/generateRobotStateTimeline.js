@@ -9,6 +9,7 @@ export type GenerateRobotStateTimelineArgs = {|
   orderedStepIds: Array<string>,
   initialRobotState: StepGeneration.RobotState,
   invariantContext: StepGeneration.InvariantContext,
+  config: StepGeneration.Config,
 |}
 export const generateRobotStateTimeline = (
   args: GenerateRobotStateTimelineArgs
@@ -18,6 +19,7 @@ export const generateRobotStateTimeline = (
     orderedStepIds,
     initialRobotState,
     invariantContext,
+    config,
   } = args
 
   const allStepArgs: Array<StepGeneration.CommandCreatorArgs | null> = orderedStepIds.map(
@@ -76,7 +78,8 @@ export const generateRobotStateTimeline = (
                   }),
                 ],
                 _invariantContext,
-                _prevRobotState
+                _prevRobotState,
+                config
               ),
           ]
         }
@@ -89,7 +92,8 @@ export const generateRobotStateTimeline = (
   const timeline = StepGeneration.commandCreatorsTimeline(
     curriedCommandCreators,
     invariantContext,
-    initialRobotState
+    initialRobotState,
+    config
   )
 
   return timeline

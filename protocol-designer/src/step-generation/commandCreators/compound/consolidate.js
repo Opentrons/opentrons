@@ -30,7 +30,8 @@ import { mixUtil } from './mix'
 export const consolidate: CommandCreator<ConsolidateArgs> = (
   args,
   invariantContext,
-  prevRobotState
+  prevRobotState,
+  config
 ) => {
   /**
     Consolidate will aspirate several times in sequence from multiple source wells,
@@ -355,6 +356,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   return reduceCommandCreators(
     commandCreators,
     invariantContext,
-    prevRobotState
+    prevRobotState,
+    config
   )
 }

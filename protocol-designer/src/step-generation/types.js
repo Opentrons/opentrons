@@ -361,17 +361,20 @@ export type CommandsAndWarnings = {|
   commands: Array<Command>,
   warnings?: Array<CommandCreatorWarning>,
 |}
+export type Config = {| FOO: boolean |} // TODO IMMEDIATELY actual flags
 export type CommandCreatorResult =
   | CommandsAndWarnings
   | CommandCreatorErrorResponse
 export type CommandCreator<Args> = (
   args: Args,
   invariantContext: InvariantContext,
-  prevRobotState: RobotState
+  prevRobotState: RobotState,
+  config: Config
 ) => CommandCreatorResult
 export type CurriedCommandCreator = (
   invariantContext: InvariantContext,
-  prevRobotState: RobotState
+  prevRobotState: RobotState,
+  config: Config
 ) => CommandCreatorResult
 
 export type Timeline = {|

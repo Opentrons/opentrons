@@ -9,7 +9,8 @@ import { dropTip } from './dropTip'
 export const dropAllTips: CommandCreator<null> = (
   args,
   invariantContext,
-  prevRobotState
+  prevRobotState,
+  config
 ) => {
   const pipetteIds: Array<string> = Object.keys(prevRobotState.pipettes)
   const commandCreators = pipetteIds.map(pipette =>
@@ -18,6 +19,7 @@ export const dropAllTips: CommandCreator<null> = (
   return reduceCommandCreators(
     commandCreators,
     invariantContext,
-    prevRobotState
+    prevRobotState,
+    config
   )
 }

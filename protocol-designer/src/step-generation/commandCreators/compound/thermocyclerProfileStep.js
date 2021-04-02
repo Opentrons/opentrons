@@ -17,7 +17,8 @@ import type {
 export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs> = (
   args,
   invariantContext,
-  prevRobotState
+  prevRobotState,
+  config
 ) => {
   const {
     blockTargetTempHold,
@@ -86,6 +87,7 @@ export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs
   return reduceCommandCreators(
     commandCreators,
     invariantContext,
-    prevRobotState
+    prevRobotState,
+    config
   )
 }

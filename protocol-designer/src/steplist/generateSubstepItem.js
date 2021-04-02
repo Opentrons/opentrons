@@ -18,6 +18,7 @@ import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
 
 import type { StepIdType } from '../form-types'
 import type {
+  Config,
   CurriedCommandCreator,
   InvariantContext,
   RobotState,
@@ -247,6 +248,7 @@ function transferLikeSubsteps(args: {|
   invariantContext: InvariantContext,
   robotState: RobotState,
   stepId: StepIdType,
+  config: Config,
 |}): ?SourceDestSubstepItem {
   const { stepArgs, invariantContext, stepId } = args
 
@@ -287,7 +289,8 @@ function transferLikeSubsteps(args: {|
       substepCommandCreator,
       invariantContext,
       initialRobotState,
-      pipetteSpec.channels
+      pipetteSpec.channels,
+      { FOO: true } // config // TODO IMMEDIATELY
     )
 
     const mergedMultiRows: Array<
@@ -312,7 +315,8 @@ function transferLikeSubsteps(args: {|
       substepCommandCreator,
       invariantContext,
       initialRobotState,
-      1
+      1,
+      { FOO: false } // config // TODO IMMEDIATELY
     )
 
     const mergedRows: Array<StepItemSourceDestRow> = mergeSubstepRowsSingleChannel(
@@ -374,6 +378,7 @@ export function generateSubstepItem(
       invariantContext,
       robotState,
       stepId,
+      config: { FOO: false }, // TODO IMMEDIATELY
     })
   }
 

@@ -20,7 +20,8 @@ import type {
 export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = (
   args,
   invariantContext,
-  prevRobotState
+  prevRobotState,
+  config
 ) => {
   const thermocyclerState = thermocyclerStateGetter(prevRobotState, args.module)
 
@@ -101,6 +102,7 @@ export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = 
   return reduceCommandCreators(
     commandCreators,
     invariantContext,
-    prevRobotState
+    prevRobotState,
+    config
   )
 }

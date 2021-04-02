@@ -7,6 +7,7 @@ import { getNextRobotStateAndWarningsSingleCommand } from '../step-generation/ge
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type { Channels } from '@opentrons/components'
 import type {
+  Config,
   CommandCreatorError,
   CommandsAndWarnings,
   CurriedCommandCreator,
@@ -64,9 +65,10 @@ type SubstepTimelineAcc = {
 export const substepTimelineSingleChannel = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
-  initialRobotState: RobotState
+  initialRobotState: RobotState,
+  config: Config
 ): Array<SubstepTimelineFrame> => {
-  const nextFrame = commandCreator(invariantContext, initialRobotState)
+  const nextFrame = commandCreator(invariantContext, initialRobotState, config)
   if (nextFrame.errors) return []
 
   const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
@@ -122,9 +124,10 @@ export const substepTimelineMultiChannel = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
-  channels: Channels
+  channels: Channels,
+  config: Config
 ): Array<SubstepTimelineFrame> => {
-  const nextFrame = commandCreator(invariantContext, initialRobotState)
+  const nextFrame = commandCreator(invariantContext, initialRobotState, config)
   if (nextFrame.errors) return []
   const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
     (acc, command: Command, index) => {
@@ -192,20 +195,23 @@ export const substepTimeline = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
-  channels: Channels
+  channels: Channels,
+  config: Config
 ): Array<SubstepTimelineFrame> => {
   if (channels === 1) {
     return substepTimelineSingleChannel(
       commandCreator,
       invariantContext,
-      initialRobotState
+      initialRobotState,
+      config
     )
   } else {
     return substepTimelineMultiChannel(
       commandCreator,
       invariantContext,
       initialRobotState,
-      channels
+      channels,
+      config
     )
   }
 }

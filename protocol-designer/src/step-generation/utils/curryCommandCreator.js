@@ -7,6 +7,6 @@ export function curryCommandCreator<Args>(
   commandCreator: CommandCreator<Args>,
   args: Args
 ): CurriedCommandCreator {
-  return (_invariantContext, _prevRobotState) =>
-    commandCreator(args, _invariantContext, _prevRobotState)
+  return (_invariantContext, _prevRobotState, config) =>
+    commandCreator(args, _invariantContext, _prevRobotState, config)
 }

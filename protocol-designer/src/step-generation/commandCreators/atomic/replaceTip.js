@@ -13,7 +13,8 @@ type PickUpTipArgs = {| pipette: string, tiprack: string, well: string |}
 const _pickUpTip: CommandCreator<PickUpTipArgs> = (
   args,
   invariantContext,
-  prevRobotState
+  prevRobotState,
+  config
 ) => {
   return {
     commands: [
@@ -38,7 +39,8 @@ type ReplaceTipArgs = {| pipette: string |}
 export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   args,
   invariantContext,
-  prevRobotState
+  prevRobotState,
+  config
 ) => {
   const { pipette } = args
   const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
@@ -95,6 +97,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   return reduceCommandCreators(
     commandCreators,
     invariantContext,
-    prevRobotState
+    prevRobotState,
+    config
   )
 }

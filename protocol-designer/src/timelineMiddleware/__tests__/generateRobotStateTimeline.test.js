@@ -114,6 +114,7 @@ describe('generateRobotStateTimeline', () => {
       orderedStepIds,
       initialRobotState,
       invariantContext,
+      config: undefined,
     })
 
     expect(result.timeline.length).toEqual(orderedStepIds.length)

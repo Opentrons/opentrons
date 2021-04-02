@@ -34,7 +34,8 @@ import type {
 export const distribute: CommandCreator<DistributeArgs> = (
   args,
   invariantContext,
-  prevRobotState
+  prevRobotState,
+  config
 ) => {
   /**
     Distribute will aspirate from a single source well into multiple destination wells.
@@ -387,6 +388,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   return reduceCommandCreators(
     commandCreators,
     invariantContext,
-    prevRobotState
+    prevRobotState,
+    config
   )
 }

@@ -33,7 +33,8 @@ import type {
 export const transfer: CommandCreator<TransferArgs> = (
   args,
   invariantContext,
-  prevRobotState
+  prevRobotState,
+  config
 ) => {
   /**
     Transfer will iterate through a set of 1 or more source and destination wells.
@@ -458,6 +459,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   return reduceCommandCreators(
     commandCreators,
     invariantContext,
-    prevRobotState
+    prevRobotState,
+    config
   )
 }

@@ -49,7 +49,8 @@ bench(`commandCreatorsTimeline: mix ${times} times`, b => {
   const timeline = commandCreatorsTimeline(
     curriedCommandCreators,
     invariantContext,
-    initialRobotState
+    initialRobotState,
+    { FOO: false } // TODO IMMEDIATELY
   )
 
   b.end()

@@ -2,6 +2,7 @@
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type {
+  Config,
   InvariantContext,
   RobotState,
   CommandCreatorError,
@@ -20,7 +21,8 @@ type CCReducerAcc = {|
 export const reduceCommandCreators = (
   commandCreators: Array<CurriedCommandCreator>,
   invariantContext: InvariantContext,
-  initialRobotState: RobotState
+  initialRobotState: RobotState,
+  config: Config
 ): CommandCreatorResult => {
   const result = commandCreators.reduce(
     (prev: CCReducerAcc, reducerFn: CurriedCommandCreator): CCReducerAcc => {
@@ -28,7 +30,7 @@ export const reduceCommandCreators = (
         // if there are errors, short-circuit the reduce
         return prev
       }
-      const next = reducerFn(invariantContext, prev.robotState)
+      const next = reducerFn(invariantContext, prev.robotState, config)
       if (next.errors) {
         return {
           robotState: prev.robotState,

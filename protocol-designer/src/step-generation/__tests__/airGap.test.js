@@ -10,6 +10,7 @@ import {
   getErrorResult,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
+  DEFAULT_CONFIG,
 } from '../__fixtures__'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { airGap } from '../commandCreators/atomic/airGap'
@@ -65,7 +66,12 @@ describe('airGap', () => {
       labware: SOURCE_LABWARE,
       well: 'A1',
     }
-    const result = airGap({ ...params }, invariantContext, robotStateWithTip)
+    const result = airGap(
+      { ...params },
+      invariantContext,
+      robotStateWithTip,
+      DEFAULT_CONFIG
+    )
     expect(getSuccessResult(result).commands).toEqual([
       {
         command: 'airGap',
@@ -84,7 +90,8 @@ describe('airGap', () => {
         well: 'A1',
       },
       invariantContext,
-      robotStateWithTip
+      robotStateWithTip,
+      DEFAULT_CONFIG
     )
     expectTimelineError(getErrorResult(result).errors, 'PIPETTE_DOES_NOT_EXIST')
   })
@@ -99,7 +106,8 @@ describe('airGap', () => {
         well: 'A1',
       },
       invariantContext,
-      robotStateWithTip
+      robotStateWithTip,
+      DEFAULT_CONFIG
     )
     expectTimelineError(getErrorResult(result).errors, 'LABWARE_DOES_NOT_EXIST')
   })
@@ -112,7 +120,12 @@ describe('airGap', () => {
       labware: SOURCE_LABWARE,
       well: 'A1',
     }
-    const result = airGap({ ...params }, invariantContext, robotStateNoTip)
+    const result = airGap(
+      { ...params },
+      invariantContext,
+      robotStateNoTip,
+      DEFAULT_CONFIG
+    )
     expectTimelineError(getErrorResult(result).errors, 'NO_TIP_ON_PIPETTE')
   })
 
@@ -134,7 +147,8 @@ describe('airGap', () => {
         well: 'A1',
       },
       invariantContext,
-      robotStateWithTip
+      robotStateWithTip,
+      DEFAULT_CONFIG
     )
 
     expectTimelineError(getErrorResult(result).errors, 'TIP_VOLUME_EXCEEDED')
@@ -162,7 +176,8 @@ describe('airGap', () => {
         well: 'A1',
       },
       invariantContext,
-      robotStateWithTip
+      robotStateWithTip,
+      DEFAULT_CONFIG
     )
     expectTimelineError(
       getErrorResult(result).errors,
@@ -195,7 +210,8 @@ describe('airGap', () => {
         well: 'A1',
       },
       invariantContext,
-      robotStateWithTip
+      robotStateWithTip,
+      DEFAULT_CONFIG
     )
 
     expectTimelineError(
@@ -222,7 +238,8 @@ describe('airGap', () => {
         well: 'A1',
       },
       invariantContext,
-      robotStateWithTip
+      robotStateWithTip,
+      DEFAULT_CONFIG
     )
 
     expectTimelineError(

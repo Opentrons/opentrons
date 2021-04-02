@@ -17,9 +17,9 @@ import Worker from './worker'
 import type { Middleware } from 'redux'
 import type { Flags } from '../feature-flags/types'
 import type { BaseState } from '../types'
+import type { Config } from '../step-generation'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 import type { SubstepsArgsNoTimeline, TimelineWorker } from './types'
-
 const hasChanged = (
   nextValues: { [any]: any, ... },
   memoizedValues: { [any]: any, ... }
@@ -29,11 +29,15 @@ const hasChanged = (
       nextValues[selectorKey] !== memoizedValues?.[selectorKey]
   )
 
-const getTimelineArgs = (state: BaseState): GenerateRobotStateTimelineArgs => ({
+const getTimelineArgs = (
+  state: BaseState,
+  config: Config
+): GenerateRobotStateTimelineArgs => ({
   allStepArgsAndErrors: getArgsAndErrorsByStepId(state),
   orderedStepIds: getOrderedStepIds(state),
   invariantContext: getInvariantContext(state),
   initialRobotState: getInitialRobotState(state),
+  config,
 })
 
 const getSubstepsArgs = (state: BaseState): SubstepsArgsNoTimeline => ({
@@ -53,8 +57,9 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
   let prevSubstepsArgs: SubstepsArgsNoTimeline | null = null
   let prevSuccessAction: ComputeRobotStateTimelineSuccessAction | null = null
 
+  const config = { FOO: false } // TODO IMMEDIATELY
   const timelineNeedsRecompute = (state: BaseState): boolean => {
-    const nextSelectorResults = getTimelineArgs(state)
+    const nextSelectorResults = getTimelineArgs(state, config)
     const nextFeatureFlags = getFeatureFlagData(state)
 
     if (prevTimelineArgs === null || prevFeatureFlags === null) {

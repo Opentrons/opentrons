@@ -3,6 +3,7 @@ import last from 'lodash/last'
 import { getNextRobotStateAndWarningsSingleCommand } from '../getNextRobotStateAndWarnings'
 import { stripNoOpCommands } from './stripNoOpCommands'
 import type {
+  Config,
   InvariantContext,
   RobotState,
   Timeline,
@@ -13,7 +14,8 @@ import type {
 export const commandCreatorsTimeline = (
   commandCreators: Array<CurriedCommandCreator>,
   invariantContext: InvariantContext,
-  initialRobotState: RobotState
+  initialRobotState: RobotState,
+  config: Config
 ): Timeline => {
   const timeline = commandCreators.reduce(
     (acc: Timeline, commandCreator: CurriedCommandCreator, index: number) => {
@@ -29,7 +31,8 @@ export const commandCreatorsTimeline = (
 
       const commandCreatorResult = commandCreator(
         invariantContext,
-        prevRobotState
+        prevRobotState,
+        config
       )
 
       if (commandCreatorResult.errors) {
