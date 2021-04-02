@@ -5,12 +5,10 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [4.2.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.2.0...v4.2.1-alpha.0) (2021-04-02)
 
-This is a hotfix to prevent crashing in the Z axis with one pipette. You must re-calibrate your pipette offset and your labware before proceeding to a run.
 
 ### Bug Fixes
 
 * **api:** do not search for a tip length calibration by slot name ([#7574](https://github.com/Opentrons/opentrons/issues/7574)) ([313f4ef](https://github.com/Opentrons/opentrons/commit/313f4ef))
-
 
 
 
