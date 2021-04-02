@@ -51,14 +51,10 @@ def tip_length_for(pipette: PipetteDict, tiprack: Labware) -> float:
         return tip_length - tip_overlap
 
     try:
-        # For now, parent should be an empty string since we are
-        # not uniquely characterizing labware calibrations by
-        # slot number
-        parent = ''
         return get.load_tip_length_calibration(
             pipette['pipette_id'],
-            tiprack._implementation.get_definition(),
-            parent).tip_length
+            tiprack._implementation.get_definition()
+            ).tip_length
     except TipLengthCalNotFound:
         return _build_length_from_overlap()
 

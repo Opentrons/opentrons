@@ -295,8 +295,8 @@ class PipetteOffsetCalibrationUserFlow:
         try:
             return get.load_tip_length_calibration(
                 self._hw_pipette.pipette_id,
-                self._tip_rack._implementation.get_definition(),
-                '').tip_length
+                self._tip_rack._implementation.get_definition()
+                ).tip_length
         except TipLengthCalNotFound:
             return None
 
