@@ -520,6 +520,7 @@ export const getInvariantContext: Selector<InvariantContext> = createSelector(
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    config: { FOO: false }, // TODO IMMEDIATELY get from FFs
   })
 )
 
