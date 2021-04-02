@@ -56,6 +56,7 @@
     "batch_edit": {
       "disabled": {
         "pipette-different": "Cannot edit unless selected steps share the same pipette.",
+        "labware-different": "Cannot edit unless selected steps share the same type of labware.",
         "aspirate-labware-different": "Cannot edit unless selected steps share the same type of source labware.",
         "dispense-labware-different": "Cannot edit unless selected steps share the same type of destination labware.",
         "multi-aspirate-present": "Cannot edit while one or more selected steps uses the multi-aspirate path.",
