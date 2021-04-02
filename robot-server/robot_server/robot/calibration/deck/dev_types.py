@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict, Union, List
 from typing_extensions import TypedDict, Literal
 from opentrons.types import Point
 
@@ -7,9 +7,9 @@ from .constants import DeckCalibrationState
 SavedPoints = TypedDict(
     'SavedPoints',
     {
-        '1BLC': Point,
-        '3BRC': Point,
-        '7TLC': Point,
+        '1BLC': List[float],
+        '3BRC': List[float],
+        '7TLC': List[float],
     },
     total=False
     )

@@ -41,9 +41,9 @@ def solve_attitude(
     :param actual:
     :returns: 
     """
-    ex_p1 = [*expected[0], 1]
-    ex_p2 = [*expected[1], 1]
-    ex_p3 = [*expected[2], 1]
+    ex_p1 = expected[0]
+    ex_p2 = expected[1]
+    ex_p3 = expected[2]
     zero = [0, 0, 0]
 
     expected_matrix = np.array([

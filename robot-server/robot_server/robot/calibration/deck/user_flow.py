@@ -307,7 +307,7 @@ class DeckCalibrationUserFlow:
             self._z_height_reference = cur_pt.z
         else:
             pt_id = SAVE_POINT_STATE_MAP[self._current_state]
-            self._saved_points[pt_id] = cur_pt
+            self._saved_points[pt_id] = [cur_pt[0], cur_pt[1]]
 
             if self._current_state == State.savingPointThree:
                 self._save_attitude_matrix()
