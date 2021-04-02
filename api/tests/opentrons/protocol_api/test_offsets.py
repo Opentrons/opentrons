@@ -170,7 +170,6 @@ def test_create_tip_length_calibration_data(monkeypatch, clear_custom_tiprack_di
         'hash_labware_def', mock_hash_labware)
 
     tip_length = 22.0
-    parent = ''
     expected_data = {
         MOCK_HASH: {
             'tipLength': tip_length,
@@ -182,7 +181,7 @@ def test_create_tip_length_calibration_data(monkeypatch, clear_custom_tiprack_di
     }
     assert not os.path.exists(custom_tiprack_path(URI))
     result = modify.create_tip_length_data(
-        minimalLabwareDef, parent, tip_length)
+        minimalLabwareDef, tip_length)
     assert result == expected_data
     assert os.path.exists(custom_tiprack_path(URI))
 
@@ -226,7 +225,7 @@ def test_load_nonexistent_tip_length_calibration_data(
 
     # file does not exist (FileNotFoundError)
     with pytest.raises(cs_types.TipLengthCalNotFound):
-        get.load_tip_length_calibration(PIPETTE_ID, minimalLabwareDef, '')
+        get.load_tip_length_calibration(PIPETTE_ID, minimalLabwareDef)
 
     # labware hash not in calibration file (KeyError)
     calpath = config.get_tip_length_cal_path()
@@ -239,7 +238,7 @@ def test_load_nonexistent_tip_length_calibration_data(
         }
         json.dump(test_offset, offset_file)
     with pytest.raises(cs_types.TipLengthCalNotFound):
-        get.load_tip_length_calibration(PIPETTE_ID, minimalLabwareDef, '')
+        get.load_tip_length_calibration(PIPETTE_ID, minimalLabwareDef)
 
 
 def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
@@ -250,12 +249,11 @@ def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
         'hash_labware_def', mock_hash_labware)
 
     tip_length = 22.0
-    parent = ''
     test_data = modify.create_tip_length_data(
-        minimalLabwareDef, parent, tip_length)
+        minimalLabwareDef, tip_length)
     modify.save_tip_length_calibration(PIPETTE_ID, test_data)
     result = get.load_tip_length_calibration(
-        PIPETTE_ID, minimalLabwareDef, parent)
+        PIPETTE_ID, minimalLabwareDef)
     expected = cs_types.TipLengthCalibration(
         tip_length=tip_length,
         pipette=PIPETTE_ID,

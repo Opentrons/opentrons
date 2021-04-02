@@ -917,10 +917,9 @@ def test_tip_length_for_load_caldata(ctx):
     pip_id = instr.hw_pipette['pipette_id']
     fake_tip_length = 31
 
-    parent = ''
     test_data = modify.create_tip_length_data(
         tiprack._implementation.get_definition(),
-        parent, fake_tip_length)
+        fake_tip_length)
     modify.save_tip_length_calibration(pip_id, test_data)
 
     assert instr._tip_length_for(tiprack) == fake_tip_length
