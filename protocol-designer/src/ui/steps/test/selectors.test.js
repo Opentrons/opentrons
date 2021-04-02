@@ -1131,6 +1131,8 @@ describe('getMultiSelectDisabledFields', () => {
           aspirate_delay_seconds: labwareDifferentText,
           dispense_delay_checkbox: labwareDifferentText,
           dispense_delay_seconds: labwareDifferentText,
+          mix_touchTip_checkbox: labwareDifferentText,
+          mix_touchTip_mmFromBottom: labwareDifferentText,
         })
       })
     })

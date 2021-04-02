@@ -70,6 +70,8 @@ const batchEditMixLabwareDifferentDisabledFieldNames: Array<StepFieldName> = [
   'aspirate_delay_seconds',
   'dispense_delay_checkbox',
   'dispense_delay_seconds',
+  'mix_touchTip_checkbox',
+  'mix_touchTip_mmFromBottom',
 ]
 
 const batchEditMoveLiquidMultiAspiratePathDisabledFieldNames: Array<StepFieldName> = [
