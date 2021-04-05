@@ -22,19 +22,20 @@ class MagDeckEmulator(AbstractEmulator):
     """Magdeck emulator"""
 
     def __init__(self) -> None:
-        self.height = 0
-        self.position = 0
+        self.height: float = 0
+        self.position: float = 0
 
     def handle(self, words: List[str]) -> Optional[str]:
         """Handle a command."""
         cmd = words[0]
         logger.info(f"Got command {cmd}")
         if cmd == GCODE_HOME:
-            pass
+            self.height = 0
         elif cmd == GCODE_MOVE:
-            pass
+            assert words[1][0] == 'Z'
+            self.position = float(words[1][1:])
         elif cmd == GCODE_PROBE:
-            pass
+            self.height = 45
         elif cmd == GCODE_GET_PROBED_DISTANCE:
             return f"height:{self.height}"
         elif cmd == GCODE_GET_POSITION:

@@ -27,7 +27,7 @@ class ConnectionHandler:
                         response = f'{response}\r\n'
                         logger.debug("Sending: %s", response)
                         writer.write(response.encode())
-                except (IndexError, StopIteration) as e:
+                except Exception as e:
                     logger.exception("exception")
                     writer.write(f'Error: {str(e)}\r\n'.encode())
 

@@ -18,6 +18,15 @@ async def magdeck(loop: asyncio.BaseEventLoop, emulation_app) -> MagDeck:
     yield td
 
 
-def test_device_info(magdeck):
+def test_device_info(magdeck: MagDeck):
     assert {'model': 'magdeck_emulator', 'serial': 'fake_serial',
             'version': '1'} == magdeck.device_info
+
+
+async def test_engage_cycle(magdeck: MagDeck):
+    """It should cycle engage and disengage"""
+    await magdeck.engage(1)
+    assert magdeck.current_height == 1
+
+    await magdeck.deactivate()
+    assert magdeck.current_height == 0
