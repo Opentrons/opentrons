@@ -86,7 +86,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         """Send open lid command"""
         c = CommandBuilder(
             terminator=SERIAL_ACK
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.OPEN_LID
         )
         await self._connection.send_command(
@@ -96,7 +96,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         """Send close lid command"""
         c = CommandBuilder(
             terminator=SERIAL_ACK
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.CLOSE_LID
         )
         await self._connection.send_command(
@@ -106,7 +106,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         """Send get lid status command"""
         c = CommandBuilder(
             terminator=SERIAL_ACK
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.GET_LID_STATUS
         )
         response = await self._connection.send_command(
@@ -118,9 +118,9 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         temp = min(LID_TARGET_MAX, max(LID_TARGET_MIN, temp))
         c = CommandBuilder(
             terminator=SERIAL_ACK
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.SET_LID_TEMP
-        ).with_float(
+        ).add_float(
             prefix="S", value=temp, precision=utils.TC_GCODE_ROUNDING_PRECISION
         )
         await self._connection.send_command(
@@ -130,7 +130,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         """Send a get lid temperature command."""
         c = CommandBuilder(
             terminator=SERIAL_ACK
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.GET_LID_TEMP
         )
         response = await self._connection.send_command(
@@ -149,17 +149,17 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
 
         c = CommandBuilder(
             terminator=SERIAL_ACK
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.SET_PLATE_TEMP
-        ).with_float(
+        ).add_float(
             prefix="S", value=temp, precision=utils.TC_GCODE_ROUNDING_PRECISION
         )
         if hold_time is not None:
-            c = c.with_float(prefix="H", value=hold_time,
-                             precision=utils.TC_GCODE_ROUNDING_PRECISION)
+            c = c.add_float(prefix="H", value=hold_time,
+                            precision=utils.TC_GCODE_ROUNDING_PRECISION)
         if volume is not None:
-            c = c.with_float(prefix="V", value=volume,
-                             precision=utils.TC_GCODE_ROUNDING_PRECISION)
+            c = c.add_float(prefix="V", value=volume,
+                            precision=utils.TC_GCODE_ROUNDING_PRECISION)
 
         await self._connection.send_command(
             data=c.build(), retries=DEFAULT_COMMAND_RETRIES)
@@ -168,23 +168,24 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         """Send a get plate temperature command."""
         c = CommandBuilder(
             terminator=SERIAL_ACK
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.GET_PLATE_TEMP
         )
         response = await self._connection.send_command(
             data=c.build(), retries=DEFAULT_COMMAND_RETRIES
         )
         return utils.parse_plate_temperature_response(
-            temperature_string=response, rounding_val=utils.TC_GCODE_ROUNDING_PRECISION
+            temperature_string=response,
+            rounding_val=utils.TC_GCODE_ROUNDING_PRECISION
         )
 
     async def set_ramp_rate(self, ramp_rate: float) -> None:
         """Send a set ramp rate command"""
         c = CommandBuilder(
             terminator=SERIAL_ACK
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.SET_RAMP_RATE
-        ).with_float(
+        ).add_float(
             prefix="S", value=ramp_rate, precision=utils.TC_GCODE_ROUNDING_PRECISION
         )
         await self._connection.send_command(
@@ -194,7 +195,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         """Send deactivate all command."""
         c = CommandBuilder(
             terminator=SERIAL_ACK
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.DEACTIVATE_ALL
         )
         await self._connection.send_command(
@@ -204,7 +205,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         """Send deactivate lid command"""
         c = CommandBuilder(
             terminator=SERIAL_ACK
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.DEACTIVATE_LID
         )
         await self._connection.send_command(
@@ -214,7 +215,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         """Send deactivate block command"""
         c = CommandBuilder(
             terminator=SERIAL_ACK
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.DEACTIVATE_BLOCK
         )
         await self._connection.send_command(
@@ -224,7 +225,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         """Send get device info command"""
         c = CommandBuilder(
             terminator=SERIAL_ACK
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.DEVICE_INFO
         )
         response = await self._connection.send_command(

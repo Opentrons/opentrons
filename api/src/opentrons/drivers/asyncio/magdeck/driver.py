@@ -95,7 +95,7 @@ class MagDeckDriver(AbstractMagDeckDriver):
         """Homes the magnet"""
         c = CommandBuilder(
             terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.HOME
         )
         await self._send_command(c)
@@ -108,7 +108,7 @@ class MagDeckDriver(AbstractMagDeckDriver):
         """
         c = CommandBuilder(
             terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.PROBE_PLATE
         )
         await self._send_command(c)
@@ -120,7 +120,7 @@ class MagDeckDriver(AbstractMagDeckDriver):
         """
         c = CommandBuilder(
             terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.GET_PLATE_HEIGHT
         )
         response = await self._send_command(c)
@@ -135,7 +135,7 @@ class MagDeckDriver(AbstractMagDeckDriver):
         """
         c = CommandBuilder(
             terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.GET_CURRENT_POSITION
         )
 
@@ -152,9 +152,9 @@ class MagDeckDriver(AbstractMagDeckDriver):
         """
         c = CommandBuilder(
             terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.MOVE
-        ).with_float(
+        ).add_float(
             prefix="Z", value=position_mm, precision=GCODE_ROUNDING_PRECISION
         )
         await self._send_command(c)
@@ -178,7 +178,7 @@ class MagDeckDriver(AbstractMagDeckDriver):
         """
         c = CommandBuilder(
             terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.DEVICE_INFO
         )
         response = await self._send_command(c)
@@ -194,7 +194,7 @@ class MagDeckDriver(AbstractMagDeckDriver):
         """
         c = CommandBuilder(
             terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.PROGRAMMING_MODE
         )
         await self._send_command(c)

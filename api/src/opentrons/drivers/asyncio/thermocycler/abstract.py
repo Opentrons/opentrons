@@ -88,4 +88,3 @@ class AbstractThermocyclerDriver(ABC):
     @abstractmethod
     async def enter_programming_mode(self) -> None:
         ...
-

@@ -94,7 +94,7 @@ class TempDeckDriver(AbstractTempDeckDriver):
         """
         c = CommandBuilder(
             terminator=TEMP_DECK_COMMAND_TERMINATOR
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.DISENGAGE
         )
         await self._send_command(command=c)
@@ -110,11 +110,11 @@ class TempDeckDriver(AbstractTempDeckDriver):
         """
         c = CommandBuilder(
             terminator=TEMP_DECK_COMMAND_TERMINATOR
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.SET_TEMP
-        ).with_float(prefix="S",
-                     value=celsius,
-                     precision=utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+        ).add_float(prefix="S",
+                    value=celsius,
+                    precision=utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
         await self._send_command(command=c)
 
     async def get_temperature(self) -> Temperature:
@@ -126,7 +126,7 @@ class TempDeckDriver(AbstractTempDeckDriver):
         """
         c = CommandBuilder(
             terminator=TEMP_DECK_COMMAND_TERMINATOR
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.GET_TEMP
         )
         response = await self._send_command(command=c)
@@ -154,7 +154,7 @@ class TempDeckDriver(AbstractTempDeckDriver):
         """
         c = CommandBuilder(
             terminator=TEMP_DECK_COMMAND_TERMINATOR
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.DEVICE_INFO
         )
         response = await self._send_command(command=c)
@@ -170,7 +170,7 @@ class TempDeckDriver(AbstractTempDeckDriver):
         """
         c = CommandBuilder(
             terminator=TEMP_DECK_COMMAND_TERMINATOR
-        ).with_gcode(
+        ).add_gcode(
             gcode=GCODE.PROGRAMMING_MODE
         )
         await self._send_command(command=c)
