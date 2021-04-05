@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { LabeledValue } from '@opentrons/components'
+import { Box, LabeledValue, SPACING_3 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import type {
@@ -15,13 +15,10 @@ import {
 } from '../../../../molecules/ModuleControls'
 
 import { StatusCard } from './StatusCard'
-import { StatusItem } from './StatusItem'
 import styles from './styles.css'
 
-const BLOCK_TEMP_ABBREV = 'Block Temp'
 const CYCLE_NUMBER = 'Cycle #'
 const HOLD_TIME_REMAINING = 'Hold time remaining:'
-const LID_TEMP_ABBREV = 'Lid Temp'
 const STEP_NUMBER = 'Step #'
 const TIME_REMAINING_FOR_STEP = 'Time remaining for step:'
 
@@ -133,28 +130,29 @@ export const ThermocyclerCard = ({
       isCardExpanded={isCardExpanded}
       toggleCard={toggleCard}
     >
-      <div className={styles.card_row}>
-        <StatusItem status={module.status} />
+      <Box padding={SPACING_3}>
+        <TemperatureData title="lid" current={lidTemp} target={lidTarget} />
         <TemperatureControl
           module={module}
+          isSecondaryTemp={true}
           sendModuleCommand={sendModuleCommand}
           disabledReason={controlDisabledReason}
         />
-      </div>
-      <div className={styles.card_row}>
+      </Box>
+      <Box padding={SPACING_3} paddingTop={0}>
         <TemperatureData
-          className={styles.temp_data_item}
-          title={BLOCK_TEMP_ABBREV}
+          status={module.status}
+          title="block"
           current={currentTemp}
           target={targetTemp}
         />
-        <TemperatureData
-          className={styles.temp_data_item}
-          title={LID_TEMP_ABBREV}
-          current={lidTemp}
-          target={lidTarget}
+        <TemperatureControl
+          module={module}
+          isSecondaryTemp={false}
+          sendModuleCommand={sendModuleCommand}
+          disabledReason={controlDisabledReason}
         />
-      </div>
+      </Box>
       {executingProfile && (
         <CycleInfo
           holdTime={holdTime}

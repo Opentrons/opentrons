@@ -20,7 +20,8 @@ from opentrons.protocol_api import paired_instrument_context as paired
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.calibration_storage import get, types as cs_types
+from opentrons.calibration_storage import (
+    get, modify, delete, types as cs_types)
 
 import pytest
 
@@ -831,6 +832,51 @@ def test_loaded_modules(ctx, monkeypatch):
     assert ctx.loaded_modules[7] == mod2
 
 
+def test_order_of_module_load(loop):
+    import opentrons.hardware_control as hardware_control
+    import opentrons.protocol_api as protocol_api
+
+    mods = [
+        'tempdeck', 'thermocycler', 'tempdeck']
+    thread_manager = hardware_control.ThreadManager(
+        hardware_control.API.build_hardware_simulator, attached_modules=mods)
+    fake_hardware = thread_manager.sync
+
+    attached_modules = fake_hardware.attached_modules
+    hw_temp1 = attached_modules[0]
+    hw_temp2 = attached_modules[2]
+
+    ctx1 = protocol_api.ProtocolContext(
+        implementation=ProtocolContextImplementation(),
+        loop=loop)
+    with ctx1.temp_connect(fake_hardware) as c:
+        temp1 = c.load_module('tempdeck', 4)
+        c.load_module('thermocycler')
+        temp2 = c.load_module('tempdeck', 1)
+        async_temp1 = temp1._module._obj_to_adapt
+        async_temp2 = temp2._module._obj_to_adapt
+
+        assert id(async_temp1) == id(hw_temp1)
+        assert id(async_temp2) == id(hw_temp2)
+
+    # Test that the order remains the same for the
+    # hardware modules regardless of the slot it
+    # was loaded into
+    ctx2 = protocol_api.ProtocolContext(
+        implementation=ProtocolContextImplementation(),
+        loop=loop)
+
+    with ctx2.temp_connect(fake_hardware) as c:
+        c.load_module('thermocycler')
+        temp1 = c.load_module('tempdeck', 1)
+        temp2 = c.load_module('tempdeck', 4)
+
+        async_temp1 = temp1._module._obj_to_adapt
+        async_temp2 = temp2._module._obj_to_adapt
+        assert id(async_temp1) == id(hw_temp1)
+        assert id(async_temp2) == id(hw_temp2)
+
+
 def test_tip_length_for(ctx, monkeypatch):
     instr = ctx.load_instrument('p20_single_gen2', 'left')
     tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
@@ -863,6 +909,21 @@ def test_tip_length_for_caldata(ctx, monkeypatch, use_new_calibration):
         tiprack._implementation.get_definition()['parameters']['tipLength']
         - instr.hw_pipette['tip_overlap']
         ['opentrons/geb_96_tiprack_10ul/1'])
+
+
+def test_tip_length_for_load_caldata(ctx):
+    instr = ctx.load_instrument('p20_single_gen2', 'left')
+    tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
+    pip_id = instr.hw_pipette['pipette_id']
+    fake_tip_length = 31
+
+    test_data = modify.create_tip_length_data(
+        tiprack._implementation.get_definition(),
+        fake_tip_length)
+    modify.save_tip_length_calibration(pip_id, test_data)
+
+    assert instr._tip_length_for(tiprack) == fake_tip_length
+    delete.clear_tip_length_calibration()
 
 
 def test_bundled_labware(loop, get_labware_fixture):

@@ -135,6 +135,9 @@ class Location:
         return Location(point=self.point + point,
                         labware=self._labware.object)
 
+    def __repr__(self) -> str:
+        return f"Location(point={repr(self._point)}, labware={self._labware})"
+
 
 # TODO(mc, 2020-10-22): use MountType implementation for Mount
 class Mount(enum.Enum):

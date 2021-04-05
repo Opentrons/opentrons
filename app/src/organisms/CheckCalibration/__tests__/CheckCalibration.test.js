@@ -5,6 +5,7 @@ import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 
 import * as Sessions from '../../../redux/sessions'
+// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import { CheckCalibration } from '../index'

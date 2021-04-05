@@ -59,30 +59,40 @@ def test_update_position(smoothie, monkeypatch):
     assert driver.position == expected
 
 
-def test_remove_serial_echo(smoothie):
-    gcode = 'G28.2B'
-    cmd = gcode
-    res = smoothie._remove_unwanted_characters(
-        cmd, cmd)
-    assert res == ''
-    cmd = f'\r\n{gcode}\r\n\r\n'
-    res = smoothie._remove_unwanted_characters(
-        cmd,
-        cmd)
-    assert res == ''
-    cmd = f'\r\n{gcode}\r\n\r\nsome-data\r\nok\r\n'
-    response = cmd + "TESTS-RULE"
-    res = smoothie._remove_unwanted_characters(
-        cmd,
-        response)
-    assert res == 'TESTS-RULE'
+@pytest.mark.parametrize(
+    argnames=["cmd", "resp", "expected"],
+    argvalues=[
+        # Remove command from response
+        ["G28.2B", "G28.2B", ""],
+        ["G28.2B G1", "G28.2B G1", " "],
+        ["G28.2B G1", "G1G28.2BG1", ""],
+        # Remove command and whitespace from response
+        ["\r\nG52\r\n\r\n", "\r\nG52\r\n\r\n", ""],
+        ["\r\nG52\r\n\r\nsome-data\r\nok\r\n",
+         "\r\nG52\r\n\r\nsome-data\r\nok\r\nTESTS-RULE",
+         "TESTS-RULE"
+         ],
+        ["\r\nG52\r\n\r\nsome-data\r\nok\r\n",
+         "G52\r\n\r\nsome-data\r\nokT\r\nESTS-RULE",
+         "TESTS-RULE"],
+        # L is not a command echo but a token
+        ["M371 L \r\n\r\n",
+         "L:703130",
+         "L:703130"],
+        # R is not a command echo but a token
+        ["M3 R \r\n\r\n",
+         "M3R:703130",
+         "R:703130"]
 
-    cmd = f'\r\n{gcode}\r\n\r\nsome-data\r\nok\r\n'
-    response = cmd.strip() + '\r\nT\r\nESTS-RULE'
+    ]
+)
+def test_remove_serial_echo(
+        smoothie: driver_3_0.SmoothieDriver_3_0_0,
+        cmd: str, resp: str, expected: str):
+    """It should remove unwanted characters only."""
     res = smoothie._remove_unwanted_characters(
-        cmd,
-        response)
-    assert res == 'TESTS-RULE'
+        cmd, resp)
+    assert res == expected
 
 
 def test_parse_position_response(smoothie):
@@ -267,6 +277,78 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M400'],
     ]
     fuzzy_assert(result=command_log, expected=expected)
+
+
+def test_move_with_split(smoothie, monkeypatch):
+    command_log = []
+    smoothie._setup()
+    smoothie.home()
+    smoothie.simulating = False
+
+    smoothie.configure_splits_for(
+        {
+            "B": MoveSplit(
+                split_distance=1,
+                split_current=1.75,
+                split_speed=1,
+                after_time=1800,
+                fullstep=True),
+            "C": MoveSplit(
+                split_distance=1,
+                split_current=1.75,
+                split_speed=1,
+                after_time=1800,
+                fullstep=True)
+        }
+    )
+    smoothie._steps_per_mm = {"B": 1.0, "C": 1.0}
+
+    def write_with_log(command, ack, connection, timeout, tag=None):
+        command_log.append(command.strip())
+        return driver_3_0.SMOOTHIE_ACK
+
+    def _parse_position_response(arg):
+        return smoothie.position
+
+    monkeypatch.setattr(
+        serial_communication, 'write_and_return', write_with_log)
+    monkeypatch.setattr(
+        driver_3_0, '_parse_position_response', _parse_position_response)
+
+    smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'C': 3})
+    expected = [
+        ['M55 M92 C0.03125 G4 P0.01 G0 F60 M907 A0.1 B0.05 C1.75 X1.25 Y1.25 '
+         'Z0.8 G4 P0.005'],
+        ['M400'],
+        ['G0 C18.0'],
+        ['M400'],
+        ['M54 M92 C1.0 G4 P0.01'],
+        ['M400'],
+        ['G0 F24000 M907 A0.1 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005 G0.+'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005'],
+        ['M400'],
+    ]
+    fuzzy_assert(result=command_log, expected=expected)
+    command_log = []
+
+    smoothie.move({'B': 2})
+
+    expected = [
+        ['M53 M92 B0.03125 G4 P0.01 G0 F60 M907 A0.1 B1.75 C0.05 '
+         'X0.3 Y0.3 Z0.1 G4 P0.005'],
+        ['M400'],
+        ['G0 B18.0'],
+        ['M400'],
+        ['M52 M92 B1.0 G4 P0.01'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005 G0 B2'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005'],
+        ['M400'],
+    ]
+    fuzzy_assert(result=command_log, expected=expected)
+    command_log = []
 
 
 def test_set_active_current(smoothie, monkeypatch):

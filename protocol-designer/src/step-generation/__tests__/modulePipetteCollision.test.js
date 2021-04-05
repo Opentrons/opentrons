@@ -7,9 +7,11 @@ import {
 import { modulePipetteCollision } from '../utils/modulePipetteCollision'
 import { getInitialRobotStateStandard, makeContext } from '../__fixtures__'
 import { _getFeatureFlag } from '../utils/_getFeatureFlag'
+import type { FlagTypes } from '../../feature-flags'
+
 jest.mock('../utils/_getFeatureFlag')
 
-const mock_getFeatureFlag: JestMockFn<[string], boolean> = _getFeatureFlag
+const mock_getFeatureFlag: JestMockFn<[FlagTypes], boolean> = _getFeatureFlag
 
 let invariantContext
 let robotState

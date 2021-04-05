@@ -11,6 +11,7 @@ import {
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
 import { getLatestLabwareDef, getLegacyLabwareDef } from './getLabware'
+// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import type { ModuleModel, DeckSlotId } from '@opentrons/shared-data'
 
@@ -112,6 +113,7 @@ export class URLDeck extends React.Component<{||}> {
                     {labwareDefV2 ? (
                       <LabwareRender definition={labwareDefV2} />
                     ) : (
+                      /* $FlowFixMe(mc, 2021-03-18): LegacyLabwareRender does not take x and y props */
                       <LegacyLabwareRender
                         x={0}
                         y={0}

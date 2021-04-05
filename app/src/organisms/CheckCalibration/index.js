@@ -180,6 +180,7 @@ export function CheckCalibration(
   return Panel ? (
     <>
       <ModalPage
+        /* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion */
         titleBar={titleBarProps}
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >

@@ -2,7 +2,9 @@
   "name": "@opentrons/components",
   "version": "4.2.0",
   "description": "React components library for Opentrons' projects",
-  "main": "src/index.js",
+  "flow:main": "flow-types/index.js.flow",
+  "source": "src/index.ts",
+  "types": "lib/index.d.ts",
   "style": "src/index.css",
   "repository": {
     "type": "git",
@@ -19,7 +21,15 @@
     "react-router-dom": "5.1.1"
   },
   "dependencies": {
+    "@opentrons/shared-data": "4.2.0",
     "@popperjs/core": "2.1.1",
+    "@types/classnames": "^2.2.5",
+    "@types/lodash": "^4.14.168",
+    "@types/react": "^17.0.2",
+    "@types/react-router-dom": "^5.1.7",
+    "@types/react-select": "^4.0.13",
+    "@types/styled-components": "^5.1.7",
+    "@types/webpack-env": "^1.16.0",
     "classnames": "2.2.5",
     "lodash": "4.17.15",
     "react-popper": "1.0.0",

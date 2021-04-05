@@ -1,5 +1,4 @@
 // @flow
-import * as React from 'react'
 import difference from 'lodash/difference'
 import isEqual from 'lodash/isEqual'
 import without from 'lodash/without'
@@ -10,7 +9,6 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../../step-generation/utils'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
-import styles from './StepEditForm.css'
 import type { Options } from '@opentrons/components'
 import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { FormWarning } from '../../steplist/formLevel/warnings'
@@ -168,48 +166,6 @@ export const getVisibleProfileFormLevelErrors = (args: {|
       })
     })
   })
-}
-
-// TODO(IL, 2021-02-25): DEPRECATED. this is only used by FieldConnector. Remove in #7298
-export function getTooltipForField(
-  stepType: ?string,
-  name: string,
-  disabled: boolean
-): ?React.Node {
-  if (!stepType) {
-    console.error(
-      `expected stepType for form, cannot getTooltipText for ${name}`
-    )
-    return null
-  }
-
-  const prefixes = ['aspirate_', 'dispense_']
-  const nameWithoutPrefix = prefixes.some(prefix => name.startsWith(prefix))
-    ? name.split('_').slice(1).join('_')
-    : name
-
-  // NOTE: this is a temporary solution until we want to be able to choose from
-  // multiple tooltips for the same field depending on form state.
-  // As-is, this will only let us show two tooltips for any given field per step type:
-  // non-disabled tooltip copy, and disabled tooltip copy.
-  const disabledKeys = disabled
-    ? [
-        `tooltip.step_fields.${stepType}.disabled.${name}`,
-        `tooltip.step_fields.${stepType}.disabled.$generic`,
-      ]
-    : []
-
-  // specificity cascade for names.
-  // first level: "disabled" wins out if disabled arg is true
-  // second level: prefix. "aspirate_foo" wins over "foo"
-  const text: string = i18n.t([
-    ...disabledKeys,
-    `tooltip.step_fields.defaults.${name}`,
-    `tooltip.step_fields.defaults.${nameWithoutPrefix}`,
-    '',
-  ])
-
-  return text ? <div className={styles.tooltip}>{text}</div> : null
 }
 
 export const getFieldDefaultTooltip = (name: string): string =>

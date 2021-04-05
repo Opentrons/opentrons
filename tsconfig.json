@@ -2,10 +2,16 @@
   "files": [],
   "references": [
     {
+      "path": "./components"
+    },
+    {
       "path": "./app-shell"
     },
     {
       "path": "./discovery-client"
+    },
+    {
+      "path": "./labware-library"
     }
   ]
 }

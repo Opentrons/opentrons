@@ -19,62 +19,62 @@ def test_builder_create_command_with_terminator() -> None:
         [1.2342, 0, 1.0],
     ]
 )
-def test_builder_create_command_with_float(
+def test_builder_create_command_add_float(
         value: float, precision: Optional[int], expected_float: float) -> None:
     """It should create a command with a floating point value."""
     terminator = "terminator"
     builder = CommandBuilder(terminator=terminator)
-    assert builder.with_float(
+    assert builder.add_float(
         prefix='Z', value=value, precision=precision
     ).build() == f"Z{expected_float} terminator"
 
 
-def test_builder_create_command_with_int() -> None:
+def test_builder_create_command_add_int() -> None:
     """It should create a command with an integer point value."""
     terminator = "terminator"
     builder = CommandBuilder(terminator=terminator)
-    assert builder.with_int(
+    assert builder.add_int(
         prefix='Z', value=15
-    ).build() == "Z15 terminator"
+    ).build() == f"Z15 {terminator}"
 
 
-def test_builder_create_command_with_gcode() -> None:
+def test_builder_create_command_add_gcode() -> None:
     """It should create a command with a GCODE."""
     terminator = "terminator"
     builder = CommandBuilder(terminator=terminator)
-    assert builder.with_gcode(
+    assert builder.add_gcode(
         gcode='G321'
-    ).build() == "G321 terminator"
+    ).build() == f"G321 {terminator}"
 
 
-def test_builder_create_command_with_builder() -> None:
+def test_builder_create_command_add_builder() -> None:
     """It should create a command words in another builder."""
     terminator = "terminator"
     builder = CommandBuilder(terminator=terminator)
-    assert builder.with_gcode(
+    assert builder.add_gcode(
         gcode='G321'
-    ).build() == "G321 terminator"
+    ).build() == f"G321 {terminator}"
 
     builder2 = CommandBuilder(terminator=terminator)
-    assert builder2.with_builder(
+    assert builder2.add_builder(
         builder=builder
-    ).with_gcode(
+    ).add_gcode(
         gcode="G123"
-    ).with_builder(
+    ).add_builder(
         builder=builder
-    ).build() == "G321 G123 G321 terminator"
+    ).build() == f"G321 G123 G321 {terminator}"
 
 
 def test_builder_chain() -> None:
     """It should create a command using chaining."""
     terminator = "terminator"
     builder = CommandBuilder(terminator=terminator)
-    assert builder.with_gcode(
+    assert builder.add_gcode(
         gcode='G321'
-    ).with_float(
+    ).add_float(
         prefix="X", value=321, precision=3
-    ).with_gcode(
+    ).add_gcode(
         gcode="M321"
-    ).with_int(
+    ).add_int(
         prefix="Z", value=3
-    ).with_gcode("G111").build() == "G321 X321 M321 Z3 G111 terminator"
+    ).add_gcode("G111").build() == f"G321 X321 M321 Z3 G111 {terminator}"

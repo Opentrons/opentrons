@@ -1747,13 +1747,14 @@ class API(HardwareAPILike):
 
         # destroy removed mods
         self._unregister_modules(removed_mods_at_ports)
-        self._backend._usb.sort_ports()
+        sorted_mods_at_port =\
+            self._backend._usb.match_virtual_ports(new_mods_at_ports)
 
         # build new mods
-        for mod in new_mods_at_ports:
+        for mod in sorted_mods_at_port:
             new_instance = await self._backend.build_module(
                     port=mod.port,
-                    usb_port=self._backend._usb.find_port(mod.port),
+                    usb_port=mod.usb_port,
                     model=mod.name,
                     interrupt_callback=self.pause_with_message,
                     loop=self.loop,
@@ -1761,6 +1762,46 @@ class API(HardwareAPILike):
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {mod.name} discovered and attached"
                            f" at port {mod.port}, new_instance: {new_instance}")
+
+    async def find_modules(
+            self, by_model: modules.types.ModuleModel,
+            resolved_type: modules.types.ModuleType
+            ) -> List[modules.AbstractModule]:
+        """
+        Find Modules.
+
+        Given a module model and type, find all attached
+        modules that fit this criteria. If there are no
+        modules attached, but the module is being loaded
+        in simulation, then it should return a simulating
+        module of the same type.
+        """
+        matching_modules = []
+        mod_type = {
+            modules.types.ModuleType.MAGNETIC: 'magdeck',
+            modules.types.ModuleType.TEMPERATURE: 'tempdeck',
+            modules.types.ModuleType.THERMOCYCLER: 'thermocycler'
+        }[resolved_type]
+        for module in self.attached_modules:
+            if mod_type == module.name():
+                matching_modules.append(module)
+        if self.is_simulator and not matching_modules:
+            mod_class = {
+                'magdeck': modules.MagDeck,
+                'tempdeck': modules.TempDeck,
+                'thermocycler': modules.Thermocycler
+                }[mod_type]
+            simulating_module = mod_class(
+                    port='',
+                    usb_port=self._backend._usb.find_port(''),
+                    simulating=True,
+                    loop=self.loop,
+                    execution_manager=ExecutionManager(
+                        loop=self.loop),
+                    sim_model=by_model.value)
+            await simulating_module._connect()
+            matching_modules.append(simulating_module)
+        return matching_modules
 
     def get_instrument_max_height(
             self,

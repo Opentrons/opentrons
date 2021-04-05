@@ -321,7 +321,7 @@ async def test_save_offsets(mock_user_flow):
             abs_position=Point(x=10, y=10, z=40),
             critical_point=uf.critical_point_override)
         await uf.save_offset()
-        create_tip_length_data_patch.assert_called_with(ANY, '', 30)
+        create_tip_length_data_patch.assert_called_with(ANY, 30)
 
 
 async def test_save_custom_tiprack_def(

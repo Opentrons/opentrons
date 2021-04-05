@@ -174,13 +174,12 @@ If you find yourself in a place where...
 ...you can create your own primitive with the style props above using `styleProps` (to apply the styles based on props) and `isntStyleProp` (to ensure style props don't get passed down to the DOM):
 
 ```js static
-// @flow
 import styled from 'styled-components'
 import { styleProps, isntStyleProp, C_DARK_GRAY } from '@opentrons/components'
 
 import type { PrimitiveComponent } from '@opentrons/components'
 
-export const Gray: PrimitiveComponent<HTMLDivElement> = styled.div.withConfig({
+export const Gray: PrimitiveComponent<'div'> = styled.div.withConfig({
   shouldForwardProp: isntStyleProp,
 })`
   color: ${C_DARK_GRAY};

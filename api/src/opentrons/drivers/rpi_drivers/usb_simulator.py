@@ -4,16 +4,20 @@ USB Simulating Driver.
 A class to convert info from the usb bus into a
 more readable format.
 """
-from typing import List, Set
+from typing import List, Set, Union
+
+from opentrons.hardware_control.modules.types import ModuleAtPort
+from opentrons.hardware_control.types import BoardRevision
 
 from .interfaces import USBDriverInterface
 from .types import USBPort
 
 
 class USBBusSimulator(USBDriverInterface):
-    def __init__(self):
+    def __init__(self, board_revision: BoardRevision):
         self._usb_dev: List[USBPort] = self.read_usb_bus()
-        self._sorted = set()
+        self._sorted: Set[Union[int, str]] = set()
+        self._board_revision = board_revision
 
     @staticmethod
     def read_bus() -> List[str]:
@@ -26,16 +30,14 @@ class USBBusSimulator(USBDriverInterface):
         return ['']
 
     @staticmethod
-    def convert_port_path(full_port_path: str) -> USBPort:
+    def read_symlink(virtual_port: str) -> str:
         """
-        Convert port path.
+        """
+        return ''
 
-        Take the value returned from the USB bus and format
-        that information into a dataclass
-        :param full_port_path: The string port path
-        :returns: The USBPort dataclass
-        """
-        pass
+    @property
+    def board_revision(self) -> BoardRevision:
+        return self._board_revision
 
     @property
     def usb_dev(self) -> List[USBPort]:
@@ -96,8 +98,12 @@ class USBBusSimulator(USBDriverInterface):
         :returns: The matching port, or an empty port dataclass
         """
         return USBPort(
-            name='', sub_names=[], hub=None,
-            port_number=None, device_path=device_path)
+            name='', sub_names=[], device_path=device_path)
 
     def sort_ports(self) -> None:
         pass
+
+    def match_virtual_ports(
+            self, virtual_port: List[ModuleAtPort]
+            ) -> List[ModuleAtPort]:
+        return virtual_port

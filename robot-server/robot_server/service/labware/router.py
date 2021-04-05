@@ -101,10 +101,10 @@ def _check_parent(
 
 
 @router.get("/labware/calibrations",
-            description="Fetch all saved labware calibrations from the robot",
-            summary="Search the robot for any saved labware offsets"
-                    "which allows you to check whether a particular"
-                    "labware has been calibrated or not.",
+            summary="Fetch all saved labware calibrations from the robot",
+            description="Search the robot for any saved labware offsets "
+                        "which allows you to check whether a particular "
+                        "labware has been calibrated or not.",
             response_model=lw_models.MultipleCalibrationsResponse)
 async def get_all_labware_calibrations(
         loadName: str = None,

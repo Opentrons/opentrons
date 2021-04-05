@@ -1,6 +1,9 @@
 from typing import List, Set
 from typing_extensions import Protocol
 
+from opentrons.hardware_control.modules.types import ModuleAtPort
+from opentrons.hardware_control.types import BoardRevision
+
 from .types import USBPort
 
 
@@ -11,7 +14,11 @@ class USBDriverInterface(Protocol):
         ...
 
     @staticmethod
-    def convert_port_path(full_port_path: str) -> USBPort:
+    def read_symlink(virtual_port: str) -> str:
+        ...
+
+    @property
+    def board_revision(self) -> BoardRevision:
         ...
 
     @property
@@ -37,4 +44,9 @@ class USBDriverInterface(Protocol):
         ...
 
     def sort_ports(self) -> None:
+        ...
+
+    def match_virtual_ports(
+            self, virtual_port: List[ModuleAtPort]
+            ) -> List[ModuleAtPort]:
         ...

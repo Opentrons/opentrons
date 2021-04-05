@@ -12,9 +12,9 @@ class CommandBuilder:
             terminator: The command terminator.
         """
         self._terminator = terminator
-        self._words: List[str] = []
+        self._elements: List[str] = []
 
-    def with_float(
+    def add_float(
             self, prefix: str, value: float,
             precision: Optional[int]) -> 'CommandBuilder':
         """
@@ -27,10 +27,10 @@ class CommandBuilder:
 
         Returns: self
         """
-        value = round(value, precision) if precision is not None else value
-        return self.add_word(f"{prefix}{value}")
+        value = round(value, precision) if precision else value
+        return self.add_element(f"{prefix}{value}")
 
-    def with_int(self, prefix: str, value: int) -> 'CommandBuilder':
+    def add_int(self, prefix: str, value: int) -> 'CommandBuilder':
         """
         Add an integer value.
 
@@ -40,9 +40,9 @@ class CommandBuilder:
 
         Returns: self
         """
-        return self.add_word(f"{prefix}{value}")
+        return self.add_element(f"{prefix}{value}")
 
-    def with_gcode(self, gcode: str) -> 'CommandBuilder':
+    def add_gcode(self, gcode: str) -> 'CommandBuilder':
         """
         Add a GCODE.
 
@@ -51,30 +51,30 @@ class CommandBuilder:
 
         Returns: self
         """
-        return self.add_word(gcode)
+        return self.add_element(gcode)
 
-    def with_builder(self, builder: 'CommandBuilder') -> 'CommandBuilder':
+    def add_builder(self, builder: 'CommandBuilder') -> 'CommandBuilder':
         """
-        Add all words from builder
+        Add all elements from builder
 
         Args:
             builder: a command builder
 
         Returns: self
         """
-        self._words += builder._words
+        self._elements += builder._elements
         return self
 
-    def add_word(self, word: str) -> 'CommandBuilder':
+    def add_element(self, element: str) -> 'CommandBuilder':
         """
-        Add a word to the command builder
+        Add an element to the command builder
 
         Args:
-            word: a word as a string
+            element: an element as a string
 
         Returns: self
         """
-        self._words.append(word)
+        self._elements.append(element)
         return self
 
     def build(self) -> str:
@@ -83,13 +83,13 @@ class CommandBuilder:
 
         Returns: string
         """
-        return " ".join(self._words + [self._terminator])
+        return " ".join(self._elements + [self._terminator])
 
     def __str__(self) -> str:
         return self.build()
 
     def __iter__(self):
-        return iter(self._words)
+        return iter(self._elements)
 
     def __bool__(self) -> bool:
-        return len(self._words) != 0
+        return len(self._elements) != 0

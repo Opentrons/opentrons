@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import configureMockStore from 'redux-mock-store'
 
-import { Button } from '@opentrons/components'
+import { SecondaryBtn } from '@opentrons/components'
 import { ModuleUpdate } from '../ModuleUpdate'
 
 const mockStore = configureMockStore([])
@@ -61,7 +61,9 @@ describe('ModuleUpdate', () => {
             />
           </Provider>
         )
-        expect(wrapper.find(Button).prop('disabled')).toEqual(expectDisabled)
+        expect(wrapper.find(SecondaryBtn).prop('disabled')).toEqual(
+          expectDisabled
+        )
       }
     )
   })

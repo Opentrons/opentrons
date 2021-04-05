@@ -16,6 +16,7 @@ export function ResourceCard(props: Props): React.Node {
     <Card title={props.title}>
       <div className={styles.card_content}>
         <p className={styles.link_label}>{props.description}</p>
+        {/* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion or by using SecondaryBtn */}
         <OutlineButton
           Component="a"
           href={props.url}

@@ -1,4 +1,6 @@
 // @flow
+import { getFlagsFromQueryParams } from '../../feature-flags'
+import type { FlagTypes } from '../../feature-flags'
 
 // HACK Ian 2019-11-12: this is a temporary solution to pass PD runtime feature flags
 // down into step-generation, which is meant to be relatively independent of PD.
@@ -8,11 +10,13 @@
 // A long-term solution might be to either restart PD upon setting flags that are used here,
 // or pass flags as "config options" into step-generation via a factory that stands in front of all step-generation imports,
 // or just avoid this complexity for non-experimental features.
-export const _getFeatureFlag = (flagName: string): boolean => {
+export const _getFeatureFlag = (flagName: FlagTypes): boolean => {
   if (!global.localStorage) {
     let value = false
     try {
-      value = process.env[flagName] === 'true'
+      value =
+        process.env[flagName] === 'true' ||
+        getFlagsFromQueryParams()[flagName] === true
     } catch (e) {
       console.error(
         `appear to be in node environment, but cannot access ${flagName} in process.env. ${e}`
@@ -20,8 +24,11 @@ export const _getFeatureFlag = (flagName: string): boolean => {
     }
     return value
   }
-  const allFlags = JSON.parse(
-    global.localStorage.getItem('root.featureFlags.flags') || '{}'
-  )
+  const allFlags = {
+    ...JSON.parse(
+      global.localStorage.getItem('root.featureFlags.flags') || '{}'
+    ),
+    ...getFlagsFromQueryParams(),
+  }
   return (allFlags && allFlags[flagName]) || false
 }

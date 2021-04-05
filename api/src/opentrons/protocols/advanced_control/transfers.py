@@ -364,10 +364,13 @@ class TransferPlan:
                  volume,
                  sources,
                  dests,
+                 # todo(mm, 2021-03-10):
+                 # Refactor to not need an InstrumentContext, so we can more
+                 # easily test this class's logic on its own.
                  instr: 'InstrumentContext',
                  max_volume: float,
                  api_version: APIVersion,
-                 mode: Optional[str] = None,
+                 mode: str,
                  options: Optional[TransferOptions] = None
                  ) -> None:
         """ Build the transfer plan.
@@ -414,15 +417,7 @@ class TransferPlan:
         self._mix_after_opts = self._options.mix.mix_after
         self._max_volume = max_volume
 
-        if not mode:
-            if len(sources) < len(dests):
-                self._mode = TransferMode.DISTRIBUTE
-            elif len(sources) > len(dests):
-                self._mode = TransferMode.CONSOLIDATE
-            else:
-                self._mode = TransferMode.TRANSFER
-        else:
-            self._mode = TransferMode[mode.upper()]
+        self._mode = TransferMode[mode.upper()]
 
     def __iter__(self):
         if self._strategy.new_tip == types.TransferTipPolicy.ONCE:
@@ -554,6 +549,9 @@ class TransferPlan:
         # the other maintains consistency in default behaviors of all functions
         plan_iter = self._expand_for_volume_constraints(
             self._volumes, self._dests,
+            # todo(mm, 2021-03-09): Is it right for this to be
+            # _instr_.max_volume? Does/should this take the tip maximum volume
+            # into account?
             self._instr.max_volume
             - self._strategy.disposal_volume
             - self._strategy.air_gap)
@@ -648,6 +646,9 @@ class TransferPlan:
                .. Aspirate -> .....*
         """
         plan_iter = self._expand_for_volume_constraints(
+            # todo(mm, 2021-03-09): Is it right to use _instr.max_volume here?
+            # Why don't we account for tip max volume, disposal volume, or air
+            # gap?
             self._volumes, self._sources, self._instr.max_volume)
         current_xfer = next(plan_iter)
         if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
