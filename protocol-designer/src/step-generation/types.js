@@ -277,7 +277,7 @@ export type SourceAndDest = {|
 |}
 
 // Data that never changes across time
-export type Config = {| FOO: boolean |} // TODO IMMEDIATELY actual keys
+export type Config = {| OT_PD_DISABLE_MODULE_RESTRICTIONS: boolean |}
 export type InvariantContext = {|
   labwareEntities: LabwareEntities,
   moduleEntities: ModuleEntities,

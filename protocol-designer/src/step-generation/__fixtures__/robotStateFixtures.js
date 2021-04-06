@@ -41,7 +41,9 @@ import type {
   RobotStateAndWarnings,
 } from '../'
 
-export const DEFAULT_CONFIG: Config = { FOO: false } // TODO IMMEDIATELY
+export const DEFAULT_CONFIG: Config = {
+  OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
+}
 
 // Eg {A1: true, B1: true, ...}
 type WellTipState = { [wellName: string]: boolean }
