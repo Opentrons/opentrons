@@ -3,8 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [4.2.1-alpha.0](https://github.com/opentrons/opentrons/compare/v4.2.0...v4.2.1-alpha.0) (2021-04-02)
-
+## [4.2.1](https://github.com/opentrons/opentrons/compare/v4.2.0...v4.2.1) (2021-04-06)
 
 ### Bug Fixes
 
@@ -14,8 +13,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Reverts
 
 * **robot-server:** Save the z offset for pipette calibration  ([b76230a](https://github.com/opentrons/opentrons/commit/b76230a))
-
-
 
 
 
