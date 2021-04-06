@@ -65,7 +65,7 @@ describe('robotAdminReducer', () => {
       type: 'robotAdmin:RESTART_STATUS_CHANGED',
       payload: {
         robotName: 'robotName',
-        restartStatus: 'restarting',
+        restartStatus: 'restart-in-progress',
         bootId: null,
         startTime: null,
       },
@@ -76,7 +76,7 @@ describe('robotAdminReducer', () => {
     expect(result).toEqual({
       robotName: {
         restart: {
-          status: 'restarting',
+          status: 'restart-in-progress',
           bootId: 'abc123',
           startTime: new Date('2000-01-01'),
         },

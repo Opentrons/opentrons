@@ -5,7 +5,7 @@ import type { RobotApiRequestMeta } from '../robot-api/types'
 
 export type RobotRestartStatus =
   | 'restart-pending'
-  | 'restarting'
+  | 'restart-in-progress'
   | 'restart-succeeded'
   | 'restart-timed-out'
   | 'restart-failed'

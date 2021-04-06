@@ -60,7 +60,9 @@ describe('robot admin selectors', () => {
             restart: { ...RESTART_BASE, status: 'restart-timed-out' },
           },
           pending: { restart: { ...RESTART_BASE, status: 'restart-pending' } },
-          inProgress: { restart: { ...RESTART_BASE, status: 'restarting' } },
+          inProgress: {
+            restart: { ...RESTART_BASE, status: 'restart-in-progress' },
+          },
         },
       }
 
@@ -116,7 +118,9 @@ describe('robot admin selectors', () => {
     it('should return restart success if was restarting and is now connectable', () => {
       const state: PartialState = {
         robotAdmin: {
-          robotName: { restart: { ...RESTART_BASE, status: 'restarting' } },
+          robotName: {
+            restart: { ...RESTART_BASE, status: 'restart-in-progress' },
+          },
         },
       }
 
@@ -154,7 +158,9 @@ describe('robot admin selectors', () => {
     it('should return null if new boot ID but robot not yet connectable', () => {
       const state: PartialState = {
         robotAdmin: {
-          robotName: { restart: { ...RESTART_BASE, status: 'restarting' } },
+          robotName: {
+            restart: { ...RESTART_BASE, status: 'restart-in-progress' },
+          },
         },
       }
 
@@ -186,7 +192,7 @@ describe('robot admin selectors', () => {
         START_TIME
       )
 
-      expect(result).toBe('restarting')
+      expect(result).toBe('restart-in-progress')
     })
 
     it('should return restart timed out if it takes too long', () => {
@@ -197,7 +203,11 @@ describe('robot admin selectors', () => {
       const state: PartialState = {
         robotAdmin: {
           robotName: {
-            restart: { ...RESTART_BASE, startTime, status: 'restarting' },
+            restart: {
+              ...RESTART_BASE,
+              startTime,
+              status: 'restart-in-progress',
+            },
           },
         },
       }

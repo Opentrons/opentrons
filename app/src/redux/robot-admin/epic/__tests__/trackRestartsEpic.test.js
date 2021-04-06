@@ -112,7 +112,7 @@ describe('robotAdminEpic tracks restarting state', () => {
         'robot-1-boot',
         expect.any(Date)
       )
-      .mockReturnValue('restarting')
+      .mockReturnValue('restart-in-progress')
 
     when(getNextRestartStatus)
       .calledWith(
@@ -140,7 +140,7 @@ describe('robotAdminEpic tracks restarting state', () => {
       const output$ = trackRestartsEpic(action$, state$)
 
       expectObservable(output$).toBe('-(ab)', {
-        a: Actions.restartStatusChanged(robot1.name, 'restarting'),
+        a: Actions.restartStatusChanged(robot1.name, 'restart-in-progress'),
         b: Actions.restartStatusChanged(robot3.name, 'restart-timed-out'),
       })
     })

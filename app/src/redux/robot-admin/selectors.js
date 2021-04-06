@@ -4,7 +4,7 @@ import { CONNECTABLE } from '../discovery'
 import {
   RESTART_TIMEOUT_SEC,
   RESTART_PENDING_STATUS,
-  RESTARTING_STATUS,
+  RESTART_IN_PROGRESS_STATUS,
   RESTART_SUCCEEDED_STATUS,
   RESTART_TIMED_OUT_STATUS,
 } from './constants'
@@ -17,7 +17,9 @@ const robotState = (state: State, name: string) => state.robotAdmin[name]
 
 export function getRobotRestarting(state: State, robotName: string): boolean {
   const status = robotState(state, robotName)?.restart?.status
-  return status === RESTART_PENDING_STATUS || status === RESTARTING_STATUS
+  return (
+    status === RESTART_PENDING_STATUS || status === RESTART_IN_PROGRESS_STATUS
+  )
 }
 
 export function getNextRestartStatus(
@@ -32,7 +34,7 @@ export function getNextRestartStatus(
   }
 
   if (getRestartHasBegun(state, robotName, connectivityStatus)) {
-    return RESTARTING_STATUS
+    return RESTART_IN_PROGRESS_STATUS
   }
 
   if (getRestartHasTimedOut(state, robotName, now)) {
@@ -83,7 +85,7 @@ function getRestartIsComplete(
   const { status: prevRestartStatus, bootId: prevBootId } = prevRestartState
   const isConnectable = connectivityStatus === CONNECTABLE
   const hasNewBootId = bootId && bootId !== prevBootId
-  const wasDown = prevRestartStatus === RESTARTING_STATUS
+  const wasDown = prevRestartStatus === RESTART_IN_PROGRESS_STATUS
 
   return isConnectable && (hasNewBootId || wasDown)
 }
