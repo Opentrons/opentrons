@@ -185,7 +185,7 @@ export const supportLinkProps: SupportLinks = {
     name: 'OT-2 Start guide',
     url:
       'https://support.opentrons.com/guide-for-getting-started-with-the-ot-2',
-    description: "You recieved your robot, here's what's next",
+    description: "You received your robot, here's what's next",
     gtm: { action: 'click', category: 'l-header', label: 'start-guide' },
   },
   help: {

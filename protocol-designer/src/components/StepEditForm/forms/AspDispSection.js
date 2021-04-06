@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { IconButton, HoverTooltip } from '@opentrons/components'
+import { IconButton, Tooltip, useHoverTooltip } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import styles from '../StepEditForm.css'
 
@@ -14,29 +14,28 @@ type Props = {
 
 export const AspDispSection = (props: Props): React.Node => {
   const { children, className, collapsed, toggleCollapsed, prefix } = props
-
+  const [targetProps, tooltipProps] = useHoverTooltip()
   return (
     <div className={className}>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>{prefix}</span>
-        <HoverTooltip
+        <Tooltip
+          {...tooltipProps}
           key={collapsed ? 'collapsed' : 'expanded'} // NOTE: without this key, the IconButton will not re-render unless clicked
-          tooltipComponent={i18n.t('tooltip.advanced_settings')}
         >
-          {hoverTooltipHandlers => (
-            <div
-              {...hoverTooltipHandlers}
-              onClick={toggleCollapsed}
-              className={styles.advanced_settings_button_wrapper}
-            >
-              <IconButton
-                className={styles.advanced_settings_button}
-                name="settings"
-                hover={!collapsed}
-              />
-            </div>
-          )}
-        </HoverTooltip>
+          {i18n.t('tooltip.advanced_settings')}
+        </Tooltip>
+        <div
+          {...targetProps}
+          onClick={toggleCollapsed}
+          className={styles.advanced_settings_button_wrapper}
+        >
+          <IconButton
+            className={styles.advanced_settings_button}
+            name="settings"
+            hover={!collapsed}
+          />
+        </div>
       </div>
       {children}
     </div>
