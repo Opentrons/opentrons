@@ -234,7 +234,6 @@ export type MultiselectFieldValues = {
   ...
 }
 
-// TODO IMMEDIATELY: add test
 export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
   stepFormSelectors.getSavedStepForms,
   getMultiSelectItemIds,
