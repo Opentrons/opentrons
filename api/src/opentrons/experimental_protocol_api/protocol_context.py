@@ -13,14 +13,11 @@ class ProtocolContext:
         instrument_name: str,
         mount: str,
         tip_racks: typing.Sequence[typing.Any] = tuple(),  # Todo: Tip rack type
-        replace: bool
+        replace: bool = False
     ):
         raise NotImplementedError()
-    
-    def load_labware():
+
+    def load_labware(self):
         raise NotImplementedError()
-    
+
     # All else todo
-
-
-        

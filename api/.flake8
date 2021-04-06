@@ -36,6 +36,7 @@ per-file-ignores =
     src/opentrons/data_storage/*:ANN,D
     src/opentrons/deck_calibration/*:ANN,D
     src/opentrons/drivers/*:ANN,D
+    src/opentrons/experimental_protocol_api/*:ANN,D
     src/opentrons/hardware_control/*:ANN,D
     src/opentrons/helpers/*:ANN,D
     src/opentrons/protocol_api/*:ANN,D
