@@ -21,12 +21,53 @@ import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { ModuleItem, NoModulesMessage } from './ModuleItem'
 
 import type { State, Dispatch } from '../../../redux/types'
+import type { AttachedModule } from '../../../redux/modules/types'
 import { UsbHubItem } from './UsbHubItem'
+import { LexModelBuildingService } from 'aws-sdk'
 
 // TODO(bc, 2021-02-16): i18n
 
 const TITLE = 'Connected Modules'
 const POLL_MODULE_INTERVAL_MS = 5000
+
+type ModulesListByPort = {|
+  [port: string]: Array<AttachedModule>,
+|}
+
+const moduleListWithUSBInfo: (
+  ModulesListByPort,
+  string | null
+) => Array<React.Node> = (modulesByPort, controlDisabledReason) => {
+  return Object.keys(modulesByPort).map(port =>
+    modulesByPort[port].length > 1 ? (
+      <UsbHubItem
+        hub={port}
+        modules={modulesByPort[port]}
+        controlDisabledReason={controlDisabledReason}
+      />
+    ) : (
+      <ModuleItem
+        usbPort={port}
+        key={modulesByPort[port][0].serial}
+        module={modulesByPort[port][0]}
+        controlDisabledReason={controlDisabledReason}
+      />
+    )
+  )
+}
+
+const legacyModuleList: (
+  Array<AttachedModule>,
+  string | null
+) => Array<React.Node> = (modules, controlDisabledReason) => {
+  return modules.map(mod => (
+    <ModuleItem
+      key={mod.serial}
+      module={mod}
+      controlDisabledReason={controlDisabledReason}
+    />
+  ))
+}
 
 type Props = {| robotName: string |}
 
@@ -49,6 +90,10 @@ export function AttachedModulesCard(props: Props): React.Node {
     return portMap
   }, {})
 
+  const modulesList = isEmpty(modulesByPort)
+    ? legacyModuleList(modules, controlDisabledReason)
+    : moduleListWithUSBInfo(modulesByPort, controlDisabledReason)
+
   // if robot is connected, the modules epic will poll /modules automatically,
   // but we need to poll ourselves if we're viewing this robot without
   // connecting to its RPC server
@@ -62,39 +107,10 @@ export function AttachedModulesCard(props: Props): React.Node {
     <Card title={TITLE}>
       {modules.length === 0 ? (
         <NoModulesMessage />
-      ) : !isEmpty(modulesByPort) ? (
-        Object.keys(modulesByPort).map(port => (
-          <Box
-            key={port}
-            paddingX={SPACING_3}
-            paddingY="1.5rem"
-            borderBottom={BORDER_SOLID_LIGHT}
-            css={css`
-              &:last-child: {
-                border-bottom: 1px solid transparent;
-              }
-            `}
-          >
-            {modulesByPort[port].length > 1 ? (
-              <UsbHubItem
-                hub={port}
-                modules={modulesByPort[port]}
-                controlDisabledReason={controlDisabledReason}
-              />
-            ) : (
-              <ModuleItem
-                usbPort={port}
-                key={modulesByPort[port][0].serial}
-                module={modulesByPort[port][0]}
-                controlDisabledReason={controlDisabledReason}
-              />
-            )}
-          </Box>
-        ))
       ) : (
-        modules.map(mod => (
+        modulesList.map((mod, index) => (
           <Box
-            key={mod.serial}
+            key={index}
             paddingX={SPACING_3}
             paddingY="1.5rem"
             borderBottom={BORDER_SOLID_LIGHT}
@@ -104,11 +120,7 @@ export function AttachedModulesCard(props: Props): React.Node {
               }
             `}
           >
-            <ModuleItem
-              key={mod.serial}
-              module={mod}
-              controlDisabledReason={controlDisabledReason}
-            />
+            {mod}
           </Box>
         ))
       )}

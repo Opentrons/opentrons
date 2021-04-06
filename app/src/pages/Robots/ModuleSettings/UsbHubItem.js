@@ -18,7 +18,7 @@ import type { AttachedModule } from '../../../redux/modules/types'
 const MULTIPLE_MODULES = 'Multiple modules connected'
 
 type Props = {|
-  hub: number,
+  hub: string,
   modules: Array<AttachedModule>,
   controlDisabledReason: string | null,
 |}

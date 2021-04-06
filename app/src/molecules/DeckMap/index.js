@@ -137,12 +137,11 @@ function mapStateToProps(state: State, ownProps: OP): SP {
       module => {
         const matchedMod =
           matchedModules.find(mm => mm.slot === module.slot) ?? null
-        const usbInfo =
-          matchedMod && matchedMod.module.usbPort.hub
-            ? `USB Port ${matchedMod.module.usbPort.hub} via Hub`
-            : matchedMod && matchedMod.module.usbPort.port
-            ? `USB Port ${matchedMod.module.usbPort.port}`
-            : 'USB Info N/A'
+        const usbInfo = matchedMod?.module?.usbPort?.hub
+          ? `USB Port ${matchedMod.module.usbPort.hub} via Hub`
+          : matchedMod?.module?.usbPort?.port
+          ? `USB Port ${matchedMod.module.usbPort.port}`
+          : 'USB Info N/A'
         return {
           ...module,
           mode: matchedMod !== null ? 'present' : 'missing',

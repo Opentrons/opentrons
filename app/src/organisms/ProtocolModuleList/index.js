@@ -107,12 +107,11 @@ function UsbPortInfo(props: UsbPortInfoProps): React.Node {
   // return nothing if module is missing
   if (props.matchedModule === null) return null
   const portInfo = props.matchedModule.module.usbPort
-  const portText =
-    portInfo && portInfo.hub
-      ? `Port ${portInfo.hub} via Hub`
-      : portInfo && portInfo.port
-      ? `Port ${portInfo.port}`
-      : 'N/A'
+  const portText = portInfo?.hub
+    ? `Port ${portInfo.hub} via Hub`
+    : portInfo?.port
+    ? `Port ${portInfo.port}`
+    : 'N/A'
   return (
     <>
       <Flex {...USB_PORT_STYLE}>
