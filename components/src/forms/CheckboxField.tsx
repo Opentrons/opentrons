@@ -3,7 +3,6 @@ import cx from 'classnames'
 import { Icon } from '../icons'
 
 import styles from './forms.css'
-import type { HoverTooltipHandlers } from '../tooltips'
 
 export interface CheckboxFieldProps {
   /** change handler */
@@ -26,8 +25,6 @@ export interface CheckboxFieldProps {
   tabIndex?: number
   /** props passed into label div. TODO IMMEDIATELY what is the Flow type? */
   labelProps?: React.ComponentProps<'div'>
-  /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: HoverTooltipHandlers | null | undefined
   /** if true, render indeterminate icon */
   isIndeterminate?: boolean
 }
