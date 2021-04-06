@@ -19,8 +19,9 @@ async def magdeck(loop: asyncio.BaseEventLoop, emulation_app) -> MagDeck:
 
 
 def test_device_info(magdeck: MagDeck):
-    assert {'model': 'magdeck_emulator', 'serial': 'fake_serial',
-            'version': '1'} == magdeck.device_info
+    assert magdeck.device_info == {
+        'model': 'magdeck_emulator', 'serial': 'fake_serial', 'version': '1'
+    }
 
 
 async def test_engage_cycle(magdeck: MagDeck):

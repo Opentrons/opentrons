@@ -1,8 +1,8 @@
 import asyncio
 import logging
 from typing import Mapping, Optional, Union
-from opentrons.drivers.mag_deck import (
-    SimulatingDriver, MagDeck as MagDeckDriver)
+from opentrons.drivers.asyncio.magdeck import (
+    SimulatingDriver, MagDeckDriver, AbstractMagDeckDriver)
 from opentrons.drivers.mag_deck.driver import mag_locks
 from opentrons.drivers.rpi_drivers.types import USBPort
 from ..execution_manager import ExecutionManager
@@ -53,16 +53,36 @@ class MagDeck(mod_abc.AbstractModule):
                     simulating=False,
                     loop: asyncio.AbstractEventLoop = None,
                     sim_model: str = None):
+        """Factory function."""
+        if not simulating:
+            driver = await MagDeckDriver.create(port=port)
+        else:
+            driver = SimulatingDriver(sim_model=sim_model)
         # MagDeck does not currently use interrupts, so the callback is not
         # passed on
         mod = cls(port=port,
                   usb_port=usb_port,
-                  simulating=simulating,
                   loop=loop,
                   execution_manager=execution_manager,
-                  sim_model=sim_model)
-        await mod._connect()
+                  device_info=await driver.get_device_info(),
+                  driver=driver)
         return mod
+
+    def __init__(self,
+                 port: str,
+                 usb_port: USBPort,
+                 execution_manager: ExecutionManager,
+                 driver: AbstractMagDeckDriver,
+                 device_info: Mapping[str, str],
+                 loop: asyncio.AbstractEventLoop = None) -> None:
+        """Constructor"""
+        super().__init__(port=port,
+                         usb_port=usb_port,
+                         loop=loop,
+                         execution_manager=execution_manager)
+        self._device_info = device_info
+        self._driver = driver
+        self._current_height = 0.0
 
     @classmethod
     def name(cls) -> str:
@@ -75,43 +95,12 @@ class MagDeck(mod_abc.AbstractModule):
     def bootloader(cls) -> types.UploadFunction:
         return update.upload_via_avrdude
 
-    @staticmethod
-    def _build_driver(
-            simulating: bool,
-            sim_model: str = None
-    ) -> Union['SimulatingDriver', 'MagDeckDriver']:
-        if simulating:
-            return SimulatingDriver(sim_model=sim_model)
-        else:
-            return MagDeckDriver()
-
-    def __init__(self,
-                 port: str,
-                 usb_port: USBPort,
-                 execution_manager: ExecutionManager,
-                 simulating: bool,
-                 loop: asyncio.AbstractEventLoop = None,
-                 sim_model: str = None) -> None:
-        super().__init__(port=port,
-                         usb_port=usb_port,
-                         simulating=simulating,
-                         loop=loop,
-                         execution_manager=execution_manager,
-                         sim_model=sim_model)
-        self._device_info: Mapping[str, str] = {}
-        self._driver: Union['SimulatingDriver', 'MagDeckDriver']
-        if mag_locks.get(port):
-            self._driver = mag_locks[port][1]
-        else:
-            self._driver = self._build_driver(
-                simulating, sim_model)
-
     async def calibrate(self):
         """
         Calibration involves probing for top plate to get the plate height
         """
         await self.wait_for_is_running()
-        self._driver.probe_plate()
+        await self._driver.probe_plate()
         # return if successful or not?
 
     async def engage(self, height: float):
@@ -123,19 +112,19 @@ class MagDeck(mod_abc.AbstractModule):
             raise ValueError(
                 f'Invalid engage height for {self.model()}: {height} mm. '
                 f'Must be 0 - {MAX_ENGAGE_HEIGHT[self.model()]} mm')
-        self._driver.move(height)
+        await self._driver.move(height)
 
     async def deactivate(self):
         """
         Home the magnet
         """
         await self.wait_for_is_running()
-        self._driver.home()
+        await self._driver.home()
         await self.engage(0.0)
 
     @property
     def current_height(self) -> float:
-        return self._driver.mag_position
+        return self._current_height
 
     @property
     def device_info(self) -> Mapping[str, str]:
@@ -193,24 +182,6 @@ class MagDeck(mod_abc.AbstractModule):
         self._loop = loop
 
     # Internal Methods
-
-    async def _connect(self):
-        """
-        Connect to the serial port
-        """
-        if not self._driver.is_connected():
-            self._driver.connect(self._port)
-        self._device_info = self._driver.get_device_info()
-
-    def _disconnect(self):
-        """
-        Disconnect from the serial port
-        """
-        if self._driver:
-            self._driver.disconnect(port=self._port)
-
-    def __del__(self):
-        self._disconnect()
 
     async def prep_for_update(self) -> str:
         self._driver.enter_programming_mode()

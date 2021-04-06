@@ -99,7 +99,4 @@ class AsyncSerial:
 
         Returns: boolean
         """
-        return await asyncio.get_event_loop().run_in_executor(
-            executor=self._executor,
-            func=lambda: self._serial.is_open()
-        )
+        return self._serial.is_open

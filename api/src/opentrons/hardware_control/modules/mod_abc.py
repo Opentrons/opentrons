@@ -34,7 +34,6 @@ class AbstractModule(abc.ABC):
         """
         pass
 
-    @abc.abstractmethod
     def __init__(self,
                  port: str,
                  usb_port: USBPort,
