@@ -46,18 +46,8 @@ TC_BOOTLOADER_BAUDRATE = 1200
 SERIAL_ACK = '\r\n'
 TC_COMMAND_TERMINATOR = SERIAL_ACK
 TC_ACK = 'ok' + SERIAL_ACK + 'ok' + SERIAL_ACK
-ERROR_KEYWORD = 'error'
 DEFAULT_TC_TIMEOUT = 40
 DEFAULT_COMMAND_RETRIES = 3
-DEFAULT_STABILIZE_DELAY = 0.1
-DEFAULT_POLLER_WAIT_SECONDS = 0.1
-POLLING_FREQUENCY_MS = 1000
-HOLD_TIME_FUZZY_SECONDS = POLLING_FREQUENCY_MS / 1000 * 5
-TEMP_THRESHOLD = 0.3
-
-
-class ThermocyclerError(Exception):
-    pass
 
 
 class ThermocyclerDriver(AbstractThermocyclerDriver):
@@ -85,7 +75,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
     async def open_lid(self) -> None:
         """Send open lid command"""
         c = CommandBuilder(
-            terminator=SERIAL_ACK
+            terminator=TC_COMMAND_TERMINATOR
         ).add_gcode(
             gcode=GCODE.OPEN_LID
         )
@@ -95,7 +85,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
     async def close_lid(self) -> None:
         """Send close lid command"""
         c = CommandBuilder(
-            terminator=SERIAL_ACK
+            terminator=TC_COMMAND_TERMINATOR
         ).add_gcode(
             gcode=GCODE.CLOSE_LID
         )
@@ -105,7 +95,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
     async def get_lid_status(self) -> LidStatus:
         """Send get lid status command"""
         c = CommandBuilder(
-            terminator=SERIAL_ACK
+            terminator=TC_COMMAND_TERMINATOR
         ).add_gcode(
             gcode=GCODE.GET_LID_STATUS
         )
@@ -117,7 +107,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         """Set the lid temperature"""
         temp = min(LID_TARGET_MAX, max(LID_TARGET_MIN, temp))
         c = CommandBuilder(
-            terminator=SERIAL_ACK
+            terminator=TC_COMMAND_TERMINATOR
         ).add_gcode(
             gcode=GCODE.SET_LID_TEMP
         ).add_float(
@@ -129,7 +119,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
     async def get_lid_temperature(self) -> Temperature:
         """Send a get lid temperature command."""
         c = CommandBuilder(
-            terminator=SERIAL_ACK
+            terminator=TC_COMMAND_TERMINATOR
         ).add_gcode(
             gcode=GCODE.GET_LID_TEMP
         )
@@ -148,7 +138,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         temp = min(BLOCK_TARGET_MAX, max(BLOCK_TARGET_MIN, temp))
 
         c = CommandBuilder(
-            terminator=SERIAL_ACK
+            terminator=TC_COMMAND_TERMINATOR
         ).add_gcode(
             gcode=GCODE.SET_PLATE_TEMP
         ).add_float(
@@ -167,7 +157,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
     async def get_plate_temperature(self) -> PlateTemperature:
         """Send a get plate temperature command."""
         c = CommandBuilder(
-            terminator=SERIAL_ACK
+            terminator=TC_COMMAND_TERMINATOR
         ).add_gcode(
             gcode=GCODE.GET_PLATE_TEMP
         )
@@ -182,7 +172,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
     async def set_ramp_rate(self, ramp_rate: float) -> None:
         """Send a set ramp rate command"""
         c = CommandBuilder(
-            terminator=SERIAL_ACK
+            terminator=TC_COMMAND_TERMINATOR
         ).add_gcode(
             gcode=GCODE.SET_RAMP_RATE
         ).add_float(
@@ -194,7 +184,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
     async def deactivate_all(self) -> None:
         """Send deactivate all command."""
         c = CommandBuilder(
-            terminator=SERIAL_ACK
+            terminator=TC_COMMAND_TERMINATOR
         ).add_gcode(
             gcode=GCODE.DEACTIVATE_ALL
         )
@@ -204,7 +194,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
     async def deactivate_lid(self) -> None:
         """Send deactivate lid command"""
         c = CommandBuilder(
-            terminator=SERIAL_ACK
+            terminator=TC_COMMAND_TERMINATOR
         ).add_gcode(
             gcode=GCODE.DEACTIVATE_LID
         )
@@ -214,7 +204,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
     async def deactivate_block(self) -> None:
         """Send deactivate block command"""
         c = CommandBuilder(
-            terminator=SERIAL_ACK
+            terminator=TC_COMMAND_TERMINATOR
         ).add_gcode(
             gcode=GCODE.DEACTIVATE_BLOCK
         )
@@ -224,7 +214,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
     async def get_device_info(self) -> Dict[str, str]:
         """Send get device info command"""
         c = CommandBuilder(
-            terminator=SERIAL_ACK
+            terminator=TC_COMMAND_TERMINATOR
         ).add_gcode(
             gcode=GCODE.DEVICE_INFO
         )

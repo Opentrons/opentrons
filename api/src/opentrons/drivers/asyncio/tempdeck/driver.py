@@ -20,12 +20,8 @@ from opentrons.drivers.asyncio.tempdeck.abstract import AbstractTempDeckDriver, 
 
 log = logging.getLogger(__name__)
 
-ERROR_KEYWORD = 'error'
-ALARM_KEYWORD = 'alarm'
-
 DEFAULT_TEMP_DECK_TIMEOUT = 1
 
-DEFAULT_STABILIZE_DELAY = 0.1
 DEFAULT_COMMAND_RETRIES = 3
 
 
@@ -189,9 +185,4 @@ class TempDeckDriver(AbstractTempDeckDriver):
             data=command.build(),
             retries=DEFAULT_COMMAND_RETRIES
         )
-        response_lower = response.lower()
-        if ERROR_KEYWORD in response_lower or ALARM_KEYWORD in response_lower:
-            log.error(f"Received error message from Temp-Deck: {response}")
-            raise TempDeckError(response)
-
         return response
