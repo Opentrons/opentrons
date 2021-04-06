@@ -191,7 +191,8 @@ describe('robot admin selectors', () => {
 
     it('should return restart timed out if it takes too long', () => {
       const startTime = new Date('2000-01-01')
-      const tooLong = add(startTime, { seconds: 61 })
+      const notLongEnough = add(startTime, { seconds: 299 })
+      const tooLong = add(startTime, { seconds: 301 })
 
       const state: PartialState = {
         robotAdmin: {
@@ -201,7 +202,15 @@ describe('robot admin selectors', () => {
         },
       }
 
-      const result = getNextRestartStatus(
+      const before = getNextRestartStatus(
+        state,
+        'robotName',
+        REACHABLE,
+        null,
+        notLongEnough
+      )
+
+      const after = getNextRestartStatus(
         state,
         'robotName',
         REACHABLE,
@@ -209,7 +218,8 @@ describe('robot admin selectors', () => {
         tooLong
       )
 
-      expect(result).toBe('restart-timed-out')
+      expect(before).toBe(null)
+      expect(after).toBe('restart-timed-out')
     })
   })
 })

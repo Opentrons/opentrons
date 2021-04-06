@@ -1,7 +1,7 @@
 // @flow
 import { ofType, combineEpics } from 'redux-observable'
 import { of } from 'rxjs'
-import { map, filter, withLatestFrom, mergeMap } from 'rxjs/operators'
+import { map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
 
 import { getRobotByName, getDiscoveredRobots } from '../../discovery'
 import { getNextRestartStatus } from '../selectors'
@@ -31,7 +31,7 @@ const trackRestartBeginEpic: Epic = (action$, state$) => {
 // mark robot as restart-succeeded if discovery info indicates restart is done
 const trackRestartProgressEpic: Epic = (action$, state$) => {
   return state$.pipe(
-    mergeMap(state => {
+    switchMap(state => {
       const now = new Date()
       const statusChanges = getDiscoveredRobots(state).flatMap(robot => {
         const { name: robotName, status: connectivityStatus } = robot
