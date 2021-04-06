@@ -118,11 +118,13 @@ export const BatchEditMix = (props: BatchEditMixProps): React.Node => {
               prefix: 'dispense',
             })}
           >
-            <FlowRateField
-              {...propsForFields['dispense_flowRate']}
-              pipetteId={getPipetteIdForForm()}
-              flowRateType="dispense"
-            />
+            <Box className={styles.form_row}>
+              <FlowRateField
+                {...propsForFields['dispense_flowRate']}
+                pipetteId={getPipetteIdForForm()}
+                flowRateType="dispense"
+              />
+            </Box>
             <DelayFields
               checkboxFieldName={'dispense_delay_checkbox'}
               secondsFieldName={'dispense_delay_seconds'}
