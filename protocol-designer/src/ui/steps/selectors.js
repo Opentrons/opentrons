@@ -276,7 +276,6 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
   }
 )
 
-// TODO IMMEDIATELY: add test for null return
 export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
   _getSavedMultiSelectFieldValues,
   stepFormSelectors.getBatchEditFieldChanges,

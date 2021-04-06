@@ -873,6 +873,13 @@ describe('getMultiSelectFieldValues', () => {
     const result = getMultiSelectFieldValues.resultFunc(savedValues, changes)
     expect(result).toEqual({ a: { value: '123', isIndeterminate: false } })
   })
+
+  it('should return null when savedValues is null (signifying invalid combination of stepTypes)', () => {
+    const savedValues = null
+    const changes = { a: '123' }
+    const result = getMultiSelectFieldValues.resultFunc(savedValues, changes)
+    expect(result).toBe(null)
+  })
 })
 
 describe('getMultiSelectDisabledFields', () => {
