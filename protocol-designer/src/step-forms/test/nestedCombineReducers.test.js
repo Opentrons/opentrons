@@ -67,7 +67,7 @@ describe('nestedCombineReducers', () => {
   it('should throw an error when any sub-reducer returns undefined', () => {
     // counts total fruits added, but we "accidentally" return undefined for any other actions
     const badCountReducer = (state, action) => {
-      if (typeof state === 'undefined') {
+      if (state === undefined) {
         // weird way to initialize, but otherwise this will fail b/c
         // the reducer initializes to undefined
         // (which we'll test for separately!)
@@ -76,7 +76,9 @@ describe('nestedCombineReducers', () => {
       if (action.type === 'ADD_FRUIT') {
         return state + 1
       }
-      // intentionally missing `return state` here
+      // should be `return state` here, but we're pretending we made a mistake writing this reducer
+      // and omitted `return state`, which would mean implicitly returning undefined
+      return undefined
     }
 
     const badCombinedReducer = nestedCombineReducers(

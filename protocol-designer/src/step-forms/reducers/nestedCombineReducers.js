@@ -7,12 +7,9 @@ export type GetNextState = ({|
   prevStateFallback: Object,
 |}) => Object
 
-export type NestedCombineReducers<T, A> = (
+export type NestedCombineReducers<S, A> = (
   getNextState: GetNextState
-) => Reducer<T, A>
-
-// an arbitrary used to test for initialization
-const FAKE_INIT_ACTION = '@@redux/INITnestedCombineReducers'
+) => Reducer<S, A>
 
 const getUndefinedStateErrorMessage = (key: string, action: Object) => {
   const actionType = action && action.type
@@ -26,6 +23,8 @@ const getUndefinedStateErrorMessage = (key: string, action: Object) => {
   )
 }
 
+// an arbitrary used to test for initialization
+const FAKE_INIT_ACTION = '@@redux/INITnestedCombineReducers'
 const assertReducerShape = (getNextState: GetNextState): void => {
   const initialState = getNextState({
     action: FAKE_INIT_ACTION,
@@ -33,7 +32,7 @@ const assertReducerShape = (getNextState: GetNextState): void => {
     prevStateFallback: {},
   })
   Object.keys(initialState).forEach(key => {
-    if (typeof initialState[key] === 'undefined') {
+    if (initialState[key] === undefined) {
       throw new Error(
         `Reducer "${key}" returned undefined during initialization. ` +
           `If the state passed to the reducer is undefined, you must ` +
@@ -45,10 +44,9 @@ const assertReducerShape = (getNextState: GetNextState): void => {
   })
 }
 
-export const nestedCombineReducers: NestedCombineReducers<
-  any,
-  any
-> = getNextState => {
+export function nestedCombineReducers<S, A>(
+  getNextState: GetNextState
+): Reducer<S, A> {
   assertReducerShape(getNextState)
 
   return (state, action) => {
@@ -58,15 +56,18 @@ export const nestedCombineReducers: NestedCombineReducers<
     // error if any reducers return undefined, just like redux combineReducers
     Object.keys(nextState).forEach(key => {
       const nextStateForKey = nextState[key]
-      if (typeof nextStateForKey === 'undefined') {
+      if (nextStateForKey === undefined) {
         const errorMessage = getUndefinedStateErrorMessage(key, action)
         throw new Error(errorMessage)
       }
     })
 
     if (
-      state &&
-      Object.keys(nextState).every(key => state[key] === nextState[key])
+      state !== null &&
+      typeof state === 'object' &&
+      Object.keys(nextState).every(
+        (key: string) => state[key] === nextState[key]
+      )
     ) {
       // no change
       return state
