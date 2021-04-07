@@ -27,7 +27,7 @@ import {
   splitLiquid,
 } from '../utils/misc'
 import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
-import { FIXED_TRASH_ID } from '../__fixtures__'
+import { DEFAULT_CONFIG, FIXED_TRASH_ID } from '../__fixtures__'
 import { thermocyclerPipetteCollision } from '../utils'
 import type { RobotState } from '../'
 
@@ -238,6 +238,7 @@ describe('makeInitialRobotState', () => {
   expect(
     makeInitialRobotState({
       invariantContext: {
+        config: DEFAULT_CONFIG,
         pipetteEntities: {
           p10SingleId: {
             id: 'p10SingleId',
