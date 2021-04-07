@@ -68,6 +68,7 @@ export const getMockMixStep = (): SavedStepFormState => ({
     mix_mmFromBottom: 0.5,
     pipette: 'some_pipette_id',
     wells: ['A1'],
+    volume: '100',
     aspirate_flowRate: null,
     dispense_flowRate: null,
     aspirate_delay_checkbox: false,
