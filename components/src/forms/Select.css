@@ -106,3 +106,9 @@
   z-index: 99;
   height: 4px;
 }
+
+.example_select_override {
+  & :global(.ot_select__control) {
+    background-color: blue;
+  }
+}
