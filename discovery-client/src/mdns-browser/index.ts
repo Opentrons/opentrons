@@ -1,11 +1,19 @@
 // mdns browser wrapper
 import net from 'net'
-import { createBrowser, tcp, ServiceType } from 'mdns-js'
+import { createBaseBrowser } from './base-browser'
+import { getIPv4Interfaces, compareInterfaces } from './interfaces'
 
-import type { Browser as BaseBrowser, BrowserService } from 'mdns-js'
-import type { MdnsBrowser, MdnsBrowserOptions, LogLevel } from './types'
+import type { LogLevel } from '../types'
+import type {
+  MdnsBrowser,
+  MdnsBrowserOptions,
+  MdnsBrowserService,
+} from './types'
+import type { BaseBrowser, BaseBrowserService } from './base-browser'
 
-monkeyPatchThrowers()
+export type { MdnsBrowser, MdnsBrowserOptions, MdnsBrowserService }
+
+const IFACE_POLL_INTERVAL_MS = 10000
 
 /**
  * Create a mDNS browser wrapper can be started and stopped and calls
@@ -22,17 +30,24 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
   }
 
   let browser: BaseBrowser | null = null
+  let ifacePollIntervalId: NodeJS.Timeout | null = null
 
-  const start = (): void => {
+  function start(): void {
     stop()
 
     log('debug', 'Creating _http._tcp mDNS browser', { ports })
 
-    const baseBrowser = createBrowser(tcp('http'))
+    const baseBrowser = createBaseBrowser()
 
     baseBrowser
-      .once('ready', () => baseBrowser.discover())
-      .on('update', (service: BrowserService) => {
+      .once('ready', () => {
+        baseBrowser.discover()
+        ifacePollIntervalId = setInterval(
+          pollNetworkInterfaces,
+          IFACE_POLL_INTERVAL_MS
+        )
+      })
+      .on('update', (service: BaseBrowserService) => {
         const { fullname, addresses, port } = service
         const ip = addresses.find(address => net.isIPv4(address))
 
@@ -56,8 +71,11 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
   }
 
   function stop(): void {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (browser) {
+    if (ifacePollIntervalId !== null) {
+      clearInterval(ifacePollIntervalId)
+    }
+
+    if (browser !== null) {
       log('debug', 'Stopping mDNS browser')
       browser.stop()
       browser.removeAllListeners('ready')
@@ -67,24 +85,23 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
     }
   }
 
-  return { start, stop }
-}
+  function pollNetworkInterfaces(): void {
+    if (browser !== null) {
+      const interfaces = getIPv4Interfaces()
+      const { interfacesMatch, extra, missing } = compareInterfaces(
+        browser,
+        interfaces
+      )
 
-/**
- * The `ServiceType` class in mdns-js can throw in an uncatchable way when
- * it receives certain types of advertisements that happen in real life. This
- * function monkeypatches the ServiceType prototype to catch the throws
- * https://github.com/mdns-js/node-mdns-js/issues/82
- */
-function monkeyPatchThrowers(): void {
-  // this method can throw (without emitting), so we need to patch this up
-  const originalServiceTypeFromString = ServiceType.prototype.fromString
-
-  ServiceType.prototype.fromString = function (...args) {
-    try {
-      originalServiceTypeFromString.apply(this, args)
-    } catch (error) {
-      console.warn(error)
+      if (!interfacesMatch) {
+        logger?.debug('Restarting mDNS due to network interface mismatch', {
+          extra,
+          missing,
+        })
+        start()
+      }
     }
   }
+
+  return { start, stop }
 }
