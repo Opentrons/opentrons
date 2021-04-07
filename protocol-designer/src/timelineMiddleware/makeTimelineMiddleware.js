@@ -11,7 +11,7 @@ import {
   type ComputeRobotStateTimelineSuccessAction,
 } from '../file-data/actions'
 import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
-import TimelineWorkerFactory from './timelineWorker'
+import TimelineWorkerFactory from './worker'
 
 import type { Middleware } from 'redux'
 import type { BaseState } from '../types'

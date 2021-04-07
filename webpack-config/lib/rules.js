@@ -48,9 +48,9 @@ module.exports = {
     },
   },
 
-  // worker loader for inline webworkers
+  // worker loader for inline webworkers. File must be named exactly "worker.js"
   worker: {
-    test: /worker\.js$/,
+    test: /[\\/]+worker\.js$/,
     exclude: /node_modules/,
     use: {
       loader: 'worker-loader',
