@@ -1,7 +1,7 @@
 """ Test the functions and classes in the protocol context """
 
 import json
-from unittest import mock
+import mock
 
 import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
@@ -145,6 +145,36 @@ async def test_location_cache(ctx, monkeypatch, get_labware_def, hardware):
     # Once we have a location cache, that should be our from_loc
     right.move_to(lw.wells()[1].top())
     assert test_args[0].labware.as_well() == lw.wells()[0]
+
+
+async def test_location_cache_two_pipettes(ctx, get_labware_def, hardware):
+    ctx.home()
+    left = ctx.load_instrument('p10_single', Mount.LEFT)
+    right = ctx.load_instrument('p10_single', Mount.RIGHT)
+
+    left_loc = Location(point=Point(1, 2, 3), labware="1")
+    right_loc = Location(point=Point(3, 4, 5), labware="2")
+
+    left_loc2 = Location(point=Point(3, 2, 1), labware="3")
+    right_loc2 = Location(point=Point(5, 4, 3), labware="4")
+
+    with mock.patch.object(papi_geometry.planning, "plan_moves") as m:
+        # The first moves. The location cache is empty.
+        left.move_to(left_loc)
+        assert m.call_args[0][0].labware.is_empty
+        assert m.call_args[0][1] == left_loc
+        right.move_to(right_loc)
+        assert m.call_args[0][0].labware.is_empty
+        assert m.call_args[0][1] == right_loc
+
+        # The second moves. The location cache is the previous target.
+        left.move_to(left_loc2)
+        assert m.call_args[0][0] == left_loc
+        assert m.call_args[0][1] == left_loc2
+        right.move_to(right_loc2)
+        assert m.call_args[0][0] == right_loc
+        assert m.call_args[0][1] == right_loc2
+
 
 
 async def test_move_uses_arc(ctx, monkeypatch, get_labware_def, hardware):
