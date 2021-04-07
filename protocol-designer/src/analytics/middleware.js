@@ -2,6 +2,7 @@
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
+  getSavedStepForms,
 } from '../step-forms/selectors'
 import { getFileMetadata } from '../file-data/selectors'
 import { trackEvent } from './mixpanel'
@@ -9,6 +10,7 @@ import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
 import type { Middleware } from 'redux'
 import type { BaseState } from '../types'
+import type { FormData } from '../form-types'
 import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
 import type { AnalyticsEventAction } from './actions'
 import type { AnalyticsEvent } from './mixpanel'
@@ -60,8 +62,22 @@ export const reduxActionToAnalyticsEvent = (
     const fileMetadata = getFileMetadata(state)
     const dateCreatedTimestamp = fileMetadata.created
 
-    const { editedFields } = action.payload
+    const { editedFields, stepIds } = action.payload
     const additionalProperties = flattenNestedProperties(editedFields)
+    const savedStepForms = getSavedStepForms(state)
+    const batchEditedStepForms: Array<FormData> = stepIds.map(
+      id => savedStepForms[id]
+    )
+    let stepType = null
+    if (batchEditedStepForms.length > 0) {
+      if (batchEditedStepForms.every(form => form.stepType === 'moveLiquid')) {
+        stepType = 'moveLiquid'
+      } else if (batchEditedStepForms.every(form => form.stepType === 'mix')) {
+        stepType = 'mix'
+      }
+    }
+
+    additionalProperties.stepType = stepType
 
     // (these fields are prefixed with double underscore only to make sure they
     // never accidentally overlap with actual fields)
