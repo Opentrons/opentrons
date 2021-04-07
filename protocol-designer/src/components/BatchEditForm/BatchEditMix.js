@@ -150,7 +150,6 @@ export const BatchEditMix = (props: BatchEditMixProps): React.Node => {
               label={i18n.t('form.step_edit_form.field.blowout.label')}
               className={styles.small_field}
             >
-              {/* TODO(IL, 2021-03-03): Location is supported only with same-pipette, right? Which options? */}
               <BlowoutLocationField
                 {...propsForFields['blowout_location']}
                 className={styles.full_width}
@@ -160,14 +159,6 @@ export const BatchEditMix = (props: BatchEditMixProps): React.Node => {
               />
             </CheckboxRowField>
           </FormColumn>
-          {/* <SourceDestBatchEditMoveLiquidFields
-            prefix="aspirate"
-            propsForFields={propsForFields}
-          />
-          <SourceDestBatchEditMoveLiquidFields
-            prefix="dispense"
-            propsForFields={propsForFields}
-          /> */}
         </Box>
 
         <Box textAlign="right" maxWidth="55rem" marginTop="3rem">
