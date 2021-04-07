@@ -2,7 +2,6 @@
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
-  getBatchEditFieldChanges,
 } from '../step-forms/selectors'
 import { getFileMetadata } from '../file-data/selectors'
 import { trackEvent } from './mixpanel'
@@ -61,7 +60,7 @@ export const reduxActionToAnalyticsEvent = (
     const fileMetadata = getFileMetadata(state)
     const dateCreatedTimestamp = fileMetadata.created
 
-    const editedFields = getBatchEditFieldChanges(state)
+    const { editedFields } = action.payload
     const additionalProperties = flattenNestedProperties(editedFields)
 
     // (these fields are prefixed with double underscore only to make sure they

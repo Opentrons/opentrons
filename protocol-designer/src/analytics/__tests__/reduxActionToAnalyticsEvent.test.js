@@ -1,13 +1,13 @@
 // @flow
-import { when, resetAllWhenMocks } from 'jest-when'
+import { resetAllWhenMocks } from 'jest-when'
 import { reduxActionToAnalyticsEvent } from '../middleware'
 import { getFileMetadata } from '../../file-data/selectors'
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
-  getBatchEditFieldChanges,
 } from '../../step-forms/selectors'
 import type { FileMetadataFields } from '../../file-data/types'
+import type { SaveStepFormsMultiAction } from '../../step-forms/actions'
 
 jest.mock('../../file-data/selectors')
 jest.mock('../../step-forms/selectors')
@@ -18,10 +18,6 @@ const getArgsAndErrorsByStepIdMock: JestMockFn<
   any
 > = getArgsAndErrorsByStepId
 const getPipetteEntitiesMock: JestMockFn<any, any> = getPipetteEntities
-const getBatchEditFieldChangesMock: JestMockFn<
-  any,
-  any
-> = getBatchEditFieldChanges
 
 let fooState: any
 beforeEach(() => {
@@ -92,20 +88,17 @@ describe('reduxActionToAnalyticsEvent', () => {
     })
   })
   it('should convert a SAVE_STEP_FORMS_MULTI action into a saveStepsMulti action with additional properties', () => {
-    const changes = {
-      someField: 'someVal',
-      anotherField: 'anotherVal',
-      someNestedField: {
-        innerNestedField: true,
-      },
-    }
-    when(getBatchEditFieldChangesMock)
-      .calledWith(expect.anything())
-      .mockReturnValue(changes)
-    const action = {
+    const action: SaveStepFormsMultiAction = {
       type: 'SAVE_STEP_FORMS_MULTI',
       payload: {
-        selectedStepIds: [], // this does not matter
+        stepIds: [],
+        editedFields: {
+          someField: 'someVal',
+          anotherField: 'anotherVal',
+          someNestedField: {
+            innerNestedField: true,
+          },
+        },
       },
     }
 
