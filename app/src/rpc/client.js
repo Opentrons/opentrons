@@ -1,4 +1,5 @@
 import EventEmitter from 'events'
+// TODO IMMEDIATELY
 // TODO(mc, 2017-08-29): Disable winston and uuid because of worker-loader bug
 // preventing webpackification of built-in node modules (os and crypto)
 // import log from 'winston'

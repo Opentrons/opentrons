@@ -27,8 +27,8 @@ module.exports = webpackMerge(baseConfig, {
       path: OUTPUT_PATH,
       publicPath: PUBLIC_PATH,
     },
-    // workaround for worker-loader HMR
-    // see https://github.com/webpack/webpack/issues/6642
+    // workaround for worker-plugin HMR
+    // see https://github.com/GoogleChromeLabs/worker-plugin#globalobject-string--false
     DEV_MODE ? { globalObject: 'this' } : {}
   ),
 

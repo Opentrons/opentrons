@@ -1,5 +1,6 @@
 // browser websocket client event-emitter/JSON wrapper for convenience
 import EventEmitter from 'events'
+// TODO IMMEDIATELY
 // TODO(mc, 2017-08-29): Disable winston because of worker-loader bug
 // preventing webpackification of built-in node modules
 // import log from 'winston'

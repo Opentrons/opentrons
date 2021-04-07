@@ -48,19 +48,6 @@ module.exports = {
     },
   },
 
-  // worker loader for inline webworkers. File must be named exactly "worker.js"
-  worker: {
-    test: /[\\/]+worker\.js$/,
-    exclude: /node_modules/,
-    use: {
-      loader: 'worker-loader',
-      options: {
-        inline: true,
-        fallback: false,
-      },
-    },
-  },
-
   // global CSS files
   globalCss: {
     test: /\.global\.css$/,
