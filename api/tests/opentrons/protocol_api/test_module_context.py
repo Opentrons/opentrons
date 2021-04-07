@@ -337,7 +337,7 @@ def test_deprecated_module_load_labware(ctx_with_tempdeck):
     assert lw2.name == labware_name
 
 
-def test_magdeck_gen1_labware_props(ctx):
+async def test_magdeck_gen1_labware_props(ctx):
     # TODO Ian 2019-05-29 load fixtures, not real defs
     labware_name = 'biorad_96_wellplate_200ul_pcr'
     labware_def = json.loads(
@@ -351,13 +351,13 @@ def test_magdeck_gen1_labware_props(ctx):
     mod.load_labware(labware_name)
     mod.engage()
     lw_offset = labware_def['parameters']['magneticModuleEngageHeight']
-    assert mod._module._driver.plate_height == lw_offset
+    assert await mod._module._driver.get_plate_height() == lw_offset
     mod.disengage()
     mod.engage(offset=2)
-    assert mod._module._driver.plate_height == lw_offset + 2
+    assert await mod._module._driver.get_plate_height() == lw_offset + 2
     mod.disengage()
     mod.engage(height=3)
-    assert mod._module._driver.plate_height == 3
+    assert await mod._module._driver.get_plate_height() == 3
     mod._geometry.reset_labware()
     labware_name = 'corning_96_wellplate_360ul_flat'
     mod.load_labware(labware_name)
@@ -366,11 +366,11 @@ def test_magdeck_gen1_labware_props(ctx):
     with pytest.raises(ValueError):
         mod.engage(offset=1)
     mod.engage(height=2)
-    assert mod._module._driver.plate_height == 2
+    assert await mod._module._driver.get_plate_height() == 2
     mod.engage(height=0)
-    assert mod._module._driver.plate_height == 0
+    assert await mod._module._driver.get_plate_height() == 0
     mod.engage(height_from_base=2)
-    assert mod._module._driver.plate_height == 2 +\
+    assert await mod._module._driver.get_plate_height() == 2 +\
         OFFSET_TO_LABWARE_BOTTOM[mod._module.model()]
 
 

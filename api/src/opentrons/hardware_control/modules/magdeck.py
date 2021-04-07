@@ -1,49 +1,29 @@
 import asyncio
 import logging
-from typing import Mapping, Optional, Union
+from typing import Mapping, Optional
 from opentrons.drivers.asyncio.magdeck import (
     SimulatingDriver, MagDeckDriver, AbstractMagDeckDriver)
-from opentrons.drivers.mag_deck.driver import mag_locks
 from opentrons.drivers.rpi_drivers.types import USBPort
 from ..execution_manager import ExecutionManager
 from . import update, mod_abc, types
 
 log = logging.getLogger('__name__')
 
-MAX_ENGAGE_HEIGHT = {  # mm from home position
+MAX_ENGAGE_HEIGHT = {
+    # mm from home position
     'magneticModuleV1': 45,
-    'magneticModuleV2': 25}
+    'magneticModuleV2': 25
+}
 OFFSET_TO_LABWARE_BOTTOM = {
     'magneticModuleV1': 5,
-    'magneticModuleV2': 2.5}
-
-FIRST_GEN2_REVISION = 20
-
-
-def _model_from_revision(revision: Optional[str]) -> str:
-    """ Defines the revision -> model mapping """
-    if not revision or 'v' not in revision:
-        log.error(f'bad revision: {revision}')
-        return 'magneticModuleV1'
-    try:
-        revision_num = float(revision.split('v')[-1])  # type: ignore
-    except (ValueError, TypeError):
-        log.exception('bad revision: {revision}')
-        return 'magneticModuleV1'
-    if revision_num < FIRST_GEN2_REVISION:
-        return 'magneticModuleV1'
-    else:
-        return 'magneticModuleV2'
-
-
-class MissingDevicePortError(Exception):
-    pass
+    'magneticModuleV2': 2.5
+}
 
 
 class MagDeck(mod_abc.AbstractModule):
-    """
-    Under development. API subject to change
-    """
+
+    FIRST_GEN2_REVISION = 20
+
     @classmethod
     async def build(cls,
                     port: str,
@@ -54,12 +34,12 @@ class MagDeck(mod_abc.AbstractModule):
                     loop: asyncio.AbstractEventLoop = None,
                     sim_model: str = None):
         """Factory function."""
+        driver: AbstractMagDeckDriver
         if not simulating:
             driver = await MagDeckDriver.create(port=port)
         else:
             driver = SimulatingDriver(sim_model=sim_model)
-        # MagDeck does not currently use interrupts, so the callback is not
-        # passed on
+
         mod = cls(port=port,
                   usb_port=usb_port,
                   loop=loop,
@@ -86,51 +66,52 @@ class MagDeck(mod_abc.AbstractModule):
 
     @classmethod
     def name(cls) -> str:
+        """Get the module name."""
         return 'magdeck'
 
     def model(self) -> str:
-        return _model_from_revision(self._device_info.get('model'))
+        """Get the model."""
+        return self._model_from_revision(self._device_info.get('model'))
 
     @classmethod
     def bootloader(cls) -> types.UploadFunction:
+        """Get the bootloating method."""
         return update.upload_via_avrdude
 
     async def calibrate(self):
-        """
-        Calibration involves probing for top plate to get the plate height
-        """
+        """Calibration involves probing for top plate to get the plate height."""
         await self.wait_for_is_running()
         await self._driver.probe_plate()
         # return if successful or not?
 
     async def engage(self, height: float):
-        """
-        Move the magnet to a specific height, in mm from home position
-        """
+        """Move the magnet to a specific height, in mm from home position."""
         await self.wait_for_is_running()
         if height > MAX_ENGAGE_HEIGHT[self.model()] or height < 0:
             raise ValueError(
                 f'Invalid engage height for {self.model()}: {height} mm. '
                 f'Must be 0 - {MAX_ENGAGE_HEIGHT[self.model()]} mm')
         await self._driver.move(height)
+        self._current_height = await self._driver.get_mag_position()
 
     async def deactivate(self):
-        """
-        Home the magnet
-        """
+        """Home the magnet."""
         await self.wait_for_is_running()
         await self._driver.home()
         await self.engage(0.0)
 
     @property
     def current_height(self) -> float:
+        """Get the current height."""
         return self._current_height
 
     @property
     def device_info(self) -> Mapping[str, str]:
         """
-        Returns a dict:
+
+        Returns: a dict
             { 'serial': 'abc123', 'model': '8675309', 'version': '9001' }
+
         """
         return self._device_info
 
@@ -184,6 +165,22 @@ class MagDeck(mod_abc.AbstractModule):
     # Internal Methods
 
     async def prep_for_update(self) -> str:
-        self._driver.enter_programming_mode()
+        await self._driver.enter_programming_mode()
         new_port = await update.find_bootloader_port()
         return new_port or self.port
+
+    @staticmethod
+    def _model_from_revision(revision: Optional[str]) -> str:
+        """ Defines the revision -> model mapping """
+        if not revision or 'v' not in revision:
+            log.error(f'bad revision: {revision}')
+            return 'magneticModuleV1'
+        try:
+            revision_num = float(revision.split('v')[-1])  # type: ignore
+        except (ValueError, TypeError):
+            log.exception('bad revision: {revision}')
+            return 'magneticModuleV1'
+        if revision_num < MagDeck.FIRST_GEN2_REVISION:
+            return 'magneticModuleV1'
+        else:
+            return 'magneticModuleV2'

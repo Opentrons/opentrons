@@ -28,6 +28,18 @@ async def test_engage_cycle(magdeck: MagDeck):
     """It should cycle engage and disengage"""
     await magdeck.engage(1)
     assert magdeck.current_height == 1
+    assert magdeck.live_data == {
+        'data': {
+            'engaged': True, 'height': 1.0
+        },
+        'status': 'engaged'
+    }
 
     await magdeck.deactivate()
     assert magdeck.current_height == 0
+    assert magdeck.live_data == {
+        'data': {
+            'engaged': False, 'height': 0.0
+        },
+        'status': 'disengaged'
+    }
