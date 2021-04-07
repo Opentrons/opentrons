@@ -1,9 +1,11 @@
 // @flow
+// 
 import * as React from 'react'
 import styles from './styles.css'
 import { CollapsibleItem } from '@opentrons/components'
 
 type Props = {|
+  /** Slot number the module is in */
   header: string,
   /** Title for the card */
   title: string,

@@ -23,7 +23,6 @@ import { ModuleItem, NoModulesMessage } from './ModuleItem'
 import type { State, Dispatch } from '../../../redux/types'
 import type { AttachedModule } from '../../../redux/modules/types'
 import { UsbHubItem } from './UsbHubItem'
-import { LexModelBuildingService } from 'aws-sdk'
 
 // TODO(bc, 2021-02-16): i18n
 
