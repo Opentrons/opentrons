@@ -1,4 +1,6 @@
 // @flow
+import first from 'lodash/first'
+import uniq from 'lodash/uniq'
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
@@ -10,7 +12,7 @@ import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
 import type { Middleware } from 'redux'
 import type { BaseState } from '../types'
-import type { FormData } from '../form-types'
+import type { FormData, StepType } from '../form-types'
 import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
 import type { AnalyticsEventAction } from './actions'
 import type { AnalyticsEvent } from './mixpanel'
@@ -69,12 +71,11 @@ export const reduxActionToAnalyticsEvent = (
       id => savedStepForms[id]
     )
     let stepType = null
-    if (batchEditedStepForms.length > 0) {
-      if (batchEditedStepForms.every(form => form.stepType === 'moveLiquid')) {
-        stepType = 'moveLiquid'
-      } else if (batchEditedStepForms.every(form => form.stepType === 'mix')) {
-        stepType = 'mix'
-      }
+    const uniqueStepTypes: Array<StepType> = uniq(
+      batchEditedStepForms.map(form => form.stepType)
+    )
+    if (uniqueStepTypes.length === 1) {
+      stepType = first(uniqueStepTypes)
     }
 
     additionalProperties.stepType = stepType
