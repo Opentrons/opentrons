@@ -1,9 +1,5 @@
 // browser websocket client event-emitter/JSON wrapper for convenience
 import EventEmitter from 'events'
-// TODO IMMEDIATELY
-// TODO(mc, 2017-08-29): Disable winston because of worker-loader bug
-// preventing webpackification of built-in node modules
-// import log from 'winston'
 
 // TODO(mc): find out if buffering incomplete messages if needed
 // ws frame size is pretty big, though, so it's probably unnecesary
@@ -13,7 +9,7 @@ function parseMessage(data) {
   try {
     message = JSON.parse(data)
   } catch (e) {
-    // log.warn('JSON parse error', e)
+    console.warn('JSON parse error', e)
   }
 
   return message
