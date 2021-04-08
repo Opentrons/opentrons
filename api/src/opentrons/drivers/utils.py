@@ -17,10 +17,15 @@ KEY_VALUE_REGEX = re.compile(r"((?P<key>\S+):(?P<value>\S+))")
 
 
 class ParseError(Exception):
-    pass
+    def __init__(self, error_message: str, parse_source: str) -> None:
+        self.error_message = error_message
+        self.parse_source = parse_source
+        super().__init__(
+            f"ParseError(error_message={error_message}, parse_source={parse_source})"
+        )
 
 
-def parse_string_value_from_substring(substring) -> str:
+def parse_string_value_from_substring(substring: str) -> str:
     """
     Returns the ascii value in the expected string "N:aa11bb22", where "N" is
     the key, and "aa11bb22" is string value to be returned
@@ -31,8 +36,9 @@ def parse_string_value_from_substring(substring) -> str:
     except (ValueError, IndexError, TypeError, AttributeError):
         log.exception('Unexpected arg to parse_string_value_from_substring:')
         raise ParseError(
-            'Unexpected arg to parse_string_value_from_substring: {}'.format(
-                substring))
+            error_message='Unexpected arg to parse_string_value_from_substring',
+            parse_source=substring
+        )
 
 
 def parse_temperature_response(
@@ -47,8 +53,8 @@ def parse_temperature_response(
         )
     except KeyError:
         raise ParseError(
-            f'Unexpected argument to parse_temperature_response: '
-            f'{temperature_string}'
+            error_message='Unexpected argument to parse_temperature_response',
+            parse_source=temperature_string
         )
 
 
@@ -64,8 +70,10 @@ def parse_plate_temperature_response(
             hold=parse_optional_number(data['H'], rounding_val)
         )
     except KeyError:
-        raise ParseError(f'Unexpected argument to'
-                         f' parse_lid_temperature_response: {temperature_string}')
+        raise ParseError(
+            error_message='Unexpected argument to parse_lid_temperature_response',
+            parse_source=temperature_string
+        )
 
 
 def parse_device_information(
@@ -77,11 +85,13 @@ def parse_device_information(
     """
     res = parse_key_values(device_info_string)
 
-    for key in ['model', 'version', 'serial']:
-        if key not in res:
-            raise ParseError(f'Missing key {key} from device info '
-                             f'string {device_info_string}.')
-    return res
+    try:
+        return {key: res[key] for key in ['model', 'version', 'serial']}
+    except KeyError as e:
+        raise ParseError(
+            error_message=f"Missing key '{str(e)}' in parse_device_information",
+            parse_source=device_info_string
+        )
 
 
 def parse_key_values(value: str) -> Dict[str, str]:
@@ -90,13 +100,10 @@ def parse_key_values(value: str) -> Dict[str, str]:
         to dict
         {'key1': 'value1', 'key2': 'value2'}
     """
-    if not value or not isinstance(value, str):
-        raise ParseError(
-            f'Unexpected argument to parse_key_values: {value}'
-        )
-
-    res = {g.groupdict()['key']: g.groupdict()['value']
-           for g in KEY_VALUE_REGEX.finditer(value)}
+    res = {
+        g.groupdict()['key']: g.groupdict()['value']
+        for g in KEY_VALUE_REGEX.finditer(value)
+    }
     return res
 
 
@@ -109,10 +116,11 @@ def parse_number(value: str, rounding_val: int) -> float:
     """Convert string to float."""
     try:
         return round(float(value), rounding_val)
-    except (ValueError, IndexError, TypeError, AttributeError):
-        err = f'Unexpected argument to parse_number: {value}'
-        log.exception(err)
-        raise ParseError(err)
+    except ValueError:
+        raise ParseError(
+            error_message='Unexpected argument to parse_number',
+            parse_source=value
+        )
 
 
 class AxisMoveTimestamp:

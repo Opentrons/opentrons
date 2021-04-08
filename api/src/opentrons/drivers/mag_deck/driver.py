@@ -71,8 +71,9 @@ def _parse_distance_response(distance_string) -> float:
     val = data.get('Z', data.get('height'))
     if val is None:
         raise utils.ParseError(
-            f'Unexpected argument to _parse_distance_response: '
-            f'{distance_string}')
+            error_message='Unexpected argument to _parse_distance_response',
+            parse_source=distance_string
+        )
 
     return utils.parse_number(val, GCODE_ROUNDING_PRECISION)
 

@@ -23,7 +23,6 @@ def test_parse_distance_response_success(
         ["heigt:12.34"],
         ["height:wolf"],
         ["Z :32.2"],
-        [None],
         [''],
     ]
 )

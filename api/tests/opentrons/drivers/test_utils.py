@@ -12,7 +12,10 @@ from opentrons.drivers.types import Temperature, PlateTemperature
         ['serial:serial_v model:m version:123-2 ',
          {'version': '123-2', 'serial': 'serial_v', 'model': 'm'}],
         ['   serial:serial_v model:m    version:123-2   ',
+         {'version': '123-2', 'serial': 'serial_v', 'model': 'm'}],
+        ['something:extra serial:serial_v model:m version:123-2',
          {'version': '123-2', 'serial': 'serial_v', 'model': 'm'}]
+
     ]
 )
 def test_parse_device_information_success(
@@ -27,7 +30,6 @@ def test_parse_device_information_success(
         ['version:123 serial:serial_v'],
         ['version:123 serialg:serial_v model:123'],
         [''],
-        [None]
     ]
 )
 def test_parse_device_information_failure(input_str: str) -> None:
@@ -61,7 +63,6 @@ def test_parse_temperature_response_success(
         ['T:not_a_float C:123'],
         ['C:not_a_float T:123'],
         [''],
-        [None]
     ]
 )
 def test_parse_temperature_response_failure(input_str: str) -> None:
@@ -95,7 +96,6 @@ def test_parse_plate_temperature_response_success(
         ['C:not_a_float T:123 H:321'],
         ['H:not_a_float C:123 T:321'],
         [''],
-        [None]
     ]
 )
 def test_parse_plate_temperature_response_failure(input_str: str) -> None:
