@@ -43,7 +43,9 @@ const getSubstepsArgs = (state: BaseState): SubstepsArgsNoTimeline => ({
 
 // TODO(IL, 2020-06-15): once we create an Action union for PD, use that instead of `any` for Middleware<S, A>
 export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
-  const worker: TimelineWorker = new Worker('./worker', { type: 'module' })
+  const worker: TimelineWorker = (new Worker('./worker', {
+    type: 'module',
+  }): any)
 
   let prevTimelineArgs: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}
   let prevSubstepsArgs: SubstepsArgsNoTimeline | null = null
