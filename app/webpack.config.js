@@ -6,6 +6,7 @@ const webpack = require('webpack')
 const webpackMerge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
+const WorkerPlugin = require('worker-plugin')
 
 const { DEV_MODE, baseConfig } = require('@opentrons/webpack-config')
 const { productName: title } = require('@opentrons/app-shell/package.json')
@@ -38,6 +39,11 @@ module.exports = webpackMerge(baseConfig, {
         .filter(v => v.startsWith('OT_APP'))
         .concat(['NODE_ENV'])
     ),
+
+    new WorkerPlugin({
+      // disable warnings about HMR when we're in prod
+      globalObject: DEV_MODE ? 'self' : false,
+    }),
 
     new HtmlWebpackPlugin({
       title,

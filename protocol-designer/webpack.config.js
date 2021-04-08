@@ -65,7 +65,10 @@ module.exports = merge(baseConfig, {
 
   plugins: [
     new webpack.EnvironmentPlugin(envVars),
-    new WorkerPlugin(),
+    new WorkerPlugin({
+      // disable warnings about HMR when we're in prod
+      globalObject: DEV_MODE ? 'self' : false,
+    }),
     new FaviconsWebpackPlugin({
       logo: './src/images/favicon-logo.png',
       prefix: 'icons-[hash]/',
