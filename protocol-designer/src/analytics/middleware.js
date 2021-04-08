@@ -76,6 +76,10 @@ export const reduxActionToAnalyticsEvent = (
     )
     if (uniqueStepTypes.length === 1) {
       stepType = first(uniqueStepTypes)
+    } else {
+      console.warn(
+        `Something went wrong, expected one step type in the batch edit form, but got ${uniqueStepTypes} `
+      )
     }
 
     additionalProperties.stepType = stepType
