@@ -195,10 +195,8 @@ class TempDeck:
 
     def update_temperature(self) -> str:
         if self._update_thread and self._update_thread.is_alive():
+            # No need to do anything. The updater is already running.
             pass
-            # TODO AL 20210320 - I don't know what this for. default was never used.
-            # updated_temperature = default or self._temperature.copy()
-            # self._temperature.update(updated_temperature)
         else:
             def _update():
                 try:
