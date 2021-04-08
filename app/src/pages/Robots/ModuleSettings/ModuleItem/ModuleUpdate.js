@@ -10,6 +10,7 @@ import {
   Icon,
   AlertModal,
   JUSTIFY_FLEX_END,
+  DISPLAY_INLINE_BLOCK,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
@@ -76,22 +77,16 @@ export function ModuleUpdate(props: Props): React.Node {
     dispatch(dismissRequest(latestRequestId))
   }
   return (
-    <Flex justifyContent={JUSTIFY_FLEX_END}>
-      <Flex>
-        <SecondaryBtn
-          width="11rem"
-          onClick={handleClick}
-          disabled={!canControl || !hasAvailableUpdate || isPending}
-          {...targetProps}
-        >
-          {isPending ? (
-            <Icon name="ot-spinner" height="1em" spin />
-          ) : (
-            buttonText
-          )}
-        </SecondaryBtn>
-        <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
-      </Flex>
+    <Flex justifyContent={JUSTIFY_FLEX_END} display={DISPLAY_INLINE_BLOCK}>
+      <SecondaryBtn
+        width="11rem"
+        onClick={handleClick}
+        disabled={!canControl || !hasAvailableUpdate || isPending}
+        {...targetProps}
+      >
+        {isPending ? <Icon name="ot-spinner" height="1em" spin /> : buttonText}
+      </SecondaryBtn>
+      <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
       {latestRequest && latestRequest.status === FAILURE && (
         <Portal>
           <AlertModal

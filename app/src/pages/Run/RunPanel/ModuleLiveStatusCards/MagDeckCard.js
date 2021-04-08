@@ -14,6 +14,7 @@ import type {
 
 type Props = {|
   module: MagneticModule,
+  slot: string,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
   sendModuleCommand: (
@@ -30,8 +31,10 @@ export const MagDeckCard = ({
   toggleCard,
   sendModuleCommand,
   controlDisabledReason,
+  slot,
 }: Props): React.Node => (
   <StatusCard
+    header={slot}
     title={getModuleDisplayName(module.model)}
     isCardExpanded={isCardExpanded}
     toggleCard={toggleCard}

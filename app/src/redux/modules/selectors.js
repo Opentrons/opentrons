@@ -23,7 +23,9 @@ export const getAttachedModules: (
 ) => Array<Types.AttachedModule> = createSelector(
   (state, robotName) =>
     robotName !== null ? state.modules[robotName]?.modulesById : {},
-  modulesById => sortBy(modulesById, 'serial')
+  // sort by usbPort info, if they do not exist (robot version below 4.3), sort by serial
+  modulesByPort =>
+    sortBy(modulesByPort, ['usbPort.hub', 'usbPort.port', 'serial'])
 )
 
 export const getAttachedModulesForConnectedRobot = (
@@ -55,6 +57,30 @@ export const getUnpreparedModules: (
     return attachedModules.filter(
       m => preparableSessionModules.includes(m.model) && !isModulePrepared(m)
     )
+  }
+)
+
+export const getMatchedModules: (
+  state: State
+) => Array<Types.MatchedModule> = createSelector(
+  getAttachedModulesForConnectedRobot,
+  RobotSelectors.getModules,
+  (attachedModules, protocolModules) => {
+    const matchedAmod: Array<Types.MatchedModule> = []
+    const matchedPmod = []
+    protocolModules.forEach(pmod => {
+      const compatible =
+        attachedModules.find(
+          amod =>
+            checkModuleCompatibility(amod.model, pmod.model) &&
+            !matchedAmod.find(m => m.module === amod)
+        ) ?? null
+      if (compatible !== null) {
+        matchedPmod.push(pmod)
+        matchedAmod.push({ slot: pmod.slot, module: compatible })
+      }
+    })
+    return matchedAmod
   }
 )
 

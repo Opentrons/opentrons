@@ -10,7 +10,7 @@ import {
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
   SPACING_1,
-  C_LIGHT_GRAY,
+  C_NEAR_WHITE,
   TEXT_TRANSFORM_UPPERCASE,
   SPACING_3,
   SPACING_2,
@@ -158,7 +158,7 @@ function EngageHeightRangeCard(props: ModelContents) {
       width="14rem"
       paddingX={SPACING_3}
       paddingY={SPACING_2}
-      backgroundColor={C_LIGHT_GRAY}
+      backgroundColor={C_NEAR_WHITE}
     >
       <Text
         fontWeight={FONT_WEIGHT_SEMIBOLD}
