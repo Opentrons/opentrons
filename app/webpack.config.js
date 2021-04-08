@@ -23,15 +23,10 @@ const PUBLIC_PATH = DEV_MODE ? `http://localhost:${PORT}/` : ''
 module.exports = webpackMerge(baseConfig, {
   entry: [JS_ENTRY],
 
-  output: Object.assign(
-    {
-      path: OUTPUT_PATH,
-      publicPath: PUBLIC_PATH,
-    },
-    // workaround for worker-plugin HMR
-    // see https://github.com/GoogleChromeLabs/worker-plugin#globalobject-string--false
-    DEV_MODE ? { globalObject: 'this' } : {}
-  ),
+  output: Object.assign({
+    path: OUTPUT_PATH,
+    publicPath: PUBLIC_PATH,
+  }),
 
   plugins: [
     new webpack.EnvironmentPlugin(
@@ -43,6 +38,8 @@ module.exports = webpackMerge(baseConfig, {
     new WorkerPlugin({
       // disable warnings about HMR when we're in prod
       globalObject: DEV_MODE ? 'self' : false,
+      // add required JS plugins to child compiler
+      plugins: ['EnvironmentPlugin'],
     }),
 
     new HtmlWebpackPlugin({

@@ -68,6 +68,8 @@ module.exports = merge(baseConfig, {
     new WorkerPlugin({
       // disable warnings about HMR when we're in prod
       globalObject: DEV_MODE ? 'self' : false,
+      // add required JS plugins to child compiler
+      plugins: ['EnvironmentPlugin'],
     }),
     new FaviconsWebpackPlugin({
       logo: './src/images/favicon-logo.png',

@@ -43,6 +43,7 @@ const getSubstepsArgs = (state: BaseState): SubstepsArgsNoTimeline => ({
 
 // TODO(IL, 2020-06-15): once we create an Action union for PD, use that instead of `any` for Middleware<S, A>
 export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
+  // TODO(IL, 2021-04-08): in TS conversion, this 'any' should be avoidable
   const worker: TimelineWorker = (new Worker('./worker', {
     type: 'module',
   }): any)
