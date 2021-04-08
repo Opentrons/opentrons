@@ -78,6 +78,7 @@ export const reduxActionToAnalyticsEvent = (
       stepType = first(uniqueStepTypes)
     } else {
       console.warn(
+        // $FlowFixMe(sa, 2021-04-08): https://github.com/facebook/flow/issues/2814
         `Something went wrong, expected one step type in the batch edit form, but got ${uniqueStepTypes} `
       )
     }
