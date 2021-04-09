@@ -47,6 +47,17 @@
 
       "volume": "Volume to dispense in each well"
     },
+    "indeterminate": {
+      "aspirate_airGap_checkbox": "Not all selected Transfers are using this setting",
+      "dispense_airGap_checkbox": "Not all selected Transfers are using this setting",
+      "aspirate_mix_checkbox": "Not all selected Transfers are using this setting",
+      "dispense_mix_checkbox": "Not all selected Transfers are using this setting",
+      "aspirate_delay_checkbox": "Not all selected Transfers are using this setting",
+      "dispense_delay_checkbox": "Not all selected Transfers are using this setting",
+      "preWetTip": "Not all selected Transfers are using this setting",
+      "aspirate_touchTip_checkbox": "Not all selected Transfers are using this setting",
+      "dispense_touchTip_checkbox": "Not all selected Transfers are using this setting"
+    },
     "moveLiquid": {
       "disabled": {
         "$generic": "Incompatible with current path",

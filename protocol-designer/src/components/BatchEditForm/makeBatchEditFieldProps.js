@@ -4,7 +4,10 @@ import type {
   DisabledFields,
   MultiselectFieldValues,
 } from '../../ui/steps/selectors'
-import { getFieldDefaultTooltip } from '../StepEditForm/utils'
+import {
+  getFieldDefaultTooltip,
+  getFieldIndeterminateTooltip,
+} from '../StepEditForm/utils'
 import type { FieldPropsByName } from '../StepEditForm/types'
 import type { StepFieldName } from '../../form-types'
 
@@ -16,6 +19,16 @@ export const makeBatchEditFieldProps = (
   const fieldNames: Array<StepFieldName> = Object.keys(fieldValues)
   return fieldNames.reduce<FieldPropsByName>((acc, name) => {
     const defaultTooltip = getFieldDefaultTooltip(name)
+    const isIndeterminate = fieldValues[name].isIndeterminate
+    const indeterminateTooltip = getFieldIndeterminateTooltip(name)
+
+    let tooltipContent = defaultTooltip // Default to the default content (or blank)
+    if (isIndeterminate) {
+      tooltipContent = indeterminateTooltip // If field is not disabled and is interderminate
+    } else if (name in disabledFields) {
+      tooltipContent = disabledFields[name] // Use disabled content if field is disabled
+    }
+
     acc[name] = {
       disabled: name in disabledFields,
       name,
@@ -24,9 +37,8 @@ export const makeBatchEditFieldProps = (
       errorToShow: null,
       onFieldBlur: noop,
       onFieldFocus: noop,
-      isIndeterminate: fieldValues[name].isIndeterminate,
-      tooltipContent:
-        name in disabledFields ? disabledFields[name] : defaultTooltip,
+      isIndeterminate: isIndeterminate,
+      tooltipContent: tooltipContent,
     }
     return acc
   }, {})
