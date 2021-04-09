@@ -1,5 +1,6 @@
 declare module 'mdns-js' {
   import EventEmitter from 'events'
+  import { Socket } from 'dgram'
 
   namespace mdns {
     interface BrowserService {
@@ -17,6 +18,11 @@ declare module 'mdns-js' {
     interface NetworkConnection {
       interfaceIndex: number
       networkInterface: string
+      socket: Socket
+      counters: {
+        sent: number
+        received: number
+      }
     }
 
     class ServiceType {

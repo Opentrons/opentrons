@@ -1,7 +1,9 @@
 // mdns browser wrapper
 import net from 'net'
 import { createBaseBrowser } from './base-browser'
-import { getIPv4Interfaces, compareInterfaces } from './interfaces'
+import { repeatCall } from './repeat-call'
+
+import * as Ifaces from './interfaces'
 
 import type { LogLevel } from '../types'
 import type {
@@ -10,10 +12,12 @@ import type {
   MdnsBrowserService,
 } from './types'
 import type { BaseBrowser, BaseBrowserService } from './base-browser'
+import type { RepeatCallResult } from './repeat-call'
 
 export type { MdnsBrowser, MdnsBrowserOptions, MdnsBrowserService }
 
-const IFACE_POLL_INTERVAL_MS = 10000
+const IFACE_POLL_INTERVAL_MS = 5000
+const QUERY_INTERVAL_MS = [4000, 8000, 16000, 32000, 64000, 128000]
 
 /**
  * Create a mDNS browser wrapper can be started and stopped and calls
@@ -30,7 +34,8 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
   }
 
   let browser: BaseBrowser | null = null
-  let ifacePollIntervalId: NodeJS.Timeout | null = null
+  let ifacePollTask: RepeatCallResult | null = null
+  let queryTask: RepeatCallResult | null = null
 
   function start(): void {
     stop()
@@ -41,11 +46,16 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
 
     baseBrowser
       .once('ready', () => {
-        baseBrowser.discover()
-        ifacePollIntervalId = setInterval(
-          pollNetworkInterfaces,
-          IFACE_POLL_INTERVAL_MS
-        )
+        queryTask = repeatCall({
+          handler: queryMdns,
+          interval: QUERY_INTERVAL_MS,
+          callImmediately: true,
+        })
+
+        ifacePollTask = repeatCall({
+          handler: pollNetworkInterfaces,
+          interval: IFACE_POLL_INTERVAL_MS,
+        })
       })
       .on('update', (service: BaseBrowserService) => {
         const { fullname, addresses, port } = service
@@ -71,8 +81,14 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
   }
 
   function stop(): void {
-    if (ifacePollIntervalId !== null) {
-      clearInterval(ifacePollIntervalId)
+    if (ifacePollTask !== null) {
+      ifacePollTask.cancel()
+      ifacePollTask = null
+    }
+
+    if (queryTask !== null) {
+      queryTask.cancel()
+      queryTask = null
     }
 
     if (browser !== null) {
@@ -85,12 +101,20 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
     }
   }
 
+  function queryMdns(): void {
+    if (browser !== null) {
+      log('debug', 'Sending mDNS discovery query')
+      browser.discover()
+    }
+  }
+
   function pollNetworkInterfaces(): void {
     if (browser !== null) {
-      const interfaces = getIPv4Interfaces()
-      const { interfacesMatch, extra, missing } = compareInterfaces(
-        browser,
-        interfaces
+      log('silly', 'Checking network interfaces for changes')
+
+      const { interfacesMatch, extra, missing } = Ifaces.compareInterfaces(
+        Ifaces.getBrowserInterfaces(browser),
+        Ifaces.getSystemInterfaces()
       )
 
       if (!interfacesMatch) {

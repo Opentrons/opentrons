@@ -1,11 +1,14 @@
 import Mdns from 'mdns-js'
 import { when } from 'jest-when'
+import { isEqual } from 'lodash'
 
 import { mockBaseBrowser, mockBrowserService } from '../__fixtures__'
-import { getIPv4Interfaces, compareInterfaces } from '../interfaces'
+import * as Ifaces from '../interfaces'
+import { repeatCall as mockRepeatCall } from '../repeat-call'
 import { createMdnsBrowser } from '..'
 
 jest.mock('../interfaces')
+jest.mock('../repeat-call')
 
 jest.mock('mdns-js', () => ({
   tcp: (name: string) => ({
@@ -22,17 +25,29 @@ const createBrowser = Mdns.createBrowser as jest.MockedFunction<
   typeof Mdns.createBrowser
 >
 
+const getBrowserInterfaces = Ifaces.getBrowserInterfaces as jest.MockedFunction<
+  typeof Ifaces.getBrowserInterfaces
+>
+
+const getSystemInterfaces = Ifaces.getSystemInterfaces as jest.MockedFunction<
+  typeof Ifaces.getSystemInterfaces
+>
+
+const compareInterfaces = Ifaces.compareInterfaces as jest.MockedFunction<
+  typeof Ifaces.compareInterfaces
+>
+
+const repeatCall = mockRepeatCall as jest.MockedFunction<typeof mockRepeatCall>
+
 describe('mdns browser', () => {
   const onService = jest.fn()
 
   beforeEach(() => {
     createBrowser.mockReturnValue(mockBaseBrowser)
-    jest.useFakeTimers()
+    repeatCall.mockReturnValue({ cancel: jest.fn() })
   })
 
   afterEach(() => {
-    jest.clearAllTimers()
-    jest.useRealTimers()
     jest.resetAllMocks()
     mockBaseBrowser.removeAllListeners()
   })
@@ -44,14 +59,12 @@ describe('mdns browser', () => {
     mockBaseBrowser.emit('ready')
 
     expect(createBrowser).toHaveBeenCalledWith(Mdns.tcp('http'))
-    expect(mockBaseBrowser.discover).toHaveBeenCalled()
   })
 
   it('does not search for anything until start is called', () => {
     createMdnsBrowser({ onService, ports: [31950] })
 
     expect(createBrowser).toHaveBeenCalledTimes(0)
-    expect(mockBaseBrowser.discover).toHaveBeenCalledTimes(0)
   })
 
   it('does not search for anything until base mdns browser is ready', () => {
@@ -60,10 +73,90 @@ describe('mdns browser', () => {
     browser.start()
 
     expect(createBrowser).toHaveBeenCalledWith(Mdns.tcp('http'))
-    expect(mockBaseBrowser.discover).toHaveBeenCalledTimes(0)
+    expect(repeatCall).toHaveBeenCalledTimes(0)
+  })
+
+  it('requeries the mDNS browser on a backed-off interval', () => {
+    let requery: () => unknown = () => {
+      throw new Error('stubbed repeatCall handler not found')
+    }
+
+    repeatCall.mockImplementation(options => {
+      const { handler, interval, callImmediately } = options
+      if (
+        isEqual(interval, [4000, 8000, 16000, 32000, 64000, 128000]) &&
+        callImmediately === true
+      ) {
+        requery = handler
+      }
+
+      return { cancel: jest.fn() }
+    })
+
+    const browser = createMdnsBrowser({ onService, ports: [12345] })
+    browser.start()
+    mockBaseBrowser.emit('ready')
+
+    // discovery is called again on requery interval
+    requery()
+    expect(mockBaseBrowser.discover).toHaveBeenCalledTimes(1)
+
+    requery()
+    expect(mockBaseBrowser.discover).toHaveBeenCalledTimes(2)
+  })
+
+  it('checks that the mDNS browser is bound to network interfaces on an 5 second interval', () => {
+    when(
+      getBrowserInterfaces as jest.MockedFunction<typeof getBrowserInterfaces>
+    )
+      .calledWith(mockBaseBrowser)
+      .mockReturnValue([])
+
+    // return new system interfaces on the second poll
+    when(getSystemInterfaces as jest.MockedFunction<typeof getSystemInterfaces>)
+      .calledWith()
+      .mockReturnValueOnce([])
+      .mockReturnValue([{ name: 'en1', address: '192.168.1.1' }])
+
+    when(compareInterfaces as jest.MockedFunction<typeof compareInterfaces>)
+      .calledWith([], [])
+      .mockReturnValue({ interfacesMatch: true, extra: [], missing: [] })
+      .calledWith([], [{ name: 'en1', address: '192.168.1.1' }])
+      .mockReturnValue({
+        interfacesMatch: false,
+        extra: [],
+        missing: [{ name: 'en1', address: '192.168.1.1' }],
+      })
+
+    let checkInterfaces: () => unknown = () => {
+      throw new Error('stubbed repeatCall handler not found')
+    }
+
+    repeatCall.mockImplementation(options => {
+      const { handler, interval } = options
+      if (interval === 5000) checkInterfaces = handler
+      return { cancel: jest.fn() }
+    })
+
+    const browser = createMdnsBrowser({ onService, ports: [12345] })
+    browser.start()
+    mockBaseBrowser.emit('ready')
+    createBrowser.mockClear()
+
+    // one poll no need to refresh
+    checkInterfaces()
+    expect(createBrowser).toHaveBeenCalledTimes(0)
+
+    // new interfaces come in on second poll, browser should be rebuilt
+    checkInterfaces()
+    expect(createBrowser).toHaveBeenCalledTimes(1)
   })
 
   it('can stop the browser', () => {
+    const cancelInterval = jest.fn()
+
+    repeatCall.mockReturnValue({ cancel: cancelInterval })
+
     const browser = createMdnsBrowser({ onService, ports: [31950] })
 
     browser.start()
@@ -71,6 +164,7 @@ describe('mdns browser', () => {
     browser.stop()
 
     expect(mockBaseBrowser.stop).toHaveBeenCalled()
+    expect(cancelInterval).toHaveBeenCalledTimes(2)
   })
 
   it('can restart the browser', () => {
@@ -80,14 +174,12 @@ describe('mdns browser', () => {
     mockBaseBrowser.emit('ready')
 
     expect(createBrowser).toHaveBeenCalledTimes(1)
-    expect(mockBaseBrowser.discover).toHaveBeenCalledTimes(1)
     expect(mockBaseBrowser.stop).toHaveBeenCalledTimes(0)
 
     browser.start()
     mockBaseBrowser.emit('ready')
 
     expect(createBrowser).toHaveBeenCalledTimes(2)
-    expect(mockBaseBrowser.discover).toHaveBeenCalledTimes(2)
     expect(mockBaseBrowser.stop).toHaveBeenCalledTimes(1)
   })
 
@@ -167,43 +259,5 @@ describe('mdns browser', () => {
       ip: '192.168.1.42',
       port: 12345,
     })
-  })
-
-  it('checks that the mDNS browser is bound to network interfaces on an interval', () => {
-    const browser = createMdnsBrowser({ onService, ports: [12345] })
-
-    browser.start()
-    mockBaseBrowser.emit('ready')
-
-    // return new interfaces on the third poll
-    when(getIPv4Interfaces as jest.MockedFunction<typeof getIPv4Interfaces>)
-      .calledWith()
-      .mockReturnValueOnce([])
-      .mockReturnValueOnce([])
-      .mockReturnValue(['en0'])
-
-    when(compareInterfaces as jest.MockedFunction<typeof compareInterfaces>)
-      .calledWith(mockBaseBrowser, [])
-      .mockReturnValue({ interfacesMatch: true, extra: [], missing: [] })
-      .calledWith(mockBaseBrowser, ['en0'])
-      .mockReturnValue({ interfacesMatch: false, extra: [], missing: [] })
-
-    // initial discovery
-    expect(mockBaseBrowser.discover).toHaveBeenCalledTimes(1)
-
-    // one poll after ten seconds, no need to refresh
-    jest.advanceTimersByTime(10000)
-    mockBaseBrowser.emit('ready')
-    expect(mockBaseBrowser.discover).toHaveBeenCalledTimes(1)
-
-    // another poll after ten seconds, no need to refresh
-    jest.advanceTimersByTime(10000)
-    mockBaseBrowser.emit('ready')
-    expect(mockBaseBrowser.discover).toHaveBeenCalledTimes(1)
-
-    // another poll after ten seconds, new interfaces come in
-    jest.advanceTimersByTime(10001)
-    mockBaseBrowser.emit('ready')
-    expect(mockBaseBrowser.discover).toHaveBeenCalledTimes(2)
   })
 })

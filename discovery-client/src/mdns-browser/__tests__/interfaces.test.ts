@@ -1,146 +1,167 @@
 import { mockBaseBrowser } from '../__fixtures__'
-import { compareInterfaces } from '../interfaces'
+import { getBrowserInterfaces, compareInterfaces } from '../interfaces'
 
+import type { Socket } from 'dgram'
 import type { Browser as BaseBrowser } from 'mdns-js'
 
+const socket = (address: string): Socket =>
+  ({ address: () => ({ address, port: 0 }) } as Socket)
+
 describe('interface utilities', () => {
-  it('should know when a browser includes all given interfaces', () => {
-    const browser = {
-      ...mockBaseBrowser,
-      networking: {
-        connections: [{ interfaceIndex: 0, networkInterface: 'en0' }],
-      },
-    } as BaseBrowser
+  describe('getting browser interfaces', () => {
+    it('should ignore the multicast interface', () => {
+      const browser = {
+        ...mockBaseBrowser,
+        networking: {
+          connections: [
+            {
+              interfaceIndex: 0,
+              networkInterface: 'pseudo multicast',
+              socket: socket('0.0.0.0'),
+            },
+          ],
+        },
+      } as BaseBrowser
 
-    const systemInterfaces = ['en0']
+      const result = getBrowserInterfaces(browser)
+      expect(result).toEqual([])
+    })
 
-    const result = compareInterfaces(browser, systemInterfaces)
+    it('should get other interfaces', () => {
+      const browser = {
+        ...mockBaseBrowser,
+        networking: {
+          connections: [
+            {
+              interfaceIndex: 0,
+              networkInterface: 'en0',
+              socket: socket('169.254.1.1'),
+            },
+            {
+              interfaceIndex: 1,
+              networkInterface: 'wlan0',
+              socket: socket('192.168.1.1'),
+            },
+            {
+              interfaceIndex: 2,
+              networkInterface: 'pseudo multicast',
+              socket: socket('0.0.0.0'),
+            },
+          ],
+        },
+      } as BaseBrowser
 
-    expect(result).toEqual({
-      interfacesMatch: true,
-      missing: [],
-      extra: [],
+      const result = getBrowserInterfaces(browser)
+      expect(result).toEqual([
+        { name: 'en0', address: '169.254.1.1' },
+        { name: 'wlan0', address: '192.168.1.1' },
+      ])
     })
   })
 
-  it('should not complain about the "all interfaces" pseudo-interface', () => {
-    const browser = {
-      ...mockBaseBrowser,
-      networking: {
-        connections: [
-          { interfaceIndex: 0, networkInterface: 'en0' },
-          { interfaceIndex: 1, networkInterface: 'pseudo multicast' },
-        ],
-      },
-    } as BaseBrowser
+  describe('interface comparison', () => {
+    it('should know when a browser includes all given interfaces', () => {
+      const browserInterfaces = [{ name: 'en0', address: '192.168.1.1' }]
+      const systemInterfaces = [{ name: 'en0', address: '192.168.1.1' }]
 
-    const systemInterfaces = ['en0']
+      const result = compareInterfaces(browserInterfaces, systemInterfaces)
 
-    const result = compareInterfaces(browser, systemInterfaces)
-
-    expect(result).toEqual({
-      interfacesMatch: true,
-      missing: [],
-      extra: [],
+      expect(result).toEqual({
+        interfacesMatch: true,
+        missing: [],
+        extra: [],
+      })
     })
-  })
 
-  it('should handle several interfaces in the browser', () => {
-    const browser = {
-      ...mockBaseBrowser,
-      networking: {
-        connections: [
-          { interfaceIndex: 0, networkInterface: 'en0' },
-          { interfaceIndex: 1, networkInterface: 'en1' },
-          { interfaceIndex: 2, networkInterface: 'en2' },
-          { interfaceIndex: 3, networkInterface: 'wlan0' },
-          { interfaceIndex: 4, networkInterface: 'pseudo multicast' },
-        ],
-      },
-    } as BaseBrowser
+    it('should handle several interfaces in the browser', () => {
+      const browserInterfaces = [
+        { name: 'en0', address: '169.254.1.1' },
+        { name: 'en1', address: '192.168.1.1' },
+        { name: 'wlan0', address: '10.0.0.1' },
+      ]
 
-    const systemInterfaces = ['en0', 'en1', 'en2', 'wlan0']
+      const systemInterfaces = [
+        { name: 'wlan0', address: '10.0.0.1' },
+        { name: 'en0', address: '169.254.1.1' },
+        { name: 'en1', address: '192.168.1.1' },
+      ]
+      const result = compareInterfaces(browserInterfaces, systemInterfaces)
 
-    const result = compareInterfaces(browser, systemInterfaces)
-
-    expect(result).toEqual({
-      interfacesMatch: true,
-      missing: [],
-      extra: [],
+      expect(result).toEqual({
+        interfacesMatch: true,
+        missing: [],
+        extra: [],
+      })
     })
-  })
 
-  it('should know when interfaces are missing in the browser', () => {
-    const browser = {
-      ...mockBaseBrowser,
-      networking: {
-        connections: [
-          { interfaceIndex: 0, networkInterface: 'en0' },
-          { interfaceIndex: 1, networkInterface: 'en1' },
-          { interfaceIndex: 2, networkInterface: 'en2' },
-          { interfaceIndex: 3, networkInterface: 'wlan0' },
-          { interfaceIndex: 4, networkInterface: 'pseudo multicast' },
-        ],
-      },
-    } as BaseBrowser
+    it('should know when interfaces are missing in the browser', () => {
+      const browserInterfaces = [
+        { name: 'en0', address: '169.254.1.1' },
+        { name: 'en1', address: '192.168.1.1' },
+        { name: 'wlan0', address: '10.0.0.1' },
+      ]
 
-    const systemInterfaces = ['en0', 'en1', 'en2', 'en3', 'wlan0']
+      const systemInterfaces = [
+        { name: 'wlan0', address: '10.0.0.1' },
+        { name: 'en0', address: '169.254.1.1' },
+        { name: 'en1', address: '192.168.1.1' },
+        { name: 'en2', address: '192.168.100.1' },
+      ]
 
-    const result = compareInterfaces(browser, systemInterfaces)
+      const result = compareInterfaces(browserInterfaces, systemInterfaces)
 
-    expect(result).toEqual({
-      interfacesMatch: false,
-      missing: ['en3'],
-      extra: [],
+      expect(result).toEqual({
+        interfacesMatch: false,
+        missing: [{ name: 'en2', address: '192.168.100.1' }],
+        extra: [],
+      })
     })
-  })
 
-  it('should know when the browser has too many interfaces', () => {
-    const browser = {
-      ...mockBaseBrowser,
-      networking: {
-        connections: [
-          { interfaceIndex: 0, networkInterface: 'en0' },
-          { interfaceIndex: 1, networkInterface: 'en1' },
-          { interfaceIndex: 2, networkInterface: 'en2' },
-          { interfaceIndex: 3, networkInterface: 'wlan0' },
-          { interfaceIndex: 4, networkInterface: 'pseudo multicast' },
-        ],
-      },
-    } as BaseBrowser
+    it('should know when the browser has too many interfaces', () => {
+      const browserInterfaces = [
+        { name: 'en0', address: '169.254.1.1' },
+        { name: 'en1', address: '192.168.1.1' },
+        { name: 'en2', address: '192.168.100.1' },
+        { name: 'wlan0', address: '10.0.0.1' },
+      ]
 
-    const systemInterfaces = ['en0', 'en1', 'wlan0']
+      const systemInterfaces = [
+        { name: 'wlan0', address: '10.0.0.1' },
+        { name: 'en0', address: '169.254.1.1' },
+        { name: 'en1', address: '192.168.1.1' },
+      ]
 
-    const result = compareInterfaces(browser, systemInterfaces)
+      const result = compareInterfaces(browserInterfaces, systemInterfaces)
 
-    expect(result).toEqual({
-      interfacesMatch: false,
-      missing: [],
-      extra: ['en2'],
+      expect(result).toEqual({
+        interfacesMatch: false,
+        missing: [],
+        extra: [{ name: 'en2', address: '192.168.100.1' }],
+      })
     })
-  })
 
-  it('should know when browser has both too many and not enough interfaces', () => {
-    const browser = {
-      ...mockBaseBrowser,
-      networking: {
-        connections: [
-          { interfaceIndex: 0, networkInterface: 'en0' },
-          { interfaceIndex: 2, networkInterface: 'en2' },
-          { interfaceIndex: 3, networkInterface: 'wlan0' },
-          { interfaceIndex: 4, networkInterface: 'pseudo multicast' },
-        ],
-      },
-    } as BaseBrowser
+    it('should know when browser has both too many and not enough interfaces', () => {
+      const browserInterfaces = [
+        { name: 'en0', address: '169.254.1.1' },
+        { name: 'en1', address: '192.168.1.1' },
+        { name: 'en2', address: '192.168.100.1' },
+        { name: 'wlan0', address: '10.0.0.1' },
+      ]
 
-    const systemInterfaces = ['en0', 'en1', 'wlan0']
+      const systemInterfaces = [
+        { name: 'wlan0', address: '10.0.0.1' },
+        { name: 'en0', address: '169.254.1.1' },
+        { name: 'en1', address: '192.168.1.1' },
+        { name: 'en3', address: '192.168.200.1' },
+      ]
 
-    const result = compareInterfaces(browser, systemInterfaces)
+      const result = compareInterfaces(browserInterfaces, systemInterfaces)
 
-    expect(result).toEqual({
-      interfacesMatch: false,
-      missing: ['en1'],
-      extra: ['en2'],
+      expect(result).toEqual({
+        interfacesMatch: false,
+        missing: [{ name: 'en3', address: '192.168.200.1' }],
+        extra: [{ name: 'en2', address: '192.168.100.1' }],
+      })
     })
   })
 })
