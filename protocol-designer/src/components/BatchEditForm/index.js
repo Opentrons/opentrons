@@ -14,7 +14,6 @@ import {
   CheckboxRowField,
   DelayFields,
   FlowRateField,
-  TextField,
   TipPositionField,
   WellOrderField,
 } from '../StepEditForm/fields'
@@ -37,12 +36,13 @@ import {
   resetBatchEditFieldChanges,
   saveStepFormsMulti,
 } from '../../step-forms/actions'
-import type { FieldPropsByName } from '../StepEditForm/types'
-import type { WellOrderOption } from '../../form-types'
 // TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
 import formStyles from '../forms/forms.css'
 import styles from '../StepEditForm/StepEditForm.css'
 import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
+import { maskField } from '../../steplist/fieldLevel'
+import type { FieldPropsByName } from '../StepEditForm/types'
+import type { WellOrderOption } from '../../form-types'
 
 export type BatchEditFormProps = {||}
 
@@ -251,7 +251,8 @@ export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
   const batchEditFormHasChanges = useSelector(getBatchEditFormHasUnsavedChanges)
 
   const handleChangeFormInput = (name, value) => {
-    dispatch(changeBatchEditField({ [name]: value }))
+    const maskedValue = maskField(name, value)
+    dispatch(changeBatchEditField({ [name]: maskedValue }))
   }
 
   const handleSave = () => {
