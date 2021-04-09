@@ -244,7 +244,7 @@ class Labware(DeckItem):
     def __hash__(self) -> int:
         # noqa: D105
         raise NotImplementedError()
-    
+
     # todo(mm, 2021-04-09): The following methods appear on docs.opentrons.com
     # (accidentally?) but aren't versioned. Figure out whether we need to
     # include them here.
