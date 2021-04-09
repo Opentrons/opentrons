@@ -5,6 +5,7 @@ name: 'Components test, build, and deploy'
 on:
   pull_request:
     paths:
+      - 'Makefile'
       - 'components/**'
       - 'webpack-config/**'
       - 'package.json'
