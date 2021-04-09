@@ -146,17 +146,6 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
           />
         </CheckboxRowField>
       )}
-      <CheckboxRowField
-        {...propsForFields[addFieldNamePrefix('airGap_checkbox')]}
-        label={i18n.t('form.step_edit_form.field.airGap.label')}
-        className={styles.small_field}
-      >
-        <TextField
-          {...propsForFields[addFieldNamePrefix('airGap_volume')]}
-          className={styles.small_field}
-          units={i18n.t('application.units.microliter')}
-        />
-      </CheckboxRowField>
     </FormColumn>
   )
 }
