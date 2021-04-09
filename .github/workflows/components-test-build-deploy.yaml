@@ -84,7 +84,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: 'components-artifact'
-          path: components/dist
+          path: storybook-static
   deploy-components:
     name: 'deploy components artifact to S3'
     runs-on: 'ubuntu-18.04'

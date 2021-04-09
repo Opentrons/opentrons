@@ -19,7 +19,7 @@ setup:
 
 .PHONY: clean
 clean:
-	yarn shx rm -rf dist
+	yarn shx rm -rf ../storybook-static
 
 # artifacts
 #####################################################################
@@ -27,7 +27,7 @@ clean:
 .PHONY: dist
 dist: export NODE_ENV := development
 dist:
-	yarn styleguidist build
+	(cd .. && yarn build-storybook)
 
 .PHONY: flow-types
 flow-types: $(flow_out)
@@ -41,4 +41,4 @@ flow-types/%.js.flow: lib/%.d.ts
 .PHONY: dev
 build: export NODE_ENV := development
 dev:
-	yarn styleguidist server
+	(cd .. && yarn storybook)

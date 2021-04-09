@@ -225,6 +225,10 @@ circular-dependencies-js:
 	madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.js
 	madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.js
 
+.PHONY: storybook
+storybook:
+ yarn storybook
+
 .PHONY: bump
 bump:
 	@echo "Bumping versions"
