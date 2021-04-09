@@ -227,7 +227,7 @@ circular-dependencies-js:
 
 .PHONY: storybook
 storybook:
- yarn storybook
+	yarn storybook
 
 .PHONY: bump
 bump:
