@@ -15,7 +15,6 @@ import {
   CheckboxRowField,
   DelayFields,
   FlowRateField,
-  TextField,
   TipPositionField,
   WellOrderField,
 } from '../StepEditForm/fields'
