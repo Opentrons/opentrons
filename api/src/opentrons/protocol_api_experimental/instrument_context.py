@@ -1,13 +1,21 @@
 # noqa: D100
+
 from __future__ import annotations
 
 from typing import Optional, Union, Sequence, List
 
+from .labware import Well, Labware
+
 from opentrons import APIVersion, types
-from opentrons.experimental_protocol_api.labware import Well, Labware
 from opentrons.hardware_control.dev_types import PipetteDict
+
+# todo(mm, 2021-04-09): Duplicate these classes in this package to
+# decouple from the v2 opentrons.protocol_api?
 from opentrons.protocol_api import PairedInstrumentContext
 from opentrons.protocol_api.instrument_context import AdvancedLiquidHandling
+
+# todo(mm, 2021-04-09): How customer-facing are these classes? Should they be
+# accessible and documented as part of this package?
 from opentrons.protocols.api_support.util import (
     PlungerSpeeds, FlowRates, Clearances
 )

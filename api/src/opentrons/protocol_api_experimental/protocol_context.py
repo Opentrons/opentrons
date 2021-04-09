@@ -7,9 +7,8 @@
 
 import typing
 
-from opentrons.experimental_protocol_api.instrument_context import \
-    InstrumentContext
-from opentrons.experimental_protocol_api.labware import Labware
+from .instrument_context import InstrumentContext
+from .labware import Labware
 
 
 class ProtocolContext:
