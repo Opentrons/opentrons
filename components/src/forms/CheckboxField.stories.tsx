@@ -6,7 +6,6 @@ import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'Library/Molecules/Forms/Checkbox Field',
-  argTypes: { onChange: { action: 'clicked' } },
   component: CheckboxField,
 } as Meta
 

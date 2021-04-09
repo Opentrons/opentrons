@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { RobotWorkSpace } from './RobotWorkSpace'
-import { RobotCoordsText, RobotCoordsForeignDiv } from '@opentrons/components'
+import { RobotCoordsText, RobotCoordsForeignDiv, Module } from '@opentrons/components'
 import { getDeckDefinitions } from './getDeckDefinitions'
 
 import type { Story, Meta } from '@storybook/react'
@@ -8,7 +8,7 @@ import type { Story, Meta } from '@storybook/react'
 const allDeckDefs = getDeckDefinitions()
 
 export default {
-  title: 'Library/Molecules/Deck',
+  title: 'Library/Molecules/Simulation/Deck',
   argTypes: {
     deckDef: {
       control: {
@@ -31,35 +31,34 @@ const Template: Story<React.ComponentProps<typeof RobotWorkSpace>> = ({
 export const Deck = Template.bind({})
 Deck.args = {
   children: ({ deckSlotsById }) => {
-    const slotName = '5'
-    const divSlot = '3'
+    const divSlot =  deckSlotsById['9']
+    const moduleSlot = deckSlotsById['10']
+    const rectSlot = deckSlotsById['11']
     return (
       <>
         <rect
-          x={deckSlotsById[slotName].position[0]}
-          y={deckSlotsById[slotName].position[1]}
-          width={deckSlotsById[slotName].boundingBox.xDimension}
-          height={deckSlotsById[slotName].boundingBox.yDimension}
+          x={rectSlot.position[0]}
+          y={rectSlot.position[1]}
+          width={rectSlot.boundingBox.xDimension}
+          height={rectSlot.boundingBox.yDimension}
           fill="#0075ff33"
         />
-        <RobotCoordsText
-          x={deckSlotsById[slotName].position[0] + 10}
-          y={deckSlotsById[slotName].position[1] + 10}
-          fill="gray"
-        >
-          Some Text
-        </RobotCoordsText>
         <RobotCoordsForeignDiv
-          x={deckSlotsById[divSlot].position[0]}
-          y={deckSlotsById[divSlot].position[1]}
-          width={deckSlotsById[divSlot].boundingBox.xDimension}
-          height={deckSlotsById[divSlot].boundingBox.yDimension}
+          x={divSlot.position[0] - 30}
+          y={divSlot.position[1]}
+          width={divSlot.boundingBox.xDimension}
+          height={divSlot.boundingBox.yDimension}
         >
           <input
-            style={{ backgroundColor: 'lightgray', margin: '1rem' }}
+            style={{ backgroundColor: 'lightgray', margin: '1rem', width: '6rem' }}
             placeholder="example input"
           />
         </RobotCoordsForeignDiv>
+        <g
+          transform={`translate(${moduleSlot.position[0]}, ${moduleSlot.position[1]})`}
+        >
+          <Module slot={moduleSlot} model="temperatureModuleV1" mode="info" />
+        </g>
       </>
     )
   },

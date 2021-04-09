@@ -16,10 +16,9 @@ const Template: Story<React.ComponentProps<typeof Select>> = args => (
 export const Basic = Template.bind({})
 Basic.parameters = {
   docs: {
-    // description: {
-    //   component: 'Thin wrapper around `react-select` to apply our Opentrons-specific styles. All props are passed directly to [`react-select`](https://react-select.com/props) except for `styles`, `components`, and `classNamePrefix`. The `className` prop appends to the `className` we pass `react-select`. Those props are not passed directly because they provide the base styling of the component'
-    // },
-    page: null,
+    description: {
+      component: 'Thin wrapper around `react-select` to apply our Opentrons-specific styles. All props are passed directly to [`react-select`](https://react-select.com/props) except for `styles`, `components`, and `classNamePrefix`. The `className` prop appends to the `className` we pass `react-select`. Those props are not passed directly because they provide the base styling of the component'
+    },
   },
 }
 Basic.args = {
@@ -33,10 +32,9 @@ Basic.args = {
 export const GroupedOptions = Template.bind({})
 GroupedOptions.parameters = {
   docs: {
-    // description: {
-    //   component: 'You can also pass grouped options:'
-    // },
-    page: null,
+    description: {
+      component: 'You can also pass grouped options:'
+    },
   },
 }
 GroupedOptions.args = {
@@ -61,10 +59,9 @@ GroupedOptions.args = {
 export const Controlled = Template.bind({})
 Controlled.parameters = {
   docs: {
-    // description: {
-    //   component: 'Passing `value` controls the input. **Note that `value` has the same format as an entry in `options`**'
-    // },
-    page: null,
+    description: {
+      component: 'Passing `value` controls the input. **Note that `value` has the same format as an entry in `options`**'
+    },
   },
 }
 Controlled.args = {
@@ -79,10 +76,9 @@ Controlled.args = {
 export const FormattedOptionLabel = Template.bind({})
 FormattedOptionLabel.parameters = {
   docs: {
-    // description: {
-    //   component: 'You can control the renders of individual options with the `formatOptionLabel` prop:'
-    // },
-    page: null,
+    description: {
+      component: 'You can control the renders of individual options with the `formatOptionLabel` prop:'
+    },
   },
 }
 FormattedOptionLabel.args = {
@@ -103,10 +99,9 @@ FormattedOptionLabel.args = {
 export const StyleOverride = Template.bind({})
 StyleOverride.parameters = {
   docs: {
-    // description: {
-    //   component: "To override any styling, we use [`react-select`'s BEM](https://react-select.com/styles#using-classnames) class names with our specific prefix, which is `ot_select`. See `SelectField` for a specific example, where the background color of the `Control` element is modified if the field has an error"
-    // },
-    page: null,
+    description: {
+      component: "To override any styling, we use [`react-select`'s BEM](https://react-select.com/styles#using-classnames) class names with our specific prefix, which is `ot_select`. See `SelectField` for a specific example, where the background color of the `Control` element is modified if the field has an error"
+    },
   },
 }
 StyleOverride.args = {

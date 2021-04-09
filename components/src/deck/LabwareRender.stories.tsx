@@ -23,7 +23,7 @@ const tipRackDefMap: Record<string, typeof fixture_96_plate> = {
   [fixture_tiprack_1000_ul.metadata.displayName]: fixture_tiprack_1000_ul,
 }
 export default {
-  title: 'Library/Molecules/Labware',
+  title: 'Library/Molecules/Simulation/Labware',
   decorators: [
     Story => (
       <RobotWorkSpace
