@@ -118,9 +118,14 @@ class Well:
         raise NotImplementedError()
 
 
+# todo(mm, 2021-04-09): Does this still need to subclass DeckItem, or was that
+# an APIv2 implementation detail?
 class Labware(DeckItem):
     # noqa: D101
 
+    # todo(mm, 2021-04-09): I think this was an APIv2 implementation detail.
+    # It's not on docs.opentrons.com. It's just required because we subclass
+    # DeckItem. Remove it?
     @property
     def separate_calibration(self) -> bool:
         # noqa: D102
