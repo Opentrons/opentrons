@@ -21,6 +21,8 @@ from opentrons.protocols.api_support.util import (
 )
 
 
+# todo(mm, 2021-04-09): Can/should we change "Instrument" to "Pipette"?
+# todo(mm, 2021-04-09): Can/should we remove the word "Context" from the name?
 class InstrumentContext:
     # noqa: D101
 

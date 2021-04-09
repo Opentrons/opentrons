@@ -1,9 +1,4 @@
 # noqa: D100
-# Todo: Move to different top-level dir for different linting and typing rules
-
-# Notable differences between legacy context:
-# Mount must be a str
-# No implicit Optional[List]
 
 import typing
 
@@ -18,14 +13,19 @@ class ProtocolContext:
         self,
         instrument_name: str,
         mount: str,
-        tip_racks: typing.Sequence[typing.Any] = tuple(),  # Todo: Tip rack type
+        tip_racks: typing.Sequence[Labware] = tuple(),
         replace: bool = False
     ) -> InstrumentContext:
         # noqa: D102
+        # Changes from APIv2:
+        #   * mount must be a str, not types.Mount.
+        #   * tip_racks is a Sequence[Labware] defaulting to empty, not an
+        #     implicitly optional List[Labware].
         raise NotImplementedError()
 
     def load_labware(self) -> Labware:
         # noqa: D102
         raise NotImplementedError()
 
-    # All else todo
+    # todo(mm, 2021-04-09): Add all other public methods from the APIv2
+    # ProtocolContext.

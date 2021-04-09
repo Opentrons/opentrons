@@ -239,3 +239,18 @@ class Labware(DeckItem):
     def __hash__(self) -> int:
         # noqa: D105
         raise NotImplementedError()
+    
+    # todo(mm, 2021-04-09): The following methods appear on docs.opentrons.com
+    # (accidentally?) but aren't versioned. Figure out whether we need to
+    # include them here.
+    #   * next_tip()
+    #   * use_tips()
+    #   * previous_tip()
+    #   * return_tips()
+
+
+# todo(mm, 2021-04-09): In addition to the Labware class, the APIv2
+# analogue to this module provides several free functions. Some of them
+# appear on docs.opentrons.com, but none of them are versioned with
+# @requires_version, so it's unclear if they're meant to be part of the public
+# API. We need to figure out whether we need to include them here.
