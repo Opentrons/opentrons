@@ -16,6 +16,7 @@ import {
   resetBatchEditFieldChanges,
   saveStepFormsMulti,
 } from '../../step-forms/actions'
+import { maskField } from '../../steplist/fieldLevel'
 import { BatchEditMoveLiquid } from './BatchEditMoveLiquid'
 import { BatchEditMix } from './BatchEditMix'
 
@@ -31,7 +32,8 @@ export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
   const batchEditMixEnabled = useSelector(getBatchEditMixEnabled)
 
   const handleChangeFormInput = (name, value) => {
-    dispatch(changeBatchEditField({ [name]: value }))
+    const maskedValue = maskField(name, value)
+    dispatch(changeBatchEditField({ [name]: maskedValue }))
   }
 
   const handleSave = () => {
