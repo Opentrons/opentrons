@@ -99,6 +99,6 @@ def test_parse_plate_temperature_response_success(
     ]
 )
 def test_parse_plate_temperature_response_failure(input_str: str) -> None:
-    """It should faile to parse plate temperature response"""
+    """It should fail to parse plate temperature response"""
     with pytest.raises(utils.ParseError):
         utils.parse_plate_temperature_response(input_str, 2)
