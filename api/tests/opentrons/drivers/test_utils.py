@@ -49,6 +49,8 @@ def test_parse_device_information_failure(input_str: str) -> None:
          Temperature(target=123.57, current=123.45)],
         ['T:-123.566 C:-123.446',
          Temperature(target=-123.57, current=-123.45)],
+        ['a:3 T:2. C:3 H:0 G:1',
+         Temperature(target=2, current=3)],
     ]
 )
 def test_parse_temperature_response_success(
@@ -80,6 +82,8 @@ def test_parse_temperature_response_failure(input_str: str) -> None:
          PlateTemperature(target=321.4, current=45, hold=123.22)],
         ['T:-44.2442 C:-22.233 H:0',
          PlateTemperature(target=-44.24, current=-22.23, hold=0)],
+        ['a:3 T:2. C:3 H:0 G:1',
+         PlateTemperature(target=2, current=3, hold=0)],
     ]
 )
 def test_parse_plate_temperature_response_success(
