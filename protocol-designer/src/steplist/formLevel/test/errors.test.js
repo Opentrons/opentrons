@@ -34,7 +34,7 @@ describe('volumeTooHigh', () => {
       volume: 11,
     }
     expect(volumeTooHigh(fields).title).toBe(
-      `Volume is greater than maximum pipette/tip volume (${fields.pipette.spec.maxVolume})`
+      `Volume is greater than maximum pipette/tip volume (${fields.pipette.spec.maxVolume} ul)`
     )
     expect(volumeTooHigh(fields).dependentFields).toEqual(['pipette', 'volume'])
   })

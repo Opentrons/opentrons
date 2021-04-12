@@ -76,7 +76,7 @@ const FORM_ERRORS: { [FormErrorKey]: (mixed) => FormError } = {
   VOLUME_TOO_HIGH: (pipetteCapacity: mixed) => ({
     title: `Volume is greater than maximum pipette/tip volume (${String(
       pipetteCapacity
-    )})`,
+    )} ul)`,
     dependentFields: ['pipette', 'volume'],
   }),
   WELL_RATIO_MOVE_LIQUID: () => ({
