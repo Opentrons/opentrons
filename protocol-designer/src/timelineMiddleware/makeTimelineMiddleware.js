@@ -11,11 +11,9 @@ import {
   type ComputeRobotStateTimelineSuccessAction,
 } from '../file-data/actions'
 import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
-import { getFeatureFlagData } from '../feature-flags/selectors'
 import Worker from './worker'
 
 import type { Middleware } from 'redux'
-import type { Flags } from '../feature-flags/types'
 import type { BaseState } from '../types'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 import type { SubstepsArgsNoTimeline, TimelineWorker } from './types'
@@ -49,28 +47,22 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
   const worker: TimelineWorker = new Worker()
 
   let prevTimelineArgs: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}
-  let prevFeatureFlags: Flags | null = null // force timeline recompute when feature flags change
   let prevSubstepsArgs: SubstepsArgsNoTimeline | null = null
   let prevSuccessAction: ComputeRobotStateTimelineSuccessAction | null = null
 
   const timelineNeedsRecompute = (state: BaseState): boolean => {
     const nextSelectorResults = getTimelineArgs(state)
-    const nextFeatureFlags = getFeatureFlagData(state)
 
-    if (prevTimelineArgs === null || prevFeatureFlags === null) {
+    if (prevTimelineArgs === null) {
       // initial call, must populate memoized value
       prevTimelineArgs = nextSelectorResults
-      prevFeatureFlags = nextFeatureFlags
       return true
     }
 
-    const needsRecompute =
-      hasChanged(nextSelectorResults, prevTimelineArgs) ||
-      hasChanged(nextFeatureFlags, prevFeatureFlags)
+    const needsRecompute = hasChanged(nextSelectorResults, prevTimelineArgs)
 
     // update memoized values
     prevTimelineArgs = nextSelectorResults
-    prevFeatureFlags = nextFeatureFlags
     return needsRecompute
   }
 

@@ -10,6 +10,11 @@ import {
   type ModuleModel,
 } from '@opentrons/shared-data'
 
+type PhysicalPort = {|
+  hub: number | null,
+  port: number | null,
+|}
+
 export type ApiBaseModule = {|
   displayName: string,
   serial: string,
@@ -19,6 +24,7 @@ export type ApiBaseModule = {|
   fwVersion: string,
   port: string,
   hasAvailableUpdate: boolean,
+  usbPort: PhysicalPort,
 |}
 
 type ApiBaseModuleLegacy = {|
