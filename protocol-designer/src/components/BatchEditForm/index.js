@@ -203,7 +203,7 @@ export const BatchEditMoveLiquid = (
           />
         </Box>
 
-        <Box textAlign="right" maxWidth="55rem" marginTop="2rem">
+        <Box textAlign="right" maxWidth="55rem" marginTop="3rem">
           <Box
             {...cancelButtonTargetProps}
             marginRight="0.625rem"
