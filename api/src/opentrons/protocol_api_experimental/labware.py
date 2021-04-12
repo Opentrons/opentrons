@@ -9,7 +9,6 @@ from typing import (
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons_shared_data.labware.dev_types import LabwareParameters
 
 
@@ -118,18 +117,8 @@ class Well:
         raise NotImplementedError()
 
 
-# todo(mm, 2021-04-09): Does this still need to subclass DeckItem, or was that
-# an APIv2 implementation detail?
-class Labware(DeckItem):
+class Labware:
     # noqa: D101
-
-    # todo(mm, 2021-04-09): I think this was an APIv2 implementation detail.
-    # It's not on docs.opentrons.com. It's just required because we subclass
-    # DeckItem. Remove it?
-    @property
-    def separate_calibration(self) -> bool:
-        # noqa: D102
-        raise NotImplementedError()
 
     @property
     def api_version(self) -> APIVersion:
