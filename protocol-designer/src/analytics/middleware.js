@@ -1,7 +1,9 @@
 // @flow
+import uniq from 'lodash/uniq'
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
+  getSavedStepForms,
 } from '../step-forms/selectors'
 import { getFileMetadata } from '../file-data/selectors'
 import { trackEvent } from './mixpanel'
@@ -9,6 +11,7 @@ import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
 import type { Middleware } from 'redux'
 import type { BaseState } from '../types'
+import type { FormData, StepType } from '../form-types'
 import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
 import type { AnalyticsEventAction } from './actions'
 import type { AnalyticsEvent } from './mixpanel'
@@ -60,8 +63,27 @@ export const reduxActionToAnalyticsEvent = (
     const fileMetadata = getFileMetadata(state)
     const dateCreatedTimestamp = fileMetadata.created
 
-    const { editedFields } = action.payload
+    const { editedFields, stepIds } = action.payload
     const additionalProperties = flattenNestedProperties(editedFields)
+    const savedStepForms = getSavedStepForms(state)
+    const batchEditedStepForms: Array<FormData> = stepIds.map(
+      id => savedStepForms[id]
+    )
+    let stepType = null
+    const uniqueStepTypes: Array<StepType> = uniq(
+      batchEditedStepForms.map(form => form.stepType)
+    )
+    if (uniqueStepTypes.length === 1) {
+      stepType = uniqueStepTypes[0]
+    } else {
+      console.warn(
+        `Something went wrong, expected one step type in the batch edit form, but got ${String(
+          uniqueStepTypes
+        )} `
+      )
+    }
+
+    additionalProperties.stepType = stepType
 
     // (these fields are prefixed with double underscore only to make sure they
     // never accidentally overlap with actual fields)

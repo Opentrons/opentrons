@@ -1,10 +1,11 @@
 // @flow
-import { resetAllWhenMocks } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { reduxActionToAnalyticsEvent } from '../middleware'
 import { getFileMetadata } from '../../file-data/selectors'
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
+  getSavedStepForms,
 } from '../../step-forms/selectors'
 import type { FileMetadataFields } from '../../file-data/types'
 import type { SaveStepFormsMultiAction } from '../../step-forms/actions'
@@ -18,7 +19,7 @@ const getArgsAndErrorsByStepIdMock: JestMockFn<
   any
 > = getArgsAndErrorsByStepId
 const getPipetteEntitiesMock: JestMockFn<any, any> = getPipetteEntities
-
+const getSavedStepFormsMock: JestMockFn<any, any> = getSavedStepForms
 let fooState: any
 beforeEach(() => {
   fooState = {}
@@ -87,37 +88,107 @@ describe('reduxActionToAnalyticsEvent', () => {
       },
     })
   })
-  it('should convert a SAVE_STEP_FORMS_MULTI action into a saveStepsMulti action with additional properties', () => {
-    const action: SaveStepFormsMultiAction = {
-      type: 'SAVE_STEP_FORMS_MULTI',
-      payload: {
-        stepIds: [],
-        editedFields: {
+
+  describe('SAVE_STEP_FORMS_MULTI', () => {
+    let action: SaveStepFormsMultiAction
+    beforeEach(() => {
+      action = {
+        type: 'SAVE_STEP_FORMS_MULTI',
+        payload: {
+          stepIds: ['id_1', 'id_2'],
+          editedFields: {
+            someField: 'someVal',
+            anotherField: 'anotherVal',
+            someNestedField: {
+              innerNestedField: true,
+            },
+          },
+        },
+      }
+    })
+    it('should create a saveStepsMulti action with additional properties and stepType moveLiquid', () => {
+      when(getSavedStepFormsMock)
+        .calledWith(expect.anything())
+        .mockReturnValue({
+          id_1: { stepType: 'moveLiquid' },
+          id_2: { stepType: 'moveLiquid' },
+        })
+
+      const result = reduxActionToAnalyticsEvent(fooState, action)
+      expect(result).toEqual({
+        name: 'saveStepsMulti',
+        properties: {
+          // step type
+          stepType: 'moveLiquid',
+          // existing fields
           someField: 'someVal',
           anotherField: 'anotherVal',
           someNestedField: {
             innerNestedField: true,
           },
+          // de-nested fields
+          __someNestedField__innerNestedField: true,
+          // additional special properties for analytics
+          __dateCreated: '2020-09-13T12:26:40.000Z',
+          __protocolName: 'protocol name here',
         },
-      },
-    }
+      })
+    })
+    it('should create a saveStepsMulti action with additional properties and stepType mix', () => {
+      when(getSavedStepFormsMock)
+        .calledWith(expect.anything())
+        .mockReturnValue({
+          id_1: { stepType: 'mix' },
+          id_2: { stepType: 'mix' },
+        })
 
-    const result = reduxActionToAnalyticsEvent(fooState, action)
-    expect(result).toEqual({
-      name: 'saveStepsMulti',
-      properties: {
-        // existing fields
-        someField: 'someVal',
-        anotherField: 'anotherVal',
-        someNestedField: {
-          innerNestedField: true,
+      const result = reduxActionToAnalyticsEvent(fooState, action)
+      expect(result).toEqual({
+        name: 'saveStepsMulti',
+        properties: {
+          // step type
+          stepType: 'mix',
+          // existing fields
+          someField: 'someVal',
+          anotherField: 'anotherVal',
+          someNestedField: {
+            innerNestedField: true,
+          },
+          // de-nested fields
+          __someNestedField__innerNestedField: true,
+          // additional special properties for analytics
+          __dateCreated: '2020-09-13T12:26:40.000Z',
+          __protocolName: 'protocol name here',
         },
-        // de-nested fields
-        __someNestedField__innerNestedField: true,
-        // additional special properties for analytics
-        __dateCreated: '2020-09-13T12:26:40.000Z',
-        __protocolName: 'protocol name here',
-      },
+      })
+    })
+    it('should create a saveStepsMulti action with additional properties and null steptype (mixed case)', () => {
+      when(getSavedStepFormsMock)
+        .calledWith(expect.anything())
+        .mockReturnValue({
+          id_1: { stepType: 'mix' },
+          id_2: { stepType: 'moveLiquid' },
+        })
+
+      const result = reduxActionToAnalyticsEvent(fooState, action)
+      expect(result).toEqual({
+        name: 'saveStepsMulti',
+        properties: {
+          // step type
+          stepType: null,
+          // existing fields
+          someField: 'someVal',
+          anotherField: 'anotherVal',
+          someNestedField: {
+            innerNestedField: true,
+          },
+          // de-nested fields
+          __someNestedField__innerNestedField: true,
+          // additional special properties for analytics
+          __dateCreated: '2020-09-13T12:26:40.000Z',
+          __protocolName: 'protocol name here',
+        },
+      })
     })
   })
 })
