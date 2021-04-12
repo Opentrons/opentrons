@@ -1,5 +1,4 @@
 // @flow
-import first from 'lodash/first'
 import uniq from 'lodash/uniq'
 import {
   getArgsAndErrorsByStepId,
@@ -75,11 +74,12 @@ export const reduxActionToAnalyticsEvent = (
       batchEditedStepForms.map(form => form.stepType)
     )
     if (uniqueStepTypes.length === 1) {
-      stepType = first(uniqueStepTypes)
+      stepType = uniqueStepTypes[0]
     } else {
       console.warn(
-        // $FlowFixMe(sa, 2021-04-08): https://github.com/facebook/flow/issues/2814
-        `Something went wrong, expected one step type in the batch edit form, but got ${uniqueStepTypes} `
+        `Something went wrong, expected one step type in the batch edit form, but got ${String(
+          uniqueStepTypes
+        )} `
       )
     }
 
