@@ -345,12 +345,13 @@ describe('_getSavedMultiSelectFieldValues', () => {
     ]
   })
   afterEach(() => {})
-  it('should return null if any of the forms are not moveLiquid type', () => {
+
+  it('should return null if any of the forms are an unhandled type', () => {
     const savedStepForms = {
       ...mockSavedStepForms,
       another_move_liquid_step_id: {
         ...mockSavedStepForms.another_move_liquid_step_id,
-        stepType: 'notMoveLiquid',
+        stepType: 'someOtherThing',
       },
     }
     expect(
@@ -360,7 +361,21 @@ describe('_getSavedMultiSelectFieldValues', () => {
       )
     ).toBe(null)
   })
-  describe('when fields are NOT indeterminate', () => {
+
+  it('should return null if some forms are moveLiquid and others are mix', () => {
+    const savedStepForms = {
+      ...mockSavedStepForms,
+      ...getMockMixStep(),
+    }
+    expect(
+      _getSavedMultiSelectFieldValues.resultFunc(savedStepForms, [
+        'move_liquid_step_id',
+        'mix_step_id',
+      ])
+    ).toBe(null)
+  })
+
+  describe('moveLiquid: when fields are NOT indeterminate', () => {
     it('should return the fields with the indeterminate boolean', () => {
       expect(
         _getSavedMultiSelectFieldValues.resultFunc(
@@ -539,7 +554,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
       })
     })
   })
-  describe('when fields are indeterminate', () => {
+  describe('moveLiquid: when fields are indeterminate', () => {
     let mockSavedStepFormsIndeterminate
     beforeEach(() => {
       mockSavedStepFormsIndeterminate = {
@@ -737,6 +752,111 @@ describe('_getSavedMultiSelectFieldValues', () => {
       })
     })
   })
+
+  describe('mix: when fields are NOT indeterminate', () => {
+    let mockMixSavedStepForms
+    let mockMixMultiSelectItemIds
+    beforeEach(() => {
+      mockMixSavedStepForms = {
+        ...getMockMixStep(),
+        another_mix_step_id: {
+          ...getMockMixStep().mix_step_id,
+          stepId: 'another_mix_step_id',
+        },
+      }
+      mockMixMultiSelectItemIds = ['mix_step_id', 'another_mix_step_id']
+    })
+    it('should return the fields with the indeterminate boolean', () => {
+      expect(
+        _getSavedMultiSelectFieldValues.resultFunc(
+          mockMixSavedStepForms,
+          mockMixMultiSelectItemIds
+        )
+      ).toEqual({
+        volume: { value: '100', isIndeterminate: false },
+        times: { value: null, isIndeterminate: false },
+        changeTip: { value: 'always', isIndeterminate: false },
+        labware: { value: 'some_labware_id', isIndeterminate: false },
+        mix_wellOrder_first: { value: 't2b', isIndeterminate: false },
+        mix_wellOrder_second: { value: 'l2r', isIndeterminate: false },
+        blowout_checkbox: { value: false, isIndeterminate: false },
+        blowout_location: { value: 'trashId', isIndeterminate: false },
+        mix_mmFromBottom: { value: 0.5, isIndeterminate: false },
+        pipette: { value: 'some_pipette_id', isIndeterminate: false },
+        wells: { isIndeterminate: true },
+        aspirate_flowRate: { value: null, isIndeterminate: false },
+        dispense_flowRate: { value: null, isIndeterminate: false },
+        aspirate_delay_checkbox: { value: false, isIndeterminate: false },
+        aspirate_delay_seconds: { value: '1', isIndeterminate: false },
+        dispense_delay_checkbox: { value: false, isIndeterminate: false },
+        dispense_delay_seconds: { value: '1', isIndeterminate: false },
+        mix_touchTip_checkbox: { value: false, isIndeterminate: false },
+        mix_touchTip_mmFromBottom: { value: null, isIndeterminate: false },
+      })
+    })
+  })
+  describe('mix: when fields are indeterminate', () => {
+    let mockMixSavedStepFormsIndeterminate
+    let mockMixMultiSelectItemIds
+
+    beforeEach(() => {
+      mockMixSavedStepFormsIndeterminate = {
+        ...getMockMixStep(),
+        another_mix_step_id: {
+          ...getMockMixStep().mix_step_id,
+          volume: '123',
+          times: '6',
+          changeTip: 'never',
+          labware: 'other_labware_id',
+          mix_wellOrder_first: 'b2t',
+          mix_wellOrder_second: 'r2l',
+          blowout_checkbox: true,
+          blowout_location: 'some_blowout_location',
+          mix_mmFromBottom: 2,
+          pipette: 'other_pipette_id',
+          wells: ['A2'],
+          aspirate_flowRate: '11.1',
+          dispense_flowRate: '11.2',
+          aspirate_delay_checkbox: true,
+          aspirate_delay_seconds: '2',
+          dispense_delay_checkbox: true,
+          dispense_delay_seconds: '3',
+          mix_touchTip_checkbox: true,
+          mix_touchTip_mmFromBottom: '14',
+        },
+      }
+
+      mockMixMultiSelectItemIds = ['mix_step_id', 'another_mix_step_id']
+    })
+    it('should return the fields with the indeterminate boolean', () => {
+      expect(
+        _getSavedMultiSelectFieldValues.resultFunc(
+          mockMixSavedStepFormsIndeterminate,
+          mockMixMultiSelectItemIds
+        )
+      ).toEqual({
+        volume: { isIndeterminate: true },
+        times: { isIndeterminate: true },
+        changeTip: { isIndeterminate: true },
+        labware: { isIndeterminate: true },
+        mix_wellOrder_first: { isIndeterminate: true },
+        mix_wellOrder_second: { isIndeterminate: true },
+        blowout_checkbox: { isIndeterminate: true },
+        blowout_location: { isIndeterminate: true },
+        mix_mmFromBottom: { isIndeterminate: true },
+        pipette: { isIndeterminate: true },
+        wells: { isIndeterminate: true },
+        aspirate_flowRate: { isIndeterminate: true },
+        dispense_flowRate: { isIndeterminate: true },
+        aspirate_delay_checkbox: { isIndeterminate: true },
+        aspirate_delay_seconds: { isIndeterminate: true },
+        dispense_delay_checkbox: { isIndeterminate: true },
+        dispense_delay_seconds: { isIndeterminate: true },
+        mix_touchTip_checkbox: { isIndeterminate: true },
+        mix_touchTip_mmFromBottom: { isIndeterminate: true },
+      })
+    })
+  })
 })
 
 describe('getMultiSelectFieldValues', () => {
@@ -752,6 +872,13 @@ describe('getMultiSelectFieldValues', () => {
     const changes = { a: '123' }
     const result = getMultiSelectFieldValues.resultFunc(savedValues, changes)
     expect(result).toEqual({ a: { value: '123', isIndeterminate: false } })
+  })
+
+  it('should return null when savedValues is null (signifying invalid combination of stepTypes)', () => {
+    const savedValues = null
+    const changes = { a: '123' }
+    const result = getMultiSelectFieldValues.resultFunc(savedValues, changes)
+    expect(result).toBe(null)
   })
 })
 

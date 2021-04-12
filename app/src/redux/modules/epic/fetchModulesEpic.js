@@ -152,6 +152,7 @@ const normalizeModuleResponse = (
     serial: response.serial,
     fwVersion: response.fwVersion,
     hasAvailableUpdate: response.hasAvailableUpdate,
+    usbPort: response.usbPort ?? { hub: null, port: null },
   }
 }
 

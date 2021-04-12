@@ -384,15 +384,10 @@ export const LabwareCreator = (): JSX.Element => {
         | React.DragEvent<HTMLLabelElement>
         | React.ChangeEvent<HTMLInputElement>
     ) => {
-      // TODO(IL, 2021-03-31): should be new Filelist() or maybe null, FileList isn't an array []. Can drop the never[] type!
       let files: FileList | never[] = []
-      // @ts-expect-error(IL, 2021-03-31): need to do `'event' in dataTransfer`
-      if (event.dataTransfer && event.dataTransfer.files) {
-        // @ts-expect-error(IL, 2021-03-31): same
+      if ('dataTransfer' in event && event.dataTransfer.files !== null) {
         files = event.dataTransfer.files
-        // @ts-expect-error(IL, 2021-03-31): need to do `'files' in event.target`
-      } else if (event.target.files) {
-        // @ts-expect-error(IL, 2021-03-31): same
+      } else if ('files' in event.target && event.target.files !== null) {
         files = event.target.files
       }
 
@@ -400,8 +395,9 @@ export const LabwareCreator = (): JSX.Element => {
       const reader = new FileReader()
 
       // reset the state of the input to allow file re-uploads
-      // @ts-expect-error(IL, 2021-03-31): need to do conditional to disabiguate the union
-      event.currentTarget.value = ''
+      if ('value' in event.currentTarget) {
+        event.currentTarget.value = ''
+      }
 
       if (!file.name.endsWith('.json')) {
         setImportError({ key: 'INVALID_FILE_TYPE' })
