@@ -128,14 +128,14 @@ class Well:
 class Labware:
     # noqa: D101
 
-    def __init__(self, labware_id: str) -> None:
+    def __init__(self, resource_id: str) -> None:
         # noqa: D107
-        self._id = labware_id
+        self._resource_id = resource_id
 
     @property
-    def id(self) -> str:
+    def resource_id(self) -> str:
         # noqa: D102
-        return self._id
+        return self._resource_id
 
     @property
     def api_version(self) -> APIVersion:

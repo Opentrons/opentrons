@@ -27,10 +27,10 @@ from opentrons.protocols.api_support.util import (
 class InstrumentContext:
     # noqa: D101
 
-    def __init__(self, client: ProtocolEngineClient, pipette_id: str) -> None:
+    def __init__(self, client: ProtocolEngineClient, resource_id: str) -> None:
         # noqa: D107
         self._client = client
-        self._pipette_id = pipette_id
+        self._resource_id = resource_id
 
     @property
     def api_version(self) -> APIVersion:
@@ -116,11 +116,13 @@ class InstrumentContext:
         # TODO(al, 2021-04-12): What about presses and increment? They are not
         #  supported by PE command. They are also not supported by PD protocols
         #  either.
+        if presses is not None or increment is not None:
+            raise NotImplementedError()
         if isinstance(location, Well):
             self._client.pick_up_tip(
-                pipetteId=self._pipette_id,
-                labwareId=location.parent.id,
-                wellName=location.well_name
+                pipette_id=self._resource_id,
+                labware_id=location.parent.resource_id,
+                well_name=location.well_name
             )
         else:
             # TODO(al, 2021-04-12): Support for picking up next tip in a labware
@@ -134,7 +136,20 @@ class InstrumentContext:
             location: Union[types.Location, Well] = None,
             home_after: bool = True) -> InstrumentContext:
         # noqa: D102
-        raise NotImplementedError()
+        # TODO(al, 2021-04-12): What about home_after?
+        if not home_after:
+            raise NotImplementedError()
+        if isinstance(location, Well):
+            self._client.drop_tip(
+                pipette_id=self._resource_id,
+                labware_id=location.parent.resource_id,
+                well_name=location.well_name
+            )
+        else:
+            # TODO(al, 2021-04-12): Support for dropping tip in trash.
+            raise NotImplementedError()
+
+        return self
 
     def home(self) -> InstrumentContext:
         # noqa: D102
