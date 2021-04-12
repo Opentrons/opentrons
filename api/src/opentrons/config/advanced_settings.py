@@ -10,7 +10,7 @@ from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 from opentrons.system import log_control
 
 if TYPE_CHECKING:
-    from pathlib import Path  # noqa: F401 - imported for types
+    from pathlib import Path
 
 log = logging.getLogger(__name__)
 
@@ -242,7 +242,7 @@ def _clean_id(_id: str) -> str:
     return _id
 
 
-def _read_json_file(path: Union[str, 'Path']) -> Dict[str, Any]:
+def _read_json_file(path: Union[str, Path]) -> Dict[str, Any]:
     try:
         with open(path, 'r') as fd:
             data = json.load(fd)
@@ -255,7 +255,7 @@ def _read_json_file(path: Union[str, 'Path']) -> Dict[str, Any]:
     return data
 
 
-def _read_settings_file(settings_file: 'Path') -> SettingsData:
+def _read_settings_file(settings_file: Path) -> SettingsData:
     """
     Read the settings file, which is a json object with settings IDs as keys
     and boolean values. For each key, look up the `Settings` object with that
@@ -280,7 +280,7 @@ def _read_settings_file(settings_file: 'Path') -> SettingsData:
 
 def _write_settings_file(data: Mapping[str, Any],
                          version: int,
-                         settings_file: 'Path'):
+                         settings_file: Path):
     try:
         with settings_file.open('w') as fd:
             json.dump({**data, '_version': version}, fd)

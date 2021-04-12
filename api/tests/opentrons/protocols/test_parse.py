@@ -293,7 +293,6 @@ def test_extra_contents(
     assert parsed.bundled_data == extra_data
 
 
-# noqa: E122
 @pytest.mark.parametrize('bad_protocol', [
     '''
 metadata={"apiLevel": "2.0"}

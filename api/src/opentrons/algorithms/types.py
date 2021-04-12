@@ -1,5 +1,4 @@
-"""
-Algorithm types.
+"""Algorithm types.
 
 Any type definitions required for the algorithms
 module should be put in this file.
@@ -14,8 +13,7 @@ VertexName = TypeVar('VertexName')
 
 @dataclass(frozen=True)
 class GenericNode(Generic[VertexName]):
-    """
-    Generic graph node dataclass.
+    """Generic graph node dataclass.
 
     A dataclass to hold information about a
     graph node. Information should not be
@@ -26,8 +24,7 @@ class GenericNode(Generic[VertexName]):
     sub_names: List[str]
 
     def __hash__(self) -> int:
-        """
-        Hash function.
+        """Hash function.
 
         To have a unique set of nodes, they must
         all have a unique hash. Lists are not

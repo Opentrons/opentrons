@@ -19,8 +19,7 @@ class Waypoint:
 
 @final
 class MoveType(Enum):
-    """
-    Arc or direct movement type.
+    """Arc or direct movement type.
 
     - GENERAL_ARC: an arc movement between two unrelated locations
     - IN_LABWARE_ARC: an arc movement between two locations in the same labware
