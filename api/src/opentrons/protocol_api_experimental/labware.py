@@ -27,6 +27,14 @@ class OutOfTipsError(Exception):
 
 class Well:
     # noqa: D101
+    def __init__(
+            self,
+            well_name: str,
+            labware: Labware
+    ) -> None:
+        # noqa: D107
+        self._well_name = well_name
+        self._labware = labware
 
     @property
     def api_version(self) -> APIVersion:
@@ -36,7 +44,7 @@ class Well:
     @property
     def parent(self) -> Labware:
         # noqa: D102
-        raise NotImplementedError()
+        return self._labware
 
     @property
     def has_tip(self) -> bool:
@@ -86,7 +94,7 @@ class Well:
     @property
     def well_name(self) -> str:
         # noqa: D102
-        raise NotImplementedError()
+        return self._well_name
 
     def top(self, z: float = 0.0) -> Location:
         # noqa: D102
@@ -119,6 +127,15 @@ class Well:
 
 class Labware:
     # noqa: D101
+
+    def __init__(self, labware_id: str) -> None:
+        # noqa: D107
+        self._id = labware_id
+
+    @property
+    def id(self) -> str:
+        # noqa: D102
+        return self._id
 
     @property
     def api_version(self) -> APIVersion:

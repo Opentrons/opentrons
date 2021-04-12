@@ -80,3 +80,27 @@ def test_load_labware(
     )
 
     assert result == stubbed_load_labware_result
+
+
+def test_pick_up_tip(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a pick up tip command."""
+    request = commands.PickUpTipRequest(
+        pipetteId="123", labwareId="456", wellName="A2"
+    )
+    response = commands.PickUpTipResult()
+
+    decoy.when(
+        transport.execute_command(request=request, command_id=UUID_MATCHER)
+    ).then_return(response)
+
+    result = subject.pick_up_tip(
+        pipetteId="123",
+        labwareId="456",
+        wellName="A2"
+    )
+
+    assert result == response

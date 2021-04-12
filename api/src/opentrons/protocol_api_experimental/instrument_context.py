@@ -13,6 +13,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 # decouple from the v2 opentrons.protocol_api?
 from opentrons.protocol_api import PairedInstrumentContext
 from opentrons.protocol_api.instrument_context import AdvancedLiquidHandling
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 # todo(mm, 2021-04-09): How customer-facing are these classes? Should they be
 # accessible and documented as part of this package?
@@ -25,6 +26,11 @@ from opentrons.protocols.api_support.util import (
 # todo(mm, 2021-04-09): Can/should we remove the word "Context" from the name?
 class InstrumentContext:
     # noqa: D101
+
+    def __init__(self, client: ProtocolEngineClient, pipette_id: str) -> None:
+        # noqa: D107
+        self._client = client
+        self._pipette_id = pipette_id
 
     @property
     def api_version(self) -> APIVersion:
@@ -107,7 +113,21 @@ class InstrumentContext:
             presses: Optional[int] = None,
             increment: Optional[float] = None) -> InstrumentContext:
         # noqa: D102
-        raise NotImplementedError()
+        # TODO(al, 2021-04-12): What about presses and increment? They are not
+        #  supported by PE command. They are also not supported by PD protocols
+        #  either.
+        if isinstance(location, Well):
+            self._client.pick_up_tip(
+                pipetteId=self._pipette_id,
+                labwareId=location.parent.id,
+                wellName=location.well_name
+            )
+        else:
+            # TODO(al, 2021-04-12): Support for picking up next tip in a labware
+            #  and in tipracks associated with a pipette
+            raise NotImplementedError()
+
+        return self
 
     def drop_tip(
             self,
