@@ -133,11 +133,6 @@ class Labware:
         self._resource_id = resource_id
 
     @property
-    def resource_id(self) -> str:
-        # noqa: D102
-        return self._resource_id
-
-    @property
     def api_version(self) -> APIVersion:
         # noqa: D102
         raise NotImplementedError()
@@ -250,6 +245,13 @@ class Labware:
     def __hash__(self) -> int:
         # noqa: D105
         raise NotImplementedError()
+
+    # For Opentrons internal use only.
+    # Not part of the public Python Protocol API.
+    @property
+    def resource_id(self) -> str:
+        # noqa: D102
+        return self._resource_id
 
     # todo(mm, 2021-04-09): The following methods appear on docs.opentrons.com
     # (accidentally?) but aren't versioned. Figure out whether we need to
