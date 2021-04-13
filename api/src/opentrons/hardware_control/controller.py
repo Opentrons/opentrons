@@ -29,7 +29,7 @@ if TYPE_CHECKING:
         RegisterModules, AttachedInstrument, AttachedInstruments,
         InstrumentHardwareConfigs)
     from opentrons.drivers.rpi_drivers.dev_types\
-        import GPIODriverLike  # noqa: F501
+        import GPIODriverLike
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -136,8 +136,8 @@ class Controller:
             expected: Union[PipetteModel, PipetteName, None]
     ) -> AttachedInstrument:
         found_model: Optional[PipetteModel]\
-                = self._smoothie_driver.read_pipette_model(  # type: ignore
-                    mount.name.lower())
+            = self._smoothie_driver.read_pipette_model(  # type: ignore
+            mount.name.lower())
         if found_model and found_model not in pipette_config.config_models:
             # TODO: Consider how to handle this error - it bubbles up now
             # and will cause problems at higher levels
@@ -160,8 +160,8 @@ class Controller:
         else:
             if expected:
                 raise RuntimeError(
-                        f'mount {mount}: instrument {expected} was'
-                        f' requested, but no instrument is present')
+                    f'mount {mount}: instrument {expected} was'
+                    f' requested, but no instrument is present')
             return {'config': None, 'id': None}
 
     def get_attached_instruments(

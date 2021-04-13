@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from .types import HardwareAPILike
 
 if TYPE_CHECKING:
-    from .dev_types import HasLoop  # noqa: F501
+    from .dev_types import HasLoop
 
 
 # TODO: BC 2020-02-25 instead of overwriting __get_attribute__ in this class
@@ -78,8 +78,8 @@ class SynchronousAdapter(HardwareAPILike):
         if asyncio.iscoroutinefunction(check):
             # Return a synchronized version of the coroutine
             return functools.partial(
-                    object.__getattribute__(self, 'call_coroutine_sync'),
-                    obj_to_adapt._loop, inner_attr)
+                object.__getattribute__(self, 'call_coroutine_sync'),
+                obj_to_adapt._loop, inner_attr)
         elif asyncio.iscoroutine(check):
             # Catch awaitable properties and reify the future before returning
             fut = asyncio.run_coroutine_threadsafe(check, obj_to_adapt._loop)

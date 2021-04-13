@@ -12,7 +12,6 @@ pytest = "==6.1.0"
 pytest-watch = "~=4.2.0"
 pytest-cov = "*"
 atomicwrites = {version = "*",sys_platform = "== 'win32'"}
-pylama = "*"
 requests = "*"
 tavern = "==1.6.0"
 pykwalify = "==1.7.0"
@@ -21,6 +20,10 @@ pytest-aiohttp = "*"
 graphviz = "*"
 mock = "~=4.0.2"
 mypy = "==0.790.0"
+flake8 = "~=3.9.0"
+flake8-annotations = "~=2.6.2"
+flake8-docstrings = "~=1.6.0"
+flake8-noqa = "~=1.1.0"
 
 [packages]
 uvicorn = "==0.11.3"

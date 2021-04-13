@@ -5,8 +5,8 @@ control the OT2.
 
 """
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION  # noqa: F401, E501
-from . import labware  # noqa: E402
-from .contexts import (ProtocolContext,  # noqa: E402
+from . import labware
+from .contexts import (ProtocolContext,
                        InstrumentContext,
                        PairedInstrumentContext,
                        TemperatureModuleContext,

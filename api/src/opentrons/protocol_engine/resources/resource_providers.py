@@ -7,8 +7,7 @@ from .labware_data_provider import LabwareDataProvider
 
 
 class ResourceProviders:
-    """
-    ResourceProviders container class.
+    """ResourceProviders container class.
 
     Wraps various data providers that define procedures to pull and generate
     data for engine setup and command execution.

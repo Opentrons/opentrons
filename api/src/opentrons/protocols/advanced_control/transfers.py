@@ -7,8 +7,8 @@ from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
 
 if TYPE_CHECKING:
-    from opentrons.protocol_api.contexts import InstrumentContext  # noqa: F501
-    from opentrons.protocols.execution.dev_types import Dictable  # noqa: F501
+    from opentrons.protocol_api.contexts import InstrumentContext
+    from opentrons.protocols.execution.dev_types import Dictable
 
 
 class MixStrategy(enum.Enum):
@@ -360,6 +360,7 @@ class TransferPlan:
     the various little commands that can be involved in a transfer. It can be
     iterated to resolve methods to call to execute the plan.
     """
+
     def __init__(self,
                  volume,
                  sources,
@@ -496,13 +497,13 @@ class TransferPlan:
                 raise ValueError(
                     'Source and destination lists must be divisible')
             sources = [source for source in sources
-                       for i in range(int(len(targets)/len(sources)))]
+                       for i in range(int(len(targets) / len(sources)))]
         elif len(sources) > len(targets):
             if len(sources) % len(targets) != 0:
                 raise ValueError(
                     'Source and destination lists must be divisible')
             targets = [target for target in targets
-                       for i in range(int(len(sources)/len(targets)))]
+                       for i in range(int(len(sources) / len(targets)))]
         return sources, targets
 
     def _plan_distribute(self):
@@ -589,7 +590,8 @@ class TransferPlan:
         yield from self._new_tip_action()
 
     Target = TypeVar('Target')
-    @staticmethod  # noqa: E301
+
+    @staticmethod
     def _expand_for_volume_constraints(
             volumes: Iterator[float],
             targets: Iterator[Target],
@@ -817,10 +819,10 @@ class TransferPlan:
         # TODO: add a check for container being multi-channel compatible?
         # Helper function for multi-channel use-case
         assert isinstance(s, Well) or isinstance(s, types.Location) or \
-               (isinstance(s, List) and isinstance(s[0], Well)) or \
-               (isinstance(s, List) and isinstance(s[0], List)) or \
-               (isinstance(s, List) and isinstance(s[0], types.Location)), \
-               'Source should be a Well or List[Well] but is {}'.format(s)
+            (isinstance(s, List) and isinstance(s[0], Well)) or \
+            (isinstance(s, List) and isinstance(s[0], List)) or \
+            (isinstance(s, List) and isinstance(s[0], types.Location)), \
+            'Source should be a Well or List[Well] but is {}'.format(s)
         assert isinstance(d, Well) or isinstance(d, types.Location) or \
             (isinstance(d, List) and isinstance(d[0], Well)) or \
             (isinstance(d, List) and isinstance(d[0], List)) or \

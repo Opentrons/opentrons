@@ -119,10 +119,10 @@ def _publish_dec(
         after: bool,
         command: CmdFunction,
         meta: Any = None):  # noqa: ANN202
-    def _decorator(f: Callable):  # noqa: ANN202,ANN003,ANN002
+    def _decorator(f: Callable):  # noqa: ANN202
         @functools.wraps(
             f,
-            updated=functools.WRAPPER_UPDATES+('__globals__',))  # type: ignore
+            updated=functools.WRAPPER_UPDATES + ('__globals__',))  # type: ignore
         def _decorated(*args, **kwargs):  # noqa: ANN202,ANN003,ANN002
             try:
                 broker = cast(Broker, args[0].broker)

@@ -589,7 +589,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def pick_up_tip(  # noqa: C901
+    def pick_up_tip(
             self, location: Union[types.Location, Well] = None,
             presses: Optional[int] = None,
             increment: Optional[float] = None) -> InstrumentContext:
@@ -679,7 +679,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def drop_tip(  # noqa: C901
+    def drop_tip(
             self,
             location: Union[types.Location, Well] = None,
             home_after: bool = True)\

@@ -7,8 +7,7 @@ class IdGenerator:
     """Unique ID generation provider."""
 
     def generate_id(self) -> str:
-        """
-        Generate a unique identifier.
+        """Generate a unique identifier.
 
         Uses UUIDv4 for safety in a multiprocessing environment.
         """
