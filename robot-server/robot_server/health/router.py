@@ -1,0 +1,46 @@
+"""HTTP routes and handlers for /health endpoints."""
+from fastapi import APIRouter, Depends, status
+
+from opentrons import __version__, config, protocol_api
+from opentrons.hardware_control import ThreadManager
+
+from robot_server.service.dependencies import get_hardware
+from .models import Health, HealthLinks
+
+
+LOG_PATHS = ["/logs/serial.log", "/logs/api.log", "/logs/server.log"]
+
+
+health_router = APIRouter()
+
+
+@health_router.get(
+    path="/health",
+    summary="Get server health",
+    status_code=status.HTTP_200_OK,
+    response_model=Health,
+)
+async def get_health(hardware: ThreadManager = Depends(get_hardware)) -> Health:
+    """Get information about the health of the robot server.
+
+    Use the health endpoint to check that the robot server is running
+    anr ready to operate. A 200 OK response means the server is running.
+    The response includes information about the software and system.
+    """
+    return Health(
+        name=config.name(),
+        api_version=__version__,
+        fw_version=hardware.fw_version,
+        board_revision=hardware.board_revision,
+        logs=LOG_PATHS,
+        system_version=config.OT_SYSTEM_VERSION,
+        maximum_protocol_api_version=list(protocol_api.MAX_SUPPORTED_VERSION),
+        minimum_protocol_api_version=list(protocol_api.MIN_SUPPORTED_VERSION),
+        links=HealthLinks(
+            apiLog="/logs/api.log",
+            serialLog="/logs/serial.log",
+            serverLog="/logs/server.log",
+            apiSpec="/openapi.json",
+            systemTime="/system/time",
+        ),
+    )
