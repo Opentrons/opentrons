@@ -5,6 +5,7 @@ from decoy import Decoy
 from opentrons.protocol_api_experimental.instrument_context import InstrumentContext
 from opentrons.protocol_api_experimental.labware import Well, Labware
 from opentrons.protocol_engine.clients import SyncClient
+from opentrons.protocol_engine.types import WellOrigin, WellLocation
 
 
 @pytest.fixture
@@ -74,4 +75,24 @@ def test_drop_tip(
         pipette_id=pipette_id,
         labware_id=well.parent.resource_id,
         well_name=well.well_name
+    ))
+
+
+def test_dispense(
+        decoy: Decoy,
+        sync_client: SyncClient,
+        pipette_id: str,
+        subject: InstrumentContext,
+        well: Well
+) -> None:
+    """It should send a dispense command."""
+    subject.dispense(volume=10, location=well)
+
+    decoy.verify(sync_client.dispense(
+        pipette_id=pipette_id,
+        labware_id=well.parent.resource_id,
+        well_name=well.well_name,
+        well_location=WellLocation(origin=WellOrigin.BOTTOM,
+                                   offset=(0, 0, 1)),
+        volume=10
     ))

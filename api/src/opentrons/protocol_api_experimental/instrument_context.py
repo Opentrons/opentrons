@@ -14,6 +14,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_api import PairedInstrumentContext
 from opentrons.protocol_api.instrument_context import AdvancedLiquidHandling
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.types import WellOrigin, WellLocation
 
 # todo(mm, 2021-04-09): How customer-facing are these classes? Should they be
 # accessible and documented as part of this package?
@@ -63,7 +64,30 @@ class InstrumentContext:  # noqa: D101
                  volume: Optional[float] = None,
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> InstrumentContext:
-        raise NotImplementedError()
+        """Dispense a volume of liquid (in microliters)."""
+        if rate != 1:
+            raise NotImplementedError("Flow rate adjustment "
+                                      "not yet supported.")
+
+        # TODO (spp:
+        #  - Disambiguate location. Cases in point:
+        #       1. location not specified; use current labware & well
+        #       2. specified location is a Point)
+        #  - Use well_bottom_clearance as offset for well_location
+
+        if isinstance(location, Well):
+            self._client.dispense(
+                pipette_id=self._resource_id,
+                labware_id=location.parent.resource_id,
+                well_name=location.well_name,
+                well_location=WellLocation(origin=WellOrigin.BOTTOM,
+                                           offset=(0, 0, 1)),
+                volume=volume,
+            )
+        else:
+            raise NotImplementedError("Dispensing to a non-well location "
+                                      "not yet supported.")
+        return self
 
     def mix(self,  # noqa: D102
             repetitions: int = 1,

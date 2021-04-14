@@ -4,7 +4,7 @@ from typing import cast
 
 from .. import commands
 from ..state import StateView
-from ..types import DeckSlotLocation
+from ..types import DeckSlotLocation, WellLocation
 from .transports import AbstractSyncTransport
 
 
@@ -81,3 +81,25 @@ class SyncClient:
             command_id=self._create_command_id()
         )
         return cast(commands.DropTipResult, result)
+
+    def dispense(
+            self,
+            pipette_id: str,
+            labware_id: str,
+            well_name: str,
+            well_location: WellLocation,
+            volume: float
+    ) -> commands.DispenseResult:
+        """Execute a ``DispenseRequest``, returning the result."""
+        request = commands.DispenseRequest(
+            pipetteId=pipette_id,
+            labwareId=labware_id,
+            wellName=well_name,
+            wellLocation=well_location,
+            volume=volume,
+        )
+        result = self._transport.execute_command(
+            request=request,
+            command_id=self._create_command_id()
+        )
+        return cast(commands.DispenseResult, result)
