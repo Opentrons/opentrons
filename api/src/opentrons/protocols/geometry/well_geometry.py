@@ -93,10 +93,24 @@ class WellGeometry:
         Specifies an arbitrary point in deck coordinates based
         on percentages of the radius in each axis. For example, to specify the
         back-right corner of a well at 1/4 of the well depth from the bottom,
-        the call would be `_from_center_cartesian(1, 1, -0.5)`.
+        the call would be `from_center_cartesian(1, 1, -0.5)`.
 
         No checks are performed to ensure that the resulting position will be
         inside of the well.
+
+        To use this point in a liquid handling command, you must create a
+        location object using the well such as,
+
+        .. code-block:: python
+
+            from opentrons import types
+
+            # Cannot be passed into a liquid handling function
+            point = well.from_center_cartesian(1, 1, -0.5)
+
+            # Can be passed into a liquid handling function
+            location = types.Location(
+                well.from_center_cartesian(1, 1, -0.5), well)
 
         :param x: a float in the range [-1.0, 1.0] for a percentage of half of
             the radius/length in the X axis
