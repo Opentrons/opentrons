@@ -15,8 +15,7 @@ import {
   C_MED_GRAY,
   FONT_SIZE_CAPTION,
   FONT_WEIGHT_SEMIBOLD,
-  SIZE_1,
-  SPACING_AUTO,
+  SPACING_1,
   SPACING_2,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
@@ -24,20 +23,22 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { selectors as robotSelectors } from '../../redux/robot'
-import { getMissingModules } from '../../redux/modules'
+import { getMatchedModules, getMissingModules } from '../../redux/modules'
 import styles from './styles.css'
 
+import type { MatchedModule } from '../../redux/modules/types'
 import type { State } from '../../redux/types'
 
 const DECK_SLOT_STYLE = { width: '4.5rem' }
 const MODULE_STYLE = { width: '7rem', paddingRight: SPACING_3 }
-const USB_PORT_STYLE = { width: SPACING_AUTO }
+const USB_PORT_STYLE = { width: '3.5rem' }
 
 export function ProtocolModuleList(): React.Node {
   const { t } = useTranslation('protocol_calibration')
   const modulesRequired = useSelector((state: State) =>
     robotSelectors.getModules(state)
   )
+  const matched = useSelector((state: State) => getMatchedModules(state))
   const missingModules = useSelector((state: State) => getMissingModules(state))
 
   if (modulesRequired.length < 1) return null
@@ -69,17 +70,24 @@ export function ProtocolModuleList(): React.Node {
               alignItems={ALIGN_CENTER}
               padding="0.75rem"
             >
-              <Icon
-                name={
-                  missingModules.includes(m)
-                    ? 'checkbox-blank-circle-outline'
-                    : 'check-circle'
-                }
-                className={styles.module_connect_icon}
+              <Flex width={'6rem'}>
+                <Icon
+                  name={
+                    missingModules.includes(m)
+                      ? 'checkbox-blank-circle-outline'
+                      : 'check-circle'
+                  }
+                  width={'15px'}
+                  marginRight={SPACING_2}
+                />
+                <Text {...DECK_SLOT_STYLE}>{`Slot ${m.slot}`}</Text>
+              </Flex>
+              <Flex {...MODULE_STYLE}>
+                <Text>{getModuleDisplayName(m.model)}</Text>
+              </Flex>
+              <UsbPortInfo
+                matchedModule={matched.find(a => a.slot === m.slot) || null}
               />
-              <Text {...DECK_SLOT_STYLE}>{`Slot ${m.slot}`}</Text>
-              <Text {...MODULE_STYLE}>{getModuleDisplayName(m.model)}</Text>
-              <UsbPortInfo moduleMissing={missingModules.includes(m)} />
             </Flex>
           ))}
         </Box>
@@ -89,24 +97,33 @@ export function ProtocolModuleList(): React.Node {
 }
 
 type UsbPortInfoProps = {|
-  moduleMissing: boolean,
+  matchedModule: MatchedModule | null,
 |}
 
 function UsbPortInfo(props: UsbPortInfoProps): React.Node {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation('protocol_calibration')
-  if (props.moduleMissing) return null
-  // TODO: return the correct port info if it is available
+
+  // return nothing if module is missing
+  if (props.matchedModule === null) return null
+  const portInfo = props.matchedModule.module.usbPort
+  const portText = portInfo?.hub
+    ? `Port ${portInfo.hub} via Hub`
+    : portInfo?.port
+    ? `Port ${portInfo.port}`
+    : 'N/A'
   return (
     <>
-      <Text marginRight={SPACING_2} {...USB_PORT_STYLE}>
-        N/A
-      </Text>
-      <Flex {...targetProps}>
-        <Icon name="alert-circle" width={SIZE_1} />
-        <Tooltip style={{ width: '2rem' }} {...tooltipProps}>
-          {t('modules_update_software_tooltip')}
-        </Tooltip>
+      <Flex {...USB_PORT_STYLE}>
+        <Text>{portText}</Text>
+        {portText === 'N/A' && (
+          <Flex {...targetProps}>
+            <Icon name="alert-circle" width={'15px'} paddingLeft={SPACING_1} />
+            <Tooltip style={{ width: '2rem' }} {...tooltipProps}>
+              {t('modules_update_software_tooltip')}
+            </Tooltip>
+          </Flex>
+        )}
       </Flex>
     </>
   )

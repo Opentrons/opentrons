@@ -1,6 +1,4 @@
-"""
-opentrons_shared_data: a python package wrapping json config definitions
-for the opentrons stack
+"""A Python package wrapping json config definitions for the Opentrons stack.
 
 This package should never be installed on its own, only as a dependency of
 the main opentrons package

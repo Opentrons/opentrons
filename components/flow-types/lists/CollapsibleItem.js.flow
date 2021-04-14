@@ -8,6 +8,11 @@
 import * as React from "react";
 export type CollapsibleItemProps = {|
   /**
+    * header
+  */
+  header?: string,
+
+  /**
    * text of title
    */
   title: string,

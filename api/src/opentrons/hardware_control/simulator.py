@@ -31,7 +31,7 @@ if TYPE_CHECKING:
         RegisterModules, AttachedInstrument,
         AttachedInstruments, InstrumentSpec, InstrumentHardwareConfigs)
     from opentrons.drivers.rpi_drivers.dev_types\
-        import GPIODriverLike  # noqa: F501
+        import GPIODriverLike
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -276,7 +276,7 @@ class Simulator:
             loop: asyncio.AbstractEventLoop,
             execution_manager: ExecutionManager,
             sim_model: str = None
-            ) -> modules.AbstractModule:
+    ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             usb_port=usb_port,

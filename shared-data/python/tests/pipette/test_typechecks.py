@@ -1,5 +1,3 @@
-from itertools import chain
-
 import pytest
 import typeguard
 
@@ -24,6 +22,7 @@ def build_model_name_pairs():
         yield model, conf['name']
         for bcn in conf.get('backCompatNames', []):
             yield model, bcn
+
 
 @pytest.mark.parametrize(
     'model,name', list(build_model_name_pairs()))

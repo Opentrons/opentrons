@@ -6,6 +6,7 @@ import type {
   ThermocyclerModuleModel,
   MagneticModuleModel,
 } from '@opentrons/shared-data'
+import type { Slot } from '../robot/api-types'
 
 import {
   TEMPERATURE_MODULE_TYPE,
@@ -52,6 +53,11 @@ export type AttachedModule =
   | MagneticModule
   | ThermocyclerModule
 // action object types
+
+export type MatchedModule = {|
+  slot: Slot,
+  module: AttachedModule,
+|}
 
 // fetch modules
 

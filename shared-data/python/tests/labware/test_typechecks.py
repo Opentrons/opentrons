@@ -11,6 +11,7 @@ from . import get_ot_defs
 
 otdefs = Path()
 
+
 @pytest.mark.parametrize('loadname,version', get_ot_defs())
 def test_opentrons_definition_types(loadname, version):
     defdict = load_definition(loadname, version)

@@ -24,6 +24,7 @@ type Props = {|
   controlDisabledReason: string | null,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
+  slot: string,
 |}
 
 export const TempDeckCard = ({
@@ -32,8 +33,10 @@ export const TempDeckCard = ({
   controlDisabledReason,
   isCardExpanded,
   toggleCard,
+  slot,
 }: Props): React.Node => (
   <StatusCard
+    header={slot}
     title={getModuleDisplayName(module.model)}
     isCardExpanded={isCardExpanded}
     toggleCard={toggleCard}

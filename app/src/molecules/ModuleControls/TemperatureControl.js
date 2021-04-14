@@ -82,7 +82,7 @@ export const TemperatureControl = ({
     if (tempValue != null) {
       sendModuleCommand(
         module.serial,
-        isSecondaryTemp ? 'set_lid_temperature' : 'deactivate',
+        isSecondaryTemp ? 'set_lid_temperature' : 'set_temperature',
         [Number(tempValue)]
       )
     }
