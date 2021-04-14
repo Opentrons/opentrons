@@ -8,7 +8,7 @@ from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol_api.labware import \
     LabwareImplementation
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons import types
+from opentrons import types, ThreadManager
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.context.protocol_api.protocol_context import \
     ProtocolContextImplementation
@@ -17,9 +17,9 @@ from opentrons.protocols.context.simulator.instrument_context import \
 
 
 @pytest.fixture
-def protocol_context() -> ProtocolContextImplementation:
+def protocol_context(hardware: ThreadManager) -> ProtocolContextImplementation:
     """Protocol context implementation fixture."""
-    return ProtocolContextImplementation()
+    return ProtocolContextImplementation(hardware=hardware)
 
 
 @pytest.fixture
