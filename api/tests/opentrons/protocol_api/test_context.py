@@ -147,6 +147,53 @@ async def test_location_cache(ctx, monkeypatch, get_labware_def, hardware):
     assert test_args[0].labware.as_well() == lw.wells()[0]
 
 
+async def test_location_cache_two_pipettes(ctx, get_labware_def, hardware):
+    """It should be invalidated when next movement is a different pipette
+    than the cached location."""
+    ctx.home()
+    left = ctx.load_instrument('p10_single', Mount.LEFT)
+    right = ctx.load_instrument('p10_single', Mount.RIGHT)
+
+    left_loc = Location(point=Point(1, 2, 3), labware="1")
+    right_loc = Location(point=Point(3, 4, 5), labware="2")
+
+    with mock.patch.object(papi_geometry.planning, "plan_moves") as m:
+        # The first moves. The location cache is empty.
+        left.move_to(left_loc)
+        assert m.call_args[0][0].labware.is_empty
+        assert m.call_args[0][1] == left_loc
+        # The second move the location cache is not used because we're moving
+        # a different pipette.
+        right.move_to(right_loc)
+        assert m.call_args[0][0].labware.is_empty
+        assert m.call_args[0][1] == right_loc
+
+
+async def test_location_cache_two_pipettes_fails_pre_2_10(
+        ctx,
+        get_labware_def, hardware
+):
+    """It should reuse location cache even if cached location was set by
+    move of a different pipette."""
+    ctx.home()
+    left = ctx.load_instrument('p10_single', Mount.LEFT)
+    right = ctx.load_instrument('p10_single', Mount.RIGHT)
+    left._implementation._api_version = APIVersion(2, 9)
+    right._implementation._api_version = APIVersion(2, 9)
+
+    left_loc = Location(point=Point(1, 2, 3), labware="1")
+    right_loc = Location(point=Point(3, 4, 5), labware="2")
+
+    with mock.patch.object(papi_geometry.planning, "plan_moves") as m:
+        # The first moves. The location cache is empty.
+        left.move_to(left_loc)
+        assert m.call_args[0][0].labware.is_empty
+        assert m.call_args[0][1] == left_loc
+        right.move_to(right_loc)
+        assert m.call_args[0][0].labware == left_loc.labware
+        assert m.call_args[0][1] == right_loc
+
+
 async def test_move_uses_arc(ctx, monkeypatch, get_labware_def, hardware):
     ctx.connect(hardware)
     ctx.home()
