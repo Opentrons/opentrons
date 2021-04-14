@@ -11,11 +11,18 @@ export default {
   title: 'Library/Molecules/Simulation/Deck',
   argTypes: {
     deckDef: {
+      options: Object.keys(allDeckDefs),
       control: {
         type: 'select',
-        options: Object.keys(allDeckDefs),
       },
       defaultValue: 'ot2_standard',
+    },
+    deckLayerBlocklist: {
+      options: Object.keys(allDeckDefs['ot2_standard'].layers),
+      control: {
+        type: 'check',
+      },
+      defaultValue: '',
     },
   },
 } as Meta
