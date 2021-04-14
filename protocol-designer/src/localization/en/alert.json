@@ -88,8 +88,8 @@
       "body3a": "To delete or duplicate multiple steps:",
       "body3b": "Use the control bar at the top of the Protocol Timeline.",
 
-      "body4a": "To batch edit Transfer advanced settings:",
-      "body4b": "Only include Transfer steps in your selection."
+      "body4a": "To batch edit Transfer or Mix advanced settings:",
+      "body4b": "Only include Transfer or Mix steps in your selection."
     }
   },
   "timeline": {
