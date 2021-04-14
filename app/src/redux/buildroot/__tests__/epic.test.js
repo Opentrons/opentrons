@@ -2,6 +2,7 @@ import { TestScheduler } from 'rxjs/testing'
 
 import { mockRobot as robot } from '../../robot-api/__fixtures__'
 import { startDiscovery } from '../../discovery'
+import { restartRobotSuccess } from '../../robot-admin'
 import * as RobotApiHttp from '../../robot-api/http'
 import * as Fixtures from '../__fixtures__'
 import * as epics from '../epic'
@@ -401,9 +402,10 @@ describe('buildroot update epics', () => {
         const state$ = hot('-a', { a: state })
         const output$ = epics.restartAfterCommitEpic(action$, state$)
 
-        expectObservable(output$).toBe('-ab', {
+        expectObservable(output$).toBe('-a(bc)', {
           a: actions.setBuildrootSessionStep('restart'),
           b: startDiscovery(1200000),
+          c: restartRobotSuccess(robot.name, {}),
         })
 
         flush()

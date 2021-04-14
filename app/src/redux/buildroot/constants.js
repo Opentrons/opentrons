@@ -9,7 +9,6 @@ export const UPLOAD_FILE: 'uploadFile' = 'uploadFile'
 export const PROCESS_FILE: 'processFile' = 'processFile'
 export const COMMIT_UPDATE: 'commitUpdate' = 'commitUpdate'
 export const RESTART: 'restart' = 'restart'
-export const RESTARTING: 'restarting' = 'restarting'
 export const FINISHED: 'finished' = 'finished'
 
 // session stages
