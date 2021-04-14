@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0-alpha.0) (2021-04-14)
+
+
+### Bug Fixes
+
+* **discovery-client:** allow discovery client to track network interfaces ([#7608](https://github.com/Opentrons/opentrons/issues/7608)) ([c526b19](https://github.com/Opentrons/opentrons/commit/c526b19))
+
+
+### Features
+
+* **app:** allow robot restarts to track boot ID and timeout ([#7589](https://github.com/Opentrons/opentrons/issues/7589)) ([3b33102](https://github.com/Opentrons/opentrons/commit/3b33102)), closes [#6585](https://github.com/Opentrons/opentrons/issues/6585)
+
+
+
+
+
 ## [4.2.1](https://github.com/Opentrons/opentrons/compare/v4.2.0...v4.2.1) (2021-04-06)
 
 **Note:** Version bump only for package @opentrons/discovery-client

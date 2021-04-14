@@ -6,9 +6,25 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 4.2.1
+# Opentrons App Changes in 4.3.0
 
-## Changes
+Opentrons App 4.3.0 brings compatibility with using multiples of the same module (for instance, two Temperature Modules) in a protocol, as well as some bugfixes.
+
+## New Features
+
+- The USB port to which each module is attached is now displayed in the protocol info screen
+- When setting up the deck before executing a protocol, the app now supports multiples of the same module
+
+## Bugfixes
+
+- Fix an issue where robots would sometimes not reappear after an update when connected via USB ([#7608](https://github.com/Opentrons/opentrons/issues/7608))
+
+
+---
+
+## Opentrons App Changes in 4.2.1
+
+### Changes
 
 - There are no app side changes to this release.
 

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0-alpha.0) (2021-04-14)
+
+
+### Features
+
+* **robot-server:** Add physical module usb port information to the http server ([#7362](https://github.com/Opentrons/opentrons/issues/7362)) ([07b0f4a](https://github.com/Opentrons/opentrons/commit/07b0f4a))
+
+
+### Reverts
+
+* **robot-server:** Save the z offset for pipette calibration  ([0b102da](https://github.com/Opentrons/opentrons/commit/0b102da))
+
+
+
+
+
 ## [4.2.1](https://github.com/Opentrons/opentrons/compare/v4.2.0...v4.2.1) (2021-04-06)
 
 ### Reverts

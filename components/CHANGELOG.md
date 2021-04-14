@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0-alpha.0) (2021-04-14)
+
+
+### Bug Fixes
+
+* **components:** bump the components library version manually ([#7606](https://github.com/Opentrons/opentrons/issues/7606)) ([247c5dc](https://github.com/Opentrons/opentrons/commit/247c5dc))
+
+
+### Features
+
+* **components:** allow Tooltip to take style props ([#7462](https://github.com/Opentrons/opentrons/issues/7462)) ([b692444](https://github.com/Opentrons/opentrons/commit/b692444)), closes [#7461](https://github.com/Opentrons/opentrons/issues/7461)
+* **components, protocol-designer:** provide more e2e selectors ([#7441](https://github.com/Opentrons/opentrons/issues/7441)) ([a07ac19](https://github.com/Opentrons/opentrons/commit/a07ac19)), closes [#7384](https://github.com/Opentrons/opentrons/issues/7384)
+* **protocol-designer:** Add expand/collapse animation to MutliSelectToolbar ([#7492](https://github.com/Opentrons/opentrons/issues/7492)) ([7588f2c](https://github.com/Opentrons/opentrons/commit/7588f2c))
+
+
+
+
+
 ## [4.2.1](https://github.com/Opentrons/opentrons/compare/v4.2.0...v4.2.1) (2021-04-06)
 
 **Note:** Version bump only for package @opentrons/components

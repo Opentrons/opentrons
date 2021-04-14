@@ -3,6 +3,83 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0-alpha.0) (2021-04-14)
+
+
+### Bug Fixes
+
+* **api:**  can't find pipettes ([#7639](https://github.com/Opentrons/opentrons/issues/7639)) ([4e5176c](https://github.com/Opentrons/opentrons/commit/4e5176c))
+* **api:** api location cache fix ([#7609](https://github.com/Opentrons/opentrons/issues/7609)) ([df68ea2](https://github.com/Opentrons/opentrons/commit/df68ea2)), closes [#7156](https://github.com/Opentrons/opentrons/issues/7156)
+* **api:** check the symlink of the virtual port to map to the physical port ([#7524](https://github.com/Opentrons/opentrons/issues/7524)) ([32b9de5](https://github.com/Opentrons/opentrons/commit/32b9de5))
+* **api:** do not search for a tip length calibration by slot name ([#7574](https://github.com/Opentrons/opentrons/issues/7574)) ([22b6ccd](https://github.com/Opentrons/opentrons/commit/22b6ccd))
+* **api:** represent Location correctly in log ([#7565](https://github.com/Opentrons/opentrons/issues/7565)) ([be091a3](https://github.com/Opentrons/opentrons/commit/be091a3)), closes [#7564](https://github.com/Opentrons/opentrons/issues/7564)
+* **api:** Sleeps do not happen in thermocycler and tempdeck when simulating.  ([8ef61c0](https://github.com/Opentrons/opentrons/commit/8ef61c0)), closes [#7506](https://github.com/Opentrons/opentrons/issues/7506)
+* **api, shared-data:** Regular expression used to split well into row and column did not allow a 0 column. ([#7566](https://github.com/Opentrons/opentrons/issues/7566)) ([1f6b11b](https://github.com/Opentrons/opentrons/commit/1f6b11b)), closes [#7531](https://github.com/Opentrons/opentrons/issues/7531)
+* **components:** bump the components library version manually ([#7606](https://github.com/Opentrons/opentrons/issues/7606)) ([247c5dc](https://github.com/Opentrons/opentrons/commit/247c5dc))
+* **discovery-client:** allow discovery client to track network interfaces ([#7608](https://github.com/Opentrons/opentrons/issues/7608)) ([c526b19](https://github.com/Opentrons/opentrons/commit/c526b19))
+* **protocol-designer:** add config to invariantContext ([#7598](https://github.com/Opentrons/opentrons/issues/7598)) ([2addf84](https://github.com/Opentrons/opentrons/commit/2addf84))
+* **protocol-designer:** clear presaved form on multiselect ([#7494](https://github.com/Opentrons/opentrons/issues/7494)) ([cc5d8ca](https://github.com/Opentrons/opentrons/commit/cc5d8ca))
+* **protocol-designer:** fix probs with typing zero in tip position ([#7495](https://github.com/Opentrons/opentrons/issues/7495)) ([8b0bf73](https://github.com/Opentrons/opentrons/commit/8b0bf73)), closes [#7485](https://github.com/Opentrons/opentrons/issues/7485)
+* **protocol-designer:** Fix starting deck state button toolbar overlap ([#7613](https://github.com/Opentrons/opentrons/issues/7613)) ([3e868fb](https://github.com/Opentrons/opentrons/commit/3e868fb)), closes [#7611](https://github.com/Opentrons/opentrons/issues/7611)
+* **protocol-designer:** fix tip position modal minus button ([#7592](https://github.com/Opentrons/opentrons/issues/7592)) ([bb93c7c](https://github.com/Opentrons/opentrons/commit/bb93c7c)), closes [#7508](https://github.com/Opentrons/opentrons/issues/7508)
+* **protocol-designer:** fix tooltip for delay tip position field ([#7503](https://github.com/Opentrons/opentrons/issues/7503)) ([ec2d677](https://github.com/Opentrons/opentrons/commit/ec2d677))
+* **protocol-designer:** mask batch edit form fields ([#7612](https://github.com/Opentrons/opentrons/issues/7612)) ([65c121f](https://github.com/Opentrons/opentrons/commit/65c121f))
+* **protocol-designer:** remove air gap fields from batch edit form ([#7616](https://github.com/Opentrons/opentrons/issues/7616)) ([0c48e46](https://github.com/Opentrons/opentrons/commit/0c48e46))
+* **protocol-designer:** remove single-edit dependencies for PathField ([#7526](https://github.com/Opentrons/opentrons/issues/7526)) ([15b4a34](https://github.com/Opentrons/opentrons/commit/15b4a34)), closes [#7301](https://github.com/Opentrons/opentrons/issues/7301) [#7295](https://github.com/Opentrons/opentrons/issues/7295)
+* **protocol-designer:** Restore hidden tooltips on MultiSelectToolbar ([#7501](https://github.com/Opentrons/opentrons/issues/7501)) ([b6ddb8f](https://github.com/Opentrons/opentrons/commit/b6ddb8f))
+* **protocol-designer:** track batch edit form change properties in mixpanel ([#7593](https://github.com/Opentrons/opentrons/issues/7593)) ([abf2e77](https://github.com/Opentrons/opentrons/commit/abf2e77))
+* **protocol-designer:** Update cancel/save button tooltip placement ([#7535](https://github.com/Opentrons/opentrons/issues/7535)) ([53529f3](https://github.com/Opentrons/opentrons/commit/53529f3))
+* **protocol-designer:** Update no shared settings text ([#7457](https://github.com/Opentrons/opentrons/issues/7457)) ([2aa3201](https://github.com/Opentrons/opentrons/commit/2aa3201))
+* **protocol-designer:** Update tooltip placement to avoid deckmap conflict ([#7512](https://github.com/Opentrons/opentrons/issues/7512)) ([f900f55](https://github.com/Opentrons/opentrons/commit/f900f55))
+
+
+### Features
+
+* **api:** add module emulation ([#7353](https://github.com/Opentrons/opentrons/issues/7353)) ([78869dc](https://github.com/Opentrons/opentrons/commit/78869dc))
+* **api:** Add physical USB Port information to the hardware controller ([#7359](https://github.com/Opentrons/opentrons/issues/7359)) ([7d9734b](https://github.com/Opentrons/opentrons/commit/7d9734b))
+* **api:** allow ProtocolContext to load labware using the ProtocolEngine ([#7398](https://github.com/Opentrons/opentrons/issues/7398)) ([858135b](https://github.com/Opentrons/opentrons/commit/858135b)), closes [#7390](https://github.com/Opentrons/opentrons/issues/7390) [#7448](https://github.com/Opentrons/opentrons/issues/7448)
+* **api:** api json command dispatcher and translator ([#7555](https://github.com/Opentrons/opentrons/issues/7555)) ([9c56ab5](https://github.com/Opentrons/opentrons/commit/9c56ab5)), closes [#7428](https://github.com/Opentrons/opentrons/issues/7428)
+* **api:** fast simulation catches tip and volume errors ([#7631](https://github.com/Opentrons/opentrons/issues/7631)) ([b8e3d26](https://github.com/Opentrons/opentrons/commit/b8e3d26)), closes [#7627](https://github.com/Opentrons/opentrons/issues/7627)
+* **api:** protocol engine InstrumentContext implementes pick_up_tip and drop_tip ([#7621](https://github.com/Opentrons/opentrons/issues/7621)) ([1d77016](https://github.com/Opentrons/opentrons/commit/1d77016)), closes [#7326](https://github.com/Opentrons/opentrons/issues/7326) [#7327](https://github.com/Opentrons/opentrons/issues/7327)
+* **api:** protocol engine labware interface implementationn ([#7453](https://github.com/Opentrons/opentrons/issues/7453)) ([1ad02d8](https://github.com/Opentrons/opentrons/commit/1ad02d8)), closes [#7332](https://github.com/Opentrons/opentrons/issues/7332)
+* **api:** sort modules in protocol context by USB port ([#7532](https://github.com/Opentrons/opentrons/issues/7532)) ([a752897](https://github.com/Opentrons/opentrons/commit/a752897))
+* **app:** allow robot restarts to track boot ID and timeout ([#7589](https://github.com/Opentrons/opentrons/issues/7589)) ([3b33102](https://github.com/Opentrons/opentrons/commit/3b33102)), closes [#6585](https://github.com/Opentrons/opentrons/issues/6585)
+* **components:** allow Tooltip to take style props ([#7462](https://github.com/Opentrons/opentrons/issues/7462)) ([b692444](https://github.com/Opentrons/opentrons/commit/b692444)), closes [#7461](https://github.com/Opentrons/opentrons/issues/7461)
+* **components, protocol-designer:** provide more e2e selectors ([#7441](https://github.com/Opentrons/opentrons/issues/7441)) ([a07ac19](https://github.com/Opentrons/opentrons/commit/a07ac19)), closes [#7384](https://github.com/Opentrons/opentrons/issues/7384)
+* **protocol-designer:** Add batch edit announcement modal ([#7465](https://github.com/Opentrons/opentrons/issues/7465)) ([cd82e1c](https://github.com/Opentrons/opentrons/commit/cd82e1c)), closes [#7318](https://github.com/Opentrons/opentrons/issues/7318)
+* **protocol-designer:** add batch edit mix disabled fields ([#7575](https://github.com/Opentrons/opentrons/issues/7575)) ([77af1d5](https://github.com/Opentrons/opentrons/commit/77af1d5)), closes [#7558](https://github.com/Opentrons/opentrons/issues/7558)
+* **protocol-designer:** add Batch Edit Mix form  ([#7597](https://github.com/Opentrons/opentrons/issues/7597)) ([bcddf1f](https://github.com/Opentrons/opentrons/commit/bcddf1f)), closes [#7557](https://github.com/Opentrons/opentrons/issues/7557)
+* **protocol-designer:** add development mixpanel reporting ([#7490](https://github.com/Opentrons/opentrons/issues/7490)) ([3295581](https://github.com/Opentrons/opentrons/commit/3295581)), closes [#7472](https://github.com/Opentrons/opentrons/issues/7472)
+* **protocol-designer:** Add expand/collapse animation to MutliSelectToolbar ([#7492](https://github.com/Opentrons/opentrons/issues/7492)) ([7588f2c](https://github.com/Opentrons/opentrons/commit/7588f2c))
+* **protocol-designer:** add hover background to well order ([#7460](https://github.com/Opentrons/opentrons/issues/7460)) ([db2a5c1](https://github.com/Opentrons/opentrons/commit/db2a5c1)), closes [#7456](https://github.com/Opentrons/opentrons/issues/7456)
+* **protocol-designer:** add mix batch edit FF ([#7568](https://github.com/Opentrons/opentrons/issues/7568)) ([6e1d7bb](https://github.com/Opentrons/opentrons/commit/6e1d7bb)), closes [#7559](https://github.com/Opentrons/opentrons/issues/7559)
+* **protocol-designer:** add tooltips for disabled fields ([#7447](https://github.com/Opentrons/opentrons/issues/7447)) ([c730a7e](https://github.com/Opentrons/opentrons/commit/c730a7e)), closes [#7397](https://github.com/Opentrons/opentrons/issues/7397)
+* **protocol-designer:** add tooltips when tip position disabled in batch edit mode ([#7451](https://github.com/Opentrons/opentrons/issues/7451)) ([f4b6efe](https://github.com/Opentrons/opentrons/commit/f4b6efe)), closes [#7450](https://github.com/Opentrons/opentrons/issues/7450)
+* **protocol-designer:** allow FFs to be set via query params ([#7545](https://github.com/Opentrons/opentrons/issues/7545)) ([c50bd75](https://github.com/Opentrons/opentrons/commit/c50bd75))
+* **protocol-designer:** allow user to choose default vs custom tip position ([#7471](https://github.com/Opentrons/opentrons/issues/7471)) ([ed31d94](https://github.com/Opentrons/opentrons/commit/ed31d94)), closes [#7143](https://github.com/Opentrons/opentrons/issues/7143)
+* **protocol-designer:** bump to 5.2.4; remove batch edit FF ([#7446](https://github.com/Opentrons/opentrons/issues/7446)) ([b415508](https://github.com/Opentrons/opentrons/commit/b415508)), closes [#7340](https://github.com/Opentrons/opentrons/issues/7340)
+* **protocol-designer:** cancel well order changes when clicking cancel button ([#7473](https://github.com/Opentrons/opentrons/issues/7473)) ([cd83650](https://github.com/Opentrons/opentrons/commit/cd83650)), closes [#7463](https://github.com/Opentrons/opentrons/issues/7463)
+* **protocol-designer:** change copy of batch edit cancel button ([#7484](https://github.com/Opentrons/opentrons/issues/7484)) ([7b45f6a](https://github.com/Opentrons/opentrons/commit/7b45f6a)), closes [#7486](https://github.com/Opentrons/opentrons/issues/7486)
+* **protocol-designer:** change no shared settings copy text ([#7502](https://github.com/Opentrons/opentrons/issues/7502)) ([a0d4880](https://github.com/Opentrons/opentrons/commit/a0d4880))
+* **protocol-designer:** disable batch edit touch tip field when labware different ([#7419](https://github.com/Opentrons/opentrons/issues/7419)) ([7f6ae5a](https://github.com/Opentrons/opentrons/commit/7f6ae5a)), closes [#7418](https://github.com/Opentrons/opentrons/issues/7418)
+* **protocol-designer:** disable terminal item click in batch edit mode ([#7496](https://github.com/Opentrons/opentrons/issues/7496)) ([88fdbe2](https://github.com/Opentrons/opentrons/commit/88fdbe2)), closes [#7493](https://github.com/Opentrons/opentrons/issues/7493)
+* **protocol-designer:** distinguish mix liquid and mix batch edit events in mixpanel ([#7602](https://github.com/Opentrons/opentrons/issues/7602)) ([eda6583](https://github.com/Opentrons/opentrons/commit/eda6583)), closes [#7562](https://github.com/Opentrons/opentrons/issues/7562)
+* **protocol-designer:** fix batch edit step count bug ([#7511](https://github.com/Opentrons/opentrons/issues/7511)) ([ec40357](https://github.com/Opentrons/opentrons/commit/ec40357)), closes [#7509](https://github.com/Opentrons/opentrons/issues/7509)
+* **protocol-designer:** Make discard changes button secondary ([#7504](https://github.com/Opentrons/opentrons/issues/7504)) ([f385200](https://github.com/Opentrons/opentrons/commit/f385200))
+* **protocol-designer:** show deck state in batch edit hover and show "no shared settings" ([#7458](https://github.com/Opentrons/opentrons/issues/7458)) ([5282c6f](https://github.com/Opentrons/opentrons/commit/5282c6f)), closes [#7455](https://github.com/Opentrons/opentrons/issues/7455)
+* **protocol-designer:** update Flow Rate field+modal ([#7476](https://github.com/Opentrons/opentrons/issues/7476)) ([fe3b29e](https://github.com/Opentrons/opentrons/commit/fe3b29e)), closes [#7467](https://github.com/Opentrons/opentrons/issues/7467)
+* **protocol-engine:** Start a Protocol-Engine–backed implementation of InstrumentContext ([#7474](https://github.com/Opentrons/opentrons/issues/7474)) ([0be7126](https://github.com/Opentrons/opentrons/commit/0be7126)), closes [#7324](https://github.com/Opentrons/opentrons/issues/7324)
+* **robot-server:** Add physical module usb port information to the http server ([#7362](https://github.com/Opentrons/opentrons/issues/7362)) ([07b0f4a](https://github.com/Opentrons/opentrons/commit/07b0f4a))
+
+
+### Reverts
+
+* **robot-server:** Save the z offset for pipette calibration  ([0b102da](https://github.com/Opentrons/opentrons/commit/0b102da))
+
+
+
+
+
 ## [4.2.1](https://github.com/opentrons/opentrons/compare/v4.2.0...v4.2.1) (2021-04-06)
 
 ### Bug Fixes
