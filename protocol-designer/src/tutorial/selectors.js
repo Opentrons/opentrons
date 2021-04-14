@@ -65,10 +65,5 @@ export const shouldShowCoolingHint: Selector<boolean> = createSelector(
 
 export const shouldShowBatchEditHint: Selector<boolean> = createSelector(
   getOrderedStepIds,
-  orderedStepIds => {
-    if (orderedStepIds.length >= 1) {
-      return true
-    }
-    return false
-  }
+  orderedStepIds => orderedStepIds.length >= 1
 )
