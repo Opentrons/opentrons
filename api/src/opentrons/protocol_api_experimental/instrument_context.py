@@ -66,15 +66,16 @@ class InstrumentContext:  # noqa: D101
                  rate: float = 1.0) -> InstrumentContext:
         """Dispense a volume of liquid (in microliters)."""
         if rate != 1:
-            raise NotImplementedError("Flow rate adjustment "
-                                      "not yet supported.")
+            raise NotImplementedError("Flow rate adjustment not yet supported in PE.")
+
+        if volume is None:
+            raise NotImplementedError("Volume tracking not yet supported in PE.")
 
         # TODO (spp:
         #  - Disambiguate location. Cases in point:
         #       1. location not specified; use current labware & well
         #       2. specified location is a Point)
-        #  - Use well_bottom_clearance as offset for well_location
-
+        #  - Use well_bottom_clearance as offset for well_location(?)
         if isinstance(location, Well):
             self._client.dispense(
                 pipette_id=self._resource_id,
@@ -86,7 +87,7 @@ class InstrumentContext:  # noqa: D101
             )
         else:
             raise NotImplementedError("Dispensing to a non-well location "
-                                      "not yet supported.")
+                                      "not yet supported in PE.")
         return self
 
     def mix(self,  # noqa: D102
