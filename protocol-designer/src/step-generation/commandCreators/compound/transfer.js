@@ -348,9 +348,11 @@ export const transfer: CommandCreator<TransferArgs> = (
             willReuseTip = false
           } else if (args.changeTip === 'always') {
             willReuseTip = false
-          } else if (args.changeTip === 'perSource' && !isLastPair) {
-            const nextSourceWell = sourceDestPairs[pairIdx + 1][0]
-            willReuseTip = nextSourceWell === sourceWell
+          } else if (args.changeTip === 'perSource') {
+            if (isLastChunk && !isLastPair) {
+              const nextSourceWell = sourceDestPairs[pairIdx + 1][0]
+              willReuseTip = nextSourceWell === sourceWell
+            }
           } else if (args.changeTip === 'perDest' && !isLastPair) {
             const nextDestWell = sourceDestPairs[pairIdx + 1][1]
             willReuseTip = nextDestWell === destWell
