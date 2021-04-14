@@ -13,6 +13,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 # decouple from the v2 opentrons.protocol_api?
 from opentrons.protocol_api import PairedInstrumentContext
 from opentrons.protocol_api.instrument_context import AdvancedLiquidHandling
+from opentrons import protocol_engine
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 # todo(mm, 2021-04-09): How customer-facing are these classes? Should they be
@@ -66,7 +67,41 @@ class InstrumentContext:
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> InstrumentContext:
         # noqa: D102
-        raise NotImplementedError()
+
+        if not volume:
+            # todo(mm, 2021-04-14): If None or 0, use highest volume possible.
+            raise NotImplementedError(
+                "volume must be specified."
+            )
+
+        if rate != 1:
+            raise NotImplementedError(
+                "Protocol Engine does not yet support adjusting flow rates."
+            )
+
+        if isinstance(location, Well):
+            self._client.aspirate(
+                pipette_id=self._resource_id,
+                labware_id=location.parent.resource_id,
+                well_name=location.well_name,
+                well_location=protocol_engine.WellLocation(
+                    origin=protocol_engine.WellOrigin.BOTTOM,
+                    # todo(mm, 2021-04-14): Get default offset in well via
+                    # self.well_bottom_clearance.aspirate, instead of hard-coding.
+                    offset=(0, 0, 1)
+                ),
+                volume=volume
+            )
+        else:
+            # todo(mm, 2021-04-14):
+            #   * If location is None, use current location.
+            #   * If location is a Location (possibly deck coords, or possibly
+            #     something like well.top()), use that.
+            raise NotImplementedError(
+                "locations other than Wells are currently unsupported."
+            )
+
+        return self
 
     def dispense(self,
                  volume: Optional[float] = None,
