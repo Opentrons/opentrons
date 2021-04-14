@@ -92,7 +92,8 @@ const UNABLE_TO_CANCEL_UPDATE_SESSION =
   'Unable to cancel in-progress update session'
 const UNABLE_TO_COMMIT_UPDATE = 'Unable to commit update'
 const UNABLE_TO_RESTART_ROBOT = 'Unable to restart robot'
-const ROBOT_RECONNECTED_WITH_VERSION = 'It looks like your robot has version'
+const ROBOT_RECONNECTED_WITH_VERSION = 'Robot reconnected with version'
+const ROBOT_DID_NOT_RECONNECT = 'Robot did not successfully reconnect'
 const BUT_WE_EXPECTED = 'but we expected'
 const UNKNOWN = 'unknown'
 const CHECK_TO_VERIFY_UPDATE =
@@ -355,17 +356,26 @@ export const finishAfterRestartEpic: Epic = (action$, state$) => {
       const targetVersion = getBuildrootTargetVersion(stateWithRobot)
       const robot: ViewableRobot = (getBuildrootRobot(stateWithRobot): any)
       const robotVersion = getRobotApiVersion(robot)
-      const actual = robotVersion || UNKNOWN
-      const expected = targetVersion || UNKNOWN
+      const timedOut = action.payload.restartStatus === RESTART_TIMED_OUT_STATUS
+      const actual = robotVersion ?? UNKNOWN
+      const expected = targetVersion ?? UNKNOWN
+      let finishAction
 
-      const finishAction =
+      if (
         targetVersion != null &&
         robotVersion != null &&
         robotVersion === targetVersion
-          ? setBuildrootSessionStep(FINISHED)
-          : unexpectedBuildrootError(
-              `${ROBOT_RECONNECTED_WITH_VERSION} ${actual}, ${BUT_WE_EXPECTED} ${expected}. ${CHECK_TO_VERIFY_UPDATE}`
-            )
+      ) {
+        finishAction = setBuildrootSessionStep(FINISHED)
+      } else if (timedOut) {
+        finishAction = unexpectedBuildrootError(
+          `${ROBOT_DID_NOT_RECONNECT}. ${CHECK_TO_VERIFY_UPDATE}.`
+        )
+      } else {
+        finishAction = unexpectedBuildrootError(
+          `${ROBOT_RECONNECTED_WITH_VERSION} ${actual}, ${BUT_WE_EXPECTED} ${expected}. ${CHECK_TO_VERIFY_UPDATE}.`
+        )
+      }
 
       return of(finishAction, finishDiscovery())
     })
