@@ -99,6 +99,7 @@ describe('labware calibration selectors', () => {
             model: 'magneticModuleV1',
             slot: '3',
             _id: 1945365648,
+            protocolLoadOrder: 0,
           },
         }
       })
@@ -407,6 +408,7 @@ describe('labware calibration selectors', () => {
             model: 'magneticModuleV1',
             slot: '3',
             _id: 1945365648,
+            protocolLoadOrder: 0,
           },
         }
       })
@@ -515,6 +517,7 @@ describe('labware calibration selectors', () => {
             model: 'magneticModuleV1',
             slot: '3',
             _id: 1945365648,
+            protocolLoadOrder: 0,
           },
         }
       })

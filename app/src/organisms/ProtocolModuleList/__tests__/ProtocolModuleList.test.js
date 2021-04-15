@@ -34,12 +34,14 @@ const mockMagneticModule1 = {
   model: 'magneticModuleV1',
   slot: '1',
   _id: 1234,
+  protocolLoadOrder: 0,
 }
 
 const mockMagneticModule2 = {
   model: 'magneticModuleV2',
   slot: '3',
   _id: 2345,
+  protocolLoadOrder: 1,
 }
 
 const mockMatchedModule1 = {
