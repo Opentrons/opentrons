@@ -6,13 +6,11 @@ This module provides things like :py:class:`ModuleGeometry` and
 objects on the deck (as opposed to calling commands on them, which is handled
 by :py:mod:`.module_contexts`)
 """
-
-from enum import Enum, auto
 import functools
 import logging
 import re
 from typing import (Mapping, Optional,
-                    Type, TypeVar, Union, TYPE_CHECKING)
+                    Union, TYPE_CHECKING)
 
 import numpy as np  # type: ignore
 import jsonschema  # type: ignore
@@ -20,6 +18,9 @@ from opentrons.protocols.context.protocol_api.labware import\
     LabwareImplementation
 
 from opentrons_shared_data import module
+from opentrons.hardware_control.modules.types import (
+    ModuleModel, ModuleType, MagneticModuleModel,
+    TemperatureModuleModel, ThermocyclerModuleModel)
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import (
@@ -27,72 +28,11 @@ from opentrons.protocols.api_support.definitions import (
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocol_api.labware import Labware
 
+from .types import GenericConfiguration, ThermocyclerConfiguration
+
 if TYPE_CHECKING:
     from opentrons_shared_data.module.dev_types import (
-        ModuleDefinitionV1, ModuleDefinitionV2,
-        ThermocyclerModuleType, MagneticModuleType, TemperatureModuleType,
-        )
-
-
-E = TypeVar('E', bound='_ProvideLookup')
-Configuration = TypeVar('Configuration', bound='GenericConfiguration')
-
-
-class _ProvideLookup(Enum):
-    @classmethod
-    def from_str(cls: Type[E], typename: str) -> 'E':
-        for m in cls.__members__.values():
-            if m.value == typename:
-                return m
-        raise AttributeError(f'No such module type {typename}')
-
-
-class GenericConfiguration(Enum):
-    @classmethod
-    def configuration_type(
-            cls: Type[Configuration], config: str) -> 'Configuration':
-        for m in cls.__members__.values():
-            if m.name == config.upper():
-                return m
-        raise AttributeError(f'{config} not available')
-
-
-class ThermocyclerConfiguration(GenericConfiguration):
-    FULL = auto()
-    SEMI = auto()
-
-    def __str__(self):
-        return self.name
-
-
-class ModuleType(_ProvideLookup):
-    THERMOCYCLER: 'ThermocyclerModuleType' = 'thermocyclerModuleType'
-    TEMPERATURE: 'TemperatureModuleType' = 'temperatureModuleType'
-    MAGNETIC: 'MagneticModuleType' = 'magneticModuleType'
-
-
-class MagneticModuleModel(_ProvideLookup):
-    MAGNETIC_V1: str = 'magneticModuleV1'
-    MAGNETIC_V2: str = 'magneticModuleV2'
-
-
-class TemperatureModuleModel(_ProvideLookup):
-    TEMPERATURE_V1: str = 'temperatureModuleV1'
-    TEMPERATURE_V2: str = 'temperatureModuleV2'
-
-
-class ThermocyclerModuleModel(_ProvideLookup):
-
-    @classmethod
-    def from_str(cls: Type['ThermocyclerModuleModel'],
-                 typename: str) -> 'ThermocyclerModuleModel':
-        return super().from_str(typename)
-
-    THERMOCYCLER_V1: str = 'thermocyclerModuleV1'
-
-
-ModuleModel = Union[
-    MagneticModuleModel, TemperatureModuleModel, ThermocyclerModuleModel]
+        ModuleDefinitionV1, ModuleDefinitionV2)
 
 
 def module_model_from_string(model_string: str) -> ModuleModel:

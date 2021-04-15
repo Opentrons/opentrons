@@ -6,6 +6,14 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+# Opentrons App Changes in 4.2.1
+
+## Changes
+
+- There are no app side changes to this release.
+
+---
+
 # Opentrons App Changes in 4.2.0
 
 ## Changes

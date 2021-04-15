@@ -196,7 +196,7 @@ class API(HardwareAPILike):
     @classmethod
     async def build_hardware_simulator(
             cls,
-            attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,  # noqa E501
+            attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,  # noqa: E501
             attached_modules: List[str] = None,
             config: RobotConfig = None,
             loop: asyncio.AbstractEventLoop = None,
@@ -224,7 +224,7 @@ class API(HardwareAPILike):
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance.cache_instruments()
         await backend.watch_modules(
-                register_modules=api_instance.register_modules)
+            register_modules=api_instance.register_modules)
         return api_instance
 
     def __repr__(self):
@@ -1012,7 +1012,7 @@ class API(HardwareAPILike):
             self,
             to_transform_primary: Tuple[float, ...],
             to_transform_secondary: Tuple[float, ...]
-            ) -> Tuple[Tuple, Tuple]:
+    ) -> Tuple[Tuple, Tuple]:
         # Type ignored below because linal.apply_transform (rightly) specifies
         # Tuple[float, float, float] and the implied type from
         # target_position.items() is (rightly) Tuple[float, ...] with unbounded
@@ -1213,10 +1213,10 @@ class API(HardwareAPILike):
         with_zero = filter(lambda i: i[0].current_volume == 0, instruments)
         for instr in with_zero:
             speed = self._plunger_speed(
-                        instr[0],
-                        instr[0].blow_out_flow_rate, 'aspirate')
+                instr[0],
+                instr[0].blow_out_flow_rate, 'aspirate')
             bottom = (instr[0].config.bottom, )
-            await self._move_plunger(instr[1], bottom, speed=(speed*rate))
+            await self._move_plunger(instr[1], bottom, speed=(speed * rate))
             instr[0].ready_to_aspirate = True
 
     async def aspirate(self, mount: Union[top_types.Mount, PipettePair],
@@ -1581,7 +1581,7 @@ class API(HardwareAPILike):
             await self._move_plunger(
                 mount, droptip, speed=speed)
             if home_after:
-                safety_margin = abs(max(bottom)-max(droptip))
+                safety_margin = abs(max(bottom) - max(droptip))
                 smoothie_pos = self._backend.fast_home(
                     plunger_axes, safety_margin)
                 self._current_position = self._deck_from_smoothie(
@@ -1618,7 +1618,7 @@ class API(HardwareAPILike):
 
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # move left
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(2*shake_off_dist, 0, 0)    # move right
+        shake_pos = top_types.Point(2 * shake_off_dist, 0, 0)    # move right
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # original position
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
@@ -1637,13 +1637,13 @@ class API(HardwareAPILike):
 
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # move left
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(2*shake_off_dist, 0, 0)    # move right
+        shake_pos = top_types.Point(2 * shake_off_dist, 0, 0)    # move right
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # original position
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         shake_pos = top_types.Point(0, -shake_off_dist, 0)  # move front
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(0, 2*shake_off_dist, 0)    # move back
+        shake_pos = top_types.Point(0, 2 * shake_off_dist, 0)    # move back
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         shake_pos = top_types.Point(0, -shake_off_dist, 0)  # original position
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
@@ -1739,7 +1739,7 @@ class API(HardwareAPILike):
             self,
             new_mods_at_ports: List[modules.ModuleAtPort] = None,
             removed_mods_at_ports: List[modules.ModuleAtPort] = None
-            ) -> None:
+    ) -> None:
         if new_mods_at_ports is None:
             new_mods_at_ports = []
         if removed_mods_at_ports is None:
@@ -1753,15 +1753,55 @@ class API(HardwareAPILike):
         # build new mods
         for mod in sorted_mods_at_port:
             new_instance = await self._backend.build_module(
-                    port=mod.port,
-                    usb_port=mod.usb_port,
-                    model=mod.name,
-                    interrupt_callback=self.pause_with_message,
-                    loop=self.loop,
-                    execution_manager=self._execution_manager)
+                port=mod.port,
+                usb_port=mod.usb_port,
+                model=mod.name,
+                interrupt_callback=self.pause_with_message,
+                loop=self.loop,
+                execution_manager=self._execution_manager)
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {mod.name} discovered and attached"
                            f" at port {mod.port}, new_instance: {new_instance}")
+
+    async def find_modules(
+            self, by_model: modules.types.ModuleModel,
+            resolved_type: modules.types.ModuleType
+    ) -> List[modules.AbstractModule]:
+        """
+        Find Modules.
+
+        Given a module model and type, find all attached
+        modules that fit this criteria. If there are no
+        modules attached, but the module is being loaded
+        in simulation, then it should return a simulating
+        module of the same type.
+        """
+        matching_modules = []
+        mod_type = {
+            modules.types.ModuleType.MAGNETIC: 'magdeck',
+            modules.types.ModuleType.TEMPERATURE: 'tempdeck',
+            modules.types.ModuleType.THERMOCYCLER: 'thermocycler'
+        }[resolved_type]
+        for module in self.attached_modules:
+            if mod_type == module.name():
+                matching_modules.append(module)
+        if self.is_simulator and not matching_modules:
+            mod_class = {
+                'magdeck': modules.MagDeck,
+                'tempdeck': modules.TempDeck,
+                'thermocycler': modules.Thermocycler
+            }[mod_type]
+            simulating_module = mod_class(
+                port='',
+                usb_port=self._backend._usb.find_port(''),
+                simulating=True,
+                loop=self.loop,
+                execution_manager=ExecutionManager(
+                    loop=self.loop),
+                sim_model=by_model.value)
+            await simulating_module._connect()
+            matching_modules.append(simulating_module)
+        return matching_modules
 
     def get_instrument_max_height(
             self,

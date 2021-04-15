@@ -31,7 +31,7 @@ if TYPE_CHECKING:
         RegisterModules, AttachedInstrument,
         AttachedInstruments, InstrumentSpec, InstrumentHardwareConfigs)
     from opentrons.drivers.rpi_drivers.dev_types\
-        import GPIODriverLike  # noqa: F501
+        import GPIODriverLike
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -149,7 +149,8 @@ class Simulator:
         self._run_flag.set()
         self._log = MODULE_LOG.getChild(repr(self))
         self._strict_attached = bool(strict_attached_instruments)
-        self._usb = usb_simulator.USBBusSimulator()
+        self._board_revision = BoardRevision.OG
+        self._usb = usb_simulator.USBBusSimulator(self._board_revision)
 
     @property
     def gpio_chardev(self) -> GPIODriverLike:
@@ -275,7 +276,7 @@ class Simulator:
             loop: asyncio.AbstractEventLoop,
             execution_manager: ExecutionManager,
             sim_model: str = None
-            ) -> modules.AbstractModule:
+    ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             usb_port=usb_port,
@@ -302,7 +303,7 @@ class Simulator:
 
     @property
     def board_revision(self) -> BoardRevision:
-        return BoardRevision.OG
+        return self._board_revision
 
     async def update_firmware(self, filename, loop, modeset) -> str:
         return 'Did nothing (simulating)'

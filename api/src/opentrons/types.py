@@ -3,14 +3,11 @@ import enum
 from math import sqrt, isclose
 from typing import Any, NamedTuple, TYPE_CHECKING, Union
 
-from opentrons.protocols.api_support.labware_like import LabwareLike
+from .protocols.api_support.labware_like import LabwareLike
 
 if TYPE_CHECKING:
-    from typing import (Optional,       # noqa: F401 Used for typechecking
-                        Tuple)
-    from .protocol_api.labware import (  # noqa: F401 Used for typechecking
-        Labware, Well)
-    from opentrons.protocols.geometry.module_geometry import ModuleGeometry  # noqa: F401, E501
+    from .protocol_api.labware import Labware, Well
+    from .protocols.geometry.module_geometry import ModuleGeometry
 
 
 class PipetteNotAttachedError(KeyError):
@@ -134,6 +131,9 @@ class Location:
         """
         return Location(point=self.point + point,
                         labware=self._labware.object)
+
+    def __repr__(self) -> str:
+        return f"Location(point={repr(self._point)}, labware={self._labware})"
 
 
 # TODO(mc, 2020-10-22): use MountType implementation for Mount

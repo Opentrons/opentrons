@@ -29,6 +29,7 @@ import {
 } from '../../steplist/formLevel/profileErrors'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
+import * as featureFlagSelectors from '../../feature-flags/selectors'
 import { denormalizePipetteEntities } from '../utils'
 import {
   selectors as labwareDefSelectors,
@@ -516,10 +517,19 @@ export const getInvariantContext: Selector<InvariantContext> = createSelector(
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
-  (labwareEntities, moduleEntities, pipetteEntities) => ({
+  featureFlagSelectors.getDisableModuleRestrictions,
+  (
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    disableModuleRestrictions
+  ) => ({
+    labwareEntities,
+    moduleEntities,
+    pipetteEntities,
+    config: {
+      OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
+    },
   })
 )
 

@@ -3,6 +3,13 @@ import type { RobotApiRequestMeta } from '../robot-api/types'
 
 // common types
 
+export type RobotRestartStatus =
+  | 'restart-pending'
+  | 'restart-in-progress'
+  | 'restart-succeeded'
+  | 'restart-timed-out'
+  | 'restart-failed'
+
 export type RobotAdminStatus =
   | 'up'
   | 'down'
@@ -26,6 +33,16 @@ export type RestartRobotAction = {|
   type: 'robotAdmin:RESTART',
   payload: {| robotName: string |},
   meta: $Shape<{| ...RobotApiRequestMeta, robot: true |}>,
+|}
+
+export type RestartStatusChangedAction = {|
+  type: 'robotAdmin:RESTART_STATUS_CHANGED',
+  payload: {|
+    robotName: string,
+    restartStatus: RobotRestartStatus,
+    bootId: string | null,
+    startTime: Date | null,
+  |},
 |}
 
 export type RestartRobotSuccessAction = {|
@@ -78,6 +95,7 @@ export type ResetConfigFailureAction = {|
 
 export type RobotAdminAction =
   | RestartRobotAction
+  | RestartStatusChangedAction
   | RestartRobotSuccessAction
   | RestartRobotFailureAction
   | FetchResetConfigOptionsAction
@@ -89,8 +107,15 @@ export type RobotAdminAction =
 
 // state types
 
+export type RestartState = {|
+  bootId: string | null,
+  startTime: Date | null,
+  status: RobotRestartStatus,
+|}
+
 export type PerRobotAdminState = $Shape<{|
   status: RobotAdminStatus,
+  restart: RestartState,
   resetConfigOptions: Array<ResetConfigOption>,
 |}>
 

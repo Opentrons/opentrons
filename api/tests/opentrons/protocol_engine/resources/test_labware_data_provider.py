@@ -32,7 +32,7 @@ async def test_labware_data_gets_calibration(
     # TODO(mc, 2020-10-18): this mock is a kinda code-smelly. Fetching labware
     # calibration data is a little convoluted and could use some clean up
     with patch(
-        'opentrons.protocol_engine.resources.labware_data_provider.get_labware_calibration'  # noqa[E501]
+        'opentrons.protocol_engine.resources.labware_data_provider.get_labware_calibration'  # noqa: E501
     ) as mock_get_lw_calibration:
         mock_get_lw_calibration.return_value = Point(1, 2, 3)
 

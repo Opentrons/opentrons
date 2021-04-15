@@ -595,3 +595,65 @@ This deactivates only the well block of the Thermocycler.
   tc_mod.deactivate_block()
 
 .. versionadded:: 2.0
+
+
+***************************************
+Using Multiple Modules of the Same Type
+***************************************
+
+To use this feature, you must be running software version 4.3 or higher. Currently, you can only use multiple Magnetic Modules or multiple Temperature Modules.
+You won't be able to load multiple Thermocycler Modules.
+
+To use multiple modules, load two modules of the same type into your protocol. The robot will then map out
+each module in order of appearance to the physical robot ports in order of appearance. That means if you load 
+two Temperature Modules, the Temperature Module attached to the first port starting from the left will be related to the first Temperature
+Module in your protocol while the second Temperature Module loaded would be related to the Temperature Module connected to the
+next port to the right.
+
+The following diagram shows the mapping of two Temperature Modules on the robot.
+
+.. image:: ../img/modules/multiples_of_a_module.png
+
+
+In a protocol, the diagram would map to your modules as found below.
+
+
+.. code-block:: python
+    :substitutions:
+
+    from opentrons import protocol_api
+
+    metadata = {'apiLevel': '|apiLevel|'}
+
+    def run(protocol: protocol_api.ProtocolContext):
+         # Load Temperature Module A in deck slot 1 on port 1 of the robot.
+         temperature_module_a = protocol.load_module('temperature module gen2', 1)
+
+         # Load Temperature Module B in deck slot 3 on port 1 of the hub.
+         temperature_module_b = protocol.load_module('temperature module gen2', 3)
+
+Referencing the diagram, you should make sure that Temperature Module A in slot 1 is plugged into
+port 1 of the robot and Temperature Module B in slot 3 is plugged into port 1 of the hub.
+
+If for whatever reason you want to plug Temperature Module B into a port to the left of Temperature Module A,
+you should load Temperature Module B before Temperature Module A.
+
+
+.. code-block:: python
+    :substitutions:
+
+    from opentrons import protocol_api
+
+    metadata = {'apiLevel': '|apiLevel|'}
+
+    def run(protocol: protocol_api.ProtocolContext):
+         # Load Temperature Module B in deck slot 3 on port 1 of the robot.
+         temperature_module_b = protocol.load_module('temperature module gen2', 3)
+
+         # Load Temperature Module A in deck slot 1 on port 1 of the hub.
+         temperature_module_a = protocol.load_module('temperature module gen2', 1)
+
+
+The Opentrons App will display USB Port information while using modules in your protocol. You can also use the
+guidelines from above to get a predictable module order in Jupyter Notebook, but it will not display USB Port information
+in Jupyter Notebook.

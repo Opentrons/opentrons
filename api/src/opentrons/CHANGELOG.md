@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.1](https://github.com/Opentrons/opentrons/compare/v4.2.0..v4.2.1) (2021-04-06)
+
+### Bug Fixes
+
+* **api:** do not search for a tip length calibration by slot name ([#7574](https://github.com/Opentrons/opentrons/issues/7574)) ([313f4ef](https://github.com/Opentrons/opentrons/commit/313f4ef))
+
+
+
+
 # [4.2.0](https://github.com/Opentrons/opentrons/compare/v4.1.1...v4.2.0) (2021-03-18)
 
 ### Bug Fixes

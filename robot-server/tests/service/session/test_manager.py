@@ -29,7 +29,7 @@ async def test_add_calls_session_create(session_manager,
                                         session):
     mock_session_create.assert_called_once()
     assert mock_session_create.call_args[1]['configuration'] == \
-           session_manager._session_common
+        session_manager._session_common
     assert isinstance(mock_session_create.call_args[1]['instance_meta'],
                       SessionMetaData)
 
@@ -90,7 +90,7 @@ def test_get_by_id_not_found(session_manager):
 
 async def test_get_by_type(session_manager):
     sessions = await asyncio.gather(
-        *[session_manager.add(SessionType.live_protocol, SessionMetaData()) for _ in range(5)]  # noqa: e501
+        *[session_manager.add(SessionType.live_protocol, SessionMetaData()) for _ in range(5)]  # noqa: E501
     )
     assert session_manager.get(SessionType.live_protocol) == tuple(sessions)
     assert session_manager.get(SessionType.calibration_check) == tuple()

@@ -206,7 +206,6 @@ export const TipPositionModal = (props: Props): React.Node => {
 
   return (
     <Portal>
-      {/* TODO IMMEDIATELY remove this keypress thing?? */}
       <HandleKeypress
         preventDefault
         handlers={[
@@ -279,18 +278,12 @@ export const TipPositionModal = (props: Props): React.Node => {
                   <div className={styles.adjustment_buttons}>
                     <OutlineButton
                       className={styles.adjustment_button}
-                      disabled={
-                        value !== null && Number(value) >= maxMmFromBottom
-                      }
                       onClick={makeHandleIncrement(SMALL_STEP_MM)}
                     >
                       <Icon name="plus" />
                     </OutlineButton>
                     <OutlineButton
                       className={styles.adjustment_button}
-                      disabled={
-                        value !== null && Number(value) <= minMmFromBottom
-                      }
                       onClick={makeHandleDecrement(SMALL_STEP_MM)}
                     >
                       <Icon name="minus" />

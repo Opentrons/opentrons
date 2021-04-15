@@ -222,7 +222,7 @@ clean-ts:
 .PHONY: circular-dependencies-js
 circular-dependencies-js:
 	madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.js
-	madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.js
+	madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
 	madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.js
 
 .PHONY: storybook

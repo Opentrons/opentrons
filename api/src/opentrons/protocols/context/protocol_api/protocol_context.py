@@ -1,12 +1,11 @@
 import logging
-from typing import Dict, Optional, Set
+from typing import Dict, Optional, Set, TYPE_CHECKING
 
 from opentrons import types, API
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.config import feature_flags as fflags
-from opentrons.hardware_control.modules import MagDeck, TempDeck, Thermocycler
-from opentrons.hardware_control import ExecutionManager, SynchronousAdapter
 from opentrons.hardware_control.types import DoorState
+from opentrons.hardware_control import SynchronousAdapter
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry import module_geometry
@@ -25,6 +24,9 @@ from opentrons.protocols.labware import load_from_definition, \
     get_labware_definition
 from opentrons.protocols.types import Protocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.modules import AbstractModule
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -84,6 +86,8 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
         self._last_location: Optional[types.Location] = None
+        self._last_mount: Optional[types.Mount] = None
+        self._loaded_modules: Set['AbstractModule'] = set()
 
     @classmethod
     def build_using(cls,
@@ -186,32 +190,18 @@ class ProtocolContextImplementation(AbstractProtocol):
             configuration=configuration)
 
         # Try to find in the hardware instance
+        available_modules = self._hw_manager.hardware.find_modules(
+            resolved_model, resolved_type)
+
         hc_mod_instance = None
-        for mod in self._hw_manager.hardware.attached_modules:
-            if module_geometry.models_compatible(
-                    module_geometry.module_model_from_string(mod.model()),
-                    resolved_model):
+        for mod in available_modules:
+            compatible = module_geometry.models_compatible(
+                module_geometry.module_model_from_string(mod.model()),
+                resolved_model)
+            if compatible and mod not in self._loaded_modules:
+                self._loaded_modules.add(mod)
                 hc_mod_instance = SynchronousAdapter(mod)
                 break
-
-        if self.is_simulating() and hc_mod_instance is None:
-            mod_type = {
-                module_geometry.ModuleType.MAGNETIC: MagDeck,
-                module_geometry.ModuleType.TEMPERATURE: TempDeck,
-                module_geometry.ModuleType.THERMOCYCLER: Thermocycler
-                }[resolved_type]
-
-            hc_mod_instance = SynchronousAdapter(
-                mod_type(
-                    port='',
-                    usb_port=self._hw_manager.hardware._backend._usb.find_port(''),
-                    simulating=True,
-                    loop=self._hw_manager.hardware.loop,
-                    execution_manager=ExecutionManager(
-                        loop=self._hw_manager.hardware.loop),
-                    sim_model=resolved_model.value)
-            )
-            hc_mod_instance._connect()
 
         if not hc_mod_instance:
             return None
@@ -306,10 +296,21 @@ class ProtocolContextImplementation(AbstractProtocol):
         """Check if door is closed."""
         return DoorState.CLOSED == self._hw_manager.hardware.door_state
 
-    def get_last_location(self) -> Optional[types.Location]:
+    def get_last_location(
+        self,
+        mount: Optional[types.Mount] = None,
+    ) -> Optional[types.Location]:
         """Get the most recent moved to location."""
-        return self._last_location
+        if mount is None or mount == self._last_mount:
+            return self._last_location
 
-    def set_last_location(self, location: Optional[types.Location]) -> None:
+        return None
+
+    def set_last_location(
+        self,
+        location: Optional[types.Location],
+        mount: Optional[types.Mount] = None,
+    ) -> None:
         """Set the most recent moved to location."""
         self._last_location = location
+        self._last_mount = mount

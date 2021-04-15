@@ -47,6 +47,7 @@ import {
   createInitialProfileStep,
 } from '../utils/createInitialProfileItems'
 import { getLabwareOnModule } from '../../ui/modules/utils'
+import { nestedCombineReducers } from './nestedCombineReducers'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 import type { Reducer } from 'redux'
 import type { LoadFileAction } from '../../load-file'
@@ -1373,9 +1374,8 @@ export type RootState = {
 // TODO Ian 2018-12-13: find some existing util to do this
 // semi-nested version of combineReducers?
 // TODO: Ian 2018-12-13 remove this 'action: any' type
-export const rootReducer: Reducer<RootState, any> = (state, action) => {
-  const prevStateFallback = state || {}
-  const nextState = {
+export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
+  ({ action, state, prevStateFallback }) => ({
     orderedStepIds: orderedStepIds(prevStateFallback.orderedStepIds, action),
     labwareInvariantProperties: labwareInvariantProperties(
       prevStateFallback.labwareInvariantProperties,
@@ -1403,15 +1403,5 @@ export const rootReducer: Reducer<RootState, any> = (state, action) => {
       prevStateFallback.batchEditFormChanges,
       action
     ),
-  }
-  if (
-    state &&
-    Object.keys(nextState).every(
-      stateKey => state[stateKey] === nextState[stateKey]
-    )
-  ) {
-    // no change
-    return state
-  }
-  return nextState
-}
+  })
+)

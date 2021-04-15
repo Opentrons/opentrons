@@ -24,7 +24,7 @@ type DisabledFields = {
   [fieldName: string]: string,
 }
 
-const pipetteDifferentDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMoveLiquidPipetteDifferentDisabledFieldNames: Array<StepFieldName> = [
   // aspirate
   'aspirate_mix_checkbox',
   'aspirate_mix_volume',
@@ -41,7 +41,12 @@ const pipetteDifferentDisabledFieldNames: Array<StepFieldName> = [
   'dispense_flowRate',
 ]
 
-const aspirateLabwareDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMixPipetteDifferentDisabledFieldNames: Array<StepFieldName> = [
+  'aspirate_flowRate',
+  'dispense_flowRate',
+]
+
+const batchEditMoveLiquidAspirateLabwareDisabledFieldNames: Array<StepFieldName> = [
   'aspirate_mmFromBottom',
   'aspirate_delay_checkbox',
   'aspirate_delay_seconds',
@@ -50,7 +55,7 @@ const aspirateLabwareDisabledFieldNames: Array<StepFieldName> = [
   'aspirate_touchTip_mmFromBottom',
 ]
 
-const dispenseLabwareDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMoveLiquidDispenseLabwareDisabledFieldNames: Array<StepFieldName> = [
   'dispense_mmFromBottom',
   'dispense_delay_checkbox',
   'dispense_delay_seconds',
@@ -59,13 +64,23 @@ const dispenseLabwareDisabledFieldNames: Array<StepFieldName> = [
   'dispense_touchTip_mmFromBottom',
 ]
 
-const multiAspiratePathDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMixLabwareDifferentDisabledFieldNames: Array<StepFieldName> = [
+  'mix_mmFromBottom',
+  'aspirate_delay_checkbox',
+  'aspirate_delay_seconds',
+  'dispense_delay_checkbox',
+  'dispense_delay_seconds',
+  'mix_touchTip_checkbox',
+  'mix_touchTip_mmFromBottom',
+]
+
+const batchEditMoveLiquidMultiAspiratePathDisabledFieldNames: Array<StepFieldName> = [
   'aspirate_mix_checkbox',
   'aspirate_mix_volume',
   'aspirate_mix_times',
 ]
 
-const multiDispensePathDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMoveLiquidMultiDispensePathDisabledFieldNames: Array<StepFieldName> = [
   'dispense_mix_checkbox',
   'dispense_mix_volume',
   'dispense_mix_times',
@@ -73,13 +88,13 @@ const multiDispensePathDisabledFieldNames: Array<StepFieldName> = [
   'blowout_location',
 ]
 
-const pipetteDifferentAndMultiAspiratePathDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMoveLiquidPipetteDifferentAndMultiAspiratePathDisabledFieldNames: Array<StepFieldName> = [
   'aspirate_mix_checkbox',
   'aspirate_mix_volume',
   'aspirate_mix_times',
 ]
 
-const pipetteDifferentAndMultiDispensePathDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMoveLiquidPipetteDifferentAndMultiDispensePathDisabledFieldNames: Array<StepFieldName> = [
   'dispense_mix_checkbox',
   'dispense_mix_volume',
   'dispense_mix_times',
@@ -98,44 +113,62 @@ const fieldsWithDisabledTooltipText = (
     }),
     {}
   )
-export const getPipetteDifferentDisabledFields = (): DisabledFields =>
+
+type BatchEditFormType = 'moveLiquid' | 'mix'
+
+export const getPipetteDifferentDisabledFields = (
+  batchEditFormType: BatchEditFormType
+): DisabledFields => {
+  let disabledFieldNames = []
+  switch (batchEditFormType) {
+    case 'moveLiquid':
+      disabledFieldNames = batchEditMoveLiquidPipetteDifferentDisabledFieldNames
+      break
+    case 'mix':
+      disabledFieldNames = batchEditMixPipetteDifferentDisabledFieldNames
+      break
+  }
+  return fieldsWithDisabledTooltipText(disabledFieldNames, 'pipette-different')
+}
+
+export const getLabwareDisabledFields = (): DisabledFields =>
   fieldsWithDisabledTooltipText(
-    pipetteDifferentDisabledFieldNames,
-    'pipette-different'
+    batchEditMixLabwareDifferentDisabledFieldNames,
+    'labware-different'
   )
 
 export const getAspirateLabwareDisabledFields = (): DisabledFields =>
   fieldsWithDisabledTooltipText(
-    aspirateLabwareDisabledFieldNames,
+    batchEditMoveLiquidAspirateLabwareDisabledFieldNames,
     'aspirate-labware-different'
   )
 
 export const getDispenseLabwareDisabledFields = (): DisabledFields =>
   fieldsWithDisabledTooltipText(
-    dispenseLabwareDisabledFieldNames,
+    batchEditMoveLiquidDispenseLabwareDisabledFieldNames,
     'dispense-labware-different'
   )
 
 export const getMultiAspiratePathDisabledFields = (): DisabledFields =>
   fieldsWithDisabledTooltipText(
-    multiAspiratePathDisabledFieldNames,
+    batchEditMoveLiquidMultiAspiratePathDisabledFieldNames,
     'multi-aspirate-present'
   )
 
 export const getMultiDispensePathDisabledFields = (): DisabledFields =>
   fieldsWithDisabledTooltipText(
-    multiDispensePathDisabledFieldNames,
+    batchEditMoveLiquidMultiDispensePathDisabledFieldNames,
     'multi-dispense-present'
   )
 
 export const getPipetteDifferentAndMultiAspiratePathFields = (): DisabledFields =>
   fieldsWithDisabledTooltipText(
-    pipetteDifferentAndMultiAspiratePathDisabledFieldNames,
+    batchEditMoveLiquidPipetteDifferentAndMultiAspiratePathDisabledFieldNames,
     'multi-aspirate-present-pipette-different'
   )
 
 export const getPipetteDifferentAndMultiDispensePathFields = (): DisabledFields =>
   fieldsWithDisabledTooltipText(
-    pipetteDifferentAndMultiDispensePathDisabledFieldNames,
+    batchEditMoveLiquidPipetteDifferentAndMultiDispensePathDisabledFieldNames,
     'multi-dispense-present-pipette-different'
   )
