@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 
 import { SidePanel } from '@opentrons/components'
 import { selectors as robotSelectors } from '../../../redux/robot'
-import { useFeatureFlag } from '../../../redux/config'
 import { getProtocolLabwareList } from '../../../redux/calibration/labware'
 import { ProtocolModuleList } from '../../../organisms/ProtocolModuleList'
 import { PipetteList } from './PipetteList'
