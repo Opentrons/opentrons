@@ -19,7 +19,6 @@ Opentrons App 4.3.0 brings compatibility with using multiples of the same module
 
 - Fix an issue where robots would sometimes not reappear after an update when connected via USB ([#7608](https://github.com/Opentrons/opentrons/issues/7608))
 
-
 ---
 
 ## Opentrons App Changes in 4.2.1

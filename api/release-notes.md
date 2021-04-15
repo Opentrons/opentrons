@@ -12,7 +12,6 @@ OT-2 software 4.3.0 brings a major new feature: the ability to use multiple modu
 
 - Protocols may now load more than one of the same module type by calling `protocol.load_module()` multiple times with the same type of module and different deck slots
 
-
 ## Bugfixes
 
 - Fix an issue where pipettes would move diagonally when accessing the same well one after another ([#7156](https://github.com/Opentrons/opentrons/issues/7156))
