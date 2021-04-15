@@ -60,12 +60,12 @@ class InstrumentContext:  # noqa: D101
                  rate: float = 1.0) -> InstrumentContext:
         raise NotImplementedError()
 
-    def dispense(
+    def dispense(  # noqa: D102
             self,
             volume: Optional[float] = None,
             location: Union[types.Location, Well] = None,
             rate: float = 1.0) -> InstrumentContext:
-        """Dispense a volume of liquid (in microliters)."""
+
         if rate != 1:
             raise NotImplementedError("Flow rate adjustment not yet supported in PE.")
 
