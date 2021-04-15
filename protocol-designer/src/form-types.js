@@ -80,9 +80,7 @@ export type StepType =
   | 'manualIntervention'
   | 'magnet'
   | 'temperature'
-  | 'awaitTemperature'
   | 'thermocycler'
-  | 'thermocyclerState'
 export const stepIconsByType: { [StepType]: IconName } = {
   moveLiquid: 'ot-transfer',
   mix: 'ot-mix',
