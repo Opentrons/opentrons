@@ -7,8 +7,4 @@
     "outDir": "lib"
   },
   "include": ["typings", "src"],
-  "exclude": [
-    "lib/**/*",
-    "**/*.stories.tsx"
-  ]
 }

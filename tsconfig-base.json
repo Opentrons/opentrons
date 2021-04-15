@@ -9,5 +9,8 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true
-  }
+  },
+  "exclude": [
+    "**/*.stories.tsx"
+  ]
 }
