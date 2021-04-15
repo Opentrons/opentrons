@@ -190,7 +190,7 @@ class ProtocolContextImplementation(AbstractProtocol):
             configuration=configuration)
 
         # Try to find in the hardware instance
-        available_modules = self._hw_manager.hardware.find_modules(
+        available_modules, simulating_module = self._hw_manager.hardware.find_modules(
             resolved_model, resolved_type)
 
         hc_mod_instance = None
@@ -202,6 +202,9 @@ class ProtocolContextImplementation(AbstractProtocol):
                 self._loaded_modules.add(mod)
                 hc_mod_instance = SynchronousAdapter(mod)
                 break
+
+        if simulating_module and not hc_mod_instance:
+            hc_mod_instance = SynchronousAdapter(simulating_module)
 
         if not hc_mod_instance:
             return None
