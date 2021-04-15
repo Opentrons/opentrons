@@ -13,7 +13,7 @@ describe('Batch Edit Transform', () => {
     // enter into the batch edit mode
 
     cy.get('[data-test="StepItem_1"]').click({
-      [isMacOSX ? 'metaKey' : 'cmdKey']: true,
+      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
     })
 
     cy.get('button').contains('exit batch edit').should('exist')
@@ -41,7 +41,7 @@ describe('Batch Edit Transform', () => {
 
     // Verify that transfer and other step selection does not support multistep editing
     cy.get('[data-test="StepItem_4"]').click({
-      [isMacOSX ? 'metaKey' : 'cmdKey']: true,
+      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
     })
     cy.get('#StepSelectionBannerComponent_numberStepsSelected')
       .contains('2 steps selected')
