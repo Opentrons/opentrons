@@ -321,7 +321,8 @@ export const getModules: State => Array<SessionModule> = createSelector(
 
 export const getModulesByProtocolLoadOrder: State => Array<SessionModule> = createSelector(
   getModules,
-  modules => modules.slice().sort((a, b) => a.protocolLoadOrder - b.protocolLoadOrder)
+  modules =>
+    modules.slice().sort((a, b) => a.protocolLoadOrder - b.protocolLoadOrder)
 )
 
 export const getModulesByModel: State => {
