@@ -17,7 +17,7 @@ export const FormGroup = Template.bind({})
 FormGroup.args = {
   label: 'This is a FormGroup',
   children: [
-      <CheckboxField key="first" label='first field'/>,
-      <CheckboxField key="second" label='second field'/>
+      <CheckboxField onChange={e => {}} key="first" label='first field'/>,
+      <CheckboxField onChange={e => {}} key="second" label='second field'/>
   ]
 }

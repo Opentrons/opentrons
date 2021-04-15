@@ -6,7 +6,7 @@ import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'Library/Molecules/Forms/Checkbox Field',
-  component: CheckboxField,
+  component: CheckboxFieldComponent,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof CheckboxFieldComponent>> = args => {

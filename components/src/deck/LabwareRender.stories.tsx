@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { RobotWorkSpace } from '@opentrons/components'
+import { RobotWorkSpace } from './RobotWorkSpace'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
 import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough'

@@ -6,11 +6,12 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { RobotWorkSpace } from '@opentrons/components'
+import { RobotWorkSpace } from './RobotWorkSpace'
 import { getDeckDefinitions } from './getDeckDefinitions'
 
 import { Module as ModuleComponent } from './Module'
 
+import type { RobotWorkSpaceRenderProps } from './types'
 import type { Story, Meta } from '@storybook/react'
 
 const moduleModels = [
@@ -30,7 +31,7 @@ export default {
 const Template: Story<React.ComponentProps<typeof ModuleComponent>> = args => {
   return (
       <RobotWorkSpace deckDef={getDeckDefinitions()["ot2_standard"]}>
-        {({deckSlotsById}) => {
+        {({deckSlotsById}: RobotWorkSpaceRenderProps) => {
           const slot =  deckSlotsById['7']
           return (
             <g transform={`translate(${slot.position[0]}, ${slot.position[1]})`} >
