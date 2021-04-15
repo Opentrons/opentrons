@@ -1,6 +1,12 @@
 /* stylelint-disable selector-class-pattern */
 @import "..";
 
+.example_select_override {
+  & :global(.ot_select__control) {
+    background-color: blue;
+  }
+}
+
 .select {
   position: relative;
 
@@ -105,10 +111,4 @@
   right: 0;
   z-index: 99;
   height: 4px;
-}
-
-.example_select_override {
-  & :global(.ot_select__control) {
-    background-color: blue;
-  }
 }
