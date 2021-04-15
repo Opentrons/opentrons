@@ -5,7 +5,6 @@ import { Icon } from '../icons'
 import styles from './forms.css'
 import type { HoverTooltipHandlers } from '../tooltips'
 
-
 /**
  * Checkbox Field Properties.
  */

@@ -6,7 +6,6 @@ import styles from './lists.css'
 import { Icon } from '../icons'
 import type { IconName, IconProps } from '../icons'
 
-
 // TODO(bc, 2021-03-31): reconsider whether this belongs in components library
 // it is bloated with application specific functionality
 

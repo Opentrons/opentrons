@@ -16,6 +16,8 @@ components/flow-types/**
 app-shell/lib/**
 discovery-client/lib/**
 **/lib/**/*.d.ts
+# TODO add story files back to linting once the are parsed by tsc
+**/*.stories.tsx
 
 # prettier
 **/package.json

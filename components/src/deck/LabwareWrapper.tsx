@@ -39,8 +39,8 @@ export function LabwareWrapper(props: LabwareWrapperProps): JSX.Element {
           className={styles.highlighted}
           x="0.5"
           y="0.5"
-          width={(width as number) - 1}
-          height={(height as number) - 1}
+          width={width - 1}
+          height={height - 1}
           rx="6"
         />
       )}

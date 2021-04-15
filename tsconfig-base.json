@@ -10,7 +10,5 @@
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
-  "exclude": [
-    "**/*.stories.tsx"
-  ]
+  "exclude": ["**/*.stories.tsx"]
 }

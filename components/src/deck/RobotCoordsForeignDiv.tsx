@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Box } from '../primitives'
-import type { PrimitiveComponent } from '../primitives'
 
 export interface RobotCoordsForeignDivProps {
   width?: string | number

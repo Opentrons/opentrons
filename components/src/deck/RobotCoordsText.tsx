@@ -1,5 +1,4 @@
 import * as React from 'react'
-import type { PrimitiveComponent } from '../primitives/types'
 
 export interface RobotCoordsTextProps extends React.ComponentProps<'text'> {
   x: number
