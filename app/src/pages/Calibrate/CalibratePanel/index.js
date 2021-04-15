@@ -27,13 +27,12 @@ export function CalibratePanel(): React.Node {
     allLabware,
     lw => lw.type && lw.isTiprack
   )
-  const showModuleList = useFeatureFlag('moduleAugmentation')
 
   return (
     <SidePanel title={t('cal_panel_title')}>
       <div className={styles.setup_panel}>
         <PipetteList robotName={robotName} tipracks={tipracks} />
-        {showModuleList && <ProtocolModuleList />}
+        <ProtocolModuleList />
         <LabwareGroup
           robotName={robotName}
           tipracks={tipracks}

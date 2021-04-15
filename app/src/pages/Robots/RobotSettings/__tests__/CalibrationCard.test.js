@@ -142,7 +142,6 @@ describe('CalibrationCard', () => {
     getFeatureFlags.mockReturnValue({
       allPipetteConfig: false,
       enableBundleUpload: false,
-      moduleAugmentation: false,
     })
     getAttachedPipettes.mockReturnValue(mockAttachedPipettes)
     getAttachedPipetteCalibrations.mockReturnValue(
