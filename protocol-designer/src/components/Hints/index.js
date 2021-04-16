@@ -10,6 +10,7 @@ import { Portal } from '../portals/MainPageModalPortal'
 import styles from './hints.css'
 import EXAMPLE_ADD_LIQUIDS_IMAGE from '../../images/example_add_liquids.png'
 import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../images/example_watch_liquids_move.png'
+import EXAMPLE_BATCH_EDIT_IMAGE from '../../images/announcements/multi_select.gif'
 import type { HintKey } from '../../tutorial'
 import type { BaseState, ThunkDispatch } from '../../types'
 
@@ -105,6 +106,44 @@ class HintsComponent extends React.Component<Props, State> {
                 <span>{i18n.t(`alert.hint.${hintKey}.li2`)}</span>
               </li>
             </ol>
+          </>
+        )
+      case 'protocol_can_enter_batch_edit':
+        return (
+          <>
+            <span className={styles.column_left}>
+              <img src={EXAMPLE_BATCH_EDIT_IMAGE} />
+            </span>
+            <span className={styles.column_right}>
+              <p>{i18n.t(`alert.hint.${hintKey}.body1`)}</p>
+              <p>
+                {i18n.t(`alert.hint.${hintKey}.body2`)}
+                <ol className={styles.numbered_list}>
+                  <li>
+                    {i18n.t(`alert.hint.${hintKey}.li1a`)}
+                    <strong>
+                      {i18n.t(`alert.hint.${hintKey}.strong_li1`)}
+                    </strong>
+                    {i18n.t(`alert.hint.${hintKey}.li1b`)}
+                  </li>
+                  <li>
+                    {i18n.t(`alert.hint.${hintKey}.li2a`)}
+                    <strong>
+                      {i18n.t(`alert.hint.${hintKey}.strong_li2`)}
+                    </strong>
+                    {i18n.t(`alert.hint.${hintKey}.li2b`)}
+                  </li>
+                </ol>
+              </p>
+              <p>
+                {i18n.t(`alert.hint.${hintKey}.body3a`)} <br />
+                {i18n.t(`alert.hint.${hintKey}.body3b`)}
+              </p>
+              <p>
+                {i18n.t(`alert.hint.${hintKey}.body4a`)} <br />
+                {i18n.t(`alert.hint.${hintKey}.body4b`)}
+              </p>
+            </span>
           </>
         )
       default:
