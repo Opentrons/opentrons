@@ -9,18 +9,26 @@ from .protocol_engine import ProtocolEngine
 from .state import StateStore, StateView, LabwareData
 from .execution import CommandHandlers
 from .resources import ResourceProviders
-from .types import DeckLocation, DeckSlotLocation, Dimensions, WellLocation, WellOrigin
+from .types import (
+    DeckLocation,
+    DeckSlotLocation,
+    Dimensions,
+    PipetteName,
+    WellLocation,
+    WellOrigin,
+)
 
 __all__ = [
     "ProtocolEngine",
     "StateStore",
     "StateView",
+    "LabwareData",
     "CommandHandlers",
     "ResourceProviders",
     "DeckLocation",
     "DeckSlotLocation",
     "Dimensions",
-    "LabwareData",
+    "PipetteName",
     "WellLocation",
     "WellOrigin",
 ]

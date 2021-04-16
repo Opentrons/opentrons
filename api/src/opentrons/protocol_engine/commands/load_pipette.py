@@ -2,9 +2,9 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons.types import MountType
 
+from ..types import PipetteName
 from .command import CommandImplementation, CommandHandlers
 
 

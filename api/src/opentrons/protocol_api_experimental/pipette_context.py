@@ -18,18 +18,44 @@ from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 # todo(mm, 2021-04-09): How customer-facing are these classes? Should they be
 # accessible and documented as part of this package?
-from opentrons.protocols.api_support.util import (
-    PlungerSpeeds, FlowRates, Clearances
-)
+from opentrons.protocols.api_support.util import PlungerSpeeds, FlowRates, Clearances
 
 
-# todo(mm, 2021-04-09): Can/should we change "Instrument" to "Pipette"?
 # todo(mm, 2021-04-09): Can/should we remove the word "Context" from the name?
-class InstrumentContext:  # noqa: D101
+class PipetteContext:  # noqa: D101
+    def __init__(
+        self,
+        engine_client: ProtocolEngineClient,
+        resource_id: str,
+    ) -> None:
+        """Initialize a PipetteContext API provider.
 
-    def __init__(self, client: ProtocolEngineClient, resource_id: str) -> None:  # noqa: D107, E501
-        self._client = client
+        You should not need to call this constructor yourself. The system will
+        create a PipetteContext for you when you call :py:meth:`load_pipette`.
+
+        Args:
+            engine_client: A client to a ProtocolEngine to execute commands.
+            resource_id: The pipette's identifier inside the ProtocolEngine.
+        """
+        self._engine_client = engine_client
         self._resource_id = resource_id
+
+    def __hash__(self) -> int:
+        """Get resource identity for hash equality."""
+        return hash(self._resource_id)
+
+    def __eq__(self, other: object) -> bool:
+        """Compare to another object by matching resource identifier."""
+        return (
+            isinstance(other, PipetteContext)
+            and self._resource_id == other._resource_id
+        )
+
+    def __repr__(self) -> str:  # noqa: D105
+        raise NotImplementedError()
+
+    def __str__(self) -> str:  # noqa: D105
+        raise NotImplementedError()
 
     @property
     def api_version(self) -> APIVersion:  # noqa: D102
@@ -54,16 +80,16 @@ class InstrumentContext:  # noqa: D101
     def default_speed(self, speed: float) -> None:
         raise NotImplementedError()
 
-    def aspirate(self,  # noqa: D102
-                 volume: Optional[float] = None,
-                 location: Union[types.Location, Well] = None,
-                 rate: float = 1.0) -> InstrumentContext:
+    def aspirate(  # noqa: D102
+        self,
+        volume: Optional[float] = None,
+        location: Union[types.Location, Well] = None,
+        rate: float = 1.0,
+    ) -> InstrumentContext:
 
         if volume is None or volume == 0:
             # todo(mm, 2021-04-14): If None or 0, use highest volume possible.
-            raise NotImplementedError(
-                "volume must be specified."
-            )
+            raise NotImplementedError("volume must be specified.")
 
         if rate != 1:
             raise NotImplementedError(
@@ -71,7 +97,7 @@ class InstrumentContext:  # noqa: D101
             )
 
         if isinstance(location, Well):
-            self._client.aspirate(
+            self._engine_client.aspirate(
                 pipette_id=self._resource_id,
                 labware_id=location.parent.resource_id,
                 well_name=location.well_name,
@@ -79,9 +105,9 @@ class InstrumentContext:  # noqa: D101
                     origin=WellOrigin.BOTTOM,
                     # todo(mm, 2021-04-14): Get default offset in well via
                     # self.well_bottom_clearance.aspirate, instead of hard-coding.
-                    offset=(0, 0, 1)
+                    offset=(0, 0, 1),
                 ),
-                volume=volume
+                volume=volume,
             )
         else:
             # todo(mm, 2021-04-14):
@@ -95,10 +121,11 @@ class InstrumentContext:  # noqa: D101
         return self
 
     def dispense(  # noqa: D102
-            self,
-            volume: Optional[float] = None,
-            location: Union[types.Location, Well] = None,
-            rate: float = 1.0) -> InstrumentContext:
+        self,
+        volume: Optional[float] = None,
+        location: Union[types.Location, Well] = None,
+        rate: float = 1.0,
+    ) -> InstrumentContext:
 
         if rate != 1:
             raise NotImplementedError("Flow rate adjustment not yet supported in PE.")
@@ -112,61 +139,69 @@ class InstrumentContext:  # noqa: D101
         #       2. specified location is a Point)
         #  - Use well_bottom_clearance as offset for well_location(?)
         if isinstance(location, Well):
-            self._client.dispense(
+            self._engine_client.dispense(
                 pipette_id=self._resource_id,
                 labware_id=location.parent.resource_id,
                 well_name=location.well_name,
-                well_location=WellLocation(origin=WellOrigin.BOTTOM,
-                                           offset=(0, 0, 1)),
+                well_location=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
                 volume=volume,
             )
         else:
-            raise NotImplementedError("Dispensing to a non-well location "
-                                      "not yet supported in PE.")
+            raise NotImplementedError(
+                "Dispensing to a non-well location " "not yet supported in PE."
+            )
         return self
 
-    def mix(self,  # noqa: D102
-            repetitions: int = 1,
-            volume: Optional[float] = None,
-            location: Union[types.Location, Well] = None,
-            rate: float = 1.0) -> InstrumentContext:
+    def mix(  # noqa: D102
+        self,
+        repetitions: int = 1,
+        volume: Optional[float] = None,
+        location: Union[types.Location, Well] = None,
+        rate: float = 1.0,
+    ) -> InstrumentContext:
         raise NotImplementedError()
 
-    def blow_out(self,  # noqa: D102
-                 location: Union[types.Location, Well] = None
-                 ) -> InstrumentContext:
+    def blow_out(  # noqa: D102
+        self,
+        location: Union[types.Location, Well] = None,
+    ) -> InstrumentContext:
         raise NotImplementedError()
 
-    def touch_tip(self,  # noqa: D102
-                  location: Optional[Well] = None,
-                  radius: float = 1.0,
-                  v_offset: float = -1.0,
-                  speed: float = 60.0) -> InstrumentContext:
+    def touch_tip(  # noqa: D102
+        self,
+        location: Optional[Well] = None,
+        radius: float = 1.0,
+        v_offset: float = -1.0,
+        speed: float = 60.0,
+    ) -> InstrumentContext:
         raise NotImplementedError()
 
-    def air_gap(self,  # noqa: D102
-                volume: Optional[float] = None,
-                height: Optional[float] = None) -> InstrumentContext:
+    def air_gap(  # noqa: D102
+        self,
+        volume: Optional[float] = None,
+        height: Optional[float] = None,
+    ) -> InstrumentContext:
         raise NotImplementedError()
 
     def return_tip(self, home_after: bool = True) -> InstrumentContext:  # noqa: D102
         raise NotImplementedError()
 
     def pick_up_tip(  # noqa: D102
-            self,
-            location: Union[types.Location, Well] = None,
-            presses: Optional[int] = None,
-            increment: Optional[float] = None) -> InstrumentContext:
+        self,
+        location: Union[types.Location, Well] = None,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
+    ) -> InstrumentContext:
         # TODO(al, 2021-04-12): What about presses and increment? They are not
         #  supported by PE command. They are also not supported by PD protocols
         #  either.
         if presses is not None or increment is not None:
             raise NotImplementedError()
         if isinstance(location, Well):
-            self._client.pick_up_tip(
+            self._engine_client.pick_up_tip(
                 pipette_id=self._resource_id,
                 labware_id=location.parent.resource_id,
-                well_name=location.well_name
+                well_name=location.well_name,
             )
         else:
             # TODO(al, 2021-04-12): Support for picking up next tip in a labware
@@ -176,17 +211,18 @@ class InstrumentContext:  # noqa: D101
         return self
 
     def drop_tip(  # noqa: D102
-            self,
-            location: Union[types.Location, Well] = None,
-            home_after: bool = True) -> InstrumentContext:
+        self,
+        location: Union[types.Location, Well] = None,
+        home_after: bool = True,
+    ) -> InstrumentContext:
         # TODO(al, 2021-04-12): What about home_after?
         if not home_after:
             raise NotImplementedError()
         if isinstance(location, Well):
-            self._client.drop_tip(
+            self._engine_client.drop_tip(
                 pipette_id=self._resource_id,
                 labware_id=location.parent.resource_id,
-                well_name=location.well_name
+                well_name=location.well_name,
             )
         else:
             # TODO(al, 2021-04-12): Support for dropping tip in trash.
@@ -200,42 +236,46 @@ class InstrumentContext:  # noqa: D101
     def home_plunger(self) -> InstrumentContext:  # noqa: D102
         raise NotImplementedError()
 
-    def distribute(self,  # noqa: D102
-                   volume: Union[float, Sequence[float]],
-                   source: Well,
-                   dest: List[Well],
-                   *args,  # noqa: ANN002
-                   **kwargs,  # noqa: ANN003
-                   ) -> InstrumentContext:
+    def distribute(  # noqa: D102
+        self,
+        volume: Union[float, Sequence[float]],
+        source: Well,
+        dest: List[Well],
+        *args,  # noqa: ANN002
+        **kwargs,  # noqa: ANN003
+    ) -> InstrumentContext:
         raise NotImplementedError()
 
-    def consolidate(self,  # noqa: D102
-                    volume: Union[float, Sequence[float]],
-                    source: List[Well],
-                    dest: Well,
-                    *args,  # noqa: ANN002
-                    **kwargs  # noqa: ANN003
-                    ) -> InstrumentContext:
+    def consolidate(  # noqa: D102
+        self,
+        volume: Union[float, Sequence[float]],
+        source: List[Well],
+        dest: Well,
+        *args,  # noqa: ANN002
+        **kwargs,  # noqa: ANN003
+    ) -> InstrumentContext:
         raise NotImplementedError()
 
-    def transfer(self,  # noqa: D102
-                 volume: Union[float, Sequence[float]],
-                 source: AdvancedLiquidHandling,
-                 dest: AdvancedLiquidHandling,
-                 trash: bool = True,
-                 **kwargs  # noqa: ANN003
-                 ) -> InstrumentContext:
+    def transfer(  # noqa: D102
+        self,
+        volume: Union[float, Sequence[float]],
+        source: AdvancedLiquidHandling,
+        dest: AdvancedLiquidHandling,
+        trash: bool = True,
+        **kwargs,  # noqa: ANN003
+    ) -> InstrumentContext:
         raise NotImplementedError()
 
     def delay(self) -> None:  # noqa: D102
         raise NotImplementedError()
 
-    def move_to(self,  # noqa: D102
-                location: types.Location,
-                force_direct: bool = False,
-                minimum_z_height: Optional[float] = None,
-                speed: Optional[float] = None
-                ) -> InstrumentContext:
+    def move_to(  # noqa: D102
+        self,
+        location: types.Location,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
+    ) -> InstrumentContext:
         raise NotImplementedError()
 
     @property
@@ -310,12 +350,15 @@ class InstrumentContext:  # noqa: D101
     def well_bottom_clearance(self) -> Clearances:  # noqa: D102
         raise NotImplementedError()
 
-    def __repr__(self) -> str:  # noqa: D105
-        raise NotImplementedError()
-
-    def __str__(self) -> str:  # noqa: D105
-        raise NotImplementedError()
-
     def pair_with(  # noqa: D102
-            self, instrument: InstrumentContext) -> PairedInstrumentContext:
+        self, instrument: InstrumentContext
+    ) -> PairedInstrumentContext:
         raise NotImplementedError()
+
+
+InstrumentContext = PipetteContext
+"""Alias of PipetteContext to preserve compatibility with Protocol API v2.
+
+.. deprecated:: Protocol API v3.0
+    Use :py:class:`PipetteContext` instead.
+"""

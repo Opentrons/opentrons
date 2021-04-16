@@ -12,8 +12,8 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.types import DeckSlotName
-from opentrons.protocol_engine import DeckSlotLocation, commands
+from opentrons.types import DeckSlotName, MountType
+from opentrons.protocol_engine import DeckSlotLocation, PipetteName, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
 from opentrons.protocol_engine.types import WellOrigin, WellLocation
 
@@ -45,7 +45,7 @@ def subject(transport: AbstractSyncTransport) -> SyncClient:
 def stubbed_load_labware_result(
     decoy: Decoy,
     transport: AbstractSyncTransport,
-    minimal_labware_def: LabwareDefinition
+    minimal_labware_def: LabwareDefinition,
 ) -> commands.LoadLabwareResult:
     """Set up the protocol engine with default stubbed response for load labware."""
     request = commands.LoadLabwareRequest(
@@ -83,26 +83,45 @@ def test_load_labware(
     assert result == stubbed_load_labware_result
 
 
+def test_load_pipette(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a load pipette command and return its result."""
+    request = commands.LoadPipetteRequest(
+        pipetteName=PipetteName.P300_SINGLE,
+        mount=MountType.RIGHT,
+    )
+
+    expected_result = commands.LoadPipetteResult(pipetteId="abc123")
+
+    decoy.when(
+        transport.execute_command(request=request, command_id=UUID_MATCHER)
+    ).then_return(expected_result)
+
+    result = subject.load_pipette(
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.RIGHT,
+    )
+
+    assert result == expected_result
+
+
 def test_pick_up_tip(
     decoy: Decoy,
     transport: AbstractSyncTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a pick up tip command."""
-    request = commands.PickUpTipRequest(
-        pipetteId="123", labwareId="456", wellName="A2"
-    )
+    request = commands.PickUpTipRequest(pipetteId="123", labwareId="456", wellName="A2")
     response = commands.PickUpTipResult()
 
     decoy.when(
         transport.execute_command(request=request, command_id=UUID_MATCHER)
     ).then_return(response)
 
-    result = subject.pick_up_tip(
-        pipette_id="123",
-        labware_id="456",
-        well_name="A2"
-    )
+    result = subject.pick_up_tip(pipette_id="123", labware_id="456", well_name="A2")
 
     assert result == response
 
@@ -113,20 +132,14 @@ def test_drop_tip(
     subject: SyncClient,
 ) -> None:
     """It should execute a drop up tip command."""
-    request = commands.DropTipRequest(
-        pipetteId="123", labwareId="456", wellName="A2"
-    )
+    request = commands.DropTipRequest(pipetteId="123", labwareId="456", wellName="A2")
     response = commands.DropTipResult()
 
     decoy.when(
         transport.execute_command(request=request, command_id=UUID_MATCHER)
     ).then_return(response)
 
-    result = subject.drop_tip(
-        pipette_id="123",
-        labware_id="456",
-        well_name="A2"
-    )
+    result = subject.drop_tip(pipette_id="123", labware_id="456", well_name="A2")
 
     assert result == response
 
@@ -169,10 +182,11 @@ def test_dispense(
 ) -> None:
     """It should execute a dispense command."""
     request = commands.DispenseRequest(
-        pipetteId="123", labwareId="456", wellName="A2",
-        wellLocation=WellLocation(origin=WellOrigin.BOTTOM,
-                                   offset=(0, 0, 1)),
-        volume=10
+        pipetteId="123",
+        labwareId="456",
+        wellName="A2",
+        wellLocation=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
+        volume=10,
     )
 
     response = commands.DispenseResult(volume=1)
@@ -182,9 +196,10 @@ def test_dispense(
     ).then_return(response)
 
     result = subject.dispense(
-        pipette_id="123", labware_id="456", well_name="A2",
-        well_location=WellLocation(origin=WellOrigin.BOTTOM,
-                                   offset=(0, 0, 1)),
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
         volume=10,
     )
 
