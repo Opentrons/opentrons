@@ -76,6 +76,7 @@ const PAUSE_TEMP_PARAM_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['pauseAction', 'pauseTemperature'],
 }
+
 const VOLUME_TOO_HIGH = (pipetteCapacity: number) => ({
   title: `Volume is greater than maximum pipette/tip volume (${pipetteCapacity} ul)`,
   dependentFields: ['pipette', 'volume'],
@@ -136,6 +137,7 @@ const BLOCK_TEMPERATURE_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['blockIsActive', 'blockTargetTemp'],
 }
+
 const BLOCK_TEMPERATURE_HOLD_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['blockIsActiveHold', 'blockTargetTempHold'],
