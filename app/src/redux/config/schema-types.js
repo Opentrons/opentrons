@@ -10,7 +10,6 @@ export type DiscoveryCandidates = string | Array<string>
 export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
-  | 'moduleAugmentation'
 
 export type FeatureFlags = $Shape<{|
   [DevInternalFlag]: boolean | void,
