@@ -41,11 +41,11 @@ export type FormErrorKey =
   | 'BLOCK_TEMPERATURE_HOLD_REQUIRED'
   | 'LID_TEMPERATURE_HOLD_REQUIRED'
 
-export type FormError = {
+export type FormError = {|
   title: string,
   body?: React.Node,
   dependentFields: Array<StepFieldName>,
-}
+|}
 
 const INCOMPATIBLE_ASPIRATE_LABWARE: FormError = {
   title: 'Selected aspirate labware is incompatible with selected pipette',
