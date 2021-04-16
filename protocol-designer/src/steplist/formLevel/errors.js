@@ -235,7 +235,7 @@ export const wellRatioMoveLiquid = (
     : WELL_RATIO_MOVE_LIQUID
 }
 
-export const volumeTooHigh = (fields: HydratedFormData): ?FormError => {
+export const volumeTooHigh = (fields: HydratedFormData): FormError | null => {
   const { pipette } = fields
   const volume = Number(fields.volume)
   const pipetteCapacity = getPipetteCapacity(pipette)
