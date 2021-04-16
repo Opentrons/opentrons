@@ -269,6 +269,7 @@ export const TipPositionModal = (props: Props): React.Node => {
                       value: 'custom',
                     },
                   ]}
+                  name="TipPositionOptions"
                 />
                 {TipPositionInputField}
               </div>
@@ -277,12 +278,14 @@ export const TipPositionModal = (props: Props): React.Node => {
                 {!isDefault && (
                   <div className={styles.adjustment_buttons}>
                     <OutlineButton
+                      id="Increment_tipPosition"
                       className={styles.adjustment_button}
                       onClick={makeHandleIncrement(SMALL_STEP_MM)}
                     >
                       <Icon name="plus" />
                     </OutlineButton>
                     <OutlineButton
+                      id="Decrement_tipPosition"
                       className={styles.adjustment_button}
                       onClick={makeHandleDecrement(SMALL_STEP_MM)}
                     >

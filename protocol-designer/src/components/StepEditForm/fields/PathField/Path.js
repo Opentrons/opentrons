@@ -41,6 +41,7 @@ type PathFieldProps = {|
 type ButtonProps = {
   children?: React.Node,
   disabled: boolean,
+  id?: string,
   selected: boolean,
   subtitle: string,
   onClick: (e: SyntheticMouseEvent<*>) => mixed,
@@ -48,7 +49,15 @@ type ButtonProps = {
 }
 
 const PathButton = (buttonProps: ButtonProps) => {
-  const { children, disabled, onClick, path, selected, subtitle } = buttonProps
+  const {
+    children,
+    disabled,
+    onClick,
+    id,
+    path,
+    selected,
+    subtitle,
+  } = buttonProps
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const tooltip = (
@@ -74,6 +83,7 @@ const PathButton = (buttonProps: ButtonProps) => {
           [styles.disabled]: disabled,
         })}
         onClick={disabled ? null : onClick}
+        id={id}
       >
         {children}
       </li>
@@ -89,6 +99,9 @@ const getSubtitle = (
   return reasonForDisabled || ''
 }
 
+const getPathButtonId = (name, selectedValue) =>
+  `PathButton_${name}_${name === selectedValue ? 'selected' : 'deselected'}`
+
 export const Path = (props: PathFieldProps): React.Node => {
   const { disabledPathMap, value, updateValue } = props
   return (
@@ -96,6 +109,7 @@ export const Path = (props: PathFieldProps): React.Node => {
       <ul className={styles.path_options}>
         {ALL_PATH_OPTIONS.map(option => (
           <PathButton
+            id={getPathButtonId(option.name, value)}
             key={option.name}
             selected={option.name === value}
             path={option.name}
