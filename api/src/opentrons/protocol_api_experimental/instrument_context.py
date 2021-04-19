@@ -60,7 +60,7 @@ class InstrumentContext:  # noqa: D101
                  rate: float = 1.0) -> InstrumentContext:
         # noqa: D102
 
-        if not volume:
+        if volume is None or volume == 0:
             # todo(mm, 2021-04-14): If None or 0, use highest volume possible.
             raise NotImplementedError(
                 "volume must be specified."
