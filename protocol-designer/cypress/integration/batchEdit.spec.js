@@ -48,7 +48,7 @@ describe('Batch Edit Transform', () => {
       .should('exist')
 
     cy.get('[id=Text_noSharedSettings]').contains(
-      'Batch editing of settings is only available for Transfers'
+      'Batch editing of settings is only available for Transfer or Mix steps'
     )
 
     // Expand ALL steps
