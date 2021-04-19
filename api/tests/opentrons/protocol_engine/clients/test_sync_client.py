@@ -156,7 +156,7 @@ def test_aspirate(
         pipette_id="123", labware_id="456", well_name="A2",
         well_location=WellLocation(origin=WellOrigin.BOTTOM,
                                    offset=(0, 0, 1)),
-        volume=10,
+        volume=123.45,
     )
 
     assert result == result_from_transport
