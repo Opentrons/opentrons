@@ -19,9 +19,19 @@ This code is totally unsupported. To do science on a robot, use the stable
 
 from .protocol_context import ProtocolContext
 from .pipette_context import PipetteContext, InstrumentContext
+from .errors import InvalidPipetteNameError, InvalidMountError
+from .types import PipetteName, Mount, DeprecatedMount
 
 __all__ = [
+    # Protocol API classes
     "ProtocolContext",
     "PipetteContext",
     "InstrumentContext",
+    # Protocol API errors
+    "InvalidPipetteNameError",
+    "InvalidMountError",
+    # Protocol API types and data classes
+    "PipetteName",
+    "Mount",
+    "DeprecatedMount",
 ]
