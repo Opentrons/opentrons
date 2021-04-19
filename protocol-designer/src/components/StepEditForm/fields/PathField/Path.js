@@ -73,6 +73,10 @@ const PathButton = (buttonProps: ButtonProps) => {
     </Tooltip>
   )
 
+  const pathButtonData = `PathButton_${selected ? 'selected' : 'deselected'}_${
+    disabled ? 'disabled' : 'enabled'
+  }`
+
   return (
     <>
       {tooltip}
@@ -84,6 +88,7 @@ const PathButton = (buttonProps: ButtonProps) => {
         })}
         onClick={disabled ? null : onClick}
         id={id}
+        data-test={pathButtonData}
       >
         {children}
       </li>
@@ -99,9 +104,6 @@ const getSubtitle = (
   return reasonForDisabled || ''
 }
 
-const getPathButtonId = (name, selectedValue) =>
-  `PathButton_${name}_${name === selectedValue ? 'selected' : 'deselected'}`
-
 export const Path = (props: PathFieldProps): React.Node => {
   const { disabledPathMap, value, updateValue } = props
   return (
@@ -109,7 +111,7 @@ export const Path = (props: PathFieldProps): React.Node => {
       <ul className={styles.path_options}>
         {ALL_PATH_OPTIONS.map(option => (
           <PathButton
-            id={getPathButtonId(option.name, value)}
+            id={`PathButton_${option.name}`}
             key={option.name}
             selected={option.name === value}
             path={option.name}

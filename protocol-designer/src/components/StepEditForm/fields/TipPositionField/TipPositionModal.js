@@ -194,6 +194,7 @@ export const TipPositionModal = (props: Props): React.Node => {
       caption={`between ${minMmFromBottom} and ${maxMmFromBottom}`}
       className={styles.position_from_bottom_input}
       error={errorText}
+      id={'TipPositionModal_custom-input'}
       isIndeterminate={value === null && isIndeterminate}
       onChange={handleInputFieldChange}
       units="mm"

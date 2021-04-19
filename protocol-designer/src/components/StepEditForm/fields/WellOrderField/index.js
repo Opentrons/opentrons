@@ -110,12 +110,18 @@ export const WellOrderField = (props: Props): React.Node => {
                 getIconClassNames()
               )}
               id={`WellOrderField_button_${props.prefix}`}
+              data-test={`WellOrderField_button_${String(firstValue)}_${String(
+                secondValue
+              )}`}
             />
           ) : (
             <Text
               onClick={handleOpen}
               css={mixedWellOrderStyles}
               id={`WellOrderField_button_${props.prefix}`}
+              data-test={`WellOrderField_button_${String(firstValue)}_${String(
+                secondValue
+              )}`}
             >
               {i18n.t('form.step_edit_form.field.well_order.mixed')}
             </Text>
