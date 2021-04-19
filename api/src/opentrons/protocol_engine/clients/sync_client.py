@@ -44,3 +44,40 @@ class SyncClient:
         )
 
         return cast(commands.LoadLabwareResult, result)
+
+    def pick_up_tip(
+            self,
+            pipette_id: str,
+            labware_id: str,
+            well_name: str
+    ) -> commands.PickUpTipResult:
+        """Execute a PickUpTipRequest."""
+        request = commands.PickUpTipRequest(
+            pipetteId=pipette_id,
+            labwareId=labware_id,
+            wellName=well_name
+        )
+        result = self._transport.execute_command(
+            request=request,
+            command_id=self._create_command_id(),
+        )
+
+        return cast(commands.PickUpTipResult, result)
+
+    def drop_tip(
+            self,
+            pipette_id: str,
+            labware_id: str,
+            well_name: str
+    ) -> commands.DropTipResult:
+        """Execute a DropTipRequest."""
+        request = commands.DropTipRequest(
+            pipetteId=pipette_id,
+            labwareId=labware_id,
+            wellName=well_name
+        )
+        result = self._transport.execute_command(
+            request=request,
+            command_id=self._create_command_id()
+        )
+        return cast(commands.DropTipResult, result)

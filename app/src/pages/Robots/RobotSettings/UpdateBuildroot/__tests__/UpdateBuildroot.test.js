@@ -164,7 +164,7 @@ describe('UpdateBuildroot wizard', () => {
       userFileInfo: null,
       token: null,
       pathPrefix: null,
-      step: Buildroot.RESTARTING,
+      step: Buildroot.RESTART,
       stage: null,
       progress: null,
       error: null,

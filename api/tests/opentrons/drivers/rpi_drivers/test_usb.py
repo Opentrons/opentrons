@@ -16,7 +16,7 @@ fake_bus_og = [
     '/sys/bus/usb/devices/usb1/1-1/1-1.1/dev',
     '/sys/bus/usb/devices/usb1/1-1/dev',
     '/sys/bus/usb/devices/usb1/1-1/1-1.5/dev',
-    '/sys/bus/usb/devices/usb1/1-1/1-1.5/1-1.5:1.2/0003:046D:C52B.0017/hidraw/hidraw0/dev',  # NOQA
+    '/sys/bus/usb/devices/usb1/1-1/1-1.5/1-1.5:1.2/0003:046D:C52B.0017/hidraw/hidraw0/dev',  # noqa: E501
     '/sys/bus/usb/devices/usb1/1-1/1-1.5/1-1.5:1.2/usbmisc/hiddev0/dev'
 ]
 

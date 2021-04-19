@@ -9,7 +9,7 @@ import {
   mockFetchSystemTimeSuccess,
   mockFetchSystemTimeFailure,
 } from '../../__fixtures__'
-import { robotAdminEpic } from '..'
+import { syncTimeOnConnectEpic } from '../syncTimeOnConnectEpic'
 
 const createConnectAction = robotName => (RobotActions.connect(robotName): any)
 
@@ -22,7 +22,7 @@ const createTimeSuccessResponse = (time: Date) => {
 const createEpicOutput = (mocks, createHotObservable) => {
   const action$ = createHotObservable('--a', { a: mocks.action })
   const state$ = createHotObservable('s-s', { s: mocks.state })
-  const output$ = robotAdminEpic(action$, state$)
+  const output$ = syncTimeOnConnectEpic(action$, state$)
 
   return output$
 }

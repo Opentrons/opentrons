@@ -14,7 +14,7 @@ LOG = logging.getLogger(__name__)
 
 try:
     # systemd journal is available, we can use its handler
-    import systemd.journal  # noqa: F401
+    import systemd.journal
     import systemd.daemon
 
     def _handler_for(topic_name: str,

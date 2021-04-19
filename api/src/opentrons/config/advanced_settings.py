@@ -10,7 +10,7 @@ from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 from opentrons.system import log_control
 
 if TYPE_CHECKING:
-    from pathlib import Path  # noqa: F401 - imported for types
+    from pathlib import Path
 
 log = logging.getLogger(__name__)
 

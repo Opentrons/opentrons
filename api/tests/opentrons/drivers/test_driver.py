@@ -64,7 +64,7 @@ def test_update_position(smoothie, monkeypatch):
     argvalues=[
         # Remove command from response
         ["G28.2B", "G28.2B", ""],
-        ["G28.2B G1", "G28.2B G1", " "],
+        ["G28.2B G1", "G28.2B G1", ""],
         ["G28.2B G1", "G1G28.2BG1", ""],
         # Remove command and whitespace from response
         ["\r\nG52\r\n\r\n", "\r\nG52\r\n\r\n", ""],
@@ -82,8 +82,10 @@ def test_update_position(smoothie, monkeypatch):
         # R is not a command echo but a token
         ["M3 R \r\n\r\n",
          "M3R:703130",
-         "R:703130"]
-
+         "R:703130"],
+        ["M369 L \r\n\r\n",
+         "M369 L \r\n\r\nL:5032304D56323032303230303432323036000000000000000000000000000000",  # noqa: E501
+         "L:5032304D56323032303230303432323036000000000000000000000000000000"]
     ]
 )
 def test_remove_serial_echo(

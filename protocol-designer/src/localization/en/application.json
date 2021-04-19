@@ -30,5 +30,5 @@
   },
   "exit_batch_edit": "exit batch edit",
   "n_steps_selected": "{{n}} steps selected",
-  "no_batch_edit_shared_settings": "Batch editing of settings is only available for Transfers"
+  "no_batch_edit_shared_settings": "Batch editing of settings is only available for Transfer or Mix steps"
 }

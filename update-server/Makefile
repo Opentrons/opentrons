@@ -47,7 +47,7 @@ test:
 
 .PHONY: lint
 lint:
-	$(python) -m pylama otupdate tests
+	$(python) -m flake8 otupdate tests
 	$(python) -m mypy otupdate
 
 .PHONY: wheel

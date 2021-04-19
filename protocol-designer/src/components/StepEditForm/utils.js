@@ -171,6 +171,9 @@ export const getVisibleProfileFormLevelErrors = (args: {|
 export const getFieldDefaultTooltip = (name: string): string =>
   i18n.t([`tooltip.step_fields.defaults.${name}`, ''])
 
+export const getFieldIndeterminateTooltip = (name: string): string =>
+  i18n.t([`tooltip.step_fields.indeterminate.${name}`, ''])
+
 export const getSingleSelectDisabledTooltip = (
   name: string,
   stepType: string
