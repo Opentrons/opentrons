@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.3...v4.3.0-beta.0) (2021-04-19)
+
+**Note:** Version bump only for package @opentrons/shared-data
+
+
+
+
+
 # [4.3.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.2...v4.3.0-alpha.3) (2021-04-19)
 
 **Note:** Version bump only for package @opentrons/shared-data
