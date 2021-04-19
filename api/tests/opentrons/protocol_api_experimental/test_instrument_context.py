@@ -104,6 +104,7 @@ def test_aspirate_not_implemented_errors(
     subject: InstrumentContext,
     well: Well,
 ) -> None:
+    """It should raise NotImplementedError when appropriate."""
     with pytest.raises(NotImplementedError):
         # location other than a Well not supported.
         subject.aspirate(12345.6789, well.bottom(1), 1)

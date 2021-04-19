@@ -15,7 +15,6 @@ from opentrons.protocol_api import PairedInstrumentContext
 from opentrons.protocol_api.instrument_context import AdvancedLiquidHandling
 from opentrons.protocol_engine import WellLocation, WellOrigin
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.types import WellOrigin, WellLocation
 
 # todo(mm, 2021-04-09): How customer-facing are these classes? Should they be
 # accessible and documented as part of this package?
