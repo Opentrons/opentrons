@@ -6,7 +6,7 @@ import { AnalyticsToggle } from '../../../organisms/AnalyticsSettingsModal/Analy
 
 const TITLE = 'Privacy Settings'
 
-export function AnalyticsSettingsCard(): React.ReactNode {
+export function AnalyticsSettingsCard(): JSX.Element {
   return (
     <Card title={TITLE}>
       <AnalyticsToggle />

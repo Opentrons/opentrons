@@ -4,7 +4,7 @@ import { Page } from '../../atoms/Page'
 import { SessionHeader } from '../../organisms/SessionHeader'
 import { RunLog } from './RunLog'
 
-export function Run(): React.ReactNode {
+export function Run(): JSX.Element {
   return (
     <Page titleBarProps={{ title: <SessionHeader /> }}>
       <RunLog />

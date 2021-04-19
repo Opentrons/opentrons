@@ -11,7 +11,7 @@ import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 import type { State, Dispatch } from '../../redux/types'
 import type { AlertId } from '../../redux/alerts/types'
 
-export function Alerts(): React.ReactNode {
+export function Alerts(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
 
   // TODO(mc, 2020-05-07): move head logic to selector with alert priorities

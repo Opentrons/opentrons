@@ -49,7 +49,7 @@ type Props = {
 function TipRackDisplayName(props: {
   tiprackUri: string,
   customLabware: LabwareDefinition2[],
-}): React.ReactNode {
+}): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const { tiprackUri, customLabware } = props
   const [namespace, loadName] = tiprackUri ? tiprackUri.split('/') : ['', '']
@@ -70,7 +70,7 @@ function TipRackDisplayName(props: {
 
 function LastCalibrated(props: {
   calibration: PipetteOffsetCalibration | TipLengthCalibration,
-}): React.ReactNode {
+}): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   return (
     <Text

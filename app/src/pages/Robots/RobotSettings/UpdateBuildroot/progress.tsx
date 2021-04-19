@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-export function ProgressSpinner(): React.ReactNode {
+export function ProgressSpinner(): JSX.Element {
   return (
     <div className={styles.progress_spinner}>
       <span />

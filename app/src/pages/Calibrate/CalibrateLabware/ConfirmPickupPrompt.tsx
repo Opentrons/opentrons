@@ -15,7 +15,7 @@ export type ConfirmPickupPromptProps = {
 
 export function ConfirmPickupPrompt(
   props: ConfirmPickupPromptProps
-): React.ReactNode {
+): JSX.Element {
   const {
     onNoClick,
     onYesClick,

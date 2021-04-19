@@ -177,7 +177,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     return initialValues
   }
 
-  render(): React.ReactNode {
+  render(): JSX.Element {
     const { updateInProgress, closeModal } = this.props
     const fields = this.getVisibleFields()
     const UNKNOWN_KEYS = this.getUnknownKeys()

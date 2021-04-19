@@ -15,7 +15,7 @@ export type TipLengthCalibrationInfoBoxProps = {
 
 export function TipLengthCalibrationInfoBox(
   props: TipLengthCalibrationInfoBoxProps
-): React.ReactNode {
+): JSX.Element {
   const { title, children } = props
 
   return (

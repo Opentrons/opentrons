@@ -45,7 +45,7 @@ const ENABLE_DEV_TOOLS_BODY =
 
 const DEV_TITLE = 'Developer Only (unstable)'
 
-export function AppAdvancedSettingsCard(): React.ReactNode {
+export function AppAdvancedSettingsCard(): JSX.Element {
   const useTrashSurfaceForTipCal = useSelector(state =>
     Config.getUseTrashSurfaceForTipCal(state)
   )

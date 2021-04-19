@@ -16,7 +16,7 @@ const TITLE = 'Privacy Settings'
 const CONTINUE = 'continue'
 
 // TODO(mc, 2020-05-07): move render logic to `state.alerts`
-export function AnalyticsSettingsModal(): React.ReactNode {
+export function AnalyticsSettingsModal(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const seen = useSelector(getAnalyticsOptInSeen)
   const setSeen = () => dispatch(setAnalyticsOptInSeen())

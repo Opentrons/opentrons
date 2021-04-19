@@ -4,7 +4,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 // calibration check session types
 
-import typeof {
+import {
   CHECK_STEP_SESSION_STARTED,
   CHECK_STEP_LABWARE_LOADED,
   CHECK_STEP_INSPECTING_TIP,
@@ -28,74 +28,78 @@ import typeof {
 /* Robot Calibration Check Types */
 
 export type RobotCalibrationCheckStep =
-  | CHECK_STEP_SESSION_STARTED
-  | CHECK_STEP_LABWARE_LOADED
-  | CHECK_STEP_INSPECTING_TIP
-  | CHECK_STEP_PREPARING_PIPETTE
-  | CHECK_STEP_COMPARING_NOZZLE
-  | CHECK_STEP_COMPARING_TIP
-  | CHECK_STEP_COMPARING_HEIGHT
-  | CHECK_STEP_COMPARING_POINT_ONE
-  | CHECK_STEP_COMPARING_POINT_TWO
-  | CHECK_STEP_COMPARING_POINT_THREE
-  | CHECK_STEP_RETURNING_TIP
-  | CHECK_STEP_RESULTS_SUMMARY
-  | CHECK_STEP_SESSION_EXITED
-  | CHECK_STEP_CHECK_COMPLETE
+  | typeof CHECK_STEP_SESSION_STARTED
+  | typeof CHECK_STEP_LABWARE_LOADED
+  | typeof CHECK_STEP_INSPECTING_TIP
+  | typeof CHECK_STEP_PREPARING_PIPETTE
+  | typeof CHECK_STEP_COMPARING_NOZZLE
+  | typeof CHECK_STEP_COMPARING_TIP
+  | typeof CHECK_STEP_COMPARING_HEIGHT
+  | typeof CHECK_STEP_COMPARING_POINT_ONE
+  | typeof CHECK_STEP_COMPARING_POINT_TWO
+  | typeof CHECK_STEP_COMPARING_POINT_THREE
+  | typeof CHECK_STEP_RETURNING_TIP
+  | typeof CHECK_STEP_RESULTS_SUMMARY
+  | typeof CHECK_STEP_SESSION_EXITED
+  | typeof CHECK_STEP_CHECK_COMPLETE
 
 export type RobotCalibrationCheckPipetteRank =
-  | CHECK_PIPETTE_RANK_FIRST
-  | CHECK_PIPETTE_RANK_SECOND
+  | typeof CHECK_PIPETTE_RANK_FIRST
+  | typeof CHECK_PIPETTE_RANK_SECOND
 
 export type RobotCalibrationCheckStatus =
-  | CHECK_STATUS_IN_THRESHOLD
-  | CHECK_STATUS_OUTSIDE_THRESHOLD
+  | typeof CHECK_STATUS_IN_THRESHOLD
+  | typeof CHECK_STATUS_OUTSIDE_THRESHOLD
 
-export type CalibrationCheckInstrument = {
-  model: string,
-  name: string,
-  tipLength: number,
-  mount: Mount,
-  rank: RobotCalibrationCheckPipetteRank,
-  tipRackLoadName: string,
-  tipRackDisplay: string,
-  tipRackUri: string,
-  serial: string,
-  defaultTipracks: LabwareDefinition2[],
+export interface CalibrationCheckInstrument {
+  model: string
+  name: string
+  tipLength: number
+  mount: Mount
+  rank: RobotCalibrationCheckPipetteRank
+  tipRackLoadName: string
+  tipRackDisplay: string
+  tipRackUri: string
+  serial: string
+  defaultTipracks: LabwareDefinition2[]
 }
 
-export type CalibrationCheckComparison = {
-  differenceVector: [number, number, number],
-  thresholdVector: [number, number, number],
-  exceedsThreshold: boolean,
+export interface CalibrationCheckComparison {
+  differenceVector: [number, number, number]
+  thresholdVector: [number, number, number]
+  exceedsThreshold: boolean
 }
 
-export type CalibrationCheckComparisonMap = {
-  status: RobotCalibrationCheckStatus,
-  [RobotCalibrationCheckStep]: CalibrationCheckComparison,
+type CalibrationCheckComparisonByStep = Record<
+  RobotCalibrationCheckStep,
+  CalibrationCheckComparison
+>
+export interface CalibrationCheckComparisonMap
+  extends CalibrationCheckComparisonByStep {
+  status: RobotCalibrationCheckStatus
 }
 
-export type CalibrationCheckComparisonsPerCalibration = {
-  tipLength?: CalibrationCheckComparisonMap,
-  pipetteOffset?: CalibrationCheckComparisonMap,
-  deck?: CalibrationCheckComparisonMap,
+export interface CalibrationCheckComparisonsPerCalibration {
+  tipLength?: CalibrationCheckComparisonMap
+  pipetteOffset?: CalibrationCheckComparisonMap
+  deck?: CalibrationCheckComparisonMap
 }
 
-export type CalibrationCheckComparisonByPipette = {
-  first: CalibrationCheckComparisonsPerCalibration,
-  second: CalibrationCheckComparisonsPerCalibration,
+export interface CalibrationCheckComparisonByPipette {
+  first: CalibrationCheckComparisonsPerCalibration
+  second: CalibrationCheckComparisonsPerCalibration
 }
 
-export type CheckCalibrationSessionDetails = {
-  instruments: CalibrationCheckInstrument[],
-  currentStep: RobotCalibrationCheckStep,
-  comparisonsByPipette: CalibrationCheckComparisonByPipette,
-  labware: CalibrationLabware[],
-  activePipette: CalibrationCheckInstrument,
-  activeTipRack: CalibrationLabware,
+export interface CheckCalibrationSessionDetails {
+  instruments: CalibrationCheckInstrument[]
+  currentStep: RobotCalibrationCheckStep
+  comparisonsByPipette: CalibrationCheckComparisonByPipette
+  labware: CalibrationLabware[]
+  activePipette: CalibrationCheckInstrument
+  activeTipRack: CalibrationLabware
 }
 
-export type CheckCalibrationSessionParams = {
-  hasCalibrationBlock: boolean,
-  tipRacks: CalibrationLabware[],
+export interface CheckCalibrationSessionParams {
+  hasCalibrationBlock: boolean
+  tipRacks: CalibrationLabware[]
 }

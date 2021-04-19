@@ -35,7 +35,7 @@ type ConnectionStatusProps = {
 
 export function ConnectionStatusMessage(
   props: ConnectionStatusProps
-): React.ReactNode {
+): JSX.Element {
   const { type, ipAddress, status, internetStatus } = props
   const { t } = useTranslation(['robot_connection', 'shared'])
 

@@ -37,7 +37,7 @@ export class Form extends React.Component<FormProps> {
     event.preventDefault()
   }
 
-  render(): React.ReactNode {
+  render(): JSX.Element {
     const onSubmit = !this.props.disabled ? this.onSubmit : undefined
 
     return (
@@ -57,7 +57,7 @@ export class Select<T: string> extends React.Component<SelectProps<T>> {
     }
   }
 
-  render(): React.ReactNode {
+  render(): JSX.Element {
     const { value, options, disabled, className } = this.props
 
     return (
@@ -81,7 +81,7 @@ export class TextInput<T: string> extends React.Component<TextInputProps<T>> {
     }
   }
 
-  render(): React.ReactNode {
+  render(): JSX.Element {
     const { type, value, disabled, className } = this.props
 
     return (

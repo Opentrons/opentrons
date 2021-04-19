@@ -28,9 +28,9 @@ import { MorePanel } from '../pages/More/MorePanel'
 import { Navbar } from './Navbar'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
-const stopEvent = (event: SyntheticEvent<>) => event.preventDefault()
+const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
-export const AppComponent = (): React.ReactNode => (
+export const AppComponent = (): JSX.Element=> (
   <>
     <GlobalStyle />
     <Flex

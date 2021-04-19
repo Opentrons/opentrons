@@ -19,7 +19,7 @@ const RESTART_NOW = 'Restart Now'
 
 export function RestartRequiredBanner(
   props: RestartRequiredBannerProps
-): React.ReactNode {
+): JSX.Element {
   const { robotName } = props
   const [dismissed, setDismissed] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()

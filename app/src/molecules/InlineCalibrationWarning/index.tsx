@@ -41,7 +41,7 @@ export type InlineCalibrationWarningProps = {
 
 export function InlineCalibrationWarning(
   props: InlineCalibrationWarningProps
-): React.ReactNode {
+): JSX.Element {
   const { warningType, marginTop = SPACING_2, ...styleProps } = props
   return (
     <>

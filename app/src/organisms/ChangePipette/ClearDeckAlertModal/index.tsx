@@ -20,7 +20,7 @@ const HEADING = 'Before continuing, please remove:'
 
 export function ClearDeckAlertModal(
   props: ClearDeckAlertModalProps
-): React.ReactNode {
+): JSX.Element {
   const {
     onContinueClick,
     onCancelClick,

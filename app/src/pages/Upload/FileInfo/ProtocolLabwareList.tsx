@@ -40,7 +40,7 @@ const renderCalValue = (axis: string, value: number): React.ReactNode => (
 
 export function ProtocolLabwareList(
   props: ProtocolLabwareListProps
-): React.ReactNode {
+): JSX.Element {
   const { labware } = props
   const { t } = useTranslation(['protocol_info', 'protocol_calibration'])
   const [calDescTooltipTargetProps, calDescTooltipProps] = useHoverTooltip({

@@ -22,7 +22,7 @@ export class CommandList extends React.Component<CommandListProps> {
     if (this.refs.ensureVisible) this.refs.ensureVisible.scrollIntoView(true) // eslint-disable-line react/no-string-refs
   }
 
-  render(): React.ReactNode {
+  render(): JSX.Element {
     const {
       commands,
       sessionStatus,

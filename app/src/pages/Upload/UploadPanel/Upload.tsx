@@ -52,7 +52,7 @@ export class Upload extends React.Component<UploadProps, UploadState> {
     this.setState({ uploadedFile: null })
   }
 
-  render(): React.ReactNode {
+  render(): JSX.Element {
     const { uploadedFile } = this.state
     const { filename } = this.props
 

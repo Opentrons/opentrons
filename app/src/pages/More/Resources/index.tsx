@@ -4,7 +4,7 @@ import { Page } from '../../../atoms/Page'
 import { ResourceCard } from './ResourceCard'
 import { CardContainer, CardRow } from '../../../atoms/layout'
 
-export function Resources(): React.ReactNode {
+export function Resources(): JSX.Element {
   return (
     <Page titleBarProps={{ title: 'Resources' }}>
       <CardContainer>

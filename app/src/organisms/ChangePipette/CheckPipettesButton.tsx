@@ -25,7 +25,7 @@ export type CheckPipetteButtonProps = {
 
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps
-): React.ReactNode {
+): JSX.Element {
   const { robotName, onDone, className, children, hidden = false } = props
   const fetchPipettesRequestId = React.useRef<string | null>(null)
   const [dispatch] = useDispatchApiRequests<FetchPipettesAction>(

@@ -13,7 +13,7 @@ import { ModalCopy } from './ModalCopy'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-export function LostConnectionAlert(): React.ReactNode {
+export function LostConnectionAlert(): JSX.Element {
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
 

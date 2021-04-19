@@ -95,7 +95,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 }
 export function CalibratePipetteOffset(
   props: CalibratePipetteOffsetParentProps
-): React.ReactNode {
+): JSX.Element {
   const {
     session,
     robotName,

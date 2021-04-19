@@ -94,7 +94,7 @@ function StatusIcon(props: { match: boolean }) {
 
 function BuildOffsetText(props: {
   offsetData: [number, number, number],
-}): React.ReactNode {
+}): JSX.Element {
   const { offsetData } = props
   const { t } = useTranslation('protocol_info')
   return (

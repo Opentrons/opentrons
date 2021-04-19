@@ -7,7 +7,7 @@ import { AnalyticsSettingsCard } from './AnalyticsSettingsCard'
 import { AppSoftwareSettingsCard } from './AppSoftwareSettingsCard'
 import { AppAdvancedSettingsCard } from './AppAdvancedSettingsCard'
 
-export function AppSettings(): React.ReactNode {
+export function AppSettings(): JSX.Element {
   return (
     <Page titleBarProps={{ title: 'App' }}>
       <Box margin={SPACING_3}>

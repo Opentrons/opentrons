@@ -11,7 +11,7 @@ export type ConfirmStartDeckCalModalProps = {
 
 export function ConfirmStartDeckCalModal(
   props: ConfirmStartDeckCalModalProps
-): React.ReactNode {
+): JSX.Element {
   const { cancel, confirm } = props
   const { t } = useTranslation(['robot_calibration', 'shared'])
 

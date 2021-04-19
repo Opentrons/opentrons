@@ -27,7 +27,7 @@ const buildTiprackRequest: (string, string) => string = (displayName, slot) =>
 
 export function ConfirmCrashRecoveryModal(
   props: ConfirmCrashRecoveryModalProps
-): React.ReactNode {
+): JSX.Element {
   const {
     back,
     confirm,

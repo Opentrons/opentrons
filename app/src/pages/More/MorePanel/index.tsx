@@ -12,7 +12,7 @@ const ITEMS = [
   { label: 'Resources', url: '/more/resources' },
 ]
 
-export function MorePanel(): React.ReactNode {
+export function MorePanel(): JSX.Element {
   return (
     <SidePanel title={MORE}>
       <div className={styles.menu_panel}>

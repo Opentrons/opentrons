@@ -18,7 +18,7 @@ const CLICK_HERE = 'click here'
 
 export function SkipAppUpdateMessage(
   props: SkipAppUpdateMessageProps
-): React.ReactNode {
+): JSX.Element {
   return (
     <Text paddingLeft={SPACING_3}>
       {SKIP_APP_MESSAGE}

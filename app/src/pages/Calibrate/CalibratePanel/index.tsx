@@ -14,7 +14,7 @@ import styles from './styles.css'
 
 import type { State } from '../../../redux/types'
 
-export function CalibratePanel(): React.ReactNode {
+export function CalibratePanel(): JSX.Element {
   const { t } = useTranslation('protocol_calibration')
   const robotName = useSelector(robotSelectors.getConnectedRobotName)
 

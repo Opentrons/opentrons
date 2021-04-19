@@ -35,7 +35,7 @@ export const PipetteList: React.AbstractComponent<PipetteListComponentProps> = w
 
 export function PipetteListComponent(
   props: PipetteListComponentProps
-): React.ReactNode {
+): JSX.Element {
   const { t } = useTranslation('protocol_calibration')
   const dispatch = useDispatch<Dispatch>()
 

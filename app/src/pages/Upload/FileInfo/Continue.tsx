@@ -23,7 +23,7 @@ import {
 const PROCEED_TO_CALIBRATE = 'Proceed to Calibrate'
 const VERIFY_CALIBRATIONS = 'Verify pipette and labware calibrations'
 
-export function Continue(): React.ReactNode {
+export function Continue(): JSX.Element {
   const { path, disabledReason } = useSelector(getCalibrateLocation)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,

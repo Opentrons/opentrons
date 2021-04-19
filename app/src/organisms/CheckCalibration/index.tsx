@@ -101,7 +101,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 
 export function CheckCalibration(
   props: CalibrationCheckParentProps
-): React.ReactNode {
+): JSX.Element {
   const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const {
     currentStep,

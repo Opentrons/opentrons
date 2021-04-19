@@ -47,7 +47,7 @@ export interface ChosenTipRackRenderProps {
 
 export function ChosenTipRackRender(
   props: ChosenTipRackRenderProps
-): React.ReactNode {
+): JSX.Element {
   const { showCalibrationText, selectedValue, tipRackByUriMap } = props
   const loadName = selectedValue.value.split('/')[1]
   const displayName = selectedValue.label
