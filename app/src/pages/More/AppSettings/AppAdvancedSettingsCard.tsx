@@ -94,7 +94,7 @@ export function AppAdvancedSettingsCard(): JSX.Element {
             // field whose values are only the elements of BlockSelection; but sadly,
             // neither of us can get Flow to know it
             handleUseTrashSelection(
-              ((event.currentTarget.valueas any): BlockSelection)
+              ((event.currentTarget.value as any): BlockSelection)
             )
           }}
           options={[

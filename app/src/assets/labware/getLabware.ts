@@ -6,7 +6,7 @@ import type {
 
 // require all definitions in the labware/definitions/1 directory
 // require.context is webpack-specific method
-const labwareSchemaV1DefsContext = (requireas any).context(
+const labwareSchemaV1DefsContext = (require as any).context(
   '@opentrons/shared-data/labware/definitions/1',
   true, // traverse subdirectories
   /\.json$/, // import filter
@@ -32,7 +32,7 @@ export function getLegacyLabwareDef(
 
 // require all definitions in the labware/definitions/2 directory
 // require.context is webpack-specific method
-const labwareSchemaV2DefsContext = (requireas any).context(
+const labwareSchemaV2DefsContext = (require as any).context(
   '@opentrons/shared-data/labware/definitions/2',
   true, // traverse subdirectories
   /\.json$/, // import filter
@@ -49,7 +49,7 @@ function getLatestLabwareDefs(): LabwareDefinition2[] {
       .map(name => labwareSchemaV2DefsContext(name))
     // group by namespace + loadName
     const labwareDefGroups: {
-      [groupKey: string]: LabwareDefinition2[],
+      [groupKey: string]: LabwareDefinition2[]
     } = groupBy(allDefs, d => `${d.namespace}/${d.parameters.loadName}`)
 
     labwareSchemaV2Defs = Object.keys(labwareDefGroups).map(

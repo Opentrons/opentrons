@@ -39,7 +39,7 @@ describe('analytics selectors', () => {
   let mockState: MockState
 
   beforeEach(() => {
-    mockState = ({ mockState: true }as any)
+    mockState = ({ mockState: true } as any)
   })
 
   afterEach(() => {

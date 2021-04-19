@@ -24,7 +24,7 @@ describe('robot-api http client', () => {
   beforeAll(() => {
     global.fetch = fetch
     testApp = express()
-    testApp.use((expressas any).json())
+    testApp.use((express as any).json())
 
     return portfinder.getPortPromise({ port: 31950 }).then(port => {
       testPort = port
@@ -200,7 +200,7 @@ describe('robot-api http client', () => {
       '/file',
       multer({ storage: multer.memoryStorage() }).any(),
       (req, res) => {
-        const files = (reqas any).files ?? []
+        const files = (req as any).files ?? []
 
         res.status(201).send({
           files: files.map(f => ({

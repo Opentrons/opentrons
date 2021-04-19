@@ -238,7 +238,7 @@ describe('<SelectNetwork />', () => {
       it('closes spinner and shows success when disconnect succeeds', () => {
         disconnectAndSetMockRequestState({
           status: RobotApi.SUCCESS,
-          response: ({}as any),
+          response: ({} as any),
         })
 
         expect(wrapper.find(DisconnectModal)).toHaveLength(0)
@@ -259,14 +259,14 @@ describe('<SelectNetwork />', () => {
 
         expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
-          RobotApi.dismissRequest(((requestIdas any): string))
+          RobotApi.dismissRequest(((requestId as any): string))
         )
       })
 
       it('closes spinner and shows failure if disconnect fails', () => {
         disconnectAndSetMockRequestState({
           status: RobotApi.FAILURE,
-          response: ({}as any),
+          response: ({} as any),
           error: { message: 'oh no!' },
         })
 
@@ -288,7 +288,7 @@ describe('<SelectNetwork />', () => {
 
         expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
-          RobotApi.dismissRequest(((requestIdas any): string))
+          RobotApi.dismissRequest(((requestId as any): string))
         )
       })
     })
@@ -426,7 +426,7 @@ describe('<SelectNetwork />', () => {
       it('closes spinner and shows success if connect succeeds', () => {
         connectAndSetMockRequestState({
           status: RobotApi.SUCCESS,
-          response: ({}as any),
+          response: ({} as any),
         })
 
         expect(wrapper.find(ConnectModal)).toHaveLength(0)
@@ -447,14 +447,14 @@ describe('<SelectNetwork />', () => {
 
         expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
-          RobotApi.dismissRequest(((requestIdas any): string))
+          RobotApi.dismissRequest(((requestId as any): string))
         )
       })
 
       it('closes spinner and shows failure if connect fails', () => {
         connectAndSetMockRequestState({
           status: RobotApi.FAILURE,
-          response: ({}as any),
+          response: ({} as any),
           error: { message: 'oh no!' },
         })
 
@@ -476,7 +476,7 @@ describe('<SelectNetwork />', () => {
 
         expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
-          RobotApi.dismissRequest(((requestIdas any): string))
+          RobotApi.dismissRequest(((requestId as any): string))
         )
       })
 

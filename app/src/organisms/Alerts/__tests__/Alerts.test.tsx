@@ -32,7 +32,7 @@ jest.mock('../../../redux/alerts/selectors')
 const getActiveAlerts: JestMockFn<[State], $ReadOnlyAlertId[]> =
   AppAlerts.getActiveAlerts
 
-const MOCK_STATE: State = ({ mockState: true }as any)
+const MOCK_STATE: State = ({ mockState: true } as any)
 
 describe('app-wide Alerts component', () => {
   const render = () => {

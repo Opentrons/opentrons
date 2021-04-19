@@ -12,7 +12,7 @@ import type { Config } from '../../../../redux/config/types'
 
 jest.mock('../../../../redux/config/selectors')
 
-const MOCK_STATE: State = ({ mockState: true }as any)
+const MOCK_STATE: State = ({ mockState: true } as any)
 
 const getConfig: JestMockFn<[State], Partial<Config> | null> = Cfg.getConfig
 

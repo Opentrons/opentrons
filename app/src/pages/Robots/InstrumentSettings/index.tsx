@@ -43,7 +43,7 @@ export function InstrumentSettings(props: InstrumentSettingsProps): JSX.Element 
           render={routeProps => (
             <ChangePipette
               robotName={robotName}
-              mount={(routeProps.match.params.mountas any)}
+              mount={(routeProps.match.params.mount as any)}
               closeModal={routeProps.history.goBack}
             />
           )}
@@ -53,7 +53,7 @@ export function InstrumentSettings(props: InstrumentSettingsProps): JSX.Element 
           render={routeProps => (
             <ConfigurePipette
               robotName={robotName}
-              mount={(routeProps.match.params.mountas any)}
+              mount={(routeProps.match.params.mount as any)}
               closeModal={routeProps.history.goBack}
             />
           )}

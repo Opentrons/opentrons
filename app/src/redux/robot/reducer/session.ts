@@ -18,46 +18,34 @@ import type {
 import type { InvalidProtocolFileAction } from '../../protocol/types'
 import type { SessionUpdateAction } from '../actions'
 
-type Request = {
-  inProgress: boolean,
-  error: ?{ message: string },
+interface Request {
+  inProgress: boolean
+  error: { message: string } | null | undefined
 }
 
-export type SessionState = {
-  sessionRequest: Request,
-  state: SessionStatus,
-  statusInfo: SessionStatusInfo,
+export interface SessionState {
+  sessionRequest: Request
+  state: SessionStatus
+  statusInfo: SessionStatusInfo
   // TODO(aa, 2020-06-01): DoorState is not currently used anywhere yet
-  doorState: DoorState,
-  blocked: boolean,
-  errors: Array<{
-    timestamp: number,
-    line: number,
-    message: string,
-  }>,
+  doorState: DoorState
+  blocked: boolean
+  errors: { timestamp: number; line: number; message: string }[]
   // TODO(mc, 2018-01-11): command IDs should be strings
-  protocolCommands: number[],
-  protocolCommandsById: {
-    [number]: Command,
-  },
-  pipettesByMount: {
-    [Mount]: StatePipette,
-  },
-  labwareBySlot: {
-    [Slot]: StateLabware,
-  },
-  modulesBySlot: {
-    [Slot]: SessionModule,
-  },
-  runRequest: Request,
-  pauseRequest: Request,
-  resumeRequest: Request,
-  cancelRequest: Request,
-  remoteTimeCompensation: number | null,
-  startTime: ?number,
-  runTime: number,
-  apiLevel: [number, number] | null,
-  capabilities: string[],
+  protocolCommands: number[]
+  protocolCommandsById: { [id: number]: Command }
+  pipettesByMount: { [mount: Mount]: StatePipette }
+  labwareBySlot: { [slot: Slot]: StateLabware }
+  modulesBySlot: { [slot: Slot]: SessionModule }
+  runRequest: Request
+  pauseRequest: Request
+  resumeRequest: Request
+  cancelRequest: Request
+  remoteTimeCompensation: number | null
+  startTime: number | null | undefined
+  runTime: number
+  apiLevel: [number, number] | null
+  capabilities: string[]
 }
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
@@ -228,7 +216,7 @@ function handleSessionInProgress(state: SessionState): SessionState {
   }
 }
 
-function handleSessionResponse(state: SessionState, actionas any): SessionState {
+function handleSessionResponse(state: SessionState, action: any): SessionState {
   const { payload } = action
 
   if (payload.error) {
@@ -260,11 +248,11 @@ function handleInvalidFile(
   }
 }
 
-function handleRun(state: SessionState, actionas any): SessionState {
+function handleRun(state: SessionState, action: any): SessionState {
   return { ...state, runTime: 0, runRequest: { inProgress: true, error: null } }
 }
 
-function handleRunResponse(state: SessionState, actionas any): SessionState {
+function handleRunResponse(state: SessionState, action: any): SessionState {
   const { error, payload } = action
 
   if (error) {
@@ -274,15 +262,15 @@ function handleRunResponse(state: SessionState, actionas any): SessionState {
   return { ...state, runRequest: { inProgress: false, error: null } }
 }
 
-function handleTickRunTime(state: SessionState, actionas any): SessionState {
+function handleTickRunTime(state: SessionState, action: any): SessionState {
   return { ...state, runTime: Date.now() }
 }
 
-function handlePause(state: SessionState, actionas any): SessionState {
+function handlePause(state: SessionState, action: any): SessionState {
   return { ...state, pauseRequest: { inProgress: true, error: null } }
 }
 
-function handlePauseResponse(state: SessionState, actionas any): SessionState {
+function handlePauseResponse(state: SessionState, action: any): SessionState {
   const { error, payload } = action
 
   if (error) {
@@ -292,11 +280,11 @@ function handlePauseResponse(state: SessionState, actionas any): SessionState {
   return { ...state, pauseRequest: { inProgress: false, error: null } }
 }
 
-function handleResume(state: SessionState, actionas any): SessionState {
+function handleResume(state: SessionState, action: any): SessionState {
   return { ...state, resumeRequest: { inProgress: true, error: null } }
 }
 
-function handleResumeResponse(state: SessionState, actionas any): SessionState {
+function handleResumeResponse(state: SessionState, action: any): SessionState {
   const { error, payload } = action
 
   if (error) {
@@ -306,11 +294,11 @@ function handleResumeResponse(state: SessionState, actionas any): SessionState {
   return { ...state, resumeRequest: { inProgress: false, error: null } }
 }
 
-function handleCancel(state: SessionState, actionas any): SessionState {
+function handleCancel(state: SessionState, action: any): SessionState {
   return { ...state, cancelRequest: { inProgress: true, error: null } }
 }
 
-function handleCancelResponse(state: SessionState, actionas any): SessionState {
+function handleCancelResponse(state: SessionState, action: any): SessionState {
   const { error, payload } = action
   if (error) {
     return { ...state, cancelRequest: { inProgress: false, error: payload } }

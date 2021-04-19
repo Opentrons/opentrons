@@ -23,7 +23,7 @@ const mockRobot: ViewableRobot = ({
   connected: true,
   status: CONNECTABLE,
   ip: '1.2.3.4',
-}as any)
+} as any)
 
 const mockGetInternetStatus: JestMockFn<
   [State, string],
@@ -87,11 +87,11 @@ describe('ConnectionCard', () => {
   it('passes type ConnectionStatusMessage based on robot.local', () => {
     mockGetInternetStatus.mockReturnValue(Networking.STATUS_FULL)
 
-    const localRobot: ViewableRobot = ({ ...mockRobot, local: true }as any)
+    const localRobot: ViewableRobot = ({ ...mockRobot, local: true } as any)
     const { wrapper: localWrapper } = render(localRobot)
     const localStatus = localWrapper.find(ConnectionStatusMessage)
 
-    const wifiRobot: ViewableRobot = ({ ...mockRobot, local: false }as any)
+    const wifiRobot: ViewableRobot = ({ ...mockRobot, local: false } as any)
     const { wrapper: wifiWrapper } = render(wifiRobot)
     const wifiStatus = wifiWrapper.find(ConnectionStatusMessage)
 

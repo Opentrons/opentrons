@@ -22,7 +22,7 @@ const mockFetchRobotApi: JestMockFn<
 const mockGetRobotByName: JestMockFn<
   [State, string],
   RobotHost
-> = (DiscoverySelectors.getRobotByNameas any)
+> = (DiscoverySelectors.getRobotByName as any)
 
 export type EpicTestMocks<A, R> = {
   state: State,
@@ -48,7 +48,7 @@ export const setupEpicTestMocks = <
   makeTriggerAction?: (robotName: string) => A,
   mockResponse?: R
 ): EpicTestMocks<A, R> => {
-  const mockState: State = ({ state: true, mock: true } as any)
+  const mockState: State = ({ state: true, mock: true }  as any)
   const triggerAction =
     typeof makeTriggerAction === 'function'
       ? makeTriggerAction(mockRobot.name)
@@ -84,7 +84,7 @@ export const setupEpicTestMocks = <
 
 export const runEpicTest = <A, R: RobotApiResponse>(
   epicMocks: EpicTestMocks<A, R>,
-  run: (schedularArgsas any) => mixed
+  run: (schedularArgs as any) => mixed
 ) => {
   const { testScheduler, fetchRobotApi, response } = epicMocks
 

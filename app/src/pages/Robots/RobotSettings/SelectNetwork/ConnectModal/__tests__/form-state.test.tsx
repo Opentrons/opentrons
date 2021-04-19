@@ -35,7 +35,7 @@ describe('ConnectModal state hooks', () => {
 
     const mockFormOnce = (values, errors = {}, touched = {}) => {
       useFormikContext.mockReturnValueOnce(
-        ({ values, errors, touched, setValues, setErrors, setTouched }as any)
+        ({ values, errors, touched, setValues, setErrors, setTouched } as any)
       )
     }
 

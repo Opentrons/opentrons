@@ -1,4 +1,3 @@
-
 import { makeEvent } from '../make-event'
 
 import * as Alerts from '../../alerts'

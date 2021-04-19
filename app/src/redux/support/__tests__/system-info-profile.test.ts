@@ -1,4 +1,3 @@
-
 import { makeProfileUpdate } from '../profile'
 
 import * as SystemInfo from '../../system-info'

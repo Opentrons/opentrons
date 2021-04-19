@@ -24,7 +24,7 @@ jest.mock('react-router-dom', () => ({ Link: () => <></> }))
 const getShellUpdateState: JestMockFn<[State], Partial<ShellUpdateState>> =
   Shell.getShellUpdateState
 
-const MOCK_STATE: State = ({ mockState: true }as any)
+const MOCK_STATE: State = ({ mockState: true } as any)
 
 describe('UpdateAppModal', () => {
   const closeModal = jest.fn()

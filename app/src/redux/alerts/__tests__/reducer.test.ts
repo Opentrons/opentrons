@@ -1,4 +1,3 @@
-
 import * as Actions from '../actions'
 import { alertsReducer } from '../reducer'
 

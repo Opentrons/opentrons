@@ -69,7 +69,7 @@ jest.mock('../AdvancedSettingsCard', () => ({
   AdvancedSettingsCard: () => <></>,
 }))
 
-const MOCK_STATE: State = ({ mockState: true }as any)
+const MOCK_STATE: State = ({ mockState: true } as any)
 const ROBOT_URL = `/robots/${mockConnectableRobot.name}`
 
 const getConnectRequest: JestMockFn<

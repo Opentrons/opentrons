@@ -44,36 +44,36 @@ describe('custom labware selectors', () => {
           listFailureMessage: null,
           filenames: ['4.json', '2.json', '1.json', '3.json'],
           filesByName: {
-            '4.json': ({}as any),
+            '4.json': ({} as any),
             '2.json': ({
               definition: {
                 metadata: { displayCategory: 'A', displayName: 'B' },
               },
-            }as any),
+            } as any),
             '1.json': ({
               definition: {
                 metadata: { displayCategory: 'A', displayName: 'A' },
               },
-            }as any),
+            } as any),
             '3.json': ({
               definition: {
                 metadata: { displayCategory: 'B', displayName: 'A' },
               },
-            }as any),
+            } as any),
           },
         },
       },
       expected: [
         ({
           definition: { metadata: { displayCategory: 'A', displayName: 'A' } },
-        }as any),
+        } as any),
         ({
           definition: { metadata: { displayCategory: 'A', displayName: 'B' } },
-        }as any),
+        } as any),
         ({
           definition: { metadata: { displayCategory: 'B', displayName: 'A' } },
-        }as any),
-        ({}as any),
+        } as any),
+        ({} as any),
       ],
     },
 
@@ -141,7 +141,7 @@ describe('custom labware selectors', () => {
           labware: {
             directory: '/path/to/labware',
           },
-        }as any),
+        } as any),
       },
       expected: '/path/to/labware',
     },
