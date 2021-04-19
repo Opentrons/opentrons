@@ -5,6 +5,7 @@ from decoy import Decoy
 from opentrons.protocol_api_experimental.instrument_context import InstrumentContext
 from opentrons.protocol_api_experimental.labware import Well, Labware
 from opentrons.protocol_engine.clients import SyncClient
+from opentrons.protocol_engine.types import WellLocation, WellOrigin
 
 
 @pytest.fixture
@@ -74,4 +75,26 @@ def test_drop_tip(
         pipette_id=pipette_id,
         labware_id=well.parent.resource_id,
         well_name=well.well_name
+    ))
+
+
+def test_aspirate(
+    decoy: Decoy,
+    sync_client: SyncClient,
+    pipette_id: str,
+    subject: InstrumentContext,
+    well: Well
+) -> None:
+    """It should send an aspirate command to the SyncClient."""
+    subject.aspirate(volume=12345.6789, location=well, rate=1.0)
+
+    decoy.verify(sync_client.aspirate(
+        pipette_id=pipette_id,
+        labware_id=well.parent.resource_id,
+        well_name=well.well_name,
+        well_location=WellLocation(
+            origin=WellOrigin.TOP,
+            offset=(0, 0, 1)
+        ),
+        volume=12345.6789
     ))
