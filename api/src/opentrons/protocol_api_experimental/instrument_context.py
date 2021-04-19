@@ -58,7 +58,6 @@ class InstrumentContext:  # noqa: D101
                  volume: Optional[float] = None,
                  location: Union[types.Location, Well] = None,
                  rate: float = 1.0) -> InstrumentContext:
-        # noqa: D102
 
         if volume is None or volume == 0:
             # todo(mm, 2021-04-14): If None or 0, use highest volume possible.
