@@ -24,9 +24,6 @@ class PipetteContext(AbstractInstrument):
     def aspirate(self,
                  volume: float,
                  rate: float) -> None:
-        if rate != 1:
-            raise NotImplementedError(
-                "Protocol Engine does not yet support adjusting flow rate.")
         raise NotImplementedError()
 
     def dispense(self,
