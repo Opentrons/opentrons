@@ -131,6 +131,37 @@ def test_drop_tip(
     assert result == response
 
 
+def test_aspirate(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should send an AspirateCommand through the transport."""
+    request = commands.AspirateRequest(
+        pipetteId="123", labwareId="456", wellName="A2",
+        wellLocation=WellLocation(
+            origin=WellOrigin.BOTTOM,
+            offset=(0, 0, 1)
+        ),
+        volume=123.45
+    )
+
+    result_from_transport = commands.AspirateResult(volume=67.89)
+
+    decoy.when(
+        transport.execute_command(request=request, command_id=UUID_MATCHER)
+    ).then_return(result_from_transport)
+
+    result = subject.aspirate(
+        pipette_id="123", labware_id="456", well_name="A2",
+        well_location=WellLocation(origin=WellOrigin.BOTTOM,
+                                   offset=(0, 0, 1)),
+        volume=10,
+    )
+
+    assert result == result_from_transport
+
+
 def test_dispense(
     decoy: Decoy,
     transport: AbstractSyncTransport,
