@@ -13,7 +13,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 # decouple from the v2 opentrons.protocol_api?
 from opentrons.protocol_api import PairedInstrumentContext
 from opentrons.protocol_api.instrument_context import AdvancedLiquidHandling
-from opentrons import protocol_engine
+from opentrons.protocol_engine import WellLocation, WellOrigin
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 # todo(mm, 2021-04-09): How customer-facing are these classes? Should they be
@@ -84,8 +84,8 @@ class InstrumentContext:
                 pipette_id=self._resource_id,
                 labware_id=location.parent.resource_id,
                 well_name=location.well_name,
-                well_location=protocol_engine.WellLocation(
-                    origin=protocol_engine.WellOrigin.BOTTOM,
+                well_location=WellLocation(
+                    origin=WellOrigin.BOTTOM,
                     # todo(mm, 2021-04-14): Get default offset in well via
                     # self.well_bottom_clearance.aspirate, instead of hard-coding.
                     offset=(0, 0, 1)
