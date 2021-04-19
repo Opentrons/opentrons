@@ -82,6 +82,29 @@ class SyncClient:
         )
         return cast(commands.DropTipResult, result)
 
+    def aspirate(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+        volume: float,
+    ) -> commands.AspirateResult:
+        """Execute an ``AspirateRequest``, returning the result."""
+        request = commands.AspirateRequest(
+            pipetteId=pipette_id,
+            labwareId=labware_id,
+            wellName=well_name,
+            wellLocation=well_location,
+            volume=volume,
+        )
+        result = self._transport.execute_command(
+            request=request,
+            command_id=self._create_command_id()
+        )
+
+        return cast(commands.AspirateResult, result)
+
     def dispense(
             self,
             pipette_id: str,
