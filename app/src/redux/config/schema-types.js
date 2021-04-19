@@ -7,9 +7,7 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
 export type DiscoveryCandidates = string | Array<string>
 
-export type DevInternalFlag =
-  | 'allPipetteConfig'
-  | 'enableBundleUpload'
+export type DevInternalFlag = 'allPipetteConfig' | 'enableBundleUpload'
 
 export type FeatureFlags = $Shape<{|
   [DevInternalFlag]: boolean | void,
