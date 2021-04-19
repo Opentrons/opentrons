@@ -8,8 +8,9 @@
   },
   "author": "Opentrons Labworks",
   "license": "Apache-2.0",
-  "main": "js/index.js",
-  "types": "index.d.ts",
+  "source": "js/index.ts",
+  "types": "lib/index.d.ts",
+  "flow:main": "flow-types/index.js.flow",
   "dependencies": {
     "ajv": "6.10.2",
     "lodash": "4.17.15"
