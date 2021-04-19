@@ -57,7 +57,7 @@ ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
 ot_resources := $(filter %,$(shell $(SHX) find src/opentrons/resources))
 ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 
-ot_tests_to_typecheck := tests/opentrons/protocol_engine tests/opentrons/motion_planning
+ot_tests_to_typecheck := tests/opentrons/protocol_api_experimental tests/opentrons/protocol_engine tests/opentrons/motion_planning
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
