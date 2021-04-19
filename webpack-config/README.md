@@ -117,7 +117,6 @@ module.exports = merge.strategy({ 'module.rules': 'replace' })(baseConfig, {
 | key        | loaders                                    | matches             |
 | ---------- | ------------------------------------------ | ------------------- |
 | js         | babel-loader                               | \*.js               |
-| worker     | worker-loader                              | \*.worker.js        |
 | globalCss  | css-loader, postcss-loader                 | \*.global.css       |
 | localCss   | css-loader (modules: true), postcss-loader | !(global).css       |
 | handlebars | handlebars-loader                          | \*.hbs              |
