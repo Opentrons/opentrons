@@ -147,6 +147,53 @@ async def test_location_cache(ctx, monkeypatch, get_labware_def, hardware):
     assert test_args[0].labware.as_well() == lw.wells()[0]
 
 
+async def test_location_cache_two_pipettes(ctx, get_labware_def, hardware):
+    """It should be invalidated when next movement is a different pipette
+    than the cached location."""
+    ctx.home()
+    left = ctx.load_instrument('p10_single', Mount.LEFT)
+    right = ctx.load_instrument('p10_single', Mount.RIGHT)
+
+    left_loc = Location(point=Point(1, 2, 3), labware="1")
+    right_loc = Location(point=Point(3, 4, 5), labware="2")
+
+    with mock.patch.object(papi_geometry.planning, "plan_moves") as m:
+        # The first moves. The location cache is empty.
+        left.move_to(left_loc)
+        assert m.call_args[0][0].labware.is_empty
+        assert m.call_args[0][1] == left_loc
+        # The second move the location cache is not used because we're moving
+        # a different pipette.
+        right.move_to(right_loc)
+        assert m.call_args[0][0].labware.is_empty
+        assert m.call_args[0][1] == right_loc
+
+
+async def test_location_cache_two_pipettes_fails_pre_2_10(
+        ctx,
+        get_labware_def, hardware
+):
+    """It should reuse location cache even if cached location was set by
+    move of a different pipette."""
+    ctx.home()
+    left = ctx.load_instrument('p10_single', Mount.LEFT)
+    right = ctx.load_instrument('p10_single', Mount.RIGHT)
+    left._implementation._api_version = APIVersion(2, 9)
+    right._implementation._api_version = APIVersion(2, 9)
+
+    left_loc = Location(point=Point(1, 2, 3), labware="1")
+    right_loc = Location(point=Point(3, 4, 5), labware="2")
+
+    with mock.patch.object(papi_geometry.planning, "plan_moves") as m:
+        # The first moves. The location cache is empty.
+        left.move_to(left_loc)
+        assert m.call_args[0][0].labware.is_empty
+        assert m.call_args[0][1] == left_loc
+        right.move_to(right_loc)
+        assert m.call_args[0][0].labware == left_loc.labware
+        assert m.call_args[0][1] == right_loc
+
+
 async def test_move_uses_arc(ctx, monkeypatch, get_labware_def, hardware):
     ctx.connect(hardware)
     ctx.home()
@@ -207,7 +254,7 @@ def test_pick_up_and_drop_tip(ctx, get_labware_def):
 
     instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa E501
+    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa: E501
     nozzle_offset = Point(*pipette.config.nozzle_offset)
     assert pipette.critical_point() == nozzle_offset
     target_location = tiprack['A1'].top()
@@ -216,7 +263,7 @@ def test_pick_up_and_drop_tip(ctx, get_labware_def):
     assert not tiprack.wells()[0].has_tip
     overlap = instr.hw_pipette['tip_overlap'][tiprack.uri]
     new_offset = nozzle_offset - Point(0, 0,
-                                       tip_length-overlap)
+                                       tip_length - overlap)
     assert pipette.critical_point() == new_offset
     assert pipette.has_tip
 
@@ -243,7 +290,7 @@ def test_return_tip_old_version(loop, get_labware_def):
     with pytest.raises(TypeError):
         instr.return_tip()
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa E501
+    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa: E501
 
     target_location = tiprack['A1'].top()
     instr.pick_up_tip(target_location)
@@ -269,7 +316,7 @@ def test_return_tip(ctx, get_labware_def):
     with pytest.raises(TypeError):
         instr.return_tip()
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa E501
+    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa: E501
 
     target_location = tiprack['A1'].top()
     instr.pick_up_tip(target_location)
@@ -293,7 +340,7 @@ def test_use_filter_tips(ctx, get_labware_def):
     mount = Mount.LEFT
 
     instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa E501
+    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa: E501
 
     assert pipette.available_volume == pipette.config.max_volume
 
@@ -322,7 +369,7 @@ def test_pick_up_tip_no_location(ctx, get_labware_def,
     instr = ctx.load_instrument(
         pipette_model, mount, tip_racks=[tiprack1, tiprack2])
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa E501
+    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa: E501
     nozzle_offset = Point(*pipette.config.nozzle_offset)
     assert pipette.critical_point() == nozzle_offset
 
@@ -333,7 +380,7 @@ def test_pick_up_tip_no_location(ctx, get_labware_def,
     assert not tiprack1.wells()[0].has_tip
     overlap = instr.hw_pipette['tip_overlap'][tiprack1.uri]
     new_offset = nozzle_offset - Point(0, 0,
-                                       tip_length1-overlap)
+                                       tip_length1 - overlap)
     assert pipette.critical_point() == new_offset
 
     # TODO: remove argument and verify once trash container is added
@@ -832,7 +879,7 @@ def test_loaded_modules(ctx, monkeypatch):
     assert ctx.loaded_modules[7] == mod2
 
 
-def test_order_of_module_load(loop):
+def test_order_of_module_load(loop, hardware):
     import opentrons.hardware_control as hardware_control
     import opentrons.protocol_api as protocol_api
 
@@ -847,7 +894,7 @@ def test_order_of_module_load(loop):
     hw_temp2 = attached_modules[2]
 
     ctx1 = protocol_api.ProtocolContext(
-        implementation=ProtocolContextImplementation(),
+        implementation=ProtocolContextImplementation(hardware=hardware),
         loop=loop)
     with ctx1.temp_connect(fake_hardware) as c:
         temp1 = c.load_module('tempdeck', 4)
@@ -863,7 +910,7 @@ def test_order_of_module_load(loop):
     # hardware modules regardless of the slot it
     # was loaded into
     ctx2 = protocol_api.ProtocolContext(
-        implementation=ProtocolContextImplementation(),
+        implementation=ProtocolContextImplementation(hardware=hardware),
         loop=loop)
 
     with ctx2.temp_connect(fake_hardware) as c:
@@ -926,7 +973,7 @@ def test_tip_length_for_load_caldata(ctx):
     delete.clear_tip_length_calibration()
 
 
-def test_bundled_labware(loop, get_labware_fixture):
+def test_bundled_labware(loop, get_labware_fixture, hardware):
     fixture_96_plate = get_labware_fixture('fixture_96_plate')
     bundled_labware = {
         'fixture/fixture_96_plate/1': fixture_96_plate
@@ -934,6 +981,7 @@ def test_bundled_labware(loop, get_labware_fixture):
 
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
+            hardware=hardware,
             bundled_labware=bundled_labware),
         loop=loop
     )
@@ -941,10 +989,10 @@ def test_bundled_labware(loop, get_labware_fixture):
     lw1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
     assert ctx.loaded_labwares[3] == lw1
     assert ctx.loaded_labwares[3]._implementation.get_definition() ==\
-           fixture_96_plate
+        fixture_96_plate
 
 
-def test_bundled_labware_missing(loop, get_labware_fixture):
+def test_bundled_labware_missing(loop, get_labware_fixture, hardware):
     bundled_labware = {}
     with pytest.raises(
         RuntimeError,
@@ -952,7 +1000,9 @@ def test_bundled_labware_missing(loop, get_labware_fixture):
     ):
         ctx = papi.ProtocolContext(
             implementation=ProtocolContextImplementation(
-                bundled_labware=bundled_labware),
+                bundled_labware=bundled_labware,
+                hardware=hardware
+            ),
             loop=loop)
         ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
 
@@ -967,54 +1017,64 @@ def test_bundled_labware_missing(loop, get_labware_fixture):
         ctx = papi.ProtocolContext(
             implementation=ProtocolContextImplementation(
                 bundled_labware={},
-                extra_labware=bundled_labware),
+                extra_labware=bundled_labware,
+                hardware=hardware
+            ),
             loop=loop
         )
         ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
 
 
-def test_bundled_data(loop):
+def test_bundled_data(loop, hardware):
     bundled_data = {'foo': b'1,2,3'}
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
-            bundled_data=bundled_data),
+            bundled_data=bundled_data,
+            hardware=hardware
+        ),
         loop=loop
     )
     assert ctx.bundled_data == bundled_data
 
 
-def test_extra_labware(loop, get_labware_fixture):
+def test_extra_labware(loop, get_labware_fixture, hardware):
     fixture_96_plate = get_labware_fixture('fixture_96_plate')
     bundled_labware = {
         'fixture/fixture_96_plate/1': fixture_96_plate
     }
     ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(extra_labware=bundled_labware),
+        implementation=ProtocolContextImplementation(
+            extra_labware=bundled_labware, hardware=hardware
+        ),
         loop=loop
     )
 
     ls1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
     assert ctx.loaded_labwares[3] == ls1
     assert ctx.loaded_labwares[3]._implementation.get_definition() ==\
-           fixture_96_plate
+        fixture_96_plate
 
 
-def test_api_version_checking():
+def test_api_version_checking(hardware):
     minor_over = (papi.MAX_SUPPORTED_VERSION.major,
                   papi.MAX_SUPPORTED_VERSION.minor + 1)
     with pytest.raises(RuntimeError):
         papi.ProtocolContext(api_version=minor_over,
-                             implementation=ProtocolContextImplementation())
+                             implementation=ProtocolContextImplementation(
+                                 hardware=hardware
+                             ))
 
     major_over = (papi.MAX_SUPPORTED_VERSION.major + 1,
                   papi.MAX_SUPPORTED_VERSION.minor)
     with pytest.raises(RuntimeError):
         papi.ProtocolContext(api_version=major_over,
-                             implementation=ProtocolContextImplementation())
+                             implementation=ProtocolContextImplementation(
+                                 hardware=hardware
+                             ))
 
 
-def test_api_per_call_checking(monkeypatch):
-    implementation = ProtocolContextImplementation()
+def test_api_per_call_checking(monkeypatch, hardware):
+    implementation = ProtocolContextImplementation(hardware=hardware)
 
     ctx = papi.ProtocolContext(implementation=implementation,
                                api_version=APIVersion(1, 9))
@@ -1035,9 +1095,13 @@ def test_api_per_call_checking(monkeypatch):
         ctx.disconnect()
 
 
-def test_home_plunger(monkeypatch):
-    ctx = papi.ProtocolContext(implementation=ProtocolContextImplementation(),
-                               api_version=APIVersion(2, 0))
+def test_home_plunger(monkeypatch, hardware):
+    ctx = papi.ProtocolContext(
+        implementation=ProtocolContextImplementation(
+            hardware=hardware
+        ),
+        api_version=APIVersion(2, 0)
+    )
     ctx.home()
     instr = ctx.load_instrument('p1000_single', 'left')
     instr.home_plunger()
@@ -1060,7 +1124,7 @@ def test_move_to_with_thermocycler(ctx):
         [ProtocolContextImplementation],
         [ProtocolContextSimulation],
     ])
-def test_temp_connect(implementation_class):
+def test_temp_connect(implementation_class, hardware):
     """Test that temp_connect can be used to assign hardware controller to
     protocol implementation."""
 
@@ -1074,22 +1138,22 @@ def test_temp_connect(implementation_class):
     }
 
     # Create the SynchronousAdapter wrapping the wrappable_hardware.
-    hardware = SynchronousAdapter(wrappable_hardware)
+    temp_hardware = SynchronousAdapter(wrappable_hardware)
 
-    ctx = papi.ProtocolContext(implementation=implementation_class(),
+    ctx = papi.ProtocolContext(implementation=implementation_class(hardware=hardware),
                                api_version=APIVersion(2, 0))
     instr = ctx.load_instrument('p1000_single', 'left')
 
-    with ctx.temp_connect(hardware):
+    with ctx.temp_connect(temp_hardware):
         instr.home()
 
     # Was home_z called on the hardware passed to temp_connect?
-    hardware.home_z.assert_called_once_with(Mount.LEFT)
+    temp_hardware.home_z.assert_called_once_with(Mount.LEFT)
 
     # Clear mock history.
-    hardware.home_z.reset_mock()
+    temp_hardware.home_z.reset_mock()
 
     # Calling. outside context manager will not call temp hardware method.
     instr.home()
 
-    hardware.home_z.assert_not_called()
+    temp_hardware.home_z.assert_not_called()

@@ -15,7 +15,7 @@ if os.name == 'posix':
 HERE = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(os.path.join(HERE, '..', 'scripts'))
 
-from python_build_utils import normalize_version
+from python_build_utils import normalize_version  # noqa: E402
 
 
 def get_version():

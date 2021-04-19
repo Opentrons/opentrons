@@ -1,5 +1,4 @@
-"""
-Protocol engine command models.
+"""Protocol engine command models.
 
 The `protocol_engine.commands` module contains the data models of all
 command requests and results the engine is able to handle. It also contains

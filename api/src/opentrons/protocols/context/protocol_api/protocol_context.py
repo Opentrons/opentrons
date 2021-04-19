@@ -86,6 +86,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
         self._last_location: Optional[types.Location] = None
+        self._last_mount: Optional[types.Mount] = None
         self._loaded_modules: Set['AbstractModule'] = set()
 
     @classmethod
@@ -195,8 +196,8 @@ class ProtocolContextImplementation(AbstractProtocol):
         hc_mod_instance = None
         for mod in available_modules:
             compatible = module_geometry.models_compatible(
-                    module_geometry.module_model_from_string(mod.model()),
-                    resolved_model)
+                module_geometry.module_model_from_string(mod.model()),
+                resolved_model)
             if compatible and mod not in self._loaded_modules:
                 self._loaded_modules.add(mod)
                 hc_mod_instance = SynchronousAdapter(mod)
@@ -295,10 +296,21 @@ class ProtocolContextImplementation(AbstractProtocol):
         """Check if door is closed."""
         return DoorState.CLOSED == self._hw_manager.hardware.door_state
 
-    def get_last_location(self) -> Optional[types.Location]:
+    def get_last_location(
+        self,
+        mount: Optional[types.Mount] = None,
+    ) -> Optional[types.Location]:
         """Get the most recent moved to location."""
-        return self._last_location
+        if mount is None or mount == self._last_mount:
+            return self._last_location
 
-    def set_last_location(self, location: Optional[types.Location]) -> None:
+        return None
+
+    def set_last_location(
+        self,
+        location: Optional[types.Location],
+        mount: Optional[types.Mount] = None,
+    ) -> None:
         """Set the most recent moved to location."""
         self._last_location = location
+        self._last_mount = mount

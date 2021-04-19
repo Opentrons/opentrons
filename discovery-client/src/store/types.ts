@@ -3,9 +3,10 @@ import type {
   ServerHealthResponse,
   HealthErrorResponse,
   HealthPollerResult,
-  MdnsBrowserService,
   DiscoveryClientRobot,
 } from '../types'
+
+import type { MdnsBrowserService } from '../mdns-browser'
 
 import {
   HEALTH_STATUS_UNREACHABLE,

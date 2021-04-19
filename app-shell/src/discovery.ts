@@ -19,7 +19,6 @@ import {
 
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
-import { createNetworkInterfaceMonitor } from './system-info'
 
 import type {
   Address,
@@ -30,7 +29,6 @@ import type {
 
 import type { Action, Dispatch } from './types'
 import type { Config } from './config'
-import type { NetworkInterfaceMonitor } from './system-info'
 
 const log = createLogger('discovery')
 
@@ -38,8 +36,6 @@ const log = createLogger('discovery')
 const FAST_POLL_INTERVAL_MS = 3000
 const SLOW_POLL_INTERVAL_MS = 15000
 const UPDATE_THROTTLE_MS = 500
-const IFACE_MONITOR_SLOW_INTERVAL_MS = 30000
-const IFACE_MONITOR_FAST_INTERVAL_MS = 5000
 
 interface DiscoveryStore {
   robots: DiscoveryClientRobot[]
@@ -139,23 +135,9 @@ export function registerDiscovery(
     }
   })
 
-  let ifaceMonitor: NetworkInterfaceMonitor | undefined
-  const startIfaceMonitor = (pollInterval: number): void => {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-optional-chain
-    ifaceMonitor && ifaceMonitor.stop()
-    ifaceMonitor = createNetworkInterfaceMonitor({
-      pollInterval,
-      onInterfaceChange: () => client.start({}),
-    })
-  }
-
   app.once('will-quit', () => {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-optional-chain
-    ifaceMonitor && ifaceMonitor.stop()
     client.stop()
   })
-
-  startIfaceMonitor(IFACE_MONITOR_SLOW_INTERVAL_MS)
 
   return function handleIncomingAction(action: Action) {
     log.debug('handling action in discovery', { action })
@@ -164,11 +146,9 @@ export function registerDiscovery(
       case UI_INITIALIZED:
       case DISCOVERY_START:
         handleRobots()
-        startIfaceMonitor(IFACE_MONITOR_FAST_INTERVAL_MS)
         return client.start({ healthPollInterval: FAST_POLL_INTERVAL_MS })
 
       case DISCOVERY_FINISH:
-        startIfaceMonitor(IFACE_MONITOR_SLOW_INTERVAL_MS)
         return client.start({ healthPollInterval: SLOW_POLL_INTERVAL_MS })
 
       case DISCOVERY_REMOVE:

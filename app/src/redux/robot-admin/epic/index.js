@@ -6,6 +6,7 @@ import { restartEpic, startDiscoveryOnRestartEpic } from './restartEpic'
 import { fetchResetOptionsEpic } from './fetchResetOptionsEpic'
 import { resetConfigEpic, restartOnResetConfigEpic } from './resetConfigEpic'
 import { syncTimeOnConnectEpic } from './syncTimeOnConnectEpic'
+import { trackRestartsEpic } from './trackRestartsEpic'
 
 import type { Epic } from '../../types'
 
@@ -15,5 +16,6 @@ export const robotAdminEpic: Epic = combineEpics(
   fetchResetOptionsEpic,
   resetConfigEpic,
   restartOnResetConfigEpic,
-  syncTimeOnConnectEpic
+  syncTimeOnConnectEpic,
+  trackRestartsEpic
 )

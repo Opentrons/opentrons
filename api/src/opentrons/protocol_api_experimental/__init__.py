@@ -1,5 +1,4 @@
-"""
-An experimental, in-progress rewrite of the public Python Protocol API v2.
+"""An experimental, in-progress rewrite of the public Python Protocol API v2.
 
 This rewrite is to implement the API in terms of the newer Protocol Engine
 back-end architecture.

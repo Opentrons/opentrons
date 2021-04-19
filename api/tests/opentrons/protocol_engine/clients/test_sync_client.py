@@ -15,6 +15,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import DeckSlotLocation, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
+from opentrons.protocol_engine.types import WellOrigin, WellLocation
 
 
 UUID_MATCHER = matchers.StringMatching(
@@ -125,6 +126,35 @@ def test_drop_tip(
         pipette_id="123",
         labware_id="456",
         well_name="A2"
+    )
+
+    assert result == response
+
+
+def test_dispense(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a dispense command."""
+    request = commands.DispenseRequest(
+        pipetteId="123", labwareId="456", wellName="A2",
+        wellLocation=WellLocation(origin=WellOrigin.BOTTOM,
+                                   offset=(0, 0, 1)),
+        volume=10
+    )
+
+    response = commands.DispenseResult(volume=1)
+
+    decoy.when(
+        transport.execute_command(request=request, command_id=UUID_MATCHER)
+    ).then_return(response)
+
+    result = subject.dispense(
+        pipette_id="123", labware_id="456", well_name="A2",
+        well_location=WellLocation(origin=WellOrigin.BOTTOM,
+                                   offset=(0, 0, 1)),
+        volume=10,
     )
 
     assert result == response

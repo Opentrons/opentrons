@@ -11,8 +11,7 @@ from .pipetting import PipettingHandler
 
 
 class CommandHandlers:
-    """
-    CommandHandlers container class.
+    """CommandHandlers container class.
 
     CommandHandlers wraps various child handlers that define procedures to
     execute the side-effects of commands.

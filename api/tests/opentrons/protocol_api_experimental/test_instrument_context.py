@@ -116,3 +116,23 @@ def test_aspirate_not_implemented_errors(
     with pytest.raises(NotImplementedError):
         # None volume not supported.
         subject.aspirate(None, well, 1)
+
+
+def test_dispense(
+        decoy: Decoy,
+        sync_client: SyncClient,
+        pipette_id: str,
+        subject: InstrumentContext,
+        well: Well
+) -> None:
+    """It should send a dispense command."""
+    subject.dispense(volume=10, location=well)
+
+    decoy.verify(sync_client.dispense(
+        pipette_id=pipette_id,
+        labware_id=well.parent.resource_id,
+        well_name=well.well_name,
+        well_location=WellLocation(origin=WellOrigin.BOTTOM,
+                                   offset=(0, 0, 1)),
+        volume=10
+    ))

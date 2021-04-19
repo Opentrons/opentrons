@@ -166,8 +166,7 @@ class GeometryState:
         labware_id: str,
         pipette_config: PipetteDict
     ) -> float:
-        """
-        Given a labware and a pipette's config, get the effective tip length.
+        """Given a labware and a pipette's config, get the effective tip length.
 
         Effective tip length is the nominal tip length less the distance the
         tip overlaps with the pipette nozzle.
@@ -187,8 +186,7 @@ class GeometryState:
         well_name: str,
         pipette_config: PipetteDict
     ) -> TipGeometry:
-        """
-        Given a labware, well, and hardware pipette config, get the tip geometry.
+        """Given a labware, well, and hardware pipette config, get the tip geometry.
 
         Tip geometry includes effective tip length, tip diameter, and tip volume,
         which is all data required by the hardware controller for proper tip handling.

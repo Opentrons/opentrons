@@ -1,11 +1,8 @@
 // @flow
-import fromPairs from 'lodash/fromPairs'
-import mapValues from 'lodash/mapValues'
-import { DISCOVERY_UPDATE_LIST, HEALTH_STATUS_OK } from '../discovery'
 import * as Constants from './constants'
 
 import type { Action } from '../types'
-import type { RobotAdminState, PerRobotAdminState } from './types'
+import type { RobotAdminState } from './types'
 
 const INITIAL_STATE: RobotAdminState = {}
 
@@ -14,29 +11,24 @@ export function robotAdminReducer(
   action: Action
 ): RobotAdminState {
   switch (action.type) {
-    case Constants.RESTART: {
-      const { robotName } = action.payload
-      const robotState = state[robotName]
-
-      return {
-        ...state,
-        [robotName]: {
-          ...robotState,
-          status: Constants.RESTART_PENDING_STATUS,
-        },
-      }
-    }
-
+    case Constants.RESTART_STATUS_CHANGED:
     case Constants.RESTART_FAILURE: {
-      const { robotName } = action.payload
+      const { robotName, bootId = null, startTime = null } = action.payload
+      const restartStatus =
+        action.type === Constants.RESTART_FAILURE
+          ? Constants.RESTART_FAILED_STATUS
+          : action.payload.restartStatus
+
       const robotState = state[robotName]
+      const restartState = {
+        bootId: bootId ?? robotState?.restart?.bootId ?? null,
+        startTime: startTime ?? robotState?.restart?.startTime ?? null,
+        status: restartStatus,
+      }
 
       return {
         ...state,
-        [robotName]: {
-          ...robotState,
-          status: Constants.RESTART_FAILED_STATUS,
-        },
+        [robotName]: { ...robotState, restart: restartState },
       }
     }
 
@@ -48,37 +40,6 @@ export function robotAdminReducer(
         ...state,
         [robotName]: { ...robotState, resetConfigOptions: options },
       }
-    }
-
-    case DISCOVERY_UPDATE_LIST: {
-      const { robots } = action.payload
-      const upByName = fromPairs(
-        robots.map(robot => [
-          robot.name,
-          robot.addresses.some(a => a.healthStatus === HEALTH_STATUS_OK),
-        ])
-      )
-
-      return mapValues(
-        state,
-        (
-          robotState: PerRobotAdminState,
-          robotName: string
-        ): PerRobotAdminState => {
-          let { status } = robotState
-          const up = upByName[robotName]
-
-          if (up && status !== Constants.RESTART_PENDING_STATUS) {
-            status = Constants.UP_STATUS
-          } else if (!up && status === Constants.RESTART_PENDING_STATUS) {
-            status = Constants.RESTARTING_STATUS
-          } else if (!up && status !== Constants.RESTARTING_STATUS) {
-            status = Constants.DOWN_STATUS
-          }
-
-          return { ...robotState, status }
-        }
-      )
     }
   }
 

@@ -16,7 +16,9 @@ extend-ignore =
 
 # configure flake8-docstrings
 # https://pypi.org/project/flake8-docstrings/
-docstring-convention = pep257
+docstring-convention = google
+
+noqa-require-code = true
 
 # TODO(mc, 2020-11-06): this config ignores type annotation and doc
 # string lints in these modules; remove entries as they are fixed
