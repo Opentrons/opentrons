@@ -2,7 +2,7 @@
 import { createSelector } from 'reselect'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
-import { getUnsavedForm } from '../step-forms/selectors'
+import { getUnsavedForm, getOrderedStepIds } from '../step-forms/selectors'
 import isEmpty from 'lodash/isEmpty'
 import type { BaseState, Selector } from '../types'
 import type { HintKey } from '.'
@@ -61,4 +61,9 @@ export const shouldShowCoolingHint: Selector<boolean> = createSelector(
     }
     return false
   }
+)
+
+export const shouldShowBatchEditHint: Selector<boolean> = createSelector(
+  getOrderedStepIds,
+  orderedStepIds => orderedStepIds.length >= 1
 )

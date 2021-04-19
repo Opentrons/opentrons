@@ -85,7 +85,7 @@ def test_wifi_list(api_client, monkeypatch):
 
 def test_wifi_configure(api_client):
     msg = "Device 'wlan0' successfully activated with" \
-          " '076aa998-0275-4aa0-bf85-e9629021e267'."  # noqa
+          " '076aa998-0275-4aa0-bf85-e9629021e267'."
 
     with patch("opentrons.system.nmcli.configure") as m:
         m.return_value = True, msg
@@ -192,21 +192,21 @@ def test_list_keys(list_key_patch, api_client):
     assert resp.status_code == 200
     body = resp.json()
     assert body == {'keys': [
-            {
-                "uri": "/wifi/keys/ad12d1df199bc912",
-                "id": "ad12d1df199bc912",
-                "name": "ad12.pem"
-            },
-            {
-                "uri": "/wifi/keys/cbdda8124128cf",
-                "id": "cbdda8124128cf",
-                "name": "cbdd.pem"
-            },
-            {
-                "uri": "/wifi/keys/812410990c5412",
-                "id": "812410990c5412",
-                "name": "8124.pem"
-            }
+        {
+            "uri": "/wifi/keys/ad12d1df199bc912",
+            "id": "ad12d1df199bc912",
+            "name": "ad12.pem"
+        },
+        {
+            "uri": "/wifi/keys/cbdda8124128cf",
+            "id": "cbdda8124128cf",
+            "name": "cbdd.pem"
+        },
+        {
+            "uri": "/wifi/keys/812410990c5412",
+            "id": "812410990c5412",
+            "name": "8124.pem"
+        }
     ]}
 
 

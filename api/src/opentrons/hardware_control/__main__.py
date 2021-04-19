@@ -68,5 +68,5 @@ if __name__ == '__main__':
         '-s', '--smoothie-port',
         help='Port on which to talk to smoothie, autodetected by default',
         default=None)
-    args = parser.parse_args()  # noqa: F841
+    args = parser.parse_args()
     run(port=args.port)

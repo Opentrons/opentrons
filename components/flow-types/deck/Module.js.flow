@@ -21,5 +21,10 @@ export type ModuleProps = {|
    * slot details of the location of this module
    */
   slot: DeckSlot,
+
+  /**
+    * USB port details of this module
+  */
+  usbInfoString?: string,
 |};
 declare export function Module(props: ModuleProps): React$Node;

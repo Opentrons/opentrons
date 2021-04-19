@@ -8,7 +8,8 @@ except OSError:
     aionotify = None  # type: ignore
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import ModuleAtPort
-from opentrons.hardware_control.modules.types import BundledFirmware
+from opentrons.hardware_control.modules.types import (
+    BundledFirmware, MagneticModuleModel, ModuleType)
 from opentrons.hardware_control.modules import tempdeck, magdeck
 from opentrons.drivers.rpi_drivers.types import USBPort
 
@@ -58,6 +59,21 @@ async def test_module_caching():
     assert len(two_magdecks) == 2
     assert two_magdecks[0] is with_magdeck[1]
     assert two_magdecks[1] is not two_magdecks[0]
+
+
+async def test_filtering_modules():
+    import opentrons.hardware_control as hardware_control
+    mods = [
+        'tempdeck', 'tempdeck', 'magdeck',
+        'magdeck', 'thermocycler']
+    api = await hardware_control.API.build_hardware_simulator(
+                        attached_modules=mods)
+    await asyncio.sleep(0.5)
+
+    filtered_modules = await api.find_modules(
+        MagneticModuleModel.MAGNETIC_V1, ModuleType.MAGNETIC)
+    assert len(filtered_modules) == 2
+    assert filtered_modules == api.attached_modules[2:4]
 
 
 async def test_module_update_integration(monkeypatch, loop):

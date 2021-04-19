@@ -13,7 +13,7 @@ import {
 } from 'rxjs/operators'
 
 // imported directly to avoid circular dependencies between discovery and shell
-import { getAllRobots, getRobotApiVersion, CONNECTABLE } from '../discovery'
+import { getAllRobots, getRobotApiVersion } from '../discovery'
 import {
   startDiscovery,
   finishDiscovery,
@@ -21,7 +21,15 @@ import {
 } from '../discovery/actions'
 
 import { GET, POST, fetchRobotApi } from '../robot-api'
-import { RESTART_PATH } from '../robot-admin'
+
+import {
+  RESTART_PATH,
+  RESTART_STATUS_CHANGED,
+  RESTART_SUCCEEDED_STATUS,
+  RESTART_TIMED_OUT_STATUS,
+  restartRobotSuccess,
+} from '../robot-admin'
+
 import { actions as robotActions } from '../robot'
 
 import {
@@ -49,7 +57,6 @@ import {
   PROCESS_FILE,
   COMMIT_UPDATE,
   RESTART,
-  RESTARTING,
   FINISHED,
   AWAITING_FILE,
   DONE,
@@ -63,6 +70,7 @@ import {
 import type { State, Epic } from '../types'
 import type { ViewableRobot } from '../discovery/types'
 import type { RobotApiResponse } from '../robot-api/types'
+import type { RestartStatusChangedAction } from '../robot-admin/types'
 
 import type {
   BuildrootAction,
@@ -84,8 +92,11 @@ const UNABLE_TO_CANCEL_UPDATE_SESSION =
 const UNABLE_TO_COMMIT_UPDATE = 'Unable to commit update'
 const UNABLE_TO_RESTART_ROBOT = 'Unable to restart robot'
 const ROBOT_RECONNECTED_WITH_VERSION = 'Robot reconnected with version'
+const ROBOT_DID_NOT_RECONNECT = 'Robot did not successfully reconnect'
 const BUT_WE_EXPECTED = 'but we expected'
 const UNKNOWN = 'unknown'
+const CHECK_TO_VERIFY_UPDATE =
+  "Check your robot's settings page to verify whether or not the update was successful."
 
 // listen for the kickoff action and:
 //   if not ready for buildroot, kickoff premigration
@@ -123,7 +134,7 @@ export const startUpdateEpic: Epic = (action$, state$) =>
       // otherwise robot is ready for migration or update, so get token
       // capabilities response has the correct request path to use
       const sessionPath =
-        capabilities['buildrootUpdate'] || capabilities['buildrootMigration']
+        capabilities.buildrootUpdate || capabilities.buildrootMigration
 
       if (sessionPath == null) {
         return unexpectedBuildrootError(
@@ -303,11 +314,16 @@ export const restartAfterCommitEpic: Epic = (_, state$) => {
       const host: ViewableRobot = (getBuildrootRobot(stateWithSession)as any)
       const path = host.serverHealth?.capabilities?.restart || RESTART_PATH
       const request$ = fetchRobotApi(host, { method: POST, path }).pipe(
-        map(resp => {
+        switchMap(resp => {
           return resp.ok
-            ? startDiscovery(REDISCOVERY_TIME_MS)
-            : unexpectedBuildrootError(
-                `${UNABLE_TO_RESTART_ROBOT}: ${resp.body.message}`
+            ? of(
+                startDiscovery(REDISCOVERY_TIME_MS),
+                restartRobotSuccess(host.name, {})
+              )
+            : of(
+                unexpectedBuildrootError(
+                  `${UNABLE_TO_RESTART_ROBOT}: ${resp.body.message}`
+                )
               )
         })
       )
@@ -317,49 +333,48 @@ export const restartAfterCommitEpic: Epic = (_, state$) => {
   )
 }
 
-export const watchForOfflineAfterRestartEpic: Epic = (_, state$) => {
-  return state$.pipe(
-    filter(state => {
+export const finishAfterRestartEpic: Epic = (action$, state$) => {
+  return action$.pipe(
+    ofType(RESTART_STATUS_CHANGED),
+    withLatestFrom<RestartStatusChangedAction, State>(state$),
+    filter(([action, state]) => {
       const session = getBuildrootSession(state)
       const robot = getBuildrootRobot(state)
+      const restartDone =
+        action.payload.restartStatus === RESTART_SUCCEEDED_STATUS ||
+        action.payload.restartStatus === RESTART_TIMED_OUT_STATUS
 
       return (
-        robot?.status !== CONNECTABLE &&
+        restartDone &&
+        robot?.name === action.payload.robotName &&
         !session?.error &&
         session?.step === RESTART
       )
     }),
-    mapTo(setBuildrootSessionStep(RESTARTING))
-  )
-}
-
-export const watchForOnlineAfterRestartEpic: Epic = (_, state$) => {
-  return state$.pipe(
-    filter(state => {
-      const session = getBuildrootSession(state)
-      const robot = getBuildrootRobot(state)
-
-      return (
-        robot?.status === CONNECTABLE &&
-        !session?.error &&
-        session?.step === RESTARTING
-      )
-    }),
-    switchMap<State, _, _>(stateWithRobot => {
+    switchMap(([action, stateWithRobot]) => {
       const targetVersion = getBuildrootTargetVersion(stateWithRobot)
       const robot: ViewableRobot = (getBuildrootRobot(stateWithRobot)as any)
       const robotVersion = getRobotApiVersion(robot)
-      const actual = robotVersion || UNKNOWN
-      const expected = targetVersion || UNKNOWN
+      const timedOut = action.payload.restartStatus === RESTART_TIMED_OUT_STATUS
+      const actual = robotVersion ?? UNKNOWN
+      const expected = targetVersion ?? UNKNOWN
+      let finishAction
 
-      const finishAction =
+      if (
         targetVersion != null &&
         robotVersion != null &&
         robotVersion === targetVersion
-          ? setBuildrootSessionStep(FINISHED)
-          : unexpectedBuildrootError(
-              `${ROBOT_RECONNECTED_WITH_VERSION} ${actual}, ${BUT_WE_EXPECTED} ${expected}`
-            )
+      ) {
+        finishAction = setBuildrootSessionStep(FINISHED)
+      } else if (timedOut) {
+        finishAction = unexpectedBuildrootError(
+          `${ROBOT_DID_NOT_RECONNECT}. ${CHECK_TO_VERIFY_UPDATE}.`
+        )
+      } else {
+        finishAction = unexpectedBuildrootError(
+          `${ROBOT_RECONNECTED_WITH_VERSION} ${actual}, ${BUT_WE_EXPECTED} ${expected}. ${CHECK_TO_VERIFY_UPDATE}.`
+        )
+      }
 
       return of(finishAction, finishDiscovery())
     })
@@ -404,8 +419,7 @@ export const buildrootEpic: Epic = combineEpics(
   uploadFileEpic,
   commitUpdateEpic,
   restartAfterCommitEpic,
-  watchForOfflineAfterRestartEpic,
-  watchForOnlineAfterRestartEpic,
+  finishAfterRestartEpic,
   removeMigratedRobotsEpic,
   disconnectRpcOnStartEpic
 )

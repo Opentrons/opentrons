@@ -129,27 +129,21 @@ def get_labware_calibration(
 
 def load_tip_length_calibration(
         pip_id: str,
-        definition: 'LabwareDefinition',
-        parent: str) -> local_types.TipLengthCalibration:
+        definition: 'LabwareDefinition'
+        ) -> local_types.TipLengthCalibration:
     """
     Function used to grab the current tip length associated
     with a particular tiprack.
 
     :param pip_id: pipette you are using
     :param definition: full definition of the tiprack
-    :param parent: parent of the tiprack
     """
-    # TODO(lc, 07-14-2020) since we're trying not to utilize
-    # a labware object for these functions, the is tiprack
-    # check should happen outside of this function.
-    # assert labware._is_tiprack, \
-    #     'cannot save tip length for non-tiprack labware'
     labware_hash = helpers.hash_labware_def(definition)
     labware_uri = helpers.uri_from_definition(definition)
     load_name = definition['parameters']['loadName']
     return _get_tip_length_data(
         pip_id=pip_id,
-        labware_hash=labware_hash + parent,
+        labware_hash=labware_hash,
         labware_load_name=load_name,
         labware_uri=labware_uri)
 

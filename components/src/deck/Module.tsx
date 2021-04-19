@@ -25,6 +25,8 @@ export interface ModuleProps {
   mode: 'default' | 'present' | 'missing' | 'info'
   /** slot details of the location of this module */
   slot: DeckSlot
+  /** USB port detail of the connected module */
+  usbInfoString?: string
 }
 
 export function Module(props: ModuleProps): JSX.Element {
@@ -75,13 +77,17 @@ export function Module(props: ModuleProps): JSX.Element {
         className: cx(styles.module, { [styles.flipped]: shouldFlip }),
       }}
     >
-      <ModuleItemContents {...props} />
+      <ModuleItemContents {...props} shouldFlip={shouldFlip} />
     </RobotCoordsForeignDiv>
   )
 }
 
-function ModuleItemContents(props: ModuleProps): JSX.Element {
-  const { mode, model } = props
+interface ModuleItemContentsProps extends ModuleProps {
+  shouldFlip: boolean
+}
+
+function ModuleItemContents(props: ModuleItemContentsProps): JSX.Element {
+  const { mode, model, usbInfoString, shouldFlip } = props
   const displayName = getModuleDisplayName(model)
 
   const iconClassName = cx(styles.module_review_icon, {
@@ -98,10 +104,21 @@ function ModuleItemContents(props: ModuleProps): JSX.Element {
 
   return (
     <>
-      <div className={styles.module_wrapper}>
-        {mode !== 'missing' && (
-          <p key="portInfo" className={styles.module_port_text}>
-            usb info n/a
+      <div
+        className={
+          shouldFlip ? styles.flipped_module_wrapper : styles.module_wrapper
+        }
+      >
+        {mode !== 'missing' && usbInfoString && (
+          <p
+            key="usbPortInfo"
+            className={
+              usbInfoString.includes('N/A')
+                ? styles.module_port_text_na
+                : styles.module_port_text
+            }
+          >
+            {usbInfoString}
           </p>
         )}
         <p key="displayName" className={styles.module_review_text}>

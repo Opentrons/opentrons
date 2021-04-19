@@ -30,10 +30,10 @@ def _create_response(dt: datetime) \
 
 
 @router.get("/system/time",
-            description="Fetch system time & date",
-            summary="Get robot's time status, which includes- current UTC "
-                    "date & time, local timezone, whether robot time is synced"
-                    " with an NTP server &/or it has an active RTC.",
+            summary="Fetch system time & date",
+            description="Get robot's time status, which includes- current UTC "
+                        "date & time, local timezone, whether robot time is "
+                        "synced with an NTP server &/or it has an active RTC.",
             response_model=time_models.SystemTimeResponse
             )
 async def get_time() -> time_models.SystemTimeResponse:

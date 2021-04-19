@@ -8,8 +8,7 @@ class ProtocolEngineError(RuntimeError):
 
 
 class UnexpectedProtocolError(ProtocolEngineError):
-    """
-    An error raised when an unexpected error occurs.
+    """An error raised when an unexpected error occurs.
 
     This error is indicative of a software bug. If it happens, it means an
     exception was raised somewhere in the stack and it was not properly caught
@@ -23,8 +22,7 @@ class UnexpectedProtocolError(ProtocolEngineError):
 
 
 class FailedToLoadPipetteError(ProtocolEngineError):
-    """
-    An error raised when executing a LoadPipetteRequest fails.
+    """An error raised when executing a LoadPipetteRequest fails.
 
     This failure may be caused by:
     - An incorrect pipette already attached to the mount

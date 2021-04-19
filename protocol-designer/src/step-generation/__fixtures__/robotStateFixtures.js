@@ -34,7 +34,16 @@ import {
 } from './commandFixtures'
 import { makeInitialRobotState } from '../utils'
 import { tiprackWellNamesFlat } from './data'
-import type { InvariantContext, RobotState, RobotStateAndWarnings } from '../'
+import type {
+  Config,
+  InvariantContext,
+  RobotState,
+  RobotStateAndWarnings,
+} from '../'
+
+export const DEFAULT_CONFIG: Config = {
+  OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
+}
 
 // Eg {A1: true, B1: true, ...}
 type WellTipState = { [wellName: string]: boolean }
@@ -137,7 +146,12 @@ export function makeContext(): InvariantContext {
       spec: fixtureP300Multi,
     },
   }
-  return { labwareEntities, moduleEntities, pipetteEntities }
+  return {
+    labwareEntities,
+    moduleEntities,
+    pipetteEntities,
+    config: DEFAULT_CONFIG,
+  }
 }
 
 export const makeState = (args: {|

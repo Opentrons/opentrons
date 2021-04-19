@@ -35,7 +35,7 @@ describe('Protocols with Modules', () => {
     cy.closeAnnouncementModal()
   })
 
-  describe('builds a new protocol with mag deck', () => {
+  describe('builds a new protocol with a thermocycler', () => {
     it('sets up pipettes, tips, and module', () => {
       cy.get('button').contains('Create New').click()
       // Give it a name
@@ -226,7 +226,13 @@ describe('Protocols with Modules', () => {
           cy.get('input[type="checkbox"]').click({ force: true })
         })
         cy.get('button').contains('save').click()
+        // close "batch edit hint" modal
+        cy.contains('Editing multiple steps').should('exist')
+        // force option used because checkbox is hidden
+        cy.get('input[type="checkbox"]').click({ force: true })
+        cy.get('button').contains('ok').click()
       })
+
       // Verify Second State Added
       cy.get(sidePanel).within(() => {
         cy.contains('Lid (closed)').should('exist')

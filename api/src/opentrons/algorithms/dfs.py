@@ -1,5 +1,4 @@
-"""
-Depth first search.
+"""Depth first search.
 
 Search a generic graph down to its leaf
 nodes first before back-tracking up the tree.
@@ -12,16 +11,14 @@ from .types import VertexLike, VertexName
 
 
 class DFS(Generic[VertexName]):
-    """
-    Depth first search class.
+    """Depth first search class.
 
     This class will build a graph object and then
     perform a depth first search on the graph.
     """
 
     def __init__(self, graph: List[VertexLike]) -> None:
-        """
-        DFS Initializer.
+        """DFS Initializer.
 
         :param graph: A list of nodes you wish to add to
         the graph.
@@ -30,8 +27,7 @@ class DFS(Generic[VertexName]):
 
     @property
     def graph(self) -> Graph:
-        """
-        DFS property: graph.
+        """DFS property: graph.
 
         :returns: the graph object in which
         dfs is being performed on.
@@ -39,8 +35,7 @@ class DFS(Generic[VertexName]):
         return self._graph
 
     def dfs(self) -> Set[VertexName]:
-        """
-        Depth first search.
+        """Depth first search.
 
         :returns: the set of visited vertices
         in depth first search order.

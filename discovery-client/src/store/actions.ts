@@ -1,4 +1,5 @@
-import type { MdnsBrowserService, HealthPollerResult } from '../types'
+import type { HealthPollerResult } from '../types'
+import type { MdnsBrowserService } from '../mdns-browser'
 
 import * as Types from './types'
 

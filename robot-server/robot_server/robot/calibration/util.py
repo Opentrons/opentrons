@@ -193,7 +193,7 @@ def save_tip_length_calibration(pipette_id: str,
     # tip length data, hence the empty string, we should remove it
     # from create_tip_length_data in a refactor
     tip_length_data = modify.create_tip_length_data(
-        tip_rack._implementation.get_definition(), '',
+        tip_rack._implementation.get_definition(),
         tip_length_offset
     )
     modify.save_tip_length_calibration(pipette_id, tip_length_data)

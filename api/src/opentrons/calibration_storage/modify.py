@@ -107,7 +107,6 @@ def save_labware_calibration(
 
 def create_tip_length_data(
         definition: 'LabwareDefinition',
-        parent: str,
         length: float,
         cal_status: local_types.CalibrationStatus = None
         ) -> 'PipTipLengthCalibration':
@@ -115,15 +114,8 @@ def create_tip_length_data(
     Function to correctly format tip length data.
 
     :param definition: full labware definition
-    :param parent: the slot associated with the tiprack
-    [not yet implemented, so it is always an empty string]
     :param length: the tip length to save
     """
-    # TODO(lc, 07-14-2020) since we're trying not to utilize
-    # a labware object for these functions, the is tiprack
-    # check should happen outside of this function.
-    # assert labware._is_tiprack, \
-    #     'cannot save tip length for non-tiprack labware'
     labware_hash = helpers.hash_labware_def(definition)
     labware_uri = helpers.uri_from_definition(definition)
     if cal_status:
@@ -144,7 +136,7 @@ def create_tip_length_data(
     if not definition.get('namespace') == OPENTRONS_NAMESPACE:
         _save_custom_tiprack_definition(labware_uri, definition)
 
-    data = {labware_hash + parent: tip_length_data}
+    data = {labware_hash: tip_length_data}
     return data
 
 

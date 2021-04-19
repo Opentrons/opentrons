@@ -17,8 +17,7 @@ from .commands import (
 
 
 class ProtocolEngine:
-    """
-    Main ProtocolEngine class.
+    """Main ProtocolEngine class.
 
     A ProtocolEngine instance holds the state of a protocol as it executes,
     and manages calls to a command executor that actually implements the logic
@@ -56,8 +55,7 @@ class ProtocolEngine:
         state_store: StateStore,
         handlers: CommandHandlers,
     ) -> None:
-        """
-        Initialize a ProtocolEngine instance.
+        """Initialize a ProtocolEngine instance.
 
         This constructor does not inject provider implementations. Prefer the
         ProtocolEngine.create factory classmethod.

@@ -94,6 +94,7 @@ export const Accordion = (props: AccordionProps): React.Node => {
       position={POSITION_STICKY}
       top="0"
       overflow="hidden"
+      zIndex="10"
       borderBottom={props.expanded ? BORDER_SOLID_MEDIUM : 'none'}
       opacity={props.expanded ? 1 : 0}
     >

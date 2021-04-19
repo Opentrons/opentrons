@@ -64,7 +64,7 @@ PYTHON_API_VERSION_DEPRECATED = """
 
 The python protocol you uploaded has the Python API Version {0}.  Robot server version 4.0.0 is
 the official end of life of Python API Version {0}. The minimum supported Python API Version is {1}. This means that this protocol
-will not run in robot server version 4.0.0 and above. 
+will not run in robot server version 4.0.0 and above.
 Please downgrade your robot server version if you wish to run this protocol. Otherwise, please upgrade this
 protocol to Python API Version {1} or above.
 
@@ -73,7 +73,7 @@ To upgrade your protocol to Python API Version {1} or above, please view our doc
 Please contact support@opentrons.com to retrieve the previous software version and be guided
 through the downgrade process.
 
-"""  # noqa E511
+"""  # noqa: E501
 
 
 class MalformedProtocolError(Exception):

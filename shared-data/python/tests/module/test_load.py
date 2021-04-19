@@ -14,10 +14,11 @@ def test_load_v2_defs(defname):
     assert load_definition('2', defname)\
         == json.loads(load_shared_data(f'module/definitions/2/{defname}.json'))
 
+
 @pytest.mark.parametrize('defname', ['magdeck', 'tempdeck', 'thermocycler'])
 def test_load_v1_defs(defname):
     assert load_definition('1', defname)\
-        == json.loads(load_shared_data(f'module/definitions/1.json'))[defname]
+        == json.loads(load_shared_data('module/definitions/1.json'))[defname]
 
 
 def test_bad_module_name_throws():

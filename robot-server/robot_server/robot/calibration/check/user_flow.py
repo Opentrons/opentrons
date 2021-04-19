@@ -323,8 +323,7 @@ class CheckCalibrationUserFlow:
                 pip_offset.uri)
         return get.load_tip_length_calibration(
             pipette.pipette_id,
-            tiprack_def,
-            '')
+            tiprack_def)
 
     def _check_valid_calibrations(self):
         deck = self._deck_calibration
@@ -635,10 +634,8 @@ class CheckCalibrationUserFlow:
                 SourceType.calibration_check)
             tip_definition =\
                 self.active_tiprack._implementation.get_definition()
-            parent = self.active_tiprack.parent
             tip_length_dict = modify.create_tip_length_data(
                 definition=tip_definition,
-                parent=parent,
                 length=calibration.tip_length,
                 cal_status=calibration.status
             )
@@ -816,8 +813,8 @@ class CheckCalibrationUserFlow:
         try:
             return get.load_tip_length_calibration(
                 pip_id,
-                self.active_tiprack._implementation.get_definition(),
-                '').tip_length
+                self.active_tiprack._implementation.get_definition()
+                ).tip_length
         except TipLengthCalNotFound:
             tip_overlap = self.hw_pipette.config.tip_overlap.get(
                 self.active_tiprack.uri,

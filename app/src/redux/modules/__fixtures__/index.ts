@@ -34,6 +34,7 @@ export const mockApiTemperatureModule: ApiTypes.ApiTemperatureModule = {
     currentTemp: 25,
     targetTemp: null,
   },
+  usbPort: { hub: 1, port: 1 },
 }
 
 export const mockApiTemperatureModuleGen2: ApiTypes.ApiTemperatureModule = {
@@ -51,6 +52,7 @@ export const mockApiTemperatureModuleGen2: ApiTypes.ApiTemperatureModule = {
     currentTemp: 25,
     targetTemp: null,
   },
+  usbPort: { hub: 1, port: 1 },
 }
 
 export const mockTemperatureModule: Types.TemperatureModule = {
@@ -66,6 +68,7 @@ export const mockTemperatureModule: Types.TemperatureModule = {
     currentTemp: 25,
     targetTemp: null,
   },
+  usbPort: { hub: 1, port: 1 },
 }
 
 export const mockTemperatureModuleGen2: Types.TemperatureModule = {
@@ -81,6 +84,7 @@ export const mockTemperatureModuleGen2: Types.TemperatureModule = {
     currentTemp: 25,
     targetTemp: null,
   },
+  usbPort: { hub: 1, port: 1 },
 }
 
 export const mockApiMagneticModuleLegacy: ApiTypes.ApiMagneticModuleLegacy = {
@@ -113,6 +117,7 @@ export const mockApiMagneticModule: ApiTypes.ApiMagneticModule = {
     engaged: false,
     height: 42,
   },
+  usbPort: { hub: 1, port: 1 },
 }
 
 export const mockApiMagneticModuleGen2: ApiTypes.ApiMagneticModule = {
@@ -130,6 +135,7 @@ export const mockApiMagneticModuleGen2: ApiTypes.ApiMagneticModule = {
     engaged: false,
     height: 42,
   },
+  usbPort: { hub: 1, port: 1 },
 }
 
 export const mockMagneticModule: Types.MagneticModule = {
@@ -145,6 +151,7 @@ export const mockMagneticModule: Types.MagneticModule = {
     engaged: false,
     height: 42,
   },
+  usbPort: { hub: 1, port: 1 },
 }
 
 export const mockApiThermocyclerLegacy: ApiTypes.ApiThermocyclerModuleLegacy = {
@@ -195,6 +202,7 @@ export const mockApiThermocycler: ApiTypes.ApiThermocyclerModule = {
     currentStepIndex: null,
     totalStepCount: null,
   },
+  usbPort: { hub: 1, port: 1 },
 }
 
 export const mockThermocycler: Types.ThermocyclerModule = {
@@ -219,6 +227,7 @@ export const mockThermocycler: Types.ThermocyclerModule = {
     currentStepIndex: null,
     totalStepCount: null,
   },
+  usbPort: { hub: 1, port: 1 },
 }
 
 // fetch modules fixtures

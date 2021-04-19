@@ -23,8 +23,8 @@ async def get_event_publisher() -> publisher.Publisher:
     publisher instance."""
     notify_server_settings = NotifyServerSettings()
     event_publisher = publisher.create(
-                notify_server_settings.publisher_address.connection_string()
-            )
+        notify_server_settings.publisher_address.connection_string()
+    )
     return event_publisher
 
 
@@ -89,9 +89,9 @@ async def get_session_manager(
         -> SessionManager:
     """The single session manager instance"""
     return SessionManager(
-            hardware=hardware,
-            motion_lock=motion_lock,
-            protocol_manager=protocol_manager)
+        hardware=hardware,
+        motion_lock=motion_lock,
+        protocol_manager=protocol_manager)
 
 
 async def check_version_header(

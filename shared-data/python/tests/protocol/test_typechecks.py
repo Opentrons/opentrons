@@ -9,6 +9,7 @@ from opentrons_shared_data.protocol.dev_types import (
 
 from . import list_fixtures
 
+
 @pytest.mark.parametrize('defpath', list_fixtures(4))
 def test_v4_types(defpath):
     defn = json.loads(load_shared_data(defpath))

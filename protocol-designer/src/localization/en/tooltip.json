@@ -47,6 +47,18 @@
 
       "volume": "Volume to dispense in each well"
     },
+    "indeterminate": {
+      "aspirate_airGap_checkbox": "Not all selected steps are using this setting",
+      "dispense_airGap_checkbox": "Not all selected steps are using this setting",
+      "aspirate_mix_checkbox": "Not all selected steps are using this setting",
+      "dispense_mix_checkbox": "Not all selected steps are using this setting",
+      "aspirate_delay_checkbox": "Not all selected steps are using this setting",
+      "dispense_delay_checkbox": "Not all selected steps are using this setting",
+      "preWetTip": "Not all selected steps are using this setting",
+      "aspirate_touchTip_checkbox": "Not all selected steps are using this setting",
+      "dispense_touchTip_checkbox": "Not all selected steps are using this setting",
+      "mix_touchTip_checkbox": "Not all selected steps are using this setting"
+    },
     "moveLiquid": {
       "disabled": {
         "$generic": "Incompatible with current path",
@@ -56,6 +68,7 @@
     "batch_edit": {
       "disabled": {
         "pipette-different": "Cannot edit unless selected steps share the same pipette.",
+        "labware-different": "Cannot edit unless selected steps share the same type of labware.",
         "aspirate-labware-different": "Cannot edit unless selected steps share the same type of source labware.",
         "dispense-labware-different": "Cannot edit unless selected steps share the same type of destination labware.",
         "multi-aspirate-present": "Cannot edit while one or more selected steps uses the multi-aspirate path.",

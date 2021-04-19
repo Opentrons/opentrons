@@ -228,7 +228,7 @@ def test_sessions_get(
         },
         'links': {
             'commandExecute': {
-                'href': f'/sessions/{mock_session.meta.identifier}/commands/execute',  # noqa: e5011
+                'href': f'/sessions/{mock_session.meta.identifier}/commands/execute',  # noqa: E501
                 'meta': None,
             },
             'self': {
@@ -299,7 +299,7 @@ def test_sessions_execute_command_no_session(
     mock_session_manager.get_by_id.assert_called_once_with("1234")
     assert response.json() == {
         'errors': [{
-            'detail': f"Resource type 'session' with id '1234' was not found",  # noqa: e5011
+            'detail': "Resource type 'session' with id '1234' was not found",  # noqa: E501
             'links': {
                 'self': {'href': '/sessions'},
                 'sessionById': {'href': '/sessions/{sessionId}'}
@@ -355,7 +355,7 @@ def test_sessions_execute_command(
         },
         'links': {
             'commandExecute': {
-                'href': f'/sessions/{mock_session.meta.identifier}/commands/execute',  # noqa: e501
+                'href': f'/sessions/{mock_session.meta.identifier}/commands/execute',  # noqa: E501
                 'meta': None,
             },
             'self': {
@@ -419,7 +419,7 @@ def test_execute_command_session_inactive(
         sessions_api_client,
         mock_session_manager,
         mock_session,
-        ):
+):
     """Test that only the active session can execute commands"""
     mock_session_manager.get_by_id.return_value = mock_session
     mock_session_manager.is_active.return_value = False

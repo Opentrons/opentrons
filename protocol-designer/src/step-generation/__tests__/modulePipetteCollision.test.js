@@ -6,18 +6,11 @@ import {
 } from '@opentrons/shared-data'
 import { modulePipetteCollision } from '../utils/modulePipetteCollision'
 import { getInitialRobotStateStandard, makeContext } from '../__fixtures__'
-import { _getFeatureFlag } from '../utils/_getFeatureFlag'
-jest.mock('../utils/_getFeatureFlag')
-
-const mock_getFeatureFlag: JestMockFn<[string], boolean> = _getFeatureFlag
 
 let invariantContext
 let robotState
 let collisionArgs
 beforeEach(() => {
-  jest.clearAllMocks()
-  mock_getFeatureFlag.mockReturnValue(false)
-
   invariantContext = makeContext()
   invariantContext.moduleEntities['magDeckId'] = {
     id: 'magDeckId',
@@ -46,11 +39,8 @@ describe('modulePipetteCollision', () => {
   })
 
   it('should return false under the same conditions, if OT_PD_DISABLE_MODULE_RESTRICTIONS flag is enabled', () => {
-    mock_getFeatureFlag.mockReturnValue(true)
+    collisionArgs.invariantContext.config.OT_PD_DISABLE_MODULE_RESTRICTIONS = true
     expect(modulePipetteCollision(collisionArgs)).toBe(false)
-    expect(mock_getFeatureFlag).toHaveBeenCalledWith(
-      'OT_PD_DISABLE_MODULE_RESTRICTIONS'
-    )
   })
 
   it('should return false with no labware', () => {

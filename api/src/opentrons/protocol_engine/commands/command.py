@@ -94,8 +94,7 @@ class PendingCommand(Generic[ReqT, ResT]):
 
 
 class CommandImplementation(ABC, Generic[ReqT, ResT]):
-    """
-    Abstract command implementation.
+    """Abstract command implementation.
 
     A given command request should map to a specific command implementation,
     which defines how to:

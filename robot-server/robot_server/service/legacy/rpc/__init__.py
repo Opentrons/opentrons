@@ -1,1 +1,1 @@
-from .rpc import RPCServer  # noqa: W0611
+from .rpc import RPCServer  # noqa: F401

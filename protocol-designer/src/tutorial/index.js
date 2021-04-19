@@ -9,6 +9,7 @@ type HintKey =
   | 'deck_setup_explanation'
   | 'module_without_labware'
   | 'thermocycler_lid_passive_cooling'
+  | 'protocol_can_enter_batch_edit'
   // blocking hints
   | 'custom_labware_with_modules'
   | 'export_v4_protocol_3_18'

@@ -12,6 +12,7 @@ from typing import List, Set
 
 from opentrons.algorithms.dfs import DFS
 from opentrons.hardware_control.modules.types import ModuleAtPort
+from opentrons.hardware_control.types import BoardRevision
 
 from .interfaces import USBDriverInterface
 from .types import USBPort
@@ -27,7 +28,8 @@ USB_PORT_INFO = re.compile(PORT_PATTERN + DEVICE_PATH)
 
 
 class USBBus(USBDriverInterface):
-    def __init__(self):
+    def __init__(self, board_revision: BoardRevision):
+        self._board_revision = board_revision
         self._usb_dev: List[USBPort] = self.read_usb_bus()
         self._dfs: DFS = DFS(self._usb_dev)
         self._sorted = self._dfs.dfs()
@@ -59,17 +61,9 @@ class USBBus(USBDriverInterface):
             pass
         return symlink
 
-    @staticmethod
-    def convert_port_path(full_port_path: str) -> USBPort:
-        """
-        Convert port path.
-
-        Take the value returned from the USB bus and format
-        that information into a dataclass
-        :param full_port_path: The string port path
-        :returns: The USBPort dataclass
-        """
-        return USBPort.build(full_port_path.strip('/'))
+    @property
+    def board_revision(self) -> BoardRevision:
+        return self._board_revision
 
     @property
     def usb_dev(self) -> List[USBPort]:
@@ -122,7 +116,10 @@ class USBBus(USBDriverInterface):
         for port in active_ports:
             match = USB_PORT_INFO.search(port)
             if match:
-                port_matches.append(self.convert_port_path(match.group(0)))
+                port_matches.append(
+                    USBPort.build(
+                        match.group(0).strip('/'),
+                        self.board_revision))
         return port_matches
 
     def find_port(self, device_path: str) -> USBPort:

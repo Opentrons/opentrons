@@ -16,6 +16,8 @@ export type { DiscoveryClientRobot, HealthStatus }
 
 export type RobotsMap = Partial<{ [name: string]: DiscoveryClientRobot }>
 
+export type ConnectivityStatus = CONNECTABLE | REACHABLE | UNREACHABLE
+
 export type DiscoveryState = {
   scanning: boolean,
   robotsByName: RobotsMap,
@@ -40,7 +42,7 @@ export type Robot = {
   serverHealthStatus: HealthStatus,
 }
 
-// robot with a seen, but not connecteable IP
+// robot with a seen, but not connectable IP
 export type ReachableRobot = {
   ...BaseRobot,
   status: REACHABLE,

@@ -4,6 +4,20 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
+# OT-2 Software Changes in 4.2.1
+
+This is a hotfix to prevent crashing in the Z axis with one pipette. You must re-calibrate your pipette offset and your labware before proceeding to a run if you are
+experiencing this issue.
+
+## Bugfixes
+
+- Fixed an issue where tip length calibration was not being accessed correctly during a protocol run, and labware calibration.
+  - If you performed pipette calibration in 4.2.0, you will need to re-do that calibration upon this update.
+
+## Known Issues
+
+In 4.2.1 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
+
 ---
 
 # OT-2 Software Changes in 4.2.0

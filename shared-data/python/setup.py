@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 HERE = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(os.path.join(HERE, '..', '..', 'scripts'))
 
-from python_build_utils import normalize_version
+from python_build_utils import normalize_version  # noqa: E402
 
 # make stdout blocking since Travis sets it to nonblocking
 if os.name == 'posix':
@@ -22,6 +22,7 @@ DATA_SUBDIRS = ['deck',
                 'pipette',
                 'protocol']
 DEST_BASE_PATH = 'data'
+
 
 def get_shared_data_files():
     to_include = []

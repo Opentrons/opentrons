@@ -277,10 +277,12 @@ export type SourceAndDest = {|
 |}
 
 // Data that never changes across time
+export type Config = {| OT_PD_DISABLE_MODULE_RESTRICTIONS: boolean |}
 export type InvariantContext = {|
   labwareEntities: LabwareEntities,
   moduleEntities: ModuleEntities,
   pipetteEntities: PipetteEntities,
+  config: Config,
 |}
 
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": `TimelineFrame`?

@@ -74,6 +74,7 @@ export type ServerHealthResponse = {
   smoothieVersion: string,
   systemVersion: string,
   capabilities?: CapabilityMap,
+  bootId?: string,
   ...
 }
 
@@ -99,7 +100,7 @@ export type Address = {|
   /** IP address */
   ip: string,
   /** Port */
-  port: number
+  port: number,
 |}
 
 /**
@@ -124,7 +125,10 @@ export type HostState = {|
 /**
  * IP address and instantaneous health information for a given robot
  */
-export type DiscoveryClientRobotAddress = $Diff<HostState, {|robotName: mixed|}>
+export type DiscoveryClientRobotAddress = $Diff<
+  HostState,
+  {| robotName: mixed |}
+>
 
 /*
  * Robot object that the DiscoveryClient returns that combines latest known
@@ -133,7 +137,7 @@ export type DiscoveryClientRobotAddress = $Diff<HostState, {|robotName: mixed|}>
 export type DiscoveryClientRobot = {|
   ...RobotState,
   /** IP addresses and health state, ranked by connectability (descending) */
-  addresses: DiscoveryClientRobotAddress[]
+  addresses: DiscoveryClientRobotAddress[],
 |}
 
 /**
@@ -142,11 +146,11 @@ export type DiscoveryClientRobot = {|
  */
 export type DiscoveryClientConfig = {|
   /** Health poll interval used by the HealthPoller */
-  healthPollInterval?: number;
+  healthPollInterval?: number,
   /** Robots list to (re)initialize the tracking state */
-  initialRobots?: DiscoveryClientRobot[];
+  initialRobots?: DiscoveryClientRobot[],
   /** Extra IP addresses to manially track */
-  manualAddresses?: Address[];
+  manualAddresses?: Address[],
 |}
 
 /**
@@ -154,9 +158,9 @@ export type DiscoveryClientConfig = {|
  */
 export type DiscoveryClientOptions = {|
   /** Function to call when the robots list is updated */
-  onListChange: (robots: DiscoveryClientRobot[]) => mixed;
+  onListChange: (robots: DiscoveryClientRobot[]) => mixed,
   /** Optional logger */
-  logger?: Logger;
+  logger?: Logger,
 |}
 
 export interface DiscoveryClient {
@@ -187,4 +191,6 @@ export type LegacyService = {|
   serverHealth: ServerHealthResponse | null | void,
 |}
 
-declare export function createDiscoveryClient(options: DiscoveryClientOptions): DiscoveryClient
+declare export function createDiscoveryClient(
+  options: DiscoveryClientOptions
+): DiscoveryClient

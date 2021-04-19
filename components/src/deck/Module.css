@@ -49,6 +49,14 @@
 
 .module_port_text {
   fill: currentColor;
+  color: var(--c-white);
+  font-size: 0.75rem;
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+}
+
+.module_port_text_na {
+  fill: currentColor;
   color: var(--c-med-gray);
   font-size: 0.75rem;
   font-weight: var(--fw-semibold);
@@ -57,9 +65,20 @@
 
 .module_wrapper {
   display: flex;
+  width: 100%;
+  padding: 1.15rem;
   justify-content: center;
   flex-direction: column;
-  margin: 0.5rem;
+  align-items: flex-end;
+}
+
+.flipped_module_wrapper {
+  display: flex;
+  width: 100%;
+  padding: 1.15rem;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .module_name_text {

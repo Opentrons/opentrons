@@ -58,7 +58,7 @@ make -C labware-library serve PORT=9091
 This project (along with our other front-end projects) uses [webpack][] to generate artifacts.
 
 - Extends our [base webpack config][base-config]
-- Entry point is [`labware-library/src/index.js`][entry]
+- Entry point is [`labware-library/src/index.tsx`][entry]
 - [Handlebars][] HTML template is [`labware-library/src/index.hbs`][template]
   - Post-build, the site is crawled and prerendered with [react-snap][]
 - Global CSS is [`labware-library/src/global.css`][global-style]

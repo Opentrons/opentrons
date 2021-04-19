@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 import typeguard
 
@@ -7,7 +5,6 @@ from opentrons_shared_data import module
 from opentrons_shared_data.module import dev_types
 
 from . import list_v2_defs
-
 
 
 @pytest.mark.parametrize('defname', list_v2_defs())

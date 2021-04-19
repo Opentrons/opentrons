@@ -50,7 +50,6 @@ function ConnectModulesComponent(props: Props) {
   if (modulesMissing) {
     fetchModules()
   }
-  console.log(hasDuplicateModules)
   return (
     <div className={styles.page_content_dark}>
       <Prompt

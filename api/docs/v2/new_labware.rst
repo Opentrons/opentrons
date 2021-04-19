@@ -289,20 +289,6 @@ control of positions within the well for unusual or custom labware.
 .. versionadded:: 2.0
 
 
-From Center Cartesian
----------------------
-
-The method :py:meth:`.Well.from_center_cartesian` specifies an arbitrary point
-in deck coordinates based on percentages of the radius in each axis.
-
-.. code-block:: python
-
-   plate['A1'].from_center_cartesian(1, 1, -0.5) # The back-right corner of a well at 1/4 of the well depth from the bottom
-
-.. versionadded:: 2.8
-
-
-
 Manipulating Positions
 ^^^^^^^^^^^^^^^^^^^^^^
 

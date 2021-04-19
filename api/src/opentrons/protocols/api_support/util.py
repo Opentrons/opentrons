@@ -17,7 +17,7 @@ if TYPE_CHECKING:
         AbstractInstrument
     from opentrons.protocol_api.labware import Well, Labware
     from opentrons.protocols.geometry.deck import Deck
-    from opentrons.hardware_control.dev_types import HasLoop  # noqa: F501
+    from opentrons.hardware_control.dev_types import HasLoop
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -117,6 +117,7 @@ def labware_column_shift(
 
 class FlowRates:
     """ Utility class for rich setters/getters for flow rates """
+
     def __init__(self,
                  instr: AbstractInstrument) -> None:
         self._instr = instr
@@ -182,6 +183,7 @@ def _find_value_for_api_version(for_version: APIVersion,
 
 class PlungerSpeeds:
     """ Utility class for rich setters/getters for speeds """
+
     def __init__(self,
                  instr: AbstractInstrument) -> None:
         self._instr = instr

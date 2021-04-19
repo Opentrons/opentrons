@@ -25,7 +25,6 @@ module.exports = {
   module: {
     rules: [
       rules.js,
-      rules.worker,
       rules.globalCss,
       rules.localCss,
       rules.handlebars,

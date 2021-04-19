@@ -15,8 +15,7 @@ from opentrons.algorithms import dfs, types
 def convert_to_vertex(
         graph_dict: dict,
         cast_type: Callable) -> List[types.GenericNode]:
-    """
-    Convert to Vertex.
+    """Convert to Vertex.
 
     Helper function to convert a json file to a list of
     generic nodes to help build the graph.
@@ -32,8 +31,7 @@ def convert_to_vertex(
 
 def load_graph() -> Tuple[Tuple[List[types.GenericNode], str],
                           Tuple[List[types.GenericNode], str]]:
-    """
-    Load Graphs.
+    """Load Graphs.
 
     Helper function to load the test json graph files.
     """
@@ -47,8 +45,7 @@ def load_graph() -> Tuple[Tuple[List[types.GenericNode], str],
 
 @pytest.fixture(scope="session", params=load_graph())
 def dfs_graph(request: Any) -> Tuple[dfs.DFS, str]:
-    """
-    Build DFS class.
+    """Build DFS class.
 
     Fixture that sets up a dfs class for either an
     alphabetical or numerical graph.
@@ -59,8 +56,7 @@ def dfs_graph(request: Any) -> Tuple[dfs.DFS, str]:
 
 
 def test_vertices(dfs_graph: dfs.DFS) -> None:
-    """
-    Test vertices.
+    """Test vertices.
 
     Test adding and removing the vertices of a graph.
 
@@ -86,8 +82,7 @@ def test_vertices(dfs_graph: dfs.DFS) -> None:
 
 
 def test_neighbors(dfs_graph: dfs.DFS) -> None:
-    """
-    Test neighbors.
+    """Test neighbors.
 
     Test adding neighbors to a vertex.
     Neighbors act as keys for a given vertex.
@@ -113,8 +108,7 @@ def test_neighbors(dfs_graph: dfs.DFS) -> None:
 
 
 def test_depth_first_search(dfs_graph: dfs.DFS) -> None:
-    """
-    Test the depth first search algorithm.
+    """Test the depth first search algorithm.
 
     The method should dig down into the bottom leaf node
     before backtracking up to find unvisited nodes.

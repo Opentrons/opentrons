@@ -474,8 +474,8 @@ async def configure(ssid: str,
     # This unfortunately doesn’t respect the --terse flag, so we need to
     # regex out the name or the uuid to use later in connection up; the
     # uuid is slightly more regular, so that’s what we use.
-    uuid_matches = re.search(  # noqa
-        r"Connection '(.*)'[\s]+\(([\w\d-]+)\) successfully", res)  # noqa
+    uuid_matches = re.search(
+        r"Connection '(.*)'[\s]+\(([\w\d-]+)\) successfully", res)
     if not uuid_matches:
         return False, err.split('\r')[-1]
     name = uuid_matches.group(1)
@@ -637,7 +637,7 @@ def sanitize_args(cmd: List[str]) -> List[str]:
         def _is_password(cmdstr):
             return 'wifi-sec.psk' in cmdstr\
                 or 'password' in cmdstr.lower()
-        if idx > 0 and _is_password(cmd[idx-1]):
+        if idx > 0 and _is_password(cmd[idx - 1]):
             sanitized.append('****')
         else:
             sanitized.append(fieldname)

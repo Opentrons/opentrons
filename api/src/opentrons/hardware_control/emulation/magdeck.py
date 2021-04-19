@@ -1,7 +1,7 @@
 import logging
-from typing import Optional
+from typing import Optional, List
 from opentrons.drivers.mag_deck.driver import GCODES
-from .command_processor import CommandProcessor
+from .abstract_emulator import AbstractEmulator
 
 logger = logging.getLogger(__name__)
 
@@ -18,15 +18,16 @@ MODEL = "magdeck_emulator"
 VERSION = 1
 
 
-class MagDeckEmulator(CommandProcessor):
+class MagDeckEmulator(AbstractEmulator):
     """Magdeck emulator"""
 
     def __init__(self) -> None:
         self.height = 0
         self.position = 0
 
-    def handle(self, cmd: str, payload: str) -> Optional[str]:
+    def handle(self, words: List[str]) -> Optional[str]:
         """Handle a command."""
+        cmd = words[0]
         logger.info(f"Got command {cmd}")
         if cmd == GCODE_HOME:
             pass

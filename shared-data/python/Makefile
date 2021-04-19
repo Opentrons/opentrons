@@ -80,7 +80,7 @@ $(BUILD_DIR)/opentrons_shared_data-%-py2.py3-none-any.whl: setup.py $(py_sources
 .PHONY: lint
 lint: $(py_sources)
 	$(python) -m mypy opentrons_shared_data
-	$(python) -m pylama opentrons_shared_data
+	$(python) -m flake8 opentrons_shared_data tests setup.py
 
 .PHONY: push-no-restart
 push-no-restart: $(wheel_file)

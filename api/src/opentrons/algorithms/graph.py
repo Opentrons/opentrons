@@ -1,6 +1,4 @@
-
-"""
-Graph Builder.
+"""Graph Builder.
 
 Generic graph builder classes.
 """
@@ -12,8 +10,7 @@ from .types import VertexLike, VertexName
 
 
 class Vertex(Generic[VertexName, VertexLike]):
-    """
-    Vertex class.
+    """Vertex class.
 
     A class to hold information about each vertex
     of a graph.
@@ -22,8 +19,7 @@ class Vertex(Generic[VertexName, VertexLike]):
     def __init__(
             self, vertex: VertexLike,
             neighbors: List[VertexName]) -> None:
-        """
-        Vertex class initializer.
+        """Vertex class initializer.
 
         :param vertex: A node dataclass
         :param neighbors: A list of node names who
@@ -34,8 +30,7 @@ class Vertex(Generic[VertexName, VertexLike]):
 
     @property
     def name(self) -> VertexName:
-        """
-        Vertex class property: name.
+        """Vertex class property: name.
 
         :returns: Name of the vertex
         """
@@ -43,8 +38,7 @@ class Vertex(Generic[VertexName, VertexLike]):
 
     @property
     def vertex(self) -> VertexLike:
-        """
-        Vertex class property: vertex.
+        """Vertex class property: vertex.
 
         :returns: The node dataclass
         """
@@ -52,8 +46,7 @@ class Vertex(Generic[VertexName, VertexLike]):
 
     @property
     def neighbors(self) -> List[VertexName]:
-        """
-        Vertex class property: neighbors.
+        """Vertex class property: neighbors.
 
         :returns: The list of node names who are
         neighbors with the vertex.
@@ -61,8 +54,7 @@ class Vertex(Generic[VertexName, VertexLike]):
         return self._neighbors
 
     def add_neighbor(self, vertex_name: VertexName) -> None:
-        """
-        Add a neighbor.
+        """Add a neighbor.
 
         :param vertex_name: The name of the neighbor
         """
@@ -70,8 +62,7 @@ class Vertex(Generic[VertexName, VertexLike]):
         self._neighbors.sort()
 
     def remove_neighbor(self, vertex_name: VertexName) -> None:
-        """
-        Remove a neighbor.
+        """Remove a neighbor.
 
         :param vertex_name: The name of the neighbor
         """
@@ -80,8 +71,7 @@ class Vertex(Generic[VertexName, VertexLike]):
 
 
 def default_sort(vertex: Vertex) -> VertexName:
-    """
-    Sort function default for a graph.
+    """Sort function default for a graph.
 
     By default, a graph's nodes will be searched
     by the name of the node. Generally, the name
@@ -91,8 +81,7 @@ def default_sort(vertex: Vertex) -> VertexName:
 
 
 class Graph(Generic[VertexName, VertexLike]):
-    """
-    Graph class.
+    """Graph class.
 
     A class to handle functions moving through the
     graph.
@@ -107,8 +96,7 @@ class Graph(Generic[VertexName, VertexLike]):
             self, sorted_graph: List[Vertex],
             lookup_table: Dict[VertexName, Vertex],
             sort_by: Callable[[Vertex], str]) -> None:
-        """
-        Graph class initializer.
+        """Graph class initializer.
 
         :param sorted_graph: The initial graph, sorted
         and converted to vertex objects.
@@ -124,8 +112,7 @@ class Graph(Generic[VertexName, VertexLike]):
     @classmethod
     def build(cls, graph: List[VertexLike],
               sort_by: Callable = default_sort) -> Graph:
-        """
-        Graph class builder.
+        """Graph class builder.
 
         :param graph: A list of nodes to add to the graph.
         :param sort_by: The function used to sort the graph
@@ -143,8 +130,7 @@ class Graph(Generic[VertexName, VertexLike]):
 
     @property
     def graph(self) -> Sequence[Vertex]:
-        """
-        Graph class property: graph.
+        """Graph class property: graph.
 
         :returns: A list of sorted vertex objects
         """
@@ -152,8 +138,7 @@ class Graph(Generic[VertexName, VertexLike]):
 
     @staticmethod
     def build_vertex(vertex: VertexLike) -> Vertex:
-        """
-        Build a vertex.
+        """Build a vertex.
 
         Use this to sort the neighbors and then build
         a vertex using a node dataclass.
@@ -164,8 +149,7 @@ class Graph(Generic[VertexName, VertexLike]):
         return Vertex(vertex, vertex.sub_names)
 
     def add_vertex(self, vertex: VertexLike) -> None:
-        """
-        Add a vertex.
+        """Add a vertex.
 
         :param vertex: A node dataclass
         """
@@ -176,8 +160,7 @@ class Graph(Generic[VertexName, VertexLike]):
         self._sorted_graph.sort(key=self._sort_by)
 
     def remove_vertex(self, vertex: VertexLike) -> None:
-        """
-        Remove a vertex.
+        """Remove a vertex.
 
         :param vertex: A node dataclass
         """
@@ -187,8 +170,7 @@ class Graph(Generic[VertexName, VertexLike]):
             self._sorted_graph.remove(vertex_to_remove)
 
     def get_vertex(self, vertex_name: VertexName) -> Vertex:
-        """
-        Get a vertex.
+        """Get a vertex.
 
         :param vertex_name: The name of the vertex
         :returns: The vertex object

@@ -105,7 +105,9 @@ export const announcements: Array<Announcement> = [
         <p>Starting today, you’ll be able to:</p>
         <ul>
           <li>Select, delete, and duplicate multiple steps at once</li>
-          <li>Edit advanced settings for multiple Transfer steps at once</li>
+          <li>
+            Edit advanced settings for multiple Transfer or Mix steps at once
+          </li>
         </ul>
 
         <p>
@@ -115,7 +117,7 @@ export const announcements: Array<Announcement> = [
 
         <p>
           From here, you can access the control bar at the top of the protocol
-          timeline, or edit advanced settings for Transfer steps!
+          timeline, or edit advanced settings for Transfer or Mix steps!
         </p>
       </>
     ),

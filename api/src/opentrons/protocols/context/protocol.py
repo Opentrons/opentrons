@@ -160,9 +160,16 @@ class AbstractProtocol(ABC):
         ...
 
     @abstractmethod
-    def get_last_location(self) -> Optional[types.Location]:
+    def get_last_location(
+        self,
+        mount: Optional[types.Mount] = None,
+    ) -> Optional[types.Location]:
         ...
 
     @abstractmethod
-    def set_last_location(self, location: Optional[types.Location]) -> None:
+    def set_last_location(
+        self,
+        location: Optional[types.Location],
+        mount: Optional[types.Mount] = None,
+    ) -> None:
         ...

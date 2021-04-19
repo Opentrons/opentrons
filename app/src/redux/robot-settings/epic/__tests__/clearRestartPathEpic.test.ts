@@ -10,8 +10,8 @@ import type { State } from '../../../types'
 jest.mock('../../../robot-admin/selectors')
 jest.mock('../../selectors')
 
-const mockGetRobotAdminStatus: JestMockFn<[State, string], mixed> =
-  RobotAdminSelectors.getRobotAdminStatus
+const mockGetRobotRestarting: JestMockFn<[State, string], mixed> =
+  RobotAdminSelectors.getRobotRestarting
 
 const mockGetAllRestartRequiredRobots: JestMockFn<[State], string[]> =
   Selectors.getAllRestartRequiredRobots
@@ -21,7 +21,7 @@ describe('clearRestartPathEpic', () => {
 
   beforeEach(() => {
     mockGetAllRestartRequiredRobots.mockReturnValue([])
-    mockGetRobotAdminStatus.mockReturnValue(null)
+    mockGetRobotRestarting.mockReturnValue(false)
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
@@ -34,7 +34,7 @@ describe('clearRestartPathEpic', () => {
 
   it('dispatches CLEAR_RESTART_PATH on robot restart', () => {
     mockGetAllRestartRequiredRobots.mockReturnValue(['a', 'b'])
-    mockGetRobotAdminStatus.mockReturnValue('restarting')
+    mockGetRobotRestarting.mockReturnValue(true)
 
     testScheduler.run(({ hot, cold, expectObservable }) => {
       const action$ = cold('--')

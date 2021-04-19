@@ -2,14 +2,13 @@
 // wraps the api client worker to handle API side effects in a different thread
 
 import { createLogger } from '../../../logger'
-import Worker from './worker'
 
 const log = createLogger(__filename)
 
 const shouldProcess = a => a.meta && (a.meta.robot || a.meta.robotCommand)
 
 export function apiClientMiddleware() {
-  const worker = new Worker()
+  const worker = new Worker('./worker', { type: 'module' })
 
   return store => {
     const { getState, dispatch } = store

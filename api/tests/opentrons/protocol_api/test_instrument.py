@@ -10,10 +10,11 @@ from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture
-def make_context_and_labware():
+def make_context_and_labware(hardware):
     def _make_context_and_labware(api_version):
         ctx = papi.ProtocolContext(
             implementation=ProtocolContextImplementation(
+                hardware=hardware,
                 api_version=api_version
             ),
             api_version=api_version

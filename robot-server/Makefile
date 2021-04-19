@@ -75,7 +75,7 @@ test:
 .PHONY: lint
 lint: $(ot_py_sources)
 	$(python) -m mypy $(SRC_PATH)
-	$(python) -m pylama $(SRC_PATH) tests
+	$(python) -m flake8 $(SRC_PATH) tests setup.py
 
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env

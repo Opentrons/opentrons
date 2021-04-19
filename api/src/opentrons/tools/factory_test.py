@@ -178,11 +178,11 @@ def test_smoothie_gpio(driver: 'SmoothieDriver_3_0_0'):
     print('ISP')
     # drop the ISP line to LOW, and make sure it is dead
     driver._smoothie_programming_mode()
-    try:                                        # NOQA
-        _write_and_return('M999')               # NOQA
-        print(RESULT_SPACE.format(FAIL))        # NOQA
-    except Exception:                           # NOQA
-        print(RESULT_SPACE.format(PASS))        # NOQA
+    try:
+        _write_and_return('M999')
+        print(RESULT_SPACE.format(FAIL))
+    except Exception:
+        print(RESULT_SPACE.format(PASS))
 
     print('RESET')
     # toggle the RESET line to LOW, and make sure it is NOT dead
@@ -227,7 +227,7 @@ def test_speaker():
 def record_camera(filepath):
     print('USB Camera')
     # record 1 second of video from the USB camera
-    c = 'ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1 {}'  # NOQA
+    c = 'ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1 {}'  # noqa: E501
     try:
         run_quiet_process(c.format(filepath))
         print(RESULT_SPACE.format(PASS))
@@ -269,7 +269,7 @@ def start_server(folder, filepath):
     print('\nOPEN\t--> {0}:8000/{1}\n'.format(
         _this_wifi_ip_address(),
         filepath.split('/')[-1]
-        ))
+    ))
     print('\nQuit\t--> CTRL-C\n\n\n')
     try:
         run_quiet_process('cd {} && python -m http.server'.format(folder))

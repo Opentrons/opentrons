@@ -89,7 +89,7 @@ class DeckCalibrationSession(BaseSession):
         # DeckCalibrationSessionStatus has an exact type for instrument
         supported_commands = self._deck_cal_user_flow.supported_commands
         return DeckCalibrationSessionStatus(
-            instrument=self._deck_cal_user_flow.get_pipette(),  # type: ignore[arg-type] # noqa: e501
+            instrument=self._deck_cal_user_flow.get_pipette(),  # type: ignore[arg-type]  # noqa: E501
             currentStep=self._deck_cal_user_flow.current_state,
             labware=self._deck_cal_user_flow.get_required_labware(),
             supportedCommands=supported_commands)

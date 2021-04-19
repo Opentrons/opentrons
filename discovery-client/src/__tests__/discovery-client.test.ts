@@ -4,13 +4,8 @@ import * as HealthPollerModule from '../health-poller'
 import * as MdnsBrowserModule from '../mdns-browser'
 import { createDiscoveryClient } from '..'
 
-import type {
-  HealthPoller,
-  HealthPollerResult,
-  MdnsBrowser,
-  MdnsBrowserService,
-  Logger,
-} from '../types'
+import type { HealthPoller, HealthPollerResult, Logger } from '../types'
+import type { MdnsBrowser, MdnsBrowserService } from '../mdns-browser'
 
 jest.mock('../health-poller')
 jest.mock('../mdns-browser')

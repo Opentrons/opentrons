@@ -2,7 +2,7 @@ import functools
 from typing import Any, List, Dict
 
 
-def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa C901
+def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa: C901
 
     def object_container(value):
         # Save id of instance of object's type as a reference too

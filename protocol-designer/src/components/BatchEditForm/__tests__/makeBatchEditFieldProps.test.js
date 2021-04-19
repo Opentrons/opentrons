@@ -8,8 +8,14 @@ const getFieldDefaultTooltipSpy = jest.spyOn(
   'getFieldDefaultTooltip'
 )
 
+const getIndeterminateTooltipSpy = jest.spyOn(
+  stepEditFormUtils,
+  'getFieldIndeterminateTooltip'
+)
+
 beforeEach(() => {
   getFieldDefaultTooltipSpy.mockImplementation(name => `tooltip for ${name}`)
+  getIndeterminateTooltipSpy.mockImplementation(name => `tooltip for ${name}`)
 })
 
 afterEach(() => {
@@ -98,5 +104,54 @@ describe('makeBatchEditFieldProps', () => {
     )
 
     expect(result.aspirate_flowRate.isIndeterminate).toBe(true)
+  })
+
+  it('should show indeterminate tooltip content for indeterminate checkboxes', () => {
+    const fieldValues = {
+      preWetTip: {
+        value: 'mixed',
+        isIndeterminate: true,
+      },
+    }
+    const handleChangeFormInput: any = jest.fn()
+
+    const disabledFields = {}
+
+    const result = makeBatchEditFieldProps(
+      fieldValues,
+      disabledFields,
+      handleChangeFormInput
+    )
+
+    expect(result.preWetTip.isIndeterminate).toBe(true)
+    expect(result.preWetTip.tooltipContent).toBe(
+      'Not all selected steps are using this setting'
+    )
+  })
+
+  it('should override indeterminate tooltip content if field is also disabled', () => {
+    const fieldValues = {
+      preWetTip: {
+        value: 'mixed',
+        isIndeterminate: true,
+      },
+    }
+    const handleChangeFormInput: any = jest.fn()
+
+    const disabledFields = {
+      preWetTip: 'Disabled explanation text here',
+    }
+
+    const result = makeBatchEditFieldProps(
+      fieldValues,
+      disabledFields,
+      handleChangeFormInput
+    )
+
+    expect(result.preWetTip.isIndeterminate).toBe(true)
+    expect(result.preWetTip.disabled).toBe(true)
+    expect(result.preWetTip.tooltipContent).toBe(
+      'Disabled explanation text here'
+    )
   })
 })

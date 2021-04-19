@@ -275,7 +275,13 @@ describe('Protocols with Modules', () => {
         cy.get('button[disabled]').should('not.exist')
         cy.get('textarea').type('heating up')
         cy.get('button').contains('save', { matchCase: false }).click()
+        // close "batch edit hint" modal
+        cy.contains('Editing multiple steps').should('exist')
+        // force option used because checkbox is hidden
+        cy.get('input[type="checkbox"]').click({ force: true })
+        cy.get('button').contains('ok').click()
       })
+
       cy.get('[data-test="StepItem_2"]').within(() => {
         cy.contains('Pause Until', { matchCase: false }).should('exist')
         cy.contains('heating up').should('exist')

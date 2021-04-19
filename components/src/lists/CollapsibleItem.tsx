@@ -6,6 +6,8 @@ import styles from './lists.css'
 import { Icon } from '../icons'
 
 export interface CollapsibleItemProps {
+  /** header */
+  header?: string
   /** text of title */
   title: string
   /** children nodes */
@@ -22,8 +24,9 @@ export interface CollapsibleItemProps {
  * A list item with title, and collapsible children.
  */
 export function CollapsibleItem(props: CollapsibleItemProps): JSX.Element {
-  const { onCollapseToggle } = props
+  const { onCollapseToggle, header } = props
   const collapsible = onCollapseToggle != null
+  const hasHeader = header != null
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
@@ -45,6 +48,7 @@ export function CollapsibleItem(props: CollapsibleItemProps): JSX.Element {
   return (
     <div className={className}>
       <div className={titleBarClass}>
+        {hasHeader && <p className={styles.header_text}>{header}</p>}
         <h3 className={styles.title}>{props.title}</h3>
         {collapsible && (
           <div

@@ -43,9 +43,9 @@ async def get_modules(hardware: ThreadManager = Depends(get_hardware))\
 
 
 @router.get("/modules/{serial}/data",
-            description="Get live data for a specific module",
-            summary="This is similar to the values in GET /modules, but for "
-                    "only a specific currently-attached module",
+            summary="Get live data for a specific module",
+            description="This is similar to the values in GET /modules, but "
+                        "for only a specific currently-attached module",
             response_model=ModuleSerial,
             responses={status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}}
             )
@@ -74,10 +74,11 @@ async def get_module_serial(
 
 
 @router.post("/modules/{serial}",
-             description="Execute a command on a specific module",
-             summary="Command a module to take an action. Valid actions depend"
-                     " on the specific module attached, which is the model "
-                     "value from GET /modules/{serial}/data or GET /modules",
+             summary="Execute a command on a specific module",
+             description="Command a module to take an action. Valid actions "
+                         "depend on the specific module attached, which is "
+                         "the model value from GET /modules/{serial}/data or "
+                         "GET /modules",
              response_model=SerialCommandResponse,
              responses={
                  status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}
@@ -124,9 +125,9 @@ async def post_serial_command(
 
 
 @router.post("/modules/{serial}/update",
-             description="Initiate a firmware update on a specific module",
-             summary="Command robot to flash its bundled firmware file for "
-                     "this module's type to this specific module",
+             summary="Initiate a firmware update on a specific module",
+             description="Command robot to flash its bundled firmware file "
+                         "for this module's type to this specific module",
              response_model=V1BasicResponse,
              responses={status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}}
              )

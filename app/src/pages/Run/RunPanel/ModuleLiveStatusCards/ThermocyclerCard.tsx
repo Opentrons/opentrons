@@ -94,6 +94,7 @@ type Props = {
     command: ModuleCommand,
     args?: unknown[]
   ) => mixed,
+  slot: string,
   controlDisabledReason: string | null,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
@@ -105,7 +106,8 @@ export const ThermocyclerCard = ({
   controlDisabledReason,
   isCardExpanded,
   toggleCard,
-}: Props): JSX.Element => {
+  slot,
+}: Props): JSX.Element=> {
   const {
     currentTemp,
     targetTemp,
@@ -125,6 +127,7 @@ export const ThermocyclerCard = ({
     currentStepIndex != null
   return (
     <StatusCard
+      header={slot}
       title={getModuleDisplayName(module.model)}
       isCardExpanded={isCardExpanded}
       toggleCard={toggleCard}

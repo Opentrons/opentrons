@@ -13,8 +13,6 @@ import { registerDiscovery } from '../discovery'
 import * as Cfg from '../config'
 import * as SysInfo from '../system-info'
 
-import type { Dispatch } from '../types'
-
 jest.mock('electron')
 jest.mock('electron-store')
 jest.mock('@opentrons/discovery-client')
@@ -123,12 +121,12 @@ describe('app-shell/discovery', () => {
   it('sets poll speed on "discovery:START" and "discovery:FINISH"', () => {
     const handleAction = registerDiscovery(dispatch)
 
-    handleAction({ type: 'discovery:START' })
+    handleAction(startDiscovery())
     expect(mockClient.start).toHaveBeenLastCalledWith({
       healthPollInterval: 3000,
     })
 
-    handleAction({ type: 'discovery:FINISH' })
+    handleAction(finishDiscovery())
     expect(mockClient.start).toHaveBeenLastCalledWith({
       healthPollInterval: 15000,
     })
@@ -149,7 +147,7 @@ describe('app-shell/discovery', () => {
     ]
 
     mockClient.getRobots.mockReturnValue(expected)
-    registerDiscovery(dispatch)({ type: 'discovery:START' })
+    registerDiscovery(dispatch)(startDiscovery())
     expect(dispatch).toHaveBeenCalledWith({
       type: 'discovery:UPDATE_LIST',
       payload: { robots: expected },
@@ -433,66 +431,6 @@ describe('app-shell/discovery', () => {
           ]),
         })
       )
-    })
-  })
-
-  // TODO(mc, 2020-06-16): move this functionality into discovery-client
-  describe('network interface monitoring', () => {
-    const stopMonitor = jest.fn()
-    let interfacePollInterval: number
-    let handleInterfaceChange: (ifaces: SysInfo.NetworkInterface[]) => unknown
-    let handleAction: Dispatch
-
-    beforeEach(() => {
-      createNetworkInterfaceMonitor.mockImplementation(options => {
-        const { pollInterval, onInterfaceChange } = options
-        interfacePollInterval = pollInterval
-        handleInterfaceChange = onInterfaceChange
-        return { stop: stopMonitor }
-      })
-
-      handleAction = registerDiscovery(dispatch)
-    })
-
-    it('should create a network interface monitor', () => {
-      expect(interfacePollInterval).toBe(30000)
-      expect(typeof handleInterfaceChange).toBe('function')
-    })
-
-    it('should restart the mdns browser when interfaces change', () => {
-      expect(mockClient.start).toHaveBeenCalledTimes(1)
-      handleInterfaceChange([])
-      expect(mockClient.start).toHaveBeenCalledTimes(2)
-    })
-
-    it('calls stops the interface monitor when electron app emits "will-quit"', () => {
-      const [event, handler] = appOnce.mock.calls[0]
-      expect(event).toEqual('will-quit')
-
-      // trigger event handler
-      expect(stopMonitor).toHaveBeenCalledTimes(0)
-      handler()
-      expect(stopMonitor).toHaveBeenCalledTimes(1)
-    })
-
-    it('should speed up the network interface monitor in fast discovery mode', () => {
-      expect(stopMonitor).toHaveBeenCalledTimes(0)
-      expect(createNetworkInterfaceMonitor).toHaveBeenCalledTimes(1)
-
-      handleAction(startDiscovery())
-      expect(stopMonitor).toHaveBeenCalledTimes(1)
-      expect(createNetworkInterfaceMonitor).toHaveBeenCalledTimes(2)
-
-      expect(interfacePollInterval).toBe(5000)
-    })
-
-    it('should slow the network interface monitor down once discovery ends', () => {
-      handleAction(startDiscovery())
-      handleAction(finishDiscovery())
-      expect(stopMonitor).toHaveBeenCalledTimes(2)
-      expect(createNetworkInterfaceMonitor).toHaveBeenCalledTimes(3)
-
-      expect(interfacePollInterval).toBe(30000)
     })
   })
 })

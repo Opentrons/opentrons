@@ -3,7 +3,6 @@ import {
   GEN_ONE_MULTI_PIPETTES,
   MODULES_WITH_COLLISION_ISSUES,
 } from '../../constants'
-import { _getFeatureFlag } from './_getFeatureFlag'
 import type { PipetteEntity } from '../../step-forms/types'
 import type { DeckSlot } from '../../types'
 import type { InvariantContext, RobotState } from '../types'
@@ -13,11 +12,11 @@ export const modulePipetteCollision = (args: {|
   invariantContext: InvariantContext,
   prevRobotState: RobotState,
 |}): boolean => {
-  if (_getFeatureFlag('OT_PD_DISABLE_MODULE_RESTRICTIONS')) {
+  const { pipette, labware, invariantContext, prevRobotState } = args
+  if (invariantContext.config.OT_PD_DISABLE_MODULE_RESTRICTIONS) {
     // always ignore collision hazard
     return false
   }
-  const { pipette, labware, invariantContext, prevRobotState } = args
   const pipetteEntity: ?PipetteEntity = pipette
     ? invariantContext.pipetteEntities[pipette]
     : null

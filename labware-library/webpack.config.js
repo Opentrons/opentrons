@@ -10,8 +10,8 @@ const { baseConfig } = require('@opentrons/webpack-config')
 // const {baseConfig, DEV_MODE} = require('@opentrons/webpack-config')
 const pkg = require('./package.json')
 
-const JS_ENTRY = path.join(__dirname, './src/index.js')
-const HTML_ENTRY = path.join(__dirname, './src/index.hbs')
+const JS_ENTRY = path.join(__dirname, 'src/index.tsx')
+const HTML_ENTRY = path.join(__dirname, 'src/index.hbs')
 const OUT_PATH = path.join(__dirname, 'dist')
 
 const LABWARE_LIBRARY_ENV_VAR_PREFIX = 'OT_LL'

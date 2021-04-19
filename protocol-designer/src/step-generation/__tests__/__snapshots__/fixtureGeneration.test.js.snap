@@ -544,6 +544,9 @@ Object {
 
 exports[`snapshot tests makeContext 1`] = `
 Object {
+  "config": Object {
+    "OT_PD_DISABLE_MODULE_RESTRICTIONS": false,
+  },
   "labwareEntities": Object {
     "destPlateId": Object {
       "def": Object {

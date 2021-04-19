@@ -1,4 +1,4 @@
-import pytest  # noqa
+import pytest
 
 from opentrons.system import nmcli
 
@@ -124,22 +124,22 @@ GENERAL.STATE:100 (connected)'''
 
     assert await nmcli.is_connected() == 'full'
     assert await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI) == {
-                # test "--" gets mapped to None
-                'ipAddress': None,
-                'macAddress': 'B8:27:EB:5F:A6:89',
-                # test "--" gets mapped to None
-                'gatewayAddress': None,
-                'state': 'disconnected',
-                'type': 'wifi'
-            }
+        # test "--" gets mapped to None
+        'ipAddress': None,
+        'macAddress': 'B8:27:EB:5F:A6:89',
+        # test "--" gets mapped to None
+        'gatewayAddress': None,
+        'state': 'disconnected',
+        'type': 'wifi'
+    }
 
     assert await nmcli.iface_info(nmcli.NETWORK_IFACES.ETH_LL) == {
-                'ipAddress': '169.254.229.173/16',
-                'macAddress': 'B8:27:EB:39:C0:9A',
-                # test missing output gets mapped to None
-                'gatewayAddress': None,
-                'state': 'connected',
-                'type': 'ethernet'
+        'ipAddress': '169.254.229.173/16',
+        'macAddress': 'B8:27:EB:39:C0:9A',
+        # test missing output gets mapped to None
+        'gatewayAddress': None,
+        'state': 'connected',
+        'type': 'ethernet'
     }
 
     async def mock_call(cmd):

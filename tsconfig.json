@@ -12,6 +12,9 @@
     },
     {
       "path": "./discovery-client"
+    },
+    {
+      "path": "./labware-library"
     }
   ]
 }

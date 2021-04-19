@@ -24,8 +24,7 @@ def get_waypoints(
     origin_cp: Optional[CriticalPoint] = None,
     dest_cp: Optional[CriticalPoint] = None,
 ) -> List[Waypoint]:
-    """
-    Get waypoints between an origin point and a destination point.
+    """Get waypoints between an origin point and a destination point.
 
     Given a move type and Z limits, which should be calculated according to
     deck / labware / pipette geometry, creates waypoints with proper

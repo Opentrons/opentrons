@@ -1,3 +1,5 @@
+"""Global constants for the HTTP API server."""
+
 # This is the version of the HTTP API used by the server.  This value should
 # be incremented anytime the schema of a request or response is changed. This
 # value is different and separate from the application version.

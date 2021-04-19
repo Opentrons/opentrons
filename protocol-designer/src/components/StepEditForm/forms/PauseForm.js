@@ -4,7 +4,13 @@ import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
 
-import { FormGroup, HoverTooltip } from '@opentrons/components'
+import {
+  FormGroup,
+  useHoverTooltip,
+  Tooltip,
+  TOOLTIP_BOTTOM,
+  TOOLTIP_FIXED,
+} from '@opentrons/components'
 import { i18n } from '../../../localization'
 import {
   PAUSE_UNTIL_RESUME,
@@ -17,10 +23,6 @@ import styles from '../StepEditForm.css'
 
 import type { StepFormProps } from '../types'
 
-const PauseUntilTempTooltip = () => (
-  <div>{getSingleSelectDisabledTooltip('wait_until_temp', 'pauseAction')}</div>
-)
-
 export const PauseForm = (props: StepFormProps): React.Node => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
@@ -29,6 +31,11 @@ export const PauseForm = (props: StepFormProps): React.Node => {
   const pauseUntilTempEnabled = useSelector(
     uiModuleSelectors.getTempModuleIsOnDeck
   )
+
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_BOTTOM,
+    strategy: TOOLTIP_FIXED,
+  })
 
   const { propsForFields } = props
   const { pauseAction } = props.formData
@@ -89,58 +96,54 @@ export const PauseForm = (props: StepFormProps): React.Node => {
             </div>
           )}
 
-          <HoverTooltip
-            placement="bottom"
-            tooltipComponent={
-              pauseUntilTempEnabled ? null : <PauseUntilTempTooltip />
-            }
-          >
-            {hoverTooltipHandlers => (
-              <div {...hoverTooltipHandlers}>
-                <div className={styles.checkbox_row}>
-                  <RadioGroupField
-                    {...propsForFields['pauseAction']}
-                    className={cx({
-                      [styles.disabled]: !pauseUntilTempEnabled,
-                    })}
-                    options={[
-                      {
-                        name: i18n.t(
-                          'form.step_edit_form.field.pauseAction.options.untilTemperature'
-                        ),
-                        value: PAUSE_UNTIL_TEMP,
-                      },
-                    ]}
+          {pauseUntilTempEnabled ? null : (
+            <Tooltip {...tooltipProps}>
+              {getSingleSelectDisabledTooltip('wait_until_temp', 'pauseAction')}
+            </Tooltip>
+          )}
+          <div {...targetProps}>
+            <div className={styles.checkbox_row}>
+              <RadioGroupField
+                {...propsForFields['pauseAction']}
+                className={cx({
+                  [styles.disabled]: !pauseUntilTempEnabled,
+                })}
+                options={[
+                  {
+                    name: i18n.t(
+                      'form.step_edit_form.field.pauseAction.options.untilTemperature'
+                    ),
+                    value: PAUSE_UNTIL_TEMP,
+                  },
+                ]}
+              />
+            </div>
+            {pauseAction === PAUSE_UNTIL_TEMP && (
+              <div className={styles.form_row}>
+                <FormGroup
+                  label={i18n.t(
+                    'form.step_edit_form.field.moduleActionLabware.label'
+                  )}
+                >
+                  <StepFormDropdown
+                    {...propsForFields['moduleId']}
+                    options={moduleLabwareOptions}
                   />
-                </div>
-                {pauseAction === PAUSE_UNTIL_TEMP && (
-                  <div className={styles.form_row}>
-                    <FormGroup
-                      label={i18n.t(
-                        'form.step_edit_form.field.moduleActionLabware.label'
-                      )}
-                    >
-                      <StepFormDropdown
-                        {...propsForFields['moduleId']}
-                        options={moduleLabwareOptions}
-                      />
-                    </FormGroup>
-                    <FormGroup
-                      label={i18n.t(
-                        'form.step_edit_form.field.pauseTemperature.label'
-                      )}
-                    >
-                      <TextField
-                        {...propsForFields['pauseTemperature']}
-                        className={styles.small_field}
-                        units={i18n.t('application.units.degrees')}
-                      />
-                    </FormGroup>
-                  </div>
-                )}
+                </FormGroup>
+                <FormGroup
+                  label={i18n.t(
+                    'form.step_edit_form.field.pauseTemperature.label'
+                  )}
+                >
+                  <TextField
+                    {...propsForFields['pauseTemperature']}
+                    className={styles.small_field}
+                    units={i18n.t('application.units.degrees')}
+                  />
+                </FormGroup>
               </div>
             )}
-          </HoverTooltip>
+          </div>
         </div>
         <div className={styles.section_column}>
           <div className={styles.form_row}>

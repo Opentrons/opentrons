@@ -154,7 +154,17 @@ class InstrumentContextImplementation(AbstractInstrument):
                 minimum_z_height: Optional[float],
                 speed: Optional[float]) -> None:
         """Move the instrument."""
-        last_location = self._protocol_interface.get_last_location()
+        # prevent direct movement bugs in PAPI version >= 2.10
+        location_cache_mount = (
+            self._mount
+            if self._api_version >= APIVersion(2, 10) else
+            None
+        )
+
+        last_location = self._protocol_interface.get_last_location(
+            mount=location_cache_mount
+        )
+
         if last_location:
             from_lw = last_location.labware
         else:
@@ -190,7 +200,10 @@ class InstrumentContextImplementation(AbstractInstrument):
             self._protocol_interface.set_last_location(None)
             raise
         else:
-            self._protocol_interface.set_last_location(location)
+            self._protocol_interface.set_last_location(
+                location=location,
+                mount=location_cache_mount
+            )
 
     def get_mount(self) -> types.Mount:
         """Get the mount this pipette is attached to."""

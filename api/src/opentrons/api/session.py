@@ -388,12 +388,12 @@ class Session(RobotBusy):
                     instrs[mount] = {'model': pip['model'],
                                      'id': pip.get('pipette_id', '')}
             sync_sim = ThreadManager(
-                    API.build_hardware_simulator,
-                    instrs,
-                    [mod.name()
-                        for mod in self._hardware.attached_modules],
-                    strict_attached_instruments=False
-                    ).sync
+                API.build_hardware_simulator,
+                instrs,
+                [mod.name()
+                 for mod in self._hardware.attached_modules],
+                strict_attached_instruments=False
+            ).sync
             sync_sim.home()
 
             # Use feature flag to determine ProtocolContext implementation
@@ -514,7 +514,7 @@ class Session(RobotBusy):
         else:
             self.blocked = False
 
-    @robot_is_busy  # noqa: C901
+    @robot_is_busy
     def _run(self) -> None:
         def on_command(message: command_types.CommandMessage) -> None:
             if message['$'] == 'before':
@@ -616,7 +616,7 @@ class Session(RobotBusy):
         else:
             self.stateInfo.pop('estimatedDuration', None)
         if self.startTime:
-            self.stateInfo['changedAt'] = now()-self.startTime
+            self.stateInfo['changedAt'] = now() - self.startTime
         else:
             self.stateInfo.pop('changedAt', None)
         self._on_state_changed()

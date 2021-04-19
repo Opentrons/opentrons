@@ -1,7 +1,9 @@
 import typing
 
 from opentrons import types
+from opentrons.hardware_control import NoTipAttachedError, TipAttachedError
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.types import HardwareAction
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds, \
     Clearances
@@ -41,12 +43,18 @@ class InstrumentContextSimulation(AbstractInstrument):
         self._default_speed = speed
 
     def aspirate(self, volume: float, rate: float) -> None:
-        self._pipette_dict['current_volume'] += volume
+        self._raise_if_no_tip(HardwareAction.ASPIRATE.name)
+        new_volume = self.get_current_volume() + volume
+        assert new_volume <= self._pipette_dict['working_volume'],\
+            "Cannot aspirate more than pipette max volume"
+        self._pipette_dict['current_volume'] = new_volume
 
     def dispense(self, volume: float, rate: float) -> None:
+        self._raise_if_no_tip(HardwareAction.DISPENSE.name)
         self._pipette_dict['current_volume'] -= volume
 
     def blow_out(self) -> None:
+        self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
         self._pipette_dict['current_volume'] = 0
         self._pipette_dict['ready_to_aspirate'] = False
 
@@ -57,10 +65,12 @@ class InstrumentContextSimulation(AbstractInstrument):
     def pick_up_tip(self, well: WellImplementation, tip_length: float,
                     presses: typing.Optional[int],
                     increment: typing.Optional[float]) -> None:
+        self._raise_if_tip("drop tip")
         self._pipette_dict['has_tip'] = True
         self._pipette_dict['current_volume'] = 0
 
     def drop_tip(self, home_after: bool) -> None:
+        self._raise_if_no_tip(HardwareAction.DROPTIP.name)
         self._pipette_dict['has_tip'] = False
 
     def home(self) -> None:
@@ -129,7 +139,7 @@ class InstrumentContextSimulation(AbstractInstrument):
         return self._pipette_dict['ready_to_aspirate']
 
     def prepare_for_aspirate(self) -> None:
-        pass
+        self._raise_if_no_tip(HardwareAction.PREPARE_ASPIRATE.name)
 
     def get_return_height(self) -> float:
         return self._pipette_dict['return_tip_height']
@@ -162,3 +172,17 @@ class InstrumentContextSimulation(AbstractInstrument):
             self._pipette_dict['dispense_speed'] = dispense
         if blow_out is not None:
             self._pipette_dict['blow_out_speed'] = blow_out
+
+    def _raise_if_no_tip(self, action: str) -> None:
+        """Raise NoTipAttachedError if no tip."""
+        if not self.has_tip():
+            raise NoTipAttachedError(
+                f'Cannot perform {action} without a tip attached'
+            )
+
+    def _raise_if_tip(self, action: str) -> None:
+        """Raise TipAttachedError if tip."""
+        if self.has_tip():
+            raise TipAttachedError(
+                f'Cannot {action} with a tip attached'
+            )

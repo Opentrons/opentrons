@@ -37,6 +37,7 @@ export interface ServerHealthResponse {
   smoothieVersion: string
   systemVersion: string
   capabilities?: CapabilityMap
+  bootId?: string
 }
 
 export interface HealthErrorResponse {
@@ -80,7 +81,7 @@ export interface HealthPollerResult {
  * for its own state
  */
 export interface HealthPollerTarget {
-  /** IP address used to contruct health URLs */
+  /** IP address used to construct health URLs */
   ip: string
   /** Port address used to construct health URLs */
   port: number
@@ -126,50 +127,16 @@ export interface HealthPoller {
 }
 
 /**
- * Relavent data from an mDNS advertisement
- */
-export interface MdnsBrowserService {
-  /** The service's name from the advertisement */
-  name: string
-  /** The IP address that the service is using */
-  ip: string
-  /** The port the service is using */
-  port: number
-}
-
-/**
- * Options used to construct an mDNS browser
- */
-export interface MdnsBrowserOptions {
-  /** list of allowed ports; if empty, no services will be emitted */
-  ports: number[]
-  /** Function to call whenever a service is discovered on mDNS */
-  onService: (service: MdnsBrowserService) => unknown
-  /** Optional logger */
-  logger?: Logger
-}
-
-/**
- * An mDNS browser that can be started and stopped as needed
- */
-export interface MdnsBrowser {
-  /** Start discovering services */
-  start: () => void
-  /** Stop discovering services and tear down the underlying browser */
-  stop: () => void
-}
-
-/**
  * IP address and instantaneous health information for a given robot
  */
 export type DiscoveryClientRobotAddress = Omit<HostState, 'robotName'>
 
 /*
  * Robot object that the DiscoveryClient returns that combines latest known
- * health data from the robot along with possible IP addressess
+ * health data from the robot along with possible IP addresses
  */
 export interface DiscoveryClientRobot extends RobotState {
-  /** IP addresses and health state, ranked by connectability (descending) */
+  /** IP addresses and health state, ranked by connectivity (descending) */
   addresses: DiscoveryClientRobotAddress[]
 }
 
@@ -182,7 +149,7 @@ export interface DiscoveryClientConfig {
   healthPollInterval?: number
   /** Robots list to (re)initialize the tracking state */
   initialRobots?: DiscoveryClientRobot[]
-  /** Extra IP addresses to manially track */
+  /** Extra IP addresses to manually track */
   manualAddresses?: Address[]
 }
 

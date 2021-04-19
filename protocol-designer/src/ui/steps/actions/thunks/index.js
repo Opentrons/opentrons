@@ -182,6 +182,10 @@ export const saveStepForm: () => ThunkAction<any> = () => (
     dispatch(tutorialActions.addHint('thermocycler_lid_passive_cooling'))
   }
 
+  if (tutorialSelectors.shouldShowBatchEditHint(initialState)) {
+    dispatch(tutorialActions.addHint('protocol_can_enter_batch_edit'))
+  }
+
   // save the form
   dispatch(_saveStepForm(unsavedForm))
 }

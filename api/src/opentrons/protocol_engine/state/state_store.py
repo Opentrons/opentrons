@@ -76,8 +76,7 @@ class StateView:
 
 
 class StateStore(StateView):
-    """
-    ProtocolEngine state store.
+    """ProtocolEngine state store.
 
     A StateStore manages several substores, which will modify themselves in
     reaction to commands and other protocol events. Only Store classes should
