@@ -148,7 +148,7 @@ class PipetteContext:  # noqa: D101
             )
         else:
             raise NotImplementedError(
-                "Dispensing to a non-well location " "not yet supported in PE."
+                "Dispensing to a non-well location not yet supported in PE."
             )
         return self
 
