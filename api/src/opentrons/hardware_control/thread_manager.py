@@ -196,8 +196,8 @@ class ThreadManager:
 
             # Update self._cached_modules to delete all removed modules' entries and add
             # newly attached modules. Removing references to stale instances
-            # is necessary to allow the garbage collector to delete those objects from
-            # memory and cleanly stop all the threads associated with them.
+            # is necessary in order to allow the garbage collector to delete
+            # those objects from memory and cleanly stop all associated threads.
             cached_mods = {
                     module: cached_mods.get(module, wrap(module)) for module in attr}
             object.__setattr__(self, '_cached_modules', cached_mods)

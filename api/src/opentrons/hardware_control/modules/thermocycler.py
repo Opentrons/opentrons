@@ -349,4 +349,7 @@ class Thermocycler(mod_abc.AbstractModule):
         return new_port or self.port
 
     def cleanup(self) -> None:
-        self._driver.disconnect()
+        try:
+            self._driver.disconnect()
+        except Exception:
+            MODULE_LOG.exception('Exception while cleaning up Thermocycler')

@@ -627,10 +627,3 @@ class Thermocycler:
         await asyncio.sleep(0.05)
         trigger_connection.close()
         self.disconnect()
-
-    def __del__(self):
-        try:
-            if self._poller:
-                self._poller.close()  # type: ignore
-        except Exception:
-            log.exception('Exception while cleaning up Thermocycler')
