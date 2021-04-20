@@ -85,7 +85,7 @@ class PipetteContext:  # noqa: D101
         volume: Optional[float] = None,
         location: Union[types.Location, Well] = None,
         rate: float = 1.0,
-    ) -> InstrumentContext:
+    ) -> PipetteContext:
 
         if volume is None or volume == 0:
             # todo(mm, 2021-04-14): If None or 0, use highest volume possible.
@@ -125,7 +125,7 @@ class PipetteContext:  # noqa: D101
         volume: Optional[float] = None,
         location: Union[types.Location, Well] = None,
         rate: float = 1.0,
-    ) -> InstrumentContext:
+    ) -> PipetteContext:
 
         if rate != 1:
             raise NotImplementedError("Flow rate adjustment not yet supported in PE.")
@@ -158,13 +158,13 @@ class PipetteContext:  # noqa: D101
         volume: Optional[float] = None,
         location: Union[types.Location, Well] = None,
         rate: float = 1.0,
-    ) -> InstrumentContext:
+    ) -> PipetteContext:
         raise NotImplementedError()
 
     def blow_out(  # noqa: D102
         self,
         location: Union[types.Location, Well] = None,
-    ) -> InstrumentContext:
+    ) -> PipetteContext:
         raise NotImplementedError()
 
     def touch_tip(  # noqa: D102
@@ -173,17 +173,17 @@ class PipetteContext:  # noqa: D101
         radius: float = 1.0,
         v_offset: float = -1.0,
         speed: float = 60.0,
-    ) -> InstrumentContext:
+    ) -> PipetteContext:
         raise NotImplementedError()
 
     def air_gap(  # noqa: D102
         self,
         volume: Optional[float] = None,
         height: Optional[float] = None,
-    ) -> InstrumentContext:
+    ) -> PipetteContext:
         raise NotImplementedError()
 
-    def return_tip(self, home_after: bool = True) -> InstrumentContext:  # noqa: D102
+    def return_tip(self, home_after: bool = True) -> PipetteContext:  # noqa: D102
         raise NotImplementedError()
 
     def pick_up_tip(  # noqa: D102
@@ -191,7 +191,7 @@ class PipetteContext:  # noqa: D101
         location: Union[types.Location, Well] = None,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
-    ) -> InstrumentContext:
+    ) -> PipetteContext:
         # TODO(al, 2021-04-12): What about presses and increment? They are not
         #  supported by PE command. They are also not supported by PD protocols
         #  either.
@@ -214,7 +214,7 @@ class PipetteContext:  # noqa: D101
         self,
         location: Union[types.Location, Well] = None,
         home_after: bool = True,
-    ) -> InstrumentContext:
+    ) -> PipetteContext:
         # TODO(al, 2021-04-12): What about home_after?
         if not home_after:
             raise NotImplementedError()
@@ -230,10 +230,10 @@ class PipetteContext:  # noqa: D101
 
         return self
 
-    def home(self) -> InstrumentContext:  # noqa: D102
+    def home(self) -> PipetteContext:  # noqa: D102
         raise NotImplementedError()
 
-    def home_plunger(self) -> InstrumentContext:  # noqa: D102
+    def home_plunger(self) -> PipetteContext:  # noqa: D102
         raise NotImplementedError()
 
     def distribute(  # noqa: D102
@@ -243,7 +243,7 @@ class PipetteContext:  # noqa: D101
         dest: List[Well],
         *args,  # noqa: ANN002
         **kwargs,  # noqa: ANN003
-    ) -> InstrumentContext:
+    ) -> PipetteContext:
         raise NotImplementedError()
 
     def consolidate(  # noqa: D102
@@ -253,7 +253,7 @@ class PipetteContext:  # noqa: D101
         dest: Well,
         *args,  # noqa: ANN002
         **kwargs,  # noqa: ANN003
-    ) -> InstrumentContext:
+    ) -> PipetteContext:
         raise NotImplementedError()
 
     def transfer(  # noqa: D102
@@ -263,7 +263,7 @@ class PipetteContext:  # noqa: D101
         dest: AdvancedLiquidHandling,
         trash: bool = True,
         **kwargs,  # noqa: ANN003
-    ) -> InstrumentContext:
+    ) -> PipetteContext:
         raise NotImplementedError()
 
     def delay(self) -> None:  # noqa: D102
@@ -275,7 +275,7 @@ class PipetteContext:  # noqa: D101
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
-    ) -> InstrumentContext:
+    ) -> PipetteContext:
         raise NotImplementedError()
 
     @property
@@ -351,14 +351,6 @@ class PipetteContext:  # noqa: D101
         raise NotImplementedError()
 
     def pair_with(  # noqa: D102
-        self, instrument: InstrumentContext
+        self, instrument: PipetteContext
     ) -> PairedInstrumentContext:
         raise NotImplementedError()
-
-
-InstrumentContext = PipetteContext
-"""Alias of PipetteContext to preserve compatibility with Protocol API v2.
-
-.. deprecated:: Protocol API v3.0
-    Use :py:class:`PipetteContext` instead.
-"""
