@@ -19,12 +19,17 @@ from .types import (
 )
 
 __all__ = [
+    # main export
     "ProtocolEngine",
+    # state interfaces and models
     "StateStore",
     "StateView",
     "LabwareData",
+    # command execution interfaces
     "CommandHandlers",
+    # resource management interfaces
     "ResourceProviders",
+    # type definitions and other value models
     "DeckLocation",
     "DeckSlotLocation",
     "Dimensions",

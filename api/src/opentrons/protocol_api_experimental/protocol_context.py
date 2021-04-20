@@ -1,6 +1,6 @@
 # noqa: D100
 
-from typing import Sequence, Union
+from typing import List, Optional, Sequence, Union
 
 from opentrons.protocol_engine.clients import SyncClient
 
@@ -58,7 +58,7 @@ class ProtocolContext:  # noqa: D101
         self,
         instrument_name: str,
         mount: Union[DeprecatedMount, str],
-        tip_racks: Sequence[Labware] = (),
+        tip_racks: Optional[List[Labware]] = None,
         replace: bool = False,
     ) -> InstrumentContext:
         """Load a pipette into the protocol.
@@ -69,7 +69,7 @@ class ProtocolContext:  # noqa: D101
         return self.load_pipette(
             pipette_name=instrument_name,
             mount=(mount if isinstance(mount, str) else str(mount).lower()),
-            tip_racks=tip_racks,
+            tip_racks=(tip_racks if tip_racks is not None else ()),
             replace=replace,
         )
 
