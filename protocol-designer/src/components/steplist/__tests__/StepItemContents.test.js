@@ -2,10 +2,10 @@
 import React from 'react'
 import { shallow } from 'enzyme'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import { THERMOCYCLER_STATE } from '../../../constants'
 import { StepItemContents } from '../StepItem'
 import { ModuleStepItems } from '../ModuleStepItems'
 import type { StepItemContentsProps } from '../StepItem'
-import { THERMOCYCLER_STATE } from '../../../constants'
 
 describe('StepItemContents', () => {
   let props
@@ -118,7 +118,6 @@ describe('StepItemContents', () => {
 
   describe('awaitTemperature step type', () => {
     let awaitTemperatureProps: StepItemContentsProps
-    // TODO(IL, 2021-02-04) that's not a stepType?!? See #7285
     const stepType: 'temperature' = 'temperature'
     beforeEach(() => {
       awaitTemperatureProps = {
@@ -154,7 +153,6 @@ describe('StepItemContents', () => {
 
   describe('thermocyclerState substep type', () => {
     let thermocyclerStateProps: StepItemContentsProps
-    // TODO(IL, 2021-02-04) that's not a stepType?!? See #7285
     const stepType: 'thermocycler' = 'thermocycler'
 
     beforeEach(() => {
