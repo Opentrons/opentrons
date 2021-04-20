@@ -209,7 +209,7 @@ class MagDeck(mod_abc.AbstractModule):
         if self._driver:
             self._driver.disconnect(port=self._port)
 
-    def __del__(self):
+    def cleanup(self) -> None:
         self._disconnect()
 
     async def prep_for_update(self) -> str:

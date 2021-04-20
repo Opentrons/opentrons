@@ -210,16 +210,24 @@ class TempDeck:
             updated_temperature = default or self._temperature.copy()
             self._temperature.update(updated_temperature)
         else:
-            # comment
-            try:
-                self._update_thread = Thread(
-                    target=self._recursive_update_temperature,
-                    args=[DEFAULT_COMMAND_RETRIES],
-                    name='Tempdeck recursive update temperature')
-                self._update_thread.start()
-            except (TempDeckError, SerialException, SerialNoResponse) as e:
-                return str(e)
+            def _update():
+                try:
+                    self._recursive_update_temperature(retries=DEFAULT_COMMAND_RETRIES)
+                except (OSError, TempDeckError, SerialException, SerialNoResponse):
+                    log.exception("UPDATE FAILED")
+
+            self._update_thread = Thread(
+                target=_update(),
+                name='Tempdeck recursive update temperature')
+            self._update_thread.start()
         return ''
+
+    def _update_temperature(self):
+        self._update_thread = Thread(
+            target=self._recursive_update_temperature,
+            args=[DEFAULT_COMMAND_RETRIES],
+            name='Tempdeck recursive update temperature')
+        self._update_thread.start()
 
     @property
     def target(self) -> Optional[int]:

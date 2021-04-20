@@ -4,7 +4,7 @@ import threading
 import logging
 import asyncio
 import functools
-from typing import Generic, TypeVar, Any, Optional
+from typing import Generic, TypeVar, Any, Optional, Dict
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
 
@@ -108,7 +108,7 @@ class ThreadManager:
         self._sync_managed_obj: Optional[SynchronousAdapter] = None
         is_running = threading.Event()
         self._is_running = is_running
-
+        self._cached_modules: Dict[AbstractModule, CallBridger[AbstractModule]] = {}
         # TODO: remove this if we switch to python 3.8
         # https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-and-threads  # noqa
         # On windows, the event loop and system interface is different and
@@ -175,10 +175,9 @@ class ThreadManager:
             loop.call_soon_threadsafe(loop.stop)
         except Exception:
             pass
-        object.__getattribute__(self, 'wrap_module').cache_clear()
+        self._cached_modules = {}
         object.__getattribute__(self, '_thread').join()
 
-    @functools.lru_cache(8)
     def wrap_module(
             self, module: AbstractModule) -> CallBridger[AbstractModule]:
         return CallBridger(module, object.__getattribute__(self, '_loop'))
@@ -193,7 +192,16 @@ class ThreadManager:
             wrap = object.__getattribute__(self, 'wrap_module')
             managed = object.__getattribute__(self, 'managed_obj')
             attr = getattr(managed, attr_name)
-            return [wrap(mod) for mod in attr]
+            cached_mods = object.__getattribute__(self, '_cached_modules')
+
+            # Update self._cached_modules to delete all removed modules' entries and add
+            # newly attached modules. Removing references to stale instances
+            # is necessary to allow the garbage collector to delete those objects from
+            # memory and cleanly stop all the threads associated with them.
+            cached_mods = {
+                    module: cached_mods.get(module, wrap(module)) for module in attr}
+            object.__setattr__(self, '_cached_modules', cached_mods)
+            return cached_mods.values()
         elif attr_name == 'clean_up':
             # the wrapped object probably has this attr as well as us, and we
             # want to call both, with the wrapped one first

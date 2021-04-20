@@ -347,3 +347,6 @@ class Thermocycler(mod_abc.AbstractModule):
         new_port = await update.find_bootloader_port()
 
         return new_port or self.port
+
+    def cleanup(self) -> None:
+        self._driver.disconnect()

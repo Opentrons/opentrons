@@ -1733,7 +1733,7 @@ class API(HardwareAPILike):
         for removed_mod in removed_modules:
             self._log.info(f"Module {removed_mod.name()} detached"
                            f" from port {removed_mod.port}")
-            del removed_mod
+            removed_mod.cleanup()
 
     async def register_modules(
             self,
