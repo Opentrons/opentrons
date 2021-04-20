@@ -10,9 +10,10 @@ import {
 } from '../../step-generation/utils'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
 import type { Options } from '@opentrons/components'
+import type { AlertData } from '../alerts/types'
 import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { FormWarning } from '../../steplist/formLevel/warnings'
-import type { StepFormErrors } from '../../steplist/types'
+import type { FormError } from '../../steplist/formLevel/errors'
 import type {
   FormData,
   ProfileItem,
@@ -92,11 +93,11 @@ export const getDirtyFields = (
   return without(dirtyFields, 'stepType', 'id')
 }
 
-export const getVisibleFormErrors = (args: {
+export const getVisibleFormErrors = (args: {|
   focusedField: ?string,
   dirtyFields: Array<string>,
-  errors: StepFormErrors,
-}): StepFormErrors => {
+  errors: Array<FormError>,
+|}): Array<FormError> => {
   const { focusedField, dirtyFields, errors } = args
   return errors.filter(error => {
     const dependentFieldsAreNotFocused = !error.dependentFields.includes(
@@ -198,3 +199,10 @@ export function getLabwareFieldForPositioningField(
   }
   return fieldMap[name]
 }
+
+export const formErrorToAlertData = (
+  formError: FormError | ProfileFormError
+): AlertData => ({
+  title: formError.title,
+  description: formError.body || null,
+})

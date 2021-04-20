@@ -2,8 +2,9 @@
 import * as React from 'react'
 import {
   Box,
-  PrimaryButton,
+  FormGroup,
   OutlineButton,
+  PrimaryButton,
   Tooltip,
   useHoverTooltip,
   TOOLTIP_TOP,
@@ -15,7 +16,9 @@ import {
   CheckboxRowField,
   DelayFields,
   FlowRateField,
+  TextField,
   TipPositionField,
+  VolumeField,
   WellOrderField,
 } from '../StepEditForm/fields'
 import {
@@ -31,13 +34,13 @@ import styles from '../StepEditForm/StepEditForm.css'
 import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
 
 type BatchEditMixProps = {|
-  batchEditFormHasChanges: boolean,
+  disableSave: boolean,
   propsForFields: FieldPropsByName,
   handleCancel: () => mixed,
   handleSave: () => mixed,
 |}
 export const BatchEditMix = (props: BatchEditMixProps): React.Node => {
-  const { propsForFields, handleCancel, handleSave } = props
+  const { disableSave, propsForFields, handleCancel, handleSave } = props
   const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
     strategy: TOOLTIP_FIXED,
@@ -46,7 +49,6 @@ export const BatchEditMix = (props: BatchEditMixProps): React.Node => {
     placement: TOOLTIP_TOP,
     strategy: TOOLTIP_FIXED,
   })
-  const disableSave = !props.batchEditFormHasChanges
 
   const getLabwareIdForPositioningField = (name: string): string | null => {
     const labwareField = getLabwareFieldForPositioningField(name)
@@ -71,6 +73,23 @@ export const BatchEditMix = (props: BatchEditMixProps): React.Node => {
   return (
     <div className={formStyles.form}>
       <Box className={styles.form_wrapper}>
+        <div className={styles.form_row}>
+          <VolumeField
+            {...propsForFields['volume']}
+            label={i18n.t('form.step_edit_form.mixVolumeLabel')}
+            stepType="mix"
+            className={styles.small_field}
+          />
+          <FormGroup
+            className={styles.small_field}
+            label={i18n.t('form.step_edit_form.mixRepetitions')}
+          >
+            <TextField
+              {...propsForFields['times']}
+              units={i18n.t('application.units.times')}
+            />
+          </FormGroup>
+        </div>
         <Box className={styles.section_wrapper}>
           <FormColumn
             sectionHeader={i18n.t('form.batch_edit_form.settings_for', {

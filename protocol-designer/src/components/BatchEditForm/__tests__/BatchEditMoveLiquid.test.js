@@ -16,7 +16,7 @@ describe('BatchEditMoveLiquid', () => {
     localizationSpy.mockImplementation(path => path)
 
     props = {
-      batchEditFormHasChanges: true,
+      disableSave: false,
       propsForFields: {},
       handleCancel,
       handleSave,
@@ -47,8 +47,8 @@ describe('BatchEditMoveLiquid', () => {
       expect(handleSave).toHaveBeenCalled()
     })
 
-    it('should be disabled when form has no changes and have matching tooltip text', () => {
-      props.batchEditFormHasChanges = false
+    it('should be disabled when props.disableSave is true, and have matching tooltip text', () => {
+      props.disableSave = true
       const tooltipPath = 'tooltip.save_batch_edit.disabled'
       const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
 

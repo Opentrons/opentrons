@@ -43,13 +43,10 @@ import type {
   Mount,
   InstrumentInfoProps,
 } from '@opentrons/components'
-import type { FormWarning } from '../../steplist/formLevel'
+import type { FormError, FormWarning } from '../../steplist/formLevel'
 import type { BaseState, Selector, DeckSlot } from '../../types'
 import type { FormData, StepIdType } from '../../form-types'
-import type {
-  StepArgsAndErrorsById,
-  StepFormErrors,
-} from '../../steplist/types'
+import type { StepArgsAndErrorsById } from '../../steplist/types'
 import type {
   InitialDeckSetup,
   NormalizedLabwareById,
@@ -462,7 +459,7 @@ function _getHydratedForm(
 }
 
 // TODO type with hydrated form type
-const _formLevelErrors = (hydratedForm: FormData): StepFormErrors => {
+const _formLevelErrors = (hydratedForm: FormData): Array<FormError> => {
   return getFormErrors(hydratedForm.stepType, hydratedForm)
 }
 
@@ -553,14 +550,13 @@ export const getDynamicFieldFormErrorsForUnsavedForm: Selector<
   return errors
 })
 
-export const getFormLevelErrorsForUnsavedForm: Selector<StepFormErrors> = createSelector(
-  getHydratedUnsavedForm,
-  hydratedForm => {
-    if (!hydratedForm) return []
-    const errors = _formLevelErrors(hydratedForm)
-    return errors
-  }
-)
+export const getFormLevelErrorsForUnsavedForm: Selector<
+  Array<FormError>
+> = createSelector(getHydratedUnsavedForm, hydratedForm => {
+  if (!hydratedForm) return []
+  const errors = _formLevelErrors(hydratedForm)
+  return errors
+})
 
 export const getCurrentFormCanBeSaved: Selector<boolean> = createSelector(
   getHydratedUnsavedForm,

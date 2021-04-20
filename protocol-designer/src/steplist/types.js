@@ -6,7 +6,6 @@ import type {
   ThermocyclerProfileStepArgs,
 } from '../step-generation'
 import type { StepIdType } from '../form-types'
-import type { FormError } from './formLevel/errors'
 
 // timeline start and end
 export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
@@ -162,8 +161,6 @@ export type SubstepItemData =
   | ThermocyclerStateSubstepItem
 
 export type Substeps = { [StepIdType]: ?SubstepItemData }
-
-export type StepFormErrors = Array<FormError>
 
 export type StepArgsAndErrors = {
   errors: boolean,

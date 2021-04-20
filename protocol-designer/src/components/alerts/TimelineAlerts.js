@@ -12,10 +12,11 @@ import { selectors as fileDataSelectors } from '../../file-data'
 import { Alerts, type Props } from './Alerts'
 import type { CommandCreatorError } from '../../step-generation/types'
 import type { BaseState } from '../../types'
+import type { AlertData } from './types'
 
 type SP = {|
-  errors: $PropertyType<Props, 'errors'>,
-  warnings: $PropertyType<Props, 'warnings'>,
+  errors: Array<AlertData>,
+  warnings: Array<AlertData>,
   _stepId: ?string,
 |}
 
@@ -30,15 +31,14 @@ type SP = {|
 
 function mapStateToProps(state: BaseState): SP {
   const timeline = fileDataSelectors.getRobotStateTimeline(state)
-  const errors = (timeline.errors || []: Array<CommandCreatorError>).map(
-    error => ({
-      title: i18n.t(`alert.timeline.error.${error.type}.title`, error.message),
-      description: <ErrorContents level="timeline" errorType={error.type} />,
-    })
-  )
+  const errors = (timeline.errors ||
+    []: Array<CommandCreatorError>).map<AlertData>(error => ({
+    title: i18n.t(`alert.timeline.error.${error.type}.title`, error.message),
+    description: <ErrorContents level="timeline" errorType={error.type} />,
+  }))
   const warnings = timelineWarningSelectors
     .getTimelineWarningsForSelectedStep(state)
-    .map(warning => ({
+    .map<AlertData>(warning => ({
       title: i18n.t(`alert.timeline.warning.${warning.type}.title`),
       description: (
         <WarningContents level="timeline" warningType={warning.type} />
@@ -60,8 +60,10 @@ function mergeProps(
 ): Props {
   const { dispatch } = dispatchProps
   const stepId = stateProps._stepId
+  const { errors, warnings } = stateProps
   return {
-    ...stateProps,
+    errors,
+    warnings,
     dismissWarning: (dismissId: string) => {
       if (stepId) {
         dispatch(

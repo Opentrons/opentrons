@@ -162,7 +162,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
 }
 
 type BatchEditMoveLiquidProps = {|
-  batchEditFormHasChanges: boolean,
+  disableSave: boolean,
   propsForFields: FieldPropsByName,
   handleCancel: () => mixed,
   handleSave: () => mixed,
@@ -170,7 +170,7 @@ type BatchEditMoveLiquidProps = {|
 export const BatchEditMoveLiquid = (
   props: BatchEditMoveLiquidProps
 ): React.Node => {
-  const { propsForFields, handleCancel, handleSave } = props
+  const { disableSave, propsForFields, handleCancel, handleSave } = props
   const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
     strategy: TOOLTIP_FIXED,
@@ -179,7 +179,6 @@ export const BatchEditMoveLiquid = (
     placement: TOOLTIP_TOP,
     strategy: TOOLTIP_FIXED,
   })
-  const disableSave = !props.batchEditFormHasChanges
 
   return (
     <div className={formStyles.form}>

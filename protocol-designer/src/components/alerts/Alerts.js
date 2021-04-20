@@ -4,17 +4,11 @@ import assert from 'assert'
 import { PDAlert } from './PDAlert'
 import type { AlertData, AlertType } from './types'
 
-/* TODO:  BC 2018-09-13 this component is an abstraction that is meant to be shared for timeline
- * and form level alerts. Currently it is being used in TimelineAlerts, but it should be used in
- * FormAlerts as well. This change will also include adding form level alert copy to i18n
- * see #1814 for reference
- */
-
-export type Props = {
+export type Props = {|
   errors: Array<AlertData>,
   warnings: Array<AlertData>,
-  dismissWarning: string => mixed,
-}
+  dismissWarning?: string => mixed,
+|}
 
 type MakeAlert = (
   alertType: AlertType,
@@ -24,8 +18,11 @@ type MakeAlert = (
 
 const AlertsComponent = (props: Props) => {
   const makeHandleCloseWarning = (dismissId: ?string) => () => {
-    assert(dismissId, 'expected dismissId, Alert cannot dismiss warning')
-    if (dismissId) {
+    assert(
+      dismissId && props.dismissWarning,
+      'expected dismissId and dismissWarning, Alert cannot dismiss warning'
+    )
+    if (dismissId && props.dismissWarning) {
       props.dismissWarning(dismissId)
     }
   }

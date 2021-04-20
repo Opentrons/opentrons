@@ -77,7 +77,7 @@ const PAUSE_TEMP_PARAM_REQUIRED: FormError = {
   dependentFields: ['pauseAction', 'pauseTemperature'],
 }
 
-const VOLUME_TOO_HIGH = (pipetteCapacity: number) => ({
+export const VOLUME_TOO_HIGH = (pipetteCapacity: number): FormError => ({
   title: `Volume is greater than maximum pipette/tip volume (${pipetteCapacity} ul)`,
   dependentFields: ['pipette', 'volume'],
 })

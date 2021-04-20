@@ -14,10 +14,10 @@ export type FormWarningType =
   | 'BELOW_MIN_DISPOSAL_VOLUME'
   | 'BELOW_MIN_AIR_GAP_VOLUME'
 
-export type FormWarning = {
-  ...$Exact<FormError>,
+export type FormWarning = {|
+  ...FormError,
   type: FormWarningType,
-}
+|}
 
 const belowMinAirGapVolumeWarning = (min: number): FormWarning => ({
   type: 'BELOW_MIN_AIR_GAP_VOLUME',

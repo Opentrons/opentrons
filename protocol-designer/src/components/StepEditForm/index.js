@@ -18,6 +18,7 @@ import { makeSingleEditFieldProps } from './fields/makeSingleEditFieldProps'
 import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
 import type { BaseState, ThunkDispatch } from '../../types'
+import type { FocusHandlers } from './types'
 import type { FormData, StepFieldName } from '../../form-types'
 
 type SP = {|
@@ -39,6 +40,29 @@ type StepEditFormManagerProps = {|
   ...DP,
 |}
 
+// TODO IMMEDIATELY factor out
+export const useMakeFocusHandlers = (
+  initialDirtyFields: Array<string>
+): FocusHandlers => {
+  const [focusedField, setFocusedField] = React.useState<string | null>(null)
+  const [dirtyFields, setDirtyFields] = React.useState<Array<StepFieldName>>(
+    initialDirtyFields
+  )
+
+  const focus = setFocusedField
+
+  const blur = (fieldName: StepFieldName) => {
+    if (fieldName === focusedField) {
+      setFocusedField(null)
+    }
+    if (!dirtyFields.includes(fieldName)) {
+      setDirtyFields([...dirtyFields, fieldName])
+    }
+  }
+
+  return { focus, blur, focusedField, dirtyFields }
+}
+
 const StepEditFormManager = (props: StepEditFormManagerProps) => {
   const {
     canSave,
@@ -57,25 +81,9 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     showMoreOptionsModal,
     setShowMoreOptionsModal,
   ] = React.useState<boolean>(false)
-  const [focusedField, setFocusedField] = React.useState<string | null>(null)
-  const [dirtyFields, setDirtyFields] = React.useState<Array<StepFieldName>>(
-    getDirtyFields(isNewStep, formData)
-  )
-
   const toggleMoreOptionsModal = () => {
     resetScrollElements()
     setShowMoreOptionsModal(!showMoreOptionsModal)
-  }
-
-  const focus = setFocusedField
-
-  const blur = (fieldName: StepFieldName) => {
-    if (fieldName === focusedField) {
-      setFocusedField(null)
-    }
-    if (!dirtyFields.includes(fieldName)) {
-      setDirtyFields([...dirtyFields, fieldName])
-    }
   }
 
   const stepId = formData?.id
@@ -109,16 +117,13 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     isPristineSetTempForm
   )
 
+  const focusHandlers = useMakeFocusHandlers(
+    getDirtyFields(isNewStep, formData)
+  )
+
   // no form selected
   if (formData == null) {
     return null
-  }
-
-  const focusHandlers = {
-    focusedField,
-    dirtyFields,
-    focus,
-    blur,
   }
 
   const propsForFields = makeSingleEditFieldProps(
@@ -155,9 +160,9 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
       <StepEditFormComponent
         {...{
           canSave,
-          dirtyFields,
-          focusedField,
-          focusHandlers,
+          dirtyFields: focusHandlers.dirtyFields,
+          focusedField: focusHandlers.focusedField,
+          focusHandlers, // TODO IMMEDIATELY duplicate props dirtyFields + focusedField are already in focusHandlers
           formData,
           handleClose: confirmClose,
           handleDelete: confirmDelete,
