@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.3.0-beta.0...v4.3.0-alpha.4) (2021-04-20)
+
+
+### Bug Fixes
+
+* **app:** add missing border to thermocycler live status card ([#7681](https://github.com/Opentrons/opentrons/issues/7681)) ([6fdfe25](https://github.com/Opentrons/opentrons/commit/6fdfe25))
+* **app:** use correct module order to get usb port ([#7651](https://github.com/Opentrons/opentrons/issues/7651)) ([4c08cee](https://github.com/Opentrons/opentrons/commit/4c08cee))
+
+
+
+
+
 # [4.3.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.3...v4.3.0-beta.0) (2021-04-19)
 
 **Note:** Version bump only for package @opentrons/app
