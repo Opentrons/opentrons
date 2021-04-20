@@ -31,6 +31,7 @@ const DropdownFormField = (props: DropdownFormFieldProps) => {
   return (
     <DropdownField
       options={props.options}
+      id={`DisposalVolumeField_dropdown`}
       value={props.value ? String(props.value) : null}
       onBlur={props.onFieldBlur}
       onChange={e => props.updateValue(e.currentTarget.value)}
