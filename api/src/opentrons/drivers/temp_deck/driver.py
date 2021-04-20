@@ -222,13 +222,6 @@ class TempDeck:
             self._update_thread.start()
         return ''
 
-    def _update_temperature(self):
-        self._update_thread = Thread(
-            target=self._recursive_update_temperature,
-            args=[DEFAULT_COMMAND_RETRIES],
-            name='Tempdeck recursive update temperature')
-        self._update_thread.start()
-
     @property
     def target(self) -> Optional[int]:
         return self._temperature.get('target')
