@@ -44,7 +44,6 @@ const batchEditMoveLiquidPipetteDifferentDisabledFieldNames: Array<StepFieldName
 const batchEditMixPipetteDifferentDisabledFieldNames: Array<StepFieldName> = [
   'aspirate_flowRate',
   'dispense_flowRate',
-  'volume',
 ]
 
 const batchEditMoveLiquidAspirateLabwareDisabledFieldNames: Array<StepFieldName> = [

@@ -1215,7 +1215,7 @@ describe('getMultiSelectDisabledFields', () => {
           },
         }
       })
-      it('should return flow rate and volume fields being disabled with associated reasons', () => {
+      it('should return flow rate fields being disabled with associated reasons', () => {
         expect(
           getMultiSelectDisabledFields.resultFunc(
             savedStepForms,
@@ -1226,9 +1226,6 @@ describe('getMultiSelectDisabledFields', () => {
             'tooltip.step_fields.batch_edit.disabled.pipette-different'
           ),
           dispense_flowRate: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          volume: i18n.t(
             'tooltip.step_fields.batch_edit.disabled.pipette-different'
           ),
         })
