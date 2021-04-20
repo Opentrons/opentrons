@@ -18,7 +18,8 @@ This code is totally unsupported. To do science on a robot, use the stable
 # advantage of the APIv3 break to consolidate the API namespaces.
 
 from .protocol_context import ProtocolContext
-from .pipette_context import PipetteContext, InstrumentContext
+from .pipette_context import PipetteContext
+from .instrument_context import InstrumentContext
 from .errors import InvalidPipetteNameError, InvalidMountError
 from .types import PipetteName, Mount, DeprecatedMount
 

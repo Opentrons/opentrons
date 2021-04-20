@@ -4,7 +4,8 @@ from typing import Sequence, Union
 
 from opentrons.protocol_engine.clients import SyncClient
 
-from .pipette_context import PipetteContext, InstrumentContext
+from .pipette_context import PipetteContext
+from .instrument_context import InstrumentContext
 from .labware import Labware
 from .types import Mount, DeprecatedMount, PipetteName
 from . import errors
