@@ -214,7 +214,7 @@ class TempDeck:
                 try:
                     self._recursive_update_temperature(retries=DEFAULT_COMMAND_RETRIES)
                 except (OSError, TempDeckError, SerialException, SerialNoResponse):
-                    log.exception("UPDATE FAILED")
+                    log.exception("Failed to execute _recursive_update_temperature.")
 
             self._update_thread = Thread(
                 target=_update(),
