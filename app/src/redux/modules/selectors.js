@@ -64,7 +64,7 @@ export const getMatchedModules: (
   state: State
 ) => Array<Types.MatchedModule> = createSelector(
   getAttachedModulesForConnectedRobot,
-  RobotSelectors.getModules,
+  RobotSelectors.getModulesByProtocolLoadOrder,
   (attachedModules, protocolModules) => {
     const matchedAmod: Array<Types.MatchedModule> = []
     const matchedPmod = []

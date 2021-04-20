@@ -643,11 +643,12 @@ export function client(dispatch) {
       update.labwareBySlot[slot] = labware
     }
 
-    function addApiModuleToModules(apiModule) {
+    function addApiModuleToModules(apiModule, index) {
       const { name, ...noName } = apiModule
       update.modulesBySlot[apiModule.slot] = {
         ...noName,
         model: apiModule?.model ?? normalizeModuleModel(apiModule.name),
+        protocolLoadOrder: index,
       }
     }
   }
