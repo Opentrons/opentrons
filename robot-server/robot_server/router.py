@@ -29,6 +29,11 @@ router.include_router(
 router.include_router(
     router=health_router,
     tags=["Health", V1_TAG],
+    responses={
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "model": V1BasicResponse,
+        }
+    },
 )
 
 # New v2 routes

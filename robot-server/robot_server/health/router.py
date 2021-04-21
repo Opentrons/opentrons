@@ -5,6 +5,7 @@ from opentrons import __version__, config, protocol_api
 from opentrons.hardware_control import ThreadManager
 
 from robot_server.service.dependencies import get_hardware
+from robot_server.service.legacy.models import V1BasicResponse
 from .models import Health, HealthLinks
 
 
@@ -19,6 +20,12 @@ health_router = APIRouter()
     summary="Get server health",
     status_code=status.HTTP_200_OK,
     response_model=Health,
+    responses={
+        status.HTTP_503_SERVICE_UNAVAILABLE: {
+            "model": V1BasicResponse,
+            "description": "Robot motor controller is not ready",
+        }
+    },
 )
 async def get_health(hardware: ThreadManager = Depends(get_hardware)) -> Health:
     """Get information about the health of the robot server.
