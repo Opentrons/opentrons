@@ -14,6 +14,7 @@ from opentrons.hardware_control.modules import tempdeck, magdeck
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 
+# Freezes
 async def test_get_modules_simulating():
     import opentrons.hardware_control as hardware_control
     mods = ['tempdeck', 'magdeck', 'thermocycler']
@@ -61,6 +62,7 @@ async def test_module_caching():
     assert two_magdecks[1] is not two_magdecks[0]
 
 
+# freezes
 async def test_filtering_modules():
     import opentrons.hardware_control as hardware_control
     mods = [
@@ -178,6 +180,7 @@ async def test_module_update_integration(monkeypatch, loop):
     )
 
 
+# freezes
 async def test_get_bundled_fw(monkeypatch, tmpdir):
     from opentrons.hardware_control import modules
 

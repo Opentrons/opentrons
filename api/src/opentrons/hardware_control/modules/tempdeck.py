@@ -243,8 +243,8 @@ class TempDeck(mod_abc.AbstractModule):
         self._poller.start()
 
     def cleanup(self) -> None:
-        if self._poller:
-            log.debug("Stopping tempdeck poller.")
+        if hasattr(self, '_poller') and self._poller:
+            log.info("===== Stopping tempdeck poller.")
             self._poller.stop()
 
     async def prep_for_update(self) -> str:

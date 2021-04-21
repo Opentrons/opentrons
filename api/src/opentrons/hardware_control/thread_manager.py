@@ -175,7 +175,7 @@ class ThreadManager:
             loop.call_soon_threadsafe(loop.stop)
         except Exception:
             pass
-        self._cached_modules = {}
+        object.__setattr__(self, '_cached_modules', {})
         object.__getattribute__(self, '_thread').join()
 
     def wrap_module(
@@ -199,7 +199,7 @@ class ThreadManager:
             # is necessary in order to allow the garbage collector to delete
             # those objects from memory and cleanly stop all associated threads.
             cached_mods = {
-                    module: cached_mods.get(module, wrap(module)) for module in attr}
+                    module: cached_mods.get(module) or wrap(module) for module in attr}
             object.__setattr__(self, '_cached_modules', cached_mods)
             return cached_mods.values()
         elif attr_name == 'clean_up':
