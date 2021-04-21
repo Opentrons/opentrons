@@ -2,11 +2,16 @@
 
 // general constants
 
+// 5 minute restart timeout
+export const RESTART_TIMEOUT_SEC = 300
+
+// restart statuses
 export const RESTART_PENDING_STATUS: 'restart-pending' = 'restart-pending'
-export const RESTARTING_STATUS: 'restarting' = 'restarting'
+export const RESTART_IN_PROGRESS_STATUS: 'restart-in-progress' =
+  'restart-in-progress'
 export const RESTART_FAILED_STATUS: 'restart-failed' = 'restart-failed'
-export const UP_STATUS: 'up' = 'up'
-export const DOWN_STATUS: 'down' = 'down'
+export const RESTART_TIMED_OUT_STATUS: 'restart-timed-out' = 'restart-timed-out'
+export const RESTART_SUCCEEDED_STATUS: 'restart-succeeded' = 'restart-succeeded'
 
 // action type strings
 
@@ -34,6 +39,9 @@ export const RESET_CONFIG_SUCCESS: 'robotAdmin:RESET_CONFIG_SUCCESS' =
 
 export const RESET_CONFIG_FAILURE: 'robotAdmin:RESET_CONFIG_FAILURE' =
   'robotAdmin:RESET_CONFIG_FAILURE'
+
+export const RESTART_STATUS_CHANGED: 'robotAdmin:RESTART_STATUS_CHANGED' =
+  'robotAdmin:RESTART_STATUS_CHANGED'
 
 // http paths
 

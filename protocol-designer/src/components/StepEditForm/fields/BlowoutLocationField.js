@@ -35,6 +35,7 @@ export const BlowoutLocationField = (
       className={cx(styles.large_field, className)}
       options={options}
       disabled={disabled}
+      id={'BlowoutLocationField_dropdown'}
       onBlur={onFieldBlur}
       onFocus={onFieldFocus}
       value={value ? String(value) : null}

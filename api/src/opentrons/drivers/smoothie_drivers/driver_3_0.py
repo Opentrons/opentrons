@@ -1157,8 +1157,9 @@ class SmoothieDriver_3_0_0:
             return len(_s) > 1
         # Split at spaces.
         tokens = (c.strip() for c in command.strip().split(' '))
-        # A list of commands to remove from response.
-        remove_from_response = [
+        # A list of commands to remove from response. Including the entire
+        # command.
+        remove_from_response = [command] + [
             c for c in tokens if _is_token_command(c)
         ]
 

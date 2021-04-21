@@ -54,7 +54,7 @@ export const getRobots: (
   }
 )
 
-// accending priority order, where no match is lowest priority
+// ascending priority order, where no match is lowest priority
 const HEALTH_PRIORITY = [
   HEALTH_STATUS_UNREACHABLE,
   HEALTH_STATUS_NOT_OK,
@@ -63,7 +63,7 @@ const HEALTH_PRIORITY = [
 
 const SEEN_PRIORITY = [false, true]
 
-// accending priority order, where no match is lowest priority
+// ascending priority order, where no match is lowest priority
 const IP_PRIORITY_MATCH = [
   RE_HOSTNAME_IPV6_LL,
   RE_HOSTNAME_IPV4_LL,
@@ -71,7 +71,7 @@ const IP_PRIORITY_MATCH = [
   RE_HOSTNAME_LOOPBACK,
 ]
 
-// compare hosts in decending priority order
+// compare hosts in descending priority order
 export function compareHostsByConnectability(
   a: HostState,
   b: HostState
