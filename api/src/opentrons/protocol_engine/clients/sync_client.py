@@ -2,9 +2,11 @@
 from uuid import uuid4
 from typing import cast
 
+from opentrons.types import MountType
+
 from .. import commands
 from ..state import StateView
-from ..types import DeckSlotLocation, WellLocation
+from ..types import DeckSlotLocation, PipetteName, WellLocation
 from .transports import AbstractSyncTransport
 
 
@@ -31,7 +33,7 @@ class SyncClient:
         namespace: str,
         version: int,
     ) -> commands.LoadLabwareResult:
-        """Execute a LoadLabwareRequest, returning the result."""
+        """Execute a LoadLabwareRequest and return the result."""
         request = commands.LoadLabwareRequest(
             location=location,
             loadName=load_name,
@@ -45,17 +47,32 @@ class SyncClient:
 
         return cast(commands.LoadLabwareResult, result)
 
+    def load_pipette(
+        self,
+        pipette_name: PipetteName,
+        mount: MountType,
+    ) -> commands.LoadPipetteResult:
+        """Execute a LoadPipetteRequest and return the result."""
+        request = commands.LoadPipetteRequest(
+            pipetteName=pipette_name,
+            mount=mount,
+        )
+        result = self._transport.execute_command(
+            request=request,
+            command_id=self._create_command_id(),
+        )
+
+        return cast(commands.LoadPipetteResult, result)
+
     def pick_up_tip(
-            self,
-            pipette_id: str,
-            labware_id: str,
-            well_name: str
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
     ) -> commands.PickUpTipResult:
-        """Execute a PickUpTipRequest."""
+        """Execute a PickUpTipRequest and return the result."""
         request = commands.PickUpTipRequest(
-            pipetteId=pipette_id,
-            labwareId=labware_id,
-            wellName=well_name
+            pipetteId=pipette_id, labwareId=labware_id, wellName=well_name
         )
         result = self._transport.execute_command(
             request=request,
@@ -65,20 +82,17 @@ class SyncClient:
         return cast(commands.PickUpTipResult, result)
 
     def drop_tip(
-            self,
-            pipette_id: str,
-            labware_id: str,
-            well_name: str
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
     ) -> commands.DropTipResult:
-        """Execute a DropTipRequest."""
+        """Execute a DropTipRequest and return the result."""
         request = commands.DropTipRequest(
-            pipetteId=pipette_id,
-            labwareId=labware_id,
-            wellName=well_name
+            pipetteId=pipette_id, labwareId=labware_id, wellName=well_name
         )
         result = self._transport.execute_command(
-            request=request,
-            command_id=self._create_command_id()
+            request=request, command_id=self._create_command_id()
         )
         return cast(commands.DropTipResult, result)
 
@@ -106,12 +120,12 @@ class SyncClient:
         return cast(commands.AspirateResult, result)
 
     def dispense(
-            self,
-            pipette_id: str,
-            labware_id: str,
-            well_name: str,
-            well_location: WellLocation,
-            volume: float
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+        volume: float,
     ) -> commands.DispenseResult:
         """Execute a ``DispenseRequest``, returning the result."""
         request = commands.DispenseRequest(
@@ -122,7 +136,6 @@ class SyncClient:
             volume=volume,
         )
         result = self._transport.execute_command(
-            request=request,
-            command_id=self._create_command_id()
+            request=request, command_id=self._create_command_id()
         )
         return cast(commands.DispenseResult, result)

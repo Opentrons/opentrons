@@ -6,7 +6,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 
 from opentrons.protocol_engine import errors, ResourceProviders
-from opentrons.protocol_engine.types import DeckSlotLocation
+from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName
 from opentrons.protocol_engine.state import PipetteData
 
 from opentrons.protocol_engine.execution.equipment import (
@@ -54,7 +54,7 @@ async def test_load_labware_assigns_id(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         load_name="load-name",
         namespace="opentrons-test",
-        version=1
+        version=1,
     )
 
     assert type(res) == LoadedLabware
@@ -71,15 +71,13 @@ async def test_load_labware_gets_labware_def(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         load_name="load-name",
         namespace="opentrons-test",
-        version=1
+        version=1,
     )
 
     assert type(res) == LoadedLabware
     assert res.definition == minimal_labware_def
     mock_resources_with_data.labware_data.get_labware_definition.assert_called_with(
-        load_name="load-name",
-        namespace="opentrons-test",
-        version=1
+        load_name="load-name", namespace="opentrons-test", version=1
     )
 
 
@@ -93,7 +91,7 @@ async def test_load_labware_gets_labware_cal_data(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         load_name="load-name",
         namespace="opentrons-test",
-        version=1
+        version=1,
     )
 
     assert type(res) == LoadedLabware
@@ -109,7 +107,10 @@ async def test_load_pipette_assigns_id(
     handler: EquipmentHandler,
 ) -> None:
     """Loading a pipette should generate a unique identifier for the pipette."""
-    res = await handler.load_pipette(pipette_name="p300_single", mount=MountType.LEFT)
+    res = await handler.load_pipette(
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
 
     assert type(res) == LoadedPipette
     assert res.pipette_id == "unique-id"
@@ -122,14 +123,19 @@ async def test_load_pipette_checks_checks_existence(
 ) -> None:
     """Loading a pipette should cache hardware instruments."""
     mock_state_view.pipettes.get_pipette_data_by_mount.return_value = None
-    await handler.load_pipette(pipette_name="p300_single", mount=MountType.LEFT)
+    await handler.load_pipette(
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
 
     mock_state_view.pipettes.get_pipette_data_by_mount.assert_called_with(
         MountType.RIGHT
     )
-    mock_hardware.cache_instruments.assert_called_with({
-        HwMount.LEFT: "p300_single",
-    })
+    mock_hardware.cache_instruments.assert_called_with(
+        {
+            HwMount.LEFT: "p300_single",
+        }
+    )
 
 
 async def test_load_pipette_checks_checks_existence_with_already_loaded(
@@ -138,17 +144,24 @@ async def test_load_pipette_checks_checks_existence_with_already_loaded(
     handler: EquipmentHandler,
 ) -> None:
     """Loading a pipette should cache with pipettes already attached."""
-    mock_state_view.pipettes.get_pipette_data_by_mount.return_value = \
-        PipetteData(mount=MountType.LEFT, pipette_name="p300_multi")
-    await handler.load_pipette(pipette_name="p300_single", mount=MountType.RIGHT)
+    mock_state_view.pipettes.get_pipette_data_by_mount.return_value = PipetteData(
+        mount=MountType.LEFT,
+        pipette_name=PipetteName.P300_MULTI,
+    )
+    await handler.load_pipette(
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.RIGHT,
+    )
 
     mock_state_view.pipettes.get_pipette_data_by_mount.assert_called_with(
         MountType.LEFT
     )
-    mock_hardware.cache_instruments.assert_called_with({
-        HwMount.LEFT: "p300_multi",
-        HwMount.RIGHT: "p300_single",
-    })
+    mock_hardware.cache_instruments.assert_called_with(
+        {
+            HwMount.LEFT: "p300_multi",
+            HwMount.RIGHT: "p300_single",
+        }
+    )
 
 
 async def test_load_pipette_raises_if_pipette_not_attached(
@@ -158,12 +171,14 @@ async def test_load_pipette_raises_if_pipette_not_attached(
 ) -> None:
     """Loading a pipette should should raise if unable to cache instruments."""
     mock_hardware.cache_instruments.side_effect = RuntimeError(
-        'mount LEFT: instrument p300_single was requested, '
-        'but no instrument is present'
+        "mount LEFT: instrument p300_single was requested, "
+        "but no instrument is present"
     )
 
     with pytest.raises(
-        errors.FailedToLoadPipetteError,
-        match=".+p300_single was requested"
+        errors.FailedToLoadPipetteError, match=".+p300_single was requested"
     ):
-        await handler.load_pipette(pipette_name="p300_single", mount=MountType.LEFT)
+        await handler.load_pipette(
+            pipette_name=PipetteName.P300_SINGLE,
+            mount=MountType.LEFT,
+        )
