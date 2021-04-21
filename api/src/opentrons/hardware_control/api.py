@@ -172,8 +172,8 @@ class API(HardwareAPILike):
 
             if firmware is not None:
                 if fw_version != firmware[1]:
-                    await backend.update_firmware(
-                        str(firmware[0]), checked_loop, True)
+                    #await backend.update_firmware(
+                        #str(firmware[0]), checked_loop, True)
                     await backend.connect(port)
             elif firmware is None and fw_version is None:
                 msg = 'Motor controller could not be connected and no '\
