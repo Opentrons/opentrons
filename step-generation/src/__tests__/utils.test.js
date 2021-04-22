@@ -14,7 +14,7 @@ import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_tra
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { TEMPERATURE_DEACTIVATED } from '../../constants'
+import { TEMPERATURE_DEACTIVATED } from '../constants'
 import {
   AIR,
   DEST_WELL_BLOWOUT_DESTINATION,

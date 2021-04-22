@@ -3,7 +3,7 @@ import {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
-} from '../../constants'
+} from '../constants'
 import { awaitTemperature } from '../commandCreators/atomic/awaitTemperature'
 import {
   getStateAndContextTempTCModules,

@@ -5,7 +5,7 @@ import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_AT_TARGET,
-} from '../../constants'
+} from '../constants'
 import type {
   TemperatureParams,
   ModuleOnlyParams,

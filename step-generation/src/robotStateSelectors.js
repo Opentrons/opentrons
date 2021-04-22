@@ -1,7 +1,7 @@
 // @flow
 import assert from 'assert'
 // TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
-import { orderWells } from '../steplist/utils/orderWells.js'
+import { orderWells } from 'protocol-designer/src/steplist/utils/orderWells.js'
 import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
 import {

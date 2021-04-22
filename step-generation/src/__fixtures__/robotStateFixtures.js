@@ -19,11 +19,10 @@ import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fix
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
 import {
-  SPAN7_8_10_11_SLOT,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
-} from '../../constants'
+} from '../constants'
 import {
   DEFAULT_PIPETTE,
   MULTI_PIPETTE,
@@ -300,7 +299,7 @@ export const getStateAndContextTempTCModules = ({
       },
     },
     [thermocyclerId]: {
-      slot: SPAN7_8_10_11_SLOT,
+      slot: 'span7_8_10_11',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
         blockTargetTemp: null,

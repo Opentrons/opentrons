@@ -3,7 +3,7 @@ import {
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
-} from '../../constants'
+} from '../constants'
 import {
   forSetTemperature as _forSetTemperature,
   forDeactivateTemperature as _forDeactivateTemperature,

@@ -1,5 +1,5 @@
 // @flow
-import { FIXED_TRASH_ID } from '../../../constants'
+import { FIXED_TRASH_ID } from 'protocol-designer/src/constants'
 import type { CommandCreator } from '../../types'
 
 type DropTipArgs = {| pipette: string |}

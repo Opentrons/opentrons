@@ -60,3 +60,5 @@ export const MODULE_TYPES = [
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 ]
+
+export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
