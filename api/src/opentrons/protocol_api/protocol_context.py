@@ -560,7 +560,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def loaded_instruments(self) -> Dict[str, Optional['InstrumentContext']]:
+    def loaded_instruments(self) -> Dict[str, 'InstrumentContext']:
         """ Get the instruments that have been loaded into the protocol.
 
         This is a map of mount name to instruments previously loaded with
@@ -570,9 +570,11 @@ class ProtocolContext(CommandPublisher):
         of them with :py:meth:`load_instrument`, the unused one will not
         be present.
 
-        :returns: A dict mapping mount names in lowercase to the instrument
-                  in that mount. If no instrument is loaded in the mount,
-                  it will not be present
+        :returns: A dict mapping mount name
+                  (``'left'`` or ``'right'``)
+                  to the instrument in that mount.
+                  If a mount has no loaded instrument,
+                  that key will be missing from the dict.
         """
         return {mount.name.lower(): instr for mount, instr
                 in self._instruments.items()
