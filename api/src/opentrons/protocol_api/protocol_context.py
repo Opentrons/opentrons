@@ -382,7 +382,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def loaded_labwares(self) -> Dict[int, Union[Labware, ModuleGeometry]]:
+    def loaded_labwares(self) -> Dict[int, Labware]:
         """ Get the labwares that have been loaded into the protocol context.
 
         Slots with nothing in them will not be present in the return value.
@@ -401,7 +401,7 @@ class ProtocolContext(CommandPublisher):
                   the locations.
         """
         def _only_labwares() -> Iterator[
-                Tuple[int, Union[Labware, ModuleGeometry]]]:
+                Tuple[int, Labware]]:
             for slotnum, slotitem in self._implementation.get_deck().items():
                 if isinstance(slotitem, AbstractLabware):
                     yield slotnum, Labware(implementation=slotitem)
