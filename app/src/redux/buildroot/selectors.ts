@@ -81,7 +81,9 @@ export function getBuildrootRobotName(state: State): string | null {
   return state.buildroot.session?.robotName || null
 }
 
-export const getBuildrootRobot: State => ViewableRobot | null = createSelector(
+export const getBuildrootRobot: (
+  state: State
+) => ViewableRobot | null = createSelector(
   getViewableRobots,
   getBuildrootRobotName,
   (robots, robotName) => {
@@ -135,9 +137,9 @@ export const getBuildrootUpdateDisplayInfo: (
   state: State,
   robotName: string
 ) => {
-  autoUpdateAction: string,
-  autoUpdateDisabledReason: string | null,
-  updateFromFileDisabledReason: string | null,
+  autoUpdateAction: string
+  autoUpdateDisabledReason: string | null
+  updateFromFileDisabledReason: string | null
 } = createSelector(
   getRobotByName,
   state => getBuildrootRobot(state),

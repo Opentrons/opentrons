@@ -12,20 +12,20 @@ export interface RobotHost {
 }
 
 export interface RobotApiRequestOptions {
-  method: Method,
-  path: string,
-  body?: { },
+  method: Method
+  path: string
+  body?: {}
   query?: {
-    [param: string]: string | boolean | number | null | void,
-  },
-  form?: FormData,
+    [param: string]: string | boolean | number | null | undefined
+  }
+  form?: FormData
 }
 
-export type RobotApiResponseMeta = {
-  path: string,
-  method: Method,
-  status: number,
-  ok: boolean,
+export interface RobotApiResponseMeta {
+  path: string
+  method: Method
+  status: number
+  ok: boolean
 }
 
 export interface RobotApiResponse extends RobotApiResponseMeta {
@@ -36,11 +36,11 @@ export interface RobotApiResponse extends RobotApiResponseMeta {
 export interface RobotApiRequestMeta {
   requestId: string
   response: {
-    method: Method,
-    path: string,
-    status: number,
-    ok: boolean,
-  },
+    method: Method
+    path: string
+    status: number
+    ok: boolean
+  }
   [key: string]: unknown
 }
 
@@ -62,37 +62,40 @@ export type RobotApiAction = DismissRequestAction
 // DataT parameter must be a subtype of RobotApiV2ResponseData
 // MetaT defaults to void if unspecified
 export interface ResourceLink {
-  href: string,
-  meta?: Partial<{ [key: string]: string | void }>,
+  href: string
+  meta?: Partial<{ [key: string]: string | null | undefined }>
 }
 
-export interface ResourceLinks { [key: string]: ResourceLink | string | void }
+export type ResourceLinks = Record<
+  string,
+  ResourceLink | string | null | undefined
+>
 
 // generic response data supertype
 export type RobotApiV2ResponseData = Partial<{ id: string }>
 
-export type RobotApiV2ResponseBody<
-  DataT: RobotApiV2ResponseData | RobotApiV2ResponseData[]
-> = {
-  data: DataT,
-  links?: ResourceLinks,
+export interface RobotApiV2ResponseBody<
+  DataT extends RobotApiV2ResponseData | RobotApiV2ResponseData[]
+> {
+  data: DataT
+  links?: ResourceLinks
 }
 
 export interface RobotApiV2Error {
-  id?: string,
-  links?: ResourceLinks,
-  status?: string,
-  title?: string,
-  detail?: string,
+  id?: string
+  links?: ResourceLinks
+  status?: string
+  title?: string
+  detail?: string
   source?: {
-    pointer?: string,
-    parameter?: string,
-  },
-  meta?: {},
+    pointer?: string
+    parameter?: string
+  }
+  meta?: {}
 }
 
 export interface RobotApiV2ErrorResponseBody {
-  errors: RobotApiV2Error[],
+  errors: RobotApiV2Error[]
 }
 
 // API request tracking state
@@ -101,15 +104,13 @@ export type RequestStatus = typeof PENDING | typeof SUCCESS | typeof FAILURE
 
 export type RequestState =
   | { status: typeof PENDING }
-  | { status: typeof SUCCESS, response: RobotApiResponseMeta }
+  | { status: typeof SUCCESS; response: RobotApiResponseMeta }
   | {
-      status: typeof FAILURE,
-      response: RobotApiResponseMeta,
-      error: { message?: string } | RobotApiV2ErrorResponseBody,
+      status: typeof FAILURE
+      response: RobotApiResponseMeta
+      error: { message?: string } | RobotApiV2ErrorResponseBody
     }
 
-export type RobotApiState = Partial<
-  {
-    [requestId: string]: void | RequestState,
-  }
->
+export type RobotApiState = Partial<{
+  [requestId: string]: null | undefined | RequestState
+}>

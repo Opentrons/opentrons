@@ -7,7 +7,7 @@ import type { ValidLabwareFile } from '../types'
 
 type SelectorSpec = {
   name: string,
-  selector: State => mixed,
+  selector: (state: State) => mixed,
   state: Partial<State>,
   expected: mixed,
 }

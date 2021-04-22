@@ -24,12 +24,16 @@ export const OPENTRONS_LABWARE_FILE: 'OPENTRONS_LABWARE_FILE' =
 
 export const VALID_LABWARE_FILE: 'VALID_LABWARE_FILE' = 'VALID_LABWARE_FILE'
 
-export const getCustomLabwareDirectory: State => string = createSelector(
+export const getCustomLabwareDirectory: (
+  state: State
+) => string = createSelector(
   getConfig,
   config => config?.labware.directory ?? ''
 )
 
-export const getCustomLabware: State => CheckedLabwareFile[] = createSelector(
+export const getCustomLabware: (
+  state: State
+) => CheckedLabwareFile[] = createSelector(
   state => state.labware.filenames,
   state => state.labware.filesByName,
   (filenames, filesByName) =>
@@ -40,14 +44,17 @@ export const getCustomLabware: State => CheckedLabwareFile[] = createSelector(
 )
 
 // $FlowFixMe: flow unable to do type refinements via filter
-export const getValidCustomLabware: State => ValidLabwareFile[] = createSelector(
-  getCustomLabware,
-  labware => labware.filter(f => f.type === VALID_LABWARE_FILE)
+export const getValidCustomLabware: (
+  state: State
+) => ValidLabwareFile[] = createSelector(getCustomLabware, labware =>
+  labware.filter(f => f.type === VALID_LABWARE_FILE)
 )
 
-export const getAddLabwareFailure: State => {
-  file: FailedLabwareFile | null,
-  errorMessage: string | null,
+export const getAddLabwareFailure: (
+  state: State
+) => {
+  file: FailedLabwareFile | null
+  errorMessage: string | null
 } = createSelector(
   state => state.labware.addFailureFile,
   state => state.labware.addFailureMessage,
@@ -57,9 +64,10 @@ export const getAddLabwareFailure: State => {
 export const getListLabwareErrorMessage = (state: State): null | string =>
   state.labware.listFailureMessage
 
-export const getCustomLabwareDefinitions: State => LabwareDefinition2[] = createSelector(
-  getValidCustomLabware,
-  labware => labware.map(lw => lw.definition)
+export const getCustomLabwareDefinitions: (
+  state: State
+) => LabwareDefinition2[] = createSelector(getValidCustomLabware, labware =>
+  labware.map(lw => lw.definition)
 )
 
 export const getCustomTipRackDefinitions: (

@@ -96,7 +96,7 @@ const getRobotCalibrationOk = (state: State): boolean => {
   return deckCalOk
 }
 
-const getRunDisabledReason: State => string | null = createSelector(
+const getRunDisabledReason: (state: State) => string | null = createSelector(
   getConnectedRobot,
   RobotSelectors.getSessionIsLoaded,
   RobotSelectors.getCommands,
@@ -114,7 +114,7 @@ const getRunDisabledReason: State => string | null = createSelector(
   }
 )
 
-export const getRobotsLocation: State => NavLocation = createSelector(
+export const getRobotsLocation: (state: State) => NavLocation = createSelector(
   getConnectedRobot,
   getConnectedRobotUpdateAvailable,
   getRobotCalibrationOk,
@@ -128,7 +128,7 @@ export const getRobotsLocation: State => NavLocation = createSelector(
   })
 )
 
-export const getUploadLocation: State => NavLocation = createSelector(
+export const getUploadLocation: (state: State) => NavLocation = createSelector(
   getConnectedRobot,
   RobotSelectors.getIsRunning,
   getDeckCalibrationOk,
@@ -152,7 +152,9 @@ export const getUploadLocation: State => NavLocation = createSelector(
   }
 )
 
-export const getCalibrateLocation: State => NavLocation = createSelector(
+export const getCalibrateLocation: (
+  state: State
+) => NavLocation = createSelector(
   RobotSelectors.getIsRunning,
   RobotSelectors.getIsDone,
   getRunDisabledReason,
@@ -176,7 +178,7 @@ export const getCalibrateLocation: State => NavLocation = createSelector(
   }
 )
 
-export const getRunLocation: State => NavLocation = createSelector(
+export const getRunLocation: (state: State) => NavLocation = createSelector(
   getRunDisabledReason,
   disabledReason => {
     return {
@@ -189,7 +191,7 @@ export const getRunLocation: State => NavLocation = createSelector(
   }
 )
 
-export const getMoreLocation: State => NavLocation = createSelector(
+export const getMoreLocation: (state: State) => NavLocation = createSelector(
   getAvailableShellUpdate,
   getU2EWindowsDriverStatus,
   (appUpdate, driverStatus) => {
@@ -210,7 +212,9 @@ export const getMoreLocation: State => NavLocation = createSelector(
   }
 )
 
-export const getNavbarLocations: State => NavLocation[] = createSelector(
+export const getNavbarLocations: (
+  state: State
+) => NavLocation[] = createSelector(
   getRobotsLocation,
   getUploadLocation,
   getCalibrateLocation,

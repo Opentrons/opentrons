@@ -10,7 +10,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { State } from '../types'
 import type { ProtocolData, ProtocolType, ProtocolFile } from './types'
 
-type ProtocolInfoSelector = State => {
+type ProtocolInfoSelector = (state: State) => {
   protocolName: string | null,
   lastModified: number | null,
   appName: string | null,
@@ -31,7 +31,7 @@ export const getProtocolContents = (state: State): string | null =>
 export const getProtocolData = (state: State): ProtocolData | null =>
   state.protocol.data
 
-export const getProtocolFilename: State => string | null = createSelector(
+export const getProtocolFilename: (state: State) => string | null = createSelector(
   getProtocolFile,
   file => file?.name ?? null
 )
@@ -47,7 +47,7 @@ type LabwareDefinitionBySlotMap = {
   ...
 }
 
-export const getLabwareDefBySlot: State => LabwareDefinitionBySlotMap = createSelector(
+export const getLabwareDefBySlot: (state: State) => LabwareDefinitionBySlotMap = createSelector(
   getProtocolData,
   data => {
     if (data?.labwareDefinitions && data.labware) {
@@ -131,22 +131,22 @@ export const getProtocolDisplayData: ProtocolInfoSelector = createSelector(
   }
 )
 
-export const getProtocolName: State => string | null = createSelector(
+export const getProtocolName: (state: State) => string | null = createSelector(
   getProtocolDisplayData,
   displayData => displayData.protocolName
 )
 
-export const getProtocolAuthor: State => string | null = createSelector(
+export const getProtocolAuthor: (state: State) => string | null = createSelector(
   getProtocolData,
   data => data?.metadata?.author ?? null
 )
 
-export const getProtocolDescription: State => string | null = createSelector(
+export const getProtocolDescription: (state: State) => string | null = createSelector(
   getProtocolData,
   data => data?.metadata?.description ?? null
 )
 
-export const getProtocolSource: State => string | null = createSelector(
+export const getProtocolSource: (state: State) => string | null = createSelector(
   getProtocolData,
   data => {
     return typeof data?.metadata?.source === 'string'
@@ -155,18 +155,18 @@ export const getProtocolSource: State => string | null = createSelector(
   }
 )
 
-export const getProtocolLastUpdated: State => number | null = createSelector(
+export const getProtocolLastUpdated: (state: State) => number | null = createSelector(
   getProtocolFile,
   getProtocolDisplayData,
   (file, displayData) => displayData.lastModified ?? file?.lastModified ?? null
 )
 
-export const getProtocolType: State => ProtocolType | null = createSelector(
+export const getProtocolType: (state: State) => ProtocolType | null = createSelector(
   getProtocolFile,
   file => file?.type || null
 )
 
-export const getProtocolCreatorApp: State => {
+export const getProtocolCreatorApp: (state: State) => {
   name: string | null,
   version: string | null,
 } = createSelector(getProtocolDisplayData, displayData => {
@@ -187,7 +187,7 @@ export const getProtocolApiVersion = (state: State): string | null => {
 const METHOD_OT_API = 'Python Protocol API'
 const METHOD_UNKNOWN = 'Unknown Application'
 
-export const getProtocolMethod: State => string | null = createSelector(
+export const getProtocolMethod: (state: State) => string | null = createSelector(
   getProtocolFile,
   getProtocolContents,
   getProtocolData,

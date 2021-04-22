@@ -24,8 +24,8 @@ export function getShellUpdateState(state: State): ShellUpdateState {
   return state.shell.update
 }
 
-export const getAvailableShellUpdate: State =>
-  | string
-  | null = createSelector(getShellUpdateState, state =>
+export const getAvailableShellUpdate: (
+  state: State
+) => string | null = createSelector(getShellUpdateState, state =>
   state.available && state.info ? state.info.version : null
 )

@@ -4,12 +4,11 @@ import type {
   ProtocolFileV1,
 } from '@opentrons/shared-data/protocol'
 
-import typeof { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
+import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
 
-export type PythonProtocolMetadata = {
-  ...$Exact<$PropertyType<ProtocolFileV1<{ ... }>, 'metadata'>>,
-  source?: string,
-  ...
+export type PythonProtocolMetadata = ProtocolFileV1['metadata'] & {
+  source?: string
+  [key: string]: unknown
 }
 
 // data may be a full JSON protocol or just a metadata dict from Python
@@ -18,31 +17,34 @@ export type ProtocolData =
   | JsonProtocolFile
   | { metadata: PythonProtocolMetadata }
 
-export type ProtocolType = TYPE_JSON | TYPE_PYTHON | TYPE_ZIP
+export type ProtocolType =
+  | typeof TYPE_JSON
+  | typeof TYPE_PYTHON
+  | typeof TYPE_ZIP
 
-export type ProtocolFile = {
-  name: string,
-  type: ?ProtocolType,
-  lastModified: ?number,
-  ...
+export interface ProtocolFile {
+  name: string
+  type: ProtocolType | null | undefined
+  lastModified: number | null | undefined
+  [key: string]: unknown
 }
 
 // action types
 
-export type OpenProtocolAction = {
-  type: 'protocol:OPEN',
-  payload: { file: ProtocolFile },
+export interface OpenProtocolAction {
+  type: 'protocol:OPEN'
+  payload: { file: ProtocolFile }
 }
 
-export type UploadProtocolAction = {
-  type: 'protocol:UPLOAD',
-  payload: { contents: string, data: ProtocolData | null },
-  meta: { robot: true },
+export interface UploadProtocolAction {
+  type: 'protocol:UPLOAD'
+  payload: { contents: string; data: ProtocolData | null }
+  meta: { robot: true }
 }
 
-export type InvalidProtocolFileAction = {
-  type: 'protocol:INVALID_FILE',
-  payload: { file: ProtocolFile, message: string },
+export interface InvalidProtocolFileAction {
+  type: 'protocol:INVALID_FILE'
+  payload: { file: ProtocolFile; message: string }
 }
 
 export type ProtocolAction =
@@ -52,8 +54,8 @@ export type ProtocolAction =
 
 // state types
 
-export type ProtocolState = $ReadOnly<{
-  file: ProtocolFile | null,
-  contents: string | null,
-  data: ProtocolData | null,
-}>
+export interface ProtocolState {
+  readonly file: ProtocolFile | null
+  readonly contents: string | null
+  readonly data: ProtocolData | null
+}

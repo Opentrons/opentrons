@@ -7,11 +7,11 @@ import * as CalibrateSelectors from '../calibrate-selectors'
 import type { State } from '../../types'
 
 type SelectorSpec = {
-  name: string,
-  selector: State => mixed,
-  before?: () => mixed,
-  after?: () => mixed,
-  expected: mixed,
+  name: string
+  selector: (state: State) => mixed
+  before?: () => mixed
+  after?: () => mixed
+  expected: mixed
 }
 
 jest.mock('../selectors')
@@ -46,7 +46,7 @@ const DISABLED_CALIBRATE = {
 }
 
 describe('calibrate nav selectors', () => {
-  const mockState: State = ({ mockState: true } as any)
+  const mockState: State = { mockState: true } as any
 
   beforeEach(() => {
     mockGetCalibrateLocation.mockReturnValue(DISABLED_CALIBRATE)
@@ -103,7 +103,7 @@ describe('calibrate nav selectors', () => {
       before: () => {
         mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE)
         mockGetPipettes.mockReturnValue([
-          ({ _id: 0, mount: 'right', tipRacks: [] } as any),
+          { _id: 0, mount: 'right', tipRacks: [] } as any,
         ])
       },
       expected: {
@@ -127,7 +127,7 @@ describe('calibrate nav selectors', () => {
       before: () => {
         mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE)
         mockGetPipettes.mockReturnValue([
-          ({ _id: 0, mount: 'right', tipRacks: [1, 2] } as any),
+          { _id: 0, mount: 'right', tipRacks: [1, 2] } as any,
         ])
       },
       expected: {
@@ -152,15 +152,15 @@ describe('calibrate nav selectors', () => {
       before: () => {
         mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE)
         mockGetPipettes.mockReturnValue([
-          ({ _id: 0, mount: 'right', tipRacks: [1, 2] } as any),
+          { _id: 0, mount: 'right', tipRacks: [1, 2] } as any,
         ])
         mockGetTipracksByMount.mockReturnValue({
           right: [
-            ({ _id: 1, definitionHash: 'hash-1' } as any),
-            ({ _id: 2, definitionHash: 'hash-2' } as any),
-            ({ _id: 3, definitionHash: null } as any),
+            { _id: 1, definitionHash: 'hash-1' } as any,
+            { _id: 2, definitionHash: 'hash-2' } as any,
+            { _id: 3, definitionHash: null } as any,
           ],
-          left: [({ _id: 1, definitionHash: 'hash-1' } as any)],
+          left: [{ _id: 1, definitionHash: 'hash-1' } as any],
         })
       },
       expected: {

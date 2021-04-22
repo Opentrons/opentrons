@@ -1,10 +1,7 @@
 //
-import {
-  typeof TEMPDECK,
-  typeof MAGDECK,
-  typeof THERMOCYCLER,
-  type ModuleModel,
-} from '@opentrons/shared-data'
+import { TEMPDECK, MAGDECK, THERMOCYCLER } from '@opentrons/shared-data'
+
+import type { ModuleModel } from '@opentrons/shared-data'
 
 export type Slot =
   | '1'
@@ -19,21 +16,21 @@ export type Slot =
   | '10'
   | '11'
 
-export type ApiSessionModule = {
+export interface ApiSessionModule {
   // resource ID
-  _id: number,
+  _id: number
   // slot module is installed in
-  slot: Slot,
+  slot: Slot
   // name identifier of the module
-  name: TEMPDECK | MAGDECK | THERMOCYCLER,
-  model: ModuleModel,
+  name: typeof TEMPDECK | typeof MAGDECK | typeof THERMOCYCLER
+  model: ModuleModel
 }
 
-export type ApiSessionModuleLegacy = {
+export interface ApiSessionModuleLegacy {
   // resource ID
-  _id: number,
+  _id: number
   // slot module is installed in
-  slot: Slot,
+  slot: Slot
   // name identifier of the module
-  name: TEMPDECK | MAGDECK | THERMOCYCLER,
+  name: typeof TEMPDECK | typeof MAGDECK | typeof THERMOCYCLER
 }

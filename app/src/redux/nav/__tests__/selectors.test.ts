@@ -16,11 +16,11 @@ import type { State } from '../../types'
 import type { Robot, ViewableRobot } from '../../discovery/types'
 
 type SelectorSpec = {
-  name: string,
-  selector: State => mixed,
-  before?: () => mixed,
-  after?: () => mixed,
-  expected: mixed,
+  name: string
+  selector: (state: State) => mixed
+  before?: () => mixed
+  after?: () => mixed
+  expected: mixed
 }
 
 jest.mock('../../calibration/selectors')
@@ -83,7 +83,7 @@ const mockGetSessionIsLoaded: JestMockFn<
 const mockGetCommands: JestMockFn<
   [State],
   any
-> = (RobotSelectors.getCommands as any)
+> = RobotSelectors.getCommands as any
 
 const mockGetDeckCalibrationStatus: JestMockFn<
   [State, string],
@@ -132,8 +132,8 @@ const EXPECTED_MORE = {
 }
 
 describe('nav selectors', () => {
-  const mockState: State = ({ mockState: true } as any)
-  const mockRobot: Robot = ({ mockRobot: true, name: 'mock-robot' } as any)
+  const mockState: State = { mockState: true } as any
+  const mockRobot: Robot = { mockRobot: true, name: 'mock-robot' } as any
 
   beforeEach(() => {
     mockGetConnectedRobot.mockReturnValue(null)

@@ -16,80 +16,80 @@ export type RobotAdminStatus =
   | 'restarting'
   | 'restart-failed'
 
-export type ResetConfigOption = {
-  id: string,
-  name: string,
-  description: string,
+export interface ResetConfigOption {
+  id: string
+  name: string
+  description: string
 }
 
 export type ResetConfigRequest = Partial<{
-  [optionId: string]: boolean,
+  [optionId: string]: boolean
 }>
 
 // action types
 
-export type RestartRobotAction = {
-  type: 'robotAdmin:RESTART',
-  payload: { robotName: string },
-  meta: Partial<{ ...RobotApiRequestMeta, robot: true }>,
+export interface RestartRobotAction {
+  type: 'robotAdmin:RESTART'
+  payload: { robotName: string }
+  meta: Partial<RobotApiRequestMeta & { robot: true }>
 }
 
-export type RestartStatusChangedAction = {
-  type: 'robotAdmin:RESTART_STATUS_CHANGED',
+export interface RestartStatusChangedAction {
+  type: 'robotAdmin:RESTART_STATUS_CHANGED'
   payload: {
-    robotName: string,
-    restartStatus: RobotRestartStatus,
-    bootId: string | null,
-    startTime: Date | null,
-  },
+    robotName: string
+    restartStatus: RobotRestartStatus
+    bootId: string | null
+    startTime: Date | null
+  }
 }
 
-export type RestartRobotSuccessAction = {
-  type: 'robotAdmin:RESTART_SUCCESS',
-  payload: { robotName: string },
-  meta: RobotApiRequestMeta,
+export interface RestartRobotSuccessAction {
+  type: 'robotAdmin:RESTART_SUCCESS'
+  payload: { robotName: string }
+  meta: RobotApiRequestMeta
 }
 
-export type RestartRobotFailureAction = {
-  type: 'robotAdmin:RESTART_FAILURE',
-  payload: { robotName: string, error: {} },
-  meta: RobotApiRequestMeta,
+export interface RestartRobotFailureAction {
+  type: 'robotAdmin:RESTART_FAILURE'
+  payload: { robotName: string; error: {} }
+  meta: RobotApiRequestMeta
 }
 
-export type FetchResetConfigOptionsAction = {
-  type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS',
-  payload: { robotName: string },
-  meta: RobotApiRequestMeta,
+export interface FetchResetConfigOptionsAction {
+  type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS'
+  payload: { robotName: string }
+  meta: RobotApiRequestMeta
 }
 
-export type FetchResetConfigOptionsSuccessAction = {
-  type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_SUCCESS',
-  payload: { robotName: string, options: ResetConfigOption[] },
-  meta: RobotApiRequestMeta,
+export interface FetchResetConfigOptionsSuccessAction {
+  type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_SUCCESS'
+  payload: { robotName: string; options: ResetConfigOption[] }
+  meta: RobotApiRequestMeta
 }
 
-export type FetchResetConfigOptionsFailureAction = {
-  type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_FAILURE',
-  payload: { robotName: string, error: {} },
-  meta: RobotApiRequestMeta,
+export interface FetchResetConfigOptionsFailureAction {
+  type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_FAILURE'
+  payload: { robotName: string; error: {} }
+  meta: RobotApiRequestMeta
 }
 
-export type ResetConfigAction = {
-  type: 'robotAdmin:RESET_CONFIG',
-  payload: { robotName: string, resets: ResetConfigRequest },
-  meta: RobotApiRequestMeta,
+export interface ResetConfigAction {
+  type: 'robotAdmin:RESET_CONFIG'
+  payload: { robotName: string; resets: ResetConfigRequest }
+  meta: RobotApiRequestMeta
 }
 
-export type ResetConfigSuccessAction = {
-  type: 'robotAdmin:RESET_CONFIG_SUCCESS',
-  payload: { robotName: string },
-  meta: RobotApiRequestMeta,
+export interface ResetConfigSuccessAction {
+  type: 'robotAdmin:RESET_CONFIG_SUCCESS'
+  payload: { robotName: string }
+  meta: RobotApiRequestMeta
 }
 
-export type ResetConfigFailureAction = {
-  type: 'robotAdmin:RESET_CONFIG_FAILURE',
-  payload: { robotName: string, error: {} },
-  meta: RobotApiRequestMeta,
+export interface ResetConfigFailureAction {
+  type: 'robotAdmin:RESET_CONFIG_FAILURE'
+  payload: { robotName: string; error: {} }
+  meta: RobotApiRequestMeta
 }
 
 export type RobotAdminAction =
@@ -107,17 +107,17 @@ export type RobotAdminAction =
 // state types
 
 export interface RestartState {
-  bootId: string | null,
-  startTime: Date | null,
-  status: RobotRestartStatus,
+  bootId: string | null
+  startTime: Date | null
+  status: RobotRestartStatus
 }
 
 export type PerRobotAdminState = Partial<{
-  status: RobotAdminStatus,
-  restart: RestartState,
-  resetConfigOptions: ResetConfigOption[],
+  status: RobotAdminStatus
+  restart: RestartState
+  resetConfigOptions: ResetConfigOption[]
 }>
 
 export type RobotAdminState = Partial<{
-  [robotName: string]: void | PerRobotAdminState,
+  [robotName: string]: null | undefined | PerRobotAdminState
 }>

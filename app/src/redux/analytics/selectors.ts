@@ -99,7 +99,7 @@ const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
   })
 )
 
-export const getProtocolAnalyticsData: State => Promise<ProtocolAnalyticsData> = createSelector(
+export const getProtocolAnalyticsData: (state: State) => Promise<ProtocolAnalyticsData> = createSelector(
   _getUnhashedProtocolAnalyticsData,
   data => {
     const hashTasks = [hash(data.protocolAuthor), hash(data.protocolText)]

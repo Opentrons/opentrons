@@ -30,12 +30,12 @@ import type {
   ViewableRobot,
 } from './types'
 
-type GetConnectableRobots = State => Robot[]
-type GetReachableRobots = State => ReachableRobot[]
-type GetUnreachableRobots = State => UnreachableRobot[]
-type GetAllRobots = State => DiscoveredRobot[]
-type GetViewableRobots = State => ViewableRobot[]
-type GetConnectedRobot = State => Robot | null
+type GetConnectableRobots = (state: State) => Robot[]
+type GetReachableRobots = (state: State) => ReachableRobot[]
+type GetUnreachableRobots = (state: State) => UnreachableRobot[]
+type GetAllRobots = (state: State) => DiscoveredRobot[]
+type GetViewableRobots = (state: State) => ViewableRobot[]
+type GetConnectedRobot = (state: State) => Robot | null
 
 const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
 
@@ -54,7 +54,9 @@ export function getScanning(state: State): boolean {
   return state.discovery.scanning
 }
 
-export const getDiscoveredRobots: State => DiscoveredRobot[] = createSelector(
+export const getDiscoveredRobots: (
+  state: State
+) => DiscoveredRobot[] = createSelector(
   state => state.discovery.robotsByName,
   getConnectedRobotName,
   (robotsMap, connectedRobotName) => {
@@ -166,7 +168,7 @@ export const getRobotFirmwareVersion = (
 
 export const getRobotProtocolApiVersion = (
   robot: DiscoveredRobot
-): { min: string, max: string } | null => {
+): { min: string; max: string } | null => {
   const healthField = robot.health
   const DEFAULT_API_VERSION = '1.0'
   if (!healthField) {
