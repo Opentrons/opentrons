@@ -9,18 +9,18 @@ import type {
   DisconnectResponseAction,
 } from '../actions'
 
-export type ConnectionState = {
-  connectedTo: ?string,
+export interface ConnectionState {
+  connectedTo: string | null | undefined
   connectRequest: {
-    inProgress: boolean,
-    error: ?{ message?: string, ... },
-    name: string,
-  },
+    inProgress: boolean
+    error: { message?: string; [key: string]: unknown } | null | undefined
+    name: string
+  }
   disconnectRequest: {
-    inProgress: boolean,
-    error: ?{ message?: string, ... },
-  },
-  unexpectedDisconnect: boolean,
+    inProgress: boolean
+    error: { message?: string; [key: string]: unknown } | null | undefined
+  }
+  unexpectedDisconnect: boolean
 }
 
 const INITIAL_STATE: ConnectionState = {
@@ -77,7 +77,7 @@ function handleConnectResponse(
   action: ConnectResponseAction
 ): ConnectionState {
   const error = action.payload.error || null
-  let connectedTo = state.connectRequest.name
+  let connectedTo: string | null = state.connectRequest.name
   let requestName = ''
 
   if (error) {
