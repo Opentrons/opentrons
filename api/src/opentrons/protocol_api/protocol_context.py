@@ -580,7 +580,7 @@ class ProtocolContext(CommandPublisher):
 
     @publish.both(command=cmds.pause)
     @requires_version(2, 0)
-    def pause(self, msg=None):
+    def pause(self, msg=None) -> None:
         """ Pause execution of the protocol until resume is called.
 
         This function returns immediately, but the next function call that
@@ -593,13 +593,13 @@ class ProtocolContext(CommandPublisher):
 
     @publish.both(command=cmds.resume)
     @requires_version(2, 0)
-    def resume(self):
+    def resume(self) -> None:
         """ Resume a previously-paused protocol """
         self._implementation.resume()
 
     @publish.both(command=cmds.comment)
     @requires_version(2, 0)
-    def comment(self, msg):
+    def comment(self, msg) -> None:
         """
         Add a user-readable comment string that will be echoed to the Opentrons
         app.
