@@ -11,107 +11,108 @@ export type DevInternalFlag =
   | 'enableBundleUpload'
   | 'moduleAugmentation'
 
-export type FeatureFlags = Partial<{
-  [DevInternalFlag]: boolean | void,
-}>
+export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
-export type ConfigV0 = $ReadOnly<{
-  version: 0,
-  devtools: boolean,
-  reinstallDevtools: boolean,
+export type ConfigV0 = Readonly<{
+  version: 0
+  devtools: boolean
+  reinstallDevtools: boolean
 
   // app update config
-  update: $ReadOnly<{
-    channel: UpdateChannel,
-  }>,
+  update: Readonly<{
+    channel: UpdateChannel
+  }>
 
   // robot update config
-  buildroot: $ReadOnly<{
-    manifestUrl: string,
-  }>,
+  buildroot: Readonly<{
+    manifestUrl: string
+  }>
 
   // logging config
-  log: $ReadOnly<{
-    level: $ReadOnly<{
-      file: LogLevel,
-      console: LogLevel,
-    }>,
-  }>,
+  log: Readonly<{
+    level: Readonly<{
+      file: LogLevel
+      console: LogLevel
+    }>
+  }>
 
   // ui and browser config
-  ui: $ReadOnly<{
-    width: number,
-    height: number,
-    url: $ReadOnly<{
-      protocol: UrlProtocol,
-      path: string,
-    }>,
-    webPreferences: $ReadOnly<{
-      webSecurity: boolean,
-    }>,
-  }>,
+  ui: Readonly<{
+    width: number
+    height: number
+    url: Readonly<{
+      protocol: UrlProtocol
+      path: string
+    }>
+    webPreferences: Readonly<{
+      webSecurity: boolean
+    }>
+  }>
 
-  analytics: $ReadOnly<{
-    appId: string,
-    optedIn: boolean,
-    seenOptIn: boolean,
-  }>,
+  analytics: Readonly<{
+    appId: string
+    optedIn: boolean
+    seenOptIn: boolean
+  }>
 
   // deprecated
-  p10WarningSeen: $ReadOnly<{
-    [id: string]: ?boolean,
-    ...
-  }>,
+  p10WarningSeen: Readonly<{
+    [id: string]: boolean | null | undefined
+  }>
 
-  support: $ReadOnly<{
-    userId: string,
-    createdAt: number,
-    name: string,
-    email: ?string,
-  }>,
+  support: Readonly<{
+    userId: string
+    createdAt: number
+    name: string
+    email: string | null | undefined
+  }>
 
-  discovery: $ReadOnly<{
-    candidates: DiscoveryCandidates,
-  }>,
+  discovery: Readonly<{
+    candidates: DiscoveryCandidates
+  }>
 
   // custom labware files
-  labware: $ReadOnly<{
-    directory: string,
-  }>,
+  labware: Readonly<{
+    directory: string
+  }>
 
   // app wide alerts
-  alerts: $ReadOnly<{ ignored: $ReadOnlystring[] }>,
+  alerts: Readonly<{ readonly ignored: string[] }>
 
   // internal development flags
-  devInternal?: $ReadOnly<FeatureFlags>,
+  devInternal?: Readonly<FeatureFlags>
 }>
 
-export type ConfigV1 = $ReadOnly<{
-  ...ConfigV0,
-  version: 1,
-  discovery: $ReadOnly<{
-    candidates: DiscoveryCandidates,
-    disableCache: boolean,
-  }>,
-}>
+export type ConfigV1 = Readonly<
+  ConfigV0 & {
+    version: 1
+    discovery: Readonly<{
+      candidates: DiscoveryCandidates
+      disableCache: boolean
+    }>
+  }
+>
 
-export type ConfigV2 = $ReadOnly<{
-  ...ConfigV1,
-  version: 2,
-  calibration: $ReadOnly<{
-    useTrashSurfaceForTipCal: boolean | null,
-  }>,
-}>
+export type ConfigV2 = Readonly<
+  ConfigV1 & {
+    version: 2
+    calibration: Readonly<{
+      useTrashSurfaceForTipCal: boolean | null
+    }>
+  }
+>
 
 // v3 config changes default values but does not change schema
-export type ConfigV3 = $ReadOnly<{
-  ...ConfigV2,
-  version: 3,
-  support: $ReadOnly<{
-    ...$PropertyType<ConfigV2, 'support'>,
-    name: string | null,
-    email: string | null,
-  }>,
-}>
+export type ConfigV3 = Readonly<
+  ConfigV2 & {
+    version: 3
+    support: Readonly<
+      Pick<ConfigV2, 'support'> & {
+        name: string | null
+        email: string | null
+      }
+    >
+  }
+>
 
 export type Config = ConfigV3
