@@ -1,3 +1,4 @@
+// @flow
 import {
   MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_V1,

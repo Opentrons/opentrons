@@ -1,7 +1,7 @@
 // @flow
 import { generateRobotStateTimeline } from './generateRobotStateTimeline'
 import { generateSubsteps } from './generateSubsteps'
-import type { Timeline } from '../step-generation/types'
+import type { Timeline } from '@opentrons/step-generation'
 import type { WorkerContext } from './types'
 
 // Since we can't type the worker.js itself (flow would not understand `new Worker()`),

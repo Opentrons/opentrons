@@ -5,29 +5,27 @@ import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
 
-import { substepTimeline } from './substepTimeline'
-import * as steplistUtils from './utils'
 import {
   consolidate,
   distribute,
   transfer,
   mix,
   curryCommandCreator,
-} from '../step-generation'
+} from '@opentrons/step-generation'
+import { substepTimeline } from './substepTimeline'
+import * as steplistUtils from './utils'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
 
-import type { StepIdType } from '../form-types'
 import type {
   CurriedCommandCreator,
   InvariantContext,
   RobotState,
-} from '../step-generation'
-import type {
   ConsolidateArgs,
   DistributeArgs,
   MixArgs,
   TransferArgs,
-} from '../step-generation/types'
+} from '@opentrons/step-generation'
+import type { StepIdType } from '../form-types'
 import type {
   NamedIngred,
   StepArgsAndErrors,

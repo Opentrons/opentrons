@@ -1,18 +1,18 @@
 // @flow
 import assert from 'assert'
 // TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
-import { orderWells } from 'protocol-designer/src/steplist/utils/orderWells.js'
+import { orderWells } from './utils'
 import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
 import {
   getTiprackVolume,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { InvariantContext, RobotState } from './'
 import type {
   ModuleTemporalProperties,
   ThermocyclerModuleState,
-} from '../step-forms'
+} from '@opentrons/step-generation'
+import type { InvariantContext, RobotState } from './'
 
 export function sortLabwareBySlot(
   labwareState: $PropertyType<RobotState, 'labware'>

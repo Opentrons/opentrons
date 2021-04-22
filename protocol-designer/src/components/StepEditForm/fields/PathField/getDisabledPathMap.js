@@ -7,8 +7,7 @@ import {
   volumeInCapacityForMultiAspirate,
 } from '../../../../steplist/formLevel/handleFormChange/utils'
 
-import type { ChangeTipOptions } from '../../../../step-generation/types'
-import type { PipetteEntities } from '../../../../step-forms'
+import type { ChangeTipOptions, PipetteEntities } from '@opentrons/step-generation'
 import type { PathOption } from '../../../../form-types'
 
 export type DisabledPathMap = { [PathOption]: string } | null

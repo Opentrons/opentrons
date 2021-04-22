@@ -1,8 +1,7 @@
 // @flow
 import last from 'lodash/last'
 import pick from 'lodash/pick'
-import { getWellsForTips } from '../step-generation/utils'
-import { getNextRobotStateAndWarningsSingleCommand } from '../step-generation/getNextRobotStateAndWarnings'
+import { getWellsForTips, getNextRobotStateAndWarningsSingleCommand } from '@opentrons/step-generation'
 
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type { Channels } from '@opentrons/components'
@@ -12,7 +11,7 @@ import type {
   CurriedCommandCreator,
   InvariantContext,
   RobotState,
-} from '../step-generation/types'
+} from '@opentrons/step-generation'
 import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */

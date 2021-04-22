@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
@@ -14,7 +15,7 @@ import { curryCommandCreator } from './curryCommandCreator'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { PipetteEntity, LabwareEntity } from '../../step-forms'
+import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
 import type {
   LocationLiquidState,
   InvariantContext,

@@ -26,7 +26,7 @@ import type {
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureArgs,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { ThermocyclerModuleState } from '../../step-forms/types'
+import type { ThermocyclerModuleState } from '../types'
 
 const forThermocyclerSetTargetBlockTemperature = makeImmutableStateUpdater(
   _forThermocyclerSetTargetBlockTemperature
