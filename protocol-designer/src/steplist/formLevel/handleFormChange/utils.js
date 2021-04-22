@@ -8,7 +8,10 @@ import type {
   LabwareDefinition2,
   PipetteChannels,
 } from '@opentrons/shared-data'
-import type { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
+import type {
+  LabwareEntities,
+  PipetteEntities,
+} from '@opentrons/step-generation'
 import type { FormPatch } from '../../actions/types'
 import type { FormData, PathOption, StepFieldName } from '../../../form-types'
 

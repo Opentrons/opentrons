@@ -7,7 +7,10 @@ import {
   getSuccessResult,
 } from '../__fixtures__'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { ThermocyclerModuleState, ThermocyclerProfileStepArgs } from '../types'
+import type {
+  ThermocyclerModuleState,
+  ThermocyclerProfileStepArgs,
+} from '../types'
 
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'

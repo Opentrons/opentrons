@@ -9,7 +9,7 @@ import type {
   LabwareDefinition2,
   ModuleRealType,
   ModuleModel,
-  PipetteNameSpecs
+  PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,

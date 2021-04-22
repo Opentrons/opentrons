@@ -17,10 +17,7 @@ import {
 import { FilePipettesModal } from '../FilePipettesModal'
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { BaseState, ThunkDispatch } from '../../../types'
-import type {
-  PipetteOnDeck,
-  FormPipettesByMount,
-} from '../../../step-forms'
+import type { PipetteOnDeck, FormPipettesByMount } from '../../../step-forms'
 import type { StepIdType } from '../../../form-types'
 
 type Props = React.ElementProps<typeof FilePipettesModal>

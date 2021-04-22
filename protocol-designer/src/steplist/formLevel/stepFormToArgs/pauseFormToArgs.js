@@ -6,7 +6,10 @@ import {
 } from '../../../constants'
 
 import type { FormData } from '../../../form-types'
-import type { AwaitTemperatureArgs, PauseArgs } from '@opentrons/step-generation'
+import type {
+  AwaitTemperatureArgs,
+  PauseArgs,
+} from '@opentrons/step-generation'
 
 export const pauseFormToArgs = (
   formData: FormData

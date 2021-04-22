@@ -1,9 +1,6 @@
 // @flow
 import type { Mount } from '@opentrons/components'
-import type {
-  ModuleRealType,
-  ModuleModel,
-} from '@opentrons/shared-data'
+import type { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
 import type { DeckSlot } from '../types'
 import typeof {
   MAGNETIC_MODULE_TYPE,

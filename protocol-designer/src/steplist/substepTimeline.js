@@ -1,7 +1,10 @@
 // @flow
 import last from 'lodash/last'
 import pick from 'lodash/pick'
-import { getWellsForTips, getNextRobotStateAndWarningsSingleCommand } from '@opentrons/step-generation'
+import {
+  getWellsForTips,
+  getNextRobotStateAndWarningsSingleCommand,
+} from '@opentrons/step-generation'
 
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type { Channels } from '@opentrons/components'
