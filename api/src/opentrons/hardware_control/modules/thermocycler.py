@@ -353,3 +353,6 @@ class Thermocycler(mod_abc.AbstractModule):
             self._driver.disconnect()
         except Exception:
             MODULE_LOG.exception('Exception while cleaning up Thermocycler')
+
+    def __del__(self):
+        self.cleanup()

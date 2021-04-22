@@ -331,12 +331,12 @@ class TCPoller(threading.Thread):
             self._send_write_fd.write(b'c')
 
     def close(self):
-        log.info("===== Halting TCPoller")
+        log.debug("Halting TCPoller")
         self._halt_write_fd.write(b'q')
 
     def __del__(self):
         """ Clean up thread fifos"""
-        log.info("===== Cleaning up thread fifos in TCPoller.")
+        log.debug("Cleaning up thread fifos in TCPoller.")
         try:
             os.unlink(self._send_path)
         except NameError:
@@ -381,7 +381,7 @@ class Thermocycler:
         if self.is_connected() or self._poller:
             self._poller.close()  # type: ignore
             self._poller.join()  # type: ignore
-            log.info("===== TC poller stopped.")
+            log.debug("TC poller stopped.")
         self._poller = None
         return self
 

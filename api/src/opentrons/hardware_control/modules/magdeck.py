@@ -212,6 +212,9 @@ class MagDeck(mod_abc.AbstractModule):
     def cleanup(self) -> None:
         self._disconnect()
 
+    def __del__(self):
+        self.cleanup()
+
     async def prep_for_update(self) -> str:
         self._driver.enter_programming_mode()
         new_port = await update.find_bootloader_port()

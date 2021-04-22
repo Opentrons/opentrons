@@ -244,8 +244,11 @@ class TempDeck(mod_abc.AbstractModule):
 
     def cleanup(self) -> None:
         if hasattr(self, '_poller') and self._poller:
-            log.info("===== Stopping tempdeck poller.")
+            log.debug("Stopping tempdeck poller.")
             self._poller.stop()
+
+    def __del__(self):
+        self.cleanup()
 
     async def prep_for_update(self) -> str:
         model = self._device_info and self._device_info.get('model')

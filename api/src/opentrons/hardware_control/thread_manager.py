@@ -4,7 +4,8 @@ import threading
 import logging
 import asyncio
 import functools
-from typing import Generic, TypeVar, Any, Optional, Dict
+import weakref
+from typing import Generic, TypeVar, Any, Optional
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
 
@@ -108,7 +109,8 @@ class ThreadManager:
         self._sync_managed_obj: Optional[SynchronousAdapter] = None
         is_running = threading.Event()
         self._is_running = is_running
-        self._cached_modules: Dict[AbstractModule, CallBridger[AbstractModule]] = {}
+        self._cached_modules: weakref.WeakKeyDictionary[
+            AbstractModule, CallBridger[AbstractModule]] = weakref.WeakKeyDictionary()
         # TODO: remove this if we switch to python 3.8
         # https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-and-threads  # noqa
         # On windows, the event loop and system interface is different and
@@ -175,12 +177,27 @@ class ThreadManager:
             loop.call_soon_threadsafe(loop.stop)
         except Exception:
             pass
-        object.__setattr__(self, '_cached_modules', {})
+        object.__setattr__(self, '_cached_modules', weakref.WeakKeyDictionary({}))
         object.__getattribute__(self, '_thread').join()
 
-    def wrap_module(
-            self, module: AbstractModule) -> CallBridger[AbstractModule]:
-        return CallBridger(module, object.__getattribute__(self, '_loop'))
+    def wrap_module(self, module: AbstractModule) -> CallBridger[AbstractModule]:
+        """ Return the module object wrapped in a CallBridger and cache it.
+
+        The wrapped module objects are cached in `self._cached_modules` so they can be
+        re-used throughout the module object's life, as creating a wrapper is expensive.
+        We use a WeakKeyDictionary for caching so that module objects can be
+        garbage collected when modules are detached (since entries in WeakKeyDictionary
+        get discarded when there is no longer a strong reference to the key).
+        """
+        wrapper_cache = object.__getattribute__(self, '_cached_modules')
+        this_module_wrapper = wrapper_cache.get(module)
+
+        if this_module_wrapper is None:
+            this_module_wrapper = CallBridger(module,
+                                              object.__getattribute__(self, '_loop'))
+            wrapper_cache.update({module: this_module_wrapper})
+
+        return this_module_wrapper
 
     def __getattribute__(self, attr_name):
         # hardware_control.api.API.attached_modules is the only hardware
@@ -192,16 +209,7 @@ class ThreadManager:
             wrap = object.__getattribute__(self, 'wrap_module')
             managed = object.__getattribute__(self, 'managed_obj')
             attr = getattr(managed, attr_name)
-            cached_mods = object.__getattribute__(self, '_cached_modules')
-
-            # Update self._cached_modules to delete all removed modules' entries and add
-            # newly attached modules. Removing references to stale instances
-            # is necessary in order to allow the garbage collector to delete
-            # those objects from memory and cleanly stop all associated threads.
-            cached_mods = {
-                    module: cached_mods.get(module) or wrap(module) for module in attr}
-            object.__setattr__(self, '_cached_modules', cached_mods)
-            return cached_mods.values()
+            return [wrap(mod) for mod in attr]
         elif attr_name == 'clean_up':
             # the wrapped object probably has this attr as well as us, and we
             # want to call both, with the wrapped one first
