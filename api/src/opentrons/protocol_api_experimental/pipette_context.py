@@ -26,7 +26,7 @@ class PipetteContext:  # noqa: D101
     def __init__(
         self,
         engine_client: ProtocolEngineClient,
-        resource_id: str,
+        pipette_id: str,
     ) -> None:
         """Initialize a PipetteContext API provider.
 
@@ -34,21 +34,26 @@ class PipetteContext:  # noqa: D101
         create a PipetteContext for you when you call :py:meth:`load_pipette`.
 
         Args:
-            engine_client: A client to a ProtocolEngine to execute commands.
-            resource_id: The pipette's identifier inside the ProtocolEngine.
+            engine_client: A client to access protocol state and execute commands.
+            pipette_id: The pipette's identifier in commands and protocol state.
         """
         self._engine_client = engine_client
-        self._resource_id = resource_id
+        self._pipette_id = pipette_id
 
     def __hash__(self) -> int:
-        """Get resource identity for hash equality."""
-        return hash(self._resource_id)
+        """Get hash.
+
+        Uses the pipette instance's unique identifier in protocol state.
+        """
+        return hash(self._pipette_id)
 
     def __eq__(self, other: object) -> bool:
-        """Compare to another object by matching resource identifier."""
+        """Compare for object equality.
+
+        Checks that other object is a `PipetteContext` and has the same identifier.
+        """
         return (
-            isinstance(other, PipetteContext)
-            and self._resource_id == other._resource_id
+            isinstance(other, PipetteContext) and self._pipette_id == other._pipette_id
         )
 
     def __repr__(self) -> str:  # noqa: D105
@@ -98,8 +103,8 @@ class PipetteContext:  # noqa: D101
 
         if isinstance(location, Well):
             self._engine_client.aspirate(
-                pipette_id=self._resource_id,
-                labware_id=location.parent.resource_id,
+                pipette_id=self._pipette_id,
+                labware_id=location.parent.labware_id,
                 well_name=location.well_name,
                 well_location=WellLocation(
                     origin=WellOrigin.BOTTOM,
@@ -140,8 +145,8 @@ class PipetteContext:  # noqa: D101
         #  - Use well_bottom_clearance as offset for well_location(?)
         if isinstance(location, Well):
             self._engine_client.dispense(
-                pipette_id=self._resource_id,
-                labware_id=location.parent.resource_id,
+                pipette_id=self._pipette_id,
+                labware_id=location.parent.labware_id,
                 well_name=location.well_name,
                 well_location=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
                 volume=volume,
@@ -199,8 +204,8 @@ class PipetteContext:  # noqa: D101
             raise NotImplementedError()
         if isinstance(location, Well):
             self._engine_client.pick_up_tip(
-                pipette_id=self._resource_id,
-                labware_id=location.parent.resource_id,
+                pipette_id=self._pipette_id,
+                labware_id=location.parent.labware_id,
                 well_name=location.well_name,
             )
         else:
@@ -220,8 +225,8 @@ class PipetteContext:  # noqa: D101
             raise NotImplementedError()
         if isinstance(location, Well):
             self._engine_client.drop_tip(
-                pipette_id=self._resource_id,
-                labware_id=location.parent.resource_id,
+                pipette_id=self._pipette_id,
+                labware_id=location.parent.labware_id,
                 well_name=location.well_name,
             )
         else:

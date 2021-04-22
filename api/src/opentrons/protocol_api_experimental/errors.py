@@ -1,4 +1,5 @@
 """Python Protocol API v3 errors."""
+# TODO(mc, 2021-04-22): assign unique codes to all these errors
 
 
 class InvalidPipetteNameError(ValueError):

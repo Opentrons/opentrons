@@ -2,10 +2,9 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_api_experimental.pipette_context import PipetteContext
-from opentrons.protocol_api_experimental.labware import Well, Labware
-from opentrons.protocol_engine.clients import SyncClient
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import WellOrigin, WellLocation
+from opentrons.protocol_api_experimental import PipetteContext, Labware, Well
 
 
 @pytest.fixture
@@ -15,49 +14,56 @@ def decoy() -> Decoy:
 
 
 @pytest.fixture
-def sync_client(decoy: Decoy) -> SyncClient:
+def engine_client(decoy: Decoy) -> EngineClient:
     """Mock sync client."""
-    return decoy.create_decoy(spec=SyncClient)
+    return decoy.create_decoy(spec=EngineClient)
 
 
 @pytest.fixture
 def pipette_id() -> str:
-    """Pipette id."""
-    return "some_id"
+    """Get a pipette id."""
+    return "some_pipette_id"
 
 
 @pytest.fixture
-def subject(sync_client: SyncClient, pipette_id: str) -> PipetteContext:
-    """Test subject."""
-    return PipetteContext(engine_client=sync_client, resource_id=pipette_id)
+def labware_id() -> str:
+    """Get a labware id."""
+    return "some_labware_id"
 
 
 @pytest.fixture
-def labware() -> Labware:
+def labware(engine_client: EngineClient, labware_id: str) -> Labware:
     """Labware fixture."""
-    return Labware(resource_id="12345")
+    return Labware(engine_client=engine_client, labware_id=labware_id)
 
 
 @pytest.fixture
-def well(labware: Labware) -> Well:
+def well(engine_client: EngineClient, labware: Labware) -> Well:
     """Well fixture."""
-    return Well(well_name="A1", labware=labware)
+    return Well(engine_client=engine_client, labware=labware, well_name="A1")
+
+
+@pytest.fixture
+def subject(engine_client: EngineClient, pipette_id: str) -> PipetteContext:
+    """Test subject."""
+    return PipetteContext(engine_client=engine_client, pipette_id=pipette_id)
 
 
 def test_pick_up_tip(
     decoy: Decoy,
-    sync_client: SyncClient,
+    engine_client: EngineClient,
     pipette_id: str,
-    subject: PipetteContext,
+    labware_id: str,
     well: Well,
+    subject: PipetteContext,
 ) -> None:
     """It should send a pick up tip command."""
     subject.pick_up_tip(location=well)
 
     decoy.verify(
-        sync_client.pick_up_tip(
+        engine_client.pick_up_tip(
             pipette_id=pipette_id,
-            labware_id=well.parent.resource_id,
+            labware_id=labware_id,
             well_name=well.well_name,
         )
     )
@@ -65,18 +71,19 @@ def test_pick_up_tip(
 
 def test_drop_tip(
     decoy: Decoy,
-    sync_client: SyncClient,
+    engine_client: EngineClient,
     pipette_id: str,
-    subject: PipetteContext,
+    labware_id: str,
     well: Well,
+    subject: PipetteContext,
 ) -> None:
     """It should send a drop tip command."""
     subject.drop_tip(location=well)
 
     decoy.verify(
-        sync_client.drop_tip(
+        engine_client.drop_tip(
             pipette_id=pipette_id,
-            labware_id=well.parent.resource_id,
+            labware_id=labware_id,
             well_name=well.well_name,
         )
     )
@@ -84,18 +91,19 @@ def test_drop_tip(
 
 def test_aspirate(
     decoy: Decoy,
-    sync_client: SyncClient,
+    engine_client: EngineClient,
     pipette_id: str,
-    subject: PipetteContext,
+    labware_id: str,
     well: Well,
+    subject: PipetteContext,
 ) -> None:
     """It should send an aspirate command to the SyncClient."""
     subject.aspirate(volume=12345.6789, location=well, rate=1.0)
 
     decoy.verify(
-        sync_client.aspirate(
+        engine_client.aspirate(
             pipette_id=pipette_id,
-            labware_id=well.parent.resource_id,
+            labware_id=labware_id,
             well_name=well.well_name,
             well_location=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
             volume=12345.6789,
@@ -124,18 +132,19 @@ def test_aspirate_not_implemented_errors(
 
 def test_dispense(
     decoy: Decoy,
-    sync_client: SyncClient,
+    engine_client: EngineClient,
     pipette_id: str,
-    subject: PipetteContext,
+    labware_id: str,
     well: Well,
+    subject: PipetteContext,
 ) -> None:
     """It should send a dispense command."""
     subject.dispense(volume=10, location=well)
 
     decoy.verify(
-        sync_client.dispense(
+        engine_client.dispense(
             pipette_id=pipette_id,
-            labware_id=well.parent.resource_id,
+            labware_id=labware_id,
             well_name=well.well_name,
             well_location=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
             volume=10,

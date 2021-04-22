@@ -2,17 +2,17 @@
 
 from typing import List, Optional, Sequence, Union
 
-from opentrons.protocol_engine.clients import SyncClient
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 from .pipette_context import PipetteContext
 from .instrument_context import InstrumentContext
 from .labware import Labware
-from .types import Mount, DeprecatedMount, PipetteName
+from .types import DeckSlotName, DeckSlotLocation, DeprecatedMount, Mount, PipetteName
 from . import errors
 
 
 class ProtocolContext:  # noqa: D101
-    def __init__(self, engine_client: SyncClient) -> None:
+    def __init__(self, engine_client: ProtocolEngineClient) -> None:
         """Initialize a ProtocolContext API provider.
 
         You do not need to initialize the ProtocolContext yourself; the system
@@ -51,7 +51,7 @@ class ProtocolContext:  # noqa: D101
 
         return PipetteContext(
             engine_client=self._engine_client,
-            resource_id=result.pipetteId,
+            pipette_id=result.pipetteId,
         )
 
     def load_instrument(
@@ -73,8 +73,27 @@ class ProtocolContext:  # noqa: D101
             replace=replace,
         )
 
-    def load_labware(self) -> Labware:  # noqa: D102
-        raise NotImplementedError()
+    def load_labware(  # noqa: D102
+        self,
+        load_name: str,
+        location: Union[int, str],
+        label: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        if label is not None:
+            raise NotImplementedError("Labware labeling not yet implemented.")
+
+        result = self._engine_client.load_labware(
+            load_name=load_name,
+            location=DeckSlotLocation(slot=DeckSlotName.from_primitive(location)),
+            # TODO(mc, 2021-04-22): make sure this default is compatible with using
+            # namespace=None to load custom labware in PAPIv3
+            namespace=namespace or "opentrons",
+            version=version or 1,
+        )
+
+        return Labware(engine_client=self._engine_client, labware_id=result.labwareId)
 
     # todo(mm, 2021-04-09): Add all other public methods from the APIv2
     # ProtocolContext.
