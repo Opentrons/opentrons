@@ -2,7 +2,8 @@ import asyncio
 import contextlib
 import logging
 from typing import (Dict, Iterator, List, Callable,
-                    Optional, Set, Tuple, Union, TYPE_CHECKING, cast)
+                    Optional, Tuple, Union, TYPE_CHECKING, cast)
+from collections import OrderedDict
 
 from opentrons.hardware_control import (SynchronousAdapter, ThreadManager)
 from opentrons import types
@@ -87,7 +88,7 @@ class ProtocolContext(CommandPublisher):
         self._loop = loop or asyncio.get_event_loop()
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
             = {mount: None for mount in types.Mount}
-        self._modules: Set[ModuleContext] = set()
+        self._modules: List[ModuleContext] = []
 
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
         self._commands: List[str] = []
@@ -469,7 +470,7 @@ class ProtocolContext(CommandPublisher):
         module_context = mod_class(
             self, module.module, module.geometry, self.api_version, self._loop
         )
-        self._modules.add(module_context)
+        self._modules.append(module_context)
         return module_context
 
     @property  # type: ignore
@@ -492,7 +493,7 @@ class ProtocolContext(CommandPublisher):
             for module in self._modules:
                 yield int(str(module.geometry.parent)), module
 
-        return dict(_modules())
+        return OrderedDict(_modules())
 
     @requires_version(2, 0)
     def load_instrument(
