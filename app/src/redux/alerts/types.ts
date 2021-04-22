@@ -1,26 +1,27 @@
-
-import typeof {
+import {
   ALERT_U2E_DRIVER_OUTDATED,
   ALERT_APP_UPDATE_AVAILABLE,
   ALERT_TRIGGERED,
   ALERT_DISMISSED,
 } from './constants.js'
 
-export type AlertId = ALERT_U2E_DRIVER_OUTDATED | ALERT_APP_UPDATE_AVAILABLE
+export type AlertId =
+  | typeof ALERT_U2E_DRIVER_OUTDATED
+  | typeof ALERT_APP_UPDATE_AVAILABLE
 
-export type AlertTriggeredAction = {
-  type: ALERT_TRIGGERED,
-  payload: { alertId: AlertId },
+export interface AlertTriggeredAction {
+  type: typeof ALERT_TRIGGERED
+  payload: { alertId: AlertId }
 }
 
-export type AlertDismissedAction = {
-  type: ALERT_DISMISSED,
-  payload: { alertId: AlertId, remember: boolean },
+export interface AlertDismissedAction {
+  type: typeof ALERT_DISMISSED
+  payload: { alertId: AlertId; remember: boolean }
 }
 
 export type AlertsAction = AlertTriggeredAction | AlertDismissedAction
 
-export type AlertsState = $ReadOnly<{
-  active: $ReadOnlyAlertId[],
-  ignored: $ReadOnlyAlertId[],
+export type AlertsState = Readonly<{
+  readonly active: AlertId[]
+  readonly ignored: AlertId[]
 }>

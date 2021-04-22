@@ -14,15 +14,15 @@ export type LogLevel =
 
 export type Log = (message: string, meta?: {}) => void
 
-export type Logger = {
-  error: Log,
-  warn: Log,
-  info: Log,
-  http: Log,
-  verbose: Log,
-  debug: Log,
-  silly: Log,
-|}
+export interface Logger {
+  error: Log
+  warn: Log
+  info: Log
+  http: Log
+  verbose: Log
+  debug: Log
+  silly: Log
+}
 
 const ERROR: 'error' = 'error'
 const WARN: 'warn' = 'warn'
@@ -46,7 +46,7 @@ export function createLogger(filename: string): Logger {
   }
 }
 
-function log(level: LogLevel, message: string, label: string, meta?: {}) {
+function log(level: LogLevel, message: string, label: string, meta?: {}): void {
   const print = `[${label}] ${level}: ${message}`
 
   // log to web console, too
