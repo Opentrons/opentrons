@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.3...v4.3.0-beta.0) (2021-04-19)
+
+**Note:** Version bump only for package @opentrons/shared-data
+
+
+
+
+
+# [4.3.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.2...v4.3.0-alpha.3) (2021-04-19)
+
+**Note:** Version bump only for package @opentrons/shared-data
+
+
+
+
+
+# [4.3.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.1...v4.3.0-alpha.2) (2021-04-19)
+
+**Note:** Version bump only for package @opentrons/shared-data
+
+
+
+
+
+# [4.3.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.0...v4.3.0-alpha.1) (2021-04-15)
+
+
+### Bug Fixes
+
+* **shared-data:** fix data not being included in package build ([#7650](https://github.com/Opentrons/opentrons/issues/7650)) ([1708904](https://github.com/Opentrons/opentrons/commit/1708904))
+
+
+
+
+
+# [4.3.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0-alpha.0) (2021-04-14)
+
+
+### Bug Fixes
+
+* **api, shared-data:** Regular expression used to split well into row and column did not allow a 0 column. ([#7566](https://github.com/Opentrons/opentrons/issues/7566)) ([1f6b11b](https://github.com/Opentrons/opentrons/commit/1f6b11b)), closes [#7531](https://github.com/Opentrons/opentrons/issues/7531)
+
+
+
+
+
 ## [4.2.1](https://github.com/Opentrons/opentrons/compare/v4.2..0...v4.2.1) (2021-04-06)
 
 **Note:** Version bump only for package @opentrons/shared-data
