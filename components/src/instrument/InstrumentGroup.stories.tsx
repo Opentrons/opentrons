@@ -7,31 +7,40 @@ import { InstrumentGroup as InstrumentGroupComponent } from './InstrumentGroup'
 
 import type { Story, Meta } from '@storybook/react'
 
-
-const allPipetteSpecsByDisplayNames = keyBy(getAllPipetteNames().map(getPipetteNameSpecs), 'displayName')
-const leftPipettesByName = reduce(allPipetteSpecsByDisplayNames, (acc, pipetteSpecs, displayName) => {
-  return {
-    ...acc,
-    [displayName]:{
-      mount: 'left',
-      description: displayName,
-      pipetteSpecs,
-      isDisabled: false,
+const allPipetteSpecsByDisplayNames = keyBy(
+  getAllPipetteNames().map(getPipetteNameSpecs),
+  'displayName'
+)
+const leftPipettesByName = reduce(
+  allPipetteSpecsByDisplayNames,
+  (acc, pipetteSpecs, displayName) => {
+    return {
+      ...acc,
+      [displayName]: {
+        mount: 'left',
+        description: displayName,
+        pipetteSpecs,
+        isDisabled: false,
+      },
     }
-  }
-}, {})
-const rightPipettesByName = reduce(allPipetteSpecsByDisplayNames, (acc, pipetteSpecs, displayName) => {
-  return {
-    ...acc,
-    [displayName]:{
-      mount: 'right',
-      description: displayName,
-      pipetteSpecs,
-      isDisabled: false,
+  },
+  {}
+)
+const rightPipettesByName = reduce(
+  allPipetteSpecsByDisplayNames,
+  (acc, pipetteSpecs, displayName) => {
+    return {
+      ...acc,
+      [displayName]: {
+        mount: 'right',
+        description: displayName,
+        pipetteSpecs,
+        isDisabled: false,
+      },
     }
-  }
-}, {})
-
+  },
+  {}
+)
 
 export default {
   title: 'Library/Organisms/Instrument Group',
@@ -49,13 +58,18 @@ export default {
         options: Object.keys(rightPipettesByName),
       },
       defaultValue: Object.keys(rightPipettesByName)[0],
-    }
-  }
+    },
+  },
 } as Meta
 
-
-const Template: Story<React.ComponentProps<typeof InstrumentGroupComponent>> = ({left, right, ...args}) => (
-  <InstrumentGroupComponent {...args} left={leftPipettesByName[left]} right={rightPipettesByName[right]} />
+const Template: Story<
+  React.ComponentProps<typeof InstrumentGroupComponent>
+> = ({ left, right, ...args }) => (
+  <InstrumentGroupComponent
+    {...args}
+    left={leftPipettesByName[left]}
+    right={rightPipettesByName[right]}
+  />
 )
 export const InstrumentGroup = Template.bind({})
 InstrumentGroup.args = {
@@ -70,5 +84,5 @@ InstrumentGroup.args = {
     description: 'p10 Single',
     pipetteSpecs: { channels: 1, displayCategory: 'GEN2' },
     isDisabled: true,
-  }
+  },
 }

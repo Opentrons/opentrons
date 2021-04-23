@@ -9,7 +9,9 @@ export default {
   component: CheckboxFieldComponent,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof CheckboxFieldComponent>> = args => {
+const Template: Story<
+  React.ComponentProps<typeof CheckboxFieldComponent>
+> = args => {
   const [isChecked, setIsChecked] = React.useState<boolean>(false)
   return (
     <CheckboxFieldComponent

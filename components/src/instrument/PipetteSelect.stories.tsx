@@ -7,10 +7,22 @@ export default {
   title: 'Library/Organisms/Pipette Select',
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof PipetteSelectComponent>> = ({pipetteName, ...args}) => {
-  const [pipetteNameControlled, setPipetteNameControlled] = React.useState(pipetteName)
-  const handleChange = (pipName: string): unknown => setPipetteNameControlled(pipName)
-  return <PipetteSelectComponent {...args} pipetteName={pipetteNameControlled} onPipetteChange={handleChange} />
+const Template: Story<React.ComponentProps<typeof PipetteSelectComponent>> = ({
+  pipetteName,
+  ...args
+}) => {
+  const [pipetteNameControlled, setPipetteNameControlled] = React.useState(
+    pipetteName
+  )
+  const handleChange = (pipName: string): unknown =>
+    setPipetteNameControlled(pipName)
+  return (
+    <PipetteSelectComponent
+      {...args}
+      pipetteName={pipetteNameControlled}
+      onPipetteChange={handleChange}
+    />
+  )
 }
 export const PipetteSelect = Template.bind({})
 PipetteSelect.args = {

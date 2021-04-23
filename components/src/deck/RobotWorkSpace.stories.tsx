@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { RobotWorkSpace } from './RobotWorkSpace'
-import { RobotCoordsText, RobotCoordsForeignDiv, Module } from '@opentrons/components'
+import {
+  RobotCoordsText,
+  RobotCoordsForeignDiv,
+  Module,
+} from '@opentrons/components'
 import { getDeckDefinitions } from './getDeckDefinitions'
 
 import type { Story, Meta } from '@storybook/react'
@@ -38,7 +42,7 @@ const Template: Story<React.ComponentProps<typeof RobotWorkSpace>> = ({
 export const Deck = Template.bind({})
 Deck.args = {
   children: ({ deckSlotsById }) => {
-    const divSlot =  deckSlotsById['9']
+    const divSlot = deckSlotsById['9']
     const moduleSlot = deckSlotsById['10']
     const rectSlot = deckSlotsById['11']
     return (
@@ -57,7 +61,11 @@ Deck.args = {
           height={divSlot.boundingBox.yDimension}
         >
           <input
-            style={{ backgroundColor: 'lightgray', margin: '1rem', width: '6rem' }}
+            style={{
+              backgroundColor: 'lightgray',
+              margin: '1rem',
+              width: '6rem',
+            }}
             placeholder="example input"
           />
         </RobotCoordsForeignDiv>
