@@ -11,27 +11,29 @@ import {
   Text,
   TitledList,
   Tooltip,
-  ALIGN_CENTER,
   C_MED_GRAY,
   FONT_SIZE_CAPTION,
   FONT_WEIGHT_SEMIBOLD,
+  FONT_BODY_1_DARK,
   SPACING_1,
   SPACING_2,
-  SPACING_3,
+  SPACING_4,
   TEXT_TRANSFORM_UPPERCASE,
   Box,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { selectors as robotSelectors } from '../../redux/robot'
-import { getMatchedModules, getMissingModules } from '../../redux/modules'
+import { getMatchedModules } from '../../redux/modules'
 import styles from './styles.css'
 
 import type { MatchedModule } from '../../redux/modules/types'
 import type { State } from '../../redux/types'
 
-const DECK_SLOT_STYLE = { width: '4.5rem' }
-const MODULE_STYLE = { width: '7rem', paddingRight: SPACING_3 }
-const USB_PORT_STYLE = { width: '3.5rem' }
+const MODULE_STYLE = { width: '37%' }
+const USB_ORDER_STYLE = { width: '27%', paddingRight: '0.75rem' }
+const USB_PORT_STYLE = { width: '23%', paddingRight: '0.75rem' }
+const DECK_SLOT_STYLE = { width: '13%' }
 
 export function ProtocolModuleList(): React.Node {
   const { t } = useTranslation('protocol_calibration')
@@ -39,22 +41,40 @@ export function ProtocolModuleList(): React.Node {
     robotSelectors.getModules(state)
   )
   const matched = useSelector((state: State) => getMatchedModules(state))
-  const missingModules = useSelector((state: State) => getMissingModules(state))
-
+  const hasDuplicateModule = useSelector((state: State) =>
+    Object.values(robotSelectors.getModulesByModel(state)).some(
+      m => Array.isArray(m) && m.length > 1
+    )
+  )
+  const modulesByLoadOrder = useSelector((state: State) =>
+    robotSelectors.getModulesByProtocolLoadOrder(state)
+  )
+  const moduleList = hasDuplicateModule ? modulesByLoadOrder : modulesRequired
   if (modulesRequired.length < 1) return null
   return (
     <TitledList key={t('modules_title')} title={t('modules_title')}>
+      <Text
+        css={FONT_BODY_1_DARK}
+        paddingLeft="0.75rem"
+        paddingRight={SPACING_4}
+      >
+        {t('module_connect_instruction')}
+      </Text>
       <Flex
         color={C_MED_GRAY}
         fontSize={FONT_SIZE_CAPTION}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
-        marginLeft="2.125rem"
-        marginBottom={SPACING_2}
+        marginY={SPACING_2}
+        paddingX="0.875rem"
+        justifyContent={!hasDuplicateModule ? JUSTIFY_SPACE_BETWEEN : null}
       >
-        <Text {...DECK_SLOT_STYLE}>{t('modules_deck_slot_title')}</Text>
         <Text {...MODULE_STYLE}>{t('modules_module_title')}</Text>
+        {hasDuplicateModule && (
+          <Text {...USB_ORDER_STYLE}>{t('modules_usb_order_title')}</Text>
+        )}
         <Text {...USB_PORT_STYLE}>{t('modules_usb_port_title')}</Text>
+        <Text {...DECK_SLOT_STYLE}>{t('modules_deck_slot_title')}</Text>
       </Flex>
       <ListItem
         key={'module'}
@@ -62,32 +82,26 @@ export function ProtocolModuleList(): React.Node {
         className={styles.module_list_item}
         activeClassName={styles.active}
       >
-        <Box>
-          {modulesRequired.map(m => (
+        <Box width="100%">
+          {moduleList.map(m => (
             <Flex
               key={m.slot}
               data-test={m.slot}
-              alignItems={ALIGN_CENTER}
               padding="0.75rem"
+              justifyContent={
+                !hasDuplicateModule ? JUSTIFY_SPACE_BETWEEN : null
+              }
             >
-              <Flex width={'6rem'}>
-                <Icon
-                  name={
-                    missingModules.includes(m)
-                      ? 'checkbox-blank-circle-outline'
-                      : 'check-circle'
-                  }
-                  width={'15px'}
-                  marginRight={SPACING_2}
+              <Text {...MODULE_STYLE}>{getModuleDisplayName(m.model)}</Text>
+              {hasDuplicateModule && (
+                <Text {...USB_ORDER_STYLE}>{m.protocolLoadOrder + 1}</Text>
+              )}
+              <Flex {...USB_PORT_STYLE}>
+                <UsbPortInfo
+                  matchedModule={matched.find(a => a.slot === m.slot) || null}
                 />
-                <Text {...DECK_SLOT_STYLE}>{`Slot ${m.slot}`}</Text>
               </Flex>
-              <Flex {...MODULE_STYLE}>
-                <Text>{getModuleDisplayName(m.model)}</Text>
-              </Flex>
-              <UsbPortInfo
-                matchedModule={matched.find(a => a.slot === m.slot) || null}
-              />
+              <Text {...DECK_SLOT_STYLE}>{`Slot ${m.slot}`}</Text>
             </Flex>
           ))}
         </Box>
@@ -114,17 +128,20 @@ function UsbPortInfo(props: UsbPortInfoProps): React.Node {
     : 'N/A'
   return (
     <>
-      <Flex {...USB_PORT_STYLE}>
-        <Text>{portText}</Text>
-        {portText === 'N/A' && (
-          <Flex {...targetProps}>
-            <Icon name="alert-circle" width={'15px'} paddingLeft={SPACING_1} />
-            <Tooltip style={{ width: '2rem' }} {...tooltipProps}>
-              {t('modules_update_software_tooltip')}
-            </Tooltip>
-          </Flex>
-        )}
-      </Flex>
+      <Text>{portText}</Text>
+      {portText === 'N/A' && (
+        <Flex {...targetProps}>
+          <Icon
+            name="alert-circle"
+            height="15px"
+            width={'15px'}
+            paddingLeft={SPACING_1}
+          />
+          <Tooltip style={{ width: '2rem' }} {...tooltipProps}>
+            {t('modules_update_software_tooltip')}
+          </Tooltip>
+        </Flex>
+      )}
     </>
   )
 }
