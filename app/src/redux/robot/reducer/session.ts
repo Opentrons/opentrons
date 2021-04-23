@@ -18,7 +18,7 @@ import type {
 import type { InvalidProtocolFileAction } from '../../protocol/types'
 import type { SessionUpdateAction } from '../actions'
 
-interface Request {
+export interface Request {
   inProgress: boolean
   error: { message: string } | null | undefined
 }

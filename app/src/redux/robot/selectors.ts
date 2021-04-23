@@ -33,15 +33,18 @@ import type {
 } from './types'
 
 import type { ConnectionState } from './reducer/connection'
-import type { CalibrationRequest } from './reducer/calibration'
+import type {
+  CalibrationRequest,
+  CalibrationState,
+} from './reducer/calibration'
+import type { SessionState, Request } from './reducer/session'
 import type { ModuleModel } from '@opentrons/shared-data'
-import { Session } from '../sessions'
 
-const calibration = (state: State) => state.robot.calibration
-const connection = (state: State) => state.robot.connection
-const session = (state: State) => state.robot.session
-const sessionRequest = (state: State) => session(state).sessionRequest
-const cancelRequest = (state: State) => session(state).cancelRequest
+const calibration = (state: State): CalibrationState => state.robot.calibration
+const connection = (state: State): ConnectionState => state.robot.connection
+const session = (state: State): SessionState => state.robot.session
+const sessionRequest = (state: State): Request => session(state).sessionRequest
+const cancelRequest = (state: State): Request => session(state).cancelRequest
 
 export function isMount(target: string | null | undefined): boolean {
   return Constants.PIPETTE_MOUNTS.indexOf(target) > -1
@@ -229,7 +232,10 @@ export const getStartTime: (state: State) => string | null = createSelector(
 export const getRunSeconds: (state: State) => number = createSelector(
   getStartTimeMs,
   (state: State) => session(state).runTime,
-  (startTime: ?number, runTime: ?number): number => {
+  (
+    startTime: number | null | undefined,
+    runTime: number | null | undefined
+  ): number => {
     return runTime && startTime && runTime > startTime
       ? Math.floor((runTime - startTime) / 1000)
       : 0
@@ -253,7 +259,9 @@ export function getCalibrationRequest(state: State): CalibrationRequest {
   return calibration(state).calibrationRequest
 }
 
-export function getPipettesByMount(state: State): Record<Mount, StatePipette> {
+export function getPipettesByMount(
+  state: State
+): Partial<Record<Mount, StatePipette>> {
   return session(state).pipettesByMount
 }
 
@@ -263,12 +271,12 @@ export const getPipettes: (state: State) => Pipette[] = createSelector(
     calibration(state).probedByMount,
   (state: State) => calibration(state).tipOnByMount,
   (
-    pipettesByMount: Record<Mount, StatePipette>,
+    pipettesByMount: Partial<Record<Mount, StatePipette>>,
     probedByMount: Partial<Record<Mount, boolean>>,
     tipOnByMount: Partial<Record<Mount, boolean>>
   ): Pipette[] => {
     return Constants.PIPETTE_MOUNTS.filter(
-      (mount: Mount) => pipettesByMount[mount] != null
+      (mount: Mount): boolean => pipettesByMount[mount] != null
     ).map(mount => {
       const pipette = pipettesByMount[mount]
       const probed = probedByMount[mount] || false
@@ -280,7 +288,7 @@ export const getPipettes: (state: State) => Pipette[] = createSelector(
         tipOn,
         modelSpecs: getPipetteModelSpecs(pipette.name) || null,
         requestedAs: pipette.requestedAs || null,
-      }
+      } as Pipette
     })
   }
 )
@@ -301,14 +309,16 @@ export const getNextPipette: (state: State) => Pipette | null = createSelector(
 
 // returns the mount of the pipette to use for labware calibration
 // TODO(mc, 2018-02-07): be smarter about the backup case
-export const getCalibrator: (state: State) => Pipette | void = createSelector(
+export const getCalibrator: (
+  state: State
+) => Pipette | undefined = createSelector(
   getPipettes,
   pipettes => pipettes.find(i => i.tipOn) ?? pipettes[0]
 )
 
 // TODO(mc, 2018-02-07): remove this selector in favor of the one above
-export function getCalibratorMount(state: State): ?Mount {
-  const calibrator: Pipette | void = getCalibrator(state)
+export function getCalibratorMount(state: State): Mount | null | undefined {
+  const calibrator: Pipette | undefined = getCalibrator(state)
 
   if (!calibrator) return null
 
@@ -320,7 +330,9 @@ export const getPipettesCalibrated: (state: State) => boolean = createSelector(
   pipettes => pipettes.length !== 0 && pipettes.every(i => i.probed)
 )
 
-export function getModulesBySlot(state: State): Record<Slot, SessionModule> {
+export function getModulesBySlot(
+  state: State
+): Partial<Record<Slot, SessionModule>> {
   return session(state).modulesBySlot
 }
 
@@ -329,7 +341,9 @@ export const getModules: (state: State) => SessionModule[] = createSelector(
   // TODO (ka 2019-3-26): can't import getConfig due to circular dependency
   state => state.config,
   (modulesBySlot, config) =>
-    Object.keys(modulesBySlot).map((slot: Slot) => modulesBySlot[slot])
+    Object.keys(modulesBySlot).map(
+      (slot: Slot): SessionModule => modulesBySlot[slot]
+    )
 )
 
 export const getModulesByModel: (
@@ -337,13 +351,16 @@ export const getModulesByModel: (
 ) => Record<ModuleModel, SessionModule[]> = createSelector(
   getModules,
   modules => {
-    return modules.reduce((acc, val) => {
-      if (!acc[val.model]) {
-        acc[val.model] = []
-      }
-      acc[val.model].push(val)
-      return acc
-    }, {})
+    return modules.reduce<Partial<Record<ModuleModel, SessionModule[]>>>(
+      (acc, val) => {
+        if (!acc[val.model]) {
+          acc[val.model] = []
+        }
+        acc[val.model].push(val)
+        return acc
+      },
+      {}
+    )
   }
 )
 
