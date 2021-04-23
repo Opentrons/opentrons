@@ -22,6 +22,6 @@ export interface AlertDismissedAction {
 export type AlertsAction = AlertTriggeredAction | AlertDismissedAction
 
 export type AlertsState = Readonly<{
-  readonly active: AlertId[]
-  readonly ignored: AlertId[]
+  active: AlertId[]
+  ignored: AlertId[]
 }>

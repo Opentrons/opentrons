@@ -77,7 +77,7 @@ export type ConfigV0 = Readonly<{
   }>
 
   // app wide alerts
-  alerts: Readonly<{ readonly ignored: string[] }>
+  alerts: Readonly<{ ignored: string[] }>
 
   // internal development flags
   devInternal?: Readonly<FeatureFlags>

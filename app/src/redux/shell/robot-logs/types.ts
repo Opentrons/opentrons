@@ -1,5 +1,4 @@
-
-export type RobotLogsState = $ReadOnly<{
+export type RobotLogsState = Readonly<{
   downloading: boolean
 }>
 

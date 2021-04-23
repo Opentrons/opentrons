@@ -10,7 +10,7 @@ export const getRequestById = (
 
 export const getRequests = (
   state: State,
-  ids: $ReadOnlystring[]
+  ids: string[]
 ): Array<Types.RequestState | null> => {
   return ids.map(id => getRequestById(state, id))
 }

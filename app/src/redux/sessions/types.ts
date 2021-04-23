@@ -154,8 +154,9 @@ export interface SessionCommandResponseModel extends SessionCommandAttributes {
 }
 
 export type SessionResponse = RobotApiV2ResponseBody<SessionResponseModel>
+
 export type MultiSessionResponse = RobotApiV2ResponseBody<
-  $ReadOnlySessionResponseModel[]
+  SessionResponseModel[]
 >
 
 export type SessionCommandResponse = RobotApiV2ResponseBody<SessionCommandResponseModel>
@@ -236,7 +237,7 @@ export interface FetchAllSessionsSuccessAction {
   type: typeof FETCH_ALL_SESSIONS_SUCCESS
   payload: {
     robotName: string
-    sessions: $ReadOnlySessionResponseModel[]
+    readonly sessions: SessionResponseModel[]
   }
   meta: RobotApiRequestMeta
 }
