@@ -4,7 +4,7 @@ module.exports = {
   root: true,
 
   parserOptions: {
-    project: './*/tsconfig.json',
+    project: './tsconfig-eslint.json',
   },
 
   extends: ['standard-with-typescript', 'plugin:react/recommended', 'prettier'],
@@ -93,6 +93,13 @@ module.exports = {
         'jest/valid-title': 'warn',
         'jest/no-conditional-expect': 'warn',
         'jest/no-done-callback': 'warn',
+      },
+    },
+    {
+      files: ['**/*.stories.tsx'],
+      rules: {
+        'import/no-default-export': 'off',
+        '@typescript-eslint/consistent-type-assertions': 'off',
       },
     },
     {
