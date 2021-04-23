@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.5...v4.3.0-alpha.6) (2021-04-23)
+
+
+### Bug Fixes
+
+* **api:** ensure loaded modules is returned in order ([#7704](https://github.com/Opentrons/opentrons/issues/7704)) ([66a775c](https://github.com/Opentrons/opentrons/commit/66a775c))
+
+
+
+
+
 # [4.3.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.4...v4.3.0-alpha.5) (2021-04-20)
 
 **Note:** Version bump only for package @opentrons/api-server

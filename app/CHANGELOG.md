@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.5...v4.3.0-alpha.6) (2021-04-23)
+
+
+### Bug Fixes
+
+* **app:** add USB order to protocol module list ([#7710](https://github.com/Opentrons/opentrons/issues/7710)) ([64e87a7](https://github.com/Opentrons/opentrons/commit/64e87a7))
+
+
+
+
+
 # [4.3.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.4...v4.3.0-alpha.5) (2021-04-20)
 
 
