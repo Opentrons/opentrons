@@ -31,7 +31,7 @@ export const getU2EInterfacesMap: (
   (usbDevices, networkInterfaces) => {
     const ue2Adapters = usbDevices.filter(isRealtekU2EAdapter)
 
-    return ue2Adapters.reduce((interfacesBySerial, device) => {
+    return ue2Adapters.reduce<U2EInterfaceMap>((interfacesBySerial, device) => {
       interfacesBySerial[device.serialNumber] = networkInterfaces.filter(
         iface => {
           const expectedSerial = iface.mac.split(':').join('').toLowerCase()
