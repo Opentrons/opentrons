@@ -25,6 +25,11 @@ const mockGetModulesByModel: JestMockFn<
   $Call<typeof robotSelectors.getModulesByModel, State>
 > = robotSelectors.getModulesByModel
 
+const mockGetModulesByProtocolLoadOrder: JestMockFn<
+  [State],
+  $Call<typeof robotSelectors.getModulesByProtocolLoadOrder, State>
+> = robotSelectors.getModulesByProtocolLoadOrder
+
 const mockGetMatchedModules: JestMockFn<
   [State],
   $Call<typeof moduleSelectors.getMatchedModules, State>
@@ -87,6 +92,7 @@ describe('ModuleList', () => {
   beforeEach(() => {
     mockGetModules.mockReturnValue(mockModules)
     mockGetModulesByModel.mockReturnValue(mockModulesByModel)
+    mockGetModulesByProtocolLoadOrder.mockReturnValue(mockModules)
 
     render = (location: string = '/') => {
       return mountWithProviders(
@@ -203,6 +209,10 @@ describe('ModuleList', () => {
 
   it('render correct module info when multiple modules of the same type are requested', () => {
     mockGetModules.mockReturnValue([mockMagneticModuleV2, mockMagneticModule2])
+    mockGetModulesByProtocolLoadOrder.mockReturnValue([
+      mockMagneticModuleV2,
+      mockMagneticModule2,
+    ])
 
     const matchedMods = [mockMatchedModule1, mockMatchedModule2]
     mockGetMatchedModules.mockReturnValue(matchedMods)
@@ -237,6 +247,7 @@ describe('ModuleList', () => {
 
   it('does not renders if no modules is required', () => {
     mockGetModules.mockReturnValue([])
+    mockGetModulesByProtocolLoadOrder.mockReturnValue([])
 
     const { wrapper } = render()
 

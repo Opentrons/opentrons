@@ -46,7 +46,10 @@ export function ProtocolModuleList(): React.Node {
       m => Array.isArray(m) && m.length > 1
     )
   )
-
+  const modulesByLoadOrder = useSelector((state: State) =>
+    robotSelectors.getModulesByProtocolLoadOrder(state)
+  )
+  const moduleList = hasDuplicateModule ? modulesByLoadOrder : modulesRequired
   if (modulesRequired.length < 1) return null
   return (
     <TitledList key={t('modules_title')} title={t('modules_title')}>
@@ -80,7 +83,7 @@ export function ProtocolModuleList(): React.Node {
         activeClassName={styles.active}
       >
         <Box width="100%">
-          {modulesRequired.map(m => (
+          {moduleList.map(m => (
             <Flex
               key={m.slot}
               data-test={m.slot}
