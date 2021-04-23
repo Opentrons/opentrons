@@ -1,10 +1,10 @@
 ---
-test_name: Load labware, pipettes, and modules
+test_name: Upload python protocol loading labware, pipettes, and modules in each slot.
 marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Upload python protocol labware, pipettes, and modules
+  - name: Upload protocol and validate analysis results.
     request:
       url: "{host:s}:{port:d}/protocols"
       method: POST
@@ -89,12 +89,12 @@ stages:
         data: !anydict
         links: !anydict
 ---
-test_name: Load thermocycler
+test_name: Upload python protocol that uses the thermocycler
 marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Upload python protocol with thermocycler
+  - name: Upload protocol validating the analysis results.
     request:
       url: "{host:s}:{port:d}/protocols"
       method: POST
@@ -119,9 +119,10 @@ stages:
             - uri: "opentrons/nest_96_wellplate_2ml_deep/1"
               location: 7
               label: 'deepwell plate'
-            - uri: "opentrons/opentrons_1_trash_1100ml_fixed/1"
+            # Trash slot. Don't care what is there.
+            - uri: !anystr
               location: 12
-              label: "opentrons_1_trash_1100ml_fixed"
+              label: !anystr
             modules:
             - type: 'thermocyclerModuleType'
               location: 7
@@ -138,12 +139,12 @@ stages:
         data: !anydict
         links: !anydict
 ---
-test_name: Load custom labware
+test_name: Upload python protocol loading custom labware
 marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Upload python protocol loading custom labware
+  - name: Upload protocol and custom labware file.
     request:
       url: "{host:s}:{port:d}/protocols"
       method: POST
@@ -171,9 +172,10 @@ stages:
             - uri: "custom_beta/test_1_reservoir_5ul/1"
               location: 1
               label: custom1
-            - uri: "opentrons/opentrons_1_trash_1100ml_fixed/1"
+            # Trash slot. Don't care what is there.
+            - uri: !anystr
               location: 12
-              label: "opentrons_1_trash_1100ml_fixed"
+              label: !anystr
             modules: []
           errors: []
         links: !anydict

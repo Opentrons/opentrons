@@ -1,5 +1,5 @@
 ---
-test_name: Full upload life cycle.
+test_name: Upload basic_transfer_standalone protocol with full response validation.
 marks:
   - usefixtures:
       - run_server
@@ -41,7 +41,10 @@ stages:
               - label: opentrons_96_tiprack_300ul
                 uri: opentrons/opentrons_96_tiprack_300ul/1
                 location: 2
-              - !anydict
+              # Trash slot. Don't care what is there.
+              - uri: !anystr
+                location: 12
+                label: !anystr
             modules: []
           errors: []
         links:
@@ -51,7 +54,7 @@ stages:
             href: '/protocols'
           protocolById:
             href: '/protocols/{{protocolId}}'
-  - name: Get the protocol
+  - name: Get the protocol. Checking that response is the same as POST response.
     request:
       url: "{host:s}:{port:d}/protocols/{protocol_id}"
       method: GET

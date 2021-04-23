@@ -1,10 +1,10 @@
 ---
-test_name: Basic Transfer with configuration files
+test_name: Basic Transfer with configuration files.
 marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Upload just the protocol file.
+  - name: Upload just the protocol file. Checking for missing support file.
     request:
       url: "{host:s}:{port:d}/protocols"
       method: POST
@@ -29,7 +29,7 @@ stages:
             - type: ModuleNotFoundError
               description: No module named 'helpers'
         links: !anydict
-  - name: Upload the missing helpers.py file
+  - name: Upload the missing helpers.py file. Checking for missing JSON file in response.
     request:
       url: "{host:s}:{port:d}/protocols/{protocol_id}"
       method: PATCH
@@ -85,7 +85,10 @@ stages:
               - label: opentrons_96_tiprack_300ul
                 uri: opentrons/opentrons_96_tiprack_300ul/1
                 location: 2
-              - !anydict
+              # Trash slot. Don't care what is there.
+              - uri: !anystr
+                location: 12
+                label: !anystr
             modules: [ ]
           errors: []
         links: !anydict
