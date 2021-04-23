@@ -1,4 +1,3 @@
-
 import type { RobotApiRequestMeta } from '../robot-api/types'
 
 export interface RobotSettingsField {
@@ -22,12 +21,12 @@ export interface PerRobotRobotSettingsState {
 }
 
 export type RobotSettingsState = Partial<{
-  [robotName: string]: void | PerRobotRobotSettingsState
+  [robotName: string]: undefined | PerRobotRobotSettingsState
 }>
 
 export interface RobotSettingsFieldUpdate {
-  id: $PropertyType<RobotSettingsField, 'id'>
-  value: $PropertyType<RobotSettingsField, 'value'>
+  id: RobotSettingsField['id']
+  value: RobotSettingsField['value']
 }
 
 // action types

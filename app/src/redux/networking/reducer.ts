@@ -17,9 +17,10 @@ const getRobotState = (
 ): PerRobotNetworkingState => state[robotName] || INITIAL_ROBOT_STATE
 
 export function networkingReducer(
-  state: NetworkingState = INITIAL_STATE,
+  state: NetworkingState,
   action: Action
 ): NetworkingState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_STATUS_SUCCESS: {
       const { robotName, internetStatus, interfaces } = action.payload

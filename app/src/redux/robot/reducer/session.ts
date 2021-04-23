@@ -30,13 +30,13 @@ export interface SessionState {
   // TODO(aa, 2020-06-01): DoorState is not currently used anywhere yet
   doorState: DoorState
   blocked: boolean
-  errors: { timestamp: number; line: number; message: string }[]
+  errors: Array<{ timestamp: number; line: number; message: string }>
   // TODO(mc, 2018-01-11): command IDs should be strings
   protocolCommands: number[]
   protocolCommandsById: { [id: number]: Command }
-  pipettesByMount: { [mount: Mount]: StatePipette }
-  labwareBySlot: { [slot: Slot]: StateLabware }
-  modulesBySlot: { [slot: Slot]: SessionModule }
+  pipettesByMount: Partial<Record<Mount, StatePipette>>
+  labwareBySlot: Partial<Record<Slot, StateLabware>>
+  modulesBySlot: Partial<Record<Slot, SessionModule>>
   runRequest: Request
   pauseRequest: Request
   resumeRequest: Request
@@ -95,9 +95,10 @@ const INITIAL_STATE: SessionState = {
 }
 
 export function sessionReducer(
-  state: SessionState = INITIAL_STATE,
+  state: SessionState,
   action: Action
 ): SessionState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case 'robot:CONNECT_RESPONSE': {
       if (action.payload.error) return state

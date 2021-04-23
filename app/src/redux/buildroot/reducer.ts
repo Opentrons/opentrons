@@ -27,9 +27,10 @@ export const initialSession = (
 })
 
 export function buildrootReducer(
-  state: BuildrootState = INITIAL_STATE,
+  state: BuildrootState,
   action: Action
 ): BuildrootState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.BR_UPDATE_VERSION: {
       return { ...state, version: action.payload }

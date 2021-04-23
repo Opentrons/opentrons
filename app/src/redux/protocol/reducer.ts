@@ -6,9 +6,10 @@ import type { ProtocolState } from './types'
 const INITIAL_STATE: ProtocolState = { file: null, contents: null, data: null }
 
 export function protocolReducer(
-  state: ProtocolState = INITIAL_STATE,
+  state: ProtocolState,
   action: Action
 ): ProtocolState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case 'protocol:INVALID_FILE':
       return { ...INITIAL_STATE, file: action.payload.file }

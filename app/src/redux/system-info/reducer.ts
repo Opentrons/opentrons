@@ -11,9 +11,10 @@ const INITIAL_STATE: SystemInfoState = {
 }
 
 export function systemInfoReducer(
-  state: SystemInfoState = INITIAL_STATE,
+  state: SystemInfoState,
   action: Action
 ): SystemInfoState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.INITIALIZED: {
       const { usbDevices, networkInterfaces } = action.payload

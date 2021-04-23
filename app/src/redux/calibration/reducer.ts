@@ -16,9 +16,10 @@ const INITIAL_PER_ROBOT_STATE: PerRobotCalibrationState = {
 }
 
 export function calibrationReducer(
-  state: CalibrationState = INITIAL_STATE,
+  state: CalibrationState,
   action: Action
 ): CalibrationState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_CALIBRATION_STATUS_SUCCESS: {
       const { robotName, calibrationStatus } = action.payload

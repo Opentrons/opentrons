@@ -11,9 +11,10 @@ const INITIAL_MODULES_STATE: PerRobotModulesState = {
 }
 
 export function modulesReducer(
-  state: ModulesState = INITIAL_STATE,
+  state: ModulesState,
   action: Action
 ): ModulesState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_MODULES_SUCCESS: {
       const { robotName, modules } = action.payload

@@ -14,9 +14,10 @@ export const INITIAL_STATE: CustomLabwareState = {
 }
 
 export function customLabwareReducer(
-  state: CustomLabwareState = INITIAL_STATE,
+  state: CustomLabwareState,
   action: Action
 ): CustomLabwareState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Actions.CUSTOM_LABWARE_LIST: {
       return {
