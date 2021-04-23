@@ -13,7 +13,7 @@ import {
 
 export type { DiscoveryClientRobot, HealthStatus }
 
-export type RobotsMap = Partial<{ [name: string]: DiscoveryClientRobot }>
+export type RobotsMap = Record<string, DiscoveryClientRobot>
 
 export type ConnectivityStatus =
   | typeof CONNECTABLE

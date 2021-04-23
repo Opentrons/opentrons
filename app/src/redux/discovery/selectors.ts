@@ -22,7 +22,7 @@ import {
 import { getConnectedRobotName } from '../robot/selectors'
 
 import type { State } from '../types'
-import type {
+import {
   DiscoveredRobot,
   Robot,
   ReachableRobot,
@@ -39,7 +39,7 @@ type GetConnectedRobot = (state: State) => Robot | null
 
 const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
 
-const isLocal = (ip: string) => {
+const isLocal = (ip: string): boolean => {
   return (
     RE_HOSTNAME_IPV6_LL.test(ip) ||
     RE_HOSTNAME_IPV4_LL.test(ip) ||
@@ -48,7 +48,7 @@ const isLocal = (ip: string) => {
   )
 }
 
-const ipToHostname = (ip: string) => (isIp.v6(ip) ? `[${ip}]` : ip)
+const ipToHostname = (ip: string): string => (isIp.v6(ip) ? `[${ip}]` : ip)
 
 export function getScanning(state: State): boolean {
   return state.discovery.scanning
@@ -133,13 +133,14 @@ export const getAllRobots: GetAllRobots = createSelector(
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
-  concat
+  (cr: DiscoveredRobot[], rr: DiscoveredRobot[], ur: DiscoveredRobot[]) =>
+    concat<DiscoveredRobot>(cr, rr, ur)
 )
 
 export const getViewableRobots: GetViewableRobots = createSelector(
   getConnectableRobots,
   getReachableRobots,
-  concat
+  (cr: ViewableRobot[], rr: ViewableRobot[]) => concat<ViewableRobot>(cr, rr)
 )
 
 export const getConnectedRobot: GetConnectedRobot = createSelector(
