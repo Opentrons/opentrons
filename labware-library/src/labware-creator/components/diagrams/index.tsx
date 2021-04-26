@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import * as React from 'react'
 import type { WellBottomShape } from '@opentrons/shared-data'
-import type { LabwareType, WellShape } from './fields'
+import type { LabwareType, WellShape } from '../../fields'
 
 interface HeightImgProps {
   labwareType: LabwareType | null | undefined
