@@ -19,7 +19,6 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
-    "protocol-designer": "4.3.0-beta.0",
     "core-js": "3.2.1",
     "immer": "5.1.0",
     "lodash": "4.17.15"
