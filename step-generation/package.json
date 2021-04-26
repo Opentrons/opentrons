@@ -13,6 +13,7 @@
   "version": "4.3.0-beta.0",
   "description": "Step generation",
   "main": "src/index.js",
+  "types": "lib/main.d.ts",
   "bugs": {
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
