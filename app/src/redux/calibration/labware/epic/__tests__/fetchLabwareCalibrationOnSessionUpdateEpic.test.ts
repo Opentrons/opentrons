@@ -11,9 +11,9 @@ import type { State } from '../../../../types'
 jest.mock('../../actions')
 jest.mock('../../../../robot/selectors')
 
-const mockGetConnectedRobotName: jest.MockedFunction<
+const mockGetConnectedRobotName = robotSelectors.getConnectedRobotName as jest.MockedFunction<
   typeof robotSelectors.getConnectedRobotName
-> = robotSelectors.getConnectedRobotName as any
+>
 
 describe('fetch labware calibration on rpc cal session update epic', () => {
   beforeEach(() => {

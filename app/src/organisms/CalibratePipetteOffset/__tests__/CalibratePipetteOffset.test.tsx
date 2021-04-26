@@ -36,7 +36,7 @@ type CalibratePipetteOffsetSpec = {
 
 const mockGetDeckDefinitions: JestMockFn<
   [],
-  $Call<typeof getDeckDefinitions, any>
+  ReturnType<typeof getDeckDefinitions>
 > = getDeckDefinitions
 
 describe('CalibratePipetteOffset', () => {

@@ -26,17 +26,14 @@ jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 
-type CalibrateTipLengthSpec = {
-  component: React.AbstractComponent<any>,
+interface CalibrateTipLengthSpec {
+  component: React.ComponentType,
   childProps?: {},
   currentStep: TipLengthCalibrationStep,
-  ...
+  [key: string]: unknown,
 }
 
-const mockGetDeckDefinitions: JestMockFn<
-  [],
-  $Call<typeof getDeckDefinitions, any>
-> = getDeckDefinitions
+const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<typeof getDeckDefinitions>
 
 describe('CalibrateTipLength', () => {
   let mockStore

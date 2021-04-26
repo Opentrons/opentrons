@@ -8,40 +8,33 @@ import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import * as robotSelectors from '../../../redux/robot/selectors'
 import * as moduleSelectors from '../../../redux/modules/selectors'
 import { ProtocolModuleList } from '..'
-
-import type { State } from '../../../redux/types'
+import { ApiSessionModule } from '../../../redux/robot'
+import { MatchedModule } from '../../../redux/modules/types'
 
 jest.mock('../../../redux/robot/selectors')
 jest.mock('../../../redux/modules/selectors')
 
-const mockGetModules: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getModules, State>
-> = robotSelectors.getModules
+const mockGetModules = robotSelectors.getModules as jest.MockedFunction<typeof robotSelectors.getModules>
 
-const mockGetMissingModules: JestMockFn<
-  [State],
-  $Call<typeof moduleSelectors.getMissingModules, State>
-> = moduleSelectors.getMissingModules
+const mockGetMissingModules = moduleSelectors.getMissingModules as jest.MockedFunction<typeof moduleSelectors.getMissingModules>
 
-const mockGetMatchedModules: JestMockFn<
-  [State],
-  $Call<typeof moduleSelectors.getMatchedModules, State>
-> = moduleSelectors.getMatchedModules
+const mockGetMatchedModules = moduleSelectors.getMatchedModules as jest.MockedFunction<typeof moduleSelectors.getMatchedModules>
 
-const mockMagneticModule1 = {
+type MockedModuleType = Pick<ApiSessionModule, 'model' | 'slot' | '_id'>
+
+const mockMagneticModule1: MockedModuleType = {
   model: 'magneticModuleV1',
   slot: '1',
   _id: 1234,
 }
 
-const mockMagneticModule2 = {
+const mockMagneticModule2: MockedModuleType = {
   model: 'magneticModuleV2',
   slot: '3',
   _id: 2345,
 }
 
-const mockMatchedModule1 = {
+const mockMatchedModule1: MatchedModule = {
   module: {
     ...mockMagneticModule,
     usbPort: { hub: null, port: 1 },
@@ -49,7 +42,7 @@ const mockMatchedModule1 = {
   slot: '1',
 }
 
-const mockMatchedModule2 = {
+const mockMatchedModule2: MatchedModule = {
   module: {
     ...mockMagneticModule,
     usbPort: { hub: 2, port: null },
@@ -57,7 +50,7 @@ const mockMatchedModule2 = {
   slot: '3',
 }
 
-const mockLegacyMatchedModule = {
+const mockLegacyMatchedModule: MatchedModule = {
   module: {
     ...mockMagneticModule,
     usbPort: { hub: null, port: null },
@@ -65,10 +58,10 @@ const mockLegacyMatchedModule = {
   slot: '3',
 }
 
-const mockModules = [mockMagneticModule1, mockMagneticModule2]
+const mockModules: MockedModuleType[] = [mockMagneticModule1, mockMagneticModule2]
 
 describe('ModuleList', () => {
-  let render
+  let render: (location?: string) => ReturnType<typeof mountWithProviders>
 
   beforeEach(() => {
     mockGetModules.mockReturnValue(mockModules)

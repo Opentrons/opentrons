@@ -6,12 +6,12 @@ import * as Calibration from '../../../redux/calibration'
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import * as Fixtures from '../../../redux/sessions/__fixtures__'
 import * as Sessions from '../../../redux/sessions'
-import type { State } from '../../../redux/types'
 import { ResultsSummary } from '../ResultsSummary'
 import { saveAs } from 'file-saver'
 import { PrimaryBtn, Flex, Text } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { ReactWrapper} from 'enzyme'
 
 jest.mock('file-saver')
 jest.mock('../../../redux/calibration/selectors')
@@ -25,43 +25,36 @@ jest.mock('@opentrons/shared-data', () => ({
   getPipetteModelSpecs: jest.fn(),
 }))
 
-const mockSaveAs: JestMockFn<
-  [Blob, string],
-  $Call<typeof saveAs, Blob, string>
-> = saveAs
+const mockSaveAs = saveAs as jest.MockedFunction<typeof saveAs>
 
-const mockGetCalibrationStatus: JestMockFn<
-  [State, string],
-  $Call<typeof Calibration.getCalibrationStatus, State, string>
-> = Calibration.getCalibrationStatus
+const mockGetCalibrationStatus = Calibration.getCalibrationStatus as jest.MockedFunction<typeof Calibration.getCalibrationStatus>
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 
-const mockGetPipetteModelSpecs: JestMockFn<
-  [string],
-  ?Partial<PipetteModelSpecs>
-> = getPipetteModelSpecs
+const mockGetPipetteModelSpecs =
+getPipetteModelSpecs
 
 describe('ResultsSummary', () => {
-  let render
-  let mockStore
+  let render: (props?: Partial<React.ComponentProps<typeof ResultsSummary> & {pipMount: string}>) => ReactWrapper
+  let mockStore: jest.MockedFunction<any>
   let dispatch
-  let mockDeleteSession
+  let mockDeleteSession: jest.MockedFunction<any>
 
-  const getExitButton = wrapper => wrapper.find(PrimaryBtn)
+  const getExitButton = (wrapper: ReactWrapper): ReactWrapper => wrapper.find(PrimaryBtn)
 
-  const getSaveLink = wrapper =>
+  const getSaveLink = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('button[title="download-results-button"]')
 
-  const getDeckParent = wrapper => wrapper.children(Flex).at(1)
-  const getLeftPipParent = wrapper =>
+  const getDeckParent = (wrapper: ReactWrapper): ReactWrapper => wrapper.children(Flex).at(1)
+  const getLeftPipParent = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('div[title="left-mount-container"]')
-  const getLeftPipResultsParent = wrapper =>
+  const getLeftPipResultsParent = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('div[title="left-mount-results"]')
-  const getRightPipParent = wrapper =>
+  const getRightPipParent = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('div[title="right-mount-container"]')
-  const getRightPipResultsParent = wrapper =>
+  const getRightPipResultsParent = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('div[title="right-mount-results"]')
+
   beforeEach(() => {
     mockDeleteSession = jest.fn()
     const mockSendCommands = jest.fn()
@@ -77,9 +70,7 @@ describe('ResultsSummary', () => {
     mockGetPipetteModelSpecs.mockReturnValue({
       displayName: 'mock pipette display name',
     })
-    render = (
-      props: Partial<React.ElementProps<typeof ResultsSummary>> = {}
-    ) => {
+    render = (props = {}) => {
       const {
         pipMount = 'left',
         isMulti = false,

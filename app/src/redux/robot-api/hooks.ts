@@ -8,6 +8,12 @@ import { PENDING } from './constants'
 import { getRequestById } from './selectors'
 import type { RequestState } from './types'
 
+type ActionWithRequestMeta = Action & {
+  meta: { [requestId: string]: string }
+}
+export type DispatchApiRequestType = (a: Action) => ActionWithRequestMeta
+export type DispatchRequestsType = (...actions: ActionWithRequestMeta[]) => void
+
 /**
  * React hook to attach a unique request ID to and dispatch an API action
  * Note: dispatching will trigger a re-render of the component
@@ -31,19 +37,17 @@ import type { RequestState } from './types'
  *   )
  * }
  */
-export function useDispatchApiRequest<
-  A: { ...Action, meta: { requestId: string } }
->(): [(A) => A, string[]] {
-  const dispatch = useDispatch<(A) => void>()
+export function useDispatchApiRequest(): [DispatchApiRequestType, string[]] {
+  const dispatch = useDispatch<(a: Action) => void>()
 
   // TODO(mc, 2019-11-06): evaluate whether or not this can be a ref
-  const [requestIds, addRequestId] = useReducer<string[], string>(
-    (ids, next) => [...ids, next],
+  const [requestIds, addRequestId] = useReducer(
+    (ids: string[], next: string) => [...ids, next],
     []
   )
 
   const dispatchApiRequest = useCallback(
-    (a: A): A => {
+    (a: Action): ActionWithRequestMeta => {
       const requestId = uniqueId('robotApi_request_')
       const action = { ...a, meta: { ...a.meta, requestId } }
 
@@ -84,15 +88,13 @@ export function useDispatchApiRequest<
  *   )
  * }
  */
-export function useDispatchApiRequests<
-  A: { ...Action, meta: { requestId: string } }
->(
-  onDispatchedRequest: (A => void) | null = null
-): [(...A[]) => void, string[]] {
+export function useDispatchApiRequests(
+  onDispatchedRequest: ((action: Action) => void) | null = null
+): [DispatchRequestsType, string[]] {
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
 
-  const trackedRequestId = useRef<string | null>(null)
-  const [unrequestedQueue, setUnrequestedQueue] = useState<A[]>([])
+  const trackedRequestId = useRef<string | null | undefined>(null)
+  const [unrequestedQueue, setUnrequestedQueue] = useState<Action[]>([])
 
   const trackedRequestIsPending =
     useSelector<State, RequestState | null>(state => {
@@ -108,7 +110,7 @@ export function useDispatchApiRequests<
     setUnrequestedQueue(unrequestedQueue.slice(1))
   }
 
-  const dispatchApiRequests = (...a: A[]) => {
+  const dispatchApiRequests = (...a: Action[]): void => {
     setUnrequestedQueue([...unrequestedQueue, ...a])
   }
 

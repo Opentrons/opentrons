@@ -15,6 +15,8 @@ import * as Analytics from '../../../redux/analytics/actions'
 
 import type { Labware } from '../../../redux/robot/types'
 import type { State } from '../../../redux/types'
+import type { DispatchApiRequestType } from '../../../redux/robot-api'
+import { Calibrate } from '..'
 
 jest.mock('../../../redux/robot-api')
 jest.mock('../../../redux/robot/selectors')
@@ -23,30 +25,18 @@ jest.mock('../../../redux/config/selectors')
 jest.mock('../../../redux/pipettes/selectors')
 jest.mock('../../../redux/analytics/actions')
 
-const mockGetUncalibratedTipracksByMount: JestMockFn<
-  [State, string],
-  $Call<typeof getUncalibratedTipracksByMount, State, string>
-> = getUncalibratedTipracksByMount
+const mockGetUncalibratedTipracksByMount = getUncalibratedTipracksByMount as jest.MockedFunction<typeof getUncalibratedTipracksByMount>
 
-const mockGetUnconfirmedLabware: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getUnconfirmedLabware, State>
-> = robotSelectors.getUnconfirmedLabware
+const mockGetUnconfirmedLabware = robotSelectors.getUnconfirmedLabware as jest.MockedFunction<typeof robotSelectors.getUnconfirmedLabware>
 
-const mockUseDispatchApiRequests: JestMockFn<
-  [() => void],
-  [() => void, string[]]
-> = useDispatchApiRequests
+const mockUseDispatchApiRequests = useDispatchApiRequests as jest.MockedFunction<typeof useDispatchApiRequests>
 
-const mockGetHasCalibrationBlock: JestMockFn<
-  [State],
-  $Call<typeof getHasCalibrationBlock, State>
-> = getHasCalibrationBlock
+const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction<typeof getHasCalibrationBlock>
 
 const threehundredtiprack: LabwareDefinition2 = tiprack300Def
 const MOCK_STATE: State = ({ mockState: true } as any)
 
-const stubUnconfirmedLabware = [
+const stubUnconfirmedLabware: Labware[] = [
   ({
     _id: 123,
     type: 'some_wellplate',
@@ -61,12 +51,12 @@ const stubUnconfirmedLabware = [
     calibration: 'unconfirmed',
     isMoving: false,
     definition: wellPlate96Def,
-  }: Partial<Labware>),
+  } as Labware),
 ]
 
 describe('Testing calibrate tip length control', () => {
-  let dispatchApiRequests
-  let render
+  let dispatchApiRequests: DispatchApiRequestType
+  let render: ((props?: Partial<React.ComponentProps<typeof Calibrate>>) => ReturnType<typeof mountWithStore>)
   const fakeRobot = 'fakerobot'
   const fakeMount = 'right'
 
@@ -76,9 +66,7 @@ describe('Testing calibrate tip length control', () => {
     mockGetUncalibratedTipracksByMount.mockReturnValue({ left: [], right: [] })
     mockGetUnconfirmedLabware.mockReturnValue(stubUnconfirmedLabware)
     mockGetHasCalibrationBlock.mockReturnValue(true)
-    render = (
-      props: Partial<React.ElementProps<typeof CalibrateTipLengthControl>> = {}
-    ) => {
+    render = (props = {}) => {
       const {
         isExtendedPipOffset = false,
         hasCalibrated = true,

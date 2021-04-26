@@ -29,18 +29,17 @@ jest.mock('../../UpdateAppModal', () => ({
 
 jest.mock('../../../redux/alerts/selectors')
 
-const getActiveAlerts: JestMockFn<[State], $ReadOnlyAlertId[]> =
-  AppAlerts.getActiveAlerts
+const getActiveAlerts = AppAlerts.getActiveAlerts as jest.MockedFunction<typeof AppAlerts.getActiveAlerts>
 
 const MOCK_STATE: State = ({ mockState: true } as any)
 
 describe('app-wide Alerts component', () => {
-  const render = () => {
+  const render = (): ReturnType<typeof mountWithStore> => {
     return mountWithStore(<Alerts />, { initialState: MOCK_STATE })
   }
 
-  const stubActiveAlerts = alertIds => {
-    getActiveAlerts.mockImplementation(state => {
+  const stubActiveAlerts = (alertIds: AlertId[]): void => {
+    getActiveAlerts.mockImplementation((state: State): AlertId[] => {
       expect(state).toEqual(MOCK_STATE)
       return alertIds
     })

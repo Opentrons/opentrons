@@ -15,19 +15,18 @@ jest.mock('react-router-dom', () => ({
 
 // TODO(mc, 2020-05-07): remove this feature flag
 jest.mock('../../../redux/config/hooks', () => ({
-  useFeatureFlag: flag => flag === 'systemInfoEnabled',
+  useFeatureFlag: (flag: string) => flag === 'systemInfoEnabled',
 }))
 
 const EXPECTED_DOWNLOAD_URL =
   'https://www.realtek.com/en/component/zoo/category/network-interface-controllers-10-100-1000m-gigabit-ethernet-usb-3-0-software'
 
-const useTrackEvent: JestMockFn<[], $Call<typeof Analytics.useTrackEvent>> =
-  Analytics.useTrackEvent
+const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<typeof Analytics.useTrackEvent>
 
 describe('U2EDriverOutdatedAlert', () => {
   const dismissAlert = jest.fn()
-  const trackEvent = jest.fn()
-  const render = () => {
+  const trackEvent: ReturnType<typeof Analytics.useTrackEvent> = jest.fn() as any
+  const render = (): ReturnType<typeof mount> => {
     return mount(<U2EDriverOutdatedAlert dismissAlert={dismissAlert} />)
   }
 

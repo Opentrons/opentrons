@@ -15,8 +15,8 @@ import { getCustomTipRackDefinitions } from '../../../redux/custom-labware'
 import { getAttachedPipettes } from '../../../redux/pipettes'
 
 import { ChooseTipRack } from '../ChooseTipRack'
-import type { State } from '../../../redux/types'
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
+import type { ReactWrapper } from 'enzyme'
 
 jest.mock('../../../redux/pipettes/selectors')
 jest.mock('../../../redux/calibration/')
@@ -27,35 +27,25 @@ const mockAttachedPipettes: AttachedPipettesByMount = ({
   right: null,
 } as any)
 
-const mockGetCalibrationForPipette: JestMockFn<
-  [State, string, string, string],
-  $Call<typeof getCalibrationForPipette, State, string, string, string>
-> = getCalibrationForPipette
+const mockGetCalibrationForPipette
+= getCalibrationForPipette as jest.MockedFunction<typeof getCalibrationForPipette>
 
-const mockGetTipLengthForPipetteAndTiprack: JestMockFn<
-  [State, string, string, string],
-  $Call<typeof getTipLengthForPipetteAndTiprack, State, string, string, string>
-> = getTipLengthForPipetteAndTiprack
+const mockGetTipLengthForPipetteAndTiprack
+= getTipLengthForPipetteAndTiprack as jest.MockedFunction<typeof getTipLengthForPipetteAndTiprack>
 
-const mockGetTipLengthCalibrations: JestMockFn<
-  [State, string],
-  $Call<typeof getTipLengthCalibrations, State, string>
-> = getTipLengthCalibrations
+const mockGetTipLengthCalibrations
+= getTipLengthCalibrations as jest.MockedFunction<typeof getTipLengthCalibrations>
 
-const mockGetAttachedPipettes: JestMockFn<
-  [State, string],
-  $Call<typeof getAttachedPipettes, State, string>
-> = getAttachedPipettes
+const mockGetAttachedPipettes
+= getAttachedPipettes as jest.MockedFunction<typeof getAttachedPipettes>
 
-const mockGetCustomTipRackDefinitions: JestMockFn<
-  [State],
-  $Call<typeof getCustomTipRackDefinitions, State>
-> = getCustomTipRackDefinitions
+const mockGetCustomTipRackDefinitions
+= getCustomTipRackDefinitions as jest.MockedFunction<typeof getCustomTipRackDefinitions>
 
 describe('ChooseTipRack', () => {
-  let render
+  let render: ((props?: Partial<React.ComponentProps<typeof ChooseTipRack>>) => ReturnType<typeof mountWithStore>)
 
-  const getUseThisTipRackButton = wrapper =>
+  const getUseThisTipRackButton = (wrapper: ReturnType<typeof mountWithStore>): ReactWrapper =>
     wrapper.find('button[data-test="useThisTipRackButton"]')
 
   beforeEach(() => {
@@ -68,7 +58,7 @@ describe('ChooseTipRack', () => {
       mockDeckCalTipRack.definition,
     ])
 
-    render = (props: Partial<React.ElementProps<typeof ChooseTipRack>> = {}) => {
+    render = (props: Partial<React.ComponentProps<typeof ChooseTipRack>> = {}): ReturnType<typeof mountWithStore> => {
       const {
         tipRack = mockDeckCalTipRack,
         mount = 'left',

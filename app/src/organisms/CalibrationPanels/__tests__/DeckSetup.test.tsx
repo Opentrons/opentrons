@@ -11,26 +11,25 @@ import * as Sessions from '../../../redux/sessions'
 
 import { DeckSetup } from '../DeckSetup'
 
+import type {ReactWrapper} from 'enzyme'
+
 jest.mock('../../../assets/labware/getLabware')
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('@opentrons/components/src/deck/RobotWorkSpace', () => ({
   RobotWorkSpace: () => <></>,
 }))
 
-const mockGetDeckDefinitions: JestMockFn<
-  [],
-  $Call<typeof getDeckDefinitions, any>
-> = getDeckDefinitions
+const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<typeof getDeckDefinitions>
 
 describe('DeckSetup', () => {
-  let render
+  let render: (props?: Partial<React.ComponentProps<typeof DeckSetup> & {pipMount: string}>) => ReturnType<typeof mount>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
   beforeEach(() => {
     mockGetDeckDefinitions.mockReturnValue({})
-    render = (props: Partial<React.ElementProps<typeof DeckSetup>> = {}) => {
+    render = (props: Partial<React.ComponentProps<typeof DeckSetup> & {pipMount: string}> = {}): ReturnType<typeof mount> => {
       const {
         pipMount = 'left',
         isMulti = false,
@@ -63,7 +62,7 @@ describe('DeckSetup', () => {
   it('clicking continue proceeds to next step', () => {
     const wrapper = render()
 
-    act(() => wrapper.find('button').invoke('onClick')())
+    act(() => wrapper.find('button').invoke('onClick')({} as any))
     wrapper.update()
 
     expect(mockSendCommands).toHaveBeenCalledWith({

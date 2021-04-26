@@ -21,11 +21,11 @@ jest.mock('lodash/uniqueId')
 const mockUniqueId: JestMockFn<[string | void], string> = uniqueId
 const mockGetRobotSessionOfType: JestMockFn<
   [State, string, SessionType],
-  $Call<typeof Sessions.getRobotSessionOfType, State, string, SessionType>
+  ReturnType<typeof Sessions.getRobotSessionOfType>
 > = Sessions.getRobotSessionOfType
 const mockGetRequestById: JestMockFn<
   [State, string],
-  $Call<typeof RobotApi.getRequestById, State, string>
+  ReturnType<typeof RobotApi.getRequestById>
 > = RobotApi.getRequestById
 
 describe('useCalibratePipetteOffset hook', () => {
