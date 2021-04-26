@@ -7,7 +7,7 @@ import type { Remote } from './types'
 export const remote: Remote = new Proxy(
   {},
   {
-    get(_target, propName: string) {
+    get(_target, propName: string): unknown {
       assert(
         global.APP_SHELL_REMOTE,
         'Expected APP_SHELL_REMOTE to be attached to global scope; is app-shell/src/preload.js properly configured?'
