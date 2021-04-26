@@ -12,7 +12,7 @@ import {
   getDisabledChangeTipOptions,
   type DisabledChangeTipArgs,
 } from './getDisabledChangeTipOptions'
-import type { ChangeTipOptions } from '../../../../step-generation/types'
+import type { ChangeTipOptions } from '@opentrons/step-generation'
 import type { FieldProps } from '../../types'
 import styles from '../../StepEditForm.css'
 

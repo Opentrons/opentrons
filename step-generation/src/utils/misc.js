@@ -10,10 +10,12 @@ import {
   getWellsDepth,
   getWellNamePerMultiTip,
 } from '@opentrons/shared-data'
+import { blowout } from '../commandCreators/atomic/blowout'
+import { curryCommandCreator } from './curryCommandCreator'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { PipetteEntity, LabwareEntity } from '../../step-forms'
+import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
 import type {
   LocationLiquidState,
   InvariantContext,
@@ -21,8 +23,6 @@ import type {
   SourceAndDest,
   CurriedCommandCreator,
 } from '../types'
-import { curryCommandCreator } from './curryCommandCreator'
-import { blowout } from '../commandCreators/atomic/blowout'
 
 export const AIR: '__air__' = '__air__'
 

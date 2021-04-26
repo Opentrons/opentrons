@@ -6,8 +6,10 @@ import {
   getSuccessResult,
 } from '../__fixtures__'
 import type { Diff } from '../utils/thermocyclerStateDiff'
-import type { ThermocyclerStateStepArgs } from '../types'
-import type { ThermocyclerModuleState } from '../../step-forms/types'
+import type {
+  ThermocyclerModuleState,
+  ThermocyclerStateStepArgs,
+} from '../types'
 
 jest.mock('../utils/thermocyclerStateDiff')
 

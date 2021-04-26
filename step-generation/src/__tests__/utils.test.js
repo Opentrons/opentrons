@@ -14,7 +14,7 @@ import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_tra
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { TEMPERATURE_DEACTIVATED } from '../../constants'
+import { TEMPERATURE_DEACTIVATED } from '../constants'
 import {
   AIR,
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -28,7 +28,7 @@ import {
 } from '../utils/misc'
 import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { DEFAULT_CONFIG, FIXED_TRASH_ID } from '../__fixtures__'
-import { thermocyclerPipetteCollision } from '../utils'
+import { orderWells, thermocyclerPipetteCollision } from '../utils'
 import type { RobotState } from '../'
 
 describe('splitLiquid', () => {
@@ -747,5 +747,87 @@ describe('getLocationTotalVolume', () => {
   it('should return 0 location with only AIR', () => {
     const result = getLocationTotalVolume({ [AIR]: { volume: 123 } })
     expect(result).toEqual(0)
+  })
+})
+
+describe('orderWells', () => {
+  const orderTuples = [
+    ['t2b', 'l2r'],
+    ['t2b', 'r2l'],
+    ['b2t', 'l2r'],
+    ['b2t', 'r2l'],
+    ['l2r', 't2b'],
+    ['l2r', 'b2t'],
+    ['r2l', 't2b'],
+    ['r2l', 'b2t'],
+  ]
+
+  describe('regular labware', () => {
+    const regularOrdering = [
+      ['A1', 'B1'],
+      ['A2', 'B2'],
+    ]
+    const regularAnswerMap = {
+      t2b: {
+        l2r: ['A1', 'B1', 'A2', 'B2'],
+        r2l: ['A2', 'B2', 'A1', 'B1'],
+      },
+      b2t: {
+        l2r: ['B1', 'A1', 'B2', 'A2'],
+        r2l: ['B2', 'A2', 'B1', 'A1'],
+      },
+      l2r: {
+        t2b: ['A1', 'A2', 'B1', 'B2'],
+        b2t: ['B1', 'B2', 'A1', 'A2'],
+      },
+      r2l: {
+        t2b: ['A2', 'A1', 'B2', 'B1'],
+        b2t: ['B2', 'B1', 'A2', 'A1'],
+      },
+    }
+    orderTuples.forEach(tuple => {
+      it(`first ${tuple[0]} then ${tuple[1]}`, () => {
+        expect(orderWells(regularOrdering, ...tuple)).toEqual(
+          // $FlowFixMe adding additional keys to answer map would add more confusion
+          regularAnswerMap[tuple[0]][tuple[1]]
+        )
+      })
+    })
+  })
+
+  describe('irregular labware', () => {
+    const irregularOrdering = [
+      ['A1', 'B1'],
+      ['A2', 'B2', 'C2'],
+      ['A3'],
+      ['A4', 'B4', 'C4', 'D4'],
+    ]
+    const irregularAnswerMap = {
+      t2b: {
+        l2r: ['A1', 'B1', 'A2', 'B2', 'C2', 'A3', 'A4', 'B4', 'C4', 'D4'],
+        r2l: ['A4', 'B4', 'C4', 'D4', 'A3', 'A2', 'B2', 'C2', 'A1', 'B1'],
+      },
+      b2t: {
+        l2r: ['B1', 'A1', 'C2', 'B2', 'A2', 'A3', 'D4', 'C4', 'B4', 'A4'],
+        r2l: ['D4', 'C4', 'B4', 'A4', 'A3', 'C2', 'B2', 'A2', 'B1', 'A1'],
+      },
+      l2r: {
+        t2b: ['A1', 'A2', 'A3', 'A4', 'B1', 'B2', 'B4', 'C2', 'C4', 'D4'],
+        b2t: ['D4', 'C2', 'C4', 'B1', 'B2', 'B4', 'A1', 'A2', 'A3', 'A4'],
+      },
+      r2l: {
+        t2b: ['A4', 'A3', 'A2', 'A1', 'B4', 'B2', 'B1', 'C4', 'C2', 'D4'],
+        b2t: ['D4', 'C4', 'C2', 'B4', 'B2', 'B1', 'A4', 'A3', 'A2', 'A1'],
+      },
+    }
+
+    orderTuples.forEach(tuple => {
+      it(`first ${tuple[0]} then ${tuple[1]}`, () => {
+        expect(orderWells(irregularOrdering, ...tuple)).toEqual(
+          // $FlowFixMe adding additional keys to answer map would add more confusion
+          irregularAnswerMap[tuple[0]][tuple[1]]
+        )
+      })
+    })
   })
 })

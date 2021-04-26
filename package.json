@@ -13,6 +13,7 @@
     "protocol-library-kludge",
     "robot-server/robot_server",
     "shared-data",
+    "step-generation",
     "update-server/otupdate",
     "webpack-config",
     "notify-server/notify_server"

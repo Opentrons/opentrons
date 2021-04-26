@@ -1,11 +1,8 @@
 // @flow
-import {
-  GEN_ONE_MULTI_PIPETTES,
-  MODULES_WITH_COLLISION_ISSUES,
-} from '../../constants'
-import type { PipetteEntity } from '../../step-forms/types'
-import type { DeckSlot } from '../../types'
-import type { InvariantContext, RobotState } from '../types'
+import { GEN_ONE_MULTI_PIPETTES } from '@opentrons/shared-data'
+import { MODULES_WITH_COLLISION_ISSUES } from '../constants'
+import type { PipetteEntity } from '@opentrons/step-generation'
+import type { DeckSlot, InvariantContext, RobotState } from '../types'
 export const modulePipetteCollision = (args: {|
   pipette: ?string,
   labware: ?string,

@@ -1,23 +1,110 @@
 // @flow
+import type { Mount } from '@opentrons/components'
+import typeof {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  ModuleRealType,
+  ModuleModel,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,
   EngageMagnetParams,
   ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
-import typeof { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../constants'
-import type { ProfileItem } from '../form-types'
-import type {
-  LabwareTemporalProperties,
-  ModuleTemporalProperties,
-  PipetteTemporalProperties,
-  LabwareEntities,
-  ModuleEntities,
-  PipetteEntities,
-} from '../step-forms'
+import typeof {
+  TEMPERATURE_DEACTIVATED,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_APPROACHING_TARGET,
+} from './constants'
+
+// Copied from PD
+export type DeckSlot = string
+type THERMOCYCLER_STATE = 'thermocyclerState'
+type THERMOCYCLER_PROFILE = 'thermocyclerProfile'
+export type LabwareTemporalProperties = {|
+  slot: DeckSlot,
+|}
+
+export type PipetteTemporalProperties = {|
+  mount: Mount,
+|}
+
+export type MagneticModuleState = {|
+  type: MAGNETIC_MODULE_TYPE,
+  engaged: boolean,
+|}
+
+export type TemperatureStatus =
+  | TEMPERATURE_DEACTIVATED
+  | TEMPERATURE_AT_TARGET
+  | TEMPERATURE_APPROACHING_TARGET
+
+export type TemperatureModuleState = {|
+  type: TEMPERATURE_MODULE_TYPE,
+  status: TemperatureStatus,
+  targetTemperature: number | null,
+|}
+export type ThermocyclerModuleState = {|
+  type: THERMOCYCLER_MODULE_TYPE,
+  blockTargetTemp: number | null, // null means block is deactivated
+  lidTargetTemp: number | null, // null means lid is deactivated
+  lidOpen: boolean | null, // if false, closed. If null, unknown
+|}
+
+export type ModuleTemporalProperties = {|
+  slot: DeckSlot,
+  moduleState:
+    | MagneticModuleState
+    | TemperatureModuleState
+    | ThermocyclerModuleState,
+|}
+
+export type LabwareEntity = {|
+  id: string,
+  labwareDefURI: string,
+  def: LabwareDefinition2,
+|}
+export type LabwareEntities = {
+  [labwareId: string]: LabwareEntity,
+}
+
+export type ModuleEntity = {|
+  id: string,
+  type: ModuleRealType,
+  model: ModuleModel,
+|}
+
+export type ModuleEntities = { [moduleId: string]: ModuleEntity }
+
+export type NormalizedPipetteById = {
+  [pipetteId: string]: {|
+    name: string,
+    id: string,
+    tiprackDefURI: string,
+  |},
+}
+export type NormalizedPipette = $Values<NormalizedPipetteById>
+
+// "entities" have only properties that are time-invariant
+// when they are de-normalized, the definitions they reference are baked in
+// =========== PIPETTES ========
+export type PipetteEntity = {|
+  ...NormalizedPipette,
+  tiprackLabwareDef: LabwareDefinition2,
+  spec: PipetteNameSpecs,
+|}
+
+export type PipetteEntities = {
+  [pipetteId: string]: PipetteEntity,
+}
 
 // ===== MIX-IN TYPES =====
-
 export type ChangeTipOptions =
   | 'always'
   | 'once'
@@ -218,6 +305,28 @@ export type DeactivateTemperatureArgs = {|
   message?: string,
 |}
 
+const PROFILE_CYCLE: 'profileCycle' = 'profileCycle'
+const PROFILE_STEP: 'profileStep' = 'profileStep'
+
+type ProfileStepItem = {|
+  type: typeof PROFILE_STEP,
+  id: string,
+  title: string,
+  temperature: string,
+  durationMinutes: string,
+  durationSeconds: string,
+|}
+
+type ProfileCycleItem = {|
+  type: typeof PROFILE_CYCLE,
+  id: string,
+  steps: Array<ProfileStepItem>,
+  repetitions: string,
+|}
+
+// TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
+export type ProfileItem = ProfileStepItem | ProfileCycleItem
+
 export type ThermocyclerProfileStepArgs = {|
   module: string,
   commandCreatorFnName: THERMOCYCLER_PROFILE,
@@ -385,3 +494,6 @@ export type RobotStateAndWarnings = {|
   robotState: RobotState,
   warnings: Array<CommandCreatorWarning>,
 |}
+
+// Copied from PD
+export type WellOrderOption = 'l2r' | 'r2l' | 't2b' | 'b2t'

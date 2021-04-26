@@ -1,7 +1,7 @@
 // @flow
 import takeWhile from 'lodash/takeWhile'
 import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
-import * as StepGeneration from '../step-generation'
+import * as StepGeneration from '@opentrons/step-generation'
 import type { StepArgsAndErrorsById } from '../steplist/types'
 
 export type GenerateRobotStateTimelineArgs = {|

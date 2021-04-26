@@ -8,12 +8,12 @@ import type {
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureArgs,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { ThermocyclerModuleState } from '@opentrons/step-generation'
 import type {
   InvariantContext,
   RobotStateAndWarnings,
   RobotState,
 } from '../types'
-import type { ThermocyclerModuleState } from '../../step-forms/types'
 
 const _getThermocyclerModuleState = (
   robotState: RobotState,

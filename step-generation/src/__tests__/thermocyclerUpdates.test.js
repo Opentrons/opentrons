@@ -4,7 +4,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { SPAN7_8_10_11_SLOT } from '../../constants'
 import {
   forThermocyclerSetTargetBlockTemperature as _forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature as _forThermocyclerSetTargetLidTemperature,
@@ -27,7 +26,7 @@ import type {
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureArgs,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { ThermocyclerModuleState } from '../../step-forms/types'
+import type { ThermocyclerModuleState } from '../types'
 
 const forThermocyclerSetTargetBlockTemperature = makeImmutableStateUpdater(
   _forThermocyclerSetTargetBlockTemperature
@@ -71,7 +70,7 @@ beforeEach(() => {
   }
   lidOpenRobotState = getInitialRobotStateStandard(invariantContext)
   lidOpenRobotState.modules[moduleId] = {
-    slot: SPAN7_8_10_11_SLOT,
+    slot: 'span7_8_10_11',
     moduleState: {
       type: THERMOCYCLER_MODULE_TYPE,
       lidOpen: true,
@@ -244,7 +243,7 @@ describe('thermocycler state updaters', () => {
         robotState: {
           modules: {
             [moduleId]: {
-              slot: SPAN7_8_10_11_SLOT,
+              slot: 'span7_8_10_11',
               moduleState: {
                 ...lidOpenRobotState.modules[moduleId].moduleState,
                 ...expectedUpdate,

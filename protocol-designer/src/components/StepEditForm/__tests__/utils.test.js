@@ -1,9 +1,9 @@
 // @flow
-import { getBlowoutLocationOptionsForForm } from '../utils'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
-} from '../../../step-generation/utils'
+} from '@opentrons/step-generation'
+import { getBlowoutLocationOptionsForForm } from '../utils'
 
 describe('getBlowoutLocationOptionsForForm', () => {
   let destOption
