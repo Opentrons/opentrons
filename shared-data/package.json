@@ -9,7 +9,7 @@
   "author": "Opentrons Labworks",
   "license": "Apache-2.0",
   "source": "js/index.ts",
-  "types": "lib/index.d.ts",
+  "types": "lib/js/index.d.ts",
   "flow:main": "flow-types/index.js.flow",
   "dependencies": {
     "ajv": "6.10.2",

@@ -1,9 +1,10 @@
-import { $Diff } from 'utility-types'
 import Ajv from 'ajv'
 import flatten from 'lodash/flatten'
 import range from 'lodash/range'
 import round from 'lodash/round'
+
 import labwareSchema from '../../labware/schemas/2.json'
+
 import {
   toWellName,
   sortWells,
@@ -12,6 +13,7 @@ import {
   getAsciiVolumeUnits,
   ensureVolumeUnits,
 } from '../helpers/index'
+
 import type {
   LabwareDefinition2 as Definition,
   LabwareMetadata as Metadata,
@@ -25,64 +27,61 @@ import type {
   LabwareOffset as Offset,
   LabwareVolumeUnits as VolumeUnits,
 } from '../types'
+
 // NOTE: leaving this 'beta' to reduce conflicts with future labware cloud namespaces
 export const DEFAULT_CUSTOM_NAMESPACE = 'custom_beta'
+
 const SCHEMA_VERSION = 2
 const DEFAULT_BRAND_NAME = 'generic'
-type Cell = {
+
+interface Cell {
   row: number
   column: number
 }
+
 // This represents creating a "range" of well names with step intervals included
 // For example, starting at well "A1" with a column stride of 2 would result in
 // the grid name being ordered as: "A1", "B1"..."A3", "B3"..etc
-type GridStart = {
+interface GridStart {
   rowStart: string
   colStart: string
   rowStride: number
   colStride: number
 }
-type InputParams = $Diff<
-  Params,
-  {
-    loadName: unknown
-  }
->
-type InputWellGroup = $Diff<
-  WellGroup,
-  {
-    wells: unknown
-  }
->
-export type BaseLabwareProps = {
+
+type InputParams = Omit<Params, 'loadName'>
+
+type InputWellGroup = Omit<WellGroup, 'wells'>
+
+export interface BaseLabwareProps {
   metadata: Metadata
   parameters: InputParams
   dimensions: Dimensions
   brand?: Brand
   version?: number
   namespace?: string
-  loadNamePostfix?: Array<string>
+  loadNamePostfix?: string[]
   strict?: boolean | null | undefined // If true, throws error on failed validation
 }
-export type RegularLabwareProps = BaseLabwareProps & {
+
+export interface RegularLabwareProps extends BaseLabwareProps {
   offset: Offset
   grid: Cell
   spacing: Cell
   well: InputWell
   group?: InputWellGroup
 }
-export type IrregularLabwareProps = BaseLabwareProps & {
-  offset: Array<Offset>
-  grid: Array<Cell>
-  spacing: Array<Cell>
-  well: Array<InputWell>
-  gridStart: Array<GridStart>
-  group?: Array<InputWellGroup>
+
+export interface IrregularLabwareProps extends BaseLabwareProps {
+  offset: Offset[]
+  grid: Cell[]
+  spacing: Cell[]
+  well: InputWell[]
+  gridStart: GridStart[]
+  group?: InputWellGroup[]
 }
-const ajv = new Ajv({
-  allErrors: true,
-  jsonPointers: true,
-})
+
+const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(labwareSchema)
 
 function validateDefinition(
@@ -136,15 +135,15 @@ export function _calculateWellCoord(
 }
 
 function determineIrregularLayout(
-  grids: Array<Cell>,
-  spacing: Array<Cell>,
-  offset: Array<Offset>,
-  gridStart: Array<GridStart>,
-  wells: Array<InputWell>,
-  group: Array<InputWellGroup> = []
+  grids: Cell[],
+  spacing: Cell[],
+  offset: Offset[],
+  gridStart: GridStart[],
+  wells: InputWell[],
+  group: InputWellGroup[] = []
 ): {
   wells: WellMap
-  groups: Array<WellGroup>
+  groups: WellGroup[]
 } {
   return grids.reduce(
     (result, gridObj, gridIdx) => {
@@ -184,13 +183,13 @@ function determineIrregularLayout(
 }
 
 export function _generateIrregularLoadName(args: {
-  grid: Array<Cell>
-  well: Array<InputWell>
+  grid: Cell[]
+  well: InputWell[]
   totalWellCount: number
   units: VolumeUnits
   brand: string
   displayCategory: string
-  loadNamePostfix?: Array<string>
+  loadNamePostfix?: string[]
 }): string {
   const {
     grid,
@@ -217,7 +216,7 @@ export function _generateIrregularLoadName(args: {
 }
 
 // Decide order of wells for single grid containers
-function determineOrdering(grid: Cell): Array<Array<string>> {
+function determineOrdering(grid: Cell): string[][] {
   const ordering = range(grid.column).map(colNum =>
     range(grid.row).map(rowNum =>
       toWellName({
@@ -230,9 +229,7 @@ function determineOrdering(grid: Cell): Array<Array<string>> {
 }
 
 // Decide order of wells for multi-grid containers
-export function determineIrregularOrdering(
-  wellsArray: Array<string>
-): Array<Array<string>> {
+export function determineIrregularOrdering(wellsArray: string[]): string[][] {
   const sortedArray = wellsArray.sort(sortWells)
   const ordering = splitWellsOnColumn(sortedArray)
   return ordering
@@ -242,7 +239,7 @@ export function determineIrregularOrdering(
 // Will return a nested object of all well objects for a labware
 function calculateCoordinates(
   wellProps: InputWell,
-  ordering: Array<Array<string>>,
+  ordering: string[][],
   spacing: Cell,
   offset: Offset,
   dimensions: Dimensions
@@ -284,14 +281,14 @@ function joinLoadName(
     .replace(/[^a-z0-9_.]/g, '')
 }
 
-type RegularNameProps = {
+interface RegularNameProps {
   displayCategory: string
   displayVolumeUnits: VolumeUnits
   gridRows: number
   gridColumns: number
   totalLiquidVolume: number
   brandName?: string
-  loadNamePostfix?: Array<string>
+  loadNamePostfix?: string[]
 }
 export function createRegularLoadName(args: RegularNameProps): string {
   const {

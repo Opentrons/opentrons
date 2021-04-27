@@ -3,8 +3,15 @@
   "references": [],
   "compilerOptions": {
     "composite": true,
-    "rootDir": "js",
+    "rootDir": ".",
     "outDir": "lib"
   },
-  "include": ["typings", "js"]
+  "include": [
+    "typings",
+    "js",
+    "deck/**/*.json",
+    "labware/**/*.json",
+    "module/**/*.json",
+    "protocol/**/*.json"
+  ]
 }

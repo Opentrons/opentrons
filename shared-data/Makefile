@@ -6,6 +6,10 @@ SHELL := bash
 # TODO(mc, 2018-10-25): use dist to match other projects
 BUILD_DIR := build
 
+# type definitions
+typedefs := $(shell yarn -s shx find "lib/js/**/*.d.ts")
+flow_out := $(patsubst lib/js/%.d.ts,flow-types/%.js.flow,$(typedefs))
+
 # Top level targets
 
 .PHONY: all
@@ -38,7 +42,7 @@ clean-js:
 .PHONY: flow-types
 flow-types: $(flow_out)
 
-flow-types/%.js.flow: lib/%.d.ts
+flow-types/%.js.flow: lib/js/%.d.ts
 	yarn flowgen $< --add-flow-header --interface-records --no-inexact --output-file $@
 
 # Python targets
