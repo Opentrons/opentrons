@@ -20,12 +20,11 @@ import type { Jog, Plane, StepSize } from './types'
 import type { StyleProps } from '@opentrons/components'
 
 export type { Jog }
-export type JogControlsProps = {
+export interface JogControlsProps extends StyleProps {
   jog: Jog,
   planes?: Plane[],
   stepSizes?: StepSize[],
   auxiliaryControl?: React.ReactNode | null,
-  ...StyleProps,
 }
 
 export { HORIZONTAL_PLANE, VERTICAL_PLANE }

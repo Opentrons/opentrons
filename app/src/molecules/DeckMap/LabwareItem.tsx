@@ -16,16 +16,16 @@ import {
   humanizeLabwareType,
 } from '@opentrons/components'
 
-import { type Labware } from '../../redux/robot'
+import type { Labware } from '../../redux/robot'
 import { getLegacyLabwareDef } from '../../assets/labware/getLabware'
 
 import styles from './styles.css'
 
-export type LabwareItemProps = {
+export interface LabwareItemProps {
   highlighted?: boolean | null,
   areTipracksConfirmed?: boolean,
   handleClick?: () => void,
-  labware: $Exact<Labware>,
+  labware: Labware,
   x: number,
   y: number,
 }
@@ -40,7 +40,7 @@ export function LabwareItem(props: LabwareItemProps): JSX.Element {
     clickable &&
     ((isTiprack && confirmed) || (!isTiprack && areTipracksConfirmed === false))
 
-  let title
+  let title: string
   let item
   let width
   let height
@@ -57,7 +57,7 @@ export function LabwareItem(props: LabwareItemProps): JSX.Element {
     title = humanizeLabwareType(type)
   }
 
-  const renderContents = () => {
+  const renderContents = (): JSX.Element => {
     const contents = showSpinner ? (
       <div className={styles.labware_spinner_wrapper}>
         <Icon className={styles.spinner} name="ot-spinner" spin />

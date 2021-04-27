@@ -25,10 +25,7 @@ import {
 import type { StyleProps } from '@opentrons/components'
 import type { NavLocation } from '../../redux/nav/types'
 
-export type NavbarLinkProps = {
-  ...NavLocation,
-  ...StyleProps,
-}
+export type NavbarLinkProps = NavLocation & StyleProps
 
 const ACTIVE_STYLE = css`
   &.active {

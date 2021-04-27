@@ -3,8 +3,8 @@ import remark from 'remark'
 import reactRenderer from 'remark-react'
 import styles from './styles.css'
 
-export type ReleaseNotesProps = {
-  source: ?string,
+export interface ReleaseNotesProps {
+  source: string | null | undefined
 }
 
 const renderer = remark().use(reactRenderer, {
@@ -30,6 +30,6 @@ export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
   )
 }
 
-function ExternalLink(props) {
+function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
   return <a {...props} target="_blank" rel="noopener noreferrer" />
 }
