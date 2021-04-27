@@ -6,7 +6,10 @@ import { InstrumentDiagram as InstrumentDiagramComponent } from './InstrumentDia
 
 import type { Story, Meta } from '@storybook/react'
 
-const allPipetteSpecsByDisplayNames = keyBy(getAllPipetteNames().map(getPipetteNameSpecs), 'displayName')
+const allPipetteSpecsByDisplayNames = keyBy(
+  getAllPipetteNames().map(getPipetteNameSpecs),
+  'displayName'
+)
 
 export default {
   title: 'Library/Organisms/Instrument Diagram',
@@ -24,12 +27,16 @@ export default {
         options: Object.keys(allPipetteSpecsByDisplayNames),
       },
       defaultValue: Object.keys(allPipetteSpecsByDisplayNames)[0],
-    }
-  }
+    },
+  },
 } as Meta
 
-
-const Template: Story<React.ComponentProps<typeof InstrumentDiagramComponent>> = ({pipetteSpecs, ...args}) => (
-  <InstrumentDiagramComponent {...args} pipetteSpecs={allPipetteSpecsByDisplayNames[pipetteSpecs]} />
+const Template: Story<
+  React.ComponentProps<typeof InstrumentDiagramComponent>
+> = ({ pipetteSpecs, ...args }) => (
+  <InstrumentDiagramComponent
+    {...args}
+    pipetteSpecs={allPipetteSpecsByDisplayNames[pipetteSpecs]}
+  />
 )
 export const InstrumentDiagram = Template.bind({})

@@ -9,7 +9,9 @@ export default {
   component: ToggleField,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof ToggleFieldComponent>> = args => {
+const Template: Story<
+  React.ComponentProps<typeof ToggleFieldComponent>
+> = args => {
   const [isOn, setIsOn] = React.useState<boolean>(false)
   return (
     <ToggleFieldComponent

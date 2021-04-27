@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig-base.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "noEmit": true
+  },
+  "include": [
+    "app-shell/src",
+    "app-shell/typings",
+    "components/src",
+    "components/typings",
+    "discovery-client/src",
+    "discovery-client/typings",
+    "labware-library/src",
+    "labware-library/typings"
+  ]
+}

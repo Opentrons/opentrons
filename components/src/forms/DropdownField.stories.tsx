@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { DropdownField as DropdownFieldComponent} from './DropdownField'
+import { DropdownField as DropdownFieldComponent } from './DropdownField'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -9,7 +9,9 @@ export default {
   argTypes: { onChange: { action: 'clicked' } },
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof DropdownFieldComponent>> = args => {
+const Template: Story<
+  React.ComponentProps<typeof DropdownFieldComponent>
+> = args => {
   const [selectedValue, setSelectedValue] = React.useState<string | null>(null)
   return (
     <DropdownFieldComponent

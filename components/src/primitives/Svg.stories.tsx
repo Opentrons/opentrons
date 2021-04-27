@@ -10,7 +10,7 @@ export default {
 const Template: Story<React.ComponentProps<typeof SvgComponent>> = args => (
   <SvgComponent {...args} />
 )
-export const Svg= Template.bind({})
+export const Svg = Template.bind({})
 Svg.args = {
   svgWidth: '300',
   svgHeight: '300',

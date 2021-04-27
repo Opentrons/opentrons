@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { TitleBar } from './TitleBar'
-import { Text, Icon, SIZE_1} from '@opentrons/components'
+import { Text, Icon, SIZE_1 } from '@opentrons/components'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -19,8 +19,16 @@ Basic.args = {
 
 export const TitlesAsReactNodes = Template.bind({})
 TitlesAsReactNodes.args = {
-  title: <Text as="span">Fancy Title With Icon <Icon size={SIZE_1} name="wifi"/></Text>,
-  subtitle: <Text as="a" href="#">sub-title as  link</Text>,
+  title: (
+    <Text as="span">
+      Fancy Title With Icon <Icon size={SIZE_1} name="wifi" />
+    </Text>
+  ),
+  subtitle: (
+    <Text as="a" href="#">
+      sub-title as link
+    </Text>
+  ),
 }
 
 export const WithBackButton = Template.bind({})
@@ -30,5 +38,5 @@ WithBackButton.args = {
   back: {
     children: 'back',
     onClick: () => {},
-  }
+  },
 }

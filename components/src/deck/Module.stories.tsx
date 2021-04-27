@@ -30,16 +30,16 @@ export default {
 
 const Template: Story<React.ComponentProps<typeof ModuleComponent>> = args => {
   return (
-      <RobotWorkSpace deckDef={getDeckDefinitions()["ot2_standard"]}>
-        {({deckSlotsById}: RobotWorkSpaceRenderProps) => {
-          const slot =  deckSlotsById['7']
-          return (
-            <g transform={`translate(${slot.position[0]}, ${slot.position[1]})`} >
-                <ModuleComponent mode={args.mode} model={args.model} slot={slot}/>
-            </g>
-          )
-        }}
-      </RobotWorkSpace>
+    <RobotWorkSpace deckDef={getDeckDefinitions()['ot2_standard']}>
+      {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
+        const slot = deckSlotsById['7']
+        return (
+          <g transform={`translate(${slot.position[0]}, ${slot.position[1]})`}>
+            <ModuleComponent mode={args.mode} model={args.model} slot={slot} />
+          </g>
+        )
+      }}
+    </RobotWorkSpace>
   )
 }
 export const Module = Template.bind({})
@@ -49,14 +49,13 @@ Module.argTypes = {
       type: 'select',
       options: moduleModels,
     },
-    defaultValue: moduleModels[0]
+    defaultValue: moduleModels[0],
   },
   mode: {
     control: {
       type: 'select',
       options: displayModes,
     },
-    defaultValue: displayModes[0]
+    defaultValue: displayModes[0],
   },
 }
-

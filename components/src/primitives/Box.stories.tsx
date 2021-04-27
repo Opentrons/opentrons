@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Box as BoxComponent} from './Box'
+import { Box as BoxComponent } from './Box'
 
 import type { Story, Meta } from '@storybook/react'
 

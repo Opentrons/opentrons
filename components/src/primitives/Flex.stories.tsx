@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Flex as FlexComponent} from './Flex'
+import { Flex as FlexComponent } from './Flex'
 import {
   Box,
   DIRECTION_COLUMN,
