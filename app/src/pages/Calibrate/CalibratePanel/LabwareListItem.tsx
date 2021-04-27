@@ -20,10 +20,9 @@ import { CalibrationData } from './CalibrationData'
 import type { BaseProtocolLabware } from '../../../redux/calibration/labware/types'
 import styles from './styles.css'
 
-export type LabwareListItemProps = {
-  ...BaseProtocolLabware,
+export interface LabwareListItemProps extends BaseProtocolLabware {
   isDisabled: boolean,
-  onClick: () => mixed,
+  onClick: () => unknown,
 }
 
 export function LabwareListItem(props: LabwareListItemProps): JSX.Element {

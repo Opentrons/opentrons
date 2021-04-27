@@ -31,9 +31,9 @@ import type { Dispatch } from '../../../redux/types'
 
 const SUPPORT_PAGE = 'https://support.opentrons.com/en/' // TODO: update link to correct doc
 
-export type PromptProps = {
+export interface PromptProps {
   modulesMissing: boolean,
-  onPromptClick: () => mixed,
+  onPromptClick: () => unknown,
   hasDuplicateModules: boolean,
 }
 

@@ -7,8 +7,8 @@ import { getCalibratePipettesLocations } from '../../../redux/nav'
 import { PIPETTE_MOUNTS } from '../../../redux/pipettes'
 import { PageTabs } from '@opentrons/components'
 
-export type PipetteTabsProps = {
-  currentMount: ?string,
+export interface PipetteTabsProps {
+  currentMount: string | null | undefined,
 }
 
 export function PipetteTabs(props: PipetteTabsProps): JSX.Element {

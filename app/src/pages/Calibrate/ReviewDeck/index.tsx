@@ -18,7 +18,7 @@ import styles from './styles.css'
 
 import type { Dispatch } from '../../../redux/types'
 
-export type ReviewDeckProps = { slot: ?string }
+export interface ReviewDeckProps { slot: string | null | undefined }
 
 export function ReviewDeck(props: ReviewDeckProps): JSX.Element {
   const { slot } = props
@@ -39,13 +39,13 @@ export function ReviewDeck(props: ReviewDeckProps): JSX.Element {
 
   const currentLabware = allLabware.find(lw => lw.slot === slot)
 
-  const continueToCalibrate = () => {
+  const continueToCalibrate = (): void => {
     if (currentLabware && calibratorMount) {
       const mountToUse = currentLabware.calibratorMount || calibratorMount
       dispatch(robotActions.moveTo(mountToUse, currentLabware.slot))
     }
   }
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (mustPrepNestedLabware) {
       setIsPrepNestedLabwareOpen(true)
     } else {

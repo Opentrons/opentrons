@@ -16,9 +16,9 @@ import type { Dispatch } from '../../../redux/types'
 
 import { ProceedToRun } from './ProceedToRun'
 
-export type InfoBoxButtonProps = { labware: ?Labware }
+export interface InfoBoxButtonProps { labware: Labware | null}
 
-export function InfoBoxButton(props: InfoBoxButtonProps): JSX.Element {
+export function InfoBoxButton(props: InfoBoxButtonProps): JSX.Element | null {
   const { labware } = props
   const dispatch = useDispatch<Dispatch>()
 
@@ -31,7 +31,7 @@ export function InfoBoxButton(props: InfoBoxButtonProps): JSX.Element {
   const buttonTargetIsNext =
     buttonTarget != null && buttonTarget === nextLabwareTarget
   const targetConfirmed = buttonTarget && buttonTarget.confirmed
-  const mountToUse: ?Mount =
+  const mountToUse: Mount | null | undefined =
     (buttonTarget && buttonTarget.calibratorMount) || robotCalibratorMount
 
   if (!buttonTarget || (labware && labware.isMoving) || !mountToUse) return null

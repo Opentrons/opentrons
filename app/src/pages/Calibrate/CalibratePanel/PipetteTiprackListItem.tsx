@@ -24,8 +24,7 @@ import { getTipLengthForPipetteAndTiprack } from '../../../redux/calibration'
 
 const MARGIN_LEFT_SIZE = '1.6rem'
 
-export type PipetteTiprackListItemProps = {
-  ...BaseProtocolLabware,
+export interface PipetteTiprackListItemProps extends BaseProtocolLabware {
   robotName: string | null,
   pipette: AttachedPipette | null,
   calibrateUrl: string | null,

@@ -10,14 +10,15 @@ import { selectors as robotSelectors } from '../../../redux/robot'
 import { InfoBoxButton } from './InfoBoxButton'
 
 import type { Labware, LabwareType } from '../../../redux/robot/types'
+import type { IconName } from '@opentrons/components'
 
-export type InfoBoxProps = { labware: ?Labware }
+export interface InfoBoxProps { labware: Labware | null }
 
 export function InfoBox(props: InfoBoxProps): JSX.Element {
   const { labware } = props
 
   let title = 'No labware selected'
-  let iconName = 'checkbox-blank-circle-outline'
+  let iconName: IconName = 'checkbox-blank-circle-outline'
   let description = 'Please select labware to continue'
 
   if (labware) {

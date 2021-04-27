@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 import type { TipLengthCalibration } from '../../../redux/calibration/api-types'
 
-export type TipLengthCalibrationDataProps = {
+export interface TipLengthCalibrationDataProps {
   calibrationData: TipLengthCalibration | null,
   calDataAvailable: boolean,
 }

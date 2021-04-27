@@ -24,12 +24,12 @@ import { PipetteTiprackListItem } from './PipetteTiprackListItem'
 import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import type { Dispatch, State } from '../../../redux/types'
 
-export type PipetteListComponentProps = {
+export interface PipetteListComponentProps {
   robotName: string | null,
   tipracks: BaseProtocolLabware[],
 }
 
-export const PipetteList: React.AbstractComponent<PipetteListComponentProps> = withRouter(
+export const PipetteList: React.Component<PipetteListComponentProps> = withRouter(
   PipetteListComponent
 )
 
@@ -74,7 +74,7 @@ export function PipetteListComponent(
         const calibratePathFor = (
           mount: 'left' | 'right',
           hash: string | null
-        ) => {
+        ): string => {
           const url =
             urlsByMount[mount][hash ?? 'default'] ??
             urlsByMount[mount]['default']

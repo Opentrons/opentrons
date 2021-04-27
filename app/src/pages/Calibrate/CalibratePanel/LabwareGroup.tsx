@@ -12,7 +12,7 @@ import { LabwareListItem } from './LabwareListItem'
 import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import type { Dispatch } from '../../../redux/types'
 
-export type LabwareGroupProps = {
+export interface LabwareGroupProps {
   robotName: string | null,
   tipracks: BaseProtocolLabware[],
   otherLabware: BaseProtocolLabware[],
@@ -39,7 +39,7 @@ export function LabwareGroup(props: LabwareGroupProps): JSX.Element {
     robotName && dispatch(fetchLabwareCalibrations(robotName))
   }, [dispatch, robotName])
 
-  const setLabwareToCalibrate = (lw: BaseProtocolLabware) => {
+  const setLabwareToCalibrate = (lw: BaseProtocolLabware): void => {
     const calibrator = lw.calibratorMount || calibratorMount
     if (!!deckPopulated && calibrator) {
       dispatch(robotActions.moveTo(calibrator, lw.slot))
