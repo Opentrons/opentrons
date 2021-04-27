@@ -12,6 +12,9 @@
     },
     {
       "path": "./labware-library"
+    },
+    {
+      "path": "./shared-data"
     }
   ]
 }

@@ -22,7 +22,9 @@ const TipDecoration = React.memo(function TipDecoration(props: {
   well: LabwareWell
 }) {
   const { well } = props
+  // @ts-expect-error(mc, 2021-04-27): refine well type before accessing `diameter`
   if (well.diameter) {
+    // @ts-expect-error(mc, 2021-04-27): refine well type before accessing `diameter`
     const radius = well.diameter / 2
     return (
       <circle className={styles.tip} cx={well.x} cy={well.y} r={radius - 1} />

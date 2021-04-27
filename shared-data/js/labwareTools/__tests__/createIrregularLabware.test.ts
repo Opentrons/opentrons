@@ -36,7 +36,8 @@ describe('test helper functions', () => {
 
     range(grid.column).forEach(colIdx => {
       range(grid.row).forEach(rowIdx => {
-        const idx = colIdx + rowIdx
+        const idx = colIdx * grid.row + rowIdx
+
         const wellName1 = _irregularWellName(rowIdx, colIdx, gridStart[0])
 
         expect(expected1[idx]).toEqual(wellName1)

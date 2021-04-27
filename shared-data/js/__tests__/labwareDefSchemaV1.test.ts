@@ -51,7 +51,7 @@ describe('test the schema against a minimalist fixture', () => {
     const valid = validate(badDef)
     const validationErrors = validate.errors
     expect(
-      validationErrors.find(err => err.dataPath === '/ordering/0')
+      validationErrors?.find(err => err.dataPath === '/ordering/0')
     ).toMatchObject({
       message: 'should be array',
     })

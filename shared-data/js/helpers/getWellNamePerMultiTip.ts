@@ -1,6 +1,7 @@
 import range from 'lodash/range'
 import { getLabwareHasQuirk, sortWells } from '.'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '../types'
+
 // TODO Ian 2018-03-13 pull pipette offsets/positions from some pipette definitions data
 const OFFSET_8_CHANNEL = 9 // offset in mm between tips
 
@@ -31,11 +32,12 @@ export function findWellAt(
       )
     })
 }
+
 // "topWellName" means well at the "top" of the column we're accessing: usually A row, or B row for 384-format
 export function getWellNamePerMultiTip(
   labwareDef: LabwareDefinition2,
   topWellName: string
-): Array<string> | null {
+): string[] | null {
   const topWell = labwareDef.wells[topWellName]
 
   if (!topWell) {
@@ -46,7 +48,7 @@ export function getWellNamePerMultiTip(
   }
 
   const { x, y } = topWell
-  let offsetYTipPositions: Array<number> = range(0, 8).map(
+  let offsetYTipPositions: number[] = range(0, 8).map(
     tipNo => y - tipNo * OFFSET_8_CHANNEL
   )
 
@@ -59,7 +61,7 @@ export function getWellNamePerMultiTip(
 
   // Return null for containers with any undefined wells
   const wellsAccessed = offsetYTipPositions.reduce(
-    (acc: Array<string> | null, tipPosY) => {
+    (acc: string[] | null, tipPosY) => {
       const wellForTip = findWellAt(labwareDef, x, tipPosY)
 
       if (acc === null || !wellForTip) {

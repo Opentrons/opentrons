@@ -1,22 +1,28 @@
 import path from 'path'
 import glob from 'glob'
+
 const definitionsGlobPath = path.join(
   __dirname,
   '../../labware/definitions/2/**/*.json'
 )
+
 const EXPECTED_VALID_QUIRKS = [
   'centerMultichannelOnWells',
   'touchTipDisabled',
   'fixedTrash',
 ]
+
 describe('check quirks for all labware defs', () => {
   const labwarePaths = glob.sync(definitionsGlobPath)
+
   beforeAll(() => {
     // Make sure definitions path didn't break, which would give you false positives
     expect(labwarePaths.length).toBeGreaterThan(0)
   })
+
   labwarePaths.forEach(labwarePath => {
     const defname = path.basename(path.dirname(labwarePath))
+
     it(`${defname} has valid quirks`, () => {
       const labwareDef = require(labwarePath)
 
