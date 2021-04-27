@@ -62,7 +62,7 @@ export type FormModalProps = {
   network: WifiNetwork | null,
   fields: ConnectFormField[],
   isValid: boolean,
-  onCancel: () => mixed,
+  onCancel: () => unknown,
 }
 
 export const FormModal = (props: FormModalProps): JSX.Element => {

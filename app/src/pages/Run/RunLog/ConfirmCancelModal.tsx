@@ -12,7 +12,7 @@ const CANCEL_TEXT = 'cancel run'
 const BACK_TEXT = 'go back'
 
 export type ConfirmCancelModalProps = {
-  onClose: () => mixed,
+  onClose: () => unknown,
 }
 
 export function ConfirmCancelModal(props: ConfirmCancelModalProps): JSX.Element {

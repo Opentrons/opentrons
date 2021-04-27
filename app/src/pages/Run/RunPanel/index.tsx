@@ -26,10 +26,10 @@ type SP = {
 }
 
 type DP = {
-  onRunClick: () => mixed,
-  onPauseClick: () => mixed,
-  onResumeClick: () => mixed,
-  onResetClick: () => mixed,
+  onRunClick: () => unknown,
+  onPauseClick: () => unknown,
+  onResumeClick: () => unknown,
+  onResetClick: () => unknown,
 }
 
 type Props = { ...SP, ...DP }

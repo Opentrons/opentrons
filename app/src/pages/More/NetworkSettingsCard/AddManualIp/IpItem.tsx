@@ -11,7 +11,7 @@ export type IpItemProps = {
 }
 
 export class IpItem extends React.Component<IpItemProps> {
-  remove: () => mixed = () => this.props.removeIp(this.props.candidate)
+  remove: () => unknown = () => this.props.removeIp(this.props.candidate)
 
   render(): JSX.Element {
     const iconName = this.props.discovered ? 'check' : 'ot-spinner'

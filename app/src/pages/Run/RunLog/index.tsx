@@ -22,7 +22,7 @@ type SP = {
 }
 
 type DP = {
-  onResetClick: () => mixed,
+  onResetClick: () => unknown,
 }
 
 export const RunLog: React.AbstractComponent<{}> = connect<

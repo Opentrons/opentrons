@@ -8,7 +8,7 @@ import styles from './styles.css'
 type Props = {
   heading?: ?string,
   description: string,
-  close?: () => mixed,
+  close?: () => unknown,
   closeUrl?: string,
   error: { message?: string, ... },
 }

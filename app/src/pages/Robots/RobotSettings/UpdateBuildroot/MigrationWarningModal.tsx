@@ -10,7 +10,7 @@ import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
 export type MigrationWarningModalProps = {
   notNowButton: ButtonProps,
   updateType: BuildrootUpdateType | null,
-  proceed: () => mixed,
+  proceed: () => unknown,
 }
 
 type MaybeButtonProps = ButtonProps | null| undefined

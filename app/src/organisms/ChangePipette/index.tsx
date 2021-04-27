@@ -49,7 +49,7 @@ import type { WizardStep } from './types'
 type Props = {
   robotName: string,
   mount: Mount,
-  closeModal: () => mixed,
+  closeModal: () => unknown,
 }
 
 // TODO(mc, 2019-12-18): i18n

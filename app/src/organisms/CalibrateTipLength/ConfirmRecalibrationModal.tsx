@@ -33,8 +33,8 @@ const CANCEL = 'cancel'
 const CALIBRATION_URL = 'https://support.opentrons.com/en/articles/4523313'
 
 type Props = {
-  confirm: () => mixed,
-  cancel: () => mixed,
+  confirm: () => unknown,
+  cancel: () => unknown,
   tiprackDisplayName: string,
 }
 

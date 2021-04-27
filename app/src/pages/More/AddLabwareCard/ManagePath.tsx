@@ -19,9 +19,9 @@ export const RESET_SOURCE_NAME = 'reset-source'
 
 export type ManagePathProps = {
   path: string,
-  onChangePath: () => mixed,
-  onResetPath: () => mixed,
-  onOpenPath: () => mixed,
+  onChangePath: () => unknown,
+  onResetPath: () => unknown,
+  onOpenPath: () => unknown,
 }
 
 const handleFocus = (e: SyntheticFocusEvent<HTMLInputElement>) => {

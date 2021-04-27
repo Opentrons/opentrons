@@ -10,7 +10,7 @@ export type IconCtaProps = {
   iconName: IconName,
   text: string,
   className?: string,
-  onClick: () => mixed,
+  onClick: () => unknown,
 }
 
 export const IconCta = ({

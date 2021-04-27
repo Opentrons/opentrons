@@ -15,7 +15,7 @@ export type ReleaseNotesModalProps = {
   notNowButton: ButtonProps,
   releaseNotes: string,
   systemType: RobotSystemType | null,
-  proceed: () => mixed,
+  proceed: () => unknown,
 }
 
 export function ReleaseNotesModal(props: ReleaseNotesModalProps): JSX.Element {

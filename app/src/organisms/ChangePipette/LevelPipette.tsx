@@ -38,8 +38,8 @@ type Props = {
   displayName: string,
   displayCategory: PipetteDisplayCategory | null,
   pipetteModelName: string,
-  back: () => mixed,
-  exit: () => mixed,
+  back: () => unknown,
+  exit: () => unknown,
   startPipetteOffsetCalibration: () => void,
 }
 

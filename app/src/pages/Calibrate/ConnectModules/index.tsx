@@ -21,7 +21,7 @@ type SP = {
   hasDuplicateModules: boolean,
 }
 
-type DP = { setReviewed: () => mixed, fetchModules: () => mixed }
+type DP = { setReviewed: () => unknown, fetchModules: () => unknown }
 
 type Props = { ...OP, ...SP, ...DP }
 

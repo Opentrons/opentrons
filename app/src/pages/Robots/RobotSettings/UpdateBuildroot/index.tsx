@@ -19,7 +19,7 @@ import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 export type UpdateBuildrootProps = {
   robot: ViewableRobot,
-  close: () => mixed,
+  close: () => unknown,
 }
 
 export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {

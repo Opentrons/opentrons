@@ -18,7 +18,7 @@ export type SessionAlertProps = {
   sessionStatus: SessionStatus,
   sessionStatusInfo: SessionStatusInfo,
   className?: string,
-  onResetClick: () => mixed,
+  onResetClick: () => unknown,
 }
 
 export function SessionAlert(props: SessionAlertProps): JSX.Element {

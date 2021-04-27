@@ -13,7 +13,7 @@ export type InstallModalProps = {
   robot: ViewableRobot,
   robotSystemType: RobotSystemType | null,
   session: BuildrootUpdateSession,
-  close: () => mixed,
+  close: () => unknown,
 }
 
 export function InstallModal(props: InstallModalProps): JSX.Element {

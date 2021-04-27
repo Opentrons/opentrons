@@ -32,7 +32,7 @@ type SP = {
   isScanning: boolean,
 }
 
-type DP = { onScanClick: () => mixed }
+type DP = { onScanClick: () => unknown }
 
 type Props = { ...SP, ...DP }
 

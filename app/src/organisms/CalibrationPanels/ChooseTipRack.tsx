@@ -91,7 +91,7 @@ type ChooseTipRackProps = {
   sessionType: SessionType,
   chosenTipRack: LabwareDefinition2 | null,
   handleChosenTipRack: (arg: LabwareDefinition2 | null) => mixed,
-  closeModal: () => mixed,
+  closeModal: () => unknown,
   robotName?: string | null,
   defaultTipracks?: LabwareDefinition2[] | null,
 }

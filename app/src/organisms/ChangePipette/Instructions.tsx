@@ -31,8 +31,8 @@ type Props = {
   displayCategory: PipetteDisplayCategory | null,
   direction: Direction,
   setWantedName: (name: string | null) => mixed,
-  confirm: () => mixed,
-  exit: () => mixed,
+  confirm: () => unknown,
+  exit: () => unknown,
 }
 
 export function Instructions(props: Props): JSX.Element {

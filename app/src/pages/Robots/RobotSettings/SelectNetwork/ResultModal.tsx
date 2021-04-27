@@ -12,7 +12,7 @@ export type ResultModalProps = {
   ssid: string | null,
   isPending: boolean,
   error: { message?: string, ... } | null,
-  onClose: () => mixed,
+  onClose: () => unknown,
 }
 
 export const ResultModal = (props: ResultModalProps): JSX.Element => {

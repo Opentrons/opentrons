@@ -13,7 +13,7 @@ export type CommandListProps = {
   sessionStatus: SessionStatus,
   sessionStatusInfo: SessionStatusInfo,
   showSpinner: boolean,
-  onResetClick: () => mixed,
+  onResetClick: () => unknown,
 }
 
 export class CommandList extends React.Component<CommandListProps> {

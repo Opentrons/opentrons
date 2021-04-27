@@ -20,7 +20,7 @@ type OP = {
 }
 
 type DP = {
-  onConfirmClick: () => mixed,
+  onConfirmClick: () => unknown,
   jog: Jog,
 }
 

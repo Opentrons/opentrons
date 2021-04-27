@@ -36,7 +36,7 @@ const AN_ERROR_OCCURRED_WHILE_UPDATING =
 type Props = {
   robotName: string,
   mount: Mount,
-  closeModal: () => mixed,
+  closeModal: () => unknown,
 }
 
 export function ConfigurePipette(props: Props): JSX.Element {

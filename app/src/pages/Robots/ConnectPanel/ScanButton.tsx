@@ -6,7 +6,7 @@ import styles from './styles.css'
 
 export type ScanButtonProps = {
   isScanning: boolean,
-  onScanClick: () => mixed,
+  onScanClick: () => unknown,
   found: boolean,
 }
 

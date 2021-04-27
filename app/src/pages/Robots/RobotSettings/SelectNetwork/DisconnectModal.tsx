@@ -5,8 +5,8 @@ import * as Copy from './i18n'
 
 export type DisconnectModalProps = {
   ssid: string,
-  onDisconnect: () => mixed,
-  onCancel: () => mixed,
+  onDisconnect: () => unknown,
+  onCancel: () => unknown,
 }
 
 export const DisconnectModal = ({

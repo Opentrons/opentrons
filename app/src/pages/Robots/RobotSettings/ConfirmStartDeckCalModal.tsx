@@ -5,8 +5,8 @@ import { AlertModal } from '@opentrons/components'
 import styles from './styles.css'
 
 export type ConfirmStartDeckCalModalProps = {
-  cancel: () => mixed,
-  confirm: () => mixed,
+  cancel: () => unknown,
+  confirm: () => unknown,
 }
 
 export function ConfirmStartDeckCalModal(

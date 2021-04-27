@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 
 type SkipAppUpdateMessageProps = {
-  onClick: () => mixed,
+  onClick: () => unknown,
 }
 
 const SKIP_APP_MESSAGE =

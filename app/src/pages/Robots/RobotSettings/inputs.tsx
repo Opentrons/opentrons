@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 
 export type FormProps = {
-  onSubmit: () => mixed,
+  onSubmit: () => unknown,
   disabled?: boolean,
   children: React.ReactNode,
   className?: string,

@@ -22,8 +22,8 @@ export type ViewUpdateModalProps = {
   robotName: string,
   robotUpdateType: BuildrootUpdateType | null,
   robotSystemType: RobotSystemType | null,
-  close: () => mixed,
-  proceed: () => mixed,
+  close: () => unknown,
+  proceed: () => unknown,
 }
 
 export function ViewUpdateModal(props: ViewUpdateModalProps): JSX.Element {

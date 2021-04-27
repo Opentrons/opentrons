@@ -17,8 +17,8 @@ export type SelectSsidProps = {
   value: string | null,
   showWifiDisconnect: boolean,
   onConnect: (ssid: string) => mixed,
-  onJoinOther: () => mixed,
-  onDisconnect: () => mixed,
+  onJoinOther: () => unknown,
+  onDisconnect: () => unknown,
 }
 
 const FIELD_NAME = '__SelectSsid__'

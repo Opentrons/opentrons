@@ -14,7 +14,7 @@ export type RobotListItemProps = {
   isSelected: boolean,
   isLocal: boolean,
   isConnected: boolean,
-  onToggleConnect: () => mixed,
+  onToggleConnect: () => unknown,
 }
 
 export function RobotListItem(props: RobotListItemProps): JSX.Element {

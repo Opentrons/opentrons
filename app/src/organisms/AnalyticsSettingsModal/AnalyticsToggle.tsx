@@ -13,7 +13,7 @@ type OP = {}
 
 type SP = { optedIn: boolean }
 
-type DP = { toggleOptedIn: () => mixed }
+type DP = { toggleOptedIn: () => unknown }
 
 type Props = { ...SP, ...DP }
 

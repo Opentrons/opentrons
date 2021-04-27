@@ -19,10 +19,10 @@ export type RunControlsProps = {
   isPaused: boolean,
   isRunning: boolean,
   isBlocked: boolean,
-  onRunClick: () => mixed,
-  onPauseClick: () => mixed,
-  onResumeClick: () => mixed,
-  onResetClick: () => mixed,
+  onRunClick: () => unknown,
+  onPauseClick: () => unknown,
+  onResumeClick: () => unknown,
+  onResetClick: () => unknown,
 }
 
 export function RunControls(props: RunControlsProps): JSX.Element {
