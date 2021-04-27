@@ -9,7 +9,6 @@ import { ViewUpdateModal } from '../ViewUpdateModal'
 import { InstallModal } from '../InstallModal'
 
 import type { State } from '../../../../../redux/types'
-import type { ViewableRobot } from '../../../../../redux/discovery/types'
 
 // shallow render connected children
 jest.mock('../VersionInfoModal', () => ({
@@ -22,26 +21,15 @@ jest.mock('../ViewUpdateModal', () => ({
 
 jest.mock('../../../../../redux/buildroot/selectors')
 
-const getBuildrootUpdateAvailable: JestMockFn<
-  [State, ViewableRobot],
-  $Call<typeof Buildroot.getBuildrootUpdateAvailable, State, ViewableRobot>
-> = Buildroot.getBuildrootUpdateAvailable
-
-const getBuildrootSession: JestMockFn<
-  [State],
-  $Call<typeof Buildroot.getBuildrootSession, State>
-> = Buildroot.getBuildrootSession
-
-const getRobotSystemType: JestMockFn<
-  [ViewableRobot],
-  $Call<typeof Buildroot.getRobotSystemType, ViewableRobot>
-> = Buildroot.getRobotSystemType
+const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateAvailable>
+const getBuildrootSession = Buildroot.getBuildrootSession as jest.MockedFunction<typeof Buildroot.getBuildrootSession>
+const getRobotSystemType = Buildroot.getRobotSystemType as jest.MockedFunction<typeof Buildroot.getRobotSystemType>
 
 const MOCK_STATE: State = ({ mockState: true } as any)
 
 describe('UpdateBuildroot wizard', () => {
   const closeModal = jest.fn()
-  const render = () => {
+  const render = (): ReturnType<typeof mountWithStore> => {
     return mountWithStore(
       <UpdateBuildroot robot={mockRobot} close={closeModal} />,
       { initialState: MOCK_STATE }

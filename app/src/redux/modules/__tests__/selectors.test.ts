@@ -8,35 +8,29 @@ import type { State } from '../../types'
 
 jest.mock('../../robot/selectors')
 
-const mockGetConnectedRobotName: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getConnectedRobotName, State>
-> = RobotSelectors.getConnectedRobotName
-
-const mockGetProtocolModules: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getModules, State>
-> = RobotSelectors.getModules
-
-const mockGetProtocolIsRunning: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getIsRunning, State>
-> = RobotSelectors.getIsRunning
-
-type SelectorSpec = {
-  name: string,
-  selector: (State, ...any[]) => mixed,
-  state: Partial<State>,
-  args?: any[],
-  before?: () => mixed,
-  expected: mixed,
+const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<
+  typeof RobotSelectors.getConnectedRobotName
+>
+const mockGetProtocolModules = RobotSelectors.getModules as jest.MockedFunction<
+  typeof RobotSelectors.getModules
+>
+const mockGetProtocolIsRunning = RobotSelectors.getIsRunning as jest.MockedFunction<
+  typeof RobotSelectors.getIsRunning
+>
+interface SelectorSpec {
+  name: string
+  selector: (state: State, ...args: any[]) => unknown
+  state: State
+  args?: any[]
+  before?: () => unknown
+  expected: unknown
 }
 
 const SPECS: SelectorSpec[] = [
   {
     name: 'getAttachedModules returns no attached modules by default',
     selector: Selectors.getAttachedModules,
-    state: { modules: {} },
+    state: { modules: {} } as any,
     args: ['robotName'],
     expected: [],
   },
@@ -53,7 +47,7 @@ const SPECS: SelectorSpec[] = [
           },
         },
       },
-    },
+    } as any,
     args: ['robotName'],
     expected: [
       Fixtures.mockTemperatureModule,
@@ -71,17 +65,17 @@ const SPECS: SelectorSpec[] = [
           modulesById: {
             abc123: Fixtures.mockTemperatureModule,
             def456: Fixtures.mockMagneticModule,
-            ghi789: ({
+            ghi789: {
               ...Fixtures.mockThermocycler,
               data: {
                 ...Fixtures.mockThermocycler.data,
                 lid: 'closed',
               },
-            }: Types.ThermocyclerModule),
+            } as Types.ThermocyclerModule,
           },
         },
       },
-    },
+    } as any,
     args: [],
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
@@ -110,7 +104,7 @@ const SPECS: SelectorSpec[] = [
           },
         },
       },
-    },
+    } as any,
     args: [],
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
@@ -137,7 +131,7 @@ const SPECS: SelectorSpec[] = [
           },
         },
       },
-    },
+    } as any,
     args: [],
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
@@ -159,15 +153,15 @@ const SPECS: SelectorSpec[] = [
       modules: {
         robotName: {
           modulesById: {
-            abc123: ({
+            abc123: {
               ...Fixtures.mockMagneticModule,
               serial: 'abc123',
-            }: Types.MagneticModule),
+            } as Types.MagneticModule,
             def456: Fixtures.mockMagneticModule,
           },
         },
       },
-    },
+    } as any,
     args: [],
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
@@ -186,7 +180,7 @@ const SPECS: SelectorSpec[] = [
   {
     name: 'getModuleControlsDisabled returns connect message if not connected',
     selector: Selectors.getModuleControlsDisabled,
-    state: { modules: {} },
+    state: { modules: {} } as any,
     args: ['someOtherRobotName'],
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
@@ -196,7 +190,7 @@ const SPECS: SelectorSpec[] = [
   {
     name: 'getModuleControlsDisabled returns running message if running',
     selector: Selectors.getModuleControlsDisabled,
-    state: { modules: {} },
+    state: { modules: {} } as any,
     args: ['robotName'],
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
@@ -207,7 +201,7 @@ const SPECS: SelectorSpec[] = [
   {
     name: 'getModuleControlsDisabled returns null if can control',
     selector: Selectors.getModuleControlsDisabled,
-    state: { modules: {} },
+    state: { modules: {} } as any,
     args: ['robotName'],
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
@@ -219,7 +213,7 @@ const SPECS: SelectorSpec[] = [
     name:
       'getModuleControlsDisabled returns connect message if not connected and no robotName passed',
     selector: Selectors.getModuleControlsDisabled,
-    state: { modules: {} },
+    state: { modules: {} } as any,
     args: [],
     before: () => {
       mockGetConnectedRobotName.mockReturnValue(null)
@@ -230,7 +224,7 @@ const SPECS: SelectorSpec[] = [
     name:
       'getModuleControlsDisabled returns running message if running and no robotName passed',
     selector: Selectors.getModuleControlsDisabled,
-    state: { modules: {} },
+    state: { modules: {} } as any,
     args: [],
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')

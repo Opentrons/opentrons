@@ -9,7 +9,8 @@ import * as RobotSelectors from '../../../../redux/robot/selectors'
 import { ControlsCard } from '../ControlsCard'
 import { CONNECTABLE, UNREACHABLE } from '../../../../redux/discovery'
 
-import type { State, Action } from '../../../../redux/types'
+import type { ReactWrapper } from 'enzyme'
+import type { State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 jest.mock('../../../../redux/robot-controls/selectors')
@@ -33,21 +34,15 @@ const mockUnconnectableRobot: ViewableRobot = ({
   status: UNREACHABLE,
 } as any)
 
-const mockGetLightsOn: JestMockFn<
-  [State, string],
-  $Call<typeof RobotControls.getLightsOn, State, string>
-> = RobotControls.getLightsOn
+const mockGetLightsOn = RobotControls.getLightsOn as jest.MockedFunction<typeof RobotControls.getLightsOn>
 
-const mockGetIsRunning: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getIsRunning, State>
-> = RobotSelectors.getIsRunning
+const mockGetIsRunning = RobotSelectors.getIsRunning as jest.MockedFunction<typeof RobotSelectors.getIsRunning>
 
 const MOCK_STATE: State = ({ mockState: true } as any)
 
 describe('ControlsCard', () => {
-  const render = (robot: ViewableRobot = mockRobot) => {
-    return mountWithProviders<_, State, Action>(
+  const render = (robot: ViewableRobot = mockRobot): ReturnType<typeof mountWithProviders> => {
+    return mountWithProviders(
       <ControlsCard robot={robot} />,
       {
         initialState: MOCK_STATE,
@@ -56,11 +51,11 @@ describe('ControlsCard', () => {
     )
   }
 
-  const getHomeButton = wrapper => wrapper.find('button[children="home"]')
+  const getHomeButton = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('button[children="home"]')
 
-  const getRestartButton = wrapper => wrapper.find('button[children="restart"]')
+  const getRestartButton = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('button[children="restart"]')
 
-  const getLightsButton = wrapper => wrapper.find('ToggleBtn[label="lights"]')
+  const getLightsButton = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('ToggleBtn[label="lights"]')
 
   beforeEach(() => {
     jest.useFakeTimers()

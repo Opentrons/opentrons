@@ -9,6 +9,7 @@ import { TitledControl } from '../../../../atoms/TitledControl'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 
 import type { State } from '../../../../redux/types'
+import type { ReactWrapper } from 'enzyme'
 
 import { mockCalibrationCheckSessionAttributes } from '../../../../redux/sessions/__fixtures__'
 
@@ -18,27 +19,19 @@ jest.mock('../../../../organisms/CheckCalibration', () => ({
   CheckCalibration: () => <></>,
 }))
 
-const getRobotSessionOfType: JestMockFn<
-  [State, string, Sessions.SessionType],
-  $Call<
-    typeof Sessions.getRobotSessionOfType,
-    State,
-    string,
-    Sessions.SessionType
-  >
-> = Sessions.getRobotSessionOfType
+const getRobotSessionOfType = Sessions.getRobotSessionOfType as jest.MockedFunction<typeof Sessions.getRobotSessionOfType>
 
 const MOCK_STATE: State = ({ mockState: true } as any)
 
 describe('CheckCalibrationControl', () => {
-  const getCalCheckButton = wrapper =>
+  const getCalCheckButton = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper
       .find('TitledControl[title="calibration health check"]')
       .find('button')
 
   const render = (
-    props: Partial<React.ElementProps<typeof CheckCalibrationControl>> = {}
-  ) => {
+    props: Partial<React.ComponentProps<typeof CheckCalibrationControl>> = {}
+  ): ReturnType<typeof mountWithProviders> => {
     const { robotName = 'robot-name', disabledReason = null } = props
     return mountWithProviders(
       <CheckCalibrationControl

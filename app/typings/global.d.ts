@@ -7,6 +7,7 @@ declare global {
         ipcRenderer: IpcRenderer
         [key: string]: unknown
       }
+      [key: string]: unknown
     }
   }
 }

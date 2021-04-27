@@ -8,7 +8,6 @@ import { ConnectionCard } from '../ConnectionCard'
 import { SelectNetwork } from '../SelectNetwork'
 import { ConnectionStatusMessage } from '../connection'
 
-import type { State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 jest.mock('../../../../redux/networking/selectors')
@@ -25,18 +24,12 @@ const mockRobot: ViewableRobot = ({
   ip: '1.2.3.4',
 } as any)
 
-const mockGetInternetStatus: JestMockFn<
-  [State, string],
-  $Call<typeof Networking.getInternetStatus, State, string>
-> = Networking.getInternetStatus
+const mockGetInternetStatus = Networking.getInternetStatus as jest.MockedFunction<typeof Networking.getInternetStatus>
 
-const mockGetNetworkInterfaces: JestMockFn<
-  [State, string],
-  $Call<typeof Networking.getNetworkInterfaces, State, string>
-> = Networking.getNetworkInterfaces
+const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<typeof Networking.getNetworkInterfaces>
 
 describe('ConnectionCard', () => {
-  let render
+  let render: (robot?: ViewableRobot) => ReturnType<typeof mountWithProviders>
 
   beforeEach(() => {
     jest.useFakeTimers()

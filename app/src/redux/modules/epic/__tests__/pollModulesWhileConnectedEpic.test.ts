@@ -8,20 +8,17 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { modulesEpic } from '../../epic'
 
-import type { State } from '../../../types'
-
 jest.mock('../../../robot/selectors')
 
 const mockState = { state: true }
 const { mockRobot } = Fixtures
 
-const mockGetConnectedRobotName: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getConnectedRobotName, State>
-> = RobotSelectors.getConnectedRobotName
+const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<
+  typeof RobotSelectors.getConnectedRobotName
+>
 
 describe('pollModulesWhileConnectedEpic', () => {
-  let testScheduler
+  let testScheduler: any
 
   beforeEach(() => {
     testScheduler = new TestScheduler((actual, expected) => {

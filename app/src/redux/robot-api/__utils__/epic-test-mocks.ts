@@ -14,41 +14,39 @@ import type {
 jest.mock('../http')
 jest.mock('../../discovery/selectors')
 
-const mockFetchRobotApi: JestMockFn<
-  [RobotHost, RobotApiRequestOptions],
-  $Call<typeof RobotApiHttp.fetchRobotApi, RobotHost, RobotApiRequestOptions>
-> = RobotApiHttp.fetchRobotApi
+const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
+  typeof RobotApiHttp.fetchRobotApi
+>
+const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
+  typeof DiscoverySelectors.getRobotByName
+>
 
-const mockGetRobotByName: JestMockFn<
-  [State, string],
-  RobotHost
-> = (DiscoverySelectors.getRobotByName as any)
-
-export type EpicTestMocks<A, R> = {
-  state: State,
-  action: A,
-  response: R | void,
-  robot: RobotHost,
-  meta: typeof mockRequestMeta,
-  getRobotByName: typeof mockGetRobotByName,
-  fetchRobotApi: typeof mockFetchRobotApi,
-  testScheduler: any,
+export interface EpicTestMocks<A, R> {
+  state: State
+  action: A
+  response: R | void
+  robot: RobotHost
+  meta: typeof mockRequestMeta
+  getRobotByName: typeof mockGetRobotByName
+  fetchRobotApi: typeof mockFetchRobotApi
+  testScheduler: any
 }
 
+interface TriggerAction {
+  meta: { requestId: string; [key: string]: unknown }
+  [key: string]: unknown
+}
 /**
  * Sets up the necessary mocks for robot HTTP API epic testing. Remember to
  * call `jest.resetAllMocks()` in `afterEach`!
  *
  * @returns {EpicTestMocks}
  */
-export const setupEpicTestMocks = <
-  A: { meta: { requestId: string, ... }, ... },
-  R: RobotApiResponse
->(
+export const setupEpicTestMocks = <A = TriggerAction, R = RobotApiResponse>(
   makeTriggerAction?: (robotName: string) => A,
   mockResponse?: R
 ): EpicTestMocks<A, R> => {
-  const mockState: State = ({ state: true, mock: true }  as any)
+  const mockState: State = { state: true, mock: true } as any
   const triggerAction =
     typeof makeTriggerAction === 'function'
       ? makeTriggerAction(mockRobot.name)
@@ -82,9 +80,9 @@ export const setupEpicTestMocks = <
   }
 }
 
-export const runEpicTest = <A, R: RobotApiResponse>(
+export const runEpicTest = <A, R = RobotApiResponse>(
   epicMocks: EpicTestMocks<A, R>,
-  run: (schedularArgs as any) => mixed
+  run: (schedularArgs: any) => mixed
 ) => {
   const { testScheduler, fetchRobotApi, response } = epicMocks
 

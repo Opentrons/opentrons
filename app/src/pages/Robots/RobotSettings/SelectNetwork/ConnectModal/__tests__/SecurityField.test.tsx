@@ -11,10 +11,7 @@ import { SECURITY_NONE, SECURITY_WPA_PSK } from '../../constants'
 
 jest.mock('../form-state')
 
-const useConnectFormField: JestMockFn<
-  [string],
-  $Call<typeof FormState.useConnectFormField, string>
-> = FormState.useConnectFormField
+const useConnectFormField = FormState.useConnectFormField as jest.MockedFunction<typeof FormState.useConnectFormField>
 
 describe('ConnectModal SecurityField', () => {
   const fieldId = 'field-id'
@@ -29,7 +26,7 @@ describe('ConnectModal SecurityField', () => {
   const setValue = jest.fn()
   const setTouched = jest.fn()
 
-  const render = (value = null, error = null, showAllOptions = false) => {
+  const render = (value: any | null = null, error: any | null = null, showAllOptions: any | null = false): ReturnType<typeof mount> => {
     useConnectFormField.mockImplementation(name => {
       expect(name).toBe(fieldName)
       return {

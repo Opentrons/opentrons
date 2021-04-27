@@ -69,6 +69,7 @@ declare module '@opentrons/shared-data' {
   export type PipetteModelSpecs = Record<string, any> // stubbed
   export function getAllPipetteNames(...a: any[]): any // stubbed
   export function getPipetteNameSpecs(s: string): any // stubbed
+  export function getPipetteModelSpecs(s: string): any // stubbed
 
   // MODULE DEF TYPES
 

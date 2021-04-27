@@ -23,8 +23,8 @@ export type ConnectModalProps = {
   network: WifiNetwork | null,
   wifiKeys: WifiKey[],
   eapOptions: EapOption[],
-  onConnect: WifiConfigureRequest => mixed,
-  onCancel: () => mixed,
+  onConnect: (r: WifiConfigureRequest) => unknown,
+  onCancel: () => unknown,
 }
 
 export const ConnectModal = (props: ConnectModalProps): JSX.Element => {

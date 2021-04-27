@@ -20,15 +20,15 @@ import { mockTipLengthCalibration1 } from '../../../../redux/calibration/tip-len
 
 import { CONNECTABLE, UNREACHABLE } from '../../../../redux/discovery'
 
-import type { State, Action } from '../../../../redux/types'
+import type { State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
-import type { AnalyticsEvent } from '../../../../redux/analytics/types'
+import type { ReactWrapper } from 'enzyme'
 import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
 } from '../../../../redux/pipettes/types'
 
-const mockCallTrackEvent: JestMockFn<[AnalyticsEvent], void> = jest.fn()
+const mockCallTrackEvent = jest.fn()
 
 jest.mock('react-router-dom', () => ({ Link: 'a' }))
 jest.mock('file-saver')
@@ -54,10 +54,7 @@ jest.mock('../PipetteOffsets', () => ({
 
 const MOCK_STATE: State = ({ mockState: true } as any)
 
-const mockGetIsRunning: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getIsRunning, State>
-> = RobotSelectors.getIsRunning
+const mockGetIsRunning = RobotSelectors.getIsRunning as jest.MockedFunction<typeof RobotSelectors.getIsRunning>
 
 const mockUnconnectableRobot: ViewableRobot = ({
   name: 'robot-name',
@@ -87,38 +84,30 @@ const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = ({
   },
 } as any)
 
-const getAttachedPipettes: JestMockFn<
-  [State, string],
-  $Call<typeof Pipettes.getAttachedPipettes, State, string>
-> = Pipettes.getAttachedPipettes
+const getAttachedPipettes
+ = Pipettes.getAttachedPipettes as jest.MockedFunction<typeof Pipettes.getAttachedPipettes>
 
-const getAttachedPipetteCalibrations: JestMockFn<
-  [State, string],
-  $Call<typeof Pipettes.getAttachedPipetteCalibrations, State, string>
-> = Pipettes.getAttachedPipetteCalibrations
+const getAttachedPipetteCalibrations
+ = Pipettes.getAttachedPipetteCalibrations as jest.MockedFunction<typeof Pipettes.getAttachedPipetteCalibrations>
 
-const getFeatureFlags: JestMockFn<
-  [State],
-  $Call<typeof Config.getFeatureFlags, State>
-> = Config.getFeatureFlags
+const getFeatureFlags
+ = Config.getFeatureFlags as jest.MockedFunction<typeof Config.getFeatureFlags>
 
-const getDeckCalibrationStatus: JestMockFn<
-  [State, string],
-  $Call<typeof Calibration.getDeckCalibrationStatus, State, string>
-> = Calibration.getDeckCalibrationStatus
+const getDeckCalibrationStatus
+ = Calibration.getDeckCalibrationStatus as jest.MockedFunction<typeof Calibration.getDeckCalibrationStatus>
 
-const getDeckCalButton = wrapper =>
+const getDeckCalButton = (wrapper: ReactWrapper): ReactWrapper =>
   wrapper.find('DeckCalibrationControl').find('button')
 
-const getCheckCalibrationControl = wrapper =>
-  wrapper.find(CheckCalibrationControl)
+const getCheckCalibrationControl = (wrapper: ReactWrapper): ReactWrapper =>
+  wrapper.find('CheckCalibrationControl')
 
-const getDownloadButton = wrapper =>
+const getDownloadButton = (wrapper: ReactWrapper): ReactWrapper =>
   wrapper.find('a').filter({ children: 'Download your calibration data' })
 
 describe('CalibrationCard', () => {
-  const render = (robot: ViewableRobot = mockRobot) => {
-    return mountWithProviders<_, State, Action>(
+  const render = (robot: ViewableRobot = mockRobot): ReturnType<typeof mountWithProviders> => {
+    return mountWithProviders(
       <CalibrationCard robot={robot} pipettesPageUrl={'fake-url'} />,
       { initialState: MOCK_STATE, i18n }
     )
@@ -126,7 +115,7 @@ describe('CalibrationCard', () => {
 
   const realBlob = global.Blob
   beforeAll(() => {
-    global.Blob = function (content, options) {
+    global.Blob = function (content: any, options: any) {
       return { content, options }
     }
   })

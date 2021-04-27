@@ -2,7 +2,7 @@ import * as React from 'react'
 import { shallow } from 'enzyme'
 
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
-import { SelectField } from '@opentrons/components'
+import { SelectField, SelectOptionGroup } from '@opentrons/components'
 import { UploadKeyInput } from '../UploadKeyInput'
 import { KeyFileField } from '../KeyFileField'
 import * as FormState from '../form-state'
@@ -11,10 +11,7 @@ import { LABEL_ADD_NEW_KEY } from '../../i18n'
 
 jest.mock('../form-state')
 
-const useConnectFormField: JestMockFn<
-  [string],
-  $Call<typeof FormState.useConnectFormField, string>
-> = FormState.useConnectFormField
+const useConnectFormField = FormState.useConnectFormField as jest.MockedFunction<typeof FormState.useConnectFormField>
 
 describe('ConnectModal KeyFileField', () => {
   const fieldId = 'field-id'
@@ -31,7 +28,7 @@ describe('ConnectModal KeyFileField', () => {
   const setValue = jest.fn()
   const setTouched = jest.fn()
 
-  const render = (value = null) => {
+  const render = (value: any | null = null): ReturnType<typeof shallow> => {
     useConnectFormField.mockImplementation(name => {
       expect(name).toBe(fieldName)
       return {
@@ -131,7 +128,7 @@ describe('ConnectModal KeyFileField', () => {
   it('does not update the field value when add new option is selected', () => {
     const wrapper = render()
     const select = wrapper.find(SelectField)
-    const options = select.prop('options').flatMap(o => o.options)
+    const options = select.prop('options').flatMap((o: SelectOptionGroup) => o.options)
     const addNewOpt = options.find(o => o?.label === LABEL_ADD_NEW_KEY)
 
     select.invoke('onValueChange')(fieldName, addNewOpt?.value)

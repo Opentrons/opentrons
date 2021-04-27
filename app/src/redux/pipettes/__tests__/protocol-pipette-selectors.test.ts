@@ -13,33 +13,29 @@ jest.mock('../../calibration/pipette-offset/selectors')
 
 interface SelectorSpec {
   name: string
-  state: Partial<State>
-  expected: mixed
+  state: State
+  expected: unknown
   matching: boolean
   calibrated: boolean
-  before?: () => mixed
-  after?: () => mixed
+  before?: () => unknown
+  after?: () => unknown
 }
 
-const mockGetPipetteOffsetCalibrations: JestMockFn<
-  [State, string],
-  $Call<typeof POCSelectors.getPipetteOffsetCalibrations, State, string>
-> = POCSelectors.getPipetteOffsetCalibrations
+const mockGetPipetteOffsetCalibrations = POCSelectors.getPipetteOffsetCalibrations as jest.MockedFunction<
+  typeof POCSelectors.getPipetteOffsetCalibrations
+>
 
-const mockGetPipetteModelSpecs: JestMockFn<
-  [string],
-  $Call<typeof SharedData.getPipetteModelSpecs, string>
-> = SharedData.getPipetteModelSpecs
+const mockGetPipetteModelSpecs = SharedData.getPipetteModelSpecs as jest.MockedFunction<
+  typeof SharedData.getPipetteModelSpecs
+>
 
-const mockGetPipetteNameSpecs: JestMockFn<
-  [string],
-  $Call<typeof SharedData.getPipetteNameSpecs, string>
-> = SharedData.getPipetteNameSpecs
+const mockGetPipetteNameSpecs = SharedData.getPipetteNameSpecs as jest.MockedFunction<
+  typeof SharedData.getPipetteNameSpecs
+>
 
-const mockGetProtocolPipettes: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getPipettes, State>
-> = RobotSelectors.getPipettes
+const mockGetProtocolPipettes = RobotSelectors.getPipettes as jest.MockedFunction<
+  typeof RobotSelectors.getPipettes
+>
 
 const mockLeftPipette: any = {
   id: 'abc',
@@ -106,7 +102,7 @@ const SPECS: SelectorSpec[] = [
           settingsById: null,
         },
       },
-    },
+    } as any,
     expected: {
       left: {
         compatibility: 'match',
@@ -183,7 +179,7 @@ const SPECS: SelectorSpec[] = [
           settingsById: null,
         },
       },
-    },
+    } as any,
     before: () => {
       mockGetProtocolPipettes.mockReturnValue([
         mockLeftProtoPipette,
@@ -237,7 +233,7 @@ const SPECS: SelectorSpec[] = [
           settingsById: null,
         },
       },
-    },
+    } as any,
     before: () => {
       mockGetProtocolPipettes.mockReturnValue([
         { ...mockLeftProtoPipette, modelSpecs: mockLeftLegacySpecs },
@@ -284,7 +280,7 @@ const SPECS: SelectorSpec[] = [
           settingsById: null,
         },
       },
-    },
+    } as any,
     matching: true,
     calibrated: true,
     before: () => {
@@ -331,7 +327,7 @@ const SPECS: SelectorSpec[] = [
           settingsById: null,
         },
       },
-    },
+    } as any,
     expected: {
       left: {
         compatibility: 'inexact_match',
@@ -385,7 +381,7 @@ const SPECS: SelectorSpec[] = [
           settingsById: null,
         },
       },
-    },
+    } as any,
     expected: {
       left: {
         compatibility: 'inexact_match',
@@ -440,7 +436,7 @@ const SPECS: SelectorSpec[] = [
           settingsById: null,
         },
       },
-    },
+    } as any,
     expected: {
       left: {
         compatibility: 'match',

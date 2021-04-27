@@ -10,23 +10,16 @@ import {
 import { SecondaryBtn, Icon } from '@opentrons/components'
 import { StatusCard } from '../StatusCard'
 
-import type { State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 jest.mock('../../../../redux/robot/selectors')
 
-const getSessionStatus: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getSessionStatus, any>
-> = RobotSelectors.getSessionStatus
+const getSessionStatus = RobotSelectors.getSessionStatus as jest.MockedFunction<typeof RobotSelectors.getSessionStatus>
 
-const getConnectRequest: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getConnectRequest, any>
-> = RobotSelectors.getConnectRequest
+const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<typeof RobotSelectors.getConnectRequest>
 
 describe('RobotSettings StatusCard', () => {
-  const render = (robot: ViewableRobot = Fixtures.mockConnectableRobot) => {
+  const render = (robot: ViewableRobot = Fixtures.mockConnectableRobot): ReturnType<typeof mountWithProviders> => {
     return mountWithProviders(<StatusCard robot={robot} />, {
       i18n,
     })

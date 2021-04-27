@@ -17,34 +17,30 @@ import {
   CALIBRATION_SOURCE_UNKNOWN,
 } from '../../../../redux/calibration'
 import { DeckCalibrationControl } from '../DeckCalibrationControl'
-import { InlineCalibrationWarning } from '../../../../molecules/InlineCalibrationWarning'
 
-import type { State } from '../../../../redux/types'
+import type { ReactWrapper } from 'enzyme'
 
 jest.mock('../../../../redux/robot-api/selectors')
 jest.mock('../../../../redux/sessions/selectors')
 
-const mockGetRequestById: JestMockFn<
-  [State, string],
-  $Call<typeof RobotApi.getRequestById, State, string>
-> = RobotApi.getRequestById
+const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<typeof RobotApi.getRequestById>
 
 describe('DeckCalibrationControl', () => {
-  let render
+  let render: ((props?: Partial<React.ComponentProps<typeof DeckCalibrationControl>>) => ReturnType<typeof mountWithProviders>)
 
-  const getDeckCalButton = wrapper =>
+  const getDeckCalButton = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('DeckCalibrationControl').find('button')
 
-  const getCancelDeckCalButton = wrapper =>
+  const getCancelDeckCalButton = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('OutlineButton[children="cancel"]').find('button')
 
-  const getConfirmDeckCalButton = wrapper =>
+  const getConfirmDeckCalButton = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('OutlineButton[children="continue"]').find('button')
 
-  const getCalibrationWarning = wrapper =>
-    wrapper.find(InlineCalibrationWarning)
+  const getCalibrationWarning = (wrapper: ReactWrapper): ReactWrapper =>
+    wrapper.find('InlineCalibrationWarning')
 
-  const getFailedStartModal = wrapper =>
+  const getFailedStartModal = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('AlertModal[heading="Failed to start deck calibration"]')
 
   beforeEach(() => {
@@ -131,7 +127,7 @@ describe('DeckCalibrationControl', () => {
         },
       })
       expect(
-        wrapper.findWhere(elem => elem.prop('fontStyle') === 'italic').html()
+        wrapper.findWhere((elem: ReactWrapper) => elem.prop('fontStyle') === 'italic').html()
       ).toMatch(spec.shouldMatch)
     })
   })

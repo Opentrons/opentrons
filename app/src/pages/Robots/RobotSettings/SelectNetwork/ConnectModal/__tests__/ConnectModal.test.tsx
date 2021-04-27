@@ -7,36 +7,15 @@ import * as FormFields from '../form-fields'
 
 import { ConnectModal, ConnectModalComponent } from '..'
 import { FormModal } from '../FormModal'
-
-import type {
-  WifiNetwork,
-  EapOption,
-  WifiKey,
-  ConnectFormValues,
-} from '../../types'
+import { ConnectFormField } from '../../types'
 
 jest.mock('../form-fields')
 
-const getConnectFormFields: JestMockFn<
-  [
-    WifiNetwork | null,
-    string,
-    EapOption[],
-    WifiKey[],
-    ConnectFormValues
-  ],
-  $Call<typeof FormFields.getConnectFormFields, any, any, any, any, any>
-> = FormFields.getConnectFormFields
+const getConnectFormFields = FormFields.getConnectFormFields as jest.MockedFunction<typeof FormFields.getConnectFormFields>
 
-const validateConnectFormFields: JestMockFn<
-  [WifiNetwork | null, EapOption[], ConnectFormValues],
-  $Call<typeof FormFields.validateConnectFormFields, any, any, any>
-> = FormFields.validateConnectFormFields
+const validateConnectFormFields = FormFields.validateConnectFormFields as jest.MockedFunction<typeof FormFields.validateConnectFormFields>
 
-const connectFormToConfigureRequest: JestMockFn<
-  [WifiNetwork | null, ConnectFormValues],
-  $Call<typeof FormFields.connectFormToConfigureRequest, any, any, any>
-> = FormFields.connectFormToConfigureRequest
+const connectFormToConfigureRequest = FormFields.connectFormToConfigureRequest as jest.MockedFunction<typeof FormFields.connectFormToConfigureRequest>
 
 const robotName = 'robotName'
 const eapOptions = [Fixtures.mockEapOption]
@@ -57,7 +36,7 @@ describe("SelectNetwork's ConnectModal", () => {
   })
 
   describe('Formik wrapper', () => {
-    const render = (network = null) => {
+    const render = (network: React.ComponentProps<typeof ConnectModal>['network'] | null = null): ReturnType<typeof shallow> => {
       return shallow(
         <ConnectModal
           {...{
@@ -144,7 +123,7 @@ describe("SelectNetwork's ConnectModal", () => {
     const handleSubmit = jest.fn()
     const handleValidate = jest.fn()
 
-    const render = (network = null) => {
+    const render = (network: React.ComponentProps<typeof ConnectModalComponent>['network'] | null = null): ReturnType<typeof mount> => {
       return mount(
         <ConnectModalComponent
           {...{
@@ -185,14 +164,14 @@ describe("SelectNetwork's ConnectModal", () => {
     })
 
     it('passes fields to the connect form modal', () => {
-      const mockFields = [
+      const mockFields: ConnectFormField[] = [
         {
           type: 'text',
           name: 'fieldName',
           label: '* Field Name',
           isPassword: false,
         },
-      ]
+      ] as any
 
       getConnectFormFields.mockReturnValue(mockFields)
 

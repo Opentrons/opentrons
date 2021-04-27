@@ -8,8 +8,6 @@ import {
 } from '../../../../redux/calibration'
 import { useCalibratePipetteOffset } from '../../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
 
-import type { State } from '../../../../redux/types'
-
 import { PipetteInfo } from '../PipetteInfo'
 import { mockAttachedPipette } from '../__fixtures__'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
@@ -29,45 +27,18 @@ jest.mock('react-router-dom', () => ({ Link: () => <></> }))
 jest.mock('../../../../redux/discovery')
 jest.mock('../../../../redux/robot/selectors')
 
-const mockGetCustomLabwareDefinitions: JestMockFn<
-  [State],
-  $Call<typeof getCustomLabwareDefinitions, State>
-> = getCustomLabwareDefinitions
-
-const mockGetCalibrationForPipette: JestMockFn<
-  [State, string, string, string],
-  $Call<typeof getCalibrationForPipette, State, string, string, string>
-> = getCalibrationForPipette
-
-const mockGetTipLengthForPipetteAndTiprack: JestMockFn<
-  [State, string, string, string],
-  $Call<typeof getTipLengthForPipetteAndTiprack, State, string, string, string>
-> = getTipLengthForPipetteAndTiprack
-
-const mockUseCalibratePipetteOffset: JestMockFn<
-  [string, {}, null],
-  $Call<typeof useCalibratePipetteOffset, string, {}, null>
-> = useCalibratePipetteOffset
-
-const mockGetHasCalibrationBlock: JestMockFn<
-  [State],
-  $Call<typeof Config.getHasCalibrationBlock, State>
-> = Config.getHasCalibrationBlock
-
-const mockGetRobotByName: JestMockFn<
-  [State, string],
-  $Call<typeof getRobotByName, State, string>
-> = getRobotByName
-
-const mockGetIsRunning: JestMockFn<
-  [State],
-  $Call<typeof getIsRunning, State>
-> = getIsRunning
+const mockGetCustomLabwareDefinitions = getCustomLabwareDefinitions as jest.MockedFunction<typeof getCustomLabwareDefinitions>
+const mockGetCalibrationForPipette = getCalibrationForPipette as jest.MockedFunction<typeof getCalibrationForPipette>
+const mockGetTipLengthForPipetteAndTiprack = getTipLengthForPipetteAndTiprack as jest.MockedFunction<typeof getTipLengthForPipetteAndTiprack>
+const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<typeof useCalibratePipetteOffset>
+const mockGetHasCalibrationBlock = Config.getHasCalibrationBlock as jest.MockedFunction<typeof Config.getHasCalibrationBlock>
+const mockGetRobotByName = getRobotByName as jest.MockedFunction<typeof getRobotByName>
+const mockGetIsRunning = getIsRunning as jest.MockedFunction<typeof getIsRunning>
 
 describe('PipetteInfo', () => {
   const robotName = 'robot-name'
-  let render
-  let startWizard
+  let render: ((props?: Partial<React.ComponentProps<typeof PipetteInfo>>) => ReturnType<typeof mountWithStore>)
+  let startWizard: any
 
   beforeEach(() => {
     startWizard = jest.fn()
@@ -79,7 +50,7 @@ describe('PipetteInfo', () => {
     mockGetIsRunning.mockReturnValue(false)
     mockGetRobotByName.mockReturnValue(mockConnectedRobot)
 
-    render = (props: Partial<React.ElementProps<typeof PipetteInfo>> = {}) => {
+    render = (props = {}) => {
       const { pipette = mockAttachedPipette } = props
       return mountWithStore(
         <PipetteInfo

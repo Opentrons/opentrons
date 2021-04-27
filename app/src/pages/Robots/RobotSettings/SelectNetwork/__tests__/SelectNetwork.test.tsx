@@ -17,7 +17,9 @@ import { DisconnectModal } from '../DisconnectModal'
 import { ResultModal } from '../ResultModal'
 import { SelectNetwork } from '..'
 
+import type { ReactWrapper } from 'enzyme'
 import type { State } from '../../../../../redux/types'
+import { RequestState } from '../../../../../redux/robot-api/types'
 
 jest.mock('../../../../../redux/networking/selectors')
 jest.mock('../../../../../redux/robot-api/selectors')
@@ -48,35 +50,20 @@ const mockWifiKeys = [
 
 const mockEapOptions = [Fixtures.mockEapOption]
 
-const mockGetWifiList: JestMockFn<
-  [State, string],
-  $Call<typeof Networking.getWifiList, State, string>
-> = Networking.getWifiList
+const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<typeof Networking.getWifiList>
 
-const mockGetWifiKeys: JestMockFn<
-  [State, string],
-  $Call<typeof Networking.getWifiKeys, State, string>
-> = Networking.getWifiKeys
+const mockGetWifiKeys = Networking.getWifiKeys as jest.MockedFunction<typeof Networking.getWifiKeys>
 
-const mockGetEapOptions: JestMockFn<
-  [State, string],
-  $Call<typeof Networking.getEapOptions, State, string>
-> = Networking.getEapOptions
+const mockGetEapOptions = Networking.getEapOptions as jest.MockedFunction<typeof Networking.getEapOptions>
 
-const mockGetCanDisconnect: JestMockFn<
-  [State, string],
-  $Call<typeof Networking.getCanDisconnect, State, string>
-> = Networking.getCanDisconnect
+const mockGetCanDisconnect = Networking.getCanDisconnect as jest.MockedFunction<typeof Networking.getCanDisconnect>
 
-const mockGetRequestById: JestMockFn<
-  [State, string],
-  $Call<typeof RobotApi.getRequestById, State, string>
-> = RobotApi.getRequestById
+const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<typeof RobotApi.getRequestById>
 
 describe('<SelectNetwork />', () => {
-  let dispatch
-  let mockStore
-  let render
+  let dispatch: any
+  let mockStore: any
+  let render: (() => ReactWrapper)
 
   beforeEach(() => {
     dispatch = jest.fn()
@@ -158,8 +145,8 @@ describe('<SelectNetwork />', () => {
   })
 
   describe('disconnecting from the active network', () => {
-    let wrapper
-    let disconnectModal
+    let wrapper: ReactWrapper
+    let disconnectModal: ReactWrapper
 
     beforeEach(() => {
       wrapper = render()
@@ -170,7 +157,7 @@ describe('<SelectNetwork />', () => {
       })
       wrapper.update()
 
-      disconnectModal = wrapper.find(DisconnectModal)
+      disconnectModal = wrapper.find('DisconnectModal')
     })
 
     it('renders a DisconnectModal on SelectSsid::onDisconnect', () => {
@@ -188,13 +175,13 @@ describe('<SelectNetwork />', () => {
     })
 
     describe('dispatching the request', () => {
-      let requestId
+      let requestId: string | null
 
-      const disconnectAndSetMockRequestState = (requestState = null) => {
+      const disconnectAndSetMockRequestState = (requestState: RequestState | null = null) => {
         act(() => {
           disconnectModal.invoke('onDisconnect')()
           const actionCall = dispatch.mock.calls.find(
-            call => call[0].type === Networking.POST_WIFI_DISCONNECT
+            (call: any) => call[0].type === Networking.POST_WIFI_DISCONNECT
           )
           requestId = actionCall?.[0].meta.requestId
 
@@ -259,7 +246,7 @@ describe('<SelectNetwork />', () => {
 
         expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
-          RobotApi.dismissRequest(((requestId as any): string))
+          RobotApi.dismissRequest(requestId as any)
         )
       })
 
@@ -288,15 +275,15 @@ describe('<SelectNetwork />', () => {
 
         expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
-          RobotApi.dismissRequest(((requestId as any): string))
+          RobotApi.dismissRequest(requestId as any)
         )
       })
     })
   })
 
   describe('joining a network', () => {
-    let wrapper
-    let connectModal
+    let wrapper: ReactWrapper
+    let connectModal: ReactWrapper
 
     beforeEach(() => {
       wrapper = render()
@@ -308,7 +295,7 @@ describe('<SelectNetwork />', () => {
       })
       wrapper.update()
 
-      connectModal = wrapper.find(ConnectModal)
+      connectModal = wrapper.find('ConnectModal')
     })
 
     it('renders a ConnectModal on SelectSsid::onSelect', () => {
@@ -339,7 +326,7 @@ describe('<SelectNetwork />', () => {
         selectSsid.invoke('onJoinOther')()
       })
       wrapper.update()
-      connectModal = wrapper.find(Portal).find(ConnectModal)
+      connectModal = wrapper.find(Portal).find('ConnectModal')
 
       expect(connectModal).toHaveLength(1)
       expect(connectModal.props()).toEqual({
@@ -379,13 +366,13 @@ describe('<SelectNetwork />', () => {
 
     describe('dispatching the request', () => {
       const mockConfigure = { ssid: mockWifiList[1].ssid, psk: 'password' }
-      let requestId
+      let requestId: string | null
 
-      const connectAndSetMockRequestState = (requestState = null) => {
+      const connectAndSetMockRequestState = (requestState: RequestState | null = null) => {
         act(() => {
           connectModal.invoke('onConnect')(mockConfigure)
           const actionCall = dispatch.mock.calls.find(
-            call => call[0].type === Networking.POST_WIFI_CONFIGURE
+            (call: any) => call[0].type === Networking.POST_WIFI_CONFIGURE
           )
           requestId = actionCall?.[0].meta.requestId
 
@@ -447,7 +434,7 @@ describe('<SelectNetwork />', () => {
 
         expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
-          RobotApi.dismissRequest(((requestId as any): string))
+          RobotApi.dismissRequest(requestId as any)
         )
       })
 
@@ -476,7 +463,7 @@ describe('<SelectNetwork />', () => {
 
         expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
-          RobotApi.dismissRequest(((requestId as any): string))
+          RobotApi.dismissRequest(requestId as any)
         )
       })
 

@@ -15,11 +15,10 @@ import { U2EDriverWarning } from '../U2EDriverWarning'
 
 jest.mock('../../../../redux/analytics')
 
-const useTrackEvent: JestMockFn<[], $Call<typeof Analytics.useTrackEvent>> =
-  Analytics.useTrackEvent
+const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<typeof Analytics.useTrackEvent>
 
 describe('U2EDriverWarning', () => {
-  const trackEvent = jest.fn()
+  const trackEvent: ReturnType<typeof Analytics.useTrackEvent> = jest.fn() as any
 
   beforeEach(() => {
     useTrackEvent.mockReturnValue(trackEvent)

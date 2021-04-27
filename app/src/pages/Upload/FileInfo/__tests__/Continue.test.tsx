@@ -12,7 +12,7 @@ import type { State } from '../../../../redux/types'
 
 jest.mock('../../../../redux/nav')
 
-const MOCK_STATE: State = { mockState: true }  as any
+const MOCK_STATE: State = { mockState: true } as any
 
 const MOCK_STORE = {
   getState: () => MOCK_STATE,
@@ -20,20 +20,17 @@ const MOCK_STORE = {
   subscribe: noop,
 }
 
-const getCalibrateLocation: JestMockFn<
-  [State],
-  $Call<typeof navigation.getCalibrateLocation, State>
-> = navigation.getCalibrateLocation
+const getCalibrateLocation = navigation.getCalibrateLocation as jest.MockedFunction<typeof navigation.getCalibrateLocation>
 
-function stubSelector<R>(mock: JestMockFn<[State], R>, rVal: R) {
-  mock.mockImplementation(state => {
+function stubSelector<R>(mock: jest.MockedFunction<typeof navigation.getCalibrateLocation>, rVal: R): void {
+  mock.mockImplementation((state: State): R => {
     expect(state).toBe(MOCK_STATE)
     return rVal
   })
 }
 
 describe('Continue to run or calibration button component', () => {
-  const render = (labwareCalibrated: boolean = false) => {
+  const render = (labwareCalibrated: boolean = false): ReturnType<typeof mount> => {
     return mount(
       <Provider store={MOCK_STORE}>
         <StaticRouter context={{}} location={'/upload/file-info'}>

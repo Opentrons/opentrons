@@ -7,25 +7,20 @@ import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
 import * as Networking from '../../../../../../redux/networking'
 import { UploadKeyInput } from '../UploadKeyInput'
 
-import type { State } from '../../../../../../redux/types'
-
 jest.mock('../../../../../../redux/networking/selectors')
 
 const mockState = { state: true, mock: true }
 const mockRobotName = 'robot-name'
 const mockFile = new File(['key-contents'], 'key.crt')
 
-const mockGetWifiKeyByRequestId: JestMockFn<
-  [State, string, string | null],
-  $Call<typeof Networking.getWifiKeyByRequestId, State, string, string | null>
-> = Networking.getWifiKeyByRequestId
+const mockGetWifiKeyByRequestId = Networking.getWifiKeyByRequestId as jest.MockedFunction<typeof Networking.getWifiKeyByRequestId>
 
 describe('ConnectForm UploadKey input field', () => {
   const handleUpload = jest.fn()
   const label = 'field-label'
-  let dispatch
-  let mockStore
-  let render
+  let dispatch: any
+  let mockStore: any
+  let render: (ref?: any) => ReturnType<typeof mount>
 
   beforeEach(() => {
     dispatch = jest.fn()

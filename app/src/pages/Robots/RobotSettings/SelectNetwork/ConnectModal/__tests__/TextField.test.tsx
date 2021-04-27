@@ -6,10 +6,7 @@ import * as FormState from '../form-state'
 
 jest.mock('../form-state')
 
-const useConnectFormField: JestMockFn<
-  [string],
-  $Call<typeof FormState.useConnectFormField, string>
-> = FormState.useConnectFormField
+const useConnectFormField = FormState.useConnectFormField as jest.MockedFunction<typeof FormState.useConnectFormField>
 
 describe('ConnectModal TextField', () => {
   const fieldId = 'field-id'
@@ -23,7 +20,7 @@ describe('ConnectModal TextField', () => {
   const labelSelector = `label[htmlFor="${fieldId}"]`
   const checkboxSelector = 'input[type="checkbox"]'
 
-  const render = (isPassword = false, error = null) => {
+  const render = (isPassword: boolean = false, error: any | null = null): ReturnType<typeof mount> => {
     useConnectFormField.mockImplementation(name => {
       expect(name).toBe(fieldName)
       return {

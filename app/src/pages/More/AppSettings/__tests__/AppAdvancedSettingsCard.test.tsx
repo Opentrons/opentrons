@@ -4,52 +4,38 @@ import * as Config from '../../../../redux/config'
 import { AppAdvancedSettingsCard } from '../AppAdvancedSettingsCard'
 
 import type { State } from '../../../../redux/types'
+import type { ReactWrapper } from 'enzyme'
 
 jest.mock('../../../../redux/config/selectors')
 
-const getUseTrashSurfaceForTipCal: JestMockFn<
-  [State],
-  $Call<typeof Config.getUseTrashSurfaceForTipCal, State>
-> = Config.getUseTrashSurfaceForTipCal
+const getUseTrashSurfaceForTipCal = Config.getUseTrashSurfaceForTipCal as jest.MockedFunction<typeof Config.getUseTrashSurfaceForTipCal>
 
-const getDevtoolsEnabled: JestMockFn<
-  [State],
-  $Call<typeof Config.getDevtoolsEnabled, State>
-> = Config.getDevtoolsEnabled
+const getDevtoolsEnabled = Config.getDevtoolsEnabled as jest.MockedFunction<typeof Config.getDevtoolsEnabled>
 
-const getFeatureFlags: JestMockFn<
-  [State],
-  $Call<typeof Config.getFeatureFlags, State>
-> = Config.getFeatureFlags
+const getFeatureFlags = Config.getFeatureFlags as jest.MockedFunction<typeof Config.getFeatureFlags>
 
-const getUpdateChannel: JestMockFn<
-  [State],
-  $Call<typeof Config.getUpdateChannel, State>
-> = Config.getUpdateChannel
+const getUpdateChannel = Config.getUpdateChannel as jest.MockedFunction<typeof Config.getUpdateChannel>
 
-const getUpdateChannelOptions: JestMockFn<
-  [State],
-  $Call<typeof Config.getUpdateChannelOptions, State>
-> = Config.getUpdateChannelOptions
+const getUpdateChannelOptions = Config.getUpdateChannelOptions as jest.MockedFunction<typeof Config.getUpdateChannelOptions>
 
 const MOCK_STATE: Partial<State> = { robotApi: {} }
 
 describe('AppAdvancedSettingsCard', () => {
-  const render = () => {
+  const render = (): ReturnType<typeof mountWithStore>=> {
     return mountWithStore(<AppAdvancedSettingsCard />, {
       initialState: MOCK_STATE,
     })
   }
 
-  const getUseTrashForTipCalRadioGroup = wrapper =>
+  const getUseTrashForTipCalRadioGroup = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find(
       'LabeledRadioGroup[data-test="useTrashSurfaceForTipCalRadioGroup"]'
     )
 
-  const getDevtoolsToggle = wrapper =>
+  const getDevtoolsToggle = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('LabeledToggle[data-test="enableDevToolsToggle"]')
 
-  const getUpdateChannelSelect = wrapper =>
+  const getUpdateChannelSelect = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('LabeledSelect[data-test="updateChannelSetting"]')
 
   beforeEach(() => {

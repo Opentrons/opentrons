@@ -5,19 +5,15 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
 
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-} from '../../../robot-api/types'
+import type { Action } from '../../../types'
 
 jest.mock('../../../robot-api/http')
 
-const fetchRobotApi: JestMockFn<
-  [RobotHost, RobotApiRequestOptions],
-  $Call<typeof RobotApiHttp.fetchRobotApi, RobotHost, RobotApiRequestOptions>
-> = RobotApiHttp.fetchRobotApi
+const fetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
+  typeof RobotApiHttp.fetchRobotApi
+>
 
-const makeTriggerAction = robotName =>
+const makeTriggerAction = (robotName: string): Action =>
   Actions.createSessionCommand(robotName, '1234', Fixtures.mockSessionCommand)
 
 describe('createSessionCommandEpic', () => {

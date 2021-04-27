@@ -6,31 +6,26 @@ import * as CalibrateSelectors from '../calibrate-selectors'
 
 import type { State } from '../../types'
 
-type SelectorSpec = {
+interface SelectorSpec {
   name: string
-  selector: (state: State) => mixed
-  before?: () => mixed
-  after?: () => mixed
-  expected: mixed
+  selector: (state: State) => unknown
+  before?: () => unknown
+  after?: () => unknown
+  expected: unknown
 }
 
 jest.mock('../selectors')
 jest.mock('../../robot/selectors')
 
-const mockGetCalibrateLocation: JestMockFn<
-  [State],
-  $Call<typeof NavSelectors.getCalibrateLocation, State>
-> = NavSelectors.getCalibrateLocation
-
-const mockGetPipettes: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getPipettes, State>
-> = RobotSelectors.getPipettes
-
-const mockGetTipracksByMount: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getTipracksByMount, State>
-> = RobotSelectors.getTipracksByMount
+const mockGetCalibrateLocation = NavSelectors.getCalibrateLocation as jest.MockedFunction<
+  typeof NavSelectors.getCalibrateLocation
+>
+const mockGetPipettes = RobotSelectors.getPipettes as jest.MockedFunction<
+  typeof RobotSelectors.getPipettes
+>
+const mockGetTipracksByMount = RobotSelectors.getTipracksByMount as jest.MockedFunction<
+  typeof RobotSelectors.getTipracksByMount
+>
 
 const ENABLED_CALIBRATE = {
   id: 'calibrate',
@@ -49,7 +44,7 @@ describe('calibrate nav selectors', () => {
   const mockState: State = { mockState: true } as any
 
   beforeEach(() => {
-    mockGetCalibrateLocation.mockReturnValue(DISABLED_CALIBRATE)
+    mockGetCalibrateLocation.mockReturnValue(DISABLED_CALIBRATE as any)
     mockGetPipettes.mockReturnValue([])
     mockGetTipracksByMount.mockReturnValue({ left: [], right: [] })
   })
@@ -81,7 +76,8 @@ describe('calibrate nav selectors', () => {
     {
       name: 'getCalibratePipettesLocations returns disabled if no pipettes',
       selector: CalibrateSelectors.getCalibratePipettesLocations,
-      before: () => mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE),
+      before: () =>
+        mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE as any),
       expected: {
         left: {
           default: {
@@ -101,7 +97,7 @@ describe('calibrate nav selectors', () => {
       name: 'getCalibratePipettesLocations returns disabled if pipette unused',
       selector: CalibrateSelectors.getCalibratePipettesLocations,
       before: () => {
-        mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE)
+        mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE as any)
         mockGetPipettes.mockReturnValue([
           { _id: 0, mount: 'right', tipRacks: [] } as any,
         ])
@@ -125,7 +121,7 @@ describe('calibrate nav selectors', () => {
       name: 'getCalibratePipettesLocations returns enabled if pipette used',
       selector: CalibrateSelectors.getCalibratePipettesLocations,
       before: () => {
-        mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE)
+        mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE as any)
         mockGetPipettes.mockReturnValue([
           { _id: 0, mount: 'right', tipRacks: [1, 2] } as any,
         ])
@@ -150,7 +146,7 @@ describe('calibrate nav selectors', () => {
         'getCalibratePipetteLocations returns specifications for all tipracks',
       selector: CalibrateSelectors.getCalibratePipettesLocations,
       before: () => {
-        mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE)
+        mockGetCalibrateLocation.mockReturnValue(ENABLED_CALIBRATE as any)
         mockGetPipettes.mockReturnValue([
           { _id: 0, mount: 'right', tipRacks: [1, 2] } as any,
         ])
