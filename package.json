@@ -148,10 +148,5 @@
     "webpack-node-externals": "^1.7.2",
     "worker-plugin": "^5.0.0",
     "ws": "7.1.2"
-  },
-  "dependencies": {},
-  "scripts": {
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
   }
 }

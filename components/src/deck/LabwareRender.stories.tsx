@@ -1,35 +1,47 @@
 import * as React from 'react'
 
 import { RobotWorkSpace } from './RobotWorkSpace'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
-import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack'
-import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul'
-import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 
 import { LabwareRender } from './LabwareRender'
 
 import type { Story, Meta } from '@storybook/react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-const labwareDefMap: Record<string, typeof fixture_96_plate> = {
-  [fixture_96_plate.metadata.displayName]: fixture_96_plate,
-  [fixture_24_tuberack.metadata.displayName]: fixture_24_tuberack,
-  [fixture_12_trough.metadata.displayName]: fixture_12_trough,
+const fixture96Plate = fixture_96_plate as LabwareDefinition2
+const fixture24Tuberack = fixture_24_tuberack as LabwareDefinition2
+const fixture12Trough = fixture_12_trough as LabwareDefinition2
+
+const fixtureTiprack10 = fixture_tiprack_10_ul as LabwareDefinition2
+const fixtureTiprack300 = fixture_tiprack_300_ul as LabwareDefinition2
+const fixtureTiprack1000 = fixture_tiprack_1000_ul as LabwareDefinition2
+
+const labwareDefMap: Record<string, LabwareDefinition2> = {
+  [fixture96Plate.metadata.displayName]: fixture96Plate,
+  [fixture24Tuberack.metadata.displayName]: fixture24Tuberack,
+  [fixture12Trough.metadata.displayName]: fixture12Trough,
 }
-const tipRackDefMap: Record<string, typeof fixture_96_plate> = {
-  [fixture_tiprack_10_ul.metadata.displayName]: fixture_tiprack_10_ul,
-  [fixture_tiprack_300_ul.metadata.displayName]: fixture_tiprack_300_ul,
-  [fixture_tiprack_1000_ul.metadata.displayName]: fixture_tiprack_1000_ul,
+
+const tipRackDefMap: Record<string, LabwareDefinition2> = {
+  [fixtureTiprack10.metadata.displayName]: fixtureTiprack10,
+  [fixtureTiprack300.metadata.displayName]: fixtureTiprack300,
+  [fixtureTiprack1000.metadata.displayName]: fixtureTiprack1000,
 }
+
 export default {
   title: 'Library/Molecules/Simulation/Labware',
   decorators: [
     Story => (
       <RobotWorkSpace
         viewBox={`0 0 ${fixture_96_plate.dimensions.xDimension} ${fixture_96_plate.dimensions.yDimension}`}
-        children={() => <Story />}
-      />
+      >
+        {() => <Story />}
+      </RobotWorkSpace>
     ),
   ],
 } as Meta

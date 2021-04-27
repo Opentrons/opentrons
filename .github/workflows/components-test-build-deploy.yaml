@@ -79,8 +79,7 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'build components'
-        run: |
-          make -C components
+        run: make -C components
       - name: 'upload github artifact'
         uses: actions/upload-artifact@v2
         with:
@@ -89,7 +88,7 @@ jobs:
   deploy-components:
     name: 'deploy components artifact to S3'
     runs-on: 'ubuntu-18.04'
-    needs: ["js-unit-test", "build-components"]
+    needs: ['js-unit-test', 'build-components']
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v2'

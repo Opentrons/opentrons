@@ -69,10 +69,7 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
         placeholder={placeholder}
         menuPosition={menuPosition}
         formatOptionLabel={formatOptionLabel}
-        onChange={opt =>
-          onValueChange &&
-          onValueChange(name, opt != null && 'value' in opt ? opt.value : '')
-        }
+        onChange={opt => onValueChange && onValueChange(name, opt?.value || '')}
         onBlur={() => onLoseFocus && onLoseFocus(name)}
       />
       {caption && <p className={captionCx}>{caption}</p>}

@@ -57,6 +57,7 @@ clean-py:
 .PHONY: clean-js
 clean-js: clean-ts
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
+	$(MAKE) -C $(COMPONENTS_DIR) clean
 
 .PHONY: setup-py
 setup-py:
@@ -224,10 +225,6 @@ circular-dependencies-js:
 	madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.js
 	madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
 	madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.js
-
-.PHONY: storybook
-storybook:
-	yarn storybook
 
 .PHONY: bump
 bump:

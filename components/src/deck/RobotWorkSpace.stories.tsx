@@ -1,10 +1,6 @@
 import * as React from 'react'
 import { RobotWorkSpace } from './RobotWorkSpace'
-import {
-  RobotCoordsText,
-  RobotCoordsForeignDiv,
-  Module,
-} from '@opentrons/components'
+import { RobotCoordsForeignDiv, Module } from '@opentrons/components'
 import { getDeckDefinitions } from './getDeckDefinitions'
 
 import type { Story, Meta } from '@storybook/react'

@@ -74,13 +74,11 @@ const STRIP_PROPS = [
 export function Button(props: ButtonProps): JSX.Element {
   const { id, name, title, disabled, hover, tabIndex, form } = props
   const className = cx(props.className, { [styles.hover]: hover })
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const onClick = !disabled ? props.onClick : undefined
   const Component: any = props.Component ?? 'button'
   const type = props.type ?? BUTTON_TYPE_BUTTON
 
   // pass all props if using a custom component
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const buttonProps = !props.Component
     ? { id, name, type, form, title, disabled, onClick, className, tabIndex }
     : {

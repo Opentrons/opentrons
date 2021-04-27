@@ -84,7 +84,7 @@ export function useTooltip(options: UseTooltipOptions = {}): UseTooltipResult {
     style: tooltipState.tooltipStyle,
     arrowStyle: tooltipState.arrowStyle,
     placement: tooltipState.placement,
-    arrowRef: arrowRef,
+    arrowRef,
   }
 
   return [targetProps, tooltipProps]

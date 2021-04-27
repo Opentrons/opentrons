@@ -4,11 +4,6 @@ import { ToggleField as ToggleFieldComponent } from './ToggleField'
 
 import type { Story, Meta } from '@storybook/react'
 
-export default {
-  title: 'Library/Molecules/Forms/Toggle Field',
-  component: ToggleField,
-} as Meta
-
 const Template: Story<
   React.ComponentProps<typeof ToggleFieldComponent>
 > = args => {
@@ -24,7 +19,13 @@ const Template: Story<
     />
   )
 }
+
 export const ToggleField = Template.bind({})
 ToggleField.args = {
   label: 'Toggle Me',
 }
+
+export default {
+  title: 'Library/Molecules/Forms/Toggle Field',
+  component: ToggleField,
+} as Meta
