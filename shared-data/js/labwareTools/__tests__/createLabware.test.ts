@@ -84,10 +84,6 @@ describe('createLabware', () => {
     labware2 = createRegularLabware(labware2Args)
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   it('snapshot tests', () => {
     expect(labware1).toEqual(exampleLabware1)
     expect(labware2).toEqual(exampleLabware2)

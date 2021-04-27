@@ -57,7 +57,7 @@ export type LabwareDisplayCategory =
   | 'trash'
   | 'other'
 
-export type LabwareVolumeUnits = '\xB5L' | 'mL' | 'L'
+export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
 
 // TODO(mc, 2019-05-29): Remove this enum in favor of string + exported
 // constants + unit tests to catch typos in our definitions. Make changes

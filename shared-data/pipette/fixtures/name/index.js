@@ -1,7 +1,7 @@
 // @flow
 import pipetteNameSpecFixtures from './pipetteNameSpecFixtures.json'
 
-import type { PipetteNameSpecs } from '../../../js/types'
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
 
 export const fixtureP10Single: $Shape<PipetteNameSpecs> =
   pipetteNameSpecFixtures['p10_single']

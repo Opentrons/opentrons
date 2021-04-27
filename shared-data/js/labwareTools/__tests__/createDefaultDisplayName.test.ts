@@ -1,8 +1,17 @@
-import { createDefaultDisplayName } from '../index'
+import { createDefaultDisplayName } from '..'
+
+import type { RegularNameProps } from '..'
+
+interface TestCase {
+  testName: string
+  args: RegularNameProps
+  expected: string
+}
+
 describe('createDefaultDisplayName', () => {
-  const testCases = [
+  const testCases: TestCase[] = [
     {
-      testName: 'minimal case',
+      testName: 'handle the minimal case',
       args: {
         displayCategory: 'wellPlate',
         displayVolumeUnits: 'µL',
@@ -13,7 +22,7 @@ describe('createDefaultDisplayName', () => {
       expected: 'Generic 6 Well Plate 123 µL',
     },
     {
-      testName: 'decimal in volume',
+      testName: 'handle a decimal in volume',
       args: {
         displayCategory: 'wellPlate',
         displayVolumeUnits: 'µL',
@@ -35,7 +44,7 @@ describe('createDefaultDisplayName', () => {
       expected: 'Generic 80 Well Plate 123 µL',
     },
     {
-      testName: 'tube rack (example of a different displayCategory)',
+      testName: 'handle tube rack (example of a different displayCategory)',
       args: {
         displayCategory: 'tubeRack',
         displayVolumeUnits: 'µL',
@@ -46,7 +55,7 @@ describe('createDefaultDisplayName', () => {
       expected: 'Generic 6 Tube Rack 123 µL',
     },
     {
-      testName: 'should append loadNamePostfix',
+      testName: 'append loadNamePostfix',
       args: {
         displayCategory: 'wellPlate',
         displayVolumeUnits: 'µL',
@@ -93,8 +102,9 @@ describe('createDefaultDisplayName', () => {
       expected: 'Generic 6 Well Plate 0.123 mL',
     },
   ]
+
   testCases.forEach(({ testName, args, expected }) => {
-    it(testName, () => {
+    it(`should ${testName}`, () => {
       expect(createDefaultDisplayName(args)).toEqual(expected)
     })
   })

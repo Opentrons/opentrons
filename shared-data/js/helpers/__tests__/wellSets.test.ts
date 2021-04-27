@@ -1,13 +1,26 @@
 import {
-  fixtureP10Single,
-  fixtureP10Multi,
-} from '@opentrons/shared-data/pipette/fixtures/name'
+  p10_single,
+  p10_multi,
+} from '@opentrons/shared-data/pipette/fixtures/name/pipetteNameSpecFixtures.json'
+
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
-import fixture_overlappy_wellplate from '../../../labware/fixtures/2/fixture_overlappy_wellplate'
+import fixture_overlappy_wellplate from '../../../labware/fixtures/2/fixture_overlappy_wellplate.json'
+
 import { makeWellSetHelpers } from '../wellSets'
 import { findWellAt } from '../getWellNamePerMultiTip'
+
+import type { LabwareDefinition2, PipetteNameSpecs } from '../../types'
+import type { WellSetHelpers } from '../wellSets'
+
+const fixtureP10Single = p10_single as PipetteNameSpecs
+const fixtureP10Multi = p10_multi as PipetteNameSpecs
+const fixture12Trough = fixture_12_trough as LabwareDefinition2
+const fixture96Plate = fixture_96_plate as LabwareDefinition2
+const fixture384Plate = fixture_384_plate as LabwareDefinition2
+const fixtureOverlappyWellplage = fixture_overlappy_wellplate as LabwareDefinition2
+
 describe('findWellAt', () => {
   it('should determine if given (x, y) is within a rectangular well', () => {
     const def: any = {
@@ -23,16 +36,21 @@ describe('findWellAt', () => {
     }
     const middle = findWellAt(def, 200, 200)
     expect(middle).toBe('A1')
+
     const insideCornerNE = findWellAt(def, 200 - 4, 200 + 4)
     expect(insideCornerNE).toEqual('A1')
+
     // exactly at an edge doesn't count
     const exactlyOnCornerNE = findWellAt(def, 200 - 5, 200 + 5)
     expect(exactlyOnCornerNE).toBeUndefined()
+
     const exactlyOnWEdge = findWellAt(def, 200, 200 - 5)
     expect(exactlyOnWEdge).toBeUndefined()
+
     const justOutsideToEast = findWellAt(def, 200 + 5.1, 200)
     expect(justOutsideToEast).toBeUndefined()
   })
+
   it('should determine if given (x, y) is within a circular well', () => {
     const def: any = {
       wells: {
@@ -46,40 +64,52 @@ describe('findWellAt', () => {
     }
     const middle = findWellAt(def, 200, 200)
     expect(middle).toBe('A1')
+
     const inside = findWellAt(def, 200 - 1, 200 + 1)
     expect(inside).toEqual('A1')
+
     // exactly at an edge doesn't count
     const exactlyOnWEdge = findWellAt(def, 200, 200 - 5)
     expect(exactlyOnWEdge).toBeUndefined()
+
     const justOutsideToEast = findWellAt(def, 200 + 5.1, 200)
     expect(justOutsideToEast).toBeUndefined()
   })
 })
 describe('canPipetteUseLabware', () => {
-  let canPipetteUseLabware
+  let canPipetteUseLabware: WellSetHelpers['canPipetteUseLabware']
+
   beforeEach(() => {
     const helpers = makeWellSetHelpers()
     canPipetteUseLabware = helpers.canPipetteUseLabware
   })
+
   it('returns false when wells are too close together for multi channel pipette', () => {
-    const labwareDef = { ...fixture_overlappy_wellplate }
-    const pipette = { ...fixtureP10Multi }
+    const labwareDef = fixtureOverlappyWellplage
+    const pipette = fixtureP10Multi
+
     expect(canPipetteUseLabware(pipette, labwareDef)).toBe(false)
   })
+
   it('returns true when pipette is single channel', () => {
-    const labwareDef = { ...fixture_overlappy_wellplate }
-    const pipette = { ...fixtureP10Single }
+    const labwareDef = fixtureOverlappyWellplage
+    const pipette = fixtureP10Single
+
     expect(canPipetteUseLabware(pipette, labwareDef)).toBe(true)
   })
 })
+
 describe('getWellSetForMultichannel (integration test)', () => {
-  let getWellSetForMultichannel
+  let getWellSetForMultichannel: WellSetHelpers['getWellSetForMultichannel']
+
   beforeEach(() => {
     const helpers = makeWellSetHelpers()
     getWellSetForMultichannel = helpers.getWellSetForMultichannel
   })
+
   it('96-flat', () => {
-    const labwareDef = fixture_96_plate
+    const labwareDef = fixture96Plate
+
     expect(getWellSetForMultichannel(labwareDef, 'A1')).toEqual([
       'A1',
       'B1',
@@ -90,6 +120,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'G1',
       'H1',
     ])
+
     expect(getWellSetForMultichannel(labwareDef, 'B1')).toEqual([
       'A1',
       'B1',
@@ -100,6 +131,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'G1',
       'H1',
     ])
+
     expect(getWellSetForMultichannel(labwareDef, 'H1')).toEqual([
       'A1',
       'B1',
@@ -110,6 +142,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'G1',
       'H1',
     ])
+
     expect(getWellSetForMultichannel(labwareDef, 'A2')).toEqual([
       'A2',
       'B2',
@@ -121,12 +154,16 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'H2',
     ])
   })
+
   it('invalid well', () => {
-    const labwareDef = fixture_96_plate
+    const labwareDef = fixture96Plate
+
     expect(getWellSetForMultichannel(labwareDef, 'A13')).toBeFalsy()
   })
+
   it('trough-12row', () => {
-    const labwareDef = fixture_12_trough
+    const labwareDef = fixture12Trough
+
     expect(getWellSetForMultichannel(labwareDef, 'A1')).toEqual([
       'A1',
       'A1',
@@ -137,6 +174,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'A1',
       'A1',
     ])
+
     expect(getWellSetForMultichannel(labwareDef, 'A2')).toEqual([
       'A2',
       'A2',
@@ -148,8 +186,10 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'A2',
     ])
   })
+
   it('384-plate', () => {
-    const labwareDef = fixture_384_plate
+    const labwareDef = fixture384Plate
+
     expect(getWellSetForMultichannel(labwareDef, 'C1')).toEqual([
       'A1',
       'C1',
@@ -160,6 +200,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
       'M1',
       'O1',
     ])
+
     expect(getWellSetForMultichannel(labwareDef, 'F2')).toEqual([
       'B2',
       'D2',

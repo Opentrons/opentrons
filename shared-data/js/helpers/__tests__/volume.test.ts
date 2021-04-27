@@ -1,7 +1,26 @@
 // volume helpers tests
 import * as helpers from '..'
+
+interface BaseSpec<T extends (...args: any) => any> {
+  name: string
+  func: T
+  input: Parameters<T>
+  expected: ReturnType<T>
+}
+
+type GetDisplayVolumeSpec = BaseSpec<typeof helpers.getDisplayVolume>
+
+type GetAsciiVolumeUnitsSpec = BaseSpec<typeof helpers.getAsciiVolumeUnits>
+
+type EnsureVolumeUnitsSpec = BaseSpec<typeof helpers.ensureVolumeUnits>
+
+type TestSpec =
+  | GetDisplayVolumeSpec
+  | GetAsciiVolumeUnitsSpec
+  | EnsureVolumeUnitsSpec
+
 describe('volume helpers', () => {
-  const SPECS = [
+  const SPECS: TestSpec[] = [
     {
       name: 'getDisplayVolume outputs µL string by default',
       func: helpers.getDisplayVolume,
@@ -81,7 +100,9 @@ describe('volume helpers', () => {
       expected: 'L',
     },
   ]
+
   SPECS.forEach(s => {
-    it(s.name, () => expect(s.func(...s.input)).toEqual(s.expected))
+    // @ts-expect-error(mc, 2021-04-27): rewrite as regular tests
+    it(`should ${s.name}`, () => expect(s.func(...s.input)).toEqual(s.expected))
   })
 })

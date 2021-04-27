@@ -134,6 +134,11 @@ export function _calculateWellCoord(
   return { ...well, ...coords }
 }
 
+interface Layout {
+  wells: WellMap
+  groups: WellGroup[]
+}
+
 function determineIrregularLayout(
   grids: Cell[],
   spacing: Cell[],
@@ -141,11 +146,8 @@ function determineIrregularLayout(
   gridStart: GridStart[],
   wells: InputWell[],
   group: InputWellGroup[] = []
-): {
-  wells: WellMap
-  groups: WellGroup[]
-} {
-  return grids.reduce(
+): Layout {
+  return grids.reduce<Layout>(
     (result, gridObj, gridIdx) => {
       const reverseRowIdx = range(gridObj.row - 1, -1)
       const inputGroup = group[gridIdx] || {
@@ -281,7 +283,7 @@ function joinLoadName(
     .replace(/[^a-z0-9_.]/g, '')
 }
 
-interface RegularNameProps {
+export interface RegularNameProps {
   displayCategory: string
   displayVolumeUnits: VolumeUnits
   gridRows: number
@@ -290,6 +292,7 @@ interface RegularNameProps {
   brandName?: string
   loadNamePostfix?: string[]
 }
+
 export function createRegularLoadName(args: RegularNameProps): string {
   const {
     gridRows,
