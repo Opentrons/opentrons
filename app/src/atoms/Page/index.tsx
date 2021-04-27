@@ -5,7 +5,7 @@ import { TitleBar } from '@opentrons/components'
 
 import type { TitleBarProps } from '@opentrons/components'
 
-export type PageProps = {
+export interface PageProps {
   titleBarProps?: TitleBarProps,
   children: React.ReactNode,
 }

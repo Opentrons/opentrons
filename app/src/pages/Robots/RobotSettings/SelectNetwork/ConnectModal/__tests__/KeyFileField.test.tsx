@@ -2,7 +2,7 @@ import * as React from 'react'
 import { shallow } from 'enzyme'
 
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
-import { SelectField, SelectOptionGroup } from '@opentrons/components'
+import { SelectField } from '@opentrons/components'
 import { UploadKeyInput } from '../UploadKeyInput'
 import { KeyFileField } from '../KeyFileField'
 import * as FormState from '../form-state'
@@ -128,7 +128,7 @@ describe('ConnectModal KeyFileField', () => {
   it('does not update the field value when add new option is selected', () => {
     const wrapper = render()
     const select = wrapper.find(SelectField)
-    const options = select.prop('options').flatMap((o: SelectOptionGroup) => o.options)
+    const options = select.prop('options').flatMap(o => o.options)
     const addNewOpt = options.find(o => o?.label === LABEL_ADD_NEW_KEY)
 
     select.invoke('onValueChange')(fieldName, addNewOpt?.value)

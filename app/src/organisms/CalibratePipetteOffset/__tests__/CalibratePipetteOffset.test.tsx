@@ -22,31 +22,29 @@ import {
 } from '../../../organisms/CalibrationPanels'
 
 import type { PipetteOffsetCalibrationStep } from '../../../redux/sessions/types'
+import type { ReactWrapper } from 'enzyme'
+import { DispatchRequestsType } from '../../../redux/robot-api'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 
-type CalibratePipetteOffsetSpec = {
-  component: React.AbstractComponent<any>,
+type CalibratePipetteOffsetSpec = Partial<{
+  component: React.ReactNode,
   childProps?: {},
   currentStep: PipetteOffsetCalibrationStep,
-  ...
-}
+}>
 
-const mockGetDeckDefinitions: JestMockFn<
-  [],
-  ReturnType<typeof getDeckDefinitions>
-> = getDeckDefinitions
+const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<typeof getDeckDefinitions>
 
 describe('CalibratePipetteOffset', () => {
-  let mockStore
-  let render
-  let dispatch
-  let dispatchRequests
+  let mockStore: any
+  let render: (props?: Partial<React.ComponentProps<typeof CalibratePipetteOffset>>) => ReturnType<typeof mount>
+  let dispatch: Dispatch
+  let dispatchRequests: DispatchRequestsType
   let mockPipOffsetCalSession: Sessions.PipetteOffsetCalibrationSession
 
-  const getExitButton = wrapper =>
+  const getExitButton = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find({ title: 'exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [

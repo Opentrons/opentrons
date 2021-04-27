@@ -21,34 +21,34 @@ import {
 } from '../../CalibrationPanels'
 
 import type { DeckCalibrationStep } from '../../../redux/sessions/types'
+import { DispatchRequestsType } from '../../../redux/robot-api'
+import { Dispatch } from '../../../redux/types'
+import type { ReactWrapper } from 'enzyme'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 
-type CalibrateDeckSpec = {
-  component: React.AbstractComponent<any>,
+interface CalibrateDeckSpec {
+  component: React.ReactNode,
   childProps?: {},
   currentStep: DeckCalibrationStep,
-  ...
+  [key: string] : unknown
 }
 
-const mockGetDeckDefinitions: JestMockFn<
-  [],
-  ReturnType<typeof getDeckDefinitions>
-> = getDeckDefinitions
+const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<typeof getDeckDefinitions>
 
 describe('CalibrateDeck', () => {
-  let mockStore
-  let render
-  let dispatch
-  let dispatchRequests
+  let mockStore: any
+  let render: (props?: Partial<React.ComponentProps<typeof CalibrateDeck>>) => ReturnType<typeof mount>
+  let dispatch: Dispatch
+  let dispatchRequests: DispatchRequestsType
   let mockDeckCalSession: Sessions.DeckCalibrationSession = {
     id: 'fake_session_id',
     ...mockDeckCalibrationSessionAttributes,
   }
 
-  const getExitButton = wrapper =>
+  const getExitButton = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find({ title: 'exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [

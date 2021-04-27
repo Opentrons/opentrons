@@ -66,7 +66,7 @@ const terminalContentsStyleProps = {
 }
 
 const PANEL_BY_STEP: {
-  [string]: React.ComponentType<CalibrationPanelProps>,
+  [step: string]: React.ComponentType<CalibrationPanelProps>,
 } = {
   [Sessions.DECK_STEP_SESSION_STARTED]: Introduction,
   [Sessions.DECK_STEP_LABWARE_LOADED]: DeckSetup,
@@ -79,7 +79,7 @@ const PANEL_BY_STEP: {
   [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
 }
 const PANEL_STYLE_PROPS_BY_STEP: {
-  [string]: StyleProps,
+  [step: string]: StyleProps,
 } = {
   [Sessions.DECK_STEP_SESSION_STARTED]: terminalContentsStyleProps,
   [Sessions.DECK_STEP_LABWARE_LOADED]: darkContentsStyleProps,
@@ -91,7 +91,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
   [Sessions.DECK_STEP_SAVING_POINT_THREE]: contentsStyleProps,
   [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
 }
-export function CalibrateDeck(props: CalibrateDeckParentProps): JSX.Element {
+export function CalibrateDeck(props: CalibrateDeckParentProps): JSX.Element | null {
   const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details || {}
@@ -109,7 +109,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): JSX.Element {
     return spec ? spec.channels > 1 : false
   }, [instrument])
 
-  function sendCommands(...commands: SessionCommandParams[]) {
+  function sendCommands(...commands: SessionCommandParams[]): void {
     if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
@@ -121,7 +121,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): JSX.Element {
     }
   }
 
-  function cleanUpAndExit() {
+  function cleanUpAndExit(): void {
     if (session?.id) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
