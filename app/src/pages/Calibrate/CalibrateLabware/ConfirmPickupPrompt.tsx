@@ -6,7 +6,7 @@ import styles from './styles.css'
 
 import type { Labware, Pipette } from '../../../redux/robot/types'
 
-export type ConfirmPickupPromptProps = {
+export interface ConfirmPickupPromptProps {
   labware: Labware,
   calibrator: Pipette,
   onNoClick: () => void,

@@ -5,9 +5,7 @@ import styles from './styles.css'
 
 const LABEL = 'Select the pipette you wish to attach:'
 
-export type PipetteSelectionProps = {
-  ...React.ElementProps<typeof PipetteSelect>,
-}
+export type PipetteSelectionProps = React.ComponentProps<typeof PipetteSelect>
 
 export function PipetteSelection(props: PipetteSelectionProps): JSX.Element {
   return (

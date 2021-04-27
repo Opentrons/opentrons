@@ -8,9 +8,9 @@ import {
 } from '@opentrons/components'
 import styles from './styles.css'
 
-export type ConfirmCrashRecoveryModalProps = {
-  back: () => mixed,
-  confirm: () => mixed,
+export interface ConfirmCrashRecoveryModalProps {
+  back: () => unknown,
+  confirm: () => unknown,
   tipRackDisplayName: string,
   tipRackSlot: string,
   requiresNewTip: boolean,
@@ -22,7 +22,7 @@ const MAIN_BODY =
 const CANCEL = 'cancel'
 const START_OVER = 'yes, start over'
 const CONFIRM_AND_START_OVER = 'tip placed in a1, start over'
-const buildTiprackRequest: (string, string) => string = (displayName, slot) =>
+const buildTiprackRequest = (displayName: string, slot: string): string =>
   `Please put an undamaged tip in position A1 of the ${displayName} in slot ${slot}.`
 
 export function ConfirmCrashRecoveryModal(

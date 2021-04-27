@@ -27,24 +27,24 @@ import type {
 
 import type { FormValues } from './ConfigFormGroup'
 
-export type DisplayFieldProps = {
-  ...PipetteSettingsField,
-  name: string,
-  displayName: string,
+export interface DisplayFieldProps extends PipetteSettingsField {
+  name: string
+  displayName: string
 }
 
 export type DisplayQuirkFieldProps = {
-  [quirkId: string]: boolean,
   name: string,
   displayName: string,
+} & {
+  [quirkId: string]: boolean,
 }
 
-export type ConfigFormProps = {
-  settings: PipetteSettingsFieldsMap,
-  updateInProgress: boolean,
-  updateSettings: (fields: PipetteSettingsFieldsUpdate) => mixed,
-  closeModal: () => mixed,
-  __showHiddenFields: boolean,
+export interface ConfigFormProps {
+  settings: PipetteSettingsFieldsMap
+  updateInProgress: boolean
+  updateSettings: (fields: PipetteSettingsFieldsUpdate) => unknown
+  closeModal: () => unknown
+  __showHiddenFields: boolean
 }
 
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
@@ -94,7 +94,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   getUnknownKeys: () => string[] = () => {
-    return keys<string>(
+    return keys(
       omit(this.props.settings, [
         ...PLUNGER_KEYS,
         ...POWER_KEYS,
@@ -125,7 +125,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     return Number(value)
   }
 
-  validate: (values: FormValues) => { ... } = values => {
+  validate = (values: FormValues): {} => {
     const errors = {}
     const fields = this.getVisibleFields()
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
@@ -199,7 +199,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
         {(formProps: FormikProps<FormValues>) => {
           const { errors, values } = formProps
           const disableSubmit = !isEmpty(errors)
-          const handleReset = () => {
+          const handleReset = (): void => {
             const newValues = mapValues(values, v => {
               if (typeof v === 'boolean') {
                 // NOTE: checkbox fields don't have defaults from the API b/c they come in from `quirks`

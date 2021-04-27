@@ -7,7 +7,7 @@ import type { Labware, Pipette } from '../../../redux/robot'
 import { InstructionStep } from '../../../molecules/InstructionStep'
 import { getInstructionsByType, getDiagramSrc } from './instructions-data'
 
-export type LabwareCalibrationProps = {
+export interface LabwareCalibrationProps {
   labware: Labware,
   calibrator: Pipette,
   calibrateToBottom: boolean,

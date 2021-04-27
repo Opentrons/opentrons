@@ -20,9 +20,8 @@ import type { CalibrationPanelProps } from './types'
 const CONDITION = 'Jog too far or bend a tip?'
 const START_OVER = 'Start over'
 
-export type Props = {
-  requiresNewTip: boolean,
-  ...CalibrationPanelProps,
+export interface Props extends CalibrationPanelProps {
+  requiresNewTip: boolean
 }
 
 export function useConfirmCrashRecovery(
@@ -31,7 +30,7 @@ export function useConfirmCrashRecovery(
   const { sendCommands, tipRack, requiresNewTip } = props
   const [showModal, setShowModal] = React.useState(false)
 
-  const doStartOver = () => {
+  const doStartOver = (): void => {
     sendCommands({ command: Sessions.sharedCalCommands.INVALIDATE_LAST_ACTION })
   }
   return [

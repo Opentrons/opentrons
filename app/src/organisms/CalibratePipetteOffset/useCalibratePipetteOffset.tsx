@@ -30,18 +30,18 @@ const PIPETTE_OFFSET_TITLE = 'Pipette offset calibration'
 const TIP_LENGTH_TITLE = 'Tip length calibration'
 const EXIT = 'exit'
 
-export type InvokerProps = {
+export interface InvokerProps {
   overrideParams?: Partial<PipetteOffsetCalibrationSessionParams>,
   withIntent?: PipetteOffsetIntent,
 }
 
-export type Invoker = (InvokerProps | void) => void
+export type Invoker = (props: InvokerProps | undefined) => void
 
 export function useCalibratePipetteOffset(
   robotName: string,
   sessionParams: Partial<PipetteOffsetCalibrationSessionParams>,
-  onComplete: (() => mixed) | null = null
-): [Invoker, React.ReactNode | null] {
+  onComplete: (() => unknown) | null = null
+): [Invoker, (React.ReactNode | null)] {
   const createRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
@@ -131,7 +131,7 @@ export function useCalibratePipetteOffset(
   } = sessionParams
   const handleStartPipOffsetCalSession: Invoker = (props = {}) => {
     const {
-      overrideParams = ({}: Partial<PipetteOffsetCalibrationSessionParams>),
+      overrideParams = ({} as Partial<PipetteOffsetCalibrationSessionParams>),
       withIntent = INTENT_CALIBRATE_PIPETTE_OFFSET,
     } = props
     setIntent(withIntent)
