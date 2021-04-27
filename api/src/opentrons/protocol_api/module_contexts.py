@@ -144,7 +144,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa: E302
                              namespace: Optional[str] = None,
                              version: int = 1,) -> Labware:
         """
-        .. deprecated:: 2.1
+        .. deprecated:: 2.0
             Use :py:meth:`load_labware` instead.
         """
         MODULE_LOG.warning(
