@@ -117,6 +117,7 @@ export function _irregularWellName(
     colNum,
   })
 }
+
 export function _calculateWellCoord(
   rowIdx: number,
   colIdx: number,
@@ -153,7 +154,8 @@ function determineIrregularLayout(
       const inputGroup = group[gridIdx] || {
         metadata: {},
       }
-      const currentGroup = { ...inputGroup, wells: [] }
+      const currentGroup: WellGroup = { ...inputGroup, wells: [] }
+
       range(gridObj.column).forEach(colIdx => {
         range(gridObj.row).forEach(rowIdx => {
           const wellName = _irregularWellName(

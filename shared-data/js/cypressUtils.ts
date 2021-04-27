@@ -2,8 +2,8 @@ import isEqual from 'lodash/isEqual'
 import isObject from 'lodash/isObject'
 import transform from 'lodash/transform'
 
-const difference = (object, base) => {
-  const changes = (object, base) => {
+const difference = (object: any, base: any): any => {
+  const changes = (object: any, base: any): any => {
     return transform(object, function (result, value, key) {
       if (!isEqual(value, base[key])) {
         result[key] =
@@ -24,7 +24,7 @@ export const expectDeepEqual = (assert: any, a: any, b: any): void => {
     assert.deepEqual(a, b)
   } catch (e) {
     // visualize undefineds
-    const replacer = (key, value) =>
+    const replacer = (key: string, value: unknown): unknown =>
       typeof value === 'undefined' ? '__undefined__' : value
 
     throw Error(

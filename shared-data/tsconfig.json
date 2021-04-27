@@ -12,6 +12,8 @@
     "deck/**/*.json",
     "labware/**/*.json",
     "module/**/*.json",
-    "protocol/**/*.json"
+    "pipette/**/*.json",
+    "protocol/**/*.json",
+    "build/**/*.json"
   ]
 }

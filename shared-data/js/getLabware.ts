@@ -2,20 +2,24 @@ import assert from 'assert'
 import mapValues from 'lodash/mapValues'
 // TODO: Ian 2019-06-04 remove the shared-data build process for labware v1
 import definitions from '../build/labware.json'
+
 import {
   FIXED_TRASH_RENDER_HEIGHT,
   OPENTRONS_LABWARE_NAMESPACE,
   SLOT_RENDER_HEIGHT,
 } from './constants'
+
 import type {
   LabwareDefinition1,
   LabwareDefinition2,
   WellDefinition,
 } from './types'
+
 assert(
   definitions && Object.keys(definitions).length > 0,
   'Expected v1 labware defs. Something went wrong with shared-data/build/labware.json'
 )
+
 // labware definitions only used for back-compat with legacy v1 defs.
 // do not list in any "available labware" UI.
 // TODO(mc, 2019-12-3): how should this correspond to RETIRED_LABWARE?
@@ -40,19 +44,24 @@ export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
 ]
+
 export function getLabwareV1Def(
   labwareName: string
 ): LabwareDefinition1 | null | undefined {
   const labware: LabwareDefinition1 | null | undefined =
+    // @ts-expect-error(mc, 2021-04-27): make lookup more strict or remove v1 defs entirely
     definitions[labwareName]
   return labware
 }
+
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
   return Boolean(def?.metadata?.isTiprack)
 }
+
 export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
   return labwareDef.parameters.isTiprack
 }
+
 // NOTE: these labware definitions in _SHORT_MM_LABWARE_DEF_LOADNAMES
 // were written in "short mm" = 0.5mm, but
 // we will write all future definitions in actual mm.
@@ -67,10 +76,12 @@ const _SHORT_MM_LABWARE_DEF_LOADNAMES = [
   'nest_96_wellplate_100ul_pcr_full_skirt',
   'usascientific_96_wellplate_2.4ml_deep',
 ]
+
 // offset added to parameters.magneticModuleEngageHeight to convert older labware
 // definitions from "distance from home switch" to "distance from labware bottom"
 // Note: this is in actual mm, not "short mm" :)
 const ENGAGE_HEIGHT_OFFSET = -4
+
 export function getLabwareDefaultEngageHeight(
   labwareDef: LabwareDefinition2
 ): number | null {
@@ -100,7 +111,7 @@ export function getLabwareDefaultEngageHeight(
 const _getSvgYValueForWell = (
   def: LabwareDefinition1,
   wellDef: WellDefinition
-) => {
+): number => {
   const labwareName = def.metadata.name
   const renderHeight =
     labwareName === 'fixed-trash'

@@ -1,16 +1,22 @@
 import assert from 'assert'
 import uniq from 'lodash/uniq'
+
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import type { LabwareDefinition2 } from '../types'
+
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
+
 export * from './volume'
 export * from './wellSets'
+
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
+
 export const getLabwareDefURI = (def: LabwareDefinition2): string =>
   `${def.namespace}/${def.parameters.loadName}/${def.version}`
+
 // Load names of "retired" labware
 // TODO(mc, 2019-12-3): how should this correspond to LABWAREV2_DO_NOT_LIST?
 // see shared-data/js/getLabware.js
@@ -27,6 +33,7 @@ const RETIRED_LABWARE = [
   'eppendorf_96_tiprack_1000ul_eptips',
   'eppendorf_96_tiprack_10ul_eptips',
 ]
+
 export const getLabwareDisplayName = (
   labwareDef: LabwareDefinition2
 ): string => {
@@ -41,6 +48,7 @@ export const getLabwareDisplayName = (
 
   return displayName
 }
+
 export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
   assert(
     labwareDef.parameters.isTiprack,
@@ -56,6 +64,7 @@ export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
   )
   return volume
 }
+
 export function getLabwareHasQuirk(
   labwareDef: LabwareDefinition2,
   quirk: string
@@ -63,6 +72,7 @@ export function getLabwareHasQuirk(
   const quirks = labwareDef.parameters.quirks
   return quirks ? quirks.includes(quirk) : false
 }
+
 export const intToAlphabetLetter = (
   i: number,
   lowerCase: boolean = false
@@ -113,10 +123,9 @@ export function sortWells(a: string, b: string): number {
 
   return letterA > letterB ? 1 : -1
 }
-export function splitWellsOnColumn(
-  sortedArray: Array<string>
-): Array<Array<string>> {
-  return sortedArray.reduce((acc, curr) => {
+
+export function splitWellsOnColumn(sortedArray: string[]): string[][] {
+  return sortedArray.reduce<string[][]>((acc, curr) => {
     const lastColumn = acc.slice(-1)
 
     if (lastColumn === undefined || lastColumn.length === 0) {
@@ -132,16 +141,18 @@ export function splitWellsOnColumn(
     }
   }, [])
 }
+
 export const getWellDepth = (
   labwareDef: LabwareDefinition2,
   well: string
 ): number => labwareDef.wells[well].depth
+
 // NOTE: this is used in PD for converting "offset from top" to "mm from bottom".
 // Assumes all wells have same offset because multi-offset not yet supported.
 // TODO: Ian 2019-07-13 return {[string: well]: offset} to support multi-offset
 export const getWellsDepth = (
   labwareDef: LabwareDefinition2,
-  wells: Array<string>
+  wells: string[]
 ): number => {
   const offsets = wells.map(well => getWellDepth(labwareDef, well))
 

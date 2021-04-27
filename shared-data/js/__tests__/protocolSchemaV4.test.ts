@@ -4,21 +4,24 @@ import Ajv from 'ajv'
 import path from 'path'
 import glob from 'glob'
 import omit from 'lodash/omit'
+
 import protocolSchema from '../../protocol/schemas/4.json'
 import labwareV2Schema from '../../labware/schemas/2.json'
 import simpleV4Fixture from '../../protocol/fixtures/4/simpleV4.json'
+
 const fixturesGlobPath = path.join(
   __dirname,
   '../../protocol/fixtures/4/**/*.json'
 )
+
 const protocolFixtures = glob.sync(fixturesGlobPath)
-const ajv = new Ajv({
-  allErrors: true,
-  jsonPointers: true,
-})
+const ajv = new Ajv({ allErrors: true, jsonPointers: true })
+
 // v4 protocol schema contains reference to v2 labware schema, so give AJV access to it
 ajv.addSchema(labwareV2Schema)
+
 const validateProtocol = ajv.compile(protocolSchema)
+
 describe('validate v4 protocol fixtures under JSON schema', () => {
   protocolFixtures.forEach(protocolPath => {
     it(path.basename(protocolPath), () => {
@@ -36,6 +39,7 @@ describe('validate v4 protocol fixtures under JSON schema', () => {
     })
   })
 })
+
 describe('ensure bad protocol data fails validation', () => {
   it('$otSharedSchema is required to be "#/protocol/schemas/4"', () => {
     expect(validateProtocol(omit(simpleV4Fixture, '$otSharedSchema'))).toBe(
@@ -48,12 +52,14 @@ describe('ensure bad protocol data fails validation', () => {
       })
     ).toBe(false)
   })
+
   it('schemaVersion is required to be 4', () => {
     expect(validateProtocol(omit(simpleV4Fixture, 'schemaVersion'))).toBe(false)
     expect(validateProtocol({ ...simpleV4Fixture, schemaVersion: 3 })).toBe(
       false
     )
   })
+
   it('reject bad values in "pipettes" objects', () => {
     const badPipettes = {
       missingKeys: {},
@@ -73,18 +79,20 @@ describe('ensure bad protocol data fails validation', () => {
         blah: 'blah',
       },
     }
-    Object.keys(badPipettes).forEach((pipetteId: string) => {
+
+    Object.entries(badPipettes).forEach(([pipetteId, pipette]) => {
       expect(
         validateProtocol({
           ...simpleV4Fixture,
           pipettes: {
             ...simpleV4Fixture.pipettes,
-            [pipetteId]: badPipettes[pipetteId],
+            [pipetteId]: pipette,
           },
         })
       ).toBe(false)
     })
   })
+
   it('reject bad values in "labware" objects', () => {
     const badLabware = {
       noSlot: {
@@ -99,18 +107,20 @@ describe('ensure bad protocol data fails validation', () => {
         blah: 'blah',
       },
     }
-    Object.keys(badLabware).forEach((labwareId: string) => {
+
+    Object.entries(badLabware).forEach(([labwareId, labware]) => {
       expect(
         validateProtocol({
           ...simpleV4Fixture,
           labware: {
             ...simpleV4Fixture.labware,
-            [labwareId]: badLabware[labwareId],
+            [labwareId]: labware,
           },
         })
       ).toBe(false)
     })
   })
+
   it('reject bad values in "modules" objects', () => {
     const badModules = {
       badModuleType: {
@@ -129,13 +139,14 @@ describe('ensure bad protocol data fails validation', () => {
         blah: 'blah',
       },
     }
-    Object.keys(badModules).forEach((moduleId: string) => {
+
+    Object.entries(badModules).forEach(([moduleId, module]) => {
       expect(
         validateProtocol({
           ...simpleV4Fixture,
           modules: {
             ...simpleV4Fixture.modules,
-            [moduleId]: badModules[moduleId],
+            [moduleId]: module,
           },
         })
       ).toBe(false)
