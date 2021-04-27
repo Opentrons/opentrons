@@ -11,7 +11,7 @@ const HEADING = 'Are you sure you want to cancel this run?'
 const CANCEL_TEXT = 'cancel run'
 const BACK_TEXT = 'go back'
 
-export type ConfirmCancelModalProps = {
+export interface ConfirmCancelModalProps {
   onClose: () => unknown,
 }
 
@@ -19,7 +19,7 @@ export function ConfirmCancelModal(props: ConfirmCancelModalProps): JSX.Element 
   const { onClose } = props
   const dispatch = useDispatch<Dispatch>()
 
-  const cancel = () => {
+  const cancel = (): void => {
     dispatch(robotActions.cancel())
     onClose()
   }

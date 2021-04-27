@@ -7,7 +7,7 @@ import styles from './styles.css'
 
 import type { Dispatch } from '../../../redux/types'
 
-export type RestartRequiredBannerProps = {
+export interface RestartRequiredBannerProps {
   robotName: string,
 }
 
@@ -19,7 +19,7 @@ const RESTART_NOW = 'Restart Now'
 
 export function RestartRequiredBanner(
   props: RestartRequiredBannerProps
-): JSX.Element {
+): JSX.Element | null {
   const { robotName } = props
   const [dismissed, setDismissed] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()

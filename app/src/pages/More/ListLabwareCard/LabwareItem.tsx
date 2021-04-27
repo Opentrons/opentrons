@@ -29,7 +29,7 @@ const THIS_FILE_CONFLICTS_WITH_ANOTHER_DEFINITION =
 const THIS_FILE_CONFLICTS_WITH_AN_OPENTRONS_DEFINITION =
   'This file conflicts with an Opentrons standard labware definition. If you are trying to create a definition based on an Opentrons definition, please contact support'
 
-export type LabwareItemProps = {
+export interface LabwareItemProps {
   file: CheckedLabwareFile,
 }
 

@@ -11,7 +11,7 @@ import {
 
 import type { State, Dispatch } from '../../../redux/types'
 
-export type ProtocolLabwareProps = {
+export interface ProtocolLabwareProps {
   robotName: string,
 }
 

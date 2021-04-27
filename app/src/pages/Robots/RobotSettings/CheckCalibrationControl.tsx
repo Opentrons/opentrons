@@ -24,7 +24,7 @@ import type { RequestState } from '../../../redux/robot-api/types'
 
 import type { State } from '../../../redux/types'
 
-export type CheckCalibrationControlProps = {
+export interface CheckCalibrationControlProps {
   robotName: string,
   disabledReason: string | null,
 }

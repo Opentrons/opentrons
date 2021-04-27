@@ -57,7 +57,7 @@ const StyledSecurityField: StyledComponent<
   ${fieldStyle}
 `
 
-export type FormModalProps = {
+export interface FormModalProps {
   id: string,
   network: WifiNetwork | null,
   fields: ConnectFormField[],

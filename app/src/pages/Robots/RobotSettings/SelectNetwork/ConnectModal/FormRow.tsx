@@ -5,7 +5,7 @@ import { FONT_WEIGHT_SEMIBOLD } from '@opentrons/components'
 
 import type { StyledComponent } from 'styled-components'
 
-export type FormRowProps = {
+export interface FormRowProps {
   label: string,
   labelFor: string,
   children: React.ReactNode,

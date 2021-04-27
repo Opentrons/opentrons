@@ -4,7 +4,7 @@ import { Page } from '../../../atoms/Page'
 import { CardContainer, CardRow } from '../../../atoms/layout'
 import { AttachedModulesCard } from './AttachedModulesCard'
 
-export type ModuleSettingsProps = {
+export interface ModuleSettingsProps {
   robotName: string,
   robotDisplayName: string,
 }

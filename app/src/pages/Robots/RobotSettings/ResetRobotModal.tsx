@@ -35,7 +35,7 @@ import { Portal } from '../../../App/portal'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
 
-export type ResetRobotModalProps = {
+export interface ResetRobotModalProps {
   robotName: string,
   closeModal: () => unknown,
 }

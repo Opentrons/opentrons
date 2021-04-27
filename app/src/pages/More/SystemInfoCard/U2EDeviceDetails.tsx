@@ -26,7 +26,7 @@ const NETWORK_INTERFACE = 'Network Interface'
 const IPV4_ADDRESS = 'Local IPv4 Address'
 const IPV6_ADDRESS = 'Local IPv6 Address'
 
-export type U2EDeviceDetailsProps = {
+export interface U2EDeviceDetailsProps {
   device: UsbDevice | null,
   ifaces: NetworkInterface[],
 }

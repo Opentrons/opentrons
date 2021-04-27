@@ -18,7 +18,7 @@ import type {
   RobotSystemType,
 } from '../../../../redux/buildroot/types'
 
-export type ViewUpdateModalProps = {
+export interface ViewUpdateModalProps {
   robotName: string,
   robotUpdateType: BuildrootUpdateType | null,
   robotSystemType: RobotSystemType | null,

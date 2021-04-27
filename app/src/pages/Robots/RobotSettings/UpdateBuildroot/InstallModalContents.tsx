@@ -9,7 +9,7 @@ import type {
   RobotSystemType,
 } from '../../../../redux/buildroot/types'
 
-export type InstallModalContentsProps = {
+export interface InstallModalContentsProps {
   robotSystemType: RobotSystemType | null,
   session: BuildrootUpdateSession,
 }

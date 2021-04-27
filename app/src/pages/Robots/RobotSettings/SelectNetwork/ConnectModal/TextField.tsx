@@ -11,7 +11,7 @@ import { FormRow } from './FormRow'
 import { useConnectFormField } from './form-state'
 import { LABEL_SHOW_PASSWORD } from '../i18n'
 
-export type TextFieldProps = {
+export interface TextFieldProps {
   id: string,
   name: string,
   label: string,

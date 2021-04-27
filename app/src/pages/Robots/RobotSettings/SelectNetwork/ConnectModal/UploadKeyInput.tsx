@@ -11,10 +11,10 @@ import {
 
 import type { State } from '../../../../../redux/types'
 
-export type UploadKeyInputProps = {
+export interface UploadKeyInputProps {
   robotName: string,
   label: string,
-  onUpload: (keyId: string) => mixed,
+  onUpload: (keyId: string) => unknown,
 }
 
 // TODO(mc, 2020-03-04): create styled HiddenInput in components library
@@ -29,7 +29,7 @@ const HiddenInput = styled.input`
   border: 0;
 `
 
-const UploadKeyInputComponent = (props: UploadKeyInputProps, ref) => {
+const UploadKeyInputComponent = (props: UploadKeyInputProps, ref): JSX.Element => {
   const { robotName, label, onUpload } = props
   const [dispatchApi, requestIds] = useDispatchApiRequest()
   const handleUpload = React.useRef()

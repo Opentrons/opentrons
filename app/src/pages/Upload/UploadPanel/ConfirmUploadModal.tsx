@@ -3,7 +3,7 @@ import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
 
-export type ConfirmUploadModalProps = {
+export interface ConfirmUploadModalProps {
   confirm: () => unknown,
   cancel: () => unknown,
 }

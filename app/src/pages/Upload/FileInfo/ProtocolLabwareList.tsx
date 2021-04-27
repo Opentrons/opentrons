@@ -19,7 +19,7 @@ import {
 
 import type { LabwareSummary } from '../../../redux/calibration/types'
 
-export type ProtocolLabwareListProps = {
+export interface ProtocolLabwareListProps {
   labware: LabwareSummary[],
 }
 

@@ -8,7 +8,7 @@ import styles from './styles.css'
 
 import type { SessionStatus, SessionStatusInfo } from '../../../redux/robot'
 
-export type CommandListProps = {
+export interface CommandListProps {
   commands: any[],
   sessionStatus: SessionStatus,
   sessionStatusInfo: SessionStatusInfo,

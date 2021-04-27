@@ -7,11 +7,11 @@ import * as Copy from './i18n'
 
 import type { NetworkChangeType } from './types'
 
-export type ResultModalProps = {
+export interface ResultModalProps {
   type: NetworkChangeType,
   ssid: string | null,
   isPending: boolean,
-  error: { message?: string, ... } | null,
+  error: { message?: string, [key: string]: unknown} | null,
   onClose: () => unknown,
 }
 

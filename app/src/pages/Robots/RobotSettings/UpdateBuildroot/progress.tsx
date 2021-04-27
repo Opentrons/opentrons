@@ -16,7 +16,7 @@ export function ProgressSpinner(): JSX.Element {
   )
 }
 
-export type ProgressBarProps = {
+export interface ProgressBarProps {
   progress: number | null,
 }
 

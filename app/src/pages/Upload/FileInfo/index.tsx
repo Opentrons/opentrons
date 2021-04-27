@@ -21,11 +21,11 @@ import { ProtocolLabwareCard } from './ProtocolLabwareCard'
 import { Continue } from './Continue'
 import { UploadError } from '../UploadError'
 
-export type FileInfoProps = {
+export interface FileInfoProps {
   robot: Robot,
-  filename: ?string,
+  filename: string | null | undefined,
   uploadInProgress: boolean,
-  uploadError: ?{ message: string },
+  uploadError: { message: string } | null | undefined,
   sessionLoaded: boolean,
   sessionHasSteps: boolean,
   showCustomLabwareWarning: boolean,

@@ -22,7 +22,7 @@ import styles from './styles.css'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-export type ProtocolPipettesCardProps = { robotName: string }
+export interface ProtocolPipettesCardProps { robotName: string }
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'

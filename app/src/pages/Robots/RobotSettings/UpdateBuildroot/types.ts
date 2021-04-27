@@ -1,5 +1,5 @@
-export type VersionProps = {
-  appVersion: string,
-  robotVersion: string | null,
-  availableUpdate: string,
+export interface VersionProps {
+  appVersion: string
+  robotVersion: string | null
+  availableUpdate: string
 }

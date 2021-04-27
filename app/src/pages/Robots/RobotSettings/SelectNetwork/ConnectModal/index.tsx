@@ -18,7 +18,7 @@ import type {
   EapOption,
 } from '../types'
 
-export type ConnectModalProps = {
+export interface ConnectModalProps {
   robotName: string,
   network: WifiNetwork | null,
   wifiKeys: WifiKey[],

@@ -4,7 +4,7 @@ import { ScanButton } from './ScanButton'
 
 import styles from './styles.css'
 
-export type ScanStatusProps = {
+export interface ScanStatusProps {
   onScanClick: () => unknown,
   isScanning: boolean,
   found: boolean,

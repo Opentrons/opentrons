@@ -12,11 +12,11 @@ import type {
 
 import type { WifiNetwork } from '../types'
 
-export type SelectSsidProps = {
+export interface SelectSsidProps {
   list: WifiNetwork[],
   value: string | null,
   showWifiDisconnect: boolean,
-  onConnect: (ssid: string) => mixed,
+  onConnect: (ssid: string) => unknown,
   onJoinOther: () => unknown,
   onDisconnect: () => unknown,
 }

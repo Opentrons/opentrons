@@ -5,7 +5,7 @@ import { Portal } from '../../../../App/portal'
 import { ManualIpForm } from './ManualIpForm'
 import { IpList } from './IpList'
 
-export type AddManualIpProps = {
+export interface AddManualIpProps {
   closeModal: () => unknown,
 }
 

@@ -17,14 +17,14 @@ export const OPEN_SOURCE_NAME = 'open-source'
 export const CHANGE_SOURCE_NAME = 'change-source'
 export const RESET_SOURCE_NAME = 'reset-source'
 
-export type ManagePathProps = {
+export interface ManagePathProps {
   path: string,
   onChangePath: () => unknown,
   onResetPath: () => unknown,
   onOpenPath: () => unknown,
 }
 
-const handleFocus = (e: SyntheticFocusEvent<HTMLInputElement>) => {
+const handleFocus = (e: React.FocusEvent<HTMLInputElement>): void => {
   e.currentTarget.select()
 }
 
@@ -34,7 +34,7 @@ export function ManagePath(props: ManagePathProps): JSX.Element {
     open => !open,
     false
   )
-  const handleResetPath = () => {
+  const handleResetPath = (): void => {
     toggleConfirmResetIsOpen()
     onResetPath()
   }

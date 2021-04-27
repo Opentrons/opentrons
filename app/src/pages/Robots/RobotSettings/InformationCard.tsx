@@ -31,7 +31,7 @@ import { LabeledValue } from '../../../atoms/structure'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-export type InformationCardProps = {
+export interface InformationCardProps {
   robot: ViewableRobot,
   updateUrl: string,
 }

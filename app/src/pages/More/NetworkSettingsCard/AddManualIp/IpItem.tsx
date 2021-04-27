@@ -4,10 +4,10 @@ import styles from './styles.css'
 
 import type { IconName } from '@opentrons/components'
 
-export type IpItemProps = {
+export interface IpItemProps {
   candidate: string,
   discovered: boolean,
-  removeIp: (ip: string) => mixed,
+  removeIp: (ip: string) => unknown,
 }
 
 export class IpItem extends React.Component<IpItemProps> {

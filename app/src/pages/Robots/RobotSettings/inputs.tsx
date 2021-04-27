@@ -5,10 +5,10 @@ import * as React from 'react'
 import {
   InputField,
   DropdownField,
-  type DropdownOption,
 } from '@opentrons/components'
+import type { DropdownOption } from '@opentrons/components'
 
-export type FormProps = {
+export interface FormProps {
   onSubmit: () => unknown,
   disabled?: boolean,
   children: React.ReactNode,
@@ -19,7 +19,7 @@ export type InputProps<T> = {
   name: T,
   value: ?string,
   disabled?: boolean,
-  onChange: ({ [name: T]: string }) => mixed,
+  onChange: ({ [name: T]: string }) => unknown,
   className?: string,
 }
 

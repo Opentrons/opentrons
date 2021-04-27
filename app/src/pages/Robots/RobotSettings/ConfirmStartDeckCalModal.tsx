@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { AlertModal } from '@opentrons/components'
 import styles from './styles.css'
 
-export type ConfirmStartDeckCalModalProps = {
+export interface ConfirmStartDeckCalModalProps {
   cancel: () => unknown,
   confirm: () => unknown,
 }

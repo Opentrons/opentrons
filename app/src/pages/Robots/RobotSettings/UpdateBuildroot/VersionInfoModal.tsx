@@ -19,7 +19,7 @@ import styles from './styles.css'
 import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
-export type VersionInfoModalProps = {
+export interface VersionInfoModalProps {
   robot: ViewableRobot,
   robotUpdateType: BuildrootUpdateType | null,
   close: () => unknown,

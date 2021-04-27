@@ -6,7 +6,7 @@ import type { HoverTooltipHandlers } from '@opentrons/components'
 import cx from 'classnames'
 import styles from './styles.css'
 
-export type RobotLinkProps = {
+export interface RobotLinkProps {
   children: React.ReactNode,
   url: string,
   className?: string,

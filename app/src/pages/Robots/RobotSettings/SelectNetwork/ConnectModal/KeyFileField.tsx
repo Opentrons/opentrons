@@ -8,7 +8,7 @@ import { useConnectFormField } from './form-state'
 
 import type { WifiKey } from '../types'
 
-export type KeyFileFieldProps = {
+export interface KeyFileFieldProps {
   id: string,
   name: string,
   label: string,

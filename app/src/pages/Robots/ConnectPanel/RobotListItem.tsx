@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { RobotLink } from './RobotLink'
 import styles from './styles.css'
 
-export type RobotListItemProps = {
+export interface RobotListItemProps {
   name: string,
   displayName: string,
   isConnectable: boolean,

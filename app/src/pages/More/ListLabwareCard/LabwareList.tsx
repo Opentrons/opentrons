@@ -22,7 +22,7 @@ const NO_LABWARE_DEFINITIONS_FOUND = 'No labware definitions found'
 const PLEASE_ADD_CUSTOM_LABWARE =
   'Please add custom labware via the Labware Management options above'
 
-export type LabwareListProps = {
+export interface LabwareListProps {
   labware: CheckedLabwareFile[],
   errorMessage: string | null,
 }

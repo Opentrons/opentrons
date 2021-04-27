@@ -47,8 +47,7 @@ const StyledName: StyledComponent<
   `}
 `
 
-export type NetworkOptionLabelProps = {
-  ...WifiNetwork,
+export interface NetworkOptionLabelProps extends WifiNetwork {
   showConnectedIcon: boolean,
 }
 

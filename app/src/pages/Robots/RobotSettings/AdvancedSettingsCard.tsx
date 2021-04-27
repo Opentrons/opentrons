@@ -36,7 +36,7 @@ import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 import type { RobotSettings } from '../../../redux/robot-settings/types'
 
-export type AdvancedSettingsCardProps = {
+export interface AdvancedSettingsCardProps {
   robot: ViewableRobot,
   resetUrl: string,
 }

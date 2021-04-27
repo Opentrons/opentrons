@@ -7,7 +7,7 @@ import styles from './styles.css'
 import type { ButtonProps } from '@opentrons/components'
 import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
 
-export type MigrationWarningModalProps = {
+export interface MigrationWarningModalProps {
   notNowButton: ButtonProps,
   updateType: BuildrootUpdateType | null,
   proceed: () => unknown,

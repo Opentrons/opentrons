@@ -5,7 +5,7 @@ import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 import type { IconName } from '@opentrons/components'
 
-export type IconCtaProps = {
+export interface IconCtaProps {
   name: string,
   iconName: IconName,
   text: string,

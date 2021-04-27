@@ -1,4 +1,4 @@
 
 export interface AlertProps {
-  dismissAlert: (remember?: boolean) => mixed
+  dismissAlert: (remember?: boolean) => unknown
 }

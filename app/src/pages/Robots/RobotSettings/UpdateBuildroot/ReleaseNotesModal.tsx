@@ -10,7 +10,7 @@ import type { ButtonProps } from '@opentrons/components'
 import type { Dispatch } from '../../../../redux/types'
 import type { RobotSystemType } from '../../../../redux/buildroot/types'
 
-export type ReleaseNotesModalProps = {
+export interface ReleaseNotesModalProps {
   robotName: string,
   notNowButton: ButtonProps,
   releaseNotes: string,

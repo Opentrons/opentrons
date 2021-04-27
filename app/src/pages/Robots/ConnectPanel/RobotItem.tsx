@@ -14,8 +14,7 @@ import { RobotListItem } from './RobotListItem.js'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-export type RobotItemProps = {
-  ...ContextRouter,
+export interface RobotItemProps extends ContextRouter {
   robot: ViewableRobot,
 }
 

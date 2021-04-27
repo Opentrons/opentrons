@@ -6,7 +6,7 @@ import { ProgressBar } from './progress'
 import styles from './styles.css'
 import type { ButtonProps } from '@opentrons/components'
 
-export type DownloadUpdateModalProps = {
+export interface DownloadUpdateModalProps {
   notNowButton: ButtonProps,
   error: string | null,
   progress: number | null,

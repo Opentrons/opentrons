@@ -21,7 +21,7 @@ import type { PipetteCompatibility } from '../../../redux/pipettes/types'
 
 const AXIS_NAMES = ['x', 'y', 'z']
 
-export type InstrumentItemProps = {
+export interface InstrumentItemProps {
   compatibility?: PipetteCompatibility,
   mount?: string,
   children: React.ReactNode,

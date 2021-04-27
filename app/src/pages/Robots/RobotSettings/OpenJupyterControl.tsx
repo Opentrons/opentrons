@@ -16,7 +16,7 @@ import { LabeledValue } from '../../../atoms/structure'
 
 const EVENT_JUPYTER_OPEN = { name: 'jupyterOpen', properties: {} }
 
-export type OpenJupyterControlProps = {
+export interface OpenJupyterControlProps {
   robotIp: string,
 }
 

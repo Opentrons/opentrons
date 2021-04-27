@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import styles from './styles.css'
 
-export type ScanButtonProps = {
+export interface ScanButtonProps {
   isScanning: boolean,
   onScanClick: () => unknown,
   found: boolean,

@@ -17,7 +17,7 @@ import {
 import type { State, Dispatch } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
-export type UpdateBuildrootProps = {
+export interface UpdateBuildrootProps {
   robot: ViewableRobot,
   close: () => unknown,
 }

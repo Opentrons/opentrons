@@ -8,7 +8,7 @@ import { FormRow } from './FormRow'
 
 import type { EapOption } from '../types'
 
-export type SecurityFieldProps = {
+export interface SecurityFieldProps {
   id: string,
   name: string,
   placeholder: string,

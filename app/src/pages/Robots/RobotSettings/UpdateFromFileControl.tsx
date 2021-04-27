@@ -31,7 +31,7 @@ const HIDDEN_CSS = css`
   clip: rect(1px 1px 1px 1px);
 `
 
-export type UpdateFromFileControlProps = {
+export interface UpdateFromFileControlProps {
   robotName: string,
 }
 
@@ -47,7 +47,7 @@ export function UpdateFromFileControl(
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateBtnProps, updateBtnTooltipProps] = useHoverTooltip()
 
-  const handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
+  const handleChange = (event: SyntheticInputEvent<HTMLInputElement>): void => {
     const { files } = event.target
     if (files.length === 1 && !updateDisabled) {
       // NOTE: File.path is Electron-specific

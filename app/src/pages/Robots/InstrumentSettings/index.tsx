@@ -8,7 +8,7 @@ import { ChangePipette } from '../../../organisms/ChangePipette'
 import { ConfigurePipette } from '../../../organisms/ConfigurePipette'
 import { Page } from '../../../atoms/Page'
 
-export type InstrumentSettingsProps = {
+export interface InstrumentSettingsProps {
   robotName: string,
   robotDisplayName: string,
   url: string,

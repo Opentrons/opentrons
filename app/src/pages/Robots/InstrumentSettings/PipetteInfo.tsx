@@ -33,7 +33,7 @@ import { PipetteCalibrationInfo } from './PipetteCalibrationInfo'
 import type { State } from '../../../redux/types'
 import type { Mount, AttachedPipette } from '../../../redux/pipettes/types'
 
-export type PipetteInfoProps = {
+export interface PipetteInfoProps {
   robotName: string,
   mount: Mount,
   pipette: AttachedPipette | null,

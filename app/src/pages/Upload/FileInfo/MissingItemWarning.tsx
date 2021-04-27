@@ -12,7 +12,7 @@ import {
 import styles from './styles.css'
 import { SectionContentHalf } from '../../../atoms/layout'
 
-export type MissingItemWarningProps = {
+export interface MissingItemWarningProps {
   missingItem: string,
   urlLabel: string,
   url: string,
