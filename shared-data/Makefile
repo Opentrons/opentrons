@@ -13,7 +13,7 @@ flow_out := $(patsubst lib/%.d.ts,flow-types/%.js.flow,$(typedefs))
 # Top level targets
 
 .PHONY: all
-all: clean dist dist-py
+all: clean dist
 
 .PHONY: setup
 setup: setup-py setup-js
@@ -27,8 +27,7 @@ clean: clean-js clean-py
 # JavaScript targets
 
 .PHONY: setup-js
-setup-js:
-	$(MAKE) dist
+setup-js: dist-js
 
 .PHONY: dist-js
 dist-js:
