@@ -44,7 +44,9 @@ export interface LabwareDefinition1 {
     tipVolume?: number
   }
   ordering: string[][]
-  wells: Record<string, WellDefinition>
+  wells: {
+    [well: string]: WellDefinition
+  }
 }
 
 // TODO(mc, 2019-05-29): Remove this enum in favor of string + exported

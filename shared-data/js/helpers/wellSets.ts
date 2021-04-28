@@ -52,15 +52,12 @@ export interface WellSetHelpers {
 }
 
 export const makeWellSetHelpers = (): WellSetHelpers => {
-  const cache: Record<
-    string,
-    | {
-        labwareDef: LabwareDefinition2
-        wellSetByPrimaryWell: WellSetByPrimaryWell
-      }
-    | null
-    | undefined
-  > = {}
+  const cache: Partial<{
+    [labwareDefURI: string]: {
+      labwareDef: LabwareDefinition2
+      wellSetByPrimaryWell: WellSetByPrimaryWell
+    } | null
+  }> = {}
 
   const getAllWellSetsForLabware = (
     labwareDef: LabwareDefinition2

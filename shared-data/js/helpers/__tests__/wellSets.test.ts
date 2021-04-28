@@ -15,7 +15,7 @@ const fixtureP10Multi = pipetteNameSpecsFixtures.p10_multi as PipetteNameSpecs
 const fixture12Trough = fixture_12_trough as LabwareDefinition2
 const fixture96Plate = fixture_96_plate as LabwareDefinition2
 const fixture384Plate = fixture_384_plate as LabwareDefinition2
-const fixtureOverlappyWellplage = fixture_overlappy_wellplate as LabwareDefinition2
+const fixtureOverlappyWellplate = fixture_overlappy_wellplate as LabwareDefinition2
 
 describe('findWellAt', () => {
   it('should determine if given (x, y) is within a rectangular well', () => {
@@ -81,14 +81,14 @@ describe('canPipetteUseLabware', () => {
   })
 
   it('returns false when wells are too close together for multi channel pipette', () => {
-    const labwareDef = fixtureOverlappyWellplage
+    const labwareDef = fixtureOverlappyWellplate
     const pipette = fixtureP10Multi
 
     expect(canPipetteUseLabware(pipette, labwareDef)).toBe(false)
   })
 
   it('returns true when pipette is single channel', () => {
-    const labwareDef = fixtureOverlappyWellplage
+    const labwareDef = fixtureOverlappyWellplate
     const pipette = fixtureP10Single
 
     expect(canPipetteUseLabware(pipette, labwareDef)).toBe(true)

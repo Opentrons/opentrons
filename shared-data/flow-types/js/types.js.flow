@@ -45,7 +45,9 @@ export type LabwareDefinition1 = {|
     tipVolume?: number,
   },
   ordering: string[][],
-  wells: { [key: string]: WellDefinition },
+  wells: {
+    [well: string]: WellDefinition,
+  },
 |};
 export type LabwareDisplayCategory =
   | "wellPlate"

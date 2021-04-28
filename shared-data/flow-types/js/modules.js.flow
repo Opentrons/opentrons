@@ -25,7 +25,11 @@ export type ModuleDef2 = {|
   displayName: string,
   quirks: string[],
   slotTransforms: {
-    [key: string]: { [key: string]: { [key: string]: AffineTransform } },
+    [deckDef: string]: {
+      [slot: string]: {
+        [transformName: string]: AffineTransform,
+      },
+    },
   },
   compatibleWith: ModuleModel[],
 |};

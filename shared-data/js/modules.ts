@@ -38,10 +38,13 @@ export interface ModuleDef2 {
   calibrationPoint: Coordinates
   displayName: string
   quirks: string[]
-  slotTransforms: Record<
-    string,
-    Record<string, Record<string, AffineTransform>>
-  >
+  slotTransforms: {
+    [deckDef: string]: {
+      [slot: string]: {
+        [transformName: string]: AffineTransform
+      }
+    }
+  }
   compatibleWith: ModuleModel[]
 }
 
