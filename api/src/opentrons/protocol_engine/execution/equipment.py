@@ -3,14 +3,13 @@ from dataclasses import dataclass
 from typing import Tuple
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
 
 from ..errors import FailedToLoadPipetteError
 from ..resources import ResourceProviders
 from ..state import StateView
-from ..types import LabwareLocation
+from ..types import LabwareLocation, PipetteName
 
 
 @dataclass(frozen=True)
@@ -87,15 +86,14 @@ class EquipmentHandler:
 
         cache_request = {mount.to_hw_mount(): pipette_name}
         if other_pipette is not None:
-            cache_request[
-                other_mount.to_hw_mount()
-            ] = other_pipette.pipette_name
+            cache_request[other_mount.to_hw_mount()] = other_pipette.pipette_name
 
         # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
         # behavior of protocol_context.load_instrument, and is used here as a
         # pipette existence check
+        # TODO(mc, 2021-04-16): reconcile PipetteName enum with PipetteName union
         try:
-            await self._hardware.cache_instruments(cache_request)
+            await self._hardware.cache_instruments(cache_request)  # type: ignore[arg-type]  # noqa: E501
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 

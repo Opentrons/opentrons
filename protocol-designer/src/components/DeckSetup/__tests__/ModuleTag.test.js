@@ -12,15 +12,15 @@ import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
-} from '../../../constants'
+} from '@opentrons/step-generation'
 import { ModuleStatus, ModuleTag } from '../ModuleTag'
 
 import * as timelineFramesSelectors from '../../../top-selectors/timelineFrames'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import * as uiSelectors from '../../../ui/steps'
 
+import type { CommandsAndRobotState } from '@opentrons/step-generation'
 import type { BaseState } from '../../../types'
-import type { CommandsAndRobotState } from '../../../step-generation'
 import type { ModuleEntities, InitialDeckSetup } from '../../../step-forms'
 
 jest.mock('../../../ui/steps')

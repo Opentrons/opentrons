@@ -7,7 +7,7 @@ import {
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { TEMPERATURE_DEACTIVATED } from '../../../../constants'
+import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { getNextDefaultTemperatureModuleId } from '../getNextDefaultTemperatureModuleId'
 
 const getThermocycler = () => ({

@@ -24,9 +24,10 @@ import {
   type ModuleCreationArgs,
   type PipetteFieldsData,
 } from '../FilePipettesModal'
+import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import type { NewProtocolFields } from '../../../load-file'
-import type { PipetteOnDeck, NormalizedPipette } from '../../../step-forms'
+import type { PipetteOnDeck } from '../../../step-forms'
 import type { LabwareDefByDefURI } from '../../../labware-defs/types'
 
 type Props = React.ElementProps<typeof FilePipettesModalComponent>
