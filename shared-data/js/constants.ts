@@ -1,5 +1,3 @@
-import type { ModuleModel } from './types'
-
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
 
@@ -35,6 +33,10 @@ export const THERMOCYCLER_MODULE_V1: 'thermocyclerModuleV1' =
 export const GEN2: 'GEN2' = 'GEN2'
 export const GEN1: 'GEN1' = 'GEN1'
 
+// pipette mounts
+export const LEFT: 'left' = 'left'
+export const RIGHT: 'right' = 'right'
+
 // NOTE: these are NOT module MODELs, they are `moduleType`s. Should match ENUM in module definition file.
 export const TEMPERATURE_MODULE_TYPE: 'temperatureModuleType' =
   'temperatureModuleType'
@@ -51,7 +53,7 @@ export const TEMPERATURE_MODULE_MODELS = [
 
 export const THERMOCYCLER_MODULE_MODELS = [THERMOCYCLER_MODULE_V1]
 
-export const MODULE_MODELS: ModuleModel[] = [
+export const MODULE_MODELS = [
   ...MAGNETIC_MODULE_MODELS,
   ...TEMPERATURE_MODULE_MODELS,
   ...THERMOCYCLER_MODULE_MODELS,

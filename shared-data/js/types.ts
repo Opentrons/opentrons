@@ -1,4 +1,4 @@
-import type {
+import {
   MAGDECK,
   TEMPDECK,
   THERMOCYCLER,
@@ -12,6 +12,8 @@ import type {
   THERMOCYCLER_MODULE_TYPE,
   GEN1,
   GEN2,
+  LEFT,
+  RIGHT,
 } from './constants'
 
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
@@ -283,6 +285,8 @@ export interface ModuleDefinition {
 export type PipetteChannels = 1 | 8
 
 export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2
+
+export type PipetteMount = typeof LEFT | typeof RIGHT
 
 export interface FlowRateSpec {
   value: number

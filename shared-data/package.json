@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "source": "js/index.ts",
   "types": "lib/js/index.d.ts",
-  "flow:main": "flow-types/index.js.flow",
+  "flow:main": "flow-types/js/index.js.flow",
   "dependencies": {
     "ajv": "6.10.2",
     "lodash": "4.17.15"

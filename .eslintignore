@@ -10,7 +10,9 @@ shared-data/python/**
 
 # flow
 flow-typed/npm/**
+discovery-client/flow-types/**
 components/flow-types/**
+shared-data/flow-types/**
 
 # typescript
 app-shell/lib/**
