@@ -1,30 +1,113 @@
 import logging
-from typing import Optional, List
+import re
+from typing import Optional, Dict
 
+from opentrons.drivers.smoothie_drivers import HOMED_POSITION
 from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE
+from opentrons.hardware_control.emulation.parser import Command, Parser
 
 from .abstract_emulator import AbstractEmulator
 
 logger = logging.getLogger(__name__)
 
-v = """Build version: EMULATOR, Build date: CURRENT, MCU: NONE, System Clock: NONE"""
+VERSION_STRING = "Build version: EMULATOR, " \
+                 "Build date: CURRENT, MCU: NONE, System Clock: NONE"
 
 
 class SmoothieEmulator(AbstractEmulator):
     """Smoothie emulator"""
 
-    def __init__(self) -> None:
-        self.x = self.y = self.z = self.a = self.b = self.c = 0.00
+    WRITE_INSTRUMENT_RE = re.compile(r"(?P<mount>[LR])\s*(?P<value>[a-f0-9]+)")
 
-    def handle(self, words: List[str]) -> Optional[str]:
+    def __init__(self) -> None:
+        self._pos = {'A': 0.0, 'B': 0.0, 'C': 0.0, 'X': 0.0, 'Y': 0.0, 'Z': 0.0}
+        self._home_status = {
+            'X': 0,
+            'Y': 0,
+            'Z': 0,
+            'A': 0,
+            'B': 0,
+            'C': 0,
+        }
+        self._speed = 0.0
+        self._pipette_model = {
+            # p20_multi_v2.0
+            "L": "7032305F6D756C74695F76322E30000000000000000000000000000000000000",
+            # p20_single_v2.0
+            "R": "7032305F73696E676C655F76322E300000000000000000000000000000000000"
+        }
+        self._pipette_id = {
+            # P3HMV202020041605
+            "L": "5033484D56323032303230303431363035000000000000000000000000000000",
+            # P20SV202020070101
+            "R": "5032305356323032303230303730313031000000000000000000000000000000"
+        }
+        self._parser = Parser(gcodes=list(GCODE))
+
+    def handle(self, line: str) -> Optional[str]:
+        """Handle a line"""
+        results = (self._handle(c) for c in self._parser.parse(line))
+        joined = ' '.join(r for r in results if r)
+        return None if not joined else joined
+
+    def _handle(self, command: Command) -> Optional[str]:  # noqa: C901
         """Handle a command."""
-        cmd = words[0]
-        logger.info(f"Got command {cmd}")
-        if GCODE.HOMING_STATUS == cmd:
-            return "X:0 Y:0 Z:0 A:0 B:0 C:0"
-        elif GCODE.CURRENT_POSITION == cmd:
-            return f"{cmd}\r\n\r\nok MCS: X:{self.x} Y:{self.y} " \
-                   f"Z:{self.z} A:{self.a} B:{self.b} C:{self.c}"
-        elif GCODE.VERSION == cmd:
-            return v
+        # TODO (al, 2021-04-28): break this up into multiple functions and
+        #  remove 'noqa(C901)'.
+        logger.info(f"Got command {command}")
+        if GCODE.HOMING_STATUS == command.gcode:
+            vals = " ".join(f"{k}:{v}" for k, v in self._home_status.items())
+            return vals
+        elif GCODE.CURRENT_POSITION == command.gcode:
+            vals = " ".join(f"{k}:{v}" for k, v in self._pos.items())
+            return f"{command.gcode}\r\n\r\nok MCS: {vals}"
+        elif GCODE.VERSION == command.gcode:
+            return VERSION_STRING
+        elif GCODE.READ_INSTRUMENT_ID == command.gcode:
+            if "L" in command.params:
+                return f"L:{self._pipette_id['L']}"
+            elif "R" in command.params:
+                return f"R:{self._pipette_id['R']}"
+        elif GCODE.READ_INSTRUMENT_MODEL == command.gcode:
+            if "L" in command.params:
+                return f"L:{self._pipette_model['L']}"
+            elif "R" in command.params:
+                return f"R:{self._pipette_model['R']}"
+        elif GCODE.WRITE_INSTRUMENT_ID == command.gcode:
+            self._pipette_id.update(self._mount_strings(command))
+        elif GCODE.WRITE_INSTRUMENT_MODEL == command.gcode:
+            self._pipette_model.update(self._mount_strings(command))
+        elif GCODE.MOVE == command.gcode:
+            for key, value in command.params.items():
+                assert isinstance(value, float), f"invalid value '{value}'"
+                if 'F' == key:
+                    self._speed = value
+                else:
+                    self._home_status[key] = 0
+                    self._pos[key] = value
+        elif GCODE.HOME == command.gcode:
+            for axis in command.params.keys():
+                self._pos[axis] = HOMED_POSITION[axis]
+                self._home_status[axis] = 1
         return None
+
+    @staticmethod
+    def _mount_strings(command: Command) -> Dict[str, str]:
+        """
+        Parse the body of the command for the mount strings.
+
+        Write instrument id and model use the format:
+            MOUNT VALUE
+        where MOUNT is either L or R and VALUE is a string of ascii codes.
+
+        Args:
+            command: Command
+
+        Returns:
+            A dict of L and/or R to the string value following it.
+        """
+        pars = (i.groupdict() for i in
+                SmoothieEmulator.WRITE_INSTRUMENT_RE.finditer(command.body))
+        result = {p['mount']: p['value'] for p in pars}
+        assert result, f"missing mount values '{command.body}'"
+        return result

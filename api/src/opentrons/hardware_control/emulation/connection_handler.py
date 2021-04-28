@@ -18,18 +18,15 @@ class ConnectionHandler:
         while True:
             line = await reader.readuntil(self._emulator.get_terminator())
             logger.debug("Received: %s", line)
-
-            words = line.decode().strip().split(' ')
-            if words:
-                try:
-                    response = self._emulator.handle(words)
-                    if response:
-                        response = f'{response}\r\n'
-                        logger.debug("Sending: %s", response)
-                        writer.write(response.encode())
-                except (IndexError, StopIteration) as e:
-                    logger.exception("exception")
-                    writer.write(f'Error: {str(e)}\r\n'.encode())
+            try:
+                response = self._emulator.handle(line.decode().strip())
+                if response:
+                    response = f'{response}\r\n'
+                    logger.debug("Sending: %s", response)
+                    writer.write(response.encode())
+            except Exception as e:
+                logger.exception("exception")
+                writer.write(f'Error: {str(e)}\r\n'.encode())
 
             writer.write(self._emulator.get_ack())
             await writer.drain()
