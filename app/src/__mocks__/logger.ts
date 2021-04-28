@@ -1,9 +1,8 @@
 // mock logger for tests
 import path from 'path'
+import type { Logger } from '../logger'
 
-export function createLogger(
-  filename: string
-): (message: string, meta: unknown) => void {
+export function createLogger(filename: string): Logger {
   const label = path.relative(path.join(__dirname, '../../..'), filename)
 
   // @ts-expect-error
@@ -18,8 +17,6 @@ export function createLogger(
   )
 }
 
-export const useLogger = (
-  filename: string
-): ((message: string, meta: unknown) => void) => {
+export const useLogger = (filename: string): Logger => {
   return createLogger(filename)
 }

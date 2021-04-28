@@ -9,7 +9,7 @@ import type { InstrumentInfoProps } from '@opentrons/components'
 import type { Pipette, Labware } from '../../../redux/robot/types'
 import type { Mount } from '../../../redux/pipettes/types'
 
-export type PipettesContentsProps = {
+export interface PipettesContentsProps {
   currentMount: Mount | null,
   pipettes: Pipette[],
   activeTipracks: { left: Labware | null, right: Labware | null },
