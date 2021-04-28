@@ -13,7 +13,6 @@ import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
-  labwareTypeOptions,
   tubeRackInsertOptions,
   aluminumBlockAutofills,
   aluminumBlockTypeOptions,
@@ -42,7 +41,6 @@ import { RadioField } from './components/RadioField'
 import { Section } from './components/Section'
 import { TextField } from './components/TextField'
 import { HeightGuidingText } from './components/HeightGuidingText'
-import { ImportLabware } from './components/ImportLabware'
 import { ImportErrorModal } from './components/ImportErrorModal'
 import {
   HeightImg,
@@ -65,6 +63,9 @@ import type {
   LabwareFields,
   ProcessedLabwareFields,
 } from './fields'
+import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
+import { UploadExisting } from './components/sections/UploadExisting'
+import { Regularity } from './components/sections/Regularity'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
@@ -495,75 +496,25 @@ export const LabwareCreator = (): JSX.Element => {
               <h2>Custom Labware Creator BETA</h2>
               <IntroCopy />
               <div className={styles.flex_row}>
-                <div className={styles.new_definition_section}>
-                  <Section
-                    label="Create a new definition"
-                    fieldList={[
-                      'labwareType',
-                      'tubeRackInsertLoadName',
-                      'aluminumBlockType',
-                      'aluminumBlockChildType',
-                    ]}
-                    headingClassName={cx(styles.setup_heading, {
-                      [styles.disabled_section]: lastUploaded !== null,
-                    })}
-                  >
-                    <div className={styles.labware_type_fields}>
-                      {lastUploaded === null ? (
-                        <>
-                          <Dropdown
-                            name="labwareType"
-                            options={labwareTypeOptions}
-                          />
-                          {labwareTypeChildFields}
-                        </>
-                      ) : null}
-
-                      <PrimaryButton
-                        className={styles.start_creating_btn}
-                        disabled={!canProceedToForm || lastUploaded !== null}
-                        onClick={scrollToForm}
-                      >
-                        start creating labware
-                      </PrimaryButton>
-                    </div>
-                  </Section>
-                </div>
-                <div className={styles.upload_existing_section}>
-                  <h2 className={styles.setup_heading}>
-                    Edit a file you’ve built with our labware creator
-                  </h2>
-                  {lastUploaded === null ? (
-                    <ImportLabware onUpload={onUpload} />
-                  ) : (
-                    <div className={styles.labware_type_fields}>
-                      {labwareTypeChildFields}
-                      <PrimaryButton
-                        className={styles.start_creating_btn}
-                        onClick={scrollToForm}
-                        disabled={!canProceedToForm}
-                      >
-                        start editing labware
-                      </PrimaryButton>
-                    </div>
-                  )}
-                </div>
+                <CreateNewDefinition
+                  showDropDownOptions={lastUploaded === null}
+                  disabled={!canProceedToForm || lastUploaded !== null}
+                  labwareTypeChildFields={labwareTypeChildFields}
+                  onClick={scrollToForm}
+                />
+                <UploadExisting
+                  disabled={!canProceedToForm}
+                  labwareTypeChildFields={labwareTypeChildFields}
+                  lastUploaded={lastUploaded}
+                  onClick={scrollToForm}
+                  onUpload={onUpload}
+                />
               </div>
               <div ref={scrollRef} />
               {showCreatorForm && (
                 <>
                   {/* PAGE 1 - Labware */}
-                  <Section label="Regularity" fieldList={['homogeneousWells']}>
-                    {/* tubeRackSides: Array<string> maybe?? */}
-                    <div className={styles.flex_row}>
-                      <div className={styles.homogenous_wells_section}>
-                        <RadioField
-                          name="homogeneousWells"
-                          options={yesNoOptions}
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <Regularity />
                   <Section
                     label="Footprint"
                     fieldList={['footprintXDimension', 'footprintYDimension']}
