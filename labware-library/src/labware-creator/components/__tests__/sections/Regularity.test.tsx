@@ -11,7 +11,7 @@ import {
 import { Regularity } from '../../sections/Regularity'
 import { getFormAlerts } from '../../utils/getFormAlerts'
 import { RadioField } from '../../RadioField'
-import { wrapInFormik } from '../utils/wrapInFormik'
+import { wrapInFormik } from '../../utils/wrapInFormik'
 
 jest.mock('../../RadioField')
 jest.mock('../../utils/getFormAlerts')
