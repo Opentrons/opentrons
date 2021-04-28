@@ -1,14 +1,15 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
+import { AlertItem } from '@opentrons/components'
 import { getIsHidden } from '../../formSelectors'
+import { IRREGULAR_LABWARE_ERROR } from '../../fields'
 import {
   getFormAlerts,
   Props as FormAlertProps,
   IrregularLabwareAlert,
 } from '../utils/getFormAlerts'
-import { IRREGULAR_LABWARE_ERROR } from '../../fields'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { AlertItem } from '@opentrons/components/src/alerts/AlertItem'
+
 
 jest.mock('../formSelectors')
 

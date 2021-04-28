@@ -3,12 +3,10 @@ import compact from 'lodash/compact'
 import uniq from 'lodash/uniq'
 import { AlertItem } from '@opentrons/components'
 import { getIsHidden } from '../../formSelectors'
-import { IRREGULAR_LABWARE_ERROR, LINK_CUSTOM_LABWARE_FORM } from '../../fields'
+import { LabwareFields, IRREGULAR_LABWARE_ERROR, LINK_CUSTOM_LABWARE_FORM } from '../../fields'
 import { LinkOut } from '../LinkOut'
 
 import type { FormikTouched, FormikErrors } from 'formik'
-import type { LabwareFields } from '../../fields'
-
 export interface Props {
   values: LabwareFields
   fieldList: Array<keyof LabwareFields>
