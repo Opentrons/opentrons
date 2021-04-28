@@ -10,7 +10,7 @@ import {
 } from '../utils/getFormAlerts'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-jest.mock('../formSelectors')
+jest.mock('../../formSelectors')
 
 const getIsHiddenMock = getIsHidden as jest.MockedFunction<typeof getIsHidden>
 
