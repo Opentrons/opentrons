@@ -1,5 +1,4 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
 import { AlertItem } from '@opentrons/components'
 import { getIsHidden } from '../../formSelectors'
 import { IRREGULAR_LABWARE_ERROR } from '../../fields'
