@@ -66,6 +66,7 @@ module.exports = {
         '@typescript-eslint/prefer-nullish-coalescing': 'warn',
         '@typescript-eslint/prefer-optional-chain': 'warn',
         '@typescript-eslint/restrict-plus-operands': 'warn',
+        '@typescript-eslint/restrict-template-expressions': 'warn',
       },
     },
     {
