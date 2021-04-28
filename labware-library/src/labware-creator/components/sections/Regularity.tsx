@@ -12,7 +12,7 @@ export const Regularity = (): JSX.Element => {
   const fieldList: Array<keyof LabwareFields> = ['homogeneousWells']
   const { values, errors, touched } = useFormikContext<LabwareFields>()
 
-  const ret = (
+  return (
     <SectionBody label="Regularity">
       <>
         {getFormAlerts({ values, touched, errors, fieldList })}
@@ -24,5 +24,4 @@ export const Regularity = (): JSX.Element => {
       </>
     </SectionBody>
   )
-  return ret
 }
