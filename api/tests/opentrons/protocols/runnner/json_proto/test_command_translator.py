@@ -1,7 +1,6 @@
 import pytest
-from mock import MagicMock
-from opentrons.protocol_engine import StateView, WellLocation, WellOrigin
-from opentrons.protocol_engine.commands import AspirateRequest
+from opentrons.protocol_engine import WellLocation, WellOrigin
+from opentrons.protocol_engine.commands import AspirateRequest, DispenseRequest
 from opentrons.protocols.runner.json_proto.models import json_protocol as models
 
 from opentrons.protocols.runner.json_proto.command_translator import (
@@ -10,13 +9,8 @@ from opentrons.protocols.runner.json_proto.command_translator import (
 
 
 @pytest.fixture
-def mock_state_view() -> MagicMock:
-    return MagicMock(spec=StateView)
-
-
-@pytest.fixture
-def subject(mock_state_view) -> CommandTranslator:
-    return CommandTranslator(state_view=mock_state_view)
+def subject() -> CommandTranslator:
+    return CommandTranslator()
 
 
 def test_aspirate(subject, aspirate_command: models.LiquidCommand) -> None:
@@ -33,6 +27,25 @@ def test_aspirate(subject, aspirate_command: models.LiquidCommand) -> None:
             wellLocation=WellLocation(
                 origin=WellOrigin.BOTTOM,
                 offset=(0, 0, aspirate_command.params.offsetFromBottomMm)
+            )
+        )
+    ]
+
+
+def test_dispense(subject, dispense_command: models.LiquidCommand) -> None:
+    """It should translate a JSON dispense command to a Protocol Engine
+     dispense request."""
+    request = subject.translate(dispense_command)
+
+    assert request == [
+        DispenseRequest(
+            pipetteId=dispense_command.params.pipette,
+            labwareId=dispense_command.params.labware,
+            wellName=dispense_command.params.well,
+            volume=dispense_command.params.volume,
+            wellLocation=WellLocation(
+                origin=WellOrigin.BOTTOM,
+                offset=(0, 0, dispense_command.params.offsetFromBottomMm)
             )
         )
     ]

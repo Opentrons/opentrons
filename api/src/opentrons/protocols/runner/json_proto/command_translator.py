@@ -1,7 +1,8 @@
 from typing import Dict, Iterable
 
-from opentrons.protocol_engine import StateView, WellLocation, WellOrigin
-from opentrons.protocol_engine.commands import CommandRequestType, AspirateRequest
+from opentrons.protocol_engine import WellLocation, WellOrigin
+from opentrons.protocol_engine.commands import CommandRequestType, \
+    AspirateRequest, DispenseRequest
 from opentrons.protocols.runner.json_proto.models import json_protocol as models
 
 
@@ -15,16 +16,9 @@ ReturnType = Iterable[CommandRequestType]
 class CommandTranslator:
     """Class that translates commands from PD/JSON to ProtocolEngine."""
 
-    def __init__(
-            self,
-            state_view: StateView) -> None:
-        """
-        Construct a command translator
-
-        Args:
-            state_view: The protocol engine state view.
-        """
-        self._state_view = state_view
+    def __init__(self) -> None:
+        """Construct a command translator"""
+        pass
 
     def translate(self, command: models.AllCommands) -> ReturnType:
         """
@@ -77,7 +71,26 @@ class CommandTranslator:
     def _dispense(
             self,
             command: models.LiquidCommand) -> ReturnType:
-        raise NotImplementedError()
+        """
+        Translate a dispense JSON command to a protocol engine dispense request.
+
+        Args:
+            command: JSON protocol dispense command
+
+        Returns: DispenseRequest
+        """
+        return [
+            DispenseRequest(
+                pipetteId=command.params.pipette,
+                labwareId=command.params.labware,
+                wellName=command.params.well,
+                volume=command.params.volume,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.BOTTOM,
+                    offset=(0, 0, command.params.offsetFromBottomMm)
+                )
+            )
+        ]
 
     def _air_gap(
             self,
