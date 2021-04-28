@@ -1,25 +1,21 @@
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'
+
 import { labwareSchemaV1 } from '../schema'
+import type { LabwareDefinition1 } from '../types'
+
 const DEFINITIONS_GLOB_PATTERN = '../../labware/definitions/1/*.json'
-const GLOB_OPTIONS = {
-  absolute: true,
-  cwd: __dirname,
-}
+const GLOB_OPTIONS = { absolute: true, cwd: __dirname }
+
 // JSON Schema defintion & setup
-const ajv = new Ajv({
-  allErrors: true,
-  jsonPointers: true,
-})
+const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(labwareSchemaV1)
+
 describe('test the schema against a minimalist fixture', () => {
   it('...', () => {
     const minimalLabwareDef = {
-      metadata: {
-        name: 'test-labware',
-        format: 'trough',
-      },
+      metadata: { name: 'test-labware', format: 'trough' },
       ordering: [['A1']],
       wells: {
         A1: {
@@ -36,20 +32,21 @@ describe('test the schema against a minimalist fixture', () => {
     }
     const valid = validate(minimalLabwareDef)
     const validationErrors = validate.errors
+
     expect(validationErrors).toBe(null)
     expect(valid).toBe(true)
   })
+
   it('fail on bad labware', () => {
     const badDef = {
-      metadata: {
-        name: 'bad',
-      },
+      metadata: { name: 'bad' },
       ordering: ['A1'],
       // array of strings not array of arrays
       wells: {},
     }
     const valid = validate(badDef)
     const validationErrors = validate.errors
+
     expect(
       validationErrors?.find(err => err.dataPath === '/ordering/0')
     ).toMatchObject({
@@ -58,16 +55,18 @@ describe('test the schema against a minimalist fixture', () => {
     expect(valid).toBe(false)
   })
 })
+
 describe('test schemas of all definitions', () => {
   const labwarePaths = glob.sync(DEFINITIONS_GLOB_PATTERN, GLOB_OPTIONS)
-  it('got at least 1 labware definition file', () => {
+
+  beforeAll(() => {
     // Make sure definitions path didn't break, which would give you false positives
     expect(labwarePaths.length).toBeGreaterThan(0)
   })
+
   labwarePaths.forEach(labwarePath => {
     const filename = path.parse(labwarePath).name
-
-    const labwareDef = require(labwarePath)
+    const labwareDef = require(labwarePath) as LabwareDefinition1
 
     it(filename, () => {
       const valid = validate(labwareDef)
@@ -75,6 +74,7 @@ describe('test schemas of all definitions', () => {
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
     })
+
     it(`file name matches metadata.name: ${filename}`, () => {
       expect(labwareDef.metadata.name).toEqual(filename)
     })

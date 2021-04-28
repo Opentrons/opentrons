@@ -1,5 +1,6 @@
 // tests for pipette info accessors in `shared-data/js/pipettes.js`
 import { getPipetteNameSpecs, getPipetteModelSpecs } from '../pipettes'
+
 const PIPETTE_NAMES = [
   'p10_single',
   'p50_single',
@@ -9,6 +10,7 @@ const PIPETTE_NAMES = [
   'p50_multi',
   'p300_multi',
 ]
+
 const PIPETTE_MODELS = [
   'p10_single_v1',
   'p10_single_v1.3',
@@ -38,6 +40,7 @@ const PIPETTE_MODELS = [
   'p1000_single_v1.4',
   'p1000_single_v1.5',
 ]
+
 describe('pipette data accessors', () => {
   describe('getPipetteNameSpecs', () => {
     PIPETTE_NAMES.forEach(name =>
@@ -45,6 +48,7 @@ describe('pipette data accessors', () => {
         expect(getPipetteNameSpecs(name)).toMatchSnapshot())
     )
   })
+
   describe('getPipetteModelSpecs', () => {
     PIPETTE_MODELS.forEach(model =>
       it(`model ${model} snapshot`, () =>

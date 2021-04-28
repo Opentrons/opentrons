@@ -63,16 +63,9 @@ describe('ensure bad protocol data fails validation', () => {
   it('reject bad values in "pipettes" objects', () => {
     const badPipettes = {
       missingKeys: {},
-      missingName: {
-        mount: 'left',
-      },
-      missingMount: {
-        name: 'pipetteName',
-      },
-      badMount: {
-        mount: 'blah',
-        name: 'pipetteName',
-      },
+      missingName: { mount: 'left' },
+      missingMount: { name: 'pipetteName' },
+      badMount: { mount: 'blah', name: 'pipetteName' },
       hasAdditionalProperties: {
         mount: 'left',
         name: 'pipetteName',
@@ -95,12 +88,8 @@ describe('ensure bad protocol data fails validation', () => {
 
   it('reject bad values in "labware" objects', () => {
     const badLabware = {
-      noSlot: {
-        definitionId: 'defId',
-      },
-      noDefId: {
-        slot: '1',
-      },
+      noSlot: { definitionId: 'defId' },
+      noDefId: { slot: '1' },
       hasAdditionalProperties: {
         slot: '1',
         definitionId: 'defId',
@@ -123,16 +112,9 @@ describe('ensure bad protocol data fails validation', () => {
 
   it('reject bad values in "modules" objects', () => {
     const badModules = {
-      badModuleType: {
-        slot: '1',
-        moduleType: 'fake',
-      },
-      noSlot: {
-        moduleType: 'thermocycler',
-      },
-      noModuleType: {
-        slot: '1',
-      },
+      badModuleType: { slot: '1', moduleType: 'fake' },
+      noSlot: { moduleType: 'thermocycler' },
+      noModuleType: { slot: '1' },
       hasAdditionalProperties: {
         slot: '1',
         moduleType: 'thermocycler',
