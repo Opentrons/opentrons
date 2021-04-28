@@ -36,9 +36,13 @@ export const ModuleLiveStatusCards = (): React.Node => {
 
   if (matchedModules.length === 0) return null
 
+  const moduleList = matchedModules
+    .slice()
+    .sort((a, b) => Number(a.slot) - Number(b.slot))
+
   return (
     <>
-      {matchedModules.map((m, index) => {
+      {moduleList.map((m, index) => {
         switch (m.module.type) {
           case TEMPERATURE_MODULE_TYPE:
             return (
