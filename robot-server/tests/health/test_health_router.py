@@ -1,9 +1,14 @@
+"""Tests for the /health router."""
+from mock import MagicMock
+from starlette.testclient import TestClient
+
 from opentrons import __version__
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION)
 
 
-def test_health(api_client, hardware):
+def test_get_health(api_client: TestClient, hardware: MagicMock) -> None:
+    """Test GET /health."""
     hardware.fw_version = "FW111"
     hardware.board_revision = "BR2.1"
 
@@ -24,6 +29,7 @@ def test_health(api_client, hardware):
             "systemTime": "/system/time"
         }
     }
+
     resp = api_client.get('/health')
     text = resp.json()
     assert resp.status_code == 200

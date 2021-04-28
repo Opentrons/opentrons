@@ -238,7 +238,7 @@ To help with code quality and maintainability, we use a collection of tools that
 
 - [Linters][lint]
   - Analyze the code for various potential bugs and errors
-  - [Pylama][pylama] - Python code audit tool
+  - [Flake8][flake8] - Python code audit tool
   - [ESLint][eslint] - JavaScript/JSON linter
   - [stylelint][] - CSS linter
 - [Typecheckers][type-check]
@@ -274,7 +274,7 @@ make format
 [type-safe]: https://en.wikipedia.org/wiki/Type_safety
 [code-style]: https://en.wikipedia.org/wiki/Programming_style
 [eslint]: https://eslint.org/
-[pylama]: https://github.com/klen/pylama
+[flake8]: https://flake8.pycqa.org
 [stylelint]: https://stylelint.io/
 [flow]: https://flow.org/
 [mypy]: http://mypy-lang.org/
