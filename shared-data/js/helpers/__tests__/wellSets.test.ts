@@ -1,8 +1,4 @@
-import {
-  p10_single,
-  p10_multi,
-} from '@opentrons/shared-data/pipette/fixtures/name/pipetteNameSpecFixtures.json'
-
+import pipetteNameSpecsFixtures from '../../../pipette/fixtures/name/pipetteNameSpecFixtures.json'
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
@@ -14,8 +10,8 @@ import { findWellAt } from '../getWellNamePerMultiTip'
 import type { LabwareDefinition2, PipetteNameSpecs } from '../../types'
 import type { WellSetHelpers } from '../wellSets'
 
-const fixtureP10Single = p10_single as PipetteNameSpecs
-const fixtureP10Multi = p10_multi as PipetteNameSpecs
+const fixtureP10Single = pipetteNameSpecsFixtures.p10_single as PipetteNameSpecs
+const fixtureP10Multi = pipetteNameSpecsFixtures.p10_multi as PipetteNameSpecs
 const fixture12Trough = fixture_12_trough as LabwareDefinition2
 const fixture96Plate = fixture_96_plate as LabwareDefinition2
 const fixture384Plate = fixture_384_plate as LabwareDefinition2
