@@ -30,10 +30,10 @@ import styles from './styles.css'
 import type { MatchedModule } from '../../redux/modules/types'
 import type { State } from '../../redux/types'
 
-const MODULE_STYLE = { width: '37%' }
-const USB_ORDER_STYLE = { width: '27%', paddingRight: '0.75rem' }
-const USB_PORT_STYLE = { width: '23%', paddingRight: '0.75rem' }
-const DECK_SLOT_STYLE = { width: '13%' }
+const MODULE_STYLE = { width: '33%' }
+const USB_ORDER_STYLE = { width: '25%', paddingRight: '0.4rem' }
+const USB_PORT_STYLE = { width: '27%', paddingRight: '0.75rem' }
+const DECK_SLOT_STYLE = { width: '15%' }
 
 export function ProtocolModuleList(): React.Node {
   const { t } = useTranslation('protocol_calibration')
@@ -121,11 +121,12 @@ function UsbPortInfo(props: UsbPortInfoProps): React.Node {
   // return nothing if module is missing
   if (props.matchedModule === null) return null
   const portInfo = props.matchedModule.module.usbPort
-  const portText = portInfo?.hub
-    ? `Port ${portInfo.hub} via Hub`
-    : portInfo?.port
-    ? `Port ${portInfo.port}`
-    : 'N/A'
+  const portText =
+    portInfo?.hub && portInfo?.port
+      ? `USB Port ${portInfo.hub} Hub Port ${portInfo.port}`
+      : portInfo?.port
+      ? `USB Port ${portInfo.port}`
+      : 'N/A'
   return (
     <>
       <Text>{portText}</Text>
