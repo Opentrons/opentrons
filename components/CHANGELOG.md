@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0-alpha.7](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.6...v4.3.0-alpha.7) (2021-04-29)
+
+
+### Bug Fixes
+
+* **app:** add USB hub port number ([#7738](https://github.com/Opentrons/opentrons/issues/7738)) ([2f317bc](https://github.com/Opentrons/opentrons/commit/2f317bc))
+
+
+
+
+
 # [4.3.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.5...v4.3.0-alpha.6) (2021-04-23)
 
 **Note:** Version bump only for package @opentrons/components
