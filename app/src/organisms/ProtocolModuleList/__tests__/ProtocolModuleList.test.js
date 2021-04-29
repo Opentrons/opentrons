@@ -67,7 +67,7 @@ const mockMatchedModule1 = {
 const mockMatchedModule2 = {
   module: {
     ...mockMagneticModule,
-    usbPort: { hub: 2, port: null },
+    usbPort: { hub: 2, port: 3 },
   },
   slot: '3',
 }
@@ -155,7 +155,7 @@ describe('ModuleList', () => {
         expect(allText).not.toContain('N/A')
         expect(toolTip.exists()).toBe(false)
       } else {
-        expect(allText).toContain('Port 2 via Hub')
+        expect(allText).toContain('USB Port 2 Hub Port 3')
         expect(toolTip.exists()).toBe(false)
       }
     })
