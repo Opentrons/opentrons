@@ -7,6 +7,13 @@ ValueType = TypeVar('ValueType')
 
 
 class OptionalValue(Generic[ValueType]):
+    """
+    A class that serializes optional values.
+
+    Modules represent a null value as 'none'. For example this response from
+    the thermocycler means the hold time is not set:
+        H:none T:1.23
+    """
     _value: Optional[ValueType]
 
     def __init__(self, value: Optional[ValueType] = None):
@@ -22,3 +29,9 @@ class OptionalValue(Generic[ValueType]):
 
     def __repr__(self) -> str:
         return "none" if self._value is None else str(self._value)
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, OptionalValue):
+            return False
+
+        return other.val == self.val
