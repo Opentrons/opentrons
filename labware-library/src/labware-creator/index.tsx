@@ -9,7 +9,7 @@ import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
-import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
+import { AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
@@ -21,11 +21,6 @@ import {
   getImplicitAutofillValues,
   yesNoOptions,
   tubeRackAutofills,
-  SUGGESTED_X,
-  SUGGESTED_Y,
-  SUGGESTED_XY_RANGE,
-  MAX_SUGGESTED_Z,
-  LINK_CUSTOM_LABWARE_FORM,
 } from './fields'
 import { labwareDefToFields } from './labwareDefToFields'
 import { labwareFormSchema } from './labwareFormSchema'
@@ -42,6 +37,11 @@ import { Section } from './components/Section'
 import { TextField } from './components/TextField'
 import { HeightGuidingText } from './components/HeightGuidingText'
 import { ImportErrorModal } from './components/ImportErrorModal'
+import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
+import { UploadExisting } from './components/sections/UploadExisting'
+import { Regularity } from './components/sections/Regularity'
+import { getHeightAlerts } from './components/utils/getHeightAlerts'
+import { Footprint } from './components/sections/Footprint'
 import {
   HeightImg,
   GridImg,
@@ -63,9 +63,6 @@ import type {
   LabwareFields,
   ProcessedLabwareFields,
 } from './fields'
-import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
-import { UploadExisting } from './components/sections/UploadExisting'
-import { Regularity } from './components/sections/Regularity'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
@@ -128,50 +125,6 @@ const displayAsTube = (values: LabwareFields): boolean =>
     values.aluminumBlockType === '96well' &&
     // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
     ['tubes', 'pcrTubeStrip'].includes(values.aluminumBlockChildType))
-
-const getHeightAlerts = (
-  values: LabwareFields,
-  touched: FormikTouched<LabwareFields>
-): JSX.Element | null => {
-  const { labwareZDimension } = values
-  const zAsNum = Number(labwareZDimension) // NOTE: if empty string or null, may be cast to 0, but that's fine for `>`
-  if (touched.labwareZDimension && zAsNum > MAX_SUGGESTED_Z) {
-    return (
-      <AlertItem
-        type="info"
-        title="This labware may be too tall to work with some pipette + tip combinations. Please test on robot."
-      />
-    )
-  }
-  return null
-}
-
-const xyMessage = (
-  <div>
-    Our recommended footprint for labware is {SUGGESTED_X} by {SUGGESTED_Y} +/-
-    1mm. If you can fit your labware snugly into a single slot on the deck
-    continue through the form. If not please request custom labware via{' '}
-    <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>this form</LinkOut>.
-  </div>
-)
-
-const getXYDimensionAlerts = (
-  values: LabwareFields,
-  touched: FormikTouched<LabwareFields>
-): JSX.Element | null => {
-  const xAsNum = Number(values.footprintXDimension)
-  const yAsNum = Number(values.footprintYDimension)
-  const showXInfo =
-    touched.footprintXDimension &&
-    Math.abs(xAsNum - SUGGESTED_X) > SUGGESTED_XY_RANGE
-  const showYInfo =
-    touched.footprintYDimension &&
-    Math.abs(yAsNum - SUGGESTED_Y) > SUGGESTED_XY_RANGE
-
-  return showXInfo || showYInfo ? (
-    <AlertItem type="info" title={xyMessage} />
-  ) : null
-}
 
 export const LabwareCreator = (): JSX.Element => {
   const [
@@ -515,39 +468,7 @@ export const LabwareCreator = (): JSX.Element => {
                 <>
                   {/* PAGE 1 - Labware */}
                   <Regularity />
-                  <Section
-                    label="Footprint"
-                    fieldList={['footprintXDimension', 'footprintYDimension']}
-                    additionalAlerts={getXYDimensionAlerts(values, touched)}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Ensure measurement is taken from the{' '}
-                          <strong>very bottom</strong> of plate.
-                        </p>
-                        <p>
-                          The footprint measurement helps determine if the
-                          labware fits firmly into the slots on the OT-2 deck.
-                        </p>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <img src={require('./images/footprint.svg')} />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="footprintXDimension"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                        <TextField
-                          name="footprintYDimension"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <Footprint />
                   <Section
                     label={
                       // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
