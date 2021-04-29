@@ -52,6 +52,7 @@ export function UsbHubItem(props: Props): React.Node {
             key={mod.serial}
             module={mod}
             controlDisabledReason={controlDisabledReason}
+            hubPort={String(mod.usbPort.port)}
           />
         </Box>
       ))}
