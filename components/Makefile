@@ -35,4 +35,4 @@ flow-types/%.js.flow: lib/%.d.ts
 
 .PHONY: dev
 dev:
-	yarn --cwd .. storybook --port $(port)
+	yarn --cwd .. start-storybook --port $(port)
