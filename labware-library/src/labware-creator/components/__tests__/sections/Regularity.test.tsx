@@ -2,7 +2,6 @@ import React from 'react'
 import { FormikConfig } from 'formik'
 import { when } from 'jest-when'
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
 import {
   getDefaultFormState,
   LabwareFields,
