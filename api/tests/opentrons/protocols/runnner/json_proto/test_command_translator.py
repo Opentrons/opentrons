@@ -1,6 +1,8 @@
 import pytest
 from opentrons.protocol_engine import WellLocation, WellOrigin
-from opentrons.protocol_engine.commands import AspirateRequest, DispenseRequest
+from opentrons.protocol_engine.commands import (
+    AspirateRequest, DispenseRequest, DropTipRequest
+)
 from opentrons.protocols.runner.json_proto.models import json_protocol as models
 
 from opentrons.protocols.runner.json_proto.command_translator import (
@@ -13,7 +15,9 @@ def subject() -> CommandTranslator:
     return CommandTranslator()
 
 
-def test_aspirate(subject, aspirate_command: models.LiquidCommand) -> None:
+def test_aspirate(
+        subject: CommandTranslator, aspirate_command: models.LiquidCommand
+) -> None:
     """It should translate a JSON aspirate command to a Protocol Engine
      aspirate request."""
     request = subject.translate(aspirate_command)
@@ -32,7 +36,10 @@ def test_aspirate(subject, aspirate_command: models.LiquidCommand) -> None:
     ]
 
 
-def test_dispense(subject, dispense_command: models.LiquidCommand) -> None:
+def test_dispense(
+        subject: CommandTranslator,
+        dispense_command: models.LiquidCommand
+) -> None:
     """It should translate a JSON dispense command to a Protocol Engine
      dispense request."""
     request = subject.translate(dispense_command)
@@ -47,5 +54,22 @@ def test_dispense(subject, dispense_command: models.LiquidCommand) -> None:
                 origin=WellOrigin.BOTTOM,
                 offset=(0, 0, dispense_command.params.offsetFromBottomMm)
             )
+        )
+    ]
+
+
+def test_drop_tip(
+        subject: CommandTranslator,
+        drop_tip_command: models.PickUpDropTipCommand
+) -> None:
+    """It should translate a JSON drop tip command to a Protocol Engine
+     drop tip request."""
+    request = subject.translate(drop_tip_command)
+
+    assert request == [
+        DropTipRequest(
+            pipetteId=drop_tip_command.params.pipette,
+            labwareId=drop_tip_command.params.labware,
+            wellName=drop_tip_command.params.well
         )
     ]
