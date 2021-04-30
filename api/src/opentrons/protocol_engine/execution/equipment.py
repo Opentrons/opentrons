@@ -6,7 +6,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
 
-from ..errors import FailedToLoadPipetteError
+from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
 from ..resources import ResourceProviders
 from ..state import StateView
 from ..types import LabwareLocation, PipetteName
@@ -56,11 +56,19 @@ class EquipmentHandler:
         """Load labware by assigning an identifier and pulling required data."""
         labware_id = self._resources.id_generator.generate_id()
 
-        definition = await self._resources.labware_data.get_labware_definition(
-            load_name=load_name,
-            namespace=namespace,
-            version=version,
-        )
+        try:
+            # Try to use existing definition in state.
+            definition = self._state.labware.get_labware_definition(
+                load_name=load_name,
+                namespace=namespace,
+                version=version
+            )
+        except LabwareDefinitionDoesNotExistError:
+            definition = await self._resources.labware_data.get_labware_definition(
+                load_name=load_name,
+                namespace=namespace,
+                version=version,
+            )
 
         calibration = await self._resources.labware_data.get_labware_calibration(
             definition=definition,

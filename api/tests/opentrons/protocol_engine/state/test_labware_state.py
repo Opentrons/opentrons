@@ -5,6 +5,7 @@ from typing import Tuple
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckSlotName
+from opentrons.protocols import models
 
 from opentrons.protocol_engine import commands as cmd, errors, StateStore
 from opentrons.protocol_engine.resources import DeckFixedLabware
@@ -45,6 +46,35 @@ def load_labware(
     return command
 
 
+def add_labware_definition(
+    store: StateStore,
+    definition: LabwareDefinition,
+) -> cmd.CompletedCommand[
+    cmd.AddLabwareDefinitionRequest,
+    cmd.AddLabwareDefinitionResult
+]:
+    """Add a labware definition into state using an AddLabwareRequest."""
+    model = models.LabwareDefinition.parse_obj(definition)
+    request = cmd.AddLabwareDefinitionRequest(
+        labware_definition=model
+    )
+    result = cmd.AddLabwareDefinitionResult(
+        loadName=model.parameters.loadName,
+        namespace=model.namespace,
+        version=model.version
+    )
+    command = cmd.CompletedCommand(
+        created_at=datetime.now(tz=timezone.utc),
+        started_at=datetime.now(tz=timezone.utc),
+        completed_at=datetime.now(tz=timezone.utc),
+        request=request,
+        result=result
+    )
+
+    store.handle_command(command, "command-id")
+    return command
+
+
 def test_get_labware_data_bad_id(store: StateStore) -> None:
     """get_labware_data_by_id should raise if labware ID doesn't exist."""
     with pytest.raises(errors.LabwareDoesNotExistError):
@@ -68,6 +98,57 @@ def test_handles_load_labware(
     assert data.location == command.request.location
     assert data.definition == command.result.definition
     assert data.calibration == command.result.calibration
+
+
+def test_handle_load_labware_saves_definition(
+    store: StateStore,
+    well_plate_def: LabwareDefinition
+) -> None:
+    """It should add the labware labware definition to state."""
+    command = load_labware(
+        store=store,
+        labware_id="plate-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        definition=well_plate_def,
+        calibration=(1, 2, 3),
+    )
+
+    definition = store.labware.get_labware_definition(
+        load_name=command.request.loadName,
+        namespace=command.request.namespace,
+        version=command.request.version
+    )
+
+    assert definition == well_plate_def
+
+
+def test_get_labware_definition_bad_id(store: StateStore) -> None:
+    """get_labware_definition should raise if labware definition doesn't exist."""
+    with pytest.raises(errors.LabwareDefinitionDoesNotExistError):
+        store.labware.get_labware_definition(
+            load_name="dkn9dknmfeo",
+            namespace="9vmkdnvi2",
+            version=0x138281,
+        )
+
+
+def test_handles_add_labware_defintion(
+        store: StateStore,
+        well_plate_def: LabwareDefinition
+):
+    """It should add the labware definition to the state store."""
+    command = add_labware_definition(
+        store=store,
+        definition=well_plate_def
+    )
+
+    data = store.labware.get_labware_definition(
+        load_name=command.result.loadName,
+        namespace=command.result.namespace,
+        version=command.result.version
+    )
+
+    assert data == well_plate_def
 
 
 def test_loads_fixed_labware(

@@ -1,6 +1,6 @@
 import pytest
 
-from opentrons.protocols.runner.json_proto.models import json_protocol as models
+from opentrons.protocols.models import json_protocol as models
 
 
 @pytest.fixture

@@ -1,17 +1,24 @@
 """Basic labware data state and store."""
 from dataclasses import dataclass
 from typing import Dict, List, Sequence, Tuple
+
 from typing_extensions import final
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition,
     WellDefinition,
 )
-from opentrons.calibration_storage.helpers import uri_from_definition
+from opentrons.calibration_storage.helpers import uri_from_definition, \
+    uri_from_details
 
 from .. import errors
 from ..resources import DeckFixedLabware
-from ..commands import CompletedCommandType, LoadLabwareResult
+from ..commands import (
+    CompletedCommandType,
+    LoadLabwareResult,
+    AddLabwareDefinitionResult,
+    AddLabwareDefinitionRequest
+)
 from ..types import LabwareLocation, Dimensions
 from .substore import Substore, CommandReactive
 
@@ -30,6 +37,7 @@ class LabwareState:
     """Basic labware data state and getter methods."""
 
     _labware_by_id: Dict[str, LabwareData]
+    _labware_definitions_by_uri: Dict[str, LabwareDefinition]
 
     def __init__(self, deck_fixed_labware: Sequence[DeckFixedLabware]) -> None:
         """Initialize a LabwareState instance."""
@@ -41,6 +49,7 @@ class LabwareState:
             )
             for fixed_labware in deck_fixed_labware
         }
+        self._labware_definitions_by_uri = {}
 
     def get_labware_data_by_id(self, labware_id: str) -> LabwareData:
         """Get labware data by the labware's unique identifier."""
@@ -60,6 +69,19 @@ class LabwareState:
     def get_all_labware(self) -> List[Tuple[str, LabwareData]]:
         """Get a list of all labware entries in state."""
         return [entry for entry in self._labware_by_id.items()]
+
+    def get_labware_definition(
+            self, load_name: str, namespace: str, version: int
+    ) -> LabwareDefinition:
+        """Get the labware definition matching loadName namespace and version."""
+        try:
+            uri = uri_from_details(
+                namespace=namespace, load_name=load_name, version=version
+            )
+            return self._labware_definitions_by_uri[uri]
+        except KeyError:
+            raise errors.LabwareDefinitionDoesNotExistError(
+                f"Labware definition for {load_name}, {namespace}, {version} not found.")
 
     def get_labware_has_quirk(self, labware_id: str, quirk: str) -> bool:
         """Get if a labware has a certain quirk."""
@@ -133,8 +155,24 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
     def handle_completed_command(self, command: CompletedCommandType) -> None:
         """Modify state in reaction to a completed command."""
         if isinstance(command.result, LoadLabwareResult):
+            uri = uri_from_details(
+                namespace=command.request.namespace,
+                load_name=command.request.loadName,
+                version=command.request.version
+            )
+            self._state._labware_definitions_by_uri[uri] = \
+                command.result.definition
             self._state._labware_by_id[command.result.labwareId] = LabwareData(
                 location=command.request.location,
                 definition=command.result.definition,
                 calibration=command.result.calibration,
             )
+        elif isinstance(command.request, AddLabwareDefinitionRequest) and \
+                isinstance(command.result, AddLabwareDefinitionResult):
+            uri = uri_from_details(
+                namespace=command.result.namespace,
+                load_name=command.result.loadName,
+                version=command.result.version
+            )
+            self._state._labware_definitions_by_uri[uri] = \
+                command.request.labware_definition.dict(exclude_defaults=True)
