@@ -26,7 +26,7 @@ export const UploadExisting = (props: Props): JSX.Element => {
   return (
     <div className={styles.upload_existing_section}>
       <h2 className={styles.setup_heading}>
-        Edit a file you’ve built with our labware creator omg!
+        Edit a file you’ve built with our labware creator
       </h2>
       {lastUploaded === null ? (
         <ImportLabware onUpload={onUpload} />

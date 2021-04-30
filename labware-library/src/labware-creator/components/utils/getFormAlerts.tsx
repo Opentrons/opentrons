@@ -3,22 +3,38 @@ import compact from 'lodash/compact'
 import uniq from 'lodash/uniq'
 import { AlertItem } from '@opentrons/components'
 import { getIsHidden } from '../../formSelectors'
-import { IRREGULAR_LABWARE_ERROR, LINK_CUSTOM_LABWARE_FORM } from '../../fields'
+import {
+  LabwareFields,
+  IRREGULAR_LABWARE_ERROR,
+  LINK_CUSTOM_LABWARE_FORM,
+} from '../../fields'
 import { LinkOut } from '../LinkOut'
 
 import type { FormikTouched, FormikErrors } from 'formik'
-import type { LabwareFields } from '../../fields'
-
-interface Props {
+export interface Props {
   values: LabwareFields
   fieldList: Array<keyof LabwareFields>
   touched: FormikTouched<LabwareFields>
   errors: FormikErrors<LabwareFields>
 }
 
+export const IrregularLabwareAlert = (): JSX.Element => (
+  <AlertItem
+    key={IRREGULAR_LABWARE_ERROR}
+    type="error"
+    title={
+      <>
+        Your labware is not compatible with the Labware Creator. Please fill out{' '}
+        <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>this form</LinkOut> to request
+        a custom labware definition.
+      </>
+    }
+  />
+)
+
 export const getFormAlerts = (props: Props): JSX.Element[] | null => {
   const { values, fieldList, touched, errors } = props
-  if (fieldList != null && fieldList.length > 0) {
+  if (fieldList.length > 0) {
     const numFieldsHidden = fieldList
       .map(field => getIsHidden(field, values))
       .filter(Boolean).length
@@ -37,20 +53,7 @@ export const getFormAlerts = (props: Props): JSX.Element[] | null => {
 
   return allErrors.map(error => {
     if (error === IRREGULAR_LABWARE_ERROR) {
-      return (
-        <AlertItem
-          key={error}
-          type="error"
-          title={
-            <>
-              Your labware is not compatible with the Labware Creator. Please
-              fill out{' '}
-              <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>this form</LinkOut> to
-              request a custom labware definition.
-            </>
-          }
-        />
-      )
+      return <IrregularLabwareAlert />
     }
     return <AlertItem key={error} type="warning" title={error} />
   })
