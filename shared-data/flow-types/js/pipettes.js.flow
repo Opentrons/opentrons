@@ -5,16 +5,20 @@
  * @flow
  */
 
+import pipetteNameSpecs from "../pipette/definitions/pipetteNameSpecs.json";
+import pipetteModelSpecs from "../pipette/definitions/pipetteModelSpecs.json";
 import type { PipetteNameSpecs, PipetteModelSpecs } from "./types";
 declare type SortableProps = "maxVolume" | "channels";
+export type PipetteName = $Keys<typeof pipetteNameSpecs>;
+export type PipetteModel = $Keys<typeof pipetteModelSpecs.config>;
 declare export function getPipetteNameSpecs(
-  name: string
+  name: PipetteName
 ): PipetteNameSpecs | null;
 declare export function getPipetteModelSpecs(
-  model: string
+  model: PipetteModel
 ): PipetteModelSpecs | null | void;
 declare export function getAllPipetteNames(
   ...sortBy: SortableProps[]
-): string[];
+): PipetteName[];
 declare export function shouldLevel(specs: PipetteNameSpecs): boolean;
 declare export {};

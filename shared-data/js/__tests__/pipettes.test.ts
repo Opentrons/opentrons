@@ -9,7 +9,7 @@ const PIPETTE_NAMES = [
   'p10_multi',
   'p50_multi',
   'p300_multi',
-]
+] as const
 
 const PIPETTE_MODELS = [
   'p10_single_v1',
@@ -39,7 +39,7 @@ const PIPETTE_MODELS = [
   'p1000_single_v1.3',
   'p1000_single_v1.4',
   'p1000_single_v1.5',
-]
+] as const
 
 describe('pipette data accessors', () => {
   describe('getPipetteNameSpecs', () => {

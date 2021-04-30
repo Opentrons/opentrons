@@ -1,20 +1,10 @@
 {
   "extends": "../tsconfig-base.json",
-  "references": [],
+  "references": [{ "path": "./tsconfig-data.json" }],
   "compilerOptions": {
     "composite": true,
     "rootDir": ".",
     "outDir": "lib"
   },
-  "include": [
-    "typings",
-    "js",
-    "protocol",
-    "deck/**/*.json",
-    "labware/**/*.json",
-    "module/**/*.json",
-    "pipette/**/*.json",
-    "protocol/**/*.json",
-    "build/**/*.json"
-  ]
+  "include": ["typings", "js", "protocol"]
 }
