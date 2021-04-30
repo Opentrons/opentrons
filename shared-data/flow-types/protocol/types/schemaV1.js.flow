@@ -15,8 +15,8 @@ export type AspirateDispenseArgs = {|
   ...$Exact<PipetteLabwareFields>,
 
   volume: number,
-  offsetFromBottomMm?: number | null | void,
-  "flow-rate"?: number | null | void,
+  offsetFromBottomMm?: number | null,
+  "flow-rate"?: number | null,
 |};
 export type Command =
   | {
@@ -30,7 +30,7 @@ export type Command =
   | {
       command: "touch-tip",
       params: PipetteLabwareFields & {
-        offsetFromBottomMm?: number | null | void,
+        offsetFromBottomMm?: number | null,
       },
     }
   | {

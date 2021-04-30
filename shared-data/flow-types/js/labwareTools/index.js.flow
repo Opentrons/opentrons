@@ -38,7 +38,7 @@ export type BaseLabwareProps = {|
   version?: number,
   namespace?: string,
   loadNamePostfix?: string[],
-  strict?: boolean | null | void,
+  strict?: boolean | null,
 |};
 export type RegularLabwareProps = {|
   ...$Exact<BaseLabwareProps>,
