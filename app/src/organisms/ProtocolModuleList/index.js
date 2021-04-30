@@ -53,13 +53,15 @@ export function ProtocolModuleList(): React.Node {
   if (modulesRequired.length < 1) return null
   return (
     <TitledList key={t('modules_title')} title={t('modules_title')}>
-      <Text
-        css={FONT_BODY_1_DARK}
-        paddingLeft="0.75rem"
-        paddingRight={SPACING_4}
-      >
-        {t('module_connect_instruction')}
-      </Text>
+      {hasDuplicateModule && (
+        <Text
+          css={FONT_BODY_1_DARK}
+          paddingLeft="0.75rem"
+          paddingRight={SPACING_4}
+        >
+          {t('module_connect_instruction')}
+        </Text>
+      )}
       <Flex
         color={C_MED_GRAY}
         fontSize={FONT_SIZE_CAPTION}
