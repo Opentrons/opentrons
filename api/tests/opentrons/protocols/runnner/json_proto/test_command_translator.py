@@ -1,7 +1,7 @@
 import pytest
 from opentrons.protocol_engine import WellLocation, WellOrigin
 from opentrons.protocol_engine.commands import (
-    AspirateRequest, DispenseRequest, DropTipRequest
+    AspirateRequest, DispenseRequest, PickUpTipRequest, DropTipRequest
 )
 from opentrons.protocols.runner.json_proto.models import json_protocol as models
 
@@ -71,5 +71,22 @@ def test_drop_tip(
             pipetteId=drop_tip_command.params.pipette,
             labwareId=drop_tip_command.params.labware,
             wellName=drop_tip_command.params.well
+        )
+    ]
+
+
+def test_pick_up_tip(subject, pick_up_command: models.PickUpDropTipCommand) -> None:
+    """
+    It should translate a JSON pick up tip command to a Protocol Engine
+    PickUpTip request.
+    """
+    request = subject.translate(pick_up_command)
+
+    assert request == [
+        PickUpTipRequest(
+            pipetteId=pick_up_command.params.pipette,
+            labwareId=pick_up_command.params.labware,
+            wellName=pick_up_command.params.well,
+
         )
     ]
