@@ -9,8 +9,8 @@ export interface PipetteLabwareFields {
 
 export interface AspirateDispenseArgs extends PipetteLabwareFields {
   volume: number
-  offsetFromBottomMm?: number | null | undefined
-  'flow-rate'?: number | null | undefined
+  offsetFromBottomMm?: number | null
+  'flow-rate'?: number | null
 }
 
 export type Command =
@@ -25,7 +25,7 @@ export type Command =
   | {
       command: 'touch-tip'
       params: PipetteLabwareFields & {
-        offsetFromBottomMm?: number | null | undefined
+        offsetFromBottomMm?: number | null
       }
     }
   | {

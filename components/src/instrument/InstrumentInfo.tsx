@@ -12,7 +12,7 @@ export interface InstrumentInfoProps {
   /** 'left' or 'right' */
   mount: Mount
   /** if true, show labels 'LEFT PIPETTE' / 'RIGHT PIPETTE' */
-  showMountLabel?: boolean | null | undefined
+  showMountLabel?: boolean | null
   /** human-readable description, eg 'p300 Single-channel' */
   description: string
   /** paired tiprack model */
@@ -20,7 +20,7 @@ export interface InstrumentInfoProps {
   /** if disabled, pipette & its info are grayed out */
   isDisabled: boolean
   /** specs of mounted pipette */
-  pipetteSpecs?: InstrumentDiagramProps['pipetteSpecs'] | null | undefined
+  pipetteSpecs?: InstrumentDiagramProps['pipetteSpecs'] | null
   /** classes to apply */
   className?: string
   /** classes to apply to the info group child */

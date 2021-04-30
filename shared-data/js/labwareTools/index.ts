@@ -61,7 +61,7 @@ export interface BaseLabwareProps {
   version?: number
   namespace?: string
   loadNamePostfix?: string[]
-  strict?: boolean | null | undefined // If true, throws error on failed validation
+  strict?: boolean | null // If true, throws error on failed validation
 }
 
 export interface RegularLabwareProps extends BaseLabwareProps {
