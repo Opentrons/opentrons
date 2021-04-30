@@ -8,15 +8,16 @@ from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
+from opentrons.drivers.types import Temperature
 
-'''
+"""
 - Driver is responsible for providing an interface for the temp-deck
 - Driver is the only system component that knows about the temp-deck's GCODES
   or how the temp-deck communications
 
 - Driver is NOT responsible interpreting the temperatures or states in any way
   or knowing anything about what the device is being used for
-'''
+"""
 
 log = logging.getLogger(__name__)
 
@@ -118,7 +119,7 @@ class TempDeck:
         self._connection = None
         self._config = config
 
-        self._temperature = {'current': 25, 'target': None}
+        self._temperature = Temperature(current=25, target=None)
         self._update_thread = None
         self._port = None
         self._lock = None
@@ -178,7 +179,7 @@ class TempDeck:
                 '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
         except (TempDeckError, SerialException, SerialNoResponse) as e:
             return str(e)
-        self._temperature.update({'target': celsius})
+        self._temperature.target = celsius
         while self.status != 'holding at target':
             await asyncio.sleep(0.1)
         return ''
@@ -189,26 +190,13 @@ class TempDeck:
                         utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
         self._send_command(
                 '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
-        self._temperature.update({'target': celsius})
+        self._temperature.target = celsius
         return ''
 
-    # NOTE: only present to support apiV1 non-blocking by default behavior
-    def legacy_set_temperature(self, celsius) -> str:
-        self.run_flag.wait()
-        celsius = round(float(celsius),
-                        utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
-        try:
-            self._send_command(
-                '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
-        except (TempDeckError, SerialException, SerialNoResponse) as e:
-            return str(e)
-        self._temperature.update({'target': celsius})
-        return ''
-
-    def update_temperature(self, default=None) -> str:
+    def update_temperature(self) -> str:
         if self._update_thread and self._update_thread.is_alive():
-            updated_temperature = default or self._temperature.copy()
-            self._temperature.update(updated_temperature)
+            # No need to do anything. The updater is already running.
+            pass
         else:
             def _update():
                 try:
@@ -223,17 +211,17 @@ class TempDeck:
         return ''
 
     @property
-    def target(self) -> Optional[int]:
-        return self._temperature.get('target')
+    def target(self) -> Optional[float]:
+        return self._temperature.target
 
     @property
-    def temperature(self) -> int:
-        return self._temperature['current']  # type: ignore
+    def temperature(self) -> float:
+        return self._temperature.current  # type: ignore
 
     def _get_status(self) -> str:
         # Separate function for testability
-        current = self._temperature['current']
-        target = self._temperature.get('target')
+        current = self._temperature.current
+        target = self._temperature.target
         delta = 0.7
         if target:
             diff = target - current  # type: ignore
@@ -251,7 +239,7 @@ class TempDeck:
         return self._get_status()
 
     def get_device_info(self) -> Mapping[str, str]:
-        '''
+        """
         Queries Temp-Deck for its build version, model, and serial number
 
         returns: dict
@@ -266,7 +254,7 @@ class TempDeck:
 
         Example input from Temp-Deck's serial response:
             "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
-        '''
+        """
         return self._get_info(DEFAULT_COMMAND_RETRIES)
 
     def pause(self):
@@ -301,18 +289,15 @@ class TempDeck:
             raise SerialException(error_msg)
 
     def _wait_for_ack(self):
-        '''
+        """
         This methods writes a sequence of newline characters, which will
         guarantee temp-deck responds with 'ok\r\nok\r\n' within 1 seconds
-        '''
+        """
         self._send_command('\r\n', timeout=DEFAULT_TEMP_DECK_TIMEOUT)
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(
             self, command, timeout=DEFAULT_TEMP_DECK_TIMEOUT, tag=None):
-        """
-
-        """
         assert self._lock, 'not connected'
         with self._lock:
             command_line = command + ' ' + TEMP_DECK_COMMAND_TERMINATOR
@@ -353,9 +338,8 @@ class TempDeck:
             res = self._send_command(
                 GCODES['GET_TEMP'],
                 tag=f'tempdeck {id(self)} rut')
-            res = utils.parse_temperature_response(
+            self._temperature = utils.parse_temperature_response(
                 res, utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
-            self._temperature.update(res)
             return None
         except utils.ParseError as e:
             retries -= 1
