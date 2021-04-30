@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0-alpha.8](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.7...v4.3.0-alpha.8) (2021-04-30)
+
+
+### Bug Fixes
+
+* **app:** conditionally show module usb order instructions ([#7749](https://github.com/Opentrons/opentrons/issues/7749)) ([cc2e974](https://github.com/Opentrons/opentrons/commit/cc2e974))
+
+
+
+
+
 # [4.3.0-alpha.7](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.6...v4.3.0-alpha.7) (2021-04-29)
 
 
