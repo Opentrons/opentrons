@@ -1,16 +1,18 @@
+"""System time utilities to support /system/time endpoints."""
 import asyncio
 import logging
-from typing import Dict, Tuple, Union
+from typing import Dict, Tuple, Union, cast
 from datetime import datetime, timezone
 from opentrons.util.helpers import utc_now
 from opentrons.config import IS_ROBOT
+
 from robot_server.system import errors
 from robot_server.service.errors import CommonErrorDef
 
 log = logging.getLogger(__name__)
 
 
-def _str_to_dict(res_str) -> Dict[str, Union[str, bool]]:
+def _str_to_dict(res_str: str) -> Dict[str, Union[str, bool]]:
     res_lines = res_str.splitlines()
     res_dict = {}
 
@@ -18,69 +20,79 @@ def _str_to_dict(res_str) -> Dict[str, Union[str, bool]]:
         if line:
             try:
                 prop, val = line.split('=')
-                res_dict[prop] = val if val not in ['yes', 'no'] \
-                    else val == 'yes'  # Convert yes/no to boolean value
+                res_dict[prop] = (
+                    # Convert yes/no to boolean value
+                    val if val not in ['yes', 'no'] else val == 'yes'
+                )
             except (ValueError, IndexError) as e:
-                log.error(f'Error converting timedatectl status line {line}:'
-                          f' {e}')
-    return res_dict
+                log.error(f'Error converting timedatectl status line {line}:  {e}')
+
+    return cast(Dict[str, Union[str, bool]], res_dict)
 
 
-async def _time_status(loop: asyncio.AbstractEventLoop = None
-                       ) -> Dict[str, Union[str, bool]]:
-    """
-    Get details of robot's date & time, with specifics of RTC (if present)
-    & status of NTP synchronization.
-    :return: Dictionary of status params.
+async def _time_status() -> Dict[str, Union[str, bool]]:
+    """Get details of robot's date & time.
+
+    Includes status of RTC (if present) and NTP synchronization.
+
+    Returns:
+        Dictionary of status params.
     """
     proc = await asyncio.create_subprocess_shell(
         'timedatectl show',
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
-        loop=loop or asyncio.get_event_loop()
+        loop=asyncio.get_event_loop()
     )
     out, err = await proc.communicate()
     return _str_to_dict(out.decode())
 
 
-async def _set_time(time: str,
-                    loop: asyncio.AbstractEventLoop = None) -> Tuple[str, str]:
-    """
-    :return: tuple of output of date --set (usually the new date)
-        & error, if any.
+async def _set_time(time: str) -> Tuple[str, str]:
+    """Set the system time by spawning a `date` subprocess.
+
+    Returns:
+        Tuple of the output of `date --set` (usually the new date) and any error.
     """
     proc = await asyncio.create_subprocess_shell(
         f'date --utc --set \"{time}\"',
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
-        loop=loop or asyncio.get_event_loop()
+        loop=asyncio.get_event_loop()
     )
     out, err = await proc.communicate()
     return out.decode(), err.decode()
 
 
-async def get_system_time(loop: asyncio.AbstractEventLoop = None) -> datetime:
-    """
-    :return: Just the system time as a UTC datetime object.
+async def get_system_time() -> datetime:
+    """Get the system time.
+
+    Returns:
+        The system time as a UTC datetime object.
     """
     return utc_now()
 
 
-async def set_system_time(new_time_dt: datetime,
-                          loop: asyncio.AbstractEventLoop = None
-                          ) -> datetime:
-    """
-    Set the system time unless system time is already being synchronized using
-    an RTC or NTPsync.
-    Raise error with message, if any.
-    :return: current date read.
+async def set_system_time(new_time_dt: datetime) -> datetime:
+    """Set the system time.
+
+    This operation will error if system time is already being synchronized using
+    an RTC or NTP-sync.
+
+    Returns:
+        The system time, whether or not it was changed
+
+    Raises:
+        SystemSetTimeException: the time was unable to be set using `date --set`
+        SystemTimeAlreadySynchronized: the time cannot be set beacuse it is
+            already synchronized with NTP and/or an RTC.
     """
     if not IS_ROBOT:
         raise errors.SystemSetTimeException(
             msg="Not supported on dev server.",
             definition=CommonErrorDef.NOT_IMPLEMENTED)
 
-    status = await _time_status(loop)
+    status = await _time_status()
     if status.get('LocalRTC') is True or status.get('NTPSynchronized') is True:
         # TODO: Update this to handle RTC sync correctly once we introduce RTC
         raise errors.SystemTimeAlreadySynchronized(

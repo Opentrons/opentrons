@@ -125,8 +125,8 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
         msg = f"Could not reload config: {stdout} {stderr}"
         log.error(msg)
         raise V1HandlerError(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                message=msg
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            message=msg
         )
 
     if log_level_name:
