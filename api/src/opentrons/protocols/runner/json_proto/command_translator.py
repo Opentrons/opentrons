@@ -2,7 +2,7 @@ from typing import Dict, Iterable
 
 from opentrons.protocol_engine import WellLocation, WellOrigin
 from opentrons.protocol_engine.commands import CommandRequestType, \
-    AspirateRequest, DispenseRequest, DropTipRequest
+    AspirateRequest, DispenseRequest, PickUpTipRequest, DropTipRequest
 from opentrons.protocols.runner.json_proto.models import json_protocol as models
 
 
@@ -110,7 +110,21 @@ class CommandTranslator:
     def _pick_up(
             self,
             command: models.PickUpDropTipCommand) -> ReturnType:
-        raise NotImplementedError()
+        """
+        Translate a pick_up_tip JSON command to a protocol engine pick_up_tip request.
+
+        Args:
+            command: JSON protocol PickUpTip command
+
+        Returns: PickUpTipRequest
+        """
+        return [
+            PickUpTipRequest(
+                pipetteId=command.params.pipette,
+                labwareId=command.params.labware,
+                wellName=command.params.well
+            )
+        ]
 
     def _drop_tip(
             self,
