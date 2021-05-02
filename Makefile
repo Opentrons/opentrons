@@ -47,44 +47,53 @@ usb_host=$(shell yarn run -s discovery find -i 169.254)
 .PHONY: setup
 setup: setup-js setup-py
 
-.PHONY: clean-py
-clean-py:
-	$(MAKE) -C $(API_DIR) clean
-	$(MAKE) -C $(UPDATE_SERVER_DIR) clean
-	$(MAKE) -C $(ROBOT_SERVER_DIR) clean
-	$(MAKE) -C $(SHARED_DATA_DIR) clean
-
 .PHONY: clean-js
 clean-js: clean-ts
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
 
-.PHONY: setup-py
-setup-py:
+PYTHON_DIRS = $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)
+PYTHON_CLEAN = $(addsuffix .clean, $(PYTHON_DIRS))
+
+$(PYTHON_CLEAN):
+	$(MAKE) -C $(basename $@) clean
+
+.PHONY: clean-py
+clean-py: $(PYTHON_CLEAN)
+
+PYTHON_SETUP = $(addsuffix .setup, $(PYTHON_DIRS))
+$(PYTHON_SETUP):
+	$(MAKE) -C $(basename $@) setup
+
+.PHONY: prepare-setup-py
+prepare-setup-py:
 	$(OT_PYTHON) -m pip install pipenv==2020.8.13
-	$(MAKE) -C $(API_DIR) setup
-	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
-	$(MAKE) -C $(NOTIFY_SERVER_DIR) setup
-	$(MAKE) -C $(ROBOT_SERVER_DIR) setup
-	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
+
+.PHONY: setup-py
+setup-py: prepare-setup-py 
+	$(MAKE) $(PYTHON_SETUP)
+
+PYTHON_TEARDOWN_DIRS = $(API_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR)
+
+PYTHON_TEARDOWN = $(addsuffix .pyteardown, $(PYTHON_TEARDOWN_DIRS))
+$(PYTHON_TEARDOWN): 
+	$(MAKE) -C $(basename $@) clean teardown
+SHARED_DATA.pyteardown:
+	$(MAKE) -C $(SHARED_DATA_DIR) clean-py teardown-py
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
 setup-js:
 	yarn config set network-timeout 60000
 	yarn
-	$(MAKE) -j 1 -C $(APP_SHELL_DIR) setup
-	$(MAKE) -j 1 -C $(SHARED_DATA_DIR) setup-js
+	$(MAKE) -C $(APP_SHELL_DIR) setup
+	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
 # uninstall all project dependencies
 .PHONY: teardown
 teardown: teardown-py teardown-js
 
 .PHONY: teardown-py
-teardown-py:
-	$(MAKE) -C $(API_DIR) clean teardown
-	$(MAKE) -C $(ROBOT_SERVER_DIR) clean teardown
-	$(MAKE) -C $(NOTIFY_SERVER_DIR) clean teardown
-	$(MAKE) -C $(SHARED_DATA_DIR) clean-py teardown-py
+teardown-py: $(PYTHON_TEARDOWN) SHARED_DATA.pyteardown
 
 .PHONY: teardown-js
 teardown-js: clean-js
@@ -185,13 +194,16 @@ else
 	prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 endif
 
-.PHONY: lint-py
-lint-py:
-	$(MAKE) -C $(API_DIR) lint
-	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
-	$(MAKE) -C $(ROBOT_SERVER_DIR) lint
+PYTHON_LINT_DIRS = $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR)
+
+PYTHON_LINT = $(addsuffix .pylint, $(PYTHON_LINT_DIRS))
+$(PYTHON_TEARDOWN): 
+	$(MAKE) -C $(basename $@) clean teardown
+SHARED_DATA.pylint:
 	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
-	$(MAKE) -C $(NOTIFY_SERVER_DIR) lint
+
+.PHONY: lint-py
+lint-py: $(PYTHON_LINT) SHARED_DATA.pylint
 
 .PHONY: lint-js
 lint-js:
