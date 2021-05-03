@@ -11,7 +11,7 @@ import {
 import { getOrderedWells } from '../../utils'
 import { getMixDelayData } from './getDelayData'
 import type { HydratedMixFormDataLegacy } from '../../../form-types'
-import type { MixArgs } from '../../../step-generation'
+import type { MixArgs } from '@opentrons/step-generation'
 
 type MixStepArgs = MixArgs
 

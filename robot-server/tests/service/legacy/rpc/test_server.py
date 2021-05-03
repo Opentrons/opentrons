@@ -133,6 +133,7 @@ class NotifyTester(object):
     then wait on an event which is initially cleared. Calling finish will
     set the event and cause start to return.
     """
+
     def __init__(self):
         self.value = 0
         self.notifications = Notifications()
@@ -159,6 +160,7 @@ class ConcurrentCallTester(object):
     Using the notifications and semaphore, the unit test can prove that
     concurrent function calls work.
     """
+
     def __init__(self):
         self.notifications = Notifications()
         # Semaphore used for control of execution.
@@ -238,23 +240,23 @@ def test_get_object_by_id(session, root):
     session.socket.receive_json()  # Skip ack
     res = session.socket.receive_json()  # Get call result
     expected = {'$': {
-                    'token': session.token,
-                    'status': 'success',
-                    'type': rpc.CALL_RESULT_MESSAGE},
-                'data': {
-                    'i': type_id(session.server.root),
-                    't': id(type),
-                    'v': {
-                        'STATIC',
-                        'value',
-                        'throw',
-                        'throw_eipe',
-                        'next',
-                        'combine',
-                        'add'
-                       }
-                    }
-                }
+        'token': session.token,
+        'status': 'success',
+        'type': rpc.CALL_RESULT_MESSAGE},
+        'data': {
+        'i': type_id(session.server.root),
+        't': id(type),
+        'v': {
+            'STATIC',
+            'value',
+            'throw',
+            'throw_eipe',
+            'next',
+            'combine',
+            'add'
+        }
+    }
+    }
     # We care only about dictionary keys, since we don't want
     # to track ids of function objects
     res['data']['v'] = set(res['data']['v'])
@@ -275,10 +277,10 @@ def test_call_on_result(session, root):
     session.socket.receive_json()  # Skip ack
     res = session.socket.receive_json()  # Get call result
     expected = {'$': {
-                    'token': session.token,
-                    'status': 'success',
-                    'type': rpc.CALL_RESULT_MESSAGE},
-                'data': 0}
+        'token': session.token,
+        'status': 'success',
+        'type': rpc.CALL_RESULT_MESSAGE},
+        'data': 0}
     assert res == expected
 
     session.call(
@@ -290,10 +292,10 @@ def test_call_on_result(session, root):
     session.socket.receive_json()  # Skip ack
     res = session.socket.receive_json()  # Get call result
     expected = {'$': {
-                    'token': session.token,
-                    'status': 'success',
-                    'type': rpc.CALL_RESULT_MESSAGE},
-                'data': 1}
+        'token': session.token,
+        'status': 'success',
+        'type': rpc.CALL_RESULT_MESSAGE},
+        'data': 1}
 
     assert res == expected
 
@@ -426,13 +428,13 @@ def test_call_on_reference(session, root):
     assert foo_id != new_foo_id
 
     expected = {'$': {
-                    'token': session.token,
-                    'status': 'success',
-                    'type': rpc.CALL_RESULT_MESSAGE},
-                'data': {
-                    # i was popped out above
-                    't': type_id(root),
-                    'v': {'value': 1}}}
+        'token': session.token,
+        'status': 'success',
+        'type': rpc.CALL_RESULT_MESSAGE},
+        'data': {
+        # i was popped out above
+        't': type_id(root),
+        'v': {'value': 1}}}
     assert res == expected
 
 

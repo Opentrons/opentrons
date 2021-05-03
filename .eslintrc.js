@@ -4,7 +4,7 @@ module.exports = {
   root: true,
 
   parserOptions: {
-    project: './*/tsconfig.json',
+    project: './tsconfig-eslint.json',
   },
 
   extends: ['standard-with-typescript', 'plugin:react/recommended', 'prettier'],
@@ -66,6 +66,7 @@ module.exports = {
         '@typescript-eslint/prefer-nullish-coalescing': 'warn',
         '@typescript-eslint/prefer-optional-chain': 'warn',
         '@typescript-eslint/restrict-plus-operands': 'warn',
+        '@typescript-eslint/restrict-template-expressions': 'warn',
       },
     },
     {
@@ -87,12 +88,20 @@ module.exports = {
         'jest/no-disabled-tests': 'error',
         'jest/consistent-test-it': 'error',
         '@typescript-eslint/consistent-type-assertions': 'off',
+        '@typescript-eslint/no-var-requires': 'off',
 
         // TODO(mc, 2021-01-29): fix these and remove warning overrides
         'jest/no-deprecated-functions': 'warn',
         'jest/valid-title': 'warn',
         'jest/no-conditional-expect': 'warn',
         'jest/no-done-callback': 'warn',
+      },
+    },
+    {
+      files: ['**/*.stories.tsx'],
+      rules: {
+        'import/no-default-export': 'off',
+        '@typescript-eslint/consistent-type-assertions': 'off',
       },
     },
     {

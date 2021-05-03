@@ -37,6 +37,7 @@ export const PipetteField: React.AbstractComponent<OP> = connect<
     >
       <DropdownField
         options={props.pipetteOptions}
+        name={props.name}
         value={value ? String(value) : null}
         onBlur={onFieldBlur}
         onFocus={onFieldFocus}

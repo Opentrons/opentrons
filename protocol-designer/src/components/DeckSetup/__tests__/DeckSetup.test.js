@@ -8,8 +8,8 @@ import {
   MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
+import { TEMPERATURE_AT_TARGET } from '@opentrons/step-generation'
 import * as labwareModuleCompatibility from '../../../utils/labwareModuleCompatibility'
-import { TEMPERATURE_AT_TARGET } from '../../../constants'
 import { getSwapBlocked } from '../DeckSetup'
 
 describe('DeckSetup', () => {

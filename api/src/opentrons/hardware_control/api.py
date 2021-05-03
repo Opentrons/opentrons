@@ -1733,7 +1733,7 @@ class API(HardwareAPILike):
         for removed_mod in removed_modules:
             self._log.info(f"Module {removed_mod.name()} detached"
                            f" from port {removed_mod.port}")
-            del removed_mod
+            removed_mod.cleanup()
 
     async def register_modules(
             self,
@@ -1766,7 +1766,7 @@ class API(HardwareAPILike):
     async def find_modules(
             self, by_model: modules.types.ModuleModel,
             resolved_type: modules.types.ModuleType
-    ) -> List[modules.AbstractModule]:
+    ) -> Tuple[List[modules.AbstractModule], Optional[modules.AbstractModule]]:
         """
         Find Modules.
 
@@ -1777,6 +1777,7 @@ class API(HardwareAPILike):
         module of the same type.
         """
         matching_modules = []
+        simulated_module = None
         mod_type = {
             modules.types.ModuleType.MAGNETIC: 'magdeck',
             modules.types.ModuleType.TEMPERATURE: 'tempdeck',
@@ -1785,7 +1786,7 @@ class API(HardwareAPILike):
         for module in self.attached_modules:
             if mod_type == module.name():
                 matching_modules.append(module)
-        if self.is_simulator and not matching_modules:
+        if self.is_simulator:
             mod_class = {
                 'magdeck': modules.MagDeck,
                 'tempdeck': modules.TempDeck,
@@ -1800,8 +1801,8 @@ class API(HardwareAPILike):
                     loop=self.loop),
                 sim_model=by_model.value)
             await simulating_module._connect()
-            matching_modules.append(simulating_module)
-        return matching_modules
+            simulated_module = simulating_module
+        return matching_modules, simulated_module
 
     def get_instrument_max_height(
             self,

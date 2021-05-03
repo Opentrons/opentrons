@@ -6,6 +6,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from fastapi import UploadFile
+from opentrons.util import entrypoint_util
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from robot_server.service.protocol.errors import ProtocolIOException
 from robot_server.util import FileMeta, save_upload
@@ -96,6 +98,15 @@ def get_protocol_contents(contents: Contents) -> str:
     """Read the protocol file contents as a string"""
     with contents.protocol_file.path.open("r") as f:
         return f.read()
+
+
+def get_custom_labware(contents: Contents) -> typing.Dict[str, LabwareDefinition]:
+    """Get the custom labware present in this uploaded protocol."""
+    # TODO (al, 2021-04-21): This is not the ideal way to feed custom
+    #  labware into a protocol but it is the path of least resistance. I'd
+    #  prefer a lazy loading approach, but this is a nice function and it solves
+    #  the problem.
+    return entrypoint_util.labware_from_paths([contents.directory.name])
 
 
 def clean_up(contents: Contents):

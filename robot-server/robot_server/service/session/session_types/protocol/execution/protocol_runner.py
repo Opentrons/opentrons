@@ -66,8 +66,7 @@ class ProtocolRunner:
                 loop=self._loop,
                 broker=self._broker,
                 motion_lock=self._motion_lock,
-                # TODO Amit 8/3/2020 - need an answer for custom labware
-                extra_labware=[])
+                extra_labware=list(self._protocol.get_custom_labware().values()))
 
     def run(self):
         """Run the protocol"""

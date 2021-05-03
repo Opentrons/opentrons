@@ -5,21 +5,20 @@ import values from 'lodash/values'
 import find from 'lodash/find'
 import {
   getPipetteNameSpecs,
+  GEN_ONE_MULTI_PIPETTES,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  SPAN7_8_10_11_SLOT,
-  TC_SPAN_SLOTS,
-  GEN_ONE_MULTI_PIPETTES,
-} from '../../constants'
+import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import type { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { DeckSlot } from '../../types'
 import type {
   NormalizedPipette,
   NormalizedPipetteById,
   PipetteEntity,
   PipetteEntities,
+} from '@opentrons/step-generation'
+import type { LabwareDefByDefURI } from '../../labware-defs'
+import type { DeckSlot } from '../../types'
+import type {
   InitialDeckSetup,
   ModuleOnDeck,
   FormPipettesByMount,

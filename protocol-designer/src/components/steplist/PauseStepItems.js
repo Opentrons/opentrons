@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
+import type { PauseArgs } from '@opentrons/step-generation'
 import { i18n } from '../../localization'
 import styles from './StepItem.css'
-import type { PauseArgs } from '../../step-generation'
 type Props = {
   pauseArgs: PauseArgs,
 }

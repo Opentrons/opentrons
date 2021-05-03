@@ -18,21 +18,21 @@ import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
 import type {
+  ModuleEntity,
+  PipetteEntity,
+  LabwareEntities,
+  PipetteEntities,
+  Timeline,
+} from '@opentrons/step-generation'
+import type {
   FilePipette,
   FileLabware,
   FileModule,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
-import type {
-  ModuleEntity,
-  PipetteEntity,
-  LabwareEntities,
-  PipetteEntities,
-} from '../../step-forms'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Selector } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
-import type { Timeline } from '../../step-generation/types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')

@@ -14,6 +14,7 @@ from threading import Lock
 from opentrons.drivers import serial_communication
 from opentrons.drivers.temp_deck import TempDeck
 from opentrons.drivers import utils
+from opentrons.drivers.types import Temperature
 
 
 @pytest.fixture
@@ -72,7 +73,7 @@ def test_fail_get_temp_deck_temperature(monkeypatch, temp_deck):
     while not done:
         time.sleep(0.25)
 
-    assert temp_deck._temperature == {'current': 90, 'target': None}
+    assert temp_deck._temperature == Temperature(current=90, target=None)
 
     def _mock_send_command2(command, timeout=None, tag=None):
         nonlocal done
@@ -85,7 +86,7 @@ def test_fail_get_temp_deck_temperature(monkeypatch, temp_deck):
     time.sleep(0.25)
     while not done:
         time.sleep(0.25)
-    assert temp_deck._temperature == {'current': 90, 'target': None}
+    assert temp_deck._temperature == Temperature(current=90, target=None)
 
 
 async def test_set_temp_deck_temperature(monkeypatch, temp_deck):

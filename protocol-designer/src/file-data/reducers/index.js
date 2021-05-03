@@ -3,11 +3,11 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
 import type { Reducer } from 'redux'
+import type { Timeline } from '@opentrons/step-generation'
 import type { Action } from '../../types'
 import type { FileMetadataFields, SaveFileMetadataAction } from '../types'
 import type { LoadFileAction, NewProtocolFields } from '../../load-file'
 import type { ComputeRobotStateTimelineSuccessAction } from '../actions'
-import type { Timeline } from '../../step-generation'
 import type { Substeps } from '../../steplist/types'
 
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(

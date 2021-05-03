@@ -194,6 +194,7 @@ export const TipPositionModal = (props: Props): React.Node => {
       caption={`between ${minMmFromBottom} and ${maxMmFromBottom}`}
       className={styles.position_from_bottom_input}
       error={errorText}
+      id={'TipPositionModal_custom_input'}
       isIndeterminate={value === null && isIndeterminate}
       onChange={handleInputFieldChange}
       units="mm"
@@ -269,6 +270,7 @@ export const TipPositionModal = (props: Props): React.Node => {
                       value: 'custom',
                     },
                   ]}
+                  name="TipPositionOptions"
                 />
                 {TipPositionInputField}
               </div>
@@ -277,12 +279,14 @@ export const TipPositionModal = (props: Props): React.Node => {
                 {!isDefault && (
                   <div className={styles.adjustment_buttons}>
                     <OutlineButton
+                      id="Increment_tipPosition"
                       className={styles.adjustment_button}
                       onClick={makeHandleIncrement(SMALL_STEP_MM)}
                     >
                       <Icon name="plus" />
                     </OutlineButton>
                     <OutlineButton
+                      id="Decrement_tipPosition"
                       className={styles.adjustment_button}
                       onClick={makeHandleDecrement(SMALL_STEP_MM)}
                     >

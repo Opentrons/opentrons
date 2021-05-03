@@ -17,9 +17,9 @@ from datetime import datetime
 from opentrons.protocols.context.protocol_api.labware import \
     LabwareImplementation
 from starlette.testclient import TestClient
+from robot_server.app import app
 from robot_server.constants import API_VERSION_HEADER, API_VERSION_LATEST
-from robot_server.service.app import app
-from robot_server.service.dependencies import get_hardware, verify_hardware
+from robot_server.service.dependencies import get_hardware
 from opentrons.hardware_control import API, HardwareAPILike, ThreadedAsyncLock
 from opentrons import config
 
@@ -53,10 +53,6 @@ def override_hardware(hardware):
         """Override for get_hardware dependency"""
         return hardware
 
-    async def verify_hardware_override():
-        pass
-
-    app.dependency_overrides[verify_hardware] = verify_hardware_override
     app.dependency_overrides[get_hardware] = get_hardware_override
 
 
@@ -103,13 +99,15 @@ def run_server(request_session, server_temp_directory):
     # `--source` is the source code folder to collect coverage stats on.
     with subprocess.Popen([sys.executable, "-m", "coverage", "run", "-a",
                            "--source", "robot_server",
-                           "-m", "robot_server.main"],
+                           "-m", "uvicorn", "robot_server:app",
+                           "--host", "localhost", "--port", "31950"],
                           env={'OT_ROBOT_SERVER_DOT_ENV_PATH': "test.env",
                                'OT_API_CONFIG_DIR': server_temp_directory},
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE) as proc:
         # Wait for a bit to get started by polling /health
         from requests.exceptions import ConnectionError
+
         while True:
             try:
                 request_session.get("http://localhost:31950/health")

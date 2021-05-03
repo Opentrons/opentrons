@@ -399,9 +399,12 @@ class Labware(DeckItem):
 
     @requires_version(2, 0)
     def wells_by_index(self) -> Dict[str, Well]:
+        """
+        .. deprecated:: 2.0
+            Use :py:meth:`wells_by_name` or dict access instead.
+        """
         MODULE_LOG.warning(
-            'wells_by_index is deprecated and will be deleted in version '
-            '3.12.0. please wells_by_name or dict access')
+            'wells_by_index is deprecated. Use wells_by_name or dict access instead.')
         return self.wells_by_name()
 
     @requires_version(2, 0)
@@ -452,9 +455,12 @@ class Labware(DeckItem):
 
     @requires_version(2, 0)
     def rows_by_index(self) -> Dict[str, List[Well]]:
+        """
+        .. deprecated:: 2.0
+            Use :py:meth:`rows_by_name` instead.
+        """
         MODULE_LOG.warning(
-            'rows_by_index is deprecated and will be deleted in version '
-            '3.12.0. please use rows_by_name')
+            'rows_by_index is deprecated. Use rows_by_name instead.')
         return self.rows_by_name()
 
     @requires_version(2, 0)
@@ -507,9 +513,12 @@ class Labware(DeckItem):
 
     @requires_version(2, 0)
     def columns_by_index(self) -> Dict[str, List[Well]]:
+        """
+        .. deprecated:: 2.0
+            Use :py:meth:`columns_by_name` instead.
+        """
         MODULE_LOG.warning(
-            'columns_by_index is deprecated and will be deleted in version '
-            '3.12.0. please use columns_by_name')
+            'columns_by_index is deprecated. Use columns_by_name instead.')
         return self.columns_by_name()
 
     @property  # type: ignore

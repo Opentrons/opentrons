@@ -1,3 +1,4 @@
-export type Channels = 1 | 8
-
-export type Mount = 'left' | 'right'
+export type {
+  PipetteChannels as Channels,
+  PipetteMount as Mount,
+} from '@opentrons/shared-data'

@@ -3,11 +3,11 @@ from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional, Tuple
 from typing_extensions import final
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
+from ..types import PipetteName
 from ..commands import (
     CompletedCommandType,
     LoadPipetteResult,
@@ -51,18 +51,13 @@ class PipetteState:
         try:
             return self._pipettes_by_id[pipette_id]
         except KeyError:
-            raise errors.PipetteDoesNotExistError(
-                f"Pipette {pipette_id} not found."
-            )
+            raise errors.PipetteDoesNotExistError(f"Pipette {pipette_id} not found.")
 
     def get_all_pipettes(self) -> List[Tuple[str, PipetteData]]:
         """Get a list of all pipette entries in state."""
         return [entry for entry in self._pipettes_by_id.items()]
 
-    def get_pipette_data_by_mount(
-        self,
-        mount: MountType
-    ) -> Optional[PipetteData]:
+    def get_pipette_data_by_mount(self, mount: MountType) -> Optional[PipetteData]:
         """Get pipette data by the pipette's mount."""
         for pipette in self._pipettes_by_id.values():
             if pipette.mount == mount:
@@ -129,8 +124,7 @@ class PipetteStore(Substore[PipetteState], CommandReactive):
             pipette_id = command.result.pipetteId
 
             self._state._pipettes_by_id[pipette_id] = PipetteData(
-                pipette_name=command.request.pipetteName,
-                mount=command.request.mount
+                pipette_name=command.request.pipetteName, mount=command.request.mount
             )
             self._state._aspirated_volume_by_id[pipette_id] = 0
 

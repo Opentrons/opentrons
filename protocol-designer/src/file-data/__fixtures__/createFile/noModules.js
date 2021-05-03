@@ -1,7 +1,7 @@
 // @flow
 // Named arguments to createFile selector. This data would be the result of several selectors.
+import type { RobotState, Timeline } from '@opentrons/step-generation'
 import type { SavedStepFormState, ModuleEntities } from '../../../step-forms'
-import type { RobotState, Timeline } from '../../../step-generation'
 import type { StepIdType } from '../../../form-types'
 
 export const initialRobotState: RobotState = {

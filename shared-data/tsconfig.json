@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig-base.json",
+  "references": [{ "path": "./tsconfig-data.json" }],
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": ".",
+    "outDir": "lib"
+  },
+  "include": ["js", "protocol"]
+}

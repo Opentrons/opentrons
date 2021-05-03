@@ -30,28 +30,25 @@ async def get_event_publisher() -> publisher.Publisher:
 
 @util.call_once
 async def get_hardware_wrapper(
-        event_publisher: publisher.Publisher = Depends(get_event_publisher)) \
-        -> HardwareWrapper:
+    event_publisher: publisher.Publisher = Depends(get_event_publisher),
+) -> HardwareWrapper:
     """Get the single HardwareWrapper instance."""
     return HardwareWrapper(event_publisher=event_publisher)
 
 
-async def verify_hardware(
-        api_wrapper: HardwareWrapper = Depends(get_hardware_wrapper)) -> None:
-    """
-    A dependency that raises an http exception if hardware is not ready. Must
-    only be used in PATH operation.
-    """
-    if not api_wrapper.get_hardware():
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                            detail="Robot is not ready for request")
-
-
 async def get_hardware(
-        api_wrapper: HardwareWrapper = Depends(get_hardware_wrapper)) \
-        -> ThreadManager:
+    api_wrapper: HardwareWrapper = Depends(get_hardware_wrapper),
+) -> ThreadManager:
     """Hardware dependency"""
-    return api_wrapper.get_hardware()
+    hardware = api_wrapper.get_hardware()
+
+    if hardware is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Robot motor controller is not ready.",
+        )
+
+    return hardware
 
 
 @util.call_once
@@ -66,11 +63,12 @@ async def get_motion_lock() -> ThreadedAsyncLock:
 
 @util.call_once
 async def get_rpc_server(
-        hardware: ThreadManager = Depends(get_hardware),
-        lock: ThreadedAsyncLock = Depends(get_motion_lock)
+    hardware: ThreadManager = Depends(get_hardware),
+    lock: ThreadedAsyncLock = Depends(get_motion_lock),
 ) -> RPCServer:
     """The RPC Server instance"""
     from opentrons.api import MainRouter
+
     root = MainRouter(hardware, lock=lock)
     return RPCServer(None, root)
 
@@ -83,10 +81,10 @@ async def get_protocol_manager() -> ProtocolManager:
 
 @util.call_once
 async def get_session_manager(
-        hardware: ThreadManager = Depends(get_hardware),
-        motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
-        protocol_manager: ProtocolManager = Depends(get_protocol_manager)) \
-        -> SessionManager:
+    hardware: ThreadManager = Depends(get_hardware),
+    motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
+    protocol_manager: ProtocolManager = Depends(get_protocol_manager),
+) -> SessionManager:
     """The single session manager instance"""
     return SessionManager(
         hardware=hardware,
@@ -95,23 +93,22 @@ async def get_session_manager(
 
 
 async def check_version_header(
-        request: Request,
-        opentrons_version: typing.Union[
-            int, constants.API_VERSION_LATEST_TYPE
-        ] = Header(
-            ...,
-            description=f"The requested HTTP API version which must be at "
-                        f"least '{constants.MIN_API_VERSION}' or higher. To "
-                        f"use the latest version specify "
-                        f"'{constants.API_VERSION_LATEST}'.")
+    request: Request,
+    opentrons_version: typing.Union[int, constants.API_VERSION_LATEST_TYPE] = Header(
+        ...,
+        description=f"The requested HTTP API version which must be at "
+        f"least '{constants.MIN_API_VERSION}' or higher. To "
+        f"use the latest version specify "
+        f"'{constants.API_VERSION_LATEST}'.",
+    ),
 ) -> None:
     """Dependency that will check that Opentrons-Version header meets
     requirements."""
     # Get the maximum version accepted by client
     requested_version = (
         int(opentrons_version)
-        if opentrons_version != constants.API_VERSION_LATEST else
-        constants.API_VERSION
+        if opentrons_version != constants.API_VERSION_LATEST
+        else constants.API_VERSION
     )
 
     if requested_version < constants.MIN_API_VERSION:
@@ -124,11 +121,7 @@ async def check_version_header(
                 "App or other HTTP API client."
             ),
         )
-        raise BaseRobotServerError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            error=error
-        )
+        raise BaseRobotServerError(status_code=status.HTTP_400_BAD_REQUEST, error=error)
     else:
         # Attach the api version to request's state dict
-        request.state.api_version = min(requested_version,
-                                        constants.API_VERSION)
+        request.state.api_version = min(requested_version, constants.API_VERSION)

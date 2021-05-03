@@ -1,5 +1,5 @@
 // @flow
-import type { NormalizedPipetteById } from '../types'
+import type { NormalizedPipetteById } from '@opentrons/step-generation'
 import type { StepIdType } from '../../form-types'
 
 export type CreatePipettesAction = {|

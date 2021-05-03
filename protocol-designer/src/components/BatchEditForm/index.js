@@ -9,7 +9,6 @@ import {
   getMultiSelectFieldValues,
   getMultiSelectItemIds,
 } from '../../ui/steps/selectors'
-import { getBatchEditMixEnabled } from '../../feature-flags/selectors'
 import { getBatchEditFormHasUnsavedChanges } from '../../step-forms/selectors'
 import {
   changeBatchEditField,
@@ -29,7 +28,6 @@ export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
   const disabledFields = useSelector(getMultiSelectDisabledFields)
   const selectedStepIds = useSelector(getMultiSelectItemIds)
   const batchEditFormHasChanges = useSelector(getBatchEditFormHasUnsavedChanges)
-  const batchEditMixEnabled = useSelector(getBatchEditMixEnabled)
 
   const handleChangeFormInput = (name, value) => {
     const maskedValue = maskField(name, value)
@@ -64,18 +62,16 @@ export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
           />
         )
       case 'mix':
-        if (batchEditMixEnabled) {
-          return (
-            <BatchEditMix
-              {...{
-                propsForFields,
-                handleCancel,
-                handleSave,
-                batchEditFormHasChanges,
-              }}
-            />
-          )
-        }
+        return (
+          <BatchEditMix
+            {...{
+              propsForFields,
+              handleCancel,
+              handleSave,
+              batchEditFormHasChanges,
+            }}
+          />
+        )
     }
   }
 

@@ -1,7 +1,7 @@
 // @flow
+import type { Timeline } from '@opentrons/step-generation'
 import type { StepIdType, StepType } from '../../../form-types'
 import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
-import type { Timeline } from '../../../step-generation'
 
 type AddStepPayload = {| id: string, stepType: StepType |}
 export type AddStepAction = {|

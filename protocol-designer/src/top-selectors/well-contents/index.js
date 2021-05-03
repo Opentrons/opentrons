@@ -8,7 +8,7 @@ import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import * as StepGeneration from '../../step-generation'
+import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { timelineFrameBeforeActiveItem } from '../timelineFrames'

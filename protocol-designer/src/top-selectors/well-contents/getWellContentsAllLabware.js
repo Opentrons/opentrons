@@ -12,12 +12,12 @@ import {
 
 import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
 import type { Selector } from '../../types'
 import type {
   ContentsByWell,
   WellContentsByLabware,
 } from '../../labware-ingred/types'
-import type { SingleLabwareLiquidState } from '../../step-generation'
 
 const _getWellContents = (
   labwareDef: LabwareDefinition2,

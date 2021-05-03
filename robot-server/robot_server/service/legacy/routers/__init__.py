@@ -1,47 +1,38 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from . import health, networking, control, settings, deck_calibration, \
-    modules, pipettes, motors, camera, logs, rpc
-from ...dependencies import verify_hardware, check_version_header
+from . import (
+    networking,
+    control,
+    settings,
+    deck_calibration,
+    modules,
+    pipettes,
+    motors,
+    camera,
+    logs,
+    rpc
+)
 
 legacy_routes = APIRouter()
 
-legacy_routes.include_router(router=health.router,
-                             tags=["Health"],
-                             dependencies=[Depends(verify_hardware),
-                                           Depends(check_version_header)])
-legacy_routes.include_router(router=networking.router,
-                             tags=["Networking"],
-                             dependencies=[Depends(check_version_header)])
-legacy_routes.include_router(router=control.router,
-                             tags=["Control"],
-                             dependencies=[Depends(verify_hardware),
-                                           Depends(check_version_header)])
-legacy_routes.include_router(router=settings.router,
-                             tags=["Settings"],
-                             dependencies=[Depends(verify_hardware),
-                                           Depends(check_version_header)])
-legacy_routes.include_router(router=deck_calibration.router,
-                             tags=["Deck Calibration"],
-                             dependencies=[Depends(verify_hardware),
-                                           Depends(check_version_header)])
-legacy_routes.include_router(router=modules.router,
-                             tags=["Modules"],
-                             dependencies=[Depends(verify_hardware),
-                                           Depends(check_version_header)])
-legacy_routes.include_router(router=pipettes.router,
-                             tags=["Pipettes"],
-                             dependencies=[Depends(verify_hardware),
-                                           Depends(check_version_header)])
-legacy_routes.include_router(router=motors.router,
-                             tags=["Motors"],
-                             dependencies=[Depends(verify_hardware),
-                                           Depends(check_version_header)])
-legacy_routes.include_router(router=camera.router,
-                             tags=["Camera"],
-                             dependencies=[Depends(check_version_header)])
-legacy_routes.include_router(router=logs.router,
-                             tags=["Logs"])
-legacy_routes.include_router(router=rpc.router,
-                             tags=["RPC"],
-                             dependencies=[Depends(verify_hardware)])
+legacy_routes.include_router(router=networking.router, tags=["Networking"])
+
+legacy_routes.include_router(router=control.router, tags=["Control"])
+
+legacy_routes.include_router(router=settings.router, tags=["Settings"])
+
+legacy_routes.include_router(router=deck_calibration.router, tags=["Deck Calibration"])
+
+legacy_routes.include_router(router=modules.router, tags=["Modules"])
+
+legacy_routes.include_router(router=pipettes.router, tags=["Pipettes"])
+
+legacy_routes.include_router(router=motors.router, tags=["Motors"])
+
+legacy_routes.include_router(router=camera.router, tags=["Camera"])
+
+legacy_routes.include_router(router=logs.router, tags=["Logs"])
+
+legacy_routes.include_router(router=rpc.router, tags=["RPC"])
+
+__all__ = ["legacy_routes"]

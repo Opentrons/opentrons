@@ -1,10 +1,10 @@
 // @flow
 import assert from 'assert'
-import type { HydratedMagnetFormData } from '../../../form-types'
 import type {
   EngageMagnetArgs,
   DisengageMagnetArgs,
-} from '../../../step-generation'
+} from '@opentrons/step-generation'
+import type { HydratedMagnetFormData } from '../../../form-types'
 
 type MagnetArgs = EngageMagnetArgs | DisengageMagnetArgs
 

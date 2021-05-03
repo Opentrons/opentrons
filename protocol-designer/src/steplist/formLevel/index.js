@@ -18,6 +18,7 @@ import {
   profileTargetLidTempRequired,
   blockTemperatureHoldRequired,
   lidTemperatureHoldRequired,
+  volumeTooHigh,
 } from './errors'
 import {
   composeWarnings,
@@ -52,7 +53,7 @@ type FormHelpers = {|
 
 const stepFormHelperMap: { [StepType]: FormHelpers } = {
   mix: {
-    getErrors: composeErrors(incompatibleLabware),
+    getErrors: composeErrors(incompatibleLabware, volumeTooHigh),
     getWarnings: composeWarnings(belowPipetteMinimumVolume),
   },
   pause: {

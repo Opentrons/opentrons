@@ -10,7 +10,7 @@ import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
 import { getSelectedStepId } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { Alerts, type Props } from './Alerts'
-import type { CommandCreatorError } from '../../step-generation/types'
+import type { CommandCreatorError } from '@opentrons/step-generation'
 import type { BaseState } from '../../types'
 
 type SP = {|

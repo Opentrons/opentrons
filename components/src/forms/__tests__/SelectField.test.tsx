@@ -3,7 +3,7 @@ import { shallow } from 'enzyme'
 
 import { SelectField } from '../SelectField'
 import { Select } from '../Select'
-import type { SelectOption } from '../Select'
+import type { SelectOption, SelectProps } from '../Select'
 
 describe('SelectField', () => {
   it('renders a Select', () => {
@@ -48,7 +48,9 @@ describe('SelectField', () => {
         disabled={disabled}
         placeholder={placeholder}
         menuPosition={menuPosition}
-        formatOptionLabel={formatOptionLabel}
+        formatOptionLabel={
+          formatOptionLabel as SelectProps['formatOptionLabel']
+        }
         className={className}
       />
     )

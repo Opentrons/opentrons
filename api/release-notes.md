@@ -4,32 +4,52 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
-# OT-2 Software Changes in 4.2.1
+# OT-2 Software Changes in 4.3.0
+
+OT-2 software 4.3.0 brings a major new feature: the ability to use multiple modules of the same type in a protocol. For instance, you can use two Opentrons Temperature modules in a protocol at the same time. There are also several bugfixes.
+
+## New Features
+
+- Protocols may now load more than one of the same module type by calling `protocol.load_module()` multiple times with the same type of module and different deck slots
+
+## Bugfixes
+
+- Fix an issue where pipettes would move diagonally when accessing the same well one after another ([#7156](https://github.com/Opentrons/opentrons/issues/7156))
+- Fixes an issue causing slow protocol uploads in protocols using Thermocycler Modules or Temperature Modules ([#7506](https://github.com/Opentrons/opentrons/issues/7506))
+- Fixes an issue where labware could not have a 0 column. You can now once again create custom labware with a column 0 ([#7531](https://github.com/Opentrons/opentrons/issues/7531))
+
+## Known Issues
+
+In 4.3.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
+
+---
+
+## OT-2 Software Changes in 4.2.1
 
 This is a hotfix to prevent crashing in the Z axis with one pipette. You must re-calibrate your pipette offset and your labware before proceeding to a run if you are
 experiencing this issue.
 
-## Bugfixes
+### Bugfixes
 
 - Fixed an issue where tip length calibration was not being accessed correctly during a protocol run, and labware calibration.
   - If you performed pipette calibration in 4.2.0, you will need to re-do that calibration upon this update.
 
-## Known Issues
+### Known Issues
 
 In 4.2.1 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
 
 ---
 
-# OT-2 Software Changes in 4.2.0
+## OT-2 Software Changes in 4.2.0
 
-## Bugfixes
+### Bugfixes
 
 - Fixed an issue where the pipette or pipette mount would not descend far enough to access the mounting screws when changing the pipette
 - Fixed an issue that would cause the left and right pipettes to be at different heights, even after executing pipette calibration
   - If you are experiencing this issue, you should recalibrate your pipettes after updating.
 - Fixed an issue where the OT-2 would be unable to connect to Wi-Fi networks using 802.1x Fast Migration.
 
-## Known Issues
+### Known Issues
 
 In 4.2.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
 

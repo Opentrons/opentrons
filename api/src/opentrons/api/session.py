@@ -404,8 +404,7 @@ class Session(RobotBusy):
 
             ctx_impl = impl_class.build_using(
                 self._protocol,
-                hardware=sync_sim,
-                extra_labware=getattr(self._protocol, 'extra_labware', {}))
+                hardware=sync_sim)
             self._simulating_ctx = ProtocolContext.build_using(
                 protocol=self._protocol,
                 loop=self._loop,

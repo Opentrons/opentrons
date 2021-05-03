@@ -1,8 +1,8 @@
 // @flow
+import type { Timeline } from '@opentrons/step-generation'
 import type { Substeps } from '../steplist/types'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 import type { GenerateSubstepsArgs } from './generateSubsteps'
-import type { Timeline } from '../step-generation'
 
 // worker itself will spread the robotStateTimeline in
 export type SubstepsArgsNoTimeline = $Diff<

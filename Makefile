@@ -12,14 +12,15 @@ SHELL := bash
 PATH := $(shell yarn bin):$(PATH)
 
 API_DIR := api
+APP_SHELL_DIR := app-shell
+COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
 LABWARE_LIBRARY_DIR := labware-library
+NOTIFY_SERVER_DIR := notify-server
 PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
-NOTIFY_SERVER_DIR := notify-server
-APP_SHELL_DIR := app-shell
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -57,6 +58,7 @@ clean-py:
 .PHONY: clean-js
 clean-js: clean-ts
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
+	$(MAKE) -C $(COMPONENTS_DIR) clean
 
 .PHONY: setup-py
 setup-py:

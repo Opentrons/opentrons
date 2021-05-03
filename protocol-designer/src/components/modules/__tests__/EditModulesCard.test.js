@@ -10,10 +10,10 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
+import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { SUPPORTED_MODULE_TYPES } from '../../../modules'
-import { TEMPERATURE_DEACTIVATED } from '../../../constants'
 import { EditModulesCard } from '../EditModulesCard'
 import { CrashInfoBox } from '../CrashInfoBox'
 import { ModuleRow } from '../ModuleRow'

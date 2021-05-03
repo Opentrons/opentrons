@@ -1,5 +1,5 @@
 // @flow
-import type { InnerDelayArgs } from '../../../step-generation'
+import type { InnerDelayArgs } from '@opentrons/step-generation'
 import type {
   DelayCheckboxFields,
   DelaySecondFields,

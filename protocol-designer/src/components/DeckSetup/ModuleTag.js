@@ -9,16 +9,15 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   type ModuleRealType,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
-import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
-import { selectors as stepFormSelectors } from '../../step-forms'
 import {
-  STD_SLOT_X_DIM,
-  STD_SLOT_Y_DIM,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
-} from '../../constants'
+} from '@opentrons/step-generation'
+import { i18n } from '../../localization'
+import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import { STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
 import * as uiSelectors from '../../ui/steps'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { makeTemperatureText } from '../../utils'

@@ -13,7 +13,7 @@ import {
   TERMINAL_ITEM_SELECTION_TYPE,
   type HoverableItem,
 } from '../../ui/steps/reducers'
-import type { CommandsAndRobotState } from '../../step-generation'
+import type { CommandsAndRobotState } from '@opentrons/step-generation'
 import type { StepIdType } from '../../form-types'
 
 const initialRobotState: any = 'fake initial robot state'

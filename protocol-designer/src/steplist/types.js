@@ -4,7 +4,7 @@ import type {
   CommandCreatorArgs,
   PauseArgs,
   ThermocyclerProfileStepArgs,
-} from '../step-generation'
+} from '@opentrons/step-generation'
 import type { StepIdType } from '../form-types'
 import type { FormError } from './formLevel/errors'
 

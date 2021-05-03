@@ -15,6 +15,7 @@
 ; read type signatures from node_modules but ignore flow errors within
 .*/node_modules/.*
 <PROJECT_ROOT>/components/flow-types/.*
+<PROJECT_ROOT>/shared-data/flow-types/.*
 
 [include]
 
@@ -37,7 +38,7 @@ merge_timeout=300
 esproposal.optional_chaining=enable
 ; default value of 19 (16 * 2^19 bytes > 8ish MB) isn't quite enough and can
 ; result in flow crashing with `Unhandled exception: SharedMem.Hash_table_full`
-sharedmemory.hash_table_pow=20
+sharedmemory.hash_table_pow=21
 ; enable types-first mode for speed and explicitness
 ; https://flow.org/en/docs/lang/types-first/
 types_first=true

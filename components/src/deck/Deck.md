@@ -1,5 +1,0 @@
-Deck map:
-
-```js
-<Deck />
-```

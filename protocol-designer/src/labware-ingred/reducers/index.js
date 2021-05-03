@@ -9,12 +9,12 @@ import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 
 import type { Reducer } from 'redux'
-import type { Action, DeckSlot } from '../../types'
 import type {
   SingleLabwareLiquidState,
   LocationLiquidState,
   LabwareLiquidState,
-} from '../../step-generation'
+} from '@opentrons/step-generation'
+import type { Action, DeckSlot } from '../../types'
 import type { LiquidGroupsById, DisplayLabware } from '../types'
 import type { LoadFileAction } from '../../load-file'
 import type {

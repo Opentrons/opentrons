@@ -20,7 +20,7 @@ describe('StepItemContents', () => {
   describe('magnet step type', () => {
     let magnetProps
     beforeEach(() => {
-      const stepType = 'magnet'
+      const stepType: 'magnet' = 'magnet'
       magnetProps = {
         ...props,
         rawForm: {
@@ -118,8 +118,7 @@ describe('StepItemContents', () => {
 
   describe('awaitTemperature step type', () => {
     let awaitTemperatureProps: StepItemContentsProps
-    // TODO(IL, 2021-02-04) that's not a stepType?!? See #7285
-    const stepType: any = 'awaitTemperature'
+    const stepType: 'temperature' = 'temperature'
     beforeEach(() => {
       awaitTemperatureProps = {
         ...props,
@@ -138,7 +137,7 @@ describe('StepItemContents', () => {
 
     it('module is rendered with temperature and only labware nick name', () => {
       awaitTemperatureProps.substeps = {
-        substepType: stepType,
+        substepType: 'awaitTemperature',
         temperature: 45,
         labwareNickname: 'temperature nickname',
         message: 'message',
@@ -154,8 +153,7 @@ describe('StepItemContents', () => {
 
   describe('thermocyclerState substep type', () => {
     let thermocyclerStateProps: StepItemContentsProps
-    // TODO(IL, 2021-02-04) that's not a stepType?!? See #7285
-    const stepType: any = THERMOCYCLER_STATE
+    const stepType: 'thermocycler' = 'thermocycler'
 
     beforeEach(() => {
       thermocyclerStateProps = {
@@ -175,7 +173,7 @@ describe('StepItemContents', () => {
 
     it('module is rendered with temperature and lid state and only labware nick name', () => {
       thermocyclerStateProps.substeps = {
-        substepType: stepType,
+        substepType: THERMOCYCLER_STATE,
         blockTargetTemp: 55,
         lidTargetTemp: 45,
         lidOpen: false,

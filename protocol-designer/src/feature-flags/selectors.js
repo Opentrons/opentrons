@@ -19,8 +19,3 @@ export const getDisableModuleRestrictions: Selector<?boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_DISABLE_MODULE_RESTRICTIONS
 )
-
-export const getBatchEditMixEnabled: Selector<?boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_BATCH_EDIT_MIX
-)

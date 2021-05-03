@@ -35,6 +35,10 @@ class BaseLiquidHandlingRequest(BasePipettingRequest):
         description="Relative well location at which to perform the operation",
     )
 
+    # todo(mm, 2021-03-26): This class or one of its subclasses should have a
+    # field for liquid flow rate in microliters per second.
+    # See Opentrons/opentrons#4837 for terminology concerns.
+
 
 class BaseLiquidHandlingResult(BaseModel):
     """Base properties of a liquid handling result."""

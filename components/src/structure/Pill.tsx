@@ -5,6 +5,8 @@ import styles from './Pill.css'
 
 import type { UseHoverTooltipTargetProps } from '../tooltips'
 
+// TODO(bc, 2021-03-29): this component is only used in PD
+// reconsider whether it belongs in components library
 // TODO(bc, 2021-03-05): can this color prop actually be null or undefined if not present?
 // if no, then remove the cast to string
 export interface PillProps {

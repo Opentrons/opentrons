@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.3...v4.3.0-beta.0) (2021-04-19)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
+# [4.3.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.2...v4.3.0-alpha.3) (2021-04-19)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
+# [4.3.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.1...v4.3.0-alpha.2) (2021-04-19)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
+# [4.3.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.0...v4.3.0-alpha.1) (2021-04-15)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
+# [4.3.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0-alpha.0) (2021-04-14)
+
+
+### Bug Fixes
+
+* **discovery-client:** allow discovery client to track network interfaces ([#7608](https://github.com/Opentrons/opentrons/issues/7608)) ([c526b19](https://github.com/Opentrons/opentrons/commit/c526b19))
+
+
+
+
+
 ## [4.2.1](https://github.com/Opentrons/opentrons/compare/v4.2.0...v4.2.1) (2021-04-06)
 
 **Note:** Version bump only for package @opentrons/app-shell

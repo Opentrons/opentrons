@@ -7,6 +7,8 @@ import styles from './lists.css'
 import { Icon } from '../icons'
 import type { IconName } from '../icons'
 
+// TODO(bc, 2021-03-31): this is only used in the app
+// reconsider whether this belongs in components library
 interface ListItemProps {
   /** click handler */
   onClick?: (event: React.SyntheticEvent) => unknown

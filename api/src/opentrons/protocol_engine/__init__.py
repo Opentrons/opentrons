@@ -9,18 +9,31 @@ from .protocol_engine import ProtocolEngine
 from .state import StateStore, StateView, LabwareData
 from .execution import CommandHandlers
 from .resources import ResourceProviders
-from .types import DeckLocation, DeckSlotLocation, Dimensions, WellLocation, WellOrigin
+from .types import (
+    DeckLocation,
+    DeckSlotLocation,
+    Dimensions,
+    PipetteName,
+    WellLocation,
+    WellOrigin,
+)
 
 __all__ = [
+    # main export
     "ProtocolEngine",
+    # state interfaces and models
     "StateStore",
     "StateView",
+    "LabwareData",
+    # command execution interfaces
     "CommandHandlers",
+    # resource management interfaces
     "ResourceProviders",
+    # type definitions and other value models
     "DeckLocation",
     "DeckSlotLocation",
     "Dimensions",
-    "LabwareData",
+    "PipetteName",
     "WellLocation",
     "WellOrigin",
 ]

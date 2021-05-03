@@ -50,6 +50,7 @@ import { getLabwareOnModule } from '../../ui/modules/utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 import type { Reducer } from 'redux'
+import type { NormalizedPipetteById } from '@opentrons/step-generation'
 import type { LoadFileAction } from '../../load-file'
 import type {
   CreateContainerAction,
@@ -98,7 +99,6 @@ import type {
 } from '../../ui/steps/actions/types'
 import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
 import type {
-  NormalizedPipetteById,
   NormalizedLabware,
   NormalizedLabwareById,
   ModuleEntities,

@@ -1,9 +1,9 @@
 // @flow
 import { mergeWhen } from './mergeWhen'
-import { orderWells, getOrderedWells } from './orderWells'
+import { getOrderedWells } from './orderWells'
 import type { StepIdType } from '../../form-types'
 
-export { mergeWhen, orderWells, getOrderedWells }
+export { mergeWhen, getOrderedWells }
 
 export type WellRatio = 'n:n' | '1:many' | 'many:1'
 export function getWellRatio(sourceWells: mixed, destWells: mixed): ?WellRatio {

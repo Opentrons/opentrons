@@ -14,8 +14,8 @@ import * as stepFormSelectors from '../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { getModuleUnderLabware } from '../modules/utils'
 import type { Options } from '@opentrons/components'
+import type { LabwareEntity } from '@opentrons/step-generation'
 import type { Selector } from '../../types'
-import type { LabwareEntity } from '../../step-forms'
 
 export const getLabwareNicknamesById: Selector<{
   [labwareId: string]: string,

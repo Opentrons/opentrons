@@ -76,7 +76,7 @@ describe('useHoverTooltip', () => {
     expect(wrapper.find(Tooltip).prop('visible')).toBe(false)
 
     act(() => {
-      jest.runTimersToTime(300)
+      jest.advanceTimersByTime(300)
     })
     wrapper.update()
 
@@ -120,7 +120,7 @@ describe('useHoverTooltip', () => {
     expect(wrapper.find(Tooltip).prop('visible')).toBe(false)
 
     act(() => {
-      jest.runTimersToTime(200)
+      jest.advanceTimersByTime(200)
     })
     wrapper.update()
 
@@ -145,7 +145,7 @@ describe('useHoverTooltip', () => {
     expect(wrapper.find(Tooltip).prop('visible')).toBe(true)
 
     act(() => {
-      jest.runTimersToTime(500)
+      jest.advanceTimersByTime(500)
     })
     wrapper.update()
 

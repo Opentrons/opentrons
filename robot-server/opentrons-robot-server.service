@@ -6,7 +6,7 @@ After=opentrons-status-leds.service
 
 [Service]
 Type=notify
-ExecStart=uvicorn robot_server.service.app:app --uds /run/aiohttp.sock --ws wsproto
+ExecStart=uvicorn robot_server:app --uds /run/aiohttp.sock --ws wsproto
 # Stop the button blinking
 ExecStartPost=systemctl stop opentrons-gpio-setup.service
 Environment=OT_SMOOTHIE_ID=AMA RUNNING_ON_PI=true

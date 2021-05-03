@@ -57,7 +57,8 @@
       "preWetTip": "Not all selected steps are using this setting",
       "aspirate_touchTip_checkbox": "Not all selected steps are using this setting",
       "dispense_touchTip_checkbox": "Not all selected steps are using this setting",
-      "mix_touchTip_checkbox": "Not all selected steps are using this setting"
+      "mix_touchTip_checkbox": "Not all selected steps are using this setting",
+      "blowout_checkbox": "Not all selected steps are using this setting"
     },
     "moveLiquid": {
       "disabled": {

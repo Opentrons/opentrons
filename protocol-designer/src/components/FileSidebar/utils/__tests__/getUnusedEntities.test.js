@@ -10,7 +10,7 @@ import {
   MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
-import { TEMPERATURE_DEACTIVATED } from '../../../../constants'
+import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { getUnusedEntities } from '../getUnusedEntities'
 
 describe('getUnusedEntities', () => {

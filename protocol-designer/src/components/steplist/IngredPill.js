@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 import { Pill, type UseHoverTooltipResult } from '@opentrons/components'
+import { AIR } from '@opentrons/step-generation'
 import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
-import { AIR } from '../../step-generation/utils'
 import type {
   WellIngredientVolumeData,
   WellIngredientNames,

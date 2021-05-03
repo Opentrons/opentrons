@@ -1,10 +1,10 @@
 // @flow
 import assert from 'assert'
-import type { HydratedTemperatureFormData } from '../../../form-types'
 import type {
   SetTemperatureArgs,
   DeactivateTemperatureArgs,
-} from '../../../step-generation'
+} from '@opentrons/step-generation'
+import type { HydratedTemperatureFormData } from '../../../form-types'
 
 type TemperatureArgs = SetTemperatureArgs | DeactivateTemperatureArgs
 

@@ -8,9 +8,9 @@ import uniqBy from 'lodash/uniqBy'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import {
   getLabwareDefURI,
+  getIsTiprack,
   OPENTRONS_LABWARE_NAMESPACE,
 } from '@opentrons/shared-data'
-import { getIsTiprack } from '../../../shared-data/js/getLabware'
 import * as labwareDefSelectors from './selectors'
 import { getAllWellSetsForLabware } from '../utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

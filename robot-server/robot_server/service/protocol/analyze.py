@@ -129,7 +129,10 @@ def _parse_protocol(protocol_contents: contents.Contents) -> Protocol:
     :raises AnalyzeParseError:
     """
     try:
+        extra_labware = contents.get_custom_labware(protocol_contents)
+
         return parse(contents.get_protocol_contents(protocol_contents),
+                     extra_labware=extra_labware,
                      filename=protocol_contents.protocol_file.path.name)
     except SyntaxError as e:
         raise AnalyzeParseError(
@@ -164,7 +167,7 @@ def _simulate_protocol(protocol: Protocol) -> ProtocolContext:
     """
     try:
         ctx = ProtocolContext.build_using(
-            implementation=ProtocolContextSimulation.build_using(protocol),
+            implementation=ProtocolContextSimulation.build_using(protocol=protocol),
             protocol=protocol,
         )
         run_protocol(protocol, context=ctx)

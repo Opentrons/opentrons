@@ -6,6 +6,7 @@ from datetime import datetime
 from dataclasses import dataclass, field
 
 from fastapi import UploadFile
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from robot_server.service.protocol import contents, analyze, environment
 from opentrons.util.helpers import utc_now
@@ -84,6 +85,10 @@ class UploadedProtocol:
     def get_contents(self) -> str:
         """Read the protocol file contents as a string"""
         return contents.get_protocol_contents(self._data.contents)
+
+    def get_custom_labware(self) -> typing.Dict[str, LabwareDefinition]:
+        """Read the protocol file contents as a string"""
+        return contents.get_custom_labware(self._data.contents)
 
     @contextmanager
     def protocol_environment(self):

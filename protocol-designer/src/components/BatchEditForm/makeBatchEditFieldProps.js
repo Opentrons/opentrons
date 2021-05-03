@@ -23,8 +23,8 @@ export const makeBatchEditFieldProps = (
     const indeterminateTooltip = getFieldIndeterminateTooltip(name)
 
     let tooltipContent = defaultTooltip // Default to the default content (or blank)
-    if (isIndeterminate) {
-      tooltipContent = indeterminateTooltip // If field is not disabled and is interderminate
+    if (isIndeterminate && indeterminateTooltip) {
+      tooltipContent = indeterminateTooltip
     }
     if (name in disabledFields) {
       tooltipContent = disabledFields[name] // Use disabled content if field is disabled, override indeterminate tooltip if applicable

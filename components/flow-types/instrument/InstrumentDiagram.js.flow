@@ -5,13 +5,10 @@
  * @flow
  */
 
-import type {
-  PipetteNameSpecs,
-  PipetteModelSpecs,
-} from "@opentrons/shared-data";
+import type { PipetteNameSpecs } from "@opentrons/shared-data";
 import type { Mount } from "../robot-types";
 export type InstrumentDiagramProps = {|
-  pipetteSpecs?: PipetteNameSpecs | PipetteModelSpecs | null,
+  pipetteSpecs?: Pick<PipetteNameSpecs, "displayCategory" | "channels"> | null,
   className?: string,
   mount: Mount,
 |};

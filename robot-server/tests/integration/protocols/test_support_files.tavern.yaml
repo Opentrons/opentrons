@@ -1,0 +1,103 @@
+---
+test_name: Basic Transfer with configuration files.
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload just the protocol file. Checking for missing support file.
+    request:
+      url: "{host:s}:{port:d}/protocols"
+      method: POST
+      files:
+        protocolFile: "tests/integration/protocols/basic_transfer_with_config.py"
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+      json:
+        data:
+          id: !anystr
+          protocolFile:
+            basename: basic_transfer_with_config.py
+          supportFiles: []
+          lastModifiedAt: !anystr
+          createdAt: !anystr
+          metadata: !anydict
+          requiredEquipment: !anydict
+          errors:
+            - type: ModuleNotFoundError
+              description: No module named 'helpers'
+        links: !anydict
+  - name: Upload the missing helpers.py file. Checking for missing JSON file in response.
+    request:
+      url: "{host:s}:{port:d}/protocols/{protocol_id}"
+      method: PATCH
+      files:
+        file: "tests/integration/protocols/helpers.py"
+    response:
+      status_code: 200
+      json:
+        data:
+          id: !anystr
+          protocolFile:
+            basename: basic_transfer_with_config.py
+          supportFiles:
+            - basename: helpers.py
+          lastModifiedAt: !anystr
+          createdAt: !anystr
+          metadata: !anydict
+          requiredEquipment: !anydict
+          errors:
+            - type: ExceptionInProtocolError
+              description: "[Errno 2] No such file or directory: 'basic_transfer_config.json'"
+              lineNumber: 8
+        links: !anydict
+  - name: Upload the missing basic_transfer_config.json file
+    request:
+      url: "{host:s}:{port:d}/protocols/{protocol_id}"
+      method: PATCH
+      files:
+        file: "tests/integration/protocols/basic_transfer_config.json"
+    response:
+      status_code: 200
+      json:
+        data:
+          id: !anystr
+          protocolFile:
+            basename: basic_transfer_with_config.py
+          supportFiles:
+            - basename: helpers.py
+            - basename: basic_transfer_config.json
+          lastModifiedAt: !anystr
+          createdAt: !anystr
+          metadata: !anydict
+          requiredEquipment: !anydict
+            pipettes:
+              - mount: right
+                requestedAs: p300_single
+                pipetteName: p300_single
+                channels: 1
+            labware:
+              - label: corning_96_wellplate_360ul_flat
+                uri: opentrons/corning_96_wellplate_360ul_flat/1
+                location: 1
+              - label: opentrons_96_tiprack_300ul
+                uri: opentrons/opentrons_96_tiprack_300ul/1
+                location: 2
+              # Trash slot. Don't care what is there.
+              - uri: !anystr
+                location: 12
+                label: !anystr
+            modules: [ ]
+          errors: []
+        links: !anydict
+  - name: Delete the protocol
+    request:
+      url: "{host:s}:{port:d}/protocols/{protocol_id}"
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        data: !anydict
+        links: !anydict

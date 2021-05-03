@@ -97,6 +97,7 @@ function TipPositionInput(props: Props) {
           value={String(value)}
           isIndeterminate={isIndeterminate}
           units={i18n.t('application.units.millimeter')}
+          id={`TipPositionField_${name}`}
         />
       </Wrapper>
     </>

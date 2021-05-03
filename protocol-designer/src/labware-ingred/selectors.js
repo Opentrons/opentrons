@@ -6,7 +6,7 @@ import max from 'lodash/max'
 import reduce from 'lodash/reduce'
 
 import type { Options } from '@opentrons/components'
-import type { LabwareLiquidState } from '../step-generation'
+import type { LabwareLiquidState } from '@opentrons/step-generation'
 import type {
   RootState,
   ContainersState,

@@ -192,3 +192,20 @@ def test_holding_at_target(patch_poller_wait):
     # not enough history
     tc._block_temp_buffer = [29.8, 30, 30, 30.1]
     assert not tc._is_holding_at_target()
+
+
+def test_temp_status_update_callback():
+    tc = Thermocycler(lambda x: None)
+    tc._temp_status_update_callback('T:95.0 C:77.4 H:600')
+
+    assert tc.target == 95
+    assert tc.temperature == 77.4
+    assert tc.hold_time == 600
+
+
+def test_lid_temp_status_callback():
+    tc = Thermocycler(lambda x: None)
+    tc._lid_temp_status_callback('T:96 C:78')
+
+    assert tc.lid_temp == 78
+    assert tc.lid_target == 96

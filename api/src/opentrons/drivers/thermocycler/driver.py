@@ -331,10 +331,12 @@ class TCPoller(threading.Thread):
             self._send_write_fd.write(b'c')
 
     def close(self):
+        log.debug("Halting TCPoller")
         self._halt_write_fd.write(b'q')
 
     def __del__(self):
         """ Clean up thread fifos"""
+        log.debug("Cleaning up thread fifos in TCPoller.")
         try:
             os.unlink(self._send_path)
         except NameError:
@@ -376,9 +378,10 @@ class Thermocycler:
         return self
 
     def disconnect(self) -> 'Thermocycler':
-        if self.is_connected():
+        if self.is_connected() or self._poller:
             self._poller.close()  # type: ignore
             self._poller.join()  # type: ignore
+            log.debug("TC poller stopped.")
         self._poller = None
         return self
 
@@ -480,33 +483,24 @@ class Thermocycler:
         # Payload is shaped like `T:95.0 C:77.4 H:600` where T is the
         # target temperature, C is the current temperature, and H is the
         # hold time remaining
-        val_dict = {}
-        data_substrs = [d for d in temperature_response.split()]
-
-        for substr in data_substrs:
-            key = utils.parse_key_from_substring(substr)
-            value = utils.parse_number_from_substring(
-                substr, utils.TC_GCODE_ROUNDING_PRECISION)
-            val_dict[key] = value
-
-        self._current_temp = val_dict['C']
-        self._target_temp = val_dict['T']
-        self._hold_time = val_dict['H']
+        temp = utils.parse_plate_temperature_response(
+            temperature_string=temperature_response,
+            rounding_val=utils.TC_GCODE_ROUNDING_PRECISION
+        )
+        self._current_temp = temp.current
+        self._target_temp = temp.target
+        self._hold_time = temp.hold
         self._block_temp_buffer.append(self._current_temp)
 
     def _lid_temp_status_callback(self, lid_temp_res):
         # Payload is shaped like `T:95.0 C:77.4` where T is the
         # target temperature, C is the current temperature
-        val_dict = {}
-        data_substrs = [d for d in lid_temp_res.split()]
-
-        for substr in data_substrs:
-            key = utils.parse_key_from_substring(substr)
-            value = utils.parse_number_from_substring(
-                substr, utils.TC_GCODE_ROUNDING_PRECISION)
-            val_dict[key] = value
-        self._lid_temp = val_dict['C']
-        self._lid_target = val_dict['T']
+        temp = utils.parse_temperature_response(
+            temperature_string=lid_temp_res,
+            rounding_val=utils.TC_GCODE_ROUNDING_PRECISION
+        )
+        self._lid_temp = temp.current
+        self._lid_target = temp.target
 
     def _interrupt_callback(self, interrupt_response):
         # TODO sanitize response and then call the callback
@@ -624,9 +618,3 @@ class Thermocycler:
         await asyncio.sleep(0.05)
         trigger_connection.close()
         self.disconnect()
-
-    def __del__(self):
-        try:
-            self._poller.close()  # type: ignore
-        except Exception:
-            log.exception('Exception while cleaning up Thermocycler:')

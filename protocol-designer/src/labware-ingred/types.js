@@ -1,5 +1,5 @@
 // @flow
-import type { LocationLiquidState } from '../step-generation'
+import type { LocationLiquidState } from '@opentrons/step-generation'
 // TODO Ian 2018-02-19 make these shared in component library, standardize with Run App
 
 //  ===== LABWARE ===========

@@ -14,10 +14,8 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  TEMPERATURE_DEACTIVATED,
-} from '../../constants'
+import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import {
   getFormWarnings,
   getFormErrors,
@@ -43,6 +41,14 @@ import type {
   Mount,
   InstrumentInfoProps,
 } from '@opentrons/components'
+import type {
+  InvariantContext,
+  LabwareEntity,
+  LabwareEntities,
+  ModuleEntities,
+  ModuleEntity,
+  PipetteEntities,
+} from '@opentrons/step-generation'
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, Selector, DeckSlot } from '../../types'
 import type { FormData, StepIdType } from '../../form-types'
@@ -55,14 +61,9 @@ import type {
   NormalizedLabwareById,
   NormalizedLabware,
   LabwareOnDeck,
-  LabwareEntity,
-  LabwareEntities,
   MagneticModuleState,
   ModuleOnDeck,
-  ModuleEntity,
-  ModuleEntities,
   ModulesForEditModulesCard,
-  PipetteEntities,
   PipetteOnDeck,
   FormPipettesByMount,
   TemperatureModuleState,
@@ -74,7 +75,6 @@ import type {
   SavedStepFormState,
   BatchEditFormChangesState,
 } from '../reducers'
-import type { InvariantContext } from '../../step-generation'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
