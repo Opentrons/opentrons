@@ -26,5 +26,8 @@ lerna.json
 !api/release-notes.md
 !app-shell/build/release-notes.md
 
+# components library
+storybook-static
+
 # mypy
 **/.mypy_cache/**
