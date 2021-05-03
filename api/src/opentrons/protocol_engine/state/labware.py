@@ -4,12 +4,11 @@ from typing import Dict, List, Sequence, Tuple
 
 from typing_extensions import final
 
-from opentrons_shared_data.labware.dev_types import (
+from opentrons.protocols.models import (
     LabwareDefinition,
     WellDefinition,
 )
-from opentrons.calibration_storage.helpers import uri_from_definition, \
-    uri_from_details
+from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
 from ..resources import DeckFixedLabware
@@ -90,7 +89,7 @@ class LabwareState:
     def get_quirks(self, labware_id: str) -> List[str]:
         """Get a labware's quirks."""
         data = self.get_labware_data_by_id(labware_id)
-        return data.definition["parameters"].get("quirks", [])
+        return data.definition.parameters.quirks or []
 
     def get_well_definition(
         self,
@@ -101,7 +100,7 @@ class LabwareState:
         labware_data = self.get_labware_data_by_id(labware_id)
 
         try:
-            return labware_data.definition["wells"][well_name]
+            return labware_data.definition.wells[well_name]
         except KeyError:
             raise errors.WellDoesNotExistError(
                 f"{well_name} does not exist in {labware_id}."
@@ -110,36 +109,40 @@ class LabwareState:
     def get_tip_length(self, labware_id: str) -> float:
         """Get the tip length of a tip rack."""
         data = self.get_labware_data_by_id(labware_id)
-        try:
-            return data.definition["parameters"]["tipLength"]
-        except KeyError:
+        if data.definition.parameters.tipLength is None:
             raise errors.LabwareIsNotTipRackError(
                 f"Labware {labware_id} has no tip length defined."
             )
+        return data.definition.parameters.tipLength
 
     def get_definition_uri(self, labware_id: str) -> str:
         """Get a labware's definition URI."""
-        return uri_from_definition(self.get_labware_data_by_id(labware_id).definition)
+        definition = self.get_labware_data_by_id(labware_id).definition
+        return uri_from_details(
+            namespace=definition.namespace,
+            load_name=definition.parameters.loadName,
+            version=definition.version
+        )
 
     def is_tiprack(self, labware_id: str) -> bool:
         """Get whether labware is a tiprack."""
         labware_data = self.get_labware_data_by_id(labware_id)
-        return labware_data.definition["parameters"]["isTiprack"]
+        return labware_data.definition.parameters.isTiprack
 
     def get_load_name(self, labware_id: str) -> str:
         """Get the labware's load name."""
         labware_data = self.get_labware_data_by_id(labware_id)
-        return labware_data.definition["parameters"]["loadName"]
+        return labware_data.definition.parameters.loadName
 
     def get_dimensions(self, labware_id: str) -> Dimensions:
         """Get the labware's dimensions."""
         labware_data = self.get_labware_data_by_id(labware_id)
-        dims = labware_data.definition["dimensions"]
+        dims = labware_data.definition.dimensions
 
         return Dimensions(
-            x=dims["xDimension"],
-            y=dims["yDimension"],
-            z=dims["zDimension"],
+            x=dims.xDimension,
+            y=dims.yDimension,
+            z=dims.zDimension,
         )
 
 
@@ -174,5 +177,4 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
                 load_name=command.result.loadName,
                 version=command.result.version
             )
-            self._state._labware_definitions_by_uri[uri] = \
-                command.request.labware_definition.dict(exclude_defaults=True)
+            self._state._labware_definitions_by_uri[uri] = command.request.labware_definition

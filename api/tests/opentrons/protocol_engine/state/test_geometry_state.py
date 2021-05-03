@@ -4,7 +4,7 @@ from mock import MagicMock
 from typing import cast
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons_shared_data.labware.dev_types import LabwareDefinition, WellDefinition
+from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 from opentrons.types import Point, DeckSlotName
@@ -101,13 +101,13 @@ def test_get_labware_parent_position(
 
 def test_get_labware_origin_position(
     standard_deck_def: DeckDefinitionV2,
-    minimal_labware_def: LabwareDefinition,
+    well_plate_def: LabwareDefinition,
     mock_labware_store: MagicMock,
     geometry_store: GeometryStore,
 ) -> None:
     """It should return a deck slot position with the labware's offset as its origin."""
     labware_data = LabwareData(
-        definition=minimal_labware_def,
+        definition=well_plate_def,
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         calibration=(1, -2, 3)
     )
@@ -115,9 +115,9 @@ def test_get_labware_origin_position(
     mock_labware_store.state.get_labware_data_by_id.return_value = labware_data
     expected_parent = geometry_store.state.get_slot_position(DeckSlotName.SLOT_3)
     expected_offset = Point(
-        x=minimal_labware_def["cornerOffsetFromSlot"]["x"],
-        y=minimal_labware_def["cornerOffsetFromSlot"]["y"],
-        z=minimal_labware_def["cornerOffsetFromSlot"]["z"],
+        x=well_plate_def.cornerOffsetFromSlot.x,
+        y=well_plate_def.cornerOffsetFromSlot.y,
+        z=well_plate_def.cornerOffsetFromSlot.z,
     )
     expected_point = expected_parent + expected_offset
 
@@ -149,7 +149,7 @@ def test_get_labware_highest_z(
         "labware-id"
     )
     assert highest_z == (
-        labware_data.definition["dimensions"]["zDimension"] +
+        labware_data.definition.dimensions.zDimension +
         slot_pos[2] +
         3
     )
@@ -197,14 +197,14 @@ def test_get_all_labware_highest_z(
 
 
 def test_get_labware_position(
-    minimal_labware_def: LabwareDefinition,
+    well_plate_def: LabwareDefinition,
     standard_deck_def: DeckDefinitionV2,
     mock_labware_store: MagicMock,
     geometry_store: GeometryStore,
 ) -> None:
     """It should return the slot position plus calibrated offset."""
     labware_data = LabwareData(
-        definition=minimal_labware_def,
+        definition=well_plate_def,
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_4),
         calibration=(1, -2, 3)
     )
@@ -215,9 +215,9 @@ def test_get_labware_position(
     position = geometry_store.state.get_labware_position(labware_id="abc")
 
     assert position == Point(
-        x=slot_pos[0] + minimal_labware_def["cornerOffsetFromSlot"]["x"] + 1,
-        y=slot_pos[1] + minimal_labware_def["cornerOffsetFromSlot"]["y"] - 2,
-        z=slot_pos[2] + minimal_labware_def["cornerOffsetFromSlot"]["z"] + 3,
+        x=slot_pos[0] + well_plate_def.cornerOffsetFromSlot.x + 1,
+        y=slot_pos[1] + well_plate_def.cornerOffsetFromSlot.y - 2,
+        z=slot_pos[2] + well_plate_def.cornerOffsetFromSlot.z + 3,
     )
 
 
@@ -233,7 +233,7 @@ def test_get_well_position(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         calibration=(1, -2, 3)
     )
-    well_def = well_plate_def["wells"]["B2"]
+    well_def = well_plate_def.wells["B2"]
     slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
 
     mock_labware_store.state.get_labware_data_by_id.return_value = labware_data
@@ -249,9 +249,9 @@ def test_get_well_position(
         "B2"
     )
     assert point == Point(
-        x=slot_pos[0] + 1 + well_def["x"],
-        y=slot_pos[1] - 2 + well_def["y"],
-        z=slot_pos[2] + 3 + well_def["z"] + well_def["depth"],
+        x=slot_pos[0] + 1 + well_def.x,
+        y=slot_pos[1] - 2 + well_def.y,
+        z=slot_pos[2] + 3 + well_def.z + well_def.depth,
     )
 
 
@@ -267,7 +267,7 @@ def test_get_well_position_with_top_offset(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         calibration=(1, -2, 3)
     )
-    well_def = well_plate_def["wells"]["B2"]
+    well_def = well_plate_def.wells["B2"]
     slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
 
     mock_labware_store.state.get_labware_data_by_id.return_value = labware_data
@@ -280,9 +280,9 @@ def test_get_well_position_with_top_offset(
     )
 
     assert point == Point(
-        x=slot_pos[0] + 1 + well_def["x"] + 1,
-        y=slot_pos[1] - 2 + well_def["y"] + 2,
-        z=slot_pos[2] + 3 + well_def["z"] + well_def["depth"] + 3,
+        x=slot_pos[0] + 1 + well_def.x + 1,
+        y=slot_pos[1] - 2 + well_def.y + 2,
+        z=slot_pos[2] + 3 + well_def.z + well_def.depth + 3,
     )
 
 
@@ -298,7 +298,7 @@ def test_get_well_position_with_bottom_offset(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         calibration=(1, -2, 3)
     )
-    well_def = well_plate_def["wells"]["B2"]
+    well_def = well_plate_def.wells["B2"]
     slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
 
     mock_labware_store.state.get_labware_data_by_id.return_value = labware_data
@@ -311,9 +311,9 @@ def test_get_well_position_with_bottom_offset(
     )
 
     assert point == Point(
-        x=slot_pos[0] + 1 + well_def["x"] + 3,
-        y=slot_pos[1] - 2 + well_def["y"] + 2,
-        z=slot_pos[2] + 3 + well_def["z"] + 1,
+        x=slot_pos[0] + 1 + well_def.x + 3,
+        y=slot_pos[1] - 2 + well_def.y + 2,
+        z=slot_pos[2] + 3 + well_def.z + 1,
     )
 
 
@@ -360,7 +360,7 @@ def test_get_tip_geometry(
 ) -> None:
     """It should get a "well's" tip geometry."""
     pipette_config: PipetteDict = cast(PipetteDict, {"tip_overlap": {"default": 10}})
-    well_def = tip_rack_def["wells"]["B2"]
+    well_def = tip_rack_def.wells["B2"]
 
     mock_labware_store.state.get_tip_length.return_value = 50
     mock_labware_store.state.get_definition_uri.return_value = ""
@@ -373,18 +373,27 @@ def test_get_tip_geometry(
     )
 
     assert tip_geometry.effective_length == 40
-    assert tip_geometry.diameter == well_def["diameter"]  # type: ignore[misc]
-    assert tip_geometry.volume == well_def["totalLiquidVolume"]
+    assert tip_geometry.diameter == well_def.diameter  # type: ignore[misc]
+    assert tip_geometry.volume == well_def.totalLiquidVolume
     mock_labware_store.state.get_well_definition.assert_called_with(
         "tip-rack-id",
         "B2",
     )
 
+
+def test_get_tip_geometry_raises(
+    tip_rack_def: LabwareDefinition,
+    mock_labware_store: MagicMock,
+    geometry_store: GeometryStore
+):
+    """It should raise LabwareIsNotTipRackError if well is not circular"""
+    pipette_config: PipetteDict = cast(PipetteDict,
+                                       {"tip_overlap": {"default": 10}})
+    well_def = tip_rack_def.wells["B2"]
+    well_def.shape = "rectangular"
+
     with pytest.raises(errors.LabwareIsNotTipRackError):
-        mock_labware_store.state.get_well_definition.return_value = cast(
-            WellDefinition,
-            {"shape": "rectangular"}
-        )
+        mock_labware_store.state.get_well_definition.return_value = well_def
 
         geometry_store.state.get_tip_geometry(
             labware_id="tip-rack-id",

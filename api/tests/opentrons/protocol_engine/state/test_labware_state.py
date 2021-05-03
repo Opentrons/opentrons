@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime, timezone
 from typing import Tuple
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 from opentrons.protocols import models
 
@@ -333,7 +333,7 @@ def test_get_well_definition(
         calibration=(1, 2, 3),
     )
 
-    expected_well_def = well_plate_def["wells"]["B2"]
+    expected_well_def = well_plate_def.wells["B2"]
     result = store.labware.get_well_definition(
         labware_id="plate-id",
         well_name="B2",
@@ -371,7 +371,7 @@ def test_get_tip_length_gets_length_from_definition(
     )
 
     length = store.labware.get_tip_length("tip-rack-id")
-    assert length == tip_rack_def["parameters"]["tipLength"]
+    assert length == tip_rack_def.parameters.tipLength
 
 
 def test_get_labware_uri_from_definition(
@@ -440,7 +440,7 @@ def test_get_dimensions(well_plate_def: LabwareDefinition, store: StateStore) ->
     )
 
     assert store.labware.get_dimensions("plate-id") == Dimensions(
-        x=well_plate_def["dimensions"]["xDimension"],
-        y=well_plate_def["dimensions"]["yDimension"],
-        z=well_plate_def["dimensions"]["zDimension"],
+        x=well_plate_def.dimensions.xDimension,
+        y=well_plate_def.dimensions.yDimension,
+        z=well_plate_def.dimensions.zDimension,
     )

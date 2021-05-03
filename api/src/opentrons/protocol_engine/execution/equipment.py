@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import Tuple, Optional
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
 

@@ -5,7 +5,7 @@ from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 from typing import cast
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 

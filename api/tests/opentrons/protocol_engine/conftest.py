@@ -7,7 +7,7 @@ from decoy import Decoy
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.labware import load_definition
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.api_support.constants import STANDARD_DECK, SHORT_TRASH_DECK
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control.api import API as HardwareController
@@ -128,31 +128,41 @@ def short_trash_deck_def() -> DeckDefinitionV2:
 @pytest.fixture(scope="session")
 def fixed_trash_def() -> LabwareDefinition:
     """Get the definition of the OT-2 standard fixed trash."""
-    return load_definition("opentrons_1_trash_1100ml_fixed", 1)
+    return LabwareDefinition.parse_obj(
+        load_definition("opentrons_1_trash_1100ml_fixed", 1)
+    )
 
 
 @pytest.fixture(scope="session")
 def short_fixed_trash_def() -> LabwareDefinition:
     """Get the definition of the OT-2 short fixed trash."""
-    return load_definition("opentrons_1_trash_850ml_fixed", 1)
+    return LabwareDefinition.parse_obj(
+        load_definition("opentrons_1_trash_850ml_fixed", 1)
+    )
 
 
 @pytest.fixture(scope="session")
 def well_plate_def() -> LabwareDefinition:
     """Get the definition of a 96 well plate."""
-    return load_definition("corning_96_wellplate_360ul_flat", 1)
+    return LabwareDefinition.parse_obj(
+        load_definition("corning_96_wellplate_360ul_flat", 1)
+    )
 
 
 @pytest.fixture(scope="session")
 def reservoir_def() -> LabwareDefinition:
     """Get the definition of single-row reservoir."""
-    return load_definition("nest_12_reservoir_15ml", 1)
+    return LabwareDefinition.parse_obj(
+        load_definition("nest_12_reservoir_15ml", 1)
+    )
 
 
 @pytest.fixture(scope="session")
 def tip_rack_def() -> LabwareDefinition:
     """Get the definition of Opentrons 300 uL tip rack."""
-    return load_definition("opentrons_96_tiprack_300ul", 1)
+    return LabwareDefinition.parse_obj(
+        load_definition("opentrons_96_tiprack_300ul", 1)
+    )
 
 
 @pytest.fixture

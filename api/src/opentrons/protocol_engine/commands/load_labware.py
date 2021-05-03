@@ -1,7 +1,10 @@
 """Load labware command request, result, and implementation models."""
 from __future__ import annotations
+
 from pydantic import BaseModel, Field
-from typing import Any, Tuple
+from typing import Tuple
+
+from opentrons.protocols.models import LabwareDefinition
 
 from ..types import LabwareLocation
 from .command import CommandImplementation, CommandHandlers
@@ -39,8 +42,7 @@ class LoadLabwareResult(BaseModel):
         ...,
         description="An ID to reference this labware in subsequent commands.",
     )
-    # TODO(mc, 2020-10-21): Don't use `Any` here (TypedDicts make Pydantic sad)
-    definition: Any = Field(
+    definition: LabwareDefinition = Field(
         ...,
         description="The full definition data for this labware.",
     )
