@@ -1,6 +1,8 @@
 import * as errorCreators from '../../errorCreators'
-import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreatorError, CommandCreator } from '../../types'
+
+// @ts-expect-error (sa, 2021-05-03): Type 'undefined' is not assignable to type 'CommandCreatorError[]'
 export const blowout: CommandCreator<BlowoutParams> = (
   args,
   invariantContext,
@@ -9,7 +11,7 @@ export const blowout: CommandCreator<BlowoutParams> = (
   /** Blowout with given args. Requires tip. */
   const { pipette, labware, well, offsetFromBottomMm, flowRate } = args
   const actionName = 'blowout'
-  const errors: Array<CommandCreatorError> = []
+  const errors: CommandCreatorError[] = []
   const pipetteData = prevRobotState.pipettes[pipette]
 
   // TODO Ian 2018-04-30 this logic using command creator args + robotstate to push errors

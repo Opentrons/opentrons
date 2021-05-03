@@ -1,18 +1,19 @@
 import { removePairs } from './removePairs'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 const _isEqualMix = (
   a: AspDispAirgapParams,
   b: AspDispAirgapParams
 ): boolean => {
   const compareParams = ['pipette', 'volume', 'labware', 'well']
+      // @ts-expect-error(SA, 2021-05-03): can's index AspDispAirgapParams with string
   return compareParams.every(param => a[param] === b[param])
 }
 
 export const _stripNoOpMixCommands = (
-  commands: Array<Command>
-): Array<Command> =>
+  commands: Command[]
+): Command[] =>
   removePairs<Command>(
     commands,
     (a, b) =>
@@ -24,5 +25,5 @@ export const _stripNoOpMixCommands = (
 // Remove groups of commands from the array if together they will have no effect on the state
 // (NOTE: the only one here right now is strip mix commands, but we may add
 // additional transformations besides mix commands to stripNoOpCommands later on)
-export const stripNoOpCommands = (commands: Array<Command>): Array<Command> =>
+export const stripNoOpCommands = (commands: Command[]): Command[] =>
   _stripNoOpMixCommands(commands)

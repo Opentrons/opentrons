@@ -14,8 +14,8 @@ import type {
   AtomicProfileStep,
   EngageMagnetParams,
   ModuleOnlyParams,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
+} from '@opentrons/shared-data/protocol/types/schemaV4'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_AT_TARGET,
@@ -90,7 +90,6 @@ export interface NormalizedPipetteById {
     tiprackDefURI: string
   }
 }
-type OMG = keyof NormalizedPipetteById
 
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
 
@@ -126,9 +125,9 @@ export interface InnerDelayArgs {
 
 interface CommonArgs {
   /** Optional user-readable name for this step */
-  name: ?string
+  name: string | null | undefined
   /** Optional user-readable description/notes for this step */
-  description: ?string
+  description: string | null | undefined
 }
 
 // ===== Processed form types. Used as args to call command creator fns =====
@@ -151,7 +150,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions
   /** Delay after every aspirate */
-  aspirateDelay: ?InnerDelayArgs
+  aspirateDelay: InnerDelayArgs | null | undefined
   /** Air gap after every aspirate */
   aspirateAirGapVolume: number | null
   /** Flow rate in uL/sec for all aspirates */
@@ -163,7 +162,7 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Air gap after dispense */
   dispenseAirGapVolume: number | null
   /** Delay after every dispense */
-  dispenseDelay: ?InnerDelayArgs
+  dispenseDelay: InnerDelayArgs | null | undefined
   /** Touch tip in destination well after dispense */
   touchTipAfterDispense: boolean
   /** Optional offset for touch tip after dispense (if null, use PD default) */
@@ -181,14 +180,14 @@ export type ConsolidateArgs = SharedTransferLikeArgs & {
   destWell: string
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
-  blowoutLocation: ?string
+  blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
   blowoutOffsetFromTopMm: number
 
   /** Mix in first well in chunk */
-  mixFirstAspirate: ?InnerMixArgs
+  mixFirstAspirate: InnerMixArgs | null | undefined
   /** Mix in destination well after dispense */
-  mixInDestination: ?InnerMixArgs
+  mixInDestination: InnerMixArgs | null | undefined
 }
 
 export type TransferArgs = SharedTransferLikeArgs & {
@@ -198,14 +197,14 @@ export type TransferArgs = SharedTransferLikeArgs & {
   destWells: string[]
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
-  blowoutLocation: ?string
+  blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
   blowoutOffsetFromTopMm: number
 
   /** Mix in first well in chunk */
-  mixBeforeAspirate: ?InnerMixArgs
+  mixBeforeAspirate: InnerMixArgs | null | undefined
   /** Mix in destination well after dispense */
-  mixInDestination: ?InnerMixArgs
+  mixInDestination: InnerMixArgs | null | undefined
 }
 
 export type DistributeArgs = SharedTransferLikeArgs & {
@@ -215,15 +214,15 @@ export type DistributeArgs = SharedTransferLikeArgs & {
   destWells: string[]
 
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
-  disposalVolume: ?number
+  disposalVolume: number | null | undefined
   /** pass to blowout **/
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
-  blowoutLocation: ?string
+  blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
   blowoutOffsetFromTopMm: number
 
   /** Mix in first well in chunk */
-  mixBeforeAspirate: ?InnerMixArgs
+  mixBeforeAspirate: InnerMixArgs | null | undefined
 }
 
 export type MixArgs = CommonArgs & {
@@ -242,7 +241,7 @@ export type MixArgs = CommonArgs & {
   changeTip: ChangeTipOptions
 
   /** If given, blow out in the specified destination after mixing each well */
-  blowoutLocation: ?string
+  blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
   blowoutOffsetFromTopMm: number
 
@@ -253,8 +252,8 @@ export type MixArgs = CommonArgs & {
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   /** delays */
-  aspirateDelaySeconds: ?number
-  dispenseDelaySeconds: ?number
+  aspirateDelaySeconds: number | null | undefined
+  dispenseDelaySeconds: number | null | undefined
 }
 
 export type PauseArgs = CommonArgs & {
@@ -262,11 +261,14 @@ export type PauseArgs = CommonArgs & {
   message?: string
   wait: number | true
   pauseTemperature?: number | null
-  meta: ?{
-    hours?: number
-    minutes?: number
-    seconds?: number
-  }
+  meta:
+    | {
+        hours?: number
+        minutes?: number
+        seconds?: number
+      }
+    | null
+    | undefined
 }
 
 export interface AwaitTemperatureArgs {
