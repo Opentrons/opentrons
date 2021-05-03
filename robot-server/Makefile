@@ -74,13 +74,13 @@ test:
 
 .PHONY: lint
 lint: $(ot_py_sources)
-	$(python) -m mypy $(SRC_PATH)
+	$(python) -m mypy $(SRC_PATH) tests/health tests/system
 	$(python) -m flake8 $(SRC_PATH) tests setup.py
 
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
-	$(pipenv) run uvicorn "robot_server.service.app:app" --host localhost --port 31950 --ws wsproto --reload
+	$(pipenv) run uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --reload
 
 .PHONY: local-shell
 local-shell:

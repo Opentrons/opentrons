@@ -1,27 +1,43 @@
 """Global constants for the HTTP API server."""
 
-# This is the version of the HTTP API used by the server.  This value should
-# be incremented anytime the schema of a request or response is changed. This
-# value is different and separate from the application version.
 from typing_extensions import Literal, Final
 
 API_VERSION: Final = 2
+"""The current version of the HTTP API used by the server.
 
-# Minimum API version supported by the server. Increasing this value should
-# be considered a **breaking change** in the application.
+This value will be incremented any time the schema of a request or response
+is changed. The value is separate from the overall application version.
+"""
+
+
 MIN_API_VERSION: Final = 2
+"""The minimum HTTP API version supported by the server.
 
-# Keyword header value for a client to ask to use the latest HTTP API version.
-API_VERSION_LATEST_TYPE = Literal["*"]
-API_VERSION_LATEST: API_VERSION_LATEST_TYPE = "*"
+Incrementing this value would be considered a breaking change to the overall
+application, and would result in a major version bump of the software.
+"""
 
-# Header identifying maximum acceptable version in request and actual version
-# used to create response. Mandatory in requests and responses.
+
 API_VERSION_HEADER: Final = "Opentrons-Version"
+"""Custom header to specify which HTTP API version is being requested or served.
 
-# Response header specifing minimum acceptable API version
+Mandatory in requests and response. Can be used by the server and clients to
+negotiate and migrate requests and responses to a version both parties understand.
+"""
+
+
 MIN_API_VERSION_HEADER: Final = "Opentrons-Min-Version"
+"""Header to specify the server's minumum supported HTTP API version.
+
+Mandatory in all responses, not used in requests.
+"""
 
 
-# Tag applied to legacy api endpoints
+API_VERSION_LATEST_TYPE = Literal["*"]
+
+API_VERSION_LATEST: API_VERSION_LATEST_TYPE = "*"
+"""Version head value meaning 'give me the latest avilable version'"""
+
+
 V1_TAG = "v1"
+"""Tag applied to legacy endpoints that are still supported in HTTP API v2."""

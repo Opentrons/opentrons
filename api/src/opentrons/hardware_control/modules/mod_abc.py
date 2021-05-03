@@ -162,3 +162,11 @@ class AbstractModule(abc.ABC):
     def bootloader(cls) -> UploadFunction:
         """ Method used to upload file to this module's bootloader. """
         pass
+
+    def cleanup(self) -> None:
+        """ Clean up the module instance.
+
+        Clean up, i.e. stop pollers, disconnect serial, etc in preparation for
+        object destruction.
+        """
+        pass

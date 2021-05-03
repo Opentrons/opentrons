@@ -8,6 +8,8 @@ on:
     paths:
       - '**/*.js'
       - './.*.js'
+      - '**/*.ts'
+      - '**/*.tsx'
       - '**/*.json'
       - '**/*.css'
       - '**/*.md'
@@ -15,6 +17,8 @@ on:
     paths:
       - '**/*.js'
       - './.*.js'
+      - '**/*.ts'
+      - '**/*.tsx'
       - '**/*.json'
       - '**/*.md'
       - '.github/workflows/js-check.yaml'

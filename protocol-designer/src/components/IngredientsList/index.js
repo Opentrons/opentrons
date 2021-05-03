@@ -11,7 +11,7 @@ import { swatchColors } from '../swatchColors'
 import { LabwareDetailsCard } from './LabwareDetailsCard'
 import styles from './IngredientsList.css'
 import type { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
-import type { SingleLabwareLiquidState } from '../../step-generation'
+import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
 
 type RemoveWellsContents = (args: {|
   liquidGroupId: string,

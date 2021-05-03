@@ -8,8 +8,8 @@ import { selectors as stepFormSelectors } from '../step-forms'
 import { getActiveItem } from '../ui/steps/selectors'
 import { START_TERMINAL_ITEM_ID, PRESAVED_STEP_ID } from '../steplist'
 
+import type { CommandsAndRobotState } from '@opentrons/step-generation'
 import type { Selector } from '../types'
-import type { CommandsAndRobotState } from '../step-generation'
 import {
   SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,

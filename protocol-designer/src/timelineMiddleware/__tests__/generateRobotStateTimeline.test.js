@@ -1,4 +1,5 @@
 // @flow
+// TODO IMMEDIATELY: figure our better way to import fixtures from step generation
 import {
   getInitialRobotStateStandard,
   makeContext,
@@ -6,7 +7,7 @@ import {
   MULTI_PIPETTE,
   SOURCE_LABWARE,
   DEST_LABWARE,
-} from '../../step-generation/__fixtures__'
+} from '@opentrons/step-generation/src/__fixtures__'
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
 jest.mock('../../labware-defs/utils')
 

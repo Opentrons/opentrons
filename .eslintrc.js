@@ -88,6 +88,7 @@ module.exports = {
         'jest/no-disabled-tests': 'error',
         'jest/consistent-test-it': 'error',
         '@typescript-eslint/consistent-type-assertions': 'off',
+        '@typescript-eslint/no-var-requires': 'off',
 
         // TODO(mc, 2021-01-29): fix these and remove warning overrides
         'jest/no-deprecated-functions': 'warn',

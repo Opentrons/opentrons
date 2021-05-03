@@ -13,6 +13,7 @@
     "protocol-library-kludge",
     "robot-server/robot_server",
     "shared-data",
+    "step-generation",
     "update-server/otupdate",
     "webpack-config",
     "notify-server/notify_server"
@@ -137,6 +138,7 @@
     "terser-webpack-plugin": "^2.3.5",
     "@testing-library/react": "^11.2.6",
     "@testing-library/react-hooks": "^5.1.1",
+    "@testing-library/jest-dom": "^5.12.0",
     "typescript": "4.1.3",
     "url-loader": "^2.1.0",
     "wait-on": "^4.0.2",

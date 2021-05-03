@@ -29,9 +29,12 @@ import {
   MIN_TC_DURATION_SECONDS,
   MAX_TC_DURATION_SECONDS,
 } from '../../constants'
+import type {
+  LabwareEntity,
+  PipetteEntity,
+  InvariantContext,
+} from '@opentrons/step-generation'
 import type { StepFieldName } from '../../form-types'
-import type { LabwareEntity, PipetteEntity } from '../../step-forms'
-import type { InvariantContext } from '../../step-generation'
 
 export type { StepFieldName }
 

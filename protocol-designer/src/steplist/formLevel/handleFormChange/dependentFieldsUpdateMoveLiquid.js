@@ -7,7 +7,7 @@ import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
-} from '../../../step-generation/utils'
+} from '@opentrons/step-generation'
 import { getWellRatio } from '../../utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
@@ -21,12 +21,12 @@ import {
   volumeInCapacityForMulti,
   DISPOSAL_VOL_DIGITS,
 } from './utils'
-import type { FormData, StepFieldName } from '../../../form-types'
-import type { FormPatch } from '../../actions/types'
 import type {
   LabwareEntities,
   PipetteEntities,
-} from '../../../step-forms/types'
+} from '@opentrons/step-generation'
+import type { FormData, StepFieldName } from '../../../form-types'
+import type { FormPatch } from '../../actions/types'
 import {
   getMinPipetteVolume,
   getPipetteCapacity,

@@ -15,6 +15,7 @@
 ; read type signatures from node_modules but ignore flow errors within
 .*/node_modules/.*
 <PROJECT_ROOT>/components/flow-types/.*
+<PROJECT_ROOT>/shared-data/flow-types/.*
 
 [include]
 
