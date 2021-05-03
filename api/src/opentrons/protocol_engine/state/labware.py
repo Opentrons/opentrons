@@ -80,7 +80,8 @@ class LabwareState:
             return self._labware_definitions_by_uri[uri]
         except KeyError:
             raise errors.LabwareDefinitionDoesNotExistError(
-                f"Labware definition for {load_name}, {namespace}, {version} not found.")
+                f"Labware definition for {load_name}, "
+                f"{namespace}, {version} not found.")
 
     def get_labware_has_quirk(self, labware_id: str, quirk: str) -> bool:
         """Get if a labware has a certain quirk."""
@@ -177,4 +178,5 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
                 load_name=command.result.loadName,
                 version=command.result.version
             )
-            self._state._labware_definitions_by_uri[uri] = command.request.labware_definition
+            self._state._labware_definitions_by_uri[uri] =\
+                command.request.labware_definition

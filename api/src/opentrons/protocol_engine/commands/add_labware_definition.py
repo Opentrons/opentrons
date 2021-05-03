@@ -52,4 +52,3 @@ class AddLabwareDefinitionImplementation(
             namespace=self._request.labware_definition.namespace,
             version=self._request.labware_definition.version
         )
-

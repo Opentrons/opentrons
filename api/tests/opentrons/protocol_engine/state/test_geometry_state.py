@@ -4,7 +4,7 @@ from mock import MagicMock
 from typing import cast
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons.protocols.models import LabwareDefinition, WellDefinition
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 from opentrons.types import Point, DeckSlotName
@@ -385,8 +385,8 @@ def test_get_tip_geometry_raises(
     tip_rack_def: LabwareDefinition,
     mock_labware_store: MagicMock,
     geometry_store: GeometryStore
-):
-    """It should raise LabwareIsNotTipRackError if well is not circular"""
+) -> None:
+    """It should raise LabwareIsNotTipRackError if well is not circular."""
     pipette_config: PipetteDict = cast(PipetteDict,
                                        {"tip_overlap": {"default": 10}})
     well_def = tip_rack_def.wells["B2"]

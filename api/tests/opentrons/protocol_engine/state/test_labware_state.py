@@ -135,7 +135,7 @@ def test_get_labware_definition_bad_id(store: StateStore) -> None:
 def test_handles_add_labware_defintion(
         store: StateStore,
         well_plate_def: LabwareDefinition
-):
+) -> None:
     """It should add the labware definition to the state store."""
     command = add_labware_definition(
         store=store,

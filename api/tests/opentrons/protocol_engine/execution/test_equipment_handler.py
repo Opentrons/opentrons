@@ -69,7 +69,8 @@ async def test_load_labware_gets_labware_def(
     mock_state_view: MagicMock,
 ) -> None:
     """Loading labware should load the labware's defintion."""
-    mock_state_view.labware.get_labware_definition.side_effect = LabwareDefinitionDoesNotExistError
+    mock_state_view.labware.get_labware_definition.side_effect =\
+        LabwareDefinitionDoesNotExistError
 
     res = await handler.load_labware(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),

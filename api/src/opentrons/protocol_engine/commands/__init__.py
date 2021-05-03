@@ -18,7 +18,9 @@ from typing import Union
 from .command import PendingCommand, RunningCommand, CompletedCommand, FailedCommand
 
 from .load_labware import LoadLabwareRequest, LoadLabwareResult
-from .add_labware_definition import AddLabwareDefinitionRequest, AddLabwareDefinitionResult
+from .add_labware_definition import (
+    AddLabwareDefinitionRequest, AddLabwareDefinitionResult
+)
 from .load_pipette import LoadPipetteRequest, LoadPipetteResult
 from .move_to_well import MoveToWellRequest, MoveToWellResult
 from .pick_up_tip import PickUpTipRequest, PickUpTipResult
