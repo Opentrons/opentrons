@@ -30,6 +30,7 @@ def load_labware(
         namespace="opentrons-test",
         version=1,
         location=location,
+        labwareId=None
     )
     result = cmd.LoadLabwareResult(
         labwareId=labware_id, definition=definition, calibration=calibration

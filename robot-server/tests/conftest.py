@@ -235,6 +235,63 @@ def get_labware_fixture():
 
 
 @pytest.fixture
+def minimal_labware_def():
+    return {
+        "metadata": {
+            "displayName": "minimal labware",
+            "displayCategory": "other",
+            "displayVolumeUnits": "mL",
+
+        },
+        "cornerOffsetFromSlot": {
+            "x": 10,
+            "y": 10,
+            "z": 5
+        },
+        "parameters": {
+            "isTiprack": False,
+            "loadName": "minimal_labware_def",
+            "isMagneticModuleCompatible": True,
+            "quirks": ["a quirk"],
+            "format": "irregular"
+        },
+        "ordering": [["A1"], ["A2"]],
+        "wells": {
+            "A1": {
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "shape": "circular"
+            },
+            "A2": {
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 10,
+              "y": 0,
+              "z": 0,
+              "shape": "circular"
+            }
+        },
+        "dimensions": {
+            "xDimension": 1.0,
+            "yDimension": 2.0,
+            "zDimension": 3.0
+        },
+        "groups": [],
+        "brand": {
+            "brand": "opentrons"
+        },
+        "version": 1,
+        "schemaVersion": 2,
+        "namespace": "opentronstest"
+    }
+
+
+@pytest.fixture
 def custom_tiprack_def():
     return {
         "metadata": {

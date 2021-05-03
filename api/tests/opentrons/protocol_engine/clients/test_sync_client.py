@@ -53,6 +53,7 @@ def stubbed_load_labware_result(
         loadName="some_labware",
         namespace="opentrons",
         version=1,
+        labwareId=None,
     )
 
     result = commands.LoadLabwareResult(

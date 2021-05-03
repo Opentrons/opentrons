@@ -52,9 +52,23 @@ class EquipmentHandler:
         namespace: str,
         version: int,
         location: LabwareLocation,
+        labware_id: Optional[str]
     ) -> LoadedLabware:
-        """Load labware by assigning an identifier and pulling required data."""
-        labware_id = self._resources.id_generator.generate_id()
+        """Load labware by assigning an identifier and pulling required data.
+
+        Args:
+            load_name: The labware's load name.
+            namespace: The namespace.
+            version: Version
+            location: The deck location at which labware is placed.
+            labware_id: An optional identifier to assign the labware. If None, an
+                identifier will be generated.
+
+        Returns:
+            A LoadedLabware object.
+        """
+        labware_id = labware_id if labware_id else \
+            self._resources.id_generator.generate_id()
 
         try:
             # Try to use existing definition in state.

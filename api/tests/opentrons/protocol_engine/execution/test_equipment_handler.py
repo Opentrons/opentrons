@@ -56,10 +56,29 @@ async def test_load_labware_assigns_id(
         load_name="load-name",
         namespace="opentrons-test",
         version=1,
+        labware_id=None
     )
 
     assert type(res) == LoadedLabware
     assert res.labware_id == "unique-id"
+
+
+async def test_load_labware_uses_provided_id(
+    mock_resources_with_data: AsyncMock,
+    handler: EquipmentHandler,
+) -> None:
+    """It should use the provided ID rather than generating an ID for the labware."""
+    res = await handler.load_labware(
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        load_name="load-name",
+        namespace="opentrons-test",
+        version=1,
+        labware_id="my labware id"
+    )
+
+    assert type(res) == LoadedLabware
+    assert res.labware_id == "my labware id"
+    mock_resources_with_data.id_generator.generate_id.assert_not_called()
 
 
 async def test_load_labware_gets_labware_def(
@@ -77,6 +96,7 @@ async def test_load_labware_gets_labware_def(
         load_name="load-name",
         namespace="opentrons-test",
         version=1,
+        labware_id=None,
     )
 
     assert type(res) == LoadedLabware
@@ -100,6 +120,7 @@ async def test_load_labware_uses_loaded_labware_def(
         load_name="load-name",
         namespace="opentrons-test",
         version=1,
+        labware_id=None,
     )
 
     assert type(res) == LoadedLabware
@@ -124,6 +145,7 @@ async def test_load_labware_gets_labware_cal_data(
         load_name="load-name",
         namespace="opentrons-test",
         version=1,
+        labware_id=None,
     )
 
     assert type(res) == LoadedLabware

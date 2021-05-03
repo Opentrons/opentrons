@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
-from typing import Tuple
+from typing import Tuple, Optional
 
 from opentrons.protocols.models import LabwareDefinition
 
@@ -28,6 +28,11 @@ class LoadLabwareRequest(BaseModel):
     version: int = Field(
         ...,
         description="The labware definition version.",
+    )
+    labwareId: Optional[str] = Field(
+        ...,
+        description="An optional ID to assign to this labware. If None, an ID "
+                    "will be generated."
     )
 
     def get_implementation(self) -> LoadLabwareImplementation:
@@ -64,6 +69,7 @@ class LoadLabwareImplementation(
             namespace=self._request.namespace,
             version=self._request.version,
             location=self._request.location,
+            labware_id=self._request.labwareId
         )
 
         return LoadLabwareResult(

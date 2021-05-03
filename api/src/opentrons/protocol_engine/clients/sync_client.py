@@ -39,6 +39,7 @@ class SyncClient:
             loadName=load_name,
             namespace=namespace,
             version=version,
+            labwareId=None,
         )
         result = self._transport.execute_command(
             request=request,
