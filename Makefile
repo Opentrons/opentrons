@@ -51,18 +51,18 @@ setup: setup-js setup-py
 clean-js: clean-ts
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
 
-PYTHON_DIRS = $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)
-PYTHON_CLEAN = $(addsuffix .clean, $(PYTHON_DIRS))
+PYTHON_DIRS = $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python
+PYTHON_CLEAN = $(addsuffix -py-clean, $(PYTHON_DIRS))
 
-$(PYTHON_CLEAN):
-	$(MAKE) -C $(basename $@) clean
+%-py-clean:
+	$(MAKE) -C $* clean
 
 .PHONY: clean-py
 clean-py: $(PYTHON_CLEAN)
 
-PYTHON_SETUP = $(addsuffix .setup, $(PYTHON_DIRS))
-$(PYTHON_SETUP):
-	$(MAKE) -C $(basename $@) setup
+PYTHON_SETUP = $(addsuffix -py-setup, $(PYTHON_DIRS))
+%-py-setup:
+	$(MAKE) -C $* setup
 
 .PHONY: prepare-setup-py
 prepare-setup-py:
@@ -72,13 +72,9 @@ prepare-setup-py:
 setup-py: prepare-setup-py 
 	$(MAKE) $(PYTHON_SETUP)
 
-PYTHON_TEARDOWN_DIRS = $(API_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR)
-
-PYTHON_TEARDOWN = $(addsuffix .pyteardown, $(PYTHON_TEARDOWN_DIRS))
-$(PYTHON_TEARDOWN): 
-	$(MAKE) -C $(basename $@) clean teardown
-SHARED_DATA.pyteardown:
-	$(MAKE) -C $(SHARED_DATA_DIR) clean-py teardown-py
+PYTHON_TEARDOWN = $(addsuffix -py-teardown, $(PYTHON_DIRS))
+%-py-teardown: 
+	$(MAKE) -C $* clean teardown
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
@@ -93,7 +89,7 @@ setup-js:
 teardown: teardown-py teardown-js
 
 .PHONY: teardown-py
-teardown-py: $(PYTHON_TEARDOWN) SHARED_DATA.pyteardown
+teardown-py: $(PYTHON_TEARDOWN)
 
 .PHONY: teardown-js
 teardown-js: clean-js
@@ -194,16 +190,12 @@ else
 	prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 endif
 
-PYTHON_LINT_DIRS = $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR)
-
-PYTHON_LINT = $(addsuffix .pylint, $(PYTHON_LINT_DIRS))
-$(PYTHON_TEARDOWN): 
-	$(MAKE) -C $(basename $@) clean teardown
-SHARED_DATA.pylint:
-	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
+PYTHON_LINT = $(addsuffix -py-lint, $(PYTHON_DIRS))
+%-py-lint:
+	$(MAKE) -C $* lint
 
 .PHONY: lint-py
-lint-py: $(PYTHON_LINT) SHARED_DATA.pylint
+lint-py: $(PYTHON_LINT) 
 
 .PHONY: lint-js
 lint-js:
