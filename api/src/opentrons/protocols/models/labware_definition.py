@@ -130,7 +130,7 @@ class Dimensions(BaseModel):
     xDimension: float = Field(..., ge=0.0)
 
 
-class Wells(BaseModel):
+class WellDefinition(BaseModel):
     class Config:
         extra = Extra.allow
 
@@ -209,7 +209,7 @@ class Group(BaseModel):
     )
 
 
-class Model(BaseModel):
+class LabwareDefinition(BaseModel):
     schemaVersion: Literal[1, 2] = Field(
         ..., description='Which schema version a labware is using'
     )
@@ -249,7 +249,7 @@ class Model(BaseModel):
         ...,
         description='Outer dimensions of a labware'
     )
-    wells: Dict[str, Wells] = Field(
+    wells: Dict[str, WellDefinition] = Field(
         ...,
         description='Unordered object of well objects with position and '
                     'dimensional information',
