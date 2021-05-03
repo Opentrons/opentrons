@@ -1,4 +1,3 @@
-// @flow
 import {
   Box,
   Flex,
@@ -17,13 +16,13 @@ import type { AttachedModule } from '../../../redux/modules/types'
 
 const MULTIPLE_MODULES = 'Multiple modules connected'
 
-type Props = {|
-  hub: string,
-  modules: Array<AttachedModule>,
-  controlDisabledReason: string | null,
-|}
+interface Props {
+  hub: string
+  modules: AttachedModule[]
+  controlDisabledReason: string | null
+}
 
-export function UsbHubItem(props: Props): React.Node {
+export function UsbHubItem(props: Props): JSX.Element {
   const { hub, modules, controlDisabledReason } = props
 
   return (

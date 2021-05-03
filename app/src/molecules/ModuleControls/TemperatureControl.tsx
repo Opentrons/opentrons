@@ -1,78 +1,101 @@
 import * as React from 'react'
+
 import {
-  OutlineButton,
   AlertModal,
   InputField,
-  CheckboxField,
-  HoverTooltip,
+  SecondaryBtn,
+  useHoverTooltip,
+  Tooltip,
+  Text,
+  FONT_WEIGHT_SEMIBOLD,
+  SPACING_1,
+  Flex,
+  Box,
+  DIRECTION_COLUMN,
+  FONT_STYLE_ITALIC,
+  FONT_SIZE_BODY_1,
+  SPACING_2,
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
-import styles from './styles.css'
+import { THERMOCYCLER_MODULE_TYPE } from '../../redux/modules'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import type {
   ThermocyclerModule,
   TemperatureModule,
   ModuleCommand,
 } from '../../redux/modules/types'
-import { THERMOCYCLER_MODULE_TYPE } from '../../redux/modules'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import type { ModuleModel } from '@opentrons/shared-data'
 
-const TC_BLOCK = 'Block'
-
-type Props = {
-  module: ThermocyclerModule | TemperatureModule,
+interface Props {
+  module: ThermocyclerModule | TemperatureModule;
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
     args?: unknown[]
-  ) => mixed,
-  disabledReason?: string | null,
+  ) => unknown;
+  isSecondaryTemp: boolean;
+  disabledReason?: string | null;
 }
 
 export const TemperatureControl = ({
   module,
+  isSecondaryTemp,
   sendModuleCommand,
   disabledReason,
 }: Props): JSX.Element => {
-  const [primaryTempValue, setPrimaryTempValue] = React.useState(null)
-  const [secondaryTempValue, setSecondaryTempValue] = React.useState(null)
-  const [isModalOpen, setIsModalOpen] = React.useState(false)
-  const [isSecondaryTempEnabled, enableSecondaryTemp] = React.useState(false)
+  const [tempValue, setTempValue] = React.useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
+  const isThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
+  const displayName = getModuleDisplayName(module.model)
+  const modulePartName = isThermocycler
+    ? isSecondaryTemp
+      ? ' Lid'
+      : ' Block'
+    : ''
+  const alertHeading = `Set ${modulePartName} Temperature for ${displayName}`
+  const alertBody = `Pre heat or cool your ${displayName}${modulePartName}.`
+  const primaryFieldLabel = `Set Temp:`
+  const tempRanges = getModuleTemperatureRanges(module.model, isSecondaryTemp)
+  const note = `enter a whole-number between ${tempRanges.min}°C and ${tempRanges.max}°C`
 
   const hasTarget =
-    module.status !== 'idle' ||
-    (module.type === THERMOCYCLER_MODULE_TYPE && module.data.lidTarget != null)
+    module.type === THERMOCYCLER_MODULE_TYPE && isSecondaryTemp
+      ? module.data.lidTarget != null
+      : module.status !== 'idle'
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (hasTarget) {
-      sendModuleCommand(module.serial, 'deactivate')
+      sendModuleCommand(
+        module.serial,
+        isSecondaryTemp ? 'deactivate_lid' : 'deactivate'
+      )
     } else {
       setIsModalOpen(true)
     }
   }
 
-  const handleSubmitTemp = () => {
-    if (primaryTempValue != null) {
-      sendModuleCommand(module.serial, 'set_temperature', [
-        Number(primaryTempValue),
-      ])
+  const handleSubmitTemp = (): void => {
+    if (tempValue != null) {
+      sendModuleCommand(
+        module.serial,
+        isSecondaryTemp ? 'set_lid_temperature' : 'set_temperature',
+        [Number(tempValue)]
+      )
     }
-    if (secondaryTempValue != null) {
-      sendModuleCommand(module.serial, 'set_lid_temperature', [
-        Number(secondaryTempValue),
-      ])
-    }
+    setTempValue(null)
     setIsModalOpen(false)
-    setPrimaryTempValue(null)
-    setSecondaryTempValue(null)
   }
-  const isThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
-  const displayName = getModuleDisplayName(module.model)
-  const alertHeading = `Set ${displayName} Temp`
-  const alertBody = `Pre heat or cool ${displayName}.`
-  const primaryFieldLabel = `Set ${isThermocycler ? TC_BLOCK : ''} Temp:`
+
+  const handleCancel = (): void => {
+    setIsModalOpen(false)
+    setTempValue(null)
+  }
+
   return (
-    <>
+    <Flex flexDirection={DIRECTION_COLUMN}>
       {!hasTarget && isModalOpen && (
         <Portal>
           <AlertModal
@@ -81,63 +104,79 @@ export const TemperatureControl = ({
             buttons={[
               {
                 children: 'Cancel',
-                onClick: () => setIsModalOpen(false),
+                onClick: handleCancel,
               },
               {
-                children: 'Save',
-                disabled: primaryTempValue == null,
+                children: 'Set temp',
+                disabled: tempValue == null,
                 onClick: handleSubmitTemp,
               },
             ]}
             alertOverlay
           >
-            <p>{alertBody}</p>
-            <div className={styles.input_wrapper}>
-              <div className={styles.set_temp_field}>
-                <label className={styles.set_temp_label}>
-                  {primaryFieldLabel}
-                </label>
+            <Text>{alertBody}</Text>
+            <Box>
+              <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>{primaryFieldLabel}</Text>
+              <Flex width="6rem" marginTop={SPACING_1}>
                 <InputField
                   units="°C"
-                  value={primaryTempValue}
-                  onChange={e => setPrimaryTempValue(e.target.value)}
+                  value={tempValue}
+                  onChange={e => setTempValue(e.target.value)}
                 />
-              </div>
-              {isThermocycler && (
-                <div className={styles.lid_temp_field}>
-                  <CheckboxField
-                    value={isSecondaryTempEnabled}
-                    onChange={() =>
-                      enableSecondaryTemp(!isSecondaryTempEnabled)
-                    }
-                  />
-                  <p className={styles.lid_temp_label}>Lid Temp</p>
-                  {isSecondaryTempEnabled && (
-                    <InputField
-                      units="°C"
-                      value={secondaryTempValue}
-                      onChange={e => setSecondaryTempValue(e.target.value)}
-                    />
-                  )}
-                </div>
-              )}
-            </div>
+              </Flex>
+              <Text
+                fontSize={FONT_SIZE_BODY_1}
+                fontStyle={FONT_STYLE_ITALIC}
+                marginTop={SPACING_1}
+              >
+                {note}
+              </Text>
+            </Box>
           </AlertModal>
         </Portal>
       )}
-      <HoverTooltip tooltipComponent={disabledReason}>
-        {hoverTooltipHandlers => (
-          <div {...hoverTooltipHandlers}>
-            <OutlineButton
-              onClick={handleClick}
-              disabled={disabledReason != null}
-              className={styles.temp_control_button}
-            >
-              {hasTarget === true ? 'Deactivate' : 'Set Temp'}
-            </OutlineButton>
-          </div>
-        )}
-      </HoverTooltip>
-    </>
+      <SecondaryBtn
+        paddingX={SPACING_2}
+        width={'11rem'}
+        onClick={handleClick}
+        disabled={disabledReason != null}
+        {...targetProps}
+      >
+        {hasTarget === true
+          ? `Deactivate${modulePartName}`
+          : `Set${modulePartName} Temp`}
+      </SecondaryBtn>
+      {disabledReason && <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>}
+    </Flex>
   )
+}
+
+interface TemperatureRanges {
+  min: number
+  max: number
+}
+
+function getModuleTemperatureRanges(
+  model: ModuleModel,
+  isSecondaryTemp: boolean
+): TemperatureRanges {
+  if (isSecondaryTemp && TEMPERATURE_RANGES[model]?.secondary) {
+    return TEMPERATURE_RANGES[model]?.secondary as TemperatureRanges
+  } else {
+    return TEMPERATURE_RANGES[model]?.primary as TemperatureRanges
+  }
+}
+
+const TEMPERATURE_RANGES: {
+  [model in ModuleModel]?: {
+    primary: TemperatureRanges,
+    secondary?: TemperatureRanges | null,
+  }
+} = {
+  temperatureModuleV1: { primary: { min: 4, max: 96 }, secondary: null },
+  temperatureModuleV2: { primary: { min: 4, max: 96 }, secondary: null },
+  thermocyclerModuleV1: {
+    primary: { min: 4, max: 99 },
+    secondary: { min: 37, max: 110 },
+  },
 }

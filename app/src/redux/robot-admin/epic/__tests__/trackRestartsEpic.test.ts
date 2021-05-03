@@ -1,16 +1,26 @@
-// @flow
 import { when } from 'jest-when'
 
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
-import { getDiscoveredRobots } from '../../../discovery'
 import * as Actions from '../../actions'
-import { getNextRestartStatus } from '../../selectors'
+import * as robotAdminSelectors from '../../selectors'
+import * as discoverySelectors from '../../../discovery/selectors'
 
 import { trackRestartsEpic } from '../trackRestartsEpic'
+import type {
+  ConnectivityStatus,
+  DiscoveredRobot,
+} from '../../../discovery/types'
+import { ServerHealthResponse } from '@opentrons/discovery-client'
 
 jest.mock('../../../discovery/selectors')
 jest.mock('../../selectors')
 
+const getNextRestartStatus = robotAdminSelectors.getNextRestartStatus as jest.MockedFunction<
+  typeof robotAdminSelectors.getNextRestartStatus
+>
+const getDiscoveredRobots = discoverySelectors.getDiscoveredRobots as jest.MockedFunction<
+  typeof discoverySelectors.getDiscoveredRobots
+>
 describe('robotAdminEpic tracks restarting state', () => {
   beforeEach(() => {
     // $FlowFixMe(mc, 2021-04-05): don't feel like typing this in Flow
@@ -25,7 +35,7 @@ describe('robotAdminEpic tracks restarting state', () => {
 
   it('dispatches a RESTART_STATUS_CHANGED action on restart success', () => {
     const mocks = setupEpicTestMocks((robotName: string) =>
-      Actions.restartRobotSuccess(robotName, {})
+      Actions.restartRobotSuccess(robotName, {} as any)
     )
 
     when(mocks.getRobotByName)
@@ -42,7 +52,7 @@ describe('robotAdminEpic tracks restarting state', () => {
           mocks.robot.name,
           'restart-pending',
           null,
-          (expect.any(Date): any)
+          expect.any(Date) as any
         ),
       })
     })
@@ -50,7 +60,7 @@ describe('robotAdminEpic tracks restarting state', () => {
 
   it('dispatches a RESTART_STATUS_CHANGED action with boot ID if present', () => {
     const mocks = setupEpicTestMocks((robotName: string) =>
-      Actions.restartRobotSuccess(robotName, {})
+      Actions.restartRobotSuccess(robotName, {} as any)
     )
 
     when(mocks.getRobotByName)
@@ -70,7 +80,7 @@ describe('robotAdminEpic tracks restarting state', () => {
           mocks.robot.name,
           'restart-pending',
           'previous-boot-id',
-          (expect.any(Date): any)
+          expect.any(Date) as any
         ),
       })
     })
@@ -82,27 +92,31 @@ describe('robotAdminEpic tracks restarting state', () => {
     const robot1 = {
       ...mocks.robot,
       name: 'robot1',
-      status: 'connectable',
+      status: 'connectable' as ConnectivityStatus,
       serverHealth: { bootId: 'robot-1-boot' },
     }
 
     const robot2 = {
       ...mocks.robot,
       name: 'robot2',
-      status: 'reachable',
+      status: 'reachable' as ConnectivityStatus,
       serverHealth: { bootId: 'robot-2-boot' },
     }
 
     const robot3 = {
       ...mocks.robot,
       name: 'robot3',
-      status: 'unreachable',
+      status: 'unreachable' as ConnectivityStatus,
       serverHealth: { bootId: 'robot-3-boot' },
     }
 
     when(getDiscoveredRobots)
       .calledWith(mocks.state)
-      .mockReturnValue([robot1, robot2, robot3])
+      .mockReturnValue([
+        robot1 as DiscoveredRobot,
+        robot2 as DiscoveredRobot,
+        robot3 as DiscoveredRobot,
+      ])
 
     when(getNextRestartStatus)
       .calledWith(

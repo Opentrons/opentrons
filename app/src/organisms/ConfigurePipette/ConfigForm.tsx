@@ -105,12 +105,13 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   handleSubmit: (values: FormValues) => void = values => {
-    const params = mapValues(values, (v: ?(string | boolean)) => {
+    const params = mapValues<FormValues, number | boolean | null>(values, v => {
       if (v === true || v === false) return v
       if (v === '' || v == null) return null
       return Number(v)
     })
 
+    // @ts-expect-error TODO updateSettings type doesn't include boolean for values of params, but they could be returned.
     this.props.updateSettings(params)
   }
 
@@ -163,7 +164,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
 
   getInitialValues: () => FormValues = () => {
     const fields = this.getVisibleFields()
-    const initialFieldValues = mapValues(fields, f => {
+    const initialFieldValues = mapValues<PipetteSettingsFieldsMap, string | boolean>(fields, f => {
       if (f.value === true || f.value === false) return f.value
       return f.value !== f.default ? f.value.toString() : ''
     })

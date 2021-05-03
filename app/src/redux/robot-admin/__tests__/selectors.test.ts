@@ -1,4 +1,3 @@
-// @flow
 import { add } from 'date-fns'
 import { CONNECTABLE, REACHABLE } from '../../discovery'
 import {
@@ -7,8 +6,7 @@ import {
   getResetConfigOptions,
 } from '../selectors'
 import type { State } from '../../types'
-
-type PartialState = $Shape<State>
+import { ConnectivityStatus } from '../../discovery/types'
 
 const START_TIME = new Date('2000-01-01')
 
@@ -20,7 +18,7 @@ const RESTART_BASE = {
 describe('robot admin selectors', () => {
   describe('get reset config options', () => {
     it('should return empty array by default', () => {
-      const state: PartialState = { robotAdmin: {} }
+      const state: State = { robotAdmin: {} } as any
 
       const result = getResetConfigOptions(state, 'robotName')
 
@@ -28,7 +26,7 @@ describe('robot admin selectors', () => {
     })
 
     it('should return options from state', () => {
-      const state: PartialState = {
+      const state: State = {
         robotAdmin: {
           robotName: {
             resetConfigOptions: [
@@ -37,7 +35,7 @@ describe('robot admin selectors', () => {
             ],
           },
         },
-      }
+      } as any
 
       const result = getResetConfigOptions(state, 'robotName')
 
@@ -50,7 +48,7 @@ describe('robot admin selectors', () => {
 
   describe('get robot restarting', () => {
     it('should return true if restart status is pending or in progress', () => {
-      const state: PartialState = {
+      const state: State = {
         robotAdmin: {
           succeeded: {
             restart: { ...RESTART_BASE, status: 'restart-succeeded' },
@@ -64,7 +62,7 @@ describe('robot admin selectors', () => {
             restart: { ...RESTART_BASE, status: 'restart-in-progress' },
           },
         },
-      }
+      } as any
 
       expect(getRobotRestarting(state, 'succeeded')).toBe(false)
       expect(getRobotRestarting(state, 'failed')).toBe(false)
@@ -75,7 +73,7 @@ describe('robot admin selectors', () => {
 
   describe('get next robot restarting status', () => {
     it('should return null if robot is not restarting', () => {
-      const state: PartialState = {
+      const state: State = {
         robotAdmin: {
           succeeded: {
             restart: { ...RESTART_BASE, status: 'restart-succeeded' },
@@ -85,9 +83,13 @@ describe('robot admin selectors', () => {
             restart: { ...RESTART_BASE, status: 'restart-timed-out' },
           },
         },
-      }
+      } as any
 
-      const baseArgs = [CONNECTABLE, 'boot-id', new Date()]
+      const baseArgs: [ConnectivityStatus, string | null, Date] = [
+        CONNECTABLE,
+        'boot-id',
+        new Date(),
+      ]
 
       expect(getNextRestartStatus(state, 'nonExistent', ...baseArgs)).toBe(null)
       expect(getNextRestartStatus(state, 'succeeded', ...baseArgs)).toBe(null)
@@ -96,13 +98,13 @@ describe('robot admin selectors', () => {
     })
 
     it('should return restart success if connectable robot has new boot ID', () => {
-      const state: PartialState = {
+      const state: State = {
         robotAdmin: {
           robotName: {
             restart: { ...RESTART_BASE, status: 'restart-pending' },
           },
         },
-      }
+      } as any
 
       const result = getNextRestartStatus(
         state,
@@ -116,13 +118,13 @@ describe('robot admin selectors', () => {
     })
 
     it('should return restart success if was restarting and is now connectable', () => {
-      const state: PartialState = {
+      const state: State = {
         robotAdmin: {
           robotName: {
             restart: { ...RESTART_BASE, status: 'restart-in-progress' },
           },
         },
-      }
+      } as any
 
       const result = getNextRestartStatus(
         state,
@@ -136,13 +138,13 @@ describe('robot admin selectors', () => {
     })
 
     it('should return null if no new boot ID and restart still pending', () => {
-      const state: PartialState = {
+      const state: State = {
         robotAdmin: {
           robotName: {
             restart: { ...RESTART_BASE, status: 'restart-pending' },
           },
         },
-      }
+      } as any
 
       const result = getNextRestartStatus(
         state,
@@ -156,13 +158,13 @@ describe('robot admin selectors', () => {
     })
 
     it('should return null if new boot ID but robot not yet connectable', () => {
-      const state: PartialState = {
+      const state: State = {
         robotAdmin: {
           robotName: {
             restart: { ...RESTART_BASE, status: 'restart-in-progress' },
           },
         },
-      }
+      } as any
 
       const result = getNextRestartStatus(
         state,
@@ -176,13 +178,13 @@ describe('robot admin selectors', () => {
     })
 
     it('should return restarting if restart was pending and went down', () => {
-      const state: PartialState = {
+      const state: State = {
         robotAdmin: {
           robotName: {
             restart: { ...RESTART_BASE, status: 'restart-pending' },
           },
         },
-      }
+      } as any
 
       const result = getNextRestartStatus(
         state,
@@ -200,7 +202,7 @@ describe('robot admin selectors', () => {
       const notLongEnough = add(startTime, { seconds: 299 })
       const tooLong = add(startTime, { seconds: 301 })
 
-      const state: PartialState = {
+      const state: State = {
         robotAdmin: {
           robotName: {
             restart: {
@@ -210,7 +212,7 @@ describe('robot admin selectors', () => {
             },
           },
         },
-      }
+      } as any
 
       const before = getNextRestartStatus(
         state,
