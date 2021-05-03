@@ -1,9 +1,14 @@
 import { validateLabwareFiles, validateNewLabwareFile } from '../validation'
 
-import validLabwareA from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import validLabwareB from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import uncheckedLabwareA from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import uncheckedLabwareB from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 
 import type { CheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
+const validLabwareA = uncheckedLabwareA as LabwareDefinition2
+const validLabwareB = uncheckedLabwareB as LabwareDefinition2
 
 describe('validateLabwareFiles', () => {
   it('handles unparseable and invalid labware files', () => {
@@ -28,8 +33,8 @@ describe('validateLabwareFiles', () => {
 
   it('handles valid labware files', () => {
     const files = [
-      { filename: 'a.json', data: validLabwareA, modified: Date.now() },
-      { filename: 'b.json', data: validLabwareB, modified: Date.now() },
+      { filename: 'a.json', data: uncheckedLabwareA, modified: Date.now() },
+      { filename: 'b.json', data: uncheckedLabwareB, modified: Date.now() },
     ]
 
     expect(validateLabwareFiles(files)).toEqual([
@@ -50,9 +55,9 @@ describe('validateLabwareFiles', () => {
 
   it('handles non-unique labware files', () => {
     const files = [
-      { filename: 'a.json', data: validLabwareA, modified: 3 },
-      { filename: 'b.json', data: validLabwareB, modified: 2 },
-      { filename: 'c.json', data: validLabwareA, modified: 1 },
+      { filename: 'a.json', data: uncheckedLabwareA, modified: 3 },
+      { filename: 'b.json', data: uncheckedLabwareB, modified: 2 },
+      { filename: 'c.json', data: uncheckedLabwareA, modified: 1 },
     ]
 
     expect(validateLabwareFiles(files)).toEqual([
@@ -100,7 +105,7 @@ describe('validateNewLabwareFile', () => {
     const existing: CheckedLabwareFile[] = []
     const newFile = {
       filename: 'a.json',
-      data: validLabwareA,
+      data: uncheckedLabwareA,
       modified: 42,
     }
 
@@ -123,7 +128,7 @@ describe('validateNewLabwareFile', () => {
     ]
     const newFile = {
       filename: 'a.json',
-      data: validLabwareA,
+      data: uncheckedLabwareA,
       modified: 21,
     }
 

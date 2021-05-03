@@ -1,6 +1,7 @@
 import type { ProtocolFile as V3ProtocolFile } from './schemaV3'
 import type { Command as V4Command, FileModule } from './schemaV4'
-export type MoveToWellParams = {
+
+export interface MoveToWellParams {
   pipette: string
   labware: string
   well: string
@@ -25,5 +26,5 @@ export type ProtocolFile<
   $otSharedSchema: '#/protocol/schemas/5'
   schemaVersion: 5
   modules: Record<string, FileModule>
-  commands: Array<Command>
+  commands: Command[]
 }

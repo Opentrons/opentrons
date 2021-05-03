@@ -20,6 +20,8 @@ This code is totally unsupported. To do science on a robot, use the stable
 from .protocol_context import ProtocolContext
 from .pipette_context import PipetteContext
 from .instrument_context import InstrumentContext
+from .labware import Labware
+from .well import Well
 from .errors import InvalidPipetteNameError, InvalidMountError
 from .types import PipetteName, Mount, DeprecatedMount
 
@@ -28,6 +30,8 @@ __all__ = [
     "ProtocolContext",
     "PipetteContext",
     "InstrumentContext",
+    "Labware",
+    "Well",
     # Protocol API errors
     "InvalidPipetteNameError",
     "InvalidMountError",

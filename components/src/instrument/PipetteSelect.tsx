@@ -34,7 +34,9 @@ export interface PipetteSelectProps {
 const NONE = 'None'
 const OPTION_NONE = { value: '', label: NONE }
 
-const PIPETTE_SORT = ['maxVolume', 'channels']
+const PIPETTE_SORT = ['maxVolume', 'channels'] as const
+
+// @ts-expect-error(mc, 2021-04-27): use TS type guard for filter
 const allPipetteNameSpecs: PipetteNameSpecs[] = getAllPipetteNames(
   ...PIPETTE_SORT
 )

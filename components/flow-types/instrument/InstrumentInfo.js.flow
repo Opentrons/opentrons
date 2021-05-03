@@ -6,11 +6,8 @@
  */
 
 import * as React from "react";
-import type {
-  PipetteNameSpecs,
-  PipetteModelSpecs,
-} from "@opentrons/shared-data";
 import type { Mount } from "../robot-types";
+import type { InstrumentDiagramProps } from "./InstrumentDiagram";
 export type InstrumentInfoProps = {|
   /**
    * 'left' or 'right'
@@ -40,7 +37,10 @@ export type InstrumentInfoProps = {|
   /**
    * specs of mounted pipette
    */
-  pipetteSpecs?: PipetteModelSpecs | PipetteNameSpecs | null | void,
+  pipetteSpecs?: $PropertyType<
+    InstrumentDiagramProps,
+    "pipetteSpecs"
+  > | null | void,
 
   /**
    * classes to apply

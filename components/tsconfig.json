@@ -1,6 +1,10 @@
 {
   "extends": "../tsconfig-base.json",
-  "references": [],
+  "references": [
+    {
+      "path": "../shared-data"
+    }
+  ],
   "compilerOptions": {
     "composite": true,
     "rootDir": "src",

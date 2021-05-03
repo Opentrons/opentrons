@@ -1,7 +1,12 @@
-import type { Mount } from '@opentrons/components'
-import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  DeckSlotId,
+  LabwareDefinition2,
+  PipetteMount as Mount,
+} from '../../js/types'
+
 // NOTE: this is an enum type in the spec, but it's inconvenient to flow-type them.
 type PipetteName = string
+
 export interface FilePipette {
   mount: Mount
   name: PipetteName
@@ -11,20 +16,25 @@ export interface FileLabware {
   definitionId: string
   displayName?: string
 }
+
 interface FlowRateParams {
   flowRate: number
 }
+
 export interface PipetteAccessParams {
   pipette: string
   labware: string
   well: string
 }
+
 interface VolumeParams {
   volume: number
 }
+
 interface OffsetParams {
   offsetFromBottomMm: number
 }
+
 export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &

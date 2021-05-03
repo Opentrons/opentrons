@@ -1,9 +1,6 @@
 // @flow
 // protocol type defs
-import type {
-  JsonProtocolFile,
-  ProtocolFileV1,
-} from '@opentrons/shared-data/protocol'
+import type { JsonProtocolFile, ProtocolFileV1 } from '@opentrons/shared-data'
 
 import typeof { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
 

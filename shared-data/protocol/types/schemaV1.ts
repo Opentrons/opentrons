@@ -1,16 +1,18 @@
-import type { Mount } from '@opentrons/components'
-import type { DeckSlotId } from '@opentrons/shared-data'
+import type { DeckSlotId, PipetteMount as Mount } from '../../js/types'
+
 // COMMANDS
-export type PipetteLabwareFields = {
+export interface PipetteLabwareFields {
   pipette: string
   labware: string
   well: string
 }
-export type AspirateDispenseArgs = PipetteLabwareFields & {
+
+export interface AspirateDispenseArgs extends PipetteLabwareFields {
   volume: number
-  offsetFromBottomMm?: number | null | undefined
-  'flow-rate'?: number | null | undefined
+  offsetFromBottomMm?: number | null
+  'flow-rate'?: number | null
 }
+
 export type Command =
   | {
       command: 'aspirate' | 'dispense'
@@ -23,7 +25,7 @@ export type Command =
   | {
       command: 'touch-tip'
       params: PipetteLabwareFields & {
-        offsetFromBottomMm?: number | null | undefined
+        offsetFromBottomMm?: number | null
       }
     }
   | {
@@ -49,19 +51,23 @@ type VersionString = string // eg '1.0.0'
 // NOTE: these are an enum type in the spec, but it's inconvenient to flow-type them.
 type PipetteModel = string
 type PipetteName = string
-export type FilePipette = {
+
+export interface FilePipette {
   mount: Mount
   model: PipetteModel
   name?: PipetteName
 }
-export type FileLabware = {
+
+export interface FileLabware {
   slot: DeckSlotId
   model: string
   'display-name'?: string
 }
+
 type FlowRateForPipettes = Record<PipetteModel, number>
+
 // A v1 JSON protocol file
-export type ProtocolFile<DesignerApplicationData> = {
+export interface ProtocolFile<DesignerApplicationData> {
   'protocol-schema': VersionString
   metadata: {
     'protocol-name'?: string
@@ -71,7 +77,7 @@ export type ProtocolFile<DesignerApplicationData> = {
     'last-modified'?: number | null
     category?: string | null
     subcategory?: string | null
-    tags?: Array<string>
+    tags?: string[]
   }
   'default-values': {
     'aspirate-flow-rate': FlowRateForPipettes
@@ -96,6 +102,6 @@ export type ProtocolFile<DesignerApplicationData> = {
       name: string
       description: string
     }
-    subprocedure: Array<Command>
+    subprocedure: Command[]
   }>
 }

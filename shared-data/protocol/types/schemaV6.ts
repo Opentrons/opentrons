@@ -14,5 +14,5 @@ export type ProtocolFile<
   $otSharedSchema: '#/protocol/schemas/5'
   schemaVersion: 5
   modules: Record<string, FileModule>
-  commands: Array<Command>
+  commands: Command[]
 }

@@ -1,4 +1,4 @@
-import type { DeckSlotId, ModuleModel } from '@opentrons/shared-data'
+import type { DeckSlotId, ModuleModel } from '../../js/types'
 import type {
   ProtocolFile as V3ProtocolFile,
   AspDispAirgapParams,
@@ -8,32 +8,40 @@ import type {
   MoveToSlotParams,
   DelayParams,
 } from './schemaV3'
+
 export type { BlowoutParams, FilePipette, FileLabware } from './schemaV3'
-export type FileModule = {
+
+export interface FileModule {
   slot: DeckSlotId
   model: ModuleModel
 }
-export type EngageMagnetParams = {
+
+export interface EngageMagnetParams {
   module: string
   engageHeight: number
 }
-export type TemperatureParams = {
+
+export interface TemperatureParams {
   module: string
   temperature: number
 }
-export type AtomicProfileStep = {
+
+export interface AtomicProfileStep {
   holdTime: number
   temperature: number
 }
-export type TCProfileParams = {
+
+export interface TCProfileParams {
   module: string
-  profile: Array<AtomicProfileStep>
+  profile: AtomicProfileStep[]
   volume: number
 }
-export type ModuleOnlyParams = {
+
+export interface ModuleOnlyParams {
   module: string
 }
-export type ThermocyclerSetTargetBlockTemperatureArgs = {
+
+export interface ThermocyclerSetTargetBlockTemperatureArgs {
   module: string
   temperature: number
   volume?: number
@@ -130,5 +138,5 @@ export type ProtocolFile<
   $otSharedSchema: '#/protocol/schemas/4'
   schemaVersion: 4
   modules: Record<string, FileModule>
-  commands: Array<Command>
+  commands: Command[]
 }
