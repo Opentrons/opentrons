@@ -206,4 +206,4 @@ Version 2.9
 
 Version 2.10
 ++++++++++++
-- In Python protocols requesting API version 2.10, moving to the same well with two pipettes no longer results in strange diagonal movements.
+- In Python protocols requesting API version 2.10, moving to the same well twice in a row with different pipettes no longer results in strange diagonal movements.
