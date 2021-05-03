@@ -12,6 +12,8 @@
     "discovery-client/src",
     "discovery-client/typings",
     "labware-library/src",
-    "labware-library/typings"
+    "labware-library/typings",
+    "shared-data/js",
+    "shared-data/protocol"
   ]
 }

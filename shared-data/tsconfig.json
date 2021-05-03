@@ -6,5 +6,5 @@
     "rootDir": ".",
     "outDir": "lib"
   },
-  "include": ["typings", "js", "protocol"]
+  "include": ["js", "protocol"]
 }
