@@ -6,7 +6,7 @@ from opentrons.protocol_engine.errors import LabwareDefinitionDoesNotExistError
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 
-from opentrons.protocol_engine import errors, ResourceProviders, StateView
+from opentrons.protocol_engine import errors, ResourceProviders
 from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName
 from opentrons.protocol_engine.state import PipetteData
 
@@ -66,7 +66,7 @@ async def test_load_labware_gets_labware_def(
     minimal_labware_def: LabwareDefinition,
     mock_resources_with_data: AsyncMock,
     handler: EquipmentHandler,
-    mock_state_view: StateView,
+    mock_state_view: MagicMock,
 ) -> None:
     """Loading labware should load the labware's defintion."""
     mock_state_view.labware.get_labware_definition.side_effect = LabwareDefinitionDoesNotExistError
@@ -89,7 +89,7 @@ async def test_load_labware_uses_loaded_labware_def(
     minimal_labware_def: LabwareDefinition,
     mock_resources_with_data: AsyncMock,
     handler: EquipmentHandler,
-    mock_state_view: StateView,
+    mock_state_view: MagicMock,
 ) -> None:
     """Loading labware should use the labware definition already in state."""
     mock_state_view.labware.get_labware_definition.return_value = minimal_labware_def
@@ -113,7 +113,7 @@ async def test_load_labware_gets_labware_cal_data(
     minimal_labware_def: LabwareDefinition,
     mock_resources_with_data: AsyncMock,
     handler: EquipmentHandler,
-    mock_state_view: StateView,
+    mock_state_view: MagicMock,
 ) -> None:
     """Loading labware should load the labware's calibration data."""
     mock_state_view.labware.get_labware_definition.return_value = minimal_labware_def
