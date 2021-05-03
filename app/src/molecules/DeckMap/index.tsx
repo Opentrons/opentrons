@@ -4,19 +4,17 @@ import { withRouter } from 'react-router-dom'
 import some from 'lodash/some'
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
-import { type DeckSlotId } from '@opentrons/shared-data'
-import type { ContextRouter } from 'react-router-dom'
+
 
 import { RobotWorkSpace, Module as ModuleItem } from '@opentrons/components'
-// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
+import { selectors as robotSelectors } from '../../redux/robot'
+
+import type { DeckSlot, DeckSlotId } from '@opentrons/shared-data'
+import type { RouterProps } from 'react-router-dom'
 import type { State, Dispatch } from '../../redux/types'
-import {
-  selectors as robotSelectors,
-  type Labware,
-  type SessionModule,
-} from '../../redux/robot'
+import type { Labware, SessionModule } from '../../redux/robot'
 
 import { getMatchedModules } from '../../redux/modules'
 
@@ -24,31 +22,29 @@ import { LabwareItem } from './LabwareItem'
 
 export * from './LabwareItem'
 
-type OP = {
-  ...ContextRouter,
+interface OP extends RouterProps {
   modulesRequired?: boolean,
   enableLabwareSelection?: boolean,
   className?: string,
 }
 
-type DP = { dispatch: Dispatch }
+interface DP { dispatch: Dispatch }
 
-type DisplayModule = {
-  ...$Exact<SessionModule>,
-  mode?: $PropertyType<React.ElementProps<typeof ModuleItem>, 'mode'>,
+type ModuleDisplayMode = React.ComponentProps<typeof ModuleItem>['mode']
+
+interface DisplayModule extends SessionModule {
+  mode?: React.ComponentProps<typeof ModuleItem>['mode'],
   usbInfoString?: string,
 }
 
-type SP = {
-  labwareBySlot?: { [DeckSlotId]: Labware[] },
-  modulesBySlot?: {
-    [DeckSlotId]: ?DisplayModule,
-  },
-  selectedSlot?: ?DeckSlotId,
+interface SP {
+  labwareBySlot?: {[slot: string]: Labware[] | undefined},
+  modulesBySlot?: {[slot: string]: DisplayModule | undefined},
+  selectedSlot?: DeckSlotId | null,
   areTipracksConfirmed?: boolean,
 }
 
-type Props = { ...OP, ...SP, ...DP }
+type Props = OP & SP & DP
 
 const deckSetupLayerBlocklist = [
   'calibrationMarkings',
@@ -60,7 +56,7 @@ const deckSetupLayerBlocklist = [
   'screwHoles',
 ]
 
-function DeckMapComponent(props: Props) {
+function DeckMapComponent(props: Props): JSX.Element {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
   const {
     modulesBySlot,
@@ -77,7 +73,7 @@ function DeckMapComponent(props: Props) {
       className={className}
     >
       {({ deckSlotsById }) =>
-        map(deckSlotsById, (slot: $Values<typeof deckSlotsById>, slotId) => {
+        map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {
           if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
           const moduleInSlot = modulesBySlot && modulesBySlot[slotId]
           const allLabwareInSlot = labwareBySlot && labwareBySlot[slotId]
@@ -124,7 +120,7 @@ function DeckMapComponent(props: Props) {
 function mapStateToProps(state: State, ownProps: OP): SP {
   let modulesBySlot = mapValues(
     robotSelectors.getModulesBySlot(state),
-    module => ({ ...module, mode: 'default' })
+    (module) => ({ ...module, mode: 'default' as ModuleDisplayMode})
   )
 
   // only show necessary modules if still need to connect some
@@ -143,7 +139,7 @@ function mapStateToProps(state: State, ownProps: OP): SP {
           : 'USB Info N/A'
         return {
           ...module,
-          mode: matchedMod !== null ? 'present' : 'missing',
+          mode: (matchedMod !== null ? 'present' : 'missing') as ModuleDisplayMode,
           usbInfoString: usbInfo,
         }
       }

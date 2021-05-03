@@ -34,9 +34,9 @@ export interface SessionState {
   // TODO(mc, 2018-01-11): command IDs should be strings
   protocolCommands: number[]
   protocolCommandsById: { [id: number]: Command }
-  pipettesByMount: Partial<Record<Mount, StatePipette>>
-  labwareBySlot: Partial<Record<Slot, StateLabware>>
-  modulesBySlot: Partial<Record<Slot, SessionModule>>
+  pipettesByMount: { [mount in Mount]?: StatePipette }
+  labwareBySlot: { [slot in Slot]?: StateLabware }
+  modulesBySlot: { [slot in Slot]?: SessionModule }
   runRequest: Request
   pauseRequest: Request
   resumeRequest: Request

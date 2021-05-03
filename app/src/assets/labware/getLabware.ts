@@ -12,8 +12,8 @@ const labwareSchemaV1DefsContext = (require as any).context(
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk
 )
-let labwareSchemaV1Defs: $ReadOnlyLabwareDefinition1[] | null = null
-function getLegacyLabwareDefs(): $ReadOnlyLabwareDefinition1[] {
+let labwareSchemaV1Defs: Readonly<LabwareDefinition1[]> | null = null
+function getLegacyLabwareDefs(): Readonly<LabwareDefinition1[]> {
   if (!labwareSchemaV1Defs) {
     labwareSchemaV1Defs = labwareSchemaV1DefsContext
       .keys()

@@ -332,7 +332,7 @@ export const getPipettesCalibrated: (state: State) => boolean = createSelector(
 
 export function getModulesBySlot(
   state: State
-): Partial<Record<Slot, SessionModule>> {
+): { [slot in Slot]?: SessionModule } {
   return session(state).modulesBySlot
 }
 
