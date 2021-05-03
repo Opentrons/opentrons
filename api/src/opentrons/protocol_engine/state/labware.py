@@ -40,15 +40,27 @@ class LabwareState:
 
     def __init__(self, deck_fixed_labware: Sequence[DeckFixedLabware]) -> None:
         """Initialize a LabwareState instance."""
+        self._labware_definitions_by_uri = {
+            uri_from_details(
+                load_name=fixed_labware.definition.parameters.loadName,
+                namespace=fixed_labware.definition.namespace,
+                version=fixed_labware.definition.version
+            ): fixed_labware.definition for fixed_labware in deck_fixed_labware
+        }
         self._labware_by_id = {
             fixed_labware.labware_id: LabwareData(
                 location=fixed_labware.location,
-                definition=fixed_labware.definition,
+                definition=self._labware_definitions_by_uri[
+                    uri_from_details(
+                        load_name=fixed_labware.definition.parameters.loadName,
+                        namespace=fixed_labware.definition.namespace,
+                        version=fixed_labware.definition.version
+                    )
+                ],
                 calibration=(0, 0, 0),
             )
             for fixed_labware in deck_fixed_labware
         }
-        self._labware_definitions_by_uri = {}
 
     def get_labware_data_by_id(self, labware_id: str) -> LabwareData:
         """Get labware data by the labware's unique identifier."""

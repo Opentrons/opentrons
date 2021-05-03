@@ -173,6 +173,12 @@ def test_loads_fixed_labware(
         calibration=(0, 0, 0),
     )
 
+    assert store.labware.get_labware_definition(
+        load_name=fixed_trash_def.parameters.loadName,
+        namespace=fixed_trash_def.namespace,
+        version=fixed_trash_def.version
+    ) == fixed_trash_def
+
 
 def test_get_all_labware(
     well_plate_def: LabwareDefinition,
