@@ -11,12 +11,6 @@ def subject() -> JsonFileRunner:
 
 
 @pytest.mark.xfail(raises=NotImplementedError)
-def test_python_runner_load(subject: JsonFileRunner) -> None:
-    """It should be able to prepare for run."""
-    subject.load()
-
-
-@pytest.mark.xfail(raises=NotImplementedError)
 def test_python_runner_play(subject: JsonFileRunner) -> None:
     """It should be able to start the run."""
     subject.play()

@@ -5,10 +5,6 @@ from .abstract_file_runner import AbstractFileRunner
 class JsonFileRunner(AbstractFileRunner):
     """JSON protocol file runner."""
 
-    def load(self) -> None:
-        """Prepare to run the JSON protocol file."""
-        raise NotImplementedError()
-
     def play(self) -> None:
         """Start (or un-pause) running the JSON protocol file."""
         raise NotImplementedError()
