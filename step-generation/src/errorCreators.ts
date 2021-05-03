@@ -13,12 +13,12 @@ export function insufficientTips(): CommandCreatorError {
   }
 }
 
-export function noTipOnPipette(args: {|
+export function noTipOnPipette(args: {
   actionName: string,
   pipette: string,
   labware: string,
   well: string,
-|}): CommandCreatorError {
+}): CommandCreatorError {
   const { actionName, pipette, labware, well } = args
   return {
     message: `Attempted to ${actionName} with no tip on pipette: ${pipette} from ${labware}'s well ${well}`,
@@ -26,10 +26,10 @@ export function noTipOnPipette(args: {|
   }
 }
 
-export function pipetteDoesNotExist(args: {|
+export function pipetteDoesNotExist(args: {
   actionName: string,
   pipette: string,
-|}): CommandCreatorError {
+}): CommandCreatorError {
   const { actionName, pipette } = args
   return {
     message: `Attempted to ${actionName} with pipette id "${pipette}", this pipette was not found under "pipettes"`,
@@ -37,10 +37,10 @@ export function pipetteDoesNotExist(args: {|
   }
 }
 
-export function invalidSlot(args: {|
+export function invalidSlot(args: {
   actionName: string,
   slot: string,
-|}): CommandCreatorError {
+}): CommandCreatorError {
   const { actionName, slot } = args
   return {
     message: `Attempted to ${actionName} with slot "${slot}", this is not a valid slot"`,
@@ -48,10 +48,10 @@ export function invalidSlot(args: {|
   }
 }
 
-export function labwareDoesNotExist(args: {|
+export function labwareDoesNotExist(args: {
   actionName: string,
   labware: string,
-|}): CommandCreatorError {
+}): CommandCreatorError {
   const { actionName, labware } = args
   console.warn(
     `Attempted to ${actionName} with labware id "${labware}", this labware was not found under "labware"`
@@ -77,11 +77,11 @@ export function missingTemperatureStep(): CommandCreatorError {
   }
 }
 
-export function tipVolumeExceeded(args: {|
+export function tipVolumeExceeded(args: {
   actionName: string,
   volume: string | number,
   maxVolume: string | number,
-|}): CommandCreatorError {
+}): CommandCreatorError {
   const { actionName, volume, maxVolume } = args
   return {
     message: `Attempted to ${actionName} volume greater than tip max volume (${volume} > ${maxVolume})`,
@@ -89,12 +89,12 @@ export function tipVolumeExceeded(args: {|
   }
 }
 
-export function pipetteVolumeExceeded(args: {|
+export function pipetteVolumeExceeded(args: {
   actionName: string,
   volume: string | number,
   maxVolume: string | number,
   disposalVolume?: string | number,
-|}): CommandCreatorError {
+}): CommandCreatorError {
   const { actionName, volume, maxVolume, disposalVolume } = args
   const message =
     disposalVolume != null
