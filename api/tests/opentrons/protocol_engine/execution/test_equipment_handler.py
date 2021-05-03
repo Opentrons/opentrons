@@ -3,7 +3,7 @@ import pytest
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 from opentrons.protocol_engine.errors import LabwareDefinitionDoesNotExistError
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 
 from opentrons.protocol_engine import errors, ResourceProviders
@@ -111,13 +111,13 @@ async def test_load_labware_uses_loaded_labware_def(
 
 
 async def test_load_labware_gets_labware_cal_data(
-    minimal_labware_def: LabwareDefinition,
+    well_plate_def: LabwareDefinition,
     mock_resources_with_data: AsyncMock,
     handler: EquipmentHandler,
     mock_state_view: MagicMock,
 ) -> None:
     """Loading labware should load the labware's calibration data."""
-    mock_state_view.labware.get_labware_definition.return_value = minimal_labware_def
+    mock_state_view.labware.get_labware_definition.return_value = well_plate_def
 
     res = await handler.load_labware(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
@@ -129,7 +129,7 @@ async def test_load_labware_gets_labware_cal_data(
     assert type(res) == LoadedLabware
     assert res.calibration == (1, 2, 3)
     mock_resources_with_data.labware_data.get_labware_calibration.assert_called_with(
-        definition=minimal_labware_def,
+        definition=well_plate_def,
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
     )
 
