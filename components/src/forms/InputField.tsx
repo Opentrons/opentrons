@@ -93,6 +93,7 @@ function Input(props: InputFieldProps): JSX.Element {
     <div className={styles.input_field_container}>
       <div className={styles.input_field}>
         <input
+          disabled={props.disabled}
           id={props.id}
           type={props.type ?? INPUT_TYPE_TEXT}
           value={value}
