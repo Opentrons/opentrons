@@ -10,11 +10,11 @@ OT-2 software 4.3.0 brings a major new feature: the ability to use multiple modu
 
 ## New Features
 
-- Protocols may now load more than one of the same module type by calling `protocol.load_module()` multiple times with the same type of module and different deck slots
+- The OT-2 now supports protocols with 2 Magnetic Modules or 2 Temperature Modules. Protocols may now load more than one of the same module type by calling `protocol.load_module()` multiple times with the same type of module and different deck slots.
+- New API level: 2.10. This API level contains a bugfix for an issue where pipettes would move diagonally when accessing the same well one after another ([#7156](https://github.com/Opentrons/opentrons/issues/7156)). The fix is only applied when API Level 2.10 is requested in a protocol to avoid changing the behavior of existing protocols.
 
 ## Bugfixes
 
-- Fix an issue where pipettes would move diagonally when accessing the same well one after another ([#7156](https://github.com/Opentrons/opentrons/issues/7156))
 - Fixes an issue causing slow protocol uploads in protocols using Thermocycler Modules or Temperature Modules ([#7506](https://github.com/Opentrons/opentrons/issues/7506))
 - Fixes an issue where labware could not have a 0 column. You can now once again create custom labware with a column 0 ([#7531](https://github.com/Opentrons/opentrons/issues/7531))
 
