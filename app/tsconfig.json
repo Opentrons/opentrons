@@ -10,6 +10,9 @@
     {
       "path": "../discovery-client"
     },
+    {
+      "path": "../shared-data"
+    },
   ],
   "compilerOptions": {
     "composite": true,
