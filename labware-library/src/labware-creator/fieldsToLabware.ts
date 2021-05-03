@@ -7,6 +7,7 @@ import { DISPLAY_VOLUME_UNITS } from './fields'
 import type {
   LabwareDefinition2,
   LabwareDisplayCategory,
+  LabwareWellProperties,
 } from '@opentrons/shared-data'
 import type { ProcessedLabwareFields } from './fields'
 
@@ -43,7 +44,7 @@ export function fieldsToLabware(
       depth: fields.wellDepth,
       totalLiquidVolume,
     }
-    const wellProperties =
+    const wellProperties: LabwareWellProperties =
       fields.wellShape === 'circular'
         ? {
             ...commonWellProperties,

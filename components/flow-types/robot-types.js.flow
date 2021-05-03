@@ -5,5 +5,7 @@
  * @flow
  */
 
-export type Channels = 1 | 8;
-export type Mount = "left" | "right";
+declare export {
+  PipetteChannels as Channels,
+  PipetteMount as Mount,
+} from "@opentrons/shared-data";
