@@ -38,7 +38,8 @@ class LabwareState:
                 location=fixed_labware.location,
                 definition=fixed_labware.definition,
                 calibration=(0, 0, 0),
-            ) for fixed_labware in deck_fixed_labware
+            )
+            for fixed_labware in deck_fixed_labware
         }
 
     def get_labware_data_by_id(self, labware_id: str) -> LabwareData:
@@ -47,6 +48,14 @@ class LabwareState:
             return self._labware_by_id[labware_id]
         except KeyError:
             raise errors.LabwareDoesNotExistError(f"Labware {labware_id} not found.")
+
+    def get_definition(self, labware_id: str) -> LabwareDefinition:
+        """Get labware definition by the labware's unique identifier."""
+        return self.get_labware_data_by_id(labware_id).definition
+
+    def get_labware_location(self, labware_id: str) -> LabwareLocation:
+        """Get labware location by the labware's unique identifier."""
+        return self.get_labware_data_by_id(labware_id).location
 
     def get_all_labware(self) -> List[Tuple[str, LabwareData]]:
         """Get a list of all labware entries in state."""
@@ -127,5 +136,5 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
             self._state._labware_by_id[command.result.labwareId] = LabwareData(
                 location=command.request.location,
                 definition=command.result.definition,
-                calibration=command.result.calibration
+                calibration=command.result.calibration,
             )
