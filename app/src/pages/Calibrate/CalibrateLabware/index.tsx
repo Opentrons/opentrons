@@ -6,16 +6,16 @@ import { DeckMap } from '../../../molecules/DeckMap'
 import { InfoBox } from './InfoBox'
 import styles from './styles.css'
 
-import type { ContextRouter } from 'react-router-dom'
+import type { RouterProps } from 'react-router-dom'
 import type { Labware } from '../../../redux/robot/types'
 
-type Props = { ...ContextRouter, labware: ?Labware }
+interface Props extends RouterProps { labware: Labware | null }
 
-export const CalibrateLabware: React.AbstractComponent<
-  $Diff<Props, ContextRouter>
+export const CalibrateLabware: React.ComponentType<
+  Omit<Props, keyof RouterProps>
 > = withRouter(CalibrateLabwareComponent)
 
-function CalibrateLabwareComponent(props: Props) {
+function CalibrateLabwareComponent(props: Props): JSX.Element {
   return (
     <div className={styles.calibrate_labware_wrapper}>
       <InfoBox labware={props.labware} />

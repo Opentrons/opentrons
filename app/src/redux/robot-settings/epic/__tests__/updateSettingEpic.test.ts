@@ -31,8 +31,9 @@ const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunct
   typeof DiscoverySelectors.getRobotByName
 >
 
-const mockGetAllRestartRequiredRobots: JestMockFn<[State], string[]> =
-  Selectors.getAllRestartRequiredRobots
+const mockGetAllRestartRequiredRobots = Selectors.getAllRestartRequiredRobots as jest.MockedFunction<
+  typeof Selectors.getAllRestartRequiredRobots
+>
 
 describe('updateSettingEpic', () => {
   let testScheduler

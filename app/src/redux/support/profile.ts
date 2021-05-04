@@ -19,7 +19,7 @@ import type { Action, State } from '../types'
 import type { Config } from '../config/types'
 import type { SupportProfileUpdate } from './types'
 
-type SupportConfig = $PropertyType<Config, 'support'>
+type SupportConfig = Config['support']
 
 export function initializeProfile(config: SupportConfig): void {
   setUserId(config.userId)

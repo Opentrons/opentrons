@@ -10,28 +10,28 @@ import { getCustomLabware } from '../../redux/custom-labware'
 
 import { FileInfo } from './FileInfo'
 
-import type { ContextRouter } from 'react-router-dom'
+import type { RouterProps } from 'react-router-dom'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 
-type OP = ContextRouter
+type OP = RouterProps
 
-type SP = {
-  robot: ?Robot,
-  filename: ?string,
+interface SP {
+  robot: Robot | null | undefined,
+  filename: string | null | undefined,
   uploadInProgress: boolean,
-  uploadError: ?{ message: string },
+  uploadError: { message: string } | null | undefined,
   sessionLoaded: boolean,
   sessionHasSteps: boolean,
   showCustomLabwareWarning: boolean,
 }
 
-type Props = { ...OP, ...SP, dispatch: Dispatch }
+type Props = OP & SP & { dispatch: Dispatch }
 
-export const Upload: React.AbstractComponent<
-  $Diff<OP, ContextRouter>
+export const Upload: React.ComponentType<
+  Omit<OP, keyof RouterProps>
 > = withRouter(
-  connect<Props, OP, SP, _, _, _>(mapStateToProps)(UploadComponent)
+  connect<Props, OP, SP>(mapStateToProps)(UploadComponent)
 )
 
 function mapStateToProps(state: State): SP {
@@ -50,7 +50,7 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-function UploadComponent(props: Props) {
+function UploadComponent(props: Props): JSX.Element {
   const {
     robot,
     filename,

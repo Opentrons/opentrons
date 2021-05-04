@@ -163,7 +163,7 @@ function mapStateToProps(state: State, ownProps: OP): SP {
         modulesBySlot,
       }
     } else {
-      const selectedSlot: ?DeckSlotId = ownProps.match.params.slot
+      const selectedSlot: DeckSlotId | null | undefined = ownProps.match.params.slot
       return {
         labwareBySlot,
         modulesBySlot,
@@ -174,8 +174,8 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   }
 }
 
-export const DeckMap: React.AbstractComponent<
-  $Diff<OP, ContextRouter>
+export const DeckMap: React.ComponentType<
+  Omit<OP, keyof RouterProps>
 > = withRouter(
-  connect<Props, OP, SP, DP, State, Dispatch>(mapStateToProps)(DeckMapComponent)
+  connect<Props, OP, SP, DP>(mapStateToProps)(DeckMapComponent)
 )

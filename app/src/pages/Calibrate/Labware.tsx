@@ -15,31 +15,31 @@ import { ConfirmModal } from './CalibrateLabware/ConfirmModal'
 import { ConnectModules } from './ConnectModules'
 import { PrepareModules } from './PrepareModules'
 
-import type { ContextRouter } from 'react-router-dom'
+import type { RouterProps } from 'react-router-dom'
 import type { State, Dispatch } from '../../redux/types'
 import type { Labware as RobotLabware } from '../../redux/robot/types'
 import type { AttachedModule } from '../../redux/modules/types'
 
-type OP = ContextRouter
+type OP = RouterProps
 
-type SP = {
+interface SP {
   deckPopulated: boolean,
-  labware: ?RobotLabware,
+  labware: RobotLabware | null | undefined,
   calibrateToBottom: boolean,
   robotName: string | null,
-  hasModulesLeftToReview: ?boolean,
+  hasModulesLeftToReview: boolean | null | undefined,
   unpreparedModules: AttachedModule[],
 }
 
-type Props = { ...OP, ...SP, dispatch: Dispatch }
+type Props = OP & SP & { dispatch: Dispatch }
 
-export const Labware: React.AbstractComponent<
-  $Diff<OP, ContextRouter>
+export const Labware: React.ComponentType<
+  Omit<OP, keyof RouterProps>
 > = withRouter(
-  connect<Props, OP, SP, _, _, _>(mapStateToProps)(LabwareComponent)
+  connect<Props, OP, SP>(mapStateToProps)(LabwareComponent)
 )
 
-function LabwareComponent(props: Props) {
+function LabwareComponent(props: Props): JSX.Element {
   const {
     robotName,
     calibrateToBottom,
@@ -57,7 +57,7 @@ function LabwareComponent(props: Props) {
     return <Redirect to="/" />
   }
 
-  const renderPage = () => {
+  const renderPage = (): JSX.Element => {
     if (hasModulesLeftToReview) {
       return <ConnectModules robotName={robotName} />
     } else if (unpreparedModules.length > 0) {

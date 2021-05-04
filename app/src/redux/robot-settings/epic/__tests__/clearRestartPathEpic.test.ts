@@ -13,8 +13,9 @@ jest.mock('../../selectors')
 const mockGetRobotRestarting: JestMockFn<[State, string], mixed> =
   RobotAdminSelectors.getRobotRestarting
 
-const mockGetAllRestartRequiredRobots: JestMockFn<[State], string[]> =
-  Selectors.getAllRestartRequiredRobots
+const mockGetAllRestartRequiredRobots = Selectors.getAllRestartRequiredRobots as jest.MockedFunction<
+  typeof Selectors.getAllRestartRequiredRobots
+>
 
 describe('clearRestartPathEpic', () => {
   let testScheduler

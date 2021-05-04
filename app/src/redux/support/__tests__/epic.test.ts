@@ -6,43 +6,40 @@ import * as Event from '../intercom-event'
 import { supportEpic } from '../epic'
 
 import type { Action, State } from '../../types'
-import type { Config } from '../../config/types'
-import type {
-  SupportConfig,
-  SupportProfileUpdate,
-  IntercomEvent,
-} from '../types'
+import type { Observable } from 'rxjs'
 
 jest.mock('../profile')
 jest.mock('../intercom-event')
 
-const makeProfileUpdate: JestMockFn<
-  [Action, State],
-  SupportProfileUpdate | null
-> = Profile.makeProfileUpdate
+const makeProfileUpdate = Profile.makeProfileUpdate as jest.MockedFunction<
+  typeof Profile.makeProfileUpdate
+>
 
-const makeIntercomEvent: JestMockFn<[Action, State], IntercomEvent | null> =
-  Event.makeIntercomEvent
+const makeIntercomEvent = Event.makeIntercomEvent as jest.MockedFunction<
+  typeof Event.makeIntercomEvent
+>
 
-const sendEvent: JestMockFn<[IntercomEvent], void> = Event.sendEvent
+const sendEvent = Event.sendEvent as jest.MockedFunction<typeof Event.sendEvent>
 
-const initializeProfile: JestMockFn<[SupportConfig], void> =
-  Profile.initializeProfile
+const initializeProfile = Profile.initializeProfile as jest.MockedFunction<
+  typeof Profile.initializeProfile
+>
 
-const updateProfile: JestMockFn<[SupportProfileUpdate], void> =
-  Profile.updateProfile
+const updateProfile = Profile.updateProfile as jest.MockedFunction<
+  typeof Profile.updateProfile
+>
 
 const MOCK_ACTION: Action = { type: 'MOCK_ACTION' } as any
-const MOCK_PROFILE_STATE: Partial<State & { config: Partial<Config> }> = {
+const MOCK_PROFILE_STATE: State = {
   config: {
     support: { userId: 'foo', createdAt: 42, name: 'bar', email: null },
   },
-}
+} as any
 
 const MOCK_EVENT_STATE: Partial<State> = {}
 
 describe('support profile epic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     makeProfileUpdate.mockReturnValue(null)
@@ -107,7 +104,7 @@ describe('support profile epic', () => {
 })
 
 describe('support event epic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     makeIntercomEvent.mockReturnValue(null)
@@ -125,7 +122,7 @@ describe('support event epic', () => {
     testScheduler.run(({ hot, expectObservable, flush }) => {
       const action$ = hot('-a', { a: MOCK_ACTION })
       const state$ = hot('s-', { s: MOCK_EVENT_STATE })
-      const result$ = supportEpic(action$, state$)
+      const result$ = supportEpic(action$, state$ as Observable<State>)
 
       expectObservable(result$, '--')
       flush()
