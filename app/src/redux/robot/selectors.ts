@@ -341,7 +341,7 @@ export const getModules: (state: State) => SessionModule[] = createSelector(
   // TODO (ka 2019-3-26): can't import getConfig due to circular dependency
   state => state.config,
   (modulesBySlot, config) =>
-    Object.keys(modulesBySlot).map(
+    Object.keys(modulesBySlot).map<SessionModule>(
       (slot: Slot): SessionModule => modulesBySlot[slot]
     )
 )
