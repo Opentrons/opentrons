@@ -4,16 +4,15 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
 import type { ReactWrapper } from 'enzyme'
-import { JsxEmit } from 'typescript'
 
 export interface MockStore<State, Action> {
   getState: jest.MockedFunction<() => State>
   subscribe: jest.MockedFunction<([]) => void>
-  dispatch: jest.MockedFunction<([Action]) => Action>
+  dispatch: jest.MockedFunction<(...actions: Action[]) => Action>
 }
 
 export interface WrapperWithStore<Element, State, Action> {
-  wrapper: ReactWrapper
+  wrapper: ReactWrapper<Element>
   store: MockStore<State, Action>
   refresh: (nextState?: State) => void
 }
@@ -24,7 +23,7 @@ export interface MountWithStoreOptions<State> {
 }
 
 export function mountWithStore<Element, State, Action>(
-  node: React.ReactElement,
+  node: JSX.Element,
   options?: MountWithStoreOptions<State>
 ): WrapperWithStore<Element, State, Action> {
   const initialState = options?.initialState ?? ({} as State)
@@ -42,7 +41,7 @@ export function mountWithStore<Element, State, Action>(
 
   // force a re-render by returning a new state to recalculate selectors
   // and sending a blank set of new props to the wrapper
-  const refresh = maybeNextState => {
+  const refresh = (maybeNextState?: State): void => {
     const nextState = maybeNextState ?? { ...initialState }
 
     assert(

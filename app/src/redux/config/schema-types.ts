@@ -13,106 +13,112 @@ export type DevInternalFlag =
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
-export type ConfigV0 = Readonly<{
+export interface ConfigV0 {
   version: 0
   devtools: boolean
   reinstallDevtools: boolean
 
   // app update config
-  update: Readonly<{
+  update: {
     channel: UpdateChannel
-  }>
+  }
 
   // robot update config
-  buildroot: Readonly<{
+  buildroot: {
     manifestUrl: string
-  }>
+  }
 
   // logging config
-  log: Readonly<{
-    level: Readonly<{
+  log: {
+    level: {
       file: LogLevel
       console: LogLevel
-    }>
-  }>
+    }
+  }
 
   // ui and browser config
-  ui: Readonly<{
+  ui: {
     width: number
     height: number
-    url: Readonly<{
+    url: {
       protocol: UrlProtocol
       path: string
-    }>
-    webPreferences: Readonly<{
+    }
+    webPreferences: {
       webSecurity: boolean
-    }>
-  }>
+    }
+  }
 
-  analytics: Readonly<{
+  analytics: {
     appId: string
     optedIn: boolean
     seenOptIn: boolean
-  }>
+  }
 
   // deprecated
-  p10WarningSeen: Readonly<{
+  p10WarningSeen: {
     [id: string]: boolean | null | undefined
-  }>
+  }
 
-  support: Readonly<{
+  support: {
     userId: string
     createdAt: number
     name: string
     email: string | null | undefined
-  }>
+  }
 
-  discovery: Readonly<{
+  discovery: {
     candidates: DiscoveryCandidates
-  }>
+  }
 
   // custom labware files
-  labware: Readonly<{
+  labware: {
     directory: string
-  }>
+  }
 
   // app wide alerts
-  alerts: Readonly<{ ignored: string[] }>
+  alerts: { ignored: string[] }
 
   // internal development flags
-  devInternal?: Readonly<FeatureFlags>
-}>
+  devInternal?: FeatureFlags
+}
 
-export type ConfigV1 = Readonly<
-  ConfigV0 & {
-    version: 1
-    discovery: Readonly<{
-      candidates: DiscoveryCandidates
-      disableCache: boolean
-    }>
+export interface ConfigV1 extends Omit<ConfigV0, 'version' | 'discovery'> {
+  version: 1
+  discovery: {
+    candidates: DiscoveryCandidates
+    disableCache: boolean
   }
->
+}
 
-export type ConfigV2 = Readonly<
-  ConfigV1 & {
-    version: 2
-    calibration: Readonly<{
-      useTrashSurfaceForTipCal: boolean | null
-    }>
+export interface ConfigV2 extends Omit<ConfigV1, 'version'> {
+  version: 2
+  calibration: {
+    useTrashSurfaceForTipCal: boolean | null
   }
->
+}
 
 // v3 config changes default values but does not change schema
-export type ConfigV3 = Readonly<
-  ConfigV2 & {
-    version: 3
-    support: Readonly<
-      Pick<ConfigV2, 'support'> & {
-        name: string | null
-        email: string | null
-      }
-    >
+export interface ConfigV3 extends Omit<ConfigV2, 'version' | 'support'> {
+  version: 3
+  support: Pick<ConfigV2, 'support'> & {
+    name: string | null
+    email: string | null
   }
->
+}
 
-export type Config = ConfigV3
+type DeepReadonly<T> = T extends Array<infer R>
+  ? DeepReadonlyArray<R>
+  : T extends Function
+  ? T
+  : T extends object
+  ? DeepReadonlyObject<T>
+  : T
+
+type DeepReadonlyArray<T> = ReadonlyArray<DeepReadonly<T>>
+
+type DeepReadonlyObject<T> = {
+  readonly [P in keyof T]: DeepReadonly<T[P]>
+}
+
+export type Config = DeepReadonlyObject<ConfigV3>

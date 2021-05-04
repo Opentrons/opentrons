@@ -8,28 +8,24 @@ import { TitledControl } from '../../../../atoms/TitledControl'
 import { ToggleBtn } from '../../../../atoms/ToggleBtn'
 import { UpdateNotificationsControl } from '../UpdateNotificationsControl'
 
+import type { ReactWrapper } from 'enzyme'
 import type { StyleProps } from '@opentrons/components'
 import type { State } from '../../../../redux/types'
-import type { AlertId } from '../../../../redux/alerts/types'
-import type { AnalyticsEvent } from '../../../../redux/analytics/types'
+import { AnalyticsEvent } from '../../../../redux/analytics/types'
 
 jest.mock('../../../../redux/alerts/selectors')
 jest.mock('../../../../redux/analytics/hooks')
 
-const getAlertIsPermanentlyIgnored: JestMockFn<
-  [State, AlertId],
-  boolean | null
-> = Alerts.getAlertIsPermanentlyIgnored
+const getAlertIsPermanentlyIgnored = Alerts.getAlertIsPermanentlyIgnored as jest.MockedFunction<typeof Alerts.getAlertIsPermanentlyIgnored>
 
-const useTrackEvent: JestMockFn<[], JestMockFn<[AnalyticsEvent], void>> =
-  Analytics.useTrackEvent
+const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<typeof Analytics.useTrackEvent>
 
 const MOCK_STATE: Partial<State> = {}
 
 describe('UpdateNotificationsControl', () => {
-  const trackEvent = jest.fn()
+  const trackEvent: (e: AnalyticsEvent) => void = jest.fn() as any
 
-  const render = (styleProps: Partial<StyleProps> = {}) => {
+  const render = (styleProps: Partial<StyleProps> = {}): ReturnType<typeof mountWithStore> => {
     return mountWithStore(<UpdateNotificationsControl {...styleProps} />, {
       initialState: MOCK_STATE,
     })
@@ -65,7 +61,7 @@ describe('UpdateNotificationsControl', () => {
 
   it('should have a ToggleBtn with state driven by alerts', () => {
     const { wrapper, refresh } = render()
-    const getToggle = () => wrapper.find(ToggleBtn)
+    const getToggle = (): ReactWrapper => wrapper.find(ToggleBtn)
 
     expect(getToggle().prop('disabled')).toBe(true)
     expect(getToggle().prop('toggledOn')).toBe(false)

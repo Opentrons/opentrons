@@ -46,7 +46,7 @@ export const ConfirmResetPathModalTemplate = ({
 
 export const ConfirmResetPathModal = (
   props: ConfirmResetPathModalProps
-): React.ReactNode => (
+): JSX.Element => (
   <Portal>
     <ConfirmResetPathModalTemplate {...props} />
   </Portal>

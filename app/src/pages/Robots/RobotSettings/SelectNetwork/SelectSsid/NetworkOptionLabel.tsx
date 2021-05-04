@@ -53,7 +53,7 @@ export interface NetworkOptionLabelProps extends WifiNetwork {
 
 export const NetworkOptionLabel = (
   props: NetworkOptionLabelProps
-): React.ReactNode => {
+): JSX.Element => {
   const { ssid, active, securityType, showConnectedIcon } = props
   const hasConnectedIcon = active && showConnectedIcon
   const hasSecureIcon = securityType !== SECURITY_NONE
@@ -72,7 +72,7 @@ export const NetworkActionLabel = ({
   label,
 }: {
   label: string,
-}): React.ReactNode => <StyledName padLeft={true}>{label}</StyledName>
+}): JSX.Element => <StyledName padLeft={true}>{label}</StyledName>
 
 const renderSignalIcon = signal => {
   let iconName: IconName

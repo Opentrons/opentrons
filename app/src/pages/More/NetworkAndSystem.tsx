@@ -17,7 +17,7 @@ const CARD_GRID_STYLE = css`
   }
 `
 
-export const NetworkAndSystem = (): React.ReactNode => (
+export const NetworkAndSystem = (): JSX.Element => (
   <Page titleBarProps={{ title: NETWORK_AND_SYSTEM }}>
     <div css={CARD_GRID_STYLE}>
       <NetworkSettingsCard />

@@ -27,7 +27,7 @@ const TYPE_COL_STYLE = { marginRight: SPACING_AUTO }
 const QUANTITY_COL_STYLE = { width: '12.5%', marginX: SPACING_3 }
 const CAL_DATA_COL_STYLE = { width: '25%' }
 
-const renderCalValue = (axis: string, value: number): React.ReactNode => (
+const renderCalValue = (axis: string, value: number): JSX.Element => (
   <>
     <Text as="span" fontWeight={FONT_WEIGHT_SEMIBOLD}>
       {axis.toUpperCase()}

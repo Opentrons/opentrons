@@ -11,11 +11,12 @@ import { UpdateAppModal } from '../../../../organisms/UpdateAppModal'
 import { UpdateNotificationsControl } from '../UpdateNotificationsControl'
 
 import type { State } from '../../../../redux/types'
+import { ReactWrapper } from 'enzyme'
 
 // TODO(mc, 2020-10-08): this is a partial mock because shell/update
 // needs some reorg to split actions and selectors
 jest.mock('../../../../redux/shell/update', () => ({
-  ...jest.requireActual('../../../../redux/shell/update'),
+  ...jest.requireActual<{}>('../../../../redux/shell/update'),
   getAvailableShellUpdate: jest.fn(),
 }))
 
@@ -23,13 +24,12 @@ jest.mock('../../../../organisms/UpdateAppModal', () => ({
   UpdateAppModal: () => null,
 }))
 
-const getAvailableShellUpdate: JestMockFn<[State], string | null> =
-  Shell.getAvailableShellUpdate
+const getAvailableShellUpdate = Shell.getAvailableShellUpdate as jest.MockedFunction<typeof Shell.getAvailableShellUpdate>
 
 const MOCK_STATE: Partial<State> = {}
 
 describe('AppSoftwareSettingsCard', () => {
-  const render = () => {
+  const render = (): ReturnType<typeof mountWithStore>=> {
     return mountWithStore(<AppSoftwareSettingsCard />, {
       initialState: MOCK_STATE,
     })
@@ -111,20 +111,20 @@ describe('AppSoftwareSettingsCard', () => {
     const section = wrapper
       .find(TitledControl)
       .filterWhere(
-        t => t.prop('title') === 'Restore Different Software Version'
+        (t: ReactWrapper) => t.prop('title') === 'Restore Different Software Version'
       )
 
     const releasesLink = section
       .find(Link)
       .filterWhere(
-        a =>
+        (a: ReactWrapper) =>
           a.prop('href') === 'https://github.com/Opentrons/opentrons/releases'
       )
 
     const articleLink = section
       .find(Link)
       .filterWhere(
-        a =>
+        (a: ReactWrapper) =>
           a.prop('href') ===
           'https://support.opentrons.com/articles/2393514-uninstall-the-opentrons-app'
       )
