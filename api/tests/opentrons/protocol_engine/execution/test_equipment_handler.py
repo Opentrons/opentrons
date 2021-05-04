@@ -110,10 +110,27 @@ async def test_load_pipette_assigns_id(
     res = await handler.load_pipette(
         pipette_name=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
+        pipette_id=None,
     )
 
     assert type(res) == LoadedPipette
     assert res.pipette_id == "unique-id"
+
+
+async def test_load_pipette_uses_provided_id(
+    mock_resources_with_data: AsyncMock,
+    handler: EquipmentHandler,
+) -> None:
+    """It should use the provided ID rather than generating an ID for the pipette."""
+    res = await handler.load_pipette(
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+        pipette_id="my pipette id"
+    )
+
+    assert type(res) == LoadedPipette
+    assert res.pipette_id == "my pipette id"
+    mock_resources_with_data.id_generator.generate_id.assert_not_called()
 
 
 async def test_load_pipette_checks_checks_existence(
@@ -126,6 +143,7 @@ async def test_load_pipette_checks_checks_existence(
     await handler.load_pipette(
         pipette_name=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
+        pipette_id=None,
     )
 
     mock_state_view.pipettes.get_pipette_data_by_mount.assert_called_with(
@@ -151,6 +169,7 @@ async def test_load_pipette_checks_checks_existence_with_already_loaded(
     await handler.load_pipette(
         pipette_name=PipetteName.P300_SINGLE,
         mount=MountType.RIGHT,
+        pipette_id=None,
     )
 
     mock_state_view.pipettes.get_pipette_data_by_mount.assert_called_with(
@@ -181,4 +200,5 @@ async def test_load_pipette_raises_if_pipette_not_attached(
         await handler.load_pipette(
             pipette_name=PipetteName.P300_SINGLE,
             mount=MountType.LEFT,
+            pipette_id=None,
         )
