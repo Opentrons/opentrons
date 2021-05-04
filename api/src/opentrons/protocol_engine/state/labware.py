@@ -51,11 +51,11 @@ class LabwareState:
 
     def get_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""
-        raise NotImplementedError()
+        return self.get_labware_data_by_id(labware_id).definition
 
     def get_labware_location(self, labware_id: str) -> LabwareLocation:
         """Get labware location by the labware's unique identifier."""
-        raise NotImplementedError()
+        return self.get_labware_data_by_id(labware_id).location
 
     def get_all_labware(self) -> List[Tuple[str, LabwareData]]:
         """Get a list of all labware entries in state."""

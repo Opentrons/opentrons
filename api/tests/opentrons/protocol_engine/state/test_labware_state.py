@@ -31,16 +31,14 @@ def load_labware(
         location=location,
     )
     result = cmd.LoadLabwareResult(
-        labwareId=labware_id,
-        definition=definition,
-        calibration=calibration
+        labwareId=labware_id, definition=definition, calibration=calibration
     )
     command = cmd.CompletedCommand(
         created_at=datetime.now(tz=timezone.utc),
         started_at=datetime.now(tz=timezone.utc),
         completed_at=datetime.now(tz=timezone.utc),
         request=request,
-        result=result
+        result=result,
     )
 
     store.handle_command(command, "command-id")
@@ -54,8 +52,7 @@ def test_get_labware_data_bad_id(store: StateStore) -> None:
 
 
 def test_handles_load_labware(
-    store: StateStore,
-    well_plate_def: LabwareDefinition
+    store: StateStore, well_plate_def: LabwareDefinition
 ) -> None:
     """It should add the labware data to the state."""
     command = load_labware(
@@ -86,7 +83,7 @@ def test_loads_fixed_labware(
                 location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
                 definition=fixed_trash_def,
             )
-        ]
+        ],
     )
 
     assert store.labware.get_labware_data_by_id("fixedTrash") == LabwareData(
@@ -126,6 +123,42 @@ def test_get_all_labware(
     ]
 
 
+def test_get_labware_definition(
+    well_plate_def: LabwareDefinition,
+    store: StateStore,
+) -> None:
+    """It should return all labware."""
+    load_labware(
+        store=store,
+        labware_id="plate-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        definition=well_plate_def,
+        calibration=(1, 2, 3),
+    )
+
+    result = store.labware.get_definition("plate-id")
+
+    assert result == well_plate_def
+
+
+def test_get_labware_location(
+    well_plate_def: LabwareDefinition,
+    store: StateStore,
+) -> None:
+    """It should return all labware."""
+    load_labware(
+        store=store,
+        labware_id="plate-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        definition=well_plate_def,
+        calibration=(1, 2, 3),
+    )
+
+    result = store.labware.get_labware_location("plate-id")
+
+    assert result == DeckSlotLocation(slot=DeckSlotName.SLOT_1)
+
+
 def test_get_labware_has_quirk(
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
@@ -149,13 +182,11 @@ def test_get_labware_has_quirk(
     )
 
     well_plate_has_center_quirk = store.labware.get_labware_has_quirk(
-        "plate-id",
-        "centerMultichannelOnWells"
+        "plate-id", "centerMultichannelOnWells"
     )
 
     reservoir_has_center_quirk = store.labware.get_labware_has_quirk(
-        "reservoir-id",
-        "centerMultichannelOnWells"
+        "reservoir-id", "centerMultichannelOnWells"
     )
 
     assert well_plate_has_center_quirk is False
@@ -188,7 +219,7 @@ def test_quirks(
     reservoir_quirks = store.labware.get_quirks("reservoir-id")
 
     assert well_plate_quirks == []
-    assert reservoir_quirks == ['centerMultichannelOnWells', 'touchTipDisabled']
+    assert reservoir_quirks == ["centerMultichannelOnWells", "touchTipDisabled"]
 
 
 def test_get_well_definition_bad_id(
@@ -231,8 +262,7 @@ def test_get_well_definition(
 
 
 def test_get_tip_length_raises_with_non_tip_rack(
-    well_plate_def: LabwareDefinition,
-    store: StateStore
+    well_plate_def: LabwareDefinition, store: StateStore
 ) -> None:
     """It should raise if you try to get the tip length of a regular labware."""
     load_labware(
@@ -248,8 +278,7 @@ def test_get_tip_length_raises_with_non_tip_rack(
 
 
 def test_get_tip_length_gets_length_from_definition(
-    tip_rack_def: LabwareDefinition,
-    store: StateStore
+    tip_rack_def: LabwareDefinition, store: StateStore
 ) -> None:
     """It should return the tip length from the definition."""
     load_labware(
@@ -265,8 +294,7 @@ def test_get_tip_length_gets_length_from_definition(
 
 
 def test_get_labware_uri_from_definition(
-    tip_rack_def: LabwareDefinition,
-    store: StateStore
+    tip_rack_def: LabwareDefinition, store: StateStore
 ) -> None:
     """It should return the tip length from the definition."""
     load_labware(
@@ -281,10 +309,7 @@ def test_get_labware_uri_from_definition(
     assert uri == "opentrons/opentrons_96_tiprack_300ul/1"
 
 
-def test_is_tiprack_true(
-    tip_rack_def: LabwareDefinition,
-    store: StateStore
-) -> None:
+def test_is_tiprack_true(tip_rack_def: LabwareDefinition, store: StateStore) -> None:
     """It should return true."""
     load_labware(
         store=store,
@@ -297,10 +322,7 @@ def test_is_tiprack_true(
     assert store.labware.is_tiprack("tip-rack-id") is True
 
 
-def test_is_tiprack_false(
-    reservoir_def: LabwareDefinition,
-    store: StateStore
-) -> None:
+def test_is_tiprack_false(reservoir_def: LabwareDefinition, store: StateStore) -> None:
     """It should return false."""
     load_labware(
         store=store,
@@ -313,10 +335,7 @@ def test_is_tiprack_false(
     assert store.labware.is_tiprack("res-rack-id") is False
 
 
-def test_get_load_name(
-    reservoir_def: LabwareDefinition,
-    store: StateStore
-) -> None:
+def test_get_load_name(reservoir_def: LabwareDefinition, store: StateStore) -> None:
     """It should return the load name."""
     load_labware(
         store=store,
@@ -326,13 +345,10 @@ def test_get_load_name(
         calibration=(1, 2, 3),
     )
 
-    assert store.labware.get_load_name("res-rack-id") == 'nest_12_reservoir_15ml'
+    assert store.labware.get_load_name("res-rack-id") == "nest_12_reservoir_15ml"
 
 
-def test_get_dimensions(
-    well_plate_def: LabwareDefinition,
-    store: StateStore
-) -> None:
+def test_get_dimensions(well_plate_def: LabwareDefinition, store: StateStore) -> None:
     """It should return the load name."""
     load_labware(
         store=store,
