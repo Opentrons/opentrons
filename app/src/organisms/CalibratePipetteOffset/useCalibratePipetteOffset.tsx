@@ -41,7 +41,7 @@ export function useCalibratePipetteOffset(
   robotName: string,
   sessionParams: Partial<PipetteOffsetCalibrationSessionParams>,
   onComplete: (() => unknown) | null = null
-): [Invoker, (React.ReactNode | null)] {
+): [Invoker, (JSX.Element | null)] {
   const createRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)

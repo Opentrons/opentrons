@@ -11,6 +11,7 @@ import { UpdateAppModal } from '..'
 import type { State } from '../../../redux/types'
 import type { ShellUpdateState, UpdateInfo } from '../../../redux/shell/types'
 import type { UpdateAppModalProps } from '..'
+import { ReactWrapper } from 'enzyme'
 
 // TODO(mc, 2020-10-06): this is a partial mock because shell/update
 // needs some reorg to split actions and selectors
@@ -21,8 +22,7 @@ jest.mock('../../../redux/shell/update', () => ({
 
 jest.mock('react-router-dom', () => ({ Link: () => <></> }))
 
-const getShellUpdateState: JestMockFn<[State], Partial<ShellUpdateState>> =
-  Shell.getShellUpdateState
+const getShellUpdateState = Shell.getShellUpdateState as jest.MockedFunction<typeof Shell.getShellUpdateState>
 
 const MOCK_STATE: State = ({ mockState: true } as any)
 
@@ -30,21 +30,21 @@ describe('UpdateAppModal', () => {
   const closeModal = jest.fn()
   const dismissAlert = jest.fn()
 
-  const render = (props: UpdateAppModalProps) => {
+  const render = (props: UpdateAppModalProps): ReturnType<typeof mountWithStore>=> {
     return mountWithStore(<UpdateAppModal {...props} />, {
       initialState: MOCK_STATE,
     })
   }
 
   beforeEach(() => {
-    getShellUpdateState.mockImplementation(state => {
+    getShellUpdateState.mockImplementation((state: State) => {
       expect(state).toBe(MOCK_STATE)
       return {
-        info: ({
+        info: {
           version: '1.2.3',
           releaseNotes: 'this is a release',
-        }: Partial<UpdateInfo>),
-      }
+        },
+      } as ShellUpdateState
     })
   })
 
@@ -84,7 +84,7 @@ describe('UpdateAppModal', () => {
     const { wrapper, store } = render({ closeModal })
     const downloadButton = wrapper
       .find('button')
-      .filterWhere(b => /download/i.test(b.text()))
+      .filterWhere((b: ReactWrapper) => /download/i.test(b.text()))
 
     downloadButton.invoke('onClick')()
 
@@ -92,11 +92,11 @@ describe('UpdateAppModal', () => {
   })
 
   it('should render a spinner if update is downloading', () => {
-    getShellUpdateState.mockReturnValue({ downloading: true })
+    getShellUpdateState.mockReturnValue({ downloading: true } as ShellUpdateState)
     const { wrapper } = render({ closeModal })
     const spinner = wrapper
       .find(Icon)
-      .filterWhere(i => i.prop('name') === 'ot-spinner')
+      .filterWhere((i: ReactWrapper)=> i.prop('name') === 'ot-spinner')
     const spinnerParent = spinner.closest(Flex)
 
     expect(spinnerParent.text()).toMatch(/download in progress/i)
@@ -105,11 +105,11 @@ describe('UpdateAppModal', () => {
   it('should render a instructional copy instead of release notes if update is downloaded', () => {
     getShellUpdateState.mockReturnValue({
       downloaded: true,
-      info: ({
+      info: {
         version: '1.2.3',
         releaseNotes: 'this is a release',
-      }: Partial<UpdateInfo>),
-    })
+      },
+    } as ShellUpdateState)
 
     const { wrapper } = render({ closeModal })
     const title = wrapper.find('h2')

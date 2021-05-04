@@ -11,31 +11,24 @@ import { useCalibratePipetteOffset } from '../useCalibratePipetteOffset'
 import { INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL } from '../../../organisms/CalibrationPanels'
 import { pipetteOffsetCalibrationStarted } from '../../../redux/analytics'
 
-import type { State } from '../../../redux/types'
-import type { SessionType } from '../../../redux/sessions'
+import type { Invoker } from '../useCalibratePipetteOffset'
 
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 jest.mock('lodash/uniqueId')
 
-const mockUniqueId: JestMockFn<[string | void], string> = uniqueId
-const mockGetRobotSessionOfType: JestMockFn<
-  [State, string, SessionType],
-  ReturnType<typeof Sessions.getRobotSessionOfType>
-> = Sessions.getRobotSessionOfType
-const mockGetRequestById: JestMockFn<
-  [State, string],
-  ReturnType<typeof RobotApi.getRequestById>
-> = RobotApi.getRequestById
+const mockUniqueId = uniqueId as jest.MockedFunction<typeof uniqueId>
+const mockGetRobotSessionOfType= Sessions.getRobotSessionOfType as jest.MockedFunction<typeof Sessions.getRobotSessionOfType>
+const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<typeof RobotApi.getRequestById>
 
 describe('useCalibratePipetteOffset hook', () => {
-  let startCalibration
-  let CalWizardComponent
+  let startCalibration: Invoker
+  let CalWizardComponent: JSX.Element | null
   const robotName = 'robotName'
   const mountString = 'left'
   const onComplete = jest.fn()
 
-  const TestUseCalibratePipetteOffset = () => {
+  const TestUseCalibratePipetteOffset = (): JSX.Element => {
     const [_startCalibration, _CalWizardComponent] = useCalibratePipetteOffset(
       robotName,
       {
