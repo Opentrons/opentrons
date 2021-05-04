@@ -53,7 +53,8 @@ def test_not_empty():
             "command": "equipment.loadPipette",
             "data": {
                 "pipetteName": "p10_single",
-                "mount": "left"
+                "mount": "left",
+                "pipetteId": None,
             }
         }
     })
@@ -61,7 +62,8 @@ def test_not_empty():
            command_definitions.EquipmentCommand.load_pipette
     assert request.data.data == pe_commands.LoadPipetteRequest(
         pipetteName="p10_single",
-        mount=MountType.LEFT
+        mount=MountType.LEFT,
+        pipetteId=None,
     )
 
     dt = datetime(2000, 1, 1)
@@ -81,7 +83,8 @@ def test_not_empty():
            command_definitions.EquipmentCommand.load_pipette
     assert response.data == pe_commands.LoadPipetteRequest(
         pipetteName="p10_single",
-        mount=MountType.LEFT
+        mount=MountType.LEFT,
+        pipetteId=None,
     )
     assert response.id == "id"
     assert response.createdAt == dt

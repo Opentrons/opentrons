@@ -86,6 +86,7 @@ stages:
           data: &create_pipette_data
             pipetteName: p300_single
             mount: right
+            pipetteId: null
     response:
       status_code: 200
       json:
@@ -100,6 +101,31 @@ stages:
           completedAt: !anystr
           result:
             pipetteId: !anystr
+  - name: Load pipette command specifying the id
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          command: equipment.loadPipette
+          data: &create_pipette_data_with_id
+            pipetteName: p10_single
+            mount: left
+            pipetteId: my pipette
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          id: !anystr
+          data: *create_pipette_data_with_id
+          command: equipment.loadPipette
+          status: executed
+          createdAt: !anystr
+          startedAt: !anystr
+          completedAt: !anystr
+          result:
+            pipetteId: my pipette
   - name: Delete the session
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}"
