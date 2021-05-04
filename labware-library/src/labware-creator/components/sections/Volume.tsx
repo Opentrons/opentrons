@@ -11,12 +11,12 @@ import styles from '../../styles.css'
 const maskTo2Decimal = makeMaskToDecimal(2)
 
 interface ContentProps {
-  labwareType: string
+  values: LabwareFields
 }
-
 const Content = (props: ContentProps): JSX.Element => {
+  const { values } = props
   // @ts-expect-error `includes` doesn't want to take null/undefined
-  const wellLabel = ['aluminumBlock', 'tubeRack'].includes(props.labwareType)
+  const wellLabel = ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
     ? 'tube'
     : 'well'
   return (
@@ -41,7 +41,7 @@ export const Volume = (): JSX.Element => {
       <SectionBody label="Volume">
         <>
           {getFormAlerts({ values, touched, errors, fieldList })}
-          <Content labwareType={values.labwareType} />
+          <Content values={values} />
         </>
       </SectionBody>
     </div>
