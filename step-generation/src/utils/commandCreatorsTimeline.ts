@@ -9,7 +9,7 @@ import type {
   RobotStateAndWarnings,
 } from '../types'
 export const commandCreatorsTimeline = (
-  commandCreators: Array<CurriedCommandCreator>,
+  commandCreators: CurriedCommandCreator[],
   invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): Timeline => {
@@ -18,9 +18,10 @@ export const commandCreatorsTimeline = (
       const prevRobotState =
         acc.timeline.length === 0
           ? initialRobotState
-          : last(acc.timeline).robotState
+          : // @ts-expect-error(SA, 2021-05-03): last might return undefined
+            last(acc.timeline).robotState
 
-      if (acc.errors) {
+      if (acc.errors != null) {
         // error short-circuit
         return acc
       }
@@ -29,14 +30,15 @@ export const commandCreatorsTimeline = (
         invariantContext,
         prevRobotState
       )
-
+      // @ts-expect-error(SA, 2021-05-03): errors does not exist on CommandsAndWarnings, need to type narrow
       if (commandCreatorResult.errors) {
         return {
           timeline: acc.timeline,
+          // @ts-expect-error(SA, 2021-05-03):'errors' does not exist on CommandCreatorResult
           errors: commandCreatorResult.errors,
         }
       }
-
+      // @ts-expect-error(SA, 2021-05-03): commands does not exist on CommandCreatorErrorResponse, need to type narrow
       const strippedCommands = stripNoOpCommands(commandCreatorResult.commands)
       const nextRobotStateAndWarnings = strippedCommands.reduce(
         (acc: RobotStateAndWarnings, command) =>
@@ -51,6 +53,7 @@ export const commandCreatorsTimeline = (
         }
       )
       const nextResult = {
+        // @ts-expect-error(SA, 2021-05-03): commands does not exist on CommandCreatorErrorResponse, need to type narrow
         commands: commandCreatorResult.commands,
         robotState: nextRobotStateAndWarnings.robotState,
         warnings: commandCreatorResult.warnings,

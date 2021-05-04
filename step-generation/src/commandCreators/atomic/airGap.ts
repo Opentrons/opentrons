@@ -6,7 +6,8 @@ import {
   thermocyclerPipetteCollision,
 } from '../../utils'
 
-import type { AirGapParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { AirGapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
 export const airGap: CommandCreator<AirGapParams> = (
@@ -17,7 +18,7 @@ export const airGap: CommandCreator<AirGapParams> = (
   const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
 
   const actionName = 'airGap'
-  const errors: Array<CommandCreatorError> = []
+  const errors: CommandCreatorError[] = []
 
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
 
@@ -88,9 +89,9 @@ export const airGap: CommandCreator<AirGapParams> = (
     return { errors }
   }
 
-  const commands = [
+  const commands: Command[] = [
     {
-      command: 'airGap',
+      command: actionName,
       params: {
         pipette,
         volume,

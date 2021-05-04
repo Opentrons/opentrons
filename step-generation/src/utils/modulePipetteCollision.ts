@@ -1,7 +1,11 @@
 import { GEN_ONE_MULTI_PIPETTES } from '@opentrons/shared-data'
 import { MODULES_WITH_COLLISION_ISSUES } from '../constants'
-import type { PipetteEntity } from '@opentrons/step-generation'
-import type { DeckSlot, InvariantContext, RobotState } from '../types'
+import type {
+  DeckSlot,
+  PipetteEntity,
+  InvariantContext,
+  RobotState,
+} from '../types'
 export const modulePipetteCollision = (args: {
   pipette: string | null | undefined
   labware: string | null | undefined
@@ -32,7 +36,7 @@ export const modulePipetteCollision = (args: {
   const labwareInDangerZone = Object.keys(invariantContext.moduleEntities).some(
     moduleId => {
       const moduleModel = invariantContext.moduleEntities[moduleId].model
-
+      // @ts-expect-error(SA, 2021-05-03): need to type narrow
       if (MODULES_WITH_COLLISION_ISSUES.includes(moduleModel)) {
         const moduleSlot: DeckSlot | null | undefined =
           prevRobotState.modules[moduleId]?.slot

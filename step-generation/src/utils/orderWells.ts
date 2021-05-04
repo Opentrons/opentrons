@@ -16,9 +16,8 @@ import type { WellOrderOption } from '../types'
 //   ['A2', 'B2']      === /        ['B1', 'B2']
 // ]                      /       ]
 //
-const _orderingColsToRows = (
-  ordering: Array<Array<string>>
-): Array<Array<string>> => zipWith(...ordering, (...col) => compact(uniq(col))) // $FlowFixMe(BC, 2018-08-27): flow-typed for lodash zipWith only supports <4 inner arrays
+const _orderingColsToRows = (ordering: string[][]): string[][] =>
+  zipWith(...ordering, (...col) => compact(uniq(col))) // $FlowFixMe(BC, 2018-08-27): flow-typed for lodash zipWith only supports <4 inner arrays
 
 // given a default "ordering" 2d array from labware definitions
 // where each inner array represents a physical column of wells
@@ -26,10 +25,11 @@ const _orderingColsToRows = (
 // this function returns a 1d array of wells from the labware
 // ordered by the given traversal technique
 export const orderWells = (
-  defaultOrdering: Array<Array<string>>,
+  defaultOrdering: string[][],
   first: WellOrderOption,
   second: WellOrderOption
-): Array<string> => {
+): string[] => {
+  // @ts-expect-error(SA, 2021-05-03): implicit any type
   let orderedWells = []
 
   if (first === 't2b') {
@@ -65,6 +65,6 @@ export const orderWells = (
         .map(col => col.slice().reverse())
     }
   }
-
+  // @ts-expect-error(SA, 2021-05-03): implicit any type
   return flatten(orderedWells)
 }

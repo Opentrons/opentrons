@@ -6,12 +6,12 @@ import type {
   TCProfileParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureArgs,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { ThermocyclerModuleState } from '@opentrons/step-generation'
+} from '@opentrons/shared-data/lib/protocol/types/schemaV4'
 import type {
   InvariantContext,
   RobotStateAndWarnings,
   RobotState,
+  ThermocyclerModuleState,
 } from '../types'
 
 const _getThermocyclerModuleState = (
@@ -136,6 +136,7 @@ export const forThermocyclerRunProfile = (
   const moduleState = _getThermocyclerModuleState(robotState, module)
 
   if (profile.length > 0) {
+    // @ts-expect-error (sa, 2021-05-03): last might return undefined
     moduleState.blockTargetTemp = last(profile).temperature
   }
 }

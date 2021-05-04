@@ -1,6 +1,6 @@
 import { FIXED_TRASH_ID } from '../../constants'
 import type { CommandCreator } from '../../types'
-type DropTipArgs = {
+interface DropTipArgs {
   pipette: string
 }
 

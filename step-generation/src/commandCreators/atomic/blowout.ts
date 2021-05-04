@@ -1,8 +1,8 @@
 import * as errorCreators from '../../errorCreators'
-import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { BlowoutParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
 import type { CommandCreatorError, CommandCreator } from '../../types'
 
-// @ts-expect-error (sa, 2021-05-03): Type 'undefined' is not assignable to type 'CommandCreatorError[]'
+// @ts-expect-error (sa, 2021-05-03): TS does not like conditionally checking errors.length
 export const blowout: CommandCreator<BlowoutParams> = (
   args,
   invariantContext,

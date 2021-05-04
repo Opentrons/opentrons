@@ -1,6 +1,6 @@
 import * as errorCreators from '../../errorCreators'
 import { isValidSlot } from '../../utils/isValidSlot'
-import type { MoveToSlotParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { MoveToSlotParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 export const moveToSlot: CommandCreator<MoveToSlotParams> = (
   args,

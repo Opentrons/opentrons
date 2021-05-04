@@ -10,7 +10,7 @@ import {
   getLocationTotalVolume,
 } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
-import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { AspirateParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 export function forAspirate(
   params: AspirateParams,
@@ -28,6 +28,7 @@ export function forAspirate(
     params.well
   )
   assert(
+    // @ts-expect-error (sa, 2021-05-03): this assert is unnecessary
     uniq(wellsForTips).length === allWellsShared ? 1 : wellsForTips.length,
     `expected all wells to be shared, or no wells to be shared. Got: ${JSON.stringify(
       wellsForTips

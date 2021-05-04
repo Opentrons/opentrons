@@ -27,7 +27,7 @@ import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
 import type {
   AspirateParams,
   DispenseParams,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+} from '@opentrons/shared-data/lib/protocol/types/schemaV3'
 import type { ConsolidateArgs } from '../types'
 const airGapHelper = makeAirGapHelper({
   offsetFromBottomMm: 11.54,

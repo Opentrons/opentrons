@@ -3,7 +3,7 @@ import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
 } from '../../utils'
-import type { MoveToWellParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
+import type { MoveToWellParams } from '@opentrons/shared-data/lib/protocol/types/schemaV5'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Move to specified well of labware, with optional offset and pathing options. */

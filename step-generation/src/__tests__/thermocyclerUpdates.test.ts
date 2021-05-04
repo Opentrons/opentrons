@@ -23,7 +23,7 @@ import type {
   TCProfileParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureArgs,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+} from '@opentrons/shared-data/lib/protocol/types/schemaV4'
 import type { ThermocyclerModuleState } from '../types'
 const forThermocyclerSetTargetBlockTemperature = makeImmutableStateUpdater(
   _forThermocyclerSetTargetBlockTemperature

@@ -1,4 +1,3 @@
-import { $PropertyType } from 'utility-types'
 import assert from 'assert'
 // TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
 import { orderWells } from './utils'
@@ -9,13 +8,14 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type {
+  InvariantContext,
   ModuleTemporalProperties,
+  RobotState,
   ThermocyclerModuleState,
-} from '@opentrons/step-generation'
-import type { InvariantContext, RobotState } from './'
+} from './'
 export function sortLabwareBySlot(
-  labwareState: $PropertyType<RobotState, 'labware'>
-): Array<string> {
+  labwareState: RobotState['labware']
+): string[] {
   return sortBy<string>(Object.keys(labwareState), (id: string) =>
     parseInt(labwareState[id].slot)
   )
@@ -33,6 +33,8 @@ export function _getNextTip(args: {
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
   const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
 
+  // @ts-expect-error (sa, 2021-05-03): add types to hasTip
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const hasTip = wellName => tiprackWellsState[wellName]
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
@@ -47,7 +49,7 @@ export function _getNextTip(args: {
     // return first well in the column (for 96-well format, the 'A' row)
     const tiprackColumns = tiprackDef.ordering
     const fullColumn = tiprackColumns.find(col => col.every(hasTip))
-    return fullColumn ? fullColumn[0] : null
+    return fullColumn != null ? fullColumn[0] : null
   }
 
   assert(false, `Pipette ${pipetteId} has no channels/spec, cannot _getNextTip`)
@@ -138,13 +140,13 @@ export function getPipetteWithTipMaxVol(
     )
     return NaN
   }
-
+  // @ts-expect-error(SA, 2021-05-03): ts thinks these might be falsy even though we're doing an assert above
   return min([tiprackTipVol, pipetteMaxVol])
 }
 export function getModuleState(
   robotState: RobotState,
   module: string
-): $PropertyType<ModuleTemporalProperties, 'moduleState'> {
+): ModuleTemporalProperties['moduleState'] {
   if (!(module in robotState.modules)) {
     console.warn(
       `getModuleState expected module id "${module}" to be in robot state`

@@ -1,6 +1,6 @@
 import { removePairs } from './removePairs'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
 
 const _isEqualMix = (
   a: AspDispAirgapParams,

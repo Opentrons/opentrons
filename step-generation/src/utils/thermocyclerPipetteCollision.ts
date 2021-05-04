@@ -1,9 +1,8 @@
-import { $PropertyType } from 'utility-types'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import type { RobotState } from '../'
 export const thermocyclerPipetteCollision = (
-  modules: $PropertyType<RobotState, 'modules'>,
-  labware: $PropertyType<RobotState, 'labware'>,
+  modules: RobotState['modules'],
+  labware: RobotState['labware'],
   labwareId: string
 ): boolean => {
   const labwareSlot: string = labware[labwareId]?.slot

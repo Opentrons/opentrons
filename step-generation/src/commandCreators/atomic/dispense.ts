@@ -3,7 +3,7 @@ import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
 } from '../../utils'
-import type { DispenseParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { DispenseParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Dispense with given args. Requires tip. */

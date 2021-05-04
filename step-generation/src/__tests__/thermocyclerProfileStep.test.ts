@@ -5,7 +5,7 @@ import {
   getStateAndContextTempTCModules,
   getSuccessResult,
 } from '../__fixtures__'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV4'
 import type {
   ThermocyclerModuleState,
   ThermocyclerProfileStepArgs,

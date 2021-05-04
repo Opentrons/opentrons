@@ -1,4 +1,3 @@
-import { $PropertyType } from 'utility-types'
 import assert from 'assert'
 import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
@@ -13,22 +12,23 @@ import {
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
+import type { BlowoutParams } from '@opentrons/shared-data/lib/protocol/types/schemaV4'
 import type {
-  LocationLiquidState,
+  CurriedCommandCreator,
   InvariantContext,
+  LabwareEntity,
+  LocationLiquidState,
+  PipetteEntity,
   RobotState,
   SourceAndDest,
-  CurriedCommandCreator,
 } from '../types'
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
-export function repeatArray<T>(array: Array<T>, repeats: number): Array<T> {
-  return flatMap(range(repeats), (i: number): Array<T> => array)
+export function repeatArray<T>(array: T[], repeats: number): T[] {
+  return flatMap(range(repeats), (i: number): T[] => array)
 }
-type Vol = {
+interface Vol {
   volume: number
 }
 
@@ -144,7 +144,7 @@ export function getWellsForTips(
   labwareDef: LabwareDefinition2,
   well: string
 ): {
-  wellsForTips: Array<string>
+  wellsForTips: string[]
   allWellsShared: boolean
 } {
   // Array of wells corresponding to the tip at each position.
@@ -181,16 +181,16 @@ export function getWellsForTips(
 // the SOURCE_WELL_BLOWOUT_DESTINATION / DEST_WELL_BLOWOUT_DESTINATION
 // special strings, or to a labware ID.
 export const blowoutUtil = (args: {
-  pipette: $PropertyType<BlowoutParams, 'pipette'>
+  pipette: BlowoutParams['pipette']
   sourceLabwareId: string
-  sourceWell: $PropertyType<BlowoutParams, 'well'>
+  sourceWell: BlowoutParams['well']
   destLabwareId: string
-  destWell: $PropertyType<BlowoutParams, 'well'>
+  destWell: BlowoutParams['well']
   blowoutLocation: string | null | undefined
   flowRate: number
   offsetFromTopMm: number
   invariantContext: InvariantContext
-}): Array<CurriedCommandCreator> => {
+}): CurriedCommandCreator[] => {
   const {
     pipette,
     sourceLabwareId,
@@ -240,7 +240,7 @@ export const blowoutUtil = (args: {
 }
 export function createEmptyLiquidState(
   invariantContext: InvariantContext
-): $PropertyType<RobotState, 'liquidState'> {
+): RobotState['liquidState'] {
   const { labwareEntities, pipetteEntities } = invariantContext
   return {
     pipettes: reduce(
@@ -300,9 +300,9 @@ export const getDispenseAirGapLocation = (args: {
 // NOTE: pipettes have no tips, tiprack are full
 export function makeInitialRobotState(args: {
   invariantContext: InvariantContext
-  labwareLocations: $PropertyType<RobotState, 'labware'>
-  moduleLocations: $PropertyType<RobotState, 'modules'>
-  pipetteLocations: $PropertyType<RobotState, 'pipettes'>
+  labwareLocations: RobotState['labware']
+  moduleLocations: RobotState['modules']
+  pipetteLocations: RobotState['pipettes']
 }): RobotState {
   const {
     invariantContext,

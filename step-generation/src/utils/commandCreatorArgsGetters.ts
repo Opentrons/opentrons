@@ -12,8 +12,10 @@ export const getPipetteIdFromCCArgs = (
   args.commandCreatorFnName !== 'disengageMagnet' &&
   args.commandCreatorFnName !== 'setTemperature' &&
   args.commandCreatorFnName !== 'deactivateTemperature' &&
+  // @ts-expect-error(SA, 2021-05-03): pipette does not exist on AwaitTemperatureArgs, need to type narrow
   args.pipette
-    ? args.pipette
+    ? // @ts-expect-error(SA, 2021-05-03): pipette does not exist on AwaitTemperatureArgs, need to type narrow
+      args.pipette
     : null
 
 /** If command creator is of a type that doesn't ever have wells, return true */

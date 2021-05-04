@@ -1,5 +1,5 @@
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
-import type { PipetteAccessParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { PipetteAccessParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 export function forDropTip(
   params: PipetteAccessParams,

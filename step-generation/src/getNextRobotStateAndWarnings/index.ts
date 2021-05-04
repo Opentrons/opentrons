@@ -24,7 +24,7 @@ import {
   forSetTemperature,
   forDeactivateTemperature,
 } from './temperatureUpdates'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
+import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
 import type {
   InvariantContext,
   RobotState,

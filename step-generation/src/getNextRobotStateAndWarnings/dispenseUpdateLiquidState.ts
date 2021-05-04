@@ -1,4 +1,3 @@
-import { $PropertyType } from 'utility-types'
 import assert from 'assert'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
@@ -14,8 +13,8 @@ import type {
   LocationLiquidState,
   SourceAndDest,
 } from '../types'
-type LiquidState = $PropertyType<RobotState, 'liquidState'>
-type DispenseUpdateLiquidStateArgs = {
+type LiquidState = RobotState['liquidState']
+interface DispenseUpdateLiquidStateArgs {
   invariantContext: InvariantContext
   prevLiquidState: LiquidState
   labware: string
