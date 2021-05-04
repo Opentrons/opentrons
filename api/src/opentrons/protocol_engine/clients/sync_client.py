@@ -1,6 +1,6 @@
 """Synchronous ProtocolEngine client module."""
 from uuid import uuid4
-from typing import cast
+from typing import cast, Optional
 
 from opentrons.types import MountType
 
@@ -51,11 +51,13 @@ class SyncClient:
         self,
         pipette_name: PipetteName,
         mount: MountType,
+        pipette_id: Optional[str],
     ) -> commands.LoadPipetteResult:
         """Execute a LoadPipetteRequest and return the result."""
         request = commands.LoadPipetteRequest(
             pipetteName=pipette_name,
             mount=mount,
+            pipetteId=pipette_id
         )
         result = self._transport.execute_command(
             request=request,

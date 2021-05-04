@@ -15,10 +15,12 @@ def test_load_pipette_request() -> None:
     request = LoadPipetteRequest(
         pipetteName=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
+        pipetteId=None
     )
 
     assert request.pipetteName == "p300_single"
     assert request.mount == MountType.LEFT
+    assert request.pipetteId is None
 
 
 def test_load_pipette_result() -> None:
@@ -37,6 +39,7 @@ async def test_load_pipette_implementation(mock_handlers: AsyncMock) -> None:
     request = LoadPipetteRequest(
         pipetteName=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
+        pipetteId="some id"
     )
     impl = request.get_implementation()
     result = await impl.execute(mock_handlers)
@@ -45,4 +48,5 @@ async def test_load_pipette_implementation(mock_handlers: AsyncMock) -> None:
     mock_handlers.equipment.load_pipette.assert_called_with(
         pipette_name="p300_single",
         mount=MountType.LEFT,
+        pipette_id="some id",
     )

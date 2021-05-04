@@ -1,6 +1,6 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Tuple, Optional
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import MountType
@@ -77,8 +77,19 @@ class EquipmentHandler:
         self,
         pipette_name: PipetteName,
         mount: MountType,
+        pipette_id: Optional[str],
     ) -> LoadedPipette:
-        """Ensure the requested pipette is attached."""
+        """Ensure the requested pipette is attached.
+
+        Args:
+            pipette_name: The pipette name.
+            mount: The mount on which pipette must be attached.
+            pipette_id: An optional identifier to assign the pipette. If None, an
+                identifier will be generated.
+
+        Returns:
+            A LoadedPipette object.
+        """
         other_mount = mount.other_mount()
         other_pipette = self._state.pipettes.get_pipette_data_by_mount(
             other_mount,
@@ -97,6 +108,7 @@ class EquipmentHandler:
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 
-        pipette_id = self._resources.id_generator.generate_id()
+        pipette_id = pipette_id if pipette_id else \
+            self._resources.id_generator.generate_id()
 
         return LoadedPipette(pipette_id=pipette_id)

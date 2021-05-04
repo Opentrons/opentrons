@@ -25,6 +25,7 @@ def load_pipette_command(now: datetime) -> CompletedLoadLabware:
         request=cmd.LoadPipetteRequest(
             pipetteName=PipetteName.P300_SINGLE,
             mount=MountType.LEFT,
+            pipetteId=None,
         ),
         result=cmd.LoadPipetteResult(pipetteId="pipette-id"),
         created_at=now,

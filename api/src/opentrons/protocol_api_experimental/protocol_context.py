@@ -47,6 +47,7 @@ class ProtocolContext:  # noqa: D101
         result = self._engine_client.load_pipette(
             pipette_name=PipetteName(pipette_name),
             mount=Mount(mount),
+            pipette_id=None,
         )
 
         return PipetteContext(
