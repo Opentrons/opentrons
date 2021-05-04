@@ -39,10 +39,7 @@ class HardwareWrapper:
                 Path(app_settings.simulator_configuration_file_path))
         else:
             # Create the hardware
-            self._tm = await initialize_api(
-                hardware_server=app_settings.hardware_server_enable,
-                hardware_server_socket=app_settings.hardware_server_socket_path
-            )
+            self._tm = await initialize_api()
         await self.init_event_watchers()
         log.info("Opentrons API initialized")
         return self._tm

@@ -51,14 +51,6 @@ def __dir__():
     return sorted(__all__ + LEGACY_MODULES)
 
 
-try:
-    from opentrons.hardware_control.socket_server\
-        import run as install_hardware_server
-except ImportError:
-    async def install_hardware_server(sock_path, api):  # type: ignore
-        log.warning("Cannot start hardware server: missing dependency")
-
-
 log = logging.getLogger(__name__)
 
 try:
@@ -131,20 +123,11 @@ async def initialize_robot() -> ThreadManager:
     return hardware
 
 
-async def initialize(
-        hardware_server: bool = False,
-        hardware_server_socket: str = None) \
+async def initialize() \
         -> ThreadManager:
     """
     Initialize the Opentrons hardware returning a hardware instance.
-
-    :param hardware_server: Run a jsonrpc server allowing rpc to the  hardware
-     controller. Only works on buildroot because extra dependencies are
-     required.
-    :param hardware_server_socket: Override for the hardware server socket
     """
-    checked_socket = hardware_server_socket\
-        or "/var/run/opentrons-hardware.sock"
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
 
@@ -152,10 +135,5 @@ async def initialize(
     log.info(f"Robot Name: {name()}")
 
     hardware = await initialize_robot()
-
-    if hardware_server:
-        #  TODO: BC 2020-02-25 adapt hardware socket server to ThreadManager
-        await install_hardware_server(checked_socket,
-                                      hardware)  # type: ignore
 
     return hardware
