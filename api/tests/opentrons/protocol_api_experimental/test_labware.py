@@ -2,10 +2,11 @@
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_api_experimental import DeckSlotName, Labware, Point, errors
+from opentrons_shared_data.labware import dev_types
 
 
 @pytest.fixture
@@ -24,6 +25,14 @@ def engine_client(decoy: Decoy) -> ProtocolEngineClient:
 def subject(decoy: Decoy, engine_client: ProtocolEngineClient) -> Labware:
     """Get a Labware test subject with its dependencies mocked out."""
     return Labware(engine_client=engine_client, labware_id="labware-id")
+
+
+@pytest.fixture
+def labware_definition(
+        minimal_labware_def: dev_types.LabwareDefinition
+) -> LabwareDefinition:
+    """Create a labware definition fixture."""
+    return LabwareDefinition.parse_obj(minimal_labware_def)
 
 
 def test_labware_id_property(subject: Labware) -> None:
@@ -108,27 +117,27 @@ def test_labware_quirks(
 def test_labware_parameters(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
-    minimal_labware_def: LabwareDefinition,
+    labware_definition: LabwareDefinition,
     subject: Labware,
 ) -> None:
     """It should return the labware definition's parameters."""
     decoy.when(
         engine_client.state.labware.get_definition(labware_id="labware-id")
-    ).then_return(minimal_labware_def)
+    ).then_return(labware_definition)
 
-    assert subject.parameters == minimal_labware_def["parameters"]
+    assert subject.parameters == labware_definition.parameters
 
 
 def test_labware_magdeck_engage_height_not_compatible(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
-    minimal_labware_def: LabwareDefinition,
+    labware_definition: LabwareDefinition,
     subject: Labware,
 ) -> None:
     """It should return None for magdeck engage height if not in definition."""
     decoy.when(
         engine_client.state.labware.get_definition(labware_id="labware-id")
-    ).then_return(minimal_labware_def)
+    ).then_return(labware_definition)
 
     assert subject.magdeck_engage_height is None
 
@@ -136,15 +145,15 @@ def test_labware_magdeck_engage_height_not_compatible(
 def test_labware_magdeck_engage_height(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
-    minimal_labware_def: LabwareDefinition,
+    labware_definition: LabwareDefinition,
     subject: Labware,
 ) -> None:
     """It should return magdeck engage height from definition."""
-    minimal_labware_def["parameters"]["magneticModuleEngageHeight"] = 42.0
+    labware_definition.parameters.magneticModuleEngageHeight = 42.0
 
     decoy.when(
         engine_client.state.labware.get_definition(labware_id="labware-id")
-    ).then_return(minimal_labware_def)
+    ).then_return(labware_definition)
 
     assert subject.magdeck_engage_height == 42.0
 
@@ -152,13 +161,13 @@ def test_labware_magdeck_engage_height(
 def test_labware_is_not_tiprack(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
-    minimal_labware_def: LabwareDefinition,
+    labware_definition: LabwareDefinition,
     subject: Labware,
 ) -> None:
     """It should return False if not tiprack."""
     decoy.when(
         engine_client.state.labware.get_definition(labware_id="labware-id")
-    ).then_return(minimal_labware_def)
+    ).then_return(labware_definition)
 
     assert subject.is_tiprack is False
 
@@ -166,15 +175,15 @@ def test_labware_is_not_tiprack(
 def test_labware_tip_length(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
-    minimal_labware_def: LabwareDefinition,
+    labware_definition: LabwareDefinition,
     subject: Labware,
 ) -> None:
     """It should return tip length if present in the definition."""
-    minimal_labware_def["parameters"]["tipLength"] = 42.0
+    labware_definition.parameters.tipLength = 42.0
 
     decoy.when(
         engine_client.state.labware.get_definition(labware_id="labware-id")
-    ).then_return(minimal_labware_def)
+    ).then_return(labware_definition)
 
     assert subject.tip_length == 42.0
 
@@ -182,13 +191,13 @@ def test_labware_tip_length(
 def test_labware_no_tip_length(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
-    minimal_labware_def: LabwareDefinition,
+    labware_definition: LabwareDefinition,
     subject: Labware,
 ) -> None:
     """It should raise a LabwareIsNotTiprackError if tip length is not present."""
     decoy.when(
         engine_client.state.labware.get_definition(labware_id="labware-id")
-    ).then_return(minimal_labware_def)
+    ).then_return(labware_definition)
 
     with pytest.raises(errors.LabwareIsNotTipRackError):
         subject.tip_length
