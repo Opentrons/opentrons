@@ -10,17 +10,27 @@ import styles from '../../styles.css'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 
-const getContent = (): JSX.Element => (
-  <div className={styles.flex_row}>
-    <div className={styles.volume_instructions_column}>
-      <p>Total maximum volume of each well.</p>
-    </div>
+interface ContentProps {
+  labwareType: string
+}
 
-    <div className={styles.form_fields_column}>
-      <TextField name="wellVolume" inputMasks={[maskTo2Decimal]} units="μL" />
+const Content = (props: ContentProps): JSX.Element => {
+  // @ts-expect-error `includes` doesn't want to take null/undefined
+  const wellLabel = ['aluminumBlock', 'tubeRack'].includes(props.labwareType)
+    ? 'tube'
+    : 'well'
+  return (
+    <div className={styles.flex_row}>
+      <div className={styles.volume_instructions_column}>
+        <p>Total maximum volume of each {wellLabel}.</p>
+      </div>
+
+      <div className={styles.form_fields_column}>
+        <TextField name="wellVolume" inputMasks={[maskTo2Decimal]} units="μL" />
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export const Volume = (): JSX.Element => {
   const fieldList: Array<keyof LabwareFields> = ['wellVolume']
@@ -31,7 +41,7 @@ export const Volume = (): JSX.Element => {
       <SectionBody label="Volume">
         <>
           {getFormAlerts({ values, touched, errors, fieldList })}
-          {getContent()}
+          <Content labwareType={values.labwareType} />
         </>
       </SectionBody>
     </div>

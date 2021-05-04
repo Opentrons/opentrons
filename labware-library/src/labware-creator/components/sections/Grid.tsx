@@ -10,26 +10,28 @@ import { SectionBody } from './SectionBody'
 
 import styles from '../../styles.css'
 
-const getContent = (): JSX.Element => (
-  <div className={styles.flex_row}>
-    <div className={styles.instructions_column}>
-      <p>
-        The grid of wells on your labware is arranged via rows and columns. Rows
-        run horizontally across your labware (left to right). Columns run top to
-        bottom.
-      </p>
+const Content = (): JSX.Element => {
+  return (
+    <div className={styles.flex_row}>
+      <div className={styles.instructions_column}>
+        <p>
+          The grid of wells on your labware is arranged via rows and columns.
+          Rows run horizontally across your labware (left to right). Columns run
+          top to bottom.
+        </p>
+      </div>
+      <div className={styles.diagram_column}>
+        <GridImg />
+      </div>
+      <div className={styles.form_fields_column}>
+        <TextField name="gridRows" inputMasks={[maskToInteger]} />
+        <RadioField name="regularRowSpacing" options={yesNoOptions} />
+        <TextField name="gridColumns" inputMasks={[maskToInteger]} />
+        <RadioField name="regularColumnSpacing" options={yesNoOptions} />
+      </div>
     </div>
-    <div className={styles.diagram_column}>
-      <GridImg />
-    </div>
-    <div className={styles.form_fields_column}>
-      <TextField name="gridRows" inputMasks={[maskToInteger]} />
-      <RadioField name="regularRowSpacing" options={yesNoOptions} />
-      <TextField name="gridColumns" inputMasks={[maskToInteger]} />
-      <RadioField name="regularColumnSpacing" options={yesNoOptions} />
-    </div>
-  </div>
-)
+  )
+}
 
 export const Grid = (): JSX.Element => {
   const fieldList: Array<keyof LabwareFields> = [
@@ -39,13 +41,13 @@ export const Grid = (): JSX.Element => {
     'regularColumnSpacing',
   ]
   const { values, errors, touched } = useFormikContext<LabwareFields>()
-
-  return (
+  // @ts-expect-error `includes` doesn't want to take null/undefined
+  return ['aluminumBlock', 'tubeRack'].includes(values.labwareType) ? null : (
     <div className={styles.new_definition_section}>
       <SectionBody label="Grid">
         <>
           {getFormAlerts({ values, touched, errors, fieldList })}
-          {getContent()}
+          <Content />
         </>
       </SectionBody>
     </div>

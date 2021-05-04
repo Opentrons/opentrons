@@ -48,4 +48,25 @@ describe('Volume', () => {
     expect(screen.getByText('mock alerts'))
     expect(screen.getByText('wellVolume text field'))
   })
+
+  it('should render tubes when tubeRack is selected', () => {
+    formikConfig.initialValues.labwareType = 'tubeRack'
+    render(wrapInFormik(<Volume />, formikConfig))
+
+    expect(screen.getByText('Total maximum volume of each tube.'))
+  })
+
+  it('should render tubes when aluminumBlock is selected', () => {
+    formikConfig.initialValues.labwareType = 'aluminumBlock'
+    render(wrapInFormik(<Volume />, formikConfig))
+
+    expect(screen.getByText('Total maximum volume of each tube.'))
+  })
+
+  it('should render wells when wellplate is selected', () => {
+    formikConfig.initialValues.labwareType = 'wellPlate'
+    render(wrapInFormik(<Volume />, formikConfig))
+
+    expect(screen.getByText('Total maximum volume of each well.'))
+  })
 })

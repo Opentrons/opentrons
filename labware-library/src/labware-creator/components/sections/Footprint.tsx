@@ -11,7 +11,7 @@ import styles from '../../styles.css'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 
-const getContent = (): JSX.Element => (
+const Content = (): JSX.Element => (
   <div className={styles.flex_row}>
     <div className={styles.instructions_column}>
       <p>
@@ -54,7 +54,7 @@ export const Footprint = (): JSX.Element => {
         <>
           {getFormAlerts({ values, touched, errors, fieldList })}
           {getXYDimensionAlerts(values, touched)}
-          {getContent()}
+          <Content />
         </>
       </SectionBody>
     </div>

@@ -13,26 +13,33 @@ import styles from '../../styles.css'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 
-const getContent = (values: LabwareFields): JSX.Element => (
-  <div className={styles.flex_row}>
-    <div className={styles.instructions_column}>
-      <HeightGuidingText labwareType={values.labwareType} />
+interface ContentProps {
+  values: LabwareFields
+}
+
+const Content = (props: ContentProps): JSX.Element => {
+  const { values } = props
+  return (
+    <div className={styles.flex_row}>
+      <div className={styles.instructions_column}>
+        <HeightGuidingText labwareType={values.labwareType} />
+      </div>
+      <div className={styles.diagram_column}>
+        <HeightImg
+          labwareType={values.labwareType}
+          aluminumBlockChildType={values.aluminumBlockChildType}
+        />
+      </div>
+      <div className={styles.form_fields_column}>
+        <TextField
+          name="labwareZDimension"
+          inputMasks={[maskTo2Decimal]}
+          units="mm"
+        />
+      </div>
     </div>
-    <div className={styles.diagram_column}>
-      <HeightImg
-        labwareType={values.labwareType}
-        aluminumBlockChildType={values.aluminumBlockChildType}
-      />
-    </div>
-    <div className={styles.form_fields_column}>
-      <TextField
-        name="labwareZDimension"
-        inputMasks={[maskTo2Decimal]}
-        units="mm"
-      />
-    </div>
-  </div>
-)
+  )
+}
 
 export const Height = (): JSX.Element => {
   const fieldList: Array<keyof LabwareFields> = [
@@ -54,7 +61,7 @@ export const Height = (): JSX.Element => {
         <>
           {getFormAlerts({ values, touched, errors, fieldList })}
           {getHeightAlerts(values, touched)}
-          {getContent(values)}
+          <Content values={values} />
         </>
       </SectionBody>
     </div>

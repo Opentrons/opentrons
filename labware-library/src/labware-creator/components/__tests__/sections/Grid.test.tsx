@@ -65,7 +65,7 @@ describe('Grid', () => {
     })
 
     when(getFormAlertsMock)
-      .expectCalledWith({
+      .calledWith({
         values: getDefaultFormState(),
         touched: {},
         errors: {},
@@ -86,6 +86,11 @@ describe('Grid', () => {
     render(wrapInFormik(<Grid />, formikConfig))
     expect(screen.getByText('Grid'))
     expect(screen.getByText('mock alerts'))
+    expect(
+      screen.getByText(
+        'The grid of wells on your labware is arranged via rows and columns. Rows run horizontally across your labware (left to right). Columns run top to bottom.'
+      )
+    )
     expect(screen.getByText('gridRows text field'))
     expect(screen.getByText('regularRowSpacing radio group'))
     expect(screen.getByText('gridColumns text field'))
