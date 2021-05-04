@@ -1,5 +1,4 @@
 // @flow
-import type { Mount } from '@opentrons/components'
 import typeof {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -7,8 +6,9 @@ import typeof {
 } from '@opentrons/shared-data'
 import type {
   LabwareDefinition2,
-  ModuleRealType,
   ModuleModel,
+  ModuleRealType,
+  PipetteMount,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type {
@@ -32,7 +32,7 @@ export type LabwareTemporalProperties = {|
 |}
 
 export type PipetteTemporalProperties = {|
-  mount: Mount,
+  mount: PipetteMount,
 |}
 
 export type MagneticModuleState = {|
