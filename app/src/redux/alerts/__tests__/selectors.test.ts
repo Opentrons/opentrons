@@ -7,7 +7,7 @@ import type { AlertId } from '../types'
 
 jest.mock('../../config/selectors')
 
-const getConfig: JestMockFn<[State], Partial<Config> | null> = Cfg.getConfig
+const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
 
 const MOCK_ALERT_1: AlertId = 'mockAlert1' as any
 const MOCK_ALERT_2: AlertId = 'mockAlert2' as any

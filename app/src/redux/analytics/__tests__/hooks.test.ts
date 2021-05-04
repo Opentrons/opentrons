@@ -14,7 +14,7 @@ import type { AnalyticsEvent, AnalyticsConfig } from '../types'
 jest.mock('../../config')
 jest.mock('../mixpanel')
 
-const getConfig: JestMockFn<[State], Partial<Config> | null> = Cfg.getConfig
+const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
 const trackEvent: JestMockFn<[AnalyticsEvent, AnalyticsConfig], void> =
   Mixpanel.trackEvent
 

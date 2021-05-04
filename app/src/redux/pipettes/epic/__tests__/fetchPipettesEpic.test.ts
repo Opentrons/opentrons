@@ -21,13 +21,13 @@ jest.mock('../../../discovery/selectors')
 const mockState = { state: true }
 const { mockRobot } = Fixtures
 
-const mockFetchRobotApi: JestMockFn<
-  [RobotHost, RobotApiRequestOptions],
-  Observable<RobotApiResponse>
-> = RobotApiHttp.fetchRobotApi
+const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
+  typeof RobotApiHttp.fetchRobotApi
+>
 
-const mockGetRobotByName: JestMockFn<[any, string], mixed> =
-  DiscoverySelectors.getRobotByName
+const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
+  typeof DiscoverySelectors.getRobotByName
+>
 
 describe('fetchPipettesEpic', () => {
   let testScheduler

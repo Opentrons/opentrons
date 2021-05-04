@@ -1,4 +1,3 @@
-
 import { TestScheduler } from 'rxjs/testing'
 import { selectors as RobotSelectors } from '../../../../robot'
 import * as Actions from '../../actions'
@@ -16,15 +15,17 @@ jest.mock('../../../../sessions/selectors')
 const mockState = { state: true }
 const mockRobotName = 'robot-name'
 
-const mockGetConnectedRobotName: JestMockFn<[any], ?string> =
-  RobotSelectors.getConnectedRobotName
+const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<
+  typeof RobotSelectors.getConnectedRobotName
+>
 
-const mockGetRobotSessionById: JestMockFn<[any, string, string], mixed> =
-  SessionSelectors.getRobotSessionById
+const mockGetRobotSessionById = SessionSelectors.getRobotSessionById as jest.MockedFunction<
+  typeof SessionSelectors.getRobotSessionById
+>
 
 const SPECS: Array<{
-  describe: string,
-  robotSession: SessionTypes.Session,
+  describe: string
+  robotSession: SessionTypes.Session
 }> = [
   {
     describe: 'tip length calibration',

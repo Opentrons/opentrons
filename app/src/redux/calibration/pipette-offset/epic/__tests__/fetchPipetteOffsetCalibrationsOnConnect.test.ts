@@ -1,4 +1,3 @@
-
 import { TestScheduler } from 'rxjs/testing'
 import { selectors as RobotSelectors } from '../../../../robot'
 import * as DiscoverySelectors from '../../../../discovery/selectors'
@@ -12,11 +11,13 @@ jest.mock('../../../../discovery/selectors')
 const mockState = { state: true }
 const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
-const mockGetRobotByName: JestMockFn<[any, string], mixed> =
-  DiscoverySelectors.getRobotByName
+const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
+  typeof DiscoverySelectors.getRobotByName
+>
 
-const mockGetConnectedRobotName: JestMockFn<[any], ?string> =
-  RobotSelectors.getConnectedRobotName
+const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<
+  typeof RobotSelectors.getConnectedRobotName
+>
 
 describe('fetchPipetteOffsetCalibrationsOnConnectEpic', () => {
   let testScheduler

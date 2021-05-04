@@ -13,11 +13,13 @@ jest.mock('../../../robot/selectors')
 const mockState = { state: true }
 const { mockRobot } = Fixtures
 
-const mockGetRobotByName: JestMockFn<[any, string], mixed> =
-  DiscoverySelectors.getRobotByName
+const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
+  typeof DiscoverySelectors.getRobotByName
+>
 
-const mockGetConnectedRobotName: JestMockFn<[any], ?string> =
-  RobotSelectors.getConnectedRobotName
+const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<
+  typeof RobotSelectors.getConnectedRobotName
+>
 
 describe('fetchPipettesOnConnectEpic', () => {
   let testScheduler
