@@ -35,15 +35,15 @@ import { LinkOut } from './components/LinkOut'
 import { RadioField } from './components/RadioField'
 import { Section } from './components/Section'
 import { TextField } from './components/TextField'
-import { HeightGuidingText } from './components/HeightGuidingText'
+
 import { ImportErrorModal } from './components/ImportErrorModal'
 import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
 import { UploadExisting } from './components/sections/UploadExisting'
 import { Regularity } from './components/sections/Regularity'
-import { getHeightAlerts } from './components/utils/getHeightAlerts'
+
 import { Footprint } from './components/sections/Footprint'
+import { Height } from './components/sections/Height'
 import {
-  HeightImg,
   GridImg,
   WellXYImg,
   XYSpacingImg,
@@ -469,35 +469,7 @@ export const LabwareCreator = (): JSX.Element => {
                   {/* PAGE 1 - Labware */}
                   <Regularity />
                   <Footprint />
-                  <Section
-                    label={
-                      // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
-                      ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
-                        ? 'Total Height'
-                        : 'Height'
-                    }
-                    fieldList={['labwareZDimension']}
-                    additionalAlerts={getHeightAlerts(values, touched)}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <HeightGuidingText labwareType={values.labwareType} />
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <HeightImg
-                          labwareType={values.labwareType}
-                          aluminumBlockChildType={values.aluminumBlockChildType}
-                        />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="labwareZDimension"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <Height />
                   <Section
                     label="Grid"
                     fieldList={[
