@@ -136,7 +136,6 @@ async def test_load_instrument(command_executor, mock_protocol_engine):
     request_body = pe_commands.LoadPipetteRequest(
         pipetteName="p10_single",
         mount=MountType.LEFT,
-        pipetteId=None,
     )
 
     protocol_engine_response = pe_commands.CompletedCommand(

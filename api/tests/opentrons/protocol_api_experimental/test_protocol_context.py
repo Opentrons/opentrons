@@ -50,7 +50,6 @@ def test_load_pipette(
         engine_client.load_pipette(
             pipette_name=PipetteName.P300_SINGLE,
             mount=Mount.LEFT,
-            pipette_id=None,
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="pipette-id"))
 
@@ -72,7 +71,6 @@ def test_load_instrument(
         engine_client.load_pipette(
             pipette_name=PipetteName.P300_MULTI,
             mount=Mount.LEFT,
-            pipette_id=None
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="left-pipette-id"))
 
@@ -80,7 +78,6 @@ def test_load_instrument(
         engine_client.load_pipette(
             pipette_name=PipetteName.P300_SINGLE,
             mount=Mount.RIGHT,
-            pipette_id=None
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="right-pipette-id"))
 

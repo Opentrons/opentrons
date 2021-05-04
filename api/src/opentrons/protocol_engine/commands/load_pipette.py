@@ -23,7 +23,7 @@ class LoadPipetteRequest(BaseModel):
         description="The mount the pipette should be present on.",
     )
     pipetteId: Optional[str] = Field(
-        ...,
+        None,
         description="An optional ID to assign to this pipette. If None, an ID "
                     "will be generated."
     )

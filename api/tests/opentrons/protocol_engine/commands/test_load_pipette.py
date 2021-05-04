@@ -15,7 +15,6 @@ def test_load_pipette_request() -> None:
     request = LoadPipetteRequest(
         pipetteName=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
-        pipetteId=None
     )
 
     assert request.pipetteName == "p300_single"

@@ -92,7 +92,6 @@ def test_load_pipette(
     request = commands.LoadPipetteRequest(
         pipetteName=PipetteName.P300_SINGLE,
         mount=MountType.RIGHT,
-        pipetteId=None,
     )
 
     expected_result = commands.LoadPipetteResult(pipetteId="abc123")
@@ -104,7 +103,6 @@ def test_load_pipette(
     result = subject.load_pipette(
         pipette_name=PipetteName.P300_SINGLE,
         mount=MountType.RIGHT,
-        pipette_id=None,
     )
 
     assert result == expected_result

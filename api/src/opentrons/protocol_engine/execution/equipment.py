@@ -108,7 +108,7 @@ class EquipmentHandler:
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 
-        pipette_id = pipette_id if pipette_id else \
+        pipette_id = pipette_id if pipette_id is not None else \
             self._resources.id_generator.generate_id()
 
         return LoadedPipette(pipette_id=pipette_id)
