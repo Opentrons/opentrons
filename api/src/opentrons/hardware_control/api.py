@@ -47,7 +47,7 @@ PipetteHandlingData = Tuple[Pipette, top_types.Mount]
 
 class PauseManager:
     """ This class determines whether or not the hardware controller should
-    pause or resume by evaluating the pause and resume targets. The use of two
+    pause or resume by evaluating the pause and resume types. The use of two
     pause types are used to separate the delay resume (triggered when the delay
     timer runs out) and the pause resume (trigged by user via the app).
     """
@@ -68,9 +68,6 @@ class PauseManager:
     def set_door(self, door_state):
         mod_log.info(f'setting door: {door_state}')
         self._is_door_blocking = self._evaluate_door_state(door_state)
-        if self._is_door_blocking:
-            # add a pause to the queue as it requies manual resume
-            self.pause(PauseType.PAUSE)
 
     def resume(self, pause_type: PauseType):
         # door should be closed before a resume from the app can be received

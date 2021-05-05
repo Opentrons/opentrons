@@ -36,14 +36,15 @@ def test_pause_and_delay_separation():
 
 def test_door_pause_protocol(enable_door_safety_switch):
     """
-    Test that when the door safety switch is enabled, door state OPEN
-    adds a pause to the queue, and does not resume until the door is closed
+    Test that when the door safety switch is enabled, pause cannot
+    be resumed until the door is closed
     """
     pause_mgr = PauseManager(door_state=DoorState.CLOSED)
     assert pause_mgr.queue == []
     assert not pause_mgr.should_pause
 
     pause_mgr.set_door(door_state=DoorState.OPEN)
+    pause_mgr.pause(PauseType.PAUSE)
     assert pause_mgr.queue == [PauseType.PAUSE]
     assert pause_mgr.should_pause
 
