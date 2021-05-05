@@ -30,7 +30,7 @@ const getAvailableShellUpdate: JestMockFn<[State], string | null> =
   ShellUpdate.getAvailableShellUpdate
 
 describe('shell epics', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     testScheduler = new TestScheduler((actual, expected) => {

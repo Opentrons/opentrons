@@ -21,7 +21,7 @@ const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.M
 >
 
 describe('clearAllSessionsOnDisconnectEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     mockGetRobotByName.mockReturnValue(mockRobot)

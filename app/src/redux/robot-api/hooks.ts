@@ -18,7 +18,7 @@ export type DispatchRequestsType = (...actions: ActionWithRequestMeta[]) => void
  * React hook to attach a unique request ID to and dispatch an API action
  * Note: dispatching will trigger a re-render of the component
  *
- * @returns {[action => mixed, string[]]} tuple of dispatch function and dispatched request IDs
+ * @returns {[(action: Action) => unknown, string[]]} tuple of dispatch function and dispatched request IDs
  *
  * @example
  * import { useDispatchApiRequest } from '../../robot-api'
@@ -68,7 +68,7 @@ export function useDispatchApiRequest(): [DispatchApiRequestType, string[]] {
  * upon dispatch of said action.
  * Note: dispatching will trigger a re-render of the component
  *
- * @returns {[action => mixed, string[]]} tuple of dispatch function and dispatched request IDs
+ * @returns {[(action: Action) => unknown, string[]]} tuple of dispatch function and dispatched request IDs
  *
  * @example
  * import { useDispatchApiRequests } from '../../robot-api'

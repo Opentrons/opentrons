@@ -16,7 +16,7 @@ const getU2EWindowsDriverStatus: JestMockFn<[State], DriverStatus> =
   Selectors.getU2EWindowsDriverStatus
 
 describe('system info epic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   const expectOutput = (
     statusValues: DriverStatus[],

@@ -30,7 +30,7 @@ const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunct
 >
 
 describe('sendModuleCommand', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   const meta = { requestId: '1234' }
   const action: Types.SendModuleCommandAction = {

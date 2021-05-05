@@ -14,7 +14,7 @@ jest.mock('../make-event')
 jest.mock('../mixpanel')
 
 describe('analytics epics', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     testScheduler = new TestScheduler((actual, expected) => {

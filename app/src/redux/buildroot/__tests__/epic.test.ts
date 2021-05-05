@@ -40,7 +40,7 @@ const brRobot = {
 
 describe('buildroot update epics', () => {
   let state
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     state = { shell: { buildroot: { ...INITIAL_STATE } } }

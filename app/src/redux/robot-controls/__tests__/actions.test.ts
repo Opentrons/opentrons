@@ -1,13 +1,12 @@
-
 import * as Actions from '../actions'
 
 import type { RobotControlsAction } from '../types'
 
-type ActionSpec = {
-  name: string,
-  creator: (...any[]) => mixed,
-  args: unknown[],
-  expected: RobotControlsAction,
+interface ActionSpec {
+  name: string
+  creator: (...args: any[]) => unknown
+  args: unknown[]
+  expected: RobotControlsAction
 }
 
 const SPECS: ActionSpec[] = [

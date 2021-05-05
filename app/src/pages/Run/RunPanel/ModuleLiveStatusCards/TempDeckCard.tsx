@@ -13,16 +13,16 @@ import type {
   ModuleCommand,
 } from '../../../../redux/modules/types'
 
-type Props = {
+interface Props {
   module: TemperatureModule,
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
     args?: unknown[]
-  ) => mixed,
+  ) => unknown,
   controlDisabledReason: string | null,
   isCardExpanded: boolean,
-  toggleCard: boolean => mixed,
+  toggleCard: () => unknown,
   slot: string,
 }
 

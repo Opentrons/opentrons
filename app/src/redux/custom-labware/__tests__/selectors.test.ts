@@ -1,15 +1,14 @@
-
 import * as Fixtures from '../__fixtures__'
 import * as selectors from '../selectors'
 
 import type { State } from '../../types'
 import type { ValidLabwareFile } from '../types'
 
-type SelectorSpec = {
-  name: string,
-  selector: (state: State) => mixed,
-  state: Partial<State>,
-  expected: mixed,
+interface SelectorSpec {
+  name: string
+  selector: (state: State) => unknown
+  state: State
+  expected: unknown
 }
 
 describe('custom labware selectors', () => {
@@ -31,7 +30,7 @@ describe('custom labware selectors', () => {
             [Fixtures.mockInvalidLabware.filename]: Fixtures.mockInvalidLabware,
           },
         },
-      },
+      } as State,
       expected: [Fixtures.mockValidLabware, Fixtures.mockInvalidLabware],
     },
     {
@@ -44,36 +43,36 @@ describe('custom labware selectors', () => {
           listFailureMessage: null,
           filenames: ['4.json', '2.json', '1.json', '3.json'],
           filesByName: {
-            '4.json': ({} as any),
-            '2.json': ({
+            '4.json': {},
+            '2.json': {
               definition: {
                 metadata: { displayCategory: 'A', displayName: 'B' },
               },
-            } as any),
-            '1.json': ({
+            },
+            '1.json': {
               definition: {
                 metadata: { displayCategory: 'A', displayName: 'A' },
               },
-            } as any),
-            '3.json': ({
+            },
+            '3.json': {
               definition: {
                 metadata: { displayCategory: 'B', displayName: 'A' },
               },
-            } as any),
+            },
           },
         },
-      },
+      } as any,
       expected: [
-        ({
+        {
           definition: { metadata: { displayCategory: 'A', displayName: 'A' } },
-        } as any),
-        ({
+        },
+        {
           definition: { metadata: { displayCategory: 'A', displayName: 'B' } },
-        } as any),
-        ({
+        },
+        {
           definition: { metadata: { displayCategory: 'B', displayName: 'A' } },
-        } as any),
-        ({} as any),
+        },
+        {},
       ],
     },
 
@@ -93,13 +92,13 @@ describe('custom labware selectors', () => {
           filesByName: {
             [Fixtures.mockValidLabware.filename]: Fixtures.mockValidLabware,
             [Fixtures.mockInvalidLabware.filename]: Fixtures.mockInvalidLabware,
-            'foo.json': ({
+            'foo.json': {
               ...Fixtures.mockValidLabware,
               filename: 'foo.json',
-            }: ValidLabwareFile),
+            } as ValidLabwareFile,
           },
         },
-      },
+      } as any,
       expected: [
         Fixtures.mockValidLabware,
         { ...Fixtures.mockValidLabware, filename: 'foo.json' },
@@ -116,7 +115,7 @@ describe('custom labware selectors', () => {
           filenames: [],
           filesByName: {},
         },
-      },
+      } as any,
       expected: { file: Fixtures.mockInvalidLabware, errorMessage: 'AH' },
     },
     {
@@ -130,19 +129,19 @@ describe('custom labware selectors', () => {
           filenames: [],
           filesByName: {},
         },
-      },
+      } as any,
       expected: 'AH',
     },
     {
       name: 'getCustomLabwareDirectory',
       selector: selectors.getCustomLabwareDirectory,
       state: {
-        config: ({
+        config: {
           labware: {
             directory: '/path/to/labware',
           },
-        } as any),
-      },
+        },
+      } as any,
       expected: '/path/to/labware',
     },
   ]

@@ -20,7 +20,7 @@ const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.M
 >
 
 describe('fetchPipetteOffsetCalibrationsOnConnectEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     mockGetRobotByName.mockReturnValue(mockRobot)

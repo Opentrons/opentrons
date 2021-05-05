@@ -58,7 +58,7 @@ const SPECS: Array<{
 ]
 
 describe('fetchPipetteOffsetCalibrationsOnCalibrationEndEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     mockGetConnectedRobotName.mockReturnValue('robot-name')

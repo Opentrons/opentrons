@@ -1,14 +1,13 @@
-
 import * as Actions from '../actions'
 import * as Fixtures from '../__fixtures__'
 
 import type { PipettesAction } from '../types'
 
-type ActionSpec = {
-  name: string,
-  creator: (...any[]) => mixed,
-  args: unknown[],
-  expected: PipettesAction,
+interface ActionSpec {
+  name: string
+  creator: (...args: any[]) => unknown
+  args: unknown[]
+  expected: PipettesAction
 }
 
 describe('robot pipettes actions', () => {

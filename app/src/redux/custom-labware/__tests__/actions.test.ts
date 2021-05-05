@@ -3,11 +3,11 @@ import * as actions from '../actions'
 
 import type { Action } from '../../types'
 
-type ActionSpec = {
-  name: string,
-  creator: (...any[]) => mixed,
-  args?: unknown[],
-  expected: Action,
+interface ActionSpec {
+  name: string
+  creator: (...args: any[]) => unknown
+  args?: unknown[]
+  expected: Action
 }
 
 describe('custom labware actions', () => {

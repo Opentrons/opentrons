@@ -1,12 +1,12 @@
 import * as Selectors from '../selectors'
 import type { State } from '../../types'
 
-type SelectorSpec = {
+interface SelectorSpec {
   name: string,
-  selector: (Partial<State>, ...any[]) => mixed,
+  selector: (state: State, ...args: any[]) => unknown,
   state: Partial<State>,
   args?: any[],
-  expected: mixed,
+  expected: unknown,
 }
 
 describe('robot settings selectors', () => {
@@ -73,7 +73,7 @@ describe('robot settings selectors', () => {
     const { name, selector, state, args = [], expected } = spec
 
     it(name, () => {
-      const result = selector(state, ...args)
+      const result = selector(state as State, ...args)
       expect(result).toEqual(expected)
     })
   })

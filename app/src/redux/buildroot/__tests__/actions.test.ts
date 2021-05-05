@@ -3,7 +3,7 @@ import * as actions from '../actions'
 
 import type { BuildrootAction } from '../types'
 
-type ActionSpec = {
+interface ActionSpec {
   name: string,
   creator: (...any[]) => BuildrootAction,
   args: unknown[],

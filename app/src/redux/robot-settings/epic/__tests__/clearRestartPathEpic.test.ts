@@ -5,20 +5,19 @@ import * as Actions from '../../actions'
 import * as Selectors from '../../selectors'
 import { robotSettingsEpic } from '..'
 
-import type { State } from '../../../types'
-
 jest.mock('../../../robot-admin/selectors')
 jest.mock('../../selectors')
 
-const mockGetRobotRestarting: JestMockFn<[State, string], mixed> =
-  RobotAdminSelectors.getRobotRestarting
+const mockGetRobotRestarting = RobotAdminSelectors.getRobotRestarting as jest.MockedFunction<
+  typeof RobotAdminSelectors.getRobotRestarting
+>
 
 const mockGetAllRestartRequiredRobots = Selectors.getAllRestartRequiredRobots as jest.MockedFunction<
   typeof Selectors.getAllRestartRequiredRobots
 >
 
 describe('clearRestartPathEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     mockGetAllRestartRequiredRobots.mockReturnValue([])

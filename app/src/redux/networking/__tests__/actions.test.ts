@@ -5,9 +5,9 @@ import * as Fixtures from '../__fixtures__'
 
 import type { NetworkingAction } from '../types'
 
-type ActionSpec = {
+interface ActionSpec {
   name: string,
-  creator: (...any[]) => mixed,
+  creator: (...args: any[]) => unknown,
   args: unknown[],
   expected: NetworkingAction,
 }

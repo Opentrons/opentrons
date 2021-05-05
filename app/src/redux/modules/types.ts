@@ -84,7 +84,7 @@ export interface SendModuleCommandAction {
     command: ApiTypes.ModuleCommand
     args: unknown[]
   }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface SendModuleCommandSuccessAction {
@@ -114,7 +114,7 @@ export interface SendModuleCommandFailureAction {
 export interface UpdateModuleAction {
   type: 'modules:UPDATE_MODULE'
   payload: { robotName: string; moduleId: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface UpdateModuleSuccessAction {

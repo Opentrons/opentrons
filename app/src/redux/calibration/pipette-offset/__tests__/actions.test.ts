@@ -3,7 +3,7 @@ import * as Fixtures from '../__fixtures__'
 import * as Actions from '../actions'
 import type { PipetteOffsetCalibrationsAction } from '../types'
 
-type ActionSpec = {
+interface ActionSpec {
   should: string,
   creator: (...any[]) => PipetteOffsetCalibrationsAction,
   args: unknown[],

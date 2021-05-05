@@ -51,7 +51,7 @@ const SPECS: Array<{
 ]
 
 describe('fetchTipLengthCalibrationsOnCalibrationEndEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     mockGetConnectedRobotName.mockReturnValue(mockRobotName)

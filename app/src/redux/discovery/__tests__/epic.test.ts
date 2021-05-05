@@ -5,7 +5,7 @@ import * as Actions from '../actions'
 import { discoveryEpic } from '../epic'
 
 describe('discovery actions', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     testScheduler = new TestScheduler((actual, expected) => {

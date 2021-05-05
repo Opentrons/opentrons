@@ -29,7 +29,7 @@ const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunct
 >
 
 describe('homeEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     mockGetRobotByName.mockReturnValue(mockRobot)

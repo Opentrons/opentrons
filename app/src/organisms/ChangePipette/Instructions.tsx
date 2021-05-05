@@ -20,7 +20,7 @@ const ATTACH_CONFIRM = 'have robot check connection'
 const DETACH_CONFIRM = 'confirm pipette is detached'
 const EXIT = 'exit'
 
-type Props = {
+interface Props {
   title: string,
   subtitle: string,
   robotName: string,
@@ -30,7 +30,7 @@ type Props = {
   displayName: string,
   displayCategory: PipetteDisplayCategory | null,
   direction: Direction,
-  setWantedName: (name: string | null) => mixed,
+  setWantedName: (name: string | null) => unknown,
   confirm: () => unknown,
   exit: () => unknown,
 }
@@ -80,7 +80,7 @@ export function Instructions(props: Props): JSX.Element {
   )
 }
 
-function Steps(props: Props) {
+function Steps(props: Props): JSX.Element {
   const {
     direction,
     mount,

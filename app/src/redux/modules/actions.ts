@@ -48,7 +48,7 @@ export const sendModuleCommandSuccess = (
   robotName: string,
   moduleId: string,
   command: Types.ModuleCommand,
-  returnValue: mixed,
+  returnValue: unknown,
   meta: RobotApiRequestMeta
 ): Types.SendModuleCommandSuccessAction => ({
   type: Constants.SEND_MODULE_COMMAND_SUCCESS,

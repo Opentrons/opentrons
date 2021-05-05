@@ -366,7 +366,7 @@ export const getModulesByModel: (
 
 export function getLabwareBySlot(
   state: State
-): Partial<Record<Slot, StateLabware>> {
+): { [key in Slot]?: StateLabware } {
   return session(state).labwareBySlot
 }
 
@@ -389,7 +389,7 @@ export const getLabware: (state: State) => Labware[] = createSelector(
   ): Labware[] => {
     return Object.keys(lwBySlot)
       .filter(isSlot)
-      .map<Labware>((slot: Slot) => {
+      .map<Labware>(slot => {
         const labware = lwBySlot[slot]
         const { type, isTiprack, isLegacy } = labware
 

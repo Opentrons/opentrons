@@ -12,7 +12,7 @@ import styles from './styles.css'
 
 type Diagram = 'screws' | 'tab'
 
-type DiagramProps = {
+interface DiagramProps {
   direction: Direction,
   mount: Mount,
   channels: PipetteChannels,
@@ -20,8 +20,7 @@ type DiagramProps = {
   displayCategory: PipetteDisplayCategory | null,
 }
 
-type Props = {
-  ...DiagramProps,
+interface Props extends DiagramProps {
   step: 'one' | 'two',
   children: React.ReactNode,
 }

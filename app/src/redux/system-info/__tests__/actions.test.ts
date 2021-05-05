@@ -4,7 +4,7 @@ import * as Actions from '../actions'
 import * as Fixtures from '../__fixtures__'
 import type { SystemInfoAction } from '../types'
 
-type ActionSpec = {
+interface ActionSpec {
   should: string
   creator: (...args: any[]) => SystemInfoAction
   args: any[]

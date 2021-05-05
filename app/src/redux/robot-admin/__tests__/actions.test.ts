@@ -1,11 +1,11 @@
 import * as Actions from '../actions'
 import type { RobotAdminAction } from '../types'
 
-type ActionSpec = {
-  name: string,
-  creator: (...any[]) => mixed,
-  args: unknown[],
-  expected: RobotAdminAction,
+interface ActionSpec {
+  name: string
+  creator: (...args: any[]) => unknown
+  args: unknown[]
+  expected: RobotAdminAction
 }
 
 describe('robot admin actions', () => {

@@ -24,7 +24,7 @@ const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunct
 export interface EpicTestMocks<A, R> {
   state: State
   action: A
-  response: R | void
+  response: R | undefined
   robot: RobotHost
   meta: typeof mockRequestMeta
   getRobotByName: typeof mockGetRobotByName
@@ -82,8 +82,8 @@ export const setupEpicTestMocks = <A = TriggerAction, R = RobotApiResponse>(
 
 export const runEpicTest = <A, R = RobotApiResponse>(
   epicMocks: EpicTestMocks<A, R>,
-  run: (schedularArgs: any) => mixed
-) => {
+  run: (schedularArgs: any) => unknown
+): void => {
   const { testScheduler, fetchRobotApi, response } = epicMocks
 
   testScheduler.run(schedulerArgs => {

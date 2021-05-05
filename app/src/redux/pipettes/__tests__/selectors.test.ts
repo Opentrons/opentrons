@@ -1,4 +1,3 @@
-
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import * as Fixtures from '../__fixtures__'
 import * as POCFixtures from '../../calibration/pipette-offset/__fixtures__'
@@ -6,12 +5,12 @@ import * as TLCFixtures from '../../calibration/tip-length/__fixtures__'
 import * as Selectors from '../selectors'
 import type { State } from '../../types'
 
-type SelectorSpec = {
-  name: string,
-  selector: (State, ...any[]) => mixed,
-  state: Partial<State>,
-  args?: any[],
-  expected: mixed,
+interface SelectorSpec {
+  name: string
+  selector: (state: State, ...rest: any[]) => unknown
+  state: Partial<State>
+  args?: any[]
+  expected: unknown
 }
 
 const SPECS: SelectorSpec[] = [
@@ -69,7 +68,7 @@ const SPECS: SelectorSpec[] = [
 describe('robot api selectors', () => {
   SPECS.forEach(spec => {
     const { name, selector, state, args = [], expected } = spec
-    it(name, () => expect(selector(state, ...args)).toEqual(expected))
+    it(name, () => expect(selector(state as State, ...args)).toEqual(expected))
   })
 })
 
@@ -103,7 +102,10 @@ describe('getAttachedPipetteCalibrations', () => {
     }
 
     expect(
-      Selectors.getAttachedPipetteCalibrations(mockPipetteState, 'robotName')
+      Selectors.getAttachedPipetteCalibrations(
+        mockPipetteState as State,
+        'robotName'
+      )
     ).toEqual({
       left: {
         offset: POCFixtures.mockPipetteOffsetCalibration1,
@@ -136,7 +138,10 @@ describe('getAttachedPipetteCalibrations', () => {
       },
     }
     expect(
-      Selectors.getAttachedPipetteCalibrations(mockPipetteState, 'robotName')
+      Selectors.getAttachedPipetteCalibrations(
+        mockPipetteState as State,
+        'robotName'
+      )
     ).toEqual({
       left: { offset: null, tipLength: null },
       right: { offset: null, tipLength: null },
@@ -164,7 +169,10 @@ describe('getAttachedPipetteCalibrations', () => {
       },
     }
     expect(
-      Selectors.getAttachedPipetteCalibrations(mockPipetteState, 'robotName')
+      Selectors.getAttachedPipetteCalibrations(
+        mockPipetteState as State,
+        'robotName'
+      )
     ).toEqual({
       left: { offset: null, tipLength: null },
       right: { offset: null, tipLength: null },

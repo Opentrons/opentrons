@@ -17,7 +17,7 @@ const MOCK_ALERT_1: AlertId = 'mockAlert1' as any
 const MOCK_ALERT_2: AlertId = 'mockAlert2' as any
 
 describe('alerts epic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     testScheduler = new TestScheduler((actual, expected) => {

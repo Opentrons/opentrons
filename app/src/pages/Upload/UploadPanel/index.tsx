@@ -9,30 +9,23 @@ import { Upload } from './Upload'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-type SP = {
-  filename: ?string,
-  sessionLoaded: ?boolean,
+interface SP {
+  filename: string | null | undefined,
+  sessionLoaded: boolean | null | undefined,
 }
 
-type DP = {
-  createSession: File => mixed,
+interface DP {
+  createSession: (f: File) => unknown,
 }
 
-type Props = { ...SP, ...DP }
+type Props = SP & DP
 
-export const UploadPanel: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  _,
-  _,
-  _,
-  _
->(
+export const UploadPanel: React.ComponentType<{}> = connect<Props>(
   mapStateToProps,
   mapDispatchToProps
 )(UploadPanelComponent)
 
-function UploadPanelComponent(props: Props) {
+function UploadPanelComponent(props: Props): JSX.Element {
   return (
     <SidePanel title="Protocol File">
       <Upload {...props} />

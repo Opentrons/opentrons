@@ -30,11 +30,12 @@ const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunct
   typeof DiscoverySelectors.getRobotByName
 >
 
-const mockGetAttachedPipettes: JestMockFn<[any, string], mixed> =
-  PipettesSelectors.getAttachedPipettes
+const mockGetAttachedPipettes = PipettesSelectors.getAttachedPipettes as jest.MockedFunction<
+  typeof PipettesSelectors.getAttachedPipettes
+>
 
 describe('moveEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     mockGetRobotByName.mockReturnValue(mockRobot)

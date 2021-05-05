@@ -36,7 +36,7 @@ const mockGetAllRestartRequiredRobots = Selectors.getAllRestartRequiredRobots as
 >
 
 describe('updateSettingEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     mockGetRobotByName.mockReturnValue(mockRobot)
