@@ -2,7 +2,8 @@ import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { makeMaskToDecimal } from '../../fieldMasks'
 import { LabwareFields } from '../../fields'
-import { getFormAlerts } from '../utils/getFormAlerts'
+import { isEveryFieldHidden } from '../../utils'
+import { FormAlerts } from '../FormAlerts'
 import { getXYDimensionAlerts } from '../utils/getXYDimensionAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
@@ -41,18 +42,22 @@ const Content = (): JSX.Element => (
   </div>
 )
 
-export const Footprint = (): JSX.Element => {
+export const Footprint = (): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = [
     'footprintXDimension',
     'footprintYDimension',
   ]
   const { values, errors, touched } = useFormikContext<LabwareFields>()
 
+  if (isEveryFieldHidden(fieldList, values)) {
+    return null
+  }
+
   return (
     <div className={styles.new_definition_section}>
       <SectionBody label="Footprint">
         <>
-          {getFormAlerts({ values, touched, errors, fieldList })}
+          <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           {getXYDimensionAlerts(values, touched)}
           <Content />
         </>

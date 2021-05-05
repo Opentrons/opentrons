@@ -1,20 +1,24 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
 import { when } from 'jest-when'
+import isEqual from 'lodash/isEqual'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
+import { isEveryFieldHidden } from '../../../utils'
 import { Volume } from '../../sections/Volume'
-import { getFormAlerts } from '../../utils/getFormAlerts'
+import { FormAlerts } from '../../FormAlerts'
 import { TextField } from '../../TextField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
+jest.mock('../../../utils')
 jest.mock('../../TextField')
-jest.mock('../../utils/getFormAlerts')
+jest.mock('../../FormAlerts')
 
-const getFormAlertsMock = getFormAlerts as jest.MockedFunction<
-  typeof getFormAlerts
->
+const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
 const textFieldMock = TextField as jest.MockedFunction<typeof TextField>
+const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
+  typeof isEveryFieldHidden
+>
 
 const formikConfig: FormikConfig<LabwareFields> = {
   initialValues: getDefaultFormState(),
@@ -27,14 +31,19 @@ describe('Volume', () => {
       return <div>wellVolume text field</div>
     })
 
-    when(getFormAlertsMock)
-      .calledWith({
-        values: getDefaultFormState(),
-        touched: {},
-        errors: {},
-        fieldList: ['wellVolume'],
-      })
-      .mockReturnValue([<div key="mock key">mock alerts</div>])
+    FormAlertsMock.mockImplementation(args => {
+      if (
+        isEqual(args, {
+          touched: {},
+          errors: {},
+          fieldList: ['wellVolume'],
+        })
+      ) {
+        return <div>mock alerts</div>
+      } else {
+        return <div></div>
+      }
+    })
   })
 
   afterEach(() => {
@@ -68,5 +77,14 @@ describe('Volume', () => {
     render(wrapInFormik(<Volume />, formikConfig))
 
     expect(screen.getByText('Total maximum volume of each well.'))
+  })
+
+  it('should not render when all fields are hidden', () => {
+    when(isEveryFieldHiddenMock)
+      .calledWith(['wellVolume'], formikConfig.initialValues)
+      .mockReturnValue(true)
+
+    const { container } = render(wrapInFormik(<Volume />, formikConfig))
+    expect(container.firstChild).toBe(null)
   })
 })

@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { maskToInteger } from '../../fieldMasks'
+import { isEveryFieldHidden } from '../../utils'
 import { LabwareFields, yesNoOptions } from '../../fields'
-import { getFormAlerts } from '../utils/getFormAlerts'
+import { FormAlerts } from '../FormAlerts'
 import { TextField } from '../TextField'
 import { RadioField } from '../RadioField'
 import { GridImg } from '../diagrams'
@@ -33,7 +34,7 @@ const Content = (): JSX.Element => {
   )
 }
 
-export const Grid = (): JSX.Element => {
+export const Grid = (): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = [
     'gridRows',
     'gridColumns',
@@ -41,12 +42,18 @@ export const Grid = (): JSX.Element => {
     'regularColumnSpacing',
   ]
   const { values, errors, touched } = useFormikContext<LabwareFields>()
-  // @ts-expect-error `includes` doesn't want to take null/undefined
-  return ['aluminumBlock', 'tubeRack'].includes(values.labwareType) ? null : (
+  if (
+    isEveryFieldHidden(fieldList, values) ||
+    (values.labwareType != null &&
+      ['aluminumBlock', 'tubeRack'].includes(values.labwareType))
+  ) {
+    return null
+  }
+  return (
     <div className={styles.new_definition_section}>
       <SectionBody label="Grid">
         <>
-          {getFormAlerts({ values, touched, errors, fieldList })}
+          <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <Content />
         </>
       </SectionBody>

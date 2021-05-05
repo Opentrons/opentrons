@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
+import { isEveryFieldHidden } from '../../utils'
 import { makeMaskToDecimal } from '../../fieldMasks'
 import { LabwareFields } from '../../fields'
-import { getFormAlerts } from '../utils/getFormAlerts'
+import { FormAlerts } from '../FormAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
 
@@ -32,15 +33,19 @@ const Content = (props: ContentProps): JSX.Element => {
   )
 }
 
-export const Volume = (): JSX.Element => {
+export const Volume = (): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = ['wellVolume']
   const { values, errors, touched } = useFormikContext<LabwareFields>()
+
+  if (isEveryFieldHidden(fieldList, values)) {
+    return null
+  }
 
   return (
     <div className={styles.new_definition_section}>
       <SectionBody label="Volume">
         <>
-          {getFormAlerts({ values, touched, errors, fieldList })}
+          <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <Content values={values} />
         </>
       </SectionBody>

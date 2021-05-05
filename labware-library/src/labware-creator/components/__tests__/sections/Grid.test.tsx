@@ -1,5 +1,6 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
+import isEqual from 'lodash/isEqual'
 import { when } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import {
@@ -7,23 +8,27 @@ import {
   LabwareFields,
   yesNoOptions,
 } from '../../../fields'
+import { isEveryFieldHidden } from '../../../utils'
 import { Grid } from '../../sections/Grid'
-import { getFormAlerts } from '../../utils/getFormAlerts'
+import { FormAlerts } from '../../FormAlerts'
 import { TextField } from '../../TextField'
 import { RadioField } from '../../RadioField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
+jest.mock('../../../utils')
 jest.mock('../../TextField')
 jest.mock('../../RadioField')
-jest.mock('../../utils/getFormAlerts')
+jest.mock('../../FormAlerts')
 
-const getFormAlertsMock = getFormAlerts as jest.MockedFunction<
-  typeof getFormAlerts
->
+const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
 
 const textFieldMock = TextField as jest.MockedFunction<typeof TextField>
 
 const radioFieldMock = RadioField as jest.MockedFunction<typeof RadioField>
+
+const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
+  typeof isEveryFieldHidden
+>
 
 const formikConfig: FormikConfig<LabwareFields> = {
   initialValues: getDefaultFormState(),
@@ -64,25 +69,30 @@ describe('Grid', () => {
       )
     })
 
-    when(getFormAlertsMock)
-      .calledWith({
-        values: getDefaultFormState(),
-        touched: {},
-        errors: {},
-        fieldList: [
-          'gridRows',
-          'gridColumns',
-          'regularRowSpacing',
-          'regularColumnSpacing',
-        ],
-      })
-      .mockReturnValue([<div key="mock key">mock alerts</div>])
+    FormAlertsMock.mockImplementation(args => {
+      if (
+        isEqual(args, {
+          touched: {},
+          errors: {},
+          fieldList: [
+            'gridRows',
+            'gridColumns',
+            'regularRowSpacing',
+            'regularColumnSpacing',
+          ],
+        })
+      ) {
+        return <div>mock alerts</div>
+      } else {
+        return <div></div>
+      }
+    })
   })
 
   afterEach(() => {
     jest.restoreAllMocks()
   })
-  it('should render with the correct information', () => {
+  it('should render when fields are visible', () => {
     render(wrapInFormik(<Grid />, formikConfig))
     expect(screen.getByText('Grid'))
     expect(screen.getByText('mock alerts'))
@@ -95,5 +105,47 @@ describe('Grid', () => {
     expect(screen.getByText('regularRowSpacing radio group'))
     expect(screen.getByText('gridColumns text field'))
     expect(screen.getByText('regularColumnSpacing radio group'))
+  })
+
+  it('should NOT render when the labware type is aluminumBlock', () => {
+    const { container } = render(
+      wrapInFormik(<Grid />, {
+        ...formikConfig,
+        initialValues: {
+          ...formikConfig.initialValues,
+          labwareType: 'aluminumBlock',
+        },
+      })
+    )
+    expect(container.firstChild).toBe(null)
+  })
+  it('should NOT render when the labware type is tubeRack', () => {
+    const { container } = render(
+      wrapInFormik(<Grid />, {
+        ...formikConfig,
+        initialValues: {
+          ...formikConfig.initialValues,
+          labwareType: 'tubeRack',
+        },
+      })
+    )
+    expect(container.firstChild).toBe(null)
+  })
+
+  it('should not render when all fields are hidden', () => {
+    when(isEveryFieldHiddenMock)
+      .calledWith(
+        [
+          'gridRows',
+          'gridColumns',
+          'regularRowSpacing',
+          'regularColumnSpacing',
+        ],
+        formikConfig.initialValues
+      )
+      .mockReturnValue(true)
+
+    const { container } = render(wrapInFormik(<Grid />, formikConfig))
+    expect(container.firstChild).toBe(null)
   })
 })
