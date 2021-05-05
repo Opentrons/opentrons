@@ -11,7 +11,7 @@ from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.util import linal
 from functools import lru_cache
-from opentrons.config import robot_configs
+from opentrons.config import robot_configs, feature_flags as ff
 from opentrons.config.types import RobotConfig
 
 from .util import (
@@ -28,7 +28,7 @@ from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError, DoorState,
                     DoorStateNotification, PipettePair, TipAttachedError,
                     HardwareAction, PairedPipetteConfigValueError,
-                    MotionChecks)
+                    MotionChecks, PauseType, PauseResumeError)
 from . import modules, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
@@ -43,6 +43,49 @@ mod_log = logging.getLogger(__name__)
 
 InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
 PipetteHandlingData = Tuple[Pipette, top_types.Mount]
+
+
+class PauseManager:
+    """ This class determines whether or not the hardware controller should
+    pause or resume by evaluating the pause and resume targets. The use of two
+    pause types are used to separate the delay resume (triggered when the delay
+    timer runs out) and the pause resume (trigged by user via the app).
+    """
+    def __init__(self, door_state: DoorState) -> None:
+        self.queue: List[PauseType] = []
+        self._is_door_blocking = self._evaluate_door_state(door_state)
+        self._should_pause: bool = False
+
+    @property
+    def should_pause(self):
+        return self._should_pause
+
+    def _evaluate_door_state(self, door_state) -> bool:
+        if ff.enable_door_safety_switch():
+            return door_state is DoorState.OPEN
+        return False
+
+    def set_door(self, door_state):
+        mod_log.info(f'setting door: {door_state}')
+        self._is_door_blocking = self._evaluate_door_state(door_state)
+        if self._is_door_blocking:
+            # add a pause to the queue as it requies manual resume
+            self.pause(PauseType.PAUSE)
+
+    def resume(self, pause_type: PauseType):
+        # door should be closed before a resume from the app can be received
+        if self._is_door_blocking and pause_type is PauseType.PAUSE:
+            raise PauseResumeError
+        if pause_type in self.queue:
+            self.queue.remove(pause_type)
+        if not self.queue and self._should_pause:
+            self._should_pause = False
+
+    def pause(self, pause_type: PauseType):
+        if pause_type not in self.queue:
+            self.queue.append(pause_type)
+        if not self._should_pause:
+            self._should_pause = True
 
 
 class API(HardwareAPILike):
@@ -92,6 +135,7 @@ class API(HardwareAPILike):
         self._motion_lock = asyncio.Lock(loop=self._loop)
         self._door_state = DoorState.CLOSED
         self._robot_calibration = rb_cal.load()
+        self._pause_manager = PauseManager(self._door_state)
 
     @property
     def robot_calibration(self) -> rb_cal.RobotCalibration:
@@ -118,6 +162,7 @@ class API(HardwareAPILike):
         mod_log.info(
             f'Updating the window switch status: {door_state}')
         self.door_state = door_state
+        self._pause_manager.set_door(self.door_state)
         for cb in self._callbacks:
             hw_event = DoorStateNotification(
                 new_state=door_state)
@@ -332,13 +377,16 @@ class API(HardwareAPILike):
         """ Delay execution by pausing and sleeping.
         """
         await self._wait_for_is_running()
+        self._pause_manager.pause(PauseType.DELAY)
         self.pause()
         if not self.is_simulator:
             async def sleep_for_seconds(seconds: float):
                 await asyncio.sleep(seconds)
             delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
             await self._execution_manager.register_cancellable_task(delay_task)
-        self.resume()
+        self._pause_manager.resume(PauseType.DELAY)
+        if not self._pause_manager.should_pause:
+            self.resume()
 
     def reset_instrument(self, mount: top_types.Mount = None):
         """
@@ -522,6 +570,12 @@ class API(HardwareAPILike):
                                                    explicit_modeset)
 
     # Global actions API
+    def pause_manager_pause(self, pause_type: PauseType) -> None:
+        self._pause_manager.pause(pause_type)
+
+    def pause_manager_resume(self, pause_type: PauseType) -> None:
+        self._pause_manager.resume(pause_type)
+
     def pause(self):
         """
         Pause motion of the robot after a current motion concludes.
@@ -551,6 +605,9 @@ class API(HardwareAPILike):
         """
         Resume motion after a call to :py:meth:`pause`.
         """
+        if self._pause_manager.should_pause:
+            return
+
         # Resume must be called immediately to awaken thread running hardware
         #  methods (ThreadManager)
         self._backend.resume()

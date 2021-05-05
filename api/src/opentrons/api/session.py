@@ -37,7 +37,7 @@ from opentrons.hardware_control import (API, ThreadManager,
                                         ExecutionCancelledError,
                                         ThreadedAsyncLock)
 from opentrons.hardware_control.types import (DoorState, HardwareEventType,
-                                              HardwareEvent)
+                                              HardwareEvent, PauseType)
 from .models import Container, Instrument, Module
 from .dev_types import State, StateInfo, Message, LastCommand, Error, CommandShortId
 
@@ -469,6 +469,7 @@ class Session(RobotBusy):
               reason: str = None,
               user_message: str = None,
               duration: float = None) -> None:
+        self._hardware.pause_manager_pause(PauseType.PAUSE)
         self._hardware.pause()
         self.set_state(
             'paused', reason=reason,
@@ -476,6 +477,7 @@ class Session(RobotBusy):
 
     def resume(self) -> None:
         if not self.blocked:
+            self._hardware.pause_manager_resume(PauseType.PAUSE)
             self._hardware.resume()
             self.set_state('running')
 

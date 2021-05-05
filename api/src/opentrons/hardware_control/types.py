@@ -235,6 +235,15 @@ class HardwareAction(enum.Enum):
         return self.name
 
 
+class PauseType(enum.Enum):
+    PAUSE = 0
+    DELAY = 1
+
+
+class PauseResumeError(RuntimeError):
+    pass
+
+
 class ExecutionCancelledError(RuntimeError):
     pass
 
