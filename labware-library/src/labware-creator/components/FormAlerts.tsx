@@ -42,7 +42,7 @@ export const FormAlerts = (props: Props): JSX.Element | null => {
     <>
       {allErrors.map(error => {
         if (error === IRREGULAR_LABWARE_ERROR) {
-          return <IrregularLabwareAlert key={error}/>
+          return <IrregularLabwareAlert key={error} />
         }
         return <AlertItem key={error} type="warning" title={error} />
       })}{' '}
