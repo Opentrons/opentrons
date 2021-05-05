@@ -5,7 +5,7 @@ from typing_extensions import final
 
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 from opentrons.protocols.api_support.constants import STANDARD_DECK, SHORT_TRASH_DECK
 

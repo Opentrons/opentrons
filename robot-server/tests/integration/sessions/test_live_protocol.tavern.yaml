@@ -31,6 +31,7 @@ stages:
             loadName: corning_96_wellplate_360ul_flat
             namespace: Opentrons
             version: 1
+            labwareId: null
     response:
       status_code: 200
       json:
@@ -60,6 +61,7 @@ stages:
             loadName: opentrons_96_tiprack_300ul
             namespace: Opentrons
             version: 1
+            labwareId: null
     response:
       status_code: 200
       json:
@@ -74,6 +76,36 @@ stages:
           completedAt: !anystr
           result:
             labwareId: !anystr
+            definition: !anydict
+            calibration: !anylist
+  - name: Load well plate specifying labware id
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          command: equipment.loadLabware
+          data: &wellplate_data
+            location:
+              slot: 3
+            loadName: opentrons_96_aluminumblock_nest_wellplate_100ul
+            namespace: Opentrons
+            version: 1
+            labwareId: some_labware_id
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          id: !anystr
+          data: *wellplate_data
+          command: equipment.loadLabware
+          status: executed
+          createdAt: !anystr
+          startedAt: !anystr
+          completedAt: !anystr
+          result:
+            labwareId: some_labware_id
             definition: !anydict
             calibration: !anylist
   - name: Load pipette command

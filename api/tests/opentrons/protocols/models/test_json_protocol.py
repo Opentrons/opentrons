@@ -1,5 +1,5 @@
 import pytest
-from opentrons.protocols.runner.json_proto.models import json_protocol
+from opentrons.protocols.models import json_protocol
 
 
 @pytest.mark.parametrize(

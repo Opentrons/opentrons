@@ -3,7 +3,7 @@ from opentrons.protocol_engine import WellLocation, WellOrigin
 from opentrons.protocol_engine.commands import (
     AspirateRequest, DispenseRequest, PickUpTipRequest, DropTipRequest
 )
-from opentrons.protocols.runner.json_proto.models import json_protocol as models
+from opentrons.protocols.models import json_protocol as models
 
 from opentrons.protocols.runner.json_proto.command_translator import (
     CommandTranslator

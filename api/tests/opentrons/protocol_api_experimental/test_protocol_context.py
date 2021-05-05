@@ -2,7 +2,9 @@
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware import dev_types
+
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import commands
 from opentrons.protocol_engine.clients import SyncClient
 
@@ -130,7 +132,7 @@ def test_load_pipette_with_replace(subject: ProtocolContext) -> None:
 
 def test_load_labware(
     decoy: Decoy,
-    minimal_labware_def: LabwareDefinition,
+    minimal_labware_def: dev_types.LabwareDefinition,
     engine_client: SyncClient,
     subject: ProtocolContext,
 ) -> None:
@@ -145,7 +147,7 @@ def test_load_labware(
     ).then_return(
         commands.LoadLabwareResult(
             labwareId="abc123",
-            definition=minimal_labware_def,
+            definition=LabwareDefinition.parse_obj(minimal_labware_def),
             calibration=(1, 2, 3),
         )
     )

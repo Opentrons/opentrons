@@ -2,11 +2,12 @@
 from dataclasses import dataclass
 from typing import Tuple, Optional
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
 
-from ..errors import FailedToLoadPipetteError
+from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
 from ..resources import ResourceProviders
 from ..state import StateView
 from ..types import LabwareLocation, PipetteName
@@ -52,15 +53,39 @@ class EquipmentHandler:
         namespace: str,
         version: int,
         location: LabwareLocation,
+        labware_id: Optional[str]
     ) -> LoadedLabware:
-        """Load labware by assigning an identifier and pulling required data."""
-        labware_id = self._resources.id_generator.generate_id()
+        """Load labware by assigning an identifier and pulling required data.
 
-        definition = await self._resources.labware_data.get_labware_definition(
-            load_name=load_name,
-            namespace=namespace,
-            version=version,
-        )
+        Args:
+            load_name: The labware's load name.
+            namespace: The namespace.
+            version: Version
+            location: The deck location at which labware is placed.
+            labware_id: An optional identifier to assign the labware. If None, an
+                identifier will be generated.
+
+        Returns:
+            A LoadedLabware object.
+        """
+        labware_id = labware_id if labware_id else \
+            self._resources.id_generator.generate_id()
+
+        try:
+            # Try to use existing definition in state.
+            definition = self._state.labware.get_definition_by_uri(
+                uri_from_details(
+                    load_name=load_name,
+                    namespace=namespace,
+                    version=version,
+                )
+            )
+        except LabwareDefinitionDoesNotExistError:
+            definition = await self._resources.labware_data.get_labware_definition(
+                load_name=load_name,
+                namespace=namespace,
+                version=version,
+            )
 
         calibration = await self._resources.labware_data.get_labware_calibration(
             definition=definition,

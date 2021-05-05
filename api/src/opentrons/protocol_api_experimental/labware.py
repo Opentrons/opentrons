@@ -1,6 +1,6 @@
 # noqa: D100
 from __future__ import annotations
-from typing import Any, List, Dict, Optional, Union
+from typing import Any, List, Dict, Optional, Union, cast
 
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from .errors import LabwareIsNotTipRackError
@@ -92,10 +92,10 @@ class Labware:  # noqa: D101
     # definition and call it a day?
     @property
     def parameters(self) -> LabwareParameters:  # noqa: D102
-        definition = self._engine_client.state.labware.get_definition(
+        definition = self._engine_client.state.labware.get_labware_definition(
             labware_id=self._labware_id
         )
-        return definition["parameters"]
+        return cast(LabwareParameters, definition.parameters.dict())
 
     # TODO(mc, 2021-05-03): this is an internal list of Opentrons-specific
     # data; does it really need to be a public property? Can we expose the
@@ -108,11 +108,11 @@ class Labware:  # noqa: D101
     # operational logic, and its presence in this interface is no longer
     # necessary with Protocol Engine controlling execution. Can we get rid of it?
     @property
-    def magdeck_engage_height(self) -> Optional[float]:  # noqa: D102
-        definition = self._engine_client.state.labware.get_definition(
+    def magdeck_engage_height(self) -> Optional[float]:    # noqa: D102
+        definition = self._engine_client.state.labware.get_labware_definition(
             labware_id=self._labware_id
         )
-        return definition["parameters"].get("magneticModuleEngageHeight")
+        return definition.parameters.magneticModuleEngageHeight
 
     @property
     def calibrated_offset(self) -> Point:
@@ -140,10 +140,10 @@ class Labware:  # noqa: D101
     @property
     def is_tiprack(self) -> bool:
         """Whether this labware is a tiprack."""
-        definition = self._engine_client.state.labware.get_definition(
+        definition = self._engine_client.state.labware.get_labware_definition(
             labware_id=self._labware_id
         )
-        return definition["parameters"]["isTiprack"]
+        return definition.parameters.isTiprack
 
     # TODO(mc, 2021-05-03): encode this in a specific `TipRack` interface that
     # extends from Labware
@@ -160,13 +160,12 @@ class Labware:  # noqa: D101
             LabwareIsNotTipRackError: will raise if this property is accessed
                 on a labware instance that is not a tip rack.
         """
-        definition = self._engine_client.state.labware.get_definition(
+        definition = self._engine_client.state.labware.get_labware_definition(
             labware_id=self._labware_id
         )
-        try:
-            return definition["parameters"]["tipLength"]
-        except KeyError:
+        if definition.parameters.tipLength is None:
             raise LabwareIsNotTipRackError(f"{self.load_name} is not a tip rack.")
+        return definition.parameters.tipLength
 
     def well(self, idx: int) -> Well:  # noqa: D102
         raise NotImplementedError()
