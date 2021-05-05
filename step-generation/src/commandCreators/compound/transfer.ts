@@ -56,7 +56,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   )
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'
-  const errors: Array<CommandCreatorError> = []
+  const errors: CommandCreatorError[] = []
 
   if (
     !prevRobotState.pipettes[args.pipette] ||
@@ -80,7 +80,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     )
   }
 
-  if (errors.length)
+  if (errors.length > 0)
     return {
       errors,
     }
@@ -110,7 +110,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   const lastSubTransferVol =
     args.volume - (chunksPerSubTransfer - 1) * effectiveTransferVol
   // volume of each chunk in a sub-transfer
-  let subTransferVolumes: Array<number> = Array(chunksPerSubTransfer - 1)
+  let subTransferVolumes: number[] = Array(chunksPerSubTransfer - 1)
     .fill(effectiveTransferVol)
     .concat(lastSubTransferVol)
 
@@ -122,16 +122,16 @@ export const transfer: CommandCreator<TransferArgs> = (
       .concat(splitLastVol)
       .concat(splitLastVol)
   }
-
-  const sourceDestPairs = zip(args.sourceWells, args.destWells)
-  let prevSourceWell = null
-  let prevDestWell = null
+// @ts-expect-error(SA, 2021-05-05): zip can return undefined so this really should be Array<[string | undefined, string | undefined]>
+  const sourceDestPairs: Array<[string, string]> = zip(args.sourceWells, args.destWells)
+  let prevSourceWell: string | null = null
+  let prevDestWell: string | null = null
   const commandCreators = sourceDestPairs.reduce(
     (
-      outerAcc: Array<CurriedCommandCreator>,
+      outerAcc: CurriedCommandCreator[],
       wellPair: [string, string],
       pairIdx: number
-    ): Array<CurriedCommandCreator> => {
+    ): CurriedCommandCreator[] => {
       const [sourceWell, destWell] = wellPair
       const sourceLabwareDef =
         invariantContext.labwareEntities[args.sourceLabware].def
@@ -143,10 +143,10 @@ export const transfer: CommandCreator<TransferArgs> = (
         getWellDepth(destLabwareDef, destWell) + AIR_GAP_OFFSET_FROM_TOP
       const commands = subTransferVolumes.reduce(
         (
-          innerAcc: Array<CurriedCommandCreator>,
+          innerAcc: CurriedCommandCreator[],
           subTransferVol: number,
           chunkIdx: number
-        ): Array<CurriedCommandCreator> => {
+        ): CurriedCommandCreator[] => {
           const isInitialSubtransfer = pairIdx === 0 && chunkIdx === 0
           const isLastPair = pairIdx + 1 === sourceDestPairs.length
           const isLastChunk = chunkIdx + 1 === subTransferVolumes.length
@@ -162,7 +162,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             changeTipNow = isInitialSubtransfer || destWell !== prevDestWell
           }
 
-          const tipCommands: Array<CurriedCommandCreator> = changeTipNow
+          const tipCommands: CurriedCommandCreator[] = changeTipNow
             ? [
                 curryCommandCreator(replaceTip, {
                   pipette: args.pipette,
@@ -185,7 +185,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   dispenseDelaySeconds: dispenseDelay?.seconds,
                 })
               : []
-          const mixBeforeAspirateCommands = args.mixBeforeAspirate
+          const mixBeforeAspirateCommands = (args.mixBeforeAspirate != null)
             ? mixUtil({
                 pipette: args.pipette,
                 labware: args.sourceLabware,
@@ -244,7 +244,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                 }),
               ]
             : []
-          const mixInDestinationCommands = args.mixInDestination
+          const mixInDestinationCommands = (args.mixInDestination != null)
             ? mixUtil({
                 pipette: args.pipette,
                 labware: args.destLabware,
@@ -291,7 +291,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   flowRate: aspirateFlowRateUlSec,
                   offsetFromBottomMm: airGapOffsetSourceWell,
                 }),
-                ...(aspirateDelay
+                ...(aspirateDelay != null
                   ? [
                       curryCommandCreator(delay, {
                         commandCreatorFnName: 'delay',
@@ -310,7 +310,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   flowRate: dispenseFlowRateUlSec,
                   offsetFromBottomMm: airGapOffsetDestWell,
                 }),
-                ...(dispenseDelay
+                ...(dispenseDelay != null
                   ? [
                       curryCommandCreator(delay, {
                         commandCreatorFnName: 'delay',
@@ -363,7 +363,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
                   }),
-                  ...(aspirateDelay
+                  ...(aspirateDelay != null
                     ? [
                         curryCommandCreator(delay, {
                           commandCreatorFnName: 'delay',

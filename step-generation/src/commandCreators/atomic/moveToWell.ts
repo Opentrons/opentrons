@@ -3,6 +3,7 @@ import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
 } from '../../utils'
+import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
 import type { MoveToWellParams } from '@opentrons/shared-data/lib/protocol/types/schemaV5'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
@@ -14,7 +15,7 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
 ) => {
   const { pipette, labware, well, offset, minimumZHeight, forceDirect } = args
   const actionName = 'moveToWell'
-  const errors: Array<CommandCreatorError> = []
+  const errors: CommandCreatorError[] = []
   // TODO(2020-07-30, IL): the below is duplicated or at least similar
   // across aspirate/dispense/blowout, we can probably DRY it up
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
@@ -80,7 +81,7 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
     params.minimumZHeight = minimumZHeight
   }
 
-  const commands = [
+  const commands: Command[] = [
     {
       command: 'moveToWell',
       params,

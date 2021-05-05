@@ -12,14 +12,9 @@ import {
 import { dispense } from '../commandCreators/atomic/dispense'
 import type { RobotState } from '../'
 jest.mock('../utils/thermocyclerPipetteCollision')
-const mockThermocyclerPipetteCollision: JestMockFn<
-  [
-    $PropertyType<RobotState, 'modules'>,
-    $PropertyType<RobotState, 'labware'>,
-    string
-  ],
-  boolean
-> = thermocyclerPipetteCollision
+const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
+  typeof thermocyclerPipetteCollision
+>
 describe('dispense', () => {
   let initialRobotState
   let robotStateWithTip

@@ -247,6 +247,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         sourceLabware: args.sourceLabware,
         destLabware: args.destLabware,
         sourceWell: args.sourceWell,
+        // @ts-expect-error(SA, 2021-05-05): last can return undefined
         destWell: last(destWellChunk),
       })
       const isLastChunk = chunkIndex + 1 === destWellChunks.length
@@ -290,6 +291,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
             sourceLabwareId: args.sourceLabware,
             sourceWell: args.sourceWell,
             destLabwareId: args.destLabware,
+            // @ts-expect-error(SA, 2021-05-05): last can return undefined
             destWell: last(destWellChunk),
             blowoutLocation,
             flowRate: args.blowoutFlowRateUlSec,

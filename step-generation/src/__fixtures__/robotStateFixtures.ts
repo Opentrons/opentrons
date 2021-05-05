@@ -1,4 +1,3 @@
-import { $PropertyType } from 'utility-types'
 import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
 import {
@@ -58,41 +57,49 @@ export function getTipColumn<T>(index: number, filled: T): Record<string, T> {
     .map(wellLetter => `${wellLetter}${index}`)
     .reduce((acc, well) => ({ ...acc, [well]: filled }), {})
 }
+
 // standard context fixtures to use across tests
 export function makeContext(): InvariantContext {
   const labwareEntities = {
     [FIXED_TRASH_ID]: {
       id: FIXED_TRASH_ID,
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
       labwareDefURI: getLabwareDefURI(fixture_trash),
       def: fixture_trash,
     },
     [SOURCE_LABWARE]: {
       id: SOURCE_LABWARE,
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
       labwareDefURI: getLabwareDefURI(fixture_96_plate),
       def: fixture_96_plate,
     },
     [DEST_LABWARE]: {
       id: DEST_LABWARE,
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
       labwareDefURI: getLabwareDefURI(fixture_96_plate),
       def: fixture_96_plate,
     },
     [TROUGH_LABWARE]: {
       id: TROUGH_LABWARE,
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
       labwareDefURI: getLabwareDefURI(fixture_12_trough),
       def: fixture_12_trough,
     },
     tiprack1Id: {
       id: 'tiprack1Id',
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
       labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
       def: fixture_tiprack_300_ul,
     },
     tiprack2Id: {
       id: 'tiprack2Id',
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
       labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
       def: fixture_tiprack_300_ul,
     },
     tiprack3Id: {
       id: 'tiprack3Id',
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
       labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
       def: fixture_tiprack_300_ul,
     },
@@ -102,6 +109,7 @@ export function makeContext(): InvariantContext {
     p10SingleId: {
       name: 'p10_single',
       id: 'p10SingleId',
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
       tiprackDefURI: getLabwareDefURI(fixture_tiprack_10_ul),
       tiprackLabwareDef: fixture_tiprack_10_ul,
       spec: fixtureP10Single,
@@ -109,6 +117,7 @@ export function makeContext(): InvariantContext {
     p10MultiId: {
       name: 'p10_multi',
       id: 'p10MultiId',
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
       tiprackDefURI: getLabwareDefURI(fixture_tiprack_10_ul),
       tiprackLabwareDef: fixture_tiprack_10_ul,
       spec: fixtureP10Multi,
@@ -116,6 +125,7 @@ export function makeContext(): InvariantContext {
     [DEFAULT_PIPETTE]: {
       name: 'p300_single',
       id: DEFAULT_PIPETTE,
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
       tiprackDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
       tiprackLabwareDef: fixture_tiprack_300_ul,
       spec: fixtureP300Single,
@@ -123,23 +133,26 @@ export function makeContext(): InvariantContext {
     [MULTI_PIPETTE]: {
       name: 'p300_multi',
       id: MULTI_PIPETTE,
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
       tiprackDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
       tiprackLabwareDef: fixture_tiprack_300_ul,
       spec: fixtureP300Multi,
     },
   }
   return {
+    // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
     labwareEntities,
     moduleEntities,
+    // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
     pipetteEntities,
     config: DEFAULT_CONFIG,
   }
 }
 export const makeState = (args: {
   invariantContext: InvariantContext
-  labwareLocations: $PropertyType<RobotState, 'labware'>
-  moduleLocations?: $PropertyType<RobotState, 'modules'>
-  pipetteLocations: $PropertyType<RobotState, 'pipettes'>
+  labwareLocations: RobotState['labware']
+  moduleLocations?: RobotState['modules']
+  pipetteLocations: RobotState['pipettes']
   tiprackSetting: Record<string, boolean>
 }): RobotState => {
   const {
@@ -162,10 +175,10 @@ export const makeState = (args: {
   return robotState
 }
 // ===== "STANDARDS" for uniformity across tests =====
-type StandardMakeStateArgs = {
-  pipetteLocations: $PropertyType<RobotState, 'pipettes'>
-  labwareLocations: $PropertyType<RobotState, 'labware'>
-  moduleLocations: $PropertyType<RobotState, 'modules'>
+interface StandardMakeStateArgs {
+  pipetteLocations: RobotState['pipettes']
+  labwareLocations: RobotState['labware']
+  moduleLocations: RobotState['modules']
 }
 export const makeStateArgsStandard = (): StandardMakeStateArgs => ({
   pipetteLocations: {
@@ -258,7 +271,7 @@ export const getRobotInitialStateNoTipsRemain = (
   })
   return robotInitialStateNoTipsRemain
 }
-type StateAndContext = {
+interface StateAndContext {
   robotState: RobotState
   invariantContext: InvariantContext
 }
@@ -270,6 +283,7 @@ export const getStateAndContextTempTCModules = ({
   thermocyclerId: string
 }): StateAndContext => {
   const invariantContext = makeContext()
+  // @ts-expect-error(SA, 2021-05-03): 'foo' is not a legit module model
   invariantContext.moduleEntities = {
     [temperatureModuleId]: {
       id: temperatureModuleId,

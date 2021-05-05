@@ -26,7 +26,7 @@ export function mixUtil(args: {
   dispenseFlowRateUlSec: number
   aspirateDelaySeconds?: number | null | undefined
   dispenseDelaySeconds?: number | null | undefined
-}): Array<CurriedCommandCreator> {
+}): CurriedCommandCreator[] {
   const {
     pipette,
     labware,
@@ -41,7 +41,7 @@ export function mixUtil(args: {
     dispenseDelaySeconds,
   } = args
 
-  const getDelayCommand = seconds =>
+  const getDelayCommand = (seconds?: number | null): CurriedCommandCreator[] =>
     seconds
       ? [
           curryCommandCreator(delay, {
@@ -140,8 +140,8 @@ export const mix: CommandCreator<MixArgs> = (
   // Command generation
   const commandCreators = flatMap(
     wells,
-    (well: string, wellIndex: number): Array<CurriedCommandCreator> => {
-      let tipCommands: Array<CurriedCommandCreator> = []
+    (well: string, wellIndex: number): CurriedCommandCreator[] => {
+      let tipCommands: CurriedCommandCreator[] = []
 
       if (changeTip === 'always' || (changeTip === 'once' && wellIndex === 0)) {
         tipCommands = [

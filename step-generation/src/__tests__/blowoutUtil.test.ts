@@ -1,4 +1,6 @@
+import { BlowoutParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
 import { blowout } from '../commandCreators/atomic/blowout'
+import { InvariantContext } from '../types'
 import {
   blowoutUtil,
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -15,7 +17,22 @@ import {
   makeContext,
 } from '../__fixtures__'
 jest.mock('../utils/curryCommandCreator')
-let blowoutArgs
+
+const curryCommandCreatorMock = curryCommandCreator as jest.MockedFunction<
+  typeof curryCommandCreator
+>
+
+let blowoutArgs: {
+  pipette: BlowoutParams['pipette']
+  sourceLabwareId: string
+  sourceWell: BlowoutParams['well']
+  destLabwareId: string
+  destWell: BlowoutParams['well']
+  blowoutLocation: string | null | undefined
+  flowRate: number
+  offsetFromTopMm: number
+  invariantContext: InvariantContext
+}
 describe('blowoutUtil', () => {
   beforeEach(() => {
     blowoutArgs = {
@@ -27,18 +44,17 @@ describe('blowoutUtil', () => {
       flowRate: BLOWOUT_FLOW_RATE,
       offsetFromTopMm: BLOWOUT_OFFSET_FROM_TOP_MM,
       invariantContext: makeContext(),
+      blowoutLocation: null,
     }
     // $FlowFixMe
-    curryCommandCreator.mockClear()
-    // $FlowFixMe
-    curryCommandCreator.mockReturnValue('return value from blowout')
+    curryCommandCreatorMock.mockClear()
   })
   it('blowoutUtil curries blowout with source well params', () => {
     blowoutUtil({
       ...blowoutArgs,
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(blowout, {
       pipette: blowoutArgs.pipette,
       labware: blowoutArgs.sourceLabwareId,
       well: blowoutArgs.sourceWell,
@@ -51,7 +67,7 @@ describe('blowoutUtil', () => {
       ...blowoutArgs,
       blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(blowout, {
       pipette: blowoutArgs.pipette,
       labware: blowoutArgs.destLabwareId,
       well: blowoutArgs.destWell,
@@ -61,7 +77,7 @@ describe('blowoutUtil', () => {
   })
   it('blowoutUtil curries blowout with an arbitrary labware Id', () => {
     blowoutUtil({ ...blowoutArgs, blowoutLocation: TROUGH_LABWARE })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(blowout, {
       pipette: blowoutArgs.pipette,
       labware: TROUGH_LABWARE,
       well: 'A1',
@@ -71,7 +87,7 @@ describe('blowoutUtil', () => {
   })
   it('blowoutUtil returns an empty array if not given a blowoutLocation', () => {
     const result = blowoutUtil({ ...blowoutArgs, blowoutLocation: null })
-    expect(curryCommandCreator).not.toHaveBeenCalled()
+    expect(curryCommandCreatorMock).not.toHaveBeenCalled()
     expect(result).toEqual([])
   })
 })

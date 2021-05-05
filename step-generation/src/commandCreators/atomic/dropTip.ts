@@ -1,4 +1,5 @@
 import { FIXED_TRASH_ID } from '../../constants'
+import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
 import type { CommandCreator } from '../../types'
 interface DropTipArgs {
   pipette: string
@@ -19,7 +20,7 @@ export const dropTip: CommandCreator<DropTipArgs> = (
     }
   }
 
-  const commands = [
+  const commands: Command[] = [
     {
       command: 'dropTip',
       params: {

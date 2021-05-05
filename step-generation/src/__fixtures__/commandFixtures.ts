@@ -1,4 +1,3 @@
-import { $Shape } from 'utility-types'
 import { tiprackWellNamesFlat } from './data'
 import type {
   AirGapParams,
@@ -16,7 +15,7 @@ import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
 export function getSuccessResult(
   result: CommandsAndWarnings | CommandCreatorErrorResponse
 ): CommandsAndWarnings {
-  if (result.errors) {
+  if ('errors' in result) {
     throw new Error(
       `Expected a successful command creator call but got errors: ${JSON.stringify(
         result.errors
@@ -29,7 +28,7 @@ export function getSuccessResult(
 export function getErrorResult(
   result: CommandsAndWarnings | CommandCreatorErrorResponse
 ): CommandCreatorErrorResponse {
-  if (!result.errors) {
+  if (!('errors' in result)) {
     throw new Error(
       `Expected command creator to return errors but got success result`
     )
@@ -37,7 +36,7 @@ export function getErrorResult(
 
   return result
 }
-export const replaceTipCommands = (tip: number | string): Array<Command> => [
+export const replaceTipCommands = (tip: number | string): Command[] => [
   dropTipHelper('A1'),
   pickUpTipHelper(tip),
 ]
@@ -49,7 +48,7 @@ export const ASPIRATE_OFFSET_FROM_BOTTOM_MM = 3.1
 export const DISPENSE_OFFSET_FROM_BOTTOM_MM = 3.2
 export const BLOWOUT_OFFSET_FROM_TOP_MM = 3.3
 const TOUCH_TIP_OFFSET_FROM_BOTTOM_MM = 3.4
-type FlowRateAndOffsetParamsTransferlike = {
+interface FlowRateAndOffsetParamsTransferlike {
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   blowoutFlowRateUlSec: number
@@ -70,7 +69,7 @@ export const getFlowRateAndOffsetParamsTransferLike = (): FlowRateAndOffsetParam
   touchTipAfterAspirateOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
   touchTipAfterDispenseOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
 })
-type FlowRateAndOffsetParamsMix = {
+interface FlowRateAndOffsetParamsMix {
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   blowoutFlowRateUlSec: number
@@ -99,13 +98,13 @@ export const FIXED_TRASH_ID = 'trashId'
 export const DEFAULT_BLOWOUT_WELL = 'A1'
 // =================
 type MakeAspDispHelper<P> = (
-  bakedParams?: $Shape<P>
-) => (well: string, volume: number, params?: $Shape<P>) => Command
+  bakedParams?: Partial<P>
+) => (well: string, volume: number, params?: Partial<P>) => Command
 type MakeAirGapHelper<P> = (
-  bakedParams: $Shape<P> & {
+  bakedParams: Partial<P> & {
     offsetFromBottomMm: number
   }
-) => (well: string, volume: number, params?: $Shape<P>) => Command
+) => (well: string, volume: number, params?: Partial<P>) => Command
 type MakeDispenseAirGapHelper<P> = MakeAirGapHelper<P>
 const _defaultAspirateParams = {
   pipette: DEFAULT_PIPETTE,
@@ -144,7 +143,7 @@ export const makeAirGapHelper: MakeAirGapHelper<AirGapParams> = bakedParams => (
 })
 export const blowoutHelper = (
   labware?: string | null | undefined,
-  params?: $Shape<BlowoutParams>
+  params?: Partial<BlowoutParams>
 ): Command => ({
   command: 'blowout',
   params: {
@@ -197,8 +196,8 @@ const _defaultTouchTipParams = {
   offsetFromBottomMm: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
 }
 type MakeTouchTipHelper = (
-  bakedParams?: $Shape<TouchTipParams>
-) => (well: string, params?: $Shape<TouchTipParams>) => Command
+  bakedParams?: Partial<TouchTipParams>
+) => (well: string, params?: Partial<TouchTipParams>) => Command
 export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
   well,
   params
@@ -217,7 +216,7 @@ export const delayWithOffset = (
   labware: string,
   seconds?: number,
   zOffset?: number
-): Array<Command> => [
+): Command[] => [
   {
     command: 'moveToWell',
     params: {

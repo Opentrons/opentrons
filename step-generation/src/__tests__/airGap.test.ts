@@ -1,4 +1,3 @@
-import { $PropertyType } from 'utility-types'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
@@ -17,27 +16,19 @@ import { thermocyclerPipetteCollision, modulePipetteCollision } from '../utils'
 import type { InvariantContext, RobotState } from '../'
 jest.mock('../utils/thermocyclerPipetteCollision')
 jest.mock('../utils/modulePipetteCollision')
-const mockThermocyclerPipetteCollision: JestMockFn<
-  [
-    $PropertyType<RobotState, 'modules'>,
-    $PropertyType<RobotState, 'labware'>,
-    string
-  ],
-  boolean
-> = thermocyclerPipetteCollision
-const mockModulePipetteCollision: JestMockFn<
-  [
-    {
-      pipette: string | null | undefined
-      labware: string | null | undefined
-      invariantContext: InvariantContext
-      prevRobotState: RobotState
-    }
-  ],
-  boolean
-> = modulePipetteCollision
+
+const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
+  typeof thermocyclerPipetteCollision
+>
+const mockModulePipetteCollision = modulePipetteCollision as jest.MockedFunction<
+  typeof modulePipetteCollision
+>
+
 describe('airGap', () => {
-  let invariantContext, robotStateNoTip, robotStateWithTip, flowRateAndOffsets
+  let invariantContext: any,
+    robotStateNoTip: any,
+    robotStateWithTip: any,
+    flowRateAndOffsets: any
   beforeEach(() => {
     invariantContext = makeContext()
     robotStateNoTip = getInitialRobotStateStandard(invariantContext)
@@ -108,6 +99,7 @@ describe('airGap', () => {
   it('should return a volume exceeded error when the air gap volume is above the tip max', () => {
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
     ].tiprackDefURI = getLabwareDefURI(fixture_tiprack_10_ul)
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
@@ -128,8 +120,8 @@ describe('airGap', () => {
   it('should return a TC lid closed error when there is a pipette collision with a TC', () => {
     mockThermocyclerPipetteCollision.mockImplementationOnce(
       (
-        modules: $PropertyType<RobotState, 'modules'>,
-        labware: $PropertyType<RobotState, 'labware'>,
+        modules: RobotState['modules'],
+        labware: RobotState['labware'],
         labwareId: string
       ) => {
         expect(modules).toBe(robotStateWithTip.modules)
@@ -189,6 +181,7 @@ describe('airGap', () => {
   it('should return a pipette volume exceeded error when the pipette volume is less than the air gap volume', () => {
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
     ].tiprackDefURI = getLabwareDefURI(fixture_tiprack_1000_ul)
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE

@@ -1,4 +1,3 @@
-import { $PropertyType } from 'utility-types'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { aspirate } from '../commandCreators/atomic/aspirate'
 import { getLabwareDefURI } from '@opentrons/shared-data'
@@ -16,19 +15,14 @@ import {
 } from '../__fixtures__'
 import type { RobotState } from '../'
 jest.mock('../utils/thermocyclerPipetteCollision')
-const mockThermocyclerPipetteCollision: JestMockFn<
-  [
-    $PropertyType<RobotState, 'modules'>,
-    $PropertyType<RobotState, 'labware'>,
-    string
-  ],
-  boolean
-> = thermocyclerPipetteCollision
+const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
+  typeof thermocyclerPipetteCollision
+>
 describe('aspirate', () => {
-  let initialRobotState
-  let robotStateWithTip
-  let invariantContext
-  let flowRateAndOffsets
+  let initialRobotState: any
+  let robotStateWithTip: any
+  let invariantContext: any
+  let flowRateAndOffsets: any
   beforeEach(() => {
     invariantContext = makeContext()
     initialRobotState = getInitialRobotStateStandard(invariantContext)
@@ -60,6 +54,7 @@ describe('aspirate', () => {
   it('aspirate with volume > tip max volume should throw error', () => {
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
     ].tiprackDefURI = getLabwareDefURI(fixture_tiprack_10_ul)
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
@@ -84,6 +79,7 @@ describe('aspirate', () => {
     // NOTE: assigning p300 to a 1000uL tiprack is nonsense, just for this test
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
     ].tiprackDefURI = getLabwareDefURI(fixture_tiprack_1000_ul)
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
@@ -155,8 +151,8 @@ describe('aspirate', () => {
   it('should return an error when aspirating from thermocycler with pipette collision', () => {
     mockThermocyclerPipetteCollision.mockImplementationOnce(
       (
-        modules: $PropertyType<RobotState, 'modules'>,
-        labware: $PropertyType<RobotState, 'labware'>,
+        modules: RobotState['modules'],
+        labware: RobotState['labware'],
         labwareId: string
       ) => {
         expect(modules).toBe(robotStateWithTip.modules)

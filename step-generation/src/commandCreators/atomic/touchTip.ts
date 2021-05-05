@@ -1,6 +1,8 @@
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { TouchTipParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
+
 export const touchTip: CommandCreator<TouchTipParams> = (
   args,
   invariantContext,
@@ -10,7 +12,7 @@ export const touchTip: CommandCreator<TouchTipParams> = (
   const actionName = 'touchTip'
   const { pipette, labware, well, offsetFromBottomMm } = args
   const pipetteData = prevRobotState.pipettes[pipette]
-  const errors: Array<CommandCreatorError> = []
+  const errors: CommandCreatorError[] = []
 
   if (!pipetteData) {
     errors.push(
@@ -38,7 +40,7 @@ export const touchTip: CommandCreator<TouchTipParams> = (
     }
   }
 
-  const commands = [
+  const commands: Command[] = [
     {
       command: 'touchTip',
       params: {

@@ -3,6 +3,7 @@ import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
 } from '../../utils'
+import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
 import type { DispenseParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
@@ -14,7 +15,7 @@ export const dispense: CommandCreator<DispenseParams> = (
 ) => {
   const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
   const actionName = 'dispense'
-  const errors: Array<CommandCreatorError> = []
+  const errors: CommandCreatorError[] = []
 
   if (
     modulePipetteCollision({
@@ -63,7 +64,7 @@ export const dispense: CommandCreator<DispenseParams> = (
     }
   }
 
-  const commands = [
+  const commands: Command[] = [
     {
       command: 'dispense',
       params: {

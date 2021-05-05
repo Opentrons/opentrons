@@ -8,6 +8,8 @@ import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../__fixtures__'
+import type { AwaitTemperatureArgs } from '../types'
+
 describe('awaitTemperature', () => {
   const temperatureModuleId = 'temperatureModuleId'
   const thermocyclerId = 'thermocyclerId'
@@ -29,8 +31,8 @@ describe('awaitTemperature', () => {
       },
     ],
   }
-  let invariantContext
-  let robotState
+  let invariantContext: any
+  let robotState: any
   beforeEach(() => {
     const stateAndContext = getStateAndContextTempTCModules({
       temperatureModuleId,
@@ -41,7 +43,7 @@ describe('awaitTemperature', () => {
   })
   it('temperature module id exists and temp status is approaching temp', () => {
     const temperature = 20
-    const args = {
+    const args: AwaitTemperatureArgs = {
       module: temperatureModuleId,
       temperature,
       commandCreatorFnName,
@@ -68,7 +70,7 @@ describe('awaitTemperature', () => {
   })
   it('returns missing module error when module id does not exist', () => {
     const temperature = 42
-    const args = {
+    const args: AwaitTemperatureArgs = {
       module: 'someNonexistentModuleId',
       temperature,
       commandCreatorFnName,
@@ -78,7 +80,7 @@ describe('awaitTemperature', () => {
   })
   it('returns missing module error when module id is null', () => {
     const temperature = 42
-    const args = {
+    const args: AwaitTemperatureArgs = {
       module: null,
       temperature,
       commandCreatorFnName,
@@ -88,7 +90,7 @@ describe('awaitTemperature', () => {
   })
   it('returns awaitTemperature command creator when temperature module already at target temp and awaiting that same temp', () => {
     const temperature = 42
-    const args = {
+    const args: AwaitTemperatureArgs = {
       module: temperatureModuleId,
       temperature,
       commandCreatorFnName,
@@ -115,7 +117,7 @@ describe('awaitTemperature', () => {
   })
   it('returns missing temperature step error when temperature module already at target temp and awaiting different temp', () => {
     const temperature = 80
-    const args = {
+    const args: AwaitTemperatureArgs = {
       module: temperatureModuleId,
       temperature,
       commandCreatorFnName,
@@ -131,7 +133,7 @@ describe('awaitTemperature', () => {
   })
   it('returns missing temperature step error when prev temp state is DEACTIVATED', () => {
     const temperature = 80
-    const args = {
+    const args: AwaitTemperatureArgs = {
       module: temperatureModuleId,
       temperature,
       commandCreatorFnName,
