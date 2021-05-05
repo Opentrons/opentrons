@@ -11,7 +11,6 @@ import { SectionBody } from './SectionBody'
 import styles from '../../styles.css'
 import type { LabwareFields } from '../../fields'
 
-
 interface Props {
   showDropDownOptions: boolean
   disabled: boolean
@@ -19,7 +18,7 @@ interface Props {
   onClick: () => void
 }
 
-const getContent = (props: Props): JSX.Element => {
+const Content = (props: Props): JSX.Element => {
   const {
     disabled,
     labwareTypeChildFields,
@@ -68,12 +67,8 @@ export const CreateNewDefinition = (props: Props): JSX.Element | null => {
         })}
       >
         <>
-          <FormAlerts
-            touched={touched}
-            errors={errors}
-            fieldList={fieldList}
-          />
-          {getContent({ ...props })}
+          <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
+          <Content {...props} />
         </>
       </SectionBody>
     </div>
