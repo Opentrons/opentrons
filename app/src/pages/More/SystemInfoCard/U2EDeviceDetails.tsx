@@ -36,7 +36,7 @@ const DetailText = styled.span`
   margin-right: ${SPACING_1};
 `
 
-const DEVICE_STATS: Array<{ label: string, property: $Keys<UsbDevice> }> = [
+const DEVICE_STATS: Array<{ label: string, property: keyof UsbDevice }> = [
   { label: 'Description', property: 'deviceName' },
   { label: 'Manufacturer', property: 'manufacturer' },
   { label: 'Serial Number', property: 'serialNumber' },
@@ -49,7 +49,7 @@ const DetailItem = ({
 }: {
   label: string,
   value: string | number,
-}) => (
+}): JSX.Element => (
   <Flex as="li" marginBottom={SPACING_1}>
     <DetailText>{label}:</DetailText>
     <DetailText>{value}</DetailText>

@@ -10,15 +10,23 @@ import {
 } from '../../__fixtures__'
 import { syncTimeOnConnectEpic } from '../syncTimeOnConnectEpic'
 
-const createConnectAction = robotName => RobotActions.connect(robotName) as any
+import type { Action } from '../../../types'
 
-const createTimeSuccessResponse = (time: Date) => {
+const createConnectAction = (robotName: string): Action =>
+  RobotActions.connect(robotName) as any
+
+const createTimeSuccessResponse = (
+  time: Date
+): typeof mockFetchSystemTimeSuccess => {
   const response = cloneDeep(mockFetchSystemTimeSuccess)
   set(response, 'body.data.systemTime', time.toISOString())
   return response
 }
 
-const createEpicOutput = (mocks, createHotObservable) => {
+const createEpicOutput = (
+  mocks,
+  createHotObservable
+): ReturnType<typeof syncTimeOnConnectEpic> => {
   const action$ = createHotObservable('--a', { a: mocks.action })
   const state$ = createHotObservable('s-s', { s: mocks.state })
   const output$ = syncTimeOnConnectEpic(action$, state$)

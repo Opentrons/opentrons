@@ -16,8 +16,8 @@ import type { RobotHost } from '../types'
 jest.unmock('node-fetch')
 
 describe('robot-api http client', () => {
-  let testApp: $Application<>
-  let testServer: http$Server
+  let testApp: $Application
+  let testServer: any
   let testPort: number
   let robot: RobotHost
 
