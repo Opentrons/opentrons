@@ -16,10 +16,11 @@ interface ContentProps {
 }
 const Content = (props: ContentProps): JSX.Element => {
   const { values } = props
-  // @ts-expect-error `includes` doesn't want to take null/undefined
-  const wellLabel = ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
-    ? 'tube'
-    : 'well'
+  const wellLabel =
+    values.labwareType != null &&
+    ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
+      ? 'tube'
+      : 'well'
   return (
     <div className={styles.flex_row}>
       <div className={styles.volume_instructions_column}>
