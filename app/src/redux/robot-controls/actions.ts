@@ -1,4 +1,3 @@
-
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -66,7 +65,11 @@ type HomeActionCreator = ((
 ) => Types.HomeAction) &
   ((robotName: string, target: 'pipette', mount: Mount) => Types.HomeAction)
 
-export const home: HomeActionCreator = (robotName, target, mount) => ({
+export const home: HomeActionCreator = (
+  robotName: string,
+  target: 'robot' | 'pipette',
+  mount?: Mount
+): Types.HomeAction => ({
   type: Constants.HOME,
   payload:
     target === Constants.PIPETTE && typeof mount === 'string'
