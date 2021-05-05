@@ -1,6 +1,7 @@
 """Test equipment command execution side effects."""
 import pytest
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
+from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocol_engine.errors import LabwareDefinitionDoesNotExistError
 
 from opentrons.protocols.models import LabwareDefinition
@@ -88,7 +89,7 @@ async def test_load_labware_gets_labware_def(
     mock_state_view: MagicMock,
 ) -> None:
     """Loading labware should load the labware's defintion."""
-    mock_state_view.labware.get_labware_definition.side_effect =\
+    mock_state_view.labware.get_definition_by_uri.side_effect =\
         LabwareDefinitionDoesNotExistError
 
     res = await handler.load_labware(
@@ -113,7 +114,7 @@ async def test_load_labware_uses_loaded_labware_def(
     mock_state_view: MagicMock,
 ) -> None:
     """Loading labware should use the labware definition already in state."""
-    mock_state_view.labware.get_labware_definition.return_value = minimal_labware_def
+    mock_state_view.labware.get_definition_by_uri.return_value = minimal_labware_def
 
     res = await handler.load_labware(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
@@ -125,8 +126,8 @@ async def test_load_labware_uses_loaded_labware_def(
 
     assert type(res) == LoadedLabware
     assert res.definition == minimal_labware_def
-    mock_state_view.labware.get_labware_definition.assert_called_once_with(
-        load_name="load-name", namespace="opentrons-test", version=1
+    mock_state_view.labware.get_definition_by_uri.assert_called_once_with(
+        uri_from_details(load_name="load-name", namespace="opentrons-test", version=1)
     )
     mock_resources_with_data.labware_data.get_labware_definition.assert_not_called()
 
@@ -138,7 +139,7 @@ async def test_load_labware_gets_labware_cal_data(
     mock_state_view: MagicMock,
 ) -> None:
     """Loading labware should load the labware's calibration data."""
-    mock_state_view.labware.get_labware_definition.return_value = well_plate_def
+    mock_state_view.labware.get_definition_by_uri.return_value = well_plate_def
 
     res = await handler.load_labware(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),

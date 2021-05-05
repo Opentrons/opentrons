@@ -9,10 +9,10 @@ from opentrons.protocol_engine.commands import (
 def test_add_labware_request(well_plate_def: models.LabwareDefinition) -> None:
     """It should have an AddLabwareDefinitionRequest model."""
     request = AddLabwareDefinitionRequest(
-        labware_definition=well_plate_def,
+        definition=well_plate_def,
     )
 
-    assert request.labware_definition == well_plate_def
+    assert request.definition == well_plate_def
 
 
 def test_add_labware_result() -> None:
@@ -34,7 +34,7 @@ async def test_add_labware_implementation(
 ) -> None:
     """An AddLabwareRequest should have an execution implementation."""
     request = AddLabwareDefinitionRequest(
-        labware_definition=well_plate_def
+        definition=well_plate_def
     )
 
     impl = request.get_implementation()

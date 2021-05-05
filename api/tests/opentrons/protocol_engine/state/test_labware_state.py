@@ -2,10 +2,11 @@
 import pytest
 from datetime import datetime, timezone
 from typing import Tuple
+
+from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
-from opentrons.protocols import models
 
 from opentrons.protocol_engine import commands as cmd, errors, StateStore
 from opentrons.protocol_engine.resources import DeckFixedLabware
@@ -55,14 +56,13 @@ def add_labware_definition(
     cmd.AddLabwareDefinitionResult
 ]:
     """Add a labware definition into state using an AddLabwareRequest."""
-    model = models.LabwareDefinition.parse_obj(definition)
     request = cmd.AddLabwareDefinitionRequest(
-        labware_definition=model
+        definition=definition
     )
     result = cmd.AddLabwareDefinitionResult(
-        loadName=model.parameters.loadName,
-        namespace=model.namespace,
-        version=model.version
+        loadName=definition.parameters.loadName,
+        namespace=definition.namespace,
+        version=definition.version
     )
     command = cmd.CompletedCommand(
         created_at=datetime.now(tz=timezone.utc),
@@ -97,7 +97,11 @@ def test_handles_load_labware(
     data = store.labware.get_labware_data_by_id(command.result.labwareId)
 
     assert data.location == command.request.location
-    assert data.definition == command.result.definition
+    assert data.uri == uri_from_details(
+        namespace=command.result.definition.namespace,
+        version=command.result.definition.version,
+        load_name=command.result.definition.parameters.loadName
+    )
     assert data.calibration == command.result.calibration
 
 
@@ -114,10 +118,12 @@ def test_handle_load_labware_saves_definition(
         calibration=(1, 2, 3),
     )
 
-    definition = store.labware.get_labware_definition(
-        load_name=command.request.loadName,
-        namespace=command.request.namespace,
-        version=command.request.version
+    definition = store.labware.get_definition_by_uri(
+        uri_from_details(
+            load_name=command.result.definition.parameters.loadName,
+            namespace=command.result.definition.namespace,
+            version=command.result.definition.version
+        )
     )
 
     assert definition == well_plate_def
@@ -126,10 +132,12 @@ def test_handle_load_labware_saves_definition(
 def test_get_labware_definition_bad_id(store: StateStore) -> None:
     """get_labware_definition should raise if labware definition doesn't exist."""
     with pytest.raises(errors.LabwareDefinitionDoesNotExistError):
-        store.labware.get_labware_definition(
-            load_name="dkn9dknmfeo",
-            namespace="9vmkdnvi2",
-            version=0x138281,
+        store.labware.get_definition_by_uri(
+            uri_from_details(
+                load_name="dkn9dknmfeo",
+                namespace="9vmkdnvi2",
+                version=0x138281,
+            )
         )
 
 
@@ -143,10 +151,12 @@ def test_handles_add_labware_defintion(
         definition=well_plate_def
     )
 
-    data = store.labware.get_labware_definition(
-        load_name=command.result.loadName,
-        namespace=command.result.namespace,
-        version=command.result.version
+    data = store.labware.get_definition_by_uri(
+        uri_from_details(
+            load_name=command.result.loadName,
+            namespace=command.result.namespace,
+            version=command.result.version
+        )
     )
 
     assert data == well_plate_def
@@ -170,14 +180,20 @@ def test_loads_fixed_labware(
 
     assert store.labware.get_labware_data_by_id("fixedTrash") == LabwareData(
         location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
-        definition=fixed_trash_def,
+        uri=uri_from_details(
+            namespace=fixed_trash_def.namespace,
+            version=fixed_trash_def.version,
+            load_name=fixed_trash_def.parameters.loadName,
+        ),
         calibration=(0, 0, 0),
     )
 
-    assert store.labware.get_labware_definition(
-        load_name=fixed_trash_def.parameters.loadName,
-        namespace=fixed_trash_def.namespace,
-        version=fixed_trash_def.version
+    assert store.labware.get_definition_by_uri(
+        uri_from_details(
+            namespace=fixed_trash_def.namespace,
+            version=fixed_trash_def.version,
+            load_name=fixed_trash_def.parameters.loadName,
+        ),
     ) == fixed_trash_def
 
 
@@ -224,7 +240,7 @@ def test_get_labware_definition(
         calibration=(1, 2, 3),
     )
 
-    result = store.labware.get_definition("plate-id")
+    result = store.labware.get_labware_definition("plate-id")
 
     assert result == well_plate_def
 

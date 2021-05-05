@@ -92,7 +92,7 @@ class Labware:  # noqa: D101
     # definition and call it a day?
     @property
     def parameters(self) -> LabwareParameters:  # noqa: D102
-        definition = self._engine_client.state.labware.get_definition(
+        definition = self._engine_client.state.labware.get_labware_definition(
             labware_id=self._labware_id
         )
         return cast(LabwareParameters, definition.parameters.dict())
@@ -109,7 +109,7 @@ class Labware:  # noqa: D101
     # necessary with Protocol Engine controlling execution. Can we get rid of it?
     @property
     def magdeck_engage_height(self) -> Optional[float]:    # noqa: D102
-        definition = self._engine_client.state.labware.get_definition(
+        definition = self._engine_client.state.labware.get_labware_definition(
             labware_id=self._labware_id
         )
         return definition.parameters.magneticModuleEngageHeight
@@ -140,7 +140,7 @@ class Labware:  # noqa: D101
     @property
     def is_tiprack(self) -> bool:
         """Whether this labware is a tiprack."""
-        definition = self._engine_client.state.labware.get_definition(
+        definition = self._engine_client.state.labware.get_labware_definition(
             labware_id=self._labware_id
         )
         return definition.parameters.isTiprack
@@ -160,7 +160,7 @@ class Labware:  # noqa: D101
             LabwareIsNotTipRackError: will raise if this property is accessed
                 on a labware instance that is not a tip rack.
         """
-        definition = self._engine_client.state.labware.get_definition(
+        definition = self._engine_client.state.labware.get_labware_definition(
             labware_id=self._labware_id
         )
         if definition.parameters.tipLength is None:

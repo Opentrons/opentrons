@@ -30,7 +30,7 @@ class LoadLabwareRequest(BaseModel):
         description="The labware definition version.",
     )
     labwareId: Optional[str] = Field(
-        ...,
+        None,
         description="An optional ID to assign to this labware. If None, an ID "
                     "will be generated."
     )

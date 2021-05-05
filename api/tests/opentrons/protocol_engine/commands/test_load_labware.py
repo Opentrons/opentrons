@@ -19,14 +19,14 @@ def test_load_labware_request() -> None:
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1,
-        labwareId=None
+        labwareId="some id"
     )
 
     assert request.location == DeckSlotLocation(slot=DeckSlotName.SLOT_3)
     assert request.loadName == "some-load-name"
     assert request.namespace == "opentrons-test"
     assert request.version == 1
-    assert request.labwareId is None
+    assert request.labwareId == "some id"
 
 
 def test_load_labware_result(well_plate_def: LabwareDefinition) -> None:
@@ -58,7 +58,6 @@ async def test_load_labware_implementation(
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1,
-        labwareId=None
     )
 
     impl = request.get_implementation()

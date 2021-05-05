@@ -99,7 +99,9 @@ class GeometryState:
         """Get the position of the labware's origin, without calibration."""
         labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
         slot_pos = self.get_slot_position(labware_data.location.slot)
-        origin_offset = labware_data.definition.cornerOffsetFromSlot
+        origin_offset = self._labware_store.state.get_definition_by_uri(
+            labware_data.uri
+        ).cornerOffsetFromSlot
 
         return Point(
             x=slot_pos.x + origin_offset.x,
@@ -154,7 +156,9 @@ class GeometryState:
         )
 
     def _get_highest_z_from_labware_data(self, lw_data: LabwareData) -> float:
-        z_dim = lw_data.definition.dimensions.zDimension
+        z_dim = self._labware_store.state.get_definition_by_uri(
+            lw_data.uri
+        ).dimensions.zDimension
         slot_pos = self.get_slot_position(lw_data.location.slot)
 
         return z_dim + slot_pos[2] + lw_data.calibration[2]

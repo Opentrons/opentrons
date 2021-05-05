@@ -9,7 +9,7 @@ from opentrons.protocols.models import LabwareDefinition
 
 class AddLabwareDefinitionRequest(BaseModel):
     """Request to add a labware definition."""
-    labware_definition: LabwareDefinition = Field(
+    definition: LabwareDefinition = Field(
         ...,
         description="The labware definition."
     )
@@ -48,7 +48,7 @@ class AddLabwareDefinitionImplementation(
     ) -> AddLabwareDefinitionResult:
         """Execute the add labware definition request."""
         return AddLabwareDefinitionResult(
-            loadName=self._request.labware_definition.parameters.loadName,
-            namespace=self._request.labware_definition.namespace,
-            version=self._request.labware_definition.version
+            loadName=self._request.definition.parameters.loadName,
+            namespace=self._request.definition.namespace,
+            version=self._request.definition.version
         )

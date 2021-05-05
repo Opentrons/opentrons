@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from typing import Tuple, Optional
 
+from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
@@ -72,10 +73,12 @@ class EquipmentHandler:
 
         try:
             # Try to use existing definition in state.
-            definition = self._state.labware.get_labware_definition(
-                load_name=load_name,
-                namespace=namespace,
-                version=version
+            definition = self._state.labware.get_definition_by_uri(
+                uri_from_details(
+                    load_name=load_name,
+                    namespace=namespace,
+                    version=version,
+                )
             )
         except LabwareDefinitionDoesNotExistError:
             definition = await self._resources.labware_data.get_labware_definition(
