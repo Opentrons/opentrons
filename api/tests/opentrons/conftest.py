@@ -510,7 +510,6 @@ def minimal_labware_def():
             "isTiprack": False,
             "loadName": "minimal_labware_def",
             "isMagneticModuleCompatible": True,
-            "quirks": ["a quirk"],
             "format": "irregular"
         },
         "ordering": [["A1"], ["A2"]],

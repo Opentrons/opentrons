@@ -17,7 +17,6 @@ from ..commands import (
     CompletedCommandType,
     LoadLabwareResult,
     AddLabwareDefinitionResult,
-    AddLabwareDefinitionRequest
 )
 from ..types import LabwareLocation, Dimensions
 from .substore import Substore, CommandReactive
@@ -173,8 +172,7 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
                 uri=uri,
                 calibration=command.result.calibration,
             )
-        elif isinstance(command.request, AddLabwareDefinitionRequest) and \
-                isinstance(command.result, AddLabwareDefinitionResult):
+        elif isinstance(command.result, AddLabwareDefinitionResult):
             uri = uri_from_details(
                 namespace=command.result.namespace,
                 load_name=command.result.loadName,
