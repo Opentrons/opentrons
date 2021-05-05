@@ -6,13 +6,9 @@ import noop from 'lodash/noop'
 import * as Selectors from '../selectors'
 import { useFeatureFlag } from '../hooks'
 
-import type { State } from '../../types'
-import type { FeatureFlags } from '../types'
-
 jest.mock('../selectors')
 
-const getFeatureFlags: JestMockFn<[State], FeatureFlags> =
-  Selectors.getFeatureFlags
+const getFeatureFlags = Selectors.getFeatureFlags as jest.MockedFunction<typeof Selectors.getFeatureFlags>
 
 describe('config hooks', () => {
   afterEach(() => {

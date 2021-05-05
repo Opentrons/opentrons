@@ -6,7 +6,7 @@ import { useDispatchApiRequest, useDispatchApiRequests } from '../hooks'
 
 jest.mock('lodash/uniqueId')
 
-const mockUniqueId: JestMockFn<[string | void], string> = uniqueId
+const mockUniqueId = uniqueId as jest.MockedFunction<typeof uniqueId>
 
 describe('useDispatchApiRequest', () => {
   let render

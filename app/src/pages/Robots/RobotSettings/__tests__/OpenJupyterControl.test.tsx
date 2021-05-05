@@ -6,15 +6,12 @@ import { i18n } from '../../../../i18n'
 import * as Analytics from '../../../../redux/analytics'
 import { OpenJupyterControl } from '../OpenJupyterControl'
 
-import type { AnalyticsEvent } from '../../../../redux/analytics/types'
-
 jest.mock('../../../../redux/analytics')
 
-const useTrackEvent: JestMockFn<[], (AnalyticsEvent) => void> =
-  Analytics.useTrackEvent
+const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<typeof Analytics.useTrackEvent>
 
 describe('OpenJupyterControl component', () => {
-  const render = () =>
+  const render = (): ReturnType<typeof mountWithProviders> =>
     mountWithProviders(<OpenJupyterControl robotIp="localhost" />, { i18n })
   const trackEvent = jest.fn()
 

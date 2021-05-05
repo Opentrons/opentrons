@@ -10,7 +10,6 @@ import { remote as mockRemote } from '../remote'
 import { shellEpic } from '../epic'
 
 import type { State } from '../../types'
-import type { UpdateChannel } from '../../config/types'
 
 const { ipcRenderer: mockIpc } = mockRemote
 
@@ -23,11 +22,13 @@ jest.mock('../update', () => ({
   getAvailableShellUpdate: jest.fn(),
 }))
 
-const getUpdateChannel: JestMockFn<[State], UpdateChannel> =
-  Config.getUpdateChannel
+const getUpdateChannel = Config.getUpdateChannel as jest.MockedFunction<
+  typeof Config.getUpdateChannel
+>
 
-const getAvailableShellUpdate: JestMockFn<[State], string | null> =
-  ShellUpdate.getAvailableShellUpdate
+const getAvailableShellUpdate = ShellUpdate.getAvailableShellUpdate as jest.MockedFunction<
+  typeof ShellUpdate.getAvailableShellUpdate
+>
 
 describe('shell epics', () => {
   let testScheduler: TestScheduler

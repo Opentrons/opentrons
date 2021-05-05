@@ -12,17 +12,18 @@ jest.mock('../selectors')
 
 const MOCK_STATE: State = { mockState: true } as any
 
-const getU2EWindowsDriverStatus: JestMockFn<[State], DriverStatus> =
-  Selectors.getU2EWindowsDriverStatus
+const getU2EWindowsDriverStatus = Selectors.getU2EWindowsDriverStatus as jest.MockedFunction<
+  typeof Selectors.getU2EWindowsDriverStatus
+>
 
 describe('system info epic', () => {
   let testScheduler: TestScheduler
 
   const expectOutput = (
     statusValues: DriverStatus[],
-    expectedMarbles,
-    expectedValues
-  ) => {
+    expectedMarbles: string,
+    expectedValues?: unknown
+  ): void => {
     statusValues.forEach(status => {
       getU2EWindowsDriverStatus.mockImplementationOnce(s => {
         expect(s).toEqual(MOCK_STATE)

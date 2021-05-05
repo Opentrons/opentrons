@@ -6,12 +6,11 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { restartEpic, startDiscoveryOnRestartEpic } from '../restartEpic'
 
-import type { State } from '../../../types'
-
 jest.mock('../../../robot-settings/selectors')
 
-const mockGetRestartPath: JestMockFn<[State, string], string | null> =
-  SettingsSelectors.getRobotRestartPath
+const mockGetRestartPath = SettingsSelectors.getRobotRestartPath as jest.MockedFunction<
+  typeof SettingsSelectors.getRobotRestartPath
+>
 
 describe('robotAdminEpic handles restarting', () => {
   afterEach(() => {

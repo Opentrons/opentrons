@@ -9,13 +9,6 @@ import * as Actions from '../../actions'
 import * as Types from '../../types'
 import { robotControlsEpic } from '..'
 
-import type { Observable } from 'rxjs'
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-  RobotApiResponse,
-} from '../../../robot-api/types'
-
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')
 jest.mock('../../../pipettes/selectors')

@@ -1,19 +1,13 @@
 
 import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
-import type {
-  PipetteModelSpecs,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { i18n } from '../../../../i18n'
 import { PipetteOffsetItem } from '../PipetteOffsetItem'
-import { InlineCalibrationWarning } from '../../../../molecules/InlineCalibrationWarning'
 import { findLabwareDefWithCustom } from '../../../../assets/labware/findLabware'
-import type {
-  PipetteOffsetCalibration,
-  TipLengthCalibration,
-} from '../../../../redux/calibration/types'
+
+import type { ReactWrapper } from 'enzyme'
+import { AttachedPipette, PipetteCalibrations } from '../../../../redux/pipettes/types'
 
 jest.mock('../../../../assets/labware/findLabware')
 
@@ -27,27 +21,22 @@ jest.mock('@opentrons/shared-data', () => ({
   getLabwareDisplayName: jest.fn(),
 }))
 
-const mockFindLabwareDefWithCustom: JestMockFn<
-  [string | null, string | null, string | null, LabwareDefinition2[]],
-  LabwareDefinition2 | null
-> = findLabwareDefWithCustom
+const mockFindLabwareDefWithCustom = findLabwareDefWithCustom as jest.MockedFunction<typeof findLabwareDefWithCustom>
 
-const mockGetLabwareDisplayName: JestMockFn<
-  [LabwareDefinition2],
-  string
-> = getLabwareDisplayName
+const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<typeof getLabwareDisplayName>
 
-const getMountLabel = wrapper => wrapper.find('h4')
+const getMountLabel = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('h4')
 
-const getPipetteName = wrapper => wrapper.find('p').at(1)
-const getNotCalibrated = wrapper => wrapper.find('p').at(1)
-const getCalibrationText = wrapper => wrapper.find('p')
-const getCalibrationTime = wrapper => wrapper.find('p').at(3)
-const getCalibrationTiprack = wrapper => wrapper.find('p').at(5)
-const getCalibrationWarning = wrapper => wrapper.find(InlineCalibrationWarning)
+const getPipetteName = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('p').at(1)
+const getNotCalibrated = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('p').at(1)
+const getCalibrationText = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('p')
+const getCalibrationTime = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('p').at(3)
+const getCalibrationTiprack = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('p').at(5)
+const getCalibrationWarning = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('InlineCalibrationWarning')
 
 describe('PipetteOffsetItem', () => {
-  let render
+  let render: (props?: Partial<React.ComponentProps<typeof PipetteOffsetItem>>) => ReturnType<typeof mountWithProviders>
+
   beforeEach(() => {
     render = (props = {}) => {
       const {
@@ -59,10 +48,8 @@ describe('PipetteOffsetItem', () => {
           tip_length: 0,
           mount_axis: 'z',
           plunger_axis: 'b',
-          modelSpecs: ({
-            displayName: 'P300 Single GEN2',
-          }: Partial<PipetteModelSpecs>),
-        },
+          modelSpecs: { displayName: 'P300 Single GEN2' },
+        } as AttachedPipette,
         calibration = {
           offset: {
             pipette: 'pipette-id-11',
@@ -110,7 +97,7 @@ describe('PipetteOffsetItem', () => {
   it('renders acceptably when talking to a robot with cal data but no status', () => {
     const { wrapper } = render({
       calibration: {
-        offset: ({
+        offset: {
           pipette: 'pipette-id-11',
           mount: 'left',
           offset: [1, 2, 3],
@@ -119,16 +106,16 @@ describe('PipetteOffsetItem', () => {
           lastModified: '2020-09-10T05:13Z',
           source: 'user',
           id: 'a_pip_id',
-        }: Partial<PipetteOffsetCalibration>),
-        tipLength: ({
+        },
+        tipLength: {
           id: '1',
           tipLength: 30,
           tiprack: 'asdagasdfasdsa',
           pipette: 'pipette-id-11',
           lastModified: '2020-09-10T05:10Z',
           source: 'user',
-        }: Partial<TipLengthCalibration>),
-      },
+        },
+      } as PipetteCalibrations,
     })
     expect(wrapper.find('PipetteOffsetItem')).not.toBeNull()
   })
