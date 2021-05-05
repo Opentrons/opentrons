@@ -136,6 +136,7 @@ export const FlowRateInput = (props: FlowRateInputProps): React.Node => {
 
   const FlowRateInputField = (
     <InputField
+      disabled={disabled}
       caption={rangeDescription}
       error={errorMessage}
       isIndeterminate={isIndeterminate && modalFlowRate === null}

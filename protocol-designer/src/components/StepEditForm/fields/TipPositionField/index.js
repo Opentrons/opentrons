@@ -91,6 +91,7 @@ function TipPositionInput(props: Props) {
         isDelayPositionField={isDelayPositionField}
       >
         <InputField
+          disabled={disabled}
           className={props.className || stepFormStyles.small_field}
           readOnly
           onClick={handleOpen}
