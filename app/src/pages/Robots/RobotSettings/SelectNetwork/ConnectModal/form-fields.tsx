@@ -47,7 +47,7 @@ const makeSecurityField = (
   showAllOptions,
 })
 
-const getEapIsSelected = (formSecurityType): boolean %checks => {
+const getEapIsSelected = (formSecurityType: string | null | undefined): boolean => {
   return (
     formSecurityType != null &&
     formSecurityType !== Constants.SECURITY_NONE &&
@@ -56,10 +56,10 @@ const getEapIsSelected = (formSecurityType): boolean %checks => {
 }
 
 const getEapFields = (
-  eapOptions,
-  values,
-  errors,
-  touched
+  eapOptions: EapOption[],
+  values: ConnectFormValues,
+  errors?: ConnectFormErrors,
+  touched?: boolean
 ): WifiAuthField[] => {
   const eapType = values.securityType
   return eapOptions
@@ -67,7 +67,7 @@ const getEapFields = (
     .flatMap(opt => opt.options)
 }
 
-const getEapFieldName = baseName => `eapConfig.${baseName}`
+const getEapFieldName = (baseName: string): string => `eapConfig.${baseName}`
 
 export function getConnectFormFields(
   network: WifiNetwork | null,
@@ -177,7 +177,7 @@ export function validateConnectFormFields(
       .filter(
         ({ name, required }) => required && !get(values, getEapFieldName(name))
       )
-      .forEach(({ name, displayName }) => {
+      .forEach(({ name, displayName }: Partial<EapOption>) => {
         errors[getEapFieldName(name)] = Copy.FIELD_IS_REQUIRED(displayName)
       })
   }
@@ -210,7 +210,7 @@ export const connectFormToConfigureRequest = (
     values.securityType === Constants.SECURITY_WPA_PSK
   ) {
     // NOTE(mc, 2020-03-13): Flow v0.119 unable to refine via consts
-    securityType = ((values.securityType as any): WifiSecurityType)
+    securityType = values.securityType as WifiSecurityType
   }
 
   if (ssid !== null && securityType !== null) {
