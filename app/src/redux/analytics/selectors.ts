@@ -45,6 +45,7 @@ import { hash } from './hash'
 import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
 import type { CalibrationCheckInstrument } from '../sessions/calibration-check/types'
+import type { Mount } from '../pipettes/types'
 
 import type {
   AnalyticsConfig,
@@ -119,7 +120,7 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
     const pipettes = getAttachedPipettes(state, robot.name)
     const settings = getRobotSettings(state, robot.name)
 
-    return settings.reduce(
+    return settings.reduce<RobotAnalyticsData>(
       (result, setting) => ({
         ...result,
         [`${FF_PREFIX}${setting.id}`]: !!setting.value,
@@ -174,7 +175,7 @@ export function getAnalyticsOptInSeen(state: State): boolean {
 
 export function getAnalyticsPipetteCalibrationData(
   state: State,
-  mount: string
+  mount: Mount
 ): PipetteOffsetCalibrationAnalyticsData | null {
   const robot = getConnectedRobot(state)
 
@@ -193,7 +194,7 @@ export function getAnalyticsPipetteCalibrationData(
 
 export function getAnalyticsTipLengthCalibrationData(
   state: State,
-  mount: string
+  mount: Mount
 ): TipLengthCalibrationAnalyticsData | null {
   const robot = getConnectedRobot(state)
 
