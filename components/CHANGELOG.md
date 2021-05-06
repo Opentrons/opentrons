@@ -3,94 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.3.0-alpha.9](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.8...v4.3.0-alpha.9) (2021-05-06)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [4.3.0-alpha.8](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.7...v4.3.0-alpha.8) (2021-04-30)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [4.3.0-alpha.7](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.6...v4.3.0-alpha.7) (2021-04-29)
-
+# [4.3.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0) (2021-05-06)
 
 ### Bug Fixes
 
 * **app:** add USB hub port number ([#7738](https://github.com/Opentrons/opentrons/issues/7738)) ([2f317bc](https://github.com/Opentrons/opentrons/commit/2f317bc))
-
-
-
-
-
-# [4.3.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.5...v4.3.0-alpha.6) (2021-04-23)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [4.3.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.4...v4.3.0-alpha.5) (2021-04-20)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [4.3.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v4.3.0-beta.0...v4.3.0-alpha.4) (2021-04-20)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [4.3.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.3...v4.3.0-beta.0) (2021-04-19)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [4.3.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.2...v4.3.0-alpha.3) (2021-04-19)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [4.3.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.1...v4.3.0-alpha.2) (2021-04-19)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [4.3.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.0...v4.3.0-alpha.1) (2021-04-15)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [4.3.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0-alpha.0) (2021-04-14)
-
-
-### Bug Fixes
-
 * **components:** bump the components library version manually ([#7606](https://github.com/Opentrons/opentrons/issues/7606)) ([247c5dc](https://github.com/Opentrons/opentrons/commit/247c5dc))
 
 
