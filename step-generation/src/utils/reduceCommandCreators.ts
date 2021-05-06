@@ -8,14 +8,14 @@ import type {
   CommandCreatorResult,
   CurriedCommandCreator,
 } from '../types'
-type CCReducerAcc = {
+interface CCReducerAcc {
   robotState: RobotState
-  commands: Array<Command>
-  errors: Array<CommandCreatorError>
-  warnings: Array<CommandCreatorWarning>
+  commands: Command[]
+  errors: CommandCreatorError[]
+  warnings: CommandCreatorWarning[]
 }
 export const reduceCommandCreators = (
-  commandCreators: Array<CurriedCommandCreator>,
+  commandCreators: CurriedCommandCreator[],
   invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): CommandCreatorResult => {

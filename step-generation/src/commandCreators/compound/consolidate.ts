@@ -89,9 +89,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const commandCreators = flatMap(
     sourceWellChunks,
     (
-      sourceWellChunk: Array<string>,
+      sourceWellChunk: string[],
       chunkIndex: number
-    ): Array<CurriedCommandCreator> => {
+    ): CurriedCommandCreator[] => {
       const isLastChunk = chunkIndex + 1 === sourceWellChunks.length
       // Aspirate commands for all source wells in the chunk
       const aspirateCommands = flatMap(
@@ -99,7 +99,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         (
           sourceWell: string,
           wellIndex: number
-        ): Array<CurriedCommandCreator> => {
+        ): CurriedCommandCreator[] => {
           const airGapOffsetSourceWell =
             getWellDepth(sourceLabwareDef, sourceWell) + AIR_GAP_OFFSET_FROM_TOP
           const airGapAfterAspirateCommands = aspirateAirGapVolume
@@ -112,7 +112,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   flowRate: aspirateFlowRateUlSec,
                   offsetFromBottomMm: airGapOffsetSourceWell,
                 }),
-                ...(aspirateDelay
+                ...((aspirateDelay != null)
                   ? [
                       curryCommandCreator(delay, {
                         commandCreatorFnName: 'delay',
@@ -173,7 +173,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ]
         }
       )
-      let tipCommands: Array<CurriedCommandCreator> = []
+      let tipCommands: CurriedCommandCreator[] = []
 
       if (
         args.changeTip === 'always' ||
@@ -186,7 +186,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ]
       }
 
-      const touchTipAfterDispenseCommands: Array<CurriedCommandCreator> = args.touchTipAfterDispense
+      const touchTipAfterDispenseCommands: CurriedCommandCreator[] = args.touchTipAfterDispense
         ? [
             curryCommandCreator(touchTip, {
               pipette: args.pipette,
@@ -196,7 +196,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             }),
           ]
         : []
-      const mixBeforeCommands = mixFirstAspirate
+      const mixBeforeCommands = (mixFirstAspirate != null)
         ? mixUtil({
             pipette: args.pipette,
             labware: args.sourceLabware,
@@ -226,7 +226,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             dispenseDelaySeconds: dispenseDelay?.seconds,
           })
         : []
-      const mixAfterCommands = mixInDestination
+      const mixAfterCommands = (mixInDestination != null)
         ? mixUtil({
             pipette: args.pipette,
             labware: args.destLabware,
@@ -275,7 +275,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
               }),
-              ...(aspirateDelay
+              ...((aspirateDelay != null)
                 ? [
                     curryCommandCreator(delay, {
                       commandCreatorFnName: 'delay',

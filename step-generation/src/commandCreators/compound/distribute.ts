@@ -47,7 +47,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   */
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
   const actionName = 'distribute'
-  const errors: Array<CommandCreatorError> = []
+  const errors: CommandCreatorError[] = []
 
   // TODO: Ian 2019-04-19 revisit these pipetteDoesNotExist errors, how to do it DRY?
   if (
@@ -71,7 +71,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     )
   }
 
-  if (errors.length)
+  if (errors.length > 0)
     return {
       errors,
     }
@@ -120,9 +120,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const commandCreators = flatMap(
     destWellChunks,
     (
-      destWellChunk: Array<string>,
+      destWellChunk: string[],
       chunkIndex: number
-    ): Array<CurriedCommandCreator> => {
+    ): CurriedCommandCreator[] => {
       const firstDestWell = destWellChunk[0]
       const sourceLabwareDef =
         invariantContext.labwareEntities[args.sourceLabware].def
@@ -143,7 +143,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetSourceWell,
             }),
-            ...(aspirateDelay
+            ...((aspirateDelay != null)
               ? [
                   curryCommandCreator(delay, {
                     commandCreatorFnName: 'delay',
@@ -162,7 +162,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetDestWell,
             }),
-            ...(dispenseDelay
+            ...((dispenseDelay != null)
               ? [
                   curryCommandCreator(delay, {
                     commandCreatorFnName: 'delay',
@@ -177,7 +177,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         : []
       const dispenseCommands = flatMap(
         destWellChunk,
-        (destWell: string, wellIndex: number): Array<CurriedCommandCreator> => {
+        (destWell: string, wellIndex: number): CurriedCommandCreator[] => {
           const delayAfterDispenseCommands =
             dispenseDelay != null
               ? [
@@ -226,7 +226,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         }
       )
       // NOTE: identical to consolidate
-      let tipCommands: Array<CurriedCommandCreator> = []
+      let tipCommands: CurriedCommandCreator[] = []
 
       if (
         args.changeTip === 'always' ||
@@ -263,7 +263,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
               }),
-              ...(aspirateDelay
+              ...((aspirateDelay != null)
                 ? [
                     curryCommandCreator(delay, {
                       commandCreatorFnName: 'delay',
@@ -331,7 +331,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
             }),
           ]
         : []
-      const mixBeforeAspirateCommands = args.mixBeforeAspirate
+      const mixBeforeAspirateCommands = (args.mixBeforeAspirate != null)
         ? mixUtil({
             pipette: args.pipette,
             labware: args.sourceLabware,

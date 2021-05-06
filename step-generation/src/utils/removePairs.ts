@@ -1,11 +1,11 @@
 // Skip all pairs for which `excludeWhen` returns true
 export function removePairs<T>(
-  input: Array<T>,
+  input: T[],
   excludeWhen: (arg0: T, arg1: T) => boolean
-): Array<T> {
+): T[] {
   const WIDTH = 2
   let currentPos = 0
-  const res: Array<T> = []
+  const res: T[] = []
 
   while (currentPos + 1 < input.length) {
     const firstVal = input[currentPos]

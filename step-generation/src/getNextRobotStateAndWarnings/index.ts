@@ -203,7 +203,7 @@ export function getNextRobotStateAndWarningsSingleCommand(
 }
 // Get next state after multiple commands
 export function getNextRobotStateAndWarnings(
-  commands: Array<Command>,
+  commands: Command[],
   invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): RobotStateAndWarnings {

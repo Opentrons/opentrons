@@ -50,7 +50,7 @@ describe('_getNextTip', () => {
   const getNextTipHelper = (
     channel: 1 | 8,
     tiprackTipState: Record<string, boolean>
-  ) => {
+  ): string | null => {
     const pipetteId = channel === 1 ? DEFAULT_PIPETTE : 'p300MultiId'
     const tiprackId = 'testTiprack'
 

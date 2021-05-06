@@ -10,7 +10,7 @@ export const dropAllTips: CommandCreator<null> = (
   invariantContext,
   prevRobotState
 ) => {
-  const pipetteIds: Array<string> = Object.keys(prevRobotState.pipettes)
+  const pipetteIds: string[] = Object.keys(prevRobotState.pipettes)
   const commandCreators = pipetteIds.map(pipette =>
     curryCommandCreator(dropTip, {
       pipette,

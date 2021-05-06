@@ -34,7 +34,7 @@ export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs
     }
   }
 
-  const commandCreators: Array<CurriedCommandCreator> = []
+  const commandCreators: CurriedCommandCreator[] = []
 
   if (thermocyclerState.lidOpen !== false) {
     commandCreators.push(

@@ -11,7 +11,7 @@ export interface Diff {
   deactivateLidTemperature: boolean
 }
 
-const getInitialDiff = () => ({
+const getInitialDiff = (): Diff => ({
   lidOpen: false,
   lidClosed: false,
   setBlockTemperature: false,
@@ -23,7 +23,7 @@ const getInitialDiff = () => ({
 const getLidOpenDiff = (
   prevThermocyclerState: ThermocyclerModuleState,
   args: ThermocyclerStateStepArgs
-) => {
+): Partial<Diff> => {
   if (!prevThermocyclerState.lidOpen && args.lidOpen) {
     return {
       lidOpen: true,
@@ -36,7 +36,7 @@ const getLidOpenDiff = (
 const getLidClosedDiff = (
   prevThermocyclerState: ThermocyclerModuleState,
   args: ThermocyclerStateStepArgs
-) => {
+): Partial<Diff> => {
   if (
     (prevThermocyclerState.lidOpen && !args.lidOpen) ||
     (prevThermocyclerState.lidOpen === null && !args.lidOpen)

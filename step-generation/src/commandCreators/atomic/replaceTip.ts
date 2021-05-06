@@ -7,7 +7,7 @@ import {
   modulePipetteCollision,
 } from '../../utils'
 import type { CurriedCommandCreator, CommandCreator } from '../../types'
-type PickUpTipArgs = {
+interface PickUpTipArgs {
   pipette: string
   tiprack: string
   well: string
@@ -32,7 +32,7 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
   }
 }
 
-type ReplaceTipArgs = {
+interface ReplaceTipArgs {
   pipette: string
 }
 
@@ -49,7 +49,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const { pipette } = args
   const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
 
-  if (!nextTiprack) {
+  if (nextTiprack == null) {
     // no valid next tip / tiprack, bail out
     return {
       errors: [errorCreators.insufficientTips()],
@@ -67,7 +67,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const commandCreators: Array<CurriedCommandCreator> = [
+  const commandCreators: CurriedCommandCreator[] = [
     curryCommandCreator(dropTip, {
       pipette,
     }),

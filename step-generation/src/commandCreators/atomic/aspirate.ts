@@ -16,7 +16,7 @@ export const aspirate: CommandCreator<AspirateParams> = (
 ) => {
   const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
   const actionName = 'aspirate'
-  const errors: Array<CommandCreatorError> = []
+  const errors: CommandCreatorError[] = []
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
 
   if (!pipetteSpec) {
