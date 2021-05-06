@@ -10,7 +10,7 @@ OT-2 software 4.3.0 brings a major new feature: the ability to use multiple modu
 
 ## New Features
 
-- The OT-2 now supports protocols with two Magnetic Modules or two Temperature Modules. Protocols may now load more than one of the same module type by calling `protocol.load_module()` multiple times with the same type of module and different deck slots.
+- The OT-2 now supports the use of two Magnetic Modules or two Temperature Modules in the same Python API protocol. See our Help Center article on [using modules of the same type](https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2) for an overview of how this feature should be configured.
 - New API level: 2.10. This API level contains a bugfix for an issue where pipettes would move diagonally when accessing the same well one after another ([#7156](https://github.com/Opentrons/opentrons/issues/7156)). The fix is only applied when API Level 2.10 is requested in a protocol to avoid changing the behavior of existing protocols.
 
 ## Bugfixes
