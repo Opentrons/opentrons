@@ -4,9 +4,7 @@ import { PrimaryButton, Icon } from '@opentrons/components'
 import styles from './upload-panel.css'
 
 export interface UploadInputProps {
-  onUpload: (
-    SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<>
-  ) => void,
+  onUpload: React.FormEventHandler | React.DragEventHandler
   isButton?: boolean,
 }
 

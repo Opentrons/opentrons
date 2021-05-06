@@ -32,7 +32,7 @@ type TextInputProps<T> = InputProps<T> & {
 }
 
 export class Form extends React.Component<FormProps> {
-  onSubmit: (event: SyntheticEvent<>) => void = event => {
+  onSubmit: React.FormEventHandler = event => {
     this.props.onSubmit()
     event.preventDefault()
   }
@@ -48,8 +48,8 @@ export class Form extends React.Component<FormProps> {
   }
 }
 
-export class Select<T: string> extends React.Component<SelectProps<T>> {
-  onChange: (event: SyntheticInputEvent<>) => void = event => {
+export class Select<T = string> extends React.Component<SelectProps<T>> {
+  onChange: React.ChangeEventHandler = event => {
     if (!this.props.disabled) {
       this.props.onChange({
         [this.props.name]: event.target.value,
@@ -72,8 +72,8 @@ export class Select<T: string> extends React.Component<SelectProps<T>> {
   }
 }
 
-export class TextInput<T: string> extends React.Component<TextInputProps<T>> {
-  onChange: (event: SyntheticInputEvent<>) => void = event => {
+export class TextInput<T = string> extends React.Component<TextInputProps<T>> {
+  onChange: React.ChangeEventHandler = event => {
     if (!this.props.disabled) {
       this.props.onChange({
         [this.props.name]: event.target.value,

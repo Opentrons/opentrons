@@ -100,7 +100,9 @@ const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
   })
 )
 
-export const getProtocolAnalyticsData: (state: State) => Promise<ProtocolAnalyticsData> = createSelector(
+export const getProtocolAnalyticsData: (
+  state: State
+) => Promise<ProtocolAnalyticsData> = createSelector(
   _getUnhashedProtocolAnalyticsData,
   data => {
     const hashTasks = [hash(data.protocolAuthor), hash(data.protocolText)]
@@ -220,7 +222,7 @@ function getPipetteModels(state: State, robotName: string): ModelsByMount {
       }
       return obj
     },
-    ({} as Partial<ModelsByMount>)
+    {} as Partial<ModelsByMount>
   )
 }
 
@@ -233,20 +235,23 @@ function getCalibrationCheckData(
     return null
   }
   const { comparisonsByPipette, instruments } = session.details
-  return instruments.reduce((obj, instrument: CalibrationCheckInstrument) => {
-    const { rank, mount, model } = instrument
-    const succeeded = !some(
-      Object.keys(comparisonsByPipette[rank]).map(k =>
-        Boolean(comparisonsByPipette[rank][k]?.status === 'OUTSIDE_THRESHOLD')
+  return instruments.reduce(
+    (obj, instrument: CalibrationCheckInstrument) => {
+      const { rank, mount, model } = instrument
+      const succeeded = !some(
+        Object.keys(comparisonsByPipette[rank]).map(k =>
+          Boolean(comparisonsByPipette[rank][k]?.status === 'OUTSIDE_THRESHOLD')
+        )
       )
-    )
-    obj[mount] = {
-      comparisons: comparisonsByPipette[rank],
-      succeeded: succeeded,
-      model: model,
-    }
-    return obj
-  }, ({ left: null, right: null }: Partial<CalibrationCheckByMount>))
+      obj[mount] = {
+        comparisons: comparisonsByPipette[rank],
+        succeeded: succeeded,
+        model: model,
+      }
+      return obj
+    },
+    { left: null, right: null } as Partial<CalibrationCheckByMount>
+  )
 }
 
 export function getAnalyticsDeckCalibrationData(
