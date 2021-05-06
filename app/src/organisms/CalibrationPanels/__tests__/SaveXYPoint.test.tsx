@@ -6,24 +6,26 @@ import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
 import * as Sessions from '../../../redux/sessions'
 import { SaveXYPoint } from '../SaveXYPoint'
 
+import type { ReactWrapper } from 'enzyme'
+
 const currentStepBySlot = {
   '1': Sessions.DECK_STEP_SAVING_POINT_ONE,
   '3': Sessions.DECK_STEP_SAVING_POINT_TWO,
   '7': Sessions.DECK_STEP_SAVING_POINT_THREE,
 }
 describe('SaveXYPoint', () => {
-  let render
+  let render: (props?: Partial<React.ComponentProps<typeof SaveXYPoint>>) => ReturnType<typeof mount>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getSaveButton = (wrapper, direction) =>
+  const getSaveButton = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('button[title="save"]')
 
-  const getJogButton = (wrapper, direction) =>
+  const getJogButton = (wrapper: ReactWrapper, direction: string): ReactWrapper =>
     wrapper.find(`button[title="${direction}"]`).find('button')
 
-  const getVideo = wrapper => wrapper.find(`source`)
+  const getVideo = (wrapper: ReactWrapper): ReactWrapper => wrapper.find(`source`)
 
   beforeEach(() => {
     render = (props = {}) => {
@@ -66,7 +68,7 @@ describe('SaveXYPoint', () => {
     const slot7LeftSingleSrc = 'SLOT_7_LEFT_SINGLE_X-Y.webm'
     const slot7RightMultiSrc = 'SLOT_7_RIGHT_MULTI_X-Y.webm'
     const slot7RightSingleSrc = 'SLOT_7_RIGHT_SINGLE_X-Y.webm'
-    const assetMap: { [string]: { [Mount]: { ... }, ... }, ... } = {
+    const assetMap: { [slot: string]: { [mount in Mount]: { }, }, } = {
       '1': {
         left: {
           multi: slot1LeftMultiSrc,

@@ -18,6 +18,7 @@ import {
 } from './constants'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { Mount } from '../../redux/pipettes/types'
 
 /*
  * Intents capture the context in which a calibration flow is invoked.
@@ -59,7 +60,7 @@ export interface CalibrationPanelProps {
   cleanUpAndExit: () => void
   tipRack: CalibrationLabware
   isMulti: boolean
-  mount: string
+  mount: Mount
   currentStep: CalibrationSessionStep
   sessionType: SessionType
   calBlock?: CalibrationLabware | null

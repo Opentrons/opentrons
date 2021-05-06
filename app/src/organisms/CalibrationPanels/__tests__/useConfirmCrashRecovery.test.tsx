@@ -9,26 +9,27 @@ import type {
   LabwareDefinition2,
   LabwareMetadata,
 } from '@opentrons/shared-data'
+import type { ReactWrapper } from 'enzyme'
 
 describe('useConfirmCrashRecovery', () => {
-  let render
+  let render: (props?: Partial<Props>) => ReturnType<typeof mount>
   const mockSendCommands = jest.fn()
   const mockTipRack: Partial<CalibrationLabware> = {
     slot: '4',
     definition: ({
       metadata: ({
         displayName: 'my tiprack',
-      }: Partial<LabwareMetadata>),
-    }: Partial<LabwareDefinition2>),
+      } as Partial<LabwareMetadata>),
+    } as Partial<LabwareDefinition2>),
   }
 
-  const getStarterLink = wrapper => wrapper.find('a')
-  const getModal = wrapper => wrapper.find('ConfirmCrashRecoveryModal')
-  const getExitButton = wrapper =>
+  const getStarterLink = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('a')
+  const getModal = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('ConfirmCrashRecoveryModal')
+  const getExitButton = (wrapper: ReactWrapper): ReactWrapper =>
     wrapper.find('OutlineButton[children="cancel"]')
-  const getRestartButton = wrapper => wrapper.find('OutlineButton').at(1)
+  const getRestartButton = (wrapper: ReactWrapper): ReactWrapper => wrapper.find('OutlineButton').at(1)
 
-  const TestUseConfirmCrashRecovery = (props: Partial<Props>) => {
+  const TestUseConfirmCrashRecovery = (props: Partial<Props>): JSX.Element => {
     const {
       requiresNewTip = false,
       sendCommands = mockSendCommands,
@@ -38,7 +39,7 @@ describe('useConfirmCrashRecovery', () => {
       ...props,
       requiresNewTip: requiresNewTip,
       sendCommands: sendCommands,
-      tipRack: tipRack,
+      tipRack: tipRack as CalibrationLabware,
     })
     return (
       <>
