@@ -13,31 +13,24 @@ import styles from './styles.css'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-type OP = { robotName: string }
+interface OP { robotName: string }
 
-type SP = {
-  modulesRequired: boolean,
-  modulesMissing: boolean,
-  hasDuplicateModules: boolean,
+interface SP {
+  modulesRequired: boolean
+  modulesMissing: boolean
+  hasDuplicateModules: boolean
 }
 
-type DP = { setReviewed: () => unknown, fetchModules: () => unknown }
+interface DP { setReviewed: () => unknown, fetchModules: () => unknown }
 
-type Props = { ...OP, ...SP, ...DP }
+type Props = OP & SP & DP
 
-export const ConnectModules: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  DP,
-  State,
-  Dispatch
->(
+export const ConnectModules: React.ComponentType<OP> = connect<Props, OP, SP, DP>(
   mapStateToProps,
   mapDispatchToProps
 )(ConnectModulesComponent)
 
-function ConnectModulesComponent(props: Props) {
+function ConnectModulesComponent(props: Props): JSX.Element | null {
   if (!props.modulesRequired) return null
 
   const {

@@ -8,26 +8,18 @@ import { ConfirmPickupPrompt } from './ConfirmPickupPrompt'
 import type { Dispatch } from '../../../redux/types'
 import type { Labware, Pipette } from '../../../redux/robot'
 
-type OP = {
+interface OP {
   labware: Labware,
   calibrator: Pipette,
 }
 
-type DP = {
+interface DP {
   onNoClick: () => void,
   onYesClick: () => void,
 }
 
-type Props = { ...OP, ...DP }
-
-export const ConfirmPickupContents: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  _,
-  _,
-  _,
-  _
->(
+type Props = OP & DP
+export const ConfirmPickupContents: React.ComponentType<OP> = connect<Props, OP>(
   null,
   mapDispatchToProps
 )(ConfirmPickupPrompt)

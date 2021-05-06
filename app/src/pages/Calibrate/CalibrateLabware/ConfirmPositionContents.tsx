@@ -12,33 +12,31 @@ import { JogControls } from '../../../molecules/JogControls'
 
 import type { Jog } from '../../../molecules/JogControls'
 
-type OP = {
+interface OP {
   labware: Labware,
   calibrator: Pipette,
   calibrateToBottom: boolean,
   useCenteredTroughs: boolean,
 }
 
-type DP = {
+interface DP {
   onConfirmClick: () => unknown,
   jog: Jog,
 }
 
-type Props = { ...OP, ...DP }
+type Props = OP & DP
 
-export const ConfirmPositionContents: React.AbstractComponent<OP> = connect<
+export const ConfirmPositionContents: React.ComponentType<OP> = connect<
   Props,
   OP,
-  _,
-  _,
-  _,
-  _
+  {},
+  DP
 >(
   null,
   mapDispatchToProps
 )(ConfirmPositionContentsComponent)
 
-function ConfirmPositionContentsComponent(props: Props) {
+function ConfirmPositionContentsComponent(props: Props): JSX.Element {
   const {
     jog,
     onConfirmClick,

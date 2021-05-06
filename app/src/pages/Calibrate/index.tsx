@@ -19,29 +19,21 @@ import { Pipettes as CalibratePipettes } from './Pipettes'
 import { Labware as CalibrateLabware } from './Labware'
 import { Modules as ConnectModules } from './Modules'
 
-type OP = {}
 
-type SP = {
+interface SP {
   nextPipette: Pipette | null,
   labware: Labware[],
-  nextLabware: Labware | void,
+  nextLabware: Labware | null | undefined,
   isTipsProbed: boolean,
   nextPipetteTiprack: NextTiprackPipetteInfo | null,
   modules: SessionModule[],
 }
 
-type Props = { ...OP, ...SP, dispatch: Dispatch }
+type Props = SP & { dispatch: Dispatch }
 
-export const Calibrate: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapStateToProps)(CalibrateComponent)
+export const Calibrate: React.ComponentType<{}> = connect<Props, {}, SP>(mapStateToProps)(CalibrateComponent)
 
-function CalibrateComponent(props: Props) {
+function CalibrateComponent(props: Props): JSX.Element {
   const { path } = useRouteMatch()
 
   return (
