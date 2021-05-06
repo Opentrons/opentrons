@@ -11,7 +11,7 @@ the subject's methods in a synchronous context in a child thread to ensure:
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import DeckSlotLocation, PipetteName, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
@@ -45,7 +45,7 @@ def subject(transport: AbstractSyncTransport) -> SyncClient:
 def stubbed_load_labware_result(
     decoy: Decoy,
     transport: AbstractSyncTransport,
-    minimal_labware_def: LabwareDefinition,
+    tip_rack_def: LabwareDefinition,
 ) -> commands.LoadLabwareResult:
     """Set up the protocol engine with default stubbed response for load labware."""
     request = commands.LoadLabwareRequest(
@@ -53,11 +53,12 @@ def stubbed_load_labware_result(
         loadName="some_labware",
         namespace="opentrons",
         version=1,
+        labwareId=None,
     )
 
     result = commands.LoadLabwareResult(
         labwareId="abc123",
-        definition=minimal_labware_def,
+        definition=tip_rack_def,
         calibration=(1, 2, 3),
     )
 

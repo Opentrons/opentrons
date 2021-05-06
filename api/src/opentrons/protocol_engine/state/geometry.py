@@ -99,12 +99,14 @@ class GeometryState:
         """Get the position of the labware's origin, without calibration."""
         labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
         slot_pos = self.get_slot_position(labware_data.location.slot)
-        origin_offset = labware_data.definition["cornerOffsetFromSlot"]
+        origin_offset = self._labware_store.state.get_definition_by_uri(
+            labware_data.uri
+        ).cornerOffsetFromSlot
 
         return Point(
-            x=slot_pos.x + origin_offset["x"],
-            y=slot_pos.y + origin_offset["y"],
-            z=slot_pos.z + origin_offset["z"]
+            x=slot_pos.x + origin_offset.x,
+            y=slot_pos.y + origin_offset.y,
+            z=slot_pos.z + origin_offset.z
         )
 
     def get_labware_position(
@@ -136,7 +138,7 @@ class GeometryState:
             labware_id,
             well_name
         )
-        well_depth = well_def["depth"]
+        well_depth = well_def.depth
 
         if well_location is not None:
             offset = well_location.offset
@@ -148,13 +150,15 @@ class GeometryState:
             offset = (0, 0, well_depth)
 
         return Point(
-            x=labware_pos.x + offset[0] + well_def["x"],
-            y=labware_pos.y + offset[1] + well_def["y"],
-            z=labware_pos.z + offset[2] + well_def["z"],
+            x=labware_pos.x + offset[0] + well_def.x,
+            y=labware_pos.y + offset[1] + well_def.y,
+            z=labware_pos.z + offset[2] + well_def.z,
         )
 
     def _get_highest_z_from_labware_data(self, lw_data: LabwareData) -> float:
-        z_dim = lw_data.definition["dimensions"]["zDimension"]
+        z_dim = self._labware_store.state.get_definition_by_uri(
+            lw_data.uri
+        ).dimensions.zDimension
         slot_pos = self.get_slot_position(lw_data.location.slot)
 
         return z_dim + slot_pos[2] + lw_data.calibration[2]
@@ -194,17 +198,17 @@ class GeometryState:
         effective_length = self.get_effective_tip_length(labware_id, pipette_config)
         well_def = self._labware_store.state.get_well_definition(labware_id, well_name)
 
-        if well_def["shape"] != "circular":
+        if well_def.shape != "circular":
             raise errors.LabwareIsNotTipRackError(
                 f"Well {well_name} in labware {labware_id} is not circular."
             )
 
         return TipGeometry(
             effective_length=effective_length,
-            diameter=well_def["diameter"],
+            diameter=well_def.diameter,  # type: ignore[arg-type]
             # TODO(mc, 2020-11-12): WellDefinition type says totalLiquidVolume
-            # is a float, but hardware controller expects an int
-            volume=int(well_def["totalLiquidVolume"]),
+            #  is a float, but hardware controller expects an int
+            volume=int(well_def.totalLiquidVolume),
         )
 
     # TODO(mc, 2020-11-12): support pre-PAPIv2.2/2.3 behavior of dropping the tip

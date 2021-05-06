@@ -59,7 +59,11 @@ Used for FullStory. Should be provided in the Travis build.
 
 ### `OT_PD_MIXPANEL_ID`
 
-Used for Mixpanel. Should be provided in the Travis build.
+Used for Mixpanel in prod. Should be provided in the CI build.
+
+### `OT_PD_MIXPANEL_DEV_ID`
+
+Used for Mixpanel in dev (eg via a sandbox URL). Should be provided in the CI build.
 
 ### `OT_PD_SHOW_GATE`
 

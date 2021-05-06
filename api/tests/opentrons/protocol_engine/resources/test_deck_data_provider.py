@@ -3,7 +3,7 @@ import pytest
 from mock import AsyncMock  # type: ignore[attr-defined]
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.types import DeckSlotLocation

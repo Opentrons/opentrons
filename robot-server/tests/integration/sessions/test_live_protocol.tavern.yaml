@@ -31,6 +31,7 @@ stages:
             loadName: corning_96_wellplate_360ul_flat
             namespace: Opentrons
             version: 1
+            labwareId: null
     response:
       status_code: 200
       json:
@@ -60,6 +61,7 @@ stages:
             loadName: opentrons_96_tiprack_300ul
             namespace: Opentrons
             version: 1
+            labwareId: null
     response:
       status_code: 200
       json:
@@ -76,6 +78,36 @@ stages:
             labwareId: !anystr
             definition: !anydict
             calibration: !anylist
+  - name: Load well plate specifying labware id
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          command: equipment.loadLabware
+          data: &wellplate_data
+            location:
+              slot: 3
+            loadName: opentrons_96_aluminumblock_nest_wellplate_100ul
+            namespace: Opentrons
+            version: 1
+            labwareId: some_labware_id
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          id: !anystr
+          data: *wellplate_data
+          command: equipment.loadLabware
+          status: executed
+          createdAt: !anystr
+          startedAt: !anystr
+          completedAt: !anystr
+          result:
+            labwareId: some_labware_id
+            definition: !anydict
+            calibration: !anylist
   - name: Load pipette command
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
@@ -86,6 +118,7 @@ stages:
           data: &create_pipette_data
             pipetteName: p300_single
             mount: right
+            pipetteId: null
     response:
       status_code: 200
       json:
@@ -100,6 +133,31 @@ stages:
           completedAt: !anystr
           result:
             pipetteId: !anystr
+  - name: Load pipette command specifying the id
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          command: equipment.loadPipette
+          data: &create_pipette_data_with_id
+            pipetteName: p10_single
+            mount: left
+            pipetteId: my pipette
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          id: !anystr
+          data: *create_pipette_data_with_id
+          command: equipment.loadPipette
+          status: executed
+          createdAt: !anystr
+          startedAt: !anystr
+          completedAt: !anystr
+          result:
+            pipetteId: my pipette
   - name: Delete the session
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}"

@@ -11,7 +11,7 @@ import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
 import { AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
+import { makeMaskToDecimal, maskLoadName } from './fieldMasks'
 import {
   tubeRackInsertOptions,
   aluminumBlockAutofills,
@@ -19,7 +19,6 @@ import {
   aluminumBlockChildTypeOptions,
   getDefaultFormState,
   getImplicitAutofillValues,
-  yesNoOptions,
   tubeRackAutofills,
 } from './fields'
 import { labwareDefToFields } from './labwareDefToFields'
@@ -35,16 +34,17 @@ import { LinkOut } from './components/LinkOut'
 import { RadioField } from './components/RadioField'
 import { Section } from './components/Section'
 import { TextField } from './components/TextField'
-import { HeightGuidingText } from './components/HeightGuidingText'
+
 import { ImportErrorModal } from './components/ImportErrorModal'
 import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
 import { UploadExisting } from './components/sections/UploadExisting'
 import { Regularity } from './components/sections/Regularity'
-import { getHeightAlerts } from './components/utils/getHeightAlerts'
+
 import { Footprint } from './components/sections/Footprint'
+import { Height } from './components/sections/Height'
+import { Grid } from './components/sections/Grid'
+import { Volume } from './components/sections/Volume'
 import {
-  HeightImg,
-  GridImg,
   WellXYImg,
   XYSpacingImg,
   DepthImg,
@@ -469,91 +469,10 @@ export const LabwareCreator = (): JSX.Element => {
                   {/* PAGE 1 - Labware */}
                   <Regularity />
                   <Footprint />
-                  <Section
-                    label={
-                      // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
-                      ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
-                        ? 'Total Height'
-                        : 'Height'
-                    }
-                    fieldList={['labwareZDimension']}
-                    additionalAlerts={getHeightAlerts(values, touched)}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <HeightGuidingText labwareType={values.labwareType} />
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <HeightImg
-                          labwareType={values.labwareType}
-                          aluminumBlockChildType={values.aluminumBlockChildType}
-                        />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="labwareZDimension"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Grid"
-                    fieldList={[
-                      'gridRows',
-                      'gridColumns',
-                      'regularRowSpacing',
-                      'regularColumnSpacing',
-                    ]}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          The grid of wells on your labware is arranged via rows
-                          and columns. Rows run horizontally across your labware
-                          (left to right). Columns run top to bottom.
-                        </p>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <GridImg />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="gridRows"
-                          inputMasks={[maskToInteger]}
-                        />
-                        <RadioField
-                          name="regularRowSpacing"
-                          options={yesNoOptions}
-                        />
-                        <TextField
-                          name="gridColumns"
-                          inputMasks={[maskToInteger]}
-                        />
-                        <RadioField
-                          name="regularColumnSpacing"
-                          options={yesNoOptions}
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <Height />
+                  <Grid />
                   {/* PAGE 2 */}
-                  <Section label="Volume" fieldList={['wellVolume']}>
-                    <div className={styles.flex_row}>
-                      <div className={styles.volume_instructions_column}>
-                        <p>Total maximum volume of each well.</p>
-                      </div>
-
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="wellVolume"
-                          inputMasks={[maskTo2Decimal]}
-                          units="μL"
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <Volume />
                   <Section
                     label="Well Shape & Sides"
                     fieldList={[

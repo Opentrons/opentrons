@@ -1,7 +1,7 @@
 """Test load labware commands."""
 from mock import AsyncMock  # type: ignore[attr-defined]
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.types import DeckSlotLocation
 
@@ -18,13 +18,15 @@ def test_load_labware_request() -> None:
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         loadName="some-load-name",
         namespace="opentrons-test",
-        version=1
+        version=1,
+        labwareId="some id"
     )
 
     assert request.location == DeckSlotLocation(slot=DeckSlotName.SLOT_3)
     assert request.loadName == "some-load-name"
     assert request.namespace == "opentrons-test"
     assert request.version == 1
+    assert request.labwareId == "some id"
 
 
 def test_load_labware_result(well_plate_def: LabwareDefinition) -> None:
@@ -55,7 +57,7 @@ async def test_load_labware_implementation(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         loadName="some-load-name",
         namespace="opentrons-test",
-        version=1
+        version=1,
     )
 
     impl = request.get_implementation()
@@ -70,5 +72,6 @@ async def test_load_labware_implementation(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         load_name="some-load-name",
         namespace="opentrons-test",
-        version=1
+        version=1,
+        labware_id=None
     )
