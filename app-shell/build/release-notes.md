@@ -8,12 +8,12 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 # Opentrons App Changes in 4.3.0
 
-Opentrons App 4.3.0 brings compatibility with using multiples of the same module (for instance, two Temperature Modules) in a protocol, as well as some bugfixes.
+We've improved module functionality with Opentrons App 4.3.0. The app now supports protocols with two Temperature Modules or two Magnetic Modules for Python API Protocols. All connected modules display their USB port connection (including limited USB port information for hubs). We've also updated how modules are displayed on the Run tab.
 
 ## New Features
 
+- Support for 2 Temperature Modules or 2 Magnetic Modules
 - The USB port to which each module is attached is now displayed in the protocol info screen
-- When setting up the deck before executing a protocol, the app now supports multiples of the same module
 
 ## Bugfixes
 
