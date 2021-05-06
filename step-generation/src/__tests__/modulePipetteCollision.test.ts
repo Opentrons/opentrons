@@ -5,9 +5,15 @@ import {
 } from '@opentrons/shared-data'
 import { modulePipetteCollision } from '../utils/modulePipetteCollision'
 import { getInitialRobotStateStandard, makeContext } from '../__fixtures__'
-let invariantContext
-let robotState
-let collisionArgs
+import type { RobotState, InvariantContext } from '../types'
+let invariantContext: InvariantContext
+let robotState: RobotState
+let collisionArgs: {
+  invariantContext: InvariantContext
+  pipette: string | null | undefined
+  labware: string | null | undefined
+  prevRobotState: RobotState
+}
 beforeEach(() => {
   invariantContext = makeContext()
   invariantContext.moduleEntities['magDeckId'] = {

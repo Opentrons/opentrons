@@ -9,10 +9,12 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../__fixtures__'
+import type { InvariantContext, RobotState } from '../types'
+
 describe('touchTip', () => {
-  let invariantContext
-  let initialRobotState
-  let robotStateWithTip
+  let invariantContext: InvariantContext
+  let initialRobotState: RobotState
+  let robotStateWithTip: RobotState
   beforeEach(() => {
     invariantContext = makeContext()
     initialRobotState = getInitialRobotStateStandard(invariantContext)

@@ -8,20 +8,22 @@ import {
 } from '../__fixtures__'
 import { forPickUpTip as _forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+import type { InvariantContext, RobotState } from '../types'
+
 const forPickUpTip = makeImmutableStateUpdater(_forPickUpTip)
 jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 const tiprack1Id = 'tiprack1Id'
 const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
-let invariantContext
-let initialRobotState
+let invariantContext: InvariantContext
+let initialRobotState: RobotState
+const dispenseUpdateLiquidStateMock = dispenseUpdateLiquidState as jest.MockedFunction<
+  typeof dispenseUpdateLiquidState
+>
 beforeEach(() => {
   invariantContext = makeContext()
   initialRobotState = getInitialRobotStateStandard(invariantContext)
-  // $FlowFixMe: mock methods
-  dispenseUpdateLiquidState.mockClear()
-  // $FlowFixMe: mock methods
-  dispenseUpdateLiquidState.mockReturnValue(initialRobotState.liquidState)
+  dispenseUpdateLiquidStateMock.mockClear()
 })
 describe('tip tracking', () => {
   it('single-channel', () => {

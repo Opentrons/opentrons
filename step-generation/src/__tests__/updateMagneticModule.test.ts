@@ -9,12 +9,13 @@ import {
   forEngageMagnet as _forEngageMagnet,
   forDisengageMagnet as _forDisengageMagnet,
 } from '../getNextRobotStateAndWarnings/magnetUpdates'
+import type { InvariantContext, RobotState } from '../types'
 const forEngageMagnet = makeImmutableStateUpdater(_forEngageMagnet)
 const forDisengageMagnet = makeImmutableStateUpdater(_forDisengageMagnet)
 const moduleId = 'magneticModuleId'
-let invariantContext
-let disengagedRobotState
-let engagedRobotState
+let invariantContext: InvariantContext
+let disengagedRobotState: RobotState
+let engagedRobotState: RobotState
 beforeEach(() => {
   invariantContext = makeContext()
   invariantContext.moduleEntities[moduleId] = {

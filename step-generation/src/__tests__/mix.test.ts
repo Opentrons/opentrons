@@ -16,7 +16,7 @@ import {
   makeTouchTipHelper,
   delayCommand,
 } from '../__fixtures__'
-import type { MixArgs } from '../types'
+import { InvariantContext, MixArgs, RobotState } from '../types'
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper({
   labware: SOURCE_LABWARE,
@@ -24,9 +24,9 @@ const dispenseHelper = makeDispenseHelper({
 const touchTipHelper = makeTouchTipHelper()
 // TODO: Ian 2019-06-14 more elegant way to test the blowout offset calculation
 const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
-let invariantContext
-let robotStateWithTip
-let mixinArgs
+let invariantContext: InvariantContext
+let robotStateWithTip: RobotState
+let mixinArgs: any
 beforeEach(() => {
   mixinArgs = {
     ...getFlowRateAndOffsetParamsMix(),
@@ -47,7 +47,7 @@ describe('mix: change tip', () => {
   const volume = 5
   const times = 2
 
-  const makeArgs = (changeTip): MixArgs => ({
+  const makeArgs = (changeTip: string): MixArgs => ({
     ...mixinArgs,
     volume,
     times,
@@ -273,7 +273,7 @@ describe('mix: advanced options', () => {
   })
 })
 describe('mix: errors', () => {
-  let errorArgs
+  let errorArgs: MixArgs
   beforeEach(() => {
     errorArgs = {
       ...mixinArgs,

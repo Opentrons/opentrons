@@ -17,7 +17,7 @@ describe('thermocyclerProfileStep', () => {
     testName: string
     initialThermocyclerModuleState?: ThermocyclerModuleState
     args: ThermocyclerProfileStepArgs
-    expected: Array<Command>
+    expected: Command[]
   }> = [
     {
       testName: 'should generate expected commands',
@@ -328,7 +328,7 @@ describe('thermocyclerProfileStep', () => {
           thermocyclerId,
         })
 
-        if (initialThermocyclerModuleState) {
+        if (initialThermocyclerModuleState != null) {
           robotState.modules[
             thermocyclerId
           ].moduleState = initialThermocyclerModuleState
@@ -349,7 +349,7 @@ describe('thermocyclerProfileStep', () => {
       temperatureModuleId,
       thermocyclerId,
     })
-    const args = {
+    const args: ThermocyclerProfileStepArgs = {
       commandCreatorFnName: 'thermocyclerProfile',
       blockTargetTempHold: 4,
       lidTargetTempHold: null,

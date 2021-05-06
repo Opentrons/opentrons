@@ -1,4 +1,3 @@
-import { $Shape } from 'utility-types'
 import merge from 'lodash/merge'
 import {
   THERMOCYCLER_MODULE_TYPE,
@@ -24,7 +23,7 @@ import type {
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureArgs,
 } from '@opentrons/shared-data/lib/protocol/types/schemaV4'
-import type { ThermocyclerModuleState } from '../types'
+import { InvariantContext, RobotState, ThermocyclerModuleState } from '../types'
 const forThermocyclerSetTargetBlockTemperature = makeImmutableStateUpdater(
   _forThermocyclerSetTargetBlockTemperature
 )
@@ -53,8 +52,8 @@ const forThermocyclerRunProfile = makeImmutableStateUpdater(
   _forThermocyclerRunProfile
 )
 const moduleId = 'thermocyclerModuleId'
-let invariantContext
-let lidOpenRobotState
+let invariantContext: InvariantContext
+let lidOpenRobotState: RobotState
 beforeEach(() => {
   invariantContext = makeContext()
   invariantContext.moduleEntities[moduleId] = {
@@ -73,10 +72,10 @@ beforeEach(() => {
     },
   }
 })
-type TestCase<P> = {
+interface TestCase<P> {
   params: P
-  expectedUpdate: $Shape<ThermocyclerModuleState>
-  moduleStateBefore: $Shape<ThermocyclerModuleState>
+  expectedUpdate: Partial<ThermocyclerModuleState>
+  moduleStateBefore: Partial<ThermocyclerModuleState>
   fn: ImmutableStateUpdater<P>
   testName: string
 }
@@ -303,7 +302,7 @@ describe('thermocycler state updaters', () => {
     expectedUpdate,
     fn,
     testName,
-  }: TestCase<P>) => {
+  }: TestCase<P>): void => {
     it(testName, () => {
       const prevRobotState = merge({}, lidOpenRobotState, {
         modules: {

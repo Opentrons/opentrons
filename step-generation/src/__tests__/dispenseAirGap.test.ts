@@ -1,4 +1,3 @@
-import { $PropertyType } from 'utility-types'
 import { thermocyclerPipetteCollision } from '../utils'
 import {
   getInitialRobotStateStandard,
@@ -10,15 +9,17 @@ import {
   SOURCE_LABWARE,
 } from '../__fixtures__'
 import { dispenseAirGap } from '../commandCreators/atomic/dispenseAirGap'
-import type { RobotState } from '../'
+import { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+import type { InvariantContext, RobotState } from '../types'
+
 jest.mock('../utils/thermocyclerPipetteCollision')
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
   typeof thermocyclerPipetteCollision
 >
 describe('dispenseAirGap', () => {
-  let initialRobotState
-  let robotStateWithTip
-  let invariantContext
+  let initialRobotState: RobotState
+  let robotStateWithTip: RobotState
+  let invariantContext: InvariantContext
   beforeEach(() => {
     invariantContext = makeContext()
     initialRobotState = getInitialRobotStateStandard(invariantContext)
@@ -28,7 +29,7 @@ describe('dispenseAirGap', () => {
     jest.resetAllMocks()
   })
   describe('tip tracking & commands:', () => {
-    let params
+    let params: AspDispAirgapParams
     beforeEach(() => {
       params = {
         pipette: DEFAULT_PIPETTE,
@@ -71,8 +72,8 @@ describe('dispenseAirGap', () => {
     it('should return an error when dispensing into thermocycler with pipette collision', () => {
       mockThermocyclerPipetteCollision.mockImplementationOnce(
         (
-          modules: $PropertyType<RobotState, 'modules'>,
-          labware: $PropertyType<RobotState, 'labware'>,
+          modules: RobotState['modules'],
+          labware: RobotState['labware'],
           labwareId: string
         ) => {
           expect(modules).toBe(robotStateWithTip.modules)

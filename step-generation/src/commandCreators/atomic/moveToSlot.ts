@@ -2,6 +2,7 @@ import * as errorCreators from '../../errorCreators'
 import { isValidSlot } from '../../utils/isValidSlot'
 import type { MoveToSlotParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
+import { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
 export const moveToSlot: CommandCreator<MoveToSlotParams> = (
   args,
   invariantContext,
@@ -9,7 +10,7 @@ export const moveToSlot: CommandCreator<MoveToSlotParams> = (
 ) => {
   const { pipette, slot, offset, minimumZHeight, forceDirect } = args
   const actionName = 'moveToSlot'
-  const errors: Array<CommandCreatorError> = []
+  const errors: CommandCreatorError[] = []
   const pipetteData = prevRobotState.pipettes[pipette]
 
   if (!pipetteData) {
@@ -30,7 +31,7 @@ export const moveToSlot: CommandCreator<MoveToSlotParams> = (
     )
   }
 
-  const commands = [
+  const commands: Command[] = [
     {
       command: 'moveToSlot',
       params: {

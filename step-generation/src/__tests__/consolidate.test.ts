@@ -1256,6 +1256,7 @@ describe('consolidate single-channel', () => {
         blowoutOffsetFromTopMm: 3.3,
         dispenseAirGapVolume: 35,
       }
+      // @ts-expect-error(SA, 2021-05-03): arguments missing
       const result = consolidate(args, invariantContext, initialRobotState)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([

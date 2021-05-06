@@ -10,13 +10,15 @@ import {
   DEFAULT_PIPETTE,
 } from '../__fixtures__'
 import { replaceTip } from '../commandCreators/atomic/replaceTip'
+import type { InvariantContext, RobotState } from '../types'
+
 const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'
 const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
 describe('replaceTip', () => {
-  let invariantContext
-  let initialRobotState
+  let invariantContext: InvariantContext
+  let initialRobotState: RobotState
   beforeEach(() => {
     invariantContext = makeContext()
     initialRobotState = getInitialRobotStateStandard(invariantContext)

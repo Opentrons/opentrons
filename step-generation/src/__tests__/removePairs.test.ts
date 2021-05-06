@@ -1,6 +1,9 @@
 import { removePairs } from '../utils/removePairs'
 
-const twoThenThree = (a, b) => {
+const twoThenThree = (
+  a: number | undefined,
+  b: number | undefined
+): boolean => {
   if (a === undefined) {
     throw new Error('a is undefined')
   }

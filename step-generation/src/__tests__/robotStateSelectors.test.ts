@@ -13,7 +13,8 @@ import {
   _getNextTip,
   getModuleState,
 } from '../'
-let invariantContext
+import { InvariantContext } from '../types'
+let invariantContext: InvariantContext
 beforeEach(() => {
   invariantContext = makeContext()
 })
@@ -57,7 +58,9 @@ describe('_getNextTip', () => {
 
     _invariantContext.labwareEntities[tiprackId] = {
       id: tiprackId,
+      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
       labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
+      // @ts-expect-error(SA, 2021-05-03): tiprack not getting casted to labware definition type
       def: fixture_tiprack_300_ul,
     }
     const robotState = makeState({
@@ -89,7 +92,8 @@ describe('_getNextTip', () => {
   }
 
   it('empty tiprack should return null', () => {
-    const channels = [1, 8]
+    type OneOrEight = 1 | 8
+    const channels: OneOrEight[] = [1, 8]
     channels.forEach(channel => {
       const result = getNextTipHelper(channel, { ...getTiprackTipstate(false) })
       expect(result).toBe(null)

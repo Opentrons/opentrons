@@ -7,8 +7,9 @@ import produce from 'immer'
 import { createEmptyLiquidState, createTipLiquidState } from '../utils'
 import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from '../__fixtures__'
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
-let dispenseSingleCh150ToA1Args
-let invariantContext
+import type { InvariantContext } from '../types'
+let dispenseSingleCh150ToA1Args: { invariantContext: InvariantContext; pipette: string; volume: number; useFullVolume: boolean; labware: string; well: string }
+let invariantContext: InvariantContext
 beforeEach(() => {
   invariantContext = makeContext()
   dispenseSingleCh150ToA1Args = {
@@ -21,8 +22,9 @@ beforeEach(() => {
   }
 })
 
-function getUpdatedLiquidState(params, initialLiquidState) {
-  return produce(initialLiquidState, draft => {
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+function getUpdatedLiquidState(params: any, initialLiquidState: any) {
+  return produce(initialLiquidState, (draft: any) => {
     dispenseUpdateLiquidState({ ...params, prevLiquidState: draft })
   })
 }
@@ -445,6 +447,7 @@ describe('...8-channel pipette', () => {
         customInvariantContext.labwareEntities.sourcePlateId = {
           id: SOURCE_LABWARE,
           labwareDefURI: labwareType,
+          // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
           def,
         }
         const blankLiquidState = createEmptyLiquidState(customInvariantContext)

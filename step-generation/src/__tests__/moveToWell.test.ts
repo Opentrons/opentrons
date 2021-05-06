@@ -1,4 +1,3 @@
-import { $PropertyType } from 'utility-types'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { moveToWell } from '../commandCreators/atomic/moveToWell'
 import { thermocyclerPipetteCollision } from '../utils'
@@ -10,14 +9,15 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../__fixtures__'
-import type { RobotState } from '../'
+import type { InvariantContext, RobotState } from '../types'
+
 jest.mock('../utils/thermocyclerPipetteCollision')
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
   typeof thermocyclerPipetteCollision
 >
 describe('moveToWell', () => {
-  let robotStateWithTip
-  let invariantContext
+  let robotStateWithTip: RobotState
+  let invariantContext: InvariantContext
   beforeEach(() => {
     invariantContext = makeContext()
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
@@ -90,8 +90,8 @@ describe('moveToWell', () => {
   it('should return an error when moving to well in a thermocycler with pipette collision', () => {
     mockThermocyclerPipetteCollision.mockImplementationOnce(
       (
-        modules: $PropertyType<RobotState, 'modules'>,
-        labware: $PropertyType<RobotState, 'labware'>,
+        modules: RobotState['modules'],
+        labware: RobotState['labware'],
         labwareId: string
       ) => {
         expect(modules).toBe(robotStateWithTip.modules)

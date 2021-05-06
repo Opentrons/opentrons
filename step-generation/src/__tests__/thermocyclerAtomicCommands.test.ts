@@ -1,4 +1,3 @@
-import { $PropertyType } from 'utility-types'
 import { thermocyclerSetTargetBlockTemperature } from '../commandCreators/atomic/thermocyclerSetTargetBlockTemperature'
 import { thermocyclerSetTargetLidTemperature } from '../commandCreators/atomic/thermocyclerSetTargetLidTemperature'
 import { thermocyclerAwaitBlockTemperature } from '../commandCreators/atomic/thermocyclerAwaitBlockTemperature'
@@ -24,10 +23,10 @@ const getRobotInitialState = (): any => {
 
 // neither should InvariantContext
 const invariantContext: any = {}
-const module: $PropertyType<ModuleOnlyParams, 'module'> = 'someTCModuleId'
-const temperature: $PropertyType<TemperatureParams, 'temperature'> = 42
-const holdTime: $PropertyType<AtomicProfileStep, 'holdTime'> = 10
-const volume: $PropertyType<TCProfileParams, 'volume'> = 10
+const module: ModuleOnlyParams['module'] = 'someTCModuleId'
+const temperature: TemperatureParams['temperature'] = 42
+const holdTime: AtomicProfileStep['holdTime'] = 10
+const volume: TCProfileParams['volume'] = 10
 const profile = [
   {
     temperature,
@@ -123,7 +122,7 @@ describe('thermocycler atomic commands', () => {
     commandCreator: CommandCreator<P>
     params: P
     expectedType: string
-  }) => {
+  }): void => {
     it(`creates a single "${expectedType}" command with the given params`, () => {
       const robotInitialState = getRobotInitialState()
       const result = commandCreator(params, invariantContext, robotInitialState)

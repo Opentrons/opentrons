@@ -1,4 +1,3 @@
-import { $PropertyType } from 'utility-types'
 import {
   getLabwareDefURI,
   TEMPERATURE_MODULE_TYPE,
@@ -25,10 +24,15 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   splitLiquid,
 } from '../utils/misc'
-import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
+import { Diff, thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { DEFAULT_CONFIG, FIXED_TRASH_ID } from '../__fixtures__'
 import { orderWells, thermocyclerPipetteCollision } from '../utils'
-import type { RobotState } from '../'
+import type {
+  LabwareDefinition2,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
+import type { RobotState, ThermocyclerStateStepArgs } from '../types'
+
 describe('splitLiquid', () => {
   const singleIngred = {
     ingred1: {
@@ -378,16 +382,20 @@ describe('makeInitialRobotState', () => {
           p10SingleId: {
             id: 'p10SingleId',
             name: 'p10_single',
-            spec: fixtureP10Single,
-            tiprackDefURI: getLabwareDefURI(fixture_tiprack_10_ul),
-            tiprackLabwareDef: fixture_tiprack_10_ul,
+            spec: fixtureP10Single as PipetteNameSpecs,
+            tiprackDefURI: getLabwareDefURI(
+              fixture_tiprack_10_ul as LabwareDefinition2
+            ),
+            tiprackLabwareDef: fixture_tiprack_10_ul as LabwareDefinition2,
           },
           p300MultiId: {
             id: 'p300MultiId',
             name: 'p300_multi',
-            spec: fixtureP300Multi,
-            tiprackDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
-            tiprackLabwareDef: fixture_tiprack_300_ul,
+            spec: fixtureP300Multi as PipetteNameSpecs,
+            tiprackDefURI: getLabwareDefURI(
+              fixture_tiprack_300_ul as LabwareDefinition2
+            ),
+            tiprackLabwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
           },
         },
         moduleEntities: {
@@ -400,23 +408,31 @@ describe('makeInitialRobotState', () => {
         labwareEntities: {
           somePlateId: {
             id: 'somePlateId',
-            labwareDefURI: getLabwareDefURI(fixture_96_plate),
-            def: fixture_96_plate,
+            labwareDefURI: getLabwareDefURI(
+              fixture_96_plate as LabwareDefinition2
+            ),
+            def: fixture_96_plate as LabwareDefinition2,
           },
           tiprack10Id: {
             id: 'tiprack10Id',
-            labwareDefURI: getLabwareDefURI(fixture_tiprack_10_ul),
-            def: fixture_tiprack_10_ul,
+            labwareDefURI: getLabwareDefURI(
+              fixture_tiprack_10_ul as LabwareDefinition2
+            ),
+            def: fixture_tiprack_10_ul as LabwareDefinition2,
           },
           tiprack300Id: {
             id: 'tiprack300Id',
-            labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
-            def: fixture_tiprack_300_ul,
+            labwareDefURI: getLabwareDefURI(
+              fixture_tiprack_300_ul as LabwareDefinition2
+            ),
+            def: fixture_tiprack_300_ul as LabwareDefinition2,
           },
           trashId: {
             id: FIXED_TRASH_ID,
-            labwareDefURI: getLabwareDefURI(fixture_trash),
-            def: fixture_trash,
+            labwareDefURI: getLabwareDefURI(
+              fixture_trash as LabwareDefinition2
+            ),
+            def: fixture_trash as LabwareDefinition2,
           },
         },
       },
@@ -456,7 +472,7 @@ describe('makeInitialRobotState', () => {
   ).toMatchSnapshot()
 })
 describe('thermocyclerStateDiff', () => {
-  const getInitialDiff = () => ({
+  const getInitialDiff = (): Diff => ({
     lidOpen: false,
     lidClosed: false,
     setBlockTemperature: false,
@@ -683,7 +699,7 @@ describe('thermocyclerStateDiff', () => {
   ]
   testCases.forEach(({ testMsg, moduleState, args, expected }) => {
     it(testMsg, () => {
-      expect(thermocyclerStateDiff(moduleState, args)).toEqual(expected)
+      expect(thermocyclerStateDiff(moduleState, args as ThermocyclerStateStepArgs)).toEqual(expected)
     })
   })
 })
@@ -692,8 +708,8 @@ describe('thermocyclerPipetteColision', () => {
   const labwareOnTCId = 'labwareOnTCId'
   const testCases: Array<{
     testMsg: string
-    modules: $PropertyType<RobotState, 'modules'>
-    labware: $PropertyType<RobotState, 'labware'>
+    modules: RobotState['modules']
+    labware: RobotState['labware']
     labwareId: string
     expected: boolean
   }> = [
@@ -795,10 +811,10 @@ describe('thermocyclerPipetteColision', () => {
   })
 })
 describe('getDispenseAirGapLocation', () => {
-  let sourceLabware
-  let destLabware
-  let sourceWell
-  let destWell
+  let sourceLabware: string
+  let destLabware: string
+  let sourceWell: string
+  let destWell: string
   beforeEach(() => {
     sourceLabware = 'sourceLabware'
     destLabware = 'destLabware'
@@ -906,8 +922,9 @@ describe('orderWells', () => {
     }
     orderTuples.forEach(tuple => {
       it(`first ${tuple[0]} then ${tuple[1]}`, () => {
+        // @ts-expect-error(SA, 2021-05-03): can't spread in values to function unless they're optional
         expect(orderWells(regularOrdering, ...tuple)).toEqual(
-          // $FlowFixMe adding additional keys to answer map would add more confusion
+          // @ts-expect-error(SA, 2021-05-03): adding additional keys to answer map would add more confusion
           regularAnswerMap[tuple[0]][tuple[1]]
         )
       })
@@ -940,8 +957,9 @@ describe('orderWells', () => {
     }
     orderTuples.forEach(tuple => {
       it(`first ${tuple[0]} then ${tuple[1]}`, () => {
+        // @ts-expect-error(SA, 2021-05-03): can't spread in values to function unless they're optional
         expect(orderWells(irregularOrdering, ...tuple)).toEqual(
-          // $FlowFixMe adding additional keys to answer map would add more confusion
+          // @ts-expect-error(SA, 2021-05-03): adding additional keys to answer map would add more confusion
           irregularAnswerMap[tuple[0]][tuple[1]]
         )
       })

@@ -1,7 +1,9 @@
 import { _stripNoOpMixCommands } from '../utils/stripNoOpCommands'
+import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
+
 describe('_stripNoOpMixCommands', () => {
   it('should remove pairs of aspirate+dispense commands when they result in no liquid changes', () => {
-    const commands = [
+    const commands: Command[] = [
       {
         command: 'aspirate',
         params: {
@@ -32,7 +34,7 @@ describe('_stripNoOpMixCommands', () => {
     expect(result).toEqual([])
   })
   it('should NOT remove pairs of aspirate+dispense commands when they result in liquid changes', () => {
-    const commands = [
+    const commands: Command[] = [
       {
         command: 'aspirate',
         params: {

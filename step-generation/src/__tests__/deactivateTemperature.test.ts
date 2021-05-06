@@ -1,10 +1,11 @@
 import { getStateAndContextTempTCModules } from '../__fixtures__'
 import { deactivateTemperature } from '../commandCreators/atomic/deactivateTemperature'
+import { InvariantContext, RobotState, DeactivateTemperatureArgs } from '../types';
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'
 const commandCreatorFnName = 'deactivateTemperature'
-let invariantContext
-let robotState
+let invariantContext: InvariantContext
+let robotState: RobotState
 beforeEach(() => {
   const stateAndContext = getStateAndContextTempTCModules({
     temperatureModuleId,
@@ -64,7 +65,7 @@ describe('deactivateTemperature', () => {
   ]
   testCases.forEach(({ expected, moduleId, testName }) => {
     it(testName, () => {
-      const args = {
+      const args: DeactivateTemperatureArgs = {
         module: moduleId,
         commandCreatorFnName,
       }

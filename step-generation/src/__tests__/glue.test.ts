@@ -10,22 +10,22 @@ import {
 import { DEFAULT_CONFIG } from '../__fixtures__'
 import type { InvariantContext } from '../types'
 jest.mock('../getNextRobotStateAndWarnings')
-let invariantContext
+let invariantContext: InvariantContext
 
 /** This is a minimalistic toy version of step-generation command creators and timeline updaters,
  * to show, at a glance, how all this works together.
  */
-type CountState = {
+interface CountState {
   count: number
 }
-type CountStateAndWarnings = {
+interface CountStateAndWarnings {
   robotState: CountState
-  warnings: Array<any>
+  warnings: any[]
 }
-type CountParams = {
+interface CountParams {
   value: number
 }
-type CountCommand = {
+interface CountCommand {
   command: 'add' | 'multiply' | 'divide'
   params: {
     value: number
@@ -141,7 +141,7 @@ function mockNextRobotStateAndWarningsSingleCommand(
     )
   }
 
-  const warnings = [] // NOTE: not making a fake implementation of any nextRobotState warnings!
+  const warnings: never[] = [] // NOTE: not making a fake implementation of any nextRobotState warnings!
 
   return {
     robotState: {
@@ -152,12 +152,12 @@ function mockNextRobotStateAndWarningsSingleCommand(
 }
 
 function mockNextRobotStateAndWarnings(
-  commands: Array<CountCommand>,
-  invariantContext: any,
+  commands: CountCommand[],
+  invariantContext: InvariantContext,
   prevState: CountState
 ): CountStateAndWarnings {
-  const nextState = commands.reduce(
-    (acc, command) =>
+  const nextState: CountStateAndWarnings = commands.reduce(
+    (acc: CountStateAndWarnings, command) =>
       mockNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,
@@ -168,7 +168,7 @@ function mockNextRobotStateAndWarnings(
       warnings: [],
     }
   )
-  const warnings = [] // NOTE: not making a fake implementation of any nextRobotState warnings!
+  const warnings: never[] = [] // NOTE: not making a fake implementation of any nextRobotState warnings!
 
   return {
     robotState: nextState.robotState,

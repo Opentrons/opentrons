@@ -2,7 +2,7 @@ import type {
   ThermocyclerModuleState,
   ThermocyclerStateStepArgs,
 } from '../types'
-export type Diff = {
+export interface Diff {
   lidOpen: boolean
   lidClosed: boolean
   setBlockTemperature: boolean
@@ -38,8 +38,8 @@ const getLidClosedDiff = (
   args: ThermocyclerStateStepArgs
 ) => {
   if (
-    (prevThermocyclerState.lidOpen && args.lidOpen === false) ||
-    (prevThermocyclerState.lidOpen === null && args.lidOpen === false)
+    (prevThermocyclerState.lidOpen && !args.lidOpen) ||
+    (prevThermocyclerState.lidOpen === null && !args.lidOpen)
   ) {
     return {
       lidClosed: true,

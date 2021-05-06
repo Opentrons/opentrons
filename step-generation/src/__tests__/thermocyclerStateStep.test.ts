@@ -1,21 +1,16 @@
-import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
+import { thermocyclerStateDiff, Diff } from '../utils/thermocyclerStateDiff';
 import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
 import {
   getStateAndContextTempTCModules,
   getSuccessResult,
 } from '../__fixtures__'
-import type { Diff } from '../utils/thermocyclerStateDiff'
-import type {
-  ThermocyclerModuleState,
-  ThermocyclerStateStepArgs,
-} from '../types'
 jest.mock('../utils/thermocyclerStateDiff')
-const mockThermocyclerStateDiff: JestMockFn<
-  [ThermocyclerModuleState, ThermocyclerStateStepArgs],
-  Diff
-> = thermocyclerStateDiff
 
-const getInitialDiff = () => ({
+const mockThermocyclerStateDiff = thermocyclerStateDiff as jest.MockedFunction<
+  typeof thermocyclerStateDiff
+>
+
+const getInitialDiff = (): Diff => ({
   lidOpen: false,
   lidClosed: false,
   setBlockTemperature: false,
@@ -347,6 +342,7 @@ describe('thermocyclerStateStep', () => {
           return thermocyclerStateDiff
         })
         const result = thermocyclerStateStep(
+          // @ts-expect-error (sa, 2021-05-03): thermocyclerStateArgs not getting casted to ThermocyclerStateStepArgs
           thermocyclerStateArgs,
           invariantContext,
           robotState

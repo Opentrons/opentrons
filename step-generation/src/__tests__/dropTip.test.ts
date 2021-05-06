@@ -7,8 +7,9 @@ import {
   FIXED_TRASH_ID,
 } from '../__fixtures__'
 import { dropTip } from '../commandCreators/atomic/dropTip'
+import type { InvariantContext, RobotState } from '../types'
 describe('dropTip', () => {
-  let invariantContext
+  let invariantContext: InvariantContext
   beforeEach(() => {
     invariantContext = makeContext()
   })
@@ -17,7 +18,7 @@ describe('dropTip', () => {
   function makeRobotState(args: {
     singleHasTips: boolean
     multiHasTips: boolean
-  }) {
+  }): RobotState {
     const _robotState = makeState({
       ...makeStateArgsStandard(),
       invariantContext,

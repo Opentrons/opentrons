@@ -1,4 +1,5 @@
 import { delay } from '../commandCreators/atomic/delay'
+import { PauseArgs } from '../types'
 import { getSuccessResult } from '../__fixtures__'
 
 const getRobotInitialState = (): any => {
@@ -8,13 +9,14 @@ const getRobotInitialState = (): any => {
 
 // neither should InvariantContext
 const invariantContext: any = {}
-let mixInArgs
+let mixInArgs: PauseArgs
 beforeEach(() => {
   mixInArgs = {
     commandCreatorFnName: 'delay',
     meta: null,
     name: 'Delay Test',
     description: 'test blah blah',
+    wait: true,
   }
 })
 describe('delay indefinitely', () => {

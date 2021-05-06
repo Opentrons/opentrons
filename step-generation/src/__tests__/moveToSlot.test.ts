@@ -7,10 +7,13 @@ import {
 } from '../__fixtures__'
 import { moveToSlot } from '../commandCreators/atomic/moveToSlot'
 import { expectTimelineError } from '../__utils__/testMatchers'
+import type { MoveToSlotParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+import type { InvariantContext, RobotState } from '../types'
+
 describe('moveToSlot', () => {
-  let invariantContext
-  let robotStateWithTip
-  let params
+  let invariantContext: InvariantContext
+  let robotStateWithTip: RobotState
+  let params: MoveToSlotParams
   beforeEach(() => {
     invariantContext = makeContext()
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)

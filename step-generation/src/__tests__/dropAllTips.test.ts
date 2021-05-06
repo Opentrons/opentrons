@@ -13,8 +13,8 @@ import { dropAllTips } from '../commandCreators/atomic/dropAllTips'
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
-let initialRobotState
-let invariantContext
+let initialRobotState: RobotState
+let invariantContext: InvariantContext
 beforeEach(() => {
   invariantContext = makeContext()
   initialRobotState = getInitialRobotStateStandard(invariantContext)
@@ -25,7 +25,7 @@ function expectNoTipsRemaining(
   initialRobotState: RobotState,
   invariantContext: InvariantContext,
   res: CommandsAndWarnings
-) {
+): void {
   const nextRobotState = getNextRobotStateAndWarnings(
     res.commands,
     invariantContext,

@@ -13,6 +13,7 @@ import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../__fixtures__/robotStateFixtures'
+import type { InvariantContext, RobotState } from '../types'
 const forSetTemperature = makeImmutableStateUpdater(_forSetTemperature)
 const forDeactivateTemperature = makeImmutableStateUpdater(
   _forDeactivateTemperature
@@ -21,7 +22,10 @@ const forAwaitTemperature = makeImmutableStateUpdater(_forAwaitTemperature)
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'
 const temperature = 45
-let invariantContext, deactivatedRobot, robotWithTemp, robotState
+let invariantContext: InvariantContext,
+  deactivatedRobot: RobotState,
+  robotWithTemp: RobotState,
+  robotState
 beforeEach(() => {
   const stateAndContext = getStateAndContextTempTCModules({
     temperatureModuleId,

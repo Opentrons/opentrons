@@ -4,11 +4,13 @@ import {
 } from '@opentrons/shared-data'
 import { makeContext, getInitialRobotStateStandard } from '../__fixtures__'
 import { engageMagnet } from '../commandCreators/atomic/engageMagnet'
+import type { InvariantContext, RobotState } from '../types'
+
 const moduleId = 'magneticModuleId'
 const commandCreatorFnName = 'engageMagnet'
 describe('engageMagnet', () => {
-  let invariantContext
-  let robotState
+  let invariantContext: InvariantContext
+  let robotState: RobotState
   beforeEach(() => {
     invariantContext = makeContext()
     invariantContext.moduleEntities[moduleId] = {
