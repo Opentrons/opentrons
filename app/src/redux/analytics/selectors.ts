@@ -219,7 +219,7 @@ function getPipetteModels(state: State, robotName: string): ModelsByMount {
       }
       return obj
     },
-    ({}: Partial<ModelsByMount>)
+    ({} as Partial<ModelsByMount>)
   )
 }
 

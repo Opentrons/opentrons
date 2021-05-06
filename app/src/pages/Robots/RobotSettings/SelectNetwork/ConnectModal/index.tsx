@@ -30,18 +30,18 @@ export interface ConnectModalProps {
 export const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const { network, eapOptions, onConnect } = props
 
-  const handleSubmit = (values: ConnectFormValues) => {
+  const handleSubmit = (values: ConnectFormValues): void => {
     const request = connectFormToConfigureRequest(network, values)
     if (request) onConnect(request)
   }
 
-  const handleValidate = (values: ConnectFormValues) => {
+  const handleValidate = (values: ConnectFormValues): ReturnType<typeof validateConnectFormFields>=> {
     return validateConnectFormFields(network, eapOptions, values)
   }
 
   return (
     <Formik
-      initialValues={({}: ConnectFormValues)}
+      initialValues={{}}
       onSubmit={handleSubmit}
       validate={handleValidate}
       validateOnMount

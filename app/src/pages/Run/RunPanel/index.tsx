@@ -14,7 +14,7 @@ import { ModuleLiveStatusCards } from './ModuleLiveStatusCards'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-type SP = {
+interface SP {
   isRunning: boolean,
   isPaused: boolean,
   startTime: string | null,
@@ -25,14 +25,14 @@ type SP = {
   disabled: boolean,
 }
 
-type DP = {
+interface DP {
   onRunClick: () => unknown,
   onPauseClick: () => unknown,
   onResumeClick: () => unknown,
   onResetClick: () => unknown,
 }
 
-type Props = { ...SP, ...DP }
+type Props = SP & DP
 
 const mapStateToProps = (state: State): SP => ({
   isRunning: robotSelectors.getIsRunning(state),
@@ -55,7 +55,7 @@ const mapDispatchToProps = (dispatch: Dispatch): DP => ({
   onResetClick: () => dispatch(robotActions.refreshSession()),
 })
 
-function RunPanelComponent(props: Props) {
+function RunPanelComponent(props: Props): JSX.Element {
   return (
     <SidePanel title="Execute Run">
       <SidePanelGroup>
@@ -78,14 +78,7 @@ function RunPanelComponent(props: Props) {
   )
 }
 
-export const RunPanel: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  _,
-  _,
-  _,
-  _
->(
+export const RunPanel: React.ComponentType<{}> = connect<Props>(
   mapStateToProps,
   mapDispatchToProps
 )(RunPanelComponent)
