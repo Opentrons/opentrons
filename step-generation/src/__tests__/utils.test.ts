@@ -699,7 +699,9 @@ describe('thermocyclerStateDiff', () => {
   ]
   testCases.forEach(({ testMsg, moduleState, args, expected }) => {
     it(testMsg, () => {
-      expect(thermocyclerStateDiff(moduleState, args as ThermocyclerStateStepArgs)).toEqual(expected)
+      expect(
+        thermocyclerStateDiff(moduleState, args as ThermocyclerStateStepArgs)
+      ).toEqual(expected)
     })
   })
 })

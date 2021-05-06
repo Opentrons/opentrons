@@ -8,7 +8,14 @@ import { createEmptyLiquidState, createTipLiquidState } from '../utils'
 import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from '../__fixtures__'
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
 import type { InvariantContext } from '../types'
-let dispenseSingleCh150ToA1Args: { invariantContext: InvariantContext; pipette: string; volume: number; useFullVolume: boolean; labware: string; well: string }
+let dispenseSingleCh150ToA1Args: {
+  invariantContext: InvariantContext
+  pipette: string
+  volume: number
+  useFullVolume: boolean
+  labware: string
+  well: string
+}
 let invariantContext: InvariantContext
 beforeEach(() => {
   invariantContext = makeContext()

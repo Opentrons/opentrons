@@ -14,10 +14,10 @@ export function insufficientTips(): CommandCreatorError {
 }
 
 export function noTipOnPipette(args: {
-  actionName: string,
-  pipette: string,
-  labware: string,
-  well: string,
+  actionName: string
+  pipette: string
+  labware: string
+  well: string
 }): CommandCreatorError {
   const { actionName, pipette, labware, well } = args
   return {
@@ -27,8 +27,8 @@ export function noTipOnPipette(args: {
 }
 
 export function pipetteDoesNotExist(args: {
-  actionName: string,
-  pipette: string,
+  actionName: string
+  pipette: string
 }): CommandCreatorError {
   const { actionName, pipette } = args
   return {
@@ -38,8 +38,8 @@ export function pipetteDoesNotExist(args: {
 }
 
 export function invalidSlot(args: {
-  actionName: string,
-  slot: string,
+  actionName: string
+  slot: string
 }): CommandCreatorError {
   const { actionName, slot } = args
   return {
@@ -49,8 +49,8 @@ export function invalidSlot(args: {
 }
 
 export function labwareDoesNotExist(args: {
-  actionName: string,
-  labware: string,
+  actionName: string
+  labware: string
 }): CommandCreatorError {
   const { actionName, labware } = args
   console.warn(
@@ -78,9 +78,9 @@ export function missingTemperatureStep(): CommandCreatorError {
 }
 
 export function tipVolumeExceeded(args: {
-  actionName: string,
-  volume: string | number,
-  maxVolume: string | number,
+  actionName: string
+  volume: string | number
+  maxVolume: string | number
 }): CommandCreatorError {
   const { actionName, volume, maxVolume } = args
   return {
@@ -90,10 +90,10 @@ export function tipVolumeExceeded(args: {
 }
 
 export function pipetteVolumeExceeded(args: {
-  actionName: string,
-  volume: string | number,
-  maxVolume: string | number,
-  disposalVolume?: string | number,
+  actionName: string
+  volume: string | number
+  maxVolume: string | number
+  disposalVolume?: string | number
 }): CommandCreatorError {
   const { actionName, volume, maxVolume, disposalVolume } = args
   const message =

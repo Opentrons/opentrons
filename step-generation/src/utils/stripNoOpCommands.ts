@@ -7,13 +7,11 @@ const _isEqualMix = (
   b: AspDispAirgapParams
 ): boolean => {
   const compareParams = ['pipette', 'volume', 'labware', 'well']
-      // @ts-expect-error(SA, 2021-05-03): can's index AspDispAirgapParams with string
+  // @ts-expect-error(SA, 2021-05-03): can's index AspDispAirgapParams with string
   return compareParams.every(param => a[param] === b[param])
 }
 
-export const _stripNoOpMixCommands = (
-  commands: Command[]
-): Command[] =>
+export const _stripNoOpMixCommands = (commands: Command[]): Command[] =>
   removePairs<Command>(
     commands,
     (a, b) =>

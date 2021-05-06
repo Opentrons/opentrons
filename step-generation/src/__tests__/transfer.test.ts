@@ -109,7 +109,11 @@ test('single transfer: 1 source & 1 dest', () => {
       volume: 200,
     },
   }
-  const result = transfer(mixinArgs as TransferArgs, invariantContext, robotStateWithTip)
+  const result = transfer(
+    mixinArgs as TransferArgs,
+    invariantContext,
+    robotStateWithTip
+  )
   const res = getSuccessResult(result)
   expect(res.commands).toEqual([
     aspirateHelper('A1', 30),
@@ -124,7 +128,11 @@ test('transfer with multiple sets of wells', () => {
     changeTip: 'never',
     volume: 30,
   }
-  const result = transfer(mixinArgs as TransferArgs, invariantContext, robotStateWithTip)
+  const result = transfer(
+    mixinArgs as TransferArgs,
+    invariantContext,
+    robotStateWithTip
+  )
   const res = getSuccessResult(result)
   expect(res.commands).toEqual([
     aspirateHelper('A1', 30),
@@ -142,7 +150,11 @@ test('invalid pipette ID should throw error', () => {
     changeTip: 'always',
     pipette: 'no-such-pipette-id-here',
   }
-  const result = transfer(mixinArgs as TransferArgs, invariantContext, robotStateWithTip)
+  const result = transfer(
+    mixinArgs as TransferArgs,
+    invariantContext,
+    robotStateWithTip
+  )
   const res = getErrorResult(result)
   expect(res.errors).toHaveLength(1)
   expect(res.errors[0]).toMatchObject({
@@ -158,7 +170,11 @@ test('invalid labware ID should throw error', () => {
     volume: 10,
     changeTip: 'always',
   }
-  const result = transfer(mixinArgs as TransferArgs, invariantContext, robotStateWithTip)
+  const result = transfer(
+    mixinArgs as TransferArgs,
+    invariantContext,
+    robotStateWithTip
+  )
   const res = getErrorResult(result)
   expect(res.errors).toHaveLength(1)
   expect(res.errors[0]).toMatchObject({

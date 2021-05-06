@@ -1,4 +1,4 @@
-import { thermocyclerStateDiff, Diff } from '../utils/thermocyclerStateDiff';
+import { thermocyclerStateDiff, Diff } from '../utils/thermocyclerStateDiff'
 import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
 import {
   getStateAndContextTempTCModules,

@@ -122,8 +122,11 @@ export const transfer: CommandCreator<TransferArgs> = (
       .concat(splitLastVol)
       .concat(splitLastVol)
   }
-// @ts-expect-error(SA, 2021-05-05): zip can return undefined so this really should be Array<[string | undefined, string | undefined]>
-  const sourceDestPairs: Array<[string, string]> = zip(args.sourceWells, args.destWells)
+  // @ts-expect-error(SA, 2021-05-05): zip can return undefined so this really should be Array<[string | undefined, string | undefined]>
+  const sourceDestPairs: Array<[string, string]> = zip(
+    args.sourceWells,
+    args.destWells
+  )
   let prevSourceWell: string | null = null
   let prevDestWell: string | null = null
   const commandCreators = sourceDestPairs.reduce(
@@ -185,21 +188,22 @@ export const transfer: CommandCreator<TransferArgs> = (
                   dispenseDelaySeconds: dispenseDelay?.seconds,
                 })
               : []
-          const mixBeforeAspirateCommands = (args.mixBeforeAspirate != null)
-            ? mixUtil({
-                pipette: args.pipette,
-                labware: args.sourceLabware,
-                well: sourceWell,
-                volume: args.mixBeforeAspirate.volume,
-                times: args.mixBeforeAspirate.times,
-                aspirateOffsetFromBottomMm,
-                dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
-                aspirateFlowRateUlSec,
-                dispenseFlowRateUlSec,
-                aspirateDelaySeconds: aspirateDelay?.seconds,
-                dispenseDelaySeconds: dispenseDelay?.seconds,
-              })
-            : []
+          const mixBeforeAspirateCommands =
+            args.mixBeforeAspirate != null
+              ? mixUtil({
+                  pipette: args.pipette,
+                  labware: args.sourceLabware,
+                  well: sourceWell,
+                  volume: args.mixBeforeAspirate.volume,
+                  times: args.mixBeforeAspirate.times,
+                  aspirateOffsetFromBottomMm,
+                  dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
+                  aspirateFlowRateUlSec,
+                  dispenseFlowRateUlSec,
+                  aspirateDelaySeconds: aspirateDelay?.seconds,
+                  dispenseDelaySeconds: dispenseDelay?.seconds,
+                })
+              : []
           const delayAfterAspirateCommands =
             aspirateDelay != null
               ? [
@@ -244,21 +248,22 @@ export const transfer: CommandCreator<TransferArgs> = (
                 }),
               ]
             : []
-          const mixInDestinationCommands = (args.mixInDestination != null)
-            ? mixUtil({
-                pipette: args.pipette,
-                labware: args.destLabware,
-                well: destWell,
-                volume: args.mixInDestination.volume,
-                times: args.mixInDestination.times,
-                aspirateOffsetFromBottomMm: dispenseOffsetFromBottomMm,
-                dispenseOffsetFromBottomMm,
-                aspirateFlowRateUlSec,
-                dispenseFlowRateUlSec,
-                aspirateDelaySeconds: aspirateDelay?.seconds,
-                dispenseDelaySeconds: dispenseDelay?.seconds,
-              })
-            : []
+          const mixInDestinationCommands =
+            args.mixInDestination != null
+              ? mixUtil({
+                  pipette: args.pipette,
+                  labware: args.destLabware,
+                  well: destWell,
+                  volume: args.mixInDestination.volume,
+                  times: args.mixInDestination.times,
+                  aspirateOffsetFromBottomMm: dispenseOffsetFromBottomMm,
+                  dispenseOffsetFromBottomMm,
+                  aspirateFlowRateUlSec,
+                  dispenseFlowRateUlSec,
+                  aspirateDelaySeconds: aspirateDelay?.seconds,
+                  dispenseDelaySeconds: dispenseDelay?.seconds,
+                })
+              : []
           const delayAfterDispenseCommands =
             dispenseDelay != null
               ? [

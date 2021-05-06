@@ -96,10 +96,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       // Aspirate commands for all source wells in the chunk
       const aspirateCommands = flatMap(
         sourceWellChunk,
-        (
-          sourceWell: string,
-          wellIndex: number
-        ): CurriedCommandCreator[] => {
+        (sourceWell: string, wellIndex: number): CurriedCommandCreator[] => {
           const airGapOffsetSourceWell =
             getWellDepth(sourceLabwareDef, sourceWell) + AIR_GAP_OFFSET_FROM_TOP
           const airGapAfterAspirateCommands = aspirateAirGapVolume
@@ -112,7 +109,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   flowRate: aspirateFlowRateUlSec,
                   offsetFromBottomMm: airGapOffsetSourceWell,
                 }),
-                ...((aspirateDelay != null)
+                ...(aspirateDelay != null
                   ? [
                       curryCommandCreator(delay, {
                         commandCreatorFnName: 'delay',
@@ -196,21 +193,22 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             }),
           ]
         : []
-      const mixBeforeCommands = (mixFirstAspirate != null)
-        ? mixUtil({
-            pipette: args.pipette,
-            labware: args.sourceLabware,
-            well: sourceWellChunk[0],
-            volume: mixFirstAspirate.volume,
-            times: mixFirstAspirate.times,
-            aspirateOffsetFromBottomMm,
-            dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
-            aspirateFlowRateUlSec,
-            dispenseFlowRateUlSec,
-            aspirateDelaySeconds: aspirateDelay?.seconds,
-            dispenseDelaySeconds: dispenseDelay?.seconds,
-          })
-        : []
+      const mixBeforeCommands =
+        mixFirstAspirate != null
+          ? mixUtil({
+              pipette: args.pipette,
+              labware: args.sourceLabware,
+              well: sourceWellChunk[0],
+              volume: mixFirstAspirate.volume,
+              times: mixFirstAspirate.times,
+              aspirateOffsetFromBottomMm,
+              dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
+              aspirateFlowRateUlSec,
+              dispenseFlowRateUlSec,
+              aspirateDelaySeconds: aspirateDelay?.seconds,
+              dispenseDelaySeconds: dispenseDelay?.seconds,
+            })
+          : []
       const preWetTipCommands = args.preWetTip // Pre-wet tip is equivalent to a single mix, with volume equal to the consolidate volume.
         ? mixUtil({
             pipette: args.pipette,
@@ -226,21 +224,22 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             dispenseDelaySeconds: dispenseDelay?.seconds,
           })
         : []
-      const mixAfterCommands = (mixInDestination != null)
-        ? mixUtil({
-            pipette: args.pipette,
-            labware: args.destLabware,
-            well: args.destWell,
-            volume: mixInDestination.volume,
-            times: mixInDestination.times,
-            aspirateOffsetFromBottomMm: dispenseOffsetFromBottomMm,
-            dispenseOffsetFromBottomMm,
-            aspirateFlowRateUlSec,
-            dispenseFlowRateUlSec,
-            aspirateDelaySeconds: aspirateDelay?.seconds,
-            dispenseDelaySeconds: dispenseDelay?.seconds,
-          })
-        : []
+      const mixAfterCommands =
+        mixInDestination != null
+          ? mixUtil({
+              pipette: args.pipette,
+              labware: args.destLabware,
+              well: args.destWell,
+              volume: mixInDestination.volume,
+              times: mixInDestination.times,
+              aspirateOffsetFromBottomMm: dispenseOffsetFromBottomMm,
+              dispenseOffsetFromBottomMm,
+              aspirateFlowRateUlSec,
+              dispenseFlowRateUlSec,
+              aspirateDelaySeconds: aspirateDelay?.seconds,
+              dispenseDelaySeconds: dispenseDelay?.seconds,
+            })
+          : []
       const delayAfterDispenseCommands =
         dispenseDelay != null
           ? [
@@ -275,7 +274,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
               }),
-              ...((aspirateDelay != null)
+              ...(aspirateDelay != null
                 ? [
                     curryCommandCreator(delay, {
                       commandCreatorFnName: 'delay',

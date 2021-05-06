@@ -119,10 +119,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const destWellChunks = chunk(args.destWells, maxWellsPerChunk)
   const commandCreators = flatMap(
     destWellChunks,
-    (
-      destWellChunk: string[],
-      chunkIndex: number
-    ): CurriedCommandCreator[] => {
+    (destWellChunk: string[], chunkIndex: number): CurriedCommandCreator[] => {
       const firstDestWell = destWellChunk[0]
       const sourceLabwareDef =
         invariantContext.labwareEntities[args.sourceLabware].def
@@ -143,7 +140,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetSourceWell,
             }),
-            ...((aspirateDelay != null)
+            ...(aspirateDelay != null
               ? [
                   curryCommandCreator(delay, {
                     commandCreatorFnName: 'delay',
@@ -162,7 +159,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetDestWell,
             }),
-            ...((dispenseDelay != null)
+            ...(dispenseDelay != null
               ? [
                   curryCommandCreator(delay, {
                     commandCreatorFnName: 'delay',
@@ -263,7 +260,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
               }),
-              ...((aspirateDelay != null)
+              ...(aspirateDelay != null
                 ? [
                     curryCommandCreator(delay, {
                       commandCreatorFnName: 'delay',
@@ -331,21 +328,22 @@ export const distribute: CommandCreator<DistributeArgs> = (
             }),
           ]
         : []
-      const mixBeforeAspirateCommands = (args.mixBeforeAspirate != null)
-        ? mixUtil({
-            pipette: args.pipette,
-            labware: args.sourceLabware,
-            well: args.sourceWell,
-            volume: args.mixBeforeAspirate.volume,
-            times: args.mixBeforeAspirate.times,
-            aspirateOffsetFromBottomMm,
-            dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
-            aspirateFlowRateUlSec,
-            dispenseFlowRateUlSec,
-            aspirateDelaySeconds: aspirateDelay?.seconds,
-            dispenseDelaySeconds: dispenseDelay?.seconds,
-          })
-        : []
+      const mixBeforeAspirateCommands =
+        args.mixBeforeAspirate != null
+          ? mixUtil({
+              pipette: args.pipette,
+              labware: args.sourceLabware,
+              well: args.sourceWell,
+              volume: args.mixBeforeAspirate.volume,
+              times: args.mixBeforeAspirate.times,
+              aspirateOffsetFromBottomMm,
+              dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
+              aspirateFlowRateUlSec,
+              dispenseFlowRateUlSec,
+              aspirateDelaySeconds: aspirateDelay?.seconds,
+              dispenseDelaySeconds: dispenseDelay?.seconds,
+            })
+          : []
       return [
         ...tipCommands,
         ...mixBeforeAspirateCommands,
