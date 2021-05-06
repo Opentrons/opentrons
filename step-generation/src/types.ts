@@ -14,7 +14,7 @@ import type {
   AtomicProfileStep,
   EngageMagnetParams,
   ModuleOnlyParams,
-} from '@opentrons/shared-data//lib/protocol/types/schemaV4'
+} from '@opentrons/shared-data/lib/protocol/types/schemaV4'
 import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
 import type {
   TEMPERATURE_DEACTIVATED,
