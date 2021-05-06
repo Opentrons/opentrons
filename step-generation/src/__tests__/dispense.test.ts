@@ -10,7 +10,7 @@ import {
 } from '../__fixtures__'
 import { dispense } from '../commandCreators/atomic/dispense'
 import { InvariantContext, RobotState } from '../types'
-import { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+import { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 jest.mock('../utils/thermocyclerPipetteCollision')
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
   typeof thermocyclerPipetteCollision

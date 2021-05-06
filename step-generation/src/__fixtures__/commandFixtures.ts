@@ -5,8 +5,8 @@ import type {
   BlowoutParams,
   DispenseParams,
   TouchTipParams,
-} from '@opentrons/shared-data/lib/protocol/types/schemaV3'
-import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
+} from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
 
 /** Used to wrap command creators in tests, effectively casting their results

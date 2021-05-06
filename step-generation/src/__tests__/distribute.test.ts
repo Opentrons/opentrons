@@ -22,7 +22,7 @@ import {
   SOURCE_LABWARE,
 } from '../__fixtures__'
 import { distribute } from '../commandCreators/compound/distribute'
-import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6.js'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6.js'
 import type { DistributeArgs, InvariantContext, RobotState } from '../types'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,

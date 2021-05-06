@@ -1,4 +1,4 @@
-import type { ModuleOnlyParams } from '@opentrons/shared-data/lib/protocol/types/schemaV4'
+import type { ModuleOnlyParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { CommandCreator } from '../../types'
 export const thermocyclerCloseLid: CommandCreator<ModuleOnlyParams> = (
   args,

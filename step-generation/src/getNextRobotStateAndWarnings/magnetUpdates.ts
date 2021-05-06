@@ -3,7 +3,7 @@ import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import type {
   EngageMagnetParams,
   ModuleOnlyParams,
-} from '@opentrons/shared-data/lib/protocol/types/schemaV4'
+} from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 // @ts-expect-error(SA, 2021-05-03): function parameters have implicit any types

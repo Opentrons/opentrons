@@ -7,7 +7,7 @@ import {
 } from '../__fixtures__'
 import { moveToSlot } from '../commandCreators/atomic/moveToSlot'
 import { expectTimelineError } from '../__utils__/testMatchers'
-import type { MoveToSlotParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+import type { MoveToSlotParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { InvariantContext, RobotState } from '../types'
 
 describe('moveToSlot', () => {

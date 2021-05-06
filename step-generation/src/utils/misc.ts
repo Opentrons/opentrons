@@ -12,7 +12,7 @@ import {
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { BlowoutParams } from '@opentrons/shared-data/lib/protocol/types/schemaV4'
+import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
   CurriedCommandCreator,
   InvariantContext,

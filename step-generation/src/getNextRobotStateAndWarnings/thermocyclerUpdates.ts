@@ -6,7 +6,7 @@ import type {
   TCProfileParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureArgs,
-} from '@opentrons/shared-data/lib/protocol/types/schemaV4'
+} from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
   InvariantContext,
   RobotStateAndWarnings,

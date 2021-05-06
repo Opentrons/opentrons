@@ -4,8 +4,8 @@ import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
 } from '../../utils'
-import type { AspirateParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
-import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
+import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Aspirate with given args. Requires tip. */

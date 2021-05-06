@@ -13,7 +13,7 @@ import type {
   ModuleOnlyParams,
   TemperatureParams,
   TCProfileParams,
-} from '@opentrons/shared-data/lib/protocol/types/schemaV4'
+} from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { CommandCreator } from '../types'
 
 const getRobotInitialState = (): any => {

@@ -23,11 +23,11 @@ import {
   SOURCE_LABWARE,
 } from '../__fixtures__'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
-import type { Command } from '@opentrons/shared-data/lib/protocol/types/schemaV6'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   AspirateParams,
   DispenseParams,
-} from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+} from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { ConsolidateArgs, InvariantContext, RobotState } from '../types'
 
 const airGapHelper = makeAirGapHelper({

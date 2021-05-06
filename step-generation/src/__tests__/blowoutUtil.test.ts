@@ -1,4 +1,4 @@
-import { BlowoutParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { InvariantContext } from '../types'
 import {

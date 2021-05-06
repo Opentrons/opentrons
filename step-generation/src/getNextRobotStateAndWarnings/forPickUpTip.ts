@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { getIsTiprack } from '@opentrons/shared-data'
-import type { PipetteAccessParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+import type { PipetteAccessParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 export function forPickUpTip(
   params: PipetteAccessParams,

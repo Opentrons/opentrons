@@ -10,7 +10,7 @@ import {
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
 import * as warningCreators from '../warningCreators'
 import type { InvariantContext, RobotState } from '../types'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 
 const forAspirate = makeImmutableStateUpdater(_forAspirate)
 let invariantContext: InvariantContext

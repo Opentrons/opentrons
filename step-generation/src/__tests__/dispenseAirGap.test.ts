@@ -9,7 +9,7 @@ import {
   SOURCE_LABWARE,
 } from '../__fixtures__'
 import { dispenseAirGap } from '../commandCreators/atomic/dispenseAirGap'
-import { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV3'
+import { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { InvariantContext, RobotState } from '../types'
 
 jest.mock('../utils/thermocyclerPipetteCollision')
