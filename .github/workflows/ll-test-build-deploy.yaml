@@ -85,6 +85,9 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'test-e2e'
+        env:
+          OT_LL_MIXPANEL_ID: ${{ secrets.OT_LL_MIXPANEL_ID }}
+          OT_LL_MIXPANEL_DEV_ID: ${{ secrets.OT_LL_MIXPANEL_DEV_ID }}
         run: make -C labware-library test-e2e
   build-ll:
     name: 'build labware library artifact'
@@ -110,6 +113,9 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'build LL'
+        env:
+          OT_LL_MIXPANEL_ID: ${{ secrets.OT_LL_MIXPANEL_ID }}
+          OT_LL_MIXPANEL_DEV_ID: ${{ secrets.OT_LL_MIXPANEL_DEV_ID }}
         run: |
           make -C labware-library
       - name: 'upload github artifact'
