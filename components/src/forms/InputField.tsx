@@ -12,7 +12,7 @@ export interface InputFieldProps {
   /** field is disabled if value is true */
   disabled?: boolean
   /** change handler */
-  onChange?: (event: React.SyntheticEvent<HTMLInputElement>) => unknown
+  onChange?: React.ChangeEventHandler<HTMLInputElement>
   /** classes to apply to outer element */
   className?: string
   /** inline label text. DEPRECATED */
