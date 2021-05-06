@@ -1,4 +1,3 @@
-
 import { mockRobot, mockRequestMeta } from '../../robot-api/__fixtures__'
 import * as Actions from '../actions'
 import * as Fixtures from '../__fixtures__'
@@ -6,10 +5,10 @@ import * as Fixtures from '../__fixtures__'
 import type { NetworkingAction } from '../types'
 
 interface ActionSpec {
-  name: string,
-  creator: (...args: any[]) => unknown,
-  args: unknown[],
-  expected: NetworkingAction,
+  name: string
+  creator: (...args: any[]) => unknown
+  args: unknown[]
+  expected: NetworkingAction
 }
 
 describe('networking actions', () => {
@@ -21,7 +20,7 @@ describe('networking actions', () => {
       expected: {
         type: 'networking:FETCH_STATUS',
         payload: { robotName: mockRobot.name },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -67,7 +66,7 @@ describe('networking actions', () => {
       expected: {
         type: 'networking:FETCH_WIFI_LIST',
         payload: { robotName: mockRobot.name },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -114,7 +113,7 @@ describe('networking actions', () => {
           robotName: mockRobot.name,
           options: { ssid: 'network-name', psk: 'network-password' },
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -154,7 +153,7 @@ describe('networking actions', () => {
       expected: {
         type: 'networking:FETCH_WIFI_KEYS',
         payload: { robotName: mockRobot.name },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -190,14 +189,14 @@ describe('networking actions', () => {
     {
       name: 'can create networking:POST_WIFI_KEYS',
       creator: Actions.postWifiKeys,
-      args: [mockRobot.name, (({ name: 'key.crt' } as any): File)],
+      args: [mockRobot.name, { name: 'key.crt' } as File],
       expected: {
         type: 'networking:POST_WIFI_KEYS',
         payload: {
           robotName: mockRobot.name,
-          keyFile: (({ name: 'key.crt' } as any): File),
+          keyFile: { name: 'key.crt' } as File,
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -237,7 +236,7 @@ describe('networking actions', () => {
       expected: {
         type: 'networking:FETCH_EAP_OPTIONS',
         payload: { robotName: mockRobot.name },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -280,7 +279,7 @@ describe('networking actions', () => {
           robotName: mockRobot.name,
           ...Fixtures.mockNetworkingDisconnect,
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
