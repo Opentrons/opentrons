@@ -1,13 +1,12 @@
-
 import * as Fixtures from '../__fixtures__'
 import * as Actions from '../actions'
 import type { LabwareCalibrationAction } from '../types'
 
 interface ActionSpec {
-  should: string,
-  creator: (...any[]) => LabwareCalibrationAction,
-  args: unknown[],
-  expected: LabwareCalibrationAction,
+  should: string
+  creator: (...args: any[]) => LabwareCalibrationAction
+  args: unknown[]
+  expected: LabwareCalibrationAction
 }
 
 const SPECS: ActionSpec[] = [

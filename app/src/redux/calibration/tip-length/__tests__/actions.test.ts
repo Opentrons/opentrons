@@ -1,13 +1,12 @@
-
 import * as Fixtures from '../__fixtures__'
 import * as Actions from '../actions'
 import type { TipLengthCalibrationsAction } from '../types'
 
 interface ActionSpec {
-  should: string,
-  creator: (...any[]) => TipLengthCalibrationsAction,
-  args: unknown[],
-  expected: TipLengthCalibrationsAction,
+  should: string
+  creator: (...args: any[]) => TipLengthCalibrationsAction
+  args: unknown[]
+  expected: TipLengthCalibrationsAction
 }
 
 const SPECS: ActionSpec[] = [

@@ -4,10 +4,10 @@ import * as actions from '../actions'
 import type { BuildrootAction } from '../types'
 
 interface ActionSpec {
-  name: string,
-  creator: (...any[]) => BuildrootAction,
-  args: unknown[],
-  expected: BuildrootAction,
+  name: string
+  creator: (...args: any[]) => BuildrootAction
+  args: unknown[]
+  expected: BuildrootAction
 }
 
 describe('buildroot action creators', () => {
