@@ -13,20 +13,20 @@ const labwareSchemaV1DefsContext = (require as any).context(
   'sync' // load every definition into one synchronous chunk
 )
 let labwareSchemaV1Defs: Readonly<LabwareDefinition1[]> | null = null
-function getLegacyLabwareDefs(): Readonly<LabwareDefinition1[]> {
+function getLegacyLabwareDefs(): Readonly<LabwareDefinition1[]> | null {
   if (!labwareSchemaV1Defs) {
     labwareSchemaV1Defs = labwareSchemaV1DefsContext
       .keys()
-      .map(name => labwareSchemaV1DefsContext(name))
+      .map((name: string) => labwareSchemaV1DefsContext(name))
   }
 
   return labwareSchemaV1Defs
 }
 
 export function getLegacyLabwareDef(
-  loadName: ?string
+  loadName: string | null | undefined
 ): LabwareDefinition1 | null {
-  const def = getLegacyLabwareDefs().find(d => d.metadata.name === loadName)
+  const def = getLegacyLabwareDefs()?.find(d => d.metadata.name === loadName)
   return def || null
 }
 
@@ -46,7 +46,7 @@ function getLatestLabwareDefs(): LabwareDefinition2[] {
   if (!labwareSchemaV2Defs) {
     const allDefs = labwareSchemaV2DefsContext
       .keys()
-      .map(name => labwareSchemaV2DefsContext(name))
+      .map((name: string) => labwareSchemaV2DefsContext(name))
     // group by namespace + loadName
     const labwareDefGroups: {
       [groupKey: string]: LabwareDefinition2[]
@@ -67,7 +67,7 @@ function getLatestLabwareDefs(): LabwareDefinition2[] {
 }
 
 export function getLatestLabwareDef(
-  loadName: ?string
+  loadName: string | null | undefined
 ): LabwareDefinition2 | null {
   const def = getLatestLabwareDefs().find(
     d => d.parameters.loadName === loadName
