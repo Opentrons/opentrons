@@ -15,7 +15,7 @@ import * as Calibration from '../../../redux/calibration'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { DevInternalFlag } from '../../../redux/config/types'
-import type { Dispatch } from '../../../redux/types'
+import type { State, Dispatch } from '../../../redux/types'
 
 const TITLE = 'Advanced Settings'
 
@@ -46,7 +46,7 @@ const ENABLE_DEV_TOOLS_BODY =
 const DEV_TITLE = 'Developer Only (unstable)'
 
 export function AppAdvancedSettingsCard(): JSX.Element {
-  const useTrashSurfaceForTipCal = useSelector(state =>
+  const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
   )
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
@@ -57,7 +57,7 @@ export function AppAdvancedSettingsCard(): JSX.Element {
   )
   const dispatch = useDispatch<Dispatch>()
 
-  const handleUseTrashSelection: BlockSelection => void = selection => {
+  const handleUseTrashSelection = (selection: BlockSelection): void => {
     switch (selection) {
       case ALWAYS_PROMPT:
         dispatch(Calibration.resetUseTrashSurfaceForTipCal())
@@ -70,10 +70,10 @@ export function AppAdvancedSettingsCard(): JSX.Element {
         break
     }
   }
-  const toggleDevtools = () => dispatch(Config.toggleDevtools())
-  const toggleDevInternalFlag = (flag: DevInternalFlag) =>
+  const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
+  const toggleDevInternalFlag = (flag: DevInternalFlag): unknown =>
     dispatch(Config.toggleDevInternalFlag(flag))
-  const handleChannel = event =>
+  const handleChannel: React.ChangeEventHandler = event =>
     dispatch(Config.updateConfigValue('update.channel', event.target.value))
   return (
     <>
@@ -94,7 +94,7 @@ export function AppAdvancedSettingsCard(): JSX.Element {
             // field whose values are only the elements of BlockSelection; but sadly,
             // neither of us can get Flow to know it
             handleUseTrashSelection(
-              ((event.currentTarget.value as any): BlockSelection)
+              (event.currentTarget.value as BlockSelection)
             )
           }}
           options={[
