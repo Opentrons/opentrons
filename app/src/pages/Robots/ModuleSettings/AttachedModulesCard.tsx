@@ -28,14 +28,11 @@ import { UsbHubItem } from './UsbHubItem'
 const TITLE = 'Connected Modules'
 const POLL_MODULE_INTERVAL_MS = 5000
 
-type ModulesListByPort = {|
-  [port: string]: Array<AttachedModule>,
-|}
+interface ModulesListByPort {
+  [port: string]: AttachedModule[],
+}
 
-const moduleListWithUSBInfo: (
-  ModulesListByPort,
-  string | null
-) => Array<React.Node> = (modulesByPort, controlDisabledReason) => {
+const moduleListWithUSBInfo = (modulesByPort: ModulesListByPort, controlDisabledReason: string | null): JSX.Element[] => {
   return Object.keys(modulesByPort).map(port =>
     modulesByPort[port].length > 1 ? (
       <UsbHubItem
@@ -54,10 +51,7 @@ const moduleListWithUSBInfo: (
   )
 }
 
-const legacyModuleList: (
-  Array<AttachedModule>,
-  string | null
-) => Array<React.Node> = (modules, controlDisabledReason) => {
+const legacyModuleList = (modules: AttachedModule[], controlDisabledReason: string | null): JSX.Element[] => {
   return modules.map(mod => (
     <ModuleItem
       key={mod.serial}
@@ -67,7 +61,7 @@ const legacyModuleList: (
   ))
 }
 
-type Props = { robotName: string }
+interface Props { robotName: string }
 
 export function AttachedModulesCard(props: Props): JSX.Element {
   const { robotName } = props
