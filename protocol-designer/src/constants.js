@@ -30,8 +30,6 @@ export function getAllWellsForLabware(def: LabwareDefinition2): Array<string> {
 
 export const FIXED_TRASH_ID: 'trashId' = 'trashId'
 
-export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
-
 // Standard slot dims FOR VISUALIZATION ONLY
 export const STD_SLOT_X_DIM = 128
 export const STD_SLOT_Y_DIM = 86
@@ -72,8 +70,6 @@ export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
 export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP = -1
 export const DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP = 0
 
-export const AIR_GAP_OFFSET_FROM_TOP = 1
-
 export const DEFAULT_DELAY_SECONDS = 1
 
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
@@ -95,14 +91,6 @@ export const MAX_TC_LID_TEMP = 110
 
 export const MIN_TC_DURATION_SECONDS = 0
 export const MAX_TC_DURATION_SECONDS = 60
-
-// Temperature statuses
-export const TEMPERATURE_DEACTIVATED: 'TEMPERATURE_DEACTIVATED' =
-  'TEMPERATURE_DEACTIVATED'
-export const TEMPERATURE_AT_TARGET: 'TEMPERATURE_AT_TARGET' =
-  'TEMPERATURE_AT_TARGET'
-export const TEMPERATURE_APPROACHING_TARGET: 'TEMPERATURE_APPROACHING_TARGET' =
-  'TEMPERATURE_APPROACHING_TARGET'
 
 export const MODELS_FOR_MODULE_TYPE: {
   [ModuleRealType]: Array<{|
@@ -149,11 +137,6 @@ export const DEFAULT_MODEL_FOR_MODULE_TYPE: {
   [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_V1,
   [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_V1,
 }
-
-export const MODULES_WITH_COLLISION_ISSUES = [
-  MAGNETIC_MODULE_V1,
-  TEMPERATURE_MODULE_V1,
-]
 
 // Values for pauseAction field
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'

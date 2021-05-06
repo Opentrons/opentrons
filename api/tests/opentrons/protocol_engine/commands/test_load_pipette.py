@@ -2,6 +2,7 @@
 from mock import AsyncMock  # type: ignore[attr-defined]
 
 from opentrons.types import MountType
+from opentrons.protocol_engine.types import PipetteName
 from opentrons.protocol_engine.execution import LoadedPipette
 from opentrons.protocol_engine.commands import (
     LoadPipetteRequest,
@@ -12,12 +13,13 @@ from opentrons.protocol_engine.commands import (
 def test_load_pipette_request() -> None:
     """It should have a LoadPipetteRequest model."""
     request = LoadPipetteRequest(
-        pipetteName="p300_single",
-        mount=MountType.LEFT
+        pipetteName=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
     )
 
     assert request.pipetteName == "p300_single"
     assert request.mount == MountType.LEFT
+    assert request.pipetteId is None
 
 
 def test_load_pipette_result() -> None:
@@ -33,7 +35,11 @@ async def test_load_pipette_implementation(mock_handlers: AsyncMock) -> None:
         pipette_id="pipette-id",
     )
 
-    request = LoadPipetteRequest(pipetteName="p300_single", mount=MountType.LEFT)
+    request = LoadPipetteRequest(
+        pipetteName=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+        pipetteId="some id"
+    )
     impl = request.get_implementation()
     result = await impl.execute(mock_handlers)
 
@@ -41,4 +47,5 @@ async def test_load_pipette_implementation(mock_handlers: AsyncMock) -> None:
     mock_handlers.equipment.load_pipette.assert_called_with(
         pipette_name="p300_single",
         mount=MountType.LEFT,
+        pipette_id="some id",
     )

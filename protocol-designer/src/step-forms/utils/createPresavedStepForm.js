@@ -18,14 +18,15 @@ import {
   getMagnetLabwareEngageHeight,
 } from '../../ui/modules/utils'
 import { maskField } from '../../steplist/fieldLevel'
-import type { FormData, StepType, StepIdType } from '../../form-types'
 import type {
   PipetteEntities,
   LabwareEntities,
-  InitialDeckSetup,
-} from '../types'
+  RobotState,
+  Timeline,
+} from '@opentrons/step-generation'
+import type { FormData, StepType, StepIdType } from '../../form-types'
+import type { InitialDeckSetup } from '../types'
 import type { FormPatch } from '../../steplist/actions/types'
-import type { RobotState, Timeline } from '../../step-generation'
 import type { SavedStepFormState, OrderedStepIdsState } from '../reducers'
 
 export type CreatePresavedStepFormArgs = {|

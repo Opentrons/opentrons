@@ -91,12 +91,14 @@ function TipPositionInput(props: Props) {
         isDelayPositionField={isDelayPositionField}
       >
         <InputField
+          disabled={disabled}
           className={props.className || stepFormStyles.small_field}
           readOnly
           onClick={handleOpen}
           value={String(value)}
           isIndeterminate={isIndeterminate}
           units={i18n.t('application.units.millimeter')}
+          id={`TipPositionField_${name}`}
         />
       </Wrapper>
     </>

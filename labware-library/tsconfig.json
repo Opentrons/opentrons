@@ -3,6 +3,9 @@
   "references": [
     {
       "path": "../components"
+    },
+    {
+      "path": "../shared-data"
     }
   ],
   "compilerOptions": {

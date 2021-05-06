@@ -4,6 +4,9 @@ import { Icon } from '../icons'
 
 import styles from './forms.css'
 
+/**
+ * Checkbox Field Properties.
+ */
 export interface CheckboxFieldProps {
   /** change handler */
   onChange: React.ChangeEventHandler
@@ -29,6 +32,9 @@ export interface CheckboxFieldProps {
   isIndeterminate?: boolean
 }
 
+/**
+ * Checkbox Form Field
+ */
 export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
   const error = props.error != null
   const outerClassName = cx(styles.form_field, props.className, {

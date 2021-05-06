@@ -122,3 +122,6 @@ api/pyproject.toml
 
 # typescript incremental files
 *.tsbuildinfo
+
+# Static storybook build artifacts
+storybook-static/

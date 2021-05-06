@@ -4,11 +4,11 @@ import typing
 from starlette import status as http_status_codes
 from fastapi import APIRouter, UploadFile, File, Depends, Body
 
+from robot_server.service.dependencies import get_protocol_manager
 from robot_server.service.json_api import ResourceLink
 from robot_server.service.json_api.resource_links import ResourceLinkKey, \
     ResourceLinks
 from robot_server.service.protocol import models as route_models
-from robot_server.service.dependencies import get_protocol_manager
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.protocol.protocol import UploadedProtocol
 

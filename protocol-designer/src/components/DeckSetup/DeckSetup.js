@@ -12,18 +12,16 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   type RobotWorkSpaceRenderProps,
 } from '@opentrons/components'
+import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getLabwareHasQuirk,
+  GEN_ONE_MULTI_PIPETTES,
   type DeckSlot as DeckDefSlot,
   type ModuleRealType,
 } from '@opentrons/shared-data'
 // $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-import {
-  PSEUDO_DECK_SLOTS,
-  GEN_ONE_MULTI_PIPETTES,
-  MODULES_WITH_COLLISION_ISSUES,
-} from '../../constants'
+import { PSEUDO_DECK_SLOTS } from '../../constants'
 import { i18n } from '../../localization'
 import {
   getLabwareIsCompatible,

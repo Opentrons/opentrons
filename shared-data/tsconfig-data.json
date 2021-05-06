@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig-base.json",
+  "references": [],
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": false,
+    "rootDir": ".",
+    "outDir": "lib"
+  },
+  "include": [
+    "deck/**/*.json",
+    "labware/**/*.json",
+    "module/**/*.json",
+    "pipette/**/*.json",
+    "protocol/**/*.json",
+    "build/**/*.json"
+  ],
+  "exclude": ["**/*.ts"]
+}

@@ -1,10 +1,13 @@
 """Load pipette command request, result, and implementation models."""
 from __future__ import annotations
+
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons.types import MountType
 
+from ..types import PipetteName
 from .command import CommandImplementation, CommandHandlers
 
 
@@ -18,6 +21,11 @@ class LoadPipetteRequest(BaseModel):
     mount: MountType = Field(
         ...,
         description="The mount the pipette should be present on.",
+    )
+    pipetteId: Optional[str] = Field(
+        None,
+        description="An optional ID to assign to this pipette. If None, an ID "
+                    "will be generated."
     )
 
     def get_implementation(self) -> LoadPipetteImplementation:
@@ -44,6 +52,7 @@ class LoadPipetteImplementation(
         loaded_pipette = await handlers.equipment.load_pipette(
             pipette_name=self._request.pipetteName,
             mount=self._request.mount,
+            pipette_id=self._request.pipetteId
         )
 
         return LoadPipetteResult(pipetteId=loaded_pipette.pipette_id)

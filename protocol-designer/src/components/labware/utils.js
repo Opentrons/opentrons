@@ -1,6 +1,6 @@
 // @flow
 import reduce from 'lodash/reduce'
-import { AIR } from '../../step-generation/utils'
+import { AIR } from '@opentrons/step-generation'
 import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import type { WellFill } from '@opentrons/components'
 import type { ContentsByWell, WellContents } from '../../labware-ingred/types'

@@ -93,6 +93,9 @@ def uri_from_definition(
 
     :returns str: The URI.
     """
-    return uri_from_details(definition['namespace'],
-                            definition['parameters']['loadName'],
-                            definition['version'])
+    return uri_from_details(
+        namespace=definition['namespace'],
+        load_name=definition['parameters']['loadName'],
+        version=definition['version'],
+        delimiter=delimiter
+    )

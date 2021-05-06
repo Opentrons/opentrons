@@ -953,12 +953,14 @@ def test_oversized_transfer(_instr_labware):
     assert xfer_plan_list == exp1
 
 
-def test_multichannel_transfer_old_version(loop):
+def test_multichannel_transfer_old_version(loop, hardware):
     # for API version below 2.2, multichannel pipette can only
     # reach row A of 384-well plates
-    ctx = papi.ProtocolContext(implementation=ProtocolContextImplementation(),
-                               loop=loop,
-                               api_version=APIVersion(2, 1))
+    ctx = papi.ProtocolContext(
+        implementation=ProtocolContextImplementation(hardware=hardware),
+        loop=loop,
+        api_version=APIVersion(2, 1)
+    )
     lw1 = ctx.load_labware('biorad_96_wellplate_200ul_pcr', 1)
     lw2 = ctx.load_labware('corning_384_wellplate_112ul_flat', 2)
     tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
@@ -1000,10 +1002,13 @@ def test_multichannel_transfer_old_version(loop):
             xfer_plan_list.append(step)
 
 
-def test_multichannel_transfer_locs(loop):
+def test_multichannel_transfer_locs(loop, hardware):
     api_version = APIVersion(2, 2)
     ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(api_version=api_version),
+        implementation=ProtocolContextImplementation(
+            api_version=api_version,
+            hardware=hardware
+        ),
         loop=loop,
         api_version=api_version
     )

@@ -890,7 +890,7 @@ def test_loaded_modules(ctx, monkeypatch):
     assert ctx.loaded_modules[4] == temp2
 
 
-def test_order_of_module_load(loop):
+def test_order_of_module_load(loop, hardware):
     import opentrons.hardware_control as hardware_control
     import opentrons.protocol_api as protocol_api
 
@@ -905,7 +905,7 @@ def test_order_of_module_load(loop):
     hw_temp2 = attached_modules[2]
 
     ctx1 = protocol_api.ProtocolContext(
-        implementation=ProtocolContextImplementation(),
+        implementation=ProtocolContextImplementation(hardware=hardware),
         loop=loop)
     with ctx1.temp_connect(fake_hardware) as c:
         temp1 = c.load_module('tempdeck', 4)
@@ -921,7 +921,7 @@ def test_order_of_module_load(loop):
     # hardware modules regardless of the slot it
     # was loaded into
     ctx2 = protocol_api.ProtocolContext(
-        implementation=ProtocolContextImplementation(),
+        implementation=ProtocolContextImplementation(hardware=hardware),
         loop=loop)
 
     with ctx2.temp_connect(fake_hardware) as c:
@@ -984,7 +984,7 @@ def test_tip_length_for_load_caldata(ctx):
     delete.clear_tip_length_calibration()
 
 
-def test_bundled_labware(loop, get_labware_fixture):
+def test_bundled_labware(loop, get_labware_fixture, hardware):
     fixture_96_plate = get_labware_fixture('fixture_96_plate')
     bundled_labware = {
         'fixture/fixture_96_plate/1': fixture_96_plate
@@ -992,6 +992,7 @@ def test_bundled_labware(loop, get_labware_fixture):
 
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
+            hardware=hardware,
             bundled_labware=bundled_labware),
         loop=loop
     )
@@ -1002,7 +1003,7 @@ def test_bundled_labware(loop, get_labware_fixture):
         fixture_96_plate
 
 
-def test_bundled_labware_missing(loop, get_labware_fixture):
+def test_bundled_labware_missing(loop, get_labware_fixture, hardware):
     bundled_labware = {}
     with pytest.raises(
         RuntimeError,
@@ -1010,7 +1011,9 @@ def test_bundled_labware_missing(loop, get_labware_fixture):
     ):
         ctx = papi.ProtocolContext(
             implementation=ProtocolContextImplementation(
-                bundled_labware=bundled_labware),
+                bundled_labware=bundled_labware,
+                hardware=hardware
+            ),
             loop=loop)
         ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
 
@@ -1025,29 +1028,35 @@ def test_bundled_labware_missing(loop, get_labware_fixture):
         ctx = papi.ProtocolContext(
             implementation=ProtocolContextImplementation(
                 bundled_labware={},
-                extra_labware=bundled_labware),
+                extra_labware=bundled_labware,
+                hardware=hardware
+            ),
             loop=loop
         )
         ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
 
 
-def test_bundled_data(loop):
+def test_bundled_data(loop, hardware):
     bundled_data = {'foo': b'1,2,3'}
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
-            bundled_data=bundled_data),
+            bundled_data=bundled_data,
+            hardware=hardware
+        ),
         loop=loop
     )
     assert ctx.bundled_data == bundled_data
 
 
-def test_extra_labware(loop, get_labware_fixture):
+def test_extra_labware(loop, get_labware_fixture, hardware):
     fixture_96_plate = get_labware_fixture('fixture_96_plate')
     bundled_labware = {
         'fixture/fixture_96_plate/1': fixture_96_plate
     }
     ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(extra_labware=bundled_labware),
+        implementation=ProtocolContextImplementation(
+            extra_labware=bundled_labware, hardware=hardware
+        ),
         loop=loop
     )
 
@@ -1057,22 +1066,26 @@ def test_extra_labware(loop, get_labware_fixture):
         fixture_96_plate
 
 
-def test_api_version_checking():
+def test_api_version_checking(hardware):
     minor_over = (papi.MAX_SUPPORTED_VERSION.major,
                   papi.MAX_SUPPORTED_VERSION.minor + 1)
     with pytest.raises(RuntimeError):
         papi.ProtocolContext(api_version=minor_over,
-                             implementation=ProtocolContextImplementation())
+                             implementation=ProtocolContextImplementation(
+                                 hardware=hardware
+                             ))
 
     major_over = (papi.MAX_SUPPORTED_VERSION.major + 1,
                   papi.MAX_SUPPORTED_VERSION.minor)
     with pytest.raises(RuntimeError):
         papi.ProtocolContext(api_version=major_over,
-                             implementation=ProtocolContextImplementation())
+                             implementation=ProtocolContextImplementation(
+                                 hardware=hardware
+                             ))
 
 
-def test_api_per_call_checking(monkeypatch):
-    implementation = ProtocolContextImplementation()
+def test_api_per_call_checking(monkeypatch, hardware):
+    implementation = ProtocolContextImplementation(hardware=hardware)
 
     ctx = papi.ProtocolContext(implementation=implementation,
                                api_version=APIVersion(1, 9))
@@ -1093,9 +1106,13 @@ def test_api_per_call_checking(monkeypatch):
         ctx.disconnect()
 
 
-def test_home_plunger(monkeypatch):
-    ctx = papi.ProtocolContext(implementation=ProtocolContextImplementation(),
-                               api_version=APIVersion(2, 0))
+def test_home_plunger(monkeypatch, hardware):
+    ctx = papi.ProtocolContext(
+        implementation=ProtocolContextImplementation(
+            hardware=hardware
+        ),
+        api_version=APIVersion(2, 0)
+    )
     ctx.home()
     instr = ctx.load_instrument('p1000_single', 'left')
     instr.home_plunger()
@@ -1118,7 +1135,7 @@ def test_move_to_with_thermocycler(ctx):
         [ProtocolContextImplementation],
         [ProtocolContextSimulation],
     ])
-def test_temp_connect(implementation_class):
+def test_temp_connect(implementation_class, hardware):
     """Test that temp_connect can be used to assign hardware controller to
     protocol implementation."""
 
@@ -1132,22 +1149,22 @@ def test_temp_connect(implementation_class):
     }
 
     # Create the SynchronousAdapter wrapping the wrappable_hardware.
-    hardware = SynchronousAdapter(wrappable_hardware)
+    temp_hardware = SynchronousAdapter(wrappable_hardware)
 
-    ctx = papi.ProtocolContext(implementation=implementation_class(),
+    ctx = papi.ProtocolContext(implementation=implementation_class(hardware=hardware),
                                api_version=APIVersion(2, 0))
     instr = ctx.load_instrument('p1000_single', 'left')
 
-    with ctx.temp_connect(hardware):
+    with ctx.temp_connect(temp_hardware):
         instr.home()
 
     # Was home_z called on the hardware passed to temp_connect?
-    hardware.home_z.assert_called_once_with(Mount.LEFT)
+    temp_hardware.home_z.assert_called_once_with(Mount.LEFT)
 
     # Clear mock history.
-    hardware.home_z.reset_mock()
+    temp_hardware.home_z.reset_mock()
 
     # Calling. outside context manager will not call temp hardware method.
     instr.home()
 
-    hardware.home_z.assert_not_called()
+    temp_hardware.home_z.assert_not_called()

@@ -25,8 +25,13 @@ def require_linklocal(handler):
         ipaddr_str = request.headers.get('x-host-ip')
         invalid_req_data = {
             'error': 'bad-interface',
-            'message': f'The endpoint {request.url} can only be used from '
-            'local connections'
+            'message': (
+                f"The endpoint {request.rel_url}"
+                f" can only be used from link-local connections."
+                f" Make sure you're connected to this robot directly by cable"
+                f" and using this robot's wired IP address"
+                f" (not its wireless IP address)."
+            )
         }
         if not ipaddr_str:
             return web.json_response(

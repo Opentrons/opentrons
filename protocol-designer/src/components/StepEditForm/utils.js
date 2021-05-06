@@ -2,12 +2,12 @@
 import difference from 'lodash/difference'
 import isEqual from 'lodash/isEqual'
 import without from 'lodash/without'
-import { i18n } from '../../localization'
-import { PROFILE_CYCLE } from '../../form-types'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
-} from '../../step-generation/utils'
+} from '@opentrons/step-generation'
+import { i18n } from '../../localization'
+import { PROFILE_CYCLE } from '../../form-types'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
 import type { Options } from '@opentrons/components'
 import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
@@ -170,6 +170,9 @@ export const getVisibleProfileFormLevelErrors = (args: {|
 
 export const getFieldDefaultTooltip = (name: string): string =>
   i18n.t([`tooltip.step_fields.defaults.${name}`, ''])
+
+export const getFieldIndeterminateTooltip = (name: string): string =>
+  i18n.t([`tooltip.step_fields.indeterminate.${name}`, ''])
 
 export const getSingleSelectDisabledTooltip = (
   name: string,

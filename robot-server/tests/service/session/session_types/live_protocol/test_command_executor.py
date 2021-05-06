@@ -6,6 +6,7 @@ from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine import commands as pe_commands
 from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons.protocol_engine.types import DeckSlotLocation
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, MountType
 
 from robot_server.service.session.command_execution.command import (
@@ -60,7 +61,8 @@ async def test_failed_command(command_executor, mock_protocol_engine):
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
         loadName="hello",
         version=1,
-        namespace="test"
+        namespace="test",
+        labwareId=None,
     )
 
     command_object = Command(
@@ -84,19 +86,21 @@ async def test_failed_command(command_executor, mock_protocol_engine):
         await command_executor.execute(command_object)
 
 
-async def test_load_labware(command_executor, mock_protocol_engine):
+async def test_load_labware(
+        command_executor, mock_protocol_engine, minimal_labware_def):
     """Test that load labware command is executed."""
     request_body = pe_commands.LoadLabwareRequest(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
         loadName="hello",
         version=1,
-        namespace="test"
+        namespace="test",
+        labwareId=None,
     )
 
     protocol_engine_response = pe_commands.CompletedCommand(
         result=pe_commands.LoadLabwareResult(
             labwareId="your labware",
-            definition={},
+            definition=LabwareDefinition.parse_obj(minimal_labware_def),
             calibration=(1, 2, 3)),
         request=request_body,
         created_at=datetime(2000, 1, 1),

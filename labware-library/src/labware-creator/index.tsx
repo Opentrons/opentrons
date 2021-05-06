@@ -9,24 +9,17 @@ import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
-import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
+import { AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
+import { makeMaskToDecimal, maskLoadName } from './fieldMasks'
 import {
-  labwareTypeOptions,
   tubeRackInsertOptions,
   aluminumBlockAutofills,
   aluminumBlockTypeOptions,
   aluminumBlockChildTypeOptions,
   getDefaultFormState,
   getImplicitAutofillValues,
-  yesNoOptions,
   tubeRackAutofills,
-  SUGGESTED_X,
-  SUGGESTED_Y,
-  SUGGESTED_XY_RANGE,
-  MAX_SUGGESTED_Z,
-  LINK_CUSTOM_LABWARE_FORM,
 } from './fields'
 import { labwareDefToFields } from './labwareDefToFields'
 import { labwareFormSchema } from './labwareFormSchema'
@@ -41,9 +34,22 @@ import { LinkOut } from './components/LinkOut'
 import { RadioField } from './components/RadioField'
 import { Section } from './components/Section'
 import { TextField } from './components/TextField'
-import { HeightGuidingText } from './components/HeightGuidingText'
-import { ImportLabware } from './components/ImportLabware'
+
 import { ImportErrorModal } from './components/ImportErrorModal'
+import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
+import { UploadExisting } from './components/sections/UploadExisting'
+import { Regularity } from './components/sections/Regularity'
+
+import { Footprint } from './components/sections/Footprint'
+import { Height } from './components/sections/Height'
+import { Grid } from './components/sections/Grid'
+import { Volume } from './components/sections/Volume'
+import {
+  WellXYImg,
+  XYSpacingImg,
+  DepthImg,
+  XYOffsetImg,
+} from './components/diagrams'
 import {
   wellShapeOptionsWithIcons,
   wellBottomShapeOptionsWithIcons,
@@ -51,16 +57,11 @@ import {
 import styles from './styles.css'
 
 import type { FormikProps, FormikTouched } from 'formik'
-import type {
-  LabwareDefinition2,
-  WellBottomShape,
-} from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   ImportError,
   LabwareFields,
-  LabwareType,
   ProcessedLabwareFields,
-  WellShape,
 } from './fields'
 
 const ajv = new Ajv()
@@ -118,165 +119,12 @@ const makeAutofillOnChange = ({
   }
 }
 
-interface HeightImgProps {
-  labwareType: LabwareType | null | undefined
-  aluminumBlockChildType: string | null | undefined
-}
-
-const HeightImg = (props: HeightImgProps): JSX.Element => {
-  const { labwareType, aluminumBlockChildType } = props
-  let src = require('./images/height_plate-and-reservoir.svg')
-  if (labwareType === 'tubeRack') {
-    src = require('./images/height_tubeRack.svg')
-  } else if (labwareType === 'aluminumBlock') {
-    // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
-    if (['tubes', 'pcrTubeStrip'].includes(aluminumBlockChildType)) {
-      src = require('./images/height_aluminumBlock_tubes.svg')
-    } else {
-      src = require('./images/height_aluminumBlock_plate.svg')
-    }
-  }
-  return <img src={src} />
-}
-
-const GridImg = (): JSX.Element => {
-  const src = require('./images/grid_row_column.svg')
-  return <img src={src} />
-}
-
-const WellXYImg = (props: {
-  wellShape: WellShape | null | undefined
-}): JSX.Element | null => {
-  const { wellShape } = props
-  const wellShapeToImg: Record<WellShape, string> = {
-    circular: require('./images/wellXY_circular.svg'),
-    rectangular: require('./images/wellXY_rectangular.svg'),
-  }
-
-  if (wellShape != null && wellShape in wellShapeToImg) {
-    return <img src={wellShapeToImg[wellShape]} />
-  }
-
-  return null
-}
-
-const XYSpacingImg = (props: {
-  labwareType: LabwareType | null | undefined
-  wellShape: WellShape | null | undefined
-  gridRows: string | null | undefined
-}): JSX.Element => {
-  const { labwareType, wellShape } = props
-  const gridRows = Number(props.gridRows)
-  // default to this
-  let src = require('./images/spacing_plate_circular.svg')
-
-  if (labwareType === 'reservoir') {
-    if (gridRows > 1) {
-      src = require('./images/spacing_reservoir_multirow.svg')
-    } else {
-      src = require('./images/spacing_reservoir_1row.svg')
-    }
-  } else {
-    if (wellShape === 'rectangular') {
-      src = require('./images/spacing_plate_rectangular.svg')
-    }
-  }
-  return <img src={src} />
-}
-
-interface DepthImgProps {
-  labwareType: LabwareType | null | undefined
-  wellBottomShape: WellBottomShape | null | undefined
-}
-const DepthImg = (props: DepthImgProps): JSX.Element | null => {
-  const { labwareType, wellBottomShape } = props
-  let src
-
-  if (!wellBottomShape) return null
-
-  if (labwareType === 'reservoir' || labwareType === 'tubeRack') {
-    const imgMap = {
-      v: require('./images/depth_reservoir-and-tubes_v.svg'),
-      flat: require('./images/depth_reservoir-and-tubes_flat.svg'),
-      u: require('./images/depth_reservoir-and-tubes_round.svg'),
-    }
-    src = imgMap[wellBottomShape]
-  } else {
-    const imgMap = {
-      v: require('./images/depth_plate_v.svg'),
-      flat: require('./images/depth_plate_flat.svg'),
-      u: require('./images/depth_plate_round.svg'),
-    }
-    src = imgMap[wellBottomShape]
-  }
-
-  return <img src={src} />
-}
-
-const XYOffsetImg = (props: {
-  labwareType: LabwareType | null | undefined
-  wellShape: WellShape | null | undefined
-}): JSX.Element => {
-  const { labwareType, wellShape } = props
-  let src = require('./images/offset_plate_circular.svg')
-  if (labwareType === 'reservoir') {
-    src = require('./images/offset_reservoir.svg')
-  } else if (wellShape === 'rectangular') {
-    src = require('./images/offset_plate_rectangular.svg')
-  }
-  return <img src={src} />
-}
-
 const displayAsTube = (values: LabwareFields): boolean =>
   values.labwareType === 'tubeRack' ||
   (values.labwareType === 'aluminumBlock' &&
     values.aluminumBlockType === '96well' &&
     // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
     ['tubes', 'pcrTubeStrip'].includes(values.aluminumBlockChildType))
-
-const getHeightAlerts = (
-  values: LabwareFields,
-  touched: FormikTouched<LabwareFields>
-): JSX.Element | null => {
-  const { labwareZDimension } = values
-  const zAsNum = Number(labwareZDimension) // NOTE: if empty string or null, may be cast to 0, but that's fine for `>`
-  if (touched.labwareZDimension && zAsNum > MAX_SUGGESTED_Z) {
-    return (
-      <AlertItem
-        type="info"
-        title="This labware may be too tall to work with some pipette + tip combinations. Please test on robot."
-      />
-    )
-  }
-  return null
-}
-
-const xyMessage = (
-  <div>
-    Our recommended footprint for labware is {SUGGESTED_X} by {SUGGESTED_Y} +/-
-    1mm. If you can fit your labware snugly into a single slot on the deck
-    continue through the form. If not please request custom labware via{' '}
-    <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>this form</LinkOut>.
-  </div>
-)
-
-const getXYDimensionAlerts = (
-  values: LabwareFields,
-  touched: FormikTouched<LabwareFields>
-): JSX.Element | null => {
-  const xAsNum = Number(values.footprintXDimension)
-  const yAsNum = Number(values.footprintYDimension)
-  const showXInfo =
-    touched.footprintXDimension &&
-    Math.abs(xAsNum - SUGGESTED_X) > SUGGESTED_XY_RANGE
-  const showYInfo =
-    touched.footprintYDimension &&
-    Math.abs(yAsNum - SUGGESTED_Y) > SUGGESTED_XY_RANGE
-
-  return showXInfo || showYInfo ? (
-    <AlertItem type="info" title={xyMessage} />
-  ) : null
-}
 
 export const LabwareCreator = (): JSX.Element => {
   const [
@@ -601,193 +449,30 @@ export const LabwareCreator = (): JSX.Element => {
               <h2>Custom Labware Creator BETA</h2>
               <IntroCopy />
               <div className={styles.flex_row}>
-                <div className={styles.new_definition_section}>
-                  <Section
-                    label="Create a new definition"
-                    fieldList={[
-                      'labwareType',
-                      'tubeRackInsertLoadName',
-                      'aluminumBlockType',
-                      'aluminumBlockChildType',
-                    ]}
-                    headingClassName={cx(styles.setup_heading, {
-                      [styles.disabled_section]: lastUploaded !== null,
-                    })}
-                  >
-                    <div className={styles.labware_type_fields}>
-                      {lastUploaded === null ? (
-                        <>
-                          <Dropdown
-                            name="labwareType"
-                            options={labwareTypeOptions}
-                          />
-                          {labwareTypeChildFields}
-                        </>
-                      ) : null}
-
-                      <PrimaryButton
-                        className={styles.start_creating_btn}
-                        disabled={!canProceedToForm || lastUploaded !== null}
-                        onClick={scrollToForm}
-                      >
-                        start creating labware
-                      </PrimaryButton>
-                    </div>
-                  </Section>
-                </div>
-                <div className={styles.upload_existing_section}>
-                  <h2 className={styles.setup_heading}>
-                    Edit a file you’ve built with our labware creator
-                  </h2>
-                  {lastUploaded === null ? (
-                    <ImportLabware onUpload={onUpload} />
-                  ) : (
-                    <div className={styles.labware_type_fields}>
-                      {labwareTypeChildFields}
-                      <PrimaryButton
-                        className={styles.start_creating_btn}
-                        onClick={scrollToForm}
-                        disabled={!canProceedToForm}
-                      >
-                        start editing labware
-                      </PrimaryButton>
-                    </div>
-                  )}
-                </div>
+                <CreateNewDefinition
+                  showDropDownOptions={lastUploaded === null}
+                  disabled={!canProceedToForm || lastUploaded !== null}
+                  labwareTypeChildFields={labwareTypeChildFields}
+                  onClick={scrollToForm}
+                />
+                <UploadExisting
+                  disabled={!canProceedToForm}
+                  labwareTypeChildFields={labwareTypeChildFields}
+                  lastUploaded={lastUploaded}
+                  onClick={scrollToForm}
+                  onUpload={onUpload}
+                />
               </div>
               <div ref={scrollRef} />
               {showCreatorForm && (
                 <>
                   {/* PAGE 1 - Labware */}
-                  <Section label="Regularity" fieldList={['homogeneousWells']}>
-                    {/* tubeRackSides: Array<string> maybe?? */}
-                    <div className={styles.flex_row}>
-                      <div className={styles.homogenous_wells_section}>
-                        <RadioField
-                          name="homogeneousWells"
-                          options={yesNoOptions}
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Footprint"
-                    fieldList={['footprintXDimension', 'footprintYDimension']}
-                    additionalAlerts={getXYDimensionAlerts(values, touched)}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Ensure measurement is taken from the{' '}
-                          <strong>very bottom</strong> of plate.
-                        </p>
-                        <p>
-                          The footprint measurement helps determine if the
-                          labware fits firmly into the slots on the OT-2 deck.
-                        </p>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <img src={require('./images/footprint.svg')} />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="footprintXDimension"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                        <TextField
-                          name="footprintYDimension"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label={
-                      // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
-                      ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
-                        ? 'Total Height'
-                        : 'Height'
-                    }
-                    fieldList={['labwareZDimension']}
-                    additionalAlerts={getHeightAlerts(values, touched)}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <HeightGuidingText labwareType={values.labwareType} />
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <HeightImg
-                          labwareType={values.labwareType}
-                          aluminumBlockChildType={values.aluminumBlockChildType}
-                        />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="labwareZDimension"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Grid"
-                    fieldList={[
-                      'gridRows',
-                      'gridColumns',
-                      'regularRowSpacing',
-                      'regularColumnSpacing',
-                    ]}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          The grid of wells on your labware is arranged via rows
-                          and columns. Rows run horizontally across your labware
-                          (left to right). Columns run top to bottom.
-                        </p>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <GridImg />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="gridRows"
-                          inputMasks={[maskToInteger]}
-                        />
-                        <RadioField
-                          name="regularRowSpacing"
-                          options={yesNoOptions}
-                        />
-                        <TextField
-                          name="gridColumns"
-                          inputMasks={[maskToInteger]}
-                        />
-                        <RadioField
-                          name="regularColumnSpacing"
-                          options={yesNoOptions}
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <Regularity />
+                  <Footprint />
+                  <Height />
+                  <Grid />
                   {/* PAGE 2 */}
-                  <Section label="Volume" fieldList={['wellVolume']}>
-                    <div className={styles.flex_row}>
-                      <div className={styles.volume_instructions_column}>
-                        <p>Total maximum volume of each well.</p>
-                      </div>
-
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="wellVolume"
-                          inputMasks={[maskTo2Decimal]}
-                          units="μL"
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <Volume />
                   <Section
                     label="Well Shape & Sides"
                     fieldList={[

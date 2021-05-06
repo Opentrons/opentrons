@@ -5,8 +5,9 @@ import {
   commandCreatorsTimeline,
   curryCommandCreator,
   mix,
-} from '../src/step-generation'
-import { getStateAndContextTempTCModules } from '../src/step-generation/__fixtures__'
+} from '@opentrons/step-generation'
+// TODO IMMEDIATELY: figure out a better way to import fixtures from step generation
+import { getStateAndContextTempTCModules } from '@opentrons/step-generation/src/__fixtures__'
 
 const times = 200
 

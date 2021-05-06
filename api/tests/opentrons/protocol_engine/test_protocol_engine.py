@@ -4,8 +4,9 @@ from math import isclose
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 from typing import cast
 
+from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
@@ -54,7 +55,11 @@ async def test_create_engine_initializes_state_with_deck_geometry(
     assert state.geometry.get_deck_definition() == standard_deck_def
     assert state.labware.get_labware_data_by_id(FIXED_TRASH_ID) == LabwareData(
         location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
-        definition=fixed_trash_def,
+        uri=uri_from_details(
+            load_name=fixed_trash_def.parameters.loadName,
+            namespace=fixed_trash_def.namespace,
+            version=fixed_trash_def.version,
+        ),
         calibration=(0, 0, 0),
     )
 

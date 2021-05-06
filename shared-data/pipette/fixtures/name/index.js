@@ -1,7 +1,10 @@
 // @flow
+// TODO(mc, 2021-04-27): remove or rewrite this file when PD tests are in TS
 import pipetteNameSpecFixtures from './pipetteNameSpecFixtures.json'
 
-import type { PipetteNameSpecs } from '../../../js/types'
+// import from @opentrons/shared-data instead of relative to pick up
+// generated flow types
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
 
 export const fixtureP10Single: $Shape<PipetteNameSpecs> =
   pipetteNameSpecFixtures['p10_single']

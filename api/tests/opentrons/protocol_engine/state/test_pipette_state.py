@@ -5,23 +5,17 @@ from typing import cast, Dict, Optional
 
 from opentrons.types import MountType, Mount as HwMount
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocol_engine import commands as cmd, errors, StateStore, WellLocation
+from opentrons.protocol_engine import commands as cmd, errors, StateStore
+from opentrons.protocol_engine.types import PipetteName, WellLocation
 
 
 CompletedLoadLabware = cmd.CompletedCommand[
-    cmd.LoadPipetteRequest,
-    cmd.LoadPipetteResult
+    cmd.LoadPipetteRequest, cmd.LoadPipetteResult
 ]
 
-CompletedAspirate = cmd.CompletedCommand[
-    cmd.AspirateRequest,
-    cmd.AspirateResult
-]
+CompletedAspirate = cmd.CompletedCommand[cmd.AspirateRequest, cmd.AspirateResult]
 
-CompletedDispense = cmd.CompletedCommand[
-    cmd.DispenseRequest,
-    cmd.DispenseResult
-]
+CompletedDispense = cmd.CompletedCommand[cmd.DispenseRequest, cmd.DispenseResult]
 
 
 @pytest.fixture
@@ -29,7 +23,7 @@ def load_pipette_command(now: datetime) -> CompletedLoadLabware:
     """Get a completed load pipette command."""
     return cmd.CompletedCommand(
         request=cmd.LoadPipetteRequest(
-            pipetteName="p300_single",
+            pipetteName=PipetteName.P300_SINGLE,
             mount=MountType.LEFT,
         ),
         result=cmd.LoadPipetteResult(pipetteId="pipette-id"),
@@ -228,8 +222,7 @@ def test_pipette_is_ready_to_aspirate_if_has_volume(
 
     loaded_store.handle_command(aspirate_command, "aspirate-command-1")
     is_ready = loaded_store.pipettes.get_is_ready_to_aspirate(
-        pipette_id="pipette-id",
-        pipette_config=pipette_config
+        pipette_id="pipette-id", pipette_config=pipette_config
     )
 
     assert is_ready is True
@@ -242,8 +235,7 @@ def test_pipette_is_ready_to_aspirate_if_no_volume_and_hc_says_ready(
     pipette_config = cast(PipetteDict, {"ready_to_aspirate": True})
 
     is_ready = loaded_store.pipettes.get_is_ready_to_aspirate(
-        pipette_id="pipette-id",
-        pipette_config=pipette_config
+        pipette_id="pipette-id", pipette_config=pipette_config
     )
 
     assert is_ready is True
@@ -256,8 +248,7 @@ def test_pipette_not_ready_to_aspirate_if_no_volume_and_hc_says_not_ready(
     pipette_config = cast(PipetteDict, {"ready_to_aspirate": False})
 
     is_ready = loaded_store.pipettes.get_is_ready_to_aspirate(
-        pipette_id="pipette-id",
-        pipette_config=pipette_config
+        pipette_id="pipette-id", pipette_config=pipette_config
     )
 
     assert is_ready is False

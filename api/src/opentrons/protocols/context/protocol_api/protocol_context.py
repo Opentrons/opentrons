@@ -101,6 +101,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         """
         kwargs['bundled_data'] = getattr(protocol, 'bundled_data', None)
         kwargs['bundled_labware'] = getattr(protocol, 'bundled_labware', None)
+        kwargs['extra_labware'] = getattr(protocol, 'extra_labware', None)
         kwargs['api_version'] = getattr(
             protocol, 'api_level', MAX_SUPPORTED_VERSION)
         return cls(*args, **kwargs)

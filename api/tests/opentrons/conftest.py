@@ -496,7 +496,10 @@ def get_bundle_fixture():
 def minimal_labware_def():
     return {
         "metadata": {
-            "displayName": "minimal labware"
+            "displayName": "minimal labware",
+            "displayCategory": "other",
+            "displayVolumeUnits": "mL",
+
         },
         "cornerOffsetFromSlot": {
             "x": 10,
@@ -506,7 +509,8 @@ def minimal_labware_def():
         "parameters": {
             "isTiprack": False,
             "loadName": "minimal_labware_def",
-            "quirks": ["a quirk"]
+            "isMagneticModuleCompatible": True,
+            "format": "irregular"
         },
         "ordering": [["A1"], ["A2"]],
         "wells": {
@@ -533,7 +537,14 @@ def minimal_labware_def():
             "xDimension": 1.0,
             "yDimension": 2.0,
             "zDimension": 3.0
-        }
+        },
+        "groups": [],
+        "brand": {
+            "brand": "opentrons"
+        },
+        "version": 1,
+        "schemaVersion": 2,
+        "namespace": "opentronstest"
     }
 
 
