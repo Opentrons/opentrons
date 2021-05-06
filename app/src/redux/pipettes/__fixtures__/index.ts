@@ -56,7 +56,7 @@ export const mockFetchPipettesFailure = {
 
 export const mockPipetteSettings: PipetteSettings = {
   info: { name: 'p300_single_gen2', model: 'p300_single_v2.0' },
-  fields: { [('fieldId': string)]: { value: 42, default: 42 } },
+  fields: { fieldId: { value: 42, default: 42 } },
 }
 
 export const mockFetchPipetteSettingsSuccessMeta = {
@@ -69,10 +69,9 @@ export const mockFetchPipetteSettingsSuccessMeta = {
 export const mockFetchPipetteSettingsSuccess = {
   ...mockFetchPipetteSettingsSuccessMeta,
   host: mockRobot,
-  body: ({ abc: mockPipetteSettings }: {
-    [string]: PipetteSettings,
-    ...
-  }),
+  body: { abc: mockPipetteSettings } as {
+    [key: string]: PipetteSettings
+  },
 }
 
 export const mockFetchPipetteSettingsFailureMeta = {
