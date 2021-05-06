@@ -3,8 +3,9 @@ import { useFormikContext } from 'formik'
 import cx from 'classnames'
 import { PrimaryButton } from '@opentrons/components'
 import { Dropdown } from '../../components/Dropdown'
+import { isEveryFieldHidden } from '../../utils'
 import { labwareTypeOptions } from '../../fields'
-import { getFormAlerts } from '../utils/getFormAlerts'
+import { FormAlerts } from '../FormAlerts'
 import { SectionBody } from './SectionBody'
 
 import styles from '../../styles.css'
@@ -17,7 +18,7 @@ interface Props {
   onClick: () => void
 }
 
-const getContent = (props: Props): JSX.Element => {
+const Content = (props: Props): JSX.Element => {
   const {
     disabled,
     labwareTypeChildFields,
@@ -44,7 +45,7 @@ const getContent = (props: Props): JSX.Element => {
   )
 }
 
-export const CreateNewDefinition = (props: Props): JSX.Element => {
+export const CreateNewDefinition = (props: Props): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = [
     'labwareType',
     'tubeRackInsertLoadName',
@@ -52,6 +53,10 @@ export const CreateNewDefinition = (props: Props): JSX.Element => {
     'aluminumBlockChildType',
   ]
   const { values, errors, touched } = useFormikContext<LabwareFields>()
+
+  if (isEveryFieldHidden(fieldList, values)) {
+    return null
+  }
 
   return (
     <div className={styles.new_definition_section}>
@@ -62,8 +67,8 @@ export const CreateNewDefinition = (props: Props): JSX.Element => {
         })}
       >
         <>
-          {getFormAlerts({ values, touched, errors, fieldList })}
-          {getContent({ ...props })}
+          <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
+          <Content {...props} />
         </>
       </SectionBody>
     </div>
