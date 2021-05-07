@@ -14,13 +14,41 @@ jest.mock('../../discovery/selectors')
 jest.mock('../../pipettes/selectors')
 jest.mock('../../calibration/selectors')
 
+const getConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
+  typeof discoverySelectors.getConnectedRobot
+>
+const getRunSeconds = robotSelectors.getRunSeconds as jest.MockedFunction<
+  typeof robotSelectors.getRunSeconds
+>
+const getAnalyticsSessionExitDetails = selectors.getAnalyticsSessionExitDetails as jest.MockedFunction<
+  typeof selectors.getAnalyticsSessionExitDetails
+>
+const getSessionInstrumentAnalyticsData = selectors.getSessionInstrumentAnalyticsData as jest.MockedFunction<
+  typeof selectors.getSessionInstrumentAnalyticsData
+>
+const getAnalyticsHealthCheckData = selectors.getAnalyticsHealthCheckData as jest.MockedFunction<
+  typeof selectors.getAnalyticsHealthCheckData
+>
+const getAnalyticsDeckCalibrationData = selectors.getAnalyticsDeckCalibrationData as jest.MockedFunction<
+  typeof selectors.getAnalyticsDeckCalibrationData
+>
+const getAnalyticsPipetteCalibrationData = selectors.getAnalyticsPipetteCalibrationData as jest.MockedFunction<
+  typeof selectors.getAnalyticsPipetteCalibrationData
+>
+const getAnalyticsTipLengthCalibrationData = selectors.getAnalyticsTipLengthCalibrationData as jest.MockedFunction<
+  typeof selectors.getAnalyticsTipLengthCalibrationData
+>
+const getProtocolAnalyticsData = selectors.getProtocolAnalyticsData as jest.MockedFunction<
+  typeof selectors.getProtocolAnalyticsData
+>
+
 describe('analytics events map', () => {
   beforeEach(() => {
     jest.resetAllMocks()
   })
 
   it('robot:CONNECT_RESPONSE -> robotConnected event', () => {
-    discoverySelectors.getConnectedRobot.mockImplementation(state => {
+    getConnectedRobot.mockImplementation((state: any): any => {
       if (state === 'wired') {
         return {
           name: 'wired',
@@ -50,26 +78,26 @@ describe('analytics events map', () => {
       return null
     })
 
-    const success = robotActions.connectResponse()
+    const success = robotActions.connectResponse({})
     const failure = robotActions.connectResponse(new Error('AH'))
 
     return Promise.all([
-      expect(makeEvent(success, 'wired')).resolves.toEqual({
+      expect(makeEvent(success, 'wired' as any)).resolves.toEqual({
         name: 'robotConnect',
         properties: { method: 'usb', success: true, error: '' },
       }),
 
-      expect(makeEvent(failure, 'wired')).resolves.toEqual({
+      expect(makeEvent(failure, 'wired' as any)).resolves.toEqual({
         name: 'robotConnect',
         properties: { method: 'usb', success: false, error: 'AH' },
       }),
 
-      expect(makeEvent(success, 'wireless')).resolves.toEqual({
+      expect(makeEvent(success, 'wireless' as any)).resolves.toEqual({
         name: 'robotConnect',
         properties: { method: 'wifi', success: true, error: '' },
       }),
 
-      expect(makeEvent(failure, 'wireless')).resolves.toEqual({
+      expect(makeEvent(failure, 'wireless' as any)).resolves.toEqual({
         name: 'robotConnect',
         properties: { method: 'wifi', success: false, error: 'AH' },
       }),
@@ -77,15 +105,15 @@ describe('analytics events map', () => {
   })
 
   describe('events with protocol data', () => {
-    const protocolData = { foo: 'bar' }
+    const protocolData = { foo: 'bar' } as any
 
     beforeEach(() => {
-      selectors.getProtocolAnalyticsData.mockResolvedValue(protocolData)
+      getProtocolAnalyticsData.mockResolvedValue(protocolData)
     })
 
     it('robot:PROTOCOL_UPLOAD > protocolUploadRequest', () => {
-      const nextState = {}
-      const success = { type: 'protocol:UPLOAD', payload: {} }
+      const nextState = {} as any
+      const success = { type: 'protocol:UPLOAD', payload: {} } as any
 
       return expect(makeEvent(success, nextState)).resolves.toEqual({
         name: 'protocolUploadRequest',
@@ -94,12 +122,12 @@ describe('analytics events map', () => {
     })
 
     it('robot:SESSION_RESPONSE with upload in flight', () => {
-      const nextState = {}
+      const nextState = {} as any
       const success = {
         type: 'robot:SESSION_RESPONSE',
         payload: {},
         meta: { freshUpload: true },
-      }
+      } as any
 
       return expect(makeEvent(success, nextState)).resolves.toEqual({
         name: 'protocolUploadResponse',
@@ -108,12 +136,12 @@ describe('analytics events map', () => {
     })
 
     it('robot:SESSION_ERROR with upload in flight', () => {
-      const nextState = {}
+      const nextState = {} as any
       const failure = {
         type: 'robot:SESSION_ERROR',
         payload: { error: new Error('AH') },
         meta: { freshUpload: true },
-      }
+      } as any
 
       return expect(makeEvent(failure, nextState)).resolves.toEqual({
         name: 'protocolUploadResponse',
@@ -122,17 +150,17 @@ describe('analytics events map', () => {
     })
 
     it('robot:SESSION_RESPONSE/ERROR with no upload in flight', () => {
-      const nextState = {}
+      const nextState = {} as any
       const success = {
         type: 'robot:SESSION_RESPONSE',
         payload: {},
         meta: { freshUpload: false },
-      }
+      } as any
       const failure = {
         type: 'robot:SESSION_ERROR',
         payload: { error: new Error('AH') },
         meta: { freshUpload: false },
-      }
+      } as any
 
       return Promise.all([
         expect(makeEvent(success, nextState)).resolves.toBeNull(),
@@ -141,8 +169,8 @@ describe('analytics events map', () => {
     })
 
     it('robot:RUN -> runStart event', () => {
-      const state = {}
-      const action = { type: 'robot:RUN' }
+      const state = {} as any
+      const action = { type: 'robot:RUN' } as any
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runStart',
@@ -151,10 +179,10 @@ describe('analytics events map', () => {
     })
 
     it('robot:RUN_RESPONSE success -> runFinish event', () => {
-      const state = {}
-      const action = { type: 'robot:RUN_RESPONSE', error: false }
+      const state = {} as any
+      const action = { type: 'robot:RUN_RESPONSE', error: false } as any
 
-      robotSelectors.getRunSeconds.mockReturnValue(4)
+      getRunSeconds.mockReturnValue(4)
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runFinish',
@@ -163,14 +191,14 @@ describe('analytics events map', () => {
     })
 
     it('robot:RUN_RESPONSE error -> runFinish event', () => {
-      const state = {}
+      const state = {} as any
       const action = {
         type: 'robot:RUN_RESPONSE',
         error: true,
         payload: new Error('AH'),
-      }
+      } as any
 
-      robotSelectors.getRunSeconds.mockReturnValue(4)
+      getRunSeconds.mockReturnValue(4)
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runFinish',
@@ -184,10 +212,10 @@ describe('analytics events map', () => {
     })
 
     it('robot:PAUSE -> runPause event', () => {
-      const state = {}
-      const action = { type: 'robot:PAUSE' }
+      const state = {} as any
+      const action = { type: 'robot:PAUSE' } as any
 
-      robotSelectors.getRunSeconds.mockReturnValue(4)
+      getRunSeconds.mockReturnValue(4)
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runPause',
@@ -199,10 +227,10 @@ describe('analytics events map', () => {
     })
 
     it('robot:RESUME -> runResume event', () => {
-      const state = {}
-      const action = { type: 'robot:RESUME' }
+      const state = {} as any
+      const action = { type: 'robot:RESUME' } as any
 
-      robotSelectors.getRunSeconds.mockReturnValue(4)
+      getRunSeconds.mockReturnValue(4)
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runResume',
@@ -214,10 +242,10 @@ describe('analytics events map', () => {
     })
 
     it('robot:CANCEL-> runCancel event', () => {
-      const state = {}
-      const action = { type: 'robot:CANCEL' }
+      const state = {} as any
+      const action = { type: 'robot:CANCEL' } as any
 
-      robotSelectors.getRunSeconds.mockReturnValue(4)
+      getRunSeconds.mockReturnValue(4)
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runCancel',
@@ -229,7 +257,7 @@ describe('analytics events map', () => {
     })
 
     it('robotAdmin:RESET_CONFIG -> resetRobotConfig event', () => {
-      const state = {}
+      const state = {} as any
       const action = {
         type: 'robotAdmin:RESET_CONFIG',
         payload: {
@@ -239,7 +267,7 @@ describe('analytics events map', () => {
             bar: true,
           },
         },
-      }
+      } as any
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'resetRobotConfig',
         properties: {
@@ -251,14 +279,14 @@ describe('analytics events map', () => {
 
   describe('events with calibration data', () => {
     it('analytics:PIPETTE_OFFSET_STARTED -> pipetteOffsetCalibrationStarted event', () => {
-      const state = {}
+      const state = {} as any
       const action = {
         type: 'analytics:PIPETTE_OFFSET_STARTED',
         payload: {
           someStuff: 'some-other-stuff',
         },
-      }
-      selectors.getAnalyticsPipetteCalibrationData.mockReturnValue({
+      } as any
+      getAnalyticsPipetteCalibrationData.mockReturnValue({
         markedBad: true,
         calibrationExists: true,
         pipetteModel: 'my pipette model',
@@ -275,14 +303,14 @@ describe('analytics events map', () => {
     })
 
     it('analytics:TIP_LENGTH_STARTED -> tipLengthCalibrationStarted event', () => {
-      const state = {}
+      const state = {} as any
       const action = {
         type: 'analytics:TIP_LENGTH_STARTED',
         payload: {
           someStuff: 'some-other-stuff',
         },
-      }
-      selectors.getAnalyticsTipLengthCalibrationData.mockReturnValue({
+      } as any
+      getAnalyticsTipLengthCalibrationData.mockReturnValue({
         markedBad: true,
         calibrationExists: true,
         pipetteModel: 'pipette-model',
@@ -299,18 +327,18 @@ describe('analytics events map', () => {
     })
 
     it('sessions:ENSURE_SESSION for deck cal -> deckCalibrationStarted event', () => {
-      const state = {}
+      const state = {} as any
       const action = {
         type: 'sessions:ENSURE_SESSION',
         payload: {
           sessionType: 'deckCalibration',
         },
-      }
-      selectors.getAnalyticsDeckCalibrationData.mockReturnValue({
+      } as any
+      getAnalyticsDeckCalibrationData.mockReturnValue({
         calibrationStatus: 'IDENTITY',
         markedBad: true,
         pipettes: { left: { model: 'my pipette model' } },
-      })
+      } as any)
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'deckCalibrationStarted',
@@ -323,16 +351,16 @@ describe('analytics events map', () => {
     })
 
     it('sessions:ENSURE_SESSION for health check -> calibrationHealthCheckStarted event', () => {
-      const state = {}
+      const state = {} as any
       const action = {
         type: 'sessions:ENSURE_SESSION',
         payload: {
           sessionType: 'calibrationCheck',
         },
-      }
-      selectors.getAnalyticsHealthCheckData.mockReturnValue({
+      } as any
+      getAnalyticsHealthCheckData.mockReturnValue({
         pipettes: { left: { model: 'my pipette model' } },
-      })
+      } as any)
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'calibrationHealthCheckStarted',
         properties: {
@@ -342,18 +370,18 @@ describe('analytics events map', () => {
     })
 
     it('sessions:ENSURE_SESSION for other session -> no event', () => {
-      const state = {}
+      const state = {} as any
       const action = {
         type: 'sessions:ENSURE_SESSION',
         payload: {
           sessionType: 'some-other-session',
         },
-      }
+      } as any
       return expect(makeEvent(action, state)).resolves.toBeNull()
     })
 
     it('sessions:CREATE_SESSION_COMMAND for exit -> {type}Exit', () => {
-      const state = {}
+      const state = {} as any
       const action = {
         type: 'sessions:CREATE_SESSION_COMMAND',
         payload: {
@@ -361,8 +389,8 @@ describe('analytics events map', () => {
           sessionId: 'seshid',
           command: { command: 'calibration.exitSession' },
         },
-      }
-      selectors.getAnalyticsSessionExitDetails.mockReturnValue({
+      } as any
+      getAnalyticsSessionExitDetails.mockReturnValue({
         sessionType: 'my-session-type',
         step: 'session-step',
       })
@@ -374,7 +402,7 @@ describe('analytics events map', () => {
     })
 
     it('sessions:CREATE_SESSION_COMMAND for loadLabware -> {type}Exit', () => {
-      const state = {}
+      const state = {} as any
       const action = {
         type: 'sessions:CREATE_SESSION_COMMAND',
         payload: {
@@ -389,8 +417,8 @@ describe('analytics events map', () => {
             },
           },
         },
-      }
-      selectors.getSessionInstrumentAnalyticsData.mockReturnValue({
+      } as any
+      getSessionInstrumentAnalyticsData.mockReturnValue({
         sessionType: 'my-session-type',
         pipetteModel: 'my-pipette-model',
       })

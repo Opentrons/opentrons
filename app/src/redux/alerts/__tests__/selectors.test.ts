@@ -13,13 +13,13 @@ const MOCK_ALERT_1: AlertId = 'mockAlert1' as any
 const MOCK_ALERT_2: AlertId = 'mockAlert2' as any
 const MOCK_IGNORED_ALERT: AlertId = 'mockIgnoredAlert' as any
 
-const MOCK_CONFIG: Partial<Config> = {
+const MOCK_CONFIG: Config = {
   alerts: { ignored: [MOCK_IGNORED_ALERT] },
-}
+} as any
 
 describe('alerts selectors', () => {
   const stubGetConfig = (state: State, value = MOCK_CONFIG) => {
-    getConfig.mockImplementation(s => {
+    getConfig.mockImplementation((s: State) => {
       expect(s).toEqual(state)
       return value
     })
@@ -30,9 +30,9 @@ describe('alerts selectors', () => {
   })
 
   it('should be able to get a list of active alerts', () => {
-    const state = {
+    const state: State = {
       alerts: { active: [MOCK_ALERT_1, MOCK_ALERT_2], ignored: [] },
-    } as Partial<State>
+    } as any
 
     stubGetConfig(state)
 
@@ -43,11 +43,11 @@ describe('alerts selectors', () => {
   })
 
   it('should show no active alerts until config is loaded', () => {
-    const state = {
+    const state: State = {
       alerts: { active: [MOCK_ALERT_1, MOCK_ALERT_2], ignored: [] },
-    } as Partial<State>
+    } as any
 
-    stubGetConfig(state, null)
+    stubGetConfig(state, null as any)
 
     expect(Selectors.getActiveAlerts(state)).toEqual([])
   })
@@ -55,9 +55,9 @@ describe('alerts selectors', () => {
   it('should filter ignored alerts from active alerts', () => {
     // the reducer should never let this state happen, but let's protect
     // against it in the selector, too
-    const state = {
+    const state: State = {
       alerts: { active: [MOCK_ALERT_1, MOCK_ALERT_2], ignored: [MOCK_ALERT_2] },
-    } as Partial<State>
+    } as any
 
     stubGetConfig(state)
 
@@ -65,9 +65,9 @@ describe('alerts selectors', () => {
   })
 
   it('should filter perma-ignored alerts from active alerts', () => {
-    const state = {
+    const state: State = {
       alerts: { active: [MOCK_ALERT_1, MOCK_IGNORED_ALERT], ignored: [] },
-    } as Partial<State>
+    } as any
 
     stubGetConfig(state)
 
@@ -75,7 +75,7 @@ describe('alerts selectors', () => {
   })
 
   it('should be able to tell you if an alert is perma-ignored', () => {
-    const state = { alerts: { active: [], ignored: [] } } as Partial<State>
+    const state: State = { alerts: { active: [], ignored: [] } } as any
 
     stubGetConfig(state)
 
@@ -89,9 +89,9 @@ describe('alerts selectors', () => {
   })
 
   it('should return null for getAlertIsPermanentlyIgnored if config not initialized', () => {
-    const state = { alerts: { active: [], ignored: [] } } as Partial<State>
+    const state: State = { alerts: { active: [], ignored: [] } } as any
 
-    stubGetConfig(state, null)
+    stubGetConfig(state, null as any)
 
     expect(
       Selectors.getAlertIsPermanentlyIgnored(state, MOCK_IGNORED_ALERT)
