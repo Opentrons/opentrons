@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from functools import lru_cache
 from typing import (
     List, Optional, Sequence, TYPE_CHECKING, Union)
 from opentrons.broker import Broker
