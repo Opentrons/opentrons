@@ -79,8 +79,8 @@ describe('fetchTipLengthCalibrationsOnCalibrationEndEpic', () => {
       )
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
-        const action$ = hot('--a', { a: action })
-        const state$: Observable<State> = hot('s-s', { s: mockState })
+        const action$ = hot<Action>('--a', { a: action })
+        const state$ = hot<State>('s-s', { s: mockState })
         const output$ = tipLengthCalibrationsEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
@@ -104,8 +104,8 @@ describe('fetchTipLengthCalibrationsOnCalibrationEndEpic', () => {
     )
 
     testScheduler.run(({ hot, expectObservable, flush }) => {
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('s-s', { s: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('s-s', { s: mockState })
       const output$ = tipLengthCalibrationsEpic(action$, state$)
 
       expectObservable(output$).toBe('---')
@@ -123,8 +123,8 @@ describe('fetchTipLengthCalibrationsOnCalibrationEndEpic', () => {
       )
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
-        const action$ = hot('--a', { a: action })
-        const state$: Observable<State> = hot('s-s', { s: mockState })
+        const action$ = hot<Action>('--a', { a: action })
+        const state$ = hot<State>('s-s', { s: mockState })
         const output$ = tipLengthCalibrationsEpic(action$, state$)
 
         expectObservable(output$).toBe('---')

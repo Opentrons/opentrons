@@ -4,8 +4,7 @@ import * as Cfg from '../../config'
 import * as Actions from '../actions'
 import { alertsEpic } from '../epic'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../types'
+import type { Action, State } from '../../types'
 import type { AlertId } from '../types'
 
 jest.mock('../../config/selectors')
@@ -32,14 +31,14 @@ describe('alerts epic', () => {
   it('should trigger a config:ADD_UNIQUE_VALUE to save persistent alert ignores', () => {
     getConfig.mockImplementation((state: State) => {
       expect(state).toEqual(MOCK_STATE)
-      return { alerts: { ignored: [MOCK_ALERT_1] } }
+      return { alerts: { ignored: [MOCK_ALERT_1] } } as any
     })
 
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('-a', {
+      const action$ = hot<Action>('-a', {
         a: Actions.alertDismissed(MOCK_ALERT_2, true),
       })
-      const state$: Observable<State> = hot('s-', { s: MOCK_STATE })
+      const state$ = hot<State>('s-', { s: MOCK_STATE })
       const output$ = alertsEpic(action$, state$)
 
       expectObservable(output$).toBe('-a', {

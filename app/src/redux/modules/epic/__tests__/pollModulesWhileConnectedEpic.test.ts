@@ -37,8 +37,8 @@ describe('pollModulesWhileConnectedEpic', () => {
     testScheduler.run(({ hot, expectObservable }) => {
       const action = RobotActions.connectResponse({ message: 'AH' })
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('--a', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('--a', { a: mockState })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('---')
@@ -55,8 +55,8 @@ describe('pollModulesWhileConnectedEpic', () => {
         .mockReturnValueOnce(mockRobot.name)
         .mockReturnValueOnce(null)
 
-      const action$ = hot('a', { a: action })
-      const state$: Observable<State> = hot('a 15s a', { a: mockState })
+      const action$ = hot<Action>('a', { a: action })
+      const state$ = hot<State>('a 15s a', { a: mockState })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('5s a 4999ms a 4999ms a', {

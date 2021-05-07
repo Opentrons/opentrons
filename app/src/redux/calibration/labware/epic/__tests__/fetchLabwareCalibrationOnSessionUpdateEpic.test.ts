@@ -6,8 +6,7 @@ import {
 import * as Actions from '../../actions'
 import { labwareCalibrationEpic } from '..'
 
-import type { State } from '../../../../types'
-import type { Observable } from 'rxjs'
+import type { Action, State } from '../../../../types'
 
 jest.mock('../../actions')
 jest.mock('../../../../robot/selectors')
@@ -35,8 +34,10 @@ describe('fetch labware calibration on rpc cal session update epic', () => {
     testScheduler.run(schedulerArgs => {
       const { hot, expectObservable, flush } = schedulerArgs
 
-      const action$ = hot('--a', { a: robotActions.updateOffsetResponse() })
-      const state$: Observable<State> = hot('s-s', { s: mockState })
+      const action$ = hot<Action>('--a', {
+        a: robotActions.updateOffsetResponse(),
+      })
+      const state$ = hot<State>('s-s', { s: mockState })
       const output$ = labwareCalibrationEpic(action$, state$)
 
       expectObservable(output$)
@@ -56,8 +57,10 @@ describe('fetch labware calibration on rpc cal session update epic', () => {
     testScheduler.run(schedulerArgs => {
       const { hot, expectObservable, flush } = schedulerArgs
 
-      const action$ = hot('--a', { a: robotActions.confirmTiprackResponse() })
-      const state$: Observable<State> = hot('s-s', { s: mockState })
+      const action$ = hot<Action>('--a', {
+        a: robotActions.confirmTiprackResponse(),
+      })
+      const state$ = hot<State>('s-s', { s: mockState })
       const output$ = labwareCalibrationEpic(action$, state$)
 
       expectObservable(output$)

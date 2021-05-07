@@ -41,7 +41,7 @@ describe('clearRestartPathEpic', () => {
 
     testScheduler.run(({ hot, cold, expectObservable }) => {
       const action$ = cold('--')
-      const state$: Observable<State> = hot('-a', { a: {} })
+      const state$ = hot<State>('-a', { a: {} })
       const output$ = robotSettingsEpic(action$, state$)
 
       expectObservable(output$).toBe('-(ab)', {

@@ -46,8 +46,8 @@ describe('clearAllSessionsOnDisconnectEpic', () => {
     }
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a--', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a--', { a: mockState })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -63,8 +63,8 @@ describe('clearAllSessionsOnDisconnectEpic', () => {
     }
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a--', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a--', { a: mockState })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

@@ -48,7 +48,7 @@ describe('shell epics', () => {
     const shellAction = { type: 'foo', meta: { shell: true } }
 
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('-a', { a: shellAction })
+      const action$ = hot<Action>('-a', { a: shellAction })
       const output$ = shellEpic(action$, EMPTY)
 
       expectObservable(output$).toBe('--')
@@ -77,8 +77,8 @@ describe('shell epics', () => {
     getAvailableShellUpdate.mockReturnValue('1.2.3')
 
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('----')
-      const state$: Observable<State> = hot('-a-a-a', { a: mockState })
+      const action$ = hot<Action>('----')
+      const state$ = hot<State>('-a-a-a', { a: mockState })
       const output$ = shellEpic(action$, state$)
 
       // we only expect the alert to be triggered when state goes from null
@@ -96,8 +96,8 @@ describe('shell epics', () => {
     getUpdateChannel.mockReturnValue('beta')
 
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('------')
-      const state$: Observable<State> = hot('-a-a-a', { a: mockState })
+      const action$ = hot<Action>('------')
+      const state$ = hot<State>('-a-a-a', { a: mockState })
       const output$ = shellEpic(action$, state$)
 
       // we only expect the alert to be triggered when state changes

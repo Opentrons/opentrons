@@ -15,7 +15,7 @@ describe('discovery actions', () => {
 
   it('startDiscoveryEpic with default timeout', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('-a', { a: Actions.startDiscovery() })
+      const action$ = hot<Action>('-a', { a: Actions.startDiscovery() })
       const output$ = discoveryEpic(action$)
 
       expectObservable(output$).toBe('- 30000ms a ', {
@@ -26,7 +26,7 @@ describe('discovery actions', () => {
 
   it('startDiscoveryEpic with specified timeout', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('-a', { a: Actions.startDiscovery(42) })
+      const action$ = hot<Action>('-a', { a: Actions.startDiscovery(42) })
       const output$ = discoveryEpic(action$)
 
       expectObservable(output$).toBe('- 42ms a ', {
@@ -37,7 +37,7 @@ describe('discovery actions', () => {
 
   it('startDiscoveryEpic with shell:UI_INITIALIZED', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('-a', { a: Shell.uiInitialized() })
+      const action$ = hot<Action>('-a', { a: Shell.uiInitialized() })
       const output$ = discoveryEpic(action$)
 
       expectObservable(output$).toBe('- 30000ms a ', {
@@ -53,7 +53,7 @@ describe('discovery actions', () => {
         payload: { path: 'restart' },
       }
 
-      const action$ = hot('-a', { a: serverSuccessAction })
+      const action$ = hot<Action>('-a', { a: serverSuccessAction })
       const output$ = discoveryEpic(action$)
 
       expectObservable(output$).toBe('-a ', {

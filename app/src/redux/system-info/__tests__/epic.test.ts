@@ -33,8 +33,8 @@ describe('system info epic', () => {
     })
 
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('----')
-      const state$: Observable<State> = hot('-s-s', { s: MOCK_STATE })
+      const action$ = hot<Action>('----')
+      const state$ = hot<State>('-s-s', { s: MOCK_STATE })
       const output$ = systemInfoEpic(action$, state$)
 
       expectObservable(output$).toBe(expectedMarbles, expectedValues)

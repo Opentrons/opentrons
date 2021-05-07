@@ -86,8 +86,8 @@ describe('fetchPipetteOffsetCalibrationsOnCalibrationEndEpic', () => {
       )
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
-        const action$ = hot('--a', { a: action })
-        const state$: Observable<State> = hot('s-s', { s: mockState })
+        const action$ = hot<Action>('--a', { a: action })
+        const state$ = hot<State>('s-s', { s: mockState })
         const output$ = pipetteOffsetCalibrationsEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
@@ -108,8 +108,8 @@ describe('fetchPipetteOffsetCalibrationsOnCalibrationEndEpic', () => {
       )
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
-        const action$ = hot('--a', { a: action })
-        const state$: Observable<State> = hot('s-s', { s: mockState })
+        const action$ = hot<Action>('--a', { a: action })
+        const state$ = hot<State>('s-s', { s: mockState })
         const output$ = pipetteOffsetCalibrationsEpic(action$, state$)
 
         expectObservable(output$).toBe('---')

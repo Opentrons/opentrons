@@ -5,11 +5,7 @@ import * as DiscoverySelectors from '../../discovery/selectors'
 import { mockRobot, mockRequestMeta } from '../__fixtures__'
 
 import type { State } from '../../types'
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-  RobotApiResponse,
-} from '../types'
+import type { RobotHost, RobotApiResponse } from '../types'
 
 jest.mock('../http')
 jest.mock('../../discovery/selectors')
@@ -29,7 +25,7 @@ export interface EpicTestMocks<A, R> {
   meta: typeof mockRequestMeta
   getRobotByName: typeof mockGetRobotByName
   fetchRobotApi: typeof mockFetchRobotApi
-  testScheduler: any
+  testScheduler: TestScheduler
 }
 
 interface TriggerAction {
@@ -52,12 +48,12 @@ export const setupEpicTestMocks = <A = TriggerAction, R = RobotApiResponse>(
       ? makeTriggerAction(mockRobot.name)
       : {}
 
-  const mockAction = {
+  const mockAction: A & { meta: any } = {
     ...triggerAction,
     meta: { ...(triggerAction.meta || {}), ...mockRequestMeta },
   }
 
-  mockGetRobotByName.mockImplementation((state, robotName) => {
+  mockGetRobotByName.mockImplementation((state: State, robotName: string) => {
     expect(state).toBe(mockState)
     expect(robotName).toBe(mockRobot.name)
 
@@ -90,7 +86,9 @@ export const runEpicTest = <A, R = RobotApiResponse>(
     const { cold } = schedulerArgs
 
     if (response) {
-      fetchRobotApi.mockReturnValue(cold('r', { r: response }))
+      fetchRobotApi.mockReturnValue(
+        cold<RobotApiResponse>('r', { r: response } as any)
+      )
     }
 
     run(schedulerArgs)

@@ -52,8 +52,8 @@ describe('fetchModulesEpic', () => {
         cold('r', { r: Fixtures.mockFetchModulesSuccess })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: mockState })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$)
@@ -73,8 +73,8 @@ describe('fetchModulesEpic', () => {
         cold('r', { r: Fixtures.mockFetchModulesSuccess })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -97,8 +97,8 @@ describe('fetchModulesEpic', () => {
         cold('r', { r: Fixtures.mockLegacyFetchModulesSuccess })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -130,8 +130,8 @@ describe('fetchModulesEpic', () => {
         cold('r', { r: Fixtures.mockFetchModulesFailure })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

@@ -46,8 +46,8 @@ describe('fetchPipetteOffsetCalibrationsOnConnectEpic', () => {
     mockGetConnectedRobotName.mockReturnValue(null)
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a--', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a--', { a: mockState })
       const output$ = pipetteOffsetCalibrationsEpic(action$, state$)
 
       expectObservable(output$).toBe('---')
@@ -63,8 +63,8 @@ describe('fetchPipetteOffsetCalibrationsOnConnectEpic', () => {
     mockGetConnectedRobotName.mockReturnValue(mockRobot.name)
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a--', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a--', { a: mockState })
       const output$ = pipetteOffsetCalibrationsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

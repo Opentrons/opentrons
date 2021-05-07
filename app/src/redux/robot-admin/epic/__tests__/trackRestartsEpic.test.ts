@@ -43,8 +43,8 @@ describe('robotAdminEpic tracks restarting state', () => {
       .mockReturnValue(mocks.robot)
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot('--a', { a: mocks.action })
-      const state$: Observable<State> = hot('s--', { s: mocks.state })
+      const action$ = hot<Action>('--a', { a: mocks.action })
+      const state$ = hot<State>('s--', { s: mocks.state })
       const output$ = trackRestartsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -71,8 +71,8 @@ describe('robotAdminEpic tracks restarting state', () => {
       })
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot('--a', { a: mocks.action })
-      const state$: Observable<State> = hot('s--', { s: mocks.state })
+      const action$ = hot<Action>('--a', { a: mocks.action })
+      const state$ = hot<State>('s--', { s: mocks.state })
       const output$ = trackRestartsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -149,8 +149,8 @@ describe('robotAdminEpic tracks restarting state', () => {
       .mockReturnValue('restart-timed-out')
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot('--')
-      const state$: Observable<State> = hot('-s', { s: mocks.state })
+      const action$ = hot<Action>('--')
+      const state$ = hot<State>('-s', { s: mocks.state })
       const output$ = trackRestartsEpic(action$, state$)
 
       expectObservable(output$).toBe('-(ab)', {

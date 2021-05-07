@@ -20,8 +20,8 @@ describe('networking statusEpic', () => {
     )
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
-      const action$ = hot('--a', { a: mocks.action })
-      const state$: Observable<State> = hot('s-s', { s: mocks.state })
+      const action$ = hot<Action>('--a', { a: mocks.action })
+      const state$ = hot<State>('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$)
@@ -41,8 +41,8 @@ describe('networking statusEpic', () => {
     )
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot('--a', { a: mocks.action })
-      const state$: Observable<State> = hot('s-s', { s: mocks.state })
+      const action$ = hot<Action>('--a', { a: mocks.action })
+      const state$ = hot<State>('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -66,8 +66,8 @@ describe('networking statusEpic', () => {
     )
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot('--a', { a: mocks.action })
-      const state$: Observable<State> = hot('s-s', { s: mocks.state })
+      const action$ = hot<Action>('--a', { a: mocks.action })
+      const state$ = hot<State>('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

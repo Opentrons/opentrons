@@ -58,8 +58,8 @@ describe('updateSettingEpic', () => {
         cold('r', { r: Fixtures.mockUpdateSettingSuccess })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: mockState })
       const output$ = robotSettingsEpic(action$, state$)
 
       expectObservable(output$)
@@ -80,8 +80,8 @@ describe('updateSettingEpic', () => {
         cold('r', { r: Fixtures.mockUpdateSettingSuccess })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} })
       const output$ = robotSettingsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -101,8 +101,8 @@ describe('updateSettingEpic', () => {
         cold('r', { r: Fixtures.mockUpdateSettingFailure })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} })
       const output$ = robotSettingsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

@@ -6,10 +6,9 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { labwareCalibrationEpic } from '..'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../../types'
+import type { Action } from '../../../../types'
 
-const makeTriggerActionAllCalibrations = robotName =>
+const makeTriggerActionAllCalibrations = (robotName: string) =>
   Actions.fetchLabwareCalibrations(robotName)
 
 describe('fetch labware calibration epics', () => {
@@ -23,9 +22,9 @@ describe('fetch labware calibration epics', () => {
       Fixtures.mockFetchLabwareCalibrationSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$: Observable<State> = hot('s-s', { s: mocks.state })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = labwareCalibrationEpic(action$, state$)
 
       expectObservable(output$)
@@ -44,9 +43,9 @@ describe('fetch labware calibration epics', () => {
       Fixtures.mockFetchLabwareCalibrationSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$: Observable<State> = hot('s-s', { s: mocks.state })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = labwareCalibrationEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -68,9 +67,9 @@ describe('fetch labware calibration epics', () => {
       Fixtures.mockFetchLabwareCalibrationFailure
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$: Observable<State> = hot('s-s', { s: mocks.state })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = labwareCalibrationEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

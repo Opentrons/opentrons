@@ -60,8 +60,8 @@ describe('moveEpic', () => {
         )
         .mockReturnValueOnce(cold('m', { m: Fixtures.mockMoveSuccess }))
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: mockState })
       const output$ = robotControlsEpic(action$, state$)
 
       expectObservable(output$)
@@ -102,8 +102,8 @@ describe('moveEpic', () => {
         right: { model: 'p300_single_v2.0' },
       })
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: mockState })
       const output$ = robotControlsEpic(action$, state$)
 
       expectObservable(output$)
@@ -143,8 +143,8 @@ describe('moveEpic', () => {
           cold('d', { d: Fixtures.mockDisengageMotorsSuccess })
         )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: mockState })
       const output$ = robotControlsEpic(action$, state$)
 
       expectObservable(output$)
@@ -175,8 +175,8 @@ describe('moveEpic', () => {
           cold('d', { d: Fixtures.mockDisengageMotorsSuccess })
         )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} })
       const output$ = robotControlsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -204,8 +204,8 @@ describe('moveEpic', () => {
           cold('d', { d: Fixtures.mockDisengageMotorsSuccess })
         )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} })
       const output$ = robotControlsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -228,8 +228,8 @@ describe('moveEpic', () => {
         cold('r', { r: Fixtures.mockFetchPositionsFailure })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} })
       const output$ = robotControlsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -255,8 +255,8 @@ describe('moveEpic', () => {
         )
         .mockReturnValueOnce(cold('m', { m: Fixtures.mockMoveFailure }))
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} })
       const output$ = robotControlsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -285,8 +285,8 @@ describe('moveEpic', () => {
           cold('d', { d: Fixtures.mockDisengageMotorsFailure })
         )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} })
       const output$ = robotControlsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

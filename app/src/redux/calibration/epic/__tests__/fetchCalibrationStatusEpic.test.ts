@@ -3,8 +3,7 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { calibrationEpic } from '..'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../types'
+import type { Action, State } from '../../../types'
 
 const makeTriggerAction = (robotName: string) =>
   Actions.fetchCalibrationStatus(robotName)
@@ -21,8 +20,8 @@ describe('fetch calibration status epic', () => {
     )
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
-      const action$ = hot('--a', { a: mocks.action })
-      const state$: Observable<State> = hot('s-s', { s: mocks.state })
+      const action$ = hot<Action>('--a', { a: mocks.action })
+      const state$ = hot<State>('s-s', { s: mocks.state })
       const output$ = calibrationEpic(action$, state$)
 
       expectObservable(output$)
@@ -42,8 +41,8 @@ describe('fetch calibration status epic', () => {
     )
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot('--a', { a: mocks.action })
-      const state$: Observable<State> = hot('s-s', { s: mocks.state })
+      const action$ = hot<Action>('--a', { a: mocks.action })
+      const state$ = hot<State>('s-s', { s: mocks.state })
       const output$ = calibrationEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -66,8 +65,8 @@ describe('fetch calibration status epic', () => {
     )
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot('--a', { a: mocks.action })
-      const state$: Observable<State> = hot('s-s', { s: mocks.state })
+      const action$ = hot<Action>('--a', { a: mocks.action })
+      const state$ = hot<State>('s-s', { s: mocks.state })
       const output$ = calibrationEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

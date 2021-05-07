@@ -54,8 +54,8 @@ describe('sendModuleCommand', () => {
         cold('r', { r: Fixtures.mockSendModuleCommandSuccess })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: mockState })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$)
@@ -79,8 +79,8 @@ describe('sendModuleCommand', () => {
         cold('r', { r: Fixtures.mockSendModuleCommandSuccess })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -101,8 +101,8 @@ describe('sendModuleCommand', () => {
         cold('r', { r: Fixtures.mockSendModuleCommandFailure })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$: Observable<State> = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
