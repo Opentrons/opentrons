@@ -41,6 +41,10 @@ clean:
 		'**/__pycache__' \
 		'**/*.pyc'
 
+.PHONY: teardown
+teardown:
+	$(pipenv) --rm
+
 .PHONY: test
 test:
 	$(python) -m pytest $(test_opts) $(tests)

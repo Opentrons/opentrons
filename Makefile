@@ -48,45 +48,50 @@ usb_host=$(shell yarn run -s discovery find -i 169.254)
 .PHONY: setup
 setup: setup-js setup-py
 
-.PHONY: clean-py
-clean-py:
-	$(MAKE) -C $(API_DIR) clean
-	$(MAKE) -C $(UPDATE_SERVER_DIR) clean
-	$(MAKE) -C $(ROBOT_SERVER_DIR) clean
-	$(MAKE) -C $(SHARED_DATA_DIR) clean
-
 .PHONY: clean-js
 clean-js: clean-ts
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
 	$(MAKE) -C $(COMPONENTS_DIR) clean
 
-.PHONY: setup-py
-setup-py:
+PYTHON_DIRS = $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python
+PYTHON_CLEAN = $(addsuffix -py-clean, $(PYTHON_DIRS))
+
+%-py-clean:
+	$(MAKE) -C $* clean
+
+.PHONY: clean-py
+clean-py: $(PYTHON_CLEAN)
+
+PYTHON_SETUP = $(addsuffix -py-setup, $(PYTHON_DIRS))
+%-py-setup:
+	$(MAKE) -C $* setup
+
+.PHONY: prepare-setup-py
+prepare-setup-py:
 	$(OT_PYTHON) -m pip install pipenv==2020.8.13
-	$(MAKE) -C $(API_DIR) setup
-	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
-	$(MAKE) -C $(NOTIFY_SERVER_DIR) setup
-	$(MAKE) -C $(ROBOT_SERVER_DIR) setup
-	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
+
+.PHONY: setup-py
+setup-py: prepare-setup-py 
+	$(MAKE) $(PYTHON_SETUP)
+
+PYTHON_TEARDOWN = $(addsuffix -py-teardown, $(PYTHON_DIRS))
+%-py-teardown: 
+	$(MAKE) -C $* clean teardown
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
 setup-js:
 	yarn config set network-timeout 60000
 	yarn
-	$(MAKE) -j 1 -C $(APP_SHELL_DIR) setup
-	$(MAKE) -j 1 -C $(SHARED_DATA_DIR) setup-js
+	$(MAKE) -C $(APP_SHELL_DIR) setup
+	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
 # uninstall all project dependencies
 .PHONY: teardown
 teardown: teardown-py teardown-js
 
 .PHONY: teardown-py
-teardown-py:
-	$(MAKE) -C $(API_DIR) clean teardown
-	$(MAKE) -C $(ROBOT_SERVER_DIR) clean teardown
-	$(MAKE) -C $(NOTIFY_SERVER_DIR) clean teardown
-	$(MAKE) -C $(SHARED_DATA_DIR) clean-py teardown-py
+teardown-py: $(PYTHON_TEARDOWN)
 
 .PHONY: teardown-js
 teardown-js: clean-js
@@ -187,13 +192,12 @@ else
 	prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 endif
 
+PYTHON_LINT = $(addsuffix -py-lint, $(PYTHON_DIRS))
+%-py-lint:
+	$(MAKE) -C $* lint
+
 .PHONY: lint-py
-lint-py:
-	$(MAKE) -C $(API_DIR) lint
-	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
-	$(MAKE) -C $(ROBOT_SERVER_DIR) lint
-	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
-	$(MAKE) -C $(NOTIFY_SERVER_DIR) lint
+lint-py: $(PYTHON_LINT) 
 
 .PHONY: lint-js
 lint-js:
