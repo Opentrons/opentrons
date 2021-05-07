@@ -23,7 +23,7 @@ br_ssh_opts ?= $(default_ssh_opts)
 
 .PHONY: setup
 setup:
-	$(pipenv_envvars) pipenv sync $(pipenv_opts)
+	$(pipenv) sync $(pipenv_opts)
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
