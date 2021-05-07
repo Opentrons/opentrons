@@ -36,8 +36,7 @@ from opentrons.hardware_control import (API, ThreadManager,
                                         SynchronousAdapter,
                                         ExecutionCancelledError,
                                         ThreadedAsyncLock)
-from opentrons.hardware_control.types import (DoorState, HardwareEventType,
-                                              HardwareEvent, PauseType)
+from opentrons.hardware_control.types import (HardwareEventType, HardwareEvent)
 from .models import Container, Instrument, Module
 from .dev_types import State, StateInfo, Message, LastCommand, Error, CommandShortId
 
@@ -469,7 +468,6 @@ class Session(RobotBusy):
               reason: str = None,
               user_message: str = None,
               duration: float = None) -> None:
-        self._hardware.pause_manager_pause(PauseType.PAUSE)
         self._hardware.pause()
         self.set_state(
             'paused', reason=reason,
@@ -477,14 +475,14 @@ class Session(RobotBusy):
 
     def resume(self) -> None:
         if not self.blocked:
-            self._hardware.pause_manager_resume(PauseType.PAUSE)
             self._hardware.resume()
             self.set_state('running')
 
     def _start_hardware_event_watcher(self) -> None:
         if not callable(self._event_watcher):
             # initialize and update window switch state
-            self._update_window_state(self._hardware.door_state)
+            self.door_state = str(self._hardware.door_state)
+            self.blocked = self._hardware._pause_manager.blocked_by_door
             log.info('Starting hardware event watcher')
             self._event_watcher = self._hardware.register_callback(
                 self._handle_hardware_event)
@@ -499,21 +497,12 @@ class Session(RobotBusy):
 
     def _handle_hardware_event(self, hw_event: HardwareEvent) -> None:
         if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
-            self._update_window_state(hw_event.new_state)
-            if ff.enable_door_safety_switch() and \
-                    hw_event.new_state == DoorState.OPEN and \
-                    self.state == 'running':
+            self.door_state = str(hw_event.new_state)
+            self.blocked = hw_event.blocking
+            if self.blocked and self.state == 'running':
                 self.pause('Robot door is open')
             else:
                 self._on_state_changed()
-
-    def _update_window_state(self, state: DoorState) -> None:
-        self.door_state = str(state)
-        if ff.enable_door_safety_switch() and \
-                state == DoorState.OPEN:
-            self.blocked = True
-        else:
-            self.blocked = False
 
     @robot_is_busy
     def _run(self) -> None:

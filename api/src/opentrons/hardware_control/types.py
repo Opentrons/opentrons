@@ -89,6 +89,7 @@ class DoorStateNotification:
     event: 'DoorStateNotificationType' = \
         HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
+    blocking: bool = False
 
 
 # new event types get new dataclasses
