@@ -202,7 +202,10 @@ def _build_protocol_context(
         extra_labware=extra_labware,
         hardware=hardware_simulator
     )
-    context = protocol_api.contexts.ProtocolContext(implementation=ctx_impl)
+    context = protocol_api.contexts.ProtocolContext(
+        implementation=ctx_impl,
+        api_version=version
+    )
     context.home()
     return context
 
