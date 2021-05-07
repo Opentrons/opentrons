@@ -64,7 +64,7 @@ describe('useConfirmCrashRecovery', () => {
 
   it('renders the modal with the right props when you click the link', () => {
     const wrapper = render()
-    getStarterLink(wrapper).invoke('onClick')()
+    getStarterLink(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(getModal(wrapper).exists()).toBe(true)
     expect(getModal(wrapper).prop('requiresNewTip')).toBe(false)
@@ -74,9 +74,9 @@ describe('useConfirmCrashRecovery', () => {
 
   it('invokes invalidate_last_action when you click confirm', () => {
     const wrapper = render()
-    getStarterLink(wrapper).invoke('onClick')()
+    getStarterLink(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
-    getRestartButton(wrapper).invoke('onClick')()
+    getRestartButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: 'calibration.invalidateLastAction',
@@ -85,10 +85,10 @@ describe('useConfirmCrashRecovery', () => {
 
   it('stops rendering the modal when you click cancel', () => {
     const wrapper = render()
-    getStarterLink(wrapper).invoke('onClick')()
+    getStarterLink(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(getModal(wrapper).exists()).toBe(true)
-    getExitButton(wrapper).invoke('onClick')()
+    getExitButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(getModal(wrapper).exists()).toBe(false)
   })

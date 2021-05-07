@@ -80,7 +80,7 @@ describe('ControlsCard', () => {
 
     const { wrapper, store } = render()
 
-    getLightsButton(wrapper).invoke('onClick')()
+    getLightsButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       RobotControls.updateLights(mockRobot.name, false)
@@ -90,7 +90,7 @@ describe('ControlsCard', () => {
   it('calls restartRobot on button click', () => {
     const { wrapper, store } = render()
 
-    getRestartButton(wrapper).invoke('onClick')()
+    getRestartButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       RobotAdmin.restartRobot(mockRobot.name)
@@ -100,7 +100,7 @@ describe('ControlsCard', () => {
   it('calls home on button click', () => {
     const { wrapper, store } = render()
 
-    getHomeButton(wrapper).invoke('onClick')()
+    getHomeButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       RobotControls.home(mockRobot.name, RobotControls.ROBOT)

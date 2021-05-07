@@ -40,13 +40,13 @@ describe('ManagePath', () => {
     expect(mockOnOpenPath).toHaveBeenCalledTimes(0)
     wrapper
       .find(`OutlineButton[name="${OPEN_SOURCE_NAME}"]`)
-      .invoke('onClick')()
+      .invoke('onClick')!({} as React.MouseEvent)
     expect(mockOnOpenPath).toHaveBeenCalledTimes(1)
   })
 
   it('has an IconCta that calls onChangePath on click', () => {
     expect(mockOnChangePath).toHaveBeenCalledTimes(0)
-    wrapper.find(`IconCta[name="${CHANGE_SOURCE_NAME}"]`).invoke('onClick')()
+    wrapper.find(`IconCta[name="${CHANGE_SOURCE_NAME}"]`).invoke('onClick')!({} as React.MouseEvent)
     expect(mockOnChangePath).toHaveBeenCalledTimes(1)
   })
 
@@ -55,7 +55,7 @@ describe('ManagePath', () => {
       expect(wrapper.exists(ConfirmResetPathModal)).toBe(false)
 
       act(() => {
-        wrapper.find(`IconCta[name="${RESET_SOURCE_NAME}"]`).invoke('onClick')()
+        wrapper.find(`IconCta[name="${RESET_SOURCE_NAME}"]`).invoke('onClick')!({} as React.MouseEvent)
       })
 
       wrapper.update()

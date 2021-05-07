@@ -133,7 +133,7 @@ describe('CheckCalibration', () => {
     const wrapper = render()
 
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
-    act(() => getExitButton(wrapper).invoke('onClick')())
+    act(() => getExitButton(wrapper).invoke('onClick')!({} as React.MouseEvent))
     wrapper.update()
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
@@ -157,7 +157,7 @@ describe('CheckCalibration', () => {
       },
     }
     const wrapper = render({ isJogging: false })
-    wrapper.find('button[title="forward"]').invoke('onClick')()
+    wrapper.find('button[title="forward"]').invoke('onClick')!({} as React.MouseEvent)
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand(
         'robot-name',
@@ -179,7 +179,7 @@ describe('CheckCalibration', () => {
     }
     const wrapper = render({ isJogging: true })
     dispatch.mockClear()
-    wrapper.find('button[title="forward"]').invoke('onClick')()
+    wrapper.find('button[title="forward"]').invoke('onClick')!({} as React.MouseEvent)
     expect(dispatchRequests).not.toHaveBeenCalled()
   })
 })

@@ -95,13 +95,13 @@ describe('Testing calibrate tip length control', () => {
     const { wrapper, store } = render()
     const { dispatch } = store
     const beginButton = wrapper.find('UncalibratedInfo').find('button').at(0)
-    beginButton.invoke('onClick')()
+    beginButton.invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     const continueButton = wrapper
       .find('ConfirmRecalibrationModal')
       .find('button')
       .at(0)
-    continueButton.invoke('onClick')()
+    continueButton.invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(dispatchApiRequests).toHaveBeenCalledWith(
       Sessions.ensureSession(
@@ -128,13 +128,13 @@ describe('Testing calibrate tip length control', () => {
     const { wrapper, store } = render({ isExtendedPipOffset: true })
     const { dispatch } = store
     const beginButton = wrapper.find('UncalibratedInfo').find('button').at(0)
-    beginButton.invoke('onClick')()
+    beginButton.invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     const continueButton = wrapper
       .find('ConfirmRecalibrationModal')
       .find('button')
       .at(0)
-    continueButton.invoke('onClick')()
+    continueButton.invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(dispatchApiRequests).toHaveBeenCalledWith(
       Sessions.ensureSession(

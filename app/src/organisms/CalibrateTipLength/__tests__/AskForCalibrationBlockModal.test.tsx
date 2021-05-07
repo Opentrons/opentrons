@@ -79,8 +79,8 @@ describe('AskForCalibrationBlockModal', () => {
 
       act(() => {
         spec.useTrash
-          ? findUseTrash(wrapper).invoke('onClick')()
-          : findHaveBlock(wrapper).invoke('onClick')()
+          ? findUseTrash(wrapper).invoke('onClick')!({} as React.MouseEvent)
+          : findHaveBlock(wrapper).invoke('onClick')!({} as React.MouseEvent)
       })
       if (spec.save) {
         wrapper.update()

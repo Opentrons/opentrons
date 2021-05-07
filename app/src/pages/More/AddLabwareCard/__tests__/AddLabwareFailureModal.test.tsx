@@ -46,7 +46,7 @@ describe('AddLabwareFailureModal', () => {
       c => c.type() === 'button' && c.text().toLowerCase() === 'cancel'
     )
 
-    button.invoke('onClick')()
+    button.invoke('onClick')!({} as React.MouseEvent)
     expect(mockOnCancel).toHaveBeenCalled()
   })
 
@@ -119,7 +119,7 @@ describe('AddLabwareFailureModal', () => {
         c => c.type() === 'button' && /overwrite/i.test(c.text())
       )
 
-      button.invoke('onClick')()
+      button.invoke('onClick')!({} as React.MouseEvent)
       expect(mockOnOverwrite).toHaveBeenCalledWith(file)
     })
   })

@@ -35,7 +35,7 @@ describe('DownloadUpdateModal', () => {
 
     expect(button.text()).toMatch(/not now/)
     expect(handleClose).not.toHaveBeenCalled()
-    button.invoke('onClick')()
+    button.invoke('onClick')!({} as React.MouseEvent)
     expect(handleClose).toHaveBeenCalled()
   })
 

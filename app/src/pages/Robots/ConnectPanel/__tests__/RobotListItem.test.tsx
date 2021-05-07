@@ -102,7 +102,7 @@ describe('ConnectPanel RobotListItem', () => {
     const wrapper = render({ isConnectable: true, isSelected: false })
     const toggle = wrapper.find(ToggleButton)
 
-    toggle.invoke('onClick')()
+    toggle.invoke('onClick')!({} as React.MouseEvent)
     expect(handleToggleConnect).toHaveBeenCalled()
   })
 

@@ -76,7 +76,7 @@ describe('UpdateAppModal', () => {
       .filterWhere(b => /not now/i.test(b.text()))
 
     expect(closeModal).not.toHaveBeenCalled()
-    notNowButton.invoke('onClick')()
+    notNowButton.invoke('onClick')!({} as React.MouseEvent)
     expect(closeModal).toHaveBeenCalled()
   })
 
@@ -86,7 +86,7 @@ describe('UpdateAppModal', () => {
       .find('button')
       .filterWhere((b: ReactWrapper) => /download/i.test(b.text()))
 
-    downloadButton.invoke('onClick')()
+    downloadButton.invoke('onClick')!({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith(Shell.downloadShellUpdate())
   })
@@ -126,7 +126,7 @@ describe('UpdateAppModal', () => {
       .find('button')
       .filterWhere(b => /restart/i.test(b.text()))
 
-    restartButton.invoke('onClick')()
+    restartButton.invoke('onClick')!({} as React.MouseEvent)
     expect(store.dispatch).toHaveBeenCalledWith(Shell.applyShellUpdate())
   })
 
@@ -137,7 +137,7 @@ describe('UpdateAppModal', () => {
       .find('button')
       .filterWhere(b => /not now/i.test(b.text()))
 
-    notNowButton.invoke('onClick')()
+    notNowButton.invoke('onClick')!({} as React.MouseEvent)
     expect(closeModal).toHaveBeenCalled()
   })
 
@@ -173,7 +173,7 @@ describe('UpdateAppModal', () => {
       .filterWhere(b => /not now/i.test(b.text()))
 
     expect(dismissAlert).not.toHaveBeenCalled()
-    notNowButton.invoke('onClick')()
+    notNowButton.invoke('onClick')!({} as React.MouseEvent)
     expect(dismissAlert).toHaveBeenCalledWith(false)
   })
 
@@ -199,7 +199,7 @@ describe('UpdateAppModal', () => {
       .find('button')
       .filterWhere(b => /turn off update notifications/i.test(b.text()))
 
-    ignoreButton.invoke('onClick')()
+    ignoreButton.invoke('onClick')!({} as React.MouseEvent)
 
     const title = wrapper.find('h2')
 
@@ -236,12 +236,12 @@ describe('UpdateAppModal', () => {
     wrapper
       .find('button')
       .filterWhere(b => /turn off update notifications/i.test(b.text()))
-      .invoke('onClick')()
+      .invoke('onClick')!({} as React.MouseEvent)
 
     wrapper
       .find('button')
       .filterWhere(b => /ok/i.test(b.text()))
-      .invoke('onClick')()
+      .invoke('onClick')!({} as React.MouseEvent)
 
     expect(dismissAlert).toHaveBeenCalledWith(true)
   })
@@ -252,7 +252,7 @@ describe('UpdateAppModal', () => {
     wrapper
       .find('button')
       .filterWhere(b => /turn off update notifications/i.test(b.text()))
-      .invoke('onClick')()
+      .invoke('onClick')!({} as React.MouseEvent)
 
     wrapper.unmount()
 
@@ -265,12 +265,12 @@ describe('UpdateAppModal', () => {
     wrapper
       .find('button')
       .filterWhere(b => /turn off update notifications/i.test(b.text()))
-      .invoke('onClick')()
+      .invoke('onClick')!({} as React.MouseEvent)
 
     wrapper
       .find(InternalLink)
       .filterWhere(b => b.prop('to') === '/more/app')
-      .invoke('onClick')()
+      .invoke('onClick')!({} as React.MouseEvent)
 
     expect(dismissAlert).toHaveBeenCalledWith(true)
   })
@@ -281,7 +281,7 @@ describe('UpdateAppModal', () => {
       .find('button')
       .filterWhere(b => /not now/i.test(b.text()))
 
-    notNowButton.invoke('onClick')()
+    notNowButton.invoke('onClick')!({} as React.MouseEvent)
     wrapper.unmount()
 
     expect(dismissAlert).toHaveBeenCalledTimes(1)

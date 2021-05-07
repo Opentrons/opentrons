@@ -64,7 +64,7 @@ describe('MeasureTip', () => {
 
   it('renders the confirm crash modal when invoked', () => {
     const wrapper = render()
-    wrapper.find('a[children="Start over"]').invoke('onClick')()
+    wrapper.find('a[children="Start over"]').invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(wrapper.find('ConfirmCrashRecoveryModal').exists()).toBe(true)
   })
@@ -78,7 +78,7 @@ describe('MeasureTip', () => {
       down: [0, 0, -0.1],
     }
     jogDirections.forEach(direction => {
-      act(() => getJogButton(wrapper, direction).invoke('onClick')())
+      act(() => getJogButton(wrapper, direction).invoke('onClick')!({} as React.MouseEvent))
       wrapper.update()
 
       expect(mockSendCommands).toHaveBeenCalledWith({
@@ -95,7 +95,7 @@ describe('MeasureTip', () => {
   it('clicking continue proceeds to next step', () => {
     const wrapper = render()
 
-    act(() => getContinueButton(wrapper).invoke('onClick')())
+    act(() => getContinueButton(wrapper).invoke('onClick')!({} as React.MouseEvent))
     wrapper.update()
 
     expect(mockSendCommands).toHaveBeenCalledWith(

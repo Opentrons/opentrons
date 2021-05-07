@@ -135,11 +135,11 @@ describe('DeckCalibrationControl', () => {
   it('button launches new deck calibration after confirm', () => {
     const { wrapper, store } = render()
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
-    getDeckCalButton(wrapper).invoke('onClick')()
+    getDeckCalButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(true)
 
-    getConfirmDeckCalButton(wrapper).invoke('onClick')()
+    getConfirmDeckCalButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith({
       ...Sessions.ensureSession(
@@ -152,7 +152,7 @@ describe('DeckCalibrationControl', () => {
 
   it('button launches new deck calibration immediately without rendering ConfirmStartDeckCalModal', () => {
     const { wrapper, store } = render({ pipOffsetDataPresent: false })
-    getDeckCalButton(wrapper).invoke('onClick')()
+    getDeckCalButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
 
@@ -168,11 +168,11 @@ describe('DeckCalibrationControl', () => {
   it('button launches new deck calibration and cancel closes', () => {
     const { wrapper, store } = render()
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
-    getDeckCalButton(wrapper).invoke('onClick')()
+    getDeckCalButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(true)
 
-    getCancelDeckCalButton(wrapper).invoke('onClick')()
+    getCancelDeckCalButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
 
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
     expect(store.dispatch).not.toHaveBeenCalledWith({
@@ -267,8 +267,8 @@ describe('DeckCalibrationControl', () => {
       error: { message: 'ruh roh' },
     })
     expect(getFailedStartModal(wrapper).exists()).toBe(false)
-    getDeckCalButton(wrapper).invoke('onClick')()
-    getConfirmDeckCalButton(wrapper).invoke('onClick')()
+    getDeckCalButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
+    getConfirmDeckCalButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(getFailedStartModal(wrapper).exists()).toBe(true)
   })

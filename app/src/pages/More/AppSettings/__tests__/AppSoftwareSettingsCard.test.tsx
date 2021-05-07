@@ -85,7 +85,7 @@ describe('AppSoftwareSettingsCard', () => {
     expect(button.prop('disabled')).toBe(false)
     expect(wrapper.exists(UpdateAppModal)).toBe(false)
 
-    button.invoke('onClick')()
+    button.invoke('onClick')!({} as React.MouseEvent)
 
     expect(wrapper.find(Portal).exists(UpdateAppModal)).toBe(true)
   })
@@ -95,7 +95,7 @@ describe('AppSoftwareSettingsCard', () => {
 
     const { wrapper } = render()
 
-    wrapper.find(SecondaryBtn).invoke('onClick')()
+    wrapper.find(SecondaryBtn).invoke('onClick')!({} as React.MouseEvent)
     wrapper.find(UpdateAppModal).invoke('closeModal')()
 
     expect(wrapper.exists(UpdateAppModal)).toBe(false)

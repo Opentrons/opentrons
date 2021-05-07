@@ -48,7 +48,7 @@ describe('CompleteConfirmation', () => {
   it('clicking continue sends exit command and deletes session', () => {
     const wrapper = render()
 
-    getContinueButton(wrapper).invoke('onClick')()
+    getContinueButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockCleanUpAndExit).toHaveBeenCalled()

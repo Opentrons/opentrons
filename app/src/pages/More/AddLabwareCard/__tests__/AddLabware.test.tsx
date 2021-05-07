@@ -14,7 +14,7 @@ describe('AddLabware', () => {
     const wrapper = mount(<AddLabware onAddLabware={mockOnAddLabware} />)
 
     expect(mockOnAddLabware).toHaveBeenCalledTimes(0)
-    wrapper.find(`button[name="${ADD_LABWARE_NAME}"]`).invoke('onClick')()
+    wrapper.find(`button[name="${ADD_LABWARE_NAME}"]`).invoke('onClick')!({} as React.MouseEvent)
     expect(mockOnAddLabware).toHaveBeenCalledTimes(1)
   })
 })

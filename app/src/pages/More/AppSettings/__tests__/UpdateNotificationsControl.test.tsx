@@ -86,7 +86,7 @@ describe('UpdateNotificationsControl', () => {
     const { wrapper, store } = render()
     const toggle = wrapper.find(ToggleBtn)
 
-    toggle.invoke('onClick')()
+    toggle.invoke('onClick')!({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       Alerts.alertUnignored(Alerts.ALERT_APP_UPDATE_AVAILABLE)
@@ -100,7 +100,7 @@ describe('UpdateNotificationsControl', () => {
     const { wrapper, store } = render()
     const toggle = wrapper.find(ToggleBtn)
 
-    toggle.invoke('onClick')()
+    toggle.invoke('onClick')!({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       Alerts.alertPermanentlyIgnored(Alerts.ALERT_APP_UPDATE_AVAILABLE)
@@ -114,7 +114,7 @@ describe('UpdateNotificationsControl', () => {
     const { wrapper } = render()
     const toggle = wrapper.find(ToggleBtn)
 
-    toggle.invoke('onClick')()
+    toggle.invoke('onClick')!({} as React.MouseEvent)
 
     expect(trackEvent).toHaveBeenCalledWith({
       name: 'appUpdateNotificationsToggled',
@@ -129,7 +129,7 @@ describe('UpdateNotificationsControl', () => {
     const { wrapper } = render()
     const toggle = wrapper.find(ToggleBtn)
 
-    toggle.invoke('onClick')()
+    toggle.invoke('onClick')!({} as React.MouseEvent)
 
     expect(trackEvent).toHaveBeenCalledWith({
       name: 'appUpdateNotificationsToggled',

@@ -40,7 +40,7 @@ describe('ConfirmResetPathModal', () => {
     const wrapper = mount(<ConfirmResetPathModalTemplate {...props} />)
     const button = wrapper.find(`button[name="${CANCEL_NAME}"]`)
 
-    button.invoke('onClick')()
+    button.invoke('onClick')!({} as React.MouseEvent)
     expect(mockOnCancel).toHaveBeenCalled()
   })
 
@@ -48,7 +48,7 @@ describe('ConfirmResetPathModal', () => {
     const wrapper = mount(<ConfirmResetPathModalTemplate {...props} />)
     const button = wrapper.find(`button[name="${RESET_SOURCE_NAME}"]`)
 
-    button.invoke('onClick')()
+    button.invoke('onClick')!({} as React.MouseEvent)
     expect(mockOnConfirm).toHaveBeenCalled()
   })
 })

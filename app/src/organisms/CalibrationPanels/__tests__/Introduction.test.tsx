@@ -139,7 +139,7 @@ describe('Introduction', () => {
         spec.showTipRackButton
       )
 
-      getContinueButton(wrapper).invoke('onClick')()
+      getContinueButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
       wrapper.update()
       expect(mockSendCommands).toHaveBeenCalledWith({
         command: Sessions.sharedCalCommands.LOAD_LABWARE,
@@ -157,7 +157,7 @@ describe('Introduction', () => {
     expect(allText).toContain('start deck calibration')
 
     expect(getUseDiffTipRackButton(wrapper).exists()).toBe(true)
-    getContinueButton(wrapper).invoke('onClick')()
+    getContinueButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: Sessions.sharedCalCommands.LOAD_LABWARE,
@@ -191,7 +191,7 @@ describe('Introduction', () => {
       expect(allText).toMatch(spec.note)
       expect(getUseDiffTipRackButton(wrapper).exists()).toBe(false)
 
-      getContinueButton(wrapper).invoke('onClick')()
+      getContinueButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
       wrapper.update()
       expect(mockSendCommands).toHaveBeenCalledWith({
         command: Sessions.sharedCalCommands.LOAD_LABWARE,

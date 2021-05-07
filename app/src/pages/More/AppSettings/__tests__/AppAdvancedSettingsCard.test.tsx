@@ -164,7 +164,7 @@ describe('AppAdvancedSettingsCard', () => {
 
   it('switching toggles dispatches toggle action', () => {
     const { wrapper, store } = render()
-    getDevtoolsToggle(wrapper).invoke('onClick')()
+    getDevtoolsToggle(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(store.dispatch).toHaveBeenCalledWith(
       expect.objectContaining(Config.toggleConfigValue('devtools'))

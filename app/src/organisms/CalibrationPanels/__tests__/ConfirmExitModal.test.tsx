@@ -38,7 +38,7 @@ describe('ConfirmExitModal', () => {
   it('clicking confirm exit calls exit', () => {
     const wrapper = render()
 
-    getExitButton(wrapper).invoke('onClick')()
+    getExitButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockExit).toHaveBeenCalled()
@@ -47,7 +47,7 @@ describe('ConfirmExitModal', () => {
   it('clicking back calls back', () => {
     const wrapper = render()
 
-    getBackButton(wrapper).invoke('onClick')()
+    getBackButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockBack).toHaveBeenCalled()

@@ -59,7 +59,7 @@ describe('TipPickUp', () => {
       forward: [0, -0.1, 0],
     }
     jogDirections.forEach(direction => {
-      getJogButton(wrapper, direction).invoke('onClick')()
+      getJogButton(wrapper, direction).invoke('onClick')!({} as React.MouseEvent)
       wrapper.update()
 
       expect(mockSendCommands).toHaveBeenCalledWith({
@@ -71,7 +71,7 @@ describe('TipPickUp', () => {
   it('clicking pick up tip sends pick up tip command', () => {
     const wrapper = render()
 
-    getPickUpTipButton(wrapper).invoke('onClick')()
+    getPickUpTipButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: Sessions.sharedCalCommands.PICK_UP_TIP,
@@ -90,7 +90,7 @@ describe('TipPickUp', () => {
 
   it('renders the confirm crash modal when invoked', () => {
     const wrapper = render()
-    wrapper.find('a[children="Start over"]').invoke('onClick')()
+    wrapper.find('a[children="Start over"]').invoke('onClick')!({} as React.MouseEvent)
     wrapper.update()
     expect(wrapper.find('ConfirmCrashRecoveryModal').exists()).toBe(true)
   })

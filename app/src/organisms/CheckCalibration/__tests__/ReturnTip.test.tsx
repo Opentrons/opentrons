@@ -60,7 +60,7 @@ describe('ReturnTip', () => {
         rank: Sessions.CHECK_PIPETTE_RANK_SECOND,
       },
     })
-    getContinueButton(wrapper).invoke('onClick')()
+    getContinueButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
 
     expect(mockSendCommands).toHaveBeenCalledWith(
       { command: Sessions.checkCommands.RETURN_TIP },
@@ -70,7 +70,7 @@ describe('ReturnTip', () => {
 
   it('on continue, if first pipette with diff tip racks, return tip and switch', () => {
     const wrapper = render()
-    getContinueButton(wrapper).invoke('onClick')()
+    getContinueButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
 
     expect(mockSendCommands).toHaveBeenCalledWith(
       { command: Sessions.checkCommands.RETURN_TIP },
@@ -85,7 +85,7 @@ describe('ReturnTip', () => {
         tipRackLoadName: 'same-tip-rack-name',
       })),
     })
-    getContinueButton(wrapper).invoke('onClick')()
+    getContinueButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
 
     expect(mockSendCommands).toHaveBeenCalledWith(
       { command: Sessions.checkCommands.RETURN_TIP },
