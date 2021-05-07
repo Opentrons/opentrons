@@ -1420,7 +1420,6 @@ class InstrumentContext(CommandPublisher):
             log_parent=self._log
         )
 
-    @lru_cache(maxsize=12)
     def _tip_length_for(self, tiprack: Labware) -> float:
         """ Get the tip length, including overlap, for a tip from this rack """
         return tip_length_for(self.hw_pipette, tiprack)
