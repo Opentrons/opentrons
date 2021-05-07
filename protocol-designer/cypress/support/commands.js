@@ -95,3 +95,10 @@ Cypress.Commands.add('addStep', stepName => {
 Cypress.Commands.add('openSettingsPage', () => {
   cy.get('button[class*="navbar__tab__"]').contains('Settings').click()
 })
+
+// Advance Settings for Transfer Steps
+
+// Pre-wet tip enable/disable
+Cypress.Commands.add('prewettip', () => {
+  cy.get('input[name="preWetTip"]').click({ force: true })
+})
