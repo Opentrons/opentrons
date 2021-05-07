@@ -7,13 +7,12 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { pipettesEpic } from '../../epic'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../types'
+import type { Action, State } from '../../../types'
 
 jest.mock('../../../discovery/selectors')
 jest.mock('../../../robot/selectors')
 
-const mockState = { state: true }
+const mockState: State = { state: true } as any
 const { mockRobot } = Fixtures
 
 const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
@@ -28,7 +27,7 @@ describe('fetchPipettesOnConnectEpic', () => {
   let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot)
+    mockGetRobotByName.mockReturnValue(mockRobot as any)
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
@@ -40,10 +39,10 @@ describe('fetchPipettesOnConnectEpic', () => {
   })
 
   it('dispatches nothing robot:CONNECT_RESPONSE failure', () => {
-    const action = {
+    const action: Action = {
       type: 'robot:CONNECT_RESPONSE',
       payload: { error: { message: 'AH' } },
-    }
+    } as any
 
     mockGetConnectedRobotName.mockReturnValue(null)
 
@@ -57,10 +56,10 @@ describe('fetchPipettesOnConnectEpic', () => {
   })
 
   it('dispatches FETCH_PIPETTES and FETCH_PIPETTE_SETTINGS on robot:CONNECT_RESPONSE success', () => {
-    const action = {
+    const action: Action = {
       type: 'robot:CONNECT_RESPONSE',
       payload: {},
-    }
+    } as any
 
     mockGetConnectedRobotName.mockReturnValue(mockRobot.name)
 

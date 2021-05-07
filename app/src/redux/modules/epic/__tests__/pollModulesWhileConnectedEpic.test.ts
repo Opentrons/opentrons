@@ -8,12 +8,11 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { modulesEpic } from '../../epic'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../types'
+import type { Action, State } from '../../../types'
 
 jest.mock('../../../robot/selectors')
 
-const mockState = { state: true }
+const mockState: State = { state: true } as any
 const { mockRobot } = Fixtures
 
 const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<

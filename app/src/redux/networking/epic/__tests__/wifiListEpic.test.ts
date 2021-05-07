@@ -3,8 +3,7 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { networkingEpic } from '..'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../types'
+import type { Action } from '../../../types'
 
 const makeTriggerAction = (robotName: string) =>
   Actions.fetchWifiList(robotName)
@@ -20,9 +19,9 @@ describe('networking wifiListEpic', () => {
       Fixtures.mockWifiListSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$)
@@ -42,8 +41,8 @@ describe('networking wifiListEpic', () => {
     )
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -63,8 +62,8 @@ describe('networking wifiListEpic', () => {
     )
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

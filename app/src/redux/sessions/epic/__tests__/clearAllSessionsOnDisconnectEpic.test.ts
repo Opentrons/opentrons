@@ -7,8 +7,7 @@ import { mockRobot } from '../../../robot-api/__fixtures__'
 import * as Actions from '../../actions'
 import { sessionsEpic } from '../../epic'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../types'
+import type { Action, State } from '../../../types'
 
 jest.mock('../../../discovery/selectors')
 jest.mock('../../../robot/selectors')
@@ -27,7 +26,7 @@ describe('clearAllSessionsOnDisconnectEpic', () => {
   let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot)
+    mockGetRobotByName.mockReturnValue(mockRobot as any)
     mockGetConnectedRobotName.mockReturnValue(mockRobot.name)
 
     testScheduler = new TestScheduler((actual, expected) => {
@@ -40,14 +39,14 @@ describe('clearAllSessionsOnDisconnectEpic', () => {
   })
 
   it('dispatches CLEAR_ALL_SESSIONS on robot:DISCONNECT', () => {
-    const action = {
+    const action: Action = {
       type: 'robot:DISCONNECT',
       payload: {},
-    }
+    } as any
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       const action$ = hot<Action>('--a', { a: action })
-      const state$ = hot<State>('a--', { a: mockState })
+      const state$ = hot<State>('a--', { a: mockState } as any)
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -57,14 +56,14 @@ describe('clearAllSessionsOnDisconnectEpic', () => {
   })
 
   it('dispatches CLEAR_ALL_SESSIONS on robot:UNEXPECTED_DISCONNECT', () => {
-    const action = {
+    const action: Action = {
       type: 'robot:UNEXPECTED_DISCONNECT',
       payload: {},
-    }
+    } as any
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       const action$ = hot<Action>('--a', { a: action })
-      const state$ = hot<State>('a--', { a: mockState })
+      const state$ = hot<State>('a--', { a: mockState } as any)
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

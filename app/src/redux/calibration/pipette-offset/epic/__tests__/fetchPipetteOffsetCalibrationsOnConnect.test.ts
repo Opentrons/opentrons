@@ -4,15 +4,14 @@ import * as DiscoverySelectors from '../../../../discovery/selectors'
 import * as Actions from '../../actions'
 import { pipetteOffsetCalibrationsEpic } from '..'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../../types'
+import type { Action, State } from '../../../../types'
 
 jest.mock('../../actions')
 jest.mock('../../../../robot/selectors')
 jest.mock('../../../../discovery/selectors')
 
 const mockState = { state: true }
-const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
+const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 } as any
 
 const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
   typeof DiscoverySelectors.getRobotByName
@@ -46,8 +45,8 @@ describe('fetchPipetteOffsetCalibrationsOnConnectEpic', () => {
     mockGetConnectedRobotName.mockReturnValue(null)
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      const action$ = hot<Action>('--a', { a: action })
-      const state$ = hot<State>('a--', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action } as any)
+      const state$ = hot<State>('a--', { a: mockState } as any)
       const output$ = pipetteOffsetCalibrationsEpic(action$, state$)
 
       expectObservable(output$).toBe('---')
@@ -63,8 +62,8 @@ describe('fetchPipetteOffsetCalibrationsOnConnectEpic', () => {
     mockGetConnectedRobotName.mockReturnValue(mockRobot.name)
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      const action$ = hot<Action>('--a', { a: action })
-      const state$ = hot<State>('a--', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action } as any)
+      const state$ = hot<State>('a--', { a: mockState } as any)
       const output$ = pipetteOffsetCalibrationsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

@@ -9,8 +9,7 @@ import * as ShellUpdate from '../update'
 import { remote as mockRemote } from '../remote'
 import { shellEpic } from '../epic'
 
-import type { State } from '../../types'
-import type { Observable } from 'rxjs'
+import type { Action, State } from '../../types'
 
 const { ipcRenderer: mockIpc } = mockRemote
 
@@ -45,7 +44,7 @@ describe('shell epics', () => {
   })
 
   it('"dispatches" actions to IPC if meta.shell', () => {
-    const shellAction = { type: 'foo', meta: { shell: true } }
+    const shellAction: Action = { type: 'foo', meta: { shell: true } } as any
 
     testScheduler.run(({ hot, expectObservable }) => {
       const action$ = hot<Action>('-a', { a: shellAction })

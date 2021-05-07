@@ -134,7 +134,7 @@ interface FetchPipettesFailureAction {
 
 // fetch pipette settings
 
-interface FetchPipetteSettingsAction {
+export interface FetchPipetteSettingsAction {
   type: 'pipettes:FETCH_PIPETTE_SETTINGS'
   payload: { robotName: string }
   meta: RobotApiRequestMeta

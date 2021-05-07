@@ -7,13 +7,12 @@ import { mockRobot } from '../../../robot-api/__fixtures__'
 import * as Actions from '../../actions'
 import { sessionsEpic } from '../../epic'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../types'
+import type { Action, State } from '../../../types'
 
 jest.mock('../../../discovery/selectors')
 jest.mock('../../../robot/selectors')
 
-const mockState = { state: true }
+const mockState: State = { state: true } as any
 
 const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
   typeof DiscoverySelectors.getRobotByName
@@ -27,7 +26,7 @@ describe('fetchAllSessionsOnConnectEpic', () => {
   let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot)
+    mockGetRobotByName.mockReturnValue(mockRobot as any)
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
@@ -39,10 +38,10 @@ describe('fetchAllSessionsOnConnectEpic', () => {
   })
 
   it('dispatches nothing robot:CONNECT_RESPONSE failure', () => {
-    const action = {
+    const action: Action = {
       type: 'robot:CONNECT_RESPONSE',
       payload: { error: { message: 'AH' } },
-    }
+    } as any
 
     mockGetConnectedRobotName.mockReturnValue(null)
 
@@ -56,10 +55,10 @@ describe('fetchAllSessionsOnConnectEpic', () => {
   })
 
   it('dispatches FETCH_ALL_SESSIONS on robot:CONNECT_RESPONSE success', () => {
-    const action = {
+    const action: Action = {
       type: 'robot:CONNECT_RESPONSE',
       payload: {},
-    }
+    } as any
 
     mockGetConnectedRobotName.mockReturnValue(mockRobot.name)
 

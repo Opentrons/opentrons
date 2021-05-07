@@ -8,8 +8,7 @@ import * as SessionTypes from '../../../../sessions/types'
 import * as SessionActions from '../../../../sessions/actions'
 import * as SessionSelectors from '../../../../sessions/selectors'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../../types'
+import type { Action, State } from '../../../../types'
 
 jest.mock('../../actions')
 jest.mock('../../../../robot/selectors')
@@ -80,7 +79,7 @@ describe('fetchTipLengthCalibrationsOnCalibrationEndEpic', () => {
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot<Action>('--a', { a: action })
-        const state$ = hot<State>('s-s', { s: mockState })
+        const state$ = hot<State>('s-s', { s: mockState } as any)
         const output$ = tipLengthCalibrationsEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
@@ -105,7 +104,7 @@ describe('fetchTipLengthCalibrationsOnCalibrationEndEpic', () => {
 
     testScheduler.run(({ hot, expectObservable, flush }) => {
       const action$ = hot<Action>('--a', { a: action })
-      const state$ = hot<State>('s-s', { s: mockState })
+      const state$ = hot<State>('s-s', { s: mockState } as any)
       const output$ = tipLengthCalibrationsEpic(action$, state$)
 
       expectObservable(output$).toBe('---')
@@ -124,7 +123,7 @@ describe('fetchTipLengthCalibrationsOnCalibrationEndEpic', () => {
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot<Action>('--a', { a: action })
-        const state$ = hot<State>('s-s', { s: mockState })
+        const state$ = hot<State>('s-s', { s: mockState } as any)
         const output$ = tipLengthCalibrationsEpic(action$, state$)
 
         expectObservable(output$).toBe('---')

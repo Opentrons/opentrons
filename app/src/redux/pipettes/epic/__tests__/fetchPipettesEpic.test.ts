@@ -8,13 +8,13 @@ import * as Actions from '../../actions'
 import * as Types from '../../types'
 import { pipettesEpic } from '../../epic'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../types'
+import type { Action, State } from '../../../types'
+import type { RobotApiResponse } from '../../../robot-api/types'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')
 
-const mockState = { state: true }
+const mockState: State = { state: true } as any
 const { mockRobot } = Fixtures
 
 const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
@@ -29,7 +29,7 @@ describe('fetchPipettesEpic', () => {
   let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot)
+    mockGetRobotByName.mockReturnValue(mockRobot as any)
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
@@ -41,7 +41,7 @@ describe('fetchPipettesEpic', () => {
   })
 
   describe('handles FETCH_PIPETTES', () => {
-    const meta = { requestId: '1234' }
+    const meta = { requestId: '1234' } as any
     const action: Types.FetchPipettesAction = {
       ...Actions.fetchPipettes(mockRobot.name, true),
       meta,
@@ -50,7 +50,7 @@ describe('fetchPipettesEpic', () => {
     it('calls GET /pipettes', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchPipettesSuccess })
+          cold<RobotApiResponse>('r', { r: Fixtures.mockFetchPipettesSuccess })
         )
 
         const action$ = hot<Action>('--a', { a: action })
@@ -79,7 +79,7 @@ describe('fetchPipettesEpic', () => {
         )
 
         const action$ = hot<Action>('--a', { a: action })
-        const state$ = hot<State>('a-a', { a: {} })
+        const state$ = hot<State>('a-a', { a: {} } as any)
         const output$ = pipettesEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
@@ -99,7 +99,7 @@ describe('fetchPipettesEpic', () => {
         )
 
         const action$ = hot<Action>('--a', { a: action })
-        const state$ = hot<State>('a-a', { a: {} })
+        const state$ = hot<State>('a-a', { a: {} } as any)
         const output$ = pipettesEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {

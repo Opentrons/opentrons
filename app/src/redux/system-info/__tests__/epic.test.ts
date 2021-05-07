@@ -5,8 +5,7 @@ import * as Selectors from '../selectors'
 import { NOT_APPLICABLE, UP_TO_DATE, OUTDATED } from '../constants'
 import { systemInfoEpic } from '../epic'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../types'
+import type { Action, State } from '../../types'
 import type { DriverStatus } from '../types'
 
 jest.mock('../selectors')

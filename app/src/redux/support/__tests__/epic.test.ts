@@ -36,7 +36,7 @@ const MOCK_PROFILE_STATE: State = {
   },
 } as any
 
-const MOCK_EVENT_STATE: Partial<State> = {}
+const MOCK_EVENT_STATE: State = {} as any
 
 describe('support profile epic', () => {
   let testScheduler: TestScheduler
@@ -56,7 +56,7 @@ describe('support profile epic', () => {
   it('should initialize support profile on config:INITIALIZED', () => {
     testScheduler.run(({ hot, expectObservable, flush }) => {
       const action$ = hot<Action>('-a', {
-        a: configInitialized(MOCK_PROFILE_STATE.config),
+        a: configInitialized(MOCK_PROFILE_STATE.config as any),
       })
       const state$ = hot<State>('--')
       const result$ = supportEpic(action$, state$)
@@ -139,7 +139,7 @@ describe('support event epic', () => {
     const eventPayload = {
       eventName: 'completed-robot-calibration-check',
       metadata: { someProp: 'value' },
-    }
+    } as any
     makeIntercomEvent.mockReturnValueOnce(eventPayload)
 
     testScheduler.run(({ hot, expectObservable, flush }) => {

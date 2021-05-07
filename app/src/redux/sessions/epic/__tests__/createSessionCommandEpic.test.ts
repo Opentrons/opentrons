@@ -6,7 +6,6 @@ import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
 
 import type { Action, State } from '../../../types'
-import type { Observable } from 'rxjs'
 
 jest.mock('../../../robot-api/http')
 
@@ -43,7 +42,7 @@ describe('createSessionCommandEpic', () => {
   it('calls POST /sessions/1234/commands/execute and then GET /sessions/1234', () => {
     const mocks = setupEpicTestMocks(makeTriggerAction)
 
-    runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, cold, expectObservable, flush }) => {
       fetchRobotApi.mockReturnValueOnce(
         cold('r', { r: Fixtures.mockSessionCommandsSuccess })
       )
@@ -51,8 +50,8 @@ describe('createSessionCommandEpic', () => {
         cold('r', { r: Fixtures.mockFetchSessionSuccess })
       )
 
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$)
@@ -75,13 +74,13 @@ describe('createSessionCommandEpic', () => {
   it('call does not GET /sessions/1234 if POST fails', () => {
     const mocks = setupEpicTestMocks(makeTriggerAction)
 
-    runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, cold, expectObservable, flush }) => {
       fetchRobotApi.mockReturnValueOnce(
         cold('r', { r: Fixtures.mockSessionCommandsFailure })
       )
 
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$)
@@ -94,7 +93,7 @@ describe('createSessionCommandEpic', () => {
   it('maps successful response to CREATE_SESSION_COMMAND_SUCCESS', () => {
     const mocks = setupEpicTestMocks(makeTriggerAction)
 
-    runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, cold, expectObservable, flush }) => {
       fetchRobotApi.mockReturnValueOnce(
         cold('-r', { r: Fixtures.mockSessionCommandsSuccess })
       )
@@ -102,8 +101,8 @@ describe('createSessionCommandEpic', () => {
         cold('-r', { r: Fixtures.mockFetchSessionSuccess })
       )
 
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('----a', {
@@ -123,9 +122,9 @@ describe('createSessionCommandEpic', () => {
       Fixtures.mockSessionCommandsFailure
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('a-a', { a: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('a-a', { a: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -142,7 +141,7 @@ describe('createSessionCommandEpic', () => {
   it('maps failed GET response to CREATE_SESSION_COMMAND_FAILURE', () => {
     const mocks = setupEpicTestMocks(makeTriggerAction)
 
-    runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, cold, expectObservable, flush }) => {
       fetchRobotApi.mockReturnValueOnce(
         cold('-r', { r: Fixtures.mockSessionCommandsSuccess })
       )
@@ -150,8 +149,8 @@ describe('createSessionCommandEpic', () => {
         cold('-r', { r: Fixtures.mockFetchSessionFailure })
       )
 
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('a-a', { a: mocks.state })
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('a-a', { a: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('----a', {

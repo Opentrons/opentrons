@@ -6,8 +6,7 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { restartEpic, startDiscoveryOnRestartEpic } from '../restartEpic'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../types'
+import type { Action } from '../../../types'
 
 jest.mock('../../../robot-settings/selectors')
 
@@ -26,9 +25,9 @@ describe('robotAdminEpic handles restarting', () => {
       Fixtures.mockRestartSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = restartEpic(action$, state$)
 
       expectObservable(output$)
@@ -49,9 +48,9 @@ describe('robotAdminEpic handles restarting', () => {
 
     mockGetRestartPath.mockReturnValue('/restart')
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = restartEpic(action$, state$)
 
       expectObservable(output$)
@@ -74,9 +73,9 @@ describe('robotAdminEpic handles restarting', () => {
       Fixtures.mockRestartSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = restartEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -94,9 +93,9 @@ describe('robotAdminEpic handles restarting', () => {
       Fixtures.mockRestartFailure
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = restartEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -111,12 +110,12 @@ describe('robotAdminEpic handles restarting', () => {
 
   it('starts discovery on RESTART_SUCCESS', () => {
     const mocks = setupEpicTestMocks(robotName =>
-      Actions.restartRobotSuccess(robotName, {})
+      Actions.restartRobotSuccess(robotName, {} as any)
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot<Action>('-a', { a: mocks.action })
-      const state$ = hot<State>('a-', { a: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
+      const action$ = hot('-a', { a: mocks.action })
+      const state$ = hot('a-', { a: mocks.state })
       const output$ = startDiscoveryOnRestartEpic(action$, state$)
 
       expectObservable(output$).toBe('-a', {
