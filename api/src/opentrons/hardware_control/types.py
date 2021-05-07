@@ -89,6 +89,7 @@ class DoorStateNotification:
     event: 'DoorStateNotificationType' = \
         HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
+    blocking: bool = False
 
 
 # new event types get new dataclasses
@@ -233,6 +234,15 @@ class HardwareAction(enum.Enum):
 
     def __str__(self):
         return self.name
+
+
+class PauseType(enum.Enum):
+    PAUSE = 0
+    DELAY = 1
+
+
+class PauseResumeError(RuntimeError):
+    pass
 
 
 class ExecutionCancelledError(RuntimeError):
