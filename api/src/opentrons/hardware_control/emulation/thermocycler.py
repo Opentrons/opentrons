@@ -1,3 +1,8 @@
+"""An emulation of the opentrons thermocycler module.
+
+The purpose is to provide a fake backend that responds to GCODE commands.
+"""
+
 import logging
 from typing import Optional
 from opentrons.drivers.thermocycler.driver import GCODES
@@ -43,7 +48,7 @@ class ThermocyclerEmulator(AbstractEmulator):
         self.plate_volume = util.OptionalValue[float]()
         self.plate_at_target = util.OptionalValue[float]()
         self.plate_ramp_rate = util.OptionalValue[float]()
-        self._parser = Parser(gcodes=list(GCODES.values()))
+        self._parser = Parser()
 
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""

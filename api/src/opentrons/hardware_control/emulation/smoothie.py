@@ -1,3 +1,9 @@
+"""An emulation of the Smoothie.
+
+The purpose is to provide a fake backend that responds to the GCODE sent by the
+Opentrons smoothie driver.
+"""
+
 import logging
 import re
 from typing import Optional, Dict
@@ -42,7 +48,7 @@ class SmoothieEmulator(AbstractEmulator):
             # P20SV202020070101
             "R": "5032305356323032303230303730313031000000000000000000000000000000"
         }
-        self._parser = Parser(gcodes=list(GCODE))
+        self._parser = Parser()
 
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""

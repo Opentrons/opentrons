@@ -1,3 +1,5 @@
+"""The handler of a driver client connection."""
+
 import asyncio
 import logging
 
@@ -7,8 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 class ConnectionHandler:
+    """Responsible for reading data and routing it to an emulator."""
+
     def __init__(self, emulator: AbstractEmulator):
-        """Construct"""
+        """Construct with an emulator."""
         self._emulator = emulator
 
     async def __call__(self, reader: asyncio.StreamReader,

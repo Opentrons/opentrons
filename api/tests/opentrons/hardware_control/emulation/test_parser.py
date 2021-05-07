@@ -5,27 +5,51 @@ from opentrons.hardware_control.emulation.parser import Parser, Command
 
 
 @pytest.fixture
-def gcodes() -> Sequence[str]:
-    return ["G123", "G123.2", "G1", "M123.2"]
-
-
-@pytest.fixture
-def parser(gcodes: Sequence[str]) -> Parser:
-    return Parser(gcodes)
+def parser() -> Parser:
+    return Parser()
 
 
 @pytest.mark.parametrize(
     argnames=["line", "expected"],
     argvalues=[
         ["", []],
-        ["G2", []],
-        ["G13", []],
-        ["M123", []],
+        ["G2", [
+            Command(
+                gcode="G2",
+                body="",
+                params={}
+            )
+        ]],
+        ["   M123.32 with some trailing nonesense   ", [
+            Command(
+                gcode="M123.32",
+                body="with some trailing nonesense",
+                params={}
+            )
+        ]],
         ["G123 V2 X0", [
             Command(
                 gcode="G123",
                 body="V2 X0",
                 params={"V": 2.0, "X": 0.0})
+        ]],
+        ["dfuversionM12.3G2", [
+            Command(
+                gcode="dfu",
+                body="",
+                params={}),
+            Command(
+                gcode="version",
+                body="",
+                params={}),
+            Command(
+                gcode="M12.3",
+                body="",
+                params={}),
+            Command(
+                gcode="G2",
+                body="",
+                params={})
         ]],
         # Substring check. Don't confuse G1 with G123 or G123 with G123.2
         ["G123G123.2G1", [
@@ -56,3 +80,18 @@ def test_parse_command(parser: Parser, line: str, expected: Sequence[Command]) -
     result = list(parser.parse(line))
 
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    argnames=["line"],
+    argvalues=[
+        ["not a gcode G123"],
+        ["X123 G123"],
+        ["   DFU G123"],
+        ["no gcode"]
+    ]
+)
+def test_fail_parse(parser: Parser, line: str) -> None:
+    """It should raise an exception """
+    with pytest.raises(ValueError, match="Invalid content"):
+        list(parser.parse(line=line))

@@ -1,3 +1,8 @@
+"""An emulation of the opentrons magnetic module.
+
+The purpose is to provide a fake backend that responds to GCODE commands.
+"""
+
 import logging
 from typing import Optional
 from opentrons.drivers.mag_deck.driver import GCODES
@@ -25,7 +30,7 @@ class MagDeckEmulator(AbstractEmulator):
     def __init__(self) -> None:
         self.height: float = 0
         self.position: float = 0
-        self._parser = Parser(gcodes=list(GCODES.values()))
+        self._parser = Parser()
 
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""
