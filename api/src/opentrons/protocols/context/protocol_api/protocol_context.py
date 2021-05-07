@@ -1,5 +1,6 @@
 import logging
-from typing import Dict, Optional, Set, TYPE_CHECKING
+from typing import Dict, Optional, Set, List, TYPE_CHECKING
+from collections import OrderedDict
 
 from opentrons import types, API
 from opentrons.protocols.api_support.types import APIVersion
@@ -75,7 +76,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._instruments: InstrumentDict = {
             mount: None for mount in types.Mount
         }
-        self._modules: Set[LoadModuleResult] = set()
+        self._modules: List[LoadModuleResult] = []
 
         self._hw_manager = HardwareManager(hardware)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
@@ -214,14 +215,14 @@ class ProtocolContextImplementation(AbstractProtocol):
                                   geometry=geometry,
                                   module=hc_mod_instance)
 
-        self._modules.add(result)
+        self._modules.append(result)
         self._deck_layout[resolved_location] = geometry
         return result
 
     def get_loaded_modules(self) -> Dict[int, LoadModuleResult]:
         """Get a mapping of deck location to loaded module."""
-        return {int(str(module.geometry.parent)): module
-                for module in self._modules}
+        return OrderedDict({int(str(module.geometry.parent)): module
+                            for module in self._modules})
 
     def load_instrument(self,
                         instrument_name: str,

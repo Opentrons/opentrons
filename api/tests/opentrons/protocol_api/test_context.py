@@ -872,11 +872,22 @@ def test_loaded_labwares(ctx):
 
 def test_loaded_modules(ctx, monkeypatch):
     assert ctx.loaded_modules == {}
-    mod1 = ctx.load_module('tempdeck', 4)
-    mod1.load_labware('biorad_96_wellplate_200ul_pcr')
-    mod2 = ctx.load_module('thermocycler')
-    assert ctx.loaded_modules[4] == mod1
-    assert ctx.loaded_modules[7] == mod2
+    from collections import OrderedDict
+
+    mag1 = ctx.load_module('magnetic module gen2', 1)
+    mag2 = ctx.load_module('magnetic module', 2)
+    temp1 = ctx.load_module('temperature module', 3)
+    temp2 = ctx.load_module('temperature module', 4)
+
+    expected_load_order = OrderedDict(
+        {int(mod.geometry.parent): mod
+         for mod in [mag1, mag2, temp1, temp2]})
+
+    assert ctx.loaded_modules == expected_load_order
+    assert ctx.loaded_modules[1] == mag1
+    assert ctx.loaded_modules[2] == mag2
+    assert ctx.loaded_modules[3] == temp1
+    assert ctx.loaded_modules[4] == temp2
 
 
 def test_order_of_module_load(loop, hardware):

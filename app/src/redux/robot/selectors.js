@@ -315,10 +315,14 @@ export function getModulesBySlot(state: State): { [Slot]: SessionModule } {
 
 export const getModules: State => Array<SessionModule> = createSelector(
   getModulesBySlot,
-  // TODO (ka 2019-3-26): can't import getConfig due to circular dependency
-  state => state.config,
-  (modulesBySlot, config) =>
+  modulesBySlot =>
     Object.keys(modulesBySlot).map((slot: Slot) => modulesBySlot[slot])
+)
+
+export const getModulesByProtocolLoadOrder: State => Array<SessionModule> = createSelector(
+  getModules,
+  modules =>
+    modules.slice().sort((a, b) => a.protocolLoadOrder - b.protocolLoadOrder)
 )
 
 export const getModulesByModel: State => {

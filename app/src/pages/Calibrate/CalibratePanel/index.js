@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 
 import { SidePanel } from '@opentrons/components'
 import { selectors as robotSelectors } from '../../../redux/robot'
-import { useFeatureFlag } from '../../../redux/config'
 import { getProtocolLabwareList } from '../../../redux/calibration/labware'
 import { ProtocolModuleList } from '../../../organisms/ProtocolModuleList'
 import { PipetteList } from './PipetteList'
@@ -27,13 +26,12 @@ export function CalibratePanel(): React.Node {
     allLabware,
     lw => lw.type && lw.isTiprack
   )
-  const showModuleList = useFeatureFlag('moduleAugmentation')
 
   return (
     <SidePanel title={t('cal_panel_title')}>
       <div className={styles.setup_panel}>
         <PipetteList robotName={robotName} tipracks={tipracks} />
-        {showModuleList && <ProtocolModuleList />}
+        <ProtocolModuleList />
         <LabwareGroup
           robotName={robotName}
           tipracks={tipracks}
