@@ -29,6 +29,10 @@ class PlateTemperature(Temperature):
     hold: Optional[float]
 
 
-class LidStatus(str, Enum):
-    OPEN = "open"
-    CLOSED = "closed"
+class ThermocyclerLidStatus(str, Enum):
+    """Thermocycler lid status."""
+    UNKNOWN = 'unknown'
+    CLOSED = 'closed'
+    IN_BETWEEN = 'in_between'
+    OPEN = 'open'
+    MAX = 'max'
