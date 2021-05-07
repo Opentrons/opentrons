@@ -89,6 +89,7 @@ module.exports = {
         'jest/consistent-test-it': 'error',
         '@typescript-eslint/consistent-type-assertions': 'off',
         '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/explicit-function-return-type': 'off',
 
         // TODO(mc, 2021-01-29): fix these and remove warning overrides
         'jest/no-deprecated-functions': 'warn',

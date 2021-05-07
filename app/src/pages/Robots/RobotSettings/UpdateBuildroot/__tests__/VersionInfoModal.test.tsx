@@ -73,10 +73,10 @@ describe('VersionInfoModal', () => {
     expect(primaryButton.text()).toMatch(/view robot update/i)
 
     expect(handleClose).not.toHaveBeenCalled()
-    closeButton.invoke('onClick')!({} as React.MouseEvent)
+    closeButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleClose).toHaveBeenCalled()
     expect(handleProceed).not.toHaveBeenCalled()
-    primaryButton.invoke('onClick')!({} as React.MouseEvent)
+    primaryButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleProceed).toHaveBeenCalled()
   })
 
@@ -103,10 +103,10 @@ describe('VersionInfoModal', () => {
     expect(primaryButton.text()).toMatch(/downgrade/i)
 
     expect(handleClose).not.toHaveBeenCalled()
-    closeButton.invoke('onClick')!({} as React.MouseEvent)
+    closeButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleClose).toHaveBeenCalled()
     expect(handleProceed).not.toHaveBeenCalled()
-    primaryButton.invoke('onClick')!({} as React.MouseEvent)
+    primaryButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleProceed).toHaveBeenCalled()
   })
 
@@ -130,10 +130,10 @@ describe('VersionInfoModal', () => {
     expect(primaryButton.text()).toMatch(/reinstall/i)
 
     expect(handleClose).not.toHaveBeenCalled()
-    closeButton.invoke('onClick')!({} as React.MouseEvent)
+    closeButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleClose).toHaveBeenCalled()
     expect(handleProceed).not.toHaveBeenCalled()
-    primaryButton.invoke('onClick')!({} as React.MouseEvent)
+    primaryButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleProceed).toHaveBeenCalled()
   })
 
@@ -164,7 +164,7 @@ describe('VersionInfoModal', () => {
 
       expect(wrapper.exists(UpdateAppModal)).toBe(false)
 
-      viewUpdateButton.invoke('onClick')!({} as React.MouseEvent)
+      viewUpdateButton.invoke('onClick')?.({} as React.MouseEvent)
 
       expect(wrapper.find(Portal).exists(UpdateAppModal)).toBe(true)
     })
@@ -174,7 +174,7 @@ describe('VersionInfoModal', () => {
       const skipAppUpdate = wrapper.find(SkipAppUpdateMessage)
 
       expect(handleProceed).not.toHaveBeenCalled()
-      skipAppUpdate.invoke('onClick')!({} as React.MouseEvent)
+      skipAppUpdate.invoke('onClick')?.({} as React.MouseEvent)
       expect(handleProceed).toHaveBeenCalled()
     })
 
@@ -185,7 +185,7 @@ describe('VersionInfoModal', () => {
         .find('button')
         .filterWhere(b => /view app update/i.test(b.text()))
 
-      viewUpdateButton.invoke('onClick')!({} as React.MouseEvent)
+      viewUpdateButton.invoke('onClick')?.({} as React.MouseEvent)
 
       expect(handleClose).not.toHaveBeenCalled()
 

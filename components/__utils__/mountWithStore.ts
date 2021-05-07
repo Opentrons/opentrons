@@ -7,12 +7,12 @@ import type { ReactWrapper } from 'enzyme'
 
 export interface MockStore<State, Action> {
   getState: jest.MockedFunction<() => State>
-  subscribe: jest.MockedFunction<([]) => void>
+  subscribe: jest.MockedFunction<(args: []) => void>
   dispatch: jest.MockedFunction<(...actions: Action[]) => Action>
 }
 
-export interface WrapperWithStore<Element, State, Action> {
-  wrapper: ReactWrapper<Element>
+export interface WrapperWithStore<Props, State = {}, Action = {}> {
+  wrapper: ReactWrapper<Props>
   store: MockStore<State, Action>
   refresh: (nextState?: State) => void
 }
@@ -22,10 +22,10 @@ export interface MountWithStoreOptions<State> {
   [key: string]: unknown
 }
 
-export function mountWithStore<Element, State, Action>(
-  node: JSX.Element,
+export function mountWithStore<Props, State = {}, Action = {}>(
+  node: React.ReactElement<Props>,
   options?: MountWithStoreOptions<State>
-): WrapperWithStore<Element, State, Action> {
+): WrapperWithStore<Props, State, Action> {
   const initialState = options?.initialState ?? ({} as State)
 
   const store: MockStore<State, Action> = {
@@ -34,7 +34,7 @@ export function mountWithStore<Element, State, Action>(
     dispatch: jest.fn(),
   }
 
-  const wrapper = mount(node, {
+  const wrapper = mount<Props>(node, {
     wrappingComponent: Provider,
     wrappingComponentProps: { store },
   })

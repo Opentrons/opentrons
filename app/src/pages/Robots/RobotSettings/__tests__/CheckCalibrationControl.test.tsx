@@ -77,11 +77,11 @@ describe('CheckCalibrationControl', () => {
 
   it('button launches new check calibration health after confirm', () => {
     const { wrapper, store } = render()
-    getCalCheckButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
+    getCalCheckButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     const calBlockButton = wrapper.find(PrimaryBtn)
-    calBlockButton.invoke('onClick')!({} as React.MouseEvent)
+    calBlockButton.invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(store.dispatch).toHaveBeenCalledWith({

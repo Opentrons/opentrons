@@ -185,7 +185,7 @@ describe('useCalibratePipetteOffset hook', () => {
 
     wrapper
       .find('button[title="Return tip to tip rack and exit"]')
-      .invoke('onClick')!({} as React.MouseEvent)
+      .invoke('onClick')?.({} as React.MouseEvent)
     wrapper.setProps({})
     expect(store.dispatch).toHaveBeenCalledWith({
       ...Sessions.deleteSession(robotName, seshId),

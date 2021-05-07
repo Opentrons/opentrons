@@ -51,7 +51,7 @@ describe('OpenJupyterControl component', () => {
   it('should send an analytics event on link click', () => {
     const { wrapper } = render()
 
-    wrapper.find('a[href="http://localhost:48888"]').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('a[href="http://localhost:48888"]').invoke('onClick')?.({} as React.MouseEvent)
 
     expect(trackEvent).toHaveBeenCalledWith({
       name: 'jupyterOpen',

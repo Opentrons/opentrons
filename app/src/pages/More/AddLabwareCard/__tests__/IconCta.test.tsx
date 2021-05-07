@@ -41,7 +41,7 @@ describe('IconCta', () => {
 
   it('is clickable', () => {
     expect(mockHandleClick).toHaveBeenCalledTimes(0)
-    wrapper.find('button').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     expect(mockHandleClick).toHaveBeenCalledTimes(1)
   })
 })

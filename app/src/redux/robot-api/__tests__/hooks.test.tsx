@@ -37,7 +37,7 @@ describe('useDispatchApiRequest', () => {
     const { wrapper, store } = render()
     expect(store.dispatch).toHaveBeenCalledTimes(0)
 
-    wrapper.find('button').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(store.dispatch).toHaveBeenCalledWith({
@@ -48,7 +48,7 @@ describe('useDispatchApiRequest', () => {
 
   it('adds requestId to requestIds list', () => {
     const { wrapper } = render()
-    wrapper.find('button').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(wrapper.text()).toEqual('mockId_0')
@@ -56,9 +56,9 @@ describe('useDispatchApiRequest', () => {
 
   it('can dispatch multiple requests', () => {
     const { wrapper, store } = render()
-    wrapper.find('button').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
-    wrapper.find('button').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(store.dispatch).toHaveBeenCalledTimes(2)
@@ -106,7 +106,7 @@ describe('useDispatchApiRequests', () => {
         },
       },
     })
-    wrapper.find('button').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(store.dispatch).toHaveBeenCalledTimes(1)
@@ -126,7 +126,7 @@ describe('useDispatchApiRequests', () => {
         },
       },
     })
-    wrapper.find('button').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(store.dispatch).toHaveBeenCalledTimes(2)
@@ -151,7 +151,7 @@ describe('useDispatchApiRequests', () => {
         mockId_1: { status: PENDING },
       },
     })
-    wrapper.find('button').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(store.dispatch).toHaveBeenCalledTimes(2)

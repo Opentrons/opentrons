@@ -136,7 +136,7 @@ describe('CalibrateTipLength', () => {
     const wrapper = render()
 
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
-    act(() => getExitButton(wrapper).invoke('onClick')!({} as React.MouseEvent))
+    act(() => getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent))
     wrapper.update()
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
@@ -161,7 +161,7 @@ describe('CalibrateTipLength', () => {
       },
     }
     const wrapper = render({ isJogging: false, session })
-    wrapper.find('button[title="forward"]').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('button[title="forward"]').invoke('onClick')?.({} as React.MouseEvent)
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,
@@ -180,7 +180,7 @@ describe('CalibrateTipLength', () => {
       },
     }
     const wrapper = render({ isJogging: true, session })
-    wrapper.find('button[title="forward"]').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('button[title="forward"]').invoke('onClick')?.({} as React.MouseEvent)
     expect(dispatchRequests).not.toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,

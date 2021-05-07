@@ -80,7 +80,7 @@ describe('SaveZPoint', () => {
       down: [0, 0, -0.1],
     }
     jogDirections.forEach(direction => {
-      getJogButton(wrapper, direction).invoke('onClick')!({} as React.MouseEvent)
+      getJogButton(wrapper, direction).invoke('onClick')?.({} as React.MouseEvent)
       wrapper.update()
 
       expect(mockSendCommands).toHaveBeenCalledWith({
@@ -115,7 +115,7 @@ describe('SaveZPoint', () => {
       .find('button[children="Reveal XY jog controls to move across deck"]')
       .invoke('onClick')({ preventDefault: () => {} })
     jogDirections.forEach(direction => {
-      getJogButton(wrapper, direction).invoke('onClick')!({} as React.MouseEvent)
+      getJogButton(wrapper, direction).invoke('onClick')?.({} as React.MouseEvent)
 
       expect(mockSendCommands).toHaveBeenCalledWith({
         command: Sessions.deckCalCommands.JOG,
@@ -135,7 +135,7 @@ describe('SaveZPoint', () => {
   it('sends save offset command when primary button is clicked', () => {
     const wrapper = render()
 
-    getSaveButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
+    getSaveButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockSendCommands).toHaveBeenCalledWith(
@@ -187,7 +187,7 @@ describe('SaveZPoint', () => {
 
   it('renders the confirm crash modal when invoked', () => {
     const wrapper = render()
-    wrapper.find('a[children="Start over"]').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('a[children="Start over"]').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
     expect(wrapper.find('ConfirmCrashRecoveryModal').exists()).toBe(true)
   })

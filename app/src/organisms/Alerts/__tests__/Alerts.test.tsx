@@ -34,8 +34,8 @@ const getActiveAlerts = AppAlerts.getActiveAlerts as jest.MockedFunction<typeof 
 const MOCK_STATE: State = ({ mockState: true } as any)
 
 describe('app-wide Alerts component', () => {
-  const render = (): ReturnType<typeof mountWithStore> => {
-    return mountWithStore(<Alerts />, { initialState: MOCK_STATE })
+  const render = () => {
+    return mountWithStore<React.ComponentProps<typeof Alerts>>(<Alerts />, { initialState: MOCK_STATE })
   }
 
   const stubActiveAlerts = (alertIds: AlertId[]): void => {
@@ -90,7 +90,7 @@ describe('app-wide Alerts component', () => {
     refresh()
     expect(wrapper.exists(UpdateAppModal)).toBe(true)
 
-    wrapper.find(UpdateAppModal).invoke('dismissAlert')(true)
+    wrapper.find(UpdateAppModal).invoke('dismissAlert')?.(true)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       AppAlerts.alertDismissed(AppAlerts.ALERT_APP_UPDATE_AVAILABLE, true)

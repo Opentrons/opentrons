@@ -51,7 +51,7 @@ describe('TipConfirmation', () => {
   it('clicking invalidate tip send invalidate tip command', () => {
     const wrapper = render()
 
-    getInvalidateTipButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
+    getInvalidateTipButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: Sessions.sharedCalCommands.INVALIDATE_TIP,
@@ -62,7 +62,7 @@ describe('TipConfirmation', () => {
       sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
     })
     expect(wrapper.text()).toContain('Yes, move to slot 5')
-    getConfirmTipButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
+    getConfirmTipButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockSendCommands).toHaveBeenCalledWith({
@@ -74,7 +74,7 @@ describe('TipConfirmation', () => {
       sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
     })
     expect(wrapper.text()).toContain('Yes, move to slot 5')
-    getConfirmTipButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
+    getConfirmTipButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockSendCommands).toHaveBeenCalledWith({
@@ -86,7 +86,7 @@ describe('TipConfirmation', () => {
       sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
     })
     expect(wrapper.text()).toContain('Yes, move to measure tip length')
-    getConfirmTipButton(wrapper).invoke('onClick')!({} as React.MouseEvent)
+    getConfirmTipButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockSendCommands).toHaveBeenCalledWith({

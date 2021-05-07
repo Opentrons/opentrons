@@ -5,6 +5,8 @@
     "noEmit": true
   },
   "include": [
+    "app/src",
+    "app/typings",
     "app-shell/src",
     "app-shell/typings",
     "components/src",

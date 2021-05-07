@@ -51,7 +51,7 @@ describe('U2EDriverOutdatedAlert', () => {
     const wrapper = render()
     const link = wrapper.find('Link[to="/more/network-and-system"]')
 
-    link.invoke('onClick')!({} as React.MouseEvent)
+    link.invoke('onClick')?.({} as React.MouseEvent)
 
     expect(link.prop('children')).toContain('view adapter info')
     expect(dismissAlert).toHaveBeenCalledWith(false)
@@ -65,7 +65,7 @@ describe('U2EDriverOutdatedAlert', () => {
     const wrapper = render()
     const link = wrapper.find(`a[href="${EXPECTED_DOWNLOAD_URL}"]`)
 
-    link.invoke('onClick')!({} as React.MouseEvent)
+    link.invoke('onClick')?.({} as React.MouseEvent)
 
     expect(link.prop('children')).toContain('get update')
     expect(dismissAlert).toHaveBeenCalledWith(false)
@@ -83,7 +83,7 @@ describe('U2EDriverOutdatedAlert', () => {
       checkbox.simulate('change')
     })
     wrapper.update()
-    wrapper.find('Link[to="/more/network-and-system"]').invoke('onClick')!({} as React.MouseEvent)
+    wrapper.find('Link[to="/more/network-and-system"]').invoke('onClick')?.({} as React.MouseEvent)
 
     expect(dismissAlert).toHaveBeenCalledWith(true)
     expect(trackEvent).toHaveBeenCalledWith({

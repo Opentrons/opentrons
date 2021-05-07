@@ -178,7 +178,7 @@ describe('ResultsSummary', () => {
 
   it('exits when button is clicked', () => {
     const wrapper = render()
-    act(() => getExitButton(wrapper).invoke('onClick')!({} as React.MouseEvent))
+    act(() => getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent))
     wrapper.update()
 
     expect(mockDeleteSession).toHaveBeenCalled()
@@ -186,7 +186,7 @@ describe('ResultsSummary', () => {
 
   it('saves the calibration report when the button is clicked', () => {
     const wrapper = render()
-    act(() => getSaveLink(wrapper).invoke('onClick')!({} as React.MouseEvent))
+    act(() => getSaveLink(wrapper).invoke('onClick')?.({} as React.MouseEvent))
     wrapper.update()
     expect(mockSaveAs).toHaveBeenCalled()
   })

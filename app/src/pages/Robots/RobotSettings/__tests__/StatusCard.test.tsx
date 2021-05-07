@@ -49,7 +49,7 @@ describe('RobotSettings StatusCard', () => {
     const { wrapper, store } = render()
     const button = wrapper.find(SecondaryBtn)
 
-    button.invoke('onClick')!({} as React.MouseEvent)
+    button.invoke('onClick')?.({} as React.MouseEvent)
     expect(store.dispatch).toHaveBeenCalledWith(
       RobotActions.connect(Fixtures.mockConnectableRobot.name)
     )
@@ -66,7 +66,7 @@ describe('RobotSettings StatusCard', () => {
     const { wrapper, store } = render(Fixtures.mockConnectedRobot)
     const button = wrapper.find(SecondaryBtn)
 
-    button.invoke('onClick')!({} as React.MouseEvent)
+    button.invoke('onClick')?.({} as React.MouseEvent)
     expect(store.dispatch).toHaveBeenCalledWith(RobotActions.disconnect())
   })
 
