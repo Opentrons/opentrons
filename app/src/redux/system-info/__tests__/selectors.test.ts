@@ -1,4 +1,3 @@
-
 import * as Fixtures from '../__fixtures__'
 import * as Selectors from '../selectors'
 import * as Utils from '../utils'
@@ -14,7 +13,7 @@ describe('robot controls selectors', () => {
   it('should return null by default with getU2EAdapterDevice', () => {
     const state: State = {
       systemInfo: { usbDevices: [], networkInterfaces: [] },
-    } as Partial<State>
+    } as any
 
     expect(Selectors.getU2EAdapterDevice(state)).toBe(null)
   })
@@ -25,7 +24,7 @@ describe('robot controls selectors', () => {
         usbDevices: [Fixtures.mockUsbDevice, Fixtures.mockRealtekDevice],
         networkInterfaces: [],
       },
-    } as Partial<State>
+    } as any
 
     expect(Selectors.getU2EAdapterDevice(state)).toBe(
       Fixtures.mockRealtekDevice
@@ -39,7 +38,7 @@ describe('robot controls selectors', () => {
           usbDevices: [Fixtures.mockUsbDevice, Fixtures.mockRealtekDevice],
           networkInterfaces: [],
         },
-      } as Partial<State>
+      } as any
 
       expect(Selectors.getU2EWindowsDriverStatus(state)).toBe(
         Constants.NOT_APPLICABLE
@@ -63,7 +62,7 @@ describe('robot controls selectors', () => {
           ],
           networkInterfaces: [],
         },
-      } as Partial<State>
+      } as any
 
       expect(Selectors.getU2EWindowsDriverStatus(state)).toBe(
         Constants.OUTDATED
@@ -75,7 +74,7 @@ describe('robot controls selectors', () => {
     it('should return empty dict by default', () => {
       const state: State = {
         systemInfo: { usbDevices: [], networkInterfaces: [] },
-      } as Partial<State>
+      } as any
 
       expect(Selectors.getU2EInterfacesMap(state)).toEqual({})
     })
@@ -86,7 +85,7 @@ describe('robot controls selectors', () => {
           usbDevices: [Fixtures.mockRealtekDevice],
           networkInterfaces: [Fixtures.mockNetworkInterface],
         },
-      } as Partial<State>
+      } as any
 
       expect(Selectors.getU2EInterfacesMap(state)).toEqual({
         [Fixtures.mockRealtekDevice.serialNumber]: [],
@@ -106,7 +105,7 @@ describe('robot controls selectors', () => {
 
       const state: State = {
         systemInfo: { usbDevices: [adapter], networkInterfaces: [iface] },
-      } as Partial<State>
+      } as any
 
       expect(Selectors.getU2EInterfacesMap(state)).toEqual({
         [adapter.serialNumber]: [iface],
@@ -149,7 +148,7 @@ describe('robot controls selectors', () => {
             iface2v4,
           ],
         },
-      } as Partial<State>
+      } as any
 
       expect(Selectors.getU2EInterfacesMap(state)).toEqual({
         [adapter1.serialNumber]: [iface1v4, iface1v6],
@@ -165,7 +164,7 @@ describe('robot controls selectors', () => {
           usbDevices: [Fixtures.mockUsbDevice],
           networkInterfaces: [],
         },
-      } as Partial<State>
+      } as any
 
       expect(Selectors.getU2EDeviceAnalyticsProps(state)).toBe(null)
     })
@@ -176,7 +175,7 @@ describe('robot controls selectors', () => {
           usbDevices: [Fixtures.mockRealtekDevice],
           networkInterfaces: [],
         },
-      } as Partial<State>
+      } as any
 
       expect(Selectors.getU2EDeviceAnalyticsProps(state)).toEqual({
         'U2E Vendor ID': Fixtures.mockRealtekDevice.vendorId,
@@ -194,7 +193,7 @@ describe('robot controls selectors', () => {
           usbDevices: [Fixtures.mockWindowsRealtekDevice],
           networkInterfaces: [],
         },
-      } as Partial<State>
+      } as any
 
       expect(Selectors.getU2EDeviceAnalyticsProps(state)).toMatchObject({
         'U2E Windows Driver Version':
@@ -222,7 +221,7 @@ describe('robot controls selectors', () => {
           usbDevices: [adapter],
           networkInterfaces: [ifaceV6, ifaceV4],
         },
-      } as Partial<State>
+      } as any
 
       expect(Selectors.getU2EDeviceAnalyticsProps(state)).toMatchObject({
         'U2E IPv4 Address': ifaceV4.address,

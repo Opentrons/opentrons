@@ -5,6 +5,9 @@ import * as Actions from '../../actions'
 import * as Selectors from '../../selectors'
 import { robotSettingsEpic } from '..'
 
+import type { Observable } from 'rxjs'
+import type { State } from '../../../types'
+
 jest.mock('../../../robot-admin/selectors')
 jest.mock('../../selectors')
 
@@ -38,7 +41,7 @@ describe('clearRestartPathEpic', () => {
 
     testScheduler.run(({ hot, cold, expectObservable }) => {
       const action$ = cold('--')
-      const state$ = hot('-a', { a: {} })
+      const state$: Observable<State> = hot('-a', { a: {} })
       const output$ = robotSettingsEpic(action$, state$)
 
       expectObservable(output$).toBe('-(ab)', {

@@ -1,4 +1,3 @@
-
 import {
   setupEpicTestMocks,
   runEpicTest,
@@ -6,6 +5,9 @@ import {
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { tipLengthCalibrationsEpic } from '..'
+
+import type { Observable } from 'rxjs'
+import type { State } from '../../../../types'
 
 const makeTriggerActionAllCalibrations = robotName =>
   Actions.fetchTipLengthCalibrations(robotName)
@@ -23,7 +25,7 @@ describe('fetch pipette offset calibration epics', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = tipLengthCalibrationsEpic(action$, state$)
 
       expectObservable(output$)
@@ -44,7 +46,7 @@ describe('fetch pipette offset calibration epics', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = tipLengthCalibrationsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -68,7 +70,7 @@ describe('fetch pipette offset calibration epics', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = tipLengthCalibrationsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

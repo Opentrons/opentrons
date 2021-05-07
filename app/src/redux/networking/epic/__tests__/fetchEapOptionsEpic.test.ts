@@ -3,7 +3,11 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { networkingEpic } from '..'
 
-const makeTriggerAction = robotName => Actions.fetchEapOptions(robotName)
+import type { Observable } from 'rxjs'
+import type { State } from '../../../types'
+
+const makeTriggerAction = (robotName: string) =>
+  Actions.fetchEapOptions(robotName)
 
 describe('networking fetch eap option epic', () => {
   afterEach(() => {
@@ -18,7 +22,7 @@ describe('networking fetch eap option epic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$)
@@ -39,7 +43,7 @@ describe('networking fetch eap option epic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -60,7 +64,7 @@ describe('networking fetch eap option epic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

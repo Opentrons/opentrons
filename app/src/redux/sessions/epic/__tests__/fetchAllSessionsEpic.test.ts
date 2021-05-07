@@ -5,7 +5,11 @@ import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
 import { mockRobot } from '../../../robot-api/__fixtures__'
 
-const makeTriggerAction = robotName => Actions.fetchAllSessions(robotName)
+import type { Observable } from 'rxjs'
+import type { State } from '../../../types'
+
+const makeTriggerAction = (robotName: string) =>
+  Actions.fetchAllSessions(robotName)
 
 describe('fetchAllSessionsEpic', () => {
   afterEach(() => {
@@ -25,7 +29,7 @@ describe('fetchAllSessionsEpic', () => {
 
     runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$)
@@ -46,7 +50,7 @@ describe('fetchAllSessionsEpic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -67,7 +71,7 @@ describe('fetchAllSessionsEpic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

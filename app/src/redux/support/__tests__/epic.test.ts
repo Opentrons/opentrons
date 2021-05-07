@@ -58,14 +58,14 @@ describe('support profile epic', () => {
       const action$ = hot('-a', {
         a: configInitialized(MOCK_PROFILE_STATE.config),
       })
-      const state$ = hot('--')
+      const state$: Observable<State> = hot('--')
       const result$ = supportEpic(action$, state$)
 
       expectObservable(result$, '--')
       flush()
 
       expect(initializeProfile).toHaveBeenCalledWith(
-        MOCK_PROFILE_STATE.config.support
+        MOCK_PROFILE_STATE.config?.support
       )
     })
   })
@@ -73,7 +73,7 @@ describe('support profile epic', () => {
   it('should do nothing with actions that do not map to a profile update', () => {
     testScheduler.run(({ hot, expectObservable, flush }) => {
       const action$ = hot('-a', { a: MOCK_ACTION })
-      const state$ = hot('s-', { s: MOCK_PROFILE_STATE })
+      const state$: Observable<State> = hot('s-', { s: MOCK_PROFILE_STATE })
       const result$ = supportEpic(action$, state$)
 
       expectObservable(result$, '--')
@@ -92,7 +92,7 @@ describe('support profile epic', () => {
 
     testScheduler.run(({ hot, expectObservable, flush }) => {
       const action$ = hot('-a', { a: MOCK_ACTION })
-      const state$ = hot('s-', { s: MOCK_PROFILE_STATE })
+      const state$: Observable<State> = hot('s-', { s: MOCK_PROFILE_STATE })
       const result$ = supportEpic(action$, state$)
 
       expectObservable(result$)
@@ -121,7 +121,7 @@ describe('support event epic', () => {
   it('should do nothing with actions that do not map to an event', () => {
     testScheduler.run(({ hot, expectObservable, flush }) => {
       const action$ = hot('-a', { a: MOCK_ACTION })
-      const state$ = hot('s-', { s: MOCK_EVENT_STATE })
+      const state$: Observable<State> = hot('s-', { s: MOCK_EVENT_STATE })
       const result$ = supportEpic(action$, state$ as Observable<State>)
 
       expectObservable(result$, '--')
@@ -144,7 +144,7 @@ describe('support event epic', () => {
 
     testScheduler.run(({ hot, expectObservable, flush }) => {
       const action$ = hot('-a', { a: MOCK_ACTION })
-      const state$ = hot('s-', { s: MOCK_PROFILE_STATE })
+      const state$: Observable<State> = hot('s-', { s: MOCK_PROFILE_STATE })
       const result$ = supportEpic(action$, state$)
 
       expectObservable(result$)

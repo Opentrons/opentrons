@@ -4,7 +4,10 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
 
-const makeTriggerAction = robotName =>
+import type { Observable } from 'rxjs'
+import type { State } from '../../../types'
+
+const makeTriggerAction = (robotName: string) =>
   Actions.createSession(robotName, 'calibrationCheck')
 
 describe('createSessionEpic', () => {
@@ -31,7 +34,7 @@ describe('createSessionEpic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('a-a', { a: mocks.state })
+      const state$: Observable<State> = hot('a-a', { a: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$)
@@ -52,7 +55,7 @@ describe('createSessionEpic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -73,7 +76,7 @@ describe('createSessionEpic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

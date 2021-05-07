@@ -11,11 +11,6 @@ import { robotSettingsEpic } from '..'
 
 import type { Observable } from 'rxjs'
 import type { State } from '../../../types'
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-  RobotApiResponse,
-} from '../../../robot-api/types'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')
@@ -64,7 +59,7 @@ describe('fetchSettingsEpic', () => {
       )
 
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: mockState })
+      const state$: Observable<State> = hot('a-a', { a: mockState })
       const output$ = robotSettingsEpic(action$, state$)
 
       expectObservable(output$)
@@ -85,7 +80,7 @@ describe('fetchSettingsEpic', () => {
       )
 
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
+      const state$: Observable<State> = hot('a-a', { a: {} })
       const output$ = robotSettingsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -106,7 +101,7 @@ describe('fetchSettingsEpic', () => {
       )
 
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
+      const state$: Observable<State> = hot('a-a', { a: {} })
       const output$ = robotSettingsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

@@ -5,7 +5,10 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { networkingEpic } from '..'
 
-const makeTriggerAction = robotName =>
+import type { Observable } from 'rxjs'
+import type { State } from '../../../types'
+
+const makeTriggerAction = (robotName: string) =>
   Actions.postWifiConfigure(robotName, {
     ssid: 'network-name',
     psk: 'network-password',
@@ -24,7 +27,7 @@ describe('networking wifiConfigureEpic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$)
@@ -46,7 +49,7 @@ describe('networking wifiConfigureEpic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -67,7 +70,7 @@ describe('networking wifiConfigureEpic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -87,7 +90,7 @@ describe('networking wifiConfigureEpic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--(ab)', {

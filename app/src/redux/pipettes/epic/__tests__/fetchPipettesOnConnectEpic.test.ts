@@ -7,6 +7,9 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { pipettesEpic } from '../../epic'
 
+import type { Observable } from 'rxjs'
+import type { State } from '../../../types'
+
 jest.mock('../../../discovery/selectors')
 jest.mock('../../../robot/selectors')
 
@@ -46,7 +49,7 @@ describe('fetchPipettesOnConnectEpic', () => {
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a--', { a: mockState })
+      const state$: Observable<State> = hot('a--', { a: mockState })
       const output$ = pipettesEpic(action$, state$)
 
       expectObservable(output$).toBe('---')
@@ -63,7 +66,7 @@ describe('fetchPipettesOnConnectEpic', () => {
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a--', { a: mockState })
+      const state$: Observable<State> = hot('a--', { a: mockState })
       const output$ = pipettesEpic(action$, state$)
 
       expectObservable(output$).toBe('--(ab)', {

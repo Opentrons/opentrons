@@ -6,11 +6,13 @@ import * as robotAdminSelectors from '../../selectors'
 import * as discoverySelectors from '../../../discovery/selectors'
 
 import { trackRestartsEpic } from '../trackRestartsEpic'
+
 import type {
   ConnectivityStatus,
   DiscoveredRobot,
 } from '../../../discovery/types'
-import { ServerHealthResponse } from '@opentrons/discovery-client'
+import type { Observable } from 'rxjs'
+import type { State } from '../../../types'
 
 jest.mock('../../../discovery/selectors')
 jest.mock('../../selectors')
@@ -23,9 +25,7 @@ const getDiscoveredRobots = discoverySelectors.getDiscoveredRobots as jest.Mocke
 >
 describe('robotAdminEpic tracks restarting state', () => {
   beforeEach(() => {
-    // $FlowFixMe(mc, 2021-04-05): don't feel like typing this in Flow
     getNextRestartStatus.mockReturnValue(null)
-    // $FlowFixMe(mc, 2021-04-05): don't feel like typing this in Flow
     getDiscoveredRobots.mockReturnValue([])
   })
 
@@ -44,7 +44,7 @@ describe('robotAdminEpic tracks restarting state', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s--', { s: mocks.state })
+      const state$: Observable<State> = hot('s--', { s: mocks.state })
       const output$ = trackRestartsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -72,7 +72,7 @@ describe('robotAdminEpic tracks restarting state', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s--', { s: mocks.state })
+      const state$: Observable<State> = hot('s--', { s: mocks.state })
       const output$ = trackRestartsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -150,7 +150,7 @@ describe('robotAdminEpic tracks restarting state', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--')
-      const state$ = hot('-s', { s: mocks.state })
+      const state$: Observable<State> = hot('-s', { s: mocks.state })
       const output$ = trackRestartsEpic(action$, state$)
 
       expectObservable(output$).toBe('-(ab)', {

@@ -10,6 +10,9 @@ import {
 import { makeEvent } from '../make-event'
 import { analyticsEpic } from '../epic'
 
+import type { Observable } from 'rxjs'
+import type { State } from '../../types'
+
 jest.mock('../make-event')
 jest.mock('../mixpanel')
 
@@ -32,7 +35,7 @@ describe('analytics epics', () => {
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot('-a', { a: action })
-        const state$ = hot('--', {})
+        const state$: Observable<State> = hot('--', {})
         const output$ = analyticsEpic(action$, state$)
 
         expectObservable(output$).toBe('--')
@@ -54,7 +57,7 @@ describe('analytics epics', () => {
         makeEvent.mockReturnValueOnce([event])
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('s-', { s: state })
+        const state$: Observable<State> = hot('s-', { s: state })
         const output$ = analyticsEpic(action$, state$)
 
         expectObservable(output$).toBe('--')
@@ -71,7 +74,7 @@ describe('analytics epics', () => {
         makeEvent.mockReturnValueOnce([null])
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('s-', { s: state })
+        const state$: Observable<State> = hot('s-', { s: state })
         const output$ = analyticsEpic(action$, state$)
 
         expectObservable(output$).toBe('--')
@@ -88,7 +91,7 @@ describe('analytics epics', () => {
         makeEvent.mockReturnValueOnce([null])
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('s-', { s: state })
+        const state$: Observable<State> = hot('s-', { s: state })
         const output$ = analyticsEpic(action$, state$)
 
         expectObservable(output$).toBe('--')
@@ -105,7 +108,7 @@ describe('analytics epics', () => {
     it('sets opt-in', () => {
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot('----')
-        const state$ = hot('-a-b', { a: off, b: on })
+        const state$: Observable<State> = hot('-a-b', { a: off, b: on })
         const output$ = analyticsEpic(action$, state$)
 
         expectObservable(output$).toBe('----')
@@ -117,7 +120,7 @@ describe('analytics epics', () => {
     it('sets opt-out', () => {
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot('----')
-        const state$ = hot('-a-b', { a: on, b: off })
+        const state$: Observable<State> = hot('-a-b', { a: on, b: off })
         const output$ = analyticsEpic(action$, state$)
 
         expectObservable(output$).toBe('----')
@@ -129,7 +132,7 @@ describe('analytics epics', () => {
     it('noops on no change in status or if config not yet initialized', () => {
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot('----')
-        const state$ = hot('-a-b', { a: on, b: on })
+        const state$: Observable<State> = hot('-a-b', { a: on, b: on })
         const output$ = analyticsEpic(action$, state$)
 
         expectObservable(output$).toBe('----')
@@ -139,7 +142,7 @@ describe('analytics epics', () => {
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot('----')
-        const state$ = hot('-a-b', { a: off, b: off })
+        const state$: Observable<State> = hot('-a-b', { a: off, b: off })
         const output$ = analyticsEpic(action$, state$)
 
         expectObservable(output$).toBe('----')
@@ -149,7 +152,10 @@ describe('analytics epics', () => {
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot('----')
-        const state$ = hot('-a-b', { a: { config: null }, b: { config: null } })
+        const state$: Observable<State> = hot('-a-b', {
+          a: { config: null },
+          b: { config: null },
+        })
         const output$ = analyticsEpic(action$, state$)
 
         expectObservable(output$).toBe('----')
@@ -159,7 +165,10 @@ describe('analytics epics', () => {
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot('----')
-        const state$ = hot('-a-b', { a: { config: null }, b: on })
+        const state$: Observable<State> = hot('-a-b', {
+          a: { config: null },
+          b: on,
+        })
         const output$ = analyticsEpic(action$, state$)
 
         expectObservable(output$).toBe('----')

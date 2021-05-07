@@ -3,6 +3,9 @@ import { selectors as RobotSelectors } from '../../../../robot'
 import * as Actions from '../../actions'
 import { pipetteOffsetCalibrationsEpic } from '..'
 
+import type { Observable } from 'rxjs'
+import type { State } from '../../../../types'
+
 import * as SessionFixtures from '../../../../sessions/__fixtures__'
 import * as SessionTypes from '../../../../sessions/types'
 import * as SessionActions from '../../../../sessions/actions'
@@ -84,7 +87,7 @@ describe('fetchPipetteOffsetCalibrationsOnCalibrationEndEpic', () => {
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot('--a', { a: action })
-        const state$ = hot('s-s', { s: mockState })
+        const state$: Observable<State> = hot('s-s', { s: mockState })
         const output$ = pipetteOffsetCalibrationsEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
@@ -106,7 +109,7 @@ describe('fetchPipetteOffsetCalibrationsOnCalibrationEndEpic', () => {
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
         const action$ = hot('--a', { a: action })
-        const state$ = hot('s-s', { s: mockState })
+        const state$: Observable<State> = hot('s-s', { s: mockState })
         const output$ = pipetteOffsetCalibrationsEpic(action$, state$)
 
         expectObservable(output$).toBe('---')

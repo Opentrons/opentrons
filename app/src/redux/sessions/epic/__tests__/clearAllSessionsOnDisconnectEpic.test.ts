@@ -7,6 +7,9 @@ import { mockRobot } from '../../../robot-api/__fixtures__'
 import * as Actions from '../../actions'
 import { sessionsEpic } from '../../epic'
 
+import type { Observable } from 'rxjs'
+import type { State } from '../../../types'
+
 jest.mock('../../../discovery/selectors')
 jest.mock('../../../robot/selectors')
 
@@ -44,7 +47,7 @@ describe('clearAllSessionsOnDisconnectEpic', () => {
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a--', { a: mockState })
+      const state$: Observable<State> = hot('a--', { a: mockState })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -61,7 +64,7 @@ describe('clearAllSessionsOnDisconnectEpic', () => {
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a--', { a: mockState })
+      const state$: Observable<State> = hot('a--', { a: mockState })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

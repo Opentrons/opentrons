@@ -9,11 +9,7 @@ import * as Types from '../../types'
 import { pipettesEpic } from '../../epic'
 
 import type { Observable } from 'rxjs'
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-  RobotApiResponse,
-} from '../../../robot-api/types'
+import type { State } from '../../../types'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')
@@ -61,7 +57,7 @@ describe('updatePipetteSettingsEpic', () => {
         )
 
         const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: mockState })
+        const state$: Observable<State> = hot('a-a', { a: mockState })
         const output$ = pipettesEpic(action$, state$)
 
         expectObservable(output$)
@@ -86,7 +82,7 @@ describe('updatePipetteSettingsEpic', () => {
         )
 
         const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: {} })
+        const state$: Observable<State> = hot('a-a', { a: {} })
         const output$ = pipettesEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
@@ -107,7 +103,7 @@ describe('updatePipetteSettingsEpic', () => {
         )
 
         const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: {} })
+        const state$: Observable<State> = hot('a-a', { a: {} })
         const output$ = pipettesEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {

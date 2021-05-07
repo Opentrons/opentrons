@@ -8,6 +8,9 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { modulesEpic } from '../../epic'
 
+import type { Observable } from 'rxjs'
+import type { State } from '../../../types'
+
 jest.mock('../../../robot/selectors')
 
 const mockState = { state: true }
@@ -18,7 +21,7 @@ const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.M
 >
 
 describe('pollModulesWhileConnectedEpic', () => {
-  let testScheduler: any
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     testScheduler = new TestScheduler((actual, expected) => {
@@ -35,7 +38,7 @@ describe('pollModulesWhileConnectedEpic', () => {
       const action = RobotActions.connectResponse({ message: 'AH' })
 
       const action$ = hot('--a', { a: action })
-      const state$ = hot('--a', { a: mockState })
+      const state$: Observable<State> = hot('--a', { a: mockState })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('---')
@@ -53,7 +56,7 @@ describe('pollModulesWhileConnectedEpic', () => {
         .mockReturnValueOnce(null)
 
       const action$ = hot('a', { a: action })
-      const state$ = hot('a 15s a', { a: mockState })
+      const state$: Observable<State> = hot('a 15s a', { a: mockState })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('5s a 4999ms a 4999ms a', {

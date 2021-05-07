@@ -3,6 +3,9 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { fetchResetOptionsEpic } from '../fetchResetOptionsEpic'
 
+import type { Observable } from 'rxjs'
+import type { State } from '../../../types'
+
 describe('robotAdminEpic handles fetching "factory reset" options', () => {
   afterEach(() => {
     jest.resetAllMocks()
@@ -16,7 +19,7 @@ describe('robotAdminEpic handles fetching "factory reset" options', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = fetchResetOptionsEpic(action$, state$)
 
       expectObservable(output$)
@@ -37,7 +40,7 @@ describe('robotAdminEpic handles fetching "factory reset" options', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = fetchResetOptionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -58,7 +61,7 @@ describe('robotAdminEpic handles fetching "factory reset" options', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = fetchResetOptionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

@@ -5,7 +5,8 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
 
-import type { Action } from '../../../types'
+import type { Observable } from 'rxjs'
+import type { Action, State } from '../../../types'
 
 jest.mock('../../../robot-api/http')
 
@@ -56,7 +57,7 @@ describe('ensureSessionEpic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('a-a', { a: mocks.state })
+      const state$: Observable<State> = hot('a-a', { a: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$)
@@ -77,7 +78,7 @@ describe('ensureSessionEpic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -98,7 +99,7 @@ describe('ensureSessionEpic', () => {
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -124,7 +125,7 @@ describe('ensureSessionEpic', () => {
       )
 
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('a-a', { a: mocks.state })
+      const state$: Observable<State> = hot('a-a', { a: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$)
@@ -151,7 +152,7 @@ describe('ensureSessionEpic', () => {
       )
 
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
+      const state$: Observable<State> = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

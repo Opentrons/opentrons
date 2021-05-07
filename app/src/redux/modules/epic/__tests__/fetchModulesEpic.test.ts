@@ -9,11 +9,7 @@ import * as Types from '../../types'
 import { modulesEpic } from '../../epic'
 
 import type { Observable } from 'rxjs'
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-  RobotApiResponse,
-} from '../../../robot-api/types'
+import type { State } from '../../../types'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')
@@ -57,7 +53,7 @@ describe('fetchModulesEpic', () => {
       )
 
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: mockState })
+      const state$: Observable<State> = hot('a-a', { a: mockState })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$)
@@ -78,7 +74,7 @@ describe('fetchModulesEpic', () => {
       )
 
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
+      const state$: Observable<State> = hot('a-a', { a: {} })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -102,7 +98,7 @@ describe('fetchModulesEpic', () => {
       )
 
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
+      const state$: Observable<State> = hot('a-a', { a: {} })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -135,7 +131,7 @@ describe('fetchModulesEpic', () => {
       )
 
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
+      const state$: Observable<State> = hot('a-a', { a: {} })
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

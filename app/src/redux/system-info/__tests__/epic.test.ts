@@ -5,6 +5,7 @@ import * as Selectors from '../selectors'
 import { NOT_APPLICABLE, UP_TO_DATE, OUTDATED } from '../constants'
 import { systemInfoEpic } from '../epic'
 
+import type { Observable } from 'rxjs'
 import type { State } from '../../types'
 import type { DriverStatus } from '../types'
 
@@ -33,7 +34,7 @@ describe('system info epic', () => {
 
     testScheduler.run(({ hot, expectObservable }) => {
       const action$ = hot('----')
-      const state$ = hot('-s-s', { s: MOCK_STATE })
+      const state$: Observable<State> = hot('-s-s', { s: MOCK_STATE })
       const output$ = systemInfoEpic(action$, state$)
 
       expectObservable(output$).toBe(expectedMarbles, expectedValues)

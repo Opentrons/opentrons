@@ -10,6 +10,7 @@ import { remote as mockRemote } from '../remote'
 import { shellEpic } from '../epic'
 
 import type { State } from '../../types'
+import type { Observable } from 'rxjs'
 
 const { ipcRenderer: mockIpc } = mockRemote
 
@@ -77,7 +78,7 @@ describe('shell epics', () => {
 
     testScheduler.run(({ hot, expectObservable }) => {
       const action$ = hot('----')
-      const state$ = hot('-a-a-a', { a: mockState })
+      const state$: Observable<State> = hot('-a-a-a', { a: mockState })
       const output$ = shellEpic(action$, state$)
 
       // we only expect the alert to be triggered when state goes from null
@@ -96,7 +97,7 @@ describe('shell epics', () => {
 
     testScheduler.run(({ hot, expectObservable }) => {
       const action$ = hot('------')
-      const state$ = hot('-a-a-a', { a: mockState })
+      const state$: Observable<State> = hot('-a-a-a', { a: mockState })
       const output$ = shellEpic(action$, state$)
 
       // we only expect the alert to be triggered when state changes

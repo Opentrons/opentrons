@@ -11,6 +11,9 @@ import * as selectors from '../selectors'
 
 import { INITIAL_STATE } from '../reducer'
 
+import type { Observable } from 'rxjs'
+import type { State } from '../../types'
+
 jest.mock('../selectors')
 jest.mock('../../robot-api/http')
 
@@ -61,7 +64,7 @@ describe('buildroot update epics', () => {
         const action$ = hot('-a', {
           a: actions.startBuildrootUpdate(robot.name),
         })
-        const state$ = hot('a-', { a: state })
+        const state$: Observable<State> = hot('a-', { a: state })
         const output$ = epics.startUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
@@ -77,7 +80,7 @@ describe('buildroot update epics', () => {
         const action$ = hot('-a', {
           a: actions.startBuildrootUpdate(robot.name),
         })
-        const state$ = hot('a-', { a: state })
+        const state$: Observable<State> = hot('a-', { a: state })
         const output$ = epics.startUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
@@ -96,7 +99,7 @@ describe('buildroot update epics', () => {
         selectors.getBuildrootRobot.mockReturnValueOnce(balenaRobot)
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('a-', { a: state })
+        const state$: Observable<State> = hot('a-', { a: state })
         const output$ = epics.startUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
@@ -115,7 +118,7 @@ describe('buildroot update epics', () => {
         selectors.getBuildrootRobot.mockReturnValueOnce(balenaRobot)
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('a-', { a: state })
+        const state$: Observable<State> = hot('a-', { a: state })
         const output$ = epics.startUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
@@ -131,7 +134,7 @@ describe('buildroot update epics', () => {
         selectors.getBuildrootRobot.mockReturnValueOnce(robot)
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('a-', { a: state })
+        const state$: Observable<State> = hot('a-', { a: state })
         const output$ = epics.startUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
@@ -153,7 +156,7 @@ describe('buildroot update epics', () => {
         )
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('a-', { a: state })
+        const state$: Observable<State> = hot('a-', { a: state })
         const output$ = epics.createSessionEpic(action$, state$)
 
         expectObservable(output$).toBe('-s', {
@@ -185,7 +188,7 @@ describe('buildroot update epics', () => {
           )
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('a-', { a: state })
+        const state$: Observable<State> = hot('a-', { a: state })
         const output$ = epics.createSessionEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', { a: action })
@@ -206,7 +209,7 @@ describe('buildroot update epics', () => {
         )
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('a-', { a: state })
+        const state$: Observable<State> = hot('a-', { a: state })
         const output$ = epics.createSessionEpic(action$, state$)
 
         expectObservable(output$).toBe('-e', {
@@ -228,7 +231,7 @@ describe('buildroot update epics', () => {
           )
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('a-', { a: state })
+        const state$: Observable<State> = hot('a-', { a: state })
         const output$ = epics.createSessionEpic(action$, state$)
 
         expectObservable(output$).toBe('-e', {
@@ -249,7 +252,7 @@ describe('buildroot update epics', () => {
         step: 'premigrationRestart',
       })
 
-      const state$ = hot('-a', { a: state })
+      const state$: Observable<State> = hot('-a', { a: state })
       const output$ = epics.retryAfterPremigrationEpic(null, state$)
 
       expectObservable(output$).toBe('-a', {
@@ -279,7 +282,10 @@ describe('buildroot update epics', () => {
         )
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('-x 4s y 2s y #', { x: state, y: state })
+        const state$: Observable<State> = hot('-x 4s y 2s y #', {
+          x: state,
+          y: state,
+        })
         const output$ = epics.statusPollEpic(action$, state$)
         const { stage, message, progress } = Fixtures.mockStatusSuccess.body
         const expectedAction = actions.buildrootStatus(
@@ -314,7 +320,7 @@ describe('buildroot update epics', () => {
       selectors.getBuildrootSession.mockReturnValue(session)
 
       const action$ = null
-      const state$ = hot('-a', { a: state })
+      const state$: Observable<State> = hot('-a', { a: state })
       const output$ = epics.uploadFileEpic(action$, state$)
 
       expectObservable(output$).toBe('-a', {
@@ -345,7 +351,7 @@ describe('buildroot update epics', () => {
         )
 
         const action$ = hot('--')
-        const state$ = hot('-a', { a: state })
+        const state$: Observable<State> = hot('-a', { a: state })
         const output$ = epics.commitUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
@@ -370,7 +376,7 @@ describe('buildroot update epics', () => {
         )
 
         const action$ = hot('--')
-        const state$ = hot('-a', { a: state })
+        const state$: Observable<State> = hot('-a', { a: state })
         const output$ = epics.commitUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-ab', {
@@ -399,7 +405,7 @@ describe('buildroot update epics', () => {
         )
 
         const action$ = hot('--')
-        const state$ = hot('-a', { a: state })
+        const state$: Observable<State> = hot('-a', { a: state })
         const output$ = epics.restartAfterCommitEpic(action$, state$)
 
         expectObservable(output$).toBe('-a(bc)', {
@@ -426,7 +432,7 @@ describe('buildroot update epics', () => {
         )
 
         const action$ = hot('--')
-        const state$ = hot('-a', { a: state })
+        const state$: Observable<State> = hot('-a', { a: state })
         const output$ = epics.restartAfterCommitEpic(action$, state$)
 
         expectObservable(output$).toBe('-ab', {
@@ -443,7 +449,7 @@ describe('buildroot update epics', () => {
         selectors.getBuildrootRobotName.mockReturnValue(balenaRobot.name)
 
         const action$ = hot('-a', { a: { type: 'buildroot:USER_FILE_INFO' } })
-        const state$ = hot('a-', { a: state })
+        const state$: Observable<State> = hot('a-', { a: state })
         const output$ = epics.retryAfterUserFileInfoEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
@@ -466,7 +472,7 @@ describe('buildroot update epics', () => {
         selectors.getBuildrootSession.mockReturnValue(session)
 
         const action$ = null
-        const state$ = hot('-a', { a: state })
+        const state$: Observable<State> = hot('-a', { a: state })
         const output$ = epics.uploadFileEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {

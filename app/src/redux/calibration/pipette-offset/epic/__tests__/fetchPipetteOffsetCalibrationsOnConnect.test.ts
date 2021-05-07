@@ -4,6 +4,9 @@ import * as DiscoverySelectors from '../../../../discovery/selectors'
 import * as Actions from '../../actions'
 import { pipetteOffsetCalibrationsEpic } from '..'
 
+import type { Observable } from 'rxjs'
+import type { State } from '../../../../types'
+
 jest.mock('../../actions')
 jest.mock('../../../../robot/selectors')
 jest.mock('../../../../discovery/selectors')
@@ -44,7 +47,7 @@ describe('fetchPipetteOffsetCalibrationsOnConnectEpic', () => {
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a--', { a: mockState })
+      const state$: Observable<State> = hot('a--', { a: mockState })
       const output$ = pipetteOffsetCalibrationsEpic(action$, state$)
 
       expectObservable(output$).toBe('---')
@@ -61,7 +64,7 @@ describe('fetchPipetteOffsetCalibrationsOnConnectEpic', () => {
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       const action$ = hot('--a', { a: action })
-      const state$ = hot('a--', { a: mockState })
+      const state$: Observable<State> = hot('a--', { a: mockState })
       const output$ = pipetteOffsetCalibrationsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
