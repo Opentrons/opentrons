@@ -11,27 +11,21 @@ def test_pause_and_delay_separation():
     """
     pause_mgr = PauseManager(door_state=DoorState.CLOSED)
     assert pause_mgr.queue == []
-    assert not pause_mgr.should_pause
 
     pause_mgr.pause(PauseType.PAUSE)
     assert pause_mgr.queue == [PauseType.PAUSE]
-    assert pause_mgr.should_pause
 
     pause_mgr.pause(PauseType.DELAY)
     assert pause_mgr.queue == [PauseType.PAUSE, PauseType.DELAY]
-    assert pause_mgr.should_pause
 
     pause_mgr.resume(PauseType.PAUSE)
     assert pause_mgr.queue == [PauseType.DELAY]
-    assert pause_mgr.should_pause
 
     pause_mgr.resume(PauseType.PAUSE)
     assert pause_mgr.queue == [PauseType.DELAY]
-    assert pause_mgr.should_pause
 
     pause_mgr.resume(PauseType.DELAY)
     assert pause_mgr.queue == []
-    assert not pause_mgr.should_pause
 
 
 def test_door_pause_protocol(enable_door_safety_switch):
@@ -41,22 +35,17 @@ def test_door_pause_protocol(enable_door_safety_switch):
     """
     pause_mgr = PauseManager(door_state=DoorState.CLOSED)
     assert pause_mgr.queue == []
-    assert not pause_mgr.should_pause
 
     pause_mgr.set_door(door_state=DoorState.OPEN)
     pause_mgr.pause(PauseType.PAUSE)
     assert pause_mgr.queue == [PauseType.PAUSE]
-    assert pause_mgr.should_pause
 
     with pytest.raises(PauseResumeError):
         pause_mgr.resume(PauseType.PAUSE)
         assert pause_mgr.queue == [PauseType.PAUSE]
-        assert pause_mgr.should_pause
 
     pause_mgr.set_door(door_state=DoorState.CLOSED)
     assert pause_mgr.queue == [PauseType.PAUSE]
-    assert pause_mgr.should_pause
 
     pause_mgr.resume(PauseType.PAUSE)
     assert pause_mgr.queue == []
-    assert not pause_mgr.should_pause
