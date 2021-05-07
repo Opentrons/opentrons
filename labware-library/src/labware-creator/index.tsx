@@ -3,13 +3,13 @@ import assert from 'assert'
 import Ajv from 'ajv'
 import cx from 'classnames'
 import * as React from 'react'
-import { Formik } from 'formik'
+import { Formik, FormikErrors } from 'formik'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
-import { AlertModal, PrimaryButton } from '@opentrons/components'
+import { AlertModal, AlertItem, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
@@ -81,6 +81,10 @@ interface MakeAutofillOnChangeArgs {
 const PDF_URL =
   'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
 
+const FORM_LEVEL_ERRORS = 'FORM_LEVEL_ERRORS'
+const WELLS_OUT_OF_BOUNDS_X = 'WELLS_OUT_OF_BOUNDS_X'
+const WELLS_OUT_OF_BOUNDS_Y = 'WELLS_OUT_OF_BOUNDS_Y'
+
 const makeAutofillOnChange = ({
   autofills,
   values,
@@ -125,6 +129,97 @@ const displayAsTube = (values: LabwareFields): boolean =>
     values.aluminumBlockType === '96well' &&
     // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
     ['tubes', 'pcrTubeStrip'].includes(values.aluminumBlockChildType))
+
+// TODO IMMEDIATELY: factor out, test
+// TODO IMMEDIATELY: support rectangular wells: wellXDimension, wellYDimension rather than diameter!
+const getWellGridBoundingBox = (args: {
+  gridColumns: number
+  gridOffsetX: number
+  gridOffsetY: number
+  gridRows: number
+  gridSpacingX: number
+  gridSpacingY: number
+  wellDiameter: number
+}): {
+  topLeftCornerX: number
+  topLeftCornerY: number
+  bottomRightCornerX: number
+  bottomRightCornerY: number
+} => {
+  const {
+    gridColumns,
+    gridOffsetX,
+    gridOffsetY,
+    gridRows,
+    gridSpacingX,
+    gridSpacingY,
+    wellDiameter,
+  } = args
+  const r = wellDiameter / 2
+  const topLeftCornerX = gridOffsetX - r
+  const topLeftCornerY = gridOffsetY - r
+  const bottomRightCornerX =
+    topLeftCornerX + gridSpacingX * (gridColumns - 1) + wellDiameter
+  const bottomRightCornerY =
+    topLeftCornerY + gridSpacingY * (gridRows - 1) + wellDiameter
+  return {
+    topLeftCornerX,
+    topLeftCornerY,
+    bottomRightCornerX,
+    bottomRightCornerY,
+  }
+}
+
+// TODO IMMEDIATELY: factor out, test, and type this properly no `any`
+const formLevelValidation = (values: LabwareFields): FormikErrors<any> => {
+  // Form-level errors are nested in the FormikErrors object under a special key, FORM_LEVEL_ERRORS.
+  const formLevelErrors: Record<string, string> = {}
+
+  // TODO IMMEDIATELY: right now it's throwing an error if cast fails (even if it's fields we don't care about here)
+  // ^ How does the SVG viz's definition work when some fields are missing (eg brand/pipette might be)
+  const castValues = labwareFormSchema.cast(values)
+
+  // ==================
+  // TODO IMMEDIATELY: split the section below out into its own fn, eg getFormLevelFootprintErrors or something
+
+  // TODO IMMEDIATELY: this is only for circle. We need rectangle too! Rect uses wellXDimension, wellYDimension
+  // TODO IMMEDIATELY: we probably want a lot of small broken out fns,
+  // because for the viewport we want to know the bounding box x0/y0, x1/y1
+  const {
+    topLeftCornerX,
+    topLeftCornerY,
+    bottomRightCornerX,
+    bottomRightCornerY,
+  } = getWellGridBoundingBox(castValues)
+
+  const wellBoundsInsideFootprintX =
+    topLeftCornerX > 0 && bottomRightCornerX < castValues.footprintXDimension
+  const wellBoundsInsideFootprintY =
+    topLeftCornerY > 0 && bottomRightCornerY < castValues.footprintYDimension
+
+  // TODO IMMEDIATELY. Eg "tips" or "wells/tubes" maybe??
+  // Not sure of copy but I think there's an existing util for this we use
+  const labwareName = '--TODO--'
+
+  if (!wellBoundsInsideFootprintX) {
+    formLevelErrors[WELLS_OUT_OF_BOUNDS_X] =
+      `Grid of ${labwareName} is larger than labware footprint in the X dimension. ` +
+      `Please double-check well size, X Spacing, and X Offset.`
+  }
+  if (!wellBoundsInsideFootprintY) {
+    formLevelErrors[WELLS_OUT_OF_BOUNDS_Y] =
+      `Grid of ${labwareName} is larger than labware footprint in the Y dimension. ` +
+      `Please double-check well size, Y Spacing, and Y Offset.`
+  }
+
+  if (Object.keys(formLevelErrors).length > 0) {
+    return {
+      [FORM_LEVEL_ERRORS]: formLevelErrors,
+    }
+  } else {
+    return {}
+  }
+}
 
 export const LabwareCreator = (): JSX.Element => {
   const [
@@ -343,6 +438,7 @@ export const LabwareCreator = (): JSX.Element => {
         initialValues={lastUploaded || getDefaultFormState()}
         enableReinitialize
         validationSchema={labwareFormSchema}
+        validate={formLevelValidation}
         onSubmit={(values: LabwareFields) => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
             values
@@ -713,6 +809,16 @@ export const LabwareCreator = (): JSX.Element => {
                     </div>
                   </Section>
                   <Section label="Check your work">
+                    {typeof errors[FORM_LEVEL_ERRORS] === 'object' &&
+                      Object.keys(
+                        errors[FORM_LEVEL_ERRORS]
+                      ).map(formErrorKey => (
+                        <AlertItem
+                          type="error"
+                          title={errors[FORM_LEVEL_ERRORS][formErrorKey]}
+                          key={formErrorKey}
+                        />
+                      ))}
                     <div className={styles.preview_labware}>
                       <ConditionalLabwareRender values={values} />
                       <p className={styles.preview_instructions}>

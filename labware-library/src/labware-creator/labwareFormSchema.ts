@@ -219,3 +219,5 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = Yup.object(
       displayName,
     }
   })
+
+console.log({ labwareFormSchema })
