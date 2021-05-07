@@ -7,12 +7,12 @@ import {
   SIZE_2,
   PrimaryBtn,
   Icon,
-  type IconName,
   HandleKeypress,
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { ControlContainer } from './ControlContainer'
 
+import type { IconName } from '@opentrons/components'
 import type { Jog, Plane, Sign, Bearing } from './types'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 
@@ -32,7 +32,7 @@ type ControlsContents = {
   subtitle: string,
 }
 
-const CONTROLS_CONTENTS_BY_PLANE: { [Plane]: ControlsContents } = {
+const CONTROLS_CONTENTS_BY_PLANE: { [plane in Plane]: ControlsContents } = {
   [VERTICAL_PLANE]: {
     controls: [
       {

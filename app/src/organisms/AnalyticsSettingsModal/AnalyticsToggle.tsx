@@ -9,22 +9,13 @@ import {
 
 import type { State, Dispatch } from '../../redux/types'
 
-type OP = {}
+interface SP { optedIn: boolean }
 
-type SP = { optedIn: boolean }
+interface DP { toggleOptedIn: () => unknown }
 
-type DP = { toggleOptedIn: () => unknown }
+type Props = SP & DP
 
-type Props = { ...SP, ...DP }
-
-export const AnalyticsToggle: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  DP,
-  _,
-  _
->(
+export const AnalyticsToggle: React.ComponentType = connect<Props, {}, SP, DP>(
   mapStateToProps,
   mapDispatchToProps
 )(AnalyticsToggleComponent)

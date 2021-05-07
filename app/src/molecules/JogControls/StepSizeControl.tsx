@@ -13,7 +13,7 @@ const STEP_SIZE_SUBTITLE = 'Change with + and -'
 type StepSizeControlProps = {
   stepSizes: StepSize[],
   currentStepSize: StepSize,
-  setCurrentStepSize: StepSize => void,
+  setCurrentStepSize: (stepSize: StepSize) => void,
 }
 export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   const { stepSizes, currentStepSize, setCurrentStepSize } = props
@@ -28,9 +28,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
     if (i > 0) setCurrentStepSize(stepSizes[i - 1])
   }
 
-  const handleStepSelect: (
-    event: SyntheticInputEvent<HTMLInputElement>
-  ) => void = event => {
+  const handleStepSelect: React.ChangeEventHandler<HTMLInputElement> = event => {
     setCurrentStepSize(Number(event.target.value))
     event.target.blur()
   }

@@ -7,12 +7,11 @@ import {
   FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
 
-type Props = {
+interface Props extends React.ComponentProps<typeof Box> {
   label: string | React.ReactNode,
   value: string | React.ReactNode,
-  labelProps?: React.ElementProps<typeof Text>,
-  valueProps?: React.ElementProps<typeof Text>,
-  ...React.ElementProps<typeof Box>,
+  labelProps?: React.ComponentProps<typeof Text>,
+  valueProps?: React.ComponentProps<typeof Text>,
 }
 
 export function LabeledValue(props: Props): JSX.Element {
