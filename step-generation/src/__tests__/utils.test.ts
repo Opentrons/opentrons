@@ -27,7 +27,10 @@ import {
 import { Diff, thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { DEFAULT_CONFIG, FIXED_TRASH_ID } from '../__fixtures__'
 import { orderWells, thermocyclerPipetteCollision } from '../utils'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
 import type { RobotState, ThermocyclerStateStepArgs } from '../types'
 
 describe('splitLiquid', () => {
@@ -379,7 +382,7 @@ describe('makeInitialRobotState', () => {
           p10SingleId: {
             id: 'p10SingleId',
             name: 'p10_single',
-            spec: fixtureP10Single,
+            spec: fixtureP10Single as PipetteNameSpecs,
             tiprackDefURI: getLabwareDefURI(
               fixture_tiprack_10_ul as LabwareDefinition2
             ),
@@ -388,7 +391,7 @@ describe('makeInitialRobotState', () => {
           p300MultiId: {
             id: 'p300MultiId',
             name: 'p300_multi',
-            spec: fixtureP300Multi,
+            spec: fixtureP300Multi as PipetteNameSpecs,
             tiprackDefURI: getLabwareDefURI(
               fixture_tiprack_300_ul as LabwareDefinition2
             ),
