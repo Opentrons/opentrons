@@ -1,20 +1,22 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
-import type { Mount } from '@opentrons/components'
 
 import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
 import * as Sessions from '../../../redux/sessions'
 import { SaveXYPoint } from '../SaveXYPoint'
 
+import type { Mount } from '@opentrons/components'
 import type { ReactWrapper } from 'enzyme'
+import type { CalibrationSessionStep, VectorTuple } from '../../../redux/sessions/types'
 
-const currentStepBySlot = {
+type ChannelString = 'multi' | 'single'
+const currentStepBySlot: {[slotNumber: string]: CalibrationSessionStep} = {
   '1': Sessions.DECK_STEP_SAVING_POINT_ONE,
   '3': Sessions.DECK_STEP_SAVING_POINT_TWO,
   '7': Sessions.DECK_STEP_SAVING_POINT_THREE,
 }
 describe('SaveXYPoint', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof SaveXYPoint>>) => ReturnType<typeof mount>
+  let render: (props?: Partial<React.ComponentProps<typeof SaveXYPoint> & {pipMount: Mount}>) => ReturnType<typeof mount>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
@@ -68,7 +70,7 @@ describe('SaveXYPoint', () => {
     const slot7LeftSingleSrc = 'SLOT_7_LEFT_SINGLE_X-Y.webm'
     const slot7RightMultiSrc = 'SLOT_7_RIGHT_MULTI_X-Y.webm'
     const slot7RightSingleSrc = 'SLOT_7_RIGHT_SINGLE_X-Y.webm'
-    const assetMap: { [slot: string]: { [mount in Mount]: { }, }, } = {
+    const assetMap: { [slot: string]: { [mount in Mount]: { [channels in ChannelString]: string } } } = {
       '1': {
         left: {
           multi: slot1LeftMultiSrc,
@@ -102,15 +104,15 @@ describe('SaveXYPoint', () => {
     }
     Object.keys(assetMap).forEach(slotNumber => {
       const xyStep = assetMap[slotNumber]
-      Object.keys(xyStep).forEach(mountString => {
-        Object.keys(xyStep[mountString]).forEach(channelString => {
+      Object.keys(xyStep).forEach((mountString) => {
+        Object.keys(xyStep[mountString as Mount]).forEach(channelString => {
           const wrapper = render({
-            pipMount: mountString,
+            pipMount: mountString as Mount,
             isMulti: channelString === 'multi',
             currentStep: currentStepBySlot[slotNumber],
           })
           expect(getVideo(wrapper).prop('src')).toEqual(
-            xyStep[mountString][channelString]
+            xyStep[mountString as Mount][channelString as ChannelString]
           )
         })
       })
@@ -120,8 +122,8 @@ describe('SaveXYPoint', () => {
   it('allows jogging in z axis', () => {
     const wrapper = render()
 
-    const jogDirections = ['left', 'right', 'back', 'forward']
-    const jogVectorByDirection = {
+    const jogDirections: string[] = ['left', 'right', 'back', 'forward']
+    const jogVectorByDirection: {[dir: string]: VectorTuple} = {
       left: [-0.1, 0, 0],
       right: [0.1, 0, 0],
       back: [0, 0.1, 0],

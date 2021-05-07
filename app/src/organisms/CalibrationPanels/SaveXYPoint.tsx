@@ -106,14 +106,14 @@ const HEALTH_POINT_THREE_BUTTON_TEXT = `${HEALTH_BUTTON_TEXT} and move to slot 7
 const ALLOW_VERTICAL_TEXT = 'Reveal Z jog controls to move up and down'
 
 const contentsBySessionTypeByCurrentStep: {
-  [SessionType]: {
-    [CalibrationSessionStep]: {
+  [sessionType in SessionType]?: {
+    [step in CalibrationSessionStep]?: {
       slotNumber: string,
       buttonText: string,
       moveCommand: SessionCommandString | null,
       finalCommand?: SessionCommandString | null,
-    },
-  },
+    }
+  }
 } = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
     [Sessions.DECK_STEP_SAVING_POINT_ONE]: {
@@ -227,7 +227,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
 
   const [allowVertical, setAllowVertical] = React.useState(false)
 
-  const AllowVerticalPrompt = () => (
+  const AllowVerticalPrompt = (): JSX.Element => (
     <Flex
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
