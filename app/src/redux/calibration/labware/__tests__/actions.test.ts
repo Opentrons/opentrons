@@ -17,7 +17,7 @@ const SPECS: ActionSpec[] = [
     expected: {
       type: 'calibration:FETCH_LABWARE_CALIBRATIONS',
       payload: { robotName: 'robot-name' },
-      meta: {},
+      meta: {} as any,
     },
   },
   {
@@ -34,7 +34,7 @@ const SPECS: ActionSpec[] = [
         robotName: 'robot-name',
         labwareCalibrations: Fixtures.mockAllLabwareCalibration,
       },
-      meta: { requestId: '123' },
+      meta: { requestId: '123' } as any,
     },
   },
   {
@@ -51,7 +51,7 @@ const SPECS: ActionSpec[] = [
         robotName: 'robot-name',
         error: Fixtures.mockFetchLabwareCalibrationFailure.body,
       },
-      meta: { requestId: '123' },
+      meta: { requestId: '123' } as any,
     },
   },
 ]

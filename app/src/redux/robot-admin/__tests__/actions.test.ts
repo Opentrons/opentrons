@@ -27,7 +27,7 @@ describe('robot admin actions', () => {
       expected: {
         type: 'robotAdmin:RESTART_SUCCESS',
         payload: { robotName: 'robotName' },
-        meta: { requestId: 'foo' },
+        meta: { requestId: 'foo' } as any,
       },
     },
     {
@@ -37,7 +37,7 @@ describe('robot admin actions', () => {
       expected: {
         type: 'robotAdmin:RESTART_FAILURE',
         payload: { robotName: 'robotName', error: { message: 'AH' } },
-        meta: { requestId: 'foo' },
+        meta: { requestId: 'foo' } as any,
       },
     },
     {
@@ -47,7 +47,7 @@ describe('robot admin actions', () => {
       expected: {
         type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS',
         payload: { robotName: 'robotName' },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -70,7 +70,7 @@ describe('robot admin actions', () => {
             { id: 'bar', name: 'Bar', description: 'bazqux' },
           ],
         },
-        meta: { requestId: 'foo' },
+        meta: { requestId: 'foo' } as any,
       },
     },
     {
@@ -80,7 +80,7 @@ describe('robot admin actions', () => {
       expected: {
         type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_FAILURE',
         payload: { robotName: 'robotName', error: { message: 'AH' } },
-        meta: { requestId: 'foo' },
+        meta: { requestId: 'foo' } as any,
       },
     },
     {
@@ -90,7 +90,7 @@ describe('robot admin actions', () => {
       expected: {
         type: 'robotAdmin:RESET_CONFIG',
         payload: { robotName: 'robotName', resets: { foo: true, bar: false } },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -100,7 +100,7 @@ describe('robot admin actions', () => {
       expected: {
         type: 'robotAdmin:RESET_CONFIG_SUCCESS',
         payload: { robotName: 'robotName' },
-        meta: { requestId: 'foo' },
+        meta: { requestId: 'foo' } as any,
       },
     },
     {
@@ -110,7 +110,7 @@ describe('robot admin actions', () => {
       expected: {
         type: 'robotAdmin:RESET_CONFIG_FAILURE',
         payload: { robotName: 'robotName', error: { message: 'AH' } },
-        meta: { requestId: 'foo' },
+        meta: { requestId: 'foo' } as any,
       },
     },
   ]

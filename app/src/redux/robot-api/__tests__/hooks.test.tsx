@@ -42,7 +42,7 @@ describe('useDispatchApiRequest', () => {
 
     expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockAction',
-      meta: { requestId: 'mockId_0' },
+      meta: { requestId: 'mockId_0' } as any,
     })
   })
 
@@ -112,7 +112,7 @@ describe('useDispatchApiRequests', () => {
     expect(store.dispatch).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockAction',
-      meta: { requestId: 'mockId_0' },
+      meta: { requestId: 'mockId_0' } as any,
     })
   })
 
@@ -132,11 +132,11 @@ describe('useDispatchApiRequests', () => {
     expect(store.dispatch).toHaveBeenCalledTimes(2)
     expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockAction',
-      meta: { requestId: 'mockId_0' },
+      meta: { requestId: 'mockId_0' } as any,
     })
     expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockOtherAction',
-      meta: { requestId: 'mockId_1' },
+      meta: { requestId: 'mockId_1' } as any,
     })
   })
 
@@ -157,11 +157,11 @@ describe('useDispatchApiRequests', () => {
     expect(store.dispatch).toHaveBeenCalledTimes(2)
     expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockAction',
-      meta: { requestId: 'mockId_0' },
+      meta: { requestId: 'mockId_0' } as any,
     })
     expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockOtherAction',
-      meta: { requestId: 'mockId_1' },
+      meta: { requestId: 'mockId_1' } as any,
     })
   })
 })

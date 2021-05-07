@@ -17,7 +17,7 @@ const SPECS: ActionSpec[] = [
     expected: {
       type: 'calibration:FETCH_PIPETTE_OFFSET_CALIBRATIONS',
       payload: { robotName: 'robot-name' },
-      meta: {},
+      meta: {} as any,
     },
   },
   {
@@ -34,7 +34,7 @@ const SPECS: ActionSpec[] = [
         robotName: 'robot-name',
         pipetteOffsetCalibrations: Fixtures.mockAllPipetteOffsetsCalibration,
       },
-      meta: { requestId: '123' },
+      meta: { requestId: '123' } as any,
     },
   },
   {
@@ -51,7 +51,7 @@ const SPECS: ActionSpec[] = [
         robotName: 'robot-name',
         error: Fixtures.mockFetchPipetteOffsetCalibrationsFailure.body,
       },
-      meta: { requestId: '123' },
+      meta: { requestId: '123' } as any,
     },
   },
 ]

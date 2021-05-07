@@ -25,7 +25,7 @@ describe('robot session check actions', () => {
           sessionType: 'calibrationCheck',
           params: {},
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -38,7 +38,7 @@ describe('robot session check actions', () => {
           robotName: 'robot-name',
           ...Fixtures.mockSessionResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -48,7 +48,7 @@ describe('robot session check actions', () => {
       expected: {
         type: 'sessions:CREATE_SESSION_FAILURE',
         payload: { robotName: 'robot-name', error: mockV2ErrorResponse },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -58,7 +58,7 @@ describe('robot session check actions', () => {
       expected: {
         type: 'sessions:DELETE_SESSION',
         payload: { robotName: 'robot-name', sessionId: '1234' },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -71,7 +71,7 @@ describe('robot session check actions', () => {
           robotName: 'robot-name',
           ...Fixtures.mockSessionResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -85,7 +85,7 @@ describe('robot session check actions', () => {
           sessionId: '1234',
           error: mockV2ErrorResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -95,7 +95,7 @@ describe('robot session check actions', () => {
       expected: {
         type: 'sessions:FETCH_SESSION',
         payload: { robotName: 'robot-name', sessionId: '1234' },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -108,7 +108,7 @@ describe('robot session check actions', () => {
           robotName: 'robot-name',
           ...Fixtures.mockSessionResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -122,7 +122,7 @@ describe('robot session check actions', () => {
           sessionId: '1234',
           error: mockV2ErrorResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -136,7 +136,7 @@ describe('robot session check actions', () => {
           sessionId: '1234',
           command: Fixtures.mockSessionCommand,
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -155,7 +155,7 @@ describe('robot session check actions', () => {
           sessionId: '1234',
           ...Fixtures.mockSessionResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -169,7 +169,7 @@ describe('robot session check actions', () => {
           sessionId: '1234',
           error: mockV2ErrorResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -183,7 +183,7 @@ describe('robot session check actions', () => {
           sessionType: 'calibrationCheck',
           params: {},
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {

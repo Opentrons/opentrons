@@ -11,8 +11,7 @@ import type {
   ConnectivityStatus,
   DiscoveredRobot,
 } from '../../../discovery/types'
-import type { Observable } from 'rxjs'
-import type { State } from '../../../types'
+import type { Action } from '../../../types'
 
 jest.mock('../../../discovery/selectors')
 jest.mock('../../selectors')
@@ -34,17 +33,17 @@ describe('robotAdminEpic tracks restarting state', () => {
   })
 
   it('dispatches a RESTART_STATUS_CHANGED action on restart success', () => {
-    const mocks = setupEpicTestMocks((robotName: string) =>
+    const mocks = setupEpicTestMocks<Action>((robotName: string) =>
       Actions.restartRobotSuccess(robotName, {} as any)
     )
 
     when(mocks.getRobotByName)
       .calledWith(mocks.state, mocks.robot.name)
-      .mockReturnValue(mocks.robot)
+      .mockReturnValue(mocks.robot as any)
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s--', { s: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s--', { s: mocks.state })
       const output$ = trackRestartsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -52,14 +51,14 @@ describe('robotAdminEpic tracks restarting state', () => {
           mocks.robot.name,
           'restart-pending',
           null,
-          expect.any(Date) as any
+          expect.any(Date)
         ),
       })
     })
   })
 
   it('dispatches a RESTART_STATUS_CHANGED action with boot ID if present', () => {
-    const mocks = setupEpicTestMocks((robotName: string) =>
+    const mocks = setupEpicTestMocks<Action>((robotName: string) =>
       Actions.restartRobotSuccess(robotName, {} as any)
     )
 
@@ -68,11 +67,11 @@ describe('robotAdminEpic tracks restarting state', () => {
       .mockReturnValue({
         ...mocks.robot,
         serverHealth: { bootId: 'previous-boot-id' },
-      })
+      } as any)
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s--', { s: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s--', { s: mocks.state })
       const output$ = trackRestartsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -80,14 +79,14 @@ describe('robotAdminEpic tracks restarting state', () => {
           mocks.robot.name,
           'restart-pending',
           'previous-boot-id',
-          expect.any(Date) as any
+          expect.any(Date)
         ),
       })
     })
   })
 
   it('dispatches any necessary status changes', () => {
-    const mocks = setupEpicTestMocks()
+    const mocks = setupEpicTestMocks<Action>()
 
     const robot1 = {
       ...mocks.robot,
@@ -148,9 +147,9 @@ describe('robotAdminEpic tracks restarting state', () => {
       )
       .mockReturnValue('restart-timed-out')
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot<Action>('--')
-      const state$ = hot<State>('-s', { s: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
+      const action$ = hot('--')
+      const state$ = hot('-s', { s: mocks.state })
       const output$ = trackRestartsEpic(action$, state$)
 
       expectObservable(output$).toBe('-(ab)', {

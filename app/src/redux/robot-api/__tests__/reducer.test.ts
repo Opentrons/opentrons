@@ -16,7 +16,7 @@ const SPECS: ReducerSpec[] = [
     state: { def: { status: 'pending' } },
     action: {
       type: 'someScope:FETCH_THING',
-      meta: { requestId: 'abc' },
+      meta: { requestId: 'abc' } as any,
     },
     expected: { abc: { status: 'pending' }, def: { status: 'pending' } },
   },

@@ -17,7 +17,7 @@ describe('robotSettingsReducer', () => {
       name: 'handles FETCH_SETTINGS_SUCCESS without restart required',
       action: {
         type: 'robotSettings:FETCH_SETTINGS_SUCCESS',
-        meta: {},
+        meta: {} as any,
         payload: {
           robotName: 'robotName',
           settings: Fixtures.mockRobotSettings,
@@ -36,7 +36,7 @@ describe('robotSettingsReducer', () => {
       name: 'handles FETCH_SETTINGS_SUCCESS with restart required',
       action: {
         type: 'robotSettings:FETCH_SETTINGS_SUCCESS',
-        meta: {},
+        meta: {} as any,
         payload: {
           robotName: 'robotName',
           settings: Fixtures.mockRobotSettings.slice(0, 1),
@@ -60,7 +60,7 @@ describe('robotSettingsReducer', () => {
       name: 'handles UPDATE_SETTING_SUCCESS',
       action: {
         type: 'robotSettings:UPDATE_SETTING_SUCCESS',
-        meta: {},
+        meta: {} as any,
         payload: {
           robotName: 'robotName',
           settings: Fixtures.mockRobotSettings,

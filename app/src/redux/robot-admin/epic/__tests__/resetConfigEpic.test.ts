@@ -3,8 +3,7 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { resetConfigEpic } from '../resetConfigEpic'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../types'
+import type { Action } from '../../../types'
 
 const makeResetConfigAction = (robotName: string) =>
   Actions.resetConfig(robotName, {
@@ -18,14 +17,14 @@ describe('robotAdminEpic handles performing a "factory reset"', () => {
   })
 
   it('calls POST /settings/reset on RESET_CONFIG', () => {
-    const mocks = setupEpicTestMocks(
+    const mocks = setupEpicTestMocks<Action>(
       makeResetConfigAction,
       Fixtures.mockResetConfigSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = resetConfigEpic(action$, state$)
 
       expectObservable(output$)
@@ -40,14 +39,14 @@ describe('robotAdminEpic handles performing a "factory reset"', () => {
   })
 
   it('maps successful response to RESET_CONFIG_SUCCESS', () => {
-    const mocks = setupEpicTestMocks(
+    const mocks = setupEpicTestMocks<Action>(
       makeResetConfigAction,
       Fixtures.mockResetConfigSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = resetConfigEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -60,14 +59,14 @@ describe('robotAdminEpic handles performing a "factory reset"', () => {
   })
 
   it('maps failed response to RESET_CONFIG_FAILURE', () => {
-    const mocks = setupEpicTestMocks(
+    const mocks = setupEpicTestMocks<Action>(
       makeResetConfigAction,
       Fixtures.mockResetConfigFailure
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot<Action>('--a', { a: mocks.action })
-      const state$ = hot<State>('s-s', { s: mocks.state })
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = resetConfigEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

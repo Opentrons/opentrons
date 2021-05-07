@@ -10,13 +10,13 @@ import FormData from 'form-data'
 import { robotApiUrl, fetchRobotApi } from '../http'
 import { HTTP_API_VERSION, GET, POST, PATCH, DELETE } from '../constants'
 
-import type { $Application } from 'express'
+import type { Application } from 'express'
 import type { RobotHost } from '../types'
 
 jest.unmock('node-fetch')
 
 describe('robot-api http client', () => {
-  let testApp: $Application
+  let testApp: Application
   let testServer: any
   let testPort: number
   let robot: RobotHost
@@ -30,7 +30,7 @@ describe('robot-api http client', () => {
       testPort = port
       robot = { name: 'robot-name', ip: '127.0.0.1', port }
 
-      return new Promise((resolve, reject) => {
+      return new Promise<void>((resolve, reject) => {
         const server = testApp.listen(port)
 
         if (server) {
@@ -203,7 +203,7 @@ describe('robot-api http client', () => {
         const files = (req as any).files ?? []
 
         res.status(201).send({
-          files: files.map(f => ({
+          files: files.map((f: any) => ({
             key: f.fieldname,
             filename: f.originalname,
             contents: f.buffer.toString('utf-8'),

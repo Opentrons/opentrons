@@ -20,7 +20,7 @@ const SPECS: ReducerSpec[] = [
         robotName: 'robotName',
         modules: [Fixtures.mockTemperatureModule],
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       robotName: {

@@ -19,7 +19,7 @@ describe('robot pipettes actions', () => {
       expected: {
         type: 'pipettes:FETCH_PIPETTES',
         payload: { robotName: 'robot-name', refresh: false },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -29,7 +29,7 @@ describe('robot pipettes actions', () => {
       expected: {
         type: 'pipettes:FETCH_PIPETTES',
         payload: { robotName: 'robot-name', refresh: true },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -46,7 +46,7 @@ describe('robot pipettes actions', () => {
           robotName: 'robot-name',
           pipettes: Fixtures.mockFetchPipettesSuccess.body,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -59,7 +59,7 @@ describe('robot pipettes actions', () => {
           robotName: 'robot-name',
           error: { message: 'AH' },
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -69,7 +69,7 @@ describe('robot pipettes actions', () => {
       expected: {
         type: 'pipettes:FETCH_PIPETTE_SETTINGS',
         payload: { robotName: 'robot-name' },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -86,7 +86,7 @@ describe('robot pipettes actions', () => {
           robotName: 'robot-name',
           settings: { pipetteId: Fixtures.mockPipetteSettings },
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -99,7 +99,7 @@ describe('robot pipettes actions', () => {
           robotName: 'robot-name',
           error: { message: 'AH' },
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -113,7 +113,7 @@ describe('robot pipettes actions', () => {
           pipetteId: 'pipette-id',
           fields: { fieldA: 42, fieldB: null },
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -132,7 +132,7 @@ describe('robot pipettes actions', () => {
           pipetteId: 'pipette-id',
           fields: Fixtures.mockUpdatePipetteSettingsSuccess.body.fields,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -151,7 +151,7 @@ describe('robot pipettes actions', () => {
           pipetteId: 'pipette-id',
           error: { message: 'AH' },
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
   ]

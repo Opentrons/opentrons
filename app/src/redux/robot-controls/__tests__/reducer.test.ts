@@ -19,7 +19,7 @@ const SPECS: ReducerSpec[] = [
         robotName: 'robotName',
         lightsOn: true,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { lightsOn: false } },
     expected: { robotName: { lightsOn: true } },
@@ -32,7 +32,7 @@ const SPECS: ReducerSpec[] = [
         robotName: 'robotName',
         lightsOn: false,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { lightsOn: true } },
     expected: { robotName: { lightsOn: false } },
@@ -42,7 +42,7 @@ const SPECS: ReducerSpec[] = [
     action: {
       type: 'robotControls:HOME',
       payload: { robotName: 'robotName', target: 'robot' },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { movementStatus: null } },
     expected: { robotName: { movementStatus: 'homing', movementError: null } },
@@ -52,7 +52,7 @@ const SPECS: ReducerSpec[] = [
     action: {
       type: 'robotControls:HOME_SUCCESS',
       payload: { robotName: 'robotName' },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { movementStatus: 'homing' } },
     expected: { robotName: { movementStatus: null, movementError: null } },
@@ -62,7 +62,7 @@ const SPECS: ReducerSpec[] = [
     action: {
       type: 'robotControls:HOME_FAILURE',
       payload: { robotName: 'robotName', error: { message: 'AH' } },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { movementStatus: 'homing' } },
     expected: {
@@ -79,7 +79,7 @@ const SPECS: ReducerSpec[] = [
         mount: 'left',
         disengageMotors: false,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { movementStatus: null } },
     expected: { robotName: { movementStatus: 'moving', movementError: null } },
@@ -89,7 +89,7 @@ const SPECS: ReducerSpec[] = [
     action: {
       type: 'robotControls:MOVE_SUCCESS',
       payload: { robotName: 'robotName' },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { movementStatus: 'moving' } },
     expected: { robotName: { movementStatus: null, movementError: null } },
@@ -99,7 +99,7 @@ const SPECS: ReducerSpec[] = [
     action: {
       type: 'robotControls:MOVE_FAILURE',
       payload: { robotName: 'robotName', error: { message: 'AH' } },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { movementStatus: 'moving' } },
     expected: {

@@ -22,7 +22,7 @@ const SPECS: ReducerSpec[] = [
         robotName: 'eggplant-parm',
         ...Fixtures.mockSessionResponse,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'eggplant-parm': {
@@ -48,7 +48,7 @@ const SPECS: ReducerSpec[] = [
         robotName: 'eggplant-parm',
         ...Fixtures.mockSessionResponse,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'eggplant-parm': {
@@ -83,7 +83,7 @@ const SPECS: ReducerSpec[] = [
         robotName: 'eggplant-parm',
         ...Fixtures.mockSessionResponse,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'eggplant-parm': {},
@@ -107,7 +107,7 @@ const SPECS: ReducerSpec[] = [
         robotName: 'eggplant-parm',
         ...Fixtures.mockSessionResponse,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'eggplant-parm': {
@@ -140,7 +140,7 @@ const SPECS: ReducerSpec[] = [
       'eggplant-parm',
       Fixtures.mockSessionId,
       Fixtures.mockSessionResponse,
-      {}
+      {} as any
     ),
     state: {
       'eggplant-parm': {
@@ -175,7 +175,7 @@ const SPECS: ReducerSpec[] = [
         robotName: 'rock-lobster',
         sessions: Fixtures.mockMultiSessionResponse.data,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'rock-lobster': {},
@@ -204,7 +204,7 @@ const SPECS: ReducerSpec[] = [
         robotName: 'rock-lobster',
         sessions: Fixtures.mockMultiSessionResponse.data,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'rock-lobster': {
@@ -239,7 +239,7 @@ const SPECS: ReducerSpec[] = [
         robotName: 'eggplant-parm',
         ...Fixtures.mockSessionResponse,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'eggplant-parm': {
@@ -277,7 +277,7 @@ const SPECS: ReducerSpec[] = [
       },
       meta: {
         response: { ...Fixtures.mockDeleteSessionFailureMeta, status: 404 },
-      },
+      } as any,
     },
     state: {
       'frumious-bandersnatch': {
@@ -315,7 +315,7 @@ const SPECS: ReducerSpec[] = [
       },
       meta: {
         response: { ...Fixtures.mockFetchSessionFailureMeta, status: 404 },
-      },
+      } as any,
     },
     state: {
       'detestable-moss': {
