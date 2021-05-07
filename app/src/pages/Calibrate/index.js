@@ -81,7 +81,7 @@ function getRedirectUrl(props: Props): string {
     return `/calibrate/pipettes/${nextPipetteTiprack.mount}/${nextPipetteTiprack.tiprack.definitionHash}`
   }
 
-  if (modules) {
+  if (modules.length) {
     return `calibrate/modules`
   }
   if (nextLabware) return `/calibrate/labware/${nextLabware.slot}`

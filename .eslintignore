@@ -10,7 +10,9 @@ shared-data/python/**
 
 # flow
 flow-typed/npm/**
+discovery-client/flow-types/**
 components/flow-types/**
+shared-data/flow-types/**
 
 # typescript
 app-shell/lib/**
@@ -23,6 +25,9 @@ discovery-client/lib/**
 lerna.json
 !api/release-notes.md
 !app-shell/build/release-notes.md
+
+# components library
+storybook-static
 
 # mypy
 **/.mypy_cache/**

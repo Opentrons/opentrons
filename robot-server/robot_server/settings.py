@@ -51,18 +51,6 @@ class RobotServerSettings(BaseSettings):
         description="Unix file system path to serve on. This value supersedes"
                     " the port and host name settings."
     )
-
-    hardware_server_enable: bool = Field(
-        False,
-        description="Run a jsonrpc server allowing rpc to the  hardware "
-                    "controller. Only works on buildroot because extra "
-                    "dependencies are required."
-    )
-    hardware_server_socket_path: str = Field(
-        '/var/run/opentrons-hardware.sock',
-        description="Unix file system path used by the hardware server."
-    )
-
     simulator_configuration_file_path: str = Field(
         None,
         description="Path to a json file that describes the hardware"

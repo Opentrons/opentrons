@@ -8,7 +8,7 @@ from .pipetting_common import BaseLiquidHandlingRequest, BaseLiquidHandlingResul
 
 @final
 class AspirateRequest(BaseLiquidHandlingRequest):
-    """A request to aspirate from a specific well."""
+    """A request to move to a specific well and aspirate from it."""
 
     def get_implementation(self) -> AspirateImplementation:
         """Get the execution implementation of the AspirateRequest."""

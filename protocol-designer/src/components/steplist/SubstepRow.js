@@ -9,7 +9,7 @@ import { IngredPill } from './IngredPill'
 import { PDListItem } from '../lists'
 import { swatchColors } from '../swatchColors'
 import { formatVolume, formatPercentage } from './utils'
-import type { LocationLiquidState } from '../../step-generation'
+import type { LocationLiquidState } from '@opentrons/step-generation'
 import type {
   SubstepIdentifier,
   SubstepWellData,

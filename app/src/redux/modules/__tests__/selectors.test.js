@@ -87,7 +87,12 @@ const SPECS: Array<SelectorSpec> = [
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
       mockGetProtocolModules.mockReturnValue([
-        { _id: 0, slot: '1', model: 'thermocyclerModuleV1' },
+        {
+          _id: 0,
+          slot: '1',
+          model: 'thermocyclerModuleV1',
+          protocolLoadOrder: 0,
+        },
       ])
     },
     expected: [
@@ -116,14 +121,29 @@ const SPECS: Array<SelectorSpec> = [
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
       mockGetProtocolModules.mockReturnValue([
-        { _id: 0, slot: '1', model: 'thermocyclerModuleV1' },
-        { _id: 1, slot: '2', model: 'temperatureModuleV1' },
-        { _id: 2, slot: '3', model: 'magneticModuleV1' },
+        {
+          _id: 0,
+          slot: '1',
+          model: 'thermocyclerModuleV1',
+          protocolLoadOrder: 0,
+        },
+        {
+          _id: 1,
+          slot: '2',
+          model: 'temperatureModuleV1',
+          protocolLoadOrder: 1,
+        },
+        { _id: 2, slot: '3', model: 'magneticModuleV1', protocolLoadOrder: 2 },
       ])
     },
     expected: [
-      { _id: 0, slot: '1', model: 'thermocyclerModuleV1' },
-      { _id: 2, slot: '3', model: 'magneticModuleV1' },
+      {
+        _id: 0,
+        slot: '1',
+        model: 'thermocyclerModuleV1',
+        protocolLoadOrder: 0,
+      },
+      { _id: 2, slot: '3', model: 'magneticModuleV1', protocolLoadOrder: 2 },
     ],
   },
   {
@@ -143,14 +163,29 @@ const SPECS: Array<SelectorSpec> = [
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
       mockGetProtocolModules.mockReturnValue([
-        { _id: 0, slot: '1', model: 'thermocyclerModuleV1' },
-        { _id: 1, slot: '2', model: 'temperatureModuleV1' },
-        { _id: 2, slot: '3', model: 'magneticModuleV2' },
+        {
+          _id: 0,
+          slot: '1',
+          model: 'thermocyclerModuleV1',
+          protocolLoadOrder: 0,
+        },
+        {
+          _id: 1,
+          slot: '2',
+          model: 'temperatureModuleV1',
+          protocolLoadOrder: 1,
+        },
+        { _id: 2, slot: '3', model: 'magneticModuleV2', protocolLoadOrder: 2 },
       ])
     },
     expected: [
-      { _id: 0, slot: '1', model: 'thermocyclerModuleV1' },
-      { _id: 2, slot: '3', model: 'magneticModuleV2' },
+      {
+        _id: 0,
+        slot: '1',
+        model: 'thermocyclerModuleV1',
+        protocolLoadOrder: 0,
+      },
+      { _id: 2, slot: '3', model: 'magneticModuleV2', protocolLoadOrder: 2 },
     ],
   },
   {
@@ -173,15 +208,15 @@ const SPECS: Array<SelectorSpec> = [
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
       mockGetProtocolModules.mockReturnValue([
-        { _id: 0, slot: '1', model: 'magneticModuleV2' },
-        { _id: 1, slot: '2', model: 'magneticModuleV1' },
-        { _id: 2, slot: '3', model: 'magneticModuleV1' },
-        { _id: 3, slot: '4', model: 'magneticModuleV1' },
+        { _id: 0, slot: '1', model: 'magneticModuleV2', protocolLoadOrder: 0 },
+        { _id: 1, slot: '2', model: 'magneticModuleV1', protocolLoadOrder: 1 },
+        { _id: 2, slot: '3', model: 'magneticModuleV1', protocolLoadOrder: 2 },
+        { _id: 3, slot: '4', model: 'magneticModuleV1', protocolLoadOrder: 3 },
       ])
     },
     expected: [
-      { _id: 0, slot: '1', model: 'magneticModuleV2' },
-      { _id: 3, slot: '4', model: 'magneticModuleV1' },
+      { _id: 0, slot: '1', model: 'magneticModuleV2', protocolLoadOrder: 0 },
+      { _id: 3, slot: '4', model: 'magneticModuleV1', protocolLoadOrder: 3 },
     ],
   },
   {

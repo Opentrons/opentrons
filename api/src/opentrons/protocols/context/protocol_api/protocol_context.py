@@ -1,5 +1,6 @@
 import logging
-from typing import Dict, Optional, Set, TYPE_CHECKING
+from typing import Dict, Optional, Set, List, TYPE_CHECKING
+from collections import OrderedDict
 
 from opentrons import types, API
 from opentrons.protocols.api_support.types import APIVersion
@@ -75,7 +76,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._instruments: InstrumentDict = {
             mount: None for mount in types.Mount
         }
-        self._modules: Set[LoadModuleResult] = set()
+        self._modules: List[LoadModuleResult] = []
 
         self._hw_manager = HardwareManager(hardware)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
@@ -100,6 +101,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         """
         kwargs['bundled_data'] = getattr(protocol, 'bundled_data', None)
         kwargs['bundled_labware'] = getattr(protocol, 'bundled_labware', None)
+        kwargs['extra_labware'] = getattr(protocol, 'extra_labware', None)
         kwargs['api_version'] = getattr(
             protocol, 'api_level', MAX_SUPPORTED_VERSION)
         return cls(*args, **kwargs)
@@ -190,7 +192,7 @@ class ProtocolContextImplementation(AbstractProtocol):
             configuration=configuration)
 
         # Try to find in the hardware instance
-        available_modules = self._hw_manager.hardware.find_modules(
+        available_modules, simulating_module = self._hw_manager.hardware.find_modules(
             resolved_model, resolved_type)
 
         hc_mod_instance = None
@@ -203,6 +205,9 @@ class ProtocolContextImplementation(AbstractProtocol):
                 hc_mod_instance = SynchronousAdapter(mod)
                 break
 
+        if simulating_module and not hc_mod_instance:
+            hc_mod_instance = SynchronousAdapter(simulating_module)
+
         if not hc_mod_instance:
             return None
 
@@ -210,14 +215,14 @@ class ProtocolContextImplementation(AbstractProtocol):
                                   geometry=geometry,
                                   module=hc_mod_instance)
 
-        self._modules.add(result)
+        self._modules.append(result)
         self._deck_layout[resolved_location] = geometry
         return result
 
     def get_loaded_modules(self) -> Dict[int, LoadModuleResult]:
         """Get a mapping of deck location to loaded module."""
-        return {int(str(module.geometry.parent)): module
-                for module in self._modules}
+        return OrderedDict({int(str(module.geometry.parent)): module
+                            for module in self._modules})
 
     def load_instrument(self,
                         instrument_name: str,

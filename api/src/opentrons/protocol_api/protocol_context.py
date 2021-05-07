@@ -2,7 +2,8 @@ import asyncio
 import contextlib
 import logging
 from typing import (Dict, Iterator, List, Callable,
-                    Optional, Set, Tuple, Union, TYPE_CHECKING, cast)
+                    Optional, Tuple, Union, TYPE_CHECKING, cast)
+from collections import OrderedDict
 
 from opentrons.hardware_control import (SynchronousAdapter, ThreadManager)
 from opentrons import types
@@ -87,7 +88,7 @@ class ProtocolContext(CommandPublisher):
         self._loop = loop or asyncio.get_event_loop()
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
             = {mount: None for mount in types.Mount}
-        self._modules: Set[ModuleContext] = set()
+        self._modules: List[ModuleContext] = []
 
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
         self._commands: List[str] = []
@@ -374,15 +375,18 @@ class ProtocolContext(CommandPublisher):
             namespace: Optional[str] = None,
             version: int = 1
     ) -> Labware:
+        """
+        .. deprecated:: 2.0
+            Use :py:meth:`load_labware` instead.
+        """
         MODULE_LOG.warning(
-            'load_labware_by_name is deprecated and will be removed in '
-            'version 3.12.0. please use load_labware')
+            'load_labware_by_name is deprecated. Use load_labware instead.')
         return self.load_labware(
             load_name, location, label, namespace, version)
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def loaded_labwares(self) -> Dict[int, Union[Labware, ModuleGeometry]]:
+    def loaded_labwares(self) -> Dict[int, Labware]:
         """ Get the labwares that have been loaded into the protocol context.
 
         Slots with nothing in them will not be present in the return value.
@@ -401,7 +405,7 @@ class ProtocolContext(CommandPublisher):
                   the locations.
         """
         def _only_labwares() -> Iterator[
-                Tuple[int, Union[Labware, ModuleGeometry]]]:
+                Tuple[int, Labware]]:
             for slotnum, slotitem in self._implementation.get_deck().items():
                 if isinstance(slotitem, AbstractLabware):
                     yield slotnum, Labware(implementation=slotitem)
@@ -469,7 +473,7 @@ class ProtocolContext(CommandPublisher):
         module_context = mod_class(
             self, module.module, module.geometry, self.api_version, self._loop
         )
-        self._modules.add(module_context)
+        self._modules.append(module_context)
         return module_context
 
     @property  # type: ignore
@@ -492,7 +496,7 @@ class ProtocolContext(CommandPublisher):
             for module in self._modules:
                 yield int(str(module.geometry.parent)), module
 
-        return dict(_modules())
+        return OrderedDict(_modules())
 
     @requires_version(2, 0)
     def load_instrument(
@@ -560,7 +564,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def loaded_instruments(self) -> Dict[str, Optional['InstrumentContext']]:
+    def loaded_instruments(self) -> Dict[str, 'InstrumentContext']:
         """ Get the instruments that have been loaded into the protocol.
 
         This is a map of mount name to instruments previously loaded with
@@ -570,9 +574,11 @@ class ProtocolContext(CommandPublisher):
         of them with :py:meth:`load_instrument`, the unused one will not
         be present.
 
-        :returns: A dict mapping mount names in lowercase to the instrument
-                  in that mount. If no instrument is loaded in the mount,
-                  it will not be present
+        :returns: A dict mapping mount name
+                  (``'left'`` or ``'right'``)
+                  to the instrument in that mount.
+                  If a mount has no loaded instrument,
+                  that key will be missing from the dict.
         """
         return {mount.name.lower(): instr for mount, instr
                 in self._instruments.items()
@@ -580,7 +586,7 @@ class ProtocolContext(CommandPublisher):
 
     @publish.both(command=cmds.pause)
     @requires_version(2, 0)
-    def pause(self, msg=None):
+    def pause(self, msg=None) -> None:
         """ Pause execution of the protocol until resume is called.
 
         This function returns immediately, but the next function call that
@@ -593,13 +599,13 @@ class ProtocolContext(CommandPublisher):
 
     @publish.both(command=cmds.resume)
     @requires_version(2, 0)
-    def resume(self):
+    def resume(self) -> None:
         """ Resume a previously-paused protocol """
         self._implementation.resume()
 
     @publish.both(command=cmds.comment)
     @requires_version(2, 0)
-    def comment(self, msg):
+    def comment(self, msg) -> None:
         """
         Add a user-readable comment string that will be echoed to the Opentrons
         app.

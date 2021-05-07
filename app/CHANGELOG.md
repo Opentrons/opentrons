@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0) (2021-05-06)
+
+* **app:** conditionally show module usb order instructions ([#7749](https://github.com/Opentrons/opentrons/issues/7749)) ([cc2e974](https://github.com/Opentrons/opentrons/commit/cc2e974))
+* **app:** add USB hub port number ([#7738](https://github.com/Opentrons/opentrons/issues/7738)) ([2f317bc](https://github.com/Opentrons/opentrons/commit/2f317bc))
+* **app:** add USB order to protocol module list ([#7710](https://github.com/Opentrons/opentrons/issues/7710)) ([64e87a7](https://github.com/Opentrons/opentrons/commit/64e87a7))
+* **app:** fix calibrate page redirect url ([#7691](https://github.com/Opentrons/opentrons/issues/7691)) ([450a0c2](https://github.com/Opentrons/opentrons/commit/450a0c2))
+* **app:** add missing border to thermocycler live status card ([#7681](https://github.com/Opentrons/opentrons/issues/7681)) ([6fdfe25](https://github.com/Opentrons/opentrons/commit/6fdfe25))
+* **app:** use correct module order to get usb port ([#7651](https://github.com/Opentrons/opentrons/issues/7651)) ([4c08cee](https://github.com/Opentrons/opentrons/commit/4c08cee))
+
+### Features
+
+* **app:** allow robot restarts to track boot ID and timeout ([#7589](https://github.com/Opentrons/opentrons/issues/7589)) ([3b33102](https://github.com/Opentrons/opentrons/commit/3b33102)), closes [#6585](https://github.com/Opentrons/opentrons/issues/6585)
+
+
+
+
+
 ## [4.2.1](https://github.com/Opentrons/opentrons/compare/v4.2.0...v4.2.1) (2021-04-06)
 
 **Note:** Version bump only for package @opentrons/app

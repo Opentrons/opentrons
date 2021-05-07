@@ -6,9 +6,24 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 4.2.1
+# Opentrons App Changes in 4.3.0
 
-## Changes
+We've improved module functionality with Opentrons App 4.3.0. The app now supports protocols with two Temperature Modules or two Magnetic Modules for Python API Protocols. All connected modules display their USB port connection (including limited USB port information for hubs). We've also updated how modules are displayed on the Run tab.
+
+## New Features
+
+- Support for 2 Temperature Modules or 2 Magnetic Modules
+- The USB port to which each module is attached is now displayed in the protocol info screen
+
+## Bugfixes
+
+- Fix an issue where robots would sometimes not reappear after an update when connected via USB ([#7608](https://github.com/Opentrons/opentrons/issues/7608))
+
+---
+
+## Opentrons App Changes in 4.2.1
+
+### Changes
 
 - There are no app side changes to this release.
 

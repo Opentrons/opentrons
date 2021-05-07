@@ -1,8 +1,4 @@
 import EventEmitter from 'events'
-// TODO(mc, 2017-08-29): Disable winston and uuid because of worker-loader bug
-// preventing webpackification of built-in node modules (os and crypto)
-// import log from 'winston'
-// import uuid from 'uuid/v4'
 
 import { WebSocketClient } from './websocket-client'
 import { RemoteObject } from './remote-object'
@@ -197,7 +193,7 @@ class RpcContext extends EventEmitter {
   }
 
   _send(message) {
-    // log.debug('Sending: %j', message)
+    console.debug('Sending: %j', message)
     this._ws.send(message)
   }
 
@@ -221,11 +217,12 @@ class RpcContext extends EventEmitter {
 
         if (meta.monitor) this._startMonitoring()
 
-        RemoteObject(this, root).then(remote => {
-          this.remote = remote
-          this.emit('ready')
-        })
-        // .catch((e) => log.error('Error creating control remote', e))
+        RemoteObject(this, root)
+          .then(remote => {
+            this.remote = remote
+            this.emit('ready')
+          })
+          .catch(e => console.error('Error creating control remote', e))
 
         break
 

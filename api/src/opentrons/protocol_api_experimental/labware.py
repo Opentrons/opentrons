@@ -1,155 +1,171 @@
 # noqa: D100
 from __future__ import annotations
-import logging
+from typing import Any, List, Dict, Optional, Union, cast
 
-from typing import (
-    List, Dict, Optional
-)
-
-from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.types import Location, Point, LocationLabware
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.labware.dev_types import LabwareParameters
-
-
-MODULE_LOG = logging.getLogger(__name__)
-
-
-class TipSelectionError(Exception):  # noqa: D101
-    pass
-
-
-class OutOfTipsError(Exception):  # noqa: D101
-    pass
-
-
-class Well:  # noqa: D101
-    def __init__(  # noqa: D107
-            self,
-            well_name: str,
-            labware: Labware
-    ) -> None:
-
-        self._well_name = well_name
-        self._labware = labware
-
-    @property
-    def api_version(self) -> APIVersion:  # noqa: D102
-        raise NotImplementedError()
-
-    @property
-    def parent(self) -> Labware:  # noqa: D102
-        return self._labware
-
-    @property
-    def has_tip(self) -> bool:  # noqa: D102
-        raise NotImplementedError()
-
-    @has_tip.setter
-    def has_tip(self, value: bool) -> None:
-        raise NotImplementedError()
-
-    @property
-    def max_volume(self) -> float:  # noqa: D102
-        raise NotImplementedError()
-
-    @property
-    def geometry(self) -> WellGeometry:  # noqa: D102
-        raise NotImplementedError()
-
-    @property
-    def diameter(self) -> Optional[float]:  # noqa: D102
-        raise NotImplementedError()
-
-    @property
-    def length(self) -> Optional[float]:  # noqa: D102
-        raise NotImplementedError()
-
-    @property
-    def width(self) -> Optional[float]:  # noqa: D102
-        raise NotImplementedError()
-
-    @property
-    def depth(self) -> float:  # noqa: D102
-        raise NotImplementedError()
-
-    @property
-    def display_name(self) -> str:  # noqa: D102
-        raise NotImplementedError()
-
-    @property
-    def well_name(self) -> str:  # noqa: D102
-        return self._well_name
-
-    def top(self, z: float = 0.0) -> Location:  # noqa: D102
-        raise NotImplementedError()
-
-    def bottom(self, z: float = 0.0) -> Location:  # noqa: D102
-        raise NotImplementedError()
-
-    def center(self) -> Location:  # noqa: D102
-        raise NotImplementedError()
-
-    def from_center_cartesian(self, x: float, y: float, z: float) -> Point:  # noqa: D102, E501
-        raise NotImplementedError()
-
-    def __repr__(self) -> str:  # noqa: D105
-        raise NotImplementedError()
-
-    def __eq__(self, other: object) -> bool:  # noqa: D105
-        raise NotImplementedError()
-
-    def __hash__(self) -> int:  # noqa: D105
-        raise NotImplementedError()
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from .errors import LabwareIsNotTipRackError
+from .types import DeckSlotName, LabwareParameters, Point
+from .well import Well
 
 
 class Labware:  # noqa: D101
+    def __init__(
+        self,
+        engine_client: ProtocolEngineClient,
+        labware_id: str,
+    ) -> None:
+        """Initialize a Labware API provider.
 
-    def __init__(self, resource_id: str) -> None:  # noqa: D107
-        self._resource_id = resource_id
+        You should not need to call this constructor yourself. The system will
+        create a `Labware` for you when you call :py:meth:`load_labware`.
+
+        Args:
+            engine_client: A client to access protocol state.
+            labware_id: The labware's identifier in commands and protocol state.
+        """
+        self._engine_client = engine_client
+        self._labware_id = labware_id
+
+    # TODO(mc, 2021-04-22): remove this property; it's redundant and
+    # unlikely to be used by PAPI users
+    @property
+    def api_version(self) -> Any:  # noqa: D102
+        raise NotImplementedError()
 
     @property
-    def api_version(self) -> APIVersion:  # noqa: D102
-        raise NotImplementedError()
+    def labware_id(self) -> str:
+        """Unique identifier for this labware instance in the protocol.
 
-    def __getitem__(self, key: str) -> Well:  # noqa: D105
-        raise NotImplementedError()
+        This identifier is used to reference this labware in commands and
+        protocol state. This ID will be unique for every piece of labware
+        in the protocol, even if labware share the same definition.
+        """
+        return self._labware_id
 
     @property
-    def uri(self) -> str:  # noqa: D102
-        raise NotImplementedError()
+    def uri(self) -> str:
+        """A string fully identifying the labware's underlying definition.
 
+        The labware's definition URI will be distinct and different than the
+        labware's ``labware_id``, which refers instead to specific instance of
+        the labware on the deck during the protocol.
+
+        The definition URI is of the format ``"{namespace}/{load_name}/{version}"``.
+        """
+        return self._engine_client.state.labware.get_definition_uri(
+            labware_id=self._labware_id
+        )
+
+    # TODO(mc, 2021-04-22): labware may be on a module, replace Any with Module
     @property
-    def parent(self) -> LocationLabware:  # noqa: D102
-        raise NotImplementedError()
+    def parent(self) -> Union[DeckSlotName, Any]:
+        """The parent location of this labware.
 
+        If the labware's parent is a string, that string represents a specific
+        deck slot. Otherwise, the labware is on a module, and the object
+        returned will be a :py:class:`ModuleContext`.
+        """
+        parent = self._engine_client.state.labware.get_labware_location(
+            labware_id=self._labware_id
+        )
+        return str(parent.slot)
+
+    # TODO(mc, 2021-05-03): document removal of name setter
     @property
     def name(self) -> str:  # noqa: D102
         raise NotImplementedError()
 
-    @name.setter
-    def name(self, new_name: str) -> None:
-        raise NotImplementedError()
-
     @property
-    def load_name(self) -> str:  # noqa: D102
-        raise NotImplementedError()
+    def load_name(self) -> str:
+        """The load name of this labware's definition.
 
+        This is best used for informational purposes. There is no requirement
+        that a load name be unique among other definitions. To specify a fully-
+        qualified definition, use :py:meth:`uri`.
+        """
+        return self._engine_client.state.labware.get_load_name(
+            labware_id=self._labware_id
+        )
+
+    # TODO(mc, 2021-05-03): this is an internal dictionary of Opentrons-specific
+    # data; does it really need to be a public property? Can we expose the
+    # definition and call it a day?
     @property
     def parameters(self) -> LabwareParameters:  # noqa: D102
-        raise NotImplementedError()
+        definition = self._engine_client.state.labware.get_labware_definition(
+            labware_id=self._labware_id
+        )
+        return cast(LabwareParameters, definition.parameters.dict())
 
+    # TODO(mc, 2021-05-03): this is an internal list of Opentrons-specific
+    # data; does it really need to be a public property? Can we expose the
+    # definition and call it a day?
     @property
     def quirks(self) -> List[str]:  # noqa: D102
-        raise NotImplementedError()
+        return self._engine_client.state.labware.get_quirks(labware_id=self._labware_id)
+
+    # TODO(mc, 2021-05-03): this property appears to be primarily for magdeck
+    # operational logic, and its presence in this interface is no longer
+    # necessary with Protocol Engine controlling execution. Can we get rid of it?
+    @property
+    def magdeck_engage_height(self) -> Optional[float]:    # noqa: D102
+        definition = self._engine_client.state.labware.get_labware_definition(
+            labware_id=self._labware_id
+        )
+        return definition.parameters.magneticModuleEngageHeight
 
     @property
-    def magdeck_engage_height(self) -> Optional[float]:  # noqa: D102
-        raise NotImplementedError()
+    def calibrated_offset(self) -> Point:
+        """The location of the labware's front-bottom-left corner in deck coordinates.
+
+        This value takes into account the labware's calibration data.
+        """
+        return self._engine_client.state.geometry.get_labware_position(
+            labware_id=self._labware_id
+        )
 
     @property
-    def calibrated_offset(self) -> Point:  # noqa: D102
-        raise NotImplementedError()
+    def highest_z(self) -> float:
+        """The z-coordinate of the highest point on the labware.
+
+        This value takes into account the labware's definition as well
+        as its calibration data.
+        """
+        return self._engine_client.state.geometry.get_labware_highest_z(
+            labware_id=self._labware_id
+        )
+
+    # TODO(mc, 2021-05-03): encode this in a specific `TipRack` interface that
+    # extends from Labware
+    @property
+    def is_tiprack(self) -> bool:
+        """Whether this labware is a tiprack."""
+        definition = self._engine_client.state.labware.get_labware_definition(
+            labware_id=self._labware_id
+        )
+        return definition.parameters.isTiprack
+
+    # TODO(mc, 2021-05-03): encode this in a specific `TipRack` interface that
+    # extends from Labware
+    # TODO(mc, 2021-05-03): this property appears to be primarily for pipette
+    # operational logic, and its presence in this interface is no longer
+    # necessary with Protocol Engine controlling execution. Does it need to be
+    # public? Can we expose the definition and call it a day?
+    # TODO(mc, 2021-05-03): document removal of tip_length setter
+    @property
+    def tip_length(self) -> float:
+        """The nominal length of tips if this labware is a tiprack.
+
+        Raises:
+            LabwareIsNotTipRackError: will raise if this property is accessed
+                on a labware instance that is not a tip rack.
+        """
+        definition = self._engine_client.state.labware.get_labware_definition(
+            labware_id=self._labware_id
+        )
+        if definition.parameters.tipLength is None:
+            raise LabwareIsNotTipRackError(f"{self.load_name} is not a tip rack.")
+        return definition.parameters.tipLength
 
     def well(self, idx: int) -> Well:  # noqa: D102
         raise NotImplementedError()
@@ -172,36 +188,25 @@ class Labware:  # noqa: D101
     def columns_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
         raise NotImplementedError()
 
-    @property
-    def highest_z(self) -> float:  # noqa: D102
-        raise NotImplementedError()
-
-    @property
-    def is_tiprack(self) -> bool:  # noqa: D102
-        raise NotImplementedError()
-
-    @property
-    def tip_length(self) -> float:  # noqa: D102
-        raise NotImplementedError()
-
-    @tip_length.setter
-    def tip_length(self, length: float) -> None:
-        raise NotImplementedError()
-
     def __repr__(self) -> str:  # noqa: D105
         raise NotImplementedError()
 
-    def __eq__(self, other: object) -> bool:  # noqa: D105
-        raise NotImplementedError()
+    def __eq__(self, other: object) -> bool:
+        """Compare for object equality.
 
-    def __hash__(self) -> int:  # noqa: D105
-        raise NotImplementedError()
+        Checks that other object is a `Labware` and has the same identifier.
+        """
+        return isinstance(other, Labware) and self._labware_id == other._labware_id
 
-    # For Opentrons internal use only.
-    # Not part of the public Python Protocol API.
-    @property
-    def resource_id(self) -> str:  # noqa: D102
-        return self._resource_id
+    def __hash__(self) -> int:
+        """Get hash.
+
+        Uses the labware instance's unique identifier in protocol state.
+        """
+        return hash(self._labware_id)
+
+    def __getitem__(self, key: str) -> Well:  # noqa: D105
+        raise NotImplementedError()
 
     # todo(mm, 2021-04-09): The following methods appear on docs.opentrons.com
     # (accidentally?) but aren't versioned. Figure out whether we need to
@@ -217,3 +222,6 @@ class Labware:  # noqa: D101
 # appear on docs.opentrons.com, but none of them are versioned with
 # @requires_version, so it's unclear if they're meant to be part of the public
 # API. We need to figure out whether we need to include them here.
+# todo(MC, 2021-05-04): In support of those free functions, there are two
+# errors defined: `TipSelectionError` and `OutOfTipsError`. We need to figure
+# out if we need them, too.

@@ -1,7 +1,7 @@
 // @flow
 import assert from 'assert'
 import { getWellsDepth } from '@opentrons/shared-data'
-import { DEST_WELL_BLOWOUT_DESTINATION } from '../../../step-generation/utils'
+import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -17,7 +17,7 @@ import type {
   DistributeArgs,
   TransferArgs,
   InnerMixArgs,
-} from '../../../step-generation'
+} from '@opentrons/step-generation'
 
 type MoveLiquidFields = $PropertyType<HydratedMoveLiquidFormData, 'fields'>
 

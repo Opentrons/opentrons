@@ -32,6 +32,7 @@ export const AspDispSection = (props: Props): React.Node => {
         >
           <IconButton
             className={styles.advanced_settings_button}
+            id={`AspDispSection_settings_button_${props.prefix}`}
             name="settings"
             hover={!collapsed}
           />

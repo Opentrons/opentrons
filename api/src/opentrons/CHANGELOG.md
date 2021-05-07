@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0) (2021-05-06)
+
+### Bug Fixes
+
+* **api:** ensure loaded modules is returned in order ([#7704](https://github.com/Opentrons/opentrons/issues/7704)) ([66a775c](https://github.com/Opentrons/opentrons/commit/66a775c))
+* **api:** return a simulated module for magnetic modules if they are not compatible ([#7654](https://github.com/Opentrons/opentrons/issues/7654)) ([f6fcb77](https://github.com/Opentrons/opentrons/commit/f6fcb77))
+* **api:**  can't find pipettes ([#7639](https://github.com/Opentrons/opentrons/issues/7639)) ([4e5176c](https://github.com/Opentrons/opentrons/commit/4e5176c))
+* **api:** api location cache fix ([#7609](https://github.com/Opentrons/opentrons/issues/7609)) ([df68ea2](https://github.com/Opentrons/opentrons/commit/df68ea2)), closes [#7156](https://github.com/Opentrons/opentrons/issues/7156)
+* **api:** check the symlink of the virtual port to map to the physical port ([#7524](https://github.com/Opentrons/opentrons/issues/7524)) ([32b9de5](https://github.com/Opentrons/opentrons/commit/32b9de5))
+* **api:** do not search for a tip length calibration by slot name ([#7574](https://github.com/Opentrons/opentrons/issues/7574)) ([22b6ccd](https://github.com/Opentrons/opentrons/commit/22b6ccd))
+* **api:** represent Location correctly in log ([#7565](https://github.com/Opentrons/opentrons/issues/7565)) ([be091a3](https://github.com/Opentrons/opentrons/commit/be091a3)), closes [#7564](https://github.com/Opentrons/opentrons/issues/7564)
+* **api:** Sleeps do not happen in thermocycler and tempdeck when simulating.  ([8ef61c0](https://github.com/Opentrons/opentrons/commit/8ef61c0)), closes [#7506](https://github.com/Opentrons/opentrons/issues/7506)
+
+
+### Features
+
+* **api:** add module emulation ([#7353](https://github.com/Opentrons/opentrons/issues/7353)) ([78869dc](https://github.com/Opentrons/opentrons/commit/78869dc))
+* **api:** Add physical USB Port information to the hardware controller ([#7359](https://github.com/Opentrons/opentrons/issues/7359)) ([7d9734b](https://github.com/Opentrons/opentrons/commit/7d9734b))
+* **api:** allow ProtocolContext to load labware using the ProtocolEngine ([#7398](https://github.com/Opentrons/opentrons/issues/7398)) ([858135b](https://github.com/Opentrons/opentrons/commit/858135b)), closes [#7390](https://github.com/Opentrons/opentrons/issues/7390) [#7448](https://github.com/Opentrons/opentrons/issues/7448)
+* **api:** api json command dispatcher and translator ([#7555](https://github.com/Opentrons/opentrons/issues/7555)) ([9c56ab5](https://github.com/Opentrons/opentrons/commit/9c56ab5)), closes [#7428](https://github.com/Opentrons/opentrons/issues/7428)
+* **api:** fast simulation catches tip and volume errors ([#7631](https://github.com/Opentrons/opentrons/issues/7631)) ([b8e3d26](https://github.com/Opentrons/opentrons/commit/b8e3d26)), closes [#7627](https://github.com/Opentrons/opentrons/issues/7627)
+* **api:** protocol engine InstrumentContext implementes pick_up_tip and drop_tip ([#7621](https://github.com/Opentrons/opentrons/issues/7621)) ([1d77016](https://github.com/Opentrons/opentrons/commit/1d77016)), closes [#7326](https://github.com/Opentrons/opentrons/issues/7326) [#7327](https://github.com/Opentrons/opentrons/issues/7327)
+* **api:** protocol engine labware interface implementationn ([#7453](https://github.com/Opentrons/opentrons/issues/7453)) ([1ad02d8](https://github.com/Opentrons/opentrons/commit/1ad02d8)), closes [#7332](https://github.com/Opentrons/opentrons/issues/7332)
+* **api:** sort modules in protocol context by USB port ([#7532](https://github.com/Opentrons/opentrons/issues/7532)) ([a752897](https://github.com/Opentrons/opentrons/commit/a752897))
+* **protocol-engine:** Start a Protocol-Engine–backed implementation of InstrumentContext ([#7474](https://github.com/Opentrons/opentrons/issues/7474)) ([0be7126](https://github.com/Opentrons/opentrons/commit/0be7126)), closes [#7324](https://github.com/Opentrons/opentrons/issues/7324)
+* **robot-server:** Add physical module usb port information to the http server ([#7362](https://github.com/Opentrons/opentrons/issues/7362)) ([07b0f4a](https://github.com/Opentrons/opentrons/commit/07b0f4a))
+
+
+
+
+
 ## [4.2.1](https://github.com/Opentrons/opentrons/compare/v4.2.0..v4.2.1) (2021-04-06)
 
 ### Bug Fixes

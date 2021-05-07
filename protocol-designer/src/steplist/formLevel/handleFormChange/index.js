@@ -6,12 +6,12 @@ import { dependentFieldsUpdatePause } from './dependentFieldsUpdatePause'
 import { dependentFieldsUpdateTemperature } from './dependentFieldsUpdateTemperature'
 import { dependentFieldsUpdateThermocycler } from './dependentFieldsUpdateThermocycler'
 
-import type { FormData } from '../../../form-types'
-import type { FormPatch } from '../../actions/types'
 import type {
   LabwareEntities,
   PipetteEntities,
-} from '../../../step-forms/types'
+} from '@opentrons/step-generation'
+import type { FormData } from '../../../form-types'
+import type { FormPatch } from '../../actions/types'
 
 export function handleFormChange(
   patch: FormPatch,

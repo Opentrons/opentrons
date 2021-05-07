@@ -20,6 +20,7 @@ def test_state_store_handles_command(store: StateStore, now: datetime) -> None:
             namespace="opentrons-test",
             version=1,
             location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
+            labwareId=None
         )
     )
 
