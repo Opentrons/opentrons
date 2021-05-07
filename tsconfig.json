@@ -14,6 +14,9 @@
       "path": "./labware-library"
     },
     {
+      "path": "./step-generation"
+    },
+    {
       "path": "./shared-data"
     }
   ]

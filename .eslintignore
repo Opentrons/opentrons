@@ -13,6 +13,7 @@ flow-typed/npm/**
 discovery-client/flow-types/**
 components/flow-types/**
 shared-data/flow-types/**
+step-generation/flow-types/**
 
 # typescript
 app-shell/lib/**
