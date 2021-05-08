@@ -1,9 +1,12 @@
 """Application routes."""
 from fastapi import APIRouter, status
 
+from opentrons.config.feature_flags import enable_protocol_engine
+
 from .constants import V1_TAG
 from .errors import LegacyErrorResponse
 from .health import health_router
+from .sessions import sessions_router as experimental_sessions_router
 from .system import system_router
 from .service.legacy.routers import legacy_routes
 from .service.session.router import router as session_router
@@ -36,11 +39,16 @@ router.include_router(
     },
 )
 
-# New v2 routes
-router.include_router(
-    router=session_router,
-    tags=["Session Management"],
-)
+if enable_protocol_engine():
+    router.include_router(
+        router=experimental_sessions_router,
+        tags=["Session Management"],
+    )
+else:
+    router.include_router(
+        router=session_router,
+        tags=["Session Management"],
+    )
 
 router.include_router(
     router=labware_router,
