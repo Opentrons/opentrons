@@ -1,9 +1,6 @@
 import { thermocyclerStateDiff, Diff } from '../utils/thermocyclerStateDiff'
 import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
-import {
-  getStateAndContextTempTCModules,
-  getSuccessResult,
-} from '../fixtures'
+import { getStateAndContextTempTCModules, getSuccessResult } from '../fixtures'
 jest.mock('../utils/thermocyclerStateDiff')
 
 const mockThermocyclerStateDiff = thermocyclerStateDiff as jest.MockedFunction<

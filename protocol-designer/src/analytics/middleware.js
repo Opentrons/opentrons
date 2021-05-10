@@ -28,7 +28,9 @@ export const reduxActionToAnalyticsEvent = (
     // create the "saveStep" action, taking advantage of the formToArgs machinery
     // to get nice cleaned-up data instead of the raw form data.
     const a: SaveStepFormAction = action
-    const argsAndErrors: StepArgsAndErrors = getArgsAndErrorsByStepId(state)[a.payload.id]
+    const argsAndErrors: StepArgsAndErrors = getArgsAndErrorsByStepId(state)[
+      a.payload.id
+    ]
     const { stepArgs } = argsAndErrors
 
     if (stepArgs !== null) {
@@ -51,7 +53,7 @@ export const reduxActionToAnalyticsEvent = (
 
       if (stepArgs.pipette) {
         additionalProperties.__pipetteName =
-        // $FlowFixMe(sa, 2021-05-10): stepArgs is unknown typed here for some reason
+          // $FlowFixMe(sa, 2021-05-10): stepArgs is unknown typed here for some reason
           pipetteEntities[stepArgs?.pipette].name
       }
 
