@@ -69,7 +69,6 @@ def test_api_version_too_low(api_client):
         {
             "id": "OutdatedAPIVersion",
             "title": "Requested HTTP API version no longer supported",
-            "status": "400",
             "detail": (
                 "HTTP API version 1 is no longer supported. Please upgrade "
                 "your Opentrons App or other HTTP API client."

@@ -46,9 +46,9 @@ def test_raise_system_synchronized_error(
         }
     })
     assert response.json() == {'errors': [{
+        'id': 'UnknownError',
         'detail': 'Cannot set system time; already synchronized with NTP '
                   'or RTC',
-        'status': '403',
         'title': 'Action Forbidden'}]}
     assert response.status_code == 403
 
@@ -69,8 +69,8 @@ def test_raise_system_exception(
         }
     })
     assert response.json() == {'errors': [{
+        'id': 'UnknownError',
         'detail': 'Something went wrong',
-        'status': '500',
         'title': 'Internal Server Error'}]}
     assert response.status_code == 500
 

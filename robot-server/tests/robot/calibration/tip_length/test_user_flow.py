@@ -350,4 +350,6 @@ def test_no_pipette(hardware, mount):
                                has_calibration_block=None,
                                tip_rack=None)
 
-    assert error.value.error.detail == f"No pipette present on {mount} mount"
+    assert error.value.content["errors"][0]["detail"] == (
+        f"No pipette present on {mount} mount"
+    )

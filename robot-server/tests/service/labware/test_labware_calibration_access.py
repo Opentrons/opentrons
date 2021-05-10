@@ -49,7 +49,7 @@ def test_access_individual_labware(api_client, grab_id):
     body = resp.json()
     assert body == {
         'errors': [{
-            'status': '404',
+            'id': 'UnknownError',
             'title': 'Resource Not Found',
             'detail': "Resource type 'calibration' with id "
                       "'funnyId' was not found"
@@ -63,7 +63,7 @@ def test_delete_individual_labware(api_client, grab_id):
     body = resp.json()
     assert body == {
         'errors': [{
-            'status': '404',
+            'id': 'UnknownError',
             'title': 'Resource Not Found',
             'detail': "Resource type 'calibration' with id "
                       "'funnyId' was not found"

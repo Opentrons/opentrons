@@ -5,13 +5,8 @@ from enum import Enum
 from typing import Dict, Optional
 from starlette import status as status_codes
 
-from robot_server.service.json_api.errors import Error, ErrorSource, ResourceLinks
-
-
-class BaseRobotServerError(Exception):
-    def __init__(self, status_code: int, error: Error):
-        self.status_code = status_code
-        self.error = error
+from robot_server.errors import ApiError, MultiErrorResponse, ErrorResponse
+from robot_server.service.json_api import ResourceLinks
 
 
 @dataclass(frozen=True)
@@ -28,13 +23,16 @@ class ErrorDef(ErrorCreateDef, Enum):
         super().__init__(**(asdict(e)))
 
 
-class RobotServerError(BaseRobotServerError):
-    """A BaseRobotServerError that uses an ErrorDef enum"""
+class RobotServerError(ApiError):
+    """A BaseRobotServerError that uses an ErrorDef enum.
+
+    .. deprecated::
+        Use `robot_server.errors.ErrorResponse(...).as_error(status_code)` instead.
+    """
     def __init__(self,
                  definition: ErrorCreateDef,
-                 error_id: str = None,
+                 error_id: str = "UnknownError",
                  links: Optional[ResourceLinks] = None,
-                 source: Optional[ErrorSource] = None,
                  meta: Optional[Dict] = None,
                  *fmt_args, **fmt_kw_args):
         """
@@ -43,23 +41,26 @@ class RobotServerError(BaseRobotServerError):
         :param definition: The ErrorDef enum defining error
         :param error_id: optional error id
         :param links: optional links
-        :param source: optional source of error
         :param meta: optional metadata about error
         :param fmt_args: format_string args
         :param fmt_kw_args: format_string kw_args
         """
+        content = MultiErrorResponse(
+            errors=[
+                ErrorResponse(
+                    id=error_id,
+                    title=definition.title,
+                    detail=definition.format_string.format(*fmt_args, **fmt_kw_args),
+                    meta=meta,
+                ),
+            ],
+            links=links,
+        ).dict(exclude_none=True)
+
         super().__init__(
-            definition.status_code,
-            Error(
-                id=error_id,
-                links=links,
-                status=str(definition.status_code),
-                title=definition.title,
-                detail=definition.format_string.format(*fmt_args,
-                                                       **fmt_kw_args),
-                source=source,
-                meta=meta
-            ))
+            status_code=definition.status_code,
+            content=content,
+        )
 
 
 class CommonErrorDef(ErrorDef):

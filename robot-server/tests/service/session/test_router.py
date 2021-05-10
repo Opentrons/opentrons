@@ -88,8 +88,8 @@ def test_sessions_create_error(
     })
     assert response.json() == {
         'errors': [{
+            'id': 'UnknownError',
             'detail': "Please attach pipettes before proceeding",
-            'status': '403',
             'title': 'Action Forbidden'}
         ]}
     assert response.status_code == 403
@@ -144,14 +144,14 @@ def test_sessions_delete_not_found(
     response = sessions_api_client.delete("/sessions/check")
     assert response.json() == {
         'errors': [{
+            'id': 'UnknownError',
+            'title': 'Resource Not Found',
             'detail': "Resource type 'session' with id 'check' was not found",
-            'links': {
-                'self': {'href': '/sessions'},
-                'sessionById': {'href': '/sessions/{sessionId}'}
-            },
-            'status': '404',
-            'title': 'Resource Not Found'
-        }]
+        }],
+        'links': {
+            'self': {'href': '/sessions'},
+            'sessionById': {'href': '/sessions/{sessionId}'}
+        },
     }
     assert response.status_code == 404
 
@@ -197,14 +197,14 @@ def test_sessions_get_not_found(
     response = sessions_api_client.get("/sessions/1234")
     assert response.json() == {
         'errors': [{
+            'id': 'UnknownError',
             'detail': "Resource type 'session' with id '1234' was not found",
-            'links': {
-                'self': {'href': '/sessions'},
-                'sessionById': {'href': '/sessions/{sessionId}'}
-            },
-            'status': '404',
             'title': 'Resource Not Found'
-        }]
+        }],
+        'links': {
+            'self': {'href': '/sessions'},
+            'sessionById': {'href': '/sessions/{sessionId}'}
+        },
     }
     assert response.status_code == 404
 
@@ -299,14 +299,14 @@ def test_sessions_execute_command_no_session(
     mock_session_manager.get_by_id.assert_called_once_with("1234")
     assert response.json() == {
         'errors': [{
+            'id': 'UnknownError',
+            'title': 'Resource Not Found',
             'detail': "Resource type 'session' with id '1234' was not found",  # noqa: E501
-            'links': {
-                'self': {'href': '/sessions'},
-                'sessionById': {'href': '/sessions/{sessionId}'}
-            },
-            'status': '404',
-            'title': 'Resource Not Found'
-        }]
+        }],
+        'links': {
+            'self': {'href': '/sessions'},
+            'sessionById': {'href': '/sessions/{sessionId}'}
+        },
     }
     assert response.status_code == 404
 
@@ -407,8 +407,8 @@ def test_execute_command_error(sessions_api_client,
         'errors': [
             {
                 'detail': 'Cannot do it',
-                'status': f'{expected_status}',
-                'title': 'Action Forbidden'
+                'title': 'Action Forbidden',
+                'id': 'UnknownError',
             }
         ]
     }
@@ -439,8 +439,8 @@ def test_execute_command_session_inactive(
     assert response.json() == {
         'errors': [
             {
+                'id': 'UnknownError',
                 'title': 'Action Forbidden',
-                'status': '403',
                 'detail': f"Session '{mock_session.meta.identifier}'"
                          f" is not active. Only the active session can "
                          f"execute commands"

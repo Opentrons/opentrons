@@ -2,6 +2,8 @@
 from pydantic import BaseModel, Field
 from typing import Any, Dict, Optional, Sequence
 
+from robot_server.service.json_api import ResourceLinks
+
 
 class ApiError(Exception):
     """An exception to throw when an endpoint should respond with an error."""
@@ -72,3 +74,10 @@ class MultiErrorResponse(BaseErrorResponse):
     """An error response with multiple errors."""
 
     errors: Sequence[ErrorResponse] = Field(..., description="Error details.")
+    links: Optional[ResourceLinks] = Field(
+        None,
+        description=(
+            "Links that leads to further details about "
+            "this particular occurrence of the problem."
+        ),
+    )

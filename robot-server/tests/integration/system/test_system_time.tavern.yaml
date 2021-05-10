@@ -54,6 +54,6 @@ stages:
       status_code: 501
       json:
         errors:
-          - status: '501'
+          - id: 'UnknownError'
             title: 'Not implemented'
             detail: 'Method not implemented. Not supported on dev server.'

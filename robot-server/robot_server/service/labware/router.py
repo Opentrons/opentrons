@@ -11,9 +11,10 @@ from opentrons.calibration_storage import (
     get as get_cal,
     delete)
 
+from robot_server.errors import ErrorResponse
 from robot_server.service.labware import models as lw_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
-from robot_server.service.json_api import ErrorResponse
+
 
 router = APIRouter()
 

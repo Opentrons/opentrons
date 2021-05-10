@@ -4,7 +4,7 @@ import logging
 from opentrons import __version__
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import Response, JSONResponse
+from starlette.responses import Response
 from starlette.requests import Request
 from starlette.middleware.base import RequestResponseEndpoint
 
@@ -19,8 +19,6 @@ from .service.dependencies import (
 from .errors import exception_handlers
 from .router import router
 from .service import initialize_logging
-from .service.errors import BaseRobotServerError
-from .service.json_api.errors import ErrorResponse
 from . import constants
 
 log = logging.getLogger(__name__)
@@ -96,32 +94,3 @@ async def api_version_response_header(
     response.headers[constants.API_VERSION_HEADER] = str(request.state.api_version)
     response.headers[constants.MIN_API_VERSION_HEADER] = str(constants.MIN_API_VERSION)
     return response
-
-
-# TODO(mc, 2021-05-10): remove this when we no longer raise `BaseRobotServerError`
-@app.exception_handler(BaseRobotServerError)
-async def robot_server_exception_handler(
-    request: Request,
-    exc: BaseRobotServerError,
-) -> JSONResponse:
-    """Catch robot server exceptions."""
-    if not exc.error.status:
-        exc.error.status = str(exc.status_code)
-    log.error(f"RobotServerError: {exc.error}")
-    return JSONResponse(
-        status_code=exc.status_code,
-        content=ErrorResponse(errors=[exc.error]).dict(
-            exclude_unset=True, exclude_none=True
-        ),
-    )
-
-
-def route_has_tag(request: Request, tag: str) -> bool:
-    """Check if router handling the request has the tag."""
-    router = request.scope.get("router")
-    if router:
-        for route in router.routes:
-            if route.endpoint == request.scope.get("endpoint"):
-                return tag in route.tags
-
-    return False

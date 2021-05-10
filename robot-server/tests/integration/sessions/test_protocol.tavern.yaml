@@ -9,13 +9,13 @@ marks:
 stages:
   - name: Create the session
     request:
-      url: "{host:s}:{port:d}/sessions"
+      url: '{host:s}:{port:d}/sessions'
       method: POST
       json:
         data:
           sessionType: protocol
           createParams:
-            protocolId: "my_protocol"
+            protocolId: 'my_protocol'
     response:
       status_code: 404
 ---
@@ -28,10 +28,10 @@ marks:
 stages:
   - name: Upload a protocol to use with the session
     request:
-      url: "{host:s}:{port:d}/protocols"
+      url: '{host:s}:{port:d}/protocols'
       method: POST
       files:
-        protocolFile: "tests/integration/protocols/basic_transfer_standalone.py"
+        protocolFile: 'tests/integration/protocols/basic_transfer_standalone.py'
     response:
       save:
         json:
@@ -39,23 +39,23 @@ stages:
       status_code: 201
   - name: Can't create session due to feature flag
     request:
-      url: "{host:s}:{port:d}/sessions"
+      url: '{host:s}:{port:d}/sessions'
       method: POST
       json:
         data:
           sessionType: protocol
           createParams:
-            protocolId: "{protocol_id}"
+            protocolId: '{protocol_id}'
     response:
       status_code: 403
       json:
         errors:
-        - status: "403"
-          title: Action Forbidden
-          detail: "HTTP Protocol Session feature is disabled"
+          - id: 'UnknownError'
+            title: Action Forbidden
+            detail: 'HTTP Protocol Session feature is disabled'
   - name: Delete the protocol
     request:
-      url: "{host:s}:{port:d}/protocols/{protocol_id}"
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
       method: DELETE
 ---
 test_name: Protocol session life cycle
@@ -68,10 +68,10 @@ marks:
 stages:
   - name: Upload a protocol to use with the session
     request:
-      url: "{host:s}:{port:d}/protocols"
+      url: '{host:s}:{port:d}/protocols'
       method: POST
       files:
-        protocolFile: "tests/integration/protocols/basic_transfer_standalone.py"
+        protocolFile: 'tests/integration/protocols/basic_transfer_standalone.py'
     response:
       save:
         json:
@@ -79,13 +79,13 @@ stages:
       status_code: 201
   - name: Create the session
     request:
-      url: "{host:s}:{port:d}/sessions"
+      url: '{host:s}:{port:d}/sessions'
       method: POST
       json:
         data:
           sessionType: protocol
           createParams:
-            protocolId: "{protocol_id}"
+            protocolId: '{protocol_id}'
     response:
       status_code: 201
       save:
@@ -96,36 +96,36 @@ stages:
           id: !anystr
           sessionType: protocol
           createParams:
-            protocolId: "{protocol_id}"
+            protocolId: '{protocol_id}'
           createdAt: !anystr
           details:
-            protocolId: "{protocol_id}"
+            protocolId: '{protocol_id}'
             currentState: !anystr
             events: !anylist
         links: !anydict
   - name: Get the session
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
+      url: '{host:s}:{port:d}/sessions/{session_id}'
       method: GET
     response:
       status_code: 200
       json: *proto_session
   - name: Delete the session
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
+      url: '{host:s}:{port:d}/sessions/{session_id}'
       method: DELETE
     response:
       status_code: 200
       json: *proto_session
   - name: Get the session will fail
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
+      url: '{host:s}:{port:d}/sessions/{session_id}'
       method: GET
     response:
       status_code: 404
   - name: Delete the protocol
     request:
-      url: "{host:s}:{port:d}/protocols/{protocol_id}"
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
       method: DELETE
 ---
 test_name: Protocol session with support file
@@ -138,11 +138,11 @@ marks:
 stages:
   - name: Upload a protocol that uses a custom labware
     request:
-      url: "{host:s}:{port:d}/protocols"
+      url: '{host:s}:{port:d}/protocols'
       method: POST
       files:
-        protocolFile: "tests/integration/protocols/load_custom_labware.py"
-        supportFiles: "tests/integration/protocols/test_1_reservoir_5ul.json"
+        protocolFile: 'tests/integration/protocols/load_custom_labware.py'
+        supportFiles: 'tests/integration/protocols/test_1_reservoir_5ul.json'
     response:
       save:
         json:
@@ -150,13 +150,13 @@ stages:
       status_code: 201
   - name: Create the session and wait for simulation
     request:
-      url: "{host:s}:{port:d}/sessions"
+      url: '{host:s}:{port:d}/sessions'
       method: POST
       json:
         data:
           sessionType: protocol
           createParams:
-            protocolId: "{protocol_id}"
+            protocolId: '{protocol_id}'
     response:
       status_code: 201
       save:
@@ -167,17 +167,17 @@ stages:
           id: !anystr
           sessionType: protocol
           createParams:
-            protocolId: "{protocol_id}"
+            protocolId: '{protocol_id}'
           createdAt: !anystr
           details:
-            protocolId: "{protocol_id}"
+            protocolId: '{protocol_id}'
             currentState: !anystr
             events: !anylist
         links: !anydict
-    delay_after: 0.5  # Let simulation complete
+    delay_after: 0.5 # Let simulation complete
   - name: Get the session and make sure it's in loaded state.
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
+      url: '{host:s}:{port:d}/sessions/{session_id}'
       method: GET
     response:
       status_code: 200
@@ -186,16 +186,16 @@ stages:
           id: !anystr
           sessionType: protocol
           createParams:
-            protocolId: "{protocol_id}"
+            protocolId: '{protocol_id}'
           createdAt: !anystr
           details:
-            protocolId: "{protocol_id}"
+            protocolId: '{protocol_id}'
             currentState: loaded
             events: []
         links: !anydict
   - name: Run the protocol
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      url: '{host:s}:{port:d}/sessions/{session_id}/commands/execute'
       method: POST
       json:
         data:
@@ -204,10 +204,10 @@ stages:
     response:
       status_code: 200
       json: !anydict
-    delay_after: 0.5  # Let run complete
+    delay_after: 0.5 # Let run complete
   - name: Get the session and make sure it's in finished state.
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
+      url: '{host:s}:{port:d}/sessions/{session_id}'
       method: GET
     response:
       status_code: 200
@@ -216,10 +216,10 @@ stages:
           id: !anystr
           sessionType: protocol
           createParams:
-            protocolId: "{protocol_id}"
+            protocolId: '{protocol_id}'
           createdAt: !anystr
           details:
-            protocolId: "{protocol_id}"
+            protocolId: '{protocol_id}'
             currentState: finished
             events:
               - source: sessionCommand
@@ -231,12 +231,12 @@ stages:
         links: !anydict
   - name: Delete the session
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
+      url: '{host:s}:{port:d}/sessions/{session_id}'
       method: DELETE
     response:
       status_code: 200
       json: !anydict
   - name: Delete the protocol
     request:
-      url: "{host:s}:{port:d}/protocols/{protocol_id}"
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
       method: DELETE
