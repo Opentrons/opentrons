@@ -159,12 +159,9 @@ describe('Advanced Settings for Transfer Form', () => {
       [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
     })
     // Check tooltip here
-    cy.get('[id=main-page]').scrollTo('top')
-    cy.get('input[name="preWetTip"]')
-      .parent()
-      .trigger('pointerEnter', { scrollBehavior: false })
-      .wait(1000)
-    cy.get('div[id="Tooltip__26"]').should(
+    cy.contains('pre-wet tip')
+      .trigger('pointerover')
+    cy.get('div[role="tooltip"]').should(
       'contain',
       'Not all selected steps are using this setting'
     )
