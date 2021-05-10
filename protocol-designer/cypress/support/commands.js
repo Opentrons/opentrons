@@ -102,3 +102,8 @@ Cypress.Commands.add('openSettingsPage', () => {
 Cypress.Commands.add('prewettip', () => {
   cy.get('input[name="preWetTip"]').click({ force: true })
 })
+
+// Mix settings select/deselect
+Cypress.Commands.add('mix', () => {
+  cy.get('input[name="aspirate_mix_checkbox"]').click({ force: true })
+})
