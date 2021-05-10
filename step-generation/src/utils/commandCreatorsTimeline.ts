@@ -30,15 +30,12 @@ export const commandCreatorsTimeline = (
         invariantContext,
         prevRobotState
       )
-      // @ts-expect-error(SA, 2021-05-03): errors does not exist on CommandsAndWarnings, need to type narrow
-      if (commandCreatorResult.errors) {
+      if ('errors' in commandCreatorResult) {
         return {
           timeline: acc.timeline,
-          // @ts-expect-error(SA, 2021-05-03):'errors' does not exist on CommandCreatorResult
           errors: commandCreatorResult.errors,
         }
       }
-      // @ts-expect-error(SA, 2021-05-03): commands does not exist on CommandCreatorErrorResponse, need to type narrow
       const strippedCommands = stripNoOpCommands(commandCreatorResult.commands)
       const nextRobotStateAndWarnings = strippedCommands.reduce(
         (acc: RobotStateAndWarnings, command) =>
@@ -53,7 +50,6 @@ export const commandCreatorsTimeline = (
         }
       )
       const nextResult = {
-        // @ts-expect-error(SA, 2021-05-03): commands does not exist on CommandCreatorErrorResponse, need to type narrow
         commands: commandCreatorResult.commands,
         robotState: nextRobotStateAndWarnings.robotState,
         warnings: commandCreatorResult.warnings,

@@ -27,20 +27,16 @@ export const reduceCommandCreators = (
       }
 
       const next = reducerFn(invariantContext, prev.robotState)
-      // @ts-expect-error(SA, 2021-05-03): errors does not exist on CommandsAndWarnings, need to type narrow
-      if (next.errors) {
+      if ('errors' in next) {
         return {
           robotState: prev.robotState,
           commands: prev.commands,
-          // @ts-expect-error(SA, 2021-05-03): errors does not exist on CommandsAndWarnings, need to type narrow
           errors: next.errors,
           warnings: prev.warnings,
         }
       }
-      // @ts-expect-error(SA, 2021-05-03): commands does not exist on CommandCreatorErrorResponse, need to type narrow
       const allCommands = [...prev.commands, ...next.commands]
       const updates = getNextRobotStateAndWarnings(
-        // @ts-expect-error(SA, 2021-05-03): commands does not exist on CommandCreatorErrorResponse, need to type narrow
         next.commands,
         invariantContext,
         prev.robotState
