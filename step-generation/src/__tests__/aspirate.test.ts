@@ -12,7 +12,7 @@ import {
   getErrorResult,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
-} from '../__fixtures__'
+} from '../fixtures'
 import type { RobotState } from '../'
 jest.mock('../utils/thermocyclerPipetteCollision')
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<

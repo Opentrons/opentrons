@@ -4,7 +4,7 @@ import {
   getErrorResult,
   getStateAndContextTempTCModules,
   getSuccessResult,
-} from '../__fixtures__'
+} from '../fixtures'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
   ThermocyclerModuleState,

@@ -12,7 +12,7 @@ import { makeImmutableStateUpdater } from '../__utils__/makeImmutableStateUpdate
 import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
-} from '../__fixtures__/robotStateFixtures'
+} from '../fixtures/robotStateFixtures'
 import type { InvariantContext, RobotState } from '../types'
 const forSetTemperature = makeImmutableStateUpdater(_forSetTemperature)
 const forDeactivateTemperature = makeImmutableStateUpdater(

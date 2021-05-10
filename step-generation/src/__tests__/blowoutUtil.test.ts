@@ -15,7 +15,7 @@ import {
   BLOWOUT_FLOW_RATE,
   BLOWOUT_OFFSET_FROM_TOP_MM,
   makeContext,
-} from '../__fixtures__'
+} from '../fixtures'
 jest.mock('../utils/curryCommandCreator')
 
 const curryCommandCreatorMock = curryCommandCreator as jest.MockedFunction<

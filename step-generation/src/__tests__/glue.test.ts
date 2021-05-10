@@ -7,7 +7,7 @@ import {
   reduceCommandCreators,
   commandCreatorsTimeline,
 } from '../utils'
-import { DEFAULT_CONFIG } from '../__fixtures__'
+import { DEFAULT_CONFIG } from '../fixtures'
 import type { InvariantContext } from '../types'
 jest.mock('../getNextRobotStateAndWarnings')
 let invariantContext: InvariantContext

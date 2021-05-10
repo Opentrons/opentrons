@@ -1,6 +1,6 @@
 import { delay } from '../commandCreators/atomic/delay'
 import { PauseArgs } from '../types'
-import { getSuccessResult } from '../__fixtures__'
+import { getSuccessResult } from '../fixtures'
 
 const getRobotInitialState = (): any => {
   // This particular state shouldn't matter for delay

@@ -16,7 +16,7 @@ import {
 } from '../getNextRobotStateAndWarnings/thermocyclerUpdates'
 import type { ImmutableStateUpdater } from '../__utils__'
 import { makeImmutableStateUpdater } from '../__utils__'
-import { makeContext, getInitialRobotStateStandard } from '../__fixtures__'
+import { makeContext, getInitialRobotStateStandard } from '../fixtures'
 import type {
   ModuleOnlyParams,
   TCProfileParams,

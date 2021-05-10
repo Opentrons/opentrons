@@ -8,7 +8,7 @@ import {
   getErrorResult,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
-} from '../__fixtures__'
+} from '../fixtures'
 import type { InvariantContext, RobotState } from '../types'
 
 describe('touchTip', () => {

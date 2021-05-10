@@ -3,8 +3,8 @@ import {
   makeContext,
   makeState,
   DEFAULT_PIPETTE,
-  FIXED_TRASH_ID,
-} from '../__fixtures__'
+} from '../fixtures'
+import { FIXED_TRASH_ID } from '../constants'
 import { makeImmutableStateUpdater } from '../__utils__'
 import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
 import { InvariantContext, RobotState } from '../types'

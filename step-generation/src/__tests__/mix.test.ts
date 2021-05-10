@@ -15,7 +15,7 @@ import {
   blowoutHelper,
   makeTouchTipHelper,
   delayCommand,
-} from '../__fixtures__'
+} from '../fixtures'
 import { InvariantContext, MixArgs, RobotState } from '../types'
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper({

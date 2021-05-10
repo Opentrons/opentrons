@@ -6,7 +6,7 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
   TROUGH_LABWARE,
-} from '../__fixtures__'
+} from '../fixtures'
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
 import * as warningCreators from '../warningCreators'
 import type { InvariantContext, RobotState } from '../types'

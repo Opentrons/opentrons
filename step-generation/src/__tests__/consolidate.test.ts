@@ -8,7 +8,6 @@ import {
   DEST_LABWARE,
   DISPENSE_OFFSET_FROM_BOTTOM_MM,
   dropTipHelper,
-  FIXED_TRASH_ID,
   getErrorResult,
   getFlowRateAndOffsetParamsTransferLike,
   getInitialRobotStateStandard,
@@ -21,7 +20,8 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
-} from '../__fixtures__'
+} from '../fixtures'
+import { FIXED_TRASH_ID } from '../constants'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {

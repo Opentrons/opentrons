@@ -5,7 +5,7 @@ import {
   makeContext,
   getTipColumn,
   DEFAULT_PIPETTE,
-} from '../__fixtures__'
+} from '../fixtures'
 import { forPickUpTip as _forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
 import type { InvariantContext, RobotState } from '../types'

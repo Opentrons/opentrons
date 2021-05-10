@@ -6,7 +6,6 @@ import {
   delayWithOffset,
   DEST_LABWARE,
   dropTipHelper,
-  FIXED_TRASH_ID,
   getErrorResult,
   getFlowRateAndOffsetParamsTransferLike,
   getRobotInitialStateNoTipsRemain,
@@ -20,7 +19,8 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
-} from '../__fixtures__'
+} from '../fixtures'
+import { FIXED_TRASH_ID } from '../constants'
 import { distribute } from '../commandCreators/compound/distribute'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6.js'
 import type { DistributeArgs, InvariantContext, RobotState } from '../types'

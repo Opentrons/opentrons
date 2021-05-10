@@ -79,7 +79,7 @@ export function denormalizePipetteEntities(
           `no pipette spec for pipette id "${pipetteId}", name "${pipette.name}"`
         )
       }
-
+      // $FlowFixMe(sa, 2021-05-10): PipetteEntity is exact typed 
       const pipetteEntity: PipetteEntity = {
         ...pipette,
         spec,

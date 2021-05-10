@@ -6,6 +6,7 @@ import type {
   DispenseParams,
   TouchTipParams,
 } from '@opentrons/shared-data/protocol/types/schemaV3'
+import { FIXED_TRASH_ID } from '../constants'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
 
@@ -94,8 +95,8 @@ export const MULTI_PIPETTE = 'p300MultiId'
 export const SOURCE_LABWARE = 'sourcePlateId'
 export const DEST_LABWARE = 'destPlateId'
 export const TROUGH_LABWARE = 'troughId'
-export const FIXED_TRASH_ID = 'trashId'
 export const DEFAULT_BLOWOUT_WELL = 'A1'
+
 // =================
 type MakeAspDispHelper<P> = (
   bakedParams?: Partial<P>

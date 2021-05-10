@@ -20,6 +20,7 @@ import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
+  FIXED_TRASH_ID,
 } from '../constants'
 import {
   DEFAULT_PIPETTE,
@@ -27,7 +28,6 @@ import {
   SOURCE_LABWARE,
   DEST_LABWARE,
   TROUGH_LABWARE,
-  FIXED_TRASH_ID,
 } from './commandFixtures'
 import { makeInitialRobotState } from '../utils'
 import { tiprackWellNamesFlat } from './data'

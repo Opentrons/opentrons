@@ -5,7 +5,7 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import produce from 'immer'
 import { createEmptyLiquidState, createTipLiquidState } from '../utils'
-import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from '../__fixtures__'
+import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from '../fixtures'
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
 import type { InvariantContext } from '../types'
 let dispenseSingleCh150ToA1Args: {

@@ -18,7 +18,7 @@ import {
   pickUpTipHelper,
   SOURCE_LABWARE,
   makeDispenseAirGapHelper,
-} from '../__fixtures__'
+} from '../fixtures'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,

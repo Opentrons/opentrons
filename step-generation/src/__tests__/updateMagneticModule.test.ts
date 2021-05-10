@@ -4,7 +4,7 @@ import {
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
 import { makeImmutableStateUpdater } from '../__utils__'
-import { makeContext, getInitialRobotStateStandard } from '../__fixtures__'
+import { makeContext, getInitialRobotStateStandard } from '../fixtures'
 import {
   forEngageMagnet as _forEngageMagnet,
   forDisengageMagnet as _forDisengageMagnet,

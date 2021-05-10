@@ -7,7 +7,7 @@ import {
   getSuccessResult,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
-} from '../__fixtures__'
+} from '../fixtures'
 import { dispense } from '../commandCreators/atomic/dispense'
 import { InvariantContext, RobotState } from '../types'
 import { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'

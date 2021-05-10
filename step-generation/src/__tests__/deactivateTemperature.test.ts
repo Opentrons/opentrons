@@ -1,4 +1,4 @@
-import { getStateAndContextTempTCModules } from '../__fixtures__'
+import { getStateAndContextTempTCModules } from '../fixtures'
 import { deactivateTemperature } from '../commandCreators/atomic/deactivateTemperature'
 import {
   InvariantContext,

@@ -7,7 +7,7 @@ import { thermocyclerDeactivateLid } from '../commandCreators/atomic/thermocycle
 import { thermocyclerRunProfile } from '../commandCreators/atomic/thermocyclerRunProfile'
 import { thermocyclerCloseLid } from '../commandCreators/atomic/thermocyclerCloseLid'
 import { thermocyclerOpenLid } from '../commandCreators/atomic/thermocyclerOpenLid'
-import { getSuccessResult } from '../__fixtures__'
+import { getSuccessResult } from '../fixtures'
 import type {
   AtomicProfileStep,
   ModuleOnlyParams,

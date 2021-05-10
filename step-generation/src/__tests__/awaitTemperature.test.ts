@@ -7,7 +7,7 @@ import { awaitTemperature } from '../commandCreators/atomic/awaitTemperature'
 import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
-} from '../__fixtures__'
+} from '../fixtures'
 import type { AwaitTemperatureArgs } from '../types'
 
 describe('awaitTemperature', () => {

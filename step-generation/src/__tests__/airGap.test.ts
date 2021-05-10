@@ -9,7 +9,7 @@ import {
   getErrorResult,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
-} from '../__fixtures__'
+} from '../fixtures'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { airGap } from '../commandCreators/atomic/airGap'
 import { thermocyclerPipetteCollision, modulePipetteCollision } from '../utils'

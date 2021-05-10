@@ -8,7 +8,7 @@ import {
   getSuccessResult,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
-} from '../__fixtures__'
+} from '../fixtures'
 import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { RobotState, InvariantContext } from '../types'
 describe('blowout', () => {

@@ -1,5 +1,5 @@
 import { createEmptyLiquidState } from '../utils'
-import { makeContext, makeState } from '../__fixtures__'
+import { makeContext, makeState } from '../fixtures'
 describe('snapshot tests', () => {
   it('makeContext', () => {
     expect(makeContext()).toMatchSnapshot()

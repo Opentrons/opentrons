@@ -3,7 +3,7 @@ import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerS
 import {
   getStateAndContextTempTCModules,
   getSuccessResult,
-} from '../__fixtures__'
+} from '../fixtures'
 jest.mock('../utils/thermocyclerStateDiff')
 
 const mockThermocyclerStateDiff = thermocyclerStateDiff as jest.MockedFunction<

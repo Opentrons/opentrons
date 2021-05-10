@@ -12,7 +12,7 @@ import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_tra
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { TEMPERATURE_DEACTIVATED } from '../constants'
+import { TEMPERATURE_DEACTIVATED, FIXED_TRASH_ID } from '../constants'
 import {
   AIR,
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -25,7 +25,7 @@ import {
   splitLiquid,
 } from '../utils/misc'
 import { Diff, thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
-import { DEFAULT_CONFIG, FIXED_TRASH_ID } from '../__fixtures__'
+import { DEFAULT_CONFIG } from '../fixtures'
 import { orderWells, thermocyclerPipetteCollision } from '../utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { RobotState, ThermocyclerStateStepArgs } from '../types'

@@ -8,7 +8,7 @@ import {
   pickUpTipHelper,
   dropTipHelper,
   DEFAULT_PIPETTE,
-} from '../__fixtures__'
+} from '../fixtures'
 import { replaceTip } from '../commandCreators/atomic/replaceTip'
 import type { InvariantContext, RobotState } from '../types'
 

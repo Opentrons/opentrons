@@ -5,7 +5,7 @@ import {
   getRobotStateWithTipStandard,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
-} from '../__fixtures__'
+} from '../fixtures'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { InvariantContext, RobotState } from '../types'
 

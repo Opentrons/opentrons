@@ -4,7 +4,7 @@ import {
   getRobotStateWithTipStandard,
   getErrorResult,
   getSuccessResult,
-} from '../__fixtures__'
+} from '../fixtures'
 import { moveToSlot } from '../commandCreators/atomic/moveToSlot'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import type { MoveToSlotParams } from '@opentrons/shared-data/protocol/types/schemaV3'
