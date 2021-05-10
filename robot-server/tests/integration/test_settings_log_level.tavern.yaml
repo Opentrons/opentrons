@@ -11,16 +11,16 @@ marks:
         - warning
         - error
 stages:
-  - name: Set log_level to acceptable values
+  - name: Set log_level to acceptable values 
     request:
       method: POST
-      url: '{host:s}:{port:d}/settings/log_level/local'
-      json:
-        log_level: '{log_level}'
+      url: "{host:s}:{port:d}/settings/log_level/local"
+      json: 
+        log_level: "{log_level}"
     response:
       status_code: 200
       json:
-        message: 'log_level set to {log_level}'
+        message: "log_level set to {log_level}"
 ---
 # Incorect Log Level Requests
 test_name: POST Set log level to invalid value
@@ -28,11 +28,11 @@ marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Set log_level to error
+  - name: Set log_level to error 
     request:
       method: POST
-      url: '{host:s}:{port:d}/settings/log_level/local'
-      json:
+      url: "{host:s}:{port:d}/settings/log_level/local"
+      json: 
         log_level: bad_level
     response:
       status_code: 422
@@ -44,13 +44,13 @@ marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Set log_level to nothing
+  - name: Set log_level to nothing 
     request:
       method: POST
-      url: '{host:s}:{port:d}/settings/log_level/local'
-      json:
+      url: "{host:s}:{port:d}/settings/log_level/local"
+      json: 
         log_level: Null
     response:
       status_code: 422
       json:
-        message: 'log_level must be set'
+        message: "log_level must be set"

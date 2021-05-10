@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Dict, Optional
 from starlette import status as status_codes
 
-from robot_server.errors import ApiError, ErrorResponse, ErrorDetails
+from robot_server.errors import ApiError, ErrorSource, ErrorDetails, ErrorResponse
 from robot_server.service.json_api import ResourceLinks
 
 
@@ -28,7 +28,7 @@ class RobotServerError(ApiError):
     """A BaseRobotServerError that uses an ErrorDef enum.
 
     .. deprecated::
-        Use `robot_server.errors.ErrorResponse(...).as_error(status_code)` instead.
+        Use `robot_server.errors.ErrorDetails(...).as_error(status_code)` instead.
     """
 
     def __init__(
@@ -36,6 +36,7 @@ class RobotServerError(ApiError):
         definition: ErrorCreateDef,
         error_id: str = "UnknownError",
         links: Optional[ResourceLinks] = None,
+        source: Optional[ErrorSource] = None,
         meta: Optional[Dict] = None,
         *fmt_args,
         **fmt_kw_args
@@ -56,6 +57,7 @@ class RobotServerError(ApiError):
                     id=error_id,
                     title=definition.title,
                     detail=definition.format_string.format(*fmt_args, **fmt_kw_args),
+                    source=source,
                     meta=meta,
                 ),
             ),

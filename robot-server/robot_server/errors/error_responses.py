@@ -1,5 +1,4 @@
 """JSON API errors and response models."""
-from __future__ import annotations
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 from typing import Any, Dict, Generic, Optional, Sequence, Tuple, TypeVar
@@ -64,15 +63,15 @@ class ErrorDetails(BaseErrorResponse):
 
         class BadRequest(ErrorDetails):
             id: Literal["BadRequest"] = "BadRequest"
-            title: "Bad Request"
+            title: str = "Bad Request"
 
         # ...
 
-        router.get(
+        @router.get(
             path="/some/path",
             response_model=SomeModel,
             responses={
-                status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[BadRequest]}
+                status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[BadRequest]},
             }
         )
         def get_some_model():
