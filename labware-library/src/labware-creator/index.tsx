@@ -56,7 +56,7 @@ import {
 } from './components/optionsWithImages'
 import styles from './styles.css'
 
-import type { FormikProps, FormikTouched } from 'formik'
+import type { FormikTouched } from 'formik'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   ImportError,
@@ -84,6 +84,12 @@ const PDF_URL =
 const FORM_LEVEL_ERRORS = 'FORM_LEVEL_ERRORS'
 const WELLS_OUT_OF_BOUNDS_X = 'WELLS_OUT_OF_BOUNDS_X'
 const WELLS_OUT_OF_BOUNDS_Y = 'WELLS_OUT_OF_BOUNDS_Y'
+type FormErrorType = typeof WELLS_OUT_OF_BOUNDS_X | typeof WELLS_OUT_OF_BOUNDS_Y
+type LabwareCreatorErrors = FormikErrors<
+  LabwareFields & {
+    [FORM_LEVEL_ERRORS]: Partial<Record<FormErrorType, string>>
+  }
+>
 
 const makeAutofillOnChange = ({
   autofills,
@@ -170,10 +176,10 @@ const getWellGridBoundingBox = (args: {
   }
 }
 
-// TODO IMMEDIATELY: factor out, test, and type this properly no `any`
-const formLevelValidation = (values: LabwareFields): FormikErrors<any> => {
+// TODO IMMEDIATELY: factor out + test
+const formLevelValidation = (values: LabwareFields): LabwareCreatorErrors => {
   // Form-level errors are nested in the FormikErrors object under a special key, FORM_LEVEL_ERRORS.
-  const formLevelErrors: Record<string, string> = {}
+  const formLevelErrors: Partial<Record<FormErrorType, string>> = {}
 
   // TODO IMMEDIATELY: right now it's throwing an error if cast fails (even if it's fields we don't care about here)
   // ^ How does the SVG viz's definition work when some fields are missing (eg brand/pipette might be)
@@ -218,6 +224,26 @@ const formLevelValidation = (values: LabwareFields): FormikErrors<any> => {
     }
   } else {
     return {}
+  }
+}
+
+// TODO IMMEDIATELY extract to file
+const FormLevelErrorAlerts = (props: {
+  errors: LabwareCreatorErrors
+}): JSX.Element | null => {
+  const { errors } = props
+  const formLevelErrors = errors[FORM_LEVEL_ERRORS]
+  if (formLevelErrors !== undefined) {
+    const errorTypesAndErrors = Object.entries(formLevelErrors)
+    return (
+      <>
+        {errorTypesAndErrors.map(([errorType, errorMessage]) => (
+          <AlertItem type="error" title={errorMessage} key={errorType} />
+        ))}
+      </>
+    )
+  } else {
+    return null
   }
 }
 
@@ -475,15 +501,16 @@ export const LabwareCreator = (): JSX.Element => {
           })
         }}
       >
-        {({
-          handleSubmit,
-          values,
-          isValid,
-          errors,
-          touched,
-          setTouched,
-          setValues,
-        }: FormikProps<LabwareFields>) => {
+        {bag => {
+          const {
+            handleSubmit,
+            values,
+            isValid,
+            touched,
+            setTouched,
+            setValues,
+          } = bag
+          const errors: LabwareCreatorErrors = bag.errors
           // @ts-expect-error(IL, 2021-03-24): values/errors/touched not typed for reportErrors to be happy
           reportErrors({ values, errors, touched })
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
@@ -809,16 +836,7 @@ export const LabwareCreator = (): JSX.Element => {
                     </div>
                   </Section>
                   <Section label="Check your work">
-                    {typeof errors[FORM_LEVEL_ERRORS] === 'object' &&
-                      Object.keys(
-                        errors[FORM_LEVEL_ERRORS]
-                      ).map(formErrorKey => (
-                        <AlertItem
-                          type="error"
-                          title={errors[FORM_LEVEL_ERRORS][formErrorKey]}
-                          key={formErrorKey}
-                        />
-                      ))}
+                    <FormLevelErrorAlerts errors={errors} />
                     <div className={styles.preview_labware}>
                       <ConditionalLabwareRender values={values} />
                       <p className={styles.preview_instructions}>
