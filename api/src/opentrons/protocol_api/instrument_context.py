@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from functools import lru_cache
 from typing import (
     List, Optional, Sequence, TYPE_CHECKING, Union)
 from opentrons.broker import Broker
@@ -1420,7 +1419,6 @@ class InstrumentContext(CommandPublisher):
             log_parent=self._log
         )
 
-    @lru_cache(maxsize=12)
     def _tip_length_for(self, tiprack: Labware) -> float:
         """ Get the tip length, including overlap, for a tip from this rack """
         return tip_length_for(self.hw_pipette, tiprack)
