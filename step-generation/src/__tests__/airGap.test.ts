@@ -13,6 +13,7 @@ import {
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { airGap } from '../commandCreators/atomic/airGap'
 import { thermocyclerPipetteCollision, modulePipetteCollision } from '../utils'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { InvariantContext, RobotState } from '../'
 jest.mock('../utils/thermocyclerPipetteCollision')
 jest.mock('../utils/modulePipetteCollision')
@@ -25,10 +26,10 @@ const mockModulePipetteCollision = modulePipetteCollision as jest.MockedFunction
 >
 
 describe('airGap', () => {
-  let invariantContext: any,
-    robotStateNoTip: any,
-    robotStateWithTip: any,
-    flowRateAndOffsets: any
+  let invariantContext: InvariantContext,
+    robotStateNoTip: RobotState,
+    robotStateWithTip: RobotState,
+    flowRateAndOffsets: Partial<AspDispAirgapParams>
   beforeEach(() => {
     invariantContext = makeContext()
     robotStateNoTip = getInitialRobotStateStandard(invariantContext)
@@ -48,7 +49,7 @@ describe('airGap', () => {
       volume: 50,
       labware: SOURCE_LABWARE,
       well: 'A1',
-    }
+    } as AspDispAirgapParams
     const result = airGap({ ...params }, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
       {
@@ -65,7 +66,7 @@ describe('airGap', () => {
         volume: 50,
         labware: SOURCE_LABWARE,
         well: 'A1',
-      },
+      } as AspDispAirgapParams,
       invariantContext,
       robotStateWithTip
     )
@@ -79,7 +80,7 @@ describe('airGap', () => {
         volume: 50,
         labware: 'problematicLabwareId',
         well: 'A1',
-      },
+      } as AspDispAirgapParams,
       invariantContext,
       robotStateWithTip
     )
@@ -92,7 +93,7 @@ describe('airGap', () => {
       volume: 50,
       labware: SOURCE_LABWARE,
       well: 'A1',
-    }
+    } as AspDispAirgapParams
     const result = airGap({ ...params }, invariantContext, robotStateNoTip)
     expectTimelineError(getErrorResult(result).errors, 'NO_TIP_ON_PIPETTE')
   })
@@ -101,6 +102,7 @@ describe('airGap', () => {
       DEFAULT_PIPETTE
       // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
     ].tiprackDefURI = getLabwareDefURI(fixture_tiprack_10_ul)
+    // @ts-expect-error(SA, 2021-05-03): labware not getting casted to LabwareDefinition2
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
     ].tiprackLabwareDef = fixture_tiprack_10_ul
@@ -111,7 +113,7 @@ describe('airGap', () => {
         volume: 201,
         labware: SOURCE_LABWARE,
         well: 'A1',
-      },
+      } as AspDispAirgapParams,
       invariantContext,
       robotStateWithTip
     )
@@ -137,7 +139,7 @@ describe('airGap', () => {
         volume: 50,
         labware: SOURCE_LABWARE,
         well: 'A1',
-      },
+      } as AspDispAirgapParams,
       invariantContext,
       robotStateWithTip
     )
@@ -169,7 +171,7 @@ describe('airGap', () => {
         volume: 50,
         labware: SOURCE_LABWARE,
         well: 'A1',
-      },
+      } as AspDispAirgapParams,
       invariantContext,
       robotStateWithTip
     )
@@ -183,6 +185,7 @@ describe('airGap', () => {
       DEFAULT_PIPETTE
       // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
     ].tiprackDefURI = getLabwareDefURI(fixture_tiprack_1000_ul)
+    // @ts-expect-error(SA, 2021-05-03): labware not getting casted to LabwareDefinition2
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
     ].tiprackLabwareDef = fixture_tiprack_1000_ul
@@ -193,7 +196,7 @@ describe('airGap', () => {
         volume: 301,
         labware: SOURCE_LABWARE,
         well: 'A1',
-      },
+      } as AspDispAirgapParams,
       invariantContext,
       robotStateWithTip
     )

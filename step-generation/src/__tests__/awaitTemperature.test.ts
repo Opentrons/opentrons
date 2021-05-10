@@ -8,7 +8,7 @@ import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../fixtures'
-import type { AwaitTemperatureArgs } from '../types'
+import { AwaitTemperatureArgs, InvariantContext, RobotState } from '../types'
 
 describe('awaitTemperature', () => {
   const temperatureModuleId = 'temperatureModuleId'
@@ -31,8 +31,8 @@ describe('awaitTemperature', () => {
       },
     ],
   }
-  let invariantContext: any
-  let robotState: any
+  let invariantContext: InvariantContext
+  let robotState: RobotState
   beforeEach(() => {
     const stateAndContext = getStateAndContextTempTCModules({
       temperatureModuleId,

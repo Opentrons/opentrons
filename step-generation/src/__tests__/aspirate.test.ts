@@ -13,16 +13,18 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../fixtures'
-import type { RobotState } from '../'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { InvariantContext, RobotState } from '../'
+
 jest.mock('../utils/thermocyclerPipetteCollision')
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
   typeof thermocyclerPipetteCollision
 >
 describe('aspirate', () => {
-  let initialRobotState: any
-  let robotStateWithTip: any
-  let invariantContext: any
-  let flowRateAndOffsets: any
+  let initialRobotState: RobotState
+  let robotStateWithTip: RobotState
+  let invariantContext: InvariantContext
+  let flowRateAndOffsets: Partial<AspDispAirgapParams>
   beforeEach(() => {
     invariantContext = makeContext()
     initialRobotState = getInitialRobotStateStandard(invariantContext)
@@ -42,7 +44,7 @@ describe('aspirate', () => {
       volume: 50,
       labware: SOURCE_LABWARE,
       well: 'A1',
-    }
+    } as AspDispAirgapParams
     const result = aspirate(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
       {
@@ -56,6 +58,7 @@ describe('aspirate', () => {
       DEFAULT_PIPETTE
       // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
     ].tiprackDefURI = getLabwareDefURI(fixture_tiprack_10_ul)
+    // @ts-expect-error(SA, 2021-05-03): labware not getting casted to LabwareDefinition2
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
     ].tiprackLabwareDef = fixture_tiprack_10_ul
@@ -66,7 +69,7 @@ describe('aspirate', () => {
         volume: 201,
         labware: SOURCE_LABWARE,
         well: 'A1',
-      },
+      } as AspDispAirgapParams,
       invariantContext,
       robotStateWithTip
     )
@@ -81,6 +84,7 @@ describe('aspirate', () => {
       DEFAULT_PIPETTE
       // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
     ].tiprackDefURI = getLabwareDefURI(fixture_tiprack_1000_ul)
+    // @ts-expect-error(SA, 2021-05-03): labware not getting casted to LabwareDefinition2
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
     ].tiprackLabwareDef = fixture_tiprack_1000_ul
@@ -91,7 +95,7 @@ describe('aspirate', () => {
         volume: 301,
         labware: SOURCE_LABWARE,
         well: 'A1',
-      },
+      } as AspDispAirgapParams,
       invariantContext,
       robotStateWithTip
     )
@@ -108,7 +112,7 @@ describe('aspirate', () => {
         volume: 50,
         labware: SOURCE_LABWARE,
         well: 'A1',
-      },
+      } as AspDispAirgapParams,
       invariantContext,
       robotStateWithTip
     )
@@ -122,7 +126,7 @@ describe('aspirate', () => {
         volume: 50,
         labware: SOURCE_LABWARE,
         well: 'A1',
-      },
+      } as AspDispAirgapParams,
       invariantContext,
       initialRobotState
     )
@@ -139,7 +143,7 @@ describe('aspirate', () => {
         volume: 50,
         labware: 'problematicLabwareId',
         well: 'A1',
-      },
+      } as AspDispAirgapParams,
       invariantContext,
       robotStateWithTip
     )
@@ -168,7 +172,7 @@ describe('aspirate', () => {
         volume: 50,
         labware: SOURCE_LABWARE,
         well: 'A1',
-      },
+      } as AspDispAirgapParams,
       invariantContext,
       robotStateWithTip
     )
