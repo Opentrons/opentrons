@@ -8,13 +8,6 @@ from starlette import status as status_codes
 from robot_server.service.json_api.errors import Error, ErrorSource, ResourceLinks
 
 
-class V1HandlerError(Exception):
-    """An exception raised in order to produce a V1BasicResponse response"""
-    def __init__(self, status_code, message):
-        self.status_code = status_code
-        self.message = message
-
-
 class BaseRobotServerError(Exception):
     def __init__(self, status_code: int, error: Error):
         self.status_code = status_code

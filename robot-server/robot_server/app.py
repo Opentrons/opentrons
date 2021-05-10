@@ -19,8 +19,7 @@ from .service.dependencies import (
 from .errors import exception_handlers
 from .router import router
 from .service import initialize_logging
-from .service.legacy.models import V1BasicResponse
-from .service.errors import V1HandlerError, BaseRobotServerError
+from .service.errors import BaseRobotServerError
 from .service.json_api.errors import ErrorResponse
 from . import constants
 
@@ -114,16 +113,6 @@ async def robot_server_exception_handler(
         content=ErrorResponse(errors=[exc.error]).dict(
             exclude_unset=True, exclude_none=True
         ),
-    )
-
-
-# TODO(mc, 2021-05-10): remove this when we no longer raise `V1HandlerError`
-@app.exception_handler(V1HandlerError)
-async def v1_exception_handler(request: Request, exc: V1HandlerError) -> JSONResponse:
-    """Catch legacy errors."""
-    log.error(f"V1HandlerError: {exc.status_code}: {exc.message}")
-    return JSONResponse(
-        status_code=exc.status_code, content=V1BasicResponse(message=exc.message).dict()
     )
 
 

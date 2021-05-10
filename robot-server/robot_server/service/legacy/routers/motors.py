@@ -5,17 +5,22 @@ from pydantic import ValidationError
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.types import Axis
 
+from robot_server.errors import LegacyErrorResponse
 from robot_server.service.dependencies import get_hardware
-from robot_server.service.errors import V1HandlerError
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models import motors as model
 
 router = APIRouter()
 
 
-@router.get("/motors/engaged",
-            description="Query which motors are engaged and holding",
-            response_model=model.EngagedMotors)
+@router.get(
+    path="/motors/engaged",
+    description="Query which motors are engaged and holding",
+    response_model=model.EngagedMotors,
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": LegacyErrorResponse},
+    },
+)
 async def get_engaged_motors(hardware: ThreadManager = Depends(get_hardware)
                              ) -> model.EngagedMotors:  # type: ignore
     try:
@@ -24,9 +29,9 @@ async def get_engaged_motors(hardware: ThreadManager = Depends(get_hardware)
                      for k, v in engaged_axes.items()}
         return model.EngagedMotors(**axes_dict)
     except ValidationError as e:
-        raise V1HandlerError(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, str(e)
-        )
+        raise LegacyErrorResponse(
+            message=str(e)
+        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @router.post("/motors/disengage",

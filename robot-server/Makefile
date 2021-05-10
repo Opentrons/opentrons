@@ -74,7 +74,7 @@ test:
 
 .PHONY: lint
 lint: $(ot_py_sources)
-	$(python) -m mypy $(SRC_PATH) tests/health tests/system
+	$(python) -m mypy $(SRC_PATH) tests/errors tests/health tests/system
 	$(python) -m flake8 $(SRC_PATH) tests setup.py
 
 .PHONY: dev

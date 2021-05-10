@@ -6,9 +6,9 @@ from fastapi import Path, APIRouter, Depends
 from opentrons.hardware_control import ThreadManager, modules
 from opentrons.hardware_control.modules import AbstractModule
 
+from robot_server.errors import LegacyErrorResponse
 from robot_server.service.dependencies import get_hardware
 from robot_server.service.legacy.models import V1BasicResponse
-from robot_server.service.errors import V1HandlerError
 from robot_server.service.legacy.models.modules import Module, ModuleSerial,\
     Modules, SerialCommandResponse, SerialCommand, PhysicalPort
 
@@ -42,13 +42,18 @@ async def get_modules(hardware: ThreadManager = Depends(get_hardware))\
     return Modules(modules=module_data)
 
 
-@router.get("/modules/{serial}/data",
-            summary="Get live data for a specific module",
-            description="This is similar to the values in GET /modules, but "
-                        "for only a specific currently-attached module",
-            response_model=ModuleSerial,
-            responses={status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}}
-            )
+@router.get(
+    path="/modules/{serial}/data",
+    summary="Get live data for a specific module",
+    description=(
+        "This is similar to the values in GET /modules, but "
+        "for only a specific currently-attached module"
+    ),
+    response_model=ModuleSerial,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse},
+    },
+)
 async def get_module_serial(
         serial: str = Path(...,
                            description="Serial number of the module"),
@@ -62,8 +67,9 @@ async def get_module_serial(
         res = matching_module.live_data
 
     if not res:
-        raise V1HandlerError(status_code=status.HTTP_404_NOT_FOUND,
-                             message="Module not found")
+        raise LegacyErrorResponse(
+            message="Module not found"
+        ).as_error(status.HTTP_404_NOT_FOUND)
 
     # TODO(mc, 2020-09-17): types of res.get(...) do not match what
     # ModuleSerial expects
@@ -73,16 +79,21 @@ async def get_module_serial(
     )
 
 
-@router.post("/modules/{serial}",
-             summary="Execute a command on a specific module",
-             description="Command a module to take an action. Valid actions "
-                         "depend on the specific module attached, which is "
-                         "the model value from GET /modules/{serial}/data or "
-                         "GET /modules",
-             response_model=SerialCommandResponse,
-             responses={
-                 status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}
-             })
+@router.post(
+    path="/modules/{serial}",
+    summary="Execute a command on a specific module",
+    description=(
+        "Command a module to take an action. Valid actions "
+        "depend on the specific module attached, which is "
+        "the model value from GET /modules/{serial}/data or "
+        "GET /modules"
+    ),
+    response_model=SerialCommandResponse,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
+        status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
+    },
+)
 async def post_serial_command(
         command: SerialCommand,
         serial: str = Path(...,
@@ -92,15 +103,17 @@ async def post_serial_command(
     """Send a command on device identified by serial"""
     attached_modules = hardware.attached_modules     # type: ignore
     if not attached_modules:
-        raise V1HandlerError(message="No connected modules",
-                             status_code=status.HTTP_404_NOT_FOUND)
+        raise LegacyErrorResponse(
+            message="No connected modules"
+        ).as_error(status.HTTP_404_NOT_FOUND)
 
     # Search for the module
     matching_mod = find_matching_module(serial, attached_modules)
 
     if not matching_mod:
-        raise V1HandlerError(message="Specified module not found",
-                             status_code=status.HTTP_404_NOT_FOUND)
+        raise LegacyErrorResponse(
+            message="Specified module not found"
+        ).as_error(status.HTTP_404_NOT_FOUND)
 
     if hasattr(matching_mod, command.command_type):
         clean_args = command.args or []
@@ -111,26 +124,32 @@ async def post_serial_command(
             else:
                 val = method(*clean_args)
         except TypeError as e:
-            raise V1HandlerError(
+            raise LegacyErrorResponse(
                 message=f'Server encountered a TypeError '
                         f'while running {method} : {e}. '
-                        f'Possibly a type mismatch in args',
-                status_code=status.HTTP_400_BAD_REQUEST)
+                        f'Possibly a type mismatch in args'
+            ).as_error(status.HTTP_400_BAD_REQUEST)
         else:
             return SerialCommandResponse(message='Success', returnValue=val)
     else:
-        raise V1HandlerError(
-            message=f'Module does not have command: {command.command_type}',
-            status_code=status.HTTP_400_BAD_REQUEST)
+        raise LegacyErrorResponse(
+            message=f'Module does not have command: {command.command_type}'
+        ).as_error(status.HTTP_400_BAD_REQUEST)
 
 
-@router.post("/modules/{serial}/update",
-             summary="Initiate a firmware update on a specific module",
-             description="Command robot to flash its bundled firmware file "
-                         "for this module's type to this specific module",
-             response_model=V1BasicResponse,
-             responses={status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}}
-             )
+@router.post(
+    path="/modules/{serial}/update",
+    summary="Initiate a firmware update on a specific module",
+    description=(
+        "Command robot to flash its bundled firmware file "
+        "for this module's type to this specific module"
+    ),
+    response_model=V1BasicResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": LegacyErrorResponse},
+    },
+)
 async def post_serial_update(
         serial: str = Path(...,
                            description="Serial number of the module"),
@@ -141,8 +160,9 @@ async def post_serial_update(
     matching_module = find_matching_module(serial, attached_modules)
 
     if not matching_module:
-        raise V1HandlerError(message=f'Module {serial} not found',
-                             status_code=status.HTTP_404_NOT_FOUND)
+        raise LegacyErrorResponse(
+            message=f'Module {serial} not found'
+        ).as_error(status.HTTP_404_NOT_FOUND)
 
     try:
         if matching_module.bundled_fw:
@@ -165,7 +185,7 @@ async def post_serial_update(
     except asyncio.TimeoutError:
         res = 'Module not responding'
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    raise V1HandlerError(message=res, status_code=status_code)
+    raise LegacyErrorResponse(message=res).as_error(status_code)
 
 
 def find_matching_module(serial: str,
