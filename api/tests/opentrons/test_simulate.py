@@ -115,3 +115,12 @@ def test_simulate_extra_labware(protocol, protocol_file, monkeypatch):
     ctx = simulate.get_protocol_api('2.0')
     with pytest.raises(FileNotFoundError):
         ctx.load_labware("fixture_12_trough", 1, namespace='fixture')
+
+
+@pytest.mark.parametrize('protocol_file', ['test_bug_7552.py'])
+def test_simulate_7552(protocol,
+                       protocol_file,
+                       monkeypatch):
+    monkeypatch.setenv('OT_API_FF_allowBundleCreation', '1')
+    with pytest.raises(ExceptionInProtocolError):
+        simulate.simulate(protocol.filelike, 'test_bug_7552.py')

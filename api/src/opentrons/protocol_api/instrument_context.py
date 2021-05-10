@@ -184,6 +184,11 @@ class InstrumentContext(CommandPublisher):
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
 
+        # ce: seems like validation could go here:
+        if isinstance(location, Well):
+            if location.parent.is_tiprack:
+                raise RuntimeWarning("Cannot aspirate a tiprack")
+
         if self.current_volume == 0:
             # Make sure we're at the top of the labware and clear of any
             # liquid to prepare the pipette for aspiration
