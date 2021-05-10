@@ -51,7 +51,7 @@ async def get_modules(hardware: ThreadManager = Depends(get_hardware))\
     ),
     response_model=ModuleSerial,
     responses={
-        status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse},
+        status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
     },
 )
 async def get_module_serial(

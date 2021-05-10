@@ -25,6 +25,9 @@ class BaseErrorResponse(BaseModel):
     def as_error(self, status_code: int) -> ApiError:
         """Serialize the response as an API error to raise in a handler.
 
+        Arguments:
+            status_code: The HTTP status code the response should return.
+
         Example:
             raise ResourceNotFoundResponse().as_error(status.HTTP_404_NOT_FOUND)
         """
