@@ -1,15 +1,11 @@
 """Main FastAPI application."""
 import logging
-import traceback
 
 from opentrons import __version__
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, JSONResponse
 from starlette.requests import Request
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 from starlette.middleware.base import RequestResponseEndpoint
 
 from .service.dependencies import (
@@ -20,21 +16,12 @@ from .service.dependencies import (
     get_session_manager,
 )
 
+from .errors import exception_handlers
 from .router import router
-
 from .service import initialize_logging
 from .service.legacy.models import V1BasicResponse
-
-from .service.errors import (
-    V1HandlerError,
-    transform_http_exception_to_json_api_errors,
-    transform_validation_error_to_json_api_errors,
-    consolidate_fastapi_response,
-    BaseRobotServerError,
-    ErrorResponse,
-    build_unhandled_exception_response,
-)
-
+from .service.errors import V1HandlerError, BaseRobotServerError
+from .service.json_api.errors import ErrorResponse
 from . import constants
 
 log = logging.getLogger(__name__)
@@ -51,6 +38,13 @@ app = FastAPI(
     ),
     version=__version__,
 )
+
+# exception handlers
+# TODO(mc, 2021-05-10): after upgrade to FastAPI > 0.61.2, we can pass these
+# to FastAPI's `exception_handlers` arg instead. Current version has bug, see:
+# https://github.com/tiangolo/fastapi/pull/1924
+for exc_cls, handler in exception_handlers.items():
+    app.add_exception_handler(exc_cls, handler)
 
 # cors
 app.add_middleware(
@@ -90,7 +84,7 @@ async def on_shutdown() -> None:
 @app.middleware("http")
 async def api_version_response_header(
     request: Request,
-    call_next: RequestResponseEndpoint
+    call_next: RequestResponseEndpoint,
 ) -> Response:
     """Attach Opentrons-Version headers to responses."""
     # Attach the version the request state. Optional dependency
@@ -105,9 +99,11 @@ async def api_version_response_header(
     return response
 
 
+# TODO(mc, 2021-05-10): remove this when we no longer raise `BaseRobotServerError`
 @app.exception_handler(BaseRobotServerError)
 async def robot_server_exception_handler(
-    request: Request, exc: BaseRobotServerError
+    request: Request,
+    exc: BaseRobotServerError,
 ) -> JSONResponse:
     """Catch robot server exceptions."""
     if not exc.error.status:
@@ -121,66 +117,13 @@ async def robot_server_exception_handler(
     )
 
 
+# TODO(mc, 2021-05-10): remove this when we no longer raise `V1HandlerError`
 @app.exception_handler(V1HandlerError)
 async def v1_exception_handler(request: Request, exc: V1HandlerError) -> JSONResponse:
     """Catch legacy errors."""
     log.error(f"V1HandlerError: {exc.status_code}: {exc.message}")
     return JSONResponse(
         status_code=exc.status_code, content=V1BasicResponse(message=exc.message).dict()
-    )
-
-
-@app.exception_handler(RequestValidationError)
-async def custom_request_validation_exception_handler(
-    request: Request, exception: RequestValidationError
-) -> JSONResponse:
-    """Custom handling of FastAPI request validation errors."""
-    log.error(f"{request.method} {request.url.path} : {str(exception)}")
-
-    if route_has_tag(request, constants.V1_TAG):
-        response = V1BasicResponse(
-            message=consolidate_fastapi_response(exception.errors())
-        ).dict()
-    else:
-        response = transform_validation_error_to_json_api_errors(
-            HTTP_422_UNPROCESSABLE_ENTITY, exception
-        ).dict(exclude_unset=True)
-
-    return JSONResponse(status_code=HTTP_422_UNPROCESSABLE_ENTITY, content=response)
-
-
-@app.exception_handler(StarletteHTTPException)
-async def custom_http_exception_handler(
-    request: Request, exception: StarletteHTTPException
-) -> JSONResponse:
-    """Handle HTTP exceptions."""
-    log.error(
-        f"{request.method} {request.url.path} : "
-        f"{exception.status_code}, {exception.detail}"
-    )
-
-    if route_has_tag(request, constants.V1_TAG):
-        response = V1BasicResponse(message=exception.detail).dict()
-    else:
-        response = transform_http_exception_to_json_api_errors(exception).dict(
-            exclude_unset=True
-        )
-
-    return JSONResponse(
-        status_code=exception.status_code,
-        content=response,
-    )
-
-
-@app.exception_handler(Exception)
-async def unexpected_exception_handler(
-    request: Request, exc: Exception
-) -> JSONResponse:
-    """Log unhandled errors (re-raise always)."""
-    log.error(f"Unhandled exception: {traceback.format_exc()}")
-    return JSONResponse(
-        status_code=500,
-        content=build_unhandled_exception_response(exc).dict(exclude_unset=True),
     )
 
 
