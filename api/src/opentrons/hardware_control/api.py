@@ -57,15 +57,15 @@ class PauseManager:
         self._blocked_by_door = self._evaluate_door_state(door_state)
 
     @property
-    def blocked_by_door(self):
+    def blocked_by_door(self) -> bool:
         return self._blocked_by_door
 
-    def _evaluate_door_state(self, door_state) -> bool:
+    def _evaluate_door_state(self, door_state: DoorState) -> bool:
         if ff.enable_door_safety_switch():
             return door_state is DoorState.OPEN
         return False
 
-    def set_door(self, door_state):
+    def set_door(self, door_state: DoorState):
         self._blocked_by_door = self._evaluate_door_state(door_state)
 
     def resume(self, pause_type: PauseType):
@@ -373,13 +373,13 @@ class API(HardwareAPILike):
         """ Delay execution by pausing and sleeping.
         """
         await self._wait_for_is_running()
-        self.pause(from_delay=True)
+        self.pause(PauseType.DELAY)
         if not self.is_simulator:
             async def sleep_for_seconds(seconds: float):
                 await asyncio.sleep(seconds)
             delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
             await self._execution_manager.register_cancellable_task(delay_task)
-        self.resume(from_delay=True)
+        self.resume(PauseType.DELAY)
 
     def reset_instrument(self, mount: top_types.Mount = None):
         """
@@ -563,7 +563,7 @@ class API(HardwareAPILike):
                                                    explicit_modeset)
 
     # Global actions API
-    def pause(self, from_delay: bool = False):
+    def pause(self, pause_type: PauseType):
         """
         Pause motion of the robot after a current motion concludes.
 
@@ -575,10 +575,7 @@ class API(HardwareAPILike):
         is paused will not proceed until the system is resumed with
         :py:meth:`resume`.
         """
-        if from_delay:
-            self._pause_manager.pause(PauseType.DELAY)
-        else:
-            self._pause_manager.pause(PauseType.PAUSE)
+        self._pause_manager.pause(pause_type)
 
         async def _chained_calls():
             await self._execution_manager.pause()
@@ -590,16 +587,13 @@ class API(HardwareAPILike):
         self._log.warning('Pause with message: {}'.format(message))
         for cb in self._callbacks:
             cb(message)
-        self.pause()
+        self.pause(PauseType.PAUSE)
 
-    def resume(self, from_delay: bool = False):
+    def resume(self, pause_type: PauseType):
         """
         Resume motion after a call to :py:meth:`pause`.
         """
-        if from_delay:
-            self._pause_manager.resume(PauseType.DELAY)
-        else:
-            self._pause_manager.resume(PauseType.PAUSE)
+        self._pause_manager.resume(pause_type)
 
         if self._pause_manager.queue:
             return

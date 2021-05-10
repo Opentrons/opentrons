@@ -4,7 +4,7 @@ from typing import Dict, Optional, Set, TYPE_CHECKING
 from opentrons import types, API
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.config import feature_flags as fflags
-from opentrons.hardware_control.types import DoorState
+from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
@@ -258,11 +258,11 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
-        self._hw_manager.hardware.pause()
+        self._hw_manager.hardware.pause(PauseType.PAUSE)
 
     def resume(self) -> None:
         """Result the protocol."""
-        self._hw_manager.hardware.resume()
+        self._hw_manager.hardware.resume(PauseType.PAUSE)
 
     def comment(self, msg: str) -> None:
         """Add comment to run log."""
