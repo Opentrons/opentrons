@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Dict, Optional
 from starlette import status as status_codes
 
-from robot_server.errors import ApiError, MultiErrorResponse, ErrorResponse
+from robot_server.errors import ApiError, ErrorResponse, ErrorDetails
 from robot_server.service.json_api import ResourceLinks
 
 
@@ -19,6 +19,7 @@ class ErrorCreateDef:
 class ErrorDef(ErrorCreateDef, Enum):
     """An enumeration of ErrorCreateDef Error definitions for use by
     RobotServerError"""
+
     def __init__(self, e) -> None:
         super().__init__(**(asdict(e)))
 
@@ -29,12 +30,16 @@ class RobotServerError(ApiError):
     .. deprecated::
         Use `robot_server.errors.ErrorResponse(...).as_error(status_code)` instead.
     """
-    def __init__(self,
-                 definition: ErrorCreateDef,
-                 error_id: str = "UnknownError",
-                 links: Optional[ResourceLinks] = None,
-                 meta: Optional[Dict] = None,
-                 *fmt_args, **fmt_kw_args):
+
+    def __init__(
+        self,
+        definition: ErrorCreateDef,
+        error_id: str = "UnknownError",
+        links: Optional[ResourceLinks] = None,
+        meta: Optional[Dict] = None,
+        *fmt_args,
+        **fmt_kw_args
+    ):
         """
         Constructor.
 
@@ -45,15 +50,15 @@ class RobotServerError(ApiError):
         :param fmt_args: format_string args
         :param fmt_kw_args: format_string kw_args
         """
-        content = MultiErrorResponse(
-            errors=[
-                ErrorResponse(
+        content = ErrorResponse(
+            errors=(
+                ErrorDetails(
                     id=error_id,
                     title=definition.title,
                     detail=definition.format_string.format(*fmt_args, **fmt_kw_args),
                     meta=meta,
                 ),
-            ],
+            ),
             links=links,
         ).dict(exclude_none=True)
 
@@ -65,27 +70,29 @@ class RobotServerError(ApiError):
 
 class CommonErrorDef(ErrorDef):
     """Generic common defined errors"""
+
     INTERNAL_SERVER_ERROR = ErrorCreateDef(
         status_code=status_codes.HTTP_500_INTERNAL_SERVER_ERROR,
-        title='Internal Server Error',
-        format_string='{error}'
+        title="Internal Server Error",
+        format_string="{error}",
     )
     NOT_IMPLEMENTED = ErrorCreateDef(
         status_code=status_codes.HTTP_501_NOT_IMPLEMENTED,
-        title='Not implemented',
-        format_string='Method not implemented. {error}')
+        title="Not implemented",
+        format_string="Method not implemented. {error}",
+    )
     RESOURCE_NOT_FOUND = ErrorCreateDef(
         status_code=status_codes.HTTP_404_NOT_FOUND,
-        title='Resource Not Found',
-        format_string="Resource type '{resource}' with id '{id}' was not found"
+        title="Resource Not Found",
+        format_string="Resource type '{resource}' with id '{id}' was not found",
     )
     ACTION_FORBIDDEN = ErrorCreateDef(
         status_code=status_codes.HTTP_403_FORBIDDEN,
-        title='Action Forbidden',
-        format_string='{reason}'
+        title="Action Forbidden",
+        format_string="{reason}",
     )
     RESOURCE_ALREADY_EXISTS = ErrorCreateDef(
         status_code=status_codes.HTTP_403_FORBIDDEN,
-        title='Resource Exists',
-        format_string="A '{resource}' with id '{id}' already exists"
+        title="Resource Exists",
+        format_string="A '{resource}' with id '{id}' already exists",
     )

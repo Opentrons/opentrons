@@ -1,7 +1,7 @@
 """Tests for the server's exception handlers."""
 import pytest
 from decoy import matchers
-from fastapi import FastAPI, status
+from fastapi import FastAPI, Header, status
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 from typing import List
@@ -128,8 +128,8 @@ def test_handles_legacy_framework_exceptions(app: FastAPI, client: TestClient) -
     }
 
 
-def test_handles_validation_error(app: FastAPI, client: TestClient) -> None:
-    """It should properly format validation errors."""
+def test_handles_body_validation_error(app: FastAPI, client: TestClient) -> None:
+    """It should properly format body validation errors."""
 
     @app.post("/items")
     def create_item(item: Item) -> Item:
@@ -137,26 +137,74 @@ def test_handles_validation_error(app: FastAPI, client: TestClient) -> None:
 
     response = client.post(
         "/items",
-        json={"string_field": None, "int_field": "foobar", "array_field": ["fizzbuzz"]},
+        json={"int_field": "foobar", "array_field": ["fizzbuzz"]},
     )
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert response.json() == {
         "errors": [
             {
-                "id": "BadRequest",
-                "title": "Bad Request",
-                "detail": "Invalid request parameters",
-                "meta": {
-                    "validationErrors": {
-                        "body.item.string_field": "none is not an allowed value",
-                        "body.item.int_field": "value is not a valid integer",
-                        "body.item.array_field[0]": (
-                            "value could not be parsed to a boolean"
-                        ),
-                    }
-                },
-            }
+                "id": "InvalidRequest",
+                "title": "Invalid Request",
+                "detail": "field required",
+                "source": {"pointer": "/string_field"},
+            },
+            {
+                "id": "InvalidRequest",
+                "title": "Invalid Request",
+                "detail": "value is not a valid integer",
+                "source": {"pointer": "/int_field"},
+            },
+            {
+                "id": "InvalidRequest",
+                "title": "Invalid Request",
+                "detail": "value could not be parsed to a boolean",
+                "source": {"pointer": "/array_field/0"},
+            },
+        ]
+    }
+
+
+def test_handles_query_validation_error(app: FastAPI, client: TestClient) -> None:
+    """It should properly format query param validation errors."""
+
+    @app.get("/items")
+    def get_item(count: int) -> Item:
+        raise NotImplementedError()
+
+    response = client.get("/items?count=foo")
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json() == {
+        "errors": [
+            {
+                "id": "InvalidRequest",
+                "title": "Invalid Request",
+                "detail": "value is not a valid integer",
+                "source": {"parameter": "count"},
+            },
+        ]
+    }
+
+
+def test_handles_header_validation_error(app: FastAPI, client: TestClient) -> None:
+    """It should properly format header validation errors."""
+
+    @app.get("/items")
+    def get_item(header_name: str = Header(...)) -> Item:
+        raise NotImplementedError()
+
+    response = client.get("/items")
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json() == {
+        "errors": [
+            {
+                "id": "InvalidRequest",
+                "title": "Invalid Request",
+                "detail": "field required",
+                "source": {"header": "header-name"},
+            },
         ]
     }
 
@@ -178,6 +226,6 @@ def test_handles_legacy_validation_error(app: FastAPI, client: TestClient) -> No
         "message": (
             "body.item.string_field: none is not an allowed value; "
             "body.item.int_field: value is not a valid integer; "
-            "body.item.array_field[0]: value could not be parsed to a boolean"
+            "body.item.array_field.0: value could not be parsed to a boolean"
         )
     }

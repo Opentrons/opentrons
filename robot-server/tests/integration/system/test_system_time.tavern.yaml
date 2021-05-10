@@ -36,12 +36,11 @@ stages:
       status_code: 422
       json:
         errors:
-          - id: 'BadRequest'
-            title: 'Bad Request'
-            detail: 'Invalid request parameters'
-            meta:
-              validationErrors:
-                'body.new_time.data.systemTime': 'field required'
+          - id: 'InvalidRequest'
+            title: 'Invalid Request'
+            detail: 'field required'
+            source:
+              pointer: '/data/systemTime'
   - name: System Time PUT request on a dev server raises error
     request:
       url: '{host:s}:{port:d}/system/time'

@@ -5,12 +5,14 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from traceback import format_exception, format_exception_only
-from typing import Any, Callable, Coroutine, Dict, Sequence, Type, Union
+from typing import Any, Callable, Coroutine, Dict, Optional, Sequence, Type, Union
 
 from robot_server.constants import V1_TAG
-from .global_errors import UnexpectedErrorResponse, BadRequestResponse
+from .global_errors import UnexpectedError, BadRequest, InvalidRequest
+
 from .error_responses import (
     ApiError,
+    ErrorSource,
     BaseErrorResponse,
     LegacyErrorResponse,
     MultiErrorResponse,
@@ -31,14 +33,21 @@ def _route_is_legacy(request: Request) -> bool:
     return False
 
 
-def _format_validation_location(parts: Sequence[Union[str, int]]) -> str:
-    """Format a validation location from FastAPI into a string path."""
-    result = str(parts[0])
-
-    for part in parts[1::]:
-        result += f"[{str(part)}]" if isinstance(part, int) else f".{str(part)}"
-
-    return result
+def _format_validation_source(
+    parts: Sequence[Union[str, int]]
+) -> Optional[ErrorSource]:
+    """Format a validation location from FastAPI into an ErrorSource."""
+    if parts[0] == "body":
+        # ["body", "model", "field"] > { "pointer": "/field" }
+        return ErrorSource(pointer=f"/{'/'.join(str(p) for p in parts[2::])}")
+    elif parts[0] == "query":
+        # ["query", "param"] > { parameter: "param" }
+        return ErrorSource(parameter=str(parts[1]))
+    elif parts[0] == "header":
+        # ["header", "name"] > { header: "name" }
+        return ErrorSource(header=str(parts[1]))
+    else:
+        return None
 
 
 async def handle_api_error(request: Request, error: ApiError) -> JSONResponse:
@@ -63,7 +72,7 @@ async def handle_framework_error(
     if _route_is_legacy(request):
         response: BaseErrorResponse = LegacyErrorResponse(message=error.detail)
     else:
-        response = MultiErrorResponse(errors=[BadRequestResponse(detail=error.detail)])
+        response = BadRequest(detail=error.detail)
 
     return await handle_api_error(request, response.as_error(error.status_code))
 
@@ -73,23 +82,24 @@ async def handle_validation_error(
     error: RequestValidationError,
 ) -> JSONResponse:
     """Map a validation error from the framework to an API response."""
-    validation_errors = {
-        _format_validation_location(val_error["loc"]): val_error["msg"]
-        for val_error in error.errors()
-    }
+    validation_errors = error.errors()
 
     if _route_is_legacy(request):
         message = "; ".join(
-            [f"{field}: {msg}" for (field, msg) in validation_errors.items()]
+            [
+                f"{'.'.join([str(v) for v in val_error['loc']])}: {val_error['msg']}"
+                for val_error in validation_errors
+            ]
         )
         response: BaseErrorResponse = LegacyErrorResponse(message=message)
     else:
         response = MultiErrorResponse(
             errors=[
-                BadRequestResponse(
-                    detail="Invalid request parameters",
-                    meta={"validationErrors": validation_errors},
+                InvalidRequest(
+                    detail=val_error["msg"],
+                    source=_format_validation_source(val_error["loc"]),
                 )
+                for val_error in validation_errors
             ]
         )
 
@@ -109,14 +119,7 @@ async def handle_unexpected_error(request: Request, error: Exception) -> JSONRes
     if _route_is_legacy(request):
         response: BaseErrorResponse = LegacyErrorResponse(message=detail)
     else:
-        response = MultiErrorResponse(
-            errors=[
-                UnexpectedErrorResponse(
-                    detail=detail,
-                    meta={"stacktrace": stacktrace},
-                )
-            ]
-        )
+        response = UnexpectedError(detail=detail, meta={"stacktrace": stacktrace})
 
     return await handle_api_error(
         request,

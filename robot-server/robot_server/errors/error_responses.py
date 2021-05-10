@@ -1,6 +1,8 @@
 """JSON API errors and response models."""
+from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import Any, Dict, Optional, Sequence
+from pydantic.generics import GenericModel
+from typing import Any, Dict, Generic, Optional, Sequence, Tuple, TypeVar
 
 from robot_server.service.json_api import ResourceLinks
 
@@ -23,31 +25,60 @@ class BaseErrorResponse(BaseModel):
     """Base class for error response bodies."""
 
     def as_error(self, status_code: int) -> ApiError:
-        """Serialize the response as an API error to raise in a handler.
-
-        Arguments:
-            status_code: The HTTP status code the response should return.
-
-        Example:
-            raise ResourceNotFoundResponse().as_error(status.HTTP_404_NOT_FOUND)
-        """
+        """Serialize the response as an API error to raise in a handler."""
         return ApiError(
             status_code=status_code,
             content=self.dict(exclude_none=True),
         )
 
 
-class LegacyErrorResponse(BaseErrorResponse):
-    """An error response with a human readable message."""
+class ErrorSource(BaseModel):
+    """An object containing references to the source of the error."""
 
-    message: str = Field(
-        ...,
-        description="A human-readable message describing the error.",
+    pointer: Optional[str] = Field(
+        None,
+        description=(
+            "A JSON Pointer [RFC6901] to the associated entity in the request document."
+        ),
+    )
+    parameter: Optional[str] = Field(
+        None,
+        description="a string indicating which URI query parameter caused the error.",
+    )
+    header: Optional[str] = Field(
+        None,
+        description="A string indicating which header caused the error.",
     )
 
 
-class ErrorResponse(BaseErrorResponse):
-    """An error response with error type and occurance details."""
+class ErrorDetails(BaseErrorResponse):
+    """An error response with error type and occurance details.
+
+    Extend this class to create specific error responses, and use it in your
+    route handlers.
+
+    Example:
+        from fastapi import status
+        from typing_extensions import Literal
+        from robot_server.errors import ErrorResponse, ErrorDetails
+
+        class BadRequest(ErrorDetails):
+            id: Literal["BadRequest"] = "BadRequest"
+            title: "Bad Request"
+
+        # ...
+
+        router.get(
+            path="/some/path",
+            response_model=SomeModel,
+            responses={
+                status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[BadRequest]}
+            }
+        )
+        def get_some_model():
+            # ...
+            raise BadRequest.as_error(status.HTTP_400_BAD_REQUEST)
+    """
 
     id: str = Field(
         ...,
@@ -64,6 +95,10 @@ class ErrorResponse(BaseErrorResponse):
             "of the error."
         ),
     )
+    source: Optional[ErrorSource] = Field(
+        None,
+        description="An object containing references to the source of the error.",
+    )
     meta: Optional[Dict[str, Any]] = Field(
         None,
         description=(
@@ -72,11 +107,40 @@ class ErrorResponse(BaseErrorResponse):
         ),
     )
 
+    def as_error(self, status_code: int) -> ApiError:
+        """Serial this ErrorDetails as an ApiError from an ErrorResponse."""
+        return ErrorResponse(errors=(self,)).as_error(status_code)
 
-class MultiErrorResponse(BaseErrorResponse):
-    """An error response with multiple errors."""
 
-    errors: Sequence[ErrorResponse] = Field(..., description="Error details.")
+ErrorDetailsT = TypeVar("ErrorDetailsT", bound=ErrorDetails)
+
+
+class LegacyErrorResponse(BaseErrorResponse):
+    """An error response with a human readable message."""
+
+    message: str = Field(
+        ...,
+        description="A human-readable message describing the error.",
+    )
+
+
+class ErrorResponse(BaseErrorResponse, GenericModel, Generic[ErrorDetailsT]):
+    """A response body for a single error."""
+
+    errors: Tuple[ErrorDetailsT] = Field(..., description="Error details.")
+    links: Optional[ResourceLinks] = Field(
+        None,
+        description=(
+            "Links that leads to further details about "
+            "this particular occurrence of the problem."
+        ),
+    )
+
+
+class MultiErrorResponse(BaseErrorResponse, GenericModel, Generic[ErrorDetailsT]):
+    """An response body for multiple errors."""
+
+    errors: Sequence[ErrorDetailsT] = Field(..., description="Error details.")
     links: Optional[ResourceLinks] = Field(
         None,
         description=(

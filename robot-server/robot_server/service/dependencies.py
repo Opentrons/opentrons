@@ -16,7 +16,7 @@ from notify_server.clients import publisher
 from notify_server.settings import Settings as NotifyServerSettings
 
 
-class OutdatedApiVersionResponse(errors.ErrorResponse):
+class OutdatedApiVersionResponse(errors.ErrorDetails):
     """An error returned when you request an outdated HTTP API version."""
 
     id: Literal["OutdatedAPIVersion"] = "OutdatedAPIVersion"
@@ -98,9 +98,8 @@ async def get_session_manager(
 ) -> SessionManager:
     """The single session manager instance"""
     return SessionManager(
-        hardware=hardware,
-        motion_lock=motion_lock,
-        protocol_manager=protocol_manager)
+        hardware=hardware, motion_lock=motion_lock, protocol_manager=protocol_manager
+    )
 
 
 async def check_version_header(
@@ -123,9 +122,7 @@ async def check_version_header(
     )
 
     if requested_version < constants.MIN_API_VERSION:
-        raise errors.MultiErrorResponse(
-            errors=[OutdatedApiVersionResponse()]
-        ).as_error(status.HTTP_400_BAD_REQUEST)
+        raise OutdatedApiVersionResponse().as_error(status.HTTP_400_BAD_REQUEST)
     else:
         # Attach the api version to request's state dict
         request.state.api_version = min(requested_version, constants.API_VERSION)
