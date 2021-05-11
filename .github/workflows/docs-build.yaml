@@ -14,7 +14,6 @@ on:
       - '.github/actions/webstack/deploy-to-sandbox/**'
       - '.github/workflows/utils.js'
     tags:
-      - 'v*'
       - 'docs@*'
   workflow_dispatch:
 
