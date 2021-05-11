@@ -29,10 +29,10 @@ VERSION = 1
 class TempDeckEmulator(AbstractEmulator):
     """TempDeck emulator"""
 
-    def __init__(self) -> None:
+    def __init__(self, parser: Parser) -> None:
         self.target_temp = util.OptionalValue[float]()
         self.current_temp = 0.0
-        self._parser = Parser()
+        self._parser = parser
 
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""

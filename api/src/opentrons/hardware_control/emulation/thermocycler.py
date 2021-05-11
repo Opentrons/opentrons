@@ -36,7 +36,7 @@ VERSION = 1
 class ThermocyclerEmulator(AbstractEmulator):
     """Thermocycler emulator"""
 
-    def __init__(self) -> None:
+    def __init__(self, parser: Parser) -> None:
         self.lid_target_temp = util.OptionalValue[float]()
         self.lid_current_temp: float = util.TEMPERATURE_ROOM
         self.lid_status = ThermocyclerLidStatus.CLOSED
@@ -48,7 +48,7 @@ class ThermocyclerEmulator(AbstractEmulator):
         self.plate_volume = util.OptionalValue[float]()
         self.plate_at_target = util.OptionalValue[float]()
         self.plate_ramp_rate = util.OptionalValue[float]()
-        self._parser = Parser()
+        self._parser = parser
 
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""

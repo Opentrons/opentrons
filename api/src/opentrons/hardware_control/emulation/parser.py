@@ -13,6 +13,8 @@ class Command:
 class Parser:
     """Gcode line parser."""
 
+    # TODO (al, 2021-05-11): Should G01 and G1 be treated differently? Currently
+    #  they are two different Gcodes.
     GCODE_RE = re.compile(r"(?:(?:[MG]\d+\.?\d*)|dfu|version)")
     """A gcode is either M or G followed by decimal. Or 'dfu' or 'version'."""
     ALPHA_PREFIXED_NUMBER_RE = re.compile(r"(?P<prefix>[A-Z])(?P<number>-?\d*\.?\d*)")

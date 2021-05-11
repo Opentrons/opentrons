@@ -25,7 +25,7 @@ class SmoothieEmulator(AbstractEmulator):
 
     WRITE_INSTRUMENT_RE = re.compile(r"(?P<mount>[LR])\s*(?P<value>[a-f0-9]+)")
 
-    def __init__(self) -> None:
+    def __init__(self, parser: Parser) -> None:
         self._pos = {'A': 0.0, 'B': 0.0, 'C': 0.0, 'X': 0.0, 'Y': 0.0, 'Z': 0.0}
         self._home_status: Dict[str, bool] = {
             'X': False,
@@ -44,7 +44,7 @@ class SmoothieEmulator(AbstractEmulator):
             "L": utils.string_to_hex("P3HMV202020041605", 64),
             "R": utils.string_to_hex("P20SV202020070101", 64),
         }
-        self._parser = Parser()
+        self._parser = parser
 
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""

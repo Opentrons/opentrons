@@ -27,10 +27,10 @@ VERSION = 1
 class MagDeckEmulator(AbstractEmulator):
     """Magdeck emulator"""
 
-    def __init__(self) -> None:
+    def __init__(self, parser: Parser) -> None:
         self.height: float = 0
         self.position: float = 0
-        self._parser = Parser()
+        self._parser = parser
 
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""

@@ -150,8 +150,8 @@ class AxisMoveTimestamp:
 
 def string_to_hex(val: str, min_length: int = 0) -> str:
     """
-    Create a hex representation of val. Will be padded with "0"
-    until min_length is reached.
+    Create a hex representation of val. The end of the result will be padded
+    with "0" until min_length is reached.
 
     Args:
         val: The string to convert.
