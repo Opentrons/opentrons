@@ -11,7 +11,7 @@ import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
 import { AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import { makeMaskToDecimal, maskLoadName } from './fieldMasks'
+import { maskLoadName } from './fieldMasks'
 import {
   tubeRackInsertOptions,
   aluminumBlockAutofills,
@@ -46,7 +46,8 @@ import { Grid } from './components/sections/Grid'
 import { Volume } from './components/sections/Volume'
 import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
 import { WellBottomAndDepth } from './components/sections/WellBottomAndDepth'
-import { XYSpacingImg, XYOffsetImg } from './components/diagrams'
+import { WellSpacing } from './components/sections/WellSpacing'
+import { GridOffset } from './components/sections/GridOffset'
 
 import styles from './styles.css'
 
@@ -60,8 +61,6 @@ import type {
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
-
-const maskTo2Decimal = makeMaskToDecimal(2)
 
 interface MakeAutofillOnChangeArgs {
   name: keyof LabwareFields
@@ -462,85 +461,8 @@ export const LabwareCreator = (): JSX.Element => {
                   <Volume />
                   <WellShapeAndSides />
                   <WellBottomAndDepth />
-                  <Section
-                    label="Well Spacing"
-                    fieldList={['gridSpacingX', 'gridSpacingY']}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Spacing is between the <strong>center</strong> of
-                          wells.
-                        </p>
-                        <p>
-                          Well spacing measurements inform the robot how far
-                          away rows and columns are from each other.
-                        </p>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <XYSpacingImg
-                          labwareType={values.labwareType}
-                          wellShape={values.wellShape}
-                          gridRows={values.gridRows}
-                        />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="gridSpacingX"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                        <TextField
-                          name="gridSpacingY"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Grid Offset"
-                    fieldList={['gridOffsetX', 'gridOffsetY']}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Find the measurement from the center of{' '}
-                          <strong>
-                            {values.labwareType === 'reservoir'
-                              ? 'the top left-most well'
-                              : 'well A1'}
-                          </strong>{' '}
-                          to the edge of the labware{"'"}s footprint.
-                        </p>
-                        <p>
-                          Corner offset informs the robot how far the grid of
-                          wells is from the slot{"'"}s top left corner.
-                        </p>
-                        <div className={styles.help_text}>
-                          <img src={require('./images/offset_helpText.svg')} />
-                        </div>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <XYOffsetImg
-                          labwareType={values.labwareType}
-                          wellShape={values.wellShape}
-                        />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="gridOffsetX"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                        <TextField
-                          name="gridOffsetY"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <WellSpacing />
+                  <GridOffset />
                   <Section label="Check your work">
                     <div className={styles.preview_labware}>
                       <ConditionalLabwareRender values={values} />
