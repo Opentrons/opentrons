@@ -13,9 +13,9 @@ class Command:
 class Parser:
     """Gcode line parser."""
 
-    GCODE_RE = re.compile(r"(?:(?:[MG]\d+\.*\d*)|dfu|version)")
+    GCODE_RE = re.compile(r"(?:(?:[MG]\d+\.?\d*)|dfu|version)")
     """A gcode is either M or G followed by decimal. Or 'dfu' or 'version'."""
-    PREFIX_NUMBER_RE = re.compile(r"(?P<prefix>[A-Z])(?P<value>-?\d*\.?\d*)")
+    ALPHA_PREFIXED_NUMBER_RE = re.compile(r"(?P<prefix>[A-Z])(?P<number>-?\d*\.?\d*)")
     """All parameters are a capital letter followed by a decimal value."""
 
     def parse(self, line: str) -> Generator[Command, None, None]:
@@ -37,7 +37,7 @@ class Parser:
                     line[previous.end(): i.start()]
                 )
             else:
-                # This is the first match. It better bet at the beginning or
+                # This is the first match. It better be at the beginning or
                 # there's junk in the beginning.
                 if i.start() != 0:
                     raise ValueError(f"Invalid content: {line}")
@@ -63,11 +63,11 @@ class Parser:
 
         Returns: a Command object
         """
-        pars = (i.groupdict() for i in Parser.PREFIX_NUMBER_RE.finditer(body))
+        pars = (i.groupdict() for i in Parser.ALPHA_PREFIXED_NUMBER_RE.finditer(body))
         return Command(
             gcode=gcode,
             body=body.strip(),
             params={
-                p['prefix']: float(p['value']) if p['value'] else None for p in pars
+                p['prefix']: float(p['number']) if p['number'] else None for p in pars
             }
         )
