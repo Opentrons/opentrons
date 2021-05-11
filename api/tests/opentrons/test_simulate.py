@@ -12,15 +12,16 @@ from opentrons.protocols.execution.errors import ExceptionInProtocolError
 HERE = Path(__file__).parent
 
 
-@pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
+@pytest.mark.parametrize('protocol_file', ['test_simulate.py'])
 def test_simulate_function_apiv2(protocol,
                                  protocol_file,
                                  monkeypatch):
     monkeypatch.setenv('OT_API_FF_allowBundleCreation', '1')
     runlog, bundle = simulate.simulate(
-        protocol.filelike, 'testosaur_v2.py')
+        protocol.filelike, 'test_simulate.py')
     assert isinstance(bundle, protocols.types.BundleContents)
     assert [item['payload']['text'] for item in runlog] == [
+        '2.0',
         'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1',
         'Aspirating 10.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 150.0 uL/sec',  # noqa: E501,
         'Dispensing 10.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 300.0 uL/sec',  # noqa: E501,
