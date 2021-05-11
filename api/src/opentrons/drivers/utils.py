@@ -1,3 +1,4 @@
+import binascii
 import logging
 import time
 from typing import Dict, Optional, Mapping, Iterable, Sequence
@@ -145,3 +146,23 @@ class AxisMoveTimestamp:
     def reset_moved(self, axis_iter: Iterable[str]):
         """ Reset the clocks for a set of axes """
         self._moved_at.update({ax: None for ax in axis_iter})
+
+
+def string_to_hex(val: str, min_length: int = 0) -> str:
+    """
+    Create a hex representation of val. Will be padded with "0"
+    until min_length is reached.
+
+    Args:
+        val: The string to convert.
+        min_length: The minimum length of result. "0" will be used as
+            padding. Default is no minimum length and no padding.
+
+    Returns:
+        Hex string
+    """
+    hex_string = binascii.hexlify(val.encode()).decode()
+    hex_string_length = len(hex_string)
+    if hex_string_length < min_length:
+        return hex_string + "0" * (min_length - hex_string_length)
+    return hex_string

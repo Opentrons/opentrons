@@ -359,35 +359,13 @@ def test_fast_home(smoothie: driver_3_0.SmoothieDriver_3_0_0, spy: MagicMock):
     ]
 
 
-def test_homing_flags(smoothie: driver_3_0.SmoothieDriver_3_0_0, spy: MagicMock):
-    smoothie.move(target={
-        'X': 0,
-        'Y': 0,
-        'Z': 0,
-        'A': 0,
-        'B': 0,
-        'C': 0
-    })
+def test_update_homing_flags(smoothie: driver_3_0.SmoothieDriver_3_0_0, spy: MagicMock):
     smoothie.update_homed_flags()
-    assert smoothie.homed_flags == {
-        'X': False,
-        'Y': False,
-        'Z': False,
-        'A': False,
-        'B': False,
-        'C': False
-    }
-
-    smoothie.home("abcZ")
-    smoothie.update_homed_flags()
-    assert smoothie.homed_flags == {
-        'X': False,
-        'Y': False,
-        'Z': True,
-        'A': True,
-        'B': True,
-        'C': True
-    }
+    command_log = [x[0][0].strip() for x in spy.call_args_list]
+    assert command_log == [
+        'G28.6',
+        'M400'
+    ]
 
 
 def test_update_pipette_config(
