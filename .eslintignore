@@ -18,6 +18,7 @@ shared-data/flow-types/**
 app-shell/lib/**
 discovery-client/lib/**
 **/lib/**/*.d.ts
+**/lib/**/*.json
 
 # prettier
 **/package.json
