@@ -15,22 +15,21 @@ class JsonFileRunner(AbstractFileRunner):
             protocol: JsonProtocol,
             protocol_engine: ProtocolEngine,
             command_translator: CommandTranslator,
-            command_queue_worker: CommandQueueWorker):
-        """
-        Constructor.
+            command_queue_worker: CommandQueueWorker) -> None:
+        """ JsonFileRunner constructor.
 
         Args:
-            protocol:
-            protocol_engine:
-            command_translator:
-            command_queue_worker:
+            protocol: a JSON protocol
+            protocol_engine: instance of the Protocol Engine
+            command_translator: the JSON command translator
+            command_queue_worker: Command Queue worker
         """
         self._protocol = protocol
         self._protocol_engine = protocol_engine
         self._command_translator = command_translator
         self._command_queue_worker = command_queue_worker
 
-    def load(self):
+    def load(self) -> None:
         """Translate JSON commands and send them to protocol engine."""
         for json_cmd in self._protocol.commands:
             translated_items = self._command_translator.translate(json_cmd)

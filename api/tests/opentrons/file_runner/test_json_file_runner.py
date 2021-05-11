@@ -6,7 +6,6 @@ from decoy import Decoy
 from opentrons.file_runner import JsonFileRunner
 from opentrons.file_runner.command_queue_worker import CommandQueueWorker
 from opentrons.protocol_engine import ProtocolEngine, WellLocation
-# from opentrons.protocol_engine.commands import (PickUpTipReq
 from opentrons.protocol_engine.commands import CommandRequestType, PickUpTipRequest, \
     AspirateRequest, DispenseRequest
 from opentrons.protocols import models
@@ -16,29 +15,31 @@ from opentrons.protocols.runner.json_proto.command_translator import \
 
 @pytest.fixture
 def decoy() -> Decoy:
+    """Create a Decoy state container for this test suite."""
     return Decoy()
 
 
 @pytest.fixture
 def protocol_engine(decoy: Decoy) -> ProtocolEngine:
-    """Create a protocol engine fixture"""
+    """Create a protocol engine fixture."""
     return decoy.create_decoy(spec=ProtocolEngine)
 
 
 @pytest.fixture
 def command_translator(decoy: Decoy) -> CommandTranslator:
-    """Create a command translator fixture"""
+    """Create a stubbed command translator fixture."""
     return decoy.create_decoy(spec=CommandTranslator)
 
 
 @pytest.fixture
 def command_queue_worker(decoy: Decoy) -> CommandQueueWorker:
-    """Create a command translator fixture"""
+    """Create a stubbed command translator fixture."""
     return decoy.create_decoy(spec=CommandQueueWorker)
 
 
 @pytest.fixture
-def sample_json_proto(minimal_labware_def) -> dict:
+def sample_json_proto(minimal_labware_def: dict) -> dict:
+    """JSON protocol fixture."""
     return {
         "schemaVersion": 3,
         "metadata": {},
@@ -109,8 +110,8 @@ def sample_json_proto(minimal_labware_def) -> dict:
 
 
 @pytest.fixture
-def protocol(sample_json_proto) -> models.JsonProtocol:
-    """Create a json protocol fixture."""
+def protocol(sample_json_proto: dict) -> models.JsonProtocol:
+    """Create a JSON protocol fixture."""
     return models.JsonProtocol.parse_obj(sample_json_proto)
 
 
@@ -161,7 +162,7 @@ def test_json_runner_load_translation(
         decoy: Decoy,
         subject: JsonFileRunner,
         protocol: models.JsonProtocol,
-        protocol_engine,
+        protocol_engine: ProtocolEngine,
         command_translator: CommandTranslator
 ) -> None:
     """It should create a list of translated commands."""
@@ -180,11 +181,10 @@ def test_json_runner_load_commands_to_engine(
         decoy: Decoy,
         protocol: models.JsonProtocol,
         subject: JsonFileRunner,
-        command_translator,
-        protocol_engine
+        command_translator: CommandTranslator,
+        protocol_engine: ProtocolEngine
 ) -> None:
     """It should send translated commands to protocol engine."""
-
     mock_cmd1 = cast(CommandRequestType,
                      PickUpTipRequest(pipetteId="123", labwareId="abc", wellName="def"))
     mock_cmd2 = cast(CommandRequestType,

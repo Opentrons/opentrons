@@ -94,6 +94,6 @@ class ProtocolEngine:
 
         return done_cmd
 
-    def add_command(self, request: CommandRequestType):
+    def add_command(self, request: CommandRequestType) -> None:
         """Add a command to ProtocolEngine."""
         raise NotImplementedError
