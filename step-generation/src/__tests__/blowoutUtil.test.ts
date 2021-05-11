@@ -46,7 +46,6 @@ describe('blowoutUtil', () => {
       invariantContext: makeContext(),
       blowoutLocation: null,
     }
-    // $FlowFixMe
     curryCommandCreatorMock.mockClear()
   })
   it('blowoutUtil curries blowout with source well params', () => {

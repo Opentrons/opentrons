@@ -17,7 +17,7 @@ import type { WellOrderOption } from '../types'
 // ]                      /       ]
 //
 const _orderingColsToRows = (ordering: string[][]): string[][] =>
-  zipWith(...ordering, (...col) => compact(uniq(col))) // $FlowFixMe(BC, 2018-08-27): flow-typed for lodash zipWith only supports <4 inner arrays
+  zipWith(...ordering, (...col) => compact(uniq(col)))
 
 // given a default "ordering" 2d array from labware definitions
 // where each inner array represents a physical column of wells
