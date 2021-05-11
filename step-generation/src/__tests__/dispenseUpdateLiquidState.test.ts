@@ -1,13 +1,19 @@
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import fixture_384_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
+import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import _fixture384Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import produce from 'immer'
 import { createEmptyLiquidState, createTipLiquidState } from '../utils'
 import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from '../fixtures'
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext } from '../types'
+
+const fixture96Plate = _fixture96Plate as LabwareDefinition2
+const fixture12Trough = _fixture12Trough as LabwareDefinition2
+const fixture384Plate = _fixture384Plate as LabwareDefinition2
+
 let dispenseSingleCh150ToA1Args: {
   invariantContext: InvariantContext
   pipette: string
@@ -323,8 +329,8 @@ describe('...8-channel pipette', () => {
   describe('dispense into empty column with different ingreds in each tip:', () => {
     const tests = [
       {
-        labwareType: 'fixture_96_plate',
-        def: fixture_96_plate,
+        labwareType: 'fixture96Plate',
+        def: fixture96Plate,
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
@@ -370,8 +376,8 @@ describe('...8-channel pipette', () => {
         },
       },
       {
-        labwareType: 'fixture_12_trough',
-        def: fixture_12_trough,
+        labwareType: 'fixture12Trough',
+        def: fixture12Trough,
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
@@ -390,8 +396,8 @@ describe('...8-channel pipette', () => {
         },
       },
       {
-        labwareType: 'fixture_384_plate',
-        def: fixture_384_plate,
+        labwareType: 'fixture384Plate',
+        def: fixture384Plate,
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
@@ -454,7 +460,6 @@ describe('...8-channel pipette', () => {
         customInvariantContext.labwareEntities.sourcePlateId = {
           id: SOURCE_LABWARE,
           labwareDefURI: labwareType,
-          // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
           def,
         }
         const blankLiquidState = createEmptyLiquidState(customInvariantContext)

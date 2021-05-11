@@ -22,6 +22,8 @@ import type {
   TEMPERATURE_APPROACHING_TARGET,
 } from './constants'
 
+export type { Command }
+
 // Copied from PD
 export type DeckSlot = string
 type THERMOCYCLER_STATE = 'thermocyclerState'

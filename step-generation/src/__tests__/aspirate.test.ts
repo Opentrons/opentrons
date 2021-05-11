@@ -1,8 +1,8 @@
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { aspirate } from '../commandCreators/atomic/aspirate'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
+import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import _fixtureTiprack1000ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 import { thermocyclerPipetteCollision } from '../utils'
 import {
   getInitialRobotStateStandard,
@@ -13,8 +13,12 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../fixtures'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { InvariantContext, RobotState } from '../'
+
+const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
+const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
 
 jest.mock('../utils/thermocyclerPipetteCollision')
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
@@ -56,12 +60,10 @@ describe('aspirate', () => {
   it('aspirate with volume > tip max volume should throw error', () => {
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-    ].tiprackDefURI = getLabwareDefURI(fixture_tiprack_10_ul)
-    // @ts-expect-error(SA, 2021-05-03): labware not getting casted to LabwareDefinition2
+    ].tiprackDefURI = getLabwareDefURI(fixtureTiprack10ul)
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
-    ].tiprackLabwareDef = fixture_tiprack_10_ul
+    ].tiprackLabwareDef = fixtureTiprack10ul
     const result = aspirate(
       {
         ...flowRateAndOffsets,
@@ -82,12 +84,10 @@ describe('aspirate', () => {
     // NOTE: assigning p300 to a 1000uL tiprack is nonsense, just for this test
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-    ].tiprackDefURI = getLabwareDefURI(fixture_tiprack_1000_ul)
-    // @ts-expect-error(SA, 2021-05-03): labware not getting casted to LabwareDefinition2
+    ].tiprackDefURI = getLabwareDefURI(fixtureTiprack1000ul)
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
-    ].tiprackLabwareDef = fixture_tiprack_1000_ul
+    ].tiprackLabwareDef = fixtureTiprack1000ul
     const result = aspirate(
       {
         ...flowRateAndOffsets,

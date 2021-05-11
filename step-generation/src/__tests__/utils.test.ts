@@ -28,7 +28,11 @@ import { Diff, thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { DEFAULT_CONFIG } from '../fixtures'
 import { orderWells, thermocyclerPipetteCollision } from '../utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { RobotState, ThermocyclerStateStepArgs } from '../types'
+import type {
+  RobotState,
+  ThermocyclerStateStepArgs,
+  WellOrderOption,
+} from '../types'
 
 describe('splitLiquid', () => {
   const singleIngred = {
@@ -886,7 +890,7 @@ describe('getLocationTotalVolume', () => {
   })
 })
 describe('orderWells', () => {
-  const orderTuples = [
+  const orderTuples: Array<[WellOrderOption, WellOrderOption]> = [
     ['t2b', 'l2r'],
     ['t2b', 'r2l'],
     ['b2t', 'l2r'],
@@ -901,7 +905,10 @@ describe('orderWells', () => {
       ['A1', 'B1'],
       ['A2', 'B2'],
     ]
-    const regularAnswerMap = {
+    const regularAnswerMap: Record<
+      WellOrderOption,
+      Partial<Record<WellOrderOption, string[]>>
+    > = {
       t2b: {
         l2r: ['A1', 'B1', 'A2', 'B2'],
         r2l: ['A2', 'B2', 'A1', 'B1'],
@@ -921,9 +928,7 @@ describe('orderWells', () => {
     }
     orderTuples.forEach(tuple => {
       it(`first ${tuple[0]} then ${tuple[1]}`, () => {
-        // @ts-expect-error(SA, 2021-05-03): can't spread in values to function unless they're optional
-        expect(orderWells(regularOrdering, ...tuple)).toEqual(
-          // @ts-expect-error(SA, 2021-05-03): adding additional keys to answer map would add more confusion
+        expect(orderWells(regularOrdering, tuple[0], tuple[1])).toEqual(
           regularAnswerMap[tuple[0]][tuple[1]]
         )
       })
@@ -936,7 +941,10 @@ describe('orderWells', () => {
       ['A3'],
       ['A4', 'B4', 'C4', 'D4'],
     ]
-    const irregularAnswerMap = {
+    const irregularAnswerMap: Record<
+      WellOrderOption,
+      Partial<Record<WellOrderOption, string[]>>
+    > = {
       t2b: {
         l2r: ['A1', 'B1', 'A2', 'B2', 'C2', 'A3', 'A4', 'B4', 'C4', 'D4'],
         r2l: ['A4', 'B4', 'C4', 'D4', 'A3', 'A2', 'B2', 'C2', 'A1', 'B1'],
@@ -956,9 +964,7 @@ describe('orderWells', () => {
     }
     orderTuples.forEach(tuple => {
       it(`first ${tuple[0]} then ${tuple[1]}`, () => {
-        // @ts-expect-error(SA, 2021-05-03): can't spread in values to function unless they're optional
         expect(orderWells(irregularOrdering, ...tuple)).toEqual(
-          // @ts-expect-error(SA, 2021-05-03): adding additional keys to answer map would add more confusion
           irregularAnswerMap[tuple[0]][tuple[1]]
         )
       })

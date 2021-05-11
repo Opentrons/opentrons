@@ -40,7 +40,10 @@ const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
 // TODO: Ian 2019-06-14 more elegant way to test the blowout offset calculation
 const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
-let mixinArgs: Partial<DistributeArgs>
+let mixinArgs: Omit<
+  DistributeArgs,
+  'sourceWell' | 'destWells' | 'changeTip' | 'volume'
+>
 let invariantContext: InvariantContext
 let robotStateWithTip: RobotState
 let robotInitialStateNoTipsRemain: RobotState
@@ -65,6 +68,7 @@ beforeEach(() => {
     aspirateDelay: null,
     dispenseDelay: null,
     aspirateAirGapVolume: null,
+    dispenseAirGapVolume: null,
     touchTipAfterDispense: false,
   }
   blowoutSingleToTrash = blowoutHelper(FIXED_TRASH_ID, {
@@ -89,7 +93,7 @@ beforeEach(() => {
 })
 describe('distribute: minimal example', () => {
   it('single channel; 60uL from A1 -> A2, A3; no tip pickup', () => {
-    const distributeArgs = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3'],
@@ -97,7 +101,6 @@ describe('distribute: minimal example', () => {
       volume: 60,
     }
     const result = distribute(
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
       distributeArgs,
       invariantContext,
       robotStateWithTip
@@ -113,7 +116,6 @@ describe('distribute: minimal example', () => {
 })
 describe('tip handling for multiple distribute chunks', () => {
   it('changeTip: "once"', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -141,7 +143,6 @@ describe('tip handling for multiple distribute chunks', () => {
     ])
   })
   it('changeTip: "always"', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -172,7 +173,7 @@ describe('tip handling for multiple distribute chunks', () => {
   })
   it('changeTip: "never" with carried-over tip', () => {
     // NOTE: this has been used as BASE CASE for the "advanced settings" tests
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -198,7 +199,6 @@ describe('tip handling for multiple distribute chunks', () => {
     ])
   })
   it('changeTip: "never" should fail with no initial tip', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -234,7 +234,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
   it('should mix before aspirate, then aspirate disposal volume', () => {
     // NOTE this also tests "uneven final chunk" eg A6 in [A2 A3 | A4 A5 | A6]
     // which is especially relevant to disposal volume
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -323,7 +323,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
   //   ])
   // })
   it('should delay after aspirate', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -355,7 +354,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
   it('should delay after air gap aspirate and regular aspirate', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -394,7 +392,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
   it('should air gap after aspirate and break into two chunks', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -425,7 +422,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
   it('should delay after air gap dispense and regular dispense', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -466,7 +462,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
   it('should delay after mix aspirate and regular aspirate', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -518,7 +513,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
   it('should touch tip after aspirate', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -547,7 +541,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
   it('should touch tip after dispense', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -589,7 +582,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     const volume = 130
     const disposalVolume = 20
     const aspirateVol = volume * 2 + disposalVolume
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -636,7 +629,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
   it('should delay after dispense', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -670,7 +662,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
   it('should delay after mix dispense AND regular dispense', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -724,7 +715,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
   describe('all advanced settings enabled', () => {
-    let allArgs: Partial<DistributeArgs>
+    let allArgs: DistributeArgs
     beforeEach(() => {
       allArgs = {
         ...mixinArgs,
@@ -757,7 +748,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       }
     })
     it('should create commands in the expected order with expected params', () => {
-      const args: Partial<DistributeArgs> = {
+      const args: DistributeArgs = {
         ...mixinArgs,
         sourceWell: 'A1',
         destWells: ['B1', 'B2'],
@@ -785,7 +776,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutFlowRateUlSec: 2.3,
         blowoutOffsetFromTopMm: 3.3,
       }
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
+
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -820,7 +811,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       ])
     })
     it('should create commands in the expected order with expected params (blowout in trash, reuse tip)', () => {
-      const args = {
+      const args: DistributeArgs = {
         ...allArgs,
         volume: 100,
         sourceWell: 'A1',
@@ -828,7 +819,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         changeTip: 'never',
         blowoutLocation: 'trashId',
       }
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
+
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -880,7 +871,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       ])
     })
     it('should create commands in the expected order with expected params (blowout in trash, change tip each aspirate)', () => {
-      const args = {
+      const args: DistributeArgs = {
         ...allArgs,
         volume: 100,
         sourceWell: 'A1',
@@ -888,7 +879,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         changeTip: 'always',
         blowoutLocation: 'trashId',
       }
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
+
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -947,7 +938,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       ])
     })
     it('should create commands in the expected order with expected params (blowout in trash, change tip once)', () => {
-      const args = {
+      const args: DistributeArgs = {
         ...allArgs,
         volume: 100,
         sourceWell: 'A1',
@@ -955,7 +946,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         changeTip: 'once',
         blowoutLocation: 'trashId',
       }
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
+
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1008,7 +999,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       ])
     })
     it('should create commands in the expected order with expected params (blowout in source, reuse tip)', () => {
-      const args = {
+      const args: DistributeArgs = {
         ...allArgs,
         volume: 100,
         sourceWell: 'A1',
@@ -1016,7 +1007,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         changeTip: 'never',
         blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       }
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
+
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1067,7 +1058,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       ])
     })
     it('should create commands in the expected order with expected params (blowout in source, change tip each aspirate)', () => {
-      const args = {
+      const args: DistributeArgs = {
         ...allArgs,
         volume: 100,
         sourceWell: 'A1',
@@ -1075,7 +1066,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         changeTip: 'always',
         blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       }
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
+
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1129,7 +1120,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       ])
     })
     it('should create commands in the expected order with expected params (blowout in source, change tip once)', () => {
-      const args = {
+      const args: DistributeArgs = {
         ...allArgs,
         volume: 100,
         sourceWell: 'A1',
@@ -1137,7 +1128,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         changeTip: 'once',
         blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
       }
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
+
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1189,7 +1180,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       ])
     })
     it('should create commands in the expected order with expected params (blowout in dest, reuse tip)', () => {
-      const args = {
+      const args: DistributeArgs = {
         ...allArgs,
         volume: 100,
         sourceWell: 'A1',
@@ -1197,7 +1188,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         changeTip: 'never',
         blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
       }
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
+
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1250,7 +1241,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       ])
     })
     it('should create commands in the expected order with expected params (blowout in dest, change tip each aspirate)', () => {
-      const args = {
+      const args: DistributeArgs = {
         ...allArgs,
         volume: 100,
         sourceWell: 'A1',
@@ -1258,7 +1249,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         changeTip: 'always',
         blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
       }
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
+
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1317,7 +1308,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       ])
     })
     it('should create commands in the expected order with expected params (blowout in dest, change tip once)', () => {
-      const args = {
+      const args: DistributeArgs = {
         ...allArgs,
         volume: 100,
         sourceWell: 'A1',
@@ -1325,7 +1316,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         changeTip: 'once',
         blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
       }
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
+
       const result = distribute(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1382,7 +1373,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
 })
 describe('invalid input + state errors', () => {
   it('invalid pipette ID should throw error', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -1406,7 +1396,7 @@ describe('invalid input + state errors', () => {
 describe('distribute volume exceeds pipette max volume', () => {
   it(`no disposal volume`, () => {
     const changeTip = 'once'
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -1426,7 +1416,7 @@ describe('distribute volume exceeds pipette max volume', () => {
   })
   it(`with disposal volume`, () => {
     const changeTip = 'once'
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',

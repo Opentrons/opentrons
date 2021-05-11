@@ -1,5 +1,5 @@
 import { getLabwareDefURI, MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   makeContext,
   makeState,
@@ -14,6 +14,10 @@ import {
   getModuleState,
 } from '../'
 import { InvariantContext } from '../types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
+const fixtureTiprack300ul = _fixtureTiprack300ul as LabwareDefinition2
+
 let invariantContext: InvariantContext
 beforeEach(() => {
   invariantContext = makeContext()
@@ -58,10 +62,8 @@ describe('_getNextTip', () => {
 
     _invariantContext.labwareEntities[tiprackId] = {
       id: tiprackId,
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-      labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
-      // @ts-expect-error(SA, 2021-05-03): tiprack not getting casted to labware definition type
-      def: fixture_tiprack_300_ul,
+      labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
+      def: fixtureTiprack300ul,
     }
     const robotState = makeState({
       invariantContext: _invariantContext,

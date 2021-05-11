@@ -65,7 +65,7 @@ function tripleMix(
 let invariantContext: InvariantContext
 let initialRobotState: RobotState
 let robotStatePickedUpOneTip: any
-let mixinArgs: Partial<ConsolidateArgs>
+let mixinArgs: Omit<ConsolidateArgs, 'volume' | 'changeTip'>
 beforeEach(() => {
   invariantContext = makeContext()
   initialRobotState = getInitialRobotStateStandard(invariantContext)
@@ -88,6 +88,7 @@ beforeEach(() => {
     aspirateDelay: null,
     dispenseDelay: null,
     aspirateAirGapVolume: null,
+    dispenseAirGapVolume: null,
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
@@ -95,13 +96,13 @@ beforeEach(() => {
 })
 describe('consolidate single-channel', () => {
   it('Minimal single-channel: A1 A2 to B1, 50uL with p300', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       sourceWells: ['A1', 'A2'],
       volume: 50,
       changeTip: 'once',
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -113,8 +114,12 @@ describe('consolidate single-channel', () => {
   })
   it('Single-channel with exceeding pipette max: A1 A2 A3 A4 to B1, 150uL with p300', () => {
     // TODO Ian 2018-05-03 is this a duplicate of exceeding max with changeTip="once"???
-    const data = { ...mixinArgs, volume: 150, changeTip: 'once' }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+    const data: ConsolidateArgs = {
+      ...mixinArgs,
+      volume: 150,
+      changeTip: 'once',
+    }
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -128,8 +133,12 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('Single-channel with exceeding pipette max: with changeTip="always"', () => {
-    const data = { ...mixinArgs, volume: 150, changeTip: 'always' }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+    const data: ConsolidateArgs = {
+      ...mixinArgs,
+      volume: 150,
+      changeTip: 'always',
+    }
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -145,8 +154,12 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('Single-channel with exceeding pipette max: with changeTip="once"', () => {
-    const data = { ...mixinArgs, volume: 150, changeTip: 'once' }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+    const data: ConsolidateArgs = {
+      ...mixinArgs,
+      volume: 150,
+      changeTip: 'once',
+    }
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -160,8 +173,12 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('Single-channel with exceeding pipette max: with changeTip="never"', () => {
-    const data = { ...mixinArgs, volume: 150, changeTip: 'never' }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+    const data: ConsolidateArgs = {
+      ...mixinArgs,
+      volume: 150,
+      changeTip: 'never',
+    }
+
     const result = consolidate(data, invariantContext, robotStatePickedUpOneTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -174,7 +191,7 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('mix on aspirate should mix before aspirate in first well of chunk only, and tip position bound to labware', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 100,
       changeTip: 'once',
@@ -183,7 +200,7 @@ describe('consolidate single-channel', () => {
         volume: 50,
       },
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -205,7 +222,7 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('should delay after mix aspirate AND regular aspirate in first well of chunk only', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 100,
       changeTip: 'once',
@@ -218,7 +235,7 @@ describe('consolidate single-channel', () => {
         mmFromBottom: 14,
       },
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -258,7 +275,7 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('should mix on aspirate', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 125,
       changeTip: 'once',
@@ -266,7 +283,7 @@ describe('consolidate single-channel', () => {
         times: 3,
         volume: 50,
       },
-    } // @ts-expect-error(SA, 2021-05-03): arguments missing
+    }
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -310,7 +327,7 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('should mix after dispense', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 100,
       changeTip: 'once',
@@ -319,7 +336,7 @@ describe('consolidate single-channel', () => {
         volume: 53,
       },
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -341,7 +358,7 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('should delay after mix dispense AND regular dispense', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 100,
       changeTip: 'once',
@@ -354,7 +371,7 @@ describe('consolidate single-channel', () => {
         mmFromBottom: 14,
       },
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -392,7 +409,7 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('should mix after dispense with blowout to trash: first mix, then blowout', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 100,
       changeTip: 'once',
@@ -402,7 +419,7 @@ describe('consolidate single-channel', () => {
       },
       blowoutLocation: FIXED_TRASH_ID,
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -431,7 +448,7 @@ describe('consolidate single-channel', () => {
   })
   it('"pre-wet tip" should aspirate and dispense consolidate volume from first well of each chunk', () => {
     // TODO LATER Ian 2018-02-13 Should it be 2/3 max volume instead?
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 150,
       changeTip: 'once',
@@ -439,7 +456,7 @@ describe('consolidate single-channel', () => {
       sourceWells: ['A1', 'A2', 'A3', 'A4'],
     }
     const preWetVol = data.volume // NOTE same as volume above... for now
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -464,7 +481,7 @@ describe('consolidate single-channel', () => {
   })
   it('pre-wet tip should use the aspirate delay when specified', () => {
     // TODO LATER Ian 2018-02-13 Should it be 2/3 max volume instead?
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 150,
       changeTip: 'once',
@@ -476,7 +493,7 @@ describe('consolidate single-channel', () => {
       },
     }
     const preWetVol = data.volume // NOTE same as volume above... for now
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -507,7 +524,7 @@ describe('consolidate single-channel', () => {
   })
   it('pre-wet tip should use the dispense delay when specified', () => {
     // TODO LATER Ian 2018-02-13 Should it be 2/3 max volume instead?
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 150,
       changeTip: 'once',
@@ -519,7 +536,7 @@ describe('consolidate single-channel', () => {
       },
     }
     const preWetVol = data.volume // NOTE same as volume above... for now
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -547,7 +564,7 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('should delay after aspirate', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 150,
       changeTip: 'never',
@@ -556,7 +573,7 @@ describe('consolidate single-channel', () => {
         mmFromBottom: 14,
       },
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, robotStatePickedUpOneTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -573,7 +590,7 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('should delay after air gap aspirate and regular aspirate', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 100,
       aspirateDelay: {
@@ -583,7 +600,7 @@ describe('consolidate single-channel', () => {
       changeTip: 'once',
       aspirateAirGapVolume: 5,
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     // break into single chunks because volume + air gap volume is too big for multi aspirate
@@ -610,7 +627,7 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('should delay after dispense', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 150,
       changeTip: 'never',
@@ -619,7 +636,7 @@ describe('consolidate single-channel', () => {
         mmFromBottom: 14,
       },
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, robotStatePickedUpOneTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -634,13 +651,13 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('touchTip after aspirate should touch tip after every aspirate command', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 150,
       changeTip: 'once',
       touchTipAfterAspirate: true,
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     const touchTipAfterAsp = {
@@ -661,13 +678,13 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('touchTip after dispense should touch tip after dispense on destination well', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 150,
       changeTip: 'once',
       touchTipAfterDispense: true,
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     const touchTipAfterDisp = {
@@ -687,27 +704,27 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('invalid pipette ID should return error', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       sourceWells: ['A1', 'A2'],
       volume: 150,
       changeTip: 'once',
       pipette: 'no-such-pipette-id-here',
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getErrorResult(result)
     expect(res.errors).toHaveLength(1)
     expect(res.errors[0].type).toEqual('PIPETTE_DOES_NOT_EXIST')
   })
   it('should air gap after aspirate and dispense all air + liquid at once', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 100,
       changeTip: 'once',
       aspirateAirGapVolume: 5,
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     // break into single chunks because volume + air gap volume is too big for multi aspirate
@@ -726,13 +743,13 @@ describe('consolidate single-channel', () => {
     ])
   })
   it('should air gap after aspirate and break into single chunks and dispense all air + liquid at once', () => {
-    const data = {
+    const data: ConsolidateArgs = {
       ...mixinArgs,
       volume: 150,
       changeTip: 'once',
       aspirateAirGapVolume: 5,
     }
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
+
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     // break into single chunks because volume + air gap volume is too big for multi aspirate
@@ -754,7 +771,7 @@ describe('consolidate single-channel', () => {
   })
   describe('all advanced settings enabled', () => {
     it('should create commands in the expected order with expected params (changeTip: never, blowout in trash)', () => {
-      const args = {
+      const args: ConsolidateArgs = {
         ...mixinArgs,
         sourceWells: ['A1', 'A2', 'A3'],
         destWell: 'B1',
@@ -785,7 +802,6 @@ describe('consolidate single-channel', () => {
         dispenseAirGapVolume: 35,
       }
       const result = consolidate(
-        // @ts-expect-error(SA, 2021-05-03): arguments missing
         args,
         invariantContext,
         robotStatePickedUpOneTip
@@ -1226,7 +1242,7 @@ describe('consolidate single-channel', () => {
       ])
     })
     it('should create commands in the expected order with expected params (changeTip: once, blowout in dest)', () => {
-      const args = {
+      const args: ConsolidateArgs = {
         ...mixinArgs,
         sourceWells: ['A1', 'A2', 'A3'],
         destWell: 'B1',
@@ -1256,7 +1272,7 @@ describe('consolidate single-channel', () => {
         blowoutOffsetFromTopMm: 3.3,
         dispenseAirGapVolume: 35,
       }
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
+
       const result = consolidate(args, invariantContext, initialRobotState)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1702,7 +1718,7 @@ describe('consolidate single-channel', () => {
       ])
     })
     it('should create commands in the expected order with expected params (changeTip: always, blowout in dest)', () => {
-      const args = {
+      const args: ConsolidateArgs = {
         ...mixinArgs,
         sourceWells: ['A1', 'A2', 'A3'],
         destWell: 'B1',
@@ -1732,7 +1748,7 @@ describe('consolidate single-channel', () => {
         blowoutOffsetFromTopMm: 3.3,
         dispenseAirGapVolume: 35,
       }
-      // @ts-expect-error(SA, 2021-05-03): arguments missing
+
       const result = consolidate(args, invariantContext, initialRobotState)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -2221,7 +2237,7 @@ describe('consolidate multi-channel', () => {
       pipette: 'p300MultiId',
     })
 
-  const args: Partial<ConsolidateArgs> = {
+  const args: Omit<ConsolidateArgs, 'changeTip' | 'volume'> = {
     ...getFlowRateAndOffsetParamsTransferLike(),
     commandCreatorFnName: 'consolidate',
     name: 'Consolidate Test',
@@ -2238,12 +2254,12 @@ describe('consolidate multi-channel', () => {
     aspirateDelay: null,
     dispenseDelay: null,
     aspirateAirGapVolume: null,
+    dispenseAirGapVolume: null,
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
   }
   it('simple multi-channel: cols A1 A2 A3 A4 to col A12', () => {
-    // @ts-expect-error(SA, 2021-05-03): arguments missing
     const data: ConsolidateArgs = { ...args, volume: 140, changeTip: 'once' }
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)

@@ -1,6 +1,12 @@
 import { thermocyclerStateDiff, Diff } from '../utils/thermocyclerStateDiff'
 import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
 import { getStateAndContextTempTCModules, getSuccessResult } from '../fixtures'
+import type {
+  Command,
+  InvariantContext,
+  RobotState,
+  ThermocyclerStateStepArgs,
+} from '../types'
 jest.mock('../utils/thermocyclerStateDiff')
 
 const mockThermocyclerStateDiff = thermocyclerStateDiff as jest.MockedFunction<
@@ -22,7 +28,14 @@ describe('thermocyclerStateStep', () => {
   afterEach(() => {
     jest.resetAllMocks()
   })
-  const testCases = [
+  const testCases: Array<{
+    expected: Command[]
+    invariantContext: InvariantContext
+    robotState: RobotState
+    testMsg: string
+    thermocyclerStateArgs: ThermocyclerStateStepArgs
+    thermocyclerStateDiff: Diff
+  }> = [
     {
       testMsg: 'should open the lid when diff includes lidOpen',
       thermocyclerStateArgs: {
@@ -339,7 +352,6 @@ describe('thermocyclerStateStep', () => {
           return thermocyclerStateDiff
         })
         const result = thermocyclerStateStep(
-          // @ts-expect-error (sa, 2021-05-03): thermocyclerStateArgs not getting casted to ThermocyclerStateStepArgs
           thermocyclerStateArgs,
           invariantContext,
           robotState
