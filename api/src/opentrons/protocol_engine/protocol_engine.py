@@ -93,3 +93,7 @@ class ProtocolEngine:
         self.state_store.handle_command(done_cmd, command_id=command_id)
 
         return done_cmd
+
+    def add_command(self, request: CommandRequestType):
+        """Add a command to ProtocolEngine."""
+        raise NotImplementedError
