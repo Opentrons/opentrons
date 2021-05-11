@@ -108,12 +108,16 @@ def determine_drop_target(
 
 def validate_can_aspirate(
         location: Union[Labware, Well, types.Location]) -> None:
-    """
-    Can one aspirate on the given `location` or not? This method is
+    """ Can one aspirate on the given `location` or not? This method is
     pretty basic and will probably remain so (?) as the future holds neat
-    ambitions for how validation is implemented and as robots become
-    more aware of their environment.
-    :raises RuntimeError:
+    ambitions for how validation is implemented. And as robots become more
+    intelligent more rigorous testing will be possible
+
+    Args:
+        location: target for aspiration
+
+    Raises:
+        RuntimeError:
     """
     if _is_tiprack(location):
         raise RuntimeError("Cannot aspirate a tiprack")
@@ -121,12 +125,16 @@ def validate_can_aspirate(
 
 def validate_can_dispense(
         location: Union[Labware, Well, types.Location]) -> None:
-    """
-    Can one dispense to the given `location` or not? This method is
+    """ Can one dispense to the given `location` or not? This method is
     pretty basic and will probably remain so (?) as the future holds neat
-    ambitions for how validation is implemented and as robots become
-    more aware of their environment.
-    :raises RuntimeError:
+    ambitions for how validation is implemented. And as robots become more
+    intelligent more rigorous testing will be possible
+
+    Args:
+        location: target for dispense
+
+    Raises:
+        RuntimeError:
     """
     if _is_tiprack(location):
         raise RuntimeError("Cannot dispense to a tiprack")
