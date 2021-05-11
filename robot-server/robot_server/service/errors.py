@@ -34,7 +34,7 @@ class RobotServerError(ApiError):
     def __init__(
         self,
         definition: ErrorCreateDef,
-        error_id: str = "UnknownError",
+        error_id: str = "UncategorizedError",
         links: Optional[ResourceLinks] = None,
         source: Optional[ErrorSource] = None,
         meta: Optional[Dict] = None,

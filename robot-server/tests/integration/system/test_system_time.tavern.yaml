@@ -53,6 +53,6 @@ stages:
       status_code: 501
       json:
         errors:
-          - id: "UnknownError"
+          - id: "UncategorizedError"
             title: "Not implemented"
             detail: "Method not implemented. Not supported on dev server."

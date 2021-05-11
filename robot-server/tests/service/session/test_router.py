@@ -88,7 +88,7 @@ def test_sessions_create_error(
     })
     assert response.json() == {
         'errors': [{
-            'id': 'UnknownError',
+            'id': 'UncategorizedError',
             'detail': "Please attach pipettes before proceeding",
             'title': 'Action Forbidden'}
         ]}
@@ -144,7 +144,7 @@ def test_sessions_delete_not_found(
     response = sessions_api_client.delete("/sessions/check")
     assert response.json() == {
         'errors': [{
-            'id': 'UnknownError',
+            'id': 'UncategorizedError',
             'title': 'Resource Not Found',
             'detail': "Resource type 'session' with id 'check' was not found",
         }],
@@ -197,7 +197,7 @@ def test_sessions_get_not_found(
     response = sessions_api_client.get("/sessions/1234")
     assert response.json() == {
         'errors': [{
-            'id': 'UnknownError',
+            'id': 'UncategorizedError',
             'detail': "Resource type 'session' with id '1234' was not found",
             'title': 'Resource Not Found'
         }],
@@ -299,7 +299,7 @@ def test_sessions_execute_command_no_session(
     mock_session_manager.get_by_id.assert_called_once_with("1234")
     assert response.json() == {
         'errors': [{
-            'id': 'UnknownError',
+            'id': 'UncategorizedError',
             'title': 'Resource Not Found',
             'detail': "Resource type 'session' with id '1234' was not found",  # noqa: E501
         }],
@@ -408,7 +408,7 @@ def test_execute_command_error(sessions_api_client,
             {
                 'detail': 'Cannot do it',
                 'title': 'Action Forbidden',
-                'id': 'UnknownError',
+                'id': 'UncategorizedError',
             }
         ]
     }
@@ -439,7 +439,7 @@ def test_execute_command_session_inactive(
     assert response.json() == {
         'errors': [
             {
-                'id': 'UnknownError',
+                'id': 'UncategorizedError',
                 'title': 'Action Forbidden',
                 'detail': f"Session '{mock_session.meta.identifier}'"
                          f" is not active. Only the active session can "
