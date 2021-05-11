@@ -117,10 +117,10 @@ def test_simulate_extra_labware(protocol, protocol_file, monkeypatch):
         ctx.load_labware("fixture_12_trough", 1, namespace='fixture')
 
 
-@pytest.mark.parametrize('protocol_file', ['test_bug_7552.py'])
-def test_simulate_7552(protocol,
+@pytest.mark.parametrize('protocol_file', ['bug_aspirate_tip.py'])
+def test_simulate_aspirate_tip(protocol,
                        protocol_file,
                        monkeypatch):
     monkeypatch.setenv('OT_API_FF_allowBundleCreation', '1')
     with pytest.raises(ExceptionInProtocolError):
-        simulate.simulate(protocol.filelike, 'test_bug_7552.py')
+        simulate.simulate(protocol.filelike, 'bug_aspirate_tip.py')
