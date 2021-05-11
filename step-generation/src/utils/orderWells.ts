@@ -29,8 +29,7 @@ export const orderWells = (
   first: WellOrderOption,
   second: WellOrderOption
 ): string[] => {
-  // @ts-expect-error(SA, 2021-05-03): implicit any type
-  let orderedWells = []
+  let orderedWells: string[][] = []
 
   if (first === 't2b') {
     if (second === 'l2r') {
@@ -65,6 +64,5 @@ export const orderWells = (
         .map(col => col.slice().reverse())
     }
   }
-  // @ts-expect-error(SA, 2021-05-03): implicit any type
   return flatten(orderedWells)
 }

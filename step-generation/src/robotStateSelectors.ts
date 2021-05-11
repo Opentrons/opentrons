@@ -33,9 +33,7 @@ export function _getNextTip(args: {
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
   const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
 
-  // @ts-expect-error (sa, 2021-05-03): add types to hasTip
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  const hasTip = wellName => tiprackWellsState[wellName]
+  const hasTip = (wellName: string): boolean => tiprackWellsState[wellName]
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
 

@@ -6,16 +6,16 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
-  fixtureP10Single,
-  fixtureP10Multi,
-  fixtureP300Single,
-  fixtureP300Multi,
+  fixtureP10Single as _fixtureP10Single,
+  fixtureP10Multi as _fixtureP10Multi,
+  fixtureP300Single as _fixtureP300Single,
+  fixtureP300Multi as _fixtureP300Multi,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import _fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
@@ -32,11 +32,29 @@ import {
 import { makeInitialRobotState } from '../utils'
 import { tiprackWellNamesFlat } from './data'
 import type {
+  LabwareDefinition2,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
+import type {
   Config,
   InvariantContext,
+  ModuleEntities,
+  PipetteEntities,
   RobotState,
   RobotStateAndWarnings,
 } from '../'
+
+const fixtureP10Single = _fixtureP10Single as PipetteNameSpecs
+const fixtureP10Multi = _fixtureP10Multi as PipetteNameSpecs
+const fixtureP300Single = _fixtureP300Single as PipetteNameSpecs
+const fixtureP300Multi = _fixtureP300Multi as PipetteNameSpecs
+
+const fixtureTrash = _fixtureTrash as LabwareDefinition2
+const fixture96Plate = _fixture96Plate as LabwareDefinition2
+const fixture12Trough = _fixture12Trough as LabwareDefinition2
+const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
+const fixtureTiprack300ul = _fixtureTiprack300ul as LabwareDefinition2
+
 export const DEFAULT_CONFIG: Config = {
   OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
 }
@@ -63,87 +81,85 @@ export function makeContext(): InvariantContext {
   const labwareEntities = {
     [FIXED_TRASH_ID]: {
       id: FIXED_TRASH_ID,
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-      labwareDefURI: getLabwareDefURI(fixture_trash),
-      def: fixture_trash,
+
+      labwareDefURI: getLabwareDefURI(fixtureTrash),
+      def: fixtureTrash,
     },
     [SOURCE_LABWARE]: {
       id: SOURCE_LABWARE,
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-      labwareDefURI: getLabwareDefURI(fixture_96_plate),
-      def: fixture_96_plate,
+
+      labwareDefURI: getLabwareDefURI(fixture96Plate),
+      def: fixture96Plate,
     },
     [DEST_LABWARE]: {
       id: DEST_LABWARE,
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-      labwareDefURI: getLabwareDefURI(fixture_96_plate),
-      def: fixture_96_plate,
+
+      labwareDefURI: getLabwareDefURI(fixture96Plate),
+      def: fixture96Plate,
     },
     [TROUGH_LABWARE]: {
       id: TROUGH_LABWARE,
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-      labwareDefURI: getLabwareDefURI(fixture_12_trough),
-      def: fixture_12_trough,
+
+      labwareDefURI: getLabwareDefURI(fixture12Trough),
+      def: fixture12Trough,
     },
     tiprack1Id: {
       id: 'tiprack1Id',
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-      labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
-      def: fixture_tiprack_300_ul,
+
+      labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
+      def: fixtureTiprack300ul,
     },
     tiprack2Id: {
       id: 'tiprack2Id',
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-      labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
-      def: fixture_tiprack_300_ul,
+
+      labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
+      def: fixtureTiprack300ul,
     },
     tiprack3Id: {
       id: 'tiprack3Id',
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-      labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
-      def: fixture_tiprack_300_ul,
+
+      labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
+      def: fixtureTiprack300ul,
     },
   }
-  const moduleEntities = {}
-  const pipetteEntities = {
+  const moduleEntities: ModuleEntities = {}
+  const pipetteEntities: PipetteEntities = {
     p10SingleId: {
       name: 'p10_single',
       id: 'p10SingleId',
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-      tiprackDefURI: getLabwareDefURI(fixture_tiprack_10_ul),
-      tiprackLabwareDef: fixture_tiprack_10_ul,
+
+      tiprackDefURI: getLabwareDefURI(fixtureTiprack10ul),
+      tiprackLabwareDef: fixtureTiprack10ul,
       spec: fixtureP10Single,
     },
     p10MultiId: {
       name: 'p10_multi',
       id: 'p10MultiId',
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-      tiprackDefURI: getLabwareDefURI(fixture_tiprack_10_ul),
-      tiprackLabwareDef: fixture_tiprack_10_ul,
+
+      tiprackDefURI: getLabwareDefURI(fixtureTiprack10ul),
+      tiprackLabwareDef: fixtureTiprack10ul,
       spec: fixtureP10Multi,
     },
     [DEFAULT_PIPETTE]: {
       name: 'p300_single',
       id: DEFAULT_PIPETTE,
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-      tiprackDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
-      tiprackLabwareDef: fixture_tiprack_300_ul,
+
+      tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
+      tiprackLabwareDef: fixtureTiprack300ul,
       spec: fixtureP300Single,
     },
     [MULTI_PIPETTE]: {
       name: 'p300_multi',
       id: MULTI_PIPETTE,
-      // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
-      tiprackDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
-      tiprackLabwareDef: fixture_tiprack_300_ul,
+
+      tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
+      tiprackLabwareDef: fixtureTiprack300ul,
       spec: fixtureP300Multi,
     },
   }
   return {
-    // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
     labwareEntities,
     moduleEntities,
-    // @ts-expect-error(SA, 2021-05-03): schema version is getting casted to number instead of literal
     pipetteEntities,
     config: DEFAULT_CONFIG,
   }

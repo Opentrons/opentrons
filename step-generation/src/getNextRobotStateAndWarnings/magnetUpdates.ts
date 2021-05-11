@@ -4,11 +4,16 @@ import type {
   EngageMagnetParams,
   ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import type {
+  InvariantContext,
+  ModuleTemporalProperties,
+  RobotStateAndWarnings,
+} from '../types'
 
-// @ts-expect-error(SA, 2021-05-03): function parameters have implicit any types
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function _setMagnet(moduleState, engaged) {
+function _setMagnet(
+  moduleState: ModuleTemporalProperties['moduleState'],
+  engaged: boolean
+): void {
   if (moduleState.type === MAGNETIC_MODULE_TYPE) {
     moduleState.engaged = engaged
   }

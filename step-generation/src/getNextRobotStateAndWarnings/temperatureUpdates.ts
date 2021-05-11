@@ -9,11 +9,18 @@ import type {
   TemperatureParams,
   ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import type {
+  InvariantContext,
+  RobotStateAndWarnings,
+  ModuleTemporalProperties,
+  TemperatureStatus,
+} from '../types'
 
-// @ts-expect-error(SA, 2021-05-03): function parameters have implicit any types
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function _setTemperatureAndStatus(moduleState, temperature, status) {
+function _setTemperatureAndStatus(
+  moduleState: ModuleTemporalProperties['moduleState'],
+  temperature: number | null,
+  status: TemperatureStatus
+): void {
   if (moduleState.type === TEMPERATURE_MODULE_TYPE) {
     moduleState.targetTemperature = temperature
     moduleState.status = status

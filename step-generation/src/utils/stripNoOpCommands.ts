@@ -6,8 +6,12 @@ const _isEqualMix = (
   a: AspDispAirgapParams,
   b: AspDispAirgapParams
 ): boolean => {
-  const compareParams = ['pipette', 'volume', 'labware', 'well']
-  // @ts-expect-error(SA, 2021-05-03): can's index AspDispAirgapParams with string
+  const compareParams: Array<'pipette' | 'volume' | 'labware' | 'well'> = [
+    'pipette',
+    'volume',
+    'labware',
+    'well',
+  ]
   return compareParams.every(param => a[param] === b[param])
 }
 
