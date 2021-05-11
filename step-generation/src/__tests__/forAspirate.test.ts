@@ -9,7 +9,11 @@ import {
 } from '../fixtures'
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
 import * as warningCreators from '../warningCreators'
-import type { InvariantContext, RobotState } from '../types'
+import type {
+  InvariantContext,
+  LocationLiquidState,
+  RobotState,
+} from '../types'
 import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 
 const forAspirate = makeImmutableStateUpdater(_forAspirate)
@@ -382,7 +386,14 @@ describe('...8-channel pipette', () => {
 })
 describe('8-channel trough', () => {
   const labwareId = TROUGH_LABWARE
-  const troughCases = [
+  const troughCases: Array<{
+    testName: string
+    initialWellContents: LocationLiquidState
+    aspirateVolume: number
+    expectedWarnings: any
+    expectedWellContents: LocationLiquidState
+    expectedTipContents: LocationLiquidState
+  }> = [
     {
       testName: '20uLx8 from 300uL trough well',
       initialWellContents: {
@@ -451,7 +462,6 @@ describe('8-channel trough', () => {
       it(`aspirate from single-ingredient common well (trough-12row): ${testName}`, () => {
         robotState.liquidState.labware[labwareId] = {
           ...robotState.liquidState.labware[labwareId],
-          // @ts-expect-error(SA, 2021-05-03): specify all well contents in fixtures
           A1: initialWellContents,
         }
         const args = {
