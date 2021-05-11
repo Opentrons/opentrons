@@ -118,9 +118,7 @@ def test_simulate_extra_labware(protocol, protocol_file, monkeypatch):
 
 
 @pytest.mark.parametrize('protocol_file', ['bug_aspirate_tip.py'])
-def test_simulate_aspirate_tip(protocol,
-                       protocol_file,
-                       monkeypatch):
+def test_simulate_aspirate_tip(protocol, protocol_file, monkeypatch):
     monkeypatch.setenv('OT_API_FF_allowBundleCreation', '1')
     with pytest.raises(ExceptionInProtocolError):
         simulate.simulate(protocol.filelike, 'bug_aspirate_tip.py')

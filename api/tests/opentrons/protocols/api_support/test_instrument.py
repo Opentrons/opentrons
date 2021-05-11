@@ -2,7 +2,9 @@ from unittest import mock
 
 import pytest
 from opentrons.protocol_api.labware import Well
-from opentrons.protocols.api_support.instrument import determine_drop_target
+from opentrons.protocols.api_support.instrument import determine_drop_target, \
+    validate_can_aspirate, \
+    validate_can_dispense
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.context.well import WellImplementation
 from opentrons.protocols.api_support.types import APIVersion
@@ -48,3 +50,24 @@ def test_determine_drop_target(
     r = determine_drop_target(api_version, well, 0.5)
     assert r.labware.object == well
     assert r.point == expected_point
+
+
+def test_validate_can_aspirate(ctx):
+    well_plate = ctx.load_labware('corning_96_wellplate_360ul_flat', 1)
+    # test type `Labware`
+    validate_can_aspirate(well_plate)
+    # test type `Well`
+    validate_can_aspirate(well_plate.wells()[0])
+    # test type `Location`
+    validate_can_aspirate(well_plate.wells()[0].top())
+    with pytest.raises(RuntimeError):
+        validate_can_aspirate(ctx.load_labware('opentrons_96_tiprack_300ul', 2))
+
+
+def test_validate_can_dispense(ctx):
+    well_plate = ctx.load_labware('corning_96_wellplate_360ul_flat', 1)
+    validate_can_dispense(well_plate)
+    validate_can_dispense(well_plate.wells()[0])
+    validate_can_dispense(well_plate.wells()[0].top())
+    with pytest.raises(RuntimeError):
+        validate_can_dispense(ctx.load_labware('opentrons_96_tiprack_300ul', 2))

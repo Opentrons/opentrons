@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Any
+from typing import Optional, Any, Union
 
 from opentrons import types
 from opentrons.calibration_storage import get
@@ -104,3 +104,39 @@ def determine_drop_target(
         assert tr.is_tiprack
         z_height = return_height * tr.tip_length
         return location.top(-z_height)
+
+
+def validate_can_aspirate(
+        location: Union[Labware, Well, types.Location]) -> None:
+    """
+    Can one aspirate on the given `location` or not? This method is
+    pretty basic and will probably remain so (?) as the future holds neat
+    ambitions for how validation is implemented and as robots become
+    more aware of their environment.
+    :raises RuntimeError:
+    """
+    if _is_tiprack(location):
+        raise RuntimeError("Cannot aspirate a tiprack")
+
+
+def validate_can_dispense(
+        location: Union[Labware, Well, types.Location]) -> None:
+    """
+    Can one dispense to the given `location` or not? This method is
+    pretty basic and will probably remain so (?) as the future holds neat
+    ambitions for how validation is implemented and as robots become
+    more aware of their environment.
+    :raises RuntimeError:
+    """
+    if _is_tiprack(location):
+        raise RuntimeError("Cannot dispense to a tiprack")
+
+
+def _is_tiprack(location: Union[Labware, Well, types.Location]) -> bool:
+    if isinstance(location, Labware):
+        return location.is_tiprack
+    elif isinstance(location, Well):
+        return location.parent.is_tiprack
+    else:
+        labware = location.labware.as_labware()
+        return labware.parent and labware.parent.is_tiprack
