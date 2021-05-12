@@ -26,7 +26,7 @@ wheel_file = dist/$(call python_get_wheelname,robot-server,robotserver,$(BUILD_N
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
 # specified test
 tests ?= tests
-test_opts ?=  --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)
@@ -74,8 +74,8 @@ test:
 
 .PHONY: lint
 lint: $(ot_py_sources)
-	$(python) -m mypy $(SRC_PATH) tests/errors tests/health tests/system
-	$(python) -m flake8 $(SRC_PATH) tests setup.py
+	$(python) -m mypy $(SRC_PATH) $(tests)
+	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
 
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.1](https://github.com/Opentrons/opentrons/compare/v4.3.0...v4.3.1) (2021-05-10)
+
+### Bug Fixes
+
+* **api:** do not cache tip lengths because it breaks calibration ([#7778](https://github.com/Opentrons/opentrons/issues/7778)) ([d43fdd7](https://github.com/Opentrons/opentrons/commit/d43fdd7))
+
+
+
+
+
 # [4.3.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0) (2021-05-06)
 
 ### Bug Fixes

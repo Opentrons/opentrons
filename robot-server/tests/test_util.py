@@ -2,6 +2,7 @@ from datetime import timedelta, datetime
 
 import pytest
 from mock import patch, MagicMock
+from typing import Any
 
 from robot_server import util
 
@@ -51,7 +52,7 @@ def test_duration_raises(mock_utc_now, mock_start_time):
 
 
 async def test_call_once():
-    return_value = dict()
+    return_value: Any = dict()
     mock = MagicMock(return_value=return_value)
 
     @util.call_once
