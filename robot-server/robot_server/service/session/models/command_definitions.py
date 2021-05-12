@@ -8,14 +8,15 @@ from enum import Enum
 
 
 class CommandDefinition(str, Enum):
+    _localname: str
+
     """The base of command definition enumerations."""
     def __new__(cls, value):
         """Create a string enum."""
+        # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
         namespace = cls.namespace()
         full_name = f"{namespace}.{value}" if namespace else value
-        # Ignoring type errors because this is exactly as described here
-        # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
-        obj = str.__new__(cls, full_name)  # type: ignore
+        obj = str.__new__(cls, full_name)
         obj._value_ = full_name
         obj._localname = value
         return obj
@@ -32,7 +33,7 @@ class CommandDefinition(str, Enum):
     @property
     def localname(self):
         """Get the name of the command without the namespace"""
-        return self._localname  # type: ignore
+        return self._localname
 
 
 class RobotCommand(CommandDefinition):

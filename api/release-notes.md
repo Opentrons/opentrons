@@ -4,7 +4,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
-# OT-2 Software Changes in 4.3.0
+# OT-2 Software Changes in 4.3.1
 
 OT-2 software 4.3.0 brings a major new feature: the ability to use multiple modules of the same type in a protocol. For instance, you can use two Opentrons Temperature modules in a protocol at the same time. There are also several bugfixes.
 
@@ -17,6 +17,7 @@ OT-2 software 4.3.0 brings a major new feature: the ability to use multiple modu
 
 - Fixes an issue causing slow protocol uploads in protocols using Thermocycler Modules or Temperature Modules ([#7506](https://github.com/Opentrons/opentrons/issues/7506))
 - Fixes an issue where labware could not have a 0 column. You can now once again create custom labware with a column 0 ([#7531](https://github.com/Opentrons/opentrons/issues/7531))
+- Fixes an issue where tip length calibration would not be applied during labware calibration, so calibrating labware would cause incorrect movement during protocol runes ([#7765](https://github.com/Opentrons/opentrons/issues/7765))
 
 ## Known Issues
 
