@@ -560,7 +560,7 @@ class API(HardwareAPILike):
         """
         self._pause_manager.resume(pause_type)
 
-        if self._pause_manager.queue:
+        if self._pause_manager.should_pause:
             return
 
         # Resume must be called immediately to awaken thread running hardware

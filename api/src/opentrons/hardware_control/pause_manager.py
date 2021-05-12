@@ -17,6 +17,10 @@ class PauseManager:
         self._blocked_by_door = self._evaluate_door_state(door_state)
 
     @property
+    def should_pause(self) -> bool:
+        return bool(self.queue)
+
+    @property
     def blocked_by_door(self) -> bool:
         return self._blocked_by_door
 
