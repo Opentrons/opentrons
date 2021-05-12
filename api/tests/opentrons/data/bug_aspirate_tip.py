@@ -5,7 +5,7 @@ metadata = {
     'protocolName': 'Bug 7552',
     'author': 'Name <email@address.com>',
     'description': 'Simulation allows aspirating and dispensing on a tip rack',
-    'apiLevel': '2.7'
+    'apiLevel': '2.11'
 }
 
 

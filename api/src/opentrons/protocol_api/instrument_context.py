@@ -123,7 +123,7 @@ class InstrumentContext(CommandPublisher):
     def default_speed(self, speed: float):
         self._implementation.set_default_speed(speed)
 
-    @requires_version(2, 0)
+    @requires_version(2, 0)  # noqa: C901
     def aspirate(self,
                  volume: Optional[float] = None,
                  location: Union[types.Location, Well] = None,
@@ -183,7 +183,8 @@ class InstrumentContext(CommandPublisher):
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
-        validate_can_aspirate(dest)
+        if self.api_version >= APIVersion(2, 11):
+            validate_can_aspirate(dest)
 
         if self.current_volume == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -287,7 +288,8 @@ class InstrumentContext(CommandPublisher):
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
-        validate_can_dispense(loc)
+        if self.api_version >= APIVersion(2, 11):
+            validate_can_dispense(loc)
 
         c_vol = self.current_volume if not volume else volume
 
