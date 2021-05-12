@@ -2,15 +2,14 @@ import React from 'react'
 import { FormikConfig } from 'formik'
 import isEqual from 'lodash/isEqual'
 import { when } from 'jest-when'
-import { render, screen, MatcherFunction } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import { nestedTextMatcher } from '../testUtils'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { GridOffset } from '../../sections/GridOffset'
 import { FormAlerts } from '../../FormAlerts'
 import { TextField } from '../../TextField'
-
 import { wrapInFormik } from '../../utils/wrapInFormik'
-
 jest.mock('../../../utils')
 jest.mock('../../TextField')
 jest.mock('../../FormAlerts')
@@ -27,20 +26,6 @@ const formikConfig: FormikConfig<LabwareFields> = {
   initialValues: getDefaultFormState(),
   onSubmit: jest.fn(),
 }
-
-type Query = (f: MatcherFunction) => HTMLElement
-
-// This helper function is needed to grab text with other html markup within
-const withMarkup = (query: Query) => (text: string): HTMLElement =>
-  // @ts-expect-error `from` doesnt want null | undefined
-  query((content: string, element: HTMLElement) => {
-    const hasText = (element: HTMLElement): boolean =>
-      element.textContent === text
-    const childrenDontHaveText = Array.from(element.children).every(
-      child => !hasText(child as HTMLElement)
-    )
-    return hasText(element) && childrenDontHaveText
-  })
 
 describe('GridOffset', () => {
   beforeEach(() => {
@@ -98,9 +83,10 @@ describe('GridOffset', () => {
       })
     )
 
-    const getByTextWithMarkup = withMarkup(getByText)
-    getByTextWithMarkup(
-      "Find the measurement from the center of the top left-most well to the edge of the labware's footprint."
+    getByText(
+      nestedTextMatcher(
+        "Find the measurement from the center of the top left-most well to the edge of the labware's footprint."
+      )
     )
   })
 
