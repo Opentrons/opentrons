@@ -276,6 +276,12 @@ export const aluminumBlockAutofills = {
   },
 }
 
+export const labwareTypeAutofills = {
+  tipRack: {
+    homogeneousWells: 'true' as const,
+  },
+}
+
 export const aluminumBlockChildTypeOptions: Options = [
   {
     name: 'Tubes',

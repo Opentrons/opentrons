@@ -4,7 +4,6 @@ import Ajv from 'ajv'
 import cx from 'classnames'
 import * as React from 'react'
 import { Formik } from 'formik'
-import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
@@ -18,9 +17,9 @@ import {
   aluminumBlockTypeOptions,
   aluminumBlockChildTypeOptions,
   getDefaultFormState,
-  getImplicitAutofillValues,
   tubeRackAutofills,
 } from './fields'
+import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
 import { labwareDefToFields } from './labwareDefToFields'
 import { labwareFormSchema } from './labwareFormSchema'
 import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
@@ -50,7 +49,7 @@ import { XYSpacingImg, XYOffsetImg } from './components/diagrams'
 
 import styles from './styles.css'
 
-import type { FormikProps, FormikTouched } from 'formik'
+import type { FormikProps } from 'formik'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   ImportError,
@@ -63,55 +62,8 @@ const validateLabwareSchema = ajv.compile(labwareSchema)
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 
-interface MakeAutofillOnChangeArgs {
-  name: keyof LabwareFields
-  autofills: Record<string, Partial<LabwareFields>>
-  values: LabwareFields
-  touched: Object
-  setTouched: (touched: FormikTouched<LabwareFields>) => unknown
-  setValues: (values: LabwareFields) => unknown
-}
-
 const PDF_URL =
   'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
-
-const makeAutofillOnChange = ({
-  autofills,
-  values,
-  touched,
-  setValues,
-  setTouched,
-}: MakeAutofillOnChangeArgs) => (
-  name: string,
-  value: string | null | undefined
-) => {
-  if (value == null) {
-    console.log(`no value for ${name}, skipping autofill`)
-    return
-  }
-  const _autofillValues = autofills[value]
-  if (_autofillValues) {
-    const autofillValues = {
-      ..._autofillValues,
-      ...getImplicitAutofillValues(_autofillValues),
-    }
-
-    const namesToTrue = mapValues(autofillValues, () => true)
-    setValues({
-      ...values,
-      ...autofillValues,
-      [name]: value,
-    })
-    setTouched({
-      ...touched,
-      ...namesToTrue,
-    })
-  } else {
-    console.error(
-      `expected autofills for ${name}: ${value} -- is the value missing from the autofills object?`
-    )
-  }
-}
 
 export const LabwareCreator = (): JSX.Element => {
   const [
