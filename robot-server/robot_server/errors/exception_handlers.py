@@ -37,17 +37,20 @@ def _format_validation_source(
     parts: Sequence[Union[str, int]]
 ) -> Optional[ErrorSource]:
     """Format a validation location from FastAPI into an ErrorSource."""
-    if parts[0] == "body":
-        # ["body", "model", "field"] > { "pointer": "/field" }
-        return ErrorSource(pointer=f"/{'/'.join(str(p) for p in parts[2::])}")
-    elif parts[0] == "query":
-        # ["query", "param"] > { parameter: "param" }
-        return ErrorSource(parameter=str(parts[1]))
-    elif parts[0] == "header":
-        # ["header", "name"] > { header: "name" }
-        return ErrorSource(header=str(parts[1]))
-    else:
-        return None
+    try:
+        if parts[0] == "body":
+            # ["body", "model", "field"] > { "pointer": "/field" }
+            return ErrorSource(pointer=f"/{'/'.join(str(p) for p in parts[2::])}")
+        elif parts[0] == "query":
+            # ["query", "param"] > { parameter: "param" }
+            return ErrorSource(parameter=str(parts[1]))
+        elif parts[0] == "header":
+            # ["header", "name"] > { header: "name" }
+            return ErrorSource(header=str(parts[1]))
+    except KeyError:
+        pass
+
+    return None
 
 
 async def handle_api_error(request: Request, error: ApiError) -> JSONResponse:
@@ -86,10 +89,8 @@ async def handle_validation_error(
 
     if _route_is_legacy(request):
         message = "; ".join(
-            [
-                f"{'.'.join([str(v) for v in val_error['loc']])}: {val_error['msg']}"
-                for val_error in validation_errors
-            ]
+            f"{'.'.join([str(v) for v in val_error['loc']])}: {val_error['msg']}"
+            for val_error in validation_errors
         )
         response: BaseErrorResponse = LegacyErrorResponse(message=message)
     else:
