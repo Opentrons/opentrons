@@ -276,10 +276,17 @@ export const aluminumBlockAutofills = {
   },
 }
 
-export const labwareTypeAutofills = {
+export const labwareTypeAutofills: Record<
+  LabwareType,
+  Partial<LabwareFields>
+> = {
   tipRack: {
     homogeneousWells: 'true' as const,
   },
+  tubeRack: {},
+  wellPlate: {},
+  reservoir: {},
+  aluminumBlock: {},
 }
 
 export const aluminumBlockChildTypeOptions: Options = [

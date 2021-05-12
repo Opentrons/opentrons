@@ -20,8 +20,13 @@ export const _getIsAutofilled = (
     getImplicitAutofillValues(values)
   ).includes(name)
 
-  if (labwareType === 'tipRack' && name === 'homogeneousWells') {
-    return Object.keys(labwareTypeAutofills[labwareType] || {}).includes(name)
+  if (
+    labwareType != null &&
+    Object.keys(labwareTypeAutofills[labwareType]).includes(name)
+  ) {
+    // labwareTypeAutofills isn't populated for all labware types, but when it is
+    // populated it has precedent over all the cases below.
+    return true
   }
 
   if (labwareType === 'aluminumBlock' && aluminumBlockType != null) {
