@@ -54,6 +54,7 @@ def test_determine_drop_target(
 
 def test_validate_can_aspirate(ctx):
     well_plate = ctx.load_labware('corning_96_wellplate_360ul_flat', 1)
+    tip_rack = ctx.load_labware('opentrons_96_tiprack_300ul', 2)
     # test type `Labware`
     validate_can_aspirate(well_plate)
     # test type `Well`
@@ -61,13 +62,16 @@ def test_validate_can_aspirate(ctx):
     # test type `Location`
     validate_can_aspirate(well_plate.wells()[0].top())
     with pytest.raises(RuntimeError):
-        validate_can_aspirate(ctx.load_labware('opentrons_96_tiprack_300ul', 2))
+        validate_can_aspirate(tip_rack)
+    with pytest.raises(RuntimeError):
+        validate_can_aspirate(tip_rack.wells_by_name()['A1'])
+    with pytest.raises(RuntimeError):
+        validate_can_aspirate(tip_rack.wells_by_name()['A1'].top())
 
 
 def test_validate_can_dispense(ctx):
     well_plate = ctx.load_labware('corning_96_wellplate_360ul_flat', 1)
-    validate_can_dispense(well_plate)
-    validate_can_dispense(well_plate.wells()[0])
+    tip_rack = ctx.load_labware('opentrons_96_tiprack_300ul', 2)
     validate_can_dispense(well_plate.wells()[0].top())
     with pytest.raises(RuntimeError):
-        validate_can_dispense(ctx.load_labware('opentrons_96_tiprack_300ul', 2))
+        validate_can_dispense(tip_rack.wells_by_name()['A1'].top())

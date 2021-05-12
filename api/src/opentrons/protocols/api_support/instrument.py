@@ -123,8 +123,7 @@ def validate_can_aspirate(
         raise RuntimeError("Cannot aspirate a tiprack")
 
 
-def validate_can_dispense(
-        location: Union[Labware, Well, types.Location]) -> None:
+def validate_can_dispense(location: types.Location) -> None:
     """ Can one dispense to the given `location` or not? This method is
     pretty basic and will probably remain so (?) as the future holds neat
     ambitions for how validation is implemented. And as robots become more
@@ -136,7 +135,8 @@ def validate_can_dispense(
     Raises:
         RuntimeError:
     """
-    if _is_tiprack(location):
+    labware = location.labware.as_labware()
+    if labware.parent and labware.parent.is_tiprack:
         raise RuntimeError("Cannot dispense to a tiprack")
 
 
