@@ -8,9 +8,9 @@ from opentrons.calibration_storage import (
     helpers,
     delete)
 
+from robot_server.errors import ErrorResponse
 from robot_server.service.pipette_offset import models as pip_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
-from robot_server.service.json_api import ErrorResponse
 from robot_server.service.shared_models import calibration as cal_model
 
 router = APIRouter()
