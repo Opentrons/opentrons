@@ -17,7 +17,8 @@ from opentrons.config.robot_configs import current_for_revision
 from opentrons.drivers import serial_communication
 from opentrons.drivers.types import MoveSplits
 from opentrons.drivers.utils import (
-    AxisMoveTimestamp, parse_key_values, parse_number, parse_optional_number
+    AxisMoveTimestamp, parse_key_values, parse_number, parse_optional_number,
+    string_to_hex
 )
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
@@ -213,19 +214,6 @@ def _byte_array_to_ascii_string(byte_array):
         log.exception('Unexpected argument to _byte_array_to_ascii_string:')
         raise ParseError(
             f'Unexpected argument to _byte_array_to_ascii_string: {byte_array}'
-        )
-    return res
-
-
-def _byte_array_to_hex_string(byte_array):
-    # data must be sent as stringified HEX values
-    # because of how Smoothieware parses GCODE messages
-    try:
-        res = ''.join('%02x' % b for b in byte_array)
-    except TypeError:
-        log.exception('Unexpected argument to _byte_array_to_hex_string:')
-        raise ParseError(
-            f'Unexpected argument to _byte_array_to_hex_string: {byte_array}'
         )
     return res
 
@@ -1400,8 +1388,7 @@ class SmoothieDriver_3_0_0:
         self.delay(CURRENT_CHANGE_DELAY)
         # data is read/written as strings of HEX characters
         # to avoid firmware weirdness in how it parses GCode arguments
-        byte_string = _byte_array_to_hex_string(
-            bytearray(data_string.encode()))
+        byte_string = string_to_hex(data_string)
         command = _command_builder().add_gcode(
             gcode=gcode
         ).add_element(

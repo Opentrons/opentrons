@@ -4,6 +4,7 @@ import logging
 from opentrons.hardware_control.emulation.connection_handler import \
     ConnectionHandler
 from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
+from opentrons.hardware_control.emulation.parser import Parser
 from opentrons.hardware_control.emulation.tempdeck import TempDeckEmulator
 from opentrons.hardware_control.emulation.thermocycler import ThermocyclerEmulator
 from opentrons.hardware_control.emulation.smoothie import SmoothieEmulator
@@ -32,16 +33,16 @@ async def run() -> None:
     await asyncio.gather(
         run_server(host=host,
                    port=MAGDECK_PORT,
-                   handler=ConnectionHandler(MagDeckEmulator())),
+                   handler=ConnectionHandler(MagDeckEmulator(parser=Parser()))),
         run_server(host=host,
                    port=TEMPDECK_PORT,
-                   handler=ConnectionHandler(TempDeckEmulator())),
+                   handler=ConnectionHandler(TempDeckEmulator(parser=Parser()))),
         run_server(host=host,
                    port=THERMOCYCLER_PORT,
-                   handler=ConnectionHandler(ThermocyclerEmulator())),
+                   handler=ConnectionHandler(ThermocyclerEmulator(parser=Parser()))),
         run_server(host=host,
                    port=SMOOTHIE_PORT,
-                   handler=ConnectionHandler(SmoothieEmulator())),
+                   handler=ConnectionHandler(SmoothieEmulator(parser=Parser()))),
     )
 
 

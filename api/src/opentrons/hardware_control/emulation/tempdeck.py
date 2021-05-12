@@ -1,9 +1,17 @@
+"""An emulation of the opentrons temperature module.
+
+The purpose is to provide a fake backend that responds to GCODE commands.
+"""
+
 import logging
-from typing import Optional, List
+from typing import Optional
 
 from opentrons.drivers.temp_deck.driver import GCODES
+from opentrons.hardware_control.emulation import util
+from opentrons.hardware_control.emulation.parser import Parser, Command
 
 from .abstract_emulator import AbstractEmulator
+
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +19,7 @@ GCODE_GET_TEMP = GCODES['GET_TEMP']
 GCODE_SET_TEMP = GCODES['SET_TEMP']
 GCODE_DEVICE_INFO = GCODES['DEVICE_INFO']
 GCODE_DISENGAGE = GCODES['DISENGAGE']
-GCODE_DFU = GCODES['PROGRAMMING_MODE']
+GCODE_PROGRAMMING_MODE = GCODES['PROGRAMMING_MODE']
 
 SERIAL = "fake_serial"
 MODEL = "temp_emulator"
@@ -21,22 +29,35 @@ VERSION = 1
 class TempDeckEmulator(AbstractEmulator):
     """TempDeck emulator"""
 
-    def __init__(self) -> None:
-        self.target_temp = 0
-        self.current_temp = 0
+    def __init__(self, parser: Parser) -> None:
+        self.target_temp = util.OptionalValue[float]()
+        self.current_temp = 0.0
+        self._parser = parser
 
-    def handle(self, words: List[str]) -> Optional[str]:
+    def handle(self, line: str) -> Optional[str]:
+        """Handle a line"""
+        results = (self._handle(c) for c in self._parser.parse(line))
+        joined = ' '.join(r for r in results if r)
+        return None if not joined else joined
+
+    def _handle(self, command: Command) -> Optional[str]:
         """Handle a command."""
-        cmd = words[0]
-        logger.info(f"Got command {cmd}")
-        if cmd == GCODE_GET_TEMP:
+        logger.info(f"Got command {command}")
+        if command.gcode == GCODE_GET_TEMP:
             return f"T:{self.target_temp} C:{self.current_temp}"
-        elif cmd == GCODE_SET_TEMP:
-            pass
-        elif cmd == GCODE_DISENGAGE:
-            pass
-        elif cmd == GCODE_DEVICE_INFO:
+        elif command.gcode == GCODE_SET_TEMP:
+            temperature = command.params['S']
+            assert isinstance(temperature, float),\
+                f"invalid temperature '{temperature}'"
+            self._set_target(temperature)
+        elif command.gcode == GCODE_DISENGAGE:
+            self._set_target(util.TEMPERATURE_ROOM)
+        elif command.gcode == GCODE_DEVICE_INFO:
             return f"serial:{SERIAL} model:{MODEL} version:{VERSION}"
-        elif cmd == GCODE_DFU:
+        elif command.gcode == GCODE_PROGRAMMING_MODE:
             pass
         return None
+
+    def _set_target(self, target_temp: float) -> None:
+        self.target_temp.val = target_temp
+        self.current_temp = self.target_temp.val
