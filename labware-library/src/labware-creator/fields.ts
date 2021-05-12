@@ -44,13 +44,13 @@ export type LabwareType =
   | 'reservoir'
   | 'tubeRack'
   | 'aluminumBlock'
-  | 'tiprack'
+  | 'tipRack'
 export const labwareTypeOptions: Options = [
   { name: 'Well Plate', value: 'wellPlate' },
   { name: 'Reservoir', value: 'reservoir' },
   { name: 'Tubes + Opentrons Tube Rack', value: 'tubeRack' },
   { name: 'Tubes / Plates + Opentrons Aluminum Block', value: 'aluminumBlock' },
-  { name: 'Tip Rack', value: 'tiprack' },
+  { name: 'Tip Rack', value: 'tipRack' },
 ]
 
 export type WellShape = 'circular' | 'rectangular'
