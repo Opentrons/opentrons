@@ -139,6 +139,15 @@ async def old_aspiration(monkeypatch):
 
 
 @pytest.fixture
+async def enable_door_safety_switch():
+    await config.advanced_settings.set_adv_setting(
+        'enableDoorSafetySwitch', True)
+    yield
+    await config.advanced_settings.set_adv_setting(
+        'enableDoorSafetySwitch', False)
+
+
+@pytest.fixture
 async def use_new_calibration(monkeypatch):
     await config.advanced_settings.set_adv_setting(
         'enableTipLengthCalibration', True)
