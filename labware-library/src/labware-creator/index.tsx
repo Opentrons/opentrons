@@ -381,6 +381,7 @@ export const LabwareCreator = (): JSX.Element => {
           const canProceedToForm = Boolean(
             values.labwareType === 'wellPlate' ||
               values.labwareType === 'reservoir' ||
+              values.labwareType === 'tipRack' ||
               (values.labwareType === 'tubeRack' &&
                 values.tubeRackInsertLoadName) ||
               (values.labwareType === 'aluminumBlock' &&
