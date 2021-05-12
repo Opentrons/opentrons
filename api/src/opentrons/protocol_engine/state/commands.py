@@ -18,6 +18,10 @@ class CommandState:
         """Get a command by its unique identifier."""
         return self._commands_by_id.get(uid)
 
+    def get_all_command_ids(self) -> List[str]:
+        """Get a list of all command IDs in state."""
+        raise NotImplementedError()
+
     def get_all_commands(self) -> List[Tuple[str, CommandType]]:
         """Get a list of all command entries in state."""
         return [entry for entry in self._commands_by_id.items()]

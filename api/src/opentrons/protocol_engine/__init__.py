@@ -6,6 +6,7 @@ protocol state and side-effects like robot movements.
 """
 
 from .protocol_engine import ProtocolEngine
+from .commands import CommandRequestType, CommandResultType
 from .state import StateStore, StateView, LabwareData
 from .execution import CommandHandlers
 from .resources import ResourceProviders
@@ -21,6 +22,9 @@ from .types import (
 __all__ = [
     # main export
     "ProtocolEngine",
+    # command types
+    "CommandRequestType",
+    "CommandResultType",
     # state interfaces and models
     "StateStore",
     "StateView",
