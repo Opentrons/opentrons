@@ -16,7 +16,7 @@ class JsonFileRunner(AbstractFileRunner):
             protocol_engine: ProtocolEngine,
             command_translator: CommandTranslator,
             command_queue_worker: CommandQueueWorker) -> None:
-        """JsonFileRunner constructor.
+        """JSON file runner constructor.
 
         Args:
             protocol: a JSON protocol
