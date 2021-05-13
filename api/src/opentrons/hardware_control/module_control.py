@@ -1,7 +1,7 @@
 import logging
 import asyncio
 import re
-from typing import List, Tuple, Optional, TYPE_CHECKING
+from typing import List, Tuple, Optional
 from glob import glob
 
 from opentrons.config import IS_ROBOT, IS_LINUX
