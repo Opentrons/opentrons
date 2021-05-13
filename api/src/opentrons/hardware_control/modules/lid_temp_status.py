@@ -6,7 +6,7 @@ class LidTemperatureStatus:
     """A wrapper for the lid temperature status."""
 
     TEMP_THRESHOLD = 0.3
-    """The threshold under which the difference between target and temperature 
+    """The threshold under which the difference between target and temperature
     is considered `holding`."""
 
     def __init__(self) -> None:
