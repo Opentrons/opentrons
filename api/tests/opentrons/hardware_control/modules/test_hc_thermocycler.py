@@ -1,6 +1,6 @@
 import pytest
 import mock
-from opentrons.drivers.asyncio.thermocycler import SimulatingDriver
+from opentrons.drivers.thermocycler import SimulatingDriver
 from opentrons.hardware_control import modules, ExecutionManager
 
 from opentrons.drivers.rpi_drivers.types import USBPort

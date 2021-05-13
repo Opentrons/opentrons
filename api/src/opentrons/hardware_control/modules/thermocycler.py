@@ -14,10 +14,7 @@ from opentrons.hardware_control.poller import Reader, WaitableListener, Poller
 
 from ..execution_manager import ExecutionManager
 from . import types, update, mod_abc
-from opentrons.drivers.thermocycler.driver import (
-    ThermocyclerError
-)
-from opentrons.drivers.asyncio.thermocycler import (
+from opentrons.drivers.thermocycler import (
     AbstractThermocyclerDriver, SimulatingDriver, ThermocyclerDriver
 )
 
@@ -28,6 +25,10 @@ POLLING_FREQUENCY_SEC = 1.0
 SIM_POLLING_FREQUENCY_SEC = 0.001
 
 TEMP_UPDATE_RETRIES = 50
+
+
+class ThermocyclerError(Exception):
+    pass
 
 
 class Thermocycler(mod_abc.AbstractModule):

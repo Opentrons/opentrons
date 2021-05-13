@@ -1,6 +1,6 @@
 from typing import Optional
 
-from opentrons.drivers.asyncio.thermocycler.abstract import AbstractThermocyclerDriver
+from opentrons.drivers.thermocycler.abstract import AbstractThermocyclerDriver
 from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
 
 

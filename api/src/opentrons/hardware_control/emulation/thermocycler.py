@@ -5,7 +5,7 @@ The purpose is to provide a fake backend that responds to GCODE commands.
 
 import logging
 from typing import Optional
-from opentrons.drivers.asyncio.thermocycler.driver import GCODE
+from opentrons.drivers.thermocycler.driver import GCODE
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.emulation.parser import Parser, Command
 
