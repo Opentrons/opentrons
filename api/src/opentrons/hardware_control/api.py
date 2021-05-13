@@ -155,10 +155,6 @@ class API(HardwareAPILike):
         """
         checked_loop = use_or_initialize_loop(loop)
         checked_config = config or robot_configs.load()
-        # TODO (lc 05-12-2021) give responsibility of the the
-        # execution manager to the hardware controller in a follow-up.
-        # That means both execution manager and pause with message callback
-        # not need to be passed in to the builder any longer.
         backend = await Controller.build(checked_config)
         backend.set_lights(button=None, rails=False)
 
