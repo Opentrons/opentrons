@@ -1,7 +1,7 @@
 import asyncio
 from abc import abstractmethod, ABC
 from collections import deque
-from typing import TypeVar, Generic, Optional, Deque
+from typing import TypeVar, Generic, Deque
 
 DataT = TypeVar("DataT")
 
