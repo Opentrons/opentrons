@@ -216,7 +216,7 @@ class TempDeck:
 
     @property
     def temperature(self) -> float:
-        return self._temperature.current  # type: ignore
+        return self._temperature.current
 
     def _get_status(self) -> str:
         # Separate function for testability
