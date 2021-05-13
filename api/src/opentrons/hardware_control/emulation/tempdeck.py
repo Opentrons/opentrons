@@ -6,7 +6,7 @@ The purpose is to provide a fake backend that responds to GCODE commands.
 import logging
 from typing import Optional
 
-from opentrons.drivers.asyncio.tempdeck.driver import GCODE
+from opentrons.drivers.temp_deck.driver import GCODE
 from opentrons.hardware_control.emulation import util
 from opentrons.hardware_control.emulation.parser import Parser, Command
 

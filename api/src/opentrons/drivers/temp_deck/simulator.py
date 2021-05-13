@@ -1,6 +1,6 @@
 from typing import Optional, Dict
 
-from opentrons.drivers.asyncio.tempdeck.abstract import AbstractTempDeckDriver, \
+from opentrons.drivers.temp_deck.abstract import AbstractTempDeckDriver, \
     Temperature
 
 TEMP_DECK_MODELS = {

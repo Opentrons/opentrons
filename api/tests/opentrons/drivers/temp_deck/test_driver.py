@@ -3,8 +3,8 @@ import pytest
 
 from opentrons.drivers.asyncio.communication.serial_connection import \
     SerialConnection
-from opentrons.drivers.asyncio.tempdeck.abstract import Temperature
-from opentrons.drivers.asyncio.tempdeck.driver import (
+from opentrons.drivers.temp_deck.abstract import Temperature
+from opentrons.drivers.temp_deck.driver import (
     TempDeckDriver, TEMP_DECK_COMMAND_TERMINATOR
 )
 from opentrons.drivers.command_builder import CommandBuilder

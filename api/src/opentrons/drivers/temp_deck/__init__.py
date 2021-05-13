@@ -1,6 +1,10 @@
-from opentrons.drivers.temp_deck.driver import TempDeck, SimulatingDriver
+from .driver import TempDeckDriver
+from .abstract import AbstractTempDeckDriver
+from .simulator import SimulatingDriver
+
 
 __all__ = [
-    'TempDeck',
-    'SimulatingDriver'
+    "TempDeckDriver",
+    "AbstractTempDeckDriver",
+    "SimulatingDriver",
 ]

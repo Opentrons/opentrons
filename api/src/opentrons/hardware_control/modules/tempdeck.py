@@ -6,8 +6,9 @@ from opentrons.hardware_control.modules.types import TemperatureStatus
 from opentrons.hardware_control.poller import Reader, WaitableListener, Poller
 from typing_extensions import Final
 from opentrons.drivers.types import Temperature
-from opentrons.drivers.asyncio.tempdeck import (
-    SimulatingDriver, AbstractTempDeckDriver, TempDeckDriver)
+from opentrons.drivers.temp_deck import (
+    SimulatingDriver, AbstractTempDeckDriver, TempDeckDriver
+)
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import update, mod_abc, types
