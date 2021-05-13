@@ -146,7 +146,7 @@ class AttachedModulesControl:
                 'tempdeck': modules.TempDeck,
                 'thermocycler': modules.Thermocycler
             }[mod_type]
-            simulating_module = mod_class(
+            simulating_module = await mod_class.build(
                 port='',
                 usb_port=self.api._backend._usb.find_port(''),
                 simulating=True,
@@ -154,7 +154,6 @@ class AttachedModulesControl:
                 execution_manager=ExecutionManager(
                     loop=self.api.loop),
                 sim_model=by_model.value)
-            await simulating_module._connect()
             simulated_module = simulating_module
         return matching_modules, simulated_module
 

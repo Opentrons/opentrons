@@ -5,19 +5,12 @@ The purpose is to provide a fake backend that responds to GCODE commands.
 
 import logging
 from typing import Optional
-from opentrons.drivers.mag_deck.driver import GCODES
+from opentrons.drivers.asyncio.magdeck.driver import GCODE
 from opentrons.hardware_control.emulation.parser import Parser, Command
 from .abstract_emulator import AbstractEmulator
 
 logger = logging.getLogger(__name__)
 
-GCODE_HOME = GCODES['HOME']
-GCODE_MOVE = GCODES['MOVE']
-GCODE_PROBE_PLATE = GCODES['PROBE_PLATE']
-GCODE_GET_PLATE_HEIGHT = GCODES['GET_PLATE_HEIGHT']
-GCODE_GET_CURRENT_POSITION = GCODES['GET_CURRENT_POSITION']
-GCODE_DEVICE_INFO = GCODES['DEVICE_INFO']
-GCODE_PROGRAMMING_MODE = GCODES['PROGRAMMING_MODE']
 
 SERIAL = "magnetic_emulator"
 MODEL = "mag_deck_v20"
@@ -41,20 +34,20 @@ class MagDeckEmulator(AbstractEmulator):
     def _handle(self, command: Command) -> Optional[str]:
         """Handle a command."""
         logger.info(f"Got command {command}")
-        if command.gcode == GCODE_HOME:
+        if command.gcode == GCODE.HOME:
             self.height = 0
-        elif command.gcode == GCODE_MOVE:
+        elif command.gcode == GCODE.MOVE:
             position = command.params['Z']
             assert isinstance(position, float), f"invalid position '{position}'"
             self.position = position
-        elif command.gcode == GCODE_PROBE_PLATE:
+        elif command.gcode == GCODE.PROBE_PLATE:
             self.height = 45
-        elif command.gcode == GCODE_GET_PLATE_HEIGHT:
+        elif command.gcode == GCODE.GET_PLATE_HEIGHT:
             return f"height:{self.height}"
-        elif command.gcode == GCODE_GET_CURRENT_POSITION:
+        elif command.gcode == GCODE.GET_CURRENT_POSITION:
             return f"Z:{self.position}"
-        elif command.gcode == GCODE_DEVICE_INFO:
+        elif command.gcode == GCODE.DEVICE_INFO:
             return f"serial:{SERIAL} model:{MODEL} version:{VERSION}"
-        elif command.gcode == GCODE_PROGRAMMING_MODE:
+        elif command.gcode == GCODE.PROGRAMMING_MODE:
             pass
         return None
