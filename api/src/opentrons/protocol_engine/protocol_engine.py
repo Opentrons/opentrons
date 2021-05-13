@@ -96,4 +96,6 @@ class ProtocolEngine:
 
     def add_command(self, request: CommandRequestType) -> None:
         """Add a command to ProtocolEngine."""
+        # TODO(spp, 2020-05-13):
+        #   Generate a UUID to be used as command_id for each command added.
         raise NotImplementedError

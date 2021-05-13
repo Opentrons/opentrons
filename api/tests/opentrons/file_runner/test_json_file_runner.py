@@ -1,13 +1,12 @@
 """Tests for a JsonFileRunner interface."""
 import pytest
-from typing import cast
 from decoy import Decoy
 
 from opentrons.file_runner import JsonFileRunner
 from opentrons.file_runner.command_queue_worker import CommandQueueWorker
 from opentrons.protocol_engine import ProtocolEngine, WellLocation
-from opentrons.protocol_engine.commands import CommandRequestType, PickUpTipRequest, \
-    AspirateRequest, DispenseRequest
+from opentrons.protocol_engine.commands import (PickUpTipRequest, AspirateRequest,
+                                                DispenseRequest)
 from opentrons.protocols import models
 from opentrons.protocols.runner.json_proto.command_translator import \
     CommandTranslator
@@ -158,25 +157,6 @@ def test_json_runner_stop(
     decoy.verify(command_queue_worker.stop())
 
 
-def test_json_runner_load_translation(
-        decoy: Decoy,
-        subject: JsonFileRunner,
-        protocol: models.JsonProtocol,
-        protocol_engine: ProtocolEngine,
-        command_translator: CommandTranslator
-) -> None:
-    """It should create a list of translated commands."""
-    decoy.when(command_translator.translate(protocol.commands[0])).then_return([])
-    decoy.when(command_translator.translate(protocol.commands[1])).then_return([])
-    decoy.when(command_translator.translate(protocol.commands[2])).then_return([])
-
-    subject.load()
-
-    decoy.verify(command_translator.translate(protocol.commands[0]),
-                 command_translator.translate(protocol.commands[1]),
-                 command_translator.translate(protocol.commands[2]))
-
-
 def test_json_runner_load_commands_to_engine(
         decoy: Decoy,
         protocol: models.JsonProtocol,
@@ -185,14 +165,11 @@ def test_json_runner_load_commands_to_engine(
         protocol_engine: ProtocolEngine
 ) -> None:
     """It should send translated commands to protocol engine."""
-    mock_cmd1 = cast(CommandRequestType,
-                     PickUpTipRequest(pipetteId="123", labwareId="abc", wellName="def"))
-    mock_cmd2 = cast(CommandRequestType,
-                     AspirateRequest(volume=321, wellLocation=WellLocation(),
-                                     pipetteId="123", labwareId="xyz", wellName="def"))
-    mock_cmd3 = cast(CommandRequestType,
-                     DispenseRequest(volume=321, wellLocation=WellLocation(),
-                                     pipetteId="123", labwareId="xyz", wellName="def"))
+    mock_cmd1 = PickUpTipRequest(pipetteId="123", labwareId="abc", wellName="def")
+    mock_cmd2 = AspirateRequest(volume=321, wellLocation=WellLocation(),
+                                pipetteId="123", labwareId="xyz", wellName="def")
+    mock_cmd3 = DispenseRequest(volume=321, wellLocation=WellLocation(),
+                                pipetteId="123", labwareId="xyz", wellName="def")
     decoy.when(
         command_translator.translate(protocol.commands[0])).then_return([mock_cmd1])
     decoy.when(
