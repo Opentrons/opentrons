@@ -1,6 +1,6 @@
 from typing import Dict
 
-from opentrons.drivers.asyncio.magdeck.abstract import AbstractMagDeckDriver
+from .abstract import AbstractMagDeckDriver
 
 
 MAG_DECK_MODELS = {

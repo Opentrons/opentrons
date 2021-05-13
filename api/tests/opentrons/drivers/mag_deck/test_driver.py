@@ -3,7 +3,7 @@ import pytest
 
 from opentrons.drivers.asyncio.communication.serial_connection import \
     SerialConnection
-from opentrons.drivers.asyncio.magdeck.driver import (
+from opentrons.drivers.mag_deck.driver import (
     MagDeckDriver, MAG_DECK_COMMAND_TERMINATOR, GCODE_ROUNDING_PRECISION
 )
 from opentrons.drivers.command_builder import CommandBuilder
