@@ -1110,12 +1110,16 @@ class InstrumentContext(CommandPublisher):
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
 
+        do_publish(self.broker, cmds.move_to, self.move_to, 'before',
+                   None, None, self, location or self._ctx.location_cache)
         self._implementation.move_to(
             location=location,
             force_direct=force_direct,
             minimum_z_height=minimum_z_height,
             speed=speed
         )
+        do_publish(self.broker, cmds.move_to, self.move_to, 'after',
+                   None, None, self, location or self._ctx.location_cache)
         return self
 
     @property  # type: ignore
