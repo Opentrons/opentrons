@@ -13,6 +13,7 @@ import { INTERFACE_WIFI, INTERFACE_ETHERNET } from './constants'
 
 import type { State } from '../types'
 import * as Types from './types'
+import type { Dictionary } from 'lodash'
 
 export function getInternetStatus(
   state: State,
@@ -25,10 +26,10 @@ export const getNetworkInterfaces: (
   state: State,
   robotName: string
 ) => Types.InterfaceStatusByType = createSelector(
-  (state, robotName) => state.networking[robotName]?.interfaces,
+  (state: State, robotName: string) => state.networking[robotName]?.interfaces,
   interfaces => {
     const simpleIfaces = map(
-      interfaces,
+      interfaces as Dictionary<Types.InterfaceStatus>,
       (iface: Types.InterfaceStatus): Types.SimpleInterfaceStatus => {
         const { ipAddress: ipWithMask, macAddress, type } = iface
         let ipAddress: string | null = null
@@ -64,7 +65,7 @@ export const getWifiList: (
   state: State,
   robotName: string
 ) => Types.WifiNetwork[] = createSelector(
-  (state, robotName) => state.networking[robotName]?.wifiList,
+  (state: State, robotName: string) => state.networking[robotName]?.wifiList,
   (wifiList = []) => uniqBy(orderBy(wifiList, ...LIST_ORDER), 'ssid')
 )
 
@@ -72,10 +73,13 @@ export const getWifiKeys: (
   state: State,
   robotName: string
 ) => Types.WifiKey[] = createSelector(
-  (state, robotName) => state.networking[robotName]?.wifiKeyIds,
-  (state, robotName) => state.networking[robotName]?.wifiKeysById,
-  (ids: string[] = [], keysById: Partial<{ [string]: Types.WifiKey }> = {}) =>
-    ids.map(id => keysById[id])
+  (state: State, robotName: string) => state.networking[robotName]?.wifiKeyIds,
+  (state: State, robotName: string) =>
+    state.networking[robotName]?.wifiKeysById,
+  (
+    ids: string[] = [],
+    keysById: Partial<{ [id: string]: Types.WifiKey }> = {}
+  ) => ids.map(id => keysById[id] as Types.WifiKey)
 )
 
 // NOTE: not memoized because used in several rendered components
@@ -109,7 +113,7 @@ export const getCanDisconnect: (
   (list, apiVersion, featureFlags) => {
     const active = list.some(nw => nw.active)
     const supportsDisconnect = Semver.valid(apiVersion)
-      ? Semver.gte(apiVersion, API_MIN_DISCONNECT_VERSION)
+      ? Semver.gte(apiVersion as string, API_MIN_DISCONNECT_VERSION)
       : false
 
     return Boolean(active && supportsDisconnect)
