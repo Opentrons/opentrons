@@ -3,7 +3,7 @@ import { FormikConfig } from 'formik'
 import isEqual from 'lodash/isEqual'
 import { when } from 'jest-when'
 import { render, screen } from '@testing-library/react'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import { DEFAULT_FORM_STATE, LabwareFields } from '../../../fields'
 import { Footprint } from '../../sections/Footprint'
 import { FormAlerts } from '../../alerts/FormAlerts'
 import { XYDimensionAlerts } from '../../alerts/XYDimensionAlerts'
@@ -28,7 +28,7 @@ const XYDimensionAlertsMock = XYDimensionAlerts as jest.MockedFunction<
 >
 
 const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
+  initialValues: DEFAULT_FORM_STATE,
   onSubmit: jest.fn(),
 }
 

@@ -3,7 +3,7 @@ import { FormikConfig } from 'formik'
 import { when } from 'jest-when'
 import isEqual from 'lodash/isEqual'
 import { render, screen } from '@testing-library/react'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import { DEFAULT_FORM_STATE, LabwareFields } from '../../../fields'
 import { wellShapeOptionsWithIcons } from '../../optionsWithImages'
 import { displayAsTube } from '../../../utils'
 import { WellShapeAndSides } from '../../sections/WellShapeAndSides'
@@ -25,7 +25,7 @@ const displayAsTubeMock = displayAsTube as jest.MockedFunction<
 >
 
 const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
+  initialValues: DEFAULT_FORM_STATE,
   onSubmit: jest.fn(),
 }
 

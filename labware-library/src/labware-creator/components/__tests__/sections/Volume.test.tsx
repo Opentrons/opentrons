@@ -3,7 +3,7 @@ import { FormikConfig } from 'formik'
 import { when } from 'jest-when'
 import isEqual from 'lodash/isEqual'
 import { render, screen } from '@testing-library/react'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import { DEFAULT_FORM_STATE, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Volume } from '../../sections/Volume'
 import { FormAlerts } from '../../alerts/FormAlerts'
@@ -21,7 +21,7 @@ const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
 >
 
 const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
+  initialValues: DEFAULT_FORM_STATE,
   onSubmit: jest.fn(),
 }
 

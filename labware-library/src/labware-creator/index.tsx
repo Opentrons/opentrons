@@ -15,7 +15,7 @@ import {
   aluminumBlockAutofills,
   aluminumBlockChildTypeOptions,
   aluminumBlockTypeOptions,
-  getDefaultFormState,
+  DEFAULT_FORM_STATE,
   tubeRackAutofills,
   tubeRackInsertOptions,
 } from './fields'
@@ -284,7 +284,7 @@ export const LabwareCreator = (): JSX.Element => {
         </AlertModal>
       )}
       <Formik
-        initialValues={lastUploaded || getDefaultFormState()}
+        initialValues={lastUploaded || DEFAULT_FORM_STATE}
         enableReinitialize
         validationSchema={labwareFormSchema}
         validate={formLevelValidation}

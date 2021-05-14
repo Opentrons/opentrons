@@ -4,7 +4,7 @@ import { when } from 'jest-when'
 import { FormikConfig } from 'formik'
 import { render, screen } from '@testing-library/react'
 import {
-  getDefaultFormState,
+  DEFAULT_FORM_STATE,
   LabwareFields,
   yesNoOptions,
 } from '../../../fields'
@@ -25,7 +25,7 @@ const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
 >
 
 const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
+  initialValues: DEFAULT_FORM_STATE,
   onSubmit: jest.fn(),
 }
 
