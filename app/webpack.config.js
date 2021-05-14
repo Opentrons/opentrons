@@ -10,7 +10,7 @@ const WorkerPlugin = require('worker-plugin')
 
 const { DEV_MODE, baseConfig } = require('@opentrons/webpack-config')
 const { productName: title } = require('@opentrons/app-shell/package.json')
-const { description, author } = require('./package.json')
+const { description, author, version } = require('./package.json')
 
 const JS_ENTRY = path.join(__dirname, 'src/index.js')
 const HTML_ENTRY = path.join(__dirname, 'src/index.hbs')
@@ -19,6 +19,19 @@ const OUTPUT_PATH = path.join(__dirname, 'dist')
 const PORT = process.env.PORT || 8080
 const CONTENT_BASE = path.join(__dirname, './src')
 const PUBLIC_PATH = DEV_MODE ? `http://localhost:${PORT}/` : ''
+
+const passThruEnvVars = Object.keys(process.env)
+  .filter(v => v.startsWith('OT_APP'))
+  .concat(['NODE_ENV'])
+
+const envVarsWithDefaults = {
+  OT_APP_VERSION: version,
+}
+
+const envVars = passThruEnvVars.reduce(
+  (acc, envVar) => ({ [envVar]: '', ...acc }),
+  { ...envVarsWithDefaults }
+)
 
 module.exports = webpackMerge(baseConfig, {
   entry: [JS_ENTRY],
@@ -29,11 +42,7 @@ module.exports = webpackMerge(baseConfig, {
   }),
 
   plugins: [
-    new webpack.EnvironmentPlugin(
-      Object.keys(process.env)
-        .filter(v => v.startsWith('OT_APP'))
-        .concat(['NODE_ENV'])
-    ),
+    new webpack.EnvironmentPlugin(envVars),
 
     new WorkerPlugin({
       // disable warnings about HMR when we're in prod
