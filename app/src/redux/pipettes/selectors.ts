@@ -125,7 +125,7 @@ const EMPTY_INFO = {
 
 const pipettesAreInexactMatch = (
   protocolInstrName: string | null,
-  actualModelSpecs: ?PipetteModelSpecs
+  actualModelSpecs: PipetteModelSpecs | null | undefined
 ) => {
   const { backCompatNames } = actualModelSpecs || {}
   return backCompatNames && backCompatNames.includes(protocolInstrName)
