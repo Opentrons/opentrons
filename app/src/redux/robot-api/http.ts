@@ -1,4 +1,3 @@
-// @flow
 // simple fetch wrapper to format URL for robot and parse JSON response
 import { of, from } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
@@ -15,7 +14,7 @@ import type {
   RobotApiResponse,
 } from './types'
 
-const checkEmpty = (val: mixed): boolean => val == null || val === ''
+const checkEmpty = (val: unknown): boolean => val == null || val === ''
 
 export function robotApiUrl(
   host: RobotHost,
@@ -40,7 +39,7 @@ export function fetchRobotApi(
 ): Observable<RobotApiResponse> {
   const { path, method, body: reqBody, form: reqForm } = request
   const url = robotApiUrl(host, request)
-  const options: RequestOptions = {
+  const options: RequestInit = {
     method,
     headers: { 'Opentrons-Version': `${HTTP_API_VERSION}` },
   }

@@ -1,4 +1,3 @@
-// @flow
 // labware calibration controls modal
 import * as React from 'react'
 import cx from 'classnames'
@@ -10,13 +9,13 @@ import { ModalPage } from '@opentrons/components'
 import { ConfirmModalContents } from './ConfirmModalContents'
 import styles from './styles.css'
 
-export type ConfirmModalProps = {|
+export interface ConfirmModalProps {
   labware: Labware,
   calibrateToBottom: boolean,
-  onBackClick: () => mixed,
-|}
+  onBackClick: () => unknown,
+}
 
-export function ConfirmModal(props: ConfirmModalProps): React.Node {
+export function ConfirmModal(props: ConfirmModalProps): JSX.Element {
   const { labware, onBackClick, calibrateToBottom } = props
 
   // disable back click if we're moving or if we've loaded up with tips

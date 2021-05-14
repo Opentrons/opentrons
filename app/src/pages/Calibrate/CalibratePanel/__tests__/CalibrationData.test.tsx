@@ -1,12 +1,13 @@
-// @flow
 import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../../i18n'
 import { CalibrationData } from '../CalibrationData'
 
+import type { WrapperWithStore } from '@opentrons/components/__utils__'
+
 describe('CalibrationData', () => {
-  let render
+  let render: (props?: Partial<React.ComponentProps<typeof CalibrationData>>) => WrapperWithStore<React.ComponentProps<typeof CalibrationData>>
 
   beforeEach(() => {
     render = (props = {}) => {

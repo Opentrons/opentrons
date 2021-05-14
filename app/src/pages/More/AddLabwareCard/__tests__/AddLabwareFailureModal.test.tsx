@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { shallow, mount } from 'enzyme'
 
@@ -47,7 +46,7 @@ describe('AddLabwareFailureModal', () => {
       c => c.type() === 'button' && c.text().toLowerCase() === 'cancel'
     )
 
-    button.invoke('onClick')()
+    button.invoke('onClick')?.({} as React.MouseEvent)
     expect(mockOnCancel).toHaveBeenCalled()
   })
 
@@ -65,7 +64,7 @@ describe('AddLabwareFailureModal', () => {
   })
 
   describe('invalid files', () => {
-    const render = file => {
+    const render = (file: React.ComponentProps<typeof AddLabwareFailureModalTemplate>['file']) => {
       return mount(
         <AddLabwareFailureModalTemplate {...emptyProps} file={file} />
       )
@@ -120,7 +119,7 @@ describe('AddLabwareFailureModal', () => {
         c => c.type() === 'button' && /overwrite/i.test(c.text())
       )
 
-      button.invoke('onClick')()
+      button.invoke('onClick')?.({} as React.MouseEvent)
       expect(mockOnOverwrite).toHaveBeenCalledWith(file)
     })
   })

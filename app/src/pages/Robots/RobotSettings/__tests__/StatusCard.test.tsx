@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 import { i18n } from '../../../../i18n'
@@ -11,23 +10,16 @@ import {
 import { SecondaryBtn, Icon } from '@opentrons/components'
 import { StatusCard } from '../StatusCard'
 
-import type { State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 jest.mock('../../../../redux/robot/selectors')
 
-const getSessionStatus: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getSessionStatus, any>
-> = RobotSelectors.getSessionStatus
+const getSessionStatus = RobotSelectors.getSessionStatus as jest.MockedFunction<typeof RobotSelectors.getSessionStatus>
 
-const getConnectRequest: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getConnectRequest, any>
-> = RobotSelectors.getConnectRequest
+const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<typeof RobotSelectors.getConnectRequest>
 
 describe('RobotSettings StatusCard', () => {
-  const render = (robot: ViewableRobot = Fixtures.mockConnectableRobot) => {
+  const render = (robot: ViewableRobot = Fixtures.mockConnectableRobot): ReturnType<typeof mountWithProviders> => {
     return mountWithProviders(<StatusCard robot={robot} />, {
       i18n,
     })
@@ -57,7 +49,7 @@ describe('RobotSettings StatusCard', () => {
     const { wrapper, store } = render()
     const button = wrapper.find(SecondaryBtn)
 
-    button.invoke('onClick')()
+    button.invoke('onClick')?.({} as React.MouseEvent)
     expect(store.dispatch).toHaveBeenCalledWith(
       RobotActions.connect(Fixtures.mockConnectableRobot.name)
     )
@@ -74,7 +66,7 @@ describe('RobotSettings StatusCard', () => {
     const { wrapper, store } = render(Fixtures.mockConnectedRobot)
     const button = wrapper.find(SecondaryBtn)
 
-    button.invoke('onClick')()
+    button.invoke('onClick')?.({} as React.MouseEvent)
     expect(store.dispatch).toHaveBeenCalledWith(RobotActions.disconnect())
   })
 

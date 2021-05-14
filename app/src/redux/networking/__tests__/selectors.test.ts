@@ -1,4 +1,3 @@
-// @flow
 import noop from 'lodash/noop'
 import * as Discovery from '../../discovery'
 import * as Selectors from '../selectors'
@@ -10,30 +9,29 @@ import type { State } from '../../types'
 jest.mock('../../config/selectors')
 jest.mock('../../discovery/selectors')
 
-const getRobotApiVersionByName: JestMockFn<
-  [State, string],
-  $Call<typeof Discovery.getRobotApiVersionByName, State, string>
-> = Discovery.getRobotApiVersionByName
+const getRobotApiVersionByName = Discovery.getRobotApiVersionByName as jest.MockedFunction<
+  typeof Discovery.getRobotApiVersionByName
+>
 
-type SelectorSpec = {|
-  name: string,
-  selector: ($Shape<State>, ...Array<any>) => mixed,
-  state: $Shape<State>,
-  args?: Array<any>,
-  before?: (spec: SelectorSpec) => mixed,
-  expected: mixed,
-|}
+interface SelectorSpec {
+  name: string
+  selector: (state: State, ...args: any[]) => unknown
+  state: State
+  args?: any[]
+  before?: (spec: SelectorSpec) => unknown
+  expected: unknown
+}
 
 describe('robot settings selectors', () => {
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  const SPECS: Array<SelectorSpec> = [
+  const SPECS: SelectorSpec[] = [
     {
       name: 'getInternetStatus returns null if unavailable',
       selector: Selectors.getInternetStatus,
-      state: { networking: {} },
+      state: { networking: {} } as any,
       args: ['robotName'],
       expected: null,
     },
@@ -46,14 +44,14 @@ describe('robot settings selectors', () => {
             internetStatus: Constants.STATUS_FULL,
           },
         },
-      },
+      } as any,
       args: ['robotName'],
       expected: Constants.STATUS_FULL,
     },
     {
       name: 'getNetworkInterfaces returns null if unavailable',
       selector: Selectors.getNetworkInterfaces,
-      state: { networking: {} },
+      state: { networking: {} } as any,
       args: ['robotName'],
       expected: { wifi: null, ethernet: null },
     },
@@ -69,7 +67,7 @@ describe('robot settings selectors', () => {
             },
           },
         },
-      },
+      } as any,
       args: ['robotName'],
       expected: {
         wifi: {
@@ -100,7 +98,7 @@ describe('robot settings selectors', () => {
             },
           },
         },
-      },
+      } as any,
       args: ['robotName'],
       expected: {
         wifi: null,
@@ -126,7 +124,7 @@ describe('robot settings selectors', () => {
             },
           },
         },
-      },
+      } as any,
       args: ['robotName'],
       expected: {
         ethernet: null,
@@ -143,7 +141,7 @@ describe('robot settings selectors', () => {
       selector: Selectors.getWifiList,
       state: {
         networking: {},
-      },
+      } as any,
       args: ['robotName'],
       expected: [],
     },
@@ -156,7 +154,7 @@ describe('robot settings selectors', () => {
             wifiList: [Fixtures.mockWifiNetwork],
           },
         },
-      },
+      } as any,
       args: ['robotName'],
       expected: [Fixtures.mockWifiNetwork],
     },
@@ -169,7 +167,7 @@ describe('robot settings selectors', () => {
             wifiList: [Fixtures.mockWifiNetwork, Fixtures.mockWifiNetwork],
           },
         },
-      },
+      } as any,
       args: ['robotName'],
       expected: [Fixtures.mockWifiNetwork],
     },
@@ -186,7 +184,7 @@ describe('robot settings selectors', () => {
             ],
           },
         },
-      },
+      } as any,
       args: ['robotName'],
       expected: [
         { ...Fixtures.mockWifiNetwork, active: true, ssid: 'zzz' },
@@ -207,7 +205,7 @@ describe('robot settings selectors', () => {
             ],
           },
         },
-      },
+      } as any,
       args: ['robotName'],
       expected: [
         { ...Fixtures.mockWifiNetwork, active: true, ssid: 'aaa' },
@@ -219,7 +217,7 @@ describe('robot settings selectors', () => {
       selector: Selectors.getWifiKeys,
       state: {
         networking: {},
-      },
+      } as any,
       args: ['robotName'],
       expected: [],
     },
@@ -236,7 +234,7 @@ describe('robot settings selectors', () => {
             },
           },
         },
-      },
+      } as any,
       args: ['robotName'],
       expected: [
         { ...Fixtures.mockWifiKey, id: 'abc' },
@@ -256,7 +254,7 @@ describe('robot settings selectors', () => {
             },
           },
         },
-      },
+      } as any,
       args: ['robotName', 'foobar'],
       expected: { ...Fixtures.mockWifiKey, id: 'abc', requestId: 'foobar' },
     },
@@ -273,7 +271,7 @@ describe('robot settings selectors', () => {
             },
           },
         },
-      },
+      } as any,
       args: ['robotName', 'foobar'],
       expected: null,
     },
@@ -282,7 +280,7 @@ describe('robot settings selectors', () => {
       selector: Selectors.getEapOptions,
       state: {
         networking: {},
-      },
+      } as any,
       args: ['robotName'],
       expected: [],
     },
@@ -295,7 +293,7 @@ describe('robot settings selectors', () => {
             eapOptions: [Fixtures.mockEapOption],
           },
         },
-      },
+      } as any,
       args: ['robotName'],
       expected: [Fixtures.mockEapOption],
     },
@@ -308,7 +306,7 @@ describe('robot settings selectors', () => {
             wifiList: [{ ...Fixtures.mockWifiNetwork, active: true }],
           },
         },
-      },
+      } as any,
       args: ['robotName'],
       before: ({ state: mockState }) => {
         getRobotApiVersionByName.mockImplementation((state, robotName) => {

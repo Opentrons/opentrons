@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
@@ -10,16 +9,11 @@ import { U2EAdapterInfo } from '../U2EAdapterInfo'
 import { U2EDriverWarning } from '../U2EDriverWarning'
 
 import type { State } from '../../../../redux/types'
-import type {
-  UsbDevice,
-  DriverStatus,
-  U2EInterfaceMap,
-} from '../../../../redux/system-info/types'
 
 jest.mock('../../../../redux/system-info/selectors')
 jest.mock('../../../../redux/analytics')
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = ({ mockState: true } as any)
 
 const MOCK_STORE = {
   getState: () => MOCK_STATE,
@@ -27,16 +21,13 @@ const MOCK_STORE = {
   subscribe: noop,
 }
 
-const getU2EAdapterDevice: JestMockFn<[State], UsbDevice | null> =
-  SystemInfo.getU2EAdapterDevice
+const getU2EAdapterDevice = SystemInfo.getU2EAdapterDevice as jest.MockedFunction<typeof SystemInfo.getU2EAdapterDevice>
 
-const getU2EInterfacesMap: JestMockFn<[State], U2EInterfaceMap> =
-  SystemInfo.getU2EInterfacesMap
+const getU2EInterfacesMap = SystemInfo.getU2EInterfacesMap as jest.MockedFunction<typeof SystemInfo.getU2EInterfacesMap>
 
-const getU2EWindowsDriverStatus: JestMockFn<[State], DriverStatus> =
-  SystemInfo.getU2EWindowsDriverStatus
+const getU2EWindowsDriverStatus = SystemInfo.getU2EWindowsDriverStatus as jest.MockedFunction<typeof SystemInfo.getU2EWindowsDriverStatus>
 
-function stubSelector<R>(mock: JestMockFn<[State], R>, rVal: R) {
+function stubSelector<R>(mock: jest.MockedFunction<(s: State) => R>, rVal: R): void {
   mock.mockImplementation(state => {
     expect(state).toBe(MOCK_STATE)
     return rVal
@@ -44,7 +35,7 @@ function stubSelector<R>(mock: JestMockFn<[State], R>, rVal: R) {
 }
 
 describe('U2EAdapterInfo', () => {
-  const render = () => {
+  const render = (): ReturnType<typeof mount> => {
     return mount(<U2EAdapterInfo />, {
       wrappingComponent: Provider,
       wrappingComponentProps: { store: MOCK_STORE },

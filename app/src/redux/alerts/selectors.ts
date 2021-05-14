@@ -1,25 +1,28 @@
-// @flow
 import { createSelector } from 'reselect'
 import without from 'lodash/without'
 
 import { getConfig } from '../config'
 
 import type { State } from '../types'
-import type { AlertId } from './types'
+import type { AlertId, AlertsState } from './types'
 
 const getIgnoredAlertsFromConfig: (
   state: State
-) => null | $ReadOnlyArray<string> = createSelector(
+) => null | AlertId[] = createSelector(
   getConfig,
-  config => config?.alerts.ignored ?? null
+  (config: ReturnType<typeof getConfig>) => {
+    if (config === null) return null
+    const ignoredConfigAlerts: AlertId[] = (config !== null
+      ? config.alerts.ignored
+      : []) as AlertId[]
+    return ignoredConfigAlerts ?? null
+  }
 )
 
-export const getActiveAlerts: (
-  state: State
-) => $ReadOnlyArray<AlertId> = createSelector(
+export const getActiveAlerts: (state: State) => AlertId[] = createSelector(
   state => state.alerts,
   getIgnoredAlertsFromConfig,
-  (alerts, ignoredAlerts) => {
+  (alerts: AlertsState, ignoredAlerts: null | AlertId[]): AlertId[] => {
     // only return active alerts if we know which alerts (if any) have been
     // permanently ignored
     return ignoredAlerts !== null

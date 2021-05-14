@@ -1,4 +1,3 @@
-// @flow
 // deck review modal for labware calibration page
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -19,9 +18,9 @@ import styles from './styles.css'
 
 import type { Dispatch } from '../../../redux/types'
 
-export type ReviewDeckProps = {| slot: ?string |}
+export interface ReviewDeckProps { slot: string | null | undefined }
 
-export function ReviewDeck(props: ReviewDeckProps): React.Node {
+export function ReviewDeck(props: ReviewDeckProps): JSX.Element {
   const { slot } = props
 
   const dispatch = useDispatch<Dispatch>()
@@ -40,13 +39,13 @@ export function ReviewDeck(props: ReviewDeckProps): React.Node {
 
   const currentLabware = allLabware.find(lw => lw.slot === slot)
 
-  const continueToCalibrate = () => {
+  const continueToCalibrate = (): void => {
     if (currentLabware && calibratorMount) {
       const mountToUse = currentLabware.calibratorMount || calibratorMount
       dispatch(robotActions.moveTo(mountToUse, currentLabware.slot))
     }
   }
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (mustPrepNestedLabware) {
       setIsPrepNestedLabwareOpen(true)
     } else {

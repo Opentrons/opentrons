@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 
@@ -11,15 +10,15 @@ import type { ButtonProps } from '@opentrons/components'
 import type { Dispatch } from '../../../../redux/types'
 import type { RobotSystemType } from '../../../../redux/buildroot/types'
 
-export type ReleaseNotesModalProps = {|
+export interface ReleaseNotesModalProps {
   robotName: string,
   notNowButton: ButtonProps,
   releaseNotes: string,
   systemType: RobotSystemType | null,
-  proceed: () => mixed,
-|}
+  proceed: () => unknown,
+}
 
-export function ReleaseNotesModal(props: ReleaseNotesModalProps): React.Node {
+export function ReleaseNotesModal(props: ReleaseNotesModalProps): JSX.Element {
   const { robotName, notNowButton, releaseNotes, systemType, proceed } = props
   const dispatch = useDispatch<Dispatch>()
 

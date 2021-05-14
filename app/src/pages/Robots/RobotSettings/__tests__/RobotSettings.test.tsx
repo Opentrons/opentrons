@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { StaticRouter, Route, Redirect } from 'react-router-dom'
 
@@ -29,7 +28,7 @@ import { UpdateBuildroot } from '../UpdateBuildroot'
 import { ResetRobotModal } from '../ResetRobotModal'
 import { RobotSettings } from '..'
 
-import type { State } from '../../../../redux/types'
+import type { State, Action } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 jest.mock('../../../../redux/buildroot/selectors')
@@ -70,51 +69,30 @@ jest.mock('../AdvancedSettingsCard', () => ({
   AdvancedSettingsCard: () => <></>,
 }))
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = ({ mockState: true } as any)
 const ROBOT_URL = `/robots/${mockConnectableRobot.name}`
 
-const getConnectRequest: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getConnectRequest, State>
-> = RobotSelectors.getConnectRequest
+const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<typeof RobotSelectors.getConnectRequest>
 
-const getBuildrootUpdateSeen: JestMockFn<[State], boolean> =
-  Buildroot.getBuildrootUpdateSeen
+const getBuildrootUpdateSeen = Buildroot.getBuildrootUpdateSeen as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateSeen>
 
-const getBuildrootUpdateDisplayInfo: JestMockFn<
-  [State, string],
-  $Call<typeof Buildroot.getBuildrootUpdateDisplayInfo, State, string>
-> = Buildroot.getBuildrootUpdateDisplayInfo
+const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateDisplayInfo>
 
-const getBuildrootUpdateInProgress: JestMockFn<
-  [State, ViewableRobot],
-  boolean
-> = Buildroot.getBuildrootUpdateInProgress
+const getBuildrootUpdateInProgress = Buildroot.getBuildrootUpdateInProgress as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateInProgress>
 
-const getBuildrootUpdateAvailable: JestMockFn<
-  [State, ViewableRobot],
-  $Call<typeof Buildroot.getBuildrootUpdateAvailable, State, ViewableRobot>
-> = Buildroot.getBuildrootUpdateAvailable
+const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateAvailable>
 
-const getRobotRestartRequired: JestMockFn<[State, string | null], boolean> =
-  Settings.getRobotRestartRequired
+const getRobotRestartRequired = Settings.getRobotRestartRequired as jest.MockedFunction<typeof Settings.getRobotRestartRequired>
 
-const getMovementStatus: JestMockFn<
-  [State, string],
-  $Call<typeof Controls.getMovementStatus, State, string>
-> = Controls.getMovementStatus
+const getMovementStatus = Controls.getMovementStatus as jest.MockedFunction<typeof Controls.getMovementStatus>
 
-const getMovementError: JestMockFn<
-  [State, string],
-  $Call<typeof Controls.getMovementError, State, string>
-> = Controls.getMovementError
+const getMovementError = Controls.getMovementError as jest.MockedFunction<typeof Controls.getMovementError>
 
-const getRobotRestarting: JestMockFn<[State, string], boolean> =
-  Admin.getRobotRestarting
+const getRobotRestarting = Admin.getRobotRestarting as jest.MockedFunction<typeof Admin.getRobotRestarting>
 
 describe('/robots/:robotName page component', () => {
-  const render = (robot = mockConnectableRobot, url = ROBOT_URL) => {
-    return mountWithProviders(
+  const render = (robot: ViewableRobot = mockConnectableRobot, url = ROBOT_URL) => {
+    return mountWithProviders<React.ComponentProps<typeof StaticRouter>, State, Action>(
       <StaticRouter location={url} context={{}}>
         <Route path="/robots/:name?">
           <RobotSettings robot={robot} />
@@ -250,7 +228,7 @@ describe('/robots/:robotName page component', () => {
     expect(errorModal.prop('description')).toMatch(/robot was unable to home/i)
     expect(errorModal.prop('error')).toEqual({ message: 'oh no!' })
 
-    errorModal.invoke('close')()
+    errorModal.invoke('close')?.()
     expect(store.dispatch).toHaveBeenCalledWith(
       Controls.clearMovementStatus(mockConnectableRobot.name)
     )
@@ -339,7 +317,7 @@ describe('/robots/:robotName page component', () => {
 
     expect(errorModal.exists()).toBe(true)
 
-    errorModal.invoke('onCloseClick')()
+    errorModal.invoke('onCloseClick')?.()
 
     expect(store.dispatch).toHaveBeenCalledWith(
       RobotActions.clearConnectResponse()

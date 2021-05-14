@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import last from 'lodash/last'
 import { useSelector, useDispatch } from 'react-redux'
@@ -23,7 +22,6 @@ import {
   dismissRequest,
 } from '../../../../redux/robot-api'
 import { updateModule } from '../../../../redux/modules'
-import type { UpdateModuleAction } from '../../../../redux/modules/types'
 import type { State, Dispatch } from '../../../../redux/types'
 import type { RequestState } from '../../../../redux/robot-api/types'
 
@@ -37,30 +35,30 @@ const FAILED_UPDATE_HEADER = 'Failed to update Module Firmware'
 const FAILED_UPDATE_BODY =
   'An error occurred while attempting to update your robot.'
 
-type Props = {|
+interface Props {
   hasAvailableUpdate: boolean,
   controlDisabledReason: string | null,
   moduleId: string,
-|}
+}
 
-export function ModuleUpdate(props: Props): React.Node {
+export function ModuleUpdate(props: Props): JSX.Element {
   const { hasAvailableUpdate, moduleId, controlDisabledReason } = props
   const dispatch = useDispatch<Dispatch>()
   const robotName = useSelector(getConnectedRobotName)
   const [
     dispatchApiRequest,
     requestIds,
-  ] = useDispatchApiRequest<UpdateModuleAction>()
+  ] = useDispatchApiRequest()
 
   const canControl = controlDisabledReason === null
-  const handleClick = () => {
+  const handleClick = (): void => {
     canControl &&
       robotName &&
       dispatchApiRequest(updateModule(robotName, moduleId))
   }
   const latestRequestId = last(requestIds)
   const latestRequest = useSelector<State, RequestState | null>(state =>
-    getRequestById(state, latestRequestId)
+    latestRequestId ? getRequestById(state, latestRequestId) : null
   )
   const isPending = latestRequest?.status === PENDING
 
@@ -73,8 +71,10 @@ export function ModuleUpdate(props: Props): React.Node {
   }
   const [targetProps, tooltipProps] = useHoverTooltip()
 
-  const handleCloseErrorModal = () => {
-    dispatch(dismissRequest(latestRequestId))
+  const handleCloseErrorModal = (): void => {
+    if (latestRequestId != null) {
+      dispatch(dismissRequest(latestRequestId))
+    }
   }
   return (
     <Flex justifyContent={JUSTIFY_FLEX_END} display={DISPLAY_INLINE_BLOCK}>

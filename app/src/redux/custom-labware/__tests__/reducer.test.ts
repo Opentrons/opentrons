@@ -1,19 +1,18 @@
-// @flow
 import * as Fixtures from '../__fixtures__'
 import { INITIAL_STATE, customLabwareReducer } from '../reducer'
 
 import type { Action } from '../../types'
 import type { CustomLabwareState } from '../types'
 
-type ReducerSpec = {|
-  name: string,
-  state: $Shape<CustomLabwareState>,
-  action: Action,
-  expected: $Shape<CustomLabwareState>,
-|}
+interface ReducerSpec {
+  name: string
+  state: Partial<CustomLabwareState>
+  action: Action
+  expected: Partial<CustomLabwareState>
+}
 
 describe('customLabwareReducer', () => {
-  const SPECS: Array<ReducerSpec> = [
+  const SPECS: ReducerSpec[] = [
     {
       name: 'handles CUSTOM_LABWARE_LIST with new files',
       state: INITIAL_STATE,

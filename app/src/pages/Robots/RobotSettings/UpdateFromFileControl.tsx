@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { useTranslation, Trans } from 'react-i18next'
@@ -32,13 +31,13 @@ const HIDDEN_CSS = css`
   clip: rect(1px 1px 1px 1px);
 `
 
-export type UpdateFromFileControlProps = {|
+export interface UpdateFromFileControlProps {
   robotName: string,
-|}
+}
 
 export function UpdateFromFileControl(
   props: UpdateFromFileControlProps
-): React.Node {
+): JSX.Element {
   const { robotName } = props
   const { t } = useTranslation(['robot_advanced_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
@@ -48,12 +47,12 @@ export function UpdateFromFileControl(
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateBtnProps, updateBtnTooltipProps] = useHoverTooltip()
 
-  const handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     const { files } = event.target
-    if (files.length === 1 && !updateDisabled) {
+    if (files?.length === 1 && !updateDisabled) {
       // NOTE: File.path is Electron-specific
       // https://electronjs.org/docs/api/file-object
-      dispatch(startBuildrootUpdate(robotName, (files[0]: any).path))
+      dispatch(startBuildrootUpdate(robotName, (files[0] as any).path))
     }
     // clear input value to allow same file to be selected again if necessary
     event.target.value = ''

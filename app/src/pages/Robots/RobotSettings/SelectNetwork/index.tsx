@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
@@ -18,13 +17,13 @@ import { CONNECT, DISCONNECT, JOIN_OTHER } from './constants'
 import type { State, Dispatch } from '../../../../redux/types'
 import type { WifiConfigureRequest, NetworkChangeState } from './types'
 
-type SelectNetworkProps = {| robotName: string |}
+interface SelectNetworkProps { robotName: string }
 
 const LIST_REFRESH_MS = 10000
 
 export const SelectNetwork = ({
   robotName,
-}: SelectNetworkProps): React.Node => {
+}: SelectNetworkProps): JSX.Element => {
   const list = useSelector((state: State) =>
     Networking.getWifiList(state, robotName)
   )
@@ -52,13 +51,13 @@ export const SelectNetwork = ({
 
   const activeNetwork = list.find(nw => nw.active)
 
-  const handleDisconnect = () => {
+  const handleDisconnect = (): void => {
     if (activeNetwork) {
       dispatchApi(Networking.postWifiDisconnect(robotName, activeNetwork.ssid))
     }
   }
 
-  const handleConnect = (options: WifiConfigureRequest) => {
+  const handleConnect = (options: WifiConfigureRequest): void => {
     dispatchApi(Networking.postWifiConfigure(robotName, options))
     if (changeState.type === JOIN_OTHER) {
       setChangeState({ ...changeState, ssid: options.ssid })
@@ -80,7 +79,7 @@ export const SelectNetwork = ({
     }
   }, [robotName, dispatch, changeState.type])
 
-  const handleSelectConnect = ssid => {
+  const handleSelectConnect = (ssid: string): void => {
     const network = list.find(nw => nw.ssid === ssid)
 
     if (network) {
@@ -94,16 +93,16 @@ export const SelectNetwork = ({
     }
   }
 
-  const handleSelectDisconnect = () => {
+  const handleSelectDisconnect = (): void => {
     const ssid = activeNetwork?.ssid
     ssid != null && setChangeState({ type: DISCONNECT, ssid })
   }
 
-  const handleSelectJoinOther = () => {
+  const handleSelectJoinOther = (): void => {
     setChangeState({ type: JOIN_OTHER, ssid: null })
   }
 
-  const handleDone = () => {
+  const handleDone = (): void => {
     if (last(requestIds)) dispatch(RobotApi.dismissRequest(last(requestIds)))
     setChangeState({ type: null })
   }

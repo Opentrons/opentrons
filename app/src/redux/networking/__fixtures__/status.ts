@@ -1,4 +1,3 @@
-// @flow
 // fixtures for /networking/status
 
 import { GET } from '../../robot-api'
@@ -41,7 +40,7 @@ const {
   failure,
 }: ResponseFixtures<
   NetworkingStatusResponse,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: GET,
   path: '/networking/status',

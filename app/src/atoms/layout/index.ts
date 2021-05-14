@@ -1,4 +1,3 @@
-// @flow
 // TODO(mc, 2019-11-26): flex box these
 export * from './CardContainer'
 export * from './CardCopy'

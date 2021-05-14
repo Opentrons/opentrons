@@ -67,6 +67,11 @@ module.exports = {
         '@typescript-eslint/prefer-optional-chain': 'warn',
         '@typescript-eslint/restrict-plus-operands': 'warn',
         '@typescript-eslint/restrict-template-expressions': 'warn',
+        '@typescript-eslint/array-type': 'warn',
+        '@typescript-eslint/consistent-type-definitions': 'warn',
+        '@typescript-eslint/naming-convention': 'warn',
+        '@typescript-eslint/no-floating-promises': 'warn',
+        '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
       },
     },
     {
@@ -89,6 +94,7 @@ module.exports = {
         'jest/consistent-test-it': 'error',
         '@typescript-eslint/consistent-type-assertions': 'off',
         '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/explicit-function-return-type': 'off',
 
         // TODO(mc, 2021-01-29): fix these and remove warning overrides
         'jest/no-deprecated-functions': 'warn',

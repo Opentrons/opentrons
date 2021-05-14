@@ -1,4 +1,3 @@
-// @flow
 import { add, isWithinInterval } from 'date-fns'
 import { CONNECTABLE } from '../discovery'
 import {
@@ -93,6 +92,6 @@ function getRestartIsComplete(
 export function getResetConfigOptions(
   state: State,
   robotName: string
-): Array<ResetConfigOption> {
+): ResetConfigOption[] {
   return robotState(state, robotName)?.resetConfigOptions || []
 }

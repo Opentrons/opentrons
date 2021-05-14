@@ -1,5 +1,3 @@
-// @flow
-
 import { filter, withLatestFrom, map } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 
@@ -16,12 +14,12 @@ import {
 } from '../../../sessions/constants'
 import { getRobotSessionById } from '../../../sessions/selectors'
 
-const isTargetSessionType: SessionType => boolean = sessionType =>
-  [
+const isTargetSessionType = (sessionType: SessionType): boolean =>
+  ([
     SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
     SESSION_TYPE_TIP_LENGTH_CALIBRATION,
     SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-  ].includes(sessionType)
+  ] as SessionType[]).includes(sessionType)
 
 const sessionIncursRefetch: (
   state: State,

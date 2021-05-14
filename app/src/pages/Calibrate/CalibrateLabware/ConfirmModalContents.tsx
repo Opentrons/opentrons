@@ -1,4 +1,3 @@
-// @flow
 // contents container for ConfirmModal
 import * as React from 'react'
 import { connect } from 'react-redux'
@@ -9,25 +8,18 @@ import { ConfirmPositionContents } from './ConfirmPositionContents'
 import { ConfirmPickupContents } from './ConfirmPickupContents'
 import { InProgressContents } from './InProgressContents'
 
-import type { State, Dispatch } from '../../../redux/types'
+import type { State } from '../../../redux/types'
 import type { Pipette, Labware } from '../../../redux/robot/types'
 
-type OP = {| labware: Labware, calibrateToBottom: boolean |}
+interface OP { labware: Labware, calibrateToBottom: boolean }
 
-type SP = {| calibrator: ?Pipette, useCenteredTroughs: boolean |}
+interface SP { calibrator: Pipette | null | undefined, useCenteredTroughs: boolean }
 
-type Props = {| ...OP, ...SP, dispatch: Dispatch |}
+type Props = OP & SP
 
-export const ConfirmModalContents: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  {||},
-  _,
-  _
->(mapStateToProps)(ConfirmModalContentsComponent)
+export const ConfirmModalContents = connect(mapStateToProps)(ConfirmModalContentsComponent)
 
-function ConfirmModalContentsComponent(props: Props) {
+function ConfirmModalContentsComponent(props: Props): JSX.Element | null {
   const { labware, calibrator, calibrateToBottom, useCenteredTroughs } = props
   if (!calibrator) return null
 

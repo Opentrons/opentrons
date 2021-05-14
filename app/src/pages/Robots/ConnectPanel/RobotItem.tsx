@@ -1,8 +1,7 @@
-// @flow
 // connected component for an item in a RobotList
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { withRouter, type ContextRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 
 import {
   actions as RobotActions,
@@ -12,19 +11,17 @@ import { getBuildrootUpdateAvailable, UPGRADE } from '../../../redux/buildroot'
 import { CONNECTABLE } from '../../../redux/discovery'
 import { RobotListItem } from './RobotListItem.js'
 
+import type { RouteComponentProps } from 'react-router-dom'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-export type RobotItemProps = {|
-  ...ContextRouter,
+export interface RobotItemProps extends RouteComponentProps<{name :string}>{
   robot: ViewableRobot,
-|}
+}
 
-export const RobotItem: React.AbstractComponent<
-  $Diff<RobotItemProps, ContextRouter>
-> = withRouter(RobotItemComponent)
+export const RobotItem = withRouter(RobotItemComponent)
 
-export function RobotItemComponent(props: RobotItemProps): React.Node {
+export function RobotItemComponent(props: RobotItemProps): JSX.Element {
   const { robot, match } = props
   const { name, displayName, status, local: isLocal } = robot
   const isUpgradable = useSelector((state: State) => {
@@ -38,7 +35,7 @@ export function RobotItemComponent(props: RobotItemProps): React.Node {
   )
   const dispatch = useDispatch<Dispatch>()
 
-  const handleToggleConnect = () => {
+  const handleToggleConnect = (): void => {
     if (!connectInProgress) {
       const action = isConnected
         ? RobotActions.disconnect()

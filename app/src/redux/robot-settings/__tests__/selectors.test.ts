@@ -1,17 +1,16 @@
-// @flow
 import * as Selectors from '../selectors'
 import type { State } from '../../types'
 
-type SelectorSpec = {|
-  name: string,
-  selector: ($Shape<State>, ...Array<any>) => mixed,
-  state: $Shape<State>,
-  args?: Array<any>,
-  expected: mixed,
-|}
+interface SelectorSpec {
+  name: string
+  selector: (state: State, ...args: any[]) => unknown
+  state: State
+  args?: any[]
+  expected: unknown
+}
 
 describe('robot settings selectors', () => {
-  const SPECS: Array<SelectorSpec> = [
+  const SPECS: SelectorSpec[] = [
     {
       name: 'getRobotSettings',
       selector: Selectors.getRobotSettings,
@@ -24,7 +23,7 @@ describe('robot settings selectors', () => {
             ],
           },
         },
-      },
+      } as any,
       args: ['robotName'],
       expected: [{ id: 'foo', title: 'Foo', description: 'Foo', value: true }],
     },
@@ -33,7 +32,7 @@ describe('robot settings selectors', () => {
       selector: Selectors.getRobotRestartPath,
       state: {
         robotSettings: { robotName: { restartPath: '/restart', settings: [] } },
-      },
+      } as any,
       args: ['robotName'],
       expected: '/restart',
     },
@@ -42,7 +41,7 @@ describe('robot settings selectors', () => {
       selector: Selectors.getRobotRestartRequired,
       state: {
         robotSettings: { robotName: { restartPath: '/restart', settings: [] } },
-      },
+      } as any,
       args: ['robotName'],
       expected: true,
     },
@@ -51,7 +50,7 @@ describe('robot settings selectors', () => {
       selector: Selectors.getRobotRestartRequired,
       state: {
         robotSettings: { robotName: { restartPath: null, settings: [] } },
-      },
+      } as any,
       args: ['robotName'],
       expected: false,
     },
@@ -64,7 +63,7 @@ describe('robot settings selectors', () => {
           b: { restartPath: null, settings: [] },
           c: { restartPath: '/restart', settings: [] },
         },
-      },
+      } as any,
       args: [],
       expected: ['a', 'c'],
     },

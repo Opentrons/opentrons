@@ -1,12 +1,11 @@
-// @flow
 import * as React from 'react'
 
-type Props = {|
-  thresholdVector: [number, number, number],
-|}
+interface Props {
+  thresholdVector: [number, number, number]
+}
 
-export function ThresholdValue(props: Props): React.Node {
+export function ThresholdValue(props: Props): JSX.Element {
   const value = props.thresholdVector.find(axis => axis > 0)
-  const formattedValue = parseFloat(value).toFixed(1)
+  const formattedValue = parseFloat(String(value)).toFixed(1)
   return <span>{`±${formattedValue} mm`}</span>
 }

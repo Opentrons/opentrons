@@ -1,4 +1,3 @@
-// @flow
 import { combineEpics } from 'redux-observable'
 
 import { fetchLightsEpic } from './fetchLightsEpic'

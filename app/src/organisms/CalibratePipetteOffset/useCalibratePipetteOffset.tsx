@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -23,7 +22,7 @@ import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPane
 import { pipetteOffsetCalibrationStarted } from '../../redux/analytics'
 
 // pipette calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
+const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 
@@ -31,18 +30,18 @@ const PIPETTE_OFFSET_TITLE = 'Pipette offset calibration'
 const TIP_LENGTH_TITLE = 'Tip length calibration'
 const EXIT = 'exit'
 
-export type InvokerProps = {|
-  overrideParams?: $Shape<PipetteOffsetCalibrationSessionParams>,
-  withIntent?: PipetteOffsetIntent,
-|}
+export interface InvokerProps {
+  overrideParams?: Partial<PipetteOffsetCalibrationSessionParams>
+  withIntent?: PipetteOffsetIntent
+}
 
-export type Invoker = (InvokerProps | void) => void
+export type Invoker = (props: InvokerProps | undefined) => void
 
 export function useCalibratePipetteOffset(
   robotName: string,
-  sessionParams: $Shape<PipetteOffsetCalibrationSessionParams>,
-  onComplete: (() => mixed) | null = null
-): [Invoker, React.Node | null] {
+  sessionParams: Pick<PipetteOffsetCalibrationSessionParams, 'mount'> & Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>,
+  onComplete: (() => unknown) | null = null
+): [Invoker, (JSX.Element | null)] {
   const createRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
@@ -132,7 +131,7 @@ export function useCalibratePipetteOffset(
   } = sessionParams
   const handleStartPipOffsetCalSession: Invoker = (props = {}) => {
     const {
-      overrideParams = ({}: $Shape<PipetteOffsetCalibrationSessionParams>),
+      overrideParams = {},
       withIntent = INTENT_CALIBRATE_PIPETTE_OFFSET,
     } = props
     setIntent(withIntent)

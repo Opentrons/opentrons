@@ -1,4 +1,3 @@
-// @flow
 // Deck Calibration Orchestration Component
 import * as React from 'react'
 
@@ -31,9 +30,10 @@ import {
   INTENT_DECK_CALIBRATION,
 } from '../../organisms/CalibrationPanels'
 
-import type { StyleProps } from '@opentrons/components'
+import type { StyleProps, Mount } from '@opentrons/components'
 import type {
   CalibrationLabware,
+  CalibrationSessionStep,
   SessionCommandParams,
 } from '../../redux/sessions/types'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
@@ -67,7 +67,7 @@ const terminalContentsStyleProps = {
 }
 
 const PANEL_BY_STEP: {
-  [string]: React.ComponentType<CalibrationPanelProps>,
+  [step in CalibrationSessionStep]?: React.ComponentType<CalibrationPanelProps>
 } = {
   [Sessions.DECK_STEP_SESSION_STARTED]: Introduction,
   [Sessions.DECK_STEP_LABWARE_LOADED]: DeckSetup,
@@ -80,7 +80,7 @@ const PANEL_BY_STEP: {
   [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
 }
 const PANEL_STYLE_PROPS_BY_STEP: {
-  [string]: StyleProps,
+  [step in CalibrationSessionStep]?: StyleProps
 } = {
   [Sessions.DECK_STEP_SESSION_STARTED]: terminalContentsStyleProps,
   [Sessions.DECK_STEP_LABWARE_LOADED]: darkContentsStyleProps,
@@ -92,7 +92,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
   [Sessions.DECK_STEP_SAVING_POINT_THREE]: contentsStyleProps,
   [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
 }
-export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
+export function CalibrateDeck(props: CalibrateDeckParentProps): JSX.Element | null {
   const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details || {}
@@ -110,7 +110,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
     return spec ? spec.channels > 1 : false
   }, [instrument])
 
-  function sendCommands(...commands: Array<SessionCommandParams>) {
+  function sendCommands(...commands: SessionCommandParams[]): void {
     if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
@@ -122,7 +122,7 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
     }
   }
 
-  function cleanUpAndExit() {
+  function cleanUpAndExit(): void {
     if (session?.id) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
@@ -150,19 +150,19 @@ export function CalibrateDeck(props: CalibrateDeckParentProps): React.Node {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
 
-  const Panel = PANEL_BY_STEP[currentStep]
-  return Panel ? (
+  const Panel = currentStep != null ? PANEL_BY_STEP[currentStep] : null
+  return currentStep != null && Panel ? (
     <>
       <ModalPage
         titleBar={titleBarProps}
-        innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
+        innerProps={currentStep ? PANEL_STYLE_PROPS_BY_STEP[currentStep] : {}}
       >
         <Panel
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
           tipRack={tipRack}
           isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase()}
+          mount={instrument?.mount.toLowerCase() as Mount}
           currentStep={currentStep}
           sessionType={session.sessionType}
           intent={INTENT_DECK_CALIBRATION}

@@ -1,12 +1,10 @@
-// @flow
-
 import type {
   DiscoveryClientRobot,
   HealthResponse,
   HealthStatus,
 } from '@opentrons/discovery-client'
 
-import typeof {
+import {
   HEALTH_STATUS_OK,
   CONNECTABLE,
   REACHABLE,
@@ -15,84 +13,83 @@ import typeof {
 
 export type { DiscoveryClientRobot, HealthStatus }
 
-export type RobotsMap = $Shape<{| [name: string]: DiscoveryClientRobot |}>
+export type RobotsMap = Record<string, DiscoveryClientRobot>
 
-export type ConnectivityStatus = CONNECTABLE | REACHABLE | UNREACHABLE
+export type ConnectivityStatus =
+  | typeof CONNECTABLE
+  | typeof REACHABLE
+  | typeof UNREACHABLE
 
-export type DiscoveryState = {|
-  scanning: boolean,
-  robotsByName: RobotsMap,
-|}
+export interface DiscoveryState {
+  scanning: boolean
+  robotsByName: RobotsMap
+}
 
-export type BaseRobot = {|
-  ...$Rest<DiscoveryClientRobot, {| addresses: mixed |}>,
-  displayName: string,
-  connected: boolean,
-  local: boolean | null,
-  seen: boolean,
-|}
+export interface BaseRobot extends Omit<DiscoveryClientRobot, 'addresses'> {
+  displayName: string
+  connected: boolean
+  local: boolean | null
+  seen: boolean
+}
 
 // fully connectable robot
-export type Robot = {|
-  ...BaseRobot,
-  status: CONNECTABLE,
-  health: HealthResponse,
-  ip: string,
-  port: number,
-  healthStatus: HEALTH_STATUS_OK,
-  serverHealthStatus: HealthStatus,
-|}
+export interface Robot extends BaseRobot {
+  status: typeof CONNECTABLE
+  health: HealthResponse
+  ip: string
+  port: number
+  healthStatus: typeof HEALTH_STATUS_OK
+  serverHealthStatus: HealthStatus
+}
 
 // robot with a seen, but not connectable IP
-export type ReachableRobot = {|
-  ...BaseRobot,
-  status: REACHABLE,
-  ip: string,
-  port: number,
-  healthStatus: HealthStatus,
-  serverHealthStatus: HealthStatus,
-|}
+export interface ReachableRobot extends BaseRobot {
+  status: typeof REACHABLE
+  ip: string
+  port: number
+  healthStatus: HealthStatus
+  serverHealthStatus: HealthStatus
+}
 
 // robot with no reachable IP
-export type UnreachableRobot = {|
-  ...BaseRobot,
-  status: UNREACHABLE,
-  ip: string | null,
-  port: number | null,
-  healthStatus: HealthStatus | null,
-  serverHealthStatus: HealthStatus | null,
-|}
+export interface UnreachableRobot extends BaseRobot {
+  status: typeof UNREACHABLE
+  ip: string | null
+  port: number | null
+  healthStatus: HealthStatus | null
+  serverHealthStatus: HealthStatus | null
+}
 
 export type ViewableRobot = Robot | ReachableRobot
 
 export type DiscoveredRobot = Robot | ReachableRobot | UnreachableRobot
 
-export type StartDiscoveryAction = {|
-  type: 'discovery:START',
-  payload: {| timeout: number | null |},
-  meta: {| shell: true |},
-|}
+export interface StartDiscoveryAction {
+  type: 'discovery:START'
+  payload: { timeout: number | null }
+  meta: { shell: true }
+}
 
-export type FinishDiscoveryAction = {|
-  type: 'discovery:FINISH',
-  meta: {| shell: true |},
-|}
+export interface FinishDiscoveryAction {
+  type: 'discovery:FINISH'
+  meta: { shell: true }
+}
 
-export type UpdateListAction = {|
-  type: 'discovery:UPDATE_LIST',
-  payload: {| robots: Array<DiscoveryClientRobot> |},
-|}
+export interface UpdateListAction {
+  type: 'discovery:UPDATE_LIST'
+  payload: { robots: DiscoveryClientRobot[] }
+}
 
-export type RemoveRobotAction = {|
-  type: 'discovery:REMOVE',
-  payload: {| robotName: string |},
-  meta: {| shell: true |},
-|}
+export interface RemoveRobotAction {
+  type: 'discovery:REMOVE'
+  payload: { robotName: string }
+  meta: { shell: true }
+}
 
-export type ClearDiscoveryCacheAction = {|
-  type: 'discovery:CLEAR_CACHE',
-  meta: {| shell: true |},
-|}
+export interface ClearDiscoveryCacheAction {
+  type: 'discovery:CLEAR_CACHE'
+  meta: { shell: true }
+}
 
 export type DiscoveryAction =
   | StartDiscoveryAction

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
@@ -9,21 +8,15 @@ import * as LabwareFixtures from '../../../../redux/custom-labware/__fixtures__'
 import * as LabwareSelectors from '../../../../redux/custom-labware/selectors'
 import * as LabwareActions from '../../../../redux/custom-labware/actions'
 
-import type { State } from '../../../../redux/types'
-
 jest.mock('../../../../redux/custom-labware/selectors')
 
-const mockGetCustomLabware: JestMockFn<
-  [State],
-  $Call<typeof LabwareSelectors.getCustomLabware, State>
-> = LabwareSelectors.getCustomLabware
+const mockGetCustomLabware = LabwareSelectors.getCustomLabware as jest.MockedFunction<typeof LabwareSelectors.getCustomLabware>
 
-const mockGetListLabwareErrorMessage: JestMockFn<[State], string | null> =
-  LabwareSelectors.getListLabwareErrorMessage
+const mockGetListLabwareErrorMessage = LabwareSelectors.getListLabwareErrorMessage as jest.MockedFunction<typeof LabwareSelectors.getListLabwareErrorMessage>
 
 describe('ListLabwareCard', () => {
-  let mockStore
-  let render
+  let mockStore: any
+  let render: () => ReturnType<typeof mount>
 
   beforeEach(() => {
     jest.useFakeTimers()

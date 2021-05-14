@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Link as InternalLink } from 'react-router-dom'
 import styled from 'styled-components'
@@ -28,7 +27,6 @@ const DONT_REMIND_ME_AGAIN = "Don't remind me again"
 
 const ADAPTER_INFO_URL = '/more/network-and-system'
 
-// $FlowFixMe(mc, 2021-03-15): will be fixed by TS conversion
 const LinkButton = styled(Link)`
   width: auto;
   padding-left: 1rem;
@@ -41,7 +39,7 @@ const IgnoreCheckbox = styled(CheckboxField)`
   bottom: 1.5rem;
 `
 
-export function U2EDriverOutdatedAlert(props: AlertProps): React.Node {
+export function U2EDriverOutdatedAlert(props: AlertProps): JSX.Element {
   const trackEvent = useTrackEvent()
   const [rememberDismiss, toggleRememberDismiss] = useToggle()
   const { dismissAlert } = props
@@ -51,7 +49,6 @@ export function U2EDriverOutdatedAlert(props: AlertProps): React.Node {
       alertOverlay
       heading={DRIVER_OUT_OF_DATE}
       buttons={[
-        /* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion or replacement of AlertModal */
         {
           Component: LinkButton,
           as: InternalLink,
@@ -65,7 +62,6 @@ export function U2EDriverOutdatedAlert(props: AlertProps): React.Node {
             })
           },
         },
-        /* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion or replacement of AlertModal */
         {
           Component: LinkButton,
           href: U2E_DRIVER_UPDATE_URL,

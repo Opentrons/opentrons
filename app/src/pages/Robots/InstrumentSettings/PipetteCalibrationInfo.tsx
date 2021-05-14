@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import {
@@ -75,15 +74,15 @@ type CalBlockModalState =
   | typeof CAL_BLOCK_MODAL_OPEN_WITH_REDO_TLC
   | typeof CAL_BLOCK_MODAL_OPEN_WITH_KEEP_TLC
 
-type Props = {|
+interface Props {
   robotName: string,
   serialNumber: string | null,
   mount: Mount,
   disabledReason: string | null,
   isChangingOrConfiguringPipette: boolean,
-|}
+}
 
-export function PipetteCalibrationInfo(props: Props): React.Node {
+export function PipetteCalibrationInfo(props: Props): JSX.Element {
   const {
     robotName,
     serialNumber,
@@ -124,11 +123,11 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
     setCalBlockModalState,
   ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
 
-  type StartWizardOptions = {|
+  interface StartWizardOptions {
     keepTipLength: boolean,
     hasBlockModalResponse?: boolean | null,
-  |}
-  const startPipetteOffsetPossibleTLC = (options: StartWizardOptions) => {
+  }
+  const startPipetteOffsetPossibleTLC = (options: StartWizardOptions): void => {
     const { keepTipLength, hasBlockModalResponse = null } = options
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
       setCalBlockModalState(
@@ -236,7 +235,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
                 })
             : () => startPipetteOffsetPossibleTLC({ keepTipLength: true })
         }
-        disabled={disabledReason}
+        disabled={Boolean(disabledReason)}
         width="15rem"
         paddingX={SPACING_2}
         marginBottom={SPACING_1}
@@ -280,7 +279,7 @@ export function PipetteCalibrationInfo(props: Props): React.Node {
             onClick={() =>
               startPipetteOffsetPossibleTLC({ keepTipLength: false })
             }
-            disabled={disabledReason}
+            disabled={Boolean(disabledReason)}
             width="15rem"
             paddingX={SPACING_2}
           >

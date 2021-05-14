@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   Box,
@@ -28,15 +27,15 @@ import {
 import type { MagneticModule, ModuleCommand } from '../../redux/modules/types'
 import type { ModuleModel } from '@opentrons/shared-data'
 
-type ModelContents = {|
+interface ModelContents {
   version: string,
   units: string | null,
   maxHeight: number,
   labwareBottomHeight: number,
   disengagedHeight: number,
-|}
+}
 
-const contentsByModel: ModuleModel => ModelContents = model => {
+const contentsByModel = (model: ModuleModel): ModelContents => {
   if (model === MAGNETIC_MODULE_V1) {
     return {
       version: 'GEN 1',
@@ -56,27 +55,27 @@ const contentsByModel: ModuleModel => ModelContents = model => {
   }
 }
 
-type Props = {|
-  module: MagneticModule,
+interface Props {
+  module: MagneticModule;
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
-    args?: Array<mixed>
-  ) => mixed,
-  disabledReason?: string | null,
-|}
+    args?: unknown[]
+  ) => unknown;
+  disabledReason?: string | null;
+}
 
 export const MagnetControl = ({
   module,
   sendModuleCommand,
   disabledReason,
-}: Props): React.Node => {
-  const [engageHeightValue, setEngageHeightValue] = React.useState(null)
-  const [isModalOpen, setIsModalOpen] = React.useState(false)
+}: Props): JSX.Element => {
+  const [engageHeightValue, setEngageHeightValue] = React.useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
 
   const isEngaged = module.status === 'engaged'
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (isEngaged) {
       sendModuleCommand(module.serial, 'deactivate')
     } else {
@@ -84,7 +83,7 @@ export const MagnetControl = ({
     }
   }
 
-  const handleSumbitHeight = () => {
+  const handleSumbitHeight = (): void => {
     if (engageHeightValue != null) {
       sendModuleCommand(module.serial, 'engage', [Number(engageHeightValue)])
     }

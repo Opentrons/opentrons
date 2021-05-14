@@ -1,18 +1,16 @@
-// @flow
-
 import * as Actions from '../actions'
 import * as Fixtures from '../__fixtures__'
 import type { RobotSettingsAction } from '../types'
 
-type ActionSpec = {|
-  name: string,
-  creator: (...Array<any>) => mixed,
-  args: Array<mixed>,
-  expected: RobotSettingsAction,
-|}
+interface ActionSpec {
+  name: string
+  creator: (...args: any[]) => unknown
+  args: unknown[]
+  expected: RobotSettingsAction
+}
 
 describe('robot settings actions', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'robotSettings:FETCH_SETTINGS',
       creator: Actions.fetchSettings,
@@ -20,7 +18,7 @@ describe('robot settings actions', () => {
       expected: {
         type: 'robotSettings:FETCH_SETTINGS',
         payload: { robotName: 'robot-name' },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -39,7 +37,7 @@ describe('robot settings actions', () => {
           settings: Fixtures.mockRobotSettings,
           restartPath: null,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -49,7 +47,7 @@ describe('robot settings actions', () => {
       expected: {
         type: 'robotSettings:FETCH_SETTINGS_FAILURE',
         payload: { robotName: 'robot-name', error: { message: 'AH' } },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -63,7 +61,7 @@ describe('robot settings actions', () => {
           settingId: 'foo',
           value: true,
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -82,7 +80,7 @@ describe('robot settings actions', () => {
           settings: Fixtures.mockRobotSettings,
           restartPath: null,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -92,7 +90,7 @@ describe('robot settings actions', () => {
       expected: {
         type: 'robotSettings:UPDATE_SETTING_FAILURE',
         payload: { robotName: 'robot-name', error: { message: 'AH' } },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {

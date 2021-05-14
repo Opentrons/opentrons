@@ -1,20 +1,19 @@
-// @flow
 import * as React from 'react'
 import { IconButton, Icon } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { IconName } from '@opentrons/components'
 
-export type IpItemProps = {|
+export interface IpItemProps {
   candidate: string,
   discovered: boolean,
-  removeIp: (ip: string) => mixed,
-|}
+  removeIp: (ip: string) => unknown,
+}
 
 export class IpItem extends React.Component<IpItemProps> {
-  remove: () => mixed = () => this.props.removeIp(this.props.candidate)
+  remove: () => unknown = () => this.props.removeIp(this.props.candidate)
 
-  render(): React.Node {
+  render(): JSX.Element {
     const iconName = this.props.discovered ? 'check' : 'ot-spinner'
     return (
       <div className={styles.ip_item_group}>
@@ -30,11 +29,11 @@ export class IpItem extends React.Component<IpItemProps> {
   }
 }
 
-type DiscoveryIconProps = {|
+interface DiscoveryIconProps {
   iconName: IconName,
-|}
+}
 
-function DiscoveryIcon(props: DiscoveryIconProps) {
+function DiscoveryIcon(props: DiscoveryIconProps): JSX.Element {
   const spin = props.iconName === 'ot-spinner'
   return (
     <div className={styles.discovery_icon}>

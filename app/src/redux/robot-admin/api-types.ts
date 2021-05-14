@@ -1,7 +1,5 @@
-// @flow
-
-export type SystemTimeData = {
-  id: 'time',
-  systemTime: string,
-  ...
+export interface SystemTimeData {
+  id: 'time'
+  systemTime: string
+  [key: string]: unknown
 }

@@ -1,4 +1,3 @@
-// @flow
 import { TestScheduler } from 'rxjs/testing'
 
 import * as DiscoverySelectors from '../../../discovery/selectors'
@@ -8,23 +7,27 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { pipettesEpic } from '../../epic'
 
+import type { Action, State } from '../../../types'
+
 jest.mock('../../../discovery/selectors')
 jest.mock('../../../robot/selectors')
 
-const mockState = { state: true }
+const mockState: State = { state: true } as any
 const { mockRobot } = Fixtures
 
-const mockGetRobotByName: JestMockFn<[any, string], mixed> =
-  DiscoverySelectors.getRobotByName
+const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
+  typeof DiscoverySelectors.getRobotByName
+>
 
-const mockGetConnectedRobotName: JestMockFn<[any], ?string> =
-  RobotSelectors.getConnectedRobotName
+const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<
+  typeof RobotSelectors.getConnectedRobotName
+>
 
 describe('fetchPipettesOnConnectEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot)
+    mockGetRobotByName.mockReturnValue(mockRobot as any)
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
@@ -36,16 +39,16 @@ describe('fetchPipettesOnConnectEpic', () => {
   })
 
   it('dispatches nothing robot:CONNECT_RESPONSE failure', () => {
-    const action = {
+    const action: Action = {
       type: 'robot:CONNECT_RESPONSE',
       payload: { error: { message: 'AH' } },
-    }
+    } as any
 
     mockGetConnectedRobotName.mockReturnValue(null)
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a--', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a--', { a: mockState })
       const output$ = pipettesEpic(action$, state$)
 
       expectObservable(output$).toBe('---')
@@ -53,16 +56,16 @@ describe('fetchPipettesOnConnectEpic', () => {
   })
 
   it('dispatches FETCH_PIPETTES and FETCH_PIPETTE_SETTINGS on robot:CONNECT_RESPONSE success', () => {
-    const action = {
+    const action: Action = {
       type: 'robot:CONNECT_RESPONSE',
       payload: {},
-    }
+    } as any
 
     mockGetConnectedRobotName.mockReturnValue(mockRobot.name)
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a--', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a--', { a: mockState })
       const output$ = pipettesEpic(action$, state$)
 
       expectObservable(output$).toBe('--(ab)', {

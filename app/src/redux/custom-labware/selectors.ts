@@ -1,4 +1,3 @@
-// @flow
 // custom labware selectors
 import { createSelector } from 'reselect'
 import sortBy from 'lodash/sortBy'
@@ -25,12 +24,17 @@ export const OPENTRONS_LABWARE_FILE: 'OPENTRONS_LABWARE_FILE' =
 
 export const VALID_LABWARE_FILE: 'VALID_LABWARE_FILE' = 'VALID_LABWARE_FILE'
 
-export const getCustomLabwareDirectory: State => string = createSelector(
+export const getCustomLabwareDirectory: (
+  state: State
+) => string = createSelector(
   getConfig,
   config => config?.labware.directory ?? ''
 )
 
-export const getCustomLabware: State => Array<CheckedLabwareFile> = createSelector(
+//  @ts-expect-error(sa, 2021-05-11): filesByName[name] might be undefined because filesByName is typed as a partial type
+export const getCustomLabware: (
+  state: State
+) => CheckedLabwareFile[] = createSelector(
   state => state.labware.filenames,
   state => state.labware.filesByName,
   (filenames, filesByName) =>
@@ -40,16 +44,19 @@ export const getCustomLabware: State => Array<CheckedLabwareFile> = createSelect
     )
 )
 
-// $FlowFixMe: flow unable to do type refinements via filter
-export const getValidCustomLabware: State => Array<ValidLabwareFile> = createSelector(
-  getCustomLabware,
-  labware => labware.filter(f => f.type === VALID_LABWARE_FILE)
+// @ts-expect-error(sa, 2021-05-11): TS unable to do type refinements via filter
+export const getValidCustomLabware: (
+  state: State
+) => ValidLabwareFile[] = createSelector(getCustomLabware, labware =>
+  labware.filter(f => f.type === VALID_LABWARE_FILE)
 )
 
-export const getAddLabwareFailure: State => {|
-  file: FailedLabwareFile | null,
-  errorMessage: string | null,
-|} = createSelector(
+export const getAddLabwareFailure: (
+  state: State
+) => {
+  file: FailedLabwareFile | null
+  errorMessage: string | null
+} = createSelector(
   state => state.labware.addFailureFile,
   state => state.labware.addFailureMessage,
   (file, errorMessage) => ({ file, errorMessage })
@@ -58,14 +65,15 @@ export const getAddLabwareFailure: State => {|
 export const getListLabwareErrorMessage = (state: State): null | string =>
   state.labware.listFailureMessage
 
-export const getCustomLabwareDefinitions: State => Array<LabwareDefinition2> = createSelector(
-  getValidCustomLabware,
-  labware => labware.map(lw => lw.definition)
+export const getCustomLabwareDefinitions: (
+  state: State
+) => LabwareDefinition2[] = createSelector(getValidCustomLabware, labware =>
+  labware.map(lw => lw.definition)
 )
 
 export const getCustomTipRackDefinitions: (
   state: State
-) => Array<LabwareDefinition2> = createSelector(
+) => LabwareDefinition2[] = createSelector(
   getCustomLabwareDefinitions,
   labware => labware.filter(lw => getIsTiprack(lw))
 )

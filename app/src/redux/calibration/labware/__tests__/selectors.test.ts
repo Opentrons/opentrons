@@ -1,4 +1,3 @@
-// @flow
 import omit from 'lodash/omit'
 import * as Fixtures from '../__fixtures__'
 import * as StatusFixtures from '../../__fixtures__'
@@ -14,25 +13,22 @@ jest.mock('../../../robot')
 
 const robotName = 'robotName'
 
-const getLabware: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getLabware, State>
-> = robotSelectors.getLabware
-
-const getModulesBySlot: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getModulesBySlot, State>
-> = robotSelectors.getModulesBySlot
+const getLabware = robotSelectors.getLabware as jest.MockedFunction<
+  typeof robotSelectors.getLabware
+>
+const getModulesBySlot = robotSelectors.getModulesBySlot as jest.MockedFunction<
+  typeof robotSelectors.getModulesBySlot
+>
 
 describe('labware calibration selectors', () => {
   describe('getLabwareCalibrations', () => {
     it('should return empty array if no robot in state', () => {
-      const state: $Shape<State> = { calibration: {} }
+      const state: State = { calibration: {} } as any
       expect(Selectors.getLabwareCalibrations(state, robotName)).toEqual([])
     })
 
     it('should return empty array if robot in state but no calibrations yet', () => {
-      const state: $Shape<State> = {
+      const state: State = {
         calibration: {
           robotName: {
             calibrationStatus: null,
@@ -41,12 +37,12 @@ describe('labware calibration selectors', () => {
             tipLengthCalibrations: null,
           },
         },
-      }
+      } as any
       expect(Selectors.getLabwareCalibrations(state, robotName)).toEqual([])
     })
 
     it('should return list of calibrations if in state', () => {
-      const state: $Shape<State> = {
+      const state: State = {
         calibration: {
           robotName: {
             calibrationStatus: StatusFixtures.mockCalibrationStatus,
@@ -55,7 +51,7 @@ describe('labware calibration selectors', () => {
             tipLengthCalibrations: null,
           },
         },
-      }
+      } as any
       expect(Selectors.getLabwareCalibrations(state, robotName)).toEqual(
         Fixtures.mockAllLabwareCalibration.data
       )
@@ -63,32 +59,32 @@ describe('labware calibration selectors', () => {
   })
 
   describe('getProtocolLabwareList', () => {
-    let state: $Shape<State>
+    let state: State
 
     afterEach(() => {
       jest.resetAllMocks()
     })
 
     beforeEach(() => {
-      state = { calibration: {} }
+      state = { calibration: {} } as any
 
       getLabware.mockImplementation(calledState => {
         expect(calledState).toBe(state)
 
         return [
-          ({
+          {
             type: wellPlate96Def.parameters.loadName,
             definition: wellPlate96Def,
             slot: '3',
             definitionHash: Fixtures.mockLabwareCalibration1.definitionHash,
-          }: $Shape<ProtocolLabware>),
-          ({
+          } as any,
+          {
             type: 'some_v1_labware',
             definition: null,
             slot: '1',
             definitionHash: null,
-          }: $Shape<ProtocolLabware>),
-        ]
+          } as any,
+        ] as ProtocolLabware[]
       })
 
       getModulesBySlot.mockImplementation(calledState => {
@@ -118,7 +114,7 @@ describe('labware calibration selectors', () => {
       const lwCalibration = Fixtures.mockLabwareCalibration1
       const { calibrationData } = lwCalibration
 
-      state = ({
+      state = {
         calibration: {
           robotName: {
             calibrationStatus: null,
@@ -144,7 +140,7 @@ describe('labware calibration selectors', () => {
             },
           },
         },
-      }: $Shape<State>)
+      } as any
 
       expect(
         Selectors.getUniqueProtocolLabwareSummaries(state, robotName)
@@ -200,7 +196,7 @@ describe('labware calibration selectors', () => {
         },
       }
 
-      state = ({
+      state = {
         calibration: {
           robotName: {
             calibrationStatus: null,
@@ -211,7 +207,7 @@ describe('labware calibration selectors', () => {
             },
           },
         },
-      }: $Shape<State>)
+      } as any
 
       expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
         {
@@ -275,7 +271,7 @@ describe('labware calibration selectors', () => {
 
       getModulesBySlot.mockReturnValue({})
 
-      state = ({
+      state = {
         calibration: {
           robotName: {
             calibrationStatus: null,
@@ -286,7 +282,7 @@ describe('labware calibration selectors', () => {
             },
           },
         },
-      }: $Shape<State>)
+      } as any
 
       expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
         {
@@ -335,7 +331,7 @@ describe('labware calibration selectors', () => {
 
       getModulesBySlot.mockReturnValue({})
 
-      state = ({
+      state = {
         calibration: {
           robotName: {
             calibrationStatus: null,
@@ -346,7 +342,7 @@ describe('labware calibration selectors', () => {
             },
           },
         },
-      }: $Shape<State>)
+      } as any
 
       expect(Selectors.getProtocolLabwareList(state, robotName)).toEqual([
         {
@@ -377,27 +373,27 @@ describe('labware calibration selectors', () => {
   })
 
   describe('getUniqueProtocolLabwareSummaries', () => {
-    let state: $Shape<State>
+    let state: State
 
     beforeEach(() => {
-      state = { calibration: {} }
+      state = { calibration: {} } as any
 
       getLabware.mockImplementation(calledState => {
         expect(calledState).toBe(state)
 
         return [
-          ({
+          {
             type: wellPlate96Def.parameters.loadName,
             definition: wellPlate96Def,
             slot: '3',
             definitionHash: Fixtures.mockLabwareCalibration1.definitionHash,
-          }: $Shape<ProtocolLabware>),
-          ({
+          } as any,
+          {
             type: 'some_v1_labware',
             definition: null,
             slot: '1',
-          }: $Shape<ProtocolLabware>),
-        ]
+          } as any,
+        ] as ProtocolLabware[]
       })
 
       getModulesBySlot.mockImplementation(calledState => {
@@ -467,19 +463,19 @@ describe('labware calibration selectors', () => {
 
     it('flattens out duplicate labware using quantity field', () => {
       getLabware.mockReturnValue([
-        ({
+        {
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
           definitionHash: '123fakeDefinitionHash',
           slot: '3',
-        }: $Shape<ProtocolLabware>),
-        ({
+        } as any,
+        {
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
           definitionHash: '123fakeDefinitionHash',
           slot: '4',
-        }: $Shape<ProtocolLabware>),
-      ])
+        } as any,
+      ] as ProtocolLabware[])
       getModulesBySlot.mockReturnValue({})
 
       expect(
@@ -497,19 +493,19 @@ describe('labware calibration selectors', () => {
 
     it('does not aggregate labware across differing parents', () => {
       getLabware.mockReturnValue([
-        ({
+        {
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
           definitionHash: '123fakeDefinitionHash',
           slot: '2',
-        }: $Shape<ProtocolLabware>),
-        ({
+        } as any,
+        {
           type: wellPlate96Def.parameters.loadName,
           definition: wellPlate96Def,
           definitionHash: '123fakeDefinitionHash',
           slot: '3',
-        }: $Shape<ProtocolLabware>),
-      ])
+        } as any,
+      ] as ProtocolLabware[])
 
       getModulesBySlot.mockImplementation(calledState => {
         return {

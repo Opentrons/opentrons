@@ -1,7 +1,6 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
+import { mountWithStore } from '@opentrons/components/__utils__'
 
 import * as CustomLabware from '../../../../redux/custom-labware'
 import * as CustomLabwareFixtures from '../../../../redux/custom-labware/__fixtures__'
@@ -10,40 +9,28 @@ import { ManagePath } from '../ManagePath'
 import { AddLabware } from '../AddLabware'
 import { AddLabwareFailureModal } from '../AddLabwareFailureModal'
 
-import type { State } from '../../../../redux/types'
-import type { FailedLabwareFile } from '../../../../redux/custom-labware/types'
+import type { WrapperWithStore } from '@opentrons/components/__utils__'
+import type { State, Action } from '../../../../redux/types'
 
 jest.mock('../../../../redux/custom-labware/selectors')
 
-const mockGetCustomLabwareDirectory: JestMockFn<[State], string> =
-  CustomLabware.getCustomLabwareDirectory
+const mockGetCustomLabwareDirectory = CustomLabware.getCustomLabwareDirectory as jest.MockedFunction<typeof CustomLabware.getCustomLabwareDirectory>
 
-const mockGetAddLabwareFailure: JestMockFn<
-  [State],
-  {| file: FailedLabwareFile | null, errorMessage: string | null |}
-> = CustomLabware.getAddLabwareFailure
+const mockGetAddLabwareFailure = CustomLabware.getAddLabwareFailure as jest.MockedFunction<typeof CustomLabware.getAddLabwareFailure>
 
 const mockLabwarePath = '/path/to/labware'
 
 describe('AddLabwareCard', () => {
-  let mockStore
-  let render
+  let mockStore: React.ComponentProps<typeof Provider>['store']
+  let render: () => WrapperWithStore<typeof AddLabwareCard, State, Action>
 
   beforeEach(() => {
     mockGetCustomLabwareDirectory.mockReturnValue(mockLabwarePath)
     mockGetAddLabwareFailure.mockReturnValue({ file: null, errorMessage: null })
 
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({ state: true }),
-      dispatch: jest.fn(),
-    }
-
     render = () =>
-      mount(
-        <Provider store={mockStore}>
-          <AddLabwareCard />
-        </Provider>
+      mountWithStore<typeof AddLabwareCard, State, Action>(
+        <AddLabwareCard />
       )
   })
 
@@ -52,7 +39,7 @@ describe('AddLabwareCard', () => {
   })
 
   it('passes labware directory to ManagePath', () => {
-    const wrapper = render()
+    const { wrapper } = render()
     const detail = wrapper.find(ManagePath)
 
     expect(mockGetCustomLabwareDirectory).toHaveBeenCalledWith({ state: true })
@@ -60,42 +47,42 @@ describe('AddLabwareCard', () => {
   })
 
   it('passes change path function to ManagePath', () => {
-    const wrapper = render()
+    const { wrapper } = render()
     const control = wrapper.find(ManagePath)
     const expectedChangeAction = CustomLabware.changeCustomLabwareDirectory()
 
     expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
-    control.invoke('onChangePath')()
+    control.invoke('onChangePath')?.()
     expect(mockStore.dispatch).toHaveBeenCalledWith(expectedChangeAction)
   })
 
   it('passes open path function to ManagePath', () => {
-    const wrapper = render()
+    const { wrapper } = render()
     const control = wrapper.find(ManagePath)
     const expectedOpenAction = CustomLabware.openCustomLabwareDirectory()
 
     expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
-    control.invoke('onOpenPath')()
+    control.invoke('onOpenPath')?.()
     expect(mockStore.dispatch).toHaveBeenCalledWith(expectedOpenAction)
   })
 
   it('passes reset path function to ManagePath', () => {
-    const wrapper = render()
+    const { wrapper } = render()
     const control = wrapper.find(ManagePath)
     const expectedOpenAction = CustomLabware.resetCustomLabwareDirectory()
 
     expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
-    control.invoke('onResetPath')()
+    control.invoke('onResetPath')?.()
     expect(mockStore.dispatch).toHaveBeenCalledWith(expectedOpenAction)
   })
 
   it('passes dispatch function to AddLabware', () => {
-    const wrapper = render()
+    const { wrapper } = render()
     const control = wrapper.find(AddLabware)
     const expectedAction = CustomLabware.addCustomLabware()
 
     expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
-    control.invoke('onAddLabware')()
+    control.invoke('onAddLabware')?.()
     expect(mockStore.dispatch).toHaveBeenCalledWith(expectedAction)
   })
 
@@ -105,7 +92,7 @@ describe('AddLabwareCard', () => {
       errorMessage: 'AH',
     })
 
-    const wrapper = render()
+    const { wrapper } = render()
     const modal = wrapper.find(AddLabwareFailureModal)
 
     expect(modal.props()).toEqual({
@@ -122,15 +109,15 @@ describe('AddLabwareCard', () => {
 
     mockGetAddLabwareFailure.mockReturnValue({ file, errorMessage: null })
 
-    const wrapper = render()
+    const { wrapper } = render()
     const modal = wrapper.find(AddLabwareFailureModal)
 
-    modal.invoke('onCancel')()
+    modal.invoke('onCancel')?.()
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       CustomLabware.clearAddCustomLabwareFailure()
     )
 
-    modal.invoke('onOverwrite')(file)
+    modal.invoke('onOverwrite')?.(file)
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       CustomLabware.addCustomLabware(file)
     )

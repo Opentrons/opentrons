@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import {
@@ -21,9 +20,9 @@ import type { Dispatch } from '../../../redux/types'
 import type { AttachedModule } from '../../../redux/modules/types'
 
 const LID_OPEN_DELAY_MS = 30 * 1000
-type Props = {| robotName: string, modules: Array<AttachedModule> |}
+interface Props { robotName: string, modules: AttachedModule[] }
 
-export function PrepareModules(props: Props): React.Node {
+export function PrepareModules(props: Props): JSX.Element {
   const { modules, robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const [isHandling, setIsHandling] = React.useState(false)
@@ -38,7 +37,7 @@ export function PrepareModules(props: Props): React.Node {
 
   useTimeout(() => setIsHandling(false), isHandling ? LID_OPEN_DELAY_MS : null)
 
-  const handleOpenLidClick = () => {
+  const handleOpenLidClick = (): void => {
     modules
       .filter(mod => getModuleType(mod.model) === THERMOCYCLER_MODULE_TYPE)
       .forEach(mod =>

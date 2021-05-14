@@ -1,8 +1,9 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { Icon } from '@opentrons/components'
 import { IconCta } from '../IconCta'
+
+import type { ReactWrapper } from 'enzyme'
 
 const NAME = 'some-call-to-action'
 const ICON_NAME = 'flask-outline'
@@ -10,7 +11,7 @@ const TEXT = 'some text'
 
 describe('IconCta', () => {
   const mockHandleClick = jest.fn()
-  let wrapper
+  let wrapper: ReactWrapper<React.ComponentProps<typeof IconCta>>
 
   beforeEach(() => {
     wrapper = mount(
@@ -42,7 +43,7 @@ describe('IconCta', () => {
 
   it('is clickable', () => {
     expect(mockHandleClick).toHaveBeenCalledTimes(0)
-    wrapper.find('button').invoke('onClick')()
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     expect(mockHandleClick).toHaveBeenCalledTimes(1)
   })
 })

@@ -16,26 +16,40 @@ import {
 import { MockCalibrationManager } from './__fixtures__/calibration-manager'
 import { mockConnectableRobot } from '../../discovery/__fixtures__'
 
-import { getConnectableRobots } from '../../discovery/selectors'
-import { getLabwareDefBySlot } from '../../protocol/selectors'
-import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
+import * as discoSelectors from '../../discovery/selectors'
+import * as protocolSelectors from '../../protocol/selectors'
+import * as customLwSelectors from '../../custom-labware/selectors'
+
+import type { Dispatch } from 'redux'
+import type { State, Action } from '../../types'
 
 jest.mock('../../../rpc/client')
 jest.mock('../../discovery/selectors')
 jest.mock('../../protocol/selectors')
 jest.mock('../../custom-labware/selectors')
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+const getLabwareDefBySlot = protocolSelectors.getLabwareDefBySlot as jest.MockedFunction<
+  typeof protocolSelectors.getLabwareDefBySlot
+>
+const getCustomLabwareDefinitions = customLwSelectors.getCustomLabwareDefinitions as jest.MockedFunction<
+  typeof customLwSelectors.getCustomLabwareDefinitions
+>
+const getConnectableRobots = discoSelectors.getConnectableRobots as jest.MockedFunction<
+  typeof discoSelectors.getConnectableRobots
+>
+
+const delay = (ms: number): Promise<ReturnType<typeof setTimeout>> =>
+  new Promise(resolve => setTimeout(resolve, ms))
 
 describe('api client', () => {
-  let dispatch
-  let sendToClient
-  let rpcClient
-  let session
-  let sessionManager
-  let calibrationManager
+  let dispatch: jest.MockedFunction<Dispatch>
+  let sendToClient: (state: State, action: Action) => Promise<unknown>
+  let rpcClient: any
+  let session: any
+  let sessionManager: any
+  let calibrationManager: any
 
-  let _global = {}
+  let _global: { [key: string]: unknown } = {}
   beforeAll(() => {
     _global = { setInterval, clearInterval }
 
@@ -92,26 +106,28 @@ describe('api client', () => {
 
   const ROBOT_NAME = mockConnectableRobot.name
   const ROBOT_IP = mockConnectableRobot.ip
-  const STATE = {
+  const STATE: State = {
     robot: {
       connection: {
         connectedTo: '',
         connectRequest: { inProgress: false },
       },
     },
-  }
+  } as any
 
-  const sendConnect = () => sendToClient(STATE, actions.connect(ROBOT_NAME))
+  const sendConnect = (): Promise<unknown> =>
+    sendToClient(STATE, actions.connect(ROBOT_NAME))
 
-  const sendDisconnect = () => sendToClient(STATE, actions.disconnect())
+  const sendDisconnect = (): Promise<unknown> =>
+    sendToClient(STATE, actions.disconnect())
 
-  const sendNotification = (topic, payload) => {
+  const sendNotification = (topic: any, payload: any): void => {
     expect(rpcClient.on).toHaveBeenCalledWith(
       'notification',
       expect.any(Function)
     )
 
-    const handler = rpcClient.on.mock.calls.find(args => {
+    const handler = rpcClient.on.mock.calls.find((args: any) => {
       return args[0] === 'notification'
     })[1]
 
@@ -174,10 +190,10 @@ describe('api client', () => {
     })
 
     it('disconnects RPC client on robotAdmin:RESTART message', () => {
-      const state = {
+      const state: State = {
         ...STATE,
         robot: { ...STATE.robot, connection: { connectedTo: ROBOT_NAME } },
-      }
+      } as any
       const expected = actions.disconnectResponse()
 
       return sendConnect()
@@ -206,13 +222,13 @@ describe('api client', () => {
     })
 
     it('will not try to connect multiple RpcClients at one time', () => {
-      const state = {
+      const state: State = {
         ...STATE,
         robot: {
           ...STATE.robot,
           connection: { connectRequest: { inProgress: true } },
         },
-      }
+      } as any
 
       return sendToClient(state, actions.connect(ROBOT_NAME)).then(() => {
         expect(RpcClient).toHaveBeenCalledTimes(0)
@@ -227,7 +243,7 @@ describe('api client', () => {
       session.run.mockResolvedValue()
 
       return sendConnect()
-        .then(() => sendToClient({}, actions.run()))
+        .then(() => sendToClient({} as any, actions.run()))
         .then(() => {
           expect(session.run).toHaveBeenCalled()
           expect(dispatch).toHaveBeenCalledWith(expected)
@@ -240,7 +256,7 @@ describe('api client', () => {
       session.run.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
-        .then(() => sendToClient({}, actions.run()))
+        .then(() => sendToClient({} as any, actions.run()))
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
@@ -250,7 +266,7 @@ describe('api client', () => {
       session.pause.mockResolvedValue()
 
       return sendConnect()
-        .then(() => sendToClient({}, actions.pause()))
+        .then(() => sendToClient({} as any, actions.pause()))
         .then(() => {
           expect(session.pause).toHaveBeenCalled()
           expect(dispatch).toHaveBeenCalledWith(expected)
@@ -263,7 +279,7 @@ describe('api client', () => {
       session.pause.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
-        .then(() => sendToClient({}, actions.pause()))
+        .then(() => sendToClient({} as any, actions.pause()))
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
@@ -273,7 +289,7 @@ describe('api client', () => {
       session.resume.mockResolvedValue()
 
       return sendConnect()
-        .then(() => sendToClient({}, actions.resume()))
+        .then(() => sendToClient({} as any, actions.resume()))
         .then(() => {
           expect(session.resume).toHaveBeenCalled()
           expect(dispatch).toHaveBeenCalledWith(expected)
@@ -286,7 +302,7 @@ describe('api client', () => {
       session.resume.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
-        .then(() => sendToClient({}, actions.resume()))
+        .then(() => sendToClient({} as any, actions.resume()))
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
@@ -297,7 +313,7 @@ describe('api client', () => {
       session.stop.mockResolvedValue()
 
       return sendConnect()
-        .then(() => sendToClient({}, actions.cancel()))
+        .then(() => sendToClient({} as any, actions.cancel()))
         .then(() => {
           expect(session.resume).toHaveBeenCalled()
           expect(session.stop).toHaveBeenCalled()
@@ -312,7 +328,7 @@ describe('api client', () => {
       session.stop.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
-        .then(() => sendToClient({}, actions.cancel()))
+        .then(() => sendToClient({} as any, actions.cancel()))
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
@@ -320,7 +336,7 @@ describe('api client', () => {
       session.refresh.mockResolvedValue()
 
       return sendConnect()
-        .then(() => sendToClient({}, actions.refreshSession()))
+        .then(() => sendToClient({} as any, actions.refreshSession()))
         .then(() => expect(session.refresh).toHaveBeenCalled())
     })
 
@@ -328,13 +344,13 @@ describe('api client', () => {
       session.run.mockResolvedValue()
 
       return sendConnect()
-        .then(() => sendToClient({}, actions.run()))
+        .then(() => sendToClient({} as any, actions.run()))
         .then(() => expect(global.setInterval).toHaveBeenCalled())
     })
   })
 
   describe('session responses', () => {
-    let expectedInitial
+    let expectedInitial: ReturnType<typeof actions.sessionResponse>
 
     beforeEach(() => {
       expectedInitial = actions.sessionResponse(
@@ -812,7 +828,7 @@ describe('api client', () => {
         },
         doorState: null,
         blocked: false,
-      }
+      } as any
       const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
       return sendConnect()
@@ -844,7 +860,7 @@ describe('api client', () => {
           changedAt: null,
           estimatedDuration: null,
         },
-      }
+      } as any
       const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
       return sendConnect()
@@ -881,7 +897,7 @@ describe('api client', () => {
           changedAt: 2,
           estimatedDuration: null,
         },
-      }
+      } as any
       const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
       return sendConnect()
@@ -912,7 +928,7 @@ describe('api client', () => {
           changedAt: null,
           estimatedDuration: null,
         },
-      }
+      } as any
       const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
       return sendConnect()
@@ -925,7 +941,7 @@ describe('api client', () => {
   })
 
   describe('calibration', () => {
-    let state
+    let state: State
     beforeEach(() => {
       state = {
         robot: {
@@ -956,7 +972,7 @@ describe('api client', () => {
             },
           },
         },
-      }
+      } as any
     })
 
     it('handles MOVE_TO_FRONT success', () => {
@@ -1221,7 +1237,8 @@ describe('api client', () => {
     })
 
     it('handles UPDATE_OFFSET success', () => {
-      const action = actions.updateOffset('left', 1)
+      const action = actions.updateOffset('left', 1 as any)
+      // @ts-expect-error actions.updateOffsetResponse only takes one arg but we're giving two here
       const expectedResponse = actions.updateOffsetResponse(null, false)
 
       calibrationManager.update_container_offset.mockResolvedValue()
@@ -1237,7 +1254,7 @@ describe('api client', () => {
     })
 
     it('handles UPDATE_OFFSET failure', () => {
-      const action = actions.updateOffset('left', 9)
+      const action = actions.updateOffset('left', 9 as any)
       const expectedResponse = actions.updateOffsetResponse(new Error('AH'))
 
       calibrationManager.update_container_offset.mockRejectedValue(

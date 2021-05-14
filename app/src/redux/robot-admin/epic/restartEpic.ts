@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 import { mapTo } from 'rxjs/operators'
 

@@ -1,4 +1,3 @@
-// @flow
 import { ofType, combineEpics } from 'redux-observable'
 import { of } from 'rxjs'
 import { map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
@@ -8,6 +7,7 @@ import { getNextRestartStatus } from '../selectors'
 import { restartStatusChanged } from '../actions'
 import * as Constants from '../constants'
 
+import type { Robot, ReachableRobot } from '../../discovery/types'
 import type { Epic } from '../../types'
 
 // mark robot as restart-pending if HTTP restart request succeeds

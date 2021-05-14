@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { StaticRouter } from 'react-router-dom'
@@ -10,31 +9,22 @@ import { Tooltip } from '@opentrons/components'
 import { Continue } from '../Continue'
 
 import type { State } from '../../../../redux/types'
+import { NavLocation } from '../../../../redux/nav/types'
 
 jest.mock('../../../../redux/nav')
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = { mockState: true } as any
 
 const MOCK_STORE = {
   getState: () => MOCK_STATE,
   dispatch: noop,
   subscribe: noop,
-}
+} as any
 
-const getCalibrateLocation: JestMockFn<
-  [State],
-  $Call<typeof navigation.getCalibrateLocation, State>
-> = navigation.getCalibrateLocation
-
-function stubSelector<R>(mock: JestMockFn<[State], R>, rVal: R) {
-  mock.mockImplementation(state => {
-    expect(state).toBe(MOCK_STATE)
-    return rVal
-  })
-}
+const getCalibrateLocation = navigation.getCalibrateLocation as jest.MockedFunction<typeof navigation.getCalibrateLocation>
 
 describe('Continue to run or calibration button component', () => {
-  const render = (labwareCalibrated: boolean = false) => {
+  const render = (labwareCalibrated: boolean = false): ReturnType<typeof mount> => {
     return mount(
       <Provider store={MOCK_STORE}>
         <StaticRouter context={{}} location={'/upload/file-info'}>
@@ -44,31 +34,28 @@ describe('Continue to run or calibration button component', () => {
     )
   }
 
-  const CALIBRATE_LOCATION_ENABLED = {
+  const CALIBRATE_LOCATION_ENABLED: NavLocation = {
     id: 'calibrate',
     path: '/calibrate',
     title: 'CALIBRATE',
     iconName: 'ot-calibrate',
     disabledReason: null,
-  }
+  } as any
 
-  const CALIBRATE_SELECTOR_DISABLED = {
+  const CALIBRATE_SELECTOR_DISABLED: NavLocation = {
     id: 'calibrate',
     path: '/calibrate',
     title: 'CALIBRATE',
     iconName: 'ot-calibrate',
     disabledReason: 'check your toolbox!',
-  }
-
-  beforeEach(() => {
-    stubSelector(getCalibrateLocation, CALIBRATE_LOCATION_ENABLED)
-  })
+  } as any
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
   it('renders a link to /calibrate when calibrate page is enabled', () => {
+    getCalibrateLocation.mockReturnValue(CALIBRATE_LOCATION_ENABLED)
     const wrapper = render()
     const link = wrapper.find('a')
     const tooltip = wrapper.find(Tooltip)
@@ -79,7 +66,7 @@ describe('Continue to run or calibration button component', () => {
   })
 
   it('renders a tooltip and a noop link when calibrate page is disabled', () => {
-    stubSelector(getCalibrateLocation, CALIBRATE_SELECTOR_DISABLED)
+    getCalibrateLocation.mockReturnValueOnce(CALIBRATE_SELECTOR_DISABLED)
     const wrapper = render()
     const link = wrapper.find('a')
     const tooltip = wrapper.find(Tooltip)

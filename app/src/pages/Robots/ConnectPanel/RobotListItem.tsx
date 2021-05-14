@@ -1,4 +1,3 @@
-// @flow
 // presentational component for an item in a RobotList
 import * as React from 'react'
 import { NotificationIcon, Icon, ToggleButton } from '@opentrons/components'
@@ -7,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { RobotLink } from './RobotLink'
 import styles from './styles.css'
 
-export type RobotListItemProps = {|
+export interface RobotListItemProps {
   name: string,
   displayName: string,
   isConnectable: boolean,
@@ -15,10 +14,10 @@ export type RobotListItemProps = {|
   isSelected: boolean,
   isLocal: boolean,
   isConnected: boolean,
-  onToggleConnect: () => mixed,
-|}
+  onToggleConnect: () => unknown,
+}
 
-export function RobotListItem(props: RobotListItemProps): React.Node {
+export function RobotListItem(props: RobotListItemProps): JSX.Element {
   const {
     name,
     displayName,

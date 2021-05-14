@@ -1,4 +1,3 @@
-// @flow
 
 import type { State } from '../types'
 import type {

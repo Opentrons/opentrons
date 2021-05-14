@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 import * as Formik from 'formik'
@@ -18,11 +17,9 @@ import type { ConnectFormFieldProps } from '../../types'
 // https://github.com/jaredpalmer/formik/pull/2360
 jest.mock('formik')
 
-const useFormikContext: JestMockFn<[], $Call<typeof Formik.useFormikContext>> =
-  Formik.useFormikContext
+const useFormikContext = Formik.useFormikContext as jest.MockedFunction<typeof Formik.useFormikContext>
 
-const useField: JestMockFn<[any], $Call<typeof Formik.useField, any>> =
-  Formik.useField
+const useField = Formik.useField as jest.MockedFunction<typeof Formik.useField>
 
 describe('ConnectModal state hooks', () => {
   afterEach(() => {
@@ -34,18 +31,18 @@ describe('ConnectModal state hooks', () => {
     const setTouched = jest.fn()
     const setValues = jest.fn()
 
-    const mockFormOnce = (values, errors = {}, touched = {}) => {
+    const mockFormOnce = (values: any, errors: any = {}, touched: any = {}): void => {
       useFormikContext.mockReturnValueOnce(
-        ({ values, errors, touched, setValues, setErrors, setTouched }: any)
+        ({ values, errors, touched, setValues, setErrors, setTouched } as any)
       )
     }
 
-    const TestUseResetFormOnSecurityChange = () => {
+    const TestUseResetFormOnSecurityChange = (): JSX.Element => {
       useResetFormOnSecurityChange()
       return <></>
     }
 
-    const render = () => {
+    const render = (): ReturnType<typeof mount> => {
       return mount(<TestUseResetFormOnSecurityChange />)
     }
 
@@ -101,21 +98,21 @@ describe('ConnectModal state hooks', () => {
     const setValue = jest.fn()
     const setTouched = jest.fn()
 
-    const mockFieldOnce = (value, error, touched) => {
+    const mockFieldOnce = (value?: any, error?: any, touched?: any): void => {
       const fieldProps: any = { value, onChange, onBlur }
       const fieldMeta: any = { error, touched }
       const fieldHelpers: any = { setValue, setTouched }
       useField.mockReturnValueOnce([fieldProps, fieldMeta, fieldHelpers])
     }
 
-    const MockField = (props: ConnectFormFieldProps) => <></>
+    const MockField = (props: ConnectFormFieldProps): JSX.Element => <></>
 
-    const TestUseConnectFormField = () => {
+    const TestUseConnectFormField = (): JSX.Element => {
       const fieldProps = useConnectFormField(fieldName)
       return <MockField {...fieldProps}></MockField>
     }
 
-    const render = () => mount(<TestUseConnectFormField />)
+    const render = (): ReturnType<typeof mount> => mount(<TestUseConnectFormField />)
 
     it('passes field name to useField', () => {
       mockFieldOnce()

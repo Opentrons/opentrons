@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import styled from 'styled-components'
 import { Icon, FONT_BODY_1_DARK } from '@opentrons/components'
@@ -12,13 +11,13 @@ const SIGNAL_LEVEL_LOW = 25
 const SIGNAL_LEVEL_MED = 50
 const SIGNAL_LEVEL_HIGH = 75
 
-const StyledWrapper: StyledComponent<{||}, {||}, HTMLDivElement> = styled.div`
+const StyledWrapper: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   ${FONT_BODY_1_DARK}
   width: 100%;
   display: flex;
 `
 
-const StyledIcon: StyledComponent<IconProps, {||}, typeof Icon> = styled(Icon)`
+const StyledIcon: StyledComponent<IconProps, {}, typeof Icon> = styled(Icon)`
   flex: none;
   height: 1rem;
   width: 1rem;
@@ -27,7 +26,7 @@ const StyledIcon: StyledComponent<IconProps, {||}, typeof Icon> = styled(Icon)`
 
 const StyledConnectedIcon: StyledComponent<
   IconProps,
-  {||},
+  {},
   typeof StyledIcon
 > = styled(StyledIcon)`
   margin-left: -0.5rem;
@@ -35,8 +34,8 @@ const StyledConnectedIcon: StyledComponent<
 `
 
 const StyledName: StyledComponent<
-  {| padLeft?: boolean |},
-  {||},
+  { padLeft?: boolean },
+  {},
   HTMLSpanElement
 > = styled.span`
   flex-basis: 100%;
@@ -48,14 +47,13 @@ const StyledName: StyledComponent<
   `}
 `
 
-export type NetworkOptionLabelProps = {|
-  ...WifiNetwork,
+export interface NetworkOptionLabelProps extends WifiNetwork {
   showConnectedIcon: boolean,
-|}
+}
 
 export const NetworkOptionLabel = (
   props: NetworkOptionLabelProps
-): React.Node => {
+): JSX.Element => {
   const { ssid, active, securityType, showConnectedIcon } = props
   const hasConnectedIcon = active && showConnectedIcon
   const hasSecureIcon = securityType !== SECURITY_NONE
@@ -72,9 +70,9 @@ export const NetworkOptionLabel = (
 
 export const NetworkActionLabel = ({
   label,
-}: {|
+}: {
   label: string,
-|}): React.Node => <StyledName padLeft={true}>{label}</StyledName>
+}): JSX.Element => <StyledName padLeft={true}>{label}</StyledName>
 
 const renderSignalIcon = signal => {
   let iconName: IconName

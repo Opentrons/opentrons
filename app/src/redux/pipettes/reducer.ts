@@ -1,5 +1,3 @@
-// @flow
-
 import * as Constants from './constants'
 
 import type { Action } from '../types'
@@ -13,9 +11,10 @@ const INITIAL_PIPETTES_STATE: PerRobotPipettesState = {
 }
 
 export function pipettesReducer(
-  state: PipettesState = INITIAL_STATE,
+  state: PipettesState,
   action: Action
 ): PipettesState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_PIPETTES_SUCCESS: {
       const { robotName, pipettes } = action.payload

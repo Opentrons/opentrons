@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { NavLink } from 'react-router-dom'
 import { css } from 'styled-components'
@@ -26,10 +25,7 @@ import {
 import type { StyleProps } from '@opentrons/components'
 import type { NavLocation } from '../../redux/nav/types'
 
-export type NavbarLinkProps = {|
-  ...NavLocation,
-  ...StyleProps,
-|}
+export type NavbarLinkProps = NavLocation & StyleProps
 
 const ACTIVE_STYLE = css`
   &.active {
@@ -50,7 +46,7 @@ const ACTIVE_STYLE = css`
   }
 `
 
-export function NavbarLink(props: NavbarLinkProps): React.Node {
+export function NavbarLink(props: NavbarLinkProps): JSX.Element {
   const {
     id,
     path,

@@ -1,4 +1,3 @@
-// @flow
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 
 import * as Discovery from '../../../discovery'
@@ -6,7 +5,9 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { networkingEpic } from '..'
 
-const makeTriggerAction = robotName =>
+import type { Action } from '../../../types'
+
+const makeTriggerAction = (robotName: string) =>
   Actions.postWifiConfigure(robotName, {
     ssid: 'network-name',
     psk: 'network-password',
@@ -23,7 +24,7 @@ describe('networking wifiConfigureEpic', () => {
       Fixtures.mockWifiConfigureSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
@@ -45,7 +46,7 @@ describe('networking wifiConfigureEpic', () => {
       Fixtures.mockWifiConfigureSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
@@ -66,7 +67,7 @@ describe('networking wifiConfigureEpic', () => {
       Fixtures.mockWifiConfigureFailure
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
@@ -83,10 +84,10 @@ describe('networking wifiConfigureEpic', () => {
 
   it('dispatches FETCH_WIFI_LIST and START_DISCOVERY on success', () => {
     const mocks = setupEpicTestMocks(robotName =>
-      Actions.postWifiConfigureSuccess(robotName, 'network-name', {})
+      Actions.postWifiConfigureSuccess(robotName, 'network-name', {} as any)
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)

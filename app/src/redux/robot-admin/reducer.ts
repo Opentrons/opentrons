@@ -1,4 +1,3 @@
-// @flow
 import * as Constants from './constants'
 
 import type { Action } from '../types'
@@ -7,9 +6,10 @@ import type { RobotAdminState } from './types'
 const INITIAL_STATE: RobotAdminState = {}
 
 export function robotAdminReducer(
-  state: RobotAdminState = INITIAL_STATE,
+  state: RobotAdminState,
   action: Action
 ): RobotAdminState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.RESTART_STATUS_CHANGED:
     case Constants.RESTART_FAILURE: {

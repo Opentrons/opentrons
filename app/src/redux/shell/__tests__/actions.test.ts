@@ -1,4 +1,3 @@
-// @flow
 import { uiInitialized } from '../actions'
 
 describe('shell actions', () => {

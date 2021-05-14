@@ -1,4 +1,3 @@
-// @flow
 
 export const CALIBRATION_SOURCE_DEFAULT: 'default' = 'default'
 export const CALIBRATION_SOURCE_FACTORY: 'factory' = 'factory'

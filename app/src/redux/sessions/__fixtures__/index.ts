@@ -1,4 +1,3 @@
-// @flow
 
 import { POST, DELETE, GET } from '../../robot-api'
 import {

@@ -1,4 +1,3 @@
-// @flow
 // robot session (protocol) state and reducer
 import omit from 'lodash/omit'
 import { actionTypes } from '../actions'
@@ -19,46 +18,34 @@ import type {
 import type { InvalidProtocolFileAction } from '../../protocol/types'
 import type { SessionUpdateAction } from '../actions'
 
-type Request = {
-  inProgress: boolean,
-  error: ?{ message: string },
+export interface Request {
+  inProgress: boolean
+  error: { message: string } | null | undefined
 }
 
-export type SessionState = {
-  sessionRequest: Request,
-  state: SessionStatus,
-  statusInfo: SessionStatusInfo,
+export interface SessionState {
+  sessionRequest: Request
+  state: SessionStatus
+  statusInfo: SessionStatusInfo
   // TODO(aa, 2020-06-01): DoorState is not currently used anywhere yet
-  doorState: DoorState,
-  blocked: boolean,
-  errors: Array<{|
-    timestamp: number,
-    line: number,
-    message: string,
-  |}>,
+  doorState: DoorState
+  blocked: boolean
+  errors: Array<{ timestamp: number; line: number; message: string }>
   // TODO(mc, 2018-01-11): command IDs should be strings
-  protocolCommands: Array<number>,
-  protocolCommandsById: {
-    [number]: Command,
-  },
-  pipettesByMount: {
-    [Mount]: StatePipette,
-  },
-  labwareBySlot: {
-    [Slot]: StateLabware,
-  },
-  modulesBySlot: {
-    [Slot]: SessionModule,
-  },
-  runRequest: Request,
-  pauseRequest: Request,
-  resumeRequest: Request,
-  cancelRequest: Request,
-  remoteTimeCompensation: number | null,
-  startTime: ?number,
-  runTime: number,
-  apiLevel: [number, number] | null,
-  capabilities: Array<string>,
+  protocolCommands: number[]
+  protocolCommandsById: { [id: number]: Command }
+  pipettesByMount: { [mount in Mount]?: StatePipette }
+  labwareBySlot: { [slot in Slot]?: StateLabware }
+  modulesBySlot: { [slot in Slot]?: SessionModule }
+  runRequest: Request
+  pauseRequest: Request
+  resumeRequest: Request
+  cancelRequest: Request
+  remoteTimeCompensation: number | null
+  startTime: number | null | undefined
+  runTime: number
+  apiLevel: [number, number] | null
+  capabilities: string[]
 }
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
@@ -108,9 +95,10 @@ const INITIAL_STATE: SessionState = {
 }
 
 export function sessionReducer(
-  state: SessionState = INITIAL_STATE,
+  state: SessionState,
   action: Action
 ): SessionState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case 'robot:CONNECT_RESPONSE': {
       if (action.payload.error) return state

@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import sortBy from 'lodash/sortBy'
 
@@ -20,7 +19,7 @@ export { getModuleType } from '@opentrons/shared-data'
 export const getAttachedModules: (
   state: State,
   robotName: string | null
-) => Array<Types.AttachedModule> = createSelector(
+) => Types.AttachedModule[] = createSelector(
   (state, robotName) =>
     robotName !== null ? state.modules[robotName]?.modulesById : {},
   // sort by usbPort info, if they do not exist (robot version below 4.3), sort by serial
@@ -30,7 +29,7 @@ export const getAttachedModules: (
 
 export const getAttachedModulesForConnectedRobot = (
   state: State
-): Array<Types.AttachedModule> => {
+): Types.AttachedModule[] => {
   const robotName = RobotSelectors.getConnectedRobotName(state)
   return getAttachedModules(state, robotName)
 }
@@ -43,7 +42,7 @@ const isModulePrepared = (module: Types.AttachedModule): boolean => {
 
 export const getUnpreparedModules: (
   state: State
-) => Array<Types.AttachedModule> = createSelector(
+) => Types.AttachedModule[] = createSelector(
   getAttachedModulesForConnectedRobot,
   RobotSelectors.getModules,
   (attachedModules, protocolModules) => {
@@ -86,7 +85,7 @@ export const getMatchedModules: (
 
 export const getMissingModules: (
   state: State
-) => Array<SessionModule> = createSelector(
+) => SessionModule[] = createSelector(
   getAttachedModulesForConnectedRobot,
   RobotSelectors.getModules,
   (attachedModules, protocolModules) => {

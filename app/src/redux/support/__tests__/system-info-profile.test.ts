@@ -1,21 +1,17 @@
-// @flow
-
 import { makeProfileUpdate } from '../profile'
 
 import * as SystemInfo from '../../system-info'
 import * as Fixtures from '../../system-info/__fixtures__'
 
 import type { State } from '../../types'
-import type { U2EAnalyticsProps } from '../../system-info/types'
 
 jest.mock('../../system-info/selectors')
 
-const getU2EDeviceAnalyticsProps: JestMockFn<
-  [State],
-  U2EAnalyticsProps | null
-> = SystemInfo.getU2EDeviceAnalyticsProps
+const getU2EDeviceAnalyticsProps = SystemInfo.getU2EDeviceAnalyticsProps as jest.MockedFunction<
+  typeof SystemInfo.getU2EDeviceAnalyticsProps
+>
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = { mockState: true } as any
 const MOCK_ANALYTICS_PROPS = {
   'U2E Vendor ID': Fixtures.mockRealtekDevice.vendorId,
   'U2E Product ID': Fixtures.mockRealtekDevice.productId,

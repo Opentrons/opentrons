@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import ReactDom from 'react-dom'
 import { Box } from '@opentrons/components'
@@ -9,41 +8,41 @@ import { Box } from '@opentrons/components'
 
 type PortalLevel = 'page' | 'top'
 
-type Props = {|
-  children: React.Node,
-  level: PortalLevel,
-|}
+interface  Props {
+  children: React.ReactNode
+  level: PortalLevel
+}
 
-type State = {|
-  hasRoot: boolean,
-|}
+interface  State {
+  hasRoot: boolean
+}
 
-type PortalLevelInfo = {|
-  id: string,
-  zIndex: number | string,
-|}
+interface  PortalLevelInfo {
+  id: string
+  zIndex: number | string
+}
 
-const PORTAL_ROOT_PROPS_BY_LEVEL: { [PortalLevel]: PortalLevelInfo } = {
+const PORTAL_ROOT_PROPS_BY_LEVEL: Record<PortalLevel, PortalLevelInfo> = {
   page: { id: '__otAppModalPortalRoot', zIndex: 1 },
   top: { id: '__otAppTopPortalRoot', zIndex: 10 },
 }
 
-const getPortalRoot = level =>
+const getPortalRoot = (level: PortalLevel): HTMLDivElement =>
   global.document.getElementById(PORTAL_ROOT_PROPS_BY_LEVEL[level].id)
 
-export function PortalRoot(): React.Node {
+export function PortalRoot(): JSX.Element {
   return <Box {...PORTAL_ROOT_PROPS_BY_LEVEL.page} />
 }
 
-export function TopPortalRoot(): React.Node {
+export function TopPortalRoot(): JSX.Element {
   return <Box {...PORTAL_ROOT_PROPS_BY_LEVEL.top} />
 }
 
 // the children of Portal are rendered into the PortalRoot if it exists in DOM
 export class Portal extends React.Component<Props, State> {
-  $root: ?Element
+  $root: Element | null | undefined
 
-  static defaultProps: {| level: PortalLevel |} = {
+  static defaultProps: { level: PortalLevel } = {
     level: 'page',
   }
 
@@ -55,14 +54,14 @@ export class Portal extends React.Component<Props, State> {
 
   // on first launch, $portalRoot isn't in DOM; double check once we're mounted
   // TODO(mc, 2018-10-08): prerender UI instead
-  componentDidMount() {
+  componentDidMount(): void {
     if (!this.$root) {
       this.$root = getPortalRoot(this.props.level)
       this.setState({ hasRoot: !!this.$root })
     }
   }
 
-  render(): React.Portal | null {
+  render(): React.ReactPortal | null {
     if (!this.$root) return null
     return ReactDom.createPortal(this.props.children, this.$root)
   }

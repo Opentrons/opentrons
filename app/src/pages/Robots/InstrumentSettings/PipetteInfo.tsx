@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -34,14 +33,14 @@ import { PipetteCalibrationInfo } from './PipetteCalibrationInfo'
 import type { State } from '../../../redux/types'
 import type { Mount, AttachedPipette } from '../../../redux/pipettes/types'
 
-export type PipetteInfoProps = {|
+export interface PipetteInfoProps {
   robotName: string,
   mount: Mount,
   pipette: AttachedPipette | null,
   changeUrl: string,
   settingsUrl: string | null,
   isChangingOrConfiguringPipette: boolean,
-|}
+}
 
 const MOUNT = 'mount'
 const SERIAL_NUMBER = 'Serial number'
@@ -49,7 +48,7 @@ const CHANGE = 'change'
 const ATTACH = 'attach'
 const NONE = 'none'
 
-export function PipetteInfo(props: PipetteInfoProps): React.Node {
+export function PipetteInfo(props: PipetteInfoProps): JSX.Element {
   const {
     robotName,
     mount,

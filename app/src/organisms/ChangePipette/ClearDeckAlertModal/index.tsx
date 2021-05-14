@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
@@ -7,21 +6,21 @@ import removeTrashSrc from '../../../assets/images/remove-trash@3x.png'
 import { Portal } from '../../../App/portal'
 import styles from './styles.css'
 
-export type ClearDeckAlertModalProps = {|
-  onContinueClick?: () => mixed,
-  onCancelClick?: () => mixed,
+export interface ClearDeckAlertModalProps {
+  onContinueClick?: () => unknown,
+  onCancelClick?: () => unknown,
   parentUrl?: string,
   cancelText: string,
   continueText: string,
   removeTrash?: boolean,
-  children?: React.Node,
-|}
+  children?: React.ReactNode,
+}
 
 const HEADING = 'Before continuing, please remove:'
 
 export function ClearDeckAlertModal(
   props: ClearDeckAlertModalProps
-): React.Node {
+): JSX.Element {
   const {
     onContinueClick,
     onCancelClick,
@@ -36,7 +35,6 @@ export function ClearDeckAlertModal(
       <AlertModal
         heading={HEADING}
         buttons={[
-          /* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion or replacement of AlertModal */
           {
             children: `${cancelText}`,
             onClick: onCancelClick,

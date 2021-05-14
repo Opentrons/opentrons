@@ -1,21 +1,17 @@
-// @flow
-
 import { makeProfileUpdate } from '../profile'
 
 import * as Alerts from '../../alerts'
 import * as Config from '../../config'
 
 import type { State } from '../../types'
-import type { AlertId } from '../../alerts/types'
 
 jest.mock('../../alerts/selectors')
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = { mockState: true } as any
 
-const getAlertIsPermanentlyIgnored: JestMockFn<
-  [State, AlertId],
-  boolean | null
-> = Alerts.getAlertIsPermanentlyIgnored
+const getAlertIsPermanentlyIgnored = Alerts.getAlertIsPermanentlyIgnored as jest.MockedFunction<
+  typeof Alerts.getAlertIsPermanentlyIgnored
+>
 
 describe('app config profile updates', () => {
   beforeEach(() => {

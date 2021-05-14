@@ -1,4 +1,3 @@
-// @flow
 // info panel and controls for labware calibration page
 import * as React from 'react'
 import { withRouter } from 'react-router-dom'
@@ -7,16 +6,14 @@ import { DeckMap } from '../../../molecules/DeckMap'
 import { InfoBox } from './InfoBox'
 import styles from './styles.css'
 
-import type { ContextRouter } from 'react-router-dom'
+import type { RouteComponentProps } from 'react-router-dom'
 import type { Labware } from '../../../redux/robot/types'
 
-type Props = {| ...ContextRouter, labware: ?Labware |}
+interface Props extends RouteComponentProps<{slot: string}> { labware: Labware | null | undefined}
 
-export const CalibrateLabware: React.AbstractComponent<
-  $Diff<Props, ContextRouter>
-> = withRouter(CalibrateLabwareComponent)
+export const CalibrateLabware = withRouter(CalibrateLabwareComponent)
 
-function CalibrateLabwareComponent(props: Props) {
+function CalibrateLabwareComponent(props: Props): JSX.Element {
   return (
     <div className={styles.calibrate_labware_wrapper}>
       <InfoBox labware={props.labware} />

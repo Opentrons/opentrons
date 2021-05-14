@@ -1,4 +1,3 @@
-// @flow
 import * as Constants from './constants'
 
 import type { Action } from '../types'
@@ -12,9 +11,10 @@ const INITIAL_ROBOT_STATE: PerRobotRobotSettingsState = {
 }
 
 export function robotSettingsReducer(
-  state: RobotSettingsState = INITIAL_STATE,
+  state: RobotSettingsState,
   action: Action
 ): RobotSettingsState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_SETTINGS_SUCCESS:
     case Constants.UPDATE_SETTING_SUCCESS: {

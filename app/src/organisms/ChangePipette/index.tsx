@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'
@@ -46,12 +45,13 @@ import {
 import type { State, Dispatch } from '../../redux/types'
 import type { Mount } from '../../redux/robot/types'
 import type { WizardStep } from './types'
+import type { PipetteName } from '@opentrons/shared-data'
 
-type Props = {|
+interface Props {
   robotName: string,
   mount: Mount,
-  closeModal: () => mixed,
-|}
+  closeModal: () => unknown,
+}
 
 // TODO(mc, 2019-12-18): i18n
 const PIPETTE_SETUP = 'Pipette Setup'
@@ -60,10 +60,10 @@ const CANCEL = 'Cancel'
 const MOUNT = 'mount'
 const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 
-export function ChangePipette(props: Props): React.Node {
+export function ChangePipette(props: Props): JSX.Element | null {
   const { robotName, mount, closeModal } = props
   const dispatch = useDispatch<Dispatch>()
-  const finalRequestId = React.useRef<string | null>(null)
+  const finalRequestId = React.useRef<string | null | undefined>(null)
   const [dispatchApiRequests] = useDispatchApiRequests(dispatchedAction => {
     if (
       dispatchedAction.type === HOME &&
@@ -76,7 +76,7 @@ export function ChangePipette(props: Props): React.Node {
   const [wizardStep, setWizardStep] = React.useState<WizardStep>(CLEAR_DECK)
   const [wantedName, setWantedName] = React.useState<string | null>(null)
   const [confirmExit, setConfirmExit] = React.useState(false)
-  const wantedPipette = wantedName ? getPipetteNameSpecs(wantedName) : null
+  const wantedPipette = wantedName ? getPipetteNameSpecs(wantedName as PipetteName) : null
   const attachedPipette = useSelector(
     (state: State) => getAttachedPipettes(state, robotName)[mount]
   )
@@ -120,7 +120,7 @@ export function ChangePipette(props: Props): React.Node {
 
   const startPipetteOffsetWizard = (
     hasBlockModalResponse: boolean | null = null
-  ) => {
+  ): void => {
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
       setShowCalBlockModal(true)
     } else {
@@ -212,7 +212,7 @@ export function ChangePipette(props: Props): React.Node {
 
     const attachedWrong = Boolean(!success && wantedPipette && actualPipette)
 
-    const launchPOC = () => {
+    const launchPOC = (): void => {
       // home before cal flow to account for skips when attaching pipette
       setWizardStep(CALIBRATE_PIPETTE)
       dispatchApiRequests(home(robotName, ROBOT))

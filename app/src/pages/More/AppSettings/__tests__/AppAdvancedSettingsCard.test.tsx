@@ -1,56 +1,41 @@
-// @flow
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
 import * as Config from '../../../../redux/config'
 import { AppAdvancedSettingsCard } from '../AppAdvancedSettingsCard'
 
-import type { State } from '../../../../redux/types'
+import type { State, Action } from '../../../../redux/types'
+import type { HTMLAttributes, ReactWrapper } from 'enzyme'
 
 jest.mock('../../../../redux/config/selectors')
 
-const getUseTrashSurfaceForTipCal: JestMockFn<
-  [State],
-  $Call<typeof Config.getUseTrashSurfaceForTipCal, State>
-> = Config.getUseTrashSurfaceForTipCal
+const getUseTrashSurfaceForTipCal = Config.getUseTrashSurfaceForTipCal as jest.MockedFunction<typeof Config.getUseTrashSurfaceForTipCal>
 
-const getDevtoolsEnabled: JestMockFn<
-  [State],
-  $Call<typeof Config.getDevtoolsEnabled, State>
-> = Config.getDevtoolsEnabled
+const getDevtoolsEnabled = Config.getDevtoolsEnabled as jest.MockedFunction<typeof Config.getDevtoolsEnabled>
 
-const getFeatureFlags: JestMockFn<
-  [State],
-  $Call<typeof Config.getFeatureFlags, State>
-> = Config.getFeatureFlags
+const getFeatureFlags = Config.getFeatureFlags as jest.MockedFunction<typeof Config.getFeatureFlags>
 
-const getUpdateChannel: JestMockFn<
-  [State],
-  $Call<typeof Config.getUpdateChannel, State>
-> = Config.getUpdateChannel
+const getUpdateChannel = Config.getUpdateChannel as jest.MockedFunction<typeof Config.getUpdateChannel>
 
-const getUpdateChannelOptions: JestMockFn<
-  [State],
-  $Call<typeof Config.getUpdateChannelOptions, State>
-> = Config.getUpdateChannelOptions
+const getUpdateChannelOptions = Config.getUpdateChannelOptions as jest.MockedFunction<typeof Config.getUpdateChannelOptions>
 
-const MOCK_STATE: $Shape<State> = { robotApi: {} }
+const MOCK_STATE: State = { robotApi: {} } as any
 
 describe('AppAdvancedSettingsCard', () => {
   const render = () => {
-    return mountWithStore(<AppAdvancedSettingsCard />, {
+    return mountWithStore<React.ComponentProps<typeof AppAdvancedSettingsCard>, State, Action>(<AppAdvancedSettingsCard />, {
       initialState: MOCK_STATE,
     })
   }
 
-  const getUseTrashForTipCalRadioGroup = wrapper =>
+  const getUseTrashForTipCalRadioGroup = (wrapper: ReactWrapper<React.ComponentProps<typeof AppAdvancedSettingsCard>>): ReactWrapper =>
     wrapper.find(
       'LabeledRadioGroup[data-test="useTrashSurfaceForTipCalRadioGroup"]'
     )
 
-  const getDevtoolsToggle = wrapper =>
+  const getDevtoolsToggle = (wrapper: ReactWrapper<React.ComponentProps<typeof AppAdvancedSettingsCard>>): ReactWrapper<HTMLAttributes> =>
     wrapper.find('LabeledToggle[data-test="enableDevToolsToggle"]')
 
-  const getUpdateChannelSelect = wrapper =>
+  const getUpdateChannelSelect = (wrapper: ReactWrapper<React.ComponentProps<typeof AppAdvancedSettingsCard>>): ReactWrapper<HTMLAttributes> =>
     wrapper.find('LabeledSelect[data-test="updateChannelSetting"]')
 
   beforeEach(() => {
@@ -77,12 +62,12 @@ describe('AppAdvancedSettingsCard', () => {
     expect(getDevtoolsToggle(wrapper).exists()).toBe(true)
   })
 
-  const SPECS: Array<{|
+  const SPECS: Array<{
     originalSettingValue: boolean | null,
     originalRadioValue: 'always-trash' | 'always-block' | 'always-prompt',
     newSettingValue: boolean | null,
     newRadioValue: 'always-trash' | 'always-block' | 'always-prompt',
-  |}> = [
+  }> = [
     {
       originalSettingValue: true,
       originalRadioValue: 'always-trash',
@@ -155,7 +140,7 @@ describe('AppAdvancedSettingsCard', () => {
 
       getUseTrashSurfaceForTipCal.mockReturnValue(spec.newSettingValue)
 
-      refresh({ state: 'value' })
+      refresh({ state: 'value' } as any)
       expect(
         getUseTrashForTipCalRadioGroup(wrapper)
           .find(`input[value="${spec.newRadioValue}"]`)
@@ -179,15 +164,15 @@ describe('AppAdvancedSettingsCard', () => {
 
   it('switching toggles dispatches toggle action', () => {
     const { wrapper, store } = render()
-    getDevtoolsToggle(wrapper).invoke('onClick')()
+    getDevtoolsToggle(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
     expect(store.dispatch).toHaveBeenCalledWith(
       expect.objectContaining(Config.toggleConfigValue('devtools'))
     )
 
-    getUpdateChannelSelect(wrapper).invoke('onChange')({
+    getUpdateChannelSelect(wrapper).invoke('onChange')?.({
       target: { value: 'alpha' },
-    })
+    } as any)
     wrapper.update()
     expect(store.dispatch).toHaveBeenCalledWith(
       Config.updateConfigValue('update.channel', 'alpha')

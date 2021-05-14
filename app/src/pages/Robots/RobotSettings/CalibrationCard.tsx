@@ -1,4 +1,3 @@
-// @flow
 // calibration panel with various calibration-related controls and info
 
 import * as React from 'react'
@@ -43,10 +42,10 @@ import { DeckCalibrationControl } from './DeckCalibrationControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
 import { PipetteOffsets } from './PipetteOffsets'
 
-type Props = {|
+interface Props {
   robot: ViewableRobot,
   pipettesPageUrl: string,
-|}
+}
 
 const DECK_CAL_STATUS_POLL_INTERVAL = 10000
 const CAL_ARTICLE_URL =
@@ -66,7 +65,7 @@ const attachedPipetteCalPresent: (
   return true
 }
 
-export function CalibrationCard(props: Props): React.Node {
+export function CalibrationCard(props: Props): JSX.Element {
   const { robot, pipettesPageUrl } = props
   const { name: robotName, status } = robot
   const notConnectable = status !== CONNECTABLE
@@ -132,7 +131,7 @@ export function CalibrationCard(props: Props): React.Node {
     buttonDisabledReason = t('shared:disabled_no_pipette_attached')
   }
 
-  const onClickSaveAs = e => {
+  const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
     doTrackEvent({
       name: Calibration.EVENT_CALIBRATION_DOWNLOADED,
@@ -151,11 +150,11 @@ export function CalibrationCard(props: Props): React.Node {
   }
 
   const displayCalCheck =
-    ![
+    !([
       Calibration.DECK_CAL_STATUS_SINGULARITY,
       Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
       Calibration.DECK_CAL_STATUS_IDENTITY,
-    ].includes(deckCalStatus) &&
+    ] as Array<typeof deckCalStatus>).includes(deckCalStatus) &&
     pipetteCalPresent &&
     pipettePresent
 

@@ -1,4 +1,3 @@
-// @flow
 import { TestScheduler } from 'rxjs/testing'
 
 import * as RobotAdminSelectors from '../../../robot-admin/selectors'
@@ -6,19 +5,21 @@ import * as Actions from '../../actions'
 import * as Selectors from '../../selectors'
 import { robotSettingsEpic } from '..'
 
-import type { State } from '../../../types'
+import type { Action, State } from '../../../types'
 
 jest.mock('../../../robot-admin/selectors')
 jest.mock('../../selectors')
 
-const mockGetRobotRestarting: JestMockFn<[State, string], mixed> =
-  RobotAdminSelectors.getRobotRestarting
+const mockGetRobotRestarting = RobotAdminSelectors.getRobotRestarting as jest.MockedFunction<
+  typeof RobotAdminSelectors.getRobotRestarting
+>
 
-const mockGetAllRestartRequiredRobots: JestMockFn<[State], Array<string>> =
-  Selectors.getAllRestartRequiredRobots
+const mockGetAllRestartRequiredRobots = Selectors.getAllRestartRequiredRobots as jest.MockedFunction<
+  typeof Selectors.getAllRestartRequiredRobots
+>
 
 describe('clearRestartPathEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     mockGetAllRestartRequiredRobots.mockReturnValue([])
@@ -38,8 +39,8 @@ describe('clearRestartPathEpic', () => {
     mockGetRobotRestarting.mockReturnValue(true)
 
     testScheduler.run(({ hot, cold, expectObservable }) => {
-      const action$ = cold('--')
-      const state$ = hot('-a', { a: {} })
+      const action$ = cold<Action>('--')
+      const state$ = hot<State>('-a', { a: {} } as any)
       const output$ = robotSettingsEpic(action$, state$)
 
       expectObservable(output$).toBe('-(ab)', {

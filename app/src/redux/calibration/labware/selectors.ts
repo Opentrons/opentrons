@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import head from 'lodash/head'
 import uniqWith from 'lodash/uniqWith'
@@ -22,7 +21,7 @@ import type { LabwareSummary, BaseProtocolLabware } from './types'
 export const getLabwareCalibrations = (
   state: State,
   robotName: string
-): Array<LabwareCalibration> => {
+): LabwareCalibration[] => {
   return state.calibration[robotName]?.labwareCalibrations?.data ?? []
 }
 
@@ -31,7 +30,7 @@ export const getLabwareCalibrations = (
 export const getProtocolLabwareList: (
   state: State,
   robotName: string
-) => Array<BaseProtocolLabware> = createSelector(
+) => BaseProtocolLabware[] = createSelector(
   (state, robotName) => robotSelectors.getLabware(state),
   getLabwareCalibrations,
   (state, robotName) => robotSelectors.getModulesBySlot(state),
@@ -67,12 +66,12 @@ export const getProtocolLabwareList: (
 export const getUniqueProtocolLabwareSummaries: (
   state: State,
   robotName: string
-) => Array<LabwareSummary> = createSelector(
+) => LabwareSummary[] = createSelector(
   getProtocolLabwareList,
   getLabwareCalibrations,
   (
-    baseLabwareList: Array<BaseProtocolLabware>,
-    calibrations: Array<LabwareCalibration>
+    baseLabwareList: BaseProtocolLabware[],
+    calibrations: LabwareCalibration[]
   ) => {
     const uniqueLabware = uniqWith<BaseProtocolLabware>(
       baseLabwareList,

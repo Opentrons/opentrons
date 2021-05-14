@@ -1,4 +1,3 @@
-// @flow
 import type { UsbDevice, NetworkInterface } from '../types'
 
 export const mockUsbDevice: UsbDevice = {

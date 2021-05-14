@@ -1,4 +1,3 @@
-// @flow
 // api request state reducer
 // tracks requests by ID
 // TODO(mc, 2020-03-05): caution! type checking in this file appears to

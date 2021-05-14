@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { HOMING, MOVING } from '../../redux/robot-controls'
@@ -16,15 +15,15 @@ const TO_FRONT_AND_RIGHT = 'to front and right'
 const UP = 'up'
 const ROBOT_IS_HOMING = 'Robot is homing'
 
-type Props = {|
+type Props = {
   title: string,
   subtitle: string,
   mount: Mount,
   movementStatus: MovementStatus,
   isPipetteHoming: boolean,
-|}
+}
 
-export function RequestInProgressModal(props: Props): React.Node {
+export function RequestInProgressModal(props: Props): JSX.Element {
   const { title, subtitle, mount, movementStatus, isPipetteHoming } = props
   let message = `${mount === RIGHT ? RIGHT_PIP : LEFT_PIP} ${CARRIAGE_MOVING}`
 

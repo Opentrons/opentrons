@@ -1,4 +1,3 @@
-// @flow
 // attached pipettes container card
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -28,19 +27,19 @@ import {
 } from '../../../redux/calibration'
 import type { Mount } from '../../../redux/pipettes/types'
 
-type Props = {|
+interface Props {
   robotName: string,
   makeChangeUrl: (mount: Mount) => string,
   makeConfigureUrl: (mount: Mount) => string,
   isChangingOrConfiguringPipette: boolean,
-|}
+}
 
 // TODO(mc, 2019-12-09): i18n
 const PIPETTES = 'Pipettes'
 
 const FETCH_PIPETTES_INTERVAL_MS = 5000
 
-export function AttachedPipettesCard(props: Props): React.Node {
+export function AttachedPipettesCard(props: Props): JSX.Element {
   const {
     robotName,
     makeChangeUrl,

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
@@ -14,22 +13,21 @@ import { PrimaryButton, Icon } from '@opentrons/components'
 
 import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import type { FetchPipettesAction } from '../../redux/pipettes/types'
 
-export type CheckPipetteButtonProps = {|
+export interface CheckPipetteButtonProps {
   robotName: string,
   className: string,
-  children: React.Node,
+  children: React.ReactNode,
   hidden?: boolean,
-  onDone?: () => mixed,
-|}
+  onDone?: () => unknown,
+}
 
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps
-): React.Node {
+): JSX.Element | null {
   const { robotName, onDone, className, children, hidden = false } = props
   const fetchPipettesRequestId = React.useRef<string | null>(null)
-  const [dispatch] = useDispatchApiRequests<FetchPipettesAction>(
+  const [dispatch] = useDispatchApiRequests(
     dispatchedAction => {
       if (
         dispatchedAction.type === FETCH_PIPETTES &&
@@ -39,7 +37,7 @@ export function CheckPipettesButton(
       }
     }
   )
-  const handleClick = () => dispatch(fetchPipettes(robotName, true))
+  const handleClick = (): void => dispatch(fetchPipettes(robotName, true))
   const requestStatus = useSelector<State, RequestState | null>(state =>
     fetchPipettesRequestId.current
       ? getRequestById(state, fetchPipettesRequestId.current)

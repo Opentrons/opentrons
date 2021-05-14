@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   Icon,
@@ -76,7 +75,7 @@ const DECK_INVALIDATES =
   'Recalibrating your deck will invalidate Pipette Offsets, and you will need to recalibrate Pipette Offsets after redoing Deck Calibration.'
 const NO_PIPETTE = 'No pipette attached'
 
-export function ResultsSummary(props: CalibrationPanelProps): React.Node {
+export function ResultsSummary(props: CalibrationPanelProps): JSX.Element | null {
   const {
     comparisonsByPipette,
     instruments,
@@ -88,7 +87,7 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
     return null
   }
 
-  const handleDownloadButtonClick = () => {
+  const handleDownloadButtonClick = (): void => {
     const now = new Date()
     const report = {
       comparisonsByPipette,
@@ -130,7 +129,7 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
     : comparisonsByPipette.first.deck?.status
   const deckCalibrationResult = getDeckCalibration ?? null
 
-  const pipetteResultsBad = perPipette => ({
+  const pipetteResultsBad = (perPipette: CalibrationCheckComparisonsPerCalibration | null): { offsetBad: boolean, tipLengthBad: boolean } => ({
     offsetBad: perPipette?.pipetteOffset?.status
       ? perPipette.pipetteOffset.status === CHECK_STATUS_OUTSIDE_THRESHOLD
       : false,
@@ -251,11 +250,11 @@ export function ResultsSummary(props: CalibrationPanelProps): React.Node {
   )
 }
 
-type RenderResultProps = {|
+interface RenderResultProps {
   status: string | null,
-|}
+}
 
-function RenderResult(props: RenderResultProps): React.Node {
+function RenderResult(props: RenderResultProps): JSX.Element | null {
   const { status } = props
   if (!status) {
     return null
@@ -278,12 +277,12 @@ function RenderResult(props: RenderResultProps): React.Node {
   }
 }
 
-type PipetteResultProps = {|
+interface PipetteResultProps {
   pipetteInfo: CalibrationCheckInstrument,
   pipetteCalibration: CalibrationCheckComparisonsPerCalibration,
-|}
+}
 
-function PipetteResult(props: PipetteResultProps): React.Node {
+function PipetteResult(props: PipetteResultProps): JSX.Element {
   const { pipetteInfo, pipetteCalibration } = props
   const displayName =
     getPipetteModelSpecs(pipetteInfo.model)?.displayName || pipetteInfo.model
@@ -324,13 +323,13 @@ function PipetteResult(props: PipetteResultProps): React.Node {
   )
 }
 
-function WarningText(props: {|
+function WarningText(props: {
   deckCalibrationBad: boolean,
-  pipettes: {|
-    left: {| offsetBad: boolean, tipLengthBad: boolean |},
-    right: {| offsetBad: boolean, tipLengthBad: boolean |},
-  |},
-|}): React.Node | null {
+  pipettes: {
+    left: { offsetBad: boolean, tipLengthBad: boolean },
+    right: { offsetBad: boolean, tipLengthBad: boolean },
+  },
+}): JSX.Element | null {
   const badCount = [
     props.deckCalibrationBad,
     props.pipettes.left.offsetBad,

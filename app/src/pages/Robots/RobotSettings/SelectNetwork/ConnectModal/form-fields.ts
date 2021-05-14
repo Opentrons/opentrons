@@ -1,4 +1,3 @@
-// @flow
 import get from 'lodash/get'
 
 import * as Constants from '../constants'
@@ -37,7 +36,7 @@ const FIELD_PSK: ConnectFormTextField = {
 }
 
 const makeSecurityField = (
-  eapOptions: Array<EapOption>,
+  eapOptions: EapOption[],
   showAllOptions: boolean
 ): ConnectFormSecurityField => ({
   type: Constants.FIELD_TYPE_SECURITY,
@@ -48,7 +47,9 @@ const makeSecurityField = (
   showAllOptions,
 })
 
-const getEapIsSelected = (formSecurityType): boolean %checks => {
+const getEapIsSelected = (
+  formSecurityType: string | null | undefined
+): boolean => {
   return (
     formSecurityType != null &&
     formSecurityType !== Constants.SECURITY_NONE &&
@@ -57,26 +58,26 @@ const getEapIsSelected = (formSecurityType): boolean %checks => {
 }
 
 const getEapFields = (
-  eapOptions,
-  values,
-  errors,
-  touched
-): Array<WifiAuthField> => {
+  eapOptions: EapOption[],
+  values: ConnectFormValues,
+  errors?: ConnectFormErrors,
+  touched?: boolean
+): WifiAuthField[] => {
   const eapType = values.securityType
   return eapOptions
     .filter(opt => opt.name === eapType)
     .flatMap(opt => opt.options)
 }
 
-const getEapFieldName = baseName => `eapConfig.${baseName}`
+const getEapFieldName = (baseName: string): string => `eapConfig.${baseName}`
 
 export function getConnectFormFields(
   network: WifiNetwork | null,
   robotName: string,
-  eapOptions: Array<EapOption>,
-  wifiKeys: Array<WifiKey>,
+  eapOptions: EapOption[],
+  wifiKeys: WifiKey[],
   values: ConnectFormValues
-): Array<ConnectFormField> {
+): ConnectFormField[] {
   const { securityType: formSecurityType } = values
   const fields = []
 
@@ -138,7 +139,7 @@ export function getConnectFormFields(
 
 export function validateConnectFormFields(
   network: WifiNetwork | null,
-  eapOptions: Array<EapOption>,
+  eapOptions: EapOption[],
   values: ConnectFormValues
 ): ConnectFormErrors {
   const {
@@ -146,7 +147,7 @@ export function validateConnectFormFields(
     securityType: formSecurityType,
     psk: formPsk,
   } = values
-  const errors: $Shape<ConnectFormErrors> = {}
+  const errors: Partial<ConnectFormErrors> = {}
 
   if (network === null && !formSsid) {
     errors.ssid = Copy.FIELD_IS_REQUIRED(Copy.LABEL_SSID)
@@ -178,9 +179,14 @@ export function validateConnectFormFields(
       .filter(
         ({ name, required }) => required && !get(values, getEapFieldName(name))
       )
-      .forEach(({ name, displayName }) => {
-        errors[getEapFieldName(name)] = Copy.FIELD_IS_REQUIRED(displayName)
-      })
+      .forEach(
+        ({ name, displayName }: Pick<EapOption, 'name' | 'displayName'>) => {
+          // @ts-expect-error TODO: displayName could be undefined
+          errors[
+            getEapFieldName(name) as keyof typeof errors
+          ] = Copy.FIELD_IS_REQUIRED(displayName)
+        }
+      )
   }
 
   return errors
@@ -203,6 +209,7 @@ export const connectFormToConfigureRequest = (
 
   if (getEapIsSelected(formSecurityType)) {
     securityType = Constants.SECURITY_WPA_EAP
+    // @ts-expect-error TODO: formSecurityType could be undefined, but eapType expects string
     eapConfig = { eapType: formSecurityType }
   } else if (network) {
     securityType = network.securityType
@@ -211,7 +218,7 @@ export const connectFormToConfigureRequest = (
     values.securityType === Constants.SECURITY_WPA_PSK
   ) {
     // NOTE(mc, 2020-03-13): Flow v0.119 unable to refine via consts
-    securityType = ((values.securityType: any): WifiSecurityType)
+    securityType = values.securityType as WifiSecurityType
   }
 
   if (ssid !== null && securityType !== null) {

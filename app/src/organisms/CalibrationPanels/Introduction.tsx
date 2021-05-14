@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { css } from 'styled-components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
@@ -90,25 +89,23 @@ const NOTE_HEALTH_CHECK_OUTCOMES =
 const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 const TRASH_BIN = 'Removable black plastic trash bin'
 
-type BodySpec = {|
+interface BodySpec {
   preFragment: string | null,
   boldFragment: string | null,
   postFragment: string | null,
-|}
+}
 
-type PanelContents = {|
+interface PanelContents {
   headerText: string,
   invalidationText: string | null,
-  bodyContentFragments: Array<BodySpec>,
+  bodyContentFragments: BodySpec[],
   outcomeText: string | null,
   chooseTipRackButtonText: string | null,
   continueButtonText: string,
   noteBody: BodySpec,
-|}
+}
 
-const bodyContentFromFragments: (
-  Array<BodySpec>
-) => React.Node = contentFragments => {
+const bodyContentFromFragments = (contentFragments: BodySpec[]): JSX.Element => {
   return (
     <>
       {contentFragments
@@ -129,16 +126,16 @@ const bodyContentFromFragments: (
             )}
           </React.Fragment>
         ))
-        .reduce((prev, current) => [prev, ' ', current])}
+        .reduce<React.ReactNode[]>((prev, current) => [prev, ' ', current], [])}
     </>
   )
 }
 
-const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
-  sessionType,
-  isExtendedPipOffset,
-  intent
-) => {
+const contentsByParams = (
+  sessionType: SessionType,
+  isExtendedPipOffset?: boolean | null,
+  intent?: Intent
+): PanelContents => {
   switch (sessionType) {
     case Sessions.SESSION_TYPE_DECK_CALIBRATION:
       return {
@@ -384,7 +381,7 @@ const contentsByParams: (SessionType, ?boolean, ?Intent) => PanelContents = (
   }
 }
 
-export function Introduction(props: CalibrationPanelProps): React.Node {
+export function Introduction(props: CalibrationPanelProps): JSX.Element {
   const {
     tipRack,
     calBlock,
@@ -402,17 +399,17 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
     setChosenTipRack,
   ] = React.useState<LabwareDefinition2 | null>(null)
 
-  const handleChosenTipRack = (value: LabwareDefinition2 | null) => {
+  const handleChosenTipRack = (value: LabwareDefinition2 | null): void => {
     value && setChosenTipRack(value)
   }
-  const isExtendedPipOffset =
+  const isExtendedPipOffset: boolean | null | undefined =
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
     shouldPerformTipLength
   const uniqueTipRacks = new Set(
     instruments?.map(instr => instr.tipRackLoadName)
   )
 
-  const proceed = () => {
+  const proceed = (): void => {
     if (
       supportedCommands &&
       supportedCommands.includes(Sessions.sharedCalCommands.LOAD_LABWARE)
@@ -568,11 +565,11 @@ export function Introduction(props: CalibrationPanelProps): React.Node {
   )
 }
 
-type RequiredLabwareCardProps = {|
+interface RequiredLabwareCardProps {
   loadName: string,
   displayName: string,
   linkToMeasurements?: boolean,
-|}
+}
 
 const linkStyles = css`
   &:hover {
@@ -580,11 +577,11 @@ const linkStyles = css`
   }
 `
 
-function RequiredLabwareCard(props: RequiredLabwareCardProps) {
+function RequiredLabwareCard(props: RequiredLabwareCardProps): JSX.Element {
   const { loadName, displayName, linkToMeasurements } = props
   const imageSrc =
     loadName in labwareImages
-      ? labwareImages[loadName]
+      ? labwareImages[loadName as keyof typeof labwareImages]
       : labwareImages['generic_custom_tiprack']
 
   return (

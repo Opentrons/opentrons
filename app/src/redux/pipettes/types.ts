@@ -1,5 +1,3 @@
-// @flow
-
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { Pipette as ProtocolPipette } from '../robot/types'
 import type { RobotApiRequestMeta } from '../robot-api/types'
@@ -12,99 +10,103 @@ import type {
 
 export type Mount = 'left' | 'right'
 
-export type AttachedPipette = {|
-  id: string,
-  name: string,
-  model: string,
-  tip_length: number,
-  mount_axis: string,
-  plunger_axis: string,
-  modelSpecs: PipetteModelSpecs,
-|}
-
-export type AttachedPipettesByMount = {|
-  left: null | AttachedPipette,
-  right: null | AttachedPipette,
-|}
-
-export type PipetteSettingsField = {|
-  value: ?number,
-  default: number,
-  min?: number,
-  max?: number,
-  units?: string,
-  type?: string,
-|}
-
-export type PipetteQuirksField = {
-  [quirkId: string]: boolean,
+export interface AttachedPipette {
+  id: string
+  name: string
+  model: string
+  tip_length: number
+  mount_axis: string
+  plunger_axis: string
+  modelSpecs: PipetteModelSpecs
 }
 
-export type PipetteSettingsFieldsMap = {|
-  [fieldId: string]: PipetteSettingsField,
-  quirks?: PipetteQuirksField,
-|}
+export interface AttachedPipettesByMount {
+  left: null | AttachedPipette
+  right: null | AttachedPipette
+}
 
-export type PipetteSettings = {|
-  info: {| name: ?string, model: ?string |},
-  fields: PipetteSettingsFieldsMap,
-|}
+export interface PipetteSettingsField {
+  value: number | null | undefined
+  default: number
+  min?: number
+  max?: number
+  units?: string
+  type?: string
+}
 
-export type PipetteSettingsFieldsUpdate = $Shape<{|
-  [fieldId: string]: number | null,
-|}>
+export interface PipetteQuirksField {
+  [quirkId: string]: boolean
+}
 
-export type PipetteSettingsById = $Shape<{| [id: string]: PipetteSettings |}>
+interface QuirksField {
+  quirks?: PipetteQuirksField
+}
+export type PipetteSettingsFieldsMap = QuirksField & {
+  [fieldId: string]: PipetteSettingsField
+}
 
-export type PipetteSettingsByMount = {|
-  left: PipetteSettingsFieldsMap | null,
-  right: PipetteSettingsFieldsMap | null,
-|}
+export interface PipetteSettings {
+  info: { name: string | null | undefined; model: string | null | undefined }
+  fields: PipetteSettingsFieldsMap
+}
+
+export type PipetteSettingsFieldsUpdate = Partial<{
+  [fieldId: string]: number | null
+}>
+
+export type PipetteSettingsById = Partial<{ [id: string]: PipetteSettings }>
+
+export interface PipetteSettingsByMount {
+  left: PipetteSettingsFieldsMap | null
+  right: PipetteSettingsFieldsMap | null
+}
 
 export type PipetteCompatibility = 'match' | 'inexact_match' | 'incompatible'
 
-export type ProtocolPipetteInfo = {|
-  actual: null | {|
-    ...AttachedPipette,
-    displayName: string,
-    modelSpecs: ?PipetteModelSpecs,
-  |},
-  protocol: null | {|
-    ...$Shape<$Exact<ProtocolPipette>>,
-    displayName: string,
-  |},
-  compatibility: PipetteCompatibility,
-  needsOffsetCalibration: boolean,
-|}
+export interface ProtocolPipetteInfo {
+  actual:
+    | null
+    | (AttachedPipette & {
+        displayName: string
+        modelSpecs: PipetteModelSpecs | null | undefined
+      })
+  protocol:
+    | null
+    | (Partial<ProtocolPipette> & {
+        displayName: string
+      })
+  compatibility: PipetteCompatibility
+  needsOffsetCalibration: boolean
+}
 
-export type ProtocolPipetteInfoByMount = {|
-  left: ProtocolPipetteInfo,
-  right: ProtocolPipetteInfo,
-|}
+export interface ProtocolPipetteInfoByMount {
+  left: ProtocolPipetteInfo
+  right: ProtocolPipetteInfo
+}
 
 // API response types
 
 export type FetchPipettesResponsePipette =
-  | {|
-      id: string,
-      name: string,
-      model: string,
-      tip_length: number,
-      mount_axis: string,
-      plunger_axis: string,
-    |}
-  | {|
-      id: null,
-      name: null,
-      model: null,
-      mount_axis: string,
-      plunger_axis: string,
-    |}
+  | {
+      id: string
+      name: string
+      model: string
+      tip_length: number
+      mount_axis: string
+      plunger_axis: string
+    }
+  | {
+      id: null
+      name: null
+      model: null
+      mount_axis: string
+      plunger_axis: string
+    }
 
-export type FetchPipettesResponseBody = {|
-  left: FetchPipettesResponsePipette,
-  right: FetchPipettesResponsePipette,
-|}
+export interface FetchPipettesResponseBody {
+  left: FetchPipettesResponsePipette
+  right: FetchPipettesResponsePipette
+}
 
 export type FetchPipetteSettingsResponseBody = PipetteSettingsById
 
@@ -112,71 +114,71 @@ export type FetchPipetteSettingsResponseBody = PipetteSettingsById
 
 // fetch pipettes
 
-export type FetchPipettesAction = {|
-  type: 'pipettes:FETCH_PIPETTES',
-  payload: {| robotName: string, refresh: boolean |},
-  meta: RobotApiRequestMeta,
-|}
+export interface FetchPipettesAction {
+  type: 'pipettes:FETCH_PIPETTES'
+  payload: { robotName: string; refresh: boolean }
+  meta: RobotApiRequestMeta
+}
 
-export type FetchPipettesSuccessAction = {|
-  type: 'pipettes:FETCH_PIPETTES_SUCCESS',
-  payload: {| robotName: string, pipettes: FetchPipettesResponseBody |},
-  meta: RobotApiRequestMeta,
-|}
+interface FetchPipettesSuccessAction {
+  type: 'pipettes:FETCH_PIPETTES_SUCCESS'
+  payload: { robotName: string; pipettes: FetchPipettesResponseBody }
+  meta: RobotApiRequestMeta
+}
 
-export type FetchPipettesFailureAction = {|
-  type: 'pipettes:FETCH_PIPETTES_FAILURE',
-  payload: {| robotName: string, error: {} |},
-  meta: RobotApiRequestMeta,
-|}
+interface FetchPipettesFailureAction {
+  type: 'pipettes:FETCH_PIPETTES_FAILURE'
+  payload: { robotName: string; error: {} }
+  meta: RobotApiRequestMeta
+}
 
 // fetch pipette settings
 
-export type FetchPipetteSettingsAction = {|
-  type: 'pipettes:FETCH_PIPETTE_SETTINGS',
-  payload: {| robotName: string |},
-  meta: RobotApiRequestMeta,
-|}
+export interface FetchPipetteSettingsAction {
+  type: 'pipettes:FETCH_PIPETTE_SETTINGS'
+  payload: { robotName: string }
+  meta: RobotApiRequestMeta
+}
 
-export type FetchPipetteSettingsSuccessAction = {|
-  type: 'pipettes:FETCH_PIPETTE_SETTINGS_SUCCESS',
-  payload: {| robotName: string, settings: FetchPipetteSettingsResponseBody |},
-  meta: RobotApiRequestMeta,
-|}
+interface FetchPipetteSettingsSuccessAction {
+  type: 'pipettes:FETCH_PIPETTE_SETTINGS_SUCCESS'
+  payload: { robotName: string; settings: FetchPipetteSettingsResponseBody }
+  meta: RobotApiRequestMeta
+}
 
-export type FetchPipetteSettingsFailureAction = {|
-  type: 'pipettes:FETCH_PIPETTE_SETTINGS_FAILURE',
-  payload: {| robotName: string, error: {} |},
-  meta: RobotApiRequestMeta,
-|}
+interface FetchPipetteSettingsFailureAction {
+  type: 'pipettes:FETCH_PIPETTE_SETTINGS_FAILURE'
+  payload: { robotName: string; error: {} }
+  meta: RobotApiRequestMeta
+}
 
 // update pipette settings
 
-export type UpdatePipetteSettingsAction = {|
-  type: 'pipettes:UPDATE_PIPETTE_SETTINGS',
-  payload: {|
-    robotName: string,
-    pipetteId: string,
-    fields: PipetteSettingsFieldsUpdate,
-  |},
-  meta: RobotApiRequestMeta,
-|}
+export interface UpdatePipetteSettingsAction {
+  type: 'pipettes:UPDATE_PIPETTE_SETTINGS'
+  payload: {
+    robotName: string
+    pipetteId: string
+    fields: PipetteSettingsFieldsUpdate
+  }
+  meta: RobotApiRequestMeta
+}
 
-export type UpdatePipetteSettingsSuccessAction = {|
-  type: 'pipettes:UPDATE_PIPETTE_SETTINGS_SUCCESS',
-  payload: {|
-    robotName: string,
-    pipetteId: string,
-    fields: PipetteSettingsFieldsMap,
-  |},
-  meta: RobotApiRequestMeta,
-|}
+export interface UpdatePipetteSettingsSuccessAction {
+  type: 'pipettes:UPDATE_PIPETTE_SETTINGS_SUCCESS'
+  payload: {
+    robotName: string
+    pipetteId: string
+    fields: PipetteSettingsFieldsMap
+  }
+  meta: RobotApiRequestMeta
+}
 
-export type UpdatePipetteSettingsFailureAction = {|
-  type: 'pipettes:UPDATE_PIPETTE_SETTINGS_FAILURE',
-  payload: {| robotName: string, pipetteId: string, error: {} |},
-  meta: RobotApiRequestMeta,
-|}
+export interface UpdatePipetteSettingsFailureAction {
+  type: 'pipettes:UPDATE_PIPETTE_SETTINGS_FAILURE'
+  payload: { robotName: string; pipetteId: string; error: {} }
+  meta: RobotApiRequestMeta
+}
 
 // pipette actions unions
 
@@ -193,23 +195,21 @@ export type PipettesAction =
 
 // state types
 
-export type PerRobotPipettesState = $ReadOnly<{|
-  attachedByMount: FetchPipettesResponseBody | null,
-  settingsById: FetchPipetteSettingsResponseBody | null,
-|}>
+export interface PerRobotPipettesState {
+  readonly attachedByMount: FetchPipettesResponseBody | null
+  readonly settingsById: FetchPipetteSettingsResponseBody | null
+}
 
-export type PipettesState = $Shape<
-  $ReadOnly<{|
-    [robotName: string]: void | PerRobotPipettesState,
-  |}>
->
+export type PipettesState = Partial<{
+  readonly [robotName: string]: null | undefined | PerRobotPipettesState
+}>
 
-export type PipetteCalibrations = {|
-  offset: PipetteOffsetCalibration | null,
-  tipLength: TipLengthCalibration | null,
-|}
+export interface PipetteCalibrations {
+  offset: PipetteOffsetCalibration | null
+  tipLength: TipLengthCalibration | null
+}
 
-export type PipetteCalibrationsByMount = {|
-  left: PipetteCalibrations,
-  right: PipetteCalibrations,
-|}
+export interface PipetteCalibrationsByMount {
+  left: PipetteCalibrations
+  right: PipetteCalibrations
+}

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   Box,
@@ -7,16 +6,16 @@ import {
   FONT_BODY_1_DARK,
   FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 
-type Props = {|
-  label: string | React.Node,
-  value: string | React.Node,
-  labelProps?: React.ElementProps<typeof Text>,
-  valueProps?: React.ElementProps<typeof Text>,
-  ...React.ElementProps<typeof Box>,
-|}
+interface Props extends StyleProps {
+  label: string | React.ReactNode,
+  value: string | React.ReactNode,
+  labelProps?: React.ComponentProps<typeof Text>,
+  valueProps?: React.ComponentProps<typeof Text>,
+}
 
-export function LabeledValue(props: Props): React.Node {
+export function LabeledValue(props: Props): JSX.Element {
   const {
     label,
     value,

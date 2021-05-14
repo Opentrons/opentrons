@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { Formik, Form } from 'formik'
@@ -11,6 +10,8 @@ import { KeyFileField } from '../KeyFileField'
 import { SecurityField } from '../SecurityField'
 import { FormModal } from '../FormModal'
 
+import type { FormModalProps } from '../FormModal'
+
 // KeyFileField is wired to redux, so mock it out
 jest.mock('../KeyFileField', () => ({ KeyFileField: () => null }))
 
@@ -22,7 +23,7 @@ const wifiKeys = [Fixtures.mockWifiKey]
 describe('FormModal', () => {
   const handleCancel = jest.fn()
 
-  const render = (network = null, fields = [], isValid = false) => {
+  const render = (network: FormModalProps['network'] = null, fields: FormModalProps['fields'] = [], isValid: FormModalProps['isValid'] = false) => {
     return mount(
       <FormModal
         id={id}

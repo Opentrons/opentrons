@@ -1,18 +1,17 @@
-// @flow
 import * as React from 'react'
 
 import { useTranslation } from 'react-i18next'
 import { AlertModal } from '@opentrons/components'
 import styles from './styles.css'
 
-export type ConfirmStartDeckCalModalProps = {|
-  cancel: () => mixed,
-  confirm: () => mixed,
-|}
+export interface ConfirmStartDeckCalModalProps {
+  cancel: () => unknown,
+  confirm: () => unknown,
+}
 
 export function ConfirmStartDeckCalModal(
   props: ConfirmStartDeckCalModalProps
-): React.Node {
+): JSX.Element {
   const { cancel, confirm } = props
   const { t } = useTranslation(['robot_calibration', 'shared'])
 

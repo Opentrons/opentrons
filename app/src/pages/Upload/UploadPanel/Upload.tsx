@@ -1,18 +1,17 @@
-// @flow
 import * as React from 'react'
 import { UploadInput } from './UploadInput'
 import { ConfirmUploadModal } from './ConfirmUploadModal'
 import { UploadMenu } from './UploadMenu'
 
-export type UploadProps = {|
-  filename: ?string,
-  sessionLoaded: ?boolean,
-  createSession: (file: File) => mixed,
-|}
+export interface UploadProps {
+  filename: string | null | undefined,
+  sessionLoaded: boolean | null | undefined,
+  createSession: (file: File) => unknown,
+}
 
-type UploadState = {|
-  uploadedFile: ?File,
-|}
+interface UploadState {
+  uploadedFile: File | null | undefined,
+}
 
 export class Upload extends React.Component<UploadProps, UploadState> {
   constructor(props: UploadProps) {
@@ -20,14 +19,12 @@ export class Upload extends React.Component<UploadProps, UploadState> {
     this.state = { uploadedFile: null }
   }
 
-  onUpload: (
-    event: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<>
-  ) => void = event => {
-    let files: Array<File> = []
+  onUpload: React.ChangeEventHandler<HTMLInputElement> | React.DragEventHandler = (event: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
+    let files: File[] = []
     if (event.dataTransfer && event.dataTransfer.files) {
-      files = (event.dataTransfer.files: any)
-    } else if (event.target.files) {
-      files = (event.target.files: any)
+      files = (event.dataTransfer.files as any)
+    } else if (event.target?.files) {
+      files = (event.target.files as any)
     }
 
     if (this.props.sessionLoaded) {
@@ -36,7 +33,6 @@ export class Upload extends React.Component<UploadProps, UploadState> {
       this.props.createSession(files[0])
     }
 
-    // $FlowFixMe(mc, 2020-05-31): only clear value for file input, not drag and drop
     event.currentTarget.value = ''
   }
 
@@ -53,7 +49,7 @@ export class Upload extends React.Component<UploadProps, UploadState> {
     this.setState({ uploadedFile: null })
   }
 
-  render(): React.Node {
+  render(): JSX.Element {
     const { uploadedFile } = this.state
     const { filename } = this.props
 

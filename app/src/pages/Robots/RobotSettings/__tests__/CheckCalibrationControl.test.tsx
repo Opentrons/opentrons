@@ -1,6 +1,5 @@
-// @flow
 import * as React from 'react'
-import { mountWithProviders } from '@opentrons/components/__utils__'
+import { mountWithProviders, WrapperWithStore } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../../i18n'
 import * as Sessions from '../../../../redux/sessions'
@@ -9,7 +8,8 @@ import { Tooltip, PrimaryBtn, SecondaryBtn } from '@opentrons/components'
 import { TitledControl } from '../../../../atoms/TitledControl'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 
-import type { State } from '../../../../redux/types'
+import type { State, Action } from '../../../../redux/types'
+import type { HTMLAttributes, ReactWrapper } from 'enzyme'
 
 import { mockCalibrationCheckSessionAttributes } from '../../../../redux/sessions/__fixtures__'
 
@@ -19,29 +19,21 @@ jest.mock('../../../../organisms/CheckCalibration', () => ({
   CheckCalibration: () => <></>,
 }))
 
-const getRobotSessionOfType: JestMockFn<
-  [State, string, Sessions.SessionType],
-  $Call<
-    typeof Sessions.getRobotSessionOfType,
-    State,
-    string,
-    Sessions.SessionType
-  >
-> = Sessions.getRobotSessionOfType
+const getRobotSessionOfType = Sessions.getRobotSessionOfType as jest.MockedFunction<typeof Sessions.getRobotSessionOfType>
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = ({ mockState: true } as any)
 
 describe('CheckCalibrationControl', () => {
-  const getCalCheckButton = wrapper =>
+  const getCalCheckButton = (wrapper: ReactWrapper<React.ComponentProps<typeof CheckCalibrationControl>>): ReactWrapper<HTMLAttributes> =>
     wrapper
       .find('TitledControl[title="calibration health check"]')
       .find('button')
 
   const render = (
-    props: $Shape<React.ElementProps<typeof CheckCalibrationControl>> = {}
-  ) => {
+    props: Partial<React.ComponentProps<typeof CheckCalibrationControl>> = {}
+  ): WrapperWithStore<React.ComponentProps<typeof CheckCalibrationControl>, State, Action> => {
     const { robotName = 'robot-name', disabledReason = null } = props
-    return mountWithProviders(
+    return mountWithProviders<React.ComponentProps<typeof CheckCalibrationControl>, State, Action>(
       <CheckCalibrationControl
         robotName={robotName}
         disabledReason={disabledReason}
@@ -85,11 +77,11 @@ describe('CheckCalibrationControl', () => {
 
   it('button launches new check calibration health after confirm', () => {
     const { wrapper, store } = render()
-    getCalCheckButton(wrapper).invoke('onClick')()
+    getCalCheckButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     const calBlockButton = wrapper.find(PrimaryBtn)
-    calBlockButton.invoke('onClick')()
+    calBlockButton.invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(store.dispatch).toHaveBeenCalledWith({

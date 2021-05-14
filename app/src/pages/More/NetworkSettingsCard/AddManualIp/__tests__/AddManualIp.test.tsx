@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
@@ -30,7 +29,7 @@ describe('AddManualIp setting component', () => {
 
     expect(wrapper.find(AddManualIpModal)).toHaveLength(0)
     act(() => {
-      button.prop('buttonProps').onClick()
+      button.prop('buttonProps').onClick?.({} as React.MouseEvent)
     })
     wrapper.update()
 
@@ -42,12 +41,12 @@ describe('AddManualIp setting component', () => {
     const button = wrapper.find(LabeledButton)
 
     act(() => {
-      button.prop('buttonProps').onClick()
+      button.prop('buttonProps').onClick?.({} as React.MouseEvent)
     })
     wrapper.update()
 
     act(() => {
-      wrapper.find(AddManualIpModal).invoke('closeModal')()
+      wrapper.find(AddManualIpModal).invoke('closeModal')?.()
     })
     wrapper.update()
 

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 
@@ -10,8 +9,6 @@ import { AdvancedSettingsCard } from '../AdvancedSettingsCard'
 import { UpdateFromFileControl } from '../UpdateFromFileControl'
 import { OpenJupyterControl } from '../OpenJupyterControl'
 
-import type { State } from '../../../../redux/types'
-
 jest.mock('react-router-dom', () => ({ Link: 'a' }))
 
 jest.mock('../UpdateFromFileControl', () => ({
@@ -22,14 +19,11 @@ jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/robot-settings/selectors')
 jest.mock('../../../../redux/shell/robot-logs/selectors')
 
-const getRobotSettings: JestMockFn<
-  [State, string],
-  $Call<typeof RobotSettings.getRobotSettings, State, string>
-> = RobotSettings.getRobotSettings
+const getRobotSettings = RobotSettings.getRobotSettings as jest.MockedFunction<typeof RobotSettings.getRobotSettings>
 
 // TODO(mc, 2020-09-09): flesh out these tests
 describe('RobotSettings > AdvancedSettingsCard', () => {
-  const render = (robot = mockConnectableRobot) => {
+  const render = (robot: React.ComponentProps<typeof AdvancedSettingsCard>['robot'] = mockConnectableRobot): ReturnType<typeof mountWithProviders> => {
     const resetUrl = `/robots/${robot.name}/reset`
     return mountWithProviders(
       <AdvancedSettingsCard robot={robot} resetUrl={resetUrl} />,

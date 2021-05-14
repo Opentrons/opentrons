@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { Box, LabeledValue, SPACING_3 } from '@opentrons/components'
@@ -25,10 +24,10 @@ const TIME_REMAINING_FOR_STEP = 'Time remaining for step:'
 const TimeRemaining = ({
   holdTime,
   title,
-}: {|
-  holdTime: ?number,
+}: {
+  holdTime: number | null | undefined,
   title: string,
-|}) => (
+}): JSX.Element => (
   <span
     className={cx(styles.inline_labeled_value, styles.time_remaining_wrapper)}
   >
@@ -37,20 +36,20 @@ const TimeRemaining = ({
   </span>
 )
 
-type CycleInfoProps = {|
-  totalCycleCount: ?number,
-  currentCycleIndex: ?number,
-  totalStepCount: ?number,
-  currentStepIndex: ?number,
-  holdTime: ?number,
-|}
+interface CycleInfoProps {
+  totalCycleCount: number | null | undefined,
+  currentCycleIndex: number | null | undefined,
+  totalStepCount: number | null | undefined,
+  currentStepIndex: number | null | undefined,
+  holdTime: number | null | undefined,
+}
 const CycleInfo = ({
   totalCycleCount,
   currentCycleIndex,
   totalStepCount,
   currentStepIndex,
   holdTime,
-}: CycleInfoProps) => {
+}: CycleInfoProps): JSX.Element | null => {
   if (
     totalCycleCount == null ||
     currentCycleIndex == null ||
@@ -88,18 +87,18 @@ const CycleInfo = ({
   )
 }
 
-type Props = {|
+interface Props {
   module: ThermocyclerModule,
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
-    args?: Array<mixed>
-  ) => mixed,
+    args?: unknown[]
+  ) => unknown,
   slot: string,
   controlDisabledReason: string | null,
   isCardExpanded: boolean,
-  toggleCard: boolean => mixed,
-|}
+  toggleCard: () => unknown,
+}
 
 export const ThermocyclerCard = ({
   module,
@@ -108,7 +107,7 @@ export const ThermocyclerCard = ({
   isCardExpanded,
   toggleCard,
   slot,
-}: Props): React.Node => {
+}: Props): JSX.Element=> {
   const {
     currentTemp,
     targetTemp,

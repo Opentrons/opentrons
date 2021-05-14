@@ -1,10 +1,9 @@
-// @flow
 import * as React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
 import styles from './styles.css'
 
-export function ModalCopy(): React.Node {
+export function ModalCopy(): JSX.Element {
   return (
     <div className={styles.copy}>
       <p>

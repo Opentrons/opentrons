@@ -1,28 +1,24 @@
-// @flow
-
-import type { IntercomPayload } from '../types'
 import type { State } from '../../types'
 import * as Binding from '../intercom-binding'
 import * as Calibration from '../../calibration'
 import * as Config from '../../config'
 import * as Sessions from '../../sessions'
 import * as Analytics from '../../analytics'
-import * as AnalyticsTypes from '../../analytics/types'
 import { makeIntercomEvent, sendEvent } from '../intercom-event'
 import * as Constants from '../constants'
 
 jest.mock('../intercom-binding')
 jest.mock('../../analytics/selectors')
 
-const getAnalyticsHealthCheckData: JestMockFn<
-  [State, string, string],
-  AnalyticsTypes.CalibrationHealthCheckAnalyticsData | null
-> = Analytics.getAnalyticsHealthCheckData
+const getAnalyticsHealthCheckData = Analytics.getAnalyticsHealthCheckData as jest.MockedFunction<
+  typeof Analytics.getAnalyticsHealthCheckData
+>
 
-const sendIntercomEvent: JestMockFn<[string, IntercomPayload], void> =
-  Binding.sendIntercomEvent
+const sendIntercomEvent = Binding.sendIntercomEvent as jest.MockedFunction<
+  typeof Binding.sendIntercomEvent
+>
 
-const MOCK_STATE: $Shape<{| ...State |}> = {}
+const MOCK_STATE: State = {} as any
 
 describe('support event tests', () => {
   afterEach(() => {

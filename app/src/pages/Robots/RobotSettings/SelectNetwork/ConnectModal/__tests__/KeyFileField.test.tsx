@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
@@ -10,12 +9,11 @@ import * as FormState from '../form-state'
 
 import { LABEL_ADD_NEW_KEY } from '../../i18n'
 
+import type { ShallowWrapper } from 'enzyme'
+
 jest.mock('../form-state')
 
-const useConnectFormField: JestMockFn<
-  [string],
-  $Call<typeof FormState.useConnectFormField, string>
-> = FormState.useConnectFormField
+const useConnectFormField = FormState.useConnectFormField as jest.MockedFunction<typeof FormState.useConnectFormField>
 
 describe('ConnectModal KeyFileField', () => {
   const fieldId = 'field-id'
@@ -32,7 +30,7 @@ describe('ConnectModal KeyFileField', () => {
   const setValue = jest.fn()
   const setTouched = jest.fn()
 
-  const render = (value = null) => {
+  const render = (value: any | null = null): ReturnType<typeof shallow> => {
     useConnectFormField.mockImplementation(name => {
       expect(name).toBe(fieldName)
       return {
@@ -115,9 +113,9 @@ describe('ConnectModal KeyFileField', () => {
 
   it('updates the field value with UploadKeyInput::onUpload', () => {
     const wrapper = render()
-    const upload = wrapper.find(UploadKeyInput)
+    const upload: ShallowWrapper<React.ComponentProps<typeof UploadKeyInput>> = wrapper.find(UploadKeyInput)
 
-    upload.invoke('onUpload')('new-key-id')
+    upload.invoke('onUpload')?.('new-key-id')
     expect(setValue).toHaveBeenCalledWith('new-key-id')
   })
 
@@ -125,25 +123,25 @@ describe('ConnectModal KeyFileField', () => {
     const wrapper = render()
     const select = wrapper.find(SelectField)
 
-    select.invoke('onValueChange')(fieldName, 'new-key-id')
+    select.invoke('onValueChange')?.(fieldName, 'new-key-id')
     expect(setValue).toHaveBeenCalledWith('new-key-id')
   })
 
   it('does not update the field value when add new option is selected', () => {
     const wrapper = render()
     const select = wrapper.find(SelectField)
-    const options = select.prop('options').flatMap(o => o.options)
+    const options = select.prop('options').flatMap((o: any) => o.options)
     const addNewOpt = options.find(o => o?.label === LABEL_ADD_NEW_KEY)
 
-    select.invoke('onValueChange')(fieldName, addNewOpt?.value)
+    select.invoke('onValueChange')?.(fieldName, addNewOpt?.value)
     expect(setValue).not.toHaveBeenCalledWith(addNewOpt?.value)
   })
 
   it('updates field touched with SelectField::onLoseFocus', () => {
     const wrapper = render()
-    const select = wrapper.find(SelectField)
+    const select: ShallowWrapper<React.ComponentProps<typeof SelectField>> = wrapper.find(SelectField)
 
-    select.invoke('onLoseFocus')()
+    select.invoke('onLoseFocus')?.('')
     expect(setTouched).toHaveBeenCalledWith(true)
   })
 })

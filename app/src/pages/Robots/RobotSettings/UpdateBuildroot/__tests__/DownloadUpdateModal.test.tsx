@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 
@@ -9,7 +8,7 @@ import { DownloadUpdateModal } from '../DownloadUpdateModal'
 describe('DownloadUpdateModal', () => {
   const handleClose = jest.fn()
 
-  const render = (error = null) => {
+  const render = (error: string | null = null) => {
     return mount(
       <DownloadUpdateModal
         notNowButton={{ onClick: handleClose, children: 'not now' }}
@@ -36,7 +35,7 @@ describe('DownloadUpdateModal', () => {
 
     expect(button.text()).toMatch(/not now/)
     expect(handleClose).not.toHaveBeenCalled()
-    button.invoke('onClick')()
+    button.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleClose).toHaveBeenCalled()
   })
 

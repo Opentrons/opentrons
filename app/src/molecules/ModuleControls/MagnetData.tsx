@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import {
@@ -16,11 +15,11 @@ import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 
 import type { MagneticModule } from '../../redux/modules/types'
 
-type Props = {|
-  module: MagneticModule,
-|}
+interface Props {
+  module: MagneticModule;
+}
 
-export function MagnetData(props: Props): React.Node {
+export function MagnetData(props: Props): JSX.Element {
   const { module } = props
   return (
     <Flex

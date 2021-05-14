@@ -1,4 +1,3 @@
-// @flow
 
 // protocol types
 export const TYPE_JSON: 'json' = 'json'

@@ -1,4 +1,3 @@
-// @flow
 import { version } from '../../../../package.json'
 import { initializeProfile, updateProfile } from '../profile'
 import * as IntercomBinding from '../intercom-binding'
@@ -6,15 +5,20 @@ import type { IntercomPayload } from '../types'
 
 import type { Config } from '../../config/types'
 
-type SupportConfig = $PropertyType<Config, 'support'>
+type SupportConfig = Config['support']
 
-const bootIntercom: JestMockFn<[IntercomPayload], void> =
-  IntercomBinding.bootIntercom
-const updateIntercomProfile: JestMockFn<[IntercomPayload], void> =
-  IntercomBinding.updateIntercomProfile
-const setUserId: JestMockFn<[string], void> = IntercomBinding.setUserId
-const getIntercomAppId: JestMockFn<[], ?string> =
-  IntercomBinding.getIntercomAppId
+const bootIntercom = IntercomBinding.bootIntercom as jest.MockedFunction<
+  typeof IntercomBinding.bootIntercom
+>
+const updateIntercomProfile = IntercomBinding.updateIntercomProfile as jest.MockedFunction<
+  typeof IntercomBinding.updateIntercomProfile
+>
+const setUserId = IntercomBinding.setUserId as jest.MockedFunction<
+  typeof IntercomBinding.setUserId
+>
+const getIntercomAppId = IntercomBinding.getIntercomAppId as jest.MockedFunction<
+  typeof IntercomBinding.getIntercomAppId
+>
 
 jest.mock('../intercom-binding')
 

@@ -1,4 +1,3 @@
-// @flow
 
 import { addUniqueConfigValue, subtractConfigValue } from '../config'
 import * as Constants from './constants'

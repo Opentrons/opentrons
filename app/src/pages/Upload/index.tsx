@@ -1,4 +1,3 @@
-// @flow
 // upload progress container
 import * as React from 'react'
 import { connect } from 'react-redux'
@@ -11,29 +10,25 @@ import { getCustomLabware } from '../../redux/custom-labware'
 
 import { FileInfo } from './FileInfo'
 
-import type { ContextRouter } from 'react-router-dom'
+import type { RouteComponentProps } from 'react-router-dom'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 
-type OP = ContextRouter
+type OP = RouteComponentProps<{path: string}>
 
-type SP = {|
-  robot: ?Robot,
-  filename: ?string,
+interface SP {
+  robot: Robot | null | undefined,
+  filename: string | null | undefined,
   uploadInProgress: boolean,
-  uploadError: ?{ message: string },
+  uploadError: { message: string } | null | undefined,
   sessionLoaded: boolean,
   sessionHasSteps: boolean,
   showCustomLabwareWarning: boolean,
-|}
+}
 
-type Props = {| ...OP, ...SP, dispatch: Dispatch |}
+type Props = OP & SP & { dispatch: Dispatch }
 
-export const Upload: React.AbstractComponent<
-  $Diff<OP, ContextRouter>
-> = withRouter(
-  connect<Props, OP, SP, _, _, _>(mapStateToProps)(UploadComponent)
-)
+export const Upload = withRouter(connect(mapStateToProps, {})(UploadComponent))
 
 function mapStateToProps(state: State): SP {
   return {
@@ -51,7 +46,7 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-function UploadComponent(props: Props) {
+function UploadComponent(props: Props): JSX.Element {
   const {
     robot,
     filename,

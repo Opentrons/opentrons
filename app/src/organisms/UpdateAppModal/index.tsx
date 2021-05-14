@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link as InternalLink } from 'react-router-dom'
@@ -43,10 +42,10 @@ import { ReleaseNotes } from '../../molecules/ReleaseNotes'
 
 import type { Dispatch } from '../../redux/types'
 
-export type UpdateAppModalProps = {|
-  dismissAlert?: (remember: boolean) => mixed,
-  closeModal?: () => mixed,
-|}
+export interface UpdateAppModalProps {
+  dismissAlert?: (remember: boolean) => unknown,
+  closeModal?: () => unknown,
+}
 
 // TODO(mc, 2020-10-06): i18n
 const APP_VERSION = 'App Version'
@@ -106,7 +105,7 @@ const SPINNER = (
   </BaseModal>
 )
 
-export function UpdateAppModal(props: UpdateAppModalProps): React.Node {
+export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   const { dismissAlert, closeModal } = props
   const [updatesIgnored, setUpdatesIgnored] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()
@@ -115,13 +114,13 @@ export function UpdateAppModal(props: UpdateAppModalProps): React.Node {
   const version = updateInfo?.version ?? ''
   const releaseNotes = updateInfo?.releaseNotes
 
-  const handleUpdateClick = () => {
+  const handleUpdateClick = (): void => {
     dispatch(downloaded ? applyShellUpdate() : downloadShellUpdate())
   }
 
   // ensure close handlers are called on close button click or on component
   // unmount (for safety), but not both
-  const latestHandleClose = React.useRef(null)
+  const latestHandleClose = React.useRef<(() => void) | null>(null)
 
   React.useEffect(() => {
     latestHandleClose.current = () => {
@@ -131,7 +130,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): React.Node {
     }
   })
 
-  const handleCloseClick = () => {
+  const handleCloseClick = (): void => {
     latestHandleClose.current && latestHandleClose.current()
   }
 

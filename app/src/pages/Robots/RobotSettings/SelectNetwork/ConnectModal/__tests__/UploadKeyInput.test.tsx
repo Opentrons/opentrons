@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
@@ -8,25 +7,22 @@ import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
 import * as Networking from '../../../../../../redux/networking'
 import { UploadKeyInput } from '../UploadKeyInput'
 
-import type { State } from '../../../../../../redux/types'
+import type { Action } from '../../../../../../redux/types'
 
 jest.mock('../../../../../../redux/networking/selectors')
 
 const mockState = { state: true, mock: true }
-const mockRobotName = 'robot-name'
+const mockRobotName = 'robot-name' as any
 const mockFile = new File(['key-contents'], 'key.crt')
 
-const mockGetWifiKeyByRequestId: JestMockFn<
-  [State, string, string | null],
-  $Call<typeof Networking.getWifiKeyByRequestId, State, string, string | null>
-> = Networking.getWifiKeyByRequestId
+const mockGetWifiKeyByRequestId = Networking.getWifiKeyByRequestId as jest.MockedFunction<typeof Networking.getWifiKeyByRequestId>
 
 describe('ConnectForm UploadKey input field', () => {
   const handleUpload = jest.fn()
   const label = 'field-label'
-  let dispatch
-  let mockStore
-  let render
+  let dispatch: any
+  let mockStore: any
+  let render: (ref?: any) => ReturnType<typeof mount>
 
   beforeEach(() => {
     dispatch = jest.fn()
@@ -73,7 +69,7 @@ describe('ConnectForm UploadKey input field', () => {
     const input = wrapper.find('input[type="file"]')
 
     act(() => {
-      input.invoke('onChange')({ target: { files: [mockFile] } })
+      input.invoke('onChange')?.({ target: { files: [mockFile] } } as any)
     })
 
     expect(dispatch).toHaveBeenCalledWith(
@@ -89,8 +85,8 @@ describe('ConnectForm UploadKey input field', () => {
     const input = wrapper.find('input[type="file"]')
 
     act(() => {
-      input.invoke('onChange')({ target: { files: [mockFile] } })
-      const postAction = dispatch.mock.calls.find(([action]) => {
+      input.invoke('onChange')?.({ target: { files: [mockFile] } } as any)
+      const postAction = dispatch.mock.calls.find(([action]: Action[]) => {
         return action.type === Networking.POST_WIFI_KEYS
       })
       const requestId = postAction?.[0].meta.requestId

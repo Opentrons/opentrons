@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import pick from 'lodash/pick'
 import some from 'lodash/some'
@@ -46,6 +45,7 @@ import { hash } from './hash'
 import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
 import type { CalibrationCheckInstrument } from '../sessions/calibration-check/types'
+import type { Mount } from '../pipettes/types'
 
 import type {
   AnalyticsConfig,
@@ -100,7 +100,9 @@ const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
   })
 )
 
-export const getProtocolAnalyticsData: State => Promise<ProtocolAnalyticsData> = createSelector(
+export const getProtocolAnalyticsData: (
+  state: State
+) => Promise<ProtocolAnalyticsData> = createSelector(
   _getUnhashedProtocolAnalyticsData,
   data => {
     const hashTasks = [hash(data.protocolAuthor), hash(data.protocolText)]
@@ -120,7 +122,7 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
     const pipettes = getAttachedPipettes(state, robot.name)
     const settings = getRobotSettings(state, robot.name)
 
-    return settings.reduce(
+    return settings.reduce<RobotAnalyticsData>(
       (result, setting) => ({
         ...result,
         [`${FF_PREFIX}${setting.id}`]: !!setting.value,
@@ -175,7 +177,7 @@ export function getAnalyticsOptInSeen(state: State): boolean {
 
 export function getAnalyticsPipetteCalibrationData(
   state: State,
-  mount: string
+  mount: Mount
 ): PipetteOffsetCalibrationAnalyticsData | null {
   const robot = getConnectedRobot(state)
 
@@ -194,7 +196,7 @@ export function getAnalyticsPipetteCalibrationData(
 
 export function getAnalyticsTipLengthCalibrationData(
   state: State,
-  mount: string
+  mount: Mount
 ): TipLengthCalibrationAnalyticsData | null {
   const robot = getConnectedRobot(state)
 
@@ -220,7 +222,7 @@ function getPipetteModels(state: State, robotName: string): ModelsByMount {
       }
       return obj
     },
-    ({}: $Shape<ModelsByMount>)
+    {} as Partial<ModelsByMount>
   )
 }
 
@@ -233,20 +235,23 @@ function getCalibrationCheckData(
     return null
   }
   const { comparisonsByPipette, instruments } = session.details
-  return instruments.reduce((obj, instrument: CalibrationCheckInstrument) => {
-    const { rank, mount, model } = instrument
-    const succeeded = !some(
-      Object.keys(comparisonsByPipette[rank]).map(k =>
-        Boolean(comparisonsByPipette[rank][k]?.status === 'OUTSIDE_THRESHOLD')
+  return instruments.reduce(
+    (obj, instrument: CalibrationCheckInstrument) => {
+      const { rank, mount, model } = instrument
+      const succeeded = !some(
+        Object.keys(comparisonsByPipette[rank]).map(k =>
+          Boolean(comparisonsByPipette[rank][k]?.status === 'OUTSIDE_THRESHOLD')
+        )
       )
-    )
-    obj[mount] = {
-      comparisons: comparisonsByPipette[rank],
-      succeeded: succeeded,
-      model: model,
-    }
-    return obj
-  }, ({ left: null, right: null }: $Shape<CalibrationCheckByMount>))
+      obj[mount] = {
+        comparisons: comparisonsByPipette[rank],
+        succeeded: succeeded,
+        model: model,
+      }
+      return obj
+    },
+    { left: null, right: null } as Partial<CalibrationCheckByMount>
+  )
 }
 
 export function getAnalyticsDeckCalibrationData(

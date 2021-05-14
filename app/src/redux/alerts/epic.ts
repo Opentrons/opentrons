@@ -1,4 +1,3 @@
-// @flow
 import { filter, map } from 'rxjs/operators'
 
 import { alertPermanentlyIgnored } from './actions'

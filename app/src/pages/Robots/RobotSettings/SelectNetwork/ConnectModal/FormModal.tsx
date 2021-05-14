@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Form } from 'formik'
 import styled, { css } from 'styled-components'
@@ -11,12 +10,7 @@ import { SecurityField } from './SecurityField'
 import { FIELD_TYPE_KEY_FILE, FIELD_TYPE_SECURITY } from '../constants'
 import * as Copy from '../i18n'
 
-import type { HTMLFormAttributes } from 'formik'
-import type { StyledComponent } from 'styled-components'
 import type { ConnectFormField, WifiNetwork } from '../types'
-import type { TextFieldProps } from './TextField'
-import type { KeyFileFieldProps } from './KeyFileField'
-import type { SecurityFieldProps } from './SecurityField'
 
 const fieldStyle = css`
   min-width: 12rem;
@@ -25,50 +19,36 @@ const StyledCopy = styled.p`
   margin: 0 1rem 1rem;
 `
 
-const StyledForm: StyledComponent<
-  HTMLFormAttributes,
-  {||},
-  typeof Form
-> = styled(Form)`
+const StyledForm = styled(
+  Form
+)`
   font-size: ${FONT_SIZE_BODY_1};
   display: table;
   width: 80%;
   margin-top: 0.5rem;
 `
 
-const StyledTextField: StyledComponent<
-  TextFieldProps,
-  {||},
-  typeof TextField
-> = styled(TextField)`
+const StyledTextField = styled(TextField)`
   ${fieldStyle}
 `
 
-const StyledKeyFileField: StyledComponent<
-  KeyFileFieldProps,
-  {||},
-  typeof KeyFileField
-> = styled(KeyFileField)`
+const StyledKeyFileField = styled(KeyFileField)`
   ${fieldStyle}
 `
 
-const StyledSecurityField: StyledComponent<
-  SecurityFieldProps,
-  {||},
-  typeof SecurityField
-> = styled(SecurityField)`
+const StyledSecurityField = styled(SecurityField)`
   ${fieldStyle}
 `
 
-export type FormModalProps = {|
+export interface FormModalProps {
   id: string,
   network: WifiNetwork | null,
-  fields: Array<ConnectFormField>,
+  fields: ConnectFormField[],
   isValid: boolean,
-  onCancel: () => mixed,
-|}
+  onCancel: () => unknown,
+}
 
-export const FormModal = (props: FormModalProps): React.Node => {
+export const FormModal = (props: FormModalProps): JSX.Element => {
   const { id, network, fields, isValid, onCancel } = props
 
   const heading =

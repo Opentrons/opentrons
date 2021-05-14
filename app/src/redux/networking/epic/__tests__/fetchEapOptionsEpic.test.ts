@@ -1,10 +1,12 @@
-// @flow
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { networkingEpic } from '..'
 
-const makeTriggerAction = robotName => Actions.fetchEapOptions(robotName)
+import type { Action } from '../../../types'
+
+const makeTriggerAction = (robotName: string) =>
+  Actions.fetchEapOptions(robotName)
 
 describe('networking fetch eap option epic', () => {
   afterEach(() => {
@@ -17,7 +19,7 @@ describe('networking fetch eap option epic', () => {
       Fixtures.mockFetchEapOptionsSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
@@ -38,7 +40,7 @@ describe('networking fetch eap option epic', () => {
       Fixtures.mockFetchEapOptionsSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
@@ -59,7 +61,7 @@ describe('networking fetch eap option epic', () => {
       Fixtures.mockFetchEapOptionsFailure
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)

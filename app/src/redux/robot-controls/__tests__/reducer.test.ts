@@ -1,17 +1,16 @@
-// @flow
 import { robotControlsReducer } from '../reducer'
 
 import type { Action } from '../../types'
 import type { PerRobotControlsState } from '../types'
 
-type ReducerSpec = {|
-  name: string,
-  state: $Shape<{ [robotName: string]: $Shape<PerRobotControlsState> }>,
-  action: Action,
-  expected: $Shape<{ [robotName: string]: $Shape<PerRobotControlsState> }>,
-|}
+type ReducerSpec = {
+  name: string
+  state: Partial<{ [robotName: string]: Partial<PerRobotControlsState> }>
+  action: Action
+  expected: Partial<{ [robotName: string]: Partial<PerRobotControlsState> }>
+}
 
-const SPECS: Array<ReducerSpec> = [
+const SPECS: ReducerSpec[] = [
   {
     name: 'handles robotControls:FETCH_LIGHTS_SUCCESS',
     action: {
@@ -20,7 +19,7 @@ const SPECS: Array<ReducerSpec> = [
         robotName: 'robotName',
         lightsOn: true,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { lightsOn: false } },
     expected: { robotName: { lightsOn: true } },
@@ -33,7 +32,7 @@ const SPECS: Array<ReducerSpec> = [
         robotName: 'robotName',
         lightsOn: false,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { lightsOn: true } },
     expected: { robotName: { lightsOn: false } },
@@ -43,7 +42,7 @@ const SPECS: Array<ReducerSpec> = [
     action: {
       type: 'robotControls:HOME',
       payload: { robotName: 'robotName', target: 'robot' },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { movementStatus: null } },
     expected: { robotName: { movementStatus: 'homing', movementError: null } },
@@ -53,7 +52,7 @@ const SPECS: Array<ReducerSpec> = [
     action: {
       type: 'robotControls:HOME_SUCCESS',
       payload: { robotName: 'robotName' },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { movementStatus: 'homing' } },
     expected: { robotName: { movementStatus: null, movementError: null } },
@@ -63,7 +62,7 @@ const SPECS: Array<ReducerSpec> = [
     action: {
       type: 'robotControls:HOME_FAILURE',
       payload: { robotName: 'robotName', error: { message: 'AH' } },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { movementStatus: 'homing' } },
     expected: {
@@ -80,7 +79,7 @@ const SPECS: Array<ReducerSpec> = [
         mount: 'left',
         disengageMotors: false,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { movementStatus: null } },
     expected: { robotName: { movementStatus: 'moving', movementError: null } },
@@ -90,7 +89,7 @@ const SPECS: Array<ReducerSpec> = [
     action: {
       type: 'robotControls:MOVE_SUCCESS',
       payload: { robotName: 'robotName' },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { movementStatus: 'moving' } },
     expected: { robotName: { movementStatus: null, movementError: null } },
@@ -100,7 +99,7 @@ const SPECS: Array<ReducerSpec> = [
     action: {
       type: 'robotControls:MOVE_FAILURE',
       payload: { robotName: 'robotName', error: { message: 'AH' } },
-      meta: {},
+      meta: {} as any,
     },
     state: { robotName: { movementStatus: 'moving' } },
     expected: {

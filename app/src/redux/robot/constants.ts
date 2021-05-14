@@ -1,4 +1,3 @@
-// @flow
 // robot redux module constants
 import type { Mount, Slot } from './types'
 
@@ -33,8 +32,8 @@ export const DOOR_OPEN: 'open' = 'open'
 export const DOOR_CLOSED: 'closed' = 'closed'
 
 // deck layout
-export const PIPETTE_MOUNTS: Array<Mount> = ['left', 'right']
-export const DECK_SLOTS: Array<Slot> = [
+export const PIPETTE_MOUNTS: Mount[] = ['left', 'right']
+export const DECK_SLOTS: Slot[] = [
   '1',
   '2',
   '3',

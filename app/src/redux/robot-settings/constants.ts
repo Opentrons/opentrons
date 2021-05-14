@@ -1,4 +1,3 @@
-// @flow
 
 export const SETTINGS_PATH: '/settings' = '/settings'
 

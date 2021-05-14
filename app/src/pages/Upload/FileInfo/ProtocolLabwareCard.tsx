@@ -1,4 +1,3 @@
-// @flow
 // setup labware component
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -12,14 +11,14 @@ import {
 
 import type { State, Dispatch } from '../../../redux/types'
 
-export type ProtocolLabwareProps = {|
+export interface ProtocolLabwareProps {
   robotName: string,
-|}
+}
 
 // TODO(mc, 2020-07-27): i18n
 const REQUIRED_LABWARE = 'Required Labware'
 
-export function ProtocolLabwareCard(props: ProtocolLabwareProps): React.Node {
+export function ProtocolLabwareCard(props: ProtocolLabwareProps): JSX.Element | null {
   const { robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const labwareList = useSelector((state: State) => {

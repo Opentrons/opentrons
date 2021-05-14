@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 
@@ -6,13 +5,13 @@ import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 import type { IconName } from '@opentrons/components'
 
-export type IconCtaProps = {|
+export interface IconCtaProps {
   name: string,
   iconName: IconName,
   text: string,
   className?: string,
-  onClick: () => mixed,
-|}
+  onClick: () => unknown,
+}
 
 export const IconCta = ({
   name,
@@ -20,7 +19,7 @@ export const IconCta = ({
   text,
   className,
   onClick,
-}: IconCtaProps): React.Node => (
+}: IconCtaProps): JSX.Element => (
   <button
     name={name}
     onClick={onClick}

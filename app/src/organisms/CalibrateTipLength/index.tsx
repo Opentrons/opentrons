@@ -1,4 +1,3 @@
-// @flow
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
 
@@ -31,10 +30,11 @@ import {
   INTENT_TIP_LENGTH_IN_PROTOCOL,
 } from '../../organisms/CalibrationPanels'
 
-import type { StyleProps } from '@opentrons/components'
+import type { StyleProps, Mount } from '@opentrons/components'
 import type {
   SessionCommandParams,
   CalibrationLabware,
+  CalibrationSessionStep
 } from '../../redux/sessions/types'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { CalibrateTipLengthParentProps } from './types'
@@ -70,7 +70,7 @@ const terminalContentsStyleProps = {
 }
 
 const PANEL_BY_STEP: {
-  [string]: React.ComponentType<CalibrationPanelProps>,
+  [step in CalibrationSessionStep]?: React.ComponentType<CalibrationPanelProps>
 } = {
   sessionStarted: Introduction,
   labwareLoaded: DeckSetup,
@@ -81,7 +81,7 @@ const PANEL_BY_STEP: {
   calibrationComplete: CompleteConfirmation,
 }
 const PANEL_STYLE_PROPS_BY_STEP: {
-  [string]: StyleProps,
+  [step in CalibrationSessionStep]?: StyleProps
 } = {
   [Sessions.TIP_LENGTH_STEP_SESSION_STARTED]: terminalContentsStyleProps,
   [Sessions.TIP_LENGTH_STEP_LABWARE_LOADED]: darkContentsStyleProps,
@@ -93,7 +93,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 }
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
-): React.Node {
+): JSX.Element | null {
   const { session, robotName, showSpinner, dispatchRequests, isJogging } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
@@ -108,7 +108,7 @@ export function CalibrateTipLength(
     ? labware.find(l => !l.isTiprack) ?? null
     : null
 
-  function sendCommands(...commands: Array<SessionCommandParams>) {
+  function sendCommands(...commands: SessionCommandParams[]): void {
     if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
@@ -120,7 +120,7 @@ export function CalibrateTipLength(
     }
   }
 
-  function cleanUpAndExit() {
+  function cleanUpAndExit(): void {
     if (session?.id) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
@@ -153,9 +153,8 @@ export function CalibrateTipLength(
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
 
-  const Panel = PANEL_BY_STEP[currentStep]
-
-  return Panel ? (
+  const Panel = currentStep != null ? PANEL_BY_STEP[currentStep] : null
+  return currentStep != null && Panel ? (
     <>
       <ModalPage
         titleBar={titleBarProps}
@@ -165,7 +164,7 @@ export function CalibrateTipLength(
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
           isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase()}
+          mount={instrument?.mount.toLowerCase() as Mount}
           tipRack={tipRack}
           calBlock={calBlock}
           currentStep={currentStep}

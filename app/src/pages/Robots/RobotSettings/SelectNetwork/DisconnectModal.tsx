@@ -1,20 +1,19 @@
-// @flow
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
 import * as Copy from './i18n'
 
-export type DisconnectModalProps = {|
+export interface DisconnectModalProps {
   ssid: string,
-  onDisconnect: () => mixed,
-  onCancel: () => mixed,
-|}
+  onDisconnect: () => unknown,
+  onCancel: () => unknown,
+}
 
 export const DisconnectModal = ({
   ssid,
   onDisconnect,
   onCancel,
-}: DisconnectModalProps): React.Node => (
+}: DisconnectModalProps): JSX.Element => (
   <AlertModal
     alertOverlay
     iconName="wifi"

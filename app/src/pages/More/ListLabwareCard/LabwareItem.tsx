@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import startCase from 'lodash/startCase'
@@ -30,11 +29,11 @@ const THIS_FILE_CONFLICTS_WITH_ANOTHER_DEFINITION =
 const THIS_FILE_CONFLICTS_WITH_AN_OPENTRONS_DEFINITION =
   'This file conflicts with an Opentrons standard labware definition. If you are trying to create a definition based on an Opentrons definition, please contact support'
 
-export type LabwareItemProps = {|
+export interface LabwareItemProps {
   file: CheckedLabwareFile,
-|}
+}
 
-export function LabwareItem(props: LabwareItemProps): React.Node {
+export function LabwareItem(props: LabwareItemProps): JSX.Element {
   const { file } = props
   const { type, filename, modified, definition = null } = file
   const apiName = definition?.parameters.loadName || NA
@@ -43,7 +42,7 @@ export function LabwareItem(props: LabwareItemProps): React.Node {
     ? startCase(definition.metadata.displayCategory)
     : NA
 
-  let warning = null
+  let warning: string | null = null
 
   if (type === INVALID_LABWARE_FILE) {
     warning = THIS_FILE_IS_NOT_A_VALID_DEFINITION

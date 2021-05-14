@@ -1,4 +1,3 @@
-// @flow
 // setup modules page
 import * as React from 'react'
 import { useSelector } from 'react-redux'
@@ -9,7 +8,7 @@ import { SessionHeader } from '../../organisms/SessionHeader'
 
 import { Page } from '../../atoms/Page'
 
-export function Modules(): React.Node {
+export function Modules(): JSX.Element | null {
   const robot = useSelector(getConnectedRobot)
   const robotName = robot?.name || null
 

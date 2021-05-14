@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
@@ -25,13 +24,6 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import type { CalibrationPanelProps } from './types'
-import type {
-  SessionType,
-  CalibrationSessionStep,
-  SessionCommandString,
-} from '../../redux/sessions/types'
 import {
   JogControls,
   HORIZONTAL_PLANE,
@@ -54,7 +46,17 @@ import slot7LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_7_LE
 import slot7RightMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_7_RIGHT_MULTI_X-Y.webm'
 import slot7RightSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_7_RIGHT_SINGLE_X-Y.webm'
 
-const assetMap = {
+import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { CalibrationPanelProps } from './types'
+import type {
+  SessionType,
+  CalibrationSessionStep,
+  SessionCommandString,
+  CalibrationLabware
+} from '../../redux/sessions/types'
+import type { Mount } from '@opentrons/components'
+
+const assetMap: {[slot in CalibrationLabware['slot']]: {[mount in Mount]: {[channels in 'multi' | 'single']: string}}} = {
   '1': {
     left: {
       multi: slot1LeftMultiDemoAsset,
@@ -107,14 +109,14 @@ const HEALTH_POINT_THREE_BUTTON_TEXT = `${HEALTH_BUTTON_TEXT} and move to slot 7
 const ALLOW_VERTICAL_TEXT = 'Reveal Z jog controls to move up and down'
 
 const contentsBySessionTypeByCurrentStep: {
-  [SessionType]: {
-    [CalibrationSessionStep]: {
+  [sessionType in SessionType]?: {
+    [step in CalibrationSessionStep]?: {
       slotNumber: string,
       buttonText: string,
       moveCommand: SessionCommandString | null,
       finalCommand?: SessionCommandString | null,
-    },
-  },
+    }
+  }
 } = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
     [Sessions.DECK_STEP_SAVING_POINT_ONE]: {
@@ -160,7 +162,7 @@ const contentsBySessionTypeByCurrentStep: {
   },
 }
 
-export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
+export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
   const {
     isMulti,
     mount,
@@ -172,12 +174,12 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     checkBothPipettes,
   } = props
 
-  const {
-    slotNumber,
-    buttonText,
-    moveCommand,
-    finalCommand,
-  } = contentsBySessionTypeByCurrentStep[sessionType][currentStep]
+
+  const contents = sessionType in contentsBySessionTypeByCurrentStep ? contentsBySessionTypeByCurrentStep[sessionType]?.[currentStep] : null
+  const slotNumber  = contents && contents.slotNumber
+  const buttonText  = contents && contents.buttonText
+  const moveCommand  = contents && contents.moveCommand
+  const finalCommand  = contents && contents.finalCommand
 
   const demoAsset = React.useMemo(
     () =>
@@ -187,7 +189,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
 
   const isHealthCheck =
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
-  const jog = (axis: Axis, dir: Sign, step: StepSize) => {
+  const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {
@@ -196,7 +198,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
     })
   }
 
-  const savePoint = () => {
+  const savePoint = (): void => {
     let commands = null
     if (isHealthCheck) {
       commands = [{ command: Sessions.checkCommands.COMPARE_POINT }]
@@ -228,7 +230,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
 
   const [allowVertical, setAllowVertical] = React.useState(false)
 
-  const AllowVerticalPrompt = () => (
+  const AllowVerticalPrompt = (): JSX.Element => (
     <Flex
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
@@ -286,7 +288,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): React.Node {
           loop={true}
           controls={false}
         >
-          <source src={demoAsset} />
+          <source src={String(demoAsset)} />
         </video>
       </Flex>
       <JogControls

@@ -1,4 +1,3 @@
-// @flow
 // system-info reducer tests
 
 import * as Fixtures from '../__fixtures__'
@@ -8,14 +7,14 @@ import { systemInfoReducer } from '../reducer'
 import type { Action } from '../../types'
 import type { SystemInfoState } from '../types'
 
-type ReducerSpec = {|
-  should: string,
-  action: Action,
-  initialState: SystemInfoState,
-  expectedState: SystemInfoState,
-|}
+type ReducerSpec = {
+  should: string
+  action: Action
+  initialState: SystemInfoState
+  expectedState: SystemInfoState
+}
 
-const SPECS: Array<ReducerSpec> = [
+const SPECS: ReducerSpec[] = [
   {
     should: 'handle systemInfo:INITIALIZED action',
     action: Actions.initialized(

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import {
@@ -15,7 +14,7 @@ import {
 import { getNavbarLocations } from '../redux/nav'
 import { NavbarLink } from '../molecules/NavbarLink'
 
-export function Navbar(): React.Node {
+export function Navbar(): JSX.Element {
   const locations = useSelector(getNavbarLocations)
 
   return (

@@ -1,4 +1,3 @@
-// @flow
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -25,7 +24,7 @@ export const fetchSettingsSuccess = (
 
 export const fetchSettingsFailure = (
   robotName: string,
-  error: {| message: string |},
+  error: { message: string },
   meta: RobotApiRequestMeta
 ): Types.FetchSettingsFailureAction => ({
   type: Constants.FETCH_SETTINGS_FAILURE,
@@ -56,7 +55,7 @@ export const updateSettingSuccess = (
 
 export const updateSettingFailure = (
   robotName: string,
-  error: {| message: string |},
+  error: { message: string },
   meta: RobotApiRequestMeta
 ): Types.UpdateSettingFailureAction => ({
   type: Constants.UPDATE_SETTING_FAILURE,

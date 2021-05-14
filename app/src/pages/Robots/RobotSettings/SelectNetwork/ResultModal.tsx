@@ -1,5 +1,3 @@
-// @flow
-
 import * as React from 'react'
 
 import { AlertModal, SpinnerModal } from '@opentrons/components'
@@ -9,15 +7,15 @@ import * as Copy from './i18n'
 
 import type { NetworkChangeType } from './types'
 
-export type ResultModalProps = {|
+export interface ResultModalProps {
   type: NetworkChangeType,
   ssid: string | null,
   isPending: boolean,
-  error: { message?: string, ... } | null,
-  onClose: () => mixed,
-|}
+  error: { message?: string, [key: string]: unknown} | null,
+  onClose: () => unknown,
+}
 
-export const ResultModal = (props: ResultModalProps): React.Node => {
+export const ResultModal = (props: ResultModalProps): JSX.Element => {
   const { type, ssid, isPending, error, onClose } = props
   const isDisconnect = type === DISCONNECT
 

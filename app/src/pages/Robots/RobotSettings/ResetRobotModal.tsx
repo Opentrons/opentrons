@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
@@ -36,15 +35,15 @@ import { Portal } from '../../../App/portal'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
 
-export type ResetRobotModalProps = {|
+export interface ResetRobotModalProps {
   robotName: string,
-  closeModal: () => mixed,
-|}
+  closeModal: () => unknown,
+}
 
 // TODO(bc, 2020-12-07): i18n
 const TITLE = 'Robot Configuration Reset'
 
-export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
+export function ResetRobotModal(props: ResetRobotModalProps): JSX.Element {
   const { robotName, closeModal } = props
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
@@ -52,7 +51,7 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
     return getRequestById(state, last(requestIds))
   })?.status
 
-  const triggerReset = () =>
+  const triggerReset = (): unknown =>
     dispatchRequest(resetConfig(robotName, resetOptions))
 
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
@@ -117,7 +116,7 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
               })
             }}
             name={o.id}
-            value={resetOptions[o.id]}
+            value={Boolean(resetOptions[o.id])}
             key={o.id}
           >
             <p>{o.description}</p>

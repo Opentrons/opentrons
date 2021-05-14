@@ -1,66 +1,63 @@
-// @flow
+import { TEMPDECK, MAGDECK, THERMOCYCLER } from '@opentrons/shared-data'
 
-import {
-  type MagneticModuleModel,
-  type TemperatureModuleModel,
-  type ThermocyclerModuleModel,
-  typeof TEMPDECK,
-  typeof MAGDECK,
-  typeof THERMOCYCLER,
-  type ModuleModel,
+import type {
+  MagneticModuleModel,
+  TemperatureModuleModel,
+  ThermocyclerModuleModel,
+  ModuleModel,
 } from '@opentrons/shared-data'
 
-type PhysicalPort = {|
-  hub: number | null,
-  port: number | null,
-|}
+interface PhysicalPort {
+  hub: number | null
+  port: number | null
+}
 
-export type ApiBaseModule = {|
-  displayName: string,
-  serial: string,
-  revision: string,
-  model: string,
-  moduleModel: ModuleModel,
-  fwVersion: string,
-  port: string,
-  hasAvailableUpdate: boolean,
-  usbPort: PhysicalPort,
-|}
+export interface ApiBaseModule {
+  displayName: string
+  serial: string
+  revision: string
+  model: string
+  moduleModel: ModuleModel
+  fwVersion: string
+  port: string
+  hasAvailableUpdate: boolean
+  usbPort: PhysicalPort
+}
 
-type ApiBaseModuleLegacy = {|
-  displayName: string,
-  serial: string,
-  model: string,
-  fwVersion: string,
-  port: string,
-  hasAvailableUpdate: boolean,
-|}
+interface ApiBaseModuleLegacy {
+  displayName: string
+  serial: string
+  model: string
+  fwVersion: string
+  port: string
+  hasAvailableUpdate: boolean
+}
 
-export type TemperatureData = {|
-  currentTemp: number,
-  targetTemp: number | null,
-|}
+export interface TemperatureData {
+  currentTemp: number
+  targetTemp: number | null
+}
 
-export type MagneticData = {|
-  engaged: boolean,
-  height: number,
-|}
+export interface MagneticData {
+  engaged: boolean
+  height: number
+}
 
-export type ThermocyclerData = {|
+export interface ThermocyclerData {
   // TODO(mc, 2019-12-12): in_between comes from the thermocycler firmware and
   // will be rare in normal operation due to limitations in current revision
-  lid: 'open' | 'closed' | 'in_between',
-  lidTarget: number | null,
-  lidTemp: number | null,
-  currentTemp: number | null,
-  targetTemp: number | null,
-  holdTime: number | null,
-  rampRate: number | null,
-  totalStepCount: number | null,
-  currentStepIndex: number | null,
-  totalCycleCount: number | null,
-  currentCycleIndex: number | null,
-|}
+  lid: 'open' | 'closed' | 'in_between'
+  lidTarget: number | null
+  lidTemp: number | null
+  currentTemp: number | null
+  targetTemp: number | null
+  holdTime: number | null
+  rampRate: number | null
+  totalStepCount: number | null
+  currentStepIndex: number | null
+  totalCycleCount: number | null
+  currentCycleIndex: number | null
+}
 
 export type TemperatureStatus =
   | 'idle'
@@ -77,50 +74,44 @@ export type ThermocyclerStatus =
 
 export type MagneticStatus = 'engaged' | 'disengaged'
 
-export type ApiTemperatureModule = {|
-  ...ApiBaseModule,
-  moduleModel: TemperatureModuleModel,
-  name: TEMPDECK,
-  data: TemperatureData,
-  status: TemperatureStatus,
-|}
+export interface ApiTemperatureModule extends ApiBaseModule {
+  moduleModel: TemperatureModuleModel
+  name: typeof TEMPDECK
+  data: TemperatureData
+  status: TemperatureStatus
+}
 
-export type ApiTemperatureModuleLegacy = {|
-  ...ApiBaseModuleLegacy,
-  name: TEMPDECK,
-  data: TemperatureData,
-  status: TemperatureStatus,
-|}
+export interface ApiTemperatureModuleLegacy extends ApiBaseModuleLegacy {
+  name: typeof TEMPDECK
+  data: TemperatureData
+  status: TemperatureStatus
+}
 
-export type ApiMagneticModule = {|
-  ...ApiBaseModule,
-  moduleModel: MagneticModuleModel,
-  name: MAGDECK,
-  data: MagneticData,
-  status: MagneticStatus,
-|}
+export interface ApiMagneticModule extends ApiBaseModule {
+  moduleModel: MagneticModuleModel
+  name: typeof MAGDECK
+  data: MagneticData
+  status: MagneticStatus
+}
 
-export type ApiMagneticModuleLegacy = {|
-  ...ApiBaseModuleLegacy,
-  name: MAGDECK,
-  data: MagneticData,
-  status: MagneticStatus,
-|}
+export interface ApiMagneticModuleLegacy extends ApiBaseModuleLegacy {
+  name: typeof MAGDECK
+  data: MagneticData
+  status: MagneticStatus
+}
 
-export type ApiThermocyclerModule = {|
-  ...ApiBaseModule,
-  moduleModel: ThermocyclerModuleModel,
-  name: THERMOCYCLER,
-  data: ThermocyclerData,
-  status: ThermocyclerStatus,
-|}
+export interface ApiThermocyclerModule extends ApiBaseModule {
+  moduleModel: ThermocyclerModuleModel
+  name: typeof THERMOCYCLER
+  data: ThermocyclerData
+  status: ThermocyclerStatus
+}
 
-export type ApiThermocyclerModuleLegacy = {|
-  ...ApiBaseModuleLegacy,
-  name: THERMOCYCLER,
-  data: ThermocyclerData,
-  status: ThermocyclerStatus,
-|}
+export interface ApiThermocyclerModuleLegacy extends ApiBaseModuleLegacy {
+  name: typeof THERMOCYCLER
+  data: ThermocyclerData
+  status: ThermocyclerStatus
+}
 
 export type ApiAttachedModule =
   | ApiThermocyclerModule

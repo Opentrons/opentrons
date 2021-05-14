@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
@@ -74,11 +73,11 @@ const ALLOW_XY_JOG_INSTRUCTIONS =
   'If the pipette is over the embossed 5, on the ridge of the slot, or hard to see, reveal the jog controls to move the pipette across the deck.'
 
 const contentsBySessionType: {
-  [SessionType]: {
+  [sessionType in SessionType]?: {
     headerText: string,
     buttonText: string,
     buttonEffectText: string,
-  },
+  }
 } = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
     buttonText: DECK_CAL_BUTTON_TEXT,
@@ -97,12 +96,13 @@ const contentsBySessionType: {
   },
 }
 
-export function SaveZPoint(props: CalibrationPanelProps): React.Node {
+export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
   const { isMulti, mount, sendCommands, sessionType } = props
 
-  const { headerText, buttonText, buttonEffectText } = contentsBySessionType[
-    sessionType
-  ]
+  const contents = sessionType in contentsBySessionType ? contentsBySessionType[sessionType] : null
+  const headerText = contents && contents.headerText
+  const buttonText = contents && contents.buttonText
+  const buttonEffectText = contents && contents.buttonEffectText
 
   const demoAsset = React.useMemo(
     () => mount && assetMap[mount][isMulti ? 'multi' : 'single'],
@@ -111,7 +111,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
 
   const [allowHorizontal, setAllowHorizontal] = React.useState(false)
 
-  const jog = (axis: Axis, dir: Sign, step: StepSize) => {
+  const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {
@@ -120,16 +120,16 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
     })
   }
 
-  const continueCommands = () => {
+  const continueCommands = (): (() => void) => {
     if (sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK) {
-      return () => {
+      return (): void => {
         sendCommands(
           { command: Sessions.checkCommands.COMPARE_POINT },
           { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
         )
       }
     } else {
-      return () => {
+      return (): void => {
         sendCommands(
           { command: Sessions.sharedCalCommands.SAVE_OFFSET },
           { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
@@ -143,7 +143,7 @@ export function SaveZPoint(props: CalibrationPanelProps): React.Node {
     ...props,
   })
 
-  const AllowHorizontalPrompt = () => (
+  const AllowHorizontalPrompt = (): JSX.Element => (
     <Flex
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}

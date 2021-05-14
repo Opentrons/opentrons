@@ -1,5 +1,3 @@
-// @flow
-
 import * as Constants from './constants'
 
 import type { Action } from '../types'
@@ -16,7 +14,7 @@ const INITIAL_CONTROLS_STATE: PerRobotControlsState = {
 const updateRobotState = (
   state: RobotControlsState,
   robotName: string,
-  update: $Shape<PerRobotControlsState>
+  update: Partial<PerRobotControlsState>
 ): RobotControlsState => {
   const robotState = state[robotName] || INITIAL_CONTROLS_STATE
 
@@ -27,9 +25,10 @@ const updateRobotState = (
 }
 
 export function robotControlsReducer(
-  state: RobotControlsState = INITIAL_STATE,
+  state: RobotControlsState,
   action: Action
 ): RobotControlsState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_LIGHTS_SUCCESS:
     case Constants.UPDATE_LIGHTS_SUCCESS: {

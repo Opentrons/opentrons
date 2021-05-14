@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
@@ -7,13 +6,9 @@ import noop from 'lodash/noop'
 import * as Selectors from '../selectors'
 import { useFeatureFlag } from '../hooks'
 
-import type { State } from '../../types'
-import type { FeatureFlags } from '../types'
-
 jest.mock('../selectors')
 
-const getFeatureFlags: JestMockFn<[State], FeatureFlags> =
-  Selectors.getFeatureFlags
+const getFeatureFlags = Selectors.getFeatureFlags as jest.MockedFunction<typeof Selectors.getFeatureFlags>
 
 describe('config hooks', () => {
   afterEach(() => {
@@ -22,13 +17,13 @@ describe('config hooks', () => {
 
   describe('useFeatureFlag', () => {
     let result: boolean
-    const TestUseFeatureFlag = (props: {| flag: any |}) => {
+    const TestUseFeatureFlag = (props: { flag: any }) => {
       result = useFeatureFlag(props.flag)
       return <></>
     }
 
     const mockStore = {
-      getState: () => ({ mockState: true }: any),
+      getState: () => ({ mockState: true } as any),
       dispatch: noop,
       subscribe: noop,
     }
@@ -48,28 +43,28 @@ describe('config hooks', () => {
     })
 
     it('should return false if the feature flag is set to false', () => {
-      getFeatureFlags.mockReturnValue(({ someFlag: false }: any))
+      getFeatureFlags.mockReturnValue({ someFlag: false } as any)
 
       render('someFlag')
       expect(result).toBe(false)
     })
 
     it('should return false if the feature flag is set to falsey', () => {
-      getFeatureFlags.mockReturnValue(({ someFlag: (0: any) }: any))
+      getFeatureFlags.mockReturnValue({ someFlag: 0 as any } as any)
 
       render('someFlag')
       expect(result).toBe(false)
     })
 
     it('should return true if the feature flag is set', () => {
-      getFeatureFlags.mockReturnValue(({ someFlag: true }: any))
+      getFeatureFlags.mockReturnValue({ someFlag: true } as any)
 
       render('someFlag')
       expect(result).toBe(true)
     })
 
     it('should return true if the feature flag is set to truthy', () => {
-      getFeatureFlags.mockReturnValue(({ someFlag: (1: any) }: any))
+      getFeatureFlags.mockReturnValue({ someFlag: 1 as any } as any)
 
       render('someFlag')
       expect(result).toBe(true)

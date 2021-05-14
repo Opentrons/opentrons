@@ -1,4 +1,3 @@
-// @flow
 // bottom button bar for modals
 // TODO(mc, 2018-08-18): maybe make this the default AlertModal behavior
 import * as React from 'react'
@@ -9,13 +8,14 @@ import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
 
-type Props = {|
-  buttons: Array<?ButtonProps>,
-  className?: string,
-  description?: React.Node,
-|}
+type MaybeButtonProps = ButtonProps | null| undefined
+interface Props {
+  buttons: MaybeButtonProps[]
+  className?: string | null
+  description?: React.ReactNode | null
+}
 
-export function BottomButtonBar(props: Props): React.Node {
+export function BottomButtonBar(props: Props): JSX.Element {
   const buttons = props.buttons.filter(Boolean)
   const className = cx(styles.bottom_button_bar, props.className)
 
@@ -27,7 +27,7 @@ export function BottomButtonBar(props: Props): React.Node {
           <OutlineButton
             {...button}
             key={index}
-            className={cx(styles.bottom_button, button.className)}
+            className={cx(styles.bottom_button, button?.className)}
           />
         ))}
       </div>

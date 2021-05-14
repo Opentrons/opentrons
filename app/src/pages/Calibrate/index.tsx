@@ -1,10 +1,9 @@
-// @flow
 // calibrate page routes
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { useRouteMatch, Switch, Route, Redirect } from 'react-router-dom'
 
-import type { State, Dispatch } from '../../redux/types'
+import type { State } from '../../redux/types'
 import type {
   Pipette,
   Labware,
@@ -20,29 +19,21 @@ import { Pipettes as CalibratePipettes } from './Pipettes'
 import { Labware as CalibrateLabware } from './Labware'
 import { Modules as ConnectModules } from './Modules'
 
-type OP = {||}
 
-type SP = {|
+interface SP {
   nextPipette: Pipette | null,
-  labware: Array<Labware>,
-  nextLabware: Labware | void,
+  labware: Labware[],
+  nextLabware: Labware | null | undefined,
   isTipsProbed: boolean,
   nextPipetteTiprack: NextTiprackPipetteInfo | null,
-  modules: Array<SessionModule>,
-|}
+  modules: SessionModule[],
+}
 
-type Props = {| ...OP, ...SP, dispatch: Dispatch |}
+type Props = SP
 
-export const Calibrate: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapStateToProps)(CalibrateComponent)
+export const Calibrate = connect(mapStateToProps)(CalibrateComponent)
 
-function CalibrateComponent(props: Props) {
+function CalibrateComponent(props: Props): JSX.Element {
   const { path } = useRouteMatch()
 
   return (

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Formik } from 'formik'
 import { shallow, mount } from 'enzyme'
@@ -8,36 +7,17 @@ import * as FormFields from '../form-fields'
 
 import { ConnectModal, ConnectModalComponent } from '..'
 import { FormModal } from '../FormModal'
+import { ConnectFormField } from '../../types'
 
-import type {
-  WifiNetwork,
-  EapOption,
-  WifiKey,
-  ConnectFormValues,
-} from '../../types'
+import type { ShallowWrapper } from 'enzyme'
 
 jest.mock('../form-fields')
 
-const getConnectFormFields: JestMockFn<
-  [
-    WifiNetwork | null,
-    string,
-    Array<EapOption>,
-    Array<WifiKey>,
-    ConnectFormValues
-  ],
-  $Call<typeof FormFields.getConnectFormFields, any, any, any, any, any>
-> = FormFields.getConnectFormFields
+const getConnectFormFields = FormFields.getConnectFormFields as jest.MockedFunction<typeof FormFields.getConnectFormFields>
 
-const validateConnectFormFields: JestMockFn<
-  [WifiNetwork | null, Array<EapOption>, ConnectFormValues],
-  $Call<typeof FormFields.validateConnectFormFields, any, any, any>
-> = FormFields.validateConnectFormFields
+const validateConnectFormFields = FormFields.validateConnectFormFields as jest.MockedFunction<typeof FormFields.validateConnectFormFields>
 
-const connectFormToConfigureRequest: JestMockFn<
-  [WifiNetwork | null, ConnectFormValues],
-  $Call<typeof FormFields.connectFormToConfigureRequest, any, any, any>
-> = FormFields.connectFormToConfigureRequest
+const connectFormToConfigureRequest = FormFields.connectFormToConfigureRequest as jest.MockedFunction<typeof FormFields.connectFormToConfigureRequest>
 
 const robotName = 'robotName'
 const eapOptions = [Fixtures.mockEapOption]
@@ -58,7 +38,7 @@ describe("SelectNetwork's ConnectModal", () => {
   })
 
   describe('Formik wrapper', () => {
-    const render = (network = null) => {
+    const render = (network: React.ComponentProps<typeof ConnectModal>['network'] | null = null): ShallowWrapper<React.ComponentProps<typeof ConnectModal>> => {
       return shallow(
         <ConnectModal
           {...{
@@ -95,12 +75,12 @@ describe("SelectNetwork's ConnectModal", () => {
     it('calls onConnect on submit', () => {
       const network = Fixtures.mockWifiNetwork
       const wrapper = render(network)
-      const formik = wrapper.find(Formik)
-      const mockValues = { ssid: 'foobar' }
+      const formik: ShallowWrapper<React.ComponentProps<typeof Formik>> = wrapper.find(Formik)
+      const mockValues = { ssid: 'foobar' } as any
       const mockRequest = { ssid: 'foobar', hidden: false }
 
       connectFormToConfigureRequest.mockReturnValue(mockRequest)
-      formik.invoke('onSubmit')(mockValues)
+      formik.invoke('onSubmit')?.(mockValues, {} as any) // eslint-disable-line @typescript-eslint/no-floating-promises
 
       expect(connectFormToConfigureRequest).toHaveBeenCalledWith(
         network,
@@ -116,7 +96,7 @@ describe("SelectNetwork's ConnectModal", () => {
       const mockValues = {}
 
       connectFormToConfigureRequest.mockReturnValue(null)
-      formik.invoke('onSubmit')(mockValues)
+      formik.invoke('onSubmit')?.(mockValues, {} as any) // eslint-disable-line @typescript-eslint/no-floating-promises
 
       expect(handleConnect).not.toHaveBeenCalled()
     })
@@ -130,7 +110,7 @@ describe("SelectNetwork's ConnectModal", () => {
 
       validateConnectFormFields.mockReturnValue(mockErrors)
 
-      const result = formik.invoke('validate')(mockValues)
+      const result = formik.invoke('validate')?.(mockValues)
 
       expect(result).toEqual(mockErrors)
       expect(validateConnectFormFields).toHaveBeenCalledWith(
@@ -145,7 +125,7 @@ describe("SelectNetwork's ConnectModal", () => {
     const handleSubmit = jest.fn()
     const handleValidate = jest.fn()
 
-    const render = (network = null) => {
+    const render = (network: React.ComponentProps<typeof ConnectModalComponent>['network'] | null = null): ReturnType<typeof mount> => {
       return mount(
         <ConnectModalComponent
           {...{
@@ -186,14 +166,14 @@ describe("SelectNetwork's ConnectModal", () => {
     })
 
     it('passes fields to the connect form modal', () => {
-      const mockFields = [
+      const mockFields: ConnectFormField[] = [
         {
           type: 'text',
           name: 'fieldName',
           label: '* Field Name',
           isPassword: false,
         },
-      ]
+      ] as any
 
       getConnectFormFields.mockReturnValue(mockFields)
 

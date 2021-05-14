@@ -1,4 +1,3 @@
-// @flow
 
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -43,19 +42,19 @@ import type {
 import type { RequestState } from '../../../redux/robot-api/types'
 
 // deck calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
+const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 
-export type Props = {|
+export interface Props {
   robotName: string,
   disabledReason: string | null,
   deckCalStatus: DeckCalibrationStatus | null,
   deckCalData: DeckCalibrationData | null,
   pipOffsetDataPresent: boolean,
-|}
+}
 
-export function DeckCalibrationControl(props: Props): React.Node {
+export function DeckCalibrationControl(props: Props): JSX.Element {
   const {
     robotName,
     disabledReason,
@@ -121,7 +120,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
     }
   }, [createStatus])
 
-  const handleStartDeckCalSession = () => {
+  const handleStartDeckCalSession = (): void => {
     dispatchRequests(
       Sessions.ensureSession(robotName, Sessions.SESSION_TYPE_DECK_CALIBRATION)
     )
@@ -161,7 +160,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
       typeof data.lastModified === 'string'
         ? formatLastModified(data.lastModified)
         : t('shared:unknown')
-    const getPrefix = calData =>
+    const getPrefix = (calData: DeckCalibrationData): string =>
       typeof data?.source === 'string'
         ? calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
           ? t('last_migrated')
@@ -206,7 +205,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
             {...targetProps}
             minWidth="12rem"
             onClick={confirmStart}
-            disabled={disabledOrBusyReason}
+            disabled={Boolean(disabledOrBusyReason)}
           >
             {showSpinner ? (
               <Icon name="ot-spinner" height="1em" spin />

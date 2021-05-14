@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Flex, Link, C_BLUE, FONT_SIZE_BODY_1 } from '@opentrons/components'
 
@@ -6,9 +5,9 @@ const NEED_HELP = 'Need Help?'
 const SUPPORT_PAGE =
   'https://support.opentrons.com/en/collections/2426956-ot-2-calibration'
 
-type Props = React.ElementProps<typeof Flex>
+type Props = React.ComponentProps<typeof Flex>
 
-export function NeedHelpLink(props: Props): React.Node {
+export function NeedHelpLink(props: Props): JSX.Element {
   return (
     <Flex {...props}>
       <Link

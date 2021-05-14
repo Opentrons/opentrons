@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 
 import { GET } from '../../robot-api/constants'
@@ -51,24 +50,24 @@ const mapActionToRequest: ActionToRequestMapper<FetchModulesAction> = action => 
 })
 
 type IdentifierWithData =
-  | {|
-      type: typeof MAGNETIC_MODULE_TYPE,
-      model: MagneticModuleModel,
-      data: MagneticData,
-      status: MagneticStatus,
-    |}
-  | {|
-      type: typeof TEMPERATURE_MODULE_TYPE,
-      model: TemperatureModuleModel,
-      data: TemperatureData,
-      status: TemperatureStatus,
-    |}
-  | {|
-      type: typeof THERMOCYCLER_MODULE_TYPE,
-      model: ThermocyclerModuleModel,
-      data: ThermocyclerData,
-      status: ThermocyclerStatus,
-    |}
+  | {
+      type: typeof MAGNETIC_MODULE_TYPE
+      model: MagneticModuleModel
+      data: MagneticData
+      status: MagneticStatus
+    }
+  | {
+      type: typeof TEMPERATURE_MODULE_TYPE
+      model: TemperatureModuleModel
+      data: TemperatureData
+      status: TemperatureStatus
+    }
+  | {
+      type: typeof THERMOCYCLER_MODULE_TYPE
+      model: ThermocyclerModuleModel
+      data: ThermocyclerData
+      status: ThermocyclerStatus
+    }
 
 const normalizeModuleInfoLegacy = (
   response: ApiAttachedModuleLegacy
@@ -78,22 +77,22 @@ const normalizeModuleInfoLegacy = (
       return {
         type: MAGNETIC_MODULE_TYPE,
         model: MAGNETIC_MODULE_V1,
-        data: (response.data: MagneticData),
-        status: (response.status: MagneticStatus),
+        data: response.data,
+        status: response.status,
       }
     case TEMPDECK:
       return {
         type: TEMPERATURE_MODULE_TYPE,
         model: TEMPERATURE_MODULE_V1,
-        data: (response.data: TemperatureData),
-        status: (response.status: TemperatureStatus),
+        data: response.data,
+        status: response.status,
       }
     case THERMOCYCLER:
       return {
         type: THERMOCYCLER_MODULE_TYPE,
         model: THERMOCYCLER_MODULE_V1,
-        data: (response.data: ThermocyclerData),
-        status: (response.status: ThermocyclerStatus),
+        data: response.data,
+        status: response.status,
       }
     default:
       throw new Error(`bad module name ${response.name}`)
@@ -109,23 +108,23 @@ const normalizeModuleInfoNew = (
       return {
         model: response.moduleModel,
         type: MAGNETIC_MODULE_TYPE,
-        data: (response.data: MagneticData),
-        status: (response.status: MagneticStatus),
+        data: response.data,
+        status: response.status,
       }
     case TEMPERATURE_MODULE_V1:
     case TEMPERATURE_MODULE_V2:
       return {
         model: response.moduleModel,
         type: TEMPERATURE_MODULE_TYPE,
-        data: (response.data: TemperatureData),
-        status: (response.status: TemperatureStatus),
+        data: response.data,
+        status: response.status,
       }
     case THERMOCYCLER_MODULE_V1:
       return {
         model: response.moduleModel,
         type: THERMOCYCLER_MODULE_TYPE,
-        data: (response.data: ThermocyclerData),
-        status: (response.status: ThermocyclerStatus),
+        data: response.data,
+        status: response.status,
       }
     default:
       throw new Error(`bad module model ${response.moduleModel}`)

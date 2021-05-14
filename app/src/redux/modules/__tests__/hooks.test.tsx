@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
@@ -13,17 +12,16 @@ jest.mock('../../robot/selectors')
 
 const mockStore = configureMockStore([])
 
-const mockGetConnectedRobotName: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getConnectedRobotName, State>
-> = RobotSelectors.getConnectedRobotName
+const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<
+  typeof RobotSelectors.getConnectedRobotName
+>
 
 describe('modules hooks', () => {
   describe('useSendModuleCommand hook', () => {
-    let store
-    let sendModuleCommand
+    let store: any
+    let sendModuleCommand: any
 
-    const TestUseSendModuleCommand = () => {
+    const TestUseSendModuleCommand = (): JSX.Element => {
       const _sendModuleCommand = useSendModuleCommand()
       React.useEffect(() => {
         sendModuleCommand = _sendModuleCommand

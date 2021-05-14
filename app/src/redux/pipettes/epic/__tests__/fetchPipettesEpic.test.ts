@@ -1,4 +1,3 @@
-// @flow
 import { TestScheduler } from 'rxjs/testing'
 
 import * as RobotApiHttp from '../../../robot-api/http'
@@ -9,32 +8,28 @@ import * as Actions from '../../actions'
 import * as Types from '../../types'
 import { pipettesEpic } from '../../epic'
 
-import type { Observable } from 'rxjs'
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-  RobotApiResponse,
-} from '../../../robot-api/types'
+import type { Action, State } from '../../../types'
+import type { RobotApiResponse } from '../../../robot-api/types'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')
 
-const mockState = { state: true }
+const mockState: State = { state: true } as any
 const { mockRobot } = Fixtures
 
-const mockFetchRobotApi: JestMockFn<
-  [RobotHost, RobotApiRequestOptions],
-  Observable<RobotApiResponse>
-> = RobotApiHttp.fetchRobotApi
+const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
+  typeof RobotApiHttp.fetchRobotApi
+>
 
-const mockGetRobotByName: JestMockFn<[any, string], mixed> =
-  DiscoverySelectors.getRobotByName
+const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
+  typeof DiscoverySelectors.getRobotByName
+>
 
 describe('fetchPipettesEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot)
+    mockGetRobotByName.mockReturnValue(mockRobot as any)
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
@@ -46,7 +41,7 @@ describe('fetchPipettesEpic', () => {
   })
 
   describe('handles FETCH_PIPETTES', () => {
-    const meta = { requestId: '1234' }
+    const meta = { requestId: '1234' } as any
     const action: Types.FetchPipettesAction = {
       ...Actions.fetchPipettes(mockRobot.name, true),
       meta,
@@ -55,11 +50,11 @@ describe('fetchPipettesEpic', () => {
     it('calls GET /pipettes', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchPipettesSuccess })
+          cold<RobotApiResponse>('r', { r: Fixtures.mockFetchPipettesSuccess })
         )
 
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: mockState })
+        const action$ = hot<Action>('--a', { a: action })
+        const state$ = hot<State>('a-a', { a: mockState })
         const output$ = pipettesEpic(action$, state$)
 
         expectObservable(output$)
@@ -83,8 +78,8 @@ describe('fetchPipettesEpic', () => {
           cold('r', { r: Fixtures.mockFetchPipettesSuccess })
         )
 
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: {} })
+        const action$ = hot<Action>('--a', { a: action })
+        const state$ = hot<State>('a-a', { a: {} } as any)
         const output$ = pipettesEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
@@ -103,8 +98,8 @@ describe('fetchPipettesEpic', () => {
           cold('r', { r: Fixtures.mockFetchPipettesFailure })
         )
 
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: {} })
+        const action$ = hot<Action>('--a', { a: action })
+        const state$ = hot<State>('a-a', { a: {} } as any)
         const output$ = pipettesEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {

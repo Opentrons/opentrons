@@ -1,4 +1,3 @@
-// @flow
 // prompt for ReviewModulesModal of labware calibration page
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -33,13 +32,13 @@ import type { Dispatch } from '../../../redux/types'
 const SUPPORT_PAGE =
   'https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2'
 
-export type PromptProps = {|
+export interface PromptProps {
   modulesMissing: boolean,
-  onPromptClick: () => mixed,
+  onPromptClick: () => unknown,
   hasDuplicateModules: boolean,
-|}
+}
 
-export function Prompt(props: PromptProps): React.Node {
+export function Prompt(props: PromptProps): JSX.Element {
   const { modulesMissing, onPromptClick, hasDuplicateModules } = props
   const { t } = useTranslation('protocol_calibration')
   const [targetProps, tooltipProps] = useHoverTooltip()

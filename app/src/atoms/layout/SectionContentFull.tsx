@@ -1,14 +1,13 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
 
-export type SectionContentFullProps = {|
-  children: React.Node,
-  className?: string,
-|}
+export interface SectionContentFullProps {
+  children: React.ReactNode
+  className?: string
+}
 
-export function SectionContentFull(props: SectionContentFullProps): React.Node {
+export function SectionContentFull(props: SectionContentFullProps): JSX.Element {
   return (
     <div className={cx(styles.section_content_full, props.className)}>
       {props.children}

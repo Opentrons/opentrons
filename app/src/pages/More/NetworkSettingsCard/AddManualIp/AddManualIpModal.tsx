@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
@@ -6,11 +5,11 @@ import { Portal } from '../../../../App/portal'
 import { ManualIpForm } from './ManualIpForm'
 import { IpList } from './IpList'
 
-export type AddManualIpProps = {|
-  closeModal: () => mixed,
-|}
+export interface AddManualIpProps {
+  closeModal: () => unknown,
+}
 
-export function AddManualIpModal(props: AddManualIpProps): React.Node {
+export function AddManualIpModal(props: AddManualIpProps): JSX.Element {
   return (
     <Portal>
       <AlertModal

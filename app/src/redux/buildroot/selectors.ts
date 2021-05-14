@@ -1,4 +1,3 @@
-// @flow
 import semver from 'semver'
 import { createSelector } from 'reselect'
 
@@ -82,7 +81,9 @@ export function getBuildrootRobotName(state: State): string | null {
   return state.buildroot.session?.robotName || null
 }
 
-export const getBuildrootRobot: State => ViewableRobot | null = createSelector(
+export const getBuildrootRobot: (
+  state: State
+) => ViewableRobot | null = createSelector(
   getViewableRobots,
   getBuildrootRobotName,
   (robots, robotName) => {
@@ -135,11 +136,11 @@ export function getBuildrootUpdateAvailable(
 export const getBuildrootUpdateDisplayInfo: (
   state: State,
   robotName: string
-) => {|
-  autoUpdateAction: string,
-  autoUpdateDisabledReason: string | null,
-  updateFromFileDisabledReason: string | null,
-|} = createSelector(
+) => {
+  autoUpdateAction: string
+  autoUpdateDisabledReason: string | null
+  updateFromFileDisabledReason: string | null
+} = createSelector(
   getRobotByName,
   state => getBuildrootRobot(state),
   state => getBuildrootUpdateVersion(state),

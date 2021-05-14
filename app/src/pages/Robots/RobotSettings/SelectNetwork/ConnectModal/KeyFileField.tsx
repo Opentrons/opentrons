@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { SelectField } from '@opentrons/components'
@@ -8,16 +7,17 @@ import { LABEL_ADD_NEW_KEY } from '../i18n'
 import { useConnectFormField } from './form-state'
 
 import type { WifiKey } from '../types'
+import { StyledComponent } from 'styled-components'
 
-export type KeyFileFieldProps = {|
+export interface KeyFileFieldProps {
   id: string,
   name: string,
   label: string,
   placeholder: string,
   robotName: string,
-  wifiKeys: Array<WifiKey>,
+  wifiKeys: WifiKey[],
   className?: string,
-|}
+}
 
 const ADD_NEW_KEY_VALUE = '__addNewKey__'
 
@@ -25,19 +25,19 @@ const ADD_NEW_KEY_OPTION_GROUP = {
   options: [{ value: ADD_NEW_KEY_VALUE, label: LABEL_ADD_NEW_KEY }],
 }
 
-const makeKeyOptions = (keys: Array<WifiKey>) => ({
+const makeKeyOptions = (keys: WifiKey[]): {options: Array<{value: string, label: string}>} => ({
   options: keys.map(k => ({ value: k.id, label: k.name })),
 })
 
-export const KeyFileField = (props: KeyFileFieldProps): React.Node => {
+export const KeyFileField = (props: KeyFileFieldProps): JSX.Element => {
   const { id, name, label, placeholder, robotName, wifiKeys } = props
   const { value, error, setValue, setTouched } = useConnectFormField(name)
   const options = [makeKeyOptions(wifiKeys), ADD_NEW_KEY_OPTION_GROUP]
-  const uploadKeyRef = React.useRef()
+  const uploadKeyRef = React.useRef<StyledComponent<"input", any>>(null)
 
-  const handleValueChange = (_, value) => {
+  const handleValueChange = (_: string, value: string): void => {
     if (value === ADD_NEW_KEY_VALUE) {
-      uploadKeyRef.current && uploadKeyRef.current.click()
+      uploadKeyRef.current && uploadKeyRef?.current?.click()
     } else {
       setValue(value)
     }

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
@@ -23,15 +22,15 @@ const LABWARE_FILES_IN_YOUR_CURRENT_DIRECTORY_WILL_NOT_BE_MOVED =
 export const CANCEL_NAME = 'cancel'
 export const RESET_SOURCE_NAME = 'reset-source'
 
-export type ConfirmResetPathModalProps = {|
-  onCancel: () => mixed,
-  onConfirm: () => mixed,
-|}
+export interface ConfirmResetPathModalProps {
+  onCancel: () => unknown,
+  onConfirm: () => unknown,
+}
 
 export const ConfirmResetPathModalTemplate = ({
   onCancel,
   onConfirm,
-}: ConfirmResetPathModalProps): React.Node => (
+}: ConfirmResetPathModalProps): JSX.Element => (
   <AlertModal
     alertOverlay
     heading={RESET_CUSTOM_LABWARE_SOURCE}
@@ -47,7 +46,7 @@ export const ConfirmResetPathModalTemplate = ({
 
 export const ConfirmResetPathModal = (
   props: ConfirmResetPathModalProps
-): React.Node => (
+): JSX.Element => (
   <Portal>
     <ConfirmResetPathModalTemplate {...props} />
   </Portal>

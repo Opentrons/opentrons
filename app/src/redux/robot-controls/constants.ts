@@ -1,4 +1,3 @@
-// @flow
 
 // homing and move request targets
 

@@ -1,8 +1,6 @@
-// @flow
 import React from 'react'
 import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
-import type { State } from '../../../redux/types'
 
 import wellPlate96Def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
@@ -10,15 +8,13 @@ import { UncalibratedInfo } from '../UncalibratedInfo'
 import { selectors as robotSelectors } from '../../../redux/robot'
 
 import type { TipracksByMountMap, Labware } from '../../../redux/robot/types'
+import type { Mount } from '@opentrons/components'
 
 jest.mock('../../../redux/robot/selectors')
 
-const mockGetUnconfirmedLabware: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getUnconfirmedLabware, State>
-> = robotSelectors.getUnconfirmedLabware
+const mockGetUnconfirmedLabware = robotSelectors.getUnconfirmedLabware as jest.MockedFunction<typeof robotSelectors.getUnconfirmedLabware>
 
-const leftTiprack = ({
+const leftTiprack: Labware = {
   type: 'some_tiprack',
   definition: tiprack300Def,
   slot: '3',
@@ -26,9 +22,9 @@ const leftTiprack = ({
   calibratorMount: 'left',
   isTiprack: true,
   confirmed: true,
-}: $Shape<Labware>)
+} as any
 
-const rightTiprack = ({
+const rightTiprack: Labware = {
   type: 'some_tiprack',
   definition: tiprack300Def,
   slot: '3',
@@ -36,10 +32,10 @@ const rightTiprack = ({
   calibratorMount: 'right',
   isTiprack: true,
   confirmed: true,
-}: $Shape<Labware>)
+} as any
 
-const stubUnconfirmedLabware = [
-  ({
+const stubUnconfirmedLabware: Labware[] = [
+  {
     _id: 123,
     type: 'some_wellplate',
     slot: '4',
@@ -52,13 +48,13 @@ const stubUnconfirmedLabware = [
     definitionHash: 'some_hash',
     calibration: 'unconfirmed',
     isMoving: false,
-    definition: wellPlate96Def,
-  }: $Shape<Labware>),
+    definition: wellPlate96Def as any,
+  }
 ]
 
 describe('UncalibratedInfo', () => {
-  let render
-  let mockStore
+  let render: ((props?: Partial<React.ComponentProps<typeof UncalibratedInfo> & {currentMount: Mount}>) => ReturnType<typeof mount>)
+  let mockStore: any
   let dispatch
   let mockUncalibratedInfo: TipracksByMountMap = { left: [], right: [] }
 

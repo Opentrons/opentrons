@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import {
@@ -13,11 +12,11 @@ import {
 } from '@opentrons/components'
 import type { AttachedModule } from '../../../../redux/modules/types'
 
-type Props = {|
+interface Props {
   module: AttachedModule,
-|}
+}
 
-export function ModuleInfo(props: Props): React.Node {
+export function ModuleInfo(props: Props): JSX.Element {
   const { serial, fwVersion } = props.module
 
   return (

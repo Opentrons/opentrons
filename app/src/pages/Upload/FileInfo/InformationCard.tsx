@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { format } from 'date-fns'
@@ -17,33 +16,24 @@ import { SectionContentHalf, CardRow } from '../../../atoms/layout'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-type OP = {||}
 
-type SP = {|
-  name: ?string,
-  author: ?string,
-  lastUpdated: ?number,
-  method: ?string,
-  description: ?string,
-|}
+interface SP {
+  name: string | null | undefined,
+  author: string | null | undefined,
+  lastUpdated: number | null | undefined,
+  method: string | null | undefined,
+  description: string | null | undefined,
+}
 
-type Props = {| ...OP, ...SP, dispatch: Dispatch |}
+type Props = SP & { dispatch: Dispatch }
 
 const INFO_TITLE = 'Information'
 const DESCRIPTION_TITLE = 'Description'
 const DATE_FORMAT = 'PPpp'
 
-export const InformationCard: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _,
-  _
->(mapStateToProps)(InformationCardComponent)
+export const InformationCard = connect(mapStateToProps, {})(InformationCardComponent)
 
-function InformationCardComponent(props: Props) {
+function InformationCardComponent(props: Props): JSX.Element {
   const { name, author, method, description } = props
   const lastUpdated = props.lastUpdated
     ? format(props.lastUpdated, DATE_FORMAT)

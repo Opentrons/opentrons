@@ -1,4 +1,3 @@
-// @flow
 // support profile epic
 import { combineEpics, ofType } from 'redux-observable'
 import { tap, filter, withLatestFrom, ignoreElements } from 'rxjs/operators'

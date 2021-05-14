@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import {
@@ -12,26 +11,22 @@ import {
   FONT_SIZE_CAPTION,
   FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
-
-import {
-  type LabwareDefinition2,
-  type DeckSlot,
-  getLabwareDisplayName,
-  getIsTiprack,
-} from '@opentrons/shared-data'
+import { getLabwareDisplayName, getIsTiprack, } from '@opentrons/shared-data'
 import styles from './styles.css'
+
+import type { LabwareDefinition2, DeckSlot } from '@opentrons/shared-data'
 
 const SHORT = 'SHORT'
 const TALL = 'TALL'
 
-type CalibrationLabwareRenderProps = {|
+interface CalibrationLabwareRenderProps {
   labwareDef: LabwareDefinition2,
   slotDef: DeckSlot,
-|}
+}
 
 export function CalibrationLabwareRender(
   props: CalibrationLabwareRenderProps
-): React.Node {
+): JSX.Element {
   const { labwareDef, slotDef } = props
   const title = getLabwareDisplayName(labwareDef)
   const isTiprack = getIsTiprack(labwareDef)
@@ -59,7 +54,7 @@ export function CalibrationLabwareRender(
 
 export function CalibrationBlockRender(
   props: CalibrationLabwareRenderProps
-): React.Node {
+): JSX.Element | null {
   const { labwareDef, slotDef } = props
 
   switch (labwareDef.parameters.loadName) {

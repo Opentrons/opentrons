@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import styled from 'styled-components'
 
@@ -37,8 +36,8 @@ const GetUpdateButton = styled(OutlineButton)`
 `
 
 export function U2EDriverWarning(
-  props: React.ElementProps<typeof Flex>
-): React.Node {
+  props: React.ComponentProps<typeof Flex>
+): JSX.Element {
   const trackEvent = useTrackEvent()
 
   return (

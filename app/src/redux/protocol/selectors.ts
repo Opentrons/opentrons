@@ -1,4 +1,3 @@
-// @flow
 import path from 'path'
 import startCase from 'lodash/startCase'
 
@@ -11,15 +10,18 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { State } from '../types'
 import type { ProtocolData, ProtocolType, ProtocolFile } from './types'
 
-type ProtocolInfoSelector = State => {|
-  protocolName: string | null,
-  lastModified: number | null,
-  appName: string | null,
-  appVersion: string | null,
-|}
+type ProtocolInfoSelector = (
+  state: State
+) => {
+  protocolName: string | null
+  lastModified: number | null
+  appName: string | null
+  appVersion: string | null
+}
 
 const log = createLogger(__filename)
-const stripDirAndExtension = f => path.basename(f, path.extname(f))
+const stripDirAndExtension = (f: string): string =>
+  path.basename(f, path.extname(f))
 
 export const getProtocolFile = (state: State): ProtocolFile | null =>
   state.protocol.file
@@ -32,10 +34,9 @@ export const getProtocolContents = (state: State): string | null =>
 export const getProtocolData = (state: State): ProtocolData | null =>
   state.protocol.data
 
-export const getProtocolFilename: State => string | null = createSelector(
-  getProtocolFile,
-  file => file?.name ?? null
-)
+export const getProtocolFilename: (
+  state: State
+) => string | null = createSelector(getProtocolFile, file => file?.name ?? null)
 
 // TODO: (ka 2019-06-11): Investigate removing this unused? selector
 // export const getProtocolLastModified: NumberSelector = createSelector(
@@ -43,46 +44,46 @@ export const getProtocolFilename: State => string | null = createSelector(
 //   file => file && file.lastModified
 // )
 
-type LabwareDefinitionBySlotMap = {
-  [slot: string]: LabwareDefinition2 | void,
-  ...
+interface LabwareDefinitionBySlotMap {
+  [slot: string]: LabwareDefinition2 | null | undefined
 }
 
-export const getLabwareDefBySlot: State => LabwareDefinitionBySlotMap = createSelector(
-  getProtocolData,
-  data => {
-    if (data?.labwareDefinitions && data.labware) {
-      const labwareById = data.labware
-      const labwareDefinitions = data.labwareDefinitions
+export const getLabwareDefBySlot: (
+  state: State
+) => LabwareDefinitionBySlotMap = createSelector(getProtocolData, data => {
+  if (data && 'labwareDefinitions' in data && 'labware' in data) {
+    const labwareById = data.labware
+    const labwareDefinitions = data.labwareDefinitions
 
-      return Object.keys(labwareById).reduce(
-        (defsBySlot: LabwareDefinitionBySlotMap, labwareId: string) => {
-          const labware = labwareById[labwareId]
-          let slot: string =
-            data.modules && labware.slot in data.modules
-              ? data.modules[labware.slot].slot
-              : labware.slot
+    return Object.keys(labwareById).reduce(
+      (defsBySlot: LabwareDefinitionBySlotMap, labwareId: string) => {
+        const labware = labwareById[labwareId]
+        let slot: string =
+          // @ts-expect-error(sa, 2021-05-12): data has been type narrowed to be Readonly<ProtocolFileV3<{}>>, which does not have modules
+          data.modules && labware.slot in data.modules
+            ? // @ts-expect-error(sa, 2021-05-12): data has been type narrowed to be Readonly<ProtocolFileV3<{}>>, which does not have modules
+              data.modules[labware.slot].slot
+            : labware.slot
 
-          // TODO(mc, 2020-08-04): this is for thermocycler support, and its
-          // ugliness is due to deficiences in RPC-based labware state
-          // revisit as part of Protocol Sessions project
-          if (slot === 'span7_8_10_11') slot = '7'
+        // TODO(mc, 2020-08-04): this is for thermocycler support, and its
+        // ugliness is due to deficiences in RPC-based labware state
+        // revisit as part of Protocol Sessions project
+        if (slot === 'span7_8_10_11') slot = '7'
 
-          if (slot in defsBySlot) {
-            log.warn(
-              `expected 1 labware per slot, slot ${slot} contains multiple labware`
-            )
-          }
+        if (slot in defsBySlot) {
+          log.warn(
+            `expected 1 labware per slot, slot ${slot} contains multiple labware`
+          )
+        }
 
-          defsBySlot[slot] = labwareDefinitions[labware.definitionId]
-          return defsBySlot
-        },
-        {}
-      )
-    }
-    return {}
+        defsBySlot[slot] = labwareDefinitions[labware.definitionId]
+        return defsBySlot
+      },
+      {}
+    )
   }
-)
+  return {}
+})
 
 export const getProtocolDisplayData: ProtocolInfoSelector = createSelector(
   getProtocolData,
@@ -102,7 +103,7 @@ export const getProtocolDisplayData: ProtocolInfoSelector = createSelector(
     // TODO(mc, 2020-08-04): this typing doesn't behave; put data access behind
     // a unit tested utility that migrates all data patterns up to latest schema
     const data: any = _data
-    const metadata: any | void = _data.metadata
+    const metadata: any | null | undefined = _data.metadata
 
     const protocolName =
       metadata?.protocolName ?? metadata?.['protocol-name'] ?? basename
@@ -132,45 +133,56 @@ export const getProtocolDisplayData: ProtocolInfoSelector = createSelector(
   }
 )
 
-export const getProtocolName: State => string | null = createSelector(
+export const getProtocolName: (state: State) => string | null = createSelector(
   getProtocolDisplayData,
   displayData => displayData.protocolName
 )
 
-export const getProtocolAuthor: State => string | null = createSelector(
+export const getProtocolAuthor: (
+  state: State
+) => string | null = createSelector(
   getProtocolData,
-  data => data?.metadata?.author ?? null
+  data => (data?.metadata?.author as string) ?? null
 )
 
-export const getProtocolDescription: State => string | null = createSelector(
+export const getProtocolDescription: (
+  state: State
+) => string | null = createSelector(
   getProtocolData,
-  data => data?.metadata?.description ?? null
+  data => (data?.metadata?.description as string) ?? null
 )
 
-export const getProtocolSource: State => string | null = createSelector(
-  getProtocolData,
-  data => {
-    return typeof data?.metadata?.source === 'string'
-      ? data.metadata.source
-      : null
+export const getProtocolSource: (
+  state: State
+) => string | null = createSelector(getProtocolData, data => {
+  if (data !== null && 'metadata' in data && 'source' in data.metadata) {
+    return data.metadata.source ?? null
+  } else {
+    return null
   }
-)
+})
 
-export const getProtocolLastUpdated: State => number | null = createSelector(
+export const getProtocolLastUpdated: (
+  state: State
+) => number | null = createSelector(
   getProtocolFile,
   getProtocolDisplayData,
   (file, displayData) => displayData.lastModified ?? file?.lastModified ?? null
 )
 
-export const getProtocolType: State => ProtocolType | null = createSelector(
+export const getProtocolType: (
+  state: State
+) => ProtocolType | null = createSelector(
   getProtocolFile,
   file => file?.type || null
 )
 
-export const getProtocolCreatorApp: State => {|
-  name: string | null,
-  version: string | null,
-|} = createSelector(getProtocolDisplayData, displayData => {
+export const getProtocolCreatorApp: (
+  state: State
+) => {
+  name: string | null
+  version: string | null
+} = createSelector(getProtocolDisplayData, displayData => {
   return {
     name: displayData.appName,
     version: displayData.appVersion,
@@ -188,7 +200,9 @@ export const getProtocolApiVersion = (state: State): string | null => {
 const METHOD_OT_API = 'Python Protocol API'
 const METHOD_UNKNOWN = 'Unknown Application'
 
-export const getProtocolMethod: State => string | null = createSelector(
+export const getProtocolMethod: (
+  state: State
+) => string | null = createSelector(
   getProtocolFile,
   getProtocolContents,
   getProtocolData,

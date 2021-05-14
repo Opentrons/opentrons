@@ -1,15 +1,14 @@
-// @flow
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
 
-export type ConfirmUploadModalProps = {|
-  confirm: () => mixed,
-  cancel: () => mixed,
-|}
+export interface ConfirmUploadModalProps {
+  confirm: () => unknown,
+  cancel: () => unknown,
+}
 
-export function ConfirmUploadModal(props: ConfirmUploadModalProps): React.Node {
+export function ConfirmUploadModal(props: ConfirmUploadModalProps): JSX.Element {
   return (
     <Portal>
       <AlertModal

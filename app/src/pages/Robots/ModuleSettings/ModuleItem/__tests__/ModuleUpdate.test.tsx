@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
@@ -10,7 +9,7 @@ import { ModuleUpdate } from '../ModuleUpdate'
 const mockStore = configureMockStore([])
 
 describe('ModuleUpdate', () => {
-  let store
+  let store: ReturnType<typeof mockStore>
 
   beforeEach(() => {
     store = mockStore({

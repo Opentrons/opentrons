@@ -1,4 +1,3 @@
-// @flow
 import { useSelector } from 'react-redux'
 
 import { getConfig } from '../config'
@@ -12,7 +11,9 @@ import type { AnalyticsEvent } from './types'
  *
  * @returns {AnalyticsEvent => void} track event function
  */
-export function useTrackEvent(): AnalyticsEvent => void {
-  const config = useSelector((state: State) => getConfig(state)?.analytics)
+export function useTrackEvent(): (e: AnalyticsEvent) => void {
+  const config: State = useSelector(
+    (state: State) => getConfig(state)?.analytics
+  )
   return event => config && trackEvent(event, config)
 }

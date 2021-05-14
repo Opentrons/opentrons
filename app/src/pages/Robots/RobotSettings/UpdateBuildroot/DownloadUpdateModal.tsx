@@ -1,4 +1,3 @@
-// @flow
 // Placeholder modal for missing/downloading/errored update files
 
 import * as React from 'react'
@@ -7,15 +6,15 @@ import { ProgressBar } from './progress'
 import styles from './styles.css'
 import type { ButtonProps } from '@opentrons/components'
 
-export type DownloadUpdateModalProps = {|
+export interface DownloadUpdateModalProps {
   notNowButton: ButtonProps,
   error: string | null,
   progress: number | null,
-|}
+}
 
 export function DownloadUpdateModal(
   props: DownloadUpdateModalProps
-): React.Node {
+): JSX.Element {
   const { notNowButton, error, progress } = props
   const heading = error !== null ? 'Download Error' : 'Downloading Update'
 

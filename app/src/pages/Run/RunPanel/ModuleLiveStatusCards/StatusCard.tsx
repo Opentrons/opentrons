@@ -1,27 +1,25 @@
-// @flow
-//
 import * as React from 'react'
 import styles from './styles.css'
 import { CollapsibleItem } from '@opentrons/components'
 
-type Props = {|
+interface Props {
   /** Slot number the module is in */
   header: string,
   /** Title for the card */
   title: string,
   /** Card Content, each child will be separated with a grey bottom border */
-  children: ?React.Node,
+  children: React.ReactNode | null | undefined,
   /** Optional className for card contents */
   className?: string,
   isCardExpanded: boolean,
-  toggleCard: boolean => mixed,
-|}
+  toggleCard: () => unknown,
+}
 
-export function StatusCard(props: Props): React.Node {
+export function StatusCard(props: Props): JSX.Element {
   return (
     <CollapsibleItem
       className={styles.status_card}
-      onCollapseToggle={() => props.toggleCard(!props.isCardExpanded)}
+      onCollapseToggle={props.toggleCard}
       header={`Slot ${props.header}`}
       title={props.title}
       collapsed={!props.isCardExpanded}

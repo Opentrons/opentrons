@@ -1,4 +1,3 @@
-// @flow
 import { GET } from '../../robot-api'
 import { SYSTEM_TIME_PATH } from '../constants'
 import {
@@ -18,7 +17,7 @@ export const {
   failure: mockFetchSystemTimeFailure,
 }: ResponseFixtures<
   SystemTimeData,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: GET,
   path: SYSTEM_TIME_PATH,

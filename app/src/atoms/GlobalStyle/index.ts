@@ -1,10 +1,8 @@
-// @flow
-import * as React from 'react'
 import { createGlobalStyle } from 'styled-components'
 import { C_DARK_GRAY } from '@opentrons/components'
 import 'typeface-open-sans'
 
-export const GlobalStyle: React.ComponentType<*> = createGlobalStyle`
+export const GlobalStyle = createGlobalStyle`
   * {
     box-sizing: border-box;
     margin: 0;

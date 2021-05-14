@@ -1,5 +1,3 @@
-// @flow
-
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import * as Fixtures from '../__fixtures__'
 import * as POCFixtures from '../../calibration/pipette-offset/__fixtures__'
@@ -7,19 +5,19 @@ import * as TLCFixtures from '../../calibration/tip-length/__fixtures__'
 import * as Selectors from '../selectors'
 import type { State } from '../../types'
 
-type SelectorSpec = {|
-  name: string,
-  selector: (State, ...Array<any>) => mixed,
-  state: $Shape<State>,
-  args?: Array<any>,
-  expected: mixed,
-|}
+interface SelectorSpec {
+  name: string
+  selector: (state: State, ...rest: any[]) => unknown
+  state: State
+  args?: any[]
+  expected: unknown
+}
 
-const SPECS: Array<SelectorSpec> = [
+const SPECS: SelectorSpec[] = [
   {
     name: 'getAttachedPipettes returns no attached pipettes by default',
     selector: Selectors.getAttachedPipettes,
-    state: { pipettes: {} },
+    state: { pipettes: {} } as any,
     args: ['robotName'],
     expected: { left: null, right: null },
   },
@@ -36,13 +34,15 @@ const SPECS: Array<SelectorSpec> = [
           settingsById: null,
         },
       },
-    },
+    } as any,
     args: ['robotName'],
     expected: {
       left: null,
       right: {
         ...Fixtures.mockAttachedPipette,
-        modelSpecs: getPipetteModelSpecs(Fixtures.mockAttachedPipette.model),
+        modelSpecs: getPipetteModelSpecs(
+          Fixtures.mockAttachedPipette.model as any
+        ),
       },
     },
   },
@@ -61,7 +61,7 @@ const SPECS: Array<SelectorSpec> = [
           },
         },
       },
-    },
+    } as any,
     args: ['robotName'],
     expected: { left: null, right: Fixtures.mockPipetteSettings.fields },
   },
@@ -76,7 +76,7 @@ describe('robot api selectors', () => {
 
 describe('getAttachedPipetteCalibrations', () => {
   it('should get calibrations for attached pipettes if they exist', () => {
-    const mockPipetteState: $Shape<State> = {
+    const mockPipetteState: State = {
       pipettes: {
         robotName: {
           attachedByMount: {
@@ -101,7 +101,7 @@ describe('getAttachedPipetteCalibrations', () => {
           tipLengthCalibrations: TLCFixtures.mockAllTipLengthCalibrations,
         },
       },
-    }
+    } as any
 
     expect(
       Selectors.getAttachedPipetteCalibrations(mockPipetteState, 'robotName')
@@ -117,7 +117,7 @@ describe('getAttachedPipetteCalibrations', () => {
     })
   })
   it('should return empty obj if a pipette is attached but there is no calibration', () => {
-    const mockPipetteState: $Shape<State> = {
+    const mockPipetteState: State = {
       pipettes: {
         robotName: {
           attachedByMount: {
@@ -135,7 +135,7 @@ describe('getAttachedPipetteCalibrations', () => {
           tipLengthCalibrations: null,
         },
       },
-    }
+    } as any
     expect(
       Selectors.getAttachedPipetteCalibrations(mockPipetteState, 'robotName')
     ).toEqual({
@@ -144,7 +144,7 @@ describe('getAttachedPipetteCalibrations', () => {
     })
   })
   it('should return empty obj if no pipette is attached', () => {
-    const mockPipetteState: $Shape<State> = {
+    const mockPipetteState: State = {
       pipettes: {
         robotName: {
           attachedByMount: {
@@ -163,7 +163,7 @@ describe('getAttachedPipetteCalibrations', () => {
           tipLengthCalibrations: TLCFixtures.mockAllTipLengthCalibrations,
         },
       },
-    }
+    } as any
     expect(
       Selectors.getAttachedPipetteCalibrations(mockPipetteState, 'robotName')
     ).toEqual({

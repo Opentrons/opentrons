@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
@@ -10,14 +9,14 @@ import type {
   RobotSystemType,
 } from '../../../../redux/buildroot/types'
 
-export type InstallModalProps = {|
+export interface InstallModalProps {
   robot: ViewableRobot,
   robotSystemType: RobotSystemType | null,
   session: BuildrootUpdateSession,
-  close: () => mixed,
-|}
+  close: () => unknown,
+}
 
-export function InstallModal(props: InstallModalProps): React.Node {
+export function InstallModal(props: InstallModalProps): JSX.Element {
   const { session, close, robotSystemType } = props
   const buttons = []
 
@@ -25,7 +24,7 @@ export function InstallModal(props: InstallModalProps): React.Node {
     buttons.push({ children: 'close', onClick: close })
   }
 
-  let heading: string
+  let heading: string = ''
   if (robotSystemType === 'balena') {
     if (
       session.step === 'premigration' ||

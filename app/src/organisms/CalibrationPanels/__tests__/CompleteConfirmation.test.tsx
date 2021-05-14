@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
@@ -6,21 +5,22 @@ import * as Sessions from '../../../redux/sessions'
 
 import { CompleteConfirmation } from '../CompleteConfirmation'
 
+import type { Mount } from '@opentrons/components'
+import type { ReactWrapper } from 'enzyme'
+
 describe('CompleteConfirmation', () => {
-  let render
+  let render: (props?: Partial<React.ComponentProps<typeof CompleteConfirmation> & {pipMount: Mount}>) => ReactWrapper<React.ComponentProps<typeof CompleteConfirmation>>
 
   const mockSendCommands = jest.fn()
   const mockCleanUpAndExit = jest.fn()
 
-  const getContinueButton = wrapper =>
+  const getContinueButton = (wrapper: ReactWrapper<React.ComponentProps<typeof CompleteConfirmation>>) =>
     wrapper.find('button[title="Return tip to tip rack and exit"]')
 
   beforeEach(() => {
-    render = (
-      props: $Shape<React.ElementProps<typeof CompleteConfirmation>> = {}
-    ) => {
+    render = (props = {}) => {
       const {
-        pipMount = 'left',
+        pipMount = 'left' as Mount,
         isMulti = false,
         tipRack = mockDeckCalTipRack,
         sendCommands = mockSendCommands,
@@ -49,7 +49,7 @@ describe('CompleteConfirmation', () => {
   it('clicking continue sends exit command and deletes session', () => {
     const wrapper = render()
 
-    getContinueButton(wrapper).invoke('onClick')()
+    getContinueButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockCleanUpAndExit).toHaveBeenCalled()

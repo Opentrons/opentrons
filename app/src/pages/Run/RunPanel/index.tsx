@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 
@@ -13,9 +12,10 @@ import { RunTimer } from './RunTimer'
 import { RunControls } from './RunControls'
 import { ModuleLiveStatusCards } from './ModuleLiveStatusCards'
 
-import type { State, Dispatch } from '../../../redux/types'
+import type { MapDispatchToProps } from 'react-redux'
+import type { State } from '../../../redux/types'
 
-type SP = {|
+interface SP {
   isRunning: boolean,
   isPaused: boolean,
   startTime: string | null,
@@ -24,16 +24,16 @@ type SP = {|
   modulesReady: boolean,
   runTime: string,
   disabled: boolean,
-|}
+}
 
-type DP = {|
-  onRunClick: () => mixed,
-  onPauseClick: () => mixed,
-  onResumeClick: () => mixed,
-  onResetClick: () => mixed,
-|}
+interface DP {
+  onRunClick: () => unknown,
+  onPauseClick: () => unknown,
+  onResumeClick: () => unknown,
+  onResetClick: () => unknown,
+}
 
-type Props = {| ...SP, ...DP |}
+type Props = SP & DP
 
 const mapStateToProps = (state: State): SP => ({
   isRunning: robotSelectors.getIsRunning(state),
@@ -49,14 +49,14 @@ const mapStateToProps = (state: State): SP => ({
     robotSelectors.getSessionLoadInProgress(state),
 })
 
-const mapDispatchToProps = (dispatch: Dispatch): DP => ({
+const mapDispatchToProps: MapDispatchToProps<DP, {}> = (dispatch) => ({
   onRunClick: () => dispatch(robotActions.run()),
   onPauseClick: () => dispatch(robotActions.pause()),
   onResumeClick: () => dispatch(robotActions.resume()),
   onResetClick: () => dispatch(robotActions.refreshSession()),
 })
 
-function RunPanelComponent(props: Props) {
+function RunPanelComponent(props: Props): JSX.Element {
   return (
     <SidePanel title="Execute Run">
       <SidePanelGroup>
@@ -79,14 +79,4 @@ function RunPanelComponent(props: Props) {
   )
 }
 
-export const RunPanel: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  _,
-  _,
-  _,
-  _
->(
-  mapStateToProps,
-  mapDispatchToProps
-)(RunPanelComponent)
+export const RunPanel = connect(mapStateToProps, mapDispatchToProps)(RunPanelComponent)

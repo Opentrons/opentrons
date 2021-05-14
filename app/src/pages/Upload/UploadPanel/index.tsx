@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 
@@ -8,32 +7,21 @@ import { openProtocol, getProtocolFilename } from '../../../redux/protocol'
 import { SidePanel } from '@opentrons/components'
 import { Upload } from './Upload'
 
-import type { State, Dispatch } from '../../../redux/types'
+import type { State, Action } from '../../../redux/types'
+import type { MapDispatchToProps } from 'react-redux'
 
-type SP = {|
-  filename: ?string,
-  sessionLoaded: ?boolean,
-|}
+interface SP {
+  filename: string | null | undefined,
+  sessionLoaded: boolean | null | undefined,
+}
 
-type DP = {|
-  createSession: File => mixed,
-|}
+interface DP {
+  createSession: (f: File) => unknown,
+}
 
-type Props = {| ...SP, ...DP |}
+type Props = SP & DP
 
-export const UploadPanel: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  _,
-  _,
-  _,
-  _
->(
-  mapStateToProps,
-  mapDispatchToProps
-)(UploadPanelComponent)
-
-function UploadPanelComponent(props: Props) {
+function UploadPanelComponent(props: Props): JSX.Element {
   return (
     <SidePanel title="Protocol File">
       <Upload {...props} />
@@ -48,8 +36,13 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch): DP {
+const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
   return {
-    createSession: (file: File) => dispatch(openProtocol(file)),
+    createSession: (file: File) => dispatch<Action>(openProtocol(file))
   }
 }
+
+export const UploadPanel = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UploadPanelComponent)

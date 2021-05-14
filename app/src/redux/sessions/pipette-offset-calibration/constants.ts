@@ -1,4 +1,3 @@
-// @flow
 // pipette offset calibration session constants
 import { sharedCalCommands } from '../common-calibration/constants'
 

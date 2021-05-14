@@ -1,4 +1,3 @@
-// @flow
 import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import {
@@ -37,7 +36,7 @@ const receiveActionFromShellEpic: Epic = () =>
   fromEvent<Action>(
     ipcRenderer,
     'dispatch',
-    (_: mixed, incoming: Action) => incoming
+    (_: unknown, incoming: Action) => incoming
   ).pipe<Action>(
     tap(incoming => {
       log.debug('Received action from main via IPC', {

@@ -1,18 +1,17 @@
-// @flow
 import * as Fixtures from '../__fixtures__'
 import * as actions from '../actions'
 
 import type { Action } from '../../types'
 
-type ActionSpec = {|
-  name: string,
-  creator: (...Array<any>) => mixed,
-  args?: Array<mixed>,
-  expected: Action,
-|}
+interface ActionSpec {
+  name: string
+  creator: (...args: any[]) => unknown
+  args?: unknown[]
+  expected: Action
+}
 
 describe('custom labware actions', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'fetchCustomLabware',
       creator: actions.fetchCustomLabware,

@@ -1,4 +1,3 @@
-// @flow
 import * as Types from './types'
 import { DISMISS_REQUEST } from './constants'
 

@@ -1,4 +1,3 @@
-// @flow
 // analytics epics
 import { combineEpics, ofType } from 'redux-observable'
 import { of, from, zip } from 'rxjs'
@@ -61,7 +60,9 @@ const optIntoAnalyticsEpic: Epic = (_, state$) => {
     ),
     pairwise(),
     filter(([prev, next]) => prev.optedIn !== next.optedIn),
-    tap(([_, config]: [mixed, AnalyticsConfig]) => setMixpanelTracking(config)),
+    tap(([_, config]: [unknown, AnalyticsConfig]) =>
+      setMixpanelTracking(config)
+    ),
     ignoreElements()
   )
 }

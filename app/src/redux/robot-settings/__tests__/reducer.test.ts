@@ -1,25 +1,23 @@
-// @flow
-
 import { robotSettingsReducer } from '../reducer'
 import * as Fixtures from '../__fixtures__'
 
 import type { Action } from '../../types'
 import type { RobotSettingsState } from '../types'
 
-type ReducerSpec = {|
-  name: string,
-  action: Action,
-  state: RobotSettingsState,
-  expected: RobotSettingsState,
-|}
+type ReducerSpec = {
+  name: string
+  action: Action
+  state: RobotSettingsState
+  expected: RobotSettingsState
+}
 
 describe('robotSettingsReducer', () => {
-  const SPECS: Array<ReducerSpec> = [
+  const SPECS: ReducerSpec[] = [
     {
       name: 'handles FETCH_SETTINGS_SUCCESS without restart required',
       action: {
         type: 'robotSettings:FETCH_SETTINGS_SUCCESS',
-        meta: {},
+        meta: {} as any,
         payload: {
           robotName: 'robotName',
           settings: Fixtures.mockRobotSettings,
@@ -38,7 +36,7 @@ describe('robotSettingsReducer', () => {
       name: 'handles FETCH_SETTINGS_SUCCESS with restart required',
       action: {
         type: 'robotSettings:FETCH_SETTINGS_SUCCESS',
-        meta: {},
+        meta: {} as any,
         payload: {
           robotName: 'robotName',
           settings: Fixtures.mockRobotSettings.slice(0, 1),
@@ -62,7 +60,7 @@ describe('robotSettingsReducer', () => {
       name: 'handles UPDATE_SETTING_SUCCESS',
       action: {
         type: 'robotSettings:UPDATE_SETTING_SUCCESS',
-        meta: {},
+        meta: {} as any,
         payload: {
           robotName: 'robotName',
           settings: Fixtures.mockRobotSettings,

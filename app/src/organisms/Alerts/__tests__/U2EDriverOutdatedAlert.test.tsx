@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
@@ -16,19 +15,18 @@ jest.mock('react-router-dom', () => ({
 
 // TODO(mc, 2020-05-07): remove this feature flag
 jest.mock('../../../redux/config/hooks', () => ({
-  useFeatureFlag: flag => flag === 'systemInfoEnabled',
+  useFeatureFlag: (flag: string) => flag === 'systemInfoEnabled',
 }))
 
 const EXPECTED_DOWNLOAD_URL =
   'https://www.realtek.com/en/component/zoo/category/network-interface-controllers-10-100-1000m-gigabit-ethernet-usb-3-0-software'
 
-const useTrackEvent: JestMockFn<[], $Call<typeof Analytics.useTrackEvent>> =
-  Analytics.useTrackEvent
+const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<typeof Analytics.useTrackEvent>
 
 describe('U2EDriverOutdatedAlert', () => {
   const dismissAlert = jest.fn()
-  const trackEvent = jest.fn()
-  const render = () => {
+  const trackEvent: ReturnType<typeof Analytics.useTrackEvent> = jest.fn() as any
+  const render = (): ReturnType<typeof mount> => {
     return mount(<U2EDriverOutdatedAlert dismissAlert={dismissAlert} />)
   }
 
@@ -53,7 +51,7 @@ describe('U2EDriverOutdatedAlert', () => {
     const wrapper = render()
     const link = wrapper.find('Link[to="/more/network-and-system"]')
 
-    link.invoke('onClick')()
+    link.invoke('onClick')?.({} as React.MouseEvent)
 
     expect(link.prop('children')).toContain('view adapter info')
     expect(dismissAlert).toHaveBeenCalledWith(false)
@@ -67,7 +65,7 @@ describe('U2EDriverOutdatedAlert', () => {
     const wrapper = render()
     const link = wrapper.find(`a[href="${EXPECTED_DOWNLOAD_URL}"]`)
 
-    link.invoke('onClick')()
+    link.invoke('onClick')?.({} as React.MouseEvent)
 
     expect(link.prop('children')).toContain('get update')
     expect(dismissAlert).toHaveBeenCalledWith(false)
@@ -85,7 +83,7 @@ describe('U2EDriverOutdatedAlert', () => {
       checkbox.simulate('change')
     })
     wrapper.update()
-    wrapper.find('Link[to="/more/network-and-system"]').invoke('onClick')()
+    wrapper.find('Link[to="/more/network-and-system"]').invoke('onClick')?.({} as React.MouseEvent)
 
     expect(dismissAlert).toHaveBeenCalledWith(true)
     expect(trackEvent).toHaveBeenCalledWith({

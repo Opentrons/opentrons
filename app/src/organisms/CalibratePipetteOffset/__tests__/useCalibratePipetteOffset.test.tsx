@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import uniqueId from 'lodash/uniqueId'
 import { mountWithStore } from '@opentrons/components/__utils__'
@@ -12,31 +11,24 @@ import { useCalibratePipetteOffset } from '../useCalibratePipetteOffset'
 import { INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL } from '../../../organisms/CalibrationPanels'
 import { pipetteOffsetCalibrationStarted } from '../../../redux/analytics'
 
-import type { State } from '../../../redux/types'
-import type { SessionType } from '../../../redux/sessions'
+import type { Invoker } from '../useCalibratePipetteOffset'
 
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 jest.mock('lodash/uniqueId')
 
-const mockUniqueId: JestMockFn<[string | void], string> = uniqueId
-const mockGetRobotSessionOfType: JestMockFn<
-  [State, string, SessionType],
-  $Call<typeof Sessions.getRobotSessionOfType, State, string, SessionType>
-> = Sessions.getRobotSessionOfType
-const mockGetRequestById: JestMockFn<
-  [State, string],
-  $Call<typeof RobotApi.getRequestById, State, string>
-> = RobotApi.getRequestById
+const mockUniqueId = uniqueId as jest.MockedFunction<typeof uniqueId>
+const mockGetRobotSessionOfType= Sessions.getRobotSessionOfType as jest.MockedFunction<typeof Sessions.getRobotSessionOfType>
+const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<typeof RobotApi.getRequestById>
 
 describe('useCalibratePipetteOffset hook', () => {
-  let startCalibration
-  let CalWizardComponent
+  let startCalibration: Invoker
+  let CalWizardComponent: JSX.Element | null
   const robotName = 'robotName'
   const mountString = 'left'
   const onComplete = jest.fn()
 
-  const TestUseCalibratePipetteOffset = () => {
+  const TestUseCalibratePipetteOffset = (): JSX.Element => {
     const [_startCalibration, _CalWizardComponent] = useCalibratePipetteOffset(
       robotName,
       {
@@ -193,7 +185,7 @@ describe('useCalibratePipetteOffset hook', () => {
 
     wrapper
       .find('button[title="Return tip to tip rack and exit"]')
-      .invoke('onClick')()
+      .invoke('onClick')?.({} as React.MouseEvent)
     wrapper.setProps({})
     expect(store.dispatch).toHaveBeenCalledWith({
       ...Sessions.deleteSession(robotName, seshId),

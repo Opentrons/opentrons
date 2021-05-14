@@ -1,4 +1,3 @@
-// @flow
 // UI components for displaying connection info
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
@@ -21,22 +20,22 @@ import type {
 const USB: 'USB' = 'USB'
 const WI_FI: 'Wi-Fi' = 'Wi-Fi'
 
-const boldProps: React.ElementProps<typeof Text> = {
+const boldProps: React.ComponentProps<typeof Text> = {
   as: 'span',
   fontWeight: FONT_WEIGHT_SEMIBOLD,
   textTransform: TEXT_TRANSFORM_CAPITALIZE,
 }
 
-type ConnectionStatusProps = {|
+interface ConnectionStatusProps {
   type: typeof USB | typeof WI_FI,
   ipAddress: string,
   status: typeof CONNECTABLE | typeof REACHABLE,
   internetStatus: InternetStatus | null,
-|}
+}
 
 export function ConnectionStatusMessage(
   props: ConnectionStatusProps
-): React.Node {
+): JSX.Element {
   const { type, ipAddress, status, internetStatus } = props
   const { t } = useTranslation(['robot_connection', 'shared'])
 
@@ -62,6 +61,7 @@ export function ConnectionStatusMessage(
           t={t}
           i18nKey="internet_status"
           tOptions={{ context: internetStatus }}
+          // @ts-expect-error TODO: use `defaults` prop instead of `defaultValue`
           defaultValue={t('shared:unknown')}
           components={{ bold: <Text {...boldProps} /> }}
         />
@@ -70,15 +70,15 @@ export function ConnectionStatusMessage(
   )
 }
 
-type ConnectionInfoProps = {
+interface ConnectionInfoProps {
   connection: SimpleInterfaceStatus | null,
   title: string,
   wired?: boolean,
-  children?: React.Node,
-  disabled: ?boolean,
+  children?: React.ReactNode,
+  disabled: boolean | null | undefined,
 }
 
-export function ConnectionInfo(props: ConnectionInfoProps): React.Node {
+export function ConnectionInfo(props: ConnectionInfoProps): JSX.Element {
   const { connection, title, wired, children, disabled } = props
   const labelStyles = cx(styles.connection_label, {
     [styles.disabled]: disabled,
@@ -101,13 +101,13 @@ export function ConnectionInfo(props: ConnectionInfoProps): React.Node {
   )
 }
 
-type NetworkAddressProps = {
+interface NetworkAddressProps {
   connection: SimpleInterfaceStatus | null,
-  wired: ?boolean,
-  disabled: ?boolean,
+  wired: boolean | null | undefined,
+  disabled: boolean | null | undefined,
 }
 
-function NetworkAddresses(props: NetworkAddressProps) {
+function NetworkAddresses(props: NetworkAddressProps): JSX.Element {
   const { wired, disabled, connection } = props
   const { t } = useTranslation(['robot_connection', 'shared'])
   const unknown = t('shared:unknown')

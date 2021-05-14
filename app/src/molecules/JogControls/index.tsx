@@ -1,4 +1,3 @@
-// @flow
 // jog controls component
 import * as React from 'react'
 
@@ -21,17 +20,16 @@ import type { Jog, Plane, StepSize } from './types'
 import type { StyleProps } from '@opentrons/components'
 
 export type { Jog }
-export type JogControlsProps = {|
+export interface JogControlsProps extends StyleProps {
   jog: Jog,
-  planes?: Array<Plane>,
-  stepSizes?: Array<StepSize>,
-  auxiliaryControl?: React.Node | null,
-  ...StyleProps,
-|}
+  planes?: Plane[],
+  stepSizes?: StepSize[],
+  auxiliaryControl?: React.ReactNode | null,
+}
 
 export { HORIZONTAL_PLANE, VERTICAL_PLANE }
 
-export function JogControls(props: JogControlsProps): React.Node {
+export function JogControls(props: JogControlsProps): JSX.Element {
   const {
     stepSizes = DEFAULT_STEP_SIZES,
     planes = [HORIZONTAL_PLANE, VERTICAL_PLANE],

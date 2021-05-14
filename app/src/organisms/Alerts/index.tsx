@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import head from 'lodash/head'
@@ -12,7 +11,7 @@ import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 import type { State, Dispatch } from '../../redux/types'
 import type { AlertId } from '../../redux/alerts/types'
 
-export function Alerts(): React.Node {
+export function Alerts(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
 
   // TODO(mc, 2020-05-07): move head logic to selector with alert priorities
@@ -20,7 +19,7 @@ export function Alerts(): React.Node {
     return head(AppAlerts.getActiveAlerts(state)) ?? null
   })
 
-  const dismissAlert = remember => {
+  const dismissAlert = (remember?: boolean): void => {
     if (activeAlert) {
       dispatch(AppAlerts.alertDismissed(activeAlert, remember))
     }

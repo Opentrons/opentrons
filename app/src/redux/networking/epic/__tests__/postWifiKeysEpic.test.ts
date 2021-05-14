@@ -1,11 +1,13 @@
-// @flow
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { networkingEpic } from '..'
 
+import type { Action } from '../../../types'
+
 const keyFile = new File([Buffer.from('contents')], 'key.crt')
-const makeTriggerAction = robotName => Actions.postWifiKeys(robotName, keyFile)
+const makeTriggerAction = (robotName: string) =>
+  Actions.postWifiKeys(robotName, keyFile)
 
 describe('networking post wifi keys epic', () => {
   afterEach(() => {
@@ -18,7 +20,7 @@ describe('networking post wifi keys epic', () => {
       Fixtures.mockPostWifiKeysSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
@@ -43,7 +45,7 @@ describe('networking post wifi keys epic', () => {
       Fixtures.mockPostWifiKeysSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
@@ -63,7 +65,7 @@ describe('networking post wifi keys epic', () => {
       Fixtures.mockPostWifiKeysFailure
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 
@@ -6,18 +5,22 @@ import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
 import * as Sessions from '../../../redux/sessions'
 import { SaveZPoint } from '../SaveZPoint'
 
+import type { Mount } from '@opentrons/components'
+import type { ReactWrapper, HTMLAttributes } from 'enzyme'
+import type { VectorTuple } from '../../../redux/sessions/types'
+
 describe('SaveZPoint', () => {
-  let render
+  let render: (props?: Partial<React.ComponentProps<typeof SaveZPoint> & {pipMount: Mount}>) => ReactWrapper<React.ComponentProps<typeof SaveZPoint>>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getSaveButton = wrapper => wrapper.find('button[title="save"]')
+  const getSaveButton = (wrapper: ReactWrapper<React.ComponentProps<typeof SaveZPoint>>): ReactWrapper<HTMLAttributes> => wrapper.find('button[title="save"]')
 
-  const getJogButton = (wrapper, direction) =>
+  const getJogButton = (wrapper: ReactWrapper<React.ComponentProps<typeof SaveZPoint>>, direction: string): ReactWrapper<HTMLAttributes> =>
     wrapper.find(`button[title="${direction}"]`).find('button')
 
-  const getVideo = wrapper => wrapper.find(`source`)
+  const getVideo = (wrapper: ReactWrapper<React.ComponentProps<typeof SaveZPoint>>): ReactWrapper<HTMLAttributes> => wrapper.find(`source`)
 
   beforeEach(() => {
     render = (props = {}) => {
@@ -48,7 +51,7 @@ describe('SaveZPoint', () => {
   })
 
   it('displays proper asset', () => {
-    const assetMap = {
+    const assetMap: {[mount in Mount]: {[c in 'multi' | 'single']: string}} = {
       left: {
         multi: 'SLOT_5_LEFT_MULTI_Z.webm',
         single: 'SLOT_5_LEFT_SINGLE_Z.webm',
@@ -60,13 +63,13 @@ describe('SaveZPoint', () => {
     }
 
     Object.keys(assetMap).forEach(mountString => {
-      Object.keys(assetMap[mountString]).forEach(channelString => {
+      Object.keys(assetMap[mountString as Mount]).forEach(channelString => {
         const wrapper = render({
-          pipMount: mountString,
-          isMulti: channelString === 'multi',
+          pipMount: mountString as Mount,
+          isMulti: channelString as 'multi' | 'single' === 'multi',
         })
         expect(getVideo(wrapper).prop('src')).toEqual(
-          assetMap[mountString][channelString]
+          assetMap[mountString as Mount][channelString as 'multi' | 'single']
         )
       })
     })
@@ -75,13 +78,14 @@ describe('SaveZPoint', () => {
   it('allows jogging in z axis', () => {
     const wrapper = render()
 
-    const jogDirections = ['up', 'down']
-    const jogVectorByDirection = {
+    type ZJogDir = 'up' | 'down'
+    const jogDirections: ZJogDir[] = ['up', 'down']
+    const jogVectorByDirection: {[dir in ZJogDir]: VectorTuple} = {
       up: [0, 0, 0.1],
       down: [0, 0, -0.1],
     }
     jogDirections.forEach(direction => {
-      getJogButton(wrapper, direction).invoke('onClick')()
+      getJogButton(wrapper, direction).invoke('onClick')?.({} as React.MouseEvent)
       wrapper.update()
 
       expect(mockSendCommands).toHaveBeenCalledWith({
@@ -102,8 +106,8 @@ describe('SaveZPoint', () => {
   it('allows jogging in xy axis after prompt clicked', () => {
     const wrapper = render()
 
-    const jogDirections = ['left', 'right', 'back', 'forward']
-    const jogVectorByDirection = {
+    const jogDirections: string[] = ['left', 'right', 'back', 'forward']
+    const jogVectorByDirection: {[dir: string]: VectorTuple} = {
       left: [-0.1, 0, 0],
       right: [0.1, 0, 0],
       back: [0, 0.1, 0],
@@ -114,9 +118,9 @@ describe('SaveZPoint', () => {
     })
     wrapper
       .find('button[children="Reveal XY jog controls to move across deck"]')
-      .invoke('onClick')({ preventDefault: () => {} })
+      .invoke('onClick')?.({} as React.MouseEvent)
     jogDirections.forEach(direction => {
-      getJogButton(wrapper, direction).invoke('onClick')()
+      getJogButton(wrapper, direction).invoke('onClick')?.({} as React.MouseEvent)
 
       expect(mockSendCommands).toHaveBeenCalledWith({
         command: Sessions.deckCalCommands.JOG,
@@ -136,7 +140,7 @@ describe('SaveZPoint', () => {
   it('sends save offset command when primary button is clicked', () => {
     const wrapper = render()
 
-    getSaveButton(wrapper).invoke('onClick')()
+    getSaveButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockSendCommands).toHaveBeenCalledWith(
@@ -188,7 +192,7 @@ describe('SaveZPoint', () => {
 
   it('renders the confirm crash modal when invoked', () => {
     const wrapper = render()
-    wrapper.find('a[children="Start over"]').invoke('onClick')()
+    wrapper.find('a[children="Start over"]').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
     expect(wrapper.find('ConfirmCrashRecoveryModal').exists()).toBe(true)
   })

@@ -1,4 +1,3 @@
-// @flow
 import { getLatestLabwareDef } from '../getLabware'
 import { findLabwareDefWithCustom } from '../findLabware'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -9,21 +8,21 @@ jest.mock('../getLabware', () => ({
   getLatestLabwareDef: jest.fn(),
 }))
 
-const mockGetLabware: JestMockFn<
-  [?string],
-  LabwareDefinition2 | null
-> = getLatestLabwareDef
+const mockGetLabware = getLatestLabwareDef as jest.MockedFunction<
+  typeof getLatestLabwareDef
+>
 
-const fixture_custom_beta_tiprack_10_ul = {
+// TODO(bc, IMMEDIATELY check if these tests still pass when fixture spread properly comes first)
+const fixture_custom_beta_tiprack_10_ul: LabwareDefinition2 = {
   namespace: 'custom_beta',
   ...fixture_tiprack_10_ul,
 }
 
-const fixture_tiprack_10_ul_v2 = {
+const fixture_tiprack_10_ul_v2: LabwareDefinition2 = {
   version: 2,
   ...fixture_tiprack_10_ul,
 }
-const opentrons_fixture_tiprack_300ul = {
+const opentrons_fixture_tiprack_300ul: LabwareDefinition2 = {
   namespace: 'opentrons',
   ...fixture_tiprack_300_ul,
 }

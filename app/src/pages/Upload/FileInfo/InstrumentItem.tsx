@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -22,16 +21,16 @@ import type { PipetteCompatibility } from '../../../redux/pipettes/types'
 
 const AXIS_NAMES = ['x', 'y', 'z']
 
-export type InstrumentItemProps = {|
+export interface InstrumentItemProps {
   compatibility?: PipetteCompatibility,
   mount?: string,
-  children: React.Node,
+  children: React.ReactNode,
   hidden?: boolean,
   needsOffsetCalibration: boolean,
   pipetteOffsetData?: [number, number, number] | null,
-|}
+}
 
-export function InstrumentItem(props: InstrumentItemProps): React.Node {
+export function InstrumentItem(props: InstrumentItemProps): JSX.Element | null {
   const {
     compatibility,
     mount,
@@ -42,7 +41,7 @@ export function InstrumentItem(props: InstrumentItemProps): React.Node {
   } = props
   const { t } = useTranslation(['protocol_calibration', 'protocol_info'])
   if (hidden) return null
-  const match = ['match', 'inexact_match'].includes(compatibility)
+  const match = compatibility ? (['match', 'inexact_match'] as PipetteCompatibility[]).includes(compatibility) : Boolean(compatibility)
   return (
     <>
       <Flex
@@ -85,7 +84,7 @@ export function InstrumentItem(props: InstrumentItemProps): React.Node {
   )
 }
 
-function StatusIcon(props: {| match: boolean |}) {
+function StatusIcon(props: { match: boolean }): JSX.Element {
   const { match } = props
 
   const iconName = match ? 'check-circle' : 'checkbox-blank-circle-outline'
@@ -93,9 +92,9 @@ function StatusIcon(props: {| match: boolean |}) {
   return <Icon name={iconName} className={styles.status_icon} />
 }
 
-function BuildOffsetText(props: {|
+function BuildOffsetText(props: {
   offsetData: [number, number, number],
-|}): React.Node {
+}): JSX.Element {
   const { offsetData } = props
   const { t } = useTranslation('protocol_info')
   return (

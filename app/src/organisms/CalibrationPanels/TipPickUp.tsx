@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
@@ -54,7 +53,7 @@ const ASSET_MAP = {
   multi: multiDemoAsset,
   single: singleDemoAsset,
 }
-export function TipPickUp(props: CalibrationPanelProps): React.Node {
+export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
   const { sendCommands, tipRack, isMulti } = props
 
   const tipRackDef = React.useMemo(
@@ -74,11 +73,11 @@ export function TipPickUp(props: CalibrationPanelProps): React.Node {
     SINGLE_JOG_UNTIL_AT
   )
 
-  const pickUpTip = () => {
+  const pickUpTip = (): void => {
     sendCommands({ command: Sessions.sharedCalCommands.PICK_UP_TIP })
   }
 
-  const jog = (axis: Axis, dir: Sign, step: StepSize) => {
+  const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {

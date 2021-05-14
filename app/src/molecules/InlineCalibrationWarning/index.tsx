@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   Icon,
@@ -14,8 +13,8 @@ import {
   SPACING_1,
   SPACING_2,
   ALIGN_CENTER,
-  type StyleProps,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 
 export const REQUIRED: 'required' = 'required'
 export const RECOMMENDED: 'recommended' = 'recommended'
@@ -35,14 +34,13 @@ const CONTENT_MAP = {
   },
 }
 
-export type InlineCalibrationWarningProps = {|
-  warningType: WarningType | null,
-  ...StyleProps,
-|}
+export interface InlineCalibrationWarningProps extends StyleProps {
+  warningType: WarningType | null
+}
 
 export function InlineCalibrationWarning(
   props: InlineCalibrationWarningProps
-): React.Node {
+): JSX.Element {
   const { warningType, marginTop = SPACING_2, ...styleProps } = props
   return (
     <>

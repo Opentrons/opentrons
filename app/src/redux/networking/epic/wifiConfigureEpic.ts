@@ -1,4 +1,3 @@
-// @flow
 import { of } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import { switchMap } from 'rxjs/operators'

@@ -1,4 +1,3 @@
-// @flow
 import { combineEpics } from 'redux-observable'
 
 import { fetchEapOptionsEpic } from './fetchEapOptionsEpic'

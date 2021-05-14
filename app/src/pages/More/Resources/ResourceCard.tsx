@@ -1,22 +1,20 @@
-// @flow
 // resources page layout
 import * as React from 'react'
 import { Card, OutlineButton } from '@opentrons/components'
 
 import styles from './styles.css'
 
-type Props = {
-  title: React.Node,
-  description: React.Node,
+interface Props {
+  title: React.ReactNode,
+  description: React.ReactNode,
   url: string,
 }
 
-export function ResourceCard(props: Props): React.Node {
+export function ResourceCard(props: Props): JSX.Element {
   return (
     <Card title={props.title}>
       <div className={styles.card_content}>
         <p className={styles.link_label}>{props.description}</p>
-        {/* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion or by using SecondaryBtn */}
         <OutlineButton
           Component="a"
           href={props.url}

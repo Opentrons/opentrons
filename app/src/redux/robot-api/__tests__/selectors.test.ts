@@ -1,35 +1,33 @@
-// @flow
-
 import * as Selectors from '../selectors'
 import type { State } from '../../types'
 
-type SelectorSpec = {|
-  name: string,
-  selector: (State, ...Array<any>) => mixed,
-  state: $Shape<State>,
-  args?: Array<any>,
-  expected: mixed,
-|}
+interface SelectorSpec {
+  name: string
+  selector: (state: State, ...args: any[]) => unknown
+  state: State
+  args?: any[]
+  expected: unknown
+}
 
-const SPECS: Array<SelectorSpec> = [
+const SPECS: SelectorSpec[] = [
   {
     name: 'getRequestById returns null by default',
     selector: Selectors.getRequestById,
-    state: { robotApi: {} },
+    state: { robotApi: {} } as any,
     args: ['abc'],
     expected: null,
   },
   {
     name: 'getRequestById returns state if it exists',
     selector: Selectors.getRequestById,
-    state: { robotApi: { abc: { status: 'pending' } } },
+    state: { robotApi: { abc: { status: 'pending' } } } as any,
     args: ['abc'],
     expected: { status: 'pending' },
   },
   {
     name: 'getRequests returns zip-able array of request states',
     selector: Selectors.getRequests,
-    state: { robotApi: { abc: { status: 'pending' } } },
+    state: { robotApi: { abc: { status: 'pending' } } } as any,
     args: [['abc', 'def']],
     expected: [{ status: 'pending' }, null],
   },

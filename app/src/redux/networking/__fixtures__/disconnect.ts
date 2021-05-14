@@ -1,4 +1,3 @@
-// @flow
 // fixtures for /wifi/disconnect
 
 import { POST } from '../../robot-api'
@@ -21,7 +20,7 @@ const {
   failure,
 }: ResponseFixtures<
   NetworkingDisconnectResponse,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: POST,
   path: '/wifi/disconnect',

@@ -1,4 +1,3 @@
-// @flow
 // functions for parsing protocol files
 import { createLogger } from '../../logger'
 import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
@@ -30,7 +29,7 @@ export function parseProtocolData(
   file: ProtocolFile,
   contents: string,
   // optional Python protocol metadata
-  metadata: ?$PropertyType<ProtocolData, 'metadata'>
+  metadata: ProtocolData['metadata'] | null | undefined
 ): ProtocolData | null {
   if (fileIsJson(file)) {
     try {
@@ -39,9 +38,9 @@ export function parseProtocolData(
       // TODO(mc, 2018-09-05): surface parse error to user prior to upload
       log.warn('Failed to parse JSON', { contents, message: e.message })
     }
-  } else if (metadata) {
+  } else if (metadata != null) {
     // grab Python protocol metadata, if any
-    // $FlowFixMe: (ka, 2019-06-10): cant differentiate which file schema file is needed
+    // @ts-expect-error(sa, 2021-05-12): cant differentiate which file schema file is needed
     return { metadata }
   }
 

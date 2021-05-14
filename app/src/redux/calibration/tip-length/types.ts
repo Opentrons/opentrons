@@ -1,5 +1,3 @@
-// @flow
-
 import type {
   RobotApiRequestMeta,
   RobotApiErrorResponse,
@@ -7,32 +5,32 @@ import type {
 
 import type { AllTipLengthCalibrations } from '../api-types'
 
-import typeof {
+import {
   FETCH_TIP_LENGTH_CALIBRATIONS,
   FETCH_TIP_LENGTH_CALIBRATIONS_SUCCESS,
   FETCH_TIP_LENGTH_CALIBRATIONS_FAILURE,
 } from './constants'
 
-export type FetchTipLengthCalibrationsAction = {|
-  type: FETCH_TIP_LENGTH_CALIBRATIONS,
-  payload: {| robotName: string |},
-  meta: RobotApiRequestMeta,
-|}
+export interface FetchTipLengthCalibrationsAction {
+  type: typeof FETCH_TIP_LENGTH_CALIBRATIONS
+  payload: { robotName: string }
+  meta: RobotApiRequestMeta
+}
 
-export type FetchTipLengthCalibrationsSuccessAction = {|
-  type: FETCH_TIP_LENGTH_CALIBRATIONS_SUCCESS,
-  payload: {|
-    robotName: string,
-    tipLengthCalibrations: AllTipLengthCalibrations,
-  |},
-  meta: RobotApiRequestMeta,
-|}
+export interface FetchTipLengthCalibrationsSuccessAction {
+  type: typeof FETCH_TIP_LENGTH_CALIBRATIONS_SUCCESS
+  payload: {
+    robotName: string
+    tipLengthCalibrations: AllTipLengthCalibrations
+  }
+  meta: RobotApiRequestMeta
+}
 
-export type FetchTipLengthCalibrationsFailureAction = {|
-  type: FETCH_TIP_LENGTH_CALIBRATIONS_FAILURE,
-  payload: {| robotName: string, error: RobotApiErrorResponse |},
-  meta: RobotApiRequestMeta,
-|}
+export interface FetchTipLengthCalibrationsFailureAction {
+  type: typeof FETCH_TIP_LENGTH_CALIBRATIONS_FAILURE
+  payload: { robotName: string; error: RobotApiErrorResponse }
+  meta: RobotApiRequestMeta
+}
 
 export type TipLengthCalibrationsAction =
   | FetchTipLengthCalibrationsAction

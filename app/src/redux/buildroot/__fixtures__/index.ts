@@ -1,6 +1,6 @@
-// @flow
-
 import { mockRobot } from '../../robot-api/__fixtures__'
+
+import type { RobotApiResponse } from '../../robot-api/types'
 
 export {
   mockRestartSuccess,
@@ -9,7 +9,7 @@ export {
 
 // POST /server/update/begin
 
-export const mockUpdateBeginSuccess = {
+export const mockUpdateBeginSuccess: RobotApiResponse = {
   method: 'POST',
   path: '/server/update/begin',
   ok: true,
@@ -18,7 +18,7 @@ export const mockUpdateBeginSuccess = {
   body: { token: 'foobar' },
 }
 
-export const mockUpdateBeginConflict = {
+export const mockUpdateBeginConflict: RobotApiResponse = {
   method: 'POST',
   path: '/server/update/begin',
   ok: false,
@@ -27,7 +27,7 @@ export const mockUpdateBeginConflict = {
   body: { message: 'Session in progress' },
 }
 
-export const mockUpdateBeginFailure = {
+export const mockUpdateBeginFailure: RobotApiResponse = {
   method: 'POST',
   path: '/server/update/begin',
   ok: false,
@@ -36,7 +36,7 @@ export const mockUpdateBeginFailure = {
   body: { message: 'AH' },
 }
 
-export const mockUpdateCancelSuccess = {
+export const mockUpdateCancelSuccess: RobotApiResponse = {
   method: 'POST',
   path: '/server/update/cancel',
   ok: true,
@@ -45,7 +45,7 @@ export const mockUpdateCancelSuccess = {
   body: { message: 'cancelled' },
 }
 
-export const mockUpdateCancelFailure = {
+export const mockUpdateCancelFailure: RobotApiResponse = {
   method: 'POST',
   path: '/server/update/cancel',
   ok: false,
@@ -54,7 +54,7 @@ export const mockUpdateCancelFailure = {
   body: { message: 'AH' },
 }
 
-export const mockStatusSuccess = {
+export const mockStatusSuccess: RobotApiResponse = {
   method: 'GET',
   path: '/server/update/foobar/status',
   ok: true,
@@ -63,7 +63,7 @@ export const mockStatusSuccess = {
   body: { stage: 'awaiting-file', message: 'Awaiting File', progress: 0.1 },
 }
 
-export const mockCommitSuccess = {
+export const mockCommitSuccess: RobotApiResponse = {
   method: 'POST',
   path: '/server/update/foobar/commit',
   ok: true,
@@ -72,7 +72,7 @@ export const mockCommitSuccess = {
   body: { message: 'Committed' },
 }
 
-export const mockCommitFailure = {
+export const mockCommitFailure: RobotApiResponse = {
   method: 'POST',
   path: '/server/update/foobar/commit',
   ok: false,

@@ -1,4 +1,3 @@
-// @flow
 // app info card with version and updated
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -37,15 +36,15 @@ import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 import type { RobotSettings } from '../../../redux/robot-settings/types'
 
-export type AdvancedSettingsCardProps = {|
+export interface AdvancedSettingsCardProps {
   robot: ViewableRobot,
   resetUrl: string,
-|}
+}
 
 const ROBOT_LOGS_OPTOUT_ID = 'disableLogAggregation'
 export function AdvancedSettingsCard(
   props: AdvancedSettingsCardProps
-): React.Node {
+): JSX.Element {
   const { robot, resetUrl } = props
   const { name, ip, health, status } = robot
   const { t } = useTranslation('robot_advanced_settings')
@@ -60,7 +59,7 @@ export function AdvancedSettingsCard(
   const showLogOptoutModal = settings.some(
     s => s.id === ROBOT_LOGS_OPTOUT_ID && s.value === null
   )
-  const setLogOptout = (value: boolean) =>
+  const setLogOptout = (value: boolean): unknown =>
     dispatch(updateSetting(name, ROBOT_LOGS_OPTOUT_ID, value))
 
   React.useEffect(() => {

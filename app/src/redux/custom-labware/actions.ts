@@ -1,5 +1,3 @@
-// @flow
-
 import { resetConfigValue } from '../config'
 import * as Types from './types'
 
@@ -51,7 +49,7 @@ export const fetchCustomLabware = (): Types.FetchCustomLabwareAction => ({
 })
 
 export const customLabwareList = (
-  payload: Array<Types.CheckedLabwareFile>,
+  payload: Types.CheckedLabwareFile[],
   source: Types.CustomLabwareListActionSource = POLL
 ): Types.CustomLabwareListAction => ({
   type: CUSTOM_LABWARE_LIST,

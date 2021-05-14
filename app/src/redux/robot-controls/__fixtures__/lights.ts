@@ -1,12 +1,12 @@
-// @flow
 // mock HTTP responses for /robot/lights endpoints
 
 import { mockRobot } from '../../robot-api/__fixtures__'
+import type { Method } from '../../robot-api/types'
 
 // GET /robot/lights
 
 export const mockFetchLightsSuccessMeta = {
-  method: 'GET',
+  method: 'GET' as Method,
   path: '/robot/lights',
   ok: true,
   status: 200,
@@ -19,7 +19,7 @@ export const mockFetchLightsSuccess = {
 }
 
 export const mockFetchLightsFailureMeta = {
-  method: 'GET',
+  method: 'GET' as Method,
   path: '/robot/lights',
   ok: false,
   status: 500,
@@ -34,7 +34,7 @@ export const mockFetchLightsFailure = {
 // POST /robot/lights
 
 export const mockUpdateLightsSuccessMeta = {
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/robot/lights',
   ok: true,
   status: 200,
@@ -47,7 +47,7 @@ export const mockUpdateLightsSuccess = {
 }
 
 export const mockUpdateLightsFailureMeta = {
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/robot/lights',
   ok: false,
   status: 500,

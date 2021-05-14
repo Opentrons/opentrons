@@ -1,4 +1,3 @@
-// @flow
 import { combineEpics } from 'redux-observable'
 import { fetchModulesEpic } from './fetchModulesEpic'
 import { sendModuleCommandEpic } from './sendModuleCommandEpic'

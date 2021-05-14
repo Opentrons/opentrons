@@ -1,4 +1,3 @@
-// @flow
 import * as Fixtures from '../__fixtures__'
 import { networkingReducer } from '../reducer'
 import * as Actions from '../actions'
@@ -6,16 +5,16 @@ import * as Actions from '../actions'
 import type { Action } from '../../types'
 import type { NetworkingState } from '../types'
 
-type ReducerSpec = {|
-  name: string,
-  state: NetworkingState,
-  action: Action,
-  expected: NetworkingState,
-|}
+type ReducerSpec = {
+  name: string
+  state: NetworkingState
+  action: Action
+  expected: NetworkingState
+}
 
 const ROBOT_NAME = 'robotName'
 
-const SPECS: Array<ReducerSpec> = [
+const SPECS: ReducerSpec[] = [
   {
     name: 'handles fetch status success action',
     action: Actions.fetchStatusSuccess(

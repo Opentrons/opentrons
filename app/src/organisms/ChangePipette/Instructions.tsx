@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 
@@ -21,7 +20,7 @@ const ATTACH_CONFIRM = 'have robot check connection'
 const DETACH_CONFIRM = 'confirm pipette is detached'
 const EXIT = 'exit'
 
-type Props = {|
+interface Props {
   title: string,
   subtitle: string,
   robotName: string,
@@ -31,12 +30,12 @@ type Props = {|
   displayName: string,
   displayCategory: PipetteDisplayCategory | null,
   direction: Direction,
-  setWantedName: (name: string | null) => mixed,
-  confirm: () => mixed,
-  exit: () => mixed,
-|}
+  setWantedName: (name: string | null) => unknown,
+  confirm: () => unknown,
+  exit: () => unknown,
+}
 
-export function Instructions(props: Props): React.Node {
+export function Instructions(props: Props): JSX.Element {
   const {
     title,
     subtitle,
@@ -81,7 +80,7 @@ export function Instructions(props: Props): React.Node {
   )
 }
 
-function Steps(props: Props) {
+function Steps(props: Props): JSX.Element {
   const {
     direction,
     mount,

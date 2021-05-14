@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { BottomButtonBar } from '../../molecules/modals'
@@ -7,11 +6,12 @@ import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
 
-export type FormButtonBarProps = {|
-  buttons: Array<?ButtonProps>,
-|}
+type MaybeButtonProps = ButtonProps | null| undefined
+export interface FormButtonBarProps {
+  buttons: MaybeButtonProps[]
+}
 
-export function FormButtonBar(props: FormButtonBarProps): React.Node {
+export function FormButtonBar(props: FormButtonBarProps): JSX.Element {
   const className = styles.form_button
   const buttons = props.buttons.map(button => ({ ...button, className }))
 

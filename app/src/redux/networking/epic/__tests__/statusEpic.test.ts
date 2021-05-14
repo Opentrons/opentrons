@@ -1,10 +1,11 @@
-// @flow
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { networkingEpic } from '..'
 
-const makeTriggerAction = robotName => Actions.fetchStatus(robotName)
+import type { Action } from '../../../types'
+
+const makeTriggerAction = (robotName: string) => Actions.fetchStatus(robotName)
 
 describe('networking statusEpic', () => {
   afterEach(() => {
@@ -17,7 +18,7 @@ describe('networking statusEpic', () => {
       Fixtures.mockNetworkingStatusSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)

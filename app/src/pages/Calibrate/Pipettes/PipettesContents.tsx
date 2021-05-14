@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 
@@ -10,21 +9,21 @@ import type { InstrumentInfoProps } from '@opentrons/components'
 import type { Pipette, Labware } from '../../../redux/robot/types'
 import type { Mount } from '../../../redux/pipettes/types'
 
-export type PipettesContentsProps = {|
+export interface PipettesContentsProps {
   currentMount: Mount | null,
-  pipettes: Array<Pipette>,
-  activeTipracks: {| left: Labware | null, right: Labware | null |},
+  pipettes: Pipette[],
+  activeTipracks: { left: Labware | null, right: Labware | null },
   changePipetteUrl: string,
-|}
+}
 
-export function PipettesContents(props: PipettesContentsProps): React.Node {
+export function PipettesContents(props: PipettesContentsProps): JSX.Element {
   const { currentMount, pipettes, activeTipracks } = props
 
   const infoByMount = PIPETTE_MOUNTS.reduce<
-    $Shape<{|
+    Partial<{
       left?: InstrumentInfoProps,
       right?: InstrumentInfoProps,
-    |}>
+    }>
   >((result, mount) => {
     const pipette = pipettes.find(p => p.mount === mount)
     const tiprack = activeTipracks[mount]

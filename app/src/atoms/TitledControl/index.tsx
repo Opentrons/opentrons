@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   Box,
@@ -17,13 +16,12 @@ import {
 
 import type { StyleProps } from '@opentrons/components'
 
-export type TitledControlProps = {|
+export interface TitledControlProps extends StyleProps {
   title: string,
-  description: React.Node,
-  control?: React.Node,
-  children?: React.Node,
-  ...StyleProps,
-|}
+  description: React.ReactNode,
+  control?: React.ReactNode,
+  children?: React.ReactNode,
+}
 
 export function TitledControl({
   title,
@@ -31,7 +29,7 @@ export function TitledControl({
   control,
   children,
   ...styleProps
-}: TitledControlProps): React.Node {
+}: TitledControlProps): JSX.Element {
   return (
     <Box fontSize={FONT_SIZE_BODY_1} padding={SPACING_3} {...styleProps}>
       <Flex alignItems={ALIGN_CENTER}>

@@ -1,4 +1,3 @@
-// @flow
 import createHistory from 'history/createHashHistory'
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'

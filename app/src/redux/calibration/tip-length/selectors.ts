@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import { head } from 'lodash'
 
@@ -8,7 +7,7 @@ import type { TipLengthCalibration } from '../api-types'
 export const getTipLengthCalibrations: (
   state: State,
   robotName: string | null
-) => Array<TipLengthCalibration> = (state, robotName) => {
+) => TipLengthCalibration[] = (state, robotName) => {
   if (!robotName) {
     return []
   }
@@ -36,7 +35,7 @@ export const getTipLengthForPipetteAndTiprackByUri: (
 )
 
 export const filterTipLengthForPipetteAndTiprack: (
-  allCalibrations: Array<TipLengthCalibration>,
+  allCalibrations: TipLengthCalibration[],
   pipetteSerial: string | null,
   tiprackHash: string | null
 ) => TipLengthCalibration | null = (
@@ -73,7 +72,7 @@ export const getTipLengthForPipetteAndTiprack: (
 }
 
 export const tipLengthExistsForPipetteAndTiprack: (
-  calibrations: Array<TipLengthCalibration>,
+  calibrations: TipLengthCalibration[],
   pipetteSerial: string,
   tiprackHash: string
 ) => boolean = (calibrations, pipetteSerial, tiprackHash) => {

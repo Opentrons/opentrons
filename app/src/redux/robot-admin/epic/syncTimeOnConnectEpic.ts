@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 import { filter, map, switchMap, ignoreElements } from 'rxjs/operators'
 import { parseISO, differenceInSeconds } from 'date-fns'

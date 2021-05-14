@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { LabwareItem } from './LabwareItem'
@@ -23,12 +22,12 @@ const NO_LABWARE_DEFINITIONS_FOUND = 'No labware definitions found'
 const PLEASE_ADD_CUSTOM_LABWARE =
   'Please add custom labware via the Labware Management options above'
 
-export type LabwareListProps = {|
-  labware: Array<CheckedLabwareFile>,
+export interface LabwareListProps {
+  labware: CheckedLabwareFile[],
   errorMessage: string | null,
-|}
+}
 
-export function LabwareList(props: LabwareListProps): React.Node {
+export function LabwareList(props: LabwareListProps): JSX.Element {
   const { labware, errorMessage } = props
   let children = null
 

@@ -1,4 +1,3 @@
-// @flow
 // setup pipettes component
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -23,14 +22,14 @@ import styles from './styles.css'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-export type ProtocolPipettesCardProps = {| robotName: string |}
+export interface ProtocolPipettesCardProps { robotName: string }
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
 
 export function ProtocolPipettesCard(
   props: ProtocolPipettesCardProps
-): React.Node {
+): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
@@ -78,6 +77,7 @@ export function ProtocolPipettesCard(
     <InfoSection title={t('instruments_title')}>
       <SectionContentHalf>
         {pipetteItemProps.map(itemProps => (
+          itemProps &&
           <InstrumentItem
             key={itemProps.mount}
             compatibility={itemProps.compatibility}

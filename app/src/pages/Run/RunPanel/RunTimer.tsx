@@ -1,14 +1,13 @@
-// @flow
 import * as React from 'react'
 
 import styles from './styles.css'
 
-export type RunTimerProps = {|
-  startTime: string | null,
-  runTime: string,
-|}
+export interface RunTimerProps {
+  startTime: string | null
+  runTime: string
+}
 
-export function RunTimer(props: RunTimerProps): React.Node {
+export function RunTimer(props: RunTimerProps): JSX.Element {
   const { startTime, runTime } = props
   const startTimeStamp = startTime ?? ''
 

@@ -1,23 +1,22 @@
-// @flow
 // prompt for ReviewDeck of labware calibration page
 import * as React from 'react'
 
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { OutlineButton } from '@opentrons/components'
-import { selectors as robotSelectors, type Labware } from '../../../redux/robot'
+import { selectors as robotSelectors } from '../../../redux/robot'
+import type { Labware } from '../../../redux/robot'
 
 import styles from './styles.css'
 
-export type PromptProps = {|
-  ...Labware,
-  onClick: () => void,
-|}
+export interface PromptProps extends Labware {
+  onClick: () => void
+}
 
-export function Prompt(props: PromptProps): React.Node {
+export function Prompt(props: PromptProps): JSX.Element {
   const { onClick, ...labware } = props
   const { name, definition, slot } = labware
   const labwareType = robotSelectors.labwareType(labware)
-  const labwareTitle = definition ? getLabwareDisplayName(definition) : name
+  const labwareTitle: string = definition ? getLabwareDisplayName(definition) : name
 
   return (
     <div className={styles.prompt}>

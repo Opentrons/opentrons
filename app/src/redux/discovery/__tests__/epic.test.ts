@@ -4,8 +4,10 @@ import * as Shell from '../../shell'
 import * as Actions from '../actions'
 import { discoveryEpic } from '../epic'
 
+import type { Action, State } from '../../types'
+
 describe('discovery actions', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     testScheduler = new TestScheduler((actual, expected) => {
@@ -15,8 +17,9 @@ describe('discovery actions', () => {
 
   it('startDiscoveryEpic with default timeout', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('-a', { a: Actions.startDiscovery() })
-      const output$ = discoveryEpic(action$)
+      const action$ = hot<Action>('-a', { a: Actions.startDiscovery() })
+      const state$ = hot<State>('s-', {})
+      const output$ = discoveryEpic(action$, state$)
 
       expectObservable(output$).toBe('- 30000ms a ', {
         a: Actions.finishDiscovery(),
@@ -26,8 +29,9 @@ describe('discovery actions', () => {
 
   it('startDiscoveryEpic with specified timeout', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('-a', { a: Actions.startDiscovery(42) })
-      const output$ = discoveryEpic(action$)
+      const action$ = hot<Action>('-a', { a: Actions.startDiscovery(42) })
+      const state$ = hot<State>('s-', {})
+      const output$ = discoveryEpic(action$, state$)
 
       expectObservable(output$).toBe('- 42ms a ', {
         a: Actions.finishDiscovery(),
@@ -37,8 +41,9 @@ describe('discovery actions', () => {
 
   it('startDiscoveryEpic with shell:UI_INITIALIZED', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('-a', { a: Shell.uiInitialized() })
-      const output$ = discoveryEpic(action$)
+      const action$ = hot<Action>('-a', { a: Shell.uiInitialized() })
+      const state$ = hot<State>('s-', {})
+      const output$ = discoveryEpic(action$, state$)
 
       expectObservable(output$).toBe('- 30000ms a ', {
         a: Actions.finishDiscovery(),
@@ -53,8 +58,9 @@ describe('discovery actions', () => {
         payload: { path: 'restart' },
       }
 
-      const action$ = hot('-a', { a: serverSuccessAction })
-      const output$ = discoveryEpic(action$)
+      const action$ = hot<Action>('-a', { a: serverSuccessAction } as any)
+      const state$ = hot<State>('s-', {})
+      const output$ = discoveryEpic(action$, state$)
 
       expectObservable(output$).toBe('-a ', {
         a: Actions.startDiscovery(60000),

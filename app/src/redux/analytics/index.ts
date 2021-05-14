@@ -1,4 +1,3 @@
-// @flow
 // analytics module
 import { toggleConfigValue, updateConfigValue } from '../config'
 

@@ -1,24 +1,23 @@
-// @flow
 import * as React from 'react'
-import { mount } from 'enzyme'
+import { mount, ReactWrapper } from 'enzyme'
 
 import { ConfirmCrashRecoveryModal } from '../ConfirmCrashRecoveryModal'
 
 describe('ConfirmCrashRecoveryModal', () => {
-  let render
+  let render: (props?: Partial<React.ComponentProps<typeof ConfirmCrashRecoveryModal>>) => ReactWrapper<React.ComponentProps<typeof ConfirmCrashRecoveryModal>>
   const mockBack = jest.fn()
   const mockConfirm = jest.fn()
 
-  const getExitButton = wrapper =>
+  const getExitButton = (wrapper: ReactWrapper<React.ComponentProps<typeof ConfirmCrashRecoveryModal>>) =>
     wrapper.find('OutlineButton[children="cancel"]')
-  const getNoTipRestartButton = wrapper =>
+  const getNoTipRestartButton = (wrapper: ReactWrapper<React.ComponentProps<typeof ConfirmCrashRecoveryModal>>) =>
     wrapper.find('OutlineButton[children="yes, start over"]')
-  const getReplaceTipRestartButton = wrapper =>
+  const getReplaceTipRestartButton = (wrapper: ReactWrapper<React.ComponentProps<typeof ConfirmCrashRecoveryModal>>) =>
     wrapper.find('OutlineButton[children="tip placed in a1, start over"]')
 
   beforeEach(() => {
     render = (
-      props: $Shape<React.ElementProps<typeof ConfirmCrashRecoveryModal>> = {}
+      props = {}
     ) => {
       const {
         back = mockBack,
@@ -45,7 +44,7 @@ describe('ConfirmCrashRecoveryModal', () => {
   it('clicking cancel cancels', () => {
     const wrapper = render()
     expect(getExitButton(wrapper).exists()).toBe(true)
-    getExitButton(wrapper).invoke('onClick')()
+    getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockBack).toHaveBeenCalled()
@@ -55,7 +54,7 @@ describe('ConfirmCrashRecoveryModal', () => {
     const wrapper = render({ requiresNewTip: false })
 
     expect(getNoTipRestartButton(wrapper).exists()).toBe(true)
-    getNoTipRestartButton(wrapper).invoke('onClick')()
+    getNoTipRestartButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
     expect(mockConfirm).toHaveBeenCalled()
   })
@@ -63,7 +62,7 @@ describe('ConfirmCrashRecoveryModal', () => {
   it('has a working button with the right text when tip placement needed', () => {
     const wrapper = render({ requiresNewTip: true })
     expect(getReplaceTipRestartButton(wrapper).exists()).toBe(true)
-    getReplaceTipRestartButton(wrapper).invoke('onClick')()
+    getReplaceTipRestartButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockConfirm).toHaveBeenCalled()

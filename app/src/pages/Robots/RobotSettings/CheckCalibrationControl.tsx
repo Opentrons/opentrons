@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -25,20 +24,20 @@ import type { RequestState } from '../../../redux/robot-api/types'
 
 import type { State } from '../../../redux/types'
 
-export type CheckCalibrationControlProps = {|
+export interface CheckCalibrationControlProps {
   robotName: string,
   disabledReason: string | null,
-|}
+}
 
 // pipette calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
+const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 
 export function CheckCalibrationControl({
   robotName,
   disabledReason,
-}: CheckCalibrationControlProps): React.Node {
+}: CheckCalibrationControlProps): JSX.Element {
   const { t } = useTranslation(['robot_calibration', 'shared'])
   const [targetProps, tooltipProps] = useHoverTooltip()
 
@@ -96,7 +95,7 @@ export function CheckCalibrationControl({
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
 
-  const handleStart = (hasBlockModalResponse: boolean | null = null) => {
+  const handleStart = (hasBlockModalResponse: boolean | null = null): void => {
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
       setShowCalBlockModal(true)
     } else {

@@ -1,12 +1,11 @@
-// @flow
 import * as React from 'react'
 import remark from 'remark'
 import reactRenderer from 'remark-react'
 import styles from './styles.css'
 
-export type ReleaseNotesProps = {|
-  source: ?string,
-|}
+export interface ReleaseNotesProps {
+  source: string | null | undefined
+}
 
 const renderer = remark().use(reactRenderer, {
   remarkReactComponents: {
@@ -17,7 +16,7 @@ const renderer = remark().use(reactRenderer, {
 
 const DEFAULT_RELEASE_NOTES = 'We recommend upgrading to the latest version.'
 
-export function ReleaseNotes(props: ReleaseNotesProps): React.Node {
+export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
   const { source } = props
 
   return (
@@ -31,6 +30,6 @@ export function ReleaseNotes(props: ReleaseNotesProps): React.Node {
   )
 }
 
-function ExternalLink(props) {
+function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
   return <a {...props} target="_blank" rel="noopener noreferrer" />
 }

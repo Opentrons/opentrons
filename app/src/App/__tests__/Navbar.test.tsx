@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
@@ -20,10 +19,9 @@ import type { NavLocation } from '../../redux/nav/types'
 jest.mock('react-router-dom', () => ({ NavLink: 'a' }))
 jest.mock('../../redux/nav/selectors')
 
-const getNavbarLocations: JestMockFn<[State], Array<NavLocation>> =
-  Nav.getNavbarLocations
+const getNavbarLocations = Nav.getNavbarLocations as jest.MockedFunction<typeof Nav.getNavbarLocations>
 
-const LOCATIONS = [
+const LOCATIONS: NavLocation[] = [
   { id: 'foo', path: '/foo', title: 'Foo', iconName: 'alert' },
   { id: 'bar', path: '/bar', title: 'Bar', iconName: 'alert' },
   { id: 'baz', path: '/baz', title: 'Baz', iconName: 'alert' },
@@ -36,7 +34,7 @@ describe('Navbar component', () => {
     subscribe: noop,
   }
 
-  const render = () => {
+  const render = (): ReturnType<typeof mount> => {
     return mount(<Navbar />, {
       wrappingComponent: Provider,
       wrappingComponentProps: { store },
@@ -44,7 +42,7 @@ describe('Navbar component', () => {
   }
 
   beforeEach(() => {
-    getNavbarLocations.mockImplementation(state => {
+    getNavbarLocations.mockImplementation((state: State): NavLocation[] => {
       expect(state).toEqual({ mockState: true })
       return LOCATIONS
     })

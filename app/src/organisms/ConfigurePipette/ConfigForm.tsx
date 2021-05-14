@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Formik, Form } from 'formik'
 
@@ -19,7 +18,7 @@ import {
   ConfigQuirkGroup,
 } from './ConfigFormGroup'
 
-import type { FormikProps } from 'formik/@flow-typed'
+import type { FormikProps } from 'formik'
 import type {
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
@@ -28,25 +27,25 @@ import type {
 
 import type { FormValues } from './ConfigFormGroup'
 
-export type DisplayFieldProps = {|
-  ...PipetteSettingsField,
+export interface DisplayFieldProps extends PipetteSettingsField {
+  name: string
+  displayName: string
+}
+
+export type DisplayQuirkFieldProps = {
   name: string,
   displayName: string,
-|}
-
-export type DisplayQuirkFieldProps = {|
+} & {
   [quirkId: string]: boolean,
-  name: string,
-  displayName: string,
-|}
+}
 
-export type ConfigFormProps = {|
-  settings: PipetteSettingsFieldsMap,
-  updateInProgress: boolean,
-  updateSettings: (fields: PipetteSettingsFieldsUpdate) => mixed,
-  closeModal: () => mixed,
-  __showHiddenFields: boolean,
-|}
+export interface ConfigFormProps {
+  settings: PipetteSettingsFieldsMap
+  updateInProgress: boolean
+  updateSettings: (fields: PipetteSettingsFieldsUpdate) => unknown
+  closeModal: () => unknown
+  __showHiddenFields: boolean
+}
 
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
 const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
@@ -55,9 +54,9 @@ const QUIRK_KEY = 'quirks'
 
 export class ConfigForm extends React.Component<ConfigFormProps> {
   getFieldsByKey(
-    keys: Array<string>,
+    keys: string[],
     fields: PipetteSettingsFieldsMap
-  ): Array<DisplayFieldProps> {
+  ): DisplayFieldProps[] {
     return keys.map(k => {
       const field = fields[k]
       const displayName = startCase(k)
@@ -70,7 +69,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     })
   }
 
-  getKnownQuirks: () => Array<DisplayQuirkFieldProps> = () => {
+  getKnownQuirks = (): DisplayQuirkFieldProps[] => {
     const quirks = this.props.settings[QUIRK_KEY]
     if (!quirks) return []
     const quirkKeys = Object.keys(quirks)
@@ -94,8 +93,8 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     ])
   }
 
-  getUnknownKeys: () => Array<string> = () => {
-    return keys<string>(
+  getUnknownKeys: () => string[] = () => {
+    return keys(
       omit(this.props.settings, [
         ...PLUNGER_KEYS,
         ...POWER_KEYS,
@@ -106,18 +105,19 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   handleSubmit: (values: FormValues) => void = values => {
-    const params = mapValues(values, (v: ?(string | boolean)) => {
+    const params = mapValues<FormValues, number | boolean | null>(values, v => {
       if (v === true || v === false) return v
       if (v === '' || v == null) return null
       return Number(v)
     })
 
+    // @ts-expect-error TODO updateSettings type doesn't include boolean for values of params, but they could be returned.
     this.props.updateSettings(params)
   }
 
   getFieldValue(
     key: string,
-    fields: Array<DisplayFieldProps>,
+    fields: DisplayFieldProps[],
     values: FormValues
   ): number {
     const field = fields.find(f => f.name === key)
@@ -126,7 +126,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     return Number(value)
   }
 
-  validate: (values: FormValues) => { ... } = values => {
+  validate = (values: FormValues): {} => {
     const errors = {}
     const fields = this.getVisibleFields()
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
@@ -164,9 +164,10 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
 
   getInitialValues: () => FormValues = () => {
     const fields = this.getVisibleFields()
-    const initialFieldValues = mapValues(fields, f => {
+    const initialFieldValues = mapValues<PipetteSettingsFieldsMap, string | boolean>(fields, f => {
+      // @ts-expect-error TODO: PipetteSettingsFieldsMap doesn't include a boolean value, despite checking for it here
       if (f.value === true || f.value === false) return f.value
-      return f.value !== f.default ? f.value.toString() : ''
+      return f.value !== f.default ? f.value?.toString() : ''
     })
     const initialQuirkValues = this.props.settings[QUIRK_KEY]
     const initialValues = Object.assign(
@@ -178,7 +179,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     return initialValues
   }
 
-  render(): React.Node {
+  render(): JSX.Element {
     const { updateInProgress, closeModal } = this.props
     const fields = this.getVisibleFields()
     const UNKNOWN_KEYS = this.getUnknownKeys()
@@ -200,7 +201,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
         {(formProps: FormikProps<FormValues>) => {
           const { errors, values } = formProps
           const disableSubmit = !isEmpty(errors)
-          const handleReset = () => {
+          const handleReset = (): void => {
             const newValues = mapValues(values, v => {
               if (typeof v === 'boolean') {
                 // NOTE: checkbox fields don't have defaults from the API b/c they come in from `quirks`

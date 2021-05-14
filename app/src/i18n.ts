@@ -23,13 +23,13 @@ i18n.use(initReactI18next).init(
     },
     keySeparator: false, // use namespaces and context instead
     saveMissing: true,
-    missingKeyHandler: (lng, ns, key, fallbackValue) => {
+    missingKeyHandler: (lng, ns, key, _fallbackValue) => {
       process.env.NODE_ENV === 'test'
         ? console.error(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
         : console.warn(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
     },
   },
-  (err, t) => {
+  (err, _t) => {
     if (err) {
       console.error(
         'Internationalization was not initialized properly. error: ',

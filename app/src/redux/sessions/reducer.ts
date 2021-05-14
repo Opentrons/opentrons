@@ -1,4 +1,3 @@
-// @flow
 import omit from 'lodash/omit'
 
 import * as Constants from './constants'
@@ -14,9 +13,10 @@ const INITIAL_PER_ROBOT_STATE: PerRobotSessionState = {
 }
 
 export function sessionReducer(
-  state: SessionState = INITIAL_STATE,
+  state: SessionState,
   action: Action
 ): SessionState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.CREATE_SESSION_SUCCESS:
     case Constants.FETCH_SESSION_SUCCESS:

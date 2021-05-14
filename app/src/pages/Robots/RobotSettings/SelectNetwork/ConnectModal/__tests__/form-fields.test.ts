@@ -1,5 +1,3 @@
-// @flow
-
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
 
 import {
@@ -260,7 +258,7 @@ describe('validateConnectFormFields', () => {
     ]
     const values = {
       securityType: 'someOtherEapType',
-      eapConfig: { [('fileField': string)]: '123' },
+      eapConfig: { fileField: '123' },
     }
     const errors = validateConnectFormFields(network, eapOptions, values)
 
@@ -330,7 +328,7 @@ describe('connectFormToConfigureRequest', () => {
     }
     const values = {
       securityType: 'someEapType',
-      eapConfig: { [('option1': string)]: 'fizzbuzz' },
+      eapConfig: { option1: 'fizzbuzz' },
     }
     const result = connectFormToConfigureRequest(network, values)
 
@@ -346,7 +344,7 @@ describe('connectFormToConfigureRequest', () => {
     const values = {
       ssid: 'foobar',
       securityType: 'someEapType',
-      eapConfig: { [('option1': string)]: 'fizzbuzz' },
+      eapConfig: { option1: 'fizzbuzz' },
     }
     const result = connectFormToConfigureRequest(null, values)
 

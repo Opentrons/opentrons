@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import orderBy from 'lodash/orderBy'
@@ -11,7 +10,7 @@ import {
   getUnreachableRobots,
 } from '../../../redux/discovery'
 
-import type { State, Dispatch } from '../../../redux/types'
+import type { State } from '../../../redux/types'
 
 import { SidePanel } from '@opentrons/components'
 import { RobotList } from './RobotList'
@@ -25,31 +24,19 @@ import type {
   UnreachableRobot,
 } from '../../../redux/discovery/types'
 
-type SP = {|
-  robots: Array<Robot>,
-  reachableRobots: Array<ReachableRobot>,
-  unreachableRobots: Array<UnreachableRobot>,
-  found: boolean,
-  isScanning: boolean,
-|}
+interface SP {
+  robots: Robot[]
+  reachableRobots: ReachableRobot[]
+  unreachableRobots: UnreachableRobot[]
+  found: boolean
+  isScanning: boolean
+}
 
-type DP = {| onScanClick: () => mixed |}
+interface DP { onScanClick: () => unknown }
 
-type Props = {| ...SP, ...DP |}
+type Props = SP & DP
 
-export const ConnectPanel: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  DP,
-  State,
-  Dispatch
->(
-  mapStateToProps,
-  mapDispatchToProps
-)(ConnectPanelComponent)
-
-function ConnectPanelComponent(props: Props) {
+function ConnectPanelComponent(props: Props): JSX.Element {
   const {
     robots,
     reachableRobots,
@@ -101,8 +88,8 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch): DP {
-  return {
-    onScanClick: () => dispatch(startDiscovery()),
-  }
+const mapDispatchToProps: DP = {
+  onScanClick: () => startDiscovery()
 }
+
+export const ConnectPanel = connect(mapStateToProps, mapDispatchToProps)(ConnectPanelComponent)

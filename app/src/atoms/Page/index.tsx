@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import styles from './styles.css'
@@ -6,12 +5,12 @@ import { TitleBar } from '@opentrons/components'
 
 import type { TitleBarProps } from '@opentrons/components'
 
-export type PageProps = {|
+export interface PageProps {
   titleBarProps?: TitleBarProps,
-  children: React.Node,
-|}
+  children: React.ReactNode,
+}
 
-export function Page(props: PageProps): React.Node {
+export function Page(props: PageProps): JSX.Element {
   const { titleBarProps, children } = props
 
   return (

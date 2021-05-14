@@ -1,5 +1,3 @@
-// @flow
-
 import * as Protocol from '../../protocol'
 import * as RobotSelectors from '../../robot/selectors'
 import * as Hash from '../hash'
@@ -14,19 +12,8 @@ import * as SessionFixtures from '../../sessions/__fixtures__'
 import * as SessionTypes from '../../sessions/types'
 
 import type { State } from '../../types'
-import type { Robot } from '../../discovery/types'
-import type { Config } from '../../config/types'
-import type { AttachedPipette } from '../../pipettes/types'
-import type {
-  PipetteOffsetCalibration,
-  TipLengthCalibration,
-  DeckCalibrationInfo,
-  DeckCalibrationStatus,
-} from '../../calibration/types'
 
 import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
-
-type MockState = $Shape<{| ...State, config: null | $Shape<Config> |}>
 
 jest.mock('../../protocol/selectors')
 jest.mock('../../robot/selectors')
@@ -37,10 +24,10 @@ jest.mock('../../pipettes/selectors')
 jest.mock('../hash')
 
 describe('analytics selectors', () => {
-  let mockState: MockState
+  let mockState: State
 
   beforeEach(() => {
-    mockState = ({ mockState: true }: any)
+    mockState = { mockState: true } as any
   })
 
   afterEach(() => {
@@ -49,16 +36,16 @@ describe('analytics selectors', () => {
 
   describe('analytics config selectors', () => {
     it('should return null with getAnalyticsConfig if no config', () => {
-      const mockState: MockState = { config: null }
+      const mockState = { config: null } as any
       expect(Selectors.getAnalyticsConfig(mockState)).toBe(null)
     })
 
     it('should return config.analytics with getAnalyticsConfig', () => {
-      const mockState: MockState = {
+      const mockState = {
         config: {
           analytics: { appId: 'foobar', optedIn: true, seenOptIn: true },
         },
-      }
+      } as any
       expect(Selectors.getAnalyticsConfig(mockState)).toEqual({
         appId: 'foobar',
         optedIn: true,
@@ -67,81 +54,72 @@ describe('analytics selectors', () => {
     })
 
     it('should return false with getAnalyticsOptedIn if no config', () => {
-      const mockState: MockState = { config: null }
+      const mockState = { config: null } as any
       expect(Selectors.getAnalyticsOptedIn(mockState)).toBe(false)
     })
 
     it('should return config.analytics.optedIn with getAnalyticsOptedIn', () => {
-      const mockState: MockState = {
+      const mockState = {
         config: {
           analytics: { appId: 'foobar', optedIn: true, seenOptIn: true },
         },
-      }
+      } as any
       expect(Selectors.getAnalyticsOptedIn(mockState)).toBe(true)
     })
 
     it('should return true for getAnalyticsOptInSeen if no config', () => {
-      const mockState: MockState = { config: null }
+      const mockState = { config: null } as any
       expect(Selectors.getAnalyticsOptInSeen(mockState)).toBe(true)
     })
 
     it('should return config.analytics.seenOptIn with getAnalyticsOptInSeen', () => {
-      const mockState: MockState = {
+      const mockState = {
         config: {
           analytics: { appId: 'foobar', optedIn: false, seenOptIn: false },
         },
-      }
+      } as any
       expect(Selectors.getAnalyticsOptInSeen(mockState)).toBe(false)
     })
   })
 
   describe('get protocol analytics data', () => {
-    const hash: JestMockFn<[string], Promise<string>> = Hash.hash
+    const hash = Hash.hash as jest.MockedFunction<typeof Hash.hash>
 
-    const getProtocolType: JestMockFn<
-      [State],
-      $Call<typeof Protocol.getProtocolType, State>
-    > = Protocol.getProtocolType
+    const getProtocolType = Protocol.getProtocolType as jest.MockedFunction<
+      typeof Protocol.getProtocolType
+    >
 
-    const getProtocolCreatorApp: JestMockFn<
-      [State],
-      $Call<typeof Protocol.getProtocolCreatorApp, State>
-    > = Protocol.getProtocolCreatorApp
+    const getProtocolCreatorApp = Protocol.getProtocolCreatorApp as jest.MockedFunction<
+      typeof Protocol.getProtocolCreatorApp
+    >
 
-    const getProtocolApiVersion: JestMockFn<
-      [State],
-      $Call<typeof Protocol.getProtocolApiVersion, State>
-    > = Protocol.getProtocolApiVersion
+    const getProtocolApiVersion = Protocol.getProtocolApiVersion as jest.MockedFunction<
+      typeof Protocol.getProtocolApiVersion
+    >
 
-    const getProtocolName: JestMockFn<
-      [State],
-      $Call<typeof Protocol.getProtocolName, State>
-    > = Protocol.getProtocolName
+    const getProtocolName = Protocol.getProtocolName as jest.MockedFunction<
+      typeof Protocol.getProtocolName
+    >
 
-    const getProtocolSource: JestMockFn<
-      [State],
-      $Call<typeof Protocol.getProtocolSource, State>
-    > = Protocol.getProtocolSource
+    const getProtocolSource = Protocol.getProtocolSource as jest.MockedFunction<
+      typeof Protocol.getProtocolSource
+    >
 
-    const getProtocolAuthor: JestMockFn<
-      [State],
-      $Call<typeof Protocol.getProtocolAuthor, State>
-    > = Protocol.getProtocolAuthor
+    const getProtocolAuthor = Protocol.getProtocolAuthor as jest.MockedFunction<
+      typeof Protocol.getProtocolAuthor
+    >
 
-    const getProtocolContents: JestMockFn<
-      [State],
-      $Call<typeof Protocol.getProtocolContents, State>
-    > = Protocol.getProtocolContents
+    const getProtocolContents = Protocol.getProtocolContents as jest.MockedFunction<
+      typeof Protocol.getProtocolContents
+    >
 
-    const getModules: JestMockFn<
-      [State],
-      $Call<typeof RobotSelectors.getModules, State>
-    > = RobotSelectors.getModules
+    const getModules = RobotSelectors.getModules as jest.MockedFunction<
+      typeof RobotSelectors.getModules
+    >
 
-    const getPipettes: JestMockFn<
-      [State],
-      $Call<typeof RobotSelectors.getPipettes, State>
-    > = RobotSelectors.getPipettes
+    const getPipettes = RobotSelectors.getPipettes as jest.MockedFunction<
+      typeof RobotSelectors.getPipettes
+    >
 
     beforeEach(() => {
       hash.mockImplementation(source => Promise.resolve(`hash:${source}`))
@@ -266,36 +244,21 @@ describe('analytics selectors', () => {
   })
 
   describe('analytics calibration selectors', () => {
-    const mockGetConnectedRobot: JestMockFn<
-      [$Shape<State>],
-      $Shape<Robot> | null
-    > = DiscoverySelectors.getConnectedRobot
-    const mockGetAttachedPipettes: JestMockFn<
-      [State, string],
-      {|
-        left: null | $Shape<AttachedPipette>,
-        right: null | $Shape<AttachedPipette>,
-      |}
-    > = PipetteSelectors.getAttachedPipettes
+    const mockGetConnectedRobot = DiscoverySelectors.getConnectedRobot as jest.MockedFunction<
+      typeof DiscoverySelectors.getConnectedRobot
+    >
+    const mockGetAttachedPipettes = PipetteSelectors.getAttachedPipettes as jest.MockedFunction<
+      typeof PipetteSelectors.getAttachedPipettes
+    >
     describe('getAnalyticsPipetteCalibrationData', () => {
-      const mockGetAttachedPipetteCalibrations: JestMockFn<
-        [State, string],
-        {|
-          left: {|
-            offset: $Shape<PipetteOffsetCalibration> | null,
-            tipLength: any,
-          |},
-          right: {|
-            offset: $Shape<PipetteOffsetCalibration> | null,
-            tipLength: any,
-          |},
-        |}
-      > = PipetteSelectors.getAttachedPipetteCalibrations
+      const mockGetAttachedPipetteCalibrations = PipetteSelectors.getAttachedPipetteCalibrations as jest.MockedFunction<
+        typeof PipetteSelectors.getAttachedPipetteCalibrations
+      >
       it('should get data if robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState: State = {} as any
         mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
-        })
+        } as any)
         mockGetAttachedPipetteCalibrations.mockReturnValue({
           left: {
             offset: {
@@ -304,11 +267,11 @@ describe('analytics selectors', () => {
             tipLength: null,
           },
           right: { offset: null, tipLength: null },
-        })
+        } as any)
         mockGetAttachedPipettes.mockReturnValue({
           left: { model: 'my pipette model' },
           right: null,
-        })
+        } as any)
         expect(
           Selectors.getAnalyticsPipetteCalibrationData(mockState, 'left')
         ).toEqual({
@@ -318,7 +281,7 @@ describe('analytics selectors', () => {
         })
       })
       it('should return null if no robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState: State = {} as any
         mockGetConnectedRobot.mockReturnValue(null)
         expect(
           Selectors.getAnalyticsPipetteCalibrationData(mockState, 'right')
@@ -327,25 +290,15 @@ describe('analytics selectors', () => {
     })
 
     describe('getAnalyticsTipLengthCalibrationData', () => {
-      const mockGetAttachedPipetteCalibrations: JestMockFn<
-        [State, string],
-        {|
-          left: {|
-            offset: any,
-            tipLength: $Shape<TipLengthCalibration> | null,
-          |},
-          right: {|
-            offset: any,
-            tipLength: $Shape<TipLengthCalibration> | null,
-          |},
-        |}
-      > = PipetteSelectors.getAttachedPipetteCalibrations
+      const mockGetAttachedPipetteCalibrations = PipetteSelectors.getAttachedPipetteCalibrations as jest.MockedFunction<
+        typeof PipetteSelectors.getAttachedPipetteCalibrations
+      >
 
       it('should get data if robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState: State = {} as any
         mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
-        })
+        } as any)
         mockGetAttachedPipetteCalibrations.mockReturnValue({
           right: {
             tipLength: {
@@ -354,11 +307,11 @@ describe('analytics selectors', () => {
             offset: null,
           },
           left: { offset: null, tipLength: null },
-        })
+        } as any)
         mockGetAttachedPipettes.mockReturnValue({
           right: { model: 'my pipette model' },
           left: null,
-        })
+        } as any)
         expect(
           Selectors.getAnalyticsTipLengthCalibrationData(mockState, 'right')
         ).toEqual({
@@ -368,7 +321,7 @@ describe('analytics selectors', () => {
         })
       })
       it('should return null if no robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState: State = {} as any
         mockGetConnectedRobot.mockReturnValue(null)
         expect(
           Selectors.getAnalyticsTipLengthCalibrationData(mockState, 'left')
@@ -376,29 +329,25 @@ describe('analytics selectors', () => {
       })
     })
     describe('getAnalyticsDeckCalibrationData', () => {
-      const mockGetDeckCalibrationData: JestMockFn<
-        [State, string],
-        $Call<typeof CalibrationSelectors.getDeckCalibrationData, State, string>
-      > = CalibrationSelectors.getDeckCalibrationData
-      const mockGetDeckCalibrationStatus: JestMockFn<
-        [State, string],
-        DeckCalibrationStatus | null
-      > = CalibrationSelectors.getDeckCalibrationStatus
+      const mockGetDeckCalibrationData = CalibrationSelectors.getDeckCalibrationData as jest.MockedFunction<
+        typeof CalibrationSelectors.getDeckCalibrationData
+      >
+      const mockGetDeckCalibrationStatus = CalibrationSelectors.getDeckCalibrationStatus as jest.MockedFunction<
+        typeof CalibrationSelectors.getDeckCalibrationStatus
+      >
       it('should get data if robot connected and format ok', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState: State = {} as any
         mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
-        })
-        mockGetDeckCalibrationData.mockReturnValue(
-          ({
-            status: { markedBad: true, markedAt: null, source: null },
-          }: $Shape<DeckCalibrationInfo>)
-        )
+        } as any)
+        mockGetDeckCalibrationData.mockReturnValue({
+          status: { markedBad: true, markedAt: null, source: null },
+        } as any)
         mockGetDeckCalibrationStatus.mockReturnValue('IDENTITY')
         mockGetAttachedPipettes.mockReturnValue({
           right: { model: 'my pipette model' },
           left: { model: 'my other pipette' },
-        })
+        } as any)
         expect(Selectors.getAnalyticsDeckCalibrationData(mockState)).toEqual({
           calibrationStatus: 'IDENTITY',
           markedBad: true,
@@ -409,14 +358,14 @@ describe('analytics selectors', () => {
         })
       })
       it('should return null if no robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState: State = {} as any
         mockGetConnectedRobot.mockReturnValue(null)
         expect(Selectors.getAnalyticsDeckCalibrationData(mockState)).toBeNull()
       })
       it('should handle old deck cal data', () => {
         mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
-        })
+        } as any)
         mockGetDeckCalibrationData.mockReturnValue([
           [0, 1, 2, 3],
           [4, 5, 6, 7],
@@ -427,7 +376,7 @@ describe('analytics selectors', () => {
         mockGetAttachedPipettes.mockReturnValue({
           right: { model: 'my pipette model' },
           left: { model: 'my other pipette' },
-        })
+        } as any)
         expect(Selectors.getAnalyticsDeckCalibrationData(mockState)).toEqual({
           calibrationStatus: 'IDENTITY',
           markedBad: null,
@@ -439,15 +388,9 @@ describe('analytics selectors', () => {
       })
     })
     describe('getAnalyticsHealthCheckData', () => {
-      const getRobotSessionOfType: JestMockFn<
-        [State, string, SessionTypes.SessionType],
-        $Call<
-          typeof SessionsSelectors.getRobotSessionOfType,
-          State,
-          string,
-          SessionTypes.SessionType
-        >
-      > = SessionsSelectors.getRobotSessionOfType
+      const getRobotSessionOfType = SessionsSelectors.getRobotSessionOfType as jest.MockedFunction<
+        typeof SessionsSelectors.getRobotSessionOfType
+      >
       it('should get data if robot connected', () => {
         const mockCalibrationCheckSession: SessionTypes.CalibrationCheckSession = {
           id: 'fake_check_session_id',
@@ -456,7 +399,7 @@ describe('analytics selectors', () => {
         getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
         mockGetConnectedRobot.mockReturnValue({
           name: 'my robot',
-        })
+        } as any)
         const comparisonsLeft =
           SessionFixtures.mockCalibrationCheckSessionAttributes.details
             .comparisonsByPipette.first
@@ -479,31 +422,25 @@ describe('analytics selectors', () => {
         })
       })
       it('should return null if no robot connected', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState: State = {} as any
         mockGetConnectedRobot.mockReturnValue(null)
         expect(Selectors.getAnalyticsHealthCheckData(mockState)).toBeNull()
       })
     })
     describe('getAnalyticsSessionExitDetails', () => {
-      const mockGetRobotSessionById: JestMockFn<
-        [State, string, string],
-        $Call<
-          typeof SessionsSelectors.getRobotSessionById,
-          State,
-          string,
-          string
-        >
-      > = SessionsSelectors.getRobotSessionById
+      const mockGetRobotSessionById = SessionsSelectors.getRobotSessionById as jest.MockedFunction<
+        typeof SessionsSelectors.getRobotSessionById
+      >
       it('returns data if the session exists', () => {
-        const mockState = ({}: $Shape<State>)
+        const mockState: State = {} as any
         mockGetRobotSessionById.mockReturnValue({
           sessionType: 'deckCalibration',
-          details: ({
+          details: {
             currentStep: 'inspectingTip',
-          }: $Shape<DeckCalibrationSessionDetails>),
+          } as Partial<DeckCalibrationSessionDetails>,
           createParams: {},
           id: 'blah-bloo-blah',
-        })
+        } as any)
         expect(
           Selectors.getAnalyticsSessionExitDetails(
             mockState,
@@ -519,7 +456,7 @@ describe('analytics selectors', () => {
       })
       it('returns null if the session cannot be found', () => {
         mockGetRobotSessionById.mockReturnValue(null)
-        const mockState = ({}: $Shape<State>)
+        const mockState: State = {} as any
         expect(
           Selectors.getAnalyticsSessionExitDetails(
             mockState,

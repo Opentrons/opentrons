@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { getConfig, addManualIp } from '../../../../redux/config'
@@ -7,16 +6,16 @@ import { startDiscovery } from '../../../../redux/discovery'
 import { Formik, Form, Field } from 'formik'
 import { IpField } from './IpField'
 
-import type { State, Dispatch } from '../../../../redux/types'
+import type { MapDispatchToProps } from 'react-redux'
+import type { State } from '../../../../redux/types'
 import type { DiscoveryCandidates } from '../../../../redux/config/types'
 
-type OP = {||}
 
-type SP = {| candidates: DiscoveryCandidates |}
+interface SP { candidates: DiscoveryCandidates }
 
-type DP = {| addManualIp: (ip: string) => mixed |}
+interface DP { addManualIp: (ip: string) => unknown}
 
-type Props = {| ...SP, ...DP |}
+type Props = SP & DP
 
 class ManualIpFormComponent extends React.Component<Props> {
   inputRef: { current: null | HTMLInputElement }
@@ -26,7 +25,7 @@ class ManualIpFormComponent extends React.Component<Props> {
     this.inputRef = React.createRef()
   }
 
-  render(): React.Node {
+  render(): JSX.Element {
     return (
       <Formik
         initialValues={{ ip: '' }}
@@ -58,7 +57,7 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch): DP {
+const mapDispatchToProps: MapDispatchToProps<DP, {}> = (dispatch) => {
   return {
     addManualIp: ip => {
       dispatch(addManualIp(ip))
@@ -67,14 +66,4 @@ function mapDispatchToProps(dispatch: Dispatch): DP {
   }
 }
 
-export const ManualIpForm: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  _,
-  _,
-  _,
-  _
->(
-  mapStateToProps,
-  mapDispatchToProps
-)(ManualIpFormComponent)
+export const ManualIpForm = connect(mapStateToProps, mapDispatchToProps)(ManualIpFormComponent)

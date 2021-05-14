@@ -1,6 +1,6 @@
-// @flow
+import type { AttachedPipette } from "../../../../redux/pipettes/types";
 
-export const mockAttachedPipette = {
+export const mockAttachedPipette: AttachedPipette = {
   id: '1234_pip_id',
   name: 'Opentrons Test Pipette',
   model: 'opentrons_test_pipette',

@@ -1,4 +1,3 @@
-// @flow
 // custom labware reducer
 import keyBy from 'lodash/keyBy'
 import * as Actions from './actions'
@@ -15,9 +14,10 @@ export const INITIAL_STATE: CustomLabwareState = {
 }
 
 export function customLabwareReducer(
-  state: CustomLabwareState = INITIAL_STATE,
+  state: CustomLabwareState,
   action: Action
 ): CustomLabwareState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Actions.CUSTOM_LABWARE_LIST: {
       return {

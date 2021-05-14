@@ -1,15 +1,14 @@
-// @flow
 import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
 import styles from './styles.css'
 
-type Props = {|
-  message: ?string,
-|}
+interface Props {
+  message?: string | null,
+}
 
 const TITLE = 'Error updating pipette settings'
 
-export function ConfigErrorBanner(props: Props): React.Node {
+export function ConfigErrorBanner(props: Props): JSX.Element | null {
   const { message } = props
   const [dismissed, setDismissed] = React.useState(false)
   if (message == null || dismissed) return null

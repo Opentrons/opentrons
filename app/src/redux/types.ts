@@ -1,5 +1,4 @@
 /* eslint-disable no-use-before-define */
-// @flow
 // application types
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux'
 import type { RouterState, RouterAction } from 'connected-react-router'
@@ -40,27 +39,27 @@ import type { SessionState, SessionsAction } from './sessions/types'
 
 import type { AnalyticsTriggerAction } from './analytics/types'
 
-export type State = $ReadOnly<{|
-  robot: RobotState,
-  robotApi: RobotApiState,
-  robotAdmin: RobotAdminState,
-  robotControls: RobotControlsState,
-  robotSettings: RobotSettingsState,
-  buildroot: BuildrootState,
-  pipettes: PipettesState,
-  modules: ModulesState,
-  config: ConfigState,
-  discovery: DiscoveryState,
-  networking: NetworkingState,
-  labware: CustomLabwareState,
-  protocol: ProtocolState,
-  shell: ShellState,
-  systemInfo: SystemInfoState,
-  alerts: AlertsState,
-  sessions: SessionState,
-  calibration: CalibrationState,
-  router: RouterState,
-|}>
+export interface State {
+  readonly robot: RobotState
+  readonly robotApi: RobotApiState
+  readonly robotAdmin: RobotAdminState
+  readonly robotControls: RobotControlsState
+  readonly robotSettings: RobotSettingsState
+  readonly buildroot: BuildrootState
+  readonly pipettes: PipettesState
+  readonly modules: ModulesState
+  readonly config: ConfigState
+  readonly discovery: DiscoveryState
+  readonly networking: NetworkingState
+  readonly labware: CustomLabwareState
+  readonly protocol: ProtocolState
+  readonly shell: ShellState
+  readonly systemInfo: SystemInfoState
+  readonly alerts: AlertsState
+  readonly sessions: SessionState
+  readonly calibration: CalibrationState
+  readonly router: RouterState
+}
 
 export type Action =
   | RobotAction
@@ -86,9 +85,15 @@ export type Action =
 
 export type GetState = () => State
 
-export type ThunkAction = (Dispatch, GetState) => ?Action
+export type ThunkAction = (
+  dispatch: Dispatch,
+  getState: GetState
+) => Action | null | undefined
 
-export type ThunkPromiseAction = (Dispatch, GetState) => Promise<?Action>
+export type ThunkPromiseAction = (
+  dispatch: Dispatch,
+  getState: GetState
+) => Promise<Action | null | undefined>
 
 export type Store = ReduxStore<State, Action>
 
@@ -96,20 +101,22 @@ export type Dispatch = PlainDispatch & ThunkDispatch & ThunkPromiseDispatch
 
 export type Middleware = (s: MwStore) => (n: PlainDispatch) => PlainDispatch
 
-type MwStore = {
-  getState: GetState,
-  dispatch: Dispatch,
+interface MwStore {
+  getState: GetState
+  dispatch: Dispatch
 }
 
 type PlainDispatch = ReduxDispatch<Action>
 
-type ThunkDispatch = (thunk: ThunkAction) => ?Action
+type ThunkDispatch = (thunk: ThunkAction) => Action | null | undefined
 
-type ThunkPromiseDispatch = (thunk: ThunkPromiseAction) => Promise<?Action>
+type ThunkPromiseDispatch = (
+  thunk: ThunkPromiseAction
+) => Promise<Action | null | undefined>
 
 export type Epic = (
   action$: Observable<Action>,
   state$: Observable<State>
 ) => Observable<Action>
 
-export type Error = { name?: string, message?: string, ... }
+export type Error = Partial<{ name: string; message: string }>

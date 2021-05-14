@@ -1,14 +1,13 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
 
-export type CardContentQuarterProps = {|
-  children: React.Node,
-  className?: string,
-|}
+export interface CardContentQuarterProps {
+  children: React.ReactNode
+  className?: string
+}
 
-export function CardContentQuarter(props: CardContentQuarterProps): React.Node {
+export function CardContentQuarter(props: CardContentQuarterProps): JSX.Element {
   return (
     <div className={cx(styles.card_content_25, props.className)}>
       {props.children}

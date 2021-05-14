@@ -1,4 +1,3 @@
-// @flow
 // functions for managing the user's Intercom profile
 import { version as appVersion } from '../../../package.json'
 import * as Cfg from '../config'
@@ -20,7 +19,7 @@ import type { Action, State } from '../types'
 import type { Config } from '../config/types'
 import type { SupportProfileUpdate } from './types'
 
-type SupportConfig = $PropertyType<Config, 'support'>
+type SupportConfig = Config['support']
 
 export function initializeProfile(config: SupportConfig): void {
   setUserId(config.userId)

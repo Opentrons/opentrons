@@ -1,4 +1,3 @@
-// @flow
 // setup pipettes component
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -22,22 +21,22 @@ import { SessionHeader } from '../../../organisms/SessionHeader'
 import { PipetteTabs } from './PipetteTabs'
 import { PipettesContents } from './PipettesContents'
 
-import type { ContextRouter } from 'react-router-dom'
+import type { RouteComponentProps } from 'react-router-dom'
 import type { State, Dispatch } from '../../../redux/types'
 import type { Mount } from '../../../redux/pipettes/types'
-import type { Labware } from '../../../redux/robot/types'
+import type { Labware, Pipette } from '../../../redux/robot/types'
 import { CalibrateTipLengthControl } from '../CalibrateTipLengthControl'
 
-type Props = ContextRouter
+type Props = RouteComponentProps<{mount: string, definitionHash: string}>
 
-export function Pipettes(props: Props): React.Node {
+export function Pipettes(props: Props): JSX.Element {
   const { mount, definitionHash } = props.match.params
   const dispatch = useDispatch<Dispatch>()
   const robot = useSelector(getConnectedRobot)
   const robotName = robot?.name || null
   const tipracksByMount = useSelector(robotSelectors.getTipracksByMount)
   const pipettes = useSelector(
-    state => robotName && getProtocolPipettesInfo(state, robotName)
+    (state: State) => robotName ? getProtocolPipettesInfo(state, robotName) : null
   )
 
   const changePipetteUrl =
@@ -52,10 +51,7 @@ export function Pipettes(props: Props): React.Node {
 
   const currentPipette = currentMount && pipettes && pipettes[currentMount]
 
-  const activeTipracks = PIPETTE_MOUNTS.reduce<{|
-    left: Labware | null,
-    right: Labware | null,
-  |}>(
+  const activeTipracks = PIPETTE_MOUNTS.reduce<{[m in Mount]: Labware | null}>(
     (mapToBuild, m) => {
       const tipracksForMount = tipracksByMount[m]
       if (m === mount) {
@@ -81,7 +77,7 @@ export function Pipettes(props: Props): React.Node {
 
   const activeTipRackDef = activeTipRack?.definition
 
-  const tipLengthDataForActivePipette = useSelector(state => {
+  const tipLengthDataForActivePipette = useSelector((state: State) => {
     return (
       robotName &&
       currentPipette?.actual?.id &&
@@ -111,7 +107,8 @@ export function Pipettes(props: Props): React.Node {
       : null
   )
 
-  const protoPipettes = [
+  // @ts-expect-error TODO: reconcile the expected Pipette type with the one given here
+  const protoPipettes: Pipette[] = [
     pipettes?.left?.protocol
       ? omit(pipettes.left.protocol, 'displayName')
       : null,

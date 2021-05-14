@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { LabeledToggle } from '@opentrons/components'
@@ -8,29 +7,15 @@ import {
   getAnalyticsOptedIn,
 } from '../../redux/analytics'
 
-import type { State, Dispatch } from '../../redux/types'
+import type { State } from '../../redux/types'
 
-type OP = {||}
+interface SP { optedIn: boolean }
 
-type SP = {| optedIn: boolean |}
+interface DP { toggleOptedIn: () => unknown }
 
-type DP = {| toggleOptedIn: () => mixed |}
+type Props = SP & DP
 
-type Props = {| ...SP, ...DP |}
-
-export const AnalyticsToggle: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  DP,
-  _,
-  _
->(
-  mapStateToProps,
-  mapDispatchToProps
-)(AnalyticsToggleComponent)
-
-function AnalyticsToggleComponent(props: Props) {
+function AnalyticsToggleComponent(props: Props): JSX.Element {
   return (
     <LabeledToggle
       label="Share robot & app analytics with Opentrons"
@@ -56,8 +41,8 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch): DP {
-  return {
-    toggleOptedIn: () => dispatch(toggleAnalyticsOptedIn()),
-  }
+const mapDispatchToProps: DP = {
+  toggleOptedIn: () => toggleAnalyticsOptedIn()
 }
+
+export const AnalyticsToggle = connect(mapStateToProps, mapDispatchToProps)(AnalyticsToggleComponent)

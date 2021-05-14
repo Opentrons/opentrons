@@ -1,5 +1,3 @@
-// @flow
-
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import * as Types from '../types'
 
@@ -44,6 +42,7 @@ export const mockInvalidLabware: Types.InvalidLabwareFile = {
   type: 'INVALID_LABWARE_FILE',
   filename: 'b.json',
   modified: 2,
+  definition: undefined,
 }
 
 export const mockOpentronsLabware: Types.OpentronsLabwareFile = {

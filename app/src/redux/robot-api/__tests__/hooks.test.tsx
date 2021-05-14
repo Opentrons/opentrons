@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import uniqueId from 'lodash/uniqueId'
 import { mountWithStore } from '@opentrons/components/__utils__'
@@ -7,10 +6,10 @@ import { useDispatchApiRequest, useDispatchApiRequests } from '../hooks'
 
 jest.mock('lodash/uniqueId')
 
-const mockUniqueId: JestMockFn<[string | void], string> = uniqueId
+const mockUniqueId = uniqueId as jest.MockedFunction<typeof uniqueId>
 
 describe('useDispatchApiRequest', () => {
-  let render
+  let render: () => ReturnType<typeof mountWithStore>
 
   const TestUseDispatchApiRequest = () => {
     const mockAction: any = { type: 'mockAction', meta: {} }
@@ -38,18 +37,18 @@ describe('useDispatchApiRequest', () => {
     const { wrapper, store } = render()
     expect(store.dispatch).toHaveBeenCalledTimes(0)
 
-    wrapper.find('button').invoke('onClick')()
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockAction',
-      meta: { requestId: 'mockId_0' },
+      meta: { requestId: 'mockId_0' } as any,
     })
   })
 
   it('adds requestId to requestIds list', () => {
     const { wrapper } = render()
-    wrapper.find('button').invoke('onClick')()
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(wrapper.text()).toEqual('mockId_0')
@@ -57,9 +56,9 @@ describe('useDispatchApiRequest', () => {
 
   it('can dispatch multiple requests', () => {
     const { wrapper, store } = render()
-    wrapper.find('button').invoke('onClick')()
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
-    wrapper.find('button').invoke('onClick')()
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(store.dispatch).toHaveBeenCalledTimes(2)
@@ -68,9 +67,9 @@ describe('useDispatchApiRequest', () => {
 })
 
 describe('useDispatchApiRequests', () => {
-  let render
+  let render: () => ReturnType<typeof mountWithStore>
 
-  const TestUseDispatchApiRequests = props => {
+  const TestUseDispatchApiRequests = (): JSX.Element => {
     const mockAction: any = { type: 'mockAction', meta: {} }
     const mockOtherAction: any = { type: 'mockOtherAction', meta: {} }
     const [dispatchRequests] = useDispatchApiRequests()
@@ -107,13 +106,13 @@ describe('useDispatchApiRequests', () => {
         },
       },
     })
-    wrapper.find('button').invoke('onClick')()
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(store.dispatch).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockAction',
-      meta: { requestId: 'mockId_0' },
+      meta: { requestId: 'mockId_0' } as any,
     })
   })
 
@@ -127,17 +126,17 @@ describe('useDispatchApiRequests', () => {
         },
       },
     })
-    wrapper.find('button').invoke('onClick')()
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(store.dispatch).toHaveBeenCalledTimes(2)
     expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockAction',
-      meta: { requestId: 'mockId_0' },
+      meta: { requestId: 'mockId_0' } as any,
     })
     expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockOtherAction',
-      meta: { requestId: 'mockId_1' },
+      meta: { requestId: 'mockId_1' } as any,
     })
   })
 
@@ -152,17 +151,17 @@ describe('useDispatchApiRequests', () => {
         mockId_1: { status: PENDING },
       },
     })
-    wrapper.find('button').invoke('onClick')()
+    wrapper.find('button').invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(store.dispatch).toHaveBeenCalledTimes(2)
     expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockAction',
-      meta: { requestId: 'mockId_0' },
+      meta: { requestId: 'mockId_0' } as any,
     })
     expect(store.dispatch).toHaveBeenCalledWith({
       type: 'mockOtherAction',
-      meta: { requestId: 'mockId_1' },
+      meta: { requestId: 'mockId_1' } as any,
     })
   })
 })

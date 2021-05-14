@@ -1,4 +1,3 @@
-// @flow
 // tests for the shell module
 import { EMPTY } from 'rxjs'
 import { TestScheduler } from 'rxjs/testing'
@@ -10,8 +9,7 @@ import * as ShellUpdate from '../update'
 import { remote as mockRemote } from '../remote'
 import { shellEpic } from '../epic'
 
-import type { State } from '../../types'
-import type { UpdateChannel } from '../../config/types'
+import type { Action, State } from '../../types'
 
 const { ipcRenderer: mockIpc } = mockRemote
 
@@ -24,14 +22,16 @@ jest.mock('../update', () => ({
   getAvailableShellUpdate: jest.fn(),
 }))
 
-const getUpdateChannel: JestMockFn<[State], UpdateChannel> =
-  Config.getUpdateChannel
+const getUpdateChannel = Config.getUpdateChannel as jest.MockedFunction<
+  typeof Config.getUpdateChannel
+>
 
-const getAvailableShellUpdate: JestMockFn<[State], string | null> =
-  ShellUpdate.getAvailableShellUpdate
+const getAvailableShellUpdate = ShellUpdate.getAvailableShellUpdate as jest.MockedFunction<
+  typeof ShellUpdate.getAvailableShellUpdate
+>
 
 describe('shell epics', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     testScheduler = new TestScheduler((actual, expected) => {
@@ -44,10 +44,10 @@ describe('shell epics', () => {
   })
 
   it('"dispatches" actions to IPC if meta.shell', () => {
-    const shellAction = { type: 'foo', meta: { shell: true } }
+    const shellAction: Action = { type: 'foo', meta: { shell: true } } as any
 
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('-a', { a: shellAction })
+      const action$ = hot<Action>('-a', { a: shellAction })
       const output$ = shellEpic(action$, EMPTY)
 
       expectObservable(output$).toBe('--')
@@ -64,20 +64,20 @@ describe('shell epics', () => {
     const shellAction = { type: 'bar' }
     const result = shellEpic(EMPTY, EMPTY).pipe(take(1)).toPromise()
 
-    ;(mockIpc: any).emit('dispatch', {}, shellAction)
+    ;(mockIpc as any).emit('dispatch', {}, shellAction)
 
     return expect(result).resolves.toEqual(shellAction)
   })
 
   it('triggers an appUpdateAvailable alert if an app update becomes available', () => {
-    const mockState: State = ({ mockState: true }: any)
+    const mockState: State = { mockState: true } as any
 
     getAvailableShellUpdate.mockReturnValueOnce(null)
     getAvailableShellUpdate.mockReturnValue('1.2.3')
 
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('----')
-      const state$ = hot('-a-a-a', { a: mockState })
+      const action$ = hot<Action>('----')
+      const state$ = hot<State>('-a-a-a', { a: mockState })
       const output$ = shellEpic(action$, state$)
 
       // we only expect the alert to be triggered when state goes from null
@@ -89,14 +89,14 @@ describe('shell epics', () => {
   })
 
   it('should trigger a shell:CHECK_UPDATE action if the update channel changes', () => {
-    const mockState: State = ({ mockState: true }: any)
+    const mockState: State = { mockState: true } as any
 
     getUpdateChannel.mockReturnValueOnce('latest')
     getUpdateChannel.mockReturnValue('beta')
 
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('------')
-      const state$ = hot('-a-a-a', { a: mockState })
+      const action$ = hot<Action>('------')
+      const state$ = hot<State>('-a-a-a', { a: mockState })
       const output$ = shellEpic(action$, state$)
 
       // we only expect the alert to be triggered when state changes

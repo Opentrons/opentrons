@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -35,7 +34,7 @@ const USB_ORDER_STYLE = { width: '25%', paddingRight: '0.4rem' }
 const USB_PORT_STYLE = { width: '27%', paddingRight: '0.75rem' }
 const DECK_SLOT_STYLE = { width: '15%' }
 
-export function ProtocolModuleList(): React.Node {
+export function ProtocolModuleList(): JSX.Element | null {
   const { t } = useTranslation('protocol_calibration')
   const modulesRequired = useSelector((state: State) =>
     robotSelectors.getModules(state)
@@ -112,11 +111,11 @@ export function ProtocolModuleList(): React.Node {
   )
 }
 
-type UsbPortInfoProps = {|
+interface UsbPortInfoProps {
   matchedModule: MatchedModule | null,
-|}
+}
 
-function UsbPortInfo(props: UsbPortInfoProps): React.Node {
+function UsbPortInfo(props: UsbPortInfoProps): JSX.Element | null {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation('protocol_calibration')
 

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { SidePanel, ListItem, Icon } from '@opentrons/components'
 
@@ -13,7 +12,7 @@ const ITEMS = [
   { label: 'Resources', url: '/more/resources' },
 ]
 
-export function MorePanel(): React.Node {
+export function MorePanel(): JSX.Element {
   return (
     <SidePanel title={MORE}>
       <div className={styles.menu_panel}>

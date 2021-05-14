@@ -1,4 +1,3 @@
-// @flow
 // robot discovery state
 import keyBy from 'lodash/keyBy'
 import { UI_INITIALIZED } from '../shell'
@@ -13,9 +12,10 @@ export const INITIAL_STATE: DiscoveryState = {
 }
 
 export function discoveryReducer(
-  state: DiscoveryState = INITIAL_STATE,
+  state: DiscoveryState,
   action: Action
 ): DiscoveryState {
+  state = state ?? INITIAL_STATE
   switch (action.type) {
     case UI_INITIALIZED:
     case actions.DISCOVERY_START:

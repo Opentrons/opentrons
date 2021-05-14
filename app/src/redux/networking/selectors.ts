@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import find from 'lodash/find'
 import map from 'lodash/map'
@@ -64,7 +63,7 @@ const LIST_ORDER = [
 export const getWifiList: (
   state: State,
   robotName: string
-) => Array<Types.WifiNetwork> = createSelector(
+) => Types.WifiNetwork[] = createSelector(
   (state, robotName) => state.networking[robotName]?.wifiList,
   (wifiList = []) => uniqBy(orderBy(wifiList, ...LIST_ORDER), 'ssid')
 )
@@ -72,13 +71,11 @@ export const getWifiList: (
 export const getWifiKeys: (
   state: State,
   robotName: string
-) => Array<Types.WifiKey> = createSelector(
+) => Types.WifiKey[] = createSelector(
   (state, robotName) => state.networking[robotName]?.wifiKeyIds,
   (state, robotName) => state.networking[robotName]?.wifiKeysById,
-  (
-    ids: Array<string> = [],
-    keysById: $Shape<{| [string]: Types.WifiKey |}> = {}
-  ) => ids.map(id => keysById[id])
+  (ids: string[] = [], keysById: Partial<{ [string]: Types.WifiKey }> = {}) =>
+    ids.map(id => keysById[id])
 )
 
 // NOTE: not memoized because used in several rendered components
@@ -96,7 +93,7 @@ export const getWifiKeyByRequestId = (
 export const getEapOptions = (
   state: State,
   robotName: string
-): Array<Types.EapOption> => {
+): Types.EapOption[] => {
   return state.networking[robotName]?.eapOptions ?? []
 }
 

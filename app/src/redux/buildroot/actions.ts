@@ -1,4 +1,3 @@
-// @flow
 import * as Constants from './constants'
 
 import type { RobotHost } from '../robot-api/types'

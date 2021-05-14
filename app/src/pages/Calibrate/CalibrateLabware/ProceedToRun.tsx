@@ -1,4 +1,3 @@
-// @flow
 // info panel for labware calibration page
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -15,11 +14,11 @@ import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../../redux/modules'
 
 const IS_HOMING_MESSAGE = 'Returning tip and homing robot'
 
-export type ProceedToRunProps = {|
-  returnTip: () => mixed,
-|}
+export interface ProceedToRunProps {
+  returnTip: () => unknown,
+}
 
-export function ProceedToRun(props: ProceedToRunProps): React.Node {
+export function ProceedToRun(props: ProceedToRunProps): JSX.Element {
   const { returnTip } = props
   const dispatch = useDispatch<Dispatch>()
   const sessionModules = useSelector(robotSelectors.getModules)
@@ -38,7 +37,7 @@ export function ProceedToRun(props: ProceedToRunProps): React.Node {
     }
   }, [sessionModules])
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     returnTip()
     if (mustPrepForRun) {
       setRunPrepModalOpen(true)
