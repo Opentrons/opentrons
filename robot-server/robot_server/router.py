@@ -2,9 +2,9 @@
 from fastapi import APIRouter, status
 
 from .constants import V1_TAG
+from .errors import LegacyErrorResponse
 from .health import health_router
 from .system import system_router
-from .service.legacy.models import V1BasicResponse
 from .service.legacy.routers import legacy_routes
 from .service.session.router import router as session_router
 from .service.pipette_offset.router import router as pip_os_router
@@ -21,7 +21,7 @@ router.include_router(
     tags=[V1_TAG],
     responses={
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
-            "model": V1BasicResponse,
+            "model": LegacyErrorResponse,
         }
     },
 )
@@ -31,7 +31,7 @@ router.include_router(
     tags=["Health", V1_TAG],
     responses={
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
-            "model": V1BasicResponse,
+            "model": LegacyErrorResponse,
         }
     },
 )

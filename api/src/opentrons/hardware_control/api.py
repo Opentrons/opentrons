@@ -24,11 +24,12 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         SHAKE_OFF_TIPS_PICKUP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
 from .execution_manager import ExecutionManager
+from .pause_manager import PauseManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError, DoorState,
                     DoorStateNotification, PipettePair, TipAttachedError,
                     HardwareAction, PairedPipetteConfigValueError,
-                    MotionChecks)
+                    MotionChecks, PauseType)
 from . import modules, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
@@ -92,6 +93,7 @@ class API(HardwareAPILike):
         self._motion_lock = asyncio.Lock(loop=self._loop)
         self._door_state = DoorState.CLOSED
         self._robot_calibration = rb_cal.load()
+        self._pause_manager = PauseManager(self._door_state)
 
     @property
     def robot_calibration(self) -> rb_cal.RobotCalibration:
@@ -118,9 +120,11 @@ class API(HardwareAPILike):
         mod_log.info(
             f'Updating the window switch status: {door_state}')
         self.door_state = door_state
+        self._pause_manager.set_door(self.door_state)
         for cb in self._callbacks:
             hw_event = DoorStateNotification(
-                new_state=door_state)
+                new_state=door_state,
+                blocking=self._pause_manager.blocked_by_door)
             try:
                 cb(hw_event)
             except Exception:
@@ -332,13 +336,15 @@ class API(HardwareAPILike):
         """ Delay execution by pausing and sleeping.
         """
         await self._wait_for_is_running()
-        self.pause()
-        if not self.is_simulator:
-            async def sleep_for_seconds(seconds: float):
-                await asyncio.sleep(seconds)
-            delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
-            await self._execution_manager.register_cancellable_task(delay_task)
-        self.resume()
+        self.pause(PauseType.DELAY)
+        try:
+            if not self.is_simulator:
+                async def sleep_for_seconds(seconds: float):
+                    await asyncio.sleep(seconds)
+                delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
+                await self._execution_manager.register_cancellable_task(delay_task)
+        finally:
+            self.resume(PauseType.DELAY)
 
     def reset_instrument(self, mount: top_types.Mount = None):
         """
@@ -522,7 +528,7 @@ class API(HardwareAPILike):
                                                    explicit_modeset)
 
     # Global actions API
-    def pause(self):
+    def pause(self, pause_type: PauseType):
         """
         Pause motion of the robot after a current motion concludes.
 
@@ -534,6 +540,7 @@ class API(HardwareAPILike):
         is paused will not proceed until the system is resumed with
         :py:meth:`resume`.
         """
+        self._pause_manager.pause(pause_type)
 
         async def _chained_calls():
             await self._execution_manager.pause()
@@ -545,12 +552,17 @@ class API(HardwareAPILike):
         self._log.warning('Pause with message: {}'.format(message))
         for cb in self._callbacks:
             cb(message)
-        self.pause()
+        self.pause(PauseType.PAUSE)
 
-    def resume(self):
+    def resume(self, pause_type: PauseType):
         """
         Resume motion after a call to :py:meth:`pause`.
         """
+        self._pause_manager.resume(pause_type)
+
+        if self._pause_manager.should_pause:
+            return
+
         # Resume must be called immediately to awaken thread running hardware
         #  methods (ThreadManager)
         self._backend.resume()
@@ -601,6 +613,7 @@ class API(HardwareAPILike):
         This will re-scan instruments and models, clearing any cached
         information about their presence or state.
         """
+        self._pause_manager.reset()
         await self._execution_manager.reset()
         self._attached_instruments = {
             k: None for k in self._attached_instruments.keys()}

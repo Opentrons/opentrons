@@ -36,11 +36,11 @@ stages:
       status_code: 422
       json:
         errors:
-          - status: "422"
-            title: "value_error.missing"
+          - id: "InvalidRequest"
+            title: "Invalid Request"
             detail: "field required"
             source:
-              pointer: "/body/new_time/data/systemTime"
+              pointer: "/data/systemTime"
   - name: System Time PUT request on a dev server raises error
     request:
       url: "{host:s}:{port:d}/system/time"
@@ -53,6 +53,6 @@ stages:
       status_code: 501
       json:
         errors:
-          - status: "501"
+          - id: "UncategorizedError"
             title: "Not implemented"
             detail: "Method not implemented. Not supported on dev server."
