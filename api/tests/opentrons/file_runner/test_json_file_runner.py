@@ -32,7 +32,7 @@ def command_translator(decoy: Decoy) -> CommandTranslator:
 
 @pytest.fixture
 def command_queue_worker(decoy: Decoy) -> CommandQueueWorker:
-    """Create a stubbed command translator fixture."""
+    """Create a stubbed command queue worker fixture."""
     return decoy.create_decoy(spec=CommandQueueWorker)
 
 
