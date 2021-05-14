@@ -3,7 +3,7 @@ import {
   ALERT_APP_UPDATE_AVAILABLE,
   ALERT_TRIGGERED,
   ALERT_DISMISSED,
-} from './constants.js'
+} from './constants'
 
 export type AlertId =
   | typeof ALERT_U2E_DRIVER_OUTDATED

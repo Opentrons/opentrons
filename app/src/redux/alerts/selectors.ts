@@ -4,19 +4,14 @@ import without from 'lodash/without'
 import { getConfig } from '../config'
 
 import type { State } from '../types'
+import type { Config } from '../config/types'
 import type { AlertId, AlertsState } from './types'
 
 const getIgnoredAlertsFromConfig: (
   state: State
 ) => null | AlertId[] = createSelector(
   getConfig,
-  (config: ReturnType<typeof getConfig>) => {
-    if (config === null) return null
-    const ignoredConfigAlerts: AlertId[] = (config !== null
-      ? config.alerts.ignored
-      : []) as AlertId[]
-    return ignoredConfigAlerts ?? null
-  }
+  (config: Config | null) => config?.alerts.ignored ?? null
 )
 
 export const getActiveAlerts: (state: State) => AlertId[] = createSelector(

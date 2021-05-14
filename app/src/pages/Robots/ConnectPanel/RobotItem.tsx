@@ -9,7 +9,7 @@ import {
 } from '../../../redux/robot'
 import { getBuildrootUpdateAvailable, UPGRADE } from '../../../redux/buildroot'
 import { CONNECTABLE } from '../../../redux/discovery'
-import { RobotListItem } from './RobotListItem.js'
+import { RobotListItem } from './RobotListItem'
 
 import type { RouteComponentProps } from 'react-router-dom'
 import type { State, Dispatch } from '../../../redux/types'
