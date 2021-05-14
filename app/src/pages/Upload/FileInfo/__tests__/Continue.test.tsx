@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import { StaticRouter } from 'react-router-dom'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
+import { when } from 'jest-when'
 
 import * as navigation from '../../../../redux/nav'
 import { Tooltip } from '@opentrons/components'
@@ -59,7 +60,10 @@ describe('Continue to run or calibration button component', () => {
   })
 
   it('renders a link to /calibrate when calibrate page is enabled', () => {
-    getCalibrateLocation.mockReturnValue(CALIBRATE_LOCATION_ENABLED)
+    when(getCalibrateLocation)
+      .calledWith(MOCK_STATE)
+      .mockReturnValue(CALIBRATE_LOCATION_ENABLED)
+
     const wrapper = render()
     const link = wrapper.find('a')
     const tooltip = wrapper.find(Tooltip)
@@ -70,7 +74,10 @@ describe('Continue to run or calibration button component', () => {
   })
 
   it('renders a tooltip and a noop link when calibrate page is disabled', () => {
-    getCalibrateLocation.mockReturnValueOnce(CALIBRATE_SELECTOR_DISABLED)
+    when(getCalibrateLocation)
+      .calledWith(MOCK_STATE)
+      .mockReturnValue(CALIBRATE_SELECTOR_DISABLED)
+
     const wrapper = render()
     const link = wrapper.find('a')
     const tooltip = wrapper.find(Tooltip)

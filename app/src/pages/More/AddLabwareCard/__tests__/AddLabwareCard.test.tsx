@@ -23,9 +23,9 @@ const mockGetAddLabwareFailure = CustomLabware.getAddLabwareFailure as jest.Mock
 >
 
 const mockLabwarePath = '/path/to/labware'
+const mockState = ({ state: true } as unknown) as State
 
 describe('AddLabwareCard', () => {
-  let mockStore: React.ComponentProps<typeof Provider>['store']
   let render: () => WrapperWithStore<typeof AddLabwareCard, State, Action>
 
   beforeEach(() => {
@@ -33,7 +33,9 @@ describe('AddLabwareCard', () => {
     mockGetAddLabwareFailure.mockReturnValue({ file: null, errorMessage: null })
 
     render = () =>
-      mountWithStore<typeof AddLabwareCard, State, Action>(<AddLabwareCard />)
+      mountWithStore<typeof AddLabwareCard, State, Action>(<AddLabwareCard />, {
+        initialState: mockState,
+      })
   })
 
   afterEach(() => {
