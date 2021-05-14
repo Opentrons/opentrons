@@ -204,7 +204,7 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
             {...targetProps}
             minWidth="12rem"
             onClick={confirmStart}
-            disabled={Boolean(disabledOrBusyReason)}
+            disabled={disabledOrBusyReason}
           >
             {showSpinner ? (
               <Icon name="ot-spinner" height="1em" spin />

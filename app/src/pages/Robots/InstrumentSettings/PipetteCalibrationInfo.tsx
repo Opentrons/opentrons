@@ -235,7 +235,7 @@ export function PipetteCalibrationInfo(props: Props): JSX.Element {
                 })
             : () => startPipetteOffsetPossibleTLC({ keepTipLength: true })
         }
-        disabled={Boolean(disabledReason)}
+        disabled={disabledReason}
         width="15rem"
         paddingX={SPACING_2}
         marginBottom={SPACING_1}
@@ -279,7 +279,7 @@ export function PipetteCalibrationInfo(props: Props): JSX.Element {
             onClick={() =>
               startPipetteOffsetPossibleTLC({ keepTipLength: false })
             }
-            disabled={Boolean(disabledReason)}
+            disabled={disabledReason}
             width="15rem"
             paddingX={SPACING_2}
           >
