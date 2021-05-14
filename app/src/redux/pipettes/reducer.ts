@@ -2,6 +2,7 @@ import * as Constants from './constants'
 
 import type { Action } from '../types'
 import type { PipettesState, PerRobotPipettesState } from './types'
+import type { Reducer } from 'redux'
 
 const INITIAL_STATE: PipettesState = {}
 
@@ -10,10 +11,10 @@ const INITIAL_PIPETTES_STATE: PerRobotPipettesState = {
   settingsById: null,
 }
 
-export function pipettesReducer(
-  state: PipettesState,
-  action: Action
-): PipettesState {
+export const pipettesReducer: Reducer<PipettesState, Action> = (
+  state,
+  action
+) => {
   state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_PIPETTES_SUCCESS: {

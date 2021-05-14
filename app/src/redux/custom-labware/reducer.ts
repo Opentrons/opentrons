@@ -4,6 +4,7 @@ import * as Actions from './actions'
 
 import type { Action } from '../types'
 import type { CustomLabwareState } from './types'
+import { Reducer } from 'redux'
 
 export const INITIAL_STATE: CustomLabwareState = {
   filenames: [],
@@ -13,10 +14,10 @@ export const INITIAL_STATE: CustomLabwareState = {
   listFailureMessage: null,
 }
 
-export function customLabwareReducer(
-  state: CustomLabwareState,
-  action: Action
-): CustomLabwareState {
+export const customLabwareReducer: Reducer<CustomLabwareState, Action> = (
+  state,
+  action
+) => {
   state = state ?? INITIAL_STATE
   switch (action.type) {
     case Actions.CUSTOM_LABWARE_LIST: {

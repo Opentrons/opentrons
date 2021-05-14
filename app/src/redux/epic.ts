@@ -17,9 +17,7 @@ import { systemInfoEpic } from './system-info/epic'
 import { sessionsEpic } from './sessions/epic'
 import { calibrationEpic } from './calibration/epic'
 
-import type { Epic } from './types'
-
-export const rootEpic: Epic = combineEpics(
+export const rootEpic = combineEpics(
   analyticsEpic,
   supportEpic,
   discoveryEpic,

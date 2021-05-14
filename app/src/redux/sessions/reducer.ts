@@ -4,6 +4,7 @@ import * as Constants from './constants'
 
 import type { Action } from '../types'
 
+import type { Reducer } from 'redux'
 import type { SessionState, PerRobotSessionState } from './types'
 
 const INITIAL_STATE: SessionState = {}
@@ -12,10 +13,10 @@ const INITIAL_PER_ROBOT_STATE: PerRobotSessionState = {
   robotSessions: null,
 }
 
-export function sessionReducer(
-  state: SessionState,
-  action: Action
-): SessionState {
+export const sessionReducer: Reducer<SessionState, Action> = (
+  state,
+  action
+) => {
   state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.CREATE_SESSION_SUCCESS:

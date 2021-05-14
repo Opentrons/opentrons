@@ -1,14 +1,15 @@
 import { filenameToType, parseProtocolData } from './protocol-data'
 
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { ProtocolState } from './types'
 
 const INITIAL_STATE: ProtocolState = { file: null, contents: null, data: null }
 
-export function protocolReducer(
-  state: ProtocolState,
-  action: Action
-): ProtocolState {
+export const protocolReducer: Reducer<ProtocolState, Action> = (
+  state,
+  action
+) => {
   state = state ?? INITIAL_STATE
   switch (action.type) {
     case 'protocol:INVALID_FILE':

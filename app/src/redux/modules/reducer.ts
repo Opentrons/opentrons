@@ -3,6 +3,7 @@ import * as Constants from './constants'
 
 import type { Action } from '../types'
 import type { ModulesState, PerRobotModulesState } from './types'
+import { Reducer } from 'redux'
 
 const INITIAL_STATE: ModulesState = {}
 
@@ -10,10 +11,10 @@ const INITIAL_MODULES_STATE: PerRobotModulesState = {
   modulesById: null,
 }
 
-export function modulesReducer(
-  state: ModulesState,
-  action: Action
-): ModulesState {
+export const modulesReducer: Reducer<ModulesState, Action> = (
+  state,
+  action
+) => {
   state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_MODULES_SUCCESS: {

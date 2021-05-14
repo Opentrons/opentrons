@@ -5,16 +5,17 @@ import * as actions from './actions'
 
 import type { Action } from '../types'
 import type { DiscoveryState } from './types'
+import { Reducer } from 'redux'
 
 export const INITIAL_STATE: DiscoveryState = {
   scanning: false,
   robotsByName: {},
 }
 
-export function discoveryReducer(
-  state: DiscoveryState,
-  action: Action
-): DiscoveryState {
+export const discoveryReducer: Reducer<DiscoveryState, Action> = (
+  state,
+  action
+) => {
   state = state ?? INITIAL_STATE
   switch (action.type) {
     case UI_INITIALIZED:

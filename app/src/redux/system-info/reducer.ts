@@ -2,6 +2,7 @@
 
 import * as Constants from './constants'
 
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { SystemInfoState } from './types'
 
@@ -10,10 +11,10 @@ const INITIAL_STATE: SystemInfoState = {
   networkInterfaces: [],
 }
 
-export function systemInfoReducer(
-  state: SystemInfoState,
-  action: Action
-): SystemInfoState {
+export const systemInfoReducer: Reducer<SystemInfoState, Action> = (
+  state,
+  action
+) => {
   state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.INITIALIZED: {

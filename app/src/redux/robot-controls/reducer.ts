@@ -1,5 +1,6 @@
 import * as Constants from './constants'
 
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { RobotControlsState, PerRobotControlsState } from './types'
 
@@ -24,10 +25,10 @@ const updateRobotState = (
   }
 }
 
-export function robotControlsReducer(
-  state: RobotControlsState,
-  action: Action
-): RobotControlsState {
+export const robotControlsReducer: Reducer<RobotControlsState, Action> = (
+  state,
+  action
+) => {
   state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_LIGHTS_SUCCESS:

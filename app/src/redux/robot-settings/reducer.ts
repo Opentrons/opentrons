@@ -1,5 +1,6 @@
 import * as Constants from './constants'
 
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { RobotSettingsState, PerRobotRobotSettingsState } from './types'
 
@@ -10,10 +11,10 @@ const INITIAL_ROBOT_STATE: PerRobotRobotSettingsState = {
   restartPath: null,
 }
 
-export function robotSettingsReducer(
-  state: RobotSettingsState,
-  action: Action
-): RobotSettingsState {
+export const robotSettingsReducer: Reducer<RobotSettingsState, Action> = (
+  state,
+  action
+) => {
   state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_SETTINGS_SUCCESS:
