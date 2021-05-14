@@ -427,7 +427,7 @@ export const disconnectRpcOnStartEpic: Epic = action$ => {
   return action$.pipe(ofType(BR_START_UPDATE), mapTo(robotActions.disconnect()))
 }
 
-export const buildrootEpic = combineEpics(
+export const buildrootEpic = combineEpics<Epic>(
   startUpdateEpic,
   retryAfterPremigrationEpic,
   retryAfterUserFileInfoEpic,

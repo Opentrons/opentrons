@@ -14,6 +14,7 @@ export const robotAdminReducer: Reducer<RobotAdminState, Action> = (
   switch (action.type) {
     case Constants.RESTART_STATUS_CHANGED:
     case Constants.RESTART_FAILURE: {
+      // @ts-expect-error TODO: guard type better here, don't do default destructing
       const { robotName, bootId = null, startTime = null } = action.payload
       const restartStatus =
         action.type === Constants.RESTART_FAILURE

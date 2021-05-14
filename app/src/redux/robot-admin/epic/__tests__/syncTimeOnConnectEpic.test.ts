@@ -24,8 +24,8 @@ const createTimeSuccessResponse = (
 }
 
 const createEpicOutput = (
-  mocks,
-  createHotObservable
+  mocks: any,
+  createHotObservable: any
 ): ReturnType<typeof syncTimeOnConnectEpic> => {
   const action$ = createHotObservable('--a', { a: mocks.action })
   const state$ = createHotObservable('s-s', { s: mocks.state })

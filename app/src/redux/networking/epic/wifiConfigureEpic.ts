@@ -12,8 +12,11 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-import type { Epic } from '../../types'
-import type { PostWifiConfigureAction } from '../types'
+import type { Action, Epic } from '../../types'
+import {
+  PostWifiConfigureAction,
+  PostWifiConfigureSuccessAction,
+} from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<PostWifiConfigureAction> = action => ({
   method: POST,
@@ -35,7 +38,7 @@ const mapResponseToAction: ResponseToActionMapper<PostWifiConfigureAction> = (
 
 const postWifiConfigureEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.POST_WIFI_CONFIGURE),
+    ofType<Action, PostWifiConfigureAction>(Constants.POST_WIFI_CONFIGURE),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,
@@ -47,14 +50,16 @@ const postWifiConfigureEpic: Epic = (action$, state$) => {
 
 const handleWifiConfigureSuccessEpic: Epic = action$ => {
   return action$.pipe(
-    ofType(Constants.POST_WIFI_CONFIGURE_SUCCESS),
+    ofType<Action, PostWifiConfigureSuccessAction>(
+      Constants.POST_WIFI_CONFIGURE_SUCCESS
+    ),
     switchMap(action =>
       of(Actions.fetchWifiList(action.payload.robotName), startDiscovery())
     )
   )
 }
 
-export const wifiConfigureEpic: Epic = combineEpics(
+export const wifiConfigureEpic: Epic = combineEpics<Epic>(
   postWifiConfigureEpic,
   handleWifiConfigureSuccessEpic
 )

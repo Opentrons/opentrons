@@ -63,7 +63,7 @@ const checkForUpdateAfterChannelChangeEpic: Epic = (action$, state$) => {
   )
 }
 
-export const shellEpic: Epic = combineEpics(
+export const shellEpic: Epic = combineEpics<Epic>(
   sendActionToShellEpic,
   receiveActionFromShellEpic,
   appUpdateAvailableAlertEpic,

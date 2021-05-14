@@ -10,8 +10,11 @@ import type {
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { Epic } from '../../types'
-import type { PostWifiDisconnectAction } from '../types'
+import type { Action, Epic } from '../../types'
+import {
+  PostWifiDisconnectAction,
+  PostWifiDisconnectSuccessAction,
+} from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<PostWifiDisconnectAction> = action => ({
   method: POST,
@@ -33,7 +36,7 @@ const mapResponseToAction: ResponseToActionMapper<PostWifiDisconnectAction> = (
 
 const postDisconnectEpic: Epic = (action$, state$) =>
   action$.pipe(
-    ofType(Constants.POST_WIFI_DISCONNECT),
+    ofType<Action, PostWifiDisconnectAction>(Constants.POST_WIFI_DISCONNECT),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,
@@ -44,12 +47,14 @@ const postDisconnectEpic: Epic = (action$, state$) =>
 
 const handlePostDisconnectNetworkSuccessEpic: Epic = action$ => {
   return action$.pipe(
-    ofType(Constants.POST_WIFI_DISCONNECT_SUCCESS),
+    ofType<Action, PostWifiDisconnectSuccessAction>(
+      Constants.POST_WIFI_DISCONNECT_SUCCESS
+    ),
     map(action => Actions.fetchWifiList(action.payload.robotName))
   )
 }
 
-export const disconnectEpic: Epic = combineEpics(
+export const disconnectEpic: Epic = combineEpics<Epic>(
   postDisconnectEpic,
   handlePostDisconnectNetworkSuccessEpic
 )

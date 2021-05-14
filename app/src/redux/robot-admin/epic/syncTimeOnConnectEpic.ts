@@ -6,7 +6,7 @@ import { GET, PUT, fetchRobotApi } from '../../robot-api'
 import { withRobotHost } from '../../robot-api/operators'
 import * as Constants from '../constants'
 
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 import type { RobotApiRequestOptions } from '../../robot-api/types'
 import type { ConnectAction } from '../../robot/actions'
 
@@ -32,13 +32,14 @@ const createUpdateRequest = (date: Date): RobotApiRequestOptions => {
 
 export const syncTimeOnConnectEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType('robot:CONNECT'),
+    ofType<Action, ConnectAction>('robot:CONNECT'),
     withRobotHost(state$, action => action.payload.name),
     // TODO(mc, 2020-09-08): only fetch if health.links.systemTime exists,
     // see TODO in robot-server/robot_server/service/legacy/models/health.py
     switchMap(([action, state, robot]) => {
       const fetchSystemTimeReq = mapActionToFetchRequest(action)
 
+      // @ts-expect-error TODO: robot could be null here, but fetchRobotApi expects only RobotHost
       return fetchRobotApi(robot, fetchSystemTimeReq).pipe(
         filter(response => response.ok),
         map(response => response.body.data.systemTime),
@@ -49,6 +50,7 @@ export const syncTimeOnConnectEpic: Epic = (action$, state$) => {
         }),
         switchMap(() => {
           const updateSystemTimeReq = createUpdateRequest(new Date())
+          // @ts-expect-error TODO: robot could be null here, but fetchRobotApi expects only RobotHost
           return fetchRobotApi(robot, updateSystemTimeReq)
         })
       )

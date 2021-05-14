@@ -4,7 +4,7 @@ import { fetchLabwareCalibrationsOnSessionUpdateEpic } from './fetchLabwareCalib
 
 import type { Epic } from '../../../types'
 
-export const labwareCalibrationEpic: Epic = combineEpics(
+export const labwareCalibrationEpic: Epic = combineEpics<Epic>(
   fetchLabwareCalibrationsEpic,
   fetchLabwareCalibrationsOnSessionUpdateEpic
 )

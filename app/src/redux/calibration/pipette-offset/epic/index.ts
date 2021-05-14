@@ -5,7 +5,7 @@ import { fetchPipetteOffsetCalibrationsOnCalibrationEndEpic } from './fetchPipet
 
 import type { Epic } from '../../../types'
 
-export const pipetteOffsetCalibrationsEpic: Epic = combineEpics(
+export const pipetteOffsetCalibrationsEpic: Epic = combineEpics<Epic>(
   fetchPipetteOffsetCalibrationsEpic,
   fetchPipetteOffsetCalibrationsOnConnectEpic,
   fetchPipetteOffsetCalibrationsOnCalibrationEndEpic

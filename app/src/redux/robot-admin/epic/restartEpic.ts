@@ -8,7 +8,7 @@ import { startDiscovery } from '../../discovery'
 import * as Constants from '../constants'
 import * as Actions from '../actions'
 
-import type { Epic } from '../../types'
+import type { Epic, Action } from '../../types'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
@@ -43,7 +43,7 @@ const mapResponseToAction: ResponseToActionMapper<RestartRobotAction> = (
 
 export const restartEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.RESTART),
+    ofType<Action, RestartRobotAction>(Constants.RESTART),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

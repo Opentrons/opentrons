@@ -8,7 +8,7 @@ import { trackRestartsEpic } from './trackRestartsEpic'
 
 import type { Epic } from '../../types'
 
-export const robotAdminEpic: Epic = combineEpics(
+export const robotAdminEpic = combineEpics<Epic>(
   restartEpic,
   startDiscoveryOnRestartEpic,
   fetchResetOptionsEpic,

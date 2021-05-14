@@ -7,15 +7,18 @@ import { getNextRestartStatus } from '../selectors'
 import { restartStatusChanged } from '../actions'
 import * as Constants from '../constants'
 
+import type { State, Action, Epic } from '../../types'
+import type { RestartRobotSuccessAction } from '../types'
 import type { Robot, ReachableRobot } from '../../discovery/types'
-import type { Epic } from '../../types'
 
 // mark robot as restart-pending if HTTP restart request succeeds
 const trackRestartBeginEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.RESTART_SUCCESS),
+    ofType<Action, RestartRobotSuccessAction>(Constants.RESTART_SUCCESS),
     withLatestFrom(state$, (a, s) => getRobotByName(s, a.payload.robotName)),
-    filter(maybeRobot => maybeRobot != null),
+    filter(
+      (maybeRobot): maybeRobot is Robot | ReachableRobot => maybeRobot != null
+    ),
     map(robot => {
       const startTime = new Date()
       return restartStatusChanged(
@@ -54,7 +57,7 @@ const trackRestartProgressEpic: Epic = (action$, state$) => {
   )
 }
 
-export const trackRestartsEpic: Epic = combineEpics(
+export const trackRestartsEpic = combineEpics<Epic>(
   trackRestartBeginEpic,
   trackRestartProgressEpic
 )

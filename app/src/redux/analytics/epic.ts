@@ -67,7 +67,7 @@ const optIntoAnalyticsEpic: Epic = (_, state$) => {
   )
 }
 
-export const analyticsEpic: Epic = combineEpics(
+export const analyticsEpic: Epic = combineEpics<Epic>(
   initializeAnalyticsEpic,
   sendAnalyticsEventEpic,
   optIntoAnalyticsEpic

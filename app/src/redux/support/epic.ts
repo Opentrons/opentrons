@@ -7,12 +7,13 @@ import { initializeProfile, makeProfileUpdate, updateProfile } from './profile'
 
 import { makeIntercomEvent, sendEvent } from './intercom-event'
 
-import type { Epic } from '../types'
+import type { Action, Epic } from '../types'
 import type { ConfigInitializedAction } from '../config/types'
+import { IntercomEvent, SupportProfileUpdate } from './types'
 
 const initializeSupportEpic: Epic = action$ => {
   return action$.pipe(
-    ofType(Cfg.INITIALIZED),
+    ofType<Action, ConfigInitializedAction>(Cfg.INITIALIZED),
     tap((a: ConfigInitializedAction) => {
       initializeProfile(a.payload.config.support)
     }),
@@ -23,7 +24,9 @@ const initializeSupportEpic: Epic = action$ => {
 const updateProfileEpic: Epic = (action$, state$) => {
   return action$.pipe(
     withLatestFrom(state$, makeProfileUpdate),
-    filter(maybeUpdate => maybeUpdate !== null),
+    filter<SupportProfileUpdate | null, SupportProfileUpdate>(
+      (maybeUpdate): maybeUpdate is SupportProfileUpdate => maybeUpdate !== null
+    ),
     tap(updateProfile),
     ignoreElements()
   )
@@ -32,13 +35,15 @@ const updateProfileEpic: Epic = (action$, state$) => {
 const sendEventEpic: Epic = (action$, state$) => {
   return action$.pipe(
     withLatestFrom(state$, makeIntercomEvent),
-    filter(maybeSend => maybeSend !== null),
+    filter<IntercomEvent | null, IntercomEvent>(
+      (maybeSend): maybeSend is IntercomEvent => maybeSend !== null
+    ),
     tap(sendEvent),
     ignoreElements()
   )
 }
 
-export const supportEpic: Epic = combineEpics(
+export const supportEpic: Epic = combineEpics<Epic>(
   initializeSupportEpic,
   updateProfileEpic,
   sendEventEpic

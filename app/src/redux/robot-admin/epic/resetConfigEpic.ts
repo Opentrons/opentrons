@@ -6,12 +6,16 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Constants from '../constants'
 import * as Actions from '../actions'
 
-import type { Epic } from '../../types'
+import type { Epic, Action } from '../../types'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-import type { ResetConfigAction } from '../types'
+import {
+  ResetConfigAction,
+  ResetConfigSuccessAction,
+  RestartRobotAction,
+} from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<ResetConfigAction> = action => ({
   method: POST,
@@ -33,7 +37,7 @@ const mapResponseToAction: ResponseToActionMapper<ResetConfigAction> = (
 
 export const resetConfigEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.RESET_CONFIG),
+    ofType<Action, ResetConfigAction>(Constants.RESET_CONFIG),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,
@@ -45,8 +49,8 @@ export const resetConfigEpic: Epic = (action$, state$) => {
 
 export const restartOnResetConfigEpic: Epic = action$ => {
   return action$.pipe(
-    ofType(Constants.RESET_CONFIG_SUCCESS),
-    map<ResetConfigAction, _>(a => {
+    ofType<Action, ResetConfigSuccessAction>(Constants.RESET_CONFIG_SUCCESS),
+    map<ResetConfigSuccessAction, RestartRobotAction>(a => {
       return Actions.restartRobot(a.payload.robotName)
     })
   )

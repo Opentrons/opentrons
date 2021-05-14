@@ -6,7 +6,7 @@ import { pollModulesWhileConnectedEpic } from './pollModulesWhileConnectedEpic'
 
 import type { Epic } from '../../types'
 
-export const modulesEpic: Epic = combineEpics(
+export const modulesEpic: Epic = combineEpics<Epic>(
   fetchModulesEpic,
   sendModuleCommandEpic,
   updateModuleEpic,
