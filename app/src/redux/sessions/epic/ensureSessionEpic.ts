@@ -8,7 +8,8 @@ import { withRobotHost } from '../../robot-api/operators'
 
 import * as Constants from '../constants'
 
-import type { State, Epic } from '../../types'
+import type { Observable } from 'rxjs'
+import type { Action, State, Epic } from '../../types'
 import type { RobotHost } from '../../robot-api/types'
 
 import {
@@ -29,41 +30,41 @@ import type { EnsureSessionAction } from '../types'
 // actions of fetchAllSessionsEpic and createSessionEpic
 export const ensureSessionEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.ENSURE_SESSION),
+    ofType<Action, EnsureSessionAction>(Constants.ENSURE_SESSION),
     withRobotHost<EnsureSessionAction>(state$, a => a.payload.robotName),
-    switchMap<[EnsureSessionAction, State, RobotHost], _, _>(
-      ([originalAction, state, host]) => {
-        const { sessionType, params } = originalAction.payload
-        const fetchAllRequest = mapActionToFetchAllRequest()
-        const createRequest = mapActionToCreateRequest(originalAction)
+    switchMap<
+      [EnsureSessionAction, State, RobotHost | null],
+      Observable<Action>
+    >(([originalAction, state, host]) => {
+      const { sessionType, params } = originalAction.payload
+      const fetchAllRequest = mapActionToFetchAllRequest()
+      const createRequest = mapActionToCreateRequest(originalAction)
 
-        return fetchRobotApi(host, fetchAllRequest).pipe(
-          switchMap(fetchResponse => {
-            const { ok, body } = fetchResponse
-            // if fetch all failed or body included the correct sessionType and params,
-            // we're done
-            if (
-              !ok ||
-              body.data.some(
-                s =>
-                  s.sessionType === sessionType &&
-                  isEqual(s.createParams, params)
-              )
-            ) {
-              return of(
-                mapFetchAllResponseToAction(fetchResponse, originalAction)
-              )
-            }
-
-            // else fetch all succeeded and there was no sessionType, so create one
-            return fetchRobotApi(host, createRequest).pipe(
-              map(response => {
-                return mapCreateResponseToAction(response, originalAction)
-              })
+      return fetchRobotApi(host, fetchAllRequest).pipe(
+        switchMap(fetchResponse => {
+          const { ok, body } = fetchResponse
+          // if fetch all failed or body included the correct sessionType and params,
+          // we're done
+          if (
+            !ok ||
+            body.data.some(
+              s =>
+                s.sessionType === sessionType && isEqual(s.createParams, params)
             )
-          })
-        )
-      }
-    )
+          ) {
+            return of(
+              mapFetchAllResponseToAction(fetchResponse, originalAction)
+            )
+          }
+
+          // else fetch all succeeded and there was no sessionType, so create one
+          return fetchRobotApi(host, createRequest).pipe(
+            map(response => {
+              return mapCreateResponseToAction(response, originalAction)
+            })
+          )
+        })
+      )
+    })
   )
 }

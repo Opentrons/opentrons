@@ -5,7 +5,11 @@ import { ofType } from 'redux-observable'
 import { getConnectedRobotName } from '../../robot/selectors'
 import * as Actions from '../actions'
 
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
+import type {
+  DisconnectAction,
+  UnexpectedDisconnectAction,
+} from '../../robot/actions'
 
 // NOTE: this epic is responsible for clearing out the (only) redux state of the sessions
 // that belong to the connected robot as soon as it is disconnected. This is doing the
@@ -16,10 +20,12 @@ import type { Epic } from '../../types'
 
 export const clearAllSessionsOnDisconnectEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType('robot:DISCONNECT', 'robot:UNEXPECTED_DISCONNECT'),
+    ofType<Action, DisconnectAction | UnexpectedDisconnectAction>(
+      'robot:DISCONNECT',
+      'robot:UNEXPECTED_DISCONNECT'
+    ),
     withLatestFrom(state$, (_a, s) => getConnectedRobotName(s)),
-    filter(robotName => {
-      console.log(robotName)
+    filter((robotName): robotName is string => {
       return robotName != null
     }),
     switchMap(robotName => of(Actions.clearAllSessions(robotName)))

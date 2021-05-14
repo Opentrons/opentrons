@@ -13,7 +13,7 @@ export const fetchLabwareCalibrationsOnSessionUpdateEpic: Epic = (
   return action$.pipe(
     ofType('robot:UPDATE_OFFSET_SUCCESS', 'robot:CONFIRM_TIPRACK_SUCCESS'),
     withLatestFrom(state$, (_, s) => getConnectedRobotName(s)),
-    filter(robotName => robotName !== null),
+    filter((robotName): robotName is string => robotName !== null),
     mergeMap(robotName => {
       return of(Actions.fetchLabwareCalibrations(robotName))
     })

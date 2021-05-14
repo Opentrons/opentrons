@@ -16,6 +16,7 @@ export const fetchPipetteOffsetCalibrationsOnConnectEpic: Epic = (
     withLatestFrom(state$, (a, s) => [a, getConnectedRobotName(s)]),
     filter(([action, robotName]) => robotName != null),
     mergeMap(robotName => {
+      // @ts-expect-error TODO: something is wrong here robotName will be a tuple
       return of(Actions.fetchPipetteOffsetCalibrations(robotName))
     })
   )

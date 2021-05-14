@@ -16,13 +16,14 @@ import { getAnalyticsConfig } from './selectors'
 import { initializeMixpanel, setMixpanelTracking, trackEvent } from './mixpanel'
 import { makeEvent } from './make-event'
 
+import type { Observable } from 'rxjs'
 import type { State, Action, Epic } from '../types'
 import type { ConfigInitializedAction } from '../config/types'
 import type { TrackEventArgs, AnalyticsEvent, AnalyticsConfig } from './types'
 
 const initializeAnalyticsEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Cfg.INITIALIZED),
+    ofType<Action, ConfigInitializedAction>(Cfg.INITIALIZED),
     tap((initAction: ConfigInitializedAction) => {
       const { config } = initAction.payload
       initializeMixpanel(config.analytics)
@@ -36,13 +37,17 @@ const sendAnalyticsEventEpic: Epic = (action$, state$) => {
     withLatestFrom(state$),
     // use a merge map to ensure actions dispatched in the same tick do
     // not clobber each other
-    mergeMap<[Action, State], _, TrackEventArgs>(([action, state]) => {
+    mergeMap<[Action, State], Observable<TrackEventArgs>>(([action, state]) => {
       const event$ = from(makeEvent(action, state))
       return zip(event$, of(getAnalyticsConfig(state)))
     }),
-    filter(([maybeEvent, maybeConfig]: TrackEventArgs) =>
-      Boolean(maybeEvent && maybeConfig)
-    ),
+    filter<TrackEventArgs, [AnalyticsEvent, AnalyticsConfig]>((args): args is [
+      AnalyticsEvent,
+      AnalyticsConfig
+    ] => {
+      const [maybeEvent, maybeConfig] = args
+      return Boolean(maybeEvent && maybeConfig)
+    }),
     tap(([event, config]: [AnalyticsEvent, AnalyticsConfig]) =>
       trackEvent(event, config)
     ),
@@ -56,7 +61,7 @@ const optIntoAnalyticsEpic: Epic = (_, state$) => {
     // this epic is for runtime changes in opt-in (not initialization)
     // ensure config exists so it doesn't conflict with initializeAnalyticsEpic
     filter<AnalyticsConfig | null, AnalyticsConfig>(
-      maybeConfig => maybeConfig !== null
+      (maybeConfig): maybeConfig is AnalyticsConfig => maybeConfig !== null
     ),
     pairwise(),
     filter(([prev, next]) => prev.optedIn !== next.optedIn),

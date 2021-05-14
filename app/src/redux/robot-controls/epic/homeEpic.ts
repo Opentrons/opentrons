@@ -6,7 +6,7 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
@@ -38,7 +38,7 @@ const mapResponseToAction: ResponseToActionMapper<HomeAction> = (
 
 export const homeEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.HOME),
+    ofType<Action, HomeAction>(Constants.HOME),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

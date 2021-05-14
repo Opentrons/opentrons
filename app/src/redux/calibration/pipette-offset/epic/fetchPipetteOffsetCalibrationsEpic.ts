@@ -9,7 +9,7 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../../robot-api/operators'
-import type { Epic } from '../../../types'
+import type { Action, Epic } from '../../../types'
 import type { FetchPipetteOffsetCalibrationsAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchPipetteOffsetCalibrationsAction> = action => ({
@@ -30,7 +30,9 @@ const mapResponseToAction: ResponseToActionMapper<FetchPipetteOffsetCalibrations
 
 export const fetchPipetteOffsetCalibrationsEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.FETCH_PIPETTE_OFFSET_CALIBRATIONS),
+    ofType<Action, FetchPipetteOffsetCalibrationsAction>(
+      Constants.FETCH_PIPETTE_OFFSET_CALIBRATIONS
+    ),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

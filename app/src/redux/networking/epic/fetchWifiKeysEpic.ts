@@ -9,7 +9,7 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 import type { FetchWifiKeysAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchWifiKeysAction> = action => ({
@@ -31,7 +31,7 @@ const mapResponseToAction: ResponseToActionMapper<FetchWifiKeysAction> = (
 
 export const fetchWifiKeysEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(FETCH_WIFI_KEYS),
+    ofType<Action, FetchWifiKeysAction>(FETCH_WIFI_KEYS),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

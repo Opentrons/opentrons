@@ -33,7 +33,7 @@ export const mapResponseToAction = (
 
 export const fetchAllSessionsEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.FETCH_ALL_SESSIONS),
+    ofType<Action, FetchAllSessionsAction>(Constants.FETCH_ALL_SESSIONS),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

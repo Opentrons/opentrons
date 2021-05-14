@@ -25,7 +25,7 @@ import type {
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
@@ -172,7 +172,7 @@ const mapResponseToAction: ResponseToActionMapper<FetchModulesAction> = (
 
 export const fetchModulesEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.FETCH_MODULES),
+    ofType<Action, FetchModulesAction>(Constants.FETCH_MODULES),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

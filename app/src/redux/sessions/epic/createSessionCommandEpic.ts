@@ -9,7 +9,8 @@ import * as Actions from '../actions'
 import * as Constants from '../constants'
 import { mapActionToRequest as mapActionToFetchSessionRequest } from './fetchSessionEpic'
 
-import type { State, Epic } from '../../types'
+import type { Observable } from 'rxjs'
+import type { Action, Epic } from '../../types'
 import type {
   RobotApiRequestOptions,
   RobotHost,
@@ -56,9 +57,11 @@ const mapResponseToAction = (
 
 export const createSessionCommandEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.CREATE_SESSION_COMMAND),
+    ofType<Action, CreateSessionCommandAction>(
+      Constants.CREATE_SESSION_COMMAND
+    ),
     withRobotHost(state$, a => a.payload.robotName),
-    switchMap<[CreateSessionCommandAction, State, RobotHost], _, _>(
+    switchMap<[CreateSessionCommandAction, RobotHost], Observable<Action>>(
       ([originalAction, state, host]) => {
         const commandRequest = mapActionToRequest(originalAction)
         const fetchRequest = mapActionToFetchSessionRequest(originalAction)

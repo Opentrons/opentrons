@@ -23,7 +23,9 @@ export const pollModulesWhileConnectedEpic: Epic = (action$, state$) => {
     mergeMap(() => {
       return interval(POLL_MODULE_INTERVAL_MS).pipe(
         withLatestFrom(state$, (_, state) => getConnectedRobotName(state)),
-        takeWhile<string | null, any>(robotName => Boolean(robotName)),
+        takeWhile<string | null, any>((robotName): robotName is string =>
+          Boolean(robotName)
+        ),
         map((robotName: string) => fetchModules(robotName))
       )
     })

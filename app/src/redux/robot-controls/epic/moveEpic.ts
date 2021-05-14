@@ -68,7 +68,7 @@ const disengageMotorsRequest = {
 // 3. Call POST /motors/disengage if we need to
 export const moveEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.MOVE),
+    ofType<Action, MoveAction>(Constants.MOVE),
     withRobotHost(state$, a => a.payload.robotName),
     switchMap(([action, state, host]) => {
       // hit GET /robot/positions to figure out what POST /robot/move body will be
