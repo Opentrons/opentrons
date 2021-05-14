@@ -49,43 +49,43 @@ describe('AddLabwareCard', () => {
   })
 
   it('passes change path function to ManagePath', () => {
-    const { wrapper } = render()
+    const { wrapper, store } = render()
     const control = wrapper.find(ManagePath)
     const expectedChangeAction = CustomLabware.changeCustomLabwareDirectory()
 
-    expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
+    expect(store.dispatch).toHaveBeenCalledTimes(0)
     control.invoke('onChangePath')?.()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(expectedChangeAction)
+    expect(store.dispatch).toHaveBeenCalledWith(expectedChangeAction)
   })
 
   it('passes open path function to ManagePath', () => {
-    const { wrapper } = render()
+    const { wrapper, store } = render()
     const control = wrapper.find(ManagePath)
     const expectedOpenAction = CustomLabware.openCustomLabwareDirectory()
 
-    expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
+    expect(store.dispatch).toHaveBeenCalledTimes(0)
     control.invoke('onOpenPath')?.()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(expectedOpenAction)
+    expect(store.dispatch).toHaveBeenCalledWith(expectedOpenAction)
   })
 
   it('passes reset path function to ManagePath', () => {
-    const { wrapper } = render()
+    const { wrapper, store } = render()
     const control = wrapper.find(ManagePath)
     const expectedOpenAction = CustomLabware.resetCustomLabwareDirectory()
 
-    expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
+    expect(store.dispatch).toHaveBeenCalledTimes(0)
     control.invoke('onResetPath')?.()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(expectedOpenAction)
+    expect(store.dispatch).toHaveBeenCalledWith(expectedOpenAction)
   })
 
   it('passes dispatch function to AddLabware', () => {
-    const { wrapper } = render()
+    const { wrapper, store } = render()
     const control = wrapper.find(AddLabware)
     const expectedAction = CustomLabware.addCustomLabware()
 
-    expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
+    expect(store.dispatch).toHaveBeenCalledTimes(0)
     control.invoke('onAddLabware')?.()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(expectedAction)
+    expect(store.dispatch).toHaveBeenCalledWith(expectedAction)
   })
 
   it('renders an AddLabwareFailureModal if add labware fails', () => {
@@ -111,16 +111,16 @@ describe('AddLabwareCard', () => {
 
     mockGetAddLabwareFailure.mockReturnValue({ file, errorMessage: null })
 
-    const { wrapper } = render()
+    const { wrapper, store } = render()
     const modal = wrapper.find(AddLabwareFailureModal)
 
     modal.invoke('onCancel')?.()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
+    expect(store.dispatch).toHaveBeenCalledWith(
       CustomLabware.clearAddCustomLabwareFailure()
     )
 
     modal.invoke('onOverwrite')?.(file)
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
+    expect(store.dispatch).toHaveBeenCalledWith(
       CustomLabware.addCustomLabware(file)
     )
   })
