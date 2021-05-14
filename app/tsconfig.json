@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig-base.json",
   "references": [
+    { "path": "./tsconfig-data.json" },
     {
       "path": "../app-shell"
     },
@@ -19,5 +20,5 @@
     "rootDir": "src",
     "outDir": "lib"
   },
-  "include": ["typings", "src", "./src/**/*.json"]
+  "include": ["typings", "src"]
 }
