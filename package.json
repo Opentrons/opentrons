@@ -49,6 +49,7 @@
     "@types/jest": "^26.0.20",
     "@types/jest-when": "^2.7.2",
     "@types/lodash": "^4.14.168",
+    "@types/multer": "^1.4.5",
     "@types/netmask": "^1.0.30",
     "@types/react-redux": "^7.1.16",
     "@types/react-test-renderer": "^17.0.1",
