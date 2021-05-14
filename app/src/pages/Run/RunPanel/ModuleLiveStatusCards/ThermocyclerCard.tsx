@@ -25,8 +25,8 @@ const TimeRemaining = ({
   holdTime,
   title,
 }: {
-  holdTime: number | null | undefined,
-  title: string,
+  holdTime: number | null | undefined
+  title: string
 }): JSX.Element => (
   <span
     className={cx(styles.inline_labeled_value, styles.time_remaining_wrapper)}
@@ -37,11 +37,11 @@ const TimeRemaining = ({
 )
 
 interface CycleInfoProps {
-  totalCycleCount: number | null | undefined,
-  currentCycleIndex: number | null | undefined,
-  totalStepCount: number | null | undefined,
-  currentStepIndex: number | null | undefined,
-  holdTime: number | null | undefined,
+  totalCycleCount: number | null | undefined
+  currentCycleIndex: number | null | undefined
+  totalStepCount: number | null | undefined
+  currentStepIndex: number | null | undefined
+  holdTime: number | null | undefined
 }
 const CycleInfo = ({
   totalCycleCount,
@@ -88,16 +88,16 @@ const CycleInfo = ({
 }
 
 interface Props {
-  module: ThermocyclerModule,
+  module: ThermocyclerModule
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
     args?: unknown[]
-  ) => unknown,
-  slot: string,
-  controlDisabledReason: string | null,
-  isCardExpanded: boolean,
-  toggleCard: () => unknown,
+  ) => unknown
+  slot: string
+  controlDisabledReason: string | null
+  isCardExpanded: boolean
+  toggleCard: () => unknown
 }
 
 export const ThermocyclerCard = ({
@@ -107,7 +107,7 @@ export const ThermocyclerCard = ({
   isCardExpanded,
   toggleCard,
   slot,
-}: Props): JSX.Element=> {
+}: Props): JSX.Element => {
   const {
     currentTemp,
     targetTemp,

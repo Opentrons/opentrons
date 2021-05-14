@@ -34,9 +34,9 @@ const AN_ERROR_OCCURRED_WHILE_UPDATING =
   "An error occurred while updating your pipette's settings. Please try again."
 
 interface Props {
-  robotName: string,
-  mount: Mount,
-  closeModal: () => unknown,
+  robotName: string
+  mount: Mount
+  closeModal: () => unknown
 }
 
 export function ConfigurePipette(props: Props): JSX.Element {

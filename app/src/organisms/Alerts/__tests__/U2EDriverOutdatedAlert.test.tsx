@@ -21,11 +21,15 @@ jest.mock('../../../redux/config/hooks', () => ({
 const EXPECTED_DOWNLOAD_URL =
   'https://www.realtek.com/en/component/zoo/category/network-interface-controllers-10-100-1000m-gigabit-ethernet-usb-3-0-software'
 
-const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<typeof Analytics.useTrackEvent>
+const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<
+  typeof Analytics.useTrackEvent
+>
 
 describe('U2EDriverOutdatedAlert', () => {
   const dismissAlert = jest.fn()
-  const trackEvent: ReturnType<typeof Analytics.useTrackEvent> = jest.fn() as any
+  const trackEvent: ReturnType<
+    typeof Analytics.useTrackEvent
+  > = jest.fn() as any
   const render = (): ReturnType<typeof mount> => {
     return mount(<U2EDriverOutdatedAlert dismissAlert={dismissAlert} />)
   }
@@ -83,7 +87,9 @@ describe('U2EDriverOutdatedAlert', () => {
       checkbox.simulate('change')
     })
     wrapper.update()
-    wrapper.find('Link[to="/more/network-and-system"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('Link[to="/more/network-and-system"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
 
     expect(dismissAlert).toHaveBeenCalledWith(true)
     expect(trackEvent).toHaveBeenCalledWith({

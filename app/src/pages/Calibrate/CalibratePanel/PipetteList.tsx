@@ -25,12 +25,12 @@ import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import type { Dispatch, State } from '../../../redux/types'
 
 export interface PipetteListComponentProps {
-  robotName: string | null,
-  tipracks: BaseProtocolLabware[],
+  robotName: string | null
+  tipracks: BaseProtocolLabware[]
 }
 
 // @ts-expect-error TODO remove this withRouter? it seems unused
-export const PipetteList = withRouter( PipetteListComponent)
+export const PipetteList = withRouter(PipetteListComponent)
 
 export function PipetteListComponent(
   props: PipetteListComponentProps

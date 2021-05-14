@@ -8,7 +8,7 @@ import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
 
-type MaybeButtonProps = ButtonProps | null| undefined
+type MaybeButtonProps = ButtonProps | null | undefined
 interface Props {
   buttons: MaybeButtonProps[]
   className?: string | null

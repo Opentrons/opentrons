@@ -10,9 +10,9 @@ import { ConfirmModalContents } from './ConfirmModalContents'
 import styles from './styles.css'
 
 export interface ConfirmModalProps {
-  labware: Labware,
-  calibrateToBottom: boolean,
-  onBackClick: () => unknown,
+  labware: Labware
+  calibrateToBottom: boolean
+  onBackClick: () => unknown
 }
 
 export function ConfirmModal(props: ConfirmModalProps): JSX.Element {

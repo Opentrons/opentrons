@@ -10,11 +10,16 @@ import type { Mount } from '@opentrons/components'
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 
 describe('ReturnTip', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof ReturnTip> & {pipMount: Mount}>) => ReactWrapper<React.ComponentProps<typeof ReturnTip>>
+  let render: (
+    props?: Partial<
+      React.ComponentProps<typeof ReturnTip> & { pipMount: Mount }
+    >
+  ) => ReactWrapper<React.ComponentProps<typeof ReturnTip>>
   let mockSendCommands: jest.MockedFunction<any>
 
-  const getContinueButton = (wrapper: ReactWrapper<React.ComponentProps<typeof ReturnTip>>) =>
-    wrapper.find('button[title="confirmReturnTip"]')
+  const getContinueButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ReturnTip>>
+  ) => wrapper.find('button[title="confirmReturnTip"]')
 
   beforeEach(() => {
     mockSendCommands = jest.fn()

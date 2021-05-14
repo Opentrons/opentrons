@@ -9,10 +9,10 @@ import {
 import type { StyleProps } from '@opentrons/components'
 
 interface Props extends StyleProps {
-  label: string | React.ReactNode,
-  value: string | React.ReactNode,
-  labelProps?: React.ComponentProps<typeof Text>,
-  valueProps?: React.ComponentProps<typeof Text>,
+  label: string | React.ReactNode
+  value: string | React.ReactNode
+  labelProps?: React.ComponentProps<typeof Text>
+  valueProps?: React.ComponentProps<typeof Text>
 }
 
 export function LabeledValue(props: Props): JSX.Element {

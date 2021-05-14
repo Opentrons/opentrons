@@ -27,17 +27,33 @@ jest.mock('react-router-dom', () => ({ Link: () => <></> }))
 jest.mock('../../../../redux/discovery')
 jest.mock('../../../../redux/robot/selectors')
 
-const mockGetCustomLabwareDefinitions = getCustomLabwareDefinitions as jest.MockedFunction<typeof getCustomLabwareDefinitions>
-const mockGetCalibrationForPipette = getCalibrationForPipette as jest.MockedFunction<typeof getCalibrationForPipette>
-const mockGetTipLengthForPipetteAndTiprack = getTipLengthForPipetteAndTiprack as jest.MockedFunction<typeof getTipLengthForPipetteAndTiprack>
-const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<typeof useCalibratePipetteOffset>
-const mockGetHasCalibrationBlock = Config.getHasCalibrationBlock as jest.MockedFunction<typeof Config.getHasCalibrationBlock>
-const mockGetRobotByName = getRobotByName as jest.MockedFunction<typeof getRobotByName>
-const mockGetIsRunning = getIsRunning as jest.MockedFunction<typeof getIsRunning>
+const mockGetCustomLabwareDefinitions = getCustomLabwareDefinitions as jest.MockedFunction<
+  typeof getCustomLabwareDefinitions
+>
+const mockGetCalibrationForPipette = getCalibrationForPipette as jest.MockedFunction<
+  typeof getCalibrationForPipette
+>
+const mockGetTipLengthForPipetteAndTiprack = getTipLengthForPipetteAndTiprack as jest.MockedFunction<
+  typeof getTipLengthForPipetteAndTiprack
+>
+const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
+  typeof useCalibratePipetteOffset
+>
+const mockGetHasCalibrationBlock = Config.getHasCalibrationBlock as jest.MockedFunction<
+  typeof Config.getHasCalibrationBlock
+>
+const mockGetRobotByName = getRobotByName as jest.MockedFunction<
+  typeof getRobotByName
+>
+const mockGetIsRunning = getIsRunning as jest.MockedFunction<
+  typeof getIsRunning
+>
 
 describe('PipetteInfo', () => {
   const robotName = 'robot-name'
-  let render: ((props?: Partial<React.ComponentProps<typeof PipetteInfo>>) => ReturnType<typeof mountWithStore>)
+  let render: (
+    props?: Partial<React.ComponentProps<typeof PipetteInfo>>
+  ) => ReturnType<typeof mountWithStore>
   let startWizard: any
 
   beforeEach(() => {
@@ -78,7 +94,9 @@ describe('PipetteInfo', () => {
   it('just launch POC w/o cal block modal if POC button clicked and data exists', () => {
     mockGetCalibrationForPipette.mockReturnValue(mockPipetteOffsetCalibration1)
     const { wrapper } = render()
-    wrapper.find('button[title="pipetteOffsetCalButton"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="pipetteOffsetCalButton"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     wrapper.update()
     expect(startWizard).toHaveBeenCalledWith({
       withIntent: 'recalibrate-pipette-offset',
@@ -88,7 +106,9 @@ describe('PipetteInfo', () => {
   it('launch POC w/ cal block modal denied if POC button clicked and no existing data and no cal block pref saved', () => {
     const { wrapper } = render()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
-    wrapper.find('button[title="pipetteOffsetCalButton"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="pipetteOffsetCalButton"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
     wrapper
@@ -106,10 +126,14 @@ describe('PipetteInfo', () => {
   it('launch POC w/ cal block modal confirmed if POC button clicked and no existing data and no cal block pref saved', () => {
     const { wrapper } = render()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
-    wrapper.find('button[title="pipetteOffsetCalButton"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="pipetteOffsetCalButton"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
-    wrapper.find('button[children="Use trash bin"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[children="Use trash bin"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(startWizard).toHaveBeenCalledWith({
       overrideParams: {
         hasCalibrationBlock: false,
@@ -126,7 +150,9 @@ describe('PipetteInfo', () => {
     )
     const { wrapper } = render()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
-    wrapper.find('button[title="recalibrateTipButton"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="recalibrateTipButton"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
     wrapper
@@ -148,10 +174,14 @@ describe('PipetteInfo', () => {
     )
     const { wrapper } = render()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
-    wrapper.find('button[title="recalibrateTipButton"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="recalibrateTipButton"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(true)
-    wrapper.find('button[children="Use trash bin"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[children="Use trash bin"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(startWizard).toHaveBeenCalledWith({
       overrideParams: {
         hasCalibrationBlock: false,
@@ -170,7 +200,9 @@ describe('PipetteInfo', () => {
     )
     const { wrapper } = render()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
-    wrapper.find('button[title="recalibrateTipButton"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="recalibrateTipButton"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
     expect(startWizard).toHaveBeenCalledWith({
@@ -191,7 +223,9 @@ describe('PipetteInfo', () => {
     )
     const { wrapper } = render()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
-    wrapper.find('button[title="recalibrateTipButton"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="recalibrateTipButton"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     wrapper.update()
     expect(wrapper.find('AskForCalibrationBlockModal').exists()).toBe(false)
     expect(startWizard).toHaveBeenCalledWith({

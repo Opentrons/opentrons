@@ -15,7 +15,7 @@ import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../../redux/modules'
 const IS_HOMING_MESSAGE = 'Returning tip and homing robot'
 
 export interface ProceedToRunProps {
-  returnTip: () => unknown,
+  returnTip: () => unknown
 }
 
 export function ProceedToRun(props: ProceedToRunProps): JSX.Element {

@@ -24,8 +24,8 @@ import type { ViewableRobot } from '../../../redux/discovery/types'
 import { PipetteOffsetItem } from './PipetteOffsetItem'
 
 interface Props {
-  pipettesPageUrl: string,
-  robot: ViewableRobot,
+  pipettesPageUrl: string
+  robot: ViewableRobot
 }
 
 export function PipetteOffsets(props: Props): JSX.Element {

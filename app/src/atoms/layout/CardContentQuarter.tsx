@@ -7,7 +7,9 @@ export interface CardContentQuarterProps {
   className?: string
 }
 
-export function CardContentQuarter(props: CardContentQuarterProps): JSX.Element {
+export function CardContentQuarter(
+  props: CardContentQuarterProps
+): JSX.Element {
   return (
     <div className={cx(styles.card_content_25, props.className)}>
       {props.children}

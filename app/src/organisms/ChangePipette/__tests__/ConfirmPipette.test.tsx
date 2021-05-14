@@ -1,6 +1,8 @@
-
 import * as React from 'react'
-import { mountWithStore, WrapperWithStore } from '@opentrons/components/__utils__'
+import {
+  mountWithStore,
+  WrapperWithStore,
+} from '@opentrons/components/__utils__'
 
 import { ConfirmPipette } from '../ConfirmPipette'
 import { CheckPipettesButton } from '../CheckPipettesButton'
@@ -22,7 +24,13 @@ describe('ConfirmPipette', () => {
   beforeEach(() => {
     jest.resetAllMocks()
   })
-  const render = (props: Partial<Props>): WrapperWithStore<React.ComponentProps<typeof ConfirmPipette>, State, Action> => {
+  const render = (
+    props: Partial<Props>
+  ): WrapperWithStore<
+    React.ComponentProps<typeof ConfirmPipette>,
+    State,
+    Action
+  > => {
     const {
       robotName = 'robot-name',
       mount = 'left',
@@ -30,16 +38,20 @@ describe('ConfirmPipette', () => {
       subtitle = 'my-subtitle',
       success = true,
       attachedWrong = false,
-      wantedPipette = ({
+      wantedPipette = {
         displayName: 'wanted-display-name',
         channels: 1,
-      } as PipetteNameSpecs),
-      actualPipette = ({} as PipetteModelSpecs),
-      actualPipetteOffset = ({} as PipetteOffsetCalibration),
+      } as PipetteNameSpecs,
+      actualPipette = {} as PipetteModelSpecs,
+      actualPipetteOffset = {} as PipetteOffsetCalibration,
       displayName = 'actual-display-name',
       displayCategory = 'GEN2',
     } = props
-    return mountWithStore<React.ComponentProps<typeof ConfirmPipette>, State, Action>(
+    return mountWithStore<
+      React.ComponentProps<typeof ConfirmPipette>,
+      State,
+      Action
+    >(
       <ConfirmPipette
         robotName={robotName}
         mount={mount}
@@ -65,11 +77,11 @@ describe('ConfirmPipette', () => {
     {
       success: true,
       attachedWrong: false,
-      wantedPipette: ({
+      wantedPipette: {
         displayName: 'wanted',
         channels: 1,
-      } as Partial<PipetteNameSpecs>),
-      actualPipette: ({} as Partial<PipetteModelSpecs>),
+      } as Partial<PipetteNameSpecs>,
+      actualPipette: {} as Partial<PipetteModelSpecs>,
       actualPipetteOffset: null,
       backDisabled: true,
       iconName: 'check-circle',
@@ -83,12 +95,12 @@ describe('ConfirmPipette', () => {
     {
       success: true,
       attachedWrong: false,
-      wantedPipette: ({
+      wantedPipette: {
         displayName: 'wanted',
         channels: 1,
-      } as Partial<PipetteNameSpecs>),
-      actualPipette: ({} as Partial<PipetteModelSpecs>),
-      actualPipetteOffset: ({} as Partial<PipetteOffsetCalibration>),
+      } as Partial<PipetteNameSpecs>,
+      actualPipette: {} as Partial<PipetteModelSpecs>,
+      actualPipetteOffset: {} as Partial<PipetteOffsetCalibration>,
       backDisabled: true,
       iconName: 'check-circle',
       continueMatch: null,
@@ -117,8 +129,8 @@ describe('ConfirmPipette', () => {
       success: false,
       attachedWrong: false,
       wantedPipette: null,
-      actualPipette: ({} as Partial<PipetteModelSpecs>),
-      actualPipetteOffset: ({} as Partial<PipetteOffsetCalibration>),
+      actualPipette: {} as Partial<PipetteModelSpecs>,
+      actualPipetteOffset: {} as Partial<PipetteOffsetCalibration>,
       backDisabled: false,
       iconName: 'close-circle',
       continueMatch: /confirm pipette is detached/,
@@ -131,11 +143,11 @@ describe('ConfirmPipette', () => {
     {
       success: false,
       attachedWrong: true,
-      wantedPipette: ({
+      wantedPipette: {
         displayName: 'my-display-name',
         channels: 1,
-      } as Partial<PipetteNameSpecs>),
-      actualPipette: ({} as Partial<PipetteModelSpecs>),
+      } as Partial<PipetteNameSpecs>,
+      actualPipette: {} as Partial<PipetteModelSpecs>,
       actualPipetteOffset: null,
       backDisabled: true,
       iconName: 'close-circle',
@@ -149,12 +161,12 @@ describe('ConfirmPipette', () => {
     {
       success: false,
       attachedWrong: true,
-      wantedPipette: ({
+      wantedPipette: {
         displayName: 'my-display-name',
         channels: 1,
-      } as Partial<PipetteNameSpecs>),
-      actualPipette: ({} as Partial<PipetteModelSpecs>),
-      actualPipetteOffset: ({} as Partial<PipetteOffsetCalibration>),
+      } as Partial<PipetteNameSpecs>,
+      actualPipette: {} as Partial<PipetteModelSpecs>,
+      actualPipetteOffset: {} as Partial<PipetteOffsetCalibration>,
       backDisabled: true,
       iconName: 'close-circle',
       continueMatch: /detach and try again/,

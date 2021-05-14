@@ -39,9 +39,10 @@ export type Invoker = (props: InvokerProps | undefined) => void
 
 export function useCalibratePipetteOffset(
   robotName: string,
-  sessionParams: Pick<PipetteOffsetCalibrationSessionParams, 'mount'> & Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>,
+  sessionParams: Pick<PipetteOffsetCalibrationSessionParams, 'mount'> &
+    Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>,
   onComplete: (() => unknown) | null = null
-): [Invoker, (JSX.Element | null)] {
+): [Invoker, JSX.Element | null] {
   const createRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)

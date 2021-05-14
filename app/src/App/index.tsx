@@ -30,7 +30,7 @@ import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
 const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
-export const AppComponent = (): JSX.Element=> (
+export const AppComponent = (): JSX.Element => (
   <>
     <GlobalStyle />
     <Flex

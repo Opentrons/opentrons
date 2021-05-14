@@ -48,7 +48,7 @@ const StyledName: StyledComponent<
 `
 
 export interface NetworkOptionLabelProps extends WifiNetwork {
-  showConnectedIcon: boolean,
+  showConnectedIcon: boolean
 }
 
 export const NetworkOptionLabel = (
@@ -71,7 +71,7 @@ export const NetworkOptionLabel = (
 export const NetworkActionLabel = ({
   label,
 }: {
-  label: string,
+  label: string
 }): JSX.Element => <StyledName padLeft={true}>{label}</StyledName>
 
 const renderSignalIcon = signal => {

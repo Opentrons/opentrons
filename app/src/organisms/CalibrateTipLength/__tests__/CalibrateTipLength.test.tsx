@@ -27,19 +27,23 @@ jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 
 interface CalibrateTipLengthSpec {
-  component: React.ComponentType<any>,
-  childProps?: {},
-  currentStep: TipLengthCalibrationStep,
-  [key: string]: unknown,
+  component: React.ComponentType<any>
+  childProps?: {}
+  currentStep: TipLengthCalibrationStep
+  [key: string]: unknown
 }
 
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<typeof getDeckDefinitions>
+const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
+  typeof getDeckDefinitions
+>
 
 type Wrapper = ReactWrapper<React.ComponentProps<typeof CalibrateTipLength>>
 
 describe('CalibrateTipLength', () => {
   let mockStore: any
-  let render: (props?: Partial<React.ComponentProps<typeof CalibrateTipLength>>) => Wrapper
+  let render: (
+    props?: Partial<React.ComponentProps<typeof CalibrateTipLength>>
+  ) => Wrapper
   let dispatch: jest.MockedFunction<() => {}>
   let dispatchRequests: jest.MockedFunction<() => {}>
   let mockTipLengthSession: Sessions.TipLengthCalibrationSession = {
@@ -138,7 +142,9 @@ describe('CalibrateTipLength', () => {
     const wrapper = render()
 
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
-    act(() => getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent))
+    act(() =>
+      getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+    )
     wrapper.update()
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
@@ -163,7 +169,9 @@ describe('CalibrateTipLength', () => {
       },
     }
     const wrapper = render({ isJogging: false, session })
-    wrapper.find('button[title="forward"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,
@@ -182,7 +190,9 @@ describe('CalibrateTipLength', () => {
       },
     }
     const wrapper = render({ isJogging: true, session })
-    wrapper.find('button[title="forward"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).not.toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,

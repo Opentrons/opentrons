@@ -7,9 +7,9 @@ import styles from './styles.css'
 import type { ButtonProps } from '@opentrons/components'
 
 export interface DownloadUpdateModalProps {
-  notNowButton: ButtonProps,
-  error: string | null,
-  progress: number | null,
+  notNowButton: ButtonProps
+  error: string | null
+  progress: number | null
 }
 
 export function DownloadUpdateModal(

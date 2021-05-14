@@ -1,9 +1,6 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  useConditionalConfirm,
-  SpinnerModalPage,
-} from '@opentrons/components'
+import { useConditionalConfirm, SpinnerModalPage } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import * as RobotApi from '../../redux/robot-api'
 import * as Sessions from '../../redux/sessions'
@@ -44,11 +41,11 @@ const TIP_LENGTH_CALIBRATION = 'tip length calibration'
 const EXIT = 'exit'
 
 export interface CalibrateTipLengthControlProps {
-  robotName: string,
-  hasCalibrated: boolean,
-  mount: Mount,
-  tipRackDefinition: LabwareDefinition2,
-  isExtendedPipOffset: boolean,
+  robotName: string
+  hasCalibrated: boolean
+  mount: Mount
+  tipRackDefinition: LabwareDefinition2
+  isExtendedPipOffset: boolean
 }
 
 // tip length calibration commands for which the full page spinner should not appear
@@ -177,9 +174,11 @@ export function CalibrateTipLengthControl({
         : null
     )?.status === RobotApi.PENDING
 
-  const uncalibratedTipracksByMount: TipracksByMountMap = useSelector((state: State) => {
-    return getUncalibratedTipracksByMount(state, robotName)
-  })
+  const uncalibratedTipracksByMount: TipracksByMountMap = useSelector(
+    (state: State) => {
+      return getUncalibratedTipracksByMount(state, robotName)
+    }
+  )
 
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     handleStart,

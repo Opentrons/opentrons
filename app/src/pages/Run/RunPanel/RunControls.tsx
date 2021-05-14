@@ -13,16 +13,16 @@ const DOOR_OPEN_RUN = 'Please close the robot door before running this protocol'
 const DOOR_OPEN_RESUME = 'Please close the robot door before resuming'
 
 export interface RunControlsProps {
-  disabled: boolean,
-  modulesReady: boolean,
-  isReadyToRun: boolean,
-  isPaused: boolean,
-  isRunning: boolean,
-  isBlocked: boolean,
-  onRunClick: () => unknown,
-  onPauseClick: () => unknown,
-  onResumeClick: () => unknown,
-  onResetClick: () => unknown,
+  disabled: boolean
+  modulesReady: boolean
+  isReadyToRun: boolean
+  isPaused: boolean
+  isRunning: boolean
+  isBlocked: boolean
+  onRunClick: () => unknown
+  onPauseClick: () => unknown
+  onResumeClick: () => unknown
+  onResetClick: () => unknown
 }
 
 export function RunControls(props: RunControlsProps): JSX.Element {

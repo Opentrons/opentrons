@@ -28,24 +28,29 @@ jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../redux/calibration/selectors')
 
 type CheckCalibrationSpec = Partial<{
-  component: React.ComponentType<any>,
-  childProps?: {},
-  currentStep: RobotCalibrationCheckStep,
+  component: React.ComponentType<any>
+  childProps?: {}
+  currentStep: RobotCalibrationCheckStep
 }>
 
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<typeof getDeckDefinitions>
+const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
+  typeof getDeckDefinitions
+>
 
 describe('CheckCalibration', () => {
   let mockStore: any
-  let render: (props?: Partial<React.ComponentProps<typeof CheckCalibration>>) => ReactWrapper<React.ComponentProps<typeof CheckCalibration>>
+  let render: (
+    props?: Partial<React.ComponentProps<typeof CheckCalibration>>
+  ) => ReactWrapper<React.ComponentProps<typeof CheckCalibration>>
   let dispatch: jest.MockedFunction<Dispatch>
   let dispatchRequests: jest.MockedFunction<any>
   let mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
     id: 'fake_check_session_id',
     ...mockCalibrationCheckSessionAttributes,
   }
-  const getExitButton = (wrapper: ReactWrapper<React.ComponentProps<typeof CheckCalibration>>) =>
-    wrapper.find({ title: 'exit' }).find('button')
+  const getExitButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof CheckCalibration>>
+  ) => wrapper.find({ title: 'exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [
     Introduction,
@@ -87,7 +92,9 @@ describe('CheckCalibration', () => {
     }
     dispatchRequests = jest.fn()
 
-    render = (props: Partial<React.ComponentProps<typeof CheckCalibration>> = {}) => {
+    render = (
+      props: Partial<React.ComponentProps<typeof CheckCalibration>> = {}
+    ) => {
       const { showSpinner = false, isJogging = false } = props
       return mount(
         <CheckCalibration
@@ -134,7 +141,9 @@ describe('CheckCalibration', () => {
     const wrapper = render()
 
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
-    act(() => getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent))
+    act(() =>
+      getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+    )
     wrapper.update()
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
@@ -158,7 +167,9 @@ describe('CheckCalibration', () => {
       },
     }
     const wrapper = render({ isJogging: false })
-    wrapper.find('button[title="forward"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand(
         'robot-name',
@@ -180,7 +191,9 @@ describe('CheckCalibration', () => {
     }
     const wrapper = render({ isJogging: true })
     dispatch.mockClear()
-    wrapper.find('button[title="forward"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).not.toHaveBeenCalled()
   })
 })

@@ -16,13 +16,12 @@ import { SectionContentHalf, CardRow } from '../../../atoms/layout'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-
 interface SP {
-  name: string | null | undefined,
-  author: string | null | undefined,
-  lastUpdated: number | null | undefined,
-  method: string | null | undefined,
-  description: string | null | undefined,
+  name: string | null | undefined
+  author: string | null | undefined
+  lastUpdated: number | null | undefined
+  method: string | null | undefined
+  description: string | null | undefined
 }
 
 type Props = SP & { dispatch: Dispatch }
@@ -31,7 +30,10 @@ const INFO_TITLE = 'Information'
 const DESCRIPTION_TITLE = 'Description'
 const DATE_FORMAT = 'PPpp'
 
-export const InformationCard = connect(mapStateToProps, {})(InformationCardComponent)
+export const InformationCard = connect(
+  mapStateToProps,
+  {}
+)(InformationCardComponent)
 
 function InformationCardComponent(props: Props): JSX.Element {
   const { name, author, method, description } = props

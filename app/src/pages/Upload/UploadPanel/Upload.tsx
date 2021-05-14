@@ -4,13 +4,13 @@ import { ConfirmUploadModal } from './ConfirmUploadModal'
 import { UploadMenu } from './UploadMenu'
 
 export interface UploadProps {
-  filename: string | null | undefined,
-  sessionLoaded: boolean | null | undefined,
-  createSession: (file: File) => unknown,
+  filename: string | null | undefined
+  sessionLoaded: boolean | null | undefined
+  createSession: (file: File) => unknown
 }
 
 interface UploadState {
-  uploadedFile: File | null | undefined,
+  uploadedFile: File | null | undefined
 }
 
 export class Upload extends React.Component<UploadProps, UploadState> {
@@ -19,12 +19,16 @@ export class Upload extends React.Component<UploadProps, UploadState> {
     this.state = { uploadedFile: null }
   }
 
-  onUpload: React.ChangeEventHandler<HTMLInputElement> | React.DragEventHandler = (event: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
+  onUpload:
+    | React.ChangeEventHandler<HTMLInputElement>
+    | React.DragEventHandler = (
+    event: React.ChangeEvent<HTMLInputElement> | React.DragEvent
+  ) => {
     let files: File[] = []
     if (event.dataTransfer && event.dataTransfer.files) {
-      files = (event.dataTransfer.files as any)
+      files = event.dataTransfer.files as any
     } else if (event.target?.files) {
-      files = (event.target.files as any)
+      files = event.target.files as any
     }
 
     if (this.props.sessionLoaded) {

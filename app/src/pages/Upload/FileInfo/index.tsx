@@ -22,13 +22,13 @@ import { Continue } from './Continue'
 import { UploadError } from '../UploadError'
 
 export interface FileInfoProps {
-  robot: Robot,
-  filename: string | null | undefined,
-  uploadInProgress: boolean,
-  uploadError: { message: string } | null | undefined,
-  sessionLoaded: boolean,
-  sessionHasSteps: boolean,
-  showCustomLabwareWarning: boolean,
+  robot: Robot
+  filename: string | null | undefined
+  uploadInProgress: boolean
+  uploadError: { message: string } | null | undefined
+  sessionLoaded: boolean
+  sessionHasSteps: boolean
+  showCustomLabwareWarning: boolean
 }
 
 export function FileInfo(props: FileInfoProps): JSX.Element {

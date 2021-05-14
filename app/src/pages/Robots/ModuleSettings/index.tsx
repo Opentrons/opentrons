@@ -5,8 +5,8 @@ import { CardContainer, CardRow } from '../../../atoms/layout'
 import { AttachedModulesCard } from './AttachedModulesCard'
 
 export interface ModuleSettingsProps {
-  robotName: string,
-  robotDisplayName: string,
+  robotName: string
+  robotDisplayName: string
 }
 
 export function ModuleSettings(props: ModuleSettingsProps): JSX.Element {

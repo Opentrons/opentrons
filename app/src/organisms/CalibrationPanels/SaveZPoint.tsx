@@ -74,9 +74,9 @@ const ALLOW_XY_JOG_INSTRUCTIONS =
 
 const contentsBySessionType: {
   [sessionType in SessionType]?: {
-    headerText: string,
-    buttonText: string,
-    buttonEffectText: string,
+    headerText: string
+    buttonText: string
+    buttonEffectText: string
   }
 } = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
@@ -99,7 +99,10 @@ const contentsBySessionType: {
 export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
   const { isMulti, mount, sendCommands, sessionType } = props
 
-  const contents = sessionType in contentsBySessionType ? contentsBySessionType[sessionType] : null
+  const contents =
+    sessionType in contentsBySessionType
+      ? contentsBySessionType[sessionType]
+      : null
   const headerText = contents && contents.headerText
   const buttonText = contents && contents.buttonText
   const buttonEffectText = contents && contents.buttonEffectText

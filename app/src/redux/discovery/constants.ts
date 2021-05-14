@@ -1,4 +1,3 @@
-
 export const CONNECTABLE: 'connectable' = 'connectable'
 export const REACHABLE: 'reachable' = 'reachable'
 export const UNREACHABLE: 'unreachable' = 'unreachable'

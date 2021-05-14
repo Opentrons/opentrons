@@ -16,21 +16,21 @@ import type { MapDispatchToProps } from 'react-redux'
 import type { State } from '../../../redux/types'
 
 interface SP {
-  isRunning: boolean,
-  isPaused: boolean,
-  startTime: string | null,
-  isReadyToRun: boolean,
-  isBlocked: boolean,
-  modulesReady: boolean,
-  runTime: string,
-  disabled: boolean,
+  isRunning: boolean
+  isPaused: boolean
+  startTime: string | null
+  isReadyToRun: boolean
+  isBlocked: boolean
+  modulesReady: boolean
+  runTime: string
+  disabled: boolean
 }
 
 interface DP {
-  onRunClick: () => unknown,
-  onPauseClick: () => unknown,
-  onResumeClick: () => unknown,
-  onResetClick: () => unknown,
+  onRunClick: () => unknown
+  onPauseClick: () => unknown
+  onResumeClick: () => unknown
+  onResetClick: () => unknown
 }
 
 type Props = SP & DP
@@ -49,7 +49,7 @@ const mapStateToProps = (state: State): SP => ({
     robotSelectors.getSessionLoadInProgress(state),
 })
 
-const mapDispatchToProps: MapDispatchToProps<DP, {}> = (dispatch) => ({
+const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => ({
   onRunClick: () => dispatch(robotActions.run()),
   onPauseClick: () => dispatch(robotActions.pause()),
   onResumeClick: () => dispatch(robotActions.resume()),
@@ -79,4 +79,7 @@ function RunPanelComponent(props: Props): JSX.Element {
   )
 }
 
-export const RunPanel = connect(mapStateToProps, mapDispatchToProps)(RunPanelComponent)
+export const RunPanel = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(RunPanelComponent)

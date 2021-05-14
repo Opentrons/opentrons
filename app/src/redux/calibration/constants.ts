@@ -1,4 +1,3 @@
-
 export const CALIBRATION_SOURCE_DEFAULT: 'default' = 'default'
 export const CALIBRATION_SOURCE_FACTORY: 'factory' = 'factory'
 export const CALIBRATION_SOURCE_USER: 'user' = 'user'

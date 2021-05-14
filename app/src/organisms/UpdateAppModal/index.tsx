@@ -43,8 +43,8 @@ import { ReleaseNotes } from '../../molecules/ReleaseNotes'
 import type { Dispatch } from '../../redux/types'
 
 export interface UpdateAppModalProps {
-  dismissAlert?: (remember: boolean) => unknown,
-  closeModal?: () => unknown,
+  dismissAlert?: (remember: boolean) => unknown
+  closeModal?: () => unknown
 }
 
 // TODO(mc, 2020-10-06): i18n

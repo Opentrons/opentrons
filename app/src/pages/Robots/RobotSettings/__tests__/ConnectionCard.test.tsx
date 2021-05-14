@@ -17,16 +17,20 @@ jest.mock('../SelectNetwork', () => ({
   },
 }))
 
-const mockRobot: ViewableRobot = ({
+const mockRobot: ViewableRobot = {
   name: 'robot-name',
   connected: true,
   status: CONNECTABLE,
   ip: '1.2.3.4',
-} as any)
+} as any
 
-const mockGetInternetStatus = Networking.getInternetStatus as jest.MockedFunction<typeof Networking.getInternetStatus>
+const mockGetInternetStatus = Networking.getInternetStatus as jest.MockedFunction<
+  typeof Networking.getInternetStatus
+>
 
-const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<typeof Networking.getNetworkInterfaces>
+const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
+  typeof Networking.getNetworkInterfaces
+>
 
 describe('ConnectionCard', () => {
   let render: (robot?: ViewableRobot) => ReturnType<typeof mountWithProviders>
@@ -80,11 +84,11 @@ describe('ConnectionCard', () => {
   it('passes type ConnectionStatusMessage based on robot.local', () => {
     mockGetInternetStatus.mockReturnValue(Networking.STATUS_FULL)
 
-    const localRobot: ViewableRobot = ({ ...mockRobot, local: true } as any)
+    const localRobot: ViewableRobot = { ...mockRobot, local: true } as any
     const { wrapper: localWrapper } = render(localRobot)
     const localStatus = localWrapper.find(ConnectionStatusMessage)
 
-    const wifiRobot: ViewableRobot = ({ ...mockRobot, local: false } as any)
+    const wifiRobot: ViewableRobot = { ...mockRobot, local: false } as any
     const { wrapper: wifiWrapper } = render(wifiRobot)
     const wifiStatus = wifiWrapper.find(ConnectionStatusMessage)
 

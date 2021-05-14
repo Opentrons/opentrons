@@ -20,20 +20,30 @@ jest.mock('react-router-dom', () => ({
 jest.mock('../../../../redux/buildroot/selectors')
 jest.mock('../../../../redux/discovery/selectors')
 
-const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateDisplayInfo>
+const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof Buildroot.getBuildrootUpdateDisplayInfo
+>
 
-const getRobotApiVersion = Discovery.getRobotApiVersion as jest.MockedFunction<typeof Discovery.getRobotApiVersion>
+const getRobotApiVersion = Discovery.getRobotApiVersion as jest.MockedFunction<
+  typeof Discovery.getRobotApiVersion
+>
 
-const getRobotFirmwareVersion = Discovery.getRobotFirmwareVersion as jest.MockedFunction<typeof Discovery.getRobotFirmwareVersion>
+const getRobotFirmwareVersion = Discovery.getRobotFirmwareVersion as jest.MockedFunction<
+  typeof Discovery.getRobotFirmwareVersion
+>
 
-const getRobotProtocolApiVersion = Discovery.getRobotProtocolApiVersion as jest.MockedFunction<typeof Discovery.getRobotProtocolApiVersion>
+const getRobotProtocolApiVersion = Discovery.getRobotProtocolApiVersion as jest.MockedFunction<
+  typeof Discovery.getRobotProtocolApiVersion
+>
 
 const MOCK_ROBOT_VERSION = '1.2.3'
 const MOCK_FIRMWARE_VERSION = '4.5.6'
 const MOCK_MIN_PAPI_VERSION = '1.0'
 const MOCK_MAX_PAPI_VERSION = '2.8'
 describe('InformationCard', () => {
-  const render = (robot = mockConnectableRobot): ReturnType<typeof mountWithProviders> => {
+  const render = (
+    robot = mockConnectableRobot
+  ): ReturnType<typeof mountWithProviders> => {
     const updateUrl = `/robots/${robot.name}/update`
     return mountWithProviders(
       <InformationCard robot={robot} updateUrl={updateUrl} />,

@@ -13,10 +13,10 @@ import {
 import type { StyleProps } from '@opentrons/components'
 
 export interface ToggleBtnProps extends StyleProps {
-  label: string,
-  toggledOn: boolean,
-  disabled?: boolean | null,
-  onClick?: (e: React.MouseEvent) => unknown,
+  label: string
+  toggledOn: boolean
+  disabled?: boolean | null
+  onClick?: (e: React.MouseEvent) => unknown
 }
 
 export function ToggleBtn(props: ToggleBtnProps): JSX.Element {

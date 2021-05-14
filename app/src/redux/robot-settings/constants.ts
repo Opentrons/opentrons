@@ -1,4 +1,3 @@
-
 export const SETTINGS_PATH: '/settings' = '/settings'
 
 export const FETCH_SETTINGS: 'robotSettings:FETCH_SETTINGS' =

@@ -12,26 +12,32 @@ import { LabwareGroup } from '../LabwareGroup'
 jest.mock('../../../../redux/robot/selectors')
 jest.mock('../../../../redux/calibration/labware/selectors')
 
-const mockGetCalibratorMount
-= robotSelectors.getCalibratorMount as jest.MockedFunction<typeof robotSelectors.getCalibratorMount>
+const mockGetCalibratorMount = robotSelectors.getCalibratorMount as jest.MockedFunction<
+  typeof robotSelectors.getCalibratorMount
+>
 
-const mockGetDeckPopulated
-= robotSelectors.getDeckPopulated as jest.MockedFunction<typeof robotSelectors.getDeckPopulated>
+const mockGetDeckPopulated = robotSelectors.getDeckPopulated as jest.MockedFunction<
+  typeof robotSelectors.getDeckPopulated
+>
 
-const mockGetTipracksConfirmed
-= robotSelectors.getTipracksConfirmed as jest.MockedFunction<typeof robotSelectors.getTipracksConfirmed>
+const mockGetTipracksConfirmed = robotSelectors.getTipracksConfirmed as jest.MockedFunction<
+  typeof robotSelectors.getTipracksConfirmed
+>
 
-const mockGetIsRunning
-= robotSelectors.getIsRunning as jest.MockedFunction<typeof robotSelectors.getIsRunning>
+const mockGetIsRunning = robotSelectors.getIsRunning as jest.MockedFunction<
+  typeof robotSelectors.getIsRunning
+>
 
-const mockGetConnectedRobotName
-= robotSelectors.getConnectedRobotName as jest.MockedFunction<typeof robotSelectors.getConnectedRobotName>
+const mockGetConnectedRobotName = robotSelectors.getConnectedRobotName as jest.MockedFunction<
+  typeof robotSelectors.getConnectedRobotName
+>
 
-const mockGetModulesBySlot
-= robotSelectors.getModulesBySlot as jest.MockedFunction<typeof robotSelectors.getModulesBySlot>
+const mockGetModulesBySlot = robotSelectors.getModulesBySlot as jest.MockedFunction<
+  typeof robotSelectors.getModulesBySlot
+>
 
 const stubTipRacks: BaseProtocolLabware[] = [
-  ({
+  {
     type: 'some_tiprack',
     definition: tiprack300Def,
     slot: '3',
@@ -41,8 +47,8 @@ const stubTipRacks: BaseProtocolLabware[] = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  } as any),
-  ({
+  } as any,
+  {
     type: 'some_other_tiprack',
     definition: null,
     slot: '1',
@@ -52,11 +58,11 @@ const stubTipRacks: BaseProtocolLabware[] = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  } as any),
+  } as any,
 ]
 
 const stubOtherLabware: BaseProtocolLabware[] = [
-  ({
+  {
     type: 'some_wellplate',
     definition: wellPlate96Def,
     slot: '4',
@@ -66,8 +72,8 @@ const stubOtherLabware: BaseProtocolLabware[] = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  } as any),
-  ({
+  } as any,
+  {
     type: 'some_other_wellplate',
     definition: wellPlate96Def,
     slot: '7',
@@ -77,11 +83,13 @@ const stubOtherLabware: BaseProtocolLabware[] = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  } as any),
+  } as any,
 ]
 
 describe('LabwareGroup', () => {
-  let render: ((props?: Partial<React.ComponentProps<typeof LabwareGroup>>) => ReturnType<typeof mountWithProviders>)
+  let render: (
+    props?: Partial<React.ComponentProps<typeof LabwareGroup>>
+  ) => ReturnType<typeof mountWithProviders>
 
   beforeEach(() => {
     mockGetConnectedRobotName.mockReturnValue('robotName')

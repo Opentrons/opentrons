@@ -18,7 +18,7 @@ import { InstrumentSettings } from './InstrumentSettings'
 import { ModuleSettings } from './ModuleSettings'
 
 export function Robots(): JSX.Element {
-  const { path, url, params } = useRouteMatch<{name: string}>()
+  const { path, url, params } = useRouteMatch<{ name: string }>()
   const instrumentsMatch = useRouteMatch(`${path}/instruments`)
   const modulesMatch = useRouteMatch(`${path}/modules`)
   const location = useLocation()

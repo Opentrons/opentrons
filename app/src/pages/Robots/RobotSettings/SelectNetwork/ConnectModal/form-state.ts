@@ -39,7 +39,9 @@ export const useResetFormOnSecurityChange = (): void => {
 }
 
 export const useConnectFormField = (name: string): ConnectFormFieldProps => {
-  const [fieldProps, fieldMeta, fieldHelpers] = useField<string | undefined>(name)
+  const [fieldProps, fieldMeta, fieldHelpers] = useField<string | undefined>(
+    name
+  )
   const { value, onChange, onBlur } = fieldProps
   const { setValue, setTouched } = fieldHelpers
   const error = fieldMeta.touched ? fieldMeta.error : null

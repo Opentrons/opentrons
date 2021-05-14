@@ -13,7 +13,7 @@ import {
 import type { AttachedModule } from '../../../../redux/modules/types'
 
 interface Props {
-  module: AttachedModule,
+  module: AttachedModule
 }
 
 export function ModuleInfo(props: Props): JSX.Element {

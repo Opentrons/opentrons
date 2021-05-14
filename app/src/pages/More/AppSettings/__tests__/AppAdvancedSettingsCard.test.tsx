@@ -8,34 +8,54 @@ import type { HTMLAttributes, ReactWrapper } from 'enzyme'
 
 jest.mock('../../../../redux/config/selectors')
 
-const getUseTrashSurfaceForTipCal = Config.getUseTrashSurfaceForTipCal as jest.MockedFunction<typeof Config.getUseTrashSurfaceForTipCal>
+const getUseTrashSurfaceForTipCal = Config.getUseTrashSurfaceForTipCal as jest.MockedFunction<
+  typeof Config.getUseTrashSurfaceForTipCal
+>
 
-const getDevtoolsEnabled = Config.getDevtoolsEnabled as jest.MockedFunction<typeof Config.getDevtoolsEnabled>
+const getDevtoolsEnabled = Config.getDevtoolsEnabled as jest.MockedFunction<
+  typeof Config.getDevtoolsEnabled
+>
 
-const getFeatureFlags = Config.getFeatureFlags as jest.MockedFunction<typeof Config.getFeatureFlags>
+const getFeatureFlags = Config.getFeatureFlags as jest.MockedFunction<
+  typeof Config.getFeatureFlags
+>
 
-const getUpdateChannel = Config.getUpdateChannel as jest.MockedFunction<typeof Config.getUpdateChannel>
+const getUpdateChannel = Config.getUpdateChannel as jest.MockedFunction<
+  typeof Config.getUpdateChannel
+>
 
-const getUpdateChannelOptions = Config.getUpdateChannelOptions as jest.MockedFunction<typeof Config.getUpdateChannelOptions>
+const getUpdateChannelOptions = Config.getUpdateChannelOptions as jest.MockedFunction<
+  typeof Config.getUpdateChannelOptions
+>
 
 const MOCK_STATE: State = { robotApi: {} } as any
 
 describe('AppAdvancedSettingsCard', () => {
   const render = () => {
-    return mountWithStore<React.ComponentProps<typeof AppAdvancedSettingsCard>, State, Action>(<AppAdvancedSettingsCard />, {
+    return mountWithStore<
+      React.ComponentProps<typeof AppAdvancedSettingsCard>,
+      State,
+      Action
+    >(<AppAdvancedSettingsCard />, {
       initialState: MOCK_STATE,
     })
   }
 
-  const getUseTrashForTipCalRadioGroup = (wrapper: ReactWrapper<React.ComponentProps<typeof AppAdvancedSettingsCard>>): ReactWrapper =>
+  const getUseTrashForTipCalRadioGroup = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof AppAdvancedSettingsCard>>
+  ): ReactWrapper =>
     wrapper.find(
       'LabeledRadioGroup[data-test="useTrashSurfaceForTipCalRadioGroup"]'
     )
 
-  const getDevtoolsToggle = (wrapper: ReactWrapper<React.ComponentProps<typeof AppAdvancedSettingsCard>>): ReactWrapper<HTMLAttributes> =>
+  const getDevtoolsToggle = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof AppAdvancedSettingsCard>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find('LabeledToggle[data-test="enableDevToolsToggle"]')
 
-  const getUpdateChannelSelect = (wrapper: ReactWrapper<React.ComponentProps<typeof AppAdvancedSettingsCard>>): ReactWrapper<HTMLAttributes> =>
+  const getUpdateChannelSelect = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof AppAdvancedSettingsCard>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find('LabeledSelect[data-test="updateChannelSetting"]')
 
   beforeEach(() => {
@@ -63,10 +83,10 @@ describe('AppAdvancedSettingsCard', () => {
   })
 
   const SPECS: Array<{
-    originalSettingValue: boolean | null,
-    originalRadioValue: 'always-trash' | 'always-block' | 'always-prompt',
-    newSettingValue: boolean | null,
-    newRadioValue: 'always-trash' | 'always-block' | 'always-prompt',
+    originalSettingValue: boolean | null
+    originalRadioValue: 'always-trash' | 'always-block' | 'always-prompt'
+    newSettingValue: boolean | null
+    newRadioValue: 'always-trash' | 'always-block' | 'always-prompt'
   }> = [
     {
       originalSettingValue: true,

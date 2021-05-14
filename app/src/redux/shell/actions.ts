@@ -1,4 +1,3 @@
-
 import type { UiInitializedAction } from './types'
 
 export const UI_INITIALIZED: 'shell:UI_INITIALIZED' = 'shell:UI_INITIALIZED'

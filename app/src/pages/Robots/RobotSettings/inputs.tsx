@@ -2,10 +2,7 @@
 // TODO(mc, 2018-10-18): delete this file in favor of Formik
 import * as React from 'react'
 
-import {
-  InputField,
-  DropdownField,
-} from '@opentrons/components'
+import { InputField, DropdownField } from '@opentrons/components'
 import type { DropdownOption } from '@opentrons/components'
 
 export interface FormProps {
@@ -19,16 +16,16 @@ export interface InputProps<T extends string | number | symbol> {
   name: T
   value: string | null | undefined
   disabled?: boolean
-  onChange: (valMap: {[name in T]: string}) => unknown
+  onChange: (valMap: { [name in T]: string }) => unknown
   className?: string
 }
 
 type SelectProps<T extends string | number | symbol> = InputProps<T> & {
-  options: DropdownOption[],
+  options: DropdownOption[]
 }
 
 type TextInputProps<T extends string | number | symbol> = InputProps<T> & {
-  type: 'text' | 'password',
+  type: 'text' | 'password'
 }
 
 export class Form extends React.Component<FormProps> {
@@ -48,12 +45,14 @@ export class Form extends React.Component<FormProps> {
   }
 }
 
-export class Select<T extends string | number | symbol = string> extends React.Component<SelectProps<T>> {
+export class Select<
+  T extends string | number | symbol = string
+> extends React.Component<SelectProps<T>> {
   onChange: React.ChangeEventHandler<HTMLSelectElement> = event => {
     if (!this.props.disabled) {
       this.props.onChange({
         [this.props.name]: event.target.value,
-      } as {[name in T]: string})
+      } as { [name in T]: string })
     }
   }
 
@@ -72,12 +71,14 @@ export class Select<T extends string | number | symbol = string> extends React.C
   }
 }
 
-export class TextInput<T extends string | number | symbol = string> extends React.Component<TextInputProps<T>> {
+export class TextInput<
+  T extends string | number | symbol = string
+> extends React.Component<TextInputProps<T>> {
   onChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     if (!this.props.disabled) {
       this.props.onChange({
         [this.props.name]: event.target.value,
-      } as {[name in T]: string})
+      } as { [name in T]: string })
     }
   }
 

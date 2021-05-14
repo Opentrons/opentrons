@@ -6,7 +6,7 @@ import { ManualIpForm } from './ManualIpForm'
 import { IpList } from './IpList'
 
 export interface AddManualIpProps {
-  closeModal: () => unknown,
+  closeModal: () => unknown
 }
 
 export function AddManualIpModal(props: AddManualIpProps): JSX.Element {

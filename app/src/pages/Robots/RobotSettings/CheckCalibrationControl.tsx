@@ -25,8 +25,8 @@ import type { RequestState } from '../../../redux/robot-api/types'
 import type { State } from '../../../redux/types'
 
 export interface CheckCalibrationControlProps {
-  robotName: string,
-  disabledReason: string | null,
+  robotName: string
+  disabledReason: string | null
 }
 
 // pipette calibration commands for which the full page spinner should not appear

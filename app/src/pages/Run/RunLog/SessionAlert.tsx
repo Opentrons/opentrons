@@ -11,14 +11,16 @@ const buildPauseMessage = (message: string | null | undefined): string =>
 const buildPause = (message: string | null | undefined): string =>
   `Run paused${buildPauseMessage(message)}`
 
-const buildPauseUserMessage = (message: string | null | undefined): string | JSX.Element | null | undefined =>
+const buildPauseUserMessage = (
+  message: string | null | undefined
+): string | JSX.Element | null | undefined =>
   message && <div className={styles.pause_user_message}>{message}</div>
 
 export interface SessionAlertProps {
-  sessionStatus: SessionStatus,
-  sessionStatusInfo: SessionStatusInfo,
-  className?: string,
-  onResetClick: () => unknown,
+  sessionStatus: SessionStatus
+  sessionStatusInfo: SessionStatusInfo
+  className?: string
+  onResetClick: () => unknown
 }
 
 export function SessionAlert(props: SessionAlertProps): JSX.Element | null {

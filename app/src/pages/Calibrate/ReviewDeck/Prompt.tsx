@@ -16,7 +16,9 @@ export function Prompt(props: PromptProps): JSX.Element {
   const { onClick, ...labware } = props
   const { name, definition, slot } = labware
   const labwareType = robotSelectors.labwareType(labware)
-  const labwareTitle: string = definition ? getLabwareDisplayName(definition) : name
+  const labwareTitle: string = definition
+    ? getLabwareDisplayName(definition)
+    : name
 
   return (
     <div className={styles.prompt}>

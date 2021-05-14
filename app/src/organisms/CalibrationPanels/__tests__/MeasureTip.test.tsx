@@ -14,16 +14,23 @@ import type { ReactWrapper } from 'enzyme'
 import type { VectorTuple } from '../../../redux/sessions/types'
 
 describe('MeasureTip', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof MeasureTip> & {pipMount: Mount}>) => ReactWrapper<React.ComponentProps<typeof MeasureTip>>
+  let render: (
+    props?: Partial<
+      React.ComponentProps<typeof MeasureTip> & { pipMount: Mount }
+    >
+  ) => ReactWrapper<React.ComponentProps<typeof MeasureTip>>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getContinueButton = (wrapper: ReactWrapper<React.ComponentProps<typeof MeasureTip>>) =>
-    wrapper.find('button[title="saveTipLengthButton"]').find('button')
+  const getContinueButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof MeasureTip>>
+  ) => wrapper.find('button[title="saveTipLengthButton"]').find('button')
 
-  const getJogButton = (wrapper: ReactWrapper<React.ComponentProps<typeof MeasureTip>>, direction: string) =>
-    wrapper.find(`button[title="${direction}"]`).find('button')
+  const getJogButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof MeasureTip>>,
+    direction: string
+  ) => wrapper.find(`button[title="${direction}"]`).find('button')
 
   beforeEach(() => {
     render = (props = {}) => {
@@ -68,7 +75,9 @@ describe('MeasureTip', () => {
 
   it('renders the confirm crash modal when invoked', () => {
     const wrapper = render()
-    wrapper.find('a[children="Start over"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('a[children="Start over"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     wrapper.update()
     expect(wrapper.find('ConfirmCrashRecoveryModal').exists()).toBe(true)
   })
@@ -78,12 +87,16 @@ describe('MeasureTip', () => {
 
     type ZJogDirections = 'up' | 'down'
     const jogDirections: ZJogDirections[] = ['up', 'down']
-    const jogParamsByDirection: {[dir in ZJogDirections]: VectorTuple} = {
+    const jogParamsByDirection: { [dir in ZJogDirections]: VectorTuple } = {
       up: [0, 0, 0.1],
       down: [0, 0, -0.1],
     }
     jogDirections.forEach((direction: ZJogDirections) => {
-      act(() => getJogButton(wrapper, direction).invoke('onClick')?.({} as React.MouseEvent))
+      act(() =>
+        getJogButton(wrapper, direction).invoke('onClick')?.(
+          {} as React.MouseEvent
+        )
+      )
       wrapper.update()
 
       expect(mockSendCommands).toHaveBeenCalledWith({
@@ -100,7 +113,9 @@ describe('MeasureTip', () => {
   it('clicking continue proceeds to next step', () => {
     const wrapper = render()
 
-    act(() => getContinueButton(wrapper).invoke('onClick')?.({} as React.MouseEvent))
+    act(() =>
+      getContinueButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+    )
     wrapper.update()
 
     expect(mockSendCommands).toHaveBeenCalledWith(

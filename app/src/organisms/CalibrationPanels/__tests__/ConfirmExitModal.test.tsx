@@ -7,21 +7,23 @@ import { ConfirmExitModal } from '../ConfirmExitModal'
 import type { ReactWrapper } from 'enzyme'
 
 describe('ConfirmExitModal', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof ConfirmExitModal>>) => ReactWrapper<React.ComponentProps<typeof ConfirmExitModal>>
+  let render: (
+    props?: Partial<React.ComponentProps<typeof ConfirmExitModal>>
+  ) => ReactWrapper<React.ComponentProps<typeof ConfirmExitModal>>
 
   const mockBack = jest.fn()
   const mockExit = jest.fn()
 
-  const getExitButton = (wrapper: ReactWrapper<React.ComponentProps<typeof ConfirmExitModal>>) =>
-    wrapper.find('OutlineButton[children="yes, exit now"]')
+  const getExitButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ConfirmExitModal>>
+  ) => wrapper.find('OutlineButton[children="yes, exit now"]')
 
-  const getBackButton = (wrapper: ReactWrapper<React.ComponentProps<typeof ConfirmExitModal>>) =>
-    wrapper.find('OutlineButton[children="no, go back"]')
+  const getBackButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ConfirmExitModal>>
+  ) => wrapper.find('OutlineButton[children="no, go back"]')
 
   beforeEach(() => {
-    render = (
-      props = {}
-    ) => {
+    render = (props = {}) => {
       const { sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION } = props
       return mount(
         <ConfirmExitModal

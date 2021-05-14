@@ -33,9 +33,9 @@ const CANCEL = 'cancel'
 const CALIBRATION_URL = 'https://support.opentrons.com/en/articles/4523313'
 
 interface Props {
-  confirm: () => unknown,
-  cancel: () => unknown,
-  tiprackDisplayName: string,
+  confirm: () => unknown
+  cancel: () => unknown
+  tiprackDisplayName: string
 }
 
 export function ConfirmRecalibrationModal(props: Props): JSX.Element {

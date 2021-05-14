@@ -3,7 +3,7 @@ import { AlertItem } from '@opentrons/components'
 import styles from './styles.css'
 
 interface Props {
-  message?: string | null,
+  message?: string | null
 }
 
 const TITLE = 'Error updating pipette settings'

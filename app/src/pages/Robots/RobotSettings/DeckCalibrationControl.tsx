@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -47,11 +46,11 @@ const spinnerCommandBlockList: SessionCommandString[] = [
 ]
 
 export interface Props {
-  robotName: string,
-  disabledReason: string | null,
-  deckCalStatus: DeckCalibrationStatus | null,
-  deckCalData: DeckCalibrationData | null,
-  pipOffsetDataPresent: boolean,
+  robotName: string
+  disabledReason: string | null
+  deckCalStatus: DeckCalibrationStatus | null
+  deckCalData: DeckCalibrationData | null
+  pipOffsetDataPresent: boolean
 }
 
 export function DeckCalibrationControl(props: Props): JSX.Element {

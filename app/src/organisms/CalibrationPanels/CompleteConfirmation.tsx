@@ -22,9 +22,12 @@ import slotThreeRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_3
 import { NeedHelpLink } from './NeedHelpLink'
 
 import type { CalibrationPanelProps } from './types'
-import type { SessionType, CalibrationLabware } from '../../redux/sessions/types'
+import type {
+  SessionType,
+  CalibrationLabware,
+} from '../../redux/sessions/types'
 
-const assetBySlot: {[slot in CalibrationLabware['slot']]: string} = {
+const assetBySlot: { [slot in CalibrationLabware['slot']]: string } = {
   '1': slotOneRemoveBlockAsset,
   '3': slotThreeRemoveBlockAsset,
 }
@@ -37,7 +40,9 @@ const PROCEED_TO_DECK = 'Continue to slot 5'
 const EXIT = 'exit'
 const PROCEED_TO_PIP_OFFSET = 'continue to Pipette Offset Calibration'
 
-const contentsBySessionType: { [sessionType in SessionType]?: { headerText: string } } = {
+const contentsBySessionType: {
+  [sessionType in SessionType]?: { headerText: string }
+} = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: { headerText: DECK_CAL_HEADER },
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
     headerText: PIP_OFFSET_CAL_HEADER,
@@ -47,7 +52,9 @@ const contentsBySessionType: { [sessionType in SessionType]?: { headerText: stri
   },
 }
 
-export function CompleteConfirmation(props: CalibrationPanelProps): JSX.Element {
+export function CompleteConfirmation(
+  props: CalibrationPanelProps
+): JSX.Element {
   const {
     sessionType,
     calBlock,
@@ -64,7 +71,10 @@ export function CompleteConfirmation(props: CalibrationPanelProps): JSX.Element 
     ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
     : sessionType
 
-  const headerText = lookupType in contentsBySessionType ? contentsBySessionType[lookupType]?.headerText : null
+  const headerText =
+    lookupType in contentsBySessionType
+      ? contentsBySessionType[lookupType]?.headerText
+      : null
 
   const proceed = (): void => {
     sendCommands(

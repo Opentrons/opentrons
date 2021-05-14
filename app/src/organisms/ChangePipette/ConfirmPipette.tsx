@@ -20,21 +20,21 @@ const EXIT_WITHOUT_CAL = 'exit without calibrating'
 const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
 
 export interface Props {
-  robotName: string,
-  mount: Mount,
-  title: string,
-  subtitle: string,
-  success: boolean,
-  attachedWrong: boolean,
-  wantedPipette: PipetteNameSpecs | null,
-  actualPipette: PipetteModelSpecs | null,
-  actualPipetteOffset: PipetteOffsetCalibration | null,
-  displayName: string,
-  displayCategory: PipetteDisplayCategory | null,
-  tryAgain: () => unknown,
-  back: () => unknown,
-  exit: () => unknown,
-  startPipetteOffsetCalibration: () => void,
+  robotName: string
+  mount: Mount
+  title: string
+  subtitle: string
+  success: boolean
+  attachedWrong: boolean
+  wantedPipette: PipetteNameSpecs | null
+  actualPipette: PipetteModelSpecs | null
+  actualPipetteOffset: PipetteOffsetCalibration | null
+  displayName: string
+  displayCategory: PipetteDisplayCategory | null
+  tryAgain: () => unknown
+  back: () => unknown
+  exit: () => unknown
+  startPipetteOffsetCalibration: () => void
 }
 
 export function ConfirmPipette(props: Props): JSX.Element {

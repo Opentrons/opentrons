@@ -36,19 +36,16 @@ const FAILED_UPDATE_BODY =
   'An error occurred while attempting to update your robot.'
 
 interface Props {
-  hasAvailableUpdate: boolean,
-  controlDisabledReason: string | null,
-  moduleId: string,
+  hasAvailableUpdate: boolean
+  controlDisabledReason: string | null
+  moduleId: string
 }
 
 export function ModuleUpdate(props: Props): JSX.Element {
   const { hasAvailableUpdate, moduleId, controlDisabledReason } = props
   const dispatch = useDispatch<Dispatch>()
   const robotName = useSelector(getConnectedRobotName)
-  const [
-    dispatchApiRequest,
-    requestIds,
-  ] = useDispatchApiRequest()
+  const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
 
   const canControl = controlDisabledReason === null
   const handleClick = (): void => {

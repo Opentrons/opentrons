@@ -112,6 +112,7 @@ exports[`LabwareList component renders 3`] = `
     <LabwareItem
       file={
         Object {
+          "definition": undefined,
           "filename": "b.json",
           "modified": 2,
           "type": "INVALID_LABWARE_FILE",

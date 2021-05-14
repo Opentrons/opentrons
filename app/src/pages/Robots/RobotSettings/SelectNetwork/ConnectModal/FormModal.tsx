@@ -19,9 +19,7 @@ const StyledCopy = styled.p`
   margin: 0 1rem 1rem;
 `
 
-const StyledForm = styled(
-  Form
-)`
+const StyledForm = styled(Form)`
   font-size: ${FONT_SIZE_BODY_1};
   display: table;
   width: 80%;
@@ -41,11 +39,11 @@ const StyledSecurityField = styled(SecurityField)`
 `
 
 export interface FormModalProps {
-  id: string,
-  network: WifiNetwork | null,
-  fields: ConnectFormField[],
-  isValid: boolean,
-  onCancel: () => unknown,
+  id: string
+  network: WifiNetwork | null
+  fields: ConnectFormField[]
+  isValid: boolean
+  onCancel: () => unknown
 }
 
 export const FormModal = (props: FormModalProps): JSX.Element => {

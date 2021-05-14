@@ -7,12 +7,12 @@ import cx from 'classnames'
 import styles from './styles.css'
 
 export interface RobotLinkProps {
-  children: React.ReactNode,
-  url: string,
-  className?: string,
-  activeClassName?: string,
-  hoverTooltipHandlers?: HoverTooltipHandlers | null,
-  disabled?: boolean,
+  children: React.ReactNode
+  url: string
+  className?: string
+  activeClassName?: string
+  hoverTooltipHandlers?: HoverTooltipHandlers | null
+  disabled?: boolean
 }
 
 export function RobotLink(props: RobotLinkProps): JSX.Element {

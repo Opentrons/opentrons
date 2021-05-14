@@ -12,7 +12,9 @@ import type { Mount } from '@opentrons/components'
 
 jest.mock('../../../redux/robot/selectors')
 
-const mockGetUnconfirmedLabware = robotSelectors.getUnconfirmedLabware as jest.MockedFunction<typeof robotSelectors.getUnconfirmedLabware>
+const mockGetUnconfirmedLabware = robotSelectors.getUnconfirmedLabware as jest.MockedFunction<
+  typeof robotSelectors.getUnconfirmedLabware
+>
 
 const leftTiprack: Labware = {
   type: 'some_tiprack',
@@ -49,11 +51,15 @@ const stubUnconfirmedLabware: Labware[] = [
     calibration: 'unconfirmed',
     isMoving: false,
     definition: wellPlate96Def as any,
-  }
+  },
 ]
 
 describe('UncalibratedInfo', () => {
-  let render: ((props?: Partial<React.ComponentProps<typeof UncalibratedInfo> & {currentMount: Mount}>) => ReturnType<typeof mount>)
+  let render: (
+    props?: Partial<
+      React.ComponentProps<typeof UncalibratedInfo> & { currentMount: Mount }
+    >
+  ) => ReturnType<typeof mount>
   let mockStore: any
   let dispatch
   let mockUncalibratedInfo: TipracksByMountMap = { left: [], right: [] }

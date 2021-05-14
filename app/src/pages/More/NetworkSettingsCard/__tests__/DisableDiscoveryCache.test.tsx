@@ -11,11 +11,14 @@ import type { State } from '../../../../redux/types'
 
 jest.mock('../../../../redux/config/selectors')
 
-const MOCK_STATE: State = ({ mockState: true } as any)
+const MOCK_STATE: State = { mockState: true } as any
 
 const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
 
-function stubSelector<R>(mock: jest.MockedFunction<(s: State) => R>, rVal: R): void {
+function stubSelector<R>(
+  mock: jest.MockedFunction<(s: State) => R>,
+  rVal: R
+): void {
   mock.mockImplementation(state => {
     expect(state).toBe(MOCK_STATE)
     return rVal

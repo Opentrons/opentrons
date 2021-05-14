@@ -10,13 +10,13 @@ import type { WifiKey } from '../types'
 import { StyledComponent } from 'styled-components'
 
 export interface KeyFileFieldProps {
-  id: string,
-  name: string,
-  label: string,
-  placeholder: string,
-  robotName: string,
-  wifiKeys: WifiKey[],
-  className?: string,
+  id: string
+  name: string
+  label: string
+  placeholder: string
+  robotName: string
+  wifiKeys: WifiKey[]
+  className?: string
 }
 
 const ADD_NEW_KEY_VALUE = '__addNewKey__'
@@ -25,7 +25,9 @@ const ADD_NEW_KEY_OPTION_GROUP = {
   options: [{ value: ADD_NEW_KEY_VALUE, label: LABEL_ADD_NEW_KEY }],
 }
 
-const makeKeyOptions = (keys: WifiKey[]): {options: Array<{value: string, label: string}>} => ({
+const makeKeyOptions = (
+  keys: WifiKey[]
+): { options: Array<{ value: string; label: string }> } => ({
   options: keys.map(k => ({ value: k.id, label: k.name })),
 })
 
@@ -33,7 +35,7 @@ export const KeyFileField = (props: KeyFileFieldProps): JSX.Element => {
   const { id, name, label, placeholder, robotName, wifiKeys } = props
   const { value, error, setValue, setTouched } = useConnectFormField(name)
   const options = [makeKeyOptions(wifiKeys), ADD_NEW_KEY_OPTION_GROUP]
-  const uploadKeyRef = React.useRef<StyledComponent<"input", any>>(null)
+  const uploadKeyRef = React.useRef<StyledComponent<'input', any>>(null)
 
   const handleValueChange = (_: string, value: string): void => {
     if (value === ADD_NEW_KEY_VALUE) {

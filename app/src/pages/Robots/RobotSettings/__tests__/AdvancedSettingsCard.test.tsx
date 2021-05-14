@@ -19,11 +19,17 @@ jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/robot-settings/selectors')
 jest.mock('../../../../redux/shell/robot-logs/selectors')
 
-const getRobotSettings = RobotSettings.getRobotSettings as jest.MockedFunction<typeof RobotSettings.getRobotSettings>
+const getRobotSettings = RobotSettings.getRobotSettings as jest.MockedFunction<
+  typeof RobotSettings.getRobotSettings
+>
 
 // TODO(mc, 2020-09-09): flesh out these tests
 describe('RobotSettings > AdvancedSettingsCard', () => {
-  const render = (robot: React.ComponentProps<typeof AdvancedSettingsCard>['robot'] = mockConnectableRobot): ReturnType<typeof mountWithProviders> => {
+  const render = (
+    robot: React.ComponentProps<
+      typeof AdvancedSettingsCard
+    >['robot'] = mockConnectableRobot
+  ): ReturnType<typeof mountWithProviders> => {
     const resetUrl = `/robots/${robot.name}/reset`
     return mountWithProviders(
       <AdvancedSettingsCard robot={robot} resetUrl={resetUrl} />,

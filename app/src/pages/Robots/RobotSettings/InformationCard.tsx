@@ -32,8 +32,8 @@ import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
 export interface InformationCardProps {
-  robot: ViewableRobot,
-  updateUrl: string,
+  robot: ViewableRobot
+  updateUrl: string
 }
 
 const UPDATE_RECHECK_DELAY_MS = 60000

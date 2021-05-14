@@ -22,18 +22,23 @@ jest.mock('../../../redux/shell/update', () => ({
 
 jest.mock('react-router-dom', () => ({ Link: () => <></> }))
 
-const getShellUpdateState = Shell.getShellUpdateState as jest.MockedFunction<typeof Shell.getShellUpdateState>
+const getShellUpdateState = Shell.getShellUpdateState as jest.MockedFunction<
+  typeof Shell.getShellUpdateState
+>
 
-const MOCK_STATE: State = ({ mockState: true } as any)
+const MOCK_STATE: State = { mockState: true } as any
 
 describe('UpdateAppModal', () => {
   const closeModal = jest.fn()
   const dismissAlert = jest.fn()
 
   const render = (props: UpdateAppModalProps) => {
-    return mountWithStore<UpdateAppModalProps, State, Action>(<UpdateAppModal {...props} />, {
-      initialState: MOCK_STATE,
-    })
+    return mountWithStore<UpdateAppModalProps, State, Action>(
+      <UpdateAppModal {...props} />,
+      {
+        initialState: MOCK_STATE,
+      }
+    )
   }
 
   beforeEach(() => {
@@ -92,7 +97,9 @@ describe('UpdateAppModal', () => {
   })
 
   it('should render a spinner if update is downloading', () => {
-    getShellUpdateState.mockReturnValue({ downloading: true } as ShellUpdateState)
+    getShellUpdateState.mockReturnValue({
+      downloading: true,
+    } as ShellUpdateState)
     const { wrapper } = render({ closeModal })
     const spinner = wrapper
       .find(Icon)
@@ -120,7 +127,9 @@ describe('UpdateAppModal', () => {
   })
 
   it('should render a "Restart App" button if update is downloaded', () => {
-    getShellUpdateState.mockReturnValue({ downloaded: true } as ShellUpdateState)
+    getShellUpdateState.mockReturnValue({
+      downloaded: true,
+    } as ShellUpdateState)
     const { wrapper, store } = render({ closeModal })
     const restartButton = wrapper
       .find('button')
@@ -131,7 +140,9 @@ describe('UpdateAppModal', () => {
   })
 
   it('should render a "Not Now" button if update is downloaded', () => {
-    getShellUpdateState.mockReturnValue({ downloaded: true } as ShellUpdateState)
+    getShellUpdateState.mockReturnValue({
+      downloaded: true,
+    } as ShellUpdateState)
     const { wrapper } = render({ closeModal })
     const notNowButton = wrapper
       .find('button')
@@ -220,7 +231,9 @@ describe('UpdateAppModal', () => {
   })
 
   it('should not show the "ignore" button if the user has proceeded with the update', () => {
-    getShellUpdateState.mockReturnValue({ downloaded: true } as ShellUpdateState)
+    getShellUpdateState.mockReturnValue({
+      downloaded: true,
+    } as ShellUpdateState)
 
     const { wrapper } = render({ dismissAlert })
     const ignoreButton = wrapper

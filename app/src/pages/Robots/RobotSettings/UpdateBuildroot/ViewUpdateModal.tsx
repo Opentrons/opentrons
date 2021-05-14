@@ -19,21 +19,25 @@ import type {
 } from '../../../../redux/buildroot/types'
 
 export interface ViewUpdateModalProps {
-  robotName: string,
-  robotUpdateType: BuildrootUpdateType | null,
-  robotSystemType: RobotSystemType | null,
-  close: () => unknown,
-  proceed: () => unknown,
+  robotName: string
+  robotUpdateType: BuildrootUpdateType | null
+  robotSystemType: RobotSystemType | null
+  close: () => unknown
+  proceed: () => unknown
 }
 
-export function ViewUpdateModal(props: ViewUpdateModalProps): JSX.Element | null {
+export function ViewUpdateModal(
+  props: ViewUpdateModalProps
+): JSX.Element | null {
   const { robotName, robotUpdateType, robotSystemType, close, proceed } = props
   const updateInfo = useSelector(getBuildrootUpdateInfo)
   const downloadProgress = useSelector(getBuildrootDownloadProgress)
   const downloadError = useSelector(getBuildrootDownloadError)
 
-  const [showMigrationWarning, setShowMigrationWarning] =
-    React.useState < boolean > (robotSystemType === BALENA)
+  const [
+    showMigrationWarning,
+    setShowMigrationWarning,
+  ] = React.useState<boolean>(robotSystemType === BALENA)
 
   const notNowButton = {
     onClick: close,

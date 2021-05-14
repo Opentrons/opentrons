@@ -4,9 +4,9 @@ import { AlertModal } from '@opentrons/components'
 import * as Copy from './i18n'
 
 export interface DisconnectModalProps {
-  ssid: string,
-  onDisconnect: () => unknown,
-  onCancel: () => unknown,
+  ssid: string
+  onDisconnect: () => unknown
+  onCancel: () => unknown
 }
 
 export const DisconnectModal = ({

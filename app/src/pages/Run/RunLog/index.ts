@@ -13,14 +13,14 @@ import type { SessionStatus, SessionStatusInfo } from '../../../redux/robot'
 export { ConfirmCancelModal } from './ConfirmCancelModal'
 
 interface SP {
-  commands: any[],
-  sessionStatus: SessionStatus,
-  sessionStatusInfo: SessionStatusInfo,
-  showSpinner: boolean,
+  commands: any[]
+  sessionStatus: SessionStatus
+  sessionStatusInfo: SessionStatusInfo
+  showSpinner: boolean
 }
 
 interface DP {
-  onResetClick: () => unknown,
+  onResetClick: () => unknown
 }
 
 function mapStateToProps(state: State): SP {
@@ -34,10 +34,10 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-const mapDispatchToProps: MapDispatchToProps<DP, {}> = (dispatch) => {
+const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
   return {
     onResetClick: () => dispatch(robotActions.refreshSession()),
   }
 }
 
-export const RunLog = connect( mapStateToProps, mapDispatchToProps)(CommandList)
+export const RunLog = connect(mapStateToProps, mapDispatchToProps)(CommandList)

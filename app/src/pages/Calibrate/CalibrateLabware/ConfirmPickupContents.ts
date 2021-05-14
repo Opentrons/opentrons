@@ -8,13 +8,13 @@ import type { MapDispatchToProps } from 'react-redux'
 import type { Labware, Pipette } from '../../../redux/robot'
 
 interface OP {
-  labware: Labware,
-  calibrator: Pipette,
+  labware: Labware
+  calibrator: Pipette
 }
 
 interface DP {
-  onNoClick: () => void,
-  onYesClick: () => void,
+  onNoClick: () => void
+  onYesClick: () => void
 }
 
 const mapDispatchToProps: MapDispatchToProps<DP, OP> = (dispatch, ownProps) => {
@@ -33,4 +33,7 @@ const mapDispatchToProps: MapDispatchToProps<DP, OP> = (dispatch, ownProps) => {
   }
 }
 
-export const ConfirmPickupContents = connect(null, mapDispatchToProps)(ConfirmPickupPrompt)
+export const ConfirmPickupContents = connect(
+  null,
+  mapDispatchToProps
+)(ConfirmPickupPrompt)

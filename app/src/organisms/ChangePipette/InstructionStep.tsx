@@ -13,16 +13,16 @@ import styles from './styles.css'
 type Diagram = 'screws' | 'tab'
 
 interface DiagramProps {
-  direction: Direction,
-  mount: Mount,
-  channels: PipetteChannels,
-  diagram: Diagram,
-  displayCategory: PipetteDisplayCategory | null,
+  direction: Direction
+  mount: Mount
+  channels: PipetteChannels
+  diagram: Diagram
+  displayCategory: PipetteDisplayCategory | null
 }
 
 interface Props extends DiagramProps {
-  step: 'one' | 'two',
-  children: React.ReactNode,
+  step: 'one' | 'two'
+  children: React.ReactNode
 }
 
 export function getDiagramsSrc(props: DiagramProps): string {

@@ -8,19 +8,21 @@ import type { FieldProps } from 'formik'
 import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
 
 export interface FormColumnProps {
-  children: React.ReactNode,
+  children: React.ReactNode
 }
 
 export function FormColumn(props: FormColumnProps): JSX.Element {
   return <div className={styles.form_column}>{props.children}</div>
 }
 
-export interface FormValues { [key: string]: (string | boolean) | null | undefined }
+export interface FormValues {
+  [key: string]: (string | boolean) | null | undefined
+}
 
 export interface ConfigFormGroupProps {
-  groupLabel: string,
-  groupError?: string | null | undefined,
-  formFields: DisplayFieldProps[],
+  groupLabel: string
+  groupError?: string | null | undefined
+  formFields: DisplayFieldProps[]
 }
 
 export function ConfigFormGroup(props: ConfigFormGroupProps): JSX.Element {
@@ -46,9 +48,9 @@ export function ConfigFormGroup(props: ConfigFormGroupProps): JSX.Element {
 }
 
 export interface ConfigFormRowProps {
-  label: string,
-  labelFor: string,
-  children: React.ReactNode,
+  label: string
+  labelFor: string
+  children: React.ReactNode
 }
 
 const FIELD_ID_PREFIX = '__PipetteConfig__'
@@ -67,8 +69,8 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
 }
 
 export interface ConfigInputProps {
-  field: DisplayFieldProps,
-  className?: string,
+  field: DisplayFieldProps
+  className?: string
 }
 
 export function ConfigInput(props: ConfigInputProps): JSX.Element {
@@ -99,8 +101,8 @@ export function ConfigInput(props: ConfigInputProps): JSX.Element {
 }
 
 export interface ConfigCheckboxProps {
-  field: DisplayQuirkFieldProps,
-  className?: string,
+  field: DisplayQuirkFieldProps
+  className?: string
 }
 
 export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
@@ -124,8 +126,8 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
 }
 
 export interface ConfigQuirkGroupProps {
-  groupLabel: string,
-  quirks: DisplayQuirkFieldProps[],
+  groupLabel: string
+  quirks: DisplayQuirkFieldProps[]
 }
 
 export function ConfigQuirkGroup(props: ConfigQuirkGroupProps): JSX.Element {

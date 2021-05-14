@@ -22,12 +22,12 @@ import { getLegacyLabwareDef } from '../../assets/labware/getLabware'
 import styles from './styles.css'
 
 export interface LabwareItemProps {
-  highlighted?: boolean | null,
-  areTipracksConfirmed?: boolean,
-  handleClick?: () => void,
-  labware: Labware,
-  x: number,
-  y: number,
+  highlighted?: boolean | null
+  areTipracksConfirmed?: boolean
+  handleClick?: () => void
+  labware: Labware
+  x: number
+  y: number
 }
 
 export function LabwareItem(props: LabwareItemProps): JSX.Element {

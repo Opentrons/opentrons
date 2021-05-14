@@ -20,10 +20,10 @@ import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 export interface VersionInfoModalProps {
-  robot: ViewableRobot,
-  robotUpdateType: BuildrootUpdateType | null,
-  close: () => unknown,
-  proceed: () => unknown,
+  robot: ViewableRobot
+  robotUpdateType: BuildrootUpdateType | null
+  close: () => unknown
+  proceed: () => unknown
 }
 
 const REINSTALL_HEADING = 'Robot is up to date'

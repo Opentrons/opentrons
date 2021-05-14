@@ -90,22 +90,24 @@ const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 const TRASH_BIN = 'Removable black plastic trash bin'
 
 interface BodySpec {
-  preFragment: string | null,
-  boldFragment: string | null,
-  postFragment: string | null,
+  preFragment: string | null
+  boldFragment: string | null
+  postFragment: string | null
 }
 
 interface PanelContents {
-  headerText: string,
-  invalidationText: string | null,
-  bodyContentFragments: BodySpec[],
-  outcomeText: string | null,
-  chooseTipRackButtonText: string | null,
-  continueButtonText: string,
-  noteBody: BodySpec,
+  headerText: string
+  invalidationText: string | null
+  bodyContentFragments: BodySpec[]
+  outcomeText: string | null
+  chooseTipRackButtonText: string | null
+  continueButtonText: string
+  noteBody: BodySpec
 }
 
-const bodyContentFromFragments = (contentFragments: BodySpec[]): JSX.Element => {
+const bodyContentFromFragments = (
+  contentFragments: BodySpec[]
+): JSX.Element => {
   return (
     <>
       {contentFragments
@@ -566,9 +568,9 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
 }
 
 interface RequiredLabwareCardProps {
-  loadName: string,
-  displayName: string,
-  linkToMeasurements?: boolean,
+  loadName: string
+  displayName: string
+  linkToMeasurements?: boolean
 }
 
 const linkStyles = css`

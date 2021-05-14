@@ -7,13 +7,13 @@ import { Portal } from '../../../App/portal'
 import styles from './styles.css'
 
 export interface ClearDeckAlertModalProps {
-  onContinueClick?: () => unknown,
-  onCancelClick?: () => unknown,
-  parentUrl?: string,
-  cancelText: string,
-  continueText: string,
-  removeTrash?: boolean,
-  children?: React.ReactNode,
+  onContinueClick?: () => unknown
+  onCancelClick?: () => unknown
+  parentUrl?: string
+  cancelText: string
+  continueText: string
+  removeTrash?: boolean
+  children?: React.ReactNode
 }
 
 const HEADING = 'Before continuing, please remove:'

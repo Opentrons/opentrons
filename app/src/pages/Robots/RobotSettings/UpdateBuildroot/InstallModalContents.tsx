@@ -10,8 +10,8 @@ import type {
 } from '../../../../redux/buildroot/types'
 
 export interface InstallModalContentsProps {
-  robotSystemType: RobotSystemType | null,
-  session: BuildrootUpdateSession,
+  robotSystemType: RobotSystemType | null
+  session: BuildrootUpdateSession
 }
 
 export function InstallModalContents(

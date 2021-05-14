@@ -34,18 +34,16 @@ export function LostConnectionAlert(): JSX.Element | null {
     dispatch(robotActions.disconnect())
   }
 
-  return (
-    showAlert ? (
-      <Portal>
-        <AlertModal
-          onCloseClick={disconnect}
-          heading={'Connection to robot lost'}
-          buttons={[{ onClick: disconnect, children: 'close' }]}
-          alertOverlay
-        >
-          <ModalCopy />
-        </AlertModal>
-      </Portal>
-    ) : null
-  )
+  return showAlert ? (
+    <Portal>
+      <AlertModal
+        onCloseClick={disconnect}
+        heading={'Connection to robot lost'}
+        buttons={[{ onClick: disconnect, children: 'close' }]}
+        alertOverlay
+      >
+        <ModalCopy />
+      </AlertModal>
+    </Portal>
+  ) : null
 }

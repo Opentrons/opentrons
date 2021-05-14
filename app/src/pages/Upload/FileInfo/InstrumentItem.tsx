@@ -22,12 +22,12 @@ import type { PipetteCompatibility } from '../../../redux/pipettes/types'
 const AXIS_NAMES = ['x', 'y', 'z']
 
 export interface InstrumentItemProps {
-  compatibility?: PipetteCompatibility,
-  mount?: string,
-  children: React.ReactNode,
-  hidden?: boolean,
-  needsOffsetCalibration: boolean,
-  pipetteOffsetData?: [number, number, number] | null,
+  compatibility?: PipetteCompatibility
+  mount?: string
+  children: React.ReactNode
+  hidden?: boolean
+  needsOffsetCalibration: boolean
+  pipetteOffsetData?: [number, number, number] | null
 }
 
 export function InstrumentItem(props: InstrumentItemProps): JSX.Element | null {
@@ -41,7 +41,11 @@ export function InstrumentItem(props: InstrumentItemProps): JSX.Element | null {
   } = props
   const { t } = useTranslation(['protocol_calibration', 'protocol_info'])
   if (hidden) return null
-  const match = compatibility ? (['match', 'inexact_match'] as PipetteCompatibility[]).includes(compatibility) : Boolean(compatibility)
+  const match = compatibility
+    ? (['match', 'inexact_match'] as PipetteCompatibility[]).includes(
+        compatibility
+      )
+    : Boolean(compatibility)
   return (
     <>
       <Flex
@@ -93,7 +97,7 @@ function StatusIcon(props: { match: boolean }): JSX.Element {
 }
 
 function BuildOffsetText(props: {
-  offsetData: [number, number, number],
+  offsetData: [number, number, number]
 }): JSX.Element {
   const { offsetData } = props
   const { t } = useTranslation('protocol_info')

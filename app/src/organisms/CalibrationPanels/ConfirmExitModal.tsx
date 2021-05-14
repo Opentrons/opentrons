@@ -5,9 +5,9 @@ import * as Sessions from '../../redux/sessions'
 import type { SessionType } from '../../redux/sessions/types'
 
 export interface ConfirmExitModalProps {
-  back: () => unknown,
-  exit: () => unknown,
-  sessionType: SessionType,
+  back: () => unknown
+  exit: () => unknown
+  sessionType: SessionType
 }
 
 const HEADING = 'Are you sure?'

@@ -9,13 +9,18 @@ import type { Mount } from '@opentrons/components'
 import type { ReactWrapper } from 'enzyme'
 
 describe('CompleteConfirmation', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof CompleteConfirmation> & {pipMount: Mount}>) => ReactWrapper<React.ComponentProps<typeof CompleteConfirmation>>
+  let render: (
+    props?: Partial<
+      React.ComponentProps<typeof CompleteConfirmation> & { pipMount: Mount }
+    >
+  ) => ReactWrapper<React.ComponentProps<typeof CompleteConfirmation>>
 
   const mockSendCommands = jest.fn()
   const mockCleanUpAndExit = jest.fn()
 
-  const getContinueButton = (wrapper: ReactWrapper<React.ComponentProps<typeof CompleteConfirmation>>) =>
-    wrapper.find('button[title="Return tip to tip rack and exit"]')
+  const getContinueButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof CompleteConfirmation>>
+  ) => wrapper.find('button[title="Return tip to tip rack and exit"]')
 
   beforeEach(() => {
     render = (props = {}) => {

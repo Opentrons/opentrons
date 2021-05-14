@@ -40,15 +40,15 @@ import type {
 } from '../../../redux/calibration/types'
 
 interface Props {
-  mount: 'left' | 'right',
-  pipette: AttachedPipette | null,
-  calibration: PipetteCalibrations | null,
-  customLabware: LabwareDefinition2[],
+  mount: 'left' | 'right'
+  pipette: AttachedPipette | null
+  calibration: PipetteCalibrations | null
+  customLabware: LabwareDefinition2[]
 }
 
 function TipRackDisplayName(props: {
-  tiprackUri: string,
-  customLabware: LabwareDefinition2[],
+  tiprackUri: string
+  customLabware: LabwareDefinition2[]
 }): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const { tiprackUri, customLabware } = props
@@ -69,7 +69,7 @@ function TipRackDisplayName(props: {
 }
 
 function LastCalibrated(props: {
-  calibration: PipetteOffsetCalibration | TipLengthCalibration,
+  calibration: PipetteOffsetCalibration | TipLengthCalibration
 }): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   return (
@@ -86,8 +86,8 @@ function LastCalibrated(props: {
 }
 
 interface PipetteOffsetSectionProps {
-  pipette: AttachedPipette,
-  calibration: PipetteOffsetCalibration | null,
+  pipette: AttachedPipette
+  calibration: PipetteOffsetCalibration | null
 }
 
 function PipetteOffsetSection(props: PipetteOffsetSectionProps): JSX.Element {
@@ -118,8 +118,8 @@ function PipetteOffsetSection(props: PipetteOffsetSectionProps): JSX.Element {
 }
 
 interface TipLengthSectionProps {
-  calibration: PipetteCalibrations | null,
-  customLabware: LabwareDefinition2[],
+  calibration: PipetteCalibrations | null
+  customLabware: LabwareDefinition2[]
 }
 
 export function TipLengthSection(props: TipLengthSectionProps): JSX.Element {

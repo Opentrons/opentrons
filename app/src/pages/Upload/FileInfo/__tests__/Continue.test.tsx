@@ -21,10 +21,14 @@ const MOCK_STORE = {
   subscribe: noop,
 } as any
 
-const getCalibrateLocation = navigation.getCalibrateLocation as jest.MockedFunction<typeof navigation.getCalibrateLocation>
+const getCalibrateLocation = navigation.getCalibrateLocation as jest.MockedFunction<
+  typeof navigation.getCalibrateLocation
+>
 
 describe('Continue to run or calibration button component', () => {
-  const render = (labwareCalibrated: boolean = false): ReturnType<typeof mount> => {
+  const render = (
+    labwareCalibrated: boolean = false
+  ): ReturnType<typeof mount> => {
     return mount(
       <Provider store={MOCK_STORE}>
         <StaticRouter context={{}} location={'/upload/file-info'}>

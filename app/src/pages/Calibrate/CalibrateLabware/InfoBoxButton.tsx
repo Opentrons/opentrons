@@ -16,7 +16,9 @@ import type { Dispatch } from '../../../redux/types'
 
 import { ProceedToRun } from './ProceedToRun'
 
-export interface InfoBoxButtonProps { labware: Labware | null | undefined}
+export interface InfoBoxButtonProps {
+  labware: Labware | null | undefined
+}
 
 export function InfoBoxButton(props: InfoBoxButtonProps): JSX.Element | null {
   const { labware } = props

@@ -8,11 +8,11 @@ import { InstructionStep } from '../../../molecules/InstructionStep'
 import { getInstructionsByType, getDiagramSrc } from './instructions-data'
 
 export interface LabwareCalibrationProps {
-  labware: Labware,
-  calibrator: Pipette,
-  calibrateToBottom: boolean,
-  buttonText: string,
-  useCenteredTroughs: boolean,
+  labware: Labware
+  calibrator: Pipette
+  calibrateToBottom: boolean
+  buttonText: string
+  useCenteredTroughs: boolean
 }
 
 export function ConfirmPositionDiagram(

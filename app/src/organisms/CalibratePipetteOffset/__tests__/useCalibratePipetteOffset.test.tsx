@@ -18,8 +18,12 @@ jest.mock('../../../redux/robot-api/selectors')
 jest.mock('lodash/uniqueId')
 
 const mockUniqueId = uniqueId as jest.MockedFunction<typeof uniqueId>
-const mockGetRobotSessionOfType= Sessions.getRobotSessionOfType as jest.MockedFunction<typeof Sessions.getRobotSessionOfType>
-const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<typeof RobotApi.getRequestById>
+const mockGetRobotSessionOfType = Sessions.getRobotSessionOfType as jest.MockedFunction<
+  typeof Sessions.getRobotSessionOfType
+>
+const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
+  typeof RobotApi.getRequestById
+>
 
 describe('useCalibratePipetteOffset hook', () => {
   let startCalibration: Invoker

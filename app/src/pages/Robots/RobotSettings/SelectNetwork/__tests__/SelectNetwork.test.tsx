@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { Provider } from 'react-redux'
 
@@ -49,15 +48,25 @@ const mockWifiKeys = [
 
 const mockEapOptions = [Fixtures.mockEapOption]
 
-const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<typeof Networking.getWifiList>
+const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
+  typeof Networking.getWifiList
+>
 
-const mockGetWifiKeys = Networking.getWifiKeys as jest.MockedFunction<typeof Networking.getWifiKeys>
+const mockGetWifiKeys = Networking.getWifiKeys as jest.MockedFunction<
+  typeof Networking.getWifiKeys
+>
 
-const mockGetEapOptions = Networking.getEapOptions as jest.MockedFunction<typeof Networking.getEapOptions>
+const mockGetEapOptions = Networking.getEapOptions as jest.MockedFunction<
+  typeof Networking.getEapOptions
+>
 
-const mockGetCanDisconnect = Networking.getCanDisconnect as jest.MockedFunction<typeof Networking.getCanDisconnect>
+const mockGetCanDisconnect = Networking.getCanDisconnect as jest.MockedFunction<
+  typeof Networking.getCanDisconnect
+>
 
-const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<typeof RobotApi.getRequestById>
+const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
+  typeof RobotApi.getRequestById
+>
 
 describe('<SelectNetwork />', () => {
   let dispatch: any
@@ -146,7 +155,9 @@ describe('<SelectNetwork />', () => {
 
   describe('disconnecting from the active network', () => {
     let wrapper: ReactWrapper<React.ComponentProps<typeof SelectNetwork>>
-    let disconnectModal: ReactWrapper<React.ComponentProps<typeof DisconnectModal>>
+    let disconnectModal: ReactWrapper<
+      React.ComponentProps<typeof DisconnectModal>
+    >
 
     beforeEach(() => {
       wrapper = render()
@@ -177,7 +188,9 @@ describe('<SelectNetwork />', () => {
     describe('dispatching the request', () => {
       let requestId: string | null
 
-      const disconnectAndSetMockRequestState = (requestState: RequestState | null = null) => {
+      const disconnectAndSetMockRequestState = (
+        requestState: RequestState | null = null
+      ) => {
         act(() => {
           disconnectModal.invoke('onDisconnect')?.()
           const actionCall = dispatch.mock.calls.find(
@@ -225,7 +238,7 @@ describe('<SelectNetwork />', () => {
       it('closes spinner and shows success when disconnect succeeds', () => {
         disconnectAndSetMockRequestState({
           status: RobotApi.SUCCESS,
-          response: ({} as any),
+          response: {} as any,
         })
 
         expect(wrapper.find(DisconnectModal)).toHaveLength(0)
@@ -253,7 +266,7 @@ describe('<SelectNetwork />', () => {
       it('closes spinner and shows failure if disconnect fails', () => {
         disconnectAndSetMockRequestState({
           status: RobotApi.FAILURE,
-          response: ({} as any),
+          response: {} as any,
           error: { message: 'oh no!' },
         })
 
@@ -368,7 +381,9 @@ describe('<SelectNetwork />', () => {
       const mockConfigure = { ssid: mockWifiList[1].ssid, psk: 'password' }
       let requestId: string | null
 
-      const connectAndSetMockRequestState = (requestState: RequestState | null = null) => {
+      const connectAndSetMockRequestState = (
+        requestState: RequestState | null = null
+      ) => {
         act(() => {
           connectModal.invoke('onConnect')?.(mockConfigure)
           const actionCall = dispatch.mock.calls.find(
@@ -413,7 +428,7 @@ describe('<SelectNetwork />', () => {
       it('closes spinner and shows success if connect succeeds', () => {
         connectAndSetMockRequestState({
           status: RobotApi.SUCCESS,
-          response: ({} as any),
+          response: {} as any,
         })
 
         expect(wrapper.find(ConnectModal)).toHaveLength(0)
@@ -441,7 +456,7 @@ describe('<SelectNetwork />', () => {
       it('closes spinner and shows failure if connect fails', () => {
         connectAndSetMockRequestState({
           status: RobotApi.FAILURE,
-          response: ({} as any),
+          response: {} as any,
           error: { message: 'oh no!' },
         })
 

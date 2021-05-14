@@ -9,7 +9,9 @@ import styles from './styles.css'
 import type { RouteComponentProps } from 'react-router-dom'
 import type { Labware } from '../../../redux/robot/types'
 
-interface Props extends RouteComponentProps<{slot: string}> { labware: Labware | null | undefined}
+interface Props extends RouteComponentProps<{ slot: string }> {
+  labware: Labware | null | undefined
+}
 
 export const CalibrateLabware = withRouter(CalibrateLabwareComponent)
 

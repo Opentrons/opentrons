@@ -30,21 +30,27 @@ jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 
 type CalibratePipetteOffsetSpec = Partial<{
-  component: React.ReactNode,
-  childProps?: {},
-  currentStep: PipetteOffsetCalibrationStep,
+  component: React.ReactNode
+  childProps?: {}
+  currentStep: PipetteOffsetCalibrationStep
 }>
 
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<typeof getDeckDefinitions>
+const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
+  typeof getDeckDefinitions
+>
 
 describe('CalibratePipetteOffset', () => {
   let mockStore: any
-  let render: (props?: Partial<React.ComponentProps<typeof CalibratePipetteOffset>>) => ReactWrapper<React.ComponentType<typeof CalibratePipetteOffset>>
+  let render: (
+    props?: Partial<React.ComponentProps<typeof CalibratePipetteOffset>>
+  ) => ReactWrapper<React.ComponentType<typeof CalibratePipetteOffset>>
   let dispatch: jest.MockedFunction<Dispatch>
   let dispatchRequests: DispatchRequestsType
   let mockPipOffsetCalSession: Sessions.PipetteOffsetCalibrationSession
 
-  const getExitButton = (wrapper: ReturnType<typeof render>): ReactWrapper<HTMLAttributes> =>
+  const getExitButton = (
+    wrapper: ReturnType<typeof render>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find({ title: 'exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [
@@ -136,7 +142,9 @@ describe('CalibratePipetteOffset', () => {
     const wrapper = render()
 
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
-    act((): void => getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent))
+    act((): void =>
+      getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+    )
     wrapper.update()
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
@@ -161,7 +169,9 @@ describe('CalibratePipetteOffset', () => {
       },
     }
     const wrapper = render({ isJogging: false, session })
-    wrapper.find('button[title="forward"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,
@@ -180,7 +190,9 @@ describe('CalibratePipetteOffset', () => {
       },
     }
     const wrapper = render({ isJogging: true, session })
-    wrapper.find('button[title="forward"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).not.toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,

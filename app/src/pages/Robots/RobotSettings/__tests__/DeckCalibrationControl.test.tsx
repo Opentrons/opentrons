@@ -1,5 +1,8 @@
 import * as React from 'react'
-import { mountWithProviders, WrapperWithStore } from '@opentrons/components/__utils__'
+import {
+  mountWithProviders,
+  WrapperWithStore,
+} from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../../i18n'
 
@@ -24,24 +27,41 @@ import type { Action, State } from '../../../../redux/types'
 jest.mock('../../../../redux/robot-api/selectors')
 jest.mock('../../../../redux/sessions/selectors')
 
-const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<typeof RobotApi.getRequestById>
+const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
+  typeof RobotApi.getRequestById
+>
 
 describe('DeckCalibrationControl', () => {
-  let render: ((props?: Partial<React.ComponentProps<typeof DeckCalibrationControl>>) => WrapperWithStore<React.ComponentProps<typeof DeckCalibrationControl>, State, Action>)
+  let render: (
+    props?: Partial<React.ComponentProps<typeof DeckCalibrationControl>>
+  ) => WrapperWithStore<
+    React.ComponentProps<typeof DeckCalibrationControl>,
+    State,
+    Action
+  >
 
-  const getDeckCalButton = (wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>): ReactWrapper<HTMLAttributes> =>
+  const getDeckCalButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find('DeckCalibrationControl').find('button')
 
-  const getCancelDeckCalButton = (wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>): ReactWrapper<HTMLAttributes> =>
+  const getCancelDeckCalButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find('OutlineButton[children="cancel"]').find('button')
 
-  const getConfirmDeckCalButton = (wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>): ReactWrapper<HTMLAttributes> =>
+  const getConfirmDeckCalButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find('OutlineButton[children="continue"]').find('button')
 
-  const getCalibrationWarning = (wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>): ReactWrapper =>
-    wrapper.find('InlineCalibrationWarning')
+  const getCalibrationWarning = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>
+  ): ReactWrapper => wrapper.find('InlineCalibrationWarning')
 
-  const getFailedStartModal = (wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>): ReactWrapper =>
+  const getFailedStartModal = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>
+  ): ReactWrapper =>
     wrapper.find('AlertModal[heading="Failed to start deck calibration"]')
 
   beforeEach(() => {
@@ -72,7 +92,11 @@ describe('DeckCalibrationControl', () => {
         },
         pipOffsetDataPresent = true,
       } = props
-      return mountWithProviders<React.ComponentProps<typeof DeckCalibrationControl>, State, Action>(
+      return mountWithProviders<
+        React.ComponentProps<typeof DeckCalibrationControl>,
+        State,
+        Action
+      >(
         <DeckCalibrationControl
           robotName={robotName}
           disabledReason={disabledReason}
@@ -128,7 +152,11 @@ describe('DeckCalibrationControl', () => {
         },
       })
       expect(
-        wrapper.findWhere((elem: ReactWrapper) => elem.prop('fontStyle') === 'italic').html()
+        wrapper
+          .findWhere(
+            (elem: ReactWrapper) => elem.prop('fontStyle') === 'italic'
+          )
+          .html()
       ).toMatch(spec.shouldMatch)
     })
   })

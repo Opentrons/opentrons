@@ -21,16 +21,14 @@ export function AnalyticsSettingsModal(): JSX.Element | null {
   const seen = useSelector(getAnalyticsOptInSeen)
   const setSeen = (): unknown => dispatch(setAnalyticsOptInSeen())
 
-  return (
-    !seen ? (
-      <Portal>
-        <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
-          <AnalyticsToggle />
-          <OutlineButton onClick={setSeen} float="right" margin="0.75rem">
-            {CONTINUE}
-          </OutlineButton>
-        </Modal>
-      </Portal>
-    ) : null
-  )
+  return !seen ? (
+    <Portal>
+      <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
+        <AnalyticsToggle />
+        <OutlineButton onClick={setSeen} float="right" margin="0.75rem">
+          {CONTINUE}
+        </OutlineButton>
+      </Modal>
+    </Portal>
+  ) : null
 }

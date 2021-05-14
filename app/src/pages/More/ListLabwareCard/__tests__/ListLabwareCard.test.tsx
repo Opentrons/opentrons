@@ -10,9 +10,13 @@ import * as LabwareActions from '../../../../redux/custom-labware/actions'
 
 jest.mock('../../../../redux/custom-labware/selectors')
 
-const mockGetCustomLabware = LabwareSelectors.getCustomLabware as jest.MockedFunction<typeof LabwareSelectors.getCustomLabware>
+const mockGetCustomLabware = LabwareSelectors.getCustomLabware as jest.MockedFunction<
+  typeof LabwareSelectors.getCustomLabware
+>
 
-const mockGetListLabwareErrorMessage = LabwareSelectors.getListLabwareErrorMessage as jest.MockedFunction<typeof LabwareSelectors.getListLabwareErrorMessage>
+const mockGetListLabwareErrorMessage = LabwareSelectors.getListLabwareErrorMessage as jest.MockedFunction<
+  typeof LabwareSelectors.getListLabwareErrorMessage
+>
 
 describe('ListLabwareCard', () => {
   let mockStore: any

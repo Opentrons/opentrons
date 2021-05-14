@@ -29,7 +29,7 @@ import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
 interface Props {
-  robot: ViewableRobot,
+  robot: ViewableRobot
 }
 
 export function ControlsCard(props: Props): JSX.Element {
@@ -40,7 +40,8 @@ export function ControlsCard(props: Props): JSX.Element {
   const lightsOn = useSelector((state: State) => getLightsOn(state, robotName))
   const isRunning = useSelector(robotSelectors.getIsRunning)
   const notConnectable = status !== CONNECTABLE
-  const toggleLights = (): unknown => dispatch(updateLights(robotName, !lightsOn))
+  const toggleLights = (): unknown =>
+    dispatch(updateLights(robotName, !lightsOn))
 
   React.useEffect(() => {
     dispatch(fetchLights(robotName))

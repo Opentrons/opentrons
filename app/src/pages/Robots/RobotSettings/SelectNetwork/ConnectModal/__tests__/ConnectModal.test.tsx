@@ -13,11 +13,17 @@ import type { ShallowWrapper } from 'enzyme'
 
 jest.mock('../form-fields')
 
-const getConnectFormFields = FormFields.getConnectFormFields as jest.MockedFunction<typeof FormFields.getConnectFormFields>
+const getConnectFormFields = FormFields.getConnectFormFields as jest.MockedFunction<
+  typeof FormFields.getConnectFormFields
+>
 
-const validateConnectFormFields = FormFields.validateConnectFormFields as jest.MockedFunction<typeof FormFields.validateConnectFormFields>
+const validateConnectFormFields = FormFields.validateConnectFormFields as jest.MockedFunction<
+  typeof FormFields.validateConnectFormFields
+>
 
-const connectFormToConfigureRequest = FormFields.connectFormToConfigureRequest as jest.MockedFunction<typeof FormFields.connectFormToConfigureRequest>
+const connectFormToConfigureRequest = FormFields.connectFormToConfigureRequest as jest.MockedFunction<
+  typeof FormFields.connectFormToConfigureRequest
+>
 
 const robotName = 'robotName'
 const eapOptions = [Fixtures.mockEapOption]
@@ -38,7 +44,11 @@ describe("SelectNetwork's ConnectModal", () => {
   })
 
   describe('Formik wrapper', () => {
-    const render = (network: React.ComponentProps<typeof ConnectModal>['network'] | null = null): ShallowWrapper<React.ComponentProps<typeof ConnectModal>> => {
+    const render = (
+      network:
+        | React.ComponentProps<typeof ConnectModal>['network']
+        | null = null
+    ): ShallowWrapper<React.ComponentProps<typeof ConnectModal>> => {
       return shallow(
         <ConnectModal
           {...{
@@ -75,7 +85,9 @@ describe("SelectNetwork's ConnectModal", () => {
     it('calls onConnect on submit', () => {
       const network = Fixtures.mockWifiNetwork
       const wrapper = render(network)
-      const formik: ShallowWrapper<React.ComponentProps<typeof Formik>> = wrapper.find(Formik)
+      const formik: ShallowWrapper<
+        React.ComponentProps<typeof Formik>
+      > = wrapper.find(Formik)
       const mockValues = { ssid: 'foobar' } as any
       const mockRequest = { ssid: 'foobar', hidden: false }
 
@@ -125,7 +137,11 @@ describe("SelectNetwork's ConnectModal", () => {
     const handleSubmit = jest.fn()
     const handleValidate = jest.fn()
 
-    const render = (network: React.ComponentProps<typeof ConnectModalComponent>['network'] | null = null): ReturnType<typeof mount> => {
+    const render = (
+      network:
+        | React.ComponentProps<typeof ConnectModalComponent>['network']
+        | null = null
+    ): ReturnType<typeof mount> => {
       return mount(
         <ConnectModalComponent
           {...{

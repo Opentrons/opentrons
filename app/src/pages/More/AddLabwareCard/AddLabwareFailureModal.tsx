@@ -45,11 +45,11 @@ const API_NAME = 'API name: '
 const FILENAME = 'File name: '
 
 export interface AddLabwareFailureModalProps {
-  file: FailedLabwareFile | null,
-  errorMessage: string | null,
-  directory: string,
-  onCancel: () => unknown,
-  onOverwrite: (file: DuplicateLabwareFile) => unknown,
+  file: FailedLabwareFile | null
+  errorMessage: string | null
+  directory: string
+  onCancel: () => unknown
+  onOverwrite: (file: DuplicateLabwareFile) => unknown
 }
 
 const renderFilename = (file: FailedLabwareFile): JSX.Element => (

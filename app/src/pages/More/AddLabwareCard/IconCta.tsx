@@ -6,11 +6,11 @@ import styles from './styles.css'
 import type { IconName } from '@opentrons/components'
 
 export interface IconCtaProps {
-  name: string,
-  iconName: IconName,
-  text: string,
-  className?: string,
-  onClick: () => unknown,
+  name: string
+  iconName: IconName
+  text: string
+  className?: string
+  onClick: () => unknown
 }
 
 export const IconCta = ({

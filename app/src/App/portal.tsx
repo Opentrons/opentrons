@@ -8,16 +8,16 @@ import { Box } from '@opentrons/components'
 
 type PortalLevel = 'page' | 'top'
 
-interface  Props {
+interface Props {
   children: React.ReactNode
   level: PortalLevel
 }
 
-interface  State {
+interface State {
   hasRoot: boolean
 }
 
-interface  PortalLevelInfo {
+interface PortalLevelInfo {
   id: string
   zIndex: number | string
 }

@@ -27,10 +27,10 @@ const boldProps: React.ComponentProps<typeof Text> = {
 }
 
 interface ConnectionStatusProps {
-  type: typeof USB | typeof WI_FI,
-  ipAddress: string,
-  status: typeof CONNECTABLE | typeof REACHABLE,
-  internetStatus: InternetStatus | null,
+  type: typeof USB | typeof WI_FI
+  ipAddress: string
+  status: typeof CONNECTABLE | typeof REACHABLE
+  internetStatus: InternetStatus | null
 }
 
 export function ConnectionStatusMessage(
@@ -71,11 +71,11 @@ export function ConnectionStatusMessage(
 }
 
 interface ConnectionInfoProps {
-  connection: SimpleInterfaceStatus | null,
-  title: string,
-  wired?: boolean,
-  children?: React.ReactNode,
-  disabled: boolean | null | undefined,
+  connection: SimpleInterfaceStatus | null
+  title: string
+  wired?: boolean
+  children?: React.ReactNode
+  disabled: boolean | null | undefined
 }
 
 export function ConnectionInfo(props: ConnectionInfoProps): JSX.Element {
@@ -102,9 +102,9 @@ export function ConnectionInfo(props: ConnectionInfoProps): JSX.Element {
 }
 
 interface NetworkAddressProps {
-  connection: SimpleInterfaceStatus | null,
-  wired: boolean | null | undefined,
-  disabled: boolean | null | undefined,
+  connection: SimpleInterfaceStatus | null
+  wired: boolean | null | undefined
+  disabled: boolean | null | undefined
 }
 
 function NetworkAddresses(props: NetworkAddressProps): JSX.Element {

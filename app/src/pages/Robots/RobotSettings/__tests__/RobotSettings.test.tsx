@@ -69,30 +69,55 @@ jest.mock('../AdvancedSettingsCard', () => ({
   AdvancedSettingsCard: () => <></>,
 }))
 
-const MOCK_STATE: State = ({ mockState: true } as any)
+const MOCK_STATE: State = { mockState: true } as any
 const ROBOT_URL = `/robots/${mockConnectableRobot.name}`
 
-const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<typeof RobotSelectors.getConnectRequest>
+const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<
+  typeof RobotSelectors.getConnectRequest
+>
 
-const getBuildrootUpdateSeen = Buildroot.getBuildrootUpdateSeen as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateSeen>
+const getBuildrootUpdateSeen = Buildroot.getBuildrootUpdateSeen as jest.MockedFunction<
+  typeof Buildroot.getBuildrootUpdateSeen
+>
 
-const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateDisplayInfo>
+const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof Buildroot.getBuildrootUpdateDisplayInfo
+>
 
-const getBuildrootUpdateInProgress = Buildroot.getBuildrootUpdateInProgress as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateInProgress>
+const getBuildrootUpdateInProgress = Buildroot.getBuildrootUpdateInProgress as jest.MockedFunction<
+  typeof Buildroot.getBuildrootUpdateInProgress
+>
 
-const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateAvailable>
+const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<
+  typeof Buildroot.getBuildrootUpdateAvailable
+>
 
-const getRobotRestartRequired = Settings.getRobotRestartRequired as jest.MockedFunction<typeof Settings.getRobotRestartRequired>
+const getRobotRestartRequired = Settings.getRobotRestartRequired as jest.MockedFunction<
+  typeof Settings.getRobotRestartRequired
+>
 
-const getMovementStatus = Controls.getMovementStatus as jest.MockedFunction<typeof Controls.getMovementStatus>
+const getMovementStatus = Controls.getMovementStatus as jest.MockedFunction<
+  typeof Controls.getMovementStatus
+>
 
-const getMovementError = Controls.getMovementError as jest.MockedFunction<typeof Controls.getMovementError>
+const getMovementError = Controls.getMovementError as jest.MockedFunction<
+  typeof Controls.getMovementError
+>
 
-const getRobotRestarting = Admin.getRobotRestarting as jest.MockedFunction<typeof Admin.getRobotRestarting>
+const getRobotRestarting = Admin.getRobotRestarting as jest.MockedFunction<
+  typeof Admin.getRobotRestarting
+>
 
 describe('/robots/:robotName page component', () => {
-  const render = (robot: ViewableRobot = mockConnectableRobot, url = ROBOT_URL) => {
-    return mountWithProviders<React.ComponentProps<typeof StaticRouter>, State, Action>(
+  const render = (
+    robot: ViewableRobot = mockConnectableRobot,
+    url = ROBOT_URL
+  ) => {
+    return mountWithProviders<
+      React.ComponentProps<typeof StaticRouter>,
+      State,
+      Action
+    >(
       <StaticRouter location={url} context={{}}>
         <Route path="/robots/:name?">
           <RobotSettings robot={robot} />

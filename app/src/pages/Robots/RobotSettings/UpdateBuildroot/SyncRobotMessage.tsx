@@ -4,11 +4,13 @@ import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../redux/buildroot'
 import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
 
 export interface SyncRobotMessageProps {
-  updateType: BuildrootUpdateType,
-  version: string,
+  updateType: BuildrootUpdateType
+  version: string
 }
 
-export function SyncRobotMessage(props: SyncRobotMessageProps): JSX.Element | null {
+export function SyncRobotMessage(
+  props: SyncRobotMessageProps
+): JSX.Element | null {
   const { updateType, version } = props
 
   if (updateType === REINSTALL) return null

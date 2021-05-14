@@ -17,7 +17,9 @@ import type { ConnectFormFieldProps } from '../../types'
 // https://github.com/jaredpalmer/formik/pull/2360
 jest.mock('formik')
 
-const useFormikContext = Formik.useFormikContext as jest.MockedFunction<typeof Formik.useFormikContext>
+const useFormikContext = Formik.useFormikContext as jest.MockedFunction<
+  typeof Formik.useFormikContext
+>
 
 const useField = Formik.useField as jest.MockedFunction<typeof Formik.useField>
 
@@ -31,10 +33,19 @@ describe('ConnectModal state hooks', () => {
     const setTouched = jest.fn()
     const setValues = jest.fn()
 
-    const mockFormOnce = (values: any, errors: any = {}, touched: any = {}): void => {
-      useFormikContext.mockReturnValueOnce(
-        ({ values, errors, touched, setValues, setErrors, setTouched } as any)
-      )
+    const mockFormOnce = (
+      values: any,
+      errors: any = {},
+      touched: any = {}
+    ): void => {
+      useFormikContext.mockReturnValueOnce({
+        values,
+        errors,
+        touched,
+        setValues,
+        setErrors,
+        setTouched,
+      } as any)
     }
 
     const TestUseResetFormOnSecurityChange = (): JSX.Element => {
@@ -112,7 +123,8 @@ describe('ConnectModal state hooks', () => {
       return <MockField {...fieldProps}></MockField>
     }
 
-    const render = (): ReturnType<typeof mount> => mount(<TestUseConnectFormField />)
+    const render = (): ReturnType<typeof mount> =>
+      mount(<TestUseConnectFormField />)
 
     it('passes field name to useField', () => {
       mockFieldOnce()

@@ -9,13 +9,13 @@ import { FormRow } from './FormRow'
 import type { EapOption } from '../types'
 
 export interface SecurityFieldProps {
-  id: string,
-  name: string,
-  placeholder: string,
-  label: string,
-  showAllOptions: boolean,
-  eapOptions: EapOption[],
-  className?: string,
+  id: string
+  name: string
+  placeholder: string
+  label: string
+  showAllOptions: boolean
+  eapOptions: EapOption[]
+  className?: string
 }
 
 const ALL_SECURITY_OPTIONS = [
@@ -23,7 +23,9 @@ const ALL_SECURITY_OPTIONS = [
   { options: [{ value: SECURITY_WPA_PSK, label: LABEL_SECURITY_PSK }] },
 ]
 
-const makeEapOptionsGroup = (eapOptions: EapOption[]): {options: Array<{value: string, label: string}>} => ({
+const makeEapOptionsGroup = (
+  eapOptions: EapOption[]
+): { options: Array<{ value: string; label: string }> } => ({
   options: eapOptions.map(opt => ({
     value: opt.name,
     label: opt.displayName ?? opt.name,

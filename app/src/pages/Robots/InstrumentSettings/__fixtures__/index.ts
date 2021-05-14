@@ -1,4 +1,4 @@
-import type { AttachedPipette } from "../../../../redux/pipettes/types";
+import type { AttachedPipette } from '../../../../redux/pipettes/types'
 
 export const mockAttachedPipette: AttachedPipette = {
   id: '1234_pip_id',

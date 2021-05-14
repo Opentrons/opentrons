@@ -12,13 +12,16 @@ import * as Buildroot from '../../../../redux/buildroot'
 import { RobotItem } from '../RobotItem'
 import { RobotListItem } from '../RobotListItem'
 
-
 jest.mock('../../../../redux/buildroot/selectors')
 jest.mock('../../../../redux/robot/selectors')
 
-const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateAvailable>
+const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<
+  typeof Buildroot.getBuildrootUpdateAvailable
+>
 
-const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<typeof RobotSelectors.getConnectRequest>
+const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<
+  typeof RobotSelectors.getConnectRequest
+>
 
 describe('ConnectPanel RobotItem', () => {
   const store: any = {
@@ -27,12 +30,19 @@ describe('ConnectPanel RobotItem', () => {
     dispatch: jest.fn(),
   }
 
-  const render = (robot: any = Fixtures.mockConnectableRobot, matchParams: any = {}): ReturnType<typeof mount> => {
+  const render = (
+    robot: any = Fixtures.mockConnectableRobot,
+    matchParams: any = {}
+  ): ReturnType<typeof mount> => {
     // TODO(mc, 2020-03-30): upgrade react-router to 5.1 for hooks
     // grab the wrapped component from react-router::withRouter
     const Component = (RobotItem as any).WrappedComponent
 
-    const Wrapper = ({ children }: { children: React.ReactNode }): JSX.Element => (
+    const Wrapper = ({
+      children,
+    }: {
+      children: React.ReactNode
+    }): JSX.Element => (
       <Provider store={store}>
         <StaticRouter location="/" context={{}}>
           {children}

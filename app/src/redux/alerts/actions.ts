@@ -1,4 +1,3 @@
-
 import { addUniqueConfigValue, subtractConfigValue } from '../config'
 import * as Constants from './constants'
 import * as Types from './types'

@@ -8,7 +8,9 @@ import { useFeatureFlag } from '../hooks'
 
 jest.mock('../selectors')
 
-const getFeatureFlags = Selectors.getFeatureFlags as jest.MockedFunction<typeof Selectors.getFeatureFlags>
+const getFeatureFlags = Selectors.getFeatureFlags as jest.MockedFunction<
+  typeof Selectors.getFeatureFlags
+>
 
 describe('config hooks', () => {
   afterEach(() => {

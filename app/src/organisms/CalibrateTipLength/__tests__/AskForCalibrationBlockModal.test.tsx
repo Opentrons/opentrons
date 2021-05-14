@@ -6,9 +6,11 @@ import { AskForCalibrationBlockModal } from '../AskForCalibrationBlockModal'
 import { CheckboxField } from '@opentrons/components'
 import { setUseTrashSurfaceForTipCal } from '../../../redux/calibration'
 
-import type { WrapperWithStore} from '@opentrons/components/__utils__'
+import type { WrapperWithStore } from '@opentrons/components/__utils__'
 
-type RenderReturnType = WrapperWithStore<React.ComponentProps<typeof AskForCalibrationBlockModal>>
+type RenderReturnType = WrapperWithStore<
+  React.ComponentProps<typeof AskForCalibrationBlockModal>
+>
 describe('AskForCalibrationBlockModal', () => {
   let onResponse: jest.MockedFunction<() => {}>
   let render: (initialValue?: boolean | null) => RenderReturnType
@@ -34,7 +36,8 @@ describe('AskForCalibrationBlockModal', () => {
     jest.resetAllMocks()
   })
 
-  const findCalBlockModal = (wrapper: RenderReturnType['wrapper']) => wrapper.find(AskForCalibrationBlockModal)
+  const findCalBlockModal = (wrapper: RenderReturnType['wrapper']) =>
+    wrapper.find(AskForCalibrationBlockModal)
   const findHaveBlock = (wrapper: RenderReturnType['wrapper']) =>
     findCalBlockModal(wrapper).find(
       'button[children="Continue with calibration block"]'

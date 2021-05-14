@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next'
 import styles from './styles.css'
 
 export interface ScanButtonProps {
-  isScanning: boolean,
-  onScanClick: () => unknown,
-  found: boolean,
+  isScanning: boolean
+  onScanClick: () => unknown
+  found: boolean
 }
 
 export function ScanButton(props: ScanButtonProps): JSX.Element {

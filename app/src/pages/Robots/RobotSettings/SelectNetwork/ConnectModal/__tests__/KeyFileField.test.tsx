@@ -13,7 +13,9 @@ import type { ShallowWrapper } from 'enzyme'
 
 jest.mock('../form-state')
 
-const useConnectFormField = FormState.useConnectFormField as jest.MockedFunction<typeof FormState.useConnectFormField>
+const useConnectFormField = FormState.useConnectFormField as jest.MockedFunction<
+  typeof FormState.useConnectFormField
+>
 
 describe('ConnectModal KeyFileField', () => {
   const fieldId = 'field-id'
@@ -113,7 +115,9 @@ describe('ConnectModal KeyFileField', () => {
 
   it('updates the field value with UploadKeyInput::onUpload', () => {
     const wrapper = render()
-    const upload: ShallowWrapper<React.ComponentProps<typeof UploadKeyInput>> = wrapper.find(UploadKeyInput)
+    const upload: ShallowWrapper<
+      React.ComponentProps<typeof UploadKeyInput>
+    > = wrapper.find(UploadKeyInput)
 
     upload.invoke('onUpload')?.('new-key-id')
     expect(setValue).toHaveBeenCalledWith('new-key-id')
@@ -139,7 +143,9 @@ describe('ConnectModal KeyFileField', () => {
 
   it('updates field touched with SelectField::onLoseFocus', () => {
     const wrapper = render()
-    const select: ShallowWrapper<React.ComponentProps<typeof SelectField>> = wrapper.find(SelectField)
+    const select: ShallowWrapper<
+      React.ComponentProps<typeof SelectField>
+    > = wrapper.find(SelectField)
 
     select.invoke('onLoseFocus')?.('')
     expect(setTouched).toHaveBeenCalledWith(true)

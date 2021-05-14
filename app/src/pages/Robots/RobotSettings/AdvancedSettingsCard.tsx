@@ -37,8 +37,8 @@ import type { ViewableRobot } from '../../../redux/discovery/types'
 import type { RobotSettings } from '../../../redux/robot-settings/types'
 
 export interface AdvancedSettingsCardProps {
-  robot: ViewableRobot,
-  resetUrl: string,
+  robot: ViewableRobot
+  resetUrl: string
 }
 
 const ROBOT_LOGS_OPTOUT_ID = 'disableLogAggregation'

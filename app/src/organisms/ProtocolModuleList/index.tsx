@@ -112,7 +112,7 @@ export function ProtocolModuleList(): JSX.Element | null {
 }
 
 interface UsbPortInfoProps {
-  matchedModule: MatchedModule | null,
+  matchedModule: MatchedModule | null
 }
 
 function UsbPortInfo(props: UsbPortInfoProps): JSX.Element | null {

@@ -12,11 +12,17 @@ import type { State } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/buildroot')
 
-const getBuildrootUpdateInfo = Buildroot.getBuildrootUpdateInfo as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateInfo>
-const getBuildrootDownloadProgress = Buildroot.getBuildrootDownloadProgress as jest.MockedFunction<typeof Buildroot.getBuildrootDownloadProgress>
-const getBuildrootDownloadError = Buildroot.getBuildrootDownloadError as jest.MockedFunction<typeof Buildroot.getBuildrootDownloadError>
+const getBuildrootUpdateInfo = Buildroot.getBuildrootUpdateInfo as jest.MockedFunction<
+  typeof Buildroot.getBuildrootUpdateInfo
+>
+const getBuildrootDownloadProgress = Buildroot.getBuildrootDownloadProgress as jest.MockedFunction<
+  typeof Buildroot.getBuildrootDownloadProgress
+>
+const getBuildrootDownloadError = Buildroot.getBuildrootDownloadError as jest.MockedFunction<
+  typeof Buildroot.getBuildrootDownloadError
+>
 
-const MOCK_STATE: State = ({ mockState: true } as any)
+const MOCK_STATE: State = { mockState: true } as any
 const MOCK_ROBOT_NAME = 'robot-name'
 
 describe('ViewUpdateModal', () => {
@@ -24,8 +30,12 @@ describe('ViewUpdateModal', () => {
   const handleProceed = jest.fn()
 
   const render = (
-    robotUpdateType: React.ComponentProps<typeof ViewUpdateModal>['robotUpdateType'] = Buildroot.UPGRADE,
-    robotSystemType: React.ComponentProps<typeof ViewUpdateModal>['robotSystemType']= Buildroot.BUILDROOT
+    robotUpdateType: React.ComponentProps<
+      typeof ViewUpdateModal
+    >['robotUpdateType'] = Buildroot.UPGRADE,
+    robotSystemType: React.ComponentProps<
+      typeof ViewUpdateModal
+    >['robotSystemType'] = Buildroot.BUILDROOT
   ) => {
     return mountWithStore<React.ComponentProps<typeof ViewUpdateModal>>(
       <ViewUpdateModal

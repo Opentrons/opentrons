@@ -32,7 +32,7 @@ const HIDDEN_CSS = css`
 `
 
 export interface UpdateFromFileControlProps {
-  robotName: string,
+  robotName: string
 }
 
 export function UpdateFromFileControl(
@@ -47,7 +47,7 @@ export function UpdateFromFileControl(
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateBtnProps, updateBtnTooltipProps] = useHoverTooltip()
 
-  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     const { files } = event.target
     if (files?.length === 1 && !updateDisabled) {
       // NOTE: File.path is Electron-specific

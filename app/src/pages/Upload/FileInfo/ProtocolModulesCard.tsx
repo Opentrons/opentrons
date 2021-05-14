@@ -33,13 +33,12 @@ export function ProtocolModulesCard(): JSX.Element | null {
 
   if (modules.length < 1) return null
 
-  const moduleDetails: { [model in ModuleModel]?: number } = modules.reduce<{ [model in ModuleModel]?: number }>(
-    (total, module: SessionModule) => {
-      total[module.model] = (total[module.model] || 0) + 1
-      return total
-    },
-    {}
-  )
+  const moduleDetails: { [model in ModuleModel]?: number } = modules.reduce<
+    { [model in ModuleModel]?: number }
+  >((total, module: SessionModule) => {
+    total[module.model] = (total[module.model] || 0) + 1
+    return total
+  }, {})
   const modulesInfo = Object.keys(moduleDetails).map(k => {
     return { model: k as ModuleModel, counts: moduleDetails[k as ModuleModel] }
   })

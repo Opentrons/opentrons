@@ -19,10 +19,16 @@ jest.mock('@opentrons/components/src/deck/RobotWorkSpace', () => ({
   RobotWorkSpace: () => <></>,
 }))
 
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<typeof getDeckDefinitions>
+const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
+  typeof getDeckDefinitions
+>
 
 describe('DeckSetup', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof DeckSetup> & { pipMount: Mount }>) => ReactWrapper<React.ComponentProps<typeof DeckSetup>>
+  let render: (
+    props?: Partial<
+      React.ComponentProps<typeof DeckSetup> & { pipMount: Mount }
+    >
+  ) => ReactWrapper<React.ComponentProps<typeof DeckSetup>>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()

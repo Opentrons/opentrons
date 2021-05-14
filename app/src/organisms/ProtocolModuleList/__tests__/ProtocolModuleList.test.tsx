@@ -14,11 +14,19 @@ import { MatchedModule } from '../../../redux/modules/types'
 jest.mock('../../../redux/robot/selectors')
 jest.mock('../../../redux/modules/selectors')
 
-const mockGetModules = robotSelectors.getModules as jest.MockedFunction<typeof robotSelectors.getModules>
+const mockGetModules = robotSelectors.getModules as jest.MockedFunction<
+  typeof robotSelectors.getModules
+>
 
-const mockGetMatchedModules = moduleSelectors.getMatchedModules as jest.MockedFunction<typeof moduleSelectors.getMatchedModules>
-const mockGetModulesByModel = robotSelectors.getModulesByModel as  jest.MockedFunction<typeof robotSelectors.getModulesByModel>
-const mockGetModulesByProtocolLoadOrder = robotSelectors.getModulesByProtocolLoadOrder as  jest.MockedFunction<typeof robotSelectors.getModulesByProtocolLoadOrder>
+const mockGetMatchedModules = moduleSelectors.getMatchedModules as jest.MockedFunction<
+  typeof moduleSelectors.getMatchedModules
+>
+const mockGetModulesByModel = robotSelectors.getModulesByModel as jest.MockedFunction<
+  typeof robotSelectors.getModulesByModel
+>
+const mockGetModulesByProtocolLoadOrder = robotSelectors.getModulesByProtocolLoadOrder as jest.MockedFunction<
+  typeof robotSelectors.getModulesByProtocolLoadOrder
+>
 
 type MockedModuleType = Pick<ApiSessionModule, 'model' | 'slot' | '_id'>
 

@@ -49,7 +49,9 @@ export function ChosenTipRackRender(
   props: ChosenTipRackRenderProps
 ): JSX.Element {
   const { showCalibrationText, selectedValue, tipRackByUriMap } = props
-  const loadName: keyof typeof labwareImages = selectedValue.value.split('/')[1] as any
+  const loadName: keyof typeof labwareImages = selectedValue.value.split(
+    '/'
+  )[1] as any
   const displayName = selectedValue.label
   const calibrationData = tipRackByUriMap[selectedValue.value]?.calibration
 

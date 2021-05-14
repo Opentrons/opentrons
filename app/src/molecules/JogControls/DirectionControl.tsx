@@ -17,19 +17,19 @@ import type { Jog, Plane, Sign, Bearing } from './types'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 
 interface Control {
-  bearing: Bearing,
-  keyName: string,
-  shiftKey: boolean,
-  gridRow: number,
-  gridColumn: number,
-  iconName: IconName,
-  axis: 'x' | 'y' | 'z',
-  sign: Sign,
+  bearing: Bearing
+  keyName: string
+  shiftKey: boolean
+  gridRow: number
+  gridColumn: number
+  iconName: IconName
+  axis: 'x' | 'y' | 'z'
+  sign: Sign
 }
 interface ControlsContents {
-  controls: Control[],
-  title: string,
-  subtitle: string,
+  controls: Control[]
+  title: string
+  subtitle: string
 }
 
 const CONTROLS_CONTENTS_BY_PLANE: { [plane in Plane]: ControlsContents } = {
@@ -108,9 +108,9 @@ const CONTROLS_CONTENTS_BY_PLANE: { [plane in Plane]: ControlsContents } = {
 }
 
 interface DirectionControlProps {
-  plane: Plane,
-  jog: Jog,
-  stepSize: number,
+  plane: Plane
+  jog: Jog
+  stepSize: number
 }
 
 export function DirectionControl(props: DirectionControlProps): JSX.Element {

@@ -29,10 +29,13 @@ const TITLE = 'Connected Modules'
 const POLL_MODULE_INTERVAL_MS = 5000
 
 interface ModulesListByPort {
-  [port: string]: AttachedModule[],
+  [port: string]: AttachedModule[]
 }
 
-const moduleListWithUSBInfo = (modulesByPort: ModulesListByPort, controlDisabledReason: string | null): JSX.Element[] => {
+const moduleListWithUSBInfo = (
+  modulesByPort: ModulesListByPort,
+  controlDisabledReason: string | null
+): JSX.Element[] => {
   return Object.keys(modulesByPort).map(port =>
     modulesByPort[port].length > 1 ? (
       <UsbHubItem
@@ -51,7 +54,10 @@ const moduleListWithUSBInfo = (modulesByPort: ModulesListByPort, controlDisabled
   )
 }
 
-const legacyModuleList = (modules: AttachedModule[], controlDisabledReason: string | null): JSX.Element[] => {
+const legacyModuleList = (
+  modules: AttachedModule[],
+  controlDisabledReason: string | null
+): JSX.Element[] => {
   return modules.map(mod => (
     <ModuleItem
       key={mod.serial}
@@ -61,7 +67,9 @@ const legacyModuleList = (modules: AttachedModule[], controlDisabledReason: stri
   ))
 }
 
-interface Props { robotName: string }
+interface Props {
+  robotName: string
+}
 
 export function AttachedModulesCard(props: Props): JSX.Element {
   const { robotName } = props
@@ -73,14 +81,17 @@ export function AttachedModulesCard(props: Props): JSX.Element {
   const controlDisabledReason = useSelector((state: State) =>
     getModuleControlsDisabled(state, robotName)
   )
-  const modulesByPort = modules.reduce<{[port: number]: AttachedModule[]}>((portMap, module) => {
-    const port = module.usbPort.hub || module.usbPort.port
-    if (port !== null) {
-      const portContents = portMap[port] ?? []
-      portMap[port] = [...portContents, module]
-    }
-    return portMap
-  }, {})
+  const modulesByPort = modules.reduce<{ [port: number]: AttachedModule[] }>(
+    (portMap, module) => {
+      const port = module.usbPort.hub || module.usbPort.port
+      if (port !== null) {
+        const portContents = portMap[port] ?? []
+        portMap[port] = [...portContents, module]
+      }
+      return portMap
+    },
+    {}
+  )
 
   const modulesList = isEmpty(modulesByPort)
     ? legacyModuleList(modules, controlDisabledReason)

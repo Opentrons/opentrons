@@ -18,7 +18,13 @@ describe("SelectNetwork's ResultModal", () => {
   })
 
   describe('pending', () => {
-    const render: (type: ResultModalProps['type'], ssid?: ResultModalProps['ssid']) => ShallowWrapper<React.ComponentProps<typeof ResultModal>> = (type, ssid = mockSsid) => {
+    const render: (
+      type: ResultModalProps['type'],
+      ssid?: ResultModalProps['ssid']
+    ) => ShallowWrapper<React.ComponentProps<typeof ResultModal>> = (
+      type,
+      ssid = mockSsid
+    ) => {
       return shallow(
         <ResultModal
           {...{
@@ -80,7 +86,13 @@ describe("SelectNetwork's ResultModal", () => {
   })
 
   describe('success', () => {
-    const render: (type: ResultModalProps['type'], ssid?: ResultModalProps['ssid']) => ShallowWrapper<React.ComponentProps<typeof ResultModal>> = (type, ssid = mockSsid) => {
+    const render: (
+      type: ResultModalProps['type'],
+      ssid?: ResultModalProps['ssid']
+    ) => ShallowWrapper<React.ComponentProps<typeof ResultModal>> = (
+      type,
+      ssid = mockSsid
+    ) => {
       return shallow(
         <ResultModal
           {...{
@@ -163,7 +175,13 @@ describe("SelectNetwork's ResultModal", () => {
 
   describe('failure', () => {
     const error = { message: 'oh no!' }
-    const render: (type: ResultModalProps['type'], ssid?: ResultModalProps['ssid']) => ShallowWrapper<React.ComponentProps<typeof ResultModal>> = (type, ssid = mockSsid) => {
+    const render: (
+      type: ResultModalProps['type'],
+      ssid?: ResultModalProps['ssid']
+    ) => ShallowWrapper<React.ComponentProps<typeof ResultModal>> = (
+      type,
+      ssid = mockSsid
+    ) => {
       return shallow(
         <ResultModal
           {...{

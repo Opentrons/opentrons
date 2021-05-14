@@ -93,9 +93,7 @@ export function AppAdvancedSettingsCard(): JSX.Element {
             // the elements of BlockSelection; i know this is a limited-selection
             // field whose values are only the elements of BlockSelection; but sadly,
             // neither of us can get Flow to know it
-            handleUseTrashSelection(
-              (event.currentTarget.value as BlockSelection)
-            )
+            handleUseTrashSelection(event.currentTarget.value as BlockSelection)
           }}
           options={[
             { name: ALWAYS_USE_BLOCK_LABEL, value: ALWAYS_BLOCK },

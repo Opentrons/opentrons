@@ -15,7 +15,9 @@ const mockState = { state: true, mock: true }
 const mockRobotName = 'robot-name' as any
 const mockFile = new File(['key-contents'], 'key.crt')
 
-const mockGetWifiKeyByRequestId = Networking.getWifiKeyByRequestId as jest.MockedFunction<typeof Networking.getWifiKeyByRequestId>
+const mockGetWifiKeyByRequestId = Networking.getWifiKeyByRequestId as jest.MockedFunction<
+  typeof Networking.getWifiKeyByRequestId
+>
 
 describe('ConnectForm UploadKey input field', () => {
   const handleUpload = jest.fn()

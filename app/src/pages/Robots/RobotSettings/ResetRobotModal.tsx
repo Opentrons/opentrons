@@ -36,8 +36,8 @@ import type { State, Dispatch } from '../../../redux/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
 
 export interface ResetRobotModalProps {
-  robotName: string,
-  closeModal: () => unknown,
+  robotName: string
+  closeModal: () => unknown
 }
 
 // TODO(bc, 2020-12-07): i18n

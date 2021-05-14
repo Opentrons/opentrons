@@ -1,4 +1,3 @@
-
 import * as IntercomBinding from '../intercom-binding'
 import * as Constants from '../constants'
 

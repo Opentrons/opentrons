@@ -7,7 +7,9 @@ import { TipLengthCalibrationData } from '../TipLengthCalibrationData'
 import type { WrapperWithStore } from '@opentrons/components/__utils__'
 
 describe('TipLengthCalibrationData', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof TipLengthCalibrationData>>) => WrapperWithStore<React.ComponentProps<typeof TipLengthCalibrationData>>
+  let render: (
+    props?: Partial<React.ComponentProps<typeof TipLengthCalibrationData>>
+  ) => WrapperWithStore<React.ComponentProps<typeof TipLengthCalibrationData>>
 
   beforeEach(() => {
     render = (props = {}) => {

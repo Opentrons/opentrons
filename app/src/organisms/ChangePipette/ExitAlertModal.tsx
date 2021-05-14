@@ -4,8 +4,8 @@ import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 
 interface Props {
-  back: () => unknown,
-  exit: () => unknown,
+  back: () => unknown
+  exit: () => unknown
 }
 
 // TODO(mc, 2019-12-18): i18n

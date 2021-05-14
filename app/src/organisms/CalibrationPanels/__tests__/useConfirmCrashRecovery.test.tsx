@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { mount } from 'enzyme'
 
@@ -16,18 +15,25 @@ describe('useConfirmCrashRecovery', () => {
   const mockSendCommands = jest.fn()
   const mockTipRack: Partial<CalibrationLabware> = {
     slot: '4',
-    definition: ({
-      metadata: ({
+    definition: {
+      metadata: {
         displayName: 'my tiprack',
-      } as LabwareMetadata),
-    } as LabwareDefinition2),
+      } as LabwareMetadata,
+    } as LabwareDefinition2,
   }
 
-  const getStarterLink = (wrapper: ReactWrapper<Props>): ReactWrapper<HTMLAttributes> => wrapper.find('a')
-  const getModal = (wrapper: ReactWrapper<Props>): ReactWrapper => wrapper.find('ConfirmCrashRecoveryModal')
-  const getExitButton = (wrapper: ReactWrapper<Props>): ReactWrapper<HTMLAttributes> =>
+  const getStarterLink = (
+    wrapper: ReactWrapper<Props>
+  ): ReactWrapper<HTMLAttributes> => wrapper.find('a')
+  const getModal = (wrapper: ReactWrapper<Props>): ReactWrapper =>
+    wrapper.find('ConfirmCrashRecoveryModal')
+  const getExitButton = (
+    wrapper: ReactWrapper<Props>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find('OutlineButton[children="cancel"]')
-  const getRestartButton = (wrapper: ReactWrapper<Props>): ReactWrapper<HTMLAttributes> => wrapper.find('OutlineButton').at(1)
+  const getRestartButton = (
+    wrapper: ReactWrapper<Props>
+  ): ReactWrapper<HTMLAttributes> => wrapper.find('OutlineButton').at(1)
 
   const TestUseConfirmCrashRecovery = (props: Partial<Props>): JSX.Element => {
     const {

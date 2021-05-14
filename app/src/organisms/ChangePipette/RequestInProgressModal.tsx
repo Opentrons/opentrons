@@ -16,11 +16,11 @@ const UP = 'up'
 const ROBOT_IS_HOMING = 'Robot is homing'
 
 type Props = {
-  title: string,
-  subtitle: string,
-  mount: Mount,
-  movementStatus: MovementStatus,
-  isPipetteHoming: boolean,
+  title: string
+  subtitle: string
+  mount: Mount
+  movementStatus: MovementStatus
+  isPipetteHoming: boolean
 }
 
 export function RequestInProgressModal(props: Props): JSX.Element {

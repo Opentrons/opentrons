@@ -8,12 +8,12 @@ import type { ButtonProps } from '@opentrons/components'
 import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
 
 export interface MigrationWarningModalProps {
-  notNowButton: ButtonProps,
-  updateType: BuildrootUpdateType | null,
-  proceed: () => unknown,
+  notNowButton: ButtonProps
+  updateType: BuildrootUpdateType | null
+  proceed: () => unknown
 }
 
-type MaybeButtonProps = ButtonProps | null| undefined
+type MaybeButtonProps = ButtonProps | null | undefined
 
 const HEADING = 'Robot Operating System Update Available'
 

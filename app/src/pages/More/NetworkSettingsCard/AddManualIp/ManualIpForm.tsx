@@ -10,10 +10,13 @@ import type { MapDispatchToProps } from 'react-redux'
 import type { State } from '../../../../redux/types'
 import type { DiscoveryCandidates } from '../../../../redux/config/types'
 
+interface SP {
+  candidates: DiscoveryCandidates
+}
 
-interface SP { candidates: DiscoveryCandidates }
-
-interface DP { addManualIp: (ip: string) => unknown}
+interface DP {
+  addManualIp: (ip: string) => unknown
+}
 
 type Props = SP & DP
 
@@ -57,7 +60,7 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-const mapDispatchToProps: MapDispatchToProps<DP, {}> = (dispatch) => {
+const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
   return {
     addManualIp: ip => {
       dispatch(addManualIp(ip))
@@ -66,4 +69,7 @@ const mapDispatchToProps: MapDispatchToProps<DP, {}> = (dispatch) => {
   }
 }
 
-export const ManualIpForm = connect(mapStateToProps, mapDispatchToProps)(ManualIpFormComponent)
+export const ManualIpForm = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ManualIpFormComponent)

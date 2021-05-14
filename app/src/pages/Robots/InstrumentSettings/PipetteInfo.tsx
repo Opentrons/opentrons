@@ -34,12 +34,12 @@ import type { State } from '../../../redux/types'
 import type { Mount, AttachedPipette } from '../../../redux/pipettes/types'
 
 export interface PipetteInfoProps {
-  robotName: string,
-  mount: Mount,
-  pipette: AttachedPipette | null,
-  changeUrl: string,
-  settingsUrl: string | null,
-  isChangingOrConfiguringPipette: boolean,
+  robotName: string
+  mount: Mount
+  pipette: AttachedPipette | null
+  changeUrl: string
+  settingsUrl: string | null
+  isChangingOrConfiguringPipette: boolean
 }
 
 const MOUNT = 'mount'

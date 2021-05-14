@@ -64,7 +64,9 @@ describe('AddLabwareFailureModal', () => {
   })
 
   describe('invalid files', () => {
-    const render = (file: React.ComponentProps<typeof AddLabwareFailureModalTemplate>['file']) => {
+    const render = (
+      file: React.ComponentProps<typeof AddLabwareFailureModalTemplate>['file']
+    ) => {
       return mount(
         <AddLabwareFailureModalTemplate {...emptyProps} file={file} />
       )

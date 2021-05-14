@@ -23,8 +23,8 @@ const PLEASE_ADD_CUSTOM_LABWARE =
   'Please add custom labware via the Labware Management options above'
 
 export interface LabwareListProps {
-  labware: CheckedLabwareFile[],
-  errorMessage: string | null,
+  labware: CheckedLabwareFile[]
+  errorMessage: string | null
 }
 
 export function LabwareList(props: LabwareListProps): JSX.Element {

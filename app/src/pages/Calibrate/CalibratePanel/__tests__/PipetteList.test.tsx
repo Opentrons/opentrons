@@ -10,9 +10,7 @@ import * as calibrateSelectors from '../../../../redux/nav/calibrate-selectors'
 import type { BaseProtocolLabware } from '../../../../redux/calibration/types'
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { fetchTipLengthCalibrations } from '../../../../redux/calibration/'
-import {
-  PipetteListComponent,
-} from '../PipetteList'
+import { PipetteListComponent } from '../PipetteList'
 
 import type { PipetteListComponentProps } from '../PipetteList'
 
@@ -20,13 +18,17 @@ jest.mock('../../../../redux/robot/selectors')
 jest.mock('../../../../redux/nav/calibrate-selectors')
 jest.mock('../../../../redux/pipettes/selectors')
 
-const mockGetProtocolPipettes
-  = robotSelectors.getPipettes as jest.MockedFunction<typeof robotSelectors.getPipettes>
+const mockGetProtocolPipettes = robotSelectors.getPipettes as jest.MockedFunction<
+  typeof robotSelectors.getPipettes
+>
 
-const mockGetCalibratePipetteLocations
-  = calibrateSelectors.getCalibratePipettesLocations as jest.MockedFunction<typeof calibrateSelectors.getCalibratePipettesLocations>
+const mockGetCalibratePipetteLocations = calibrateSelectors.getCalibratePipettesLocations as jest.MockedFunction<
+  typeof calibrateSelectors.getCalibratePipettesLocations
+>
 
-const mockGetAttachedPipettes = PipettesSelectors.getAttachedPipettes as jest.MockedFunction<typeof PipettesSelectors.getAttachedPipettes>
+const mockGetAttachedPipettes = PipettesSelectors.getAttachedPipettes as jest.MockedFunction<
+  typeof PipettesSelectors.getAttachedPipettes
+>
 
 const mockLeftSpecs: any = {
   displayName: 'Left Pipette',
@@ -41,7 +43,7 @@ const mockLeftProtoPipette: any = {
 }
 
 const stubTipRacks: BaseProtocolLabware[] = [
-  ({
+  {
     type: 'some_tiprack',
     definition: tiprack300Def,
     slot: '3',
@@ -51,8 +53,8 @@ const stubTipRacks: BaseProtocolLabware[] = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  } as any),
-  ({
+  } as any,
+  {
     type: 'some_other_tiprack',
     definition: null,
     slot: '1',
@@ -62,7 +64,7 @@ const stubTipRacks: BaseProtocolLabware[] = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  } as any),
+  } as any,
 ]
 
 const mockPipetteLocations = {
@@ -96,13 +98,18 @@ const mockPipetteLocations = {
   },
 }
 
-const mockAttachedPipettes: ReturnType<typeof PipettesSelectors.getAttachedPipettes> = {
+const mockAttachedPipettes: ReturnType<
+  typeof PipettesSelectors.getAttachedPipettes
+> = {
   left: { model: 'p300_single_v2.0' },
   right: null,
 } as any
 
 describe('PipetteListComponent', () => {
-  let render: (props: PipetteListComponentProps, location?: string | undefined) => ReturnType<typeof mountWithProviders>
+  let render: (
+    props: PipetteListComponentProps,
+    location?: string | undefined
+  ) => ReturnType<typeof mountWithProviders>
 
   beforeEach(() => {
     mockGetProtocolPipettes.mockReturnValue([mockLeftProtoPipette])

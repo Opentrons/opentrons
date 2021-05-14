@@ -5,7 +5,7 @@ import styles from './upload-panel.css'
 
 export interface UploadInputProps {
   onUpload: React.FormEventHandler | React.DragEventHandler
-  isButton?: boolean,
+  isButton?: boolean
 }
 
 export function UploadInput(props: UploadInputProps): JSX.Element {

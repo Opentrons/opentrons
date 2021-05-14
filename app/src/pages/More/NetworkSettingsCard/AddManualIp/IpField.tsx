@@ -3,9 +3,9 @@ import { IconButton } from '@opentrons/components'
 import styles from './styles.css'
 
 export interface IpFieldProps {
-  field: any,
-  form: any,
-  inputRef: { current: null | HTMLInputElement },
+  field: any
+  form: any
+  inputRef: { current: null | HTMLInputElement }
 }
 
 export function IpField(props: IpFieldProps): JSX.Element {

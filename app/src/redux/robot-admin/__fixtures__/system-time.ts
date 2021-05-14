@@ -15,17 +15,16 @@ export const {
   failureMeta: mockFetchSystemTimeFailureMeta,
   success: mockFetchSystemTimeSuccess,
   failure: mockFetchSystemTimeFailure,
-}: ResponseFixtures<
-  SystemTimeData,
-  { message: string }
-> = makeResponseFixtures({
-  method: GET,
-  path: SYSTEM_TIME_PATH,
-  successStatus: 200,
-  successBody: {
-    id: 'time',
-    systemTime: mockSystemTime,
-  },
-  failureStatus: 500,
-  failureBody: mockFailureBody,
-})
+}: ResponseFixtures<SystemTimeData, { message: string }> = makeResponseFixtures(
+  {
+    method: GET,
+    path: SYSTEM_TIME_PATH,
+    successStatus: 200,
+    successBody: {
+      id: 'time',
+      systemTime: mockSystemTime,
+    },
+    failureStatus: 500,
+    failureBody: mockFailureBody,
+  }
+)

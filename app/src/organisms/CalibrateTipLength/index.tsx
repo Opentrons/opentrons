@@ -34,7 +34,7 @@ import type { StyleProps, Mount } from '@opentrons/components'
 import type {
   SessionCommandParams,
   CalibrationLabware,
-  CalibrationSessionStep
+  CalibrationSessionStep,
 } from '../../redux/sessions/types'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { CalibrateTipLengthParentProps } from './types'

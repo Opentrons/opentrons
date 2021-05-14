@@ -23,31 +23,39 @@ jest.mock('../../../redux/pipettes/selectors')
 jest.mock('../../../redux/calibration/')
 jest.mock('../../../redux/custom-labware/selectors')
 
-const mockAttachedPipettes: AttachedPipettesByMount = ({
+const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
   right: null,
-} as any)
+} as any
 
-const mockGetCalibrationForPipette
-= getCalibrationForPipette as jest.MockedFunction<typeof getCalibrationForPipette>
+const mockGetCalibrationForPipette = getCalibrationForPipette as jest.MockedFunction<
+  typeof getCalibrationForPipette
+>
 
-const mockGetTipLengthForPipetteAndTiprack
-= getTipLengthForPipetteAndTiprack as jest.MockedFunction<typeof getTipLengthForPipetteAndTiprack>
+const mockGetTipLengthForPipetteAndTiprack = getTipLengthForPipetteAndTiprack as jest.MockedFunction<
+  typeof getTipLengthForPipetteAndTiprack
+>
 
-const mockGetTipLengthCalibrations
-= getTipLengthCalibrations as jest.MockedFunction<typeof getTipLengthCalibrations>
+const mockGetTipLengthCalibrations = getTipLengthCalibrations as jest.MockedFunction<
+  typeof getTipLengthCalibrations
+>
 
-const mockGetAttachedPipettes
-= getAttachedPipettes as jest.MockedFunction<typeof getAttachedPipettes>
+const mockGetAttachedPipettes = getAttachedPipettes as jest.MockedFunction<
+  typeof getAttachedPipettes
+>
 
-const mockGetCustomTipRackDefinitions
-= getCustomTipRackDefinitions as jest.MockedFunction<typeof getCustomTipRackDefinitions>
+const mockGetCustomTipRackDefinitions = getCustomTipRackDefinitions as jest.MockedFunction<
+  typeof getCustomTipRackDefinitions
+>
 
 describe('ChooseTipRack', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof ChooseTipRack>>) => WrapperWithStore<React.ComponentProps<typeof ChooseTipRack>>
+  let render: (
+    props?: Partial<React.ComponentProps<typeof ChooseTipRack>>
+  ) => WrapperWithStore<React.ComponentProps<typeof ChooseTipRack>>
 
-  const getUseThisTipRackButton = (wrapper: ReactWrapper<React.ComponentProps<typeof ChooseTipRack>>): ReactWrapper =>
-    wrapper.find('button[data-test="useThisTipRackButton"]')
+  const getUseThisTipRackButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ChooseTipRack>>
+  ): ReactWrapper => wrapper.find('button[data-test="useThisTipRackButton"]')
 
   beforeEach(() => {
     mockGetCalibrationForPipette.mockReturnValue(null)

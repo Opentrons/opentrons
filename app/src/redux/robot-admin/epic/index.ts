@@ -1,4 +1,3 @@
-
 import { combineEpics } from 'redux-observable'
 
 import { restartEpic, startDiscoveryOnRestartEpic } from './restartEpic'

@@ -9,17 +9,19 @@ import { ConfigurePipette } from '../../../organisms/ConfigurePipette'
 import { Page } from '../../../atoms/Page'
 
 export interface InstrumentSettingsProps {
-  robotName: string,
-  robotDisplayName: string,
-  url: string,
-  path: string,
-  pathname: string,
+  robotName: string
+  robotDisplayName: string
+  url: string
+  path: string
+  pathname: string
 }
 
 // used to guarantee mount param in route is left or right
 const RE_MOUNT = `(${LEFT}|${RIGHT})`
 
-export function InstrumentSettings(props: InstrumentSettingsProps): JSX.Element {
+export function InstrumentSettings(
+  props: InstrumentSettingsProps
+): JSX.Element {
   const { robotName, robotDisplayName, url, path, pathname } = props
   const titleBarProps = { title: robotDisplayName }
 
@@ -43,7 +45,7 @@ export function InstrumentSettings(props: InstrumentSettingsProps): JSX.Element 
           render={routeProps => (
             <ChangePipette
               robotName={robotName}
-              mount={(routeProps.match.params.mount)}
+              mount={routeProps.match.params.mount}
               closeModal={routeProps.history.goBack}
             />
           )}
@@ -53,7 +55,7 @@ export function InstrumentSettings(props: InstrumentSettingsProps): JSX.Element 
           render={routeProps => (
             <ConfigurePipette
               robotName={robotName}
-              mount={(routeProps.match.params.mount)}
+              mount={routeProps.match.params.mount}
               closeModal={routeProps.history.goBack}
             />
           )}

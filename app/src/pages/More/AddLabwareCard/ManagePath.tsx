@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 
 import { LabeledButton, InputField } from '@opentrons/components'
@@ -18,10 +17,10 @@ export const CHANGE_SOURCE_NAME = 'change-source'
 export const RESET_SOURCE_NAME = 'reset-source'
 
 export interface ManagePathProps {
-  path: string,
-  onChangePath: () => unknown,
-  onResetPath: () => unknown,
-  onOpenPath: () => unknown,
+  path: string
+  onChangePath: () => unknown
+  onResetPath: () => unknown
+  onOpenPath: () => unknown
 }
 
 const handleFocus = (e: React.FocusEvent<HTMLInputElement>): void => {

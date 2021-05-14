@@ -11,13 +11,21 @@ import { InProgressContents } from './InProgressContents'
 import type { State } from '../../../redux/types'
 import type { Pipette, Labware } from '../../../redux/robot/types'
 
-interface OP { labware: Labware, calibrateToBottom: boolean }
+interface OP {
+  labware: Labware
+  calibrateToBottom: boolean
+}
 
-interface SP { calibrator: Pipette | null | undefined, useCenteredTroughs: boolean }
+interface SP {
+  calibrator: Pipette | null | undefined
+  useCenteredTroughs: boolean
+}
 
 type Props = OP & SP
 
-export const ConfirmModalContents = connect(mapStateToProps)(ConfirmModalContentsComponent)
+export const ConfirmModalContents = connect(mapStateToProps)(
+  ConfirmModalContentsComponent
+)
 
 function ConfirmModalContentsComponent(props: Props): JSX.Element | null {
   const { labware, calibrator, calibrateToBottom, useCenteredTroughs } = props

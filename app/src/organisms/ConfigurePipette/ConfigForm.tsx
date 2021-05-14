@@ -33,10 +33,10 @@ export interface DisplayFieldProps extends PipetteSettingsField {
 }
 
 export type DisplayQuirkFieldProps = {
-  name: string,
-  displayName: string,
+  name: string
+  displayName: string
 } & {
-  [quirkId: string]: boolean,
+  [quirkId: string]: boolean
 }
 
 export interface ConfigFormProps {
@@ -164,7 +164,10 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
 
   getInitialValues: () => FormValues = () => {
     const fields = this.getVisibleFields()
-    const initialFieldValues = mapValues<PipetteSettingsFieldsMap, string | boolean>(fields, f => {
+    const initialFieldValues = mapValues<
+      PipetteSettingsFieldsMap,
+      string | boolean
+    >(fields, f => {
       // @ts-expect-error TODO: PipetteSettingsFieldsMap doesn't include a boolean value, despite checking for it here
       if (f.value === true || f.value === false) return f.value
       return f.value !== f.default ? f.value?.toString() : ''

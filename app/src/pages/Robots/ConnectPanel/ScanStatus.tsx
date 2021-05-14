@@ -5,9 +5,9 @@ import { ScanButton } from './ScanButton'
 import styles from './styles.css'
 
 export interface ScanStatusProps {
-  onScanClick: () => unknown,
-  isScanning: boolean,
-  found: boolean,
+  onScanClick: () => unknown
+  isScanning: boolean
+  found: boolean
 }
 
 export function ScanStatus(props: ScanStatusProps): JSX.Element {

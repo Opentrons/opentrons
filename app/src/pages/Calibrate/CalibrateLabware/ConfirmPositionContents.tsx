@@ -13,19 +13,18 @@ import type { MapDispatchToProps } from 'react-redux'
 import type { Jog } from '../../../molecules/JogControls'
 
 interface OP {
-  labware: Labware,
-  calibrator: Pipette,
-  calibrateToBottom: boolean,
-  useCenteredTroughs: boolean,
+  labware: Labware
+  calibrator: Pipette
+  calibrateToBottom: boolean
+  useCenteredTroughs: boolean
 }
 
 interface DP {
-  onConfirmClick: () => unknown,
-  jog: Jog,
+  onConfirmClick: () => unknown
+  jog: Jog
 }
 
 type Props = OP & DP
-
 
 function ConfirmPositionContentsComponent(props: Props): JSX.Element {
   const {
@@ -71,4 +70,7 @@ const mapDispatchToProps: MapDispatchToProps<DP, OP> = (dispatch, ownProps) => {
   }
 }
 
-export const ConfirmPositionContents = connect(null, mapDispatchToProps)(ConfirmPositionContentsComponent)
+export const ConfirmPositionContents = connect(
+  null,
+  mapDispatchToProps
+)(ConfirmPositionContentsComponent)

@@ -29,17 +29,21 @@ jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 
 interface CalibrateDeckSpec {
-  component: React.ReactNode,
-  childProps?: {},
-  currentStep: DeckCalibrationStep,
-  [key: string] : unknown
+  component: React.ReactNode
+  childProps?: {}
+  currentStep: DeckCalibrationStep
+  [key: string]: unknown
 }
 
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<typeof getDeckDefinitions>
+const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
+  typeof getDeckDefinitions
+>
 
 describe('CalibrateDeck', () => {
   let mockStore: any
-  let render: (props?: Partial<React.ComponentProps<typeof CalibrateDeck>>) => ReactWrapper<React.ComponentProps<typeof CalibrateDeck>>
+  let render: (
+    props?: Partial<React.ComponentProps<typeof CalibrateDeck>>
+  ) => ReactWrapper<React.ComponentProps<typeof CalibrateDeck>>
   let dispatch: Dispatch
   let dispatchRequests: DispatchRequestsType
   let mockDeckCalSession: Sessions.DeckCalibrationSession = {
@@ -47,7 +51,9 @@ describe('CalibrateDeck', () => {
     ...mockDeckCalibrationSessionAttributes,
   }
 
-  const getExitButton = (wrapper: ReactWrapper<React.ComponentProps<typeof CalibrateDeck>>): ReactWrapper<HTMLAttributes> =>
+  const getExitButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof CalibrateDeck>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find({ title: 'exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [
@@ -140,7 +146,9 @@ describe('CalibrateDeck', () => {
     const wrapper = render()
 
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
-    act((): void => getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent))
+    act((): void =>
+      getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+    )
     wrapper.update()
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
@@ -164,7 +172,9 @@ describe('CalibrateDeck', () => {
       },
     }
     const wrapper = render({ isJogging: false, session })
-    wrapper.find('button[title="forward"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,
@@ -183,7 +193,9 @@ describe('CalibrateDeck', () => {
       },
     }
     const wrapper = render({ isJogging: true, session })
-    wrapper.find('button[title="forward"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).not.toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,

@@ -8,7 +8,7 @@ import { PIPETTE_MOUNTS } from '../../../redux/pipettes'
 import { PageTabs } from '@opentrons/components'
 
 export interface PipetteTabsProps {
-  currentMount: string | null | undefined,
+  currentMount: string | null | undefined
 }
 
 export function PipetteTabs(props: PipetteTabsProps): JSX.Element {

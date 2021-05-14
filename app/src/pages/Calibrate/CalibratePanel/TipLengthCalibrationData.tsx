@@ -10,8 +10,8 @@ import {
 import type { TipLengthCalibration } from '../../../redux/calibration/api-types'
 
 export interface TipLengthCalibrationDataProps {
-  calibrationData: TipLengthCalibration | null,
-  calDataAvailable: boolean,
+  calibrationData: TipLengthCalibration | null
+  calDataAvailable: boolean
 }
 
 export function TipLengthCalibrationData(

@@ -4,7 +4,9 @@ import { css } from 'styled-components'
 import { Flex, ALIGN_CENTER, SIZE_4 } from '@opentrons/components'
 import type { ModuleModel } from '@opentrons/shared-data'
 
-interface Props { model: ModuleModel }
+interface Props {
+  model: ModuleModel
+}
 
 export function ModuleImage(props: Props): JSX.Element {
   const imgSrc = getModuleImg(props.model)

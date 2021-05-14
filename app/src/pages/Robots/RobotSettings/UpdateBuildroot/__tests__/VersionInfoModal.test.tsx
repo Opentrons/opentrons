@@ -21,14 +21,24 @@ jest.mock('../../../../../organisms/UpdateAppModal', () => ({
 
 const MOCK_STATE: State = {} as any
 
-const getAvailableShellUpdate = Shell.getAvailableShellUpdate as jest.MockedFunction<typeof Shell.getAvailableShellUpdate>
+const getAvailableShellUpdate = Shell.getAvailableShellUpdate as jest.MockedFunction<
+  typeof Shell.getAvailableShellUpdate
+>
 
 describe('VersionInfoModal', () => {
   const handleClose = jest.fn()
   const handleProceed = jest.fn()
 
-  const render = (robotUpdateType: React.ComponentProps<typeof VersionInfoModal>['robotUpdateType'] = UPGRADE) => {
-    return mountWithStore<React.ComponentProps<typeof VersionInfoModal>, State, Action>(
+  const render = (
+    robotUpdateType: React.ComponentProps<
+      typeof VersionInfoModal
+    >['robotUpdateType'] = UPGRADE
+  ) => {
+    return mountWithStore<
+      React.ComponentProps<typeof VersionInfoModal>,
+      State,
+      Action
+    >(
       <VersionInfoModal
         robot={mockReachableRobot}
         robotUpdateType={robotUpdateType}

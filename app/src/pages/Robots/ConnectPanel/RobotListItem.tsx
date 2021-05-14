@@ -7,14 +7,14 @@ import { RobotLink } from './RobotLink'
 import styles from './styles.css'
 
 export interface RobotListItemProps {
-  name: string,
-  displayName: string,
-  isConnectable: boolean,
-  isUpgradable: boolean,
-  isSelected: boolean,
-  isLocal: boolean,
-  isConnected: boolean,
-  onToggleConnect: () => unknown,
+  name: string
+  displayName: string
+  isConnectable: boolean
+  isUpgradable: boolean
+  isSelected: boolean
+  isLocal: boolean
+  isConnected: boolean
+  onToggleConnect: () => unknown
 }
 
 export function RobotListItem(props: RobotListItemProps): JSX.Element {

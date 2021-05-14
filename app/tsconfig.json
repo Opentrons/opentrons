@@ -12,7 +12,7 @@
     },
     {
       "path": "../shared-data"
-    },
+    }
   ],
   "compilerOptions": {
     "composite": true,

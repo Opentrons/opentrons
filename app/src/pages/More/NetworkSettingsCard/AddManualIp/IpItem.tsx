@@ -5,9 +5,9 @@ import styles from './styles.css'
 import type { IconName } from '@opentrons/components'
 
 export interface IpItemProps {
-  candidate: string,
-  discovered: boolean,
-  removeIp: (ip: string) => unknown,
+  candidate: string
+  discovered: boolean
+  removeIp: (ip: string) => unknown
 }
 
 export class IpItem extends React.Component<IpItemProps> {
@@ -30,7 +30,7 @@ export class IpItem extends React.Component<IpItemProps> {
 }
 
 interface DiscoveryIconProps {
-  iconName: IconName,
+  iconName: IconName
 }
 
 function DiscoveryIcon(props: DiscoveryIconProps): JSX.Element {

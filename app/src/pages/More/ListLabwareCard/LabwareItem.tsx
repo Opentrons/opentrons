@@ -30,7 +30,7 @@ const THIS_FILE_CONFLICTS_WITH_AN_OPENTRONS_DEFINITION =
   'This file conflicts with an Opentrons standard labware definition. If you are trying to create a definition based on an Opentrons definition, please contact support'
 
 export interface LabwareItemProps {
-  file: CheckedLabwareFile,
+  file: CheckedLabwareFile
 }
 
 export function LabwareItem(props: LabwareItemProps): JSX.Element {

@@ -11,9 +11,9 @@ const STEP_SIZE_TITLE = 'Jump Size'
 const STEP_SIZE_SUBTITLE = 'Change with + and -'
 
 interface StepSizeControlProps {
-  stepSizes: StepSize[],
-  currentStepSize: StepSize,
-  setCurrentStepSize: (stepSize: StepSize) => void,
+  stepSizes: StepSize[]
+  currentStepSize: StepSize
+  setCurrentStepSize: (stepSize: StepSize) => void
 }
 export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   const { stepSizes, currentStepSize, setCurrentStepSize } = props

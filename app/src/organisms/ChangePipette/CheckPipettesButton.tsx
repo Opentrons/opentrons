@@ -15,11 +15,11 @@ import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
 
 export interface CheckPipetteButtonProps {
-  robotName: string,
-  className: string,
-  children: React.ReactNode,
-  hidden?: boolean,
-  onDone?: () => unknown,
+  robotName: string
+  className: string
+  children: React.ReactNode
+  hidden?: boolean
+  onDone?: () => unknown
 }
 
 export function CheckPipettesButton(
@@ -27,16 +27,14 @@ export function CheckPipettesButton(
 ): JSX.Element | null {
   const { robotName, onDone, className, children, hidden = false } = props
   const fetchPipettesRequestId = React.useRef<string | null>(null)
-  const [dispatch] = useDispatchApiRequests(
-    dispatchedAction => {
-      if (
-        dispatchedAction.type === FETCH_PIPETTES &&
-        dispatchedAction.meta.requestId
-      ) {
-        fetchPipettesRequestId.current = dispatchedAction.meta.requestId
-      }
+  const [dispatch] = useDispatchApiRequests(dispatchedAction => {
+    if (
+      dispatchedAction.type === FETCH_PIPETTES &&
+      dispatchedAction.meta.requestId
+    ) {
+      fetchPipettesRequestId.current = dispatchedAction.meta.requestId
     }
-  )
+  })
   const handleClick = (): void => dispatch(fetchPipettes(robotName, true))
   const requestStatus = useSelector<State, RequestState | null>(state =>
     fetchPipettesRequestId.current

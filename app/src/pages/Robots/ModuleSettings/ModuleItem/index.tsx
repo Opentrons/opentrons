@@ -20,10 +20,10 @@ import type { AttachedModule } from '../../../../redux/modules/types'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 interface Props {
-  module: AttachedModule,
-  controlDisabledReason: string | null,
-  usbPort?: string | null,
-  hubPort?: string | null,
+  module: AttachedModule
+  controlDisabledReason: string | null
+  usbPort?: string | null
+  hubPort?: string | null
 }
 
 export function ModuleItem(props: Props): JSX.Element {

@@ -4,15 +4,15 @@ import { CollapsibleItem } from '@opentrons/components'
 
 interface Props {
   /** Slot number the module is in */
-  header: string,
+  header: string
   /** Title for the card */
-  title: string,
+  title: string
   /** Card Content, each child will be separated with a grey bottom border */
-  children: React.ReactNode | null | undefined,
+  children: React.ReactNode | null | undefined
   /** Optional className for card contents */
-  className?: string,
-  isCardExpanded: boolean,
-  toggleCard: () => unknown,
+  className?: string
+  isCardExpanded: boolean
+  toggleCard: () => unknown
 }
 
 export function StatusCard(props: Props): JSX.Element {

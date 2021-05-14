@@ -52,11 +52,15 @@ import type {
   SessionType,
   CalibrationSessionStep,
   SessionCommandString,
-  CalibrationLabware
+  CalibrationLabware,
 } from '../../redux/sessions/types'
 import type { Mount } from '@opentrons/components'
 
-const assetMap: {[slot in CalibrationLabware['slot']]: {[mount in Mount]: {[channels in 'multi' | 'single']: string}}} = {
+const assetMap: {
+  [slot in CalibrationLabware['slot']]: {
+    [mount in Mount]: { [channels in 'multi' | 'single']: string }
+  }
+} = {
   '1': {
     left: {
       multi: slot1LeftMultiDemoAsset,
@@ -111,10 +115,10 @@ const ALLOW_VERTICAL_TEXT = 'Reveal Z jog controls to move up and down'
 const contentsBySessionTypeByCurrentStep: {
   [sessionType in SessionType]?: {
     [step in CalibrationSessionStep]?: {
-      slotNumber: string,
-      buttonText: string,
-      moveCommand: SessionCommandString | null,
-      finalCommand?: SessionCommandString | null,
+      slotNumber: string
+      buttonText: string
+      moveCommand: SessionCommandString | null
+      finalCommand?: SessionCommandString | null
     }
   }
 } = {
@@ -174,12 +178,14 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
     checkBothPipettes,
   } = props
 
-
-  const contents = sessionType in contentsBySessionTypeByCurrentStep ? contentsBySessionTypeByCurrentStep[sessionType]?.[currentStep] : null
-  const slotNumber  = contents && contents.slotNumber
-  const buttonText  = contents && contents.buttonText
-  const moveCommand  = contents && contents.moveCommand
-  const finalCommand  = contents && contents.finalCommand
+  const contents =
+    sessionType in contentsBySessionTypeByCurrentStep
+      ? contentsBySessionTypeByCurrentStep[sessionType]?.[currentStep]
+      : null
+  const slotNumber = contents && contents.slotNumber
+  const buttonText = contents && contents.buttonText
+  const moveCommand = contents && contents.moveCommand
+  const finalCommand = contents && contents.finalCommand
 
   const demoAsset = React.useMemo(
     () =>

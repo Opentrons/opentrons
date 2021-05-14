@@ -87,14 +87,14 @@ function formatOptionsFromLabwareDef(lw: LabwareDefinition2): SelectOption {
 }
 
 interface ChooseTipRackProps {
-  tipRack: CalibrationLabware,
-  mount: Mount,
-  sessionType: SessionType,
-  chosenTipRack: LabwareDefinition2 | null,
-  handleChosenTipRack: (arg: LabwareDefinition2 | null) => unknown,
-  closeModal: () => unknown,
-  robotName?: string | null,
-  defaultTipracks?: LabwareDefinition2[] | null,
+  tipRack: CalibrationLabware
+  mount: Mount
+  sessionType: SessionType
+  chosenTipRack: LabwareDefinition2 | null
+  handleChosenTipRack: (arg: LabwareDefinition2 | null) => unknown
+  closeModal: () => unknown
+  robotName?: string | null
+  defaultTipracks?: LabwareDefinition2[] | null
 }
 
 export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
@@ -188,7 +188,10 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
       : formatOptionsFromLabwareDef(tipRack.definition)
   )
 
-  const handleValueChange = (selected: SelectOption | null, _: unknown): void => {
+  const handleValueChange = (
+    selected: SelectOption | null,
+    _: unknown
+  ): void => {
     selected && setSelectedValue(selected)
   }
   const handleUseTipRack = (): void => {

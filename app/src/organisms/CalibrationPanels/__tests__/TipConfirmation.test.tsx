@@ -9,15 +9,23 @@ import type { Mount } from '@opentrons/components'
 import type { ReactWrapper, HTMLAttributes } from 'enzyme'
 
 describe('TipConfirmation', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof TipConfirmation> & {pipMount: Mount}>) => ReactWrapper<React.ComponentProps<typeof TipConfirmation>>
+  let render: (
+    props?: Partial<
+      React.ComponentProps<typeof TipConfirmation> & { pipMount: Mount }
+    >
+  ) => ReactWrapper<React.ComponentProps<typeof TipConfirmation>>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getConfirmTipButton = (wrapper: ReactWrapper<React.ComponentProps<typeof TipConfirmation>>): ReactWrapper<HTMLAttributes> =>
+  const getConfirmTipButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof TipConfirmation>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find('button[title="confirmTipAttachedButton"]')
 
-  const getInvalidateTipButton = (wrapper: ReactWrapper<React.ComponentProps<typeof TipConfirmation>>): ReactWrapper<HTMLAttributes> =>
+  const getInvalidateTipButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof TipConfirmation>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find('button[title="invalidateTipButton"]')
 
   beforeEach(() => {

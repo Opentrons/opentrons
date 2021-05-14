@@ -9,9 +9,13 @@ import {
 
 import type { State } from '../../redux/types'
 
-interface SP { optedIn: boolean }
+interface SP {
+  optedIn: boolean
+}
 
-interface DP { toggleOptedIn: () => unknown }
+interface DP {
+  toggleOptedIn: () => unknown
+}
 
 type Props = SP & DP
 
@@ -42,7 +46,10 @@ function mapStateToProps(state: State): SP {
 }
 
 const mapDispatchToProps: DP = {
-  toggleOptedIn: () => toggleAnalyticsOptedIn()
+  toggleOptedIn: () => toggleAnalyticsOptedIn(),
 }
 
-export const AnalyticsToggle = connect(mapStateToProps, mapDispatchToProps)(AnalyticsToggleComponent)
+export const AnalyticsToggle = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AnalyticsToggleComponent)

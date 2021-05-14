@@ -6,20 +6,25 @@ import { SessionAlert } from './SessionAlert'
 import { Portal } from '../../../App/portal'
 import styles from './styles.css'
 
-import type { CommandNode, SessionStatus, SessionStatusInfo } from '../../../redux/robot'
+import type {
+  CommandNode,
+  SessionStatus,
+  SessionStatusInfo,
+} from '../../../redux/robot'
 
 export interface CommandListProps {
-  commands: any[],
-  sessionStatus: SessionStatus,
-  sessionStatusInfo: SessionStatusInfo,
-  showSpinner: boolean,
-  onResetClick: () => unknown,
+  commands: any[]
+  sessionStatus: SessionStatus
+  sessionStatusInfo: SessionStatusInfo
+  showSpinner: boolean
+  onResetClick: () => unknown
 }
 
 export class CommandList extends React.Component<CommandListProps> {
   componentDidUpdate(): void {
     // TODO(mc, 2018-07-24): use new refs
-    if (this.refs.ensureVisible) (this.refs.ensureVisible as React.ElementRef<"li">).scrollIntoView(true) // eslint-disable-line react/no-string-refs
+    if (this.refs.ensureVisible)
+      (this.refs.ensureVisible as React.ElementRef<'li'>).scrollIntoView(true) // eslint-disable-line react/no-string-refs
   }
 
   render(): JSX.Element {
@@ -30,7 +35,9 @@ export class CommandList extends React.Component<CommandListProps> {
       showSpinner,
       onResetClick,
     } = this.props
-    const makeCommandToTemplateMapper = (depth: number) => (command: CommandNode): JSX.Element => {
+    const makeCommandToTemplateMapper = (depth: number) => (
+      command: CommandNode
+    ): JSX.Element => {
       const {
         id,
         isCurrent,
@@ -50,7 +57,11 @@ export class CommandList extends React.Component<CommandListProps> {
         )
       }
 
-      const liProps: { key: string | number, className: string, ref?: string } = {
+      const liProps: {
+        key: string | number
+        className: string
+        ref?: string
+      } = {
         key: id,
         className: cx(style, {
           [styles.executed]: Boolean(handledAt),

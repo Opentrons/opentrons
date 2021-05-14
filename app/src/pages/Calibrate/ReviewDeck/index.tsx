@@ -18,7 +18,9 @@ import styles from './styles.css'
 
 import type { Dispatch } from '../../../redux/types'
 
-export interface ReviewDeckProps { slot: string | null | undefined }
+export interface ReviewDeckProps {
+  slot: string | null | undefined
+}
 
 export function ReviewDeck(props: ReviewDeckProps): JSX.Element {
   const { slot } = props

@@ -12,7 +12,9 @@ import { InfoBoxButton } from './InfoBoxButton'
 import type { Labware, LabwareType } from '../../../redux/robot/types'
 import type { IconName } from '@opentrons/components'
 
-export interface InfoBoxProps { labware: Labware | null | undefined}
+export interface InfoBoxProps {
+  labware: Labware | null | undefined
+}
 
 export function InfoBox(props: InfoBoxProps): JSX.Element {
   const { labware } = props

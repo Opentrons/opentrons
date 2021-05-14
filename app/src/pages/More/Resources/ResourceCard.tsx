@@ -5,9 +5,9 @@ import { Card, OutlineButton } from '@opentrons/components'
 import styles from './styles.css'
 
 interface Props {
-  title: React.ReactNode,
-  description: React.ReactNode,
-  url: string,
+  title: React.ReactNode
+  description: React.ReactNode
+  url: string
 }
 
 export function ResourceCard(props: Props): JSX.Element {

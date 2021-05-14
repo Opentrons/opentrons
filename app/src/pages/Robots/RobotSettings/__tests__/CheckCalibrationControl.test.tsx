@@ -1,5 +1,8 @@
 import * as React from 'react'
-import { mountWithProviders, WrapperWithStore } from '@opentrons/components/__utils__'
+import {
+  mountWithProviders,
+  WrapperWithStore,
+} from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../../i18n'
 import * as Sessions from '../../../../redux/sessions'
@@ -19,21 +22,33 @@ jest.mock('../../../../organisms/CheckCalibration', () => ({
   CheckCalibration: () => <></>,
 }))
 
-const getRobotSessionOfType = Sessions.getRobotSessionOfType as jest.MockedFunction<typeof Sessions.getRobotSessionOfType>
+const getRobotSessionOfType = Sessions.getRobotSessionOfType as jest.MockedFunction<
+  typeof Sessions.getRobotSessionOfType
+>
 
-const MOCK_STATE: State = ({ mockState: true } as any)
+const MOCK_STATE: State = { mockState: true } as any
 
 describe('CheckCalibrationControl', () => {
-  const getCalCheckButton = (wrapper: ReactWrapper<React.ComponentProps<typeof CheckCalibrationControl>>): ReactWrapper<HTMLAttributes> =>
+  const getCalCheckButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof CheckCalibrationControl>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper
       .find('TitledControl[title="calibration health check"]')
       .find('button')
 
   const render = (
     props: Partial<React.ComponentProps<typeof CheckCalibrationControl>> = {}
-  ): WrapperWithStore<React.ComponentProps<typeof CheckCalibrationControl>, State, Action> => {
+  ): WrapperWithStore<
+    React.ComponentProps<typeof CheckCalibrationControl>,
+    State,
+    Action
+  > => {
     const { robotName = 'robot-name', disabledReason = null } = props
-    return mountWithProviders<React.ComponentProps<typeof CheckCalibrationControl>, State, Action>(
+    return mountWithProviders<
+      React.ComponentProps<typeof CheckCalibrationControl>,
+      State,
+      Action
+    >(
       <CheckCalibrationControl
         robotName={robotName}
         disabledReason={disabledReason}

@@ -30,7 +30,8 @@ export function AddLabwareCard(): JSX.Element {
   const addFailure = useSelector(getAddLabwareFailure)
   const handleOpenPath = (): unknown => dispatch(openCustomLabwareDirectory())
   const handleResetPath = (): unknown => dispatch(resetCustomLabwareDirectory())
-  const handleChangePath = (): unknown => dispatch(changeCustomLabwareDirectory())
+  const handleChangePath = (): unknown =>
+    dispatch(changeCustomLabwareDirectory())
   const handleAddLabware = (): unknown => dispatch(addCustomLabware())
   const showAddFailure = addFailure.file || addFailure.errorMessage !== null
 

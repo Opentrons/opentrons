@@ -12,16 +12,16 @@ import type {
 } from '../../../../redux/modules/types'
 
 interface Props {
-  module: MagneticModule,
-  slot: string,
-  isCardExpanded: boolean,
-  toggleCard: () => unknown,
+  module: MagneticModule
+  slot: string
+  isCardExpanded: boolean
+  toggleCard: () => unknown
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
     args?: unknown[]
-  ) => unknown,
-  controlDisabledReason: string | null,
+  ) => unknown
+  controlDisabledReason: string | null
 }
 
 export const MagDeckCard = ({

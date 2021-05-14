@@ -13,7 +13,9 @@ import type {
   HealthStatus,
 } from '../../../redux/discovery/types'
 
-interface State { dismissed: boolean }
+interface State {
+  dismissed: boolean
+}
 
 // TODO(bc, 2020-12-07): i18n
 const UNRESPONSIVE_TITLE = 'Unable to establish connection with robot'
@@ -30,7 +32,10 @@ const LAST_RESORT = (
   </p>
 )
 
-const NO_SERVER_MESSAGE = (serverStatus: HealthStatus, ip: string): JSX.Element => (
+const NO_SERVER_MESSAGE = (
+  serverStatus: HealthStatus,
+  ip: string
+): JSX.Element => (
   <div className={styles.banner}>
     <p>
       This OT-2 has been seen recently, but it is currently{' '}

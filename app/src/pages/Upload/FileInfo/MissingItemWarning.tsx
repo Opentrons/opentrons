@@ -13,13 +13,15 @@ import styles from './styles.css'
 import { SectionContentHalf } from '../../../atoms/layout'
 
 export interface MissingItemWarningProps {
-  missingItem: string,
-  urlLabel: string,
-  url: string,
-  isBlocking?: boolean,
+  missingItem: string
+  urlLabel: string
+  url: string
+  isBlocking?: boolean
 }
 
-export function MissingItemWarning(props: MissingItemWarningProps): JSX.Element {
+export function MissingItemWarning(
+  props: MissingItemWarningProps
+): JSX.Element {
   const { missingItem, urlLabel, url, isBlocking = false } = props
   return (
     <SectionContentHalf className={styles.align_center}>

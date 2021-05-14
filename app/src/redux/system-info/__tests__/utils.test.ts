@@ -1,4 +1,3 @@
-
 import { mockUsbDevice, mockRealtekDevice } from '../__fixtures__'
 import { isRealtekU2EAdapter, getDriverStatus } from '../utils'
 

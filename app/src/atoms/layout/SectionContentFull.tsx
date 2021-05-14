@@ -7,7 +7,9 @@ export interface SectionContentFullProps {
   className?: string
 }
 
-export function SectionContentFull(props: SectionContentFullProps): JSX.Element {
+export function SectionContentFull(
+  props: SectionContentFullProps
+): JSX.Element {
   return (
     <div className={cx(styles.section_content_full, props.className)}>
       {props.children}

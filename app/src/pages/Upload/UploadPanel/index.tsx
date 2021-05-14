@@ -11,12 +11,12 @@ import type { State, Action } from '../../../redux/types'
 import type { MapDispatchToProps } from 'react-redux'
 
 interface SP {
-  filename: string | null | undefined,
-  sessionLoaded: boolean | null | undefined,
+  filename: string | null | undefined
+  sessionLoaded: boolean | null | undefined
 }
 
 interface DP {
-  createSession: (f: File) => unknown,
+  createSession: (f: File) => unknown
 }
 
 type Props = SP & DP
@@ -38,7 +38,7 @@ function mapStateToProps(state: State): SP {
 
 const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
   return {
-    createSession: (file: File) => dispatch<Action>(openProtocol(file))
+    createSession: (file: File) => dispatch<Action>(openProtocol(file)),
   }
 }
 

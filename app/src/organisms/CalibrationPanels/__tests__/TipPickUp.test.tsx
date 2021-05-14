@@ -10,16 +10,23 @@ import type { ReactWrapper } from 'enzyme'
 import type { VectorTuple } from '../../../redux/sessions/types'
 
 describe('TipPickUp', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof TipPickUp> & {pipMount: Mount}>) => ReactWrapper<React.ComponentProps<typeof TipPickUp>>
+  let render: (
+    props?: Partial<
+      React.ComponentProps<typeof TipPickUp> & { pipMount: Mount }
+    >
+  ) => ReactWrapper<React.ComponentProps<typeof TipPickUp>>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getPickUpTipButton = (wrapper: ReactWrapper<React.ComponentProps<typeof TipPickUp>>) =>
-    wrapper.find('button[children="Pick up tip"]')
+  const getPickUpTipButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof TipPickUp>>
+  ) => wrapper.find('button[children="Pick up tip"]')
 
-  const getJogButton = (wrapper: ReactWrapper<React.ComponentProps<typeof TipPickUp>>, direction: string) =>
-    wrapper.find(`button[title="${direction}"]`).find('button')
+  const getJogButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof TipPickUp>>,
+    direction: string
+  ) => wrapper.find(`button[title="${direction}"]`).find('button')
 
   beforeEach(() => {
     render = (props = {}) => {
@@ -53,8 +60,15 @@ describe('TipPickUp', () => {
   it('allows jogging in z axis', () => {
     const wrapper = render()
 
-    const jogDirections: string[] = ['left', 'right', 'back', 'forward', 'up', 'down']
-    const jogVectorsByDirection: {[dir: string]: VectorTuple} = {
+    const jogDirections: string[] = [
+      'left',
+      'right',
+      'back',
+      'forward',
+      'up',
+      'down',
+    ]
+    const jogVectorsByDirection: { [dir: string]: VectorTuple } = {
       up: [0, 0, 0.1],
       down: [0, 0, -0.1],
       left: [-0.1, 0, 0],
@@ -63,7 +77,9 @@ describe('TipPickUp', () => {
       forward: [0, -0.1, 0],
     }
     jogDirections.forEach(direction => {
-      getJogButton(wrapper, direction).invoke('onClick')?.({} as React.MouseEvent)
+      getJogButton(wrapper, direction).invoke('onClick')?.(
+        {} as React.MouseEvent
+      )
       wrapper.update()
 
       expect(mockSendCommands).toHaveBeenCalledWith({
@@ -94,7 +110,9 @@ describe('TipPickUp', () => {
 
   it('renders the confirm crash modal when invoked', () => {
     const wrapper = render()
-    wrapper.find('a[children="Start over"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('a[children="Start over"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     wrapper.update()
     expect(wrapper.find('ConfirmCrashRecoveryModal').exists()).toBe(true)
   })

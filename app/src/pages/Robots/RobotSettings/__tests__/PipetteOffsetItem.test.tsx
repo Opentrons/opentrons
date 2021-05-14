@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
@@ -9,7 +8,10 @@ import { findLabwareDefWithCustom } from '../../../../assets/labware/findLabware
 import type { ReactWrapper } from 'enzyme'
 import type { State, Action } from '../../../../redux/types'
 import type { WrapperWithStore } from '@opentrons/components/__utils__'
-import type { AttachedPipette, PipetteCalibrations } from '../../../../redux/pipettes/types'
+import type {
+  AttachedPipette,
+  PipetteCalibrations,
+} from '../../../../redux/pipettes/types'
 
 jest.mock('../../../../assets/labware/findLabware')
 
@@ -23,21 +25,45 @@ jest.mock('@opentrons/shared-data', () => ({
   getLabwareDisplayName: jest.fn(),
 }))
 
-const mockFindLabwareDefWithCustom = findLabwareDefWithCustom as jest.MockedFunction<typeof findLabwareDefWithCustom>
+const mockFindLabwareDefWithCustom = findLabwareDefWithCustom as jest.MockedFunction<
+  typeof findLabwareDefWithCustom
+>
 
-const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<typeof getLabwareDisplayName>
+const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
+  typeof getLabwareDisplayName
+>
 
-const getMountLabel = (wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>): ReactWrapper => wrapper.find('h4')
+const getMountLabel = (
+  wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>
+): ReactWrapper => wrapper.find('h4')
 
-const getPipetteName = (wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>): ReactWrapper => wrapper.find('p').at(1)
-const getNotCalibrated = (wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>): ReactWrapper => wrapper.find('p').at(1)
-const getCalibrationText = (wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>): ReactWrapper => wrapper.find('p')
-const getCalibrationTime = (wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>): ReactWrapper => wrapper.find('p').at(3)
-const getCalibrationTiprack = (wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>): ReactWrapper => wrapper.find('p').at(5)
-const getCalibrationWarning = (wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>): ReactWrapper => wrapper.find('InlineCalibrationWarning')
+const getPipetteName = (
+  wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>
+): ReactWrapper => wrapper.find('p').at(1)
+const getNotCalibrated = (
+  wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>
+): ReactWrapper => wrapper.find('p').at(1)
+const getCalibrationText = (
+  wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>
+): ReactWrapper => wrapper.find('p')
+const getCalibrationTime = (
+  wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>
+): ReactWrapper => wrapper.find('p').at(3)
+const getCalibrationTiprack = (
+  wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>
+): ReactWrapper => wrapper.find('p').at(5)
+const getCalibrationWarning = (
+  wrapper: ReactWrapper<React.ComponentProps<typeof PipetteOffsetItem>>
+): ReactWrapper => wrapper.find('InlineCalibrationWarning')
 
 describe('PipetteOffsetItem', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof PipetteOffsetItem>>) => WrapperWithStore<React.ComponentProps<typeof PipetteOffsetItem>, State, Action>
+  let render: (
+    props?: Partial<React.ComponentProps<typeof PipetteOffsetItem>>
+  ) => WrapperWithStore<
+    React.ComponentProps<typeof PipetteOffsetItem>,
+    State,
+    Action
+  >
 
   beforeEach(() => {
     render = (props = {}) => {
@@ -84,7 +110,11 @@ describe('PipetteOffsetItem', () => {
         },
         customLabware = [],
       } = props
-      return mountWithProviders<React.ComponentProps<typeof PipetteOffsetItem>, State, Action>(
+      return mountWithProviders<
+        React.ComponentProps<typeof PipetteOffsetItem>,
+        State,
+        Action
+      >(
         <PipetteOffsetItem
           mount={mount}
           pipette={pipette}
@@ -137,9 +167,9 @@ describe('PipetteOffsetItem', () => {
   })
 
   it('displays date and tiprack display name from def', () => {
-    mockFindLabwareDefWithCustom.mockReturnValue(
-      ({ parameters: { loadName: 'opentrons_96_tiprack_300ul' } } as any)
-    )
+    mockFindLabwareDefWithCustom.mockReturnValue({
+      parameters: { loadName: 'opentrons_96_tiprack_300ul' },
+    } as any)
     mockGetLabwareDisplayName.mockReturnValue('Opentrons 96 Tiprack 300 fancy')
 
     const { wrapper } = render()
@@ -162,9 +192,9 @@ describe('PipetteOffsetItem', () => {
   })
 
   it('displays a warning when its offset calibration is marked bad', () => {
-    mockFindLabwareDefWithCustom.mockReturnValue(
-      ({ parameters: { loadName: 'opentrons_96_tiprack_300ul' } } as any)
-    )
+    mockFindLabwareDefWithCustom.mockReturnValue({
+      parameters: { loadName: 'opentrons_96_tiprack_300ul' },
+    } as any)
     mockGetLabwareDisplayName.mockReturnValue('Opentrons 96 Tiprack 300 fancy')
 
     const { wrapper } = render({
@@ -204,9 +234,9 @@ describe('PipetteOffsetItem', () => {
   })
 
   it('displays a warning when its tip length calibration is marked bad', () => {
-    mockFindLabwareDefWithCustom.mockReturnValue(
-      ({ parameters: { loadName: 'opentrons_96_tiprack_300ul' } } as any)
-    )
+    mockFindLabwareDefWithCustom.mockReturnValue({
+      parameters: { loadName: 'opentrons_96_tiprack_300ul' },
+    } as any)
     mockGetLabwareDisplayName.mockReturnValue('Opentrons 96 Tiprack 300 fancy')
 
     const { wrapper } = render({

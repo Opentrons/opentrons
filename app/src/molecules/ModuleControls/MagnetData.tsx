@@ -16,7 +16,7 @@ import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import type { MagneticModule } from '../../redux/modules/types'
 
 interface Props {
-  module: MagneticModule;
+  module: MagneticModule
 }
 
 export function MagnetData(props: Props): JSX.Element {

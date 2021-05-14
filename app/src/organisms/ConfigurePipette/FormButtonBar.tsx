@@ -6,7 +6,7 @@ import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
 
-type MaybeButtonProps = ButtonProps | null| undefined
+type MaybeButtonProps = ButtonProps | null | undefined
 export interface FormButtonBarProps {
   buttons: MaybeButtonProps[]
 }

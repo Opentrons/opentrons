@@ -22,40 +22,51 @@ jest.mock('../CheckCalibrationControl', () => ({
   CheckCalibrationControl: () => <></>,
 }))
 
-const mockRobot: ViewableRobot = ({
+const mockRobot: ViewableRobot = {
   name: 'robot-name',
   connected: true,
   status: CONNECTABLE,
-} as any)
+} as any
 
-const mockUnconnectableRobot: ViewableRobot = ({
+const mockUnconnectableRobot: ViewableRobot = {
   name: 'robot-name',
   connected: true,
   status: UNREACHABLE,
-} as any)
+} as any
 
-const mockGetLightsOn = RobotControls.getLightsOn as jest.MockedFunction<typeof RobotControls.getLightsOn>
+const mockGetLightsOn = RobotControls.getLightsOn as jest.MockedFunction<
+  typeof RobotControls.getLightsOn
+>
 
-const mockGetIsRunning = RobotSelectors.getIsRunning as jest.MockedFunction<typeof RobotSelectors.getIsRunning>
+const mockGetIsRunning = RobotSelectors.getIsRunning as jest.MockedFunction<
+  typeof RobotSelectors.getIsRunning
+>
 
-const MOCK_STATE: State = ({ mockState: true } as any)
+const MOCK_STATE: State = { mockState: true } as any
 
 describe('ControlsCard', () => {
   const render = (robot: ViewableRobot = mockRobot) => {
-    return mountWithProviders<React.ComponentProps<typeof ControlsCard>, State, Action>(
-      <ControlsCard robot={robot} />,
-      {
-        initialState: MOCK_STATE,
-        i18n,
-      }
-    )
+    return mountWithProviders<
+      React.ComponentProps<typeof ControlsCard>,
+      State,
+      Action
+    >(<ControlsCard robot={robot} />, {
+      initialState: MOCK_STATE,
+      i18n,
+    })
   }
 
-  const getHomeButton = (wrapper: ReactWrapper<React.ComponentProps<typeof ControlsCard>>): ReactWrapper<HTMLAttributes> => wrapper.find('button[children="home"]')
+  const getHomeButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ControlsCard>>
+  ): ReactWrapper<HTMLAttributes> => wrapper.find('button[children="home"]')
 
-  const getRestartButton = (wrapper: ReactWrapper<React.ComponentProps<typeof ControlsCard>>): ReactWrapper<HTMLAttributes> => wrapper.find('button[children="restart"]')
+  const getRestartButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ControlsCard>>
+  ): ReactWrapper<HTMLAttributes> => wrapper.find('button[children="restart"]')
 
-  const getLightsButton = (wrapper: ReactWrapper<React.ComponentProps<typeof ControlsCard>>): ReactWrapper<HTMLAttributes> => wrapper.find('ToggleBtn[label="lights"]')
+  const getLightsButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ControlsCard>>
+  ): ReactWrapper<HTMLAttributes> => wrapper.find('ToggleBtn[label="lights"]')
 
   beforeEach(() => {
     jest.useFakeTimers()
@@ -124,11 +135,11 @@ describe('ControlsCard', () => {
   })
 
   it('home, and restart buttons disabled if not connected', () => {
-    const mockRobotNotConnected: ViewableRobot = ({
+    const mockRobotNotConnected: ViewableRobot = {
       name: 'robot-name',
       connected: false,
       status: CONNECTABLE,
-    } as any)
+    } as any
 
     const { wrapper } = render(mockRobotNotConnected)
 

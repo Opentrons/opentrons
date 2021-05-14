@@ -15,8 +15,8 @@ import type { RouteComponentProps } from 'react-router-dom'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-export interface RobotItemProps extends RouteComponentProps<{name :string}>{
-  robot: ViewableRobot,
+export interface RobotItemProps extends RouteComponentProps<{ name: string }> {
+  robot: ViewableRobot
 }
 
 export const RobotItem = withRouter(RobotItemComponent)

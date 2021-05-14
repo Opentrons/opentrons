@@ -27,7 +27,7 @@ import type { Mount } from '../../../redux/pipettes/types'
 import type { Labware, Pipette } from '../../../redux/robot/types'
 import { CalibrateTipLengthControl } from '../CalibrateTipLengthControl'
 
-type Props = RouteComponentProps<{mount: string, definitionHash: string}>
+type Props = RouteComponentProps<{ mount: string; definitionHash: string }>
 
 export function Pipettes(props: Props): JSX.Element {
   const { mount, definitionHash } = props.match.params
@@ -35,8 +35,8 @@ export function Pipettes(props: Props): JSX.Element {
   const robot = useSelector(getConnectedRobot)
   const robotName = robot?.name || null
   const tipracksByMount = useSelector(robotSelectors.getTipracksByMount)
-  const pipettes = useSelector(
-    (state: State) => robotName ? getProtocolPipettesInfo(state, robotName) : null
+  const pipettes = useSelector((state: State) =>
+    robotName ? getProtocolPipettesInfo(state, robotName) : null
   )
 
   const changePipetteUrl =
@@ -51,7 +51,9 @@ export function Pipettes(props: Props): JSX.Element {
 
   const currentPipette = currentMount && pipettes && pipettes[currentMount]
 
-  const activeTipracks = PIPETTE_MOUNTS.reduce<{[m in Mount]: Labware | null}>(
+  const activeTipracks = PIPETTE_MOUNTS.reduce<
+    { [m in Mount]: Labware | null }
+  >(
     (mapToBuild, m) => {
       const tipracksForMount = tipracksByMount[m]
       if (m === mount) {

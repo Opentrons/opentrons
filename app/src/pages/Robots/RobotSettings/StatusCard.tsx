@@ -23,7 +23,9 @@ import { LabeledValue } from '../../../atoms/structure'
 import type { Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-interface Props { robot: ViewableRobot }
+interface Props {
+  robot: ViewableRobot
+}
 
 export function StatusCard(props: Props): JSX.Element {
   const { robot } = props

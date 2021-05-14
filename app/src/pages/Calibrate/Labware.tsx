@@ -20,22 +20,20 @@ import type { State } from '../../redux/types'
 import type { Labware as RobotLabware } from '../../redux/robot/types'
 import type { AttachedModule } from '../../redux/modules/types'
 
-type OP = RouteComponentProps<{slot: string}>
+type OP = RouteComponentProps<{ slot: string }>
 
 interface SP {
-  deckPopulated: boolean,
-  labware?: RobotLabware | null,
-  calibrateToBottom: boolean,
-  robotName: string | null,
-  hasModulesLeftToReview: boolean | null | undefined,
-  unpreparedModules: AttachedModule[],
+  deckPopulated: boolean
+  labware?: RobotLabware | null
+  calibrateToBottom: boolean
+  robotName: string | null
+  hasModulesLeftToReview: boolean | null | undefined
+  unpreparedModules: AttachedModule[]
 }
 
 type Props = OP & SP
 
-export const Labware = withRouter(
-  connect(mapStateToProps)(LabwareComponent)
-)
+export const Labware = withRouter(connect(mapStateToProps)(LabwareComponent))
 
 function LabwareComponent(props: Props): JSX.Element {
   const {

@@ -27,8 +27,8 @@ const IPV4_ADDRESS = 'Local IPv4 Address'
 const IPV6_ADDRESS = 'Local IPv6 Address'
 
 export interface U2EDeviceDetailsProps {
-  device: UsbDevice | null,
-  ifaces: NetworkInterface[],
+  device: UsbDevice | null
+  ifaces: NetworkInterface[]
 }
 
 const DetailText = styled.span`
@@ -36,7 +36,7 @@ const DetailText = styled.span`
   margin-right: ${SPACING_1};
 `
 
-const DEVICE_STATS: Array<{ label: string, property: keyof UsbDevice }> = [
+const DEVICE_STATS: Array<{ label: string; property: keyof UsbDevice }> = [
   { label: 'Description', property: 'deviceName' },
   { label: 'Manufacturer', property: 'manufacturer' },
   { label: 'Serial Number', property: 'serialNumber' },
@@ -47,8 +47,8 @@ const DetailItem = ({
   label,
   value,
 }: {
-  label: string,
-  value: string | number,
+  label: string
+  value: string | number
 }): JSX.Element => (
   <Flex as="li" marginBottom={SPACING_1}>
     <DetailText>{label}:</DetailText>

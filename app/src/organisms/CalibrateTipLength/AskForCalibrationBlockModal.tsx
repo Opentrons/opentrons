@@ -43,9 +43,9 @@ const BLOCK_REQUEST_URL = 'https://opentrons-ux.typeform.com/to/DgvBE9Ir'
 const CAL_BLOCK_LOAD_NAME = 'opentrons_calibrationblock_short_side_right'
 
 interface Props {
-  onResponse: (hasBlock: boolean) => void,
-  titleBarTitle: string,
-  closePrompt: () => void,
+  onResponse: (hasBlock: boolean) => void
+  titleBarTitle: string
+  closePrompt: () => void
 }
 export function AskForCalibrationBlockModal(props: Props): JSX.Element {
   const [rememberPreference, setRememberPreference] = React.useState<boolean>(
@@ -102,7 +102,9 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
         <Box css={FONT_BODY_2_DARK} marginX="1rem">
           <Flex marginLeft="1px" marginBottom={SPACING_3}>
             <CheckboxField
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRememberPreference(e.currentTarget.checked)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setRememberPreference(e.currentTarget.checked)
+              }
               value={rememberPreference}
             />
             <Text marginLeft={SPACING_2}>{REMEMBER}</Text>

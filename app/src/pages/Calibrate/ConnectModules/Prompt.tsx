@@ -33,9 +33,9 @@ const SUPPORT_PAGE =
   'https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2'
 
 export interface PromptProps {
-  modulesMissing: boolean,
-  onPromptClick: () => unknown,
-  hasDuplicateModules: boolean,
+  modulesMissing: boolean
+  onPromptClick: () => unknown
+  hasDuplicateModules: boolean
 }
 
 export function Prompt(props: PromptProps): JSX.Element {

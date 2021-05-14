@@ -5,7 +5,6 @@ import some from 'lodash/some'
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 
-
 import { RobotWorkSpace, Module as ModuleItem } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
@@ -22,25 +21,24 @@ import { LabwareItem } from './LabwareItem'
 
 export * from './LabwareItem'
 
-interface OP extends RouteComponentProps<{slot?: string}> {
-  modulesRequired?: boolean,
-  enableLabwareSelection?: boolean,
-  className?: string,
+interface OP extends RouteComponentProps<{ slot?: string }> {
+  modulesRequired?: boolean
+  enableLabwareSelection?: boolean
+  className?: string
 }
 
 interface SP {
-  labwareBySlot?: {[slot: string]: Labware[] | undefined},
-  modulesBySlot?: {[slot: string]: DisplayModule | undefined},
-  selectedSlot?: DeckSlotId | null,
-  areTipracksConfirmed?: boolean,
+  labwareBySlot?: { [slot: string]: Labware[] | undefined }
+  modulesBySlot?: { [slot: string]: DisplayModule | undefined }
+  selectedSlot?: DeckSlotId | null
+  areTipracksConfirmed?: boolean
 }
-
 
 type ModuleDisplayMode = React.ComponentProps<typeof ModuleItem>['mode']
 
 interface DisplayModule extends SessionModule {
-  mode?: React.ComponentProps<typeof ModuleItem>['mode'],
-  usbInfoString?: string,
+  mode?: React.ComponentProps<typeof ModuleItem>['mode']
+  usbInfoString?: string
 }
 
 type Props = OP & SP
@@ -117,9 +115,14 @@ function DeckMapComponent(props: Props): JSX.Element {
 }
 
 function mapStateToProps(state: State, ownProps: OP): SP {
-  let modulesBySlot: {[slot in Slot]?: DisplayModule} = mapValues(
+  let modulesBySlot: {
+    [slot in Slot]?: DisplayModule
+  } = mapValues(
     robotSelectors.getModulesBySlot(state),
-    (module: SessionModule) => ({ ...module, mode: 'default' as ModuleDisplayMode})
+    (module: SessionModule) => ({
+      ...module,
+      mode: 'default' as ModuleDisplayMode,
+    })
   )
 
   // only show necessary modules if still need to connect some
@@ -140,7 +143,9 @@ function mapStateToProps(state: State, ownProps: OP): SP {
             : 'USB Info N/A'
         return {
           ...module,
-          mode: (matchedMod !== null ? 'present' : 'missing') as ModuleDisplayMode,
+          mode: (matchedMod !== null
+            ? 'present'
+            : 'missing') as ModuleDisplayMode,
           usbInfoString: usbInfo,
         }
       }
@@ -150,7 +155,9 @@ function mapStateToProps(state: State, ownProps: OP): SP {
     }
   } else {
     const allLabware = robotSelectors.getLabware(state)
-    const labwareBySlot = allLabware.reduce<{[slot in Labware['slot']]?: Labware[]}>((slotMap, labware) => {
+    const labwareBySlot = allLabware.reduce<
+      { [slot in Labware['slot']]?: Labware[] }
+    >((slotMap, labware) => {
       const { slot } = labware
       const slotContents = slotMap[slot] ?? []
 
@@ -164,7 +171,8 @@ function mapStateToProps(state: State, ownProps: OP): SP {
         modulesBySlot,
       }
     } else {
-      const selectedSlot: DeckSlotId | null | undefined = ownProps.match.params.slot
+      const selectedSlot: DeckSlotId | null | undefined =
+        ownProps.match.params.slot
       return {
         labwareBySlot,
         modulesBySlot,

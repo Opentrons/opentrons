@@ -49,7 +49,7 @@ const SECOND_RANK_NO_BLOCK_PROMPT = 'as illustrated below'
 const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
 const contentsBySessionType: {
   [st in SessionType]: {
-    moveCommandString: SessionCommandString,
+    moveCommandString: SessionCommandString
   }
 } = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
@@ -70,8 +70,8 @@ function HealthCheckText({
   activePipette,
   calBlock,
 }: {
-  activePipette?: CalibrationCheckInstrument | null,
-  calBlock?: CalibrationLabware | null,
+  activePipette?: CalibrationCheckInstrument | null
+  calBlock?: CalibrationLabware | null
 }): JSX.Element | null {
   if (!activePipette) return null
   const { mount, rank, tipRackDisplay } = activePipette
@@ -180,7 +180,10 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
           {({ deckSlotsById }) =>
             map(
               deckSlotsById,
-              (slot: typeof deckSlotsById[keyof typeof deckSlotsById], slotId) => {
+              (
+                slot: typeof deckSlotsById[keyof typeof deckSlotsById],
+                slotId
+              ) => {
                 if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
                 let labwareDef = null
                 if (String(tipRack?.slot) === slotId) {

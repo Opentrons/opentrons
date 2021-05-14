@@ -85,7 +85,10 @@ const DIAGRAMS: Record<TypeKey, Record<Channels, Record<Step, string>>> = {
   },
 }
 
-const DIAGRAMS_BOTTOM: Record<TypeKey, Record<Channels, Record<Step, string>>> = {
+const DIAGRAMS_BOTTOM: Record<
+  TypeKey,
+  Record<Channels, Record<Step, string>>
+> = {
   tiprack: {
     single: {
       one: require('./images/step-1-tiprack-single@3x.png'),
@@ -158,7 +161,10 @@ const DIAGRAMS_BOTTOM: Record<TypeKey, Record<Channels, Record<Step, string>>> =
   },
 }
 
-const INSTRUCTIONS: Record<TypeKey, Record<Channels, Record<Step, React.ReactNode>>> = {
+const INSTRUCTIONS: Record<
+  TypeKey,
+  Record<Channels, Record<Step, React.ReactNode>>
+> = {
   tiprack: {
     single: {
       one: 'Jog pipette until it is centered above tip A1.',
@@ -292,7 +298,10 @@ const INSTRUCTIONS: Record<TypeKey, Record<Channels, Record<Step, React.ReactNod
   },
 }
 
-const INSTRUCTIONS_BOTTOM: Record<TypeKey, Record<Channels, Record<Step, React.ReactNode>>> = {
+const INSTRUCTIONS_BOTTOM: Record<
+  TypeKey,
+  Record<Channels, Record<Step, React.ReactNode>>
+> = {
   tiprack: {
     single: {
       one: 'Jog pipette until it is centered above tip A1.',

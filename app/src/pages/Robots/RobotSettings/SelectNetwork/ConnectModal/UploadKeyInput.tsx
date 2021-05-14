@@ -12,9 +12,9 @@ import {
 import type { State } from '../../../../../redux/types'
 
 export interface UploadKeyInputProps {
-  robotName: string,
-  label: string,
-  onUpload: (keyId: string) => unknown,
+  robotName: string
+  label: string
+  onUpload: (keyId: string) => unknown
 }
 
 // TODO(mc, 2020-03-04): create styled HiddenInput in components library
@@ -29,7 +29,10 @@ const HiddenInput = styled.input`
   border: 0;
 `
 
-const UploadKeyInputComponent = (props: UploadKeyInputProps, ref: React.ForwardedRef<HTMLInputElement>): JSX.Element => {
+const UploadKeyInputComponent = (
+  props: UploadKeyInputProps,
+  ref: React.ForwardedRef<HTMLInputElement>
+): JSX.Element => {
   const { robotName, label, onUpload } = props
   const [dispatchApi, requestIds] = useDispatchApiRequest()
   const handleUpload = React.useRef<(key: string) => void>()
@@ -67,4 +70,7 @@ const UploadKeyInputComponent = (props: UploadKeyInputProps, ref: React.Forwarde
   )
 }
 
-export const UploadKeyInput = React.forwardRef<HTMLInputElement, UploadKeyInputProps>(UploadKeyInputComponent)
+export const UploadKeyInput = React.forwardRef<
+  HTMLInputElement,
+  UploadKeyInputProps
+>(UploadKeyInputComponent)

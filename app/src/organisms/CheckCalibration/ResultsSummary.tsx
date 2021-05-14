@@ -75,7 +75,9 @@ const DECK_INVALIDATES =
   'Recalibrating your deck will invalidate Pipette Offsets, and you will need to recalibrate Pipette Offsets after redoing Deck Calibration.'
 const NO_PIPETTE = 'No pipette attached'
 
-export function ResultsSummary(props: CalibrationPanelProps): JSX.Element | null {
+export function ResultsSummary(
+  props: CalibrationPanelProps
+): JSX.Element | null {
   const {
     comparisonsByPipette,
     instruments,
@@ -129,7 +131,9 @@ export function ResultsSummary(props: CalibrationPanelProps): JSX.Element | null
     : comparisonsByPipette.first.deck?.status
   const deckCalibrationResult = getDeckCalibration ?? null
 
-  const pipetteResultsBad = (perPipette: CalibrationCheckComparisonsPerCalibration | null): { offsetBad: boolean, tipLengthBad: boolean } => ({
+  const pipetteResultsBad = (
+    perPipette: CalibrationCheckComparisonsPerCalibration | null
+  ): { offsetBad: boolean; tipLengthBad: boolean } => ({
     offsetBad: perPipette?.pipetteOffset?.status
       ? perPipette.pipetteOffset.status === CHECK_STATUS_OUTSIDE_THRESHOLD
       : false,
@@ -251,7 +255,7 @@ export function ResultsSummary(props: CalibrationPanelProps): JSX.Element | null
 }
 
 interface RenderResultProps {
-  status: string | null,
+  status: string | null
 }
 
 function RenderResult(props: RenderResultProps): JSX.Element | null {
@@ -278,8 +282,8 @@ function RenderResult(props: RenderResultProps): JSX.Element | null {
 }
 
 interface PipetteResultProps {
-  pipetteInfo: CalibrationCheckInstrument,
-  pipetteCalibration: CalibrationCheckComparisonsPerCalibration,
+  pipetteInfo: CalibrationCheckInstrument
+  pipetteCalibration: CalibrationCheckComparisonsPerCalibration
 }
 
 function PipetteResult(props: PipetteResultProps): JSX.Element {
@@ -324,11 +328,11 @@ function PipetteResult(props: PipetteResultProps): JSX.Element {
 }
 
 function WarningText(props: {
-  deckCalibrationBad: boolean,
+  deckCalibrationBad: boolean
   pipettes: {
-    left: { offsetBad: boolean, tipLengthBad: boolean },
-    right: { offsetBad: boolean, tipLengthBad: boolean },
-  },
+    left: { offsetBad: boolean; tipLengthBad: boolean }
+    right: { offsetBad: boolean; tipLengthBad: boolean }
+  }
 }): JSX.Element | null {
   const badCount = [
     props.deckCalibrationBad,

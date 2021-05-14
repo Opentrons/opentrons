@@ -17,10 +17,12 @@ import { LabeledValue } from '../../../atoms/structure'
 const EVENT_JUPYTER_OPEN = { name: 'jupyterOpen', properties: {} }
 
 export interface OpenJupyterControlProps {
-  robotIp: string,
+  robotIp: string
 }
 
-export function OpenJupyterControl(props: OpenJupyterControlProps): JSX.Element {
+export function OpenJupyterControl(
+  props: OpenJupyterControlProps
+): JSX.Element {
   const { robotIp } = props
   const { t } = useTranslation(['robot_advanced_settings', 'shared'])
   const href = `http://${robotIp}:48888`

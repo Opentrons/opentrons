@@ -140,14 +140,12 @@ describe('SelectSsid component', () => {
     const expectedBar = mount(
       <NetworkOptionLabel {...mockWifiList[1]} showConnectedIcon={true} />
     )
-    const fooLabel = selectField.prop('formatOptionLabel')?.(
-      { value: 'foo' },
-      { context: CONTEXT_VALUE } as any
-    ) as any
-    const barLabel = selectField.prop('formatOptionLabel')?.(
-      { value: 'bar' },
-      { context: CONTEXT_MENU } as any
-    ) as any
+    const fooLabel = selectField.prop('formatOptionLabel')?.({ value: 'foo' }, {
+      context: CONTEXT_VALUE,
+    } as any) as any
+    const barLabel = selectField.prop('formatOptionLabel')?.({ value: 'bar' }, {
+      context: CONTEXT_MENU,
+    } as any) as any
 
     expect(mount(fooLabel)).toEqual(expectedFoo)
     expect(mount(barLabel)).toEqual(expectedBar)

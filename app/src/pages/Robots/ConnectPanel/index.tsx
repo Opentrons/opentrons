@@ -32,7 +32,9 @@ interface SP {
   isScanning: boolean
 }
 
-interface DP { onScanClick: () => unknown }
+interface DP {
+  onScanClick: () => unknown
+}
 
 type Props = SP & DP
 
@@ -89,7 +91,10 @@ function mapStateToProps(state: State): SP {
 }
 
 const mapDispatchToProps: DP = {
-  onScanClick: () => startDiscovery()
+  onScanClick: () => startDiscovery(),
 }
 
-export const ConnectPanel = connect(mapStateToProps, mapDispatchToProps)(ConnectPanelComponent)
+export const ConnectPanel = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ConnectPanelComponent)

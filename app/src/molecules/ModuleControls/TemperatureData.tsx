@@ -22,10 +22,10 @@ import type {
 } from '../../redux/modules/types'
 
 interface TemperatureDataProps {
-  title: string | null,
-  current: number | null,
-  target: number | null,
-  status?: TemperatureStatus | ThermocyclerStatus | null,
+  title: string | null
+  current: number | null
+  target: number | null
+  status?: TemperatureStatus | ThermocyclerStatus | null
 }
 
 export const TemperatureData = ({

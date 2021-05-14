@@ -48,9 +48,9 @@ import type { WizardStep } from './types'
 import type { PipetteName } from '@opentrons/shared-data'
 
 interface Props {
-  robotName: string,
-  mount: Mount,
-  closeModal: () => unknown,
+  robotName: string
+  mount: Mount
+  closeModal: () => unknown
 }
 
 // TODO(mc, 2019-12-18): i18n
@@ -76,7 +76,9 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const [wizardStep, setWizardStep] = React.useState<WizardStep>(CLEAR_DECK)
   const [wantedName, setWantedName] = React.useState<string | null>(null)
   const [confirmExit, setConfirmExit] = React.useState(false)
-  const wantedPipette = wantedName ? getPipetteNameSpecs(wantedName as PipetteName) : null
+  const wantedPipette = wantedName
+    ? getPipetteNameSpecs(wantedName as PipetteName)
+    : null
   const attachedPipette = useSelector(
     (state: State) => getAttachedPipettes(state, robotName)[mount]
   )

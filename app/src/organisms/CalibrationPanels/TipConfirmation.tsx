@@ -24,8 +24,8 @@ const NO_TRY_AGAIN = 'No, try again'
 
 const contentsBySessionType: {
   [sessionType in SessionType]: {
-    yesButtonText: string,
-    moveCommandString: SessionCommandString,
+    yesButtonText: string
+    moveCommandString: SessionCommandString
   }
 } = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {

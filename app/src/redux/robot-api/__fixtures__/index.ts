@@ -10,33 +10,33 @@ import type {
 } from '../types'
 
 export type ResponseFixturesOptions<SuccessBody, FailureBody> = {
-  method: Method,
-  path: string,
-  successStatus: number,
-  successBody: SuccessBody,
-  failureStatus: number,
-  failureBody: FailureBody,
+  method: Method
+  path: string
+  successStatus: number
+  successBody: SuccessBody
+  failureStatus: number
+  failureBody: FailureBody
 }
 
 export type ResponseFixtures<SuccessBody, FailureBody> = {
-  successMeta: { method: Method, path: string, status: number, ok: boolean },
-  failureMeta: { method: Method, path: string, status: number, ok: boolean },
+  successMeta: { method: Method; path: string; status: number; ok: boolean }
+  failureMeta: { method: Method; path: string; status: number; ok: boolean }
   success: {
-    method: Method,
-    path: string,
-    status: number,
-    ok: boolean,
-    host: RobotHost,
-    body: SuccessBody,
-  },
+    method: Method
+    path: string
+    status: number
+    ok: boolean
+    host: RobotHost
+    body: SuccessBody
+  }
   failure: {
-    method: Method,
-    path: string,
-    status: number,
-    ok: boolean,
-    host: RobotHost,
-    body: FailureBody,
-  },
+    method: Method
+    path: string
+    status: number
+    ok: boolean
+    host: RobotHost
+    body: FailureBody
+  }
 }
 
 export const mockRobot: RobotHost = {
@@ -50,9 +50,9 @@ export const mockRequestMeta: RobotApiRequestMeta = { requestId: 'abc' }
 export const mockFailureBody = { message: 'AH' }
 
 export const mockFailedRequestState: {
-  status: 'failure',
-  response: RobotApiResponseMeta,
-  error: { message?: string },
+  status: 'failure'
+  response: RobotApiResponseMeta
+  error: { message?: string }
 } = {
   response: {
     path: '/modules/abc123/update',

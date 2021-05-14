@@ -1,4 +1,3 @@
-
 import type {
   StartDiscoveryAction,
   FinishDiscoveryAction,

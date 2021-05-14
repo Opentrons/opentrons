@@ -17,10 +17,10 @@ import {
 import type { StyleProps } from '@opentrons/components'
 
 export interface TitledControlProps extends StyleProps {
-  title: string,
-  description: React.ReactNode,
-  control?: React.ReactNode,
-  children?: React.ReactNode,
+  title: string
+  description: React.ReactNode
+  control?: React.ReactNode
+  children?: React.ReactNode
 }
 
 export function TitledControl({

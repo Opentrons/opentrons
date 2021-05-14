@@ -4,11 +4,13 @@ import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
 
 export interface ConfirmUploadModalProps {
-  confirm: () => unknown,
-  cancel: () => unknown,
+  confirm: () => unknown
+  cancel: () => unknown
 }
 
-export function ConfirmUploadModal(props: ConfirmUploadModalProps): JSX.Element {
+export function ConfirmUploadModal(
+  props: ConfirmUploadModalProps
+): JSX.Element {
   return (
     <Portal>
       <AlertModal

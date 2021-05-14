@@ -6,9 +6,9 @@ import { CalibrationValues } from '../CalibrateLabware/CalibrationValues'
 import type { LabwareCalibrationData } from '../../../redux/calibration/labware/types'
 
 export function CalibrationData(props: {
-  calibrationData: LabwareCalibrationData | null,
-  calibratedThisSession: boolean,
-  calDataAvailable: boolean,
+  calibrationData: LabwareCalibrationData | null
+  calibratedThisSession: boolean
+  calDataAvailable: boolean
 }): JSX.Element {
   const { calibrationData, calibratedThisSession, calDataAvailable } = props
 

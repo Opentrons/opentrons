@@ -25,7 +25,9 @@ export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
   const onFinalPipette =
     !checkBothPipettes ||
     activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
-  let commandsList: Array<{command: SessionCommandString}> = [{ command: Sessions.checkCommands.RETURN_TIP }]
+  let commandsList: Array<{ command: SessionCommandString }> = [
+    { command: Sessions.checkCommands.RETURN_TIP },
+  ]
   if (onFinalPipette) {
     commandsList = [
       ...commandsList,

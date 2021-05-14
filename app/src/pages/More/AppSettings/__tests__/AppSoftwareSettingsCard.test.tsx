@@ -24,13 +24,19 @@ jest.mock('../../../../organisms/UpdateAppModal', () => ({
   UpdateAppModal: () => null,
 }))
 
-const getAvailableShellUpdate = Shell.getAvailableShellUpdate as jest.MockedFunction<typeof Shell.getAvailableShellUpdate>
+const getAvailableShellUpdate = Shell.getAvailableShellUpdate as jest.MockedFunction<
+  typeof Shell.getAvailableShellUpdate
+>
 
 const MOCK_STATE: State = {} as any
 
 describe('AppSoftwareSettingsCard', () => {
   const render = () => {
-    return mountWithStore<React.ComponentProps<typeof AppSoftwareSettingsCard>, State, Action>(<AppSoftwareSettingsCard />, {
+    return mountWithStore<
+      React.ComponentProps<typeof AppSoftwareSettingsCard>,
+      State,
+      Action
+    >(<AppSoftwareSettingsCard />, {
       initialState: MOCK_STATE,
     })
   }
@@ -111,7 +117,8 @@ describe('AppSoftwareSettingsCard', () => {
     const section = wrapper
       .find(TitledControl)
       .filterWhere(
-        (t: ReactWrapper<React.ComponentProps<typeof TitledControl>>) => t.prop('title') === 'Restore Different Software Version'
+        (t: ReactWrapper<React.ComponentProps<typeof TitledControl>>) =>
+          t.prop('title') === 'Restore Different Software Version'
       )
 
     const releasesLink = section

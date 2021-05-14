@@ -14,7 +14,9 @@ import styles from './styles.css'
 import type { MapDispatchToProps } from 'react-redux'
 import type { State } from '../../../redux/types'
 
-interface OP { robotName: string }
+interface OP {
+  robotName: string
+}
 
 interface SP {
   modulesRequired: boolean
@@ -22,10 +24,12 @@ interface SP {
   hasDuplicateModules: boolean
 }
 
-interface DP { setReviewed: () => unknown, fetchModules: () => unknown }
+interface DP {
+  setReviewed: () => unknown
+  fetchModules: () => unknown
+}
 
 type Props = OP & SP & DP
-
 
 function ConnectModulesComponent(props: Props): JSX.Element | null {
   if (!props.modulesRequired) return null
@@ -71,4 +75,7 @@ const mapDispatchToProps: MapDispatchToProps<DP, OP> = (dispatch, ownProps) => {
   }
 }
 
-export const ConnectModules = connect(mapStateToProps, mapDispatchToProps)(ConnectModulesComponent)
+export const ConnectModules = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ConnectModulesComponent)

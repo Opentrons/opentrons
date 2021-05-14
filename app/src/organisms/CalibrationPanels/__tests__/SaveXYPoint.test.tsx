@@ -7,27 +7,40 @@ import { SaveXYPoint } from '../SaveXYPoint'
 
 import type { Mount } from '@opentrons/components'
 import type { ReactWrapper, HTMLAttributes } from 'enzyme'
-import type { CalibrationSessionStep, VectorTuple } from '../../../redux/sessions/types'
+import type {
+  CalibrationSessionStep,
+  VectorTuple,
+} from '../../../redux/sessions/types'
 
 type ChannelString = 'multi' | 'single'
-const currentStepBySlot: {[slotNumber: string]: CalibrationSessionStep} = {
+const currentStepBySlot: { [slotNumber: string]: CalibrationSessionStep } = {
   '1': Sessions.DECK_STEP_SAVING_POINT_ONE,
   '3': Sessions.DECK_STEP_SAVING_POINT_TWO,
   '7': Sessions.DECK_STEP_SAVING_POINT_THREE,
 }
 describe('SaveXYPoint', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof SaveXYPoint> & {pipMount: Mount}>) => ReactWrapper<React.ComponentProps<typeof SaveXYPoint>>
+  let render: (
+    props?: Partial<
+      React.ComponentProps<typeof SaveXYPoint> & { pipMount: Mount }
+    >
+  ) => ReactWrapper<React.ComponentProps<typeof SaveXYPoint>>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getSaveButton = (wrapper: ReactWrapper<React.ComponentProps<typeof SaveXYPoint>>): ReactWrapper<HTMLAttributes> =>
-    wrapper.find('button[title="save"]')
+  const getSaveButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof SaveXYPoint>>
+  ): ReactWrapper<HTMLAttributes> => wrapper.find('button[title="save"]')
 
-  const getJogButton = (wrapper: ReactWrapper<React.ComponentProps<typeof SaveXYPoint>>, direction: string): ReactWrapper<HTMLAttributes> =>
+  const getJogButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof SaveXYPoint>>,
+    direction: string
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find(`button[title="${direction}"]`).find('button')
 
-  const getVideo = (wrapper: ReactWrapper<React.ComponentProps<typeof SaveXYPoint>>): ReactWrapper<HTMLAttributes> => wrapper.find(`source`)
+  const getVideo = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof SaveXYPoint>>
+  ): ReactWrapper<HTMLAttributes> => wrapper.find(`source`)
 
   beforeEach(() => {
     render = (props = {}) => {
@@ -70,7 +83,11 @@ describe('SaveXYPoint', () => {
     const slot7LeftSingleSrc = 'SLOT_7_LEFT_SINGLE_X-Y.webm'
     const slot7RightMultiSrc = 'SLOT_7_RIGHT_MULTI_X-Y.webm'
     const slot7RightSingleSrc = 'SLOT_7_RIGHT_SINGLE_X-Y.webm'
-    const assetMap: { [slot: string]: { [mount in Mount]: { [channels in ChannelString]: string } } } = {
+    const assetMap: {
+      [slot: string]: {
+        [mount in Mount]: { [channels in ChannelString]: string }
+      }
+    } = {
       '1': {
         left: {
           multi: slot1LeftMultiSrc,
@@ -104,7 +121,7 @@ describe('SaveXYPoint', () => {
     }
     Object.keys(assetMap).forEach(slotNumber => {
       const xyStep = assetMap[slotNumber]
-      Object.keys(xyStep).forEach((mountString) => {
+      Object.keys(xyStep).forEach(mountString => {
         Object.keys(xyStep[mountString as Mount]).forEach(channelString => {
           const wrapper = render({
             pipMount: mountString as Mount,
@@ -123,14 +140,16 @@ describe('SaveXYPoint', () => {
     const wrapper = render()
 
     const jogDirections: string[] = ['left', 'right', 'back', 'forward']
-    const jogVectorByDirection: {[dir: string]: VectorTuple} = {
+    const jogVectorByDirection: { [dir: string]: VectorTuple } = {
       left: [-0.1, 0, 0],
       right: [0.1, 0, 0],
       back: [0, 0.1, 0],
       forward: [0, -0.1, 0],
     }
     jogDirections.forEach(direction => {
-      getJogButton(wrapper, direction).invoke('onClick')?.({} as React.MouseEvent)
+      getJogButton(wrapper, direction).invoke('onClick')?.(
+        {} as React.MouseEvent
+      )
       wrapper.update()
 
       expect(mockSendCommands).toHaveBeenCalledWith({
@@ -237,7 +256,9 @@ describe('SaveXYPoint', () => {
 
   it('renders the confirm crash modal when invoked', () => {
     const wrapper = render()
-    wrapper.find('a[children="Start over"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('a[children="Start over"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     wrapper.update()
     expect(wrapper.find('ConfirmCrashRecoveryModal').exists()).toBe(true)
   })

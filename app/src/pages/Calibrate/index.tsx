@@ -19,14 +19,13 @@ import { Pipettes as CalibratePipettes } from './Pipettes'
 import { Labware as CalibrateLabware } from './Labware'
 import { Modules as ConnectModules } from './Modules'
 
-
 interface SP {
-  nextPipette: Pipette | null,
-  labware: Labware[],
-  nextLabware: Labware | null | undefined,
-  isTipsProbed: boolean,
-  nextPipetteTiprack: NextTiprackPipetteInfo | null,
-  modules: SessionModule[],
+  nextPipette: Pipette | null
+  labware: Labware[]
+  nextLabware: Labware | null | undefined
+  isTipsProbed: boolean
+  nextPipetteTiprack: NextTiprackPipetteInfo | null
+  modules: SessionModule[]
 }
 
 type Props = SP

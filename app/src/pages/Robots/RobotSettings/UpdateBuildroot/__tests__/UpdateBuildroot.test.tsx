@@ -1,6 +1,9 @@
 import * as React from 'react'
 
-import { mountWithStore, WrapperWithStore } from '@opentrons/components/__utils__'
+import {
+  mountWithStore,
+  WrapperWithStore,
+} from '@opentrons/components/__utils__'
 import { mockConnectableRobot as mockRobot } from '../../../../../redux/discovery/__fixtures__'
 import * as Buildroot from '../../../../../redux/buildroot'
 import { UpdateBuildroot } from '..'
@@ -21,15 +24,23 @@ jest.mock('../ViewUpdateModal', () => ({
 
 jest.mock('../../../../../redux/buildroot/selectors')
 
-const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<typeof Buildroot.getBuildrootUpdateAvailable>
-const getBuildrootSession = Buildroot.getBuildrootSession as jest.MockedFunction<typeof Buildroot.getBuildrootSession>
-const getRobotSystemType = Buildroot.getRobotSystemType as jest.MockedFunction<typeof Buildroot.getRobotSystemType>
+const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<
+  typeof Buildroot.getBuildrootUpdateAvailable
+>
+const getBuildrootSession = Buildroot.getBuildrootSession as jest.MockedFunction<
+  typeof Buildroot.getBuildrootSession
+>
+const getRobotSystemType = Buildroot.getRobotSystemType as jest.MockedFunction<
+  typeof Buildroot.getRobotSystemType
+>
 
-const MOCK_STATE: State = ({ mockState: true } as any)
+const MOCK_STATE: State = { mockState: true } as any
 
 describe('UpdateBuildroot wizard', () => {
   const closeModal = jest.fn()
-  const render = (): WrapperWithStore<React.ComponentProps<typeof UpdateBuildroot>> => {
+  const render = (): WrapperWithStore<
+    React.ComponentProps<typeof UpdateBuildroot>
+  > => {
     return mountWithStore<React.ComponentProps<typeof UpdateBuildroot>>(
       <UpdateBuildroot robot={mockRobot} close={closeModal} />,
       { initialState: MOCK_STATE }

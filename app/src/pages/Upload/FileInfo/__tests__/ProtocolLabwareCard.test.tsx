@@ -21,14 +21,26 @@ const MOCK_STORE = {
 }
 const ROBOT_NAME = 'robotName'
 
-const getUniqueProtocolLabwareSummaries = Calibration.getUniqueProtocolLabwareSummaries as jest.MockedFunction<typeof Calibration.getUniqueProtocolLabwareSummaries>
+const getUniqueProtocolLabwareSummaries = Calibration.getUniqueProtocolLabwareSummaries as jest.MockedFunction<
+  typeof Calibration.getUniqueProtocolLabwareSummaries
+>
 
-function stubSelector(mock: jest.MockedFunction<typeof Calibration.getUniqueProtocolLabwareSummaries>, rVal: ReturnType<typeof Calibration.getUniqueProtocolLabwareSummaries>): void {
-  mock.mockImplementation((state, robotName): ReturnType<typeof Calibration.getUniqueProtocolLabwareSummaries> => {
-    expect(state).toBe(MOCK_STATE)
-    expect(robotName).toBe(ROBOT_NAME)
-    return rVal
-  })
+function stubSelector(
+  mock: jest.MockedFunction<
+    typeof Calibration.getUniqueProtocolLabwareSummaries
+  >,
+  rVal: ReturnType<typeof Calibration.getUniqueProtocolLabwareSummaries>
+): void {
+  mock.mockImplementation(
+    (
+      state,
+      robotName
+    ): ReturnType<typeof Calibration.getUniqueProtocolLabwareSummaries> => {
+      expect(state).toBe(MOCK_STATE)
+      expect(robotName).toBe(ROBOT_NAME)
+      return rVal
+    }
+  )
 }
 
 describe('ProtocolLabwareCard', () => {
@@ -39,7 +51,9 @@ describe('ProtocolLabwareCard', () => {
     })
   }
 
-  const EMPTY_LABWARE: ReturnType<typeof Calibration.getUniqueProtocolLabwareSummaries> = []
+  const EMPTY_LABWARE: ReturnType<
+    typeof Calibration.getUniqueProtocolLabwareSummaries
+  > = []
   const FULL_LABWARE = [
     {
       quantity: 2,

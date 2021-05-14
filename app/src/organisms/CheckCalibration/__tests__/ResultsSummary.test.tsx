@@ -11,7 +11,7 @@ import { saveAs } from 'file-saver'
 import { PrimaryBtn, Flex, Text } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import type { ReactWrapper} from 'enzyme'
+import type { ReactWrapper } from 'enzyme'
 import type { Mount } from '../../../redux/pipettes/types'
 
 jest.mock('file-saver')
@@ -28,32 +28,51 @@ jest.mock('@opentrons/shared-data', () => ({
 
 const mockSaveAs = saveAs as jest.MockedFunction<typeof saveAs>
 
-const mockGetCalibrationStatus = Calibration.getCalibrationStatus as jest.MockedFunction<typeof Calibration.getCalibrationStatus>
+const mockGetCalibrationStatus = Calibration.getCalibrationStatus as jest.MockedFunction<
+  typeof Calibration.getCalibrationStatus
+>
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 
-const mockGetPipetteModelSpecs = getPipetteModelSpecs as jest.MockedFunction<typeof getPipetteModelSpecs>
+const mockGetPipetteModelSpecs = getPipetteModelSpecs as jest.MockedFunction<
+  typeof getPipetteModelSpecs
+>
 
 describe('ResultsSummary', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof ResultsSummary> & {pipMount: Mount}>) => ReactWrapper<React.ComponentProps<typeof ResultsSummary>>
+  let render: (
+    props?: Partial<
+      React.ComponentProps<typeof ResultsSummary> & { pipMount: Mount }
+    >
+  ) => ReactWrapper<React.ComponentProps<typeof ResultsSummary>>
   let mockStore: jest.MockedFunction<any>
   let dispatch
   let mockDeleteSession: jest.MockedFunction<any>
 
-  const getExitButton = (wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>): ReactWrapper<React.ComponentProps<typeof PrimaryBtn>> => wrapper.find(PrimaryBtn)
+  const getExitButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>
+  ): ReactWrapper<React.ComponentProps<typeof PrimaryBtn>> =>
+    wrapper.find(PrimaryBtn)
 
-  const getSaveLink = (wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>): ReactWrapper<HTMLAttributes> =>
+  const getSaveLink = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find('button[title="download-results-button"]')
 
-  const getDeckParent = (wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>): ReactWrapper => wrapper.children(Flex).at(1)
-  const getLeftPipParent = (wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>): ReactWrapper =>
-    wrapper.find('div[title="left-mount-container"]')
-  const getLeftPipResultsParent = (wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>): ReactWrapper =>
-    wrapper.find('div[title="left-mount-results"]')
-  const getRightPipParent = (wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>): ReactWrapper =>
-    wrapper.find('div[title="right-mount-container"]')
-  const getRightPipResultsParent = (wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>): ReactWrapper =>
-    wrapper.find('div[title="right-mount-results"]')
+  const getDeckParent = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>
+  ): ReactWrapper => wrapper.children(Flex).at(1)
+  const getLeftPipParent = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>
+  ): ReactWrapper => wrapper.find('div[title="left-mount-container"]')
+  const getLeftPipResultsParent = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>
+  ): ReactWrapper => wrapper.find('div[title="left-mount-results"]')
+  const getRightPipParent = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>
+  ): ReactWrapper => wrapper.find('div[title="right-mount-container"]')
+  const getRightPipResultsParent = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ResultsSummary>>
+  ): ReactWrapper => wrapper.find('div[title="right-mount-results"]')
 
   beforeEach(() => {
     mockDeleteSession = jest.fn()
@@ -178,7 +197,9 @@ describe('ResultsSummary', () => {
 
   it('exits when button is clicked', () => {
     const wrapper = render()
-    act((): void =>  getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent))
+    act((): void =>
+      getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+    )
     wrapper.update()
 
     expect(mockDeleteSession).toHaveBeenCalled()
@@ -186,7 +207,9 @@ describe('ResultsSummary', () => {
 
   it('saves the calibration report when the button is clicked', () => {
     const wrapper = render()
-    act((): void => getSaveLink(wrapper).invoke('onClick')?.({} as React.MouseEvent))
+    act((): void =>
+      getSaveLink(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+    )
     wrapper.update()
     expect(mockSaveAs).toHaveBeenCalled()
   })

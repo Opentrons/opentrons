@@ -11,11 +11,11 @@ import type { Dispatch } from '../../../../redux/types'
 import type { RobotSystemType } from '../../../../redux/buildroot/types'
 
 export interface ReleaseNotesModalProps {
-  robotName: string,
-  notNowButton: ButtonProps,
-  releaseNotes: string,
-  systemType: RobotSystemType | null,
-  proceed: () => unknown,
+  robotName: string
+  notNowButton: ButtonProps
+  releaseNotes: string
+  systemType: RobotSystemType | null
+  proceed: () => unknown
 }
 
 export function ReleaseNotesModal(props: ReleaseNotesModalProps): JSX.Element {

@@ -48,7 +48,9 @@ describe('ManagePath', () => {
 
   it('has an IconCta that calls onChangePath on click', () => {
     expect(mockOnChangePath).toHaveBeenCalledTimes(0)
-    wrapper.find(`IconCta[name="${CHANGE_SOURCE_NAME}"]`).invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find(`IconCta[name="${CHANGE_SOURCE_NAME}"]`).invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(mockOnChangePath).toHaveBeenCalledTimes(1)
   })
 
@@ -57,7 +59,9 @@ describe('ManagePath', () => {
       expect(wrapper.exists(ConfirmResetPathModal)).toBe(false)
 
       act(() => {
-        wrapper.find(`IconCta[name="${RESET_SOURCE_NAME}"]`).invoke('onClick')?.({} as React.MouseEvent)
+        wrapper
+          .find(`IconCta[name="${RESET_SOURCE_NAME}"]`)
+          .invoke('onClick')?.({} as React.MouseEvent)
       })
 
       wrapper.update()

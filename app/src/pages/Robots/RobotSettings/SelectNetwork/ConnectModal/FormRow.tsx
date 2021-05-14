@@ -4,9 +4,9 @@ import styled from 'styled-components'
 import { FONT_WEIGHT_SEMIBOLD } from '@opentrons/components'
 
 export interface FormRowProps {
-  label: string,
-  labelFor: string,
-  children: React.ReactNode,
+  label: string
+  labelFor: string
+  children: React.ReactNode
 }
 
 const StyledRow = styled.div`

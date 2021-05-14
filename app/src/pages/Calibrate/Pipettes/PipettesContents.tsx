@@ -10,10 +10,10 @@ import type { Pipette, Labware } from '../../../redux/robot/types'
 import type { Mount } from '../../../redux/pipettes/types'
 
 export interface PipettesContentsProps {
-  currentMount: Mount | null,
-  pipettes: Pipette[],
-  activeTipracks: { left: Labware | null, right: Labware | null },
-  changePipetteUrl: string,
+  currentMount: Mount | null
+  pipettes: Pipette[]
+  activeTipracks: { left: Labware | null; right: Labware | null }
+  changePipetteUrl: string
 }
 
 export function PipettesContents(props: PipettesContentsProps): JSX.Element {
@@ -21,8 +21,8 @@ export function PipettesContents(props: PipettesContentsProps): JSX.Element {
 
   const infoByMount = PIPETTE_MOUNTS.reduce<
     Partial<{
-      left?: InstrumentInfoProps,
-      right?: InstrumentInfoProps,
+      left?: InstrumentInfoProps
+      right?: InstrumentInfoProps
     }>
   >((result, mount) => {
     const pipette = pipettes.find(p => p.mount === mount)

@@ -25,19 +25,27 @@ jest.mock('../../../redux/config/selectors')
 jest.mock('../../../redux/pipettes/selectors')
 jest.mock('../../../redux/analytics/actions')
 
-const mockGetUncalibratedTipracksByMount = getUncalibratedTipracksByMount as jest.MockedFunction<typeof getUncalibratedTipracksByMount>
+const mockGetUncalibratedTipracksByMount = getUncalibratedTipracksByMount as jest.MockedFunction<
+  typeof getUncalibratedTipracksByMount
+>
 
-const mockGetUnconfirmedLabware = robotSelectors.getUnconfirmedLabware as jest.MockedFunction<typeof robotSelectors.getUnconfirmedLabware>
+const mockGetUnconfirmedLabware = robotSelectors.getUnconfirmedLabware as jest.MockedFunction<
+  typeof robotSelectors.getUnconfirmedLabware
+>
 
-const mockUseDispatchApiRequests = useDispatchApiRequests as jest.MockedFunction<typeof useDispatchApiRequests>
+const mockUseDispatchApiRequests = useDispatchApiRequests as jest.MockedFunction<
+  typeof useDispatchApiRequests
+>
 
-const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction<typeof getHasCalibrationBlock>
+const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction<
+  typeof getHasCalibrationBlock
+>
 
 const threehundredtiprack: LabwareDefinition2 = tiprack300Def as any
-const MOCK_STATE: State = ({ mockState: true } as any)
+const MOCK_STATE: State = { mockState: true } as any
 
 const stubUnconfirmedLabware: Labware[] = [
-  ({
+  {
     _id: 123,
     type: 'some_wellplate',
     slot: '4',
@@ -51,12 +59,14 @@ const stubUnconfirmedLabware: Labware[] = [
     calibration: 'unconfirmed',
     isMoving: false,
     definition: wellPlate96Def,
-  } as Labware),
+  } as Labware,
 ]
 
 describe('Testing calibrate tip length control', () => {
   let dispatchApiRequests: DispatchApiRequestType
-  let render: (props?: Partial<React.ComponentProps<typeof CalibrateTipLengthControl>>) =>  WrapperWithStore<React.ComponentProps<typeof CalibrateTipLengthControl>>
+  let render: (
+    props?: Partial<React.ComponentProps<typeof CalibrateTipLengthControl>>
+  ) => WrapperWithStore<React.ComponentProps<typeof CalibrateTipLengthControl>>
   const fakeRobot = 'fakerobot'
   const fakeMount = 'right'
 
@@ -72,7 +82,9 @@ describe('Testing calibrate tip length control', () => {
         hasCalibrated = true,
         tipRackDefinition = threehundredtiprack,
       } = props
-      return mountWithStore<React.ComponentProps<typeof CalibrateTipLengthControl>>(
+      return mountWithStore<
+        React.ComponentProps<typeof CalibrateTipLengthControl>
+      >(
         <CalibrateTipLengthControl
           robotName={fakeRobot}
           hasCalibrated={hasCalibrated}

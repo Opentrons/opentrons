@@ -28,10 +28,10 @@ import {
 import type { Mount } from '../../../redux/pipettes/types'
 
 interface Props {
-  robotName: string,
-  makeChangeUrl: (mount: Mount) => string,
-  makeConfigureUrl: (mount: Mount) => string,
-  isChangingOrConfiguringPipette: boolean,
+  robotName: string
+  makeChangeUrl: (mount: Mount) => string
+  makeConfigureUrl: (mount: Mount) => string
+  isChangingOrConfiguringPipette: boolean
 }
 
 // TODO(mc, 2019-12-09): i18n

@@ -11,7 +11,7 @@ import {
   FONT_SIZE_CAPTION,
   FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
-import { getLabwareDisplayName, getIsTiprack, } from '@opentrons/shared-data'
+import { getLabwareDisplayName, getIsTiprack } from '@opentrons/shared-data'
 import styles from './styles.css'
 
 import type { LabwareDefinition2, DeckSlot } from '@opentrons/shared-data'
@@ -20,8 +20,8 @@ const SHORT = 'SHORT'
 const TALL = 'TALL'
 
 interface CalibrationLabwareRenderProps {
-  labwareDef: LabwareDefinition2,
-  slotDef: DeckSlot,
+  labwareDef: LabwareDefinition2
+  slotDef: DeckSlot
 }
 
 export function CalibrationLabwareRender(

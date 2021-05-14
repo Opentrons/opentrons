@@ -17,7 +17,7 @@ import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
 interface Props {
-  robot: ViewableRobot,
+  robot: ViewableRobot
 }
 
 const STATUS_REFRESH_MS = 5000

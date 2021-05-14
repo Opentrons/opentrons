@@ -14,16 +14,16 @@ import type {
 } from '../../../../redux/modules/types'
 
 interface Props {
-  module: TemperatureModule,
+  module: TemperatureModule
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
     args?: unknown[]
-  ) => unknown,
-  controlDisabledReason: string | null,
-  isCardExpanded: boolean,
-  toggleCard: () => unknown,
-  slot: string,
+  ) => unknown
+  controlDisabledReason: string | null
+  isCardExpanded: boolean
+  toggleCard: () => unknown
+  slot: string
 }
 
 export const TempDeckCard = ({

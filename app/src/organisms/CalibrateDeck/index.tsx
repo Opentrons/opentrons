@@ -92,7 +92,9 @@ const PANEL_STYLE_PROPS_BY_STEP: {
   [Sessions.DECK_STEP_SAVING_POINT_THREE]: contentsStyleProps,
   [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
 }
-export function CalibrateDeck(props: CalibrateDeckParentProps): JSX.Element | null {
+export function CalibrateDeck(
+  props: CalibrateDeckParentProps
+): JSX.Element | null {
   const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details || {}

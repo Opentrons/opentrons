@@ -14,16 +14,16 @@ import type { RouteComponentProps } from 'react-router-dom'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 
-type OP = RouteComponentProps<{path: string}>
+type OP = RouteComponentProps<{ path: string }>
 
 interface SP {
-  robot: Robot | null | undefined,
-  filename: string | null | undefined,
-  uploadInProgress: boolean,
-  uploadError: { message: string } | null | undefined,
-  sessionLoaded: boolean,
-  sessionHasSteps: boolean,
-  showCustomLabwareWarning: boolean,
+  robot: Robot | null | undefined
+  filename: string | null | undefined
+  uploadInProgress: boolean
+  uploadError: { message: string } | null | undefined
+  sessionLoaded: boolean
+  sessionHasSteps: boolean
+  showCustomLabwareWarning: boolean
 }
 
 type Props = OP & SP & { dispatch: Dispatch }

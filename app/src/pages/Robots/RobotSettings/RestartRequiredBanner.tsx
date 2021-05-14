@@ -8,7 +8,7 @@ import styles from './styles.css'
 import type { Dispatch } from '../../../redux/types'
 
 export interface RestartRequiredBannerProps {
-  robotName: string,
+  robotName: string
 }
 
 // TODO(mc, 2019-10-24): i18n

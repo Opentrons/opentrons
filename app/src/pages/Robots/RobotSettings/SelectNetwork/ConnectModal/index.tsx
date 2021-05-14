@@ -19,12 +19,12 @@ import type {
 } from '../types'
 
 export interface ConnectModalProps {
-  robotName: string,
-  network: WifiNetwork | null,
-  wifiKeys: WifiKey[],
-  eapOptions: EapOption[],
-  onConnect: (r: WifiConfigureRequest) => unknown,
-  onCancel: () => unknown,
+  robotName: string
+  network: WifiNetwork | null
+  wifiKeys: WifiKey[]
+  eapOptions: EapOption[]
+  onConnect: (r: WifiConfigureRequest) => unknown
+  onCancel: () => unknown
 }
 
 export const ConnectModal = (props: ConnectModalProps): JSX.Element => {
@@ -35,7 +35,9 @@ export const ConnectModal = (props: ConnectModalProps): JSX.Element => {
     if (request) onConnect(request)
   }
 
-  const handleValidate = (values: ConnectFormValues): ReturnType<typeof validateConnectFormFields>=> {
+  const handleValidate = (
+    values: ConnectFormValues
+  ): ReturnType<typeof validateConnectFormFields> => {
     return validateConnectFormFields(network, eapOptions, values)
   }
 
@@ -51,7 +53,9 @@ export const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   )
 }
 
-export const ConnectModalComponent = (props: ConnectModalProps): JSX.Element => {
+export const ConnectModalComponent = (
+  props: ConnectModalProps
+): JSX.Element => {
   const { robotName, network, wifiKeys, eapOptions, onCancel } = props
   const { values, isValid } = useFormikContext<ConnectFormValues>()
 

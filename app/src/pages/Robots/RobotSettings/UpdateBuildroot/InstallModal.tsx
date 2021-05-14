@@ -10,10 +10,10 @@ import type {
 } from '../../../../redux/buildroot/types'
 
 export interface InstallModalProps {
-  robot: ViewableRobot,
-  robotSystemType: RobotSystemType | null,
-  session: BuildrootUpdateSession,
-  close: () => unknown,
+  robot: ViewableRobot
+  robotSystemType: RobotSystemType | null
+  session: BuildrootUpdateSession
+  close: () => unknown
 }
 
 export function InstallModal(props: InstallModalProps): JSX.Element {

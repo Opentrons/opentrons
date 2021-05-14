@@ -10,15 +10,21 @@ import type { ReactWrapper } from 'enzyme'
 import type { Mount } from '@opentrons/components'
 
 describe('Introduction', () => {
-  let render: (props?: Partial<React.ComponentProps<typeof Introduction> & { pipMount: Mount }>) => ReactWrapper<React.ComponentProps<typeof Introduction>>
+  let render: (
+    props?: Partial<
+      React.ComponentProps<typeof Introduction> & { pipMount: Mount }
+    >
+  ) => ReactWrapper<React.ComponentProps<typeof Introduction>>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getContinueButton = (wrapper: ReactWrapper<React.ComponentProps<typeof Introduction>>) =>
-    wrapper.find('button[data-test="continueButton"]')
-  const getUseDiffTipRackButton = (wrapper: ReactWrapper<React.ComponentProps<typeof Introduction>>) =>
-    wrapper.find('button[data-test="chooseTipRackButton"]')
+  const getContinueButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof Introduction>>
+  ) => wrapper.find('button[data-test="continueButton"]')
+  const getUseDiffTipRackButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof Introduction>>
+  ) => wrapper.find('button[data-test="chooseTipRackButton"]')
 
   beforeEach(() => {
     render = (props = {}) => {

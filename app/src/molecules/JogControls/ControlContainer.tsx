@@ -11,9 +11,9 @@ import {
 } from '@opentrons/components'
 
 interface ControlContainerProps {
-  title: string,
-  subtitle: string,
-  children: React.ReactNode,
+  title: string
+  subtitle: string
+  children: React.ReactNode
 }
 
 export function ControlContainer(props: ControlContainerProps): JSX.Element {

@@ -23,8 +23,8 @@ export const CANCEL_NAME = 'cancel'
 export const RESET_SOURCE_NAME = 'reset-source'
 
 export interface ConfirmResetPathModalProps {
-  onCancel: () => unknown,
-  onConfirm: () => unknown,
+  onCancel: () => unknown
+  onConfirm: () => unknown
 }
 
 export const ConfirmResetPathModalTemplate = ({

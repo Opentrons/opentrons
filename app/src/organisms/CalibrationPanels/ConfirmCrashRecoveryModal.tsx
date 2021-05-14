@@ -9,11 +9,11 @@ import {
 import styles from './styles.css'
 
 export interface ConfirmCrashRecoveryModalProps {
-  back: () => unknown,
-  confirm: () => unknown,
-  tipRackDisplayName: string,
-  tipRackSlot: string,
-  requiresNewTip: boolean,
+  back: () => unknown
+  confirm: () => unknown
+  tipRackDisplayName: string
+  tipRackSlot: string
+  requiresNewTip: boolean
 }
 
 const HEADING = 'Start Over?'

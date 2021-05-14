@@ -13,12 +13,12 @@ import type {
 import type { WifiNetwork } from '../types'
 
 export interface SelectSsidProps {
-  list: WifiNetwork[],
-  value: string | null,
-  showWifiDisconnect: boolean,
-  onConnect: (ssid: string) => unknown,
-  onJoinOther: () => unknown,
-  onDisconnect: () => unknown,
+  list: WifiNetwork[]
+  value: string | null
+  showWifiDisconnect: boolean
+  onConnect: (ssid: string) => unknown
+  onJoinOther: () => unknown
+  onDisconnect: () => unknown
 }
 
 const FIELD_NAME = '__SelectSsid__'
@@ -31,7 +31,9 @@ const SELECT_JOIN_OTHER_GROUP = {
   options: [{ value: JOIN_OTHER_VALUE, label: Copy.LABEL_JOIN_OTHER_NETWORK }],
 }
 
-const makeSelectDisconnectGroup = (ssid: string): {options: Array<{value: string, label: string}>} => ({
+const makeSelectDisconnectGroup = (
+  ssid: string
+): { options: Array<{ value: string; label: string }> } => ({
   options: [
     { value: DISCONNECT_WIFI_VALUE, label: Copy.DISCONNECT_FROM_SSID(ssid) },
   ],
@@ -78,7 +80,9 @@ export function SelectSsid(props: SelectSsidProps): JSX.Element {
     }
   }
 
-  const formatOptionLabel: React.ComponentProps<typeof StyledSelectField>['formatOptionLabel'] = (option, { context }): JSX.Element | null => {
+  const formatOptionLabel: React.ComponentProps<
+    typeof StyledSelectField
+  >['formatOptionLabel'] = (option, { context }): JSX.Element | null => {
     const { value, label } = option
 
     if (label != null) return <NetworkActionLabel label={label} />

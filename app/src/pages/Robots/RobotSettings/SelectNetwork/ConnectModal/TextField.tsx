@@ -12,11 +12,11 @@ import { useConnectFormField } from './form-state'
 import { LABEL_SHOW_PASSWORD } from '../i18n'
 
 export interface TextFieldProps {
-  id: string,
-  name: string,
-  label: string,
-  isPassword: boolean,
-  className?: string,
+  id: string
+  name: string
+  label: string
+  isPassword: boolean
+  className?: string
 }
 
 export const TextField = (props: TextFieldProps): JSX.Element => {

@@ -3,8 +3,8 @@ import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 
 export interface ConfirmExitModalProps {
-  back: () => unknown,
-  exit: () => unknown,
+  back: () => unknown
+  exit: () => unknown
 }
 
 const HEADING = 'Are you sure you want to exit?'

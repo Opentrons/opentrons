@@ -8,7 +8,9 @@ import { OpenJupyterControl } from '../OpenJupyterControl'
 
 jest.mock('../../../../redux/analytics')
 
-const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<typeof Analytics.useTrackEvent>
+const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<
+  typeof Analytics.useTrackEvent
+>
 
 describe('OpenJupyterControl component', () => {
   const render = (): ReturnType<typeof mountWithProviders> =>
@@ -51,7 +53,9 @@ describe('OpenJupyterControl component', () => {
   it('should send an analytics event on link click', () => {
     const { wrapper } = render()
 
-    wrapper.find('a[href="http://localhost:48888"]').invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('a[href="http://localhost:48888"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
 
     expect(trackEvent).toHaveBeenCalledWith({
       name: 'jupyterOpen',

@@ -23,7 +23,11 @@ const wifiKeys = [Fixtures.mockWifiKey]
 describe('FormModal', () => {
   const handleCancel = jest.fn()
 
-  const render = (network: FormModalProps['network'] = null, fields: FormModalProps['fields'] = [], isValid: FormModalProps['isValid'] = false) => {
+  const render = (
+    network: FormModalProps['network'] = null,
+    fields: FormModalProps['fields'] = [],
+    isValid: FormModalProps['isValid'] = false
+  ) => {
     return mount(
       <FormModal
         id={id}

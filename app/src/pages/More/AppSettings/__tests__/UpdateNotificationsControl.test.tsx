@@ -15,9 +15,13 @@ import { AnalyticsEvent } from '../../../../redux/analytics/types'
 jest.mock('../../../../redux/alerts/selectors')
 jest.mock('../../../../redux/analytics/hooks')
 
-const getAlertIsPermanentlyIgnored = Alerts.getAlertIsPermanentlyIgnored as jest.MockedFunction<typeof Alerts.getAlertIsPermanentlyIgnored>
+const getAlertIsPermanentlyIgnored = Alerts.getAlertIsPermanentlyIgnored as jest.MockedFunction<
+  typeof Alerts.getAlertIsPermanentlyIgnored
+>
 
-const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<typeof Analytics.useTrackEvent>
+const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<
+  typeof Analytics.useTrackEvent
+>
 
 const MOCK_STATE: State = {} as any
 
@@ -25,7 +29,11 @@ describe('UpdateNotificationsControl', () => {
   const trackEvent: (e: AnalyticsEvent) => void = jest.fn() as any
 
   const render = (styleProps: Partial<StyleProps> = {}) => {
-    return mountWithStore<React.ComponentProps<typeof UpdateNotificationsControl>, State, Action>(<UpdateNotificationsControl {...styleProps} />, {
+    return mountWithStore<
+      React.ComponentProps<typeof UpdateNotificationsControl>,
+      State,
+      Action
+    >(<UpdateNotificationsControl {...styleProps} />, {
       initialState: MOCK_STATE,
     })
   }

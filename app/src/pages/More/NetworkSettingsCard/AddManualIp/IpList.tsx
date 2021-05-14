@@ -8,17 +8,16 @@ import type { State, Dispatch } from '../../../../redux/types'
 import type { DiscoveryCandidates } from '../../../../redux/config/types'
 import type { Robot, ReachableRobot } from '../../../../redux/discovery/types'
 
-
 interface SP {
-  robots: Array<Robot | ReachableRobot>,
-  candidates: DiscoveryCandidates,
+  robots: Array<Robot | ReachableRobot>
+  candidates: DiscoveryCandidates
 }
 
 interface DP {
-  removeManualIp: (ip: string) => unknown,
+  removeManualIp: (ip: string) => unknown
 }
 
-type Props =  SP & DP
+type Props = SP & DP
 
 function IpListComponent(props: Props): JSX.Element {
   const { candidates, removeManualIp, robots } = props
@@ -50,7 +49,7 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-const mapDispatchToProps: MapDispatchToProps<DP, {}> = (dispatch) => {
+const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
   return {
     removeManualIp: ip => dispatch(removeManualIp(ip)),
   }

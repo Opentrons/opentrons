@@ -14,9 +14,13 @@ import type { State, Action } from '../../../../redux/types'
 
 jest.mock('../../../../redux/custom-labware/selectors')
 
-const mockGetCustomLabwareDirectory = CustomLabware.getCustomLabwareDirectory as jest.MockedFunction<typeof CustomLabware.getCustomLabwareDirectory>
+const mockGetCustomLabwareDirectory = CustomLabware.getCustomLabwareDirectory as jest.MockedFunction<
+  typeof CustomLabware.getCustomLabwareDirectory
+>
 
-const mockGetAddLabwareFailure = CustomLabware.getAddLabwareFailure as jest.MockedFunction<typeof CustomLabware.getAddLabwareFailure>
+const mockGetAddLabwareFailure = CustomLabware.getAddLabwareFailure as jest.MockedFunction<
+  typeof CustomLabware.getAddLabwareFailure
+>
 
 const mockLabwarePath = '/path/to/labware'
 
@@ -29,9 +33,7 @@ describe('AddLabwareCard', () => {
     mockGetAddLabwareFailure.mockReturnValue({ file: null, errorMessage: null })
 
     render = () =>
-      mountWithStore<typeof AddLabwareCard, State, Action>(
-        <AddLabwareCard />
-      )
+      mountWithStore<typeof AddLabwareCard, State, Action>(<AddLabwareCard />)
   })
 
   afterEach(() => {

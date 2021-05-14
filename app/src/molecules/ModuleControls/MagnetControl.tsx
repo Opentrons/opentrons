@@ -28,11 +28,11 @@ import type { MagneticModule, ModuleCommand } from '../../redux/modules/types'
 import type { ModuleModel } from '@opentrons/shared-data'
 
 interface ModelContents {
-  version: string,
-  units: string | null,
-  maxHeight: number,
-  labwareBottomHeight: number,
-  disengagedHeight: number,
+  version: string
+  units: string | null
+  maxHeight: number
+  labwareBottomHeight: number
+  disengagedHeight: number
 }
 
 const contentsByModel = (model: ModuleModel): ModelContents => {
@@ -56,13 +56,13 @@ const contentsByModel = (model: ModuleModel): ModelContents => {
 }
 
 interface Props {
-  module: MagneticModule;
+  module: MagneticModule
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
     args?: unknown[]
-  ) => unknown;
-  disabledReason?: string | null;
+  ) => unknown
+  disabledReason?: string | null
 }
 
 export const MagnetControl = ({
@@ -70,7 +70,9 @@ export const MagnetControl = ({
   sendModuleCommand,
   disabledReason,
 }: Props): JSX.Element => {
-  const [engageHeightValue, setEngageHeightValue] = React.useState<string | null>(null)
+  const [engageHeightValue, setEngageHeightValue] = React.useState<
+    string | null
+  >(null)
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
 
   const isEngaged = module.status === 'engaged'

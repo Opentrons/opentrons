@@ -18,8 +18,8 @@ import type { State, Dispatch } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 export interface UpdateBuildrootProps {
-  robot: ViewableRobot,
-  close: () => unknown,
+  robot: ViewableRobot
+  close: () => unknown
 }
 
 export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {

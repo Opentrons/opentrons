@@ -13,9 +13,9 @@ import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import type { Dispatch } from '../../../redux/types'
 
 export interface LabwareGroupProps {
-  robotName: string | null,
-  tipracks: BaseProtocolLabware[],
-  otherLabware: BaseProtocolLabware[],
+  robotName: string | null
+  tipracks: BaseProtocolLabware[]
+  otherLabware: BaseProtocolLabware[]
 }
 
 export function LabwareGroup(props: LabwareGroupProps): JSX.Element {

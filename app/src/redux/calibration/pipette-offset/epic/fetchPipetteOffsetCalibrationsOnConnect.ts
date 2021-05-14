@@ -1,4 +1,3 @@
-
 import { of } from 'rxjs'
 import { filter, withLatestFrom, mergeMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'

@@ -6,11 +6,11 @@ import { Portal } from '../../App/portal'
 import styles from './styles.css'
 
 interface Props {
-  heading?: string | null,
-  description: string,
-  close?: () => unknown,
-  closeUrl?: string,
-  error: { message?: string, [key: string]: unknown},
+  heading?: string | null
+  description: string
+  close?: () => unknown
+  closeUrl?: string
+  error: { message?: string; [key: string]: unknown }
 }
 
 const DEFAULT_HEADING = 'Unexpected Error'

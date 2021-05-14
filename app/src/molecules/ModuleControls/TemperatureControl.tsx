@@ -28,14 +28,14 @@ import type {
 import type { ModuleModel } from '@opentrons/shared-data'
 
 interface Props {
-  module: ThermocyclerModule | TemperatureModule;
+  module: ThermocyclerModule | TemperatureModule
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
     args?: unknown[]
-  ) => unknown;
-  isSecondaryTemp: boolean;
-  disabledReason?: string | null;
+  ) => unknown
+  isSecondaryTemp: boolean
+  disabledReason?: string | null
 }
 
 export const TemperatureControl = ({
@@ -169,8 +169,8 @@ function getModuleTemperatureRanges(
 
 const TEMPERATURE_RANGES: {
   [model in ModuleModel]?: {
-    primary: TemperatureRanges,
-    secondary?: TemperatureRanges | null,
+    primary: TemperatureRanges
+    secondary?: TemperatureRanges | null
   }
 } = {
   temperatureModuleV1: { primary: { min: 4, max: 96 }, secondary: null },

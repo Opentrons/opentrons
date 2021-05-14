@@ -8,11 +8,11 @@ import * as Copy from './i18n'
 import type { NetworkChangeType } from './types'
 
 export interface ResultModalProps {
-  type: NetworkChangeType,
-  ssid: string | null,
-  isPending: boolean,
-  error: { message?: string, [key: string]: unknown} | null,
-  onClose: () => unknown,
+  type: NetworkChangeType
+  ssid: string | null
+  isPending: boolean
+  error: { message?: string; [key: string]: unknown } | null
+  onClose: () => unknown
 }
 
 export const ResultModal = (props: ResultModalProps): JSX.Element => {

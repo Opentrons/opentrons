@@ -12,10 +12,12 @@ const CANCEL_TEXT = 'cancel run'
 const BACK_TEXT = 'go back'
 
 export interface ConfirmCancelModalProps {
-  onClose: () => unknown,
+  onClose: () => unknown
 }
 
-export function ConfirmCancelModal(props: ConfirmCancelModalProps): JSX.Element {
+export function ConfirmCancelModal(
+  props: ConfirmCancelModalProps
+): JSX.Element {
   const { onClose } = props
   const dispatch = useDispatch<Dispatch>()
 
