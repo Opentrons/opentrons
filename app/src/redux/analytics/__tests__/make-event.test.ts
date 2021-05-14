@@ -78,7 +78,7 @@ describe('analytics events map', () => {
       return null
     })
 
-    const success = robotActions.connectResponse({})
+    const success = robotActions.connectResponse(null)
     const failure = robotActions.connectResponse(new Error('AH'))
 
     return Promise.all([
