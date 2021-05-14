@@ -212,4 +212,4 @@ Version 2.10
 
 Version 2.11
 ++++++++++++
-- In Python protocols requesting API version 2.11, validation to prevent aspiration and dispensation to tip-racks.
+- In Python protocols requesting API version 2.11, attempting to aspirate from or dispense to tip racks will raise an error.
