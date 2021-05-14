@@ -11,7 +11,7 @@ import { getCustomLabware } from '../../redux/custom-labware'
 import { FileInfo } from './FileInfo'
 
 import type { RouteComponentProps } from 'react-router-dom'
-import type { State, Dispatch } from '../../redux/types'
+import type { State } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 
 type OP = RouteComponentProps<{ path: string }>
@@ -26,7 +26,7 @@ interface SP {
   showCustomLabwareWarning: boolean
 }
 
-type Props = OP & SP & { dispatch: Dispatch }
+type Props = OP & SP
 
 export const Upload = withRouter(connect(mapStateToProps, {})(UploadComponent))
 
