@@ -8,10 +8,14 @@ context('Tubes and Rack', () => {
       cy.visit('/create')
       cy.viewport('macbook-15')
       cy.contains('NO').click({ force: true })
-      cy.contains('Select...').click({ force: true })
-      cy.contains('Tubes + Opentrons Tube Rack').click({ force: true })
-      cy.contains('Select...').click({ force: true })
-      cy.contains('6 tubes').click({ force: true })
+      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
+      cy.get('label').contains('What type of labware are you creating?').children().first().trigger('mousedown')
+      cy.get('*[class^="Dropdown__option_label"]').contains('Tubes + Opentrons Tube Rack').click()
+
+      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
+      cy.get('label').contains('Which tube rack insert?').children().first().trigger('mousedown')
+      cy.get('*[class^="Dropdown__option_label"]').contains('6 tubes').click()
+      
       cy.contains('start creating labware').click({ force: true })
     })
 
@@ -143,8 +147,9 @@ context('Tubes and Rack', () => {
 
         // Test pipette
         cy.contains('Test Pipette is required').should('exist')
-        cy.contains('Select...').click({ force: true })
-        cy.contains('P10 Single').click({ force: true })
+        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
+        cy.get('label').contains('Test Pipette').children().first().trigger('mousedown')
+        cy.get('*[class^="Dropdown__option_label"]').contains('P10 Single GEN1').click()
         cy.contains('Test Pipette is required').should('not.exist')
 
         // All fields present
@@ -161,10 +166,15 @@ context('Tubes and Rack', () => {
       cy.visit('/create')
       cy.viewport('macbook-15')
       cy.contains('NO').click({ force: true })
-      cy.contains('Select...').click({ force: true })
-      cy.contains('Tubes + Opentrons Tube Rack').click({ force: true })
-      cy.contains('Select...').click({ force: true })
-      cy.contains('15 tubes').click({ force: true })
+
+      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
+      cy.get('label').contains('What type of labware are you creating?').children().first().trigger('mousedown')
+      cy.get('*[class^="Dropdown__option_label"]').contains('Tubes + Opentrons Tube Rack').click()
+
+      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
+      cy.get('label').contains('Which tube rack insert?').children().first().trigger('mousedown')
+      cy.get('*[class^="Dropdown__option_label"]').contains('15 tubes').click()
+
       cy.contains('start creating labware').click({ force: true })
     })
 
@@ -298,8 +308,9 @@ context('Tubes and Rack', () => {
 
         // Test pipette
         cy.contains('Test Pipette is required').should('exist')
-        cy.contains('Select...').click({ force: true })
-        cy.contains('P10 Single').click({ force: true })
+        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
+        cy.get('label').contains('Test Pipette').children().first().trigger('mousedown')
+        cy.get('*[class^="Dropdown__option_label"]').contains('P10 Single GEN1').click()
         cy.contains('Test Pipette is required').should('not.exist')
 
         // All fields present
@@ -316,10 +327,15 @@ context('Tubes and Rack', () => {
       cy.visit('/create')
       cy.viewport('macbook-15')
       cy.contains('NO').click({ force: true })
-      cy.contains('Select...').click({ force: true })
-      cy.contains('Tubes + Opentrons Tube Rack').click({ force: true })
-      cy.contains('Select...').click({ force: true })
-      cy.contains('24 tubes (snap cap)').click({ force: true })
+      
+      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
+      cy.get('label').contains('What type of labware are you creating?').children().first().trigger('mousedown')
+      cy.get('*[class^="Dropdown__option_label"]').contains('Tubes + Opentrons Tube Rack').click()
+
+      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
+      cy.get('label').contains('Which tube rack insert?').children().first().trigger('mousedown')
+      cy.get('*[class^="Dropdown__option_label"]').contains('24 tubes (snap cap)').click()
+      
       cy.contains('start creating labware').click({ force: true })
     })
 
@@ -453,8 +469,9 @@ context('Tubes and Rack', () => {
 
         // Test pipette
         cy.contains('Test Pipette is required').should('exist')
-        cy.contains('Select...').click({ force: true })
-        cy.contains('P10 Single').click({ force: true })
+        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
+        cy.get('label').contains('Test Pipette').children().first().trigger('mousedown')
+        cy.get('*[class^="Dropdown__option_label"]').contains('P10 Single GEN1').click()
         cy.contains('Test Pipette is required').should('not.exist')
 
         // All fields present

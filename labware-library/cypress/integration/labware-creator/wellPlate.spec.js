@@ -15,9 +15,10 @@ context('Well Plates', () => {
 
   describe('Create a well plate', () => {
     before(() => {
-      cy.contains('Select...').click({ force: true })
-      cy.contains('Well Plate').click({ force: true })
-      cy.contains('start creating labware').click({ force: true })
+      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
+      cy.get('label').contains('What type of labware are you creating?').children().first().trigger('mousedown')
+      cy.get('*[class^="Dropdown__option_label"]').contains('Well Plate').click()
+      cy.get('button').contains('start creating labware').click({ force: true })
     })
 
     it('contains a button to the testing guide', () => {
@@ -236,8 +237,9 @@ context('Well Plates', () => {
 
         // Test pipette
         cy.contains('Test Pipette is required').should('exist')
-        cy.contains('Select...').click({ force: true })
-        cy.contains('P10 Single').click({ force: true })
+        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
+        cy.get('label').contains('Test Pipette').children().first().trigger('mousedown')
+        cy.get('*[class^="Dropdown__option_label"]').contains('P10 Single GEN1').click()
         cy.contains('Test Pipette is required').should('not.exist')
 
         // All fields present
