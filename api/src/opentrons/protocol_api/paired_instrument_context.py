@@ -812,6 +812,7 @@ class PairedInstrumentContext(CommandPublisher):
         locations: Optional[List] = None
         if location:
             locations = self._get_locations(location)
+
         publish_paired(self.broker, cmds.paired_move_to,
                        'before', None, instruments, locations)
         self.paired_instrument_obj.move_to(
