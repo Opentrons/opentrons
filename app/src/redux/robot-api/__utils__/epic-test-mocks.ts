@@ -45,15 +45,15 @@ export const setupEpicTestMocks = <A = TriggerAction, R = RobotApiResponse>(
   const mockState: State = { state: true, mock: true } as any
   const triggerAction =
     typeof makeTriggerAction === 'function'
-      ? makeTriggerAction(mockRobot.name)
-      : {}
+      ? (makeTriggerAction(mockRobot.name) as A & { meta: any })
+      : ({} as A & { meta: any })
 
-  const mockAction: A & { meta: any } = {
+  const mockAction = {
     ...triggerAction,
     meta: { ...(triggerAction.meta || {}), ...mockRequestMeta },
   }
-
-  mockGetRobotByName.mockImplementation((state: State, robotName: string) => {
+// @ts-expect-error(sa, 2021-05-17): mockRobot does not have all properties in the return value of getRobotByName
+mockGetRobotByName.mockImplementation((state: State, robotName: string) => {
     expect(state).toBe(mockState)
     expect(robotName).toBe(mockRobot.name)
 

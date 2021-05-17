@@ -5,7 +5,6 @@ import express from 'express'
 import multer from 'multer'
 import portfinder from 'portfinder'
 import fetch from 'node-fetch'
-import FormData from 'form-data'
 
 import { robotApiUrl, fetchRobotApi } from '../http'
 import { HTTP_API_VERSION, GET, POST, PATCH, DELETE } from '../constants'
@@ -213,8 +212,8 @@ describe('robot-api http client', () => {
     )
 
     const form = new FormData()
-    form.append('file1', Buffer.from('lorem ipsum'), '1.txt')
-    form.append('file2', Buffer.from('dolor sit amet'), '2.txt')
+    form.append('file1', Buffer.from('lorem ipsum') as any, '1.txt')
+    form.append('file2', Buffer.from('dolor sit amet') as any, '2.txt')
 
     const result = fetchRobotApi(robot, {
       method: POST,

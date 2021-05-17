@@ -90,7 +90,7 @@ describe('useDispatchApiRequests', () => {
         initialState: {
           robotApi: {},
         },
-      })
+      } as any)
   })
 
   afterEach(() => {

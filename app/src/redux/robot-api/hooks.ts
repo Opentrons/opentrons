@@ -49,6 +49,7 @@ export function useDispatchApiRequest(): [DispatchApiRequestType, string[]] {
   const dispatchApiRequest = useCallback(
     (a: Action): ActionWithRequestMeta => {
       const requestId = uniqueId('robotApi_request_')
+      //  @ts-expect-error(sa, 2021-05-17): type guard a.meta, also robotCommand might not exist on a.meta
       const action = { ...a, meta: { ...a.meta, requestId } }
 
       addRequestId(requestId)
