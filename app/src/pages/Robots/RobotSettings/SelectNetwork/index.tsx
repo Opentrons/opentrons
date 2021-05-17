@@ -47,9 +47,10 @@ export const SelectNetwork = ({
 
   const [dispatchApi, requestIds] = RobotApi.useDispatchApiRequest()
 
-  const requestState = useSelector((state: State) =>
-    RobotApi.getRequestById(state, last(requestIds))
-  )
+  const requestState = useSelector((state: State) => {
+    const lastId = last(requestIds)
+    return lastId != null ? RobotApi.getRequestById(state, lastId) : null
+  })
 
   const activeNetwork = list.find(nw => nw.active)
 
@@ -105,7 +106,8 @@ export const SelectNetwork = ({
   }
 
   const handleDone = (): void => {
-    if (last(requestIds)) dispatch(RobotApi.dismissRequest(last(requestIds)))
+    const lastId = last(requestIds)
+    if (lastId != null) dispatch(RobotApi.dismissRequest(lastId))
     setChangeState({ type: null })
   }
 
@@ -127,7 +129,7 @@ export const SelectNetwork = ({
               ssid={changeState.ssid}
               isPending={requestState.status === RobotApi.PENDING}
               error={
-                requestState.error && requestState.error.message
+                'error' in requestState && requestState.error && 'message' in requestState.error && requestState.error.message
                   ? requestState.error
                   : null
               }

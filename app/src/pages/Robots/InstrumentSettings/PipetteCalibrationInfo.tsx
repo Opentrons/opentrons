@@ -235,6 +235,7 @@ export function PipetteCalibrationInfo(props: Props): JSX.Element {
                 })
             : () => startPipetteOffsetPossibleTLC({ keepTipLength: true })
         }
+        // @ts-expect-error TODO: SecondaryBtn expects disabled to be explicit boolean type, cast here?
         disabled={disabledReason}
         width="15rem"
         paddingX={SPACING_2}
@@ -279,6 +280,7 @@ export function PipetteCalibrationInfo(props: Props): JSX.Element {
             onClick={() =>
               startPipetteOffsetPossibleTLC({ keepTipLength: false })
             }
+            // @ts-expect-error TODO: SecondaryBtn expects disabled to be explicit boolean type, cast here?
             disabled={disabledReason}
             width="15rem"
             paddingX={SPACING_2}

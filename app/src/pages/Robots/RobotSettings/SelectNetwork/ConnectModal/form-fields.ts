@@ -181,9 +181,9 @@ export function validateConnectFormFields(
       )
       .forEach(
         ({ name, displayName }: Pick<EapOption, 'name' | 'displayName'>) => {
-          // @ts-expect-error TODO: displayName could be undefined
           errors[
             getEapFieldName(name) as keyof typeof errors
+            // @ts-expect-error TODO: displayName could be undefined
           ] = Copy.FIELD_IS_REQUIRED(displayName)
         }
       )
