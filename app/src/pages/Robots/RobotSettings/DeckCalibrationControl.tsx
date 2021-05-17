@@ -87,7 +87,7 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
           dispatchedAction.payload.command.command
         )
       ) {
-        trackedRequestId.current = dispatchedAction.meta.requestId
+        trackedRequestId.current = ('meta' in dispatchedAction  && 'requestId' in dispatchedAction.meta &&  dispatchedAction.meta.requestId != null) ? dispatchedAction.meta.requestId : null
       }
     }
   )
@@ -156,12 +156,12 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
       return t('deck_calibration_missing')
     }
     const datestring =
-      typeof data.lastModified === 'string'
+      'lastModified' in data && typeof data.lastModified === 'string'
         ? formatLastModified(data.lastModified)
         : t('shared:unknown')
     const getPrefix = (calData: DeckCalibrationData): string =>
-      typeof data?.source === 'string'
-        ? calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
+      'source' in data && typeof data?.source === 'string'
+        ? 'source' in calData && calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
           ? t('last_migrated')
           : t('last_calibrated')
         : t('last_calibrated')
@@ -204,6 +204,7 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
             {...targetProps}
             minWidth="12rem"
             onClick={confirmStart}
+            // @ts-expect-error TODO: SecondaryBtn expects a boolean value for it's disabled prop, cast disabledOrBusyReason?
             disabled={disabledOrBusyReason}
           >
             {showSpinner ? (
@@ -249,7 +250,7 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
           >
             <Text>{t('deck_calibration_error_occured')}</Text>
             <Text>
-              {createRequest?.error &&
+              {createRequest != null && 'error' in createRequest && createRequest.error &&
                 RobotApi.getErrorResponseMessage(createRequest.error)}
             </Text>
           </AlertModal>
