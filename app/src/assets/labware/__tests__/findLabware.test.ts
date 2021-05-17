@@ -12,17 +12,22 @@ const mockGetLabware = getLatestLabwareDef as jest.MockedFunction<
   typeof getLatestLabwareDef
 >
 
-// TODO(bc, IMMEDIATELY check if these tests still pass when fixture spread properly comes first)
+// @ts-expect-error TODO(bc, IMMEDIATELY check if these tests still pass when fixture spread properly comes first)
 const fixture_custom_beta_tiprack_10_ul: LabwareDefinition2 = {
+  // @ts-expect-error TODO(bc, IMMEDIATELY check if these tests still pass when fixture spread properly comes first)
   namespace: 'custom_beta',
   ...fixture_tiprack_10_ul,
 }
 
+// @ts-expect-error TODO(bc, IMMEDIATELY check if these tests still pass when fixture spread properly comes first)
 const fixture_tiprack_10_ul_v2: LabwareDefinition2 = {
+  // @ts-expect-error TODO(bc, IMMEDIATELY check if these tests still pass when fixture spread properly comes first)
   version: 2,
   ...fixture_tiprack_10_ul,
 }
+// @ts-expect-error TODO(bc, IMMEDIATELY check if these tests still pass when fixture spread properly comes first)
 const opentrons_fixture_tiprack_300ul: LabwareDefinition2 = {
+  // @ts-expect-error TODO(bc, IMMEDIATELY check if these tests still pass when fixture spread properly comes first)
   namespace: 'opentrons',
   ...fixture_tiprack_300_ul,
 }
