@@ -7,9 +7,9 @@ import {
 } from '../../robot-api/__fixtures__'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
-import type { NetworkingStatusResponse } from '../types'
+import type { NetworkingStatusResponse, InterfaceStatus } from '../types'
 
-export const mockWifiInterface = {
+export const mockWifiInterface: InterfaceStatus = {
   ipAddress: '192.168.43.97/24',
   macAddress: 'B8:27:EB:6C:95:CF',
   gatewayAddress: '192.168.43.161',
@@ -17,7 +17,7 @@ export const mockWifiInterface = {
   type: 'wifi',
 }
 
-export const mockEthernetInterface = {
+export const mockEthernetInterface: InterfaceStatus = {
   ipAddress: '169.254.229.173/16',
   macAddress: 'B8:27:EB:39:C0:9A',
   gatewayAddress: null,
