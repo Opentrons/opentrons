@@ -7,6 +7,7 @@ import * as Types from './types'
 
 import type { Observable, UnaryFunction, OperatorFunction } from 'rxjs'
 import type { State, Action } from '../types'
+import type { ViewableRobot } from '../discovery/types'
 
 export type ActionToRequestMapper<TriggerAction> = (
   triggerAction: TriggerAction,
@@ -22,17 +23,17 @@ export type ResponseToActionMapper<TriggerAction> = (
 export function withRobotHost<A>(
   state$: Observable<State>,
   getRobotName: (action: A) => string
-): UnaryFunction<
-  Observable<A>,
-  Observable<[A, State, Types.RobotHost | null]>
-> {
+): UnaryFunction<Observable<A>, Observable<[A, State, ViewableRobot]>> {
   return pipe(
     withLatestFrom(state$, (a: A, s: State): [
       A,
       State,
-      Types.RobotHost | null
+      ViewableRobot | null
     ] => [a, s, getRobotByName(s, getRobotName(a))]),
-    filter(([a, s, maybeRobot]) => maybeRobot !== null)
+    filter((args): args is [A, State, ViewableRobot] => {
+      const [, , maybeRobot] = args
+      return maybeRobot !== null
+    })
   )
 }
 
@@ -51,8 +52,10 @@ export function mapToRobotApiRequest<A>(
     // - Our request lifecycle state can't handle a cancelled request
     // Change this to a switchMap once one or both of these are addressed
     mergeMap(([host, request, origAction]) => {
+      // @ts-expect-error(sa, 2021-05-17): host could be null, type guard in the filter
       return fetchRobotApi(host, request).pipe(
         withLatestFrom(state$),
+        // @ts-expect-error(sa, 2021-05-17): action could be null, type guard in the filter
         map(([resp, state]) => mapResponseToAction(resp, origAction, state))
       )
     })
