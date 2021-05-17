@@ -83,7 +83,7 @@ export function UncalibratedInfo(props: UncalibratedInfoProps): JSX.Element {
 
   let continueText
   let defHash
-  let continueButtonOnClick
+  let continueButtonOnClick: string
   if (uncalibratedTipracksByMount?.[mount].length) {
     continueText = CONTINUE_TO_NEXT_TIP_TYPE
     defHash = uncalibratedTipracksByMount[mount][0].definitionHash || ''

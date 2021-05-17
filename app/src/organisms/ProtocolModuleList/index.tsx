@@ -51,7 +51,7 @@ export function ProtocolModuleList(): JSX.Element | null {
   const moduleList = hasDuplicateModule ? modulesByLoadOrder : modulesRequired
   if (modulesRequired.length < 1) return null
   return (
-    <TitledList key={t('modules_title')} title={t('modules_title')}>
+    <TitledList key={t<string>('modules_title')} title={t('modules_title')}>
       {hasDuplicateModule && (
         <Text
           css={FONT_BODY_1_DARK}

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { withRouter } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import uniqBy from 'lodash/uniqBy'
 
 import { selectors as robotSelectors } from '../../../redux/robot'
@@ -24,12 +24,12 @@ import { PipetteTiprackListItem } from './PipetteTiprackListItem'
 import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import type { Dispatch, State } from '../../../redux/types'
 
-export interface PipetteListComponentProps {
+export interface PipetteListComponentProps extends RouteComponentProps {
   robotName: string | null
   tipracks: BaseProtocolLabware[]
 }
 
-// @ts-expect-error TODO remove this withRouter? it seems unused
+// TODO(bc, 2021-05-17): remove this withRouter? it seems unused
 export const PipetteList = withRouter(PipetteListComponent)
 
 export function PipetteListComponent(
@@ -51,7 +51,7 @@ export function PipetteListComponent(
 
   return (
     <TitledList
-      key={t('tip_length_cal_title')}
+      key={t<string>('tip_length_cal_title')}
       title={t('tip_length_cal_title')}
     >
       {PIPETTE_MOUNTS.map(mount => {
