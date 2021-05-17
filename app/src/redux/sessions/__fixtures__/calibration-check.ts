@@ -49,27 +49,27 @@ export const goodXYComparison: CalibrationCheckComparison = {
 export const badTipLengthCalibration: CalibrationCheckComparisonMap = {
   status: 'OUTSIDE_THRESHOLD',
   [CHECK_STEP_COMPARING_TIP]: badZComparison,
-}
+} as any
 export const badPipetteOffsetCalibration: CalibrationCheckComparisonMap = {
   status: 'OUTSIDE_THRESHOLD',
   [CHECK_STEP_COMPARING_HEIGHT]: badZComparison,
   [CHECK_STEP_COMPARING_POINT_ONE]: badXYComparison,
-}
+} as any
 export const goodTipLengthCalibration: CalibrationCheckComparisonMap = {
   status: 'IN_THRESHOLD',
   [CHECK_STEP_COMPARING_TIP]: goodZComparison,
-}
+} as any
 export const goodPipetteOffsetCalibration: CalibrationCheckComparisonMap = {
   status: 'IN_THRESHOLD',
   [CHECK_STEP_COMPARING_HEIGHT]: goodZComparison,
   [CHECK_STEP_COMPARING_POINT_ONE]: goodXYComparison,
-}
+} as any
 export const goodDeckCalibration: CalibrationCheckComparisonMap = {
   status: 'IN_THRESHOLD',
   [CHECK_STEP_COMPARING_POINT_ONE]: goodXYComparison,
   [CHECK_STEP_COMPARING_POINT_TWO]: goodXYComparison,
   [CHECK_STEP_COMPARING_POINT_THREE]: goodXYComparison,
-}
+} as any
 
 export const mockSecondPipetteHealthCheckCalibration: CalibrationCheckComparisonsPerCalibration = {
   tipLength: badTipLengthCalibration,
@@ -84,7 +84,7 @@ export const mockFirstPipettteHealthCheckPerCalibration: CalibrationCheckCompari
 export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationSessionDetails = {
   instruments: [
     {
-      model: 'fake_pipette_model',
+      model: 'fake_pipette_model' as any,
       name: 'fake_pipette_name',
       tipLength: 42,
       mount: 'left',
@@ -96,7 +96,7 @@ export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationSessionDet
       defaultTipracks: [],
     },
     {
-      model: 'fake_pipette_model',
+      model: 'fake_pipette_model' as any,
       name: 'fake_pipette_name',
       tipLength: 42,
       mount: 'right',
@@ -115,7 +115,7 @@ export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationSessionDet
   },
   labware: [mockCalibrationCheckLabware],
   activePipette: {
-    model: 'fake_pipette_model',
+    model: 'fake_pipette_model' as any,
     name: 'fake_pipette_name',
     tipLength: 42,
     mount: 'left',
