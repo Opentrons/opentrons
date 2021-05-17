@@ -117,7 +117,7 @@ describe('findLabwareDefWithCustom', () => {
           spec.namespace,
           spec.loadName,
           spec.version,
-          spec.customLabware
+          spec.customLabware as LabwareDefinition2[]
         )
       ).toEqual(spec.expect)
     })
