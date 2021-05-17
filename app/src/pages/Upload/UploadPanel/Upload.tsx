@@ -25,9 +25,9 @@ export class Upload extends React.Component<UploadProps, UploadState> {
     event: React.ChangeEvent<HTMLInputElement> | React.DragEvent
   ) => {
     let files: File[] = []
-    if (event.dataTransfer && event.dataTransfer.files) {
+    if ('dataTransfer' in event && event.dataTransfer.files) {
       files = event.dataTransfer.files as any
-    } else if (event.target?.files) {
+    } else if ('files' in event.target && event.target?.files) {
       files = event.target.files as any
     }
 
@@ -37,7 +37,7 @@ export class Upload extends React.Component<UploadProps, UploadState> {
       this.props.createSession(files[0])
     }
 
-    event.currentTarget.value = ''
+    if ('value' in event.currentTarget) event.currentTarget.value = ''
   }
 
   confirmUpload: () => void = () => {

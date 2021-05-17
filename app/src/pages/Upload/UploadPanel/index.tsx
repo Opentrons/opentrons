@@ -7,8 +7,7 @@ import { openProtocol, getProtocolFilename } from '../../../redux/protocol'
 import { SidePanel } from '@opentrons/components'
 import { Upload } from './Upload'
 
-import type { State, Action } from '../../../redux/types'
-import type { MapDispatchToProps } from 'react-redux'
+import type { State, Dispatch } from '../../../redux/types'
 
 interface SP {
   filename: string | null | undefined
@@ -16,7 +15,7 @@ interface SP {
 }
 
 interface DP {
-  createSession: (f: File) => unknown
+  createSession: (f: File) => any
 }
 
 type Props = SP & DP
@@ -36,13 +35,14 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
+const mapDispatchToProps = (dispatch: Dispatch): DP => {
   return {
-    createSession: (file: File) => dispatch<Action>(openProtocol(file)),
+    createSession: (file: File) => dispatch(openProtocol(file)),
   }
 }
 
 export const UploadPanel = connect(
   mapStateToProps,
+  // @ts-expect-error TODO: thunk action messes up react-redux mapDispatchToProps type, should use hooks api here anyway
   mapDispatchToProps
 )(UploadPanelComponent)

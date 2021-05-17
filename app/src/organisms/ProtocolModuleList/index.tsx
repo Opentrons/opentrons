@@ -68,7 +68,7 @@ export function ProtocolModuleList(): JSX.Element | null {
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         marginY={SPACING_2}
         paddingX="0.875rem"
-        justifyContent={!hasDuplicateModule ? JUSTIFY_SPACE_BETWEEN : null}
+        justifyContent={!hasDuplicateModule ? JUSTIFY_SPACE_BETWEEN : undefined}
       >
         <Text {...MODULE_STYLE}>{t('modules_module_title')}</Text>
         {hasDuplicateModule && (
@@ -90,7 +90,7 @@ export function ProtocolModuleList(): JSX.Element | null {
               data-test={m.slot}
               padding="0.75rem"
               justifyContent={
-                !hasDuplicateModule ? JUSTIFY_SPACE_BETWEEN : null
+                !hasDuplicateModule ? JUSTIFY_SPACE_BETWEEN : undefined
               }
             >
               <Text {...MODULE_STYLE}>{getModuleDisplayName(m.model)}</Text>
@@ -139,6 +139,7 @@ function UsbPortInfo(props: UsbPortInfoProps): JSX.Element | null {
             width={'15px'}
             paddingLeft={SPACING_1}
           />
+          {/* @ts-expect-error  TODO: this inline style will always be overwritten by tooltipProps, remove it? */}
           <Tooltip style={{ width: '2rem' }} {...tooltipProps}>
             {t('modules_update_software_tooltip')}
           </Tooltip>
