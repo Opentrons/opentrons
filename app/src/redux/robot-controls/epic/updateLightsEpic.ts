@@ -6,7 +6,7 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
@@ -14,6 +14,7 @@ import type {
 } from '../../robot-api/operators'
 
 import type { UpdateLightsAction } from '../types'
+import { RobotApiRequestMeta } from '../../robot-api/types'
 
 const mapActionToRequest: ActionToRequestMapper<UpdateLightsAction> = action => ({
   method: POST,
@@ -26,7 +27,10 @@ const mapResponseToAction: ResponseToActionMapper<UpdateLightsAction> = (
   originalAction
 ) => {
   const { host, body, ...responseMeta } = response
-  const meta = { ...originalAction.meta, response: responseMeta }
+  const meta: RobotApiRequestMeta = {
+    ...originalAction.meta,
+    response: responseMeta,
+  }
 
   return response.ok
     ? Actions.updateLightsSuccess(host.name, body.on, meta)
@@ -35,7 +39,7 @@ const mapResponseToAction: ResponseToActionMapper<UpdateLightsAction> = (
 
 export const updateLightsEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.UPDATE_LIGHTS),
+    ofType<Action, UpdateLightsAction>(Constants.UPDATE_LIGHTS),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

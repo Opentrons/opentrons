@@ -23,20 +23,24 @@ export const startDiscoveryEpic: Epic = action$ =>
       StartDiscoveryAction | UiInitializedAction,
       Observable<DiscoveryAction>
     >(startAction => {
-      const timeout = startAction.payload
-        ? startAction.payload.timeout ?? DISCOVERY_TIMEOUT_MS
-        : DISCOVERY_TIMEOUT_MS
+      const timeout =
+        'payload' in startAction && startAction.payload != null
+          ? startAction.payload.timeout ?? DISCOVERY_TIMEOUT_MS
+          : DISCOVERY_TIMEOUT_MS
 
       return of(finishDiscovery()).pipe(delay(timeout))
     })
   )
 
+// TODO(bc, 2021-05-17): nuke this epic, it is now dead code, functionality is covered by resartEpic in robot-admin
 // TODO(mc, 2019-08-01): handle restart requests using robot-api actions
 export const startDiscoveryOnRestartEpic: Epic = action$ =>
   action$.pipe(
     filter(
       action =>
+        // @ts-expect-error TODO: remove this whole epic, it is dead code
         action.type === 'api:SERVER_SUCCESS' &&
+        // @ts-expect-error TODO: remove this whole epic, it is dead code
         action.payload.path === 'restart'
     ),
     switchMap(() => of(startDiscovery(RESTART_DISCOVERY_TIMEOUT_MS)))

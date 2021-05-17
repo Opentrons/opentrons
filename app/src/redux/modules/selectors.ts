@@ -20,8 +20,15 @@ export const getAttachedModules: (
   state: State,
   robotName: string | null
 ) => Types.AttachedModule[] = createSelector(
-  (state, robotName) =>
-    robotName !== null ? state.modules[robotName]?.modulesById : {},
+  (
+    state: State,
+    robotName: string | null
+  ): { [moduleId: string]: Types.AttachedModule } =>
+    robotName !== null
+      ? (state.modules[robotName]?.modulesById as {
+          [moduleId: string]: Types.AttachedModule
+        })
+      : {},
   // sort by usbPort info, if they do not exist (robot version below 4.3), sort by serial
   modulesByPort =>
     sortBy(modulesByPort, ['usbPort.hub', 'usbPort.port', 'serial'])
@@ -89,8 +96,8 @@ export const getMissingModules: (
   getAttachedModulesForConnectedRobot,
   RobotSelectors.getModules,
   (attachedModules, protocolModules) => {
-    const matchedAmod = []
-    const matchedPmod = []
+    const matchedAmod: Types.AttachedModule[] = []
+    const matchedPmod: typeof protocolModules = []
     protocolModules.forEach(pmod => {
       const compatible = attachedModules.find(
         amod =>

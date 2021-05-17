@@ -47,7 +47,7 @@ export interface FetchLightsFailureAction {
 export interface UpdateLightsAction {
   type: 'robotControls:UPDATE_LIGHTS'
   payload: { robotName: string; lightsOn: boolean }
-  meta: Partial<RobotApiRequestMeta>
+  meta: RobotApiRequestMeta
 }
 
 export interface UpdateLightsSuccessAction {
