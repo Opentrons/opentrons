@@ -104,18 +104,4 @@ export interface ConfigV3 extends Omit<ConfigV2, 'version' | 'support'> {
   }
 }
 
-type DeepReadonly<T> = T extends Array<infer R>
-  ? DeepReadonlyArray<R>
-  : T extends Function
-  ? T
-  : T extends object
-  ? DeepReadonlyObject<T>
-  : T
-
-type DeepReadonlyArray<T> = ReadonlyArray<DeepReadonly<T>>
-
-type DeepReadonlyObject<T> = {
-  readonly [P in keyof T]: DeepReadonly<T[P]>
-}
-
-export type Config = DeepReadonlyObject<ConfigV3>
+export type Config = ConfigV3

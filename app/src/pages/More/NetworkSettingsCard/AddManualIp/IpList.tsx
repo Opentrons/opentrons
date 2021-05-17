@@ -4,7 +4,7 @@ import { getConfig, removeManualIp } from '../../../../redux/config'
 import { getViewableRobots } from '../../../../redux/discovery'
 import { IpItem } from './IpItem'
 
-import type { State, Dispatch } from '../../../../redux/types'
+import type { State } from '../../../../redux/types'
 import type { DiscoveryCandidates } from '../../../../redux/config/types'
 import type { Robot, ReachableRobot } from '../../../../redux/discovery/types'
 
