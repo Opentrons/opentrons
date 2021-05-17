@@ -29,8 +29,16 @@ describe('custom labware actions', () => {
       expected: {
         type: 'labware:CUSTOM_LABWARE_LIST',
         payload: [
-          { type: 'INVALID_LABWARE_FILE', filename: 'a.json', modified: 0 },
-          { type: 'INVALID_LABWARE_FILE', filename: 'b.json', modified: 1 },
+          {
+            type: 'INVALID_LABWARE_FILE',
+            filename: 'a.json',
+            modified: 0,
+          } as any,
+          {
+            type: 'INVALID_LABWARE_FILE',
+            filename: 'b.json',
+            modified: 1,
+          } as any,
         ],
         meta: { source: 'poll' },
       },
@@ -45,7 +53,11 @@ describe('custom labware actions', () => {
       expected: {
         type: 'labware:CUSTOM_LABWARE_LIST',
         payload: [
-          { type: 'INVALID_LABWARE_FILE', filename: 'a.json', modified: 0 },
+          {
+            type: 'INVALID_LABWARE_FILE',
+            filename: 'a.json',
+            modified: 0,
+          } as any,
         ],
         meta: { source: 'changeDirectory' },
       },
@@ -111,6 +123,7 @@ describe('custom labware actions', () => {
             type: 'INVALID_LABWARE_FILE',
             filename: 'a.json',
             modified: 0,
+            definition: undefined,
           },
         },
       },

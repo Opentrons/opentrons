@@ -120,7 +120,7 @@ describe('customLabwareReducer', () => {
     const { name, state, action, expected } = spec
 
     it(name, () => {
-      const result = customLabwareReducer(state, action)
+      const result = customLabwareReducer(state as CustomLabwareState, action)
       expect(result).toEqual(expected)
       // check for new reference
       expect(result).not.toBe(state)
