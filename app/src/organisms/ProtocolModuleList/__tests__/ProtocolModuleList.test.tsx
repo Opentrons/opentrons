@@ -28,25 +28,25 @@ const mockGetModulesByProtocolLoadOrder = robotSelectors.getModulesByProtocolLoa
   typeof robotSelectors.getModulesByProtocolLoadOrder
 >
 
-type MockedModuleType = Pick<ApiSessionModule, 'model' | 'slot' | '_id'>
+type MockedModuleType = Pick<ApiSessionModule, 'model' | 'slot' | '_id' | 'protocolLoadOrder'>
 
 const mockMagneticModule1: MockedModuleType = {
-  model: 'magneticModuleV1',
-  slot: '1',
+  model: 'magneticModuleV1' as ApiSessionModule['model'],
+  slot: '1' as ApiSessionModule['slot'],
   _id: 1234,
   protocolLoadOrder: 0,
 }
 
 const mockMagneticModule2: MockedModuleType = {
-  model: 'magneticModuleV2',
-  slot: '3',
+  model: 'magneticModuleV2' as ApiSessionModule['model'],
+  slot: '3' as ApiSessionModule['slot'],
   _id: 2345,
   protocolLoadOrder: 1,
 }
 
 const mockMagneticModuleV2 = {
-  model: 'magneticModuleV2',
-  slot: '1',
+  model: 'magneticModuleV2' as ApiSessionModule['model'],
+  slot: '1' as ApiSessionModule['slot'],
   _id: 1234,
   protocolLoadOrder: 0,
 }
@@ -56,7 +56,7 @@ const mockMatchedModule1: MatchedModule = {
     ...mockMagneticModule,
     usbPort: { hub: null, port: 1 },
   },
-  slot: '1',
+  slot: '1' as ApiSessionModule['slot'],
 }
 
 const mockMatchedModule2: MatchedModule = {
@@ -64,7 +64,7 @@ const mockMatchedModule2: MatchedModule = {
     ...mockMagneticModule,
     usbPort: { hub: 2, port: 3 },
   },
-  slot: '3',
+  slot: '3' as ApiSessionModule['slot'],
 }
 
 const mockLegacyMatchedModule: MatchedModule = {
@@ -72,7 +72,7 @@ const mockLegacyMatchedModule: MatchedModule = {
     ...mockMagneticModule,
     usbPort: { hub: null, port: null },
   },
-  slot: '3',
+  slot: '3' as ApiSessionModule['slot'],
 }
 
 const mockModules = [mockMagneticModule1, mockMagneticModule2]
