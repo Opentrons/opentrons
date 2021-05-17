@@ -105,8 +105,14 @@ context('File Import', () => {
 
     // Test pipette
     // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-    cy.get('label').contains('Test Pipette').children().first().trigger('mousedown')
-    cy.get('*[class^="Dropdown__option_label"]').contains('P10 Single GEN1').click()
+    cy.get('label')
+      .contains('Test Pipette')
+      .children()
+      .first()
+      .trigger('mousedown')
+    cy.get('*[class^="Dropdown__option_label"]')
+      .contains('P10 Single GEN1')
+      .click()
 
     // All fields present
     cy.get('button[class*="_export_button_"]').click({ force: true })

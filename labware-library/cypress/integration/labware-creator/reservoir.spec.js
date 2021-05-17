@@ -12,7 +12,10 @@ context('Reservoirs', () => {
   describe('Create a reservoir', () => {
     before(() => {
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-      cy.contains('What type of labware are you creating?').children().first().trigger('mousedown')
+      cy.contains('What type of labware are you creating?')
+        .children()
+        .first()
+        .trigger('mousedown')
       cy.get('*[class^="Dropdown__option_label"]').contains('Reservoir').click()
       cy.contains('Reservoir').click({ force: true })
       cy.contains('start creating labware').click({ force: true })
@@ -235,8 +238,14 @@ context('Reservoirs', () => {
         // Test pipette
         cy.contains('Test Pipette is required').should('exist')
         // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-        cy.get('label').contains('Test Pipette').children().first().trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]').contains('P10 Single GEN1').click()
+        cy.get('label')
+          .contains('Test Pipette')
+          .children()
+          .first()
+          .trigger('mousedown')
+        cy.get('*[class^="Dropdown__option_label"]')
+          .contains('P10 Single GEN1')
+          .click()
         cy.contains('Test Pipette is required').should('not.exist')
 
         // All fields present
