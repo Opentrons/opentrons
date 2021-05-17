@@ -41,6 +41,7 @@ def test_simulate_function_json_apiv2(get_json_protocol_fixture):
         'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec',
         'Touching tip',
         'Blowing out at B1 of Dest Plate on 3',
+        'Moving to 5',
         'Dropping tip into A1 of Trash on 12'
     ]
 
