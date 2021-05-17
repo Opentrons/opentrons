@@ -21,7 +21,7 @@ const SPECS: ReducerSpec[] = [
       ROBOT_NAME,
       Fixtures.mockNetworkingStatus.status,
       Fixtures.mockNetworkingStatus.interfaces,
-      {}
+      {} as any
     ),
     state: {
       [ROBOT_NAME]: {
@@ -41,7 +41,7 @@ const SPECS: ReducerSpec[] = [
     action: Actions.fetchWifiListSuccess(
       ROBOT_NAME,
       [Fixtures.mockWifiNetwork],
-      {}
+      {} as any
     ),
     state: {
       [ROBOT_NAME]: {
@@ -63,7 +63,7 @@ const SPECS: ReducerSpec[] = [
     action: Actions.fetchWifiKeysSuccess(
       ROBOT_NAME,
       [Fixtures.mockWifiKey],
-      {}
+      {} as any
     ),
     state: {
       [ROBOT_NAME]: {
@@ -85,7 +85,7 @@ const SPECS: ReducerSpec[] = [
     action: Actions.postWifiKeysSuccess(
       ROBOT_NAME,
       { ...Fixtures.mockWifiKey, id: 'foobar' },
-      {}
+      {} as any
     ),
     state: {
       [ROBOT_NAME]: {
@@ -109,7 +109,7 @@ const SPECS: ReducerSpec[] = [
     name: 'handles post wifi keys success action with requestId',
     action: Actions.postWifiKeysSuccess(ROBOT_NAME, Fixtures.mockWifiKey, {
       requestId: 'request-id',
-    }),
+    } as any),
     state: {
       [ROBOT_NAME]: {
         wifiList: [],
@@ -132,7 +132,11 @@ const SPECS: ReducerSpec[] = [
   },
   {
     name: 'handles post wifi keys success action with existing key',
-    action: Actions.postWifiKeysSuccess(ROBOT_NAME, Fixtures.mockWifiKey, {}),
+    action: Actions.postWifiKeysSuccess(
+      ROBOT_NAME,
+      Fixtures.mockWifiKey,
+      {} as any
+    ),
     state: {
       [ROBOT_NAME]: {
         wifiList: [],
@@ -156,7 +160,7 @@ const SPECS: ReducerSpec[] = [
         { ...Fixtures.mockWifiKey, id: 'def' },
         { ...Fixtures.mockWifiKey, id: 'abc' },
       ],
-      {}
+      {} as any
     ),
     state: {
       [ROBOT_NAME]: {
@@ -184,7 +188,7 @@ const SPECS: ReducerSpec[] = [
     action: Actions.fetchWifiKeysSuccess(
       ROBOT_NAME,
       [{ ...Fixtures.mockWifiKey, id: 'abc' }],
-      {}
+      {} as any
     ),
     state: {
       [ROBOT_NAME]: {
@@ -211,7 +215,7 @@ const SPECS: ReducerSpec[] = [
     action: Actions.fetchEapOptionsSuccess(
       ROBOT_NAME,
       [Fixtures.mockEapOption],
-      {}
+      {} as any
     ),
     state: {
       [ROBOT_NAME]: { wifiKeyIds: [], wifiKeysById: {}, eapOptions: [] },
