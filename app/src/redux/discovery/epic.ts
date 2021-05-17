@@ -34,14 +34,12 @@ export const startDiscoveryEpic: Epic = action$ =>
 // TODO(mc, 2019-08-01): handle restart requests using robot-api actions
 export const startDiscoveryOnRestartEpic: Epic = action$ =>
   action$.pipe(
-    filter<Action, Action>(
-      (action): action is Action =>
+    filter(
+      action =>
         action.type === 'api:SERVER_SUCCESS' &&
         action.payload.path === 'restart'
     ),
-    switchMap<Action, Observable<DiscoveryAction>>(() =>
-      of(startDiscovery(RESTART_DISCOVERY_TIMEOUT_MS))
-    )
+    switchMap(() => of(startDiscovery(RESTART_DISCOVERY_TIMEOUT_MS)))
   )
 
 export const discoveryEpic: Epic = combineEpics<Epic>(
