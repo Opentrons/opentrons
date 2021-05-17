@@ -23,7 +23,10 @@ import {
   tubeRackAutofills,
 } from './fields'
 import { labwareDefToFields } from './labwareDefToFields'
-import { labwareFormSchema } from './labwareFormSchema'
+import {
+  labwareFormSchema,
+  labwareFormSchemaBaseObject,
+} from './labwareFormSchema'
 import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
 import { labwareTestProtocol, pipetteNameOptions } from './labwareTestProtocol'
 import { fieldsToLabware } from './fieldsToLabware'
@@ -178,12 +181,87 @@ const getWellGridBoundingBox = (args: {
 
 // TODO IMMEDIATELY: factor out + test
 const formLevelValidation = (values: LabwareFields): LabwareCreatorErrors => {
+  // Return value if there are missing fields and partial form casting fails.
+  // TODO IMMEDIATELY or add an error just to be safe / grokable?
+  // The require fields errors *should* be handled by the required fields errors of those fields, right? So form-level doesn't have to
+  // do anything.. ??
+  const COULD_NOT_CAST = {}
+
   // Form-level errors are nested in the FormikErrors object under a special key, FORM_LEVEL_ERRORS.
   const formLevelErrors: Partial<Record<FormErrorType, string>> = {}
 
   // TODO IMMEDIATELY: right now it's throwing an error if cast fails (even if it's fields we don't care about here)
   // ^ How does the SVG viz's definition work when some fields are missing (eg brand/pipette might be)
-  const castValues = labwareFormSchema.cast(values)
+  // const castValues = labwareFormSchema.cast(values)
+  let castFields: {
+    gridColumns: undefined | number
+    gridOffsetX: undefined | number
+    gridOffsetY: undefined | number
+    gridRows: undefined | number
+    gridSpacingX: undefined | number
+    gridSpacingY: undefined | number
+    wellDiameter: undefined | number
+    footprintXDimension: undefined | number
+    footprintYDimension: undefined | number
+  } | null = null
+  try {
+    castFields = labwareFormSchemaBaseObject
+      .pick([
+        'gridColumns',
+        'gridOffsetX',
+        'gridOffsetY',
+        'gridRows',
+        'gridSpacingX',
+        'gridSpacingY',
+        'wellDiameter',
+        'footprintXDimension',
+        'footprintYDimension',
+      ])
+      .cast(values)
+  } catch (error) {
+    // Yup will throw a validation error if validation fails. We catch those and
+    // ignore them. We can sniff if something is a Yup error by checking error.name.
+    // See https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
+    // and https://github.com/formium/formik/blob/2d613c11a67b1c1f5189e21b8d61a9dd8a2d0a2e/packages/formik/src/Formik.tsx
+    if (error.name === 'ValidationError' || error.name === 'TypeError') {
+      // TODO IMMEDIATELY why are missing values for required fields giving TypeError instead of ValidationError?
+      // Is this partial schema (from `pick`) not handing requireds correctly??
+      console.log('debug: error was', { error }) // TODO IMMEDIATELY stray log
+      return COULD_NOT_CAST
+    } else {
+      throw error
+    }
+  }
+
+  if (
+    castFields === null ||
+    castFields.gridColumns === undefined ||
+    castFields.gridOffsetX === undefined ||
+    castFields.gridOffsetY === undefined ||
+    castFields.gridRows === undefined ||
+    castFields.gridSpacingX === undefined ||
+    castFields.gridSpacingY === undefined ||
+    castFields.wellDiameter === undefined ||
+    castFields.footprintXDimension === undefined ||
+    castFields.footprintYDimension === undefined
+  ) {
+    // NOTE: this probably should never be reached,
+    console.log('reached 2nd "COULD_NOT_CAST" case!!') // TODO IMMEDIATELY stray log
+    return COULD_NOT_CAST
+  }
+  console.log({ castFields })
+
+  const {
+    gridColumns,
+    gridOffsetX,
+    gridOffsetY,
+    gridRows,
+    gridSpacingX,
+    gridSpacingY,
+    wellDiameter,
+    footprintXDimension,
+    footprintYDimension,
+  } = castFields
 
   // ==================
   // TODO IMMEDIATELY: split the section below out into its own fn, eg getFormLevelFootprintErrors or something
@@ -196,12 +274,20 @@ const formLevelValidation = (values: LabwareFields): LabwareCreatorErrors => {
     topLeftCornerY,
     bottomRightCornerX,
     bottomRightCornerY,
-  } = getWellGridBoundingBox(castValues)
+  } = getWellGridBoundingBox({
+    gridColumns,
+    gridOffsetX,
+    gridOffsetY,
+    gridRows,
+    gridSpacingX,
+    gridSpacingY,
+    wellDiameter,
+  })
 
   const wellBoundsInsideFootprintX =
-    topLeftCornerX > 0 && bottomRightCornerX < castValues.footprintXDimension
+    topLeftCornerX > 0 && bottomRightCornerX < footprintXDimension
   const wellBoundsInsideFootprintY =
-    topLeftCornerY > 0 && bottomRightCornerY < castValues.footprintYDimension
+    topLeftCornerY > 0 && bottomRightCornerY < footprintYDimension
 
   // TODO IMMEDIATELY. Eg "tips" or "wells/tubes" maybe??
   // Not sure of copy but I think there's an existing util for this we use
