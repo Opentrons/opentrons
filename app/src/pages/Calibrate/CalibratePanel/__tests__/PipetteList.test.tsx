@@ -134,7 +134,7 @@ describe('PipetteListComponent', () => {
     const { store } = render({
       robotName: 'robotName',
       tipracks: stubTipRacks,
-    })
+    } as any)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       fetchTipLengthCalibrations('robotName')
@@ -145,7 +145,7 @@ describe('PipetteListComponent', () => {
     const { wrapper } = render({
       robotName: 'robotName',
       tipracks: stubTipRacks,
-    })
+    } as any)
     const component = wrapper.find(PipetteListComponent)
 
     expect(
