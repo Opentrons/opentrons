@@ -1,7 +1,7 @@
 """Protocol engine commands sub-state."""
 from typing import Dict, List, Optional, Tuple
 
-from ..commands import CommandType
+from ..commands import CommandType, CommandRequestType
 from .substore import Substore
 
 
@@ -21,6 +21,10 @@ class CommandState:
     def get_all_commands(self) -> List[Tuple[str, CommandType]]:
         """Get a list of all command entries in state."""
         return [entry for entry in self._commands_by_id.items()]
+
+    def get_next_request(self) -> Optional[Tuple[str, CommandRequestType]]:
+        """Get the next pending request or None if there are no pending request."""
+        raise NotImplementedError()
 
 
 class CommandStore(Substore[CommandState]):
