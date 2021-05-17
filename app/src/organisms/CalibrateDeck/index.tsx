@@ -173,6 +173,7 @@ export function CalibrateDeck(
         />
       </ModalPage>
       {showConfirmExit && (
+        // @ts-expect-error TODO: ConfirmExitModal expects sessionType
         <ConfirmExitModal exit={confirmExit} back={cancelExit} />
       )}
     </>
