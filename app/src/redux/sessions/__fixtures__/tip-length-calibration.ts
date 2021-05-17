@@ -26,7 +26,7 @@ export const mockTipLengthCalBlock: CalibrationLabware = {
 
 export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSessionDetails = {
   instrument: {
-    model: 'fake_pipette_model',
+    model: 'fake_pipette_model' as any,
     name: 'fake_pipette_name',
     tipLength: 42,
     mount: 'right',
