@@ -36,7 +36,7 @@ export interface RobotSettingsFieldUpdate {
 export interface FetchSettingsAction {
   type: 'robotSettings:FETCH_SETTINGS'
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchSettingsSuccessAction {
@@ -60,7 +60,7 @@ export interface FetchSettingsFailureAction {
 export interface UpdateSettingAction {
   type: 'robotSettings:UPDATE_SETTING'
   payload: { robotName: string; settingId: string; value: boolean | null }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface UpdateSettingSuccessAction {
