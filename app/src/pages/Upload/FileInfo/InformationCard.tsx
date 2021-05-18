@@ -14,17 +14,17 @@ import { LabeledValue } from '@opentrons/components'
 import { InfoSection } from './InfoSection'
 import { SectionContentHalf, CardRow } from '../../../atoms/layout'
 
-import type { State, Dispatch } from '../../../redux/types'
+import type { State} from '../../../redux/types'
 
 interface SP {
-  name: string | null | undefined
-  author: string | null | undefined
-  lastUpdated: number | null | undefined
-  method: string | null | undefined
-  description: string | null | undefined
+  name?: string | null
+  author?: string | null
+  lastUpdated?: number | null
+  method?: string | null
+  description?: string | null
 }
 
-type Props = SP & { dispatch: Dispatch }
+type Props = SP
 
 const INFO_TITLE = 'Information'
 const DESCRIPTION_TITLE = 'Description'
