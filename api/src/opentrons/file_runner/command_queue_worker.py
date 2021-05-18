@@ -87,5 +87,3 @@ class CommandQueueWorker:
                 command_id=cmd_id,
                 request=request
             )
-
-        self._task = None
