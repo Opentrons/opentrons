@@ -32,17 +32,19 @@ export function mountWithProviders<Element, State, Action>(
     dispatch: jest.fn(),
   }
 
-  const I18nWrapper: React.ReactFragment | React.ComponentType<typeof I18nextProvider> = provideI18n
+  const I18nWrapper: React.ElementType<React.ComponentProps<typeof I18nextProvider>> = provideI18n
     ? ({
         i18n,
         children,
       }: {
         i18n: React.ComponentProps<typeof I18nextProvider>['i18n'],
-        children: React.ReactNode,
+        children?: React.ReactNode,
       }): JSX.Element => <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
     : React.Fragment
-  const StateWrapper: React.ReactFragment | React.ComponentType = provideStore
-    ? ({ store, children }: { children: React.ReactNode, store: Store<State>}): JSX.Element => (
+
+  interface StateWrapperProps { children: React.ReactNode, store: Store<State>}
+  const StateWrapper: React.ElementType<StateWrapperProps> = provideStore
+    ? ({ store, children }: StateWrapperProps): JSX.Element => (
         <Provider store={store}>{children}</Provider>
       )
     : React.Fragment
@@ -53,7 +55,7 @@ export function mountWithProviders<Element, State, Action>(
     i18n,
   }: {
     children: React.ReactNode,
-    store: State,
+    store: Store<State>,
     i18n: React.ComponentProps<typeof I18nextProvider>['i18n'],
   }) => (
     <StateWrapper store={store}>
@@ -68,7 +70,7 @@ export function mountWithProviders<Element, State, Action>(
 
   // force a re-render by returning a new state to recalculate selectors
   // and sending a blank set of new props to the wrapper
-  const refresh = maybeNextState => {
+  const refresh = (maybeNextState?: State): void => {
     const nextState = maybeNextState ?? { ...initialState }
 
     assert(
