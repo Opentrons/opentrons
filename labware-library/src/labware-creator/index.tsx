@@ -20,7 +20,6 @@ import {
   getImplicitAutofillValues,
   tubeRackAutofills,
   tubeRackInsertOptions,
-  yesNoOptions,
 } from './fields'
 import { labwareDefToFields } from './labwareDefToFields'
 import { labwareFormSchema } from './labwareFormSchema'

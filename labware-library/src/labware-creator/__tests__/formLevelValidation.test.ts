@@ -1,10 +1,13 @@
 import {
-  getWellGridBoundingBox,
+  FORM_LEVEL_ERRORS,
   formLevelValidation,
+  getWellGridBoundingBox,
+  WELLS_OUT_OF_BOUNDS_X,
+  WELLS_OUT_OF_BOUNDS_Y,
 } from '../formLevelValidation'
-
+import { getDefaultFormState } from '../fields'
 // NOTE(IL, 2021-05-18): eventual dependency on definitions.tsx which uses require.context
-// would break this test
+// would break this test (though it's not directly used)
 jest.mock('../../definitions')
 
 describe('getWellGridBoundingBox', () => {
@@ -87,7 +90,33 @@ describe('getWellGridBoundingBox', () => {
   })
 })
 
-// TODO IMMEDIATELY
-// describe('formLevelValidation', () => {
-//     it('should')
-// })
+describe('formLevelValidation', () => {
+  it('should return no errors with the initial values of the form', () => {
+    const errors = formLevelValidation({ ...getDefaultFormState() })
+    expect(errors).toEqual({})
+  })
+
+  it('should return errors when well outside bounding box', () => {
+    const errors = formLevelValidation({
+      ...getDefaultFormState(),
+      footprintXDimension: '86',
+      footprintYDimension: '128',
+      gridColumns: '2',
+      gridOffsetX: '2',
+      gridOffsetY: '2',
+      gridRows: '2',
+      gridSpacingX: '2',
+      gridSpacingY: '2',
+      wellDiameter: '999', // big ol' well
+      labwareType: 'tipRack',
+    })
+    expect(errors).toEqual({
+      [FORM_LEVEL_ERRORS]: {
+        [WELLS_OUT_OF_BOUNDS_X]:
+          'Grid of tips is larger than labware footprint in the X dimension. Please double check well size, X Spacing, and X Offset.',
+        [WELLS_OUT_OF_BOUNDS_Y]:
+          'Grid of tips is larger than labware footprint in the Y dimension. Please double check well size, Y Spacing, and Y Offset.',
+      },
+    })
+  })
+})

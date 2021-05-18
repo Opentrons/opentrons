@@ -3,8 +3,8 @@ import { labwareFormSchemaBaseObject } from './labwareFormSchema'
 import type { LabwareFields } from './fields'
 
 export const FORM_LEVEL_ERRORS = 'FORM_LEVEL_ERRORS'
-const WELLS_OUT_OF_BOUNDS_X = 'WELLS_OUT_OF_BOUNDS_X'
-const WELLS_OUT_OF_BOUNDS_Y = 'WELLS_OUT_OF_BOUNDS_Y'
+export const WELLS_OUT_OF_BOUNDS_X = 'WELLS_OUT_OF_BOUNDS_X'
+export const WELLS_OUT_OF_BOUNDS_Y = 'WELLS_OUT_OF_BOUNDS_Y'
 type FormErrorType = typeof WELLS_OUT_OF_BOUNDS_X | typeof WELLS_OUT_OF_BOUNDS_Y
 export type LabwareCreatorErrors = FormikErrors<
   LabwareFields & {
@@ -73,6 +73,21 @@ export const getWellGridBoundingBox = (
       bottomRightCornerX,
       bottomRightCornerY,
     }
+  }
+}
+
+const getLabwareName = (values: LabwareFields): string => {
+  const { labwareType } = values
+  switch (labwareType) {
+    case 'tipRack':
+      return 'tips'
+    case 'tubeRack':
+      return 'tubes'
+    case 'wellPlate':
+    case 'aluminumBlock':
+    case 'reservoir':
+    default:
+      return 'wells'
   }
 }
 
@@ -254,19 +269,17 @@ export const formLevelValidation = (
   const wellBoundsInsideFootprintY =
     topLeftCornerY > 0 && bottomRightCornerY < footprintYDimension
 
-  // TODO IMMEDIATELY. Eg "tips" or "wells/tubes" maybe??
-  // Not sure of copy but I think there's an existing util for this we use
-  const labwareName = '--TODO--'
+  const labwareName = getLabwareName(values)
 
   if (!wellBoundsInsideFootprintX) {
     formLevelErrors[WELLS_OUT_OF_BOUNDS_X] =
       `Grid of ${labwareName} is larger than labware footprint in the X dimension. ` +
-      `Please double-check well size, X Spacing, and X Offset.`
+      `Please double check well size, X Spacing, and X Offset.`
   }
   if (!wellBoundsInsideFootprintY) {
     formLevelErrors[WELLS_OUT_OF_BOUNDS_Y] =
       `Grid of ${labwareName} is larger than labware footprint in the Y dimension. ` +
-      `Please double-check well size, Y Spacing, and Y Offset.`
+      `Please double check well size, Y Spacing, and Y Offset.`
   }
 
   if (Object.keys(formLevelErrors).length > 0) {
