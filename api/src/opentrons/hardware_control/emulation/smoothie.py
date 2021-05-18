@@ -16,7 +16,7 @@ from .abstract_emulator import AbstractEmulator
 
 logger = logging.getLogger(__name__)
 
-VERSION_STRING = "Build version: EMULATOR, " \
+VERSION_STRING = "Build version: edge-8414642, " \
                  "Build date: CURRENT, MCU: NONE, System Clock: NONE"
 
 
