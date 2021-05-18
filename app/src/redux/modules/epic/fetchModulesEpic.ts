@@ -95,7 +95,7 @@ const normalizeModuleInfoLegacy = (
         status: response.status,
       }
     default:
-      throw new Error(`bad module name ${response.name}`)
+      throw new Error(`bad module name ${(response as any).name}`)
   }
 }
 
@@ -127,14 +127,14 @@ const normalizeModuleInfoNew = (
         status: response.status,
       }
     default:
-      throw new Error(`bad module model ${response.moduleModel}`)
+      throw new Error(`bad module model ${(response as any).moduleModel}`)
   }
 }
 
 const normalizeModuleInfo = (
   response: ApiAttachedModule | ApiAttachedModuleLegacy
 ): IdentifierWithData => {
-  if (response.moduleModel) {
+  if ('moduleModel' in response) {
     return normalizeModuleInfoNew(response)
   } else {
     return normalizeModuleInfoLegacy(response)
