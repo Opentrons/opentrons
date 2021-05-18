@@ -11,7 +11,7 @@ import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
 import { AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
+import { makeMaskToDecimal, maskLoadName } from './fieldMasks'
 import {
   aluminumBlockAutofills,
   aluminumBlockChildTypeOptions,
@@ -37,7 +37,7 @@ import { Dropdown } from './components/Dropdown'
 import { FormLevelErrorAlerts } from './components/FormLevelErrorAlerts'
 import { IntroCopy } from './components/IntroCopy'
 import { LinkOut } from './components/LinkOut'
-import { RadioField } from './components/RadioField'
+
 import { Section } from './components/Section'
 import { TextField } from './components/TextField'
 
@@ -48,17 +48,12 @@ import { Regularity } from './components/sections/Regularity'
 
 import { Footprint } from './components/sections/Footprint'
 import { Height } from './components/sections/Height'
-import {
-  GridImg,
-  WellXYImg,
-  XYSpacingImg,
-  DepthImg,
-  XYOffsetImg,
-} from './components/diagrams'
-import {
-  wellShapeOptionsWithIcons,
-  wellBottomShapeOptionsWithIcons,
-} from './components/optionsWithImages'
+import { Grid } from './components/sections/Grid'
+import { Volume } from './components/sections/Volume'
+import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
+import { WellBottomAndDepth } from './components/sections/WellBottomAndDepth'
+import { XYSpacingImg, XYOffsetImg } from './components/diagrams'
+
 import styles from './styles.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -122,13 +117,6 @@ const makeAutofillOnChange = ({
     )
   }
 }
-
-const displayAsTube = (values: LabwareFields): boolean =>
-  values.labwareType === 'tubeRack' ||
-  (values.labwareType === 'aluminumBlock' &&
-    values.aluminumBlockType === '96well' &&
-    // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
-    ['tubes', 'pcrTubeStrip'].includes(values.aluminumBlockChildType))
 
 export const LabwareCreator = (): JSX.Element => {
   const [
@@ -401,6 +389,7 @@ export const LabwareCreator = (): JSX.Element => {
           const canProceedToForm = Boolean(
             values.labwareType === 'wellPlate' ||
               values.labwareType === 'reservoir' ||
+              values.labwareType === 'tipRack' ||
               (values.labwareType === 'tubeRack' &&
                 values.tubeRackInsertLoadName) ||
               (values.labwareType === 'aluminumBlock' &&
@@ -477,169 +466,11 @@ export const LabwareCreator = (): JSX.Element => {
                   <Regularity />
                   <Footprint />
                   <Height />
-                  <Section
-                    label="Grid"
-                    fieldList={[
-                      'gridRows',
-                      'gridColumns',
-                      'regularRowSpacing',
-                      'regularColumnSpacing',
-                    ]}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          The grid of wells on your labware is arranged via rows
-                          and columns. Rows run horizontally across your labware
-                          (left to right). Columns run top to bottom.
-                        </p>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <GridImg />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="gridRows"
-                          inputMasks={[maskToInteger]}
-                        />
-                        <RadioField
-                          name="regularRowSpacing"
-                          options={yesNoOptions}
-                        />
-                        <TextField
-                          name="gridColumns"
-                          inputMasks={[maskToInteger]}
-                        />
-                        <RadioField
-                          name="regularColumnSpacing"
-                          options={yesNoOptions}
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <Grid />
                   {/* PAGE 2 */}
-                  <Section label="Volume" fieldList={['wellVolume']}>
-                    <div className={styles.flex_row}>
-                      <div className={styles.volume_instructions_column}>
-                        <p>Total maximum volume of each well.</p>
-                      </div>
-
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="wellVolume"
-                          inputMasks={[maskTo2Decimal]}
-                          units="μL"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Well Shape & Sides"
-                    fieldList={[
-                      'wellShape',
-                      'wellDiameter',
-                      'wellXDimension',
-                      'wellYDimension',
-                    ]}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        {displayAsTube(values) ? (
-                          <>
-                            <p>
-                              Reference the <strong>top</strong> of the{' '}
-                              <strong>inside</strong> of the tube. Ignore any
-                              lip.{' '}
-                            </p>
-                            <p>
-                              Diameter helps the robot locate the sides of the
-                              tubes. If there are multiple measurements for this
-                              dimension then use the smaller one.{' '}
-                            </p>
-                          </>
-                        ) : (
-                          <>
-                            <p>
-                              Reference the <strong>inside</strong> of the well.
-                              Ignore any lip.
-                            </p>
-                            <p>
-                              Diameter helps the robot locate the sides of the
-                              wells.
-                            </p>
-                          </>
-                        )}
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <WellXYImg wellShape={values.wellShape} />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <RadioField
-                          name="wellShape"
-                          labelTextClassName={styles.hidden}
-                          options={wellShapeOptionsWithIcons}
-                        />
-                        {values.wellShape === 'rectangular' ? (
-                          <>
-                            <TextField
-                              name="wellXDimension"
-                              inputMasks={[maskTo2Decimal]}
-                              units="mm"
-                            />
-                            <TextField
-                              name="wellYDimension"
-                              inputMasks={[maskTo2Decimal]}
-                              units="mm"
-                            />
-                          </>
-                        ) : (
-                          <TextField
-                            name="wellDiameter"
-                            inputMasks={[maskTo2Decimal]}
-                            units="mm"
-                          />
-                        )}
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Well Bottom & Depth"
-                    fieldList={['wellBottomShape', 'wellDepth']}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Reference the measurement from the top of the well
-                          (include any lip but exclude any cap) to the bottom of
-                          the <strong>inside</strong> of the{' '}
-                          {displayAsTube(values) ? 'tube' : 'well'}.
-                        </p>
-
-                        <p>
-                          Depth informs the robot how far down it can go inside
-                          a well.
-                        </p>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <DepthImg
-                          labwareType={values.labwareType}
-                          wellBottomShape={values.wellBottomShape}
-                        />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <RadioField
-                          name="wellBottomShape"
-                          labelTextClassName={styles.hidden}
-                          options={wellBottomShapeOptionsWithIcons}
-                        />
-                        <TextField
-                          name="wellDepth"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <Volume />
+                  <WellShapeAndSides />
+                  <WellBottomAndDepth />
                   <Section
                     label="Well Spacing"
                     fieldList={['gridSpacingX', 'gridSpacingY']}

@@ -30,7 +30,8 @@ import { selectors as robotSelectors } from '../../../redux/robot'
 
 import type { Dispatch } from '../../../redux/types'
 
-const SUPPORT_PAGE = 'https://support.opentrons.com/en/' // TODO: update link to correct doc
+const SUPPORT_PAGE =
+  'https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2'
 
 export type PromptProps = {|
   modulesMissing: boolean,
@@ -62,6 +63,23 @@ export function Prompt(props: PromptProps): React.Node {
       >
         {t('module_connect_description')}
       </Text>
+      {hasDuplicateModules && (
+        <Text
+          paddingX={SPACING_4}
+          marginY={SPACING_2}
+          fontSize={FONT_SIZE_BODY_2}
+          textAlign={TEXT_ALIGN_CENTER}
+          color={C_WHITE}
+        >
+          <Trans
+            t={t}
+            i18nKey="module_connect_duplicate_description"
+            components={{
+              a: <Link color={C_BLUE} external href={SUPPORT_PAGE} />,
+            }}
+          />
+        </Text>
+      )}
       <Flex {...targetProps}>
         <LightSecondaryBtn
           marginY={SPACING_2}
@@ -80,23 +98,6 @@ export function Prompt(props: PromptProps): React.Node {
           </Tooltip>
         )}
       </Flex>
-      {hasDuplicateModules && (
-        <Text
-          paddingX={SPACING_4}
-          marginBottom={SPACING_2}
-          fontSize={FONT_SIZE_BODY_2}
-          textAlign={TEXT_ALIGN_CENTER}
-          color={C_WHITE}
-        >
-          <Trans
-            t={t}
-            i18nKey="module_connect_duplicate_description"
-            components={{
-              a: <Link color={C_BLUE} external href={SUPPORT_PAGE} />,
-            }}
-          />
-        </Text>
-      )}
     </Flex>
   )
 }

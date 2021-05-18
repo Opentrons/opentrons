@@ -703,7 +703,7 @@ def test_blow_out(ctx, monkeypatch):
     instr.pick_up_tip()
     instr.aspirate(10, lw.wells()[0])
 
-    def fake_move(loc):
+    def fake_move(loc, publish):
         nonlocal move_location
         move_location = loc
 
@@ -872,11 +872,22 @@ def test_loaded_labwares(ctx):
 
 def test_loaded_modules(ctx, monkeypatch):
     assert ctx.loaded_modules == {}
-    mod1 = ctx.load_module('tempdeck', 4)
-    mod1.load_labware('biorad_96_wellplate_200ul_pcr')
-    mod2 = ctx.load_module('thermocycler')
-    assert ctx.loaded_modules[4] == mod1
-    assert ctx.loaded_modules[7] == mod2
+    from collections import OrderedDict
+
+    mag1 = ctx.load_module('magnetic module gen2', 1)
+    mag2 = ctx.load_module('magnetic module', 2)
+    temp1 = ctx.load_module('temperature module', 3)
+    temp2 = ctx.load_module('temperature module', 4)
+
+    expected_load_order = OrderedDict(
+        {int(mod.geometry.parent): mod
+         for mod in [mag1, mag2, temp1, temp2]})
+
+    assert ctx.loaded_modules == expected_load_order
+    assert ctx.loaded_modules[1] == mag1
+    assert ctx.loaded_modules[2] == mag2
+    assert ctx.loaded_modules[3] == temp1
+    assert ctx.loaded_modules[4] == temp2
 
 
 def test_order_of_module_load(loop, hardware):
@@ -927,7 +938,6 @@ def test_order_of_module_load(loop, hardware):
 def test_tip_length_for(ctx, monkeypatch):
     instr = ctx.load_instrument('p20_single_gen2', 'left')
     tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
-    instr._tip_length_for.cache_clear()
     assert instr._tip_length_for(tiprack)\
         == (tiprack._implementation.get_definition()['parameters']['tipLength']
             - instr.hw_pipette['tip_overlap']
@@ -948,9 +958,7 @@ def test_tip_length_for_caldata(ctx, monkeypatch, use_new_calibration):
             status=cs_types.CalibrationStatus(markedBad=False),
             uri='opentrons/geb_96_tiprack_10ul/1')
     monkeypatch.setattr(get, 'load_tip_length_calibration', mock_tip_length)
-    instr._tip_length_for.cache_clear()
     assert instr._tip_length_for(tiprack) == 2
-    instr._tip_length_for.cache_clear()
     mock_tip_length.side_effect = cs_types.TipLengthCalNotFound
     assert instr._tip_length_for(tiprack) == (
         tiprack._implementation.get_definition()['parameters']['tipLength']

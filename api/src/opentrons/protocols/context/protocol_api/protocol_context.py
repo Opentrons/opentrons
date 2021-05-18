@@ -1,10 +1,11 @@
 import logging
-from typing import Dict, Optional, Set, TYPE_CHECKING
+from typing import Dict, Optional, Set, List, TYPE_CHECKING
+from collections import OrderedDict
 
 from opentrons import types, API
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.config import feature_flags as fflags
-from opentrons.hardware_control.types import DoorState
+from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
@@ -75,7 +76,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._instruments: InstrumentDict = {
             mount: None for mount in types.Mount
         }
-        self._modules: Set[LoadModuleResult] = set()
+        self._modules: List[LoadModuleResult] = []
 
         self._hw_manager = HardwareManager(hardware)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
@@ -214,14 +215,14 @@ class ProtocolContextImplementation(AbstractProtocol):
                                   geometry=geometry,
                                   module=hc_mod_instance)
 
-        self._modules.add(result)
+        self._modules.append(result)
         self._deck_layout[resolved_location] = geometry
         return result
 
     def get_loaded_modules(self) -> Dict[int, LoadModuleResult]:
         """Get a mapping of deck location to loaded module."""
-        return {int(str(module.geometry.parent)): module
-                for module in self._modules}
+        return OrderedDict({int(str(module.geometry.parent)): module
+                            for module in self._modules})
 
     def load_instrument(self,
                         instrument_name: str,
@@ -258,11 +259,11 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
-        self._hw_manager.hardware.pause()
+        self._hw_manager.hardware.pause(PauseType.PAUSE)
 
     def resume(self) -> None:
         """Result the protocol."""
-        self._hw_manager.hardware.resume()
+        self._hw_manager.hardware.resume(PauseType.PAUSE)
 
     def comment(self, msg: str) -> None:
         """Add comment to run log."""

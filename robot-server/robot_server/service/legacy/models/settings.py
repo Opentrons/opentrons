@@ -63,11 +63,12 @@ class AdvancedSettingRequest(BaseModel):
 
 
 class LogLevels(str, Enum):
+    _level_id: int
+
     """Valid log levels"""
     def __new__(cls, value, level):
-        # Ignoring type errors because this is exactly as described here
         # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
-        obj = str.__new__(cls, value)  # type: ignore
+        obj = str.__new__(cls, value)
         obj._value_ = value
         obj._level_id = level
         return obj
@@ -80,7 +81,7 @@ class LogLevels(str, Enum):
     @property
     def level_id(self):
         """The log level id as defined in logging lib"""
-        return self._level_id  # type: ignore
+        return self._level_id
 
 
 class LogLevel(BaseModel):

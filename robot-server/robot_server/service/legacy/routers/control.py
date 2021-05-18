@@ -8,8 +8,8 @@ from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock, \
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
 
+from robot_server.errors import LegacyErrorResponse
 from robot_server.service.dependencies import get_hardware, get_motion_lock
-from robot_server.service.errors import V1HandlerError
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models import control
 
@@ -49,10 +49,17 @@ async def get_robot_positions() -> control.RobotPositionsResponse:
     return control.RobotPositionsResponse(positions=robot_positions)
 
 
-@router.post("/robot/move",
-             description="Move the robot's gantry to a position (usually to a "
-                         "position retrieved from GET /robot/positions)",
-             response_model=V1BasicResponse)
+@router.post(
+    path="/robot/move",
+    description=(
+        "Move the robot's gantry to a position (usually to a "
+        "position retrieved from GET /robot/positions)"
+    ),
+    response_model=V1BasicResponse,
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
+    },
+)
 async def post_move_robot(
         robot_move_target: control.RobotMoveTarget,
         hardware: ThreadManager = Depends(get_hardware),
@@ -67,13 +74,18 @@ async def post_move_robot(
                 message=f"Move complete. New position: {pos}"
             )
     except ThreadedAsyncForbidden as e:
-        raise V1HandlerError(status_code=status.HTTP_403_FORBIDDEN,
-                             message=str(e))
+        raise LegacyErrorResponse(message=str(e)).as_error(status.HTTP_403_FORBIDDEN)
 
 
-@router.post("/robot/home",
-             description="Home the robot",
-             response_model=V1BasicResponse)
+@router.post(
+    path="/robot/home",
+    description="Home the robot",
+    response_model=V1BasicResponse,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
+        status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
+    },
+)
 async def post_home_robot(
         robot_home_target: control.RobotHomeTarget,
         hardware: ThreadManager = Depends(get_hardware),
@@ -96,13 +108,13 @@ async def post_home_robot(
                 await home()
                 message = "Homing robot."
             else:
-                raise V1HandlerError(message=f"{target} is invalid",
-                                     status_code=status.HTTP_400_BAD_REQUEST)
+                raise LegacyErrorResponse(
+                    message=f"{target} is invalid"
+                ).as_error(status.HTTP_400_BAD_REQUEST)
 
             return V1BasicResponse(message=message)
     except ThreadedAsyncForbidden as e:
-        raise V1HandlerError(status_code=status.HTTP_403_FORBIDDEN,
-                             message=str(e))
+        raise LegacyErrorResponse(message=str(e)).as_error(status.HTTP_403_FORBIDDEN)
 
 
 @router.get("/robot/lights",

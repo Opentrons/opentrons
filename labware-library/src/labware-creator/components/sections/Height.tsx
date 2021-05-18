@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
+import { isEveryFieldHidden } from '../../utils'
 import { makeMaskToDecimal } from '../../fieldMasks'
 import { LabwareFields } from '../../fields'
-import { getFormAlerts } from '../utils/getFormAlerts'
 import { getHeightAlerts } from '../utils/getHeightAlerts'
+import { FormAlerts } from '../FormAlerts'
 import { TextField } from '../TextField'
 import { HeightImg } from '../diagrams'
 import { HeightGuidingText } from '../HeightGuidingText'
@@ -13,33 +14,44 @@ import styles from '../../styles.css'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 
-const getContent = (values: LabwareFields): JSX.Element => (
-  <div className={styles.flex_row}>
-    <div className={styles.instructions_column}>
-      <HeightGuidingText labwareType={values.labwareType} />
-    </div>
-    <div className={styles.diagram_column}>
-      <HeightImg
-        labwareType={values.labwareType}
-        aluminumBlockChildType={values.aluminumBlockChildType}
-      />
-    </div>
-    <div className={styles.form_fields_column}>
-      <TextField
-        name="labwareZDimension"
-        inputMasks={[maskTo2Decimal]}
-        units="mm"
-      />
-    </div>
-  </div>
-)
+interface ContentProps {
+  values: LabwareFields
+}
 
-export const Height = (): JSX.Element => {
+const Content = (props: ContentProps): JSX.Element => {
+  const { values } = props
+  return (
+    <div className={styles.flex_row}>
+      <div className={styles.instructions_column}>
+        <HeightGuidingText labwareType={values.labwareType} />
+      </div>
+      <div className={styles.diagram_column}>
+        <HeightImg
+          labwareType={values.labwareType}
+          aluminumBlockChildType={values.aluminumBlockChildType}
+        />
+      </div>
+      <div className={styles.form_fields_column}>
+        <TextField
+          name="labwareZDimension"
+          inputMasks={[maskTo2Decimal]}
+          units="mm"
+        />
+      </div>
+    </div>
+  )
+}
+
+export const Height = (): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = [
     'labwareType',
     'labwareZDimension',
   ]
   const { values, errors, touched } = useFormikContext<LabwareFields>()
+
+  if (isEveryFieldHidden(fieldList, values)) {
+    return null
+  }
 
   return (
     <div className={styles.new_definition_section}>
@@ -52,9 +64,9 @@ export const Height = (): JSX.Element => {
         }
       >
         <>
-          {getFormAlerts({ values, touched, errors, fieldList })}
+          <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           {getHeightAlerts(values, touched)}
-          {getContent(values)}
+          <Content values={values} />
         </>
       </SectionBody>
     </div>

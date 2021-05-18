@@ -248,8 +248,13 @@ describe('analytics selectors', () => {
 
     it('should collect module models', () => {
       getModules.mockReturnValue([
-        { _id: 0, slot: '1', model: 'temperatureModuleV1' },
-        { _id: 1, slot: '2', model: 'magneticModuleV2' },
+        {
+          _id: 0,
+          slot: '1',
+          model: 'temperatureModuleV1',
+          protocolLoadOrder: 0,
+        },
+        { _id: 1, slot: '2', model: 'magneticModuleV2', protocolLoadOrder: 1 },
       ])
 
       const result = Selectors.getProtocolAnalyticsData(mockState)

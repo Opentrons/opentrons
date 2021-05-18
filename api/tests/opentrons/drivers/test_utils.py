@@ -106,3 +106,17 @@ def test_parse_plate_temperature_response_failure(input_str: str) -> None:
     """It should fail to parse plate temperature response"""
     with pytest.raises(utils.ParseError):
         utils.parse_plate_temperature_response(input_str, 2)
+
+
+@pytest.mark.parametrize(
+    argnames=['input_str', 'min_length', "expected"],
+    argvalues=[
+        ["", 0, ""],
+        ["", 1, "0"],
+        ["abcd", 12, "616263640000"],
+        ["abcd", 5, "61626364"],
+    ]
+)
+def test_string_to_hex(input_str: str, min_length: int, expected: str) -> None:
+    """It should convert string to hex with padding to reach min_length."""
+    assert expected == utils.string_to_hex(val=input_str, min_length=min_length)

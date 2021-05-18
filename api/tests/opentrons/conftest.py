@@ -139,6 +139,15 @@ async def old_aspiration(monkeypatch):
 
 
 @pytest.fixture
+async def enable_door_safety_switch():
+    await config.advanced_settings.set_adv_setting(
+        'enableDoorSafetySwitch', True)
+    yield
+    await config.advanced_settings.set_adv_setting(
+        'enableDoorSafetySwitch', False)
+
+
+@pytest.fixture
 async def use_new_calibration(monkeypatch):
     await config.advanced_settings.set_adv_setting(
         'enableTipLengthCalibration', True)
@@ -277,9 +286,6 @@ def model(request, hardware, loop):
     # Use with pytest.mark.parametrize(’labware’, [some-labware-name])
     # to have a different labware loaded as .container. If not passed,
     # defaults to the version-appropriate way to do 96 flat
-    if request.node.get_closest_marker('api2_only')\
-       and request.param != build_v2_model:
-        pytest.skip('only works with hardware controller')
     try:
         lw_name = request.getfixturevalue('labware_name')
     except Exception:

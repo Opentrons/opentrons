@@ -6,7 +6,7 @@ from opentrons.drivers.types import MoveSplit
 from tests.opentrons.conftest import fuzzy_assert
 from opentrons.config.robot_configs import (
     DEFAULT_GANTRY_STEPS_PER_MM, DEFAULT_PIPETTE_CONFIGS)
-from opentrons.drivers import serial_communication
+from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.smoothie_drivers import driver_3_0
 
 
@@ -502,8 +502,7 @@ def test_functional(smoothie):
 def test_parse_pipette_data():
     msg = 'TestsRule!!'
     mount = 'L'
-    good_data = mount + ': ' \
-        + driver_3_0._byte_array_to_hex_string(msg.encode())
+    good_data = f"{mount}:{utils.string_to_hex(msg)}"
     parsed = driver_3_0._parse_instrument_data(good_data).get(mount)
     assert parsed.decode() == msg
 
@@ -552,7 +551,7 @@ def test_read_pipette_v13(smoothie, monkeypatch):
 
     def _new_send_message(
             command, timeout=None, suppress_error_msg=True):
-        return 'L:' + driver_3_0._byte_array_to_hex_string(b'p300_single_v13')
+        return 'L:' + utils.string_to_hex('p300_single_v13')
 
     monkeypatch.setattr(driver, '_send_command', _new_send_message)
 

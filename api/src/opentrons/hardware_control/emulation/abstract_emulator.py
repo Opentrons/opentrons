@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
+from typing import Optional
 
 
 class AbstractEmulator(ABC):
     """Interface of gcode line processing hardware emulator."""
 
     @abstractmethod
-    def handle(self, words: List[str]) -> Optional[str]:
+    def handle(self, line: str) -> Optional[str]:
         """Handle a command and return a response."""
         ...
 
