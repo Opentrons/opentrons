@@ -3,7 +3,7 @@ import assert from 'assert'
 import Ajv from 'ajv'
 import cx from 'classnames'
 import * as React from 'react'
-import { Formik, FormikErrors } from 'formik'
+import { Formik, FormikTouched } from 'formik'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
@@ -13,20 +13,22 @@ import { AlertModal, AlertItem, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
-  tubeRackInsertOptions,
   aluminumBlockAutofills,
-  aluminumBlockTypeOptions,
   aluminumBlockChildTypeOptions,
+  aluminumBlockTypeOptions,
   getDefaultFormState,
   getImplicitAutofillValues,
-  yesNoOptions,
   tubeRackAutofills,
+  tubeRackInsertOptions,
+  yesNoOptions,
 } from './fields'
 import { labwareDefToFields } from './labwareDefToFields'
+import { labwareFormSchema } from './labwareFormSchema'
 import {
-  labwareFormSchema,
-  labwareFormSchemaBaseObject,
-} from './labwareFormSchema'
+  FORM_LEVEL_ERRORS,
+  formLevelValidation,
+  LabwareCreatorErrors,
+} from './formLevelValidation'
 import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
 import { labwareTestProtocol, pipetteNameOptions } from './labwareTestProtocol'
 import { fieldsToLabware } from './fieldsToLabware'
@@ -59,7 +61,6 @@ import {
 } from './components/optionsWithImages'
 import styles from './styles.css'
 
-import type { FormikTouched } from 'formik'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   ImportError,
@@ -83,16 +84,6 @@ interface MakeAutofillOnChangeArgs {
 
 const PDF_URL =
   'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
-
-const FORM_LEVEL_ERRORS = 'FORM_LEVEL_ERRORS'
-const WELLS_OUT_OF_BOUNDS_X = 'WELLS_OUT_OF_BOUNDS_X'
-const WELLS_OUT_OF_BOUNDS_Y = 'WELLS_OUT_OF_BOUNDS_Y'
-type FormErrorType = typeof WELLS_OUT_OF_BOUNDS_X | typeof WELLS_OUT_OF_BOUNDS_Y
-type LabwareCreatorErrors = FormikErrors<
-  LabwareFields & {
-    [FORM_LEVEL_ERRORS]: Partial<Record<FormErrorType, string>>
-  }
->
 
 const makeAutofillOnChange = ({
   autofills,
@@ -138,180 +129,6 @@ const displayAsTube = (values: LabwareFields): boolean =>
     values.aluminumBlockType === '96well' &&
     // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
     ['tubes', 'pcrTubeStrip'].includes(values.aluminumBlockChildType))
-
-// TODO IMMEDIATELY: factor out, test
-// TODO IMMEDIATELY: support rectangular wells: wellXDimension, wellYDimension rather than diameter!
-const getWellGridBoundingBox = (args: {
-  gridColumns: number
-  gridOffsetX: number
-  gridOffsetY: number
-  gridRows: number
-  gridSpacingX: number
-  gridSpacingY: number
-  wellDiameter: number
-}): {
-  topLeftCornerX: number
-  topLeftCornerY: number
-  bottomRightCornerX: number
-  bottomRightCornerY: number
-} => {
-  const {
-    gridColumns,
-    gridOffsetX,
-    gridOffsetY,
-    gridRows,
-    gridSpacingX,
-    gridSpacingY,
-    wellDiameter,
-  } = args
-  const r = wellDiameter / 2
-  const topLeftCornerX = gridOffsetX - r
-  const topLeftCornerY = gridOffsetY - r
-  const bottomRightCornerX =
-    topLeftCornerX + gridSpacingX * (gridColumns - 1) + wellDiameter
-  const bottomRightCornerY =
-    topLeftCornerY + gridSpacingY * (gridRows - 1) + wellDiameter
-  return {
-    topLeftCornerX,
-    topLeftCornerY,
-    bottomRightCornerX,
-    bottomRightCornerY,
-  }
-}
-
-// TODO IMMEDIATELY: factor out + test
-const formLevelValidation = (values: LabwareFields): LabwareCreatorErrors => {
-  // Return value if there are missing fields and partial form casting fails.
-  // TODO IMMEDIATELY or add an error just to be safe / grokable?
-  // The require fields errors *should* be handled by the required fields errors of those fields, right? So form-level doesn't have to
-  // do anything.. ??
-  const COULD_NOT_CAST = {}
-
-  // Form-level errors are nested in the FormikErrors object under a special key, FORM_LEVEL_ERRORS.
-  const formLevelErrors: Partial<Record<FormErrorType, string>> = {}
-
-  // TODO IMMEDIATELY: right now it's throwing an error if cast fails (even if it's fields we don't care about here)
-  // ^ How does the SVG viz's definition work when some fields are missing (eg brand/pipette might be)
-  // const castValues = labwareFormSchema.cast(values)
-  let castFields: {
-    gridColumns: undefined | number
-    gridOffsetX: undefined | number
-    gridOffsetY: undefined | number
-    gridRows: undefined | number
-    gridSpacingX: undefined | number
-    gridSpacingY: undefined | number
-    wellDiameter: undefined | number
-    footprintXDimension: undefined | number
-    footprintYDimension: undefined | number
-  } | null = null
-  try {
-    castFields = labwareFormSchemaBaseObject
-      .pick([
-        'gridColumns',
-        'gridOffsetX',
-        'gridOffsetY',
-        'gridRows',
-        'gridSpacingX',
-        'gridSpacingY',
-        'wellDiameter',
-        'footprintXDimension',
-        'footprintYDimension',
-      ])
-      .cast(values)
-  } catch (error) {
-    // Yup will throw a validation error if validation fails. We catch those and
-    // ignore them. We can sniff if something is a Yup error by checking error.name.
-    // See https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
-    // and https://github.com/formium/formik/blob/2d613c11a67b1c1f5189e21b8d61a9dd8a2d0a2e/packages/formik/src/Formik.tsx
-    if (error.name === 'ValidationError' || error.name === 'TypeError') {
-      // TODO IMMEDIATELY why are missing values for required fields giving TypeError instead of ValidationError?
-      // Is this partial schema (from `pick`) not handing requireds correctly??
-      console.log('debug: error was', { error }) // TODO IMMEDIATELY stray log
-      return COULD_NOT_CAST
-    } else {
-      throw error
-    }
-  }
-
-  if (
-    castFields === null ||
-    castFields.gridColumns === undefined ||
-    castFields.gridOffsetX === undefined ||
-    castFields.gridOffsetY === undefined ||
-    castFields.gridRows === undefined ||
-    castFields.gridSpacingX === undefined ||
-    castFields.gridSpacingY === undefined ||
-    castFields.wellDiameter === undefined ||
-    castFields.footprintXDimension === undefined ||
-    castFields.footprintYDimension === undefined
-  ) {
-    // NOTE: this probably should never be reached,
-    console.log('reached 2nd "COULD_NOT_CAST" case!!') // TODO IMMEDIATELY stray log
-    return COULD_NOT_CAST
-  }
-  console.log({ castFields })
-
-  const {
-    gridColumns,
-    gridOffsetX,
-    gridOffsetY,
-    gridRows,
-    gridSpacingX,
-    gridSpacingY,
-    wellDiameter,
-    footprintXDimension,
-    footprintYDimension,
-  } = castFields
-
-  // ==================
-  // TODO IMMEDIATELY: split the section below out into its own fn, eg getFormLevelFootprintErrors or something
-
-  // TODO IMMEDIATELY: this is only for circle. We need rectangle too! Rect uses wellXDimension, wellYDimension
-  // TODO IMMEDIATELY: we probably want a lot of small broken out fns,
-  // because for the viewport we want to know the bounding box x0/y0, x1/y1
-  const {
-    topLeftCornerX,
-    topLeftCornerY,
-    bottomRightCornerX,
-    bottomRightCornerY,
-  } = getWellGridBoundingBox({
-    gridColumns,
-    gridOffsetX,
-    gridOffsetY,
-    gridRows,
-    gridSpacingX,
-    gridSpacingY,
-    wellDiameter,
-  })
-
-  const wellBoundsInsideFootprintX =
-    topLeftCornerX > 0 && bottomRightCornerX < footprintXDimension
-  const wellBoundsInsideFootprintY =
-    topLeftCornerY > 0 && bottomRightCornerY < footprintYDimension
-
-  // TODO IMMEDIATELY. Eg "tips" or "wells/tubes" maybe??
-  // Not sure of copy but I think there's an existing util for this we use
-  const labwareName = '--TODO--'
-
-  if (!wellBoundsInsideFootprintX) {
-    formLevelErrors[WELLS_OUT_OF_BOUNDS_X] =
-      `Grid of ${labwareName} is larger than labware footprint in the X dimension. ` +
-      `Please double-check well size, X Spacing, and X Offset.`
-  }
-  if (!wellBoundsInsideFootprintY) {
-    formLevelErrors[WELLS_OUT_OF_BOUNDS_Y] =
-      `Grid of ${labwareName} is larger than labware footprint in the Y dimension. ` +
-      `Please double-check well size, Y Spacing, and Y Offset.`
-  }
-
-  if (Object.keys(formLevelErrors).length > 0) {
-    return {
-      [FORM_LEVEL_ERRORS]: formLevelErrors,
-    }
-  } else {
-    return {}
-  }
-}
 
 // TODO IMMEDIATELY extract to file
 const FormLevelErrorAlerts = (props: {
@@ -597,6 +414,7 @@ export const LabwareCreator = (): JSX.Element => {
             setValues,
           } = bag
           const errors: LabwareCreatorErrors = bag.errors
+          console.log({ errors })
           // @ts-expect-error(IL, 2021-03-24): values/errors/touched not typed for reportErrors to be happy
           reportErrors({ values, errors, touched })
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic

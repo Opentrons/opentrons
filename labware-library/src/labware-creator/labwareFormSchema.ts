@@ -29,17 +29,19 @@ const requiredPositiveNumber = (label: string): Yup.NumberSchema =>
 
 const requiredPositiveInteger = (label: string): Yup.NumberSchema =>
   Yup.number()
+    .default(0)
     .label(label)
     .typeError(MUST_BE_A_NUMBER)
     .moreThan(0)
     .integer()
     .required()
 
-const unsupportedLabwareIfFalse = (label: string): Yup.BooleanSchema =>
+const unsupportedLabwareIfFalse = (label: string): Yup.AnySchema =>
   Yup.boolean()
     .label(label)
     .typeError(REQUIRED_FIELD)
     .oneOf([true], IRREGULAR_LABWARE_ERROR)
+    .nullable()
     .required()
 
 const nameExistsError = (nameName: string): string =>
@@ -76,16 +78,20 @@ export const labwareFormSchemaBaseObject = Yup.object({
 
   // tubeRackSides: Array<string>
   footprintXDimension: Yup.number()
+    .default(0)
     .label(LABELS.footprintXDimension)
     .typeError(MUST_BE_A_NUMBER)
     .min(MIN_X_DIMENSION, IRREGULAR_LABWARE_ERROR)
     .max(MAX_X_DIMENSION, IRREGULAR_LABWARE_ERROR)
+    .nullable()
     .required(),
   footprintYDimension: Yup.number()
+    .default(0)
     .label(LABELS.footprintYDimension)
     .typeError(MUST_BE_A_NUMBER)
     .min(MIN_Y_DIMENSION, IRREGULAR_LABWARE_ERROR)
     .max(MAX_Y_DIMENSION, IRREGULAR_LABWARE_ERROR)
+    .nullable()
     .required(),
   labwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension).max(
     MAX_Z_DIMENSION,
@@ -125,6 +131,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
     wellBottomShapeOptions.map(o => o.value)
   ),
   wellDepth: Yup.number()
+    .default(0)
     .label(LABELS.wellDepth)
     .typeError(MUST_BE_A_NUMBER)
     .moreThan(0)

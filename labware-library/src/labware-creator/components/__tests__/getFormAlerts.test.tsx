@@ -49,8 +49,7 @@ describe('getFormAlerts', () => {
     }
     const expectedErrors = [
       <AlertItem key={'some error'} type="warning" title={'some error'} />,
-      // eslint-disable-next-line react/jsx-key
-      <IrregularLabwareAlert />,
+      <IrregularLabwareAlert key={IRREGULAR_LABWARE_ERROR} />,
     ]
     expect(getFormAlerts(props)).toEqual(expectedErrors)
   })

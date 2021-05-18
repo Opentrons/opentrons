@@ -170,7 +170,7 @@ context('Reservoirs', () => {
         cy.get("img[src*='_v.']").should('exist')
         cy.get("input[name='wellDepth']").focus().blur()
         cy.contains('Depth must be a number').should('exist')
-        cy.get("input[name='wellDepth']").type('80').blur()
+        cy.get("input[name='wellDepth']").type('70').blur()
         cy.contains('Depth must be a number').should('not.exist')
       })
 
