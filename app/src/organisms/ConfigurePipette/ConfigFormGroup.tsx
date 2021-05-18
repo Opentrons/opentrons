@@ -60,6 +60,7 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
   const { labelFor, label } = props
   return (
     <div className={styles.form_row}>
+      {/* @ts-expect-error TODO: this label element's label prop doesn't do anything, remove it */}
       <label label={label} htmlFor={labelFor} className={styles.form_label}>
         {props.label}
       </label>
@@ -88,6 +89,7 @@ export function ConfigInput(props: ConfigInputProps): JSX.Element {
             value={String(fieldProps.field.value ?? '')}
             onChange={fieldProps.field.onChange}
             onBlur={fieldProps.field.onBlur}
+            // @ts-expect-error TODO: this error prop can't handle some formik error array types
             error={fieldProps.form.errors[name]}
             {...{
               units,

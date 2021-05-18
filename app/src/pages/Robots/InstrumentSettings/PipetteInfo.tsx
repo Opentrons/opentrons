@@ -115,6 +115,7 @@ export function PipetteInfo(props: PipetteInfoProps): JSX.Element {
           <PrimaryBtn
             {...(disabledReason ? changePipTargetProps : {})}
             as={disabledReason ? 'button' : Link}
+            // @ts-expect-error TODO: 'to' prop can only be passed if as={Link}
             to={changeUrl}
             disabled={disabledReason}
             title="changePipetteButton"
@@ -127,6 +128,7 @@ export function PipetteInfo(props: PipetteInfoProps): JSX.Element {
             <SecondaryBtn
               {...(disabledReason ? settingsTargetProps : {})}
               as={disabledReason ? 'button' : Link}
+              // @ts-expect-error TODO: 'to' prop can only be passed if as={Link}
               to={settingsUrl}
               disabled={disabledReason}
               title="pipetteSettingsButton"

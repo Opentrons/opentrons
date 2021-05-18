@@ -32,11 +32,10 @@ export interface DisplayFieldProps extends PipetteSettingsField {
   displayName: string
 }
 
-export type DisplayQuirkFieldProps = {
-  name: string
-  displayName: string
-} & {
-  [quirkId: string]: boolean
+export interface DisplayQuirkFieldProps {
+  'name': string
+  'displayName': string
+  [quirkId: string]: boolean | string
 }
 
 export interface ConfigFormProps {
@@ -73,14 +72,15 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     const quirks = this.props.settings[QUIRK_KEY]
     if (!quirks) return []
     const quirkKeys = Object.keys(quirks)
-    return quirkKeys.map(name => {
+    return quirkKeys.map<DisplayQuirkFieldProps>((name: string) => {
       const value = quirks[name]
       const displayName = startCase(name)
-      return {
-        [name]: value,
+      const quirksProps: DisplayQuirkFieldProps = {
         name,
         displayName,
+        [name]: value,
       }
+      return quirksProps
     })
   }
 
@@ -133,6 +133,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
 
     // validate all visible fields with min and max
     forOwn(fields, (field, name) => {
+      // @ts-expect-error TODO: value needs to be of type string here, but technically that's not prover
       const value = values[name].trim()
       const { min, max } = field
       if (value !== '') {
@@ -142,6 +143,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
         } else if (
           typeof min === 'number' &&
           typeof max === 'number' &&
+          // TODO(bc, 2021-05-18): this should probably be (parsed < min || parsed > max) so we're not accidentally comparing a string to a number
           (parsed < min || value > max)
         ) {
           set(errors, name, `Min ${min} / Max ${max}`)
@@ -170,7 +172,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     >(fields, f => {
       // @ts-expect-error TODO: PipetteSettingsFieldsMap doesn't include a boolean value, despite checking for it here
       if (f.value === true || f.value === false) return f.value
-      return f.value !== f.default ? f.value?.toString() : ''
+      return f.value !== f.default ? f.value?.toString() ?? '' : ''
     })
     const initialQuirkValues = this.props.settings[QUIRK_KEY]
     const initialValues = Object.assign(
