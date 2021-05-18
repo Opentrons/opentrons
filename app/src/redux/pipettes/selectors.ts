@@ -25,7 +25,11 @@ import type { PipetteOffsetCalibration } from '../calibration/types'
 import * as Constants from './constants'
 import * as Types from './types'
 
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type {
+  PipetteModelSpecs,
+  PipetteName,
+  PipetteModel,
+} from '@opentrons/shared-data'
 import type { State } from '../types'
 import type { TipracksByMountMap } from '../robot/types'
 
@@ -35,7 +39,7 @@ export const getAttachedPipettes: (
   state: State,
   robotName: string | null
 ) => Types.AttachedPipettesByMount = createSelector(
-  (state, robotName) =>
+  (state: State, robotName: string | null) =>
     robotName ? state.pipettes[robotName]?.attachedByMount : null,
   attachedByMount => {
     return Constants.PIPETTE_MOUNTS.reduce<Types.AttachedPipettesByMount>(
@@ -43,7 +47,7 @@ export const getAttachedPipettes: (
         const attached = attachedByMount?.[mount] || null
         const modelSpecs =
           attached && attached.model
-            ? getPipetteModelSpecs(attached.model)
+            ? getPipetteModelSpecs(attached.model as PipetteModel)
             : null
 
         if (attached && attached.model && modelSpecs) {
@@ -126,24 +130,18 @@ const EMPTY_INFO = {
 const pipettesAreInexactMatch = (
   protocolInstrName: string | null,
   actualModelSpecs: PipetteModelSpecs | null | undefined
-) => {
+): boolean => {
   const { backCompatNames } = actualModelSpecs || {}
-  return backCompatNames && backCompatNames.includes(protocolInstrName)
+  return Boolean(
+    protocolInstrName != null && backCompatNames?.includes(protocolInstrName)
+  )
 }
 
 // TODO(mc, 2019-12-10): possibly use getConnectedRobot selector rather than robotName
 export const getProtocolPipettesInfo: (
   state: State,
   robotName: string | null
-) => Types.ProtocolPipetteInfoByMount = createSelector<
-  State,
-  string | null,
-  Types.ProtocolPipetteInfoByMount,
-  _,
-  _,
-  _,
-  _
->(
+) => Types.ProtocolPipetteInfoByMount = createSelector(
   getAttachedPipettes,
   getProtocolPipettes,
   getPipetteOffsetCalibrations,
@@ -151,8 +149,9 @@ export const getProtocolPipettesInfo: (
     const pipetteHasOffset = (
       calibrations: PipetteOffsetCalibration[],
       serial: string
-    ) => Boolean(head(calibrations.filter(cal => cal.pipette === serial)))
-    return Constants.PIPETTE_MOUNTS.reduce(
+    ): boolean =>
+      Boolean(head(calibrations.filter(cal => cal.pipette === serial)))
+    return Constants.PIPETTE_MOUNTS.reduce<Types.ProtocolPipetteInfoByMount>(
       (result, mount) => {
         const protocolPipette = protocolPipettes.find(i => i.mount === mount)
         const actualPipette = attachedByMount[mount]
@@ -160,7 +159,7 @@ export const getProtocolPipettesInfo: (
 
         const actualModelSpecs = actualPipette?.modelSpecs
         const requestedDisplayName = requestedAs
-          ? getPipetteNameSpecs(requestedAs)?.displayName
+          ? getPipetteNameSpecs(requestedAs as PipetteName)?.displayName
           : protocolPipette?.modelSpecs?.displayName
 
         const protocolPipetteName =
@@ -212,42 +211,33 @@ export const getProtocolPipettesInfo: (
 export const getProtocolPipettesMatching: (
   state: State,
   robotName: string
-) => boolean = createSelector<State, string, boolean, _>(
-  getProtocolPipettesInfo,
-  infoByMount => {
-    return every(
-      infoByMount,
-      (info: Types.ProtocolPipetteInfo) =>
-        info.compatibility !== Constants.INCOMPATIBLE
-    )
-  }
-)
+) => boolean = createSelector(getProtocolPipettesInfo, infoByMount => {
+  return every(
+    infoByMount,
+    (info: Types.ProtocolPipetteInfo) =>
+      info.compatibility !== Constants.INCOMPATIBLE
+  )
+})
 
 export const getProtocolPipettesCalibrated: (
   state: State,
   robotName: string
-) => boolean = createSelector<State, string, boolean, _>(
-  getProtocolPipettesInfo,
-  infoByMount => {
-    return every(
-      infoByMount,
-      (info: Types.ProtocolPipetteInfo) => !info.needsOffsetCalibration
-    )
-  }
-)
+) => boolean = createSelector(getProtocolPipettesInfo, infoByMount => {
+  return every(
+    infoByMount,
+    (info: Types.ProtocolPipetteInfo) => !info.needsOffsetCalibration
+  )
+})
 
 export const getSomeProtocolPipettesInexact: (
   state: State,
   robotName: string
-) => boolean = createSelector<State, string, boolean, _>(
-  getProtocolPipettesInfo,
-  infoByMount => {
-    return some(
-      infoByMount,
-      info => info.compatibility === Constants.INEXACT_MATCH
-    )
-  }
-)
+) => boolean = createSelector(getProtocolPipettesInfo, infoByMount => {
+  return some(
+    infoByMount,
+    info => info.compatibility === Constants.INEXACT_MATCH
+  )
+})
 
 export const getUncalibratedTipracksByMount: (
   state: State,
