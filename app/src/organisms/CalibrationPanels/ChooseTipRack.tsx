@@ -197,7 +197,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
   const handleUseTipRack = (): void => {
     const selectedTipRack = tipRackByUriMap[selectedValue.value]
     if (!isEqual(chosenTipRack, selectedTipRack?.definition)) {
-      handleChosenTipRack(selectedTipRack?.definition)
+      handleChosenTipRack(selectedTipRack?.definition ?? null)
     }
     closeModal()
   }

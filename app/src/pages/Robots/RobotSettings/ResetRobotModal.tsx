@@ -47,9 +47,12 @@ export function ResetRobotModal(props: ResetRobotModalProps): JSX.Element {
   const { robotName, closeModal } = props
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
-  const resetRequestStatus = useSelector((state: State) => {
-    return getRequestById(state, last(requestIds))
-  })?.status
+
+  const resetRequest = useSelector((state: State) => {
+    const lastId = last(requestIds)
+    return lastId != null ? getRequestById(state, lastId) : null
+  })
+  const resetRequestStatus = resetRequest != null ? resetRequest.status : null
 
   const triggerReset = (): unknown =>
     dispatchRequest(resetConfig(robotName, resetOptions))

@@ -7,7 +7,6 @@ import { LABEL_ADD_NEW_KEY } from '../i18n'
 import { useConnectFormField } from './form-state'
 
 import type { WifiKey } from '../types'
-import { StyledComponent } from 'styled-components'
 
 export interface KeyFileFieldProps {
   id: string
@@ -35,7 +34,7 @@ export const KeyFileField = (props: KeyFileFieldProps): JSX.Element => {
   const { id, name, label, placeholder, robotName, wifiKeys } = props
   const { value, error, setValue, setTouched } = useConnectFormField(name)
   const options = [makeKeyOptions(wifiKeys), ADD_NEW_KEY_OPTION_GROUP]
-  const uploadKeyRef = React.useRef<StyledComponent<'input', any>>(null)
+  const uploadKeyRef = React.useRef<HTMLInputElement>(null)
 
   const handleValueChange = (_: string, value: string): void => {
     if (value === ADD_NEW_KEY_VALUE) {
