@@ -80,7 +80,9 @@ export function useCalibratePipetteOffset(
           dispatchedAction.payload.command.command
         )
       ) {
-        spinnerRequestId.current = dispatchedAction.meta.requestId
+        spinnerRequestId.current = ('meta' in dispatchedAction && 'requestId' in dispatchedAction.meta)
+                                    ? dispatchedAction.meta.requestId ?? null
+                                    : null
       }
     }
   )

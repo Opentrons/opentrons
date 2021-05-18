@@ -104,7 +104,7 @@ export function PipetteInfo(props: PipetteInfoProps): JSX.Element {
           )}
         </Box>
         <Text
-          wordSpacing={SIZE_6} // always one word to a line
+          wordSpacing={SIZE_6} // always one word to a lin
           fontSize={FONT_SIZE_BODY_1}
           fontWeight={FONT_WEIGHT_SEMIBOLD}
         >

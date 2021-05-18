@@ -61,7 +61,9 @@ export function CheckCalibrationControl({
           dispatchedAction.payload.command.command
         )
       ) {
-        trackedRequestId.current = dispatchedAction.meta.requestId
+        trackedRequestId.current = ('meta' in dispatchedAction && 'requestId' in dispatchedAction.meta)
+          ? dispatchedAction.meta.requestId ?? null
+          : null
       }
     }
   )
