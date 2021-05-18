@@ -39,7 +39,6 @@ export const syncTimeOnConnectEpic: Epic = (action$, state$) => {
     switchMap(([action, state, robot]) => {
       const fetchSystemTimeReq = mapActionToFetchRequest(action)
 
-      // @ts-expect-error TODO: robot could be null here, but fetchRobotApi expects only RobotHost
       return fetchRobotApi(robot, fetchSystemTimeReq).pipe(
         filter(response => response.ok),
         map(response => response.body.data.systemTime),
@@ -50,7 +49,6 @@ export const syncTimeOnConnectEpic: Epic = (action$, state$) => {
         }),
         switchMap(() => {
           const updateSystemTimeReq = createUpdateRequest(new Date())
-          // @ts-expect-error TODO: robot could be null here, but fetchRobotApi expects only RobotHost
           return fetchRobotApi(robot, updateSystemTimeReq)
         })
       )

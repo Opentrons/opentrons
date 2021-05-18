@@ -9,10 +9,12 @@ import { getAttachedPipettes } from '../../pipettes'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
+import type { Observable } from 'rxjs'
 import type { State, Action, Epic } from '../../types'
 import type {
   RobotApiRequestOptions,
   RobotApiResponse,
+  RobotHost,
 } from '../../robot-api/types'
 
 import type { MoveAction, PositionsResponse } from '../types'
@@ -70,39 +72,41 @@ export const moveEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType<Action, MoveAction>(Constants.MOVE),
     withRobotHost(state$, a => a.payload.robotName),
-    switchMap(([action, state, host]) => {
-      // hit GET /robot/positions to figure out what POST /robot/move body will be
-      return fetchRobotApi(host, fetchPositionsRequest).pipe(
-        switchMap(positionsResponse => {
-          // call move endpoint if we have positions, otherwise
-          // pass the failure response along
-          return positionsResponse.ok
-            ? fetchRobotApi(
-                host,
-                mapActionToRequest(action, state, positionsResponse.body)
-              )
-            : of(positionsResponse)
-        }),
-        // at this point we have either a successful movement call,
-        // a failed movement call, or a failed position call
-        switchMap(maybeMoveSuccess => {
-          // if the last call was successful and we need to disengage motors,
-          // go ahead and make that call; otherwise pass the response along
-          return maybeMoveSuccess.ok && action.payload.disengageMotors
-            ? fetchRobotApi(host, disengageMotorsRequest).pipe(
-                map(disengageResponse =>
-                  // if the disengage call succeeds, make sure we still pass
-                  // our movement success response into our final action for
-                  // consistency
-                  disengageResponse.ok ? maybeMoveSuccess : disengageResponse
+    switchMap<[MoveAction, State, RobotHost], Observable<Action>>(
+      ([action, state, host]) => {
+        // hit GET /robot/positions to figure out what POST /robot/move body will be
+        return fetchRobotApi(host, fetchPositionsRequest).pipe(
+          switchMap(positionsResponse => {
+            // call move endpoint if we have positions, otherwise
+            // pass the failure response along
+            return positionsResponse.ok
+              ? fetchRobotApi(
+                  host,
+                  mapActionToRequest(action, state, positionsResponse.body)
                 )
-              )
-            : of(maybeMoveSuccess)
-        }),
-        // response will be one of:
-        // movement success, movement fail, positions fail, disengage fail
-        map(response => mapResponseToAction(response, action))
-      )
-    })
+              : of(positionsResponse)
+          }),
+          // at this point we have either a successful movement call,
+          // a failed movement call, or a failed position call
+          switchMap(maybeMoveSuccess => {
+            // if the last call was successful and we need to disengage motors,
+            // go ahead and make that call; otherwise pass the response along
+            return maybeMoveSuccess.ok && action.payload.disengageMotors
+              ? fetchRobotApi(host, disengageMotorsRequest).pipe(
+                  map(disengageResponse =>
+                    // if the disengage call succeeds, make sure we still pass
+                    // our movement success response into our final action for
+                    // consistency
+                    disengageResponse.ok ? maybeMoveSuccess : disengageResponse
+                  )
+                )
+              : of(maybeMoveSuccess)
+          }),
+          // response will be one of:
+          // movement success, movement fail, positions fail, disengage fail
+          map(response => mapResponseToAction(response, action))
+        )
+      }
+    )
   )
 }

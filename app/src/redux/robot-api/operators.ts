@@ -7,7 +7,7 @@ import * as Types from './types'
 
 import type { Observable, UnaryFunction, OperatorFunction } from 'rxjs'
 import type { State, Action } from '../types'
-import type { ViewableRobot } from '../discovery/types'
+import type { RobotHost } from './types'
 
 export type ActionToRequestMapper<TriggerAction> = (
   triggerAction: TriggerAction,
@@ -23,14 +23,14 @@ export type ResponseToActionMapper<TriggerAction> = (
 export function withRobotHost<A>(
   state$: Observable<State>,
   getRobotName: (action: A) => string
-): UnaryFunction<Observable<A>, Observable<[A, State, ViewableRobot]>> {
+): UnaryFunction<Observable<A>, Observable<[A, State, RobotHost]>> {
   return pipe(
-    withLatestFrom(state$, (a: A, s: State): [
-      A,
-      State,
-      ViewableRobot | null
-    ] => [a, s, getRobotByName(s, getRobotName(a))]),
-    filter((args): args is [A, State, ViewableRobot] => {
+    withLatestFrom(state$, (a: A, s: State): [A, State, RobotHost | null] => [
+      a,
+      s,
+      getRobotByName(s, getRobotName(a)) as RobotHost | null,
+    ]),
+    filter((args): args is [A, State, RobotHost] => {
       const [, , maybeRobot] = args
       return maybeRobot !== null
     })
