@@ -45,7 +45,7 @@ export const mockRobot: RobotHost = {
   port: 31950,
 }
 
-export const mockRequestMeta = { requestId: 'abc' } as any
+export const mockRequestMeta = { requestId: 'abc' } as RobotApiRequestMeta
 
 export const mockFailureBody = { message: 'AH' }
 

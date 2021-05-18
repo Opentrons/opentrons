@@ -2,9 +2,8 @@ import { combineReducers } from 'redux'
 
 import { robotLogsReducer } from './robot-logs/reducer'
 
-import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type { ShellState, ShellUpdateState } from './types'
+import type { ShellUpdateState } from './types'
 
 const INITIAL_STATE: ShellUpdateState = {
   checking: false,
@@ -47,10 +46,7 @@ export function shellUpdateReducer(
   return state
 }
 
-export const shellReducer: Reducer<ShellState, Action> = combineReducers<
-  _,
-  Action
->({
+export const shellReducer = combineReducers({ // TODO IMMEDIATELY use
   update: shellUpdateReducer,
   robotLogs: robotLogsReducer,
 })

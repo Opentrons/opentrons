@@ -85,10 +85,9 @@ export type Action =
 
 export type GetState = () => State
 
-export type ThunkAction = (
-  dispatch: Dispatch,
-  getState: GetState
-) => Action | null | undefined
+export type ThunkAction =
+  | ((dispatch: Dispatch, getState: GetState) => Action)
+  | ((dispatch: Dispatch, getState: GetState) => void)
 
 export type ThunkPromiseAction = (
   dispatch: Dispatch,

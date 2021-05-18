@@ -1,4 +1,3 @@
-import { createSelector } from 'reselect'
 import { head } from 'lodash'
 
 import type { State } from '../../types'
@@ -16,23 +15,6 @@ export const getTipLengthCalibrations: (
   return calibrations
 }
 
-export const getTipLengthForPipetteAndTiprackByUri: (
-  state: State,
-  robotName: string | null,
-  pipetteSerial: string,
-  tiprackUri: string
-) => TipLengthCalibration | null = createSelector(
-  getTipLengthCalibrations,
-  (allCalibrations, pipetteSerial, tipRackUri) => {
-    return (
-      head(
-        allCalibrations.filter(
-          cal => cal.pipette === pipetteSerial && cal.uri === tipRackUri
-        )
-      ) || null
-    )
-  }
-)
 
 export const filterTipLengthForPipetteAndTiprack: (
   allCalibrations: TipLengthCalibration[],
