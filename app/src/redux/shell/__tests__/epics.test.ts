@@ -18,7 +18,7 @@ jest.mock('../../config')
 // TODO(mc, 2020-10-08): this is a partial mock because shell/update
 // needs some reorg to split actions and selectors
 jest.mock('../update', () => ({
-  ...jest.requireActual('../update'),
+  ...jest.requireActual<{}>('../update'),
   getAvailableShellUpdate: jest.fn(),
 }))
 
