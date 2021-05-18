@@ -27,8 +27,8 @@ const PORTAL_ROOT_PROPS_BY_LEVEL: Record<PortalLevel, PortalLevelInfo> = {
   top: { id: '__otAppTopPortalRoot', zIndex: 10 },
 }
 
-const getPortalRoot = (level: PortalLevel): HTMLDivElement =>
-  global.document.getElementById(PORTAL_ROOT_PROPS_BY_LEVEL[level].id)
+const getPortalRoot = (level: PortalLevel): HTMLElement | null =>
+  (global.document as HTMLDocument).getElementById(PORTAL_ROOT_PROPS_BY_LEVEL[level].id)
 
 export function PortalRoot(): JSX.Element {
   return <Box {...PORTAL_ROOT_PROPS_BY_LEVEL.page} />
