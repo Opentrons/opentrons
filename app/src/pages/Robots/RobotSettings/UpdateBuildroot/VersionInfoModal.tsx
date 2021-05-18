@@ -16,6 +16,7 @@ import { SkipAppUpdateMessage } from './SkipAppUpdateMessage'
 import { SyncRobotMessage } from './SyncRobotMessage'
 import styles from './styles.css'
 
+import type { ButtonProps } from '@opentrons/components'
 import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
@@ -50,7 +51,7 @@ export function VersionInfoModal(props: VersionInfoModalProps): JSX.Element {
   }
 
   let heading = ''
-  let primaryButton = { className: styles.view_update_button }
+  let primaryButton: ButtonProps = { className: styles.view_update_button }
   let message = null
   let secondaryMessage = null
 

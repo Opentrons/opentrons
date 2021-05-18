@@ -11,12 +11,12 @@ import { UpdateAppModal } from '..'
 import type { State, Action } from '../../../redux/types'
 import type { ShellUpdateState } from '../../../redux/shell/types'
 import type { UpdateAppModalProps } from '..'
-import { ReactWrapper } from 'enzyme'
+import type { HTMLAttributes, ReactWrapper } from 'enzyme'
 
 // TODO(mc, 2020-10-06): this is a partial mock because shell/update
 // needs some reorg to split actions and selectors
 jest.mock('../../../redux/shell/update', () => ({
-  ...jest.requireActual('../../../redux/shell/update'),
+  ...jest.requireActual<{[fnName: string]: (...args: any[]) => any}>('../../../redux/shell/update'),
   getShellUpdateState: jest.fn(),
 }))
 
@@ -78,7 +78,7 @@ describe('UpdateAppModal', () => {
     const { wrapper } = render({ closeModal })
     const notNowButton = wrapper
       .find('button')
-      .filterWhere(b => /not now/i.test(b.text()))
+      .filterWhere((b: ReactWrapper<HTMLAttributes>) => /not now/i.test(b.text()))
 
     expect(closeModal).not.toHaveBeenCalled()
     notNowButton.invoke('onClick')?.({} as React.MouseEvent)
@@ -103,7 +103,7 @@ describe('UpdateAppModal', () => {
     const { wrapper } = render({ closeModal })
     const spinner = wrapper
       .find(Icon)
-      .filterWhere(i => i.prop('name') === 'ot-spinner')
+      .filterWhere((i: ReactWrapper<React.ComponentProps<typeof Icon>>) => i.prop('name') === 'ot-spinner')
     const spinnerParent = spinner.closest(Flex)
 
     expect(spinnerParent.text()).toMatch(/download in progress/i)
@@ -133,7 +133,7 @@ describe('UpdateAppModal', () => {
     const { wrapper, store } = render({ closeModal })
     const restartButton = wrapper
       .find('button')
-      .filterWhere(b => /restart/i.test(b.text()))
+      .filterWhere((b: ReactWrapper<HTMLAttributes>) => /restart/i.test(b.text()))
 
     restartButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(store.dispatch).toHaveBeenCalledWith(Shell.applyShellUpdate())
@@ -146,7 +146,7 @@ describe('UpdateAppModal', () => {
     const { wrapper } = render({ closeModal })
     const notNowButton = wrapper
       .find('button')
-      .filterWhere(b => /not now/i.test(b.text()))
+      .filterWhere((b: ReactWrapper<HTMLAttributes>) => /not now/i.test(b.text()))
 
     notNowButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(closeModal).toHaveBeenCalled()
@@ -181,7 +181,7 @@ describe('UpdateAppModal', () => {
     const { wrapper } = render({ dismissAlert })
     const notNowButton = wrapper
       .find('button')
-      .filterWhere(b => /not now/i.test(b.text()))
+      .filterWhere((b: ReactWrapper<HTMLAttributes>) => /not now/i.test(b.text()))
 
     expect(dismissAlert).not.toHaveBeenCalled()
     notNowButton.invoke('onClick')?.({} as React.MouseEvent)
@@ -208,7 +208,7 @@ describe('UpdateAppModal', () => {
     const { wrapper } = render({ dismissAlert })
     const ignoreButton = wrapper
       .find('button')
-      .filterWhere(b => /turn off update notifications/i.test(b.text()))
+      .filterWhere((b: ReactWrapper<HTMLAttributes>) => /turn off update notifications/i.test(b.text()))
 
     ignoreButton.invoke('onClick')?.({} as React.MouseEvent)
 
@@ -225,7 +225,7 @@ describe('UpdateAppModal', () => {
     const { wrapper } = render({ closeModal })
     const ignoreButton = wrapper
       .find('button')
-      .filterWhere(b => /turn off update notifications/i.test(b.text()))
+      .filterWhere((b: ReactWrapper<HTMLAttributes>) => /turn off update notifications/i.test(b.text()))
 
     expect(ignoreButton.exists()).toBe(false)
   })
@@ -238,7 +238,7 @@ describe('UpdateAppModal', () => {
     const { wrapper } = render({ dismissAlert })
     const ignoreButton = wrapper
       .find('button')
-      .filterWhere(b => /turn off update notifications/i.test(b.text()))
+      .filterWhere((b: ReactWrapper<HTMLAttributes>) => /turn off update notifications/i.test(b.text()))
 
     expect(ignoreButton.exists()).toBe(false)
   })
@@ -248,12 +248,12 @@ describe('UpdateAppModal', () => {
 
     wrapper
       .find('button')
-      .filterWhere(b => /turn off update notifications/i.test(b.text()))
+      .filterWhere((b: ReactWrapper<HTMLAttributes>) => /turn off update notifications/i.test(b.text()))
       .invoke('onClick')?.({} as React.MouseEvent)
 
     wrapper
       .find('button')
-      .filterWhere(b => /ok/i.test(b.text()))
+      .filterWhere((b: ReactWrapper<HTMLAttributes>) => /ok/i.test(b.text()))
       .invoke('onClick')?.({} as React.MouseEvent)
 
     expect(dismissAlert).toHaveBeenCalledWith(true)
@@ -264,7 +264,7 @@ describe('UpdateAppModal', () => {
 
     wrapper
       .find('button')
-      .filterWhere(b => /turn off update notifications/i.test(b.text()))
+      .filterWhere((b: ReactWrapper<HTMLAttributes>) => /turn off update notifications/i.test(b.text()))
       .invoke('onClick')?.({} as React.MouseEvent)
 
     wrapper.unmount()
@@ -277,12 +277,12 @@ describe('UpdateAppModal', () => {
 
     wrapper
       .find('button')
-      .filterWhere(b => /turn off update notifications/i.test(b.text()))
+      .filterWhere((b: ReactWrapper<HTMLAttributes>) => /turn off update notifications/i.test(b.text()))
       .invoke('onClick')?.({} as React.MouseEvent)
 
     wrapper
       .find(InternalLink)
-      .filterWhere(b => b.prop('to') === '/more/app')
+      .filterWhere((b: ReactWrapper<React.ComponentProps<typeof InternalLink>>) => b.prop('to') === '/more/app')
       .invoke('onClick')?.({} as React.MouseEvent<HTMLAnchorElement>)
 
     expect(dismissAlert).toHaveBeenCalledWith(true)
@@ -292,7 +292,7 @@ describe('UpdateAppModal', () => {
     const { wrapper } = render({ dismissAlert })
     const notNowButton = wrapper
       .find('button')
-      .filterWhere(b => /not now/i.test(b.text()))
+      .filterWhere((b: ReactWrapper<HTMLAttributes>) => /not now/i.test(b.text()))
 
     notNowButton.invoke('onClick')?.({} as React.MouseEvent)
     wrapper.unmount()

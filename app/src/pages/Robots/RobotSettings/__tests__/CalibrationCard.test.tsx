@@ -107,7 +107,7 @@ const getDeckCalButton = (
 
 const getCheckCalibrationControl = (
   wrapper: ReactWrapper<React.ComponentProps<typeof CalibrationCard>>
-): ReactWrapper => wrapper.find(CheckCalibrationControl)
+): ReactWrapper => wrapper.find('CheckCalibrationControl')
 
 const getDownloadButton = (
   wrapper: ReactWrapper<React.ComponentProps<typeof CalibrationCard>>

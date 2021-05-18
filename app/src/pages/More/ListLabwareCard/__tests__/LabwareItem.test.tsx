@@ -17,6 +17,7 @@ describe('LabwareItem', () => {
     filename: 'some_file.json',
     // Oct 21, 2019, 20:00:00 UTC
     modified: 1571688000000,
+    definition: undefined,
   }
 
   const validFile: ValidLabwareFile = {

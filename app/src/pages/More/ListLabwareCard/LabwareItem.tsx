@@ -53,7 +53,7 @@ export function LabwareItem(props: LabwareItemProps): JSX.Element {
   }
 
   return (
-    <li className={cx(styles.item, { [styles.invalid]: warning })}>
+    <li className={cx(styles.item, { [styles.invalid]: Boolean(warning) })}>
       <p className={styles.item_category_column}>{displayCategory}</p>
       <div className={styles.item_name_column}>
         <p className={styles.item_primary_name}>{displayName}</p>
