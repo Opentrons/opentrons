@@ -86,8 +86,8 @@ export interface CalibrationCheckComparisonsPerCalibration {
 }
 
 export interface CalibrationCheckComparisonByPipette {
-  first: CalibrationCheckComparisonsPerCalibration
-  second: CalibrationCheckComparisonsPerCalibration
+  [CHECK_PIPETTE_RANK_FIRST]: CalibrationCheckComparisonsPerCalibration
+  [CHECK_PIPETTE_RANK_SECOND]: CalibrationCheckComparisonsPerCalibration
 }
 
 export interface CheckCalibrationSessionDetails {

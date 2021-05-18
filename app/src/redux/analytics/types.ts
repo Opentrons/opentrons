@@ -7,6 +7,7 @@ import * as CalUITypes from '../../organisms/CalibrationPanels/types'
 
 import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
 import type { DeckCalibrationStatus } from '../calibration/types'
+import type { Mount } from '@opentrons/components'
 
 export type AnalyticsConfig = Config['analytics']
 
@@ -31,7 +32,7 @@ export type RobotAnalyticsData = {
 } & {
   // feature flags
   // e.g. robotFF_settingName
-  [ffName: string]: boolean
+  [ffName: string]: boolean | string
 }
 
 export interface BuildrootAnalyticsData {
@@ -53,9 +54,8 @@ export interface TipLengthCalibrationAnalyticsData {
   pipetteModel: string
 }
 
-export interface ModelsByMount {
-  left: { model: string } | null
-  right: { model: string } | null
+export type ModelsByMount = {
+  [mount in Mount]: { model: string } | null
 }
 
 export interface DeckCalibrationAnalyticsData {

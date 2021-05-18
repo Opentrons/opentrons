@@ -20,9 +20,8 @@ export interface AttachedPipette {
   modelSpecs: PipetteModelSpecs
 }
 
-export interface AttachedPipettesByMount {
-  left: null | AttachedPipette
-  right: null | AttachedPipette
+export type AttachedPipettesByMount = {
+  [mount in Mount]: null | AttachedPipette
 }
 
 export interface PipetteSettingsField {

@@ -44,7 +44,10 @@ import { hash } from './hash'
 
 import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
-import type { CalibrationCheckInstrument } from '../sessions/calibration-check/types'
+import type {
+  CalibrationCheckComparisonsPerCalibration,
+  CalibrationCheckInstrument,
+} from '../sessions/calibration-check/types'
 import type { Mount } from '../pipettes/types'
 
 import type {
@@ -102,18 +105,19 @@ const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
 
 export const getProtocolAnalyticsData: (
   state: State
-) => Promise<ProtocolAnalyticsData> = createSelector(
-  _getUnhashedProtocolAnalyticsData,
-  data => {
-    const hashTasks = [hash(data.protocolAuthor), hash(data.protocolText)]
+) => Promise<ProtocolAnalyticsData> = createSelector<
+  State,
+  ProtocolAnalyticsData,
+  Promise<ProtocolAnalyticsData>
+>(_getUnhashedProtocolAnalyticsData, (data: ProtocolAnalyticsData) => {
+  const hashTasks = [hash(data.protocolAuthor), hash(data.protocolText)]
 
-    return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
-      ...data,
-      protocolAuthor: data.protocolAuthor !== '' ? protocolAuthor : '',
-      protocolText: data.protocolText !== '' ? protocolText : '',
-    }))
-  }
-)
+  return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
+    ...data,
+    protocolAuthor: data.protocolAuthor !== '' ? protocolAuthor : '',
+    protocolText: data.protocolText !== '' ? protocolText : '',
+  }))
+})
 
 export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
   const robot = getConnectedRobot(state)
@@ -122,7 +126,7 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
     const pipettes = getAttachedPipettes(state, robot.name)
     const settings = getRobotSettings(state, robot.name)
 
-    return settings.reduce<RobotAnalyticsData>(
+    const robotAnalyticsData = settings.reduce<RobotAnalyticsData>(
       (result, setting) => ({
         ...result,
         [`${FF_PREFIX}${setting.id}`]: !!setting.value,
@@ -134,6 +138,8 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
         robotRightPipette: pipettes.right?.model || '',
       }
     )
+
+    return robotAnalyticsData
   }
 
   return null
@@ -188,7 +194,7 @@ export function getAnalyticsPipetteCalibrationData(
     return {
       calibrationExists: Boolean(pipcal),
       markedBad: pipcal?.status?.markedBad ?? false,
-      pipetteModel: pip.model,
+      pipetteModel: pip?.model ?? '',
     }
   }
   return null
@@ -208,22 +214,27 @@ export function getAnalyticsTipLengthCalibrationData(
     return {
       calibrationExists: Boolean(tipcal),
       markedBad: tipcal?.status?.markedBad ?? false,
-      pipetteModel: pip.model,
+      pipetteModel: pip?.model ?? '',
     }
   }
   return null
 }
 
 function getPipetteModels(state: State, robotName: string): ModelsByMount {
-  return Object.entries(getAttachedPipettes(state, robotName)).reduce(
-    (obj, [mount, pipData]) => {
-      if (pipData) {
-        obj[mount] = pick(pipData, ['model'])
+  const attachedPipettesEntries = Object.entries(
+    getAttachedPipettes(state, robotName)
+  )
+
+  const modelsByMount = attachedPipettesEntries.reduce<ModelsByMount>(
+    (obj, [mount, pipData]): ModelsByMount => {
+      if (pipData != null) {
+        obj[mount as Mount] = pick(pipData, ['model'])
       }
       return obj
     },
-    {} as Partial<ModelsByMount>
+    { left: null, right: null }
   )
+  return modelsByMount
 }
 
 function getCalibrationCheckData(
@@ -235,12 +246,16 @@ function getCalibrationCheckData(
     return null
   }
   const { comparisonsByPipette, instruments } = session.details
-  return instruments.reduce(
+  return instruments.reduce<CalibrationCheckByMount>(
     (obj, instrument: CalibrationCheckInstrument) => {
       const { rank, mount, model } = instrument
       const succeeded = !some(
         Object.keys(comparisonsByPipette[rank]).map(k =>
-          Boolean(comparisonsByPipette[rank][k]?.status === 'OUTSIDE_THRESHOLD')
+          Boolean(
+            comparisonsByPipette[rank][
+              k as keyof CalibrationCheckComparisonsPerCalibration
+            ]?.status === 'OUTSIDE_THRESHOLD'
+          )
         )
       )
       obj[mount] = {
@@ -250,7 +265,7 @@ function getCalibrationCheckData(
       }
       return obj
     },
-    { left: null, right: null } as Partial<CalibrationCheckByMount>
+    { left: null, right: null }
   )
 }
 

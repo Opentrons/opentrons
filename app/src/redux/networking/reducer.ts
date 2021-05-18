@@ -60,7 +60,8 @@ export const networkingReducer: Reducer<NetworkingState, Action> = (
 
     case Constants.POST_WIFI_KEYS_SUCCESS: {
       const { robotName, wifiKey: apiWifiKey } = action.payload
-      const { requestId } = action.meta
+      const requestId =
+        'requestId' in action.meta ? action.meta.requestId : null
       const wifiKey = requestId ? { ...apiWifiKey, requestId } : apiWifiKey
       const robotState = getRobotState(state, robotName)
       const wifiKeyIds = uniq([...(robotState.wifiKeyIds ?? []), wifiKey.id])
