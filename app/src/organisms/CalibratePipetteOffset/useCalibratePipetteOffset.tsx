@@ -62,18 +62,18 @@ export function useCalibratePipetteOffset(
         dispatchedAction.payload.sessionType ===
           Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
       ) {
-        createRequestId.current = dispatchedAction.meta.requestId
+        createRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
       } else if (
         dispatchedAction.type === Sessions.DELETE_SESSION &&
         pipOffsetCalSession?.id === dispatchedAction.payload.sessionId
       ) {
-        deleteRequestId.current = dispatchedAction.meta.requestId
+        deleteRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
       ) {
-        jogRequestId.current = dispatchedAction.meta.requestId
+        jogRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(

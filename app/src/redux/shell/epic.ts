@@ -23,7 +23,13 @@ const log = createLogger(__filename)
 
 const sendActionToShellEpic: Epic = action$ =>
   action$.pipe(
-    filter<Action>(a => a.meta != null && a.meta.shell != null && a.meta.shell),
+    filter<Action>(
+      a =>
+        'meta' in a &&
+        a.meta != null &&
+        'shell' in a.meta &&
+        a.meta.shell != null
+    ),
     tap<Action>((shellAction: Action) =>
       ipcRenderer.send('dispatch', shellAction)
     ),
@@ -34,6 +40,7 @@ const receiveActionFromShellEpic: Epic = () =>
   // IPC event listener: (IpcRendererEvent, ...args) => void
   // our action is the only argument, so pluck it out from index 1
   fromEvent<Action>(
+    // @ts-expect-error TODO: don't use fromEvent and ipcRenderer type should work properly
     ipcRenderer,
     'dispatch',
     (_: unknown, incoming: Action) => incoming

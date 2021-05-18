@@ -117,16 +117,16 @@ export type FetchPipetteSettingsResponseBody = PipetteSettingsById
 export interface FetchPipettesAction {
   type: 'pipettes:FETCH_PIPETTES'
   payload: { robotName: string; refresh: boolean }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
-interface FetchPipettesSuccessAction {
+export interface FetchPipettesSuccessAction {
   type: 'pipettes:FETCH_PIPETTES_SUCCESS'
   payload: { robotName: string; pipettes: FetchPipettesResponseBody }
   meta: RobotApiRequestMeta
 }
 
-interface FetchPipettesFailureAction {
+export interface FetchPipettesFailureAction {
   type: 'pipettes:FETCH_PIPETTES_FAILURE'
   payload: { robotName: string; error: {} }
   meta: RobotApiRequestMeta
@@ -137,16 +137,16 @@ interface FetchPipettesFailureAction {
 export interface FetchPipetteSettingsAction {
   type: 'pipettes:FETCH_PIPETTE_SETTINGS'
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
-interface FetchPipetteSettingsSuccessAction {
+export interface FetchPipetteSettingsSuccessAction {
   type: 'pipettes:FETCH_PIPETTE_SETTINGS_SUCCESS'
   payload: { robotName: string; settings: FetchPipetteSettingsResponseBody }
   meta: RobotApiRequestMeta
 }
 
-interface FetchPipetteSettingsFailureAction {
+export interface FetchPipetteSettingsFailureAction {
   type: 'pipettes:FETCH_PIPETTE_SETTINGS_FAILURE'
   payload: { robotName: string; error: {} }
   meta: RobotApiRequestMeta
@@ -161,7 +161,7 @@ export interface UpdatePipetteSettingsAction {
     pipetteId: string
     fields: PipetteSettingsFieldsUpdate
   }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface UpdatePipetteSettingsSuccessAction {

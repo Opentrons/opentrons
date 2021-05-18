@@ -59,7 +59,7 @@ export interface MatchedModule {
 export interface FetchModulesAction {
   type: 'modules:FETCH_MODULES'
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchModulesSuccessAction {

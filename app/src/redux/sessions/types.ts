@@ -168,7 +168,7 @@ export interface CreateSessionAction {
     sessionType: SessionType
     params: SessionParams
   }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface CreateSessionSuccessAction {
@@ -186,7 +186,7 @@ export interface CreateSessionFailureAction {
 export interface DeleteSessionAction {
   type: typeof DELETE_SESSION
   payload: { robotName: string; sessionId: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface DeleteSessionSuccessAction {
@@ -208,7 +208,7 @@ export interface DeleteSessionFailureAction {
 export interface FetchSessionAction {
   type: typeof FETCH_SESSION
   payload: { robotName: string; sessionId: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchSessionSuccessAction {
@@ -230,7 +230,7 @@ export interface FetchSessionFailureAction {
 export interface FetchAllSessionsAction {
   type: typeof FETCH_ALL_SESSIONS
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchAllSessionsSuccessAction {
@@ -255,7 +255,7 @@ export interface EnsureSessionAction {
     sessionType: SessionType
     params: SessionParams
   }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface CreateSessionCommandAction {
@@ -265,7 +265,7 @@ export interface CreateSessionCommandAction {
     sessionId: string
     command: SessionCommandAttributes
   }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface CreateSessionCommandSuccessAction {

@@ -27,7 +27,7 @@ export interface PositionsResponse {
 export interface FetchLightsAction {
   type: 'robotControls:FETCH_LIGHTS'
   payload: { robotName: string }
-  meta: Partial<RobotApiRequestMeta>
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchLightsSuccessAction {
@@ -69,7 +69,7 @@ export interface HomeAction {
   payload:
     | { robotName: string; target: 'robot' }
     | { robotName: string; target: 'pipette'; mount: Mount }
-  meta: Partial<RobotApiRequestMeta>
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface HomeSuccessAction {
@@ -94,7 +94,7 @@ export interface MoveAction {
     position: MovePosition
     disengageMotors: boolean
   }
-  meta: Partial<RobotApiRequestMeta>
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface MoveSuccessAction {

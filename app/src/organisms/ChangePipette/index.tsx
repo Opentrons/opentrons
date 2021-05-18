@@ -70,7 +70,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
       dispatchedAction.payload.target === PIPETTE
     ) {
       // track final home pipette request, its success closes modal
-      finalRequestId.current = dispatchedAction.meta.requestId
+      finalRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId : null
     }
   })
   const [wizardStep, setWizardStep] = React.useState<WizardStep>(CLEAR_DECK)

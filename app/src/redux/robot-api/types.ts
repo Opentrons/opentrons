@@ -34,7 +34,7 @@ export interface RobotApiResponse extends RobotApiResponseMeta {
 }
 
 export interface RobotApiRequestMeta {
-  requestId: string
+  requestId?: string
   response: {
     method: Method
     path: string

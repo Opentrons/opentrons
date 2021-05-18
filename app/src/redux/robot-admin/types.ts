@@ -59,7 +59,7 @@ export interface RestartRobotFailureAction {
 export interface FetchResetConfigOptionsAction {
   type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS'
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchResetConfigOptionsSuccessAction {
@@ -77,7 +77,7 @@ export interface FetchResetConfigOptionsFailureAction {
 export interface ResetConfigAction {
   type: 'robotAdmin:RESET_CONFIG'
   payload: { robotName: string; resets: ResetConfigRequest }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface ResetConfigSuccessAction {

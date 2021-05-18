@@ -30,9 +30,9 @@ export function CheckPipettesButton(
   const [dispatch] = useDispatchApiRequests(dispatchedAction => {
     if (
       dispatchedAction.type === FETCH_PIPETTES &&
-      dispatchedAction.meta.requestId
+      'requestId' in dispatchedAction.meta
     ) {
-      fetchPipettesRequestId.current = dispatchedAction.meta.requestId
+      fetchPipettesRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
     }
   })
   const handleClick = (): void => dispatch(fetchPipettes(robotName, true))

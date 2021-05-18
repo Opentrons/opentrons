@@ -33,7 +33,7 @@ export * from './api-types'
 export interface FetchStatusAction {
   type: typeof FETCH_STATUS
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchStatusSuccessAction {
@@ -43,13 +43,13 @@ export interface FetchStatusSuccessAction {
     internetStatus: ApiTypes.InternetStatus
     interfaces: ApiTypes.InterfaceStatusMap
   }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchStatusFailureAction {
   type: typeof FETCH_STATUS_FAILURE
   payload: { robotName: string; error: {} }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 // fetch wifi list
@@ -57,19 +57,19 @@ export interface FetchStatusFailureAction {
 export interface FetchWifiListAction {
   type: typeof FETCH_WIFI_LIST
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchWifiListSuccessAction {
   type: typeof FETCH_WIFI_LIST_SUCCESS
   payload: { robotName: string; wifiList: ApiTypes.WifiNetwork[] }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchWifiListFailureAction {
   type: typeof FETCH_WIFI_LIST_FAILURE
   payload: { robotName: string; error: RobotApiErrorResponse }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 // connect to new network
@@ -77,19 +77,19 @@ export interface FetchWifiListFailureAction {
 export interface PostWifiConfigureAction {
   type: typeof POST_WIFI_CONFIGURE
   payload: { robotName: string; options: ApiTypes.WifiConfigureRequest }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface PostWifiConfigureSuccessAction {
   type: typeof POST_WIFI_CONFIGURE_SUCCESS
   payload: { robotName: string; ssid: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface PostWifiConfigureFailureAction {
   type: typeof POST_WIFI_CONFIGURE_FAILURE
   payload: { robotName: string; error: RobotApiErrorResponse }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 // fetch wifi keys
@@ -97,19 +97,19 @@ export interface PostWifiConfigureFailureAction {
 export interface FetchWifiKeysAction {
   type: typeof FETCH_WIFI_KEYS
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchWifiKeysSuccessAction {
   type: typeof FETCH_WIFI_KEYS_SUCCESS
   payload: { robotName: string; wifiKeys: ApiTypes.ApiWifiKey[] }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchWifiKeysFailureAction {
   type: typeof FETCH_WIFI_KEYS_FAILURE
   payload: { robotName: string; error: RobotApiErrorResponse }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 // post wifi keys
@@ -117,19 +117,19 @@ export interface FetchWifiKeysFailureAction {
 export interface PostWifiKeysAction {
   type: typeof POST_WIFI_KEYS
   payload: { robotName: string; keyFile: File }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface PostWifiKeysSuccessAction {
   type: typeof POST_WIFI_KEYS_SUCCESS
   payload: { robotName: string; wifiKey: ApiTypes.ApiWifiKey }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface PostWifiKeysFailureAction {
   type: typeof POST_WIFI_KEYS_FAILURE
   payload: { robotName: string; error: RobotApiErrorResponse }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 // fetch eap options
@@ -137,19 +137,19 @@ export interface PostWifiKeysFailureAction {
 export interface FetchEapOptionsAction {
   type: typeof FETCH_EAP_OPTIONS
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchEapOptionsSuccessAction {
   type: typeof FETCH_EAP_OPTIONS_SUCCESS
   payload: { robotName: string; eapOptions: ApiTypes.EapOption[] }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchEapOptionsFailureAction {
   type: typeof FETCH_EAP_OPTIONS_FAILURE
   payload: { robotName: string; error: RobotApiErrorResponse }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 // disconnect network
@@ -157,19 +157,19 @@ export interface FetchEapOptionsFailureAction {
 export interface PostWifiDisconnectAction {
   type: 'networking:POST_WIFI_DISCONNECT'
   payload: { robotName: string; ssid: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface PostWifiDisconnectSuccessAction {
   type: 'networking:POST_WIFI_DISCONNECT_SUCCESS'
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface PostWifiDisconnectFailureAction {
   type: 'networking:POST_WIFI_DISCONNECT_FAILURE'
   payload: { robotName: string; error: {} }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface NetworkingDisconnectResponse {

@@ -28,7 +28,7 @@ export * from './tip-length/types'
 export interface FetchCalibrationStatusAction {
   type: typeof FETCH_CALIBRATION_STATUS
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchCalibrationStatusSuccessAction {

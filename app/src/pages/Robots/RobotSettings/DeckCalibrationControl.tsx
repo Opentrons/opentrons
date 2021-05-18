@@ -73,14 +73,14 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
-        createRequestId.current = dispatchedAction.meta.requestId
-        trackedRequestId.current = dispatchedAction.meta.requestId
+        createRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
+        trackedRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
       ) {
-        jogRequestId.current = dispatchedAction.meta.requestId
+        jogRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
