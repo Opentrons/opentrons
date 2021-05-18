@@ -126,7 +126,6 @@ export const formLevelValidation = (
     if (error.name === 'ValidationError' || error.name === 'TypeError') {
       // TODO IMMEDIATELY why are missing values for required fields giving TypeError instead of ValidationError?
       // Is this partial schema (from `pick`) not handing requireds correctly??
-      console.log('debug: error was', { error }) // TODO IMMEDIATELY stray log
       return COULD_NOT_CAST
     } else {
       throw error
@@ -145,11 +144,9 @@ export const formLevelValidation = (
     castFields.gridSpacingY == null ||
     castFields.wellShape == null
   ) {
-    // NOTE: this probably should never be reached,
-    console.log('reached 2nd "COULD_NOT_CAST" case!!') // TODO IMMEDIATELY stray log
+    // NOTE(IL, 20201-05-18): this probably should never be reached??
     return COULD_NOT_CAST
   }
-  console.log({ castFields }) // TODO IMMEDIATELY stray log
 
   const {
     footprintXDimension,
@@ -180,7 +177,6 @@ export const formLevelValidation = (
       if (error.name === 'ValidationError' || error.name === 'TypeError') {
         // TODO IMMEDIATELY why are missing values for required fields giving TypeError instead of ValidationError?
         // Is this partial schema (from `pick`) not handing requireds correctly??
-        console.log('debug: error was', { error }) // TODO IMMEDIATELY stray log
         return COULD_NOT_CAST
       } else {
         throw error
@@ -215,7 +211,6 @@ export const formLevelValidation = (
       if (error.name === 'ValidationError' || error.name === 'TypeError') {
         // TODO IMMEDIATELY why are missing values for required fields giving TypeError instead of ValidationError?
         // Is this partial schema (from `pick`) not handing requireds correctly??
-        console.log('debug: error was', { error }) // TODO IMMEDIATELY stray log
         return COULD_NOT_CAST
       } else {
         throw error
@@ -237,11 +232,8 @@ export const formLevelValidation = (
   }
 
   if (boundingBox === undefined) {
-    console.log('bounding box undef') // TODO IMMEDIATELY stray log
     return COULD_NOT_CAST
   }
-
-  console.log({ boundingBox })
 
   // ==================
   // TODO IMMEDIATELY: split the section below out into its own fn, eg getFormLevelFootprintErrors or something

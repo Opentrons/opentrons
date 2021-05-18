@@ -9,7 +9,7 @@ import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
-import { AlertModal, AlertItem, PrimaryButton } from '@opentrons/components'
+import { AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
@@ -25,7 +25,6 @@ import {
 import { labwareDefToFields } from './labwareDefToFields'
 import { labwareFormSchema } from './labwareFormSchema'
 import {
-  FORM_LEVEL_ERRORS,
   formLevelValidation,
   LabwareCreatorErrors,
 } from './formLevelValidation'
@@ -35,6 +34,7 @@ import { fieldsToLabware } from './fieldsToLabware'
 import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
 import { ConditionalLabwareRender } from './components/ConditionalLabwareRender'
 import { Dropdown } from './components/Dropdown'
+import { FormLevelErrorAlerts } from './components/FormLevelErrorAlerts'
 import { IntroCopy } from './components/IntroCopy'
 import { LinkOut } from './components/LinkOut'
 import { RadioField } from './components/RadioField'
@@ -129,26 +129,6 @@ const displayAsTube = (values: LabwareFields): boolean =>
     values.aluminumBlockType === '96well' &&
     // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
     ['tubes', 'pcrTubeStrip'].includes(values.aluminumBlockChildType))
-
-// TODO IMMEDIATELY extract to file
-const FormLevelErrorAlerts = (props: {
-  errors: LabwareCreatorErrors
-}): JSX.Element | null => {
-  const { errors } = props
-  const formLevelErrors = errors[FORM_LEVEL_ERRORS]
-  if (formLevelErrors !== undefined) {
-    const errorTypesAndErrors = Object.entries(formLevelErrors)
-    return (
-      <>
-        {errorTypesAndErrors.map(([errorType, errorMessage]) => (
-          <AlertItem type="error" title={errorMessage} key={errorType} />
-        ))}
-      </>
-    )
-  } else {
-    return null
-  }
-}
 
 export const LabwareCreator = (): JSX.Element => {
   const [
@@ -414,7 +394,7 @@ export const LabwareCreator = (): JSX.Element => {
             setValues,
           } = bag
           const errors: LabwareCreatorErrors = bag.errors
-          console.log({ errors })
+
           // @ts-expect-error(IL, 2021-03-24): values/errors/touched not typed for reportErrors to be happy
           reportErrors({ values, errors, touched })
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
