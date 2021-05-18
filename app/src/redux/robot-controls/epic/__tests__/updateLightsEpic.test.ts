@@ -9,6 +9,7 @@ import * as Types from '../../types'
 import { robotControlsEpic } from '..'
 
 import type { Action, State } from '../../../types'
+import type { RobotApiRequestMeta } from '../../../robot-api/types';
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')
@@ -38,7 +39,7 @@ describe('updateLightsEpic', () => {
     jest.resetAllMocks()
   })
 
-  const meta = { requestId: '1234' }
+  const meta = { requestId: '1234' } as RobotApiRequestMeta
   const action: Types.UpdateLightsAction = {
     ...Actions.updateLights(mockRobot.name, true),
     meta,

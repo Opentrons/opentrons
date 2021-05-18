@@ -36,7 +36,8 @@ export const updateLights = (
 ): Types.UpdateLightsAction => ({
   type: Constants.UPDATE_LIGHTS,
   payload: { robotName, lightsOn },
-  meta: {},
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const updateLightsSuccess = (

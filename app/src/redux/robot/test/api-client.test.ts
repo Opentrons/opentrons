@@ -2,8 +2,9 @@
 import functions from 'lodash/functions'
 import omit from 'lodash/omit'
 import { push } from 'connected-react-router'
-
+// @ts-expect-error(sa, 2021-05-17): api client is not typed yet
 import { client } from '../api-client/client'
+// @ts-expect-error(sa, 2021-05-17): rpc client is not typed yet
 import { Client as RpcClient } from '../../../rpc/client'
 import { actions, constants } from '../'
 import * as AdminActions from '../../robot-admin/actions'
