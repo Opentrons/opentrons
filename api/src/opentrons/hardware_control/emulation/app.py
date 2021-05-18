@@ -49,6 +49,6 @@ async def run() -> None:
 if __name__ == "__main__":
     h = logging.StreamHandler()
     h.setLevel(logging.DEBUG)
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(h)
+    logger.parent.setLevel(logging.DEBUG)
+    logger.parent.addHandler(h)
     asyncio.run(run())
