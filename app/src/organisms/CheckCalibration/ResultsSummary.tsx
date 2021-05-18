@@ -38,6 +38,7 @@ import find from 'lodash/find'
 import { PIPETTE_MOUNTS, LEFT, RIGHT } from '../../redux/pipettes'
 import { saveAs } from 'file-saver'
 
+import type { Mount } from '../../redux/pipettes/types'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import {
   CHECK_STATUS_OUTSIDE_THRESHOLD,
@@ -110,8 +111,13 @@ export function ResultsSummary(
     instruments,
     (p: CalibrationCheckInstrument) => p.mount.toLowerCase() === RIGHT
   )
-
-  const calibrationsByMount = {
+  type CalibrationByMount = {
+    [m in Mount]: {
+      pipette: CalibrationCheckInstrument | undefined,
+      calibration: CalibrationCheckComparisonsPerCalibration | null
+    }
+  }
+  const calibrationsByMount: CalibrationByMount = {
     left: {
       pipette: leftPipette,
       calibration: leftPipette
@@ -206,11 +212,15 @@ export function ResultsSummary(
               title={`${m}-mount-results`}
               alignItems={ALIGN_STRETCH}
             >
-              {calibrationsByMount[m].pipette &&
-              calibrationsByMount[m].calibration &&
-              Object.entries(calibrationsByMount[m].calibration).length ? (
+              {
+              calibrationsByMount[m].pipette != null &&
+              calibrationsByMount[m].calibration != null &&
+              // @ts-expect-error TODO: ts can't narrow that this isn't nullish
+              Object.entries(calibrationsByMount[m].calibration).length > 0 ? (
                 <PipetteResult
+                  // @ts-expect-error TODO: ts can't narrow that this isn't nullish
                   pipetteInfo={calibrationsByMount[m].pipette}
+                  // @ts-expect-error TODO: ts can't narrow that this isn't nullish
                   pipetteCalibration={calibrationsByMount[m].calibration}
                 />
               ) : (
@@ -340,7 +350,7 @@ function WarningText(props: {
     props.pipettes.left.tipLengthBad,
     props.pipettes.right.offsetBad,
     props.pipettes.right.tipLengthBad,
-  ].reduce((sum, item) => sum + (item === true ? 1 : 0), 0)
+  ].reduce((sum, item) => sum + (item ? 1 : 0), 0)
   return badCount > 0 ? (
     <>
       <Box marginTop={SPACING_3} fontSize={FONT_SIZE_BODY_2}>
