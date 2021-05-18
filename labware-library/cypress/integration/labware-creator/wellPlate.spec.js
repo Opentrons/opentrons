@@ -82,7 +82,7 @@ context('Well Plates', () => {
       it('tests number of rows', () => {
         cy.get("input[name='gridRows']").focus().blur()
         cy.contains('Number of rows must be a number').should('exist')
-        cy.get("input[name='gridRows']").type('10').blur()
+        cy.get("input[name='gridRows']").type('8').blur()
         cy.contains('Number of rows must be a number').should('not.exist')
       })
 
@@ -124,7 +124,7 @@ context('Well Plates', () => {
     it('tests volume', () => {
       cy.get("input[name='wellVolume']").focus().blur()
       cy.contains('Max volume per well must be a number').should('exist')
-      cy.get("input[name='wellVolume']").type('10').blur()
+      cy.get("input[name='wellVolume']").type('100').blur()
       cy.contains('Max volume per well must be a number').should('not.exist')
     })
 
@@ -151,11 +151,11 @@ context('Well Plates', () => {
         cy.get("input[name='wellYDimension']").should('exist')
         cy.get("input[name='wellXDimension']").focus().blur()
         cy.contains('Well X must be a number').should('exist')
-        cy.get("input[name='wellXDimension']").type('10').blur()
+        cy.get("input[name='wellXDimension']").type('8').blur()
         cy.contains('Well X must be a number').should('not.exist')
         cy.get("input[name='wellYDimension']").focus().blur()
         cy.contains('Well Y must be a number').should('exist')
-        cy.get("input[name='wellYDimension']").type('10').blur()
+        cy.get("input[name='wellYDimension']").type('8').blur()
         cy.contains('Well Y must be a number').should('not.exist')
       })
 
@@ -187,7 +187,7 @@ context('Well Plates', () => {
       it('tests well spacing', () => {
         cy.get("input[name='gridSpacingX']").focus().blur()
         cy.contains('X Spacing (Xs) must be a number').should('exist')
-        cy.get("input[name='gridSpacingX']").type('10').blur()
+        cy.get("input[name='gridSpacingX']").type('12').blur()
         cy.contains('X Spacing (Xs) must be a number').should('not.exist')
         cy.get("input[name='gridSpacingY']").focus().blur()
         cy.contains('Y Spacing (Ys) must be a number').should('exist')
@@ -202,17 +202,20 @@ context('Well Plates', () => {
         cy.contains('X Offset (Xo) must be a number').should('not.exist')
         cy.get("input[name='gridOffsetY']").focus().blur()
         cy.contains('Y Offset (Yo) must be a number').should('exist')
-        cy.get("input[name='gridOffsetY']").type('10').blur()
+        cy.get("input[name='gridOffsetY']").type('8').blur()
         cy.contains('Y Offset (Yo) must be a number').should('not.exist')
       })
 
-      it('does has a preview image', () => {
+      it('should have a preview image and no footprint errors', () => {
         cy.contains('Add missing info to see labware preview').should(
           'not.exist'
         )
+        cy.contains(
+          'Please double-check well size, Y Spacing, and Y Offset.'
+        ).should('not.exist')
       })
 
-      it('tests the file export', () => {
+      it('should export a file', () => {
         // Try with missing fields
         cy.get('button[class*="_export_button_"]').click({ force: true })
         cy.contains(
@@ -227,10 +230,10 @@ context('Well Plates', () => {
         cy.get("input[name='brandId']").type('001')
 
         // File info
-        cy.get("input[placeholder='TestPro 100 Well Plate 10 µL']").should(
+        cy.get("input[placeholder='TestPro 80 Well Plate 100 µL']").should(
           'exist'
         )
-        cy.get("input[placeholder='testpro_100_wellplate_10ul']").should(
+        cy.get("input[placeholder='testpro_80_wellplate_100ul']").should(
           'exist'
         )
 
@@ -245,6 +248,8 @@ context('Well Plates', () => {
         cy.contains(
           'Please resolve all invalid fields in order to export the labware definition'
         ).should('not.exist')
+
+        // TODO IMMEDIATELY match against fixture ??? Is this not happening?
       })
     })
   })
