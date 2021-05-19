@@ -85,6 +85,11 @@ dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
 	$(pipenv) run $(run_dev)
 
+.PHONY: emulation
+emulation: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulators.env
+emulation:
+	$(pipenv) run $(run_dev)
+
 .PHONY: local-shell
 local-shell:
 	$(pipenv) shell
