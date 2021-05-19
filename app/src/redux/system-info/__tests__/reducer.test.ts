@@ -7,7 +7,7 @@ import { systemInfoReducer } from '../reducer'
 import type { Action } from '../../types'
 import type { SystemInfoState } from '../types'
 
-type ReducerSpec = {
+interface ReducerSpec {
   should: string
   action: Action
   initialState: SystemInfoState

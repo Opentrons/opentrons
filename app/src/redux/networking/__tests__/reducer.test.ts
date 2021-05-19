@@ -5,7 +5,7 @@ import * as Actions from '../actions'
 import type { Action } from '../../types'
 import type { NetworkingState } from '../types'
 
-type ReducerSpec = {
+interface ReducerSpec {
   name: string
   state: NetworkingState
   action: Action

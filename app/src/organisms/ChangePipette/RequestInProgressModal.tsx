@@ -15,7 +15,7 @@ const TO_FRONT_AND_RIGHT = 'to front and right'
 const UP = 'up'
 const ROBOT_IS_HOMING = 'Robot is homing'
 
-type Props = {
+interface Props {
   title: string
   subtitle: string
   mount: Mount

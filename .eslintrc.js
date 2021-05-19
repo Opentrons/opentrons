@@ -67,8 +67,6 @@ module.exports = {
         '@typescript-eslint/prefer-optional-chain': 'warn',
         '@typescript-eslint/restrict-plus-operands': 'warn',
         '@typescript-eslint/restrict-template-expressions': 'warn',
-        '@typescript-eslint/array-type': 'warn',
-        '@typescript-eslint/consistent-type-definitions': 'warn',
         '@typescript-eslint/naming-convention': 'warn',
         '@typescript-eslint/no-floating-promises': 'warn',
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',

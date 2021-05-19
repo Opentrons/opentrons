@@ -44,7 +44,7 @@ export type DriverStatus =
   | typeof UP_TO_DATE
   | typeof OUTDATED
 
-export type U2EAnalyticsProps = {
+export interface U2EAnalyticsProps {
   'U2E Vendor ID': number
   'U2E Product ID': number
   'U2E Serial Number': string

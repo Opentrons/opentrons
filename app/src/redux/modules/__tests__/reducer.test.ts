@@ -4,7 +4,7 @@ import { modulesReducer } from '../reducer'
 import type { Action } from '../../types'
 import type { ModulesState } from '../types'
 
-type ReducerSpec = {
+interface ReducerSpec {
   name: string
   state: ModulesState
   action: Action

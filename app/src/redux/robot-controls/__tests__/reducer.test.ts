@@ -3,7 +3,7 @@ import { robotControlsReducer } from '../reducer'
 import type { Action } from '../../types'
 import type { PerRobotControlsState } from '../types'
 
-type ReducerSpec = {
+interface ReducerSpec {
   name: string
   state: Partial<{ [robotName: string]: Partial<PerRobotControlsState> }>
   action: Action

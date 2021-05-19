@@ -68,11 +68,11 @@ export const getUnpreparedModules: (
 
 export const getMatchedModules: (
   state: State
-) => Array<Types.MatchedModule> = createSelector(
+) => Types.MatchedModule[] = createSelector(
   getAttachedModulesForConnectedRobot,
   RobotSelectors.getModulesByProtocolLoadOrder,
   (attachedModules, protocolModules) => {
-    const matchedAmod: Array<Types.MatchedModule> = []
+    const matchedAmod: Types.MatchedModule[] = []
     const matchedPmod = []
     protocolModules.forEach(pmod => {
       const compatible =

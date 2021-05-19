@@ -9,7 +9,7 @@ import type {
   RobotApiV2ErrorResponseBody,
 } from '../types'
 
-export type ResponseFixturesOptions<SuccessBody, FailureBody> = {
+export interface ResponseFixturesOptions<SuccessBody, FailureBody> {
   method: Method
   path: string
   successStatus: number
@@ -18,7 +18,7 @@ export type ResponseFixturesOptions<SuccessBody, FailureBody> = {
   failureBody: FailureBody
 }
 
-export type ResponseFixtures<SuccessBody, FailureBody> = {
+export interface ResponseFixtures<SuccessBody, FailureBody> {
   successMeta: { method: Method; path: string; status: number; ok: boolean }
   failureMeta: { method: Method; path: string; status: number; ok: boolean }
   success: {
