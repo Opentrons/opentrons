@@ -86,12 +86,14 @@ def _find_smoothie_file() -> Tuple[Path, str]:
 
 
 async def initialize_robot() -> ThreadManager:
+    """Build the hardware controller."""
     if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         log.info("Initialized robot using virtual Smoothie")
         systemdd_notify()
         return ThreadManager(API.build_hardware_simulator)
 
-    port = os.environ.get("OT_SMOOTHIE_PORT")
+    # Check if smoothie emulator is to be used
+    port = os.environ.get("OT_SMOOTHIE_EMULATOR_URI")
     if not port:
         smoothie_id = os.environ.get('OT_SMOOTHIE_ID', 'AMA')
         # Let this raise an exception.
