@@ -29,7 +29,7 @@ export function parseProtocolData(
   file: ProtocolFile,
   contents: string,
   // optional Python protocol metadata
-  metadata: ProtocolData['metadata'] | null | undefined
+  metadata?: ProtocolData['metadata'] | null
 ): ProtocolData | null {
   if (fileIsJson(file)) {
     try {
