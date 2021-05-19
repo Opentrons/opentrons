@@ -1,6 +1,6 @@
 import createHistory from 'history/createHashHistory'
 import { combineReducers } from 'redux'
-import { connectRouter, RouterState } from 'connected-react-router'
+import { connectRouter } from 'connected-react-router'
 
 // oldest robot api state
 import { robotReducer } from './robot'

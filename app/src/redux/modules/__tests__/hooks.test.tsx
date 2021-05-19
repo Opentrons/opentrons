@@ -6,7 +6,6 @@ import configureMockStore from 'redux-mock-store'
 import * as RobotSelectors from '../../robot/selectors'
 import * as Actions from '../actions'
 import { useSendModuleCommand } from '../hooks'
-import type { State } from '../../types'
 
 jest.mock('../../robot/selectors')
 
