@@ -153,7 +153,7 @@ export const MagnetControl = ({
   )
 }
 
-function EngageHeightRangeCard(props: ModelContents) {
+function EngageHeightRangeCard(props: ModelContents): JSX.Element {
   return (
     <Box
       width="14rem"

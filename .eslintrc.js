@@ -72,6 +72,7 @@ module.exports = {
         '@typescript-eslint/naming-convention': 'warn',
         '@typescript-eslint/no-floating-promises': 'warn',
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
+        '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
       },
     },
     {

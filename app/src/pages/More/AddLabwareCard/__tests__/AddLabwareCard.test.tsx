@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Provider } from 'react-redux'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
 import * as CustomLabware from '../../../../redux/custom-labware'
