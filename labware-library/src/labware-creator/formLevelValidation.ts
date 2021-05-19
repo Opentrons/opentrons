@@ -91,16 +91,6 @@ const getLabwareName = (values: LabwareFields): string => {
   }
 }
 
-// pick<TKey extends keyof TShape>(keys: TKey[]): OptionalObjectSchema<
-//   Pick<TShape, TKey>,
-//   TContext,
-//   TypeOfShape<Pick<TShape, TKey>>
-//   | Optionals<TIn>
-// >;
-
-// TShape extends ObjectShape, TContext extends AnyObject = AnyObject, TIn extends Maybe<TypeOfShape<TShape>>
-// = TypeOfShape<TShape>> extends ObjectSchema<TShape, TContext, TIn> {
-
 const partialCast = <TKey extends keyof LabwareFields>(
   values: LabwareFields,
   keys: TKey[]
@@ -118,7 +108,7 @@ const partialCast = <TKey extends keyof LabwareFields>(
     // See https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
     // and https://github.com/formium/formik/blob/2d613c11a67b1c1f5189e21b8d61a9dd8a2d0a2e/packages/formik/src/Formik.tsx
     if (error.name !== 'ValidationError' && error.name !== 'TypeError') {
-      // TODO IMMEDIATELY why are missing values for required fields giving TypeError instead of ValidationError?
+      // TODO(IL, 2021-05-19): why are missing values for required fields giving TypeError instead of ValidationError?
       // Is this partial schema (from `pick`) not handing requireds correctly??
       throw error
     }
@@ -138,9 +128,6 @@ export const formLevelValidation = (
   // Form-level errors are nested in the FormikErrors object under a special key, FORM_LEVEL_ERRORS.
   const formLevelErrors: Partial<Record<FormErrorType, string>> = {}
 
-  // TODO IMMEDIATELY: right now it's throwing an error if cast fails (even if it's fields we don't care about here)
-  // ^ How does the SVG viz's definition work when some fields are missing (eg brand/pipette might be)
-  // const castValues = labwareFormSchema.cast(values)
   const castFields = partialCast(values, [
     'footprintXDimension',
     'footprintYDimension',
@@ -218,13 +205,6 @@ export const formLevelValidation = (
   if (boundingBox === undefined) {
     return COULD_NOT_CAST
   }
-
-  // ==================
-  // TODO IMMEDIATELY: split the section below out into its own fn, eg getFormLevelFootprintErrors or something
-
-  // TODO IMMEDIATELY: this is only for circle. We need rectangle too! Rect uses wellXDimension, wellYDimension
-  // TODO IMMEDIATELY: we probably want a lot of small broken out fns,
-  // because for the viewport we want to know the bounding box x0/y0, x1/y1
 
   const {
     topLeftCornerX,
