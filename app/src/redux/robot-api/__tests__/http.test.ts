@@ -5,6 +5,7 @@ import express from 'express'
 import multer from 'multer'
 import portfinder from 'portfinder'
 import fetch from 'node-fetch'
+import FormData from 'form-data'
 
 import { robotApiUrl, fetchRobotApi } from '../http'
 import { HTTP_API_VERSION, GET, POST, PATCH, DELETE } from '../constants'
