@@ -83,8 +83,10 @@ export const GridOffset = (): JSX.Element | null => {
   return (
     <div className={styles.new_definition_section}>
       <SectionBody label="Grid Offset">
-        <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
-        <Content values={values} />
+        <>
+          <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
+          <Content values={values} />
+        </>
       </SectionBody>
     </div>
   )
