@@ -3,9 +3,9 @@ import { ofType } from 'redux-observable'
 
 import { getConnectedRobotName } from '../../../robot/selectors'
 import * as Actions from '../actions'
-import type { Epic, State } from '../../../types'
+import type { Action, Epic, State } from '../../../types'
 
-import type { SessionType } from '../../../sessions/types'
+import type { SessionType, DeleteSessionAction } from '../../../sessions/types'
 import {
   DELETE_SESSION,
   SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
@@ -40,13 +40,11 @@ export const fetchTipLengthCalibrationsOnCalibrationEndEpic: Epic = (
   state$
 ) => {
   return action$.pipe(
-    ofType(DELETE_SESSION),
-    withLatestFrom(state$, (a, s) => [
-      a,
-      s,
-      getConnectedRobotName(s),
-      a.payload.sessionId,
-    ]),
+    ofType<Action, DeleteSessionAction>(DELETE_SESSION),
+    withLatestFrom<
+      DeleteSessionAction,
+      [DeleteSessionAction, State, string, string]
+    >(state$, (a, s) => [a, s, getConnectedRobotName(s), a.payload.sessionId]),
     filter(
       ([action, state, robotName, sessionId]) =>
         robotName != null && sessionIncursRefetch(state, robotName, sessionId)
