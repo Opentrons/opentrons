@@ -25,6 +25,7 @@ import {
 
 import type { State, Action } from '../types'
 import type { AnalyticsEvent } from './types'
+import type { Mount } from '../pipettes/types'
 
 const log = createLogger(__filename)
 
@@ -343,9 +344,10 @@ export function makeEvent(
                     name: `${instrData.sessionType}TipRackSelect`,
                     properties: {
                       pipetteModel: instrData.pipetteModel,
-                      tipRackDisplayName: 'tiprackDefinition' in commandData
-                        ? commandData.tiprackDefinition.metadata.displayName
-                        : null,
+                      tipRackDisplayName:
+                        'tiprackDefinition' in commandData
+                          ? commandData.tiprackDefinition.metadata.displayName
+                          : null,
                     },
                   }
                 : null
@@ -376,7 +378,10 @@ export function makeEvent(
         name: 'pipetteOffsetCalibrationStarted',
         properties: {
           ...action.payload,
-          ...getAnalyticsPipetteCalibrationData(state, action.payload.mount),
+          ...getAnalyticsPipetteCalibrationData(
+            state,
+            action.payload.mount as Mount
+          ),
         },
       })
     }
@@ -386,7 +391,10 @@ export function makeEvent(
         name: 'tipLengthCalibrationStarted',
         properties: {
           ...action.payload,
-          ...getAnalyticsTipLengthCalibrationData(state, action.payload.mount),
+          ...getAnalyticsTipLengthCalibrationData(
+            state,
+            action.payload.mount as Mount
+          ),
         },
       })
     }
