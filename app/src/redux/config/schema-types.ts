@@ -98,7 +98,7 @@ export interface ConfigV2 extends Omit<ConfigV1, 'version'> {
 // v3 config changes default values but does not change schema
 export interface ConfigV3 extends Omit<ConfigV2, 'version' | 'support'> {
   version: 3
-  support: Pick<ConfigV2, 'support'> & {
+  support: ConfigV2['support'] & {
     name: string | null
     email: string | null
   }
