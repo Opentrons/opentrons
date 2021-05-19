@@ -91,6 +91,41 @@ const getLabwareName = (values: LabwareFields): string => {
   }
 }
 
+// pick<TKey extends keyof TShape>(keys: TKey[]): OptionalObjectSchema<
+//   Pick<TShape, TKey>,
+//   TContext,
+//   TypeOfShape<Pick<TShape, TKey>>
+//   | Optionals<TIn>
+// >;
+
+// TShape extends ObjectShape, TContext extends AnyObject = AnyObject, TIn extends Maybe<TypeOfShape<TShape>>
+// = TypeOfShape<TShape>> extends ObjectSchema<TShape, TContext, TIn> {
+
+const partialCast = <TKey extends keyof LabwareFields>(
+  values: LabwareFields,
+  keys: TKey[]
+): Pick<
+  ReturnType<typeof labwareFormSchemaBaseObject['cast']>,
+  TKey
+> | null => {
+  const partialSchema = labwareFormSchemaBaseObject.pick(keys)
+  let castFields: ReturnType<typeof partialSchema['cast']> | null = null
+  try {
+    castFields = partialSchema.cast(values)
+  } catch (error) {
+    // Yup will throw a validation error if validation fails. We catch those and
+    // ignore them. We can sniff if something is a Yup error by checking error.name.
+    // See https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
+    // and https://github.com/formium/formik/blob/2d613c11a67b1c1f5189e21b8d61a9dd8a2d0a2e/packages/formik/src/Formik.tsx
+    if (error.name !== 'ValidationError' && error.name !== 'TypeError') {
+      // TODO IMMEDIATELY why are missing values for required fields giving TypeError instead of ValidationError?
+      // Is this partial schema (from `pick`) not handing requireds correctly??
+      throw error
+    }
+  }
+  return castFields
+}
+
 export const formLevelValidation = (
   values: LabwareFields
 ): LabwareCreatorErrors => {
@@ -106,49 +141,20 @@ export const formLevelValidation = (
   // TODO IMMEDIATELY: right now it's throwing an error if cast fails (even if it's fields we don't care about here)
   // ^ How does the SVG viz's definition work when some fields are missing (eg brand/pipette might be)
   // const castValues = labwareFormSchema.cast(values)
-  let castFields:
-    | {
-        gridColumns: undefined | null | number
-        gridOffsetX: undefined | null | number
-        gridOffsetY: undefined | null | number
-        gridRows: undefined | null | number
-        gridSpacingX: undefined | null | number
-        gridSpacingY: undefined | null | number
-        footprintXDimension: undefined | null | number
-        footprintYDimension: undefined | null | number
-        wellShape: undefined | null | string
-      }
-    | undefined
-  try {
-    castFields = labwareFormSchemaBaseObject
-      .pick([
-        'footprintXDimension',
-        'footprintYDimension',
-        'gridColumns',
-        'gridOffsetX',
-        'gridOffsetY',
-        'gridRows',
-        'gridSpacingX',
-        'gridSpacingY',
-        'wellShape',
-      ])
-      .cast(values)
-  } catch (error) {
-    // Yup will throw a validation error if validation fails. We catch those and
-    // ignore them. We can sniff if something is a Yup error by checking error.name.
-    // See https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
-    // and https://github.com/formium/formik/blob/2d613c11a67b1c1f5189e21b8d61a9dd8a2d0a2e/packages/formik/src/Formik.tsx
-    if (error.name === 'ValidationError' || error.name === 'TypeError') {
-      // TODO IMMEDIATELY why are missing values for required fields giving TypeError instead of ValidationError?
-      // Is this partial schema (from `pick`) not handing requireds correctly??
-      return COULD_NOT_CAST
-    } else {
-      throw error
-    }
-  }
+  const castFields = partialCast(values, [
+    'footprintXDimension',
+    'footprintYDimension',
+    'gridColumns',
+    'gridOffsetX',
+    'gridOffsetY',
+    'gridRows',
+    'gridSpacingX',
+    'gridSpacingY',
+    'wellShape',
+  ])
 
   if (
-    castFields === undefined ||
+    castFields == null ||
     castFields.footprintXDimension == null ||
     castFields.footprintYDimension == null ||
     castFields.gridColumns == null ||
@@ -159,7 +165,6 @@ export const formLevelValidation = (
     castFields.gridSpacingY == null ||
     castFields.wellShape == null
   ) {
-    // NOTE(IL, 20201-05-18): this probably should never be reached??
     return COULD_NOT_CAST
   }
 
@@ -178,26 +183,9 @@ export const formLevelValidation = (
   let boundingBox: BoundingBoxResult | undefined
 
   if (wellShape === 'circular') {
-    let wellDiameter: number | undefined
-    try {
-      const castResult = labwareFormSchemaBaseObject
-        .pick(['wellDiameter'])
-        .cast(values)
-      wellDiameter = castResult.wellDiameter
-    } catch (error) {
-      // Yup will throw a validation error if validation fails. We catch those and
-      // ignore them. We can sniff if something is a Yup error by checking error.name.
-      // See https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
-      // and https://github.com/formium/formik/blob/2d613c11a67b1c1f5189e21b8d61a9dd8a2d0a2e/packages/formik/src/Formik.tsx
-      if (error.name === 'ValidationError' || error.name === 'TypeError') {
-        // TODO IMMEDIATELY why are missing values for required fields giving TypeError instead of ValidationError?
-        // Is this partial schema (from `pick`) not handing requireds correctly??
-        return COULD_NOT_CAST
-      } else {
-        throw error
-      }
-    }
-    if (wellDiameter !== undefined) {
+    const castResult = partialCast(values, ['wellDiameter'])
+    if (castResult?.wellDiameter != null) {
+      const { wellDiameter } = castResult
       boundingBox = getWellGridBoundingBox({
         gridColumns,
         gridOffsetX,
@@ -209,30 +197,11 @@ export const formLevelValidation = (
       })
     }
   } else if (wellShape === 'rectangular') {
-    let wellXDimension: undefined | null | number
-    let wellYDimension: undefined | null | number
-
-    try {
-      const castResult = labwareFormSchemaBaseObject
-        .pick(['wellXDimension', 'wellYDimension'])
-        .cast(values)
-      wellXDimension = castResult.wellXDimension
-      wellYDimension = castResult.wellYDimension
-    } catch (error) {
-      // Yup will throw a validation error if validation fails. We catch those and
-      // ignore them. We can sniff if something is a Yup error by checking error.name.
-      // See https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
-      // and https://github.com/formium/formik/blob/2d613c11a67b1c1f5189e21b8d61a9dd8a2d0a2e/packages/formik/src/Formik.tsx
-      if (error.name === 'ValidationError' || error.name === 'TypeError') {
-        // TODO IMMEDIATELY why are missing values for required fields giving TypeError instead of ValidationError?
-        // Is this partial schema (from `pick`) not handing requireds correctly??
-        return COULD_NOT_CAST
-      } else {
-        throw error
-      }
-    }
-
-    if (wellXDimension != null && wellYDimension != null) {
+    const castResult = partialCast(values, ['wellXDimension', 'wellYDimension'])
+    if (
+      castResult?.wellXDimension != null &&
+      castResult?.wellYDimension != null
+    ) {
       boundingBox = getWellGridBoundingBox({
         gridColumns,
         gridOffsetX,
@@ -240,8 +209,8 @@ export const formLevelValidation = (
         gridRows,
         gridSpacingX,
         gridSpacingY,
-        wellXDimension,
-        wellYDimension,
+        wellXDimension: castResult.wellXDimension,
+        wellYDimension: castResult.wellYDimension,
       })
     }
   }
