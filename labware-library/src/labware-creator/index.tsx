@@ -37,8 +37,9 @@ import { TextField } from './components/TextField'
 import { ImportErrorModal } from './components/ImportErrorModal'
 import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
 import { UploadExisting } from './components/sections/UploadExisting'
-import { Regularity } from './components/sections/Regularity'
 
+import { CustomTiprackWarning } from './components/sections/CustomTiprackWarning'
+import { Regularity } from './components/sections/Regularity'
 import { Footprint } from './components/sections/Footprint'
 import { Height } from './components/sections/Height'
 import { Grid } from './components/sections/Grid'
@@ -406,6 +407,7 @@ export const LabwareCreator = (): JSX.Element => {
               {showCreatorForm && (
                 <>
                   {/* PAGE 1 - Labware */}
+                  <CustomTiprackWarning />
                   <Regularity />
                   <Footprint />
                   <Height />
