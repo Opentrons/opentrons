@@ -23,7 +23,7 @@ async def tempdeck(loop: asyncio.BaseEventLoop, emulation_app) -> TempDeck:
 
 
 def test_device_info(tempdeck) -> None:
-    assert {'model': 'temp_emulator', 'serial': 'fake_serial',
+    assert {'model': 'v0', 'serial': 'temperature_emulator',
             'version': '1'} == tempdeck.device_info
 
 

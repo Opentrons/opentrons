@@ -40,5 +40,5 @@ async def thermocycler(
 @pytest.mark.skipif(IS_WIN, reason="Cannot be run on Windows")
 def test_device_info(thermocycler: Thermocycler):
     """It should have device info."""
-    assert {'model': 'thermocycler_emulator', 'serial': 'fake_serial',
+    assert {'model': 'v0', 'serial': 'thermocycler_emulator',
             'version': '1'} == thermocycler.device_info

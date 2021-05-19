@@ -17,7 +17,7 @@ async def smoothie(loop: asyncio.BaseEventLoop, emulation_app) -> Controller:
 
 def test_get_fw_version(smoothie: Controller):
     """It should be set."""
-    assert smoothie._cached_fw_version == 'EMULATOR'
+    assert smoothie._cached_fw_version == 'edge-8414642'
 
 
 def test_get_attached_instruments(smoothie: Controller):
