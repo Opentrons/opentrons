@@ -58,7 +58,8 @@ export type ModelsByMount = {
   [mount in Mount]: { model: string } | null
 }
 
-export interface DeckCalibrationAnalyticsData {
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type DeckCalibrationAnalyticsData = {
   calibrationStatus: DeckCalibrationStatus | null
   markedBad: boolean | null
   pipettes: ModelsByMount
@@ -77,7 +78,8 @@ export interface CalibrationCheckByMount {
   } | null
 }
 
-export interface CalibrationHealthCheckAnalyticsData {
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type CalibrationHealthCheckAnalyticsData = {
   pipettes: CalibrationCheckByMount | null
 }
 

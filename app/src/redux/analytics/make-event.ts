@@ -80,6 +80,7 @@ export function makeEvent(
           ...getRobotAnalyticsData(state),
           ...data,
           success: actionType === 'robot:SESSION_RESPONSE',
+          // @ts-expect-error even if we used the in operator, TS cant narrow error to anything more specific than 'unknown' https://github.com/microsoft/TypeScript/issues/25720
           error: (actionPayload.error && actionPayload.error.message) || '',
         },
       }))
@@ -342,7 +343,7 @@ export function makeEvent(
                     name: `${instrData.sessionType}TipRackSelect`,
                     properties: {
                       pipetteModel: instrData.pipetteModel,
-                      tipRackDisplayName: commandData.tiprackDefinition
+                      tipRackDisplayName: 'tiprackDefinition' in commandData
                         ? commandData.tiprackDefinition.metadata.displayName
                         : null,
                     },

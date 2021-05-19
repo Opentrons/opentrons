@@ -65,7 +65,23 @@ import type {
   SessionInstrumentAnalyticsData,
 } from './types'
 
-type ProtocolDataSelector = OutputSelector<State, void, ProtocolAnalyticsData>
+type ProtocolDataSelectorResultFunc = (
+  v1: ReturnType<typeof getProtocolType>,
+  v2: ReturnType<typeof getProtocolCreatorApp>,
+  v3: ReturnType<typeof getProtocolApiVersion>,
+  v4: ReturnType<typeof getProtocolName>,
+  v5: ReturnType<typeof getProtocolSource>,
+  v6: ReturnType<typeof getProtocolAuthor>,
+  v7: ReturnType<typeof getProtocolContents>,
+  v8: ReturnType<typeof getPipettes>,
+  v9: ReturnType<typeof getModules>
+) => ProtocolAnalyticsData
+
+type ProtocolDataSelector = OutputSelector<
+  State,
+  ProtocolAnalyticsData,
+  ProtocolDataSelectorResultFunc
+>
 
 export const FF_PREFIX = 'robotFF_'
 

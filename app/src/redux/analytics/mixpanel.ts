@@ -41,7 +41,7 @@ export function trackEvent(
   log.debug('Trackable event', { event, optedIn })
   if (MIXPANEL_ID && optedIn) {
     if (event.superProperties) mixpanel.register(event.superProperties)
-    if (event.name) mixpanel.track(event.name, event.properties)
+    if ('name' in event) mixpanel.track(event.name, event.properties)
   }
 }
 

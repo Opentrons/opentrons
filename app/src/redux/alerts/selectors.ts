@@ -11,7 +11,7 @@ const getIgnoredAlertsFromConfig: (
   state: State
 ) => null | AlertId[] = createSelector(
   getConfig,
-  (config: Config | null) => config?.alerts.ignored ?? null
+  (config: Config | null) => (config?.alerts.ignored as AlertId[]) ?? null
 )
 
 export const getActiveAlerts: (state: State) => AlertId[] = createSelector(
