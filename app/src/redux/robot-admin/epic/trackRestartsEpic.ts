@@ -7,7 +7,7 @@ import { getNextRestartStatus } from '../selectors'
 import { restartStatusChanged } from '../actions'
 import * as Constants from '../constants'
 
-import type { State, Action, Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 import type { RestartRobotSuccessAction } from '../types'
 import type { Robot, ReachableRobot } from '../../discovery/types'
 

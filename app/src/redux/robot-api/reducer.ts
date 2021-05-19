@@ -10,6 +10,7 @@ import type { Action } from '../types'
 import type { RobotApiState } from './types'
 
 export function robotApiReducer(
+  // eslint-disable-next-line @typescript-eslint/default-param-last
   state: RobotApiState = {},
   action: Action
 ): RobotApiState {
