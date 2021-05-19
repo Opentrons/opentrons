@@ -1,8 +1,11 @@
 import type { State } from '../types'
-import type { RobotSettings } from './types'
+import type { RobotSettings, PerRobotRobotSettingsState } from './types'
 
-const robotState = (state: State, name: string | null) =>
-  name != null ? state.robotSettings[name] : null
+const robotState = (
+  state: State,
+  name: string | null
+): PerRobotRobotSettingsState | null =>
+  name != null ? state.robotSettings[name] ?? null : null
 
 export function getRobotSettings(
   state: State,
