@@ -9,7 +9,7 @@ import * as Types from '../../types'
 import { robotControlsEpic } from '..'
 
 import type { Action, State } from '../../../types'
-import type { RobotApiRequestMeta } from '../../../robot-api/types';
+import type { RobotApiRequestMeta } from '../../../robot-api/types'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')

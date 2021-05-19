@@ -32,7 +32,10 @@ export function CheckPipettesButton(
       dispatchedAction.type === FETCH_PIPETTES &&
       'requestId' in dispatchedAction.meta
     ) {
-      fetchPipettesRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
+      fetchPipettesRequestId.current =
+        'requestId' in dispatchedAction.meta
+          ? dispatchedAction.meta.requestId ?? null
+          : null
     }
   })
   const handleClick = (): void => dispatch(fetchPipettes(robotName, true))

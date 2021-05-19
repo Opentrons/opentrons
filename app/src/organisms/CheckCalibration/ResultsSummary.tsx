@@ -113,7 +113,7 @@ export function ResultsSummary(
   )
   type CalibrationByMount = {
     [m in Mount]: {
-      pipette: CalibrationCheckInstrument | undefined,
+      pipette: CalibrationCheckInstrument | undefined
       calibration: CalibrationCheckComparisonsPerCalibration | null
     }
   }
@@ -212,8 +212,7 @@ export function ResultsSummary(
               title={`${m}-mount-results`}
               alignItems={ALIGN_STRETCH}
             >
-              {
-              calibrationsByMount[m].pipette != null &&
+              {calibrationsByMount[m].pipette != null &&
               calibrationsByMount[m].calibration != null &&
               // @ts-expect-error TODO: ts can't narrow that this isn't nullish
               Object.entries(calibrationsByMount[m].calibration).length > 0 ? (

@@ -92,7 +92,11 @@ export function ModuleUpdate(props: Props): JSX.Element {
             buttons={[{ children: OK_TEXT, onClick: handleCloseErrorModal }]}
           >
             <p>{FAILED_UPDATE_BODY}</p>
-            <p>{latestRequest.error != null  ? getErrorResponseMessage(latestRequest.error) : null}</p>
+            <p>
+              {latestRequest.error != null
+                ? getErrorResponseMessage(latestRequest.error)
+                : null}
+            </p>
           </AlertModal>
         </Portal>
       )}

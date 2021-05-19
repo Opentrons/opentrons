@@ -28,7 +28,10 @@ const mockGetModulesByProtocolLoadOrder = robotSelectors.getModulesByProtocolLoa
   typeof robotSelectors.getModulesByProtocolLoadOrder
 >
 
-type MockedModuleType = Pick<ApiSessionModule, 'model' | 'slot' | '_id' | 'protocolLoadOrder'>
+type MockedModuleType = Pick<
+  ApiSessionModule,
+  'model' | 'slot' | '_id' | 'protocolLoadOrder'
+>
 
 const mockMagneticModule1: MockedModuleType = {
   model: 'magneticModuleV1' as ApiSessionModule['model'],

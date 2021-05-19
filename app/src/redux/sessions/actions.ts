@@ -42,8 +42,8 @@ export const deleteSession = (
 ): Types.DeleteSessionAction => ({
   type: Constants.DELETE_SESSION,
   payload: { robotName, sessionId },
-   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-   meta: {} as RobotApiRequestMeta,
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const deleteSessionSuccess = (
@@ -73,8 +73,8 @@ export const fetchSession = (
 ): Types.FetchSessionAction => ({
   type: Constants.FETCH_SESSION,
   payload: { robotName, sessionId },
-   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-   meta: {} as RobotApiRequestMeta,
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const fetchSessionSuccess = (
@@ -103,8 +103,8 @@ export const fetchAllSessions = (
 ): Types.FetchAllSessionsAction => ({
   type: Constants.FETCH_ALL_SESSIONS,
   payload: { robotName },
-   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-   meta: {} as RobotApiRequestMeta,
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const fetchAllSessionsSuccess = (
@@ -134,8 +134,8 @@ export const createSessionCommand = (
 ): Types.CreateSessionCommandAction => ({
   type: Constants.CREATE_SESSION_COMMAND,
   payload: { robotName, sessionId, command },
-   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-   meta: {} as RobotApiRequestMeta,
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const createSessionCommandSuccess = (
@@ -167,8 +167,8 @@ export const ensureSession = (
 ): Types.EnsureSessionAction => ({
   type: Constants.ENSURE_SESSION,
   payload: { robotName, sessionType, params },
-   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-   meta: {} as RobotApiRequestMeta,
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const clearAllSessions = (

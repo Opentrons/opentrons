@@ -4,7 +4,7 @@ import { PrimaryButton, Icon } from '@opentrons/components'
 import styles from './upload-panel.css'
 
 export interface UploadInputProps {
-  onUpload: React.EventHandler<React.MouseEvent | React.ChangeEvent>,
+  onUpload: React.EventHandler<React.MouseEvent | React.ChangeEvent>
   isButton?: boolean
 }
 
@@ -17,8 +17,12 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
 
   const labelProps = isButton
     ? {
-        Component: 'label' as React.ComponentProps<typeof PrimaryButton>['Component'],
-        iconName: 'ot-file' as React.ComponentProps<typeof PrimaryButton>['iconName'],
+        Component: 'label' as React.ComponentProps<
+          typeof PrimaryButton
+        >['Component'],
+        iconName: 'ot-file' as React.ComponentProps<
+          typeof PrimaryButton
+        >['iconName'],
         className: styles.upload_button,
       }
     : { onDrop: onUpload, className: styles.file_drop }

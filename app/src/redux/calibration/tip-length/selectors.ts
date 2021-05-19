@@ -15,7 +15,6 @@ export const getTipLengthCalibrations: (
   return calibrations
 }
 
-
 export const filterTipLengthForPipetteAndTiprack: (
   allCalibrations: TipLengthCalibration[],
   pipetteSerial: string | null,

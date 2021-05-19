@@ -34,7 +34,7 @@ export function robotApiReducer(
 
     if (meta.response.ok === false) {
       const error =
-      // @ts-expect-error(sa, 2021-05-17): type guard action.payload
+        // @ts-expect-error(sa, 2021-05-17): type guard action.payload
         action.payload && action.payload.error ? action.payload.error : {}
 
       return {

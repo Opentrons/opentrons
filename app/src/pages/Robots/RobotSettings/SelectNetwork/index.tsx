@@ -129,7 +129,10 @@ export const SelectNetwork = ({
               ssid={changeState.ssid}
               isPending={requestState.status === RobotApi.PENDING}
               error={
-                'error' in requestState && requestState.error && 'message' in requestState.error && requestState.error.message
+                'error' in requestState &&
+                requestState.error &&
+                'message' in requestState.error &&
+                requestState.error.message
                   ? requestState.error
                   : null
               }

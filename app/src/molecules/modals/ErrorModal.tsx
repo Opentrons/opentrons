@@ -20,7 +20,10 @@ const AN_UNKNOWN_ERROR_OCCURRED = 'An unknown error occurred'
 export function ErrorModal(props: Props): JSX.Element {
   const { description, error } = props
   const heading = props.heading || DEFAULT_HEADING
-  let closeButtonProps: ButtonProps = { children: 'close', onClick: props.close }
+  let closeButtonProps: ButtonProps = {
+    children: 'close',
+    onClick: props.close,
+  }
 
   if (props.closeUrl) {
     closeButtonProps = {

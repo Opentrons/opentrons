@@ -73,21 +73,35 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
-        createRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
-        trackedRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
+        createRequestId.current =
+          'requestId' in dispatchedAction.meta
+            ? dispatchedAction.meta.requestId ?? null
+            : null
+        trackedRequestId.current =
+          'requestId' in dispatchedAction.meta
+            ? dispatchedAction.meta.requestId ?? null
+            : null
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
       ) {
-        jogRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
+        jogRequestId.current =
+          'requestId' in dispatchedAction.meta
+            ? dispatchedAction.meta.requestId ?? null
+            : null
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
           dispatchedAction.payload.command.command
         )
       ) {
-        trackedRequestId.current = ('meta' in dispatchedAction  && 'requestId' in dispatchedAction.meta &&  dispatchedAction.meta.requestId != null) ? dispatchedAction.meta.requestId : null
+        trackedRequestId.current =
+          'meta' in dispatchedAction &&
+          'requestId' in dispatchedAction.meta &&
+          dispatchedAction.meta.requestId != null
+            ? dispatchedAction.meta.requestId
+            : null
       }
     }
   )
@@ -161,7 +175,8 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
         : t('shared:unknown')
     const getPrefix = (calData: DeckCalibrationData): string =>
       'source' in data && typeof data?.source === 'string'
-        ? 'source' in calData && calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
+        ? 'source' in calData &&
+          calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
           ? t('last_migrated')
           : t('last_calibrated')
         : t('last_calibrated')
@@ -250,7 +265,9 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
           >
             <Text>{t('deck_calibration_error_occured')}</Text>
             <Text>
-              {createRequest != null && 'error' in createRequest && createRequest.error &&
+              {createRequest != null &&
+                'error' in createRequest &&
+                createRequest.error &&
                 RobotApi.getErrorResponseMessage(createRequest.error)}
             </Text>
           </AlertModal>

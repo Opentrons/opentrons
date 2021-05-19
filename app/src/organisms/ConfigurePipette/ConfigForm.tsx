@@ -33,8 +33,8 @@ export interface DisplayFieldProps extends PipetteSettingsField {
 }
 
 export interface DisplayQuirkFieldProps {
-  'name': string
-  'displayName': string
+  name: string
+  displayName: string
   [quirkId: string]: boolean | string
 }
 

@@ -49,4 +49,4 @@ export function shellUpdateReducer(
 export const shellReducer = combineReducers<any, Action>({
   update: shellUpdateReducer,
   robotLogs: robotLogsReducer,
-})  
+})

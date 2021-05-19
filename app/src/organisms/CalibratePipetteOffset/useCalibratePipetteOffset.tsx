@@ -62,27 +62,37 @@ export function useCalibratePipetteOffset(
         dispatchedAction.payload.sessionType ===
           Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
       ) {
-        createRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
+        createRequestId.current =
+          'requestId' in dispatchedAction.meta
+            ? dispatchedAction.meta.requestId ?? null
+            : null
       } else if (
         dispatchedAction.type === Sessions.DELETE_SESSION &&
         pipOffsetCalSession?.id === dispatchedAction.payload.sessionId
       ) {
-        deleteRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
+        deleteRequestId.current =
+          'requestId' in dispatchedAction.meta
+            ? dispatchedAction.meta.requestId ?? null
+            : null
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
       ) {
-        jogRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
+        jogRequestId.current =
+          'requestId' in dispatchedAction.meta
+            ? dispatchedAction.meta.requestId ?? null
+            : null
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
           dispatchedAction.payload.command.command
         )
       ) {
-        spinnerRequestId.current = ('meta' in dispatchedAction && 'requestId' in dispatchedAction.meta)
-                                    ? dispatchedAction.meta.requestId ?? null
-                                    : null
+        spinnerRequestId.current =
+          'meta' in dispatchedAction && 'requestId' in dispatchedAction.meta
+            ? dispatchedAction.meta.requestId ?? null
+            : null
       }
     }
   )

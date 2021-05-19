@@ -14,7 +14,7 @@ import { LabeledValue } from '@opentrons/components'
 import { InfoSection } from './InfoSection'
 import { SectionContentHalf, CardRow } from '../../../atoms/layout'
 
-import type { State} from '../../../redux/types'
+import type { State } from '../../../redux/types'
 
 interface SP {
   name?: string | null

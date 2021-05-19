@@ -24,17 +24,23 @@ const StyledIcon: StyledComponent<typeof Icon, any> = styled(Icon)`
   padding-left: 0.125rem;
 `
 
-const StyledConnectedIcon: StyledComponent<typeof StyledIcon, any> = styled(StyledIcon)`
+const StyledConnectedIcon: StyledComponent<typeof StyledIcon, any> = styled(
+  StyledIcon
+)`
   margin-left: -0.5rem;
   padding-left: 0;
 `
 
-const StyledName: StyledComponent<'span', any, {padLeft: boolean}> = styled.span`
+const StyledName: StyledComponent<
+  'span',
+  any,
+  { padLeft: boolean }
+> = styled.span`
   flex-basis: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  ${({ padLeft }: {padLeft: boolean}) => `
+  ${({ padLeft }: { padLeft: boolean }) => `
     padding-left: ${padLeft ? '0.75rem' : '0.25rem'};
   `}
 `

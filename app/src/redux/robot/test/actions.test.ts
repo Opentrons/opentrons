@@ -72,7 +72,7 @@ describe('robot actions', () => {
 
   it('SESSION_UPDATE action', () => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const update = { state: 'running', startTime: 1 } as SessionUpdate 
+    const update = { state: 'running', startTime: 1 } as SessionUpdate
     const expected = {
       type: 'robot:SESSION_UPDATE',
       payload: update,

@@ -48,22 +48,29 @@ export function CheckCalibrationControl({
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
-        createRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
+        createRequestId.current =
+          'requestId' in dispatchedAction.meta
+            ? dispatchedAction.meta.requestId ?? null
+            : null
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
       ) {
-        jogRequestId.current = 'requestId' in dispatchedAction.meta ? dispatchedAction.meta.requestId ?? null : null
+        jogRequestId.current =
+          'requestId' in dispatchedAction.meta
+            ? dispatchedAction.meta.requestId ?? null
+            : null
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
           dispatchedAction.payload.command.command
         )
       ) {
-        trackedRequestId.current = ('meta' in dispatchedAction && 'requestId' in dispatchedAction.meta)
-          ? dispatchedAction.meta.requestId ?? null
-          : null
+        trackedRequestId.current =
+          'meta' in dispatchedAction && 'requestId' in dispatchedAction.meta
+            ? dispatchedAction.meta.requestId ?? null
+            : null
       }
     }
   )

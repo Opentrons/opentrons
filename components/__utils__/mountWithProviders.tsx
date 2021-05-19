@@ -32,17 +32,24 @@ export function mountWithProviders<Element, State, Action>(
     dispatch: jest.fn(),
   }
 
-  const I18nWrapper: React.ElementType<React.ComponentProps<typeof I18nextProvider>> = provideI18n
+  const I18nWrapper: React.ElementType<
+    React.ComponentProps<typeof I18nextProvider>
+  > = provideI18n
     ? ({
         i18n,
         children,
       }: {
-        i18n: React.ComponentProps<typeof I18nextProvider>['i18n'],
-        children?: React.ReactNode,
-      }): JSX.Element => <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+        i18n: React.ComponentProps<typeof I18nextProvider>['i18n']
+        children?: React.ReactNode
+      }): JSX.Element => (
+        <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+      )
     : React.Fragment
 
-  interface StateWrapperProps { children: React.ReactNode, store: Store<State>}
+  interface StateWrapperProps {
+    children: React.ReactNode
+    store: Store<State>
+  }
   const StateWrapper: React.ElementType<StateWrapperProps> = provideStore
     ? ({ store, children }: StateWrapperProps): JSX.Element => (
         <Provider store={store}>{children}</Provider>
@@ -54,9 +61,9 @@ export function mountWithProviders<Element, State, Action>(
     children,
     i18n,
   }: {
-    children: React.ReactNode,
-    store: Store<State>,
-    i18n: React.ComponentProps<typeof I18nextProvider>['i18n'],
+    children: React.ReactNode
+    store: Store<State>
+    i18n: React.ComponentProps<typeof I18nextProvider>['i18n']
   }) => (
     <StateWrapper store={store}>
       <I18nWrapper i18n={i18n}>{children}</I18nWrapper>
