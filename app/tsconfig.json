@@ -1,9 +1,8 @@
 {
   "extends": "../tsconfig-base.json",
   "references": [
-    { "path": "./tsconfig-data.json" },
     {
-      "path": "../app-shell"
+      "path": "./tsconfig-data.json"
     },
     {
       "path": "../components"

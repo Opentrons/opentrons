@@ -4,9 +4,9 @@
   "compilerOptions": {
     "composite": true,
     "emitDeclarationOnly": false,
-    "rootDir": ".",
+    "rootDir": "src",
     "outDir": "lib"
   },
   "include": ["src/**/*.json"],
-  "exclude": ["**/*.ts"]
+  "exclude": ["**/*.ts", "**/*.tsx"]
 }
