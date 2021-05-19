@@ -4,6 +4,7 @@ import { getConfig } from '../config'
 import { trackEvent } from './mixpanel'
 
 import type { State } from '../types'
+import type { Config } from '../config/types'
 import type { AnalyticsEvent } from './types'
 
 /**
@@ -12,7 +13,7 @@ import type { AnalyticsEvent } from './types'
  * @returns {AnalyticsEvent => void} track event function
  */
 export function useTrackEvent(): (e: AnalyticsEvent) => void {
-  const config: State = useSelector(
+  const config: Config['analytics'] | undefined = useSelector(
     (state: State) => getConfig(state)?.analytics
   )
   return event => config && trackEvent(event, config)
