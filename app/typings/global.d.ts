@@ -7,6 +7,7 @@ declare global {
         ipcRenderer: IpcRenderer
         [key: string]: unknown
       }
+      btoa: (str: string | Buffer) => string;
       [key: string]: unknown
     }
   }

@@ -16,7 +16,7 @@ export interface RobotState {
   session: SessionState
   calibration: CalibrationState
 }
-
+// TODO: (sa 2021-15-18: remove any typed state in combineReducers)
 export const robotReducer: Reducer<RobotState, Action> = combineReducers<
   any,
   Action

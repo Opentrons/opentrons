@@ -311,9 +311,9 @@ export type SessionsAction =
   | EnsureSessionAction
   | ClearAllSessionsAction
 
-export type SessionsById = Partial<{
+export interface SessionsById {
   [id: string]: Session
-}>
+}
 
 export type PerRobotSessionState = Partial<{
   readonly robotSessions: SessionsById | null

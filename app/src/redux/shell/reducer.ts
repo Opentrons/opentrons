@@ -45,8 +45,8 @@ export function shellUpdateReducer(
 
   return state
 }
-
-export const shellReducer = combineReducers({ // TODO IMMEDIATELY use
+// TODO: (sa 2021-15-18: remove any typed state in combineReducers)
+export const shellReducer = combineReducers<any, Action>({
   update: shellUpdateReducer,
   robotLogs: robotLogsReducer,
-})
+})  
