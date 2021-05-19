@@ -47,11 +47,11 @@ const sessionRequest = (state: State): Request => session(state).sessionRequest
 const cancelRequest = (state: State): Request => session(state).cancelRequest
 
 export function isMount(target: string | null | undefined): boolean {
-  return Constants.PIPETTE_MOUNTS.indexOf(target as Mount) > -1
+  return Constants.PIPETTE_MOUNTS.includes(target as Mount)
 }
 
 export function isSlot(target: string | null | undefined): boolean {
-  return Constants.DECK_SLOTS.indexOf(target as Slot) > -1
+  return Constants.DECK_SLOTS.includes(target as Slot)
 }
 
 export function labwareType(labware: Labware): LabwareType {
@@ -267,28 +267,29 @@ export function getPipettesByMount(
 
 export const getPipettes: (state: State) => Pipette[] = createSelector(
   getPipettesByMount,
-  (state: State): Partial<Record<Mount, boolean>> =>
+  (state: State): { [mount in Mount]?: boolean } =>
     calibration(state).probedByMount,
   (state: State) => calibration(state).tipOnByMount,
   (
-    pipettesByMount: Partial<Record<Mount, StatePipette>>,
-    probedByMount: Partial<Record<Mount, boolean>>,
-    tipOnByMount: Partial<Record<Mount, boolean>>
+    pipettesByMount: { [mount in Mount]?: StatePipette },
+    probedByMount: { [mount in Mount]?: boolean },
+    tipOnByMount: { [mount in Mount]?: boolean }
   ): Pipette[] => {
     return Constants.PIPETTE_MOUNTS.filter(
-      (mount: Mount): boolean => pipettesByMount[mount] != null
+      (mount: Mount) => pipettesByMount[mount] != null
     ).map(mount => {
-      const pipette = pipettesByMount[mount]
+      const pipette = pipettesByMount[mount] as StatePipette
       const probed = probedByMount[mount] || false
       const tipOn = tipOnByMount[mount] || false
 
-      return {
+      const fullPipette: Pipette = {
         ...pipette,
         probed,
         tipOn,
         modelSpecs: getPipetteModelSpecs(pipette?.name as PipetteModel) || null,
         requestedAs: pipette?.requestedAs || null,
-      } as Pipette
+      }
+      return fullPipette
     })
   }
 )
@@ -397,7 +398,7 @@ export const getLabware: (state: State) => Labware[] = createSelector(
     return Object.keys(lwBySlot)
       .filter(isSlot)
       .map(slot => {
-        const labware = lwBySlot[slot as Slot]
+        const labware = lwBySlot[slot as Slot] as Labware
         const { type, isTiprack, isLegacy } = labware ?? {}
 
         let definition = null
@@ -449,13 +450,14 @@ export const getLabware: (state: State) => Labware[] = createSelector(
           }
         }
 
-        return {
+        const fullLabware: Labware = {
           ...labware,
           calibration,
           confirmed,
           isMoving,
           definition,
-        } as Labware
+        }
+        return fullLabware
       })
       .sort((a, b) => {
         if (a.isTiprack && !b.isTiprack) return -1

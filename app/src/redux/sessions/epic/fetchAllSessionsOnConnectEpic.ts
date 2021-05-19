@@ -12,7 +12,7 @@ export const fetchAllSessionsOnConnectEpic: Epic = (action$, state$) => {
     ofType('robot:CONNECT_RESPONSE'),
     withLatestFrom(state$, (a, s) => [a, getConnectedRobotName(s)]),
     filter((args): args is [Action, string] => {
-      const [_action, robotName] = args
+      const [, robotName] = args
       return robotName != null
     }),
     switchMap(([action, robotName]) => of(Actions.fetchAllSessions(robotName)))
