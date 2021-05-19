@@ -1,5 +1,4 @@
 // functions for managing the user's Intercom profile
-import { version as appVersion } from '../../../package.json'
 import * as Cfg from '../config'
 import * as Alerts from '../alerts'
 import { FF_PREFIX, getRobotAnalyticsData } from '../analytics'
@@ -27,7 +26,7 @@ export function initializeProfile(config: SupportConfig): void {
   bootIntercom({
     app_id: getIntercomAppId(),
     created_at: config.createdAt,
-    [Constants.PROFILE_APP_VERSION]: appVersion,
+    [Constants.PROFILE_APP_VERSION]: process.env.OT_APP_VERSION,
   })
 }
 
