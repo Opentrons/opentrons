@@ -123,7 +123,7 @@ describe('robotControlsReducer', () => {
   SPECS.forEach(spec => {
     const { name, state, action, expected } = spec
     it(name, () =>
-      expect(robotControlsReducer(state, action)).toEqual(expected)
+      expect(robotControlsReducer(state as any, action)).toEqual(expected)
     )
   })
 })

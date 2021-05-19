@@ -63,7 +63,7 @@ export const getCalibratePipettesLocations: (
     ): { [hash: string]: SubnavLocation } => {
       const hashes: string[] = tipracks
         .map(tr => tr.definitionHash)
-        .filter<string>(Boolean)
+        .filter<string>((tr): tr is string => Boolean(tr))
       return hashes.reduce<{ [hash: string]: SubnavLocation }>(
         (pathMap, hash) => {
           pathMap[hash] = {

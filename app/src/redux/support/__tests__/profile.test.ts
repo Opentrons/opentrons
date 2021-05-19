@@ -1,7 +1,6 @@
 import { version } from '../../../../package.json'
 import { initializeProfile, updateProfile } from '../profile'
 import * as IntercomBinding from '../intercom-binding'
-import type { IntercomPayload } from '../types'
 
 import type { Config } from '../../config/types'
 
@@ -28,7 +27,7 @@ describe('support profile tests', () => {
     createdAt: 1234,
     name: null,
     email: null,
-  }
+  } as any
 
   beforeEach(() => {
     getIntercomAppId.mockReturnValue('some-intercom-app-id')
