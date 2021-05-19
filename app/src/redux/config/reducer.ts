@@ -6,6 +6,7 @@ import type { ConfigState } from './types'
 
 // config reducer
 export function configReducer(
+  // eslint-disable-next-line @typescript-eslint/default-param-last
   state: ConfigState = null,
   action: Action
 ): ConfigState {
