@@ -7,7 +7,8 @@ declare global {
         ipcRenderer: IpcRenderer
         [key: string]: unknown
       }
-      btoa: (str: string | Buffer) => string;
+      btoa: (str: string | Buffer) => string
+      Intercom?: (...args: any[]) => unknown
       [key: string]: unknown
     }
   }

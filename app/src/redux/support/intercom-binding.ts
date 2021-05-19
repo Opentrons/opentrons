@@ -26,7 +26,7 @@ export const bootIntercom = (props: IntercomPayload): void => {
       user_id: userId,
     }
     log.debug('Booting intercom', props)
-    global.Intercom(Constants.INTERCOM_BOOT, iprops)
+    global.Intercom?.(Constants.INTERCOM_BOOT, iprops)
   }
 }
 
@@ -37,7 +37,7 @@ export const updateIntercomProfile = (props: IntercomPayload): void => {
       user_id: userId,
     }
     log.debug('Updating intercom profile', props)
-    global.Intercom(Constants.INTERCOM_UPDATE, iprops)
+    global.Intercom?.(Constants.INTERCOM_UPDATE, iprops)
   }
 }
 
@@ -47,6 +47,6 @@ export const sendIntercomEvent = (
 ): void => {
   if (okToCall()) {
     log.debug('Sending intercom event', { eventName, metadata })
-    global.Intercom(Constants.INTERCOM_TRACK_EVENT, eventName, metadata)
+    global.Intercom?.(Constants.INTERCOM_TRACK_EVENT, eventName, metadata)
   }
 }
