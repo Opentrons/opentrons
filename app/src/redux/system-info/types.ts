@@ -44,7 +44,7 @@ export type DriverStatus =
   | typeof UP_TO_DATE
   | typeof OUTDATED
 
-export interface U2EAnalyticsProps {
+export type U2EAnalyticsProps = {
   'U2E Vendor ID': number
   'U2E Product ID': number
   'U2E Serial Number': string
@@ -52,6 +52,7 @@ export interface U2EAnalyticsProps {
   'U2E Manufacturer': string
   'U2E IPv4 Address': string | null
   'U2E Windows Driver Version'?: string | null
+  [key: string]: string | number | null | undefined
 }
 
 // TODO(mc, 2020-04-17): add other system info

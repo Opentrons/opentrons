@@ -47,7 +47,7 @@ export interface RestartStatusChangedAction {
 export interface RestartRobotSuccessAction {
   type: 'robotAdmin:RESTART_SUCCESS'
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface RestartRobotFailureAction {

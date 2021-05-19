@@ -11,7 +11,8 @@ import type { AlertDismissedAction } from './types'
 export const alertsEpic: Epic = (action$, state$) => {
   return action$.pipe(
     filter<Action, AlertDismissedAction>(
-      a => a.type === ALERT_DISMISSED && a.payload.remember
+      (a: Action): a is AlertDismissedAction =>
+        a.type === ALERT_DISMISSED && a.payload.remember
     ),
     map(dismiss => alertPermanentlyIgnored(dismiss.payload.alertId))
   )

@@ -43,12 +43,10 @@ export const fetchPipetteOffsetCalibrationsOnCalibrationEndEpic: Epic = (
 ) => {
   return action$.pipe(
     ofType<Action, DeleteSessionAction>(DELETE_SESSION),
-    withLatestFrom(state$, (a, s) => [
-      a,
-      s,
-      getConnectedRobotName(s),
-      a.payload.sessionId,
-    ]),
+    withLatestFrom<
+      DeleteSessionAction,
+      [DeleteSessionAction, State, string, string]
+    >(state$, (a, s) => [a, s, getConnectedRobotName(s), a.payload.sessionId]),
     filter(
       ([action, state, robotName, sessionId]) =>
         robotName != null && sessionIncursRefetch(state, robotName, sessionId)

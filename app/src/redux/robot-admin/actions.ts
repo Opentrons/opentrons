@@ -11,7 +11,7 @@ export const restartRobot = (robotName: string): Types.RestartRobotAction => ({
 
 export const restartRobotSuccess = (
   robotName: string,
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 ): Types.RestartRobotSuccessAction => ({
   type: Constants.RESTART_SUCCESS,
   payload: { robotName },
