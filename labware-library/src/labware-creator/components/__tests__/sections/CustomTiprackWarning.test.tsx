@@ -7,13 +7,20 @@ import { CustomTiprackWarning } from '../../sections/CustomTiprackWarning'
 
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
-  onSubmit: jest.fn(),
-}
+let formikConfig: FormikConfig<LabwareFields>
 
 describe('CustomTiprackWarning', () => {
-  it('should not render when no labware type selecred', () => {
+  beforeEach(() => {
+    formikConfig = {
+      initialValues: getDefaultFormState(),
+      onSubmit: jest.fn(),
+    }
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+  it('should not render when no labware type selected', () => {
     const { container } = render(
       wrapInFormik(<CustomTiprackWarning />, formikConfig)
     )
