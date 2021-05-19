@@ -16,7 +16,7 @@ import type { HTMLAttributes, ReactWrapper } from 'enzyme'
 // TODO(mc, 2020-10-06): this is a partial mock because shell/update
 // needs some reorg to split actions and selectors
 jest.mock('../../../redux/shell/update', () => ({
-  ...jest.requireActual<{[fnName: string]: (...args: any[]) => any}>('../../../redux/shell/update'),
+  ...jest.requireActual<{}>('../../../redux/shell/update'),
   getShellUpdateState: jest.fn(),
 }))
 
