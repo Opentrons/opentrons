@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - 'protocol-designer/**'
+      - 'step-generation/**'
       - 'shared-data/**'
       - 'components/**'
       - 'webpack-config/**'
@@ -14,6 +15,7 @@ on:
   push:
     paths:
       - 'protocol-designer/**'
+      - 'step-generation/**'
       - 'shared-data/**'
       - 'components/**'
       - 'webpack-config/**'
