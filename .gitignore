@@ -52,6 +52,7 @@ pip-delete-this-directory.txt
 
 # node packages
 node_modules
+package-lock.json
 
 # Unit test / coverage reports
 htmlcov/
