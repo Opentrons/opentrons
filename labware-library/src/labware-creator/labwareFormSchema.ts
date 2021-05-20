@@ -36,12 +36,12 @@ const requiredPositiveInteger = (label: string): Yup.NumberSchema =>
     .integer()
     .required()
 
-const unsupportedLabwareIfFalse = (label: string): Yup.AnySchema =>
+const unsupportedLabwareIfFalse = (label: string): Yup.BooleanSchema =>
   Yup.boolean()
+    .default(false)
     .label(label)
     .typeError(REQUIRED_FIELD)
     .oneOf([true], IRREGULAR_LABWARE_ERROR)
-    .nullable()
     .required()
 
 const nameExistsError = (nameName: string): string =>
