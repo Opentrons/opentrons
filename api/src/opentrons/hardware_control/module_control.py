@@ -169,7 +169,8 @@ class AttachedModulesControl:
         discovered_modules = []
 
         for port in devices:
-            module_at_port = self.get_module_at_port(port)
+            symlink_port = port.split('dev/')[1]
+            module_at_port = self.get_module_at_port(symlink_port)
             if module_at_port:
                 discovered_modules.append(module_at_port)
         log.debug('Discovered modules: {}'.format(discovered_modules))
@@ -186,7 +187,7 @@ class AttachedModulesControl:
             if name not in modules.MODULE_HW_BY_NAME:
                 log.warning(f"Unexpected module connected: {name} on {port}")
                 return None
-            return modules.ModuleAtPort(port=f'{port}', name=name)
+            return modules.ModuleAtPort(port=f'dev/{port}', name=name)
         return None
 
     async def handle_module_appearance(self, event: AionotifyEvent):
