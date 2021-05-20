@@ -274,9 +274,7 @@ class TempDeck:
 
     def _connect_to_port(self, port=None):
         try:
-            temp_deck = environ.get('OT_TEMP_DECK_ID', None)
             self._connection = serial_communication.connect(
-                device_name=temp_deck,
                 port=port,
                 baudrate=TEMP_DECK_BAUDRATE
             )

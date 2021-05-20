@@ -75,8 +75,7 @@ class API(HardwareAPILike):
         self._config = config
         self._backend = backend
         self._loop = loop
-        # TODO (lc 05-12-2021) give responsibility of the the
-        # execution manager to the hardware controller in a follow-up.
+
         self._execution_manager = ExecutionManager(loop=loop)
         self._callbacks: set = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}

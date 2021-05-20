@@ -18,7 +18,7 @@ from opentrons.config.types import RobotConfig
 from opentrons.types import Mount
 
 from .module_control import AttachedModulesControl
-from .types import BoardRevision, Axis
+from .types import AionotifyEvent, BoardRevision, Axis
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
@@ -222,7 +222,10 @@ class Controller:
             return
         if event is not None:
             if 'ot_module' in event.name:
-                await self.module_controls.handle_module_appearance(event)
+                event_name = event.name
+                flags = aionotify.Flags.parse(event.flags)
+                event_description = AionotifyEvent.build(event_name, flags)
+                await self.module_controls.handle_module_appearance(event_description)
 
     async def watch(self, loop: asyncio.AbstractEventLoop):
         can_watch = aionotify is not None

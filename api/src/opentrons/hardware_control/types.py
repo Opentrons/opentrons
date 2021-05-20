@@ -3,7 +3,7 @@ import asyncio
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, TYPE_CHECKING
+from typing import cast, Tuple, Union, List, Dict, TYPE_CHECKING
 from typing_extensions import Literal
 from opentrons import types as top_types
 
@@ -239,6 +239,24 @@ class HardwareAction(enum.Enum):
 class PauseType(enum.Enum):
     PAUSE = 0
     DELAY = 1
+
+
+@dataclass
+class AionotifyEvent:
+    flags: enum.EnumMeta
+    name: str
+
+    @classmethod
+    def build(cls, name: str, flags: List[enum.Enum]):
+        # See https://github.com/python/mypy/issues/5317
+        # as to why mypy cannot detect that list
+        # comprehension or variables cannot be dynamically
+        # determined to meet the argument criteria for
+        # enums. Hence, the type ignore below.
+        flag_list = [f.name for f in flags]
+        Flag = enum.Enum('Flag',  # type: ignore
+                         flag_list)
+        cls(flags=Flag, name=name)
 
 
 class PauseResumeError(RuntimeError):

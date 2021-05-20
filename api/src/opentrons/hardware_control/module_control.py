@@ -6,15 +6,11 @@ from glob import glob
 
 from opentrons.config import IS_ROBOT, IS_LINUX
 from opentrons.drivers.rpi_drivers import types
-from opentrons.hardware_control.modules.types import ModuleAtPort
+
 
 from .execution_manager import ExecutionManager
+from .types import AionotifyEvent
 from . import modules
-
-try:
-    import aionotify  # type: ignore
-except OSError:
-    aionotify = None  # type: ignore
 
 
 log = logging.getLogger(__name__)
@@ -161,7 +157,7 @@ class AttachedModulesControl:
             simulated_module = simulating_module
         return matching_modules, simulated_module
 
-    def scan(self) -> List[ModuleAtPort]:
+    def scan(self) -> List[modules.ModuleAtPort]:
         """ Scan for connected modules and return list of
             tuples of serial ports and device names
         """
@@ -180,7 +176,7 @@ class AttachedModulesControl:
         return discovered_modules
 
     @staticmethod
-    def get_module_at_port(port: str) -> Optional[ModuleAtPort]:
+    def get_module_at_port(port: str) -> Optional[modules.ModuleAtPort]:
         """ Given a port, returns either a ModuleAtPort
             if it is a recognized module, or None if not recognized.
         """
@@ -190,28 +186,27 @@ class AttachedModulesControl:
             if name not in modules.MODULE_HW_BY_NAME:
                 log.warning(f"Unexpected module connected: {name} on {port}")
                 return None
-            return ModuleAtPort(port=f'/dev/{port}', name=name)
+            return modules.ModuleAtPort(port=f'{port}', name=name)
         return None
 
-    async def handle_module_appearance(self, event):
+    async def handle_module_appearance(self, event: AionotifyEvent):
         """ Only called upon availability of aionotify. Check that
         the file system has changed and either remove or add modules
         depending on the result.
 
-        :param event: Aionotify event. Note that since aionotify is
-        only supported on a linux system, we cannot properly type
-        this parameter.
+        :param event_name: The title of the even passed into aionotify.
+        :param event_flags: AionotifyFlags dataclass that maps flags listed from
+        the aionotify event.
         """
         maybe_module_at_port = self.get_module_at_port(event.name)
         new_modules = None
         removed_modules = None
-        flags = aionotify.Flags.parse(event.flags)
         if maybe_module_at_port is not None:
-            if aionotify.Flags.DELETE in flags:
+            if hasattr(event.flags, 'DELETE'):
                 removed_modules = [maybe_module_at_port]
                 log.info(
                     f'Module Removed: {maybe_module_at_port}')
-            elif aionotify.Flags.CREATE in flags:
+            elif hasattr(event.flags, 'CREATE'):
                 new_modules = [maybe_module_at_port]
                 log.info(
                     f'Module Added: {maybe_module_at_port}')
