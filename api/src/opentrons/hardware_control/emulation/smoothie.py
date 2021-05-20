@@ -7,6 +7,7 @@ import logging
 import re
 from typing import Optional, Dict
 
+from opentrons import _find_smoothie_file
 from opentrons.drivers import utils
 from opentrons.drivers.smoothie_drivers import HOMED_POSITION
 from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE
@@ -16,9 +17,6 @@ from .abstract_emulator import AbstractEmulator
 
 logger = logging.getLogger(__name__)
 
-VERSION_STRING = "Build version: edge-8414642, " \
-                 "Build date: CURRENT, MCU: NONE, System Clock: NONE"
-
 
 class SmoothieEmulator(AbstractEmulator):
     """Smoothie emulator"""
@@ -26,6 +24,12 @@ class SmoothieEmulator(AbstractEmulator):
     WRITE_INSTRUMENT_RE = re.compile(r"(?P<mount>[LR])\s*(?P<value>[a-f0-9]+)")
 
     def __init__(self, parser: Parser) -> None:
+        """Constructor"""
+        _, fw_version = _find_smoothie_file()
+        self._version_string = \
+            f"Build version: {fw_version}, Build date: CURRENT, " \
+            f"MCU: NONE, System Clock: NONE"
+
         self._pos = {'A': 0.0, 'B': 0.0, 'C': 0.0, 'X': 0.0, 'Y': 0.0, 'Z': 0.0}
         self._home_status: Dict[str, bool] = {
             'X': False,
@@ -64,7 +68,7 @@ class SmoothieEmulator(AbstractEmulator):
             vals = " ".join(f"{k}:{v}" for k, v in self._pos.items())
             return f"{command.gcode}\r\n\r\nok MCS: {vals}"
         elif GCODE.VERSION == command.gcode:
-            return VERSION_STRING
+            return self._version_string
         elif GCODE.READ_INSTRUMENT_ID == command.gcode:
             if "L" in command.params:
                 return f"L:{self._pipette_id['L']}"
