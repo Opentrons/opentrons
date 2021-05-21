@@ -30,7 +30,7 @@ GCODE_DEVICE_INFO = GCODES['DEVICE_INFO']
 
 SERIAL = "thermocycler_emulator"
 MODEL = "v02"
-VERSION = 1
+VERSION = "v1.1.0"
 
 
 class ThermocyclerEmulator(AbstractEmulator):

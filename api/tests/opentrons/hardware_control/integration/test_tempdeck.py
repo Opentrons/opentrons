@@ -24,7 +24,7 @@ async def tempdeck(loop: asyncio.BaseEventLoop, emulation_app) -> TempDeck:
 
 def test_device_info(tempdeck) -> None:
     assert {'model': 'temp_deck_v20', 'serial': 'temperature_emulator',
-            'version': '1'} == tempdeck.device_info
+            'version': 'v2.0.1'} == tempdeck.device_info
 
 
 @pytest.mark.xfail(reason="This test an its sleeps will be deprecated soon.")

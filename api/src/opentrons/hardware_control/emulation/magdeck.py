@@ -21,7 +21,7 @@ GCODE_PROGRAMMING_MODE = GCODES['PROGRAMMING_MODE']
 
 SERIAL = "magnetic_emulator"
 MODEL = "mag_deck_v20"
-VERSION = 1
+VERSION = "2.0.0"
 
 
 class MagDeckEmulator(AbstractEmulator):

@@ -41,4 +41,4 @@ async def thermocycler(
 def test_device_info(thermocycler: Thermocycler):
     """It should have device info."""
     assert {'model': 'v02', 'serial': 'thermocycler_emulator',
-            'version': '1'} == thermocycler.device_info
+            'version': 'v1.1.0'} == thermocycler.device_info

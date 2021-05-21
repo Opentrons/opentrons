@@ -23,7 +23,7 @@ GCODE_PROGRAMMING_MODE = GCODES['PROGRAMMING_MODE']
 
 SERIAL = "temperature_emulator"
 MODEL = "temp_deck_v20"
-VERSION = 1
+VERSION = "v2.0.1"
 
 
 class TempDeckEmulator(AbstractEmulator):
