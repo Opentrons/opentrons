@@ -1,5 +1,39 @@
 const isMacOSX = Cypress.platform === 'darwin'
+const batchEditClickOptions = { [isMacOSX ? 'metaKey' : 'ctrlKey']: true }
 const invalidInput = 'abcdefghijklmnopqrstuvwxyz!@#$%^&*()<>?,-'
+
+function importProtocol() {
+  cy.fixture('../../fixtures/protocol/5/transferSettings.json').then(
+    fileContent => {
+      cy.get('input[type=file]').upload({
+        fileContent: JSON.stringify(fileContent),
+        fileName: 'fixture.json',
+        mimeType: 'application/json',
+        encoding: 'utf8',
+      })
+      cy.get('[data-test="ComputingSpinner"]').should('exist')
+      // wait until computation is done before proceeding, with generous timeout
+      cy.get('[data-test="ComputingSpinner"]', { timeout: 30000 }).should(
+        'not.exist'
+      )
+    }
+  )
+}
+
+function openDesignTab() {
+  cy.get('button[id=NavTab_design]').click()
+  cy.get('button').contains('ok').click()
+
+  // Verify the Design Page
+  cy.get('#TitleBar_main > h1').contains('Multi select banner test protocol')
+  cy.get('#TitleBar_main > h2').contains('STARTING DECK STATE')
+  cy.get('button[id=StepCreationButton]').contains('+ Add Step')
+}
+
+function enterBatchEdit() {
+  cy.get('[data-test="StepItem_1"]').click(batchEditClickOptions)
+  cy.get('button').contains('exit batch edit').should('exist')
+}
 
 describe('Advanced Settings for Transfer Form', () => {
   before(() => {
@@ -9,14 +43,12 @@ describe('Advanced Settings for Transfer Form', () => {
     openDesignTab()
   })
 
-  it('Verify functionality of advance settings with different pipette and labware', () => {
+  it('Verify functionality of advanced settings with different pipette and labware', () => {
     enterBatchEdit()
 
-    // Different Pipette diabales aspirate and dispense Flowrate and Mix settings
+    // Different Pipette disbales aspirate and dispense Flowrate and Mix settings
     // step 6 has different pipette than step 1
-    cy.get('[data-test="StepItem_6"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_6"]').click(batchEditClickOptions)
 
     // Pre-wet tip is always enabled
     cy.get('input[name="preWetTip"]').should('be.enabled')
@@ -47,19 +79,13 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('button').contains('exit batch edit').click()
   })
 
-  it('Verify functionality of advance settings with same pipette and labware', () => {
+  it('Verify functionality of advanced settings with same pipette and labware', () => {
     // click on step 2 in batch edit mode
-    cy.get('[data-test="StepItem_2"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // deselecting on step 6 in batch edit mode
-    cy.get('[data-test="StepItem_6"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_6"]').click(batchEditClickOptions)
     // click on step 3 , as step 2 & 3 have same pipette and labware
-    cy.get('[data-test="StepItem_3"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_3"]').click(batchEditClickOptions)
     // Aspirate Flowrate and mix are enabled
     cy.get('input[name="aspirate_flowRate"]').should('be.enabled')
     cy.get('input[name="aspirate_mix_checkbox"]').should('be.enabled')
@@ -96,9 +122,7 @@ describe('Advanced Settings for Transfer Form', () => {
 
   it('verify flowrate indeterminate value', () => {
     // click on step 2 in batch edit mode
-    cy.get('[data-test="StepItem_2"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
 
     cy.get('div[class*=FlowRateInput__description]').contains(
@@ -111,11 +135,9 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('button').contains('save').click()
 
     // Click on step 4 as it has flowrate set to 100 from previous testcase
-    cy.get('[data-test="StepItem_4"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_4"]').click(batchEditClickOptions)
 
-    // indeterminate state in flowrate is displayed with "-"
+    // indeterminate state in flowrate is empty
     cy.get('input[name="aspirate_flowRate"]').should('have.value', '')
   })
 
@@ -151,18 +173,14 @@ describe('Advanced Settings for Transfer Form', () => {
 
   it('verify prewet tip indeterminate value', () => {
     // Click on step 2, to enter batch edit and enable prewet tip
-    cy.get('[data-test="StepItem_2"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // enable pre-wet tip
-    cy.prewettip()
+    cy.togglePreWetTip()
     cy.get('input[name="preWetTip"]').should('be.visible')
     // Click save button to save the changes
     cy.get('button').contains('save').click()
     // Click on step 1, as it does not have prewet-tip selected - indeteminate state
-    cy.get('[data-test="StepItem_1"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_1"]').click(batchEditClickOptions)
     // Check tooltip here
     cy.contains('pre-wet tip').trigger('pointerover')
     cy.get('div[role="tooltip"]').should(
@@ -175,9 +193,7 @@ describe('Advanced Settings for Transfer Form', () => {
 
   it('verify mix settings indeterminate value', () => {
     // Click on step 2, to enter batch edit mode
-    cy.get('[data-test="StepItem_4"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_4"]').click(batchEditClickOptions)
     // Select mix settings
     cy.mixaspirate()
     cy.get('input[name="aspirate_mix_volume"]').type('10')
@@ -185,9 +201,7 @@ describe('Advanced Settings for Transfer Form', () => {
     // Click save button to save the changes
     cy.get('button').contains('save').click()
     // Click on step 3 to generate indertminate state for mix settings.
-    cy.get('[data-test="StepItem_3"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_3"]').click(batchEditClickOptions)
     // Verify the tooltip here
     cy.contains('mix').trigger('pointerover')
     cy.get('div[role="tooltip"]').should(
@@ -200,13 +214,9 @@ describe('Advanced Settings for Transfer Form', () => {
 
   it('verify mix settings batch editing in transfer form', () => {
     // Click on step 2, to enter batch edit mode
-    cy.get('[data-test="StepItem_2"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Click on step 3 to batch edit mix settings
-    cy.get('[data-test="StepItem_3"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_3"]').click(batchEditClickOptions)
     cy.get('input[name="aspirate_mix_checkbox"]').click({ force: true })
     // Select mix settings
     cy.get('input[name="aspirate_mix_volume"]').type('10')
@@ -228,9 +238,7 @@ describe('Advanced Settings for Transfer Form', () => {
 
   it('verify delay settings indeterminate value', () => {
     // Click on step 2, to enter batch edit mode
-    cy.get('[data-test="StepItem_2"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Select delay settings
     cy.get('input[name="aspirate_delay_checkbox"]')
       .check({ force: true })
@@ -239,9 +247,7 @@ describe('Advanced Settings for Transfer Form', () => {
     // Click save button to save the changes
     cy.get('button').contains('save').click()
     // Click on step 3 to generate indertminate state for delay settings.
-    cy.get('[data-test="StepItem_3"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_3"]').click(batchEditClickOptions)
     // Verify the tooltip here
     cy.contains('delay').trigger('pointerover')
     cy.get('div[role="tooltip"]').should(
@@ -254,13 +260,9 @@ describe('Advanced Settings for Transfer Form', () => {
 
   it('verify delay settings batch editing in transfer form', () => {
     // Click on step 4, to enter batch edit mode
-    cy.get('[data-test="StepItem_4"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_4"]').click(batchEditClickOptions)
     // Click on step 5 to batch edit mix settings
-    cy.get('[data-test="StepItem_5"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_5"]').click(batchEditClickOptions)
     // Select delay settings
     cy.get('input[name="aspirate_delay_checkbox"]').click({ force: true })
     cy.get('input[name="aspirate_delay_seconds"]').clear().type('2')
@@ -270,14 +272,14 @@ describe('Advanced Settings for Transfer Form', () => {
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
 
-    // Click on step 4 to verify that delay has volume set to 2 with 2 repitititons
+    // Click on step 4 to verify that delay has volume set to 2
     cy.get('[data-test="StepItem_4"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
     // Verify that volume is set to 2 and repitions to 2
     cy.get('input[name="aspirate_delay_seconds"]').should('have.value', 2)
 
-    // Click on step 5 to verify that delay has volume set to 2 with 2 repitititons
+    // Click on step 5 to verify that delay has volume set to 2
     cy.get('[data-test="StepItem_5"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
@@ -288,18 +290,14 @@ describe('Advanced Settings for Transfer Form', () => {
   it('verify touchTip settings indeterminate value', () => {
     cy.get('[data-test="StepItem_2"]').click()
     // Click on step 2, to enter batch edit mode
-    cy.get('[data-test="StepItem_2"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Select touchTip settings
     cy.get('input[name="aspirate_touchTip_checkbox"]').click({ force: true })
 
     // Click save button to save the changes
     cy.get('button').contains('save').click()
-    // Click on step 5 to generate indertminate state for delay settings.
-    cy.get('[data-test="StepItem_5"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    // Click on step 5 to generate indertminate state for touchTip settings.
+    cy.get('[data-test="StepItem_5"]').click(batchEditClickOptions)
 
     // Verify the tooltip here
     cy.contains('touch tip').trigger('pointerover')
@@ -313,13 +311,9 @@ describe('Advanced Settings for Transfer Form', () => {
 
   it('verify touchTip settings batch editing in transfer form', () => {
     // Click on step 2, to enter batch edit mode
-    cy.get('[data-test="StepItem_2"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Click on step 3 to batch edit mix settings
-    cy.get('[data-test="StepItem_3"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_3"]').click(batchEditClickOptions)
     // Select touchTip settings
     cy.get('input[name="aspirate_touchTip_checkbox"]').click({ force: true })
     // cy.get('[id=TipPositionModal_custom_input]').type(15)
@@ -328,20 +322,20 @@ describe('Advanced Settings for Transfer Form', () => {
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
 
-    // Click on step 2 to verify that touchTip has volume set to 2 with 2 repitititons
+    // Click on step 2 to verify that touchTip has volume set to 2
     cy.get('[data-test="StepItem_2"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify that volume is set to 2 and repitions to 2
+    // Verify that volume is set
     cy.get('[id=TipPositionField_aspirate_touchTip_mmFromBottom]').should(
       'have.value',
       24
     )
-    // Click on step 3 to verify that touchTip has volume set to 2 with 2 repitititons
+    // Click on step 3 to verify that touchTip has volume set
     cy.get('[data-test="StepItem_3"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify that volume is set to 2 and repitions to 2
+    // Verify that volume is set
     cy.get('[id=TipPositionField_aspirate_touchTip_mmFromBottom]').should(
       'have.value',
       24
@@ -350,18 +344,14 @@ describe('Advanced Settings for Transfer Form', () => {
 
   it('verify blowout settings indeterminate value', () => {
     // Click on step 2, to enter batch edit mode
-    cy.get('[data-test="StepItem_2"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Select blowout settings
     cy.get('input[name="blowout_checkbox"]').click({ force: true })
 
     // Click save button to save the changes
     cy.get('button').contains('save').click()
     // Click on step 4 to generate indertminate state for blowout settings.
-    cy.get('[data-test="StepItem_4"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_4"]').click(batchEditClickOptions)
     // Verify the tooltip here
     cy.contains('blowout').trigger('pointerover')
     cy.get('div[role="tooltip"]').should(
@@ -374,13 +364,9 @@ describe('Advanced Settings for Transfer Form', () => {
 
   it('verify blowout settings batch editing in transfer form', () => {
     // Click on step 2, to enter batch edit mode
-    cy.get('[data-test="StepItem_2"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Click on step 3 to batch edit mix settings
-    cy.get('[data-test="StepItem_3"]').click({
-      [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-    })
+    cy.get('[data-test="StepItem_3"]').click(batchEditClickOptions)
     // Select blowout settings
     cy.get('input[name="blowout_checkbox"]').click({ force: true })
     // Click save button to save the changes
@@ -388,54 +374,17 @@ describe('Advanced Settings for Transfer Form', () => {
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
 
-    // Click on step 2 to verify that blowout has volume set to 2 with 2 repitititons
+    // Click on step 2 to verify that blowout has trash selected
     cy.get('[data-test="StepItem_2"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify that volume is set to 2 and repitions to 2
+    // Verify that trashId is selected
     cy.get('[id=BlowoutLocationField_dropdown]').should('have.value', 'trashId')
-    // Click on step 3 to verify that blowout has volume set to 2 with 2 repitititons
+    // Click on step 3 to verify the batch editing
     cy.get('[data-test="StepItem_3"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify that volume is set to 2 and repitions to 2
+    // Verify that trash is selected for the blowout option
     cy.get('[id=BlowoutLocationField_dropdown]').should('have.value', 'trashId')
   })
 })
-
-function importProtocol() {
-  cy.fixture('../../fixtures/protocol/5/transferSettings.json').then(
-    fileContent => {
-      cy.get('input[type=file]').upload({
-        fileContent: JSON.stringify(fileContent),
-        fileName: 'fixture.json',
-        mimeType: 'application/json',
-        encoding: 'utf8',
-      })
-      cy.get('[data-test="ComputingSpinner"]').should('exist')
-      // wait until computation is done before proceeding, with generous timeout
-      cy.get('[data-test="ComputingSpinner"]', { timeout: 30000 }).should(
-        'not.exist'
-      )
-    }
-  )
-}
-
-function openDesignTab() {
-  cy.get('button[id=NavTab_design]').click()
-  cy.get('button').contains('ok').click()
-
-  // Verify the Design Page
-  cy.get('#TitleBar_main > h1').contains('Multi select banner test protocol')
-  cy.get('#TitleBar_main > h2').contains('STARTING DECK STATE')
-  cy.get('button[id=StepCreationButton]').contains('+ Add Step')
-}
-
-function enterBatchEdit() {
-  const isMacOSX = Cypress.platform === 'darwin'
-  cy.get('[data-test="StepItem_1"]').click({
-    [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
-  })
-
-  cy.get('button').contains('exit batch edit').should('exist')
-}

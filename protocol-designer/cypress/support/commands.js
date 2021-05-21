@@ -99,7 +99,7 @@ Cypress.Commands.add('openSettingsPage', () => {
 // Advance Settings for Transfer Steps
 
 // Pre-wet tip enable/disable
-Cypress.Commands.add('prewettip', () => {
+Cypress.Commands.add('togglePreWetTip', () => {
   cy.get('input[name="preWetTip"]').click({ force: true })
 })
 
