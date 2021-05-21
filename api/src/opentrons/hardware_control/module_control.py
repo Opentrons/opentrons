@@ -1,12 +1,13 @@
 import logging
 import asyncio
+import os
 import re
 from typing import List, Tuple, Optional
 from glob import glob
 
 from opentrons.config import IS_ROBOT, IS_LINUX
 from opentrons.drivers.rpi_drivers import types
-
+from opentrons.hardware_control.modules import ModuleAtPort
 
 from .execution_manager import ExecutionManager
 from .types import AionotifyEvent
@@ -173,6 +174,26 @@ class AttachedModulesControl:
             module_at_port = self.get_module_at_port(symlink_port)
             if module_at_port:
                 discovered_modules.append(module_at_port)
+
+        # Check for emulator environment variables
+        emulator_uri = os.environ.get("OT_THERMOCYCLER_EMULATOR_URI")
+        if emulator_uri:
+            discovered_modules.append(
+                ModuleAtPort(port=emulator_uri, name="thermocycler")
+            )
+
+        emulator_uri = os.environ.get("OT_TEMPERATURE_EMULATOR_URI")
+        if emulator_uri:
+            discovered_modules.append(
+                ModuleAtPort(port=emulator_uri, name="tempdeck")
+            )
+
+        emulator_uri = os.environ.get("OT_MAGNETIC_EMULATOR_URI")
+        if emulator_uri:
+            discovered_modules.append(
+                ModuleAtPort(port=emulator_uri, name="magdeck")
+            )
+
         log.debug('Discovered modules: {}'.format(discovered_modules))
         return discovered_modules
 
