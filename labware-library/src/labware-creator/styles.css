@@ -133,7 +133,8 @@
 .preview_instructions,
 .brand_column,
 .brand_id_column,
-.volume_instructions_column {
+.volume_instructions_column,
+.instructions_text {
   flex-basis: 100%;
   flex-shrink: 0;
   font-size: var(--fs-body-1);

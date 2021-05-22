@@ -28,9 +28,9 @@ GCODE_DEACTIVATE_LID = GCODES['DEACTIVATE_LID']
 GCODE_DEACTIVATE_BLOCK = GCODES['DEACTIVATE_BLOCK']
 GCODE_DEVICE_INFO = GCODES['DEVICE_INFO']
 
-SERIAL = "fake_serial"
-MODEL = "thermocycler_emulator"
-VERSION = 1
+SERIAL = "thermocycler_emulator"
+MODEL = "v02"
+VERSION = "v1.1.0"
 
 
 class ThermocyclerEmulator(AbstractEmulator):

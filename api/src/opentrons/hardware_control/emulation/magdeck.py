@@ -19,9 +19,9 @@ GCODE_GET_CURRENT_POSITION = GCODES['GET_CURRENT_POSITION']
 GCODE_DEVICE_INFO = GCODES['DEVICE_INFO']
 GCODE_PROGRAMMING_MODE = GCODES['PROGRAMMING_MODE']
 
-SERIAL = "fake_serial"
-MODEL = "magdeck_emulator"
-VERSION = 1
+SERIAL = "magnetic_emulator"
+MODEL = "mag_deck_v20"
+VERSION = "2.0.0"
 
 
 class MagDeckEmulator(AbstractEmulator):

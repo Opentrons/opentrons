@@ -41,6 +41,7 @@ def test_simulate_function_json_apiv2(get_json_protocol_fixture):
         'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec',
         'Touching tip',
         'Blowing out at B1 of Dest Plate on 3',
+        'Moving to 5',
         'Dropping tip into A1 of Trash on 12'
     ]
 
@@ -116,3 +117,9 @@ def test_simulate_extra_labware(protocol, protocol_file, monkeypatch):
     ctx = simulate.get_protocol_api('2.0')
     with pytest.raises(FileNotFoundError):
         ctx.load_labware("fixture_12_trough", 1, namespace='fixture')
+
+
+@pytest.mark.parametrize('protocol_file', ['bug_aspirate_tip.py'])
+def test_simulate_aspirate_tip(protocol, protocol_file, monkeypatch):
+    with pytest.raises(ExceptionInProtocolError):
+        simulate.simulate(protocol.filelike, 'bug_aspirate_tip.py')

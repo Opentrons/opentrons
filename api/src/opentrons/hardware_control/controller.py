@@ -2,8 +2,8 @@ from __future__ import annotations
 import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
-from typing import (Any, Dict, List, Optional,
-                    Tuple, TYPE_CHECKING, Union, Sequence)
+from typing import (Any, Dict, List, Optional, Tuple,
+                    TYPE_CHECKING, Union, Sequence)
 from typing_extensions import Final
 try:
     import aionotify  # type: ignore
@@ -11,22 +11,21 @@ except OSError:
     aionotify = None  # type: ignore
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
-from opentrons.drivers.rpi_drivers import build_gpio_chardev, types, usb
+from opentrons.drivers.rpi_drivers import build_gpio_chardev, usb
 import opentrons.config
 from opentrons.config import pipette_config
 from opentrons.config.types import RobotConfig
 from opentrons.types import Mount
 
-from . import modules
-from .execution_manager import ExecutionManager
-from .types import BoardRevision, Axis
+from .module_control import AttachedModulesControl
+from .types import AionotifyEvent, BoardRevision, Axis
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
         PipetteModel, PipetteName
     )
     from .dev_types import (
-        RegisterModules, AttachedInstrument, AttachedInstruments,
+        AttachedInstrument, AttachedInstruments,
         InstrumentHardwareConfigs)
     from opentrons.drivers.rpi_drivers.dev_types\
         import GPIODriverLike
@@ -40,7 +39,8 @@ class Controller:
     """
 
     @classmethod
-    async def build(cls, config: RobotConfig) -> Controller:
+    async def build(
+            cls, config: RobotConfig) -> Controller:
         """ Build a Controller instance.
 
         Use this factory method rather than the initializer to handle proper
@@ -79,16 +79,22 @@ class Controller:
             handle_locks=False)
         self._cached_fw_version: Optional[str] = None
         self._usb = usb.USBBus(self._board_revision)
+        self._module_controls: Optional[AttachedModulesControl] = None
         try:
-            self._module_watcher = aionotify.Watcher()
-            self._module_watcher.watch(
-                alias='modules',
-                path='/dev',
-                flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE))
+            self._event_watcher = self._build_event_watcher()
         except AttributeError:
             MODULE_LOG.warning(
                 'Failed to initiate aionotify, cannot watch modules '
                 'or door, likely because not running on linux')
+
+    @staticmethod
+    def _build_event_watcher():
+        watcher = aionotify.Watcher()
+        watcher.watch(
+            alias='modules',
+            path='/dev',
+            flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE))
+        return watcher
 
     @property
     def gpio_chardev(self) -> GPIODriverLike:
@@ -97,6 +103,16 @@ class Controller:
     @property
     def board_revision(self) -> BoardRevision:
         return self._board_revision
+
+    @property
+    def module_controls(self) -> AttachedModulesControl:
+        if not self._module_controls:
+            raise AttributeError('Module controls not found.')
+        return self._module_controls
+
+    @module_controls.setter
+    def module_controls(self, module_controls: AttachedModulesControl):
+        self._module_controls = module_controls
 
     def start_gpio_door_watcher(self, **kargs):
         self.gpio_chardev.start_door_switch_watcher(**kargs)
@@ -198,65 +214,26 @@ class Controller:
         finally:
             self._smoothie_driver.pop_active_current()
 
-    async def _handle_watch_event(self, register_modules: RegisterModules):
+    async def _handle_watch_event(self):
         try:
-            event = await self._module_watcher.get_event()
+            event = await self._event_watcher.get_event()
         except asyncio.IncompleteReadError:
             MODULE_LOG.debug("incomplete read error when quitting watcher")
             return
-        flags = aionotify.Flags.parse(event.flags)
-        if event is not None and 'ot_module' in event.name:
-            maybe_module_at_port = modules.get_module_at_port(event.name)
-            new_modules = None
-            removed_modules = None
-            if maybe_module_at_port is not None:
-                if aionotify.Flags.DELETE in flags:
-                    removed_modules = [maybe_module_at_port]
-                    MODULE_LOG.info(
-                        f'Module Removed: {maybe_module_at_port}')
-                elif aionotify.Flags.CREATE in flags:
-                    new_modules = [maybe_module_at_port]
-                    MODULE_LOG.info(
-                        f'Module Added: {maybe_module_at_port}')
-                try:
-                    await register_modules(
-                        removed_mods_at_ports=removed_modules,
-                        new_mods_at_ports=new_modules,
-                    )
-                except Exception:
-                    MODULE_LOG.exception(
-                        'Exception in Module registration')
+        if event is not None:
+            if 'ot_module' in event.name:
+                event_name = event.name
+                flags = aionotify.Flags.parse(event.flags)
+                event_description = AionotifyEvent.build(event_name, flags)
+                await self.module_controls.handle_module_appearance(event_description)
 
-    async def watch_modules(self, loop: asyncio.AbstractEventLoop,
-                            register_modules: RegisterModules):
+    async def watch(self, loop: asyncio.AbstractEventLoop):
         can_watch = aionotify is not None
         if can_watch:
-            await self._module_watcher.setup(loop)
+            await self._event_watcher.setup(loop)
 
-        initial_modules = modules.discover()
-        try:
-            await register_modules(new_mods_at_ports=initial_modules)
-        except Exception:
-            MODULE_LOG.exception('Exception in Module registration')
-        while can_watch and (not self._module_watcher.closed):
-            await self._handle_watch_event(register_modules)
-
-    async def build_module(
-            self,
-            port: str,
-            usb_port: types.USBPort,
-            model: str,
-            interrupt_callback: modules.InterruptCallback,
-            loop: asyncio.AbstractEventLoop,
-            execution_manager: ExecutionManager) -> modules.AbstractModule:
-        return await modules.build(
-            port=port,
-            usb_port=usb_port,
-            which=model,
-            simulating=False,
-            interrupt_callback=interrupt_callback,
-            loop=loop,
-            execution_manager=execution_manager)
+        while can_watch and (not self._event_watcher.closed):
+            await self._handle_watch_event()
 
     async def connect(self, port: str = None):
         self._smoothie_driver.connect(port)
@@ -326,9 +303,9 @@ class Controller:
             loop = asyncio.get_event_loop()
         except RuntimeError:
             return
-        if hasattr(self, '_module_watcher'):
-            if loop.is_running() and self._module_watcher:
-                self._module_watcher.close()
+        if hasattr(self, '_event_watcher'):
+            if loop.is_running() and self._event_watcher:
+                self._event_watcher.close()
         if hasattr(self, 'gpio_chardev'):
             try:
                 if not loop.is_closed():

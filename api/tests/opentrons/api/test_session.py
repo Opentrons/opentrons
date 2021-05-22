@@ -171,7 +171,6 @@ def run(ctx):
             contents=proto)
 
 
-@pytest.mark.api2_only
 async def test_session_extra_labware(main_router, get_labware_fixture,
                                      virtual_smoothie_env):
     proto = '''
@@ -205,7 +204,6 @@ def run(ctx):
             contents=proto)
 
 
-@pytest.mark.api2_only
 async def test_session_bundle(main_router, get_bundle_fixture,
                               virtual_smoothie_env):
     bundle = get_bundle_fixture('simple_bundle')
@@ -255,6 +253,29 @@ def run(ctx):
                                                   jsonp)
     assert 'p50_single_v1' in [pip.name for pip in session2.instruments]
     assert 'p10_single_v1' in [pip.name for pip in session2.instruments]
+
+
+async def test_session_move_to_labware(main_router,
+                                       virtual_smoothie_env):
+    proto = '''
+metadata = {"apiLevel": "2.0"}
+def run(ctx):
+    rack1 = ctx.load_labware('opentrons_96_tiprack_300ul', '1')
+    rack2 = ctx.load_labware('opentrons_96_tiprack_300ul', '2')
+    left = ctx.load_instrument('p300_single', 'left', tip_racks=[rack1])
+    plate = ctx.load_labware('corning_96_wellplate_360ul_flat', '4')
+    left.pick_up_tip()
+    left.move_to(plate['A1'].top())
+    left.move_to(plate['A2'].top())
+    left.drop_tip()
+    '''
+    session = main_router.session_manager.create('dummy-pipette',
+                                                 proto)
+    assert 'p300_single_v1' in [pip.name for pip in session.instruments]
+
+    # Labware that does not have a liquid handling event, but is interacted
+    # with using a pipette should still show up in the list of labware.
+    assert 'corning_96_wellplate_360ul_flat' in [lw.type for lw in session.containers]
 
 
 async def test_session_run_concurrently(

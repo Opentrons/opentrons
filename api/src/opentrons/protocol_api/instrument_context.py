@@ -12,7 +12,7 @@ from opentrons.hardware_control.types import PipettePair
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.api_support.instrument import \
     validate_blowout_location, tip_length_for, validate_tiprack, \
-    determine_drop_target
+    determine_drop_target, validate_can_aspirate, validate_can_dispense
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.util import (
@@ -123,7 +123,7 @@ class InstrumentContext(CommandPublisher):
     def default_speed(self, speed: float):
         self._implementation.set_default_speed(speed)
 
-    @requires_version(2, 0)
+    @requires_version(2, 0)  # noqa: C901
     def aspirate(self,
                  volume: Optional[float] = None,
                  location: Union[types.Location, Well] = None,
@@ -183,6 +183,8 @@ class InstrumentContext(CommandPublisher):
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
+        if self.api_version >= APIVersion(2, 11):
+            validate_can_aspirate(dest)
 
         if self.current_volume == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -191,7 +193,8 @@ class InstrumentContext(CommandPublisher):
             if self.api_version < APIVersion(2, 3) or \
                     not self._implementation.is_ready_to_aspirate():
                 if dest.labware.is_well:
-                    self.move_to(dest.labware.as_well().top())
+                    self.move_to(dest.labware.as_well().top(),
+                                 publish=False)
                 else:
                     # TODO(seth,2019/7/29): This should be a warning exposed
                     #  via rpc to the runapp
@@ -202,9 +205,9 @@ class InstrumentContext(CommandPublisher):
                         "cause over aspiration if the previous command is a "
                         "blow_out.")
                 self._implementation.prepare_for_aspirate()
-            self.move_to(dest)
+            self.move_to(dest, publish=False)
         elif dest != self._ctx.location_cache:
-            self.move_to(dest)
+            self.move_to(dest, publish=False)
 
         c_vol = self._implementation.get_available_volume() \
             if not volume else volume
@@ -271,10 +274,10 @@ class InstrumentContext(CommandPublisher):
             else:
                 loc = location.bottom().move(
                     types.Point(0, 0, self.well_bottom_clearance.dispense))
-            self.move_to(loc)
+            self.move_to(loc, publish=False)
         elif isinstance(location, types.Location):
             loc = location
-            self.move_to(location)
+            self.move_to(location, publish=False)
         elif location is not None:
             raise TypeError(
                 f'location should be a Well or Location, but it is {location}')
@@ -286,6 +289,8 @@ class InstrumentContext(CommandPublisher):
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
+        if self.api_version >= APIVersion(2, 11):
+            validate_can_dispense(loc)
 
         c_vol = self.current_volume if not volume else volume
 
@@ -393,10 +398,10 @@ class InstrumentContext(CommandPublisher):
                 self._log.warning('Blow_out being performed on a tiprack. '
                                   'Please re-check your code')
             loc = location.top()
-            self.move_to(loc)
+            self.move_to(loc, publish=False)
         elif isinstance(location, types.Location):
             loc = location
-            self.move_to(loc)
+            self.move_to(loc, publish=False)
         elif location is not None:
             raise TypeError(
                 'location should be a Well or Location, but it is {}'
@@ -496,7 +501,7 @@ class InstrumentContext(CommandPublisher):
                 move_with_z_offset =\
                     well.as_well().top().point + types.Point(0, 0, v_offset)
                 to_loc = types.Location(move_with_z_offset, well)
-            self.move_to(to_loc)
+            self.move_to(to_loc, publish=False)
         else:
             raise TypeError(
                 'location should be a Well, but it is {}'.format(location))
@@ -554,7 +559,7 @@ class InstrumentContext(CommandPublisher):
         if not loc or not loc.labware.is_well:
             raise RuntimeError('No previous Well cached to perform air gap')
         target = loc.labware.as_well().top(height)
-        self.move_to(target)
+        self.move_to(target, publish=False)
         self.aspirate(volume)
         return self
 
@@ -660,7 +665,7 @@ class InstrumentContext(CommandPublisher):
         do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                    'before', None, None, self, location=target)
 
-        self.move_to(target.top())
+        self.move_to(target.top(), publish=False)
 
         self._implementation.pick_up_tip(
             well=target._impl,
@@ -780,7 +785,7 @@ class InstrumentContext(CommandPublisher):
                 " However, it is a {}".format(location))
         do_publish(self.broker, cmds.drop_tip, self.drop_tip,
                    'before', None, None, self, location=target)
-        self.move_to(target)
+        self.move_to(target, publish=False)
 
         self._implementation.drop_tip(home_after=home_after)
         do_publish(self.broker, cmds.drop_tip, self.drop_tip,
@@ -1086,7 +1091,8 @@ class InstrumentContext(CommandPublisher):
                 location: types.Location,
                 force_direct: bool = False,
                 minimum_z_height: Optional[float] = None,
-                speed: Optional[float] = None
+                speed: Optional[float] = None,
+                publish: bool = True
                 ) -> InstrumentContext:
         """ Move the instrument.
 
@@ -1101,6 +1107,8 @@ class InstrumentContext(CommandPublisher):
                       the straight linear speed of the motion; to limit
                       individual axis speeds, you can use
                       :py:attr:`.ProtocolContext.max_speeds`.
+        :param publish: Whether a call to this function should publish to the
+        runlog or not.
         """
         from_loc = self._ctx.location_cache
         if not from_loc:
@@ -1110,12 +1118,18 @@ class InstrumentContext(CommandPublisher):
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
 
+        if publish:
+            do_publish(self.broker, cmds.move_to, self.move_to, 'before',
+                       None, None, self, location or self._ctx.location_cache)
         self._implementation.move_to(
             location=location,
             force_direct=force_direct,
             minimum_z_height=minimum_z_height,
             speed=speed
         )
+        if publish:
+            do_publish(self.broker, cmds.move_to, self.move_to, 'after',
+                       None, None, self, location or self._ctx.location_cache)
         return self
 
     @property  # type: ignore

@@ -286,9 +286,6 @@ def model(request, hardware, loop):
     # Use with pytest.mark.parametrize(’labware’, [some-labware-name])
     # to have a different labware loaded as .container. If not passed,
     # defaults to the version-appropriate way to do 96 flat
-    if request.node.get_closest_marker('api2_only')\
-       and request.param != build_v2_model:
-        pytest.skip('only works with hardware controller')
     try:
         lw_name = request.getfixturevalue('labware_name')
     except Exception:
