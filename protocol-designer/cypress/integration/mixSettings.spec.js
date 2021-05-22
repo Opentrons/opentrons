@@ -74,7 +74,7 @@ describe('Advanced Settings for Mix Form', () => {
     enterBatchEdit()
 
     // Same labware enables aspirate and dispense Flowrate ,tipPosition ,delay and touchTip
-    //deslecting step 4
+    // deslecting step 4
     cy.get('[data-test="StepItem_4"]').click(batchEditClickOptions)
     // step 2 has same labware as step 1
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
@@ -108,7 +108,7 @@ describe('Advanced Settings for Mix Form', () => {
       .should('be.empty')
 
     // click on Discard Changes button to not save the changes
-    cy.get('button').contains('discard changes').click()  
+    cy.get('button').contains('discard changes').click()
 
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
@@ -205,7 +205,7 @@ describe('Advanced Settings for Mix Form', () => {
     cy.get('[data-test="StepItem_1"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify that volume is set to 2 
+    // Verify that volume is set to 2
     cy.get('input[name="aspirate_delay_seconds"]').should('have.value', 2)
 
     // Click on step 2 to verify that delay has volume set to 2
@@ -322,10 +322,14 @@ describe('Advanced Settings for Mix Form', () => {
     // Click on step 2, to enter batch edit and click on well order to change the order
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // click on well-order and change the order
-    cy.get('[id=WellOrderField_button_mix]').click({force:true})
+    cy.get('[id=WellOrderField_button_mix]').click({ force: true })
     cy.get('h4').contains('Well Order')
-    cy.get('p').contains('Change the order in which the robot aspirates from the selected wells')
-    cy.get('select[name="mix_wellOrder_first"]').select('Bottom to top').should('have.value', 'b2t')
+    cy.get('p').contains(
+      'Change the order in which the robot aspirates from the selected wells'
+    )
+    cy.get('select[name="mix_wellOrder_first"]')
+      .select('Bottom to top')
+      .should('have.value', 'b2t')
     // Click done button to save the changes
     cy.get('button').contains('done').click()
     // Click save button to save the changes
@@ -334,7 +338,7 @@ describe('Advanced Settings for Mix Form', () => {
     cy.get('[data-test="StepItem_1"]').click(batchEditClickOptions)
 
     cy.get('[id=WellOrderField_button_mix]').contains('mixed')
-    
+
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
   })
