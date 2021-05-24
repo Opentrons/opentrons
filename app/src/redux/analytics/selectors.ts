@@ -142,7 +142,7 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
     const pipettes = getAttachedPipettes(state, robot.name)
     const settings = getRobotSettings(state, robot.name)
 
-    const robotAnalyticsData = settings.reduce<RobotAnalyticsData>(
+    return settings.reduce<RobotAnalyticsData>(
       (result, setting) => ({
         ...result,
         [`${FF_PREFIX}${setting.id}`]: !!setting.value,
@@ -154,8 +154,6 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
         robotRightPipette: pipettes.right?.model || '',
       }
     )
-
-    return robotAnalyticsData
   }
 
   return null
