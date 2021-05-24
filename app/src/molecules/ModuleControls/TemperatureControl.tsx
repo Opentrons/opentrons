@@ -160,15 +160,16 @@ function getModuleTemperatureRanges(
   model: ModuleModel,
   isSecondaryTemp: boolean
 ): TemperatureRanges {
-  if (isSecondaryTemp && TEMPERATURE_RANGES[model]?.secondary) {
-    return TEMPERATURE_RANGES[model]?.secondary as TemperatureRanges
+  if (isSecondaryTemp && TEMPERATURE_RANGES[model].secondary) {
+    return TEMPERATURE_RANGES[model].secondary as TemperatureRanges
   } else {
-    return TEMPERATURE_RANGES[model]?.primary as TemperatureRanges
+    return TEMPERATURE_RANGES[model].primary as TemperatureRanges
   }
 }
 
+// @ts-expect-error key should be optional as not all models are present
 const TEMPERATURE_RANGES: {
-  [model in ModuleModel]?: {
+  [model in ModuleModel]: {
     primary: TemperatureRanges
     secondary?: TemperatureRanges | null
   }
