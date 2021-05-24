@@ -4,7 +4,7 @@ import reactRenderer from 'remark-react'
 import styles from './styles.css'
 
 export interface ReleaseNotesProps {
-  source: string | null | undefined
+  source?: string | null
 }
 
 const renderer = remark().use(reactRenderer, {
