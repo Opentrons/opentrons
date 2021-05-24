@@ -344,10 +344,11 @@ export function makeEvent(
                     name: `${instrData.sessionType}TipRackSelect`,
                     properties: {
                       pipetteModel: instrData.pipetteModel,
-                      tipRackDisplayName:
-                        'tiprackDefinition' in commandData
-                          ? commandData.tiprackDefinition.metadata.displayName
-                          : null,
+                      // @ts-expect-error TODO: use in operator and add test case for no tiprackDefiniton on CommandData
+                      tipRackDisplayName: commandData.tiprackDefinition
+                        ? // @ts-expect-error TODO: use in operator and add test case for no tiprackDefiniton on CommandData
+                          commandData.tiprackDefinition.metadata.displayName
+                        : null,
                     },
                   }
                 : null
