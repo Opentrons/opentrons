@@ -44,8 +44,8 @@ This accomplishes the same thing as the following basic commands:
         p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
 
         p300.pick_up_tip()
-        p300.aspirate(100, plate.wells('A1'))
-        p300.dispense(100, plate.wells('B1'))
+        p300.aspirate(100, plate.well('A1'))
+        p300.dispense(100, plate.well('B1'))
         p300.return_tip()
 
 ******************************
@@ -74,7 +74,7 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
 
         # range() starts at 0 and stops before 8, creating a range of 0-7
         for i in range(8):
-            p300.distribute(200, reservoir.wells()[i], plate.rows()[i])
+            p300.distribute(200, reservoir.well()[i], plate.rows()[i])
 
 ******************************
 
@@ -99,7 +99,7 @@ The OT-2 pipettes can do some things that a human cannot do with a pipette, like
 
         p300.pick_up_tip()
 
-        for well in reservoir.wells()[:4]:
+        for well in reservoir.well()[:4]:
             p300.aspirate(35, well)
             p300.air_gap(10)
         
@@ -128,13 +128,13 @@ This example first spreads a diluent to all wells of a plate. It then dilutes 8 
         tiprack_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
         reservoir = protocol.load_labware('usascientific_12_reservoir_22ml', 4)
         p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1, tiprack_2])
-        p300.distribute(50, reservoir['A12'], plate.wells())  # dilutent
+        p300.distribute(50, reservoir['A12'], plate.well())  # dilutent
 
         # loop through each row
         for i in range(8):
 
             # save the source well and destination column to variables
-            source = reservoir.wells()[i]
+            source = reservoir.well()[i]
             row = plate.rows()[i]
 
             # transfer 30uL of source to first well in column
@@ -183,4 +183,4 @@ This example deposits various volumes of liquids into the same plate of wells an
             89, 90, 91, 92, 93, 94, 95, 96
           ]
 
-        p300.distribute(water_volumes, reservoir['A12'], plate.wells())
+        p300.distribute(water_volumes, reservoir['A12'], plate.well())
