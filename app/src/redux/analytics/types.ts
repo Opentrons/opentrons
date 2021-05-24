@@ -32,7 +32,7 @@ export type RobotAnalyticsData = {
 } & {
   // feature flags
   // e.g. robotFF_settingName
-  [ffName: string]: boolean | string
+  [ffName: string]: boolean
 }
 
 export interface BuildrootAnalyticsData {

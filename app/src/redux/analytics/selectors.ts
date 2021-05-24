@@ -142,11 +142,13 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
     const pipettes = getAttachedPipettes(state, robot.name)
     const settings = getRobotSettings(state, robot.name)
 
+    // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
     return settings.reduce<RobotAnalyticsData>(
       (result, setting) => ({
         ...result,
         [`${FF_PREFIX}${setting.id}`]: !!setting.value,
       }),
+      // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
       {
         robotApiServerVersion: getRobotApiVersion(robot) || '',
         robotSmoothieVersion: getRobotFirmwareVersion(robot) || '',
