@@ -46,7 +46,7 @@ describe('analytics hooks', () => {
       return <></>
     }
 
-    const render = (): ReturnType<typeof mount> => {
+    const render = () => {
       return mount(<TestTrackEvent />, {
         wrappingComponent: Provider,
         wrappingComponentProps: {
