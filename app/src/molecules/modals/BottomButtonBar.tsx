@@ -27,7 +27,8 @@ export function BottomButtonBar(props: Props): JSX.Element {
           <OutlineButton
             {...button}
             key={index}
-            className={cx(styles.bottom_button, button?.className)}
+            // @ts-expect-error button is possibly null
+            className={cx(styles.bottom_button, button.className)}
           />
         ))}
       </div>
