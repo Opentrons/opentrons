@@ -14,4 +14,15 @@ class SessionRunner:
         created_at: datetime,
         input_data: CreateSessionInputData,
     ) -> SessionInput:
+        """Handle an input event.
+
+        Arguments:
+            session_id: Session the input is targeting.
+            input_id: ID to assign to the input event resource.
+            created_at: Timestamp to assign to the input event resource.
+            input_data: Input event payload
+
+        Returns:
+            A resource model representing the input event.
+        """
         raise NotImplementedError()
