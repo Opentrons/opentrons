@@ -5,6 +5,7 @@ import { AlertItem } from '@opentrons/components'
 import {
   LabwareFields,
   IRREGULAR_LABWARE_ERROR,
+  LOOSE_TIP_FIT_ERROR,
   LINK_CUSTOM_LABWARE_FORM,
 } from '../fields'
 import { LinkOut } from './LinkOut'
@@ -30,6 +31,20 @@ export const IrregularLabwareAlert = (): JSX.Element => (
   />
 )
 
+// make LOOSE_TIP_FIT_ERROR alert here
+export const LooseTipFitAlert = (): JSX.Element => (
+  <AlertItem
+    key={LOOSE_TIP_FIT_ERROR}
+    type="error"
+    title={
+      <>
+        If your tip does not fit when placed by hand then it is not a good
+        candidate for this pipette on the OT-2.
+      </>
+    }
+  />
+)
+
 export const FormAlerts = (props: Props): JSX.Element | null => {
   const { fieldList, touched, errors } = props
 
@@ -41,11 +56,14 @@ export const FormAlerts = (props: Props): JSX.Element | null => {
   return (
     <>
       {allErrors.map(error => {
+        if (error === LOOSE_TIP_FIT_ERROR) {
+          return <LooseTipFitAlert key={error} />
+        }
         if (error === IRREGULAR_LABWARE_ERROR) {
           return <IrregularLabwareAlert key={error} />
         }
         return <AlertItem key={error} type="warning" title={error} />
-      })}{' '}
+      })}
     </>
   )
 }

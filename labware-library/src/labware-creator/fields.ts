@@ -18,6 +18,8 @@ export const DISPLAY_VOLUME_UNITS = 'µL'
 // magic string for all validation errors that direct user away to the labware request form
 export const IRREGULAR_LABWARE_ERROR = 'IRREGULAR_LABWARE_ERROR'
 
+export const LOOSE_TIP_FIT_ERROR = 'LOOSE_TIP_FIT_ERROR'
+
 export const LINK_CUSTOM_LABWARE_FORM =
   'https://opentrons-ux.typeform.com/to/xi8h0W'
 
@@ -70,6 +72,11 @@ export type BooleanString = 'true' | 'false' // TODO IMMEDIATELY revisit
 export const yesNoOptions = [
   { name: 'Yes', value: 'true' },
   { name: 'No', value: 'false' },
+]
+
+export const snugLooseOptions = [
+  { name: 'Snug', value: 'snug' },
+  { name: 'Loose', value: 'loose' },
 ]
 
 export interface LabwareFields {
@@ -368,6 +375,7 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   tubeRackInsertLoadName: 'Which tube rack insert?',
   aluminumBlockType: 'Which aluminum block?',
   aluminumBlockChildType: 'What labware is on top of your aluminum block?',
+  handPlacedTipFit: 'Fit',
   homogeneousWells: 'Are all your wells the same shape and size?',
   footprintXDimension: 'Length',
   footprintYDimension: 'Width',
