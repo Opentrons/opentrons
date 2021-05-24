@@ -85,6 +85,7 @@ export interface LabwareFields {
   aluminumBlockType: string | null | undefined // eg, '24well' or '96well'
   aluminumBlockChildType: string | null | undefined
 
+  handPlacedTipFit: string | null | undefined
   // tubeRackSides: string[], // eg, []
   footprintXDimension: string | null | undefined
   footprintYDimension: string | null | undefined
@@ -132,6 +133,7 @@ export interface ProcessedLabwareFields {
   tubeRackInsertLoadName: string
   aluminumBlockType: string
   aluminumBlockChildType: string | null
+  handPlacedTipFit: string | null
 
   // tubeRackSides: string[], // eg, []
   footprintXDimension: number
@@ -332,6 +334,7 @@ export const getDefaultFormState = (): LabwareFields => ({
   aluminumBlockType: null,
   aluminumBlockChildType: null,
 
+  handPlacedTipFit: null,
   // tubeRackSides: [],
   footprintXDimension: null,
   footprintYDimension: null,

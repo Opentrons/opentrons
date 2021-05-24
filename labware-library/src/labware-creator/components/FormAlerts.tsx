@@ -31,7 +31,6 @@ export const IrregularLabwareAlert = (): JSX.Element => (
   />
 )
 
-// make LOOSE_TIP_FIT_ERROR alert here
 export const LooseTipFitAlert = (): JSX.Element => (
   <AlertItem
     key={LOOSE_TIP_FIT_ERROR}
