@@ -101,31 +101,23 @@ export function CalibrateTipLengthControl({
         dispatchedAction.type === Sessions.ENSURE_SESSION &&
         dispatchedAction.payload.sessionType === sessionType
       ) {
-        createRequestId.current =
-          'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
-            : null
+        // @ts-expect-error TODO: account for possible absence of requestId on meta
+        createRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
       ) {
-        jogRequestId.current =
-          'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
-            : null
+        // @ts-expect-error TODO: account for possible absence of requestId on meta
+        jogRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
           dispatchedAction.payload.command.command
         )
       ) {
-        trackedRequestId.current =
-          'meta' in dispatchedAction &&
-          'requestId' in dispatchedAction.meta &&
-          dispatchedAction.meta.requestId != null
-            ? dispatchedAction.meta.requestId
-            : null
+        // @ts-expect-error TODO: account for possible absence of meta on action, requestId on meta
+        trackedRequestId.current = dispatchedAction.meta.requestId
       }
     }
   )
