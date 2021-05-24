@@ -41,7 +41,8 @@ export function trackEvent(
   log.debug('Trackable event', { event, optedIn })
   if (MIXPANEL_ID && optedIn) {
     if (event.superProperties) mixpanel.register(event.superProperties)
-    if ('name' in event) mixpanel.track(event.name, event.properties)
+    // @ts-expect-error TODO protect for no name on event and add test case
+    if (event.name) mixpanel.track(event.name, event.properties)
   }
 }
 
