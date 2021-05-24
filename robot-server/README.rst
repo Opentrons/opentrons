@@ -65,12 +65,14 @@ The **Opentrons** application will automatically discover a locally running robo
 ***************
 Simulators
 ***************
-`make dev` or will run the robot-server with simple software simulations of the Smoothie and magnetic, temperature, and thermocycler modules.
+Simulation mode will run the robot-server with simple software simulations of the Smoothie and magnetic, temperature, and thermocycler modules. This mode is ideal for rapid testing as the GCODE communication layer is bypassed.
+
+- `make -C robot-server dev`
 
 ***************
 Emulators
 ***************
-Using the emulation mode will have the robot server communicate to the emulation application. In this mode, the robot server is running as it would on the OT-2.
+Using the emulation mode will have the robot server send GCODE commands to a running emulation application. In this mode, the robot server is running exactly as it would on the OT-2.
 
 This requires two steps. Enter these commands from the opentrons directory:
 
