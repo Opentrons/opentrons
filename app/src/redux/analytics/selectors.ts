@@ -208,7 +208,8 @@ export function getAnalyticsPipetteCalibrationData(
     return {
       calibrationExists: Boolean(pipcal),
       markedBad: pipcal?.status?.markedBad ?? false,
-      pipetteModel: pip?.model ?? '',
+      // @ts-expect-error protect for cases where model is not on pip
+      pipetteModel: pip.model,
     }
   }
   return null
@@ -228,27 +229,24 @@ export function getAnalyticsTipLengthCalibrationData(
     return {
       calibrationExists: Boolean(tipcal),
       markedBad: tipcal?.status?.markedBad ?? false,
-      pipetteModel: pip?.model ?? '',
+      // @ts-expect-error protect for cases where model is not on pip
+      pipetteModel: pip.model,
     }
   }
   return null
 }
 
 function getPipetteModels(state: State, robotName: string): ModelsByMount {
-  const attachedPipettesEntries = Object.entries(
+  // @ts-expect-error ensure that both mount keys exist on returned object
+  return Object.entries(
     getAttachedPipettes(state, robotName)
-  )
-
-  const modelsByMount = attachedPipettesEntries.reduce<ModelsByMount>(
-    (obj, [mount, pipData]): ModelsByMount => {
-      if (pipData != null) {
-        obj[mount as Mount] = pick(pipData, ['model'])
-      }
-      return obj
-    },
-    { left: null, right: null }
-  )
-  return modelsByMount
+  ).reduce<ModelsByMount>((obj, [mount, pipData]): ModelsByMount => {
+    if (pipData) {
+      obj[mount as Mount] = pick(pipData, ['model'])
+    }
+    return obj
+    // @ts-expect-error ensure that both mount keys exist on returned object
+  }, {})
 }
 
 function getCalibrationCheckData(
