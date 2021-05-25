@@ -23,13 +23,8 @@ const log = createLogger(__filename)
 
 const sendActionToShellEpic: Epic = action$ =>
   action$.pipe(
-    filter<Action>(
-      a =>
-        'meta' in a &&
-        a.meta != null &&
-        'shell' in a.meta &&
-        a.meta.shell != null
-    ),
+    // @ts-expect-error protect against absent meta key on action
+    filter<Action>(a => a.meta != null && a.meta.shell != null && a.meta.shell),
     tap<Action>((shellAction: Action) =>
       ipcRenderer.send('dispatch', shellAction)
     ),
