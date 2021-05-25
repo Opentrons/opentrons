@@ -1,7 +1,6 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
 import isEqual from 'lodash/isEqual'
-import { when } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import {
   getDefaultFormState,
@@ -12,17 +11,17 @@ import { HandPlacedTipFit } from '../../sections/HandPlacedTipFit'
 import { FormAlerts } from '../../FormAlerts'
 import { Dropdown } from '../../Dropdown'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import { getTipFitAlerts } from '../../utils/getTipFitAlerts'
+import { TipFitAlerts } from '../../TipFitAlerts'
 
 jest.mock('../../Dropdown')
 jest.mock('../../FormAlerts')
-jest.mock('../../utils/getTipFitAlerts')
+jest.mock('../../TipFitAlerts')
 
 const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
 const dropdownMock = Dropdown as jest.MockedFunction<typeof Dropdown>
 
-const getTipFitAlertsMock = getTipFitAlerts as jest.MockedFunction<
-  typeof getTipFitAlerts
+const tipFitAlertsMock = TipFitAlerts as jest.MockedFunction<
+  typeof TipFitAlerts
 >
 
 let formikConfig: FormikConfig<LabwareFields>
@@ -58,9 +57,18 @@ describe('HandPlacedTipFit', () => {
       }
     })
 
-    when(getTipFitAlertsMock)
-      .expectCalledWith(formikConfig.initialValues, {})
-      .mockReturnValue(<div>mock getTipFitAlertsMock alerts</div>)
+    tipFitAlertsMock.mockImplementation(args => {
+      if (
+        isEqual(args, {
+          values: formikConfig.initialValues,
+          touched: {},
+        })
+      ) {
+        return <div>mock getTipFitAlertsMock alerts</div>
+      } else {
+        return <div></div>
+      }
+    })
   })
 
   afterEach(() => {

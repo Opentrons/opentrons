@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { snugLooseOptions } from '../../fields'
-import { getTipFitAlerts } from '../utils/getTipFitAlerts'
 import { FormAlerts } from '../FormAlerts'
+import { TipFitAlerts } from '../TipFitAlerts'
 import { Dropdown } from '../Dropdown'
 import { SectionBody } from './SectionBody'
 
@@ -43,7 +43,7 @@ export const HandPlacedTipFit = (): JSX.Element | null => {
               errors={errors}
               fieldList={fieldList}
             />
-            {getTipFitAlerts(values, touched)}
+            <TipFitAlerts values={values} touched={touched} />
             <Content />
           </>
         </SectionBody>
