@@ -18,18 +18,18 @@ from opentrons.config.types import RobotConfig
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-from opentrons.drivers.rpi_drivers import types as usb_types, usb_simulator
+from opentrons.drivers.rpi_drivers import usb_simulator
 
 from . import modules
-from .execution_manager import ExecutionManager
 from .types import BoardRevision, Axis
+from .module_control import AttachedModulesControl
 
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName
     from .dev_types import (
-        RegisterModules, AttachedInstrument,
-        AttachedInstruments, InstrumentSpec, InstrumentHardwareConfigs)
+        AttachedInstrument, AttachedInstruments,
+        InstrumentSpec, InstrumentHardwareConfigs)
     from opentrons.drivers.rpi_drivers.dev_types\
         import GPIODriverLike
 
@@ -151,10 +151,24 @@ class Simulator:
         self._strict_attached = bool(strict_attached_instruments)
         self._board_revision = BoardRevision.OG
         self._usb = usb_simulator.USBBusSimulator(self._board_revision)
+        # TODO (lc 05-12-2021) In a follow-up refactor that pulls the execution
+        # manager responsbility into the controller/backend itself as opposed
+        # to the hardware api controller.
+        self._module_controls: Optional[AttachedModulesControl] = None
 
     @property
     def gpio_chardev(self) -> GPIODriverLike:
         return self._gpio_chardev
+
+    @property
+    def module_controls(self) -> AttachedModulesControl:
+        if not self._module_controls:
+            raise AttributeError('Module controls not found.')
+        return self._module_controls
+
+    @module_controls.setter
+    def module_controls(self, module_controls: AttachedModulesControl):
+        self._module_controls = module_controls
 
     def update_position(self) -> Dict[str, float]:
         return self._position
@@ -255,37 +269,18 @@ class Simulator:
     def set_active_current(self, axis_currents: Dict[Axis, float]):
         pass
 
-    async def watch_modules(self, register_modules: RegisterModules):
+    async def watch(self):
         new_mods_at_ports = [
             modules.ModuleAtPort(
                 port=f'/dev/ot_module_sim_{mod}{str(idx)}', name=mod)
             for idx, mod
             in enumerate(self._stubbed_attached_modules)]
-        await register_modules(new_mods_at_ports=new_mods_at_ports)
+        await self.module_controls.register_modules(
+            new_mods_at_ports=new_mods_at_ports)
 
     @contextmanager
     def save_current(self):
         yield
-
-    async def build_module(
-            self,
-            port: str,
-            usb_port: usb_types.USBPort,
-            model: str,
-            interrupt_callback: modules.InterruptCallback,
-            loop: asyncio.AbstractEventLoop,
-            execution_manager: ExecutionManager,
-            sim_model: str = None
-    ) -> modules.AbstractModule:
-        return await modules.build(
-            port=port,
-            usb_port=usb_port,
-            which=model,
-            simulating=True,
-            interrupt_callback=interrupt_callback,
-            loop=loop,
-            execution_manager=execution_manager,
-            sim_model=sim_model)
 
     @property
     def axis_bounds(self) -> Dict[Axis, Tuple[float, float]]:

@@ -34,30 +34,32 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
 
   return (
     <div className={fieldStyles.field_wrapper}>
-      <div className={fieldStyles.field_label}>{LABELS[props.name]}</div>
-      <Field name={props.name}>
-        {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
-        {({ field, form }) => (
-          <SelectField
-            name={field.name}
-            caption={props.caption}
-            value={field.value}
-            options={options}
-            onLoseFocus={name => {
-              reportFieldEdit({ value: field.value, name })
-              form.setFieldTouched(name)
-            }}
-            onValueChange={
-              props.onValueChange ||
-              ((name, value) => form.setFieldValue(name, value))
-            }
-            formatOptionLabel={({ value, label }) => {
-              const option = props.options.find(opt => opt.value === value)
-              return option ? <OptionLabel {...option} /> : null
-            }}
-          />
-        )}
-      </Field>
+      <label className={fieldStyles.field_label}>
+        {LABELS[props.name]}
+        <Field name={props.name}>
+          {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
+          {({ field, form }) => (
+            <SelectField
+              name={field.name}
+              caption={props.caption}
+              value={field.value}
+              options={options}
+              onLoseFocus={name => {
+                reportFieldEdit({ value: field.value, name })
+                form.setFieldTouched(name)
+              }}
+              onValueChange={
+                props.onValueChange ||
+                ((name, value) => form.setFieldValue(name, value))
+              }
+              formatOptionLabel={({ value, label }) => {
+                const option = props.options.find(opt => opt.value === value)
+                return option ? <OptionLabel {...option} /> : null
+              }}
+            />
+          )}
+        </Field>
+      </label>
     </div>
   )
 }

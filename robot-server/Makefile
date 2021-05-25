@@ -44,6 +44,9 @@ ot_sources := $(ot_py_sources)
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'robot_server/**/.mypy_cache'
 
+# Uvicorn command to run the robot server in dev mode.
+run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --reload
+
 .PHONY: all
 all: clean wheel
 
@@ -80,7 +83,12 @@ lint: $(ot_py_sources)
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
-	$(pipenv) run uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --reload
+	$(pipenv) run $(run_dev)
+
+.PHONY: dev-with-emulator
+dev-with-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator.env
+dev-with-emulator:
+	$(pipenv) run $(run_dev)
 
 .PHONY: local-shell
 local-shell:

@@ -21,7 +21,7 @@ async def magdeck(loop: asyncio.BaseEventLoop, emulation_app) -> MagDeck:
 
 def test_device_info(magdeck: MagDeck):
     assert magdeck.device_info == {
-        'model': 'magdeck_emulator', 'serial': 'fake_serial', 'version': '1'
+        'model': 'mag_deck_v20', 'serial': 'magnetic_emulator', 'version': '2.0.0'
     }
 
 

@@ -21,9 +21,9 @@ GCODE_DEVICE_INFO = GCODES['DEVICE_INFO']
 GCODE_DISENGAGE = GCODES['DISENGAGE']
 GCODE_PROGRAMMING_MODE = GCODES['PROGRAMMING_MODE']
 
-SERIAL = "fake_serial"
-MODEL = "temp_emulator"
-VERSION = 1
+SERIAL = "temperature_emulator"
+MODEL = "temp_deck_v20"
+VERSION = "v2.0.1"
 
 
 class TempDeckEmulator(AbstractEmulator):
@@ -49,15 +49,13 @@ class TempDeckEmulator(AbstractEmulator):
             temperature = command.params['S']
             assert isinstance(temperature, float),\
                 f"invalid temperature '{temperature}'"
-            self._set_target(temperature)
+            self.target_temp.val = temperature
+            self.current_temp = self.target_temp.val
         elif command.gcode == GCODE_DISENGAGE:
-            self._set_target(util.TEMPERATURE_ROOM)
+            self.target_temp.val = None
+            self.current_temp = util.TEMPERATURE_ROOM
         elif command.gcode == GCODE_DEVICE_INFO:
             return f"serial:{SERIAL} model:{MODEL} version:{VERSION}"
         elif command.gcode == GCODE_PROGRAMMING_MODE:
             pass
         return None
-
-    def _set_target(self, target_temp: float) -> None:
-        self.target_temp.val = target_temp
-        self.current_temp = self.target_temp.val

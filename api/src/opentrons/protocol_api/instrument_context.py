@@ -12,7 +12,7 @@ from opentrons.hardware_control.types import PipettePair
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.api_support.instrument import \
     validate_blowout_location, tip_length_for, validate_tiprack, \
-    determine_drop_target
+    determine_drop_target, validate_can_aspirate, validate_can_dispense
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.util import (
@@ -123,7 +123,7 @@ class InstrumentContext(CommandPublisher):
     def default_speed(self, speed: float):
         self._implementation.set_default_speed(speed)
 
-    @requires_version(2, 0)
+    @requires_version(2, 0)  # noqa: C901
     def aspirate(self,
                  volume: Optional[float] = None,
                  location: Union[types.Location, Well] = None,
@@ -183,6 +183,8 @@ class InstrumentContext(CommandPublisher):
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
+        if self.api_version >= APIVersion(2, 11):
+            validate_can_aspirate(dest)
 
         if self.current_volume == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -287,6 +289,8 @@ class InstrumentContext(CommandPublisher):
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
+        if self.api_version >= APIVersion(2, 11):
+            validate_can_dispense(loc)
 
         c_vol = self.current_volume if not volume else volume
 

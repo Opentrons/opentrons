@@ -104,3 +104,40 @@ def determine_drop_target(
         assert tr.is_tiprack
         z_height = return_height * tr.tip_length
         return location.top(-z_height)
+
+
+def validate_can_aspirate(location: types.Location) -> None:
+    """ Can one aspirate on the given `location` or not? This method is
+    pretty basic and will probably remain so (?) as the future holds neat
+    ambitions for how validation is implemented. And as robots become more
+    intelligent more rigorous testing will be possible
+
+    Args:
+        location: target for aspiration
+
+    Raises:
+        RuntimeError:
+    """
+    if _is_tiprack(location):
+        raise RuntimeError("Cannot aspirate a tiprack")
+
+
+def validate_can_dispense(location: types.Location) -> None:
+    """ Can one dispense to the given `location` or not? This method is
+    pretty basic and will probably remain so (?) as the future holds neat
+    ambitions for how validation is implemented. And as robots become more
+    intelligent more rigorous testing will be possible
+
+    Args:
+        location: target for dispense
+
+    Raises:
+        RuntimeError:
+    """
+    if _is_tiprack(location):
+        raise RuntimeError("Cannot dispense to a tiprack")
+
+
+def _is_tiprack(location: types.Location) -> bool:
+    labware = location.labware.as_labware()
+    return labware.parent and labware.parent.is_tiprack
