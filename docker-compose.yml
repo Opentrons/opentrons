@@ -2,6 +2,7 @@ version: "3"
 services:
   emulator:
     image: opentrons:latest
+    build .
     command: python3 -m opentrons.hardware_control.emulation.app
     ports:
      - "9996:9996"
