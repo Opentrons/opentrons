@@ -1,0 +1,16 @@
+.git
+.cache
+dist
+build
+
+./api-server
+./app
+./labware-library
+./node_modules
+./protocol-designer
+./discovery-client
+./coverage
+./components
+./app-shell
+./update-server
+./step-generation

@@ -1,0 +1,15 @@
+FROM python:3.7 as base
+RUN apt-get update && apt-get install -y pipenv
+
+FROM base AS api_build
+COPY shared-data shared-data
+COPY scripts scripts
+COPY LICENSE LICENSE
+COPY api api
+COPY notify-server notify-server
+COPY robot-server robot-server
+RUN pip install -e /api
+RUN cd /robot-server && pipenv lock --keep-outdated --requirements > requirements.txt
+RUN pip install -r /robot-server/requirements.txt
+
+
