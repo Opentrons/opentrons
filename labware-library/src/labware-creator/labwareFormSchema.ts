@@ -54,13 +54,13 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = Yup.object(
     labwareType: requiredString(LABELS.labwareType).oneOf(
       labwareTypeOptions.map(o => o.value)
     ),
-    handPlacedTipFit: Yup.mixed().when('labwareType', {
+    handPlacedTipFit: Yup.string().when('labwareType', {
       is: 'tipRack',
       then: requiredString(LABELS.handPlacedTipFit).oneOf(
         ['snug'],
         LOOSE_TIP_FIT_ERROR
       ),
-      otherwise: Yup.mixed().nullable(),
+      otherwise: Yup.string().nullable(),
     }),
     tubeRackInsertLoadName: Yup.mixed().when('labwareType', {
       is: 'tubeRack',

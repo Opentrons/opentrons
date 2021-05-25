@@ -19,7 +19,6 @@ export interface Props {
 
 export const IrregularLabwareAlert = (): JSX.Element => (
   <AlertItem
-    key={IRREGULAR_LABWARE_ERROR}
     type="error"
     title={
       <>
@@ -33,7 +32,6 @@ export const IrregularLabwareAlert = (): JSX.Element => (
 
 export const LooseTipFitAlert = (): JSX.Element => (
   <AlertItem
-    key={LOOSE_TIP_FIT_ERROR}
     type="error"
     title={
       <>
