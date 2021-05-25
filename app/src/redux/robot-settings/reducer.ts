@@ -12,10 +12,9 @@ const INITIAL_ROBOT_STATE: PerRobotRobotSettingsState = {
 }
 
 export const robotSettingsReducer: Reducer<RobotSettingsState, Action> = (
-  state,
+  state = INITIAL_STATE,
   action
 ) => {
-  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_SETTINGS_SUCCESS:
     case Constants.UPDATE_SETTING_SUCCESS: {

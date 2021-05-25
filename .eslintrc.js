@@ -23,6 +23,7 @@ module.exports = {
     '@typescript-eslint/promise-function-async': 'off',
 
     // TODO(mc, 2021-01-29): fix these and remove warning overrides
+    '@typescript-eslint/default-param-last': 'warn',
     'dot-notation': 'warn',
     'lines-between-class-members': 'warn',
     'array-callback-return': 'warn',

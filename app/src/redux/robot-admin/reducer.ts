@@ -7,10 +7,9 @@ import type { RobotAdminState } from './types'
 const INITIAL_STATE: RobotAdminState = {}
 
 export const robotAdminReducer: Reducer<RobotAdminState, Action> = (
-  state,
+  state = INITIAL_STATE,
   action
 ) => {
-  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.RESTART_STATUS_CHANGED:
     case Constants.RESTART_FAILURE: {

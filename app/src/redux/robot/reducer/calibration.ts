@@ -83,10 +83,9 @@ const INITIAL_STATE: CalibrationState = {
 }
 
 export function calibrationReducer(
-  state: CalibrationState,
+  state: CalibrationState = INITIAL_STATE,
   action: Action
 ): CalibrationState {
-  state = state ?? INITIAL_STATE
   switch (action.type) {
     case 'robot:DISCONNECT_RESPONSE':
     case 'robot:REFRESH_SESSION':

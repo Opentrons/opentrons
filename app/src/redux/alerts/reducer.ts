@@ -11,8 +11,10 @@ const INITIAL_STATE = {
   ignored: [],
 }
 
-export const alertsReducer: Reducer<AlertsState, Action> = (state, action) => {
-  state = state ?? INITIAL_STATE
+export const alertsReducer: Reducer<AlertsState, Action> = (
+  state = INITIAL_STATE,
+  action
+) => {
   switch (action.type) {
     case Constants.ALERT_TRIGGERED: {
       const { active, ignored } = state

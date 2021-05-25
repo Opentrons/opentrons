@@ -26,10 +26,9 @@ const updateRobotState = (
 }
 
 export const robotControlsReducer: Reducer<RobotControlsState, Action> = (
-  state,
+  state = INITIAL_STATE,
   action
 ) => {
-  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_LIGHTS_SUCCESS:
     case Constants.UPDATE_LIGHTS_SUCCESS: {

@@ -28,10 +28,9 @@ export const initialSession = (
 })
 
 export const buildrootReducer: Reducer<BuildrootState, Action> = (
-  state,
+  state = INITIAL_STATE,
   action
 ) => {
-  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.BR_UPDATE_VERSION: {
       return { ...state, version: action.payload }

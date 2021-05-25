@@ -14,10 +14,9 @@ const INITIAL_PER_ROBOT_STATE: PerRobotSessionState = {
 }
 
 export const sessionReducer: Reducer<SessionState, Action> = (
-  state,
+  state = INITIAL_STATE,
   action
 ) => {
-  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.CREATE_SESSION_SUCCESS:
     case Constants.FETCH_SESSION_SUCCESS:

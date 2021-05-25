@@ -16,10 +16,9 @@ const INITIAL_STATE: ShellUpdateState = {
 
 // TODO(mc, 2020-01-07): move robot logs to own module and make this the root shell reducer
 export function shellUpdateReducer(
-  state: ShellUpdateState,
+  state: ShellUpdateState = INITIAL_STATE,
   action: Action
 ): ShellUpdateState {
-  state = state ?? INITIAL_STATE
   switch (action.type) {
     case 'shell:CHECK_UPDATE': {
       return { ...state, checking: true, error: null }

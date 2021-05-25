@@ -95,10 +95,9 @@ const INITIAL_STATE: SessionState = {
 }
 
 export function sessionReducer(
-  state: SessionState,
+  state: SessionState = INITIAL_STATE,
   action: Action
 ): SessionState {
-  state = state ?? INITIAL_STATE
   switch (action.type) {
     case 'robot:CONNECT_RESPONSE': {
       if (action.payload.error) return state

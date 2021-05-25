@@ -13,10 +13,9 @@ export const INITIAL_STATE: DiscoveryState = {
 }
 
 export const discoveryReducer: Reducer<DiscoveryState, Action> = (
-  state,
+  state = INITIAL_STATE,
   action
 ) => {
-  state = state ?? INITIAL_STATE
   switch (action.type) {
     case UI_INITIALIZED:
     case actions.DISCOVERY_START:

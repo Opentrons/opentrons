@@ -12,10 +12,9 @@ const INITIAL_PIPETTES_STATE: PerRobotPipettesState = {
 }
 
 export const pipettesReducer: Reducer<PipettesState, Action> = (
-  state,
+  state = INITIAL_STATE,
   action
 ) => {
-  state = state ?? INITIAL_STATE
   switch (action.type) {
     case Constants.FETCH_PIPETTES_SUCCESS: {
       const { robotName, pipettes } = action.payload
