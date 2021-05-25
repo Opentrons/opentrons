@@ -57,6 +57,8 @@ export type SessionState = {
   remoteTimeCompensation: number | null,
   startTime: ?number,
   runTime: number,
+  pausedTime: number,
+  pausedDuration: number,
   apiLevel: [number, number] | null,
   capabilities: Array<string>,
 }
@@ -104,6 +106,8 @@ const INITIAL_STATE: SessionState = {
   remoteTimeCompensation: null,
   startTime: null,
   runTime: 0,
+  pausedTime: 0,
+  pausedDuration: 0,
   apiLevel: null,
 }
 
@@ -111,6 +115,7 @@ export function sessionReducer(
   state: SessionState = INITIAL_STATE,
   action: Action
 ): SessionState {
+  console.log(`sessionReducer ${action.type}, action=`, action);
   switch (action.type) {
     case 'robot:CONNECT_RESPONSE': {
       if (action.payload.error) return state
@@ -220,10 +225,15 @@ function handleSessionUpdate(
 }
 
 function handleSessionInProgress(state: SessionState): SessionState {
+  console.log('handleSessionInProgress', state);
   return {
     ...state,
+    // todo: ce - think we want to pick up where we left off?
+    pausedDuration: 0,
+    // todo: ce - think we want to pick up where we left off?
     runTime: 0,
-    startTime: null,
+    // todo: ce - think we want to pick up where we left off?
+    startTime: Date.now(),
     remoteTimeCompensation: null,
     sessionRequest: { inProgress: true, error: null },
   }
@@ -262,7 +272,7 @@ function handleInvalidFile(
 }
 
 function handleRun(state: SessionState, action: any): SessionState {
-  return { ...state, runTime: 0, runRequest: { inProgress: true, error: null } }
+  return { ...state, runTime: Date.now(), runRequest: { inProgress: true, error: null } }
 }
 
 function handleRunResponse(state: SessionState, action: any): SessionState {
@@ -280,7 +290,11 @@ function handleTickRunTime(state: SessionState, action: any): SessionState {
 }
 
 function handlePause(state: SessionState, action: any): SessionState {
-  return { ...state, pauseRequest: { inProgress: true, error: null } }
+  return { ...state,
+    pausedTime: Date.now(),
+    pauseRequest: { inProgress: true, error: null },
+    runTime: Date.now()
+  }
 }
 
 function handlePauseResponse(state: SessionState, action: any): SessionState {
@@ -294,7 +308,13 @@ function handlePauseResponse(state: SessionState, action: any): SessionState {
 }
 
 function handleResume(state: SessionState, action: any): SessionState {
-  return { ...state, resumeRequest: { inProgress: true, error: null } }
+  const pausedDuration = state.pausedTime ? Date.now() - state.pausedTime : 0;
+  return { ...state,
+    pausedDuration: state.pausedDuration + pausedDuration,
+    pausedTime: 0,
+    resumeRequest: { inProgress: true, error: null },
+    runTime: Date.now()
+  }
 }
 
 function handleResumeResponse(state: SessionState, action: any): SessionState {

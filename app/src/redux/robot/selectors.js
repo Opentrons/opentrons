@@ -208,6 +208,7 @@ const getStartTimeMs = (state: State): number | null => {
     return null
   }
 
+  console.log(`getStartTimeMs ${remoteTimeCompensation}`);
   return startTime + remoteTimeCompensation
 }
 
@@ -218,15 +219,13 @@ export const getStartTime: (state: State) => string | null = createSelector(
   }
 )
 
-export const getRunSeconds: State => number = createSelector(
-  getStartTimeMs,
-  (state: State) => session(state).runTime,
-  (startTime: ?number, runTime: ?number): number => {
-    return runTime && startTime && runTime > startTime
-      ? Math.floor((runTime - startTime) / 1000)
-      : 0
-  }
-)
+export function getRunSeconds(state: State): number {
+  const {startTime, runTime, pausedDuration} = session(state);
+  console.log('getRunSeconds: ', {startTime, runTime, pausedDuration});
+  return runTime && startTime && runTime > startTime
+    ? Math.floor((runTime - startTime - pausedDuration) / 1000)
+    : 0
+}
 
 export function formatSeconds(runSeconds: number): string {
   const hours = padStart(`${Math.floor(runSeconds / 3600)}`, 2, '0')
