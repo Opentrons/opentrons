@@ -85,15 +85,15 @@ describe('HandPlacedTipFit', () => {
   it('should render alerts and dropdown when tiprack is selected', () => {
     formikConfig.initialValues.labwareType = 'tipRack'
     render(wrapInFormik(<HandPlacedTipFit />, formikConfig))
-    expect(screen.getByText('Hand-Placed Tip Fit'))
+    expect(screen.getByText('Hand-Placed Tip Fit')).toBeTruthy()
     expect(
       screen.getByText(
         'Place the tip you wish to use on the pipette you wish to use it on. Give the tip a wiggle to check the fit.'
       )
-    )
-    expect(screen.getByText('mock alerts'))
-    expect(screen.getByText('handPlacedTipFit dropdown field'))
-    expect(screen.getByText('mock getTipFitAlertsMock alerts'))
+    ).toBeTruthy()
+    expect(screen.getByText('mock alerts')).toBeTruthy()
+    expect(screen.getByText('handPlacedTipFit dropdown field')).toBeTruthy()
+    expect(screen.getByText('mock getTipFitAlertsMock alerts')).toBeTruthy()
   })
 
   it('should not render when non tiprack labware selected', () => {
