@@ -18,18 +18,19 @@ class ConnectionHandler:
     async def __call__(self, reader: asyncio.StreamReader,
                        writer: asyncio.StreamWriter) -> None:
         """New connection callback."""
-        logger.debug("Connected.")
+        emulator_name = self._emulator.__class__.__name__
+        logger.debug("%s Connected.", emulator_name)
         while True:
             line = await reader.readuntil(self._emulator.get_terminator())
-            logger.debug("Received: %s", line)
+            logger.debug("%s Received: %s", emulator_name, line)
             try:
                 response = self._emulator.handle(line.decode().strip())
                 if response:
                     response = f'{response}\r\n'
-                    logger.debug("Sending: %s", response)
+                    logger.debug("%s Sending: %s", emulator_name, response)
                     writer.write(response.encode())
             except Exception as e:
-                logger.exception("exception")
+                logger.exception("%s exception", emulator_name)
                 writer.write(f'Error: {str(e)}\r\n'.encode())
 
             writer.write(self._emulator.get_ack())

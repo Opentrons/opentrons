@@ -1,6 +1,7 @@
 import asyncio
 
 import pytest
+from opentrons import _find_smoothie_file
 from opentrons.config.robot_configs import build_config
 from opentrons.hardware_control import Controller
 from opentrons.hardware_control.emulation.app import SMOOTHIE_PORT
@@ -17,7 +18,8 @@ async def smoothie(loop: asyncio.BaseEventLoop, emulation_app) -> Controller:
 
 def test_get_fw_version(smoothie: Controller):
     """It should be set."""
-    assert smoothie._cached_fw_version == 'EMULATOR'
+    _, fw_version = _find_smoothie_file()
+    assert smoothie._cached_fw_version == fw_version
 
 
 def test_get_attached_instruments(smoothie: Controller):

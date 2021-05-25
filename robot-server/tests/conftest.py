@@ -102,7 +102,7 @@ def run_server(request_session, server_temp_directory):
                            "--source", "robot_server",
                            "-m", "uvicorn", "robot_server:app",
                            "--host", "localhost", "--port", "31950"],
-                          env={'OT_ROBOT_SERVER_DOT_ENV_PATH': "test.env",
+                          env={'OT_ROBOT_SERVER_DOT_ENV_PATH': "dev.env",
                                'OT_API_CONFIG_DIR': server_temp_directory},
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE) as proc:

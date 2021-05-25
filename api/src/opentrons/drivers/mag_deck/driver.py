@@ -319,9 +319,7 @@ class MagDeck:
 
     def _connect_to_port(self, port=None):
         try:
-            mag_deck = environ.get('OT_MAG_DECK_ID')
             self._connection = serial_communication.connect(
-                device_name=mag_deck,
                 port=port,
                 baudrate=MAG_DECK_BAUDRATE
             )

@@ -164,6 +164,11 @@ push: push-no-restart
 simulate:
 	-$(python) -m opentrons.simulate -l $(sim_log_level) $(simfile)
 
+# Launch the emulator application.
+.PHONY: emulator
+emulator:
+	-$(python) -m opentrons.hardware_control.emulation.app
+
 .PHONY: deploy
 deploy: wheel
 	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))

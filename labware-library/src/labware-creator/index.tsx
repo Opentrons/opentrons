@@ -3,24 +3,23 @@ import assert from 'assert'
 import Ajv from 'ajv'
 import cx from 'classnames'
 import * as React from 'react'
-import { Formik, FormikTouched } from 'formik'
-import mapValues from 'lodash/mapValues'
+import { Formik } from 'formik'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
 import { AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import { makeMaskToDecimal, maskLoadName } from './fieldMasks'
+import { maskLoadName } from './fieldMasks'
 import {
   aluminumBlockAutofills,
   aluminumBlockChildTypeOptions,
   aluminumBlockTypeOptions,
   getDefaultFormState,
-  getImplicitAutofillValues,
   tubeRackAutofills,
   tubeRackInsertOptions,
 } from './fields'
+import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
 import { labwareDefToFields } from './labwareDefToFields'
 import { labwareFormSchema } from './labwareFormSchema'
 import {
@@ -43,15 +42,17 @@ import { TextField } from './components/TextField'
 import { ImportErrorModal } from './components/ImportErrorModal'
 import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
 import { UploadExisting } from './components/sections/UploadExisting'
-import { Regularity } from './components/sections/Regularity'
 
+import { CustomTiprackWarning } from './components/sections/CustomTiprackWarning'
+import { Regularity } from './components/sections/Regularity'
 import { Footprint } from './components/sections/Footprint'
 import { Height } from './components/sections/Height'
 import { Grid } from './components/sections/Grid'
 import { Volume } from './components/sections/Volume'
 import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
 import { WellBottomAndDepth } from './components/sections/WellBottomAndDepth'
-import { XYSpacingImg, XYOffsetImg } from './components/diagrams'
+import { WellSpacing } from './components/sections/WellSpacing'
+import { GridOffset } from './components/sections/GridOffset'
 
 import styles from './styles.css'
 
@@ -65,57 +66,8 @@ import type {
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
 
-const maskTo2Decimal = makeMaskToDecimal(2)
-
-interface MakeAutofillOnChangeArgs {
-  name: keyof LabwareFields
-  autofills: Record<string, Partial<LabwareFields>>
-  values: LabwareFields
-  touched: Object
-  setTouched: (touched: FormikTouched<LabwareFields>) => unknown
-  setValues: (values: LabwareFields) => unknown
-}
-
 const PDF_URL =
   'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
-
-const makeAutofillOnChange = ({
-  autofills,
-  values,
-  touched,
-  setValues,
-  setTouched,
-}: MakeAutofillOnChangeArgs) => (
-  name: string,
-  value: string | null | undefined
-) => {
-  if (value == null) {
-    console.log(`no value for ${name}, skipping autofill`)
-    return
-  }
-  const _autofillValues = autofills[value]
-  if (_autofillValues) {
-    const autofillValues = {
-      ..._autofillValues,
-      ...getImplicitAutofillValues(_autofillValues),
-    }
-
-    const namesToTrue = mapValues(autofillValues, () => true)
-    setValues({
-      ...values,
-      ...autofillValues,
-      [name]: value,
-    })
-    setTouched({
-      ...touched,
-      ...namesToTrue,
-    })
-  } else {
-    console.error(
-      `expected autofills for ${name}: ${value} -- is the value missing from the autofills object?`
-    )
-  }
-}
 
 export const LabwareCreator = (): JSX.Element => {
   const [
@@ -462,6 +414,7 @@ export const LabwareCreator = (): JSX.Element => {
               {showCreatorForm && (
                 <>
                   {/* PAGE 1 - Labware */}
+                  <CustomTiprackWarning />
                   <Regularity />
                   <Footprint />
                   <Height />
@@ -470,85 +423,8 @@ export const LabwareCreator = (): JSX.Element => {
                   <Volume />
                   <WellShapeAndSides />
                   <WellBottomAndDepth />
-                  <Section
-                    label="Well Spacing"
-                    fieldList={['gridSpacingX', 'gridSpacingY']}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Spacing is between the <strong>center</strong> of
-                          wells.
-                        </p>
-                        <p>
-                          Well spacing measurements inform the robot how far
-                          away rows and columns are from each other.
-                        </p>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <XYSpacingImg
-                          labwareType={values.labwareType}
-                          wellShape={values.wellShape}
-                          gridRows={values.gridRows}
-                        />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="gridSpacingX"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                        <TextField
-                          name="gridSpacingY"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Grid Offset"
-                    fieldList={['gridOffsetX', 'gridOffsetY']}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Find the measurement from the center of{' '}
-                          <strong>
-                            {values.labwareType === 'reservoir'
-                              ? 'the top left-most well'
-                              : 'well A1'}
-                          </strong>{' '}
-                          to the edge of the labware{"'"}s footprint.
-                        </p>
-                        <p>
-                          Corner offset informs the robot how far the grid of
-                          wells is from the slot{"'"}s top left corner.
-                        </p>
-                        <div className={styles.help_text}>
-                          <img src={require('./images/offset_helpText.svg')} />
-                        </div>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <XYOffsetImg
-                          labwareType={values.labwareType}
-                          wellShape={values.wellShape}
-                        />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="gridOffsetX"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                        <TextField
-                          name="gridOffsetY"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <WellSpacing />
+                  <GridOffset />
                   <Section label="Check your work">
                     <FormLevelErrorAlerts errors={errors} />
                     <div className={styles.preview_labware}>
