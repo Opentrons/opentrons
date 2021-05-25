@@ -1,8 +1,14 @@
 """Session router dependency wire-up."""
 from datetime import datetime
 
+from .session_builder import SessionBuilder
 from .session_store import SessionStore
 from .session_runner import SessionRunner
+
+
+def get_session_builder() -> SessionBuilder:
+    """Get an interface to build session resource models."""
+    raise NotImplementedError()
 
 
 def get_session_store() -> SessionStore:

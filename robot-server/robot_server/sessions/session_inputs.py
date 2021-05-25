@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel, Field
 
-from robot_server.service.json_api import ResponseDataModel
+from robot_server.service.json_api import ResourceModel
 
 
 class SessionInputType(str, Enum):
@@ -18,7 +18,7 @@ class CreateSessionInputData(BaseModel):
     inputType: SessionInputType
 
 
-class SessionInput(ResponseDataModel):
+class SessionInput(ResourceModel):
     """Session input model.
 
     A SessionInput resource represents a client-provided input into the
