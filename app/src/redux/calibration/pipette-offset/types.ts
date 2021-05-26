@@ -14,7 +14,7 @@ import {
 export interface FetchPipetteOffsetCalibrationsAction {
   type: typeof FETCH_PIPETTE_OFFSET_CALIBRATIONS
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchPipetteOffsetCalibrationsSuccessAction {

@@ -13,8 +13,7 @@ export const fetchPipetteOffsetCalibrations = (
 ): Types.FetchPipetteOffsetCalibrationsAction => ({
   type: Constants.FETCH_PIPETTE_OFFSET_CALIBRATIONS,
   payload: { robotName },
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  meta: {} as RobotApiRequestMeta,
+  meta: {},
 })
 
 export const fetchPipetteOffsetCalibrationsSuccess = (
