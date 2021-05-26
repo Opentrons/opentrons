@@ -35,15 +35,13 @@ def test_device_info(thermocycler: Thermocycler):
 async def test_lid_status(thermocycler: Thermocycler):
     """It should run open and close lid."""
     await thermocycler.wait_next_poll()
-    assert thermocycler.lid_status == "closed"
-
-    await thermocycler.open()
-    await thermocycler.wait_next_poll()
     assert thermocycler.lid_status == "open"
 
     await thermocycler.close()
-    await thermocycler.wait_next_poll()
     assert thermocycler.lid_status == "closed"
+
+    await thermocycler.open()
+    assert thermocycler.lid_status == "open"
 
 
 async def test_lid_temperature(thermocycler: Thermocycler):

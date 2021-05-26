@@ -142,18 +142,18 @@ class Thermocycler(mod_abc.AbstractModule):
         self._total_step_count = None
         self._current_step_index = None
 
-    async def deactivate_lid(self):
+    async def deactivate_lid(self) -> None:
         """Deactivate the lid heating pad"""
         await self.wait_for_is_running()
         return await self._driver.deactivate_lid()
 
-    async def deactivate_block(self):
+    async def deactivate_block(self) -> None:
         """Deactivate the block peltiers"""
         await self.wait_for_is_running()
         self._clear_cycle_counters()
         return await self._driver.deactivate_block()
 
-    async def deactivate(self):
+    async def deactivate(self) -> None:
         """Deactivate the block peltiers and lid heating pad"""
         await self.wait_for_is_running()
         self._clear_cycle_counters()
@@ -163,12 +163,14 @@ class Thermocycler(mod_abc.AbstractModule):
         """Open the lid if it is closed"""
         await self.wait_for_is_running()
         await self._driver.open_lid()
+        await self._wait_for_lid_status(ThermocyclerLidStatus.OPEN)
         return ThermocyclerLidStatus.OPEN
 
     async def close(self) -> str:
-        """ Close the lid if it is open"""
+        """Close the lid if it is open"""
         await self.wait_for_is_running()
         await self._driver.close_lid()
+        await self._wait_for_lid_status(ThermocyclerLidStatus.CLOSED)
         return ThermocyclerLidStatus.CLOSED
 
     def hold_time_probably_set(self, new_hold_time: Optional[float]) -> bool:
@@ -271,7 +273,7 @@ class Thermocycler(mod_abc.AbstractModule):
         await self.make_cancellable(task)
         await task
 
-    async def set_lid_temperature(self, temperature: float):
+    async def set_lid_temperature(self, temperature: float) -> None:
         """ Set the lid temperature in deg Celsius """
         await self.wait_for_is_running()
         await self._driver.set_lid_temperature(temp=temperature)
@@ -289,7 +291,7 @@ class Thermocycler(mod_abc.AbstractModule):
         await self.make_cancellable(task)
         await task
 
-    async def _wait_for_lid_temp(self):
+    async def _wait_for_lid_temp(self) -> None:
         """
         This method only exits if lid target temperature has been reached.
 
@@ -301,7 +303,7 @@ class Thermocycler(mod_abc.AbstractModule):
         while self._listener.lid_status != TemperatureStatus.HOLDING:
             await self._listener.wait_next_poll()
 
-    async def _wait_for_temp(self):
+    async def _wait_for_temp(self) -> None:
         """
         This method only exits if set temperature has been reached.
 
@@ -328,6 +330,11 @@ class Thermocycler(mod_abc.AbstractModule):
         else:
             while self.hold_time != 0:
                 await self.wait_next_poll()
+
+    async def _wait_for_lid_status(self, status: ThermocyclerLidStatus) -> None:
+        """Wait for lid status to be status."""
+        while self.lid_status != status:
+            await self.wait_next_poll()
 
     async def wait_next_poll(self) -> None:
         """Wait for the next poll to complete."""

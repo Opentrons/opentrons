@@ -31,7 +31,7 @@ class ThermocyclerEmulator(AbstractEmulator):
         self._plate_temperate = TemperatureWithHold(
             per_tick=2, current=util.TEMPERATURE_ROOM
         )
-        self.lid_status = ThermocyclerLidStatus.CLOSED
+        self.lid_status = ThermocyclerLidStatus.OPEN
         self.plate_volume = util.OptionalValue[float]()
         self.plate_ramp_rate = util.OptionalValue[float]()
         self._parser = parser
