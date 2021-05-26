@@ -67,8 +67,9 @@ const terminalContentsStyleProps = {
   paddingX: '1.5rem',
 }
 
-const PANEL_BY_STEP: Partial<Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>>
- = {
+const PANEL_BY_STEP: Partial<
+  Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>
+> = {
   [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: Introduction,
   [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: DeckSetup,
   [Sessions.PIP_OFFSET_STEP_MEASURING_NOZZLE_OFFSET]: MeasureNozzle,
@@ -81,7 +82,9 @@ const PANEL_BY_STEP: Partial<Record<CalibrationSessionStep, React.ComponentType<
   [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
 }
 
-const PANEL_STYLE_PROPS_BY_STEP: Partial<Record<CalibrationSessionStep, StyleProps>> = {
+const PANEL_STYLE_PROPS_BY_STEP: Partial<
+  Record<CalibrationSessionStep, StyleProps>
+> = {
   [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: terminalContentsStyleProps,
   [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: darkContentsStyleProps,
   [Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE]: contentsStyleProps,

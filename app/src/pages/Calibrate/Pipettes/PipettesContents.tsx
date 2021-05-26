@@ -19,7 +19,10 @@ export interface PipettesContentsProps {
 export function PipettesContents(props: PipettesContentsProps): JSX.Element {
   const { currentMount, pipettes, activeTipracks } = props
 
-  const infoByMount = PIPETTE_MOUNTS.reduce<{ left?: InstrumentInfoProps, right?: InstrumentInfoProps }>((result, mount) => {
+  const infoByMount = PIPETTE_MOUNTS.reduce<{
+    left?: InstrumentInfoProps
+    right?: InstrumentInfoProps
+  }>((result, mount) => {
     const pipette = pipettes.find(p => p.mount === mount)
     const tiprack = activeTipracks[mount]
     const pipetteConfig = pipette?.modelSpecs
