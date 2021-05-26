@@ -66,9 +66,9 @@ const terminalContentsStyleProps = {
   paddingX: '1.5rem',
 }
 
-const PANEL_BY_STEP: {
-  [step in CalibrationSessionStep]?: React.ComponentType<CalibrationPanelProps>
-} = {
+const PANEL_BY_STEP: Partial<
+  Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>
+> = {
   [Sessions.DECK_STEP_SESSION_STARTED]: Introduction,
   [Sessions.DECK_STEP_LABWARE_LOADED]: DeckSetup,
   [Sessions.DECK_STEP_PREPARING_PIPETTE]: TipPickUp,
@@ -79,9 +79,10 @@ const PANEL_BY_STEP: {
   [Sessions.DECK_STEP_SAVING_POINT_THREE]: SaveXYPoint,
   [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
 }
-const PANEL_STYLE_PROPS_BY_STEP: {
-  [step in CalibrationSessionStep]?: StyleProps
-} = {
+
+const PANEL_STYLE_PROPS_BY_STEP: Partial<
+  Record<CalibrationSessionStep, StyleProps>
+> = {
   [Sessions.DECK_STEP_SESSION_STARTED]: terminalContentsStyleProps,
   [Sessions.DECK_STEP_LABWARE_LOADED]: darkContentsStyleProps,
   [Sessions.DECK_STEP_PREPARING_PIPETTE]: contentsStyleProps,
@@ -151,9 +152,9 @@ export function CalibrateDeck(
   if (showSpinner) {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
-
-  const Panel = currentStep != null ? PANEL_BY_STEP[currentStep] : null
-  return currentStep != null && Panel ? (
+  // @ts-expect-error TODO: cannot index with undefined. Also, add test coverage for null case when no panel
+  const Panel = PANEL_BY_STEP[currentStep]
+  return Panel ? (
     <>
       <ModalPage
         titleBar={titleBarProps}

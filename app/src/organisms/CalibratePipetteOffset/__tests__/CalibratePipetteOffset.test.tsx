@@ -29,11 +29,10 @@ jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 
-type CalibratePipetteOffsetSpec = Partial<{
+interface CalibratePipetteOffsetSpec {
   component: React.ReactNode
-  childProps?: {}
   currentStep: PipetteOffsetCalibrationStep
-}>
+}
 
 const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
   typeof getDeckDefinitions

@@ -111,7 +111,8 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
 
   const pipSerial = useSelector(
     (state: State) =>
-      robotName && getAttachedPipettes(state, robotName)[mount]?.id
+      // @ts-expect-error(sa, 2021-05-26): possibly null, can optionally chain. leaving to avoid src code change
+      robotName && getAttachedPipettes(state, robotName)[mount].id
   )
 
   const pipetteOffsetCal = useSelector((state: State) =>

@@ -28,9 +28,7 @@ jest.mock('../../../redux/robot-api/selectors')
 
 interface CalibrateTipLengthSpec {
   component: React.ComponentType<any>
-  childProps?: {}
   currentStep: TipLengthCalibrationStep
-  [key: string]: unknown
 }
 
 const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<

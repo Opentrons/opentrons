@@ -62,37 +62,29 @@ export function useCalibratePipetteOffset(
         dispatchedAction.payload.sessionType ===
           Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
       ) {
-        createRequestId.current =
-          'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
-            : null
+        // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
+        createRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type === Sessions.DELETE_SESSION &&
         pipOffsetCalSession?.id === dispatchedAction.payload.sessionId
       ) {
-        deleteRequestId.current =
-          'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
-            : null
+        // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
+        deleteRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
       ) {
-        jogRequestId.current =
-          'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
-            : null
+        // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
+        jogRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
           dispatchedAction.payload.command.command
         )
       ) {
-        spinnerRequestId.current =
-          'meta' in dispatchedAction && 'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
-            : null
+        // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
+        spinnerRequestId.current = dispatchedAction.meta.requestId
       }
     }
   )

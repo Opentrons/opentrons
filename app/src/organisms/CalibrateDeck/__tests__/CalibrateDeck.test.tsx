@@ -19,20 +19,19 @@ import {
   CompleteConfirmation,
 } from '../../CalibrationPanels'
 
-import type { DeckCalibrationStep } from '../../../redux/sessions/types'
-import { DispatchRequestsType } from '../../../redux/robot-api'
-import { Dispatch } from '../../../redux/types'
 import type { ReactWrapper, HTMLAttributes } from 'enzyme'
+import type { DeckCalibrationStep } from '../../../redux/sessions/types'
+import type { DispatchRequestsType } from '../../../redux/robot-api'
+import type { Dispatch } from '../../../redux/types'
+import type { CalibrationPanelProps } from '../../CalibrationPanels/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 
 interface CalibrateDeckSpec {
-  component: React.ReactNode
-  childProps?: {}
+  component: (props: CalibrationPanelProps) => JSX.Element
   currentStep: DeckCalibrationStep
-  [key: string]: unknown
 }
 
 const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<

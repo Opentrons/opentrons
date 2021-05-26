@@ -69,9 +69,9 @@ const terminalContentsStyleProps = {
   paddingX: '1.5rem',
 }
 
-const PANEL_BY_STEP: {
-  [step in CalibrationSessionStep]?: React.ComponentType<CalibrationPanelProps>
-} = {
+const PANEL_BY_STEP: Partial<
+  Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>
+> = {
   sessionStarted: Introduction,
   labwareLoaded: DeckSetup,
   measuringNozzleOffset: MeasureNozzle,
@@ -80,9 +80,9 @@ const PANEL_BY_STEP: {
   measuringTipOffset: MeasureTip,
   calibrationComplete: CompleteConfirmation,
 }
-const PANEL_STYLE_PROPS_BY_STEP: {
-  [step in CalibrationSessionStep]?: StyleProps
-} = {
+const PANEL_STYLE_PROPS_BY_STEP: Partial<
+  Record<CalibrationSessionStep, StyleProps>
+> = {
   [Sessions.TIP_LENGTH_STEP_SESSION_STARTED]: terminalContentsStyleProps,
   [Sessions.TIP_LENGTH_STEP_LABWARE_LOADED]: darkContentsStyleProps,
   [Sessions.TIP_LENGTH_STEP_PREPARING_PIPETTE]: contentsStyleProps,
@@ -152,9 +152,10 @@ export function CalibrateTipLength(
   if (showSpinner) {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
+  // @ts-expect-error(sa, 2021-05-26): cannot index undefined, leaving to avoid src code change
+  const Panel = PANEL_BY_STEP[currentStep]
 
-  const Panel = currentStep != null ? PANEL_BY_STEP[currentStep] : null
-  return currentStep != null && Panel ? (
+  return Panel ? (
     <>
       <ModalPage
         titleBar={titleBarProps}
