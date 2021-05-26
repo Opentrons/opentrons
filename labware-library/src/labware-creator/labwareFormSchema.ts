@@ -6,6 +6,7 @@ import {
   wellBottomShapeOptions,
   wellShapeOptions,
   IRREGULAR_LABWARE_ERROR,
+  LOOSE_TIP_FIT_ERROR,
   LABELS,
   MAX_X_DIMENSION,
   MIN_X_DIMENSION,
@@ -53,6 +54,14 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = Yup.object(
     labwareType: requiredString(LABELS.labwareType).oneOf(
       labwareTypeOptions.map(o => o.value)
     ),
+    handPlacedTipFit: Yup.string().when('labwareType', {
+      is: 'tipRack',
+      then: requiredString(LABELS.handPlacedTipFit).oneOf(
+        ['snug'],
+        LOOSE_TIP_FIT_ERROR
+      ),
+      otherwise: Yup.string().nullable(),
+    }),
     tubeRackInsertLoadName: Yup.mixed().when('labwareType', {
       is: 'tubeRack',
       then: requiredString(LABELS.tubeRackInsertLoadName),

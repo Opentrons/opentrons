@@ -15,6 +15,7 @@ Object {
   "gridRows": "1",
   "gridSpacingX": "9.09",
   "gridSpacingY": null,
+  "handPlacedTipFit": null,
   "homogeneousWells": "true",
   "labwareType": "reservoir",
   "labwareZDimension": "44.45",

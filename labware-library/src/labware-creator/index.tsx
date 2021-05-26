@@ -39,6 +39,7 @@ import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
 import { UploadExisting } from './components/sections/UploadExisting'
 
 import { CustomTiprackWarning } from './components/sections/CustomTiprackWarning'
+import { HandPlacedTipFit } from './components/sections/HandPlacedTipFit'
 import { Regularity } from './components/sections/Regularity'
 import { Footprint } from './components/sections/Footprint'
 import { Height } from './components/sections/Height'
@@ -408,6 +409,7 @@ export const LabwareCreator = (): JSX.Element => {
                 <>
                   {/* PAGE 1 - Labware */}
                   <CustomTiprackWarning />
+                  <HandPlacedTipFit />
                   <Regularity />
                   <Footprint />
                   <Height />
