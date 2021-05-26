@@ -1,7 +1,6 @@
 import * as Types from '../types'
 import * as ApiTypes from '../api-types'
 import type {
-  Method,
   RobotApiResponse,
   RobotApiResponseMeta,
 } from '../../robot-api/types'
@@ -274,7 +273,7 @@ export const mockFetchModulesSuccessActionPayloadModules = [
 ]
 
 export const mockFetchModulesFailureMeta: RobotApiResponseMeta = {
-  method: 'GET' as Method,
+  method: 'GET',
   path: '/modules',
   ok: false,
   status: 500,
@@ -289,7 +288,7 @@ export const mockFetchModulesFailure: RobotApiResponse = {
 // send module command fixtures
 
 export const mockSendModuleCommandSuccessMeta: RobotApiResponseMeta = {
-  method: 'POST' as Method,
+  method: 'POST',
   path: '/modules/abc123',
   ok: true,
   status: 200,
