@@ -1,8 +1,7 @@
 version: "3"
 services:
   emulator:
-    image: opentrons:latest
-    build .
+    build: .
     command: python3 -m opentrons.hardware_control.emulation.app
     ports:
      - "9996:9996"
@@ -10,12 +9,12 @@ services:
      - "9998:9998"
      - "9999:9999"
   robot-server:
-    image: opentrons:latest
-    build .
+    build: .
     command: uvicorn "robot_server:app" --host 0.0.0.0 --port 31950 --ws wsproto --reload
     ports:
      - "31950:31950"
     environment:
+     - OT_API_CONFIG_DIR=/config
      - OT_SMOOTHIE_EMULATOR_URI=socket://emulator:9996
      - OT_THERMOCYCLER_EMULATOR_URI=socket://emulator:9997
      - OT_TEMPERATURE_EMULATOR_URI=socket://emulator:9998
@@ -24,3 +23,5 @@ services:
       - "emulator"
     depends_on:
       - "emulator"
+    volumes:
+      - .opentrons_config:/config:rw
