@@ -13,8 +13,7 @@ export const fetchTipLengthCalibrations = (
 ): Types.FetchTipLengthCalibrationsAction => ({
   type: Constants.FETCH_TIP_LENGTH_CALIBRATIONS,
   payload: { robotName },
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  meta: {} as RobotApiRequestMeta,
+  meta: {},
 })
 
 export const fetchTipLengthCalibrationsSuccess = (

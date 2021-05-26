@@ -14,7 +14,7 @@ import {
 export interface FetchTipLengthCalibrationsAction {
   type: typeof FETCH_TIP_LENGTH_CALIBRATIONS
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchTipLengthCalibrationsSuccessAction {
