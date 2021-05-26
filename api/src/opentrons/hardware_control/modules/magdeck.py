@@ -36,7 +36,7 @@ class MagDeck(mod_abc.AbstractModule):
         """Factory function."""
         driver: AbstractMagDeckDriver
         if not simulating:
-            driver = await MagDeckDriver.create(port=port)
+            driver = await MagDeckDriver.create(port=port, loop=loop)
         else:
             driver = SimulatingDriver(sim_model=sim_model)
 

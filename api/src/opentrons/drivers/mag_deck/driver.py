@@ -9,8 +9,9 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
-from typing import Dict
+from typing import Dict, Optional
 from enum import Enum
 
 from opentrons.drivers import utils
@@ -53,18 +54,22 @@ class MagDeckError(Exception):
 class MagDeckDriver(AbstractMagDeckDriver):
 
     @classmethod
-    async def create(cls, port: str) -> MagDeckDriver:
+    async def create(
+            cls, port: str, loop: Optional[asyncio.AbstractEventLoop] = None
+    ) -> MagDeckDriver:
         """
         Create a mag deck driver.
 
         Args:
             port: port or url of magdeck
+            loop: optional event loop
 
         Returns: driver
         """
         connection = await SerialConnection.create(
             port=port, baud_rate=MAG_DECK_BAUDRATE,
-            timeout=DEFAULT_MAG_DECK_TIMEOUT, ack=MAG_DECK_ACK
+            timeout=DEFAULT_MAG_DECK_TIMEOUT, ack=MAG_DECK_ACK,
+            loop=loop
         )
         return cls(connection=connection)
 

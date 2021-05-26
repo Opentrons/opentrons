@@ -12,7 +12,8 @@ class AsyncSerial:
 
     @classmethod
     async def create(
-            cls, port: str, baud_rate: int, timeout: Optional[int] = None
+            cls, port: str, baud_rate: int, timeout: Optional[int] = None,
+            loop: Optional[asyncio.AbstractEventLoop] = None
     ) -> AsyncSerial:
         """
         Create an AsyncSerial instance.
@@ -21,27 +22,35 @@ class AsyncSerial:
             port: url or port name
             baud_rate: the baud rate
             timeout: optional timeout in milliseconds
+            loop: optional event loop. if None get_running_loop will be used
         """
+        loop = loop or asyncio.get_running_loop()
         executor = ThreadPoolExecutor(max_workers=1)
-
-        serial = await asyncio.get_event_loop().run_in_executor(
+        serial = await loop.run_in_executor(
             executor=executor,
             func=lambda: serial_for_url(
                 url=port, baudrate=baud_rate, timeout=timeout
             )
         )
-        return cls(serial=serial, executor=executor)
+        return cls(serial=serial, executor=executor, loop=loop)
 
-    def __init__(self, serial: Serial, executor: ThreadPoolExecutor) -> None:
+    def __init__(
+            self,
+            serial: Serial,
+            executor: ThreadPoolExecutor,
+            loop: asyncio.AbstractEventLoop
+    ) -> None:
         """
         Constructor
 
         Args:
             serial: connected Serial object
             executor: a thread pool executor
+            loop: event loop
         """
         self._serial = serial
         self._executor = executor
+        self._loop = loop
 
     async def read_until(self, match: bytes) -> bytes:
         """
@@ -54,7 +63,7 @@ class AsyncSerial:
             read data.
 
         """
-        return await asyncio.get_event_loop().run_in_executor(
+        return await self._loop.run_in_executor(
             executor=self._executor,
             func=lambda: self._serial.read_until(match)
         )
@@ -70,8 +79,8 @@ class AsyncSerial:
             None
 
         """
-        return await asyncio.get_event_loop().run_in_executor(
-            executor=self._executor,
+        return await self._loop.run_in_executor(
+            executor=None,
             func=lambda: self._serial.write(data=data)
         )
 
@@ -81,9 +90,9 @@ class AsyncSerial:
 
         Returns: None
         """
-        return await asyncio.get_event_loop().run_in_executor(
+        return await self._loop.run_in_executor(
             executor=self._executor,
-            func=lambda: self._serial.open()
+            func=self._serial.open
         )
 
     async def close(self) -> None:
@@ -92,9 +101,9 @@ class AsyncSerial:
 
         Returns: None
         """
-        return await asyncio.get_event_loop().run_in_executor(
+        return await self._loop.run_in_executor(
             executor=self._executor,
-            func=lambda: self._serial.close()
+            func=self._serial.close
         )
 
     async def is_open(self) -> bool:

@@ -23,6 +23,7 @@ class SerialConnection:
             ack: str,
             name: Optional[str] = None,
             retry_wait_time_seconds: float = 0.1,
+            loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> SerialConnection:
         """
         Create a connection.
@@ -34,11 +35,12 @@ class SerialConnection:
             ack: the command response ack
             name: the connection name
             retry_wait_time_seconds: how long to wait between retries.
+            loop: optional event loop.
 
         Returns: SerialConnection
         """
         serial = await AsyncSerial.create(port=port, baud_rate=baud_rate,
-                                          timeout=timeout)
+                                          timeout=timeout, loop=loop)
         name = name or port
         return cls(
             serial=serial, port=port, name=name,
