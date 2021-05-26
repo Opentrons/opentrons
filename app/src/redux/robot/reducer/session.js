@@ -58,13 +58,15 @@ export type SessionState = {
   startTime: ?number,
   runTime: number,
   /**
-   * Used to calculate the `pausedTimer`
-   * todo: Managed locally? Lost if the app is re-loaded. How interested are we in this functionality?
+   * Used to calculate the `pausedDuration`
+   * todo: hacky in that it is managed locally. Not part of the start-time fix,
+   *  but partially fixes issue of pausing without pausing the timer. Keep?
    */
   pausedTime: number,
   /**
    * Updated after cycle of pause -> resume.
-   * todo: Managed locally? Lost if the app is re-loaded. How interested are we in this functionality?
+   * todo: hacky in that it is managed locally. Not part of the start-time fix,
+   *  but partially fixes issue of pausing without pausing the timer. Keep?
    */
   pausedDuration: number,
   apiLevel: [number, number] | null,

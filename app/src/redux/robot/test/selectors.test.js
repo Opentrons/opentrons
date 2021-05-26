@@ -218,6 +218,7 @@ describe('robot selectors', () => {
     const state = {
       robot: {
         session: {
+          pausedDuration: 0,
           startTime: null,
           runTime: 42,
         },
@@ -227,28 +228,41 @@ describe('robot selectors', () => {
     expect(getRunTime(state)).toEqual('00:00:00')
   })
 
-  it('getRunTime with no remoteTimeCompensation', () => {
-    const state = {
-      robot: {
-        session: {
-          remoteTimeCompensation: null,
-          startTime: 40,
-          runTime: 42,
-        },
-      },
-    }
-
-    expect(getRunTime(state)).toEqual('00:00:00')
-  })
-
-  it('getRunTime', () => {
+  it('getRunTime without remoteTimeCompensation', () => {
     const testGetRunTime = (seconds, expected) => {
       const stateWithRunTime = {
         robot: {
           session: {
-            remoteTimeCompensation: 0,
-            startTime: 42,
+            pausedDuration: 0,
+            remoteTimeCompensation: null,
+            startTime: 40,
             runTime: 42 + 1000 * seconds,
+          },
+        },
+      }
+
+      expect(getRunTime(stateWithRunTime)).toEqual(expected)
+    }
+
+    testGetRunTime(0, '00:00:00')
+    testGetRunTime(1, '00:00:01')
+    testGetRunTime(59, '00:00:59')
+    testGetRunTime(60, '00:01:00')
+    testGetRunTime(61, '00:01:01')
+    testGetRunTime(3599, '00:59:59')
+    testGetRunTime(3600, '01:00:00')
+    testGetRunTime(3601, '01:00:01')
+  })
+
+  it('getRunTime with remoteTimeCompensation', () => {
+    const testGetRunTime = (seconds, expected) => {
+      const stateWithRunTime = {
+        robot: {
+          session: {
+            pausedDuration: 0,
+            remoteTimeCompensation: 1000,
+            startTime: 40,
+            runTime: 1042 + 1000 * seconds,
           },
         },
       }
