@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import logging
 from enum import Enum
@@ -56,18 +58,21 @@ DEFAULT_COMMAND_RETRIES = 3
 class ThermocyclerDriver(AbstractThermocyclerDriver):
 
     @classmethod
-    async def create(cls, port: str) -> 'ThermocyclerDriver':
+    async def create(
+            cls, port: str, loop: Optional[asyncio.AbstractEventLoop]
+    ) -> ThermocyclerDriver:
         """
         Create a temp deck driver.
 
         Args:
             port: port or url of temp deck
+            loop: optional event loop
 
         Returns: driver
         """
         connection = await SerialConnection.create(
             port=port, baud_rate=TC_BAUDRATE,
-            timeout=DEFAULT_TC_TIMEOUT, ack=TC_ACK
+            timeout=DEFAULT_TC_TIMEOUT, ack=TC_ACK, loop=loop
         )
         return cls(connection=connection)
 

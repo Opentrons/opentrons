@@ -66,7 +66,7 @@ class Thermocycler(mod_abc.AbstractModule):
         polling_frequency = kwargs.get("polling_frequency")
         driver: AbstractThermocyclerDriver
         if not simulating:
-            driver = await ThermocyclerDriver.create(port=port)
+            driver = await ThermocyclerDriver.create(port=port, loop=loop)
             polling_frequency = polling_frequency or POLLING_FREQUENCY_SEC
         else:
             driver = SimulatingDriver()
