@@ -44,11 +44,10 @@ export const getCustomLabware: (
     )
 )
 
-// @ts-expect-error(sa, 2021-05-11): TS unable to do type refinements via filter
 export const getValidCustomLabware: (
   state: State
 ) => ValidLabwareFile[] = createSelector(getCustomLabware, labware =>
-  labware.filter(f => f.type === VALID_LABWARE_FILE)
+  labware.filter((f): f is ValidLabwareFile => f.type === VALID_LABWARE_FILE)
 )
 
 export const getAddLabwareFailure: (
