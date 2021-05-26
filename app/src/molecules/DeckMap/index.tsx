@@ -41,7 +41,7 @@ interface DisplayModule extends SessionModule {
   usbInfoString?: string
 }
 
-type Props = OP & SP
+interface Props extends OP, SP {}
 
 const deckSetupLayerBlocklist = [
   'calibrationMarkings',

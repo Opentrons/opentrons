@@ -32,7 +32,7 @@ interface ControlsContents {
   subtitle: string
 }
 
-const CONTROLS_CONTENTS_BY_PLANE: { [plane in Plane]: ControlsContents } = {
+const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
   [VERTICAL_PLANE]: {
     controls: [
       {
