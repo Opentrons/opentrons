@@ -12,8 +12,7 @@ export const fetchLabwareCalibrations = (
 ): Types.FetchLabwareCalibrationsAction => ({
   type: Constants.FETCH_LABWARE_CALIBRATIONS,
   payload: { robotName },
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  meta: {} as RobotApiRequestMeta,
+  meta: {},
 })
 
 export const fetchLabwareCalibrationsSuccess = (

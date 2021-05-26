@@ -16,7 +16,7 @@ import type { AllLabwareCalibrations } from './../api-types'
 export interface FetchLabwareCalibrationsAction {
   type: typeof FETCH_LABWARE_CALIBRATIONS
   payload: { robotName: string }
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 }
 
 export interface FetchLabwareCalibrationsSuccessAction {
