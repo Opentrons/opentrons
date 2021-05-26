@@ -8,7 +8,6 @@ function parseMessage(data) {
 
   try {
     message = JSON.parse(data)
-    console.log(`rpc.parseMessage: ${data}`);
   } catch (e) {
     console.warn('JSON parse error', e)
   }

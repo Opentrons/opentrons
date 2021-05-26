@@ -58,13 +58,13 @@ export type SessionState = {
   startTime: ?number,
   runTime: number,
   /**
-   * Set to `Date.now()` when session is paused. Set to `0` when session is resumed.
-   * todo? Managed locally. Lost if the app is re-loaded. How interested are we in this functionality?
+   * Used to calculate the `pausedTimer`
+   * todo: Managed locally? Lost if the app is re-loaded. How interested are we in this functionality?
    */
   pausedTime: number,
   /**
    * Updated after cycle of pause -> resume.
-   * todo? Managed locally. Lost if the app is re-loaded. How interested are we in this functionality?
+   * todo: Managed locally? Lost if the app is re-loaded. How interested are we in this functionality?
    */
   pausedDuration: number,
   apiLevel: [number, number] | null,
@@ -123,7 +123,6 @@ export function sessionReducer(
   state: SessionState = INITIAL_STATE,
   action: Action
 ): SessionState {
-  console.log(`sessionReducer ${action.type}, action=`, action);
   switch (action.type) {
     case 'robot:CONNECT_RESPONSE': {
       if (action.payload.error) return state
@@ -233,15 +232,11 @@ function handleSessionUpdate(
 }
 
 function handleSessionInProgress(state: SessionState): SessionState {
-  console.log('handleSessionInProgress', state);
   return {
     ...state,
-    // todo: ce - think we want to pick up where we left off?
     pausedDuration: 0,
-    // todo: ce - think we want to pick up where we left off?
     runTime: 0,
-    // todo: ce - think we want to pick up where we left off?
-    startTime: Date.now(),
+    startTime: null,
     remoteTimeCompensation: null,
     sessionRequest: { inProgress: true, error: null },
   }

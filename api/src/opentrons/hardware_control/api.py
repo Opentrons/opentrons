@@ -339,10 +339,7 @@ class API(HardwareAPILike):
         await self._wait_for_is_running()
         self.pause(PauseType.DELAY)
         try:
-            if self.is_simulator:
-                print(f'sleeping {duration_s/60} minutes')
-                await asyncio.sleep(duration_s)
-            else:
+            if not self.is_simulator:
                 async def sleep_for_seconds(seconds: float):
                     await asyncio.sleep(seconds)
                 delay_task = self._loop.create_task(sleep_for_seconds(duration_s))

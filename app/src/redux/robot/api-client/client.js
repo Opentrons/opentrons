@@ -429,9 +429,7 @@ export function client(dispatch) {
   function setRunTimerInterval() {
     if (runTimerInterval === NO_INTERVAL) {
       runTimerInterval = setInterval(
-        () => {
-          dispatch(actions.tickRunTime())
-        },
+        () => dispatch(actions.tickRunTime()),
         RUN_TIME_TICK_INTERVAL_MS
       )
     }

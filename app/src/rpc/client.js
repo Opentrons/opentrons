@@ -214,7 +214,6 @@ class RpcContext extends EventEmitter {
         // then cache its type object
         this._cacheCallResultMetadata(root)
         this._cacheCallResultMetadata(rootType)
-        console.log('_handleMessage', this._resultTypes, this._typeObjectCache);
 
         if (meta.monitor) this._startMonitoring()
 
