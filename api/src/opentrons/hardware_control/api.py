@@ -1739,7 +1739,6 @@ class API(HardwareAPILike):
             this_pipette.blow_out_flow_rate = self._plunger_flowrate(
                 this_pipette, blow_out, 'dispense')
 
-
     def get_instrument_max_height(
             self,
             mount: top_types.Mount,
