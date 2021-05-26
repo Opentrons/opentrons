@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { connect, MapStateToProps, MapDispatchToProps } from 'react-redux'
 import { LabeledToggle } from '@opentrons/components'
 
 import {
@@ -39,14 +39,16 @@ function AnalyticsToggleComponent(props: Props): JSX.Element {
   )
 }
 
-function mapStateToProps(state: State): SP {
+const mapStateToProps: MapStateToProps<SP, {}, State> = state => {
   return {
     optedIn: getAnalyticsOptedIn(state),
   }
 }
 
-const mapDispatchToProps: DP = {
-  toggleOptedIn: () => toggleAnalyticsOptedIn(),
+const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
+  return {
+    toggleOptedIn: () => dispatch(toggleAnalyticsOptedIn()),
+  }
 }
 
 export const AnalyticsToggle = connect(
