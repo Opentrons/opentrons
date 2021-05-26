@@ -43,6 +43,8 @@ describe('robot reducer - session', () => {
       startTime: null,
       runTime: 0,
       apiLevel: null,
+      pausedDuration: 0,
+      pausedTime: 0,
     })
   })
 
@@ -113,6 +115,7 @@ describe('robot reducer - session', () => {
       remoteTimeCompensation: null,
       startTime: null,
       runTime: 0,
+      pausedDuration: 0,
     })
   })
 
@@ -198,7 +201,6 @@ describe('robot reducer - session', () => {
   it('handles RUN action', () => {
     const state = {
       session: {
-        runTime: now,
         runRequest: { inProgress: false, error: new Error('AH') },
       },
     }
@@ -206,7 +208,7 @@ describe('robot reducer - session', () => {
 
     expect(reducer(state, action).session).toEqual({
       runRequest: { inProgress: true, error: null },
-      runTime: 0,
+      runTime: now,
     })
   })
 
@@ -248,7 +250,9 @@ describe('robot reducer - session', () => {
     const action = { type: actionTypes.PAUSE }
 
     expect(reducer(state, action).session).toEqual({
+      pausedTime: now,
       pauseRequest: { inProgress: true, error: null },
+      runTime: now,
     })
   })
 
@@ -281,13 +285,18 @@ describe('robot reducer - session', () => {
   it('handles RESUME action', () => {
     const state = {
       session: {
+        pausedDuration: 0,
+        pausedTime: now - 1000,
         resumeRequest: { inProgress: false, error: new Error('AH') },
       },
     }
     const action = { type: actionTypes.RESUME }
 
     expect(reducer(state, action).session).toEqual({
+      pausedDuration: 1000,
+      pausedTime: 0,
       resumeRequest: { inProgress: true, error: null },
+      runTime: now,
     })
   })
 
