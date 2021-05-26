@@ -19,10 +19,13 @@ const xyMessage = (
   </div>
 )
 
-export const getXYDimensionAlerts = (
-  values: LabwareFields,
+export interface Props {
+  values: LabwareFields
   touched: FormikTouched<LabwareFields>
-): JSX.Element | null => {
+}
+
+export const XYDimensionAlerts = (props: Props): JSX.Element | null => {
+  const { values, touched } = props
   const xAsNum = Number(values.footprintXDimension)
   const yAsNum = Number(values.footprintYDimension)
   const showXInfo =

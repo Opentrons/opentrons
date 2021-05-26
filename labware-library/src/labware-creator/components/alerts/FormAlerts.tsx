@@ -7,8 +7,8 @@ import {
   IRREGULAR_LABWARE_ERROR,
   LOOSE_TIP_FIT_ERROR,
   LINK_CUSTOM_LABWARE_FORM,
-} from '../fields'
-import { LinkOut } from './LinkOut'
+} from '../../fields'
+import { LinkOut } from '../LinkOut'
 
 import type { FormikTouched, FormikErrors } from 'formik'
 export interface Props {

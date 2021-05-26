@@ -3,8 +3,8 @@ import { useFormikContext } from 'formik'
 import { makeMaskToDecimal } from '../../fieldMasks'
 import { LabwareFields } from '../../fields'
 import { isEveryFieldHidden } from '../../utils'
-import { FormAlerts } from '../FormAlerts'
-import { getXYDimensionAlerts } from '../utils/getXYDimensionAlerts'
+import { FormAlerts } from '../alerts/FormAlerts'
+import { XYDimensionAlerts } from '../alerts/XYDimensionAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
 
@@ -58,7 +58,7 @@ export const Footprint = (): JSX.Element | null => {
       <SectionBody label="Footprint">
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
-          {getXYDimensionAlerts(values, touched)}
+          <XYDimensionAlerts values={values} touched={touched} />
           <Content />
         </>
       </SectionBody>

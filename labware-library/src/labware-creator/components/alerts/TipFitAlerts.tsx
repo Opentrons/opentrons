@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { FormikTouched } from 'formik'
-import { LabwareFields } from '../fields'
+import { LabwareFields } from '../../fields'
 import { AlertItem } from '@opentrons/components'
 
 export interface Props {
@@ -8,7 +8,6 @@ export interface Props {
   touched: FormikTouched<LabwareFields>
 }
 
-// TODO: (ka 2021-5-25): Move this along with other form/section alerts to alerts/ as components
 export const TipFitAlerts = (props: Props): JSX.Element | null => {
   const { values, touched } = props
   if (touched.handPlacedTipFit && values.handPlacedTipFit === 'snug') {
