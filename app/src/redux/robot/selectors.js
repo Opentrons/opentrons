@@ -203,13 +203,13 @@ export const getSessionError: State => string | null = createSelector(
 
 const getStartTimeMs = (state: State): number | null => {
   const { startTime, remoteTimeCompensation } = session(state)
-
-  if (startTime == null || remoteTimeCompensation === null) {
+  if (startTime == null) {
     return null
   }
-
-  console.log(`getStartTimeMs ${remoteTimeCompensation}`);
-  return startTime + remoteTimeCompensation
+  // [7740] ce: 5/26/2021 - upon reload `remoteTimeCompensation` is null.
+  // will look to see why, but in the meantime this solves the start-time
+  // issue on reload but may create other issues?
+  return startTime + remoteTimeCompensation || 0
 }
 
 export const getStartTime: (state: State) => string | null = createSelector(

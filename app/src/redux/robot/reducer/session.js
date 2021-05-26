@@ -57,7 +57,15 @@ export type SessionState = {
   remoteTimeCompensation: number | null,
   startTime: ?number,
   runTime: number,
+  /**
+   * Set to `Date.now()` when session is paused. Set to `0` when session is resumed.
+   * todo? Managed locally. Lost if the app is re-loaded. How interested are we in this functionality?
+   */
   pausedTime: number,
+  /**
+   * Updated after cycle of pause -> resume.
+   * todo? Managed locally. Lost if the app is re-loaded. How interested are we in this functionality?
+   */
   pausedDuration: number,
   apiLevel: [number, number] | null,
   capabilities: Array<string>,
