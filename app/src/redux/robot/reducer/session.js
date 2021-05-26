@@ -277,7 +277,11 @@ function handleInvalidFile(
 }
 
 function handleRun(state: SessionState, action: any): SessionState {
-  return { ...state, runTime: Date.now(), runRequest: { inProgress: true, error: null } }
+  return {
+    ...state,
+    runTime: Date.now(),
+    runRequest: { inProgress: true, error: null },
+  }
 }
 
 function handleRunResponse(state: SessionState, action: any): SessionState {
@@ -295,10 +299,11 @@ function handleTickRunTime(state: SessionState, action: any): SessionState {
 }
 
 function handlePause(state: SessionState, action: any): SessionState {
-  return { ...state,
+  return {
+    ...state,
     pausedTime: Date.now(),
     pauseRequest: { inProgress: true, error: null },
-    runTime: Date.now()
+    runTime: Date.now(),
   }
 }
 
@@ -313,12 +318,13 @@ function handlePauseResponse(state: SessionState, action: any): SessionState {
 }
 
 function handleResume(state: SessionState, action: any): SessionState {
-  const pausedDuration = state.pausedTime ? Date.now() - state.pausedTime : 0;
-  return { ...state,
+  const pausedDuration = state.pausedTime ? Date.now() - state.pausedTime : 0
+  return {
+    ...state,
     pausedDuration: state.pausedDuration + pausedDuration,
     pausedTime: 0,
     resumeRequest: { inProgress: true, error: null },
-    runTime: Date.now()
+    runTime: Date.now(),
   }
 }
 

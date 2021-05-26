@@ -220,8 +220,8 @@ export const getStartTime: (state: State) => string | null = createSelector(
 )
 
 export function getRunSeconds(state: State): number {
-  const startTime = getStartTimeMs(state);
-  const {runTime, pausedDuration} = session(state);
+  const startTime = getStartTimeMs(state)
+  const { runTime, pausedDuration } = session(state)
   return runTime && startTime && runTime > startTime
     ? Math.floor((runTime - startTime - pausedDuration) / 1000)
     : 0
