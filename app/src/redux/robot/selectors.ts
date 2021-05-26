@@ -47,11 +47,11 @@ const sessionRequest = (state: State): Request => session(state).sessionRequest
 const cancelRequest = (state: State): Request => session(state).cancelRequest
 
 export function isMount(target: string | null | undefined): boolean {
-  return Constants.PIPETTE_MOUNTS.includes(target as Mount)
+  return Constants.PIPETTE_MOUNTS.indexOf(target as Mount) > -1 // eslint-disable-line @typescript-eslint/prefer-includes
 }
 
 export function isSlot(target: string | null | undefined): boolean {
-  return Constants.DECK_SLOTS.includes(target as Slot)
+  return Constants.DECK_SLOTS.indexOf(target as Slot) > -1 // eslint-disable-line @typescript-eslint/prefer-includes
 }
 
 export function labwareType(labware: Labware): LabwareType {
