@@ -280,7 +280,7 @@ def test_create_session_input(
     current_time: datetime,
     client: TestClient,
 ) -> None:
-    """It should handle a pause input."""
+    """It should handle a start input."""
     expected_input = SessionInput(
         inputType=SessionInputType.START,
         createdAt=current_time,
