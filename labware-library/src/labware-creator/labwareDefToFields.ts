@@ -79,6 +79,7 @@ export function labwareDefToFields(
     tubeRackInsertLoadName: null,
     aluminumBlockType: null,
     aluminumBlockChildType: null,
+    handPlacedTipFit: null,
 
     labwareType,
     footprintXDimension: String(def.dimensions.xDimension),

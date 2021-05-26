@@ -19,6 +19,7 @@ describe('labwareDefToFields', () => {
       tubeRackInsertLoadName: null,
       aluminumBlockType: null,
       aluminumBlockChildType: null,
+      handPlacedTipFit: null,
 
       footprintXDimension: String(def.dimensions.xDimension),
       footprintYDimension: String(def.dimensions.yDimension),
