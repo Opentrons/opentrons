@@ -56,7 +56,7 @@ class TempDeck(mod_abc.AbstractModule):
         polling_frequency = kwargs.get('polling_frequency')
         driver: AbstractTempDeckDriver
         if not simulating:
-            driver = await TempDeckDriver.create(port=port)
+            driver = await TempDeckDriver.create(port=port, loop=loop)
             polling_frequency = polling_frequency or TEMP_POLL_INTERVAL_SECS
         else:
             driver = SimulatingDriver(sim_model=sim_model)

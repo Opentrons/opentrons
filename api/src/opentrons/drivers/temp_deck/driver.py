@@ -9,8 +9,9 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
-from typing import Dict
+from typing import Dict, Optional
 from enum import Enum
 
 from opentrons.drivers import utils
@@ -47,18 +48,22 @@ class TempDeckError(Exception):
 class TempDeckDriver(AbstractTempDeckDriver):
 
     @classmethod
-    async def create(cls, port: str) -> TempDeckDriver:
+    async def create(
+            cls, port: str, loop: Optional[asyncio.AbstractEventLoop] = None
+    ) -> TempDeckDriver:
         """
         Create a temp deck driver.
 
         Args:
             port: port or url of temp deck
+            loop: optional event loop
 
         Returns: driver
         """
         connection = await SerialConnection.create(
             port=port, baud_rate=TEMP_DECK_BAUDRATE,
-            timeout=DEFAULT_TEMP_DECK_TIMEOUT, ack=TEMP_DECK_ACK
+            timeout=DEFAULT_TEMP_DECK_TIMEOUT, ack=TEMP_DECK_ACK,
+            loop=loop
         )
         return cls(connection=connection)
 
