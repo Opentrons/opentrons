@@ -1,3 +1,4 @@
+
 # Contributing Guide
 
 Thanks for your interest in contributing to the Opentrons platform! This Contributing Guide is intended to ensure best practices for both internal Opentrons contributors as well as any external contributors. We want to make sure you’re set up to contribute effectively, no matter if you’re helping us out with bug reports, code, documentation, feature suggestions, or anything else. This guide covers:
@@ -144,6 +145,11 @@ Your computer will need the following tools installed to be able to develop with
 - Python 3.7 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux. If `pyenv` is not available for your system or you do not want to use it, you can set the environment variable `OT_PYTHON` to the full path to the Python 3.7 executable)
 - If you wish to use `pyenv` but are experiencing issues with macOS Mojave please see the [common build problems section](https://github.com/pyenv/pyenv/wiki/Common-build-problems) of `pyenv` documentation.
 
+  ```shell
+  pyenv install 3.7.4
+  ```
+
+  **MacOS Big Sur Note:** due to this [known issue](https://github.com/pyenv/pyenv/issues/1737) we recommend using:
   ```shell
   pyenv install 3.7.10
   ```
