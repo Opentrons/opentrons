@@ -1,3 +1,4 @@
+
 # Contributing Guide
 
 Thanks for your interest in contributing to the Opentrons platform! This Contributing Guide is intended to ensure best practices for both internal Opentrons contributors as well as any external contributors. We want to make sure you’re set up to contribute effectively, no matter if you’re helping us out with bug reports, code, documentation, feature suggestions, or anything else. This guide covers:
@@ -146,6 +147,11 @@ Your computer will need the following tools installed to be able to develop with
 
   ```shell
   pyenv install 3.7.6
+  ```
+
+  **MacOS Big Sur Note:** due to this [known issue](https://github.com/pyenv/pyenv/issues/1737) we recommend using:
+  ```shell
+  pyenv install 3.7.10
   ```
 
 - Node v12 - [nvm][] is optional, but recommended
