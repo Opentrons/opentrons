@@ -3,7 +3,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import { getLatestLabwareDef } from './getLabware'
 
-// TODO(mc, 2021-05-19): this function does not filter by loadName
+// TODO(mc, 2021-05-19): this function does not filter by namespace
 // nor version. Instead, it short-circuits as soon as it finds a loadName match
 // bugfix ticket: https://github.com/Opentrons/opentrons/issues/7823
 function filterLabwareDefinitions(
