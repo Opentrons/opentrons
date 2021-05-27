@@ -42,7 +42,6 @@ export const mockInvalidLabware: Types.InvalidLabwareFile = {
   type: 'INVALID_LABWARE_FILE',
   filename: 'b.json',
   modified: 2,
-  definition: undefined,
 }
 
 export const mockOpentronsLabware: Types.OpentronsLabwareFile = {

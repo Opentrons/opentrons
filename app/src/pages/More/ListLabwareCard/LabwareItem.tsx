@@ -35,6 +35,7 @@ export interface LabwareItemProps {
 
 export function LabwareItem(props: LabwareItemProps): JSX.Element {
   const { file } = props
+  // @ts-expect-error TODO: use other means to separate out InvalidLabwareFile than defualt value here
   const { type, filename, modified, definition = null } = file
   const apiName = definition?.parameters.loadName || NA
   const displayName = definition?.metadata.displayName || NA

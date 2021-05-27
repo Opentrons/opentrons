@@ -123,7 +123,6 @@ describe('custom labware actions', () => {
             type: 'INVALID_LABWARE_FILE',
             filename: 'a.json',
             modified: 0,
-            definition: undefined,
           },
         },
       },

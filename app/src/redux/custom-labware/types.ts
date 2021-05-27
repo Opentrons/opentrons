@@ -17,7 +17,6 @@ export interface UncheckedLabwareFile extends LabwareFileProps {
 
 export interface InvalidLabwareFile extends LabwareFileProps {
   type: 'INVALID_LABWARE_FILE'
-  definition: undefined
 }
 
 export interface DuplicateLabwareFile extends ValidatedLabwareProps {
