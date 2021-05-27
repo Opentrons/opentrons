@@ -13,20 +13,20 @@ const labwareSchemaV1DefsContext = require.context(
   'sync' // load every definition into one synchronous chunk
 )
 let labwareSchemaV1Defs: Readonly<LabwareDefinition1[]> | null = null
-function getLegacyLabwareDefs(): Readonly<LabwareDefinition1[]> | null {
+function getLegacyLabwareDefs(): Readonly<LabwareDefinition1[]> {
   if (!labwareSchemaV1Defs) {
     labwareSchemaV1Defs = labwareSchemaV1DefsContext
       .keys()
       .map((name: string) => labwareSchemaV1DefsContext(name))
   }
 
-  return labwareSchemaV1Defs
+  return labwareSchemaV1Defs as Readonly<LabwareDefinition1[]>
 }
 
 export function getLegacyLabwareDef(
   loadName: string | null | undefined
 ): LabwareDefinition1 | null {
-  const def = getLegacyLabwareDefs()?.find(d => d.metadata.name === loadName)
+  const def = getLegacyLabwareDefs().find(d => d.metadata.name === loadName)
   return def || null
 }
 
