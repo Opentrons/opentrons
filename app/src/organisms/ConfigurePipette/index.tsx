@@ -56,16 +56,15 @@ export function ConfigurePipette(props: Props): JSX.Element {
     }
   }
 
-  const updateRequest = useSelector((state: State) => {
-    const lastId = last(requestIds)
-    return lastId ? getRequestById(state, lastId) : null
-  })
+  const updateRequest = useSelector((state: State) =>
+    // @ts-expect-error(sa, 2021-05-27): avoiding src code change, verify last(requestIds) is not undefined
+    getRequestById(state, last(requestIds))
+  )
 
   const updateError: string | null =
     updateRequest && updateRequest.status === FAILURE
-      ? 'message' in updateRequest.error && updateRequest.error.message != null
-        ? updateRequest.error.message
-        : AN_ERROR_OCCURRED_WHILE_UPDATING
+      ? // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+        updateRequest.error.message || AN_ERROR_OCCURRED_WHILE_UPDATING
       : null
 
   // TODO(mc, 2019-12-09): remove this feature flag

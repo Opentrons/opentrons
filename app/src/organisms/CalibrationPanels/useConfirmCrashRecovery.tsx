@@ -25,7 +25,7 @@ export interface Props extends CalibrationPanelProps {
 
 export function useConfirmCrashRecovery(
   props: Props
-): [React.ReactNode, React.ReactNode] {
+): [message: React.ReactNode, modal: React.ReactNode] {
   const { sendCommands, tipRack, requiresNewTip } = props
   const [showModal, setShowModal] = React.useState(false)
 

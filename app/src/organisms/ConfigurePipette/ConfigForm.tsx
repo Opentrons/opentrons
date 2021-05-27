@@ -75,12 +75,11 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     return quirkKeys.map<DisplayQuirkFieldProps>((name: string) => {
       const value = quirks[name]
       const displayName = startCase(name)
-      const quirksProps: DisplayQuirkFieldProps = {
+      return {
+        [name]: value,
         name,
         displayName,
-        [name]: value,
       }
-      return quirksProps
     })
   }
 
@@ -172,7 +171,8 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     >(fields, f => {
       // @ts-expect-error TODO: PipetteSettingsFieldsMap doesn't include a boolean value, despite checking for it here
       if (f.value === true || f.value === false) return f.value
-      return f.value !== f.default ? f.value?.toString() ?? '' : ''
+      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use optional chain to access f.value
+      return f.value !== f.default ? f.value.toString() : ''
     })
     const initialQuirkValues = this.props.settings[QUIRK_KEY]
     const initialValues = Object.assign(

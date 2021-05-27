@@ -40,9 +40,9 @@ const PROCEED_TO_DECK = 'Continue to slot 5'
 const EXIT = 'exit'
 const PROCEED_TO_PIP_OFFSET = 'continue to Pipette Offset Calibration'
 
-const contentsBySessionType: {
-  [sessionType in SessionType]?: { headerText: string }
-} = {
+const contentsBySessionType: Partial<
+  Record<SessionType, { headerText: string }>
+> = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: { headerText: DECK_CAL_HEADER },
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
     headerText: PIP_OFFSET_CAL_HEADER,
@@ -70,11 +70,8 @@ export function CompleteConfirmation(
   const lookupType: SessionType = isExtendedPipOffset
     ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
     : sessionType
-
-  const headerText =
-    lookupType in contentsBySessionType
-      ? contentsBySessionType[lookupType]?.headerText
-      : null
+  // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use in operator to type narrow
+  const { headerText } = contentsBySessionType[lookupType]
 
   const proceed = (): void => {
     sendCommands(

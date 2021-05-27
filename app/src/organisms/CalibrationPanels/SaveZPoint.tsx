@@ -72,13 +72,16 @@ const ALLOW_HORIZONTAL_TEXT = 'Reveal XY jog controls to move across deck'
 const ALLOW_XY_JOG_INSTRUCTIONS =
   'If the pipette is over the embossed 5, on the ridge of the slot, or hard to see, reveal the jog controls to move the pipette across the deck.'
 
-const contentsBySessionType: {
-  [sessionType in SessionType]?: {
-    headerText: string
-    buttonText: string
-    buttonEffectText: string
-  }
-} = {
+const contentsBySessionType: Partial<
+  Record<
+    SessionType,
+    {
+      headerText: string
+      buttonText: string
+      buttonEffectText: string
+    }
+  >
+> = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
     buttonText: DECK_CAL_BUTTON_TEXT,
     headerText: BASE_HEADER,
@@ -98,14 +101,10 @@ const contentsBySessionType: {
 
 export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
   const { isMulti, mount, sendCommands, sessionType } = props
-
-  const contents =
-    sessionType in contentsBySessionType
-      ? contentsBySessionType[sessionType]
-      : null
-  const headerText = contents && contents.headerText
-  const buttonText = contents && contents.buttonText
-  const buttonEffectText = contents && contents.buttonEffectText
+  // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to to type narrow
+  const { headerText, buttonText, buttonEffectText } = contentsBySessionType[
+    sessionType
+  ]
 
   const demoAsset = React.useMemo(
     () => mount && assetMap[mount][isMulti ? 'multi' : 'single'],

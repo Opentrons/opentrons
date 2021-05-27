@@ -175,12 +175,13 @@ export function CheckCalibration(
   if (showSpinner) {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
-
-  const Panel = currentStep != null ? PANEL_BY_STEP[currentStep] : null
-  return currentStep != null && Panel ? (
+  // @ts-expect-error(sa, 2021-05-27): avoiding src code change, currentStep might be undefined
+  const Panel = PANEL_BY_STEP[currentStep]
+  return Panel ? (
     <>
       <ModalPage
         titleBar={titleBarProps}
+        // @ts-expect-error(sa, 2021-05-27): avoiding src code change, currentStep might be undefined
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >
         <Panel

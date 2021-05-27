@@ -128,7 +128,13 @@ const bodyContentFromFragments = (
             )}
           </React.Fragment>
         ))
-        .reduce<React.ReactNode[]>((prev, current) => [prev, ' ', current], [])}
+        /*
+          Without passing an initial value into reduce and using generic typing, there is no way to tell TS that the reduced value is of a different type than the acc and val
+          Could do this, but it is a behavioral change bcuz the initial val would no longer be the first value in the array:
+          .reduce<React.ReactNode[]>((prev, current) => [prev, ' ', current], [])}
+        */
+        // @ts-expect-error(sa, 2021-05-27): avoiding src code change
+        .reduce((prev, current) => [prev, ' ', current])}
     </>
   )
 }

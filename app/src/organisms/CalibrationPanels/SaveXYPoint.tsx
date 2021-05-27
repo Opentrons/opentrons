@@ -56,11 +56,10 @@ import type {
 } from '../../redux/sessions/types'
 import type { Mount } from '@opentrons/components'
 
-const assetMap: {
-  [slot in CalibrationLabware['slot']]: {
-    [mount in Mount]: { [channels in 'multi' | 'single']: string }
-  }
-} = {
+const assetMap: Record<
+  CalibrationLabware['slot'],
+  Record<Mount, Record<'multi' | 'single', string>>
+> = {
   '1': {
     left: {
       multi: slot1LeftMultiDemoAsset,
@@ -178,14 +177,17 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
     checkBothPipettes,
   } = props
 
-  const contents =
-    sessionType in contentsBySessionTypeByCurrentStep
-      ? contentsBySessionTypeByCurrentStep[sessionType]?.[currentStep]
-      : null
-  const slotNumber = contents && contents.slotNumber
-  const buttonText = contents && contents.buttonText
-  const moveCommand = contents && contents.moveCommand
-  const finalCommand = contents && contents.finalCommand
+  const {
+    // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+    slotNumber,
+    // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+    buttonText,
+    // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+    moveCommand,
+    // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+    finalCommand,
+    // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+  } = contentsBySessionTypeByCurrentStep[sessionType][currentStep]
 
   const demoAsset = React.useMemo(
     () =>
@@ -294,7 +296,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
           loop={true}
           controls={false}
         >
-          <source src={String(demoAsset)} />
+          <source src={demoAsset} />
         </video>
       </Flex>
       <JogControls

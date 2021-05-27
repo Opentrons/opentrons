@@ -212,10 +212,10 @@ export function ResultsSummary(
               title={`${m}-mount-results`}
               alignItems={ALIGN_STRETCH}
             >
-              {calibrationsByMount[m].pipette != null &&
-              calibrationsByMount[m].calibration != null &&
+              {calibrationsByMount[m].pipette &&
+              calibrationsByMount[m].calibration &&
               // @ts-expect-error TODO: ts can't narrow that this isn't nullish
-              Object.entries(calibrationsByMount[m].calibration).length > 0 ? (
+              Object.entries(calibrationsByMount[m].calibration).length ? (
                 <PipetteResult
                   // @ts-expect-error TODO: ts can't narrow that this isn't nullish
                   pipetteInfo={calibrationsByMount[m].pipette}
@@ -349,7 +349,7 @@ function WarningText(props: {
     props.pipettes.left.tipLengthBad,
     props.pipettes.right.offsetBad,
     props.pipettes.right.tipLengthBad,
-  ].reduce((sum, item) => sum + (item ? 1 : 0), 0)
+  ].reduce((sum, item) => sum + (item === true ? 1 : 0), 0)
   return badCount > 0 ? (
     <>
       <Box marginTop={SPACING_3} fontSize={FONT_SIZE_BODY_2}>

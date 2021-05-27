@@ -68,7 +68,8 @@ export function ProtocolModuleList(): JSX.Element | null {
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         marginY={SPACING_2}
         paddingX="0.875rem"
-        justifyContent={!hasDuplicateModule ? JUSTIFY_SPACE_BETWEEN : undefined}
+        // @ts-expect-error(sa, 2021-05-27): avoiding src code change, pass undefined instead of null
+        justifyContent={!hasDuplicateModule ? JUSTIFY_SPACE_BETWEEN : null}
       >
         <Text {...MODULE_STYLE}>{t('modules_module_title')}</Text>
         {hasDuplicateModule && (
@@ -89,8 +90,9 @@ export function ProtocolModuleList(): JSX.Element | null {
               key={m.slot}
               data-test={m.slot}
               padding="0.75rem"
+              // @ts-expect-error(sa, 2021-05-27): avoiding src code change, pass undefined instead of null
               justifyContent={
-                !hasDuplicateModule ? JUSTIFY_SPACE_BETWEEN : undefined
+                !hasDuplicateModule ? JUSTIFY_SPACE_BETWEEN : null
               }
             >
               <Text {...MODULE_STYLE}>{getModuleDisplayName(m.model)}</Text>

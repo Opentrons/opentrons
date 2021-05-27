@@ -45,7 +45,6 @@ import {
 import type { State, Dispatch } from '../../redux/types'
 import type { Mount } from '../../redux/robot/types'
 import type { WizardStep } from './types'
-import type { PipetteName } from '@opentrons/shared-data'
 
 interface Props {
   robotName: string
@@ -70,18 +69,15 @@ export function ChangePipette(props: Props): JSX.Element | null {
       dispatchedAction.payload.target === PIPETTE
     ) {
       // track final home pipette request, its success closes modal
-      finalRequestId.current =
-        'requestId' in dispatchedAction.meta
-          ? dispatchedAction.meta.requestId
-          : null
+      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use in operator to type narrow
+      finalRequestId.current = dispatchedAction.meta.requestId
     }
   })
   const [wizardStep, setWizardStep] = React.useState<WizardStep>(CLEAR_DECK)
   const [wantedName, setWantedName] = React.useState<string | null>(null)
   const [confirmExit, setConfirmExit] = React.useState(false)
-  const wantedPipette = wantedName
-    ? getPipetteNameSpecs(wantedName as PipetteName)
-    : null
+  // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use in operator to type narrow
+  const wantedPipette = wantedName ? getPipetteNameSpecs(wantedName) : null
   const attachedPipette = useSelector(
     (state: State) => getAttachedPipettes(state, robotName)[mount]
   )

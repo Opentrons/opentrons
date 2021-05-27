@@ -30,14 +30,14 @@ export function CheckPipettesButton(
   const [dispatch] = useDispatchApiRequests(dispatchedAction => {
     if (
       dispatchedAction.type === FETCH_PIPETTES &&
-      'requestId' in dispatchedAction.meta
+      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+      dispatchedAction.meta.requestId
     ) {
-      fetchPipettesRequestId.current =
-        'requestId' in dispatchedAction.meta
-          ? dispatchedAction.meta.requestId ?? null
-          : null
+      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+      fetchPipettesRequestId.current = dispatchedAction.meta.requestId
     }
   })
+
   const handleClick = (): void => dispatch(fetchPipettes(robotName, true))
   const requestStatus = useSelector<State, RequestState | null>(state =>
     fetchPipettesRequestId.current

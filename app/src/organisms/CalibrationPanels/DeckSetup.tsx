@@ -47,11 +47,10 @@ const SECOND_RANK_WITH_BLOCK_PROMPT =
   'and ensure Calibration Block is within its designated slot as illustrated below'
 const SECOND_RANK_NO_BLOCK_PROMPT = 'as illustrated below'
 const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
-const contentsBySessionType: {
-  [st in SessionType]: {
-    moveCommandString: SessionCommandString
-  }
-} = {
+const contentsBySessionType: Record<
+  SessionType,
+  { moveCommandString: SessionCommandString }
+> = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
     moveCommandString: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
   },

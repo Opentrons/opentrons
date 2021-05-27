@@ -27,11 +27,10 @@ import type { RobotCalibrationCheckStep } from '../../../redux/sessions/types'
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../redux/calibration/selectors')
 
-type CheckCalibrationSpec = Partial<{
+interface CheckCalibrationSpec {
   component: React.ComponentType<any>
-  childProps?: {}
   currentStep: RobotCalibrationCheckStep
-}>
+}
 
 const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
   typeof getDeckDefinitions
