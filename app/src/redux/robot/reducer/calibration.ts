@@ -166,8 +166,7 @@ export function calibrationReducer(
     case 'robot:RETURN_TIP_RESPONSE':
       return handleReturnTipResponse(state, action)
 
-    // NOTE(BC, 2021-05-26): these actions are slated for removal with upcoming pre-run flow updates
-    // TODO(mc, 2018-01-26): caution - not covered by TS
+    // TODO(mc, 20187-01-26): caution - not covered by flow yet
     case SET_DECK_POPULATED:
       return handleSetDeckPopulated(state, action as any)
     case MOVE_TO_FRONT:

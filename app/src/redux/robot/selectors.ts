@@ -47,11 +47,11 @@ const sessionRequest = (state: State): Request => session(state).sessionRequest
 const cancelRequest = (state: State): Request => session(state).cancelRequest
 
 export function isMount(target: string | null | undefined): boolean {
-  return Constants.PIPETTE_MOUNTS.indexOf(target as Mount) > -1 // eslint-disable-line @typescript-eslint/prefer-includes
+  return Constants.PIPETTE_MOUNTS.includes(target as Mount)
 }
 
 export function isSlot(target: string | null | undefined): boolean {
-  return Constants.DECK_SLOTS.indexOf(target as Slot) > -1 // eslint-disable-line @typescript-eslint/prefer-includes
+  return Constants.DECK_SLOTS.includes(target as Slot)
 }
 
 export function labwareType(labware: Labware): LabwareType {
@@ -108,21 +108,24 @@ export function getSessionStatusInfo(state: State): SessionStatusInfo {
 }
 
 export function getSessionIsLoaded(state: State): boolean {
-  return getSessionStatus(state) !== ''
+  return getSessionStatus(state) !== ('' as SessionStatus)
 }
 
 export function getIsReadyToRun(state: State): boolean {
-  return getSessionStatus(state) === 'loaded'
+  return getSessionStatus(state) === ('loaded' as SessionStatus)
 }
 
 export function getIsRunning(state: State): boolean {
   const status = getSessionStatus(state)
 
-  return status === 'running' || status === 'paused'
+  return (
+    status === ('running' as SessionStatus) ||
+    status === ('paused' as SessionStatus)
+  )
 }
 
 export function getIsPaused(state: State): boolean {
-  return getSessionStatus(state) === 'paused'
+  return getSessionStatus(state) === ('paused' as SessionStatus)
 }
 
 export function getIsBlocked(state: State): boolean {
@@ -136,7 +139,11 @@ export function getCancelInProgress(state: State): boolean {
 export function getIsDone(state: State): boolean {
   const status = getSessionStatus(state)
 
-  return status === 'error' || status === 'finished' || status === 'stopped'
+  return (
+    status === ('error' as SessionStatus) ||
+    status === ('finished' as SessionStatus) ||
+    status === ('stopped' as SessionStatus)
+  )
 }
 
 // helper function for getCommands selector
@@ -279,8 +286,8 @@ export const getPipettes: (state: State) => Pipette[] = createSelector(
         ...pipette,
         probed,
         tipOn,
-        modelSpecs: getPipetteModelSpecs(pipette.name as PipetteModel) || null,
-        requestedAs: pipette.requestedAs || null,
+        modelSpecs: getPipetteModelSpecs(pipette?.name as PipetteModel) || null,
+        requestedAs: pipette?.requestedAs || null,
       }
       return fullPipette
     })
@@ -460,13 +467,11 @@ export const getLabware: (state: State) => Labware[] = createSelector(
         // both a and b are tipracks, sort multi-channel calibrators first
         const aChannels: number =
           a.calibratorMount != null
-            ? // @ts-expect-error TODO: guard type against null access
-              instByMount[a.calibratorMount as Mount].channels
+            ? instByMount[a.calibratorMount as Mount]?.channels ?? 0
             : 0
         const bChannels: number =
           b.calibratorMount != null
-            ? // @ts-expect-error TODO: guard type against null access
-              instByMount[b.calibratorMount as Mount].channels
+            ? instByMount[b.calibratorMount as Mount]?.channels ?? 0
             : 0
 
         return bChannels - aChannels
