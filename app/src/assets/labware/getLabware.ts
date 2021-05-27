@@ -6,7 +6,7 @@ import type {
 
 // require all definitions in the labware/definitions/1 directory
 // require.context is webpack-specific method
-const labwareSchemaV1DefsContext = (require as any).context(
+const labwareSchemaV1DefsContext = require.context(
   '@opentrons/shared-data/labware/definitions/1',
   true, // traverse subdirectories
   /\.json$/, // import filter
