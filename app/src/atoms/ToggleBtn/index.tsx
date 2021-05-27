@@ -32,7 +32,8 @@ export function ToggleBtn(props: ToggleBtnProps): JSX.Element {
 
   return (
     <Btn
-      disabled={Boolean(disabled)}
+      // @ts-expect-error TODO: cast disabled to Boolean as Btn expects it
+      disabled={disabled}
       role="switch"
       aria-label={label}
       aria-checked={toggledOn}

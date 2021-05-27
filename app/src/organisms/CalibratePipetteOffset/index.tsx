@@ -166,11 +166,13 @@ export function CalibratePipetteOffset(
     return <SpinnerModalPage key={instrument?.mount} titleBar={titleBarProps} />
   }
 
-  const Panel = currentStep != null ? PANEL_BY_STEP[currentStep] : null
-  return currentStep != null && Panel ? (
+  // @ts-expect-error TODO protect against currentStep === undefined
+  const Panel = PANEL_BY_STEP[currentStep]
+  return Panel ? (
     <>
       <ModalPage
         titleBar={titleBarProps}
+        // @ts-expect-error TODO protect against currentStep === undefined
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
         key={instrument?.mount}
       >

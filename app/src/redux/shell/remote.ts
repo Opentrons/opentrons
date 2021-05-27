@@ -15,9 +15,7 @@ export const remote: Remote = new Proxy(
 
       assert(
         propName in global.APP_SHELL_REMOTE,
-        `Expected APP_SHELL_REMOTE.${String(
-          propName
-        )} to exist, is app-shell/src/preload.js properly configured?`
+        `Expected APP_SHELL_REMOTE.${propName} to exist, is app-shell/src/preload.js properly configured?`
       )
       return global.APP_SHELL_REMOTE[propName]
     },
