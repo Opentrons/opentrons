@@ -25,7 +25,10 @@ const Content = (): JSX.Element => (
       </p>
     </div>
     <div className={styles.diagram_column}>
-      <img src={require('../../images/footprint.svg')} />
+      <img
+        src={require('../../images/footprint.svg')}
+        alt="labware footprint"
+      />
     </div>
     <div className={styles.form_fields_column}>
       <TextField
@@ -55,7 +58,7 @@ export const Footprint = (): JSX.Element | null => {
 
   return (
     <div className={styles.new_definition_section}>
-      <SectionBody label="Footprint">
+      <SectionBody label="Footprint" id="Footprint">
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <XYDimensionAlerts values={values} touched={touched} />
