@@ -25,7 +25,7 @@ describe('CompleteConfirmation', () => {
   beforeEach(() => {
     render = (props = {}) => {
       const {
-        pipMount = 'left' as Mount,
+        pipMount = 'left' as const,
         isMulti = false,
         tipRack = mockDeckCalTipRack,
         sendCommands = mockSendCommands,
