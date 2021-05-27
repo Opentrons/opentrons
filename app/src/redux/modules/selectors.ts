@@ -20,6 +20,7 @@ export const getAttachedModules: (
   state: State,
   robotName: string | null
 ) => Types.AttachedModule[] = createSelector(
+  // TODO(IL, 2021-05-27): factor out this inner function for clarity
   (
     state: State,
     robotName: string | null
