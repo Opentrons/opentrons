@@ -80,7 +80,7 @@ class AsyncSerial:
 
         """
         return await self._loop.run_in_executor(
-            executor=None,
+            executor=self._executor,
             func=lambda: self._serial.write(data=data)
         )
 
