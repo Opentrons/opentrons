@@ -132,9 +132,8 @@ const pipettesAreInexactMatch = (
   actualModelSpecs: PipetteModelSpecs | null | undefined
 ): boolean => {
   const { backCompatNames } = actualModelSpecs || {}
-  return Boolean(
-    protocolInstrName != null && backCompatNames?.includes(protocolInstrName)
-  )
+  // @ts-expect-error TODO: protect against protocolInstrName === null case
+  return Boolean(backCompatNames && backCompatNames.includes(protocolInstrName))
 }
 
 // TODO(mc, 2019-12-10): possibly use getConnectedRobot selector rather than robotName
