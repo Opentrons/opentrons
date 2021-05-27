@@ -119,10 +119,17 @@ const partialCast = <TKey extends keyof LabwareFields>(
 export const formLevelValidation = (
   values: LabwareFields
 ): LabwareCreatorErrors => {
+  // NOTE(IL, 2021-05-27): Casting will fail when any of the fields in a partial cast are missing values and don't have
+  // Yup casting defaults via `default()`. This happens very commonly, eg when users haven't gotten down to fill out
+  // any of these castFields yet in a new labware. When casting fails, formLevelValidation returns no errors (empty obj)
+  // and does not block save. This seems safe to do for now bc currently all these fields are required, at least in
+  // combination with each other (eg, wellDiameter is required only if wellShape is 'circular'). So we don't need
+  // form-level errors to block save in the case that some fields are missing, bc we can rely on the field-level
+  // errors from Yup validation. BUT - if we ever break this pattern and use purely-optional fields in this
+  // formLevelValidation fn in the future, we might need to return form-level errors when certain partial casting
+  // operations fail. We'll see!
+
   // Return value if there are missing fields and partial form casting fails.
-  // TODO IMMEDIATELY or add an error just to be safe / grokable?
-  // The require fields errors *should* be handled by the required fields errors of those fields, right? So form-level doesn't have to
-  // do anything.. ??
   const COULD_NOT_CAST = {}
 
   // Form-level errors are nested in the FormikErrors object under a special key, FORM_LEVEL_ERRORS.
