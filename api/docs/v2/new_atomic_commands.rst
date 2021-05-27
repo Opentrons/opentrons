@@ -213,8 +213,8 @@ The examples in this section should be inserted in the following:
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
-        plate = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
+        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
+        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
         pipette = protocol.load_instrument('p300_single_gen2', mount='left', tip_racks=[tiprack])
         pipette.pick_up_tip()
         # example code goes here
