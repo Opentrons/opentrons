@@ -6,6 +6,8 @@ import {
   wellBottomShapeOptions,
   wellShapeOptions,
   IRREGULAR_LABWARE_ERROR,
+  LABWARE_TOO_SMALL_ERROR,
+  LABWARE_TOO_LARGE_ERROR,
   LABELS,
   LOOSE_TIP_FIT_ERROR,
   MAX_X_DIMENSION,
@@ -91,16 +93,16 @@ export const labwareFormSchemaBaseObject = Yup.object({
     .default(0)
     .label(LABELS.footprintXDimension)
     .typeError(MUST_BE_A_NUMBER)
-    .min(MIN_X_DIMENSION, IRREGULAR_LABWARE_ERROR)
-    .max(MAX_X_DIMENSION, IRREGULAR_LABWARE_ERROR)
+    .min(MIN_X_DIMENSION, LABWARE_TOO_SMALL_ERROR)
+    .max(MAX_X_DIMENSION, LABWARE_TOO_LARGE_ERROR)
     .nullable()
     .required(),
   footprintYDimension: Yup.number()
     .default(0)
     .label(LABELS.footprintYDimension)
     .typeError(MUST_BE_A_NUMBER)
-    .min(MIN_Y_DIMENSION, IRREGULAR_LABWARE_ERROR)
-    .max(MAX_Y_DIMENSION, IRREGULAR_LABWARE_ERROR)
+    .min(MIN_Y_DIMENSION, LABWARE_TOO_SMALL_ERROR)
+    .max(MAX_Y_DIMENSION, LABWARE_TOO_LARGE_ERROR)
     .nullable()
     .required(),
   labwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension).max(
