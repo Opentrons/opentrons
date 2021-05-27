@@ -269,17 +269,16 @@ class Controller:
         self._smoothie_driver.disengage_axis(''.join(axes))
 
     def set_lights(self, button: Optional[bool], rails: Optional[bool]):
-        if opentrons.config.IS_ROBOT:
-            if button is not None:
-                self.gpio_chardev.set_button_light(blue=button)
-            if rails is not None:
-                self.gpio_chardev.set_rail_lights(rails)
+        if button is not None:
+            self.gpio_chardev.set_button_light(blue=button)
+        if rails is not None:
+            self.gpio_chardev.set_rail_lights(rails)
 
     def get_lights(self) -> Dict[str, bool]:
-        if not opentrons.config.IS_ROBOT:
-            return {}
-        return {'button': self.gpio_chardev.get_button_light()[2],
-                'rails': self.gpio_chardev.get_rail_lights()}
+        return {
+            'button': self.gpio_chardev.get_button_light()[2],
+            'rails': self.gpio_chardev.get_rail_lights()
+        }
 
     def pause(self):
         self._smoothie_driver.pause()

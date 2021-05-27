@@ -52,7 +52,11 @@ PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     'fastapi==0.54.1',
     'python-multipart==0.0.5',
+    'uvicorn==0.11.3',
+    'python-dotenv',
     'opentrons',
+    'wsproto==0.15.0',
+    'typing-extensions>=3.7.4.3',
 ]
 
 
