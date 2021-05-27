@@ -19,7 +19,7 @@ import { selectors as robotSelectors } from '../../redux/robot'
 
 import type { TipracksByMountMap } from '../../redux/robot'
 import type { Dispatch } from '../../redux/types'
-import type { Mount } from '@opentrons/components'
+import type { Mount, StyleProps } from '@opentrons/components'
 
 const IS_CALIBRATED = 'Pipette tip length is calibrated.'
 const IS_NOT_CALIBRATED = 'Pipette tip length is not calibrated.'
@@ -32,9 +32,8 @@ const CONTINUE_TO_MODULE_SETUP = 'Continue to module setup'
 
 const BTN_WIDTH = '23rem'
 
-interface CalibrateButtonProps {
+interface CalibrateButtonProps extends React.PropsWithChildren<StyleProps & React.HTMLAttributes<any>> {
   hasCalibrated: boolean
-  [key: string]: unknown
 }
 
 function CalibrateButton(props: CalibrateButtonProps): JSX.Element {
