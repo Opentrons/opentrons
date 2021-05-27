@@ -7,6 +7,7 @@ COPY LICENSE LICENSE
 
 COPY shared-data shared-data
 
+COPY api/MANIFEST.in api/MANIFEST.in
 COPY api/setup.py api/setup.py
 COPY api/pypi-readme.rst api/pypi-readme.rst
 COPY api/src/opentrons api/src/opentrons
