@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { isEveryFieldHidden } from '../../utils'
 import { yesNoOptions } from '../../fields'
-import { FormAlerts } from '../FormAlerts'
+import { FormAlerts } from '../alerts/FormAlerts'
 import { RadioField } from '../RadioField'
 import { SectionBody } from './SectionBody'
 

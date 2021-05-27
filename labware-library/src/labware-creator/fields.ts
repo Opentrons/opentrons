@@ -18,6 +18,8 @@ export const DISPLAY_VOLUME_UNITS = 'µL'
 // magic string for all validation errors that direct user away to the labware request form
 export const IRREGULAR_LABWARE_ERROR = 'IRREGULAR_LABWARE_ERROR'
 
+export const LOOSE_TIP_FIT_ERROR = 'LOOSE_TIP_FIT_ERROR'
+
 export const LINK_CUSTOM_LABWARE_FORM =
   'https://opentrons-ux.typeform.com/to/xi8h0W'
 
@@ -65,11 +67,16 @@ export const wellBottomShapeOptions: Options = [
   { name: 'V-Bottom', value: 'v' },
 ]
 
-export type BooleanString = 'true' | 'false' // TODO IMMEDIATELY revisit
+export type BooleanString = 'true' | 'false'
 
 export const yesNoOptions = [
   { name: 'Yes', value: 'true' },
   { name: 'No', value: 'false' },
+]
+
+export const snugLooseOptions = [
+  { name: 'Snug', value: 'snug' },
+  { name: 'Loose', value: 'loose' },
 ]
 
 export interface LabwareFields {
@@ -78,6 +85,7 @@ export interface LabwareFields {
   aluminumBlockType: string | null | undefined // eg, '24well' or '96well'
   aluminumBlockChildType: string | null | undefined
 
+  handPlacedTipFit: string | null | undefined
   // tubeRackSides: string[], // eg, []
   footprintXDimension: string | null | undefined
   footprintYDimension: string | null | undefined
@@ -125,6 +133,7 @@ export interface ProcessedLabwareFields {
   tubeRackInsertLoadName: string
   aluminumBlockType: string
   aluminumBlockChildType: string | null
+  handPlacedTipFit: string | null
 
   // tubeRackSides: string[], // eg, []
   footprintXDimension: number
@@ -325,6 +334,7 @@ export const getDefaultFormState = (): LabwareFields => ({
   aluminumBlockType: null,
   aluminumBlockChildType: null,
 
+  handPlacedTipFit: null,
   // tubeRackSides: [],
   footprintXDimension: null,
   footprintYDimension: null,
@@ -368,6 +378,7 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   tubeRackInsertLoadName: 'Which tube rack insert?',
   aluminumBlockType: 'Which aluminum block?',
   aluminumBlockChildType: 'What labware is on top of your aluminum block?',
+  handPlacedTipFit: 'Fit',
   homogeneousWells: 'Are all your wells the same shape and size?',
   footprintXDimension: 'Length',
   footprintYDimension: 'Width',

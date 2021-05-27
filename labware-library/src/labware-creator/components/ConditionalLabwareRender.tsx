@@ -47,6 +47,9 @@ export const ConditionalLabwareRender = (props: Props): JSX.Element => {
     let castValues: ProcessedLabwareFields | null = null
     try {
       castValues = labwareFormSchema.cast(values)
+      // TODO IMMEDIATELY: if we stick with this instead of single value casting, sniff this error to make sure it's
+      // really a Yup validation error (see how Formik does it in `Formik.tsx`).
+      // See #7824 and see pattern in formLevelValidation fn
     } catch (error) {}
 
     if (castValues === null) {

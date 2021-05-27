@@ -134,7 +134,8 @@
 .brand_column,
 .brand_id_column,
 .volume_instructions_column,
-.instructions_text {
+.instructions_text,
+.tip_fit_column {
   flex-basis: 100%;
   flex-shrink: 0;
   font-size: var(--fs-body-1);
@@ -176,7 +177,8 @@
   .brand_id_column,
   .help_text,
   .export_form_fields,
-  .volume_instructions_column {
+  .volume_instructions_column,
+  .tip_fit_column {
     flex-basis: var(--size-50p);
     flex-shrink: 1;
   }
@@ -208,7 +210,8 @@
   .instructions_column,
   .diagram_column,
   .form_fields_column,
-  .brand_column {
+  .brand_column,
+  .tip_fit_column {
     flex-basis: var(--size-third);
     flex-shrink: 1;
   }

@@ -47,6 +47,7 @@ This accomplishes the same thing as the following basic commands:
         p300.aspirate(100, plate['A1'])
         p300.dispense(100, plate['B1'])
         p300.return_tip()
+        p300.drop_tip()
 
 ******************************
 

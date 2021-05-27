@@ -3,12 +3,14 @@ import { FormikTouched } from 'formik'
 import { LabwareFields, MAX_SUGGESTED_Z } from '../../fields'
 import { AlertItem } from '@opentrons/components'
 
-export const getHeightAlerts = (
-  values: LabwareFields,
+export interface Props {
+  values: LabwareFields
   touched: FormikTouched<LabwareFields>
-): JSX.Element | null => {
-  const { labwareZDimension } = values
-  const zAsNum = Number(labwareZDimension) // NOTE: if empty string or null, may be cast to 0, but that's fine for `>`
+}
+
+export const HeightAlerts = (props: Props): JSX.Element | null => {
+  const { values, touched } = props
+  const zAsNum = Number(values.labwareZDimension) // NOTE: if empty string or null, may be cast to 0, but that's fine for `>`
   if (touched.labwareZDimension && zAsNum > MAX_SUGGESTED_Z) {
     return (
       <AlertItem

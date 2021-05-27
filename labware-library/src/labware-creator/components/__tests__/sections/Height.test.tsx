@@ -6,21 +6,21 @@ import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Height } from '../../sections/Height'
-import { FormAlerts } from '../../FormAlerts'
+import { FormAlerts } from '../../alerts/FormAlerts'
+import { HeightAlerts } from '../../alerts/HeightAlerts'
 import { TextField } from '../../TextField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import { getHeightAlerts } from '../../utils/getHeightAlerts'
 
 jest.mock('../../../utils')
 jest.mock('../../TextField')
-jest.mock('../../FormAlerts')
-jest.mock('../../utils/getHeightAlerts')
+jest.mock('../../alerts/FormAlerts')
+jest.mock('../../alerts/HeightAlerts')
 
 const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
 const textFieldMock = TextField as jest.MockedFunction<typeof TextField>
 
-const getHeightAlertsMock = getHeightAlerts as jest.MockedFunction<
-  typeof getHeightAlerts
+const HeightAlertsMock = HeightAlerts as jest.MockedFunction<
+  typeof HeightAlerts
 >
 
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
@@ -52,9 +52,18 @@ describe('Height Section with Alerts', () => {
       }
     })
 
-    when(getHeightAlertsMock)
-      .calledWith(getDefaultFormState(), {})
-      .mockReturnValue(<div>mock getHeightAlertsMock alerts</div>)
+    HeightAlertsMock.mockImplementation(args => {
+      if (
+        isEqual(args, {
+          values: formikConfig.initialValues,
+          touched: {},
+        })
+      ) {
+        return <div>mock heightAlertsMock alerts</div>
+      } else {
+        return <div></div>
+      }
+    })
 
     when(isEveryFieldHiddenMock)
       .calledWith(
@@ -78,7 +87,7 @@ describe('Height Section with Alerts', () => {
     )
     expect(screen.getByText('mock alerts'))
     expect(screen.getByText('labwareZDimension text field'))
-    expect(screen.getByText('mock getHeightAlertsMock alerts'))
+    expect(screen.getByText('mock heightAlertsMock alerts'))
   })
 
   it('should update title and instructions when tubeRack is selected', () => {

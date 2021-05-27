@@ -5,15 +5,16 @@ import { when } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { Footprint } from '../../sections/Footprint'
-import { FormAlerts } from '../../FormAlerts'
+import { FormAlerts } from '../../alerts/FormAlerts'
+import { XYDimensionAlerts } from '../../alerts/XYDimensionAlerts'
 import { TextField } from '../../TextField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import { getXYDimensionAlerts } from '../../utils/getXYDimensionAlerts'
+
 import { isEveryFieldHidden } from '../../../utils'
 
 jest.mock('../../TextField')
-jest.mock('../../FormAlerts')
-jest.mock('../../utils/getXYDimensionAlerts')
+jest.mock('../../alerts/FormAlerts')
+jest.mock('../../alerts/XYDimensionAlerts')
 jest.mock('../../../utils')
 
 const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
@@ -22,8 +23,8 @@ const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden
 >
 
-const getXYDimensionAlertsMock = getXYDimensionAlerts as jest.MockedFunction<
-  typeof getXYDimensionAlerts
+const XYDimensionAlertsMock = XYDimensionAlerts as jest.MockedFunction<
+  typeof XYDimensionAlerts
 >
 
 const formikConfig: FormikConfig<LabwareFields> = {
@@ -57,9 +58,18 @@ describe('Footprint', () => {
       }
     })
 
-    when(getXYDimensionAlertsMock)
-      .expectCalledWith(getDefaultFormState(), {})
-      .mockReturnValue(<div>mock getXYDimensionAlertsMock alerts</div>)
+    XYDimensionAlertsMock.mockImplementation(args => {
+      if (
+        isEqual(args, {
+          values: formikConfig.initialValues,
+          touched: {},
+        })
+      ) {
+        return <div>mock XYDimensionAlertsMock alerts</div>
+      } else {
+        return <div></div>
+      }
+    })
 
     when(isEveryFieldHiddenMock)
       .calledWith(
@@ -83,7 +93,7 @@ describe('Footprint', () => {
     expect(screen.getByText('mock alerts'))
     expect(screen.getByText('footprintXDimension text field'))
     expect(screen.getByText('footprintYDimension text field'))
-    expect(screen.getByText('mock getXYDimensionAlertsMock alerts'))
+    expect(screen.getByText('mock XYDimensionAlertsMock alerts'))
   })
   it('should not render when all fields are hidden', () => {
     when(isEveryFieldHiddenMock)

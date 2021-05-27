@@ -10,12 +10,12 @@ import {
 } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Regularity } from '../../sections/Regularity'
-import { FormAlerts } from '../../FormAlerts'
+import { FormAlerts } from '../../alerts/FormAlerts'
 import { RadioField } from '../../RadioField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
 jest.mock('../../RadioField')
-jest.mock('../../FormAlerts')
+jest.mock('../../alerts/FormAlerts')
 jest.mock('../../../utils')
 
 const RadioFieldMock = RadioField as jest.MockedFunction<typeof RadioField>

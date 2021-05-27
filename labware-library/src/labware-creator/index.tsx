@@ -12,22 +12,27 @@ import { AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { maskLoadName } from './fieldMasks'
 import {
-  tubeRackInsertOptions,
   aluminumBlockAutofills,
-  aluminumBlockTypeOptions,
   aluminumBlockChildTypeOptions,
+  aluminumBlockTypeOptions,
   getDefaultFormState,
   tubeRackAutofills,
+  tubeRackInsertOptions,
 } from './fields'
 import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
 import { labwareDefToFields } from './labwareDefToFields'
 import { labwareFormSchema } from './labwareFormSchema'
+import {
+  formLevelValidation,
+  LabwareCreatorErrors,
+} from './formLevelValidation'
 import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
 import { labwareTestProtocol, pipetteNameOptions } from './labwareTestProtocol'
 import { fieldsToLabware } from './fieldsToLabware'
 import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
 import { ConditionalLabwareRender } from './components/ConditionalLabwareRender'
 import { Dropdown } from './components/Dropdown'
+import { FormLevelErrorAlerts } from './components/FormLevelErrorAlerts'
 import { IntroCopy } from './components/IntroCopy'
 import { LinkOut } from './components/LinkOut'
 
@@ -39,6 +44,7 @@ import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
 import { UploadExisting } from './components/sections/UploadExisting'
 
 import { CustomTiprackWarning } from './components/sections/CustomTiprackWarning'
+import { HandPlacedTipFit } from './components/sections/HandPlacedTipFit'
 import { Regularity } from './components/sections/Regularity'
 import { Footprint } from './components/sections/Footprint'
 import { Height } from './components/sections/Height'
@@ -51,7 +57,6 @@ import { GridOffset } from './components/sections/GridOffset'
 
 import styles from './styles.css'
 
-import type { FormikProps } from 'formik'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   ImportError,
@@ -282,6 +287,7 @@ export const LabwareCreator = (): JSX.Element => {
         initialValues={lastUploaded || getDefaultFormState()}
         enableReinitialize
         validationSchema={labwareFormSchema}
+        validate={formLevelValidation}
         onSubmit={(values: LabwareFields) => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
             values
@@ -318,15 +324,17 @@ export const LabwareCreator = (): JSX.Element => {
           })
         }}
       >
-        {({
-          handleSubmit,
-          values,
-          isValid,
-          errors,
-          touched,
-          setTouched,
-          setValues,
-        }: FormikProps<LabwareFields>) => {
+        {bag => {
+          const {
+            handleSubmit,
+            values,
+            isValid,
+            touched,
+            setTouched,
+            setValues,
+          } = bag
+          const errors: LabwareCreatorErrors = bag.errors
+
           // @ts-expect-error(IL, 2021-03-24): values/errors/touched not typed for reportErrors to be happy
           reportErrors({ values, errors, touched })
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
@@ -408,6 +416,7 @@ export const LabwareCreator = (): JSX.Element => {
                 <>
                   {/* PAGE 1 - Labware */}
                   <CustomTiprackWarning />
+                  <HandPlacedTipFit />
                   <Regularity />
                   <Footprint />
                   <Height />
@@ -419,6 +428,7 @@ export const LabwareCreator = (): JSX.Element => {
                   <WellSpacing />
                   <GridOffset />
                   <Section label="Check your work">
+                    <FormLevelErrorAlerts errors={errors} />
                     <div className={styles.preview_labware}>
                       <ConditionalLabwareRender values={values} />
                       <p className={styles.preview_instructions}>

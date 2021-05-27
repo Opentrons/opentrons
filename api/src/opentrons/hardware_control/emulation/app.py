@@ -28,7 +28,7 @@ async def run_server(host: str, port: int, handler: ConnectionHandler) -> None:
 
 async def run() -> None:
     """Run the module emulators."""
-    host = "127.0.0.1"
+    host = "0.0.0.0"
 
     await asyncio.gather(
         run_server(host=host,

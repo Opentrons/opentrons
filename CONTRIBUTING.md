@@ -148,6 +148,12 @@ Your computer will need the following tools installed to be able to develop with
   pyenv install 3.7.6
   ```
 
+  **MacOS Big Sur Note:** due to this [known issue](https://github.com/pyenv/pyenv/issues/1737) we recommend using:
+
+  ```shell
+  pyenv install 3.7.10
+  ```
+
 - Node v12 - [nvm][] is optional, but recommended
 
   ```shell
