@@ -91,22 +91,26 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
       ) {
-        jogRequestId.current =
-          'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
-            : null
+        // @ts-expect-error TODO: code in comments below
+        jogRequestId.current = dispatchedAction.meta.requestId
+        // jogRequestId.current =
+        //   'requestId' in dispatchedAction.meta
+        //     ? dispatchedAction.meta.requestId ?? null
+        //     : null
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
           dispatchedAction.payload.command.command
         )
       ) {
-        trackedRequestId.current =
-          'meta' in dispatchedAction &&
-          'requestId' in dispatchedAction.meta &&
-          dispatchedAction.meta.requestId != null
-            ? dispatchedAction.meta.requestId
-            : null
+        // @ts-expect-error TODO: code in comments below
+        trackedRequestId.current = dispatchedAction.meta.requestId
+        // trackedRequestId.current =
+        //   'meta' in dispatchedAction &&
+        //   'requestId' in dispatchedAction.meta &&
+        //   dispatchedAction.meta.requestId != null
+        //     ? dispatchedAction.meta.requestId
+        //     : null
       }
     }
   )

@@ -71,9 +71,11 @@ export function ModuleUpdate(props: Props): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const handleCloseErrorModal = (): void => {
-    if (latestRequestId != null) {
-      dispatch(dismissRequest(latestRequestId))
-    }
+    // @ts-expect-error TODO: use code below
+    dispatch(dismissRequest(latestRequestId))
+    // if (latestRequestId != null) {
+    //   dispatch(dismissRequest(latestRequestId))
+    // }
   }
   return (
     <Flex justifyContent={JUSTIFY_FLEX_END} display={DISPLAY_INLINE_BLOCK}>
@@ -94,11 +96,13 @@ export function ModuleUpdate(props: Props): JSX.Element {
             buttons={[{ children: OK_TEXT, onClick: handleCloseErrorModal }]}
           >
             <p>{FAILED_UPDATE_BODY}</p>
-            <p>
+            <p>{getErrorResponseMessage(latestRequest.error)}</p>
+            {/* TODO: use the following instead: */}
+            {/* <p>
               {latestRequest.error != null
                 ? getErrorResponseMessage(latestRequest.error)
                 : null}
-            </p>
+            </p> */}
           </AlertModal>
         </Portal>
       )}
