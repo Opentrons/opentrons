@@ -34,7 +34,6 @@ class AbstractModule(abc.ABC):
         """
         pass
 
-    @abc.abstractmethod
     def __init__(self,
                  port: str,
                  usb_port: USBPort,
@@ -46,7 +45,6 @@ class AbstractModule(abc.ABC):
         self._usb_port = usb_port
         self._loop = use_or_initialize_loop(loop)
         self._execution_manager = execution_manager
-        self._device_info: Mapping[str, str]
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
 
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
@@ -70,8 +68,8 @@ class AbstractModule(abc.ABC):
 
     def has_available_update(self) -> bool:
         """ Return whether a newer firmware file is available """
-        if self._device_info and self._bundled_fw:
-            device_version = parse_version(self._device_info['version'])
+        if self.device_info and self._bundled_fw:
+            device_version = parse_version(self.device_info['version'])
             available_version = parse_version(self._bundled_fw.version)
             return available_version > device_version
         return False
@@ -113,16 +111,14 @@ class AbstractModule(abc.ABC):
         pass
 
     @property
-    @abc.abstractmethod
     def port(self) -> str:
         """ The virtual port where the module is connected. """
-        pass
+        return self._port
 
     @property
-    @abc.abstractmethod
     def usb_port(self) -> USBPort:
         """ The physical port where the module is connected. """
-        pass
+        return self._usb_port
 
     @abc.abstractmethod
     async def prep_for_update(self) -> str:
@@ -135,11 +131,6 @@ class AbstractModule(abc.ABC):
 
         :returns str: The port we're running on.
         """
-        pass
-
-    @property
-    @abc.abstractmethod
-    def interrupt_callback(self) -> InterruptCallback:
         pass
 
     @property
