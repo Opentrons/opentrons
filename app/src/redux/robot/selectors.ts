@@ -279,8 +279,8 @@ export const getPipettes: (state: State) => Pipette[] = createSelector(
         ...pipette,
         probed,
         tipOn,
-        modelSpecs: getPipetteModelSpecs(pipette?.name as PipetteModel) || null,
-        requestedAs: pipette?.requestedAs || null,
+        modelSpecs: getPipetteModelSpecs(pipette.name as PipetteModel) || null,
+        requestedAs: pipette.requestedAs || null,
       }
       return fullPipette
     })
@@ -460,11 +460,13 @@ export const getLabware: (state: State) => Labware[] = createSelector(
         // both a and b are tipracks, sort multi-channel calibrators first
         const aChannels: number =
           a.calibratorMount != null
-            ? instByMount[a.calibratorMount as Mount]?.channels ?? 0
+            ? // @ts-expect-error TODO: guard type against null access
+              instByMount[a.calibratorMount as Mount].channels
             : 0
         const bChannels: number =
           b.calibratorMount != null
-            ? instByMount[b.calibratorMount as Mount]?.channels ?? 0
+            ? // @ts-expect-error TODO: guard type against null access
+              instByMount[b.calibratorMount as Mount].channels
             : 0
 
         return bChannels - aChannels
