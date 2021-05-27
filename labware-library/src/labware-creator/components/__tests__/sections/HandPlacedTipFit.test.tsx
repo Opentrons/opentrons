@@ -8,14 +8,14 @@ import {
   snugLooseOptions,
 } from '../../../fields'
 import { HandPlacedTipFit } from '../../sections/HandPlacedTipFit'
-import { FormAlerts } from '../../FormAlerts'
+import { FormAlerts } from '../../alerts/FormAlerts'
+import { TipFitAlerts } from '../../alerts/TipFitAlerts'
 import { Dropdown } from '../../Dropdown'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import { TipFitAlerts } from '../../TipFitAlerts'
 
 jest.mock('../../Dropdown')
-jest.mock('../../FormAlerts')
-jest.mock('../../TipFitAlerts')
+jest.mock('../../alerts/FormAlerts')
+jest.mock('../../alerts/TipFitAlerts')
 
 const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
 const dropdownMock = Dropdown as jest.MockedFunction<typeof Dropdown>

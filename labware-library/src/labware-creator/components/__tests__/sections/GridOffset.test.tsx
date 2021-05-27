@@ -7,12 +7,12 @@ import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { GridOffset } from '../../sections/GridOffset'
-import { FormAlerts } from '../../FormAlerts'
+import { FormAlerts } from '../../alerts/FormAlerts'
 import { TextField } from '../../TextField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 jest.mock('../../../utils')
 jest.mock('../../TextField')
-jest.mock('../../FormAlerts')
+jest.mock('../../alerts/FormAlerts')
 
 const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
 

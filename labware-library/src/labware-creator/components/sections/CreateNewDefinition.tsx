@@ -5,7 +5,7 @@ import { PrimaryBtn } from '@opentrons/components'
 import { Dropdown } from '../../components/Dropdown'
 import { isEveryFieldHidden, makeAutofillOnChange } from '../../utils'
 import { labwareTypeOptions, labwareTypeAutofills } from '../../fields'
-import { FormAlerts } from '../FormAlerts'
+import { FormAlerts } from '../alerts/FormAlerts'
 import { SectionBody } from './SectionBody'
 
 import styles from '../../styles.css'
