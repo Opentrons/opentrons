@@ -24,8 +24,9 @@ export class CommandList extends React.Component<CommandListProps> {
   componentDidUpdate(): void {
     // TODO(mc, 2018-07-24): use new refs
     // eslint-disable-next-line react/no-string-refs
-    if (this.refs.ensureVisible)
-      (this.refs.ensureVisible as React.ElementRef<'li'>).scrollIntoView(true) // eslint-disable-line react/no-string-refs
+    if (this.refs.ensureVisible) {
+      ;(this.refs.ensureVisible as React.ElementRef<'li'>).scrollIntoView(true) // eslint-disable-line react/no-string-refs
+    }
   }
 
   render(): JSX.Element {

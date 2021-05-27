@@ -92,7 +92,7 @@ describe("SelectNetwork's ConnectModal", () => {
       const mockRequest = { ssid: 'foobar', hidden: false }
 
       connectFormToConfigureRequest.mockReturnValue(mockRequest)
-      formik.invoke('onSubmit')?.(mockValues, {} as any) // eslint-disable-line @typescript-eslint/no-floating-promises
+      formik.invoke('onSubmit')?.(mockValues, {} as any)
 
       expect(connectFormToConfigureRequest).toHaveBeenCalledWith(
         network,
@@ -108,7 +108,7 @@ describe("SelectNetwork's ConnectModal", () => {
       const mockValues = {}
 
       connectFormToConfigureRequest.mockReturnValue(null)
-      formik.invoke('onSubmit')?.(mockValues, {} as any) // eslint-disable-line @typescript-eslint/no-floating-promises
+      formik.invoke('onSubmit')?.(mockValues, {} as any)
 
       expect(handleConnect).not.toHaveBeenCalled()
     })

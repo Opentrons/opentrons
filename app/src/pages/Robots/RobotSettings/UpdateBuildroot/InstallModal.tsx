@@ -24,7 +24,8 @@ export function InstallModal(props: InstallModalProps): JSX.Element {
     buttons.push({ children: 'close', onClick: close })
   }
 
-  let heading: string = ''
+  let heading: string
+  // let heading: string = ''
   if (robotSystemType === 'balena') {
     if (
       session.step === 'premigration' ||
@@ -40,6 +41,7 @@ export function InstallModal(props: InstallModalProps): JSX.Element {
 
   return (
     <AlertModal
+      // @ts-expect-error use commented code above
       heading={heading}
       buttons={buttons}
       restrictOuterScroll={false}

@@ -20,9 +20,9 @@ const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<
 >
 
 describe('U2EDriverWarning', () => {
-  const trackEvent: ReturnType<
+  const trackEvent: jest.MockedFunction<
     typeof Analytics.useTrackEvent
-  > = jest.fn() as any
+  > = jest.fn()
 
   beforeEach(() => {
     useTrackEvent.mockReturnValue(trackEvent)

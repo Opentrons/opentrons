@@ -47,10 +47,14 @@ export const SelectNetwork = ({
 
   const [dispatchApi, requestIds] = RobotApi.useDispatchApiRequest()
 
-  const requestState = useSelector((state: State) => {
-    const lastId = last(requestIds)
-    return lastId != null ? RobotApi.getRequestById(state, lastId) : null
-  })
+  const requestState = useSelector((state: State) =>
+    // @ts-expect-error TODO use commented code below to protect against retrieving a request when the id doesn't exist
+    RobotApi.getRequestById(state, last(requestIds))
+  )
+  // const requestState = useSelector((state: State) => {
+  //   const lastId = last(requestIds)
+  //   return lastId != null ? RobotApi.getRequestById(state, lastId) : null
+  // })
 
   const activeNetwork = list.find(nw => nw.active)
 
@@ -106,8 +110,11 @@ export const SelectNetwork = ({
   }
 
   const handleDone = (): void => {
-    const lastId = last(requestIds)
-    if (lastId != null) dispatch(RobotApi.dismissRequest(lastId))
+    // @ts-expect-error TODO use commented code below
+    if (last(requestIds)) dispatch(RobotApi.dismissRequest(last(requestIds)))
+    // const lastId = last(requestIds)
+    // if (lastId != null) dispatch(RobotApi.dismissRequest(lastId))
+
     setChangeState({ type: null })
   }
 
@@ -129,12 +136,14 @@ export const SelectNetwork = ({
               ssid={changeState.ssid}
               isPending={requestState.status === RobotApi.PENDING}
               error={
-                'error' in requestState &&
-                requestState.error &&
-                'message' in requestState.error &&
-                requestState.error.message
-                  ? requestState.error
-                  : null
+                // @ts-expect-error TODO use commented code below
+                requestState.error && requestState.error.message
+                // 'error' in requestState &&
+                // requestState.error &&
+                // 'message' in requestState.error &&
+                // requestState.error.message
+                //   ? requestState.error
+                //   : null
               }
               onClose={handleDone}
             />

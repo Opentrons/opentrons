@@ -41,11 +41,13 @@ export function InstrumentItem(props: InstrumentItemProps): JSX.Element | null {
   } = props
   const { t } = useTranslation(['protocol_calibration', 'protocol_info'])
   if (hidden) return null
-  const match = compatibility
-    ? (['match', 'inexact_match'] as PipetteCompatibility[]).includes(
-        compatibility
-      )
-    : Boolean(compatibility)
+  // @ts-expect-error TODO: code change to commented code below
+  const match = ['match', 'inexact_match'].includes(compatibility)
+  // const match = compatibility
+  //   ? (['match', 'inexact_match'] as PipetteCompatibility[]).includes(
+  //       compatibility
+  //     )
+  //   : Boolean(compatibility)
   return (
     <>
       <Flex

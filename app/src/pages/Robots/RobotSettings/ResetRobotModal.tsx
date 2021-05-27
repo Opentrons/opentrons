@@ -48,11 +48,18 @@ export function ResetRobotModal(props: ResetRobotModalProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
 
-  const resetRequest = useSelector((state: State) => {
-    const lastId = last(requestIds)
-    return lastId != null ? getRequestById(state, lastId) : null
-  })
-  const resetRequestStatus = resetRequest != null ? resetRequest.status : null
+  // const resetRequest = useSelector((state: State) => {
+  //   const lastId = last(requestIds)
+  //   return lastId != null ? getRequestById(state, lastId) : null
+  // })
+  // const resetRequestStatus = resetRequest != null ? resetRequest.status : null
+
+  // const triggerReset = (): unknown =>
+  const resetRequestStatus = useSelector((state: State) => {
+    // @ts-expect-error TODO: should be commented code above,
+    // code change to protect against getting the status off of a request that doesn't exist
+    return getRequestById(state, last(requestIds))
+  })?.status
 
   const triggerReset = (): unknown =>
     dispatchRequest(resetConfig(robotName, resetOptions))
@@ -119,7 +126,9 @@ export function ResetRobotModal(props: ResetRobotModalProps): JSX.Element {
               })
             }}
             name={o.id}
-            value={Boolean(resetOptions[o.id])}
+            // value={Boolean(resetOptions[o.id])}
+            // @ts-expect-error TODO commented code above to explicitly give LabeledCheckbox the boolean that it's expecting
+            value={resetOptions[o.id]}
             key={o.id}
           >
             <p>{o.description}</p>

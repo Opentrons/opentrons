@@ -55,7 +55,9 @@ export function ModuleUpdate(props: Props): JSX.Element {
   }
   const latestRequestId = last(requestIds)
   const latestRequest = useSelector<State, RequestState | null>(state =>
-    latestRequestId ? getRequestById(state, latestRequestId) : null
+    // @ts-expect-error TODO: should be `latestRequestId ? getRequestById(state, latestRequestId) : null` to be
+    // extra cautious that we don't pass a non-existent latestRequestId to anything that is expecting a real id.
+    getRequestById(state, latestRequestId)
   )
   const isPending = latestRequest?.status === PENDING
 

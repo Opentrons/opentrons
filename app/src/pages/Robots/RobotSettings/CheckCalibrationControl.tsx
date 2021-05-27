@@ -48,10 +48,12 @@ export function CheckCalibrationControl({
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
-        createRequestId.current =
-          'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
-            : null
+        // @ts-expect-error TODO: should be the code in comment below
+        createRequestId.current = dispatchedAction.meta.requestId
+        // createRequestId.current =
+        //   'requestId' in dispatchedAction.meta
+        //     ? dispatchedAction.meta.requestId ?? null
+        //     : null
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===

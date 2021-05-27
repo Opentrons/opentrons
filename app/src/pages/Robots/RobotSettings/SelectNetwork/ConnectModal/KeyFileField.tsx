@@ -38,7 +38,7 @@ export const KeyFileField = (props: KeyFileFieldProps): JSX.Element => {
 
   const handleValueChange = (_: string, value: string): void => {
     if (value === ADD_NEW_KEY_VALUE) {
-      uploadKeyRef.current && uploadKeyRef?.current?.click()
+      uploadKeyRef.current && uploadKeyRef.current.click()
     } else {
       setValue(value)
     }

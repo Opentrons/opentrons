@@ -78,21 +78,26 @@ export function ProtocolPipettesCard(
   return (
     <InfoSection title={t('instruments_title')}>
       <SectionContentHalf>
-        {pipetteItemProps.map(
-          itemProps =>
-            itemProps && (
-              <InstrumentItem
-                key={itemProps.mount}
-                compatibility={itemProps.compatibility}
-                mount={itemProps.mount}
-                hidden={itemProps.hidden}
-                needsOffsetCalibration={itemProps.needsOffsetCalibration}
-                pipetteOffsetData={itemProps.calibrationData?.offset}
-              >
-                {itemProps.displayName}
-              </InstrumentItem>
-            )
-        )}
+        {pipetteItemProps.map(itemProps => (
+          // itemProps && (
+          <InstrumentItem
+            // @ts-expect-error TODO: do `itemProps && (` to prevent access when null
+            key={itemProps.mount}
+            // @ts-expect-error TODO: do `itemProps && (` to prevent access when null
+            compatibility={itemProps.compatibility}
+            // @ts-expect-error TODO: do `itemProps && (` to prevent access when null
+            mount={itemProps.mount}
+            // @ts-expect-error TODO: do `itemProps && (` to prevent access when null
+            hidden={itemProps.hidden}
+            // @ts-expect-error TODO: do `itemProps && (` to prevent access when null
+            needsOffsetCalibration={itemProps.needsOffsetCalibration}
+            // @ts-expect-error TODO: do `itemProps && (` to prevent access when null
+            pipetteOffsetData={itemProps.calibrationData?.offset}
+          >
+            {/* @ts-expect-error TODO: do `itemProps && (` to prevent access when null */}
+            {itemProps.displayName}
+          </InstrumentItem>
+        ))}
       </SectionContentHalf>
       {!allPipettesMatching && (
         <MissingItemWarning

@@ -10,7 +10,7 @@ import {
   getUnreachableRobots,
 } from '../../../redux/discovery'
 
-import type { State } from '../../../redux/types'
+import type { State, Dispatch } from '../../../redux/types'
 
 import { SidePanel } from '@opentrons/components'
 import { RobotList } from './RobotList'
@@ -90,11 +90,22 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-const mapDispatchToProps: DP = {
-  onScanClick: () => startDiscovery(),
+function mapDispatchToProps(dispatch: Dispatch): DP {
+  return {
+    onScanClick: () => dispatch(startDiscovery()),
+  }
 }
+
+// slight code change here moving from the functional to object version of mapDispatchToProps satisfies the connect
+// functions types without having to import other types from react-redux. Mostly a convenience change as all new
+// connected components use the hooks api
+
+// const mapDispatchToProps: DP = {
+//   onScanClick: () => startDiscovery(),
+// }
 
 export const ConnectPanel = connect(
   mapStateToProps,
+  // @ts-expect-error TODO: use commented code above
   mapDispatchToProps
 )(ConnectPanelComponent)

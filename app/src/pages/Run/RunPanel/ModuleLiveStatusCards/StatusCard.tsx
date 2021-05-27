@@ -8,7 +8,7 @@ interface Props {
   /** Title for the card */
   title: string
   /** Card Content, each child will be separated with a grey bottom border */
-  children: React.ReactNode | null | undefined
+  children?: React.ReactNode
   /** Optional className for card contents */
   className?: string
   isCardExpanded: boolean

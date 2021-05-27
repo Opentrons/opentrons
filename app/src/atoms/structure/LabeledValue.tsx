@@ -9,8 +9,8 @@ import {
 import type { StyleProps } from '@opentrons/components'
 
 interface Props extends StyleProps {
-  label: string | React.ReactNode
-  value: string | React.ReactNode
+  label: React.ReactNode
+  value: React.ReactNode
   labelProps?: React.ComponentProps<typeof Text>
   valueProps?: React.ComponentProps<typeof Text>
 }

@@ -125,7 +125,7 @@ export function RunControls(props: RunControlsProps): JSX.Element {
       {pauseResumeButton}
       {cancelButton}
       {resetButton}
-      {isConfirmCancelOpen ? (
+      {isConfirmCancelOpen === true ? (
         <ConfirmCancelModal onClose={() => setConfirmCancelOpen(false)} />
       ) : null}
     </>
