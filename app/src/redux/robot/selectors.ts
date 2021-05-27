@@ -108,24 +108,21 @@ export function getSessionStatusInfo(state: State): SessionStatusInfo {
 }
 
 export function getSessionIsLoaded(state: State): boolean {
-  return getSessionStatus(state) !== ('' as SessionStatus)
+  return getSessionStatus(state) !== ''
 }
 
 export function getIsReadyToRun(state: State): boolean {
-  return getSessionStatus(state) === ('loaded' as SessionStatus)
+  return getSessionStatus(state) === 'loaded'
 }
 
 export function getIsRunning(state: State): boolean {
   const status = getSessionStatus(state)
 
-  return (
-    status === ('running' as SessionStatus) ||
-    status === ('paused' as SessionStatus)
-  )
+  return status === 'running' || status === 'paused'
 }
 
 export function getIsPaused(state: State): boolean {
-  return getSessionStatus(state) === ('paused' as SessionStatus)
+  return getSessionStatus(state) === 'paused'
 }
 
 export function getIsBlocked(state: State): boolean {
@@ -139,11 +136,7 @@ export function getCancelInProgress(state: State): boolean {
 export function getIsDone(state: State): boolean {
   const status = getSessionStatus(state)
 
-  return (
-    status === ('error' as SessionStatus) ||
-    status === ('finished' as SessionStatus) ||
-    status === ('stopped' as SessionStatus)
-  )
+  return status === 'error' || status === 'finished' || status === 'stopped'
 }
 
 // helper function for getCommands selector
