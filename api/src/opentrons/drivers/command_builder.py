@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List, Optional
 
 
@@ -16,7 +18,7 @@ class CommandBuilder:
 
     def add_float(
             self, prefix: str, value: float,
-            precision: Optional[int]) -> 'CommandBuilder':
+            precision: Optional[int]) -> CommandBuilder:
         """
         Add a float value.
 
@@ -30,7 +32,7 @@ class CommandBuilder:
         value = round(value, precision) if precision is not None else value
         return self.add_element(f"{prefix}{value}")
 
-    def add_int(self, prefix: str, value: int) -> 'CommandBuilder':
+    def add_int(self, prefix: str, value: int) -> CommandBuilder:
         """
         Add an integer value.
 
@@ -42,7 +44,7 @@ class CommandBuilder:
         """
         return self.add_element(f"{prefix}{value}")
 
-    def add_gcode(self, gcode: str) -> 'CommandBuilder':
+    def add_gcode(self, gcode: str) -> CommandBuilder:
         """
         Add a GCODE.
 
@@ -53,7 +55,7 @@ class CommandBuilder:
         """
         return self.add_element(gcode)
 
-    def add_builder(self, builder: 'CommandBuilder') -> 'CommandBuilder':
+    def add_builder(self, builder: CommandBuilder) -> CommandBuilder:
         """
         Add all elements from builder
 
@@ -65,7 +67,7 @@ class CommandBuilder:
         self._elements += builder._elements
         return self
 
-    def add_element(self, element: str) -> 'CommandBuilder':
+    def add_element(self, element: str) -> CommandBuilder:
         """
         Add an element to the command builder
 
@@ -93,3 +95,8 @@ class CommandBuilder:
 
     def __bool__(self) -> bool:
         return len(self._elements) != 0
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, CommandBuilder):
+            return self.build() == other.build()
+        return False

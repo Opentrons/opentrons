@@ -141,21 +141,22 @@ class AttachedModulesControl:
             if mod_type == module.name():
                 matching_modules.append(module)
         if self.api.is_simulator:
-            mod_class = {
-                'magdeck': modules.MagDeck,
-                'tempdeck': modules.TempDeck,
-                'thermocycler': modules.Thermocycler
+            module_builder = {
+                'magdeck': modules.MagDeck.build,
+                'tempdeck': modules.TempDeck.build,
+                'thermocycler': modules.Thermocycler.build
             }[mod_type]
-            simulating_module = mod_class(
-                port='',
-                usb_port=self.api._backend._usb.find_port(''),
-                simulating=True,
-                loop=self.api.loop,
-                execution_manager=ExecutionManager(
-                    loop=self.api.loop),
-                sim_model=by_model.value)
-            await simulating_module._connect()
-            simulated_module = simulating_module
+            if module_builder:
+                simulating_module = await module_builder(
+                    port='',
+                    usb_port=self.api._backend._usb.find_port(''),
+                    simulating=True,
+                    loop=self.api.loop,
+                    execution_manager=ExecutionManager(
+                        loop=self.api.loop),
+                    sim_model=by_model.value
+                )
+                simulated_module = simulating_module
         return matching_modules, simulated_module
 
     def scan(self) -> List[modules.ModuleAtPort]:
