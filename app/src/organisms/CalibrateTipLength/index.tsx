@@ -159,6 +159,7 @@ export function CalibrateTipLength(
     <>
       <ModalPage
         titleBar={titleBarProps}
+        // @ts-expect-error(sa, 2021-05-26): cannot index undefined, leaving to avoid src code change
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >
         <Panel
