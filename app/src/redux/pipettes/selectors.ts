@@ -148,8 +148,9 @@ export const getProtocolPipettesInfo: (
     const pipetteHasOffset = (
       calibrations: PipetteOffsetCalibration[],
       serial: string
-    ): boolean =>
-      Boolean(head(calibrations.filter(cal => cal.pipette === serial)))
+    ): boolean => {
+      return Boolean(head(calibrations.filter(cal => cal.pipette === serial)))
+    }
     return Constants.PIPETTE_MOUNTS.reduce<Types.ProtocolPipetteInfoByMount>(
       (result, mount) => {
         const protocolPipette = protocolPipettes.find(i => i.mount === mount)
