@@ -10,7 +10,7 @@ try:
 except OSError:
     aionotify = None  # type: ignore
 
-from opentrons.drivers.smoothie_drivers import driver_3_0
+from opentrons.drivers.asyncio.smoothie import SmoothieDriver
 from opentrons.drivers.rpi_drivers import build_gpio_chardev, usb
 import opentrons.config
 from opentrons.config import pipette_config
@@ -74,9 +74,9 @@ class Controller:
         self._gpio_chardev: Final = gpio
         self._board_revision: Final = self.gpio_chardev.board_rev
         # We handle our own locks in the hardware controller thank you
-        self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
-            config=self.config, gpio_chardev=self._gpio_chardev,
-            handle_locks=False)
+        self._smoothie_driver = SmoothieDriver(
+            config=self.config, gpio_chardev=self._gpio_chardev
+        )
         self._cached_fw_version: Optional[str] = None
         self._usb = usb.USBBus(self._board_revision)
         self._module_controls: Optional[AttachedModulesControl] = None
@@ -117,11 +117,11 @@ class Controller:
     def start_gpio_door_watcher(self, **kargs):
         self.gpio_chardev.start_door_switch_watcher(**kargs)
 
-    def update_position(self) -> Dict[str, float]:
-        self._smoothie_driver.update_position()
+    async def update_position(self) -> Dict[str, float]:
+        await self._smoothie_driver.update_position()
         return self._smoothie_driver.position
 
-    def move(self, target_position: Dict[str, float],
+    async def move(self, target_position: Dict[str, float],
              home_flagged_axes: bool = True, speed: float = None,
              axis_max_speeds: Dict[str, float] = None):
         with ExitStack() as cmstack:
@@ -129,30 +129,30 @@ class Controller:
                 cmstack.enter_context(
                     self._smoothie_driver.restore_axis_max_speed(
                         axis_max_speeds))
-            self._smoothie_driver.move(
+            await self._smoothie_driver.move(
                 target_position, home_flagged_axes=home_flagged_axes,
                 speed=speed)
 
-    def home(self, axes: List[str] = None) -> Dict[str, float]:
+    async def home(self, axes: List[str] = None) -> Dict[str, float]:
         if axes:
             args: Tuple[Any, ...] = (''.join(axes),)
         else:
             args = tuple()
-        return self._smoothie_driver.home(*args)
+        return await self._smoothie_driver.home(*args)
 
-    def fast_home(
+    async def fast_home(
             self, axes: Sequence[str],
             margin: float) -> Dict[str, float]:
         converted_axes = ''.join(axes)
-        return self._smoothie_driver.fast_home(converted_axes, margin)
+        return await self._smoothie_driver.fast_home(converted_axes, margin)
 
-    def _query_mount(
+    async def _query_mount(
             self,
             mount: Mount,
             expected: Union[PipetteModel, PipetteName, None]
     ) -> AttachedInstrument:
         found_model: Optional[PipetteModel]\
-            = self._smoothie_driver.read_pipette_model(  # type: ignore
+            = await self._smoothie_driver.read_pipette_model(  # type: ignore
             mount.name.lower())
         if found_model and found_model not in pipette_config.config_models:
             # TODO: Consider how to handle this error - it bubbles up now
@@ -160,7 +160,7 @@ class Controller:
             MODULE_LOG.error(
                 f'Bad model on {mount.name}: {found_model}')
             found_model = None
-        found_id = self._smoothie_driver.read_pipette_id(
+        found_id = await self._smoothie_driver.read_pipette_id(
             mount.name.lower())
 
         if found_model:
@@ -180,7 +180,7 @@ class Controller:
                     f' requested, but no instrument is present')
             return {'config': None, 'id': None}
 
-    def get_attached_instruments(
+    async def get_attached_instruments(
             self, expected: Dict[Mount, PipetteName])\
             -> AttachedInstruments:
         """ Find the instruments attached to our mounts.
@@ -194,7 +194,7 @@ class Controller:
             attached to that mount, or `None`). Both mounts will always be
             specified.
         """
-        return {mount: self._query_mount(mount, expected.get(mount))
+        return {mount: await self._query_mount(mount, expected.get(mount))
                 for mount in Mount}
 
     def set_active_current(self, axis_currents: Dict[Axis, float]):
@@ -235,8 +235,9 @@ class Controller:
         while can_watch and (not self._event_watcher.closed):
             await self._handle_watch_event()
 
-    async def connect(self, port: str = None):
-        self._smoothie_driver.connect(port)
+    async def connect(self, port: str = None) -> None:
+        """Build driver and connect to it."""
+        await self._smoothie_driver.connect(port)
         await self.update_fw_version()
 
     @property
@@ -251,7 +252,7 @@ class Controller:
         return self._cached_fw_version
 
     async def update_fw_version(self):
-        self._cached_fw_version = self._smoothie_driver.get_fw_version()
+        self._cached_fw_version = await self._smoothie_driver.get_fw_version()
 
     async def update_firmware(self,
                               filename: str,
@@ -265,8 +266,8 @@ class Controller:
     def engaged_axes(self) -> Dict[str, bool]:
         return self._smoothie_driver.engaged_axes
 
-    def disengage_axes(self, axes: List[str]):
-        self._smoothie_driver.disengage_axis(''.join(axes))
+    async def disengage_axes(self, axes: List[str]) -> None:
+        await self._smoothie_driver.disengage_axis(''.join(axes))
 
     def set_lights(self, button: Optional[bool], rails: Optional[bool]):
         if button is not None:
@@ -286,16 +287,16 @@ class Controller:
     def resume(self):
         self._smoothie_driver.resume()
 
-    def halt(self):
-        self._smoothie_driver.kill()
+    async def halt(self):
+        await self._smoothie_driver.kill()
 
-    def hard_halt(self):
-        self._smoothie_driver.hard_halt()
+    async def hard_halt(self):
+        await self._smoothie_driver.hard_halt()
 
-    def probe(self, axis: str, distance: float) -> Dict[str, float]:
+    async def probe(self, axis: str, distance: float) -> Dict[str, float]:
         """ Run a probe and return the new position dict
         """
-        return self._smoothie_driver.probe_axis(axis, distance)
+        return await self._smoothie_driver.probe_axis(axis, distance)
 
     def clean_up(self):
         try:
@@ -312,15 +313,15 @@ class Controller:
             except RuntimeError:
                 pass
 
-    def configure_mount(self, mount: Mount, config: InstrumentHardwareConfigs):
+    async def configure_mount(self, mount: Mount, config: InstrumentHardwareConfigs) -> None:
         mount_axis = Axis.by_mount(mount)
         plunger_axis = Axis.of_plunger(mount)
 
-        self._smoothie_driver.update_steps_per_mm(
+        await self._smoothie_driver.update_steps_per_mm(
             {plunger_axis.name: config['steps_per_mm']})
-        self._smoothie_driver.update_pipette_config(
+        await self._smoothie_driver.update_pipette_config(
             mount_axis.name, {'home': config['home_pos']})
-        self._smoothie_driver.update_pipette_config(
+        await self._smoothie_driver.update_pipette_config(
             plunger_axis.name, {'max_travel': config['max_travel']})
         self._smoothie_driver.set_dwelling_current(
             {plunger_axis.name: config['idle_current']})

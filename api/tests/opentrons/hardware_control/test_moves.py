@@ -1,4 +1,4 @@
-from unittest import mock
+import mock
 import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
@@ -9,13 +9,13 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.robot_calibration import RobotCalibration
 
 
-async def test_controller_musthome(hardware_api):
+async def test_controller_must_home(hardware_api):
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.RIGHT
-    home = mock.Mock()
-    home.side_effect = hardware_api.home
+    home = mock.AsyncMock()
+    hardware_api.home = home
     await hardware_api.move_to(mount, abs_position)
-    assert home.called_once()
+    home.assert_called_once()
 
 
 async def test_home_specific_sim(hardware_api, monkeypatch, is_robot):
@@ -74,7 +74,7 @@ async def test_move(hardware_api, is_robot, toggle_new_calibration):
 
 
 async def test_move_extras_passed_through(hardware_api, monkeypatch):
-    mock_be_move = mock.Mock()
+    mock_be_move = mock.AsyncMock()
     monkeypatch.setattr(hardware_api._backend, 'move', mock_be_move)
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT,
@@ -252,7 +252,7 @@ async def test_attitude_deck_cal_applied(
         [0.0, 0.0, 1.0]]
     called_with = None
 
-    def mock_move(position, speed=None, home_flagged_axes=True,
+    async def mock_move(position, speed=None, home_flagged_axes=True,
                   axis_max_speeds=None):
         nonlocal called_with
         called_with = position
