@@ -71,7 +71,7 @@ export const Footprint = (): JSX.Element | null => {
 
   return (
     <div className={styles.new_definition_section}>
-      <SectionBody label="Footprint" id="Footprint">
+      <SectionBody label="Total Footprint" id="Footprint">
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <XYDimensionAlerts values={values} touched={touched} />
