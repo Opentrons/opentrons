@@ -58,17 +58,17 @@ export type SessionState = {
   startTime: ?number,
   runTime: number,
   /**
-   * Used to calculate the `pausedDuration`
-   * todo: hacky in that it is managed locally. Not part of the start-time fix,
-   *  but partially fixes issue of pausing without pausing the timer. Keep?
-   */
-  pausedTime: number,
-  /**
-   * Updated after cycle of pause -> resume.
+   * The total number of seconds that this protocol has spent paused, across all steps executed so far.
    * todo: hacky in that it is managed locally. Not part of the start-time fix,
    *  but partially fixes issue of pausing without pausing the timer. Keep?
    */
   pausedDuration: number,
+  /**
+   * When paused it is the time at which protocol execution pause was started. When not paused it is null.
+   * todo: hacky in that it is managed locally. Not part of the start-time fix,
+   *  but partially fixes issue of pausing without pausing the timer. Keep?
+   */
+  pausedTime: number | null,
   apiLevel: [number, number] | null,
   capabilities: Array<string>,
 }
@@ -116,7 +116,7 @@ const INITIAL_STATE: SessionState = {
   remoteTimeCompensation: null,
   startTime: null,
   runTime: 0,
-  pausedTime: 0,
+  pausedTime: null,
   pausedDuration: 0,
   apiLevel: null,
 }
@@ -322,7 +322,7 @@ function handleResume(state: SessionState, action: any): SessionState {
   return {
     ...state,
     pausedDuration: state.pausedDuration + pausedDuration,
-    pausedTime: 0,
+    pausedTime: null,
     resumeRequest: { inProgress: true, error: null },
     runTime: Date.now(),
   }

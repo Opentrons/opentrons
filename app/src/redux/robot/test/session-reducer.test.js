@@ -44,7 +44,7 @@ describe('robot reducer - session', () => {
       runTime: 0,
       apiLevel: null,
       pausedDuration: 0,
-      pausedTime: 0,
+      pausedTime: null,
     })
   })
 
@@ -294,7 +294,7 @@ describe('robot reducer - session', () => {
 
     expect(reducer(state, action).session).toEqual({
       pausedDuration: 1000,
-      pausedTime: 0,
+      pausedTime: null,
       resumeRequest: { inProgress: true, error: null },
       runTime: now,
     })
