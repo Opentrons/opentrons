@@ -183,7 +183,8 @@ export function DeckCalibrationControl(props: Props): JSX.Element {
         ? formatLastModified(data.lastModified)
         : t('shared:unknown')
     const getPrefix = (calData: DeckCalibrationData): string =>
-      'source' in data && typeof data?.source === 'string'
+      // @ts-expect-error TODO protect against non existent source key with in operator
+      typeof data?.source === 'string'
         ? 'source' in calData &&
           calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
           ? t('last_migrated')
