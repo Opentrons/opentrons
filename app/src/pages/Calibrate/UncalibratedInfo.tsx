@@ -32,7 +32,8 @@ const CONTINUE_TO_MODULE_SETUP = 'Continue to module setup'
 
 const BTN_WIDTH = '23rem'
 
-interface CalibrateButtonProps extends React.PropsWithChildren<StyleProps & React.HTMLAttributes<any>> {
+interface CalibrateButtonProps
+  extends React.PropsWithChildren<StyleProps & React.HTMLAttributes<any>> {
   hasCalibrated: boolean
 }
 

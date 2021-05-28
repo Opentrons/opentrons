@@ -23,7 +23,7 @@ interface Control {
   gridRow: number
   gridColumn: number
   iconName: IconName
-  axis: Axis,
+  axis: Axis
   sign: Sign
 }
 interface ControlsContents {
