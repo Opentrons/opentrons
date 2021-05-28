@@ -124,6 +124,12 @@ class Thermocycler(mod_abc.AbstractModule):
         self._total_step_count: Optional[int] = None
         self._current_step_index: Optional[int] = None
 
+    def cleanup(self) -> None:
+        self._poller.stop()
+
+    def __del__(self):
+        self.cleanup()
+
     @classmethod
     def name(cls) -> str:
         return 'thermocycler'

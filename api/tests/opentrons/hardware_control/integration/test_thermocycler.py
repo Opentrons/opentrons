@@ -22,8 +22,8 @@ async def thermocycler(
         polling_frequency=.001
     )
     yield module
-    module.cleanup()
     await execution_manager.cancel()
+    module.cleanup()
 
 
 def test_device_info(thermocycler: Thermocycler):
