@@ -52,10 +52,6 @@ def tempdeck():
 
     yield t
 
-    # Have to stop the poller
-    t._poller.stop()
-    t._poller.join()
-
 
 @pytest.fixture
 def thermocycler():

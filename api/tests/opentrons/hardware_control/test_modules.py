@@ -235,4 +235,4 @@ def test_magnetic_module_revision_parsing(revision, model):
         (None, 'temperatureModuleV1')
     ])
 def test_temperature_module_revision_parsing(revision, model):
-    assert tempdeck._model_from_revision(revision) == model
+    assert tempdeck.TempDeck._model_from_revision(revision) == model

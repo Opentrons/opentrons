@@ -25,7 +25,8 @@ class Thermocycler(mod_abc.AbstractModule):
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None,
-                    sim_model: str = None):
+                    sim_model: str = None,
+                    **kwargs):
         """Build and connect to a Thermocycler
         """
 
