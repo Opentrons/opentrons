@@ -42,7 +42,7 @@ describe('Regularity', () => {
     screen.getByRole('radio', { name: /no/i })
   })
 
-  it('should render alert when error is present', async () => {
+  it('should render alert when error is present', () => {
     const FAKE_ERROR = 'ahh'
     formikConfig.initialErrors = { homogeneousWells: FAKE_ERROR }
     formikConfig.initialTouched = { homogeneousWells: true }
