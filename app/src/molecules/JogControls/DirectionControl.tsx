@@ -13,7 +13,7 @@ import {
 import { ControlContainer } from './ControlContainer'
 
 import type { IconName } from '@opentrons/components'
-import type { Jog, Plane, Sign, Bearing } from './types'
+import type { Jog, Plane, Sign, Bearing, Axis } from './types'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 
 interface Control {
@@ -23,7 +23,7 @@ interface Control {
   gridRow: number
   gridColumn: number
   iconName: IconName
-  axis: 'x' | 'y' | 'z'
+  axis: Axis,
   sign: Sign
 }
 interface ControlsContents {
