@@ -35,7 +35,7 @@ const receiveActionFromShellEpic: Epic = () =>
   // IPC event listener: (IpcRendererEvent, ...args) => void
   // our action is the only argument, so pluck it out from index 1
   fromEvent<Action>(
-    // @ts-expect-error TODO: don't use fromEvent and ipcRenderer type should work properly
+    // @ts-expect-error TODO: fromEvent type expects ArrayLike though ipcRenderer doesn't match that type, don't use fromEvent it's deprecated
     ipcRenderer,
     'dispatch',
     (_: unknown, incoming: Action) => incoming

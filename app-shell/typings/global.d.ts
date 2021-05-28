@@ -9,7 +9,6 @@ declare global {
     export interface Global {
       APP_SHELL_REMOTE: {
         ipcRenderer: IpcRenderer
-        [key: string]: unknown
       }
     }
   }
