@@ -111,10 +111,12 @@ class Thermocycler(mod_abc.AbstractModule):
                          execution_manager=execution_manager)
         self._driver = driver
         self._device_info = device_info
-        self._listener = ThermocyclerListener(interrupt_callback=interrupt_callback)
+        self._listener = ThermocyclerListener(
+            loop=loop, interrupt_callback=interrupt_callback
+        )
         self._poller = Poller(
             interval_seconds=polling_interval_sec, listener=self._listener,
-            reader=PollerReader(driver=self._driver)
+            reader=PollerReader(driver=self._driver), loop=loop
         )
         self._hold_time_fuzzy_seconds = polling_interval_sec * 5
         self._interrupt_cb = interrupt_callback
@@ -124,11 +126,9 @@ class Thermocycler(mod_abc.AbstractModule):
         self._total_step_count: Optional[int] = None
         self._current_step_index: Optional[int] = None
 
-    def cleanup(self) -> None:
-        self._poller.stop()
-
-    def __del__(self):
-        self.cleanup()
+    async def cleanup(self) -> None:
+        """Stop the poller task."""
+        await self._poller.stop_and_wait()
 
     @classmethod
     def name(cls) -> str:
@@ -511,9 +511,12 @@ class PollerReader(Reader[PolledData]):
 class ThermocyclerListener(WaitableListener[PolledData]):
     """Thermocycler state listener."""
 
-    def __init__(self, interrupt_callback: types.InterruptCallback = None) -> None:
+    def __init__(
+            self,
+            loop: Optional[asyncio.AbstractEventLoop] = None,
+            interrupt_callback: types.InterruptCallback = None) -> None:
         """Constructor."""
-        super().__init__()
+        super().__init__(loop=loop)
         self._callback = interrupt_callback
         self._polled_data: Optional[PolledData] = None
         self._plate_temperature_status = PlateTemperatureStatus()
