@@ -8,7 +8,6 @@ export function hash(source: string): Promise<string> {
   const data = encoder.encode(source)
 
   // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
-  // TODO (sa 2021-05-19): probably should not be using the crypto module from global, use node module instead
   return (global.crypto as any).subtle
     .digest(ALGORITHM, data)
     .then((digest: ArrayBuffer) => arrayBufferToHex(digest))
