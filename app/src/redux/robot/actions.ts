@@ -255,31 +255,31 @@ export interface TickRunTimeAction {
 
 // TODO(mc, 2018-01-23): refactor to use type above
 //   DO NOT ADD NEW ACTIONS HERE
-export const actionTypes: Record<string, any> = {
+export const actionTypes = {
   // calibration
-  SET_DECK_POPULATED: 'robot:SET_DECK_POPULATED' as const,
+  SET_DECK_POPULATED: 'robot:SET_DECK_POPULATED',
   // TODO(mc, 2018-01-10): rename MOVE_TO_FRONT to PREPARE_TO_PROBE?
-  MOVE_TO_FRONT: 'robot:MOVE_TO_FRONT' as const,
-  MOVE_TO_FRONT_RESPONSE: 'robot:MOVE_TO_FRONT_RESPONSE' as const,
-  PROBE_TIP: 'robot:PROBE_TIP' as const,
-  PROBE_TIP_RESPONSE: 'robot:PROBE_TIP_RESPONSE' as const,
+  MOVE_TO_FRONT: 'robot:MOVE_TO_FRONT',
+  MOVE_TO_FRONT_RESPONSE: 'robot:MOVE_TO_FRONT_RESPONSE',
+  PROBE_TIP: 'robot:PROBE_TIP',
+  PROBE_TIP_RESPONSE: 'robot:PROBE_TIP_RESPONSE',
 
-  RETURN_TIP: 'robot:RETURN_TIP' as const,
-  RETURN_TIP_RESPONSE: 'robot:RETURN_TIP_RESPONSE' as const,
-  CONFIRM_LABWARE: 'robot:CONFIRM_LABWARE' as const,
+  RETURN_TIP: 'robot:RETURN_TIP',
+  RETURN_TIP_RESPONSE: 'robot:RETURN_TIP_RESPONSE',
+  CONFIRM_LABWARE: 'robot:CONFIRM_LABWARE',
 
   // protocol run controls
-  RUN: 'robot:RUN' as const,
-  RUN_RESPONSE: 'robot:RUN_RESPONSE' as const,
-  PAUSE: 'robot:PAUSE' as const,
-  PAUSE_RESPONSE: 'robot:PAUSE_RESPONSE' as const,
-  RESUME: 'robot:RESUME' as const,
-  RESUME_RESPONSE: 'robot:RESUME_RESPONSE' as const,
-  CANCEL: 'robot:CANCEL' as const,
-  CANCEL_RESPONSE: 'robot:CANCEL_RESPONSE' as const,
+  RUN: 'robot:RUN',
+  RUN_RESPONSE: 'robot:RUN_RESPONSE',
+  PAUSE: 'robot:PAUSE',
+  PAUSE_RESPONSE: 'robot:PAUSE_RESPONSE',
+  RESUME: 'robot:RESUME',
+  RESUME_RESPONSE: 'robot:RESUME_RESPONSE',
+  CANCEL: 'robot:CANCEL',
+  CANCEL_RESPONSE: 'robot:CANCEL_RESPONSE',
 
-  TICK_RUN_TIME: 'robot:TICK_RUN_TIME' as const,
-}
+  TICK_RUN_TIME: 'robot:TICK_RUN_TIME',
+} as const
 
 // TODO(mc, 2018-01-23): NEW ACTION TYPES GO HERE
 export type Action =
