@@ -8,7 +8,7 @@ import type { ReactWrapper } from 'enzyme'
 export interface MockStore<State, Action> {
   getState: jest.MockedFunction<() => State>
   subscribe: jest.MockedFunction<() => void>
-  dispatch: jest.MockedFunction<(...actions: Action[]) => Action>
+  dispatch: jest.MockedFunction<(action: Action) => Action>
 }
 
 export interface WrapperWithStore<Props, State = {}, Action = {}> {
