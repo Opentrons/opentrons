@@ -138,6 +138,9 @@ export const SelectNetwork = ({
               error={
                 // @ts-expect-error TODO use commented code below
                 requestState.error && requestState.error.message
+                  // @ts-expect-error TODO use commented code below
+                  ? requestState.error
+                  : null
                 // 'error' in requestState &&
                 // requestState.error &&
                 // 'message' in requestState.error &&
