@@ -1,5 +1,5 @@
 import pytest
-from unittest import mock
+import mock
 
 from opentrons import hardware_control as hc
 from opentrons.hardware_control.types import PipettePair, Axis
@@ -25,7 +25,7 @@ def dummy_instruments():
 
 
 async def test_move_z_axis(hardware_api, monkeypatch):
-    mock_be_move = mock.Mock()
+    mock_be_move = mock.AsyncMock()
     monkeypatch.setattr(hardware_api._backend, 'move', mock_be_move)
     mount = PipettePair.PRIMARY_RIGHT
     await hardware_api.home()
@@ -241,7 +241,7 @@ async def test_tip_action_currents(
         'set_active_current',
         mock_active_current)
 
-    def fake_attached(stuff):
+    async def fake_attached(stuff):
         return {mount: {'config': pc.load(value['model']),
                         'id': value['id']}
                 for mount, value in dummy_instruments.items()}

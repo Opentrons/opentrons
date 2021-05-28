@@ -11,6 +11,5 @@ __all__ = [
     'MODULE_HW_BY_NAME', 'build', 'update_firmware',
     'ThermocyclerStep', 'AbstractModule', 'TempDeck',
     'MagDeck', 'Thermocycler', 'InterruptCallback',
-    'UploadFunction', 'BundledFirmware', 'UpdateError',
-    'UnsupportedModuleError', 'AbsentModuleError', 'ModuleAtPort'
+    'UploadFunction', 'BundledFirmware', 'UpdateError', 'ModuleAtPort'
 ]

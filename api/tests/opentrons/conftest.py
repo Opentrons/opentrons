@@ -1,6 +1,7 @@
 # Uncomment to enable logging during tests
 # import logging
 # from logging.config import dictConfig
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.context.protocol_api.labware import\
     LabwareImplementation
@@ -282,12 +283,11 @@ def model(request, hardware, loop):
 
 @pytest.fixture
 def smoothie(monkeypatch):
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
-         SmoothieDriver_3_0_0 as SmoothieDriver
+    from opentrons.drivers.asyncio.smoothie import SmoothieDriver
     from opentrons.config import robot_configs
 
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
-    driver = SmoothieDriver(robot_configs.load())
+    driver = SmoothieDriver(robot_configs.load(), SimulatingGPIOCharDev('simulated'))
     driver.connect()
     yield driver
     try:
