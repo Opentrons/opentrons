@@ -51,7 +51,7 @@ module.exports = webpackMerge(baseConfig, {
     }),
 
     new ScriptExtHtmlWebpackPlugin({ defaultAttribute: 'defer' }),
-    new webpack.DefinePlugin({ _OT_APP_VERSION_: JSON.stringify(version) }),
+    new webpack.DefinePlugin({ _PKG_VERSION_: JSON.stringify(version) }),
   ],
   node: {
     __filename: true,

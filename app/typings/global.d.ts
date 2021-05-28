@@ -10,5 +10,5 @@ declare global {
       [key: string]: unknown
     }
   }
-  export const _OT_APP_VERSION_: string
+  export const _PKG_VERSION_: string
 }

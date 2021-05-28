@@ -212,7 +212,7 @@ describe('robot-api http client', () => {
       }
     )
 
-    const form = new FormData()
+    const form = new FormData() as any
     form.append('file1', Buffer.from('lorem ipsum') as any, '1.txt')
     form.append('file2', Buffer.from('dolor sit amet') as any, '2.txt')
 
