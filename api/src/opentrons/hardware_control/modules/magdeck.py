@@ -32,7 +32,8 @@ class MagDeck(mod_abc.AbstractModule):
                     interrupt_callback: types.InterruptCallback = None,
                     simulating=False,
                     loop: asyncio.AbstractEventLoop = None,
-                    sim_model: str = None):
+                    sim_model: str = None,
+                    **kwargs):
         """Factory function."""
         driver: AbstractMagDeckDriver
         if not simulating:

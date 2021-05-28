@@ -49,7 +49,7 @@ def parse_temperature_response(
     data = parse_key_values(temperature_string)
     try:
         return Temperature(
-            current=parse_optional_number(data['C'], rounding_val),
+            current=parse_number(data['C'], rounding_val),
             target=parse_optional_number(data['T'], rounding_val)
         )
     except KeyError:
@@ -66,13 +66,13 @@ def parse_plate_temperature_response(
     data = parse_key_values(temperature_string)
     try:
         return PlateTemperature(
-            current=parse_optional_number(data['C'], rounding_val),
+            current=parse_number(data['C'], rounding_val),
             target=parse_optional_number(data['T'], rounding_val),
             hold=parse_optional_number(data['H'], rounding_val)
         )
     except KeyError:
         raise ParseError(
-            error_message='Unexpected argument to parse_lid_temperature_response',
+            error_message='Unexpected argument to parse_plate_temperature_response',
             parse_source=temperature_string
         )
 

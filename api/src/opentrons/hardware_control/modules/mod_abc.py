@@ -25,7 +25,8 @@ class AbstractModule(abc.ABC):
                     interrupt_callback: InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None,
-                    sim_model: str = None) \
+                    sim_model: str = None,
+                    **kwargs) \
             -> 'AbstractModule':
         """ Modules should always be created using this factory.
 
