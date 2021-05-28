@@ -318,7 +318,8 @@ function handlePauseResponse(state: SessionState, action: any): SessionState {
 }
 
 function handleResume(state: SessionState, action: any): SessionState {
-  const pausedDuration = state.pausedTime ? Date.now() - state.pausedTime : 0
+  const pausedDuration =
+    state.pausedTime === null ? 0 : Date.now() - Number(state.pausedTime)
   return {
     ...state,
     pausedDuration: state.pausedDuration + pausedDuration,
