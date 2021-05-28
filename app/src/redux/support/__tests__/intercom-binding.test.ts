@@ -10,24 +10,28 @@ describe('calling the intercom js api', () => {
   })
   afterEach(() => {
     jest.resetAllMocks()
+    // @ts-expect-error TS expects the operand of delete operator to be optional
     delete global.Intercom
     delete process.env.OT_APP_INTERCOM_ID
     IntercomBinding.setUserId(null)
   })
 
   it('should not boot the intercom api if the global is not present', () => {
+    // @ts-expect-error TS expects the operand of delete operator to be optional
     delete global.Intercom
     IntercomBinding.bootIntercom({})
     expect(intercom).not.toHaveBeenCalled()
   })
 
   it('should not update intercom profiles if the global is not present', () => {
+    // @ts-expect-error TS expects the operand of delete operator to be optional
     delete global.Intercom
     IntercomBinding.updateIntercomProfile({})
     expect(intercom).not.toHaveBeenCalled()
   })
 
   it('should not send intercom events if the global is not present', () => {
+    // @ts-expect-error TS expects the operand of delete operator to be optional
     delete global.Intercom
     IntercomBinding.sendIntercomEvent('someEvent', {})
     expect(intercom).not.toHaveBeenCalled()
