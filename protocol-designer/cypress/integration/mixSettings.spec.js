@@ -333,7 +333,7 @@ describe('Advanced Settings for Mix Form', () => {
 
     cy.get('select[name="mix_wellOrder_second"]')
       .select('Left to right')
-      .should('have.value', 'l2r')  
+      .should('have.value', 'l2r')
     // Click done button to save the changes
     cy.get('button').contains('done').click()
     // Click save button to save the changes
