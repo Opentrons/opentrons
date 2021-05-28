@@ -42,7 +42,7 @@ import { getCalibrationCheckSession } from '../sessions/calibration-check/select
 
 import { hash } from './hash'
 
-import type { OutputSelector } from 'reselect'
+import type { Selector } from 'reselect'
 import type { State } from '../types'
 import type {
   CalibrationCheckComparisonsPerCalibration,
@@ -65,27 +65,12 @@ import type {
   SessionInstrumentAnalyticsData,
 } from './types'
 
-type ProtocolDataSelectorResultFunc = (
-  v1: ReturnType<typeof getProtocolType>,
-  v2: ReturnType<typeof getProtocolCreatorApp>,
-  v3: ReturnType<typeof getProtocolApiVersion>,
-  v4: ReturnType<typeof getProtocolName>,
-  v5: ReturnType<typeof getProtocolSource>,
-  v6: ReturnType<typeof getProtocolAuthor>,
-  v7: ReturnType<typeof getProtocolContents>,
-  v8: ReturnType<typeof getPipettes>,
-  v9: ReturnType<typeof getModules>
-) => ProtocolAnalyticsData
-
-type ProtocolDataSelector = OutputSelector<
-  State,
-  ProtocolAnalyticsData,
-  ProtocolDataSelectorResultFunc
->
-
 export const FF_PREFIX = 'robotFF_'
 
-const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
+const _getUnhashedProtocolAnalyticsData: Selector<
+  State,
+  ProtocolAnalyticsData
+> = createSelector(
   getProtocolType,
   getProtocolCreatorApp,
   getProtocolApiVersion,
