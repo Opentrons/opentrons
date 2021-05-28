@@ -41,9 +41,9 @@ export function LabwareItem(props: LabwareItemProps): JSX.Element {
     ((isTiprack && confirmed) || (!isTiprack && areTipracksConfirmed === false))
 
   let title: string
-  let item
-  let width
-  let height
+  let item: JSX.Element
+  let width: number
+  let height: number
 
   if (definition) {
     item = <LabwareRender definition={definition} />
