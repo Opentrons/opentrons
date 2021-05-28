@@ -155,11 +155,11 @@ export const getProtocolDescription: (
 export const getProtocolSource: (
   state: State
 ) => string | null = createSelector(getProtocolData, data => {
-  if (data !== null && 'metadata' in data && 'source' in data.metadata) {
-    return data.metadata.source ?? null
-  } else {
-    return null
-  }
+  // @ts-expect-error TODO: use in operator to protect against non existent source
+  return typeof data?.metadata?.source === 'string'
+    ? // @ts-expect-error TODO: use in operator to protect against non existent source
+      data.metadata.source
+    : null
 })
 
 export const getProtocolLastUpdated: (
