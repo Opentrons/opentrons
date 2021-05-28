@@ -20,19 +20,6 @@ const PORT = process.env.PORT || 8080
 const CONTENT_BASE = path.join(__dirname, './src')
 const PUBLIC_PATH = DEV_MODE ? `http://localhost:${PORT}/` : ''
 
-const passThruEnvVars = Object.keys(process.env)
-  .filter(v => v.startsWith('OT_APP'))
-  .concat(['NODE_ENV'])
-
-const envVarsWithDefaults = {
-  OT_APP_VERSION: version,
-}
-
-const envVars = passThruEnvVars.reduce(
-  (acc, envVar) => ({ [envVar]: '', ...acc }),
-  { ...envVarsWithDefaults }
-)
-
 module.exports = webpackMerge(baseConfig, {
   entry: [JS_ENTRY],
 
@@ -42,7 +29,11 @@ module.exports = webpackMerge(baseConfig, {
   }),
 
   plugins: [
-    new webpack.EnvironmentPlugin(envVars),
+    new webpack.EnvironmentPlugin(
+      Object.keys(process.env)
+        .filter(v => v.startsWith('OT_APP'))
+        .concat(['NODE_ENV'])
+    ),
 
     new WorkerPlugin({
       // disable warnings about HMR when we're in prod
@@ -60,8 +51,8 @@ module.exports = webpackMerge(baseConfig, {
     }),
 
     new ScriptExtHtmlWebpackPlugin({ defaultAttribute: 'defer' }),
+    new webpack.DefinePlugin({ _OT_APP_VERSION_: JSON.stringify(version) }),
   ],
-
   node: {
     __filename: true,
     // use userland events because webpack's is out of date

@@ -42,7 +42,7 @@ describe('support profile tests', () => {
     expect(bootIntercom).toHaveBeenCalledWith({
       app_id: 'some-intercom-app-id',
       created_at: 1234,
-      'App Version': process.env.OT_APP_VERSION,
+      'App Version': global._OT_APP_VERSION_,
     })
   })
 

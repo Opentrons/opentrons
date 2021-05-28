@@ -1,5 +1,4 @@
 import type { IpcRenderer } from 'electron'
-
 declare global {
   namespace NodeJS {
     export interface Global {
@@ -8,6 +7,7 @@ declare global {
       }
       btoa: (str: string | Buffer) => string
       Intercom?: (...args: any[]) => unknown
+      _OT_APP_VERSION_: string
       [key: string]: unknown
     }
   }
