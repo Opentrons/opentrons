@@ -1,49 +1,27 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
+import '@testing-library/jest-dom'
 import { when } from 'jest-when'
-import isEqual from 'lodash/isEqual'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Volume } from '../../sections/Volume'
-import { FormAlerts } from '../../alerts/FormAlerts'
-import { TextField } from '../../TextField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
 jest.mock('../../../utils')
-jest.mock('../../TextField')
-jest.mock('../../alerts/FormAlerts')
 
-const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
-const textFieldMock = TextField as jest.MockedFunction<typeof TextField>
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden
 >
 
-const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
-  onSubmit: jest.fn(),
-}
+let formikConfig: FormikConfig<LabwareFields>
 
 describe('Volume', () => {
   beforeEach(() => {
-    textFieldMock.mockImplementation(args => {
-      return <div>wellVolume text field</div>
-    })
-
-    FormAlertsMock.mockImplementation(args => {
-      if (
-        isEqual(args, {
-          touched: {},
-          errors: {},
-          fieldList: ['wellVolume'],
-        })
-      ) {
-        return <div>mock alerts</div>
-      } else {
-        return <div></div>
-      }
-    })
+    formikConfig = {
+      initialValues: getDefaultFormState(),
+      onSubmit: jest.fn(),
+    }
   })
 
   afterEach(() => {
@@ -52,31 +30,42 @@ describe('Volume', () => {
 
   it('should render with the correct information', () => {
     render(wrapInFormik(<Volume />, formikConfig))
-    expect(screen.getByText('Volume'))
-    expect(screen.getByText('Total maximum volume of each well.'))
-    expect(screen.getByText('mock alerts'))
-    expect(screen.getByText('wellVolume text field'))
+    expect(screen.getByRole('heading')).toHaveTextContent(/Volume/i)
+
+    screen.getByText('Total maximum volume of each well.')
+
+    screen.getByRole('textbox', { name: /max volume per well/i }) // TODO IMMEDIATELY this should work after Sarah's PR is merged & this is rebased
   })
 
   it('should render tubes when tubeRack is selected', () => {
     formikConfig.initialValues.labwareType = 'tubeRack'
     render(wrapInFormik(<Volume />, formikConfig))
 
-    expect(screen.getByText('Total maximum volume of each tube.'))
+    screen.getByText('Total maximum volume of each tube.')
   })
 
   it('should render tubes when aluminumBlock is selected', () => {
     formikConfig.initialValues.labwareType = 'aluminumBlock'
     render(wrapInFormik(<Volume />, formikConfig))
 
-    expect(screen.getByText('Total maximum volume of each tube.'))
+    screen.getByText('Total maximum volume of each tube.')
   })
 
-  it('should render wells when wellplate is selected', () => {
+  it('should render wells when wellPlate is selected', () => {
     formikConfig.initialValues.labwareType = 'wellPlate'
     render(wrapInFormik(<Volume />, formikConfig))
 
-    expect(screen.getByText('Total maximum volume of each well.'))
+    screen.getByText('Total maximum volume of each well.')
+  })
+
+  it('should render alert when error is present', () => {
+    const FAKE_ERROR = 'ahh'
+    formikConfig.initialErrors = { wellVolume: FAKE_ERROR }
+    formikConfig.initialTouched = { wellVolume: true }
+    render(wrapInFormik(<Volume />, formikConfig))
+
+    // TODO(IL, 2021-05-26): AlertItem should have role="alert", then we can `getByRole('alert', {name: FAKE_ERROR})`
+    screen.getByText(FAKE_ERROR)
   })
 
   it('should not render when all fields are hidden', () => {
