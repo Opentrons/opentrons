@@ -31,7 +31,7 @@ export const getCustomLabwareDirectory: (
   config => config?.labware.directory ?? ''
 )
 
-//  @ts-expect-error(sa, 2021-05-11): filesByName[name] might be undefined because filesByName is typed as a partial type
+//  @ts-expect-error(sa, 2021-05-11): TODO filesByName[name] might be undefined because filesByName is typed as a partial type
 export const getCustomLabware: (
   state: State
 ) => CheckedLabwareFile[] = createSelector(

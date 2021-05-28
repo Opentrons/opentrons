@@ -5,11 +5,15 @@ import * as Types from './types'
 export const getErrorResponseMessage = (
   response: { message?: string } | Types.RobotApiV2ErrorResponseBody
 ): string | undefined => {
-  if ('message' in response) {
+  // @ts-expect-error TODO: use in operator to narrow allow for type narrowing
+  if (response.message) {
+    // @ts-expect-error TODO: use in operator to narrow allow for type narrowing
     return response.message
   }
 
-  if ('errors' in response) {
+  // @ts-expect-error TODO: use in operator to narrow allow for type narrowing
+  if (response.errors) {
+    // @ts-expect-error TODO: use in operator to narrow allow for type narrowing
     return response.errors.flatMap(e => (e.detail ? [e.detail] : [])).join(',')
   }
 
