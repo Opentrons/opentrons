@@ -49,6 +49,7 @@ export function UpdateFromFileControl(
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     const { files } = event.target
+    // TODO(bc, 2021-05-28): augment the file interface to remove the any cast below
     if (files?.length === 1 && !updateDisabled) {
       // NOTE: File.path is Electron-specific
       // https://electronjs.org/docs/api/file-object
