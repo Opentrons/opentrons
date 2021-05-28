@@ -42,7 +42,7 @@ def test_delete_tip_length_calibration(
     body = resp.json()
     assert body == {
         'errors': [{
-            'status': '404',
+            'id': 'UncategorizedError',
             'title': 'Resource Not Found',
             'detail': "Resource type 'TipLengthCalibration' with id "
                       "'wronghash&fake_pip' was not found"

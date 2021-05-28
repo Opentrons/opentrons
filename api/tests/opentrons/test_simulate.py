@@ -12,15 +12,16 @@ from opentrons.protocols.execution.errors import ExceptionInProtocolError
 HERE = Path(__file__).parent
 
 
-@pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
+@pytest.mark.parametrize('protocol_file', ['test_simulate.py'])
 def test_simulate_function_apiv2(protocol,
                                  protocol_file,
                                  monkeypatch):
     monkeypatch.setenv('OT_API_FF_allowBundleCreation', '1')
     runlog, bundle = simulate.simulate(
-        protocol.filelike, 'testosaur_v2.py')
+        protocol.filelike, 'test_simulate.py')
     assert isinstance(bundle, protocols.types.BundleContents)
     assert [item['payload']['text'] for item in runlog] == [
+        '2.0',
         'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1',
         'Aspirating 10.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 150.0 uL/sec',  # noqa: E501,
         'Dispensing 10.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 300.0 uL/sec',  # noqa: E501,
@@ -40,6 +41,7 @@ def test_simulate_function_json_apiv2(get_json_protocol_fixture):
         'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec',
         'Touching tip',
         'Blowing out at B1 of Dest Plate on 3',
+        'Moving to 5',
         'Dropping tip into A1 of Trash on 12'
     ]
 
@@ -115,3 +117,9 @@ def test_simulate_extra_labware(protocol, protocol_file, monkeypatch):
     ctx = simulate.get_protocol_api('2.0')
     with pytest.raises(FileNotFoundError):
         ctx.load_labware("fixture_12_trough", 1, namespace='fixture')
+
+
+@pytest.mark.parametrize('protocol_file', ['bug_aspirate_tip.py'])
+def test_simulate_aspirate_tip(protocol, protocol_file, monkeypatch):
+    with pytest.raises(ExceptionInProtocolError):
+        simulate.simulate(protocol.filelike, 'bug_aspirate_tip.py')

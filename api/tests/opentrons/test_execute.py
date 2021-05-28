@@ -80,6 +80,7 @@ def test_execute_function_json_v3_apiv2(get_json_protocol_fixture,
         'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec',
         'Touching tip',
         'Blowing out at B1 of Dest Plate on 3',
+        'Moving to 5',
         'Dropping tip into A1 of Trash on 12'
     ]
 
@@ -106,6 +107,7 @@ def test_execute_function_json_v4_apiv2(get_json_protocol_fixture,
         'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec',
         'Touching tip',
         'Blowing out at B1 of Dest Plate on 3',
+        'Moving to 5',
         'Dropping tip into A1 of Trash on 12'
     ]
 
@@ -132,6 +134,9 @@ def test_execute_function_json_v5_apiv2(get_json_protocol_fixture,
         'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec',
         'Touching tip',
         'Blowing out at B1 of Dest Plate on 3',
+        'Moving to 5',
+        'Moving to B2 of Dest Plate on 3',
+        'Moving to B2 of Dest Plate on 3',
         'Dropping tip into A1 of Trash on 12'
     ]
 

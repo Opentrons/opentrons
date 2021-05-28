@@ -7,12 +7,13 @@ import os
 import shutil
 import json
 import pathlib
-from mock import MagicMock
-
 import requests
-from fastapi import routing
 import pytest
+
+from mock import MagicMock
 from datetime import datetime
+from fastapi import routing
+from typing import Any, Dict
 
 from opentrons.protocols.context.protocol_api.labware import \
     LabwareImplementation
@@ -101,7 +102,7 @@ def run_server(request_session, server_temp_directory):
                            "--source", "robot_server",
                            "-m", "uvicorn", "robot_server:app",
                            "--host", "localhost", "--port", "31950"],
-                          env={'OT_ROBOT_SERVER_DOT_ENV_PATH': "test.env",
+                          env={'OT_ROBOT_SERVER_DOT_ENV_PATH': "dev.env",
                                'OT_API_CONFIG_DIR': server_temp_directory},
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE) as proc:
@@ -184,7 +185,7 @@ def set_up_tip_length_temp_directory(server_temp_directory):
         labware.get_labware_definition('opentrons_96_filtertiprack_200ul')
     def_hash = helpers.hash_labware_def(definition)
     for pip, tip_len in zip(attached_pip_list, tip_length_list):
-        cal = {def_hash: {
+        cal: Dict[str, Any] = {def_hash: {
             'tipLength': tip_len,
             'lastModified': datetime.now()}}
         modify.save_tip_length_calibration(pip, cal)

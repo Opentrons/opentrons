@@ -1,5 +1,5 @@
 import pytest
-from mock import AsyncMock, patch
+from mock import AsyncMock, patch  # type: ignore[attr-defined]
 from datetime import datetime, timezone
 
 from notify_server.models.hardware_event import DoorStatePayload

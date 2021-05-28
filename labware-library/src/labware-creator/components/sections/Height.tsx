@@ -3,8 +3,8 @@ import { useFormikContext } from 'formik'
 import { isEveryFieldHidden } from '../../utils'
 import { makeMaskToDecimal } from '../../fieldMasks'
 import { LabwareFields } from '../../fields'
-import { getHeightAlerts } from '../utils/getHeightAlerts'
-import { FormAlerts } from '../FormAlerts'
+import { HeightAlerts } from '../alerts/HeightAlerts'
+import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
 import { HeightImg } from '../diagrams'
 import { HeightGuidingText } from '../HeightGuidingText'
@@ -65,7 +65,7 @@ export const Height = (): JSX.Element | null => {
       >
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
-          {getHeightAlerts(values, touched)}
+          <HeightAlerts values={values} touched={touched} />
           <Content values={values} />
         </>
       </SectionBody>

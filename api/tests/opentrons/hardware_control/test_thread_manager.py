@@ -47,7 +47,7 @@ async def test_module_cache_remove_entry():
     mods_before = thread_manager.attached_modules
     assert len(mods_before) == 2
 
-    await thread_manager.register_modules(
+    await thread_manager._backend.module_controls.register_modules(
         removed_mods_at_ports=[
             ModuleAtPort(port='/dev/ot_module_sim_tempdeck0',
                          name='tempdeck')

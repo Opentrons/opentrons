@@ -402,7 +402,9 @@ def test_no_pipette(hardware, mount):
         PipetteOffsetCalibrationUserFlow(hardware=hardware,
                                          mount=mount)
 
-    assert error.value.error.detail == f"No pipette present on {mount} mount"
+    assert error.value.content["errors"][0]["detail"] == (
+        f"No pipette present on {mount} mount"
+    )
 
 
 @pytest.fixture

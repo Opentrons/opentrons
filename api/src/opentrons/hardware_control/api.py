@@ -24,11 +24,13 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         SHAKE_OFF_TIPS_PICKUP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
 from .execution_manager import ExecutionManager
+from .pause_manager import PauseManager
+from .module_control import AttachedModulesControl
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError, DoorState,
                     DoorStateNotification, PipettePair, TipAttachedError,
                     HardwareAction, PairedPipetteConfigValueError,
-                    MotionChecks)
+                    MotionChecks, PauseType)
 from . import modules, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
@@ -73,6 +75,7 @@ class API(HardwareAPILike):
         self._config = config
         self._backend = backend
         self._loop = loop
+
         self._execution_manager = ExecutionManager(loop=loop)
         self._callbacks: set = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
@@ -82,7 +85,6 @@ class API(HardwareAPILike):
             top_types.Mount.LEFT: None,
             top_types.Mount.RIGHT: None
         }
-        self._attached_modules: List[modules.AbstractModule] = []
         self._last_moved_mount: Optional[top_types.Mount] = None
         # The motion lock synchronizes calls to long-running physical tasks
         # involved in motion. This fixes issue where for instance a move()
@@ -92,6 +94,7 @@ class API(HardwareAPILike):
         self._motion_lock = asyncio.Lock(loop=self._loop)
         self._door_state = DoorState.CLOSED
         self._robot_calibration = rb_cal.load()
+        self._pause_manager = PauseManager(self._door_state)
 
     @property
     def robot_calibration(self) -> rb_cal.RobotCalibration:
@@ -118,9 +121,11 @@ class API(HardwareAPILike):
         mod_log.info(
             f'Updating the window switch status: {door_state}')
         self.door_state = door_state
+        self._pause_manager.set_door(self.door_state)
         for cb in self._callbacks:
             hw_event = DoorStateNotification(
-                new_state=door_state)
+                new_state=door_state,
+                blocking=self._pause_manager.blocked_by_door)
             try:
                 cb(hw_event)
             except Exception:
@@ -183,9 +188,9 @@ class API(HardwareAPILike):
 
             api_instance = cls(backend, loop=checked_loop, config=checked_config)
             await api_instance.cache_instruments()
-            checked_loop.create_task(backend.watch_modules(
-                loop=checked_loop,
-                register_modules=api_instance.register_modules))
+            module_controls = await AttachedModulesControl.build(api_instance)
+            backend.module_controls = module_controls
+            checked_loop.create_task(backend.watch(loop=checked_loop))
             backend.start_gpio_door_watcher(
                 loop=checked_loop,
                 update_door_state=api_instance._update_door_state)
@@ -215,7 +220,6 @@ class API(HardwareAPILike):
 
         checked_loop = use_or_initialize_loop(loop)
         checked_config = config or robot_configs.load()
-
         backend = await Simulator.build(
             attached_instruments,
             attached_modules,
@@ -223,8 +227,9 @@ class API(HardwareAPILike):
             strict_attached_instruments)
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance.cache_instruments()
-        await backend.watch_modules(
-            register_modules=api_instance.register_modules)
+        module_controls = await AttachedModulesControl.build(api_instance)
+        backend.module_controls = module_controls
+        await backend.watch()
         return api_instance
 
     def __repr__(self):
@@ -332,13 +337,15 @@ class API(HardwareAPILike):
         """ Delay execution by pausing and sleeping.
         """
         await self._wait_for_is_running()
-        self.pause()
-        if not self.is_simulator:
-            async def sleep_for_seconds(seconds: float):
-                await asyncio.sleep(seconds)
-            delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
-            await self._execution_manager.register_cancellable_task(delay_task)
-        self.resume()
+        self.pause(PauseType.DELAY)
+        try:
+            if not self.is_simulator:
+                async def sleep_for_seconds(seconds: float):
+                    await asyncio.sleep(seconds)
+                delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
+                await self._execution_manager.register_cancellable_task(delay_task)
+        finally:
+            self.resume(PauseType.DELAY)
 
     def reset_instrument(self, mount: top_types.Mount = None):
         """
@@ -495,8 +502,8 @@ class API(HardwareAPILike):
         return self.get_attached_instruments()
 
     @property
-    def attached_modules(self):
-        return self._attached_modules
+    def attached_modules(self) -> List[modules.AbstractModule]:
+        return self._backend.module_controls.available_modules
 
     async def update_firmware(
             self,
@@ -522,7 +529,7 @@ class API(HardwareAPILike):
                                                    explicit_modeset)
 
     # Global actions API
-    def pause(self):
+    def pause(self, pause_type: PauseType):
         """
         Pause motion of the robot after a current motion concludes.
 
@@ -534,6 +541,7 @@ class API(HardwareAPILike):
         is paused will not proceed until the system is resumed with
         :py:meth:`resume`.
         """
+        self._pause_manager.pause(pause_type)
 
         async def _chained_calls():
             await self._execution_manager.pause()
@@ -545,12 +553,17 @@ class API(HardwareAPILike):
         self._log.warning('Pause with message: {}'.format(message))
         for cb in self._callbacks:
             cb(message)
-        self.pause()
+        self.pause(PauseType.PAUSE)
 
-    def resume(self):
+    def resume(self, pause_type: PauseType):
         """
         Resume motion after a call to :py:meth:`pause`.
         """
+        self._pause_manager.resume(pause_type)
+
+        if self._pause_manager.should_pause:
+            return
+
         # Resume must be called immediately to awaken thread running hardware
         #  methods (ThreadManager)
         self._backend.resume()
@@ -601,6 +614,7 @@ class API(HardwareAPILike):
         This will re-scan instruments and models, clearing any cached
         information about their presence or state.
         """
+        self._pause_manager.reset()
         await self._execution_manager.reset()
         self._attached_instruments = {
             k: None for k in self._attached_instruments.keys()}
@@ -1651,6 +1665,14 @@ class API(HardwareAPILike):
         up_pos = top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE)
         await self.move_rel(mount, up_pos)
 
+    async def find_modules(
+            self, by_model: modules.types.ModuleModel,
+            resolved_type: modules.types.ModuleType
+            ) -> Tuple[List[modules.AbstractModule], Optional[modules.AbstractModule]]:
+        modules_result = await self._backend.module_controls.parse_modules(
+            by_model, resolved_type)
+        return modules_result
+
     # Pipette config api
     def calibrate_plunger(self,
                           mount: top_types.Mount,
@@ -1716,93 +1738,6 @@ class API(HardwareAPILike):
         if blow_out:
             this_pipette.blow_out_flow_rate = self._plunger_flowrate(
                 this_pipette, blow_out, 'dispense')
-
-    def _unregister_modules(self,
-                            mods_at_ports: List[modules.ModuleAtPort]) -> None:
-        removed_modules = []
-        for mod in mods_at_ports:
-            for attached_mod in self._attached_modules:
-                if attached_mod.port == mod.port:
-                    removed_modules.append(attached_mod)
-        for removed_mod in removed_modules:
-            try:
-                self._attached_modules.remove(removed_mod)
-            except ValueError:
-                self._log.exception(f"Removed Module {removed_mod} not"
-                                    " found in attached modules")
-        for removed_mod in removed_modules:
-            self._log.info(f"Module {removed_mod.name()} detached"
-                           f" from port {removed_mod.port}")
-            removed_mod.cleanup()
-
-    async def register_modules(
-            self,
-            new_mods_at_ports: List[modules.ModuleAtPort] = None,
-            removed_mods_at_ports: List[modules.ModuleAtPort] = None
-    ) -> None:
-        if new_mods_at_ports is None:
-            new_mods_at_ports = []
-        if removed_mods_at_ports is None:
-            removed_mods_at_ports = []
-
-        # destroy removed mods
-        self._unregister_modules(removed_mods_at_ports)
-        sorted_mods_at_port =\
-            self._backend._usb.match_virtual_ports(new_mods_at_ports)
-
-        # build new mods
-        for mod in sorted_mods_at_port:
-            new_instance = await self._backend.build_module(
-                port=mod.port,
-                usb_port=mod.usb_port,
-                model=mod.name,
-                interrupt_callback=self.pause_with_message,
-                loop=self.loop,
-                execution_manager=self._execution_manager)
-            self._attached_modules.append(new_instance)
-            self._log.info(f"Module {mod.name} discovered and attached"
-                           f" at port {mod.port}, new_instance: {new_instance}")
-
-    async def find_modules(
-            self, by_model: modules.types.ModuleModel,
-            resolved_type: modules.types.ModuleType
-    ) -> Tuple[List[modules.AbstractModule], Optional[modules.AbstractModule]]:
-        """
-        Find Modules.
-
-        Given a module model and type, find all attached
-        modules that fit this criteria. If there are no
-        modules attached, but the module is being loaded
-        in simulation, then it should return a simulating
-        module of the same type.
-        """
-        matching_modules = []
-        simulated_module = None
-        mod_type = {
-            modules.types.ModuleType.MAGNETIC: 'magdeck',
-            modules.types.ModuleType.TEMPERATURE: 'tempdeck',
-            modules.types.ModuleType.THERMOCYCLER: 'thermocycler'
-        }[resolved_type]
-        for module in self.attached_modules:
-            if mod_type == module.name():
-                matching_modules.append(module)
-        if self.is_simulator:
-            mod_class = {
-                'magdeck': modules.MagDeck,
-                'tempdeck': modules.TempDeck,
-                'thermocycler': modules.Thermocycler
-            }[mod_type]
-            simulating_module = mod_class(
-                port='',
-                usb_port=self._backend._usb.find_port(''),
-                simulating=True,
-                loop=self.loop,
-                execution_manager=ExecutionManager(
-                    loop=self.loop),
-                sim_model=by_model.value)
-            await simulating_module._connect()
-            simulated_module = simulating_module
-        return matching_modules, simulated_module
 
     def get_instrument_max_height(
             self,

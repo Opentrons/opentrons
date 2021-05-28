@@ -5,6 +5,7 @@ import pytest
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
 
+from robot_server.errors import ApiError
 from robot_server.service.legacy.routers import control
 
 
@@ -256,10 +257,10 @@ async def test_concurrent_motion_fails(hardware,
 
     # Wrap a failing coroutine
     async def failure(func):
-        with pytest.raises(control.V1HandlerError) as exc_info:
+        with pytest.raises(ApiError) as exc_info:
             await func
         assert exc_info.value.status_code == 403
-        assert exc_info.value.message.find('Robot is currently moving') == 0
+        assert exc_info.value.content["message"].find('Robot is currently moving') == 0
 
     forbidden_home = loop.create_task(
         failure(

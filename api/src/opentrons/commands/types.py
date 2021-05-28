@@ -36,6 +36,7 @@ BLOW_OUT: Final = 'command.BLOW_OUT'
 AIR_GAP: Final = 'command.AIR_GAP'
 TOUCH_TIP: Final = 'command.TOUCH_TIP'
 RETURN_TIP: Final = 'command.RETURN_TIP'
+MOVE_TO: Final = 'command.MOVE_TO'
 
 # Modules #
 
@@ -450,6 +451,21 @@ class DropTipCommand(TypedDict):
     payload: Union[DropTipCommandPayload, PairedDropTipCommandPayload]
 
 
+class MoveToCommand(TypedDict):
+    name: Literal['command.MOVE_TO']
+    payload: Union[MoveToCommandPayload, PairedMoveToCommandPayload]
+
+
+class MoveToCommandPayload(
+        TextOnlyPayload, SingleLocationPayload, SingleInstrumentPayload):
+    pass
+
+
+class PairedMoveToCommandPayload(
+        TextOnlyPayload, MultiLocationPayload, MultiInstrumentPayload):
+    pass
+
+
 Command = Union[
     DropTipCommand, PickUpTipCommand, ReturnTipCommand, AirGapCommand,
     TouchTipCommand, BlowOutCommand, MixCommand, TransferCommand,
@@ -463,7 +479,7 @@ Command = Union[
     TempdeckDeactivateCommand, TempdeckAwaitTempCommand,
     TempdeckSetTempCommand, MagdeckCalibrateCommand, MagdeckDisengageCommand,
     MagdeckEngageCommand, ResumeCommand, PauseCommand, DelayCommand,
-    CommentCommand]
+    CommentCommand, MoveToCommand]
 
 
 CommandPayload = Union[
@@ -492,7 +508,8 @@ CommandPayload = Union[
     ThermocyclerSetBlockTempCommandPayload,
     TempdeckAwaitTempCommandPayload,
     TempdeckSetTempCommandPayload,
-    PauseCommandPayload, DelayCommandPayload
+    PauseCommandPayload, DelayCommandPayload,
+    MoveToCommandPayload, PairedMoveToCommandPayload
 ]
 
 
@@ -507,6 +524,10 @@ CommandMessageMeta = TypedDict('CommandMessageMeta',
 
 
 class CommandMessageFields(CommandMessageMeta, CommandMessageSequence):
+    pass
+
+
+class MoveToMessage(CommandMessageFields, MoveToCommand):
     pass
 
 
@@ -673,4 +694,4 @@ CommandMessage = Union[
     ThermocyclerExecuteProfileMessage, ThermocyclerSetBlockTempMessage,
     ThermocyclerOpenMessage, TempdeckSetTempMessage, TempdeckDeactivateMessage,
     MagdeckEngageMessage, MagdeckDisengageMessage, MagdeckCalibrateMessage,
-    CommentMessage, DelayMessage, PauseMessage, ResumeMessage]
+    CommentMessage, DelayMessage, PauseMessage, ResumeMessage, MoveToMessage]

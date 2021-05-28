@@ -703,7 +703,7 @@ def test_blow_out(ctx, monkeypatch):
     instr.pick_up_tip()
     instr.aspirate(10, lw.wells()[0])
 
-    def fake_move(loc):
+    def fake_move(loc, publish):
         nonlocal move_location
         move_location = loc
 
@@ -938,7 +938,6 @@ def test_order_of_module_load(loop, hardware):
 def test_tip_length_for(ctx, monkeypatch):
     instr = ctx.load_instrument('p20_single_gen2', 'left')
     tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
-    instr._tip_length_for.cache_clear()
     assert instr._tip_length_for(tiprack)\
         == (tiprack._implementation.get_definition()['parameters']['tipLength']
             - instr.hw_pipette['tip_overlap']
@@ -959,9 +958,7 @@ def test_tip_length_for_caldata(ctx, monkeypatch, use_new_calibration):
             status=cs_types.CalibrationStatus(markedBad=False),
             uri='opentrons/geb_96_tiprack_10ul/1')
     monkeypatch.setattr(get, 'load_tip_length_calibration', mock_tip_length)
-    instr._tip_length_for.cache_clear()
     assert instr._tip_length_for(tiprack) == 2
-    instr._tip_length_for.cache_clear()
     mock_tip_length.side_effect = cs_types.TipLengthCalNotFound
     assert instr._tip_length_for(tiprack) == (
         tiprack._implementation.get_definition()['parameters']['tipLength']
