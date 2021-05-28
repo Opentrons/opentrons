@@ -31,4 +31,4 @@ async def test_current_setting(monkeypatch, revision, a_current):
     monkeypatch.setattr(controller, 'build_gpio_chardev', mock_build)
     backend = await hc.Controller.build(config=None)
     assert backend.board_revision == revision
-    assert backend._smoothie_driver._active_current_settings['now']['A'] == a_current
+    assert backend._smoothie_driver._active_current_settings.now['A'] == a_current

@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Dict
 from unittest.mock import Mock
 import pytest
 from opentrons.drivers.types import MoveSplit
@@ -762,3 +763,72 @@ def test_do_relative_splits_during_home_for(smoothie, monkeypatch):
         'G0 B-1 \r\n\r\n',
         'G90 M52 M54 M92 B1.0 C1.0 G4 P0.01 G0 F24000 \r\n\r\n'
     ]
+
+
+def test_unstick_axes(smoothie, monkeypatch):
+    driver = smoothie
+    cmd_list = []
+
+    def _send_command_mock(
+            command, *args, **kwargs):
+        nonlocal cmd_list
+        cmd_list.append(command.build())
+        return 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0 Probe: 0 \r\n'
+
+    monkeypatch.setattr(driver, '_send_command', _send_command_mock)
+
+    driver.simulating = False
+
+    driver.unstick_axes(axes="ABCXYZ", distance=2, speed=3)
+
+    assert cmd_list == [
+        'M203.1 A3 B3 C3 X3 Y3 Z3 \r\n\r\n',
+        'M119 \r\n\r\n',
+        'M907 A0.5 B0.05 C0.05 X1.25 Y1.25 Z0.5 G4 P0.005 G0 A-2 B-2 C-2 X-2 Y-2 Z-2 \r\n\r\n',
+        'M907 A0.5 B0.05 C0.05 X1.25 Y1.25 Z0.5 G4 P0.005 \r\n\r\n',
+        'M203.1 A125 B40 C40 X600 Y400 Z125 \r\n\r\n',
+    ]
+
+
+@pytest.mark.parametrize(
+    argnames=["home_flags", "axis_string", "expected"],
+    argvalues=[
+        [{k: False for k in "XYZABC"}, "A", "A"],
+        [{k: False for k in "XYZABC"}, "XA", "XA"],
+        [{k: False for k in "XYZABC"}, "XY", "XY"],
+        [{k: False for k in "XYZABC"}, "XYZABC", "XYZABC"],
+        [{"A": True, "B": False, "C": True,
+          "X": False, "Y": True, "Z": False}, "XYZABC", "XZB"],
+    ]
+)
+def test_home_flagged_axes(
+    smoothie, home_flags: Dict[str, bool], axis_string: str, expected: str
+) -> None:
+    """It should only home un-homed axes."""
+    smoothie.home = Mock()
+    smoothie.update_homed_flags(home_flags)
+
+    smoothie.home_flagged_axes(axes_string=axis_string)
+
+    smoothie.home.assert_called_once_with(expected)
+
+
+@pytest.mark.parametrize(
+    argnames=["home_flags", "axis_string"],
+    argvalues=[
+        [{k: True for k in "XYZABC"}, "A"],
+        [{k: True for k in "XYZABC"}, "XYZABC"],
+        [{"A": True, "B": False, "C": True,
+          "X": False, "Y": True, "Z": False}, "ACY"],
+    ]
+)
+def test_home_flagged_axes_no_call(
+    smoothie, home_flags: Dict[str, bool], axis_string: str
+) -> None:
+    """It should not home homed axes."""
+    smoothie.home = Mock()
+    smoothie.update_homed_flags(home_flags)
+
+    smoothie.home_flagged_axes(axes_string=axis_string)
+
+    smoothie.home.assert_not_called()
