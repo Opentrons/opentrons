@@ -14,13 +14,15 @@ const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden
 >
 
-const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
-  onSubmit: jest.fn(),
-}
+let formikConfig: FormikConfig<LabwareFields>
 
 describe('Regularity', () => {
   beforeEach(() => {
+    formikConfig = {
+      initialValues: getDefaultFormState(),
+      onSubmit: jest.fn(),
+    }
+
     when(isEveryFieldHiddenMock)
       .calledWith(['homogeneousWells'], formikConfig.initialValues)
       .mockReturnValue(false)
