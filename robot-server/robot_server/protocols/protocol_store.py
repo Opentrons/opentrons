@@ -110,7 +110,10 @@ class ProtocolStore:
                 file_path.unlink()
             self._get_protocol_dir(protocol_id).rmdir()
         except Exception as e:
-            log.warn(f"Unable to delete all files for protocol {protocol_id}: {str(e)}")
+            log.warning(
+                f"Unable to delete all files for protocol {protocol_id}",
+                exc_info=e,
+            )
 
         return entry
 

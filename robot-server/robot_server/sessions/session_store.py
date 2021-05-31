@@ -1,52 +1,55 @@
 """Sessions in-memory store."""
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional
+from typing import Dict, List
 
-from .session_builder import CreateSessionData
-from .session_inputs import SessionInput, CreateSessionInputData
+from .session_models import SessionCreateData
+from .control_commands import SessionControlCommand
 
 
 @dataclass(frozen=True)
-class SessionStoreEntry:
-    """An entry in the session store, used to construct response models."""
+class SessionResource:
+    """An entry in the session store, used to construct response models.
+
+    This represents all session state that cannot be derived from another
+    location, such as a ProtocolEngine instance.
+    """
 
     session_id: str
-    session_data: Optional[CreateSessionData]
+    create_data: SessionCreateData
     created_at: datetime
-    inputs: List[SessionInput]
+    control_commands: List[SessionControlCommand]
 
 
 class SessionNotFoundError(ValueError):
     """Error raised when a given session ID is not found in the store."""
 
     def __init__(self, session_id: str) -> None:
-        """Intialize the error message from the missing ID."""
+        """Initialize the error message from the missing ID."""
         super().__init__(f"Session {session_id} was not found.")
 
 
 class SessionStore:
     """Methods for storing and retrieving session resources."""
 
-    def create(
-        self,
-        session_id: str,
-        session_data: Optional[CreateSessionData],
-        created_at: datetime,
-    ) -> SessionStoreEntry:
-        """Create and store a new session resource.
+    def __init__(self) -> None:
+        """Initialize a SessionStore and its in-memory storage."""
+        self._sessions_by_id: Dict[str, SessionResource] = {}
+
+    def add(self, session: SessionResource) -> SessionResource:
+        """Add a session resource to the store.
 
         Arguments:
-            session_id: Unique identifier.
-            session_data: Data used to create the session.
-            created_at: Resource creation timestampe
+            session: Session resource to store.
 
         Returns:
-            The created session entry in the store.
+            The resource that was added to the store.
         """
-        raise NotImplementedError()
+        self._sessions_by_id[session.session_id] = session
 
-    def get(self, session_id: str) -> SessionStoreEntry:
+        return session
+
+    def get(self, session_id: str) -> SessionResource:
         """Get a specific session entry by its identifier.
 
         Arguments:
@@ -55,17 +58,20 @@ class SessionStore:
         Returns:
             The retrieved session entry from the store.
         """
-        raise NotImplementedError()
+        try:
+            return self._sessions_by_id[session_id]
+        except KeyError as e:
+            raise SessionNotFoundError(session_id) from e
 
-    def get_all(self) -> List[SessionStoreEntry]:
+    def get_all(self) -> List[SessionResource]:
         """Get all known session resources.
 
         Returns:
             All stored session entries.
         """
-        raise NotImplementedError()
+        return list(self._sessions_by_id.values())
 
-    def remove(self, session_id: str) -> SessionStoreEntry:
+    def remove(self, session_id: str) -> SessionResource:
         """Remove a session by its unique identifier.
 
         Arguments:
@@ -77,27 +83,7 @@ class SessionStore:
         Raises:
             SessionNotFoundError: The specified session ID was not found.
         """
-        raise NotImplementedError()
-
-    def create_input(
-        self,
-        session_id: str,
-        input_id: str,
-        input_data: CreateSessionInputData,
-        created_at: datetime,
-    ) -> SessionInput:
-        """Create a session input resource and add it to the store.
-
-        Arguments:
-            session_id: The session to add the input to.
-            input_id: Unique ID to assign to the input resource.
-            input_data: Data used to create the input resource.
-            created_at: Resource creation timestamp.
-
-        Returns:
-            The created input resource.
-
-        Raises:
-            SessionNotFoundError: The specified session ID was not found.
-        """
-        raise NotImplementedError()
+        try:
+            return self._sessions_by_id.pop(session_id)
+        except KeyError as e:
+            raise SessionNotFoundError(session_id) from e
