@@ -3,8 +3,12 @@
 # existing logic and models from:
 #   - api/src/opentrons/protocols/types.py
 #   - robot-server/robot_server/service/protocol/models.py
+from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
+from typing import Union
+from typing_extensions import Literal
 
 
 class ProtocolFileType(str, Enum):
@@ -20,11 +24,29 @@ class ProtocolFileType(str, Enum):
 
 
 @dataclass(frozen=True)
-class ProtocolFile:
+class AbstractProtocolFile:
     """A value object representing a protocol file on disk.
 
     Attributes:
         file_type: Whether the file is a JSON protocol or Python protocol
     """
 
+    file_path: Path
     file_type: ProtocolFileType
+
+
+@dataclass(frozen=True)
+class JsonProtocolFile(AbstractProtocolFile):
+    """A value object representing a JSON protocol file."""
+
+    file_type: Literal[ProtocolFileType.JSON] = ProtocolFileType.JSON
+
+
+@dataclass(frozen=True)
+class PythonProtocolFile(AbstractProtocolFile):
+    """A value object representing a Python protocol file."""
+
+    file_type: Literal[ProtocolFileType.PYTHON] = ProtocolFileType.PYTHON
+
+
+ProtocolFile = Union[JsonProtocolFile, PythonProtocolFile]
