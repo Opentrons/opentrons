@@ -8,7 +8,7 @@ from .protocol_store import ProtocolStore
 log = getLogger(__name__)
 
 PROTOCOL_STORE_KEY = "protocol_store"
-PROTOCOL_STORE_DIRECTORY = Path(gettempdir()) / "protocols"
+PROTOCOL_STORE_DIRECTORY = Path(gettempdir()) / "opentrons-protocols"
 
 
 def get_protocol_store(request: Request) -> ProtocolStore:
