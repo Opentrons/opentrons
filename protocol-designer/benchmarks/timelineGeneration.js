@@ -39,7 +39,7 @@ bench(`commandCreatorsTimeline: mix ${times} times`, b => {
       dispenseOffsetFromBottomMm: 2,
       aspirateFlowRateUlSec: 5,
       dispenseFlowRateUlSec: 6,
-      aspirateDelaySeconds: 2,
+      aspirateDelaySeconds: null,
       dispenseDelaySeconds: null,
     }),
   ]
