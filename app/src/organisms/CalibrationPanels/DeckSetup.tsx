@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import map from 'lodash/map'
 import {
@@ -19,7 +18,6 @@ import {
   SPACING_2,
   SPACING_3,
 } from '@opentrons/components'
-// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
@@ -49,11 +47,10 @@ const SECOND_RANK_WITH_BLOCK_PROMPT =
   'and ensure Calibration Block is within its designated slot as illustrated below'
 const SECOND_RANK_NO_BLOCK_PROMPT = 'as illustrated below'
 const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
-const contentsBySessionType: {
-  [SessionType]: {
-    moveCommandString: SessionCommandString,
-  },
-} = {
+const contentsBySessionType: Record<
+  SessionType,
+  { moveCommandString: SessionCommandString }
+> = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
     moveCommandString: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
   },
@@ -72,9 +69,9 @@ function HealthCheckText({
   activePipette,
   calBlock,
 }: {
-  activePipette?: CalibrationCheckInstrument | null,
-  calBlock?: CalibrationLabware | null,
-}): React.Node {
+  activePipette?: CalibrationCheckInstrument | null
+  calBlock?: CalibrationLabware | null
+}): JSX.Element | null {
   if (!activePipette) return null
   const { mount, rank, tipRackDisplay } = activePipette
   const toCheck = rank === 'first' ? FIRST_RANK_TO_CHECK : SECOND_RANK_TO_CHECK
@@ -99,7 +96,7 @@ function HealthCheckText({
   )
 }
 
-export function DeckSetup(props: CalibrationPanelProps): React.Node {
+export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
   const {
@@ -115,13 +112,13 @@ export function DeckSetup(props: CalibrationPanelProps): React.Node {
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
     shouldPerformTipLength
 
-  const lookupType = isExtendedPipOffset
+  const lookupType: SessionType = isExtendedPipOffset
     ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
     : sessionType
   const isHealthCheck =
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
 
-  const proceed = () => {
+  const proceed = (): void => {
     sendCommands({
       command: contentsBySessionType[lookupType].moveCommandString,
     })
@@ -182,7 +179,10 @@ export function DeckSetup(props: CalibrationPanelProps): React.Node {
           {({ deckSlotsById }) =>
             map(
               deckSlotsById,
-              (slot: $Values<typeof deckSlotsById>, slotId) => {
+              (
+                slot: typeof deckSlotsById[keyof typeof deckSlotsById],
+                slotId
+              ) => {
                 if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
                 let labwareDef = null
                 if (String(tipRack?.slot) === slotId) {

@@ -1,12 +1,14 @@
-// @flow
-
 import * as React from 'react'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import {
+  mountWithStore,
+  WrapperWithStore,
+} from '@opentrons/components/__utils__'
 
 import { ConfirmPipette } from '../ConfirmPipette'
 import { CheckPipettesButton } from '../CheckPipettesButton'
 import { TitleBar, Icon } from '@opentrons/components'
 
+import type { Action, State } from '../../../redux/types'
 import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'
 import type { Props } from '../ConfirmPipette'
 import type {
@@ -22,7 +24,13 @@ describe('ConfirmPipette', () => {
   beforeEach(() => {
     jest.resetAllMocks()
   })
-  const render = (props: $Shape<Props>) => {
+  const render = (
+    props: Partial<Props>
+  ): WrapperWithStore<
+    React.ComponentProps<typeof ConfirmPipette>,
+    State,
+    Action
+  > => {
     const {
       robotName = 'robot-name',
       mount = 'left',
@@ -30,16 +38,20 @@ describe('ConfirmPipette', () => {
       subtitle = 'my-subtitle',
       success = true,
       attachedWrong = false,
-      wantedPipette = ({
+      wantedPipette = {
         displayName: 'wanted-display-name',
         channels: 1,
-      }: $Shape<PipetteNameSpecs>),
-      actualPipette = ({}: $Shape<PipetteModelSpecs>),
-      actualPipetteOffset = ({}: $Shape<PipetteOffsetCalibration>),
+      } as PipetteNameSpecs,
+      actualPipette = {} as PipetteModelSpecs,
+      actualPipetteOffset = {} as PipetteOffsetCalibration,
       displayName = 'actual-display-name',
       displayCategory = 'GEN2',
     } = props
-    return mountWithStore(
+    return mountWithStore<
+      React.ComponentProps<typeof ConfirmPipette>,
+      State,
+      Action
+    >(
       <ConfirmPipette
         robotName={robotName}
         mount={mount}
@@ -57,7 +69,7 @@ describe('ConfirmPipette', () => {
         tryAgain={mockTryAgain}
         startPipetteOffsetCalibration={mockStartPipetteOffsetCalibration}
       />,
-      { initialState: { robotApi: {} } }
+      { initialState: { robotApi: {} } } as any
     )
   }
 
@@ -65,11 +77,11 @@ describe('ConfirmPipette', () => {
     {
       success: true,
       attachedWrong: false,
-      wantedPipette: ({
+      wantedPipette: {
         displayName: 'wanted',
         channels: 1,
-      }: $Shape<PipetteNameSpecs>),
-      actualPipette: ({}: $Shape<PipetteModelSpecs>),
+      } as Partial<PipetteNameSpecs>,
+      actualPipette: {} as Partial<PipetteModelSpecs>,
       actualPipetteOffset: null,
       backDisabled: true,
       iconName: 'check-circle',
@@ -83,12 +95,12 @@ describe('ConfirmPipette', () => {
     {
       success: true,
       attachedWrong: false,
-      wantedPipette: ({
+      wantedPipette: {
         displayName: 'wanted',
         channels: 1,
-      }: $Shape<PipetteNameSpecs>),
-      actualPipette: ({}: $Shape<PipetteModelSpecs>),
-      actualPipetteOffset: ({}: $Shape<PipetteOffsetCalibration>),
+      } as Partial<PipetteNameSpecs>,
+      actualPipette: {} as Partial<PipetteModelSpecs>,
+      actualPipetteOffset: {} as Partial<PipetteOffsetCalibration>,
       backDisabled: true,
       iconName: 'check-circle',
       continueMatch: null,
@@ -117,8 +129,8 @@ describe('ConfirmPipette', () => {
       success: false,
       attachedWrong: false,
       wantedPipette: null,
-      actualPipette: ({}: $Shape<PipetteModelSpecs>),
-      actualPipetteOffset: ({}: $Shape<PipetteOffsetCalibration>),
+      actualPipette: {} as Partial<PipetteModelSpecs>,
+      actualPipetteOffset: {} as Partial<PipetteOffsetCalibration>,
       backDisabled: false,
       iconName: 'close-circle',
       continueMatch: /confirm pipette is detached/,
@@ -131,11 +143,11 @@ describe('ConfirmPipette', () => {
     {
       success: false,
       attachedWrong: true,
-      wantedPipette: ({
+      wantedPipette: {
         displayName: 'my-display-name',
         channels: 1,
-      }: $Shape<PipetteNameSpecs>),
-      actualPipette: ({}: $Shape<PipetteModelSpecs>),
+      } as Partial<PipetteNameSpecs>,
+      actualPipette: {} as Partial<PipetteModelSpecs>,
       actualPipetteOffset: null,
       backDisabled: true,
       iconName: 'close-circle',
@@ -149,12 +161,12 @@ describe('ConfirmPipette', () => {
     {
       success: false,
       attachedWrong: true,
-      wantedPipette: ({
+      wantedPipette: {
         displayName: 'my-display-name',
         channels: 1,
-      }: $Shape<PipetteNameSpecs>),
-      actualPipette: ({}: $Shape<PipetteModelSpecs>),
-      actualPipetteOffset: ({}: $Shape<PipetteOffsetCalibration>),
+      } as Partial<PipetteNameSpecs>,
+      actualPipette: {} as Partial<PipetteModelSpecs>,
+      actualPipetteOffset: {} as Partial<PipetteOffsetCalibration>,
       backDisabled: true,
       iconName: 'close-circle',
       continueMatch: /detach and try again/,
@@ -171,16 +183,16 @@ describe('ConfirmPipette', () => {
       const { wrapper } = render({
         success: spec.success,
         attachedWrong: spec.attachedWrong,
-        wantedPipette: spec.wantedPipette,
-        actualPipette: spec.actualPipette,
-        actualPipetteOffset: spec.actualPipetteOffset,
+        wantedPipette: spec.wantedPipette as PipetteNameSpecs,
+        actualPipette: spec.actualPipette as PipetteModelSpecs,
+        actualPipetteOffset: spec.actualPipetteOffset as PipetteOffsetCalibration,
       })
       it('has the right title bar including back button disabled or not', () => {
         const titleBarProps = wrapper.find(TitleBar).props()
         expect(titleBarProps.title).toEqual('my-title')
         expect(titleBarProps.subtitle).toEqual('my-subtitle')
-        expect(titleBarProps.back.onClick).toBe(mockBack)
-        expect(titleBarProps.back.disabled).toEqual(spec.backDisabled)
+        expect(titleBarProps.back?.onClick).toBe(mockBack)
+        expect(titleBarProps.back?.disabled).toEqual(spec.backDisabled)
       })
       it('displays the right exit button text', () => {
         const exitButton = wrapper.findWhere(

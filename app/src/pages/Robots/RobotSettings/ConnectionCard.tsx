@@ -1,4 +1,3 @@
-// @flow
 // RobotSettings card for wifi status
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -17,13 +16,13 @@ import { ConnectionStatusMessage, ConnectionInfo } from './connection'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-type Props = {|
-  robot: ViewableRobot,
-|}
+interface Props {
+  robot: ViewableRobot
+}
 
 const STATUS_REFRESH_MS = 5000
 
-export function ConnectionCard(props: Props): React.Node {
+export function ConnectionCard(props: Props): JSX.Element {
   const { robot } = props
   const { name: robotName, status, local, ip } = robot
   const { t } = useTranslation('robot_connection')

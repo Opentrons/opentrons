@@ -2,6 +2,9 @@
 import { HOME } from '../../robot-controls'
 import { robotReducer as reducer, actionTypes } from '..'
 
+import type { Action } from '../../types'
+import type { RobotState } from '..'
+
 const EXPECTED_INITIAL_STATE = {
   deckPopulated: null,
   modulesReviewed: null,
@@ -20,71 +23,84 @@ const EXPECTED_INITIAL_STATE = {
 
 describe('robot reducer - calibration', () => {
   it('initial state', () => {
-    const state = reducer(undefined, {})
+    const state = reducer(undefined, {} as any)
 
     expect(state.calibration).toEqual(EXPECTED_INITIAL_STATE)
   })
 
   it('handles robot:REFRESH_SESSION', () => {
     const state = reducer(
-      { calibration: {} },
-      { type: 'robot:REFRESH_SESSION' }
+      { calibration: {} } as any,
+      { type: 'robot:REFRESH_SESSION' } as any
     )
 
     expect(state.calibration).toEqual(EXPECTED_INITIAL_STATE)
   })
 
   it('handles DISCONNECT_RESPONSE success', () => {
-    const expected = reducer(undefined, {}).calibration
-    const state = { calibration: { dummy: 'state' } }
-    const action = { type: 'robot:DISCONNECT_RESPONSE', payload: {} }
+    const expected = reducer(undefined, {} as any).calibration
+    const state: RobotState = { calibration: { dummy: 'state' } } as any
+    const action: Action = { type: 'robot:DISCONNECT_RESPONSE', payload: {} }
 
     expect(reducer(state, action).calibration).toEqual(expected)
   })
 
   it('handles protocol:UPLOAD', () => {
-    const expected = reducer(undefined, {}).calibration
-    const state = { calibration: { dummy: 'state' } }
-    const action = {
+    const expected = reducer(undefined, {} as any).calibration
+    const state: RobotState = { calibration: { dummy: 'state' } } as any
+    const action: Action = {
       type: 'protocol:UPLOAD',
-      payload: {},
+      payload: {} as any,
+      meta: {} as any,
     }
 
     expect(reducer(state, action).calibration).toEqual(expected)
   })
 
   it('handles SET_MODULES_REVIEWED action', () => {
-    const setToTrue = { type: 'robot:SET_MODULES_REVIEWED', payload: true }
-    const setToFalse = { type: 'robot:SET_MODULES_REVIEWED', payload: false }
+    const setToTrue: Action = {
+      type: 'robot:SET_MODULES_REVIEWED',
+      payload: true,
+    }
+    const setToFalse: Action = {
+      type: 'robot:SET_MODULES_REVIEWED',
+      payload: false,
+    }
 
-    let state = { calibration: { modulesReviewed: false } }
+    let state: RobotState = { calibration: { modulesReviewed: false } } as any
     expect(reducer(state, setToTrue).calibration).toEqual({
       modulesReviewed: true,
     })
 
-    state = { calibration: { modulesReviewed: true } }
+    state = { calibration: { modulesReviewed: true } } as any
     expect(reducer(state, setToFalse).calibration).toEqual({
       modulesReviewed: false,
     })
   })
 
   it('handles SET_DECK_POPULATED action', () => {
-    const setToTrue = { type: actionTypes.SET_DECK_POPULATED, payload: true }
-    const setToFalse = { type: actionTypes.SET_DECK_POPULATED, payload: false }
+    const setToTrue = {
+      type: actionTypes.SET_DECK_POPULATED,
+      payload: true,
+    } as any
+    const setToFalse = {
+      type: actionTypes.SET_DECK_POPULATED,
+      payload: false,
+    } as any
 
-    let state = { calibration: { deckPopulated: false } }
+    let state: RobotState = { calibration: { deckPopulated: false } } as any
     expect(reducer(state, setToTrue).calibration).toEqual({
       deckPopulated: true,
     })
 
-    state = { calibration: { deckPopulated: true } }
+    state = { calibration: { deckPopulated: true } } as any
     expect(reducer(state, setToFalse).calibration).toEqual({
       deckPopulated: false,
     })
   })
 
   it('handles PICKUP_AND_HOME action', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         deckPopulated: false,
         modulesReviewed: false,
@@ -94,11 +110,12 @@ describe('robot reducer - calibration', () => {
           error: new Error(),
         },
       },
-    }
+    } as any
 
-    const action = {
+    const action: Action = {
       type: 'robot:PICKUP_AND_HOME',
       payload: { mount: 'left', slot: '5' },
+      meta: {} as any,
     }
     expect(reducer(state, action).calibration).toEqual({
       deckPopulated: true,
@@ -114,7 +131,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles PICKUP_AND_HOME response actions', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: 'PICKUP_AND_HOME',
@@ -125,14 +142,14 @@ describe('robot reducer - calibration', () => {
         },
         tipOnByMount: { right: false },
       },
-    }
+    } as any
 
-    const success = {
+    const success: Action = {
       type: 'robot:PICKUP_AND_HOME_SUCCESS',
       payload: {},
     }
 
-    const failure = {
+    const failure: Action = {
       type: 'robot:PICKUP_AND_HOME_FAILURE',
       error: true,
       payload: new Error('AH'),
@@ -162,7 +179,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles DROP_TIP_AND_HOME action', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: '',
@@ -170,10 +187,11 @@ describe('robot reducer - calibration', () => {
           error: new Error('AH'),
         },
       },
-    }
-    const action = {
+    } as any
+    const action: Action = {
       type: 'robot:DROP_TIP_AND_HOME',
       payload: { mount: 'right', slot: '5' },
+      meta: {} as any,
     }
 
     expect(reducer(state, action).calibration).toEqual({
@@ -188,7 +206,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles DROP_TIP_AND_HOME response actions', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: 'DROP_TIP_AND_HOME',
@@ -199,14 +217,14 @@ describe('robot reducer - calibration', () => {
         },
         tipOnByMount: { left: false, right: true },
       },
-    }
+    } as any
 
-    const success = {
+    const success: Action = {
       type: 'robot:DROP_TIP_AND_HOME_SUCCESS',
       payload: {},
     }
 
-    const failure = {
+    const failure: Action = {
       type: 'robot:DROP_TIP_AND_HOME_FAILURE',
       error: true,
       payload: new Error('AH'),
@@ -236,7 +254,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles CONFIRM_TIPRACK action', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: '',
@@ -246,10 +264,11 @@ describe('robot reducer - calibration', () => {
           error: new Error('AH'),
         },
       },
-    }
-    const action = {
+    } as any
+    const action: Action = {
       type: 'robot:CONFIRM_TIPRACK',
       payload: { mount: 'right', slot: '5' },
+      meta: {} as any,
     }
 
     expect(reducer(state, action).calibration).toEqual({
@@ -264,7 +283,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles CONFIRM_TIPRACK response actions', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: 'CONFIRM_TIPRACK',
@@ -276,14 +295,14 @@ describe('robot reducer - calibration', () => {
         tipOnByMount: { right: true },
         confirmedBySlot: { 5: false },
       },
-    }
+    } as any
 
-    const success = {
+    const success: Action = {
       type: 'robot:CONFIRM_TIPRACK_SUCCESS',
       payload: { tipOn: false },
     }
 
-    const failure = {
+    const failure: Action = {
       type: 'robot:CONFIRM_TIPRACK_FAILURE',
       error: true,
       payload: new Error('AH'),
@@ -315,7 +334,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles MOVE_TO_FRONT action', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         deckPopulated: true,
         modulesReviewed: true,
@@ -326,11 +345,11 @@ describe('robot reducer - calibration', () => {
           error: new Error(),
         },
       },
-    }
+    } as any
     const action = {
       type: actionTypes.MOVE_TO_FRONT,
       payload: { mount: 'left' },
-    }
+    } as any
 
     expect(reducer(state, action).calibration).toEqual({
       deckPopulated: false,
@@ -345,7 +364,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles MOVE_TO_FRONT_RESPONSE action', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: 'MOVE_TO_FRONT',
@@ -354,14 +373,17 @@ describe('robot reducer - calibration', () => {
           error: null,
         },
       },
-    }
+    } as any
 
-    const success = { type: actionTypes.MOVE_TO_FRONT_RESPONSE, error: false }
+    const success = {
+      type: actionTypes.MOVE_TO_FRONT_RESPONSE,
+      error: false,
+    } as any
     const failure = {
       type: actionTypes.MOVE_TO_FRONT_RESPONSE,
       error: true,
       payload: new Error('AH'),
-    }
+    } as any
 
     expect(reducer(state, success).calibration).toEqual({
       calibrationRequest: {
@@ -383,7 +405,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles PROBE_TIP action', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: '',
@@ -393,11 +415,11 @@ describe('robot reducer - calibration', () => {
         },
         probedByMount: { left: true, right: true },
       },
-    }
+    } as any
     const action = {
       type: actionTypes.PROBE_TIP,
       payload: { mount: 'left' },
-    }
+    } as any
 
     expect(reducer(state, action).calibration).toEqual({
       calibrationRequest: {
@@ -411,7 +433,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles PROBE_TIP_RESPONSE action', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: 'PROBE_TIP',
@@ -420,13 +442,16 @@ describe('robot reducer - calibration', () => {
           error: null,
         },
       },
-    }
-    const success = { type: actionTypes.PROBE_TIP_RESPONSE, error: false }
+    } as any
+    const success = {
+      type: actionTypes.PROBE_TIP_RESPONSE,
+      error: false,
+    } as any
     const failure = {
       type: actionTypes.PROBE_TIP_RESPONSE,
       error: true,
       payload: new Error('AH'),
-    }
+    } as any
 
     expect(reducer(state, success).calibration).toEqual({
       calibrationRequest: {
@@ -449,14 +474,15 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles CONFIRM_PROBED', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         probedByMount: { left: false, right: true },
       },
-    }
-    const action = {
+    } as any
+    const action: Action = {
       type: 'robot:CONFIRM_PROBED',
       payload: 'left',
+      meta: {} as any,
     }
 
     expect(reducer(state, action).calibration).toEqual({
@@ -465,7 +491,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles MOVE_TO action', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         deckPopulated: false,
         modulesReviewed: false,
@@ -475,10 +501,11 @@ describe('robot reducer - calibration', () => {
           error: new Error('AH'),
         },
       },
-    }
-    const action = {
+    } as any
+    const action: Action = {
       type: 'robot:MOVE_TO',
       payload: { mount: 'left', slot: '3' },
+      meta: {} as any,
     }
 
     expect(reducer(state, action).calibration).toEqual({
@@ -495,7 +522,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles MOVE_TO response actions', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: 'MOVE_TO',
@@ -505,10 +532,10 @@ describe('robot reducer - calibration', () => {
           slot: '5',
         },
       },
-    }
+    } as any
 
-    const success = { type: 'robot:MOVE_TO_SUCCESS', payload: {} }
-    const failure = {
+    const success: Action = { type: 'robot:MOVE_TO_SUCCESS', payload: {} }
+    const failure: Action = {
       type: 'robot:MOVE_TO_FAILURE',
       error: true,
       payload: new Error('AH'),
@@ -535,7 +562,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles JOG action', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: '',
@@ -543,9 +570,12 @@ describe('robot reducer - calibration', () => {
           error: new Error(),
         },
       },
+    } as any
+    const action: Action = {
+      type: 'robot:JOG',
+      payload: { mount: 'right' },
+      meta: {} as any,
     }
-    const action = { type: 'robot:JOG', payload: { mount: 'right' } }
-
     expect(reducer(state, action).calibration).toEqual({
       calibrationRequest: {
         type: 'JOG',
@@ -557,7 +587,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles JOG response actions', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: 'JOG',
@@ -566,12 +596,12 @@ describe('robot reducer - calibration', () => {
           mount: 'right',
         },
       },
-    }
-    const success = {
+    } as any
+    const success: Action = {
       type: 'robot:JOG_SUCCESS',
       payload: {},
     }
-    const failure = {
+    const failure: Action = {
       type: 'robot:JOG_FAILURE',
       error: true,
       payload: new Error('AH'),
@@ -596,7 +626,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles UPDATE_OFFSET action', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: '',
@@ -604,10 +634,11 @@ describe('robot reducer - calibration', () => {
           error: new Error(),
         },
       },
-    }
-    const action = {
+    } as any
+    const action: Action = {
       type: 'robot:UPDATE_OFFSET',
       payload: { mount: 'right', slot: '5' },
+      meta: {} as any,
     }
 
     expect(reducer(state, action).calibration).toEqual({
@@ -622,7 +653,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles UPDATE_OFFSET response actions', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: 'UPDATE_OFFSET',
@@ -633,13 +664,13 @@ describe('robot reducer - calibration', () => {
         },
         confirmedBySlot: {},
       },
-    }
+    } as any
 
-    const success = {
+    const success: Action = {
       type: 'robot:UPDATE_OFFSET_SUCCESS',
       payload: {},
     }
-    const failure = {
+    const failure: Action = {
       type: 'robot:UPDATE_OFFSET_FAILURE',
       error: true,
       payload: new Error('AH'),
@@ -668,15 +699,15 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles CONFIRM_LABWARE action', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         confirmedBySlot: {},
       },
-    }
+    } as any
     const action = {
       type: actionTypes.CONFIRM_LABWARE,
       payload: { labware: '5' },
-    }
+    } as any
 
     expect(reducer(state, action).calibration).toEqual({
       confirmedBySlot: { 5: true },
@@ -684,7 +715,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles CLEAR_CALIBRATION_REQUEST and robot home actions', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: 'JOG',
@@ -693,21 +724,20 @@ describe('robot reducer - calibration', () => {
           mount: 'right',
         },
       },
-    }
-
-    const clearAction = { type: 'robot:CLEAR_CALIBRATION_REQUEST' }
+    } as any
+    const clearAction: Action = { type: 'robot:CLEAR_CALIBRATION_REQUEST' }
     expect(reducer(state, clearAction).calibration).toEqual({
       calibrationRequest: { type: '', inProgress: false, error: null },
     })
 
-    const homeAction = { type: HOME }
+    const homeAction = { type: HOME } as any
     expect(reducer(state, homeAction).calibration).toEqual({
       calibrationRequest: { type: '', inProgress: false, error: null },
     })
   })
 
   it('handles RETURN_TIP action', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: '',
@@ -715,11 +745,11 @@ describe('robot reducer - calibration', () => {
           error: new Error(),
         },
       },
-    }
+    } as any
     const action = {
       type: actionTypes.RETURN_TIP,
       payload: { mount: 'left' },
-    }
+    } as any
 
     expect(reducer(state, action).calibration).toEqual({
       calibrationRequest: {
@@ -732,7 +762,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles RETURN_TIP_RESPONSE success', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: 'RETURN_TIP',
@@ -744,10 +774,10 @@ describe('robot reducer - calibration', () => {
           left: true,
         },
       },
-    }
+    } as any
     const action = {
       type: actionTypes.RETURN_TIP_RESPONSE,
-    }
+    } as any
 
     expect(reducer(state, action).calibration).toEqual({
       calibrationRequest: {
@@ -763,7 +793,7 @@ describe('robot reducer - calibration', () => {
   })
 
   it('handles RETURN_TIP_RESPONSE failure', () => {
-    const state = {
+    const state: RobotState = {
       calibration: {
         calibrationRequest: {
           type: 'RETURN_TIP',
@@ -775,12 +805,12 @@ describe('robot reducer - calibration', () => {
           left: true,
         },
       },
-    }
+    } as any
     const action = {
       type: actionTypes.RETURN_TIP_RESPONSE,
       error: true,
       payload: { message: 'AH' },
-    }
+    } as any
 
     expect(reducer(state, action).calibration).toEqual({
       calibrationRequest: {

@@ -1,4 +1,3 @@
-// @flow
 // jog controls component
 import * as React from 'react'
 
@@ -8,32 +7,32 @@ import {
   SIZE_2,
   PrimaryBtn,
   Icon,
-  type IconName,
   HandleKeypress,
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { ControlContainer } from './ControlContainer'
 
-import type { Jog, Plane, Sign, Bearing } from './types'
+import type { IconName } from '@opentrons/components'
+import type { Jog, Plane, Sign, Bearing, Axis } from './types'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 
-type Control = {|
-  bearing: Bearing,
-  keyName: string,
-  shiftKey: boolean,
-  gridRow: number,
-  gridColumn: number,
-  iconName: IconName,
-  axis: 'x' | 'y' | 'z',
-  sign: Sign,
-|}
-type ControlsContents = {|
-  controls: Array<Control>,
-  title: string,
-  subtitle: string,
-|}
+interface Control {
+  bearing: Bearing
+  keyName: string
+  shiftKey: boolean
+  gridRow: number
+  gridColumn: number
+  iconName: IconName
+  axis: Axis
+  sign: Sign
+}
+interface ControlsContents {
+  controls: Control[]
+  title: string
+  subtitle: string
+}
 
-const CONTROLS_CONTENTS_BY_PLANE: { [Plane]: ControlsContents } = {
+const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
   [VERTICAL_PLANE]: {
     controls: [
       {
@@ -108,13 +107,13 @@ const CONTROLS_CONTENTS_BY_PLANE: { [Plane]: ControlsContents } = {
   },
 }
 
-type DirectionControlProps = {|
-  plane: Plane,
-  jog: Jog,
-  stepSize: number,
-|}
+interface DirectionControlProps {
+  plane: Plane
+  jog: Jog
+  stepSize: number
+}
 
-export function DirectionControl(props: DirectionControlProps): React.Node {
+export function DirectionControl(props: DirectionControlProps): JSX.Element {
   const { title, subtitle, controls } = CONTROLS_CONTENTS_BY_PLANE[props.plane]
 
   return (

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 
@@ -7,23 +6,30 @@ import { SessionAlert } from './SessionAlert'
 import { Portal } from '../../../App/portal'
 import styles from './styles.css'
 
-import type { SessionStatus, SessionStatusInfo } from '../../../redux/robot'
+import type {
+  CommandNode,
+  SessionStatus,
+  SessionStatusInfo,
+} from '../../../redux/robot'
 
-export type CommandListProps = {|
-  commands: Array<any>,
-  sessionStatus: SessionStatus,
-  sessionStatusInfo: SessionStatusInfo,
-  showSpinner: boolean,
-  onResetClick: () => mixed,
-|}
+export interface CommandListProps {
+  commands: any[]
+  sessionStatus: SessionStatus
+  sessionStatusInfo: SessionStatusInfo
+  showSpinner: boolean
+  onResetClick: () => unknown
+}
 
 export class CommandList extends React.Component<CommandListProps> {
-  componentDidUpdate() {
+  componentDidUpdate(): void {
     // TODO(mc, 2018-07-24): use new refs
-    if (this.refs.ensureVisible) this.refs.ensureVisible.scrollIntoView(true) // eslint-disable-line react/no-string-refs
+    // eslint-disable-next-line react/no-string-refs
+    if (this.refs.ensureVisible) {
+      ;(this.refs.ensureVisible as React.ElementRef<'li'>).scrollIntoView(true) // eslint-disable-line react/no-string-refs
+    }
   }
 
-  render(): React.Node {
+  render(): JSX.Element {
     const {
       commands,
       sessionStatus,
@@ -31,7 +37,9 @@ export class CommandList extends React.Component<CommandListProps> {
       showSpinner,
       onResetClick,
     } = this.props
-    const makeCommandToTemplateMapper = depth => command => {
+    const makeCommandToTemplateMapper = (depth: number) => (
+      command: CommandNode
+    ): JSX.Element => {
       const {
         id,
         isCurrent,
@@ -51,12 +59,16 @@ export class CommandList extends React.Component<CommandListProps> {
         )
       }
 
-      const liProps: { key: string, className: string, ref?: string } = {
+      const liProps: {
+        key: string | number
+        className: string
+        ref?: string
+      } = {
         key: id,
         className: cx(style, {
-          [styles.executed]: handledAt,
-          [styles.current]: isCurrent,
-          [styles.last_current]: isLast,
+          [styles.executed]: Boolean(handledAt),
+          [styles.current]: Boolean(isCurrent),
+          [styles.last_current]: Boolean(isLast),
         }),
       }
 
@@ -64,6 +76,7 @@ export class CommandList extends React.Component<CommandListProps> {
 
       return (
         <li {...liProps}>
+          {/* @ts-expect-error TODO: this style variable should probably be string and not string[] */}
           <p className={style}>
             [{id}] : {description}
           </p>

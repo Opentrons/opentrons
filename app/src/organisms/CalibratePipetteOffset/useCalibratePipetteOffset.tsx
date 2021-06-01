@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -23,7 +22,7 @@ import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPane
 import { pipetteOffsetCalibrationStarted } from '../../redux/analytics'
 
 // pipette calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
+const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 
@@ -31,18 +30,19 @@ const PIPETTE_OFFSET_TITLE = 'Pipette offset calibration'
 const TIP_LENGTH_TITLE = 'Tip length calibration'
 const EXIT = 'exit'
 
-export type InvokerProps = {|
-  overrideParams?: $Shape<PipetteOffsetCalibrationSessionParams>,
-  withIntent?: PipetteOffsetIntent,
-|}
+export interface InvokerProps {
+  overrideParams?: Partial<PipetteOffsetCalibrationSessionParams>
+  withIntent?: PipetteOffsetIntent
+}
 
-export type Invoker = (InvokerProps | void) => void
+export type Invoker = (props: InvokerProps | undefined) => void
 
 export function useCalibratePipetteOffset(
   robotName: string,
-  sessionParams: $Shape<PipetteOffsetCalibrationSessionParams>,
-  onComplete: (() => mixed) | null = null
-): [Invoker, React.Node | null] {
+  sessionParams: Pick<PipetteOffsetCalibrationSessionParams, 'mount'> &
+    Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>,
+  onComplete: (() => unknown) | null = null
+): [Invoker, JSX.Element | null] {
   const createRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
@@ -62,17 +62,20 @@ export function useCalibratePipetteOffset(
         dispatchedAction.payload.sessionType ===
           Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
       ) {
+        // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
         createRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type === Sessions.DELETE_SESSION &&
         pipOffsetCalSession?.id === dispatchedAction.payload.sessionId
       ) {
+        // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
         deleteRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
       ) {
+        // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
         jogRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
@@ -80,6 +83,7 @@ export function useCalibratePipetteOffset(
           dispatchedAction.payload.command.command
         )
       ) {
+        // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
         spinnerRequestId.current = dispatchedAction.meta.requestId
       }
     }
@@ -132,7 +136,7 @@ export function useCalibratePipetteOffset(
   } = sessionParams
   const handleStartPipOffsetCalSession: Invoker = (props = {}) => {
     const {
-      overrideParams = ({}: $Shape<PipetteOffsetCalibrationSessionParams>),
+      overrideParams = {},
       withIntent = INTENT_CALIBRATE_PIPETTE_OFFSET,
     } = props
     setIntent(withIntent)

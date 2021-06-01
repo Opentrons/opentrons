@@ -1,18 +1,26 @@
 // protocol state selector tests
 
 import * as protocol from '..'
+import type { State } from '../../types'
 
-const SPECS = [
+const SPECS: Array<{
+  name: string
+  selector: (state: State) => unknown
+  state: State
+  expected: unknown
+}> = [
   {
     name: 'getProtocolFile',
     selector: protocol.getProtocolFile,
-    state: { protocol: { file: { name: 'proto.json' } } },
+    state: { protocol: { file: { name: 'proto.json' } } } as any,
     expected: { name: 'proto.json' },
   },
   {
     name: 'getProtocolContents',
     selector: protocol.getProtocolContents,
-    state: { protocol: { file: { name: 'proto.json' }, contents: 'fizzbuzz' } },
+    state: {
+      protocol: { file: { name: 'proto.json' }, contents: 'fizzbuzz' },
+    } as any,
     expected: 'fizzbuzz',
   },
   {
@@ -24,32 +32,36 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: { metadata: {} },
       },
-    },
+    } as any,
     expected: { metadata: {} },
   },
   {
     name: 'getProtocolFilename with no file',
     selector: protocol.getProtocolFilename,
-    state: { protocol: { file: null } },
+    state: { protocol: { file: null } } as any,
     expected: null,
   },
   {
     name: 'getProtocolFilename',
     selector: protocol.getProtocolFilename,
-    state: { protocol: { file: { name: 'proto.json' } } },
+    state: { protocol: { file: { name: 'proto.json' } } } as any,
     expected: 'proto.json',
   },
   {
     name: 'getProtocolName with nothing loaded',
     selector: protocol.getProtocolName,
-    state: { protocol: { file: null, contents: null, data: null } },
+    state: { protocol: { file: null, contents: null, data: null } } as any,
     expected: null,
   },
   {
     name: 'getProtocolName from filename if no data',
     selector: protocol.getProtocolName,
     state: {
-      protocol: { file: { name: 'proto.json' }, contents: null, data: null },
+      protocol: {
+        file: { name: 'proto.json' },
+        contents: null,
+        data: null,
+      } as any,
     },
     expected: 'proto',
   },
@@ -62,7 +74,7 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: { metadata: {} },
       },
-    },
+    } as any,
     expected: 'proto',
   },
   {
@@ -74,7 +86,7 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: { metadata: { 'protocol-name': 'A Protocol' } },
       },
-    },
+    } as any,
     expected: 'A Protocol',
   },
   {
@@ -86,7 +98,7 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: {},
       },
-    },
+    } as any,
     expected: 'proto',
   },
   {
@@ -98,49 +110,49 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: { metadata: { protocolName: 'A Protocol' } },
       },
-    },
+    } as any,
     expected: 'A Protocol',
   },
   {
     name: 'getProtocolAuthor if no data',
     selector: protocol.getProtocolAuthor,
-    state: { protocol: { data: null } },
+    state: { protocol: { data: null } } as any,
     expected: null,
   },
   {
     name: 'getProtocolAuthor if no metadata',
     selector: protocol.getProtocolAuthor,
-    state: { protocol: { data: {} } },
+    state: { protocol: { data: {} } } as any,
     expected: null,
   },
   {
     name: 'getProtocolAuthor if author not in metadata',
     selector: protocol.getProtocolAuthor,
-    state: { protocol: { data: { metadata: {} } } },
+    state: { protocol: { data: { metadata: {} } } } as any,
     expected: null,
   },
   {
     name: 'getProtocolAuthor if author in metadata',
     selector: protocol.getProtocolAuthor,
-    state: { protocol: { data: { metadata: { author: 'Fizz Buzz' } } } },
+    state: { protocol: { data: { metadata: { author: 'Fizz Buzz' } } } } as any,
     expected: 'Fizz Buzz',
   },
   {
     name: 'getProtocolDescription if no data',
     selector: protocol.getProtocolDescription,
-    state: { protocol: { data: null } },
+    state: { protocol: { data: null } } as any,
     expected: null,
   },
   {
     name: 'getProtocolDescription if no metaddata',
     selector: protocol.getProtocolDescription,
-    state: { protocol: { data: {} } },
+    state: { protocol: { data: {} } } as any,
     expected: null,
   },
   {
     name: 'getProtocolDescription if description not in metadata',
     selector: protocol.getProtocolDescription,
-    state: { protocol: { data: { metadata: {} } } },
+    state: { protocol: { data: { metadata: {} } } } as any,
     expected: null,
   },
   {
@@ -148,13 +160,13 @@ const SPECS = [
     selector: protocol.getProtocolDescription,
     state: {
       protocol: { data: { metadata: { description: 'Fizzes buzzes' } } },
-    },
+    } as any,
     expected: 'Fizzes buzzes',
   },
   {
     name: 'getProtocolDescription if description not in metadata',
     selector: protocol.getProtocolDescription,
-    state: { protocol: { data: { metadata: {} } } },
+    state: { protocol: { data: { metadata: {} } } } as any,
     expected: null,
   },
   {
@@ -162,19 +174,19 @@ const SPECS = [
     selector: protocol.getProtocolDescription,
     state: {
       protocol: { data: { metadata: { description: 'Fizzes buzzes' } } },
-    },
+    } as any,
     expected: 'Fizzes buzzes',
   },
   {
     name: 'getProtocolLastUpdated if nothing loaded',
     selector: protocol.getProtocolLastUpdated,
-    state: { protocol: { file: null, contents: null, data: null } },
+    state: { protocol: { file: null, contents: null, data: null } } as any,
     expected: null,
   },
   {
     name: 'getProtocolLastUpdated from file.lastModified',
     selector: protocol.getProtocolLastUpdated,
-    state: { protocol: { file: { lastModified: 1 } } },
+    state: { protocol: { file: { lastModified: 1 } } } as any,
     expected: 1,
   },
   {
@@ -185,7 +197,7 @@ const SPECS = [
         file: { lastModified: 1 },
         data: {},
       },
-    },
+    } as any,
     expected: 1,
   },
   {
@@ -196,7 +208,7 @@ const SPECS = [
         file: { lastModified: 1 },
         data: { metadata: { created: 2 } },
       },
-    },
+    } as any,
     expected: 2,
   },
   {
@@ -207,7 +219,7 @@ const SPECS = [
         file: { lastModified: 1 },
         data: { metadata: { created: 2, 'last-modified': 3 } },
       },
-    },
+    } as any,
     expected: 3,
   },
   {
@@ -218,7 +230,7 @@ const SPECS = [
         file: { lastModified: 1 },
         data: { metadata: { created: 2, lastModified: 4 } },
       },
-    },
+    } as any,
     expected: 4,
   },
   {
@@ -226,7 +238,7 @@ const SPECS = [
     selector: protocol.getProtocolApiVersion,
     state: {
       robot: { session: { apiLevel: null } },
-    },
+    } as any,
     expected: null,
   },
   {
@@ -234,7 +246,7 @@ const SPECS = [
     selector: protocol.getProtocolApiVersion,
     state: {
       robot: { session: { apiLevel: [2, 4] } },
-    },
+    } as any,
     expected: '2.4',
   },
   {
@@ -243,7 +255,7 @@ const SPECS = [
     state: {
       robot: { session: { apiLevel: [1, 0] } },
       protocol: { file: null, contents: null, data: null },
-    },
+    } as any,
     expected: null,
   },
   {
@@ -252,7 +264,7 @@ const SPECS = [
     state: {
       robot: { session: { apiLevel: [1, 0] } },
       protocol: { file: { name: 'proto.py' }, contents: null, data: null },
-    },
+    } as any,
     expected: null,
   },
   {
@@ -265,7 +277,7 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: null,
       },
-    },
+    } as any,
     expected: 'Python Protocol API v1.0',
   },
   {
@@ -278,7 +290,7 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: null,
       },
-    },
+    } as any,
     expected: 'Unknown Application',
   },
   {
@@ -291,7 +303,7 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: { metadata: {} },
       },
-    },
+    } as any,
     expected: 'Unknown Application',
   },
   {
@@ -309,7 +321,7 @@ const SPECS = [
           },
         },
       },
-    },
+    } as any,
     expected: 'Protocol Designer',
   },
   {
@@ -328,7 +340,7 @@ const SPECS = [
           },
         },
       },
-    },
+    } as any,
     expected: 'Protocol Designer v1.2.3',
   },
   {
@@ -348,7 +360,7 @@ const SPECS = [
           },
         },
       },
-    },
+    } as any,
     expected: 'Protocol Designer v4.5.6',
   },
   {
@@ -361,7 +373,7 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: null,
       },
-    },
+    } as any,
     expected: {},
   },
   {
@@ -374,7 +386,7 @@ const SPECS = [
         contents: 'fizzbuzz',
         data: { labwareDefinitions: {} },
       },
-    },
+    } as any,
     expected: {},
   },
   {
@@ -397,7 +409,7 @@ const SPECS = [
           },
         },
       },
-    },
+    } as any,
     expected: {
       1: { mockDefinition1: true },
       2: { mockDefinition2: true },
@@ -429,7 +441,7 @@ const SPECS = [
           },
         },
       },
-    },
+    } as any,
     expected: {
       1: { mockDefinition1: true },
       2: { mockDefinition2: true },
@@ -461,7 +473,7 @@ const SPECS = [
           },
         },
       },
-    },
+    } as any,
     expected: {
       1: { mockDefinition1: true },
       7: { mockDefinition2: true },

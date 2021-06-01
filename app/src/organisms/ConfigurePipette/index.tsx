@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
@@ -34,13 +33,13 @@ const PIPETTE_SETTINGS = 'Pipette Settings'
 const AN_ERROR_OCCURRED_WHILE_UPDATING =
   "An error occurred while updating your pipette's settings. Please try again."
 
-type Props = {|
-  robotName: string,
-  mount: Mount,
-  closeModal: () => mixed,
-|}
+interface Props {
+  robotName: string
+  mount: Mount
+  closeModal: () => unknown
+}
 
-export function ConfigurePipette(props: Props): React.Node {
+export function ConfigurePipette(props: Props): JSX.Element {
   const { robotName, mount, closeModal } = props
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
 
@@ -51,19 +50,21 @@ export function ConfigurePipette(props: Props): React.Node {
     (state: State) => getAttachedPipetteSettings(state, robotName)[mount]
   )
 
-  const updateSettings = (fields: PipetteSettingsFieldsUpdate) => {
+  const updateSettings = (fields: PipetteSettingsFieldsUpdate): void => {
     if (pipette) {
       dispatchRequest(updatePipetteSettings(robotName, pipette.id, fields))
     }
   }
 
   const updateRequest = useSelector((state: State) =>
+    // @ts-expect-error(sa, 2021-05-27): avoiding src code change, verify last(requestIds) is not undefined
     getRequestById(state, last(requestIds))
   )
 
   const updateError: string | null =
     updateRequest && updateRequest.status === FAILURE
-      ? updateRequest.error.message || AN_ERROR_OCCURRED_WHILE_UPDATING
+      ? // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+        updateRequest.error.message || AN_ERROR_OCCURRED_WHILE_UPDATING
       : null
 
   // TODO(mc, 2019-12-09): remove this feature flag

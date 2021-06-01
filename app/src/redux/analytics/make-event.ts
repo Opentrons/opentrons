@@ -1,4 +1,3 @@
-// @flow
 // redux action types to analytics events map
 import { createLogger } from '../../logger'
 import { selectors as robotSelectors } from '../robot'
@@ -26,6 +25,7 @@ import {
 
 import type { State, Action } from '../types'
 import type { AnalyticsEvent } from './types'
+import type { Mount } from '../pipettes/types'
 
 const log = createLogger(__filename)
 
@@ -81,6 +81,7 @@ export function makeEvent(
           ...getRobotAnalyticsData(state),
           ...data,
           success: actionType === 'robot:SESSION_RESPONSE',
+          // @ts-expect-error even if we used the in operator, TS cant narrow error to anything more specific than 'unknown' https://github.com/microsoft/TypeScript/issues/25720
           error: (actionPayload.error && actionPayload.error.message) || '',
         },
       }))
@@ -343,8 +344,10 @@ export function makeEvent(
                     name: `${instrData.sessionType}TipRackSelect`,
                     properties: {
                       pipetteModel: instrData.pipetteModel,
+                      // @ts-expect-error TODO: use in operator and add test case for no tiprackDefiniton on CommandData
                       tipRackDisplayName: commandData.tiprackDefinition
-                        ? commandData.tiprackDefinition.metadata.displayName
+                        ? // @ts-expect-error TODO: use in operator and add test case for no tiprackDefiniton on CommandData
+                          commandData.tiprackDefinition.metadata.displayName
                         : null,
                     },
                   }
@@ -376,7 +379,10 @@ export function makeEvent(
         name: 'pipetteOffsetCalibrationStarted',
         properties: {
           ...action.payload,
-          ...getAnalyticsPipetteCalibrationData(state, action.payload.mount),
+          ...getAnalyticsPipetteCalibrationData(
+            state,
+            action.payload.mount as Mount
+          ),
         },
       })
     }
@@ -386,7 +392,10 @@ export function makeEvent(
         name: 'tipLengthCalibrationStarted',
         properties: {
           ...action.payload,
-          ...getAnalyticsTipLengthCalibrationData(state, action.payload.mount),
+          ...getAnalyticsTipLengthCalibrationData(
+            state,
+            action.payload.mount as Mount
+          ),
         },
       })
     }

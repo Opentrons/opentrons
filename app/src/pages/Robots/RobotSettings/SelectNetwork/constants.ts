@@ -1,5 +1,3 @@
-// @flow
-
 export {
   AUTH_TYPE_STRING,
   AUTH_TYPE_PASSWORD,

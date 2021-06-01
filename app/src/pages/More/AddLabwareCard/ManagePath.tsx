@@ -1,5 +1,3 @@
-// @flow
-
 import * as React from 'react'
 
 import { LabeledButton, InputField } from '@opentrons/components'
@@ -18,24 +16,24 @@ export const OPEN_SOURCE_NAME = 'open-source'
 export const CHANGE_SOURCE_NAME = 'change-source'
 export const RESET_SOURCE_NAME = 'reset-source'
 
-export type ManagePathProps = {|
-  path: string,
-  onChangePath: () => mixed,
-  onResetPath: () => mixed,
-  onOpenPath: () => mixed,
-|}
+export interface ManagePathProps {
+  path: string
+  onChangePath: () => unknown
+  onResetPath: () => unknown
+  onOpenPath: () => unknown
+}
 
-const handleFocus = (e: SyntheticFocusEvent<HTMLInputElement>) => {
+const handleFocus = (e: React.FocusEvent<HTMLInputElement>): void => {
   e.currentTarget.select()
 }
 
-export function ManagePath(props: ManagePathProps): React.Node {
+export function ManagePath(props: ManagePathProps): JSX.Element {
   const { path, onChangePath, onResetPath, onOpenPath } = props
   const [confirmResetIsOpen, toggleConfirmResetIsOpen] = React.useReducer(
     open => !open,
     false
   )
-  const handleResetPath = () => {
+  const handleResetPath = (): void => {
     toggleConfirmResetIsOpen()
     onResetPath()
   }

@@ -1,20 +1,20 @@
-// @flow
-
 import { robotAdminReducer } from '../reducer'
 
 import type { PerRobotAdminState } from '../types'
+import type { RobotApiRequestMeta } from '../../robot-api/types'
+import type { Action } from '../../types'
 
-type PartialState = $Shape<{|
-  [robotName: string]: void | $Shape<PerRobotAdminState>,
-|}>
+type PartialState = Partial<{
+  [robotName: string]: undefined | Partial<PerRobotAdminState>
+}>
 
 describe('robotAdminReducer', () => {
   it('should handle robotAdmin:RESTART_FAILURE', () => {
     const state: PartialState = {}
-    const action = {
+    const action: Action = {
       type: 'robotAdmin:RESTART_FAILURE',
       payload: { robotName: 'robotName', error: { message: 'AH' } },
-      meta: {},
+      meta: {} as RobotApiRequestMeta,
     }
 
     const result = robotAdminReducer(state, action)
@@ -28,7 +28,7 @@ describe('robotAdminReducer', () => {
 
   it('should handle robotAdmin:RESTART_STATUS_CHANGED with boot ID', () => {
     const state: PartialState = {}
-    const action = {
+    const action: Action = {
       type: 'robotAdmin:RESTART_STATUS_CHANGED',
       payload: {
         robotName: 'robotName',
@@ -61,7 +61,7 @@ describe('robotAdminReducer', () => {
         },
       },
     }
-    const action = {
+    const action: Action = {
       type: 'robotAdmin:RESTART_STATUS_CHANGED',
       payload: {
         robotName: 'robotName',
@@ -90,7 +90,7 @@ describe('robotAdminReducer', () => {
         resetConfigOptions: [],
       },
     }
-    const action = {
+    const action: Action = {
       type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_SUCCESS',
       payload: {
         robotName: 'robotName',
@@ -99,7 +99,7 @@ describe('robotAdminReducer', () => {
           { id: 'baz', name: 'Baz', description: 'bazqux' },
         ],
       },
-      meta: {},
+      meta: {} as RobotApiRequestMeta,
     }
 
     const result = robotAdminReducer(state, action)

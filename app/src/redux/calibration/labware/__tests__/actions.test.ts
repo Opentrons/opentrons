@@ -1,17 +1,15 @@
-// @flow
-
 import * as Fixtures from '../__fixtures__'
 import * as Actions from '../actions'
 import type { LabwareCalibrationAction } from '../types'
 
-type ActionSpec = {|
-  should: string,
-  creator: (...Array<any>) => LabwareCalibrationAction,
-  args: Array<mixed>,
-  expected: LabwareCalibrationAction,
-|}
+interface ActionSpec {
+  should: string
+  creator: (...args: any[]) => LabwareCalibrationAction
+  args: unknown[]
+  expected: LabwareCalibrationAction
+}
 
-const SPECS: Array<ActionSpec> = [
+const SPECS: ActionSpec[] = [
   {
     should: 'create a fetchLabwareCalibrations action',
     creator: Actions.fetchLabwareCalibrations,
@@ -19,7 +17,7 @@ const SPECS: Array<ActionSpec> = [
     expected: {
       type: 'calibration:FETCH_LABWARE_CALIBRATIONS',
       payload: { robotName: 'robot-name' },
-      meta: {},
+      meta: {} as any,
     },
   },
   {
@@ -36,7 +34,7 @@ const SPECS: Array<ActionSpec> = [
         robotName: 'robot-name',
         labwareCalibrations: Fixtures.mockAllLabwareCalibration,
       },
-      meta: { requestId: '123' },
+      meta: { requestId: '123' } as any,
     },
   },
   {
@@ -53,7 +51,7 @@ const SPECS: Array<ActionSpec> = [
         robotName: 'robot-name',
         error: Fixtures.mockFetchLabwareCalibrationFailure.body,
       },
-      meta: { requestId: '123' },
+      meta: { requestId: '123' } as any,
     },
   },
 ]

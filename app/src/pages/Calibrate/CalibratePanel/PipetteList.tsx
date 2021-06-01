@@ -1,8 +1,7 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { withRouter } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import uniqBy from 'lodash/uniqBy'
 
 import { selectors as robotSelectors } from '../../../redux/robot'
@@ -25,18 +24,17 @@ import { PipetteTiprackListItem } from './PipetteTiprackListItem'
 import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import type { Dispatch, State } from '../../../redux/types'
 
-export type PipetteListComponentProps = {|
-  robotName: string | null,
-  tipracks: Array<BaseProtocolLabware>,
-|}
+export interface PipetteListComponentProps extends RouteComponentProps {
+  robotName: string | null
+  tipracks: BaseProtocolLabware[]
+}
 
-export const PipetteList: React.AbstractComponent<PipetteListComponentProps> = withRouter(
-  PipetteListComponent
-)
+// TODO(bc, 2021-05-17): remove this withRouter? it seems unused
+export const PipetteList = withRouter(PipetteListComponent)
 
 export function PipetteListComponent(
   props: PipetteListComponentProps
-): React.Node {
+): JSX.Element {
   const { t } = useTranslation('protocol_calibration')
   const dispatch = useDispatch<Dispatch>()
 
@@ -53,7 +51,7 @@ export function PipetteListComponent(
 
   return (
     <TitledList
-      key={t('tip_length_cal_title')}
+      key={t<string>('tip_length_cal_title')}
       title={t('tip_length_cal_title')}
     >
       {PIPETTE_MOUNTS.map(mount => {
@@ -62,7 +60,7 @@ export function PipetteListComponent(
         const attachedPipette = attachedPipettes[mount]
         const displayName = protocolPipette?.modelSpecs?.displayName || 'N/A'
         const { disabledReason = null } = urlsByMount[mount].default
-        const pip_tipracks = uniqBy(
+        const pipTipracks = uniqBy(
           tipracks.filter(
             t =>
               t.calibratorMount === mount ||
@@ -75,7 +73,7 @@ export function PipetteListComponent(
         const calibratePathFor = (
           mount: 'left' | 'right',
           hash: string | null
-        ) => {
+        ): string => {
           const url =
             urlsByMount[mount][hash ?? 'default'] ??
             urlsByMount[mount]['default']
@@ -101,8 +99,8 @@ export function PipetteListComponent(
                 disabled={!!disabledReason}
               />
             </Flex>
-            {pip_tipracks?.length
-              ? pip_tipracks?.map(tr => {
+            {pipTipracks?.length
+              ? pipTipracks?.map(tr => {
                   return (
                     <PipetteTiprackListItem
                       {...tr}

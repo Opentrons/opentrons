@@ -1,9 +1,8 @@
-// @flow
 import * as React from 'react'
 import styles from './styles.css'
-import type { VersionProps } from './types.js'
+import type { VersionProps } from './types'
 
-export function VersionList(props: VersionProps): React.Node {
+export function VersionList(props: VersionProps): JSX.Element {
   return (
     <ol className={styles.version_list}>
       <li>Your current app version: {props.appVersion}</li>

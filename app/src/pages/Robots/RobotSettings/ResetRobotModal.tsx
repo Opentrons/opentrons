@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
@@ -36,23 +35,33 @@ import { Portal } from '../../../App/portal'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
 
-export type ResetRobotModalProps = {|
-  robotName: string,
-  closeModal: () => mixed,
-|}
+export interface ResetRobotModalProps {
+  robotName: string
+  closeModal: () => unknown
+}
 
 // TODO(bc, 2020-12-07): i18n
 const TITLE = 'Robot Configuration Reset'
 
-export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
+export function ResetRobotModal(props: ResetRobotModalProps): JSX.Element {
   const { robotName, closeModal } = props
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
+
+  // const resetRequest = useSelector((state: State) => {
+  //   const lastId = last(requestIds)
+  //   return lastId != null ? getRequestById(state, lastId) : null
+  // })
+  // const resetRequestStatus = resetRequest != null ? resetRequest.status : null
+
+  // const triggerReset = (): unknown =>
   const resetRequestStatus = useSelector((state: State) => {
+    // @ts-expect-error TODO: should be commented code above,
+    // code change to protect against getting the status off of a request that doesn't exist
     return getRequestById(state, last(requestIds))
   })?.status
 
-  const triggerReset = () =>
+  const triggerReset = (): unknown =>
     dispatchRequest(resetConfig(robotName, resetOptions))
 
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
@@ -117,6 +126,8 @@ export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
               })
             }}
             name={o.id}
+            // value={Boolean(resetOptions[o.id])}
+            // @ts-expect-error TODO commented code above to explicitly give LabeledCheckbox the boolean that it's expecting
             value={resetOptions[o.id]}
             key={o.id}
           >

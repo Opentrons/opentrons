@@ -1,5 +1,3 @@
-// @flow
-
 export const HTTP_API_VERSION: 2 = 2
 
 export const GET: 'GET' = 'GET'

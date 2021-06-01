@@ -1,5 +1,3 @@
-// @flow
-
 // general constants
 
 // 5 minute restart timeout

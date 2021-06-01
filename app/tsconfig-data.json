@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig-base.json",
+  "references": [],
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": false,
+    "rootDir": "src",
+    "outDir": "lib"
+  },
+  "include": ["src/**/*.json"],
+  "exclude": ["**/*.ts", "**/*.tsx"]
+}

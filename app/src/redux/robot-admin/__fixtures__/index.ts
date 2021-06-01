@@ -1,12 +1,12 @@
-// @flow
 // mock HTTP responses for pipettes endpoints
 import { mockRobot } from '../../robot-api/__fixtures__'
+import type { Method } from '../../robot-api/types'
 
 export * from './system-time'
 
 export const mockRestartSuccess = {
   host: mockRobot,
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/server/restart',
   ok: true,
   status: 200,
@@ -14,7 +14,7 @@ export const mockRestartSuccess = {
 }
 
 export const mockRestartSuccessMeta = {
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/server/restart',
   ok: true,
   status: 200,
@@ -22,7 +22,7 @@ export const mockRestartSuccessMeta = {
 
 export const mockRestartFailure = {
   host: mockRobot,
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/server/restart',
   ok: false,
   status: 500,
@@ -30,7 +30,7 @@ export const mockRestartFailure = {
 }
 
 export const mockRestartFailureMeta = {
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/server/restart',
   ok: false,
   status: 500,
@@ -43,7 +43,7 @@ export const mockResetOptions = [
 
 export const mockFetchResetOptionsSuccess = {
   host: mockRobot,
-  method: 'GET',
+  method: 'GET' as Method,
   path: '/settings/reset/options',
   ok: true,
   status: 200,
@@ -51,7 +51,7 @@ export const mockFetchResetOptionsSuccess = {
 }
 
 export const mockFetchResetOptionsSuccessMeta = {
-  method: 'GET',
+  method: 'GET' as Method,
   path: '/settings/reset/options',
   ok: true,
   status: 200,
@@ -59,7 +59,7 @@ export const mockFetchResetOptionsSuccessMeta = {
 
 export const mockFetchResetOptionsFailure = {
   host: mockRobot,
-  method: 'GET',
+  method: 'GET' as Method,
   path: '/settings/reset/options',
   ok: false,
   status: 500,
@@ -67,7 +67,7 @@ export const mockFetchResetOptionsFailure = {
 }
 
 export const mockFetchResetOptionsFailureMeta = {
-  method: 'GET',
+  method: 'GET' as Method,
   path: '/settings/reset/options',
   ok: false,
   status: 500,
@@ -75,15 +75,15 @@ export const mockFetchResetOptionsFailureMeta = {
 
 export const mockResetConfigSuccess = {
   host: mockRobot,
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/settings/reset',
   ok: true,
   status: 200,
-  body: ({}: { ... }),
+  body: {},
 }
 
 export const mockResetConfigSuccessMeta = {
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/settings/reset',
   ok: true,
   status: 200,
@@ -91,7 +91,7 @@ export const mockResetConfigSuccessMeta = {
 
 export const mockResetConfigFailure = {
   host: mockRobot,
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/settings/reset',
   ok: false,
   status: 500,
@@ -99,7 +99,7 @@ export const mockResetConfigFailure = {
 }
 
 export const mockResetConfigFailureMeta = {
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/settings/reset',
   ok: false,
   status: 500,

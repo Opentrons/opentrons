@@ -1,23 +1,30 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 import * as Fixtures from '../../../redux/sessions/__fixtures__'
 import * as Sessions from '../../../redux/sessions'
 import { ReturnTip } from '../ReturnTip'
 
+import type { ReactWrapper } from 'enzyme'
+import type { Mount } from '@opentrons/components'
+
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 
 describe('ReturnTip', () => {
-  let render
-  let mockSendCommands
+  let render: (
+    props?: Partial<
+      React.ComponentProps<typeof ReturnTip> & { pipMount: Mount }
+    >
+  ) => ReactWrapper<React.ComponentProps<typeof ReturnTip>>
+  let mockSendCommands: jest.MockedFunction<any>
 
-  const getContinueButton = wrapper =>
-    wrapper.find('button[title="confirmReturnTip"]')
+  const getContinueButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ReturnTip>>
+  ) => wrapper.find('button[title="confirmReturnTip"]')
 
   beforeEach(() => {
     mockSendCommands = jest.fn()
 
-    render = (props: $Shape<React.ElementProps<typeof ReturnTip>> = {}) => {
+    render = (props = {}) => {
       const {
         pipMount = 'left',
         isMulti = false,
@@ -54,14 +61,14 @@ describe('ReturnTip', () => {
     jest.resetAllMocks()
   })
 
-  it('on continue, if final pipette, return tip and transition ', () => {
+  it('on continue, if final pipette, return tip and transition', () => {
     const wrapper = render({
       activePipette: {
         ...mockSessionDetails.activePipette,
         rank: Sessions.CHECK_PIPETTE_RANK_SECOND,
       },
     })
-    getContinueButton(wrapper).invoke('onClick')()
+    getContinueButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
 
     expect(mockSendCommands).toHaveBeenCalledWith(
       { command: Sessions.checkCommands.RETURN_TIP },
@@ -71,7 +78,7 @@ describe('ReturnTip', () => {
 
   it('on continue, if first pipette with diff tip racks, return tip and switch', () => {
     const wrapper = render()
-    getContinueButton(wrapper).invoke('onClick')()
+    getContinueButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
 
     expect(mockSendCommands).toHaveBeenCalledWith(
       { command: Sessions.checkCommands.RETURN_TIP },
@@ -86,7 +93,7 @@ describe('ReturnTip', () => {
         tipRackLoadName: 'same-tip-rack-name',
       })),
     })
-    getContinueButton(wrapper).invoke('onClick')()
+    getContinueButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
 
     expect(mockSendCommands).toHaveBeenCalledWith(
       { command: Sessions.checkCommands.RETURN_TIP },

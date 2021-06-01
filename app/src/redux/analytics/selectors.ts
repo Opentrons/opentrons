@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import pick from 'lodash/pick'
 import some from 'lodash/some'
@@ -43,9 +42,13 @@ import { getCalibrationCheckSession } from '../sessions/calibration-check/select
 
 import { hash } from './hash'
 
-import type { OutputSelector } from 'reselect'
+import type { Selector } from 'reselect'
 import type { State } from '../types'
-import type { CalibrationCheckInstrument } from '../sessions/calibration-check/types'
+import type {
+  CalibrationCheckComparisonsPerCalibration,
+  CalibrationCheckInstrument,
+} from '../sessions/calibration-check/types'
+import type { Mount } from '../pipettes/types'
 
 import type {
   AnalyticsConfig,
@@ -62,11 +65,12 @@ import type {
   SessionInstrumentAnalyticsData,
 } from './types'
 
-type ProtocolDataSelector = OutputSelector<State, void, ProtocolAnalyticsData>
-
 export const FF_PREFIX = 'robotFF_'
 
-const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
+const _getUnhashedProtocolAnalyticsData: Selector<
+  State,
+  ProtocolAnalyticsData
+> = createSelector(
   getProtocolType,
   getProtocolCreatorApp,
   getProtocolApiVersion,
@@ -100,18 +104,21 @@ const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
   })
 )
 
-export const getProtocolAnalyticsData: State => Promise<ProtocolAnalyticsData> = createSelector(
-  _getUnhashedProtocolAnalyticsData,
-  data => {
-    const hashTasks = [hash(data.protocolAuthor), hash(data.protocolText)]
+export const getProtocolAnalyticsData: (
+  state: State
+) => Promise<ProtocolAnalyticsData> = createSelector<
+  State,
+  ProtocolAnalyticsData,
+  Promise<ProtocolAnalyticsData>
+>(_getUnhashedProtocolAnalyticsData, (data: ProtocolAnalyticsData) => {
+  const hashTasks = [hash(data.protocolAuthor), hash(data.protocolText)]
 
-    return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
-      ...data,
-      protocolAuthor: data.protocolAuthor !== '' ? protocolAuthor : '',
-      protocolText: data.protocolText !== '' ? protocolText : '',
-    }))
-  }
-)
+  return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
+    ...data,
+    protocolAuthor: data.protocolAuthor !== '' ? protocolAuthor : '',
+    protocolText: data.protocolText !== '' ? protocolText : '',
+  }))
+})
 
 export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
   const robot = getConnectedRobot(state)
@@ -120,11 +127,13 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
     const pipettes = getAttachedPipettes(state, robot.name)
     const settings = getRobotSettings(state, robot.name)
 
-    return settings.reduce(
+    // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
+    return settings.reduce<RobotAnalyticsData>(
       (result, setting) => ({
         ...result,
         [`${FF_PREFIX}${setting.id}`]: !!setting.value,
       }),
+      // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
       {
         robotApiServerVersion: getRobotApiVersion(robot) || '',
         robotSmoothieVersion: getRobotFirmwareVersion(robot) || '',
@@ -175,7 +184,7 @@ export function getAnalyticsOptInSeen(state: State): boolean {
 
 export function getAnalyticsPipetteCalibrationData(
   state: State,
-  mount: string
+  mount: Mount
 ): PipetteOffsetCalibrationAnalyticsData | null {
   const robot = getConnectedRobot(state)
 
@@ -186,6 +195,7 @@ export function getAnalyticsPipetteCalibrationData(
     return {
       calibrationExists: Boolean(pipcal),
       markedBad: pipcal?.status?.markedBad ?? false,
+      // @ts-expect-error protect for cases where model is not on pip
       pipetteModel: pip.model,
     }
   }
@@ -194,7 +204,7 @@ export function getAnalyticsPipetteCalibrationData(
 
 export function getAnalyticsTipLengthCalibrationData(
   state: State,
-  mount: string
+  mount: Mount
 ): TipLengthCalibrationAnalyticsData | null {
   const robot = getConnectedRobot(state)
 
@@ -206,6 +216,7 @@ export function getAnalyticsTipLengthCalibrationData(
     return {
       calibrationExists: Boolean(tipcal),
       markedBad: tipcal?.status?.markedBad ?? false,
+      // @ts-expect-error protect for cases where model is not on pip
       pipetteModel: pip.model,
     }
   }
@@ -213,15 +224,16 @@ export function getAnalyticsTipLengthCalibrationData(
 }
 
 function getPipetteModels(state: State, robotName: string): ModelsByMount {
-  return Object.entries(getAttachedPipettes(state, robotName)).reduce(
-    (obj, [mount, pipData]) => {
-      if (pipData) {
-        obj[mount] = pick(pipData, ['model'])
-      }
-      return obj
-    },
-    ({}: $Shape<ModelsByMount>)
-  )
+  // @ts-expect-error ensure that both mount keys exist on returned object
+  return Object.entries(
+    getAttachedPipettes(state, robotName)
+  ).reduce<ModelsByMount>((obj, [mount, pipData]): ModelsByMount => {
+    if (pipData) {
+      obj[mount as Mount] = pick(pipData, ['model'])
+    }
+    return obj
+    // @ts-expect-error ensure that both mount keys exist on returned object
+  }, {})
 }
 
 function getCalibrationCheckData(
@@ -233,20 +245,27 @@ function getCalibrationCheckData(
     return null
   }
   const { comparisonsByPipette, instruments } = session.details
-  return instruments.reduce((obj, instrument: CalibrationCheckInstrument) => {
-    const { rank, mount, model } = instrument
-    const succeeded = !some(
-      Object.keys(comparisonsByPipette[rank]).map(k =>
-        Boolean(comparisonsByPipette[rank][k]?.status === 'OUTSIDE_THRESHOLD')
+  return instruments.reduce<CalibrationCheckByMount>(
+    (obj, instrument: CalibrationCheckInstrument) => {
+      const { rank, mount, model } = instrument
+      const succeeded = !some(
+        Object.keys(comparisonsByPipette[rank]).map(k =>
+          Boolean(
+            comparisonsByPipette[rank][
+              k as keyof CalibrationCheckComparisonsPerCalibration
+            ]?.status === 'OUTSIDE_THRESHOLD'
+          )
+        )
       )
-    )
-    obj[mount] = {
-      comparisons: comparisonsByPipette[rank],
-      succeeded: succeeded,
-      model: model,
-    }
-    return obj
-  }, ({ left: null, right: null }: $Shape<CalibrationCheckByMount>))
+      obj[mount] = {
+        comparisons: comparisonsByPipette[rank],
+        succeeded: succeeded,
+        model: model,
+      }
+      return obj
+    },
+    { left: null, right: null }
+  )
 }
 
 export function getAnalyticsDeckCalibrationData(

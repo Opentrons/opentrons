@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Box, SPACING_3 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
@@ -12,18 +11,18 @@ import type {
   ModuleCommand,
 } from '../../../../redux/modules/types'
 
-type Props = {|
-  module: MagneticModule,
-  slot: string,
-  isCardExpanded: boolean,
-  toggleCard: boolean => mixed,
+interface Props {
+  module: MagneticModule
+  slot: string
+  isCardExpanded: boolean
+  toggleCard: () => unknown
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
-    args?: Array<mixed>
-  ) => mixed,
-  controlDisabledReason: string | null,
-|}
+    args?: unknown[]
+  ) => unknown
+  controlDisabledReason: string | null
+}
 
 export const MagDeckCard = ({
   module,
@@ -32,7 +31,7 @@ export const MagDeckCard = ({
   sendModuleCommand,
   controlDisabledReason,
   slot,
-}: Props): React.Node => (
+}: Props): JSX.Element => (
   <StatusCard
     header={slot}
     title={getModuleDisplayName(module.model)}

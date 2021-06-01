@@ -17,7 +17,9 @@ import {
 
 import * as discovery from '../selectors'
 
-const MOCK_STATE = {
+import type { State } from '../../types'
+
+const MOCK_STATE: State = {
   robot: { connection: { connectedTo: 'bar' } },
   discovery: {
     robotsByName: {
@@ -109,7 +111,7 @@ const MOCK_STATE = {
       },
     },
   },
-}
+} as any
 
 // foo is connectable because health is defined and healthStatus of primary
 // address is "ok"
@@ -213,7 +215,13 @@ const EXPECTED_BUZZ = {
 }
 
 describe('discovery selectors', () => {
-  const SPECS = [
+  const SPECS: Array<{
+    name: string
+    selector: (...args: any[]) => any
+    args?: any[]
+    state: any
+    expected: unknown
+  }> = [
     {
       name: 'getScanning when true',
       selector: discovery.getScanning,
@@ -485,6 +493,6 @@ describe('discovery selectors', () => {
 
   SPECS.forEach(spec => {
     const { name, selector, state, args = [], expected } = spec
-    it(name, () => expect(selector(state, ...args)).toEqual(expected))
+    it(name, () => expect(selector(state as State, ...args)).toEqual(expected))
   })
 })

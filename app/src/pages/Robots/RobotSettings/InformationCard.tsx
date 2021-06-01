@@ -1,4 +1,3 @@
-// @flow
 // RobotSettings card for robot status
 import * as React from 'react'
 import cx from 'classnames'
@@ -32,14 +31,14 @@ import { LabeledValue } from '../../../atoms/structure'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-export type InformationCardProps = {|
-  robot: ViewableRobot,
-  updateUrl: string,
-|}
+export interface InformationCardProps {
+  robot: ViewableRobot
+  updateUrl: string
+}
 
 const UPDATE_RECHECK_DELAY_MS = 60000
 
-export function InformationCard(props: InformationCardProps): React.Node {
+export function InformationCard(props: InformationCardProps): JSX.Element {
   const { robot, updateUrl } = props
   const { t } = useTranslation(['robot_info', 'shared'])
 

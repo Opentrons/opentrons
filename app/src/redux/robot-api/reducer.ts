@@ -1,4 +1,3 @@
-// @flow
 // api request state reducer
 // tracks requests by ID
 // TODO(mc, 2020-03-05): caution! type checking in this file appears to
@@ -17,7 +16,7 @@ export function robotApiReducer(
   if (action.type === DISMISS_REQUEST) {
     return omit(state, action.payload.requestId)
   }
-
+  // @ts-expect-error(sa, 2021-05-17): type guard action.meta
   const meta = action.meta ? action.meta : {}
 
   if (meta.requestId != null) {
@@ -34,6 +33,7 @@ export function robotApiReducer(
 
     if (meta.response.ok === false) {
       const error =
+        // @ts-expect-error(sa, 2021-05-17): type guard action.payload
         action.payload && action.payload.error ? action.payload.error : {}
 
       return {

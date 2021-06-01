@@ -1,5 +1,3 @@
-// @flow
-
 import {
   setupEpicTestMocks,
   runEpicTest,
@@ -8,7 +6,9 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { tipLengthCalibrationsEpic } from '..'
 
-const makeTriggerActionAllCalibrations = robotName =>
+import type { Action } from '../../../../types'
+
+const makeTriggerActionAllCalibrations = (robotName: string) =>
   Actions.fetchTipLengthCalibrations(robotName)
 
 describe('fetch pipette offset calibration epics', () => {
@@ -22,7 +22,7 @@ describe('fetch pipette offset calibration epics', () => {
       Fixtures.mockFetchTipLengthCalibrationsSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = tipLengthCalibrationsEpic(action$, state$)
@@ -43,7 +43,7 @@ describe('fetch pipette offset calibration epics', () => {
       Fixtures.mockFetchTipLengthCalibrationsSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = tipLengthCalibrationsEpic(action$, state$)
@@ -67,7 +67,7 @@ describe('fetch pipette offset calibration epics', () => {
       Fixtures.mockFetchTipLengthCalibrationsFailure
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = tipLengthCalibrationsEpic(action$, state$)

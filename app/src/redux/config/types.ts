@@ -1,5 +1,4 @@
-// @flow
-import typeof {
+import {
   INITIALIZED,
   VALUE_UPDATED,
   UPDATE_VALUE,
@@ -10,49 +9,49 @@ import typeof {
 } from './constants'
 
 import type { Config } from './schema-types'
-export type * from './schema-types'
+export * from './schema-types'
 
 export type ConfigState = Config | null
 
-export type ConfigInitializedAction = {|
-  type: INITIALIZED,
-  payload: {| config: Config |},
-|}
+export interface ConfigInitializedAction {
+  type: typeof INITIALIZED
+  payload: { config: Config }
+}
 
-export type ConfigValueUpdatedAction = {|
-  type: VALUE_UPDATED,
-  payload: {| path: string, value: any |},
-|}
+export interface ConfigValueUpdatedAction {
+  type: typeof VALUE_UPDATED
+  payload: { path: string; value: any }
+}
 
-export type UpdateConfigValueAction = {|
-  type: UPDATE_VALUE,
-  payload: {| path: string, value: mixed |},
-  meta: {| shell: true |},
-|}
+export interface UpdateConfigValueAction {
+  type: typeof UPDATE_VALUE
+  payload: { path: string; value: unknown }
+  meta: { shell: true }
+}
 
-export type ResetConfigValueAction = {|
-  type: RESET_VALUE,
-  payload: {| path: string |},
-  meta: {| shell: true |},
-|}
+export interface ResetConfigValueAction {
+  type: typeof RESET_VALUE
+  payload: { path: string }
+  meta: { shell: true }
+}
 
-export type ToggleConfigValueAction = {|
-  type: TOGGLE_VALUE,
-  payload: {| path: string |},
-  meta: {| shell: true |},
-|}
+export interface ToggleConfigValueAction {
+  type: typeof TOGGLE_VALUE
+  payload: { path: string }
+  meta: { shell: true }
+}
 
-export type AddUniqueConfigValueAction = {|
-  type: ADD_UNIQUE_VALUE,
-  payload: {| path: string, value: mixed |},
-  meta: {| shell: true |},
-|}
+export interface AddUniqueConfigValueAction {
+  type: typeof ADD_UNIQUE_VALUE
+  payload: { path: string; value: unknown }
+  meta: { shell: true }
+}
 
-export type SubtractConfigValueAction = {|
-  type: SUBTRACT_VALUE,
-  payload: {| path: string, value: mixed |},
-  meta: {| shell: true |},
-|}
+export interface SubtractConfigValueAction {
+  type: typeof SUBTRACT_VALUE
+  payload: { path: string; value: unknown }
+  meta: { shell: true }
+}
 
 export type ConfigValueChangeAction =
   | UpdateConfigValueAction

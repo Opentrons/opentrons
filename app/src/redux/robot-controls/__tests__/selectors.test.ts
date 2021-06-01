@@ -1,21 +1,19 @@
-// @flow
-
 import * as Selectors from '../selectors'
 import type { State } from '../../types'
 
-type SelectorSpec = {|
-  name: string,
-  selector: (State, ...Array<any>) => mixed,
-  state: $Shape<State>,
-  args?: Array<any>,
-  expected: mixed,
-|}
+interface SelectorSpec {
+  name: string
+  selector: (state: State, ...args: any[]) => unknown
+  state: State
+  args?: any[]
+  expected: unknown
+}
 
-const SPECS: Array<SelectorSpec> = [
+const SPECS: SelectorSpec[] = [
   {
     name: 'getLightsOn returns null by default',
     selector: Selectors.getLightsOn,
-    state: { robotControls: {} },
+    state: { robotControls: {} } as any,
     args: ['robotName'],
     expected: null,
   },
@@ -30,7 +28,7 @@ const SPECS: Array<SelectorSpec> = [
           movementError: null,
         },
       },
-    },
+    } as any,
     args: ['robotName'],
     expected: false,
   },
@@ -39,7 +37,7 @@ const SPECS: Array<SelectorSpec> = [
     selector: Selectors.getMovementStatus,
     state: {
       robotControls: {},
-    },
+    } as any,
     args: ['robotName'],
     expected: null,
   },
@@ -54,7 +52,7 @@ const SPECS: Array<SelectorSpec> = [
           movementError: null,
         },
       },
-    },
+    } as any,
     args: ['robotName'],
     expected: 'homing',
   },
@@ -63,7 +61,7 @@ const SPECS: Array<SelectorSpec> = [
     selector: Selectors.getMovementError,
     state: {
       robotControls: {},
-    },
+    } as any,
     args: ['robotName'],
     expected: null,
   },
@@ -78,7 +76,7 @@ const SPECS: Array<SelectorSpec> = [
           movementError: 'AH',
         },
       },
-    },
+    } as any,
     args: ['robotName'],
     expected: 'AH',
   },

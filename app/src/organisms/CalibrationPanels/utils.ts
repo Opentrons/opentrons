@@ -1,4 +1,3 @@
-// @flow
 import { format } from 'date-fns'
 import type { Axis } from '../../molecules/JogControls/types'
 import type { VectorTuple } from '../../redux/sessions/types'
@@ -11,7 +10,7 @@ export function formatJogVector(
   direction: number,
   step: number
 ): VectorTuple {
-  const vector = [0, 0, 0]
+  const vector: VectorTuple = [0, 0, 0]
   const index = ORDERED_AXES.findIndex(a => a === axis)
   if (index >= 0) {
     vector[index] = step * direction

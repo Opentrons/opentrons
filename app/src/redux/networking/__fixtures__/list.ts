@@ -1,4 +1,3 @@
-// @flow
 // fixtures for /wifi/list
 
 import { GET } from '../../robot-api'
@@ -28,7 +27,7 @@ const {
   failure,
 }: ResponseFixtures<
   WifiListResponse,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: GET,
   path: WIFI_LIST_PATH,

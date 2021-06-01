@@ -1,17 +1,15 @@
-// @flow
 // config tests
 import * as Cfg from '..'
 import { configReducer } from '../reducer'
 
 import type { State } from '../../types'
-import type { Config } from '../types'
 
 jest.mock('../../shell/remote', () => ({
   remote: { INITIAL_CONFIG: { isConfig: true } },
 }))
 
 describe('config', () => {
-  let state: $Shape<{| ...State, config: $Shape<Config> |}>
+  let state: State
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -23,12 +21,12 @@ describe('config', () => {
           ignored: ['someAlert'],
         },
       },
-    }
+    } as any
   })
 
   describe('actions', () => {
     it('can create an config:INITIALIZED for initial config values', () => {
-      expect(Cfg.configInitialized(state.config)).toEqual({
+      expect(Cfg.configInitialized(state.config as any)).toEqual({
         type: 'config:INITIALIZED',
         payload: { config: state.config },
       })
@@ -84,7 +82,7 @@ describe('config', () => {
 
   describe('reducer', () => {
     it('handles config:INITIALIZED', () => {
-      const action = Cfg.configInitialized(state.config)
+      const action = Cfg.configInitialized(state.config as any)
 
       expect(configReducer(null, action)).toEqual(state.config)
     })

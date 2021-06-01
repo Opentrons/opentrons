@@ -1,17 +1,15 @@
-// @flow
-
 import * as Actions from '../actions'
 
 import type { RobotControlsAction } from '../types'
 
-type ActionSpec = {|
-  name: string,
-  creator: (...Array<any>) => mixed,
-  args: Array<mixed>,
-  expected: RobotControlsAction,
-|}
+interface ActionSpec {
+  name: string
+  creator: (...args: any[]) => unknown
+  args: unknown[]
+  expected: RobotControlsAction
+}
 
-const SPECS: Array<ActionSpec> = [
+const SPECS: ActionSpec[] = [
   {
     name: 'robotControls:FETCH_LIGHTS',
     creator: Actions.fetchLights,
@@ -19,7 +17,7 @@ const SPECS: Array<ActionSpec> = [
     expected: {
       type: 'robotControls:FETCH_LIGHTS',
       payload: { robotName: 'robot-name' },
-      meta: {},
+      meta: {} as any,
     },
   },
   {
@@ -32,7 +30,7 @@ const SPECS: Array<ActionSpec> = [
         robotName: 'robot-name',
         lightsOn: true,
       },
-      meta: { requestId: 'abc' },
+      meta: { requestId: 'abc' } as any,
     },
   },
   {
@@ -45,7 +43,7 @@ const SPECS: Array<ActionSpec> = [
         robotName: 'robot-name',
         error: { message: 'AH' },
       },
-      meta: { requestId: 'abc' },
+      meta: { requestId: 'abc' } as any,
     },
   },
   {
@@ -55,7 +53,7 @@ const SPECS: Array<ActionSpec> = [
     expected: {
       type: 'robotControls:UPDATE_LIGHTS',
       payload: { robotName: 'robot-name', lightsOn: true },
-      meta: {},
+      meta: {} as any,
     },
   },
   {
@@ -68,7 +66,7 @@ const SPECS: Array<ActionSpec> = [
         robotName: 'robot-name',
         lightsOn: true,
       },
-      meta: { requestId: 'abc' },
+      meta: { requestId: 'abc' } as any,
     },
   },
   {
@@ -81,7 +79,7 @@ const SPECS: Array<ActionSpec> = [
         robotName: 'robot-name',
         error: { message: 'AH' },
       },
-      meta: { requestId: 'abc' },
+      meta: { requestId: 'abc' } as any,
     },
   },
   {
@@ -91,7 +89,7 @@ const SPECS: Array<ActionSpec> = [
     expected: {
       type: 'robotControls:HOME',
       payload: { robotName: 'robot-name', target: 'robot' },
-      meta: {},
+      meta: {} as any,
     },
   },
   {
@@ -101,7 +99,7 @@ const SPECS: Array<ActionSpec> = [
     expected: {
       type: 'robotControls:HOME',
       payload: { robotName: 'robot-name', target: 'pipette', mount: 'left' },
-      meta: {},
+      meta: {} as any,
     },
   },
   {
@@ -111,7 +109,7 @@ const SPECS: Array<ActionSpec> = [
     expected: {
       type: 'robotControls:HOME_SUCCESS',
       payload: { robotName: 'robot-name' },
-      meta: { requestId: 'abc' },
+      meta: { requestId: 'abc' } as any,
     },
   },
   {
@@ -121,7 +119,7 @@ const SPECS: Array<ActionSpec> = [
     expected: {
       type: 'robotControls:HOME_FAILURE',
       payload: { robotName: 'robot-name', error: { message: 'AH' } },
-      meta: { requestId: 'abc' },
+      meta: { requestId: 'abc' } as any,
     },
   },
   {
@@ -136,7 +134,7 @@ const SPECS: Array<ActionSpec> = [
         mount: 'left',
         disengageMotors: true,
       },
-      meta: {},
+      meta: {} as any,
     },
   },
   {
@@ -146,7 +144,7 @@ const SPECS: Array<ActionSpec> = [
     expected: {
       type: 'robotControls:MOVE_SUCCESS',
       payload: { robotName: 'robot-name' },
-      meta: { requestId: 'abc' },
+      meta: { requestId: 'abc' } as any,
     },
   },
   {
@@ -156,7 +154,7 @@ const SPECS: Array<ActionSpec> = [
     expected: {
       type: 'robotControls:MOVE_FAILURE',
       payload: { robotName: 'robot-name', error: { message: 'AH' } },
-      meta: { requestId: 'abc' },
+      meta: { requestId: 'abc' } as any,
     },
   },
   {

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
@@ -9,15 +8,17 @@ import { LabeledToggle } from '@opentrons/components'
 import { DisableDiscoveryCache } from '../DisableDiscoveryCache'
 
 import type { State } from '../../../../redux/types'
-import type { Config } from '../../../../redux/config/types'
 
 jest.mock('../../../../redux/config/selectors')
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = { mockState: true } as any
 
-const getConfig: JestMockFn<[State], $Shape<Config> | null> = Cfg.getConfig
+const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
 
-function stubSelector<R>(mock: JestMockFn<[State], R>, rVal: R) {
+function stubSelector<R>(
+  mock: jest.MockedFunction<(s: State) => R>,
+  rVal: R
+): void {
   mock.mockImplementation(state => {
     expect(state).toBe(MOCK_STATE)
     return rVal
@@ -32,7 +33,7 @@ describe('DisableDiscoveryCache', () => {
     getState: () => MOCK_STATE,
   }
 
-  const render = () => {
+  const render = (): ReturnType<typeof mount> => {
     return mount(<DisableDiscoveryCache />, {
       wrappingComponent: Provider,
       wrappingComponentProps: { store: MOCK_STORE },
@@ -42,7 +43,7 @@ describe('DisableDiscoveryCache', () => {
   beforeEach(() => {
     stubSelector(getConfig, {
       discovery: { candidates: [], disableCache: false },
-    })
+    } as any)
   })
 
   afterEach(() => {
@@ -66,14 +67,14 @@ describe('DisableDiscoveryCache', () => {
   it('updates the toggle status according to disableCache config', () => {
     stubSelector(getConfig, {
       discovery: { candidates: [], disableCache: true },
-    })
+    } as any)
     const wrapper = render()
     expect(wrapper.find(LabeledToggle).prop('toggledOn')).toBe(true)
 
     // toggle switches value
     stubSelector(getConfig, {
       discovery: { candidates: [], disableCache: false },
-    })
+    } as any)
 
     // trigger a re-render
     wrapper.setProps({})

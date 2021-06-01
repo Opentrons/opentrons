@@ -1,4 +1,3 @@
-// @flow
 // robot selectors
 import { head } from 'lodash'
 import padStart from 'lodash/padStart'
@@ -29,25 +28,30 @@ import type {
   SessionModule,
   TipracksByMountMap,
   NextTiprackPipetteInfo,
+  Command,
   CommandNode,
 } from './types'
 
 import type { ConnectionState } from './reducer/connection'
-import type { CalibrationRequest } from './reducer/calibration'
-import type { ModuleModel } from '@opentrons/shared-data'
+import type {
+  CalibrationRequest,
+  CalibrationState,
+} from './reducer/calibration'
+import type { SessionState, Request } from './reducer/session'
+import type { PipetteModel, ModuleModel } from '@opentrons/shared-data'
 
-const calibration = (state: State) => state.robot.calibration
-const connection = (state: State) => state.robot.connection
-const session = (state: State) => state.robot.session
-const sessionRequest = (state: State) => session(state).sessionRequest
-const cancelRequest = (state: State) => session(state).cancelRequest
+const calibration = (state: State): CalibrationState => state.robot.calibration
+const connection = (state: State): ConnectionState => state.robot.connection
+const session = (state: State): SessionState => state.robot.session
+const sessionRequest = (state: State): Request => session(state).sessionRequest
+const cancelRequest = (state: State): Request => session(state).cancelRequest
 
-export function isMount(target: ?string): boolean {
-  return Constants.PIPETTE_MOUNTS.indexOf(target) > -1
+export function isMount(target: string | null | undefined): boolean {
+  return Constants.PIPETTE_MOUNTS.includes(target as Mount)
 }
 
-export function isSlot(target: ?string): boolean {
-  return Constants.DECK_SLOTS.indexOf(target) > -1
+export function isSlot(target: string | null | undefined): boolean {
+  return Constants.DECK_SLOTS.includes(target as Slot)
 }
 
 export function labwareType(labware: Labware): LabwareType {
@@ -56,7 +60,7 @@ export function labwareType(labware: Labware): LabwareType {
 
 export function getConnectRequest(
   state: State
-): $PropertyType<ConnectionState, 'connectRequest'> {
+): ConnectionState['connectRequest'] {
   return connection(state).connectRequest
 }
 
@@ -64,7 +68,9 @@ export function getConnectedRobotName(state: State): string | null {
   return connection(state).connectedTo || null
 }
 
-export const getConnectionStatus: State => ConnectionStatus = createSelector(
+export const getConnectionStatus: (
+  state: State
+) => ConnectionStatus = createSelector(
   getConnectedRobotName,
   state => getConnectRequest(state).inProgress,
   state => connection(state).disconnectRequest.inProgress,
@@ -79,7 +85,7 @@ export const getConnectionStatus: State => ConnectionStatus = createSelector(
   }
 )
 
-export function getSessionCapabilities(state: State): Array<string> {
+export function getSessionCapabilities(state: State): string[] {
   return session(state).capabilities
 }
 
@@ -87,7 +93,9 @@ export function getSessionLoadInProgress(state: State): boolean {
   return sessionRequest(state).inProgress
 }
 
-export function getUploadError(state: State): ?{ message: string, ... } {
+export function getUploadError(
+  state: State
+): { message: string; [key: string]: unknown } | null | undefined {
   return sessionRequest(state).error
 }
 
@@ -100,24 +108,24 @@ export function getSessionStatusInfo(state: State): SessionStatusInfo {
 }
 
 export function getSessionIsLoaded(state: State): boolean {
-  return getSessionStatus(state) !== ('': SessionStatus)
+  return getSessionStatus(state) !== ('' as SessionStatus)
 }
 
 export function getIsReadyToRun(state: State): boolean {
-  return getSessionStatus(state) === ('loaded': SessionStatus)
+  return getSessionStatus(state) === ('loaded' as SessionStatus)
 }
 
 export function getIsRunning(state: State): boolean {
   const status = getSessionStatus(state)
 
   return (
-    status === ('running': SessionStatus) ||
-    status === ('paused': SessionStatus)
+    status === ('running' as SessionStatus) ||
+    status === ('paused' as SessionStatus)
   )
 }
 
 export function getIsPaused(state: State): boolean {
-  return getSessionStatus(state) === ('paused': SessionStatus)
+  return getSessionStatus(state) === ('paused' as SessionStatus)
 }
 
 export function getIsBlocked(state: State): boolean {
@@ -132,17 +140,17 @@ export function getIsDone(state: State): boolean {
   const status = getSessionStatus(state)
 
   return (
-    status === ('error': SessionStatus) ||
-    status === ('finished': SessionStatus) ||
-    status === ('stopped': SessionStatus)
+    status === ('error' as SessionStatus) ||
+    status === ('finished' as SessionStatus) ||
+    status === ('stopped' as SessionStatus)
   )
 }
 
 // helper function for getCommands selector
 function traverseCommands(
-  commandsById,
-  parentIsCurrent
-): (id: number, index: number, commands: Array<number>) => CommandNode {
+  commandsById: Record<number, Command>,
+  parentIsCurrent: boolean
+): (id: number, index: number, commands: number[]) => CommandNode {
   return function mapIdToCommand(id, index, commands) {
     const { description, handledAt, children } = commandsById[id]
     const next = commandsById[commands[index + 1]]
@@ -163,20 +171,23 @@ function traverseCommands(
   }
 }
 
-export const getCommands: State => Array<CommandNode> = createSelector(
+export const getCommands: (state: State) => CommandNode[] = createSelector(
   (state: State) => session(state).protocolCommands,
   (state: State) => session(state).protocolCommandsById,
   (commands, commandsById) => commands.map(traverseCommands(commandsById, true))
 )
 
-export const getRunProgress: State => number = createSelector(
+export const getRunProgress: (state: State) => number = createSelector(
   getCommands,
   (commands): number => {
     const leaves = commands.reduce(countLeaves, { handled: 0, total: 0 })
 
     return leaves.total && (leaves.handled / leaves.total) * 100
 
-    function countLeaves(result, command) {
+    function countLeaves(
+      result: { handled: number; total: number },
+      command: CommandNode
+    ): { handled: number; total: number } {
       let { handled, total } = result
 
       if (command.children.length) {
@@ -191,7 +202,7 @@ export const getRunProgress: State => number = createSelector(
   }
 )
 
-export const getSessionError: State => string | null = createSelector(
+export const getSessionError: (state: State) => string | null = createSelector(
   (state: State) => session(state).runRequest.error,
   (state: State) => session(state).errors,
   (runError, sessionErrors) => {
@@ -218,10 +229,13 @@ export const getStartTime: (state: State) => string | null = createSelector(
   }
 )
 
-export const getRunSeconds: State => number = createSelector(
+export const getRunSeconds: (state: State) => number = createSelector(
   getStartTimeMs,
   (state: State) => session(state).runTime,
-  (startTime: ?number, runTime: ?number): number => {
+  (
+    startTime: number | null | undefined,
+    runTime: number | null | undefined
+  ): number => {
     return runTime && startTime && runTime > startTime
       ? Math.floor((runTime - startTime) / 1000)
       : 0
@@ -236,7 +250,7 @@ export function formatSeconds(runSeconds: number): string {
   return `${hours}:${minutes}:${seconds}`
 }
 
-export const getRunTime: State => string = createSelector(
+export const getRunTime: (state: State) => string = createSelector(
   getRunSeconds,
   formatSeconds
 )
@@ -247,29 +261,35 @@ export function getCalibrationRequest(state: State): CalibrationRequest {
 
 export function getPipettesByMount(
   state: State
-): { [Mount]: StatePipette, ... } {
+): { [mount in Mount]?: StatePipette } {
   return session(state).pipettesByMount
 }
 
-export const getPipettes: State => Array<Pipette> = createSelector(
+export const getPipettes: (state: State) => Pipette[] = createSelector(
   getPipettesByMount,
-  (state: State) => calibration(state).probedByMount,
+  (state: State): { [mount in Mount]?: boolean } =>
+    calibration(state).probedByMount,
   (state: State) => calibration(state).tipOnByMount,
-  (pipettesByMount, probedByMount, tipOnByMount): Array<Pipette> => {
+  (
+    pipettesByMount: { [mount in Mount]?: StatePipette },
+    probedByMount: { [mount in Mount]?: boolean },
+    tipOnByMount: { [mount in Mount]?: boolean }
+  ): Pipette[] => {
     return Constants.PIPETTE_MOUNTS.filter(
-      mount => pipettesByMount[mount] != null
+      (mount: Mount) => pipettesByMount[mount] != null
     ).map(mount => {
-      const pipette = pipettesByMount[mount]
+      const pipette = pipettesByMount[mount] as StatePipette
       const probed = probedByMount[mount] || false
       const tipOn = tipOnByMount[mount] || false
 
-      return {
+      const fullPipette: Pipette = {
         ...pipette,
         probed,
         tipOn,
-        modelSpecs: getPipetteModelSpecs(pipette.name) || null,
-        requestedAs: pipette.requestedAs || null,
+        modelSpecs: getPipetteModelSpecs(pipette?.name as PipetteModel) || null,
+        requestedAs: pipette?.requestedAs || null,
       }
+      return fullPipette
     })
   }
 )
@@ -278,7 +298,7 @@ export function getApiLevel(state: State): [number, number] | null {
   return session(state).apiLevel
 }
 
-export const getNextPipette: State => Pipette | null = createSelector(
+export const getNextPipette: (state: State) => Pipette | null = createSelector(
   getPipettes,
   (pipettes): Pipette | null => {
     const usedPipettes = pipettes.filter(p => p.tipRacks.length > 0)
@@ -290,58 +310,75 @@ export const getNextPipette: State => Pipette | null = createSelector(
 
 // returns the mount of the pipette to use for labware calibration
 // TODO(mc, 2018-02-07): be smarter about the backup case
-export const getCalibrator: State => Pipette | void = createSelector(
+export const getCalibrator: (
+  state: State
+) => Pipette | undefined = createSelector(
   getPipettes,
   pipettes => pipettes.find(i => i.tipOn) ?? pipettes[0]
 )
 
 // TODO(mc, 2018-02-07): remove this selector in favor of the one above
-export function getCalibratorMount(state: State): ?Mount {
-  const calibrator: ?Pipette = getCalibrator(state)
+export function getCalibratorMount(state: State): Mount | null | undefined {
+  const calibrator: Pipette | undefined = getCalibrator(state)
 
   if (!calibrator) return null
 
   return calibrator.mount
 }
 
-export const getPipettesCalibrated: State => boolean = createSelector(
+export const getPipettesCalibrated: (state: State) => boolean = createSelector(
   getPipettes,
   pipettes => pipettes.length !== 0 && pipettes.every(i => i.probed)
 )
 
-export function getModulesBySlot(state: State): { [Slot]: SessionModule } {
+export function getModulesBySlot(
+  state: State
+): { [slot in Slot]?: SessionModule } {
   return session(state).modulesBySlot
 }
 
-export const getModules: State => Array<SessionModule> = createSelector(
+export const getModules: (state: State) => SessionModule[] = createSelector(
   getModulesBySlot,
   modulesBySlot =>
-    Object.keys(modulesBySlot).map((slot: Slot) => modulesBySlot[slot])
+    Object.keys(modulesBySlot)
+      .map<SessionModule | undefined>(
+        (slot: string) => modulesBySlot[slot as keyof typeof modulesBySlot]
+      )
+      .filter<SessionModule>(
+        (s: SessionModule | undefined): s is SessionModule => s !== undefined
+      )
 )
 
-export const getModulesByProtocolLoadOrder: State => Array<SessionModule> = createSelector(
-  getModules,
-  modules =>
-    modules.slice().sort((a, b) => a.protocolLoadOrder - b.protocolLoadOrder)
+export const getModulesByProtocolLoadOrder: (
+  state: State
+) => SessionModule[] = createSelector(getModules, modules =>
+  modules.slice().sort((a, b) => a.protocolLoadOrder - b.protocolLoadOrder)
 )
 
-export const getModulesByModel: State => {
-  [ModuleModel]: Array<SessionModule>,
+export const getModulesByModel: (
+  state: State
+) => {
+  [model in ModuleModel]?: SessionModule[]
 } = createSelector(getModules, modules => {
-  return modules.reduce((acc, val) => {
-    if (!acc[val.model]) {
-      acc[val.model] = []
-    }
-    acc[val.model].push(val)
-    return acc
-  }, {})
+  return modules.reduce<{ [model in ModuleModel]?: SessionModule[] }>(
+    (acc, val) => {
+      if (!acc[val.model]) {
+        acc[val.model] = []
+      }
+      acc[val.model]?.push(val)
+      return acc
+    },
+    {}
+  )
 })
 
-export function getLabwareBySlot(state: State): { [Slot]: StateLabware, ... } {
+export function getLabwareBySlot(
+  state: State
+): { [key in Slot]?: StateLabware } {
   return session(state).labwareBySlot
 }
 
-export const getLabware: State => Array<Labware> = createSelector(
+export const getLabware: (state: State) => Labware[] = createSelector(
   getPipettesByMount,
   getLabwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
@@ -360,9 +397,9 @@ export const getLabware: State => Array<Labware> = createSelector(
   ): Labware[] => {
     return Object.keys(lwBySlot)
       .filter(isSlot)
-      .map<Labware>((slot: Slot) => {
-        const labware = lwBySlot[slot]
-        const { type, isTiprack, isLegacy } = labware
+      .map(slot => {
+        const labware = lwBySlot[slot as Slot] as Labware
+        const { type, isTiprack, isLegacy } = labware ?? {}
 
         let definition = null
         if (!isLegacy) {
@@ -381,12 +418,13 @@ export const getLabware: State => Array<Labware> = createSelector(
         // type of parent (e.g. slot, tempdeck, thermocycler) is confirmed
         const confirmed = some(
           confirmedBySlot,
-          (value: boolean, key: Slot) =>
+          (value: boolean | undefined, key: string) =>
             value === true &&
             (key === slot ||
               (!isTiprack &&
-                type === lwBySlot[key].type &&
-                modulesBySlot[key]?.model === modulesBySlot[slot]?.model))
+                type === lwBySlot[key as Slot]?.type &&
+                modulesBySlot[key as Slot]?.model ===
+                  modulesBySlot[slot as Slot]?.model))
         )
 
         let calibration: LabwareCalibrationStatus = 'unconfirmed'
@@ -412,7 +450,14 @@ export const getLabware: State => Array<Labware> = createSelector(
           }
         }
 
-        return { ...labware, calibration, confirmed, isMoving, definition }
+        const fullLabware: Labware = {
+          ...labware,
+          calibration,
+          confirmed,
+          isMoving,
+          definition,
+        }
+        return fullLabware
       })
       .sort((a, b) => {
         if (a.isTiprack && !b.isTiprack) return -1
@@ -420,13 +465,13 @@ export const getLabware: State => Array<Labware> = createSelector(
         if (!a.isTiprack && !b.isTiprack) return 0
 
         // both a and b are tipracks, sort multi-channel calibrators first
-        const aChannels =
+        const aChannels: number =
           a.calibratorMount != null
-            ? instByMount[a.calibratorMount].channels
+            ? instByMount[a.calibratorMount as Mount]?.channels ?? 0
             : 0
-        const bChannels =
+        const bChannels: number =
           b.calibratorMount != null
-            ? instByMount[b.calibratorMount].channels
+            ? instByMount[b.calibratorMount as Mount]?.channels ?? 0
             : 0
 
         return bChannels - aChannels
@@ -443,38 +488,44 @@ export function getDeckPopulated(state: State): boolean | null {
   return deckPopulated != null ? deckPopulated : null
 }
 
-export const getUnconfirmedLabware: State => Array<Labware> = createSelector(
-  getLabware,
-  labware => labware.filter(lw => lw.type && !lw.confirmed)
+export const getUnconfirmedLabware: (
+  state: State
+) => Labware[] = createSelector(getLabware, labware =>
+  labware.filter(lw => lw.type && !lw.confirmed)
 )
 
-export const getTipracks: State => Array<Labware> = createSelector(
-  getLabware,
-  labware => labware.filter(lw => lw.type && lw.isTiprack)
+export const getTipracks: (
+  state: State
+) => Labware[] = createSelector(getLabware, labware =>
+  labware.filter(lw => lw.type && lw.isTiprack)
 )
 
-export const getNotTipracks: State => Array<Labware> = createSelector(
-  getLabware,
-  labware => labware.filter(lw => lw.type && !lw.isTiprack)
+export const getNotTipracks: (
+  state: State
+) => Labware[] = createSelector(getLabware, labware =>
+  labware.filter(lw => lw.type && !lw.isTiprack)
 )
 
-export const getUnconfirmedTipracks: State => Array<Labware> = createSelector(
-  getUnconfirmedLabware,
-  labware => labware.filter(lw => lw.type && lw.isTiprack)
+export const getUnconfirmedTipracks: (
+  state: State
+) => Labware[] = createSelector(getUnconfirmedLabware, labware =>
+  labware.filter(lw => lw.type && lw.isTiprack)
 )
 
-export const getNextLabware: State => Labware | void = createSelector(
+export const getNextLabware: (
+  state: State
+) => Labware | null | undefined = createSelector(
   getUnconfirmedTipracks,
   getUnconfirmedLabware,
   (tipracks, labware) => tipracks[0] ?? labware[0]
 )
 
-export const getTipracksConfirmed: State => boolean = createSelector(
+export const getTipracksConfirmed: (state: State) => boolean = createSelector(
   getUnconfirmedTipracks,
   remaining => remaining.length === 0
 )
 
-export const getLabwareConfirmed: State => boolean = createSelector(
+export const getLabwareConfirmed: (state: State) => boolean = createSelector(
   getUnconfirmedLabware,
   remaining => remaining.length === 0
 )

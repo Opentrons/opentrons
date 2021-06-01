@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -13,13 +12,13 @@ import { LabwareListItem } from './LabwareListItem'
 import type { BaseProtocolLabware } from '../../../redux/calibration/types'
 import type { Dispatch } from '../../../redux/types'
 
-export type LabwareGroupProps = {|
-  robotName: string | null,
-  tipracks: Array<BaseProtocolLabware>,
-  otherLabware: Array<BaseProtocolLabware>,
-|}
+export interface LabwareGroupProps {
+  robotName: string | null
+  tipracks: BaseProtocolLabware[]
+  otherLabware: BaseProtocolLabware[]
+}
 
-export function LabwareGroup(props: LabwareGroupProps): React.Node {
+export function LabwareGroup(props: LabwareGroupProps): JSX.Element {
   const { robotName, tipracks, otherLabware } = props
 
   const { t } = useTranslation('protocol_calibration')
@@ -40,7 +39,7 @@ export function LabwareGroup(props: LabwareGroupProps): React.Node {
     robotName && dispatch(fetchLabwareCalibrations(robotName))
   }, [dispatch, robotName])
 
-  const setLabwareToCalibrate = (lw: BaseProtocolLabware) => {
+  const setLabwareToCalibrate = (lw: BaseProtocolLabware): void => {
     const calibrator = lw.calibratorMount || calibratorMount
     if (!!deckPopulated && calibrator) {
       dispatch(robotActions.moveTo(calibrator, lw.slot))

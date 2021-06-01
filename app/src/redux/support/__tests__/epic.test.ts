@@ -1,4 +1,3 @@
-// @flow
 // support profile epic test
 import { TestScheduler } from 'rxjs/testing'
 import { configInitialized } from '../../config'
@@ -7,43 +6,40 @@ import * as Event from '../intercom-event'
 import { supportEpic } from '../epic'
 
 import type { Action, State } from '../../types'
-import type { Config } from '../../config/types'
-import type {
-  SupportConfig,
-  SupportProfileUpdate,
-  IntercomEvent,
-} from '../types'
+import type { Observable } from 'rxjs'
 
 jest.mock('../profile')
 jest.mock('../intercom-event')
 
-const makeProfileUpdate: JestMockFn<
-  [Action, State],
-  SupportProfileUpdate | null
-> = Profile.makeProfileUpdate
+const makeProfileUpdate = Profile.makeProfileUpdate as jest.MockedFunction<
+  typeof Profile.makeProfileUpdate
+>
 
-const makeIntercomEvent: JestMockFn<[Action, State], IntercomEvent | null> =
-  Event.makeIntercomEvent
+const makeIntercomEvent = Event.makeIntercomEvent as jest.MockedFunction<
+  typeof Event.makeIntercomEvent
+>
 
-const sendEvent: JestMockFn<[IntercomEvent], void> = Event.sendEvent
+const sendEvent = Event.sendEvent as jest.MockedFunction<typeof Event.sendEvent>
 
-const initializeProfile: JestMockFn<[SupportConfig], void> =
-  Profile.initializeProfile
+const initializeProfile = Profile.initializeProfile as jest.MockedFunction<
+  typeof Profile.initializeProfile
+>
 
-const updateProfile: JestMockFn<[SupportProfileUpdate], void> =
-  Profile.updateProfile
+const updateProfile = Profile.updateProfile as jest.MockedFunction<
+  typeof Profile.updateProfile
+>
 
-const MOCK_ACTION: Action = ({ type: 'MOCK_ACTION' }: any)
-const MOCK_PROFILE_STATE: $Shape<{| ...State, config: $Shape<Config> |}> = {
+const MOCK_ACTION: Action = { type: 'MOCK_ACTION' } as any
+const MOCK_PROFILE_STATE: State = {
   config: {
     support: { userId: 'foo', createdAt: 42, name: 'bar', email: null },
   },
-}
+} as any
 
-const MOCK_EVENT_STATE: $Shape<{| ...State |}> = {}
+const MOCK_EVENT_STATE: State = {} as any
 
 describe('support profile epic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     makeProfileUpdate.mockReturnValue(null)
@@ -59,25 +55,25 @@ describe('support profile epic', () => {
 
   it('should initialize support profile on config:INITIALIZED', () => {
     testScheduler.run(({ hot, expectObservable, flush }) => {
-      const action$ = hot('-a', {
-        a: configInitialized(MOCK_PROFILE_STATE.config),
+      const action$ = hot<Action>('-a', {
+        a: configInitialized(MOCK_PROFILE_STATE.config as any),
       })
-      const state$ = hot('--')
+      const state$ = hot<State>('--')
       const result$ = supportEpic(action$, state$)
 
       expectObservable(result$, '--')
       flush()
 
       expect(initializeProfile).toHaveBeenCalledWith(
-        MOCK_PROFILE_STATE.config.support
+        MOCK_PROFILE_STATE.config?.support
       )
     })
   })
 
   it('should do nothing with actions that do not map to a profile update', () => {
     testScheduler.run(({ hot, expectObservable, flush }) => {
-      const action$ = hot('-a', { a: MOCK_ACTION })
-      const state$ = hot('s-', { s: MOCK_PROFILE_STATE })
+      const action$ = hot<Action>('-a', { a: MOCK_ACTION })
+      const state$ = hot<State>('s-', { s: MOCK_PROFILE_STATE })
       const result$ = supportEpic(action$, state$)
 
       expectObservable(result$, '--')
@@ -90,13 +86,13 @@ describe('support profile epic', () => {
     })
   })
 
-  it('should call a profile update ', () => {
+  it('should call a profile update', () => {
     const profileUpdate = { someProp: 'value' }
     makeProfileUpdate.mockReturnValueOnce(profileUpdate)
 
     testScheduler.run(({ hot, expectObservable, flush }) => {
-      const action$ = hot('-a', { a: MOCK_ACTION })
-      const state$ = hot('s-', { s: MOCK_PROFILE_STATE })
+      const action$ = hot<Action>('-a', { a: MOCK_ACTION })
+      const state$ = hot<State>('s-', { s: MOCK_PROFILE_STATE })
       const result$ = supportEpic(action$, state$)
 
       expectObservable(result$)
@@ -108,7 +104,7 @@ describe('support profile epic', () => {
 })
 
 describe('support event epic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     makeIntercomEvent.mockReturnValue(null)
@@ -124,9 +120,9 @@ describe('support event epic', () => {
 
   it('should do nothing with actions that do not map to an event', () => {
     testScheduler.run(({ hot, expectObservable, flush }) => {
-      const action$ = hot('-a', { a: MOCK_ACTION })
-      const state$ = hot('s-', { s: MOCK_EVENT_STATE })
-      const result$ = supportEpic(action$, state$)
+      const action$ = hot<Action>('-a', { a: MOCK_ACTION })
+      const state$ = hot<State>('s-', { s: MOCK_EVENT_STATE })
+      const result$ = supportEpic(action$, state$ as Observable<State>)
 
       expectObservable(result$, '--')
       flush()
@@ -143,12 +139,12 @@ describe('support event epic', () => {
     const eventPayload = {
       eventName: 'completed-robot-calibration-check',
       metadata: { someProp: 'value' },
-    }
+    } as any
     makeIntercomEvent.mockReturnValueOnce(eventPayload)
 
     testScheduler.run(({ hot, expectObservable, flush }) => {
-      const action$ = hot('-a', { a: MOCK_ACTION })
-      const state$ = hot('s-', { s: MOCK_PROFILE_STATE })
+      const action$ = hot<Action>('-a', { a: MOCK_ACTION })
+      const state$ = hot<State>('s-', { s: MOCK_PROFILE_STATE })
       const result$ = supportEpic(action$, state$)
 
       expectObservable(result$)

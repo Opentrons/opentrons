@@ -1,11 +1,9 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 
 import * as Sessions from '../../../redux/sessions'
-// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import { CheckCalibration } from '../index'
@@ -22,34 +20,36 @@ import {
 
 import { mockCalibrationCheckSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
+import type { ReactWrapper } from 'enzyme'
+import type { Dispatch } from '../../../redux/types'
 import type { RobotCalibrationCheckStep } from '../../../redux/sessions/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../redux/calibration/selectors')
 
-type CheckCalibrationSpec = {
-  component: React.AbstractComponent<any>,
-  childProps?: {},
-  currentStep: RobotCalibrationCheckStep,
-  ...
+interface CheckCalibrationSpec {
+  component: React.ComponentType<any>
+  currentStep: RobotCalibrationCheckStep
 }
 
-const mockGetDeckDefinitions: JestMockFn<
-  [],
-  $Call<typeof getDeckDefinitions, any>
-> = getDeckDefinitions
+const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
+  typeof getDeckDefinitions
+>
 
 describe('CheckCalibration', () => {
-  let mockStore
-  let render
-  let dispatch
-  let dispatchRequests
+  let mockStore: any
+  let render: (
+    props?: Partial<React.ComponentProps<typeof CheckCalibration>>
+  ) => ReactWrapper<React.ComponentProps<typeof CheckCalibration>>
+  let dispatch: jest.MockedFunction<Dispatch>
+  let dispatchRequests: jest.MockedFunction<any>
   let mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
     id: 'fake_check_session_id',
     ...mockCalibrationCheckSessionAttributes,
   }
-  const getExitButton = wrapper =>
-    wrapper.find({ title: 'exit' }).find('button')
+  const getExitButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof CheckCalibration>>
+  ) => wrapper.find({ title: 'exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [
     Introduction,
@@ -61,7 +61,7 @@ describe('CheckCalibration', () => {
     ResultsSummary,
   ]
 
-  const SPECS: Array<CheckCalibrationSpec> = [
+  const SPECS: CheckCalibrationSpec[] = [
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
     { component: TipPickUp, currentStep: 'preparingPipette' },
@@ -91,7 +91,9 @@ describe('CheckCalibration', () => {
     }
     dispatchRequests = jest.fn()
 
-    render = (props = {}) => {
+    render = (
+      props: Partial<React.ComponentProps<typeof CheckCalibration>> = {}
+    ) => {
       const { showSpinner = false, isJogging = false } = props
       return mount(
         <CheckCalibration
@@ -122,7 +124,7 @@ describe('CheckCalibration', () => {
           ...mockCalibrationCheckSession.details,
           currentStep: spec.currentStep,
         },
-      }
+      } as any
       const wrapper = render()
       POSSIBLE_CHILDREN.forEach(child => {
         if (child === spec.component) {
@@ -138,7 +140,9 @@ describe('CheckCalibration', () => {
     const wrapper = render()
 
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
-    act(() => getExitButton(wrapper).invoke('onClick')())
+    act(() =>
+      getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+    )
     wrapper.update()
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
@@ -162,7 +166,9 @@ describe('CheckCalibration', () => {
       },
     }
     const wrapper = render({ isJogging: false })
-    wrapper.find('button[title="forward"]').invoke('onClick')()
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand(
         'robot-name',
@@ -184,7 +190,9 @@ describe('CheckCalibration', () => {
     }
     const wrapper = render({ isJogging: true })
     dispatch.mockClear()
-    wrapper.find('button[title="forward"]').invoke('onClick')()
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).not.toHaveBeenCalled()
   })
 })

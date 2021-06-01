@@ -1,26 +1,29 @@
-// @flow
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 
 import styles from './styles.css'
+import type { ButtonProps } from '@opentrons/components'
 
-type Props = {|
-  heading?: ?string,
-  description: string,
-  close?: () => mixed,
-  closeUrl?: string,
-  error: { message?: string, ... },
-|}
+interface Props {
+  heading?: string | null
+  description: string
+  close?: () => unknown
+  closeUrl?: string
+  error: { message?: string; [key: string]: unknown }
+}
 
 const DEFAULT_HEADING = 'Unexpected Error'
 const AN_UNKNOWN_ERROR_OCCURRED = 'An unknown error occurred'
 
-export function ErrorModal(props: Props): React.Node {
+export function ErrorModal(props: Props): JSX.Element {
   const { description, error } = props
   const heading = props.heading || DEFAULT_HEADING
-  let closeButtonProps = { children: 'close', onClick: props.close }
+  let closeButtonProps: ButtonProps = {
+    children: 'close',
+    onClick: props.close,
+  }
 
   if (props.closeUrl) {
     closeButtonProps = {
@@ -32,7 +35,6 @@ export function ErrorModal(props: Props): React.Node {
 
   return (
     <Portal>
-      {/* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion or replacement of AlertModal */}
       <AlertModal heading={heading} buttons={[closeButtonProps]} alertOverlay>
         <p className={styles.error_modal_message}>
           {error.message ?? AN_UNKNOWN_ERROR_OCCURRED}

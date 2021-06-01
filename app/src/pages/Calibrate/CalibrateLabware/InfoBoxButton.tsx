@@ -1,4 +1,3 @@
-// @flow
 // info panel for labware calibration page
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -17,9 +16,11 @@ import type { Dispatch } from '../../../redux/types'
 
 import { ProceedToRun } from './ProceedToRun'
 
-export type InfoBoxButtonProps = {| labware: ?Labware |}
+export interface InfoBoxButtonProps {
+  labware: Labware | null | undefined
+}
 
-export function InfoBoxButton(props: InfoBoxButtonProps): React.Node {
+export function InfoBoxButton(props: InfoBoxButtonProps): JSX.Element | null {
   const { labware } = props
   const dispatch = useDispatch<Dispatch>()
 
@@ -32,7 +33,7 @@ export function InfoBoxButton(props: InfoBoxButtonProps): React.Node {
   const buttonTargetIsNext =
     buttonTarget != null && buttonTarget === nextLabwareTarget
   const targetConfirmed = buttonTarget && buttonTarget.confirmed
-  const mountToUse: ?Mount =
+  const mountToUse: Mount | null | undefined =
     (buttonTarget && buttonTarget.calibratorMount) || robotCalibratorMount
 
   if (!buttonTarget || (labware && labware.isMoving) || !mountToUse) return null

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   DIRECTION_COLUMN,
@@ -22,19 +21,19 @@ import type {
   ThermocyclerStatus,
 } from '../../redux/modules/types'
 
-type TemperatureDataProps = {|
-  title: string | null,
-  current: number | null,
-  target: number | null,
-  status?: TemperatureStatus | ThermocyclerStatus | null,
-|}
+interface TemperatureDataProps {
+  title: string | null
+  current: number | null
+  target: number | null
+  status?: TemperatureStatus | ThermocyclerStatus | null
+}
 
 export const TemperatureData = ({
   title,
   status,
   current,
   target,
-}: TemperatureDataProps): React.Node => (
+}: TemperatureDataProps): JSX.Element => (
   <Flex flexDirection={DIRECTION_COLUMN} fontSize={FONT_SIZE_BODY_1}>
     {title && (
       <Text

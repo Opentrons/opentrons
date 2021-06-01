@@ -1,8 +1,14 @@
 // discovery actions test
 import * as actions from '../actions'
+import type { Action } from '../../types'
 
 describe('discovery actions', () => {
-  const SPECS = [
+  const SPECS: Array<{
+    name: string
+    creator: (...args: any[]) => Action
+    args: any[]
+    expected: unknown
+  }> = [
     {
       name: 'startDiscovery',
       creator: actions.startDiscovery,

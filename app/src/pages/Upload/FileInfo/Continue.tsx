@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
@@ -24,7 +23,7 @@ import {
 const PROCEED_TO_CALIBRATE = 'Proceed to Calibrate'
 const VERIFY_CALIBRATIONS = 'Verify pipette and labware calibrations'
 
-export function Continue(): React.Node {
+export function Continue(): JSX.Element {
   const { path, disabledReason } = useSelector(getCalibrateLocation)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
@@ -36,7 +35,7 @@ export function Continue(): React.Node {
       <PrimaryBtn
         as={Link}
         to={disabledReason ? '#' : path}
-        className={cx({ disabled: disabledReason })}
+        className={cx({ disabled: Boolean(disabledReason) })}
         width={SIZE_5}
         marginBottom={SPACING_1}
         {...targetProps}

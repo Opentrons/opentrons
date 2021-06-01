@@ -1,4 +1,3 @@
-// @flow
 import * as Constants from './constants'
 
 import type { RobotHost } from '../robot-api/types'
@@ -6,6 +5,7 @@ import type {
   BuildrootAction,
   UpdateSessionStep,
   UpdateSessionStage,
+  BuildrootStatusAction,
 } from './types'
 
 export function setBuildrootUpdateSeen(robotName: string): BuildrootAction {
@@ -64,7 +64,7 @@ export function buildrootStatus(
   stage: UpdateSessionStage,
   message: string,
   progress: number | null
-): BuildrootAction {
+): BuildrootStatusAction {
   return { type: Constants.BR_STATUS, payload: { stage, message, progress } }
 }
 

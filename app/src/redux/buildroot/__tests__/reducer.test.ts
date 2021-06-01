@@ -1,5 +1,7 @@
 import { mockRobot } from '../../robot-api/__fixtures__'
 import { INITIAL_STATE, buildrootReducer } from '../reducer'
+import type { Action } from '../../types'
+import type { BuildrootState } from '../types'
 
 const BASE_SESSION = {
   robotName: mockRobot.name,
@@ -261,7 +263,9 @@ describe('buildroot reducer', () => {
   SPECS.forEach(spec => {
     const { name, action, initialState, expected } = spec
     it(name, () =>
-      expect(buildrootReducer(initialState, action)).toEqual(expected)
+      expect(
+        buildrootReducer(initialState as BuildrootState, action as Action)
+      ).toEqual(expected)
     )
   })
 })

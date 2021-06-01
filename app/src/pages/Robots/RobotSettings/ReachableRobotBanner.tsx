@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
 import styles from './styles.css'
@@ -14,7 +13,9 @@ import type {
   HealthStatus,
 } from '../../../redux/discovery/types'
 
-type State = {| dismissed: boolean |}
+interface State {
+  dismissed: boolean
+}
 
 // TODO(bc, 2020-12-07): i18n
 const UNRESPONSIVE_TITLE = 'Unable to establish connection with robot'
@@ -31,7 +32,10 @@ const LAST_RESORT = (
   </p>
 )
 
-const NO_SERVER_MESSAGE = (serverStatus: HealthStatus, ip: string) => (
+const NO_SERVER_MESSAGE = (
+  serverStatus: HealthStatus,
+  ip: string
+): JSX.Element => (
   <div className={styles.banner}>
     <p>
       This OT-2 has been seen recently, but it is currently{' '}
@@ -42,7 +46,7 @@ const NO_SERVER_MESSAGE = (serverStatus: HealthStatus, ip: string) => (
   </div>
 )
 
-const SERVER_MESSAGE = (status: HealthStatus, ip: string) => (
+const SERVER_MESSAGE = (status: HealthStatus, ip: string): JSX.Element => (
   <div className={styles.banner}>
     <p>
       Your {"OT-2's"} API server is {STATUS_DESCRIPTION[status]} at IP address{' '}
@@ -76,7 +80,7 @@ export class ReachableRobotBanner extends React.Component<
     this.state = { dismissed: false }
   }
 
-  render(): React.Node {
+  render(): JSX.Element | null {
     const { ip, healthStatus, serverHealthStatus } = this.props
     const isVisible = !this.state.dismissed
     const message =

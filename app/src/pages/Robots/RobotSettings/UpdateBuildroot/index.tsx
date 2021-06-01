@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -18,12 +17,12 @@ import {
 import type { State, Dispatch } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
-export type UpdateBuildrootProps = {|
-  robot: ViewableRobot,
-  close: () => mixed,
-|}
+export interface UpdateBuildrootProps {
+  robot: ViewableRobot
+  close: () => unknown
+}
 
-export function UpdateBuildroot(props: UpdateBuildrootProps): React.Node {
+export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
   const { robot, close } = props
   const robotName = robot.name
   const [viewUpdateInfo, setViewUpdateInfo] = React.useState(false)

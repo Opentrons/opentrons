@@ -1,5 +1,3 @@
-// @flow
-
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Link as RRDLink } from 'react-router-dom'
@@ -25,12 +23,12 @@ import type { ViewableRobot } from '../../../redux/discovery/types'
 
 import { PipetteOffsetItem } from './PipetteOffsetItem'
 
-type Props = {|
-  pipettesPageUrl: string,
-  robot: ViewableRobot,
-|}
+interface Props {
+  pipettesPageUrl: string
+  robot: ViewableRobot
+}
 
-export function PipetteOffsets(props: Props): React.Node {
+export function PipetteOffsets(props: Props): JSX.Element {
   const { pipettesPageUrl, robot } = props
   const { name: robotName } = robot
 

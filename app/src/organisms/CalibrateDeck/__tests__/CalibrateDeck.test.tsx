@@ -1,10 +1,8 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 
-// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import * as Sessions from '../../../redux/sessions'
@@ -19,37 +17,42 @@ import {
   SaveZPoint,
   SaveXYPoint,
   CompleteConfirmation,
-} from '../../../organisms/CalibrationPanels'
+} from '../../CalibrationPanels'
 
+import type { ReactWrapper, HTMLAttributes } from 'enzyme'
 import type { DeckCalibrationStep } from '../../../redux/sessions/types'
+import type { DispatchRequestsType } from '../../../redux/robot-api'
+import type { Dispatch } from '../../../redux/types'
+import type { CalibrationPanelProps } from '../../CalibrationPanels/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 
-type CalibrateDeckSpec = {
-  component: React.AbstractComponent<any>,
-  childProps?: {},
-  currentStep: DeckCalibrationStep,
-  ...
+interface CalibrateDeckSpec {
+  component: (props: CalibrationPanelProps) => JSX.Element
+  currentStep: DeckCalibrationStep
 }
 
-const mockGetDeckDefinitions: JestMockFn<
-  [],
-  $Call<typeof getDeckDefinitions, any>
-> = getDeckDefinitions
+const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
+  typeof getDeckDefinitions
+>
 
 describe('CalibrateDeck', () => {
-  let mockStore
-  let render
-  let dispatch
-  let dispatchRequests
+  let mockStore: any
+  let render: (
+    props?: Partial<React.ComponentProps<typeof CalibrateDeck>>
+  ) => ReactWrapper<React.ComponentProps<typeof CalibrateDeck>>
+  let dispatch: Dispatch
+  let dispatchRequests: DispatchRequestsType
   let mockDeckCalSession: Sessions.DeckCalibrationSession = {
     id: 'fake_session_id',
     ...mockDeckCalibrationSessionAttributes,
   }
 
-  const getExitButton = wrapper =>
+  const getExitButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof CalibrateDeck>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find({ title: 'exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [
@@ -62,7 +65,7 @@ describe('CalibrateDeck', () => {
     CompleteConfirmation,
   ]
 
-  const SPECS: Array<CalibrateDeckSpec> = [
+  const SPECS: CalibrateDeckSpec[] = [
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
     { component: TipPickUp, currentStep: 'preparingPipette' },
@@ -142,7 +145,9 @@ describe('CalibrateDeck', () => {
     const wrapper = render()
 
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
-    act(() => getExitButton(wrapper).invoke('onClick')())
+    act((): void =>
+      getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+    )
     wrapper.update()
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
@@ -166,7 +171,9 @@ describe('CalibrateDeck', () => {
       },
     }
     const wrapper = render({ isJogging: false, session })
-    wrapper.find('button[title="forward"]').invoke('onClick')()
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,
@@ -185,7 +192,9 @@ describe('CalibrateDeck', () => {
       },
     }
     const wrapper = render({ isJogging: true, session })
-    wrapper.find('button[title="forward"]').invoke('onClick')()
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).not.toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,

@@ -1,4 +1,3 @@
-// @flow
 // epics to control the buildroot migration / update flow
 import every from 'lodash/every'
 import { combineEpics, ofType } from 'redux-observable'
@@ -68,7 +67,8 @@ import {
   BR_CREATE_SESSION_SUCCESS,
 } from './constants'
 
-import type { State, Epic } from '../types'
+import type { Observable } from 'rxjs'
+import type { State, Action, Epic } from '../types'
 import type { ViewableRobot } from '../discovery/types'
 import type { RobotApiResponse } from '../robot-api/types'
 import type { RestartStatusChangedAction } from '../robot-admin/types'
@@ -79,6 +79,7 @@ import type {
   CreateSessionAction,
   CreateSessionSuccessAction,
   BuildrootUpdateSession,
+  BuildrootStatusAction,
 } from './types'
 
 export const POLL_INTERVAL_MS = 2000
@@ -105,9 +106,9 @@ const CHECK_TO_VERIFY_UPDATE =
 //   if  migrated, kickoff regular buildroot update
 export const startUpdateEpic: Epic = (action$, state$) =>
   action$.pipe(
-    ofType(BR_START_UPDATE),
+    ofType<Action, StartBuildrootUpdateAction>(BR_START_UPDATE),
     withLatestFrom(state$),
-    map<[StartBuildrootUpdateAction, State], _>(([action, state]) => {
+    map<[StartBuildrootUpdateAction, State], any>(([action, state]) => {
       // BR_START_UPDATE will set the active updating robot in state
       const { robotName, systemFile } = action.payload
       const host = getBuildrootRobot(state)
@@ -129,6 +130,7 @@ export const startUpdateEpic: Epic = (action$, state$) =>
 
       // if capabilities is empty, the robot requires premigration
       if (capabilities === null) {
+        // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
         return startBuildrootPremigration(host)
       }
 
@@ -143,6 +145,7 @@ export const startUpdateEpic: Epic = (action$, state$) =>
         )
       }
 
+      // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
       return createSession(host, sessionPath)
     })
   )
@@ -167,8 +170,8 @@ export const retryAfterUserFileInfoEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(BR_USER_FILE_INFO),
     withLatestFrom(state$, (_, state) => getBuildrootRobotName(state)),
-    filter(robotName => robotName !== null),
-    map<string, _>(robotName => startBuildrootUpdate(robotName))
+    filter((robotName): robotName is string => robotName !== null),
+    map<string, any>(robotName => startBuildrootUpdate(robotName))
   )
 }
 
@@ -177,10 +180,12 @@ export const retryAfterUserFileInfoEpic: Epic = (action$, state$) => {
 export const createSessionEpic: Epic = action$ => {
   return action$.pipe(
     ofType(BR_CREATE_SESSION),
-    switchMap<CreateSessionAction, _, _>(createAction => {
-      const { host, sessionPath } = createAction.payload
-      return fetchRobotApi(host, { method: POST, path: sessionPath })
-    }),
+    switchMap<CreateSessionAction, ReturnType<typeof fetchRobotApi>>(
+      createAction => {
+        const { host, sessionPath } = createAction.payload
+        return fetchRobotApi(host, { method: POST, path: sessionPath })
+      }
+    ),
     switchMap(resp => {
       const { host, path, ok, status } = resp
       const pathPrefix = path.replace('/begin', '')
@@ -212,41 +217,44 @@ export const createSessionEpic: Epic = action$ => {
 export const statusPollEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(BR_CREATE_SESSION_SUCCESS),
-    mergeMap<CreateSessionSuccessAction, _, _>(action => {
-      const { host, token, pathPrefix } = action.payload
-      const request = { method: GET, path: `${pathPrefix}/${token}/status` }
+    mergeMap<CreateSessionSuccessAction, Observable<BuildrootStatusAction>>(
+      action => {
+        const { host, token, pathPrefix } = action.payload
+        const request = { method: GET, path: `${pathPrefix}/${token}/status` }
 
-      return interval(POLL_INTERVAL_MS).pipe(
-        takeUntil(
-          state$.pipe(
-            filter<State, _>(state => {
-              const session = getBuildrootSession(state)
-              return (
-                session?.stage === READY_FOR_RESTART ||
-                session?.error === true ||
-                session === null
-              )
-            })
-          )
-        ),
-        switchMap(() => fetchRobotApi(host, request)),
-        filter(resp => resp.ok),
-        map<RobotApiResponse, BuildrootAction>(successResp =>
-          buildrootStatus(
-            successResp.body.stage,
-            successResp.body.message,
-            successResp.body.progress != null
-              ? Math.round(successResp.body.progress * 100)
-              : null
+        return interval(POLL_INTERVAL_MS).pipe(
+          takeUntil(
+            state$.pipe(
+              filter(state => {
+                const session = getBuildrootSession(state)
+                return (
+                  session?.stage === READY_FOR_RESTART ||
+                  // @ts-expect-error TODO: `session?.error === true` always returns false, remove it?
+                  session?.error === true ||
+                  session === null
+                )
+              })
+            )
+          ),
+          switchMap(() => fetchRobotApi(host, request)),
+          filter(resp => resp.ok),
+          map<RobotApiResponse, BuildrootStatusAction>(successResp =>
+            buildrootStatus(
+              successResp.body.stage,
+              successResp.body.message,
+              successResp.body.progress != null
+                ? Math.round(successResp.body.progress * 100)
+                : null
+            )
           )
         )
-      )
-    })
+      }
+    )
   )
 }
 
 // filter for an active session with given properties
-const passActiveSession = (props: $Shape<BuildrootUpdateSession>) => (
+const passActiveSession = (props: Partial<BuildrootUpdateSession>) => (
   state: State
 ): boolean => {
   const robot = getBuildrootRobot(state)
@@ -257,7 +265,10 @@ const passActiveSession = (props: $Shape<BuildrootUpdateSession>) => (
     !session?.error &&
     typeof session?.pathPrefix === 'string' &&
     typeof session?.token === 'string' &&
-    every(props, (value, key) => session?.[key] === value)
+    every(
+      props,
+      (value, key) => session?.[key as keyof BuildrootUpdateSession] === value
+    )
   )
 }
 
@@ -265,14 +276,15 @@ const passActiveSession = (props: $Shape<BuildrootUpdateSession>) => (
 export const uploadFileEpic: Epic = (_, state$) => {
   return state$.pipe(
     filter(passActiveSession({ stage: AWAITING_FILE, step: GET_TOKEN })),
-    map<State, _>(stateWithSession => {
-      const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
+    map<State, ReturnType<typeof uploadBuildrootFile>>(stateWithSession => {
+      const host: ViewableRobot = getBuildrootRobot(stateWithSession) as any
       const session = getBuildrootSession(stateWithSession)
-      const pathPrefix: string = (session?.pathPrefix: any)
-      const token: string = (session?.token: any)
+      const pathPrefix: string = session?.pathPrefix as any
+      const token: string = session?.token as any
       const systemFile = session?.userFileInfo?.systemFile || null
 
       return uploadBuildrootFile(
+        // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
         host,
         `${pathPrefix}/${token}/file`,
         systemFile
@@ -285,12 +297,13 @@ export const uploadFileEpic: Epic = (_, state$) => {
 export const commitUpdateEpic: Epic = (_, state$) => {
   return state$.pipe(
     filter(passActiveSession({ stage: DONE, step: PROCESS_FILE })),
-    switchMap<State, _, BuildrootAction>(stateWithSession => {
-      const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
+    switchMap<State, Observable<BuildrootAction>>(stateWithSession => {
+      const host: ViewableRobot = getBuildrootRobot(stateWithSession) as any
       const session = getBuildrootSession(stateWithSession)
-      const pathPrefix: string = (session?.pathPrefix: any)
-      const token: string = (session?.token: any)
+      const pathPrefix: string = session?.pathPrefix as any
+      const token: string = session?.token as any
       const path = `${pathPrefix}/${token}/commit`
+      // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
       const request$ = fetchRobotApi(host, { method: POST, path }).pipe(
         filter(resp => !resp.ok),
         map(resp => {
@@ -311,9 +324,10 @@ export const restartAfterCommitEpic: Epic = (_, state$) => {
     filter(
       passActiveSession({ stage: READY_FOR_RESTART, step: COMMIT_UPDATE })
     ),
-    switchMap<State, _, _>(stateWithSession => {
-      const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
+    switchMap<State, Observable<any>>(stateWithSession => {
+      const host: ViewableRobot = getBuildrootRobot(stateWithSession) as any
       const path = host.serverHealth?.capabilities?.restart || RESTART_PATH
+      // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
       const request$ = fetchRobotApi(host, { method: POST, path }).pipe(
         switchMap(resp => {
           return resp.ok
@@ -337,8 +351,11 @@ export const restartAfterCommitEpic: Epic = (_, state$) => {
 export const finishAfterRestartEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(RESTART_STATUS_CHANGED),
-    withLatestFrom<RestartStatusChangedAction, State>(state$),
-    filter(([action, state]) => {
+    withLatestFrom<
+      RestartStatusChangedAction,
+      [RestartStatusChangedAction, State]
+    >(state$),
+    filter(([action, state]: [RestartStatusChangedAction, State]) => {
       const session = getBuildrootSession(state)
       const robot = getBuildrootRobot(state)
       const restartDone =
@@ -354,7 +371,7 @@ export const finishAfterRestartEpic: Epic = (action$, state$) => {
     }),
     switchMap(([action, stateWithRobot]) => {
       const targetVersion = getBuildrootTargetVersion(stateWithRobot)
-      const robot: ViewableRobot = (getBuildrootRobot(stateWithRobot): any)
+      const robot: ViewableRobot = getBuildrootRobot(stateWithRobot) as any
       const robotVersion = getRobotApiVersion(robot)
       const timedOut = action.payload.restartStatus === RESTART_TIMED_OUT_STATUS
       const actual = robotVersion ?? UNKNOWN
@@ -400,8 +417,8 @@ export const removeMigratedRobotsEpic: Epic = (_, state$) => {
         allRobots.some(r => r.name === robotName)
       )
     }),
-    map<State, _>(stateWithRobotName => {
-      const robotName: string = (getBuildrootRobotName(stateWithRobotName): any)
+    map<State, ReturnType<typeof removeRobot>>(stateWithRobotName => {
+      const robotName: string = getBuildrootRobotName(stateWithRobotName) as any
       return removeRobot(robotName)
     })
   )
@@ -411,7 +428,7 @@ export const disconnectRpcOnStartEpic: Epic = action$ => {
   return action$.pipe(ofType(BR_START_UPDATE), mapTo(robotActions.disconnect()))
 }
 
-export const buildrootEpic: Epic = combineEpics(
+export const buildrootEpic = combineEpics<Epic>(
   startUpdateEpic,
   retryAfterPremigrationEpic,
   retryAfterUserFileInfoEpic,

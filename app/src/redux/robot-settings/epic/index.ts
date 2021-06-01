@@ -1,4 +1,3 @@
-// @flow
 import { combineEpics } from 'redux-observable'
 import type { Epic } from '../../types'
 
@@ -6,7 +5,7 @@ import { fetchSettingsEpic } from './fetchSettingsEpic'
 import { updateSettingEpic } from './updateSettingEpic'
 import { clearRestartPathEpic } from './clearRestartPathEpic'
 
-export const robotSettingsEpic: Epic = combineEpics(
+export const robotSettingsEpic: Epic = combineEpics<Epic>(
   fetchSettingsEpic,
   updateSettingEpic,
   clearRestartPathEpic

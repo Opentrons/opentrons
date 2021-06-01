@@ -2,12 +2,15 @@
 // wraps the api client worker to handle API side effects in a different thread
 
 import { createLogger } from '../../../logger'
+import type { Action, Middleware } from '../../types'
 
 const log = createLogger(__filename)
 
-const shouldProcess = a => a.meta && (a.meta.robot || a.meta.robotCommand)
+const shouldProcess = (a: Action): boolean =>
+  // @ts-expect-error: make this `meta` access happier for TS
+  a.meta && (a.meta.robot || a.meta.robotCommand)
 
-export function apiClientMiddleware() {
+export function apiClientMiddleware(): Middleware {
   const worker = new Worker('./worker', { type: 'module' })
 
   return store => {

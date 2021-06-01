@@ -1,4 +1,3 @@
-// @flow
 // view info about the app and update
 import * as React from 'react'
 
@@ -8,7 +7,7 @@ import { AnalyticsSettingsCard } from './AnalyticsSettingsCard'
 import { AppSoftwareSettingsCard } from './AppSoftwareSettingsCard'
 import { AppAdvancedSettingsCard } from './AppAdvancedSettingsCard'
 
-export function AppSettings(): React.Node {
+export function AppSettings(): JSX.Element {
   return (
     <Page titleBarProps={{ title: 'App' }}>
       <Box margin={SPACING_3}>

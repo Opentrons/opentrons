@@ -1,5 +1,3 @@
-// @flow
-
 import * as React from 'react'
 import cx from 'classnames'
 
@@ -25,26 +23,28 @@ import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
 const EXIT_BUTTON_MESSAGE = 'confirm pipette is leveled'
 const EXIT_WITHOUT_CAL = 'exit without calibrating'
 const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
-const LEVEL_MESSAGE = (displayName: string) => `Next, level the ${displayName}`
-const CONNECTED_MESSAGE = (displayName: string) => `${displayName} connected`
+const LEVEL_MESSAGE = (displayName: string): string =>
+  `Next, level the ${displayName}`
+const CONNECTED_MESSAGE = (displayName: string): string =>
+  `${displayName} connected`
 
-type Props = {|
-  robotName: string,
-  mount: Mount,
-  title: string,
-  subtitle: string,
-  wantedPipette: PipetteNameSpecs | null,
-  actualPipette: PipetteModelSpecs | null,
-  actualPipetteOffset: PipetteOffsetCalibration | null,
-  displayName: string,
-  displayCategory: PipetteDisplayCategory | null,
-  pipetteModelName: string,
-  back: () => mixed,
-  exit: () => mixed,
-  startPipetteOffsetCalibration: () => void,
-|}
+interface Props {
+  robotName: string
+  mount: Mount
+  title: string
+  subtitle: string
+  wantedPipette: PipetteNameSpecs | null
+  actualPipette: PipetteModelSpecs | null
+  actualPipetteOffset: PipetteOffsetCalibration | null
+  displayName: string
+  displayCategory: PipetteDisplayCategory | null
+  pipetteModelName: string
+  back: () => unknown
+  exit: () => unknown
+  startPipetteOffsetCalibration: () => void
+}
 
-function Status(props: { displayName: string }) {
+function Status(props: { displayName: string }): JSX.Element {
   const iconName = 'check-circle'
   const iconClass = cx(styles.confirm_icon, {
     [styles.success]: true,
@@ -59,7 +59,7 @@ function Status(props: { displayName: string }) {
   )
 }
 
-function LevelingInstruction(props: { displayName: string }) {
+function LevelingInstruction(props: { displayName: string }): JSX.Element {
   return (
     <div className={styles.leveling_instruction}>
       {LEVEL_MESSAGE(props.displayName)}
@@ -67,7 +67,10 @@ function LevelingInstruction(props: { displayName: string }) {
   )
 }
 
-function LevelingVideo(props: { pipetteName: string, mount: Mount }) {
+function LevelingVideo(props: {
+  pipetteName: string
+  mount: Mount
+}): JSX.Element {
   const { pipetteName, mount } = props
   return (
     <div className={styles.leveling_video_wrapper}>
@@ -85,7 +88,7 @@ function LevelingVideo(props: { pipetteName: string, mount: Mount }) {
   )
 }
 
-export function LevelPipette(props: Props): React.Node {
+export function LevelPipette(props: Props): JSX.Element {
   const {
     title,
     subtitle,

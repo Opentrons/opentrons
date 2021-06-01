@@ -1,4 +1,3 @@
-// @flow
 // play pause run buttons for sidepanel
 import * as React from 'react'
 import { OutlineButton, HoverTooltip } from '@opentrons/components'
@@ -13,20 +12,20 @@ const DOOR_OPEN_RUN = 'Please close the robot door before running this protocol'
 
 const DOOR_OPEN_RESUME = 'Please close the robot door before resuming'
 
-export type RunControlsProps = {|
-  disabled: boolean,
-  modulesReady: boolean,
-  isReadyToRun: boolean,
-  isPaused: boolean,
-  isRunning: boolean,
-  isBlocked: boolean,
-  onRunClick: () => mixed,
-  onPauseClick: () => mixed,
-  onResumeClick: () => mixed,
-  onResetClick: () => mixed,
-|}
+export interface RunControlsProps {
+  disabled: boolean
+  modulesReady: boolean
+  isReadyToRun: boolean
+  isPaused: boolean
+  isRunning: boolean
+  isBlocked: boolean
+  onRunClick: () => unknown
+  onPauseClick: () => unknown
+  onResumeClick: () => unknown
+  onResetClick: () => unknown
+}
 
-export function RunControls(props: RunControlsProps): React.Node {
+export function RunControls(props: RunControlsProps): JSX.Element {
   const {
     disabled,
     modulesReady,
@@ -45,7 +44,7 @@ export function RunControls(props: RunControlsProps): React.Node {
   const pauseResumeText = isPaused ? 'Resume' : 'Pause'
   const controlsDisabled = isConfirmCancelOpen || disabled
 
-  const handleCancelClick = () => {
+  const handleCancelClick: React.MouseEventHandler = () => {
     onPauseClick()
     setConfirmCancelOpen(true)
   }

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { AlertItem, OutlineButton } from '@opentrons/components'
@@ -8,9 +7,9 @@ import styles from './styles.css'
 
 import type { Dispatch } from '../../../redux/types'
 
-export type RestartRequiredBannerProps = {|
-  robotName: string,
-|}
+export interface RestartRequiredBannerProps {
+  robotName: string
+}
 
 // TODO(mc, 2019-10-24): i18n
 const TITLE = 'Robot restart required'
@@ -20,7 +19,7 @@ const RESTART_NOW = 'Restart Now'
 
 export function RestartRequiredBanner(
   props: RestartRequiredBannerProps
-): React.Node {
+): JSX.Element | null {
   const { robotName } = props
   const [dismissed, setDismissed] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()

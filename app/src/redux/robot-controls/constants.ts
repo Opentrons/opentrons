@@ -1,5 +1,3 @@
-// @flow
-
 // homing and move request targets
 
 export const ROBOT: 'robot' = 'robot'

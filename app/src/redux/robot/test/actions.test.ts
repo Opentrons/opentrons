@@ -1,5 +1,6 @@
 // robot actions tests
 import { actions, actionTypes } from '../'
+import type { SessionUpdate } from '../types'
 
 describe('robot actions', () => {
   it('CONNECT action', () => {
@@ -70,7 +71,8 @@ describe('robot actions', () => {
   })
 
   it('SESSION_UPDATE action', () => {
-    const update = { state: 'running', startTime: 1 }
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const update = { state: 'running', startTime: 1 } as SessionUpdate
     const expected = {
       type: 'robot:SESSION_UPDATE',
       payload: update,

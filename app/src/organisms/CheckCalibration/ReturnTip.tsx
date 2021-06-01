@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   Flex,
@@ -13,6 +12,7 @@ import uniq from 'lodash/uniq'
 
 import * as Sessions from '../../redux/sessions'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
+import type { SessionCommandString } from '../../redux/sessions/types'
 
 const CONFIRM_RETURN_BODY = 'Return tip and '
 const CONTINUE_TO_NEXT = 'continue to next pipette'
@@ -20,12 +20,14 @@ const EXIT_PROGRAM = 'see calibration health check results'
 const CONTINUE = 'continue to the next tiprack'
 const EXIT = 'continue to the result summary'
 
-export function ReturnTip(props: CalibrationPanelProps): React.Node {
+export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
   const { sendCommands, checkBothPipettes, activePipette, instruments } = props
   const onFinalPipette =
     !checkBothPipettes ||
     activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
-  let commandsList = [{ command: Sessions.checkCommands.RETURN_TIP }]
+  let commandsList: Array<{ command: SessionCommandString }> = [
+    { command: Sessions.checkCommands.RETURN_TIP },
+  ]
   if (onFinalPipette) {
     commandsList = [
       ...commandsList,
@@ -48,7 +50,7 @@ export function ReturnTip(props: CalibrationPanelProps): React.Node {
     }
   }
 
-  const confirmReturnTip = () => {
+  const confirmReturnTip = (): void => {
     sendCommands(...commandsList)
   }
   return (

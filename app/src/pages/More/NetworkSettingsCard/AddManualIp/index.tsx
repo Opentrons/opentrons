@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { LabeledButton } from '@opentrons/components'
@@ -10,7 +9,7 @@ const ADD_IP_TITLE = 'Manually Add Robot Network Addresses'
 const ADD_IP_DESCRIPTION =
   'If your app is unable to automatically discover your robot, you can manually add its IP address or hostname here'
 
-export function AddManualIp(): React.Node {
+export function AddManualIp(): JSX.Element {
   const [modalOpen, setModalOpen] = React.useState(false)
 
   return (

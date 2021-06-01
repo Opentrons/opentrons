@@ -2,10 +2,17 @@
 
 import * as ShellUpdate from '../update'
 import { shellUpdateReducer } from '../reducer'
+import type { ShellUpdateState, ShellUpdateAction } from '../types'
+import type { State } from '../../types'
 
 describe('shell/update', () => {
   describe('action creators', () => {
-    const SPECS = [
+    const SPECS: Array<{
+      name: string
+      creator: (...args: any[]) => ShellUpdateAction
+      args: any[]
+      expected: any
+    }> = [
       {
         name: 'shell:CHECK_UPDATE',
         creator: ShellUpdate.checkShellUpdate,
@@ -33,20 +40,25 @@ describe('shell/update', () => {
   })
 
   describe('reducer', () => {
-    const SPECS = [
+    const SPECS: Array<{
+      name: string
+      action: ShellUpdateAction
+      initialState: ShellUpdateState
+      expected: any
+    }> = [
       {
         name: 'handles shell:CHECK_UPDATE',
-        action: { type: 'shell:CHECK_UPDATE' },
-        initialState: { checking: false, error: { message: 'AH' } },
+        action: { type: 'shell:CHECK_UPDATE' } as any,
+        initialState: { checking: false, error: { message: 'AH' } } as any,
         expected: { checking: true, error: null },
       },
       {
         name: 'handles shell:CHECK_UPDATE_RESULT with info',
         action: {
           type: 'shell:CHECK_UPDATE_RESULT',
-          payload: { available: true, info: { version: '1.0.0' } },
+          payload: { available: true, info: { version: '1.0.0' } } as any,
         },
-        initialState: { checking: true, available: false, info: null },
+        initialState: { checking: true, available: false, info: null } as any,
         expected: {
           checking: false,
           available: true,
@@ -59,13 +71,13 @@ describe('shell/update', () => {
           type: 'shell:CHECK_UPDATE_RESULT',
           payload: { error: { message: 'AH' } },
         },
-        initialState: { checking: true, error: null },
+        initialState: { checking: true, error: null } as any,
         expected: { checking: false, error: { message: 'AH' } },
       },
       {
         name: 'handles shell:DOWNLOAD_UPDATE',
-        action: { type: 'shell:DOWNLOAD_UPDATE' },
-        initialState: { downloading: false, error: { message: 'AH' } },
+        action: { type: 'shell:DOWNLOAD_UPDATE' } as any,
+        initialState: { downloading: false, error: { message: 'AH' } } as any,
         expected: { downloading: true, error: null },
       },
       {
@@ -74,7 +86,7 @@ describe('shell/update', () => {
           type: 'shell:DOWNLOAD_UPDATE_RESULT',
           payload: {},
         },
-        initialState: { downloading: true, error: null },
+        initialState: { downloading: true, error: null } as any,
         expected: { downloading: false, downloaded: true, error: null },
       },
       {
@@ -83,7 +95,7 @@ describe('shell/update', () => {
           type: 'shell:DOWNLOAD_UPDATE_RESULT',
           payload: { error: { message: 'AH' } },
         },
-        initialState: { downloading: true, error: null },
+        initialState: { downloading: true, error: null } as any,
         expected: {
           downloading: false,
           downloaded: false,
@@ -101,13 +113,18 @@ describe('shell/update', () => {
   })
 
   describe('selectors', () => {
-    const SPECS = [
+    const SPECS: Array<{
+      name: string
+      selector: (state: State) => any
+      state: State
+      expected: unknown
+    }> = [
       {
         name: 'getAvailableShellUpdate with nothing available',
         selector: ShellUpdate.getAvailableShellUpdate,
         state: {
           shell: { update: { available: false, info: { version: '1.0.0' } } },
-        },
+        } as any,
         expected: null,
       },
       {
@@ -115,7 +132,7 @@ describe('shell/update', () => {
         selector: ShellUpdate.getAvailableShellUpdate,
         state: {
           shell: { update: { available: true, info: { version: '1.0.0' } } },
-        },
+        } as any,
         expected: '1.0.0',
       },
     ]

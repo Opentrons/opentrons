@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
@@ -89,7 +88,7 @@ const SAVE_NOZZLE_Z_AXIS = 'Save the tip length'
 const CHECK_NOZZLE_Z_AXIS = 'Check the tip length'
 const SLOT = 'slot'
 
-export function MeasureTip(props: CalibrationPanelProps): React.Node {
+export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
   const {
     sendCommands,
     calBlock,
@@ -123,7 +122,7 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
     [mount, isMulti, calBlock, sessionType]
   )
 
-  const jog = (axis: Axis, dir: Sign, step: StepSize) => {
+  const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {
@@ -138,7 +137,7 @@ export function MeasureTip(props: CalibrationPanelProps): React.Node {
   const isHealthCheck =
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
 
-  const proceed = () => {
+  const proceed = (): void => {
     isHealthCheck
       ? sendCommands(
           { command: Sessions.checkCommands.COMPARE_POINT },

@@ -1,7 +1,10 @@
-// @flow
 // mock HTTP responses for pipettes endpoints
 
 import type { PipetteSettings } from '../types'
+import type {
+  RobotApiResponse,
+  RobotApiResponseMeta,
+} from '../../robot-api/types'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
@@ -24,14 +27,14 @@ export const mockUnattachedPipette = {
   plunger_axis: 'b',
 }
 
-export const mockFetchPipettesSuccessMeta = {
+export const mockFetchPipettesSuccessMeta: RobotApiResponseMeta = {
   method: 'GET',
   path: '/pipettes',
   ok: true,
   status: 200,
 }
 
-export const mockFetchPipettesSuccess = {
+export const mockFetchPipettesSuccess: RobotApiResponse = {
   ...mockFetchPipettesSuccessMeta,
   host: mockRobot,
   body: {
@@ -40,14 +43,14 @@ export const mockFetchPipettesSuccess = {
   },
 }
 
-export const mockFetchPipettesFailureMeta = {
+export const mockFetchPipettesFailureMeta: RobotApiResponseMeta = {
   method: 'GET',
   path: '/pipettes',
   ok: false,
   status: 500,
 }
 
-export const mockFetchPipettesFailure = {
+export const mockFetchPipettesFailure: RobotApiResponse = {
   ...mockFetchPipettesFailureMeta,
   host: mockRobot,
   body: { message: 'AH' },
@@ -57,33 +60,32 @@ export const mockFetchPipettesFailure = {
 
 export const mockPipetteSettings: PipetteSettings = {
   info: { name: 'p300_single_gen2', model: 'p300_single_v2.0' },
-  fields: { [('fieldId': string)]: { value: 42, default: 42 } },
+  fields: { fieldId: { value: 42, default: 42 } },
 }
 
-export const mockFetchPipetteSettingsSuccessMeta = {
+export const mockFetchPipetteSettingsSuccessMeta: RobotApiResponseMeta = {
   method: 'GET',
   path: '/pipettes/settings',
   ok: true,
   status: 200,
 }
 
-export const mockFetchPipetteSettingsSuccess = {
+export const mockFetchPipetteSettingsSuccess: RobotApiResponse = {
   ...mockFetchPipetteSettingsSuccessMeta,
   host: mockRobot,
-  body: ({ abc: mockPipetteSettings }: {
-    [string]: PipetteSettings,
-    ...
-  }),
+  body: { abc: mockPipetteSettings } as {
+    [key: string]: PipetteSettings
+  },
 }
 
-export const mockFetchPipetteSettingsFailureMeta = {
+export const mockFetchPipetteSettingsFailureMeta: RobotApiResponseMeta = {
   method: 'GET',
   path: '/pipettes/settings',
   ok: false,
   status: 500,
 }
 
-export const mockFetchPipetteSettingsFailure = {
+export const mockFetchPipetteSettingsFailure: RobotApiResponse = {
   ...mockFetchPipetteSettingsFailureMeta,
   host: mockRobot,
   body: { message: 'AH' },
@@ -91,27 +93,27 @@ export const mockFetchPipetteSettingsFailure = {
 
 // update pipette settings fixtures
 
-export const mockUpdatePipetteSettingsSuccessMeta = {
+export const mockUpdatePipetteSettingsSuccessMeta: RobotApiResponseMeta = {
   method: 'PATCH',
   path: '/pipettes/settings/abc',
   ok: true,
   status: 200,
 }
 
-export const mockUpdatePipetteSettingsSuccess = {
+export const mockUpdatePipetteSettingsSuccess: RobotApiResponse = {
   ...mockUpdatePipetteSettingsSuccessMeta,
   host: mockRobot,
   body: { fields: mockPipetteSettings.fields },
 }
 
-export const mockUpdatePipetteSettingsFailureMeta = {
+export const mockUpdatePipetteSettingsFailureMeta: RobotApiResponseMeta = {
   method: 'PATCH',
   path: '/pipettes/settings/abc',
   ok: false,
   status: 500,
 }
 
-export const mockUpdatePipetteSettingsFailure = {
+export const mockUpdatePipetteSettingsFailure: RobotApiResponse = {
   ...mockUpdatePipetteSettingsFailureMeta,
   host: mockRobot,
   body: { message: 'AH' },

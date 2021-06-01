@@ -1,4 +1,3 @@
-// @flow
 import { GET } from '../../../robot-api'
 import {
   makeResponseFixtures,
@@ -61,7 +60,7 @@ export const {
   failure: mockFetchLabwareCalibrationFailure,
 }: ResponseFixtures<
   AllLabwareCalibrations,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: GET,
   path: LABWARE_CALIBRATION_PATH,

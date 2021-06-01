@@ -1,8 +1,9 @@
-// @flow
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { networkingEpic } from '..'
+
+import type { Action } from '../../../types'
 
 const makeTriggerAction = (robotName: string) =>
   Actions.postWifiDisconnect(robotName, 'network-name')
@@ -18,7 +19,7 @@ describe('networking disconnectEpic', () => {
       Fixtures.mockNetworkingDisconnectSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
@@ -80,7 +81,7 @@ describe('networking disconnectEpic', () => {
 
   it('dispatches FETCH_WIFI_LIST on POST_WIFI_DISCONNECT_SUCCESS', () => {
     const mocks = setupEpicTestMocks(robotName =>
-      Actions.postWifiDisconnectSuccess(robotName, {})
+      Actions.postWifiDisconnectSuccess(robotName, {} as any)
     )
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {

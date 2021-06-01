@@ -1,11 +1,15 @@
 // connection reducer tests
 import { robotReducer as reducer } from '../'
 
-const getState = state => state.connection
+import type { Action } from '../../types'
+import type { RobotState } from '../reducer'
+import type { ConnectionState } from '../reducer/connection'
+
+const getState = (state: RobotState): ConnectionState => state.connection
 
 describe('robot reducer - connection', () => {
   it('initial state', () => {
-    const state = reducer(undefined, {})
+    const state = reducer(undefined, {} as any)
 
     expect(getState(state)).toEqual({
       connectedTo: null,
@@ -16,7 +20,7 @@ describe('robot reducer - connection', () => {
   })
 
   it('handles CONNECT action', () => {
-    const state = {
+    const state: RobotState = {
       connection: {
         connectedTo: null,
         connectRequest: {
@@ -25,10 +29,11 @@ describe('robot reducer - connection', () => {
           name: '',
         },
       },
-    }
-    const action = {
+    } as any
+    const action: Action = {
       type: 'robot:CONNECT',
       payload: { name: 'ot' },
+      meta: {} as any,
     }
 
     expect(getState(reducer(state, action))).toEqual({
@@ -38,7 +43,7 @@ describe('robot reducer - connection', () => {
   })
 
   it('handles CONNECT action if connect already in flight', () => {
-    const state = {
+    const state: RobotState = {
       connection: {
         connectedTo: null,
         connectRequest: {
@@ -47,10 +52,11 @@ describe('robot reducer - connection', () => {
           name: 'ot',
         },
       },
-    }
-    const action = {
+    } as any
+    const action: Action = {
       type: 'robot:CONNECT',
       payload: { name: 'someone-else' },
+      meta: {} as any,
     }
 
     expect(getState(reducer(state, action))).toEqual({
@@ -60,7 +66,7 @@ describe('robot reducer - connection', () => {
   })
 
   it('handles CONNECT_RESPONSE success', () => {
-    const state = {
+    const state: RobotState = {
       connection: {
         connectedTo: null,
         connectRequest: {
@@ -69,8 +75,11 @@ describe('robot reducer - connection', () => {
           name: 'ot',
         },
       },
+    } as any
+    const action: Action = {
+      type: 'robot:CONNECT_RESPONSE',
+      payload: {} as any,
     }
-    const action = { type: 'robot:CONNECT_RESPONSE', payload: {} }
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: 'ot',
@@ -79,7 +88,7 @@ describe('robot reducer - connection', () => {
   })
 
   it('handles CONNECT_RESPONSE failure', () => {
-    const state = {
+    const state: RobotState = {
       connection: {
         connectedTo: null,
         connectRequest: {
@@ -88,10 +97,10 @@ describe('robot reducer - connection', () => {
           name: 'ot',
         },
       },
-    }
-    const action = {
+    } as any
+    const action: Action = {
       type: 'robot:CONNECT_RESPONSE',
-      payload: { error: new Error('AH') },
+      payload: { error: new Error('AH') } as any,
     }
 
     expect(getState(reducer(state, action))).toEqual({
@@ -105,7 +114,7 @@ describe('robot reducer - connection', () => {
   })
 
   it('handles CLEAR_CONNECT_RESPONSE action', () => {
-    const state = {
+    const state: RobotState = {
       connection: {
         connectedTo: null,
         connectRequest: {
@@ -114,9 +123,12 @@ describe('robot reducer - connection', () => {
           name: 'ot',
         },
       },
-    }
+    } as any
 
-    const action = { type: 'robot:CLEAR_CONNECT_RESPONSE', error: false }
+    const action: Action = {
+      type: 'robot:CLEAR_CONNECT_RESPONSE',
+      error: false,
+    }
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: null,
@@ -125,7 +137,7 @@ describe('robot reducer - connection', () => {
   })
 
   it('handles DISCONNECT action', () => {
-    const state = {
+    const state: RobotState = {
       connection: {
         connectedTo: 'ot',
         disconnectRequest: {
@@ -134,8 +146,8 @@ describe('robot reducer - connection', () => {
           name: '',
         },
       },
-    }
-    const action = { type: 'robot:DISCONNECT' }
+    } as any
+    const action: Action = { type: 'robot:DISCONNECT', meta: {} as any }
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: 'ot',
@@ -144,14 +156,14 @@ describe('robot reducer - connection', () => {
   })
 
   it('handles DISCONNECT_RESPONSE', () => {
-    const state = {
+    const state: RobotState = {
       connection: {
         connectedTo: 'ot',
         disconnectRequest: { inProgress: true, error: null },
         unexpectedDisconnect: true,
       },
-    }
-    const action = { type: 'robot:DISCONNECT_RESPONSE', payload: {} }
+    } as any
+    const action: Action = { type: 'robot:DISCONNECT_RESPONSE', payload: {} }
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: null,

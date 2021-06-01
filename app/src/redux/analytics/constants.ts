@@ -1,5 +1,3 @@
-// @flow
-
 export const ANALYTICS_PIPETTE_OFFSET_STARTED: 'analytics:PIPETTE_OFFSET_STARTED' =
   'analytics:PIPETTE_OFFSET_STARTED'
 export const ANALYTICS_TIP_LENGTH_STARTED: 'analytics:TIP_LENGTH_STARTED' =

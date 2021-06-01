@@ -1,16 +1,15 @@
-// @flow
 import * as Actions from '../actions'
 import type { RobotApiAction } from '../types'
 
-type ActionSpec = {|
-  name: string,
-  creator: (...Array<any>) => mixed,
-  args: Array<mixed>,
-  expected: RobotApiAction,
-|}
+interface ActionSpec {
+  name: string
+  creator: (...args: any[]) => unknown
+  args: unknown[]
+  expected: RobotApiAction
+}
 
 describe('robot admin actions', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'robotApi:DISMISS_REQUEST',
       creator: Actions.dismissRequest,

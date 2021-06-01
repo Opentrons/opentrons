@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { mountWithStore } from '@opentrons/components/__utils__'
@@ -30,18 +29,21 @@ jest.mock('../../UpdateAppModal', () => ({
 
 jest.mock('../../../redux/alerts/selectors')
 
-const getActiveAlerts: JestMockFn<[State], $ReadOnlyArray<AlertId>> =
-  AppAlerts.getActiveAlerts
+const getActiveAlerts = AppAlerts.getActiveAlerts as jest.MockedFunction<
+  typeof AppAlerts.getActiveAlerts
+>
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = { mockState: true } as any
 
 describe('app-wide Alerts component', () => {
   const render = () => {
-    return mountWithStore(<Alerts />, { initialState: MOCK_STATE })
+    return mountWithStore<React.ComponentProps<typeof Alerts>>(<Alerts />, {
+      initialState: MOCK_STATE,
+    })
   }
 
-  const stubActiveAlerts = alertIds => {
-    getActiveAlerts.mockImplementation(state => {
+  const stubActiveAlerts = (alertIds: AlertId[]): void => {
+    getActiveAlerts.mockImplementation((state: State): AlertId[] => {
       expect(state).toEqual(MOCK_STATE)
       return alertIds
     })
@@ -77,7 +79,7 @@ describe('app-wide Alerts component', () => {
     refresh()
     expect(wrapper.exists(U2EDriverOutdatedAlert)).toBe(true)
 
-    wrapper.find(U2EDriverOutdatedAlert).invoke('dismissAlert')(true)
+    wrapper.find(U2EDriverOutdatedAlert).invoke('dismissAlert')?.(true)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       AppAlerts.alertDismissed(AppAlerts.ALERT_U2E_DRIVER_OUTDATED, true)
@@ -92,7 +94,7 @@ describe('app-wide Alerts component', () => {
     refresh()
     expect(wrapper.exists(UpdateAppModal)).toBe(true)
 
-    wrapper.find(UpdateAppModal).invoke('dismissAlert')(true)
+    wrapper.find(UpdateAppModal).invoke('dismissAlert')?.(true)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       AppAlerts.alertDismissed(AppAlerts.ALERT_APP_UPDATE_AVAILABLE, true)

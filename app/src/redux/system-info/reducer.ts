@@ -1,8 +1,8 @@
-// @flow
 // system-info reducer
 
 import * as Constants from './constants'
 
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { SystemInfoState } from './types'
 
@@ -11,10 +11,10 @@ const INITIAL_STATE: SystemInfoState = {
   networkInterfaces: [],
 }
 
-export function systemInfoReducer(
-  state: SystemInfoState = INITIAL_STATE,
-  action: Action
-): SystemInfoState {
+export const systemInfoReducer: Reducer<SystemInfoState, Action> = (
+  state = INITIAL_STATE,
+  action
+) => {
   switch (action.type) {
     case Constants.INITIALIZED: {
       const { usbDevices, networkInterfaces } = action.payload

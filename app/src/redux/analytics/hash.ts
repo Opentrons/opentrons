@@ -1,4 +1,3 @@
-// @flow
 // hash strings for an amount of anonymity
 // note: values will be _hashed_, not _enctrypted_; hashed values should not be
 // considered secure nor should they ever be released publicly
@@ -9,7 +8,7 @@ export function hash(source: string): Promise<string> {
   const data = encoder.encode(source)
 
   // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
-  return global.crypto.subtle
+  return (global.crypto as any).subtle
     .digest(ALGORITHM, data)
     .then((digest: ArrayBuffer) => arrayBufferToHex(digest))
 }

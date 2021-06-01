@@ -1,4 +1,3 @@
-// @flow
 // app info card with version and updated
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -34,7 +33,7 @@ const VERSION_LABEL = 'Software Version'
 const UPDATE_AVAILABLE = 'view available update'
 const UPDATE_NOT_AVAILABLE = 'up to date'
 
-export function AppSoftwareSettingsCard(): React.Node {
+export function AppSoftwareSettingsCard(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const [showUpdateModal, setShowUpdateModal] = React.useState(false)
   const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))

@@ -1,4 +1,3 @@
-// @flow
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { findLabwareDefWithCustom } from '../../../assets/labware/findLabware'
 
@@ -8,7 +7,7 @@ const UNKNOWN_CUSTOM_LABWARE = 'unknown custom tiprack'
 
 export function getDisplayNameForTipRack(
   tiprackUri: string,
-  customLabware: Array<LabwareDefinition2>
+  customLabware: LabwareDefinition2[]
 ): string {
   const [namespace, loadName] = tiprackUri ? tiprackUri.split('/') : ['', '']
   const definition = findLabwareDefWithCustom(

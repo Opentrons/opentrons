@@ -1,5 +1,3 @@
-// @flow
-
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -24,7 +22,7 @@ export const fetchLightsSuccess = (
 
 export const fetchLightsFailure = (
   robotName: string,
-  error: {| message: string |},
+  error: { message: string },
   meta: RobotApiRequestMeta
 ): Types.FetchLightsFailureAction => ({
   type: Constants.FETCH_LIGHTS_FAILURE,
@@ -38,7 +36,8 @@ export const updateLights = (
 ): Types.UpdateLightsAction => ({
   type: Constants.UPDATE_LIGHTS,
   payload: { robotName, lightsOn },
-  meta: {},
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const updateLightsSuccess = (
@@ -53,7 +52,7 @@ export const updateLightsSuccess = (
 
 export const updateLightsFailure = (
   robotName: string,
-  error: {| message: string |},
+  error: { message: string },
   meta: RobotApiRequestMeta
 ): Types.UpdateLightsFailureAction => ({
   type: Constants.UPDATE_LIGHTS_FAILURE,
@@ -67,7 +66,11 @@ type HomeActionCreator = ((
 ) => Types.HomeAction) &
   ((robotName: string, target: 'pipette', mount: Mount) => Types.HomeAction)
 
-export const home: HomeActionCreator = (robotName, target, mount) => ({
+export const home: HomeActionCreator = (
+  robotName: string,
+  target: 'robot' | 'pipette',
+  mount?: Mount
+): Types.HomeAction => ({
   type: Constants.HOME,
   payload:
     target === Constants.PIPETTE && typeof mount === 'string'
@@ -87,7 +90,7 @@ export const homeSuccess = (
 
 export const homeFailure = (
   robotName: string,
-  error: {| message: string |},
+  error: { message: string },
   meta: RobotApiRequestMeta
 ): Types.HomeFailureAction => ({
   type: Constants.HOME_FAILURE,
@@ -117,7 +120,7 @@ export const moveSuccess = (
 
 export const moveFailure = (
   robotName: string,
-  error: {| message: string |},
+  error: { message: string },
   meta: RobotApiRequestMeta
 ): Types.MoveFailureAction => ({
   type: Constants.MOVE_FAILURE,

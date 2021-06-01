@@ -1,4 +1,3 @@
-// @flow
 import { combineEpics } from 'redux-observable'
 
 import { fetchEapOptionsEpic } from './fetchEapOptionsEpic'
@@ -11,7 +10,7 @@ import { disconnectEpic } from './disconnectEpic'
 
 import type { Epic } from '../../types'
 
-export const networkingEpic: Epic = combineEpics(
+export const networkingEpic: Epic = combineEpics<Epic>(
   fetchEapOptionsEpic,
   fetchWifiKeysEpic,
   postWifiKeysEpic,

@@ -1,115 +1,107 @@
-// @flow
 import type { LogLevel } from '../../logger'
 
 export type UrlProtocol = 'file:' | 'http:'
 
 export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
-export type DiscoveryCandidates = string | Array<string>
+export type DiscoveryCandidates = string | string[]
 
 export type DevInternalFlag = 'allPipetteConfig' | 'enableBundleUpload'
 
-export type FeatureFlags = $Shape<{|
-  [DevInternalFlag]: boolean | void,
-|}>
+export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
-export type ConfigV0 = $ReadOnly<{|
-  version: 0,
-  devtools: boolean,
-  reinstallDevtools: boolean,
+export interface ConfigV0 {
+  version: 0
+  devtools: boolean
+  reinstallDevtools: boolean
 
   // app update config
-  update: $ReadOnly<{|
-    channel: UpdateChannel,
-  |}>,
+  update: {
+    channel: UpdateChannel
+  }
 
   // robot update config
-  buildroot: $ReadOnly<{|
-    manifestUrl: string,
-  |}>,
+  buildroot: {
+    manifestUrl: string
+  }
 
   // logging config
-  log: $ReadOnly<{|
-    level: $ReadOnly<{|
-      file: LogLevel,
-      console: LogLevel,
-    |}>,
-  |}>,
+  log: {
+    level: {
+      file: LogLevel
+      console: LogLevel
+    }
+  }
 
   // ui and browser config
-  ui: $ReadOnly<{|
-    width: number,
-    height: number,
-    url: $ReadOnly<{|
-      protocol: UrlProtocol,
-      path: string,
-    |}>,
-    webPreferences: $ReadOnly<{|
-      webSecurity: boolean,
-    |}>,
-  |}>,
+  ui: {
+    width: number
+    height: number
+    url: {
+      protocol: UrlProtocol
+      path: string
+    }
+    webPreferences: {
+      webSecurity: boolean
+    }
+  }
 
-  analytics: $ReadOnly<{|
-    appId: string,
-    optedIn: boolean,
-    seenOptIn: boolean,
-  |}>,
+  analytics: {
+    appId: string
+    optedIn: boolean
+    seenOptIn: boolean
+  }
 
   // deprecated
-  p10WarningSeen: $ReadOnly<{
-    [id: string]: ?boolean,
-    ...
-  }>,
+  p10WarningSeen: {
+    [id: string]: boolean | null | undefined
+  }
 
-  support: $ReadOnly<{|
-    userId: string,
-    createdAt: number,
-    name: string,
-    email: ?string,
-  |}>,
+  support: {
+    userId: string
+    createdAt: number
+    name: string
+    email: string | null | undefined
+  }
 
-  discovery: $ReadOnly<{|
-    candidates: DiscoveryCandidates,
-  |}>,
+  discovery: {
+    candidates: DiscoveryCandidates
+  }
 
   // custom labware files
-  labware: $ReadOnly<{|
-    directory: string,
-  |}>,
+  labware: {
+    directory: string
+  }
 
   // app wide alerts
-  alerts: $ReadOnly<{| ignored: $ReadOnlyArray<string> |}>,
+  alerts: { ignored: string[] }
 
   // internal development flags
-  devInternal?: $ReadOnly<FeatureFlags>,
-|}>
+  devInternal?: FeatureFlags
+}
 
-export type ConfigV1 = $ReadOnly<{|
-  ...ConfigV0,
-  version: 1,
-  discovery: $ReadOnly<{|
-    candidates: DiscoveryCandidates,
-    disableCache: boolean,
-  |}>,
-|}>
+export interface ConfigV1 extends Omit<ConfigV0, 'version' | 'discovery'> {
+  version: 1
+  discovery: {
+    candidates: DiscoveryCandidates
+    disableCache: boolean
+  }
+}
 
-export type ConfigV2 = $ReadOnly<{|
-  ...ConfigV1,
-  version: 2,
-  calibration: $ReadOnly<{|
-    useTrashSurfaceForTipCal: boolean | null,
-  |}>,
-|}>
+export interface ConfigV2 extends Omit<ConfigV1, 'version'> {
+  version: 2
+  calibration: {
+    useTrashSurfaceForTipCal: boolean | null
+  }
+}
 
 // v3 config changes default values but does not change schema
-export type ConfigV3 = $ReadOnly<{|
-  ...ConfigV2,
-  version: 3,
-  support: $ReadOnly<{|
-    ...$PropertyType<ConfigV2, 'support'>,
-    name: string | null,
-    email: string | null,
-  |}>,
-|}>
+export interface ConfigV3 extends Omit<ConfigV2, 'version' | 'support'> {
+  version: 3
+  support: ConfigV2['support'] & {
+    name: string | null
+    email: string | null
+  }
+}
 
 export type Config = ConfigV3

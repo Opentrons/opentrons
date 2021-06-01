@@ -1,4 +1,3 @@
-// @flow
 // Pipette Offset Calibration Orchestration Component
 import * as React from 'react'
 
@@ -31,9 +30,10 @@ import {
   MeasureTip,
 } from '../../organisms/CalibrationPanels'
 
-import type { StyleProps } from '@opentrons/components'
+import type { StyleProps, Mount } from '@opentrons/components'
 import type {
   CalibrationLabware,
+  CalibrationSessionStep,
   SessionCommandParams,
 } from '../../redux/sessions/types'
 import type { CalibratePipetteOffsetParentProps } from './types'
@@ -67,9 +67,9 @@ const terminalContentsStyleProps = {
   paddingX: '1.5rem',
 }
 
-const PANEL_BY_STEP: {
-  [string]: React.ComponentType<CalibrationPanelProps>,
-} = {
+const PANEL_BY_STEP: Partial<
+  Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>
+> = {
   [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: Introduction,
   [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: DeckSetup,
   [Sessions.PIP_OFFSET_STEP_MEASURING_NOZZLE_OFFSET]: MeasureNozzle,
@@ -82,9 +82,9 @@ const PANEL_BY_STEP: {
   [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
 }
 
-const PANEL_STYLE_PROPS_BY_STEP: {
-  [string]: StyleProps,
-} = {
+const PANEL_STYLE_PROPS_BY_STEP: Partial<
+  Record<CalibrationSessionStep, StyleProps>
+> = {
   [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: terminalContentsStyleProps,
   [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: darkContentsStyleProps,
   [Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE]: contentsStyleProps,
@@ -96,7 +96,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 }
 export function CalibratePipetteOffset(
   props: CalibratePipetteOffsetParentProps
-): React.Node {
+): JSX.Element | null {
   const {
     session,
     robotName,
@@ -127,7 +127,7 @@ export function CalibratePipetteOffset(
     return spec ? spec.channels > 1 : false
   }, [instrument])
 
-  function sendCommands(...commands: Array<SessionCommandParams>) {
+  function sendCommands(...commands: SessionCommandParams[]): void {
     if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
@@ -139,7 +139,7 @@ export function CalibratePipetteOffset(
     }
   }
 
-  function cleanUpAndExit() {
+  function cleanUpAndExit(): void {
     if (session?.id) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
@@ -166,11 +166,13 @@ export function CalibratePipetteOffset(
     return <SpinnerModalPage key={instrument?.mount} titleBar={titleBarProps} />
   }
 
+  // @ts-expect-error TODO protect against currentStep === undefined
   const Panel = PANEL_BY_STEP[currentStep]
   return Panel ? (
     <>
       <ModalPage
         titleBar={titleBarProps}
+        // @ts-expect-error TODO protect against currentStep === undefined
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
         key={instrument?.mount}
       >
@@ -179,7 +181,7 @@ export function CalibratePipetteOffset(
           cleanUpAndExit={cleanUpAndExit}
           tipRack={tipRack}
           isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase()}
+          mount={instrument?.mount.toLowerCase() as Mount}
           calBlock={calBlock}
           currentStep={currentStep}
           sessionType={session.sessionType}

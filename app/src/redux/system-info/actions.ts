@@ -1,12 +1,11 @@
-// @flow
 // system-info actions
 
 import * as Constants from './constants'
 import * as Types from './types'
 
 export const initialized = (
-  usbDevices: Array<Types.UsbDevice>,
-  networkInterfaces: Array<Types.NetworkInterface>
+  usbDevices: Types.UsbDevice[],
+  networkInterfaces: Types.NetworkInterface[]
 ): Types.InitializedAction => ({
   type: Constants.INITIALIZED,
   payload: { usbDevices, networkInterfaces },
@@ -27,7 +26,7 @@ export const usbDeviceRemoved = (
 })
 
 export const networkInterfacesChanged = (
-  networkInterfaces: Array<Types.NetworkInterface>
+  networkInterfaces: Types.NetworkInterface[]
 ): Types.NetworkInterfacesChangedAction => ({
   type: Constants.NETWORK_INTERFACES_CHANGED,
   payload: { networkInterfaces },

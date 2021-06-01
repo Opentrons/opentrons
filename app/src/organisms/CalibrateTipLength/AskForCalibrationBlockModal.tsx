@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   Box,
@@ -43,18 +42,18 @@ const REMEMBER = "Remember my selection for next time and don't ask again"
 const BLOCK_REQUEST_URL = 'https://opentrons-ux.typeform.com/to/DgvBE9Ir'
 const CAL_BLOCK_LOAD_NAME = 'opentrons_calibrationblock_short_side_right'
 
-type Props = {|
-  onResponse: (hasBlock: boolean) => void,
-  titleBarTitle: string,
-  closePrompt: () => void,
-|}
-export function AskForCalibrationBlockModal(props: Props): React.Node {
+interface Props {
+  onResponse: (hasBlock: boolean) => void
+  titleBarTitle: string
+  closePrompt: () => void
+}
+export function AskForCalibrationBlockModal(props: Props): JSX.Element {
   const [rememberPreference, setRememberPreference] = React.useState<boolean>(
     false
   )
   const dispatch = useDispatch<Dispatch>()
 
-  const makeSetHasBlock = hasBlock => () => {
+  const makeSetHasBlock = (hasBlock: boolean) => (): void => {
     if (rememberPreference) {
       dispatch(setUseTrashSurfaceForTipCal(!hasBlock))
     }
@@ -103,7 +102,9 @@ export function AskForCalibrationBlockModal(props: Props): React.Node {
         <Box css={FONT_BODY_2_DARK} marginX="1rem">
           <Flex marginLeft="1px" marginBottom={SPACING_3}>
             <CheckboxField
-              onChange={e => setRememberPreference(e.currentTarget.checked)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setRememberPreference(e.currentTarget.checked)
+              }
               value={rememberPreference}
             />
             <Text marginLeft={SPACING_2}>{REMEMBER}</Text>

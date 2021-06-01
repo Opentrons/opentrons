@@ -1,4 +1,3 @@
-// @flow
 import { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { sendModuleCommand } from './actions'
@@ -15,14 +14,14 @@ import type { ModuleCommand } from './types'
 export const useSendModuleCommand = (): ((
   moduleId: string,
   command: ModuleCommand,
-  args?: Array<mixed>
+  args?: unknown[]
 ) => void) => {
   const robotName = useSelector(getConnectedRobotName)
   const dispatch = useDispatch<Dispatch>()
   const log = useLogger(__dirname)
 
   return useCallback(
-    (moduleId: string, command: ModuleCommand, args?: Array<mixed>) => {
+    (moduleId: string, command: ModuleCommand, args?: unknown[]) => {
       if (robotName !== null) {
         dispatch(sendModuleCommand(robotName, moduleId, command, args))
       } else {

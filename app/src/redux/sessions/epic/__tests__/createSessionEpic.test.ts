@@ -1,11 +1,12 @@
-// @flow
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
 
-const makeTriggerAction = robotName =>
+import type { Action } from '../../../types'
+
+const makeTriggerAction = (robotName: string) =>
   Actions.createSession(robotName, 'calibrationCheck')
 
 describe('createSessionEpic', () => {
@@ -30,7 +31,7 @@ describe('createSessionEpic', () => {
       Fixtures.mockCreateSessionSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('a-a', { a: mocks.state })
       const output$ = sessionsEpic(action$, state$)
@@ -51,7 +52,7 @@ describe('createSessionEpic', () => {
       Fixtures.mockCreateSessionSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
@@ -72,7 +73,7 @@ describe('createSessionEpic', () => {
       Fixtures.mockCreateSessionFailure
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)

@@ -1,9 +1,9 @@
-// @flow
 import * as Constants from './constants'
 import * as labware from './labware'
 import * as pipetteOffset from './pipette-offset'
 import * as tipLength from './tip-length'
 
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { CalibrationState, PerRobotCalibrationState } from './types'
 
@@ -16,10 +16,10 @@ const INITIAL_PER_ROBOT_STATE: PerRobotCalibrationState = {
   tipLengthCalibrations: null,
 }
 
-export function calibrationReducer(
-  state: CalibrationState = INITIAL_STATE,
-  action: Action
-): CalibrationState {
+export const calibrationReducer: Reducer<CalibrationState, Action> = (
+  state = INITIAL_STATE,
+  action
+) => {
   switch (action.type) {
     case Constants.FETCH_CALIBRATION_STATUS_SUCCESS: {
       const { robotName, calibrationStatus } = action.payload

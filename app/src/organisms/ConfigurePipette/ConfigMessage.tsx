@@ -1,9 +1,8 @@
-// @flow
 import * as React from 'react'
 import styles from './styles.css'
 
 // TODO (ka 2019-2-12): Add intercom onClick to assistance text
-export function ConfigMessage(): React.Node {
+export function ConfigMessage(): JSX.Element {
   return (
     <div className={styles.config_message}>
       <h3 className={styles.warning_title}>Warning:</h3>

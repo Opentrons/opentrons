@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import type {
@@ -13,19 +12,18 @@ import styles from './styles.css'
 
 type Diagram = 'screws' | 'tab'
 
-type DiagramProps = {|
-  direction: Direction,
-  mount: Mount,
-  channels: PipetteChannels,
-  diagram: Diagram,
-  displayCategory: PipetteDisplayCategory | null,
-|}
+interface DiagramProps {
+  direction: Direction
+  mount: Mount
+  channels: PipetteChannels
+  diagram: Diagram
+  displayCategory: PipetteDisplayCategory | null
+}
 
-type Props = {|
-  ...DiagramProps,
-  step: 'one' | 'two',
-  children: React.Node,
-|}
+interface Props extends DiagramProps {
+  step: 'one' | 'two'
+  children: React.ReactNode
+}
 
 export function getDiagramsSrc(props: DiagramProps): string {
   const { channels, displayCategory, direction, mount, diagram } = props
@@ -36,7 +34,7 @@ export function getDiagramsSrc(props: DiagramProps): string {
     : require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
 }
 
-export function InstructionStep(props: Props): React.Node {
+export function InstructionStep(props: Props): JSX.Element {
   const { step, children, ...diagramProps } = props
 
   return (

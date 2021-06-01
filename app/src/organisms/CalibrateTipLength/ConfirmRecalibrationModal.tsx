@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import {
@@ -33,13 +32,13 @@ const CANCEL = 'cancel'
 // TODO: This link needs to be real(er)
 const CALIBRATION_URL = 'https://support.opentrons.com/en/articles/4523313'
 
-type Props = {|
-  confirm: () => mixed,
-  cancel: () => mixed,
-  tiprackDisplayName: string,
-|}
+interface Props {
+  confirm: () => unknown
+  cancel: () => unknown
+  tiprackDisplayName: string
+}
 
-export function ConfirmRecalibrationModal(props: Props): React.Node {
+export function ConfirmRecalibrationModal(props: Props): JSX.Element {
   const { confirm, cancel, tiprackDisplayName } = props
 
   return (

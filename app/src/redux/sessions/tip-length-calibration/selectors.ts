@@ -1,4 +1,3 @@
-// @flow
 import type { State } from '../../types'
 import { SESSION_TYPE_TIP_LENGTH_CALIBRATION } from '../constants'
 import type { Session, TipLengthCalibrationSession } from '../types'

@@ -1,15 +1,14 @@
-// @flow
 import * as React from 'react'
 
 import { AlertModal, Text } from '@opentrons/components'
 import * as Sessions from '../../redux/sessions'
 import type { SessionType } from '../../redux/sessions/types'
 
-export type ConfirmExitModalProps = {|
-  back: () => mixed,
-  exit: () => mixed,
-  sessionType: SessionType,
-|}
+export interface ConfirmExitModalProps {
+  back: () => unknown
+  exit: () => unknown
+  sessionType: SessionType
+}
 
 const HEADING = 'Are you sure?'
 const GO_BACK = 'no, go back'
@@ -17,7 +16,7 @@ const EXIT = 'yes, exit now'
 const ARE_YOU_SURE = 'Are you sure you want to exit'
 const NOW = 'now?'
 
-const sessionNameBySessionType: { [SessionType]: string } = {
+const sessionNameBySessionType: Record<SessionType, string> = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: 'Deck Calibration',
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]:
     'Pipette Offset Calibration',
@@ -25,7 +24,7 @@ const sessionNameBySessionType: { [SessionType]: string } = {
   [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]: 'Calibration Health Check',
 }
 
-const warningBySessionType: { [SessionType]: string } = {
+const warningBySessionType: Record<SessionType, string> = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]:
     'Doing so will return the pipette tip and exit deck calibration.',
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]:
@@ -36,7 +35,7 @@ const warningBySessionType: { [SessionType]: string } = {
     'If you exit now, you will not get any data about your calibration health.',
 }
 
-export function ConfirmExitModal(props: ConfirmExitModalProps): React.Node {
+export function ConfirmExitModal(props: ConfirmExitModalProps): JSX.Element {
   const { back, exit, sessionType } = props
 
   return (

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -27,7 +26,7 @@ const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
 
 const EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLED = 'appUpdateNotificationsToggled'
 
-export function UpdateNotificationsControl(props: StyleProps): React.Node {
+export function UpdateNotificationsControl(props: StyleProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()
 
@@ -37,7 +36,7 @@ export function UpdateNotificationsControl(props: StyleProps): React.Node {
     return ignored !== null ? !ignored : null
   })
 
-  const handleToggle = () => {
+  const handleToggle = (): void => {
     if (enabled !== null) {
       dispatch(
         enabled

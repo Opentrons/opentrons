@@ -1,5 +1,3 @@
-// @flow
-
 // session steps
 
 export const PREMIGRATION: 'premigration' = 'premigration'

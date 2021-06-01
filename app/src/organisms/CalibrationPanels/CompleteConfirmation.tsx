@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
@@ -16,15 +15,19 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import type { CalibrationPanelProps } from './types'
-import type { SessionType } from '../../redux/sessions/types'
 import * as Sessions from '../../redux/sessions'
 
 import slotOneRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
 import slotThreeRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
 import { NeedHelpLink } from './NeedHelpLink'
 
-const assetBySlot = {
+import type { CalibrationPanelProps } from './types'
+import type {
+  SessionType,
+  CalibrationLabware,
+} from '../../redux/sessions/types'
+
+const assetBySlot: { [slot in CalibrationLabware['slot']]: string } = {
   '1': slotOneRemoveBlockAsset,
   '3': slotThreeRemoveBlockAsset,
 }
@@ -37,7 +40,9 @@ const PROCEED_TO_DECK = 'Continue to slot 5'
 const EXIT = 'exit'
 const PROCEED_TO_PIP_OFFSET = 'continue to Pipette Offset Calibration'
 
-const contentsBySessionType: { [SessionType]: { headerText: string } } = {
+const contentsBySessionType: Partial<
+  Record<SessionType, { headerText: string }>
+> = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: { headerText: DECK_CAL_HEADER },
   [Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION]: {
     headerText: PIP_OFFSET_CAL_HEADER,
@@ -47,7 +52,9 @@ const contentsBySessionType: { [SessionType]: { headerText: string } } = {
   },
 }
 
-export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
+export function CompleteConfirmation(
+  props: CalibrationPanelProps
+): JSX.Element {
   const {
     sessionType,
     calBlock,
@@ -60,13 +67,13 @@ export function CompleteConfirmation(props: CalibrationPanelProps): React.Node {
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
     shouldPerformTipLength
 
-  const lookupType = isExtendedPipOffset
+  const lookupType: SessionType = isExtendedPipOffset
     ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
     : sessionType
-
+  // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use in operator to type narrow
   const { headerText } = contentsBySessionType[lookupType]
 
-  const proceed = () => {
+  const proceed = (): void => {
     sendCommands(
       {
         command: Sessions.sharedCalCommands.SET_CALIBRATION_BLOCK,

@@ -1,15 +1,23 @@
 // discovery reducer test
 import { discoveryReducer } from '../reducer'
 
+import type { Action } from '../../types'
+import type { DiscoveryState } from '../types'
+
 describe('discoveryReducer', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  const SPECS = [
+  const SPECS: Array<{
+    name: string
+    action: Action
+    initialState: DiscoveryState
+    expectedState: DiscoveryState
+  }> = [
     {
       name: 'empty dict for robotsByName and sets scanning to false',
-      action: {},
+      action: {} as any,
       initialState: undefined,
       expectedState: {
         scanning: false,
@@ -18,9 +26,9 @@ describe('discoveryReducer', () => {
     },
     {
       name: 'discovery:START sets scanning: true',
-      action: { type: 'discovery:START' },
-      initialState: { scanning: false },
-      expectedState: { scanning: true },
+      action: { type: 'discovery:START' } as any,
+      initialState: { scanning: false } as any,
+      expectedState: { scanning: true } as any,
     },
     {
       name: 'shell:UI_INITIALIZED sets scanning: true',

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   Flex,
@@ -24,10 +23,10 @@ const YES_AND_MOVE_TO_CHECK_TIP = 'Yes, move to check tip length'
 const NO_TRY_AGAIN = 'No, try again'
 
 const contentsBySessionType: {
-  [SessionType]: {
-    yesButtonText: string,
-    moveCommandString: SessionCommandString,
-  },
+  [sessionType in SessionType]: {
+    yesButtonText: string
+    moveCommandString: SessionCommandString
+  }
 } = {
   [Sessions.SESSION_TYPE_DECK_CALIBRATION]: {
     yesButtonText: YES_AND_MOVE_TO_DECK,
@@ -46,7 +45,7 @@ const contentsBySessionType: {
     moveCommandString: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
   },
 }
-export function TipConfirmation(props: CalibrationPanelProps): React.Node {
+export function TipConfirmation(props: CalibrationPanelProps): JSX.Element {
   const { sendCommands, sessionType, shouldPerformTipLength } = props
 
   const isExtendedPipOffset =
@@ -59,10 +58,10 @@ export function TipConfirmation(props: CalibrationPanelProps): React.Node {
 
   const { yesButtonText, moveCommandString } = contentsBySessionType[lookupType]
 
-  const invalidateTip = () => {
+  const invalidateTip = (): void => {
     sendCommands({ command: Sessions.sharedCalCommands.INVALIDATE_TIP })
   }
-  const confirmTip = () => {
+  const confirmTip = (): void => {
     sendCommands({ command: moveCommandString })
   }
 

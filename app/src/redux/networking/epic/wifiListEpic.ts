@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 
 import { GET } from '../../robot-api/constants'
@@ -10,7 +9,7 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 import type { FetchWifiListAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchWifiListAction> = action => ({
@@ -32,7 +31,7 @@ const mapResponseToAction: ResponseToActionMapper<FetchWifiListAction> = (
 
 export const wifiListEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.FETCH_WIFI_LIST),
+    ofType<Action, FetchWifiListAction>(Constants.FETCH_WIFI_LIST),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

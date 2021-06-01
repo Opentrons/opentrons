@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { css } from 'styled-components'
 
@@ -31,33 +30,35 @@ const OVERRIDE_TIP_LENGTH_CALIBRATED_PROMPT =
 const TIP_LENGTH_UNCALIBRATED_PROMPT =
   'Not yet calibrated. You will calibrate this tip length before proceeding to Pipette Offset Calibration.'
 
-type TipRackInfo = {|
-  definition: LabwareDefinition2,
-  calibration: TipLengthCalibration | null,
-|}
+interface TipRackInfo {
+  definition: LabwareDefinition2
+  calibration: TipLengthCalibration | null
+}
 
-export type TipRackMap = $Shape<{|
-  [uri: string]: TipRackInfo,
-|}>
+export type TipRackMap = Partial<{
+  [uri: string]: TipRackInfo
+}>
 
-export type ChosenTipRackRenderProps = {|
-  showCalibrationText: boolean,
-  selectedValue: SelectOption,
-  tipRackByUriMap: TipRackMap,
-|}
+export interface ChosenTipRackRenderProps {
+  showCalibrationText: boolean
+  selectedValue: SelectOption
+  tipRackByUriMap: TipRackMap
+}
 
 export function ChosenTipRackRender(
   props: ChosenTipRackRenderProps
-): React.Node {
+): JSX.Element {
   const { showCalibrationText, selectedValue, tipRackByUriMap } = props
-  const loadName = selectedValue.value.split('/')[1]
+  const loadName: keyof typeof labwareImages = selectedValue.value.split(
+    '/'
+  )[1] as any
   const displayName = selectedValue.label
   const calibrationData = tipRackByUriMap[selectedValue.value]?.calibration
 
   const imageSrc =
     loadName in labwareImages
       ? labwareImages[loadName]
-      : labwareImages['generic_custom_tiprack']
+      : labwareImages.generic_custom_tiprack
   return (
     <Flex
       height="100%"

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { StaticRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
@@ -13,34 +12,37 @@ import * as Buildroot from '../../../../redux/buildroot'
 import { RobotItem } from '../RobotItem'
 import { RobotListItem } from '../RobotListItem'
 
-import type { State } from '../../../../redux/types'
-
 jest.mock('../../../../redux/buildroot/selectors')
 jest.mock('../../../../redux/robot/selectors')
 
-const getBuildrootUpdateAvailable: JestMockFn<
-  [State, any],
-  $Call<typeof Buildroot.getBuildrootUpdateAvailable, State, any>
-> = Buildroot.getBuildrootUpdateAvailable
+const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<
+  typeof Buildroot.getBuildrootUpdateAvailable
+>
 
-const getConnectRequest: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getConnectRequest, State>
-> = RobotSelectors.getConnectRequest
+const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<
+  typeof RobotSelectors.getConnectRequest
+>
 
 describe('ConnectPanel RobotItem', () => {
-  const store = {
+  const store: any = {
     subscribe: () => {},
     getState: () => ({ mockState: true }),
     dispatch: jest.fn(),
   }
 
-  const render = (robot = Fixtures.mockConnectableRobot, matchParams = {}) => {
+  const render = (
+    robot: any = Fixtures.mockConnectableRobot,
+    matchParams: any = {}
+  ): ReturnType<typeof mount> => {
     // TODO(mc, 2020-03-30): upgrade react-router to 5.1 for hooks
     // grab the wrapped component from react-router::withRouter
-    const Component = (RobotItem: any).WrappedComponent
+    const Component = (RobotItem as any).WrappedComponent
 
-    const Wrapper = ({ children }: {| children: React.Node |}) => (
+    const Wrapper = ({
+      children,
+    }: {
+      children: React.ReactNode
+    }): JSX.Element => (
       <Provider store={store}>
         <StaticRouter location="/" context={{}}>
           {children}
@@ -146,7 +148,7 @@ describe('ConnectPanel RobotItem', () => {
     const wrapper = render(robot)
     const item = wrapper.find(RobotListItem)
 
-    item.invoke('onToggleConnect')()
+    item.invoke('onToggleConnect')?.()
 
     expect(store.dispatch).toHaveBeenCalledWith(
       RobotActions.connect(robot.name)
@@ -158,7 +160,7 @@ describe('ConnectPanel RobotItem', () => {
     const wrapper = render(robot)
     const item = wrapper.find(RobotListItem)
 
-    item.invoke('onToggleConnect')()
+    item.invoke('onToggleConnect')?.()
 
     expect(store.dispatch).toHaveBeenCalledWith(RobotActions.disconnect())
   })
@@ -174,7 +176,7 @@ describe('ConnectPanel RobotItem', () => {
     const wrapper = render(robot)
     const item = wrapper.find(RobotListItem)
 
-    item.invoke('onToggleConnect')()
+    item.invoke('onToggleConnect')?.()
 
     expect(store.dispatch).not.toHaveBeenCalled()
   })

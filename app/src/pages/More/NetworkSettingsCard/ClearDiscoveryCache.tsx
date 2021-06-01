@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { clearDiscoveryCache } from '../../../redux/discovery'
@@ -11,7 +10,7 @@ const CLEAR_ROBOTS_TITLE = 'Clear Discovered Robots List'
 const CLEAR_ROBOTS_DESCRIPTION =
   'If your app has unused robots in its list, click to clear the cache & remove them.'
 
-export function ClearDiscoveryCache(): React.Node {
+export function ClearDiscoveryCache(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   return (
     <LabeledButton

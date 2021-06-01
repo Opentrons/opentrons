@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 import { of } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
@@ -10,13 +9,18 @@ import * as Actions from '../actions'
 import * as Constants from '../constants'
 import { mapActionToRequest as mapActionToFetchSessionRequest } from './fetchSessionEpic'
 
-import type { State, Epic } from '../../types'
+import type { Observable } from 'rxjs'
+import type { State, Action, Epic } from '../../types'
 import type {
   RobotApiRequestOptions,
   RobotHost,
   RobotApiResponse,
 } from '../../robot-api/types'
-import type { CreateSessionCommandAction } from '../types'
+import type {
+  CreateSessionCommandAction,
+  CreateSessionCommandFailureAction,
+  CreateSessionCommandSuccessAction,
+} from '../types'
 
 const mapActionToRequest = (
   action: CreateSessionCommandAction
@@ -36,7 +40,7 @@ const mapActionToRequest = (
 const mapResponseToAction = (
   response: RobotApiResponse,
   originalAction: CreateSessionCommandAction
-) => {
+): CreateSessionCommandFailureAction | CreateSessionCommandSuccessAction => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
 
@@ -57,22 +61,25 @@ const mapResponseToAction = (
 
 export const createSessionCommandEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.CREATE_SESSION_COMMAND),
+    ofType<Action, CreateSessionCommandAction>(
+      Constants.CREATE_SESSION_COMMAND
+    ),
     withRobotHost(state$, a => a.payload.robotName),
-    switchMap<[CreateSessionCommandAction, State, RobotHost], _, _>(
-      ([originalAction, state, host]) => {
-        const commandRequest = mapActionToRequest(originalAction)
-        const fetchRequest = mapActionToFetchSessionRequest(originalAction)
+    switchMap<
+      [CreateSessionCommandAction, State, RobotHost],
+      Observable<Action>
+    >(([originalAction, _state, host]) => {
+      const commandRequest = mapActionToRequest(originalAction)
+      const fetchRequest = mapActionToFetchSessionRequest(originalAction)
 
-        return fetchRobotApi(host, commandRequest).pipe(
-          switchMap(response =>
-            response.ok ? fetchRobotApi(host, fetchRequest) : of(response)
-          ),
-          // NOTE(mc, 2020-06-15): both command execution and session fetch
-          // failure will trigger a failure action
-          map(response => mapResponseToAction(response, originalAction))
-        )
-      }
-    )
+      return fetchRobotApi(host, commandRequest).pipe(
+        switchMap(response =>
+          response.ok ? fetchRobotApi(host, fetchRequest) : of(response)
+        ),
+        // NOTE(mc, 2020-06-15): both command execution and session fetch
+        // failure will trigger a failure action
+        map(response => mapResponseToAction(response, originalAction))
+      )
+    })
   )
 }

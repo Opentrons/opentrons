@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import styled from 'styled-components'
 
@@ -27,17 +26,17 @@ const NETWORK_INTERFACE = 'Network Interface'
 const IPV4_ADDRESS = 'Local IPv4 Address'
 const IPV6_ADDRESS = 'Local IPv6 Address'
 
-export type U2EDeviceDetailsProps = {|
-  device: UsbDevice | null,
-  ifaces: Array<NetworkInterface>,
-|}
+export interface U2EDeviceDetailsProps {
+  device: UsbDevice | null
+  ifaces: NetworkInterface[]
+}
 
 const DetailText = styled.span`
   min-width: 8rem;
   margin-right: ${SPACING_1};
 `
 
-const DEVICE_STATS: Array<{| label: string, property: $Keys<UsbDevice> |}> = [
+const DEVICE_STATS: Array<{ label: string; property: keyof UsbDevice }> = [
   { label: 'Description', property: 'deviceName' },
   { label: 'Manufacturer', property: 'manufacturer' },
   { label: 'Serial Number', property: 'serialNumber' },
@@ -47,10 +46,10 @@ const DEVICE_STATS: Array<{| label: string, property: $Keys<UsbDevice> |}> = [
 const DetailItem = ({
   label,
   value,
-}: {|
-  label: string,
-  value: string | number,
-|}) => (
+}: {
+  label: string
+  value: string | number
+}): JSX.Element => (
   <Flex as="li" marginBottom={SPACING_1}>
     <DetailText>{label}:</DetailText>
     <DetailText>{value}</DetailText>
@@ -60,7 +59,7 @@ const DetailItem = ({
 export const U2EDeviceDetails = ({
   device,
   ifaces,
-}: U2EDeviceDetailsProps): React.Node => {
+}: U2EDeviceDetailsProps): JSX.Element => {
   const nwIfaceName = ifaces.length > 0 ? ifaces[0].name : NOT_ASSIGNED
 
   return (

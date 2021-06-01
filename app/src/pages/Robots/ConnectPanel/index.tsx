@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import orderBy from 'lodash/orderBy'
@@ -25,31 +24,21 @@ import type {
   UnreachableRobot,
 } from '../../../redux/discovery/types'
 
-type SP = {|
-  robots: Array<Robot>,
-  reachableRobots: Array<ReachableRobot>,
-  unreachableRobots: Array<UnreachableRobot>,
-  found: boolean,
-  isScanning: boolean,
-|}
+interface SP {
+  robots: Robot[]
+  reachableRobots: ReachableRobot[]
+  unreachableRobots: UnreachableRobot[]
+  found: boolean
+  isScanning: boolean
+}
 
-type DP = {| onScanClick: () => mixed |}
+interface DP {
+  onScanClick: () => unknown
+}
 
-type Props = {| ...SP, ...DP |}
+type Props = SP & DP
 
-export const ConnectPanel: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  DP,
-  State,
-  Dispatch
->(
-  mapStateToProps,
-  mapDispatchToProps
-)(ConnectPanelComponent)
-
-function ConnectPanelComponent(props: Props) {
+function ConnectPanelComponent(props: Props): JSX.Element {
   const {
     robots,
     reachableRobots,
@@ -106,3 +95,17 @@ function mapDispatchToProps(dispatch: Dispatch): DP {
     onScanClick: () => dispatch(startDiscovery()),
   }
 }
+
+// slight code change here moving from the functional to object version of mapDispatchToProps satisfies the connect
+// functions types without having to import other types from react-redux. Mostly a convenience change as all new
+// connected components use the hooks api
+
+// const mapDispatchToProps: DP = {
+//   onScanClick: () => startDiscovery(),
+// }
+
+export const ConnectPanel = connect(
+  mapStateToProps,
+  // @ts-expect-error TODO: use commented code above
+  mapDispatchToProps
+)(ConnectPanelComponent)

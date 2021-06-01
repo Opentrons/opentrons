@@ -1,11 +1,12 @@
-// @flow
 // access main process remote modules via attachments to `global`
 import assert from 'assert'
 
 import type { Remote } from './types'
 
-export const remote: Remote = new Proxy((({}: any): Remote), {
-  get(target, propName) {
+const emptyRemote: Remote = {} as any
+
+export const remote: Remote = new Proxy(emptyRemote, {
+  get(_target, propName: string): unknown {
     assert(
       global.APP_SHELL_REMOTE,
       'Expected APP_SHELL_REMOTE to be attached to global scope; is app-shell/src/preload.js properly configured?'
@@ -15,7 +16,7 @@ export const remote: Remote = new Proxy((({}: any): Remote), {
       propName in global.APP_SHELL_REMOTE,
       `Expected APP_SHELL_REMOTE.${propName} to exist, is app-shell/src/preload.js properly configured?`
     )
-
-    return global.APP_SHELL_REMOTE[propName]
+    // @ts-expect-error TODO we know that propName is 'ipcRenderer' but TS can't narrow it down
+    return global.APP_SHELL_REMOTE[propName] as Remote
   },
 })

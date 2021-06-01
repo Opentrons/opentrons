@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 
@@ -20,25 +19,25 @@ const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
 const EXIT_WITHOUT_CAL = 'exit without calibrating'
 const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
 
-export type Props = {|
-  robotName: string,
-  mount: Mount,
-  title: string,
-  subtitle: string,
-  success: boolean,
-  attachedWrong: boolean,
-  wantedPipette: PipetteNameSpecs | null,
-  actualPipette: PipetteModelSpecs | null,
-  actualPipetteOffset: PipetteOffsetCalibration | null,
-  displayName: string,
-  displayCategory: PipetteDisplayCategory | null,
-  tryAgain: () => mixed,
-  back: () => mixed,
-  exit: () => mixed,
-  startPipetteOffsetCalibration: () => void,
-|}
+export interface Props {
+  robotName: string
+  mount: Mount
+  title: string
+  subtitle: string
+  success: boolean
+  attachedWrong: boolean
+  wantedPipette: PipetteNameSpecs | null
+  actualPipette: PipetteModelSpecs | null
+  actualPipetteOffset: PipetteOffsetCalibration | null
+  displayName: string
+  displayCategory: PipetteDisplayCategory | null
+  tryAgain: () => unknown
+  back: () => unknown
+  exit: () => unknown
+  startPipetteOffsetCalibration: () => void
+}
 
-export function ConfirmPipette(props: Props): React.Node {
+export function ConfirmPipette(props: Props): JSX.Element {
   const {
     title,
     subtitle,
@@ -69,7 +68,7 @@ export function ConfirmPipette(props: Props): React.Node {
   )
 }
 
-function Status(props: Props) {
+function Status(props: Props): JSX.Element {
   const { displayName, wantedPipette, attachedWrong, success } = props
   const iconName = success ? 'check-circle' : 'close-circle'
   const iconClass = cx(styles.confirm_icon, {
@@ -97,7 +96,7 @@ function Status(props: Props) {
   )
 }
 
-function StatusDetails(props: Props) {
+function StatusDetails(props: Props): JSX.Element | null {
   const {
     mount,
     displayCategory,
@@ -151,7 +150,7 @@ function StatusDetails(props: Props) {
   return null
 }
 
-function AttachAnotherButton(props: Props) {
+function AttachAnotherButton(props: Props): JSX.Element {
   return (
     <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={props.back}>
       attach another pipette
@@ -159,7 +158,7 @@ function AttachAnotherButton(props: Props) {
   )
 }
 
-function CalibratePipetteOffsetButton(props: Props) {
+function CalibratePipetteOffsetButton(props: Props): JSX.Element {
   return (
     <PrimaryBtn
       marginBottom={SPACING_2}
@@ -171,7 +170,7 @@ function CalibratePipetteOffsetButton(props: Props) {
   )
 }
 
-function TryAgainButton(props: Props) {
+function TryAgainButton(props: Props): JSX.Element {
   const {
     robotName,
     attachedWrong,
@@ -211,7 +210,7 @@ const exitButtonMessage: (props: Props) => string = props => {
   return EXIT_BUTTON_MESSAGE
 }
 
-function ExitButton(props: Props) {
+function ExitButton(props: Props): JSX.Element {
   const { exit } = props
   const buttonText = exitButtonMessage(props)
 

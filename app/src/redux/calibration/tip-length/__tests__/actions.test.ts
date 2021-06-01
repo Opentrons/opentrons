@@ -1,17 +1,15 @@
-// @flow
-
 import * as Fixtures from '../__fixtures__'
 import * as Actions from '../actions'
 import type { TipLengthCalibrationsAction } from '../types'
 
-type ActionSpec = {|
-  should: string,
-  creator: (...Array<any>) => TipLengthCalibrationsAction,
-  args: Array<mixed>,
-  expected: TipLengthCalibrationsAction,
-|}
+interface ActionSpec {
+  should: string
+  creator: (...args: any[]) => TipLengthCalibrationsAction
+  args: unknown[]
+  expected: TipLengthCalibrationsAction
+}
 
-const SPECS: Array<ActionSpec> = [
+const SPECS: ActionSpec[] = [
   {
     should: 'create a fetchTipLengthCalibrations action',
     creator: Actions.fetchTipLengthCalibrations,
@@ -19,7 +17,7 @@ const SPECS: Array<ActionSpec> = [
     expected: {
       type: 'calibration:FETCH_TIP_LENGTH_CALIBRATIONS',
       payload: { robotName: 'robot-name' },
-      meta: {},
+      meta: {} as any,
     },
   },
   {
@@ -36,7 +34,7 @@ const SPECS: Array<ActionSpec> = [
         robotName: 'robot-name',
         tipLengthCalibrations: Fixtures.mockAllTipLengthCalibrations,
       },
-      meta: { requestId: '123' },
+      meta: { requestId: '123' } as any,
     },
   },
   {
@@ -53,7 +51,7 @@ const SPECS: Array<ActionSpec> = [
         robotName: 'robot-name',
         error: Fixtures.mockFetchTipLengthCalibrationsFailure.body,
       },
-      meta: { requestId: '123' },
+      meta: { requestId: '123' } as any,
     },
   },
 ]

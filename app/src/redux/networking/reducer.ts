@@ -1,4 +1,3 @@
-// @flow
 import intersection from 'lodash/intersection'
 import keyBy from 'lodash/keyBy'
 import union from 'lodash/union'
@@ -8,6 +7,7 @@ import * as Constants from './constants'
 
 import type { Action } from '../types'
 import type { NetworkingState, PerRobotNetworkingState } from './types'
+import { Reducer } from 'redux'
 
 const INITIAL_STATE: NetworkingState = {}
 const INITIAL_ROBOT_STATE: PerRobotNetworkingState = {}
@@ -17,10 +17,10 @@ const getRobotState = (
   robotName: string
 ): PerRobotNetworkingState => state[robotName] || INITIAL_ROBOT_STATE
 
-export function networkingReducer(
-  state: NetworkingState = INITIAL_STATE,
-  action: Action
-): NetworkingState {
+export const networkingReducer: Reducer<NetworkingState, Action> = (
+  state = INITIAL_STATE,
+  action
+) => {
   switch (action.type) {
     case Constants.FETCH_STATUS_SUCCESS: {
       const { robotName, internetStatus, interfaces } = action.payload

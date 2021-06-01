@@ -1,18 +1,17 @@
-// @flow
 import * as Fixtures from '../__fixtures__'
 import { modulesReducer } from '../reducer'
 
 import type { Action } from '../../types'
 import type { ModulesState } from '../types'
 
-type ReducerSpec = {|
-  name: string,
-  state: ModulesState,
-  action: Action,
-  expected: ModulesState,
-|}
+interface ReducerSpec {
+  name: string
+  state: ModulesState
+  action: Action
+  expected: ModulesState
+}
 
-const SPECS: Array<ReducerSpec> = [
+const SPECS: ReducerSpec[] = [
   {
     name: 'handles modules:FETCH_MODULES_SUCCESS',
     action: {
@@ -21,7 +20,7 @@ const SPECS: Array<ReducerSpec> = [
         robotName: 'robotName',
         modules: [Fixtures.mockTemperatureModule],
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       robotName: {

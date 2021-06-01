@@ -1,11 +1,10 @@
-// @flow
 import * as Constants from './constants'
 import * as Types from './types'
 
 // request a config value update
 export const updateConfigValue = (
   path: string,
-  value: mixed
+  value: unknown
 ): Types.UpdateConfigValueAction => ({
   type: Constants.UPDATE_VALUE,
   payload: { path, value },
@@ -33,7 +32,7 @@ export const toggleConfigValue = (
 // add a unique value into an array config if it's not already in there
 export const addUniqueConfigValue = (
   path: string,
-  value: mixed
+  value: unknown
 ): Types.AddUniqueConfigValueAction => ({
   type: Constants.ADD_UNIQUE_VALUE,
   payload: { path, value },
@@ -43,7 +42,7 @@ export const addUniqueConfigValue = (
 // remove a unique from an array config if it's in there
 export const subtractConfigValue = (
   path: string,
-  value: mixed
+  value: unknown
 ): Types.SubtractConfigValueAction => ({
   type: Constants.SUBTRACT_VALUE,
   payload: { path, value },
@@ -61,7 +60,7 @@ export const configInitialized = (
 // config value has been updated
 export const configValueUpdated = (
   path: string,
-  value: mixed
+  value: unknown
 ): Types.ConfigValueUpdatedAction => ({
   type: Constants.VALUE_UPDATED,
   payload: { path, value },

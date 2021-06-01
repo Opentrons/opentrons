@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 
@@ -16,11 +15,14 @@ import { U2EDriverWarning } from '../U2EDriverWarning'
 
 jest.mock('../../../../redux/analytics')
 
-const useTrackEvent: JestMockFn<[], $Call<typeof Analytics.useTrackEvent>> =
-  Analytics.useTrackEvent
+const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<
+  typeof Analytics.useTrackEvent
+>
 
 describe('U2EDriverWarning', () => {
-  const trackEvent = jest.fn()
+  const trackEvent: jest.MockedFunction<
+    typeof Analytics.useTrackEvent
+  > = jest.fn()
 
   beforeEach(() => {
     useTrackEvent.mockReturnValue(trackEvent)

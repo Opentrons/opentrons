@@ -1,5 +1,3 @@
-// @flow
-
 // intercom api calls
 export const INTERCOM_BOOT = 'boot'
 export const INTERCOM_UPDATE = 'update'

@@ -9,10 +9,14 @@ const mockStore = configureMockStore(middlewares)
 
 jest.mock('../../config/selectors')
 
+const getFeatureFlags = ConfigSelectors.getFeatureFlags as jest.MockedFunction<
+  typeof ConfigSelectors.getFeatureFlags
+>
+
 describe('protocol actions', () => {
-  let store
-  let _FileReader
-  let mockReader
+  let store: any
+  let _FileReader: any
+  let mockReader: any
 
   beforeEach(() => {
     _FileReader = global.FileReader
@@ -20,7 +24,7 @@ describe('protocol actions', () => {
 
     store = mockStore({})
     global.FileReader = jest.fn(() => mockReader)
-    ConfigSelectors.getFeatureFlags.mockReturnValue({
+    getFeatureFlags.mockReturnValue({
       enableBundleUpload: false,
     })
   })
@@ -35,19 +39,19 @@ describe('protocol actions', () => {
       name: 'foobar.py',
       type: 'python',
       lastModified: 123,
-    }
+    } as any
 
     const bundleFile = {
       name: 'foobar.zip',
       type: 'zip',
       lastModified: 111,
-    }
+    } as any
 
     const jsonFile = {
       name: 'foobar.json',
       type: 'json',
       lastModified: 456,
-    }
+    } as any
 
     it('dispatches a protocol:OPEN', () => {
       const result = store.dispatch(openProtocol(pythonFile))
@@ -99,7 +103,7 @@ describe('protocol actions', () => {
 
     describe('bundle upload', () => {
       it('dispatches a protocol:OPEN', () => {
-        ConfigSelectors.getFeatureFlags.mockReturnValue({
+        getFeatureFlags.mockReturnValue({
           enableBundleUpload: true,
         })
         const result = store.dispatch(openProtocol(bundleFile))

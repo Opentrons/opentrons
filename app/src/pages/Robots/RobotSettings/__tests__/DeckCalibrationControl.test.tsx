@@ -1,6 +1,8 @@
-// @flow
 import * as React from 'react'
-import { mountWithProviders } from '@opentrons/components/__utils__'
+import {
+  mountWithProviders,
+  WrapperWithStore,
+} from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../../i18n'
 
@@ -18,34 +20,48 @@ import {
   CALIBRATION_SOURCE_UNKNOWN,
 } from '../../../../redux/calibration'
 import { DeckCalibrationControl } from '../DeckCalibrationControl'
-import { InlineCalibrationWarning } from '../../../../molecules/InlineCalibrationWarning'
 
-import type { State } from '../../../../redux/types'
+import type { HTMLAttributes, ReactWrapper } from 'enzyme'
+import type { Action, State } from '../../../../redux/types'
 
 jest.mock('../../../../redux/robot-api/selectors')
 jest.mock('../../../../redux/sessions/selectors')
 
-const mockGetRequestById: JestMockFn<
-  [State, string],
-  $Call<typeof RobotApi.getRequestById, State, string>
-> = RobotApi.getRequestById
+const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
+  typeof RobotApi.getRequestById
+>
 
 describe('DeckCalibrationControl', () => {
-  let render
+  let render: (
+    props?: Partial<React.ComponentProps<typeof DeckCalibrationControl>>
+  ) => WrapperWithStore<
+    React.ComponentProps<typeof DeckCalibrationControl>,
+    State,
+    Action
+  >
 
-  const getDeckCalButton = wrapper =>
+  const getDeckCalButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find('DeckCalibrationControl').find('button')
 
-  const getCancelDeckCalButton = wrapper =>
+  const getCancelDeckCalButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find('OutlineButton[children="cancel"]').find('button')
 
-  const getConfirmDeckCalButton = wrapper =>
+  const getConfirmDeckCalButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>
+  ): ReactWrapper<HTMLAttributes> =>
     wrapper.find('OutlineButton[children="continue"]').find('button')
 
-  const getCalibrationWarning = wrapper =>
-    wrapper.find(InlineCalibrationWarning)
+  const getCalibrationWarning = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>
+  ): ReactWrapper => wrapper.find('InlineCalibrationWarning')
 
-  const getFailedStartModal = wrapper =>
+  const getFailedStartModal = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof DeckCalibrationControl>>
+  ): ReactWrapper =>
     wrapper.find('AlertModal[heading="Failed to start deck calibration"]')
 
   beforeEach(() => {
@@ -76,7 +92,11 @@ describe('DeckCalibrationControl', () => {
         },
         pipOffsetDataPresent = true,
       } = props
-      return mountWithProviders(
+      return mountWithProviders<
+        React.ComponentProps<typeof DeckCalibrationControl>,
+        State,
+        Action
+      >(
         <DeckCalibrationControl
           robotName={robotName}
           disabledReason={disabledReason}
@@ -132,7 +152,11 @@ describe('DeckCalibrationControl', () => {
         },
       })
       expect(
-        wrapper.findWhere(elem => elem.prop('fontStyle') === 'italic').html()
+        wrapper
+          .findWhere(
+            (elem: ReactWrapper) => elem.prop('fontStyle') === 'italic'
+          )
+          .html()
       ).toMatch(spec.shouldMatch)
     })
   })
@@ -140,11 +164,11 @@ describe('DeckCalibrationControl', () => {
   it('button launches new deck calibration after confirm', () => {
     const { wrapper, store } = render()
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
-    getDeckCalButton(wrapper).invoke('onClick')()
+    getDeckCalButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(true)
 
-    getConfirmDeckCalButton(wrapper).invoke('onClick')()
+    getConfirmDeckCalButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith({
       ...Sessions.ensureSession(
@@ -157,7 +181,7 @@ describe('DeckCalibrationControl', () => {
 
   it('button launches new deck calibration immediately without rendering ConfirmStartDeckCalModal', () => {
     const { wrapper, store } = render({ pipOffsetDataPresent: false })
-    getDeckCalButton(wrapper).invoke('onClick')()
+    getDeckCalButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
 
@@ -173,11 +197,11 @@ describe('DeckCalibrationControl', () => {
   it('button launches new deck calibration and cancel closes', () => {
     const { wrapper, store } = render()
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
-    getDeckCalButton(wrapper).invoke('onClick')()
+    getDeckCalButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(true)
 
-    getCancelDeckCalButton(wrapper).invoke('onClick')()
+    getCancelDeckCalButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
 
     expect(wrapper.find('ConfirmStartDeckCalModal').exists()).toBe(false)
     expect(store.dispatch).not.toHaveBeenCalledWith({
@@ -272,8 +296,8 @@ describe('DeckCalibrationControl', () => {
       error: { message: 'ruh roh' },
     })
     expect(getFailedStartModal(wrapper).exists()).toBe(false)
-    getDeckCalButton(wrapper).invoke('onClick')()
-    getConfirmDeckCalButton(wrapper).invoke('onClick')()
+    getDeckCalButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+    getConfirmDeckCalButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
     expect(getFailedStartModal(wrapper).exists()).toBe(true)
   })

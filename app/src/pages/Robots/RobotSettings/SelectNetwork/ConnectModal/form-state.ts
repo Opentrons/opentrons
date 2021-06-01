@@ -1,11 +1,10 @@
-// @flow
 import { useEffect } from 'react'
 import { useFormikContext, useField } from 'formik'
 import { usePrevious } from '@opentrons/components'
 
 import type { ConnectFormValues, ConnectFormFieldProps } from '../types'
 
-export const useResetFormOnSecurityChange = () => {
+export const useResetFormOnSecurityChange = (): void => {
   const {
     values,
     errors,
@@ -40,7 +39,9 @@ export const useResetFormOnSecurityChange = () => {
 }
 
 export const useConnectFormField = (name: string): ConnectFormFieldProps => {
-  const [fieldProps, fieldMeta, fieldHelpers] = useField<string | void>(name)
+  const [fieldProps, fieldMeta, fieldHelpers] = useField<string | undefined>(
+    name
+  )
   const { value, onChange, onBlur } = fieldProps
   const { setValue, setTouched } = fieldHelpers
   const error = fieldMeta.touched ? fieldMeta.error : null

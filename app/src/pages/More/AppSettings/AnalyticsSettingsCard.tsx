@@ -1,4 +1,3 @@
-// @flow
 // info on analytics data collected and toggle to opt in/out
 import * as React from 'react'
 
@@ -7,7 +6,7 @@ import { AnalyticsToggle } from '../../../organisms/AnalyticsSettingsModal/Analy
 
 const TITLE = 'Privacy Settings'
 
-export function AnalyticsSettingsCard(): React.Node {
+export function AnalyticsSettingsCard(): JSX.Element {
   return (
     <Card title={TITLE}>
       <AnalyticsToggle />

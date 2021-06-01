@@ -1,4 +1,3 @@
-// @flow
 // root application epic
 import { combineEpics } from 'redux-observable'
 
@@ -20,7 +19,7 @@ import { calibrationEpic } from './calibration/epic'
 
 import type { Epic } from './types'
 
-export const rootEpic: Epic = combineEpics(
+export const rootEpic = combineEpics<Epic>(
   analyticsEpic,
   supportEpic,
   discoveryEpic,

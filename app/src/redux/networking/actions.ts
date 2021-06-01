@@ -1,5 +1,3 @@
-// @flow
-
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -45,7 +43,7 @@ export const fetchWifiList = (
 
 export const fetchWifiListSuccess = (
   robotName: string,
-  wifiList: Array<Types.WifiNetwork>,
+  wifiList: Types.WifiNetwork[],
   meta: RobotApiRequestMeta
 ): Types.FetchWifiListSuccessAction => ({
   type: Constants.FETCH_WIFI_LIST_SUCCESS,
@@ -102,7 +100,7 @@ export const fetchWifiKeys = (
 
 export const fetchWifiKeysSuccess = (
   robotName: string,
-  wifiKeys: Array<Types.ApiWifiKey>,
+  wifiKeys: Types.ApiWifiKey[],
   meta: RobotApiRequestMeta
 ): Types.FetchWifiKeysSuccessAction => ({
   type: Constants.FETCH_WIFI_KEYS_SUCCESS,
@@ -159,7 +157,7 @@ export const fetchEapOptions = (
 
 export const fetchEapOptionsSuccess = (
   robotName: string,
-  eapOptions: Array<Types.EapOption>,
+  eapOptions: Types.EapOption[],
   meta: RobotApiRequestMeta
 ): Types.FetchEapOptionsSuccessAction => ({
   type: Constants.FETCH_EAP_OPTIONS_SUCCESS,

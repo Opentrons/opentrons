@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
@@ -36,7 +35,7 @@ describe('ClearDiscoveryCache', () => {
   it('dispatches a ClearDiscoveryCache Action', () => {
     const wrapper = render()
     const buttonProps = wrapper.find(LabeledButton).prop('buttonProps')
-    buttonProps.onClick()
+    buttonProps.onClick?.({} as React.MouseEvent)
     expect(dispatch).toHaveBeenCalledWith(clearDiscoveryCache())
   })
 })

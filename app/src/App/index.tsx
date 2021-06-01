@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import { hot } from 'react-hot-loader/root'
@@ -29,9 +28,9 @@ import { MorePanel } from '../pages/More/MorePanel'
 import { Navbar } from './Navbar'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
-const stopEvent = (event: SyntheticEvent<>) => event.preventDefault()
+const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
-export const AppComponent = (): React.Node => (
+export const AppComponent = (): JSX.Element => (
   <>
     <GlobalStyle />
     <Flex
@@ -77,4 +76,4 @@ export const AppComponent = (): React.Node => (
   </>
 )
 
-export const App: React.AbstractComponent<{||}> = hot(AppComponent)
+export const App = hot(AppComponent)

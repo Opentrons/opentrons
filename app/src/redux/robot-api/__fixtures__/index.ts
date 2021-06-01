@@ -1,4 +1,3 @@
-// @flow
 // generic, robot HTTP API fixtures
 
 import type {
@@ -10,35 +9,35 @@ import type {
   RobotApiV2ErrorResponseBody,
 } from '../types'
 
-export type ResponseFixturesOptions<SuccessBody, FailureBody> = {|
-  method: Method,
-  path: string,
-  successStatus: number,
-  successBody: SuccessBody,
-  failureStatus: number,
-  failureBody: FailureBody,
-|}
+export interface ResponseFixturesOptions<SuccessBody, FailureBody> {
+  method: Method
+  path: string
+  successStatus: number
+  successBody: SuccessBody
+  failureStatus: number
+  failureBody: FailureBody
+}
 
-export type ResponseFixtures<SuccessBody, FailureBody> = {|
-  successMeta: {| method: Method, path: string, status: number, ok: boolean |},
-  failureMeta: {| method: Method, path: string, status: number, ok: boolean |},
-  success: {|
-    method: Method,
-    path: string,
-    status: number,
-    ok: boolean,
-    host: RobotHost,
-    body: SuccessBody,
-  |},
-  failure: {|
-    method: Method,
-    path: string,
-    status: number,
-    ok: boolean,
-    host: RobotHost,
-    body: FailureBody,
-  |},
-|}
+export interface ResponseFixtures<SuccessBody, FailureBody> {
+  successMeta: { method: Method; path: string; status: number; ok: boolean }
+  failureMeta: { method: Method; path: string; status: number; ok: boolean }
+  success: {
+    method: Method
+    path: string
+    status: number
+    ok: boolean
+    host: RobotHost
+    body: SuccessBody
+  }
+  failure: {
+    method: Method
+    path: string
+    status: number
+    ok: boolean
+    host: RobotHost
+    body: FailureBody
+  }
+}
 
 export const mockRobot: RobotHost = {
   name: 'robot',
@@ -46,15 +45,15 @@ export const mockRobot: RobotHost = {
   port: 31950,
 }
 
-export const mockRequestMeta: RobotApiRequestMeta = { requestId: 'abc' }
+export const mockRequestMeta = { requestId: 'abc' } as RobotApiRequestMeta
 
 export const mockFailureBody = { message: 'AH' }
 
-export const mockFailedRequestState: {|
-  status: 'failure',
-  response: RobotApiResponseMeta,
-  error: {| message?: string |},
-|} = {
+export const mockFailedRequestState: {
+  status: 'failure'
+  response: RobotApiResponseMeta
+  error: { message?: string }
+} = {
   response: {
     path: '/modules/abc123/update',
     method: 'POST',

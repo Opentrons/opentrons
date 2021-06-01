@@ -1,4 +1,3 @@
-// @flow
 // RobotSettings card for robot status
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -24,9 +23,11 @@ import { LabeledValue } from '../../../atoms/structure'
 import type { Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-type Props = {| robot: ViewableRobot |}
+interface Props {
+  robot: ViewableRobot
+}
 
-export function StatusCard(props: Props): React.Node {
+export function StatusCard(props: Props): JSX.Element {
   const { robot } = props
   const dispatch = useDispatch<Dispatch>()
   const { t } = useTranslation('robot_connection')
@@ -46,7 +47,7 @@ export function StatusCard(props: Props): React.Node {
     status = sessionStatus
   }
 
-  const handleClick = () => {
+  const handleClick: React.MouseEventHandler = () => {
     if (connected) {
       dispatch(robotActions.disconnect())
     } else {

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { usePrevious } from '@opentrons/components'
@@ -10,14 +9,14 @@ import type {
   RobotSystemType,
 } from '../../../../redux/buildroot/types'
 
-export type InstallModalContentsProps = {|
-  robotSystemType: RobotSystemType | null,
-  session: BuildrootUpdateSession,
-|}
+export interface InstallModalContentsProps {
+  robotSystemType: RobotSystemType | null
+  session: BuildrootUpdateSession
+}
 
 export function InstallModalContents(
   props: InstallModalContentsProps
-): React.Node {
+): JSX.Element {
   const { robotSystemType, session } = props
   const { step: updateStep, progress, error } = session
   const prevStep = usePrevious(updateStep)

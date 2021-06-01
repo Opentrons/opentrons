@@ -1,4 +1,3 @@
-// @flow
 // functions for sending events to intercom, both for enriching user profiles
 // and for triggering contextual support conversations
 import * as Sessions from '../sessions'

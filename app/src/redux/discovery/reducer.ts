@@ -1,4 +1,3 @@
-// @flow
 // robot discovery state
 import keyBy from 'lodash/keyBy'
 import { UI_INITIALIZED } from '../shell'
@@ -6,16 +5,17 @@ import * as actions from './actions'
 
 import type { Action } from '../types'
 import type { DiscoveryState } from './types'
+import { Reducer } from 'redux'
 
 export const INITIAL_STATE: DiscoveryState = {
   scanning: false,
   robotsByName: {},
 }
 
-export function discoveryReducer(
-  state: DiscoveryState = INITIAL_STATE,
-  action: Action
-): DiscoveryState {
+export const discoveryReducer: Reducer<DiscoveryState, Action> = (
+  state = INITIAL_STATE,
+  action
+) => {
   switch (action.type) {
     case UI_INITIALIZED:
     case actions.DISCOVERY_START:

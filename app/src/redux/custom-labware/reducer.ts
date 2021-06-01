@@ -1,10 +1,10 @@
-// @flow
 // custom labware reducer
 import keyBy from 'lodash/keyBy'
 import * as Actions from './actions'
 
 import type { Action } from '../types'
 import type { CustomLabwareState } from './types'
+import { Reducer } from 'redux'
 
 export const INITIAL_STATE: CustomLabwareState = {
   filenames: [],
@@ -14,10 +14,10 @@ export const INITIAL_STATE: CustomLabwareState = {
   listFailureMessage: null,
 }
 
-export function customLabwareReducer(
-  state: CustomLabwareState = INITIAL_STATE,
-  action: Action
-): CustomLabwareState {
+export const customLabwareReducer: Reducer<CustomLabwareState, Action> = (
+  state = INITIAL_STATE,
+  action
+) => {
   switch (action.type) {
     case Actions.CUSTOM_LABWARE_LIST: {
       return {

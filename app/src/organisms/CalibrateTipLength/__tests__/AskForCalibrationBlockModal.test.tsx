@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
 import { act } from 'react-dom/test-utils'
@@ -7,14 +6,19 @@ import { AskForCalibrationBlockModal } from '../AskForCalibrationBlockModal'
 import { CheckboxField } from '@opentrons/components'
 import { setUseTrashSurfaceForTipCal } from '../../../redux/calibration'
 
+import type { WrapperWithStore } from '@opentrons/components/__utils__'
+
+type RenderReturnType = WrapperWithStore<
+  React.ComponentProps<typeof AskForCalibrationBlockModal>
+>
 describe('AskForCalibrationBlockModal', () => {
-  let onResponse
-  let render
+  let onResponse: jest.MockedFunction<() => {}>
+  let render: (initialValue?: boolean | null) => RenderReturnType
 
   beforeEach(() => {
     onResponse = jest.fn()
-    render = (initialValue: boolean | null = null) =>
-      mountWithStore(
+    render = (initialValue = null) =>
+      mountWithStore<React.ComponentProps<typeof AskForCalibrationBlockModal>>(
         <AskForCalibrationBlockModal
           onResponse={onResponse}
           titleBarTitle="Test Cal Flow"
@@ -32,14 +36,15 @@ describe('AskForCalibrationBlockModal', () => {
     jest.resetAllMocks()
   })
 
-  const findCalBlockModal = wrapper => wrapper.find(AskForCalibrationBlockModal)
-  const findHaveBlock = wrapper =>
+  const findCalBlockModal = (wrapper: RenderReturnType['wrapper']) =>
+    wrapper.find(AskForCalibrationBlockModal)
+  const findHaveBlock = (wrapper: RenderReturnType['wrapper']) =>
     findCalBlockModal(wrapper).find(
       'button[children="Continue with calibration block"]'
     )
-  const findUseTrash = wrapper =>
+  const findUseTrash = (wrapper: RenderReturnType['wrapper']) =>
     findCalBlockModal(wrapper).find('button[children="Use trash bin"]')
-  const findRemember = wrapper =>
+  const findRemember = (wrapper: RenderReturnType['wrapper']) =>
     findCalBlockModal(wrapper).find(CheckboxField).first()
 
   const SPECS = [
@@ -74,14 +79,14 @@ describe('AskForCalibrationBlockModal', () => {
     it(spec.it, () => {
       const { wrapper, store } = render(null)
       expect(wrapper.exists(AskForCalibrationBlockModal)).toBe(true)
-      findRemember(wrapper).invoke('onChange')({
+      findRemember(wrapper).invoke('onChange')?.({
         currentTarget: { checked: spec.save },
-      })
+      } as any)
 
       act(() => {
         spec.useTrash
-          ? findUseTrash(wrapper).invoke('onClick')()
-          : findHaveBlock(wrapper).invoke('onClick')()
+          ? findUseTrash(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+          : findHaveBlock(wrapper).invoke('onClick')?.({} as React.MouseEvent)
       })
       if (spec.save) {
         wrapper.update()

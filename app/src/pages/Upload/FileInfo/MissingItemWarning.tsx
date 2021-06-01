@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -13,14 +12,16 @@ import {
 import styles from './styles.css'
 import { SectionContentHalf } from '../../../atoms/layout'
 
-export type MissingItemWarningProps = {|
-  missingItem: string,
-  urlLabel: string,
-  url: string,
-  isBlocking?: boolean,
-|}
+export interface MissingItemWarningProps {
+  missingItem: string
+  urlLabel: string
+  url: string
+  isBlocking?: boolean
+}
 
-export function MissingItemWarning(props: MissingItemWarningProps): React.Node {
+export function MissingItemWarning(
+  props: MissingItemWarningProps
+): JSX.Element {
   const { missingItem, urlLabel, url, isBlocking = false } = props
   return (
     <SectionContentHalf className={styles.align_center}>

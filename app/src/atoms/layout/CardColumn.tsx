@@ -1,11 +1,10 @@
-// @flow
 import * as React from 'react'
 import styles from './styles.css'
 
-export type CardColumnProps = {|
-  children: React.Node,
-|}
+export interface CardColumnProps {
+  children: React.ReactNode
+}
 
-export function CardColumn(props: CardColumnProps): React.Node {
+export function CardColumn(props: CardColumnProps): JSX.Element {
   return <div className={styles.column_50}>{props.children}</div>
 }

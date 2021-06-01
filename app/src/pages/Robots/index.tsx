@@ -1,4 +1,3 @@
-// @flow
 // connect and configure robots page
 import * as React from 'react'
 import { useSelector } from 'react-redux'
@@ -18,8 +17,8 @@ import { RobotSettings } from './RobotSettings'
 import { InstrumentSettings } from './InstrumentSettings'
 import { ModuleSettings } from './ModuleSettings'
 
-export function Robots(): React.Node {
-  const { path, url, params } = useRouteMatch()
+export function Robots(): JSX.Element {
+  const { path, url, params } = useRouteMatch<{ name: string }>()
   const instrumentsMatch = useRouteMatch(`${path}/instruments`)
   const modulesMatch = useRouteMatch(`${path}/modules`)
   const location = useLocation()

@@ -1,17 +1,14 @@
-// @flow
 import * as React from 'react'
 
 import { PrimaryButton, Icon } from '@opentrons/components'
 import styles from './upload-panel.css'
 
-export type UploadInputProps = {|
-  onUpload: (
-    SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<>
-  ) => void,
-  isButton?: boolean,
-|}
+export interface UploadInputProps {
+  onUpload: React.EventHandler<React.MouseEvent | React.ChangeEvent>
+  isButton?: boolean
+}
 
-export function UploadInput(props: UploadInputProps): React.Node {
+export function UploadInput(props: UploadInputProps): JSX.Element {
   const { isButton, onUpload } = props
 
   const Label = isButton ? PrimaryButton : 'label'
@@ -20,15 +17,18 @@ export function UploadInput(props: UploadInputProps): React.Node {
 
   const labelProps = isButton
     ? {
-        Component: 'label',
-        iconName: 'ot-file',
+        Component: 'label' as React.ComponentProps<
+          typeof PrimaryButton
+        >['Component'],
+        iconName: 'ot-file' as React.ComponentProps<
+          typeof PrimaryButton
+        >['iconName'],
         className: styles.upload_button,
       }
     : { onDrop: onUpload, className: styles.file_drop }
 
   return (
     <div className={styles.upload}>
-      {/* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion */}
       <Label {...labelProps}>
         {!isButton && <Icon name="upload" className={styles.file_drop_icon} />}
         {labelText}
