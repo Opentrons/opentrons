@@ -53,15 +53,17 @@ class ProtocolStore:
         saved_files = []
 
         for upload_file in files:
-            contents = await upload_file.read()
-            file_path = protocol_dir / upload_file.filename
+            # TODO(mc, 2021-06-01): raise error for empty file
+            if upload_file.filename != "":
+                contents = await upload_file.read()
+                file_path = protocol_dir / upload_file.filename
 
-            if isinstance(contents, str):
-                file_path.write_text(contents, "utf-8")
-            else:
-                file_path.write_bytes(contents)
+                if isinstance(contents, str):
+                    file_path.write_text(contents, "utf-8")
+                else:
+                    file_path.write_bytes(contents)
 
-            saved_files.append(file_path)
+                saved_files.append(file_path)
 
         entry = ProtocolStoreEntry(
             protocol_id=protocol_id,
