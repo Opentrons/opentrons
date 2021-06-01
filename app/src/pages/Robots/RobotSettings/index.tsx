@@ -1,4 +1,3 @@
-// @flow
 // connect and configure robots page
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
@@ -46,16 +45,16 @@ import { CalibrationCard } from './CalibrationCard'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-type Props = {|
-  robot: ViewableRobot,
-|}
+interface Props {
+  robot: ViewableRobot
+}
 
 // TODO(bc, 2021-02-16): i18n
 const UPDATE_FRAGMENT = 'update'
 const RESET_FRAGMENT = 'reset'
 const INSTRUMENTS_FRAGMENT = 'instruments'
 
-export function RobotSettings(props: Props): React.Node {
+export function RobotSettings(props: Props): JSX.Element {
   const { robot } = props
   const { name: robotName } = robot
 

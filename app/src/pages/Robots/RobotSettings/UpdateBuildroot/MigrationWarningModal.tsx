@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
@@ -8,20 +7,22 @@ import styles from './styles.css'
 import type { ButtonProps } from '@opentrons/components'
 import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
 
-export type MigrationWarningModalProps = {|
-  notNowButton: ButtonProps,
-  updateType: BuildrootUpdateType | null,
-  proceed: () => mixed,
-|}
+export interface MigrationWarningModalProps {
+  notNowButton: ButtonProps
+  updateType: BuildrootUpdateType | null
+  proceed: () => unknown
+}
+
+type MaybeButtonProps = ButtonProps | null | undefined
 
 const HEADING = 'Robot Operating System Update Available'
 
 export function MigrationWarningModal(
   props: MigrationWarningModalProps
-): React.Node {
+): JSX.Element {
   const { notNowButton, updateType, proceed } = props
 
-  const buttons: Array<?ButtonProps> = [
+  const buttons: MaybeButtonProps[] = [
     notNowButton,
     {
       children: updateType === UPGRADE ? 'view robot update' : 'update robot',

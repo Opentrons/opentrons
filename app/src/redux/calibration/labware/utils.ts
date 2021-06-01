@@ -1,10 +1,8 @@
-// @flow
-
 import round from 'lodash/round'
 import type { LabwareCalibration } from '../types'
 import type { LabwareCalibrationData, BaseProtocolLabware } from './types'
 
-const normalizeParent = parent =>
+const normalizeParent = (parent: string | null): string | null =>
   // internal protocol labware model uses null for no parent
   // API calibration model uses empty string for no parent
   // normalize to null to do the comparison

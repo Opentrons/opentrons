@@ -1,4 +1,3 @@
-// @flow
 // TODO(mc, 2020-03-11): i18n
 
 import {
@@ -81,7 +80,7 @@ export const FIELD_NOT_LONG_ENOUGH = (
   minLength: number
 ): string => `${name} must be at least ${minLength} characters`
 
-const renderMaybeSsid = (ssid: string | null) =>
+const renderMaybeSsid = (ssid: string | null): string =>
   ssid !== null ? ` network ${ssid}` : ''
 
 export const CONNECTING_TO_NETWORK = (ssid: string | null): string =>

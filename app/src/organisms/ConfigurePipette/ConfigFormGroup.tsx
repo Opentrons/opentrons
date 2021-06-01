@@ -1,29 +1,31 @@
-// @flow
 import * as React from 'react'
-import { Field, type FieldProps } from 'formik'
+import { Field } from 'formik'
 import { FormGroup, InputField, CheckboxField } from '@opentrons/components'
 
 import styles from './styles.css'
 
+import type { FieldProps } from 'formik'
 import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
 
-export type FormColumnProps = {|
-  children: React.Node,
-|}
+export interface FormColumnProps {
+  children: React.ReactNode
+}
 
-export function FormColumn(props: FormColumnProps): React.Node {
+export function FormColumn(props: FormColumnProps): JSX.Element {
   return <div className={styles.form_column}>{props.children}</div>
 }
 
-export type FormValues = { [string]: ?(string | boolean) }
+export interface FormValues {
+  [key: string]: (string | boolean) | null | undefined
+}
 
-export type ConfigFormGroupProps = {|
-  groupLabel: string,
-  groupError?: ?string,
-  formFields: Array<DisplayFieldProps>,
-|}
+export interface ConfigFormGroupProps {
+  groupLabel: string
+  groupError?: string | null | undefined
+  formFields: DisplayFieldProps[]
+}
 
-export function ConfigFormGroup(props: ConfigFormGroupProps): React.Node {
+export function ConfigFormGroup(props: ConfigFormGroupProps): JSX.Element {
   const { groupLabel, groupError, formFields } = props
   const formattedError =
     groupError &&
@@ -45,19 +47,20 @@ export function ConfigFormGroup(props: ConfigFormGroupProps): React.Node {
   )
 }
 
-export type ConfigFormRowProps = {|
-  label: string,
-  labelFor: string,
-  children: React.Node,
-|}
+export interface ConfigFormRowProps {
+  label: string
+  labelFor: string
+  children: React.ReactNode
+}
 
 const FIELD_ID_PREFIX = '__PipetteConfig__'
-const makeId = name => `${FIELD_ID_PREFIX}.${name}`
+const makeId = (name: string): string => `${FIELD_ID_PREFIX}.${name}`
 
-export function ConfigFormRow(props: ConfigFormRowProps): React.Node {
+export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
   const { labelFor, label } = props
   return (
     <div className={styles.form_row}>
+      {/* @ts-expect-error TODO: this label element's label prop doesn't do anything, remove it */}
       <label label={label} htmlFor={labelFor} className={styles.form_label}>
         {props.label}
       </label>
@@ -66,12 +69,12 @@ export function ConfigFormRow(props: ConfigFormRowProps): React.Node {
   )
 }
 
-export type ConfigInputProps = {|
-  field: DisplayFieldProps,
-  className?: string,
-|}
+export interface ConfigInputProps {
+  field: DisplayFieldProps
+  className?: string
+}
 
-export function ConfigInput(props: ConfigInputProps): React.Node {
+export function ConfigInput(props: ConfigInputProps): JSX.Element {
   const { field, className } = props
   const { name, units, displayName } = field
   const id = makeId(field.name)
@@ -86,6 +89,7 @@ export function ConfigInput(props: ConfigInputProps): React.Node {
             value={String(fieldProps.field.value ?? '')}
             onChange={fieldProps.field.onChange}
             onBlur={fieldProps.field.onBlur}
+            // @ts-expect-error TODO: this error prop can't handle some formik error array types
             error={fieldProps.form.errors[name]}
             {...{
               units,
@@ -98,19 +102,19 @@ export function ConfigInput(props: ConfigInputProps): React.Node {
   )
 }
 
-export type ConfigCheckboxProps = {|
-  field: DisplayQuirkFieldProps,
-  className?: string,
-|}
+export interface ConfigCheckboxProps {
+  field: DisplayQuirkFieldProps
+  className?: string
+}
 
-export function ConfigCheckbox(props: ConfigCheckboxProps): React.Node {
+export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
   const { field, className } = props
   const { name, displayName } = field
   const id = makeId(name)
   return (
     <ConfigFormRow label={displayName} labelFor={id}>
       <Field name={name} type="checkbox">
-        {fieldProps => (
+        {(fieldProps: FieldProps) => (
           <CheckboxField
             name={fieldProps.field.name}
             onChange={fieldProps.field.onChange}
@@ -123,12 +127,12 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): React.Node {
   )
 }
 
-export type ConfigQuirkGroupProps = {|
-  groupLabel: string,
-  quirks: Array<DisplayQuirkFieldProps>,
-|}
+export interface ConfigQuirkGroupProps {
+  groupLabel: string
+  quirks: DisplayQuirkFieldProps[]
+}
 
-export function ConfigQuirkGroup(props: ConfigQuirkGroupProps): React.Node {
+export function ConfigQuirkGroup(props: ConfigQuirkGroupProps): JSX.Element {
   const { groupLabel, quirks } = props
   return (
     <FormGroup label={groupLabel} className={styles.form_group}>

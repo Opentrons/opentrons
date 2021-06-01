@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -22,17 +21,17 @@ import { ProtocolLabwareCard } from './ProtocolLabwareCard'
 import { Continue } from './Continue'
 import { UploadError } from '../UploadError'
 
-export type FileInfoProps = {|
-  robot: Robot,
-  filename: ?string,
-  uploadInProgress: boolean,
-  uploadError: ?{ message: string },
-  sessionLoaded: boolean,
-  sessionHasSteps: boolean,
-  showCustomLabwareWarning: boolean,
-|}
+export interface FileInfoProps {
+  robot: Robot
+  filename: string | null | undefined
+  uploadInProgress: boolean
+  uploadError: { message: string } | null | undefined
+  sessionLoaded: boolean
+  sessionHasSteps: boolean
+  showCustomLabwareWarning: boolean
+}
 
-export function FileInfo(props: FileInfoProps): React.Node {
+export function FileInfo(props: FileInfoProps): JSX.Element {
   const {
     robot,
     filename,

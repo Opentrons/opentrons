@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -35,7 +34,7 @@ const USB_ORDER_STYLE = { width: '25%', paddingRight: '0.4rem' }
 const USB_PORT_STYLE = { width: '27%', paddingRight: '0.75rem' }
 const DECK_SLOT_STYLE = { width: '15%' }
 
-export function ProtocolModuleList(): React.Node {
+export function ProtocolModuleList(): JSX.Element | null {
   const { t } = useTranslation('protocol_calibration')
   const modulesRequired = useSelector((state: State) =>
     robotSelectors.getModules(state)
@@ -52,7 +51,7 @@ export function ProtocolModuleList(): React.Node {
   const moduleList = hasDuplicateModule ? modulesByLoadOrder : modulesRequired
   if (modulesRequired.length < 1) return null
   return (
-    <TitledList key={t('modules_title')} title={t('modules_title')}>
+    <TitledList key={t<string>('modules_title')} title={t('modules_title')}>
       {hasDuplicateModule && (
         <Text
           css={FONT_BODY_1_DARK}
@@ -69,6 +68,7 @@ export function ProtocolModuleList(): React.Node {
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         marginY={SPACING_2}
         paddingX="0.875rem"
+        // @ts-expect-error(sa, 2021-05-27): avoiding src code change, pass undefined instead of null
         justifyContent={!hasDuplicateModule ? JUSTIFY_SPACE_BETWEEN : null}
       >
         <Text {...MODULE_STYLE}>{t('modules_module_title')}</Text>
@@ -90,6 +90,7 @@ export function ProtocolModuleList(): React.Node {
               key={m.slot}
               data-test={m.slot}
               padding="0.75rem"
+              // @ts-expect-error(sa, 2021-05-27): avoiding src code change, pass undefined instead of null
               justifyContent={
                 !hasDuplicateModule ? JUSTIFY_SPACE_BETWEEN : null
               }
@@ -112,11 +113,11 @@ export function ProtocolModuleList(): React.Node {
   )
 }
 
-type UsbPortInfoProps = {|
-  matchedModule: MatchedModule | null,
-|}
+interface UsbPortInfoProps {
+  matchedModule: MatchedModule | null
+}
 
-function UsbPortInfo(props: UsbPortInfoProps): React.Node {
+function UsbPortInfo(props: UsbPortInfoProps): JSX.Element | null {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation('protocol_calibration')
 
@@ -140,6 +141,7 @@ function UsbPortInfo(props: UsbPortInfoProps): React.Node {
             width={'15px'}
             paddingLeft={SPACING_1}
           />
+          {/* @ts-expect-error  TODO: this inline style will always be overwritten by tooltipProps, remove it? */}
           <Tooltip style={{ width: '2rem' }} {...tooltipProps}>
             {t('modules_update_software_tooltip')}
           </Tooltip>

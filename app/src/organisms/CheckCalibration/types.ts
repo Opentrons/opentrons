@@ -1,14 +1,11 @@
-// @flow
-import type { Action } from '../../redux/types'
 import type { CalibrationCheckSession } from '../../redux/sessions/types'
+import { DispatchRequestsType } from '../../redux/robot-api'
 
-export type CalibrationCheckParentProps = {|
-  robotName: string,
-  session: CalibrationCheckSession | null,
-  dispatchRequests: (
-    ...Array<{ ...Action, meta: { requestId: string } }>
-  ) => void,
-  isJogging: boolean,
-  showSpinner: boolean,
-  hasBlock?: boolean,
-|}
+export interface CalibrationCheckParentProps {
+  robotName: string
+  session: CalibrationCheckSession | null
+  dispatchRequests: DispatchRequestsType
+  isJogging: boolean
+  showSpinner: boolean
+  hasBlock?: boolean
+}

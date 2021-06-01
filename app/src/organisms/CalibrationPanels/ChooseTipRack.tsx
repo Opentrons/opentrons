@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { head } from 'lodash'
@@ -51,6 +50,7 @@ import type {
 import type { State } from '../../redux/types'
 import type { SelectOption, SelectOptionOrGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { Mount } from '../../redux/pipettes/types'
 
 const HEADER = 'choose tip rack'
 const INTRO = 'Choose what tip rack you would like to use to calibrate your'
@@ -68,7 +68,7 @@ const OPENTRONS_LABEL = 'opentrons'
 const CUSTOM_LABEL = 'custom'
 const USE_THIS_TIP_RACK = 'use this tip rack'
 
-const introContentByType: SessionType => string = sessionType => {
+const introContentByType = (sessionType: SessionType): string => {
   switch (sessionType) {
     case Sessions.SESSION_TYPE_DECK_CALIBRATION:
       return `${INTRO} ${DECK_CAL_INTRO_FRAGMENT}.`
@@ -86,18 +86,18 @@ function formatOptionsFromLabwareDef(lw: LabwareDefinition2): SelectOption {
   }
 }
 
-type ChooseTipRackProps = {|
-  tipRack: CalibrationLabware,
-  mount: string,
-  sessionType: SessionType,
-  chosenTipRack: LabwareDefinition2 | null,
-  handleChosenTipRack: (arg: LabwareDefinition2 | null) => mixed,
-  closeModal: () => mixed,
-  robotName?: string | null,
-  defaultTipracks?: Array<LabwareDefinition2> | null,
-|}
+interface ChooseTipRackProps {
+  tipRack: CalibrationLabware
+  mount: Mount
+  sessionType: SessionType
+  chosenTipRack: LabwareDefinition2 | null
+  handleChosenTipRack: (arg: LabwareDefinition2 | null) => unknown
+  closeModal: () => unknown
+  robotName?: string | null
+  defaultTipracks?: LabwareDefinition2[] | null
+}
 
-export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
+export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
   const {
     tipRack,
     mount,
@@ -111,6 +111,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
 
   const pipSerial = useSelector(
     (state: State) =>
+      // @ts-expect-error(sa, 2021-05-26): possibly null, can optionally chain. leaving to avoid src code change
       robotName && getAttachedPipettes(state, robotName)[mount].id
   )
 
@@ -137,7 +138,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
   const allTipRackDefs = defaultTipracks
     ? defaultTipracks.concat(customTipRacks)
     : customTipRacks
-  const tipRackByUriMap: TipRackMap = allTipRackDefs.reduce((obj, lw) => {
+  const tipRackByUriMap = allTipRackDefs.reduce<TipRackMap>((obj, lw) => {
     if (lw) {
       obj[getLabwareDefURI(lw)] = {
         definition: lw,
@@ -161,14 +162,14 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
     return obj
   }, {})
 
-  const opentronsTipRacksOptions: Array<SelectOption> = defaultTipracks
+  const opentronsTipRacksOptions: SelectOption[] = defaultTipracks
     ? defaultTipracks.map(lw => formatOptionsFromLabwareDef(lw))
     : []
-  const customTipRacksOptions: Array<SelectOption> = customTipRacks.map(lw =>
+  const customTipRacksOptions: SelectOption[] = customTipRacks.map(lw =>
     formatOptionsFromLabwareDef(lw)
   )
 
-  const groupOptions: Array<SelectOptionOrGroup> =
+  const groupOptions: SelectOptionOrGroup[] =
     customTipRacks.length > 0
       ? [
           {
@@ -188,12 +189,17 @@ export function ChooseTipRack(props: ChooseTipRackProps): React.Node {
       : formatOptionsFromLabwareDef(tipRack.definition)
   )
 
-  const handleValueChange = (selected: SelectOption | null, _) => {
+  const handleValueChange = (
+    selected: SelectOption | null,
+    _: unknown
+  ): void => {
     selected && setSelectedValue(selected)
   }
-  const handleUseTipRack = () => {
+  const handleUseTipRack = (): void => {
     const selectedTipRack = tipRackByUriMap[selectedValue.value]
+    // @ts-expect-error(sa, 2021-05-26): need to type narrow, avoiding src code change for now
     if (!isEqual(chosenTipRack, selectedTipRack.definition)) {
+      // @ts-expect-error(sa, 2021-05-26): need to type narrow, avoiding src code change for now
       handleChosenTipRack(selectedTipRack.definition)
     }
     closeModal()

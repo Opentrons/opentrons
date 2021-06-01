@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -10,14 +9,14 @@ import {
 } from '@opentrons/components'
 import type { TipLengthCalibration } from '../../../redux/calibration/api-types'
 
-export type TipLengthCalibrationDataProps = {|
-  calibrationData: TipLengthCalibration | null,
-  calDataAvailable: boolean,
-|}
+export interface TipLengthCalibrationDataProps {
+  calibrationData: TipLengthCalibration | null
+  calDataAvailable: boolean
+}
 
 export function TipLengthCalibrationData(
   props: TipLengthCalibrationDataProps
-): React.Node {
+): JSX.Element {
   const { calibrationData, calDataAvailable } = props
   const { t } = useTranslation('protocol_calibration')
 

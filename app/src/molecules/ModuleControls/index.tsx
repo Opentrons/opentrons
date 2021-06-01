@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { Box, Flex, JUSTIFY_SPACE_BETWEEN } from '@opentrons/components'
@@ -18,12 +17,12 @@ import type {
   ThermocyclerModule,
 } from '../../redux/modules/types'
 
-type Props = {|
-  module: MagneticModule | TemperatureModule | ThermocyclerModule,
-  controlDisabledReason: string | null,
-|}
+interface Props {
+  module: MagneticModule | TemperatureModule | ThermocyclerModule
+  controlDisabledReason: string | null
+}
 
-export function ModuleControls(props: Props): React.Node {
+export function ModuleControls(props: Props): JSX.Element {
   const { module: mod, controlDisabledReason } = props
   const sendModuleCommand = useSendModuleCommand()
   return (

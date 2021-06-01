@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 
@@ -12,33 +11,27 @@ import { DeckMap } from '../../../molecules/DeckMap'
 import { Prompt } from './Prompt'
 import styles from './styles.css'
 
-import type { State, Dispatch } from '../../../redux/types'
+import type { MapDispatchToProps } from 'react-redux'
+import type { State } from '../../../redux/types'
 
-type OP = {| robotName: string |}
+interface OP {
+  robotName: string
+}
 
-type SP = {|
-  modulesRequired: boolean,
-  modulesMissing: boolean,
-  hasDuplicateModules: boolean,
-|}
+interface SP {
+  modulesRequired: boolean
+  modulesMissing: boolean
+  hasDuplicateModules: boolean
+}
 
-type DP = {| setReviewed: () => mixed, fetchModules: () => mixed |}
+interface DP {
+  setReviewed: () => unknown
+  fetchModules: () => unknown
+}
 
-type Props = {| ...OP, ...SP, ...DP |}
+type Props = OP & SP & DP
 
-export const ConnectModules: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  DP,
-  State,
-  Dispatch
->(
-  mapStateToProps,
-  mapDispatchToProps
-)(ConnectModulesComponent)
-
-function ConnectModulesComponent(props: Props) {
+function ConnectModulesComponent(props: Props): JSX.Element | null {
   if (!props.modulesRequired) return null
 
   const {
@@ -75,9 +68,14 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
+const mapDispatchToProps: MapDispatchToProps<DP, OP> = (dispatch, ownProps) => {
   return {
     setReviewed: () => dispatch(robotActions.setModulesReviewed(true)),
     fetchModules: () => dispatch(fetchModules(ownProps.robotName)),
   }
 }
+
+export const ConnectModules = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ConnectModulesComponent)

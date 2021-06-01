@@ -1,4 +1,3 @@
-// @flow
 // setup modules component
 import * as React from 'react'
 import { useSelector } from 'react-redux'
@@ -26,7 +25,7 @@ import type { SessionModule } from '../../../redux/robot/types'
 const TYPE_COL_STYLE = { marginRight: SPACING_AUTO }
 const QUANTITY_COL_STYLE = { width: '37.5%', marginX: SPACING_3 }
 
-export function ProtocolModulesCard(): React.Node {
+export function ProtocolModulesCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
   const modules = useSelector((state: State) => {
     return robotSelectors.getModules(state)
@@ -34,15 +33,14 @@ export function ProtocolModulesCard(): React.Node {
 
   if (modules.length < 1) return null
 
-  const moduleDetails: { [ModuleModel]: number } = modules.reduce(
-    (total, module: SessionModule) => {
-      total[module.model] = (total[module.model] || 0) + 1
-      return total
-    },
-    {}
-  )
+  const moduleDetails: { [model in ModuleModel]?: number } = modules.reduce<
+    { [model in ModuleModel]?: number }
+  >((total, module: SessionModule) => {
+    total[module.model] = (total[module.model] || 0) + 1
+    return total
+  }, {})
   const modulesInfo = Object.keys(moduleDetails).map(k => {
-    return { model: k, counts: moduleDetails[k] }
+    return { model: k as ModuleModel, counts: moduleDetails[k as ModuleModel] }
   })
 
   return (

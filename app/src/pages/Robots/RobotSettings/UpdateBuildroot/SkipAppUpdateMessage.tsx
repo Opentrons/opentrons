@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import {
@@ -9,9 +8,9 @@ import {
   Text,
 } from '@opentrons/components'
 
-type SkipAppUpdateMessageProps = {|
-  onClick: () => mixed,
-|}
+interface SkipAppUpdateMessageProps {
+  onClick: React.MouseEventHandler
+}
 
 const SKIP_APP_MESSAGE =
   'If you wish to skip this app update and only sync your robot server with your current app version, please '
@@ -19,7 +18,7 @@ const CLICK_HERE = 'click here'
 
 export function SkipAppUpdateMessage(
   props: SkipAppUpdateMessageProps
-): React.Node {
+): JSX.Element {
   return (
     <Text paddingLeft={SPACING_3}>
       {SKIP_APP_MESSAGE}

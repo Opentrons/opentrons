@@ -1,13 +1,10 @@
-// @flow
-import type { Action } from '../../redux/types'
 import type { DeckCalibrationSession } from '../../redux/sessions/types'
+import { DispatchRequestsType } from '../../redux/robot-api'
 
-export type CalibrateDeckParentProps = {|
-  robotName: string,
-  session: DeckCalibrationSession | null,
-  dispatchRequests: (
-    ...Array<{ ...Action, meta: { requestId: string } }>
-  ) => void,
-  showSpinner: boolean,
-  isJogging: boolean,
-|}
+export interface CalibrateDeckParentProps {
+  robotName: string
+  session: DeckCalibrationSession | null
+  dispatchRequests: DispatchRequestsType
+  showSpinner: boolean
+  isJogging: boolean
+}

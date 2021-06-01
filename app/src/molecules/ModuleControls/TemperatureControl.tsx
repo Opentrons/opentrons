@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import {
@@ -28,25 +27,25 @@ import type {
 } from '../../redux/modules/types'
 import type { ModuleModel } from '@opentrons/shared-data'
 
-type Props = {|
-  module: ThermocyclerModule | TemperatureModule,
+interface Props {
+  module: ThermocyclerModule | TemperatureModule
   sendModuleCommand: (
     moduleId: string,
     command: ModuleCommand,
-    args?: Array<mixed>
-  ) => mixed,
-  isSecondaryTemp: boolean,
-  disabledReason?: string | null,
-|}
+    args?: unknown[]
+  ) => unknown
+  isSecondaryTemp: boolean
+  disabledReason?: string | null
+}
 
 export const TemperatureControl = ({
   module,
   isSecondaryTemp,
   sendModuleCommand,
   disabledReason,
-}: Props): React.Node => {
-  const [tempValue, setTempValue] = React.useState(null)
-  const [isModalOpen, setIsModalOpen] = React.useState(false)
+}: Props): JSX.Element => {
+  const [tempValue, setTempValue] = React.useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const isThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
@@ -67,7 +66,7 @@ export const TemperatureControl = ({
       ? module.data.lidTarget != null
       : module.status !== 'idle'
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (hasTarget) {
       sendModuleCommand(
         module.serial,
@@ -78,7 +77,7 @@ export const TemperatureControl = ({
     }
   }
 
-  const handleSubmitTemp = () => {
+  const handleSubmitTemp = (): void => {
     if (tempValue != null) {
       sendModuleCommand(
         module.serial,
@@ -90,7 +89,7 @@ export const TemperatureControl = ({
     setIsModalOpen(false)
   }
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setIsModalOpen(false)
     setTempValue(null)
   }
@@ -152,27 +151,28 @@ export const TemperatureControl = ({
   )
 }
 
-type temperatureRanges = {|
-  min: number,
-  max: number,
-|}
+interface TemperatureRanges {
+  min: number
+  max: number
+}
 
 function getModuleTemperatureRanges(
   model: ModuleModel,
   isSecondaryTemp: boolean
-) {
+): TemperatureRanges {
   if (isSecondaryTemp && TEMPERATURE_RANGES[model].secondary) {
-    return TEMPERATURE_RANGES[model].secondary
+    return TEMPERATURE_RANGES[model].secondary as TemperatureRanges
   } else {
-    return TEMPERATURE_RANGES[model].primary
+    return TEMPERATURE_RANGES[model].primary as TemperatureRanges
   }
 }
 
+// @ts-expect-error key should be optional as not all models are present
 const TEMPERATURE_RANGES: {
-  [ModuleModel]: {
-    primary: temperatureRanges,
-    secondary?: temperatureRanges | null,
-  },
+  [model in ModuleModel]: {
+    primary: TemperatureRanges
+    secondary?: TemperatureRanges | null
+  }
 } = {
   temperatureModuleV1: { primary: { min: 4, max: 96 }, secondary: null },
   temperatureModuleV2: { primary: { min: 4, max: 96 }, secondary: null },

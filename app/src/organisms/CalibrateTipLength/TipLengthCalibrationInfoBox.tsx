@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   Box,
@@ -9,14 +8,14 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-export type TipLengthCalibrationInfoBoxProps = {|
-  title: string,
-  children: React.Node,
-|}
+export interface TipLengthCalibrationInfoBoxProps {
+  title: string
+  children: React.ReactNode
+}
 
 export function TipLengthCalibrationInfoBox(
   props: TipLengthCalibrationInfoBoxProps
-): React.Node {
+): JSX.Element {
   const { title, children } = props
 
   return (

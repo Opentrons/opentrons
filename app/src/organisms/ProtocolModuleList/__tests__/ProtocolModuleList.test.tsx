@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { StaticRouter } from 'react-router-dom'
 import { mountWithProviders } from '@opentrons/components/__utils__'
@@ -9,85 +8,84 @@ import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import * as robotSelectors from '../../../redux/robot/selectors'
 import * as moduleSelectors from '../../../redux/modules/selectors'
 import { ProtocolModuleList } from '..'
-
-import type { State } from '../../../redux/types'
+import { ApiSessionModule } from '../../../redux/robot'
+import { MatchedModule } from '../../../redux/modules/types'
 
 jest.mock('../../../redux/robot/selectors')
 jest.mock('../../../redux/modules/selectors')
 
-const mockGetModules: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getModules, State>
-> = robotSelectors.getModules
+const mockGetModules = robotSelectors.getModules as jest.MockedFunction<
+  typeof robotSelectors.getModules
+>
 
-const mockGetModulesByModel: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getModulesByModel, State>
-> = robotSelectors.getModulesByModel
+const mockGetMatchedModules = moduleSelectors.getMatchedModules as jest.MockedFunction<
+  typeof moduleSelectors.getMatchedModules
+>
+const mockGetModulesByModel = robotSelectors.getModulesByModel as jest.MockedFunction<
+  typeof robotSelectors.getModulesByModel
+>
+const mockGetModulesByProtocolLoadOrder = robotSelectors.getModulesByProtocolLoadOrder as jest.MockedFunction<
+  typeof robotSelectors.getModulesByProtocolLoadOrder
+>
 
-const mockGetModulesByProtocolLoadOrder: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getModulesByProtocolLoadOrder, State>
-> = robotSelectors.getModulesByProtocolLoadOrder
+type MockedModuleType = Pick<
+  ApiSessionModule,
+  'model' | 'slot' | '_id' | 'protocolLoadOrder'
+>
 
-const mockGetMatchedModules: JestMockFn<
-  [State],
-  $Call<typeof moduleSelectors.getMatchedModules, State>
-> = moduleSelectors.getMatchedModules
-
-const mockMagneticModule1 = {
-  model: 'magneticModuleV1',
-  slot: '1',
+const mockMagneticModule1: MockedModuleType = {
+  model: 'magneticModuleV1' as ApiSessionModule['model'],
+  slot: '1' as ApiSessionModule['slot'],
   _id: 1234,
   protocolLoadOrder: 0,
 }
 
-const mockMagneticModule2 = {
-  model: 'magneticModuleV2',
-  slot: '3',
+const mockMagneticModule2: MockedModuleType = {
+  model: 'magneticModuleV2' as ApiSessionModule['model'],
+  slot: '3' as ApiSessionModule['slot'],
   _id: 2345,
   protocolLoadOrder: 1,
 }
 
 const mockMagneticModuleV2 = {
-  model: 'magneticModuleV2',
-  slot: '1',
+  model: 'magneticModuleV2' as ApiSessionModule['model'],
+  slot: '1' as ApiSessionModule['slot'],
   _id: 1234,
   protocolLoadOrder: 0,
 }
 
-const mockMatchedModule1 = {
+const mockMatchedModule1: MatchedModule = {
   module: {
     ...mockMagneticModule,
     usbPort: { hub: null, port: 1 },
   },
-  slot: '1',
+  slot: '1' as ApiSessionModule['slot'],
 }
 
-const mockMatchedModule2 = {
+const mockMatchedModule2: MatchedModule = {
   module: {
     ...mockMagneticModule,
     usbPort: { hub: 2, port: 3 },
   },
-  slot: '3',
+  slot: '3' as ApiSessionModule['slot'],
 }
 
-const mockLegacyMatchedModule = {
+const mockLegacyMatchedModule: MatchedModule = {
   module: {
     ...mockMagneticModule,
     usbPort: { hub: null, port: null },
   },
-  slot: '3',
+  slot: '3' as ApiSessionModule['slot'],
 }
 
 const mockModules = [mockMagneticModule1, mockMagneticModule2]
 const mockModulesByModel = {
   magneticModuleV1: [mockMagneticModule1],
   magneticModuleV2: [mockMagneticModule2],
-}
+} as any
 
 describe('ModuleList', () => {
-  let render
+  let render: (location?: string) => ReturnType<typeof mountWithProviders>
 
   beforeEach(() => {
     mockGetModules.mockReturnValue(mockModules)

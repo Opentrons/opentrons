@@ -1,4 +1,3 @@
-// @flow
 // fixtures for /wifi/keys
 
 import { GET, POST } from '../../robot-api'
@@ -25,7 +24,7 @@ export const {
   failure: mockFetchWifiKeysFailure,
 }: ResponseFixtures<
   FetchWifiKeysResponse,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: GET,
   path: WIFI_KEYS_PATH,
@@ -42,7 +41,7 @@ export const {
   failure: mockPostWifiKeysFailure,
 }: ResponseFixtures<
   PostWifiKeysResponse,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: POST,
   path: WIFI_KEYS_PATH,

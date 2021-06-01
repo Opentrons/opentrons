@@ -1,5 +1,3 @@
-// @flow
-
 // common constants
 
 export const STATUS_NONE: 'none' = 'none'

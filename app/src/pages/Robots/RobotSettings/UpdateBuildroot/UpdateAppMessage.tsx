@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import semver from 'semver'
 import styles from './styles.css'
@@ -20,7 +19,7 @@ const UPDATE_APP = (
   </>
 )
 
-export function UpdateAppMessage(props: VersionProps): React.Node {
+export function UpdateAppMessage(props: VersionProps): JSX.Element {
   const { appVersion, availableUpdate } = props
   const versionsMatch: boolean =
     semver.valid(appVersion) && semver.valid(availableUpdate)

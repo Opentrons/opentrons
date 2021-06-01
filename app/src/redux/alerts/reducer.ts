@@ -1,8 +1,8 @@
-// @flow
 import union from 'lodash/union'
 import without from 'lodash/without'
 import * as Constants from './constants'
 
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { AlertsState } from './types'
 
@@ -11,10 +11,10 @@ const INITIAL_STATE = {
   ignored: [],
 }
 
-export function alertsReducer(
-  state: AlertsState = INITIAL_STATE,
-  action: Action
-): AlertsState {
+export const alertsReducer: Reducer<AlertsState, Action> = (
+  state = INITIAL_STATE,
+  action
+) => {
   switch (action.type) {
     case Constants.ALERT_TRIGGERED: {
       const { active, ignored } = state

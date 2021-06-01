@@ -1,5 +1,3 @@
-// @flow
-
 import { makeEvent } from '../make-event'
 
 import * as Alerts from '../../alerts'
@@ -7,8 +5,8 @@ import * as Alerts from '../../alerts'
 import type { State } from '../../types'
 import type { AlertId } from '../../alerts/types'
 
-const MOCK_STATE: State = ({ mockState: true }: any)
-const MOCK_ALERT_ID: AlertId = ('fizzbuzz': any)
+const MOCK_STATE: State = { mockState: true } as any
+const MOCK_ALERT_ID: AlertId = 'fizzbuzz' as any
 
 describe('custom labware analytics events', () => {
   it('should not trigger an event for random alerts', () => {

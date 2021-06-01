@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 
@@ -10,6 +9,7 @@ import * as RobotSelectors from '../../../../redux/robot/selectors'
 import { ControlsCard } from '../ControlsCard'
 import { CONNECTABLE, UNREACHABLE } from '../../../../redux/discovery'
 
+import type { HTMLAttributes, ReactWrapper } from 'enzyme'
 import type { State, Action } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
@@ -22,46 +22,51 @@ jest.mock('../CheckCalibrationControl', () => ({
   CheckCalibrationControl: () => <></>,
 }))
 
-const mockRobot: ViewableRobot = ({
+const mockRobot: ViewableRobot = {
   name: 'robot-name',
   connected: true,
   status: CONNECTABLE,
-}: any)
+} as any
 
-const mockUnconnectableRobot: ViewableRobot = ({
+const mockUnconnectableRobot: ViewableRobot = {
   name: 'robot-name',
   connected: true,
   status: UNREACHABLE,
-}: any)
+} as any
 
-const mockGetLightsOn: JestMockFn<
-  [State, string],
-  $Call<typeof RobotControls.getLightsOn, State, string>
-> = RobotControls.getLightsOn
+const mockGetLightsOn = RobotControls.getLightsOn as jest.MockedFunction<
+  typeof RobotControls.getLightsOn
+>
 
-const mockGetIsRunning: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getIsRunning, State>
-> = RobotSelectors.getIsRunning
+const mockGetIsRunning = RobotSelectors.getIsRunning as jest.MockedFunction<
+  typeof RobotSelectors.getIsRunning
+>
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = { mockState: true } as any
 
 describe('ControlsCard', () => {
   const render = (robot: ViewableRobot = mockRobot) => {
-    return mountWithProviders<_, State, Action>(
-      <ControlsCard robot={robot} />,
-      {
-        initialState: MOCK_STATE,
-        i18n,
-      }
-    )
+    return mountWithProviders<
+      React.ComponentProps<typeof ControlsCard>,
+      State,
+      Action
+    >(<ControlsCard robot={robot} />, {
+      initialState: MOCK_STATE,
+      i18n,
+    })
   }
 
-  const getHomeButton = wrapper => wrapper.find('button[children="home"]')
+  const getHomeButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ControlsCard>>
+  ): ReactWrapper<HTMLAttributes> => wrapper.find('button[children="home"]')
 
-  const getRestartButton = wrapper => wrapper.find('button[children="restart"]')
+  const getRestartButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ControlsCard>>
+  ): ReactWrapper<HTMLAttributes> => wrapper.find('button[children="restart"]')
 
-  const getLightsButton = wrapper => wrapper.find('ToggleBtn[label="lights"]')
+  const getLightsButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ControlsCard>>
+  ): ReactWrapper<HTMLAttributes> => wrapper.find('ToggleBtn[label="lights"]')
 
   beforeEach(() => {
     jest.useFakeTimers()
@@ -86,7 +91,7 @@ describe('ControlsCard', () => {
 
     const { wrapper, store } = render()
 
-    getLightsButton(wrapper).invoke('onClick')()
+    getLightsButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       RobotControls.updateLights(mockRobot.name, false)
@@ -96,7 +101,7 @@ describe('ControlsCard', () => {
   it('calls restartRobot on button click', () => {
     const { wrapper, store } = render()
 
-    getRestartButton(wrapper).invoke('onClick')()
+    getRestartButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       RobotAdmin.restartRobot(mockRobot.name)
@@ -106,7 +111,7 @@ describe('ControlsCard', () => {
   it('calls home on button click', () => {
     const { wrapper, store } = render()
 
-    getHomeButton(wrapper).invoke('onClick')()
+    getHomeButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       RobotControls.home(mockRobot.name, RobotControls.ROBOT)
@@ -130,11 +135,11 @@ describe('ControlsCard', () => {
   })
 
   it('home, and restart buttons disabled if not connected', () => {
-    const mockRobotNotConnected: ViewableRobot = ({
+    const mockRobotNotConnected: ViewableRobot = {
       name: 'robot-name',
       connected: false,
       status: CONNECTABLE,
-    }: any)
+    } as any
 
     const { wrapper } = render(mockRobotNotConnected)
 

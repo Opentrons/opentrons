@@ -1,5 +1,3 @@
-// @flow
-
 import type { Mount } from './types'
 
 // action types
@@ -46,7 +44,7 @@ export const PIPETTE_SETTINGS_PATH: '/settings/pipettes' = '/settings/pipettes'
 
 export const LEFT: 'left' = 'left'
 export const RIGHT: 'right' = 'right'
-export const PIPETTE_MOUNTS: Array<Mount> = [LEFT, RIGHT]
+export const PIPETTE_MOUNTS: Mount[] = [LEFT, RIGHT]
 export const MATCH: 'match' = 'match'
 export const INCOMPATIBLE: 'incompatible' = 'incompatible'
 export const INEXACT_MATCH: 'inexact_match' = 'inexact_match'

@@ -1,5 +1,3 @@
-// @flow
-
 import * as React from 'react'
 import { C_BLUE, SPACING_2, Link, Text } from '@opentrons/components'
 import { TitledControl } from '../../../atoms/TitledControl'
@@ -37,7 +35,7 @@ const PERFORM_A_FULL_UNINSTALL = (
   </>
 )
 
-export function DowngradeAppControl(props: StyleProps): React.Node {
+export function DowngradeAppControl(props: StyleProps): JSX.Element {
   return (
     <TitledControl
       {...props}

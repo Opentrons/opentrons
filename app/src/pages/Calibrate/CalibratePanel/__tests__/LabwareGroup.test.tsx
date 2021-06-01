@@ -1,11 +1,9 @@
-// @flow
 import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../../i18n'
 import wellPlate96Def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import type { State } from '../../../../redux/types'
 import type { BaseProtocolLabware } from '../../../../redux/calibration/labware/types'
 import { selectors as robotSelectors } from '../../../../redux/robot'
 import { fetchLabwareCalibrations } from '../../../../redux/calibration/labware'
@@ -14,38 +12,32 @@ import { LabwareGroup } from '../LabwareGroup'
 jest.mock('../../../../redux/robot/selectors')
 jest.mock('../../../../redux/calibration/labware/selectors')
 
-const mockGetCalibratorMount: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getCalibratorMount, State>
-> = robotSelectors.getCalibratorMount
+const mockGetCalibratorMount = robotSelectors.getCalibratorMount as jest.MockedFunction<
+  typeof robotSelectors.getCalibratorMount
+>
 
-const mockGetDeckPopulated: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getDeckPopulated, State>
-> = robotSelectors.getDeckPopulated
+const mockGetDeckPopulated = robotSelectors.getDeckPopulated as jest.MockedFunction<
+  typeof robotSelectors.getDeckPopulated
+>
 
-const mockGetTipracksConfirmed: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getTipracksConfirmed, State>
-> = robotSelectors.getTipracksConfirmed
+const mockGetTipracksConfirmed = robotSelectors.getTipracksConfirmed as jest.MockedFunction<
+  typeof robotSelectors.getTipracksConfirmed
+>
 
-const mockGetIsRunning: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getIsRunning, State>
-> = robotSelectors.getIsRunning
+const mockGetIsRunning = robotSelectors.getIsRunning as jest.MockedFunction<
+  typeof robotSelectors.getIsRunning
+>
 
-const mockGetConnectedRobotName: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getConnectedRobotName, State>
-> = robotSelectors.getConnectedRobotName
+const mockGetConnectedRobotName = robotSelectors.getConnectedRobotName as jest.MockedFunction<
+  typeof robotSelectors.getConnectedRobotName
+>
 
-const mockGetModulesBySlot: JestMockFn<
-  [State],
-  $Call<typeof robotSelectors.getModulesBySlot, State>
-> = robotSelectors.getModulesBySlot
+const mockGetModulesBySlot = robotSelectors.getModulesBySlot as jest.MockedFunction<
+  typeof robotSelectors.getModulesBySlot
+>
 
-const stubTipRacks = [
-  ({
+const stubTipRacks: BaseProtocolLabware[] = [
+  {
     type: 'some_tiprack',
     definition: tiprack300Def,
     slot: '3',
@@ -55,8 +47,8 @@ const stubTipRacks = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  }: $Shape<BaseProtocolLabware>),
-  ({
+  } as any,
+  {
     type: 'some_other_tiprack',
     definition: null,
     slot: '1',
@@ -66,11 +58,11 @@ const stubTipRacks = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  }: $Shape<BaseProtocolLabware>),
+  } as any,
 ]
 
-const stubOtherLabware = [
-  ({
+const stubOtherLabware: BaseProtocolLabware[] = [
+  {
     type: 'some_wellplate',
     definition: wellPlate96Def,
     slot: '4',
@@ -80,8 +72,8 @@ const stubOtherLabware = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  }: $Shape<BaseProtocolLabware>),
-  ({
+  } as any,
+  {
     type: 'some_other_wellplate',
     definition: wellPlate96Def,
     slot: '7',
@@ -91,11 +83,13 @@ const stubOtherLabware = [
     confirmed: true,
     parent: null,
     calibrationData: null,
-  }: $Shape<BaseProtocolLabware>),
+  } as any,
 ]
 
 describe('LabwareGroup', () => {
-  let render
+  let render: (
+    props?: Partial<React.ComponentProps<typeof LabwareGroup>>
+  ) => ReturnType<typeof mountWithProviders>
 
   beforeEach(() => {
     mockGetConnectedRobotName.mockReturnValue('robotName')

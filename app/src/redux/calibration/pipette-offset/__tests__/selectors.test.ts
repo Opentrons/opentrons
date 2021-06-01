@@ -1,11 +1,9 @@
-// @flow
-
 import * as Selectors from '../selectors'
 import * as Fixtures from '../__fixtures__'
 
 import type { State } from '../../../types'
 
-const mockState: $Shape<State> = {
+const mockState: State = {
   calibration: {
     'robot-name': {
       pipetteOffsetCalibrations: Fixtures.mockAllPipetteOffsetsCalibration,
@@ -14,7 +12,7 @@ const mockState: $Shape<State> = {
       tipLengthCalibrations: null,
     },
   },
-}
+} as any
 
 describe('getPipetteOffsetCalibrations', () => {
   it('should find all pipette calibrations when they exist', () => {

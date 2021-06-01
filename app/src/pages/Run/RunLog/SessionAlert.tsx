@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { AlertItem } from '@opentrons/components'
@@ -6,23 +5,25 @@ import { getSessionError } from '../../../redux/robot/selectors'
 import type { SessionStatus, SessionStatusInfo } from '../../../redux/robot'
 import styles from './styles.css'
 
-const buildPauseMessage = (message: ?string): string =>
+const buildPauseMessage = (message: string | null | undefined): string =>
   message ? `: ${message}` : ''
 
-const buildPause = (message: ?string): string =>
+const buildPause = (message: string | null | undefined): string =>
   `Run paused${buildPauseMessage(message)}`
 
-const buildPauseUserMessage = (message: ?string) =>
+const buildPauseUserMessage = (
+  message: string | null | undefined
+): string | JSX.Element | null | undefined =>
   message && <div className={styles.pause_user_message}>{message}</div>
 
-export type SessionAlertProps = {|
-  sessionStatus: SessionStatus,
-  sessionStatusInfo: SessionStatusInfo,
-  className?: string,
-  onResetClick: () => mixed,
-|}
+export interface SessionAlertProps {
+  sessionStatus: SessionStatus
+  sessionStatusInfo: SessionStatusInfo
+  className?: string
+  onResetClick: () => unknown
+}
 
-export function SessionAlert(props: SessionAlertProps): React.Node {
+export function SessionAlert(props: SessionAlertProps): JSX.Element | null {
   const { sessionStatus, sessionStatusInfo, className, onResetClick } = props
   const sessionError = useSelector(getSessionError)
 

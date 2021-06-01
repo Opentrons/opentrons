@@ -1,4 +1,3 @@
-// @flow
 // robot information card tests
 import * as React from 'react'
 import { Link } from 'react-router-dom'
@@ -14,9 +13,6 @@ import { checkShellUpdate } from '../../../../redux/shell'
 import { LabeledValue } from '../../../../atoms/structure'
 import { InformationCard } from '../InformationCard'
 
-import type { State } from '../../../../redux/types'
-import type { DiscoveredRobot } from '../../../../redux/discovery/types'
-
 jest.mock('react-router-dom', () => ({
   Link: 'a',
 }))
@@ -24,32 +20,30 @@ jest.mock('react-router-dom', () => ({
 jest.mock('../../../../redux/buildroot/selectors')
 jest.mock('../../../../redux/discovery/selectors')
 
-const getBuildrootUpdateDisplayInfo: JestMockFn<
-  [State, string],
-  $Call<typeof Buildroot.getBuildrootUpdateDisplayInfo, State, string>
-> = Buildroot.getBuildrootUpdateDisplayInfo
+const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof Buildroot.getBuildrootUpdateDisplayInfo
+>
 
-const getRobotApiVersion: JestMockFn<
-  [DiscoveredRobot],
-  $Call<typeof Discovery.getRobotApiVersion, DiscoveredRobot>
-> = Discovery.getRobotApiVersion
+const getRobotApiVersion = Discovery.getRobotApiVersion as jest.MockedFunction<
+  typeof Discovery.getRobotApiVersion
+>
 
-const getRobotFirmwareVersion: JestMockFn<
-  [DiscoveredRobot],
-  $Call<typeof Discovery.getRobotFirmwareVersion, DiscoveredRobot>
-> = Discovery.getRobotFirmwareVersion
+const getRobotFirmwareVersion = Discovery.getRobotFirmwareVersion as jest.MockedFunction<
+  typeof Discovery.getRobotFirmwareVersion
+>
 
-const getRobotProtocolApiVersion: JestMockFn<
-  [DiscoveredRobot],
-  $Call<typeof Discovery.getRobotProtocolApiVersion, DiscoveredRobot>
-> = Discovery.getRobotProtocolApiVersion
+const getRobotProtocolApiVersion = Discovery.getRobotProtocolApiVersion as jest.MockedFunction<
+  typeof Discovery.getRobotProtocolApiVersion
+>
 
 const MOCK_ROBOT_VERSION = '1.2.3'
 const MOCK_FIRMWARE_VERSION = '4.5.6'
 const MOCK_MIN_PAPI_VERSION = '1.0'
 const MOCK_MAX_PAPI_VERSION = '2.8'
 describe('InformationCard', () => {
-  const render = (robot = mockConnectableRobot) => {
+  const render = (
+    robot = mockConnectableRobot
+  ): ReturnType<typeof mountWithProviders> => {
     const updateUrl = `/robots/${robot.name}/update`
     return mountWithProviders(
       <InformationCard robot={robot} updateUrl={updateUrl} />,

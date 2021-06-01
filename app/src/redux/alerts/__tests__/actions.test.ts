@@ -1,10 +1,9 @@
-// @flow
 import * as Config from '../../config'
 import * as Actions from '../actions'
 
 import type { AlertId } from '../types'
 
-const MOCK_ALERT_ID: AlertId = ('mockAlert': any)
+const MOCK_ALERT_ID: AlertId = 'mockAlert' as any
 
 describe('alerts actions', () => {
   it('should allow an alert to be triggered', () => {

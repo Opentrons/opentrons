@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 import omit from 'lodash/omit'
 
@@ -11,8 +10,8 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-import type { Epic } from '../../types'
-import type { PostWifiKeysAction } from '../types'
+import type { Action, Epic } from '../../types'
+import type { PostWifiKeysAction, WifiKey } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<PostWifiKeysAction> = action => {
   const { keyFile } = action.payload
@@ -30,13 +29,13 @@ const mapResponseToAction: ResponseToActionMapper<PostWifiKeysAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? postWifiKeysSuccess(host.name, omit(body, 'message'), meta)
+    ? postWifiKeysSuccess(host.name, omit(body, 'message') as WifiKey, meta)
     : postWifiKeysFailure(host.name, body, meta)
 }
 
 export const postWifiKeysEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(POST_WIFI_KEYS),
+    ofType<Action, PostWifiKeysAction>(POST_WIFI_KEYS),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

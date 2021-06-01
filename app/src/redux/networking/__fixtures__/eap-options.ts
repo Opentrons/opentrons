@@ -1,4 +1,3 @@
-// @flow
 // fixtures for /wifi/eap-options
 
 import { GET } from '../../robot-api'
@@ -55,7 +54,7 @@ const {
   failure,
 }: ResponseFixtures<
   FetchEapOptionsResponse,
-  {| message: string |}
+  { message: string }
 > = makeResponseFixtures({
   method: GET,
   path: EAP_OPTIONS_PATH,

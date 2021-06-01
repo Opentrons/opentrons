@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
@@ -12,11 +11,11 @@ import {
 
 import type { State } from '../../../../../redux/types'
 
-export type UploadKeyInputProps = {|
-  robotName: string,
-  label: string,
-  onUpload: (keyId: string) => mixed,
-|}
+export interface UploadKeyInputProps {
+  robotName: string
+  label: string
+  onUpload: (keyId: string) => unknown
+}
 
 // TODO(mc, 2020-03-04): create styled HiddenInput in components library
 const HiddenInput = styled.input`
@@ -30,16 +29,19 @@ const HiddenInput = styled.input`
   border: 0;
 `
 
-const UploadKeyInputComponent = (props: UploadKeyInputProps, ref) => {
+const UploadKeyInputComponent = (
+  props: UploadKeyInputProps,
+  ref: React.ForwardedRef<HTMLInputElement>
+): JSX.Element => {
   const { robotName, label, onUpload } = props
   const [dispatchApi, requestIds] = useDispatchApiRequest()
-  const handleUpload = React.useRef()
+  const handleUpload = React.useRef<(key: string) => void>()
 
   const createdKeyId = useSelector((state: State) => {
     return getWifiKeyByRequestId(state, robotName, last(requestIds) ?? null)
   })?.id
 
-  const handleFileInput = (event: SyntheticInputEvent<HTMLInputElement>) => {
+  const handleFileInput: React.ChangeEventHandler<HTMLInputElement> = event => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0]
       event.target.value = ''
@@ -68,7 +70,7 @@ const UploadKeyInputComponent = (props: UploadKeyInputProps, ref) => {
   )
 }
 
-export const UploadKeyInput: React.AbstractComponent<
-  UploadKeyInputProps,
-  HTMLInputElement
-> = React.forwardRef(UploadKeyInputComponent)
+export const UploadKeyInput = React.forwardRef<
+  HTMLInputElement,
+  UploadKeyInputProps
+>(UploadKeyInputComponent)

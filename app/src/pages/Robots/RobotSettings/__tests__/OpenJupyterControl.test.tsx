@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 import { SecondaryBtn } from '@opentrons/components'
@@ -7,15 +6,14 @@ import { i18n } from '../../../../i18n'
 import * as Analytics from '../../../../redux/analytics'
 import { OpenJupyterControl } from '../OpenJupyterControl'
 
-import type { AnalyticsEvent } from '../../../../redux/analytics/types'
-
 jest.mock('../../../../redux/analytics')
 
-const useTrackEvent: JestMockFn<[], (AnalyticsEvent) => void> =
-  Analytics.useTrackEvent
+const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<
+  typeof Analytics.useTrackEvent
+>
 
 describe('OpenJupyterControl component', () => {
-  const render = () =>
+  const render = (): ReturnType<typeof mountWithProviders> =>
     mountWithProviders(<OpenJupyterControl robotIp="localhost" />, { i18n })
   const trackEvent = jest.fn()
 
@@ -55,7 +53,9 @@ describe('OpenJupyterControl component', () => {
   it('should send an analytics event on link click', () => {
     const { wrapper } = render()
 
-    wrapper.find('a[href="http://localhost:48888"]').invoke('onClick')()
+    wrapper.find('a[href="http://localhost:48888"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
 
     expect(trackEvent).toHaveBeenCalledWith({
       name: 'jupyterOpen',

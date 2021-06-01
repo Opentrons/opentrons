@@ -1,13 +1,12 @@
-// @flow
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 
-type Props = {|
-  back: () => mixed,
-  exit: () => mixed,
-|}
+interface Props {
+  back: () => unknown
+  exit: () => unknown
+}
 
 // TODO(mc, 2019-12-18): i18n
 const ARE_YOU_SURE_YOU_WANT_TO_GO_BACK = 'Are you sure you want to go back?'
@@ -16,7 +15,7 @@ const EXITING_WILL_END_PIPETTE_SETUP =
 const CANCEL = 'cancel'
 const EXIT = 'exit'
 
-export function ExitAlertModal(props: Props): React.Node {
+export function ExitAlertModal(props: Props): JSX.Element {
   const { back, exit } = props
 
   return (

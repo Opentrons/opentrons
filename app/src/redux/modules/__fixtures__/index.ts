@@ -1,7 +1,9 @@
-// @flow
-
 import * as Types from '../types'
 import * as ApiTypes from '../api-types'
+import type {
+  RobotApiResponse,
+  RobotApiResponseMeta,
+} from '../../robot-api/types'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
@@ -233,14 +235,14 @@ export const mockThermocycler: Types.ThermocyclerModule = {
 
 // fetch modules fixtures
 
-export const mockFetchModulesSuccessMeta = {
+export const mockFetchModulesSuccessMeta: RobotApiResponseMeta = {
   method: 'GET',
   path: '/modules',
   ok: true,
   status: 200,
 }
 
-export const mockFetchModulesSuccess = {
+export const mockFetchModulesSuccess: RobotApiResponse = {
   ...mockFetchModulesSuccessMeta,
   host: mockRobot,
   body: {
@@ -252,7 +254,7 @@ export const mockFetchModulesSuccess = {
   },
 }
 
-export const mockLegacyFetchModulesSuccess = {
+export const mockLegacyFetchModulesSuccess: RobotApiResponse = {
   ...mockFetchModulesSuccessMeta,
   host: mockRobot,
   body: {
@@ -270,14 +272,14 @@ export const mockFetchModulesSuccessActionPayloadModules = [
   mockThermocycler,
 ]
 
-export const mockFetchModulesFailureMeta = {
+export const mockFetchModulesFailureMeta: RobotApiResponseMeta = {
   method: 'GET',
   path: '/modules',
   ok: false,
   status: 500,
 }
 
-export const mockFetchModulesFailure = {
+export const mockFetchModulesFailure: RobotApiResponse = {
   ...mockFetchModulesFailureMeta,
   host: mockRobot,
   body: { message: 'AH' },
@@ -285,14 +287,14 @@ export const mockFetchModulesFailure = {
 
 // send module command fixtures
 
-export const mockSendModuleCommandSuccessMeta = {
+export const mockSendModuleCommandSuccessMeta: RobotApiResponseMeta = {
   method: 'POST',
   path: '/modules/abc123',
   ok: true,
   status: 200,
 }
 
-export const mockSendModuleCommandSuccess = {
+export const mockSendModuleCommandSuccess: RobotApiResponse = {
   ...mockSendModuleCommandSuccessMeta,
   host: mockRobot,
   body: {
@@ -301,14 +303,14 @@ export const mockSendModuleCommandSuccess = {
   },
 }
 
-export const mockSendModuleCommandFailureMeta = {
+export const mockSendModuleCommandFailureMeta: RobotApiResponseMeta = {
   method: 'POST',
   path: '/modules/abc123',
   ok: false,
   status: 500,
 }
 
-export const mockSendModuleCommandFailure = {
+export const mockSendModuleCommandFailure: RobotApiResponse = {
   ...mockSendModuleCommandFailureMeta,
   host: mockRobot,
   body: { message: 'AH' },
@@ -316,14 +318,14 @@ export const mockSendModuleCommandFailure = {
 
 // update module command fixtures
 
-export const mockUpdateModuleSuccessMeta = {
+export const mockUpdateModuleSuccessMeta: RobotApiResponseMeta = {
   method: 'POST',
   path: '/modules/abc123/update',
   ok: true,
   status: 200,
 }
 
-export const mockUpdateModuleSuccess = {
+export const mockUpdateModuleSuccess: RobotApiResponse = {
   ...mockUpdateModuleSuccessMeta,
   host: mockRobot,
   body: {
@@ -331,14 +333,14 @@ export const mockUpdateModuleSuccess = {
   },
 }
 
-export const mockUpdateModuleFailureMeta = {
+export const mockUpdateModuleFailureMeta: RobotApiResponseMeta = {
   method: 'POST',
   path: '/modules/abc123/update',
   ok: false,
   status: 500,
 }
 
-export const mockUpdateModuleFailure = {
+export const mockUpdateModuleFailure: RobotApiResponse = {
   ...mockUpdateModuleFailureMeta,
   host: mockRobot,
   body: { message: 'BAD NEWS BEARS' },

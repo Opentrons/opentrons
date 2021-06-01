@@ -1,4 +1,3 @@
-// @flow
 import noop from 'lodash/noop'
 
 import * as CalibrationSelectors from '../../calibration/selectors'
@@ -14,15 +13,15 @@ import { NOT_APPLICABLE, OUTDATED } from '../../system-info'
 
 import { DECK_CAL_STATUS_OK, DECK_CAL_STATUS_IDENTITY } from '../../calibration'
 import type { State } from '../../types'
-import type { Robot, ViewableRobot } from '../../discovery/types'
+import type { Robot } from '../../discovery/types'
 
-type SelectorSpec = {|
-  name: string,
-  selector: State => mixed,
-  before?: () => mixed,
-  after?: () => mixed,
-  expected: mixed,
-|}
+interface SelectorSpec {
+  name: string
+  selector: (state: State) => unknown
+  before?: () => unknown
+  after?: () => unknown
+  expected: unknown
+}
 
 jest.mock('../../calibration/selectors')
 jest.mock('../../discovery/selectors')
@@ -32,64 +31,44 @@ jest.mock('../../system-info/selectors')
 jest.mock('../../shell')
 jest.mock('../../robot/selectors')
 
-const mockGetConnectedRobot: JestMockFn<
-  [State],
-  $Call<typeof DiscoverySelectors.getConnectedRobot, State>
-> = DiscoverySelectors.getConnectedRobot
+const mockGetConnectedRobot = DiscoverySelectors.getConnectedRobot as jest.MockedFunction<
+  typeof DiscoverySelectors.getConnectedRobot
+>
+const mockGetProtocolPipettesMatching = PipetteSelectors.getProtocolPipettesMatching as jest.MockedFunction<
+  typeof PipetteSelectors.getProtocolPipettesMatching
+>
+const mockGetProtocolPipettesCalibrated = PipetteSelectors.getProtocolPipettesCalibrated as jest.MockedFunction<
+  typeof PipetteSelectors.getProtocolPipettesCalibrated
+>
+const mockGetAvailableShellUpdate = ShellSelectors.getAvailableShellUpdate as jest.MockedFunction<
+  typeof ShellSelectors.getAvailableShellUpdate
+>
+const mockGetU2EWindowsDriverStatus = SystemInfoSelectors.getU2EWindowsDriverStatus as jest.MockedFunction<
+  typeof SystemInfoSelectors.getU2EWindowsDriverStatus
+>
+const mockGetBuildrootUpdateAvailable = BuildrootSelectors.getBuildrootUpdateAvailable as jest.MockedFunction<
+  typeof BuildrootSelectors.getBuildrootUpdateAvailable
+>
 
-const mockGetProtocolPipettesMatching: JestMockFn<
-  [State, string],
-  $Call<typeof PipetteSelectors.getProtocolPipettesMatching, State, string>
-> = PipetteSelectors.getProtocolPipettesMatching
+const mockGetIsRunning = RobotSelectors.getIsRunning as jest.MockedFunction<
+  typeof RobotSelectors.getIsRunning
+>
 
-const mockGetProtocolPipettesCalibrated: JestMockFn<
-  [State, string],
-  $Call<typeof PipetteSelectors.getProtocolPipettesCalibrated, State, string>
-> = PipetteSelectors.getProtocolPipettesCalibrated
+const mockGetIsDone = RobotSelectors.getIsDone as jest.MockedFunction<
+  typeof RobotSelectors.getIsDone
+>
 
-const mockGetAvailableShellUpdate: JestMockFn<
-  [State],
-  $Call<typeof ShellSelectors.getAvailableShellUpdate, State>
-> = ShellSelectors.getAvailableShellUpdate
+const mockGetSessionIsLoaded = RobotSelectors.getSessionIsLoaded as jest.MockedFunction<
+  typeof RobotSelectors.getSessionIsLoaded
+>
 
-const mockGetU2EWindowsDriverStatus: JestMockFn<
-  [State],
-  $Call<typeof SystemInfoSelectors.getU2EWindowsDriverStatus, State>
-> = SystemInfoSelectors.getU2EWindowsDriverStatus
+const mockGetCommands = RobotSelectors.getCommands as jest.MockedFunction<
+  typeof RobotSelectors.getCommands
+>
 
-const mockGetBuildrootUpdateAvailable: JestMockFn<
-  [State, ViewableRobot],
-  $Call<
-    typeof BuildrootSelectors.getBuildrootUpdateAvailable,
-    State,
-    ViewableRobot
-  >
-> = BuildrootSelectors.getBuildrootUpdateAvailable
-
-const mockGetIsRunning: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getIsRunning, State>
-> = RobotSelectors.getIsRunning
-
-const mockGetIsDone: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getIsDone, State>
-> = RobotSelectors.getIsDone
-
-const mockGetSessionIsLoaded: JestMockFn<
-  [State],
-  $Call<typeof RobotSelectors.getSessionIsLoaded, State>
-> = RobotSelectors.getSessionIsLoaded
-
-const mockGetCommands: JestMockFn<
-  [State],
-  any
-> = (RobotSelectors.getCommands: any)
-
-const mockGetDeckCalibrationStatus: JestMockFn<
-  [State, string],
-  $Call<typeof CalibrationSelectors.getDeckCalibrationStatus, State, string>
-> = CalibrationSelectors.getDeckCalibrationStatus
+const mockGetDeckCalibrationStatus = CalibrationSelectors.getDeckCalibrationStatus as jest.MockedFunction<
+  typeof CalibrationSelectors.getDeckCalibrationStatus
+>
 
 const EXPECTED_ROBOTS = {
   id: 'robots',
@@ -133,8 +112,8 @@ const EXPECTED_MORE = {
 }
 
 describe('nav selectors', () => {
-  const mockState: State = ({ mockState: true }: any)
-  const mockRobot: Robot = ({ mockRobot: true, name: 'mock-robot' }: any)
+  const mockState: State = { mockState: true } as any
+  const mockRobot: Robot = { mockRobot: true, name: 'mock-robot' } as any
 
   beforeEach(() => {
     mockGetConnectedRobot.mockReturnValue(null)
@@ -154,7 +133,7 @@ describe('nav selectors', () => {
     jest.resetAllMocks()
   })
 
-  const SPECS: Array<SelectorSpec> = [
+  const SPECS: SelectorSpec[] = [
     {
       name: 'getNavbarLocations without any robot',
       selector: Selectors.getNavbarLocations,
@@ -246,7 +225,7 @@ describe('nav selectors', () => {
         mockGetSessionIsLoaded.mockReturnValue(true)
         mockGetCommands.mockReturnValue([
           { id: 0, description: 'Foo', handledAt: null, children: [] },
-        ])
+        ] as any)
       },
       expected: [
         EXPECTED_ROBOTS,
@@ -271,7 +250,7 @@ describe('nav selectors', () => {
         mockGetSessionIsLoaded.mockReturnValue(true)
         mockGetCommands.mockReturnValue([
           { id: 0, description: 'Foo', handledAt: null, children: [] },
-        ])
+        ] as any)
         mockGetProtocolPipettesMatching.mockReturnValue(true)
       },
       expected: [
@@ -324,7 +303,7 @@ describe('nav selectors', () => {
         mockGetSessionIsLoaded.mockReturnValue(true)
         mockGetCommands.mockReturnValue([
           { id: 0, description: 'Foo', handledAt: null, children: [] },
-        ])
+        ] as any)
         mockGetProtocolPipettesMatching.mockReturnValue(true)
         mockGetProtocolPipettesCalibrated.mockReturnValue(true)
       },

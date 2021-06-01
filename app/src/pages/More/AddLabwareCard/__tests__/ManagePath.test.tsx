@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
@@ -11,12 +10,14 @@ import {
   RESET_SOURCE_NAME,
 } from '../ManagePath'
 
+import type { ReactWrapper } from 'enzyme'
+
 describe('ManagePath', () => {
   const mockPath = '/path/to/a/place'
   const mockOnChangePath = jest.fn()
   const mockOnOpenPath = jest.fn()
   const mockOnResetPath = jest.fn()
-  let wrapper
+  let wrapper: ReactWrapper<React.ComponentProps<typeof ManagePath>>
 
   beforeEach(() => {
     wrapper = mount(
@@ -41,13 +42,15 @@ describe('ManagePath', () => {
     expect(mockOnOpenPath).toHaveBeenCalledTimes(0)
     wrapper
       .find(`OutlineButton[name="${OPEN_SOURCE_NAME}"]`)
-      .invoke('onClick')()
+      .invoke('onClick')?.({} as React.MouseEvent)
     expect(mockOnOpenPath).toHaveBeenCalledTimes(1)
   })
 
   it('has an IconCta that calls onChangePath on click', () => {
     expect(mockOnChangePath).toHaveBeenCalledTimes(0)
-    wrapper.find(`IconCta[name="${CHANGE_SOURCE_NAME}"]`).invoke('onClick')()
+    wrapper.find(`IconCta[name="${CHANGE_SOURCE_NAME}"]`).invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(mockOnChangePath).toHaveBeenCalledTimes(1)
   })
 
@@ -56,7 +59,9 @@ describe('ManagePath', () => {
       expect(wrapper.exists(ConfirmResetPathModal)).toBe(false)
 
       act(() => {
-        wrapper.find(`IconCta[name="${RESET_SOURCE_NAME}"]`).invoke('onClick')()
+        wrapper
+          .find(`IconCta[name="${RESET_SOURCE_NAME}"]`)
+          .invoke('onClick')?.({} as React.MouseEvent)
       })
 
       wrapper.update()
@@ -68,7 +73,7 @@ describe('ManagePath', () => {
 
     it('ConfirmResetPathModal::onCancel closes modal without resetting path', () => {
       act(() => {
-        wrapper.find(ConfirmResetPathModal).invoke('onCancel')()
+        wrapper.find(ConfirmResetPathModal).invoke('onCancel')?.()
       })
 
       wrapper.update()
@@ -79,7 +84,7 @@ describe('ManagePath', () => {
     it('ConfirmResetPathModal::onConfirm calls onResetPath and closes modal', () => {
       expect(mockOnResetPath).toHaveBeenCalledTimes(0)
       act(() => {
-        wrapper.find(ConfirmResetPathModal).invoke('onConfirm')()
+        wrapper.find(ConfirmResetPathModal).invoke('onConfirm')?.()
       })
 
       wrapper.update()

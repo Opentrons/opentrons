@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 
 import { GET } from '../../robot-api/constants'
@@ -6,7 +5,7 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Constants from '../constants'
 import * as Actions from '../actions'
 
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
@@ -23,7 +22,7 @@ const mapResponseToAction: ResponseToActionMapper<FetchResetConfigOptionsAction>
   originalAction
 ) => {
   const { host, body, ...responseMeta } = response
-  const options: Array<ResetConfigOption> = body.options
+  const options: ResetConfigOption[] = body.options
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
@@ -33,7 +32,9 @@ const mapResponseToAction: ResponseToActionMapper<FetchResetConfigOptionsAction>
 
 export const fetchResetOptionsEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.FETCH_RESET_CONFIG_OPTIONS),
+    ofType<Action, FetchResetConfigOptionsAction>(
+      Constants.FETCH_RESET_CONFIG_OPTIONS
+    ),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

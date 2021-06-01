@@ -1,4 +1,3 @@
-// @flow
 // robot connection state and reducer
 import type { Action } from '../../types'
 
@@ -10,19 +9,19 @@ import type {
   DisconnectResponseAction,
 } from '../actions'
 
-export type ConnectionState = {|
-  connectedTo: ?string,
-  connectRequest: {|
-    inProgress: boolean,
-    error: ?{ message?: string, ... },
-    name: string,
-  |},
-  disconnectRequest: {|
-    inProgress: boolean,
-    error: ?{ message?: string, ... },
-  |},
-  unexpectedDisconnect: boolean,
-|}
+export interface ConnectionState {
+  connectedTo: string | null | undefined
+  connectRequest: {
+    inProgress: boolean
+    error: { message?: string; [key: string]: unknown } | null | undefined
+    name: string
+  }
+  disconnectRequest: {
+    inProgress: boolean
+    error: { message?: string; [key: string]: unknown } | null | undefined
+  }
+  unexpectedDisconnect: boolean
+}
 
 const INITIAL_STATE: ConnectionState = {
   connectedTo: null,
@@ -32,7 +31,7 @@ const INITIAL_STATE: ConnectionState = {
 }
 
 export function connectionReducer(
-  state?: ConnectionState,
+  state: ConnectionState | null,
   action: Action
 ): ConnectionState {
   if (state == null) return INITIAL_STATE
@@ -78,7 +77,7 @@ function handleConnectResponse(
   action: ConnectResponseAction
 ): ConnectionState {
   const error = action.payload.error || null
-  let connectedTo = state.connectRequest.name
+  let connectedTo: string | null = state.connectRequest.name
   let requestName = ''
 
   if (error) {

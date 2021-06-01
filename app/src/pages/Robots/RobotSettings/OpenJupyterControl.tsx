@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 
@@ -17,11 +16,13 @@ import { LabeledValue } from '../../../atoms/structure'
 
 const EVENT_JUPYTER_OPEN = { name: 'jupyterOpen', properties: {} }
 
-export type OpenJupyterControlProps = {|
-  robotIp: string,
-|}
+export interface OpenJupyterControlProps {
+  robotIp: string
+}
 
-export function OpenJupyterControl(props: OpenJupyterControlProps): React.Node {
+export function OpenJupyterControl(
+  props: OpenJupyterControlProps
+): JSX.Element {
   const { robotIp } = props
   const { t } = useTranslation(['robot_advanced_settings', 'shared'])
   const href = `http://${robotIp}:48888`

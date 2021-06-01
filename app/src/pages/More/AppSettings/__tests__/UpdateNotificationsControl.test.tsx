@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mountWithStore } from '@opentrons/components/__utils__'
 
@@ -10,28 +9,31 @@ import { ToggleBtn } from '../../../../atoms/ToggleBtn'
 import { UpdateNotificationsControl } from '../UpdateNotificationsControl'
 
 import type { StyleProps } from '@opentrons/components'
-import type { State } from '../../../../redux/types'
-import type { AlertId } from '../../../../redux/alerts/types'
-import type { AnalyticsEvent } from '../../../../redux/analytics/types'
+import type { State, Action } from '../../../../redux/types'
+import { AnalyticsEvent } from '../../../../redux/analytics/types'
 
 jest.mock('../../../../redux/alerts/selectors')
 jest.mock('../../../../redux/analytics/hooks')
 
-const getAlertIsPermanentlyIgnored: JestMockFn<
-  [State, AlertId],
-  boolean | null
-> = Alerts.getAlertIsPermanentlyIgnored
+const getAlertIsPermanentlyIgnored = Alerts.getAlertIsPermanentlyIgnored as jest.MockedFunction<
+  typeof Alerts.getAlertIsPermanentlyIgnored
+>
 
-const useTrackEvent: JestMockFn<[], JestMockFn<[AnalyticsEvent], void>> =
-  Analytics.useTrackEvent
+const useTrackEvent = Analytics.useTrackEvent as jest.MockedFunction<
+  typeof Analytics.useTrackEvent
+>
 
-const MOCK_STATE: $Shape<State> = {}
+const MOCK_STATE: State = {} as any
 
 describe('UpdateNotificationsControl', () => {
-  const trackEvent = jest.fn()
+  const trackEvent: (e: AnalyticsEvent) => void = jest.fn() as any
 
-  const render = (styleProps: $Shape<StyleProps> = {}) => {
-    return mountWithStore(<UpdateNotificationsControl {...styleProps} />, {
+  const render = (styleProps: Partial<StyleProps> = {}) => {
+    return mountWithStore<
+      React.ComponentProps<typeof UpdateNotificationsControl>,
+      State,
+      Action
+    >(<UpdateNotificationsControl {...styleProps} />, {
       initialState: MOCK_STATE,
     })
   }
@@ -91,7 +93,7 @@ describe('UpdateNotificationsControl', () => {
     const { wrapper, store } = render()
     const toggle = wrapper.find(ToggleBtn)
 
-    toggle.invoke('onClick')()
+    toggle.invoke('onClick')?.({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       Alerts.alertUnignored(Alerts.ALERT_APP_UPDATE_AVAILABLE)
@@ -105,7 +107,7 @@ describe('UpdateNotificationsControl', () => {
     const { wrapper, store } = render()
     const toggle = wrapper.find(ToggleBtn)
 
-    toggle.invoke('onClick')()
+    toggle.invoke('onClick')?.({} as React.MouseEvent)
 
     expect(store.dispatch).toHaveBeenCalledWith(
       Alerts.alertPermanentlyIgnored(Alerts.ALERT_APP_UPDATE_AVAILABLE)
@@ -119,7 +121,7 @@ describe('UpdateNotificationsControl', () => {
     const { wrapper } = render()
     const toggle = wrapper.find(ToggleBtn)
 
-    toggle.invoke('onClick')()
+    toggle.invoke('onClick')?.({} as React.MouseEvent)
 
     expect(trackEvent).toHaveBeenCalledWith({
       name: 'appUpdateNotificationsToggled',
@@ -134,7 +136,7 @@ describe('UpdateNotificationsControl', () => {
     const { wrapper } = render()
     const toggle = wrapper.find(ToggleBtn)
 
-    toggle.invoke('onClick')()
+    toggle.invoke('onClick')?.({} as React.MouseEvent)
 
     expect(trackEvent).toHaveBeenCalledWith({
       name: 'appUpdateNotificationsToggled',

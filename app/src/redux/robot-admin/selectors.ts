@@ -1,4 +1,3 @@
-// @flow
 import { add, isWithinInterval } from 'date-fns'
 import { CONNECTABLE } from '../discovery'
 import {
@@ -11,9 +10,16 @@ import {
 
 import type { ConnectivityStatus } from '../discovery/types'
 import type { State } from '../types'
-import type { ResetConfigOption, RobotRestartStatus } from './types'
+import type {
+  PerRobotAdminState,
+  ResetConfigOption,
+  RobotRestartStatus,
+} from './types'
 
-const robotState = (state: State, name: string) => state.robotAdmin[name]
+const robotState = (
+  state: State,
+  name: string
+): PerRobotAdminState | null | undefined => state.robotAdmin[name]
 
 export function getRobotRestarting(state: State, robotName: string): boolean {
   const status = robotState(state, robotName)?.restart?.status
@@ -93,6 +99,6 @@ function getRestartIsComplete(
 export function getResetConfigOptions(
   state: State,
   robotName: string
-): Array<ResetConfigOption> {
+): ResetConfigOption[] {
   return robotState(state, robotName)?.resetConfigOptions || []
 }

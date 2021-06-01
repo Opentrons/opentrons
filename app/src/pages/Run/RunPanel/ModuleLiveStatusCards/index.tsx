@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
@@ -15,7 +14,7 @@ import { TempDeckCard } from './TempDeckCard'
 import { MagDeckCard } from './MagDeckCard'
 import { ThermocyclerCard } from './ThermocyclerCard'
 
-export const ModuleLiveStatusCards = (): React.Node => {
+export const ModuleLiveStatusCards = (): JSX.Element | null => {
   const matchedModules = useSelector(getMatchedModules)
   const sendModuleCommand = useSendModuleCommand()
   const controlDisabledReason = useSelector(getModuleControlsDisabled)

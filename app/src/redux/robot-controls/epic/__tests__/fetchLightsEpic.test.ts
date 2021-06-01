@@ -1,4 +1,3 @@
-// @flow
 import { TestScheduler } from 'rxjs/testing'
 
 import { mockRobot } from '../../../robot-api/__fixtures__'
@@ -9,31 +8,26 @@ import * as Actions from '../../actions'
 import * as Types from '../../types'
 import { robotControlsEpic } from '..'
 
-import type { Observable } from 'rxjs'
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-  RobotApiResponse,
-} from '../../../robot-api/types'
+import type { Action, State } from '../../../types'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')
 
-const mockState = { state: true }
+const mockState: State = { state: true } as any
 
-const mockFetchRobotApi: JestMockFn<
-  [RobotHost, RobotApiRequestOptions],
-  Observable<RobotApiResponse>
-> = RobotApiHttp.fetchRobotApi
+const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
+  typeof RobotApiHttp.fetchRobotApi
+>
 
-const mockGetRobotByName: JestMockFn<[any, string], mixed> =
-  DiscoverySelectors.getRobotByName
+const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
+  typeof DiscoverySelectors.getRobotByName
+>
 
 describe('fetchLightsEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot)
+    mockGetRobotByName.mockReturnValue(mockRobot as any)
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
@@ -56,8 +50,8 @@ describe('fetchLightsEpic', () => {
         cold('r', { r: Fixtures.mockFetchLightsSuccess })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: mockState })
       const output$ = robotControlsEpic(action$, state$)
 
       expectObservable(output$)
@@ -77,8 +71,8 @@ describe('fetchLightsEpic', () => {
         cold('r', { r: Fixtures.mockFetchLightsSuccess })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} } as any)
       const output$ = robotControlsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -97,8 +91,8 @@ describe('fetchLightsEpic', () => {
         cold('r', { r: Fixtures.mockFetchLightsFailure })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} } as any)
       const output$ = robotControlsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

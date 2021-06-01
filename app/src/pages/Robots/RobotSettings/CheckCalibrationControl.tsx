@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -25,20 +24,20 @@ import type { RequestState } from '../../../redux/robot-api/types'
 
 import type { State } from '../../../redux/types'
 
-export type CheckCalibrationControlProps = {|
-  robotName: string,
-  disabledReason: string | null,
-|}
+export interface CheckCalibrationControlProps {
+  robotName: string
+  disabledReason: string | null
+}
 
 // pipette calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
+const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 
 export function CheckCalibrationControl({
   robotName,
   disabledReason,
-}: CheckCalibrationControlProps): React.Node {
+}: CheckCalibrationControlProps): JSX.Element {
   const { t } = useTranslation(['robot_calibration', 'shared'])
   const [targetProps, tooltipProps] = useHoverTooltip()
 
@@ -49,20 +48,31 @@ export function CheckCalibrationControl({
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
+        // @ts-expect-error TODO: should be the code in comment below
         createRequestId.current = dispatchedAction.meta.requestId
+        // createRequestId.current =
+        //   'requestId' in dispatchedAction.meta
+        //     ? dispatchedAction.meta.requestId ?? null
+        //     : null
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
       ) {
-        jogRequestId.current = dispatchedAction.meta.requestId
+        jogRequestId.current =
+          'requestId' in dispatchedAction.meta
+            ? dispatchedAction.meta.requestId ?? null
+            : null
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
           dispatchedAction.payload.command.command
         )
       ) {
-        trackedRequestId.current = dispatchedAction.meta.requestId
+        trackedRequestId.current =
+          'meta' in dispatchedAction && 'requestId' in dispatchedAction.meta
+            ? dispatchedAction.meta.requestId ?? null
+            : null
       }
     }
   )
@@ -96,7 +106,7 @@ export function CheckCalibrationControl({
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
 
-  const handleStart = (hasBlockModalResponse: boolean | null = null) => {
+  const handleStart = (hasBlockModalResponse: boolean | null = null): void => {
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
       setShowCalBlockModal(true)
     } else {

@@ -1,4 +1,3 @@
-// @flow
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
 
@@ -31,10 +30,11 @@ import {
   INTENT_TIP_LENGTH_IN_PROTOCOL,
 } from '../../organisms/CalibrationPanels'
 
-import type { StyleProps } from '@opentrons/components'
+import type { StyleProps, Mount } from '@opentrons/components'
 import type {
   SessionCommandParams,
   CalibrationLabware,
+  CalibrationSessionStep,
 } from '../../redux/sessions/types'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { CalibrateTipLengthParentProps } from './types'
@@ -69,9 +69,9 @@ const terminalContentsStyleProps = {
   paddingX: '1.5rem',
 }
 
-const PANEL_BY_STEP: {
-  [string]: React.ComponentType<CalibrationPanelProps>,
-} = {
+const PANEL_BY_STEP: Partial<
+  Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>
+> = {
   sessionStarted: Introduction,
   labwareLoaded: DeckSetup,
   measuringNozzleOffset: MeasureNozzle,
@@ -80,9 +80,9 @@ const PANEL_BY_STEP: {
   measuringTipOffset: MeasureTip,
   calibrationComplete: CompleteConfirmation,
 }
-const PANEL_STYLE_PROPS_BY_STEP: {
-  [string]: StyleProps,
-} = {
+const PANEL_STYLE_PROPS_BY_STEP: Partial<
+  Record<CalibrationSessionStep, StyleProps>
+> = {
   [Sessions.TIP_LENGTH_STEP_SESSION_STARTED]: terminalContentsStyleProps,
   [Sessions.TIP_LENGTH_STEP_LABWARE_LOADED]: darkContentsStyleProps,
   [Sessions.TIP_LENGTH_STEP_PREPARING_PIPETTE]: contentsStyleProps,
@@ -93,7 +93,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 }
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
-): React.Node {
+): JSX.Element | null {
   const { session, robotName, showSpinner, dispatchRequests, isJogging } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
@@ -108,7 +108,7 @@ export function CalibrateTipLength(
     ? labware.find(l => !l.isTiprack) ?? null
     : null
 
-  function sendCommands(...commands: Array<SessionCommandParams>) {
+  function sendCommands(...commands: SessionCommandParams[]): void {
     if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
@@ -120,7 +120,7 @@ export function CalibrateTipLength(
     }
   }
 
-  function cleanUpAndExit() {
+  function cleanUpAndExit(): void {
     if (session?.id) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
@@ -152,20 +152,21 @@ export function CalibrateTipLength(
   if (showSpinner) {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
-
+  // @ts-expect-error(sa, 2021-05-26): cannot index undefined, leaving to avoid src code change
   const Panel = PANEL_BY_STEP[currentStep]
 
   return Panel ? (
     <>
       <ModalPage
         titleBar={titleBarProps}
+        // @ts-expect-error(sa, 2021-05-26): cannot index undefined, leaving to avoid src code change
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >
         <Panel
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
           isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase()}
+          mount={instrument?.mount.toLowerCase() as Mount}
           tipRack={tipRack}
           calBlock={calBlock}
           currentStep={currentStep}
@@ -174,6 +175,7 @@ export function CalibrateTipLength(
         />
       </ModalPage>
       {showConfirmExit && (
+        // @ts-expect-error TODO: ConfirmExitModal expects sessionType
         <ConfirmExitModal exit={confirmExit} back={cancelExit} />
       )}
     </>

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Formik, useFormikContext } from 'formik'
 
@@ -19,30 +18,32 @@ import type {
   EapOption,
 } from '../types'
 
-export type ConnectModalProps = {|
-  robotName: string,
-  network: WifiNetwork | null,
-  wifiKeys: Array<WifiKey>,
-  eapOptions: Array<EapOption>,
-  onConnect: WifiConfigureRequest => mixed,
-  onCancel: () => mixed,
-|}
+export interface ConnectModalProps {
+  robotName: string
+  network: WifiNetwork | null
+  wifiKeys: WifiKey[]
+  eapOptions: EapOption[]
+  onConnect: (r: WifiConfigureRequest) => unknown
+  onCancel: () => unknown
+}
 
-export const ConnectModal = (props: ConnectModalProps): React.Node => {
+export const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const { network, eapOptions, onConnect } = props
 
-  const handleSubmit = (values: ConnectFormValues) => {
+  const handleSubmit = (values: ConnectFormValues): void => {
     const request = connectFormToConfigureRequest(network, values)
     if (request) onConnect(request)
   }
 
-  const handleValidate = (values: ConnectFormValues) => {
+  const handleValidate = (
+    values: ConnectFormValues
+  ): ReturnType<typeof validateConnectFormFields> => {
     return validateConnectFormFields(network, eapOptions, values)
   }
 
   return (
     <Formik
-      initialValues={({}: ConnectFormValues)}
+      initialValues={{}}
       onSubmit={handleSubmit}
       validate={handleValidate}
       validateOnMount
@@ -52,7 +53,9 @@ export const ConnectModal = (props: ConnectModalProps): React.Node => {
   )
 }
 
-export const ConnectModalComponent = (props: ConnectModalProps): React.Node => {
+export const ConnectModalComponent = (
+  props: ConnectModalProps
+): JSX.Element => {
   const { robotName, network, wifiKeys, eapOptions, onCancel } = props
   const { values, isValid } = useFormikContext<ConnectFormValues>()
 

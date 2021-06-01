@@ -1,17 +1,16 @@
-// @flow
 import * as React from 'react'
 import { Icon, PrimaryButton } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 
 import styles from './styles.css'
 
-export type ScanButtonProps = {|
-  isScanning: boolean,
-  onScanClick: () => mixed,
-  found: boolean,
-|}
+export interface ScanButtonProps {
+  isScanning: boolean
+  onScanClick: () => unknown
+  found: boolean
+}
 
-export function ScanButton(props: ScanButtonProps): React.Node {
+export function ScanButton(props: ScanButtonProps): JSX.Element {
   const { isScanning, onScanClick, found } = props
   const { t } = useTranslation()
 

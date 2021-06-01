@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
@@ -18,13 +17,15 @@ import { CONNECT, DISCONNECT, JOIN_OTHER } from './constants'
 import type { State, Dispatch } from '../../../../redux/types'
 import type { WifiConfigureRequest, NetworkChangeState } from './types'
 
-type SelectNetworkProps = {| robotName: string |}
+interface SelectNetworkProps {
+  robotName: string
+}
 
 const LIST_REFRESH_MS = 10000
 
 export const SelectNetwork = ({
   robotName,
-}: SelectNetworkProps): React.Node => {
+}: SelectNetworkProps): JSX.Element => {
   const list = useSelector((state: State) =>
     Networking.getWifiList(state, robotName)
   )
@@ -47,18 +48,23 @@ export const SelectNetwork = ({
   const [dispatchApi, requestIds] = RobotApi.useDispatchApiRequest()
 
   const requestState = useSelector((state: State) =>
+    // @ts-expect-error TODO use commented code below to protect against retrieving a request when the id doesn't exist
     RobotApi.getRequestById(state, last(requestIds))
   )
+  // const requestState = useSelector((state: State) => {
+  //   const lastId = last(requestIds)
+  //   return lastId != null ? RobotApi.getRequestById(state, lastId) : null
+  // })
 
   const activeNetwork = list.find(nw => nw.active)
 
-  const handleDisconnect = () => {
+  const handleDisconnect = (): void => {
     if (activeNetwork) {
       dispatchApi(Networking.postWifiDisconnect(robotName, activeNetwork.ssid))
     }
   }
 
-  const handleConnect = (options: WifiConfigureRequest) => {
+  const handleConnect = (options: WifiConfigureRequest): void => {
     dispatchApi(Networking.postWifiConfigure(robotName, options))
     if (changeState.type === JOIN_OTHER) {
       setChangeState({ ...changeState, ssid: options.ssid })
@@ -80,7 +86,7 @@ export const SelectNetwork = ({
     }
   }, [robotName, dispatch, changeState.type])
 
-  const handleSelectConnect = ssid => {
+  const handleSelectConnect = (ssid: string): void => {
     const network = list.find(nw => nw.ssid === ssid)
 
     if (network) {
@@ -94,17 +100,21 @@ export const SelectNetwork = ({
     }
   }
 
-  const handleSelectDisconnect = () => {
+  const handleSelectDisconnect = (): void => {
     const ssid = activeNetwork?.ssid
     ssid != null && setChangeState({ type: DISCONNECT, ssid })
   }
 
-  const handleSelectJoinOther = () => {
+  const handleSelectJoinOther = (): void => {
     setChangeState({ type: JOIN_OTHER, ssid: null })
   }
 
-  const handleDone = () => {
+  const handleDone = (): void => {
+    // @ts-expect-error TODO use commented code below
     if (last(requestIds)) dispatch(RobotApi.dismissRequest(last(requestIds)))
+    // const lastId = last(requestIds)
+    // if (lastId != null) dispatch(RobotApi.dismissRequest(lastId))
+
     setChangeState({ type: null })
   }
 
@@ -126,9 +136,17 @@ export const SelectNetwork = ({
               ssid={changeState.ssid}
               isPending={requestState.status === RobotApi.PENDING}
               error={
+                // @ts-expect-error TODO use commented code below
                 requestState.error && requestState.error.message
-                  ? requestState.error
+                  ? // @ts-expect-error TODO use commented code below
+                    requestState.error
                   : null
+                // 'error' in requestState &&
+                // requestState.error &&
+                // 'message' in requestState.error &&
+                // requestState.error.message
+                //   ? requestState.error
+                //   : null
               }
               onClose={handleDone}
             />

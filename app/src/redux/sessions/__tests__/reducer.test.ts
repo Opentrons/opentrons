@@ -1,4 +1,3 @@
-// @flow
 import * as Fixtures from '../__fixtures__'
 import * as Actions from '../actions'
 import { sessionReducer } from '../reducer'
@@ -7,14 +6,14 @@ import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
 import type { Action } from '../../types'
 import type { SessionState } from '../types'
 
-type ReducerSpec = {|
-  name: string,
-  state: SessionState,
-  action: Action,
-  expected: SessionState,
-|}
+interface ReducerSpec {
+  name: string
+  state: SessionState
+  action: Action
+  expected: SessionState
+}
 
-const SPECS: Array<ReducerSpec> = [
+const SPECS: ReducerSpec[] = [
   {
     name: 'handles sessions:CREATE_SESSION_SUCCESS',
     action: {
@@ -23,7 +22,7 @@ const SPECS: Array<ReducerSpec> = [
         robotName: 'eggplant-parm',
         ...Fixtures.mockSessionResponse,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'eggplant-parm': {
@@ -49,7 +48,7 @@ const SPECS: Array<ReducerSpec> = [
         robotName: 'eggplant-parm',
         ...Fixtures.mockSessionResponse,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'eggplant-parm': {
@@ -84,7 +83,7 @@ const SPECS: Array<ReducerSpec> = [
         robotName: 'eggplant-parm',
         ...Fixtures.mockSessionResponse,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'eggplant-parm': {},
@@ -108,7 +107,7 @@ const SPECS: Array<ReducerSpec> = [
         robotName: 'eggplant-parm',
         ...Fixtures.mockSessionResponse,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'eggplant-parm': {
@@ -141,7 +140,7 @@ const SPECS: Array<ReducerSpec> = [
       'eggplant-parm',
       Fixtures.mockSessionId,
       Fixtures.mockSessionResponse,
-      {}
+      {} as any
     ),
     state: {
       'eggplant-parm': {
@@ -176,7 +175,7 @@ const SPECS: Array<ReducerSpec> = [
         robotName: 'rock-lobster',
         sessions: Fixtures.mockMultiSessionResponse.data,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'rock-lobster': {},
@@ -205,7 +204,7 @@ const SPECS: Array<ReducerSpec> = [
         robotName: 'rock-lobster',
         sessions: Fixtures.mockMultiSessionResponse.data,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'rock-lobster': {
@@ -240,7 +239,7 @@ const SPECS: Array<ReducerSpec> = [
         robotName: 'eggplant-parm',
         ...Fixtures.mockSessionResponse,
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       'eggplant-parm': {
@@ -278,7 +277,7 @@ const SPECS: Array<ReducerSpec> = [
       },
       meta: {
         response: { ...Fixtures.mockDeleteSessionFailureMeta, status: 404 },
-      },
+      } as any,
     },
     state: {
       'frumious-bandersnatch': {
@@ -316,7 +315,7 @@ const SPECS: Array<ReducerSpec> = [
       },
       meta: {
         response: { ...Fixtures.mockFetchSessionFailureMeta, status: 404 },
-      },
+      } as any,
     },
     state: {
       'detestable-moss': {

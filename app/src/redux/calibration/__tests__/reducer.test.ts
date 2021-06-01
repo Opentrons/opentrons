@@ -1,5 +1,3 @@
-// @flow
-
 import * as Fixtures from '../__fixtures__'
 import * as LabwareFixtures from '../labware/__fixtures__'
 import * as Labware from '../labware'
@@ -15,7 +13,7 @@ describe('calibration reducer', () => {
     const action = Actions.fetchCalibrationStatusSuccess(
       'robot-name',
       Fixtures.mockCalibrationStatus,
-      {}
+      {} as any
     )
 
     expect(calibrationReducer({}, action)).toEqual({
@@ -32,7 +30,7 @@ describe('calibration reducer', () => {
     const action = Labware.fetchLabwareCalibrationsSuccess(
       'robot-name',
       LabwareFixtures.mockAllLabwareCalibration,
-      {}
+      {} as any
     )
 
     expect(calibrationReducer({}, action)).toEqual({
@@ -49,7 +47,7 @@ describe('calibration reducer', () => {
     const action = PipetteOffset.fetchPipetteOffsetCalibrationsSuccess(
       'robot-name',
       PipetteOffsetFixtures.mockAllPipetteOffsetsCalibration,
-      {}
+      {} as any
     )
 
     expect(calibrationReducer({}, action)).toEqual({
@@ -67,7 +65,7 @@ describe('calibration reducer', () => {
     const action = TipLength.fetchTipLengthCalibrationsSuccess(
       'robot-name',
       TipLengthFixtures.mockAllTipLengthCalibrations,
-      {}
+      {} as any
     )
 
     expect(calibrationReducer({}, action)).toEqual({

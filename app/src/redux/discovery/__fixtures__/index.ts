@@ -1,5 +1,3 @@
-// @flow
-
 import {
   CONNECTABLE,
   REACHABLE,
@@ -14,8 +12,8 @@ export const mockHealthResponse = {
   api_version: '0.0.0-mock',
   fw_version: '0.0.0-mock',
   system_version: '0.0.0-mock',
-  logs: ([]: Array<string>),
-  protocol_api_version: ([2, 0]: [number, number]),
+  logs: [] as string[],
+  protocol_api_version: [2, 0] as [number, number],
 }
 
 export const mockUpdateServerHealthResponse = {
@@ -24,7 +22,7 @@ export const mockUpdateServerHealthResponse = {
   updateServerVersion: '0.0.0-mock',
   smoothieVersion: '0.0.0-mock',
   systemVersion: '0.0.0-mock',
-  capabilities: ({}: { ... }),
+  capabilities: {},
 }
 
 export const mockDiscoveryClientRobot = {
@@ -60,7 +58,7 @@ export const mockConnectableRobot: Robot = {
   ...mockBaseRobot,
   status: CONNECTABLE,
   health: mockHealthResponse,
-  serverHealth: mockUpdateServerHealthResponse,
+  serverHealth: mockUpdateServerHealthResponse as Robot['serverHealth'],
   healthStatus: HEALTH_STATUS_OK,
   serverHealthStatus: HEALTH_STATUS_OK,
   ip: '127.0.0.1',
@@ -77,7 +75,7 @@ export const mockReachableRobot: ReachableRobot = {
   ...mockBaseRobot,
   status: REACHABLE,
   health: mockHealthResponse,
-  serverHealth: mockUpdateServerHealthResponse,
+  serverHealth: mockUpdateServerHealthResponse as Robot['serverHealth'],
   healthStatus: HEALTH_STATUS_NOT_OK,
   serverHealthStatus: HEALTH_STATUS_OK,
   ip: '127.0.0.1',

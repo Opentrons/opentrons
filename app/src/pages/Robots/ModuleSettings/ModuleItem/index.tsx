@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import {
@@ -20,14 +19,14 @@ import { ModuleControls } from '../../../../molecules/ModuleControls'
 import type { AttachedModule } from '../../../../redux/modules/types'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-type Props = {|
-  module: AttachedModule,
-  controlDisabledReason: string | null,
-  usbPort?: ?string,
-  hubPort?: ?string,
-|}
+interface Props {
+  module: AttachedModule
+  controlDisabledReason: string | null
+  usbPort?: string | null
+  hubPort?: string | null
+}
 
-export function ModuleItem(props: Props): React.Node {
+export function ModuleItem(props: Props): JSX.Element {
   const { module, controlDisabledReason, usbPort, hubPort } = props
 
   return (

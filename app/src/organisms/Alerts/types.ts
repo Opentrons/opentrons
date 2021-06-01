@@ -1,5 +1,3 @@
-// @flow
-
-export type AlertProps = {|
-  dismissAlert: (remember?: boolean) => mixed,
-|}
+export interface AlertProps {
+  dismissAlert: (remember?: boolean) => unknown
+}

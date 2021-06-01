@@ -1,4 +1,3 @@
-// @flow
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -12,7 +11,7 @@ export const restartRobot = (robotName: string): Types.RestartRobotAction => ({
 
 export const restartRobotSuccess = (
   robotName: string,
-  meta: RobotApiRequestMeta
+  meta: RobotApiRequestMeta | {}
 ): Types.RestartRobotSuccessAction => ({
   type: Constants.RESTART_SUCCESS,
   payload: { robotName },
@@ -39,7 +38,7 @@ export const fetchResetConfigOptions = (
 
 export const fetchResetConfigOptionsSuccess = (
   robotName: string,
-  options: Array<Types.ResetConfigOption>,
+  options: Types.ResetConfigOption[],
   meta: RobotApiRequestMeta
 ): Types.FetchResetConfigOptionsSuccessAction => ({
   type: Constants.FETCH_RESET_CONFIG_OPTIONS_SUCCESS,

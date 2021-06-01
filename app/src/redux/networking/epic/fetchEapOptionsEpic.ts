@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 
 import { GET } from '../../robot-api/constants'
@@ -10,15 +9,15 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-import type { Epic } from '../../types'
-import type { FetchWifiKeysAction } from '../types'
+import type { Action, Epic } from '../../types'
+import { FetchEapOptionsAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchWifiKeysAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<FetchEapOptionsAction> = action => ({
   method: GET,
   path: EAP_OPTIONS_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<FetchWifiKeysAction> = (
+const mapResponseToAction: ResponseToActionMapper<FetchEapOptionsAction> = (
   response,
   originalAction
 ) => {
@@ -32,7 +31,7 @@ const mapResponseToAction: ResponseToActionMapper<FetchWifiKeysAction> = (
 
 export const fetchEapOptionsEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(FETCH_EAP_OPTIONS),
+    ofType<Action, FetchEapOptionsAction>(FETCH_EAP_OPTIONS),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { SelectField, CONTEXT_VALUE, CONTEXT_MENU } from '@opentrons/components'
@@ -98,7 +97,7 @@ describe('SelectSsid component', () => {
     const wrapper = render()
     const selectField = wrapper.find(SelectField)
 
-    selectField.invoke('onValueChange')('_', 'foo')
+    selectField.invoke('onValueChange')?.('_', 'foo')
 
     expect(handleConnect).toHaveBeenCalledWith('foo')
   })
@@ -106,13 +105,13 @@ describe('SelectSsid component', () => {
   it('if user selects join other value, onJoinOther is called', () => {
     const wrapper = render()
     const selectField = wrapper.find(SelectField)
-    const options = selectField.prop('options').flatMap(o => o.options)
+    const options = selectField.prop('options').flatMap((o: any) => o.options)
     const joinOtherValue = options.find(
       o => o.label === LABEL_JOIN_OTHER_NETWORK
     )?.value
 
     expect(joinOtherValue).toEqual(expect.any(String))
-    selectField.invoke('onValueChange')('_', joinOtherValue)
+    selectField.invoke('onValueChange')?.('_', joinOtherValue)
 
     expect(handleJoinOther).toHaveBeenCalled()
   })
@@ -120,13 +119,13 @@ describe('SelectSsid component', () => {
   it('if user selects disconnect value, onDisconnect is called', () => {
     const wrapper = render()
     const selectField = wrapper.find(SelectField)
-    const options = selectField.prop('options').flatMap(o => o.options)
+    const options = selectField.prop('options').flatMap((o: any) => o.options)
     const disconectValue = options.find(
       o => o.label === DISCONNECT_FROM_SSID('foo')
     )?.value
 
     expect(disconectValue).toEqual(expect.any(String))
-    selectField.invoke('onValueChange')('_', disconectValue)
+    selectField.invoke('onValueChange')?.('_', disconectValue)
 
     expect(handleDisconnect).toHaveBeenCalled()
   })
@@ -141,14 +140,12 @@ describe('SelectSsid component', () => {
     const expectedBar = mount(
       <NetworkOptionLabel {...mockWifiList[1]} showConnectedIcon={true} />
     )
-    const fooLabel = selectField.prop('formatOptionLabel')(
-      { value: 'foo' },
-      { context: CONTEXT_VALUE }
-    )
-    const barLabel = selectField.prop('formatOptionLabel')(
-      { value: 'bar' },
-      { context: CONTEXT_MENU }
-    )
+    const fooLabel = selectField.prop('formatOptionLabel')?.({ value: 'foo' }, {
+      context: CONTEXT_VALUE,
+    } as any) as any
+    const barLabel = selectField.prop('formatOptionLabel')?.({ value: 'bar' }, {
+      context: CONTEXT_MENU,
+    } as any) as any
 
     expect(mount(fooLabel)).toEqual(expectedFoo)
     expect(mount(barLabel)).toEqual(expectedBar)
@@ -157,15 +154,15 @@ describe('SelectSsid component', () => {
   it('formats the join other label', () => {
     const wrapper = render()
     const selectField = wrapper.find(SelectField)
-    const options = selectField.prop('options').flatMap(o => o.options)
+    const options = selectField.prop('options').flatMap((o: any) => o.options)
     const joinOtherOpt = options.find(o => o.label === LABEL_JOIN_OTHER_NETWORK)
 
     expect(joinOtherOpt?.value).toEqual(expect.any(String))
     expect(joinOtherOpt?.label).toEqual(expect.any(String))
 
-    const label = selectField.prop('formatOptionLabel')(joinOtherOpt, {
+    const label = selectField.prop('formatOptionLabel')?.(joinOtherOpt, {
       context: CONTEXT_MENU,
-    })
+    } as any) as any
 
     expect(mount(label).html()).toContain(joinOtherOpt?.label)
   })
@@ -173,7 +170,7 @@ describe('SelectSsid component', () => {
   it('formats the disconnect label', () => {
     const wrapper = render()
     const selectField = wrapper.find(SelectField)
-    const options = selectField.prop('options').flatMap(o => o.options)
+    const options = selectField.prop('options').flatMap((o: any) => o.options)
     const disconectOpt = options.find(
       o => o.label === DISCONNECT_FROM_SSID('foo')
     )
@@ -181,9 +178,9 @@ describe('SelectSsid component', () => {
     expect(disconectOpt?.value).toEqual(expect.any(String))
     expect(disconectOpt?.label).toEqual(expect.any(String))
 
-    const label = selectField.prop('formatOptionLabel')(disconectOpt, {
+    const label = selectField.prop('formatOptionLabel')?.(disconectOpt, {
       context: CONTEXT_MENU,
-    })
+    } as any) as any
 
     expect(mount(label).html()).toContain(disconectOpt?.label)
   })

@@ -1,18 +1,17 @@
-// @flow
 import * as Fixtures from '../__fixtures__'
 import * as actions from '../actions'
 
 import type { Action } from '../../types'
 
-type ActionSpec = {|
-  name: string,
-  creator: (...Array<any>) => mixed,
-  args?: Array<mixed>,
-  expected: Action,
-|}
+interface ActionSpec {
+  name: string
+  creator: (...args: any[]) => unknown
+  args?: unknown[]
+  expected: Action
+}
 
 describe('custom labware actions', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'fetchCustomLabware',
       creator: actions.fetchCustomLabware,
@@ -30,8 +29,16 @@ describe('custom labware actions', () => {
       expected: {
         type: 'labware:CUSTOM_LABWARE_LIST',
         payload: [
-          { type: 'INVALID_LABWARE_FILE', filename: 'a.json', modified: 0 },
-          { type: 'INVALID_LABWARE_FILE', filename: 'b.json', modified: 1 },
+          {
+            type: 'INVALID_LABWARE_FILE',
+            filename: 'a.json',
+            modified: 0,
+          } as any,
+          {
+            type: 'INVALID_LABWARE_FILE',
+            filename: 'b.json',
+            modified: 1,
+          } as any,
         ],
         meta: { source: 'poll' },
       },
@@ -46,7 +53,11 @@ describe('custom labware actions', () => {
       expected: {
         type: 'labware:CUSTOM_LABWARE_LIST',
         payload: [
-          { type: 'INVALID_LABWARE_FILE', filename: 'a.json', modified: 0 },
+          {
+            type: 'INVALID_LABWARE_FILE',
+            filename: 'a.json',
+            modified: 0,
+          } as any,
         ],
         meta: { source: 'changeDirectory' },
       },

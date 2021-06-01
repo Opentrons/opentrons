@@ -1,43 +1,35 @@
-// @flow
-
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 // common types
 
-type LabwareFileProps = {|
-  filename: string,
-  modified: number,
-|}
+interface LabwareFileProps {
+  filename: string
+  modified: number
+}
 
-type ValidatedLabwareProps = {|
-  ...LabwareFileProps,
-  definition: LabwareDefinition2,
-|}
+interface ValidatedLabwareProps extends LabwareFileProps {
+  definition: LabwareDefinition2
+}
 
-export type UncheckedLabwareFile = {|
-  ...LabwareFileProps,
-  data: { [string]: mixed } | null,
-|}
+export interface UncheckedLabwareFile extends LabwareFileProps {
+  data: { [key: string]: unknown } | null
+}
 
-export type InvalidLabwareFile = {|
-  type: 'INVALID_LABWARE_FILE',
-  ...LabwareFileProps,
-|}
+export interface InvalidLabwareFile extends LabwareFileProps {
+  type: 'INVALID_LABWARE_FILE'
+}
 
-export type DuplicateLabwareFile = {|
-  type: 'DUPLICATE_LABWARE_FILE',
-  ...ValidatedLabwareProps,
-|}
+export interface DuplicateLabwareFile extends ValidatedLabwareProps {
+  type: 'DUPLICATE_LABWARE_FILE'
+}
 
-export type OpentronsLabwareFile = {|
-  type: 'OPENTRONS_LABWARE_FILE',
-  ...ValidatedLabwareProps,
-|}
+export interface OpentronsLabwareFile extends ValidatedLabwareProps {
+  type: 'OPENTRONS_LABWARE_FILE'
+}
 
-export type ValidLabwareFile = {|
-  type: 'VALID_LABWARE_FILE',
-  ...ValidatedLabwareProps,
-|}
+export interface ValidLabwareFile extends ValidatedLabwareProps {
+  type: 'VALID_LABWARE_FILE'
+}
 
 export type CheckedLabwareFile =
   | InvalidLabwareFile
@@ -52,13 +44,13 @@ export type FailedLabwareFile =
 
 // state types
 
-export type CustomLabwareState = $ReadOnly<{|
-  filenames: Array<string>,
-  filesByName: $Shape<{| [filename: string]: CheckedLabwareFile |}>,
-  addFailureFile: FailedLabwareFile | null,
-  addFailureMessage: string | null,
-  listFailureMessage: string | null,
-|}>
+export interface CustomLabwareState {
+  readonly filenames: string[]
+  readonly filesByName: Partial<{ [filename: string]: CheckedLabwareFile }>
+  readonly addFailureFile: FailedLabwareFile | null
+  readonly addFailureMessage: string | null
+  readonly listFailureMessage: string | null
+}
 
 // action types
 
@@ -69,47 +61,47 @@ export type CustomLabwareListActionSource =
   | 'overwriteLabware'
   | 'changeDirectory'
 
-export type FetchCustomLabwareAction = {|
-  type: 'labware:FETCH_CUSTOM_LABWARE',
-  meta: {| shell: true |},
-|}
+export interface FetchCustomLabwareAction {
+  type: 'labware:FETCH_CUSTOM_LABWARE'
+  meta: { shell: true }
+}
 
-export type CustomLabwareListAction = {|
-  type: 'labware:CUSTOM_LABWARE_LIST',
-  payload: Array<CheckedLabwareFile>,
-  meta: {| source: CustomLabwareListActionSource |},
-|}
+export interface CustomLabwareListAction {
+  type: 'labware:CUSTOM_LABWARE_LIST'
+  payload: CheckedLabwareFile[]
+  meta: { source: CustomLabwareListActionSource }
+}
 
-export type CustomLabwareListFailureAction = {|
-  type: 'labware:CUSTOM_LABWARE_LIST_FAILURE',
-  payload: {| message: string |},
-  meta: {| source: CustomLabwareListActionSource |},
-|}
+export interface CustomLabwareListFailureAction {
+  type: 'labware:CUSTOM_LABWARE_LIST_FAILURE'
+  payload: { message: string }
+  meta: { source: CustomLabwareListActionSource }
+}
 
-export type ChangeCustomLabwareDirectoryAction = {|
-  type: 'labware:CHANGE_CUSTOM_LABWARE_DIRECTORY',
-  meta: {| shell: true |},
-|}
+export interface ChangeCustomLabwareDirectoryAction {
+  type: 'labware:CHANGE_CUSTOM_LABWARE_DIRECTORY'
+  meta: { shell: true }
+}
 
-export type AddCustomLabwareAction = {|
-  type: 'labware:ADD_CUSTOM_LABWARE',
-  payload: {| overwrite: DuplicateLabwareFile | null |},
-  meta: {| shell: true |},
-|}
+export interface AddCustomLabwareAction {
+  type: 'labware:ADD_CUSTOM_LABWARE'
+  payload: { overwrite: DuplicateLabwareFile | null }
+  meta: { shell: true }
+}
 
-export type AddCustomLabwareFailureAction = {|
-  type: 'labware:ADD_CUSTOM_LABWARE_FAILURE',
-  payload: {| labware: FailedLabwareFile | null, message: string | null |},
-|}
+export interface AddCustomLabwareFailureAction {
+  type: 'labware:ADD_CUSTOM_LABWARE_FAILURE'
+  payload: { labware: FailedLabwareFile | null; message: string | null }
+}
 
-export type ClearAddCustomLabwareFailureAction = {|
-  type: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE',
-|}
+export interface ClearAddCustomLabwareFailureAction {
+  type: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE'
+}
 
-export type OpenCustomLabwareDirectoryAction = {|
-  type: 'labware:OPEN_CUSTOM_LABWARE_DIRECTORY',
-  meta: {| shell: true |},
-|}
+export interface OpenCustomLabwareDirectoryAction {
+  type: 'labware:OPEN_CUSTOM_LABWARE_DIRECTORY'
+  meta: { shell: true }
+}
 
 export type CustomLabwareAction =
   | FetchCustomLabwareAction

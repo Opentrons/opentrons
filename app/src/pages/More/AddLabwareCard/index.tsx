@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
@@ -25,14 +24,15 @@ const LABWARE_MANAGEMENT = 'Labware Management'
 const MANAGE_CUSTOM_LABWARE_DEFINITIONS =
   'Manage custom labware definitions for use in your Python Protocol API Version 2 protocols.'
 
-export function AddLabwareCard(): React.Node {
+export function AddLabwareCard(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const labwarePath = useSelector(getCustomLabwareDirectory)
   const addFailure = useSelector(getAddLabwareFailure)
-  const handleOpenPath = () => dispatch(openCustomLabwareDirectory())
-  const handleResetPath = () => dispatch(resetCustomLabwareDirectory())
-  const handleChangePath = () => dispatch(changeCustomLabwareDirectory())
-  const handleAddLabware = () => dispatch(addCustomLabware())
+  const handleOpenPath = (): unknown => dispatch(openCustomLabwareDirectory())
+  const handleResetPath = (): unknown => dispatch(resetCustomLabwareDirectory())
+  const handleChangePath = (): unknown =>
+    dispatch(changeCustomLabwareDirectory())
+  const handleAddLabware = (): unknown => dispatch(addCustomLabware())
   const showAddFailure = addFailure.file || addFailure.errorMessage !== null
 
   return (

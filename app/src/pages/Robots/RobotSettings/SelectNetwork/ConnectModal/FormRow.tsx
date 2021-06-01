@@ -1,33 +1,26 @@
-// @flow
 // presentational components for the wifi connect form
 import * as React from 'react'
 import styled from 'styled-components'
 import { FONT_WEIGHT_SEMIBOLD } from '@opentrons/components'
 
-import type { StyledComponent } from 'styled-components'
+export interface FormRowProps {
+  label: string
+  labelFor: string
+  children: React.ReactNode
+}
 
-export type FormRowProps = {|
-  label: string,
-  labelFor: string,
-  children: React.Node,
-|}
-
-const StyledRow: StyledComponent<{||}, {||}, HTMLDivElement> = styled.div`
+const StyledRow = styled.div`
   display: table-row;
 `
 
-const StyledLabel: StyledComponent<{||}, {||}, HTMLLabelElement> = styled.label`
+const StyledLabel = styled.label`
   display: table-cell;
   padding-right: 1rem;
   text-align: right;
   font-weight: ${FONT_WEIGHT_SEMIBOLD};
 `
 
-const StyledInputWrapper: StyledComponent<
-  {||},
-  {||},
-  HTMLDivElement
-> = styled.div`
+const StyledInputWrapper = styled.div`
   padding-bottom: 0.75rem;
   display: table-cell;
 
@@ -36,7 +29,7 @@ const StyledInputWrapper: StyledComponent<
   }
 `
 
-export const FormRow = (props: FormRowProps): React.Node => {
+export const FormRow = (props: FormRowProps): JSX.Element => {
   const { label, labelFor, children } = props
 
   return (

@@ -1,10 +1,11 @@
-// @flow
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { resetConfigEpic } from '../resetConfigEpic'
 
-const makeResetConfigAction = robotName =>
+import type { Action } from '../../../types'
+
+const makeResetConfigAction = (robotName: string) =>
   Actions.resetConfig(robotName, {
     foo: true,
     bar: false,
@@ -16,12 +17,12 @@ describe('robotAdminEpic handles performing a "factory reset"', () => {
   })
 
   it('calls POST /settings/reset on RESET_CONFIG', () => {
-    const mocks = setupEpicTestMocks(
+    const mocks = setupEpicTestMocks<Action>(
       makeResetConfigAction,
       Fixtures.mockResetConfigSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = resetConfigEpic(action$, state$)
@@ -38,12 +39,12 @@ describe('robotAdminEpic handles performing a "factory reset"', () => {
   })
 
   it('maps successful response to RESET_CONFIG_SUCCESS', () => {
-    const mocks = setupEpicTestMocks(
+    const mocks = setupEpicTestMocks<Action>(
       makeResetConfigAction,
       Fixtures.mockResetConfigSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = resetConfigEpic(action$, state$)
@@ -58,12 +59,12 @@ describe('robotAdminEpic handles performing a "factory reset"', () => {
   })
 
   it('maps failed response to RESET_CONFIG_FAILURE', () => {
-    const mocks = setupEpicTestMocks(
+    const mocks = setupEpicTestMocks<Action>(
       makeResetConfigAction,
       Fixtures.mockResetConfigFailure
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = resetConfigEpic(action$, state$)

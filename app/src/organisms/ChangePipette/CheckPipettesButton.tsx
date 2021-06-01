@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
@@ -14,32 +13,32 @@ import { PrimaryButton, Icon } from '@opentrons/components'
 
 import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import type { FetchPipettesAction } from '../../redux/pipettes/types'
 
-export type CheckPipetteButtonProps = {|
-  robotName: string,
-  className: string,
-  children: React.Node,
-  hidden?: boolean,
-  onDone?: () => mixed,
-|}
+export interface CheckPipetteButtonProps {
+  robotName: string
+  className: string
+  children: React.ReactNode
+  hidden?: boolean
+  onDone?: () => unknown
+}
 
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps
-): React.Node {
+): JSX.Element | null {
   const { robotName, onDone, className, children, hidden = false } = props
   const fetchPipettesRequestId = React.useRef<string | null>(null)
-  const [dispatch] = useDispatchApiRequests<FetchPipettesAction>(
-    dispatchedAction => {
-      if (
-        dispatchedAction.type === FETCH_PIPETTES &&
-        dispatchedAction.meta.requestId
-      ) {
-        fetchPipettesRequestId.current = dispatchedAction.meta.requestId
-      }
+  const [dispatch] = useDispatchApiRequests(dispatchedAction => {
+    if (
+      dispatchedAction.type === FETCH_PIPETTES &&
+      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+      dispatchedAction.meta.requestId
+    ) {
+      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
+      fetchPipettesRequestId.current = dispatchedAction.meta.requestId
     }
-  )
-  const handleClick = () => dispatch(fetchPipettes(robotName, true))
+  })
+
+  const handleClick = (): void => dispatch(fetchPipettes(robotName, true))
   const requestStatus = useSelector<State, RequestState | null>(state =>
     fetchPipettesRequestId.current
       ? getRequestById(state, fetchPipettesRequestId.current)

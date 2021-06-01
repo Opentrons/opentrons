@@ -1,4 +1,3 @@
-// @flow
 // Page for /more/network-and-system
 import * as React from 'react'
 import { css } from 'styled-components'
@@ -18,7 +17,7 @@ const CARD_GRID_STYLE = css`
   }
 `
 
-export const NetworkAndSystem = (): React.Node => (
+export const NetworkAndSystem = (): JSX.Element => (
   <Page titleBarProps={{ title: NETWORK_AND_SYSTEM }}>
     <div css={CARD_GRID_STYLE}>
       <NetworkSettingsCard />

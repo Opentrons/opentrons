@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import type { LabwareCalibrationProps } from './ConfirmPositionDiagram'
 
@@ -13,10 +12,7 @@ type TypeKey =
   | 'reservoir'
   | 'reservoirCentered'
 
-const DIAGRAMS: {
-  [TypeKey]: { [Channels]: { [Step]: string, ... }, ... },
-  ...
-} = {
+const DIAGRAMS: Record<TypeKey, Record<Channels, Record<Step, string>>> = {
   tiprack: {
     single: {
       one: require('./images/step-1-tiprack-single@3x.png'),
@@ -89,10 +85,10 @@ const DIAGRAMS: {
   },
 }
 
-const DIAGRAMS_BOTTOM: {
-  [TypeKey]: { [Channels]: { [Step]: string, ... }, ... },
-  ...
-} = {
+const DIAGRAMS_BOTTOM: Record<
+  TypeKey,
+  Record<Channels, Record<Step, string>>
+> = {
   tiprack: {
     single: {
       one: require('./images/step-1-tiprack-single@3x.png'),
@@ -165,10 +161,10 @@ const DIAGRAMS_BOTTOM: {
   },
 }
 
-const INSTRUCTIONS: {
-  [TypeKey]: { [Channels]: { [Step]: React.Node, ... }, ... },
-  ...
-} = {
+const INSTRUCTIONS: Record<
+  TypeKey,
+  Record<Channels, Record<Step, React.ReactNode>>
+> = {
   tiprack: {
     single: {
       one: 'Jog pipette until it is centered above tip A1.',
@@ -302,10 +298,10 @@ const INSTRUCTIONS: {
   },
 }
 
-const INSTRUCTIONS_BOTTOM: {
-  [TypeKey]: { [Channels]: { [Step]: React.Node, ... }, ... },
-  ...
-} = {
+const INSTRUCTIONS_BOTTOM: Record<
+  TypeKey,
+  Record<Channels, Record<Step, React.ReactNode>>
+> = {
   tiprack: {
     single: {
       one: 'Jog pipette until it is centered above tip A1.',
@@ -441,7 +437,7 @@ const INSTRUCTIONS_BOTTOM: {
 
 export function getDiagramSrc(
   props: LabwareCalibrationProps
-): { [Step]: string, ... } {
+): Record<Step, string> {
   const typeKey = getTypeKey(props)
   const channelsKey = getChannelsKey(props)
   if (props.calibrateToBottom) {
@@ -452,7 +448,7 @@ export function getDiagramSrc(
 
 export function getInstructionsByType(
   props: LabwareCalibrationProps
-): { [Step]: React.Node, ... } {
+): Record<Step, React.ReactNode> {
   const typeKey = getTypeKey(props)
   const channelsKey = getChannelsKey(props)
 
@@ -462,10 +458,10 @@ export function getInstructionsByType(
   return INSTRUCTIONS[typeKey][channelsKey]
 }
 
-function getTypeKey(props: LabwareCalibrationProps) {
+function getTypeKey(props: LabwareCalibrationProps): TypeKey {
   const { labware, useCenteredTroughs } = props
   const { type, isTiprack } = labware
-  let typeKey
+  let typeKey: TypeKey
   if (isTiprack) {
     typeKey = 'tiprack'
   } else if (type.includes('trough')) {
@@ -486,7 +482,7 @@ function getTypeKey(props: LabwareCalibrationProps) {
   return typeKey
 }
 
-function getChannelsKey(props: LabwareCalibrationProps) {
+function getChannelsKey(props: LabwareCalibrationProps): Channels {
   const { channels } = props.calibrator
   const channelsKey = channels === 8 ? 'multi' : 'single'
   return channelsKey

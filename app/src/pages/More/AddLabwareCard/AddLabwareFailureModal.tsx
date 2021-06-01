@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
@@ -45,28 +44,30 @@ const DISPLAY_NAME = 'Name: '
 const API_NAME = 'API name: '
 const FILENAME = 'File name: '
 
-export type AddLabwareFailureModalProps = {|
-  file: FailedLabwareFile | null,
-  errorMessage: string | null,
-  directory: string,
-  onCancel: () => mixed,
-  onOverwrite: (file: DuplicateLabwareFile) => mixed,
-|}
+export interface AddLabwareFailureModalProps {
+  file: FailedLabwareFile | null
+  errorMessage: string | null
+  directory: string
+  onCancel: () => unknown
+  onOverwrite: (file: DuplicateLabwareFile) => unknown
+}
 
-const renderFilename = file => (
+const renderFilename = (file: FailedLabwareFile): JSX.Element => (
   <span className={styles.code}>{file.filename}</span>
 )
 
-const renderDetails = file => (
+const renderDetails = (file: FailedLabwareFile): JSX.Element => (
   <>
     <ul className={styles.details_list}>
       <li className={styles.list_item}>
         <span className={styles.list_item_title}>{DISPLAY_NAME}</span>
+        {/* @ts-expect-error TODO: file.definition does not exist if failed file is of type InvalidLabwareFile */}
         <span>{file.definition.metadata.displayName}</span>
       </li>
       <li className={styles.list_item}>
         <span className={styles.list_item_title}>{API_NAME}</span>
         <span className={styles.code}>
+          {/* @ts-expect-error TODO: file.definition does not exist if failed file is of type InvalidLabwareFile */}
           {file.definition.parameters.loadName}
         </span>
       </li>
@@ -80,7 +81,7 @@ const renderDetails = file => (
 
 export function AddLabwareFailureModalTemplate(
   props: AddLabwareFailureModalProps
-): React.Node {
+): JSX.Element {
   const { file, errorMessage, directory, onCancel, onOverwrite } = props
   let buttons = [
     { onClick: onCancel, children: CANCEL, className: styles.button },
@@ -144,7 +145,7 @@ export function AddLabwareFailureModalTemplate(
 
 export function AddLabwareFailureModal(
   props: AddLabwareFailureModalProps
-): React.Node {
+): JSX.Element {
   return (
     <Portal>
       <AddLabwareFailureModalTemplate {...props} />

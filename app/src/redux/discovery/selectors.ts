@@ -1,4 +1,3 @@
-// @flow
 import isIp from 'is-ip'
 import concat from 'lodash/concat'
 import find from 'lodash/find'
@@ -23,7 +22,7 @@ import {
 import { getConnectedRobotName } from '../robot/selectors'
 
 import type { State } from '../types'
-import type {
+import {
   DiscoveredRobot,
   Robot,
   ReachableRobot,
@@ -31,16 +30,16 @@ import type {
   ViewableRobot,
 } from './types'
 
-type GetConnectableRobots = State => Array<Robot>
-type GetReachableRobots = State => Array<ReachableRobot>
-type GetUnreachableRobots = State => Array<UnreachableRobot>
-type GetAllRobots = State => Array<DiscoveredRobot>
-type GetViewableRobots = State => Array<ViewableRobot>
-type GetConnectedRobot = State => Robot | null
+type GetConnectableRobots = (state: State) => Robot[]
+type GetReachableRobots = (state: State) => ReachableRobot[]
+type GetUnreachableRobots = (state: State) => UnreachableRobot[]
+type GetAllRobots = (state: State) => DiscoveredRobot[]
+type GetViewableRobots = (state: State) => ViewableRobot[]
+type GetConnectedRobot = (state: State) => Robot | null
 
 const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
 
-const isLocal = (ip: string) => {
+const isLocal = (ip: string): boolean => {
   return (
     RE_HOSTNAME_IPV6_LL.test(ip) ||
     RE_HOSTNAME_IPV4_LL.test(ip) ||
@@ -49,13 +48,15 @@ const isLocal = (ip: string) => {
   )
 }
 
-const ipToHostname = (ip: string) => (isIp.v6(ip) ? `[${ip}]` : ip)
+const ipToHostname = (ip: string): string => (isIp.v6(ip) ? `[${ip}]` : ip)
 
 export function getScanning(state: State): boolean {
   return state.discovery.scanning
 }
 
-export const getDiscoveredRobots: State => Array<DiscoveredRobot> = createSelector(
+export const getDiscoveredRobots: (
+  state: State
+) => DiscoveredRobot[] = createSelector(
   state => state.discovery.robotsByName,
   getConnectedRobotName,
   (robotsMap, connectedRobotName) => {
@@ -132,13 +133,14 @@ export const getAllRobots: GetAllRobots = createSelector(
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
-  concat
+  (cr: DiscoveredRobot[], rr: DiscoveredRobot[], ur: DiscoveredRobot[]) =>
+    concat<DiscoveredRobot>(cr, rr, ur)
 )
 
 export const getViewableRobots: GetViewableRobots = createSelector(
   getConnectableRobots,
   getReachableRobots,
-  concat
+  (cr: ViewableRobot[], rr: ViewableRobot[]) => concat<ViewableRobot>(cr, rr)
 )
 
 export const getConnectedRobot: GetConnectedRobot = createSelector(
@@ -167,7 +169,7 @@ export const getRobotFirmwareVersion = (
 
 export const getRobotProtocolApiVersion = (
   robot: DiscoveredRobot
-): {| min: string, max: string |} | null => {
+): { min: string; max: string } | null => {
   const healthField = robot.health
   const DEFAULT_API_VERSION = '1.0'
   if (!healthField) {

@@ -1,7 +1,9 @@
-// @flow
 import * as React from 'react'
 
-import { mountWithStore } from '@opentrons/components/__utils__'
+import {
+  mountWithStore,
+  WrapperWithStore,
+} from '@opentrons/components/__utils__'
 import { mockConnectableRobot as mockRobot } from '../../../../../redux/discovery/__fixtures__'
 import * as Buildroot from '../../../../../redux/buildroot'
 import { UpdateBuildroot } from '..'
@@ -10,7 +12,6 @@ import { ViewUpdateModal } from '../ViewUpdateModal'
 import { InstallModal } from '../InstallModal'
 
 import type { State } from '../../../../../redux/types'
-import type { ViewableRobot } from '../../../../../redux/discovery/types'
 
 // shallow render connected children
 jest.mock('../VersionInfoModal', () => ({
@@ -23,27 +24,24 @@ jest.mock('../ViewUpdateModal', () => ({
 
 jest.mock('../../../../../redux/buildroot/selectors')
 
-const getBuildrootUpdateAvailable: JestMockFn<
-  [State, ViewableRobot],
-  $Call<typeof Buildroot.getBuildrootUpdateAvailable, State, ViewableRobot>
-> = Buildroot.getBuildrootUpdateAvailable
+const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<
+  typeof Buildroot.getBuildrootUpdateAvailable
+>
+const getBuildrootSession = Buildroot.getBuildrootSession as jest.MockedFunction<
+  typeof Buildroot.getBuildrootSession
+>
+const getRobotSystemType = Buildroot.getRobotSystemType as jest.MockedFunction<
+  typeof Buildroot.getRobotSystemType
+>
 
-const getBuildrootSession: JestMockFn<
-  [State],
-  $Call<typeof Buildroot.getBuildrootSession, State>
-> = Buildroot.getBuildrootSession
-
-const getRobotSystemType: JestMockFn<
-  [ViewableRobot],
-  $Call<typeof Buildroot.getRobotSystemType, ViewableRobot>
-> = Buildroot.getRobotSystemType
-
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = { mockState: true } as any
 
 describe('UpdateBuildroot wizard', () => {
   const closeModal = jest.fn()
-  const render = () => {
-    return mountWithStore(
+  const render = (): WrapperWithStore<
+    React.ComponentProps<typeof UpdateBuildroot>
+  > => {
+    return mountWithStore<React.ComponentProps<typeof UpdateBuildroot>>(
       <UpdateBuildroot robot={mockRobot} close={closeModal} />,
       { initialState: MOCK_STATE }
     )
@@ -79,7 +77,7 @@ describe('UpdateBuildroot wizard', () => {
     )
     expect(closeModal).not.toHaveBeenCalled()
 
-    versionInfo.invoke('close')()
+    versionInfo.invoke('close')?.()
     expect(closeModal).toHaveBeenCalled()
   })
 
@@ -88,7 +86,7 @@ describe('UpdateBuildroot wizard', () => {
     const versionInfo = wrapper.find(VersionInfoModal)
 
     expect(wrapper.exists(ViewUpdateModal)).toBe(false)
-    versionInfo.invoke('proceed')()
+    versionInfo.invoke('proceed')?.()
 
     const viewUpdate = wrapper.find(ViewUpdateModal)
     expect(viewUpdate.prop('robotName')).toBe(mockRobot.name)
@@ -96,14 +94,14 @@ describe('UpdateBuildroot wizard', () => {
     expect(viewUpdate.prop('robotSystemType')).toBe(Buildroot.BUILDROOT)
     expect(getRobotSystemType).toHaveBeenCalledWith(mockRobot)
 
-    viewUpdate.invoke('close')()
+    viewUpdate.invoke('close')?.()
     expect(closeModal).toHaveBeenCalled()
   })
 
   it('should proceed from the ViewUpdateModal to an install', () => {
     const { wrapper, store } = render()
-    wrapper.find(VersionInfoModal).invoke('proceed')()
-    wrapper.find(ViewUpdateModal).invoke('proceed')()
+    wrapper.find(VersionInfoModal).invoke('proceed')?.()
+    wrapper.find(ViewUpdateModal).invoke('proceed')?.()
 
     expect(store.dispatch).toHaveBeenCalledWith(
       Buildroot.startBuildrootUpdate(mockRobot.name)
@@ -132,7 +130,7 @@ describe('UpdateBuildroot wizard', () => {
     expect(installModal.prop('session')).toBe(mockSession)
 
     expect(closeModal).not.toHaveBeenCalled()
-    installModal.invoke('close')()
+    installModal.invoke('close')?.()
     expect(closeModal).toHaveBeenCalled()
   })
 

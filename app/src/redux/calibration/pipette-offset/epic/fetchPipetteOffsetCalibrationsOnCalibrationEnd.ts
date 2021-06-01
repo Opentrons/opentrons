@@ -1,13 +1,11 @@
-// @flow
-
 import { filter, withLatestFrom, map } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 
 import { getConnectedRobotName } from '../../../robot/selectors'
 import * as Actions from '../actions'
-import type { Epic, State } from '../../../types'
+import type { Action, Epic, State } from '../../../types'
 
-import type { SessionType } from '../../../sessions/types'
+import { DeleteSessionAction, SessionType } from '../../../sessions/types'
 import {
   DELETE_SESSION,
   SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
@@ -17,7 +15,7 @@ import {
 } from '../../../sessions/constants'
 import { getRobotSessionById } from '../../../sessions/selectors'
 
-const isTargetSessionType: SessionType => boolean = sessionType =>
+const isTargetSessionType = (sessionType: SessionType): boolean =>
   [
     SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
     SESSION_TYPE_TIP_LENGTH_CALIBRATION,
@@ -44,13 +42,11 @@ export const fetchPipetteOffsetCalibrationsOnCalibrationEndEpic: Epic = (
   state$
 ) => {
   return action$.pipe(
-    ofType(DELETE_SESSION),
-    withLatestFrom(state$, (a, s) => [
-      a,
-      s,
-      getConnectedRobotName(s),
-      a.payload.sessionId,
-    ]),
+    ofType<Action, DeleteSessionAction>(DELETE_SESSION),
+    withLatestFrom<
+      DeleteSessionAction,
+      [DeleteSessionAction, State, string, string]
+    >(state$, (a, s) => [a, s, getConnectedRobotName(s), a.payload.sessionId]),
     filter(
       ([action, state, robotName, sessionId]) =>
         robotName != null && sessionIncursRefetch(state, robotName, sessionId)

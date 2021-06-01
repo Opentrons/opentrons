@@ -1,5 +1,3 @@
-// @flow
-
 import * as Types from './types'
 import * as Constants from './constants'
 import type {
@@ -14,7 +12,8 @@ export const createSession = (
 ): Types.CreateSessionAction => ({
   type: Constants.CREATE_SESSION,
   payload: { robotName, sessionType, params },
-  meta: {},
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const createSessionSuccess = (
@@ -43,7 +42,8 @@ export const deleteSession = (
 ): Types.DeleteSessionAction => ({
   type: Constants.DELETE_SESSION,
   payload: { robotName, sessionId },
-  meta: {},
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const deleteSessionSuccess = (
@@ -73,7 +73,8 @@ export const fetchSession = (
 ): Types.FetchSessionAction => ({
   type: Constants.FETCH_SESSION,
   payload: { robotName, sessionId },
-  meta: {},
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const fetchSessionSuccess = (
@@ -102,7 +103,8 @@ export const fetchAllSessions = (
 ): Types.FetchAllSessionsAction => ({
   type: Constants.FETCH_ALL_SESSIONS,
   payload: { robotName },
-  meta: {},
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const fetchAllSessionsSuccess = (
@@ -132,7 +134,8 @@ export const createSessionCommand = (
 ): Types.CreateSessionCommandAction => ({
   type: Constants.CREATE_SESSION_COMMAND,
   payload: { robotName, sessionId, command },
-  meta: {},
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const createSessionCommandSuccess = (
@@ -164,7 +167,8 @@ export const ensureSession = (
 ): Types.EnsureSessionAction => ({
   type: Constants.ENSURE_SESSION,
   payload: { robotName, sessionType, params },
-  meta: {},
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  meta: {} as RobotApiRequestMeta,
 })
 
 export const clearAllSessions = (

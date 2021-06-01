@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 
 import { GET } from '../../robot-api/constants'
@@ -10,7 +9,7 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 import type { FetchCalibrationStatusAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchCalibrationStatusAction> = action => ({
@@ -32,7 +31,9 @@ const mapResponseToAction: ResponseToActionMapper<FetchCalibrationStatusAction> 
 
 export const fetchCalibrationStatusEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.FETCH_CALIBRATION_STATUS),
+    ofType<Action, FetchCalibrationStatusAction>(
+      Constants.FETCH_CALIBRATION_STATUS
+    ),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

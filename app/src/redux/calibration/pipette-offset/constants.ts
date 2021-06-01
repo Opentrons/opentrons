@@ -1,5 +1,3 @@
-// @flow
-
 export const PIPETTE_OFFSET_CALIBRATIONS_PATH: '/calibration/pipette_offset' =
   '/calibration/pipette_offset'
 

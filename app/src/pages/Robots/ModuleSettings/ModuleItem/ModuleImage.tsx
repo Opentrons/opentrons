@@ -1,15 +1,14 @@
-// @flow
 import * as React from 'react'
 import { css } from 'styled-components'
 
 import { Flex, ALIGN_CENTER, SIZE_4 } from '@opentrons/components'
 import type { ModuleModel } from '@opentrons/shared-data'
 
-type Props = {|
-  model: ModuleModel,
-|}
+interface Props {
+  model: ModuleModel
+}
 
-export function ModuleImage(props: Props): React.Node {
+export function ModuleImage(props: Props): JSX.Element {
   const imgSrc = getModuleImg(props.model)
 
   return (
@@ -25,11 +24,11 @@ export function ModuleImage(props: Props): React.Node {
   )
 }
 
-function getModuleImg(model: ModuleModel) {
+function getModuleImg(model: ModuleModel): string {
   return MODULE_IMGS[model]
 }
 
-const MODULE_IMGS: { [ModuleModel]: mixed } = {
+const MODULE_IMGS: { [m in ModuleModel]: string } = {
   temperatureModuleV1: require('../../../../assets/images/modules/temperatureModuleV1@3x.png'),
   temperatureModuleV2: require('../../../../assets/images/modules/temperatureModuleV2@3x.png'),
   magneticModuleV1: require('../../../../assets/images/modules/magneticModuleV1@3x.png'),

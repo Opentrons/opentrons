@@ -1,26 +1,29 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 import * as Sessions from '../../../redux/sessions'
 
 import { ConfirmExitModal } from '../ConfirmExitModal'
 
+import type { ReactWrapper } from 'enzyme'
+
 describe('ConfirmExitModal', () => {
-  let render
+  let render: (
+    props?: Partial<React.ComponentProps<typeof ConfirmExitModal>>
+  ) => ReactWrapper<React.ComponentProps<typeof ConfirmExitModal>>
 
   const mockBack = jest.fn()
   const mockExit = jest.fn()
 
-  const getExitButton = wrapper =>
-    wrapper.find('OutlineButton[children="yes, exit now"]')
+  const getExitButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ConfirmExitModal>>
+  ) => wrapper.find('OutlineButton[children="yes, exit now"]')
 
-  const getBackButton = wrapper =>
-    wrapper.find('OutlineButton[children="no, go back"]')
+  const getBackButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof ConfirmExitModal>>
+  ) => wrapper.find('OutlineButton[children="no, go back"]')
 
   beforeEach(() => {
-    render = (
-      props: $Shape<React.ElementProps<typeof ConfirmExitModal>> = {}
-    ) => {
+    render = (props = {}) => {
       const { sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION } = props
       return mount(
         <ConfirmExitModal
@@ -39,7 +42,7 @@ describe('ConfirmExitModal', () => {
   it('clicking confirm exit calls exit', () => {
     const wrapper = render()
 
-    getExitButton(wrapper).invoke('onClick')()
+    getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockExit).toHaveBeenCalled()
@@ -48,7 +51,7 @@ describe('ConfirmExitModal', () => {
   it('clicking back calls back', () => {
     const wrapper = render()
 
-    getBackButton(wrapper).invoke('onClick')()
+    getBackButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
 
     expect(mockBack).toHaveBeenCalled()

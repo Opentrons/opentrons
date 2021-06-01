@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
@@ -10,16 +9,16 @@ import { useTrackEvent } from '../hooks'
 
 import type { State } from '../../types'
 import type { Config } from '../../config/types'
-import type { AnalyticsEvent, AnalyticsConfig } from '../types'
 
 jest.mock('../../config')
 jest.mock('../mixpanel')
 
-const getConfig: JestMockFn<[State], $Shape<Config> | null> = Cfg.getConfig
-const trackEvent: JestMockFn<[AnalyticsEvent, AnalyticsConfig], void> =
-  Mixpanel.trackEvent
+const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
+const trackEvent = Mixpanel.trackEvent as jest.MockedFunction<
+  typeof Mixpanel.trackEvent
+>
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = { mockState: true } as any
 
 const MOCK_ANALYTICS_CONFIG = {
   appId: 'abc',
@@ -29,9 +28,9 @@ const MOCK_ANALYTICS_CONFIG = {
 
 describe('analytics hooks', () => {
   beforeEach(() => {
-    getConfig.mockImplementation(state => {
+    getConfig.mockImplementation((state: State) => {
       expect(state).toBe(MOCK_STATE)
-      return { analytics: MOCK_ANALYTICS_CONFIG }
+      return { analytics: MOCK_ANALYTICS_CONFIG } as Config
     })
   })
 
@@ -40,9 +39,9 @@ describe('analytics hooks', () => {
   })
 
   describe('useTrackEvent', () => {
-    let trackEventResult
+    let trackEventResult: ReturnType<typeof useTrackEvent>
 
-    const TestTrackEvent = () => {
+    const TestTrackEvent = (): JSX.Element => {
       trackEventResult = useTrackEvent()
       return <></>
     }

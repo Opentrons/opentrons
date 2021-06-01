@@ -1,4 +1,3 @@
-// @flow
 import { TestScheduler } from 'rxjs/testing'
 
 import { mockRobot } from '../../../robot-api/__fixtures__'
@@ -10,36 +9,32 @@ import * as Actions from '../../actions'
 import * as Types from '../../types'
 import { robotSettingsEpic } from '..'
 
-import type { Observable } from 'rxjs'
-import type { State } from '../../../types'
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-  RobotApiResponse,
-} from '../../../robot-api/types'
+import type { Action, State } from '../../../types'
+import type { RobotApiRequestMeta } from '../../../robot-api/types'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')
 jest.mock('../../selectors')
 
-const mockState = { state: true }
+const mockState: State = { state: true } as any
 
-const mockFetchRobotApi: JestMockFn<
-  [RobotHost, RobotApiRequestOptions],
-  Observable<RobotApiResponse>
-> = RobotApiHttp.fetchRobotApi
+const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
+  typeof RobotApiHttp.fetchRobotApi
+>
 
-const mockGetRobotByName: JestMockFn<[any, string], mixed> =
-  DiscoverySelectors.getRobotByName
+const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
+  typeof DiscoverySelectors.getRobotByName
+>
 
-const mockGetAllRestartRequiredRobots: JestMockFn<[State], Array<string>> =
-  Selectors.getAllRestartRequiredRobots
+const mockGetAllRestartRequiredRobots = Selectors.getAllRestartRequiredRobots as jest.MockedFunction<
+  typeof Selectors.getAllRestartRequiredRobots
+>
 
 describe('updateSettingEpic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot)
+    mockGetRobotByName.mockReturnValue(mockRobot as any)
     mockGetAllRestartRequiredRobots.mockReturnValue([])
 
     testScheduler = new TestScheduler((actual, expected) => {
@@ -51,7 +46,7 @@ describe('updateSettingEpic', () => {
     jest.resetAllMocks()
   })
 
-  const meta = { requestId: '1234' }
+  const meta: RobotApiRequestMeta = { requestId: '1234' } as any
   const action: Types.UpdateSettingAction = {
     ...Actions.updateSetting(mockRobot.name, 'setting-id', true),
     meta,
@@ -63,8 +58,8 @@ describe('updateSettingEpic', () => {
         cold('r', { r: Fixtures.mockUpdateSettingSuccess })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: mockState })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: mockState })
       const output$ = robotSettingsEpic(action$, state$)
 
       expectObservable(output$)
@@ -85,8 +80,8 @@ describe('updateSettingEpic', () => {
         cold('r', { r: Fixtures.mockUpdateSettingSuccess })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} } as any)
       const output$ = robotSettingsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
@@ -106,8 +101,8 @@ describe('updateSettingEpic', () => {
         cold('r', { r: Fixtures.mockUpdateSettingFailure })
       )
 
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
+      const action$ = hot<Action>('--a', { a: action })
+      const state$ = hot<State>('a-a', { a: {} } as any)
       const output$ = robotSettingsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {

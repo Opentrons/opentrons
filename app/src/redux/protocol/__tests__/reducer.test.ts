@@ -1,41 +1,60 @@
 // protocol state reducer tests
 
 import { protocolReducer } from '../reducer'
+import type { Action } from '../../types'
+import type { ProtocolState } from '../types'
 
 describe('protocolReducer', () => {
   it('initial state', () => {
-    expect(protocolReducer(undefined, {})).toEqual({
+    expect(protocolReducer(undefined, {} as any)).toEqual({
       file: null,
       contents: null,
       data: null,
     })
   })
 
-  const SPECS = [
+  const SPECS: Array<{
+    name: string
+    action: Action
+    initialState: ProtocolState
+    expectedState: ProtocolState
+  }> = [
     {
       name: 'handles protocol:OPEN',
       action: {
         type: 'protocol:OPEN',
-        payload: { file: { name: 'proto.py' } },
+        payload: { file: { name: 'proto.py' } as any },
       },
-      initialState: { file: {}, contents: 'foobar', data: {} },
-      expectedState: { file: { name: 'proto.py' }, contents: null, data: null },
+      initialState: { file: {}, contents: 'foobar', data: {} } as any,
+      expectedState: {
+        file: { name: 'proto.py' },
+        contents: null,
+        data: null,
+      } as any,
     },
     {
       name: 'handles protocol:UPLOAD',
       action: {
         type: 'protocol:UPLOAD',
         payload: { contents: 'foo', data: {} },
-      },
-      initialState: { file: { name: 'proto.py' }, contents: null, data: null },
-      expectedState: { file: { name: 'proto.py' }, contents: 'foo', data: {} },
+      } as any,
+      initialState: {
+        file: { name: 'proto.py' },
+        contents: null,
+        data: null,
+      } as any,
+      expectedState: {
+        file: { name: 'proto.py' },
+        contents: 'foo',
+        data: {},
+      } as any,
     },
     {
       name: 'handles robot:SESSION_RESPONSE with non-JSON protocol',
       action: {
         type: 'robot:SESSION_RESPONSE',
         payload: { name: 'foo', protocolText: 'bar' },
-      },
+      } as any,
       initialState: { file: null, contents: null, data: null },
       expectedState: {
         file: { name: 'foo', type: null, lastModified: null },

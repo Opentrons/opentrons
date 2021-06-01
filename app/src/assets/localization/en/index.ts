@@ -1,5 +1,3 @@
-// @flow
-
 import shared from './shared.json'
 import protocol_calibration from './protocol_calibration.json'
 import protocol_info from './protocol_info.json'

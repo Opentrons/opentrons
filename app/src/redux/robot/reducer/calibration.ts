@@ -1,4 +1,3 @@
-// @flow
 // robot calibration state and reducer
 // TODO(mc, 2018-01-10): refactor to use combineReducers
 import mapValues from 'lodash/mapValues'
@@ -40,25 +39,25 @@ type CalibrationRequestType =
   | 'SET_MODULES_REVIEWED'
   | 'RETURN_TIP'
 
-export type CalibrationRequest = $ReadOnly<{|
-  type: CalibrationRequestType,
-  mount?: Mount,
-  slot?: Slot,
-  inProgress: boolean,
-  error: Error | null,
-|}>
+export interface CalibrationRequest {
+  readonly type: CalibrationRequestType
+  readonly mount?: Mount
+  readonly slot?: Slot
+  readonly inProgress: boolean
+  readonly error: Error | null
+}
 
-export type CalibrationState = $ReadOnly<{|
-  deckPopulated: ?boolean,
-  modulesReviewed: ?boolean,
+export interface CalibrationState {
+  readonly deckPopulated: boolean | null | undefined
+  readonly modulesReviewed: boolean | null | undefined
 
-  probedByMount: { [Mount]: boolean },
-  tipOnByMount: { [Mount]: boolean },
+  readonly probedByMount: { [mount in Mount]?: boolean }
+  readonly tipOnByMount: { [mount in Mount]?: boolean }
 
-  confirmedBySlot: { [Slot]: boolean },
+  readonly confirmedBySlot: { [slot in Slot]?: boolean }
 
-  calibrationRequest: CalibrationRequest,
-|}>
+  readonly calibrationRequest: CalibrationRequest
+}
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {
@@ -169,17 +168,17 @@ export function calibrationReducer(
 
     // TODO(mc, 20187-01-26): caution - not covered by flow yet
     case SET_DECK_POPULATED:
-      return handleSetDeckPopulated(state, action)
+      return handleSetDeckPopulated(state, action as any)
     case MOVE_TO_FRONT:
-      return handleMoveToFront(state, action)
+      return handleMoveToFront(state, action as any)
     case MOVE_TO_FRONT_RESPONSE:
-      return handleMoveToFrontResponse(state, action)
+      return handleMoveToFrontResponse(state, action as any)
     case PROBE_TIP:
-      return handleProbeTip(state, action)
+      return handleProbeTip(state, action as any)
     case PROBE_TIP_RESPONSE:
-      return handleProbeTipResponse(state, action)
+      return handleProbeTipResponse(state, action as any)
     case CONFIRM_LABWARE:
-      return handleConfirmLabware(state, action)
+      return handleConfirmLabware(state, action as any)
   }
 
   return state

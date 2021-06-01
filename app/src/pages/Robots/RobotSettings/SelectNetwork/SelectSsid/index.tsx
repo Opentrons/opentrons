@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import styled from 'styled-components'
 
@@ -13,14 +12,14 @@ import type {
 
 import type { WifiNetwork } from '../types'
 
-export type SelectSsidProps = {|
-  list: Array<WifiNetwork>,
-  value: string | null,
-  showWifiDisconnect: boolean,
-  onConnect: (ssid: string) => mixed,
-  onJoinOther: () => mixed,
-  onDisconnect: () => mixed,
-|}
+export interface SelectSsidProps {
+  list: WifiNetwork[]
+  value: string | null
+  showWifiDisconnect: boolean
+  onConnect: (ssid: string) => unknown
+  onJoinOther: () => unknown
+  onDisconnect: () => unknown
+}
 
 const FIELD_NAME = '__SelectSsid__'
 
@@ -32,7 +31,9 @@ const SELECT_JOIN_OTHER_GROUP = {
   options: [{ value: JOIN_OTHER_VALUE, label: Copy.LABEL_JOIN_OTHER_NETWORK }],
 }
 
-const makeSelectDisconnectGroup = ssid => ({
+const makeSelectDisconnectGroup = (
+  ssid: string
+): { options: Array<{ value: string; label: string }> } => ({
   options: [
     { value: DISCONNECT_WIFI_VALUE, label: Copy.DISCONNECT_FROM_SSID(ssid) },
   ],
@@ -45,9 +46,9 @@ const StyledSelectField: React.ComponentType<SelectFieldProps> = styled(
 `
 
 const formatOptions = (
-  list: Array<WifiNetwork>,
+  list: WifiNetwork[],
   showWifiDisconnect: boolean
-): Array<SelectOptionOrGroup> => {
+): SelectOptionOrGroup[] => {
   const ssidOptionsList = { options: list.map(({ ssid }) => ({ value: ssid })) }
   const options = [ssidOptionsList, SELECT_JOIN_OTHER_GROUP]
 
@@ -59,7 +60,7 @@ const formatOptions = (
   return options
 }
 
-export function SelectSsid(props: SelectSsidProps): React.Node {
+export function SelectSsid(props: SelectSsidProps): JSX.Element {
   const {
     list,
     value,
@@ -69,7 +70,7 @@ export function SelectSsid(props: SelectSsidProps): React.Node {
     showWifiDisconnect,
   } = props
 
-  const handleValueChange = (_, value) => {
+  const handleValueChange = (_: string, value: string): void => {
     if (value === JOIN_OTHER_VALUE) {
       onJoinOther()
     } else if (value === DISCONNECT_WIFI_VALUE) {
@@ -79,7 +80,9 @@ export function SelectSsid(props: SelectSsidProps): React.Node {
     }
   }
 
-  const formatOptionLabel = (option, { context }) => {
+  const formatOptionLabel: React.ComponentProps<
+    typeof StyledSelectField
+  >['formatOptionLabel'] = (option, { context }): JSX.Element | null => {
     const { value, label } = option
 
     if (label != null) return <NetworkActionLabel label={label} />

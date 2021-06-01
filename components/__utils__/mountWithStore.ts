@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import * as React from 'react'
 import { Provider } from 'react-redux'
@@ -6,28 +5,28 @@ import { mount } from 'enzyme'
 
 import type { ReactWrapper } from 'enzyme'
 
-export type MockStore<State, Action> = {|
-  getState: JestMockFn<[], State>,
-  subscribe: JestMockFn<[], void>,
-  dispatch: JestMockFn<[Action], Action>,
-|}
-
-export type WrapperWithStore<Element, State, Action> = {|
-  wrapper: ReactWrapper<Element>,
-  store: MockStore<State, Action>,
-  refresh: (nextState?: State) => void,
-|}
-
-export type MountWithStoreOptions<State> = {
-  initialState?: State,
-  ...
+export interface MockStore<State, Action> {
+  getState: jest.MockedFunction<() => State>
+  subscribe: jest.MockedFunction<() => void>
+  dispatch: jest.MockedFunction<(action: Action) => Action>
 }
 
-export function mountWithStore<Element: React.ElementType, State, Action>(
-  node: React.Element<Element>,
+export interface WrapperWithStore<Props, State = {}, Action = {}> {
+  wrapper: ReactWrapper<Props>
+  store: MockStore<State, Action>
+  refresh: (nextState?: State) => void
+}
+
+export interface MountWithStoreOptions<State> {
+  initialState?: State
+  [key: string]: unknown
+}
+
+export function mountWithStore<Props, State = {}, Action = {}>(
+  node: React.ReactElement<Props>,
   options?: MountWithStoreOptions<State>
-): WrapperWithStore<Element, State, Action> {
-  const initialState = options?.initialState ?? (({}: any): State)
+): WrapperWithStore<Props, State, Action> {
+  const initialState = options?.initialState ?? ({} as State)
 
   const store: MockStore<State, Action> = {
     getState: jest.fn(() => initialState),
@@ -35,14 +34,14 @@ export function mountWithStore<Element: React.ElementType, State, Action>(
     dispatch: jest.fn(),
   }
 
-  const wrapper = mount(node, {
+  const wrapper = mount<Props>(node, {
     wrappingComponent: Provider,
     wrappingComponentProps: { store },
   })
 
   // force a re-render by returning a new state to recalculate selectors
   // and sending a blank set of new props to the wrapper
-  const refresh = maybeNextState => {
+  const refresh = (maybeNextState?: State): void => {
     const nextState = maybeNextState ?? { ...initialState }
 
     assert(

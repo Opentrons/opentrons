@@ -1,5 +1,3 @@
-// @flow
-
 import { makeEvent } from '../make-event'
 
 import * as CustomLabware from '../../custom-labware'
@@ -8,13 +6,13 @@ import * as LabwareFixtures from '../../custom-labware/__fixtures__'
 import type { State, Action } from '../../types'
 import type { AnalyticsEvent } from '../types'
 
-type EventSpec = {|
-  name: string,
-  action: Action,
-  expected: AnalyticsEvent,
-|}
+interface EventSpec {
+  name: string
+  action: Action
+  expected: AnalyticsEvent
+}
 
-const SPECS: Array<EventSpec> = [
+const SPECS: EventSpec[] = [
   {
     name: 'addCustomLabware success',
     action: CustomLabware.customLabwareList([], CustomLabware.ADD_LABWARE),
@@ -102,7 +100,7 @@ const SPECS: Array<EventSpec> = [
   },
 ]
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = { mockState: true } as any
 
 describe('custom labware analytics events', () => {
   SPECS.forEach(spec => {

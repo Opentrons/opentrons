@@ -1,4 +1,3 @@
-// @flow
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as RobotApiHttp from '../../../robot-api/http'
 
@@ -6,19 +5,15 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
 
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-} from '../../../robot-api/types'
+import type { Action } from '../../../types'
 
 jest.mock('../../../robot-api/http')
 
-const fetchRobotApi: JestMockFn<
-  [RobotHost, RobotApiRequestOptions],
-  $Call<typeof RobotApiHttp.fetchRobotApi, RobotHost, RobotApiRequestOptions>
-> = RobotApiHttp.fetchRobotApi
+const fetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
+  typeof RobotApiHttp.fetchRobotApi
+>
 
-const makeTriggerAction = robotName =>
+const makeTriggerAction = (robotName: string): Action =>
   Actions.ensureSession(robotName, 'calibrationCheck', {
     hasCalibrationBlock: true,
     tipRacks: [],
@@ -59,7 +54,7 @@ describe('ensureSessionEpic', () => {
       Fixtures.mockFetchAllSessionsSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('a-a', { a: mocks.state })
       const output$ = sessionsEpic(action$, state$)
@@ -80,7 +75,7 @@ describe('ensureSessionEpic', () => {
       Fixtures.mockFetchAllSessionsSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
@@ -101,7 +96,7 @@ describe('ensureSessionEpic', () => {
       Fixtures.mockFetchAllSessionsFailure
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
@@ -119,7 +114,7 @@ describe('ensureSessionEpic', () => {
   it('calls POST /sessions if fetch all comes back without session', () => {
     const mocks = setupEpicTestMocks(makeTriggerAction)
 
-    runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, cold, expectObservable, flush }) => {
       fetchRobotApi.mockReturnValueOnce(
         cold('r', { r: mockEmptyFetchAllSuccess })
       )
@@ -146,7 +141,7 @@ describe('ensureSessionEpic', () => {
   it('maps failed create response to CREATE_SESSION_FAILURE', () => {
     const mocks = setupEpicTestMocks(makeTriggerAction)
 
-    runEpicTest(mocks, ({ hot, cold, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, cold, expectObservable }) => {
       fetchRobotApi.mockReturnValueOnce(
         cold('r', { r: mockEmptyFetchAllSuccess })
       )

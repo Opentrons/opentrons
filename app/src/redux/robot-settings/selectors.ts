@@ -1,9 +1,11 @@
-// @flow
 import type { State } from '../types'
-import type { RobotSettings } from './types'
+import type { RobotSettings, PerRobotRobotSettingsState } from './types'
 
-const robotState = (state: State, name: string | null) =>
-  name != null ? state.robotSettings[name] : null
+const robotState = (
+  state: State,
+  name: string | null
+): PerRobotRobotSettingsState | null =>
+  name != null ? state.robotSettings[name] ?? null : null
 
 export function getRobotSettings(
   state: State,
@@ -26,7 +28,7 @@ export function getRobotRestartRequired(
   return getRobotRestartPath(state, robotName) !== null
 }
 
-export function getAllRestartRequiredRobots(state: State): Array<string> {
+export function getAllRestartRequiredRobots(state: State): string[] {
   return Object.keys(state.robotSettings).filter((name: string) => {
     return getRobotRestartRequired(state, name)
   })

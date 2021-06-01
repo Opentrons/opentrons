@@ -1,4 +1,3 @@
-// @flow
 // instrument tabs bar container
 // used for left/right pipette selection during pipette calibration
 import * as React from 'react'
@@ -8,11 +7,11 @@ import { getCalibratePipettesLocations } from '../../../redux/nav'
 import { PIPETTE_MOUNTS } from '../../../redux/pipettes'
 import { PageTabs } from '@opentrons/components'
 
-export type PipetteTabsProps = {|
-  currentMount: ?string,
-|}
+export interface PipetteTabsProps {
+  currentMount: string | null | undefined
+}
 
-export function PipetteTabs(props: PipetteTabsProps): React.Node {
+export function PipetteTabs(props: PipetteTabsProps): JSX.Element {
   const { currentMount } = props
   const pagesByMount = useSelector(getCalibratePipettesLocations)
 

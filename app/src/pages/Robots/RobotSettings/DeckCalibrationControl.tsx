@@ -1,5 +1,3 @@
-// @flow
-
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -43,19 +41,19 @@ import type {
 import type { RequestState } from '../../../redux/robot-api/types'
 
 // deck calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
+const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 
-export type Props = {|
-  robotName: string,
-  disabledReason: string | null,
-  deckCalStatus: DeckCalibrationStatus | null,
-  deckCalData: DeckCalibrationData | null,
-  pipOffsetDataPresent: boolean,
-|}
+export interface Props {
+  robotName: string
+  disabledReason: string | null
+  deckCalStatus: DeckCalibrationStatus | null
+  deckCalData: DeckCalibrationData | null
+  pipOffsetDataPresent: boolean
+}
 
-export function DeckCalibrationControl(props: Props): React.Node {
+export function DeckCalibrationControl(props: Props): JSX.Element {
   const {
     robotName,
     disabledReason,
@@ -75,21 +73,44 @@ export function DeckCalibrationControl(props: Props): React.Node {
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
+        // @ts-expect-error TODO: code in comments below
         createRequestId.current = dispatchedAction.meta.requestId
+        // createRequestId.current =
+        // 'requestId' in dispatchedAction.meta
+        // ? dispatchedAction.meta.requestId ?? null
+        // : null
+
+        // @ts-expect-error TODO: code in comments below
         trackedRequestId.current = dispatchedAction.meta.requestId
+        // trackedRequestId.current =
+        //   'requestId' in dispatchedAction.meta
+        //     ? dispatchedAction.meta.requestId ?? null
+        //     : null
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
       ) {
+        // @ts-expect-error TODO: code in comments below
         jogRequestId.current = dispatchedAction.meta.requestId
+        // jogRequestId.current =
+        //   'requestId' in dispatchedAction.meta
+        //     ? dispatchedAction.meta.requestId ?? null
+        //     : null
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
         !spinnerCommandBlockList.includes(
           dispatchedAction.payload.command.command
         )
       ) {
+        // @ts-expect-error TODO: code in comments below
         trackedRequestId.current = dispatchedAction.meta.requestId
+        // trackedRequestId.current =
+        //   'meta' in dispatchedAction &&
+        //   'requestId' in dispatchedAction.meta &&
+        //   dispatchedAction.meta.requestId != null
+        //     ? dispatchedAction.meta.requestId
+        //     : null
       }
     }
   )
@@ -121,7 +142,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
     }
   }, [createStatus])
 
-  const handleStartDeckCalSession = () => {
+  const handleStartDeckCalSession = (): void => {
     dispatchRequests(
       Sessions.ensureSession(robotName, Sessions.SESSION_TYPE_DECK_CALIBRATION)
     )
@@ -158,12 +179,14 @@ export function DeckCalibrationControl(props: Props): React.Node {
       return t('deck_calibration_missing')
     }
     const datestring =
-      typeof data.lastModified === 'string'
+      'lastModified' in data && typeof data.lastModified === 'string'
         ? formatLastModified(data.lastModified)
         : t('shared:unknown')
-    const getPrefix = calData =>
+    const getPrefix = (calData: DeckCalibrationData): string =>
+      // @ts-expect-error TODO protect against non existent source key with in operator
       typeof data?.source === 'string'
-        ? calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
+        ? 'source' in calData &&
+          calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
           ? t('last_migrated')
           : t('last_calibrated')
         : t('last_calibrated')
@@ -206,6 +229,7 @@ export function DeckCalibrationControl(props: Props): React.Node {
             {...targetProps}
             minWidth="12rem"
             onClick={confirmStart}
+            // @ts-expect-error TODO: SecondaryBtn expects a boolean value for it's disabled prop, cast disabledOrBusyReason?
             disabled={disabledOrBusyReason}
           >
             {showSpinner ? (
@@ -251,8 +275,12 @@ export function DeckCalibrationControl(props: Props): React.Node {
           >
             <Text>{t('deck_calibration_error_occured')}</Text>
             <Text>
-              {createRequest?.error &&
-                RobotApi.getErrorResponseMessage(createRequest.error)}
+              {
+                // @ts-expect-error TODO use in operator to protect against non existent error
+                createRequest?.error &&
+                  // @ts-expect-error TODO use in operator to protect against non existent error
+                  RobotApi.getErrorResponseMessage(createRequest.error)
+              }
             </Text>
           </AlertModal>
         )}

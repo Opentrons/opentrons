@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 import { of } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
@@ -9,7 +8,8 @@ import { withRobotHost } from '../../robot-api/operators'
 
 import * as Constants from '../constants'
 
-import type { State, Epic } from '../../types'
+import type { Observable } from 'rxjs'
+import type { Action, State, Epic } from '../../types'
 import type { RobotHost } from '../../robot-api/types'
 
 import {
@@ -22,7 +22,7 @@ import {
   mapResponseToAction as mapCreateResponseToAction,
 } from './createSessionEpic'
 
-import type { EnsureSessionAction } from '../types'
+import type { EnsureSessionAction, SessionResponseAttributes } from '../types'
 
 // this epic exists to ensure that a session of a given type exists in state
 // it will fetch all sessions and, if the correct session type doesn't already
@@ -30,9 +30,9 @@ import type { EnsureSessionAction } from '../types'
 // actions of fetchAllSessionsEpic and createSessionEpic
 export const ensureSessionEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.ENSURE_SESSION),
+    ofType<Action, EnsureSessionAction>(Constants.ENSURE_SESSION),
     withRobotHost<EnsureSessionAction>(state$, a => a.payload.robotName),
-    switchMap<[EnsureSessionAction, State, RobotHost], _, _>(
+    switchMap<[EnsureSessionAction, State, RobotHost], Observable<Action>>(
       ([originalAction, state, host]) => {
         const { sessionType, params } = originalAction.payload
         const fetchAllRequest = mapActionToFetchAllRequest()
@@ -46,7 +46,7 @@ export const ensureSessionEpic: Epic = (action$, state$) => {
             if (
               !ok ||
               body.data.some(
-                s =>
+                (s: SessionResponseAttributes) =>
                   s.sessionType === sessionType &&
                   isEqual(s.createParams, params)
               )

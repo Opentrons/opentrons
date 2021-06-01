@@ -1,9 +1,9 @@
-// @flow
 import keyBy from 'lodash/keyBy'
 import * as Constants from './constants'
 
 import type { Action } from '../types'
 import type { ModulesState, PerRobotModulesState } from './types'
+import { Reducer } from 'redux'
 
 const INITIAL_STATE: ModulesState = {}
 
@@ -11,10 +11,10 @@ const INITIAL_MODULES_STATE: PerRobotModulesState = {
   modulesById: null,
 }
 
-export function modulesReducer(
-  state: ModulesState = INITIAL_STATE,
-  action: Action
-): ModulesState {
+export const modulesReducer: Reducer<ModulesState, Action> = (
+  state = INITIAL_STATE,
+  action
+) => {
   switch (action.type) {
     case Constants.FETCH_MODULES_SUCCESS: {
       const { robotName, modules } = action.payload

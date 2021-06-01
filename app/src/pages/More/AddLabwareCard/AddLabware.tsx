@@ -1,5 +1,3 @@
-// @flow
-
 import * as React from 'react'
 
 import { LabeledButton } from '@opentrons/components'
@@ -18,11 +16,11 @@ const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create'
 
 export const ADD_LABWARE_NAME = 'add-labware'
 
-export type AddLabwareProps = {|
-  onAddLabware: () => mixed,
-|}
+export interface AddLabwareProps {
+  onAddLabware: () => unknown
+}
 
-export function AddLabware(props: AddLabwareProps): React.Node {
+export function AddLabware(props: AddLabwareProps): JSX.Element {
   const { onAddLabware } = props
 
   return (

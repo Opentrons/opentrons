@@ -1,9 +1,7 @@
-// @flow
 // container for position confirmation logic in ConfirmationModal
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import type { Dispatch } from '../../../redux/types'
 import type { Pipette, Labware } from '../../../redux/robot'
 
 import { actions as robotActions } from '../../../redux/robot'
@@ -11,35 +9,24 @@ import { PrimaryButton } from '@opentrons/components'
 import { ConfirmPositionDiagram } from './ConfirmPositionDiagram'
 import { JogControls } from '../../../molecules/JogControls'
 
+import type { MapDispatchToProps } from 'react-redux'
 import type { Jog } from '../../../molecules/JogControls'
 
-type OP = {|
-  labware: Labware,
-  calibrator: Pipette,
-  calibrateToBottom: boolean,
-  useCenteredTroughs: boolean,
-|}
+interface OP {
+  labware: Labware
+  calibrator: Pipette
+  calibrateToBottom: boolean
+  useCenteredTroughs: boolean
+}
 
-type DP = {|
-  onConfirmClick: () => mixed,
-  jog: Jog,
-|}
+interface DP {
+  onConfirmClick: () => unknown
+  jog: Jog
+}
 
-type Props = {| ...OP, ...DP |}
+type Props = OP & DP
 
-export const ConfirmPositionContents: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  _,
-  _,
-  _,
-  _
->(
-  null,
-  mapDispatchToProps
-)(ConfirmPositionContentsComponent)
-
-function ConfirmPositionContentsComponent(props: Props) {
+function ConfirmPositionContentsComponent(props: Props): JSX.Element {
   const {
     jog,
     onConfirmClick,
@@ -67,7 +54,7 @@ function ConfirmPositionContentsComponent(props: Props) {
   )
 }
 
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
+const mapDispatchToProps: MapDispatchToProps<DP, OP> = (dispatch, ownProps) => {
   const { slot, isTiprack } = ownProps.labware
   const { mount } = ownProps.calibrator
 
@@ -82,3 +69,8 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
     onConfirmClick: () => dispatch(onConfirmAction),
   }
 }
+
+export const ConfirmPositionContents = connect(
+  null,
+  mapDispatchToProps
+)(ConfirmPositionContentsComponent)

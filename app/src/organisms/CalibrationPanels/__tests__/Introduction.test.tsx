@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
@@ -7,19 +6,28 @@ import * as Sessions from '../../../redux/sessions'
 import * as Constants from '../constants'
 import { Introduction } from '../Introduction'
 
+import type { ReactWrapper } from 'enzyme'
+import type { Mount } from '@opentrons/components'
+
 describe('Introduction', () => {
-  let render
+  let render: (
+    props?: Partial<
+      React.ComponentProps<typeof Introduction> & { pipMount: Mount }
+    >
+  ) => ReactWrapper<React.ComponentProps<typeof Introduction>>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getContinueButton = wrapper =>
-    wrapper.find('button[data-test="continueButton"]')
-  const getUseDiffTipRackButton = wrapper =>
-    wrapper.find('button[data-test="chooseTipRackButton"]')
+  const getContinueButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof Introduction>>
+  ) => wrapper.find('button[data-test="continueButton"]')
+  const getUseDiffTipRackButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof Introduction>>
+  ) => wrapper.find('button[data-test="chooseTipRackButton"]')
 
   beforeEach(() => {
-    render = (props: $Shape<React.ElementProps<typeof Introduction>> = {}) => {
+    render = (props = {}) => {
       const {
         pipMount = 'left',
         isMulti = false,
@@ -140,7 +148,7 @@ describe('Introduction', () => {
         spec.showTipRackButton
       )
 
-      getContinueButton(wrapper).invoke('onClick')()
+      getContinueButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
       wrapper.update()
       expect(mockSendCommands).toHaveBeenCalledWith({
         command: Sessions.sharedCalCommands.LOAD_LABWARE,
@@ -158,7 +166,7 @@ describe('Introduction', () => {
     expect(allText).toContain('start deck calibration')
 
     expect(getUseDiffTipRackButton(wrapper).exists()).toBe(true)
-    getContinueButton(wrapper).invoke('onClick')()
+    getContinueButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.update()
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: Sessions.sharedCalCommands.LOAD_LABWARE,
@@ -192,7 +200,7 @@ describe('Introduction', () => {
       expect(allText).toMatch(spec.note)
       expect(getUseDiffTipRackButton(wrapper).exists()).toBe(false)
 
-      getContinueButton(wrapper).invoke('onClick')()
+      getContinueButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
       wrapper.update()
       expect(mockSendCommands).toHaveBeenCalledWith({
         command: Sessions.sharedCalCommands.LOAD_LABWARE,

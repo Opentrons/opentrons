@@ -1,4 +1,3 @@
-// @flow
 // functions for managing the binding to the Intercom js api
 
 import { createLogger } from '../../logger'
@@ -13,7 +12,8 @@ export const setUserId = (newUserId: string | null): void => {
 }
 
 // pulled in from environment at build time
-export const getIntercomAppId = (): ?string => process.env.OT_APP_INTERCOM_ID
+export const getIntercomAppId = (): string | null | undefined =>
+  process.env.OT_APP_INTERCOM_ID
 
 const okToCall = (): boolean => {
   return !!getIntercomAppId() && !!global.Intercom && !!userId

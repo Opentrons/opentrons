@@ -1,15 +1,7 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  type Mount,
-  useConditionalConfirm,
-  SpinnerModalPage,
-} from '@opentrons/components'
-import {
-  getLabwareDisplayName,
-  type LabwareDefinition2,
-} from '@opentrons/shared-data'
+import { useConditionalConfirm, SpinnerModalPage } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import * as RobotApi from '../../redux/robot-api'
 import * as Sessions from '../../redux/sessions'
 import * as Config from '../../redux/config'
@@ -42,20 +34,22 @@ import type {
 } from '../../redux/sessions/types'
 import type { RequestState } from '../../redux/robot-api/types'
 import type { TipracksByMountMap } from '../../redux/robot'
+import type { Mount } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const TIP_LENGTH_CALIBRATION = 'tip length calibration'
 const EXIT = 'exit'
 
-export type CalibrateTipLengthControlProps = {|
-  robotName: string,
-  hasCalibrated: boolean,
-  mount: Mount,
-  tipRackDefinition: LabwareDefinition2,
-  isExtendedPipOffset: boolean,
-|}
+export interface CalibrateTipLengthControlProps {
+  robotName: string
+  hasCalibrated: boolean
+  mount: Mount
+  tipRackDefinition: LabwareDefinition2
+  isExtendedPipOffset: boolean
+}
 
 // tip length calibration commands for which the full page spinner should not appear
-const spinnerCommandBlockList: Array<SessionCommandString> = [
+const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 
@@ -65,7 +59,7 @@ export function CalibrateTipLengthControl({
   mount,
   tipRackDefinition,
   isExtendedPipOffset,
-}: CalibrateTipLengthControlProps): React.Node {
+}: CalibrateTipLengthControlProps): JSX.Element {
   const createRequestId = React.useRef<string | null>(null)
   const trackedRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
@@ -107,12 +101,14 @@ export function CalibrateTipLengthControl({
         dispatchedAction.type === Sessions.ENSURE_SESSION &&
         dispatchedAction.payload.sessionType === sessionType
       ) {
+        // @ts-expect-error TODO: account for possible absence of requestId on meta
         createRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
           Sessions.sharedCalCommands.JOG
       ) {
+        // @ts-expect-error TODO: account for possible absence of requestId on meta
         jogRequestId.current = dispatchedAction.meta.requestId
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
@@ -120,6 +116,7 @@ export function CalibrateTipLengthControl({
           dispatchedAction.payload.command.command
         )
       ) {
+        // @ts-expect-error TODO: account for possible absence of meta on action, requestId on meta
         trackedRequestId.current = dispatchedAction.meta.requestId
       }
     }
@@ -139,7 +136,7 @@ export function CalibrateTipLengthControl({
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
 
-  const handleStart = (hasBlockModalResponse: boolean | null = null) => {
+  const handleStart = (hasBlockModalResponse: boolean | null = null): void => {
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
       setShowCalBlockModal(true)
     } else {
@@ -180,9 +177,11 @@ export function CalibrateTipLengthControl({
         : null
     )?.status === RobotApi.PENDING
 
-  const uncalibratedTipracksByMount: TipracksByMountMap = useSelector(state => {
-    return getUncalibratedTipracksByMount(state, robotName)
-  })
+  const uncalibratedTipracksByMount: TipracksByMountMap = useSelector(
+    (state: State) => {
+      return getUncalibratedTipracksByMount(state, robotName)
+    }
+  )
 
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     handleStart,

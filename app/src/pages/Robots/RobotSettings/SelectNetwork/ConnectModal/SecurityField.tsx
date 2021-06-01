@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { SelectField } from '@opentrons/components'
 
@@ -9,29 +8,31 @@ import { FormRow } from './FormRow'
 
 import type { EapOption } from '../types'
 
-export type SecurityFieldProps = {|
-  id: string,
-  name: string,
-  placeholder: string,
-  label: string,
-  showAllOptions: boolean,
-  eapOptions: Array<EapOption>,
-  className?: string,
-|}
+export interface SecurityFieldProps {
+  id: string
+  name: string
+  placeholder: string
+  label: string
+  showAllOptions: boolean
+  eapOptions: EapOption[]
+  className?: string
+}
 
 const ALL_SECURITY_OPTIONS = [
   { options: [{ value: SECURITY_NONE, label: LABEL_SECURITY_NONE }] },
   { options: [{ value: SECURITY_WPA_PSK, label: LABEL_SECURITY_PSK }] },
 ]
 
-const makeEapOptionsGroup = (eapOptions: Array<EapOption>) => ({
+const makeEapOptionsGroup = (
+  eapOptions: EapOption[]
+): { options: Array<{ value: string; label: string }> } => ({
   options: eapOptions.map(opt => ({
     value: opt.name,
     label: opt.displayName ?? opt.name,
   })),
 })
 
-export const SecurityField = (props: SecurityFieldProps): React.Node => {
+export const SecurityField = (props: SecurityFieldProps): JSX.Element => {
   const {
     id,
     name,

@@ -1,5 +1,3 @@
-// @flow
-
 import * as Actions from '../actions'
 import * as Fixtures from '../__fixtures__'
 
@@ -7,15 +5,15 @@ import type { SessionsAction } from '../types'
 
 import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
 
-type ActionSpec = {|
-  name: string,
-  creator: (...Array<any>) => mixed,
-  args: Array<mixed>,
-  expected: SessionsAction,
-|}
+interface ActionSpec {
+  name: string
+  creator: (...args: any[]) => unknown
+  args: unknown[]
+  expected: SessionsAction
+}
 
 describe('robot session check actions', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'sessions:CREATE_SESSION',
       creator: Actions.createSession,
@@ -27,7 +25,7 @@ describe('robot session check actions', () => {
           sessionType: 'calibrationCheck',
           params: {},
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -40,7 +38,7 @@ describe('robot session check actions', () => {
           robotName: 'robot-name',
           ...Fixtures.mockSessionResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -50,7 +48,7 @@ describe('robot session check actions', () => {
       expected: {
         type: 'sessions:CREATE_SESSION_FAILURE',
         payload: { robotName: 'robot-name', error: mockV2ErrorResponse },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -60,7 +58,7 @@ describe('robot session check actions', () => {
       expected: {
         type: 'sessions:DELETE_SESSION',
         payload: { robotName: 'robot-name', sessionId: '1234' },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -73,7 +71,7 @@ describe('robot session check actions', () => {
           robotName: 'robot-name',
           ...Fixtures.mockSessionResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -87,7 +85,7 @@ describe('robot session check actions', () => {
           sessionId: '1234',
           error: mockV2ErrorResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -97,7 +95,7 @@ describe('robot session check actions', () => {
       expected: {
         type: 'sessions:FETCH_SESSION',
         payload: { robotName: 'robot-name', sessionId: '1234' },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -110,7 +108,7 @@ describe('robot session check actions', () => {
           robotName: 'robot-name',
           ...Fixtures.mockSessionResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -124,7 +122,7 @@ describe('robot session check actions', () => {
           sessionId: '1234',
           error: mockV2ErrorResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -138,7 +136,7 @@ describe('robot session check actions', () => {
           sessionId: '1234',
           command: Fixtures.mockSessionCommand,
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -157,7 +155,7 @@ describe('robot session check actions', () => {
           sessionId: '1234',
           ...Fixtures.mockSessionResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -171,7 +169,7 @@ describe('robot session check actions', () => {
           sessionId: '1234',
           error: mockV2ErrorResponse,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -185,7 +183,7 @@ describe('robot session check actions', () => {
           sessionType: 'calibrationCheck',
           params: {},
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {

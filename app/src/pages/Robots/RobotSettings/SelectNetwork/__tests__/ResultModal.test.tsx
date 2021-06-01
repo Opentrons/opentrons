@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
@@ -6,6 +5,9 @@ import { AlertModal, SpinnerModal } from '@opentrons/components'
 import { ErrorModal } from '../../../../../molecules/modals'
 import { ResultModal } from '../ResultModal'
 import { DISCONNECT, CONNECT, JOIN_OTHER } from '../constants'
+
+import type { ShallowWrapper } from 'enzyme'
+import type { ResultModalProps } from '../ResultModal'
 
 describe("SelectNetwork's ResultModal", () => {
   const mockSsid = 'foobar'
@@ -16,7 +18,13 @@ describe("SelectNetwork's ResultModal", () => {
   })
 
   describe('pending', () => {
-    const render = (type, ssid = mockSsid) => {
+    const render: (
+      type: ResultModalProps['type'],
+      ssid?: ResultModalProps['ssid']
+    ) => ShallowWrapper<React.ComponentProps<typeof ResultModal>> = (
+      type,
+      ssid = mockSsid
+    ) => {
       return shallow(
         <ResultModal
           {...{
@@ -78,7 +86,13 @@ describe("SelectNetwork's ResultModal", () => {
   })
 
   describe('success', () => {
-    const render = (type, ssid = mockSsid) => {
+    const render: (
+      type: ResultModalProps['type'],
+      ssid?: ResultModalProps['ssid']
+    ) => ShallowWrapper<React.ComponentProps<typeof ResultModal>> = (
+      type,
+      ssid = mockSsid
+    ) => {
       return shallow(
         <ResultModal
           {...{
@@ -161,7 +175,13 @@ describe("SelectNetwork's ResultModal", () => {
 
   describe('failure', () => {
     const error = { message: 'oh no!' }
-    const render = (type, ssid = mockSsid) => {
+    const render: (
+      type: ResultModalProps['type'],
+      ssid?: ResultModalProps['ssid']
+    ) => ShallowWrapper<React.ComponentProps<typeof ResultModal>> = (
+      type,
+      ssid = mockSsid
+    ) => {
       return shallow(
         <ResultModal
           {...{

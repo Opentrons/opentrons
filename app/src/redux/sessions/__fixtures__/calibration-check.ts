@@ -1,4 +1,3 @@
-// @flow
 import type {
   CheckCalibrationSessionDetails,
   CalibrationCheckComparisonsPerCalibration,
@@ -8,7 +7,7 @@ import type {
   CalibrationLabware,
 } from '../types'
 
-import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul'
+import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   CHECK_STEP_COMPARING_HEIGHT,
   CHECK_STEP_COMPARING_POINT_ONE,
@@ -23,7 +22,7 @@ export const mockCalibrationCheckLabware: CalibrationLabware = {
   namespace: 'opentrons',
   version: 1,
   isTiprack: true,
-  definition: tipRackFixture,
+  definition: tipRackFixture as CalibrationLabware['definition'],
 }
 
 export const badZComparison: CalibrationCheckComparison = {
@@ -50,27 +49,27 @@ export const goodXYComparison: CalibrationCheckComparison = {
 export const badTipLengthCalibration: CalibrationCheckComparisonMap = {
   status: 'OUTSIDE_THRESHOLD',
   [CHECK_STEP_COMPARING_TIP]: badZComparison,
-}
+} as any
 export const badPipetteOffsetCalibration: CalibrationCheckComparisonMap = {
   status: 'OUTSIDE_THRESHOLD',
   [CHECK_STEP_COMPARING_HEIGHT]: badZComparison,
   [CHECK_STEP_COMPARING_POINT_ONE]: badXYComparison,
-}
+} as any
 export const goodTipLengthCalibration: CalibrationCheckComparisonMap = {
   status: 'IN_THRESHOLD',
   [CHECK_STEP_COMPARING_TIP]: goodZComparison,
-}
+} as any
 export const goodPipetteOffsetCalibration: CalibrationCheckComparisonMap = {
   status: 'IN_THRESHOLD',
   [CHECK_STEP_COMPARING_HEIGHT]: goodZComparison,
   [CHECK_STEP_COMPARING_POINT_ONE]: goodXYComparison,
-}
+} as any
 export const goodDeckCalibration: CalibrationCheckComparisonMap = {
   status: 'IN_THRESHOLD',
   [CHECK_STEP_COMPARING_POINT_ONE]: goodXYComparison,
   [CHECK_STEP_COMPARING_POINT_TWO]: goodXYComparison,
   [CHECK_STEP_COMPARING_POINT_THREE]: goodXYComparison,
-}
+} as any
 
 export const mockSecondPipetteHealthCheckCalibration: CalibrationCheckComparisonsPerCalibration = {
   tipLength: badTipLengthCalibration,
@@ -85,7 +84,7 @@ export const mockFirstPipettteHealthCheckPerCalibration: CalibrationCheckCompari
 export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationSessionDetails = {
   instruments: [
     {
-      model: 'fake_pipette_model',
+      model: 'fake_pipette_model' as any,
       name: 'fake_pipette_name',
       tipLength: 42,
       mount: 'left',
@@ -97,7 +96,7 @@ export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationSessionDet
       defaultTipracks: [],
     },
     {
-      model: 'fake_pipette_model',
+      model: 'fake_pipette_model' as any,
       name: 'fake_pipette_name',
       tipLength: 42,
       mount: 'right',
@@ -116,7 +115,7 @@ export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationSessionDet
   },
   labware: [mockCalibrationCheckLabware],
   activePipette: {
-    model: 'fake_pipette_model',
+    model: 'fake_pipette_model' as any,
     name: 'fake_pipette_name',
     tipLength: 42,
     mount: 'left',

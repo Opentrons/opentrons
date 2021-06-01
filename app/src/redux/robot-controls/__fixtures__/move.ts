@@ -1,11 +1,10 @@
-// @flow
-
 import { mockRobot } from '../../robot-api/__fixtures__'
+import type { Method } from '../../robot-api/types'
 
 // POST /robot/move
 
 export const mockMoveSuccessMeta = {
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/robot/move',
   ok: true,
   status: 200,
@@ -18,7 +17,7 @@ export const mockMoveSuccess = {
 }
 
 export const mockMoveFailureMeta = {
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/robot/move',
   ok: false,
   status: 500,
@@ -45,7 +44,7 @@ export const mockPositions = {
 }
 
 export const mockFetchPositionsSuccessMeta = {
-  method: 'GET',
+  method: 'GET' as Method,
   path: '/robot/positions',
   ok: true,
   status: 200,
@@ -60,7 +59,7 @@ export const mockFetchPositionsSuccess = {
 }
 
 export const mockFetchPositionsFailureMeta = {
-  method: 'GET',
+  method: 'GET' as Method,
   path: '/robot/positions',
   ok: false,
   status: 500,
@@ -75,7 +74,7 @@ export const mockFetchPositionsFailure = {
 // POST /motors/disengage
 
 export const mockDisengageMotorsSuccessMeta = {
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/motors/disengage',
   ok: true,
   status: 200,
@@ -88,7 +87,7 @@ export const mockDisengageMotorsSuccess = {
 }
 
 export const mockDisengageMotorsFailureMeta = {
-  method: 'POST',
+  method: 'POST' as Method,
   path: '/motors/disengage',
   ok: false,
   status: 500,

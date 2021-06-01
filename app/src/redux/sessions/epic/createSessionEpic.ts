@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 
 import { POST } from '../../robot-api/constants'
@@ -41,7 +40,7 @@ export const mapResponseToAction = (
 
 export const createSessionEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.CREATE_SESSION),
+    ofType<Action, CreateSessionAction>(Constants.CREATE_SESSION),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

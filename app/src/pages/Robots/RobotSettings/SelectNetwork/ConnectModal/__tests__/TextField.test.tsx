@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
@@ -7,10 +6,9 @@ import * as FormState from '../form-state'
 
 jest.mock('../form-state')
 
-const useConnectFormField: JestMockFn<
-  [string],
-  $Call<typeof FormState.useConnectFormField, string>
-> = FormState.useConnectFormField
+const useConnectFormField = FormState.useConnectFormField as jest.MockedFunction<
+  typeof FormState.useConnectFormField
+>
 
 describe('ConnectModal TextField', () => {
   const fieldId = 'field-id'
@@ -24,7 +22,10 @@ describe('ConnectModal TextField', () => {
   const labelSelector = `label[htmlFor="${fieldId}"]`
   const checkboxSelector = 'input[type="checkbox"]'
 
-  const render = (isPassword = false, error = null) => {
+  const render = (
+    isPassword: boolean = false,
+    error: any | null = null
+  ): ReturnType<typeof mount> => {
     useConnectFormField.mockImplementation(name => {
       expect(name).toBe(fieldName)
       return {
@@ -88,12 +89,12 @@ describe('ConnectModal TextField', () => {
     const wrapper = render(true)
     const checkbox = wrapper.find(checkboxSelector)
 
-    act(() => checkbox.invoke('onChange')())
+    act(() => checkbox.invoke('onChange')?.({} as React.ChangeEvent))
     wrapper.update()
     expect(wrapper.find(checkboxSelector).prop('checked')).toEqual(true)
     expect(wrapper.find(inputSelector).prop('type')).toEqual('text')
 
-    act(() => checkbox.invoke('onChange')())
+    act(() => checkbox.invoke('onChange')?.({} as React.ChangeEvent))
     wrapper.update()
     expect(wrapper.find(checkboxSelector).prop('checked')).toEqual(false)
     expect(wrapper.find(inputSelector).prop('type')).toEqual('password')

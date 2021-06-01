@@ -1,11 +1,10 @@
-// @flow
 // resources page layout
 import * as React from 'react'
 import { Page } from '../../../atoms/Page'
 import { ResourceCard } from './ResourceCard'
 import { CardContainer, CardRow } from '../../../atoms/layout'
 
-export function Resources(): React.Node {
+export function Resources(): JSX.Element {
   return (
     <Page titleBarProps={{ title: 'Resources' }}>
       <CardContainer>

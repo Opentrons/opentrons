@@ -1,14 +1,10 @@
-// @flow
-
+import { DispatchRequestsType } from '../../redux/robot-api'
 import type { TipLengthCalibrationSession } from '../../redux/sessions/types'
-import type { Action } from '../../redux/types'
 
-export type CalibrateTipLengthParentProps = {|
-  robotName: string,
-  session: TipLengthCalibrationSession | null,
-  dispatchRequests: (
-    ...Array<{ ...Action, meta: { requestId: string } }>
-  ) => void,
-  showSpinner: boolean,
-  isJogging: boolean,
-|}
+export interface CalibrateTipLengthParentProps {
+  robotName: string
+  session: TipLengthCalibrationSession | null
+  dispatchRequests: DispatchRequestsType
+  showSpinner: boolean
+  isJogging: boolean
+}

@@ -1,5 +1,4 @@
-// @flow
-import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul'
+import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import type {
   PipetteOffsetCalibrationSessionDetails,
   CalibrationLabware,
@@ -12,12 +11,12 @@ export const mockPipetteOffsetTipRack: CalibrationLabware = {
   namespace: 'opentrons',
   version: 1,
   isTiprack: true,
-  definition: tipRackFixture,
+  definition: tipRackFixture as CalibrationLabware['definition'],
 }
 
 export const mockPipetteOffsetCalibrationSessionDetails: PipetteOffsetCalibrationSessionDetails = {
   instrument: {
-    model: 'fake_pipette_model',
+    model: 'fake_pipette_model' as any,
     name: 'fake_pipette_name',
     tipLength: 42,
     mount: 'right',

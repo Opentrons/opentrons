@@ -1,6 +1,6 @@
-// @flow
 import * as Constants from './constants'
 
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { BuildrootState, BuildrootUpdateSession } from './types'
 
@@ -27,10 +27,10 @@ export const initialSession = (
   error: null,
 })
 
-export function buildrootReducer(
-  state: BuildrootState = INITIAL_STATE,
-  action: Action
-): BuildrootState {
+export const buildrootReducer: Reducer<BuildrootState, Action> = (
+  state = INITIAL_STATE,
+  action
+) => {
   switch (action.type) {
     case Constants.BR_UPDATE_VERSION: {
       return { ...state, version: action.payload }

@@ -1,4 +1,3 @@
-// @flow
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 
 import * as Fixtures from '../../__fixtures__'
@@ -6,7 +5,9 @@ import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
 import { mockRobot } from '../../../robot-api/__fixtures__'
 
-const makeTriggerAction = robotName =>
+import type { Action } from '../../../types'
+
+const makeTriggerAction = (robotName: string) =>
   Actions.fetchSession(robotName, Fixtures.mockSessionId)
 
 describe('fetchSessionEpic', () => {
@@ -25,7 +26,7 @@ describe('fetchSessionEpic', () => {
       Fixtures.mockFetchSessionSuccess
     )
 
-    runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, cold, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)

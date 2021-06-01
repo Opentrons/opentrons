@@ -1,5 +1,4 @@
 /* eslint-disable no-return-assign */
-// @flow
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
@@ -90,7 +89,7 @@ const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis and move to pick up tip'
 const CHECK_NOZZLE_Z_AXIS = 'Check nozzle z-axis and move to pick up tip'
 const SLOT = 'slot'
 
-export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
+export function MeasureNozzle(props: CalibrationPanelProps): JSX.Element {
   const { sendCommands, calBlock, mount, isMulti, sessionType } = props
 
   const referencePointStr = calBlock ? (
@@ -117,7 +116,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
     [mount, isMulti, calBlock, sessionType]
   )
 
-  const jog = (axis: Axis, dir: Sign, step: StepSize) => {
+  const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
     sendCommands({
       command: Sessions.sharedCalCommands.JOG,
       data: {
@@ -129,7 +128,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): React.Node {
   const isHealthCheck =
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
 
-  const proceed = () => {
+  const proceed = (): void => {
     isHealthCheck
       ? sendCommands({ command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK })
       : sendCommands(

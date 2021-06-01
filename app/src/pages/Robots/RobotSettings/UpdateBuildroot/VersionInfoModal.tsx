@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
@@ -17,21 +16,22 @@ import { SkipAppUpdateMessage } from './SkipAppUpdateMessage'
 import { SyncRobotMessage } from './SyncRobotMessage'
 import styles from './styles.css'
 
+import type { ButtonProps } from '@opentrons/components'
 import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
-export type VersionInfoModalProps = {|
-  robot: ViewableRobot,
-  robotUpdateType: BuildrootUpdateType | null,
-  close: () => mixed,
-  proceed: () => mixed,
-|}
+export interface VersionInfoModalProps {
+  robot: ViewableRobot
+  robotUpdateType: BuildrootUpdateType | null
+  close: () => unknown
+  proceed: () => unknown
+}
 
 const REINSTALL_HEADING = 'Robot is up to date'
 const REINSTALL_MESSAGE =
   "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
 
-export function VersionInfoModal(props: VersionInfoModalProps): React.Node {
+export function VersionInfoModal(props: VersionInfoModalProps): JSX.Element {
   const { robot, robotUpdateType, close, proceed } = props
   const [showUpdateAppModal, setShowUpdateAppModal] = React.useState(false)
   const availableAppUpdateVersion = useSelector(getAvailableShellUpdate)
@@ -51,7 +51,7 @@ export function VersionInfoModal(props: VersionInfoModalProps): React.Node {
   }
 
   let heading = ''
-  let primaryButton = { className: styles.view_update_button }
+  let primaryButton: ButtonProps = { className: styles.view_update_button }
   let message = null
   let secondaryMessage = null
 

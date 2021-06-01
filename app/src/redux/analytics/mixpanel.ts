@@ -1,4 +1,3 @@
-// @flow
 // mixpanel actions
 import mixpanel from 'mixpanel-browser'
 
@@ -21,7 +20,7 @@ const MIXPANEL_OPTS = {
   track_pageview: false,
 }
 
-export function initializeMixpanel(config: AnalyticsConfig) {
+export function initializeMixpanel(config: AnalyticsConfig): void {
   if (MIXPANEL_ID) {
     log.debug('Initializing Mixpanel', { config })
 
@@ -33,17 +32,21 @@ export function initializeMixpanel(config: AnalyticsConfig) {
   }
 }
 
-export function trackEvent(event: AnalyticsEvent, config: AnalyticsConfig) {
+export function trackEvent(
+  event: AnalyticsEvent,
+  config: AnalyticsConfig
+): void {
   const { optedIn } = config
 
   log.debug('Trackable event', { event, optedIn })
   if (MIXPANEL_ID && optedIn) {
     if (event.superProperties) mixpanel.register(event.superProperties)
+    // @ts-expect-error TODO protect for no name on event and add test case
     if (event.name) mixpanel.track(event.name, event.properties)
   }
 }
 
-export function setMixpanelTracking(config: AnalyticsConfig) {
+export function setMixpanelTracking(config: AnalyticsConfig): void {
   if (MIXPANEL_ID) {
     if (config.optedIn) {
       log.debug('User has opted into analytics; tracking with Mixpanel')

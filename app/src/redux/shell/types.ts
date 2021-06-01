@@ -1,46 +1,50 @@
-// @flow
 import type { Error } from '../types'
 import type { RobotLogsState, RobotLogsAction } from './robot-logs/types'
 
-export type Remote = {|
-  ipcRenderer: {| send: (string, ...args: Array<mixed>) => void |},
-|}
-
-export type UpdateInfo = {
-  version: string,
-  files: Array<{ sha512: string, url: string, ... }>,
-  releaseDate: string,
-  releaseNotes?: string,
+export interface Remote {
+  ipcRenderer: { send: (s: string, ...args: unknown[]) => void }
 }
 
-export type ShellUpdateState = {|
-  checking: boolean,
-  downloading: boolean,
-  available: boolean,
-  downloaded: boolean,
-  error: ?Error,
-  info: ?UpdateInfo,
-|}
+interface File {
+  sha512: string
+  url: string
+  [key: string]: unknown
+}
+export interface UpdateInfo {
+  version: string
+  files: File[]
+  releaseDate: string
+  releaseNotes?: string
+}
+
+export interface ShellUpdateState {
+  checking: boolean
+  downloading: boolean
+  available: boolean
+  downloaded: boolean
+  error: Error | null | undefined
+  info: UpdateInfo | null | undefined
+}
 
 export type ShellUpdateAction =
-  | {| type: 'shell:CHECK_UPDATE', meta: {| shell: true |} |}
-  | {|
-      type: 'shell:CHECK_UPDATE_RESULT',
-      payload: {| available?: boolean, info?: UpdateInfo, error?: Error |},
-    |}
-  | {| type: 'shell:DOWNLOAD_UPDATE', meta: {| shell: true |} |}
-  | {| type: 'shell:DOWNLOAD_UPDATE_RESULT', payload: {| error?: Error |} |}
-  | {| type: 'shell:APPLY_UPDATE', meta: {| shell: true |} |}
+  | { type: 'shell:CHECK_UPDATE'; meta: { shell: true } }
+  | {
+      type: 'shell:CHECK_UPDATE_RESULT'
+      payload: { available?: boolean; info?: UpdateInfo; error?: Error }
+    }
+  | { type: 'shell:DOWNLOAD_UPDATE'; meta: { shell: true } }
+  | { type: 'shell:DOWNLOAD_UPDATE_RESULT'; payload: { error?: Error } }
+  | { type: 'shell:APPLY_UPDATE'; meta: { shell: true } }
 
-export type ShellState = {|
-  update: ShellUpdateState,
-  robotLogs: RobotLogsState,
-|}
+export interface ShellState {
+  update: ShellUpdateState
+  robotLogs: RobotLogsState
+}
 
-export type UiInitializedAction = {|
-  type: 'shell:UI_INITIALIZED',
-  meta: {| shell: true |},
-|}
+export interface UiInitializedAction {
+  type: 'shell:UI_INITIALIZED'
+  meta: { shell: true }
+}
 
 export type ShellAction =
   | UiInitializedAction

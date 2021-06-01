@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
@@ -14,7 +13,7 @@ import { ModalCopy } from './ModalCopy'
 
 import type { State, Dispatch } from '../../../redux/types'
 
-export function LostConnectionAlert(): React.Node {
+export function LostConnectionAlert(): JSX.Element | null {
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
 
@@ -30,23 +29,21 @@ export function LostConnectionAlert(): React.Node {
     return Boolean((connectedName && robotDown) || unexpectedDisconnect)
   })
 
-  const disconnect = () => {
+  const disconnect = (): void => {
     history.push('/robots')
     dispatch(robotActions.disconnect())
   }
 
-  return (
-    showAlert && (
-      <Portal>
-        <AlertModal
-          onCloseClick={disconnect}
-          heading={'Connection to robot lost'}
-          buttons={[{ onClick: disconnect, children: 'close' }]}
-          alertOverlay
-        >
-          <ModalCopy />
-        </AlertModal>
-      </Portal>
-    )
-  )
+  return showAlert ? (
+    <Portal>
+      <AlertModal
+        onCloseClick={disconnect}
+        heading={'Connection to robot lost'}
+        buttons={[{ onClick: disconnect, children: 'close' }]}
+        alertOverlay
+      >
+        <ModalCopy />
+      </AlertModal>
+    </Portal>
+  ) : null
 }

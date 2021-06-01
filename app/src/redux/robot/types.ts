@@ -1,4 +1,3 @@
-// @flow
 // common robot types
 
 import type {
@@ -9,7 +8,7 @@ import type {
 
 import type { Mount } from '@opentrons/components'
 
-import typeof {
+import {
   DISCONNECTED,
   CONNECTING,
   CONNECTED,
@@ -49,158 +48,158 @@ export type Direction = -1 | 1
 
 // TODO(mc, 2018-10-09): deprecate this type?
 // minimum robot for actions/reducers/middleware to work
-export type BaseRobot = {
-  name: string,
+export interface BaseRobot {
+  name: string
 }
 
 // TODO(mc, 2018-10-09): deprecate this type
 // robot MDNS service for connectivity
-export type RobotService = {
-  ...$Exact<BaseRobot>,
-  ip: string,
-  port: number,
+export interface RobotService extends BaseRobot {
+  ip: string
+  port: number
 }
 
 export type LabwareCalibrationStatus =
-  | UNCONFIRMED
-  | MOVING_TO_SLOT
-  | JOGGING
-  | DROPPING_TIP
-  | OVER_SLOT
-  | PICKING_UP
-  | PICKED_UP
-  | CONFIRMING
-  | CONFIRMED
+  | typeof UNCONFIRMED
+  | typeof MOVING_TO_SLOT
+  | typeof JOGGING
+  | typeof DROPPING_TIP
+  | typeof OVER_SLOT
+  | typeof PICKING_UP
+  | typeof PICKED_UP
+  | typeof CONFIRMING
+  | typeof CONFIRMED
 
 // protocol command as returned by the API
-export type Command = {
+export interface Command {
   // command identifier
-  id: number,
+  id: number
   // user readable description of the command
-  description: string,
+  description: string
   // timestamp of when the command was handled by the robot during a run
-  handledAt: ?number,
+  handledAt: number | null | undefined
   // subcommands
-  children: number[],
-  ...
+  children: number[]
+  [key: string]: unknown
 }
 
 // protocol command graph node
 // contructed from Command
-export type CommandNode = {|
-  id: number,
-  description: string,
-  handledAt: ?number,
-  isCurrent: boolean,
-  isLast: boolean,
-  children: Array<CommandNode>,
-|}
+export interface CommandNode {
+  id: number
+  description: string
+  handledAt: number | null | undefined
+  isCurrent: boolean
+  isLast: boolean
+  children: CommandNode[]
+}
 
 // instrument as stored in redux state
-export type StatePipette = {|
+export interface StatePipette {
   // resource ID
-  _id: number,
+  _id: number
   // robot mount instrument is installed on
-  mount: Mount,
+  mount: Mount
   // number of liquid channels
-  channels: Channels,
+  channels: Channels
   // user-given name of the instrument
   // TODO: Ian + Mike 2018-11-06 This `name` is not what we now call the `name`,
   // rather it is the full versioned `model` of the pipette, as placed in the
   // Python Pipette's `name` field by the pipette factory functions.
   // TLDR: this `name` needs to be renamed in a future PR to `model`
-  name: string,
+  name: string
   // tipracks the pipette uses during the protocol
   // array of RPC object IDs corresponding to `_id` field in StateLabware
-  tipRacks: Array<number>,
+  tipRacks: number[]
   // string specified in protocol to load pipette
-  requestedAs?: ?string,
-|}
+  requestedAs?: string | null | undefined
+}
 
-export type Pipette = {|
-  ...StatePipette,
-  probed: boolean,
-  tipOn: boolean,
-  modelSpecs: PipetteModelSpecs | null,
-|}
+export interface Pipette extends StatePipette {
+  probed: boolean
+  tipOn: boolean
+  modelSpecs: PipetteModelSpecs | null
+}
 
 // labware as stored in redux state
-export type StateLabware = {|
+export interface StateLabware {
   // resource ID
-  _id: number,
+  _id: number
   // slot labware is installed in
-  slot: ApiTypes.Slot,
+  slot: ApiTypes.Slot
   // deck coordinates of la<bware when not in slot
-  position: ?Array<number>,
+  position: number[] | null | undefined
   // unique type of the labware
-  type: string,
+  type: string
   // user defined name of the labware
-  name: string,
+  name: string
   // whether or not the labware is a tiprack (implied from type)
-  isTiprack: boolean,
+  isTiprack: boolean
   // whether or not the labware is a legacy labware (labwareSchemaVersion === 1)
-  isLegacy: boolean,
+  isLegacy: boolean
   // instrument mount to use as the calibrator if isTiprack is true
-  calibratorMount: ?Mount,
+  calibratorMount: Mount | null | undefined
   // string identity of a labware; combines all definition properties that would effect a run
   // will be null if old RPC version or old labware version
-  definitionHash: string | null,
-|}
+  definitionHash: string | null
+}
 
-export type Labware = {|
-  ...StateLabware,
-  calibration: LabwareCalibrationStatus,
-  confirmed: boolean,
-  isMoving: boolean,
-  definition: LabwareDefinition2 | null,
-|}
+export interface Labware extends StateLabware {
+  calibration: LabwareCalibrationStatus
+  confirmed: boolean
+  isMoving: boolean
+  definition: LabwareDefinition2 | null
+}
 
 export type LabwareType = 'tiprack' | 'labware'
 
-export type SessionModule = $Diff<ApiTypes.ApiSessionModule, {| name: mixed |}>
+export type SessionModule = Omit<ApiTypes.ApiSessionModule, 'name'>
 
 export type SessionStatus =
   | ''
-  | LOADED
-  | RUNNING
-  | FINISHED
-  | STOPPED
-  | PAUSED
-  | ERROR
+  | typeof LOADED
+  | typeof RUNNING
+  | typeof FINISHED
+  | typeof STOPPED
+  | typeof PAUSED
+  | typeof ERROR
 
 export type ConnectionStatus =
-  | DISCONNECTED
-  | CONNECTING
-  | CONNECTED
-  | DISCONNECTING
+  | typeof DISCONNECTED
+  | typeof CONNECTING
+  | typeof CONNECTED
+  | typeof DISCONNECTING
 
-export type SessionStatusInfo = {|
-  message: string | null,
-  changedAt: number | null,
-  estimatedDuration: number | null,
-  userMessage: string | null,
-|}
+export interface SessionStatusInfo {
+  message: string | null
+  changedAt: number | null
+  estimatedDuration: number | null
+  userMessage: string | null
+}
 
-export type DoorState = null | DOOR_OPEN | DOOR_CLOSED
+export type DoorState = null | typeof DOOR_OPEN | typeof DOOR_CLOSED
 
-export type SessionUpdate = {|
-  state: SessionStatus,
-  statusInfo: SessionStatusInfo,
-  startTime: ?number,
-  doorState: DoorState,
-  blocked: boolean,
-  lastCommand: ?{|
-    id: number,
-    handledAt: number,
-  |},
-|}
+export interface SessionUpdate {
+  state: SessionStatus
+  statusInfo: SessionStatusInfo
+  startTime: number | null | undefined
+  doorState: DoorState
+  blocked: boolean
+  lastCommand:
+    | {
+        id: number
+        handledAt: number
+      }
+    | null
+    | undefined
+}
 
-export type TipracksByMountMap = {|
-  left: Array<Labware>,
-  right: Array<Labware>,
-|}
+export interface TipracksByMountMap {
+  left: Labware[]
+  right: Labware[]
+}
 
-export type NextTiprackPipetteInfo = {|
-  mount: Mount,
-  tiprack: Labware,
-|}
+export interface NextTiprackPipetteInfo {
+  mount: Mount
+  tiprack: Labware
+}

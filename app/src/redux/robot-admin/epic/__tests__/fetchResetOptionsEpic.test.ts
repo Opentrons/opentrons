@@ -1,8 +1,9 @@
-// @flow
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { fetchResetOptionsEpic } from '../fetchResetOptionsEpic'
+
+import type { Action } from '../../../types'
 
 describe('robotAdminEpic handles fetching "factory reset" options', () => {
   afterEach(() => {
@@ -15,7 +16,7 @@ describe('robotAdminEpic handles fetching "factory reset" options', () => {
       Fixtures.mockFetchResetOptionsSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = fetchResetOptionsEpic(action$, state$)
@@ -36,7 +37,7 @@ describe('robotAdminEpic handles fetching "factory reset" options', () => {
       Fixtures.mockFetchResetOptionsSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = fetchResetOptionsEpic(action$, state$)
@@ -57,7 +58,7 @@ describe('robotAdminEpic handles fetching "factory reset" options', () => {
       Fixtures.mockFetchResetOptionsFailure
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
+    runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = fetchResetOptionsEpic(action$, state$)

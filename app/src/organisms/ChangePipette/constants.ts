@@ -1,5 +1,3 @@
-// @flow
-
 export const ATTACH: 'attach' = 'attach'
 export const DETACH: 'detach' = 'detach'
 

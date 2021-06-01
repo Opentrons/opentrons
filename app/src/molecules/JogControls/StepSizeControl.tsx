@@ -1,4 +1,3 @@
-// @flow
 // jog controls component
 import * as React from 'react'
 
@@ -11,12 +10,12 @@ import type { StepSize } from './types'
 const STEP_SIZE_TITLE = 'Jump Size'
 const STEP_SIZE_SUBTITLE = 'Change with + and -'
 
-type StepSizeControlProps = {|
-  stepSizes: Array<StepSize>,
-  currentStepSize: StepSize,
-  setCurrentStepSize: StepSize => void,
-|}
-export function StepSizeControl(props: StepSizeControlProps): React.Node {
+interface StepSizeControlProps {
+  stepSizes: StepSize[]
+  currentStepSize: StepSize
+  setCurrentStepSize: (stepSize: StepSize) => void
+}
+export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   const { stepSizes, currentStepSize, setCurrentStepSize } = props
 
   const increaseStepSize: () => void = () => {
@@ -29,9 +28,7 @@ export function StepSizeControl(props: StepSizeControlProps): React.Node {
     if (i > 0) setCurrentStepSize(stepSizes[i - 1])
   }
 
-  const handleStepSelect: (
-    event: SyntheticInputEvent<HTMLInputElement>
-  ) => void = event => {
+  const handleStepSelect: React.ChangeEventHandler<HTMLInputElement> = event => {
     setCurrentStepSize(Number(event.target.value))
     event.target.blur()
   }

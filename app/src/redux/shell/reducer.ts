@@ -1,11 +1,9 @@
-// @flow
 import { combineReducers } from 'redux'
 
 import { robotLogsReducer } from './robot-logs/reducer'
 
-import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type { ShellState, ShellUpdateState } from './types'
+import type { ShellUpdateState } from './types'
 
 const INITIAL_STATE: ShellUpdateState = {
   checking: false,
@@ -46,11 +44,8 @@ export function shellUpdateReducer(
 
   return state
 }
-
-export const shellReducer: Reducer<ShellState, Action> = combineReducers<
-  _,
-  Action
->({
+// TODO: (sa 2021-15-18: remove any typed state in combineReducers)
+export const shellReducer = combineReducers<any, Action>({
   update: shellUpdateReducer,
   robotLogs: robotLogsReducer,
 })

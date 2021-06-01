@@ -1,4 +1,3 @@
-// @flow
 import { ofType } from 'redux-observable'
 import mapValues from 'lodash/mapValues'
 
@@ -8,7 +7,7 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
@@ -47,7 +46,9 @@ const mapResponseToAction: ResponseToActionMapper<UpdatePipetteSettingsAction> =
 
 export const updatePipetteSettingsEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.UPDATE_PIPETTE_SETTINGS),
+    ofType<Action, UpdatePipetteSettingsAction>(
+      Constants.UPDATE_PIPETTE_SETTINGS
+    ),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

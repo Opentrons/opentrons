@@ -1,4 +1,3 @@
-// @flow
 // "Robot Controls" card
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -29,11 +28,11 @@ import { ToggleBtn } from '../../../atoms/ToggleBtn'
 import type { State, Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
 
-type Props = {|
-  robot: ViewableRobot,
-|}
+interface Props {
+  robot: ViewableRobot
+}
 
-export function ControlsCard(props: Props): React.Node {
+export function ControlsCard(props: Props): JSX.Element {
   const { t } = useTranslation(['robot_controls', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const { robot } = props
@@ -41,7 +40,8 @@ export function ControlsCard(props: Props): React.Node {
   const lightsOn = useSelector((state: State) => getLightsOn(state, robotName))
   const isRunning = useSelector(robotSelectors.getIsRunning)
   const notConnectable = status !== CONNECTABLE
-  const toggleLights = () => dispatch(updateLights(robotName, !lightsOn))
+  const toggleLights = (): unknown =>
+    dispatch(updateLights(robotName, !lightsOn))
 
   React.useEffect(() => {
     dispatch(fetchLights(robotName))

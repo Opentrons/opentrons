@@ -1,4 +1,3 @@
-// @flow
 // system-info helpers and utilities
 
 import { NOT_APPLICABLE, UNKNOWN, UP_TO_DATE, OUTDATED } from './constants'
@@ -42,7 +41,7 @@ export const getDriverStatus = (device: UsbDevice): DriverStatus => {
   const versionParts = windowsDriverVersion.split('.').map(s => Number(s))
   if (!versionParts.every(p => Number.isFinite(p))) return UNKNOWN
 
-  const upToDate = REALTEK_UP_TO_DATE_VERSION.reduce(
+  const upToDate = REALTEK_UP_TO_DATE_VERSION.reduce<boolean | null>(
     (result, subversion, index, collection) => {
       if (result === null) {
         const target = versionParts[index] ?? 0

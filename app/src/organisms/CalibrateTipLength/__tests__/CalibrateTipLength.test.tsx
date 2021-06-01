@@ -1,10 +1,8 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 
-// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import * as Sessions from '../../../redux/sessions'
@@ -22,34 +20,36 @@ import {
 } from '../../../organisms/CalibrationPanels'
 
 import type { TipLengthCalibrationStep } from '../../../redux/sessions/types'
+import type { ReactWrapper } from 'enzyme'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 
-type CalibrateTipLengthSpec = {
-  component: React.AbstractComponent<any>,
-  childProps?: {},
-  currentStep: TipLengthCalibrationStep,
-  ...
+interface CalibrateTipLengthSpec {
+  component: React.ComponentType<any>
+  currentStep: TipLengthCalibrationStep
 }
 
-const mockGetDeckDefinitions: JestMockFn<
-  [],
-  $Call<typeof getDeckDefinitions, any>
-> = getDeckDefinitions
+const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
+  typeof getDeckDefinitions
+>
+
+type Wrapper = ReactWrapper<React.ComponentProps<typeof CalibrateTipLength>>
 
 describe('CalibrateTipLength', () => {
-  let mockStore
-  let render
-  let dispatch
-  let dispatchRequests
+  let mockStore: any
+  let render: (
+    props?: Partial<React.ComponentProps<typeof CalibrateTipLength>>
+  ) => Wrapper
+  let dispatch: jest.MockedFunction<() => {}>
+  let dispatchRequests: jest.MockedFunction<() => {}>
   let mockTipLengthSession: Sessions.TipLengthCalibrationSession = {
     id: 'fake_session_id',
     ...mockTipLengthCalibrationSessionAttributes,
   }
 
-  const getExitButton = wrapper =>
+  const getExitButton = (wrapper: Wrapper) =>
     wrapper.find({ title: 'exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [
@@ -62,7 +62,7 @@ describe('CalibrateTipLength', () => {
     CompleteConfirmation,
   ]
 
-  const SPECS: Array<CalibrateTipLengthSpec> = [
+  const SPECS: CalibrateTipLengthSpec[] = [
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
     { component: MeasureNozzle, currentStep: 'measuringNozzleOffset' },
@@ -140,7 +140,9 @@ describe('CalibrateTipLength', () => {
     const wrapper = render()
 
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
-    act(() => getExitButton(wrapper).invoke('onClick')())
+    act(() =>
+      getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
+    )
     wrapper.update()
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(true)
   })
@@ -165,7 +167,9 @@ describe('CalibrateTipLength', () => {
       },
     }
     const wrapper = render({ isJogging: false, session })
-    wrapper.find('button[title="forward"]').invoke('onClick')()
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,
@@ -184,7 +188,9 @@ describe('CalibrateTipLength', () => {
       },
     }
     const wrapper = render({ isJogging: true, session })
-    wrapper.find('button[title="forward"]').invoke('onClick')()
+    wrapper.find('button[title="forward"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
     expect(dispatchRequests).not.toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,

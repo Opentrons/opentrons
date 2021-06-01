@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mountWithProviders } from '@opentrons/components/__utils__'
 import { i18n } from '../../../../i18n'
@@ -9,7 +8,6 @@ import { ConnectionCard } from '../ConnectionCard'
 import { SelectNetwork } from '../SelectNetwork'
 import { ConnectionStatusMessage } from '../connection'
 
-import type { State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 jest.mock('../../../../redux/networking/selectors')
@@ -19,25 +17,23 @@ jest.mock('../SelectNetwork', () => ({
   },
 }))
 
-const mockRobot: ViewableRobot = ({
+const mockRobot: ViewableRobot = {
   name: 'robot-name',
   connected: true,
   status: CONNECTABLE,
   ip: '1.2.3.4',
-}: any)
+} as any
 
-const mockGetInternetStatus: JestMockFn<
-  [State, string],
-  $Call<typeof Networking.getInternetStatus, State, string>
-> = Networking.getInternetStatus
+const mockGetInternetStatus = Networking.getInternetStatus as jest.MockedFunction<
+  typeof Networking.getInternetStatus
+>
 
-const mockGetNetworkInterfaces: JestMockFn<
-  [State, string],
-  $Call<typeof Networking.getNetworkInterfaces, State, string>
-> = Networking.getNetworkInterfaces
+const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
+  typeof Networking.getNetworkInterfaces
+>
 
 describe('ConnectionCard', () => {
-  let render
+  let render: (robot?: ViewableRobot) => ReturnType<typeof mountWithProviders>
 
   beforeEach(() => {
     jest.useFakeTimers()
@@ -88,11 +84,11 @@ describe('ConnectionCard', () => {
   it('passes type ConnectionStatusMessage based on robot.local', () => {
     mockGetInternetStatus.mockReturnValue(Networking.STATUS_FULL)
 
-    const localRobot: ViewableRobot = ({ ...mockRobot, local: true }: any)
+    const localRobot: ViewableRobot = { ...mockRobot, local: true } as any
     const { wrapper: localWrapper } = render(localRobot)
     const localStatus = localWrapper.find(ConnectionStatusMessage)
 
-    const wifiRobot: ViewableRobot = ({ ...mockRobot, local: false }: any)
+    const wifiRobot: ViewableRobot = { ...mockRobot, local: false } as any
     const { wrapper: wifiWrapper } = render(wifiRobot)
     const wifiStatus = wifiWrapper.find(ConnectionStatusMessage)
 

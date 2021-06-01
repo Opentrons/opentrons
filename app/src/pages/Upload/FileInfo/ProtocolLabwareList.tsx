@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -20,15 +19,15 @@ import {
 
 import type { LabwareSummary } from '../../../redux/calibration/types'
 
-export type ProtocolLabwareListProps = {|
-  labware: Array<LabwareSummary>,
-|}
+export interface ProtocolLabwareListProps {
+  labware: LabwareSummary[]
+}
 
 const TYPE_COL_STYLE = { marginRight: SPACING_AUTO }
 const QUANTITY_COL_STYLE = { width: '12.5%', marginX: SPACING_3 }
 const CAL_DATA_COL_STYLE = { width: '25%' }
 
-const renderCalValue = (axis: string, value: number): React.Node => (
+const renderCalValue = (axis: string, value: number): JSX.Element => (
   <>
     <Text as="span" fontWeight={FONT_WEIGHT_SEMIBOLD}>
       {axis.toUpperCase()}
@@ -41,7 +40,7 @@ const renderCalValue = (axis: string, value: number): React.Node => (
 
 export function ProtocolLabwareList(
   props: ProtocolLabwareListProps
-): React.Node {
+): JSX.Element {
   const { labware } = props
   const { t } = useTranslation(['protocol_info', 'protocol_calibration'])
   const [calDescTooltipTargetProps, calDescTooltipProps] = useHoverTooltip({

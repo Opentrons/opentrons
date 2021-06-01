@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { mountWithStore } from '@opentrons/components/__utils__'
@@ -13,24 +12,33 @@ import { SyncRobotMessage } from '../SyncRobotMessage'
 import { SkipAppUpdateMessage } from '../SkipAppUpdateMessage'
 import { VersionInfoModal } from '../VersionInfoModal'
 
-import type { State } from '../../../../../redux/types'
+import type { State, Action } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/shell/update')
 jest.mock('../../../../../organisms/UpdateAppModal', () => ({
   UpdateAppModal: () => null,
 }))
 
-const MOCK_STATE: $Shape<State> = {}
+const MOCK_STATE: State = {} as any
 
-const getAvailableShellUpdate: JestMockFn<[State], string | null> =
-  Shell.getAvailableShellUpdate
+const getAvailableShellUpdate = Shell.getAvailableShellUpdate as jest.MockedFunction<
+  typeof Shell.getAvailableShellUpdate
+>
 
 describe('VersionInfoModal', () => {
   const handleClose = jest.fn()
   const handleProceed = jest.fn()
 
-  const render = (robotUpdateType = UPGRADE) => {
-    return mountWithStore(
+  const render = (
+    robotUpdateType: React.ComponentProps<
+      typeof VersionInfoModal
+    >['robotUpdateType'] = UPGRADE
+  ) => {
+    return mountWithStore<
+      React.ComponentProps<typeof VersionInfoModal>,
+      State,
+      Action
+    >(
       <VersionInfoModal
         robot={mockReachableRobot}
         robotUpdateType={robotUpdateType}
@@ -75,10 +83,10 @@ describe('VersionInfoModal', () => {
     expect(primaryButton.text()).toMatch(/view robot update/i)
 
     expect(handleClose).not.toHaveBeenCalled()
-    closeButton.invoke('onClick')()
+    closeButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleClose).toHaveBeenCalled()
     expect(handleProceed).not.toHaveBeenCalled()
-    primaryButton.invoke('onClick')()
+    primaryButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleProceed).toHaveBeenCalled()
   })
 
@@ -105,10 +113,10 @@ describe('VersionInfoModal', () => {
     expect(primaryButton.text()).toMatch(/downgrade/i)
 
     expect(handleClose).not.toHaveBeenCalled()
-    closeButton.invoke('onClick')()
+    closeButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleClose).toHaveBeenCalled()
     expect(handleProceed).not.toHaveBeenCalled()
-    primaryButton.invoke('onClick')()
+    primaryButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleProceed).toHaveBeenCalled()
   })
 
@@ -132,10 +140,10 @@ describe('VersionInfoModal', () => {
     expect(primaryButton.text()).toMatch(/reinstall/i)
 
     expect(handleClose).not.toHaveBeenCalled()
-    closeButton.invoke('onClick')()
+    closeButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleClose).toHaveBeenCalled()
     expect(handleProceed).not.toHaveBeenCalled()
-    primaryButton.invoke('onClick')()
+    primaryButton.invoke('onClick')?.({} as React.MouseEvent)
     expect(handleProceed).toHaveBeenCalled()
   })
 
@@ -166,7 +174,7 @@ describe('VersionInfoModal', () => {
 
       expect(wrapper.exists(UpdateAppModal)).toBe(false)
 
-      viewUpdateButton.invoke('onClick')()
+      viewUpdateButton.invoke('onClick')?.({} as React.MouseEvent)
 
       expect(wrapper.find(Portal).exists(UpdateAppModal)).toBe(true)
     })
@@ -176,7 +184,7 @@ describe('VersionInfoModal', () => {
       const skipAppUpdate = wrapper.find(SkipAppUpdateMessage)
 
       expect(handleProceed).not.toHaveBeenCalled()
-      skipAppUpdate.invoke('onClick')()
+      skipAppUpdate.invoke('onClick')?.({} as React.MouseEvent)
       expect(handleProceed).toHaveBeenCalled()
     })
 
@@ -187,11 +195,11 @@ describe('VersionInfoModal', () => {
         .find('button')
         .filterWhere(b => /view app update/i.test(b.text()))
 
-      viewUpdateButton.invoke('onClick')()
+      viewUpdateButton.invoke('onClick')?.({} as React.MouseEvent)
 
       expect(handleClose).not.toHaveBeenCalled()
 
-      wrapper.find(UpdateAppModal).invoke('closeModal')()
+      wrapper.find(UpdateAppModal).invoke('closeModal')?.()
 
       expect(handleClose).toHaveBeenCalled()
     })

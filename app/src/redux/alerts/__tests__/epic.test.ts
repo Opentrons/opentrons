@@ -1,24 +1,22 @@
-// @flow
 import { TestScheduler } from 'rxjs/testing'
 
 import * as Cfg from '../../config'
 import * as Actions from '../actions'
 import { alertsEpic } from '../epic'
 
-import type { State } from '../../types'
-import type { Config } from '../../config/types'
+import type { Action, State } from '../../types'
 import type { AlertId } from '../types'
 
 jest.mock('../../config/selectors')
 
-const getConfig: JestMockFn<[State], $Shape<Config> | null> = Cfg.getConfig
+const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
 
-const MOCK_STATE: State = ({ mockState: true }: any)
-const MOCK_ALERT_1: AlertId = ('mockAlert1': any)
-const MOCK_ALERT_2: AlertId = ('mockAlert2': any)
+const MOCK_STATE: State = { mockState: true } as any
+const MOCK_ALERT_1: AlertId = 'mockAlert1' as any
+const MOCK_ALERT_2: AlertId = 'mockAlert2' as any
 
 describe('alerts epic', () => {
-  let testScheduler
+  let testScheduler: TestScheduler
 
   beforeEach(() => {
     testScheduler = new TestScheduler((actual, expected) => {
@@ -31,16 +29,16 @@ describe('alerts epic', () => {
   })
 
   it('should trigger a config:ADD_UNIQUE_VALUE to save persistent alert ignores', () => {
-    getConfig.mockImplementation(state => {
+    getConfig.mockImplementation((state: State) => {
       expect(state).toEqual(MOCK_STATE)
-      return { alerts: { ignored: [MOCK_ALERT_1] } }
+      return { alerts: { ignored: [MOCK_ALERT_1] } } as any
     })
 
     testScheduler.run(({ hot, expectObservable }) => {
-      const action$ = hot('-a', {
+      const action$ = hot<Action>('-a', {
         a: Actions.alertDismissed(MOCK_ALERT_2, true),
       })
-      const state$ = hot('s-', { s: MOCK_STATE })
+      const state$ = hot<State>('s-', { s: MOCK_STATE })
       const output$ = alertsEpic(action$, state$)
 
       expectObservable(output$).toBe('-a', {

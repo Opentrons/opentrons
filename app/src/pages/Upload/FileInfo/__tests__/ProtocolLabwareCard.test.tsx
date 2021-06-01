@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
@@ -13,7 +12,7 @@ import type { State } from '../../../../redux/types'
 
 jest.mock('../../../../redux/calibration')
 
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: State = { mockState: true } as any
 
 const MOCK_STORE = {
   getState: () => MOCK_STATE,
@@ -22,28 +21,39 @@ const MOCK_STORE = {
 }
 const ROBOT_NAME = 'robotName'
 
-const getUniqueProtocolLabwareSummaries: JestMockFn<
-  [State, string],
-  $Call<typeof Calibration.getUniqueProtocolLabwareSummaries, State, string>
-> = Calibration.getUniqueProtocolLabwareSummaries
+const getUniqueProtocolLabwareSummaries = Calibration.getUniqueProtocolLabwareSummaries as jest.MockedFunction<
+  typeof Calibration.getUniqueProtocolLabwareSummaries
+>
 
-function stubSelector<R>(mock: JestMockFn<[State, string], R>, rVal: R) {
-  mock.mockImplementation((state, robotName) => {
-    expect(state).toBe(MOCK_STATE)
-    expect(robotName).toBe(ROBOT_NAME)
-    return rVal
-  })
+function stubSelector(
+  mock: jest.MockedFunction<
+    typeof Calibration.getUniqueProtocolLabwareSummaries
+  >,
+  rVal: ReturnType<typeof Calibration.getUniqueProtocolLabwareSummaries>
+): void {
+  mock.mockImplementation(
+    (
+      state,
+      robotName
+    ): ReturnType<typeof Calibration.getUniqueProtocolLabwareSummaries> => {
+      expect(state).toBe(MOCK_STATE)
+      expect(robotName).toBe(ROBOT_NAME)
+      return rVal
+    }
+  )
 }
 
 describe('ProtocolLabwareCard', () => {
-  const render = () => {
+  const render = (): ReturnType<typeof mount> => {
     return mount(<ProtocolLabwareCard robotName={ROBOT_NAME} />, {
       wrappingComponent: Provider,
       wrappingComponentProps: { store: MOCK_STORE },
     })
   }
 
-  const EMPTY_LABWARE = []
+  const EMPTY_LABWARE: ReturnType<
+    typeof Calibration.getUniqueProtocolLabwareSummaries
+  > = []
   const FULL_LABWARE = [
     {
       quantity: 2,

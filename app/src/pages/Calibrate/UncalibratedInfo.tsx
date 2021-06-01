@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { push } from 'connected-react-router'
@@ -11,7 +10,6 @@ import {
   Box,
   Text,
   SPACING_2,
-  type Mount,
   SPACING_3,
   FONT_BODY_2_DARK,
 } from '@opentrons/components'
@@ -21,6 +19,7 @@ import { selectors as robotSelectors } from '../../redux/robot'
 
 import type { TipracksByMountMap } from '../../redux/robot'
 import type { Dispatch } from '../../redux/types'
+import type { Mount, StyleProps } from '@opentrons/components'
 
 const IS_CALIBRATED = 'Pipette tip length is calibrated.'
 const IS_NOT_CALIBRATED = 'Pipette tip length is not calibrated.'
@@ -33,12 +32,12 @@ const CONTINUE_TO_MODULE_SETUP = 'Continue to module setup'
 
 const BTN_WIDTH = '23rem'
 
-type CalibrateButtonProps = {
-  hasCalibrated: boolean,
-  ...
+interface CalibrateButtonProps
+  extends React.PropsWithChildren<StyleProps & React.HTMLAttributes<any>> {
+  hasCalibrated: boolean
 }
 
-function CalibrateButton(props: CalibrateButtonProps) {
+function CalibrateButton(props: CalibrateButtonProps): JSX.Element {
   const { hasCalibrated, ...otherProps } = props
   if (hasCalibrated) {
     return <SecondaryBtn {...otherProps} />
@@ -47,15 +46,15 @@ function CalibrateButton(props: CalibrateButtonProps) {
   }
 }
 
-type UncalibratedInfoProps = {|
-  uncalibratedTipracksByMount: TipracksByMountMap,
-  mount: Mount,
-  hasCalibrated: boolean,
-  handleStart: () => mixed,
-  showSpinner: boolean,
-|}
+interface UncalibratedInfoProps {
+  uncalibratedTipracksByMount: TipracksByMountMap
+  mount: Mount
+  hasCalibrated: boolean
+  handleStart: () => unknown
+  showSpinner: boolean
+}
 
-export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
+export function UncalibratedInfo(props: UncalibratedInfoProps): JSX.Element {
   const {
     uncalibratedTipracksByMount,
     mount,
@@ -84,7 +83,7 @@ export function UncalibratedInfo(props: UncalibratedInfoProps): React.Node {
 
   let continueText
   let defHash
-  let continueButtonOnClick
+  let continueButtonOnClick: string
   if (uncalibratedTipracksByMount?.[mount].length) {
     continueText = CONTINUE_TO_NEXT_TIP_TYPE
     defHash = uncalibratedTipracksByMount[mount][0].definitionHash || ''

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -31,9 +30,10 @@ import {
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
 
-import type { StyleProps } from '@opentrons/components'
+import type { StyleProps, Mount } from '@opentrons/components'
 import type {
   CalibrationLabware,
+  RobotCalibrationCheckStep,
   SessionCommandParams,
 } from '../../redux/sessions/types'
 
@@ -70,7 +70,7 @@ const terminalContentsStyleProps = {
 }
 
 const PANEL_BY_STEP: {
-  [string]: React.ComponentType<CalibrationPanelProps>,
+  [step in RobotCalibrationCheckStep]?: React.ComponentType<CalibrationPanelProps>
 } = {
   [Sessions.CHECK_STEP_SESSION_STARTED]: Introduction,
   [Sessions.CHECK_STEP_LABWARE_LOADED]: DeckSetup,
@@ -87,7 +87,7 @@ const PANEL_BY_STEP: {
 }
 
 const PANEL_STYLE_PROPS_BY_STEP: {
-  [string]: StyleProps,
+  [step in RobotCalibrationCheckStep]?: StyleProps
 } = {
   [Sessions.CHECK_STEP_SESSION_STARTED]: terminalContentsStyleProps,
   [Sessions.CHECK_STEP_LABWARE_LOADED]: darkContentsStyleProps,
@@ -102,7 +102,7 @@ const PANEL_STYLE_PROPS_BY_STEP: {
 
 export function CheckCalibration(
   props: CalibrationCheckParentProps
-): React.Node {
+): JSX.Element | null {
   const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const {
     currentStep,
@@ -130,7 +130,7 @@ export function CheckCalibration(
     ? labware.find(l => !l.isTiprack) ?? null
     : null
 
-  function sendCommands(...commands: Array<SessionCommandParams>) {
+  function sendCommands(...commands: SessionCommandParams[]): void {
     if (session?.id && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
@@ -142,7 +142,7 @@ export function CheckCalibration(
     }
   }
 
-  function cleanUpAndExit() {
+  function cleanUpAndExit(): void {
     if (session?.id) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
@@ -175,13 +175,13 @@ export function CheckCalibration(
   if (showSpinner) {
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
-
+  // @ts-expect-error(sa, 2021-05-27): avoiding src code change, currentStep might be undefined
   const Panel = PANEL_BY_STEP[currentStep]
   return Panel ? (
     <>
       <ModalPage
-        /* $FlowFixMe(mc, 2021-03-18): resolve with TS conversion */
         titleBar={titleBarProps}
+        // @ts-expect-error(sa, 2021-05-27): avoiding src code change, currentStep might be undefined
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >
         <Panel
@@ -190,7 +190,7 @@ export function CheckCalibration(
           tipRack={activeTipRack}
           calBlock={calBlock}
           isMulti={isMulti}
-          mount={activePipette?.mount.toLowerCase()}
+          mount={activePipette?.mount.toLowerCase() as Mount}
           currentStep={currentStep}
           sessionType={session.sessionType}
           checkBothPipettes={checkBothPipettes}

@@ -1,4 +1,3 @@
-// @flow
 import { combineEpics } from 'redux-observable'
 import { createSessionEpic } from './createSessionEpic'
 import { ensureSessionEpic } from './ensureSessionEpic'
@@ -11,7 +10,7 @@ import { clearAllSessionsOnDisconnectEpic } from './clearAllSessionsOnDisconnect
 
 import type { Epic } from '../../types'
 
-export const sessionsEpic: Epic = combineEpics(
+export const sessionsEpic: Epic = combineEpics<Epic>(
   createSessionEpic,
   ensureSessionEpic,
   fetchSessionEpic,

@@ -1,18 +1,17 @@
-// @flow
 import * as React from 'react'
 import { UploadInput } from './UploadInput'
 import { ConfirmUploadModal } from './ConfirmUploadModal'
 import { UploadMenu } from './UploadMenu'
 
-export type UploadProps = {|
-  filename: ?string,
-  sessionLoaded: ?boolean,
-  createSession: (file: File) => mixed,
-|}
+export interface UploadProps {
+  filename: string | null | undefined
+  sessionLoaded: boolean | null | undefined
+  createSession: (file: File) => unknown
+}
 
-type UploadState = {|
-  uploadedFile: ?File,
-|}
+interface UploadState {
+  uploadedFile: File | null | undefined
+}
 
 export class Upload extends React.Component<UploadProps, UploadState> {
   constructor(props: UploadProps) {
@@ -20,15 +19,28 @@ export class Upload extends React.Component<UploadProps, UploadState> {
     this.state = { uploadedFile: null }
   }
 
-  onUpload: (
-    event: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<>
-  ) => void = event => {
-    let files: Array<File> = []
+  onUpload:
+    | React.ChangeEventHandler<HTMLInputElement>
+    | React.DragEventHandler = (
+    event: React.ChangeEvent<HTMLInputElement> | React.DragEvent
+  ) => {
+    let files: File[] = []
+
+    // @ts-expect-error TODO: use commented code below
     if (event.dataTransfer && event.dataTransfer.files) {
-      files = (event.dataTransfer.files: any)
+      // @ts-expect-error TODO: use commented code below
+      files = event.dataTransfer.files as any
+      // @ts-expect-error TODO: use commented code below
     } else if (event.target.files) {
-      files = (event.target.files: any)
+      // @ts-expect-error TODO: use commented code below
+      files = event.target.files as any
     }
+
+    //   if ('dataTransfer' in event && event.dataTransfer.files) {
+    //     files = event.dataTransfer.files as any
+    //   } else if ('files' in event.target && event.target?.files) {
+    //     files = event.target.files as any
+    //   }
 
     if (this.props.sessionLoaded) {
       this.setState({ uploadedFile: files[0] })
@@ -36,8 +48,9 @@ export class Upload extends React.Component<UploadProps, UploadState> {
       this.props.createSession(files[0])
     }
 
-    // $FlowFixMe(mc, 2020-05-31): only clear value for file input, not drag and drop
+    // @ts-expect-error TODO: use commented code below
     event.currentTarget.value = ''
+    // if ('value' in event.currentTarget) event.currentTarget.value = ''
   }
 
   confirmUpload: () => void = () => {
@@ -53,7 +66,7 @@ export class Upload extends React.Component<UploadProps, UploadState> {
     this.setState({ uploadedFile: null })
   }
 
-  render(): React.Node {
+  render(): JSX.Element {
     const { uploadedFile } = this.state
     const { filename } = this.props
 

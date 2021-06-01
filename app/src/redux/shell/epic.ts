@@ -1,4 +1,3 @@
-// @flow
 import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import {
@@ -24,6 +23,7 @@ const log = createLogger(__filename)
 
 const sendActionToShellEpic: Epic = action$ =>
   action$.pipe(
+    // @ts-expect-error protect against absent meta key on action
     filter<Action>(a => a.meta != null && a.meta.shell != null && a.meta.shell),
     tap<Action>((shellAction: Action) =>
       ipcRenderer.send('dispatch', shellAction)
@@ -35,9 +35,10 @@ const receiveActionFromShellEpic: Epic = () =>
   // IPC event listener: (IpcRendererEvent, ...args) => void
   // our action is the only argument, so pluck it out from index 1
   fromEvent<Action>(
+    // @ts-expect-error TODO: fromEvent type expects ArrayLike though ipcRenderer doesn't match that type, don't use fromEvent it's deprecated
     ipcRenderer,
     'dispatch',
-    (_: mixed, incoming: Action) => incoming
+    (_: unknown, incoming: Action) => incoming
   ).pipe<Action>(
     tap(incoming => {
       log.debug('Received action from main via IPC', {
@@ -64,7 +65,7 @@ const checkForUpdateAfterChannelChangeEpic: Epic = (action$, state$) => {
   )
 }
 
-export const shellEpic: Epic = combineEpics(
+export const shellEpic: Epic = combineEpics<Epic>(
   sendActionToShellEpic,
   receiveActionFromShellEpic,
   appUpdateAvailableAlertEpic,

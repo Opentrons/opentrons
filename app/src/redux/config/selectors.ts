@@ -1,4 +1,3 @@
-// @flow
 import type { DropdownOption } from '@opentrons/components'
 import type { State } from '../types'
 import type { Config, FeatureFlags, UpdateChannel } from './types'
@@ -27,18 +26,16 @@ export const getHasCalibrationBlock = (state: State): boolean | null => {
 }
 
 const UPDATE_CHANNEL_OPTS = [
-  { name: 'Stable', value: (('latest': UpdateChannel): string) },
-  { name: 'Beta', value: (('beta': UpdateChannel): string) },
+  { name: 'Stable', value: 'latest' as UpdateChannel },
+  { name: 'Beta', value: 'beta' as UpdateChannel },
 ]
 
 const UPDATE_CHANNEL_OPTS_WITH_ALPHA = [
   ...UPDATE_CHANNEL_OPTS,
-  { name: 'Alpha', value: (('alpha': UpdateChannel): string) },
+  { name: 'Alpha', value: 'alpha' as UpdateChannel },
 ]
 
-export const getUpdateChannelOptions = (
-  state: State
-): Array<DropdownOption> => {
+export const getUpdateChannelOptions = (state: State): DropdownOption[] => {
   return state.config?.devtools || state.config?.update.channel === 'alpha'
     ? UPDATE_CHANNEL_OPTS_WITH_ALPHA
     : UPDATE_CHANNEL_OPTS

@@ -1,17 +1,15 @@
-// @flow
-
 import * as Fixtures from '../__fixtures__'
 import * as Actions from '../actions'
 import type { PipetteOffsetCalibrationsAction } from '../types'
 
-type ActionSpec = {|
-  should: string,
-  creator: (...Array<any>) => PipetteOffsetCalibrationsAction,
-  args: Array<mixed>,
-  expected: PipetteOffsetCalibrationsAction,
-|}
+interface ActionSpec {
+  should: string
+  creator: (...args: any[]) => PipetteOffsetCalibrationsAction
+  args: unknown[]
+  expected: PipetteOffsetCalibrationsAction
+}
 
-const SPECS: Array<ActionSpec> = [
+const SPECS: ActionSpec[] = [
   {
     should: 'create a fetchPipetteOffsetCalibrations action',
     creator: Actions.fetchPipetteOffsetCalibrations,
@@ -19,7 +17,7 @@ const SPECS: Array<ActionSpec> = [
     expected: {
       type: 'calibration:FETCH_PIPETTE_OFFSET_CALIBRATIONS',
       payload: { robotName: 'robot-name' },
-      meta: {},
+      meta: {} as any,
     },
   },
   {
@@ -36,7 +34,7 @@ const SPECS: Array<ActionSpec> = [
         robotName: 'robot-name',
         pipetteOffsetCalibrations: Fixtures.mockAllPipetteOffsetsCalibration,
       },
-      meta: { requestId: '123' },
+      meta: { requestId: '123' } as any,
     },
   },
   {
@@ -53,7 +51,7 @@ const SPECS: Array<ActionSpec> = [
         robotName: 'robot-name',
         error: Fixtures.mockFetchPipetteOffsetCalibrationsFailure.body,
       },
-      meta: { requestId: '123' },
+      meta: { requestId: '123' } as any,
     },
   },
 ]

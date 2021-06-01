@@ -1,19 +1,17 @@
-// @flow
-
 import * as Actions from '../actions'
 import * as Fixtures from '../__fixtures__'
 
 import type { ModulesAction } from '../types'
 
-type ActionSpec = {|
-  name: string,
-  creator: (...Array<any>) => mixed,
-  args: Array<mixed>,
-  expected: ModulesAction,
-|}
+interface ActionSpec {
+  name: string
+  creator: (...args: any[]) => unknown
+  args: unknown[]
+  expected: ModulesAction
+}
 
 describe('robot modules actions', () => {
-  const SPECS: Array<ActionSpec> = [
+  const SPECS: ActionSpec[] = [
     {
       name: 'modules:FETCH_MODULES',
       creator: Actions.fetchModules,
@@ -21,7 +19,7 @@ describe('robot modules actions', () => {
       expected: {
         type: 'modules:FETCH_MODULES',
         payload: { robotName: 'robot-name' },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -38,7 +36,7 @@ describe('robot modules actions', () => {
           robotName: 'robot-name',
           modules: Fixtures.mockFetchModulesSuccessActionPayloadModules,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -51,7 +49,7 @@ describe('robot modules actions', () => {
           robotName: 'robot-name',
           error: { message: 'AH' },
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -66,7 +64,7 @@ describe('robot modules actions', () => {
           command: 'set_temperature',
           args: [1, 2, 3],
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -87,7 +85,7 @@ describe('robot modules actions', () => {
           command: 'set_temperature',
           returnValue: Fixtures.mockSendModuleCommandSuccess.body.returnValue,
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -108,7 +106,7 @@ describe('robot modules actions', () => {
           command: 'set_temperature',
           error: { message: 'AH' },
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -121,7 +119,7 @@ describe('robot modules actions', () => {
           robotName: 'robot-name',
           moduleId: 'abc123',
         },
-        meta: {},
+        meta: {} as any,
       },
     },
     {
@@ -135,7 +133,7 @@ describe('robot modules actions', () => {
           moduleId: 'abc123',
           message: 'update complete',
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
     {
@@ -149,7 +147,7 @@ describe('robot modules actions', () => {
           moduleId: 'abc123',
           error: { message: 'AH' },
         },
-        meta: { requestId: 'abc' },
+        meta: { requestId: 'abc' } as any,
       },
     },
   ]

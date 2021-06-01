@@ -1,18 +1,17 @@
-// @flow
 import * as Fixtures from '../__fixtures__'
 import { pipettesReducer } from '../reducer'
 
 import type { Action } from '../../types'
 import type { PipettesState } from '../types'
 
-type ReducerSpec = {|
-  name: string,
-  state: PipettesState,
-  action: Action,
-  expected: PipettesState,
-|}
+interface ReducerSpec {
+  name: string
+  state: PipettesState
+  action: Action
+  expected: PipettesState
+}
 
-const SPECS: Array<ReducerSpec> = [
+const SPECS: ReducerSpec[] = [
   {
     name: 'handles pipettes:FETCH_PIPETTES_SUCCESS',
     action: {
@@ -24,7 +23,7 @@ const SPECS: Array<ReducerSpec> = [
           right: Fixtures.mockAttachedPipette,
         },
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       robotName: {
@@ -50,7 +49,7 @@ const SPECS: Array<ReducerSpec> = [
         robotName: 'robotName',
         settings: { pipetteId: Fixtures.mockPipetteSettings },
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       robotName: {
@@ -72,9 +71,9 @@ const SPECS: Array<ReducerSpec> = [
       payload: {
         robotName: 'robotName',
         pipetteId: 'pipetteId',
-        fields: { [('fieldId': string)]: { value: 42, default: 42 } },
+        fields: { fieldId: { value: 42, default: 42 } },
       },
-      meta: {},
+      meta: {} as any,
     },
     state: {
       robotName: {
@@ -82,7 +81,7 @@ const SPECS: Array<ReducerSpec> = [
         settingsById: {
           pipetteId: {
             info: { name: 'p300_single_gen2', model: 'p300_single_v2.0' },
-            fields: { [('fieldId': string)]: { value: 0, default: 42 } },
+            fields: { fieldId: { value: 0, default: 42 } },
           },
         },
       },
@@ -93,7 +92,7 @@ const SPECS: Array<ReducerSpec> = [
         settingsById: {
           pipetteId: {
             info: { name: 'p300_single_gen2', model: 'p300_single_v2.0' },
-            fields: { [('fieldId': string)]: { value: 42, default: 42 } },
+            fields: { fieldId: { value: 42, default: 42 } },
           },
         },
       },
