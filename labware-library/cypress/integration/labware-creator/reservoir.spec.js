@@ -49,19 +49,19 @@ context('Reservoirs', () => {
     it('tests footprint', () => {
       cy.get("input[name='footprintXDimension']").type('150').blur()
       cy.contains(
-        'Your labware is not compatible with the Labware Creator'
+        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('exist')
       cy.get("input[name='footprintXDimension']").clear().type('127').blur()
       cy.contains(
-        'Your labware is not compatible with the Labware Creator'
+        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('not.exist')
       cy.get("input[name='footprintYDimension']").type('150').blur()
       cy.contains(
-        'Your labware is not compatible with the Labware Creator'
+        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('exist')
       cy.get("input[name='footprintYDimension']").clear().type('85').blur()
       cy.contains(
-        'Your labware is not compatible with the Labware Creator'
+        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('not.exist')
     })
 
