@@ -1,7 +1,7 @@
 import asyncio
 from abc import abstractmethod, ABC
 from collections import deque
-from typing import TypeVar, Generic, Deque
+from typing import TypeVar, Generic, Deque, Optional
 
 DataT = TypeVar("DataT")
 
@@ -59,8 +59,9 @@ class Listener(ABC, Generic[DataT]):
 class WaitableListener(Listener[DataT]):
     """A listener that can be waited on."""
 
-    def __init__(self) -> None:
+    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
         """Constructor."""
+        self._loop = loop or asyncio.get_running_loop()
         self._futures: Deque[asyncio.Future] = deque()
 
     async def wait_next_poll(self) -> DataT:
@@ -69,7 +70,7 @@ class WaitableListener(Listener[DataT]):
 
         Returns: The next poll result.
         """
-        f = asyncio.get_running_loop().create_future()
+        f = self._loop.create_future()
         self._futures.append(f)
         return await f
 
@@ -105,7 +106,9 @@ class Poller(Generic[DataT]):
             self,
             interval_seconds: float,
             reader: Reader[DataT],
-            listener: Listener[DataT]) -> None:
+            listener: Listener[DataT],
+            loop: Optional[asyncio.AbstractEventLoop] = None
+    ) -> None:
         """
         Constructor.
 
@@ -113,12 +116,14 @@ class Poller(Generic[DataT]):
             interval_seconds: time in between polls.
             reader: The data reader.
             listener: event listener.
+            loop: Optional event loop to use
         """
-        self._shutdown_event = asyncio.Event()
+        loop = loop or asyncio.get_running_loop()
+        self._shutdown_event = asyncio.Event(loop=loop)
         self._interval = interval_seconds
         self._listener = listener
         self._reader = reader
-        self._task = asyncio.create_task(self._poller())
+        self._task = loop.create_task(self._poller())
 
     def stop(self) -> None:
         """Signal poller to stop."""

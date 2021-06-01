@@ -62,8 +62,9 @@ class AttachedModulesControl:
             execution_manager=self.api._execution_manager,
             sim_model=sim_model)
 
-    def unregister_modules(self,
-                           mods_at_ports: List[modules.ModuleAtPort]) -> None:
+    async def unregister_modules(
+            self, mods_at_ports: List[modules.ModuleAtPort]
+    ) -> None:
         """
         De-register Modules.
 
@@ -83,7 +84,7 @@ class AttachedModulesControl:
         for removed_mod in removed_modules:
             log.info(f"Module {removed_mod.name()} detached"
                      f" from port {removed_mod.port}")
-            del removed_mod
+            await removed_mod.cleanup()
 
     async def register_modules(
             self,
@@ -103,7 +104,7 @@ class AttachedModulesControl:
             removed_mods_at_ports = []
 
         # destroy removed mods
-        self.unregister_modules(removed_mods_at_ports)
+        await self.unregister_modules(removed_mods_at_ports)
         sorted_mods_at_port =\
             self.api._backend._usb.match_virtual_ports(new_mods_at_ports)
 
