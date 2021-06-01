@@ -18,8 +18,14 @@ interface Props {
   values: LabwareFields
 }
 
-// TODO (ka 2021-5-7): Broke this out here since we will need to have more conditions for tips
 const Instructions = (props: Props): JSX.Element => {
+  if (props.values.labwareType === 'tipRack') {
+    return (
+      <p>
+        Reference the <strong>inside</strong> of the tip.
+      </p>
+    )
+  }
   return (
     <>
       {displayAsTube(props.values) ? (
@@ -94,10 +100,12 @@ export const WellShapeAndSides = (): JSX.Element | null => {
     'wellYDimension',
   ]
   const { values, errors, touched } = useFormikContext<LabwareFields>()
+  const label =
+    values.labwareType === 'tipRack' ? 'Tip Diameter' : 'Well Shape & Sides'
 
   return (
     <div className={styles.new_definition_section}>
-      <SectionBody label="Well Shape & Sides" id="WellShapeAndSides">
+      <SectionBody label={label} id="WellShapeAndSides">
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <Content values={values} />

@@ -291,6 +291,7 @@ export const labwareTypeAutofills: Record<
 > = {
   tipRack: {
     homogeneousWells: 'true' as const,
+    wellShape: 'circular' as const,
   },
   tubeRack: {},
   wellPlate: {},
