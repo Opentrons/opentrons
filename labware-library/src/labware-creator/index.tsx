@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import assert from 'assert'
 import Ajv from 'ajv'
 import cx from 'classnames'
@@ -10,7 +9,6 @@ import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
 import { AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import { maskLoadName } from './fieldMasks'
 import {
   aluminumBlockAutofills,
   aluminumBlockChildTypeOptions,
@@ -26,7 +24,6 @@ import {
   formLevelValidation,
   LabwareCreatorErrors,
 } from './formLevelValidation'
-import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
 import { labwareTestProtocol, pipetteNameOptions } from './labwareTestProtocol'
 import { fieldsToLabware } from './fieldsToLabware'
 import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
@@ -37,13 +34,14 @@ import { IntroCopy } from './components/IntroCopy'
 import { LinkOut } from './components/LinkOut'
 
 import { Section } from './components/Section'
-import { TextField } from './components/TextField'
 
 import { ImportErrorModal } from './components/ImportErrorModal'
 import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
 import { UploadExisting } from './components/sections/UploadExisting'
 
 import { CustomTiprackWarning } from './components/sections/CustomTiprackWarning'
+import { Description } from './components/sections/Description'
+import { File } from './components/sections/File'
 import { HandPlacedTipFit } from './components/sections/HandPlacedTipFit'
 import { Regularity } from './components/sections/Regularity'
 import { Footprint } from './components/sections/Footprint'
@@ -438,38 +436,10 @@ export const LabwareCreator = (): JSX.Element => {
                     </div>
                   </Section>
 
-                  {/* PAGE 3 */}
-                  <Section label="Description" fieldList={['brand', 'brandId']}>
-                    <div className={styles.flex_row}>
-                      <div className={styles.brand_column}>
-                        <TextField name="brand" />
-                      </div>
-                      <div className={styles.brand_id_column}>
-                        <TextField
-                          name="brandId"
-                          caption="Separate multiple by comma"
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <Description />
                   {/* PAGE 4 */}
 
-                  <Section label="File" fieldList={['loadName', 'displayName']}>
-                    <div className={styles.flex_row}>
-                      <div className={styles.export_form_fields}>
-                        <TextField
-                          name="displayName"
-                          placeholder={getDefaultDisplayName(values)}
-                        />
-                        <TextField
-                          name="loadName"
-                          placeholder={getDefaultLoadName(values)}
-                          caption="Only lower case letters, numbers, periods, and underscores may be used"
-                          inputMasks={[maskLoadName]}
-                        />
-                      </div>
-                    </div>
-                  </Section>
+                  <File />
                   <Section
                     label="Labware Test Protocol"
                     fieldList={['pipetteName']}

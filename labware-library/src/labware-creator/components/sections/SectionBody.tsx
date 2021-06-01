@@ -2,7 +2,7 @@ import * as React from 'react'
 import styles from '../Section.css'
 
 interface Props {
-  children: JSX.Element
+  children: React.ReactNode
   headingClassName?: string
   label: string
   id?: string
