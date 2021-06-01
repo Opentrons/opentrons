@@ -31,10 +31,7 @@ import {
 } from './commandFixtures'
 import { makeInitialRobotState } from '../utils'
 import { tiprackWellNamesFlat } from './data'
-import type {
-  LabwareDefinition2,
-  PipetteNameSpecs,
-} from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   Config,
   InvariantContext,
@@ -44,10 +41,10 @@ import type {
   RobotStateAndWarnings,
 } from '../'
 
-const fixtureP10Single = _fixtureP10Single as PipetteNameSpecs
-const fixtureP10Multi = _fixtureP10Multi as PipetteNameSpecs
-const fixtureP300Single = _fixtureP300Single as PipetteNameSpecs
-const fixtureP300Multi = _fixtureP300Multi as PipetteNameSpecs
+const fixtureP10Single = _fixtureP10Single
+const fixtureP10Multi = _fixtureP10Multi
+const fixtureP300Single = _fixtureP300Single
+const fixtureP300Multi = _fixtureP300Multi
 
 const fixtureTrash = _fixtureTrash as LabwareDefinition2
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
