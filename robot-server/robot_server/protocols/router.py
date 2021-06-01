@@ -47,7 +47,7 @@ async def get_protocols(
 
 @protocols_router.post(
     path="/protocols",
-    summary="Uploaded protocol",
+    summary="Upload a protocol",
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[Protocol],
 )

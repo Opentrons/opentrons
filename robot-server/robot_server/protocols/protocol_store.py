@@ -21,7 +21,7 @@ class ProtocolStoreEntry:
     files: List[Path]
 
 
-class ProtocolNotFoundError(ValueError):
+class ProtocolNotFoundError(KeyError):
     """Error raised when a protocol ID was not found in the store."""
 
     def __init__(self, protocol_id: str) -> None:
@@ -84,7 +84,7 @@ class ProtocolStore:
             raise ProtocolNotFoundError(protocol_id) from e
 
     def get_all(self) -> List[ProtocolStoreEntry]:
-        """Get all protocols currently saved in the system."""
+        """Get all protocols currently saved in this store."""
         return list(self._protocols_by_id.values())
 
     def remove(self, protocol_id: str) -> ProtocolStoreEntry:
