@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { snugLooseOptions } from '../../fields'
-import { FormAlerts } from '../FormAlerts'
-import { TipFitAlerts } from '../TipFitAlerts'
+import { FormAlerts } from '../alerts/FormAlerts'
+import { TipFitAlerts } from '../alerts/TipFitAlerts'
 import { Dropdown } from '../Dropdown'
 import { SectionBody } from './SectionBody'
 

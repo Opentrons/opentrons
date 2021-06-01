@@ -67,7 +67,7 @@ export const wellBottomShapeOptions: Options = [
   { name: 'V-Bottom', value: 'v' },
 ]
 
-export type BooleanString = 'true' | 'false' // TODO IMMEDIATELY revisit
+export type BooleanString = 'true' | 'false'
 
 export const yesNoOptions = [
   { name: 'Yes', value: 'true' },

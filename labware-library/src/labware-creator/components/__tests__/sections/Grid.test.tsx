@@ -10,7 +10,7 @@ import {
 } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Grid } from '../../sections/Grid'
-import { FormAlerts } from '../../FormAlerts'
+import { FormAlerts } from '../../alerts/FormAlerts'
 import { TextField } from '../../TextField'
 import { RadioField } from '../../RadioField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
@@ -18,7 +18,7 @@ import { wrapInFormik } from '../../utils/wrapInFormik'
 jest.mock('../../../utils')
 jest.mock('../../TextField')
 jest.mock('../../RadioField')
-jest.mock('../../FormAlerts')
+jest.mock('../../alerts/FormAlerts')
 
 const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
 

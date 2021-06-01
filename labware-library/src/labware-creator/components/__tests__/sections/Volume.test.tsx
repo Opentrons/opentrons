@@ -6,13 +6,13 @@ import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Volume } from '../../sections/Volume'
-import { FormAlerts } from '../../FormAlerts'
+import { FormAlerts } from '../../alerts/FormAlerts'
 import { TextField } from '../../TextField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
 jest.mock('../../../utils')
 jest.mock('../../TextField')
-jest.mock('../../FormAlerts')
+jest.mock('../../alerts/FormAlerts')
 
 const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
 const textFieldMock = TextField as jest.MockedFunction<typeof TextField>

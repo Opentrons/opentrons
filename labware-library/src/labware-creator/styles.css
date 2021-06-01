@@ -177,7 +177,8 @@
   .brand_id_column,
   .help_text,
   .export_form_fields,
-  .volume_instructions_column .tip_fit_column {
+  .volume_instructions_column,
+  .tip_fit_column {
     flex-basis: var(--size-50p);
     flex-shrink: 1;
   }

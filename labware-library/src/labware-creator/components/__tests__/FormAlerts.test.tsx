@@ -2,7 +2,7 @@ import * as React from 'react'
 import { render } from '@testing-library/react'
 import { getIsHidden } from '../../formSelectors'
 import { IRREGULAR_LABWARE_ERROR, LOOSE_TIP_FIT_ERROR } from '../../fields'
-import { FormAlerts, Props as FormAlertProps } from '../FormAlerts'
+import { FormAlerts, Props as FormAlertProps } from '../alerts/FormAlerts'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 jest.mock('../../formSelectors')
