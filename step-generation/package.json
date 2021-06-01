@@ -12,7 +12,7 @@
   "private": true,
   "version": "4.3.0-beta.0",
   "description": "Step generation",
-  "main": "src/index.ts",
+  "main": "lib/main.js",
   "types": "lib/main.d.ts",
   "flow:main": "flow-types/index.js.flow",
   "bugs": {
