@@ -25,7 +25,6 @@ const sendActionToShellEpic: Epic = action$ =>
   )
 
 const receiveActionFromShellEpic: Epic = () => {
-  console.log(remote.inbox)
   return remote.inbox
 }
 
