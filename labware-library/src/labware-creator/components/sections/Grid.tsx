@@ -51,7 +51,7 @@ export const Grid = (): JSX.Element | null => {
   }
   return (
     <div className={styles.new_definition_section}>
-      <SectionBody label="Grid">
+      <SectionBody label="Grid" id="Grid">
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <Content />

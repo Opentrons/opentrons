@@ -11,7 +11,10 @@ export const CustomTiprackWarning = (): JSX.Element | null => {
   if (values.labwareType === 'tipRack') {
     return (
       <div className={styles.new_definition_section}>
-        <SectionBody label="Custom Tip Racks Are Not Recommended">
+        <SectionBody
+          label="Custom Tip Racks Are Not Recommended"
+          id="CustomTiprackWarning"
+        >
           <div className={styles.flex_row}>
             <p className={styles.instructions_text}>
               Opentrons tip racks are recommended for use with the OT-2. You are
