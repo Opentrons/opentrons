@@ -87,18 +87,16 @@ class TempDeck(mod_abc.AbstractModule):
                          execution_manager=execution_manager)
         self._device_info = device_info
         self._driver = driver
-        self._listener = TempdeckListener()
+        self._listener = TempdeckListener(loop=loop)
         self._poller = Poller(
             reader=PollerReader(driver=self._driver),
             interval_seconds=polling_frequency,
-            listener=self._listener
+            listener=self._listener, loop=loop
         )
 
-    def cleanup(self) -> None:
-        self._poller.stop()
-
-    def __del__(self):
-        self.cleanup()
+    async def cleanup(self) -> None:
+        """Stop the poller task."""
+        await self._poller.stop_and_wait()
 
     @classmethod
     def name(cls) -> str:
@@ -272,9 +270,13 @@ class PollerReader(Reader[Temperature]):
 
 class TempdeckListener(WaitableListener[Temperature]):
     """Tempdeck state listener."""
-    def __init__(self, interrupt_callback: types.InterruptCallback = None) -> None:
+    def __init__(
+            self,
+            loop: Optional[asyncio.AbstractEventLoop] = None,
+            interrupt_callback: types.InterruptCallback = None
+    ) -> None:
         """Constructor."""
-        super().__init__()
+        super().__init__(loop=loop)
         self._callback = interrupt_callback
         self._polled_data = Temperature(current=25, target=None)
 
