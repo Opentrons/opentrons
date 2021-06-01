@@ -32,7 +32,7 @@ def decoy() -> Decoy:
 @pytest.fixture
 def transport(decoy: Decoy) -> AbstractSyncTransport:
     """Get a stubbed out AbstractSyncTransport."""
-    return decoy.create_decoy(spec=AbstractSyncTransport)  # type: ignore[misc]
+    return decoy.create_decoy(spec=AbstractSyncTransport)
 
 
 @pytest.fixture
@@ -152,12 +152,11 @@ def test_aspirate(
 ) -> None:
     """It should send an AspirateCommand through the transport."""
     request = commands.AspirateRequest(
-        pipetteId="123", labwareId="456", wellName="A2",
-        wellLocation=WellLocation(
-            origin=WellOrigin.BOTTOM,
-            offset=(0, 0, 1)
-        ),
-        volume=123.45
+        pipetteId="123",
+        labwareId="456",
+        wellName="A2",
+        wellLocation=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
+        volume=123.45,
     )
 
     result_from_transport = commands.AspirateResult(volume=67.89)
@@ -167,9 +166,10 @@ def test_aspirate(
     ).then_return(result_from_transport)
 
     result = subject.aspirate(
-        pipette_id="123", labware_id="456", well_name="A2",
-        well_location=WellLocation(origin=WellOrigin.BOTTOM,
-                                   offset=(0, 0, 1)),
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
         volume=123.45,
     )
 
