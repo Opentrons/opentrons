@@ -40,19 +40,21 @@ export const TextField = (props: Props): JSX.Element => {
       {({ field, form }: FieldProps) =>
         getIsHidden(props.name, form.values) ? null : (
           <div className={fieldStyles.field_wrapper}>
-            <div className={fieldStyles.field_label}>{LABELS[name]}</div>
-            <InputField
-              name={field.name}
-              value={field.value}
-              caption={caption}
-              placeholder={placeholder}
-              onChange={makeHandleChange({ field, form })}
-              onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
-                reportFieldEdit({ value: field.value, name: field.name })
-                field.onBlur(e)
-              }}
-              units={units}
-            />
+            <label className={fieldStyles.field_label}>
+              {LABELS[name]}
+              <InputField
+                name={field.name}
+                value={field.value}
+                caption={caption}
+                placeholder={placeholder}
+                onChange={makeHandleChange({ field, form })}
+                onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                  reportFieldEdit({ value: field.value, name: field.name })
+                  field.onBlur(e)
+                }}
+                units={units}
+              />
+            </label>
           </div>
         )
       }
