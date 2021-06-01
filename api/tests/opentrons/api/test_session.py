@@ -16,7 +16,6 @@ from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocol_api.labware import load
 from opentrons.types import Location, Point
-
 state = partial(state, 'session')
 
 
@@ -325,7 +324,8 @@ def run(ctx):
             for _ in range(max_workers * 5):
                 tasks.append(m.submit(run_while_running))
             # wait to enter pause
-            sleep(0.05)
+            while session.state != 'paused':
+                sleep(0.05)
             # Now resume
             tasks.append(m.submit(lambda: session.resume()))
 

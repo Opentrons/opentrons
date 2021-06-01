@@ -30,7 +30,7 @@ stages:
               currentTemp: !anyfloat
               holdTime: !anyfloat
               targetTemp: !anyfloat
-              rampRate: !anyfloat
+              rampRate: Null
               currentCycleIndex: Null
               totalCycleCount: Null
               currentStepIndex: Null
