@@ -71,7 +71,6 @@ describe('Footprint', () => {
   })
 
   it('should render form alert when error is present', () => {
-    // formikConfig.initialValues.footprintXDimension = '130'
     const FAKE_ERROR = 'ahh'
     formikConfig.initialErrors = { footprintXDimension: FAKE_ERROR }
     formikConfig.initialTouched = { footprintXDimension: true }
