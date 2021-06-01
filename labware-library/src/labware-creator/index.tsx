@@ -1,13 +1,12 @@
 import assert from 'assert'
 import Ajv from 'ajv'
-import cx from 'classnames'
 import * as React from 'react'
 import { Formik } from 'formik'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
-import { AlertModal, PrimaryButton } from '@opentrons/components'
+import { AlertModal } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import {
   aluminumBlockAutofills,
@@ -24,16 +23,11 @@ import {
   formLevelValidation,
   LabwareCreatorErrors,
 } from './formLevelValidation'
-import { labwareTestProtocol, pipetteNameOptions } from './labwareTestProtocol'
+import { labwareTestProtocol } from './labwareTestProtocol'
 import { fieldsToLabware } from './fieldsToLabware'
 import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
-import { ConditionalLabwareRender } from './components/ConditionalLabwareRender'
 import { Dropdown } from './components/Dropdown'
-import { FormLevelErrorAlerts } from './components/FormLevelErrorAlerts'
 import { IntroCopy } from './components/IntroCopy'
-import { LinkOut } from './components/LinkOut'
-
-import { Section } from './components/Section'
 
 import { ImportErrorModal } from './components/ImportErrorModal'
 import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
@@ -41,17 +35,19 @@ import { UploadExisting } from './components/sections/UploadExisting'
 
 import { CustomTiprackWarning } from './components/sections/CustomTiprackWarning'
 import { Description } from './components/sections/Description'
+import { Export } from './components/sections/Export'
 import { File } from './components/sections/File'
-import { HandPlacedTipFit } from './components/sections/HandPlacedTipFit'
-import { Regularity } from './components/sections/Regularity'
 import { Footprint } from './components/sections/Footprint'
-import { Height } from './components/sections/Height'
 import { Grid } from './components/sections/Grid'
-import { Volume } from './components/sections/Volume'
-import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
-import { WellBottomAndDepth } from './components/sections/WellBottomAndDepth'
-import { WellSpacing } from './components/sections/WellSpacing'
 import { GridOffset } from './components/sections/GridOffset'
+import { HandPlacedTipFit } from './components/sections/HandPlacedTipFit'
+import { Height } from './components/sections/Height'
+import { Preview } from './components/sections/Preview'
+import { Regularity } from './components/sections/Regularity'
+import { Volume } from './components/sections/Volume'
+import { WellBottomAndDepth } from './components/sections/WellBottomAndDepth'
+import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
+import { WellSpacing } from './components/sections/WellSpacing'
 
 import styles from './styles.css'
 
@@ -64,9 +60,6 @@ import type {
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
-
-const PDF_URL =
-  'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
 
 export const LabwareCreator = (): JSX.Element => {
   const [
@@ -324,14 +317,21 @@ export const LabwareCreator = (): JSX.Element => {
       >
         {bag => {
           const {
-            handleSubmit,
             values,
-            isValid,
             touched,
             setTouched,
             setValues,
+            isValid,
+            handleSubmit,
           } = bag
           const errors: LabwareCreatorErrors = bag.errors
+
+          const onExportClick = (): void => {
+            if (!isValid && !showExportErrorModal) {
+              setShowExportErrorModal(true, values)
+            }
+            handleSubmit()
+          }
 
           // @ts-expect-error(IL, 2021-03-24): values/errors/touched not typed for reportErrors to be happy
           reportErrors({ values, errors, touched })
@@ -412,97 +412,21 @@ export const LabwareCreator = (): JSX.Element => {
               <div ref={scrollRef} />
               {showCreatorForm && (
                 <>
-                  {/* PAGE 1 - Labware */}
                   <CustomTiprackWarning />
                   <HandPlacedTipFit />
                   <Regularity />
                   <Footprint />
                   <Height />
                   <Grid />
-                  {/* PAGE 2 */}
                   <Volume />
                   <WellShapeAndSides />
                   <WellBottomAndDepth />
                   <WellSpacing />
                   <GridOffset />
-                  <Section label="Check your work">
-                    <FormLevelErrorAlerts errors={errors} />
-                    <div className={styles.preview_labware}>
-                      <ConditionalLabwareRender values={values} />
-                      <p className={styles.preview_instructions}>
-                        Check that the size, spacing, and shape of your wells
-                        looks correct.
-                      </p>
-                    </div>
-                  </Section>
-
+                  <Preview />
                   <Description />
-                  {/* PAGE 4 */}
-
                   <File />
-                  <Section
-                    label="Labware Test Protocol"
-                    fieldList={['pipetteName']}
-                  >
-                    <div className={cx(styles.flex_row, styles.flex_row_start)}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Your file will be exported with a protocol that will
-                          help you test and troubleshoot your labware definition
-                          on the robot. The protocol requires a Single Channel
-                          pipette on the right mount of your robot.
-                        </p>
-                      </div>
-                      <div className={styles.pipette_field_wrapper}>
-                        <Dropdown
-                          name="pipetteName"
-                          options={pipetteNameOptions}
-                        />
-                      </div>
-                    </div>
-                    <div className={styles.export_section}>
-                      <div
-                        className={cx(styles.callout, styles.export_callout)}
-                      >
-                        <h4 className={styles.test_labware_heading}>
-                          Please test your definition file!
-                        </h4>
-
-                        <p>
-                          Use the labware test protocol contained in the
-                          downloaded file to check the accuracy of your
-                          definition. It’s important to create definitions that
-                          are precise and do not rely on excessive calibration
-                          prior to each run to achieve accuracy.
-                        </p>
-                        <p>
-                          Use the test guide to troubleshoot your definition.
-                        </p>
-                        <LinkOut
-                          onClick={() =>
-                            reportEvent({
-                              name: 'labwareCreatorClickTestLabware',
-                            })
-                          }
-                          href={PDF_URL}
-                          className={styles.test_guide_button}
-                        >
-                          view test guide
-                        </LinkOut>
-                      </div>
-                      <PrimaryButton
-                        className={styles.export_button}
-                        onClick={() => {
-                          if (!isValid && !showExportErrorModal) {
-                            setShowExportErrorModal(true, values)
-                          }
-                          handleSubmit()
-                        }}
-                      >
-                        EXPORT FILE
-                      </PrimaryButton>
-                    </div>
-                  </Section>
+                  <Export onExportClick={onExportClick} />
                 </>
               )}
             </div>
