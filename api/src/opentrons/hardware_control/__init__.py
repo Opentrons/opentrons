@@ -11,7 +11,7 @@ functions are available elsewhere.
 """
 
 from .adapters import SynchronousAdapter
-from .api import API
+from .api import API, PauseManager
 from .controller import Controller
 from .simulator import Simulator
 from .pipette import Pipette
@@ -24,7 +24,7 @@ from .execution_manager import ExecutionManager
 from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
 
 __all__ = [
-    'API', 'Controller', 'Simulator', 'Pipette',
+    'API', 'Controller', 'Simulator', 'Pipette', 'PauseManager',
     'SynchronousAdapter', 'HardwareAPILike', 'CriticalPoint',
     'NoTipAttachedError', 'TipAttachedError', 'DROP_TIP_RELEASE_DISTANCE',
     'ThreadManager', 'ExecutionManager', 'ExecutionState',

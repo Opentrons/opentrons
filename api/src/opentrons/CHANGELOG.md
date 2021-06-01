@@ -3,46 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.3.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.3...v4.3.0-beta.0) (2021-04-19)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [4.3.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.2...v4.3.0-alpha.3) (2021-04-19)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [4.3.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.1...v4.3.0-alpha.2) (2021-04-19)
-
+## [4.3.1](https://github.com/Opentrons/opentrons/compare/v4.3.0...v4.3.1) (2021-05-10)
 
 ### Bug Fixes
 
+* **api:** do not cache tip lengths because it breaks calibration ([#7778](https://github.com/Opentrons/opentrons/issues/7778)) ([d43fdd7](https://github.com/Opentrons/opentrons/commit/d43fdd7))
+
+
+
+
+
+# [4.3.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0) (2021-05-06)
+
+### Bug Fixes
+
+* **api:** ensure loaded modules is returned in order ([#7704](https://github.com/Opentrons/opentrons/issues/7704)) ([66a775c](https://github.com/Opentrons/opentrons/commit/66a775c))
 * **api:** return a simulated module for magnetic modules if they are not compatible ([#7654](https://github.com/Opentrons/opentrons/issues/7654)) ([f6fcb77](https://github.com/Opentrons/opentrons/commit/f6fcb77))
-
-
-
-
-
-# [4.3.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.0...v4.3.0-alpha.1) (2021-04-15)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [4.3.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0-alpha.0) (2021-04-14)
-
-
-### Bug Fixes
-
 * **api:**  can't find pipettes ([#7639](https://github.com/Opentrons/opentrons/issues/7639)) ([4e5176c](https://github.com/Opentrons/opentrons/commit/4e5176c))
 * **api:** api location cache fix ([#7609](https://github.com/Opentrons/opentrons/issues/7609)) ([df68ea2](https://github.com/Opentrons/opentrons/commit/df68ea2)), closes [#7156](https://github.com/Opentrons/opentrons/issues/7156)
 * **api:** check the symlink of the virtual port to map to the physical port ([#7524](https://github.com/Opentrons/opentrons/issues/7524)) ([32b9de5](https://github.com/Opentrons/opentrons/commit/32b9de5))

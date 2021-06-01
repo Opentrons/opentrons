@@ -255,3 +255,18 @@ def drop_tip(
             'text': text
         }
     }
+
+
+def move_to(
+        instrument: InstrumentContext,
+        location: Union[Location, Well]) -> command_types.MoveToCommand:
+    location_text = stringify_location(location)
+    text = 'Moving to {location}'.format(location=location_text)
+    return {
+        'name': command_types.MOVE_TO,
+        'payload': {
+            'instrument': instrument,
+            'location': location,
+            'text': text
+        }
+    }

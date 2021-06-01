@@ -178,3 +178,18 @@ def paired_drop_tip(
             'text': text
         }
     }
+
+
+def paired_move_to(
+        instruments: Apiv2Instruments,
+        locations: Apiv2Locations, pub_type: str) -> command_types.MoveToCommand:
+    location_text = combine_locations(locations)
+    text = f'{pub_type}: Moving to {location_text}'
+    return {
+        'name': command_types.MOVE_TO,
+        'payload': {
+            'instruments': instruments,
+            'locations': locations,
+            'text': text
+        }
+    }

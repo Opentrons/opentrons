@@ -28,6 +28,7 @@ export type ApiSessionModule = {|
   // name identifier of the module
   name: TEMPDECK | MAGDECK | THERMOCYCLER,
   model: ModuleModel,
+  protocolLoadOrder: number,
 |}
 
 export type ApiSessionModuleLegacy = {|

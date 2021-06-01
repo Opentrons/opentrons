@@ -7,6 +7,8 @@ import logging
 import asyncio
 import re
 from typing import List, Tuple
+
+from opentrons.drivers.serial_communication import get_ports_by_name
 from opentrons.hardware_control import API, ThreadManager
 from opentrons.config import (feature_flags as ff, name,
                               robot_configs, IS_ROBOT, ROBOT_FIRMWARE_DIR)
@@ -84,15 +86,26 @@ def _find_smoothie_file() -> Tuple[Path, str]:
 
 
 async def initialize_robot() -> ThreadManager:
+    """Build the hardware controller."""
     if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         log.info("Initialized robot using virtual Smoothie")
         systemdd_notify()
         return ThreadManager(API.build_hardware_simulator)
 
+    # Check if smoothie emulator is to be used
+    port = os.environ.get("OT_SMOOTHIE_EMULATOR_URI")
+    if not port:
+        smoothie_id = os.environ.get('OT_SMOOTHIE_ID', 'AMA')
+        # Let this raise an exception.
+        port = get_ports_by_name(device_name=smoothie_id)[0]
+
+    log.info(f"Connecting to smoothie at port {port}")
+
     packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
     systemdd_notify()
     hardware = ThreadManager(API.build_hardware_controller,
                              threadmanager_nonblocking=True,
+                             port=port,
                              firmware=(packed_smoothie_fw_file,
                                        packed_smoothie_fw_ver))
     try:

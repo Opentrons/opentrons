@@ -34,14 +34,14 @@ async def test_module_caching():
     # Check that we can add and remove modules and the caching keeps up
     found_mods = api.attached_modules
     assert found_mods[0].name() == 'tempdeck'
-    await api.register_modules(
+    await api._backend.module_controls.register_modules(
         new_mods_at_ports=[ModuleAtPort(port='/dev/ot_module_sim_magdeck1',
                                         name='magdeck')
                            ])
     with_magdeck = api.attached_modules.copy()
     assert len(with_magdeck) == 2
     assert with_magdeck[0] is found_mods[0]
-    await api.register_modules(
+    await api._backend.module_controls.register_modules(
         removed_mods_at_ports=[
             ModuleAtPort(port='/dev/ot_module_sim_tempdeck0',
                          name='tempdeck')
@@ -51,7 +51,7 @@ async def test_module_caching():
 
     # Check that two modules of the same kind on different ports are
     # distinct
-    await api.register_modules(
+    await api._backend.module_controls.register_modules(
         new_mods_at_ports=[ModuleAtPort(port='/dev/ot_module_sim_magdeck2',
                                         name='magdeck')
                            ])
@@ -68,7 +68,7 @@ async def test_filtering_modules():
         'magdeck', 'thermocycler']
     api = await hardware_control.API.build_hardware_simulator(
                         attached_modules=mods)
-    await asyncio.sleep(0.5)
+    await asyncio.sleep(0.05)
 
     filtered_modules, _ = await api.find_modules(
         MagneticModuleModel.MAGNETIC_V1, ModuleType.MAGNETIC)

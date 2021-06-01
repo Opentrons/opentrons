@@ -717,11 +717,13 @@ describe('api client', () => {
               _id: 1,
               slot: '1',
               model: 'temperatureModuleV1',
+              protocolLoadOrder: 0,
             },
             9: {
               _id: 9,
               slot: '9',
               model: 'magneticModuleV2',
+              protocolLoadOrder: 1,
             },
           },
         }),

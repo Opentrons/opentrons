@@ -26,7 +26,7 @@ wheel_file = dist/$(call python_get_wheelname,robot-server,robotserver,$(BUILD_N
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
 # specified test
 tests ?= tests
-test_opts ?=  --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)
@@ -43,6 +43,9 @@ ot_sources := $(ot_py_sources)
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'robot_server/**/.mypy_cache'
+
+# Uvicorn command to run the robot server in dev mode.
+run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --reload
 
 .PHONY: all
 all: clean wheel
@@ -74,13 +77,18 @@ test:
 
 .PHONY: lint
 lint: $(ot_py_sources)
-	$(python) -m mypy $(SRC_PATH) tests/health tests/system
-	$(python) -m flake8 $(SRC_PATH) tests setup.py
+	$(python) -m mypy $(SRC_PATH) $(tests)
+	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
 
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
-	$(pipenv) run uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --reload
+	$(pipenv) run $(run_dev)
+
+.PHONY: dev-with-emulator
+dev-with-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator.env
+dev-with-emulator:
+	$(pipenv) run $(run_dev)
 
 .PHONY: local-shell
 local-shell:

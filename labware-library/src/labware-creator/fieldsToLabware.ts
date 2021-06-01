@@ -102,9 +102,7 @@ export function fieldsToLabware(
       parameters: {
         format,
         quirks,
-
-        // @ts-expect-error(IL, 2021-03-18): see note below
-        isTiprack: fields.labwareType === 'tiprack', // NOTE: 'tiprack' is not a possible labwareType now anyway
+        isTiprack: fields.labwareType === 'tipRack',
         //   tipLength?: number,
         // Currently, assume labware is not magnetic module compatible. We don't have the information here.
         isMagneticModuleCompatible: false,

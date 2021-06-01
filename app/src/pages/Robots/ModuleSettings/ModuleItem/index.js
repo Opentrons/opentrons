@@ -24,16 +24,20 @@ type Props = {|
   module: AttachedModule,
   controlDisabledReason: string | null,
   usbPort?: ?string,
+  hubPort?: ?string,
 |}
 
 export function ModuleItem(props: Props): React.Node {
-  const { module, controlDisabledReason, usbPort } = props
+  const { module, controlDisabledReason, usbPort, hubPort } = props
 
   return (
     <>
       <Flex marginBottom={SPACING_1} fontWeight={FONT_WEIGHT_SEMIBOLD}>
         {usbPort && (
           <Text marginRight={SPACING_2}>{`USB Port ${usbPort}:`}</Text>
+        )}
+        {hubPort && (
+          <Text marginRight={SPACING_2}>{`Hub Port ${hubPort}:`}</Text>
         )}
         <Text>{getModuleDisplayName(module.model)}</Text>
       </Flex>

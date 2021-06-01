@@ -808,8 +808,17 @@ class PairedInstrumentContext(CommandPublisher):
                       to limit individual axis speeds, you can use
                       :py:attr:`.ProtocolContext.max_speeds`.
         """
+        instruments = list(self._instruments.values())
+        locations: Optional[List] = None
+        if location:
+            locations = self._get_locations(location)
+
+        publish_paired(self.broker, cmds.paired_move_to,
+                       'before', None, instruments, locations)
         self.paired_instrument_obj.move_to(
             location, force_direct, minimum_z_height, speed)
+        publish_paired(self.broker, cmds.paired_move_to,
+                       'after', None, instruments, locations)
         return self
 
     def _next_available_tip(self) -> Tuple[Labware, Well]:
