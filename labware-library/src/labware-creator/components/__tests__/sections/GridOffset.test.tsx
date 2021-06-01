@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual'
 import { when } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import { DEFAULT_FORM_STATE, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { GridOffset } from '../../sections/GridOffset'
 import { FormAlerts } from '../../alerts/FormAlerts'
@@ -23,7 +23,7 @@ const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
 >
 
 const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
+  initialValues: DEFAULT_FORM_STATE,
   onSubmit: jest.fn(),
 }
 

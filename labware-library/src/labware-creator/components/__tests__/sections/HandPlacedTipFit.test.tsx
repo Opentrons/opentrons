@@ -3,7 +3,7 @@ import { FormikConfig } from 'formik'
 import isEqual from 'lodash/isEqual'
 import { render, screen } from '@testing-library/react'
 import {
-  getDefaultFormState,
+  DEFAULT_FORM_STATE,
   LabwareFields,
   snugLooseOptions,
 } from '../../../fields'
@@ -29,7 +29,7 @@ let formikConfig: FormikConfig<LabwareFields>
 describe('HandPlacedTipFit', () => {
   beforeEach(() => {
     formikConfig = {
-      initialValues: getDefaultFormState(),
+      initialValues: DEFAULT_FORM_STATE,
       onSubmit: jest.fn(),
     }
 

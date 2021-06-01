@@ -5,7 +5,7 @@ import {
   WELLS_OUT_OF_BOUNDS_X,
   WELLS_OUT_OF_BOUNDS_Y,
 } from '../formLevelValidation'
-import { getDefaultFormState } from '../fields'
+import { DEFAULT_FORM_STATE } from '../fields'
 // NOTE(IL, 2021-05-18): eventual dependency on definitions.tsx which uses require.context
 // would break this test (though it's not directly used)
 jest.mock('../../definitions')
@@ -92,13 +92,13 @@ describe('getWellGridBoundingBox', () => {
 
 describe('formLevelValidation', () => {
   it('should return no errors with the initial values of the form', () => {
-    const errors = formLevelValidation({ ...getDefaultFormState() })
+    const errors = formLevelValidation({ ...DEFAULT_FORM_STATE })
     expect(errors).toEqual({})
   })
 
   it('should return errors when well outside bounding box', () => {
     const errors = formLevelValidation({
-      ...getDefaultFormState(),
+      ...DEFAULT_FORM_STATE,
       footprintXDimension: '86',
       footprintYDimension: '128',
       gridColumns: '2',
