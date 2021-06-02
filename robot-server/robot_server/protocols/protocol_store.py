@@ -29,6 +29,15 @@ class ProtocolNotFoundError(KeyError):
         super().__init__(f"Protocol {protocol_id} was not found.")
 
 
+class ProtocolFileInvalidError(ValueError):
+    """Error raised when a given source file is invalid.
+
+    May be caused by an empty filename.
+    """
+
+    pass
+
+
 class ProtocolStore:
     """Methods for storing and retrieving protocol files."""
 
@@ -52,18 +61,19 @@ class ProtocolStore:
         protocol_dir.mkdir(parents=True, exist_ok=True)
         saved_files = []
 
-        for upload_file in files:
-            # TODO(mc, 2021-06-01): raise error for empty file
-            if upload_file.filename != "":
-                contents = await upload_file.read()
-                file_path = protocol_dir / upload_file.filename
+        for index, upload_file in enumerate(files):
+            if upload_file.filename == "":
+                raise ProtocolFileInvalidError(f"File {index} is missing a filename")
 
-                if isinstance(contents, str):
-                    file_path.write_text(contents, "utf-8")
-                else:
-                    file_path.write_bytes(contents)
+            contents = await upload_file.read()
+            file_path = protocol_dir / upload_file.filename
 
-                saved_files.append(file_path)
+            if isinstance(contents, str):
+                file_path.write_text(contents, "utf-8")
+            else:
+                file_path.write_bytes(contents)
+
+            saved_files.append(file_path)
 
         entry = ProtocolResource(
             protocol_id=protocol_id,
@@ -106,11 +116,11 @@ class ProtocolStore:
     def _get_protocol_dir(self, protocol_id: str) -> Path:
         return self._directory / protocol_id
 
-    # TODO(mc, 2021-05-29): add python support
-    # TODO(mc, 2021-05-29): add multi-file support
+    # TODO(mc, 2021-06-01): add python support, add multi-file support, and
+    # honestly, probably ditch all of this logic in favor of whatever
+    # `ProtocolAnalyzer` situation we come up with
     @staticmethod
     def _get_protocol_type(files: List[Path]) -> ProtocolFileType:
-        """Naively get file type based on Path extension."""
         file_path = files[0]
 
         if file_path.suffix == ".json":

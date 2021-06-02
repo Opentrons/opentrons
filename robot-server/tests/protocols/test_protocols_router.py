@@ -16,11 +16,13 @@ from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
     ProtocolNotFoundError,
+    ProtocolFileInvalidError,
 )
 
 from robot_server.protocols.router import (
     protocols_router,
     ProtocolNotFound,
+    ProtocolFileInvalid,
     get_unique_id,
     get_current_time,
     get_protocol_store,
@@ -255,6 +257,38 @@ async def test_create_multifile_protocol(
     ]
 
     await async_client.post("/protocols", files=files)
+
+
+async def test_create_protocol_invalid_file(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    response_builder: ResponseBuilder,
+    unique_id: str,
+    current_time: datetime,
+    async_client: AsyncClient,
+) -> None:
+    """It should reject a request with an empty file."""
+    decoy.when(
+        await protocol_store.create(
+            protocol_id=unique_id,
+            created_at=current_time,
+            files=[
+                matchers.IsA(
+                    UploadFile,
+                    {"filename": "foo.json", "content_type": "application/json"},
+                )
+            ],
+        )
+    ).then_raise(ProtocolFileInvalidError("oh no"))
+
+    files = [("files", ("foo.json", bytes("{}\n", "utf-8"), "application/json"))]
+    response = await async_client.post("/protocols", files=files)
+
+    verify_response(
+        response,
+        expected_status=400,
+        expected_errors=ProtocolFileInvalid(detail="oh no"),
+    )
 
 
 def test_delete_protocol_by_id(

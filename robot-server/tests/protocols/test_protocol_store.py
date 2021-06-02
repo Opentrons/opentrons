@@ -12,6 +12,7 @@ from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
     ProtocolNotFoundError,
+    ProtocolFileInvalidError,
 )
 
 
@@ -59,6 +60,22 @@ async def test_create_protocol(
     file_path = result.files[0]
     assert file_path.read_text("utf-8") == "{}\n"
     assert str(file_path).startswith(str(tmp_path))
+
+
+async def test_create_protocol_raises_for_missing_filename(
+    tmp_path: Path,
+    subject: ProtocolStore,
+) -> None:
+    """It should raise an error if an input file is missing a filename."""
+    created_at = datetime.now()
+    invalid_file = UploadFile(filename="")
+
+    with pytest.raises(ProtocolFileInvalidError):
+        await subject.create(
+            protocol_id="protocol-id",
+            created_at=created_at,
+            files=[invalid_file],
+        )
 
 
 async def test_get_protocol(
