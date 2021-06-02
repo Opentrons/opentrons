@@ -2,10 +2,13 @@
   "files": [],
   "references": [
     {
-      "path": "./components"
+      "path": "./app"
     },
     {
       "path": "./app-shell"
+    },
+    {
+      "path": "./components"
     },
     {
       "path": "./discovery-client"

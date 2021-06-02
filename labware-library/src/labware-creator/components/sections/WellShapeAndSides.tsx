@@ -97,7 +97,7 @@ export const WellShapeAndSides = (): JSX.Element | null => {
 
   return (
     <div className={styles.new_definition_section}>
-      <SectionBody label="Well Shape & Sides">
+      <SectionBody label="Well Shape & Sides" id="WellShapeAndSides">
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <Content values={values} />

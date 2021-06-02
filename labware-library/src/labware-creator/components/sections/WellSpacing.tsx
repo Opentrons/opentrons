@@ -73,7 +73,7 @@ export const WellSpacing = (): JSX.Element | null => {
   }
   return (
     <div className={styles.new_definition_section}>
-      <SectionBody label="Well Spacing">
+      <SectionBody label="Well Spacing" id="WellSpacing">
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <Content values={values} />

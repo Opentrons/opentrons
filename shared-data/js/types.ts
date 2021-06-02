@@ -314,6 +314,7 @@ export interface PipetteNameSpecs {
   }
 }
 
+// TODO(bc, 2021-05-27): the type of `model` here should be PipetteModel
 // TODO(mc, 2019-10-14): update this type according to the schema
 export interface PipetteModelSpecs extends PipetteNameSpecs {
   model: string

@@ -62,6 +62,7 @@ export const Height = (): JSX.Element | null => {
             ? 'Total Height'
             : 'Height'
         }
+        id="Height"
       >
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
