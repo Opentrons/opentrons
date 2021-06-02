@@ -6,13 +6,14 @@ from opentrons.config.feature_flags import enable_protocol_engine
 from .constants import V1_TAG
 from .errors import LegacyErrorResponse
 from .health import health_router
+from .protocols import protocols_router
 from .sessions import sessions_router
 from .system import system_router
 from .service.legacy.routers import legacy_routes
 from .service.session.router import router as deprecated_session_router
 from .service.pipette_offset.router import router as pip_os_router
 from .service.labware.router import router as labware_router
-from .service.protocol.router import router as protocol_router
+from .service.protocol.router import router as deprecated_protocol_router
 from .service.tip_length.router import router as tl_router
 from .service.notifications.router import router as notifications_router
 
@@ -40,19 +41,32 @@ router.include_router(
 )
 
 
-router.include_router(
-    router=sessions_router if enable_protocol_engine() else deprecated_session_router,
-    tags=["Session Management"],
-)
+if enable_protocol_engine():
+    router.include_router(
+        router=sessions_router,
+        tags=["Session Management"],
+    )
+
+    router.include_router(
+        router=protocols_router,
+        tags=["Protocol Management"],
+    )
+
+else:
+    router.include_router(
+        router=deprecated_session_router,
+        tags=["Session Management"],
+    )
+
+    router.include_router(
+        router=deprecated_protocol_router,
+        tags=["Protocol Management"],
+    )
+
 
 router.include_router(
     router=labware_router,
     tags=["Labware Calibration Management"],
-)
-
-router.include_router(
-    router=protocol_router,
-    tags=["Protocol Management"],
 )
 
 router.include_router(

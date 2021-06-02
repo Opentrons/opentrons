@@ -1,13 +1,14 @@
 """Server test helpers."""
 import json
 from pydantic import BaseModel
-from requests import Response
+from requests import Response as TestClientResponse
+from httpx import Response as HttpxResponse
 from typing import Optional, Sequence, Union
 
 
 # TODO(mc, 2021-05-24): add links checking
 def verify_response(
-    response: Response,
+    response: Union[TestClientResponse, HttpxResponse],
     *,
     expected_data: Optional[Union[BaseModel, Sequence[BaseModel]]] = None,
     expected_errors: Optional[Union[BaseModel, Sequence[BaseModel]]] = None,
