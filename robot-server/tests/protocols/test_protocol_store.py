@@ -120,7 +120,7 @@ async def test_get_all_protocols(
     json_upload_file: UploadFile,
     subject: ProtocolStore,
 ) -> None:
-    """It should get a single protocol from the store."""
+    """It should get all protocols existing in the store."""
     created_at_1 = datetime.now()
     created_at_2 = datetime.now()
 
@@ -159,7 +159,7 @@ async def test_remove_protocol(
     json_upload_file: UploadFile,
     subject: ProtocolStore,
 ) -> None:
-    """It should save a single protocol to disk."""
+    """It should remove specified protocol's files from store."""
     created_at = datetime.now()
 
     expected_result = await subject.create(
@@ -182,6 +182,6 @@ async def test_remove_missing_protocol_raises(
     json_upload_file: UploadFile,
     subject: ProtocolStore,
 ) -> None:
-    """It should get a single protocol from the store."""
+    """It should raise an error when trying to remove non-existent protocol."""
     with pytest.raises(ProtocolNotFoundError, match="protocol-id"):
         subject.remove("protocol-id")

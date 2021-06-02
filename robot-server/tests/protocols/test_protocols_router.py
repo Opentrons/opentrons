@@ -38,7 +38,7 @@ def app(
     protocol_store: ProtocolStore,
     response_builder: ResponseBuilder,
 ) -> FastAPI:
-    """Get an TestClient for /protocols routes with dependencies mocked out."""
+    """Get an app instance for /protocols routes with dependencies mocked out."""
     app = FastAPI(exception_handlers=exception_handlers)
     app.dependency_overrides[get_unique_id] = lambda: unique_id
     app.dependency_overrides[get_current_time] = lambda: current_time
@@ -162,7 +162,7 @@ def test_get_protocol_not_found(
     protocol_store: ProtocolStore,
     client: TestClient,
 ) -> None:
-    """It should return a single protocol file."""
+    """It should return a 404 error when requesting a non-existent protocol."""
     not_found_error = ProtocolNotFoundError("protocol-id")
 
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_raise(
