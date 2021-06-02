@@ -1,4 +1,3 @@
-
 Docker Guide  
 =======================  
 Included in this repo are the tools to run a containerized Opentrons robot stack in docker.
@@ -26,16 +25,17 @@ Start a terminal and change directory to the root of this repo.
 ## Configuration
 
 ### Pipettes
-By default a `p20_multi_v2.0` is on the left mount and `p20_single_v2.0` is on the right. These can be changed by modifying environment variables in the `docker-compose.yml`  file.
+
+By default a `p20_multi_v2.0` is on the left mount and `p20_single_v2.0` is on the right. These can be changed by modifying environment variables in the `docker-compose.yml` file.
 
 Under the `emulator` section add an `environment` section with a variable called `OT_EMULATOR_smoothie`. A stringified JSON object with `model` and `id` field for the `left` and `right` mounts is defined by `OT_EMULATOR_smoothie`. All fields are optional.
 
 For example to use a `p300_multi` on the right add:
+
 ```
   environment:
     OT_EMULATOR_smoothie: '{"right": {"model": "p300_multi"}}'
 ```
-
 
 ## Known Issues
 
