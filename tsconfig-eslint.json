@@ -16,6 +16,8 @@
     "labware-library/src",
     "labware-library/typings",
     "shared-data/js",
-    "shared-data/protocol"
+    "shared-data/protocol",
+    "protocol-designer/src",
+    "protocol-designer/typings"
   ]
 }
