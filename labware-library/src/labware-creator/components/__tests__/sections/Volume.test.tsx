@@ -1,7 +1,7 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
 import '@testing-library/jest-dom'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
@@ -26,6 +26,7 @@ describe('Volume', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render with the correct information', () => {
@@ -34,7 +35,7 @@ describe('Volume', () => {
 
     screen.getByText('Total maximum volume of each well.')
 
-    screen.getByRole('textbox', { name: /max volume per well/i }) // TODO IMMEDIATELY this should work after Sarah's PR is merged & this is rebased
+    screen.getByRole('textbox', { name: /max volume per well/i })
   })
 
   it('should render tubes when tubeRack is selected', () => {

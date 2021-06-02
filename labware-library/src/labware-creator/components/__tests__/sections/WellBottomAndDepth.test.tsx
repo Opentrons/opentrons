@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { FormikConfig } from 'formik'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { displayAsTube } from '../../../utils'
 import { WellBottomAndDepth } from '../../sections/WellBottomAndDepth'
@@ -31,6 +31,7 @@ describe('WellBottomAndDepth', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render with the correct information', () => {
@@ -49,7 +50,7 @@ describe('WellBottomAndDepth', () => {
     screen.getAllByRole('radio', { name: /round/i })
     screen.getAllByRole('radio', { name: /v-bottom/i })
 
-    screen.getByRole('textbox', { name: /depth/i }) // TODO IMMEDIATELY this should work after Sarah's PR is merged & this is rebased
+    screen.getByRole('textbox', { name: /depth/i })
   })
 
   it('should render tubes when labware that should displayAsTube is selected', () => {

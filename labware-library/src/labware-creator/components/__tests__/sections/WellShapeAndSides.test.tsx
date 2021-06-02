@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { FormikConfig } from 'formik'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { displayAsTube } from '../../../utils'
 import { WellShapeAndSides } from '../../sections/WellShapeAndSides'
@@ -26,6 +26,7 @@ describe('WellShapeAndSides', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render with the correct information', () => {
@@ -41,7 +42,7 @@ describe('WellShapeAndSides', () => {
     screen.getAllByRole('radio', { name: /rectangular/i })
 
     // should show diameter by default when no shape is selected
-    screen.getByRole('textbox', { name: /diameter/i }) // TODO IMMEDIATELY this should work after Sarah's PR is merged & this is rebased
+    screen.getByRole('textbox', { name: /diameter/i })
   })
 
   it('should render tubes when labware that should displayAsTube is selected', () => {
@@ -66,7 +67,6 @@ describe('WellShapeAndSides', () => {
     screen.getByText('Diameter helps the robot locate the sides of the wells.')
   })
 
-  // TODO IMMEDIATELY this should work after Sarah's PR is merged & this is rebased
   it('should render diameter field when circular is selected (and should not render x/y fields)', () => {
     formikConfig.initialValues.wellShape = 'circular'
     render(wrapInFormik(<WellShapeAndSides />, formikConfig))
@@ -77,7 +77,6 @@ describe('WellShapeAndSides', () => {
     screen.getByRole('textbox', { name: /Diameter/i })
   })
 
-  // TODO IMMEDIATELY this should work after Sarah's PR is merged & this is rebased
   it('should render X and Y dimension fields when rectangular is selected', () => {
     formikConfig.initialValues.wellShape = 'rectangular'
     render(wrapInFormik(<WellShapeAndSides />, formikConfig))
