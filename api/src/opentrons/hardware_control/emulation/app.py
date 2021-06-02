@@ -5,6 +5,7 @@ from opentrons.hardware_control.emulation.connection_handler import \
     ConnectionHandler
 from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
 from opentrons.hardware_control.emulation.parser import Parser
+from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.tempdeck import TempDeckEmulator
 from opentrons.hardware_control.emulation.thermocycler import ThermocyclerEmulator
 from opentrons.hardware_control.emulation.smoothie import SmoothieEmulator
@@ -28,7 +29,8 @@ async def run_server(host: str, port: int, handler: ConnectionHandler) -> None:
 
 async def run() -> None:
     """Run the module emulators."""
-    host = "0.0.0.0"
+    settings = Settings()
+    host = settings.host
 
     await asyncio.gather(
         run_server(host=host,
@@ -42,7 +44,9 @@ async def run() -> None:
                    handler=ConnectionHandler(ThermocyclerEmulator(parser=Parser()))),
         run_server(host=host,
                    port=SMOOTHIE_PORT,
-                   handler=ConnectionHandler(SmoothieEmulator(parser=Parser()))),
+                   handler=ConnectionHandler(
+                       SmoothieEmulator(parser=Parser(), settings=settings.smoothie))
+                   ),
     )
 
 
