@@ -14,7 +14,7 @@ from robot_server.protocols.protocol_models import Protocol, ProtocolFileType
 from robot_server.protocols.response_builder import ResponseBuilder
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
-    ProtocolStoreEntry,
+    ProtocolResource,
     ProtocolNotFoundError,
 )
 
@@ -86,13 +86,13 @@ def test_get_protocols(
     created_at_1 = datetime.now()
     created_at_2 = datetime.now()
 
-    entry_1 = ProtocolStoreEntry(
+    entry_1 = ProtocolResource(
         protocol_id="abc",
         protocol_type=ProtocolFileType.PYTHON,
         created_at=created_at_1,
         files=[],
     )
-    entry_2 = ProtocolStoreEntry(
+    entry_2 = ProtocolResource(
         protocol_id="123",
         protocol_type=ProtocolFileType.JSON,
         created_at=created_at_2,
@@ -131,7 +131,7 @@ def test_get_protocol_by_id(
 ) -> None:
     """It should return a single protocol file."""
     created_at = datetime.now()
-    entry = ProtocolStoreEntry(
+    entry = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.PYTHON,
         created_at=created_at,
@@ -185,7 +185,7 @@ async def test_create_protocol(
     async_client: AsyncClient,
 ) -> None:
     """It should store a single protocol file."""
-    entry = ProtocolStoreEntry(
+    entry = ProtocolResource(
         protocol_id=unique_id,
         protocol_type=ProtocolFileType.JSON,
         created_at=current_time,

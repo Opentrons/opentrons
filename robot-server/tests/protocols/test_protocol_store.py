@@ -1,6 +1,7 @@
 """Tests for the ProtocolStore interface."""
 import pytest
 from datetime import datetime
+from decoy import matchers
 from pathlib import Path
 from fastapi import UploadFile
 from typing import Iterator
@@ -9,7 +10,7 @@ from opentrons.file_runner import ProtocolFileType
 
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
-    ProtocolStoreEntry,
+    ProtocolResource,
     ProtocolNotFoundError,
 )
 
@@ -48,16 +49,16 @@ async def test_create_protocol(
         files=[json_upload_file],
     )
 
-    expected_file_path = tmp_path / "protocol-id" / "protocol.json"
-
-    assert result == ProtocolStoreEntry(
+    assert result == ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
         created_at=created_at,
-        files=[expected_file_path],
+        files=[matchers.Anything()],
     )
 
-    assert expected_file_path.read_text("utf-8") == "{}\n"
+    file_path = result.files[0]
+    assert file_path.read_text("utf-8") == "{}\n"
+    assert str(file_path).startswith(str(tmp_path))
 
 
 async def test_get_protocol(
@@ -74,16 +75,17 @@ async def test_get_protocol(
         files=[json_upload_file],
     )
 
-    expected_file_path = tmp_path / "protocol-id" / "protocol.json"
-
     result = subject.get("protocol-id")
 
-    assert result == ProtocolStoreEntry(
+    assert result == ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
         created_at=created_at,
-        files=[expected_file_path],
+        files=[matchers.Anything()],
     )
+
+    file_path = result.files[0]
+    assert file_path.read_text("utf-8") == "{}\n"
 
 
 async def test_get_missing_protocol_raises(
@@ -117,23 +119,20 @@ async def test_get_all_protocols(
         files=[json_upload_file],
     )
 
-    expected_file_path_1 = tmp_path / "protocol-id-1" / "protocol.json"
-    expected_file_path_2 = tmp_path / "protocol-id-2" / "protocol.json"
-
     result = subject.get_all()
 
     assert result == [
-        ProtocolStoreEntry(
+        ProtocolResource(
             protocol_id="protocol-id-1",
             protocol_type=ProtocolFileType.JSON,
             created_at=created_at_1,
-            files=[expected_file_path_1],
+            files=[matchers.Anything()],
         ),
-        ProtocolStoreEntry(
+        ProtocolResource(
             protocol_id="protocol-id-2",
             protocol_type=ProtocolFileType.JSON,
             created_at=created_at_2,
-            files=[expected_file_path_2],
+            files=[matchers.Anything()],
         ),
     ]
 
@@ -146,19 +145,16 @@ async def test_remove_protocol(
     """It should save a single protocol to disk."""
     created_at = datetime.now()
 
-    await subject.create(
+    expected_result = await subject.create(
         protocol_id="protocol-id",
         created_at=created_at,
         files=[json_upload_file],
     )
 
-    expected_dir_path = tmp_path / "protocol-id"
-    expected_file_path = tmp_path / "protocol-id" / "protocol.json"
+    result = subject.remove("protocol-id")
 
-    subject.remove("protocol-id")
-
-    assert expected_dir_path.exists() is False
-    assert expected_file_path.exists() is False
+    assert result == expected_result
+    assert result.files[0].exists() is False
 
     with pytest.raises(ProtocolNotFoundError, match="protocol-id"):
         subject.get("protocol-id")

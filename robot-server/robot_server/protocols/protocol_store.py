@@ -12,7 +12,7 @@ log = getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class ProtocolStoreEntry:
+class ProtocolResource:
     """An entry in the session store, used to construct response models."""
 
     protocol_id: str
@@ -39,14 +39,14 @@ class ProtocolStore:
             directory: Directory in which to place created files.
         """
         self._directory = directory
-        self._protocols_by_id: Dict[str, ProtocolStoreEntry] = {}
+        self._protocols_by_id: Dict[str, ProtocolResource] = {}
 
     async def create(
         self,
         protocol_id: str,
         created_at: datetime,
         files: Sequence[UploadFile],
-    ) -> ProtocolStoreEntry:
+    ) -> ProtocolResource:
         """Add a protocol to the store."""
         protocol_dir = self._get_protocol_dir(protocol_id)
         protocol_dir.mkdir(parents=True, exist_ok=True)
@@ -65,7 +65,7 @@ class ProtocolStore:
 
                 saved_files.append(file_path)
 
-        entry = ProtocolStoreEntry(
+        entry = ProtocolResource(
             protocol_id=protocol_id,
             protocol_type=self._get_protocol_type(saved_files),
             created_at=created_at,
@@ -76,18 +76,18 @@ class ProtocolStore:
 
         return entry
 
-    def get(self, protocol_id: str) -> ProtocolStoreEntry:
+    def get(self, protocol_id: str) -> ProtocolResource:
         """Get a single protocol by ID."""
         try:
             return self._protocols_by_id[protocol_id]
         except KeyError as e:
             raise ProtocolNotFoundError(protocol_id) from e
 
-    def get_all(self) -> List[ProtocolStoreEntry]:
+    def get_all(self) -> List[ProtocolResource]:
         """Get all protocols currently saved in this store."""
         return list(self._protocols_by_id.values())
 
-    def remove(self, protocol_id: str) -> ProtocolStoreEntry:
+    def remove(self, protocol_id: str) -> ProtocolResource:
         """Remove a protocol from the store."""
         try:
             entry = self._protocols_by_id.pop(protocol_id)

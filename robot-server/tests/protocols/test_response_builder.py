@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 
 from opentrons.file_runner import ProtocolFileType
-from robot_server.protocols.protocol_store import ProtocolStoreEntry
+from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.protocols.protocol_models import Protocol
 from robot_server.protocols.response_builder import ResponseBuilder
 
@@ -20,7 +20,7 @@ def test_create_single_json_file_response(
     subject: ResponseBuilder,
 ) -> None:
     """It should create a BasicSession if session_data is None."""
-    protocol_entry = ProtocolStoreEntry(
+    protocol_entry = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
         created_at=current_time,
