@@ -110,7 +110,7 @@ async def test_get_missing_protocol_raises(
     json_upload_file: UploadFile,
     subject: ProtocolStore,
 ) -> None:
-    """It should get a single protocol from the store."""
+    """It should raise an error when protocol not found."""
     with pytest.raises(ProtocolNotFoundError, match="protocol-id"):
         subject.get("protocol-id")
 
