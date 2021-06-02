@@ -58,7 +58,8 @@ class ProtocolStore:
     ) -> ProtocolResource:
         """Add a protocol to the store."""
         protocol_dir = self._get_protocol_dir(protocol_id)
-        protocol_dir.mkdir(parents=True, exist_ok=True)
+        # TODO(mc, 2021-06-02): check for protocol collision
+        protocol_dir.mkdir(parents=True)
         saved_files = []
 
         for index, upload_file in enumerate(files):
