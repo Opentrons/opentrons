@@ -1,4 +1,4 @@
-from pydantic import BaseSettings, Field, BaseModel
+from pydantic import BaseSettings, BaseModel
 
 
 class PipetteSettings(BaseModel):
