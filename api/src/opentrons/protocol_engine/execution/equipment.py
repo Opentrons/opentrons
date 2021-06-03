@@ -53,7 +53,7 @@ class EquipmentHandler:
         namespace: str,
         version: int,
         location: LabwareLocation,
-        labware_id: Optional[str],
+        labware_id: Optional[str]
     ) -> LoadedLabware:
         """Load labware by assigning an identifier and pulling required data.
 
@@ -68,9 +68,8 @@ class EquipmentHandler:
         Returns:
             A LoadedLabware object.
         """
-        labware_id = (
-            labware_id if labware_id else self._resources.id_generator.generate_id()
-        )
+        labware_id = labware_id if labware_id else \
+            self._resources.id_generator.generate_id()
 
         try:
             # Try to use existing definition in state.
@@ -134,10 +133,7 @@ class EquipmentHandler:
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 
-        pipette_id = (
-            pipette_id
-            if pipette_id is not None
-            else self._resources.id_generator.generate_id()
-        )
+        pipette_id = pipette_id if pipette_id is not None else \
+            self._resources.id_generator.generate_id()
 
         return LoadedPipette(pipette_id=pipette_id)
