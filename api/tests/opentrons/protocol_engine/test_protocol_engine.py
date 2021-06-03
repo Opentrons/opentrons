@@ -33,9 +33,8 @@ class CloseToNow:
 
     def __eq__(self, other: object) -> bool:
         """Check if a target object is a datetime that is close to now."""
-        return (
-            isinstance(other, datetime) and
-            isclose(self._now.timestamp(), other.timestamp(), rel_tol=5)
+        return isinstance(other, datetime) and isclose(
+            self._now.timestamp(), other.timestamp(), rel_tol=5
         )
 
     def __repr__(self) -> str:
@@ -52,7 +51,7 @@ async def test_create_engine_initializes_state_with_deck_geometry(
     engine = await ProtocolEngine.create(hardware=mock_hardware)
     state = engine.state_store
 
-    assert state.geometry.get_deck_definition() == standard_deck_def
+    assert state.labware.get_deck_definition() == standard_deck_def
     assert state.labware.get_labware_data_by_id(FIXED_TRASH_ID) == LabwareData(
         location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
         uri=uri_from_details(
@@ -66,7 +65,7 @@ async def test_create_engine_initializes_state_with_deck_geometry(
 
 async def test_execute_command_creates_command(
     engine: ProtocolEngine,
-    mock_state_store: MagicMock
+    mock_state_store: MagicMock,
 ) -> None:
     """It should create a command in the state store when executing."""
     req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellName="A1")
@@ -76,9 +75,9 @@ async def test_execute_command_creates_command(
         RunningCommand(
             created_at=cast(datetime, CloseToNow()),
             started_at=cast(datetime, CloseToNow()),
-            request=req
+            request=req,
         ),
-        command_id="unique-id"
+        command_id="unique-id",
     )
 
 
@@ -111,7 +110,7 @@ async def test_execute_command_adds_result_to_state(
     mock_req.get_implementation.return_value = mock_impl
     mock_impl.create_command.return_value = PendingCommand(
         request=mock_req,
-        created_at=now
+        created_at=now,
     )
     mock_impl.execute.return_value = result
 
@@ -145,7 +144,7 @@ async def test_execute_command_adds_error_to_state(
     mock_req.get_implementation.return_value = mock_impl
     mock_impl.create_command.return_value = PendingCommand(
         request=mock_req,
-        created_at=now
+        created_at=now,
     )
     mock_impl.execute.side_effect = error
 
@@ -179,7 +178,7 @@ async def test_execute_command_adds_unexpected_error_to_state(
     mock_req.get_implementation.return_value = mock_impl
     mock_impl.create_command.return_value = PendingCommand(
         request=mock_req,
-        created_at=now
+        created_at=now,
     )
     mock_impl.execute.side_effect = error
 

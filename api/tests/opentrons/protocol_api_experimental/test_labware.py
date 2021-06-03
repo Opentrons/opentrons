@@ -29,7 +29,7 @@ def subject(decoy: Decoy, engine_client: ProtocolEngineClient) -> Labware:
 
 @pytest.fixture
 def labware_definition(
-        minimal_labware_def: dev_types.LabwareDefinition
+    minimal_labware_def: dev_types.LabwareDefinition,
 ) -> LabwareDefinition:
     """Create a labware definition fixture."""
     return LabwareDefinition.parse_obj(minimal_labware_def)
