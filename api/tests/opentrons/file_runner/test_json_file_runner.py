@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 from pathlib import Path
 
-from opentrons.file_runner import JsonFileRunner, JsonProtocolFile
+from opentrons.file_runner import JsonFileRunner, ProtocolFile, ProtocolFileType
 from opentrons.file_runner.json_file_reader import JsonFileReader
 from opentrons.file_runner.command_queue_worker import CommandQueueWorker
 
@@ -44,7 +44,7 @@ def command_queue_worker(decoy: Decoy) -> CommandQueueWorker:
 @pytest.fixture
 def file_reader(
     decoy: Decoy,
-    protocol_file: JsonProtocolFile,
+    protocol_file: ProtocolFile,
     json_protocol: JsonProtocol,
 ) -> JsonFileReader:
     """Create a stubbed JsonFileReader interface."""
@@ -56,14 +56,14 @@ def file_reader(
 
 
 @pytest.fixture
-def protocol_file(decoy: Decoy) -> JsonProtocolFile:
+def protocol_file(decoy: Decoy) -> ProtocolFile:
     """Get a JsonProtocolFile value fixture."""
-    return JsonProtocolFile(file_path=Path("/dev/null"))
+    return ProtocolFile(file_type=ProtocolFileType.JSON, file_path=Path("/dev/null"))
 
 
 @pytest.fixture
 def subject(
-    protocol_file: JsonProtocolFile,
+    protocol_file: ProtocolFile,
     protocol_engine: ProtocolEngine,
     file_reader: JsonFileReader,
     command_translator: CommandTranslator,

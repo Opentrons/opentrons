@@ -5,7 +5,7 @@ from opentrons.protocols.runner import CommandTranslator
 from .abstract_file_runner import AbstractFileRunner
 from .json_file_reader import JsonFileReader
 from .command_queue_worker import CommandQueueWorker
-from .protocol_file import JsonProtocolFile
+from .protocol_file import ProtocolFile
 
 
 class JsonFileRunner(AbstractFileRunner):
@@ -13,7 +13,7 @@ class JsonFileRunner(AbstractFileRunner):
 
     def __init__(
         self,
-        file: JsonProtocolFile,
+        file: ProtocolFile,
         file_reader: JsonFileReader,
         protocol_engine: ProtocolEngine,
         command_translator: CommandTranslator,

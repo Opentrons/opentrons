@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from opentrons.protocols.models import JsonProtocol
-from opentrons.file_runner import JsonProtocolFile
+from opentrons.file_runner import ProtocolFile, ProtocolFileType
 from opentrons.file_runner.json_file_reader import JsonFileReader
 
 
@@ -12,12 +12,12 @@ from opentrons.file_runner.json_file_reader import JsonFileReader
 def json_protocol_file(
     tmpdir: Path,
     json_protocol_dict: dict,
-) -> JsonProtocolFile:
-    """Get a JsonProtocolFile with JSON on-disk."""
+) -> ProtocolFile:
+    """Get a ProtocolFile with JSON on-disk."""
     file_path = tmpdir / "protocol.json"
     file_path.write_text(json.dumps(json_protocol_dict), encoding="utf-8")
 
-    return JsonProtocolFile(file_path=file_path)
+    return ProtocolFile(file_type=ProtocolFileType.JSON, file_path=file_path)
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def subject() -> JsonFileReader:
 
 def test_reads_file(
     json_protocol_dict: dict,
-    json_protocol_file: JsonProtocolFile,
+    json_protocol_file: ProtocolFile,
     subject: JsonFileReader,
 ) -> None:
     """It should read a JSON file into a JsonProtocol model."""

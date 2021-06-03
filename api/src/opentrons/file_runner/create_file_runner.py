@@ -1,5 +1,4 @@
 """Protocol runner factory."""
-from pathlib import Path
 from typing import Optional
 
 from opentrons.protocol_engine import ProtocolEngine
@@ -9,12 +8,11 @@ from .abstract_file_runner import AbstractFileRunner
 from .json_file_runner import JsonFileRunner
 from .json_file_reader import JsonFileReader
 from .command_queue_worker import CommandQueueWorker
-from .protocol_file import ProtocolFileType, JsonProtocolFile
+from .protocol_file import ProtocolFileType, ProtocolFile
 
 
 def create_file_runner(
-    file_type: Optional[ProtocolFileType],
-    file_path: Optional[Path],
+    protocol_file: Optional[ProtocolFile],
     engine: ProtocolEngine,
 ) -> AbstractFileRunner:
     """Construct a wired-up protocol runner instance.
@@ -27,14 +25,9 @@ def create_file_runner(
     Returns:
         A runner appropriate for the requested protocol type.
     """
-    file = None
-
-    if file_path is not None and file_type == ProtocolFileType.JSON:
-        file = JsonProtocolFile(file_path=file_path)
-
-    if isinstance(file, JsonProtocolFile):
+    if protocol_file is not None and protocol_file.file_type == ProtocolFileType.JSON:
         return JsonFileRunner(
-            file=file,
+            file=protocol_file,
             protocol_engine=engine,
             file_reader=JsonFileReader(),
             command_translator=CommandTranslator(),

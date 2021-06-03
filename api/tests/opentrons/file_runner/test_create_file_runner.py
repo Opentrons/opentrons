@@ -2,17 +2,23 @@
 from mock import MagicMock
 from pathlib import Path
 
-from opentrons.file_runner import ProtocolFileType, JsonFileRunner, create_file_runner
+from opentrons.file_runner import (
+    ProtocolFileType,
+    ProtocolFile,
+    JsonFileRunner,
+    create_file_runner,
+)
 
 
 def test_create_json_runner() -> None:
     """It should be able to create a JSON file runner."""
-    file_type = ProtocolFileType.JSON
-    file_path = Path("/dev/null")
+    protocol_file = ProtocolFile(
+        file_type=ProtocolFileType.JSON,
+        file_path=Path("/dev/null"),
+    )
 
     result = create_file_runner(
-        file_type=file_type,
-        file_path=file_path,
+        protocol_file=protocol_file,
         engine=MagicMock(),
     )
 

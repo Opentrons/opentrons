@@ -13,12 +13,7 @@ from .create_file_runner import create_file_runner
 from .abstract_file_runner import AbstractFileRunner
 from .json_file_runner import JsonFileRunner
 from .python_file_runner import PythonFileRunner
-from .protocol_file import (
-    ProtocolFileType,
-    ProtocolFile,
-    JsonProtocolFile,
-    PythonProtocolFile,
-)
+from .protocol_file import ProtocolFileType, ProtocolFile
 
 __all__ = [
     # runner factory
@@ -30,6 +25,4 @@ __all__ = [
     # value objects
     "ProtocolFileType",
     "ProtocolFile",
-    "JsonProtocolFile",
-    "PythonProtocolFile",
 ]
