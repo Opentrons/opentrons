@@ -6,30 +6,32 @@ import uniqBy from 'lodash/uniqBy'
 import { createSelector } from 'reselect'
 import { format } from 'date-fns'
 
+import type { ModuleModel, PipetteModel } from '@opentrons/shared-data'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getCustomLabwareDefinitions } from '../custom-labware/selectors'
 import { getLabwareDefBySlot } from '../protocol/selectors'
 import { getLatestLabwareDef } from '../../assets/labware/getLabware'
 import * as Constants from './constants'
+import { ERROR, FINISHED, PAUSED, RUNNING, STOPPED } from './constants'
 
 import type { State } from '../types'
 import type {
-  Mount,
-  Slot,
-  Pipette,
-  StatePipette,
-  Labware,
-  StateLabware,
-  ConnectionStatus,
-  LabwareCalibrationStatus,
-  LabwareType,
-  SessionStatus,
-  SessionStatusInfo,
-  SessionModule,
-  TipracksByMountMap,
-  NextTiprackPipetteInfo,
   Command,
   CommandNode,
+  ConnectionStatus,
+  Labware,
+  LabwareCalibrationStatus,
+  LabwareType,
+  Mount,
+  NextTiprackPipetteInfo,
+  Pipette,
+  SessionModule,
+  SessionStatus,
+  SessionStatusInfo,
+  Slot,
+  StateLabware,
+  StatePipette,
+  TipracksByMountMap,
 } from './types'
 
 import type { ConnectionState } from './reducer/connection'
@@ -37,8 +39,7 @@ import type {
   CalibrationRequest,
   CalibrationState,
 } from './reducer/calibration'
-import type { SessionState, Request } from './reducer/session'
-import type { PipetteModel, ModuleModel } from '@opentrons/shared-data'
+import type { Request, SessionState } from './reducer/session'
 
 const calibration = (state: State): CalibrationState => state.robot.calibration
 const connection = (state: State): ConnectionState => state.robot.connection
@@ -213,13 +214,13 @@ export const getSessionError: (state: State) => string | null = createSelector(
 )
 
 const getStartTimeMs = (state: State): number | null => {
-  const { startTime, remoteTimeCompensation } = session(state)
+  const { startTime } = session(state)
 
-  if (startTime == null || remoteTimeCompensation === null) {
+  if (startTime == null) {
     return null
   }
 
-  return startTime + remoteTimeCompensation
+  return startTime
 }
 
 export const getStartTime: (state: State) => string | null = createSelector(
@@ -229,16 +230,50 @@ export const getStartTime: (state: State) => string | null = createSelector(
   }
 )
 
+const millisToSeconds = (ms: number) => Math.floor(Math.max(0, ms) / 1000)
+
 export const getRunSeconds: (state: State) => number = createSelector(
   getStartTimeMs,
-  (state: State) => session(state).runTime,
+  getSessionStatusInfo,
+  getIsRunning,
+  getIsDone,
   (
-    startTime: number | null | undefined,
-    runTime: number | null | undefined
+    startTime: number | null,
+    statusInfo: SessionStatusInfo,
+    isRunning: boolean,
+    isDone: boolean
   ): number => {
-    return runTime && startTime && runTime > startTime
-      ? Math.floor((runTime - startTime) / 1000)
-      : 0
+    if (startTime !== null) {
+      if (isRunning) {
+        return millisToSeconds(Date.now() - startTime)
+      }
+      if (isDone) {
+        // ce: not sure what to do here if `sessionStatusInfo.changedAt` is null. Seems
+        // that it should logically be impossible. Is it safe to use the non-null assertion operator (!)?
+        if (statusInfo.changedAt === null) {
+          return millisToSeconds(Date.now() - startTime)
+        }
+        return millisToSeconds(statusInfo.changedAt)
+      }
+    }
+    return 0
+  }
+)
+
+export const getPausedSeconds: (state: State) => number = createSelector(
+  getStartTimeMs,
+  getSessionStatusInfo,
+  getIsPaused,
+  (
+    startTime: number | null,
+    statusInfo: SessionStatusInfo,
+    isPaused: boolean
+  ): number => {
+    if (isPaused && startTime !== null && statusInfo.changedAt != null) {
+      console.log('getPausedSeconds', statusInfo)
+      return millisToSeconds(Date.now() - startTime - statusInfo.changedAt)
+    }
+    return 0
   }
 )
 
@@ -252,6 +287,11 @@ export function formatSeconds(runSeconds: number): string {
 
 export const getRunTime: (state: State) => string = createSelector(
   getRunSeconds,
+  formatSeconds
+)
+
+export const getPausedTime: (state: State) => string = createSelector(
+  getPausedSeconds,
   formatSeconds
 )
 

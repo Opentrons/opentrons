@@ -275,7 +275,7 @@ describe('robot selectors', () => {
 
   it('getStartTime returns local formatted time', () => {
     const state = makeState({
-      session: { startTime: 1582926000, remoteTimeCompensation: -6000 },
+      session: { startTime: 1582926000 },
     } as any)
     expect(getStartTime(state)).toBe(format(1582920000, 'pp'))
   })
@@ -293,26 +293,12 @@ describe('robot selectors', () => {
     expect(getRunTime(state)).toEqual('00:00:00')
   })
 
-  it('getRunTime with no remoteTimeCompensation', () => {
-    const state: State = {
-      robot: {
-        session: {
-          remoteTimeCompensation: null,
-          startTime: 40,
-          runTime: 42,
-        },
-      },
-    } as any
-
-    expect(getRunTime(state)).toEqual('00:00:00')
-  })
-
+  // ce: update the runtime tests
   it('getRunTime', () => {
     const testGetRunTime = (seconds: number, expected: string): void => {
       const stateWithRunTime: State = {
         robot: {
           session: {
-            remoteTimeCompensation: 0,
             startTime: 42,
             runTime: 42 + 1000 * seconds,
           },

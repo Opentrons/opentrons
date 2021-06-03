@@ -42,9 +42,7 @@ describe('robot reducer - session', () => {
       pauseRequest: { inProgress: false, error: null },
       resumeRequest: { inProgress: false, error: null },
       cancelRequest: { inProgress: false, error: null },
-      remoteTimeCompensation: null,
       startTime: null,
-      runTime: 0,
       apiLevel: null,
     })
   })
@@ -79,6 +77,7 @@ describe('robot reducer - session', () => {
     expect(reducer(state, action).session).toEqual(expected)
   })
 
+  // ce: update the runTime tests
   it('handles protocol:UPLOAD action', () => {
     const initialState = reducer(undefined, {} as any).session
     const state: RobotState = {
@@ -114,7 +113,6 @@ describe('robot reducer - session', () => {
 
     expect(reducer(state, action).session).toEqual({
       sessionRequest: { inProgress: true, error: null },
-      remoteTimeCompensation: null,
       startTime: null,
       runTime: 0,
     })
@@ -170,7 +168,6 @@ describe('robot reducer - session', () => {
       session: {
         state: 'loaded',
         startTime: null,
-        remoteTimeCompensation: null,
         protocolCommands: [0, 1, 2],
         protocolCommandsById: {
           0: { id: 0, handledAt: 2 },
@@ -191,7 +188,6 @@ describe('robot reducer - session', () => {
 
     expect(reducer(state, action).session).toEqual({
       state: 'running',
-      remoteTimeCompensation: 3,
       startTime: 1,
       protocolCommands: [0, 1, 2],
       protocolCommandsById: {
@@ -243,13 +239,6 @@ describe('robot reducer - session', () => {
     expect(reducer(state, action).session).toEqual({
       runRequest: { inProgress: false, error: new Error('AH') },
     })
-  })
-
-  it('handles TICK_RUN_TIME', () => {
-    const state: RobotState = { session: { runTime: 0 } } as any
-    const action: Action = { type: actionTypes.TICK_RUN_TIME } as any
-
-    expect(reducer(state, action).session).toEqual({ runTime: now })
   })
 
   it('handles PAUSE action', () => {

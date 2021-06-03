@@ -388,7 +388,6 @@ export function client(dispatch) {
   }
 
   function run(state, action) {
-    setRunTimerInterval()
     remote.session_manager.session
       .run()
       .then(() => dispatch(actions.runResponse()))
@@ -426,29 +425,8 @@ export function client(dispatch) {
       .catch(error => dispatch(actions.sessionResponse(error)))
   }
 
-  function setRunTimerInterval() {
-    if (runTimerInterval === NO_INTERVAL) {
-      runTimerInterval = setInterval(
-        () => dispatch(actions.tickRunTime()),
-        RUN_TIME_TICK_INTERVAL_MS
-      )
-    }
-  }
-
-  function clearRunTimerInterval() {
-    clearInterval(runTimerInterval)
-    runTimerInterval = NO_INTERVAL
-  }
-
   function handleApiSession(apiSession) {
     const update = { state: apiSession.state, startTime: apiSession.startTime }
-
-    // ensure run timer is running or stopped
-    if (update.state === constants.RUNNING) {
-      setRunTimerInterval()
-    } else {
-      clearRunTimerInterval()
-    }
 
     update.statusInfo = {
       message: apiSession.stateInfo?.message ?? null,

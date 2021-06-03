@@ -20,6 +20,18 @@
 .run_time {
   padding: var(--run-panel-padding);
   font-weight: var(--fw-semibold);
+  font-size: var(--fs-big);
+  color: var(--c-med-gray);
+  text-transform: uppercase;
+
+  & > p {
+    font-size: var(--fs-body-2);
+  }
+}
+
+.pause_time {
+  padding: var(--run-panel-padding);
+  font-weight: var(--fw-semibold);
   font-size: var(--fs-huge);
   color: var(--c-med-gray);
   text-transform: uppercase;

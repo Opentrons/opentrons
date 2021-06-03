@@ -41,9 +41,7 @@ export interface SessionState {
   pauseRequest: Request
   resumeRequest: Request
   cancelRequest: Request
-  remoteTimeCompensation: number | null
   startTime: number | null | undefined
-  runTime: number
   apiLevel: [number, number] | null
   capabilities: string[]
 }
@@ -58,7 +56,6 @@ const {
   RESUME_RESPONSE,
   CANCEL,
   CANCEL_RESPONSE,
-  TICK_RUN_TIME,
 } = actionTypes
 
 const INITIAL_STATE: SessionState = {
@@ -88,9 +85,7 @@ const INITIAL_STATE: SessionState = {
   pauseRequest: { inProgress: false, error: null },
   resumeRequest: { inProgress: false, error: null },
   cancelRequest: { inProgress: false, error: null },
-  remoteTimeCompensation: null,
   startTime: null,
-  runTime: 0,
   apiLevel: null,
 }
 
@@ -150,8 +145,6 @@ export function sessionReducer(
       return handleCancel(state, action)
     case CANCEL_RESPONSE:
       return handleCancelResponse(state, action)
-    case TICK_RUN_TIME:
-      return handleTickRunTime(state, action)
   }
 
   return state
@@ -165,7 +158,7 @@ function handleSessionUpdate(
     payload: { state: sessionStateUpdate, startTime, lastCommand },
     meta: { now },
   } = action
-  let { protocolCommandsById, remoteTimeCompensation } = state
+  let { protocolCommandsById } = state
 
   if (lastCommand) {
     const command = {
@@ -176,14 +169,6 @@ function handleSessionUpdate(
     protocolCommandsById = {
       ...protocolCommandsById,
       [lastCommand.id]: command,
-    }
-  }
-
-  // compensate for clock differences between the robot and app
-  if (remoteTimeCompensation === null) {
-    const latestRemoteTime = lastCommand?.handledAt || startTime
-    if (latestRemoteTime) {
-      remoteTimeCompensation = now - latestRemoteTime
     }
   }
 
@@ -200,7 +185,6 @@ function handleSessionUpdate(
     statusInfo: action.payload.statusInfo,
     doorState: action.payload.doorState,
     blocked: action.payload.blocked,
-    remoteTimeCompensation,
     startTime,
     protocolCommandsById,
   }
@@ -209,9 +193,8 @@ function handleSessionUpdate(
 function handleSessionInProgress(state: SessionState): SessionState {
   return {
     ...state,
-    runTime: 0,
+    // ce: seems like `startTime` can go?
     startTime: null,
-    remoteTimeCompensation: null,
     sessionRequest: { inProgress: true, error: null },
   }
 }
@@ -249,7 +232,7 @@ function handleInvalidFile(
 }
 
 function handleRun(state: SessionState, action: any): SessionState {
-  return { ...state, runTime: 0, runRequest: { inProgress: true, error: null } }
+  return { ...state, runRequest: { inProgress: true, error: null } }
 }
 
 function handleRunResponse(state: SessionState, action: any): SessionState {
@@ -260,10 +243,6 @@ function handleRunResponse(state: SessionState, action: any): SessionState {
   }
 
   return { ...state, runRequest: { inProgress: false, error: null } }
-}
-
-function handleTickRunTime(state: SessionState, action: any): SessionState {
-  return { ...state, runTime: Date.now() }
 }
 
 function handlePause(state: SessionState, action: any): SessionState {

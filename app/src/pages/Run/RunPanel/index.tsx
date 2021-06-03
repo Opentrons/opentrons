@@ -23,6 +23,7 @@ interface SP {
   isBlocked: boolean
   modulesReady: boolean
   runTime: string
+  pauseTime: string
   disabled: boolean
 }
 
@@ -43,6 +44,8 @@ const mapStateToProps = (state: State): SP => ({
   isBlocked: robotSelectors.getIsBlocked(state),
   modulesReady: getMissingModules(state).length === 0,
   runTime: robotSelectors.getRunTime(state),
+  // ce-added: pauseTime
+  pauseTime: robotSelectors.getPausedTime(state),
   disabled:
     !robotSelectors.getSessionIsLoaded(state) ||
     robotSelectors.getCancelInProgress(state) ||
@@ -60,7 +63,11 @@ function RunPanelComponent(props: Props): JSX.Element {
   return (
     <SidePanel title="Execute Run">
       <SidePanelGroup>
-        <RunTimer startTime={props.startTime} runTime={props.runTime} />
+        <RunTimer
+          startTime={props.startTime}
+          runTime={props.runTime}
+          pauseTime={props.pauseTime}
+        />
         <RunControls
           disabled={props.disabled}
           modulesReady={props.modulesReady}
