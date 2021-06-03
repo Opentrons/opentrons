@@ -1,4 +1,6 @@
 """Tests for the create_protocol_runner factory."""
+# TODO(mc, 2021-06-03): turn these into actual integration tests
+# that uses real protocol files
 from mock import MagicMock
 from pathlib import Path
 

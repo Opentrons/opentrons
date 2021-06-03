@@ -34,4 +34,6 @@ def test_reads_file(
     """It should read a JSON file into a JsonProtocol model."""
     result = subject.read(json_protocol_file)
 
+    # TODO(mc, 2021-06-03): this `parse_obj` is sort of mirroring
+    # the implementation exactly; rethink and revisit
     assert result == JsonProtocol.parse_obj(json_protocol_dict)
