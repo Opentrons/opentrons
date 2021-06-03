@@ -7,7 +7,7 @@ class PythonFileRunner(AbstractFileRunner):
 
     def load(self) -> None:
         """Prepare to run the Python protocol file."""
-        raise NotImplementedError()
+        raise NotImplementedError("Python protocol loading not implemented")
 
     def play(self) -> None:
         """Start (or un-pause) running the Python protocol file."""
