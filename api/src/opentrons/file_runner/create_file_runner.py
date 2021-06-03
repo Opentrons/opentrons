@@ -18,8 +18,8 @@ def create_file_runner(
     """Construct a wired-up protocol runner instance.
 
     Arguments:
-        file: Protocol file the runner will be using. If `None`, returns
-            a basic runner for ProtocolEngine usage without a file.
+        protocol_file: Protocol file the runner will be using. If `None`,
+            returns a basic runner for ProtocolEngine usage without a file.
         engine: The protocol engine interface the runner will use.
 
     Returns:
