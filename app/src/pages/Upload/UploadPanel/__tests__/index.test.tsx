@@ -4,7 +4,6 @@ import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../../i18n'
 
-import * as Fixtures from '../../../../redux/discovery/__fixtures__'
 import * as Config from '../../../../redux/config'
 import * as RobotSelectors from '../../../../redux/robot/selectors'
 import * as ProtocolSelectors from '../../../../redux/protocol/selectors'

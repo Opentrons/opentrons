@@ -13,8 +13,6 @@ export function ProtocolUpload(): JSX.Element {
     <Page titleBarProps={titleBarProps}>
       <Flex height="100%" width="100%" backgroundColor={C_NEAR_WHITE} flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
         <UploadInput
-          filename={null}
-          sessionLoaded={false}
           createSession={(file) => {
             console.log('TODO: create HTTP protocol session', file)
           }}/>
