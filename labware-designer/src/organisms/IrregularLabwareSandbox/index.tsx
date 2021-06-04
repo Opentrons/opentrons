@@ -87,7 +87,7 @@ export function IrregularLabwareSandbox(): JSX.Element {
           onChange={event => {
             setRawOptions(event.target.value)
             try {
-              setLabwareToRender(createIrregularLabware(JSON.parse(rawOptions)))
+              setLabwareToRender(createIrregularLabware(JSON.parse(event.target.value)))
             } catch (error) {
               console.log('Failed to parse options as JSON', error)
             }
