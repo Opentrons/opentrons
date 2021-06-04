@@ -22,7 +22,7 @@ from opentrons.drivers.thermocycler import (
 MODULE_LOG = logging.getLogger(__name__)
 
 POLLING_FREQUENCY_SEC = 1.0
-SIM_POLLING_FREQUENCY_SEC = 0.001
+SIM_POLLING_FREQUENCY_SEC = POLLING_FREQUENCY_SEC / 20.0
 
 TEMP_UPDATE_RETRIES = 50
 
