@@ -3,16 +3,17 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import {
   fixtureP10Single,
   fixtureP300Multi,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { TEMPERATURE_DEACTIVATED, FIXED_TRASH_ID } from '../constants'
+import _fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../constants'
 import {
   AIR,
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -27,130 +28,93 @@ import {
 import { Diff, thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { DEFAULT_CONFIG } from '../fixtures'
 import { orderWells, thermocyclerPipetteCollision } from '../utils'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type {
-  RobotState,
+import type { RobotState } from '../'
+import {
+  ThermocyclerModuleState,
   ThermocyclerStateStepArgs,
   WellOrderOption,
 } from '../types'
 
+const fixtureTrash = _fixtureTrash as LabwareDefinition2
+const fixture96Plate = _fixture96Plate as LabwareDefinition2
+const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
+const fixtureTiprack300ul = _fixtureTiprack300ul as LabwareDefinition2
+
 describe('splitLiquid', () => {
   const singleIngred = {
-    ingred1: {
-      volume: 100,
-    },
+    ingred1: { volume: 100 },
   }
+
   const twoIngred = {
-    ingred1: {
-      volume: 100,
-    },
-    ingred2: {
-      volume: 300,
-    },
+    ingred1: { volume: 100 },
+    ingred2: { volume: 300 },
   }
+
   it('simple split with 1 ingredient in source', () => {
     expect(splitLiquid(60, singleIngred)).toEqual({
-      source: {
-        ingred1: {
-          volume: 40,
-        },
-      },
-      dest: {
-        ingred1: {
-          volume: 60,
-        },
-      },
+      source: { ingred1: { volume: 40 } },
+      dest: { ingred1: { volume: 60 } },
     })
   })
+
   it('get 0 volume in source when you split it all', () => {
     expect(splitLiquid(100, singleIngred)).toEqual({
-      source: {
-        ingred1: {
-          volume: 0,
-        },
-      },
-      dest: {
-        ingred1: {
-          volume: 100,
-        },
-      },
+      source: { ingred1: { volume: 0 } },
+      dest: { ingred1: { volume: 100 } },
     })
   })
+
   it('split with 2 ingredients in source', () => {
     expect(splitLiquid(20, twoIngred)).toEqual({
       source: {
-        ingred1: {
-          volume: 95,
-        },
-        ingred2: {
-          volume: 285,
-        },
+        ingred1: { volume: 95 },
+        ingred2: { volume: 285 },
       },
       dest: {
-        ingred1: {
-          volume: 5,
-        },
-        ingred2: {
-          volume: 15,
-        },
+        ingred1: { volume: 5 },
+        ingred2: { volume: 15 },
       },
     })
   })
+
   it('split all with 2 ingredients', () => {
     expect(splitLiquid(400, twoIngred)).toEqual({
       source: {
-        ingred1: {
-          volume: 0,
-        },
-        ingred2: {
-          volume: 0,
-        },
+        ingred1: { volume: 0 },
+        ingred2: { volume: 0 },
       },
       dest: twoIngred,
     })
   })
+
   it('taking out 0 volume results in same source, empty dest', () => {
     expect(splitLiquid(0, twoIngred)).toEqual({
       source: twoIngred,
       dest: {
-        ingred1: {
-          volume: 0,
-        },
-        ingred2: {
-          volume: 0,
-        },
+        ingred1: { volume: 0 },
+        ingred2: { volume: 0 },
       },
     })
   })
+
   it('split with 2 ingreds, one has 0 vol', () => {
     expect(
       splitLiquid(50, {
-        ingred1: {
-          volume: 200,
-        },
-        ingred2: {
-          volume: 0,
-        },
+        ingred1: { volume: 200 },
+        ingred2: { volume: 0 },
       })
     ).toEqual({
       source: {
-        ingred1: {
-          volume: 150,
-        },
-        ingred2: {
-          volume: 0,
-        },
+        ingred1: { volume: 150 },
+        ingred2: { volume: 0 },
       },
       dest: {
-        ingred1: {
-          volume: 50,
-        },
-        ingred2: {
-          volume: 0,
-        },
+        ingred1: { volume: 50 },
+        ingred2: { volume: 0 },
       },
     })
   })
+
   it('split with 2 ingredients, floating-point volume', () => {
     expect(
       splitLiquid(
@@ -159,200 +123,104 @@ describe('splitLiquid', () => {
       )
     ).toEqual({
       source: {
-        ingred1: {
-          volume: 100 - (0.25 * 1000) / 3,
-        },
-        ingred2: {
-          volume: 50,
-        },
+        ingred1: { volume: 100 - (0.25 * 1000) / 3 },
+        ingred2: { volume: 50 },
       },
       dest: {
-        ingred1: {
-          volume: (0.25 * 1000) / 3,
-        },
-        ingred2: {
-          volume: 250,
-        },
+        ingred1: { volume: (0.25 * 1000) / 3 },
+        ingred2: { volume: 250 },
       },
     })
   })
+
   it('splitting with no ingredients in source just splits "air"', () => {
     expect(splitLiquid(100, {})).toEqual({
       source: {},
-      dest: {
-        [AIR]: {
-          volume: 100,
-        },
-      },
+      dest: { [AIR]: { volume: 100 } },
     })
   })
+
   it('splitting with 0 volume in source just splits "air"', () => {
-    expect(
-      splitLiquid(100, {
-        ingred1: {
-          volume: 0,
-        },
-      })
-    ).toEqual({
-      source: {
-        ingred1: {
-          volume: 0,
-        },
-      },
-      dest: {
-        [AIR]: {
-          volume: 100,
-        },
-      },
+    expect(splitLiquid(100, { ingred1: { volume: 0 } })).toEqual({
+      source: { ingred1: { volume: 0 } },
+      dest: { [AIR]: { volume: 100 } },
     })
   })
+
   it('splitting with excessive volume leaves "air" in dest', () => {
     expect(
-      splitLiquid(100, {
-        ingred1: {
-          volume: 50,
-        },
-        ingred2: {
-          volume: 20,
-        },
-      })
+      splitLiquid(100, { ingred1: { volume: 50 }, ingred2: { volume: 20 } })
     ).toEqual({
-      source: {
-        ingred1: {
-          volume: 0,
-        },
-        ingred2: {
-          volume: 0,
-        },
-      },
+      source: { ingred1: { volume: 0 }, ingred2: { volume: 0 } },
       dest: {
-        ingred1: {
-          volume: 50,
-        },
-        ingred2: {
-          volume: 20,
-        },
-        [AIR]: {
-          volume: 30,
-        },
+        ingred1: { volume: 50 },
+        ingred2: { volume: 20 },
+        [AIR]: { volume: 30 },
       },
     })
   })
+
   // TODO Ian 2018-03-19 figure out what to do with air warning reporting
-  it.todo('splitting with air in source should do something (throw error???)') // expect(() =>
+  it.todo('splitting with air in source should do something (throw error???)')
+  // expect(() =>
   // splitLiquid(50, { ingred1: { volume: 100 }, [AIR]: { volume: 20 } })
   // ).toThrow(/source cannot contain air/)
 })
+
 describe('mergeLiquid', () => {
   it('merge ingreds 1 2 with 2 3 to get 1 2 3', () => {
     expect(
       mergeLiquid(
         {
-          ingred1: {
-            volume: 30,
-          },
-          ingred2: {
-            volume: 40,
-          },
+          ingred1: { volume: 30 },
+          ingred2: { volume: 40 },
         },
         {
-          ingred2: {
-            volume: 15,
-          },
-          ingred3: {
-            volume: 25,
-          },
+          ingred2: { volume: 15 },
+          ingred3: { volume: 25 },
         }
       )
     ).toEqual({
-      ingred1: {
-        volume: 30,
-      },
-      ingred2: {
-        volume: 55,
-      },
-      ingred3: {
-        volume: 25,
-      },
+      ingred1: { volume: 30 },
+      ingred2: { volume: 55 },
+      ingred3: { volume: 25 },
     })
   })
+
   it('merge ingreds 3 with 1 2 to get 1 2 3', () => {
     expect(
       mergeLiquid(
         {
-          ingred3: {
-            volume: 25,
-          },
+          ingred3: { volume: 25 },
         },
         {
-          ingred1: {
-            volume: 30,
-          },
-          ingred2: {
-            volume: 40,
-          },
+          ingred1: { volume: 30 },
+          ingred2: { volume: 40 },
         }
       )
     ).toEqual({
-      ingred1: {
-        volume: 30,
-      },
-      ingred2: {
-        volume: 40,
-      },
-      ingred3: {
-        volume: 25,
-      },
+      ingred1: { volume: 30 },
+      ingred2: { volume: 40 },
+      ingred3: { volume: 25 },
     })
   })
 })
+
 describe('repeatArray', () => {
   it('repeat array of objects', () => {
-    expect(
-      repeatArray(
-        [
-          {
-            a: 1,
-          },
-          {
-            b: 2,
-          },
-          {
-            c: 3,
-          },
-        ],
-        3
-      )
-    ).toEqual([
-      {
-        a: 1,
-      },
-      {
-        b: 2,
-      },
-      {
-        c: 3,
-      },
-      {
-        a: 1,
-      },
-      {
-        b: 2,
-      },
-      {
-        c: 3,
-      },
-      {
-        a: 1,
-      },
-      {
-        b: 2,
-      },
-      {
-        c: 3,
-      },
+    expect(repeatArray([{ a: 1 }, { b: 2 }, { c: 3 }], 3)).toEqual([
+      { a: 1 },
+      { b: 2 },
+      { c: 3 },
+      { a: 1 },
+      { b: 2 },
+      { c: 3 },
+      { a: 1 },
+      { b: 2 },
+      { c: 3 },
     ])
   })
+
   it('repeat array of arrays', () => {
     expect(
       repeatArray(
@@ -374,6 +242,7 @@ describe('repeatArray', () => {
     ])
   })
 })
+
 describe('makeInitialRobotState', () => {
   expect(
     makeInitialRobotState({
@@ -383,20 +252,16 @@ describe('makeInitialRobotState', () => {
           p10SingleId: {
             id: 'p10SingleId',
             name: 'p10_single',
-            spec: fixtureP10Single as any,
-            tiprackDefURI: getLabwareDefURI(
-              fixture_tiprack_10_ul as LabwareDefinition2
-            ),
-            tiprackLabwareDef: fixture_tiprack_10_ul as LabwareDefinition2,
+            spec: fixtureP10Single,
+            tiprackDefURI: getLabwareDefURI(fixtureTiprack10ul),
+            tiprackLabwareDef: fixtureTiprack10ul,
           },
           p300MultiId: {
             id: 'p300MultiId',
             name: 'p300_multi',
-            spec: fixtureP300Multi as any,
-            tiprackDefURI: getLabwareDefURI(
-              fixture_tiprack_300_ul as LabwareDefinition2
-            ),
-            tiprackLabwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+            spec: fixtureP300Multi,
+            tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
+            tiprackLabwareDef: fixtureTiprack300ul,
           },
         },
         moduleEntities: {
@@ -409,47 +274,31 @@ describe('makeInitialRobotState', () => {
         labwareEntities: {
           somePlateId: {
             id: 'somePlateId',
-            labwareDefURI: getLabwareDefURI(
-              fixture_96_plate as LabwareDefinition2
-            ),
-            def: fixture_96_plate as LabwareDefinition2,
+            labwareDefURI: getLabwareDefURI(fixture96Plate),
+            def: fixture96Plate,
           },
           tiprack10Id: {
             id: 'tiprack10Id',
-            labwareDefURI: getLabwareDefURI(
-              fixture_tiprack_10_ul as LabwareDefinition2
-            ),
-            def: fixture_tiprack_10_ul as LabwareDefinition2,
+            labwareDefURI: getLabwareDefURI(fixtureTiprack10ul),
+            def: fixtureTiprack10ul,
           },
           tiprack300Id: {
             id: 'tiprack300Id',
-            labwareDefURI: getLabwareDefURI(
-              fixture_tiprack_300_ul as LabwareDefinition2
-            ),
-            def: fixture_tiprack_300_ul as LabwareDefinition2,
+            labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
+            def: fixtureTiprack300ul,
           },
           trashId: {
             id: FIXED_TRASH_ID,
-            labwareDefURI: getLabwareDefURI(
-              fixture_trash as LabwareDefinition2
-            ),
-            def: fixture_trash as LabwareDefinition2,
+            labwareDefURI: getLabwareDefURI(fixtureTrash),
+            def: fixtureTrash,
           },
         },
       },
       labwareLocations: {
-        somePlateId: {
-          slot: '1',
-        },
-        tiprack10Id: {
-          slot: '2',
-        },
-        tiprack300Id: {
-          slot: '4',
-        },
-        trashId: {
-          slot: '12',
-        },
+        somePlateId: { slot: '1' },
+        tiprack10Id: { slot: '2' },
+        tiprack300Id: { slot: '4' },
+        trashId: { slot: '12' },
       },
       moduleLocations: {
         someTempModuleId: {
@@ -462,16 +311,13 @@ describe('makeInitialRobotState', () => {
         },
       },
       pipetteLocations: {
-        p10SingleId: {
-          mount: 'left',
-        },
-        p300MultiId: {
-          mount: 'right',
-        },
+        p10SingleId: { mount: 'left' },
+        p300MultiId: { mount: 'right' },
       },
     })
   ).toMatchSnapshot()
 })
+
 describe('thermocyclerStateDiff', () => {
   const getInitialDiff = (): Diff => ({
     lidOpen: false,
@@ -481,9 +327,13 @@ describe('thermocyclerStateDiff', () => {
     setLidTemperature: false,
     deactivateLidTemperature: false,
   })
-
   const thermocyclerId = 'thermocyclerId'
-  const testCases = [
+  const testCases: Array<{
+    testMsg: string
+    moduleState: ThermocyclerModuleState
+    args: ThermocyclerStateStepArgs
+    expected: Diff
+  }> = [
     {
       testMsg: 'returns lidOpen when the lid state has changed to open',
       moduleState: {
@@ -499,7 +349,10 @@ describe('thermocyclerStateDiff', () => {
         lidTargetTemp: null,
         lidOpen: true,
       },
-      expected: { ...getInitialDiff(), lidOpen: true },
+      expected: {
+        ...getInitialDiff(),
+        lidOpen: true,
+      },
     },
     {
       testMsg:
@@ -517,7 +370,11 @@ describe('thermocyclerStateDiff', () => {
         lidTargetTemp: null,
         lidOpen: false,
       },
-      expected: { ...getInitialDiff(), lidOpen: false, lidClosed: true },
+      expected: {
+        ...getInitialDiff(),
+        lidOpen: false,
+        lidClosed: true,
+      },
     },
     {
       testMsg: 'returns lidClosed when the lid state has changed to closed',
@@ -534,7 +391,10 @@ describe('thermocyclerStateDiff', () => {
         lidTargetTemp: null,
         lidOpen: false,
       },
-      expected: { ...getInitialDiff(), lidClosed: true },
+      expected: {
+        ...getInitialDiff(),
+        lidClosed: true,
+      },
     },
     {
       testMsg:
@@ -552,7 +412,11 @@ describe('thermocyclerStateDiff', () => {
         lidTargetTemp: null,
         lidOpen: true,
       },
-      expected: { ...getInitialDiff(), lidClosed: false, lidOpen: true },
+      expected: {
+        ...getInitialDiff(),
+        lidClosed: false,
+        lidOpen: true,
+      },
     },
     {
       testMsg:
@@ -570,7 +434,10 @@ describe('thermocyclerStateDiff', () => {
         lidTargetTemp: 20,
         lidOpen: false,
       },
-      expected: { ...getInitialDiff(), setLidTemperature: true },
+      expected: {
+        ...getInitialDiff(),
+        setLidTemperature: true,
+      },
     },
     {
       testMsg:
@@ -588,7 +455,10 @@ describe('thermocyclerStateDiff', () => {
         lidTargetTemp: 30,
         lidOpen: false,
       },
-      expected: { ...getInitialDiff(), setLidTemperature: true },
+      expected: {
+        ...getInitialDiff(),
+        setLidTemperature: true,
+      },
     },
     {
       testMsg:
@@ -606,7 +476,10 @@ describe('thermocyclerStateDiff', () => {
         lidTargetTemp: 20,
         lidOpen: false,
       },
-      expected: { ...getInitialDiff(), setLidTemperature: false },
+      expected: {
+        ...getInitialDiff(),
+        setLidTemperature: false,
+      },
     },
     {
       testMsg:
@@ -624,7 +497,10 @@ describe('thermocyclerStateDiff', () => {
         lidTargetTemp: null,
         lidOpen: false,
       },
-      expected: { ...getInitialDiff(), deactivateLidTemperature: true },
+      expected: {
+        ...getInitialDiff(),
+        deactivateLidTemperature: true,
+      },
     },
     {
       testMsg:
@@ -642,7 +518,10 @@ describe('thermocyclerStateDiff', () => {
         lidTargetTemp: null,
         lidOpen: false,
       },
-      expected: { ...getInitialDiff(), setBlockTemperature: true },
+      expected: {
+        ...getInitialDiff(),
+        setBlockTemperature: true,
+      },
     },
     {
       testMsg:
@@ -660,7 +539,9 @@ describe('thermocyclerStateDiff', () => {
         lidTargetTemp: null,
         lidOpen: false,
       },
-      expected: { ...getInitialDiff() },
+      expected: {
+        ...getInitialDiff(),
+      },
     },
     {
       testMsg:
@@ -678,7 +559,10 @@ describe('thermocyclerStateDiff', () => {
         lidTargetTemp: null,
         lidOpen: false,
       },
-      expected: { ...getInitialDiff(), setBlockTemperature: true },
+      expected: {
+        ...getInitialDiff(),
+        setBlockTemperature: true,
+      },
     },
     {
       testMsg: 'returns deactivate block when temp goes from number to null',
@@ -695,20 +579,23 @@ describe('thermocyclerStateDiff', () => {
         lidTargetTemp: null,
         lidOpen: false,
       },
-      expected: { ...getInitialDiff(), deactivateBlockTemperature: true },
+      expected: {
+        ...getInitialDiff(),
+        deactivateBlockTemperature: true,
+      },
     },
   ]
   testCases.forEach(({ testMsg, moduleState, args, expected }) => {
     it(testMsg, () => {
-      expect(
-        thermocyclerStateDiff(moduleState, args as ThermocyclerStateStepArgs)
-      ).toEqual(expected)
+      expect(thermocyclerStateDiff(moduleState, args)).toEqual(expected)
     })
   })
 })
+
 describe('thermocyclerPipetteColision', () => {
   const thermocyclerId = 'thermocyclerId'
   const labwareOnTCId = 'labwareOnTCId'
+
   const testCases: Array<{
     testMsg: string
     modules: RobotState['modules']
@@ -731,9 +618,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: {
-          slot: thermocyclerId,
-        }, // when labware is on a module, the slot is the module's id
+        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
       },
       labwareId: labwareOnTCId,
       expected: true,
@@ -753,9 +638,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: {
-          slot: thermocyclerId,
-        }, // when labware is on a module, the slot is the module's id
+        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
       },
       labwareId: labwareOnTCId,
       expected: true,
@@ -775,9 +658,7 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: {
-          slot: thermocyclerId,
-        }, // when labware is on a module, the slot is the module's id
+        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
       },
       labwareId: labwareOnTCId,
       expected: false,
@@ -797,14 +678,13 @@ describe('thermocyclerPipetteColision', () => {
         },
       },
       labware: {
-        [labwareOnTCId]: {
-          slot: thermocyclerId,
-        },
+        [labwareOnTCId]: { slot: thermocyclerId },
       },
       labwareId: 'someOtherLabwareNotOnTC',
       expected: false,
     },
   ]
+
   testCases.forEach(({ testMsg, modules, labware, labwareId, expected }) => {
     it(testMsg, () => {
       expect(thermocyclerPipetteCollision(modules, labware, labwareId)).toBe(
@@ -813,6 +693,7 @@ describe('thermocyclerPipetteColision', () => {
     })
   })
 })
+
 describe('getDispenseAirGapLocation', () => {
   let sourceLabware: string
   let destLabware: string
@@ -861,34 +742,28 @@ describe('getDispenseAirGapLocation', () => {
     })
   })
 })
+
 describe('getLocationTotalVolume', () => {
   it('should return the sum of all non-AIR volumes', () => {
     const result = getLocationTotalVolume({
-      a: {
-        volume: 2,
-      },
-      b: {
-        volume: 4,
-      },
-      [AIR]: {
-        volume: 100,
-      },
+      a: { volume: 2 },
+      b: { volume: 4 },
+      [AIR]: { volume: 100 },
     })
     expect(result).toEqual(2 + 4)
   })
+
   it('should return 0 for empty location', () => {
     const result = getLocationTotalVolume({})
     expect(result).toEqual(0)
   })
+
   it('should return 0 location with only AIR', () => {
-    const result = getLocationTotalVolume({
-      [AIR]: {
-        volume: 123,
-      },
-    })
+    const result = getLocationTotalVolume({ [AIR]: { volume: 123 } })
     expect(result).toEqual(0)
   })
 })
+
 describe('orderWells', () => {
   const orderTuples: Array<[WellOrderOption, WellOrderOption]> = [
     ['t2b', 'l2r'],
@@ -900,6 +775,7 @@ describe('orderWells', () => {
     ['r2l', 't2b'],
     ['r2l', 'b2t'],
   ]
+
   describe('regular labware', () => {
     const regularOrdering = [
       ['A1', 'B1'],
@@ -928,12 +804,13 @@ describe('orderWells', () => {
     }
     orderTuples.forEach(tuple => {
       it(`first ${tuple[0]} then ${tuple[1]}`, () => {
-        expect(orderWells(regularOrdering, tuple[0], tuple[1])).toEqual(
+        expect(orderWells(regularOrdering, ...tuple)).toEqual(
           regularAnswerMap[tuple[0]][tuple[1]]
         )
       })
     })
   })
+
   describe('irregular labware', () => {
     const irregularOrdering = [
       ['A1', 'B1'],
@@ -962,9 +839,11 @@ describe('orderWells', () => {
         b2t: ['D4', 'C4', 'C2', 'B4', 'B2', 'B1', 'A4', 'A3', 'A2', 'A1'],
       },
     }
+
     orderTuples.forEach(tuple => {
       it(`first ${tuple[0]} then ${tuple[1]}`, () => {
         expect(orderWells(irregularOrdering, ...tuple)).toEqual(
+          // $FlowFixMe adding additional keys to answer map would add more confusion
           irregularAnswerMap[tuple[0]][tuple[1]]
         )
       })

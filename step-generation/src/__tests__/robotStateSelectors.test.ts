@@ -1,4 +1,8 @@
-import { getLabwareDefURI, MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  MAGNETIC_MODULE_TYPE,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   makeContext,
@@ -14,14 +18,14 @@ import {
   getModuleState,
 } from '../'
 import { InvariantContext } from '../types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+let invariantContext: InvariantContext
 
 const fixtureTiprack300ul = _fixtureTiprack300ul as LabwareDefinition2
 
-let invariantContext: InvariantContext
 beforeEach(() => {
   invariantContext = makeContext()
 })
+
 describe('sortLabwareBySlot', () => {
   it('sorts all labware by slot', () => {
     const labwareState = {
@@ -45,11 +49,13 @@ describe('sortLabwareBySlot', () => {
       'eleven',
     ])
   })
+
   it('with no labware, return empty array', () => {
     const labwareState = {}
     expect(sortLabwareBySlot(labwareState)).toEqual([])
   })
 })
+
 describe('_getNextTip', () => {
   const getNextTipHelper = (
     channel: 1 | 8,
@@ -57,9 +63,7 @@ describe('_getNextTip', () => {
   ): string | null => {
     const pipetteId = channel === 1 ? DEFAULT_PIPETTE : 'p300MultiId'
     const tiprackId = 'testTiprack'
-
     const _invariantContext = makeContext()
-
     _invariantContext.labwareEntities[tiprackId] = {
       id: tiprackId,
       labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
@@ -67,22 +71,12 @@ describe('_getNextTip', () => {
     }
     const robotState = makeState({
       invariantContext: _invariantContext,
-      labwareLocations: {
-        [tiprackId]: {
-          slot: '8',
-        },
-      },
+      labwareLocations: { [tiprackId]: { slot: '8' } },
       pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-        p300MultiId: {
-          mount: 'right',
-        },
+        p300SingleId: { mount: 'left' },
+        p300MultiId: { mount: 'right' },
       },
-      tiprackSetting: {
-        [tiprackId]: true,
-      },
+      tiprackSetting: { [tiprackId]: true },
     })
     robotState.tipState.tipracks[tiprackId] = tiprackTipState
     return _getNextTip({
@@ -92,19 +86,19 @@ describe('_getNextTip', () => {
       robotState,
     })
   }
-
   it('empty tiprack should return null', () => {
-    type OneOrEight = 1 | 8
-    const channels: OneOrEight[] = [1, 8]
+    const channels = [1, 8] as const
     channels.forEach(channel => {
       const result = getNextTipHelper(channel, { ...getTiprackTipstate(false) })
       expect(result).toBe(null)
     })
   })
+
   it('full tiprack should start at A1', () => {
     const result = getNextTipHelper(1, { ...getTiprackTipstate(true) })
     expect(result).toEqual('A1')
   })
+
   it('missing A1, go to B1', () => {
     const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
@@ -112,6 +106,7 @@ describe('_getNextTip', () => {
     })
     expect(result).toEqual('B1')
   })
+
   it('missing A1 and B1, go to C1', () => {
     const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
@@ -120,6 +115,7 @@ describe('_getNextTip', () => {
     })
     expect(result).toEqual('C1')
   })
+
   it('missing first column, go to A2', () => {
     const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
@@ -127,6 +123,7 @@ describe('_getNextTip', () => {
     })
     expect(result).toEqual('A2')
   })
+
   it('missing a few random tips, go to lowest col, then lowest row', () => {
     const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
@@ -137,168 +134,115 @@ describe('_getNextTip', () => {
     expect(result).toEqual('D2')
   })
 })
+
 describe('getNextTiprack - single-channel', () => {
   it('single tiprack, missing A1', () => {
     const robotState = makeState({
       invariantContext,
       labwareLocations: {
-        tiprack1Id: {
-          slot: '1',
-        },
-        sourcePlateId: {
-          slot: '2',
-        },
+        tiprack1Id: { slot: '1' },
+        sourcePlateId: { slot: '2' },
       },
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
-      tiprackSetting: {
-        tiprack1Id: true,
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      tiprackSetting: { tiprack1Id: true },
     })
+
     robotState.tipState.tipracks.tiprack1Id.A1 = false
+
     const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
+
     expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('B1')
   })
+
   it('single tiprack, empty, should return null', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
-      labwareLocations: {
-        tiprack1Id: {
-          slot: '1',
-        },
-      },
-      tiprackSetting: {
-        tiprack1Id: false,
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: { tiprack1Id: { slot: '1' } },
+      tiprackSetting: { tiprack1Id: false },
     })
+
     const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
     expect(result).toEqual(null)
   })
+
   it('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: {
-          slot: '1',
-        },
-        tiprack2Id: {
-          slot: '11',
-        },
+        tiprack1Id: { slot: '1' },
+        tiprack2Id: { slot: '11' },
       },
-      tiprackSetting: {
-        tiprack1Id: true,
-        tiprack2Id: true,
-      },
+      tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
     })
     const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
+
     expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('A1')
   })
+
   it('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: {
-          slot: '2',
-        },
-        tiprack2Id: {
-          slot: '11',
-        },
+        tiprack1Id: { slot: '2' },
+        tiprack2Id: { slot: '11' },
       },
-      tiprackSetting: {
-        tiprack1Id: true,
-        tiprack2Id: true,
-      },
+      tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
     })
     // remove A1 tip from both racks
     robotState.tipState.tipracks.tiprack1Id.A1 = false
     robotState.tipState.tipracks.tiprack2Id.A1 = false
     const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
+
     expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('B1')
   })
+
   it('multiple tipracks, all empty, should return null', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: {
-          slot: '2',
-        },
-        tiprack2Id: {
-          slot: '11',
-        },
+        tiprack1Id: { slot: '2' },
+        tiprack2Id: { slot: '11' },
       },
-      tiprackSetting: {
-        tiprack1Id: false,
-        tiprack2Id: false,
-      },
+      tiprackSetting: { tiprack1Id: false, tiprack2Id: false },
     })
     const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
+
     expect(result).toBe(null)
   })
 })
+
 describe('getNextTiprack - 8-channel', () => {
   it('single tiprack, totally full', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: {
-          slot: '1',
-        },
+        tiprack1Id: { slot: '1' },
       },
-      tiprackSetting: {
-        tiprack1Id: true,
-      },
+      tiprackSetting: { tiprack1Id: true },
     })
+
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+
     expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('A1')
   })
+
   it('single tiprack, partially full', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: {
-          slot: '2',
-        },
+        tiprack1Id: { slot: '2' },
       },
-      tiprackSetting: {
-        tiprack1Id: true,
-      },
+      tiprackSetting: { tiprack1Id: true },
     })
     robotState.tipState.tipracks.tiprack1Id = {
       ...robotState.tipState.tipracks.tiprack1Id,
@@ -307,45 +251,33 @@ describe('getNextTiprack - 8-channel', () => {
       A5: false,
     }
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+
     expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('A3')
   })
+
   it('single tiprack, empty, should return null', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: {
-          slot: '2',
-        },
+        tiprack1Id: { slot: '2' },
       },
-      tiprackSetting: {
-        tiprack1Id: false,
-      },
+      tiprackSetting: { tiprack1Id: false },
     })
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+
     expect(result).toEqual(null)
   })
+
   it('single tiprack, a well missing from each column, should return null', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: {
-          slot: '2',
-        },
+        tiprack1Id: { slot: '2' },
       },
-      tiprackSetting: {
-        tiprack1Id: true,
-      },
+      tiprackSetting: { tiprack1Id: true },
     })
     robotState.tipState.tipracks.tiprack1Id = {
       ...robotState.tipState.tipracks.tiprack1Id,
@@ -362,62 +294,39 @@ describe('getNextTiprack - 8-channel', () => {
       G11: false,
       F12: false,
     }
+
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+
     expect(result).toEqual(null)
   })
+
   it('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: {
-          slot: '2',
-        },
-        tiprack2Id: {
-          slot: '3',
-        },
-        tiprack3Id: {
-          slot: '10',
-        },
+        tiprack1Id: { slot: '2' },
+        tiprack2Id: { slot: '3' },
+        tiprack3Id: { slot: '10' },
       },
-      tiprackSetting: {
-        tiprack1Id: true,
-        tiprack2Id: true,
-        tiprack3Id: true,
-      },
+      tiprackSetting: { tiprack1Id: true, tiprack2Id: true, tiprack3Id: true },
     })
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+
     expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('A1')
   })
+
   it('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: {
-          slot: '1',
-        },
-        tiprack2Id: {
-          slot: '2',
-        },
-        tiprack3Id: {
-          slot: '3',
-        },
+        tiprack1Id: { slot: '1' },
+        tiprack2Id: { slot: '2' },
+        tiprack3Id: { slot: '3' },
       },
-      tiprackSetting: {
-        tiprack1Id: true,
-        tiprack2Id: true,
-        tiprack3Id: true,
-      },
+      tiprackSetting: { tiprack1Id: true, tiprack2Id: true, tiprack3Id: true },
     })
     // remove tips from state
     robotState.tipState.tipracks.tiprack1Id = {
@@ -456,28 +365,21 @@ describe('getNextTiprack - 8-channel', () => {
       ...robotState.tipState.tipracks.tiprack3Id,
       A1: false,
     }
+
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+
     expect(result && result.tiprackId).toEqual('tiprack3Id')
     expect(result && result.well).toEqual('A2')
   })
+
   it('multiple tipracks, all empty, should return null', () => {
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: {
-          slot: '1',
-        },
-        tiprack2Id: {
-          slot: '2',
-        },
-        tiprack3Id: {
-          slot: '3',
-        },
+        tiprack1Id: { slot: '1' },
+        tiprack2Id: { slot: '2' },
+        tiprack3Id: { slot: '3' },
       },
       tiprackSetting: {
         tiprack1Id: false,
@@ -489,6 +391,7 @@ describe('getNextTiprack - 8-channel', () => {
     expect(result).toEqual(null)
   })
 })
+
 describe('getModuleState', () => {
   it('returns the state for specified module', () => {
     const magModuleId = 'magdeck123'
@@ -498,19 +401,11 @@ describe('getModuleState', () => {
     }
     const robotState = makeState({
       invariantContext,
-      pipetteLocations: {
-        p300SingleId: {
-          mount: 'left',
-        },
-      },
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
       labwareLocations: {
-        tiprack1Id: {
-          slot: '2',
-        },
+        tiprack1Id: { slot: '2' },
       },
-      tiprackSetting: {
-        tiprack1Id: false,
-      },
+      tiprackSetting: { tiprack1Id: false },
       moduleLocations: {
         [magModuleId]: {
           slot: '4',
@@ -518,7 +413,9 @@ describe('getModuleState', () => {
         },
       },
     })
+
     const moduleState = getModuleState(robotState, magModuleId)
+
     expect(moduleState).toEqual(magModuleState)
   })
 })
