@@ -10,6 +10,7 @@ import {
 import { DEFAULT_CONFIG } from '../fixtures'
 import type { InvariantContext } from '../types'
 jest.mock('../getNextRobotStateAndWarnings')
+
 let invariantContext: InvariantContext
 
 /** This is a minimalistic toy version of step-generation command creators and timeline updaters,
@@ -31,18 +32,12 @@ interface CountCommand {
     value: number
   }
 }
-
 const addCreator: any = (
   params: CountParams,
   invariantContext: InvariantContext,
   prevState: CountState
 ) => ({
-  commands: [
-    {
-      command: 'add',
-      params,
-    },
-  ],
+  commands: [{ command: 'add', params }],
   warnings: [],
 })
 
@@ -70,12 +65,7 @@ const multiplyCreator: any = (
   invariantContext: InvariantContext,
   prevState: CountState
 ) => ({
-  commands: [
-    {
-      command: 'multiply',
-      params,
-    },
-  ],
+  commands: [{ command: 'multiply', params }],
   warnings: [],
 })
 
@@ -85,7 +75,6 @@ const divideCreator: any = (
   prevState: CountState
 ) => {
   const { value } = params
-
   if (value === 0) {
     return {
       errors: [
@@ -98,14 +87,7 @@ const divideCreator: any = (
   }
 
   return {
-    commands: [
-      {
-        command: 'divide',
-        params: {
-          value,
-        },
-      },
-    ],
+    commands: [{ command: 'divide', params: { value } }],
     warnings: [],
   }
 }
@@ -117,71 +99,55 @@ function mockNextRobotStateAndWarningsSingleCommand(
 ): CountStateAndWarnings {
   const prevCount = prevState.count
   let count = null
-
   switch (command.command) {
     case 'add': {
       count = prevCount + command.params.value
       break
     }
-
     case 'multiply': {
       count = prevCount * command.params.value
       break
     }
-
     case 'divide': {
       count = prevCount / command.params.value
       break
     }
   }
-
   if (count === null) {
     throw new Error(
       `unknown command: ${command.command} passed to mockNextRobotStateAndWarning`
     )
   }
-
   const warnings: never[] = [] // NOTE: not making a fake implementation of any nextRobotState warnings!
-
-  return {
-    robotState: {
-      count,
-    },
-    warnings,
-  }
+  return { robotState: { count }, warnings }
 }
 
 function mockNextRobotStateAndWarnings(
   commands: CountCommand[],
-  invariantContext: InvariantContext,
+  invariantContext: any,
   prevState: CountState
 ): CountStateAndWarnings {
-  const nextState: CountStateAndWarnings = commands.reduce(
-    (acc: CountStateAndWarnings, command) =>
+  const nextState = commands.reduce<CountStateAndWarnings>(
+    (acc, command) =>
       mockNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,
         acc.robotState
       ),
-    {
-      robotState: prevState,
-      warnings: [],
-    }
+    { robotState: prevState, warnings: [] }
   )
   const warnings: never[] = [] // NOTE: not making a fake implementation of any nextRobotState warnings!
-
-  return {
-    robotState: nextState.robotState,
-    warnings,
-  }
+  return { robotState: nextState.robotState, warnings }
 }
 
+// TODO(IL, 2021-06-04): should use as jest.MockedFunction pattern
 // @ts-expect-error: mock methods
 getNextRobotStateAndWarningsSingleCommand.mockImplementation(
   mockNextRobotStateAndWarningsSingleCommand
 )
 // @ts-expect-error: mock methods
 getNextRobotStateAndWarnings.mockImplementation(mockNextRobotStateAndWarnings)
+
 beforeEach(() => {
   invariantContext = {
     labwareEntities: {},
@@ -190,60 +156,40 @@ beforeEach(() => {
     config: DEFAULT_CONFIG,
   }
 })
+
 describe('reduceCommandCreators', () => {
   it('basic command creators', () => {
-    const initialState: any = {
-      count: 0,
-    }
+    const initialState: any = { count: 0 }
     const result: any = reduceCommandCreators(
       [
-        curryCommandCreator(addCreator, {
-          value: 1,
-        }),
-        curryCommandCreator(multiplyCreator, {
-          value: 2,
-        }),
+        curryCommandCreator(addCreator, { value: 1 }),
+        curryCommandCreator(multiplyCreator, { value: 2 }),
       ],
       invariantContext,
       initialState
     )
+
     expect(result).toEqual({
       commands: [
-        {
-          command: 'add',
-          params: {
-            value: 1,
-          },
-        },
-        {
-          command: 'multiply',
-          params: {
-            value: 2,
-          },
-        },
+        { command: 'add', params: { value: 1 } },
+        { command: 'multiply', params: { value: 2 } },
       ],
       warnings: [],
     })
   })
+
   it('error in a command short-circuits the command creation pipeline', () => {
-    const initialState: any = {
-      count: 5,
-    }
+    const initialState: any = { count: 5 }
     const result = reduceCommandCreators(
       [
-        curryCommandCreator(addCreator, {
-          value: 4,
-        }),
-        curryCommandCreator(divideCreator, {
-          value: 0,
-        }),
-        curryCommandCreator(multiplyCreator, {
-          value: 3,
-        }),
+        curryCommandCreator(addCreator, { value: 4 }),
+        curryCommandCreator(divideCreator, { value: 0 }),
+        curryCommandCreator(multiplyCreator, { value: 3 }),
       ],
       invariantContext,
       initialState
     )
+
     expect(result).toEqual({
       errors: [
         {
@@ -253,79 +199,46 @@ describe('reduceCommandCreators', () => {
       ],
     })
   })
+
   it('warnings accumulate in a flat array across the command chain', () => {
-    const initialState: any = {
-      count: 5,
-    }
+    const initialState: any = { count: 5 }
     const result = reduceCommandCreators(
       [
-        curryCommandCreator(addCreatorWithWarning, {
-          value: 3,
-        }),
-        curryCommandCreator(multiplyCreator, {
-          value: 2,
-        }),
-        curryCommandCreator(addCreatorWithWarning, {
-          value: 1,
-        }),
+        curryCommandCreator(addCreatorWithWarning, { value: 3 }),
+        curryCommandCreator(multiplyCreator, { value: 2 }),
+        curryCommandCreator(addCreatorWithWarning, { value: 1 }),
       ],
       invariantContext,
       initialState
     )
+
     expect(result).toEqual({
       commands: [
-        {
-          command: 'add',
-          params: {
-            value: 3,
-          },
-        },
-        {
-          command: 'multiply',
-          params: {
-            value: 2,
-          },
-        },
-        {
-          command: 'add',
-          params: {
-            value: 1,
-          },
-        },
+        { command: 'add', params: { value: 3 } },
+        { command: 'multiply', params: { value: 2 } },
+        { command: 'add', params: { value: 1 } },
       ],
       warnings: [
-        {
-          type: 'ADD_WARNING',
-          message: 'adding 3 with warning example',
-        },
-        {
-          type: 'ADD_WARNING',
-          message: 'adding 1 with warning example',
-        },
+        { type: 'ADD_WARNING', message: 'adding 3 with warning example' },
+        { type: 'ADD_WARNING', message: 'adding 1 with warning example' },
       ],
     })
   })
 })
+
 describe('commandCreatorsTimeline', () => {
   it('any errors short-circuit the timeline chain', () => {
-    const initialState: any = {
-      count: 5,
-    }
+    const initialState: any = { count: 5 }
     const result = commandCreatorsTimeline(
       [
-        curryCommandCreator(addCreatorWithWarning, {
-          value: 4,
-        }),
-        curryCommandCreator(divideCreator, {
-          value: 0,
-        }),
-        curryCommandCreator(multiplyCreator, {
-          value: 3,
-        }),
+        curryCommandCreator(addCreatorWithWarning, { value: 4 }),
+        curryCommandCreator(divideCreator, { value: 0 }),
+        curryCommandCreator(multiplyCreator, { value: 3 }),
       ],
       invariantContext,
       initialState
     )
+
     expect(result).toEqual({
       // error-creating "divide by zero" commands's index in the command creators array
       errors: [
@@ -334,96 +247,59 @@ describe('commandCreatorsTimeline', () => {
           type: 'DIVIDE_BY_ZERO',
         },
       ],
+
       timeline: [
         // add 4 step
         {
-          robotState: {
-            count: 5 + 4,
-          },
-          commands: [
-            {
-              command: 'add',
-              params: {
-                value: 4,
-              },
-            },
-          ],
+          robotState: { count: 5 + 4 },
+          commands: [{ command: 'add', params: { value: 4 } }],
           warnings: [
             {
               message: 'adding 4 with warning example',
               type: 'ADD_WARNING',
             },
           ],
-        }, // no more steps in the timeline, stopped by error
+        },
+        // no more steps in the timeline, stopped by error
       ],
     })
   })
+
   it('warnings are indexed in an indexed command chain', () => {
-    const initialState: any = {
-      count: 5,
-    }
+    const initialState: any = { count: 5 }
+
     const result = commandCreatorsTimeline(
       [
-        curryCommandCreator(addCreatorWithWarning, {
-          value: 3,
-        }),
-        curryCommandCreator(multiplyCreator, {
-          value: 2,
-        }),
-        curryCommandCreator(addCreatorWithWarning, {
-          value: 1,
-        }),
+        curryCommandCreator(addCreatorWithWarning, { value: 3 }),
+        curryCommandCreator(multiplyCreator, { value: 2 }),
+        curryCommandCreator(addCreatorWithWarning, { value: 1 }),
       ],
       invariantContext,
       initialState
     )
+
     expect(result.timeline).toEqual([
       // add 3 w/ warning
       {
-        robotState: {
-          count: 8,
-        },
-        commands: [
-          {
-            command: 'add',
-            params: {
-              value: 3,
-            },
-          },
-        ],
+        robotState: { count: 8 },
+        commands: [{ command: 'add', params: { value: 3 } }],
         warnings: [
           {
             message: 'adding 3 with warning example',
             type: 'ADD_WARNING',
           },
         ],
-      }, // multiply by 2
+      },
+      // multiply by 2
       {
-        robotState: {
-          count: 16,
-        },
-        commands: [
-          {
-            command: 'multiply',
-            params: {
-              value: 2,
-            },
-          },
-        ],
+        robotState: { count: 16 },
+        commands: [{ command: 'multiply', params: { value: 2 } }],
         warnings: [],
-      }, // add 1 w/ warning
+      },
+      // add 1 w/ warning
       {
-        robotState: {
-          count: 17,
-        },
-        commands: [
-          {
-            command: 'add',
-            params: {
-              value: 1,
-            },
-          },
-        ],
+        robotState: { count: 17 },
+        commands: [{ command: 'add', params: { value: 1 } }],
         warnings: [
           {
             message: 'adding 1 with warning example',

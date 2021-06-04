@@ -16,63 +16,77 @@ import {
   makeTouchTipHelper,
   delayCommand,
 } from '../fixtures'
-import { InvariantContext, MixArgs, RobotState } from '../types'
+import type {
+  ChangeTipOptions,
+  InvariantContext,
+  MixArgs,
+  RobotState,
+} from '../types'
+
 const aspirateHelper = makeAspirateHelper()
-const dispenseHelper = makeDispenseHelper({
-  labware: SOURCE_LABWARE,
-})
+const dispenseHelper = makeDispenseHelper({ labware: SOURCE_LABWARE })
 const touchTipHelper = makeTouchTipHelper()
 // TODO: Ian 2019-06-14 more elegant way to test the blowout offset calculation
 const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
+
 let invariantContext: InvariantContext
 let robotStateWithTip: RobotState
-let mixinArgs: any
+let mixinArgs: Partial<MixArgs>
+
 beforeEach(() => {
   mixinArgs = {
     ...getFlowRateAndOffsetParamsMix(),
     commandCreatorFnName: 'mix',
     name: 'mix test',
     description: 'test blah blah',
+
     pipette: DEFAULT_PIPETTE,
     labware: SOURCE_LABWARE,
+
     blowoutLocation: null,
     touchTip: false,
+
     aspirateDelaySeconds: null,
     dispenseDelaySeconds: null,
   }
+
   invariantContext = makeContext()
   robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
 })
+
 describe('mix: change tip', () => {
   const volume = 5
   const times = 2
-
-  const makeArgs = (changeTip: string): MixArgs => ({
-    ...mixinArgs,
-    volume,
-    times,
-    wells: ['A1', 'B1', 'C1'],
-    changeTip,
-  })
-
+  const makeArgs = (changeTip: ChangeTipOptions): MixArgs =>
+    ({
+      ...mixinArgs,
+      volume,
+      times,
+      wells: ['A1', 'B1', 'C1'],
+      changeTip,
+    } as MixArgs)
   it('changeTip="always"', () => {
     const args = makeArgs('always')
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
+
     expect(res.commands).toEqual(
       flatMap(args.wells, (well: string, idx: number) => [
         ...replaceTipCommands(idx),
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
+
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
       ])
     )
   })
+
   it('changeTip="once"', () => {
     const args = makeArgs('once')
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
+
     expect(res.commands).toEqual([
       ...replaceTipCommands(0),
       ...flatMap(args.wells, well => [
@@ -83,10 +97,12 @@ describe('mix: change tip', () => {
       ]),
     ])
   })
+
   it('changeTip="never"', () => {
     const args = makeArgs('never')
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
+
     expect(res.commands).toEqual(
       flatMap(args.wells, well => [
         aspirateHelper(well, volume),
@@ -97,10 +113,12 @@ describe('mix: change tip', () => {
     )
   })
 })
+
 describe('mix: advanced options', () => {
   const volume = 8
   const times = 2
   const blowoutLabwareId = DEST_LABWARE
+
   it('flow rate', () => {
     const args = {
       ...mixinArgs,
@@ -108,7 +126,8 @@ describe('mix: advanced options', () => {
       times,
       wells: ['A1'],
       changeTip: 'once',
-    }
+    } as MixArgs
+
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
@@ -119,6 +138,7 @@ describe('mix: advanced options', () => {
       dispenseHelper('A1', volume),
     ])
   })
+
   it('touch tip (after each dispense)', () => {
     const args: MixArgs = {
       ...mixinArgs,
@@ -127,20 +147,24 @@ describe('mix: advanced options', () => {
       changeTip: 'always',
       touchTip: true,
       wells: ['A1', 'B1', 'C1'],
-    }
+    } as MixArgs
+
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
+
     expect(res.commands).toEqual(
       flatMap(args.wells, (well: string, idx: number) => [
         ...replaceTipCommands(idx),
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
+
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
         touchTipHelper(well),
       ])
     )
   })
+
   it('blowout', () => {
     const args: MixArgs = {
       ...mixinArgs,
@@ -149,14 +173,17 @@ describe('mix: advanced options', () => {
       changeTip: 'always',
       blowoutLocation: blowoutLabwareId,
       wells: ['A1', 'B1', 'C1'],
-    }
+    } as MixArgs
+
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
+
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
+
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
         blowoutHelper(blowoutLabwareId, {
@@ -165,6 +192,7 @@ describe('mix: advanced options', () => {
       ])
     )
   })
+
   it('touch tip after blowout', () => {
     const args: MixArgs = {
       ...mixinArgs,
@@ -174,14 +202,17 @@ describe('mix: advanced options', () => {
       blowoutLocation: blowoutLabwareId,
       touchTip: true,
       wells: ['A1', 'B1', 'C1'],
-    }
+    } as MixArgs
+
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
+
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
+
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
         blowoutHelper(blowoutLabwareId, {
@@ -199,9 +230,11 @@ describe('mix: advanced options', () => {
       times,
       changeTip: 'always',
       wells: ['A1', 'B1', 'C1'],
-    }
+    } as MixArgs
+
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
+
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
@@ -222,9 +255,11 @@ describe('mix: advanced options', () => {
       times,
       changeTip: 'always',
       wells: ['A1', 'B1', 'C1'],
-    }
+    } as MixArgs
+
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
+
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...replaceTipCommands(idx),
@@ -249,9 +284,11 @@ describe('mix: advanced options', () => {
         times,
         changeTip: 'always',
         wells: ['A1', 'B1', 'C1'],
-      }
+      } as MixArgs
+
       const result = mix(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
+
       expect(res.commands).toEqual(
         flatMap(args.wells, (well, idx) => [
           ...replaceTipCommands(idx),
@@ -272,8 +309,9 @@ describe('mix: advanced options', () => {
     })
   })
 })
+
 describe('mix: errors', () => {
-  let errorArgs: MixArgs
+  let errorArgs: Partial<MixArgs>
   beforeEach(() => {
     errorArgs = {
       ...mixinArgs,
@@ -284,7 +322,10 @@ describe('mix: errors', () => {
     }
   })
   it('invalid labware', () => {
-    const args: MixArgs = { ...errorArgs, labware: 'invalidLabwareId' }
+    const args: MixArgs = {
+      ...errorArgs,
+      labware: 'invalidLabwareId',
+    } as MixArgs
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getErrorResult(result)
     expect(res.errors).toHaveLength(1)
@@ -292,8 +333,12 @@ describe('mix: errors', () => {
       type: 'LABWARE_DOES_NOT_EXIST',
     })
   })
+
   it('invalid pipette', () => {
-    const args: MixArgs = { ...errorArgs, pipette: 'invalidPipetteId' }
+    const args: MixArgs = {
+      ...errorArgs,
+      pipette: 'invalidPipetteId',
+    } as MixArgs
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getErrorResult(result)
     expect(res.errors).toHaveLength(1)
@@ -301,6 +346,7 @@ describe('mix: errors', () => {
       type: 'PIPETTE_DOES_NOT_EXIST',
     })
   })
+
   // TODO Ian 2018-05-08
   it.todo('"times" arg non-integer')
   it.todo('"times" arg negative')

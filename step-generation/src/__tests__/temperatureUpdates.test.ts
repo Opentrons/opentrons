@@ -13,12 +13,14 @@ import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../fixtures/robotStateFixtures'
-import type { InvariantContext, RobotState } from '../types'
+import { InvariantContext, RobotState } from '../types'
+
 const forSetTemperature = makeImmutableStateUpdater(_forSetTemperature)
 const forDeactivateTemperature = makeImmutableStateUpdater(
   _forDeactivateTemperature
 )
 const forAwaitTemperature = makeImmutableStateUpdater(_forAwaitTemperature)
+
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'
 const temperature = 45
@@ -26,6 +28,7 @@ let invariantContext: InvariantContext,
   deactivatedRobot: RobotState,
   robotWithTemp: RobotState,
   robotState
+
 beforeEach(() => {
   const stateAndContext = getStateAndContextTempTCModules({
     temperatureModuleId,
@@ -33,6 +36,7 @@ beforeEach(() => {
   })
   invariantContext = stateAndContext.invariantContext
   robotState = stateAndContext.robotState
+
   deactivatedRobot = robotWithStatusAndTemp(
     robotState,
     temperatureModuleId,
@@ -46,13 +50,16 @@ beforeEach(() => {
     temperature
   )
 })
+
 describe('forSetTemperature', () => {
   it('module status is set to approaching and temp is set to target', () => {
     const params = {
       module: temperatureModuleId,
       temperature: temperature,
     }
+
     const result = forSetTemperature(params, invariantContext, deactivatedRobot)
+
     expect(result).toEqual({
       robotState: robotWithStatusAndTemp(
         deactivatedRobot,
@@ -63,12 +70,14 @@ describe('forSetTemperature', () => {
       warnings: [],
     })
   })
+
   it('module temp is changed to new target temp when already active', () => {
     const newTemperature = 55
     const params = {
       module: temperatureModuleId,
       temperature: newTemperature,
     }
+
     const result = forSetTemperature(
       params,
       invariantContext,
@@ -79,6 +88,7 @@ describe('forSetTemperature', () => {
         temperature
       )
     )
+
     expect(result).toEqual({
       warnings: [],
       robotState: robotWithStatusAndTemp(
@@ -90,36 +100,43 @@ describe('forSetTemperature', () => {
     })
   })
 })
+
 describe('forDeactivateTemperature', () => {
   it('module status is deactivated and no temperature is set', () => {
     const params = {
       module: temperatureModuleId,
     }
+
     const result = forDeactivateTemperature(
       params,
       invariantContext,
       robotWithTemp
     )
+
     expect(result).toEqual({
       robotState: deactivatedRobot,
       warnings: [],
     })
   })
+
   it('no effect when temp module is not active', () => {
     const params = {
       module: temperatureModuleId,
     }
+
     const result = forDeactivateTemperature(
       params,
       invariantContext,
       deactivatedRobot
     )
+
     expect(result).toEqual({
       robotState: deactivatedRobot,
       warnings: [],
     })
   })
 })
+
 describe('forAwaitTemperature', () => {
   ;[TEMPERATURE_AT_TARGET, TEMPERATURE_APPROACHING_TARGET].forEach(status => {
     it(`update status to 'at target' when previous status is ${status} and the given target temp matches the previous target temp`, () => {
@@ -127,29 +144,34 @@ describe('forAwaitTemperature', () => {
         module: temperatureModuleId,
         temperature: temperature,
       }
+
       const prevRobotState = robotWithStatusAndTemp(
         deactivatedRobot,
         temperatureModuleId,
         status,
         temperature
       )
+
       const robotAtTargetTemp = robotWithStatusAndTemp(
         robotWithTemp,
         temperatureModuleId,
         TEMPERATURE_AT_TARGET,
         temperature
       )
+
       const result = forAwaitTemperature(
         params,
         invariantContext,
         prevRobotState
       )
+
       expect(result).toEqual({
         robotState: robotAtTargetTemp,
         warnings: [],
       })
     })
   })
+
   it(`keep status at 'appraoching target temperature' when actively approaching target`, () => {
     const params = {
       module: temperatureModuleId,
