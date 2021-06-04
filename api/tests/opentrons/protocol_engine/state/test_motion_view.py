@@ -10,10 +10,10 @@ from opentrons.protocols.geometry.planning import MoveType, get_waypoints
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.state import PipetteData, PipetteLocationData
-from opentrons.protocol_engine.state.labware import LabwareStore
-from opentrons.protocol_engine.state.pipettes import PipetteStore
-from opentrons.protocol_engine.state.geometry import GeometryStore
-from opentrons.protocol_engine.state.motion import MotionStore
+from opentrons.protocol_engine.state.labware import LabwareView
+from opentrons.protocol_engine.state.pipettes import PipetteView
+from opentrons.protocol_engine.state.geometry import GeometryView
+from opentrons.protocol_engine.state.motion import MotionView
 
 from opentrons.protocol_engine.types import (
     DeckLocation,
@@ -24,69 +24,51 @@ from opentrons.protocol_engine.types import (
 
 
 @pytest.fixture
-def labware_store(decoy: Decoy) -> LabwareStore:
-    """Get a mock in the shape of a LabwareStore."""
-    return decoy.create_decoy(spec=LabwareStore)
-
-
-@pytest.fixture
-def pipette_store(decoy: Decoy) -> PipetteStore:
-    """Get a mock in the shape of a PipetteStore."""
-    return decoy.create_decoy(spec=PipetteStore)
-
-
-@pytest.fixture
-def geometry_store(decoy: Decoy) -> GeometryStore:
-    """Get a mock in the shape of a GeometryStore."""
-    return decoy.create_decoy(spec=GeometryStore)
-
-
-@pytest.fixture
 def subject(
-    labware_store: LabwareStore,
-    pipette_store: PipetteStore,
-    geometry_store: GeometryStore,
-) -> MotionStore:
-    """Get a MotionStore with its dependencies mocked out."""
-    return MotionStore(
-        labware_store=labware_store,
-        pipette_store=pipette_store,
-        geometry_store=geometry_store,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    geometry_view: GeometryView,
+) -> MotionView:
+    """Get a MotionView with its dependencies mocked out."""
+    return MotionView(
+        labware_view=labware_view,
+        pipette_view=pipette_view,
+        geometry_view=geometry_view,
     )
 
 
 def test_get_pipette_location_with_no_current_location(
     decoy: Decoy,
-    pipette_store: PipetteStore,
-    subject: MotionStore,
+    pipette_view: PipetteView,
+    subject: MotionView,
 ) -> None:
     """It should return mount and critical_point=None if no location."""
-    decoy.when(pipette_store.state.get_current_deck_location()).then_return(None)
+    decoy.when(pipette_view.get_current_deck_location()).then_return(None)
 
-    decoy.when(pipette_store.state.get_pipette_data_by_id("pipette-id")).then_return(
+    decoy.when(pipette_view.get_pipette_data_by_id("pipette-id")).then_return(
         PipetteData(
             mount=MountType.LEFT,
             pipette_name=PipetteName.P300_SINGLE,
         )
     )
 
-    result = subject.state.get_pipette_location("pipette-id")
+    result = subject.get_pipette_location("pipette-id")
 
     assert result == PipetteLocationData(mount=MountType.LEFT, critical_point=None)
 
 
 def test_get_pipette_location_with_current_location_with_quirks(
     decoy: Decoy,
-    labware_store: LabwareStore,
-    pipette_store: PipetteStore,
-    subject: MotionStore,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    subject: MotionView,
 ) -> None:
     """It should return cp=XY_CENTER if location labware has center quirk."""
-    decoy.when(pipette_store.state.get_current_deck_location()).then_return(
+    decoy.when(pipette_view.get_current_deck_location()).then_return(
         DeckLocation(pipette_id="pipette-id", labware_id="reservoir-id", well_name="A1")
     )
 
-    decoy.when(pipette_store.state.get_pipette_data_by_id("pipette-id")).then_return(
+    decoy.when(pipette_view.get_pipette_data_by_id("pipette-id")).then_return(
         PipetteData(
             mount=MountType.RIGHT,
             pipette_name=PipetteName.P300_SINGLE,
@@ -94,13 +76,13 @@ def test_get_pipette_location_with_current_location_with_quirks(
     )
 
     decoy.when(
-        labware_store.state.get_labware_has_quirk(
+        labware_view.get_labware_has_quirk(
             "reservoir-id",
             "centerMultichannelOnWells",
         )
     ).then_return(True)
 
-    result = subject.state.get_pipette_location("pipette-id")
+    result = subject.get_pipette_location("pipette-id")
 
     assert result == PipetteLocationData(
         mount=MountType.RIGHT,
@@ -110,12 +92,12 @@ def test_get_pipette_location_with_current_location_with_quirks(
 
 def test_get_pipette_location_with_current_location_different_pipette(
     decoy: Decoy,
-    labware_store: LabwareStore,
-    pipette_store: PipetteStore,
-    subject: MotionStore,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    subject: MotionView,
 ) -> None:
     """It should return mount and cp=None if location used other pipette."""
-    decoy.when(pipette_store.state.get_current_deck_location()).then_return(
+    decoy.when(pipette_view.get_current_deck_location()).then_return(
         DeckLocation(
             pipette_id="other-pipette-id",
             labware_id="reservoir-id",
@@ -123,7 +105,7 @@ def test_get_pipette_location_with_current_location_different_pipette(
         )
     )
 
-    decoy.when(pipette_store.state.get_pipette_data_by_id("pipette-id")).then_return(
+    decoy.when(pipette_view.get_pipette_data_by_id("pipette-id")).then_return(
         PipetteData(
             mount=MountType.LEFT,
             pipette_name=PipetteName.P300_SINGLE,
@@ -131,13 +113,13 @@ def test_get_pipette_location_with_current_location_different_pipette(
     )
 
     decoy.when(
-        labware_store.state.get_labware_has_quirk(
+        labware_view.get_labware_has_quirk(
             "reservoir-id",
             "centerMultichannelOnWells",
         )
     ).then_return(False)
 
-    result = subject.state.get_pipette_location("pipette-id")
+    result = subject.get_pipette_location("pipette-id")
 
     assert result == PipetteLocationData(
         mount=MountType.LEFT,
@@ -147,9 +129,9 @@ def test_get_pipette_location_with_current_location_different_pipette(
 
 def test_get_pipette_location_override_current_location(
     decoy: Decoy,
-    labware_store: LabwareStore,
-    pipette_store: PipetteStore,
-    subject: MotionStore,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    subject: MotionView,
 ) -> None:
     """It should calculate pipette location from a passed in deck location."""
     current_location = DeckLocation(
@@ -158,7 +140,7 @@ def test_get_pipette_location_override_current_location(
         well_name="A1",
     )
 
-    decoy.when(pipette_store.state.get_pipette_data_by_id("pipette-id")).then_return(
+    decoy.when(pipette_view.get_pipette_data_by_id("pipette-id")).then_return(
         PipetteData(
             mount=MountType.RIGHT,
             pipette_name=PipetteName.P300_SINGLE,
@@ -166,13 +148,13 @@ def test_get_pipette_location_override_current_location(
     )
 
     decoy.when(
-        labware_store.state.get_labware_has_quirk(
+        labware_view.get_labware_has_quirk(
             "reservoir-id",
             "centerMultichannelOnWells",
         )
     ).then_return(True)
 
-    result = subject.state.get_pipette_location(
+    result = subject.get_pipette_location(
         pipette_id="pipette-id",
         current_location=current_location,
     )
@@ -273,15 +255,15 @@ class WaypointSpec:
 )
 def test_get_movement_waypoints(
     decoy: Decoy,
-    labware_store: LabwareStore,
-    pipette_store: PipetteStore,
-    geometry_store: GeometryStore,
-    subject: MotionStore,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    geometry_view: GeometryView,
+    subject: MotionView,
     spec: WaypointSpec,
 ) -> None:
     """It should calculate the correct set of waypoints for a move."""
     decoy.when(
-        labware_store.state.get_labware_has_quirk(
+        labware_view.get_labware_has_quirk(
             spec.labware_id,
             "centerMultichannelOnWells",
         )
@@ -290,14 +272,14 @@ def test_get_movement_waypoints(
     if spec.labware_z is not None:
         min_travel_z = spec.labware_z
 
-        decoy.when(
-            geometry_store.state.get_labware_highest_z(spec.labware_id)
-        ).then_return(spec.labware_z)
+        decoy.when(geometry_view.get_labware_highest_z(spec.labware_id)).then_return(
+            spec.labware_z
+        )
 
     elif spec.all_labware_z is not None:
         min_travel_z = spec.all_labware_z
 
-        decoy.when(geometry_store.state.get_all_labware_highest_z()).then_return(
+        decoy.when(geometry_view.get_all_labware_highest_z()).then_return(
             spec.all_labware_z
         )
 
@@ -305,18 +287,16 @@ def test_get_movement_waypoints(
         assert False, "One of spec.labware_z or all_labware_z must be defined."
 
     decoy.when(
-        geometry_store.state.get_well_position(
+        geometry_view.get_well_position(
             spec.labware_id,
             spec.well_name,
             spec.well_location,
         )
     ).then_return(spec.dest)
 
-    decoy.when(pipette_store.state.get_current_deck_location()).then_return(
-        spec.location
-    )
+    decoy.when(pipette_view.get_current_deck_location()).then_return(spec.location)
 
-    result = subject.state.get_movement_waypoints(
+    result = subject.get_movement_waypoints(
         pipette_id=spec.pipette_id,
         labware_id=spec.labware_id,
         well_name=spec.well_name,
@@ -342,18 +322,18 @@ def test_get_movement_waypoints(
 
 def test_get_movement_waypoints_raises(
     decoy: Decoy,
-    pipette_store: PipetteStore,
-    geometry_store: GeometryStore,
-    subject: MotionStore,
+    pipette_view: PipetteView,
+    geometry_view: GeometryView,
+    subject: MotionView,
 ) -> None:
     """It should raise FailedToPlanMoveError if get_waypoints raises."""
-    decoy.when(pipette_store.state.get_current_deck_location()).then_return(None)
-    decoy.when(
-        geometry_store.state.get_well_position("labware-id", "A1", None)
-    ).then_return(Point(4, 5, 6))
+    decoy.when(pipette_view.get_current_deck_location()).then_return(None)
+    decoy.when(geometry_view.get_well_position("labware-id", "A1", None)).then_return(
+        Point(4, 5, 6)
+    )
 
     with pytest.raises(errors.FailedToPlanMoveError, match="out of bounds"):
-        subject.state.get_movement_waypoints(
+        subject.get_movement_waypoints(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="A1",

@@ -2,12 +2,16 @@
 from typing import List, Tuple
 
 import pytest
-from mock import AsyncMock, call  # type: ignore[attr-defined]
+from mock import AsyncMock, MagicMock, call  # type: ignore[attr-defined]
 
 from opentrons.file_runner.command_queue_worker import CommandQueueWorker
-from opentrons.protocol_engine import ProtocolEngine, WellLocation, StateStore
-from opentrons.protocol_engine.commands import PickUpTipRequest, \
-    AspirateRequest, DispenseRequest, CommandRequestType
+from opentrons.protocol_engine import ProtocolEngine, WellLocation, StateView
+from opentrons.protocol_engine.commands import (
+    PickUpTipRequest,
+    AspirateRequest,
+    DispenseRequest,
+    CommandRequestType,
+)
 
 
 @pytest.fixture
@@ -42,28 +46,29 @@ def commands() -> List[Tuple[str, CommandRequestType]]:
 
 
 @pytest.fixture
-def store() -> AsyncMock:
-    """Create a state store fixture."""
-    return AsyncMock(spec=StateStore)
+def state_view() -> MagicMock:
+    """Create a state view fixture."""
+    return MagicMock(spec=StateView)
 
 
 @pytest.fixture
-def store_with_commands(
-        store: AsyncMock, commands: List[Tuple[str, CommandRequestType]]
-) -> AsyncMock:
-    """Create a state store fixture with pending commands."""
+def state_view_with_commands(
+    state_view: MagicMock,
+    commands: List[Tuple[str, CommandRequestType]],
+) -> MagicMock:
+    """Create a state view fixture with pending commands."""
     # List of Tuples. Command id and command. With None terminator.
     # type ignore is because mypy doesn't like concatenating lists of different types.
     pending_commands = commands[:] + [None]  # type: ignore
-    store.commands.get_next_request.side_effect = pending_commands
-    return store
+    state_view.commands.get_next_request.side_effect = pending_commands
+    return state_view
 
 
 @pytest.fixture
-def protocol_engine(store: AsyncMock) -> AsyncMock:
+def protocol_engine(state_view: MagicMock) -> AsyncMock:
     """Create a protocol engine fixture."""
     mock = AsyncMock(spec=ProtocolEngine)
-    mock.state_store = store
+    mock.state_view = state_view
     return mock
 
 
@@ -74,12 +79,10 @@ def subject(protocol_engine: AsyncMock) -> CommandQueueWorker:
 
 
 async def test_play_no_pending(
-        protocol_engine: AsyncMock,
-        subject: CommandQueueWorker,
-        store: AsyncMock
+    protocol_engine: AsyncMock, subject: CommandQueueWorker, state_view: MagicMock
 ) -> None:
     """It should not execute any commands."""
-    store.commands.get_next_request.return_value = None
+    state_view.commands.get_next_request.return_value = None
 
     subject.play()
     await subject.wait_to_be_idle()
@@ -88,10 +91,10 @@ async def test_play_no_pending(
 
 
 async def test_play(
-        protocol_engine: AsyncMock,
-        subject: CommandQueueWorker,
-        store_with_commands: AsyncMock,
-        commands: List[Tuple[str, CommandRequestType]]
+    protocol_engine: AsyncMock,
+    subject: CommandQueueWorker,
+    state_view_with_commands: MagicMock,
+    commands: List[Tuple[str, CommandRequestType]],
 ) -> None:
     """It should cycle through pending commands and execute them."""
     subject.play()
@@ -103,12 +106,13 @@ async def test_play(
 
 
 async def test_pause(
-        protocol_engine: AsyncMock,
-        subject: CommandQueueWorker,
-        store_with_commands: AsyncMock,
-        commands: List[Tuple[str, CommandRequestType]]
+    protocol_engine: AsyncMock,
+    subject: CommandQueueWorker,
+    state_view_with_commands: MagicMock,
+    commands: List[Tuple[str, CommandRequestType]],
 ) -> None:
     """It should cycle through pending commands and execute them."""
+
     async def mock_execute_command(
         request: CommandRequestType,
         command_id: str,

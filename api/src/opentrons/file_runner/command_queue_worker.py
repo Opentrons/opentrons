@@ -84,17 +84,15 @@ class CommandQueueWorker:
             await self._task
             self._task = None
 
-    def _next_command(self) -> \
-            Optional[Tuple[str, protocol_engine.commands.CommandRequestType]]:
+    def _next_command(
+        self,
+    ) -> Optional[Tuple[str, protocol_engine.commands.CommandRequestType]]:
         if self._keep_running:
             # Will be None if the engine has no commands left.
-            return self._engine.state_store.commands.get_next_request()
+            return self._engine.state_view.commands.get_next_request()
         else:
             return None
 
     async def _play_async(self) -> None:
         for command_id, request in iter(self._next_command, None):
-            await self._engine.execute_command(
-                request=request,
-                command_id=command_id
-            )
+            await self._engine.execute_command(request=request, command_id=command_id)

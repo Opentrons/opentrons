@@ -28,9 +28,7 @@ def subject() -> PipetteStore:
 
 def test_sets_initial_state(subject: PipetteStore) -> None:
     """It should initialize its state object properly."""
-    # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
-    # until store.state returns the state instead of a state view
-    result = subject._state
+    result = subject.state
 
     assert result == PipetteState(
         pipettes_by_id={},
@@ -49,9 +47,7 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
 
     subject.handle_completed_command(command)
 
-    # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
-    # until store.state returns the state instead of a state view
-    result = subject._state
+    result = subject.state
 
     assert result.pipettes_by_id["pipette-id"] == PipetteData(
         pipette_name=PipetteName.P300_SINGLE,
@@ -75,15 +71,11 @@ def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
     subject.handle_completed_command(load_command)
     subject.handle_completed_command(aspirate_command)
 
-    # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
-    # until store.state returns the state instead of a state view
-    assert subject._state.aspirated_volume_by_id["pipette-id"] == 42
+    assert subject.state.aspirated_volume_by_id["pipette-id"] == 42
 
     subject.handle_completed_command(aspirate_command)
 
-    # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
-    # until store.state returns the state instead of a state view
-    assert subject._state.aspirated_volume_by_id["pipette-id"] == 84
+    assert subject.state.aspirated_volume_by_id["pipette-id"] == 84
 
 
 def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
@@ -106,21 +98,15 @@ def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
     subject.handle_completed_command(aspirate_command)
     subject.handle_completed_command(dispense_command)
 
-    # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
-    # until store.state returns the state instead of a state view
-    assert subject._state.aspirated_volume_by_id["pipette-id"] == 21
+    assert subject.state.aspirated_volume_by_id["pipette-id"] == 21
 
     subject.handle_completed_command(dispense_command)
 
-    # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
-    # until store.state returns the state instead of a state view
-    assert subject._state.aspirated_volume_by_id["pipette-id"] == 0
+    assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
 
     subject.handle_completed_command(dispense_command)
 
-    # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
-    # until store.state returns the state instead of a state view
-    assert subject._state.aspirated_volume_by_id["pipette-id"] == 0
+    assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
 
 
 @pytest.mark.parametrize(
@@ -205,6 +191,4 @@ def test_movement_commands_update_current_location(
     subject.handle_completed_command(load_pipette_command)
     subject.handle_completed_command(command)
 
-    # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
-    # until store.state returns the state instead of a state view
-    assert subject._state.current_location == expected_location
+    assert subject.state.current_location == expected_location

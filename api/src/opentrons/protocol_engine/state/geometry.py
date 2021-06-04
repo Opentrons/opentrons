@@ -1,7 +1,6 @@
-"""Geometry state store and getters."""
+"""Geometry state getters."""
 from dataclasses import dataclass
 from typing import Optional
-from typing_extensions import final
 
 
 from opentrons.types import Point
@@ -10,8 +9,7 @@ from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
 from .. import errors
 from ..types import WellLocation, WellOrigin
-from .substore import Substore
-from .labware import LabwareStore, LabwareData
+from .labware import LabwareView, LabwareData
 
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
@@ -19,7 +17,6 @@ DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
 # TODO(mc, 2020-11-12): reconcile this data structure with WellGeometry
 
 
-@final
 @dataclass(frozen=True)
 class TipGeometry:
     """Tip geometry data."""
@@ -31,18 +28,18 @@ class TipGeometry:
 
 # TODO(mc, 2021-06-03): continue evaluation of which selectors should go here
 # vs which selectors should be in LabwareView
-class GeometryState:
-    """Geometry getters."""
+class GeometryView:
+    """Geometry computed state getters."""
 
-    _labware_store: LabwareStore
+    _labware: LabwareView
 
-    def __init__(self, labware_store: LabwareStore) -> None:
-        """Initialize a GeometryState instance."""
-        self._labware_store = labware_store
+    def __init__(self, labware_view: LabwareView) -> None:
+        """Initialize a GeometryView instance."""
+        self._labware = labware_view
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
-        labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
+        labware_data = self._labware.get_labware_data_by_id(labware_id)
 
         return self._get_highest_z_from_labware_data(labware_data)
 
@@ -51,26 +48,22 @@ class GeometryState:
         return max(
             [
                 self._get_highest_z_from_labware_data(lw_data)
-                for uid, lw_data in self._labware_store.state.get_all_labware()
+                for uid, lw_data in self._labware.get_all_labware()
             ]
         )
 
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
-        labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
-        slot_pos = self._labware_store.state.get_slot_position(
-            labware_data.location.slot
-        )
+        labware_data = self._labware.get_labware_data_by_id(labware_id)
+        slot_pos = self._labware.get_slot_position(labware_data.location.slot)
 
         return slot_pos
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
-        labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
-        slot_pos = self._labware_store.state.get_slot_position(
-            labware_data.location.slot
-        )
-        origin_offset = self._labware_store.state.get_definition_by_uri(
+        labware_data = self._labware.get_labware_data_by_id(labware_id)
+        slot_pos = self._labware.get_slot_position(labware_data.location.slot)
+        origin_offset = self._labware.get_definition_by_uri(
             labware_data.uri
         ).cornerOffsetFromSlot
 
@@ -82,7 +75,7 @@ class GeometryState:
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
-        labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
+        labware_data = self._labware.get_labware_data_by_id(labware_id)
         origin_pos = self.get_labware_origin_position(labware_id=labware_id)
         cal_offset = labware_data.calibration
 
@@ -100,7 +93,7 @@ class GeometryState:
     ) -> Point:
         """Get the absolute position of a well in a labware."""
         labware_pos = self.get_labware_position(labware_id)
-        well_def = self._labware_store.state.get_well_definition(labware_id, well_name)
+        well_def = self._labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
 
         if well_location is not None:
@@ -119,10 +112,8 @@ class GeometryState:
         )
 
     def _get_highest_z_from_labware_data(self, lw_data: LabwareData) -> float:
-        z_dim = self._labware_store.state.get_definition_by_uri(
-            lw_data.uri
-        ).dimensions.zDimension
-        slot_pos = self._labware_store.state.get_slot_position(lw_data.location.slot)
+        z_dim = self._labware.get_definition_by_uri(lw_data.uri).dimensions.zDimension
+        slot_pos = self._labware.get_slot_position(lw_data.location.slot)
 
         return z_dim + slot_pos[2] + lw_data.calibration[2]
 
@@ -138,8 +129,8 @@ class GeometryState:
         Effective tip length is the nominal tip length less the distance the
         tip overlaps with the pipette nozzle.
         """
-        labware_uri = self._labware_store.state.get_definition_uri(labware_id)
-        nominal_length = self._labware_store.state.get_tip_length(labware_id)
+        labware_uri = self._labware.get_definition_uri(labware_id)
+        nominal_length = self._labware.get_tip_length(labware_id)
         overlap_config = pipette_config["tip_overlap"]
         default_overlap = overlap_config.get("default", 0)
         overlap = overlap_config.get(labware_uri, default_overlap)
@@ -159,7 +150,7 @@ class GeometryState:
         which is all data required by the hardware controller for proper tip handling.
         """
         effective_length = self.get_effective_tip_length(labware_id, pipette_config)
-        well_def = self._labware_store.state.get_well_definition(labware_id, well_name)
+        well_def = self._labware.get_well_definition(labware_id, well_name)
 
         if well_def.shape != "circular":
             raise errors.LabwareIsNotTipRackError(
@@ -186,17 +177,7 @@ class GeometryState:
         if labware_id == FIXED_TRASH_ID:
             return WellLocation()
 
-        nominal_length = self._labware_store.state.get_tip_length(labware_id)
+        nominal_length = self._labware.get_tip_length(labware_id)
         offset_factor = pipette_config["return_tip_height"]
 
         return WellLocation(offset=(0, 0, -nominal_length * offset_factor))
-
-
-class GeometryStore(Substore[GeometryState]):
-    """Geometry state container."""
-
-    _state: GeometryState
-
-    def __init__(self, labware_store: LabwareStore) -> None:
-        """Initialize a geometry store and its state."""
-        self._state = GeometryState(labware_store=labware_store)

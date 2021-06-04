@@ -8,7 +8,7 @@ from opentrons.util.helpers import utc_now
 from .errors import ProtocolEngineError, UnexpectedProtocolError
 from .execution import CommandHandlers
 from .resources import ResourceProviders
-from .state import StateStore, StateView
+from .state import State, StateStore, StateView
 from .commands import (
     CommandRequestType,
     PendingCommandType,
@@ -25,7 +25,7 @@ class ProtocolEngine:
     of the commands themselves.
     """
 
-    state_store: StateStore
+    _state_store: StateStore
     _handlers: CommandHandlers
     _resources: ResourceProviders
 
@@ -46,7 +46,7 @@ class ProtocolEngine:
         handlers = CommandHandlers.create(
             resources=resources,
             hardware=hardware,
-            state=StateView.create_view(state_store),
+            state=state_store.state_view,
         )
 
         return cls(state_store=state_store, handlers=handlers, resources=resources)
@@ -62,9 +62,18 @@ class ProtocolEngine:
         This constructor does not inject provider implementations. Prefer the
         ProtocolEngine.create factory classmethod.
         """
-        self.state_store = state_store
+        self._state_store = state_store
         self._handlers = handlers
         self._resources = resources
+
+    @property
+    def state_view(self) -> StateView:
+        """Get an interface to retrieve calculated state values."""
+        return self._state_store.state_view
+
+    def get_state(self) -> State:
+        """Get the engine's underlying state."""
+        return self._state_store.get_state()
 
     async def execute_command(
         self,
@@ -78,7 +87,7 @@ class ProtocolEngine:
         done_cmd: Union[CompletedCommandType, FailedCommandType]
 
         # store the command prior to execution
-        self.state_store.handle_command(cmd, command_id=command_id)
+        self._state_store.handle_command(cmd, command_id=command_id)
 
         # execute the command
         try:
@@ -93,7 +102,7 @@ class ProtocolEngine:
             done_cmd = cmd.to_failed(error, failed_at)
 
         # store the done command
-        self.state_store.handle_command(done_cmd, command_id=command_id)
+        self._state_store.handle_command(done_cmd, command_id=command_id)
 
         return done_cmd
 
@@ -107,6 +116,6 @@ class ProtocolEngine:
         command_impl = request.get_implementation()
         command = command_impl.create_command(created_at)
 
-        self.state_store.handle_command(command, command_id=command_id)
+        self._state_store.handle_command(command, command_id=command_id)
 
         return command
