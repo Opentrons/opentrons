@@ -14,7 +14,7 @@ import type {
   SourceAndDest,
 } from '../types'
 type LiquidState = RobotState['liquidState']
-interface DispenseUpdateLiquidStateArgs {
+export interface DispenseUpdateLiquidStateArgs {
   invariantContext: InvariantContext
   prevLiquidState: LiquidState
   labware: string
