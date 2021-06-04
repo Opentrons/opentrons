@@ -1,11 +1,14 @@
 import { getStateAndContextTempTCModules } from '../fixtures'
 import { setTemperature } from '../commandCreators/atomic/setTemperature'
 import type { InvariantContext, RobotState, SetTemperatureArgs } from '../types'
+
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'
 const commandCreatorFnName = 'setTemperature'
+
 let invariantContext: InvariantContext
 let robotState: RobotState
+
 beforeEach(() => {
   const stateAndContext = getStateAndContextTempTCModules({
     temperatureModuleId,
@@ -14,16 +17,13 @@ beforeEach(() => {
   invariantContext = stateAndContext.invariantContext
   robotState = stateAndContext.robotState
 })
+
 describe('setTemperature', () => {
   const targetTemperature = 42
   const missingModuleError = {
-    errors: [
-      {
-        message: expect.any(String),
-        type: 'MISSING_MODULE',
-      },
-    ],
+    errors: [{ message: expect.any(String), type: 'MISSING_MODULE' }],
   }
+
   const testCases = [
     {
       testName: 'temperature module',
@@ -49,7 +49,8 @@ describe('setTemperature', () => {
       testName: 'null moduleId',
       moduleId: null,
       expected: missingModuleError,
-    }, // TODO: Ian 2019-01-24 implement setTemperature for thermocycler
+    },
+    // TODO: Ian 2019-01-24 implement setTemperature for thermocycler
     // {
     //   testName: 'thermocycler',
     //   moduleId: thermocyclerId,
@@ -66,6 +67,7 @@ describe('setTemperature', () => {
     //   },
     // },
   ]
+
   testCases.forEach(({ expected, moduleId, testName }) => {
     it(testName, () => {
       const args: SetTemperatureArgs = {

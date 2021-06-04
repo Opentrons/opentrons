@@ -15,11 +15,13 @@ describe('touchTip', () => {
   let invariantContext: InvariantContext
   let initialRobotState: RobotState
   let robotStateWithTip: RobotState
+
   beforeEach(() => {
     invariantContext = makeContext()
     initialRobotState = getInitialRobotStateStandard(invariantContext)
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
   })
+
   it('touchTip with tip, specifying offsetFromBottomMm', () => {
     const result = touchTip(
       {
@@ -32,6 +34,7 @@ describe('touchTip', () => {
       robotStateWithTip
     )
     const res = getSuccessResult(result)
+
     expect(res.commands).toEqual([
       {
         command: 'touchTip',
@@ -44,6 +47,7 @@ describe('touchTip', () => {
       },
     ])
   })
+
   it('touchTip with invalid pipette ID should throw error', () => {
     const result = touchTip(
       {
@@ -56,8 +60,10 @@ describe('touchTip', () => {
       robotStateWithTip
     )
     const res = getErrorResult(result)
+
     expectTimelineError(res.errors, 'PIPETTE_DOES_NOT_EXIST')
   })
+
   it('touchTip with no tip should throw error', () => {
     const result = touchTip(
       {
@@ -70,6 +76,7 @@ describe('touchTip', () => {
       initialRobotState
     )
     const res = getErrorResult(result)
+
     expect(res.errors).toEqual([
       {
         message:

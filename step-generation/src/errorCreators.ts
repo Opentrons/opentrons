@@ -1,4 +1,3 @@
-// @flow
 /** Utility fns to create reusable CommandCreatorErrors */
 import type { CommandCreatorError } from './types'
 

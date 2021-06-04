@@ -10,8 +10,10 @@ import type {
   ThermocyclerModuleState,
   ThermocyclerProfileStepArgs,
 } from '../types'
+
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'
+
 describe('thermocyclerProfileStep', () => {
   const testCases: Array<{
     testName: string
@@ -109,12 +111,7 @@ describe('thermocyclerProfileStep', () => {
         lidTargetTempHold: null,
         lidOpenHold: true,
         module: thermocyclerId,
-        profileSteps: [
-          {
-            temperature: 61,
-            holdTime: 99,
-          },
-        ],
+        profileSteps: [{ temperature: 61, holdTime: 99 }],
         profileTargetLidTemp: 55,
         profileVolume: 42,
       },
@@ -123,12 +120,7 @@ describe('thermocyclerProfileStep', () => {
           command: 'thermocycler/runProfile',
           params: {
             module: 'thermocyclerId',
-            profile: [
-              {
-                temperature: 61,
-                holdTime: 99,
-              },
-            ],
+            profile: [{ temperature: 61, holdTime: 99 }],
             volume: 42,
           },
         },
@@ -181,12 +173,7 @@ describe('thermocyclerProfileStep', () => {
         lidTargetTempHold: null,
         lidOpenHold: true,
         module: thermocyclerId,
-        profileSteps: [
-          {
-            temperature: 61,
-            holdTime: 99,
-          },
-        ],
+        profileSteps: [{ temperature: 61, holdTime: 99 }],
         profileTargetLidTemp: 55,
         profileVolume: 42,
       },
@@ -201,12 +188,7 @@ describe('thermocyclerProfileStep', () => {
           command: 'thermocycler/runProfile',
           params: {
             module: 'thermocyclerId',
-            profile: [
-              {
-                temperature: 61,
-                holdTime: 99,
-              },
-            ],
+            profile: [{ temperature: 61, holdTime: 99 }],
             volume: 42,
           },
         },
@@ -259,12 +241,7 @@ describe('thermocyclerProfileStep', () => {
         lidTargetTempHold: null,
         lidOpenHold: true,
         module: thermocyclerId,
-        profileSteps: [
-          {
-            temperature: 61,
-            holdTime: 99,
-          },
-        ],
+        profileSteps: [{ temperature: 61, holdTime: 99 }],
         profileTargetLidTemp: 55,
         profileVolume: 42,
       },
@@ -273,12 +250,7 @@ describe('thermocyclerProfileStep', () => {
           command: 'thermocycler/runProfile',
           params: {
             module: 'thermocyclerId',
-            profile: [
-              {
-                temperature: 61,
-                holdTime: 99,
-              },
-            ],
+            profile: [{ temperature: 61, holdTime: 99 }],
             volume: 42,
           },
         },
@@ -317,6 +289,7 @@ describe('thermocyclerProfileStep', () => {
       ],
     },
   ]
+
   testCases.forEach(
     ({ testName, args, expected, initialThermocyclerModuleState }) => {
       it(testName, () => {
@@ -328,7 +301,7 @@ describe('thermocyclerProfileStep', () => {
           thermocyclerId,
         })
 
-        if (initialThermocyclerModuleState != null) {
+        if (initialThermocyclerModuleState) {
           robotState.modules[
             thermocyclerId
           ].moduleState = initialThermocyclerModuleState
@@ -344,11 +317,13 @@ describe('thermocyclerProfileStep', () => {
       })
     }
   )
+
   it('should return timeline error with bad moduleId', () => {
     const { robotState, invariantContext } = getStateAndContextTempTCModules({
       temperatureModuleId,
       thermocyclerId,
     })
+
     const args: ThermocyclerProfileStepArgs = {
       commandCreatorFnName: 'thermocyclerProfile',
       blockTargetTempHold: 4,
@@ -359,7 +334,9 @@ describe('thermocyclerProfileStep', () => {
       profileTargetLidTemp: 55,
       profileVolume: 42,
     }
+
     const result = thermocyclerProfileStep(args, invariantContext, robotState)
+
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'MISSING_MODULE',

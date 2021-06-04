@@ -1,4 +1,3 @@
-// @flow
 export {
   transfer,
   mix,

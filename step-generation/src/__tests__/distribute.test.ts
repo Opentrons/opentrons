@@ -1,4 +1,3 @@
-// @flow
 import { FIXED_TRASH_ID } from '../constants'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
