@@ -10,7 +10,7 @@ from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
 from .. import errors
 from ..types import WellLocation, WellOrigin
-from .substore import Substore, CommandReactive
+from .substore import Substore
 from .labware import LabwareStore, LabwareData
 
 
@@ -192,7 +192,7 @@ class GeometryState:
         return WellLocation(offset=(0, 0, -nominal_length * offset_factor))
 
 
-class GeometryStore(Substore[GeometryState], CommandReactive):
+class GeometryStore(Substore[GeometryState]):
     """Geometry state container."""
 
     _state: GeometryState

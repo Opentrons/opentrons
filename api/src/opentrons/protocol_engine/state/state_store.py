@@ -116,7 +116,6 @@ class StateStore(StateView):
         self._lifecycle_substores: List[CommandReactive] = [
             labware_store,
             pipette_store,
-            geometry_store,
             motion_store,
         ]
 
