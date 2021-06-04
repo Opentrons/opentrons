@@ -20,7 +20,7 @@ async def tempdeck(loop: asyncio.BaseEventLoop, emulation_app) -> TempDeck:
     )
     yield module
     await execution_manager.cancel()
-    module.cleanup()
+    await module.cleanup()
 
 
 def test_device_info(tempdeck) -> None:
