@@ -68,7 +68,6 @@
     "babel-plugin-unassert": "^3.0.1",
     "concurrently": "^4.1.2",
     "core-js": "^3.6.4",
-    "create-react-app": "^4.0.3",
     "css-loader": "^3.2.0",
     "cypress": "^6.6.0",
     "cypress-file-upload": "3.5.3",

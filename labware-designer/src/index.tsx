@@ -9,20 +9,17 @@ import { App } from './App'
 window.sharedData = sharedData
 console.log('Functions are available under global "sharedData":', sharedData)
 
-const render = Component => {
-  ReactDOM.render(
-    <AppContainer>
-      <Component />
-    </AppContainer>,
-    document.getElementById('root')
-  )
+const $root = document.getElementById('root')
+
+if (!$root) {
+  throw new Error('fatal: #root not found')
 }
 
-render(App)
+ReactDOM.render(<AppContainer><App/></AppContainer>, $root)
 
 // Hot Module Replacement API
 if (module.hot) {
   module.hot.accept('./App', () => {
-    render(App)
+    ReactDOM.render(<AppContainer><App/></AppContainer>, $root)
   })
 }
