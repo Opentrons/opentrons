@@ -282,18 +282,12 @@ def test_delete_session_by_id(
     client: TestClient,
 ) -> None:
     """It should be able to remove a session by ID."""
-    session = SessionResource(
-        session_id="session-id",
-        create_data=BasicSessionCreateData(),
-        created_at=datetime.now(),
-        control_commands=[],
-    )
-
-    decoy.when(session_store.remove(session_id="unique-id")).then_return(session)
-
     response = client.delete("/sessions/unique-id")
 
-    decoy.verify(engine_store.remove())
+    decoy.verify(
+        engine_store.remove(),
+        session_store.remove(session_id="unique-id"),
+    )
 
     assert response.status_code == 200
     assert response.json()["data"] is None

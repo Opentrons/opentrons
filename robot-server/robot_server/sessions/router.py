@@ -158,11 +158,10 @@ async def remove_session_by_id(
         engine_store: ProtocolEngine storage and control.
     """
     try:
+        engine_store.remove()
         session_store.remove(session_id=sessionId)
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
-
-    engine_store.remove()
 
     return EmptyResponseModel()
 

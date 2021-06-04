@@ -49,7 +49,7 @@ class SessionBuilder:
         """Create a new session control command resource.
 
         Arguments:
-            seesion: The session resource to add the command to.
+            session: The session resource to add the command to.
             control_command_id: Unique ID to assign to the command resource.
             control_command_data: Data used to create the command resource.
             created_at: Resource creation timestamp.
