@@ -2,7 +2,8 @@
   "name": "@opentrons/app",
   "version": "4.3.1",
   "description": "Opentrons desktop application UI",
-  "main": "src/index.js",
+  "source": "src/index.tsx",
+  "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/Opentrons/opentrons.git"

@@ -69,7 +69,7 @@ export const WellBottomAndDepth = (): JSX.Element | null => {
 
   return (
     <div className={styles.new_definition_section}>
-      <SectionBody label="Well Bottom & Depth">
+      <SectionBody label="Well Bottom & Depth" id="WellBottomAndDepth">
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <Content values={values} />

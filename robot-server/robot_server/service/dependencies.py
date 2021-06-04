@@ -1,5 +1,7 @@
 import typing
+from datetime import datetime, timezone
 from typing_extensions import Literal
+from uuid import uuid4
 
 from starlette import status
 from fastapi import Depends, HTTPException, Header
@@ -126,3 +128,13 @@ async def check_version_header(
     else:
         # Attach the api version to request's state dict
         request.state.api_version = min(requested_version, constants.API_VERSION)
+
+
+def get_unique_id() -> str:
+    """Get a unique ID string to use as a resource identifier."""
+    return str(uuid4())
+
+
+def get_current_time() -> datetime:
+    """Get the current time in UTC to use as a resource timestamp."""
+    return datetime.now(tz=timezone.utc)

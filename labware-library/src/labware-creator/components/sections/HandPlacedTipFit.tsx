@@ -36,7 +36,7 @@ export const HandPlacedTipFit = (): JSX.Element | null => {
   if (values.labwareType === 'tipRack') {
     return (
       <div className={styles.new_definition_section}>
-        <SectionBody label="Hand-Placed Tip Fit">
+        <SectionBody label="Hand-Placed Tip Fit" id="HandPlacedTipFit">
           <>
             <FormAlerts
               touched={touched}

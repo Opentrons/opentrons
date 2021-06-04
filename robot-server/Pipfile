@@ -9,14 +9,14 @@ python_version = "3.7"
 [dev-packages]
 c445fee = {editable = true,path = "./../api"}
 pytest = "==6.1.0"
-pytest-xdist = "~=2.2.1 "
+pytest-aiohttp = "*"
 pytest-cov = "*"
+pytest-xdist = "~=2.2.1 "
 atomicwrites = {version = "*",sys_platform = "== 'win32'"}
 requests = "*"
 tavern = "==1.6.0"
 pykwalify = "==1.7.0"
 "289f143" = {editable = true, path = "./../shared-data/python"}
-pytest-aiohttp = "*"
 graphviz = "*"
 mock = "~=4.0.2"
 mypy = "==0.812.0"
@@ -24,7 +24,8 @@ flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.1.0"
-decoy = "~=1.3.2"
+decoy = "~=1.4.0"
+httpx = "==0.18.*"
 
 [packages]
 uvicorn = "==0.11.3"
