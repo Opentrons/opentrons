@@ -16,7 +16,7 @@ from opentrons.hardware_control.modules import update, mod_abc, types
 log = logging.getLogger(__name__)
 
 TEMP_POLL_INTERVAL_SECS = 1.0
-SIM_TEMP_POLL_INTERVAL_SECS = 0.001
+SIM_TEMP_POLL_INTERVAL_SECS = TEMP_POLL_INTERVAL_SECS / 20.0
 
 
 class TempDeck(mod_abc.AbstractModule):

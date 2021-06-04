@@ -19,7 +19,7 @@ async def thermocycler(
         usb_port=USBPort(name="", port_number=1, sub_names=[], device_path="",
                          hub=1),
         loop=loop,
-        polling_frequency=.001
+        polling_frequency=0.01
     )
     yield module
     await execution_manager.cancel()
