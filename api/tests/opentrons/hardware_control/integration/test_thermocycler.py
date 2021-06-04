@@ -23,7 +23,7 @@ async def thermocycler(
     )
     yield module
     await execution_manager.cancel()
-    module.cleanup()
+    await module.cleanup()
 
 
 def test_device_info(thermocycler: Thermocycler):
