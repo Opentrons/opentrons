@@ -9,17 +9,20 @@ responsibilities of this module are:
 - Dispatch ProtocolEngine commands to an engine instance
 """
 
+from .create_file_runner import create_file_runner
 from .abstract_file_runner import AbstractFileRunner
 from .json_file_runner import JsonFileRunner
 from .python_file_runner import PythonFileRunner
-from .protocol_file import ProtocolFile, ProtocolFileType
+from .protocol_file import ProtocolFileType, ProtocolFile
 
 __all__ = [
+    # runner factory
+    "create_file_runner",
     # runner interfaces
     "AbstractFileRunner",
     "JsonFileRunner",
     "PythonFileRunner",
     # value objects
-    "ProtocolFile",
     "ProtocolFileType",
+    "ProtocolFile",
 ]
