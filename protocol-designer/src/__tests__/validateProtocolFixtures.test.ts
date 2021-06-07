@@ -1,3 +1,4 @@
+// @flow
 import Ajv from 'ajv'
 import glob from 'glob'
 import last from 'lodash/last'
@@ -29,7 +30,6 @@ const expectResultToMatchSchema = (testName, result, _protocolSchema): void => {
     console.log(`===== ERRORS FOR ${testName} =====`)
     console.log(JSON.stringify(validationErrors, null, 4))
   }
-
   expect(valid).toBe(true)
   expect(validationErrors).toBe(null)
 }
@@ -40,7 +40,6 @@ const getSchemaDefForProtocol = (protocol: any): any => {
   // "schemaVersion": 3
   // "protocol-schema": "1.0.0"
   let n
-
   if (typeof protocol.$otSharedSchema === 'string') {
     n = last(protocol.$otSharedSchema.split('/')) || `${protocol.schemaVersion}`
   } else if (protocol.schemaVersion) {
@@ -52,13 +51,10 @@ const getSchemaDefForProtocol = (protocol: any): any => {
   switch (n) {
     case '1':
       return protocolV1Schema
-
     case '3':
       return protocolV3Schema
-
     case '4':
       return protocolV4Schema
-
     case '5':
       return protocolV5Schema
   }
@@ -77,9 +73,9 @@ describe('Protocol fixtures should validate under their JSON schemas', () => {
     '../../fixtures/protocol/**/*.json'
   )
   const fixturePaths = glob.sync(fixtureDirsGlobPath)
+
   fixturePaths.forEach(protocolPath => {
     const protocol = require(protocolPath)
-
     const relativeName = path.relative(__dirname, protocolPath)
     it(`${relativeName} should validate under its schema`, () => {
       expectResultToMatchSchema(
@@ -88,12 +84,14 @@ describe('Protocol fixtures should validate under their JSON schemas', () => {
         getSchemaDefForProtocol(protocol)
       )
     })
+
     // eg for a file 'protocol-designer/fixtures/protocol/N/foo.json'
     // we should expect that file to be PD version N.x.x
     const expectedVersion = last(path.dirname(protocolPath).split(path.sep))
     it(`${relativeName} should be in a folder matching its PD major version, ${expectedVersion}`, () => {
       const designerApplication =
         protocol.designerApplication || protocol['designer-application']
+
       // NOTE: default '1' exists because any protocol that doesn't include the application version
       // key will be treated as the oldest migrateable version ('1.0.0')
       // (Mimicking same pattern from protocol-designer/src/load-file/migration/index.js)
@@ -101,7 +99,9 @@ describe('Protocol fixtures should validate under their JSON schemas', () => {
         designerApplication?.applicationVersion ||
         designerApplication?.version ||
         '1'
+
       const pdMajorVersion = pdVersion && pdVersion.split('.')[0]
+
       expect(pdMajorVersion).toEqual(expectedVersion)
     })
   })

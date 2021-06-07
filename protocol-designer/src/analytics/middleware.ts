@@ -1,3 +1,4 @@
+// @flow
 import uniq from 'lodash/uniq'
 import {
   getArgsAndErrorsByStepId,
@@ -15,6 +16,7 @@ import type { StepArgsAndErrors } from '../steplist'
 import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
 import type { AnalyticsEventAction } from './actions'
 import type { AnalyticsEvent } from './mixpanel'
+
 // Converts Redux actions to analytics events (read: Mixpanel events).
 // Returns null if there is no analytics event associated with the action,
 // which happens for most actions.
@@ -35,15 +37,18 @@ export const reduxActionToAnalyticsEvent = (
       const pipetteEntities = getPipetteEntities(state)
       const fileMetadata = getFileMetadata(state)
       const dateCreatedTimestamp = fileMetadata.created
+
       // additional fields for analytics, eg descriptive name for pipettes
       // (these fields are prefixed with double underscore only to make sure they
       // never accidentally overlap with actual fields)
       const additionalProperties = flattenNestedProperties(stepArgs)
+
       // Mixpanel wants YYYY-MM-DDTHH:MM:SS for Date type
       additionalProperties.__dateCreated =
         dateCreatedTimestamp != null && Number.isFinite(dateCreatedTimestamp)
           ? new Date(dateCreatedTimestamp).toISOString()
           : null
+
       additionalProperties.__protocolName = fileMetadata.protocolName
 
       if (stepArgs.pipette) {
@@ -58,10 +63,10 @@ export const reduxActionToAnalyticsEvent = (
       }
     }
   }
-
   if (action.type === 'SAVE_STEP_FORMS_MULTI') {
     const fileMetadata = getFileMetadata(state)
     const dateCreatedTimestamp = fileMetadata.created
+
     const { editedFields, stepIds } = action.payload
     const additionalProperties = flattenNestedProperties(editedFields)
     const savedStepForms = getSavedStepForms(state)
@@ -72,7 +77,6 @@ export const reduxActionToAnalyticsEvent = (
     const uniqueStepTypes: Array<StepType> = uniq(
       batchEditedStepForms.map(form => form.stepType)
     )
-
     if (uniqueStepTypes.length === 1) {
       stepType = uniqueStepTypes[0]
     } else {
@@ -84,6 +88,7 @@ export const reduxActionToAnalyticsEvent = (
     }
 
     additionalProperties.stepType = stepType
+
     // (these fields are prefixed with double underscore only to make sure they
     // never accidentally overlap with actual fields)
     // Mixpanel wants YYYY-MM-DDTHH:MM:SS for Date type
@@ -91,62 +96,59 @@ export const reduxActionToAnalyticsEvent = (
       dateCreatedTimestamp != null && Number.isFinite(dateCreatedTimestamp)
         ? new Date(dateCreatedTimestamp).toISOString()
         : null
+
     additionalProperties.__protocolName = fileMetadata.protocolName
+
     return {
       name: 'saveStepsMulti',
       properties: { ...editedFields, ...additionalProperties },
     }
   }
-
   if (action.type === 'DELETE_MULTIPLE_STEPS') {
     return {
       name: 'deleteMultipleSteps',
       properties: {},
     }
   }
-
   if (action.type === 'DUPLICATE_MULTIPLE_STEPS') {
     return {
       name: 'duplicateMultipleSteps',
       properties: {},
     }
   }
-
   if (action.type === 'EXPAND_MULTIPLE_STEPS') {
     return {
       name: 'expandMultipleSteps',
       properties: {},
     }
   }
-
   if (action.type === 'COLLAPSE_MULTIPLE_STEPS') {
     return {
       name: 'collapseMultipleSteps',
       properties: {},
     }
   }
-
   if (action.type === 'ANALYTICS_EVENT') {
     const a: AnalyticsEventAction = action
     return a.payload
   }
-
   return null
 }
+
 export const trackEventMiddleware: Middleware<BaseState, any> = ({
   getState,
   dispatch,
 }) => next => action => {
   const result = next(action)
+
   // NOTE: this is the Redux state AFTER the action has been fully dispatched
   const state = getState()
+
   const optedIn = getHasOptedIn(state) || false
   const event = reduxActionToAnalyticsEvent(state, action)
-
   if (event) {
     // actually report to analytics (trackEvent is responsible for using optedIn)
     trackEvent(event, optedIn)
   }
-
   return result
 }

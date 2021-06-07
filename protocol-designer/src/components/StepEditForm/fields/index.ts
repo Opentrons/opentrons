@@ -1,9 +1,13 @@
+// @flow
+
 /* Generic Fields */
+
 export { CheckboxRowField } from './CheckboxRowField'
 export { RadioGroupField } from './RadioGroupField'
 export { TextField } from './TextField'
 
 /* Specialized Fields */
+
 export { BlowoutLocationField } from './BlowoutLocationField'
 export { ChangeTipField } from './ChangeTipField'
 export { DelayFields } from './DelayFields'

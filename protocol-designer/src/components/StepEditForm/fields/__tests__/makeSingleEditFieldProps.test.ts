@@ -1,3 +1,4 @@
+// @flow
 import { makeSingleEditFieldProps } from '../makeSingleEditFieldProps'
 import {
   getDisabledFields,
@@ -7,39 +8,47 @@ import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import * as stepEditFormUtils from '../../utils'
 jest.mock('../../../../steplist/formLevel')
 jest.mock('../../../../steplist/fieldLevel')
+
 const getFieldDefaultTooltipSpy = jest.spyOn(
   stepEditFormUtils,
   'getFieldDefaultTooltip'
 )
+
 const getSingleSelectDisabledTooltipSpy = jest.spyOn(
   stepEditFormUtils,
   'getSingleSelectDisabledTooltip'
 )
+
 const getDisabledFieldsMock: JestMockFn<any, Set<string>> = getDisabledFields
 const getDefaultsForStepTypeMock: JestMockFn<
   [any],
   any
 > = getDefaultsForStepType
 const getFieldErrorsMock: JestMockFn<
-  [string, unknown],
+  [string, mixed],
   Array<string>
 > = getFieldErrors
+
 beforeEach(() => {
   getFieldDefaultTooltipSpy.mockImplementation(name => `tooltip for ${name}`)
   getSingleSelectDisabledTooltipSpy.mockImplementation(
     name => `disabled tooltip for ${name}`
   )
 })
+
 afterEach(() => {
   jest.restoreAllMocks()
 })
+
 describe('makeSingleEditFieldProps', () => {
   it('should create correct props for all fields in the given stepType', () => {
     const focusedField = 'focused_error_field'
     const dirtyFields = ['dirty_error_field', 'focused_error_field']
+
     const focus: any = jest.fn()
     const blur: any = jest.fn()
     const handleChangeFormInput: any = jest.fn()
+
     const formData: any = {
       stepType: 'fakeStepType',
       some_field: '123',
@@ -48,12 +57,14 @@ describe('makeSingleEditFieldProps', () => {
       dirty_error_field: '',
       focused_error_field: '',
     }
+
     getDisabledFieldsMock.mockImplementation(form => {
       expect(form).toBe(formData)
       const disabled = new Set()
       disabled.add('disabled_field')
       return disabled
     })
+
     getDefaultsForStepTypeMock.mockImplementation(stepType => {
       expect(stepType).toEqual('fakeStepType')
       return {
@@ -64,6 +75,7 @@ describe('makeSingleEditFieldProps', () => {
         focused_error_field: '',
       }
     })
+
     getFieldErrorsMock.mockImplementation((name, value) => {
       // pretend all the '*_error_field' fields have errors
       // (though downstream of getFieldErrors, these errors won't be shown
@@ -75,9 +87,9 @@ describe('makeSingleEditFieldProps', () => {
       ) {
         return ['invalid value', 'field is required']
       }
-
       return []
     })
+
     const focusHandlers = {
       focusedField,
       dirtyFields,
@@ -140,7 +152,9 @@ describe('makeSingleEditFieldProps', () => {
         value: '',
         tooltipContent: 'tooltip for focused_error_field',
       },
-    }) // ensure the callbacks are wired up
+    })
+
+    // ensure the callbacks are wired up
     ;[
       'some_field',
       'disabled_field',
@@ -149,12 +163,16 @@ describe('makeSingleEditFieldProps', () => {
       'focused_error_field',
     ].forEach(name => {
       const { onFieldBlur, onFieldFocus, updateValue } = result[name]
+
       onFieldBlur()
       expect(blur).toHaveBeenCalledWith(name)
+
       onFieldFocus()
       expect(focus).toHaveBeenCalledWith(name)
+
       updateValue('foo')
       expect(handleChangeFormInput).toHaveBeenCalledWith(name, 'foo')
+
       expect(getFieldErrorsMock).toHaveBeenCalledWith(name, formData[name])
     })
   })

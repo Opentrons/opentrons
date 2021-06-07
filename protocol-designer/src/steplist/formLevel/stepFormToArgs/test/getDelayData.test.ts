@@ -1,19 +1,18 @@
+// @flow
 import { getMoveLiquidDelayData, getMixDelayData } from '../getDelayData'
+
 describe('getMoveLiquidDelayData', () => {
   it('should return null if checkbox field is false', () => {
     expect(
       getMoveLiquidDelayData(
-        {
-          checkboxField: false,
-          secondsField: 3,
-          offsetField: 2,
-        },
+        { checkboxField: false, secondsField: 3, offsetField: 2 },
         'checkboxField',
         'secondsField',
         'offsetField'
       )
     ).toBe(null)
   })
+
   it('should return null if either number fields <= 0 / null', () => {
     const cases = [
       [0, 5],
@@ -23,6 +22,7 @@ describe('getMoveLiquidDelayData', () => {
       [-1, 2],
       [2, -1],
     ]
+
     cases.forEach(testCase => {
       const [secondsValue, offsetValue] = testCase
       expect(
@@ -39,32 +39,24 @@ describe('getMoveLiquidDelayData', () => {
       ).toBe(null)
     })
   })
+
   it('should return seconds & mmFromBottom if checkbox is checked', () => {
     expect(
       getMoveLiquidDelayData(
-        {
-          checkboxField: true,
-          secondsField: 30,
-          offsetField: 2,
-        },
+        { checkboxField: true, secondsField: 30, offsetField: 2 },
         'checkboxField',
         'secondsField',
         'offsetField'
       )
-    ).toEqual({
-      seconds: 30,
-      mmFromBottom: 2,
-    })
+    ).toEqual({ seconds: 30, mmFromBottom: 2 })
   })
 })
+
 describe('getMixDelayData', () => {
   it('should return null if the checkbox field is false', () => {
     expect(
       getMixDelayData(
-        {
-          checkboxField: false,
-          secondsField: 3,
-        },
+        { checkboxField: false, secondsField: 3 },
         'checkboxField',
         'secondsField'
       )
@@ -73,10 +65,7 @@ describe('getMixDelayData', () => {
   it('should return null if the seconds field is 0', () => {
     expect(
       getMixDelayData(
-        {
-          checkboxField: true,
-          secondsField: 0,
-        },
+        { checkboxField: true, secondsField: 0 },
         'checkboxField',
         'secondsField'
       )
@@ -85,10 +74,7 @@ describe('getMixDelayData', () => {
   it('should return null if the seconds field is less than 0', () => {
     expect(
       getMixDelayData(
-        {
-          checkboxField: true,
-          secondsField: -1,
-        },
+        { checkboxField: true, secondsField: -1 },
         'checkboxField',
         'secondsField'
       )
@@ -97,10 +83,7 @@ describe('getMixDelayData', () => {
   it('should return the seconds field if checckbox is checked and the seconds field is > 0', () => {
     expect(
       getMixDelayData(
-        {
-          checkboxField: true,
-          secondsField: 10,
-        },
+        { checkboxField: true, secondsField: 10 },
         'checkboxField',
         'secondsField'
       )

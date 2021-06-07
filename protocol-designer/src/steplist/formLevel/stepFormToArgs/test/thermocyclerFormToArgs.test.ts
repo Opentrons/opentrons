@@ -1,15 +1,18 @@
+// @flow
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../../constants'
 import { getDefaultsForStepType } from '../../getDefaultsForStepType'
 import { thermocyclerFormToArgs } from '../thermocyclerFormToArgs'
 import type { FormData } from '../../../../form-types'
 import type { ThermocyclerStateStepArgs } from '../../../../step-generation/types'
+
 const tcModuleId = 'tcModuleId'
+
 describe('thermocyclerFormToArgs', () => {
-  const testCases: Array<{
-    formData: FormData
-    expected: ThermocyclerStateStepArgs
-    testName: string
-  }> = [
+  const testCases: Array<{|
+    formData: FormData,
+    expected: ThermocyclerStateStepArgs,
+    testName: string,
+  |}> = [
     {
       testName: 'all active temps',
       formData: {
@@ -17,6 +20,7 @@ describe('thermocyclerFormToArgs', () => {
         stepType: 'thermocycler',
         id: 'testId',
         description: 'some description',
+
         moduleId: tcModuleId,
         thermocyclerFormType: THERMOCYCLER_STATE,
         blockIsActive: true,
@@ -27,6 +31,7 @@ describe('thermocyclerFormToArgs', () => {
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_STATE,
+
         module: tcModuleId,
         blockTargetTemp: 45,
         lidTargetTemp: 40,
@@ -40,6 +45,7 @@ describe('thermocyclerFormToArgs', () => {
         stepType: 'thermocycler',
         id: 'testId',
         description: 'some description',
+
         moduleId: tcModuleId,
         thermocyclerFormType: THERMOCYCLER_STATE,
         blockIsActive: false,
@@ -50,6 +56,7 @@ describe('thermocyclerFormToArgs', () => {
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_STATE,
+
         module: tcModuleId,
         blockTargetTemp: null,
         lidTargetTemp: 40,
@@ -63,8 +70,10 @@ describe('thermocyclerFormToArgs', () => {
         stepType: 'thermocycler',
         id: 'testId',
         description: 'some description',
+
         moduleId: tcModuleId,
         thermocyclerFormType: THERMOCYCLER_PROFILE,
+
         profileVolume: '4',
         profileTargetLidTemp: '40',
         orderedProfileItems: ['profileItem1', 'profileItem2'],
@@ -110,31 +119,19 @@ describe('thermocyclerFormToArgs', () => {
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
         module: tcModuleId,
+
         blockTargetTempHold: null,
         lidOpenHold: true,
         lidTargetTempHold: 5,
         profileSteps: [
           // top-level step
-          {
-            temperature: 5,
-            holdTime: 50,
-          }, // cycle rep 1
-          {
-            temperature: 12,
-            holdTime: 62,
-          },
-          {
-            temperature: 99,
-            holdTime: 45,
-          }, // cycle rep 2
-          {
-            temperature: 12,
-            holdTime: 62,
-          },
-          {
-            temperature: 99,
-            holdTime: 45,
-          },
+          { temperature: 5, holdTime: 50 },
+          // cycle rep 1
+          { temperature: 12, holdTime: 62 },
+          { temperature: 99, holdTime: 45 },
+          // cycle rep 2
+          { temperature: 12, holdTime: 62 },
+          { temperature: 99, holdTime: 45 },
         ],
         profileTargetLidTemp: 40,
         profileVolume: 4,
@@ -176,6 +173,7 @@ describe('thermocyclerFormToArgs', () => {
       },
     },
   ]
+
   testCases.forEach(({ formData, expected, testName }) => {
     it(`should translate "thermocyclerState" to args: ${testName}`, () => {
       expect(thermocyclerFormToArgs(formData)).toEqual(expected)

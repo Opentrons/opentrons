@@ -1,29 +1,25 @@
+// @flow
 import { getRequiresAtLeastV4 } from '../selectors/fileCreator'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
 import type { ModuleEntities } from '../../step-forms'
+
 describe('getRequiresAtLeastV4 selector', () => {
-  const testCases: Array<{
-    testName: string
+  const testCases: Array<{|
+    testName: string,
     robotStateTimeline: {
       // NOTE: this is a simplified version of Timeline type so we don't need a huge fixture
-      timeline: Array<{
-        commands: Array<{
-          command: string
-        }>
-      }>
-    }
-    moduleEntities: ModuleEntities
-    expected: boolean
-  }> = [
+      timeline: Array<{ commands: Array<{ command: string }> }>,
+    },
+    moduleEntities: ModuleEntities,
+    expected: boolean,
+  |}> = [
     {
       testName: 'should return true if there are modules',
       expected: true,
-      robotStateTimeline: {
-        timeline: [],
-      },
+      robotStateTimeline: { timeline: [] },
       moduleEntities: {
         someModule: {
           id: 'moduleId',
@@ -36,15 +32,7 @@ describe('getRequiresAtLeastV4 selector', () => {
       testName: 'should return true if there are non-v3 commands',
       expected: true,
       robotStateTimeline: {
-        timeline: [
-          {
-            commands: [
-              {
-                command: 'someNonV4Command',
-              },
-            ],
-          },
-        ],
+        timeline: [{ commands: [{ command: 'someNonV4Command' }] }],
       },
       moduleEntities: {},
     },
@@ -52,9 +40,7 @@ describe('getRequiresAtLeastV4 selector', () => {
       testName:
         'should return false if there are no modules and no v4-specific commands',
       expected: false,
-      robotStateTimeline: {
-        timeline: [],
-      },
+      robotStateTimeline: { timeline: [] },
       moduleEntities: {},
     },
   ]

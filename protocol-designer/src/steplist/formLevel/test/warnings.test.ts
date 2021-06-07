@@ -1,3 +1,4 @@
+// @flow
 import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
 import {
   _minAirGapVolume,
@@ -5,11 +6,13 @@ import {
   minDisposalVolume,
   maxDispenseWellVolume,
 } from '../warnings'
+
 describe('Min air gap volume', () => {
   const aspDisp = ['aspirate', 'dispense']
   aspDisp.forEach(aspOrDisp => {
     const checkboxField = `${aspDisp}_airGap_checkbox`
     const volumeField = `${aspDisp}_airGap_volume`
+
     describe(`${aspOrDisp} -> air gap`, () => {
       let pipette
       beforeEach(() => {
@@ -26,9 +29,7 @@ describe('Min air gap volume', () => {
         const fields = {
           [checkboxField]: false,
           [volumeField]: null,
-          ...{
-            pipette,
-          },
+          ...{ pipette },
         }
         expect(minAirGapVolume({ ...fields })).toBe(null)
       })
@@ -36,9 +37,7 @@ describe('Min air gap volume', () => {
         const fields = {
           [checkboxField]: true,
           [volumeField]: null,
-          ...{
-            pipette,
-          },
+          ...{ pipette },
         }
         expect(minAirGapVolume({ ...fields })).toBe(null)
       })
@@ -46,19 +45,16 @@ describe('Min air gap volume', () => {
         const fields = {
           [checkboxField]: true,
           [volumeField]: '150',
-          ...{
-            pipette,
-          },
+          ...{ pipette },
         }
         expect(minAirGapVolume(fields)).toBe(null)
       })
+
       it('should NOT return a warning when the air gap volume is equal to the the pipette min volume', () => {
         const fields = {
           [checkboxField]: true,
           [volumeField]: '100',
-          ...{
-            pipette,
-          },
+          ...{ pipette },
         }
         expect(minAirGapVolume(fields)).toBe(null)
       })
@@ -66,9 +62,7 @@ describe('Min air gap volume', () => {
         const fields = {
           [checkboxField]: true,
           [volumeField]: '0',
-          ...{
-            pipette,
-          },
+          ...{ pipette },
         }
         expect(minAirGapVolume(fields).type).toBe('BELOW_MIN_AIR_GAP_VOLUME')
       })
@@ -76,9 +70,7 @@ describe('Min air gap volume', () => {
         const fields = {
           [checkboxField]: true,
           [volumeField]: '0',
-          ...{
-            pipette,
-          },
+          ...{ pipette },
         }
         expect(minAirGapVolume(fields).type).toBe('BELOW_MIN_AIR_GAP_VOLUME')
       })
@@ -97,15 +89,24 @@ describe('Below pipette minimum volume', () => {
     }
   })
   it('should NOT return a warning when the volume equals the min pipette volume', () => {
-    const fields = { ...fieldsWithPipette, volume: 100 }
+    const fields = {
+      ...fieldsWithPipette,
+      volume: 100,
+    }
     expect(belowPipetteMinimumVolume(fields)).toBe(null)
   })
   it('should NOT return a warning when the volume is greater than the min pipette volume', () => {
-    const fields = { ...fieldsWithPipette, volume: 101 }
+    const fields = {
+      ...fieldsWithPipette,
+      volume: 101,
+    }
     expect(belowPipetteMinimumVolume(fields)).toBe(null)
   })
   it('should return a warning when the volume is less than the min pipette volume', () => {
-    const fields = { ...fieldsWithPipette, volume: 99 }
+    const fields = {
+      ...fieldsWithPipette,
+      volume: 99,
+    }
     expect(belowPipetteMinimumVolume(fields).type).toBe(
       'BELOW_PIPETTE_MINIMUM_VOLUME'
     )
@@ -126,40 +127,60 @@ describe('Below min disposal volume', () => {
     }
   })
   it('should NOT return a warning when there is no pipette', () => {
-    const fields = { ...fieldsWithPipette, pipette: undefined }
+    const fields = {
+      ...fieldsWithPipette,
+      pipette: undefined,
+    }
     expect(minDisposalVolume(fields)).toBe(null)
   })
   it('should NOT return a warning when there is no pipette spec', () => {
     const fields = {
       ...fieldsWithPipette,
-      pipette: {
-        spec: undefined,
-      },
+      pipette: { spec: undefined },
     }
     expect(minDisposalVolume(fields)).toBe(null)
   })
   it('should NOT return a warning when the path is NOT multi dispense', () => {
-    const fields = { ...fieldsWithPipette, path: 'another_path' }
+    const fields = {
+      ...fieldsWithPipette,
+      path: 'another_path',
+    }
     expect(minDisposalVolume(fields)).toBe(null)
   })
   it('should NOT return a warning when the volume is equal to the min pipette volume', () => {
-    const fields = { ...fieldsWithPipette, disposalVolume_volume: 100 }
+    const fields = {
+      ...fieldsWithPipette,
+      disposalVolume_volume: 100,
+    }
     expect(minDisposalVolume(fields)).toBe(null)
   })
   it('should NOT return a warning when the volume is greater than the min pipette volume', () => {
-    const fields = { ...fieldsWithPipette, disposalVolume_volume: 100 }
+    const fields = {
+      ...fieldsWithPipette,
+      disposalVolume_volume: 100,
+    }
     expect(minDisposalVolume(fields)).toBe(null)
   })
+
   it('should return a warning when the volume is less than the min pipette volume', () => {
-    const fields = { ...fieldsWithPipette, disposalVolume_volume: 99 }
+    const fields = {
+      ...fieldsWithPipette,
+      disposalVolume_volume: 99,
+    }
     expect(minDisposalVolume(fields).type).toBe('BELOW_MIN_DISPOSAL_VOLUME')
   })
   it('should return a warning when the path is multi dispense and the checkbox is unchecked', () => {
-    const fields = { ...fieldsWithPipette, disposalVolume_checkbox: false }
+    const fields = {
+      ...fieldsWithPipette,
+      disposalVolume_checkbox: false,
+    }
     expect(minDisposalVolume(fields).type).toBe('BELOW_MIN_DISPOSAL_VOLUME')
   })
   it('should return a warning when the path is multi dispense and there is no disposal volume', () => {
-    const fields = { ...fieldsWithPipette, disposalVolume_volume: undefined }
+    const fields = {
+      ...fieldsWithPipette,
+      disposalVolume_volume: undefined,
+    }
     expect(minDisposalVolume(fields).type).toBe('BELOW_MIN_DISPOSAL_VOLUME')
   })
 })
@@ -167,18 +188,22 @@ describe('Max dispense well volume', () => {
   let fieldsWithDispenseLabware
   beforeEach(() => {
     fieldsWithDispenseLabware = {
-      dispense_labware: {
-        def: { ...fixture_24_tuberack },
-      },
+      dispense_labware: { def: { ...fixture_24_tuberack } },
       dispense_wells: ['A1', 'A2'],
     }
   })
   it('should NOT return a warning when there is no dispense labware', () => {
-    const fields = { ...fieldsWithDispenseLabware, dispense_labware: undefined }
+    const fields = {
+      ...fieldsWithDispenseLabware,
+      dispense_labware: undefined,
+    }
     expect(maxDispenseWellVolume(fields)).toBe(null)
   })
   it('should NOT return a warning when there are no dispense wells', () => {
-    const fields = { ...fieldsWithDispenseLabware, dispense_wells: undefined }
+    const fields = {
+      ...fieldsWithDispenseLabware,
+      dispense_wells: undefined,
+    }
     expect(maxDispenseWellVolume(fields)).toBe(null)
   })
   it('should NOT return a warning when the volume is less than the well depth', () => {
