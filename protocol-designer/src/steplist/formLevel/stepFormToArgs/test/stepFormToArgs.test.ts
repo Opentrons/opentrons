@@ -1,9 +1,12 @@
-import { _castForm } from '../index'
+// @flow
+import { _castForm } from '../index.js'
+
 // NOTE(IL, 2020-09-24): I think the real solution to validating the
 // output of hydration/casting is static typing as per #3161
 // Because if we forget to change the value casters when adding/modifying fields,
 // and we also forget to modify these tests covering the value casters, these tests
 // won't catch any problems.
+
 describe('form casting', () => {
   it('should cast moveLiquid form fields', () => {
     const input = {
@@ -68,6 +71,7 @@ describe('form casting', () => {
       volume: 5,
     })
   })
+
   it('should cast mix form fields', () => {
     const input = {
       id: 'stepId',
@@ -91,6 +95,7 @@ describe('form casting', () => {
       aspirate_delay_seconds: '2',
       dispense_delay_seconds: '1',
     }
+
     expect(_castForm(input)).toEqual({
       ...input,
       mix_mmFromBottom: 0.5,
@@ -100,6 +105,7 @@ describe('form casting', () => {
       dispense_delay_seconds: 1,
     })
   })
+
   it('should cast pause form fields', () => {
     const input = {
       id: 'stepId',
@@ -121,9 +127,14 @@ describe('form casting', () => {
         },
       },
     }
+
     // NOTE: pauseHour + pauseMinute + pauseSecond aren't cast to number
-    expect(_castForm(input)).toEqual({ ...input, pauseTemperature: 0 })
+    expect(_castForm(input)).toEqual({
+      ...input,
+      pauseTemperature: 0,
+    })
   })
+
   it('should cast magnet form fields', () => {
     const input = {
       id: 'stepId',
@@ -141,8 +152,10 @@ describe('form casting', () => {
         },
       },
     }
+
     expect(_castForm(input)).toEqual({ ...input, engageHeight: 12 })
   })
+
   it('should cast temperature form fields', () => {
     const input = {
       id: 'stepId',
@@ -160,8 +173,12 @@ describe('form casting', () => {
         },
       },
     }
-    expect(_castForm(input)).toEqual({ ...input, targetTemperature: 24 })
+    expect(_castForm(input)).toEqual({
+      ...input,
+      targetTemperature: 24,
+    })
   })
+
   it('should cast thermocycler form fields', () => {
     const input = {
       id: 'stepId',
