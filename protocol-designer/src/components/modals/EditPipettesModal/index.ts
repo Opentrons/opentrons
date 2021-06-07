@@ -32,8 +32,7 @@ const mapSTP = (state: BaseState): SP => {
   const initialPipettes = stepFormSelectors.getPipettesForEditPipetteForm(state)
   return {
     initialPipetteValues: initialPipettes,
-    _prevPipettes: stepFormSelectors.getInitialDeckSetup(state).pipettes,
-    // TODO: Ian 2019-01-02 when multi-step editing is supported, don't use initial deck state. Instead, show the pipettes available for the selected step range
+    _prevPipettes: stepFormSelectors.getInitialDeckSetup(state).pipettes, // TODO: Ian 2019-01-02 when multi-step editing is supported, don't use initial deck state. Instead, show the pipettes available for the selected step range
     _orderedStepIds: stepFormSelectors.getOrderedStepIds(state),
     moduleRestrictionsDisabled: featureFlagSelectors.getDisableModuleRestrictions(
       state
