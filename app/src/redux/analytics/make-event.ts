@@ -101,7 +101,7 @@ export function makeEvent(
     // open for the entire run. Fixing this is blocked until we can fix
     // session.stop from triggering a run error
     case 'robot:RUN_RESPONSE': {
-      const runTime = robotSelectors.getRunSecondsAt(state)()
+      const runTime = robotSelectors.getRunSeconds(state)
       const success = !action.error
       const error = action.error ? action.payload?.message || '' : ''
 
@@ -118,7 +118,7 @@ export function makeEvent(
     }
 
     case 'robot:PAUSE': {
-      const runTime = robotSelectors.getRunSecondsAt(state)()
+      const runTime = robotSelectors.getRunSeconds(state)
 
       return getProtocolAnalyticsData(state).then(data => ({
         name: 'runPause',
@@ -127,7 +127,7 @@ export function makeEvent(
     }
 
     case 'robot:RESUME': {
-      const runTime = robotSelectors.getRunSecondsAt(state)()
+      const runTime = robotSelectors.getRunSeconds(state)
 
       return getProtocolAnalyticsData(state).then(data => ({
         name: 'runResume',
@@ -136,7 +136,7 @@ export function makeEvent(
     }
 
     case 'robot:CANCEL':
-      const runTime = robotSelectors.getRunSecondsAt(state)()
+      const runTime = robotSelectors.getRunSeconds(state)
 
       return getProtocolAnalyticsData(state).then(data => ({
         name: 'runCancel',

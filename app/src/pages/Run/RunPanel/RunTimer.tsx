@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useStore } from 'react-redux'
 import padStart from 'lodash/padStart'
-
+import { useInterval } from '@opentrons/components'
 import styles from './styles.css'
 import {
-  getRunSecondsAt,
-  getPausedSecondsAt,
+  getRunSeconds,
+  getPausedSeconds,
   getStartTimeMs,
 } from '../../../redux/robot/selectors'
 import { format } from 'date-fns'
@@ -19,22 +19,17 @@ function formatSeconds(runSeconds: number): string {
 
 export function RunTimer(): JSX.Element {
   const [now, setNow] = React.useState(Date.now())
+  const state = useStore().getState()
   const startTimeMs = useSelector(getStartTimeMs)
-  const getRunSeconds = useSelector(getRunSecondsAt)(now)
-  const getPausedSeconds = useSelector(getPausedSecondsAt)(now)
+  const runSeconds = getRunSeconds(state, now)
+  const pausedSeconds = getPausedSeconds(state, now)
 
   /**
    * Using a a timer to tick at a 1 second interval to update the run time and pause durations.
    */
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(Date.now())
-    }, 1000)
-    return clearInterval.bind(null, timer)
-  })
-
-  const pausedTime = formatSeconds(getPausedSeconds)
-  const runTime = formatSeconds(getRunSeconds)
+  useInterval(() => setNow(Date.now()), 1000)
+  const pausedTime = formatSeconds(pausedSeconds)
+  const runTime = formatSeconds(runSeconds)
   const startTime = startTimeMs != null ? format(startTimeMs, 'pp') : ''
 
   return (

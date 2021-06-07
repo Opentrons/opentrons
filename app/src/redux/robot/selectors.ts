@@ -231,57 +231,43 @@ function millisToSeconds(ms: number): number {
  * I know this is a little unorthodox but this selector is dependent on a point in time which
  * outside of testing will be `Date.now()`. Selectors don't take parameters because it adds
  * an axis to memoization that `createSelector` knows nothing about. And we don't want to keep
- * `runTime` (now) out of the state. I don't think performance is an issue here. If so we could
- * memoize the returned function but think that cache concerns might outweigh the performance concerns.
+ * `runTime` (now) out of the state. I don't think performance is an issue here. So we are
+ * breaking form. It is selector like but does take `now` argument.
  */
-export const getRunSecondsAt: (
-  state: State
-) => (now?: number) => number = createSelector(
-  getStartTimeMs,
-  getSessionStatusInfo,
-  getIsRunning,
-  getIsDone,
-  (
-    startTimeMs: number | null,
-    statusInfo: SessionStatusInfo,
-    isRunning: boolean,
-    isDone: boolean
-  ) => (now: number = Date.now()): number => {
-    if (isRunning) {
-      // TODO: to the reviewers, at this point, I think logically `startTimeMs` should not be null.
-      //  Do we have any reason to defend against it being null? I am going to assume that we can
-      //  use the non null assertion operator. If feedback shoots me down then I will defend. But then what?
-      return millisToSeconds(now - startTimeMs!)
-    }
-    if (isDone) {
-      // TODO: same 'to the reviewers' question as above but regarding `changedAt`
-      return millisToSeconds(statusInfo.changedAt!)
-    }
-    return 0
+export function getRunSeconds(state: State, now: number = Date.now()): number {
+  const startTimeMs = getStartTimeMs(state)
+  const isRunning = getIsRunning(state)
+  if (isRunning) {
+    // TODO: to the reviewers, at this point, I think logically `startTimeMs` should not be null.
+    //  Do we have any reason to defend against it being null? I am going to assume that we can
+    //  use the non null assertion operator. If feedback shoots me down then I will defend. But then what?
+    return millisToSeconds(now - startTimeMs!)
   }
-)
+  const isDone = getIsDone(state)
+  if (isDone) {
+    const statusInfo = getSessionStatusInfo(state)
+    // TODO: same 'to the reviewers' question as above but regarding `changedAt`
+    return millisToSeconds(statusInfo.changedAt!)
+  }
+  return 0
+}
 
 /**
  * Same considerations as commented above for `getRunSecondsAt`
  */
-export const getPausedSecondsAt: (
-  state: State
-) => (now?: number) => number = createSelector(
-  getStartTimeMs,
-  getSessionStatusInfo,
-  getIsPaused,
-  (
-    startTimeMs: number | null,
-    statusInfo: SessionStatusInfo,
-    isPaused: boolean
-  ) => (now: number = Date.now()): number => {
-    if (isPaused) {
-      // TODO: same 'to the reviewers' question as above concerning use of non-null assertion operator
-      return millisToSeconds(now - startTimeMs! - statusInfo.changedAt!)
-    }
-    return 0
+export function getPausedSeconds(
+  state: State,
+  now: number = Date.now()
+): number {
+  const isPaused = getIsPaused(state)
+  if (isPaused) {
+    const startTimeMs = getStartTimeMs(state)
+    const statusInfo = getSessionStatusInfo(state)
+    // TODO: same 'to the reviewers' question as above concerning use of non-null assertion operator
+    return millisToSeconds(now - startTimeMs! - statusInfo.changedAt!)
   }
-)
+  return 0
+}
 
 export function getCalibrationRequest(state: State): CalibrationRequest {
   return calibration(state).calibrationRequest
