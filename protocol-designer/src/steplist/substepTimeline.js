@@ -97,6 +97,7 @@ export const substepTimelineSingleChannel = (
               index,
               nextFrame,
               command,
+              // $FlowFixMe(sa, 2021-05-10): ignore until TS conversion
               wellInfo,
             }),
           ],

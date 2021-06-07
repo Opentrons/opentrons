@@ -1,8 +1,6 @@
 // @flow
 import { generateSubstepItem } from '../generateSubstepItem'
-import { makeInitialRobotState } from '@opentrons/step-generation'
-// TODO IMMEDIATELY: figure out a better way to import fixtures from step generation
-import { makeContext } from '@opentrons/step-generation/src/__fixtures__'
+import { makeInitialRobotState, makeContext } from '@opentrons/step-generation'
 import { THERMOCYCLER_STATE } from '../../constants'
 
 describe('generateSubstepItem', () => {

@@ -31,6 +31,7 @@ module.exports = {
           '^@opentrons/discovery-client$': `@opentrons/discovery-client/src/index.ts`,
           '^@opentrons/components$': `@opentrons/components/src/index.ts`,
           '^@opentrons/shared-data$': `@opentrons/shared-data/js/index.ts`,
+          '^@opentrons/step-generation$': `@opentrons/step-generation/src/index.ts`,
         },
       },
     ],

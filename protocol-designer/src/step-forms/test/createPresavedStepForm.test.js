@@ -9,8 +9,7 @@ import {
 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul'
-// TODO IMMEDIATELY: figure out a better way to import fixtures from step generation
-import { getStateAndContextTempTCModules } from '@opentrons/step-generation/src/__fixtures__'
+import { getStateAndContextTempTCModules } from '@opentrons/step-generation'
 import {
   DEFAULT_DELAY_SECONDS,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,

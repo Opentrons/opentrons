@@ -7,7 +7,7 @@ import {
   MULTI_PIPETTE,
   SOURCE_LABWARE,
   DEST_LABWARE,
-} from '@opentrons/step-generation/src/__fixtures__'
+} from '@opentrons/step-generation'
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
 jest.mock('../../labware-defs/utils')
 
@@ -111,6 +111,7 @@ describe('generateRobotStateTimeline', () => {
     const initialRobotState = getInitialRobotStateStandard(invariantContext)
 
     const result = generateRobotStateTimeline({
+      // $FlowFixMe(sa, 2021-05-10): ignore until TS conversion
       allStepArgsAndErrors,
       orderedStepIds,
       initialRobotState,
