@@ -394,7 +394,7 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   gridColumns: 'Number of columns',
   regularRowSpacing: 'Are all of your rows evenly spaced?',
   regularColumnSpacing: 'Are all of your columns evenly spaced?',
-  wellVolume: 'Max volume per well',
+  wellVolume: 'Volume',
   wellShape: 'Well shape',
   wellDiameter: 'Diameter',
   wellXDimension: 'Well X',
