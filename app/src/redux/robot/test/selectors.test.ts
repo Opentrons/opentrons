@@ -47,9 +47,6 @@ const getCommands = selectors.getCommands as jest.MockedFunction<
 const getRunProgress = selectors.getRunProgress as jest.MockedFunction<
   typeof selectors.getRunProgress
 >
-const getStartTime = selectors.getStartTime as jest.MockedFunction<
-  typeof selectors.getStartTime
->
 const getIsReadyToRun = selectors.getIsReadyToRun as jest.MockedFunction<
   typeof selectors.getIsReadyToRun
 >
@@ -61,9 +58,6 @@ const getIsPaused = selectors.getIsPaused as jest.MockedFunction<
 >
 const getIsDone = selectors.getIsDone as jest.MockedFunction<
   typeof selectors.getIsDone
->
-const getRunTime = selectors.getRunTime as jest.MockedFunction<
-  typeof selectors.getRunTime
 >
 const getPipettes = selectors.getPipettes as jest.MockedFunction<
   typeof selectors.getPipettes

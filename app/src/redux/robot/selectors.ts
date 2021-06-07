@@ -213,7 +213,7 @@ export const getSessionError: (state: State) => string | null = createSelector(
   }
 )
 
-const getStartTimeMs = (state: State): number | null => {
+export const getStartTimeMs = (state: State): number | null => {
   const { startTime } = session(state)
 
   if (startTime == null) {
@@ -223,76 +223,64 @@ const getStartTimeMs = (state: State): number | null => {
   return startTime
 }
 
-export const getStartTime: (state: State) => string | null = createSelector(
-  getStartTimeMs,
-  startTimeMs => {
-    return startTimeMs !== null ? format(startTimeMs, 'pp') : null
-  }
-)
+function millisToSeconds(ms: number): number {
+  return Math.floor(Math.max(0, ms) / 1000)
+}
 
-const millisToSeconds = (ms: number) => Math.floor(Math.max(0, ms) / 1000)
-
-export const getRunSeconds: (state: State) => number = createSelector(
+/**
+ * I know this is a little unorthodox but this selector is dependent on a point in time which
+ * outside of testing will be `Date.now()`. Selectors don't take parameters because it adds
+ * an axis to memoization that `createSelector` knows nothing about. And we don't want to keep
+ * `runTime` (now) out of the state. I don't think performance is an issue here. If so we could
+ * memoize the returned function but think that cache concerns might outweigh the performance concerns.
+ */
+export const getRunSecondsAt: (
+  state: State
+) => (now?: number) => number = createSelector(
   getStartTimeMs,
   getSessionStatusInfo,
   getIsRunning,
   getIsDone,
   (
-    startTime: number | null,
+    startTimeMs: number | null,
     statusInfo: SessionStatusInfo,
     isRunning: boolean,
     isDone: boolean
-  ): number => {
-    if (startTime !== null) {
-      if (isRunning) {
-        return millisToSeconds(Date.now() - startTime)
-      }
-      if (isDone) {
-        // ce: not sure what to do here if `sessionStatusInfo.changedAt` is null. Seems
-        // that it should logically be impossible. Is it safe to use the non-null assertion operator (!)?
-        if (statusInfo.changedAt === null) {
-          return millisToSeconds(Date.now() - startTime)
-        }
-        return millisToSeconds(statusInfo.changedAt)
-      }
+  ) => (now: number = Date.now()): number => {
+    if (isRunning) {
+      // TODO: to the reviewers, at this point, I think logically `startTimeMs` should not be null.
+      //  Do we have any reason to defend against it being null? I am going to assume that we can
+      //  use the non null assertion operator. If feedback shoots me down then I will defend. But then what?
+      return millisToSeconds(now - startTimeMs!)
+    }
+    if (isDone) {
+      // TODO: same 'to the reviewers' question as above but regarding `changedAt`
+      return millisToSeconds(statusInfo.changedAt!)
     }
     return 0
   }
 )
 
-export const getPausedSeconds: (state: State) => number = createSelector(
+/**
+ * Same considerations as commented above for `getRunSecondsAt`
+ */
+export const getPausedSecondsAt: (
+  state: State
+) => (now?: number) => number = createSelector(
   getStartTimeMs,
   getSessionStatusInfo,
   getIsPaused,
   (
-    startTime: number | null,
+    startTimeMs: number | null,
     statusInfo: SessionStatusInfo,
     isPaused: boolean
-  ): number => {
-    if (isPaused && startTime !== null && statusInfo.changedAt != null) {
-      console.log('getPausedSeconds', statusInfo)
-      return millisToSeconds(Date.now() - startTime - statusInfo.changedAt)
+  ) => (now: number = Date.now()): number => {
+    if (isPaused) {
+      // TODO: same 'to the reviewers' question as above concerning use of non-null assertion operator
+      return millisToSeconds(now - startTimeMs! - statusInfo.changedAt!)
     }
     return 0
   }
-)
-
-export function formatSeconds(runSeconds: number): string {
-  const hours = padStart(`${Math.floor(runSeconds / 3600)}`, 2, '0')
-  const minutes = padStart(`${Math.floor(runSeconds / 60) % 60}`, 2, '0')
-  const seconds = padStart(`${runSeconds % 60}`, 2, '0')
-
-  return `${hours}:${minutes}:${seconds}`
-}
-
-export const getRunTime: (state: State) => string = createSelector(
-  getRunSeconds,
-  formatSeconds
-)
-
-export const getPausedTime: (state: State) => string = createSelector(
-  getPausedSeconds,
-  formatSeconds
 )
 
 export function getCalibrationRequest(state: State): CalibrationRequest {

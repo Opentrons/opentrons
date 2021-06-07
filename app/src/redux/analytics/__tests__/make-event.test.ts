@@ -17,8 +17,8 @@ jest.mock('../../calibration/selectors')
 const getConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof discoverySelectors.getConnectedRobot
 >
-const getRunSeconds = robotSelectors.getRunSeconds as jest.MockedFunction<
-  typeof robotSelectors.getRunSeconds
+const getRunSeconds = robotSelectors.getRunSecondsAt as jest.MockedFunction<
+  typeof robotSelectors.getRunSecondsAt
 >
 const getAnalyticsSessionExitDetails = selectors.getAnalyticsSessionExitDetails as jest.MockedFunction<
   typeof selectors.getAnalyticsSessionExitDetails
