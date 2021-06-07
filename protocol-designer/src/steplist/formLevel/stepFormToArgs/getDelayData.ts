@@ -1,11 +1,9 @@
-// @flow
 import type { InnerDelayArgs } from '@opentrons/step-generation'
 import type {
   DelayCheckboxFields,
   DelaySecondFields,
 } from '../../../form-types'
-
-export function getMoveLiquidDelayData<F: any>(
+export function getMoveLiquidDelayData<F extends any>(
   hydratedFormData: F,
   checkboxField: DelayCheckboxFields,
   secondsField: DelaySecondFields,
@@ -24,12 +22,15 @@ export function getMoveLiquidDelayData<F: any>(
     typeof mmFromBottom === 'number' &&
     mmFromBottom > 0
   ) {
-    return { seconds, mmFromBottom }
+    return {
+      seconds,
+      mmFromBottom,
+    }
   }
+
   return null
 }
-
-export function getMixDelayData<F: any>(
+export function getMixDelayData<F extends any>(
   hydratedFormData: F,
   checkboxField: DelayCheckboxFields,
   secondsField: DelaySecondFields
@@ -40,5 +41,6 @@ export function getMixDelayData<F: any>(
   if (checkbox && typeof seconds === 'number' && seconds > 0) {
     return seconds
   }
+
   return null
 }

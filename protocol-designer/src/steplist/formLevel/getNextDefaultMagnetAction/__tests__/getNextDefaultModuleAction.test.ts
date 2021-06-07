@@ -1,6 +1,4 @@
-// @flow
 import { getNextDefaultMagnetAction } from '../'
-
 describe('getNextDefaultMagnetAction', () => {
   describe('no previous forms defaults to engage', () => {
     const testCases = [
@@ -9,19 +7,15 @@ describe('getNextDefaultMagnetAction', () => {
         expected: 'engage',
       },
     ]
-
     testCases.forEach(({ testMsg, expected }) => {
       it(testMsg, () => {
         const savedForms = {}
         const orderedStepIds = []
-
         const result = getNextDefaultMagnetAction(savedForms, orderedStepIds)
-
         expect(result).toBe(expected)
       })
     })
   })
-
   describe('with previous forms', () => {
     const testCases = [
       {
@@ -35,16 +29,21 @@ describe('getNextDefaultMagnetAction', () => {
         expected: 'engage',
       },
     ]
-
     testCases.forEach(({ testMsg, orderedStepIds, expected }) => {
       it(testMsg, () => {
         const savedForms = {
-          e: { id: 'moduleId', stepType: 'magnet', magnetAction: 'engage' },
-          d: { id: 'moduleId', stepType: 'magnet', magnetAction: 'disengage' },
+          e: {
+            id: 'moduleId',
+            stepType: 'magnet',
+            magnetAction: 'engage',
+          },
+          d: {
+            id: 'moduleId',
+            stepType: 'magnet',
+            magnetAction: 'disengage',
+          },
         }
-
         const result = getNextDefaultMagnetAction(savedForms, orderedStepIds)
-
         expect(result).toBe(expected)
       })
     })

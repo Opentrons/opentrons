@@ -1,4 +1,3 @@
-// @flow
 import {
   volumeInCapacityForMulti,
   volumeInCapacityForMultiAspirate,
@@ -6,7 +5,6 @@ import {
 } from '../utils'
 import { fixtureP300Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-
 describe('utils', () => {
   describe('volumeInCapacityForMulti', () => {
     let sharedForm

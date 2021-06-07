@@ -1,4 +1,3 @@
-// @flow
 import difference from 'lodash/difference'
 import isEqual from 'lodash/isEqual'
 import without from 'lodash/without'
@@ -8,7 +7,7 @@ import {
 } from '@opentrons/step-generation'
 import { i18n } from '../../localization'
 import { PROFILE_CYCLE } from '../../form-types'
-import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
+import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
 import type { Options } from '@opentrons/components'
 import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { FormWarning } from '../../steplist/formLevel/warnings'
@@ -20,11 +19,10 @@ import type {
   StepType,
   PathOption,
 } from '../../form-types'
-
-export function getBlowoutLocationOptionsForForm(args: {|
-  stepType: StepType,
-  path?: ?PathOption,
-|}): Options {
+export function getBlowoutLocationOptionsForForm(args: {
+  stepType: StepType
+  path?: PathOption | null | undefined
+}): Options {
   const { stepType, path } = args
   // TODO: Ian 2019-02-21 use i18n for names
   const destOption = {
@@ -43,12 +41,15 @@ export function getBlowoutLocationOptionsForForm(args: {|
       case 'single': {
         return [sourceOption, destOption]
       }
+
       case 'multiDispense': {
         return [sourceOption, { ...destOption, disabled: true }]
       }
+
       case 'multiAspirate': {
         return [{ ...sourceOption, disabled: true }, destOption]
       }
+
       default: {
         // is moveLiquid but no path -- assume we're in batch edit mode
         // with mixed/indeterminate path values
@@ -59,18 +60,20 @@ export function getBlowoutLocationOptionsForForm(args: {|
       }
     }
   }
+
   return []
 }
-
 // TODO: type fieldNames, don't use `string`
 export const getDirtyFields = (
   isNewStep: boolean,
-  formData: ?FormData
+  formData: FormData | null | undefined
 ): Array<string> => {
   let dirtyFields = []
+
   if (formData == null) {
     return []
   }
+
   if (!isNewStep) {
     dirtyFields = Object.keys(formData)
   } else {
@@ -82,20 +85,19 @@ export const getDirtyFields = (
       (acc, fieldName: StepFieldName) => {
         const currentValue = data[fieldName]
         const initialValue = defaultFormData[fieldName]
-
         return isEqual(currentValue, initialValue) ? acc : [...acc, fieldName]
       },
       []
     )
   }
+
   // exclude form "metadata" (not really fields)
   return without(dirtyFields, 'stepType', 'id')
 }
-
 export const getVisibleFormErrors = (args: {
-  focusedField: ?string,
-  dirtyFields: Array<string>,
-  errors: StepFormErrors,
+  focusedField: string | null | undefined
+  dirtyFields: Array<string>
+  errors: StepFormErrors
 }): StepFormErrors => {
   const { focusedField, dirtyFields, errors } = args
   return errors.filter(error => {
@@ -104,15 +106,13 @@ export const getVisibleFormErrors = (args: {
     )
     const dependentFieldsAreDirty =
       difference(error.dependentFields, dirtyFields).length === 0
-
     return dependentFieldsAreNotFocused && dependentFieldsAreDirty
   })
 }
-
 export const getVisibleFormWarnings = (args: {
-  focusedField: ?string,
-  dirtyFields: Array<string>,
-  errors: Array<FormWarning>,
+  focusedField: string | null | undefined
+  dirtyFields: Array<string>
+  errors: Array<FormWarning>
 }): Array<FormWarning> => {
   const { focusedField, dirtyFields, errors } = args
   return errors.filter(error => {
@@ -121,45 +121,42 @@ export const getVisibleFormWarnings = (args: {
     )
     const dependentFieldsAreDirty =
       difference(error.dependentFields, dirtyFields).length === 0
-
     return dependentFieldsAreNotFocused && dependentFieldsAreDirty
   })
 }
-
 // for the purpose of focus handlers, derive a unique ID for each dynamic field
 export const getDynamicFieldFocusHandlerId = ({
   id,
   name,
-}: {|
-  id: string,
-  name: string,
-|}): string => `${id}:${name}`
-
+}: {
+  id: string
+  name: string
+}): string => `${id}:${name}`
 // NOTE: if any fields of a given name are pristine, treat all fields of that name as pristine.
 // (Errors don't currently specify the id, so if we later want to only mask form-level errors
 // for specific profile fields, the field's parent ProfileItem id needs to be included in the error)
-export const getVisibleProfileFormLevelErrors = (args: {|
-  focusedField: ?string,
-  dirtyFields: Array<string>,
-  errors: Array<ProfileFormError>,
-  profileItemsById: { [itemId: string]: ProfileItem },
-|}): Array<ProfileFormError> => {
+export const getVisibleProfileFormLevelErrors = (args: {
+  focusedField: string | null | undefined
+  dirtyFields: Array<string>
+  errors: Array<ProfileFormError>
+  profileItemsById: Record<string, ProfileItem>
+}): Array<ProfileFormError> => {
   const { dirtyFields, focusedField, errors, profileItemsById } = args
   const profileItemIds = Object.keys(profileItemsById)
-
   return errors.filter(error => {
     return profileItemIds.every(itemId => {
       const item = profileItemsById[itemId]
       const steps = item.type === PROFILE_CYCLE ? item.steps : [item]
       return steps.every(step => {
         const fieldsForStep = error.dependentProfileFields.map(fieldName =>
-          getDynamicFieldFocusHandlerId({ id: step.id, name: fieldName })
+          getDynamicFieldFocusHandlerId({
+            id: step.id,
+            name: fieldName,
+          })
         )
-
         const dependentFieldsAreNotFocused = !fieldsForStep.includes(
           focusedField
         )
-
         const dependentProfileFieldsAreDirty =
           difference(fieldsForStep, dirtyFields).length === 0
         return dependentFieldsAreNotFocused && dependentProfileFieldsAreDirty
@@ -167,13 +164,10 @@ export const getVisibleProfileFormLevelErrors = (args: {|
     })
   })
 }
-
 export const getFieldDefaultTooltip = (name: string): string =>
   i18n.t([`tooltip.step_fields.defaults.${name}`, ''])
-
 export const getFieldIndeterminateTooltip = (name: string): string =>
   i18n.t([`tooltip.step_fields.indeterminate.${name}`, ''])
-
 export const getSingleSelectDisabledTooltip = (
   name: string,
   stepType: string
@@ -189,7 +183,7 @@ export const getSingleSelectDisabledTooltip = (
 export function getLabwareFieldForPositioningField(
   name: StepFieldName
 ): StepFieldName {
-  const fieldMap: { [StepFieldName]: StepFieldName } = {
+  const fieldMap: Record<StepFieldName, StepFieldName> = {
     aspirate_mmFromBottom: 'aspirate_labware',
     aspirate_touchTip_mmFromBottom: 'aspirate_labware',
     aspirate_delay_mmFromBottom: 'aspirate_labware',

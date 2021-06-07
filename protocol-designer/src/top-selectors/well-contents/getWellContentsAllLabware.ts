@@ -1,15 +1,11 @@
-// @flow
 import { createSelector } from 'reselect'
-
 import reduce from 'lodash/reduce'
-
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import {
   getSelectedWells,
   getHighlightedWells,
 } from '../../well-selection/selectors'
-
 import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
@@ -22,25 +18,23 @@ import type {
 const _getWellContents = (
   labwareDef: LabwareDefinition2,
   __ingredientsForContainer: SingleLabwareLiquidState,
-  selectedWells: ?WellGroup,
-  highlightedWells: ?WellGroup
+  selectedWells: WellGroup | null | undefined,
+  highlightedWells: WellGroup | null | undefined
 ): ContentsByWell | null => {
   // selectedWells and highlightedWells args may both be null,
   // they're only relevant to the selected container.
   const allWells = labwareDef.wells
-
   return reduce(
     allWells,
     (
       acc: ContentsByWell,
-      well: $PropertyType<LabwareDefinition2, 'wells'>,
+      well: LabwareDefinition2['wells'],
       wellName: string
     ): ContentsByWell => {
       const groupIds: Array<string> =
         __ingredientsForContainer && __ingredientsForContainer[wellName]
           ? Object.keys(__ingredientsForContainer[wellName])
           : []
-
       return {
         ...acc,
         [wellName]: {
@@ -71,7 +65,6 @@ export const getWellContentsAllLabware: Selector<WellContentsByLabware> = create
   ) => {
     // TODO: Ian 2019-02-14 weird flow error without explicit Array<string> annotation
     const allLabwareIds: Array<string> = Object.keys(labwareEntities)
-
     return allLabwareIds.reduce(
       (
         acc: WellContentsByLabware,
@@ -82,8 +75,7 @@ export const getWellContentsAllLabware: Selector<WellContentsByLabware> = create
 
         const wellContents = _getWellContents(
           labwareEntities[labwareId].def,
-          liquidsForLabware,
-          // Only give _getWellContents the selection data if it's a selected container
+          liquidsForLabware, // Only give _getWellContents the selection data if it's a selected container
           isSelectedLabware ? selectedWells : null,
           isSelectedLabware ? highlightedWells : null
         )

@@ -1,21 +1,20 @@
-// @flow
 import thunk from 'redux-thunk'
 import configureMockStore from 'redux-mock-store'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { saveStepFormsMulti } from '../actions'
 import { getBatchEditFieldChanges } from '../selectors'
-
 jest.mock('../selectors')
 const mockStore = configureMockStore([thunk])
 const mockGetBatchEditFieldChanges = getBatchEditFieldChanges
-
 describe('saveStepFormsMulti', () => {
   let store
   beforeEach(() => {
     store = mockStore()
     when(mockGetBatchEditFieldChanges)
       .calledWith(expect.anything())
-      .mockReturnValue({ someField: 'someVal' })
+      .mockReturnValue({
+        someField: 'someVal',
+      })
   })
   afterEach(() => resetAllWhenMocks())
   it('should dispatch SAVE_STEP_FORMS_MULTI with edited fields and step ids', () => {
@@ -25,7 +24,9 @@ describe('saveStepFormsMulti', () => {
       {
         type: 'SAVE_STEP_FORMS_MULTI',
         payload: {
-          editedFields: { someField: 'someVal' },
+          editedFields: {
+            someField: 'someVal',
+          },
           stepIds: stepIds,
         },
       },
@@ -37,7 +38,9 @@ describe('saveStepFormsMulti', () => {
       {
         type: 'SAVE_STEP_FORMS_MULTI',
         payload: {
-          editedFields: { someField: 'someVal' },
+          editedFields: {
+            someField: 'someVal',
+          },
           stepIds: [],
         },
       },

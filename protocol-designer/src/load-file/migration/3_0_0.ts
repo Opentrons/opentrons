@@ -1,4 +1,3 @@
-// @flow
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
@@ -11,17 +10,15 @@ import type {
   FilePipette,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { PDProtocolFile as PDProtocolFileV1, PDMetadata } from './1_1_0'
-
 // NOTE: PDMetadata type did not change btw 1.1.0 and 3.0.0
 export type PDProtocolFile = ProtocolFile<PDMetadata>
-
 // the version and schema for this migration
 export const PD_VERSION = '3.0.0'
 export const SCHEMA_VERSION = 3
 
 function migrateMetadata(
-  metadata: $PropertyType<PDProtocolFileV1, 'metadata'>
-): $PropertyType<PDProtocolFile, 'metadata'> {
+  metadata: PDProtocolFileV1['metadata']
+): PDProtocolFile['metadata'] {
   const metadataExtraKeys: typeof metadata = {
     ...metadata,
     protocolName: metadata['protocol-name'],
@@ -30,10 +27,9 @@ function migrateMetadata(
   return omit(metadataExtraKeys, ['protocol-name', 'last-modified'])
 }
 
-type FilePipettes = $PropertyType<PDProtocolFile, 'pipettes'>
-function migratePipettes(
-  pipettes: $PropertyType<PDProtocolFileV1, 'pipettes'>
-): FilePipettes {
+type FilePipettes = PDProtocolFile['pipettes']
+
+function migratePipettes(pipettes: PDProtocolFileV1['pipettes']): FilePipettes {
   return Object.keys(pipettes).reduce<FilePipettes>(
     (acc, pipetteId: string) => {
       const oldPipette = pipettes[pipetteId]
@@ -49,10 +45,9 @@ function migratePipettes(
   )
 }
 
-type FileLabwares = $PropertyType<PDProtocolFile, 'labware'>
-function migrateLabware(
-  labware: $PropertyType<PDProtocolFileV1, 'labware'>
-): FileLabwares {
+type FileLabwares = PDProtocolFile['labware']
+
+function migrateLabware(labware: PDProtocolFileV1['labware']): FileLabwares {
   return Object.keys(labware).reduce<FileLabwares>((acc, labwareId: string) => {
     const oldLabware = labware[labwareId]
     const nextLabware: FileLabware = {
@@ -64,9 +59,10 @@ function migrateLabware(
   }, {})
 }
 
-type LabwareDefinitions = $PropertyType<PDProtocolFile, 'labwareDefinitions'>
+type LabwareDefinitions = PDProtocolFile['labwareDefinitions']
+
 function getLabwareDefinitions(
-  labware: $PropertyType<PDProtocolFileV1, 'labware'>
+  labware: PDProtocolFileV1['labware']
 ): LabwareDefinitions {
   const allLabwareModels = uniq(
     Object.keys(labware).map((labwareId: string) => labware[labwareId].model)

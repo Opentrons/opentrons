@@ -4,7 +4,6 @@ import {
   PAUSE_UNTIL_TIME,
 } from '../../../../constants'
 import { pauseFormToArgs } from '../pauseFormToArgs'
-
 describe('pauseFormToArgs', () => {
   it('returns awaitTemperature command creator when form specifies pause until temp', () => {
     const formData = {
@@ -45,7 +44,6 @@ describe('pauseFormToArgs', () => {
     }
     expect(pauseFormToArgs(formData)).toEqual(expected)
   })
-
   it('returns delay command creator when form specifies pause until time', () => {
     const formData = {
       stepType: 'pause',

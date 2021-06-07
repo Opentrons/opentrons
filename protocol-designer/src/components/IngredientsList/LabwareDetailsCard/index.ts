@@ -1,4 +1,4 @@
-// @flow
+import { $Diff } from 'utility-types'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import assert from 'assert'
@@ -10,13 +10,15 @@ import { selectors as labwareIngredSelectors } from '../../../labware-ingred/sel
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import type { ElementProps } from 'react'
 import type { BaseState, ThunkDispatch } from '../../../types'
-
 type Props = ElementProps<typeof LabwareDetailsCardComponent>
-
-type SP = {|
-  ...$Diff<$Exact<Props>, {| renameLabware: * |}>,
-  _labwareId?: string,
-|}
+type SP = $Diff<
+  Props,
+  {
+    renameLabware: any
+  }
+> & {
+  _labwareId?: string
+}
 
 function mapStateToProps(state: BaseState): SP {
   const labwareNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
@@ -26,11 +28,11 @@ function mapStateToProps(state: BaseState): SP {
     getLabwareDisplayName(
       stepFormSelectors.getLabwareEntities(state)[labwareId].def
     )
-
   assert(
     labwareId,
     'Expected labware id to exist in connected labware details card'
   )
+
   if (!labwareId || !labwareDefDisplayName) {
     return {
       labwareDefDisplayName: '?',
@@ -47,7 +49,9 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> }
+  dispatchProps: {
+    dispatch: ThunkDispatch<any>
+  }
 ): Props {
   const dispatch = dispatchProps.dispatch
   const { _labwareId, ...passThruProps } = stateProps
@@ -57,24 +61,25 @@ function mergeProps(
       _labwareId,
       'renameLabware in LabwareDetailsCard expected a labwareId'
     )
+
     if (_labwareId) {
       dispatch(
-        labwareIngredActions.renameLabware({ labwareId: _labwareId, name })
+        labwareIngredActions.renameLabware({
+          labwareId: _labwareId,
+          name,
+        })
       )
     }
   }
 
-  return {
-    ...passThruProps,
-    renameLabware,
-  }
+  return { ...passThruProps, renameLabware }
 }
 
-export const LabwareDetailsCard: React.AbstractComponent<{||}> = connect<
+export const LabwareDetailsCard: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
-  {||},
+  {},
   _,
   _
 >(

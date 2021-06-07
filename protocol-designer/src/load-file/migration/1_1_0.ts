@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import isUndefined from 'lodash/isUndefined'
 import mapValues from 'lodash/mapValues'
@@ -13,55 +12,60 @@ import type {
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV1'
 import type { FormPatch } from '../../steplist/actions'
 import type { FormData } from '../../form-types'
-
 export type PDMetadata = {
-  pipetteTiprackAssignments: { [pipetteId: string]: string },
-
+  pipetteTiprackAssignments: Record<string, string>
   dismissedWarnings: {
-    form: { [stepId: string]: ?Array<string> },
-    timeline: { [stepId: string]: ?Array<string> },
-  },
-
-  ingredients: {
-    [groupId: string]: {
-      name: ?string,
-      description: ?string,
-      serialize: boolean,
-    },
-  },
-  ingredLocations: {
-    [labwareId: string]: {
-      [well: string]: { [ingredGroup: string]: { volume: number } },
-    },
-  },
-
-  savedStepForms: {
-    [stepId: string]: {
-      stepType: 'moveLiquid' | 'mix' | 'pause' | 'manualIntervention',
-      id: string,
-      [string]: any,
-    },
-  },
-  orderedStepIds: Array<string>,
+    form: Record<string, Array<string> | null | undefined>
+    timeline: Record<string, Array<string> | null | undefined>
+  }
+  ingredients: Record<
+    string,
+    {
+      name: string | null | undefined
+      description: string | null | undefined
+      serialize: boolean
+    }
+  >
+  ingredLocations: Record<
+    string,
+    Record<
+      string,
+      Record<
+        string,
+        {
+          volume: number
+        }
+      >
+    >
+  >
+  savedStepForms: Record<
+    string,
+    {
+      stepType: 'moveLiquid' | 'mix' | 'pause' | 'manualIntervention'
+      id: string
+      [key: string]: any
+    }
+  >
+  orderedStepIds: Array<string>
 }
-
 export type PDProtocolFile = ProtocolFile<PDMetadata>
-
-type LegacyPipetteEntities = {
-  [pipetteId: string]: {
-    id: string,
-    tiprackModel: string,
-    mount: string,
-    name?: string,
-    model?: string,
-  },
-}
+type LegacyPipetteEntities = Record<
+  string,
+  {
+    id: string
+    tiprackModel: string
+    mount: string
+    name?: string
+    model?: string
+  }
+>
 
 function getPipetteCapacityLegacy(
-  pipette: $Values<LegacyPipetteEntities>
+  pipette: LegacyPipetteEntities[keyof LegacyPipetteEntities]
 ): number {
   // hacky model to name ('p10_single_v1.3' -> 'p10_single') fallback
   const pipetteName = pipette.name || (pipette.model || '').split('_v')[0]
+
   if (!pipetteName) {
     throw new Error(
       `expected pipette name or model in migration. Pipette: "${JSON.stringify(
@@ -69,11 +73,14 @@ function getPipetteCapacityLegacy(
       )}"`
     )
   }
+
   const specs = getPipetteNameSpecs(pipetteName)
   const tiprackDef = getLabwareV1Def(pipette.tiprackModel)
+
   if (specs && tiprackDef && tiprackDef.metadata.tipVolume) {
     return Math.min(specs.maxVolume, tiprackDef.metadata.tipVolume)
   }
+
   assert(specs, `Expected spec for pipette ${JSON.stringify(pipette)}`)
   assert(
     tiprackDef,
@@ -162,6 +169,7 @@ function _updatePatchPathField(
   if (pipetteCapacityExceeded || incompatiblePath) {
     return { ...patch, path: 'single' }
   }
+
   return patch
 }
 
@@ -179,16 +187,13 @@ export function renameOrderedSteps(fileData: PDProtocolFile): PDProtocolFile {
     },
   }
 }
-
 // builds the initial deck setup step for older protocols that didn't have one.
 export function addInitialDeckSetupStep(
   fileData: PDProtocolFile
 ): PDProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
-
   // already has deck setup step, pass thru
   if (savedStepForms[INITIAL_DECK_SETUP_STEP_ID]) return fileData
-
   const additionalLabware = mapValues(
     fileData.labware,
     (labware: FileLabware) => labware.slot
@@ -197,7 +202,6 @@ export function addInitialDeckSetupStep(
     fileData.pipettes,
     (pipette: FilePipette) => pipette.mount
   )
-
   // TODO(IL, 2020-06-08): should be FormData but Flow get confused
   // (Since this is a migration, any changes should be types-only!)
   const deckSetupStep: any = {
@@ -225,7 +229,6 @@ export function addInitialDeckSetupStep(
     },
   }
 }
-
 export const TCD_DEPRECATED_FIELD_NAMES = [
   'step-name',
   'step-details',
@@ -281,7 +284,6 @@ export function updateStepFormKeys(fileData: PDProtocolFile): PDProtocolFile {
         dispense_touchTip_mmFromBottom:
           formData['dispense_touchTipMmFromBottom'],
       }
-
       return {
         ...omitBy(updatedFields, isUndefined),
         ...omit(formData, TCD_DEPRECATED_FIELD_NAMES),
@@ -316,7 +318,6 @@ export function updateStepFormKeys(fileData: PDProtocolFile): PDProtocolFile {
       }
     }
   })
-
   return {
     ...fileData,
     'designer-application': {
@@ -328,17 +329,14 @@ export function updateStepFormKeys(fileData: PDProtocolFile): PDProtocolFile {
     },
   }
 }
-
 export function replaceTCDStepsWithMoveLiquidStep(
   fileData: PDProtocolFile
 ): PDProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
   const migratedStepForms = mapValues(savedStepForms, formData => {
     const { stepType } = formData
-
     if (!['transfer', 'consolidate', 'distribute'].includes(stepType))
       return formData
-
     const pathMap = {
       transfer: 'single',
       consolidate: 'multiAspirate',
@@ -349,7 +347,6 @@ export function replaceTCDStepsWithMoveLiquidStep(
       stepType: 'moveLiquid',
       aspirate_wells_grouped: false,
     }
-
     const pipetteEntities = mapValues(
       fileData['pipettes'],
       (pipette, pipetteId) => ({
@@ -360,15 +357,16 @@ export function replaceTCDStepsWithMoveLiquidStep(
           ],
       })
     )
+
     // update path field patch if incompatible; fallback to 'single'
     const resolvedPatch = _updatePatchPathField(
       proposedPatch,
       formData,
       pipetteEntities
     )
+
     return { ...formData, ...resolvedPatch }
   })
-
   return {
     ...fileData,
     'designer-application': {
@@ -380,16 +378,12 @@ export function replaceTCDStepsWithMoveLiquidStep(
     },
   }
 }
-
 export function updateVersion(fileData: PDProtocolFile): PDProtocolFile {
   return {
     ...fileData,
-    'designer-application': {
-      ...fileData['designer-application'],
-    },
+    'designer-application': { ...fileData['designer-application'] },
   }
 }
-
 export const migrateFile = (fileData: PDProtocolFile): PDProtocolFile =>
   flow([
     renameOrderedSteps,

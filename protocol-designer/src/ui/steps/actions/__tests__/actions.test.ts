@@ -1,4 +1,3 @@
-// @flow
 import last from 'lodash/last'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
@@ -8,23 +7,17 @@ import * as stepFormSelectors from '../../../../step-forms/selectors'
 import { getMultiSelectLastSelected } from '../../selectors'
 import { selectStep, selectAllSteps, deselectAllSteps } from '../actions'
 import { duplicateStep, duplicateMultipleSteps } from '../thunks'
-
 jest.mock('../../../../step-forms/selectors')
 jest.mock('../../selectors')
-
 const mockStore = configureMockStore([thunk])
-
-const mockGetSavedStepForms: JestMockFn<[Object], any> =
+const mockGetSavedStepForms: JestMockFn<[Record<string, any>], any> =
   stepFormSelectors.getSavedStepForms
-
-const mockGetOrderedStepIds: JestMockFn<[Object], any> =
+const mockGetOrderedStepIds: JestMockFn<[Record<string, any>], any> =
   stepFormSelectors.getOrderedStepIds
-
 const mockGetMultiSelectLastSelected: JestMockFn<
-  [Object],
+  [Record<string, any>],
   any
 > = getMultiSelectLastSelected
-
 describe('steps actions', () => {
   describe('selectStep', () => {
     const stepId = 'stepId'
@@ -32,22 +25,30 @@ describe('steps actions', () => {
       when(mockGetSavedStepForms)
         .calledWith(expect.anything())
         .mockReturnValue({
-          stepId: { foo: 'getSavedStepFormsResult' },
+          stepId: {
+            foo: 'getSavedStepFormsResult',
+          },
         })
     })
-
     afterEach(() => {
       resetAllWhenMocks()
     })
-
     // TODO(IL, 2020-04-17): also test scroll to top behavior
     it('should select the step and populate the form', () => {
       const store = mockStore()
       // $FlowFixMe(IL, 2020-04-17): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
       store.dispatch(selectStep(stepId))
       expect(store.getActions()).toEqual([
-        { type: 'SELECT_STEP', payload: stepId },
-        { type: 'POPULATE_FORM', payload: { foo: 'getSavedStepFormsResult' } },
+        {
+          type: 'SELECT_STEP',
+          payload: stepId,
+        },
+        {
+          type: 'POPULATE_FORM',
+          payload: {
+            foo: 'getSavedStepFormsResult',
+          },
+        },
       ])
     })
   })
@@ -59,18 +60,19 @@ describe('steps actions', () => {
         .calledWith(expect.anything())
         .mockReturnValue(ids)
     })
-
     afterEach(() => {
       resetAllWhenMocks()
     })
-
     it('should select all of the steps', () => {
       const store = mockStore()
       // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
       store.dispatch(selectAllSteps())
       expect(store.getActions()).toContainEqual({
         type: 'SELECT_MULTIPLE_STEPS',
-        payload: { stepIds: ids, lastSelected: last(ids) },
+        payload: {
+          stepIds: ids,
+          lastSelected: last(ids),
+        },
       })
     })
     it('should register an analytics event', () => {
@@ -93,11 +95,9 @@ describe('steps actions', () => {
         .calledWith(expect.anything())
         .mockReturnValue(id)
     })
-
     afterEach(() => {
       resetAllWhenMocks()
     })
-
     it('should deselect all of the steps', () => {
       const store = mockStore()
       // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
@@ -138,7 +138,6 @@ describe('steps actions', () => {
       const consoleWarnSpy = jest
         .spyOn(global.console, 'warn')
         .mockImplementation(() => null)
-
       const store = mockStore()
       // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
       store.dispatch(deselectAllSteps())
@@ -160,7 +159,10 @@ describe('steps actions', () => {
       expect(store.getActions()).toEqual([
         {
           type: 'DUPLICATE_STEP',
-          payload: { stepId: 'id_1', duplicateStepId: 'duplicate_id' },
+          payload: {
+            stepId: 'id_1',
+            duplicateStepId: 'duplicate_id',
+          },
         },
       ])
     })
@@ -172,12 +174,10 @@ describe('steps actions', () => {
       when(mockGetOrderedStepIds)
         .calledWith(expect.anything())
         .mockReturnValue(ids)
-
       when(mockGetMultiSelectLastSelected)
         .calledWith(expect.anything())
         .mockReturnValue('id_3')
     })
-
     afterEach(() => {
       resetAllWhenMocks()
       jest.restoreAllMocks()
@@ -195,9 +195,18 @@ describe('steps actions', () => {
         type: 'DUPLICATE_MULTIPLE_STEPS',
         payload: {
           steps: [
-            { stepId: 'id_1', duplicateStepId: 'dup_1' },
-            { stepId: 'id_2', duplicateStepId: 'dup_2' },
-            { stepId: 'id_3', duplicateStepId: 'dup_3' },
+            {
+              stepId: 'id_1',
+              duplicateStepId: 'dup_1',
+            },
+            {
+              stepId: 'id_2',
+              duplicateStepId: 'dup_2',
+            },
+            {
+              stepId: 'id_3',
+              duplicateStepId: 'dup_3',
+            },
           ],
           indexToInsert: 3,
         },
@@ -227,9 +236,18 @@ describe('steps actions', () => {
         type: 'DUPLICATE_MULTIPLE_STEPS',
         payload: {
           steps: [
-            { stepId: 'id_1', duplicateStepId: 'dup_1' },
-            { stepId: 'id_2', duplicateStepId: 'dup_2' },
-            { stepId: 'id_3', duplicateStepId: 'dup_3' },
+            {
+              stepId: 'id_1',
+              duplicateStepId: 'dup_1',
+            },
+            {
+              stepId: 'id_2',
+              duplicateStepId: 'dup_2',
+            },
+            {
+              stepId: 'id_3',
+              duplicateStepId: 'dup_3',
+            },
           ],
           indexToInsert: 3,
         },

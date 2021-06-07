@@ -1,4 +1,3 @@
-// @flow
 import {
   fixtureP10Single,
   fixtureP300Single,
@@ -12,7 +11,6 @@ import {
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { getUnusedEntities } from '../getUnusedEntities'
-
 describe('getUnusedEntities', () => {
   it('pipette entities not used in steps are returned', () => {
     const stepForms = {
@@ -40,12 +38,9 @@ describe('getUnusedEntities', () => {
         mount: 'left',
       },
     }
-
     const result = getUnusedEntities(pipettesOnDeck, stepForms, 'pipette')
-
     expect(result).toEqual([pipettesOnDeck.pipette456])
   })
-
   it('module entities not used in steps are returned', () => {
     const stepForms = {
       step123: {
@@ -81,9 +76,7 @@ describe('getUnusedEntities', () => {
         slot: '9',
       },
     }
-
     const result = getUnusedEntities(modulesOnDeck, stepForms, 'moduleId')
-
     expect(result).toEqual([modulesOnDeck.temperature456])
   })
 })

@@ -1,6 +1,4 @@
-// @flow
 import type { FormData } from '../../../form-types'
-
 // NOTE: expects that '_checkbox' fields are implemented so that
 // when checkbox is disabled, its dependent fields are hidden
 export function getDisabledFieldsMixForm(

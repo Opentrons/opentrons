@@ -1,22 +1,18 @@
-// @flow
+import { $Diff } from 'utility-types'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import type { BaseState, ThunkDispatch } from '../types'
 import type { StepIdType } from '../form-types'
-
 import { actions as steplistActions } from '../steplist'
 import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { StepList } from '../components/steplist'
-
 type Props = React.ElementProps<typeof StepList>
-
-type SP = {|
-  orderedStepIds: $PropertyType<Props, 'orderedStepIds'>,
-  isMultiSelectMode: ?boolean,
-|}
-
-type DP = $Diff<$Exact<Props>, SP>
+type SP = {
+  orderedStepIds: Props['orderedStepIds']
+  isMultiSelectMode: boolean | null | undefined
+}
+type DP = $Diff<Props, SP>
 
 function mapStateToProps(state: BaseState): SP {
   return {
@@ -25,7 +21,7 @@ function mapStateToProps(state: BaseState): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
   return {
     reorderSelectedStep: (delta: number) => {
       dispatch(stepsActions.reorderSelectedStep(delta))
@@ -36,9 +32,9 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const ConnectedStepList: React.AbstractComponent<{||}> = connect<
+export const ConnectedStepList: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   DP,
   _,

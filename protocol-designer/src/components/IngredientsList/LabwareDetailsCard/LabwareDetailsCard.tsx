@@ -7,9 +7,9 @@ import { EditableTextField } from '../../EditableTextField'
 import styles from './labwareDetailsCard.css'
 
 type Props = {
-  labwareDefDisplayName: string,
-  nickname: string,
-  renameLabware: (name: string) => mixed,
+  labwareDefDisplayName: string
+  nickname: string
+  renameLabware: (name: string) => mixed
 }
 
 export function LabwareDetailsCard(props: Props): React.Node {

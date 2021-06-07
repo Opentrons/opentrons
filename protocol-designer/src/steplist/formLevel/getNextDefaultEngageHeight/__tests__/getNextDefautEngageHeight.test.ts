@@ -1,6 +1,4 @@
-// @flow
 import { getNextDefaultEngageHeight } from '../'
-
 describe('getNextDefaultEngageHeight', () => {
   describe('no previous forms', () => {
     const testCases = [
@@ -9,19 +7,15 @@ describe('getNextDefaultEngageHeight', () => {
         expected: null,
       },
     ]
-
     testCases.forEach(({ testMsg, expected }) => {
       it(testMsg, () => {
         const savedForms = {}
         const orderedStepIds = []
-
         const result = getNextDefaultEngageHeight(savedForms, orderedStepIds)
-
         expect(result).toBe(expected)
       })
     })
   })
-
   describe('with previous forms', () => {
     const testCases = [
       {
@@ -42,7 +36,6 @@ describe('getNextDefaultEngageHeight', () => {
         expected: 14,
       },
     ]
-
     testCases.forEach(({ testMsg, orderedStepIds, expected }) => {
       it(testMsg, () => {
         const savedForms = {
@@ -58,9 +51,7 @@ describe('getNextDefaultEngageHeight', () => {
             magnetAction: 'disengage',
           },
         }
-
         const result = getNextDefaultEngageHeight(savedForms, orderedStepIds)
-
         expect(result).toBe(expected)
       })
     })

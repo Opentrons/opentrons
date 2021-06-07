@@ -1,8 +1,6 @@
-// @flow
 import omit from 'lodash/omit'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-
 import type { Reducer } from 'redux'
 import type { WellGroup } from '@opentrons/components'
 import type { Action } from '../types'
@@ -12,8 +10,8 @@ import type {
   DeselectWellsAction,
 } from './actions'
 type SelectedWellsState = {
-  highlighted: WellGroup,
-  selected: WellGroup,
+  highlighted: WellGroup
+  selected: WellGroup
 }
 
 function deleteWells(
@@ -37,12 +35,10 @@ const selectedWells = handleActions(
       state,
       action: HighlightWellsAction
     ): SelectedWellsState => ({ ...state, highlighted: action.payload }),
-
     SELECT_WELLS: (state, action: SelectWellsAction): SelectedWellsState => ({
       highlighted: {},
       selected: { ...state.selected, ...action.payload },
     }),
-
     DESELECT_WELLS: (
       state,
       action: DeselectWellsAction
@@ -58,11 +54,9 @@ const selectedWells = handleActions(
   },
   selectedWellsInitialState
 )
-
-export type RootState = {|
-  selectedWells: SelectedWellsState,
-|}
-
+export type RootState = {
+  selectedWells: SelectedWellsState
+}
 export const rootReducer: Reducer<RootState, Action> = combineReducers({
   selectedWells,
 })

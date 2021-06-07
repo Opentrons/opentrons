@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
@@ -12,25 +11,22 @@ import {
 import { FileSidebar as FileSidebarComponent } from './FileSidebar'
 import type { BaseState, ThunkDispatch } from '../../types'
 import type { SavedStepFormState, InitialDeckSetup } from '../../step-forms'
-
 type Props = React.ElementProps<typeof FileSidebarComponent>
-
-type SP = {|
-  canDownload: boolean,
-  fileData: $PropertyType<Props, 'fileData'>,
-  _canCreateNew: ?boolean,
-  _hasUnsavedChanges: ?boolean,
-  pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
-  modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>,
-  savedStepForms: SavedStepFormState,
-  schemaVersion: number,
-|}
-
-export const FileSidebar: React.AbstractComponent<{||}> = connect<
+type SP = {
+  canDownload: boolean
+  fileData: Props['fileData']
+  _canCreateNew: boolean | null | undefined
+  _hasUnsavedChanges: boolean | null | undefined
+  pipettesOnDeck: InitialDeckSetup['pipettes']
+  modulesOnDeck: InitialDeckSetup['modules']
+  savedStepForms: SavedStepFormState
+  schemaVersion: number
+}
+export const FileSidebar: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
-  {||},
+  {},
   _,
   _
 >(
@@ -43,7 +39,6 @@ function mapStateToProps(state: BaseState): SP {
   const fileData = fileDataSelectors.createFile(state)
   const canDownload = selectors.getCurrentPage(state) !== 'file-splash'
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
-
   return {
     canDownload,
     fileData,
@@ -59,7 +54,9 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> }
+  dispatchProps: {
+    dispatch: ThunkDispatch<any>
+  }
 ): Props {
   const {
     _canCreateNew,

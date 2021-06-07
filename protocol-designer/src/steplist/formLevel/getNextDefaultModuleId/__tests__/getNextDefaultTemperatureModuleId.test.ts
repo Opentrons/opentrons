@@ -1,4 +1,3 @@
-// @flow
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -28,7 +27,10 @@ const getMag = () => ({
   type: MAGNETIC_MODULE_TYPE,
   model: MAGNETIC_MODULE_V1,
   slot: '_span781011',
-  moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
+  moduleState: {
+    type: MAGNETIC_MODULE_TYPE,
+    engaged: false,
+  },
 })
 
 const getTemp = () => ({
@@ -62,23 +64,19 @@ describe('getNextDefaultTemperatureModuleId', () => {
         expected: null,
       },
     ]
-
     testCases.forEach(({ testMsg, equippedModulesById, expected }) => {
       it(testMsg, () => {
         const savedForms = {}
         const orderedStepIds = []
-
         const result = getNextDefaultTemperatureModuleId(
           savedForms,
           orderedStepIds,
           equippedModulesById
         )
-
         expect(result).toBe(expected)
       })
     })
   })
-
   describe('previous forms', () => {
     const testCases = [
       {
@@ -111,24 +109,23 @@ describe('getNextDefaultTemperatureModuleId', () => {
           tempId: getTemp(),
         },
         savedForms: {
-          tempStepId: ({
+          tempStepId: {
             id: 'tempStepId',
             stepType: 'temperature',
             stepName: 'temperature',
             moduleId: 'tempId',
-          }: any),
-          magStepId: ({
+          } as any,
+          magStepId: {
             id: 'magStepId',
             stepType: 'magnet',
             stepName: 'magnet',
             moduleId: 'magdeckId',
-          }: any),
+          } as any,
         },
         orderedStepIds: ['tempStepId', 'magStepId'],
         expected: 'tempId',
       },
     ]
-
     testCases.forEach(
       ({
         testMsg,
@@ -143,7 +140,6 @@ describe('getNextDefaultTemperatureModuleId', () => {
             orderedStepIds,
             equippedModulesById
           )
-
           expect(result).toBe(expected)
         })
       }

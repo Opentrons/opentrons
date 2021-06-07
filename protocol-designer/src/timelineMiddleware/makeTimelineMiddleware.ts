@@ -1,25 +1,23 @@
-// @flow
 import {
   getArgsAndErrorsByStepId,
   getOrderedStepIds,
   getInvariantContext,
 } from '../step-forms/selectors'
 import { getInitialRobotState } from '../file-data/selectors'
+import type { ComputeRobotStateTimelineSuccessAction } from '../file-data/actions'
 import {
   computeRobotStateTimelineRequest,
   computeRobotStateTimelineSuccess,
-  type ComputeRobotStateTimelineSuccessAction,
 } from '../file-data/actions'
 import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
-
 import type { Middleware } from 'redux'
 import type { BaseState } from '../types'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 import type { SubstepsArgsNoTimeline, TimelineWorker } from './types'
 
 const hasChanged = (
-  nextValues: { [any]: any, ... },
-  memoizedValues: { [any]: any, ... }
+  nextValues: { [key in any]?: any },
+  memoizedValues: { [key in any]?: any }
 ): boolean =>
   Object.keys(nextValues).some(
     (selectorKey: string) =>
@@ -44,11 +42,11 @@ const getSubstepsArgs = (state: BaseState): SubstepsArgsNoTimeline => ({
 // TODO(IL, 2020-06-15): once we create an Action union for PD, use that instead of `any` for Middleware<S, A>
 export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
   // TODO(IL, 2021-04-08): in TS conversion, this 'any' should be avoidable
-  const worker: TimelineWorker = (new Worker('./worker', {
+  const worker: TimelineWorker = new Worker('./worker', {
     type: 'module',
-  }): any)
-
+  }) as any
   let prevTimelineArgs: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}
+
   let prevSubstepsArgs: SubstepsArgsNoTimeline | null = null
   let prevSuccessAction: ComputeRobotStateTimelineSuccessAction | null = null
 
@@ -62,7 +60,6 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
     }
 
     const needsRecompute = hasChanged(nextSelectorResults, prevTimelineArgs)
-
     // update memoized values
     prevTimelineArgs = nextSelectorResults
     return needsRecompute
@@ -74,21 +71,20 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
       prevSubstepsArgs = getSubstepsArgs(state)
       return true
     }
-    const nextSubstepSelectorResults = getSubstepsArgs(state)
 
+    const nextSubstepSelectorResults = getSubstepsArgs(state)
     const needsRecompute = hasChanged(
       nextSubstepSelectorResults,
       prevSubstepsArgs
     )
-
     prevSubstepsArgs = nextSubstepSelectorResults // update memoized value
+
     return needsRecompute
   }
 
   return ({ getState, dispatch }) => next => action => {
     // call the next dispatch method in the middleware chain
     const returnValue = next(action)
-
     const nextState = getState()
     const shouldRecomputeTimeline = timelineNeedsRecompute(nextState)
     const shouldRecomputeSubsteps = substepsNeedsRecompute(nextState)
@@ -106,7 +102,11 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
       if (prevTimelineArgs !== null && prevSubstepsArgs !== null) {
         const timelineArgs: GenerateRobotStateTimelineArgs = prevTimelineArgs
         const substepsArgs: SubstepsArgsNoTimeline = prevSubstepsArgs
-        worker.postMessage({ needsTimeline: true, timelineArgs, substepsArgs })
+        worker.postMessage({
+          needsTimeline: true,
+          timelineArgs,
+          substepsArgs,
+        })
       } else {
         console.error(
           'something weird happened, prevTimelineArgs and prevSubstepsArgs should never be null here'

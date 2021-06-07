@@ -1,4 +1,4 @@
-// @flow
+import { $Diff } from 'utility-types'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
@@ -6,15 +6,16 @@ import * as wellSelectionSelectors from '../top-selectors/well-contents'
 import { removeWellsContents } from '../labware-ingred/actions'
 import type { Dispatch } from 'redux'
 import type { BaseState } from '../types'
-
 import { IngredientsList as IngredientsListComponent } from '../components/IngredientsList'
-
 type Props = React.ElementProps<typeof IngredientsListComponent>
-
-type SP = {|
-  ...$Diff<$Exact<Props>, {| removeWellsContents: * |}>,
-  _labwareId: ?string,
-|}
+type SP = $Diff<
+  Props,
+  {
+    removeWellsContents: any
+  }
+> & {
+  _labwareId: string | null | undefined
+}
 
 function mapStateToProps(state: BaseState): SP {
   const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
@@ -22,7 +23,6 @@ function mapStateToProps(state: BaseState): SP {
     (selectedLabwareId &&
       labwareIngredSelectors.getLiquidsByLabwareId(state)[selectedLabwareId]) ||
     {}
-
   return {
     liquidGroupsById: labwareIngredSelectors.getLiquidGroupsById(state),
     labwareWellContents,
@@ -36,7 +36,9 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<*> }
+  dispatchProps: {
+    dispatch: Dispatch<any>
+  }
 ): Props {
   const { dispatch } = dispatchProps
   const { _labwareId, ...passThruProps } = stateProps
@@ -50,11 +52,11 @@ function mergeProps(
   }
 }
 
-export const IngredientsList: React.AbstractComponent<{||}> = connect<
+export const IngredientsList: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
-  {||},
+  {},
   _,
   _
 >(

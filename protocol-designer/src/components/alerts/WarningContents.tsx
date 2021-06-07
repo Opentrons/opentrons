@@ -6,8 +6,8 @@ import type { AlertLevel } from './types'
 import { TerminalItemLink } from '../steplist/TerminalItem'
 
 type WarningContentsProps = {
-  warningType: string,
-  level: AlertLevel,
+  warningType: string
+  level: AlertLevel
 }
 export const WarningContents = (props: WarningContentsProps): React.Node => {
   if (props.level === 'timeline') {

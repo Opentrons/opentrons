@@ -5,11 +5,11 @@ import { i18n } from '../../../localization'
 import styles from '../StepEditForm.css'
 
 type Props = {
-  className?: ?string,
-  collapsed?: ?boolean,
-  toggleCollapsed: () => void,
-  prefix: 'aspirate' | 'dispense',
-  children?: React.Node,
+  className?: ?string
+  collapsed?: ?boolean
+  toggleCollapsed: () => void
+  prefix: 'aspirate' | 'dispense'
+  children?: React.Node
 }
 
 export const AspDispSection = (props: Props): React.Node => {

@@ -3,7 +3,6 @@ import {
   maxFieldValue,
   temperatureRangeFieldValue,
 } from '../errors'
-
 describe('errors', () => {
   describe('minFieldValue', () => {
     const MIN = 4
@@ -43,7 +42,6 @@ describe('errors', () => {
       expect(maxChecker(MAX + 1)).toBe(`Max is ${MAX}`)
     })
   })
-
   describe('temperatureRangeFieldValue', () => {
     const MIN = 4
     const MAX = 99
@@ -69,7 +67,6 @@ describe('errors', () => {
     it('returns an error text when value passed greater than the max', () => {
       expect(rangeChecker(MAX + 1)).toBe(`Must be between ${MIN} and ${MAX} °C`)
     })
-
     it('returns an error text when value passed less than than the min', () => {
       expect(rangeChecker(MIN - 1)).toBe(`Must be between ${MIN} and ${MAX} °C`)
     })

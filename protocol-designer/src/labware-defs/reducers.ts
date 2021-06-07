@@ -1,4 +1,3 @@
-// @flow
 import omit from 'lodash/omit'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
@@ -7,7 +6,6 @@ import {
   getLabwareDefURI,
   getLabwareDefIsStandard,
 } from '@opentrons/shared-data'
-
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { LabwareUploadMessage, LabwareDefByDefURI } from './types'
@@ -17,7 +15,6 @@ import type {
   ReplaceCustomLabwareDef,
 } from './actions'
 import type { LoadFileAction } from '../load-file'
-
 const customDefs = handleActions(
   {
     CREATE_CUSTOM_LABWARE_DEF: (
@@ -25,10 +22,7 @@ const customDefs = handleActions(
       action: CreateCustomLabwareDef
     ): LabwareDefByDefURI => {
       const uri = getLabwareDefURI(action.payload.def)
-      return {
-        ...state,
-        [uri]: action.payload.def,
-      }
+      return { ...state, [uri]: action.payload.def }
     },
     REPLACE_CUSTOM_LABWARE_DEF: (
       state: LabwareDefByDefURI,
@@ -42,16 +36,15 @@ const customDefs = handleActions(
         action.payload.file.labwareDefinitions,
         def => !getLabwareDefIsStandard(def) // assume if it's not standard, it's custom
       )
-      return {
-        ...state,
-        ...customDefsFromFile,
-      }
+      return { ...state, ...customDefsFromFile }
     },
   },
   {}
 )
-
-const labwareUploadMessage = handleActions<?LabwareUploadMessage, *>(
+const labwareUploadMessage = handleActions<
+  LabwareUploadMessage | null | undefined,
+  any
+>(
   {
     LABWARE_UPLOAD_MESSAGE: (
       state,
@@ -63,17 +56,14 @@ const labwareUploadMessage = handleActions<?LabwareUploadMessage, *>(
   },
   null
 )
-
-export type RootState = {|
-  customDefs: LabwareDefByDefURI,
-  labwareUploadMessage: ?LabwareUploadMessage,
-|}
-
+export type RootState = {
+  customDefs: LabwareDefByDefURI
+  labwareUploadMessage: LabwareUploadMessage | null | undefined
+}
 const _allReducers = {
   customDefs,
   labwareUploadMessage,
 }
-
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers
 )

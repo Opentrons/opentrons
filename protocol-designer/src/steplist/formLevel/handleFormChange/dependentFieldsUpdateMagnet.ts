@@ -1,4 +1,3 @@
-// @flow
 import pick from 'lodash/pick'
 import { chainPatchUpdaters, fieldHasChanged } from './utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
@@ -14,11 +13,9 @@ const updatePatchOnMagnetActionChange = (
   rawForm: FormData
 ) => {
   if (fieldHasChanged(rawForm, patch, 'magnetAction')) {
-    return {
-      ...patch,
-      ...getDefaultFields('engageHeight'),
-    }
+    return { ...patch, ...getDefaultFields('engageHeight') }
   }
+
   return patch
 }
 

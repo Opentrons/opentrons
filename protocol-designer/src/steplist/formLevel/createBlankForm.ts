@@ -1,4 +1,3 @@
-// @flow
 import { i18n } from '../../localization'
 import { getDefaultsForStepType } from './getDefaultsForStepType'
 import type {
@@ -7,12 +6,10 @@ import type {
   BlankForm,
   FormData,
 } from '../../form-types'
-
 type NewFormArgs = {
-  stepId: StepIdType,
-  stepType: StepType,
+  stepId: StepIdType
+  stepType: StepType
 }
-
 // Add default values to a new step form
 export function createBlankForm(args: NewFormArgs): FormData {
   const { stepId, stepType } = args
@@ -22,10 +19,6 @@ export function createBlankForm(args: NewFormArgs): FormData {
     stepName: i18n.t(`application.stepType.${stepType}`),
     stepDetails: '',
   }
-
   // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
-  return {
-    ...baseForm,
-    ...getDefaultsForStepType(stepType),
-  }
+  return { ...baseForm, ...getDefaultsForStepType(stepType) }
 }

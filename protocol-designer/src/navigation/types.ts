@@ -1,4 +1,3 @@
-// @flow
 export type Page =
   | 'file-splash'
   | 'file-detail'

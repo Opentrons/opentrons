@@ -1,6 +1,4 @@
-// @flow
 import { getExportedFileSchemaVersion } from '../selectors/fileCreator'
-
 describe('getExportedFileSchemaVersion selector', () => {
   it('should return 5 when getRequiresAtLeastV5 is true', () => {
     // $FlowFixMe TODO(SA, 2020-08-26): Flow doesn't have type for resultFunc

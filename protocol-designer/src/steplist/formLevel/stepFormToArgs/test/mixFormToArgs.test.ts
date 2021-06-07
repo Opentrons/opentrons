@@ -1,4 +1,3 @@
-// @flow
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
@@ -6,16 +5,12 @@ import { mixFormToArgs } from '../mixFormToArgs'
 import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../../constants'
 import { getOrderedWells } from '../../../utils'
 jest.mock('../../../utils')
-
 const getOrderedWellsMock: JestMockFn<any, Array<string>> = getOrderedWells
-
 let hydratedForm
 const labwareDef = fixture_96_plate
 const labwareType = getLabwareDefURI(labwareDef)
-
 beforeEach(() => {
   getOrderedWellsMock.mockImplementation(wells => wells)
-
   hydratedForm = {
     id: 'stepId',
     stepType: 'mix',
@@ -48,15 +43,12 @@ beforeEach(() => {
     dispense_delay_seconds: null,
   }
 })
-
 afterEach(() => {
   jest.resetAllMocks()
 })
-
 describe('mix step form -> command creator args', () => {
   it('mixFormToArgs calls getOrderedWells correctly', () => {
     mixFormToArgs(hydratedForm)
-
     expect(getOrderedWells).toHaveBeenCalledTimes(1)
     expect(getOrderedWells).toHaveBeenCalledWith(
       hydratedForm.wells,
@@ -65,12 +57,13 @@ describe('mix step form -> command creator args', () => {
       't2b'
     )
   })
-
   const checkboxFieldCases = [
     // BLOWOUT
     {
       checkboxField: 'blowout_checkbox',
-      formFields: { blowout_location: 'trashId' },
+      formFields: {
+        blowout_location: 'trashId',
+      },
       expectedArgsUnchecked: {
         blowoutLocation: null,
         blowoutOffsetFromTopMm: 0,
@@ -79,11 +72,12 @@ describe('mix step form -> command creator args', () => {
         blowoutLocation: 'trashId',
         blowoutOffsetFromTopMm: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
       },
-    },
-    // TOUCH TIP
+    }, // TOUCH TIP
     {
       checkboxField: 'mix_touchTip_checkbox',
-      formFields: { mix_touchTip_mmFromBottom: 10.5 },
+      formFields: {
+        mix_touchTip_mmFromBottom: 10.5,
+      },
       expectedArgsUnchecked: {
         touchTip: false,
         touchTipMmFromBottom: 10.5,
@@ -92,8 +86,7 @@ describe('mix step form -> command creator args', () => {
         touchTip: true,
         touchTipMmFromBottom: 10.5,
       },
-    },
-    // Aspirate delay
+    }, // Aspirate delay
     {
       checkboxField: 'aspirate_delay_checkbox',
       formFields: {
@@ -105,8 +98,7 @@ describe('mix step form -> command creator args', () => {
       expectedArgsChecked: {
         aspirateDelaySeconds: 15,
       },
-    },
-    // Dispense delay
+    }, // Dispense delay
     {
       checkboxField: 'dispense_delay_checkbox',
       formFields: {
@@ -120,7 +112,6 @@ describe('mix step form -> command creator args', () => {
       },
     },
   ]
-
   checkboxFieldCases.forEach(
     ({
       checkboxField,
@@ -136,7 +127,6 @@ describe('mix step form -> command creator args', () => {
             ...formFields,
           })
         ).toMatchObject(expectedArgsUnchecked)
-
         expect(
           mixFormToArgs({
             ...hydratedForm,

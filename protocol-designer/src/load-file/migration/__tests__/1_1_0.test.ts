@@ -10,8 +10,7 @@ import {
   TCD_DEPRECATED_FIELD_NAMES,
   MIX_DEPRECATED_FIELD_NAMES,
   replaceTCDStepsWithMoveLiquidStep,
-} from '../1_1_0.js'
-
+} from '../1_1_0'
 describe('renameOrderedSteps', () => {
   const migratedFile = renameOrderedSteps(oldProtocol)
   it('removes orderedSteps key', () => {
@@ -22,7 +21,6 @@ describe('renameOrderedSteps', () => {
       undefined
     )
   })
-
   it('adds orderedStepIds key and value', () => {
     const oldOrderedStepsIds =
       oldProtocol['designer-application'].data.orderedSteps
@@ -33,7 +31,6 @@ describe('renameOrderedSteps', () => {
       oldOrderedStepsIds
     )
   })
-
   it('the rest of file should be unaltered', () => {
     const oldWithout = {
       ...oldProtocol,
@@ -58,7 +55,6 @@ describe('renameOrderedSteps', () => {
     expect(oldWithout).toEqual(migratedWithout)
   })
 })
-
 describe('addInitialDeckSetupStep', () => {
   const migratedFile = addInitialDeckSetupStep(oldProtocol)
   it('adds savedStepForm key', () => {
@@ -73,12 +69,13 @@ describe('addInitialDeckSetupStep', () => {
       ]
     ).not.toEqual(undefined)
   })
-
   describe('adds well formed savedStepForm value', () => {
     const wellFormedSetupStep = {
       stepType: 'manualIntervention',
       id: INITIAL_DECK_SETUP_STEP_ID,
-      labwareLocationUpdate: { trashId: '12' },
+      labwareLocationUpdate: {
+        trashId: '12',
+      },
       pipetteLocationUpdate: {},
     }
     const deckSetupStepForm =
@@ -105,7 +102,6 @@ describe('addInitialDeckSetupStep', () => {
     })
   })
 })
-
 describe('updateStepFormKeys', () => {
   describe('for TCD stepTypes', () => {
     const stubbedTCDStepsFile = {
@@ -245,7 +241,6 @@ describe('updateStepFormKeys', () => {
       })
     })
   })
-
   describe('for mix stepType', () => {
     const stubbedMixStepFile = {
       'designer-application': {
@@ -322,7 +317,6 @@ describe('updateStepFormKeys', () => {
     })
   })
 })
-
 describe('replaceTCDStepsWithMoveLiquidStep', () => {
   const oldStepForms = oldProtocol['designer-application'].data.savedStepForms
   const migratedFile = replaceTCDStepsWithMoveLiquidStep(oldProtocol)
