@@ -9,10 +9,7 @@ describe('ProtocolUpload', () => {
 
   beforeEach(() => {
     render = () => {
-      return mountWithProviders(
-        <ProtocolUpload/>,
-        { i18n }
-      )
+      return mountWithProviders(<ProtocolUpload />, { i18n })
     }
   })
 

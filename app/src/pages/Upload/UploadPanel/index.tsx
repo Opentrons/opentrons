@@ -10,17 +10,21 @@ import { Upload } from './Upload'
 import type { State, Dispatch } from '../../../redux/types'
 import { useFeatureFlag } from '../../../redux/config'
 
-export function UploadPanel(): JSX.Element | null{
+export function UploadPanel(): JSX.Element | null {
   const isUploadWithoutRPC = useFeatureFlag('preProtocolFlowWithoutRPC')
   const dispatch = useDispatch<Dispatch>()
   const filename = useSelector((state: State) => getProtocolFilename(state))
-  const sessionLoaded = useSelector((state: State) => robotSelectors.getSessionIsLoaded(state))
+  const sessionLoaded = useSelector((state: State) =>
+    robotSelectors.getSessionIsLoaded(state)
+  )
 
-  const createSession = (file: File): void => { dispatch(openProtocol(file)) }
+  const createSession = (file: File): void => {
+    dispatch(openProtocol(file))
+  }
   if (Boolean(isUploadWithoutRPC)) return null
   return (
     <SidePanel title="Protocol File">
-      <Upload {...{filename, sessionLoaded, createSession}} />
+      <Upload {...{ filename, sessionLoaded, createSession }} />
     </SidePanel>
   )
 }

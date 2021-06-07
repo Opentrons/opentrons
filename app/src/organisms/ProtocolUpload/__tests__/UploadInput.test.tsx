@@ -7,13 +7,15 @@ import { UploadInput } from '../UploadInput'
 
 describe('UploadInput', () => {
   let render: () => ReturnType<typeof renderWithProviders>
-  let createSession: jest.MockedFunction<React.ComponentProps<typeof UploadInput>['createSession']>
+  let createSession: jest.MockedFunction<
+    React.ComponentProps<typeof UploadInput>['createSession']
+  >
 
   beforeEach(() => {
     createSession = jest.fn()
     render = () => {
       return renderWithProviders(
-        <UploadInput createSession={createSession}/>,
+        <UploadInput createSession={createSession} />,
         { i18nInstance: i18n }
       )
     }
@@ -30,13 +32,13 @@ describe('UploadInput', () => {
     expect(screen.getByText('Choose File...')).toBeTruthy()
     expect(screen.getByText('Drag and drop protocol file here')).toBeTruthy()
     expect(screen.getByText("Don't have a protocol yet?")).toBeTruthy()
-    expect(screen.getByText("Browse Our Protocol Library")).toBeTruthy()
-    expect(screen.getByText("Launch Protocol Designer")).toBeTruthy()
+    expect(screen.getByText('Browse Our Protocol Library')).toBeTruthy()
+    expect(screen.getByText('Launch Protocol Designer')).toBeTruthy()
   })
 
   it('calls createSession on button click', () => {
     const { getByRole, getByTestId } = render()
-    const button = getByRole('button', {name: 'Choose File...'})
+    const button = getByRole('button', { name: 'Choose File...' })
     const input = getByTestId('file_input')
     input.click = jest.fn()
     fireEvent.click(button)

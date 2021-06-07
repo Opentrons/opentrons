@@ -24,15 +24,27 @@ jest.mock('../../../redux/custom-labware/selectors')
 const getFeatureFlags = Config.getFeatureFlags as jest.MockedFunction<
   typeof Config.getFeatureFlags
 >
-const getSessionLoadInProgress = RobotSelectors.getSessionLoadInProgress as jest.MockedFunction<typeof RobotSelectors.getSessionLoadInProgress>
-const getUploadError = RobotSelectors.getUploadError as jest.MockedFunction<typeof RobotSelectors.getUploadError>
-const getSessionIsLoaded = RobotSelectors.getSessionIsLoaded as jest.MockedFunction<typeof RobotSelectors.getSessionIsLoaded>
-const getCommands = RobotSelectors.getCommands as jest.MockedFunction<typeof RobotSelectors.getCommands>
-const getProtocolFilename = ProtocolSelectors.getProtocolFilename as jest.MockedFunction<typeof ProtocolSelectors.getProtocolFilename>
-const getCustomLabware = CustomLWSelectors.getCustomLabware as jest.MockedFunction<typeof CustomLWSelectors.getCustomLabware>
-const getConnectedRobot = DiscoSelectors.getConnectedRobot as jest.MockedFunction<typeof DiscoSelectors.getConnectedRobot>
-
-
+const getSessionLoadInProgress = RobotSelectors.getSessionLoadInProgress as jest.MockedFunction<
+  typeof RobotSelectors.getSessionLoadInProgress
+>
+const getUploadError = RobotSelectors.getUploadError as jest.MockedFunction<
+  typeof RobotSelectors.getUploadError
+>
+const getSessionIsLoaded = RobotSelectors.getSessionIsLoaded as jest.MockedFunction<
+  typeof RobotSelectors.getSessionIsLoaded
+>
+const getCommands = RobotSelectors.getCommands as jest.MockedFunction<
+  typeof RobotSelectors.getCommands
+>
+const getProtocolFilename = ProtocolSelectors.getProtocolFilename as jest.MockedFunction<
+  typeof ProtocolSelectors.getProtocolFilename
+>
+const getCustomLabware = CustomLWSelectors.getCustomLabware as jest.MockedFunction<
+  typeof CustomLWSelectors.getCustomLabware
+>
+const getConnectedRobot = DiscoSelectors.getConnectedRobot as jest.MockedFunction<
+  typeof DiscoSelectors.getConnectedRobot
+>
 
 describe('Upload page', () => {
   const render = () => {
@@ -41,12 +53,13 @@ describe('Upload page', () => {
       State,
       Action
     >(
-      <StaticRouter location='/upload/file-info' context={{}}>
-        <Route path='/upload'>
+      <StaticRouter location="/upload/file-info" context={{}}>
+        <Route path="/upload">
           <Upload />
         </Route>
-      </StaticRouter>
-    , { i18n })
+      </StaticRouter>,
+      { i18n }
+    )
   }
 
   beforeEach(() => {
@@ -71,7 +84,7 @@ describe('Upload page', () => {
   })
 
   it('renders legacy RPC upload page if feature flag not set', () => {
-    const {wrapper} = render()
+    const { wrapper } = render()
     expect(wrapper.find('FileInfo').exists()).toBe(true)
     expect(wrapper.find('ProtocolUpload').exists()).toBe(false)
   })
@@ -82,9 +95,8 @@ describe('Upload page', () => {
       enableBundleUpload: false,
       preProtocolFlowWithoutRPC: true,
     })
-    const {wrapper} = render()
+    const { wrapper } = render()
     expect(wrapper.find('FileInfo').exists()).toBe(false)
     expect(wrapper.find('ProtocolUpload').exists()).toBe(true)
   })
-
 })

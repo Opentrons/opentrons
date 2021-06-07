@@ -19,9 +19,12 @@ jest.mock('../../../redux/protocol/selectors')
 const getFeatureFlags = Config.getFeatureFlags as jest.MockedFunction<
   typeof Config.getFeatureFlags
 >
-const getProtocolFilename = ProtocolSelectors.getProtocolFilename as jest.MockedFunction<typeof ProtocolSelectors.getProtocolFilename>
-const getSessionIsLoaded = RobotSelectors.getSessionIsLoaded as jest.MockedFunction<typeof RobotSelectors.getSessionIsLoaded>
-
+const getProtocolFilename = ProtocolSelectors.getProtocolFilename as jest.MockedFunction<
+  typeof ProtocolSelectors.getProtocolFilename
+>
+const getSessionIsLoaded = RobotSelectors.getSessionIsLoaded as jest.MockedFunction<
+  typeof RobotSelectors.getSessionIsLoaded
+>
 
 describe('Upload Panel', () => {
   const render = () => {
@@ -30,12 +33,13 @@ describe('Upload Panel', () => {
       State,
       Action
     >(
-      <StaticRouter location='/upload/file-info' context={{}}>
-        <Route path='/upload'>
+      <StaticRouter location="/upload/file-info" context={{}}>
+        <Route path="/upload">
           <UploadPanel />
         </Route>
-      </StaticRouter>
-    , { i18n })
+      </StaticRouter>,
+      { i18n }
+    )
   }
 
   beforeEach(() => {
@@ -55,7 +59,7 @@ describe('Upload Panel', () => {
   })
 
   it('renders legacy RPC upload panel if feature flag not set', () => {
-    const {wrapper} = render()
+    const { wrapper } = render()
     expect(wrapper.find('SidePanel').exists()).toBe(true)
   })
 
@@ -65,7 +69,7 @@ describe('Upload Panel', () => {
       enableBundleUpload: false,
       preProtocolFlowWithoutRPC: true,
     })
-    const {wrapper} = render()
+    const { wrapper } = render()
     expect(wrapper.find('SidePanel').exists()).toBe(false)
   })
 })

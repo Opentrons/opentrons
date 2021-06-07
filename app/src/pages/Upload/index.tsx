@@ -14,17 +14,26 @@ import { ProtocolUpload } from '../../organisms/ProtocolUpload'
 import type { State } from '../../redux/types'
 
 export function Upload(): JSX.Element {
-  const robot = useSelector((state: State) =>  getConnectedRobot(state))
+  const robot = useSelector((state: State) => getConnectedRobot(state))
   const filename = useSelector((state: State) => getProtocolFilename(state))
-  const uploadInProgress = useSelector((state: State) => robotSelectors.getSessionLoadInProgress(state))
-  const uploadError = useSelector((state: State) => robotSelectors.getUploadError(state))
-  const sessionLoaded = useSelector((state: State) => robotSelectors.getSessionIsLoaded(state))
-  const sessionHasSteps = useSelector((state: State) => robotSelectors.getCommands(state).length > 0)
-  const showCustomLabwareWarning = useSelector((state: State) =>
+  const uploadInProgress = useSelector((state: State) =>
+    robotSelectors.getSessionLoadInProgress(state)
+  )
+  const uploadError = useSelector((state: State) =>
+    robotSelectors.getUploadError(state)
+  )
+  const sessionLoaded = useSelector((state: State) =>
+    robotSelectors.getSessionIsLoaded(state)
+  )
+  const sessionHasSteps = useSelector(
+    (state: State) => robotSelectors.getCommands(state).length > 0
+  )
+  const showCustomLabwareWarning = useSelector(
+    (state: State) =>
       getCustomLabware(state).length > 0 &&
       !robotSelectors
         .getSessionCapabilities(state)
-        .includes('create_with_extra_labware'),
+        .includes('create_with_extra_labware')
   )
   const { path } = useRouteMatch()
 
@@ -39,9 +48,10 @@ export function Upload(): JSX.Element {
       <Route
         path={fileInfoPath}
         render={props => {
-          return Boolean(isNewProtocolUploadPage)
-          ? <ProtocolUpload />
-          : <FileInfo
+          return Boolean(isNewProtocolUploadPage) ? (
+            <ProtocolUpload />
+          ) : (
+            <FileInfo
               robot={robot}
               filename={filename}
               uploadInProgress={uploadInProgress}
@@ -50,9 +60,9 @@ export function Upload(): JSX.Element {
               sessionHasSteps={sessionHasSteps}
               showCustomLabwareWarning={showCustomLabwareWarning}
             />
+          )
         }}
       />
     </Switch>
   )
-
 }
