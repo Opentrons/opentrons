@@ -1,4 +1,4 @@
-// @flow
+import { $Diff } from 'utility-types'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import assert from 'assert'
@@ -15,28 +15,27 @@ import { LiquidPlacementForm as LiquidPlacementFormComponent } from './LiquidPla
 import type { Dispatch } from 'redux'
 import type { LiquidPlacementFormValues } from './LiquidPlacementForm'
 import type { BaseState } from '../../types'
-
 type Props = React.ElementProps<typeof LiquidPlacementFormComponent>
-
-type SP = $Rest<
-  {|
-    ...$Exact<Props>,
-    _labwareId: ?string,
-    _selectedWells: ?Array<string>,
-    _selectionHasLiquids: boolean,
-  |},
-  {|
-    cancelForm: $PropertyType<Props, 'cancelForm'>,
-    clearWells: $PropertyType<Props, 'clearWells'>,
-    saveForm: $PropertyType<Props, 'saveForm'>,
-  |}
+type SP = $Diff<
+  Props & {
+    _labwareId: string | null | undefined
+    _selectedWells: Array<string> | null | undefined
+    _selectionHasLiquids: boolean
+  },
+  {
+    cancelForm: Props['cancelForm']
+    clearWells: Props['clearWells']
+    saveForm: Props['saveForm']
+  }
 >
 
 function mapStateToProps(state: BaseState): SP {
   const selectedWells = getSelectedWells(state)
 
   const _labwareId = labwareIngredSelectors.getSelectedLabwareId(state)
+
   const liquidLocations = labwareIngredSelectors.getLiquidsByLabwareId(state)
+
   const _selectionHasLiquids = Boolean(
     _labwareId &&
       liquidLocations[_labwareId] &&
@@ -57,7 +56,6 @@ function mapStateToProps(state: BaseState): SP {
     selectedWellsMaxVolume: wellContentsSelectors.getSelectedWellsMaxVolume(
       state
     ),
-
     _labwareId,
     _selectedWells: Object.keys(selectedWells),
     _selectionHasLiquids,
@@ -66,7 +64,9 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<*> }
+  dispatchProps: {
+    dispatch: Dispatch<any>
+  }
 ): Props {
   const {
     _labwareId,
@@ -75,7 +75,6 @@ function mergeProps(
     ...passThruProps
   } = stateProps
   const { dispatch } = dispatchProps
-
   const clearWells =
     _labwareId && _selectedWells && _selectionHasLiquids
       ? () => {
@@ -94,7 +93,6 @@ function mergeProps(
           }
         }
       : null
-
   return {
     ...passThruProps,
     cancelForm: () => dispatch(deselectAllWells()),
@@ -102,7 +100,6 @@ function mergeProps(
     saveForm: (values: LiquidPlacementFormValues) => {
       const { selectedLiquidId } = values
       const volume = Number(values.volume)
-
       assert(
         _labwareId != null,
         'when saving liquid placement form, expected a selected labware ID'
@@ -138,11 +135,11 @@ function mergeProps(
   }
 }
 
-export const LiquidPlacementForm: React.AbstractComponent<{||}> = connect<
+export const LiquidPlacementForm: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
-  {||},
+  {},
   _,
   _
 >(

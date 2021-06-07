@@ -10,8 +10,8 @@ import styles from './TipPositionInput.css'
 const WELL_HEIGHT_PIXELS = 48
 const PIXEL_DECIMALS = 2
 type Props = {
-  mmFromBottom: number,
-  wellDepthMm: number,
+  mmFromBottom: number
+  wellDepthMm: number
 }
 
 export const TipPositionZAxisViz = (props: Props): React.Node => {

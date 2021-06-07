@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import last from 'lodash/last'
 import {
@@ -8,7 +7,6 @@ import {
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
 import { PRESAVED_STEP_ID } from '../../../../steplist/types'
-
 import { PAUSE_UNTIL_TEMP } from '../../../../constants'
 import { uuid } from '../../../../utils'
 import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
@@ -18,10 +16,8 @@ import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
 } from '../../../../tutorial'
-
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import * as fileDataSelectors from '../../../../file-data/selectors'
-
 import type { StepType, StepIdType, FormData } from '../../../../form-types'
 import type { ThunkAction } from '../../../../types'
 import type {
@@ -29,13 +25,16 @@ import type {
   DuplicateMultipleStepsAction,
   SelectMultipleStepsAction,
 } from '../types'
-
-export const addAndSelectStepWithHints: ({
-  stepType: StepType,
+export const addAndSelectStepWithHints: (arg0: {
+  stepType: StepType
 }) => ThunkAction<any> = payload => (dispatch, getState) => {
   const robotStateTimeline = fileDataSelectors.getRobotStateTimeline(getState())
-  dispatch(addStep({ stepType: payload.stepType, robotStateTimeline }))
-
+  dispatch(
+    addStep({
+      stepType: payload.stepType,
+      robotStateTimeline,
+    })
+  )
   const state = getState()
   const deckHasLiquid = labwareIngredsSelectors.getDeckHasLiquid(state)
   const magnetModuleHasLabware = uiModuleSelectors.getMagnetModuleHasLabware(
@@ -53,7 +52,6 @@ export const addAndSelectStepWithHints: ({
   const thermocyclerModuleOnDeck = uiModuleSelectors.getSingleThermocyclerModuleId(
     state
   )
-
   // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
   const stepNeedsLiquid = ['mix', 'moveLiquid'].includes(payload.stepType)
   const stepMagnetNeedsLabware = ['magnet'].includes(payload.stepType)
@@ -63,22 +61,22 @@ export const addAndSelectStepWithHints: ({
     (stepTemperatureNeedsLabware &&
       ((temperatureModuleOnDeck && !temperatureModuleHasLabware) ||
         (thermocyclerModuleOnDeck && !thermocyclerModuleHasLabware)))
+
   if (stepNeedsLiquid && !deckHasLiquid) {
     dispatch(tutorialActions.addHint('add_liquids_and_labware'))
   }
+
   if (stepModuleMissingLabware) {
     dispatch(tutorialActions.addHint('module_without_labware'))
   }
 }
-
 export type ReorderSelectedStepAction = {
-  type: 'REORDER_SELECTED_STEP',
+  type: 'REORDER_SELECTED_STEP'
   payload: {
-    delta: number,
-    stepId: StepIdType,
-  },
+    delta: number
+    stepId: StepIdType
+  }
 }
-
 export const reorderSelectedStep: (
   delta: number
 ) => ThunkAction<ReorderSelectedStepAction> = delta => (dispatch, getState) => {
@@ -94,7 +92,6 @@ export const reorderSelectedStep: (
     })
   }
 }
-
 export const duplicateStep: (
   stepId: StepIdType
 ) => ThunkAction<DuplicateStepAction> = stepId => (dispatch, getState) => {
@@ -103,11 +100,13 @@ export const duplicateStep: (
   if (stepId != null) {
     dispatch({
       type: 'DUPLICATE_STEP',
-      payload: { stepId, duplicateStepId },
+      payload: {
+        stepId,
+        duplicateStepId,
+      },
     })
   }
 }
-
 export const duplicateMultipleSteps: (
   stepIds: Array<StepIdType>
 ) => ThunkAction<
@@ -116,18 +115,14 @@ export const duplicateMultipleSteps: (
   const orderedStepIds = getOrderedStepIds(getState())
   const lastSelectedItemId = getMultiSelectLastSelected(getState())
   const indexOfLastSelected = orderedStepIds.indexOf(lastSelectedItemId)
-
   stepIds.sort((a, b) => orderedStepIds.indexOf(a) - orderedStepIds.indexOf(b))
-
   const duplicateIdsZipped = stepIds.map(stepId => ({
     stepId: stepId,
     duplicateStepId: uuid(),
   }))
-
   const duplicateIds = duplicateIdsZipped.map(
     ({ duplicateStepId }) => duplicateStepId
   )
-
   const duplicateMultipleStepsAction = {
     type: 'DUPLICATE_MULTIPLE_STEPS',
     payload: {
@@ -135,23 +130,21 @@ export const duplicateMultipleSteps: (
       indexToInsert: indexOfLastSelected + 1,
     },
   }
-
   const selectMultipleStepsAction = {
     type: 'SELECT_MULTIPLE_STEPS',
-    payload: { stepIds: duplicateIds, lastSelected: last(duplicateIds) },
+    payload: {
+      stepIds: duplicateIds,
+      lastSelected: last(duplicateIds),
+    },
   }
-
   dispatch(duplicateMultipleStepsAction)
   dispatch(selectMultipleStepsAction)
 }
-
 export const SAVE_STEP_FORM: 'SAVE_STEP_FORM' = 'SAVE_STEP_FORM'
-
-export type SaveStepFormAction = {|
-  type: typeof SAVE_STEP_FORM,
-  payload: FormData,
-|}
-
+export type SaveStepFormAction = {
+  type: typeof SAVE_STEP_FORM
+  payload: FormData
+}
 export const _saveStepForm = (form: FormData): SaveStepFormAction => {
   // if presaved, transform pseudo ID to real UUID upon save
   const payload = form.id === PRESAVED_STEP_ID ? { ...form, id: uuid() } : form
@@ -229,7 +222,6 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
   )
   // save the set temperature step form that is currently open
   dispatch(_saveStepForm(unsavedSetTemperatureForm))
-
   // add a new pause step form
   dispatch(
     addStep({
@@ -237,7 +229,6 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
       robotStateTimeline: fileDataSelectors.getRobotStateTimeline(getState()),
     })
   )
-
   // NOTE: fields should be set one at a time b/c dependentFieldsUpdate fns can filter out inputs
   // contingent on other inputs (eg changing the pauseAction radio button may clear the pauseTemperature).
   dispatch(
@@ -247,8 +238,13 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
       },
     })
   )
-  dispatch(changeFormInput({ update: { pauseTemperature: temperature } }))
-
+  dispatch(
+    changeFormInput({
+      update: {
+        pauseTemperature: temperature,
+      },
+    })
+  )
   // finally save the new pause form
   const unsavedPauseForm = getUnsavedForm(getState())
 

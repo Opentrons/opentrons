@@ -1,4 +1,3 @@
-// @flow
 import {
   _hasFieldLevelErrors,
   getEquippedPipetteOptions,
@@ -8,36 +7,35 @@ import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 jest.mock('../../steplist/fieldLevel')
 jest.mock('../utils/getProfileItemsHaveErrors')
-
 const mockGetFieldErrors: JestMockFn<
-  [string, mixed],
+  [string, unknown],
   Array<string>
 > = getFieldErrors
-
 const mockGetProfileItemsHaveErrors: JestMockFn<
   [any],
   boolean
 > = getProfileItemsHaveErrors
-
 beforeEach(() => {
   jest.clearAllMocks()
 })
-
 describe('_hasFieldLevelErrors', () => {
   it('should return true if form is "thermocycler", has "profileItemsById" field, and _getProfileItemsHaveErrors returns true', () => {
     const formData = {
       stepType: 'thermocycler',
-      profileItemsById: { foo: 'abc' },
+      profileItemsById: {
+        foo: 'abc',
+      },
     }
     mockGetProfileItemsHaveErrors.mockImplementation(profileItems => {
       expect(profileItems).toEqual(formData.profileItemsById)
       return true
     })
+
     const result = _hasFieldLevelErrors(formData)
+
     expect(mockGetProfileItemsHaveErrors).toHaveBeenCalled()
     expect(result).toBe(true)
   })
-
   const testCases = [
     {
       testName: 'should return true if form has field errors',
@@ -50,7 +48,6 @@ describe('_hasFieldLevelErrors', () => {
       expected: false,
     },
   ]
-
   testCases.forEach(({ testName, mockGetFieldErrorsReturn, expected }) => {
     it(testName, () => {
       mockGetFieldErrors.mockImplementation((name, value) => {
@@ -58,14 +55,16 @@ describe('_hasFieldLevelErrors', () => {
         expect(value).toEqual('spam')
         return mockGetFieldErrorsReturn
       })
+      const formData: any = {
+        blah: 'spam',
+      }
 
-      const formData: any = { blah: 'spam' }
       const result = _hasFieldLevelErrors(formData)
+
       expect(result).toBe(expected)
     })
   })
 })
-
 describe('getEquippedPipetteOptions', () => {
   it('appends mount to pipette dropdown when pipettes are same model', () => {
     const initialDeckState = {
@@ -81,14 +80,18 @@ describe('getEquippedPipetteOptions', () => {
       },
     }
     const expected = [
-      { name: 'P20 Single-Channel GEN2 (L)', value: '123' },
-      { name: 'P20 Single-Channel GEN2 (R)', value: '456' },
+      {
+        name: 'P20 Single-Channel GEN2 (L)',
+        value: '123',
+      },
+      {
+        name: 'P20 Single-Channel GEN2 (R)',
+        value: '456',
+      },
     ]
-
     const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
     expect(result).toEqual(expected)
   })
-
   it('does NOT append mount to pipette dropdown when pipettes are different models', () => {
     const initialDeckState = {
       pipettes: {
@@ -103,14 +106,18 @@ describe('getEquippedPipetteOptions', () => {
       },
     }
     const expected = [
-      { name: 'P300 Single-Channel GEN2', value: '123' },
-      { name: 'P20 Single-Channel GEN2', value: '456' },
+      {
+        name: 'P300 Single-Channel GEN2',
+        value: '123',
+      },
+      {
+        name: 'P20 Single-Channel GEN2',
+        value: '456',
+      },
     ]
-
     const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
     expect(result).toEqual(expected)
   })
-
   it('does NOT append mount to pipette dropdown when only one pipette', () => {
     const initialDeckState = {
       pipettes: {
@@ -120,17 +127,22 @@ describe('getEquippedPipetteOptions', () => {
         },
       },
     }
-    const expected = [{ name: 'P300 Single-Channel GEN2', value: '123' }]
-
+    const expected = [
+      {
+        name: 'P300 Single-Channel GEN2',
+        value: '123',
+      },
+    ]
     const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
     expect(result).toEqual(expected)
   })
 })
-
 describe('getBatchEditFormHasUnsavedChanges', () => {
   it('should return true if there are unsaved changes ', () => {
     expect(
-      getBatchEditFormHasUnsavedChanges.resultFunc({ someField: 'someVal' })
+      getBatchEditFormHasUnsavedChanges.resultFunc({
+        someField: 'someVal',
+      })
     ).toBe(true)
   })
   it('should return false if there are no unsaved changes ', () => {

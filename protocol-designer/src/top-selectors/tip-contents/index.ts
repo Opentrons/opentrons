@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
@@ -13,10 +12,10 @@ import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { selectors as fileDataSelectors } from '../../file-data'
 import type { WellGroup } from '@opentrons/components'
 import type { Selector } from '../../types'
-
-export const getMissingTipsByLabwareId: Selector<{
-  [labwareId: string]: WellGroup,
-} | null> = createSelector(
+export const getMissingTipsByLabwareId: Selector<Record<
+  string,
+  WellGroup
+> | null> = createSelector(
   stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
   getActiveItem,
@@ -30,11 +29,11 @@ export const getMissingTipsByLabwareId: Selector<{
     lastValidRobotState
   ) => {
     let robotState = null
-
     if (activeItem == null) return null
 
     if (activeItem.selectionType === TERMINAL_ITEM_SELECTION_TYPE) {
       const terminalId = activeItem.id
+
       if (terminalId === START_TERMINAL_ITEM_ID) {
         robotState = initialRobotState
       } else if (
@@ -65,8 +64,7 @@ export const getMissingTipsByLabwareId: Selector<{
 
     const missingTips =
       robotState &&
-      robotState.tipState &&
-      // $FlowFixMe(bc, 2019-05-31): flow choking on mapValues
+      robotState.tipState && // $FlowFixMe(bc, 2019-05-31): flow choking on mapValues
       mapValues(robotState.tipState.tipracks, tipMap =>
         reduce(
           tipMap,

@@ -1,4 +1,3 @@
-// @flow
 import { i18n } from '../../../../localization'
 import { getWellRatio } from '../../../../steplist/utils'
 import { getPipetteCapacity } from '../../../../pipettes/pipetteData'
@@ -6,25 +5,21 @@ import {
   volumeInCapacityForMultiDispense,
   volumeInCapacityForMultiAspirate,
 } from '../../../../steplist/formLevel/handleFormChange/utils'
-
 import type {
   ChangeTipOptions,
   PipetteEntities,
 } from '@opentrons/step-generation'
 import type { PathOption } from '../../../../form-types'
-
-export type DisabledPathMap = { [PathOption]: string } | null
-
-export type ValuesForPath = {|
-  aspirate_airGap_checkbox: ?boolean,
-  aspirate_airGap_volume: ?string,
-  aspirate_wells: ?Array<string>,
-  changeTip: ChangeTipOptions,
-  dispense_wells: ?Array<string>,
-  pipette: ?string,
-  volume: ?string,
-|}
-
+export type DisabledPathMap = Record<PathOption, string> | null
+export type ValuesForPath = {
+  aspirate_airGap_checkbox: boolean | null | undefined
+  aspirate_airGap_volume: string | null | undefined
+  aspirate_wells: Array<string> | null | undefined
+  changeTip: ChangeTipOptions
+  dispense_wells: Array<string> | null | undefined
+  pipette: string | null | undefined
+  volume: string | null | undefined
+}
 export function getDisabledPathMap(
   values: ValuesForPath,
   pipetteEntities: PipetteEntities
@@ -36,12 +31,12 @@ export function getDisabledPathMap(
     dispense_wells,
     pipette,
   } = values
-
   if (!pipette) return null
-
   const wellRatio = getWellRatio(aspirate_wells, dispense_wells)
-
-  let disabledPathMap: { multiAspirate: string, multiAspirate: string } = {}
+  let disabledPathMap: {
+    multiAspirate: string
+    multiAspirate: string
+  } = {}
 
   // changeTip is lowest priority disable reasoning
   if (changeTip === 'perDest') {
@@ -63,18 +58,15 @@ export function getDisabledPathMap(
   // transfer volume overwrites change tip disable reasoning
   const pipetteEntity = pipetteEntities[pipette]
   const pipetteCapacity = pipetteEntity && getPipetteCapacity(pipetteEntity)
-
   const volume = Number(values.volume)
   const airGapChecked = aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(values.aspirate_airGap_volume) : 0
   airGapVolume = Number.isFinite(airGapVolume) ? airGapVolume : 0
-
   const withinCapacityForMultiDispense = volumeInCapacityForMultiDispense({
     volume,
     pipetteCapacity,
     airGapVolume,
   })
-
   const withinCapacityForMultiAspirate = volumeInCapacityForMultiAspirate({
     volume,
     pipetteCapacity,
@@ -89,6 +81,7 @@ export function getDisabledPathMap(
       ),
     }
   }
+
   if (!withinCapacityForMultiAspirate) {
     disabledPathMap = {
       ...disabledPathMap,

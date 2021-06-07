@@ -1,13 +1,10 @@
-// @flow
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
-
 import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
-
 import type { Reducer } from 'redux'
 import type {
   SingleLabwareLiquidState,
@@ -33,9 +30,7 @@ import type {
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
 } from '../actions'
-
 // REDUCERS
-
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
 // NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
@@ -48,8 +43,7 @@ const modeLabwareSelection: Reducer<DeckSlot | false, any> = handleActions(
   },
   false
 )
-
-export type SelectedContainerId = ?string
+export type SelectedContainerId = string | null | undefined
 // NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
 const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
   {
@@ -64,9 +58,7 @@ const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
   },
   null
 )
-
-export type DrillDownLabwareId = ?string
-
+export type DrillDownLabwareId = string | null | undefined
 // NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
 const drillDownLabwareId: Reducer<DrillDownLabwareId, any> = handleActions(
   {
@@ -81,16 +73,14 @@ const drillDownLabwareId: Reducer<DrillDownLabwareId, any> = handleActions(
   },
   null
 )
-
-export type ContainersState = {
-  [id: string]: ?DisplayLabware,
-}
-
+export type ContainersState = Record<string, DisplayLabware | null | undefined>
 export type SelectedLiquidGroupState = {
-  liquidGroupId: ?string,
-  newLiquidGroup?: true,
+  liquidGroupId: string | null | undefined
+  newLiquidGroup?: true
 }
-const unselectedLiquidGroupState = { liquidGroupId: null }
+const unselectedLiquidGroupState = {
+  liquidGroupId: null,
+}
 // This is only a concern of the liquid page.
 // null = nothing selected, newLiquidGroup: true means user is creating new liquid
 const selectedLiquidGroup = handleActions(
@@ -98,7 +88,9 @@ const selectedLiquidGroup = handleActions(
     SELECT_LIQUID_GROUP: (
       state: SelectedLiquidGroupState,
       action: SelectLiquidAction
-    ): SelectedLiquidGroupState => ({ liquidGroupId: action.payload }),
+    ): SelectedLiquidGroupState => ({
+      liquidGroupId: action.payload,
+    }),
     DELETE_LIQUID_GROUP: () => unselectedLiquidGroupState,
     DESELECT_LIQUID_GROUP: () => unselectedLiquidGroupState,
     CREATE_NEW_LIQUID_GROUP_FORM: (): SelectedLiquidGroupState => ({
@@ -109,13 +101,11 @@ const selectedLiquidGroup = handleActions(
   },
   unselectedLiquidGroupState
 )
-
 const initialLabwareState: ContainersState = {
   [FIXED_TRASH_ID]: {
     nickname: 'Trash',
   },
 }
-
 // NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
 export const containers: Reducer<ContainersState, any> = handleActions(
   {
@@ -146,13 +136,7 @@ export const containers: Reducer<ContainersState, any> = handleActions(
       const { labwareId, name } = action.payload
       // ignore renaming to whitespace
       return name && name.trim()
-        ? {
-            ...state,
-            [labwareId]: {
-              ...state[labwareId],
-              nickname: name,
-            },
-          }
+        ? { ...state, [labwareId]: { ...state[labwareId], nickname: name } }
         : state
     },
     DUPLICATE_LABWARE: (
@@ -177,7 +161,6 @@ export const containers: Reducer<ContainersState, any> = handleActions(
         (a, b) =>
           Number(allFileLabware[a].slot) - Number(allFileLabware[b].slot)
       )
-
       return sortedLabwareIds.reduce(
         (acc: ContainersState, id): ContainersState => {
           const fileLabware = allFileLabware[id]
@@ -201,8 +184,8 @@ export const containers: Reducer<ContainersState, any> = handleActions(
   },
   initialLabwareState
 )
+type SavedLabwareState = Record<string, boolean>
 
-type SavedLabwareState = { [labwareId: string]: boolean, ... }
 /** Keeps track of which labware have saved nicknames */
 // NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
 export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
@@ -210,24 +193,15 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
     DELETE_CONTAINER: (
       state: SavedLabwareState,
       action: DeleteContainerAction
-    ) => ({
-      ...state,
-      [action.payload.labwareId]: false,
-    }),
+    ) => ({ ...state, [action.payload.labwareId]: false }),
     RENAME_LABWARE: (
       state: SavedLabwareState,
       action: RenameLabwareAction
-    ) => ({
-      ...state,
-      [action.payload.labwareId]: true,
-    }),
+    ) => ({ ...state, [action.payload.labwareId]: true }),
     DUPLICATE_LABWARE: (
       state: SavedLabwareState,
       action: DuplicateLabwareAction
-    ) => ({
-      ...state,
-      [action.payload.duplicateLabwareId]: true,
-    }),
+    ) => ({ ...state, [action.payload.duplicateLabwareId]: true }),
     LOAD_FILE: (
       state: SavedLabwareState,
       action: LoadFileAction
@@ -235,9 +209,7 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
   },
   {}
 )
-
 export type IngredientsState = LiquidGroupsById
-
 // NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
 export const ingredients: Reducer<IngredientsState, any> = handleActions(
   {
@@ -265,9 +237,7 @@ export const ingredients: Reducer<IngredientsState, any> = handleActions(
   },
   {}
 )
-
 type LocationsState = LabwareLiquidState
-
 export const ingredLocations: Reducer<LocationsState, any> = handleActions(
   {
     SET_WELL_CONTENTS: (
@@ -276,47 +246,29 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
     ): LocationsState => {
       const { liquidGroupId, labwareId, wells, volume } = action.payload
       const newWellContents: LocationLiquidState = {
-        [liquidGroupId]: { volume },
-      }
-      const updatedWells = wells.reduce<SingleLabwareLiquidState>(
-        (acc, wellName) => ({
-          ...acc,
-          [wellName]: newWellContents,
-        }),
-        {}
-      )
-
-      return {
-        ...state,
-        [labwareId]: {
-          ...state[labwareId],
-          ...updatedWells,
+        [liquidGroupId]: {
+          volume,
         },
       }
+      const updatedWells = wells.reduce<SingleLabwareLiquidState>(
+        (acc, wellName) => ({ ...acc, [wellName]: newWellContents }),
+        {}
+      )
+      return { ...state, [labwareId]: { ...state[labwareId], ...updatedWells } }
     },
     DUPLICATE_LABWARE: (
       state: LocationsState,
       action: DuplicateLabwareAction
     ): LocationsState => {
       const { templateLabwareId, duplicateLabwareId } = action.payload
-      return {
-        ...state,
-        [duplicateLabwareId]: {
-          ...state[templateLabwareId],
-        },
-      }
+      return { ...state, [duplicateLabwareId]: { ...state[templateLabwareId] } }
     },
     REMOVE_WELLS_CONTENTS: (
       state: LocationsState,
       action: RemoveWellsContentsAction
     ): LocationsState => {
       const { wells, labwareId } = action.payload
-      return {
-        ...state,
-        [labwareId]: {
-          ...omit(state[labwareId], wells),
-        },
-      }
+      return { ...state, [labwareId]: { ...omit(state[labwareId], wells) } }
     },
     DELETE_LIQUID_GROUP: (
       state: LocationsState,
@@ -338,18 +290,16 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
   },
   {}
 )
-
-export type RootState = {|
-  modeLabwareSelection: DeckSlot | false,
-  selectedContainerId: SelectedContainerId,
-  drillDownLabwareId: DrillDownLabwareId,
-  containers: ContainersState,
-  savedLabware: SavedLabwareState,
-  selectedLiquidGroup: SelectedLiquidGroupState,
-  ingredients: IngredientsState,
-  ingredLocations: LocationsState,
-|}
-
+export type RootState = {
+  modeLabwareSelection: DeckSlot | false
+  selectedContainerId: SelectedContainerId
+  drillDownLabwareId: DrillDownLabwareId
+  containers: ContainersState
+  savedLabware: SavedLabwareState
+  selectedLiquidGroup: SelectedLiquidGroupState
+  ingredients: IngredientsState
+  ingredLocations: LocationsState
+}
 // TODO Ian 2018-01-15 factor into separate files
 export const rootReducer: Reducer<RootState, Action> = combineReducers({
   modeLabwareSelection,

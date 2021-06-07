@@ -1,24 +1,25 @@
-// @flow
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
+import type { SelectableItem } from '../reducers'
 import {
   _allReducers,
   SINGLE_STEP_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
-  type SelectableItem,
-} from '../reducers.js'
+} from '../reducers'
 import type { SelectMultipleStepsAction } from '../actions/types'
-
 jest.mock('../../../labware-defs/utils')
-
 const { collapsedSteps, selectedItem } = _allReducers
-
 describe('collapsedSteps reducer', () => {
   it('should add a collapsed step when a new step is saved for the first time', () => {
-    const state = { '1': true, '2': false }
+    const state = {
+      '1': true,
+      '2': false,
+    }
     const action = {
       type: 'SAVE_STEP_FORM',
-      payload: { id: '3' },
+      payload: {
+        id: '3',
+      },
     }
     expect(collapsedSteps(state, action)).toEqual({
       '1': true,
@@ -27,10 +28,15 @@ describe('collapsedSteps reducer', () => {
     })
   })
   it('should not update when an existing step form is saved', () => {
-    const state = { '1': true, '2': false }
+    const state = {
+      '1': true,
+      '2': false,
+    }
     const action = {
       type: 'SAVE_STEP_FORM',
-      payload: { id: '1' },
+      payload: {
+        id: '1',
+      },
     }
     expect(collapsedSteps(state, action)).toBe(state)
   })
@@ -85,7 +91,6 @@ describe('collapsedSteps reducer', () => {
       '4': true,
     })
   })
-
   it('should toggle step off-> on upon TOGGLE_STEP_COLLAPSED', () => {
     const state = {
       '1': true,
@@ -141,7 +146,6 @@ describe('collapsedSteps reducer', () => {
     })
   })
 })
-
 describe('selectedItem reducer', () => {
   it('should select the presaved step item on ADD_STEP', () => {
     const action = {
@@ -153,19 +157,19 @@ describe('selectedItem reducer', () => {
       id: PRESAVED_STEP_ID,
     })
   })
-
   it('should select the saved step item on SAVE_STEP_FORM', () => {
     const stepId = '123'
     const action = {
       type: 'SAVE_STEP_FORM',
-      payload: { id: stepId },
+      payload: {
+        id: stepId,
+      },
     }
     expect(selectedItem(null, action)).toEqual({
       selectionType: SINGLE_STEP_SELECTION_TYPE,
       id: stepId,
     })
   })
-
   it('should select the given step on SELECT_STEP', () => {
     const stepId = '123'
     const action = {
@@ -177,7 +181,6 @@ describe('selectedItem reducer', () => {
       id: stepId,
     })
   })
-
   it('should select the given select terminal item on SELECT_TERMINAL_ITEM', () => {
     const terminalId = 'test'
     const action = {
@@ -189,27 +192,28 @@ describe('selectedItem reducer', () => {
       id: terminalId,
     })
   })
-
   it('should clear selected item on CLEAR_SELECTED_ITEM', () => {
     const action = {
       type: 'CLEAR_SELECTED_ITEM',
     }
     expect(selectedItem(null, action)).toBe(null)
   })
-
   describe('multi-step selection', () => {
     const stepIds = ['someStepId', 'anotherStepId']
     const lastSelected = 'anotherStepId'
     const action: SelectMultipleStepsAction = {
       type: 'SELECT_MULTIPLE_STEPS',
-      payload: { stepIds, lastSelected },
+      payload: {
+        stepIds,
+        lastSelected,
+      },
     }
-    const multiTestCases: {|
-      title: string,
-      prev: SelectableItem | null,
-      action: SelectMultipleStepsAction,
-      expected: SelectableItem | null,
-    |} = [
+    const multiTestCases: {
+      title: string
+      prev: SelectableItem | null
+      action: SelectMultipleStepsAction
+      expected: SelectableItem | null
+    } = [
       {
         title: 'should enter multi-select mode from null',
         prev: null,
@@ -267,7 +271,6 @@ describe('selectedItem reducer', () => {
       })
     })
   })
-
   it('should deselect on DELETE_STEP', () => {
     const action = {
       type: 'DELETE_STEP',
@@ -275,7 +278,10 @@ describe('selectedItem reducer', () => {
     }
     expect(
       selectedItem(
-        { selectionType: SINGLE_STEP_SELECTION_TYPE, id: 'anyId' },
+        {
+          selectionType: SINGLE_STEP_SELECTION_TYPE,
+          id: 'anyId',
+        },
         action
       )
     ).toEqual(null)

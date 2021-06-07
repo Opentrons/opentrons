@@ -1,5 +1,3 @@
-// @flow
-
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
 import {
@@ -11,7 +9,6 @@ import {
 import { TEMPERATURE_AT_TARGET } from '@opentrons/step-generation'
 import * as labwareModuleCompatibility from '../../../utils/labwareModuleCompatibility'
 import { getSwapBlocked } from '../DeckSetup'
-
 describe('DeckSetup', () => {
   describe('getSwapBlocked', () => {
     const plateInSlot3 = {
@@ -26,7 +23,6 @@ describe('DeckSetup', () => {
       slot: '4',
       def: fixture_24_tuberack,
     }
-
     const magneticModule = {
       id: 'magnet123',
       type: MAGNETIC_MODULE_TYPE,
@@ -48,7 +44,6 @@ describe('DeckSetup', () => {
       },
       slot: '7',
     }
-
     let getLabwareIsCompatibleSpy
     beforeEach(() => {
       getLabwareIsCompatibleSpy = jest.spyOn(
@@ -56,11 +51,9 @@ describe('DeckSetup', () => {
         'getLabwareIsCompatible'
       )
     })
-
     afterEach(() => {
       getLabwareIsCompatibleSpy.mockClear()
     })
-
     it('is not blocked when there is no labware in slot', () => {
       const args = {
         hoveredLabware: null,
@@ -68,12 +61,9 @@ describe('DeckSetup', () => {
         modulesById: {},
         customLabwareDefs: {},
       }
-
       const isBlocked = getSwapBlocked(args)
-
       expect(isBlocked).toEqual(false)
     })
-
     it('is not blocked when no dragged labware', () => {
       const args = {
         hoveredLabware: plateInSlot3,
@@ -81,12 +71,9 @@ describe('DeckSetup', () => {
         modulesById: {},
         customLabwareDefs: {},
       }
-
       const isBlocked = getSwapBlocked(args)
-
       expect(isBlocked).toEqual(false)
     })
-
     it('is not blocked when dragged labware to swap on module is custom', () => {
       tuberackInSlot4.slot = 'magnet123'
       getLabwareIsCompatibleSpy.mockReturnValue(false)
@@ -100,12 +87,9 @@ describe('DeckSetup', () => {
           'fixture/fixture_96_plate': fixture_96_plate,
         },
       }
-
       const isBlocked = getSwapBlocked(args)
-
       expect(isBlocked).toEqual(false)
     })
-
     it('is blocked when dragged labware on module to swap on another module is not custom and not compatible', () => {
       tuberackInSlot4.slot = 'magnet123'
       getLabwareIsCompatibleSpy.mockReturnValue(false)
@@ -117,12 +101,9 @@ describe('DeckSetup', () => {
         },
         customLabwareDefs: {},
       }
-
       const isBlocked = getSwapBlocked(args)
-
       expect(isBlocked).toEqual(true)
     })
-
     it('is blocked when target labware on module to swap is incompatible with dragged labware', () => {
       tuberackInSlot4.slot = 'magnet123'
       getLabwareIsCompatibleSpy.mockReturnValue(false)
@@ -134,12 +115,9 @@ describe('DeckSetup', () => {
         },
         customLabwareDefs: {},
       }
-
       const isBlocked = getSwapBlocked(args)
-
       expect(isBlocked).toEqual(true)
     })
-
     it('is not blocked when labwares to swap on both modules are compatible', () => {
       tuberackInSlot4.slot = 'magnet123'
       plateInSlot3.slot = 'temperature098'
@@ -153,12 +131,9 @@ describe('DeckSetup', () => {
         },
         customLabwareDefs: {},
       }
-
       const isBlocked = getSwapBlocked(args)
-
       expect(isBlocked).toEqual(false)
     })
-
     it('is blocked when both dragged and target labwares on the modules are incompatible', () => {
       tuberackInSlot4.slot = 'magnet123'
       plateInSlot3.slot = 'temperature098'
@@ -172,12 +147,9 @@ describe('DeckSetup', () => {
         },
         customLabwareDefs: {},
       }
-
       const isBlocked = getSwapBlocked(args)
-
       expect(isBlocked).toEqual(true)
     })
-
     it('is not blocked when swapping labware from module with compatible labware on deck slot', () => {
       plateInSlot3.slot = 'temperature098'
       getLabwareIsCompatibleSpy.mockReturnValue(true)
@@ -189,12 +161,9 @@ describe('DeckSetup', () => {
         },
         customLabwareDefs: {},
       }
-
       const isBlocked = getSwapBlocked(args)
-
       expect(isBlocked).toEqual(false)
     })
-
     it('is not blocked when swapping labware from one deck slot with another labware on deck slot', () => {
       const args = {
         hoveredLabware: tuberackInSlot4,
@@ -202,12 +171,9 @@ describe('DeckSetup', () => {
         modulesById: {},
         customLabwareDefs: {},
       }
-
       const isBlocked = getSwapBlocked(args)
-
       expect(isBlocked).toEqual(false)
     })
-
     it('is not blocked when swapping compatible labware on deck slot with labware on module', () => {
       tuberackInSlot4.slot = 'magnet123'
       getLabwareIsCompatibleSpy.mockReturnValue(true)
@@ -219,9 +185,7 @@ describe('DeckSetup', () => {
         },
         customLabwareDefs: {},
       }
-
       const isBlocked = getSwapBlocked(args)
-
       expect(isBlocked).toEqual(false)
     })
   })

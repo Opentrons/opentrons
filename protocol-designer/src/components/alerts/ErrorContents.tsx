@@ -7,8 +7,8 @@ import type { AlertLevel } from './types'
 import { TerminalItemLink } from '../steplist/TerminalItem'
 
 type ErrorContentsProps = {
-  errorType: string,
-  level: AlertLevel,
+  errorType: string
+  level: AlertLevel
 }
 export const ErrorContents = (props: ErrorContentsProps): React.Node => {
   if (props.level === 'timeline') {

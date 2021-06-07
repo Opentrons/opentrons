@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import * as React from 'react'
 import { connect } from 'react-redux'
@@ -9,12 +8,10 @@ import {
 import { LabwareUploadMessageModal as LabwareUploadMessageModalComponent } from './LabwareUploadMessageModal'
 import type { Dispatch } from 'redux'
 import type { BaseState } from '../../../types'
-
 type Props = React.ElementProps<typeof LabwareUploadMessageModalComponent>
-
-type SP = {|
-  message: $PropertyType<Props, 'message'>,
-|}
+type SP = {
+  message: Props['message']
+}
 
 function mapStateToProps(state: BaseState): SP {
   return {
@@ -24,7 +21,9 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<any> }
+  dispatchProps: {
+    dispatch: Dispatch<any>
+  }
 ): Props {
   const { dispatch } = dispatchProps
   const { message } = stateProps
@@ -53,9 +52,9 @@ function mergeProps(
   }
 }
 
-export const LabwareUploadMessageModal: React.AbstractComponent<{||}> = connect<
+export const LabwareUploadMessageModal: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   _,
   _,

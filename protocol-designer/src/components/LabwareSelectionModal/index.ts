@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { LabwareSelectionModal as LabwareSelectionModalComponent } from './LabwareSelectionModal'
@@ -12,21 +11,17 @@ import {
   actions as labwareDefActions,
   selectors as labwareDefSelectors,
 } from '../../labware-defs'
-import {
-  selectors as stepFormSelectors,
-  type ModuleOnDeck,
-} from '../../step-forms'
+import type { ModuleOnDeck } from '../../step-forms'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import type { BaseState, ThunkDispatch } from '../../types'
-
 type Props = React.ElementProps<typeof LabwareSelectionModalComponent>
-
-type SP = {|
-  customLabwareDefs: $PropertyType<Props, 'customLabwareDefs'>,
-  slot: $PropertyType<Props, 'slot'>,
-  parentSlot: $PropertyType<Props, 'parentSlot'>,
-  moduleType: $PropertyType<Props, 'moduleType'>,
-  permittedTipracks: $PropertyType<Props, 'permittedTipracks'>,
-|}
+type SP = {
+  customLabwareDefs: Props['customLabwareDefs']
+  slot: Props['slot']
+  parentSlot: Props['parentSlot']
+  moduleType: Props['moduleType']
+  permittedTipracks: Props['permittedTipracks']
+}
 
 function mapStateToProps(state: BaseState): SP {
   const slot = labwareIngredSelectors.selectedAddLabwareSlot(state) || null
@@ -39,7 +34,6 @@ function mapStateToProps(state: BaseState): SP {
     (slot != null &&
       initialModules.find(moduleOnDeck => moduleOnDeck.id === slot)) ||
     null
-
   return {
     customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
     slot,
@@ -51,10 +45,11 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> }
+  dispatchProps: {
+    dispatch: ThunkDispatch<any>
+  }
 ): Props {
   const dispatch = dispatchProps.dispatch
-
   return {
     ...stateProps,
     onClose: () => {
@@ -64,17 +59,22 @@ function mergeProps(
       dispatch(labwareDefActions.createCustomLabwareDef(fileChangeEvent)),
     selectLabware: labwareDefURI => {
       if (stateProps.slot) {
-        dispatch(createContainer({ slot: stateProps.slot, labwareDefURI }))
+        dispatch(
+          createContainer({
+            slot: stateProps.slot,
+            labwareDefURI,
+          })
+        )
       }
     },
   }
 }
 
-export const LabwareSelectionModal: React.AbstractComponent<{||}> = connect<
+export const LabwareSelectionModal: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
-  {||},
+  {},
   _,
   _
 >(

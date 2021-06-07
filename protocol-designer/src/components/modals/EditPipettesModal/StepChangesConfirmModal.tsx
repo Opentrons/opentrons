@@ -7,7 +7,7 @@ import { i18n } from '../../../localization'
 import styles from './StepChangesConfirmModal.css'
 import modalStyles from '../modal.css'
 
-type Props = { onCancel: () => void, onConfirm: () => void }
+type Props = { onCancel: () => void; onConfirm: () => void }
 
 export const StepChangesConfirmModal = (props: Props): React.Node => {
   const { onCancel, onConfirm } = props

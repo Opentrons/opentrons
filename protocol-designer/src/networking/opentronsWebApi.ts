@@ -1,9 +1,6 @@
-// @flow
-
 import cookie from 'cookie'
 import queryString from 'query-string'
 import { i18n } from '../localization'
-
 export type GateStage =
   | 'loading'
   | 'promptVerifyIdentity'
@@ -11,28 +8,26 @@ export type GateStage =
   | 'failedIdentityVerification'
   | 'promptOptForAnalytics'
   | 'openGate'
-
-type GateState = { gateStage: GateStage, errorMessage: ?string }
-
+type GateState = {
+  gateStage: GateStage
+  errorMessage: string | null | undefined
+}
 export const getIsProduction = (): boolean =>
   global.location.host === 'designer.opentrons.com'
-
 const OPENTRONS_API_BASE_URL = getIsProduction()
   ? 'https://web-api.opentrons.com'
   : 'https://staging.web-api.opentrons.com'
 const PROTOCOL_DESIGNER_VERIFY_URL = getIsProduction()
   ? global.location.origin
   : 'https://staging.designer.opentrons.com'
-
 const VERIFY_EMAIL_PATH = '/users/verify-email'
 const CONFIRM_EMAIL_PATH = '/users/confirm-email'
-
 const headers = {
   Accept: 'application/json',
   'Content-Type': 'application/json',
 }
 
-const writeIdentityCookie = (payload: {| name: string, email: string |}) => {
+const writeIdentityCookie = (payload: { name: string; email: string }) => {
   const domain =
     process.env.NODE_ENV === 'production' ? 'opentrons.com' : undefined
   global.document.cookie = cookie.serialize('ot_name', payload.name, {
@@ -53,7 +48,7 @@ export const writeFakeIdentityCookie = (): void =>
   })
 
 const getStageFromIdentityCookie = (
-  token: ?string,
+  token: string | null | undefined,
   hasOptedIntoAnalytics: boolean | null
 ) => {
   const cookies = cookie.parse(global.document.cookie)
@@ -68,7 +63,6 @@ const getStageFromIdentityCookie = (
 }
 
 // TODO: BC: 2019-03-05 refactor this and pull the common networking fetch calls out into a helper
-
 export const getGateStage = (
   hasOptedIntoAnalytics: boolean | null
 ): Promise<GateState> => {
@@ -81,7 +75,9 @@ export const getGateStage = (
     return fetch(`${OPENTRONS_API_BASE_URL}${VERIFY_EMAIL_PATH}`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ token }),
+      body: JSON.stringify({
+        token,
+      }),
     }).then(response =>
       response
         .json()
@@ -96,21 +92,30 @@ export const getGateStage = (
             errorMessage = i18n.t(
               'application.networking.unauthorized_verification_failure'
             )
+
             if (status !== 401) {
               const specificAddendum =
                 (body && body.message) || `${status} ${statusText}`
               errorMessage = `${errorMessage}  (Error Message: ${specificAddendum})`
             }
+
             gateStage = 'failedIdentityVerification'
           }
-          return { gateStage, errorMessage }
+
+          return {
+            gateStage,
+            errorMessage,
+          }
         })
         .catch(error => {
           gateStage = getStageFromIdentityCookie(token, hasOptedIntoAnalytics)
           errorMessage =
             error ||
             i18n.t('application.networking.generic_verification_failure')
-          return { gateStage, errorMessage }
+          return {
+            gateStage,
+            errorMessage,
+          }
         })
     )
   } else if (email && name) {
@@ -139,24 +144,33 @@ export const getGateStage = (
               'application.networking.validation_server_failure'
             )
             gateStage = 'failedIdentityVerification'
-
             const { status, statusText } = response
             const specificAddendum =
               (body && body.message) || `${status} ${statusText}`
             errorMessage = `${errorMessage}  (Error Message: ${specificAddendum})`
           }
-          return { gateStage, errorMessage }
+
+          return {
+            gateStage,
+            errorMessage,
+          }
         })
         .catch(error => {
           gateStage = 'failedIdentityVerification'
           errorMessage =
             error || i18n.t('application.networking.validation_server_failure')
-          return { gateStage, errorMessage }
+          return {
+            gateStage,
+            errorMessage,
+          }
         })
     )
   } else {
     // No identity token
     gateStage = getStageFromIdentityCookie(token, hasOptedIntoAnalytics)
-    return Promise.resolve({ gateStage, errorMessage })
+    return Promise.resolve({
+      gateStage,
+      errorMessage,
+    })
   }
 }

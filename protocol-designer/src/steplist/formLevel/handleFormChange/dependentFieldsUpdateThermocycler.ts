@@ -1,4 +1,3 @@
-// @flow
 import pick from 'lodash/pick'
 import { chainPatchUpdaters, fieldHasChanged } from './utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
@@ -38,36 +37,27 @@ const updatePatchOnThermocyclerFormType = (
       ),
     }
   }
+
   return patch
 }
 
 const updatePatchOnBlockChange = (patch: FormPatch, rawForm: FormData) => {
   if (fieldHasChanged(rawForm, patch, 'blockIsActive')) {
-    return {
-      ...patch,
-      ...getDefaultFields('blockTargetTemp'),
-    }
+    return { ...patch, ...getDefaultFields('blockTargetTemp') }
   } else if (fieldHasChanged(rawForm, patch, 'blockIsActiveHold')) {
-    return {
-      ...patch,
-      ...getDefaultFields('blockTargetTempHold'),
-    }
+    return { ...patch, ...getDefaultFields('blockTargetTempHold') }
   }
+
   return patch
 }
 
 const updatePatchOnLidChange = (patch: FormPatch, rawForm: FormData) => {
   if (fieldHasChanged(rawForm, patch, 'lidIsActive')) {
-    return {
-      ...patch,
-      ...getDefaultFields('lidTargetTemp'),
-    }
+    return { ...patch, ...getDefaultFields('lidTargetTemp') }
   } else if (fieldHasChanged(rawForm, patch, 'lidIsActiveHold')) {
-    return {
-      ...patch,
-      ...getDefaultFields('lidTargetTempHold'),
-    }
+    return { ...patch, ...getDefaultFields('lidTargetTempHold') }
   }
+
   return patch
 }
 

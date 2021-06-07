@@ -1,11 +1,9 @@
-// @flow
 import last from 'lodash/last'
 import pick from 'lodash/pick'
 import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
 } from '@opentrons/step-generation'
-
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import type { Channels } from '@opentrons/components'
 import type {
@@ -18,8 +16,10 @@ import type {
 import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */
-export function _getNewActiveTips(commands: Array<Command>): ?TipLocation {
-  const lastNewTipCommand: ?Command = last(
+export function _getNewActiveTips(
+  commands: Array<Command>
+): TipLocation | null | undefined {
+  const lastNewTipCommand: Command | null | undefined = last(
     commands.filter(c => c.command === 'pickUpTip')
   )
   const newTipParams =
@@ -27,7 +27,6 @@ export function _getNewActiveTips(commands: Array<Command>): ?TipLocation {
       lastNewTipCommand.command === 'pickUpTip' &&
       lastNewTipCommand.params) ||
     null
-
   return newTipParams
 }
 
@@ -38,11 +37,11 @@ const _createNextTimelineFrame = ({
   volume,
   wellInfo,
 }: {
-  command: Command,
-  index: number,
-  nextFrame: CommandsAndWarnings,
-  volume: number,
-  wellInfo: SourceDestData,
+  command: Command
+  index: number
+  nextFrame: CommandsAndWarnings
+  volume: number
+  wellInfo: SourceDestData
 }) => {
   // TODO(IL, 2020-02-24): is there a cleaner way to create newTimelineFrame
   // and keep Flow happy about computed properties?
@@ -58,11 +57,10 @@ const _createNextTimelineFrame = ({
 }
 
 type SubstepTimelineAcc = {
-  timeline: Array<SubstepTimelineFrame>,
-  errors: ?Array<CommandCreatorError>,
-  prevRobotState: RobotState,
+  timeline: Array<SubstepTimelineFrame>
+  errors: Array<CommandCreatorError> | null | undefined
+  prevRobotState: RobotState
 }
-
 export const substepTimelineSingleChannel = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
@@ -70,7 +68,6 @@ export const substepTimelineSingleChannel = (
 ): Array<SubstepTimelineFrame> => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
   if (nextFrame.errors) return []
-
   const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
     (acc, command: Command, index) => {
       const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
@@ -87,7 +84,6 @@ export const substepTimelineSingleChannel = (
           preIngreds: acc.prevRobotState.liquidState.labware[labware][well],
           postIngreds: nextRobotState.liquidState.labware[labware][well],
         }
-
         return {
           ...acc,
           timeline: [
@@ -104,10 +100,7 @@ export const substepTimelineSingleChannel = (
           prevRobotState: nextRobotState,
         }
       } else {
-        return {
-          ...acc,
-          prevRobotState: nextRobotState,
-        }
+        return { ...acc, prevRobotState: nextRobotState }
       }
     },
     {
@@ -116,10 +109,8 @@ export const substepTimelineSingleChannel = (
       prevRobotState: initialRobotState,
     }
   )
-
   return timeline.timeline
 }
-
 // timeline for multi-channel substep context
 export const substepTimelineMultiChannel = (
   commandCreator: CurriedCommandCreator,
@@ -159,7 +150,6 @@ export const substepTimelineMultiChannel = (
             ? pick(nextRobotState.liquidState.labware[labware], wellsForTips)
             : {},
         }
-
         return {
           ...acc,
           timeline: [
@@ -175,10 +165,7 @@ export const substepTimelineMultiChannel = (
           prevRobotState: nextRobotState,
         }
       } else {
-        return {
-          ...acc,
-          prevRobotState: nextRobotState,
-        }
+        return { ...acc, prevRobotState: nextRobotState }
       }
     },
     {
@@ -187,10 +174,8 @@ export const substepTimelineMultiChannel = (
       prevRobotState: initialRobotState,
     }
   )
-
   return timeline.timeline
 }
-
 export const substepTimeline = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,

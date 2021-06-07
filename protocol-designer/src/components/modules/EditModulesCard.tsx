@@ -20,8 +20,8 @@ import type { ModuleRealType } from '@opentrons/shared-data'
 import type { ModulesForEditModulesCard } from '../../step-forms'
 
 type Props = {
-  modules: ModulesForEditModulesCard,
-  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed,
+  modules: ModulesForEditModulesCard
+  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed
 }
 
 export function EditModulesCard(props: Props): React.Node {

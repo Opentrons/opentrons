@@ -1,15 +1,13 @@
-// @flow
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import { userFacingFlags, DEPRECATED_FLAGS, type Flags } from './types'
-
+import type { Flags } from './types'
+import { userFacingFlags, DEPRECATED_FLAGS } from './types'
 import type { Reducer } from 'redux'
 import type { RehydratePersistedAction } from '../persist'
 import type { SetFeatureFlagAction } from './actions'
 import type { Action } from '../types'
-
 // NOTE: these values will always be overridden by persisted values,
 // whenever the browser has seen the feature flag before and persisted it.
 // Only "never before seen" flags will take on the default values from `initialFlags`.
@@ -24,18 +22,19 @@ const initialFlags: Flags = {
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
 }
-
 // NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
 const flags: Reducer<Flags, any> = handleActions(
   {
     SET_FEATURE_FLAGS: (state: Flags, action: SetFeatureFlagAction): Flags => {
       const nextState = { ...state, ...action.payload }
+
       if (action.payload.PRERELEASE_MODE === false) {
         // turn off all non-user-facing flags when prerelease mode disabled
         return mapValues(nextState, (value, flagName) =>
           userFacingFlags.includes(flagName) ? value : false
         )
       }
+
       return nextState
     },
     // Feature flags that are new (not yet in browser storage) should take on default values.
@@ -50,15 +49,12 @@ const flags: Reducer<Flags, any> = handleActions(
   },
   initialFlags
 )
-
 export const _allReducers = {
   flags,
 }
-
-export type RootState = {|
-  flags: Flags,
-|}
-
+export type RootState = {
+  flags: Flags
+}
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers
 )

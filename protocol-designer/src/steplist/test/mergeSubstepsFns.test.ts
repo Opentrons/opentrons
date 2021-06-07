@@ -1,18 +1,18 @@
-// @flow
 import {
   mergeSubstepRowsSingleChannel,
   mergeSubstepRowsMultiChannel,
 } from '../generateSubstepItem'
-
 const ingred1Id = 'ingred1Id'
+
 const wellNamesForCol = (isMulti: boolean, colNum: string): Array<string> =>
   isMulti ? 'ABCDEFGH'.split('').map(s => `${s}${colNum}`) : [`A${colNum}`]
 
-type Ingreds = { [ingredId: string]: number }
+type Ingreds = Record<string, number>
+
 const repeatIngreds = (
   isMulti: boolean,
   colNum: string,
-  _ingreds: ?Ingreds
+  _ingreds: Ingreds | null | undefined
 ): Ingreds | Array<Ingreds> => {
   const ingreds = _ingreds || {}
   return isMulti
@@ -23,11 +23,23 @@ const repeatIngreds = (
     : ingreds
 }
 
-const getFixtures = ({ isMulti }: {| isMulti: boolean |}) => {
+const getFixtures = ({ isMulti }: { isMulti: boolean }) => {
   const makeIngreds = (volume: number | null, colNum: string) =>
-    repeatIngreds(isMulti, colNum, volume ? { [ingred1Id]: volume } : null)
+    repeatIngreds(
+      isMulti,
+      colNum,
+      volume
+        ? {
+            [ingred1Id]: volume,
+          }
+        : null
+    )
+
   // NOTE: these cases do not cover dynamic behavior of `activeTips` key
-  const activeTips = { labware: 'someTiprackId', well: 'A6' }
+  const activeTips = {
+    labware: 'someTiprackId',
+    well: 'A6',
+  }
   return {
     activeTips,
     transferRowsFixture: [
@@ -40,8 +52,7 @@ const getFixtures = ({ isMulti }: {| isMulti: boolean |}) => {
           postIngreds: makeIngreds(20, '1'),
         },
         volume: 10,
-      },
-      // from 'dispense' command
+      }, // from 'dispense' command
       {
         activeTips,
         dest: {
@@ -62,8 +73,7 @@ const getFixtures = ({ isMulti }: {| isMulti: boolean |}) => {
           postIngreds: makeIngreds(25, '1'),
         },
         volume: 5,
-      },
-      // second 'aspirate'
+      }, // second 'aspirate'
       {
         activeTips,
         source: {
@@ -72,8 +82,7 @@ const getFixtures = ({ isMulti }: {| isMulti: boolean |}) => {
           postIngreds: makeIngreds(31, '2'),
         },
         volume: 5,
-      },
-      // from 'dispense' command
+      }, // from 'dispense' command
       {
         activeTips,
         dest: {
@@ -94,8 +103,7 @@ const getFixtures = ({ isMulti }: {| isMulti: boolean |}) => {
           postIngreds: makeIngreds(20, '1'),
         },
         volume: 10,
-      },
-      // first 'dispense'
+      }, // first 'dispense'
       {
         activeTips,
         dest: {
@@ -104,8 +112,7 @@ const getFixtures = ({ isMulti }: {| isMulti: boolean |}) => {
           postIngreds: makeIngreds(5, '11'),
         },
         volume: 5,
-      },
-      // second 'dispense'
+      }, // second 'dispense'
       {
         activeTips,
         dest: {
@@ -125,8 +132,9 @@ describe('mergeSubstepRowsSingleChannel', () => {
     transferRowsFixture,
     consolidateRowsFixture,
     distributeRowsFixture,
-  } = getFixtures({ isMulti: false })
-
+  } = getFixtures({
+    isMulti: false,
+  })
   const testCases = [
     {
       testName: 'mock transfer / mix',
@@ -138,13 +146,19 @@ describe('mergeSubstepRowsSingleChannel', () => {
           activeTips,
           source: {
             well: 'A1',
-            preIngreds: { [ingred1Id]: 30 },
-            postIngreds: { [ingred1Id]: 20 },
+            preIngreds: {
+              [ingred1Id]: 30,
+            },
+            postIngreds: {
+              [ingred1Id]: 20,
+            },
           },
           dest: {
             well: 'A12',
             preIngreds: {},
-            postIngreds: { [ingred1Id]: 10 },
+            postIngreds: {
+              [ingred1Id]: 10,
+            },
           },
           volume: 10,
         },
@@ -160,23 +174,32 @@ describe('mergeSubstepRowsSingleChannel', () => {
           activeTips,
           source: {
             well: 'A1',
-            preIngreds: { [ingred1Id]: 30 },
-            postIngreds: { [ingred1Id]: 25 },
+            preIngreds: {
+              [ingred1Id]: 30,
+            },
+            postIngreds: {
+              [ingred1Id]: 25,
+            },
           },
           volume: 5,
-        },
-        // last asp + disp merged into single row
+        }, // last asp + disp merged into single row
         {
           activeTips,
           source: {
             well: 'A2',
-            preIngreds: { [ingred1Id]: 36 },
-            postIngreds: { [ingred1Id]: 31 },
+            preIngreds: {
+              [ingred1Id]: 36,
+            },
+            postIngreds: {
+              [ingred1Id]: 31,
+            },
           },
           dest: {
             well: 'A12',
             preIngreds: {},
-            postIngreds: { [ingred1Id]: 10 },
+            postIngreds: {
+              [ingred1Id]: 10,
+            },
           },
           volume: 5,
         },
@@ -184,7 +207,8 @@ describe('mergeSubstepRowsSingleChannel', () => {
     },
     {
       testName: 'mock distribute',
-      showDispenseVol: true, // IRL, this is only true for distribute
+      showDispenseVol: true,
+      // IRL, this is only true for distribute
       substepRows: distributeRowsFixture,
       expected: [
         // first aspirate + disp merged into single row
@@ -192,23 +216,30 @@ describe('mergeSubstepRowsSingleChannel', () => {
           activeTips,
           source: {
             well: 'A1',
-            preIngreds: { [ingred1Id]: 30 },
-            postIngreds: { [ingred1Id]: 20 },
+            preIngreds: {
+              [ingred1Id]: 30,
+            },
+            postIngreds: {
+              [ingred1Id]: 20,
+            },
           },
           dest: {
             well: 'A11',
             preIngreds: {},
-            postIngreds: { [ingred1Id]: 5 },
+            postIngreds: {
+              [ingred1Id]: 5,
+            },
           },
           volume: 5,
-        },
-        // last asp stands alone
+        }, // last asp stands alone
         {
           activeTips,
           dest: {
             well: 'A12',
             preIngreds: {},
-            postIngreds: { [ingred1Id]: 5 },
+            postIngreds: {
+              [ingred1Id]: 5,
+            },
           },
           volume: 5,
         },
@@ -225,13 +256,14 @@ describe('mergeSubstepRowsSingleChannel', () => {
     })
   )
 })
-
 describe('mergeSubstepRowsMultiChannel', () => {
   const {
     transferRowsFixture,
     consolidateRowsFixture,
     distributeRowsFixture,
-  } = getFixtures({ isMulti: true })
+  } = getFixtures({
+    isMulti: true,
+  })
   const testCases = [
     {
       testName: 'mock transfer',
@@ -253,7 +285,8 @@ describe('mergeSubstepRowsMultiChannel', () => {
     },
     {
       testName: 'mock distribute',
-      showDispenseVol: true, // NOTE: IRL, should only be true for distribute
+      showDispenseVol: true,
+      // NOTE: IRL, should only be true for distribute
       isMixStep: false,
       substepRows: distributeRowsFixture,
     },

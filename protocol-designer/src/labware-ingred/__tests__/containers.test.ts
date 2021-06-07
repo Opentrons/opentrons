@@ -1,18 +1,17 @@
 import { containers } from '../reducers'
 jest.mock('../../labware-defs/utils')
-
 const containersInitialState = {}
-
 describe('DELETE_CONTAINER action', () => {
   it('no-op with no containers', () => {
     expect(
       containers(containersInitialState, {
         type: 'DELETE_CONTAINER',
-        payload: { labwareId: '123' },
+        payload: {
+          labwareId: '123',
+        },
       })
     ).toEqual(containersInitialState)
   })
-
   it('no-op with nonexistent labwareId', () => {
     expect(
       containers(
@@ -22,7 +21,9 @@ describe('DELETE_CONTAINER action', () => {
         },
         {
           type: 'DELETE_CONTAINER',
-          payload: { labwareId: '123' },
+          payload: {
+            labwareId: '123',
+          },
         }
       )
     ).toEqual({
@@ -30,7 +31,6 @@ describe('DELETE_CONTAINER action', () => {
       999: 'blaaah',
     })
   })
-
   it('delete given labwareId', () => {
     expect(
       containers(
@@ -41,7 +41,9 @@ describe('DELETE_CONTAINER action', () => {
         },
         {
           type: 'DELETE_CONTAINER',
-          payload: { labwareId: '123' },
+          payload: {
+            labwareId: '123',
+          },
         }
       )
     ).toEqual({
@@ -50,14 +52,17 @@ describe('DELETE_CONTAINER action', () => {
     })
   })
 })
-
 describe('DUPLICATE_LABWARE action', () => {
   it('duplicate correct labware', () => {
     expect(
       containers(
         {
-          clonePlate: { nickname: 'Samples Plate' },
-          otherPlate: { nickname: 'Destination Plate' },
+          clonePlate: {
+            nickname: 'Samples Plate',
+          },
+          otherPlate: {
+            nickname: 'Destination Plate',
+          },
         },
         {
           type: 'DUPLICATE_LABWARE',
@@ -70,9 +75,15 @@ describe('DUPLICATE_LABWARE action', () => {
         }
       )
     ).toEqual({
-      clonePlate: { nickname: 'Samples Plate' },
-      newContainer: { nickname: 'Samples Plate (1)' },
-      otherPlate: { nickname: 'Destination Plate' },
+      clonePlate: {
+        nickname: 'Samples Plate',
+      },
+      newContainer: {
+        nickname: 'Samples Plate (1)',
+      },
+      otherPlate: {
+        nickname: 'Destination Plate',
+      },
     })
   })
 })

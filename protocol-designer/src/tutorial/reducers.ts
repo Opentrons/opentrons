@@ -1,15 +1,13 @@
-// @flow
-import { combineReducers, type Reducer } from 'redux'
+import type { Reducer } from 'redux'
+import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
-
 import type { Action } from '../types'
 import type { RehydratePersistedAction } from '../persist'
 import type { HintKey } from './index'
 import type { AddHintAction, RemoveHintAction } from './actions'
 import type { NavigateToPageAction } from '../navigation/actions'
-
 type HintReducerState = Array<HintKey>
 const hints = handleActions(
   {
@@ -17,7 +15,6 @@ const hints = handleActions(
       state: HintReducerState,
       action: AddHintAction
     ): HintReducerState => uniq([...state, action.payload.hintKey]),
-
     // going to the steplist page triggers 'deck_setup_explanation' hint
     NAVIGATE_TO_PAGE: (
       state: HintReducerState,
@@ -29,8 +26,12 @@ const hints = handleActions(
   },
   []
 )
-
-type DismissedHintReducerState = { [HintKey]: { rememberDismissal: boolean } }
+type DismissedHintReducerState = Record<
+  HintKey,
+  {
+    rememberDismissal: boolean
+  }
+>
 const dismissedHintsInitialState = {}
 const dismissedHints: Reducer<DismissedHintReducerState, any> = handleActions(
   {
@@ -52,34 +53,33 @@ const dismissedHints: Reducer<DismissedHintReducerState, any> = handleActions(
       // (Flow won't let you do `return {...state, [hintKey]: spam})`) b/c it no longer
       // allows Unions as computed properties
       const nextState = { ...state }
-      nextState[hintKey] = { rememberDismissal }
+      nextState[hintKey] = {
+        rememberDismissal,
+      }
       return nextState
     },
     CLEAR_ALL_HINT_DISMISSALS: () => dismissedHintsInitialState,
   },
   dismissedHintsInitialState
 )
-
 export const dismissedHintsPersist = (
   state: DismissedHintReducerState
 ): DismissedHintReducerState => {
   // persist only 'rememberDismissal' hints
   return pickBy(
     state,
-    (h: $Values<DismissedHintReducerState>) => h && h.rememberDismissal
+    (h: DismissedHintReducerState[keyof DismissedHintReducerState]) =>
+      h && h.rememberDismissal
   )
 }
-
 const _allReducers = {
   hints,
   dismissedHints,
 }
-
-export type RootState = {|
-  hints: HintReducerState,
-  dismissedHints: DismissedHintReducerState,
-|}
-
+export type RootState = {
+  hints: HintReducerState
+  dismissedHints: DismissedHintReducerState
+}
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers
 )

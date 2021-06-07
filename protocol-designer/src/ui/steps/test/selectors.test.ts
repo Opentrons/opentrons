@@ -1,4 +1,3 @@
-// @flow
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
@@ -23,7 +22,6 @@ import {
   getBatchEditSelectedStepTypes,
 } from '../selectors'
 import { getMockMoveLiquidStep, getMockMixStep } from '../__fixtures__'
-
 import * as utils from '../../modules/utils'
 
 function createArgsForStepId(stepId, stepArgs) {
@@ -46,7 +44,6 @@ describe('getHoveredStepLabware', () => {
       modules: {},
     }
   })
-
   it('no labware is returned when no hovered step', () => {
     const stepArgs = {
       commandCreatorFnName: mixCommand,
@@ -54,16 +51,13 @@ describe('getHoveredStepLabware', () => {
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
     const hoveredStep = null
-
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStep,
       initialDeckState
     )
-
     expect(result).toEqual([])
   })
-
   it('no labware is returned when step is not found', () => {
     const stepArgs = {
       commandCreatorFnName: mixCommand,
@@ -71,26 +65,21 @@ describe('getHoveredStepLabware', () => {
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
     const hoveredStep = 'another-step'
-
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStep,
       initialDeckState
     )
-
     expect(result).toEqual([])
   })
-
   it('no labware is returned when no step arguments', () => {
     const stepArgs = null
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStepId,
       initialDeckState
     )
-
     expect(result).toEqual([])
   })
   ;['consolidate', 'distribute', 'transfer'].forEach(command => {
@@ -102,33 +91,27 @@ describe('getHoveredStepLabware', () => {
         sourceLabware,
       }
       const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-
       const result = getHoveredStepLabware.resultFunc(
         argsByStepId,
         hoveredStepId,
         initialDeckState
       )
-
       expect(result).toEqual([sourceLabware, labware])
     })
   })
-
   it('labware is returned when command is mix', () => {
     const stepArgs = {
       commandCreatorFnName: mixCommand,
       labware,
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStepId,
       initialDeckState
     )
-
     expect(result).toEqual([labware])
   })
-
   describe('modules', () => {
     const type = TEMPERATURE_MODULE_TYPE
     const setTempCommand = 'setTemperature'
@@ -155,24 +138,22 @@ describe('getHoveredStepLabware', () => {
         },
       }
     })
-
     it('labware on module is returned when module id exists', () => {
-      utils.getLabwareOnModule = jest.fn().mockReturnValue({ id: labware })
+      utils.getLabwareOnModule = jest.fn().mockReturnValue({
+        id: labware,
+      })
       const stepArgs = {
         commandCreatorFnName: setTempCommand,
         module: type,
       }
       const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-
       const result = getHoveredStepLabware.resultFunc(
         argsByStepId,
         hoveredStepId,
         initialDeckState
       )
-
       expect(result).toEqual([labware])
     })
-
     it('no labware is returned when no labware on module', () => {
       utils.getLabwareOnModule = jest.fn().mockReturnValue(null)
       const stepArgs = {
@@ -180,21 +161,21 @@ describe('getHoveredStepLabware', () => {
         module: type,
       }
       const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-
       const result = getHoveredStepLabware.resultFunc(
         argsByStepId,
         hoveredStepId,
         initialDeckState
       )
-
       expect(result).toEqual([])
     })
   })
 })
-
 describe('getSelectedStepTitleInfo', () => {
   it('should return title info of the presaved form when the presaved terminal item is selected', () => {
-    const unsavedForm = { stepName: 'The Step', stepType: 'transfer' }
+    const unsavedForm = {
+      stepName: 'The Step',
+      stepType: 'transfer',
+    }
     const result = getSelectedStepTitleInfo.resultFunc(
       unsavedForm,
       {},
@@ -206,11 +187,13 @@ describe('getSelectedStepTitleInfo', () => {
       stepType: unsavedForm.stepType,
     })
   })
-
   it('should return null when the start or end terminal item is selected', () => {
     const terminals = [START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID]
     terminals.forEach(terminalId => {
-      const unsavedForm = { stepName: 'The Step', stepType: 'transfer' }
+      const unsavedForm = {
+        stepName: 'The Step',
+        stepType: 'transfer',
+      }
       const result = getSelectedStepTitleInfo.resultFunc(
         unsavedForm,
         {},
@@ -223,13 +206,17 @@ describe('getSelectedStepTitleInfo', () => {
       })
     })
   })
-
   it('should return title info of the saved step when a saved step is selected', () => {
-    const savedForm = { stepName: 'The Step', stepType: 'transfer' }
+    const savedForm = {
+      stepName: 'The Step',
+      stepType: 'transfer',
+    }
     const stepId = 'selectedAndSavedStepId'
     const result = getSelectedStepTitleInfo.resultFunc(
       null,
-      { [stepId]: savedForm },
+      {
+        [stepId]: savedForm,
+      },
       stepId,
       null
     )
@@ -239,7 +226,6 @@ describe('getSelectedStepTitleInfo', () => {
     })
   })
 })
-
 describe('getActiveItem', () => {
   const testCases = [
     {
@@ -293,7 +279,6 @@ describe('getActiveItem', () => {
       },
     },
   ]
-
   testCases.forEach(({ title, selected, hovered, expected }) => {
     it(title, () => {
       const result = getActiveItem.resultFunc(selected, hovered)
@@ -301,7 +286,6 @@ describe('getActiveItem', () => {
     })
   })
 })
-
 describe('getMultiSelectLastSelected', () => {
   it('should return null if the selected item is a single step', () => {
     const result = getMultiSelectLastSelected.resultFunc({
@@ -326,11 +310,9 @@ describe('getMultiSelectLastSelected', () => {
     expect(result).toEqual('spam')
   })
 })
-
 describe('_getSavedMultiSelectFieldValues', () => {
   let mockSavedStepForms
   let mockmultiSelectItemIds
-
   beforeEach(() => {
     mockSavedStepForms = {
       ...getMockMoveLiquidStep(),
@@ -345,7 +327,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
     ]
   })
   afterEach(() => {})
-
   it('should return null if any of the forms are an unhandled type', () => {
     const savedStepForms = {
       ...mockSavedStepForms,
@@ -361,12 +342,8 @@ describe('_getSavedMultiSelectFieldValues', () => {
       )
     ).toBe(null)
   })
-
   it('should return null if some forms are moveLiquid and others are mix', () => {
-    const savedStepForms = {
-      ...mockSavedStepForms,
-      ...getMockMixStep(),
-    }
+    const savedStepForms = { ...mockSavedStepForms, ...getMockMixStep() }
     expect(
       _getSavedMultiSelectFieldValues.resultFunc(savedStepForms, [
         'move_liquid_step_id',
@@ -374,7 +351,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
       ])
     ).toBe(null)
   })
-
   describe('moveLiquid: when fields are NOT indeterminate', () => {
     it('should return the fields with the indeterminate boolean', () => {
       expect(
@@ -590,8 +566,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           // same thing here with air gap volume
           dispense_touchTip_checkbox: false,
           // same thing with dispense_touchTip_mmFromBottom
-          blowout_checkbox: false,
-          // same thing here with blowout location
+          blowout_checkbox: false, // same thing here with blowout location
         },
       }
     })
@@ -752,7 +727,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
       })
     })
   })
-
   describe('mix: when fields are NOT indeterminate', () => {
     let mockMixSavedStepForms
     let mockMixMultiSelectItemIds
@@ -773,32 +747,87 @@ describe('_getSavedMultiSelectFieldValues', () => {
           mockMixMultiSelectItemIds
         )
       ).toEqual({
-        volume: { value: '100', isIndeterminate: false },
-        times: { value: null, isIndeterminate: false },
-        changeTip: { value: 'always', isIndeterminate: false },
-        labware: { value: 'some_labware_id', isIndeterminate: false },
-        mix_wellOrder_first: { value: 't2b', isIndeterminate: false },
-        mix_wellOrder_second: { value: 'l2r', isIndeterminate: false },
-        blowout_checkbox: { value: false, isIndeterminate: false },
-        blowout_location: { value: 'trashId', isIndeterminate: false },
-        mix_mmFromBottom: { value: 0.5, isIndeterminate: false },
-        pipette: { value: 'some_pipette_id', isIndeterminate: false },
-        wells: { isIndeterminate: true },
-        aspirate_flowRate: { value: null, isIndeterminate: false },
-        dispense_flowRate: { value: null, isIndeterminate: false },
-        aspirate_delay_checkbox: { value: false, isIndeterminate: false },
-        aspirate_delay_seconds: { value: '1', isIndeterminate: false },
-        dispense_delay_checkbox: { value: false, isIndeterminate: false },
-        dispense_delay_seconds: { value: '1', isIndeterminate: false },
-        mix_touchTip_checkbox: { value: false, isIndeterminate: false },
-        mix_touchTip_mmFromBottom: { value: null, isIndeterminate: false },
+        volume: {
+          value: '100',
+          isIndeterminate: false,
+        },
+        times: {
+          value: null,
+          isIndeterminate: false,
+        },
+        changeTip: {
+          value: 'always',
+          isIndeterminate: false,
+        },
+        labware: {
+          value: 'some_labware_id',
+          isIndeterminate: false,
+        },
+        mix_wellOrder_first: {
+          value: 't2b',
+          isIndeterminate: false,
+        },
+        mix_wellOrder_second: {
+          value: 'l2r',
+          isIndeterminate: false,
+        },
+        blowout_checkbox: {
+          value: false,
+          isIndeterminate: false,
+        },
+        blowout_location: {
+          value: 'trashId',
+          isIndeterminate: false,
+        },
+        mix_mmFromBottom: {
+          value: 0.5,
+          isIndeterminate: false,
+        },
+        pipette: {
+          value: 'some_pipette_id',
+          isIndeterminate: false,
+        },
+        wells: {
+          isIndeterminate: true,
+        },
+        aspirate_flowRate: {
+          value: null,
+          isIndeterminate: false,
+        },
+        dispense_flowRate: {
+          value: null,
+          isIndeterminate: false,
+        },
+        aspirate_delay_checkbox: {
+          value: false,
+          isIndeterminate: false,
+        },
+        aspirate_delay_seconds: {
+          value: '1',
+          isIndeterminate: false,
+        },
+        dispense_delay_checkbox: {
+          value: false,
+          isIndeterminate: false,
+        },
+        dispense_delay_seconds: {
+          value: '1',
+          isIndeterminate: false,
+        },
+        mix_touchTip_checkbox: {
+          value: false,
+          isIndeterminate: false,
+        },
+        mix_touchTip_mmFromBottom: {
+          value: null,
+          isIndeterminate: false,
+        },
       })
     })
   })
   describe('mix: when fields are indeterminate', () => {
     let mockMixSavedStepFormsIndeterminate
     let mockMixMultiSelectItemIds
-
     beforeEach(() => {
       mockMixSavedStepFormsIndeterminate = {
         ...getMockMixStep(),
@@ -825,7 +854,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
           mix_touchTip_mmFromBottom: '14',
         },
       }
-
       mockMixMultiSelectItemIds = ['mix_step_id', 'another_mix_step_id']
     })
     it('should return the fields with the indeterminate boolean', () => {
@@ -835,53 +863,106 @@ describe('_getSavedMultiSelectFieldValues', () => {
           mockMixMultiSelectItemIds
         )
       ).toEqual({
-        volume: { isIndeterminate: true },
-        times: { isIndeterminate: true },
-        changeTip: { isIndeterminate: true },
-        labware: { isIndeterminate: true },
-        mix_wellOrder_first: { isIndeterminate: true },
-        mix_wellOrder_second: { isIndeterminate: true },
-        blowout_checkbox: { isIndeterminate: true },
-        blowout_location: { isIndeterminate: true },
-        mix_mmFromBottom: { isIndeterminate: true },
-        pipette: { isIndeterminate: true },
-        wells: { isIndeterminate: true },
-        aspirate_flowRate: { isIndeterminate: true },
-        dispense_flowRate: { isIndeterminate: true },
-        aspirate_delay_checkbox: { isIndeterminate: true },
-        aspirate_delay_seconds: { isIndeterminate: true },
-        dispense_delay_checkbox: { isIndeterminate: true },
-        dispense_delay_seconds: { isIndeterminate: true },
-        mix_touchTip_checkbox: { isIndeterminate: true },
-        mix_touchTip_mmFromBottom: { isIndeterminate: true },
+        volume: {
+          isIndeterminate: true,
+        },
+        times: {
+          isIndeterminate: true,
+        },
+        changeTip: {
+          isIndeterminate: true,
+        },
+        labware: {
+          isIndeterminate: true,
+        },
+        mix_wellOrder_first: {
+          isIndeterminate: true,
+        },
+        mix_wellOrder_second: {
+          isIndeterminate: true,
+        },
+        blowout_checkbox: {
+          isIndeterminate: true,
+        },
+        blowout_location: {
+          isIndeterminate: true,
+        },
+        mix_mmFromBottom: {
+          isIndeterminate: true,
+        },
+        pipette: {
+          isIndeterminate: true,
+        },
+        wells: {
+          isIndeterminate: true,
+        },
+        aspirate_flowRate: {
+          isIndeterminate: true,
+        },
+        dispense_flowRate: {
+          isIndeterminate: true,
+        },
+        aspirate_delay_checkbox: {
+          isIndeterminate: true,
+        },
+        aspirate_delay_seconds: {
+          isIndeterminate: true,
+        },
+        dispense_delay_checkbox: {
+          isIndeterminate: true,
+        },
+        dispense_delay_seconds: {
+          isIndeterminate: true,
+        },
+        mix_touchTip_checkbox: {
+          isIndeterminate: true,
+        },
+        mix_touchTip_mmFromBottom: {
+          isIndeterminate: true,
+        },
       })
     })
   })
 })
-
 describe('getMultiSelectFieldValues', () => {
   it('should pass through saved changes when there are no saved', () => {
-    const savedValues = { a: { value: 'blah', isIndeterminate: true } }
+    const savedValues = {
+      a: {
+        value: 'blah',
+        isIndeterminate: true,
+      },
+    }
     const changes = {}
     const result = getMultiSelectFieldValues.resultFunc(savedValues, changes)
     expect(result).toEqual(savedValues)
   })
-
   it('should apply unsaved changes to override saved changes', () => {
-    const savedValues = { a: { value: 'blah', isIndeterminate: true } }
-    const changes = { a: '123' }
+    const savedValues = {
+      a: {
+        value: 'blah',
+        isIndeterminate: true,
+      },
+    }
+    const changes = {
+      a: '123',
+    }
     const result = getMultiSelectFieldValues.resultFunc(savedValues, changes)
-    expect(result).toEqual({ a: { value: '123', isIndeterminate: false } })
+    expect(result).toEqual({
+      a: {
+        value: '123',
+        isIndeterminate: false,
+      },
+    })
   })
-
   it('should return null when savedValues is null (signifying invalid combination of stepTypes)', () => {
     const savedValues = null
-    const changes = { a: '123' }
+    const changes = {
+      a: '123',
+    }
     const result = getMultiSelectFieldValues.resultFunc(savedValues, changes)
     expect(result).toBe(null)
   })
 })
-
 describe('getMultiSelectDisabledFields', () => {
   describe('disabled field tooltips', () => {
     it('should exist', () => {
@@ -895,7 +976,6 @@ describe('getMultiSelectDisabledFields', () => {
         'multi-dispense-present',
         'multi-dispense-present-pipette-different',
       ]
-
       expect.assertions(7)
       disabledReasons.forEach(reason => {
         const searchText = `${baseText}.${reason}`
@@ -903,11 +983,9 @@ describe('getMultiSelectDisabledFields', () => {
       })
     })
   })
-
   describe('when all forms are of type moveLiquid', () => {
     let mockSavedStepForms
     let mockmultiSelectItemIds
-
     beforeEach(() => {
       mockSavedStepForms = {
         ...getMockMoveLiquidStep(),
@@ -929,7 +1007,6 @@ describe('getMultiSelectDisabledFields', () => {
         )
       ).toEqual({})
     })
-
     describe('when pipettes are different', () => {
       let savedStepForms
       beforeEach(() => {
@@ -1002,7 +1079,6 @@ describe('getMultiSelectDisabledFields', () => {
         const aspirateLabwareDifferentText = i18n.t(
           'tooltip.step_fields.batch_edit.disabled.aspirate-labware-different'
         )
-
         expect(
           getMultiSelectDisabledFields.resultFunc(
             savedStepForms,
@@ -1181,18 +1257,14 @@ describe('getMultiSelectDisabledFields', () => {
       })
     })
   })
-
   describe('when all forms are of type mix', () => {
     let mockSavedStepForms
     let mockmultiSelectItemIds
-
     beforeEach(() => {
       mockSavedStepForms = {
         ...getMockMixStep(),
         // just doing this so the ids are not the exact same
-        another_mix_step_id: {
-          ...getMockMixStep().mix_step_id,
-        },
+        another_mix_step_id: { ...getMockMixStep().mix_step_id },
       }
       mockmultiSelectItemIds = ['mix_step_id', 'another_mix_step_id']
     })
@@ -1246,7 +1318,6 @@ describe('getMultiSelectDisabledFields', () => {
         const labwareDifferentText = i18n.t(
           'tooltip.step_fields.batch_edit.disabled.labware-different'
         )
-
         expect(
           getMultiSelectDisabledFields.resultFunc(
             savedStepForms,
@@ -1264,13 +1335,8 @@ describe('getMultiSelectDisabledFields', () => {
       })
     })
   })
-
   it('should return null if when forms are not all uniformly moveliquid OR mix', () => {
-    const savedStepForms = {
-      ...getMockMoveLiquidStep(),
-      ...getMockMixStep(),
-    }
-
+    const savedStepForms = { ...getMockMoveLiquidStep(), ...getMockMixStep() }
     const multiSelectItemIds = ['move_liquid_step_id', 'mix_step_id']
     expect(
       getMultiSelectDisabledFields.resultFunc(
@@ -1280,34 +1346,42 @@ describe('getMultiSelectDisabledFields', () => {
     ).toBe(null)
   })
 })
-
 describe('getCountPerStepType', () => {
   it('should return an object representing counts of all selected step types', () => {
     const multiSelectItemIds = ['a', 'b', 'd']
     const savedStepForms = {
-      a: { stepType: 'magnet' },
-      b: { stepType: 'magnet' },
-      c: { stepType: 'mix' }, // not selected! 'mix' should not show in result
-      d: { stepType: 'moveLiquid' },
+      a: {
+        stepType: 'magnet',
+      },
+      b: {
+        stepType: 'magnet',
+      },
+      c: {
+        stepType: 'mix',
+      },
+      // not selected! 'mix' should not show in result
+      d: {
+        stepType: 'moveLiquid',
+      },
     }
     const result = getCountPerStepType.resultFunc(
       multiSelectItemIds,
       savedStepForms
     )
-    expect(result).toEqual({ magnet: 2, moveLiquid: 1 })
+    expect(result).toEqual({
+      magnet: 2,
+      moveLiquid: 1,
+    })
   })
-
   it('should return an empty object when not in multi-select mode', () => {
     const result = getCountPerStepType.resultFunc(null, {})
     expect(result).toEqual({})
   })
-
   it('should return an empty object when no steps are multi-selected', () => {
     const result = getCountPerStepType.resultFunc([], {})
     expect(result).toEqual({})
   })
 })
-
 describe('getBatchEditSelectedStepTypes', () => {
   it('should return a sorted array of selected step types that are in the multi-selection', () => {
     const result = getBatchEditSelectedStepTypes.resultFunc({
@@ -1317,7 +1391,6 @@ describe('getBatchEditSelectedStepTypes', () => {
     })
     expect(result).toEqual(['magnet', 'mix'])
   })
-
   it('should return an empty array when no steps are multi-selected', () => {
     const result = getBatchEditSelectedStepTypes.resultFunc({})
     expect(result).toEqual([])

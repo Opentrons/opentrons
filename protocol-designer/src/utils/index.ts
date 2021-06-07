@@ -1,19 +1,15 @@
-// @flow
 import uuidv1 from 'uuid/v1'
-import { makeWellSetHelpers, type WellSetHelpers } from '@opentrons/shared-data'
+import type { WellSetHelpers } from '@opentrons/shared-data'
+import { makeWellSetHelpers } from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import type { WellGroup } from '@opentrons/components'
 import type { BoundingRect, GenericRect } from '../collision-types'
-
-export const registerSelectors: any => void =
+export const registerSelectors: (arg0: any) => void =
   process.env.NODE_ENV === 'development'
     ? require('reselect-tools').registerSelectors
     : (a: any) => {}
-
 export const uuid: () => string = uuidv1
-
 // Collision detection for SelectionRect / SelectableLabware
-
 export const rectCollision = (
   rect1: BoundingRect,
   rect2: BoundingRect
@@ -22,7 +18,6 @@ export const rectCollision = (
   rect1.x + rect1.width > rect2.x &&
   rect1.y < rect2.y + rect2.height &&
   rect1.height + rect1.y > rect2.y
-
 export function clientRectToBoundingRect(rect: ClientRect): BoundingRect {
   return {
     x: rect.left,
@@ -31,7 +26,6 @@ export function clientRectToBoundingRect(rect: ClientRect): BoundingRect {
     height: rect.height,
   }
 }
-
 export const getCollidingWells = (
   rectPositions: GenericRect,
   selectableClassname: string
@@ -44,19 +38,16 @@ export const getCollidingWells = (
     width: Math.abs(x1 - x0),
     height: Math.abs(y1 - y0),
   }
-
   // NOTE: querySelectorAll returns a NodeList, so you need to unpack it as an Array to do .filter
   const selectableElems: Array<HTMLElement> = [
     ...document.querySelectorAll('.' + selectableClassname),
   ]
-
   const collidedElems = selectableElems.filter((selectableElem, i) =>
     rectCollision(
       selectionBoundingRect,
       clientRectToBoundingRect(selectableElem.getBoundingClientRect())
     )
   )
-
   const collidedWellData = collidedElems.reduce(
     (acc: WellGroup, elem): WellGroup => {
       // TODO IMMEDIATELY no magic string 'wellname'
@@ -64,18 +55,16 @@ export const getCollidingWells = (
         const wellName = elem.dataset['wellname']
         return { ...acc, [wellName]: null }
       }
+
       return acc
     },
     {}
   )
-
   return collidedWellData
 }
-
 // TODO IMMEDIATELY use where appropriate
 export const arrayToWellGroup = (w: Array<string>): WellGroup =>
   w.reduce((acc, wellName) => ({ ...acc, [wellName]: null }), {})
-
 // cross-PD memoization of well set utils
 const wellSetHelpers: WellSetHelpers = makeWellSetHelpers()
 const {
@@ -88,14 +77,12 @@ export {
   getAllWellSetsForLabware,
   getWellSetForMultichannel,
 }
-
 export const makeTemperatureText = (
   temperature: number | string | null
 ): string =>
   temperature === null
     ? i18n.t('modules.status.deactivated')
     : `${temperature} ${i18n.t('application.units.degrees')}`
-
 export const makeLidLabelText = (lidOpen: boolean): string =>
   i18n.t(`modules.lid_label`, {
     lidStatus: i18n.t(lidOpen ? 'modules.lid_open' : 'modules.lid_closed'),

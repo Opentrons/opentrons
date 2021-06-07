@@ -1,4 +1,3 @@
-// @flow
 import {
   timelineFrameBeforeActiveItem,
   timelineFrameAfterActiveItem,
@@ -8,20 +7,23 @@ import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
 } from '../../steplist/types'
+import type { HoverableItem } from '../../ui/steps/reducers'
 import {
   SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
-  type HoverableItem,
 } from '../../ui/steps/reducers'
 import type { CommandsAndRobotState } from '@opentrons/step-generation'
 import type { StepIdType } from '../../form-types'
-
 const initialRobotState: any = 'fake initial robot state'
-const initialFrame: any = { robotState: initialRobotState, commands: [] }
-
+const initialFrame: any = {
+  robotState: initialRobotState,
+  commands: [],
+}
 const lastValidRobotState: any = 'fake last valid robot state'
-const lastValidFrame: any = { robotState: lastValidRobotState, commands: [] }
-
+const lastValidFrame: any = {
+  robotState: lastValidRobotState,
+  commands: [],
+}
 const orderedStepIds: Array<StepIdType> = [
   'step1',
   'step2',
@@ -29,19 +31,17 @@ const orderedStepIds: Array<StepIdType> = [
   'step4',
   'step5',
 ]
-
 describe('timelineFrameBeforeActiveItem', () => {
   describe('full timeline (no errors)', () => {
     // this should represent the full timeline, no errors in any steps
     const fullRobotStateTimeline: any = {
       timeline: ['frameA', 'frameB', 'frameC', 'frameD', 'frameE'],
     }
-
-    const noErrorTestCases: Array<{|
-      title: string,
-      activeItem: HoverableItem | null,
-      expected: CommandsAndRobotState | null | string,
-    |}> = [
+    const noErrorTestCases: Array<{
+      title: string
+      activeItem: HoverableItem | null
+      expected: CommandsAndRobotState | null | string
+    }> = [
       {
         title: 'should return null when there is no activeItem',
         activeItem: null,
@@ -86,31 +86,28 @@ describe('timelineFrameBeforeActiveItem', () => {
     ]
     noErrorTestCases.forEach(({ title, activeItem, expected }) => {
       it(title, () => {
-        const result = (timelineFrameBeforeActiveItem: any).resultFunc(
+        const result = (timelineFrameBeforeActiveItem as any).resultFunc(
           activeItem,
           initialRobotState,
           fullRobotStateTimeline,
           lastValidRobotState,
           orderedStepIds
         )
-
         expect(result).toEqual(expected)
       })
     })
   })
-
   describe('error case (timeline trunacted due to error at step 3)', () => {
     // this should represent a timeline truncated due to error in step 3
     const truncatedRobotStateTimeline: any = {
       timeline: ['frameA', 'frameB'],
       errors: ['fake error (truncating timeline at step 3)'],
     }
-
-    const errorTestCases: Array<{|
-      title: string,
-      activeItem: HoverableItem | null,
-      expected: CommandsAndRobotState | null | string,
-    |}> = [
+    const errorTestCases: Array<{
+      title: string
+      activeItem: HoverableItem | null
+      expected: CommandsAndRobotState | null | string
+    }> = [
       {
         title:
           'should return the correct timeline frame when final deck state is active',
@@ -174,32 +171,29 @@ describe('timelineFrameBeforeActiveItem', () => {
     ]
     errorTestCases.forEach(({ title, activeItem, expected }) => {
       it(title, () => {
-        const result = (timelineFrameBeforeActiveItem: any).resultFunc(
+        const result = (timelineFrameBeforeActiveItem as any).resultFunc(
           activeItem,
           initialRobotState,
           truncatedRobotStateTimeline,
           lastValidRobotState,
           orderedStepIds
         )
-
         expect(result).toEqual(expected)
       })
     })
   })
 })
-
 describe('timelineFrameAfterActiveItem', () => {
   describe('full timeline (no errors)', () => {
     // this should represent the full timeline, no errors in any steps
     const fullRobotStateTimeline: any = {
       timeline: ['frameA', 'frameB', 'frameC', 'frameD', 'frameE'],
     }
-
-    const noErrorTestCases: Array<{|
-      title: string,
-      activeItem: HoverableItem | null,
-      expected: CommandsAndRobotState | null | string,
-    |}> = [
+    const noErrorTestCases: Array<{
+      title: string
+      activeItem: HoverableItem | null
+      expected: CommandsAndRobotState | null | string
+    }> = [
       {
         title: 'should return null when there is no activeItem',
         activeItem: null,
@@ -253,31 +247,28 @@ describe('timelineFrameAfterActiveItem', () => {
     ]
     noErrorTestCases.forEach(({ title, activeItem, expected }) => {
       it(title, () => {
-        const result = (timelineFrameAfterActiveItem: any).resultFunc(
+        const result = (timelineFrameAfterActiveItem as any).resultFunc(
           activeItem,
           initialRobotState,
           fullRobotStateTimeline,
           lastValidRobotState,
           orderedStepIds
         )
-
         expect(result).toEqual(expected)
       })
     })
   })
-
   describe('error case (timeline trunacted due to error at step 3)', () => {
     // this should represent a timeline truncated due to error in step 3
     const truncatedRobotStateTimeline: any = {
       timeline: ['frameA', 'frameB'],
       errors: ['fake error (truncating timeline at step 3)'],
     }
-
-    const errorTestCases: Array<{|
-      title: string,
-      activeItem: HoverableItem | null,
-      expected: CommandsAndRobotState | null | string,
-    |}> = [
+    const errorTestCases: Array<{
+      title: string
+      activeItem: HoverableItem | null
+      expected: CommandsAndRobotState | null | string
+    }> = [
       {
         title:
           'should return the correct timeline frame when final deck state is active',
@@ -342,14 +333,13 @@ describe('timelineFrameAfterActiveItem', () => {
     ]
     errorTestCases.forEach(({ title, activeItem, expected }) => {
       it(title, () => {
-        const result = (timelineFrameAfterActiveItem: any).resultFunc(
+        const result = (timelineFrameAfterActiveItem as any).resultFunc(
           activeItem,
           initialRobotState,
           truncatedRobotStateTimeline,
           lastValidRobotState,
           orderedStepIds
         )
-
         expect(result).toEqual(expected)
       })
     })

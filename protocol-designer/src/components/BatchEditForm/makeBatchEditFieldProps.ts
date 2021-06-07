@@ -1,4 +1,3 @@
-// @flow
 import noop from 'lodash/noop'
 import type {
   DisabledFields,
@@ -10,22 +9,22 @@ import {
 } from '../StepEditForm/utils'
 import type { FieldPropsByName } from '../StepEditForm/types'
 import type { StepFieldName } from '../../form-types'
-
 export const makeBatchEditFieldProps = (
   fieldValues: MultiselectFieldValues,
   disabledFields: DisabledFields,
-  handleChangeFormInput: (name: string, value: mixed) => void
+  handleChangeFormInput: (name: string, value: unknown) => void
 ): FieldPropsByName => {
   const fieldNames: Array<StepFieldName> = Object.keys(fieldValues)
   return fieldNames.reduce<FieldPropsByName>((acc, name) => {
     const defaultTooltip = getFieldDefaultTooltip(name)
     const isIndeterminate = fieldValues[name].isIndeterminate
     const indeterminateTooltip = getFieldIndeterminateTooltip(name)
-
     let tooltipContent = defaultTooltip // Default to the default content (or blank)
+
     if (isIndeterminate && indeterminateTooltip) {
       tooltipContent = indeterminateTooltip
     }
+
     if (name in disabledFields) {
       tooltipContent = disabledFields[name] // Use disabled content if field is disabled, override indeterminate tooltip if applicable
     }

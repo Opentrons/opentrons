@@ -1,7 +1,5 @@
-// @flow
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-
 const v1ModelTov2LoadNameMap = {
   '6-well-plate': 'corning_6_wellplate_16.8ml_flat',
   '12-well-plate': 'corning_12_wellplate_6.9ml_flat',
@@ -45,15 +43,15 @@ const v1ModelTov2LoadNameMap = {
   'tube-rack-15_50ml':
     'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',
 }
-
 export function v1LabwareModelToV2Def(model: string): LabwareDefinition2 {
-  const loadName: ?string = v1ModelTov2LoadNameMap[model]
+  const loadName: string | null | undefined = v1ModelTov2LoadNameMap[model]
+
   if (!loadName) {
     throw new Error(`expected a v2 loadName for v1 labware model "${model}"`)
   }
 
   const latestDefs = getOnlyLatestDefs()
-  const uri: ?string = Object.keys(latestDefs).find(
+  const uri: string | null | undefined = Object.keys(latestDefs).find(
     defURI => latestDefs[defURI].parameters.loadName === loadName
   )
 
@@ -62,6 +60,5 @@ export function v1LabwareModelToV2Def(model: string): LabwareDefinition2 {
   }
 
   const def = latestDefs[uri]
-
   return def
 }

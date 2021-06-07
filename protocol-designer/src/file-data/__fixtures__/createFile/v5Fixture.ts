@@ -1,9 +1,7 @@
-// @flow
 // Named arguments to createFile selector. This data would be the result of several selectors.
 import type { RobotState, Timeline } from '@opentrons/step-generation'
 import type { SavedStepFormState, ModuleEntities } from '../../../step-forms'
 import type { StepIdType } from '../../../form-types'
-
 export const initialRobotState: RobotState = {
   labware: {
     trashId: {
@@ -31,7 +29,6 @@ export const initialRobotState: RobotState = {
     tipracks: {},
   },
 }
-
 export const robotStateTimeline: Timeline = {
   timeline: [
     {
@@ -213,7 +210,6 @@ export const robotStateTimeline: Timeline = {
   ],
   errors: null,
 }
-
 export const savedStepForms: SavedStepFormState = {
   __INITIAL_DECK_SETUP_STEP__: {
     stepType: 'manualIntervention',
@@ -270,10 +266,8 @@ export const savedStepForms: SavedStepFormState = {
     aspirate_delay_seconds: '1',
     dispense_delay_checkbox: false,
     dispense_delay_seconds: '1',
-    dispense_delay_mmFromBottom: '0.5',
-    //
+    dispense_delay_mmFromBottom: '0.5', //
   },
 }
 export const orderedStepIds: Array<StepIdType> = ['moveLiquidStepId']
-
 export const moduleEntities: ModuleEntities = {}

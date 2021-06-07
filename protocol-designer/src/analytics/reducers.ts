@@ -1,15 +1,11 @@
-// @flow
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { SetOptIn } from './actions'
 import type { RehydratePersistedAction } from '../persist'
-
 type OptInState = boolean | null
 const optInInitialState = null
-
 // NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
 const hasOptedIn: Reducer<OptInState, any> = handleActions(
   {
@@ -25,15 +21,12 @@ const hasOptedIn: Reducer<OptInState, any> = handleActions(
   },
   optInInitialState
 )
-
 const _allReducers = {
   hasOptedIn,
 }
-
-export type RootState = {|
-  hasOptedIn: OptInState,
-|}
-
+export type RootState = {
+  hasOptedIn: OptInState
+}
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers
 )

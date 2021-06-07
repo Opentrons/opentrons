@@ -1,4 +1,3 @@
-// @flow
 import flow from 'lodash/flow'
 import takeRightWhile from 'lodash/takeRightWhile'
 import semver from 'semver'
@@ -9,12 +8,12 @@ import { migrateFile as migrateFileFour } from './4_0_0'
 import { migrateFile as migrateFileFive } from './5_0_0'
 import { migrateFile as migrateFileFiveOne } from './5_1_0'
 import { migrateFile as migrateFileFiveTwo } from './5_2_0'
-
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
-
 type Version = string
-type MigrationsByVersion = { [Version]: (Object) => Object }
-
+type MigrationsByVersion = Record<
+  Version,
+  (arg0: Record<string, any>) => Record<string, any>
+>
 const allMigrationsByVersion: MigrationsByVersion = {
   '1.1.0': migrateFileOne,
   '3.0.0': migrateFileThree,
@@ -23,7 +22,6 @@ const allMigrationsByVersion: MigrationsByVersion = {
   '5.1.0': migrateFileFiveOne,
   '5.2.0': migrateFileFiveTwo,
 }
-
 // get all versions to migrate newer than the file's applicationVersion
 export const getMigrationVersionsToRunFromVersion = (
   migrationsByVersion: {},
@@ -34,24 +32,21 @@ export const getMigrationVersionsToRunFromVersion = (
   )
   return takeRightWhile(allSortedVersions, v => semver.gt(v, version))
 }
-
 export const migration = (
   file: any
 ): {
-  file: PDProtocolFile,
-  didMigrate: boolean,
-  migrationsRan: Array<string>,
+  file: PDProtocolFile
+  didMigrate: boolean
+  migrationsRan: Array<string>
 } => {
   const designerApplication =
     file.designerApplication || file['designer-application']
-
   // NOTE: default exists because any protocol that doesn't include the application version
   // key will be treated as the oldest migrateable version ('1.0.0')
   const applicationVersion: string =
     designerApplication.applicationVersion ||
     designerApplication.version ||
     OLDEST_MIGRATEABLE_VERSION
-
   const migrationVersionsToRun = getMigrationVersionsToRunFromVersion(
     allMigrationsByVersion,
     applicationVersion

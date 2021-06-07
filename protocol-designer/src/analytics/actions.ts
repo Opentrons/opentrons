@@ -1,14 +1,12 @@
-// @flow
 import { initializeFullstory, shutdownFullstory } from './fullstory'
 import { setMixpanelTracking } from './mixpanel'
 import type { AnalyticsEvent } from './mixpanel'
+export type SetOptIn = {
+  type: 'SET_OPT_IN'
+  payload: boolean
+}
 
-export type SetOptIn = {|
-  type: 'SET_OPT_IN',
-  payload: boolean,
-|}
-
-const _setOptIn = (payload: $PropertyType<SetOptIn, 'payload'>): SetOptIn => {
+const _setOptIn = (payload: SetOptIn['payload']): SetOptIn => {
   // side effects
   if (payload) {
     initializeFullstory()
@@ -26,13 +24,11 @@ const _setOptIn = (payload: $PropertyType<SetOptIn, 'payload'>): SetOptIn => {
 
 export const optIn = (): SetOptIn => _setOptIn(true)
 export const optOut = (): SetOptIn => _setOptIn(false)
-
-export type AnalyticsEventAction = {|
-  type: 'ANALYTICS_EVENT',
-  payload: AnalyticsEvent,
-  meta?: mixed,
-|}
-
+export type AnalyticsEventAction = {
+  type: 'ANALYTICS_EVENT'
+  payload: AnalyticsEvent
+  meta?: unknown
+}
 // NOTE: this action creator should only be used for special cases where you want to
 // report an analytics event but you do not have any Redux action that sensibly represents
 // that analytics event.
@@ -45,4 +41,7 @@ export type AnalyticsEventAction = {|
 // we need to read opt-in status from the Redux state.
 export const analyticsEvent = (
   payload: AnalyticsEvent
-): AnalyticsEventAction => ({ type: 'ANALYTICS_EVENT', payload })
+): AnalyticsEventAction => ({
+  type: 'ANALYTICS_EVENT',
+  payload,
+})

@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import { handleActions } from 'redux-actions'
 import mapValues from 'lodash/mapValues'
@@ -15,10 +14,8 @@ import {
   MAGNETIC_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  rootReducer as labwareDefsRootReducer,
-  type RootState as LabwareDefsRootState,
-} from '../../labware-defs'
+import type { RootState as LabwareDefsRootState } from '../../labware-defs'
+import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
 import { uuid } from '../../utils'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
@@ -114,9 +111,7 @@ import type {
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
 } from '../actions'
-
 type FormState = FormData | null
-
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
 type UnsavedFormActions =
@@ -146,6 +141,7 @@ export const unsavedForm = (
   const unsavedFormState = rootState
     ? rootState.unsavedForm
     : unsavedFormInitialState
+
   switch (action.type) {
     case 'ADD_PROFILE_CYCLE': {
       if (unsavedFormState?.stepType !== 'thermocycler') {
@@ -154,9 +150,9 @@ export const unsavedForm = (
         )
         return unsavedFormState
       }
+
       const cycleId = uuid()
       const profileStepId = uuid()
-
       return {
         ...unsavedFormState,
         orderedProfileItems: [...unsavedFormState.orderedProfileItems, cycleId],
@@ -166,6 +162,7 @@ export const unsavedForm = (
         },
       }
     }
+
     case 'ADD_STEP': {
       return createPresavedStepForm({
         stepType: action.payload.stepType,
@@ -178,6 +175,7 @@ export const unsavedForm = (
         robotStateTimeline: action.meta.robotStateTimeline,
       })
     }
+
     case 'CHANGE_FORM_INPUT': {
       const fieldUpdate = handleFormChange(
         action.payload.update,
@@ -186,13 +184,12 @@ export const unsavedForm = (
         _getLabwareEntitiesRootState(rootState)
       )
       // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
-      return {
-        ...unsavedFormState,
-        ...fieldUpdate,
-      }
+      return { ...unsavedFormState, ...fieldUpdate }
     }
+
     case 'POPULATE_FORM':
       return action.payload
+
     case 'CANCEL_STEP_FORM':
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
@@ -203,6 +200,7 @@ export const unsavedForm = (
     case 'SAVE_STEP_FORM':
     case 'SELECT_TERMINAL_ITEM':
       return unsavedFormInitialState
+
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
       // only substitute unsaved step form if its ID is in the start-end range
       const { substitutionMap, startStepId, endStepId } = action.payload
@@ -223,15 +221,19 @@ export const unsavedForm = (
         return {
           ...unsavedFormState,
           ...handleFormChange(
-            { pipette: substitutionMap[unsavedFormState.pipette] },
+            {
+              pipette: substitutionMap[unsavedFormState.pipette],
+            },
             unsavedFormState,
             _getPipetteEntitiesRootState(rootState),
             _getLabwareEntitiesRootState(rootState)
           ),
         }
       }
+
       return unsavedFormState
     }
+
     case 'ADD_PROFILE_STEP': {
       if (unsavedFormState?.stepType !== 'thermocycler') {
         console.error(
@@ -239,8 +241,8 @@ export const unsavedForm = (
         )
         return unsavedFormState
       }
-      const id = uuid()
 
+      const id = uuid()
       const newStep = createInitialProfileStep(id)
 
       if (action.payload !== null) {
@@ -258,8 +260,8 @@ export const unsavedForm = (
           },
         }
       }
-      // TODO factor this createInitialProfileStep out somewhere
 
+      // TODO factor this createInitialProfileStep out somewhere
       return {
         ...unsavedFormState,
         orderedProfileItems: [...unsavedFormState.orderedProfileItems, id],
@@ -269,6 +271,7 @@ export const unsavedForm = (
         },
       }
     }
+
     case 'DELETE_PROFILE_CYCLE': {
       if (unsavedFormState?.stepType !== 'thermocycler') {
         console.error(
@@ -280,9 +283,11 @@ export const unsavedForm = (
       const { id } = action.payload
       const isCycle =
         unsavedFormState.profileItemsById[id].type === PROFILE_CYCLE
+
       if (!isCycle) {
         return unsavedFormState
       }
+
       return {
         ...unsavedFormState,
         orderedProfileItems: unsavedFormState.orderedProfileItems.filter(
@@ -291,6 +296,7 @@ export const unsavedForm = (
         profileItemsById: omit(unsavedFormState.profileItemsById, id),
       }
     }
+
     case 'DELETE_PROFILE_STEP': {
       if (unsavedFormState?.stepType !== 'thermocycler') {
         console.error(
@@ -301,10 +307,9 @@ export const unsavedForm = (
 
       const { id } = action.payload
 
-      const omitTopLevelSteps = (profileItemsById: {
-        [string]: ProfileItem,
-        ...
-      }) =>
+      const omitTopLevelSteps = (
+        profileItemsById: Record<string, ProfileItem>
+      ) =>
         omitBy(
           profileItemsById,
           (item: ProfileItem, itemId: string): boolean => {
@@ -313,40 +318,39 @@ export const unsavedForm = (
         )
 
       // not top-level, must be nested inside a cycle
-      const omitCycleSteps = (profileItemsById: {
-        [string]: ProfileItem,
-        ...
-      }) =>
-        mapValues(profileItemsById, (item: ProfileItem): ProfileItem => {
-          if (item.type === PROFILE_CYCLE) {
-            return {
-              ...item,
-              steps: item.steps.filter(
-                (stepItem: ProfileStepItem) => stepItem.id !== id
-              ),
+      const omitCycleSteps = (profileItemsById: Record<string, ProfileItem>) =>
+        mapValues(
+          profileItemsById,
+          (item: ProfileItem): ProfileItem => {
+            if (item.type === PROFILE_CYCLE) {
+              return {
+                ...item,
+                steps: item.steps.filter(
+                  (stepItem: ProfileStepItem) => stepItem.id !== id
+                ),
+              }
             }
+
+            return item
           }
-          return item
-        })
+        )
 
       const isTopLevelProfileStep =
         unsavedFormState.orderedProfileItems.includes(id) &&
         unsavedFormState.profileItemsById[id].type === PROFILE_STEP
-
       const filteredItemsById = isTopLevelProfileStep
         ? omitTopLevelSteps(unsavedFormState.profileItemsById)
         : omitCycleSteps(unsavedFormState.profileItemsById)
-
       const filteredOrderedProfileItems = isTopLevelProfileStep
         ? unsavedFormState.orderedProfileItems.filter(itemId => itemId !== id)
         : unsavedFormState.orderedProfileItems
-
       return {
         ...unsavedFormState,
         orderedProfileItems: filteredOrderedProfileItems,
         profileItemsById: filteredItemsById,
       }
     }
+
     case 'EDIT_PROFILE_CYCLE': {
       if (unsavedFormState?.stepType !== 'thermocycler') {
         console.error(
@@ -356,7 +360,6 @@ export const unsavedForm = (
       }
 
       const { id, fields } = action.payload
-
       const cycle = unsavedFormState.profileItemsById[id]
 
       if (cycle.type !== PROFILE_CYCLE) {
@@ -370,13 +373,11 @@ export const unsavedForm = (
         ...unsavedFormState,
         profileItemsById: {
           ...unsavedFormState.profileItemsById,
-          [id]: {
-            ...cycle,
-            ...fields,
-          },
+          [id]: { ...cycle, ...fields },
         },
       }
     }
+
     case 'EDIT_PROFILE_STEP': {
       if (unsavedFormState?.stepType !== 'thermocycler') {
         console.error(
@@ -386,7 +387,6 @@ export const unsavedForm = (
       }
 
       const { id, fields } = action.payload
-
       const isTopLevelStep =
         unsavedFormState.orderedProfileItems.includes(id) &&
         unsavedFormState.profileItemsById[id].type === PROFILE_STEP
@@ -406,13 +406,16 @@ export const unsavedForm = (
           unsavedFormState.profileItemsById
         ).find((itemId: string): boolean => {
           const item: ProfileItem = unsavedFormState.profileItemsById[itemId]
+
           if (item.type === PROFILE_CYCLE) {
             const stepIndex = item.steps.findIndex(step => step.id === id)
+
             if (stepIndex !== -1) {
               editedStepIndex = stepIndex
               return true
             }
           }
+
           return false
         })
 
@@ -424,38 +427,25 @@ export const unsavedForm = (
         let newCycle: ProfileCycleItem = {
           ...unsavedFormState.profileItemsById[cycleId],
         }
-
         const newSteps = [...newCycle.steps]
-
         newSteps[editedStepIndex] = {
           ...newCycle.steps[editedStepIndex],
           ...fields,
         }
-
-        newCycle = {
-          ...newCycle,
-          steps: newSteps,
-        }
-
+        newCycle = { ...newCycle, steps: newSteps }
         const newProfileItems = {
           ...unsavedFormState.profileItemsById,
           [cycleId]: newCycle,
         }
-        return {
-          ...unsavedFormState,
-          profileItemsById: newProfileItems,
-        }
+        return { ...unsavedFormState, profileItemsById: newProfileItems }
       }
     }
+
     default:
       return unsavedFormState
   }
 }
-
-export type SavedStepFormState = {
-  [StepIdType]: FormData,
-}
-
+export type SavedStepFormState = Record<StepIdType, FormData>
 export const initialDeckSetupStepForm: FormData = {
   stepType: 'manualIntervention',
   id: INITIAL_DECK_SETUP_STEP_ID,
@@ -465,7 +455,6 @@ export const initialDeckSetupStepForm: FormData = {
   pipetteLocationUpdate: {},
   moduleLocationUpdate: {},
 }
-
 export const initialSavedStepFormsState: SavedStepFormState = {
   [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
 }
@@ -488,20 +477,19 @@ type SavedStepFormsActions =
   | SwapSlotContentsAction
   | ReplaceCustomLabwareDef
   | EditModuleAction
-
 export const _editModuleFormUpdate = ({
   savedForm,
   moduleId,
   formId,
   rootState,
   nextModuleModel,
-}: {|
-  savedForm: FormData,
-  moduleId: string,
-  formId: string,
-  rootState: RootState,
-  nextModuleModel: string,
-|}): FormData => {
+}: {
+  savedForm: FormData
+  moduleId: string
+  formId: string
+  rootState: RootState
+  nextModuleModel: string
+}): FormData => {
   if (
     savedForm.stepType === 'magnet' &&
     savedForm.moduleId === moduleId &&
@@ -511,6 +499,7 @@ export const _editModuleFormUpdate = ({
 
     if (Number.isFinite(prevEngageHeight)) {
       const initialDeckSetup = _getInitialDeckSetupRootState(rootState)
+
       const labwareEntity = getLabwareOnModule(initialDeckSetup, moduleId)
       const labwareDefaultEngageHeight = labwareEntity
         ? getLabwareDefaultEngageHeight(labwareEntity.def)
@@ -533,6 +522,7 @@ export const _editModuleFormUpdate = ({
           nextModuleModel === MAGNETIC_MODULE_V1
             ? shortMMDefault
             : labwareDefaultEngageHeight
+
         if (prevEngageHeight === prevModelSpecificDefault) {
           return {
             ...savedForm,
@@ -544,15 +534,12 @@ export const _editModuleFormUpdate = ({
 
     // default case: null out engageHeight if magnet step's module has been edited
     const blankEngageHeight = getDefaultsForStepType('magnet').engageHeight
-    return {
-      ...savedForm,
-      engageHeight: blankEngageHeight,
-    }
+    return { ...savedForm, engageHeight: blankEngageHeight }
   }
+
   // not a Magnet > Engage step for the edited moduleId, no change
   return savedForm
 }
-
 export const savedStepForms = (
   rootState: RootState,
   action: SavedStepFormsActions
@@ -560,42 +547,41 @@ export const savedStepForms = (
   const savedStepForms = rootState
     ? rootState.savedStepForms
     : initialSavedStepFormsState
+
   switch (action.type) {
     case 'SAVE_STEP_FORM': {
-      return {
-        ...savedStepForms,
-        [action.payload.id]: action.payload,
-      }
+      return { ...savedStepForms, [action.payload.id]: action.payload }
     }
+
     case 'SAVE_STEP_FORMS_MULTI': {
       const { editedFields, stepIds } = action.payload
       return stepIds.reduce(
         (acc, stepId) => ({
           ...acc,
           // $FlowFixMe(sa, 2021-02-16): spreading editedFields can overwrite properties with explicit keys in a way that Flow cannot track
-          [stepId]: {
-            ...savedStepForms[stepId],
-            ...editedFields,
-          },
+          [stepId]: { ...savedStepForms[stepId], ...editedFields },
         }),
         { ...savedStepForms }
       )
     }
+
     case 'DELETE_STEP': {
       return omit(savedStepForms, action.payload)
     }
+
     case 'DELETE_MULTIPLE_STEPS': {
       return omit(savedStepForms, action.payload)
     }
+
     case 'LOAD_FILE': {
       const { file } = action.payload
       const stepFormsFromFile = getPDMetadata(file).savedStepForms
-
       return mapValues(stepFormsFromFile, stepForm => ({
         ...getDefaultsForStepType(stepForm.stepType),
         ...stepForm,
       }))
     }
+
     case 'DUPLICATE_LABWARE':
     case 'CREATE_CONTAINER': {
       // auto-update initial deck setup state.
@@ -610,10 +596,12 @@ export const savedStepForms = (
         'expected initial deck setup step to exist, could not handle CREATE_CONTAINER'
       )
       const slot = action.payload.slot
+
       if (!slot) {
         console.warn('no slots available, ignoring action:', action)
         return savedStepForms
       }
+
       return {
         ...savedStepForms,
         [INITIAL_DECK_SETUP_STEP_ID]: {
@@ -625,6 +613,7 @@ export const savedStepForms = (
         },
       }
     }
+
     case 'CREATE_MODULE': {
       const prevInitialDeckSetupStep =
         savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
@@ -642,7 +631,6 @@ export const savedStepForms = (
               ...prevInitialDeckSetupStep.labwareLocationUpdate,
               [labwareOccupyingDestination]: moduleId,
             }
-
       return mapValues(savedStepForms, (savedForm: FormData, formId) => {
         if (formId === INITIAL_DECK_SETUP_STEP_ID) {
           return {
@@ -665,6 +653,7 @@ export const savedStepForms = (
         ) {
           return { ...savedForm, moduleId }
         }
+
         // same logic applies to Thermocycler
         if (
           savedForm.stepType === 'thermocycler' &&
@@ -676,6 +665,7 @@ export const savedStepForms = (
         return savedForm
       })
     }
+
     case 'EDIT_MODULE': {
       const moduleId = action.payload.id
       return mapValues(savedStepForms, (savedForm: FormData, formId) =>
@@ -688,93 +678,98 @@ export const savedStepForms = (
         })
       )
     }
+
     case 'MOVE_DECK_ITEM': {
       const { sourceSlot, destSlot } = action.payload
-      return mapValues(savedStepForms, (savedForm: FormData): FormData => {
-        if (savedForm.stepType === 'manualIntervention') {
-          // swap labware/module slots from all manualIntervention steps
-          // (or place compatible labware in dest slot onto module)
-          const sourceLabwareId = getDeckItemIdInSlot(
-            savedForm.labwareLocationUpdate,
-            sourceSlot
-          )
-          const destLabwareId = getDeckItemIdInSlot(
-            savedForm.labwareLocationUpdate,
-            destSlot
-          )
-
-          const sourceModuleId = getDeckItemIdInSlot(
-            savedForm.moduleLocationUpdate,
-            sourceSlot
-          )
-          const destModuleId = getDeckItemIdInSlot(
-            savedForm.moduleLocationUpdate,
-            destSlot
-          )
-
-          if (sourceModuleId && destLabwareId) {
-            // moving module to a destination slot with labware
-            const prevInitialDeckSetup = _getInitialDeckSetupRootState(
-              rootState
+      return mapValues(
+        savedStepForms,
+        (savedForm: FormData): FormData => {
+          if (savedForm.stepType === 'manualIntervention') {
+            // swap labware/module slots from all manualIntervention steps
+            // (or place compatible labware in dest slot onto module)
+            const sourceLabwareId = getDeckItemIdInSlot(
+              savedForm.labwareLocationUpdate,
+              sourceSlot
             )
-            const moduleEntity = prevInitialDeckSetup.modules[sourceModuleId]
-            const labwareEntity = prevInitialDeckSetup.labware[destLabwareId]
-
-            const isCompat = getLabwareIsCompatible(
-              labwareEntity.def,
-              moduleEntity.type
+            const destLabwareId = getDeckItemIdInSlot(
+              savedForm.labwareLocationUpdate,
+              destSlot
             )
-            const moduleIsOccupied =
-              getDeckItemIdInSlot(
-                savedForm.labwareLocationUpdate,
-                sourceModuleId
-              ) != null
+            const sourceModuleId = getDeckItemIdInSlot(
+              savedForm.moduleLocationUpdate,
+              sourceSlot
+            )
+            const destModuleId = getDeckItemIdInSlot(
+              savedForm.moduleLocationUpdate,
+              destSlot
+            )
 
-            if (isCompat && !moduleIsOccupied) {
-              // only in this special case, we put module under the labware
-              return {
-                ...savedForm,
-                labwareLocationUpdate: {
-                  ...savedForm.labwareLocationUpdate,
-                  [destLabwareId]: sourceModuleId,
-                },
-                moduleLocationUpdate: {
-                  ...savedForm.moduleLocationUpdate,
-                  [sourceModuleId]: destSlot,
-                },
+            if (sourceModuleId && destLabwareId) {
+              // moving module to a destination slot with labware
+              const prevInitialDeckSetup = _getInitialDeckSetupRootState(
+                rootState
+              )
+
+              const moduleEntity = prevInitialDeckSetup.modules[sourceModuleId]
+              const labwareEntity = prevInitialDeckSetup.labware[destLabwareId]
+              const isCompat = getLabwareIsCompatible(
+                labwareEntity.def,
+                moduleEntity.type
+              )
+              const moduleIsOccupied =
+                getDeckItemIdInSlot(
+                  savedForm.labwareLocationUpdate,
+                  sourceModuleId
+                ) != null
+
+              if (isCompat && !moduleIsOccupied) {
+                // only in this special case, we put module under the labware
+                return {
+                  ...savedForm,
+                  labwareLocationUpdate: {
+                    ...savedForm.labwareLocationUpdate,
+                    [destLabwareId]: sourceModuleId,
+                  },
+                  moduleLocationUpdate: {
+                    ...savedForm.moduleLocationUpdate,
+                    [sourceModuleId]: destSlot,
+                  },
+                }
               }
             }
+
+            const labwareLocationUpdate: Record<string, string> = {
+              ...savedForm.labwareLocationUpdate,
+            }
+
+            if (sourceLabwareId != null) {
+              labwareLocationUpdate[sourceLabwareId] = destSlot
+            }
+
+            if (destLabwareId != null) {
+              labwareLocationUpdate[destLabwareId] = sourceSlot
+            }
+
+            const moduleLocationUpdate: Record<string, string> = {
+              ...savedForm.moduleLocationUpdate,
+            }
+
+            if (sourceModuleId != null) {
+              moduleLocationUpdate[sourceModuleId] = destSlot
+            }
+
+            if (destModuleId != null) {
+              moduleLocationUpdate[destModuleId] = sourceSlot
+            }
+
+            return { ...savedForm, labwareLocationUpdate, moduleLocationUpdate }
           }
 
-          const labwareLocationUpdate: { [labwareId: string]: string } = {
-            ...savedForm.labwareLocationUpdate,
-          }
-          if (sourceLabwareId != null) {
-            labwareLocationUpdate[sourceLabwareId] = destSlot
-          }
-          if (destLabwareId != null) {
-            labwareLocationUpdate[destLabwareId] = sourceSlot
-          }
-
-          const moduleLocationUpdate: { [moduleId: string]: string } = {
-            ...savedForm.moduleLocationUpdate,
-          }
-          if (sourceModuleId != null) {
-            moduleLocationUpdate[sourceModuleId] = destSlot
-          }
-          if (destModuleId != null) {
-            moduleLocationUpdate[destModuleId] = sourceSlot
-          }
-
-          return {
-            ...savedForm,
-            labwareLocationUpdate,
-            moduleLocationUpdate,
-          }
+          return savedForm
         }
-        return savedForm
-      })
+      )
     }
+
     case 'DELETE_CONTAINER': {
       const labwareIdToDelete = action.payload.labwareId
       return mapValues(savedStepForms, (savedForm: FormData) => {
@@ -788,6 +783,7 @@ export const savedStepForms = (
             ),
           }
         }
+
         const deleteLabwareUpdate = reduce<FormData, FormData>(
           savedForm,
           (acc, value, fieldName) => {
@@ -796,7 +792,9 @@ export const savedStepForms = (
               return {
                 ...acc,
                 ...handleFormChange(
-                  { [fieldName]: null },
+                  {
+                    [fieldName]: null,
+                  },
                   acc,
                   _getPipetteEntitiesRootState(rootState),
                   _getLabwareEntitiesRootState(rootState)
@@ -809,39 +807,44 @@ export const savedStepForms = (
           savedForm
         )
         // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
-        return {
-          ...savedForm,
-          ...deleteLabwareUpdate,
-        }
+        return { ...savedForm, ...deleteLabwareUpdate }
       })
     }
+
     case 'DELETE_PIPETTES': {
       // remove references to pipettes that have been deleted
       const deletedPipetteIds = action.payload
-      return mapValues(savedStepForms, (form: FormData): FormData => {
-        if (form.stepType === 'manualIntervention') {
-          return {
-            ...form,
-            pipetteLocationUpdate: omit(
-              form.pipetteLocationUpdate,
-              deletedPipetteIds
-            ),
+      return mapValues(
+        savedStepForms,
+        (form: FormData): FormData => {
+          if (form.stepType === 'manualIntervention') {
+            return {
+              ...form,
+              pipetteLocationUpdate: omit(
+                form.pipetteLocationUpdate,
+                deletedPipetteIds
+              ),
+            }
+          } else if (deletedPipetteIds.includes(form.pipette)) {
+            // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+            return {
+              ...form,
+              ...handleFormChange(
+                {
+                  pipette: null,
+                },
+                form,
+                _getPipetteEntitiesRootState(rootState),
+                _getLabwareEntitiesRootState(rootState)
+              ),
+            }
           }
-        } else if (deletedPipetteIds.includes(form.pipette)) {
-          // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
-          return {
-            ...form,
-            ...handleFormChange(
-              { pipette: null },
-              form,
-              _getPipetteEntitiesRootState(rootState),
-              _getLabwareEntitiesRootState(rootState)
-            ),
-          }
+
+          return form
         }
-        return form
-      })
+      )
     }
+
     case 'DELETE_MODULE': {
       const moduleId = action.payload.id
       return mapValues(savedStepForms, (form: FormData) => {
@@ -876,6 +879,7 @@ export const savedStepForms = (
         }
       })
     }
+
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
       const { startStepId, endStepId, substitutionMap } = action.payload
       const stepIdsToUpdate = getIdsInRange(
@@ -885,36 +889,33 @@ export const savedStepForms = (
       )
       const savedStepsUpdate = stepIdsToUpdate.reduce((acc, stepId) => {
         const prevStepForm = savedStepForms[stepId]
-
         const shouldSubstitute = Boolean(
           prevStepForm && // pristine forms will not exist in savedStepForms
             prevStepForm.pipette &&
             prevStepForm.pipette in substitutionMap
         )
-
         if (!shouldSubstitute) return acc
-
         const updatedFields = handleFormChange(
-          { pipette: substitutionMap[prevStepForm.pipette] },
+          {
+            pipette: substitutionMap[prevStepForm.pipette],
+          },
           prevStepForm,
           _getPipetteEntitiesRootState(rootState),
           _getLabwareEntitiesRootState(rootState)
         )
-
         return {
           ...acc,
           // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
-          [stepId]: {
-            ...prevStepForm,
-            ...updatedFields,
-          },
+          [stepId]: { ...prevStepForm, ...updatedFields },
         }
       }, {})
       // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
       return { ...savedStepForms, ...savedStepsUpdate }
     }
+
     case 'CHANGE_SAVED_STEP_FORM': {
       const { stepId } = action.payload
+
       if (stepId == null) {
         assert(
           false,
@@ -922,7 +923,9 @@ export const savedStepForms = (
         )
         return savedStepForms
       }
+
       const previousForm = savedStepForms[stepId]
+
       if (previousForm.stepType === 'manualIntervention') {
         // since manualIntervention steps are nested, use a recursive merge
         return {
@@ -930,6 +933,7 @@ export const savedStepForms = (
           [stepId]: merge({}, previousForm, action.payload.update),
         }
       }
+
       // other step form types are not designed to be deeply merged
       // (eg `wells` arrays should be reset, not appended to)
       return {
@@ -946,6 +950,7 @@ export const savedStepForms = (
         },
       }
     }
+
     case 'DUPLICATE_STEP': {
       return {
         ...savedStepForms,
@@ -959,6 +964,7 @@ export const savedStepForms = (
         },
       }
     }
+
     case 'DUPLICATE_MULTIPLE_STEPS': {
       return action.payload.steps.reduce(
         (acc, { stepId, duplicateStepId }) => ({
@@ -971,20 +977,21 @@ export const savedStepForms = (
         { ...savedStepForms }
       )
     }
+
     case 'REPLACE_CUSTOM_LABWARE_DEF': {
       // no mismatch, it's safe to keep all steps as they are
       if (!action.payload.isOverwriteMismatched) return savedStepForms
-
       // Reset all well-selection fields of any steps, where the labware of those selected wells is having its def replaced
       // (otherwise, a mismatched definition with different wells or different multi-channel arrangement can break the step forms)
       const stepIds = Object.keys(savedStepForms)
+
       const labwareEntities = _getLabwareEntitiesRootState(rootState)
+
       const labwareIdsToDeselect = Object.keys(labwareEntities).filter(
         labwareId =>
           labwareEntities[labwareId].labwareDefURI ===
           action.payload.defURIToOverwrite
       )
-
       const savedStepsUpdate = stepIds.reduce<SavedStepFormState>(
         (acc, stepId) => {
           const prevStepForm = savedStepForms[stepId]
@@ -996,6 +1003,7 @@ export const savedStepForms = (
           }
 
           let fieldsToUpdate = {}
+
           if (prevStepForm.stepType === 'moveLiquid') {
             if (labwareIdsToDeselect.includes(prevStepForm.aspirate_labware)) {
               fieldsToUpdate = {
@@ -1003,6 +1011,7 @@ export const savedStepForms = (
                 aspirate_wells: defaults.aspirate_wells,
               }
             }
+
             if (labwareIdsToDeselect.includes(prevStepForm.dispense_labware)) {
               fieldsToUpdate = {
                 ...fieldsToUpdate,
@@ -1028,14 +1037,10 @@ export const savedStepForms = (
             _getPipetteEntitiesRootState(rootState),
             _getLabwareEntitiesRootState(rootState)
           )
-
           return {
             ...acc,
             // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
-            [stepId]: {
-              ...prevStepForm,
-              ...updatedFields,
-            },
+            [stepId]: { ...prevStepForm, ...updatedFields },
           }
         },
         {}
@@ -1047,9 +1052,7 @@ export const savedStepForms = (
       return savedStepForms
   }
 }
-
 export type BatchEditFormChangesState = FormPatch
-
 type BatchEditFormActions =
   | ChangeBatchEditFieldAction
   | ResetBatchEditFieldChangesAction
@@ -1058,18 +1061,15 @@ type BatchEditFormActions =
   | SelectMultipleStepsAction
   | DuplicateMultipleStepsAction
   | DeleteMultipleStepsAction
-
 export const batchEditFormChanges = (
   state: BatchEditFormChangesState = {},
   action: BatchEditFormActions
 ): BatchEditFormChangesState => {
   switch (action.type) {
     case 'CHANGE_BATCH_EDIT_FIELD': {
-      return {
-        ...state,
-        ...action.payload,
-      }
+      return { ...state, ...action.payload }
     }
+
     case 'SELECT_STEP':
     case 'SAVE_STEP_FORMS_MULTI':
     case 'SELECT_MULTIPLE_STEPS':
@@ -1078,18 +1078,17 @@ export const batchEditFormChanges = (
     case 'RESET_BATCH_EDIT_FIELD_CHANGES': {
       return {}
     }
+
     default: {
       return state
     }
   }
 }
-
 const initialLabwareState: NormalizedLabwareById = {
   [FIXED_TRASH_ID]: {
     labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
   },
 }
-
 // MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
 export const labwareInvariantProperties: Reducer<
   NormalizedLabwareById,
@@ -1102,7 +1101,9 @@ export const labwareInvariantProperties: Reducer<
     ) => {
       return {
         ...state,
-        [action.payload.id]: { labwareDefURI: action.payload.labwareDefURI },
+        [action.payload.id]: {
+          labwareDefURI: action.payload.labwareDefURI,
+        },
       }
     },
     DUPLICATE_LABWARE: (
@@ -1138,18 +1139,19 @@ export const labwareInvariantProperties: Reducer<
       state: NormalizedLabwareById,
       action: ReplaceCustomLabwareDef
     ): NormalizedLabwareById =>
-      mapValues(state, (prev: NormalizedLabware): NormalizedLabware =>
-        action.payload.defURIToOverwrite === prev.labwareDefURI
-          ? {
-              ...prev,
-              labwareDefURI: getLabwareDefURI(action.payload.newDef),
-            }
-          : prev
+      mapValues(
+        state,
+        (prev: NormalizedLabware): NormalizedLabware =>
+          action.payload.defURIToOverwrite === prev.labwareDefURI
+            ? {
+                ...prev,
+                labwareDefURI: getLabwareDefURI(action.payload.newDef),
+              }
+            : prev
       ),
   },
   initialLabwareState
 )
-
 export const moduleInvariantProperties: Reducer<
   ModuleEntities,
   any
@@ -1197,9 +1199,7 @@ export const moduleInvariantProperties: Reducer<
   },
   {}
 )
-
 const initialPipetteState = {}
-
 export const pipetteInvariantProperties: Reducer<
   NormalizedPipetteById,
   any
@@ -1216,7 +1216,7 @@ export const pipetteInvariantProperties: Reducer<
         (
           filePipette: FilePipette,
           pipetteId: string
-        ): $Values<NormalizedPipetteById> => {
+        ): NormalizedPipetteById[keyof NormalizedPipetteById] => {
           const tiprackDefURI = metadata.pipetteTiprackAssignments[pipetteId]
           assert(
             tiprackDefURI,
@@ -1234,10 +1234,7 @@ export const pipetteInvariantProperties: Reducer<
       state: NormalizedPipetteById,
       action: CreatePipettesAction
     ): NormalizedPipetteById => {
-      return {
-        ...state,
-        ...action.payload,
-      }
+      return { ...state, ...action.payload }
     },
     DELETE_PIPETTES: (
       state: NormalizedPipetteById,
@@ -1248,7 +1245,6 @@ export const pipetteInvariantProperties: Reducer<
   },
   initialPipetteState
 )
-
 export type OrderedStepIdsState = Array<StepIdType>
 const initialOrderedStepIdsState = []
 export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
@@ -1258,9 +1254,11 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
       action: SaveStepFormAction
     ) => {
       const id = action.payload.id
+
       if (!state.includes(id)) {
         return [...state, id]
       }
+
       return state
     },
     DELETE_STEP: (state: OrderedStepIdsState, action: DeleteStepAction) =>
@@ -1282,9 +1280,7 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
       const stepsWithoutSelectedStep = state.filter(s => s !== stepId)
       const selectedIndex = state.findIndex(s => s === stepId)
       const nextIndex = selectedIndex + delta
-
       if (delta <= 0 && selectedIndex === 0) return state
-
       return [
         ...stepsWithoutSelectedStep.slice(0, nextIndex),
         stepId,
@@ -1297,7 +1293,6 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
     ): OrderedStepIdsState => {
       const { stepId, duplicateStepId } = action.payload
       const selectedIndex = state.findIndex(s => s === stepId)
-
       return [
         ...state.slice(0, selectedIndex + 1),
         duplicateStepId,
@@ -1325,10 +1320,9 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
   },
   initialOrderedStepIdsState
 )
-
-export type PresavedStepFormState = {|
-  stepType: StepType,
-|} | null
+export type PresavedStepFormState = {
+  stepType: StepType
+} | null
 type PresavedStepFormAction =
   | AddStepAction
   | CancelStepFormAction
@@ -1344,9 +1338,13 @@ export const presavedStepForm = (
 ): PresavedStepFormState => {
   switch (action.type) {
     case 'ADD_STEP':
-      return { stepType: action.payload.stepType }
+      return {
+        stepType: action.payload.stepType,
+      }
+
     case 'SELECT_TERMINAL_ITEM':
       return action.payload === PRESAVED_STEP_ID ? state : null
+
     case 'CANCEL_STEP_FORM':
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
@@ -1354,23 +1352,22 @@ export const presavedStepForm = (
     case 'SELECT_STEP':
     case 'SELECT_MULTIPLE_STEPS':
       return null
+
     default:
       return state
   }
 }
-
 export type RootState = {
-  orderedStepIds: OrderedStepIdsState,
-  labwareDefs: LabwareDefsRootState,
-  labwareInvariantProperties: NormalizedLabwareById,
-  pipetteInvariantProperties: NormalizedPipetteById,
-  moduleInvariantProperties: ModuleEntities,
-  presavedStepForm: PresavedStepFormState,
-  savedStepForms: SavedStepFormState,
-  unsavedForm: FormState,
-  batchEditFormChanges: BatchEditFormChangesState,
+  orderedStepIds: OrderedStepIdsState
+  labwareDefs: LabwareDefsRootState
+  labwareInvariantProperties: NormalizedLabwareById
+  pipetteInvariantProperties: NormalizedPipetteById
+  moduleInvariantProperties: ModuleEntities
+  presavedStepForm: PresavedStepFormState
+  savedStepForms: SavedStepFormState
+  unsavedForm: FormState
+  batchEditFormChanges: BatchEditFormChangesState
 }
-
 // TODO Ian 2018-12-13: find some existing util to do this
 // semi-nested version of combineReducers?
 // TODO: Ian 2018-12-13 remove this 'action: any' type

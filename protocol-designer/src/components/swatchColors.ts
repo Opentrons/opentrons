@@ -1,4 +1,3 @@
-// @flow
 import { AIR } from '@opentrons/step-generation'
 export const MIXED_WELL_COLOR = '#9b9b9b' // NOTE: matches `--c-med-gray` in colors.css
 
@@ -15,13 +14,16 @@ export const swatchColors = (ingredGroupId: string): string => {
     '#2a97dc',
     '#d24193',
   ]
+
   if (!Number.isInteger(num)) {
     if (ingredGroupId !== AIR) {
       console.warn(
         `swatchColors expected an integer or ${AIR}, got ${ingredGroupId}`
       )
     }
+
     return 'transparent'
   }
+
   return colors[num % colors.length]
 }

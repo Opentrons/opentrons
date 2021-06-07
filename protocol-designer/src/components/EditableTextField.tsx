@@ -5,14 +5,14 @@ import { ClickOutside, Icon, InputField } from '@opentrons/components'
 import styles from './editableTextField.css'
 
 type Props = {
-  className?: string,
-  value: ?string,
-  saveEdit: (newValue: string) => mixed,
+  className?: string
+  value: ?string
+  saveEdit: (newValue: string) => mixed
 }
 
 type State = {
-  editing: boolean,
-  transientValue: ?string,
+  editing: boolean
+  transientValue: ?string
 }
 
 export class EditableTextField extends React.Component<Props, State> {

@@ -1,23 +1,18 @@
-// @flow
 import { createSelector } from 'reselect'
 import { getWellNamePerMultiTip } from '@opentrons/shared-data'
 import { getWellSetForMultichannel } from '../utils'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
-
 import mapValues from 'lodash/mapValues'
-
 import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
 import { getHoveredStepId, getHoveredSubstep } from '../ui/steps'
-
 import type { WellGroup } from '@opentrons/components'
 import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
 import type { Selector } from '../types'
 import type { SubstepItemData } from '../steplist/types'
-
 // TODO IMMEDIATELY use WellGroup here
-export type AllWellHighlights = { [wellName: string]: true } // NOTE: all keys are true. There's a TODO in HighlightableLabware.js about making this a Set of well strings
+export type AllWellHighlights = Record<string, true> // NOTE: all keys are true. There's a TODO in HighlightableLabware.js about making this a Set of well strings
 
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,
@@ -28,10 +23,10 @@ function _wellsForPipette(
   if (pipetteEntity.spec.channels === 8) {
     return wells.reduce((acc, well) => {
       const setOfWellsForMulti = getWellNamePerMultiTip(labwareEntity.def, well)
-
       return setOfWellsForMulti ? [...acc, ...setOfWellsForMulti] : acc // setOfWellsForMulti is null
     }, [])
   }
+
   // single-channel
   return wells
 }
@@ -71,6 +66,7 @@ function _getSelectedWellsForStep(
     if (stepArgs.sourceLabware === labwareId) {
       wells.push(...getWells(stepArgs.sourceWells))
     }
+
     if (stepArgs.destLabware === labwareId) {
       wells.push(...getWells(stepArgs.destWells))
     }
@@ -78,6 +74,7 @@ function _getSelectedWellsForStep(
     if (stepArgs.sourceLabware === labwareId) {
       wells.push(...getWells(stepArgs.sourceWells))
     }
+
     if (stepArgs.destLabware === labwareId) {
       wells.push(...getWells([stepArgs.destWell]))
     }
@@ -85,6 +82,7 @@ function _getSelectedWellsForStep(
     if (stepArgs.sourceLabware === labwareId) {
       wells.push(...getWells([stepArgs.sourceWell]))
     }
+
     if (stepArgs.destLabware === labwareId) {
       wells.push(...getWells(stepArgs.destWells))
     }
@@ -115,7 +113,6 @@ function _getSelectedWellsForStep(
       }
     }
   })
-
   return wells
 }
 
@@ -123,7 +120,7 @@ function _getSelectedWellsForStep(
 function _getSelectedWellsForSubstep(
   stepArgs: StepGeneration.CommandCreatorArgs,
   labwareId: string,
-  substeps: ?SubstepItemData,
+  substeps: SubstepItemData | null | undefined,
   substepIndex: number,
   invariantContext: StepGeneration.InvariantContext
 ): Array<string> {
@@ -137,6 +134,7 @@ function _getSelectedWellsForSubstep(
     // TODO: Ian 2019-01-29 be more explicit about commandCreatorFnName,
     // don't rely so heavily on the fact that their well fields are the same now
     if (!substeps || substeps.commandCreatorFnName === 'delay') return []
+
     if (substeps.rows && substeps.rows[substepIndex]) {
       // single-channel
       const wellData = substeps.rows[substepIndex][wellField]
@@ -150,6 +148,7 @@ function _getSelectedWellsForSubstep(
         return wellData && wellData.well ? [...acc, wellData.well] : acc
       }, [])
     }
+
     return []
   }
 
@@ -169,6 +168,7 @@ function _getSelectedWellsForSubstep(
   if (stepArgs.sourceLabware && stepArgs.sourceLabware === labwareId) {
     wells.push(...getWells('source'))
   }
+
   // $FlowFixMe: property `destLabware` is missing in `MixArgs`
   if (stepArgs.destLabware && stepArgs.destLabware === labwareId) {
     wells.push(...getWells('dest'))
@@ -176,9 +176,11 @@ function _getSelectedWellsForSubstep(
 
   if (substeps && substeps.substepType === 'sourceDest') {
     let tipWellSet = []
-    if (substeps.multichannel) {
-      const { activeTips } = substeps.multiRows[substepIndex][0] // just use first multi row
 
+    if (substeps.multichannel) {
+      const { activeTips } = substeps.multiRows[substepIndex][0]
+
+      // just use first multi row
       if (activeTips && activeTips.labware === labwareId) {
         const multiTipWellSet = getWellSetForMultichannel(
           invariantContext.labwareEntities[labwareId].def,
@@ -192,15 +194,16 @@ function _getSelectedWellsForSubstep(
       if (activeTips && activeTips.labware === labwareId && activeTips.well)
         tipWellSet = [activeTips.well]
     }
+
     wells.push(...tipWellSet)
   }
 
   return wells
 }
 
-export const wellHighlightsByLabwareId: Selector<{
-  [labwareId: string]: WellGroup,
-}> = createSelector(
+export const wellHighlightsByLabwareId: Selector<
+  Record<string, WellGroup>
+> = createSelector(
   fileDataSelectors.getRobotStateTimeline,
   stepFormSelectors.getInvariantContext,
   stepFormSelectors.getArgsAndErrorsByStepId,
@@ -240,6 +243,7 @@ export const wellHighlightsByLabwareId: Selector<{
         labwareId: string
       ): AllWellHighlights => {
         let selectedWells: Array<string> = []
+
         if (hoveredSubstep != null) {
           // wells for hovered substep
           selectedWells = _getSelectedWellsForSubstep(

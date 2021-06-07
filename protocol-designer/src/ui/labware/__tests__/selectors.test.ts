@@ -1,4 +1,3 @@
-// @flow
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
@@ -17,20 +16,17 @@ import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/f
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-
 describe('labware selectors', () => {
   let names
   let tipracks
   let trash
   let otherLabware
-
   beforeEach(() => {
     trash = {
       trashId: {
         def: { ...fixture_trash },
       },
     }
-
     tipracks = {
       tiprack100Id: {
         id: 'tiprack100Id',
@@ -41,25 +37,20 @@ describe('labware selectors', () => {
         def: { ...fixture_tiprack_10_ul },
       },
     }
-
     otherLabware = {
       wellPlateId: {
         id: 'wellPlateId',
         def: { ...fixture_96_plate },
       },
     }
-
     names = {
       trashId: 'Trash',
       trashId2: 'Trash',
-
       tiprack100Id: 'Opentrons Tip Rack 1000 µL',
       tiprack10Id: 'Opentrons Tip Rack 10 µL',
-
       wellPlateId: 'Source Plate',
     }
   })
-
   describe('getDisposalLabwareOptions', () => {
     it('returns an empty list when labware is NOT provided', () => {
       expect(
@@ -68,24 +59,23 @@ describe('labware selectors', () => {
       ).toEqual([])
     })
     it('returns empty list when trash is NOT present', () => {
-      const labwareEntities = {
-        ...tipracks,
-      }
+      const labwareEntities = { ...tipracks }
       expect(
         // $FlowFixMe(IL, 2020-03-12): resultFunc
         getDisposalLabwareOptions.resultFunc(labwareEntities, names)
       ).toEqual([])
     })
     it('filters out labware that is NOT trash when one trash bin present', () => {
-      const labwareEntities = {
-        ...tipracks,
-        ...trash,
-      }
-
+      const labwareEntities = { ...tipracks, ...trash }
       expect(
         // $FlowFixMe(IL, 2020-03-12): resultFunc
         getDisposalLabwareOptions.resultFunc(labwareEntities, names)
-      ).toEqual([{ name: 'Trash', value: 'trashId' }])
+      ).toEqual([
+        {
+          name: 'Trash',
+          value: 'trashId',
+        },
+      ])
     })
     it('filters out labware that is NOT trash when multiple trash bins present', () => {
       const trash2 = {
@@ -93,22 +83,22 @@ describe('labware selectors', () => {
           def: { ...fixture_trash },
         },
       }
-      const labwareEntities = {
-        ...tipracks,
-        ...trash,
-        ...trash2,
-      }
-
+      const labwareEntities = { ...tipracks, ...trash, ...trash2 }
       expect(
         // $FlowFixMe(IL, 2020-03-12): resultFunc
         getDisposalLabwareOptions.resultFunc(labwareEntities, names)
       ).toEqual([
-        { name: 'Trash', value: 'trashId' },
-        { name: 'Trash', value: 'trashId2' },
+        {
+          name: 'Trash',
+          value: 'trashId',
+        },
+        {
+          name: 'Trash',
+          value: 'trashId2',
+        },
       ])
     })
   })
-
   describe('getLabwareOptions', () => {
     it('should return an empty list when no labware is present', () => {
       expect(
@@ -116,17 +106,16 @@ describe('labware selectors', () => {
         getDisposalLabwareOptions.resultFunc(
           {},
           {},
-          { labware: {}, modules: {}, pipettes: {} }
+          {
+            labware: {},
+            modules: {},
+            pipettes: {},
+          }
         )
       ).toEqual([])
     })
-
     it('should return labware options when no modules are present, with no tipracks', () => {
-      const labwareEntities = {
-        ...tipracks,
-        ...trash,
-        ...otherLabware,
-      }
+      const labwareEntities = { ...tipracks, ...trash, ...otherLabware }
       const initialDeckSetup = {
         labware: labwareEntities,
         modules: {},
@@ -136,11 +125,16 @@ describe('labware selectors', () => {
         // $FlowFixMe(IL, 2020-03-12): resultFunc
         getLabwareOptions.resultFunc(labwareEntities, names, initialDeckSetup)
       ).toEqual([
-        { name: 'Source Plate', value: 'wellPlateId' },
-        { name: 'Trash', value: 'trashId' },
+        {
+          name: 'Source Plate',
+          value: 'wellPlateId',
+        },
+        {
+          name: 'Trash',
+          value: 'trashId',
+        },
       ])
     })
-
     it('should return labware options with module prefixes when a labware is on module', () => {
       const labware = {
         wellPlateId: {
@@ -161,10 +155,7 @@ describe('labware selectors', () => {
       const labwareEntities = { ...trash, ...labware }
       const initialDeckSetup = {
         pipettes: {},
-        labware: {
-          ...trash,
-          ...labware,
-        },
+        labware: { ...trash, ...labware },
         modules: {
           magModuleId: {
             id: 'magModuleId',
@@ -186,14 +177,12 @@ describe('labware selectors', () => {
           },
         },
       }
-
-      const nicknames: { [string]: string } = {
+      const nicknames: Record<string, string> = {
         ...names,
         wellPlateId: 'Well Plate',
         tempPlateId: 'Temp Plate',
         tcPlateId: 'TC Plate',
       }
-
       expect(
         // $FlowFixMe(IL, 2020-03-12): resultFunc
         getLabwareOptions.resultFunc(
@@ -202,37 +191,55 @@ describe('labware selectors', () => {
           initialDeckSetup
         )
       ).toEqual([
-        { name: 'MAG Well Plate', value: 'wellPlateId' },
-        { name: 'TEMP Temp Plate', value: 'tempPlateId' },
-        { name: 'THERMO TC Plate', value: 'tcPlateId' },
-        { name: 'Trash', value: 'trashId' },
+        {
+          name: 'MAG Well Plate',
+          value: 'wellPlateId',
+        },
+        {
+          name: 'TEMP Temp Plate',
+          value: 'tempPlateId',
+        },
+        {
+          name: 'THERMO TC Plate',
+          value: 'tcPlateId',
+        },
+        {
+          name: 'Trash',
+          value: 'trashId',
+        },
       ])
     })
   })
-
   describe('_sortLabwareDropdownOptions', () => {
     const trashOption = {
       name: 'Some kinda fixed trash',
       value: FIXED_TRASH_ID,
     }
-    const zzzPlateOption = { name: 'Zzz Plate', value: 'zzz' }
-    const aaaPlateOption = { name: 'Aaa Plate', value: 'aaa' }
+    const zzzPlateOption = {
+      name: 'Zzz Plate',
+      value: 'zzz',
+    }
+    const aaaPlateOption = {
+      name: 'Aaa Plate',
+      value: 'aaa',
+    }
     it('should sort labware ids in alphabetical order but with fixed trash at the bottom', () => {
       const result = _sortLabwareDropdownOptions([
         trashOption,
         aaaPlateOption,
         zzzPlateOption,
       ])
+
       expect(result).toEqual([aaaPlateOption, zzzPlateOption, trashOption])
     })
-
     it('should handle {} case', () => {
       const result = _sortLabwareDropdownOptions([])
+
       expect(result).toEqual([])
     })
-
     it('should handle case w/o non-trash labware', () => {
       const result = _sortLabwareDropdownOptions([trashOption])
+
       expect(result).toEqual([trashOption])
     })
   })

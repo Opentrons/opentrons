@@ -1,4 +1,3 @@
-// @flow
 import pick from 'lodash/pick'
 import {
   chainPatchUpdaters,
@@ -26,13 +25,10 @@ const updatePatchOnLabwareChange = (
   pipetteEntities: PipetteEntities
 ): FormPatch => {
   const labwareChanged = fieldHasChanged(rawForm, patch, 'labware')
-
   if (!labwareChanged) return patch
-
   // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   const appliedPatch = { ...rawForm, ...patch }
   const pipetteId = appliedPatch.pipette
-
   return {
     ...patch,
     ...getDefaultFields('mix_mmFromBottom', 'mix_touchTip_mmFromBottom'),
@@ -55,13 +51,11 @@ const updatePatchOnPipetteChannelChange = (
 ) => {
   if (patch.pipette === undefined) return patch
   let update = {}
-
   const prevChannels = getChannels(rawForm.pipette, pipetteEntities)
   const nextChannels =
     typeof patch.pipette === 'string'
       ? getChannels(patch.pipette, pipetteEntities)
       : null
-
   // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   const appliedPatch = { ...rawForm, ...patch }
   const singleToMulti = prevChannels === 1 && nextChannels === 8
@@ -82,11 +76,11 @@ const updatePatchOnPipetteChannelChange = (
     // multi-channel to single-channel: convert primary wells to all wells
     const labwareId = appliedPatch.labware
     const labwareDef = labwareEntities[labwareId].def
-
     update = {
       wells: getAllWellsFromPrimaryWells(appliedPatch.wells, labwareDef),
     }
   }
+
   // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   return { ...patch, ...update }
 }

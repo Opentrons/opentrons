@@ -1,4 +1,3 @@
-// @flow
 import Ajv from 'ajv'
 import isEmpty from 'lodash/isEmpty'
 import protocolV3Schema from '@opentrons/shared-data/protocol/schemas/3.json'
@@ -51,6 +50,7 @@ const expectResultToMatchSchema = (result, _protocolSchema): void => {
   if (validationErrors) {
     console.log(JSON.stringify(validationErrors, null, 4))
   }
+
   expect(valid).toBe(true)
   expect(validationErrors).toBe(null)
 }
@@ -75,15 +75,12 @@ describe('createFile selector', () => {
       false, // isV4Protocol
       false // requiresV5
     )
-
     expectResultToMatchSchema(result, protocolV3Schema)
-
     // check for false positives: if the output is lacking these entities, we don't
     // have the opportunity to validate their part of the schema
     expect(!isEmpty(result.labware)).toBe(true)
     expect(!isEmpty(result.pipettes)).toBe(true)
   })
-
   it('should return a schema-valid JSON V4 protocol, if the protocol does have modules', () => {
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
     const result = createFile.resultFunc(
@@ -103,16 +100,13 @@ describe('createFile selector', () => {
       true, // isV4Protocol
       false // requiresV5
     )
-
     expectResultToMatchSchema(result, protocolV4Schema)
-
     // check for false positives: if the output is lacking these entities, we don't
     // have the opportunity to validate their part of the schema
     expect(!isEmpty(result.modules)).toBe(true)
     expect(!isEmpty(result.labware)).toBe(true)
     expect(!isEmpty(result.pipettes)).toBe(true)
   })
-
   it('should return a schema-valid JSON V5 protocol, if getRequiresAtLeastV5 returns true', () => {
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
     const result = createFile.resultFunc(
@@ -132,16 +126,13 @@ describe('createFile selector', () => {
       true, // isV4Protocol
       true // requiresV5
     )
-
     expectResultToMatchSchema(result, protocolV5Schema)
-
     // check for false positives: if the output is lacking these entities, we don't
     // have the opportunity to validate their part of the schema
     expect(!isEmpty(result.labware)).toBe(true)
     expect(!isEmpty(result.pipettes)).toBe(true)
   })
 })
-
 describe('getRequiresAtLeastV5', () => {
   it('should return true if protocol has airGap', () => {
     const airGapTimeline = {
@@ -166,7 +157,6 @@ describe('getRequiresAtLeastV5', () => {
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
     expect(getRequiresAtLeastV5.resultFunc(airGapTimeline)).toBe(true)
   })
-
   it('should return true if protocol has moveToWell', () => {
     const moveToWellTimeline = {
       timeline: [
@@ -203,14 +193,12 @@ describe('getRequiresAtLeastV5', () => {
     ).toBe(false)
   })
 })
-
 describe('getLabwareDefinitionsInUse util', () => {
   it('should exclude definitions that are neither on the deck nor assigned to a pipette', () => {
     const assignedTiprackOnDeckDef = fixture_tiprack_10_ul
     const assignedTiprackNotOnDeckDef = fixture_tiprack_300_ul
     const nonTiprackLabwareOnDeckDef = fixture_12_trough
     const nonTiprackLabwareNotOnDeckDef = fixture_96_plate
-
     // NOTE that assignedTiprackNotOnDeckDef and nonTiprackLabwareNotOnDeckDef are
     // missing from LabwareEntities bc they're not on the deck
     const labwareEntities = {
@@ -247,7 +235,6 @@ describe('getLabwareDefinitionsInUse util', () => {
         tiprackDefURI: 'assignedTiprackNotOnDeckURI',
       },
     }
-
     const result = getLabwareDefinitionsInUse(
       labwareEntities,
       pipetteEntities,

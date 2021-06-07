@@ -1,4 +1,3 @@
-// @flow
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_DELAY_SECONDS,
@@ -8,7 +7,6 @@ import {
   FIXED_TRASH_ID,
 } from '../../../constants'
 import { getDefaultsForStepType } from '..'
-
 describe('getDefaultsForStepType', () => {
   afterEach(() => {
     jest.resetAllMocks()
@@ -21,7 +19,6 @@ describe('getDefaultsForStepType', () => {
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         path: 'single',
         aspirate_wells_grouped: false,
-
         aspirate_flowRate: null,
         aspirate_labware: null,
         aspirate_wells: [],
@@ -33,7 +30,6 @@ describe('getDefaultsForStepType', () => {
         aspirate_mmFromBottom: null,
         aspirate_touchTip_checkbox: false,
         aspirate_touchTip_mmFromBottom: null,
-
         dispense_flowRate: null,
         dispense_labware: null,
         dispense_wells: [],
@@ -45,20 +41,16 @@ describe('getDefaultsForStepType', () => {
         dispense_mmFromBottom: null,
         dispense_touchTip_checkbox: false,
         dispense_touchTip_mmFromBottom: null,
-
         disposalVolume_checkbox: false,
         disposalVolume_volume: null,
-
         blowout_checkbox: false,
         blowout_location: FIXED_TRASH_ID,
         preWetTip: false,
-
         aspirate_airGap_checkbox: false,
         aspirate_airGap_volume: null,
         aspirate_delay_checkbox: false,
         aspirate_delay_mmFromBottom: null,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
-
         dispense_airGap_checkbox: false,
         dispense_airGap_volume: null,
         dispense_delay_checkbox: false,

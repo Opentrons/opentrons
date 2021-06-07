@@ -1,16 +1,13 @@
-// @flow
 import {
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
 } from '../../../constants'
-
 import type { FormData } from '../../../form-types'
 import type {
   AwaitTemperatureArgs,
   PauseArgs,
 } from '@opentrons/step-generation'
-
 export const pauseFormToArgs = (
   formData: FormData
 ): PauseArgs | AwaitTemperatureArgs | null => {
@@ -29,11 +26,14 @@ export const pauseFormToArgs = (
         module: formData.moduleId,
         message,
       }
+
     case PAUSE_UNTIL_TIME:
       return {
         commandCreatorFnName: 'delay',
-        name: `Pause ${formData.id}`, // TODO real name for steps
-        description: formData.description || '', // TODO get from form
+        name: `Pause ${formData.id}`,
+        // TODO real name for steps
+        description: formData.description || '',
+        // TODO get from form
         wait: totalSeconds,
         message,
         meta: {
@@ -42,11 +42,14 @@ export const pauseFormToArgs = (
           seconds,
         },
       }
+
     case PAUSE_UNTIL_RESUME:
       return {
         commandCreatorFnName: 'delay',
-        name: `Pause ${formData.id}`, // TODO real name for steps
-        description: formData.description || '', // TODO get from form
+        name: `Pause ${formData.id}`,
+        // TODO real name for steps
+        description: formData.description || '',
+        // TODO get from form
         wait: true,
         message,
         meta: {
@@ -55,6 +58,7 @@ export const pauseFormToArgs = (
           seconds,
         },
       }
+
     default:
       return null
   }

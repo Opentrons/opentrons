@@ -1,14 +1,12 @@
-// @flow
-import { combineReducers, type Reducer } from 'redux'
+import type { Reducer } from 'redux'
+import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-
 import type { BaseState, Action } from '../../types'
 import type {
   NavigateToPageAction,
   ToggleNewProtocolModalAction,
 } from '../actions'
 import type { Page } from '../types'
-
 const page: Reducer<Page, any> = handleActions(
   {
     LOAD_FILE: (): Page => 'file-detail',
@@ -17,7 +15,6 @@ const page: Reducer<Page, any> = handleActions(
   },
   'file-splash'
 )
-
 const newProtocolModal: Reducer<boolean, any> = handleActions(
   {
     TOGGLE_NEW_PROTOCOL_MODAL: (
@@ -28,19 +25,15 @@ const newProtocolModal: Reducer<boolean, any> = handleActions(
   },
   false
 )
-
 export const _allReducers = {
   page,
   newProtocolModal,
 }
-
-export type RootState = {|
-  page: Page,
-  newProtocolModal: boolean,
-|}
-
+export type RootState = {
+  page: Page
+  newProtocolModal: boolean
+}
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers
 )
-
 export const rootSelector = (state: BaseState): RootState => state.navigation

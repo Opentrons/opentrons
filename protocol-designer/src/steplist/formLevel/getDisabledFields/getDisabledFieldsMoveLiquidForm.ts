@@ -1,6 +1,4 @@
-// @flow
 import type { FormData } from '../../../form-types'
-
 // NOTE: expects that '_checkbox' fields are implemented so that
 // when checkbox is disabled, its dependent fields are hidden
 export function getDisabledFieldsMoveLiquidForm(
@@ -13,6 +11,7 @@ export function getDisabledFieldsMoveLiquidForm(
     disabled.add('aspirate_mix_checkbox')
   } else if (rawForm.path === 'multiDispense') {
     disabled.add('dispense_mix_checkbox')
+
     if (rawForm.disposalVolume_checkbox) {
       disabled.add('blowout_checkbox')
     }

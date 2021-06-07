@@ -1,7 +1,5 @@
-// @flow
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-
 import type { Reducer } from 'redux'
 import type { Timeline } from '@opentrons/step-generation'
 import type { Action } from '../../types'
@@ -9,7 +7,6 @@ import type { FileMetadataFields, SaveFileMetadataAction } from '../types'
 import type { LoadFileAction, NewProtocolFields } from '../../load-file'
 import type { ComputeRobotStateTimelineSuccessAction } from '../actions'
 import type { Substeps } from '../../steplist/types'
-
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   {
     COMPUTE_ROBOT_STATE_TIMELINE_REQUEST: () => true,
@@ -17,7 +14,6 @@ export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   },
   false
 )
-
 export const computedRobotStateTimeline: Reducer<Timeline, any> = handleActions(
   {
     COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS: (
@@ -25,9 +21,10 @@ export const computedRobotStateTimeline: Reducer<Timeline, any> = handleActions(
       action: ComputeRobotStateTimelineSuccessAction
     ) => action.payload.standardTimeline,
   },
-  { timeline: [] }
+  {
+    timeline: [],
+  }
 )
-
 export const computedSubsteps: Reducer<Substeps, any> = handleActions(
   {
     COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS: (
@@ -37,7 +34,6 @@ export const computedSubsteps: Reducer<Substeps, any> = handleActions(
   },
   {}
 )
-
 const defaultFields = {
   protocolName: '',
   author: '',
@@ -63,7 +59,9 @@ const currentProtocolExists = handleActions(
 
 function newProtocolMetadata(
   state: FileMetadataFields,
-  action: { payload: NewProtocolFields }
+  action: {
+    payload: NewProtocolFields
+  }
 ): FileMetadataFields {
   return {
     ...defaultFields,
@@ -80,10 +78,7 @@ const fileMetadata = handleActions(
     SAVE_FILE_METADATA: (
       state: FileMetadataFields,
       action: SaveFileMetadataAction
-    ): FileMetadataFields => ({
-      ...state,
-      ...action.payload,
-    }),
+    ): FileMetadataFields => ({ ...state, ...action.payload }),
     SAVE_PROTOCOL_FILE: (state: FileMetadataFields): FileMetadataFields => {
       // NOTE: 'last-modified' is updated "on-demand", in response to user clicking "save/export"
       return { ...state, lastModified: Date.now() }
@@ -91,15 +86,13 @@ const fileMetadata = handleActions(
   },
   defaultFields
 )
-
-export type RootState = {|
-  computedRobotStateTimeline: Timeline,
-  computedSubsteps: Substeps,
-  currentProtocolExists: boolean,
-  fileMetadata: FileMetadataFields,
-  timelineIsBeingComputed: boolean,
-|}
-
+export type RootState = {
+  computedRobotStateTimeline: Timeline
+  computedSubsteps: Substeps
+  currentProtocolExists: boolean
+  fileMetadata: FileMetadataFields
+  timelineIsBeingComputed: boolean
+}
 const _allReducers = {
   computedRobotStateTimeline,
   computedSubsteps,
@@ -107,7 +100,6 @@ const _allReducers = {
   fileMetadata,
   timelineIsBeingComputed,
 }
-
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers
 )

@@ -4,7 +4,7 @@ import type { PauseArgs } from '@opentrons/step-generation'
 import { i18n } from '../../localization'
 import styles from './StepItem.css'
 type Props = {
-  pauseArgs: PauseArgs,
+  pauseArgs: PauseArgs
 }
 
 export function PauseStepItems(props: Props): React.Node {

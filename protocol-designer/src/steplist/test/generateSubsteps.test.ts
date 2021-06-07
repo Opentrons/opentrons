@@ -1,19 +1,15 @@
-// @flow
 import { generateSubstepItem } from '../generateSubstepItem'
 import { makeInitialRobotState, makeContext } from '@opentrons/step-generation'
 import { THERMOCYCLER_STATE } from '../../constants'
-
 describe('generateSubstepItem', () => {
   const stepId = 'step123'
   const tiprackId = 'tiprack1Id'
   const pipetteId = 'p300SingleId'
   const sourcePlateId = 'sourcePlateId'
   const destPlateId = 'destPlateId'
-
   let invariantContext, labwareNamesByModuleId, robotState
   beforeEach(() => {
     invariantContext = makeContext()
-
     labwareNamesByModuleId = {
       magnet123: {
         nickname: 'mag nickname',
@@ -27,16 +23,27 @@ describe('generateSubstepItem', () => {
     }
     robotState = makeInitialRobotState({
       invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
-      labwareLocations: {
-        tiprack1Id: { slot: '2' },
-        sourcePlateId: { slot: '4' },
-        destPlateId: { slot: '5' },
+      pipetteLocations: {
+        p300SingleId: {
+          mount: 'left',
+        },
       },
-      tiprackSetting: { tiprack1Id: false },
+      labwareLocations: {
+        tiprack1Id: {
+          slot: '2',
+        },
+        sourcePlateId: {
+          slot: '4',
+        },
+        destPlateId: {
+          slot: '5',
+        },
+      },
+      tiprackSetting: {
+        tiprack1Id: false,
+      },
     })
   })
-
   it('null is returned when no robotState', () => {
     robotState = null
     const stepArgsAndErrors = {
@@ -47,7 +54,6 @@ describe('generateSubstepItem', () => {
       },
       errors: {},
     }
-
     const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
@@ -55,7 +61,6 @@ describe('generateSubstepItem', () => {
       stepId,
       labwareNamesByModuleId
     )
-
     expect(result).toBeNull()
   })
   ;[
@@ -67,7 +72,9 @@ describe('generateSubstepItem', () => {
       testName: 'null is returned when no stepArgs',
       args: {
         stepArgs: null,
-        errors: { field: {} },
+        errors: {
+          field: {},
+        },
       },
     },
     {
@@ -78,7 +85,9 @@ describe('generateSubstepItem', () => {
           commandCreatorFnName: 'deactivateTemperature',
           message: 'message',
         },
-        errors: { field: {} },
+        errors: {
+          field: {},
+        },
       },
     },
   ].forEach(({ testName, args }) => {
@@ -90,11 +99,9 @@ describe('generateSubstepItem', () => {
         stepId,
         labwareNamesByModuleId
       )
-
       expect(result).toBeNull()
     })
   })
-
   it('delay command returns pause substep data', () => {
     const stepArgsAndErrors = {
       errors: {},
@@ -104,8 +111,9 @@ describe('generateSubstepItem', () => {
         wait: true,
       },
     }
-    const robotState = makeInitialRobotState({ invariantContext })
-
+    const robotState = makeInitialRobotState({
+      invariantContext,
+    })
     const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
@@ -113,13 +121,11 @@ describe('generateSubstepItem', () => {
       stepId,
       labwareNamesByModuleId
     )
-
     expect(result).toEqual({
       substepType: 'pause',
       pauseStepArgs: stepArgsAndErrors.stepArgs,
     })
   })
-
   describe('like substeps', () => {
     let sharedArgs
     beforeEach(() => {
@@ -166,13 +172,21 @@ describe('generateSubstepItem', () => {
                 labware: tiprackId,
                 well: 'A1',
               },
-              source: { well: 'A1', preIngreds: {}, postIngreds: {} },
+              source: {
+                well: 'A1',
+                preIngreds: {},
+                postIngreds: {},
+              },
               dest: undefined,
               volume: 50,
             },
             {
               volume: 50,
-              source: { well: 'A2', preIngreds: {}, postIngreds: {} },
+              source: {
+                well: 'A2',
+                preIngreds: {},
+                postIngreds: {},
+              },
               activeTips: {
                 pipette: pipetteId,
                 labware: tiprackId,
@@ -277,7 +291,11 @@ describe('generateSubstepItem', () => {
                 labware: tiprackId,
                 well: 'A1',
               },
-              source: { well: 'A1', preIngreds: {}, postIngreds: {} },
+              source: {
+                well: 'A1',
+                preIngreds: {},
+                postIngreds: {},
+              },
               dest: {
                 well: 'A1',
                 preIngreds: {},
@@ -291,7 +309,11 @@ describe('generateSubstepItem', () => {
             },
             {
               volume: 50,
-              source: { well: 'A2', preIngreds: {}, postIngreds: {} },
+              source: {
+                well: 'A2',
+                preIngreds: {},
+                postIngreds: {},
+              },
               activeTips: {
                 pipette: pipetteId,
                 labware: tiprackId,
@@ -316,7 +338,6 @@ describe('generateSubstepItem', () => {
           errors: {},
           stepArgs: { ...sharedArgs, ...stepArgs },
         }
-
         const result = generateSubstepItem(
           stepArgsAndErrors,
           invariantContext,
@@ -324,12 +345,10 @@ describe('generateSubstepItem', () => {
           stepId,
           labwareNamesByModuleId
         )
-
         expect(result).toEqual(expected)
       })
     })
   })
-
   it('mix command returns substep data', () => {
     const stepArgsAndErrors = {
       stepArgs: {
@@ -353,7 +372,6 @@ describe('generateSubstepItem', () => {
       },
       errors: {},
     }
-
     const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
@@ -361,7 +379,6 @@ describe('generateSubstepItem', () => {
       stepId,
       labwareNamesByModuleId
     )
-
     const expected = {
       commandCreatorFnName: 'mix',
       multichannel: false,
@@ -484,7 +501,6 @@ describe('generateSubstepItem', () => {
     }
     expect(result).toEqual(expected)
   })
-
   it('engageMagnet returns substep data with engage = true', () => {
     const stepArgsAndErrors = {
       errors: {},
@@ -494,7 +510,6 @@ describe('generateSubstepItem', () => {
         message: null,
       },
     }
-
     const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
@@ -502,7 +517,6 @@ describe('generateSubstepItem', () => {
       stepId,
       labwareNamesByModuleId
     )
-
     expect(result).toEqual({
       substepType: 'magnet',
       engage: true,
@@ -510,7 +524,6 @@ describe('generateSubstepItem', () => {
       message: null,
     })
   })
-
   it('disengageMagnet returns substep data with engage = false', () => {
     const stepArgsAndErrors = {
       errors: {},
@@ -520,7 +533,6 @@ describe('generateSubstepItem', () => {
         message: null,
       },
     }
-
     const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
@@ -528,7 +540,6 @@ describe('generateSubstepItem', () => {
       stepId,
       labwareNamesByModuleId
     )
-
     expect(result).toEqual({
       substepType: 'magnet',
       engage: false,
@@ -536,7 +547,6 @@ describe('generateSubstepItem', () => {
       message: null,
     })
   })
-
   it('setTemperature returns substep data with temperature', () => {
     const stepArgsAndErrors = {
       errors: {},
@@ -547,7 +557,6 @@ describe('generateSubstepItem', () => {
         message: null,
       },
     }
-
     const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
@@ -555,7 +564,6 @@ describe('generateSubstepItem', () => {
       stepId,
       labwareNamesByModuleId
     )
-
     expect(result).toEqual({
       substepType: 'temperature',
       temperature: 45,
@@ -563,7 +571,6 @@ describe('generateSubstepItem', () => {
       message: null,
     })
   })
-
   it('setTemperature returns temperature when 0', () => {
     const stepArgsAndErrors = {
       errors: {},
@@ -574,7 +581,6 @@ describe('generateSubstepItem', () => {
         message: null,
       },
     }
-
     const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
@@ -582,7 +588,6 @@ describe('generateSubstepItem', () => {
       stepId,
       labwareNamesByModuleId
     )
-
     expect(result).toEqual({
       substepType: 'temperature',
       temperature: 0,
@@ -590,7 +595,6 @@ describe('generateSubstepItem', () => {
       message: null,
     })
   })
-
   it('deactivateTemperature returns substep data with null temp', () => {
     const stepArgsAndErrors = {
       errors: {},
@@ -600,7 +604,6 @@ describe('generateSubstepItem', () => {
         message: null,
       },
     }
-
     const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
@@ -608,7 +611,6 @@ describe('generateSubstepItem', () => {
       stepId,
       labwareNamesByModuleId
     )
-
     expect(result).toEqual({
       substepType: 'temperature',
       temperature: null,
@@ -616,7 +618,6 @@ describe('generateSubstepItem', () => {
       message: null,
     })
   })
-
   it('thermocyclerState returns substep data', () => {
     const stepArgsAndErrors = {
       errors: {},
@@ -645,7 +646,6 @@ describe('generateSubstepItem', () => {
       message: 'a message',
     })
   })
-
   it('null is returned when no matching command', () => {
     const stepArgsAndErrors = {
       errors: {},
@@ -653,7 +653,6 @@ describe('generateSubstepItem', () => {
         commandCreatorFnName: 'nonexistentCommand',
       },
     }
-
     const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
@@ -661,7 +660,6 @@ describe('generateSubstepItem', () => {
       stepId,
       {}
     )
-
     expect(result).toBeNull()
   })
 })

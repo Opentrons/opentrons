@@ -1,12 +1,11 @@
-// @flow
 import isPlainObject from 'lodash/isPlainObject'
-
 const SEPARATOR = '__'
 
 const _innerFnFlattenNested = (innerProperties: any, prefix: string) => {
   return Object.keys(innerProperties).reduce((acc, key) => {
     // if the key's value is an object, recurse into it
     const nestedValue = innerProperties[key]
+
     if (isPlainObject(nestedValue)) {
       return {
         ...acc,
@@ -19,10 +18,7 @@ const _innerFnFlattenNested = (innerProperties: any, prefix: string) => {
     if (prefix === '') {
       return acc
     } else {
-      return {
-        ...acc,
-        [`${prefix}${SEPARATOR}${key}`]: nestedValue,
-      }
+      return { ...acc, [`${prefix}${SEPARATOR}${key}`]: nestedValue }
     }
   }, {})
 }

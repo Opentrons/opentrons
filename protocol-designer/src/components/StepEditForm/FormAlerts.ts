@@ -1,7 +1,7 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Alerts, type Props } from '../alerts/Alerts'
+import type { Props } from '../alerts/Alerts'
+import { Alerts } from '../alerts/Alerts'
 import {
   actions as dismissActions,
   selectors as dismissSelectors,
@@ -21,17 +21,15 @@ import type { BaseState } from '../../types'
 /* TODO:  BC 2018-09-13 move to src/components/alerts and adapt and use src/components/alerts/Alerts
  * see #1814 for reference
  */
-
-type SP = {|
-  errors: $PropertyType<Props, 'errors'>,
-  warnings: $PropertyType<Props, 'warnings'>,
-  stepId?: ?StepIdType,
-|}
-
-type OP = {|
-  focusedField: ?StepFieldName,
-  dirtyFields: Array<StepFieldName>,
-|}
+type SP = {
+  errors: Props['errors']
+  warnings: Props['warnings']
+  stepId?: StepIdType | null | undefined
+}
+type OP = {
+  focusedField: StepFieldName | null | undefined
+  dirtyFields: Array<StepFieldName>
+}
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const { focusedField, dirtyFields } = ownProps
@@ -40,7 +38,6 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     dirtyFields,
     errors: dismissSelectors.getFormWarningsForSelectedStep(state),
   })
-
   const formLevelErrors = stepFormSelectors.getFormLevelErrorsForUnsavedForm(
     state
   )
@@ -49,10 +46,10 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     dirtyFields,
     errors: formLevelErrors,
   })
-
   // deal with special-case dynamic field form-level errors
   const { profileItemsById } = stepFormSelectors.getHydratedUnsavedForm(state)
   let visibleDynamicFieldFormErrors = []
+
   if (profileItemsById != null) {
     const dynamicFieldFormErrors = stepFormSelectors.getDynamicFieldFormErrorsForUnsavedForm(
       state
@@ -87,7 +84,9 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
 
 const mergeProps = (
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<*> }
+  dispatchProps: {
+    dispatch: Dispatch<any>
+  }
 ): Props => {
   const { stepId } = stateProps
   const { dispatch } = dispatchProps
@@ -95,7 +94,12 @@ const mergeProps = (
     ...stateProps,
     dismissWarning: (dismissId: string) => {
       if (stepId)
-        dispatch(dismissActions.dismissFormWarning({ type: dismissId, stepId }))
+        dispatch(
+          dismissActions.dismissFormWarning({
+            type: dismissId,
+            stepId,
+          })
+        )
     },
   }
 }
@@ -104,7 +108,7 @@ export const FormAlerts: React.AbstractComponent<OP> = connect<
   Props,
   OP,
   SP,
-  {||},
+  {},
   _,
   _
 >(

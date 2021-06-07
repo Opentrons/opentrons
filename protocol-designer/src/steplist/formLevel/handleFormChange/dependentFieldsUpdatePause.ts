@@ -1,5 +1,4 @@
 /* eslint-disable import/no-default-export */
-// @flow
 import pick from 'lodash/pick'
 import { chainPatchUpdaters, fieldHasChanged } from './utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
@@ -25,6 +24,7 @@ const updatePatchOnPauseTemperatureChange = (
       ),
     }
   }
+
   return patch
 }
 

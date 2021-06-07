@@ -1,4 +1,3 @@
-// @flow
 import { getProfileFieldErrors } from '../../steplist/fieldLevel'
 import { PROFILE_CYCLE } from '../../form-types'
 import type { ProfileItem } from '../../form-types'
@@ -12,14 +11,14 @@ const _someFieldsHaveErrors = (item: ProfileItem): boolean => {
       return true
     }
   }
+
   return false
 }
 
-export const getProfileItemsHaveErrors = (profileItems: {
-  [id: string]: ProfileItem,
-}): boolean => {
+export const getProfileItemsHaveErrors = (
+  profileItems: Record<string, ProfileItem>
+): boolean => {
   // TODO: fieldName includes id, stepType, etc... this is weird #3161
-
   for (const itemId in profileItems) {
     const item = profileItems[itemId]
 
@@ -37,5 +36,6 @@ export const getProfileItemsHaveErrors = (profileItems: {
       }
     }
   }
+
   return false
 }

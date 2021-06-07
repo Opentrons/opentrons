@@ -1,12 +1,12 @@
-// @flow
 import { mergeWhen } from './mergeWhen'
 import { getOrderedWells } from './orderWells'
 import type { StepIdType } from '../../form-types'
-
 export { mergeWhen, getOrderedWells }
-
 export type WellRatio = 'n:n' | '1:many' | 'many:1'
-export function getWellRatio(sourceWells: mixed, destWells: mixed): ?WellRatio {
+export function getWellRatio(
+  sourceWells: unknown,
+  destWells: unknown
+): WellRatio | null | undefined {
   if (
     !Array.isArray(sourceWells) ||
     sourceWells.length === 0 ||
@@ -15,18 +15,21 @@ export function getWellRatio(sourceWells: mixed, destWells: mixed): ?WellRatio {
   ) {
     return null
   }
+
   if (sourceWells.length === destWells.length) {
     return 'n:n'
   }
+
   if (sourceWells.length === 1 && destWells.length > 1) {
     return '1:many'
   }
+
   if (sourceWells.length > 1 && destWells.length === 1) {
     return 'many:1'
   }
+
   return null
 }
-
 export const getNextNonTerminalItemId = (
   orderedStepIds: Array<StepIdType>,
   stepsToDelete: Array<StepIdType>
@@ -37,15 +40,19 @@ export const getNextNonTerminalItemId = (
   }, 0)
   let nextStepId = orderedStepIds[highestDeletedIndex + 1]
   let attemptsLeft = orderedStepIds.length
+
   while (!nextStepId && attemptsLeft > 0) {
     attemptsLeft -= 1
     highestDeletedIndex -= 1
     const potentialNextStepId = orderedStepIds[highestDeletedIndex]
+
     if (stepsToDelete.includes(potentialNextStepId)) {
       // if the step id is being deleted, it does not count
       continue
     }
+
     nextStepId = potentialNextStepId
   }
+
   return nextStepId ?? null
 }

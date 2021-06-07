@@ -1,4 +1,3 @@
-// @flow
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import { trackEventMiddleware } from './analytics/middleware'
@@ -7,9 +6,7 @@ import { fileUploadMessage } from './load-file/actions'
 import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
 import type { Store } from 'redux'
 import type { BaseState, Action, ThunkDispatch } from './types'
-
 const timelineMiddleware = makeTimelineMiddleware()
-
 const ReselectTools =
   process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined
 
@@ -27,7 +24,6 @@ function getRootReducer() {
     ui: require('./ui').rootReducer,
     wellSelection: require('./well-selection/reducers').rootReducer,
   })
-
   // TODO: Ian 2019-06-25 consider making file loading non-committal
   // so UNDO_LOAD_FILE doesnt' just reset Redux state
   return (state: any, action) => {
@@ -55,8 +51,10 @@ function getRootReducer() {
           )
         }
       }
+
       return rootReducer(resetState, action)
     }
+
     // pass-thru
     return rootReducer(state, action)
   }
@@ -68,21 +66,17 @@ export function configureStore(): Store<
   ThunkDispatch<Action>
 > {
   const reducer = getRootReducer()
-
   const composeEnhancers: any =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-
-  const store = createStore<BaseState, Action, ThunkDispatch<*>>(
+  const store = createStore<BaseState, Action, ThunkDispatch<any>>(
     reducer,
     /* preloadedState, */
     composeEnhancers(
       applyMiddleware(trackEventMiddleware, timelineMiddleware, thunk)
     )
   )
-
   // give reselect tools access to state if in dev env
   if (ReselectTools) ReselectTools.getStateWith(() => store.getState())
-
   // initial rehydration, and persistence subscriber
   store.dispatch(rehydratePersistedAction())
   store.subscribe(makePersistSubscriber(store))
@@ -90,7 +84,9 @@ export function configureStore(): Store<
   global.enablePrereleaseMode = () => {
     store.dispatch({
       type: 'SET_FEATURE_FLAGS',
-      payload: { PRERELEASE_MODE: true },
+      payload: {
+        PRERELEASE_MODE: true,
+      },
     })
   }
 
@@ -98,6 +94,7 @@ export function configureStore(): Store<
     const nextRootReducer = getRootReducer()
     store.replaceReducer(nextRootReducer)
   }
+
   // $FlowFixMe no module.hot
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers

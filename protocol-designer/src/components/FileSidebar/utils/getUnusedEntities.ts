@@ -1,11 +1,10 @@
-// @flow
 import some from 'lodash/some'
 import reduce from 'lodash/reduce'
 import type { SavedStepFormState } from '../../../step-forms'
 
 /** Pull out all entities never specified by step forms. Assumes that all forms share the entityKey */
 export function getUnusedEntities<T>(
-  entities: { [entityId: string]: T },
+  entities: Record<string, T>,
   stepForms: SavedStepFormState,
   entityKey: 'pipette' | 'moduleId'
 ): Array<T> {

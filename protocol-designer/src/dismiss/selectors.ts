@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import { selectors as stepFormSelectors } from '../step-forms'
@@ -11,24 +10,19 @@ import type {
   DismissedWarningsAllSteps,
   WarningType,
 } from './reducers'
-
 export const rootSelector = (state: BaseState): RootState => state.dismiss
-
-export const getAllDismissedWarnings: Selector<*> = createSelector(
+export const getAllDismissedWarnings: Selector<any> = createSelector(
   rootSelector,
   s => s.dismissedWarnings
 )
-
 export const getDismissedFormWarningTypesPerStep: Selector<DismissedWarningsAllSteps> = createSelector(
   getAllDismissedWarnings,
   all => all.form
 )
-
 export const getDismissedTimelineWarningTypes: Selector<DismissedWarningsAllSteps> = createSelector(
   getAllDismissedWarnings,
   all => all.timeline
 )
-
 export const getDismissedFormWarningTypesForSelectedStep: Selector<
   Array<WarningType>
 > = createSelector(
@@ -38,6 +32,7 @@ export const getDismissedFormWarningTypesForSelectedStep: Selector<
     if (stepId == null) {
       return dismissedWarnings[PRESAVED_STEP_ID] || []
     }
+
     return dismissedWarnings[stepId] || []
   }
 )
@@ -56,10 +51,9 @@ export const getFormWarningsForSelectedStep: Selector<
     return formWarnings
   }
 )
-
-export const getHasFormLevelWarningsPerStep: Selector<{
-  [stepId: string]: boolean,
-}> = createSelector(
+export const getHasFormLevelWarningsPerStep: Selector<
+  Record<string, boolean>
+> = createSelector(
   stepFormSelectors.getFormLevelWarningsPerStep,
   getDismissedFormWarningTypesPerStep,
   (warningsPerStep, dismissedPerStep) =>

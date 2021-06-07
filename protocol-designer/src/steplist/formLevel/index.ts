@@ -1,4 +1,4 @@
-// @flow
+import type { FormError } from './errors'
 import {
   composeErrors,
   incompatibleAspirateLabware,
@@ -9,7 +9,6 @@ import {
   magnetActionRequired,
   engageHeightRequired,
   engageHeightRangeExceeded,
-  type FormError,
   moduleIdRequired,
   targetTemperatureRequired,
   blockTemperatureRequired,
@@ -20,18 +19,16 @@ import {
   lidTemperatureHoldRequired,
   volumeTooHigh,
 } from './errors'
+import type { FormWarning, FormWarningType } from './warnings'
 import {
   composeWarnings,
   belowPipetteMinimumVolume,
   maxDispenseWellVolume,
   minDisposalVolume,
-  type FormWarning,
-  type FormWarningType,
   minAspirateAirGapVolume,
   minDispenseAirGapVolume,
 } from './warnings'
 import type { StepType } from '../../form-types'
-
 export { handleFormChange } from './handleFormChange'
 export { createBlankForm } from './createBlankForm'
 export { getDefaultsForStepType } from './getDefaultsForStepType'
@@ -45,13 +42,11 @@ export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
 export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { stepFormToArgs } from './stepFormToArgs'
 export type { FormError, FormWarning, FormWarningType }
-
-type FormHelpers = {|
-  getErrors?: mixed => Array<FormError>,
-  getWarnings?: mixed => Array<FormWarning>,
-|}
-
-const stepFormHelperMap: { [StepType]: FormHelpers } = {
+type FormHelpers = {
+  getErrors?: (arg0: unknown) => Array<FormError>
+  getWarnings?: (arg0: unknown) => Array<FormWarning>
+}
+const stepFormHelperMap: Record<StepType, FormHelpers> = {
   mix: {
     getErrors: composeErrors(incompatibleLabware, volumeTooHigh),
     getWarnings: composeWarnings(belowPipetteMinimumVolume),
@@ -95,20 +90,18 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
     ),
   },
 }
-
 export const getFormErrors = (
   stepType: StepType,
-  formData: mixed
+  formData: unknown
 ): Array<FormError> => {
   const formErrorGetter =
     stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getErrors
   const errors = formErrorGetter ? formErrorGetter(formData) : []
   return errors
 }
-
 export const getFormWarnings = (
   stepType: StepType,
-  formData: mixed
+  formData: unknown
 ): Array<FormWarning> => {
   const formWarningGetter =
     stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getWarnings

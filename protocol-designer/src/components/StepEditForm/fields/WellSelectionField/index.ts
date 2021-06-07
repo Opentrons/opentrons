@@ -1,32 +1,28 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { WellSelectionInput } from './WellSelectionInput'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import type { BaseState, ThunkDispatch } from '../../../../types'
 import type { FieldProps } from '../../types'
-
-type Props = React.ElementConfig<typeof WellSelectionInput>
-
-type OP = {|
-  ...FieldProps,
-  labwareId: ?string,
-  pipetteId: ?string,
-|}
-
-type SP = {|
-  isMulti: $PropertyType<Props, 'isMulti'>,
-  primaryWellCount: $PropertyType<Props, 'primaryWellCount'>,
-|}
+type Props = JSX.LibraryManagedAttributes<
+  typeof WellSelectionInput,
+  React.ComponentProps<typeof WellSelectionInput>
+>
+type OP = FieldProps & {
+  labwareId: string | null | undefined
+  pipetteId: string | null | undefined
+}
+type SP = {
+  isMulti: Props['isMulti']
+  primaryWellCount: Props['primaryWellCount']
+}
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const { pipetteId } = ownProps
   const selectedWells = ownProps.value
-
   const pipette =
     pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
   const isMulti = pipette ? pipette.spec.channels > 1 : false
-
   return {
     primaryWellCount: Array.isArray(selectedWells)
       ? selectedWells.length
@@ -37,7 +33,9 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> },
+  dispatchProps: {
+    dispatch: ThunkDispatch<any>
+  },
   ownProps: OP
 ): Props {
   const {
@@ -51,7 +49,6 @@ function mergeProps(
     updateValue,
     value,
   } = ownProps
-
   return {
     disabled,
     errorToShow,
@@ -71,7 +68,7 @@ export const WellSelectionField: React.AbstractComponent<OP> = connect<
   Props,
   OP,
   SP,
-  {||},
+  {},
   _,
   _
 >(

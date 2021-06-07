@@ -1,10 +1,8 @@
-// @flow
 import assert from 'assert'
 import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
-
 import {
   consolidate,
   distribute,
@@ -15,7 +13,6 @@ import {
 import { substepTimeline } from './substepTimeline'
 import * as steplistUtils from './utils'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
-
 import type {
   CurriedCommandCreator,
   InvariantContext,
@@ -35,9 +32,7 @@ import type {
   SubstepTimelineFrame,
   LabwareNamesByModuleId,
 } from './types'
-
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
-
 type TransferLikeArgs =
   | ConsolidateArgs
   | DistributeArgs
@@ -65,7 +60,6 @@ function getCommandCreatorForTransferlikeSubsteps(
       mixInDestination: null,
       preWetTip: false,
     }
-
     return curryCommandCreator(transfer, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'distribute') {
     const commandCallArgs = {
@@ -82,7 +76,6 @@ function getCommandCreatorForTransferlikeSubsteps(
       mixBeforeAspirate: null,
       preWetTip: false,
     }
-
     return curryCommandCreator(distribute, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'consolidate') {
     const commandCallArgs = {
@@ -100,7 +93,6 @@ function getCommandCreatorForTransferlikeSubsteps(
       mixInDestination: null,
       preWetTip: false,
     }
-
     return curryCommandCreator(consolidate, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'mix') {
     return curryCommandCreator(mix, stepArgs)
@@ -112,16 +104,17 @@ function getCommandCreatorForTransferlikeSubsteps(
   }
 }
 
-export const mergeSubstepRowsSingleChannel = (args: {|
-  substepRows: Array<SubstepTimelineFrame>,
-  showDispenseVol: boolean,
-|}): Array<StepItemSourceDestRow> => {
+export const mergeSubstepRowsSingleChannel = (args: {
+  substepRows: Array<SubstepTimelineFrame>
+  showDispenseVol: boolean
+}): Array<StepItemSourceDestRow> => {
   const { substepRows, showDispenseVol } = args
   return steplistUtils.mergeWhen(
     substepRows,
-    (currentRow, nextRow) =>
-      // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
-      currentRow.source && nextRow.dest,
+    (
+      currentRow,
+      nextRow // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
+    ) => currentRow.source && nextRow.dest,
     (currentRow, nextRow) => ({
       ...currentRow,
       source: {
@@ -157,13 +150,12 @@ export const mergeSubstepRowsSingleChannel = (args: {|
     }
   )
 }
-
-export const mergeSubstepRowsMultiChannel = (args: {|
-  substepRows: Array<SubstepTimelineFrame>,
-  channels: number,
-  isMixStep: boolean,
-  showDispenseVol: boolean,
-|}): Array<Array<StepItemSourceDestRow>> => {
+export const mergeSubstepRowsMultiChannel = (args: {
+  substepRows: Array<SubstepTimelineFrame>
+  channels: number
+  isMixStep: boolean
+  showDispenseVol: boolean
+}): Array<Array<StepItemSourceDestRow>> => {
   const { substepRows, channels, isMixStep, showDispenseVol } = args
   return steplistUtils.mergeWhen(
     substepRows,
@@ -179,8 +171,7 @@ export const mergeSubstepRowsMultiChannel = (args: {|
         nextMultiRow &&
         nextMultiRow.dest
       )
-    },
-    // Merge each channel row together when predicate true
+    }, // Merge each channel row together when predicate true
     (currentMultiRow, nextMultiRow) => {
       return range(channels).map(channelIndex => {
         const sourceChannelWell =
@@ -203,7 +194,8 @@ export const mergeSubstepRowsMultiChannel = (args: {|
         return {
           activeTips,
           source,
-          dest: isMixStep ? source : dest, // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
+          dest: isMixStep ? source : dest,
+          // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
           volume: showDispenseVol
             ? nextMultiRow.volume
             : currentMultiRow.volume,
@@ -235,26 +227,29 @@ export const mergeSubstepRowsMultiChannel = (args: {|
             ],
         }
         const activeTips = currentMultiRow.activeTips
-        return { activeTips, source, dest, volume: currentMultiRow.volume }
+        return {
+          activeTips,
+          source,
+          dest,
+          volume: currentMultiRow.volume,
+        }
       })
   )
 }
 
-function transferLikeSubsteps(args: {|
-  stepArgs: ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs,
-  invariantContext: InvariantContext,
-  robotState: RobotState,
-  stepId: StepIdType,
-|}): ?SourceDestSubstepItem {
+function transferLikeSubsteps(args: {
+  stepArgs: ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs
+  invariantContext: InvariantContext
+  robotState: RobotState
+  stepId: StepIdType
+}): SourceDestSubstepItem | null | undefined {
   const { stepArgs, invariantContext, stepId } = args
-
   // Add tips to pipettes, since this is just a "simulation"
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
   const tipState = cloneDeep(args.robotState.tipState)
   tipState.pipettes = mapValues(tipState.pipettes, () => true)
   const initialRobotState = { ...args.robotState, tipState }
   const { pipette: pipetteId } = stepArgs
-
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
 
   // TODO Ian 2018-04-06 use assert here
@@ -268,12 +263,12 @@ function transferLikeSubsteps(args: {|
 
   // if false, show aspirate vol instead
   const showDispenseVol = stepArgs.commandCreatorFnName === 'distribute'
-
   // Call appropriate command creator with the validateForm fields.
   // Disable any mix args so those aspirate/dispenses don't show up in substeps
   const substepCommandCreator = getCommandCreatorForTransferlikeSubsteps(
     stepArgs
   )
+
   if (!substepCommandCreator) {
     assert(false, `transferLikeSubsteps could not make a command creator`)
     return null
@@ -287,7 +282,6 @@ function transferLikeSubsteps(args: {|
       initialRobotState,
       pipetteSpec.channels
     )
-
     const mergedMultiRows: Array<
       Array<StepItemSourceDestRow>
     > = mergeSubstepRowsMultiChannel({
@@ -296,7 +290,6 @@ function transferLikeSubsteps(args: {|
       channels: pipetteSpec.channels,
       showDispenseVol,
     })
-
     return {
       substepType: 'sourceDest',
       multichannel: true,
@@ -312,11 +305,12 @@ function transferLikeSubsteps(args: {|
       initialRobotState,
       1
     )
-
     const mergedRows: Array<StepItemSourceDestRow> = mergeSubstepRowsSingleChannel(
-      { substepRows, showDispenseVol }
+      {
+        substepRows,
+        showDispenseVol,
+      }
     )
-
     return {
       substepType: 'sourceDest',
       multichannel: false,
@@ -328,12 +322,12 @@ function transferLikeSubsteps(args: {|
 }
 
 export function generateSubstepItem(
-  stepArgsAndErrors: ?StepArgsAndErrors,
+  stepArgsAndErrors: StepArgsAndErrors | null | undefined,
   invariantContext: InvariantContext,
-  robotState: ?RobotState,
+  robotState: RobotState | null | undefined,
   stepId: string,
   labwareNamesByModuleId: LabwareNamesByModuleId
-): ?SubstepItemData {
+): SubstepItemData | null | undefined {
   if (!robotState) {
     console.info(
       `No robot state, could not generate substeps for step ${stepId}.` +
@@ -399,7 +393,6 @@ export function generateSubstepItem(
       stepArgs.commandCreatorFnName === 'setTemperature'
         ? stepArgs.targetTemperature
         : null
-
     return {
       substepType: 'temperature',
       temperature: temperature,

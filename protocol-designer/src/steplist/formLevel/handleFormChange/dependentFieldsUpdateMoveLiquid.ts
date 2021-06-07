@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
@@ -41,8 +40,16 @@ const wellRatioUpdatesMap = [
     prevValue: 'n:n',
     nextValue: '1:many',
     dependentFields: [
-      { name: 'changeTip', prevValue: 'perSource', nextValue: 'always' },
-      { name: 'changeTip', prevValue: 'perDest', nextValue: 'always' },
+      {
+        name: 'changeTip',
+        prevValue: 'perSource',
+        nextValue: 'always',
+      },
+      {
+        name: 'changeTip',
+        prevValue: 'perDest',
+        nextValue: 'always',
+      },
     ],
   },
   {
@@ -56,45 +63,80 @@ const wellRatioUpdatesMap = [
     prevValue: '1:many',
     nextValue: 'n:n',
     dependentFields: [
-      { name: 'changeTip', prevValue: 'perSource', nextValue: 'always' },
-      { name: 'changeTip', prevValue: 'perDest', nextValue: 'always' },
-      { name: 'path', prevValue: 'multiDispense', nextValue: 'single' },
+      {
+        name: 'changeTip',
+        prevValue: 'perSource',
+        nextValue: 'always',
+      },
+      {
+        name: 'changeTip',
+        prevValue: 'perDest',
+        nextValue: 'always',
+      },
+      {
+        name: 'path',
+        prevValue: 'multiDispense',
+        nextValue: 'single',
+      },
     ],
   },
   {
     prevValue: '1:many',
     nextValue: 'many:1',
     dependentFields: [
-      { name: 'changeTip', prevValue: 'perSource', nextValue: 'always' },
-      { name: 'changeTip', prevValue: 'perDest', nextValue: 'always' },
-      { name: 'path', prevValue: 'multiDispense', nextValue: 'single' },
+      {
+        name: 'changeTip',
+        prevValue: 'perSource',
+        nextValue: 'always',
+      },
+      {
+        name: 'changeTip',
+        prevValue: 'perDest',
+        nextValue: 'always',
+      },
+      {
+        name: 'path',
+        prevValue: 'multiDispense',
+        nextValue: 'single',
+      },
     ],
   },
   {
     prevValue: 'many:1',
     nextValue: 'n:n',
     dependentFields: [
-      { name: 'path', prevValue: 'multiAspirate', nextValue: 'single' },
+      {
+        name: 'path',
+        prevValue: 'multiAspirate',
+        nextValue: 'single',
+      },
     ],
   },
   {
     prevValue: 'many:1',
     nextValue: '1:many',
     dependentFields: [
-      { name: 'changeTip', prevValue: 'perSource', nextValue: 'always' },
-      { name: 'path', prevValue: 'multiAspirate', nextValue: 'single' },
+      {
+        name: 'changeTip',
+        prevValue: 'perSource',
+        nextValue: 'always',
+      },
+      {
+        name: 'path',
+        prevValue: 'multiAspirate',
+        nextValue: 'single',
+      },
     ],
   },
 ]
 const wellRatioUpdater = makeConditionalPatchUpdater(wellRatioUpdatesMap)
-
 export function updatePatchPathField(
   patch: FormPatch,
   rawForm: FormData,
   pipetteEntities: PipetteEntities
 ): FormPatch {
   const { id, stepType, ...stepData } = rawForm
-  const appliedPatch = { ...(stepData: FormPatch), ...patch }
+  const appliedPatch = { ...(stepData as FormPatch), ...patch }
   const { path, changeTip } = appliedPatch
 
   if (!path) {
@@ -103,6 +145,7 @@ export function updatePatchPathField(
   }
 
   let pipetteCapacityExceeded = false
+
   if (
     appliedPatch.volume &&
     typeof appliedPatch.pipette === 'string' &&
@@ -122,6 +165,7 @@ export function updatePatchPathField(
   if (pipetteCapacityExceeded || incompatiblePath) {
     return { ...patch, path: 'single' }
   }
+
   return patch
 }
 
@@ -137,14 +181,11 @@ const updatePatchOnLabwareChange = (
     'aspirate_labware'
   )
   const destLabwareChanged = fieldHasChanged(rawForm, patch, 'dispense_labware')
-
   if (!sourceLabwareChanged && !destLabwareChanged) return patch
-
   const { id, stepType, ...stepData } = rawForm
-  const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
+  const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
   // $FlowFixMe(mc, 2020-02-19): appliedPatch.pipette is type ?mixed. Address in #3161
   const pipetteId: string = appliedPatch.pipette
-
   const sourceLabwarePatch: FormPatch = sourceLabwareChanged
     ? {
         ...getDefaultFields(
@@ -160,7 +201,6 @@ const updatePatchOnLabwareChange = (
         }),
       }
     : {}
-
   const destLabwarePatch: FormPatch = destLabwareChanged
     ? {
         ...getDefaultFields(
@@ -176,11 +216,7 @@ const updatePatchOnLabwareChange = (
         }),
       }
     : {}
-
-  return {
-    ...sourceLabwarePatch,
-    ...destLabwarePatch,
-  }
+  return { ...sourceLabwarePatch, ...destLabwarePatch }
 }
 
 const updatePatchOnPipetteChange = (
@@ -194,10 +230,12 @@ const updatePatchOnPipetteChange = (
   if (fieldHasChanged(rawForm, patch, 'pipette')) {
     const newPipette = patch.pipette
     let airGapVolume: string | null = null
+
     if (typeof newPipette === 'string' && newPipette in pipetteEntities) {
       const pipetteSpec = pipetteEntities[newPipette].spec
       airGapVolume = `${pipetteSpec.minVolume}`
     }
+
     return {
       ...patch,
       ...getDefaultFields(
@@ -227,7 +265,6 @@ const clampAspirateAirGapVolume = (
 ): FormPatch => {
   const patchedAspirateAirgapVolume =
     patch.aspirate_airGap_volume ?? rawForm?.aspirate_airGap_volume
-
   const pipetteId = patch.pipette ?? rawForm.pipette
 
   if (
@@ -238,21 +275,18 @@ const clampAspirateAirGapVolume = (
     const pipetteEntity = pipetteEntities[pipetteId]
     const minPipetteVolume = getMinPipetteVolume(pipetteEntity)
     const minAirGapVolume = 0 // NOTE: a form level warning will occur if the air gap volume is below the pipette min volume
+
     const maxAirGapVolume = getPipetteCapacity(pipetteEntity) - minPipetteVolume
     const clampedAirGapVolume = clamp(
       Number(patchedAspirateAirgapVolume),
       minAirGapVolume,
       maxAirGapVolume
     )
-
     if (clampedAirGapVolume === Number(patchedAspirateAirgapVolume))
       return patch
-
-    return {
-      ...patch,
-      aspirate_airGap_volume: String(clampedAirGapVolume),
-    }
+    return { ...patch, aspirate_airGap_volume: String(clampedAirGapVolume) }
   }
+
   return patch
 }
 
@@ -262,14 +296,12 @@ const clampDispenseAirGapVolume = (
   pipetteEntities: PipetteEntities
 ): FormPatch => {
   const { id, stepType, ...stepData } = rawForm
-  const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
+  const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
   // $FlowFixMe(mc, 2020-02-19): appliedPatch.pipette is type ?mixed. Address in #3161
   const pipetteId: string = appliedPatch.pipette
-
   const disposalVolume = appliedPatch.disposalVolume_checkbox
     ? Number(appliedPatch.disposalVolume_volume) || 0
     : 0
-
   const transferVolume = Number(appliedPatch.volume)
   const dispenseAirGapVolume = Number(appliedPatch.dispense_airGap_volume)
 
@@ -281,6 +313,7 @@ const clampDispenseAirGapVolume = (
     const pipetteEntity = pipetteEntities[pipetteId]
     const capacity = getPipetteCapacity(pipetteEntity)
     const minAirGapVolume = 0 // NOTE: a form level warning will occur if the air gap volume is below the pipette min volume
+
     const maxAirGapVolume =
       appliedPatch.path === 'multiDispense'
         ? capacity - disposalVolume - transferVolume
@@ -290,14 +323,10 @@ const clampDispenseAirGapVolume = (
       minAirGapVolume,
       maxAirGapVolume
     )
-
     if (clampedAirGapVolume === dispenseAirGapVolume) return patch
-
-    return {
-      ...patch,
-      dispense_airGap_volume: String(clampedAirGapVolume),
-    }
+    return { ...patch, dispense_airGap_volume: String(clampedAirGapVolume) }
   }
+
   return patch
 }
 
@@ -307,25 +336,23 @@ const updatePatchDisposalVolumeFields = (
   pipetteEntities: PipetteEntities
 ) => {
   const { id, stepType, ...stepData } = rawForm
-  const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
-
+  const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
   const pathChangedFromMultiDispense =
     patch.path &&
     patch.path !== 'multiDispense' &&
     rawForm.path === 'multiDispense'
+
   if (pathChangedFromMultiDispense || patch.disposalVolume_checkbox === false) {
     // clear disposal volume whenever path is changed from multiDispense
     // or whenever disposalVolume_checkbox is cleared
-    return {
-      ...patch,
-      ...getClearedDisposalVolumeFields(),
-    }
+    return { ...patch, ...getClearedDisposalVolumeFields() }
   }
 
   const shouldReinitializeDisposalVolume =
     (patch.path === 'multiDispense' && rawForm.path !== 'multiDispense') ||
     (patch.pipette && patch.pipette !== rawForm.pipette) ||
     patch.disposalVolume_checkbox
+
   if (
     shouldReinitializeDisposalVolume &&
     typeof appliedPatch.pipette === 'string'
@@ -334,7 +361,6 @@ const updatePatchDisposalVolumeFields = (
     const pipetteSpec = getPipetteNameSpecs(pipetteEntity.name)
     const recommendedMinimumDisposalVol =
       (pipetteSpec && pipetteSpec.minVolume) || 0
-
     // reset to recommended vol. Expects `clampDisposalVolume` to reduce it if needed
     return {
       ...patch,
@@ -342,6 +368,7 @@ const updatePatchDisposalVolumeFields = (
       disposalVolume_volume: String(recommendedMinimumDisposalVol || 0),
     }
   }
+
   return patch
 }
 
@@ -353,15 +380,15 @@ const clampDisposalVolume = (
   pipetteEntities: PipetteEntities
 ) => {
   const { id, stepType, ...stepData } = rawForm
-  const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
+  const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
   const isDecimalString = appliedPatch.disposalVolume_volume === '.'
   if (appliedPatch.path !== 'multiDispense' || isDecimalString) return patch
-
   const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
     // $FlowFixMe(IL, 2021-03-22): appliedPath isn't well-typed, address in #3161
     appliedPatch,
     pipetteEntities
   )
+
   if (maxDisposalVolume == null) {
     assert(
       false,
@@ -371,7 +398,6 @@ const clampDisposalVolume = (
   }
 
   const candidateDispVolNum = Number(appliedPatch.disposalVolume_volume)
-
   const nextDisposalVolume = clamp(
     round(candidateDispVolNum, DISPOSAL_VOL_DIGITS),
     0,
@@ -384,11 +410,9 @@ const clampDisposalVolume = (
   }
 
   if (nextDisposalVolume > 0) {
-    return {
-      ...patch,
-      disposalVolume_volume: String(nextDisposalVolume),
-    }
+    return { ...patch, disposalVolume_volume: String(nextDisposalVolume) }
   }
+
   // clear out if path is new, or set to zero/null depending on checkbox
   return rawForm.path === 'multiDispense'
     ? {
@@ -397,10 +421,7 @@ const clampDisposalVolume = (
           ? '0'
           : null,
       }
-    : {
-        ...patch,
-        ...getClearedDisposalVolumeFields(),
-      }
+    : { ...patch, ...getClearedDisposalVolumeFields() }
 }
 
 const updatePatchOnPipetteChannelChange = (
@@ -411,15 +432,13 @@ const updatePatchOnPipetteChannelChange = (
 ) => {
   if (patch.pipette === undefined) return patch
   let update: FormPatch = {}
-
   const prevChannels = getChannels(rawForm.pipette, pipetteEntities)
   const nextChannels =
     typeof patch.pipette === 'string'
       ? getChannels(patch.pipette, pipetteEntities)
       : null
-
   const { id, stepType, ...stepData } = rawForm
-  const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
+  const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
   const singleToMulti = prevChannels === 1 && nextChannels === 8
   const multiToSingle = prevChannels === 8 && nextChannels === 1
 
@@ -449,23 +468,19 @@ const updatePatchOnPipetteChannelChange = (
     const sourceLabwareId: string = appliedPatch.aspirate_labware
     // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?mixed. Address in #3161
     const destLabwareId: string = appliedPatch.dispense_labware
-
     const sourceLabware = sourceLabwareId && labwareEntities[sourceLabwareId]
     const sourceLabwareDef = sourceLabware && sourceLabware.def
     const destLabware = destLabwareId && labwareEntities[destLabwareId]
     const destLabwareDef = destLabware && destLabware.def
-
     update = {
       aspirate_wells: getAllWellsFromPrimaryWells(
         // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_wells is type ?mixed. Address in #3161
-        appliedPatch.aspirate_wells,
-        // $FlowFixMe(mc, 2020-04-29): sourceLabwareDef is not typed properly. Address in #3161
+        appliedPatch.aspirate_wells, // $FlowFixMe(mc, 2020-04-29): sourceLabwareDef is not typed properly. Address in #3161
         sourceLabwareDef
       ),
       dispense_wells: getAllWellsFromPrimaryWells(
         // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_wells is type ?mixed. Address in #3161
-        appliedPatch.dispense_wells,
-        // $FlowFixMe(mc, 2020-04-29): destLabwareDef is not typed properly. Address in #3161
+        appliedPatch.dispense_wells, // $FlowFixMe(mc, 2020-04-29): destLabwareDef is not typed properly. Address in #3161
         destLabwareDef
       ),
     }
@@ -499,14 +514,13 @@ function updatePatchOnWellRatioChange(
   }
 
   if (nextWellRatio === prevWellRatio) return patch
-
   return {
     ...patch,
     ...(wellRatioUpdater(
       prevWellRatio,
       nextWellRatio,
       appliedPatch
-    ): FormPatch),
+    ) as FormPatch),
   }
 }
 
@@ -522,6 +536,7 @@ function updatePatchMixFields(patch: FormPatch, rawForm: FormData): FormPatch {
         ),
       }
     }
+
     if (patch.path === 'multiDispense') {
       return {
         ...patch,
@@ -533,6 +548,7 @@ function updatePatchMixFields(patch: FormPatch, rawForm: FormData): FormPatch {
       }
     }
   }
+
   return patch
 }
 
@@ -541,7 +557,7 @@ export function updatePatchBlowoutFields(
   rawForm: FormData
 ): FormPatch {
   const { id, stepType, ...stepData } = rawForm
-  const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
+  const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
 
   if (fieldHasChanged(rawForm, patch, 'path')) {
     const { path, blowout_location } = appliedPatch
@@ -552,16 +568,14 @@ export function updatePatchBlowoutFields(
         blowout_location === SOURCE_WELL_BLOWOUT_DESTINATION) ||
       (path === 'multiDispense' &&
         blowout_location === DEST_WELL_BLOWOUT_DESTINATION)
+
     if (shouldResetBlowoutLocation) {
-      return {
-        ...patch,
-        ...getDefaultFields('blowout_location'),
-      }
+      return { ...patch, ...getDefaultFields('blowout_location') }
     }
   }
+
   return patch
 }
-
 export function dependentFieldsUpdateMoveLiquid(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated

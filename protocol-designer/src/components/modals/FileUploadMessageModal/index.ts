@@ -1,4 +1,4 @@
-// @flow
+import { $Diff } from 'utility-types'
 import * as React from 'react'
 import { FileUploadMessageModal as FileUploadMessageModalComponent } from './FileUploadMessageModal'
 import { connect } from 'react-redux'
@@ -8,14 +8,11 @@ import {
 } from '../../../load-file'
 import type { Dispatch } from 'redux'
 import type { BaseState } from '../../../types'
-
 type Props = React.ElementProps<typeof FileUploadMessageModalComponent>
-
-type SP = {|
-  message: $PropertyType<Props, 'message'>,
-|}
-
-type DP = $Rest<$Exact<Props>, SP>
+type SP = {
+  message: Props['message']
+}
+type DP = $Diff<Props, SP>
 
 function mapStateToProps(state: BaseState): SP {
   return {
@@ -23,16 +20,16 @@ function mapStateToProps(state: BaseState): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch<*>): DP {
+function mapDispatchToProps(dispatch: Dispatch<any>): DP {
   return {
     cancelProtocolMigration: () => dispatch(loadFileActions.undoLoadFile()),
     dismissModal: () => dispatch(loadFileActions.dismissFileUploadMessage()),
   }
 }
 
-export const FileUploadMessageModal: React.AbstractComponent<{||}> = connect<
+export const FileUploadMessageModal: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   DP,
   _,
