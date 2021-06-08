@@ -17,10 +17,7 @@ jest.mock('../../../modules/utils')
 const useFormikContext: JestMockFn<[], $Call<typeof Formik.useFormikContext>> =
   Formik.useFormikContext
 
-const isModuleWithCollisionIssueMock: JestMockFn<
-  any,
-  any
-> = isModuleWithCollisionIssue
+const isModuleWithCollisionIssueMock: jest.MockedFunction<any> = isModuleWithCollisionIssue
 
 const SUPPORTED_SLOT = '1'
 

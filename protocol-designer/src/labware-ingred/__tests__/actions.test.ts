@@ -16,12 +16,9 @@ jest.mock('../../ui/labware/selectors')
 jest.mock('../../utils')
 jest.mock('../utils')
 
-const mockGetLabwareDefsByURI: JestMockFn<any, any> = getLabwareDefsByURI
+const mockGetLabwareDefsByURI: jest.MockedFunction<any> = getLabwareDefsByURI
 
-const mockGetLabwareNicknamesById: JestMockFn<
-  any,
-  any
-> = getLabwareNicknamesById
+const mockGetLabwareNicknamesById: jest.MockedFunction<any> = getLabwareNicknamesById
 
 const mockUuid: JestMockFn<[], string> = uuid
 

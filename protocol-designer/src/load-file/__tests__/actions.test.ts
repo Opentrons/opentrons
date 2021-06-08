@@ -5,8 +5,8 @@ import { saveFile as saveFileUtil } from '../utils'
 jest.mock('../../file-data/selectors/fileCreator')
 jest.mock('../../file-data/selectors/fileFields')
 jest.mock('../utils')
-const createFileSelectorMock: JestMockFn<any, any> = createFile
-const getFileMetadataMock: JestMockFn<any, any> = getFileMetadata
+const createFileSelectorMock: jest.MockedFunction<any> = createFile
+const getFileMetadataMock: jest.MockedFunction<any> = getFileMetadata
 const saveFileUtilMock: JestMockFn<[any, string], any> = saveFileUtil
 afterEach(() => {
   jest.resetAllMocks()
