@@ -24,37 +24,33 @@ class CommandQueueWorker:
     def play(self) -> None:
         """Start executing the `ProtocolEngine`'s queued commands.
 
-        The commands are executed in order, one by one, in a concurrent background task.
+        The commands are executed in order, one by one, in the background via asyncio
+        tasks.
 
-        See `wait_terminated` for when execution may stop.
-
-        If this `CommandQueueWorker` was already executing queued commands,
-        this method is a no-op.
+        See `wait_to_be_idle` for when execution may stop.
         """
-        if self._task is None:
-            self._terminate = False
-            self._task = asyncio.create_task(self._loop())
+        # todo(mm, 2021-06-07): How should things work if you pause and resume multiple
+        # times while a single command is executing? To ensure clean sequencing,
+        # would each resume need to be preceded by a wait_to_be_idle() call? If so,
+        # the resume request could block for multiple seconds. If not, there might be
+        # a race condition where a resume is ignored depending on the timing of
+        # self._task getting set to None. Resolving this might require more detailed
+        # state handling than "has a task" vs. "doesn't have a task".
+        if nself._task is None
+            self._keep_running = True
+            self._start_scheduling_rest_if_still_running()
 
     def pause(self) -> None:
         """Equivalent to `stop`."""
         self.stop()
 
     def stop(self) -> None:
-        """Stop queued command execution.
+        """Stop executing any more queued commands.
 
-        If a command is currently executing, it will continue. Further commands will
-        be left unexecuted in the queue.
-
-        If this worker was already stopped, this method is a no-op.
+        If a command is currently in the middle of executing, it will continue until
+        it's done. Further commands will be left unexecuted in the queue.
         """
         if self._task is not None:
-            self._terminate = True
-            # fixme(mm, 2021-05-18): I think this is a bug if stop() is called before
-            # wait_terminated(). It discards the background task before it's awaited,
-            # which both leaks the task and throws away any errors raised in the task
-            # that we haven't yet seen.
-            self._task = None
-
             self._keep_running = False
 
     async def wait_to_be_idle(self) -> None:
@@ -84,8 +80,9 @@ class CommandQueueWorker:
         it. This gives it a chance to clean up its background task, and propagate any
         errors.
         """
-        if self._task:
+        if self._task is not None:
             await self._task
+            self._task = None
 
     def _start_scheduling_rest_if_still_running(self) -> None:
         if self._keep_running:
