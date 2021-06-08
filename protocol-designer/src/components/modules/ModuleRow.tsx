@@ -22,12 +22,12 @@ import styles from './styles.css'
 import type { ModuleRealType } from '@opentrons/shared-data'
 import type { ModuleOnDeck } from '../../step-forms'
 
-type Props = {|
-  moduleOnDeck?: ModuleOnDeck,
-  showCollisionWarnings?: boolean,
-  type: ModuleRealType,
-  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed,
-|}
+type Props = {
+  moduleOnDeck?: ModuleOnDeck
+  showCollisionWarnings?: boolean
+  type: ModuleRealType
+  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed
+}
 
 export function ModuleRow(props: Props): React.Node {
   const { moduleOnDeck, openEditModuleModal, showCollisionWarnings } = props

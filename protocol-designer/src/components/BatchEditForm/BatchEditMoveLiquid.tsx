@@ -31,10 +31,10 @@ import formStyles from '../forms/forms.css'
 import styles from '../StepEditForm/StepEditForm.css'
 import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
 
-const SourceDestBatchEditMoveLiquidFields = (props: {|
+const SourceDestBatchEditMoveLiquidFields = (props: {
   prefix: 'aspirate' | 'dispense',
   propsForFields: FieldPropsByName,
-|}): React.Node => {
+}): React.Node => {
   const { prefix, propsForFields } = props
   const addFieldNamePrefix = name => `${prefix}_${name}`
 
@@ -149,12 +149,12 @@ const SourceDestBatchEditMoveLiquidFields = (props: {|
   )
 }
 
-type BatchEditMoveLiquidProps = {|
+type BatchEditMoveLiquidProps = {
   batchEditFormHasChanges: boolean,
   propsForFields: FieldPropsByName,
   handleCancel: () => mixed,
   handleSave: () => mixed,
-|}
+}
 export const BatchEditMoveLiquid = (
   props: BatchEditMoveLiquidProps
 ): React.Node => {

@@ -15,15 +15,15 @@ import type { StepIdType } from '../../form-types'
 
 const MENU_OFFSET_PX = 5
 
-type Props = {|
+type Props = {
   children: ({
     makeStepOnContextMenu: StepIdType => (
       event: SyntheticMouseEvent<>
     ) => mixed,
   }) => React.Node,
-|}
+}
 
-type Position = {| left: number | null, top: number | null |}
+type Position = { left: number | null, top: number | null }
 
 export const ContextMenu = (props: Props): React.Node => {
   const dispatch = useDispatch()

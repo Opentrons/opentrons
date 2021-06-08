@@ -14,12 +14,12 @@ import type { BaseState, ThunkDispatch } from '../../types'
 type Props = React.ElementProps<typeof LiquidEditForm>
 type WrapperProps = { showForm: boolean, formKey: string, formProps: Props }
 
-type SP = {|
+type SP = {
   ...$Exact<LiquidGroup>,
   _liquidGroupId: ?string,
   showForm: boolean,
   canDelete: $ElementType<Props, 'canDelete'>,
-|}
+}
 
 function LiquidEditFormWrapper(props: WrapperProps) {
   const { showForm, formKey, formProps } = props
@@ -90,11 +90,11 @@ function mergeProps(
   }
 }
 
-export const LiquidsPage: React.AbstractComponent<{||}> = connect<
+export const LiquidsPage: React.AbstractComponent<{}> = connect<
   WrapperProps,
-  {||},
+  {},
   SP,
-  {||},
+  {},
   _,
   _
 >(

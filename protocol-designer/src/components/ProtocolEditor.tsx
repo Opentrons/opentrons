@@ -56,6 +56,6 @@ function ProtocolEditorComponent() {
   )
 }
 
-export const ProtocolEditor: React.AbstractComponent<{||}> = DragDropContext(
+export const ProtocolEditor: React.AbstractComponent<{}> = DragDropContext(
   MouseBackEnd
 )(ProtocolEditorComponent)

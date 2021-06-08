@@ -32,11 +32,11 @@ const ALL_PATH_OPTIONS = [
   },
 ]
 
-type PathFieldProps = {|
+type PathFieldProps = {
   ...FieldProps,
   ...ValuesForPath,
   disabledPathMap: DisabledPathMap,
-|}
+}
 
 type ButtonProps = {
   children?: React.Node,

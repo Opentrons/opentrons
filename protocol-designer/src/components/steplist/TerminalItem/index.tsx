@@ -22,11 +22,11 @@ import type { TerminalItemId } from '../../../steplist'
 
 export { TerminalItemLink } from './TerminalItemLink'
 
-type Props = {|
-  children?: React.Node,
-  id: TerminalItemId,
-  title: string,
-|}
+type Props = {
+  children?: React.Node
+  id: TerminalItemId
+  title: string
+}
 
 export const TerminalItem = (props: Props): React.Node => {
   const { id, title, children } = props

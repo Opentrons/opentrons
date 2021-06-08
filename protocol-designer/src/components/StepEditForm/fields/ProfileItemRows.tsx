@@ -36,18 +36,18 @@ export const showProfileFieldErrors = ({
   fieldId,
   focusedField,
   dirtyFields,
-}: {|
+}: {
   fieldId: string,
   focusedField: ?string,
   dirtyFields: Array<string>,
-|}): boolean =>
+}): boolean =>
   !(fieldId === focusedField) && dirtyFields && dirtyFields.includes(fieldId)
 
-type ProfileCycleRowProps = {|
+type ProfileCycleRowProps = {
   cycleItem: ProfileCycleItem,
   focusHandlers: FocusHandlers,
   stepOffset: number,
-|}
+}
 export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   const { cycleItem, focusHandlers, stepOffset } = props
   const dispatch = useDispatch()
@@ -139,14 +139,14 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   )
 }
 
-export type ProfileItemRowsProps = {|
+export type ProfileItemRowsProps = {
   focusHandlers: FocusHandlers,
   orderedProfileItems: Array<string>,
   profileItemsById: {
     [string]: ProfileItem,
     ...
   },
-|}
+}
 
 export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
   const { orderedProfileItems, profileItemsById } = props
@@ -230,14 +230,14 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
   )
 }
 
-type ProfileFieldProps = {|
+type ProfileFieldProps = {
   name: string,
   focusHandlers: FocusHandlers,
   profileItem: ProfileItem,
   units?: React.Node,
   className?: string,
   updateValue: (name: string, value: mixed) => mixed,
-|}
+}
 const ProfileField = (props: ProfileFieldProps) => {
   const {
     focusHandlers,
@@ -289,12 +289,12 @@ const ProfileField = (props: ProfileFieldProps) => {
   )
 }
 
-type ProfileStepRowProps = {|
+type ProfileStepRowProps = {
   focusHandlers: FocusHandlers,
   profileStepItem: ProfileStepItem,
   stepNumber: number,
   isCycle?: ?boolean,
-|}
+}
 
 const ProfileStepRow = (props: ProfileStepRowProps) => {
   const { focusHandlers, profileStepItem, isCycle } = props

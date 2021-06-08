@@ -14,8 +14,8 @@ import type { BaseState } from '../types'
 import type { Page } from '../navigation'
 
 type Props = {
-  page: Page,
-  liquidPlacementMode: boolean,
+  page: Page
+  liquidPlacementMode: boolean
 }
 
 function Sidebar(props: Props) {
@@ -49,9 +49,9 @@ function mapStateToProps(state: BaseState): $Exact<Props> {
   }
 }
 
-export const ConnectedSidebar: React.AbstractComponent<{||}> = connect<
+export const ConnectedSidebar: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   _,
   _,
   _,

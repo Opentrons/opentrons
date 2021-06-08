@@ -12,11 +12,11 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import { WellTooltip } from './WellTooltip'
 
-type Props = {|
-  definition: ?LabwareDefinition2,
-  ingredNames: WellIngredientNames,
-  wellContents: ContentsByWell,
-|}
+type Props = {
+  definition: ?LabwareDefinition2
+  ingredNames: WellIngredientNames
+  wellContents: ContentsByWell
+}
 
 export function BrowsableLabware(props: Props): React.Node {
   const { definition, ingredNames, wellContents } = props

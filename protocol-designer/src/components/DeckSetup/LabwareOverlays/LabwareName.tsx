@@ -6,13 +6,13 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import type { LabwareOnDeck } from '../../../step-forms'
-type OP = {|
+type OP = {
   labwareOnDeck: LabwareOnDeck,
-|}
+}
 
-type SP = {|
+type SP = {
   nickname: ?string,
-|}
+}
 
 type Props = { ...OP, ...SP }
 

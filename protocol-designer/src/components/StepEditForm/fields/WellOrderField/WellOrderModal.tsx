@@ -25,7 +25,7 @@ const WELL_ORDER_VALUES: Array<WellOrderOption> = [
   ...VERTICAL_VALUES,
   ...HORIZONTAL_VALUES,
 ]
-type Props = {|
+type Props = {
   isOpen: boolean,
   closeModal: () => mixed,
   prefix: 'aspirate' | 'dispense' | 'mix',
@@ -37,20 +37,20 @@ type Props = {|
     firstValue: ?WellOrderOption,
     secondValue: ?WellOrderOption
   ) => void,
-|}
+}
 
-type State = {|
+type State = {
   firstValue: WellOrderOption,
   secondValue: WellOrderOption,
-|}
+}
 
-export const ResetButton = (props: {| onClick: () => void |}): React.Node => (
+export const ResetButton = (props: { onClick: () => void }): React.Node => (
   <OutlineButton className={modalStyles.button_medium} onClick={props.onClick}>
     {i18n.t('button.reset')}
   </OutlineButton>
 )
 
-export const CancelButton = (props: {| onClick: () => void |}): React.Node => (
+export const CancelButton = (props: { onClick: () => void }): React.Node => (
   <PrimaryButton
     className={cx(modalStyles.button_medium, modalStyles.button_right_of_break)}
     onClick={props.onClick}
@@ -59,7 +59,7 @@ export const CancelButton = (props: {| onClick: () => void |}): React.Node => (
   </PrimaryButton>
 )
 
-export const DoneButton = (props: {| onClick: () => void |}): React.Node => (
+export const DoneButton = (props: { onClick: () => void }): React.Node => (
   <PrimaryButton className={modalStyles.button_medium} onClick={props.onClick}>
     {i18n.t('button.done')}
   </PrimaryButton>
@@ -78,10 +78,10 @@ export class WellOrderModal extends React.Component<Props, State> {
     }
   }
 
-  getInitialFirstValues: () => {|
+  getInitialFirstValues: () => {
     initialFirstValue: WellOrderOption,
     initialSecondValue: WellOrderOption,
-  |} = () => {
+  } = () => {
     const { firstValue, secondValue } = this.props
     if (firstValue == null || secondValue == null) {
       return {

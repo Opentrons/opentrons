@@ -27,17 +27,17 @@ import type { BaseState } from '../types'
 import type { ContentsByWell } from '../labware-ingred/types'
 import type { WellIngredientNames } from '../steplist'
 
-type SP = {|
+type SP = {
   selectedWells: WellGroup,
   wellContents: ContentsByWell,
   labwareDef: ?LabwareDefinition2,
   liquidNamesById: WellIngredientNames,
-|}
+}
 
-type DP = {|
+type DP = {
   selectWells: WellGroup => mixed,
   deselectWells: WellGroup => mixed,
-|}
+}
 
 type Props = { ...SP, ...DP }
 
@@ -127,9 +127,9 @@ const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   selectWells: wells => dispatch(selectWells(wells)),
 })
 
-export const LiquidPlacementModal: React.AbstractComponent<{||}> = connect<
+export const LiquidPlacementModal: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   _,
   _,
   _,

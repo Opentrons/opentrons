@@ -22,9 +22,9 @@ type Props = {
   optOut: () => mixed,
 }
 
-type SP = {|
+type SP = {
   hasOptedIn: $PropertyType<Props, 'hasOptedIn'>,
-|}
+}
 
 type DP = $Rest<$Exact<Props>, SP>
 
@@ -177,9 +177,9 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const GateModal: React.AbstractComponent<{||}> = connect<
+export const GateModal: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   DP,
   _,

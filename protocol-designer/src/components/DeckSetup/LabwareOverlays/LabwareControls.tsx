@@ -13,14 +13,14 @@ import { LabwareName } from './LabwareName'
 import { LabwareHighlight } from './LabwareHighlight'
 import styles from './LabwareOverlays.css'
 
-type LabwareControlsProps = {|
+type LabwareControlsProps = {
   labwareOnDeck: LabwareOnDeck,
   selectedTerminalItemId: ?TerminalItemId,
   slot: DeckSlot,
   setHoveredLabware: (?LabwareOnDeck) => mixed,
   setDraggedLabware: (?LabwareOnDeck) => mixed,
   swapBlocked: boolean,
-|}
+}
 
 export const LabwareControls = (props: LabwareControlsProps): React.Node => {
   const {

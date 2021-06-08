@@ -4,11 +4,11 @@ import { Icon } from '@opentrons/components'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import styles from './styles.css'
 
-type Props = {|
-  showDiagram?: boolean,
-  magnetOnDeck: ?boolean,
-  temperatureOnDeck: ?boolean,
-|}
+type Props = {
+  showDiagram?: boolean
+  magnetOnDeck: ?boolean
+  temperatureOnDeck: ?boolean
+}
 
 export function CrashInfoBox(props: Props): React.Node {
   const moduleMessage = getCrashableModulesCopy(props) || ''

@@ -18,7 +18,7 @@ import type {
 } from '../../steplist/types'
 import styles from './StepItem.css'
 
-type SubstepRowProps = {|
+type SubstepRowProps = {
   volume?: ?number | ?string,
   source?: SubstepWellData,
   dest?: SubstepWellData,
@@ -27,7 +27,7 @@ type SubstepRowProps = {|
   stepId: string,
   substepIndex: number,
   selectSubstep?: SubstepIdentifier => mixed,
-|}
+}
 
 type PillTooltipContentsProps = {
   ingreds: WellIngredientVolumeData | LocationLiquidState,

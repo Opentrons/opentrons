@@ -13,11 +13,11 @@ import { Alerts, type Props } from './Alerts'
 import type { CommandCreatorError } from '@opentrons/step-generation'
 import type { BaseState } from '../../types'
 
-type SP = {|
+type SP = {
   errors: $PropertyType<Props, 'errors'>,
   warnings: $PropertyType<Props, 'warnings'>,
   _stepId: ?string,
-|}
+}
 
 /** Errors and Warnings from step-generation are written for developers
  * who are using step-generation as an API for writing Opentrons protocols.
@@ -75,11 +75,11 @@ function mergeProps(
   }
 }
 
-export const TimelineAlerts: React.AbstractComponent<{||}> = connect<
+export const TimelineAlerts: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
-  {||},
+  {},
   _,
   _
 >(

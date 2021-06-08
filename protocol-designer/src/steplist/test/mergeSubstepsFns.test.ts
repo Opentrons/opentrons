@@ -23,7 +23,7 @@ const repeatIngreds = (
     : ingreds
 }
 
-const getFixtures = ({ isMulti }: {| isMulti: boolean |}) => {
+const getFixtures = ({ isMulti }: { isMulti: boolean }) => {
   const makeIngreds = (volume: number | null, colNum: string) =>
     repeatIngreds(isMulti, colNum, volume ? { [ingred1Id]: volume } : null)
   // NOTE: these cases do not cover dynamic behavior of `activeTips` key

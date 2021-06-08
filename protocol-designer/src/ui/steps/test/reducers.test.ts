@@ -204,12 +204,12 @@ describe('selectedItem reducer', () => {
       type: 'SELECT_MULTIPLE_STEPS',
       payload: { stepIds, lastSelected },
     }
-    const multiTestCases: {|
+    const multiTestCases: {
       title: string,
       prev: SelectableItem | null,
       action: SelectMultipleStepsAction,
       expected: SelectableItem | null,
-    |} = [
+    } = [
       {
         title: 'should enter multi-select mode from null',
         prev: null,
