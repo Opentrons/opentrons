@@ -4,7 +4,7 @@ import type { ModuleOnDeck } from '../../../step-forms'
 import type { StepIdType, FormData } from '../../../form-types'
 export function getNextDefaultTemperatureModuleId(
   savedForms: Record<StepIdType, FormData>,
-  orderedStepIds: Array<StepIdType>,
+  orderedStepIds: StepIdType[],
   equippedModulesById: Record<string, ModuleOnDeck>
 ): string | null {
   return (

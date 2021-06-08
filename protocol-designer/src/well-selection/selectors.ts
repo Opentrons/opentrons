@@ -13,7 +13,7 @@ export const getHighlightedWells: Selector<WellGroup> = createSelector(
   rootSelector,
   state => state.selectedWells.highlighted
 )
-export const getSelectedWellNames: Selector<Array<string>> = createSelector(
+export const getSelectedWellNames: Selector<string[]> = createSelector(
   (state: BaseState) => rootSelector(state).selectedWells.selected,
   selectedWells => Object.keys(selectedWells).sort(sortWells)
 )

@@ -3,7 +3,7 @@ import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 jest.mock('../../steplist/fieldLevel')
 const mockGetProfileFieldErrors: JestMockFn<
   [string, string],
-  Array<string>
+  string[]
 > = getProfileFieldErrors
 describe('getProfileItemsHaveErrors', () => {
   const testCases = [

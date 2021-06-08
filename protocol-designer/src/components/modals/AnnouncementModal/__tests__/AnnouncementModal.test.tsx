@@ -16,7 +16,7 @@ describe('AnnouncementModal', () => {
     persist.getLocalStorageItem
 
   const announcementsMock: {
-    announcements: Array<Announcement>
+    announcements: Announcement[]
   } = announcements
 
   beforeEach(() => {

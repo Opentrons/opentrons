@@ -31,8 +31,8 @@ export function getWellRatio(
   return null
 }
 export const getNextNonTerminalItemId = (
-  orderedStepIds: Array<StepIdType>,
-  stepsToDelete: Array<StepIdType>
+  orderedStepIds: StepIdType[],
+  stepsToDelete: StepIdType[]
 ): StepIdType | null => {
   let highestDeletedIndex = stepsToDelete.reduce((highestIndex, val) => {
     const currentStepIndex = orderedStepIds.indexOf(val)

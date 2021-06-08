@@ -19,7 +19,7 @@ type Props = React.ElementProps<typeof LiquidPlacementFormComponent>
 type SP = $Diff<
   Props & {
     _labwareId: string | null | undefined
-    _selectedWells: Array<string> | null | undefined
+    _selectedWells: string[] | null | undefined
     _selectionHasLiquids: boolean
   },
   {

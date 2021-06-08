@@ -26,7 +26,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
     reorderSelectedStep: (delta: number) => {
       dispatch(stepsActions.reorderSelectedStep(delta))
     },
-    reorderSteps: (stepIds: Array<StepIdType>) => {
+    reorderSteps: (stepIds: StepIdType[]) => {
       dispatch(steplistActions.reorderSteps(stepIds))
     },
   }

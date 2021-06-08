@@ -110,7 +110,7 @@ const getSlotDefForModuleSlot = (
 const getModuleSlotDefs = (
   initialDeckSetup: InitialDeckSetup,
   deckSlots: { [slotId: string]: DeckDefSlot }
-): Array<DeckDefSlot> => {
+): DeckDefSlot[] => {
   return values(initialDeckSetup.modules).map((moduleOnDeck: ModuleOnDeck) =>
     getSlotDefForModuleSlot(moduleOnDeck, deckSlots)
   )
@@ -203,15 +203,15 @@ export const DeckSetupContents = (props: ContentsProps): React.Node => {
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(
     props.initialDeckSetup
   )
-  const deckSlots: Array<DeckDefSlot> = values(deckSlotsById)
+  const deckSlots: DeckDefSlot[] = values(deckSlotsById)
   const moduleSlots = getModuleSlotDefs(initialDeckSetup, deckSlotsById)
   // NOTE: in these arrays of slots, order affects SVG render layering
   // labware can be in a module or on the deck
-  const labwareParentSlots: Array<DeckDefSlot> = [...deckSlots, ...moduleSlots]
+  const labwareParentSlots: DeckDefSlot[] = [...deckSlots, ...moduleSlots]
   // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
   const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
 
-  const allLabware: Array<LabwareOnDeckType> = Object.keys(
+  const allLabware: LabwareOnDeckType[] = Object.keys(
     initialDeckSetup.labware
   ).reduce((acc, labwareId) => {
     const labware = initialDeckSetup.labware[labwareId]
@@ -220,10 +220,10 @@ export const DeckSetupContents = (props: ContentsProps): React.Node => {
       : [...acc, labware]
   }, [])
 
-  const allModules: Array<ModuleOnDeck> = values(initialDeckSetup.modules)
+  const allModules: ModuleOnDeck[] = values(initialDeckSetup.modules)
 
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
-  const multichannelWarningSlots: Array<DeckDefSlot> = showGen1MultichannelCollisionWarnings
+  const multichannelWarningSlots: DeckDefSlot[] = showGen1MultichannelCollisionWarnings
     ? compact([
         (allModules.some(
           moduleOnDeck =>

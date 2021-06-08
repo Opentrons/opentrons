@@ -40,8 +40,8 @@ type SP = {
 type CreateNewProtocolArgs = {
   customLabware: LabwareDefByDefURI
   newProtocolFields: NewProtocolFields
-  pipettes: Array<PipetteFieldsData>
-  modules: Array<ModuleCreationArgs>
+  pipettes: PipetteFieldsData[]
+  modules: ModuleCreationArgs[]
 }
 type DP = {
   onCancel: () => unknown
@@ -118,7 +118,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
         dispatch(stepFormActions.createModule(moduleArgs))
       )
       // auto-generate tipracks for pipettes
-      const newTiprackModels: Array<string> = uniq(
+      const newTiprackModels: string[] = uniq(
         pipettes.map(pipette => pipette.tiprackDefURI)
       )
       newTiprackModels.forEach(tiprackDefURI => {

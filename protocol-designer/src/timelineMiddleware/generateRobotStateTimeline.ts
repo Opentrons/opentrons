@@ -4,7 +4,7 @@ import * as StepGeneration from '@opentrons/step-generation'
 import type { StepArgsAndErrorsById } from '../steplist/types'
 export type GenerateRobotStateTimelineArgs = {
   allStepArgsAndErrors: StepArgsAndErrorsById
-  orderedStepIds: Array<string>
+  orderedStepIds: string[]
   initialRobotState: StepGeneration.RobotState
   invariantContext: StepGeneration.InvariantContext
 }

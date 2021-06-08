@@ -7,10 +7,10 @@ export function getUnusedEntities<T>(
   entities: Record<string, T>,
   stepForms: SavedStepFormState,
   entityKey: 'pipette' | 'moduleId'
-): Array<T> {
+): T[] {
   return reduce(
     entities,
-    (acc, entity, entityId): Array<T> => {
+    (acc, entity, entityId): T[] => {
       const stepContainsEntity = some(
         stepForms,
         form => form[entityKey] === entityId

@@ -42,7 +42,7 @@ const OUT_OF_BOUNDS: 'OUT_OF_BOUNDS' = 'OUT_OF_BOUNDS'
 type Error = typeof TOO_MANY_DECIMALS | typeof OUT_OF_BOUNDS
 
 const getErrorText = (args: {
-  errors: Array<Error>,
+  errors: Error[],
   maxMmFromBottom: number,
   minMmFromBottom: number,
   isPristine: boolean,
@@ -66,7 +66,7 @@ const getErrors = (args: {
   value: string | null,
   maxMmFromBottom: number,
   minMmFromBottom: number,
-}): Array<Error> => {
+}): Error[] => {
   const { isDefault, value, maxMmFromBottom, minMmFromBottom } = args
   const errors = []
   if (isDefault) return errors

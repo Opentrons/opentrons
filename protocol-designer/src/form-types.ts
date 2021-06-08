@@ -111,7 +111,7 @@ export type MixForm = AnnotationFields &
     pipette?: string
     times?: string
     volume?: string
-    wells?: Array<string>
+    wells?: string[]
     touchTip?: boolean
   }
 export type PauseForm = AnnotationFields & {
@@ -147,7 +147,7 @@ export type ProfileStepItem = {
 export type ProfileCycleItem = {
   type: typeof PROFILE_CYCLE
   id: string
-  steps: Array<ProfileStepItem>
+  steps: ProfileStepItem[]
   repetitions: string
 }
 // TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
@@ -173,7 +173,7 @@ export type HydratedMoveLiquidFormData = {
     aspirate_wells_grouped: boolean | null | undefined
     preWetTip: boolean | null | undefined
     aspirate_labware: LabwareEntity
-    aspirate_wells: Array<string>
+    aspirate_wells: string[]
     aspirate_wellOrder_first: WellOrderOption
     aspirate_wellOrder_second: WellOrderOption
     aspirate_flowRate: number | null | undefined
@@ -195,7 +195,7 @@ export type HydratedMoveLiquidFormData = {
     dispense_delay_seconds: number | null | undefined
     dispense_delay_mmFromBottom: number | null | undefined
     dispense_labware: LabwareEntity
-    dispense_wells: Array<string>
+    dispense_wells: string[]
     dispense_wellOrder_first: WellOrderOption
     dispense_wellOrder_second: WellOrderOption
     dispense_flowRate: number | null | undefined
@@ -220,7 +220,7 @@ export type HydratedMixFormDataLegacy = {
   volume: number
   changeTip: ChangeTipOptions
   labware: LabwareEntity
-  wells: Array<string>
+  wells: string[]
   mix_wellOrder_first: WellOrderOption
   mix_wellOrder_second: WellOrderOption
   aspirate_flowRate: number | null | undefined

@@ -1,7 +1,7 @@
 import type { FormData, StepFieldName } from '../../form-types'
 export type FocusHandlers = {
   focusedField: StepFieldName | null
-  dirtyFields: Array<StepFieldName>
+  dirtyFields: StepFieldName[]
   // NOTE: focus & blur take a field name as an arg, unlike onFieldBlur/onFieldFocus in FieldProps
   focus: (arg0: StepFieldName) => void
   blur: (arg0: StepFieldName) => void

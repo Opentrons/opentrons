@@ -50,10 +50,10 @@ export const getLabwareDefinitionsInUse = (
   pipettes: PipetteEntities,
   allLabwareDefsByURI: LabwareDefByDefURI
 ): LabwareDefByDefURI => {
-  const labwareDefURIsOnDeck: Array<string> = Object.keys(labware).map(
+  const labwareDefURIsOnDeck: string[] = Object.keys(labware).map(
     (labwareId: string) => labware[labwareId].labwareDefURI
   )
-  const tiprackDefURIsInUse: Array<string> = Object.keys(pipettes)
+  const tiprackDefURIsInUse: string[] = Object.keys(pipettes)
     .map(id => pipettes[id])
     .map((pipetteEntity: PipetteEntity) => pipetteEntity.tiprackDefURI)
   const labwareDefURIsInUse = uniq([
@@ -224,7 +224,7 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       pipetteEntities,
       labwareDefsByURI
     )
-    const commands: Array<Command> = flatMap(
+    const commands: Command[] = flatMap(
       robotStateTimeline.timeline,
       timelineFrame => timelineFrame.commands
     )

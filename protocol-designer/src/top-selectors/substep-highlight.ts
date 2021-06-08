@@ -17,8 +17,8 @@ export type AllWellHighlights = Record<string, true> // NOTE: all keys are true.
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,
   labwareEntity: LabwareEntity,
-  wells: Array<string>
-): Array<string> {
+  wells: string[]
+): string[] {
   // `wells` is all the wells that pipette's channel 1 interacts with.
   if (pipetteEntity.spec.channels === 8) {
     return wells.reduce((acc, well) => {
@@ -36,7 +36,7 @@ function _getSelectedWellsForStep(
   labwareId: string,
   frame: StepGeneration.CommandsAndRobotState,
   invariantContext: StepGeneration.InvariantContext
-): Array<string> {
+): string[] {
   if (StepGeneration.getHasNoWellsFromCCArgs(stepArgs)) {
     return []
   }
@@ -51,7 +51,7 @@ function _getSelectedWellsForStep(
     return []
   }
 
-  const getWells = (wells: Array<string>) =>
+  const getWells = (wells: string[]) =>
     _wellsForPipette(pipetteEntity, labwareEntity, wells)
 
   const wells = []
@@ -123,13 +123,13 @@ function _getSelectedWellsForSubstep(
   substeps: SubstepItemData | null | undefined,
   substepIndex: number,
   invariantContext: StepGeneration.InvariantContext
-): Array<string> {
+): string[] {
   if (substeps === null) {
     return []
   }
 
   // TODO: Ian 2018-10-01 proper type for wellField enum
-  function getWells(wellField: 'source' | 'dest'): Array<string> {
+  function getWells(wellField: 'source' | 'dest'): string[] {
     // ignore substeps with no well fields
     // TODO: Ian 2019-01-29 be more explicit about commandCreatorFnName,
     // don't rely so heavily on the fact that their well fields are the same now
@@ -152,7 +152,7 @@ function _getSelectedWellsForSubstep(
     return []
   }
 
-  const wells: Array<string> = []
+  const wells: string[] = []
 
   // single-labware steps
   if (
@@ -242,7 +242,7 @@ export const wellHighlightsByLabwareId: Selector<
         labwareLiquids: StepGeneration.SingleLabwareLiquidState,
         labwareId: string
       ): AllWellHighlights => {
-        let selectedWells: Array<string> = []
+        let selectedWells: string[] = []
 
         if (hoveredSubstep != null) {
           // wells for hovered substep

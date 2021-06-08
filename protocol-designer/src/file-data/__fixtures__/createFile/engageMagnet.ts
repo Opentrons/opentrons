@@ -80,7 +80,7 @@ export const savedStepForms: SavedStepFormState = {
     engageHeight: '16',
   },
 }
-export const orderedStepIds: Array<StepIdType> = ['engageMagnetStepId']
+export const orderedStepIds: StepIdType[] = ['engageMagnetStepId']
 export const moduleEntities: ModuleEntities = {
   magneticModuleId: {
     id: 'magneticModuleId',

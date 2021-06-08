@@ -39,10 +39,8 @@ export const defaultTo = (defaultValue: unknown): ValueMasker => (
 /*******************
  **     Helpers    **
  ********************/
-type ComposeMaskers = (
-  ...maskers: Array<ValueMasker>
-) => (value: unknown) => unknown
+type ComposeMaskers = (...maskers: ValueMasker[]) => (value: unknown) => unknown
 export const composeMaskers: ComposeMaskers = (
-  ...maskers: Array<ValueMasker>
+  ...maskers: ValueMasker[]
 ) => value =>
   maskers.reduce((maskingValue, masker) => masker(maskingValue), value)

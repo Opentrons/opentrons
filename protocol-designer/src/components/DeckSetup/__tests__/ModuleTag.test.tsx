@@ -35,7 +35,7 @@ const timelineFrameBeforeActiveItemMock: JestMockFn<
 const getModuleEntitiesMock: JestMockFn<[BaseState], ModuleEntities> =
   stepFormSelectors.getModuleEntities
 
-const getHoveredStepLabwareMock: JestMockFn<[BaseState], Array<string>> =
+const getHoveredStepLabwareMock: JestMockFn<[BaseState], string[]> =
   uiSelectors.getHoveredStepLabware
 
 const getInitialDeckSetup: JestMockFn<[BaseState], InitialDeckSetup> =

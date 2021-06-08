@@ -29,7 +29,7 @@ const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<StepFormProps> } = {
 
 type Props = {
   canSave: boolean
-  dirtyFields: Array<string>
+  dirtyFields: string[]
   focusHandlers: FocusHandlers
   focusedField: string | null
   formData: FormData

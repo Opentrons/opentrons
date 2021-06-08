@@ -2,7 +2,7 @@ import last from 'lodash/last'
 import type { StepIdType, FormData, MagnetAction } from '../../../form-types'
 export function getNextDefaultMagnetAction(
   savedForms: Record<StepIdType, FormData>,
-  orderedStepIds: Array<StepIdType>
+  orderedStepIds: StepIdType[]
 ): MagnetAction {
   const prevMagnetSteps = orderedStepIds
     .map(stepId => savedForms[stepId])
