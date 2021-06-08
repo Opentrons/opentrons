@@ -46,7 +46,7 @@ class CommandQueueWorker:
             self._keep_running = False
 
     # todo(mm, 2021-06-08): In addition to calling this when it's done with the object,
-    # should calling code also call this between adjacent pause() and resume()s? 
+    # should calling code also call this between adjacent pause() and resume()s?
     #
     # If yes, the resume request could block for multiple seconds.
     #
