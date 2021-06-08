@@ -142,3 +142,21 @@ export const XYOffsetImg = (props: {
   }
   return <img src={src} alt={alt} />
 }
+
+export const XYOffsetHelperTextImg = (props: {
+  labwareType: LabwareType | null | undefined
+}): JSX.Element => {
+  const { labwareType } = props
+  let src = require('../../images/offset_helpText_wells.svg')
+  let alt = 'well grid offset'
+  // NOTE (ka 2021-6-8): this case is not needed till custom tuberacks but adding logic/image in here
+  // This section is hidden with opentrons tubracks/alumn blocks at the moment since we know the grid offset already
+  if (labwareType === 'tubeRack') {
+    src = require('../../images/offset_helpText_tubes.svg')
+    alt = 'tube grid offset'
+  } else if (labwareType === 'tipRack') {
+    src = require('../../images/offset_helpText_tips.svg')
+    alt = 'tip grid offset'
+  }
+  return <img src={src} alt={alt} />
+}

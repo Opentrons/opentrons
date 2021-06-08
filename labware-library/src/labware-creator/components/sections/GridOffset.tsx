@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { makeMaskToDecimal } from '../../fieldMasks'
-import { isEveryFieldHidden } from '../../utils'
+import { isEveryFieldHidden, displayAsTube } from '../../utils'
 import { LabwareFields } from '../../fields'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
-import { XYOffsetImg } from '../diagrams'
+import { XYOffsetImg, XYOffsetHelperTextImg } from '../diagrams'
 import { SectionBody } from './SectionBody'
 
 import styles from '../../styles.css'
@@ -16,26 +16,33 @@ interface Props {
   values: LabwareFields
 }
 
-// TODO (ka 2021-5-11): Broke this out here since we will need to have more conditions for tips
 const Instructions = (props: Props): JSX.Element => {
   const { values } = props
+  let labwareTypeLocation = 'well A1'
+  // NOTE (ka 2021-6-8): this case is not needed till custom tuberacks but adding logic/text in here
+  // This section is hidden with opentrons tubracks/alumn blocks at the moment since we know the grid offset already
+  if (displayAsTube(values)) {
+    labwareTypeLocation = 'tube A1'
+  } else if (values.labwareType === 'reservoir') {
+    labwareTypeLocation = 'the top left-most well'
+  } else if (values.labwareType === 'tipRack') {
+    labwareTypeLocation = 'tip A1'
+  }
   return (
     <>
       <p>
         Find the measurement from the center of{' '}
-        <strong>
-          {values.labwareType === 'reservoir'
-            ? 'the top left-most well'
-            : 'well A1'}
-        </strong>{' '}
-        to the edge of the labware{"'"}s footprint.
+        <strong>{labwareTypeLocation}</strong> to the edge of the labware{"'"}s
+        footprint.
       </p>
       <p>
-        Corner offset informs the robot how far the grid of wells is from the
-        slot{"'"}s top left corner.
+        Corner offset informs the robot how far the grid of{' '}
+        {/* TODO (ka 2021-6-8): Use Sarah's incoming helper function once custom tuberacks is implemented */}
+        {values.labwareType === 'tipRack' ? 'tips' : 'wells'} is from the slot
+        {"'"}s top left corner.
       </p>
       <div className={styles.help_text}>
-        <img src={require('../../images/offset_helpText.svg')} />
+        <XYOffsetHelperTextImg labwareType={values.labwareType} />
       </div>
     </>
   )
