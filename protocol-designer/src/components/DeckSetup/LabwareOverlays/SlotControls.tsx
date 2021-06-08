@@ -36,11 +36,11 @@ type DNDP = {
   itemType: string,
 }
 type OP = {
-  slot: {| ...DeckSlotDefinition, id: DeckSlot }, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
+  slot: { ...DeckSlotDefinition, id: DeckSlot }, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
   moduleType: ModuleRealType | null,
   selectedTerminalItemId: ?TerminalItemId,
   handleDragHover?: () => mixed,
-|}
+}
 type DP = {
   addLabware: (e: SyntheticEvent<*>) => mixed,
   moveDeckItem: (DeckSlot, DeckSlot) => mixed,

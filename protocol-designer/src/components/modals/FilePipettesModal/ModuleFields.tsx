@@ -18,7 +18,7 @@ type Props = {
   errors:
     | null
     | string
-    | {|
+    | {
         magneticModuleType?: {
           model: string,
         },
@@ -50,7 +50,7 @@ type Props = {
   onSetFieldValue: (field: string, value: string | null) => void,
   onSetFieldTouched: (field: string, touched: boolean) => void,
   onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
-|}
+}
 
 export function ModuleFields(props: Props): React.Node {
   const {

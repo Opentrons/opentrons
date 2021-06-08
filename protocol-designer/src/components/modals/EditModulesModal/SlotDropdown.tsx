@@ -7,12 +7,12 @@ type ModelDropdownProps = {
   fieldName: string,
   disabled: boolean,
   tabIndex: number,
-  options: Array<{|
+  options: Array<{
     name: string,
     value: string,
     disabled?: boolean,
   }>,
-|}
+}
 
 export const SlotDropdown = (props: ModelDropdownProps): React.Node => {
   const { fieldName, options, disabled, tabIndex } = props

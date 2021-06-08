@@ -37,11 +37,11 @@ export type Props = {
 
 type State = {
   isEditPipetteModalOpen: boolean,
-  moduleToEdit: {|
+  moduleToEdit: {
     moduleType: ModuleRealType,
     moduleId: ?string,
   } | null,
-|}
+}
 
 // TODO(mc, 2020-02-28): explore l10n for these dates
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'

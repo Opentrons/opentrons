@@ -66,13 +66,13 @@ export type Props = {
   onCancel: () => mixed,
   initialPipetteValues?: $PropertyType<FormState, 'pipettesByMount'>,
   initialModuleValues?: $PropertyType<FormState, 'modulesByType'>,
-  onSave: ({|
+  onSave: ({
     newProtocolFields: NewProtocolFields,
     pipettes: Array<PipetteFieldsData>,
     modules: Array<ModuleCreationArgs>,
   }) => mixed,
   moduleRestrictionsDisabled: ?boolean,
-|}
+}
 
 const initialFormState: FormState = {
   fields: { name: '' },
