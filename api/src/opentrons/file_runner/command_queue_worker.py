@@ -18,9 +18,9 @@ class CommandQueueWorker:
         self._task: Optional[Awaitable] = None
         self._keep_running = False
 
-    # todo(mm, 2021-06-07): "play" and "stop" at this level do not necessarily mean
-    # as "play" and "stop" at higher-levels (FileRunner). Use more specific names, like
-    # "start_scheduling_executions" and "stop_scheduling_executions"?
+    # todo(mm, 2021-06-07): "play" and "pause" at this level do not necessarily mean
+    # as "play" and "pause" at higher-levels (FileRunner). Use more specific names, like
+    # "start_scheduling_executions" and "pause_scheduling_executions"?
     def play(self) -> None:
         """Start executing the `ProtocolEngine`'s queued commands.
 
@@ -43,12 +43,7 @@ class CommandQueueWorker:
             # could race to check and set self._task.
             self._task = asyncio.create_task(self._play_async())
 
-    # Fix before merging: Delete.
     def pause(self) -> None:
-        """Equivalent to `stop`."""
-        self.stop()
-
-    def stop(self) -> None:
         """Stop executing any more queued commands.
 
         If a command is currently in the middle of executing, it will continue until
@@ -73,7 +68,7 @@ class CommandQueueWorker:
           * The `ProtocolEngine` reports no more commands in the queue, stopping the
             `CommandQueueWorker` automatically.
             (Execution will not automatically resume if more commands are then added.)
-          * You manually stop the `CommandQueueWorker` with `stop`.
+          * You manually pause the `CommandQueueWorker` with `pause`.
 
         If a command is currently executing, this method will return after that command
         finishes.

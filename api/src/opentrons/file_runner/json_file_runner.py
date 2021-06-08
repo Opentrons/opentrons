@@ -53,4 +53,4 @@ class JsonFileRunner(AbstractFileRunner):
 
     def stop(self) -> None:
         """Cancel the running JSON protocol file."""
-        self._command_queue_worker.stop()
+        self._command_queue_worker.pause()
