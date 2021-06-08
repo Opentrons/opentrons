@@ -1,6 +1,6 @@
 """CommandQueueWorker definition. Implements JSON protocol flow control."""
 import asyncio
-from typing import Optional, Awaitable
+from typing import Awaitable, Optional, Tuple
 
 from opentrons import protocol_engine
 
@@ -36,10 +36,14 @@ class CommandQueueWorker:
         # a race condition where a resume is ignored depending on the timing of
         # self._task getting set to None. Resolving this might require more detailed
         # state handling than "has a task" vs. "doesn't have a task".
-        if nself._task is None
+        if self._task is None:
             self._keep_running = True
-            self._start_scheduling_rest_if_still_running()
+            # We rely on asyncio.create_task() returning before the event loop actually
+            # switches to the new task -- otherwise, concurrent calls to this function
+            # could race to check and set self._task.
+            self._task = asyncio.create_task(self._play_async())
 
+    # Fix before merging: Delete.
     def pause(self) -> None:
         """Equivalent to `stop`."""
         self.stop()
@@ -53,11 +57,12 @@ class CommandQueueWorker:
         if self._task is not None:
             self._keep_running = False
 
+    # To do: Investigate whether every coroutine needs to be awaited
     async def wait_to_be_idle(self) -> None:
         """Wait until this `CommandQueueWorker` is idle.
-        
+
         This means:
-        
+
         * No command is currently executing on the `ProtocolEngine`.
         * No commands are scheduled for execution in the future, and none will be
           scheduled without further action from you.
@@ -84,31 +89,17 @@ class CommandQueueWorker:
             await self._task
             self._task = None
 
-    def _start_scheduling_rest_if_still_running(self) -> None:
+    def _next_command(self) -> \
+            Optional[Tuple[str, protocol_engine.commands.CommandRequestType]]:
         if self._keep_running:
-            next_request_result = self._engine.state_store.commands.get_next_request()
-            if next_request_result is None:  # Nothing left in the queue.
-                return
-            next_command_id, next_request = next_request_result
+            # Will be None if the engine has no commands left.
+            return self._engine.state_store.commands.get_next_request()
+        else:
+            return None
 
-            # We rely on asyncio.create_task() returning before the event loop actually
-            # switches to the new task -- otherwise, this task and the new task would
-            # race to set self._task.
-            #
-            # This mutually recursive pair of functions *looks* like it would have
-            # stack depth problems as the depth grows linearly with the number of
-            # commands; but I think it's actually fine, because this method never
-            # awaits the new task that it creates here, so it will return immediately.
-            self._task = asyncio.create_task(
-                self._execute_and_start_scheduling_rest(
-                    next_command_id, next_request
-                )
+    async def _play_async(self) -> None:
+        for command_id, request in iter(self._next_command, None):
+            await self._engine.execute_command(
+                request=request,
+                command_id=command_id
             )
-
-    async def _execute_and_start_scheduling_rest(
-        self,
-        command_id_to_execute: str,
-        request_to_execute: protocol_engine.commands.CommandRequestType
-    ) -> None:
-        await self._engine.execute_command(request_to_execute, command_id_to_execute)
-        self._start_scheduling_rest_if_still_running()
