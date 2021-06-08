@@ -1,44 +1,32 @@
 """Test add labware command."""
-from mock import AsyncMock  # type: ignore[attr-defined]
-from opentrons.protocols import models
-from opentrons.protocol_engine.commands import (
-    AddLabwareDefinitionRequest, AddLabwareDefinitionResult
+import pytest
+from decoy import Decoy
+
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.protocol_engine.execution import CommandHandlers
+from opentrons.protocol_engine.commands.add_labware_definition import (
+    AddLabwareDefinition,
+    AddLabwareDefinitionData,
+    AddLabwareDefinitionResult,
 )
 
 
-def test_add_labware_request(well_plate_def: models.LabwareDefinition) -> None:
-    """It should have an AddLabwareDefinitionRequest model."""
-    request = AddLabwareDefinitionRequest(
-        definition=well_plate_def,
-    )
-
-    assert request.definition == well_plate_def
-
-
-def test_add_labware_result() -> None:
-    """It should be have an AddLabwareDefinitionResult model."""
-    result = AddLabwareDefinitionResult(
-        loadName="loadname",
-        namespace="ns",
-        version=1,
-    )
-
-    assert result.loadName == "loadname"
-    assert result.namespace == "ns"
-    assert result.version == 1
+@pytest.fixture
+def subject() -> AddLabwareDefinition.Implementation:
+    """Get a AddLabwareDefinitionImplementation with its dependencies mocked out."""
+    return AddLabwareDefinition.Implementation()
 
 
 async def test_add_labware_implementation(
-    well_plate_def: models.LabwareDefinition,
-    mock_handlers: AsyncMock,
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    command_handlers: CommandHandlers,
+    subject: AddLabwareDefinition.Implementation,
 ) -> None:
     """An AddLabwareRequest should have an execution implementation."""
-    request = AddLabwareDefinitionRequest(
-        definition=well_plate_def
-    )
+    data = AddLabwareDefinitionData(definition=well_plate_def)
 
-    impl = request.get_implementation()
-    result = await impl.execute(mock_handlers)
+    result = await subject.execute(data, command_handlers)
 
     assert result == AddLabwareDefinitionResult(
         loadName=well_plate_def.parameters.loadName,

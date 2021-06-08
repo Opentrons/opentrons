@@ -12,11 +12,7 @@ from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
 from ..resources import DeckFixedLabware
-from ..commands import (
-    CompletedCommandType,
-    LoadLabwareResult,
-    AddLabwareDefinitionResult,
-)
+from ..commands import Command, LoadLabwareResult, AddLabwareDefinitionResult
 from ..types import LabwareLocation, Dimensions
 from .substore import Substore, CommandReactive
 
@@ -77,7 +73,7 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
             deck_definition=deck_definition,
         )
 
-    def handle_completed_command(self, command: CompletedCommandType) -> None:
+    def handle_completed_command(self, command: Command) -> None:
         """Modify state in reaction to a completed command."""
         if isinstance(command.result, LoadLabwareResult):
             uri = uri_from_details(
@@ -87,7 +83,7 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
             )
             self._state.labware_definitions_by_uri[uri] = command.result.definition
             self._state.labware_by_id[command.result.labwareId] = LabwareData(
-                location=command.request.location,
+                location=command.data.location,
                 uri=uri,
                 calibration=command.result.calibration,
             )
@@ -97,7 +93,7 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
                 load_name=command.result.loadName,
                 version=command.result.version,
             )
-            self._state.labware_definitions_by_uri[uri] = command.request.definition
+            self._state.labware_definitions_by_uri[uri] = command.data.definition
 
 
 class LabwareView:

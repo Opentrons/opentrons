@@ -1,17 +1,24 @@
 """Drop tip command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel
+from typing import TYPE_CHECKING, Optional
+from typing_extensions import Literal
 
-from .command import CommandImplementation, CommandHandlers
-from .pipetting_common import BasePipettingRequest
+from .base import BaseCommand, BaseCommandRequest, BaseCommandImpl
+from .pipetting_common import BasePipettingData
 
 
-class DropTipRequest(BasePipettingRequest):
+if TYPE_CHECKING:
+    from opentrons.protocol_engine.execution import CommandHandlers
+
+
+DropTipCommandType = Literal["dropTip"]
+
+
+class DropTipData(BasePipettingData):
     """A request to drop a tip in a specific well."""
 
-    def get_implementation(self) -> DropTipImplementation:
-        """Get the drop tip request's command implementation."""
-        return DropTipImplementation(self)
+    pass
 
 
 class DropTipResult(BaseModel):
@@ -20,17 +27,33 @@ class DropTipResult(BaseModel):
     pass
 
 
-class DropTipImplementation(
-    CommandImplementation[DropTipRequest, DropTipResult]
-):
-    """Drop tip command implementation."""
+class DropTipRequest(BaseCommandRequest[DropTipData]):
+    """Drop tip command creation request model."""
 
-    async def execute(self, handlers: CommandHandlers) -> DropTipResult:
-        """Move to and drop a tip using the requested pipette."""
-        await handlers.pipetting.drop_tip(
-            pipette_id=self._request.pipetteId,
-            labware_id=self._request.labwareId,
-            well_name=self._request.wellName,
-        )
+    commandType: DropTipCommandType = "dropTip"
+    data: DropTipData
 
-        return DropTipResult()
+
+class DropTip(BaseCommand[DropTipData, DropTipResult]):
+    """Drop tip command model."""
+
+    commandType: DropTipCommandType = "dropTip"
+    data: DropTipData
+    result: Optional[DropTipResult]
+
+    class Implementation(BaseCommandImpl[DropTipData, DropTipResult]):
+        """Drop tip command implementation."""
+
+        async def execute(
+            self,
+            data: DropTipData,
+            handlers: CommandHandlers,
+        ) -> DropTipResult:
+            """Move to and drop a tip using the requested pipette."""
+            await handlers.pipetting.drop_tip(
+                pipette_id=data.pipetteId,
+                labware_id=data.labwareId,
+                well_name=data.wellName,
+            )
+
+            return DropTipResult()

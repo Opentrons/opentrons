@@ -4,7 +4,7 @@ from asyncio import AbstractEventLoop, run_coroutine_threadsafe
 
 from ..protocol_engine import ProtocolEngine
 from ..state import StateView
-from ..commands import CommandRequestType, CommandResultType, FailedCommand
+from ..commands import CommandRequest, CommandResult
 
 
 class AbstractSyncTransport(ABC):
@@ -19,9 +19,9 @@ class AbstractSyncTransport(ABC):
     @abstractmethod
     def execute_command(
         self,
-        request: CommandRequestType,
+        request: CommandRequest,
         command_id: str,
-    ) -> CommandResultType:
+    ) -> CommandResult:
         """Execute a ProtocolEngine command, blocking until the command completes.
 
         Args:
@@ -65,16 +65,19 @@ class ChildThreadTransport(AbstractSyncTransport):
 
     def execute_command(
         self,
-        request: CommandRequestType,
+        request: CommandRequest,
         command_id: str,
-    ) -> CommandResultType:
+    ) -> CommandResult:
         """Execute a command synchronously on the main thread."""
-        command_state = run_coroutine_threadsafe(
+        command = run_coroutine_threadsafe(
             self._engine.execute_command(request=request, command_id=command_id),
             loop=self._loop,
         ).result()
 
-        if isinstance(command_state, FailedCommand):
-            raise command_state.error
+        if command.error is not None:
+            raise command.error
 
-        return command_state.result
+        if command.result is None:
+            raise ValueError(f"Missing result in {command}; this is a bug")
+
+        return command.result

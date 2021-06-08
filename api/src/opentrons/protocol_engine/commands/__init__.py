@@ -13,127 +13,90 @@ they are part of the public input / output of the engine, and need validation
 and/or schema generation.
 """
 
-from typing import Union
+from .base import CommandStatus, BaseCommand, BaseCommandRequest
+from .command_builder import CommandBuilder
+from .command_unions import Command, CommandRequest, CommandResult
 
-from .command import PendingCommand, RunningCommand, CompletedCommand, FailedCommand
 
-from .load_labware import LoadLabwareRequest, LoadLabwareResult
 from .add_labware_definition import (
-    AddLabwareDefinitionRequest, AddLabwareDefinitionResult
-)
-from .load_pipette import LoadPipetteRequest, LoadPipetteResult
-from .move_to_well import MoveToWellRequest, MoveToWellResult
-from .pick_up_tip import PickUpTipRequest, PickUpTipResult
-from .drop_tip import DropTipRequest, DropTipResult
-from .aspirate import AspirateRequest, AspirateResult
-from .dispense import DispenseRequest, DispenseResult
-
-CommandRequestType = Union[
-    LoadLabwareRequest,
+    AddLabwareDefinition,
     AddLabwareDefinitionRequest,
-    LoadPipetteRequest,
-    MoveToWellRequest,
-    PickUpTipRequest,
-    DropTipRequest,
-    AspirateRequest,
-    DispenseRequest,
-]
-
-CommandResultType = Union[
-    LoadLabwareResult,
+    AddLabwareDefinitionData,
     AddLabwareDefinitionResult,
+)
+from .aspirate import Aspirate, AspirateRequest, AspirateData, AspirateResult
+from .dispense import Dispense, DispenseRequest, DispenseData, DispenseResult
+from .drop_tip import DropTip, DropTipRequest, DropTipData, DropTipResult
+from .load_labware import (
+    LoadLabware,
+    LoadLabwareRequest,
+    LoadLabwareData,
+    LoadLabwareResult,
+)
+from .load_pipette import (
+    LoadPipette,
+    LoadPipetteRequest,
+    LoadPipetteData,
     LoadPipetteResult,
+)
+from .move_to_well import (
+    MoveToWell,
+    MoveToWellRequest,
+    MoveToWellData,
     MoveToWellResult,
-    PickUpTipResult,
-    DropTipResult,
-    AspirateResult,
-    DispenseResult,
-]
+)
+from .pick_up_tip import PickUpTip, PickUpTipRequest, PickUpTipData, PickUpTipResult
 
-PendingCommandType = Union[
-    PendingCommand[LoadLabwareRequest, LoadLabwareResult],
-    PendingCommand[AddLabwareDefinitionRequest, AddLabwareDefinitionResult],
-    PendingCommand[LoadPipetteRequest, LoadPipetteResult],
-    PendingCommand[MoveToWellRequest, MoveToWellResult],
-    PendingCommand[PickUpTipRequest, PickUpTipResult],
-    PendingCommand[DropTipRequest, DropTipResult],
-    PendingCommand[AspirateRequest, AspirateResult],
-    PendingCommand[DispenseRequest, DispenseResult],
-]
-
-RunningCommandType = Union[
-    RunningCommand[LoadLabwareRequest, LoadLabwareResult],
-    RunningCommand[AddLabwareDefinitionRequest, AddLabwareDefinitionResult],
-    RunningCommand[LoadPipetteRequest, LoadPipetteResult],
-    RunningCommand[MoveToWellRequest, MoveToWellResult],
-    RunningCommand[PickUpTipRequest, PickUpTipResult],
-    RunningCommand[DropTipRequest, DropTipResult],
-    RunningCommand[AspirateRequest, AspirateResult],
-    RunningCommand[DispenseRequest, DispenseResult],
-]
-
-CompletedCommandType = Union[
-    CompletedCommand[LoadLabwareRequest, LoadLabwareResult],
-    CompletedCommand[AddLabwareDefinitionRequest, AddLabwareDefinitionResult],
-    CompletedCommand[LoadPipetteRequest, LoadPipetteResult],
-    CompletedCommand[MoveToWellRequest, MoveToWellResult],
-    CompletedCommand[PickUpTipRequest, PickUpTipResult],
-    CompletedCommand[DropTipRequest, DropTipResult],
-    CompletedCommand[AspirateRequest, AspirateResult],
-    CompletedCommand[DispenseRequest, DispenseResult],
-]
-
-FailedCommandType = Union[
-    FailedCommand[LoadLabwareRequest],
-    FailedCommand[AddLabwareDefinitionRequest],
-    FailedCommand[LoadPipetteRequest],
-    FailedCommand[MoveToWellRequest],
-    FailedCommand[PickUpTipRequest],
-    FailedCommand[DropTipRequest],
-    FailedCommand[AspirateRequest],
-    FailedCommand[DispenseRequest],
-]
-
-CommandType = Union[
-    PendingCommandType,
-    RunningCommandType,
-    CompletedCommandType,
-    FailedCommandType,
-]
 
 __all__ = [
-    # command lifecycle state models
-    "PendingCommand",
-    "RunningCommand",
-    "CompletedCommand",
-    "FailedCommand",
-
-    # type unions
-    "CommandRequestType",
-    "CommandResultType",
-    "PendingCommandType",
-    "RunningCommandType",
-    "CompletedCommandType",
-    "FailedCommandType",
-    "CommandType",
-
-    # equipment request/result models
+    # command factory
+    "CommandBuilder",
+    # command type unions
+    "Command",
+    "CommandRequest",
+    "CommandResult",
+    # base interfaces
+    "CommandStatus",
+    "BaseCommand",
+    "BaseCommandRequest",
+    # load labware command models
+    "LoadLabware",
     "LoadLabwareRequest",
+    "LoadLabwareData",
     "LoadLabwareResult",
+    # add labware definition command models
+    "AddLabwareDefinition",
     "AddLabwareDefinitionRequest",
+    "AddLabwareDefinitionData",
     "AddLabwareDefinitionResult",
+    # load pipette command models
+    "LoadPipette",
     "LoadPipetteRequest",
+    "LoadPipetteData",
     "LoadPipetteResult",
-
-    # pipetting request/result models
+    # move to well command models
+    "MoveToWell",
     "MoveToWellRequest",
+    "MoveToWellData",
     "MoveToWellResult",
+    # pick up tip command models
+    "PickUpTip",
     "PickUpTipRequest",
+    "PickUpTipData",
     "PickUpTipResult",
+    # drop tip command models
+    "DropTip",
     "DropTipRequest",
+    "DropTipData",
     "DropTipResult",
+    # aspirate command models
+    "Aspirate",
     "AspirateRequest",
+    "AspirateData",
     "AspirateResult",
+    # dispense command models
+    "Dispense",
     "DispenseRequest",
+    "DispenseData",
     "DispenseResult",
 ]

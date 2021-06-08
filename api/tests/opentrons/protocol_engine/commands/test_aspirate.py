@@ -1,45 +1,30 @@
 """Test aspirate commands."""
+import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine import CommandHandlers, WellLocation, WellOrigin
-from opentrons.protocol_engine.commands import AspirateRequest, AspirateResult
+from opentrons.protocol_engine.commands.aspirate import (
+    Aspirate,
+    AspirateData,
+    AspirateResult,
+)
 
 
-def test_aspirate_request() -> None:
-    """It should be able to create a AspirateRequest."""
-    request = AspirateRequest(
-        pipetteId="abc",
-        labwareId="123",
-        wellName="A3",
-        wellLocation=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
-        volume=50,
-    )
-
-    assert request.pipetteId == "abc"
-    assert request.labwareId == "123"
-    assert request.wellName == "A3"
-    assert request.wellLocation == WellLocation(
-        origin=WellOrigin.BOTTOM,
-        offset=(0, 0, 1),
-    )
-    assert request.volume == 50
-
-
-def test_aspirate_result() -> None:
-    """It should be able to create a AspirateResult."""
-    result = AspirateResult(volume=50)
-
-    assert result.volume == 50
+@pytest.fixture
+def subject() -> Aspirate.Implementation:
+    """Get an Aspirate implementation with its dependencies mocked out."""
+    return Aspirate.Implementation()
 
 
 async def test_aspirate_implementation(
     decoy: Decoy,
-    mock_cmd_handlers: CommandHandlers,
+    command_handlers: CommandHandlers,
+    subject: Aspirate.Implementation,
 ) -> None:
-    """A PickUpTipRequest should have an execution implementation."""
+    """An Aspirate should have an execution implementation."""
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
-    request = AspirateRequest(
+    data = AspirateData(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
@@ -48,7 +33,7 @@ async def test_aspirate_implementation(
     )
 
     decoy.when(
-        await mock_cmd_handlers.pipetting.aspirate(
+        await command_handlers.pipetting.aspirate(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
@@ -57,7 +42,6 @@ async def test_aspirate_implementation(
         )
     ).then_return(42)
 
-    impl = request.get_implementation()
-    result = await impl.execute(mock_cmd_handlers)
+    result = await subject.execute(data, command_handlers)
 
     assert result == AspirateResult(volume=42)

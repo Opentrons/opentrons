@@ -182,4 +182,5 @@ def engine(
         hardware=mock_hardware,
         state_store=mock_state_store,
         resources=mock_resources,
+        command_builder=MagicMock(),
     )

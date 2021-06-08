@@ -2,7 +2,7 @@
 from abc import ABC
 from typing import Generic, TypeVar
 
-from ..commands import CompletedCommandType
+from ..commands import Command
 
 
 SubstateT = TypeVar("SubstateT")
@@ -22,6 +22,6 @@ class Substore(ABC, Generic[SubstateT]):
 class CommandReactive(ABC):
     """Abstract base class for an interface that reacts to commands."""
 
-    def handle_completed_command(self, command: CompletedCommandType) -> None:
-        """React to a CompletedCommand."""
+    def handle_completed_command(self, command: Command) -> None:
+        """React to a Command resource change."""
         pass
