@@ -1,12 +1,11 @@
 """Base command data model and type definitions."""
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from enum import Enum
 from datetime import datetime
-from pydantic import BaseModel
-from typing import TYPE_CHECKING, Generic, TypeVar
-
-from ..errors import ProtocolEngineError
+from pydantic import BaseModel, Field
+from pydantic.generics import GenericModel
+from typing import TYPE_CHECKING, Generic, Optional, TypeVar
 
 # convenience type alias to work around type-only circular dependency
 if TYPE_CHECKING:
@@ -14,87 +13,83 @@ if TYPE_CHECKING:
 else:
     CommandHandlers = None
 
-ReqT = TypeVar("ReqT", bound=BaseModel)
-ResT = TypeVar("ResT", bound=BaseModel)
+
+CommandDataT = TypeVar("CommandDataT", bound=BaseModel)
+
+CommandResultT = TypeVar("CommandResultT", bound=BaseModel)
 
 
-@dataclass(frozen=True)
-class CompletedCommand(Generic[ReqT, ResT]):
-    """A command that has been successfully executed."""
+class CommandStatus(str, Enum):
+    """Command execution status."""
 
-    created_at: datetime
-    started_at: datetime
-    completed_at: datetime
-    request: ReqT
-    result: ResT
+    QUEUED = "queued"
+    RUNNING = "running"
+    EXECUTED = "executed"
+    FAILED = "failed"
 
 
-@dataclass(frozen=True)
-class FailedCommand(Generic[ReqT]):
-    """A command that was executed but failed."""
+class BaseCommandRequest(GenericModel, Generic[CommandDataT]):
+    """Base class for command creation requests.
 
-    created_at: datetime
-    started_at: datetime
-    failed_at: datetime
-    request: ReqT
-    error: ProtocolEngineError
+    You shouldn't use this class directly; instead, use or define
+    your own subclass per specific command type.
+    """
 
-
-@dataclass(frozen=True)
-class RunningCommand(Generic[ReqT, ResT]):
-    """A command that is currently being executed."""
-
-    created_at: datetime
-    started_at: datetime
-    request: ReqT
-
-    def to_completed(
-        self,
-        result: ResT,
-        completed_at: datetime,
-    ) -> CompletedCommand[ReqT, ResT]:
-        """Create a CompletedCommand from a RunningCommand."""
-        return CompletedCommand(
-            created_at=self.created_at,
-            started_at=self.started_at,
-            request=self.request,
-            completed_at=completed_at,
-            result=result
-        )
-
-    def to_failed(
-        self,
-        error: ProtocolEngineError,
-        failed_at: datetime,
-    ) -> FailedCommand[ReqT]:
-        """Create a FailedCommand from a RunningCommand."""
-        return FailedCommand(
-            created_at=self.created_at,
-            started_at=self.started_at,
-            request=self.request,
-            failed_at=failed_at,
-            error=error
-        )
+    commandType: str = Field(
+        ...,
+        description=(
+            "Specific command type that determines data requirements and "
+            "execution behavior"
+        ),
+    )
+    data: CommandDataT = Field(..., description="Command execution data payload")
 
 
-@dataclass(frozen=True)
-class PendingCommand(Generic[ReqT, ResT]):
-    """A command that has not yet been started."""
+class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
+    """Base command model.
 
-    created_at: datetime
-    request: ReqT
+    You shouldn't use this class directly; instead, use or define
+    your own subclass per specific command type.
+    """
 
-    def to_running(self, started_at: datetime) -> RunningCommand[ReqT, ResT]:
-        """Create a RunningCommand from a PendingCommand."""
-        return RunningCommand(
-            created_at=self.created_at,
-            request=self.request,
-            started_at=started_at,
-        )
+    id: str = Field(..., description="Unique identifier for a particular command")
+    createdAt: datetime = Field(..., description="Command creation timestamp")
+    commandType: str = Field(
+        ...,
+        description=(
+            "Specific command type that determines data requirements and "
+            "execution behavior"
+        ),
+    )
+    status: CommandStatus = Field(..., description="Command execution status")
+    data: CommandDataT = Field(..., description="Command execution data payload")
+    result: Optional[CommandResultT] = Field(
+        None,
+        description="Command execution result data, if completed",
+    )
+    # TODO(mc, 2021-06-08): model ProtocolEngine errors
+    error: Optional[str] = Field(
+        None,
+        description="Command execution failure, if failed",
+    )
+    startedAt: Optional[datetime] = Field(
+        None,
+        description="Command execution start timestamp, if started",
+    )
+    completedAt: Optional[datetime] = Field(
+        None,
+        description="Command execution completed timestamp, if completed",
+    )
 
 
-class CommandImplementation(ABC, Generic[ReqT, ResT]):
-    """Abstract command implementation.
+CommandT = TypeVar("CommandT", bound=BaseCommand)
+
+
+class AbstractCommandImpl(
+    ABC,
+    Generic[CommandDataT, CommandResultT, CommandT],
+):
+    """Abstract command creation and execution implementation.
 
     A given command request should map to a specific command implementation,
     which defines how to:
@@ -103,17 +98,24 @@ class CommandImplementation(ABC, Generic[ReqT, ResT]):
     - Execute the command, mapping data from execution into the result model
     """
 
-    _request: ReqT
+    _data: CommandDataT
 
-    def __init__(self, request: ReqT) -> None:
+    # TODO(mc, 2021-06-21): `__init__` and `execute` args are pretty clearly
+    # swapped. `data` should be fed into execute, while `handlers` should be
+    # fed into `__init__`
+    def __init__(self, data: CommandDataT) -> None:
         """Initialize a command implementation from a command request."""
-        self._request = request
+        self._data = data
 
-    def create_command(self, created_at: datetime) -> PendingCommand[ReqT, ResT]:
+    # TODO(mc, 2021-06-21): this method is awkward and not well-suited for this
+    # interface. Find a less verbose way of creating a full command resource
+    # from the request instance
+    @abstractmethod
+    def create_command(self, command_id: str, created_at: datetime) -> CommandT:
         """Create a new command resource from the implementation's request."""
-        return PendingCommand(request=self._request, created_at=created_at)
+        ...
 
     @abstractmethod
-    async def execute(self, handlers: CommandHandlers) -> ResT:
+    async def execute(self, handlers: CommandHandlers) -> CommandResultT:
         """Execute the command, mapping data from execution into a response model."""
         ...

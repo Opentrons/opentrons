@@ -1,6 +1,5 @@
 """ProtocolEngine class definition."""
 from __future__ import annotations
-from typing import Union
 
 from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.util.helpers import utc_now
@@ -9,12 +8,7 @@ from .errors import ProtocolEngineError, UnexpectedProtocolError
 from .execution import CommandHandlers
 from .resources import ResourceProviders
 from .state import State, StateStore, StateView
-from .commands import (
-    CommandRequestType,
-    PendingCommandType,
-    CompletedCommandType,
-    FailedCommandType,
-)
+from .commands import Command, CommandRequest, CommandStatus
 
 
 class ProtocolEngine:
@@ -71,17 +65,20 @@ class ProtocolEngine:
 
     async def execute_command(
         self,
-        request: CommandRequestType,
+        request: CommandRequest,
         command_id: str,
-    ) -> Union[CompletedCommandType, FailedCommandType]:
+    ) -> Command:
         """Execute a command request, waiting for it to complete."""
         cmd_impl = request.get_implementation()
         created_at = utc_now()
-        cmd = cmd_impl.create_command(created_at).to_running(created_at)
-        done_cmd: Union[CompletedCommandType, FailedCommandType]
+        command = cmd_impl.create_command(
+            command_id=command_id,
+            created_at=created_at,
+            status=CommandStatus.RUNNING,
+        ).copy(update={"startedAt": created_at})
 
         # store the command prior to execution
-        self._state_store.handle_command(cmd, command_id=command_id)
+        self._state_store.handle_command(command, command_id=command_id)
 
         # TODO(mc, 2021-06-16): refactor command execution after command
         # models have been simplified to delegate to CommandExecutor. This
@@ -96,20 +93,34 @@ class ProtocolEngine:
         try:
             result = await cmd_impl.execute(handlers)
             completed_at = utc_now()
-            done_cmd = cmd.to_completed(result, completed_at)
+            command = command.copy(
+                update={
+                    "result": result,
+                    "completedAt": completed_at,
+                    "status": CommandStatus.EXECUTED,
+                }
+            )
 
         except Exception as error:
-            failed_at = utc_now()
+            completed_at = utc_now()
             if not isinstance(error, ProtocolEngineError):
                 error = UnexpectedProtocolError(error)
-            done_cmd = cmd.to_failed(error, failed_at)
+
+            command = command.copy(
+                update={
+                    # TODO(mc, 2021-06-21): return structured error details
+                    "error": str(error),
+                    "completedAt": completed_at,
+                    "status": CommandStatus.FAILED,
+                }
+            )
 
         # store the done command
-        self._state_store.handle_command(done_cmd, command_id=command_id)
+        self._state_store.handle_command(command, command_id=command_id)
 
-        return done_cmd
+        return command
 
-    def add_command(self, request: CommandRequestType) -> PendingCommandType:
+    def add_command(self, request: CommandRequest) -> Command:
         """Add a command to ProtocolEngine."""
         # TODO(mc, 2021-06-14): ID generation and timestamp generation need to
         # be redone / reconsidered. Too much about command execution has leaked
@@ -117,7 +128,10 @@ class ProtocolEngine:
         command_id = self._resources.id_generator.generate_id()
         created_at = utc_now()
         command_impl = request.get_implementation()
-        command = command_impl.create_command(created_at)
+        command = command_impl.create_command(
+            command_id=command_id,
+            created_at=created_at,
+        )
 
         self._state_store.handle_command(command, command_id=command_id)
 

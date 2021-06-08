@@ -1,17 +1,26 @@
 """Drop tip command request, result, and implementation models."""
 from __future__ import annotations
+from datetime import datetime
 from pydantic import BaseModel
+from typing import Optional
+from typing_extensions import Literal
 
-from .command import CommandImplementation, CommandHandlers
-from .pipetting_common import BasePipettingRequest
+from .pipetting_common import BasePipettingData
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandRequest,
+    CommandHandlers,
+    CommandStatus,
+)
+
+DropTipCommandType = Literal["dropTip"]
 
 
-class DropTipRequest(BasePipettingRequest):
+class DropTipData(BasePipettingData):
     """A request to drop a tip in a specific well."""
 
-    def get_implementation(self) -> DropTipImplementation:
-        """Get the drop tip request's command implementation."""
-        return DropTipImplementation(self)
+    pass
 
 
 class DropTipResult(BaseModel):
@@ -20,17 +29,51 @@ class DropTipResult(BaseModel):
     pass
 
 
-class DropTipImplementation(
-    CommandImplementation[DropTipRequest, DropTipResult]
-):
+class DropTipRequest(BaseCommandRequest[DropTipData]):
+    """Drop tip command creation request model."""
+
+    commandType: DropTipCommandType = "dropTip"
+    data: DropTipData
+
+    def get_implementation(self) -> DropTipImplementation:
+        """Get the execution implementation of the DropTipRequest."""
+        return DropTipImplementation(self.data)
+
+
+class DropTip(BaseCommand[DropTipData, DropTipResult]):
+    """Drop tip command model."""
+
+    commandType: DropTipCommandType = "dropTip"
+    data: DropTipData
+    result: Optional[DropTipResult]
+
+
+class DropTipImplementation(AbstractCommandImpl[DropTipData, DropTipResult, DropTip]):
     """Drop tip command implementation."""
 
-    async def execute(self, handlers: CommandHandlers) -> DropTipResult:
+    def create_command(
+        self,
+        command_id: str,
+        created_at: datetime,
+        status: CommandStatus = CommandStatus.QUEUED,
+    ) -> DropTip:
+        """Create a new Dispense command resource."""
+        return DropTip(
+            id=command_id,
+            createdAt=created_at,
+            status=status,
+            data=self._data,
+        )
+
+    async def execute(
+        self,
+        handlers: CommandHandlers,
+    ) -> DropTipResult:
         """Move to and drop a tip using the requested pipette."""
         await handlers.pipetting.drop_tip(
-            pipette_id=self._request.pipetteId,
-            labware_id=self._request.labwareId,
-            well_name=self._request.wellName,
+            pipette_id=self._data.pipetteId,
+            labware_id=self._data.labwareId,
+            well_name=self._data.wellName,
         )
 
         return DropTipResult()

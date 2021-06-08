@@ -35,10 +35,12 @@ class SyncClient:
     ) -> commands.LoadLabwareResult:
         """Execute a LoadLabwareRequest and return the result."""
         request = commands.LoadLabwareRequest(
-            location=location,
-            loadName=load_name,
-            namespace=namespace,
-            version=version,
+            data=commands.LoadLabwareData(
+                location=location,
+                loadName=load_name,
+                namespace=namespace,
+                version=version,
+            )
         )
         result = self._transport.execute_command(
             request=request,
@@ -54,8 +56,10 @@ class SyncClient:
     ) -> commands.LoadPipetteResult:
         """Execute a LoadPipetteRequest and return the result."""
         request = commands.LoadPipetteRequest(
-            pipetteName=pipette_name,
-            mount=mount,
+            data=commands.LoadPipetteData(
+                pipetteName=pipette_name,
+                mount=mount,
+            )
         )
         result = self._transport.execute_command(
             request=request,
@@ -72,7 +76,11 @@ class SyncClient:
     ) -> commands.PickUpTipResult:
         """Execute a PickUpTipRequest and return the result."""
         request = commands.PickUpTipRequest(
-            pipetteId=pipette_id, labwareId=labware_id, wellName=well_name
+            data=commands.PickUpTipData(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+            )
         )
         result = self._transport.execute_command(
             request=request,
@@ -89,7 +97,11 @@ class SyncClient:
     ) -> commands.DropTipResult:
         """Execute a DropTipRequest and return the result."""
         request = commands.DropTipRequest(
-            pipetteId=pipette_id, labwareId=labware_id, wellName=well_name
+            data=commands.DropTipData(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+            )
         )
         result = self._transport.execute_command(
             request=request, command_id=self._create_command_id()
@@ -106,15 +118,16 @@ class SyncClient:
     ) -> commands.AspirateResult:
         """Execute an ``AspirateRequest``, returning the result."""
         request = commands.AspirateRequest(
-            pipetteId=pipette_id,
-            labwareId=labware_id,
-            wellName=well_name,
-            wellLocation=well_location,
-            volume=volume,
+            data=commands.AspirateData(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                volume=volume,
+            )
         )
         result = self._transport.execute_command(
-            request=request,
-            command_id=self._create_command_id()
+            request=request, command_id=self._create_command_id()
         )
 
         return cast(commands.AspirateResult, result)
@@ -129,11 +142,13 @@ class SyncClient:
     ) -> commands.DispenseResult:
         """Execute a ``DispenseRequest``, returning the result."""
         request = commands.DispenseRequest(
-            pipetteId=pipette_id,
-            labwareId=labware_id,
-            wellName=well_name,
-            wellLocation=well_location,
-            volume=volume,
+            data=commands.DispenseData(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+                volume=volume,
+            )
         )
         result = self._transport.execute_command(
             request=request, command_id=self._create_command_id()

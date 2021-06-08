@@ -1,18 +1,26 @@
 """Load pipette command request, result, and implementation models."""
 from __future__ import annotations
-
-from typing import Optional
-
+from datetime import datetime
 from pydantic import BaseModel, Field
+from typing import Optional
+from typing_extensions import Literal
 
 from opentrons.types import MountType
 
 from ..types import PipetteName
-from .command import CommandImplementation, CommandHandlers
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandRequest,
+    CommandHandlers,
+    CommandStatus,
+)
+
+LoadPipetteCommandType = Literal["loadPipette"]
 
 
-class LoadPipetteRequest(BaseModel):
-    """A request to load a pipette on to a mount."""
+class LoadPipetteData(BaseModel):
+    """Data needed to load a pipette on to a mount."""
 
     pipetteName: PipetteName = Field(
         ...,
@@ -25,16 +33,12 @@ class LoadPipetteRequest(BaseModel):
     pipetteId: Optional[str] = Field(
         None,
         description="An optional ID to assign to this pipette. If None, an ID "
-                    "will be generated."
+        "will be generated.",
     )
-
-    def get_implementation(self) -> LoadPipetteImplementation:
-        """Get the load pipette request's command implementation."""
-        return LoadPipetteImplementation(self)
 
 
 class LoadPipetteResult(BaseModel):
-    """Result data for executing a LoadPipetteRequest."""
+    """Result data for executing a LoadPipette."""
 
     pipetteId: str = Field(
         ...,
@@ -42,17 +46,50 @@ class LoadPipetteResult(BaseModel):
     )
 
 
+class LoadPipetteRequest(BaseCommandRequest[LoadPipetteData]):
+    """Load pipette command creation request model."""
+
+    commandType: LoadPipetteCommandType = "loadPipette"
+    data: LoadPipetteData
+
+    def get_implementation(self) -> LoadPipetteImplementation:
+        """Get the execution implementation of the LoadPipetteRequest."""
+        return LoadPipetteImplementation(self.data)
+
+
+class LoadPipette(BaseCommand[LoadPipetteData, LoadPipetteResult]):
+    """Load pipette command model."""
+
+    commandType: LoadPipetteCommandType = "loadPipette"
+    data: LoadPipetteData
+    result: Optional[LoadPipetteResult]
+
+
 class LoadPipetteImplementation(
-    CommandImplementation[LoadPipetteRequest, LoadPipetteResult]
+    AbstractCommandImpl[LoadPipetteData, LoadPipetteResult, LoadPipette]
 ):
     """Load pipette command implementation."""
+
+    def create_command(
+        self,
+        command_id: str,
+        created_at: datetime,
+        status: CommandStatus = CommandStatus.QUEUED,
+    ) -> LoadPipette:
+        """Create a new LoadPipette command resource."""
+        return LoadPipette(
+            id=command_id,
+            createdAt=created_at,
+            status=status,
+            data=self._data,
+        )
 
     async def execute(self, handlers: CommandHandlers) -> LoadPipetteResult:
         """Check that requested pipette is attached and assign its identifier."""
         loaded_pipette = await handlers.equipment.load_pipette(
-            pipette_name=self._request.pipetteName,
-            mount=self._request.mount,
-            pipette_id=self._request.pipetteId
+            pipette_name=self._data.pipetteName,
+            mount=self._data.mount,
+            pipette_id=self._data.pipetteId,
         )
 
         return LoadPipetteResult(pipetteId=loaded_pipette.pipette_id)

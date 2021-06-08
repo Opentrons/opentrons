@@ -1,22 +1,26 @@
 """Add labware command."""
 from __future__ import annotations
-from opentrons.protocol_engine.commands.command import (
-    CommandImplementation, CommandHandlers
-)
+from datetime import datetime
 from pydantic import BaseModel, Field
+from typing import Optional
+from typing_extensions import Literal
+
 from opentrons.protocols.models import LabwareDefinition
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandRequest,
+    CommandHandlers,
+    CommandStatus,
+)
+
+AddLabwareDefinitionCommandType = Literal["addLabwareDefinition"]
 
 
-class AddLabwareDefinitionRequest(BaseModel):
+class AddLabwareDefinitionData(BaseModel):
     """Request to add a labware definition."""
-    definition: LabwareDefinition = Field(
-        ...,
-        description="The labware definition."
-    )
 
-    def get_implementation(self) -> AddLabwareDefinitionImplementation:
-        """Get the execution implementation of the AddLabwareDefinitionRequest."""
-        return AddLabwareDefinitionImplementation(self)
+    definition: LabwareDefinition = Field(..., description="The labware definition.")
 
 
 class AddLabwareDefinitionResult(BaseModel):
@@ -36,19 +40,54 @@ class AddLabwareDefinitionResult(BaseModel):
     )
 
 
+class AddLabwareDefinitionRequest(BaseCommandRequest[AddLabwareDefinitionData]):
+    """Add labware definition command creation request."""
+
+    commandType: AddLabwareDefinitionCommandType = "addLabwareDefinition"
+    data: AddLabwareDefinitionData
+
+    def get_implementation(self) -> AddLabwareDefinitionImplementation:
+        """Get the execution implementation of the AddLabwareDefinitionRequest."""
+        return AddLabwareDefinitionImplementation(self.data)
+
+
+class AddLabwareDefinition(
+    BaseCommand[AddLabwareDefinitionData, AddLabwareDefinitionResult]
+):
+    """Add labware definition command resource."""
+
+    commandType: AddLabwareDefinitionCommandType = "addLabwareDefinition"
+    data: AddLabwareDefinitionData
+    result: Optional[AddLabwareDefinitionResult]
+
+
 class AddLabwareDefinitionImplementation(
-    CommandImplementation[AddLabwareDefinitionRequest,
-                          AddLabwareDefinitionResult]
+    AbstractCommandImpl[
+        AddLabwareDefinitionData,
+        AddLabwareDefinitionResult,
+        AddLabwareDefinition,
+    ]
 ):
     """Add labware command implementation."""
 
-    async def execute(
-            self,
-            handlers: CommandHandlers
-    ) -> AddLabwareDefinitionResult:
+    def create_command(
+        self,
+        command_id: str,
+        created_at: datetime,
+        status: CommandStatus = CommandStatus.QUEUED,
+    ) -> AddLabwareDefinition:
+        """Create a new AddLabwareDefinition command resource."""
+        return AddLabwareDefinition(
+            id=command_id,
+            createdAt=created_at,
+            status=status,
+            data=self._data,
+        )
+
+    async def execute(self, handlers: CommandHandlers) -> AddLabwareDefinitionResult:
         """Execute the add labware definition request."""
         return AddLabwareDefinitionResult(
-            loadName=self._request.definition.parameters.loadName,
-            namespace=self._request.definition.namespace,
-            version=self._request.definition.version
+            loadName=self._data.definition.parameters.loadName,
+            namespace=self._data.definition.namespace,
+            version=self._data.definition.version,
         )

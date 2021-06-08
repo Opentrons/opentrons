@@ -5,41 +5,50 @@ import pytest
 from mock import AsyncMock, MagicMock, call  # type: ignore[attr-defined]
 
 from opentrons.file_runner.command_queue_worker import CommandQueueWorker
-from opentrons.protocol_engine import ProtocolEngine, WellLocation, StateView
-from opentrons.protocol_engine.commands import (
-    PickUpTipRequest,
-    AspirateRequest,
-    DispenseRequest,
-    CommandRequestType,
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    WellLocation,
+    StateView,
+    commands as pe_commands,
 )
 
 
 @pytest.fixture
-def commands() -> List[Tuple[str, CommandRequestType]]:
+def commands() -> List[Tuple[str, pe_commands.CommandRequest]]:
     """Fixture."""
     return [
         (
             "command-id-0",
-            PickUpTipRequest(pipetteId="123", labwareId="abc", wellName="def"),
+            pe_commands.PickUpTipRequest(
+                data=pe_commands.PickUpTipData(
+                    pipetteId="123",
+                    labwareId="abc",
+                    wellName="def",
+                )
+            ),
         ),
         (
             "command-id-1",
-            AspirateRequest(
-                volume=321,
-                wellLocation=WellLocation(),
-                pipetteId="123",
-                labwareId="xyz",
-                wellName="def",
+            pe_commands.AspirateRequest(
+                data=pe_commands.AspirateData(
+                    volume=321,
+                    wellLocation=WellLocation(),
+                    pipetteId="123",
+                    labwareId="xyz",
+                    wellName="def",
+                ),
             ),
         ),
         (
             "command-id-2",
-            DispenseRequest(
-                volume=321,
-                wellLocation=WellLocation(),
-                pipetteId="123",
-                labwareId="xyz",
-                wellName="def",
+            pe_commands.DispenseRequest(
+                data=pe_commands.DispenseData(
+                    volume=321,
+                    wellLocation=WellLocation(),
+                    pipetteId="123",
+                    labwareId="xyz",
+                    wellName="def",
+                ),
             ),
         ),
     ]
@@ -54,7 +63,7 @@ def state_view() -> MagicMock:
 @pytest.fixture
 def state_view_with_commands(
     state_view: MagicMock,
-    commands: List[Tuple[str, CommandRequestType]],
+    commands: List[Tuple[str, pe_commands.CommandRequest]],
 ) -> MagicMock:
     """Create a state view fixture with pending commands."""
     # List of Tuples. Command id and command. With None terminator.
@@ -94,7 +103,7 @@ async def test_play(
     protocol_engine: AsyncMock,
     subject: CommandQueueWorker,
     state_view_with_commands: MagicMock,
-    commands: List[Tuple[str, CommandRequestType]],
+    commands: List[Tuple[str, pe_commands.CommandRequest]],
 ) -> None:
     """It should cycle through pending commands and execute them."""
     subject.play()
@@ -109,12 +118,12 @@ async def test_pause(
     protocol_engine: AsyncMock,
     subject: CommandQueueWorker,
     state_view_with_commands: MagicMock,
-    commands: List[Tuple[str, CommandRequestType]],
+    commands: List[Tuple[str, pe_commands.CommandRequest]],
 ) -> None:
     """It should cycle through pending commands and execute them."""
 
     async def mock_execute_command(
-        request: CommandRequestType,
+        request: pe_commands.CommandRequest,
         command_id: str,
     ) -> None:
         if command_id == str("command-id-0"):
