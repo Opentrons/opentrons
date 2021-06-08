@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Splash } from '@opentrons/components'
-import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../steplist'
+import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../steplist'
 import { Portal as MainPageModalPortal } from '../components/portals/MainPageModalPortal'
 import { DeckSetupManager } from '../components/DeckSetupManager'
 import { ConnectedFilePage } from '../containers/ConnectedFilePage'
@@ -16,13 +16,13 @@ import { TimelineAlerts } from '../components/alerts/TimelineAlerts'
 
 import { getSelectedTerminalItemId } from '../ui/steps'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
-import { selectors, type Page } from '../navigation'
-import type { BaseState } from '../types'
+import { selectors, Page } from '../navigation'
+import { BaseState } from '../types'
 
 type Props = {
-  page: Page,
-  selectedTerminalItemId: ?TerminalItemId,
-  ingredSelectionMode: boolean,
+  page: Page
+  selectedTerminalItemId?: TerminalItemId
+  ingredSelectionMode: boolean
 }
 
 function MainPanelComponent(props: Props) {
@@ -57,7 +57,7 @@ function MainPanelComponent(props: Props) {
   }
 }
 
-function mapStateToProps(state: BaseState): $Exact<Props> {
+function mapStateToProps(state: BaseState): Props {
   return {
     page: selectors.getCurrentPage(state),
     selectedTerminalItemId: getSelectedTerminalItemId(state),
@@ -66,9 +66,9 @@ function mapStateToProps(state: BaseState): $Exact<Props> {
   }
 }
 
-export const ConnectedMainPanel: React.AbstractComponent<{||}> = connect<
+export const ConnectedMainPanel: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   _,
   _,
   _,

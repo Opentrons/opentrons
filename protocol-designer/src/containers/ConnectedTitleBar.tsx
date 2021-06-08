@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
-import type { Dispatch } from 'redux'
+import  { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 
-import { TitleBar, Icon, type IconName } from '@opentrons/components'
+import { TitleBar, Icon,  IconName } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import styles from './TitleBar.css'
 import { i18n } from '../localization'
@@ -21,25 +21,25 @@ import { END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID } from '../steplist'
 import { selectors as fileDataSelectors } from '../file-data'
 import { closeIngredientSelector } from '../labware-ingred/actions'
 import { stepIconsByType } from '../form-types'
-import { selectors, type Page } from '../navigation'
+import { selectors,  Page } from '../navigation'
 
-import type { TitleBarProps } from '@opentrons/components'
-import type { BaseState } from '../types'
+import  { TitleBarProps } from '@opentrons/components'
+import  { BaseState } from '../types'
 
-type Props = React.ElementProps<typeof TitleBar>
+type Props = React.ComponentProps<typeof TitleBar>
 
-type DP = {| onBackClick: $PropertyType<Props, 'onBackClick'> |}
+type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
 
-type SP = {|
-  ...$Diff<$Exact<Props>, DP>,
+type SP = {
+  ...$Diff<Props, DP>,
   _page: Page,
   _liquidPlacementMode?: boolean,
   _wellSelectionMode?: boolean,
-|}
+}
 
 type TitleWithIconProps = {
-  iconName?: ?IconName,
-  text?: ?string,
+  iconName?: IconName,
+  text?: string,
 }
 
 function TitleWithIcon(props: TitleWithIconProps) {
@@ -52,7 +52,7 @@ function TitleWithIcon(props: TitleWithIconProps) {
   )
 }
 
-type TitleWithBetaTagProps = { text?: ?string }
+type TitleWithBetaTagProps = { text?: string }
 
 const TitleWithBetaTag = (props: TitleWithBetaTagProps) => (
   <div className={styles.title_wrapper}>
@@ -207,11 +207,11 @@ const StickyTitleBar = (props: TitleBarProps) => (
   <TitleBar id="TitleBar_main" {...props} className={styles.sticky_bar} />
 )
 
-export const ConnectedTitleBar: React.AbstractComponent<{||}> = connect<
+export const ConnectedTitleBar: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
-  {||},
+  {},
   _,
   _
 >(

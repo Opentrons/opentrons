@@ -13,7 +13,7 @@ import styles from './IngredientsList.css'
 import type { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
 import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
 
-type RemoveWellsContents = (args: {|
+export type RemoveWellsContents = (args: {|
   liquidGroupId: string,
   wells: Array<string>,
 |}) => mixed

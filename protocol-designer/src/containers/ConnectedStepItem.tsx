@@ -27,27 +27,27 @@ import {
   ConfirmDeleteModal,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
-  type DeleteModalType,
+  DeleteModalType,
   CLOSE_BATCH_EDIT_FORM,
 } from '../components/modals/ConfirmDeleteModal'
 
-import type { SubstepIdentifier } from '../steplist/types'
-import type { StepIdType } from '../form-types'
+import { SubstepIdentifier } from '../steplist/types'
+import { StepIdType } from '../form-types'
 
-type Props = {|
-  stepId: StepIdType,
-  stepNumber: number,
-  onStepContextMenu?: () => mixed,
-|}
+type Props = {
+  stepId: StepIdType
+  stepNumber: number
+  onStepContextMenu?: () => mixed
+}
 
-const nonePressed = (keysPressed: Array<boolean>): boolean =>
+const nonePressed = (keysPressed: boolean[]): boolean =>
   keysPressed.every(keyPress => keyPress === false)
 
 const getUserOS = () => new UAParser().getOS().name
 
 const getMouseClickKeyInfo = (
   event: SyntheticMouseEvent<>
-): {| isShiftKeyPressed: boolean, isMetaKeyPressed: boolean |} => {
+): { isShiftKeyPressed: boolean; isMetaKeyPressed: boolean } => {
   const isMac: boolean = getUserOS() === 'Mac OS'
   const isShiftKeyPressed: boolean = event.shiftKey
   const isMetaKeyPressed: boolean =
@@ -108,10 +108,8 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const highlightSubstep = (payload: SubstepIdentifier) =>
     dispatch(stepsActions.hoverOnSubstep(payload))
   const selectStep = () => dispatch(stepsActions.selectStep(stepId))
-  const selectMultipleSteps = (
-    steps: Array<StepIdType>,
-    lastSelected: StepIdType
-  ) => dispatch(stepsActions.selectMultipleSteps(steps, lastSelected))
+  const selectMultipleSteps = (steps: StepIdType[], lastSelected: StepIdType) =>
+    dispatch(stepsActions.selectMultipleSteps(steps, lastSelected))
   const toggleStepCollapsed = () =>
     dispatch(stepsActions.toggleStepCollapsed(stepId))
   const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
@@ -119,7 +117,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
 
   const handleStepItemSelection = (event: SyntheticMouseEvent<>): void => {
     const { isShiftKeyPressed, isMetaKeyPressed } = getMouseClickKeyInfo(event)
-    let stepsToSelect: Array<StepIdType> = []
+    let stepsToSelect: StepIdType[] = []
 
     // if user clicked on the last multi-selected step, shift/meta keys don't matter
     const toggledLastSelected = stepId === lastMultiSelectedStepId
@@ -240,11 +238,11 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   )
 }
 export function getMetaSelectedSteps(
-  multiSelectItemIds: Array<StepIdType> | null,
+  multiSelectItemIds: StepIdType[] | null,
   stepId: StepIdType,
   selectedStepId: StepIdType | null
-): Array<StepIdType> {
-  let stepsToSelect: Array<StepIdType> = []
+): StepIdType[] {
+  let stepsToSelect: StepIdType[] = []
   if (multiSelectItemIds?.length) {
     // already have a selection, add/remove the meta-clicked item
     stepsToSelect = multiSelectItemIds.includes(stepId)
@@ -270,7 +268,7 @@ function getShiftSelectedSteps(
   multiSelectItemIds,
   lastMultiSelectedStepId
 ) {
-  let stepsToSelect: Array<StepIdType>
+  let stepsToSelect: StepIdType[]
   if (selectedStepId) {
     stepsToSelect = getOrderedStepsInRange(
       selectedStepId,
@@ -310,7 +308,7 @@ function getShiftSelectedSteps(
 function getOrderedStepsInRange(
   lastSelectedStepId: StepIdType,
   stepId: StepIdType,
-  orderedStepIds: Array<StepIdType>
+  orderedStepIds: StepIdType[]
 ) {
   const prevIndex: number = orderedStepIds.indexOf(lastSelectedStepId)
   const currentIndex: number = orderedStepIds.indexOf(stepId)

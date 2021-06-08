@@ -10,12 +10,12 @@ import { FileSidebar } from '../components/FileSidebar'
 import { LiquidsSidebar } from '../components/LiquidsSidebar'
 import { SettingsSidebar } from '../components/SettingsPage'
 
-import type { BaseState } from '../types'
-import type { Page } from '../navigation'
+import { BaseState } from '../types'
+import { Page } from '../navigation'
 
 type Props = {
-  page: Page,
-  liquidPlacementMode: boolean,
+  page: Page
+  liquidPlacementMode: boolean
 }
 
 function Sidebar(props: Props) {
@@ -38,7 +38,7 @@ function Sidebar(props: Props) {
   return null
 }
 
-function mapStateToProps(state: BaseState): $Exact<Props> {
+function mapStateToProps(state: BaseState): Props {
   const page = selectors.getCurrentPage(state)
   const liquidPlacementMode =
     labwareIngredSelectors.getSelectedLabwareId(state) != null
@@ -49,9 +49,9 @@ function mapStateToProps(state: BaseState): $Exact<Props> {
   }
 }
 
-export const ConnectedSidebar: React.AbstractComponent<{||}> = connect<
+export const ConnectedSidebar: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   _,
   _,
   _,

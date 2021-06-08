@@ -1,13 +1,13 @@
 import { $Diff } from 'utility-types'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import type { BaseState, ThunkDispatch } from '../types'
-import type { StepIdType } from '../form-types'
+import { BaseState, ThunkDispatch } from '../types'
+import { StepIdType } from '../form-types'
 import { actions as steplistActions } from '../steplist'
 import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { StepList } from '../components/steplist'
-type Props = React.ElementProps<typeof StepList>
+type Props = React.ComponentProps<typeof StepList>
 type SP = {
   orderedStepIds: Props['orderedStepIds']
   isMultiSelectMode: boolean | null | undefined
@@ -26,7 +26,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
     reorderSelectedStep: (delta: number) => {
       dispatch(stepsActions.reorderSelectedStep(delta))
     },
-    reorderSteps: (stepIds: Array<StepIdType>) => {
+    reorderSteps: (stepIds: StepIdType[]) => {
       dispatch(steplistActions.reorderSteps(stepIds))
     },
   }

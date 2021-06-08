@@ -3,15 +3,21 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import * as wellSelectionSelectors from '../top-selectors/well-contents'
-import { removeWellsContents } from '../labware-ingred/actions'
-import type { Dispatch } from 'redux'
-import type { BaseState } from '../types'
-import { IngredientsList as IngredientsListComponent } from '../components/IngredientsList'
-type Props = React.ElementProps<typeof IngredientsListComponent>
-type SP = $Diff<
+import {
+  removeWellsContents,
+  RemoveWellsContentsAction,
+} from '../labware-ingred/actions'
+import { Dispatch } from 'redux'
+import { BaseState } from '../types'
+import {
+  IngredientsList as IngredientsListComponent,
+  RemoveWellsContents,
+} from '../components/IngredientsList'
+type Props = React.ComponentProps<typeof IngredientsListComponent>
+type SP = Omit<
   Props,
   {
-    removeWellsContents: any
+    removeWellsContents: RemoveWellsContents
   }
 > & {
   _labwareId: string | null | undefined

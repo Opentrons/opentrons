@@ -22,6 +22,7 @@ import * as dismissSelectors from '../../dismiss/selectors.js'
 import * as uiStepSelectors from '../../ui/steps/selectors.js'
 import * as fileDataSelectors from '../../file-data/selectors/index.js'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
+import { StoreType } from '../../configureStore'
 
 jest.mock('ua-parser-js')
 jest.mock('../../step-forms/selectors/index.js')
@@ -32,26 +33,51 @@ jest.mock('../../ui/steps/selectors.js')
 jest.mock('../../labware-ingred/selectors')
 jest.mock('../../feature-flags/selectors')
 
-const getSavedStepFormsMock = stepFormSelectors.getSavedStepForms
-const getOrderedStepIdsMock = stepFormSelectors.getOrderedStepIds
-const getArgsAndErrorsByStepIdMock = stepFormSelectors.getArgsAndErrorsByStepId
-const getCurrentFormIsPresavedMock = stepFormSelectors.getCurrentFormIsPresaved
-const getCurrentFormHasUnsavedChangesMock =
-  stepFormSelectors.getCurrentFormHasUnsavedChanges
-const getBatchEditFormHasUnsavedChangesMock =
-  stepFormSelectors.getBatchEditFormHasUnsavedChanges
-const getHasTimelineWarningsPerStepMock =
-  timelineWarningSelectors.getHasTimelineWarningsPerStep
-const getHasFormLevelWarningsPerStepMock =
-  dismissSelectors.getHasFormLevelWarningsPerStep
-const getCollapsedStepsMock = uiStepSelectors.getCollapsedSteps
-const getSelectedStepIdMock = uiStepSelectors.getSelectedStepId
-const getMultiSelectLastSelectedMock =
-  uiStepSelectors.getMultiSelectLastSelected
-const getMultiSelectItemIdsMock = uiStepSelectors.getMultiSelectItemIds
-const getSubstepsMock = fileDataSelectors.getSubsteps
-const getErrorStepId = fileDataSelectors.getErrorStepId
-const getIsMultiSelectModeMock = uiStepSelectors.getIsMultiSelectMode
+const getSavedStepFormsMock = stepFormSelectors.getSavedStepForms as jest.MockedFunction<
+  typeof stepFormSelectors.getSavedStepForms
+>
+const getOrderedStepIdsMock = stepFormSelectors.getOrderedStepIds as jest.MockedFunction<
+  typeof stepFormSelectors.getOrderedStepIds
+>
+const getArgsAndErrorsByStepIdMock = stepFormSelectors.getArgsAndErrorsByStepId as jest.MockedFunction<
+  typeof stepFormSelectors.getArgsAndErrorsByStepId
+>
+const getCurrentFormIsPresavedMock = stepFormSelectors.getCurrentFormIsPresaved as jest.MockedFunction<
+  typeof stepFormSelectors.getCurrentFormIsPresaved
+>
+const getCurrentFormHasUnsavedChangesMock = stepFormSelectors.getCurrentFormHasUnsavedChanges as jest.MockedFunction<
+  typeof stepFormSelectors.getCurrentFormHasUnsavedChanges
+>
+const getBatchEditFormHasUnsavedChangesMock = stepFormSelectors.getBatchEditFormHasUnsavedChanges as jest.MockedFunction<
+  typeof stepFormSelectors.getBatchEditFormHasUnsavedChanges
+>
+const getHasTimelineWarningsPerStepMock = timelineWarningSelectors.getHasTimelineWarningsPerStep as jest.MockedFunction<
+  typeof timelineWarningSelectors.getHasTimelineWarningsPerStep
+>
+const getHasFormLevelWarningsPerStepMock = dismissSelectors.getHasFormLevelWarningsPerStep as jest.MockedFunction<
+  typeof dismissSelectors.getHasFormLevelWarningsPerStep
+>
+const getCollapsedStepsMock = uiStepSelectors.getCollapsedSteps as jest.MockedFunction<
+  typeof uiStepSelectors.getCollapsedSteps
+>
+const getSelectedStepIdMock = uiStepSelectors.getSelectedStepId as jest.MockedFunction<
+  typeof uiStepSelectors.getSelectedStepId
+>
+const getMultiSelectLastSelectedMock = uiStepSelectors.getMultiSelectLastSelected as jest.MockedFunction<
+  typeof uiStepSelectors.getMultiSelectLastSelected
+>
+const getMultiSelectItemIdsMock = uiStepSelectors.getMultiSelectItemIds as jest.MockedFunction<
+  typeof uiStepSelectors.getMultiSelectItemIds
+>
+const getSubstepsMock = fileDataSelectors.getSubsteps as jest.MockedFunction<
+  typeof fileDataSelectors.getSubsteps
+>
+const getErrorStepId = fileDataSelectors.getErrorStepId as jest.MockedFunction<
+  typeof fileDataSelectors.getErrorStepId
+>
+const getIsMultiSelectModeMock = uiStepSelectors.getIsMultiSelectMode as jest.MockedFunction<
+  typeof uiStepSelectors.getIsMultiSelectMode
+>
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
@@ -65,7 +91,7 @@ const mockClickEvent = {
 }
 
 describe('ConnectedStepItem', () => {
-  let store
+  let store: StoreType
   beforeEach(() => {
     store = mockStore()
 
@@ -122,7 +148,7 @@ describe('ConnectedStepItem', () => {
     resetAllWhenMocks()
   })
 
-  const render = props =>
+  const render = (props: SP) =>
     mount(
       <Provider store={store}>
         <ConnectedStepItem {...props} />
