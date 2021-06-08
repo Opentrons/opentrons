@@ -17,7 +17,7 @@ import modalStyles from './modal.css'
 import styles from './MoreOptionsModal.css'
 
 type OP = {
-  close: (event: SyntheticEvent | null | undefined<>) => mixed,
+  close: (event: SyntheticEvent<> | null | undefined) => mixed,
   formData: FormData,
 }
 
