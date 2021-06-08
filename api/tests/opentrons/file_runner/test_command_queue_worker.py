@@ -67,7 +67,7 @@ async def test_play_no_pending(
     store.commands.get_next_request.return_value = None
 
     subject.play()
-    await subject.wait_terminated()
+    await subject.wait_to_be_idle()
 
     protocol_engine.execute_command.assert_not_called()
 
@@ -80,7 +80,7 @@ async def test_play(
 ) -> None:
     """It should cycle through pending commands and execute them."""
     subject.play()
-    await subject.wait_terminated()
+    await subject.wait_to_be_idle()
 
     expected_call_args_list = [call(command_id=str(c), request=c) for c in commands]
 
@@ -103,7 +103,7 @@ async def test_pause(
     protocol_engine.execute_command.side_effect = mock_execute_command
 
     subject.play()
-    await subject.wait_terminated()
+    await subject.wait_to_be_idle()
 
     # Only first command was executed.
     protocol_engine.execute_command.assert_called_once_with(
@@ -114,7 +114,7 @@ async def test_pause(
     protocol_engine.execute_command.reset_mock()
 
     subject.play()
-    await subject.wait_terminated()
+    await subject.wait_to_be_idle()
 
     expected_call_args_list = [call(command_id=str(c), request=c) for c in commands[1:]]
 

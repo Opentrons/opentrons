@@ -55,26 +55,34 @@ class CommandQueueWorker:
             # that we haven't yet seen.
             self._task = None
 
-    async def wait_terminated(self) -> None:
-        """Wait until this `CommandQueueWorker` has stopped executing new commands.
+            self._keep_running = False
 
-        Execution will stop when any of the following happen:
+    async def wait_to_be_idle(self) -> None:
+        """Wait until this `CommandQueueWorker` is idle.
+        
+        This means:
+        
+        * No command is currently executing on the `ProtocolEngine`.
+        * No commands are scheduled for execution in the future, and none will be
+          scheduled without further action from you.
 
-          * A command raises an error.
-          * The queue of commands in the `ProtocolEngine` runs empty.
+        A `CommandQueueWorker` can reach an idle state when either of the following
+        happen:
+
+          * The `ProtocolEngine` reports no more commands in the queue, stopping the
+            `CommandQueueWorker` automatically.
             (Execution will not automatically resume if more commands are then added.)
-          * You call `stop`.
+          * You manually stop the `CommandQueueWorker` with `stop`.
 
         If a command is currently executing, this method will return after that command
         finishes.
 
+        If an exception happened while executing commands, it will be raised from this
+        call.
+
         When you're finished with a `CommandQueueWorker`, you must call this method on
         it. This gives it a chance to clean up its background task, and propagate any
         errors.
-
-        Raises:
-            ProtocolEngineError: If there was a problem executing one of the commands
-                in the queue.
         """
         if self._task:
             await self._task
